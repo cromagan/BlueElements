@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CE8BE078-DDAE-47F5-AAA9-685564B898C9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BlueDatabase</RootNamespace>
+    <AssemblyName>BlueDatabase</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CellCollection.cs" />
+    <Compile Include="CellItem.cs" />
+    <Compile Include="ColumnCollection.cs" />
+    <Compile Include="ColumnItem.cs" />
+    <Compile Include="ColumnViewCollection.cs" />
+    <Compile Include="ColumnViewItem.cs" />
+    <Compile Include="Database.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Enums\enAction.cs" />
+    <Compile Include="Enums\enFilterType.cs" />
+    <Compile Include="Enums\enShortenStyle.cs" />
+    <Compile Include="Enums\enValueType.cs" />
+    <Compile Include="Enums\enVerwaisteDaten.cs" />
+    <Compile Include="Enums\enJoinTyp.cs" />
+    <Compile Include="Enums\enColumnLineStyle.cs" />
+    <Compile Include="Enums\enEditTypeFormula.cs" />
+    <Compile Include="Enums\enEditTypeTable.cs" />
+    <Compile Include="Enums\enExportTyp.cs" />
+    <Compile Include="Enums\enAnsicht.cs" />
+    <Compile Include="Enums\enImageNotFound.cs" />
+    <Compile Include="Enums\enNeededColumns.cs" />
+    <Compile Include="Enums\enFirstRow.cs" />
+    <Compile Include="Enums\enNeededText.cs" />
+    <Compile Include="Enums\enRoutinen.cs" />
+    <Compile Include="Enums\enDatabaseDataType.cs" />
+    <Compile Include="Enums\enViewType.cs" />
+    <Compile Include="Enums\enÜberschriftAnordnung.cs" />
+    <Compile Include="EventArgs\BeforeNewValueEventArgs.cs" />
+    <Compile Include="EventArgs\CellCancelEventArgs.cs" />
+    <Compile Include="EventArgs\CellEventArgs.cs" />
+    <Compile Include="EventArgs\ColumnEventArgs.cs" />
+    <Compile Include="EventArgs\DatabaseChangedEventArgs.cs" />
+    <Compile Include="EventArgs\DatabaseGiveBackEventArgs.cs" />
+    <Compile Include="EventArgs\DoRowAutomaticEventArgs.cs" />
+    <Compile Include="EventArgs\ExternalEditLockReasonEventArgs.cs" />
+    <Compile Include="EventArgs\FilterEventArgs.cs" />
+    <Compile Include="EventArgs\KeyChangedEventArgs.cs" />
+    <Compile Include="EventArgs\RowCancelEventArgs.cs" />
+    <Compile Include="EventArgs\RowCheckedEventArgs.cs" />
+    <Compile Include="EventArgs\RowEventArgs.cs" />
+    <Compile Include="Export.cs" />
+    <Compile Include="ExportDefinition.cs" />
+    <Compile Include="FilterCollection.cs" />
+    <Compile Include="FilterItem.cs" />
+    <Compile Include="RowCollection.cs" />
+    <Compile Include="RowItem.cs" />
+    <Compile Include="RowSortDefinition.cs" />
+    <Compile Include="RuleActionItem.cs" />
+    <Compile Include="RuleItem.cs" />
+    <Compile Include="WorkItem.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Database.resx">
+      <DependentUpon>Database.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj">
+      <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
+      <Name>BlueBasics</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

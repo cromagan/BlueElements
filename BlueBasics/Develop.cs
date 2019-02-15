@@ -1,0 +1,367 @@
+﻿using BlueBasics.Enums;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Threading;
+using static BlueBasics.FileOperations;
+
+namespace BlueBasics
+{
+    public static class Develop
+    {
+        private static readonly object _SyncLockObject = new object();
+
+        private static string _LastDebugMessage = string.Empty;
+        private static DateTime _LastDebugTime = DateTime.Now;
+        private static string _CurrentTraceLogFile = string.Empty;
+        private static TextWriterTraceListener _TraceListener;
+        private static bool _DeleteTraceLog = true;
+        private static bool _IsTraceLogging;
+        private static bool _ServiceStarted;
+
+
+        public static bool IsDevelopment()
+        {
+            if (IsHostRunning()) { return true; }
+            return System.Windows.Forms.Application.StartupPath.ToLower().Contains("\\bin\\") && modAllgemein.UserName().ToLower() == "k0012794";
+        }
+
+        public static bool IsHostRunning()
+        {
+            return Debugger.IsAttached;
+        }
+
+        public static void TraceLogging_End()
+        {
+            if (!string.IsNullOrEmpty(_CurrentTraceLogFile))
+            {
+                // Trace-Log soll umgeleitet werden
+                Trace.WriteLine("    </table>");
+                Trace.WriteLine("  </body>");
+                Trace.WriteLine(" </html>");
+                Trace.Listeners.Remove(_TraceListener);
+                _TraceListener.Flush();
+                _TraceListener.Close();
+                _TraceListener.Dispose();
+                _TraceListener = null;
+                if (_DeleteTraceLog && FileExists(_CurrentTraceLogFile)) { File.Delete(_CurrentTraceLogFile); }
+            }
+
+            _CurrentTraceLogFile = "";
+            _DeleteTraceLog = true;
+        }
+
+
+        public static void TraceLogging_Start(string TraceFileName)
+        {
+            TraceLogging_End();
+            _DeleteTraceLog = true;
+            if (FileExists(_CurrentTraceLogFile)) { File.Delete(_CurrentTraceLogFile); }
+
+            _CurrentTraceLogFile = TempFile(TraceFileName);
+            _TraceListener = new TextWriterTraceListener(_CurrentTraceLogFile);
+            Trace.Listeners.Add(_TraceListener);
+            Trace.AutoFlush = true;
+            Trace.WriteLine("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
+            Trace.WriteLine("\"http://www.w3.org/TR/html4/strict.dtd\">");
+            Trace.WriteLine("<html>");
+            Trace.WriteLine("  <head>");
+            Trace.WriteLine("    <title>Tracelog</title>");
+            Trace.WriteLine("  </head>");
+            Trace.WriteLine("<body>");
+            Trace.WriteLine("  <Font face=\"Arial\" Size=\"2\">");
+            Trace.WriteLine("  <table border=\"1\" cellspacing=\"1\" cellpadding=\"1\" align=\"left\">");
+        }
+
+        public static void AbortExe()
+        {
+            // http://geekswithblogs.net/mtreadwell/archive/2004/06/06/6123.aspx
+            Environment.Exit(-1);
+            System.Windows.Forms.Application.Exit();
+        }
+
+
+        public static string AppName()
+        {
+            try
+            {
+                var ex_a = Assembly.GetEntryAssembly();
+                return ex_a.GetName().Name;
+            }
+            catch
+            {
+                return "Programm von Christian Peter";
+            }
+        }
+
+        public static string AppExe()
+        {
+            return System.Windows.Forms.Application.StartupPath + "\\" + AppName() + ".exe";
+        }
+
+        public static void HTML_AddFoot(List<string> l)
+        {
+            l.Add("  </body>");
+            l.Add("</html>");
+        }
+
+        public static void HTML_AddHead(List<string> l, string Title)
+        {
+            l.Add("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
+            l.Add("\"http://www.w3.org/TR/html4/strict.dtd\">");
+            l.Add("<html>");
+            l.Add("  <head>");
+            l.Add("    <title>" + Title + "</title>");
+            l.Add("  </head>");
+            l.Add("<body>");
+        }
+
+        public static void DebugPrint(string Warnung)
+        {
+            DebugPrint(enFehlerArt.Warnung, Warnung);
+        }
+
+        public static void DebugPrint(enFehlerArt Art, Exception ex)
+        {
+            if (Art != enFehlerArt.Info && Art != enFehlerArt.DevelopInfo && IsDevelopment()) { Debugger.Break(); }
+            DebugPrint(Art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message);
+        }
+
+        public static void DebugPrint(Exception Warnung)
+        {
+            DebugPrint(enFehlerArt.Warnung, Warnung);
+        }
+
+        public static void DebugPrint_RoutineMussUeberschriebenWerden()
+        {
+            if (IsDevelopment()) { Debugger.Break(); }
+            DebugPrint(enFehlerArt.Warnung, "Diese Funktion muss noch überschrieben werden.");
+        }
+
+        public static void DebugPrint_NichtImplementiert()
+        {
+            if (IsDevelopment()) { Debugger.Break(); }
+            DebugPrint(enFehlerArt.Fehler, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
+        }
+
+        public static void DebugPrint(object _Enum)
+        {
+            DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + _Enum.GetType().FullName + "\r\nParameter: " + _Enum);
+        }
+
+        public static void DebugPrint_MissingCommand(string comand)
+        {
+            DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + comand);
+        }
+
+        public static void DebugPrint(enFehlerArt Art, string Meldung)
+        {
+            lock (_SyncLockObject)
+            {
+
+                if (_IsTraceLogging) { return; }
+                _IsTraceLogging = true;
+
+
+
+                if (Art == enFehlerArt.Fehler) { _LastDebugMessage = string.Empty; }
+
+                if (DateTime.Now.Subtract(_LastDebugTime).TotalSeconds > 5) { _LastDebugMessage = string.Empty; }
+
+                var net = Art + (";" + Meldung);
+                if (net == _LastDebugMessage)
+                {
+                    _IsTraceLogging = false;
+                    return;
+                }
+
+                _LastDebugMessage = net;
+                _LastDebugTime = DateTime.Now;
+                var First = true;
+                var tmp = _CurrentTraceLogFile;
+                var strace = new StackTrace(true);
+                var Nr = 100;
+                List<string> l = null;
+                Trace.WriteLine("<tr>");
+
+                switch (Art)
+                {
+                    case enFehlerArt.DevelopInfo:
+                        if (!IsDevelopment())
+                        {
+                            _IsTraceLogging = false;
+                            return;
+                        }
+
+                        Trace.WriteLine("<th><font size = 3>Runtime-Info");
+                        Nr = 5;
+                        break;
+
+                    case enFehlerArt.Info:
+                        Trace.WriteLine("<th><font size = 3>Info");
+                        Nr = 5;
+                        break;
+
+                    case enFehlerArt.Warnung:
+                        if (IsDevelopment()) { Debugger.Break(); }
+
+                        Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
+                        _DeleteTraceLog = false;
+                        break;
+
+                    case enFehlerArt.Fehler:
+                        if (IsDevelopment()) { Debugger.Break(); }
+
+                        if (!FileExists(tmp)) { l = new List<string>(); }
+
+                        Trace.WriteLine("<th><font color =FF0000>Fehler<font color =000000>");
+                        _DeleteTraceLog = false;
+                        break;
+
+                    default:
+                        Trace.WriteLine("<th>?");
+                        _DeleteTraceLog = false;
+                        break;
+                }
+
+                Trace.WriteLine("<br>" + DateTime.Now.Hour.Nummer(2) + ":" + DateTime.Now.Minute.Nummer(2) + ":" + DateTime.Now.Second.Nummer(2) + "." + DateTime.Now.Millisecond.Nummer(4) + "<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
+                Trace.WriteLine("<th ALIGN=LEFT>");
+                for (var z = 0 ; z <= Math.Min(Nr + 2, strace.FrameCount - 2) ; z++)
+                {
+                    if (!strace.GetFrame(z).GetMethod().Name.Contains("DebugPrint"))
+                    {
+                        if (First) { Trace.WriteLine("<font color =0000FF>"); }
+                        Trace.WriteLine("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
+
+                        l?.Add("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
+
+                        if (First) { Trace.WriteLine("<font color =000000>"); }
+                        First = false;
+                    }
+
+                }
+
+                Meldung = Meldung.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes();
+                Trace.WriteLine("</th><th ALIGN=LEFT><font size = 3>" + Meldung + "</th>");
+
+                Trace.WriteLine("</tr>");
+                if (Art == enFehlerArt.Fehler)
+                {
+                    TraceLogging_End();
+                    var endl = new List<string>();
+                    HTML_AddHead(endl, "Beenden...");
+                    endl.Add("<center>");
+                    endl.Add("<font size = 10>");
+                    endl.Add("Entschuldigen Sie bitte...<br><font size =5><br>");
+                    endl.Add("Das Programm <b>" + AppName() + "</b> musste beendet werden.<br>");
+                    endl.Add("<br>");
+                    endl.Add("<u><b>Grund:</u></b><br>");
+                    endl.Add(Meldung);
+                    endl.Add("<br>");
+                    endl.Add("<font size = 1>");
+                    endl.Add("Datum: " + DateTime.Now);
+                    if (FileExists(tmp))
+                    {
+                        endl.Add("<br>");
+                        endl.Add("<a href=\"file://" + tmp + "\">Tracelog öffnen</a>");
+                    }
+                    else
+                    {
+                        endl.AddRange(l);
+                    }
+
+                    HTML_AddFoot(endl);
+                    endl.Save(TempFile("", "Endmeldung", "html"), true);
+                    AbortExe();
+                    return;
+                }
+
+                _IsTraceLogging = false;
+            }
+        }
+
+
+        public static bool IsRunning()
+        {
+            return Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
+        }
+
+        public static void DoEvents()
+        {
+            System.Windows.Forms.Application.DoEvents();
+        }
+
+        public static void Debugprint_BackgroundThread()
+        {
+            if (!Thread.CurrentThread.IsBackground) { return; }
+
+            DebugPrint(enFehlerArt.Warnung, "Totes Fenster!");
+        }
+
+        public static void DebugPrint_Disposed(bool disposedValue)
+        {
+            if (!disposedValue) { return; }
+            if (IsDevelopment()) { Debugger.Break(); }
+            DebugPrint(enFehlerArt.Fehler, "Das Objekt wurde zur Laufzeit verworfen.");
+        }
+
+        public static void DebugPrint_InvokeRequired(bool InvokeRequired, bool Fehler)
+        {
+            if (!InvokeRequired) { return; }
+            if (IsDevelopment()) { Debugger.Break(); }
+
+
+            if (Fehler)
+            {
+                DebugPrint(enFehlerArt.Fehler, "Es wird von einem Unterthread zugegriffen.");
+            }
+            else
+            {
+                DebugPrint(enFehlerArt.Warnung, "Es wird von einem Unterthread zugegriffen.");
+
+            }
+        }
+
+        public static void CheckStackForOverflow()
+        {
+            var stackTrace = new StackTrace();
+            if (stackTrace.GetFrames().GetUpperBound(0) > 300)
+            {
+                DebugPrint(enFehlerArt.Fehler, "Stack-Overflow abgefangen!");
+            }
+
+        }
+
+        public static void StartService()
+        {
+            if (_ServiceStarted) { return; }
+
+            _ServiceStarted = true;
+            var ci = new CultureInfo("de-DE");
+            ci.NumberFormat.CurrencyGroupSeparator = "";
+            ci.NumberFormat.NumberGroupSeparator = "";
+            ci.NumberFormat.PercentGroupSeparator = "";
+            ci.NumberFormat.NumberDecimalSeparator = ",";
+            System.Windows.Forms.Application.CurrentCulture = ci;
+            TraceLogging_Start(TempFile("", AppName() + "-Trace.html"));
+
+            var Check = new System.Windows.Forms.Timer();
+            Check.Tick += CloseAtNight;
+            Check.Interval = 60000;
+            Check.Enabled = true;
+        }
+
+        private static void CloseAtNight(object sender, System.EventArgs e)
+        {
+            if (DateTime.Now.Hour == 4)
+            {
+                if (IsDevelopment()) { return; }
+                DebugPrint(enFehlerArt.Fehler, "Das Programm wird um 4:00 Uhr automatisch geschlossen.");
+            }
+        }
+    }
+}

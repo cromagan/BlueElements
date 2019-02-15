@@ -1,0 +1,771 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueControls.Controls;
+using BlueControls.DialogBoxes;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.ItemCollection.ItemCollectionList;
+using BlueDatabase;
+using BlueDatabase.Enums;
+
+namespace BlueControls.BlueDatabaseDialogs
+{
+
+
+    internal sealed partial class DatabaseHeadEditor
+    {
+        private readonly Database _Database;
+
+
+
+        private bool frmHeadEditor_FormClosing_isin;
+
+        private bool IgnoreAll;
+
+        public DatabaseHeadEditor(Database cDatabase)
+        {
+
+            // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+            InitializeComponent();
+
+            _Database = cDatabase;
+
+        }
+
+
+
+
+
+        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            if (IgnoreAll) { return; }
+            if (_Database.ReadOnly) { return; }
+
+            if (frmHeadEditor_FormClosing_isin) { return; }
+            frmHeadEditor_FormClosing_isin = true;
+
+
+
+            // Rules, die 1.
+            var NewRules = new ListExt<RuleItem>();
+            foreach (var ThisItem in lbxRuleSelector.Item)
+            {
+                var Rule = (RuleItem)((ObjectListItem)ThisItem).ObjectReadable;
+                NewRules.Add((RuleItem)Rule.Clone());
+            }
+
+
+            if (!Database.AllRulesOK(NewRules))
+            {
+                if (MessageBox.Show("Es sind <b>fehlerhafte Regeln</b> vorhanden, diese werden <b>gelöscht</b>.<br><br>Wollen sie fortfahren?", enImageCode.Warnung, "Ja", "Nein") != 0)
+                {
+                    e.Cancel = true;
+                    frmHeadEditor_FormClosing_isin = false;
+                    return;
+                }
+            }
+
+
+            _Database.GlobalShowPass = txbKennwort.Text;
+            _Database.Caption = txbCaption.Text;
+
+
+
+            if (tbxUndoAnzahl.Text.IsLong())
+            {
+                _Database.UndoCount = Math.Max(int.Parse(tbxUndoAnzahl.Text), 5);
+            }
+            else
+            {
+                _Database.UndoCount = 5;
+            }
+
+
+
+            if (tbxReloadVerzoegerung.Text.IsLong())
+            {
+                _Database.ReloadDelaySecond = Math.Max(int.Parse(tbxReloadVerzoegerung.Text), 5);
+            }
+            else
+            {
+                _Database.ReloadDelaySecond = 5;
+            }
+
+
+            if (tbxTags.Text != _Database.Tags.JoinWithCr())
+            {
+                _Database.Tags.Clear();
+                _Database.Tags.AddRange(tbxTags.Text.SplitByCR());
+            }
+
+
+            var l = lstBinary.Item.GetNamedBinaries();
+            if (l.IsDifferentTo(_Database.Bins))
+            {
+                _Database.Bins.Clear();
+                _Database.Bins.AddRange(l);
+            }
+
+
+            if (DatenbankAdmin.Item.ToListOfString().IsDifferentTo(_Database.DatenbankAdmin))
+            {
+                _Database.DatenbankAdmin.Clear();
+                _Database.DatenbankAdmin.AddRange(DatenbankAdmin.Item.ToListOfString());
+            }
+
+
+            if (PermissionGroups_NewRow.Item.ToListOfString().IsDifferentTo(_Database.PermissionGroups_NewRow))
+            {
+                _Database.PermissionGroups_NewRow.Clear();
+                _Database.PermissionGroups_NewRow.AddRange(PermissionGroups_NewRow.Item.ToListOfString());
+                _Database.PermissionGroups_NewRow.Remove("#Administrator");
+            }
+
+            _Database.JoinTyp = (enJoinTyp)int.Parse(cbxJoinTyp.Text);
+            _Database.VerwaisteDaten = (enVerwaisteDaten)int.Parse(cbxVerwaisteDaten.Text);
+            _Database.Skin = int.Parse(cbxBevorzugtesSkin.Text);
+            _Database.Ansicht = (enAnsicht)int.Parse(cbxAnsicht.Text);
+
+            _Database.SortDefinition = new RowSortDefinition(_Database, lbxSortierSpalten.Item.ToListOfString().ToArray(), btnSortRichtung.Checked);
+
+            // Regeln --------------
+            RepairNewRules(NewRules);
+
+            if (NewRules.IsDifferentTo(_Database.Rules))
+            {
+                _Database.Rules.Clear();
+                _Database.Rules.AddRange(NewRules);
+                RepairNewRules(_Database.Rules); // sollte umsonst sein
+            }
+
+
+
+            // Export ------------
+            var NewExports = new List<ExportDefinition>();
+            foreach (var ThisItem in ExportSets.Item)
+            {
+                NewExports.Add((ExportDefinition)((ObjectListItem)ThisItem).ObjectReadable);
+            }
+
+            if (NewExports.IsDifferentTo(_Database._Export))
+            {
+                _Database._Export.Clear();
+                _Database._Export.AddRange(NewExports);
+            }
+            _Database.AddPending(enDatabaseDataType.AutoExport, -1, _Database._Export.ToString(true), false);
+
+        }
+
+
+        protected override void OnLoad(System.EventArgs e)
+        {
+            base.OnLoad(e);
+
+
+            cbxJoinTyp.Item.Clear();
+            cbxJoinTyp.Item.AddRange(typeof(enJoinTyp));
+            cbxJoinTyp.Text = Convert.ToInt32(_Database.JoinTyp).ToString();
+
+            cbxVerwaisteDaten.Item.Clear();
+            cbxVerwaisteDaten.Item.AddRange(typeof(enVerwaisteDaten));
+            cbxVerwaisteDaten.Text = Convert.ToInt32(_Database.VerwaisteDaten).ToString();
+
+            cbxBevorzugtesSkin.Item.Clear();
+            cbxBevorzugtesSkin.Item.AddRange(typeof(enSkin));
+            cbxBevorzugtesSkin.Text = Convert.ToInt32(_Database.Skin).ToString();
+
+            cbxAnsicht.Item.Clear();
+            cbxAnsicht.Item.AddRange(typeof(enAnsicht));
+            cbxAnsicht.Text = Convert.ToInt32(_Database.Ansicht).ToString();
+
+
+            PermissionGroups_NewRow.Item.Clear();
+            PermissionGroups_NewRow.Item.AddRange(_Database.PermissionGroups_NewRow);
+
+            DatenbankAdmin.Item.Clear();
+            DatenbankAdmin.Item.AddRange(_Database.DatenbankAdmin);
+
+
+
+            txbKennwort.Text = _Database.GlobalShowPass;
+
+
+
+            lbxSortierSpalten.Item.Clear();
+            if (_Database.SortDefinition != null)
+            {
+                btnSortRichtung.Checked = _Database.SortDefinition.Reverse;
+
+                if (_Database.SortDefinition.Columns != null)
+                {
+                    foreach (var ThisColumn in _Database.SortDefinition.Columns)
+                    {
+                        if (ThisColumn != null) { lbxSortierSpalten.Item.Add(ThisColumn); }
+                    }
+                }
+            }
+
+
+            tbxTags.Text = _Database.Tags.JoinWithCr();
+            // Rules ----------------------------------------
+            lbxRuleSelector.Item.Clear();
+
+            foreach (var ThisRule in _Database.Rules)
+            {
+                if (ThisRule != null)
+                {
+                    var obj = new ObjectListItem(ThisRule);
+                    obj.Enabled = string.IsNullOrEmpty(ThisRule.SystemKey);
+                    lbxRuleSelector.Item.Add(obj);
+                }
+            }
+
+            //  Enable_Rule_Controls()
+
+
+
+
+            // Exports ----------------
+            ExportSets.Item.Clear();
+
+            foreach (var ThisSet in _Database._Export)
+            {
+                if (ThisSet != null)
+                {
+                    ExportSets.Item.Add(new ObjectListItem(ThisSet));
+                }
+            }
+            ExportSets.Item.Sort();
+
+            // -----------------------------
+
+            txbCaption.Text = _Database.Caption;
+            tbxReloadVerzoegerung.Text = _Database.ReloadDelaySecond.ToString();
+
+            tbxUndoAnzahl.Text = _Database.UndoCount.ToString();
+
+            PermissionGroups_NewRow.Suggestions.Clear();
+            PermissionGroups_NewRow.Suggestions.AddRange(_Database.Permission_AllUsed(true));
+
+
+            DatenbankAdmin.Suggestions.Clear();
+            DatenbankAdmin.Suggestions.AddRange(_Database.Permission_AllUsed(true));
+
+
+
+
+
+            lbxSortierSpalten.Suggestions.Clear();
+            foreach (var ThisColumnItem in _Database.Column)
+            {
+                if (ThisColumnItem != null) { lbxSortierSpalten.Suggestions.Add(ThisColumnItem); }
+            }
+
+
+
+            GenerateUndoTabelle();
+
+
+            lstBinary.Item.Clear();
+            lstBinary.Item.AddRange(_Database.Bins);
+
+            CryptStatus();
+
+            GenerateInfoText();
+        }
+
+
+        private void OkBut_Click(object sender, System.EventArgs e)
+        {
+            Close();
+        }
+
+
+        private void GenerateInfoText()
+        {
+            var t = "<b>Datei:</b><tab>" + _Database.Filename + "<br>";
+            t = t + "<b>Zeilen:</b><tab>" + (_Database.Row.Count() - 1);
+            capInfo.Text = t.TrimEnd("<br>");
+        }
+
+
+
+
+        #region  Export 
+
+        private void ExportSets_Add_Clicked(object sender, AllreadyHandledEventArgs e)
+        {
+            e.AlreadyHandled = true;
+
+            var NewExportItem = new ObjectListItem(new ExportDefinition(_Database));
+            ExportSets.Item.Add(NewExportItem);
+            NewExportItem.Checked = true;
+
+        }
+
+        private void ExportSets_Item_CheckedChanged(object sender, System.EventArgs e)
+        {
+            if (ExportSets.Item.Checked().Count != 1)
+            {
+                ExportEditor.ObjectWithDialog = null;
+                return;
+            }
+
+            if (_Database.ReadOnly)
+            {
+                ExportEditor.ObjectWithDialog = null;
+                return;
+            }
+            var SelectedExport = (ExportDefinition)((ObjectListItem)ExportSets.Item.Checked()[0]).ObjectReadable;
+
+            ExportEditor.ObjectWithDialog = SelectedExport;
+        }
+
+
+
+
+
+        #endregion
+
+
+        #region  Regeln 
+
+
+        private void RuleSelector_Add_Clicked(object sender, AllreadyHandledEventArgs e)
+        {
+            e.AlreadyHandled = true;
+
+            var NewRuleItem = new ObjectListItem(new RuleItem(_Database));
+            lbxRuleSelector.Item.Add(NewRuleItem);
+            NewRuleItem.Checked = true;
+
+        }
+
+        private void RuleSelector_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
+        {
+            if (e.Tag == null) { return; }
+            e.UserMenu.Add(enContextMenuComands.Kopieren);
+        }
+
+        private void RuleSelector_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
+        {
+            switch (e.ClickedComand.Internal())
+            {
+                case "Kopieren":
+                    var ClickedRule = (RuleItem)((ObjectListItem)e.Tag).ObjectReadable;
+                    var NewRuleItem = new ObjectListItem((RuleItem)ClickedRule.Clone());
+                    lbxRuleSelector.Item.Add(NewRuleItem);
+                    NewRuleItem.Checked = true;
+                    break;
+
+                default:
+                    Develop.DebugPrint(e);
+                    break;
+            }
+        }
+
+
+        private void RuleSelector_Item_CheckedChanged(object sender, System.EventArgs e)
+        {
+            if (lbxRuleSelector.Item.Checked().Count != 1) { return; }
+            var SelectedRule = (RuleItem)((ObjectListItem)lbxRuleSelector.Item.Checked()[0]).ObjectReadable;
+            RuleItemEditor.ObjectWithDialog = SelectedRule;
+        }
+
+
+
+        private void RepairNewRules(ListExt<RuleItem> Rules)
+        {
+            Rules.Sort();
+            foreach (var thisRule in Rules)
+            {
+                if (thisRule != null)
+                {
+                    if (!thisRule.IsOk() || thisRule.IsNullOrEmpty())
+                    {
+                        Rules.Remove(thisRule);
+                        RepairNewRules(Rules);
+                        return;
+                    }
+                    thisRule.Repair();
+                }
+            }
+
+            Rules.Sort();
+        }
+
+
+        #endregion
+
+
+        private void ExportSets_Remove_Clicked(object sender, ListOfBasicListItemEventArgs e)
+        {
+
+            foreach (var ThisItemBasic in e.Items)
+            {
+                if (ThisItemBasic != null)
+                {
+                    var tempVar = (ExportDefinition)((ObjectListItem)ThisItemBasic).ObjectReadable;
+                    tempVar.DeleteAllBackups();
+                }
+            }
+
+        }
+
+
+
+        private void Bilder_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
+        {
+            if (e.Tag == null) { return; }
+            if (!(e.Tag is BitmapListItem)) { return; }
+            e.UserMenu.Add(enContextMenuComands.Umbenennen);
+        }
+
+
+        private void Bilder_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
+        {
+
+            if (e.Tag == null) { return; }
+
+            if (!(e.Tag is BitmapListItem)) { return; }
+
+            var l = (BitmapListItem)e.Tag;
+
+
+            switch (e.ClickedComand.Internal())
+            {
+                case "Umbenennen":
+                    var n = InputBox.Show("<b><u>Bild umbenennen:</u></b><br><br>Achtung! Dadruch können Bezüge<br> in Texten und Spalten verlorengehen!", l.Caption, enDataFormat.Text_Ohne_Kritische_Zeichen);
+                    if (!string.IsNullOrEmpty(n)) { l.Caption = n; }
+                    break;
+
+                default:
+                    Develop.DebugPrint(e);
+                    break;
+            }
+
+        }
+
+        private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e)
+        {
+            _Database.Column.GenerateOverView();
+        }
+
+        private void DateienSchlüssel_Click(object sender, System.EventArgs e)
+        {
+            btnDateiSchluessel.Enabled = false;
+            btnDateiSchluessel.Text = "Dateien in Arbeit";
+
+            var lLCase = _Database.AllConnectedFilesLCase();
+
+
+            string NewKey;
+
+            if (string.IsNullOrEmpty(_Database.FileEncryptionKey))
+
+            {
+                var random = new Random();
+                NewKey = new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyz äöü#_-<>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 10).Select(s => s[random.Next(s.Length)]).ToArray());
+                foreach (var ThisFile in lLCase)
+                {
+                    var b = modConverter.FileToByte(ThisFile);
+                    b = modAllgemein.SimpleCrypt(b, NewKey, 1);
+                    FileOperations.DeleteFile(ThisFile);
+                    modConverter.ByteToFile(ThisFile, b);
+                }
+            }
+
+            else
+            {
+                NewKey = string.Empty;
+                foreach (var ThisFile in lLCase)
+                {
+                    var b = modConverter.FileToByte(ThisFile);
+                    b = modAllgemein.SimpleCrypt(b, _Database.FileEncryptionKey, -1);
+                    FileOperations.DeleteFile(ThisFile);
+                    modConverter.ByteToFile(ThisFile, b);
+                }
+
+            }
+
+            _Database.FileEncryptionKey = NewKey;
+
+
+            btnDateiSchluessel.Enabled = true;
+            CryptStatus();
+
+        }
+
+        private void CryptStatus()
+        {
+
+            if (string.IsNullOrEmpty(_Database.FileEncryptionKey))
+            {
+                btnDateiSchluessel.Text = "Dateien verschlüsseln";
+                btnDateiSchluessel.QuickInfo = "Dazugehörige Dateien der Datenbank sind aktuell im Originalformat auf dem Laufwerk für jedem zugänglich.";
+            }
+            else
+            {
+                btnDateiSchluessel.Text = "Dateien freigeben";
+                btnDateiSchluessel.QuickInfo = "Dazugehörige Dateien der Datenbank sind aktuell verschlüsselt.";
+            }
+
+
+        }
+
+        private void FremdImport_Click(object sender, System.EventArgs e)
+        {
+            if (_Database.ReadOnly) { return; }
+
+            var en = new System.Windows.Forms.FormClosingEventArgs(System.Windows.Forms.CloseReason.None, false);
+
+            OnFormClosing(en);
+            if (en.Cancel) { return; }
+
+
+
+
+
+            string GetFromFile;
+            var openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            openFileDialog1.CheckFileExists = true;
+            openFileDialog1.Filter = "Datenbanken|*.mdb";
+            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                GetFromFile = openFileDialog1.FileName;
+            }
+            else
+            {
+                return;
+            }
+
+            var I = new ItemCollectionList();
+
+
+            I.Add(new TextListItem(((int)enDatabaseDataType.ColumnArrangement).ToString(), "Anordnungen der Spaltenansichten"));
+            I.Add(new TextListItem(((int)enDatabaseDataType.Views).ToString(), "Formulare"));
+            I.Add(new TextListItem(((int)enDatabaseDataType.Rules).ToString(), "Regeln"));
+            I.Add(new TextListItem(((int)enDatabaseDataType.UndoInOne).ToString(), "Undo-Speicher"));
+            I.Add(new TextListItem(((int)enDatabaseDataType.AutoExport).ToString(), "Auto-Export"));
+            I.Add(new TextListItem(((int)enDatabaseDataType.BinaryDataInOne).ToString(), "Binäre Daten im Kopf der Datenbank"));
+            I.Add(new TextListItem(((int)enDatabaseDataType.Layouts).ToString(), "Eingebettete Layouts"));
+            I.Add(new TextListItem(((int)enDatabaseDataType.Tags).ToString(), "Tags des Datenbankkopfes"));
+            I.Add(new TextListItem(((int)enDatabaseDataType.SortDefinition).ToString(), "Standard-Sortierung"));
+
+            I.Sort();
+
+            var What = InputBoxComboStyle.Show("Welchen Code:", I, false);
+
+            if (string.IsNullOrEmpty(What)) { return; }
+
+
+            var _tmp = File.ReadAllBytes(GetFromFile);
+
+            var B = new List<byte>();
+            B.AddRange(_tmp);
+
+
+
+            enDatabaseDataType Art = 0;
+            var Pointer = 0;
+            var ColKey = 0;
+            var RowKey = 0;
+            var X = 0;
+            var Y = 0;
+            var Inhalt = "";
+
+            var Such = (enDatabaseDataType)int.Parse(What);
+
+            do
+            {
+                if (Pointer >= B.Count) { break; }
+                _Database.Parse(B, ref Pointer, ref Art, ref ColKey, ref RowKey, ref Inhalt, ref X, ref Y);
+
+                if (Such == Art)
+                {
+                    _Database.AddPending(Art, -1, -1, "", Inhalt, true);
+
+                    MessageBox.Show("<b>Importiert:</b><br>" + Inhalt, enImageCode.Information, "OK");
+
+                }
+            } while (Art != enDatabaseDataType.EOF);
+
+            IgnoreAll = true;
+            Close();
+
+
+        }
+
+
+        private void GenerateUndoTabelle()
+        {
+
+            var x = new Database(true, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
+            ColumnItem c;
+
+            c = x.Column.Add("Index");
+            c.Caption = "Index";
+            c.Format = enDataFormat.Ganzzahl;
+
+            c = x.Column.Add("ColumnKey");
+            c.Caption = "Spalten-<br>Schlüssel";
+            c.Format = enDataFormat.Ganzzahl;
+
+            c = x.Column.Add("ColumnName");
+            c.Caption = "Spalten-<br>Name";
+            c.Format = enDataFormat.Text;
+
+            c = x.Column.Add("ColumnCaption");
+            c.Caption = "Spaten-<br>Beschriftung";
+            c.Format = enDataFormat.Text;
+
+            c = x.Column.Add("RowKey");
+            c.Caption = "Zeilen-<br>Schlüssel";
+            c.Format = enDataFormat.Ganzzahl;
+
+            c = x.Column.Add("RowFirst");
+            c.Caption = "Zeile, Wert der<br>1. Spalte";
+            c.Format = enDataFormat.Text;
+
+
+            c = x.Column.Add("Änderzeit");
+            c.Caption = "Änder-<br>Zeit";
+            c.Format = enDataFormat.Text;
+
+
+
+
+
+
+            c = x.Column.Add("Änderer");
+            c.Caption = "Änderer";
+            c.Format = enDataFormat.Text;
+
+            c = x.Column.Add("Symbol");
+            c.Caption = "Symbol";
+            c.Format = enDataFormat.BildCode;
+
+            c = x.Column.Add("Änderung");
+            c.Caption = "Änderung";
+            c.Format = enDataFormat.Text;
+
+
+            c = x.Column.Add("WertAlt");
+            c.Caption = "Wert alt";
+            c.Format = enDataFormat.Text;
+
+            c = x.Column.Add("WertNeu");
+            c.Caption = "Wert neu";
+            c.Format = enDataFormat.Text;
+
+
+
+            foreach (var ThisColumn in x.Column)
+            {
+                if (string.IsNullOrEmpty(ThisColumn.Identifier))
+                {
+                    ThisColumn.MultiLine = true;
+                    ThisColumn.TextBearbeitungErlaubt = false;
+                    ThisColumn.DropdownBearbeitungErlaubt = false;
+                }
+            }
+
+            x.Repair();
+
+            x.ColumnArrangements[1].HideSystemColumns();
+
+
+            x.SortDefinition = new RowSortDefinition(x, "Index", true);
+
+
+
+            for (var n = 0 ; n < _Database.Works.Count ; n++)
+            {
+
+                var cd = _Database.Works[n].CellKey.SplitBy("|");
+
+
+                _Database.Cell.DataOfCellKey(_Database.Works[n].CellKey, out var Col, out var Row);
+
+                var r = x.Row.Add(n.ToString());
+
+                r.CellSet("ColumnKey", cd[0]);
+                r.CellSet("RowKey", cd[1]);
+
+
+
+                if (Col != null)
+                {
+                    r.CellSet("ColumnName", Col.Name);
+                    r.CellSet("columnCaption", Col.Caption);
+                }
+
+
+                if (Col != null && Row != null)
+                {
+                    r.CellSet("RowFirst", Row.CellFirstString());
+                }
+
+                r.CellSet("Änderer", _Database.Works[n].User);
+                r.CellSet("ÄnderZeit", _Database.Works[n].CompareKey());
+
+
+
+                var Symb = enImageCode.Fragezeichen;
+                var alt = _Database.Works[n].PreviousValue;
+                var neu = _Database.Works[n].ChangedTo;
+                var aenderung = _Database.Works[n].Comand.ToString();
+
+                switch (_Database.Works[n].Comand)
+                {
+                    case enDatabaseDataType.ce_UTF8Value_withoutSizeData:
+                    case enDatabaseDataType.ce_Value_withoutSizeData:
+                        Symb = enImageCode.Textfeld;
+                        aenderung = "Wert geändert";
+                        break;
+
+                    case enDatabaseDataType.AutoExport:
+                        aenderung = "Export ausgeführt oder geändert";
+                        alt = "";
+                        neu = "";
+                        Symb = enImageCode.Karton;
+                        break;
+
+                    case enDatabaseDataType.dummyComand_AddRow:
+                        aenderung = "Neue Zeile";
+                        Symb = enImageCode.PlusZeichen;
+                        break;
+
+                    case enDatabaseDataType.Rules:
+                        aenderung = "Regeln verändert";
+                        Symb = enImageCode.Formel;
+                        alt = "";
+                        neu = "";
+                        break;
+                }
+                r.CellSet("Änderung", aenderung);
+                r.CellSet("symbol", Symb + "|24");
+
+                r.CellSet("Wertalt", alt);
+                r.CellSet("Wertneu", neu);
+
+
+
+            }
+            tblUndo.Database = x;
+        }
+
+        private void btnSperreAufheben_Click(object sender, System.EventArgs e)
+        {
+            _Database.UnlockHard();
+            MessageBox.Show("Erledigt.", enImageCode.Information, "OK");
+        }
+    }
+}

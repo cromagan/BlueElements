@@ -1,0 +1,225 @@
+﻿using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.ItemCollection.ItemCollectionList;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Reflection;
+
+namespace BlueControls.ItemCollection.ItemCollectionPad
+{
+    // LinenKollision
+    //http://www.vb-fun.de/cgi-bin/loadframe.pl?ID=vb/tipps/tip0294.shtml
+
+    //'Imports Microsoft.VisualBasic
+
+
+    public class GridPadItem : BasicPadItem
+        {
+           
+
+            public override void DesignOrStyleChanged()
+            {
+                // Keine Variablen zum Reseten, ein Invalidate reicht
+            }
+
+
+            #region  Variablen-Deklarationen 
+
+            internal PointDF NP;
+            internal decimal GridShow = 10M; // in mm
+                                             //   Dim _RasterSnap As Decimal = 50 ' in mm
+
+
+            //Dim _Design As enDesign
+
+            private readonly Metafile NPEMF = new Metafile(modAllgemein.GetEmmbedResource(Assembly.GetExecutingAssembly(), "Nullpunkt.emf"));
+
+            #endregion
+
+
+            #region  Event-Deklarationen + Delegaten 
+
+            #endregion
+
+
+            #region  Construktor + Initialize 
+
+
+            public GridPadItem()
+            { }
+
+
+            public GridPadItem(PadStyles vFormat, Point cNP)
+            {
+                NP.SetTo(cNP);
+                Format = vFormat;
+            }
+
+
+            protected override void InitializeLevel2()
+            {
+                NP = new PointDF(this, "Nullpunkt", 0, 0, true, false, true);
+                //NP = new PointDF(this, "Nullpunkt", 0, 0);
+                Format = PadStyles.Style_Überschrift_Haupt;
+                GridShow = 10M;
+            }
+
+
+            #endregion
+
+
+            #region  Properties 
+
+
+            #endregion
+
+
+            protected override string ClassId()
+            {
+                return "GRID";
+            }
+
+            public override bool Contains(PointF P, decimal Zoomf)
+            {
+                return false;
+            }
+
+
+            public override List<PointDF> PointList()
+            {
+                var l = new List<PointDF>();
+                l.Add(NP);
+
+                return l;
+            }
+
+
+            public override RectangleDF UsedArea()
+            {
+                return new RectangleDF(NP.X - 1, NP.Y - 1, 2, 2);
+            }
+
+
+            protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+            {
+                if (Format == PadStyles.Undefiniert) { return; }
+
+                var c = GenericControl.Skin.GetBlueFont(Format, Parent.SheetStyle).Color_Main;
+
+
+                var p = new Pen(Color.FromArgb(30, c.R, c.G, c.B), 1);
+                decimal ex = 0;
+
+                var po = DCoordinates.PointOf(enAlignment.HorizontalCenter);
+
+
+                var mo = modConverter.mmToPixel(GridShow, ItemCollectionPad.DPI) * cZoom;
+
+                var count = 0;
+                do
+                {
+                    count += 1;
+                    if (count > 20) { break; }
+                    if (mo < 5) { mo = mo * 2; }
+                } while (true);
+
+                if (mo >= 5)
+                {
+                    do
+                    {
+                        GR.DrawLine(p, po.X + Convert.ToInt32(ex), 0, po.X + Convert.ToInt32(ex), SizeOfParentControl.Height);
+                        GR.DrawLine(p, 0, po.Y + Convert.ToInt32(ex), SizeOfParentControl.Width, po.Y + Convert.ToInt32(ex));
+
+                        if (ex > 0)
+                        {
+                            GR.DrawLine(p, po.X - Convert.ToInt32(ex), 0, po.X - Convert.ToInt32(ex), SizeOfParentControl.Height);
+                            GR.DrawLine(p, 0, po.Y - Convert.ToInt32(ex), SizeOfParentControl.Width, po.Y - Convert.ToInt32(ex));
+                        }
+
+                        ex = ex + mo;
+                        if (po.X - ex < 0 && po.Y - ex < 0 && po.X + ex > SizeOfParentControl.Width && po.Y + ex > SizeOfParentControl.Height)
+                        {
+                            break;
+                        }
+                    } while (true);
+                }
+
+
+                if (!ForPrinting)
+                {
+
+                    GR.DrawImage(NPEMF, new Rectangle(po.X - 7, po.Y - 7, 15, 15));
+                }
+            }
+
+            public override void SetCoordinates(RectangleDF r)
+            {
+                NP.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));
+                RecomputePointAndRelations();
+            }
+
+
+            protected override bool ParseLevel2(KeyValuePair<string, string> pair)
+            {
+
+                switch (pair.Key)
+                {
+                    case "grid":
+                        GridShow = int.Parse(pair.Value);
+                        return true;
+
+
+                    case "checked":
+                        return true;
+
+                }
+
+                return false;
+            }
+
+            protected override string ToStringLevel2()
+            {
+                return "Grid=" + GridShow + ", ";
+            }
+
+            internal override void KeepInternalLogic()
+            {
+                //Nix
+            }
+
+
+            public override void GenerateInternalRelation(List<clsPointRelation> Relations)
+            {
+                // Nix zu Tun
+            }
+
+            public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
+            {
+                var l = new List<FlexiControl>();
+
+                var Rahms = new ItemCollectionList.ItemCollectionList();
+                //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
+                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Kapitel, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Standard).ToString(), "Standard", GenericControl.Skin.GetBlueFont(PadStyles.Style_Standard, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_StandardFett).ToString(), "Standard Fett", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardFett, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardAlternativ, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GenericControl.Skin.GetBlueFont(PadStyles.Style_KleinerZusatz, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Sort();
+
+
+                l.Add(new FlexiControl("Stil", Convert.ToInt32(Format).ToString(), Rahms));
+                return l;
+            }
+
+            public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
+            {
+                Format = (PadStyles)int.Parse(Tags.TagGet("Format"));
+            }
+        }
+    }

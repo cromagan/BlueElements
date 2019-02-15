@@ -1,0 +1,191 @@
+﻿using System;
+using System.Drawing;
+using BlueBasics;
+
+namespace BlueControls
+{
+    public static class GeometryDF
+    {
+
+
+
+
+
+
+        /// Berechnet, ob sich zwei geraden IRGENDWO treffen.
+        public static PointDF LinesIntersect(PointDF Line1Start, PointDF Line1End, PointDF Line2Start, PointDF Line2End)
+        {
+
+            decimal a1, a2, b1, b2, c1, c2, denom;
+
+
+
+            a1 = Line1End.Y - Line1Start.Y;
+            b1 = Line1Start.X - Line1End.X;
+            c1 = Line1End.X * Line1Start.Y - Line1Start.X * Line1End.Y;
+
+            a2 = Line2End.Y - Line2Start.Y;
+            b2 = Line2Start.X - Line2End.X;
+            c2 = Line2End.X * Line2Start.Y - Line2Start.X * Line2End.Y;
+
+            denom = a1 * b2 - a2 * b1;
+            if (denom < 0.0000001M && denom > -0.0000001M)
+            {
+                // Ergibt ansonsten zu große ergebnisse
+                return null;
+            }
+
+            return new PointDF((b1 * c2 - b2 * c1) / denom, (a2 * c1 - a1 * c2) / denom);
+
+
+        }
+
+        public static PointDF LinesIntersect(PointDF Line1Start, PointDF Line1End, PointDF Line2Start, PointDF Line2End, bool considerEndpoints)
+        {
+
+            var sp = LinesIntersect(Line1Start, Line1End, Line2Start, Line2End);
+            if (!considerEndpoints)
+            {
+                //    DebugPrint("considerEndpoints = false")
+                return sp;
+            }
+
+            if (sp == null) { return null; }
+
+            const decimal tol = 0.0001m;
+
+            if (sp.X < Math.Min(Line1Start.X, Line1End.X) - tol) { return null; }
+            if (sp.X > Math.Max(Line1Start.X, Line1End.X) + tol) { return null; }
+            if (sp.X < Math.Min(Line2Start.X, Line2End.X) - tol) { return null; }
+            if (sp.X > Math.Max(Line2Start.X, Line2End.X) + tol) { return null; }
+
+            if (sp.Y < Math.Min(Line1Start.Y, Line1End.Y) - tol) { return null; }
+            if (sp.Y > Math.Max(Line1Start.Y, Line1End.Y) + tol) { return null; }
+            if (sp.Y < Math.Min(Line2Start.Y, Line2End.Y) - tol) { return null; }
+            if (sp.Y > Math.Max(Line2Start.Y, Line2End.Y) + tol) { return null; }
+
+            return sp;
+        }
+
+
+        /// <summary>
+        ///  Calculate the distance between the point and the segment
+        /// </summary>
+        /// <param name="P"></param>
+        /// <param name="P1"></param>
+        /// <param name="P2"></param>
+        /// <returns></returns>
+        public static decimal DistanzZuStrecke(this PointF P, PointDF P1, PointDF P2)
+        {
+            return P.DistanzZuStrecke(P1.X, P1.Y, P2.X, P2.Y);
+        }
+
+        //public static decimal DistanzZuStrecke(this PointF P, Point P1, Point P2)
+        //{
+        //    return P.DistanzZuStrecke(P1.X, P1.Y, P2.X, P2.Y);
+        //}
+        public static PointDF ToPointDF(this PointF P)
+        {
+            return new PointDF(P.X, P.Y);
+        }
+
+
+        /// <summary>
+        /// Calculate the distance between the point and the segment
+        /// </summary>
+        /// <param name="P"></param>
+        /// <param name="X1"></param>
+        /// <param name="Y1"></param>
+        /// <param name="X2"></param>
+        /// <param name="Y2"></param>
+        /// <returns></returns>
+        public static decimal DistanzZuStrecke(this PointF P, decimal X1, decimal Y1, decimal X2, decimal Y2)
+        {
+            var SP = PointOnLine(new PointDF(P.X, P.Y), X1, Y1, X2, Y2);
+
+
+            var P1 = new PointDF(P.X, P.Y);
+
+
+            if (Extensions.PointInRect(SP.ToPointF(), X1, Y1, X2, Y2, 5)) { return Länge(P1, SP); }
+
+            return Math.Min(Länge(new PointDF(X1, Y1), P1), Länge(new PointDF(X2, X2), P1));
+
+
+
+        }
+
+        public static PointDF PolarToCartesian(decimal R, double Winkel)
+        {
+            // http://de.wikipedia.org/wiki/Polarkoordinaten
+
+            Winkel = Winkel % 360;
+
+            switch (Winkel)
+            {
+                case 0:
+                    return new PointDF(R, 0);
+                case 90:
+                    return new PointDF(0, -R);
+                case 180:
+                    return new PointDF(-R, 0);
+                case 270:
+                    return new PointDF(0, R);
+                default:
+                    return new PointDF((double)R * Geometry.Cosinus(Winkel), -(double)R * Geometry.Sinus(Winkel));
+            }
+        }
+
+        public static decimal Winkelx(PointDF Sp, PointDF EP)
+        {
+            return Geometry.Winkelx(Sp.X, Sp.Y, EP.X, EP.Y);
+        }
+        public static PointDF PointOnLine(PointDF Maus, decimal P_X, decimal P_Y, decimal Q_X, decimal Q_Y)
+        {
+            //http://de.wikipedia.org/wiki/Geradengleichung
+            // < 0.000001 ist 0 gleich, weil ansonsten zu große ergebnisse rauskommen
+            if (Math.Abs(P_Y - Q_Y) < 0.0000001m) // genau Waagerecht
+            {
+                return new PointDF(Maus.X, P_Y);
+            }
+            if (Math.Abs(P_X - Q_X) < 0.0000001m) // genau Senkrecht
+            {
+                return new PointDF(P_X, Maus.Y);
+            }
+
+            var m1 = (P_Y - Q_Y) / (P_X - Q_X);
+            var m2 = -1 / m1;
+
+            var T2 = Maus.Y + Maus.X / m1;
+            var T1 = P_Y - m1 * P_X;
+
+            var SchnittX = (T2 - T1) / (m1 - m2);
+            var Schnitty = m1 * SchnittX + T1;
+
+            return new PointDF(SchnittX, Schnitty);
+        }
+
+
+
+
+        public static decimal Länge(PointDF SP, PointDF Ep)
+        {
+            // Berechnet die Länge einer Strecke
+
+            var L1 = SP.X - Ep.X;
+            var L2 = SP.Y - Ep.Y;
+
+            // ^ 2 ist langsamer, laut Project Analyzer
+            return (decimal)Math.Sqrt(Convert.ToDouble(L1 * L1 + L2 * L2));
+        }
+
+
+
+
+
+
+
+    }
+}
+
+

@@ -1,0 +1,382 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E7E05BAC-07CB-478D-861A-DB24A27BBF75}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BlueBasics</RootNamespace>
+    <AssemblyName>BlueBasics</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>Windows</MyType>
+    <StartupObject>
+    </StartupObject>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>
+    </DocumentationFile>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\</OutputPath>
+    <DocumentationFile>
+    </DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Enums\enDataFormat.cs" />
+    <Compile Include="Enums\enFehlerArt.cs" />
+    <Compile Include="Extensions\DirectoryInfoExtensions.cs" />
+    <Compile Include="ListExt.cs" />
+    <Compile Include="QuickImage.cs" />
+    <Compile Include="EventArgs\ListEventArgs.cs" />
+    <Compile Include="Extensions\BitmapExtensions.cs" />
+    <Compile Include="Extensions\ByteArrayExtension.cs" />
+    <Compile Include="Extensions\ConcurrentDictionaryExtension.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Develop.cs" />
+    <Compile Include="clsNamedBinary.cs" />
+    <Compile Include="Enums\enAlignment.cs" />
+    <Compile Include="Enums\enDirection.cs" />
+    <Compile Include="Enums\enFileFormat.cs" />
+    <Compile Include="Enums\enImageCode.cs" />
+    <Compile Include="Enums\enImageCodeEffect.cs" />
+    <Compile Include="Enums\enOrientation.cs" />
+    <Compile Include="Enums\enTaste.cs" />
+    <Compile Include="FileOperations.cs" />
+    <Compile Include="Interfaces\IChangedFeedback.cs" />
+    <Compile Include="Interfaces\ICheckable.cs" />
+    <Compile Include="Extensions\ICollectionExtension.cs" />
+    <Compile Include="Interfaces\ICompareKey.cs" />
+    <Compile Include="Interfaces\IntegerArrayExtension.cs" />
+    <Compile Include="Interfaces\IParseable.cs" />
+    <Compile Include="Interfaces\IReadableText.cs" />
+    <Compile Include="ListOfExtension.cs" />
+    <Compile Include="Geometry.cs" />
+    <Compile Include="Extensions\PaddingExtension.cs" />
+    <Compile Include="Extensions\PointExtension.cs" />
+    <Compile Include="Extensions\PointFExtension.cs" />
+    <Compile Include="Extensions\RectangleExtension.cs" />
+    <Compile Include="Extensions\SizeFExtension.cs" />
+    <Compile Include="Extensions\SortierExtensions.cs" />
+    <Compile Include="Extensions\StringExtension.cs" />
+    <Compile Include="WindowsThumbnailProvider.cs" />
+    <Compile Include="Enums\ThumbnailOptions.cs" />
+    <Compile Include="WebsiteThumbImage.cs" />
+    <Compile Include="modErgebnis.cs" />
+    <Compile Include="Extensions\BooleanExtensions.cs" />
+    <Compile Include="Interfaces\ICanBeEmpty.cs" />
+    <Compile Include="modAllgemein.cs" />
+    <Compile Include="modFernsteuerung.cs" />
+    <Compile Include="Enums\enSizeModes.cs" />
+    <Compile Include="Extensions\ColorExtension.cs" />
+    <Compile Include="modConverter.cs" />
+    <Compile Include="modTastaturSimulation.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Application.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{94E38DFF-614B-4CBD-B67C-F211BB35CE8B}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataFormat.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="System" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.IO" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ressourcen\Image\Beziehungen\Doppelkreis.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Beziehungen\Istgleich.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Beziehungen\KreisMittelPunkt.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Beziehungen\PfeilLinksRechts.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Beziehungen\PfeilObenUnten.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Beziehungen\WaagerechtSenkrecht.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusAbschneiden.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusEinpassen.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusVerzerren.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Bruchlinie.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Kopieren.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\EbeneNachHinten.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\EbeneNachVorne.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Excel.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Farben.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Farbrad.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Filmrolle.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Formel.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Gewicht.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Graustufen.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\GrößeÄndern.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Gänsefüßchen.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Hierarchie.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Hochformat.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Häkchen.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\HäkchenDoppelt.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\InDenHintergrund.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\InDenVordergrund.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Globus.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Kalender.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Karton.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Kontrast.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Kugel.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Layout.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Linksbündig.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Mauspfeil.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Note.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\PDF.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Person.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Pipette.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\PowerPoint.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Querformat.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Radiergummi.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Raster.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Rechtsbündig.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Refresh.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Schere.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Schloss.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Schlüssel.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Screenshot.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\SeiteEinrichten.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Skript.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Smiley.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\SmileyUnhappy.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Spalte.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Summe.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Tabelle.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\TasteA.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\TasteABC.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\TasteESC.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\TasteProzent.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Textfeld.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Variable.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Visitenkarte.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Word.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Zeile.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Zeilenumbruch.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Zentrieren.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Zuschneiden.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Abspielen.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Aufnahme.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\AZ.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Bemaßung.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Binärdaten.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Blitz.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Brief.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Brille.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Datei.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Datenbank.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Diskette.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Drucker.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Eins.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Fernglas.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Frage.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Fragezeichen.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Ganzzahl.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Gleitkommazahl.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Herz.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Information.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Kamera.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Kamm.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Kreis.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Kreis2.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Kreuz.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Kritisch.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Lineal.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Linie.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Lupe.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\LupeMinus.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\LupePlus.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\MinusZeichen.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Ordner.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Pause.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Pfeil_Links.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Pfeil_Links_Scrollbar.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Pfeil_Oben.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Pfeil_Oben_Scrollbar.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Pfeil_Rechts.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Pfeil_Unten.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Pinnadel.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Pinsel.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\PlusZeichen.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Sonne.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Stift.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Stop.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Taschenrechner.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Textdatei.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Trichter.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Uhr.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Warnung.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Wolke.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\ZA.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\ZoomFit.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\CheckBox.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\CheckBox_Checked.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\CheckBox_Checked_MouseOver.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\CheckBox_Disabled.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\CheckBox_Disabled_Checked.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\CheckBox_MouseOver.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\OptionBox.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\OptionBox_Checked.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\OptionBox_Checked_MouseOver.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\OptionBox_Disabled.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\OptionBox_Disabled_Checked.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\OptionBox_MouseOver.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Clipboard.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ressourcen\Image\Icons\DrehenLinks.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\DrehenRechts.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\SpiegelnHorizontal.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\SpiegelnVertikal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Stern.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Papierkorb.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Anwendung.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Bild.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Redo.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Undo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Schild.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Telefon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ressourcen\Image\Icons\XML.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Pfeil_Rechts_Scrollbar.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Pfeil_Unten_Scrollbar.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
