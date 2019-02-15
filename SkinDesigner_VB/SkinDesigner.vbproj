@@ -169,6 +169,20 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BlueBasics\BlueBasics.csproj">
+      <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
+      <Name>BlueBasics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BlueControls\BlueControls\BlueControls.csproj">
+      <Project>{6a9cfa8b-ddf5-4fa2-a110-c87a0ce34347}</Project>
+      <Name>BlueControls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BlueDatabase\BlueDatabase\BlueDatabase.csproj">
+      <Project>{ce8be078-ddae-47f5-aaa9-685564b898c9}</Project>
+      <Name>BlueDatabase</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

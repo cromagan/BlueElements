@@ -1023,7 +1023,7 @@ namespace BlueControls.Controls
         public static string Database_NeedPassword()
         {
 
-            return InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zurgiff auf diese Datenbank<br>zu erhalten:", string.Empty, enDataFormat.Text);
+            return InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, enDataFormat.Text);
         }
 
         private void ColumnArrangements_ItemInternalChanged(object sender, ListEventArgs e)

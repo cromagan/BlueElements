@@ -43,6 +43,14 @@ namespace BlueDatabase
             return Load_Internal(cFileName, ReadOnly, passwordSub, GenLayout, RenameColumn);
         }
 
+        public static Database Load(string cFileName, bool ReadOnly)
+        {
+            var d = GetByFilename(cFileName);
+            if (d != null) { return d; }
+            return Load_Internal(cFileName, ReadOnly, null, null, null);
+        }
+
+
         public static List<Database> GetByCaption(string Caption)
         {
             var l = new List<Database>();

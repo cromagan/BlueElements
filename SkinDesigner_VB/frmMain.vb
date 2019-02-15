@@ -1,17 +1,14 @@
 Option Strict On
 Option Explicit On
 
-Imports BlueElements
+Imports BlueBasics
 Imports System.Collections.Generic
-Imports BlueElements.BlueDatabase
-Imports BlueElements.BlueControls
-Imports BlueElements.ItemCollectionBasic
-Imports BlueElements.ItemCollection
-Imports BlueElements.modConverter
-Imports BlueElements.modAllgemein
 Imports System
-Imports BlueElements.Forms.DialogBox
-Imports BlueElements.EventArgs
+Imports BlueDatabase
+Imports BlueControls.Enums
+Imports BlueControls.EventArgs
+Imports BlueBasics.Enums
+Imports BlueControls.Controls
 
 Class frmMain
 
@@ -62,9 +59,9 @@ Class frmMain
         pf = pf.PathParent(3) & "BlueElements\Ressourcen\Skin\"
 
         ReDim DB(2)
-        DB(0) = Database.Load(pf & "Windows10.skn", UserName, "#Administrator") ' MUSS IMMER  Windows10 BLEIBEN! VORLAGE!
-        DB(2) = Database.Load(pf & "XP.skn", UserName, "#Administrator")
-        DB(1) = Database.Load(pf & "GlossyCyan.skn", UserName, "#Administrator")
+        DB(0) = Database.Load(pf & "Windows10.skn", False) ' MUSS IMMER  Windows10 BLEIBEN! VORLAGE!
+        DB(2) = Database.Load(pf & "XP.skn", False)
+        DB(1) = Database.Load(pf & "GlossyCyan.skn", False)
 
 
         For z As Integer = 0 To DB.GetUpperBound(0)
