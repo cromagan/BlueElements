@@ -1,4 +1,21 @@
-﻿// http://openbook.galileo-press.de/visualbasic_2008/vb2008_03_klassendesign_015.htm#mjb06b32f7141ae42e9e38c96b77a2b713
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -15,16 +32,32 @@ namespace BlueBasics
         private static bool CanWrite_LastResult;
         private static string CanWrite_LastFile = string.Empty;
 
+        public delegate bool DoThis(string file1, string file2);
 
 
-        public static void DeleteDir(string Pfad)
+        private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure)
+        {
+            var tries = 0;
+            var startTime = DateTime.Now;
+
+            while (!processMethod(file1, file2))
+            {
+                tries++;
+                if (tries > 5)
+                {
+                    if (!toBeSure) { return false; }
+                    if (DateTime.Now.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(enFehlerArt.Fehler, "Befehl konnte nicht ausgeführt werden."); }
+                }
+            }
+
+            return true;
+        }
+
+
+        private static bool TryDeleteDir(string Pfad, string WillBeIgnored)
         {
             Pfad = Pfad.CheckPath();
-
-            if (!PathExists(Pfad)) { return; }
-
-
-
+            if (!PathExists(Pfad)) { return true; }
 
             try
             {
@@ -32,155 +65,138 @@ namespace BlueBasics
             }
             catch (Exception ex)
             {
-
-                Develop.DebugPrint("Ordner " + Pfad + " konnte nicht gelöscht werden.<br>" + ex.Message);
+                Develop.DebugPrint(ex); //"Ordner " + Pfad + " konnte nicht gelöscht werden.<br>" + ex.Message);
             }
+
+            return !PathExists(Pfad);
         }
 
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="Filelist"></param>
-        /// <param name="Meldungen"></param>
-        /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
-        public static bool DeleteFile(List<string> Filelist)
+        /// <returns>True, wenn mindestens eine Datei gelöscht wurde.</returns>
+        public static bool DeleteFile(List<string> filelist)
         {
-            for (var Z = 0 ; Z < Filelist.Count ; Z++)
+            for (var Z = 0 ; Z < filelist.Count ; Z++)
             {
-                if (!FileExists(Filelist[Z])) { Filelist[Z] = ""; }
+                if (!FileExists(filelist[Z])) { filelist[Z] = string.Empty; }
             }
 
-            Filelist = Filelist.SortedDistinctList();
+            filelist = filelist.SortedDistinctList();
 
-            if (Filelist.Count == 0) { return false; }
-
+            if (filelist.Count == 0) { return false; }
 
             var del = false;
-
-
-            foreach (var ThisFile in Filelist)
+            foreach (var ThisFile in filelist)
             {
-                if (!FileExists(ThisFile)) { return true; }
-                // Komisch, manche Dateien können zwar gelöscht werden, die Attribute aber nicht geändert (Berechtigungen?)
-                try
-                {
-                    File.SetAttributes(ThisFile, FileAttributes.Normal);
-                }
-                catch (Exception ex)
-                {
-                    Develop.DebugPrint(ex);
-                }
-
-                try
-                {
-                    if (CanWrite(ThisFile, 0.5))
-                    {
-                        File.Delete(ThisFile);
-                        del = true;
-                    }
-                    else
-                    {
-                        Develop.DebugPrint(enFehlerArt.Info, "Die Datei '" + ThisFile + "' konnte nicht gelöscht werden.\r\nNicht 'FileIsWriteable'");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Develop.DebugPrint(ex);
-                }
+                if (DeleteFile(ThisFile, false)) { del = true; }
             }
 
             return del;
-
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="File"></param>
-        /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
-        public static bool DeleteFile(string File)
+
+        public static bool DeleteFile(string file, bool toBeSure)
         {
-            var f = new List<string>();
-            f.Add(File);
-            return DeleteFile(f);
+            return ProcessFile(TryDeleteFile, file, file, toBeSure);
         }
-        public static string RenameFile(string OldN, string NewN)
+        public static bool RenameFile(string oldName, string newName, bool toBeSure)
         {
+            return ProcessFile(TryRenameFile, oldName, newName, toBeSure);
+        }
+        public static bool CopyFile(string source, string target, bool toBeSure)
+        {
+            return ProcessFile(TryCopyFile, source, target, toBeSure);
+        }
 
-            if (OldN == NewN) { return string.Empty; }
+        private static bool DeleteDir(string directory, bool toBeSure)
+        {
+            return ProcessFile(TryDeleteDir, directory, directory, toBeSure);
+        }
 
 
-            var StartTime = DateTime.Now;
-            do
+
+        private static bool TryDeleteFile(string ThisFile, string WillbeIgnored)
+        {
+            // Komisch, manche Dateien können zwar gelöscht werden, die Attribute aber nicht geändert (Berechtigungen?)
+            try
             {
-                if (!FileExists(OldN)) { return "Quelldatei existiert nicht: " + OldN; }
-                if (FileExists(NewN)) { return "Zieldatei existiert bereits: " + NewN; }
-
-
-                try
-                {
-                    File.Move(OldN, NewN);
-                    return string.Empty;
-                }
-                catch (Exception ex)
-                {
-                    if (DateTime.Now.Subtract(StartTime).TotalSeconds > 30)
-                    {
-                        Develop.DebugPrint("Datei konnte nicht umbenannt werden: " + OldN + "<br>" + ex.Message);
-                        return "Datei konnte nicht umbenannt werden: " + OldN + "<br>" + ex.Message;
-                    }
-                }
-
-
-            } while (true);
-        }
-        public static string CopyFile(string OldN, string NewN)
-        {
-            if (OldN == NewN) { return string.Empty; }
-
-            var StartTime = DateTime.Now;
-            do
+                File.SetAttributes(ThisFile, FileAttributes.Normal);
+            }
+            catch (Exception ex)
             {
-                if (!FileExists(OldN)) { return "Quelldatei existiert nicht: " + OldN; }
-                if (FileExists(NewN)) { return "Zieldatei existiert bereits: " + NewN; }
+                Develop.DebugPrint(ex);
+            }
 
+            try
+            {
+                CanWrite(ThisFile, 0.5);
+                File.Delete(ThisFile);
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
+                return false;
+            }
 
-                try
-                {
-                    File.Copy(OldN, NewN);
-                    return string.Empty;
-                }
-                catch (Exception ex)
-                {
-                    if (DateTime.Now.Subtract(StartTime).TotalSeconds > 30)
-                    {
-                        Develop.DebugPrint("Datei konnte nicht kopiert werden: " + OldN + "<br>" + ex.Message);
-                        return "Datei konnte nicht kopiert werden: " + OldN + "<br>" + ex.Message;
-                    }
-                }
-
-
-            } while (true);
+            return (!FileExists(ThisFile));
         }
 
 
-        public static bool FileExists(string Datei)
+
+        private static bool TryRenameFile(string oldName, string newName)
         {
-            if (string.IsNullOrEmpty(Datei)) { return false; }
-            if (Datei.ContainsChars(Constants.Char_PfadSonderZeichen)) { return false; }
-            return File.Exists(Datei);
+            if (oldName == newName) { return true; }
+            if (!FileExists(oldName)) { return false; }
+            if (FileExists(newName)) { return false; }
+
+
+            try
+            {
+                File.Move(oldName, newName);
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
+                return false;
+            }
+
+            return (FileExists(newName) && !FileExists(oldName));
+        }
+        private static bool TryCopyFile(string source, string target)
+        {
+            if (source == target) { return true; }
+            if (!FileExists(source)) { return false; }
+            if (FileExists(target)) { return false; }
+
+            try
+            {
+                File.Copy(source, target);
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
+                return false;
+            }
+
+            return (FileExists(target));
         }
 
-        public static bool CanWriteInDirectory(string Directory)
+
+        public static bool FileExists(string file)
         {
+            if (string.IsNullOrEmpty(file)) { return false; }
+            if (file.ContainsChars(Constants.Char_PfadSonderZeichen)) { return false; }
+            return File.Exists(file);
+        }
 
-            if (string.IsNullOrEmpty(Directory)) { return false; }
-
-            var di = new DirectoryInfo(Directory);
-
+        public static bool CanWriteInDirectory(string directory)
+        {
+            if (string.IsNullOrEmpty(directory)) { return false; }
+            var di = new DirectoryInfo(directory);
             return di.IsWriteable();
-       }
+        }
 
         public static bool CanWrite(string Datei, double TryItForSeconds)
         {
@@ -188,7 +204,6 @@ namespace BlueBasics
             var s = DateTime.Now;
             do
             {
-                //  If Not FileExists(Datei) Then Return False ' Irgend ein Prozess hat die wohl gelöscht...
                 if (CanWrite(Datei)) { return true; }
                 if (DateTime.Now.Subtract(s).TotalSeconds > TryItForSeconds) { return false; }
             } while (true);
@@ -245,28 +260,18 @@ namespace BlueBasics
 
         public static string TempFile(string NewPath, string Filename)
         {
-
-            // Dim dp As String = DateiPfad(FullName)
             var dn = Filename.FileNameWithoutSuffix();
             var ds = Filename.FileSuffix();
-
-            // If Not String.IsNullOrEmpty(ds) Then dn = Mid(dn, 1, dn.Length - ds.Length - 1)
-
-
             return TempFile(NewPath, dn, ds);
         }
 
         public static string TempFile(string FullName)
         {
-
             var dp = FullName.FilePath();
             var dn = FullName.FileNameWithoutSuffix();
             var ds = FullName.FileSuffix();
-
-            // If Not String.IsNullOrEmpty(ds) Then dn = Mid(dn, 1, dn.Length - ds.Length - 1)
             return TempFile(dp, dn, ds);
         }
-
 
 
         public static string TempFile()
@@ -274,50 +279,35 @@ namespace BlueBasics
             return TempFile("", "", "");
         }
 
-
-
         public static string TempFile(string Pfad, string Wunschname, string Suffix)
         {
-
             if (string.IsNullOrEmpty(Pfad)) { Pfad = Path.GetTempPath(); }
             if (string.IsNullOrEmpty(Suffix)) { Suffix = "tmp"; }
             if (string.IsNullOrEmpty(Wunschname)) { Wunschname = UserName() + DateTime.Now.ToShortTimeString(); }
 
-
             var z = -1;
-
-
             Pfad = Pfad.TrimEnd("\\") + "\\";
-
-            //if (Pfad.Substring(Pfad.Length - 1) != "\\")
-            //{
-            //    Pfad = Pfad + "\\";
-            //}
 
             if (!PathExists(Pfad)) { Directory.CreateDirectory(Pfad); }
 
-
             Wunschname = Wunschname.RemoveChars(Constants.Char_DateiSonderZeichen);
+
+            string filename;
 
             do
             {
-                z += 1;
-                string k = null;
+                z++;
                 if (z > 0)
                 {
-                    k = Pfad + Wunschname + "_" + z.Nummer(5) + "." + Suffix;
+                    filename = Pfad + Wunschname + "_" + z.Nummer(5) + "." + Suffix;
                 }
                 else
                 {
-                    k = Pfad + Wunschname + "." + Suffix;
+                    filename = Pfad + Wunschname + "." + Suffix;
                 }
-                if (!FileExists(k)) { return k; }
-            } while (true);
+            } while (FileExists(filename));
 
+            return filename;
         }
-
-
-
-
     }
 }

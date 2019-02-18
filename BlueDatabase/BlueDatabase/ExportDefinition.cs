@@ -1,4 +1,25 @@
-﻿using System;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -481,7 +502,7 @@ namespace BlueDatabase
 
                     if (FileExists(x[0]))
                     {
-                        DeleteFile(x[0]);
+                        DeleteFile(x[0], false);
                         _BereitsExportiert[n] = string.Empty;
                     }
 
@@ -511,7 +532,7 @@ namespace BlueDatabase
                         var x = _BereitsExportiert[n].SplitBy("|");
                         if ((float)DateTime.Now.Subtract(DateTimeParse(x[1])).TotalDays > _AutomatischLöschen)
                         {
-                            if (FileExists(x[0])) { FileOperations.DeleteFile(x[0]); }
+                            if (FileExists(x[0])) { FileOperations.DeleteFile(x[0], false); }
                         }
                         if (!FileExists(x[0]))
                         {
@@ -568,7 +589,7 @@ namespace BlueDatabase
                         var x = _BereitsExportiert[n].SplitBy("|");
                         if (Database.Row.SearchByKey(int.Parse(x[2])) == null)
                         {
-                            if (FileExists(x[0])) { FileOperations.DeleteFile(x[0]); }
+                            if (FileExists(x[0])) { FileOperations.DeleteFile(x[0], false); }
                         }
 
 
@@ -830,7 +851,7 @@ namespace BlueDatabase
                     if (_BereitsExportiert[f].EndsWith("|" + Id))
                     {
                         var x = _BereitsExportiert[f].SplitBy("|");
-                        if (FileExists(x[0])) { FileOperations.DeleteFile(x[0]); }
+                        if (FileExists(x[0])) { FileOperations.DeleteFile(x[0], false); }
                         if (!FileExists(x[0]))
                         {
                             _BereitsExportiert[f] = string.Empty;

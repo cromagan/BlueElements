@@ -1,3 +1,23 @@
+#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1752,7 +1772,7 @@ namespace BlueDatabase
             if (!WindowsWaitFree(120, true)) { return; }
             if (IsSaveAble() && !BlockDateiVorhanden()) { return; }
             Reload();
-            if (BlockDateiVorhanden()) { FileOperations.DeleteFile(Blockdateiname()); }
+            if (BlockDateiVorhanden()) { DeleteFile(Blockdateiname(), true); }
 
             Release(true);
         }
@@ -3189,11 +3209,11 @@ namespace BlueDatabase
             {
                 if (FileExists(tBackup))
                 {
-                    RenameFile(tBackup, BlockDatei);
+                    RenameFile(tBackup, BlockDatei, true);
                 }
                 else
                 {
-                    CopyFile(Filename, BlockDatei);
+                    CopyFile(Filename, BlockDatei, true);
                 }
             }
             catch (Exception ex)
@@ -3202,8 +3222,7 @@ namespace BlueDatabase
                 return;
             }
 
-            // Im Parallel-Process haben theoretisch Zeit. Nicht aber, wenn ein absichtlicher Release ansteht.
-            //modAllgemein.Pausex(0.2, true);
+            if (!BlockDateiVorhanden()) { Develop.DebugPrint("Block-Datei Konflikt 1"); }
 
             // Im Parallelen-Process, Reload-Needed ist auch ein Dateizugriff
             if (ReloadNeeded()) { BinaryWriter_ReportProgressAndWait(5, "Reload"); }
@@ -3212,7 +3231,7 @@ namespace BlueDatabase
 
 
             //OK, nun gehts rund: Haupt-Datei wird zum Backup kopiert.
-            CopyFile(Filename, tBackup);
+            CopyFile(Filename, tBackup, true);
 
             // Und hier wird nun die neue Datei als TMP erzeugt erzeugt.
             var count = 0;
@@ -3237,31 +3256,25 @@ namespace BlueDatabase
                     if (count > 30)
                     {
                         Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datenbank abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + ex.Message);
-                        DeleteFile(BlockDatei);
-                        DeleteFile(TMP);
+                        DeleteFile(BlockDatei, true);
+                        DeleteFile(TMP, true);
                         return;
                     }
                     Develop.DoEvents();
-                    //modAllgemein.Pausex(1, true);
                 }
             } while (true);
 
-            // Haupt-Datei löschen
-            DeleteFile(Filename);
+            // --- Haupt-Datei löschen ---
+            DeleteFile(Filename, true);
 
 
-            // TmpFile wird zum Haupt
-            RenameFile(TMP, Filename);
+            // --- TmpFile wird zum Haupt ---
+            RenameFile(TMP, Filename, true);
 
             // Und nun den Block entfernen
-            if (!string.IsNullOrEmpty(BlockDatei))
-            {
-                while (FileExists(BlockDatei))
-                {
-                    // Erst, wenn die Hauptdatei wieder zugänglich ist, den Block entfernen
-                    if (CanWrite(Filename, 0)) { FileOperations.DeleteFile(BlockDatei); }
-                }
-            }
+            CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
+            DeleteFile(BlockDatei, true);
+
 
 
 
@@ -3271,7 +3284,7 @@ namespace BlueDatabase
 
             if (Writer_FilesToDeleteLCase.Count > 0)
             {
-                if (_VerwaisteDaten == enVerwaisteDaten.Löschen) { FileOperations.DeleteFile(Writer_FilesToDeleteLCase); }
+                if (_VerwaisteDaten == enVerwaisteDaten.Löschen) { DeleteFile(Writer_FilesToDeleteLCase); }
             }
             OnSavedToDisk();
         }
