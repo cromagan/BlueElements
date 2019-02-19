@@ -2959,6 +2959,12 @@ namespace BlueControls.Controls
         public void WriteColumnArrangementsInto(ComboBox _ColumnArrangementSelector)
         {
 
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => WriteColumnArrangementsInto(_ColumnArrangementSelector)));
+                return;
+            }
+
             if (_ColumnArrangementSelector != null)
             {
                 _ColumnArrangementSelector.Item.Clear();

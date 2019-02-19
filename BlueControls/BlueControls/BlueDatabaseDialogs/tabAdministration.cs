@@ -105,22 +105,13 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void ChangeDatabase(Database database)
         {
-
             _originalDB = null;
             btnVorherigeVersion.Text = "Vorherige Version";
 
-            //if (_database != null)
-            //{
-            //    //_database.ColumnArrangementsChanged += _database_ColumnArrangementsChanged;
-            //    _database.OpenEditor -= OpenEditor;
-            //}
             _database = database;
-
-
 
             if (_database != null && !_database.ReadOnly)
             {
-
                 if (_database.IsAdministrator() )
                 {
                     while (!_database.AllRulesOK())

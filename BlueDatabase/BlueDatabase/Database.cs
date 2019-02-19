@@ -2524,10 +2524,9 @@ namespace BlueDatabase
 
             while (HasPendingChanges())
             {
-
                 if (!BinSaver.IsBusy) { BinSaver.RunWorkerAsync(); }
                 Develop.DoEvents();
-                if (DateTime.Now.Subtract(D).TotalSeconds > 10 && !BinSaver.IsBusy && HasPendingChanges() && BlockDateiVorhanden()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank aufgrund der Blockdatei nicht freigegeben: " + Filename); }
+                if (DateTime.Now.Subtract(D).TotalSeconds > 30 && !BinSaver.IsBusy && HasPendingChanges() && BlockDateiVorhanden()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank aufgrund der Blockdatei nicht freigegeben: " + Filename); }
             }
             return true;
         }
@@ -3172,7 +3171,6 @@ namespace BlueDatabase
             if (ReloadNeeded()) { BinaryWriter_ReportProgressAndWait(5, "Reload"); }
 
             BinaryWriter_ReportProgressAndWait(10, "GetBinData");
-
 
             //OK, nun gehts rund: Haupt-Datei wird zum Backup kopiert.
             CopyFile(Filename, tBackup, true);
