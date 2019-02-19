@@ -110,7 +110,7 @@ namespace BlueBasics
             return ProcessFile(TryCopyFile, source, target, toBeSure);
         }
 
-        private static bool DeleteDir(string directory, bool toBeSure)
+        public static bool DeleteDir(string directory, bool toBeSure)
         {
             return ProcessFile(TryDeleteDir, directory, directory, toBeSure);
         }
