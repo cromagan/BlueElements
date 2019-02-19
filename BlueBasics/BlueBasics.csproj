@@ -110,9 +110,7 @@
     <Compile Include="Extensions\SizeFExtension.cs" />
     <Compile Include="Extensions\SortierExtensions.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
-    <Compile Include="WindowsThumbnailProvider.cs" />
-    <Compile Include="Enums\ThumbnailOptions.cs" />
-    <Compile Include="WebsiteThumbImage.cs" />
+    <Compile Include="Enums\enThumbnailOptions.cs" />
     <Compile Include="modErgebnis.cs" />
     <Compile Include="Extensions\BooleanExtensions.cs" />
     <Compile Include="Interfaces\ICanBeEmpty.cs" />

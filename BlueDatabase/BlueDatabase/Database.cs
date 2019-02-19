@@ -379,7 +379,6 @@ namespace BlueDatabase
         public event EventHandler<DatabaseChangedEventArgs> DatabaseChanged;
         public event EventHandler SortParameterChanged;
         public event EventHandler ConnectedControlsStopAllWorking;
-        public event EventHandler<ExternalEditLockReasonEventArgs> NeedExternalEditLockReason;
         public event EventHandler StoreView;
         public event EventHandler RestoreView;
         public event EventHandler SavedToDisk;
@@ -980,98 +979,55 @@ namespace BlueDatabase
 
 
 
-        /// <summary>
-        /// Wartet, bis die Datenbank-Datei zugänglich ist.
-        /// </summary>
-        /// <param name="Sec"></param>
-        /// <param name="MitReload">Wenn es aus einem Worker aufgerufen wird, muss MitReload false sein!</param>
-        /// <returns></returns>
-        public bool WindowsWaitFree(int Sec, bool MitReload)
-        {
+        ///// <summary>
+        ///// Wartet, bis die Datenbank-Datei zugänglich ist.
+        ///// </summary>
+        ///// <param name="Sec"></param>
+        ///// <param name="MitReload">Wenn es aus einem Worker aufgerufen wird, muss MitReload false sein!</param>
+        ///// <returns></returns>
+        //public bool WindowsWaitFree(int Sec, bool MitReload)
+        //{
 
-            if (ReadOnly) { return true; }
-            if (string.IsNullOrEmpty(Filename)) { return true; }
-            if (!FileExists(Filename)) { return true; }
-
-
-            var x = DateTime.Now;
-            do
-            {
-                if (MitReload && !_isParsing) { Reload(); }
-
-                var Fed = SavebleErrorReason_WindowsOnly();
-
-                if (MitReload && ReloadNeeded())
-                {
-
-                    if (Backup.IsBusy || BinSaver.IsBusy || BinReLoader.IsBusy)
-                    {
-                        Fed = "Reload kann nicht ausgeführt werden";
-                        Develop.DebugPrint(enFehlerArt.Warnung, "Reload kann nicht ausgeführt werden, Worker gerade in Arbeit");
-                    }
+        //    if (ReadOnly) { return true; }
+        //    if (string.IsNullOrEmpty(Filename)) { return true; }
+        //    if (!FileExists(Filename)) { return true; }
 
 
-                    if (_isParsing)
-                    {
-                        Fed = "Reload kann nicht ausgeführt werden";
-                        Develop.DebugPrint(enFehlerArt.Warnung, "Reload kann nicht ausgeführt werden, kein Parsing Handling definiert");
-                    }
+        //    var x = DateTime.Now;
+        //    do
+        //    {
+        //        if (MitReload && !_isParsing) { Reload(); }
 
-                }
+        //        var Fed = SavebleErrorReason_WindowsOnly();
 
+        //        if (MitReload && ReloadNeeded())
+        //        {
 
-                if (string.IsNullOrEmpty(Fed)) { return true; }
-
-                if (DateTime.Now.Subtract(x).TotalSeconds > Sec) { break; }
-
-                modAllgemein.Pause(0.2, false);
-            } while (true);
-
-
+        //            if (Backup.IsBusy || BinSaver.IsBusy || BinReLoader.IsBusy)
+        //            {
+        //                Fed = "Reload kann nicht ausgeführt werden";
+        //                Develop.DebugPrint(enFehlerArt.Warnung, "Reload kann nicht ausgeführt werden, Worker gerade in Arbeit");
+        //            }
 
 
-            //if (FehlerFeedback)
-            //{
-            //    MessageBox.Show("<b>Windows blockiert die Datenbank-Datei:</b><br>" + _FileName + "<br>Es ist keine Bearbeitung möglich, bis Windows die Datei wieder freigibt.", enImageCode.Warnung, "OK");
-            //}
+        //            if (_isParsing)
+        //            {
+        //                Fed = "Reload kann nicht ausgeführt werden";
+        //                Develop.DebugPrint(enFehlerArt.Warnung, "Reload kann nicht ausgeführt werden, kein Parsing Handling definiert");
+        //            }
 
-            return false;
-        }
-
-
-        /// <summary>
-        /// Prüft, ob Windows die Datenbank-Datei blockiert.
-        /// Diese Routine setzt vorraus, dass:
-        /// - Ein Dateiname vorhanden ist
-        /// - Die Datei existiert
-        /// - Schreibrechte in dem Ordner bestehen
-        /// </summary>
-        /// <returns></returns>
-        private string SavebleErrorReason_WindowsOnly()
-        {
-
-            if (ReadOnly) { return "Datenbank wurde schreibgeschützt geöffnet"; }
+        //        }
 
 
-            if (DateTime.Now.Subtract(SavebleErrorReason_WindowsOnly_lastChecked).TotalSeconds < 0) { return "Windows blockiert die Datenbank-Datei."; }
+        //        if (string.IsNullOrEmpty(Fed)) { return true; }
 
-            if (!CanWrite(Filename, 0.5))
-            {
-                //Dim c As New clsUserAccessRights(_FileName.FilePath)
-                //If Not c.CanWrite Then Return "Sie haben im Verzeichnis der Datenbank keine Schreibrechte."
-                //If Not c.CanCreateFiles Then Return "Sie haben im Verzeichnis der Datenbank keine Rechte zum Erstellen neuer Dateien."
-                //If Not c.CanDelete Then Return "Sie haben im Verzeichnis der Datenbank keine Rechte zum Löschen von Dateien."
-                //If Not c.CanCreateFiles Then Return "Sie haben im Verzeichnis der Datenbank keine Rechte zum Erstellen neuer Dateien."
-                //If Not c.CanWrite Then Return "Sie haben im Verzeichnis der Datenbank keine Rechte zum Daten schreiben."
+        //        if (DateTime.Now.Subtract(x).TotalSeconds > Sec) { break; }
 
+        //        modAllgemein.Pause(0.2, false);
+        //    } while (true);
 
-                SavebleErrorReason_WindowsOnly_lastChecked = DateTime.Now.AddSeconds(5);
-                return "Windows blockiert die Datenbank-Datei.";
-            }
-
-            return string.Empty;
-
-        }
+        //   return false;
+        //}
 
 
         public void SaveAsAndChangeTo(string NewFileName)
@@ -1768,12 +1724,9 @@ namespace BlueDatabase
         public void UnlockHard()
         {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-
-            if (!WindowsWaitFree(120, true)) { return; }
             if (IsSaveAble() && !BlockDateiVorhanden()) { return; }
             Reload();
             if (BlockDateiVorhanden()) { DeleteFile(Blockdateiname(), true); }
-
             Release(true);
         }
 
@@ -1806,21 +1759,26 @@ namespace BlueDatabase
             if (BinReLoader.IsBusy) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
             if (Backup.IsBusy) { return "Speichern aktuell nicht möglich, da gerade Sicherheitskopien erstellt werden."; }
 
-            var f = NeedEditLockReason(null, null);
-            if (!string.IsNullOrEmpty(f)) { return f; }
+            //var f = NeedEditLockReason(null, null);
+            //if (!string.IsNullOrEmpty(f)) { return f; }
 
 
             if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
             if (!FileExists(Filename)) { return string.Empty; }
 
+
+
             if (!CanWriteInDirectory(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datenbank keine Schreibrechte."; }
 
-            //if (ReloadNeeded()) { return "Der geladene Stand der Datenbank ist veraltet."; }
+            if (DateTime.Now.Subtract(SavebleErrorReason_WindowsOnly_lastChecked).TotalSeconds < 0) { return "Windows blockiert die Datenbank-Datei."; }
 
-            //if (_TryMode.Count > 0) { return "Eine Zeile ist gerade ausgelagert."; }
+            if (!CanWrite(Filename, 0.5))
+            {
+                SavebleErrorReason_WindowsOnly_lastChecked = DateTime.Now.AddSeconds(5);
+                return "Windows blockiert die Datenbank-Datei.";
+            }
 
-            f = SavebleErrorReason_WindowsOnly();
-            if (!string.IsNullOrEmpty(f)) { return f; }
+
 
             return string.Empty;
         }
@@ -2305,18 +2263,6 @@ namespace BlueDatabase
             return Convert.ToBoolean(UserGroup.ToUpper() == "#ADMINISTRATOR");
         }
 
-        internal string NeedEditLockReason(ColumnItem Column, RowItem Row)
-        {
-            var e = new ExternalEditLockReasonEventArgs(Column, Row);
-            OnNeedExternalEditLockReason(e);
-
-            return e.FeedbackReason;
-        }
-
-        private void OnNeedExternalEditLockReason(ExternalEditLockReasonEventArgs e)
-        {
-            NeedExternalEditLockReason?.Invoke(this, e);
-        }
 
         public new string ToString()
         {
@@ -3186,10 +3132,8 @@ namespace BlueDatabase
 
         private void BinSaver_DoWork(object sender, DoWorkEventArgs e)
         {
-
             if (ReadOnly) { return; }
 
-            WindowsWaitFree(20, false);
             var f = SavebleErrorReason();
 
             if (!string.IsNullOrEmpty(f))

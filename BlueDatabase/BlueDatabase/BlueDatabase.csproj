@@ -95,7 +95,6 @@
     <Compile Include="EventArgs\DatabaseChangedEventArgs.cs" />
     <Compile Include="EventArgs\DatabaseGiveBackEventArgs.cs" />
     <Compile Include="EventArgs\DoRowAutomaticEventArgs.cs" />
-    <Compile Include="EventArgs\ExternalEditLockReasonEventArgs.cs" />
     <Compile Include="EventArgs\FilterEventArgs.cs" />
     <Compile Include="EventArgs\KeyChangedEventArgs.cs" />
     <Compile Include="EventArgs\RowCancelEventArgs.cs" />

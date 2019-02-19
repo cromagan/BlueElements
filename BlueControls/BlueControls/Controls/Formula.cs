@@ -1,3 +1,22 @@
+#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,7 +52,6 @@ namespace BlueControls.Controls
 
 
         public event EventHandler<RowEventArgs> ShowingRowChanged;
-        public event EventHandler<ExternalEditLockReasonEventArgs> NeedUserEditLockReason;
         public event EventHandler DatabaseChanged;
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
@@ -88,7 +106,6 @@ namespace BlueControls.Controls
                     {
                         _Database.DatabaseChanged -= _Database_DatabaseChanged;
                         _Database.Row.RowChecked -= _Database_RowChecked;
-                        _Database.NeedExternalEditLockReason -= _Database_NeedExternalEditLockReason;
                         _Database.Column.ItemRemoved -= _Database_ColumnRemoved;
                         _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
                         _Database.StoreView -= _Database_StoreView;
@@ -104,7 +121,6 @@ namespace BlueControls.Controls
                     {
                         _Database.DatabaseChanged += _Database_DatabaseChanged;
                         _Database.Row.RowChecked += _Database_RowChecked;
-                        _Database.NeedExternalEditLockReason += _Database_NeedExternalEditLockReason;
                         _Database.Column.ItemRemoved += _Database_ColumnRemoved;
                         _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
                         _Database.StoreView += _Database_StoreView;
@@ -755,16 +771,6 @@ namespace BlueControls.Controls
 
         }
 
-
-        private void _Database_NeedExternalEditLockReason(object sender, ExternalEditLockReasonEventArgs e)
-        {
-            OnNeedUserEditLockReason(e);
-        }
-
-        private void OnNeedUserEditLockReason(ExternalEditLockReasonEventArgs e)
-        {
-            NeedUserEditLockReason?.Invoke(this, e);
-        }
 
         protected override void InitializeSkin()
         {

@@ -1,4 +1,24 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueControls.BlueDatabaseDialogs;
@@ -133,8 +153,6 @@ namespace BlueControls.Controls
 
         public event EventHandler DatabaseChanged;
 
-        public event EventHandler<ExternalEditLockReasonEventArgs> NeedExternalEditLockReason;
-
 
         #endregion
 
@@ -171,7 +189,6 @@ namespace BlueControls.Controls
                         _Database.Cell.CellValueChanged -= _Database_CellValueChanged;
                         _Database.ConnectedControlsStopAllWorking -= _Database_StopAllWorking;
                         _Database.DatabaseChanged -= _Database_DatabaseChanged;
-                        _Database.NeedExternalEditLockReason -= OnNeedExternalEditLockReason;
                         _Database.StoreView -= _Database_StoreView;
                         _Database.RowKeyChanged -= _Database_RowKeyChanged;
                         _Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
@@ -195,8 +212,7 @@ namespace BlueControls.Controls
                         _Database.Cell.CellValueChanged += _Database_CellValueChanged;
                         _Database.ConnectedControlsStopAllWorking += _Database_StopAllWorking;
                         _Database.DatabaseChanged += _Database_DatabaseChanged;
-                        _Database.NeedExternalEditLockReason += OnNeedExternalEditLockReason;
-                        _Database.StoreView += _Database_StoreView;
+                         _Database.StoreView += _Database_StoreView;
                         _Database.RowKeyChanged += _Database_RowKeyChanged;
                         _Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
                         _Database.RestoreView += _Database_RestoreView;
@@ -2985,11 +3001,6 @@ namespace BlueControls.Controls
             }
         }
 
-
-        private void OnNeedExternalEditLockReason(object sender, ExternalEditLockReasonEventArgs e)
-        {
-            NeedExternalEditLockReason?.Invoke(this, e);
-        }
 
 
 
