@@ -99,6 +99,7 @@ namespace BlueBasics
 
         public static bool DeleteFile(string file, bool toBeSure)
         {
+            if (!FileExists(file)) { return true; }
             return ProcessFile(TryDeleteFile, file, file, toBeSure);
         }
         public static bool RenameFile(string oldName, string newName, bool toBeSure)
