@@ -657,7 +657,7 @@ namespace BeCreative
                 DatabaseSet(new Database(false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout)); // Ab jetzt in der Variable _Database zu finden
             }
 
-            if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName); }
+            if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
             _Database.SaveAsAndChangeTo(SaveTab.FileName);
             DatabaseSet(SaveTab.FileName);
 
