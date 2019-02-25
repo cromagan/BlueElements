@@ -1,12 +1,31 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueControls.DialogBoxes;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
-using BlueControls.ItemCollection.ItemCollectionPad;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
@@ -1035,11 +1054,11 @@ namespace BlueControls.Controls
                 {
                     if (Drawall)
                     {
-                        thisItem.Draw(GR, cZoom, MoveX, MoveY, 0, true, Size.Empty, ForPrinting);
+                        thisItem.Draw(GR, cZoom, MoveX, MoveY, 0, Size.Empty, ForPrinting);
                     }
                     else
                     {
-                        thisItem.Draw(GR, cZoom, MoveX, MoveY, 0, true, Size, ForPrinting);
+                        thisItem.Draw(GR, cZoom, MoveX, MoveY, 0, Size, ForPrinting);
                     }
                 }
             }
@@ -1140,7 +1159,7 @@ namespace BlueControls.Controls
                 var P1 = ThisRelation.Points[0].ZoomAndMove(_Zoom, X, Y);
                 var P2 = ThisRelation.Points[1].ZoomAndMove(_Zoom, X, Y);
 
-                if (ThisRelation.Type == enRelationType.WaagerechtSenkrecht)
+                if (ThisRelation.RelationType == enRelationType.WaagerechtSenkrecht)
                 {
                     TMPGR.DrawEllipse(new Pen(Color.Green, 3), P1.X - 4, P1.Y - 3, 7, 7);
                     TMPGR.DrawEllipse(new Pen(Color.Green, 3), P2.X - 4, P2.Y - 3, 7, 7);
@@ -1166,7 +1185,7 @@ namespace BlueControls.Controls
 
 
 
-        protected override void DrawControl(Graphics GR, enStates vState)
+        protected override void DrawControl(Graphics gr, enStates state)
         {
             if (_BitmapOfControl == null)
             {
@@ -1175,15 +1194,15 @@ namespace BlueControls.Controls
 
             var TMPGR = Graphics.FromImage(_BitmapOfControl);
 
-            DrawCreativePadToBitmap(GR, vState);
+            DrawCreativePadToBitmap(gr, state);
 
             TMPGR.Dispose();
 
 
-            GR.DrawImage(_BitmapOfControl, 0, 0);
+            gr.DrawImage(_BitmapOfControl, 0, 0);
 
 
-            Skin.Draw_Border(GR, enDesign.Table_And_Pad, vState, DisplayRectangle);
+            Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, DisplayRectangle);
 
         }
 
@@ -2213,7 +2232,7 @@ namespace BlueControls.Controls
             {
                 if (thisRelation != null)
                 {
-                    if (thisRelation.Type == rel && thisRelation.Richtmaß() == r.Richtmaß())
+                    if (thisRelation.RelationType == rel && thisRelation.Richtmaß() == r.Richtmaß())
                     {
                         if (thisRelation.Points[0] == Snap1 && thisRelation.Points[1] == SnaP2) { return null; }
                         if (thisRelation.Points[0] == SnaP2 && thisRelation.Points[1] == Snap1) { return null; }
@@ -3131,11 +3150,11 @@ namespace BlueControls.Controls
 
 
                         // Wenn Punkte nicht direct verbunden sind, aber trotzdem Fix zueinander, die Beziehung optimieren
-                        if (ThisRelation.Type == enRelationType.WaagerechtSenkrecht && !ThisRelation.IsInternal())
+                        if (ThisRelation.RelationType == enRelationType.WaagerechtSenkrecht && !ThisRelation.IsInternal())
                         {
                             if (Cb.Contains(ThisRelation.Points[0]) && Cb.Contains(ThisRelation.Points[1]))
                             {
-                                ThisRelation.Type = enRelationType.PositionZueinander;
+                                ThisRelation.RelationType = enRelationType.PositionZueinander;
                                 ThisRelation.InitRelationData(false);
                                 InvalidateOrder();
                                 Relations_Optimizex();
@@ -3145,7 +3164,7 @@ namespace BlueControls.Controls
 
 
                         // Für nachher, die doppelten fixen Beziehungen merken
-                        if (ThisRelation.Type == enRelationType.PositionZueinander)
+                        if (ThisRelation.RelationType == enRelationType.PositionZueinander)
                         {
                             if (Cb.Contains(ThisRelation.Points[0]) && Cb.Contains(ThisRelation.Points[1])) { DobR.Add(ThisRelation); }
                         }
@@ -3212,7 +3231,7 @@ namespace BlueControls.Controls
 
                             if (r1.UsesSamePoints(r2))
                             {
-                                switch (r1.Type)
+                                switch (r1.RelationType)
                                 {
                                     case enRelationType.PositionZueinander:
                                         // Beziehungen mit gleichen punkten, aber einer mächtigen PositionZueinander -> andere löschen
@@ -3220,9 +3239,9 @@ namespace BlueControls.Controls
                                         InvalidateOrder();
                                         Relations_Optimizex();
                                         return;
-                                    case enRelationType.WaagerechtSenkrecht when r2.Type == enRelationType.WaagerechtSenkrecht && r1.Richtmaß() != r2.Richtmaß():
+                                    case enRelationType.WaagerechtSenkrecht when r2.RelationType == enRelationType.WaagerechtSenkrecht && r1.Richtmaß() != r2.Richtmaß():
                                         // Beziehungen mit gleichen punkten, aber spearat mix X und Y -> PositionZueinander konvertieren 
-                                        r1.Type = enRelationType.PositionZueinander;
+                                        r1.RelationType = enRelationType.PositionZueinander;
                                         r1.InitRelationData(false);
                                         Relations.Remove(r2);
                                         InvalidateOrder();
@@ -3471,7 +3490,7 @@ namespace BlueControls.Controls
 
         public static string RenameColumnInLayout(Database database, string LayoutCode, string OldName, ColumnItem Column)
         {
-            CreativePad Padx = new CreativePad(); // TODO: Creative-Pad unabhängig eines Controls erstellen.
+            var Padx = new CreativePad(); // TODO: Creative-Pad unabhängig eines Controls erstellen.
             Padx.ParseData(LayoutCode, false);
             Padx.RenameColumn(OldName, Column);
             var R = Padx.DataToString();

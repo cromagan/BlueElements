@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing;
@@ -97,7 +116,7 @@ namespace BlueControls.Controls
         }
 
 
-        protected override void DrawControl(Graphics GR, enStates vState)
+        protected override void DrawControl(Graphics gr, enStates state)
         {
             if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
 
@@ -107,12 +126,12 @@ namespace BlueControls.Controls
             if (ParentType() == enPartentType.RibbonPage)
             {
 
-                if (!Parent.Enabled) { vState = enStates.Standard_Disabled; } // TabPage
-                if (!Parent.Parent.Enabled) { vState = enStates.Standard_Disabled; }// RibbonBar
+                if (!Parent.Enabled) { state = enStates.Standard_Disabled; } // TabPage
+                if (!Parent.Parent.Enabled) { state = enStates.Standard_Disabled; }// RibbonBar
                 //  vState = enStates.Standard_Disabled
-                Skin.Draw_Back(TMPGR, enDesign.RibbonBar_Frame, vState, DisplayRectangle, this, true);
-                Skin.Draw_Border(TMPGR, enDesign.RibbonBar_Frame, vState, DisplayRectangle);
-                Skin.Draw_FormatedText(TMPGR, _Text, enDesign.RibbonBar_Frame, vState, null, enAlignment.Bottom_HorizontalCenter, new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width, DisplayRectangle.Height + 2), this, false);
+                Skin.Draw_Back(TMPGR, enDesign.RibbonBar_Frame, state, DisplayRectangle, this, true);
+                Skin.Draw_Border(TMPGR, enDesign.RibbonBar_Frame, state, DisplayRectangle);
+                Skin.Draw_FormatedText(TMPGR, _Text, enDesign.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width, DisplayRectangle.Height + 2), this, false);
 
                 if (Dock != System.Windows.Forms.DockStyle.Left)
                 {
@@ -127,17 +146,17 @@ namespace BlueControls.Controls
             {
 
                 var r = new Rectangle(DisplayRectangle.Left + Skin.Padding, DisplayRectangle.Top, DisplayRectangle.Width, DisplayRectangle.Height);
-                Skin.Draw_Back(TMPGR, enDesign.Frame, vState, DisplayRectangle, this, true);
+                Skin.Draw_Back(TMPGR, enDesign.Frame, state, DisplayRectangle, this, true);
 
                 if (Height > 33)
                 {
-                    Skin.Draw_Border(TMPGR, enDesign.Frame, vState, DisplayRectangle);
-                    Skin.Draw_FormatedText(TMPGR, _Text, enDesign.Frame, vState, null, enAlignment.Top_Left, r, this, true);
+                    Skin.Draw_Border(TMPGR, enDesign.Frame, state, DisplayRectangle);
+                    Skin.Draw_FormatedText(TMPGR, _Text, enDesign.Frame, state, null, enAlignment.Top_Left, r, this, true);
                 }
 
             }
 
-            GR.DrawImage(_BitmapOfControl, 0, 0);
+            gr.DrawImage(_BitmapOfControl, 0, 0);
             TMPGR.Dispose();
 
         }

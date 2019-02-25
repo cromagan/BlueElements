@@ -1,13 +1,32 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection.ItemCollectionPad
+namespace BlueControls.ItemCollection
 {
 
 
@@ -94,33 +113,20 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
             return "LINE";
         }
 
-        public override bool Contains(PointF P, decimal Zoomf)
+        public override bool Contains(PointF value, decimal zoomfactor)
         {
-            var ne = 5 / Zoomf;
+            var ne = 5 / zoomfactor;
 
-            if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M)
-            {
-                return false;
-            }
+            if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M) { return false; }
 
 
-            if (_TempPoints.Count == 0)
-            {
-                CalcTempPoints();
-            }
+            if (_TempPoints.Count == 0) { CalcTempPoints(); }
 
-            if (_TempPoints.Count == 0)
-            {
-                return false;
-            }
-
+            if (_TempPoints.Count == 0) { return false; }
 
             for (var z = 0 ; z <= _TempPoints.Count - 2 ; z++)
             {
-                if (P.DistanzZuStrecke(_TempPoints[z], _TempPoints[z + 1]) < ne)
-                {
-                    return true;
-                }
+                if (value.DistanzZuStrecke(_TempPoints[z], _TempPoints[z + 1]) < ne) { return true; }
             }
 
             return false;
@@ -231,7 +237,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
         }
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> Relations)
+        public override void GenerateInternalRelation(List<clsPointRelation> relations)
         {
             // nix zu Tun
         }
@@ -792,13 +798,13 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
             var l = new List<FlexiControl>();
 
 
-            var Verhalt = new ItemCollectionList.ItemCollectionList();
+            var Verhalt = new ItemCollectionList();
             Verhalt.Add(new TextListItem(Convert.ToInt32(enConectorStyle.Direct).ToString(), "Linie direkt zwischen zwei Punkten", QuickImage.Get(enImageCode.Linie)));
             Verhalt.Add(new TextListItem(Convert.ToInt32(enConectorStyle.Ausweichenx).ToString(), "Linie soll Objekten ausweichen", QuickImage.Get(enImageCode.Linie)));
             Verhalt.Add(new TextListItem(Convert.ToInt32(enConectorStyle.AusweichenUndGerade).ToString(), "Linie soll Objekten ausweichen und rechtwinklig sein", QuickImage.Get(enImageCode.Linie)));
             l.Add(new FlexiControl("Linien-Verhalten", Convert.ToInt32(Art).ToString(), Verhalt));
 
-            var Rahms = new ItemCollectionList.ItemCollectionList();
+            var Rahms = new ItemCollectionList();
             //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
             Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolOfLine()));
             Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolOfLine()));

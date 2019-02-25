@@ -1,15 +1,35 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.DialogBoxes;
 using BlueControls.Enums;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection.ItemCollectionPad
+namespace BlueControls.ItemCollection
 {
     public class RowFormulaPadItem : BasicPadItem
     {
@@ -152,9 +172,9 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
             return "ROW";
         }
 
-        public override bool Contains(PointF P, decimal Zoomf)
+        public override bool Contains(PointF value, decimal zoomfactor)
         {
-            return UsedArea().Contains(P.ToPointDF());
+            return UsedArea().Contains(value.ToPointDF());
         }
 
 
@@ -300,7 +320,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
         }
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> Relations)
+        public override void GenerateInternalRelation(List<clsPointRelation> relations)
         {
             p_LU.X = p_LO.X;
             p_RO.Y = p_LO.Y;
@@ -315,14 +335,14 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
             p_R.X = p_RO.X;
 
 
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
+            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
+            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
+            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
 
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_R));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_L));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_u));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_o));
+            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_R));
+            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_L));
+            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_u));
+            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_o));
         }
 
 
@@ -436,7 +456,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
             l.Add(new FlexiControl());
 
 
-            var Layouts = new ItemCollectionList.ItemCollectionList();
+            var Layouts = new ItemCollectionList();
             for (var z = 0 ; z < Row.Database.Layouts.Count ; z++)
             {
                 using (var p = new CreativePad())

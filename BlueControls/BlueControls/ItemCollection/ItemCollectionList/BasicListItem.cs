@@ -1,4 +1,23 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
@@ -7,7 +26,7 @@ using BlueControls.ItemCollection.Basics;
 using System;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection.ItemCollectionList
+namespace BlueControls.ItemCollection
 {
     public abstract class BasicListItem : BasicItem, ICompareKey, IComparable, ICloneable
         {
@@ -137,30 +156,31 @@ namespace BlueControls.ItemCollection.ItemCollectionList
             }
 
 
-            //protected enStates ModifyState(enStates vState)
-            //{
-            //    enStates ItemState = 0;
+        //protected enStates ModifyState(enStates vState)
+        //{
+        //    enStates ItemState = 0;
 
 
-            //    if (Convert.ToBoolean(vState & enStates.Standard_Disabled) || !_Enabled)
-            //    {
-            //        ItemState = enStates.Standard_Disabled;
-            //    }
-            //    else
-            //    {
-            //        ItemState = enStates.Standard;
-            //        if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { ItemState |= enStates.Standard_MouseOver; }
-            //    }
+        //    if (Convert.ToBoolean(vState & enStates.Standard_Disabled) || !_Enabled)
+        //    {
+        //        ItemState = enStates.Standard_Disabled;
+        //    }
+        //    else
+        //    {
+        //        ItemState = enStates.Standard;
+        //        if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { ItemState |= enStates.Standard_MouseOver; }
+        //    }
 
 
-            //    if (_Checked) { ItemState |= enStates.Checked; }
+        //    if (_Checked) { ItemState |= enStates.Checked; }
 
 
-            //    return ItemState;
-            //}
+        //    return ItemState;
+        //}
 
 
-            public void Draw(Graphics GR, int xModifier, int YModifier, enStates vState, bool DrawBorderAndBack, string FilterText)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Argumente von öffentlichen Methoden validieren", MessageId = "0")]
+        public void Draw(Graphics GR, int xModifier, int YModifier, enStates vState, bool DrawBorderAndBack, string FilterText)
             {
 
 
@@ -188,14 +208,21 @@ namespace BlueControls.ItemCollection.ItemCollectionList
 
             }
 
-
-            public int CompareTo(object obj)
+        public int CompareTo(object obj)
+        {
+            if (obj is BasicListItem tobj)
             {
-                if (!(obj is BasicListItem)) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!"); }
-                return CompareKey().CompareTo(((BasicListItem)obj).CompareKey());
+                // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
+                return CompareKey().CompareTo((tobj).CompareKey());
             }
+            else
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+                return 0;
+            }
+        }
 
-            public object Clone()
+        public object Clone()
             {
                 var x = CloneLVL2();
                 x._Checked = _Checked;

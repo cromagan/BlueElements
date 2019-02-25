@@ -17,22 +17,20 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using System;
 
-using BlueControls.ItemCollection;
-
-namespace BlueControls.EventArgs
+namespace BlueBasics
 {
-  public  class BasicListItemEventArgs : System.EventArgs
-    {
-        public BasicListItemEventArgs(BasicListItem Item)
+
+
+        public struct strProcess
         {
-            this.Item = Item;
-
-
+            public IntPtr MainWindowHandle;
+            public int prid;
+            public string MainWindowTitle;
+            public string Klasse;
+            public string ExeName;
         }
 
-        public BasicListItem Item { get; set; }
 
-
-    }
 }

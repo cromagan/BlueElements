@@ -27,7 +27,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.DialogBoxes;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Enums;
@@ -460,7 +460,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 if (_TableView.PermanentPossible(ViewItem) && _TableView.NonPermanentPossible(ViewItem))
                 {
                     btnPermanent.Enabled = true;
-                    btnPermanent.Checked = (ViewItem.Type == enViewType.PermanentColumn);
+                    btnPermanent.Checked = (ViewItem.ViewType == enViewType.PermanentColumn);
                 }
                 else if (_TableView.PermanentPossible(ViewItem))
                 {
@@ -619,11 +619,11 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (btnPermanent.Checked)
             {
-                ViewItem.Type = enViewType.PermanentColumn;
+                ViewItem.ViewType = enViewType.PermanentColumn;
             }
             else
             {
-                ViewItem.Type = enViewType.Column;
+                ViewItem.ViewType = enViewType.Column;
             }
             Check_OrderButtons();
         }

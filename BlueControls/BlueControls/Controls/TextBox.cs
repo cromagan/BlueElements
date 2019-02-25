@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -8,10 +27,8 @@ using BlueBasics.Enums;
 using BlueControls.DialogBoxes;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollection;
 using BlueDatabase.EventArgs;
-using DataFormats = System.Windows.DataFormats;
-using DataObject = System.Windows.DataObject;
 using BlueControls.Enums;
 
 namespace BlueControls.Controls
@@ -604,9 +621,9 @@ namespace BlueControls.Controls
             // Anscheinend wird bei den Clipboard operationen ein DoEventXsx ausgelöst.
             // Dadurch kommt es zum Refresh des übergeordneten Steuerelementes, warscheinlich der Textbox.
             // Deshalb  muss 'Char_DelBereich' NACH den Clipboard-Operationen stattfinden.
-            if (!System.Windows.Forms.Clipboard.GetDataObject().GetDataPresent(DataFormats.Text)) { return; }
+            if (!System.Windows.Forms.Clipboard.GetDataObject().GetDataPresent(System.Windows.Forms.DataFormats.Text)) { return; }
             Char_DelBereich(-1, -1);
-            InsertText(Convert.ToString(System.Windows.Clipboard.GetDataObject().GetData(DataFormats.UnicodeText)));
+            InsertText(Convert.ToString(System.Windows.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.UnicodeText)));
         }
 
 
@@ -643,8 +660,8 @@ namespace BlueControls.Controls
             tt = tt.Replace("\n", string.Empty);
             tt = tt.Replace("\r", "\r\n");
 
-            var datobj = new DataObject();
-            datobj.SetData(DataFormats.Text, tt);
+            var datobj = new System.Windows.Forms.DataObject();
+            datobj.SetData(System.Windows.Forms.DataFormats.Text, tt);
             System.Windows.Clipboard.SetDataObject(datobj);
         }
         #endregion
@@ -1141,19 +1158,19 @@ namespace BlueControls.Controls
         }
 
 
-        protected override void DrawControl(Graphics GR, enStates vState)
+        protected override void DrawControl(Graphics gr, enStates state)
         {
 
             if (_eTxt == null) { GenerateETXT(true); }
 
-            if (vState == enStates.Checked_Disabled)
+            if (state == enStates.Checked_Disabled)
             {
                 Develop.DebugPrint("Checked Disabled");
-                vState = enStates.Checked_Disabled;
+                state = enStates.Checked_Disabled;
             }
 
 
-            if (vState == enStates.Standard_Disabled)
+            if (state == enStates.Standard_Disabled)
             {
                 if (_MarkStart > -1) { Develop.DebugPrint("Markstart:" + _MarkStart); }
                 if (_MarkEnd > -1) { Develop.DebugPrint("_MarkEnd:" + _MarkStart); }
@@ -1164,7 +1181,7 @@ namespace BlueControls.Controls
 
             // Erst den Typ richtig stellen, dann den State ändern!
             _eTxt.Design = GetDesign();
-            _eTxt.State = vState;
+            _eTxt.State = state;
 
             switch (_Verhalten)
             {
@@ -1194,7 +1211,7 @@ namespace BlueControls.Controls
                         SliderY.Top = 0;
 
                         // Mache Vorab-Routinen können den Slider nicht umschalten, deshalb hier nochmal die Kontrolle
-                        if (Convert.ToBoolean(_eTxt.Height() > Height) == SliderY.Visible) { DrawControl(GR, vState); }
+                        if (Convert.ToBoolean(_eTxt.Height() > Height) == SliderY.Visible) { DrawControl(gr, state); }
                         return;
                     }
 
@@ -1275,7 +1292,7 @@ namespace BlueControls.Controls
 
             var TMPGR = Graphics.FromImage(_BitmapOfControl);
 
-            Skin.Draw_Back(TMPGR, _eTxt.Design, vState, DisplayRectangle, this, true);
+            Skin.Draw_Back(TMPGR, _eTxt.Design, state, DisplayRectangle, this, true);
             Cursor_Show(TMPGR);
             MarkAndGenerateZone(TMPGR);
 
@@ -1299,9 +1316,9 @@ namespace BlueControls.Controls
             }
 
 
-            Skin.Draw_Border(TMPGR, _eTxt.Design, vState, DisplayRectangle);
+            Skin.Draw_Border(TMPGR, _eTxt.Design, state, DisplayRectangle);
 
-            GR.DrawImage(_BitmapOfControl, 0, 0);
+            gr.DrawImage(_BitmapOfControl, 0, 0);
 
             TMPGR.Dispose();
 
@@ -1682,19 +1699,19 @@ namespace BlueControls.Controls
                 case "#Caption":
                     if (_MarkStart < 0 || _MarkEnd < 0) { return; }
                     Selection_Repair(true);
-                    _eTxt.Stufe(_MarkStart, _MarkEnd - 1, 3);
+                    _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 3);
                     return;
 
                 case "#NoCaption":
                     if (_MarkStart < 0 || _MarkEnd < 0) { return; }
                     Selection_Repair(true);
-                    _eTxt.Stufe(_MarkStart, _MarkEnd - 1, 4);
+                    _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 4);
                     return;
 
                 case "#Bold":
                     if (_MarkStart < 0 || _MarkEnd < 0) { return; }
                     Selection_Repair(true);
-                    _eTxt.Stufe(_MarkStart, _MarkEnd - 1, 7);
+                    _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 7);
                     return;
 
 
@@ -1840,7 +1857,7 @@ namespace BlueControls.Controls
             }
 
 
-            if (!(this is ComboBox) || ((ComboBox)this).DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown)
+            if (!(this is ComboBox cbx) || cbx.DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown)
             {
                 ThisContextMenu.Add(enContextMenuComands.Ausschneiden, Convert.ToBoolean(_MarkStart >= 0) && Enabled);
                 ThisContextMenu.Add(enContextMenuComands.Kopieren, Convert.ToBoolean(_MarkStart >= 0));

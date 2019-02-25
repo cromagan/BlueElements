@@ -27,7 +27,7 @@ using System.Diagnostics;
 using System.Drawing;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.ItemCollection.ItemCollectionList
+namespace BlueControls.ItemCollection
 {
     public class BitmapListItem : BasicListItem
     {

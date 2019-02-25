@@ -1,4 +1,23 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
@@ -8,11 +27,11 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection.ItemCollectionPad
+namespace BlueControls.ItemCollection
 {
     public abstract class BasicPadItem : BasicItem, IParseable
     {
-        protected abstract bool ParseLevel2(KeyValuePair<string, string> Pair);
+        protected abstract bool ParseLevel2(KeyValuePair<string, string> pair);
 
         protected abstract string ToStringLevel2();
 
@@ -38,7 +57,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
         /// Erstellt alle Internen Beziehungen
         /// </summary>
         /// <remarks></remarks>
-        public abstract void GenerateInternalRelation(List<clsPointRelation> Relations);
+        public abstract void GenerateInternalRelation(List<clsPointRelation> relations);
 
 
         internal abstract void KeepInternalLogic();
@@ -49,7 +68,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
         /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
         /// </summary>
         /// <remarks></remarks>
-        public abstract bool Contains(PointF P, decimal Zoomf);
+        public abstract bool Contains(PointF value, decimal zoomfactor);
 
         public ItemCollectionPad Parent;
 
@@ -142,11 +161,11 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
         public bool IsParsing { get; private set; }
 
 
-        public void Parse(string StringToParse)
+        public void Parse(string ToParse)
         {
             IsParsing = true;
 
-            foreach (var pair in StringToParse.GetAllTags())
+            foreach (var pair in ToParse.GetAllTags())
             {
                 switch (pair.Key)
                 {
@@ -307,7 +326,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
 
 
 
-        public void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, bool FullDraw, Size SizeOfParentControl, bool ForPrinting)
+        public void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
 

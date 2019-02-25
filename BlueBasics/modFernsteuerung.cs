@@ -1,3 +1,22 @@
+#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -6,23 +25,8 @@ using System.Runtime.InteropServices;
 namespace BlueBasics
 {
 
-    // TODO: Structuren und Enums auslagern
-
-    public static class modFernsteuerung
+    public static partial class modFernsteuerung
     {
-
-
-        public enum MOUSEEVENT
-        {
-            LEFTDOWN = 0x2,
-            LEFTUP = 0x4,
-            MOVE = 0x1,
-            RIGHTDOWN = 0x8,
-            RIGHTUP = 0x10,
-            MIDDLEDOWN = 0x20,
-            MIDDLEUP = 0x40,
-            ABSOLUTE = 0x8000
-        }
 
 
 
@@ -44,24 +48,6 @@ namespace BlueBasics
 
         [DllImport("user32", EntryPoint = "ShowWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        public enum enSW
-        {
-            Hide = 0,
-            Normal = 1,
-            ShowMinimized = 2,
-            ShowMaximized = 3,
-            ShowNoActivate = 4,
-            Show = 5,
-            Minimize = 6,
-            ShowMinNoActive = 7,
-            ShowNA = 8,
-            Restore = 9,
-            ShowDefault = 10,
-            ForceMinimize = 11,
-            Max = 11
-
-        }
 
 
 
@@ -94,17 +80,6 @@ namespace BlueBasics
 
         [DllImport("user32", EntryPoint = "GetWindowRect", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
-        //Declare Function ShowWindow Lib "user32" (ByVal hWnd As IntPtr, ByVal nCmdShow As Integer) As Integer
-
-
-        public struct exProcess
-        {
-            public IntPtr MainWindowHandle;
-            public int prid;
-            public string MainWindowTitle;
-            public string Klasse;
-            public string ExeName;
-        }
 
 
         /// <summary>
@@ -170,7 +145,8 @@ namespace BlueBasics
         /// </summary>
         /// <param name="wDescr"></param>
         /// <remarks></remarks>
-        public static void GetWindowInfo(ref exProcess wDescr)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults", MessageId = "BlueBasics.modFernsteuerung.GetWindowThreadProcessId(System.IntPtr,System.Int32@)")]
+        public static void GetWindowInfo(ref strProcess wDescr)
         {
             //If WorkStationISLocked() Then
             //    wDescr = Nothing
@@ -200,9 +176,9 @@ namespace BlueBasics
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static List<exProcess> exProzesse()
+        public static List<strProcess> exProzesse()
         {
-            var wDescr = new List<exProcess>();
+            var wDescr = new List<strProcess>();
             var hh = GetTopWindow((IntPtr)0);
 
 
@@ -211,7 +187,7 @@ namespace BlueBasics
                 hh = GetWindow(hh, 2);
                 if (hh.ToInt32() != 0)
                 {
-                    var l = new exProcess();
+                    var l = new strProcess();
                     l.MainWindowHandle = hh;
                     GetWindowInfo(ref l);
                     wDescr.Add(l);

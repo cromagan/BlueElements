@@ -1,4 +1,23 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
@@ -6,7 +25,7 @@ using BlueControls.DialogBoxes;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using System;
 using System.ComponentModel;
@@ -170,7 +189,7 @@ namespace BlueControls.Controls
 
 
 
-        protected override void DrawControl(Graphics GR, enStates vState)
+        protected override void DrawControl(Graphics gr, enStates state)
         {
 
             if (_DrawStyle == enComboboxStyle.RibbonBar)
@@ -180,7 +199,7 @@ namespace BlueControls.Controls
 
                 SetAlternateStyle();
                 RowItem tempVar = null;
-                Button.DrawButton(this, GR, ref tempVar, enDesign.Ribbonbar_Button, vState, QuickImage.Get(_ImageCode), enAlignment.VerticalCenter_Left, true, null, Initialtext, DisplayRectangle);
+                Button.DrawButton(this, gr, ref tempVar, enDesign.Ribbonbar_Button, state, QuickImage.Get(_ImageCode), enAlignment.VerticalCenter_Left, true, null, Initialtext, DisplayRectangle);
                 return;
             }
 
@@ -204,7 +223,7 @@ namespace BlueControls.Controls
             var i = Item[Text];
             if (i == null)
             {
-                base.DrawControl(GR, vState);
+                base.DrawControl(gr, state);
                 return;
             }
 
@@ -214,7 +233,7 @@ namespace BlueControls.Controls
             if (Focused() && _DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown)
             {
                 // Focused = Bearbeitung erwünscht, Cursor anzeigen und KEINE Items zeichnen
-                base.DrawControl(GR, vState);
+                base.DrawControl(gr, state);
                 return;
             }
 
@@ -225,7 +244,7 @@ namespace BlueControls.Controls
                 {
                     if (tempVar2.Symbol == null && tempVar2.IsClickable())
                     {
-                        base.DrawControl(GR, vState);
+                        base.DrawControl(gr, state);
                         return;
                     }
                 }
@@ -237,7 +256,7 @@ namespace BlueControls.Controls
             var TMPGR = Graphics.FromImage(_BitmapOfControl);
 
 
-            Skin.Draw_Back(TMPGR, vType, vState, DisplayRectangle, this, true);
+            Skin.Draw_Back(TMPGR, vType, state, DisplayRectangle, this, true);
 
             if (!FloatingInputBoxListBoxStyle.IsShowing(this))
             {
@@ -253,7 +272,7 @@ namespace BlueControls.Controls
                 i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, (int)i.SizeUntouchedForListBox().Height));
 
 
-                i.Draw(TMPGR, 0, 0, vState, false, string.Empty);
+                i.Draw(TMPGR, 0, 0, state, false, string.Empty);
 
                 i.Parent.Appearance = l;
                 i.SetCoordinates(r);
@@ -264,9 +283,9 @@ namespace BlueControls.Controls
 
 
             BB.Invalidate();
-            Skin.Draw_Border(TMPGR, vType, vState, DisplayRectangle);
+            Skin.Draw_Border(TMPGR, vType, state, DisplayRectangle);
 
-            GR.DrawImage(_BitmapOfControl, 0, 0);
+            gr.DrawImage(_BitmapOfControl, 0, 0);
             TMPGR.Dispose();
 
         }

@@ -1,4 +1,24 @@
-﻿using BlueBasics.Enums;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+
+using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
@@ -6,7 +26,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Extensions;
 
-namespace BlueControls.ItemCollection.ItemCollectionPad
+namespace BlueControls.ItemCollection
 {
     public class CookPadItem : BasicPadItem
         {
@@ -82,7 +102,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
 
             }
 
-            public override void GenerateInternalRelation(List<clsPointRelation> Relations)
+            public override void GenerateInternalRelation(List<clsPointRelation> relations)
             {
 
             }
@@ -109,9 +129,9 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
                 return "COOK";
             }
 
-            public override bool Contains(PointF P, decimal Zoomf)
+            public override bool Contains(PointF value, decimal zoomfactor)
             {
-                return UsedArea().Contains(Convert.ToInt32(P.X), Convert.ToInt32(P.Y));
+                return UsedArea().Contains(Convert.ToInt32(value.X), Convert.ToInt32(value.Y));
             }
 
 
@@ -127,7 +147,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
                 return new RectangleDF(Middlex.X - 30, Middlex.Y - 30, 60, 60);
             }
 
-            protected override bool ParseLevel2(KeyValuePair<string, string> Pair)
+            protected override bool ParseLevel2(KeyValuePair<string, string> pair)
             {
                 return false;
             }

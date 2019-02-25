@@ -28,7 +28,7 @@ using BlueControls.BlueDatabaseDialogs;
 using BlueControls.DialogBoxes;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Enums;
@@ -63,11 +63,11 @@ namespace BlueControls.Controls
 
         private long TabGeneratorCount;
 
-        protected override void Dispose(bool Nowdisposing)
+        protected override void Dispose(bool disposing)
         {
             try
             {
-                if (Nowdisposing)
+                if (disposing)
                 {
                     _ShowingRowKey = 0;
                     Database = null; // Wichtig,  (nicht _Database) um events zu lösen.
@@ -77,7 +77,7 @@ namespace BlueControls.Controls
             }
             finally
             {
-                base.Dispose(Nowdisposing);
+                base.Dispose(disposing);
             }
         }
 
@@ -785,9 +785,9 @@ namespace BlueControls.Controls
         }
 
 
-        protected override void DrawControl(Graphics GR, enStates vState)
+        protected override void DrawControl(Graphics gr, enStates state)
         {
-            clsSkin.Draw_Back_Transparent(GR, DisplayRectangle, this);
+            clsSkin.Draw_Back_Transparent(gr, DisplayRectangle, this);
         }
 
 

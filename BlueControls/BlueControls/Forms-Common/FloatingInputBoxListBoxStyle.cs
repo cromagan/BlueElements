@@ -1,8 +1,27 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollection;
 using System;
 using System.Drawing;
 
@@ -29,7 +48,7 @@ namespace BlueControls.DialogBoxes
             Xpos -= GenericControl.Skin.PaddingSmal;
             Ypos -= GenericControl.Skin.PaddingSmal;
 
-            Generate_ListBox1(Items, GenericControl.Skin.Padding, SteuerWi, enAddType.None);
+            Generate_ListBox1(Items, SteuerWi, enAddType.None);
 
             //UnloadLostFocus = true;
 
@@ -70,14 +89,14 @@ namespace BlueControls.DialogBoxes
 
         #region  ListBox1 
 
-        public void Generate_ListBox1(ItemCollectionList ItemsOri, int cTop, int MinWidth, enAddType AddNewAllowed)
+        public void Generate_ListBox1(ItemCollectionList ItemsOri, int MinWidth, enAddType AddNewAllowed)
         {
 
             var itemsClone = (ItemCollectionList)ItemsOri.Clone();
 
 
-            var He = Convert.ToInt32(itemsClone.HeigthOfAllItemsAdded(enStates.Standard, int.MaxValue));
-            var Wi = Convert.ToInt32(itemsClone.WidthOfBiggestItem(enStates.Standard, int.MaxValue));
+            var He = Convert.ToInt32(itemsClone.HeigthOfAllItemsAdded(int.MaxValue));
+            var Wi = Convert.ToInt32(itemsClone.WidthOfBiggestItem(int.MaxValue));
 
             if (AddNewAllowed != enAddType.None) { He += 24; }
 

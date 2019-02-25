@@ -1,4 +1,24 @@
-﻿using System;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -9,7 +29,7 @@ using BlueBasics.Interfaces;
 using BlueControls.DialogBoxes;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Enums;
@@ -384,7 +404,7 @@ namespace BlueControls.Controls
 
 
 
-        protected override void DrawControl(Graphics GR, enStates vState)
+        protected override void DrawControl(Graphics gr, enStates state)
         {
             if (Item != null) { Item.Appearance = _Appearance; }
             var tmp = enDesign.ListBox;
@@ -392,7 +412,7 @@ namespace BlueControls.Controls
 
             var PaintModXx = 0;
             var PaintModYx = 0;
-            var vStateBox = vState;
+            var vStateBox = state;
 
             if (Convert.ToBoolean(vStateBox & enStates.Standard_MouseOver)) { vStateBox = vStateBox ^ enStates.Standard_MouseOver; }
             if (Convert.ToBoolean(vStateBox & enStates.Standard_MousePressed)) { vStateBox = vStateBox ^ enStates.Standard_MousePressed; }
@@ -421,7 +441,7 @@ namespace BlueControls.Controls
                 //// Kann sein, wenn PaintModY größer als die Höhe ist
                 //if (_Appearance == enBlueListBoxAppearance.Listbox)
                 //{
-                Skin.Draw_Back(GR, tmp, vStateBox, BorderCoords, this, true);
+                Skin.Draw_Back(gr, tmp, vStateBox, BorderCoords, this, true);
                 //}
                 //else
                 //{
@@ -441,7 +461,7 @@ namespace BlueControls.Controls
                     if (!ThisItem.Enabled) { vStateItem = enStates.Standard_Disabled; }
                     if (ThisItem.Checked) { vStateItem |= enStates.Checked; }
 
-                    ThisItem.Draw(GR, 0, Convert.ToInt32(SliderY.Value), vStateItem, true, FilterTxt.Text);
+                    ThisItem.Draw(gr, 0, Convert.ToInt32(SliderY.Value), vStateItem, true, FilterTxt.Text);
                 }
 
             }
@@ -449,10 +469,10 @@ namespace BlueControls.Controls
             if (BorderCoords.Height > 0)
             {
                 // Kann sein, wenn PaintModY größer als die Höhe ist
-                if (tmp == enDesign.ListBox) { Skin.Draw_Border(GR, tmp, vStateBox, BorderCoords); }
+                if (tmp == enDesign.ListBox) { Skin.Draw_Border(gr, tmp, vStateBox, BorderCoords); }
             }
 
-            if (PaintModYx > 0) { clsSkin.Draw_Back_Transparent(GR, new Rectangle(0, BorderCoords.Bottom, Width, PaintModYx), this); }
+            if (PaintModYx > 0) { clsSkin.Draw_Back_Transparent(gr, new Rectangle(0, BorderCoords.Bottom, Width, PaintModYx), this); }
         }
 
         private void SliderY_ValueChange(object sender, System.EventArgs e)

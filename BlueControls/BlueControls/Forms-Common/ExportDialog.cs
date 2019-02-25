@@ -1,3 +1,23 @@
+#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+
 using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
@@ -6,7 +26,7 @@ using BlueBasics;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection.ItemCollectionPad;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using static BlueBasics.FileOperations;
 
@@ -36,11 +56,11 @@ namespace BlueControls.Forms
             Database = db;
             Liste = ListetItems;
 
-            Init("", CanChangeItems, "", "");
+            Init(string.Empty, CanChangeItems, string.Empty);
         }
 
 
-        public ExportDialog(string vAdditionalLayoutPath, string PreverdLayout, string AutosaveFile)
+        public ExportDialog(string vAdditionalLayoutPath, string AutosaveFile)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -52,11 +72,11 @@ namespace BlueControls.Forms
 
             //   Vars = Variablen
 
-            Init(vAdditionalLayoutPath, false, PreverdLayout, AutosaveFile);
+            Init(vAdditionalLayoutPath, false, AutosaveFile);
         }
 
 
-        public void Init(string vAdditionalLayoutPath, bool CanChangeItems, string PreverdLayout, string AutosaveFile)
+        public void Init(string vAdditionalLayoutPath, bool CanChangeItems, string AutosaveFile)
         {
 
             _AdditionalLayoutPath = vAdditionalLayoutPath;

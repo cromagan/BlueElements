@@ -155,7 +155,7 @@ namespace BlueDatabase
 
             // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
             var e = new DoRowAutomaticEventArgs(this);
-            OnDoSpecialRules(this, e);
+            OnDoSpecialRules(e);
 
 
             if (!string.IsNullOrEmpty(e.Feedback) && e.FeedbackColumn == null) { e.FeedbackColumn = Database.Column[0]; }
@@ -200,7 +200,7 @@ namespace BlueDatabase
 
             if (Convert.ToBoolean(cols.Count == 0) != Database.Cell.GetBoolean(Database.Column.SysCorrect(), this)) { CellSet(Database.Column.SysCorrect(), Convert.ToBoolean(cols.Count == 0)); }
 
-            OnRowChecked(this, new RowCheckedEventArgs(this, cols));
+            OnRowChecked(new RowCheckedEventArgs(this, cols));
 
 
             var _Info = new List<string>();
@@ -554,13 +554,13 @@ namespace BlueDatabase
         }
 
 
-        internal void OnRowChecked(RowItem Row, RowCheckedEventArgs e)
+        internal void OnRowChecked(RowCheckedEventArgs e)
         {
             RowChecked?.Invoke(this, e);
         }
 
 
-        internal void OnDoSpecialRules(RowItem Row, DoRowAutomaticEventArgs e)
+        internal void OnDoSpecialRules(DoRowAutomaticEventArgs e)
         {
             DoSpecialRules?.Invoke(this, e);
         }

@@ -1,4 +1,22 @@
-﻿using BlueBasics.Enums;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System;
@@ -380,10 +398,10 @@ namespace BlueControls.Controls
         {
 
         }
-        protected override void DrawControl(Graphics GR, enStates vState)
+        protected override void DrawControl(Graphics gr, enStates state)
         {
-            var vState_Back = vState;
-            var vState_Slider = vState;
+            var vState_Back = state;
+            var vState_Slider = state;
 
             _ClickAreaContainsMouse = _ClickArea.Contains(MousePos().X, MousePos().Y);
 
@@ -412,7 +430,7 @@ namespace BlueControls.Controls
             }
 
 
-            if (Convert.ToBoolean(vState & enStates.Standard_MouseOver))
+            if (Convert.ToBoolean(state & enStates.Standard_MouseOver))
             {
                 if (_SliderContainsMouse)
                 {
@@ -424,7 +442,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            if (Convert.ToBoolean(vState & enStates.Standard_MousePressed))
+            if (Convert.ToBoolean(state & enStates.Standard_MousePressed))
             {
                 if (_SliderContainsMouse)
                 {
@@ -436,14 +454,14 @@ namespace BlueControls.Controls
                 }
             }
 
-            Skin.Draw_Back(GR, _BackStyle, vState_Back, _ClickArea, this, true);
-            Skin.Draw_Border(GR, _BackStyle, vState_Back, _ClickArea);
+            Skin.Draw_Back(gr, _BackStyle, vState_Back, _ClickArea, this, true);
+            Skin.Draw_Border(gr, _BackStyle, vState_Back, _ClickArea);
 
 
             if (Maximum - Minimum > 0)
             {
-                Skin.Draw_Back(GR, _SliderStyle, vState_Slider, _Slider, this, false);
-                Skin.Draw_Border(GR, _SliderStyle, vState_Slider, _Slider);
+                Skin.Draw_Back(gr, _SliderStyle, vState_Slider, _Slider, this, false);
+                Skin.Draw_Border(gr, _SliderStyle, vState_Slider, _Slider);
             }
 
 

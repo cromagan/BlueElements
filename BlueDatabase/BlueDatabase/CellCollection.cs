@@ -489,7 +489,6 @@ namespace BlueDatabase
 
             if (string.IsNullOrEmpty(NewValue)) { return; }
 
-            RowItem R = Database.Row.SearchByKey(RowKey);
 
             foreach (var ThisRowItem in Database.Row)
             {
@@ -772,7 +771,7 @@ namespace BlueDatabase
 
         public bool IsNullOrEmpty(int ColumnIndex, RowItem Row)
         {
-            return IsNullOrEmpty(Database.Column[0], Row);
+            return IsNullOrEmpty(Database.Column[ColumnIndex], Row);
         }
 
         public Point GetPoint(ColumnItem Column, RowItem Row)
@@ -970,7 +969,7 @@ namespace BlueDatabase
             {
                 if (ThisRule != null)
                 {
-                    if (ThisRule.WillAlwaysCellOverride(Column, Row)) { return "Diese Zelle wird von automatischen Regeln befüllt."; }
+                    if (ThisRule.WillAlwaysCellOverride(Column)) { return "Diese Zelle wird von automatischen Regeln befüllt."; }
                     if (ThisRule.BlockEditing(Column, Row)) { return "Eine Regel sperrt diese Zelle."; }
                 }
             }
@@ -1050,7 +1049,7 @@ namespace BlueDatabase
         }
 
 
-        internal Size ContentSizeToSave(KeyValuePair<string, CellItem> vCell, ColumnItem Column, RowItem Row)
+        internal Size ContentSizeToSave(KeyValuePair<string, CellItem> vCell, ColumnItem Column)
         {
             if (Column.Format.SaveSizeData())
             {

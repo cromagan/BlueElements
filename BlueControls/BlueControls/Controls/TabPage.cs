@@ -1,4 +1,22 @@
-﻿using BlueBasics.Enums;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System.ComponentModel;
@@ -41,9 +59,9 @@ namespace BlueControls.Controls
 
 
         //UserControl1 overrides dispose to clean up the component list.
-        protected override void Dispose(bool NowDisposing)
+        protected override void Dispose(bool disposing)
         {
-            if (NowDisposing)
+            if (disposing)
             {
                 _BitmapOfControl?.Dispose();
                 _BitmapOfControl = null;
@@ -53,7 +71,7 @@ namespace BlueControls.Controls
                 //End If
             }
             GenericControl.Skin.SkinChanged -= SkinChanged;
-            base.Dispose(NowDisposing);
+            base.Dispose(disposing);
         }
 
 
@@ -106,9 +124,9 @@ namespace BlueControls.Controls
             }
         }
 
-        protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified)
+        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified)
         {
-            return tbounds; //MyBase.GetScaledBounds(bounds, factor, specified)
+            return bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
         }
         #endregion
 

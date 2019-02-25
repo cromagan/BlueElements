@@ -16,23 +16,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
-
-using BlueControls.ItemCollection;
-
-namespace BlueControls.EventArgs
+namespace BlueBasics.Enums
 {
-  public  class BasicListItemEventArgs : System.EventArgs
+
+    public enum enMouseEvent
     {
-        public BasicListItemEventArgs(BasicListItem Item)
-        {
-            this.Item = Item;
-
-
-        }
-
-        public BasicListItem Item { get; set; }
-
-
+        LEFTDOWN = 0x2,
+        LEFTUP = 0x4,
+        MOVE = 0x1,
+        RIGHTDOWN = 0x8,
+        RIGHTUP = 0x10,
+        MIDDLEDOWN = 0x20,
+        MIDDLEUP = 0x40,
+        ABSOLUTE = 0x8000
     }
+
+
 }

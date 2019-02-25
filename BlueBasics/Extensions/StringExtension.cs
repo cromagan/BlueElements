@@ -1,4 +1,22 @@
-﻿using System;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -48,22 +66,22 @@ namespace BlueBasics
             return Encoding.Default.GetBytes(TXT);
         }
 
-        public static bool isPossibleLineBreak(this char tChar)
+        public static bool isPossibleLineBreak(this char value)
         {
             const string TR = " ?!%/\\}])-.,;_°~|\r\n\t";
             // Kein Doppelpunkt, weil auch 3:50 Uhr möglich ist
-            return TR.Contains(tChar.ToString());
+            return TR.Contains(value.ToString());
         }
 
 
-        public static bool isWordSeperator(this char tChar)
+        public static bool isWordSeperator(this char value)
         {
             const string TR = "°~|=<>+`´\r\n\t";
 
-            if (char.IsPunctuation(tChar)) { return true; }
-            if (char.IsSeparator(tChar)) { return true; }
+            if (char.IsPunctuation(value)) { return true; }
+            if (char.IsSeparator(value)) { return true; }
 
-            return TR.Contains(tChar.ToString());
+            return TR.Contains(value.ToString());
 
         }
 
@@ -308,8 +326,7 @@ namespace BlueBasics
         }
 
 
-
-        public static string RemoveHtmlCodes(this string TXT)
+        public static string HTMLSpecialToNormalChar(this string TXT)
         {
             // http://sonderzeichentabelle.de/
             // http://www.htmlhelp.com/reference/html40/entities/special.html
@@ -915,12 +932,12 @@ namespace BlueBasics
             return TextToSplit.SplitBy("\r");
         }
 
-        public static int CountString(this string Text, string StringToCount)
+        public static int CountString(this string Text, string value)
         {
             var Anz = 0;
-            for (var z = 0 ; z <= Text.Length - StringToCount.Length ; z++)
+            for (var z = 0 ; z <= Text.Length - value.Length ; z++)
             {
-                if (Text.Substring(z, StringToCount.Length) == StringToCount) { Anz += 1; }
+                if (Text.Substring(z, value.Length) == value) { Anz += 1; }
             }
             return Anz;
         }

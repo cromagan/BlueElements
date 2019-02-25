@@ -1,3 +1,22 @@
+#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -96,11 +115,11 @@ namespace BlueControls
         }
 
 
-        public ExtText(enDesign vDesign, enStates vState, RowItem SkinRow = null)
+        public ExtText(enDesign vDesign, enStates state, RowItem SkinRow = null)
         {
             Initialize();
             _Design = vDesign;
-            _State = vState;
+            _State = state;
             _Row = SkinRow;
         }
 
@@ -562,15 +581,12 @@ namespace BlueControls
             if (!vPositionCorrect) { return; }
 
 
-            var tmpMW = _MaxWidth - 1;
-            if (tmpMW < 1) { tmpMW = vWidth; }
-
             DrawStates(GR, czoom, Left, Top);
 
 
             foreach (var t in Chars)
             {
-                if (t.Char > 0 && t.IsVisible(_MaxWidth, _MaxHeight)) { t.Draw(GR, tmpMW, Left, Top, czoom); }
+                if (t.Char > 0 && t.IsVisible(_MaxWidth, _MaxHeight)) { t.Draw(GR, Left, Top, czoom); }
             }
 
 
@@ -1448,11 +1464,11 @@ namespace BlueControls
             }
         }
 
-        public void Stufe(int Von, int Bis, int Stufe)
+        public void StufeÄndern(int Von, int Bis, int stufe)
         {
             for (var cc = Von ; cc <= Bis ; cc++)
             {
-                Chars[cc].Stufe = Stufe;
+                Chars[cc].Stufe = stufe;
             }
 
             ResetPosition(true);

@@ -1,9 +1,29 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
@@ -11,7 +31,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text.RegularExpressions;
 
-namespace BlueControls.ItemCollection.ItemCollectionPad
+namespace BlueControls.ItemCollection
 {
     public class TextPadItem : BasicPadItem, ICanHaveColumnVariables
     {
@@ -220,9 +240,9 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
             return "TEXT";
         }
 
-        public override bool Contains(PointF P, decimal Zoomf)
+        public override bool Contains(PointF value, decimal zoomfactor)
         {
-            return UsedArea().Contains((int)P.X, (int)P.Y);
+            return UsedArea().Contains((int)value.X, (int)value.Y);
         }
 
         public override List<PointDF> PointList()
@@ -395,7 +415,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
         }
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> Relations)
+        public override void GenerateInternalRelation(List<clsPointRelation> relations)
         {
 
 
@@ -406,19 +426,19 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
 
             if (FixSize)
             {
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
+                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
+                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
+                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
             }
             else
             {
-                Relations.Add(new clsPointRelation(enRelationType.YPositionZueinander, p_LO, p_RU));
+                relations.Add(new clsPointRelation(enRelationType.YPositionZueinander, p_LO, p_RU));
 
-                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
-                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
+                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
+                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
 
-                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
-                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
+                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
+                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
             }
         }
 
@@ -494,7 +514,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
             l.Add(new FlexiControl("Text", _VariableText, enDataFormat.Text, 5));
             l.Add(new FlexiControl("Drehwinkel", Rotation.ToString(), enDataFormat.Ganzzahl, 1));
 
-            var Rahms = new ItemCollectionList.ItemCollectionList();
+            var Rahms = new ItemCollectionList();
             //  Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
             Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolForReadableText()));
             Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolForReadableText()));
@@ -509,7 +529,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
 
 
 
-            var Aursicht = new ItemCollectionList.ItemCollectionList();
+            var Aursicht = new ItemCollectionList();
             Aursicht.Add(new TextListItem(Convert.ToInt32(enAlignment.Top_Left).ToString(), "Linksbündig ausrichten", enImageCode.Linksbündig));
             Aursicht.Add(new TextListItem(Convert.ToInt32(enAlignment.Top_HorizontalCenter).ToString(), "Zentrieren", enImageCode.Zentrieren));
             Aursicht.Add(new TextListItem(Convert.ToInt32(enAlignment.Top_Right).ToString(), "Rechtsbündig ausrichten", enImageCode.Rechtsbündig));

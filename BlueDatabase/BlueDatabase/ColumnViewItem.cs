@@ -1,3 +1,22 @@
+#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
 using System;
 using System.Drawing;
 using BlueBasics;
@@ -12,7 +31,7 @@ namespace BlueDatabase
         #region  Variablen-Deklarationen 
 
         private readonly Database DatabaseForParse;
-        private enViewType _Type;
+        private enViewType _ViewType;
 
         /// <summary>
         /// Koordinaten Angabe in "Spalten"
@@ -57,7 +76,7 @@ namespace BlueDatabase
         /// </summary>
         private void Initialize()
         {
-            _Type = enViewType.None;
+            _ViewType = enViewType.None;
             Column = null;
             _Spalte_X1 = 0;
             _Spalte_Width = 1;
@@ -77,7 +96,7 @@ namespace BlueDatabase
         {
             Initialize();
             this.Column = Column;
-            _Type = Type;
+            _ViewType = Type;
             this.Column.CheckFormulaEditType();
         }
 
@@ -100,16 +119,16 @@ namespace BlueDatabase
 
         public bool IsParsing { get; private set; }
 
-        public enViewType Type
+        public enViewType ViewType
         {
             get
             {
-                return _Type;
+                return _ViewType;
             }
             set
             {
-                if (value == _Type) { return; }
-                _Type = value;
+                if (value == _ViewType) { return; }
+                _ViewType = value;
                 OnChanged();
             }
         }
@@ -227,7 +246,7 @@ namespace BlueDatabase
 
         public override string ToString()
         {
-            var Result = "{Type=" + Convert.ToInt32(_Type);
+            var Result = "{Type=" + Convert.ToInt32(_ViewType);
             if (Column != null) { Result = Result + ", " + Column.ParsableColumnKey(); }
             if (_Spalte_X1 > 0) { Result = Result + ", X=" + _Spalte_X1; }
             if (_Spalte_Width > 1) { Result = Result + ", Width=" + _Spalte_Width; }
@@ -237,11 +256,11 @@ namespace BlueDatabase
         }
 
 
-        public void Parse(string StringToParse)
+        public void Parse(string ToParse)
         {
             IsParsing = true;
             Initialize();
-            foreach (var pair in StringToParse.GetAllTags())
+            foreach (var pair in ToParse.GetAllTags())
             {
                 switch (pair.Key)
                 {
@@ -271,11 +290,11 @@ namespace BlueDatabase
                         break;
 
                     case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt
-                        _Type = enViewType.PermanentColumn;
+                        _ViewType = enViewType.PermanentColumn;
                         break;
 
                     case "type":
-                        _Type = (enViewType)int.Parse(pair.Value);
+                        _ViewType = (enViewType)int.Parse(pair.Value);
                         break;
 
                     default:
@@ -287,8 +306,8 @@ namespace BlueDatabase
             IsParsing = false;
 
 
-            if (Column != null && _Type == enViewType.None) { _Type = enViewType.Column; }
-            if (Column != null && _Type != enViewType.None) { Column.CheckFormulaEditType(); }
+            if (Column != null && _ViewType == enViewType.None) { _ViewType = enViewType.Column; }
+            if (Column != null && _ViewType != enViewType.None) { Column.CheckFormulaEditType(); }
 
             IsParsing = false;
 

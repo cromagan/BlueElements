@@ -1,10 +1,28 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.DialogBoxes;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
@@ -15,7 +33,7 @@ using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.ItemCollection.ItemCollectionPad
+namespace BlueControls.ItemCollection
 {
     public class BitmapPadItem : BasicPadItem, ICloneable, ICanHaveColumnVariables
     {
@@ -129,9 +147,9 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
             return "IMAGE";
         }
 
-        public override bool Contains(PointF P, decimal Zoomf)
+        public override bool Contains(PointF value, decimal zoomfactor)
         {
-            return UsedArea().Contains(Convert.ToInt32(P.X), Convert.ToInt32(P.Y));
+            return UsedArea().Contains(Convert.ToInt32(value.X), Convert.ToInt32(value.Y));
         }
 
 
@@ -362,21 +380,21 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
         }
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> Relations)
+        public override void GenerateInternalRelation(List<clsPointRelation> relations)
         {
             if (FixSize)
             {
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
+                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
+                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
+                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
             }
             else
             {
-                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
-                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
+                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
+                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
 
-                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
-                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
+                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
+                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
             }
         }
 
@@ -463,7 +481,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
 
             l.Add(new FlexiControl(true));
 
-            var Comms = new ItemCollectionList.ItemCollectionList();
+            var Comms = new ItemCollectionList();
             Comms.Add(new TextListItem(Convert.ToInt32(enSizeModes.BildAbschneiden).ToString(), "Abschneiden", QuickImage.Get("BildmodusAbschneiden|32")));
             Comms.Add(new TextListItem(Convert.ToInt32(enSizeModes.Verzerren).ToString(), "Verzerren", QuickImage.Get("BildmodusVerzerren|32")));
             Comms.Add(new TextListItem(Convert.ToInt32(enSizeModes.WeißerRand).ToString(), "Einpassen", QuickImage.Get("BildmodusEinpassen|32")));
@@ -475,7 +493,7 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
 
 
 
-            var Rahms = new ItemCollectionList.ItemCollectionList();
+            var Rahms = new ItemCollectionList();
             Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Undefiniert).ToString(), "Ohne Rahmen", enImageCode.Kreuz));
             Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolOfLine()));
             Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolOfLine()));

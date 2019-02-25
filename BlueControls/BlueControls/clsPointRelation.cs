@@ -1,9 +1,28 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.ItemCollection.ItemCollectionPad;
+using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -13,7 +32,7 @@ namespace BlueControls
     public sealed class clsPointRelation : IComparable, ICompareKey, IParseable
     {
 
-        private enRelationType _type;
+        private enRelationType _relationtype;
         public readonly ListExt<PointDF> Points = new ListExt<PointDF>();
 
         private string _Richtmaß;
@@ -30,7 +49,7 @@ namespace BlueControls
         public clsPointRelation(enRelationType enRelationType, PointDF Point1, PointDF Point2)
         {
             Initialize();
-            _type = enRelationType;
+            _relationtype = enRelationType;
 
             Points.Add(Point1);
             Points.Add(Point2);
@@ -51,7 +70,7 @@ namespace BlueControls
 
         public void Initialize()
         {
-            _type = enRelationType.None;
+            _relationtype = enRelationType.None;
 
             Points.Clear();
             Points.ListOrItemChanged += Points_ListOrItemChanged;
@@ -65,17 +84,17 @@ namespace BlueControls
 
         public bool IsParsing { get; private set; }
 
-        public enRelationType Type
+        public enRelationType RelationType
         {
             get
             {
-                return _type;
+                return _relationtype;
             }
 
             set
             {
-                if (_type == value) { return; }
-                _type = value;
+                if (_relationtype == value) { return; }
+                _relationtype = value;
                 OnChanged();
             }
 
@@ -86,47 +105,48 @@ namespace BlueControls
 
         public int CompareTo(object obj)
         {
-
-            if (!(obj is clsPointRelation))
+            if (obj is clsPointRelation PRL)
+            {
+                // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
+                return CompareKey().CompareTo((PRL).CompareKey());
+            }
+            else
             {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+                return 0;
             }
-
-
-            // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
-            return CompareKey().CompareTo(((clsPointRelation)obj).CompareKey());
         }
 
         public string CompareKey()
         {
-            return Order.Nummer(5) + "|" + ((int)_type).Nummer(3);
+            return Order.Nummer(5) + "|" + ((int)_relationtype).Nummer(3);
         }
 
 
-        public void Parse(string StringToParse)
+        public void Parse(string ToParse)
         {
             IsParsing = true;
             Initialize();
             Points.ThrowEvents = false;
 
-            if (StringToParse.Contains("ParentType=BlueBasics.CreativePad,"))
+            if (ToParse.Contains("ParentType=BlueBasics.CreativePad,"))
             {
-                StringToParse = StringToParse.Replace("ParentType=BlueBasics.CreativePad,", "ParentType=Main,");
+                ToParse = ToParse.Replace("ParentType=BlueBasics.CreativePad,", "ParentType=Main,");
             }
-            if (StringToParse.Contains("ParentType=BlueBasics.BlueCreativePad,"))
+            if (ToParse.Contains("ParentType=BlueBasics.BlueCreativePad,"))
             {
-                StringToParse = StringToParse.Replace("ParentType=BlueBasics.BlueCreativePad,", "ParentType=Main,");
+                ToParse = ToParse.Replace("ParentType=BlueBasics.BlueCreativePad,", "ParentType=Main,");
             }
 
 
 
 
-            foreach (var pair in StringToParse.GetAllTags())
+            foreach (var pair in ToParse.GetAllTags())
             {
                 switch (pair.Key)
                 {
                     case "type":
-                        _type = (enRelationType)int.Parse(pair.Value);
+                        _relationtype = (enRelationType)int.Parse(pair.Value);
                         break;
                     case "value":
                         _Richtmaß = pair.Value;
@@ -164,7 +184,7 @@ namespace BlueControls
         public override string ToString()
         {
 
-            var t = "{Type=" + Convert.ToInt32(_type) +
+            var t = "{Type=" + Convert.ToInt32(_relationtype) +
                        ", Value=" + _Richtmaß;
 
 
@@ -219,112 +239,112 @@ namespace BlueControls
 
                 if (thispoint.Parent is BasicPadItem tempVar)
                 {
-                    tempVar.Draw(GR, cZoom, MoveX, MoveY, enStates.Standard, true, Size.Empty, false);
+                    tempVar.Draw(GR, cZoom, MoveX, MoveY, enStates.Standard, Size.Empty, false);
                     tempVar.DrawOutline(GR, cZoom, MoveX, MoveY, c);
                 }
             }
 
 
 
-            switch (_type)
+            switch (_relationtype)
             {
                 case enRelationType.WaagerechtSenkrecht:
-                {
-                    var P1 = Points[0].ZoomAndMove(cZoom, MoveX, MoveY);
-                    var P2 = Points[1].ZoomAndMove(cZoom, MoveX, MoveY);
-                    var pb = new PointF((P1.X + P2.X) / 2 - 5, (P1.Y + P2.Y) / 2 - 5);
-                    GR.DrawLine(p, P1, P2);
-
-
-                    switch (_Richtmaß)
                     {
-                        case "0":
-                        case "180":
-                            GR.DrawImage(QuickImage.Get(enImageCode.PfeilLinksRechts, 10).BMP, pb.X + 10, pb.Y);
-                            break;
-                        case "90":
-                        case "270":
-                            GR.DrawImage(QuickImage.Get(enImageCode.PfeilObenUnten, 10).BMP, pb.X, pb.Y + 10);
-                            break;
-                        default:
-                            Develop.DebugPrint("Winkel unbekannt: " + _Richtmaß);
-                            break;
-                    }
+                        var P1 = Points[0].ZoomAndMove(cZoom, MoveX, MoveY);
+                        var P2 = Points[1].ZoomAndMove(cZoom, MoveX, MoveY);
+                        var pb = new PointF((P1.X + P2.X) / 2 - 5, (P1.Y + P2.Y) / 2 - 5);
+                        GR.DrawLine(p, P1, P2);
 
-                    break;
-                }
+
+                        switch (_Richtmaß)
+                        {
+                            case "0":
+                            case "180":
+                                GR.DrawImage(QuickImage.Get(enImageCode.PfeilLinksRechts, 10).BMP, pb.X + 10, pb.Y);
+                                break;
+                            case "90":
+                            case "270":
+                                GR.DrawImage(QuickImage.Get(enImageCode.PfeilObenUnten, 10).BMP, pb.X, pb.Y + 10);
+                                break;
+                            default:
+                                Develop.DebugPrint("Winkel unbekannt: " + _Richtmaß);
+                                break;
+                        }
+
+                        break;
+                    }
                 case enRelationType.PositionZueinander:
                 case enRelationType.YPositionZueinander:
                 case enRelationType.AbstandZueinander:
-                {
-                    var P1 = Points[0].ZoomAndMove(cZoom, MoveX, MoveY);
-                    var P2 = Points[1].ZoomAndMove(cZoom, MoveX, MoveY);
-
-
-                    double sX = 0;
-                    double sY = 0;
-                    double iX = 0;
-                    double iY = 0;
-
-                    if (_type == enRelationType.PositionZueinander)
                     {
-                        var soll = _Richtmaß.SplitBy(";");
-                        var ist = GetRichtmaß().SplitBy(";");
-
-                        sX = float.Parse(soll[0]);
-                        sY = float.Parse(soll[1]);
-                        iX = float.Parse(ist[0]);
-                        iY = float.Parse(ist[1]);
+                        var P1 = Points[0].ZoomAndMove(cZoom, MoveX, MoveY);
+                        var P2 = Points[1].ZoomAndMove(cZoom, MoveX, MoveY);
 
 
+                        double sX = 0;
+                        double sY = 0;
+                        double iX = 0;
+                        double iY = 0;
+
+                        if (_relationtype == enRelationType.PositionZueinander)
+                        {
+                            var soll = _Richtmaß.SplitBy(";");
+                            var ist = GetRichtmaß().SplitBy(";");
+
+                            sX = float.Parse(soll[0]);
+                            sY = float.Parse(soll[1]);
+                            iX = float.Parse(ist[0]);
+                            iY = float.Parse(ist[1]);
+
+
+                        }
+                        else
+                        {
+                            sX = 0;
+                            iX = 0;
+                            sY = float.Parse(_Richtmaß);
+                            iY = float.Parse(GetRichtmaß());
+
+
+                        }
+
+
+                        GR.DrawLine(p, P1, P2);
+
+
+                        if (sX - iX > 0)
+                        {
+                            //ok
+                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Rechts, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
+                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Links, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
+
+
+                        }
+                        else if (sX - iX < 0)
+                        {
+                            //ok
+                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Links, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
+                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Rechts, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
+
+                        }
+                        else if (sY - iY < 0)
+                        {
+                            //ok
+                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Oben, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
+                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Unten, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
+
+                        }
+                        else if (sY - iY > 0)
+                        {
+                            //ok
+                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Unten, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
+                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Oben, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
+                        }
+
+                        break;
                     }
-                    else
-                    {
-                        sX = 0;
-                        iX = 0;
-                        sY = float.Parse(_Richtmaß);
-                        iY = float.Parse(GetRichtmaß());
-
-
-                    }
-
-
-                    GR.DrawLine(p, P1, P2);
-
-
-                    if (sX - iX > 0)
-                    {
-                        //ok
-                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Rechts, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
-                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Links, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
-
-
-                    }
-                    else if (sX - iX < 0)
-                    {
-                        //ok
-                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Links, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
-                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Rechts, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
-
-                    }
-                    else if (sY - iY < 0)
-                    {
-                        //ok
-                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Oben, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
-                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Unten, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
-
-                    }
-                    else if (sY - iY > 0)
-                    {
-                        //ok
-                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Unten, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
-                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Oben, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
-                    }
-
-                    break;
-                }
                 default:
-                    Develop.DebugPrint(_type);
+                    Develop.DebugPrint(_relationtype);
                     break;
             }
         }
@@ -337,43 +357,43 @@ namespace BlueControls
             if (!StrongMode) { Multi = 300; }
 
 
-            switch (_type)
+            switch (_relationtype)
             {
                 case enRelationType.WaagerechtSenkrecht:
-                {
+                    {
 
-                    if (Math.Abs(Points[0].X - Points[1].X) < 0.01m * Multi && Math.Abs(Points[0].Y - Points[1].Y) < 0.01m * Multi) { return true; }
-                    var RMd = decimal.Parse(_Richtmaß);
-                    var RMd2 = decimal.Parse(GetRichtmaß());
-                    var Dif = Math.Abs(RMd - RMd2);
+                        if (Math.Abs(Points[0].X - Points[1].X) < 0.01m * Multi && Math.Abs(Points[0].Y - Points[1].Y) < 0.01m * Multi) { return true; }
+                        var RMd = decimal.Parse(_Richtmaß);
+                        var RMd2 = decimal.Parse(GetRichtmaß());
+                        var Dif = Math.Abs(RMd - RMd2);
 
-                    if (Dif <= 0.01m * Multi) { return true; }
+                        if (Dif <= 0.01m * Multi) { return true; }
 
-                    if (Dif > 175M && Dif < 185M) { Dif -= 180M; }
-                    if (Math.Abs(Dif) <= 0.01m * Multi) { return true; }
+                        if (Dif > 175M && Dif < 185M) { Dif -= 180M; }
+                        if (Math.Abs(Dif) <= 0.01m * Multi) { return true; }
 
-                    return false;
+                        return false;
 
-                }
+                    }
                 case enRelationType.PositionZueinander:
-                {
-                    var ist = _Richtmaß.SplitBy(";");
-                    var soll = GetRichtmaß().SplitBy(";");
-                    if (Math.Abs(decimal.Parse(ist[0]) - decimal.Parse(soll[0])) > 0.01m * Multi) { return false; }
-                    if (Math.Abs(decimal.Parse(ist[1]) - decimal.Parse(soll[1])) > 0.01m * Multi) { return false; }
-                    return true;
+                    {
+                        var ist = _Richtmaß.SplitBy(";");
+                        var soll = GetRichtmaß().SplitBy(";");
+                        if (Math.Abs(decimal.Parse(ist[0]) - decimal.Parse(soll[0])) > 0.01m * Multi) { return false; }
+                        if (Math.Abs(decimal.Parse(ist[1]) - decimal.Parse(soll[1])) > 0.01m * Multi) { return false; }
+                        return true;
 
 
-                }
+                    }
                 default:
-                {
+                    {
 
-                    var RMd = decimal.Parse(_Richtmaß);
-                    var RMd2 = decimal.Parse(GetRichtmaß());
+                        var RMd = decimal.Parse(_Richtmaß);
+                        var RMd2 = decimal.Parse(GetRichtmaß());
 
-                    return Math.Abs(RMd - RMd2) <= 0.01m * Multi;
+                        return Math.Abs(RMd - RMd2) <= 0.01m * Multi;
 
-                }
+                    }
             }
         }
 
@@ -385,10 +405,10 @@ namespace BlueControls
             if (!Parsing || string.IsNullOrEmpty(_Richtmaß)) { _Richtmaß = GetRichtmaß(); }
 
 
-            if (_type == enRelationType.None) { Develop.DebugPrint(enFehlerArt.Fehler, "Der Type None ist nicht erlaubt"); }
+            if (_relationtype == enRelationType.None) { Develop.DebugPrint(enFehlerArt.Fehler, "Der Type None ist nicht erlaubt"); }
             if (Points.Count != 2) { Develop.DebugPrint(enFehlerArt.Fehler, "Genau " + 2 + " Punkte erwartet"); }
 
-            switch (_type)
+            switch (_relationtype)
             {
                 case enRelationType.WaagerechtSenkrecht:
                     _Richtmaß = Math.Round(decimal.Parse(_Richtmaß), 0).ToString();
@@ -413,7 +433,7 @@ namespace BlueControls
                     break;
 
                 default:
-                    Develop.DebugPrint(_type);
+                    Develop.DebugPrint(_relationtype);
                     break;
             }
         }
@@ -423,7 +443,7 @@ namespace BlueControls
         {
             var tmp = 0M;
 
-            switch (_type)
+            switch (_relationtype)
             {
                 case enRelationType.None:
                     Develop.DebugPrint(enFehlerArt.Fehler, "Der Type None ist nicht erlaubt");
@@ -486,7 +506,7 @@ namespace BlueControls
                     return tmp.ToString();
 
                 default:
-                    Develop.DebugPrint(_type);
+                    Develop.DebugPrint(_relationtype);
 
                     break;
             }
@@ -527,7 +547,7 @@ namespace BlueControls
 
 
 
-            switch (_type)
+            switch (_relationtype)
             {
                 case enRelationType.WaagerechtSenkrecht:
                     if (_Richtmaß == "90")
@@ -570,7 +590,7 @@ namespace BlueControls
 
                     break;
                 default:
-                    Develop.DebugPrint(_type);
+                    Develop.DebugPrint(_relationtype);
                     break;
             }
 
@@ -618,7 +638,7 @@ namespace BlueControls
 
         public bool Connects(bool CheckX)
         {
-            switch (_type)
+            switch (_relationtype)
             {
                 case enRelationType.WaagerechtSenkrecht:
                     if (CheckX)
@@ -661,7 +681,7 @@ namespace BlueControls
 
 
                 default:
-                    Develop.DebugPrint(_type);
+                    Develop.DebugPrint(_relationtype);
                     return false;
             }
 
@@ -684,7 +704,7 @@ namespace BlueControls
             if (R2 == null) { Develop.DebugPrint_Disposed(true); }
 
 
-            if (R1._type != R2._type) { return false; }
+            if (R1._relationtype != R2._relationtype) { return false; }
 
 
             if (R1.Richtmaß() != R2.Richtmaß()) { return false; }

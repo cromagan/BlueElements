@@ -248,7 +248,7 @@ namespace BlueDatabase
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public void Parse(string StringToParse)
+        public void Parse(string ToParse)
         {
 
             IsParsing = true;
@@ -256,7 +256,7 @@ namespace BlueDatabase
             _BereitsExportiert.ThrowEvents = false;
 
 
-            foreach (var pair in StringToParse.GetAllTags())
+            foreach (var pair in ToParse.GetAllTags())
             {
                 switch (pair.Key)
                 {

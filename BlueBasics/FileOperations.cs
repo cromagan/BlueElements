@@ -32,7 +32,7 @@ namespace BlueBasics
         private static bool CanWrite_LastResult;
         private static string CanWrite_LastFile = string.Empty;
 
-        public delegate bool DoThis(string file1, string file2);
+        private delegate bool DoThis(string file1, string file2);
 
 
         private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure)
@@ -196,7 +196,7 @@ namespace BlueBasics
         {
             if (string.IsNullOrEmpty(directory)) { return false; }
             var di = new DirectoryInfo(directory);
-            return di.IsWriteable();
+            return di.Writable();
         }
 
         public static bool CanWrite(string Datei, double TryItForSeconds)

@@ -1,3 +1,22 @@
+#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using BlueBasics;
@@ -106,14 +125,14 @@ namespace BlueDatabase
         }
 
 
-        public void Parse(string StringToParse)
+        public void Parse(string ToParse)
         {
             IsParsing = true;
             Actions.ThrowEvents = false;
 
             Initialize();
 
-            foreach (var pair in StringToParse.GetAllTags())
+            foreach (var pair in ToParse.GetAllTags())
             {
                 switch (pair.Key)
                 {
@@ -383,12 +402,17 @@ namespace BlueDatabase
         }
 
 
-        public int CompareTo(object Obj)
+        public int CompareTo(object obj)
         {
-
-            if (!(Obj is RuleItem)) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!"); }
-
-            return CompareKey().CompareTo(((RuleItem)Obj).CompareKey());
+            if (obj is RuleItem RLI)
+            {
+                return CompareKey().CompareTo((RLI).CompareKey());
+            }
+            else
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+                return 0;
+            }
         }
 
 
@@ -533,7 +557,7 @@ namespace BlueDatabase
             return false;
         }
 
-        internal bool WillAlwaysCellOverride(ColumnItem Column, RowItem Row)
+        internal bool WillAlwaysCellOverride(ColumnItem Column)
         {
 
             if (AnzahlWenns() > 0) { return false; }

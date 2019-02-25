@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -9,7 +28,7 @@ using BlueBasics.EventArgs;
 using BlueControls.DialogBoxes;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueControls.Enums;
@@ -225,8 +244,8 @@ namespace BlueControls.Controls
 
             list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
             var s = DummyGraphics().MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
-            var x = Math.Max(Convert.ToInt32(list.WidthOfBiggestItem(enStates.Standard, 500) + 20 + s.Width), 200);
-            var y = Math.Max(Convert.ToInt32(list.HeightOfBiggestItem(enStates.Standard, 100)) + Skin.PaddingSmal * 2, 24);
+            var x = Math.Max(Convert.ToInt32(list.WidthOfBiggestItem(500) + 20 + s.Width), 200);
+            var y = Math.Max(Convert.ToInt32(list.HeightOfBiggestItem(100)) + Skin.PaddingSmal * 2, 24);
 
             Size = new Size(x, y);
             _Value = InitialValue;
@@ -442,7 +461,7 @@ namespace BlueControls.Controls
 
 
 
-        protected override void DrawControl(Graphics GR, enStates vState)
+        protected override void DrawControl(Graphics gr, enStates state)
         {
             if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
 
@@ -451,7 +470,7 @@ namespace BlueControls.Controls
             clsSkin.Draw_Back_Transparent(TMPGR, ClientRectangle, this);
 
 
-            if (_Color.A != 0 && vState != enStates.Standard_Disabled)
+            if (_Color.A != 0 && state != enStates.Standard_Disabled)
             {
                 var lgb = new LinearGradientBrush(ClientRectangle, _Color, Color.Transparent, LinearGradientMode.Horizontal);
                 TMPGR.FillRectangle(lgb, ClientRectangle);
@@ -464,7 +483,7 @@ namespace BlueControls.Controls
 
                 if (Suggest != null)
                 {
-                    var tmpstate = vState;
+                    var tmpstate = state;
                     if (tmpstate != enStates.Checked_Disabled) { tmpstate = enStates.Standard; }
 
                     var R = new Rectangle
@@ -479,7 +498,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            GR.DrawImage(_BitmapOfControl, 0, 0);
+            gr.DrawImage(_BitmapOfControl, 0, 0);
             TMPGR.Dispose();
         }
 
@@ -981,7 +1000,7 @@ namespace BlueControls.Controls
 
             if (Column.DropdownBearbeitungErlaubt)
             {
-                Item.GetItemCollection(Column, Item, null, enShortenStyle.Both);
+                ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000);
 
                 if (!Column.DropdownWerteAndererZellenAnzeigen)
                 {

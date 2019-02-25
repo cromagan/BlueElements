@@ -1,4 +1,24 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.DialogBoxes;
@@ -9,7 +29,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.ItemCollection.ItemCollectionPad
+namespace BlueControls.ItemCollection
 {
     public class ComicCompPadItem : BasicPadItem, ICloneable
     {
@@ -203,19 +223,19 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
             return "COMIC";
         }
 
-        public override bool Contains(PointF P, decimal Zoomf)
+        public override bool Contains(PointF value, decimal zoomfactor)
         {
 
-            var ne = 5 / Zoomf;
+            var ne = 5 / zoomfactor;
 
-            if (P.DistanzZuStrecke(P1, P2) < ne)
+            if (value.DistanzZuStrecke(P1, P2) < ne)
             {
                 return true;
             }
 
             foreach (var Thispoint in PointList())
             {
-                if (Geometry.Länge(P, Thispoint.ToPointF()) < ne)
+                if (Geometry.Länge(value, Thispoint.ToPointF()) < ne)
                 {
                     return true;
                 }
@@ -610,13 +630,13 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
         }
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> Relations)
+        public override void GenerateInternalRelation(List<clsPointRelation> relations)
         {
             if (!_EinpassModus)
             {
                 if (_Length > 0M)
                 {
-                    Relations.Add(new clsPointRelation(enRelationType.AbstandZueinander, P1, P2));
+                    relations.Add(new clsPointRelation(enRelationType.AbstandZueinander, P1, P2));
                 }
 
 
@@ -624,11 +644,11 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
                 {
                     if (GeometryDF.Länge(Thispoint, P1) < GeometryDF.Länge(Thispoint, P2))
                     {
-                        Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, P1, Thispoint));
+                        relations.Add(new clsPointRelation(enRelationType.PositionZueinander, P1, Thispoint));
                     }
                     else
                     {
-                        Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, P2, Thispoint));
+                        relations.Add(new clsPointRelation(enRelationType.PositionZueinander, P2, Thispoint));
                     }
                 }
             }

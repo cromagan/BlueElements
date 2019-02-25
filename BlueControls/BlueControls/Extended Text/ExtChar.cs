@@ -1,9 +1,26 @@
-﻿using BlueBasics;
-using BlueBasics.Enums;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueDatabase;
 using System;
 using System.Drawing;
 using System.Drawing.Text;
@@ -122,7 +139,7 @@ namespace BlueControls
             set
             {
                 if (value == _Design) { return; }
-                ChangeState(value, _State, null, _Stufe);
+                ChangeState(value, _State, _Stufe);
             }
         }
 
@@ -136,7 +153,7 @@ namespace BlueControls
             set
             {
                 if (value == _State) { return; }
-                ChangeState(_Design, value, null, _Stufe);
+                ChangeState(_Design, value, _Stufe);
             }
         }
 
@@ -152,7 +169,7 @@ namespace BlueControls
             set
             {
                 if (_Stufe == value) { return; }
-                ChangeState(_Design, _State, null, value);
+                ChangeState(_Design, _State, value);
             }
         }
 
@@ -163,7 +180,7 @@ namespace BlueControls
 
 
 
-        private void ChangeState(enDesign vDesign, enStates vState, RowItem RowOfStyle, int vStufe)
+        private void ChangeState(enDesign vDesign, enStates vState, int vStufe)
         {
             if (vState == _State && vStufe == _Stufe && vDesign == _Design) { return; }
 
@@ -178,7 +195,7 @@ namespace BlueControls
             }
             else
             {
-                _Font = GenericControl.Skin.GetBlueFont(vDesign, vState, RowOfStyle, vStufe);
+                _Font = GenericControl.Skin.GetBlueFont(vDesign, vState, vStufe);
             }
         }
 
@@ -221,7 +238,7 @@ namespace BlueControls
 
 
 
-        public void Draw(Graphics GR, int WidthOfParent, int XPosMod, int YPosMod, float czoom)
+        public void Draw(Graphics GR, int XPosMod, int YPosMod, float czoom)
         {
 
             if (_Char < 20) { return; }

@@ -1,10 +1,28 @@
+#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueBasics.Enums;
-using static BlueDatabase.ColumnItem;
 using BlueDatabase.Enums;
 
 namespace BlueDatabase
@@ -147,14 +165,14 @@ namespace BlueDatabase
         }
 
 
-        public void Parse(string StringToParse)
+        public void Parse(string ToParse)
         {
             IsParsing = true;
             _Internal.ThrowEvents = false;
             PermissionGroups_Show.ThrowEvents = false;
             Initialize();
 
-            foreach (var pair in StringToParse.GetAllTags())
+            foreach (var pair in ToParse.GetAllTags())
             {
                 switch (pair.Key)
                 {
@@ -241,7 +259,7 @@ namespace BlueDatabase
             }
 
 
-            if (_Internal.Count > 0 && _Internal[0].Type != enViewType.PermanentColumn) { OK = false; }
+            if (_Internal.Count > 0 && _Internal[0].ViewType != enViewType.PermanentColumn) { OK = false; }
 
             if (OK) { return; }
 
@@ -255,7 +273,7 @@ namespace BlueDatabase
                 }
             }
 
-            if (_Internal.Count > 0) { _Internal[0].Type = enViewType.PermanentColumn; }
+            if (_Internal.Count > 0) { _Internal[0].ViewType = enViewType.PermanentColumn; }
         }
 
 
@@ -360,7 +378,7 @@ namespace BlueDatabase
 
             _Internal.Swap(Col1, Col2);
 
-            if (_Internal[Col1].Type != enViewType.PermanentColumn) { _Internal[Col2].Type = enViewType.Column; }
+            if (_Internal[Col1].ViewType != enViewType.PermanentColumn) { _Internal[Col2].ViewType = enViewType.Column; }
 
         }
 

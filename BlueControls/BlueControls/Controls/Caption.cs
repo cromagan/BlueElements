@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
@@ -7,7 +26,7 @@ using BlueControls.DialogBoxes;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollection;
 
 namespace BlueControls.Controls
 {
@@ -90,7 +109,6 @@ namespace BlueControls.Controls
 
             set
             {
-
                 base.TabIndex = 0;
             }
         }
@@ -110,7 +128,6 @@ namespace BlueControls.Controls
             set
             {
                 base.TabStop = false;
-
             }
         }
 
@@ -277,7 +294,7 @@ namespace BlueControls.Controls
 
 
 
-        protected override void DrawControl(Graphics GR, enStates state)
+        protected override void DrawControl(Graphics gr, enStates state)
         {
             if (_design == enDesign.Undefiniert)
             {
@@ -300,10 +317,10 @@ namespace BlueControls.Controls
             {
                 if (QuickModePossible())
                 {
-                    if (GR == null) { return; }
-                    clsSkin.Draw_Back_Transparent(GR, DisplayRectangle, this);
+                    if (gr == null) { return; }
+                    clsSkin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
-                    Skin.Draw_FormatedText(GR, _Text, null, tmpSkinRow, enAlignment.Top_Left, new Rectangle(), null, false);
+                    Skin.Draw_FormatedText(gr, _Text, null, tmpSkinRow, enAlignment.Top_Left, new Rectangle(), null, false);
                     return;
                 }
 
@@ -330,11 +347,11 @@ namespace BlueControls.Controls
 
             }
 
-            if (GR == null) { return; }// Wenn vorab die Größe abgefragt wird
+            if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird
 
-            clsSkin.Draw_Back_Transparent(GR, DisplayRectangle, this);
+            clsSkin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
-            if (!string.IsNullOrEmpty(_Text)) { eText.Draw(GR, 1); }
+            if (!string.IsNullOrEmpty(_Text)) { eText.Draw(gr, 1); }
         }
 
         private bool QuickModePossible()

@@ -1,4 +1,24 @@
-﻿using System;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -500,36 +520,6 @@ namespace BlueBasics
         private static void Poly_AddRad90(GraphicsPath GP, int MxX, int MxY, int Radius, int GradStart)
         {
             GP.AddArc(MxX, MxY, Radius, Radius, GradStart, 90);
-        }
-
-
-        #endregion
-
-        #region  INI-Settings + Dazugehörige API
-
-        [DllImport("kernel32.dll", EntryPoint = "GetPrivateProfileStringA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
-        private static extern int GetPrivateProfileStringA(string lpSection, string lpSetting, string lpDefault, string lpReturnedString, int nSize, string lpFileName);
-        [DllImport("kernel32.dll", EntryPoint = "WritePrivateProfileStringA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
-        private static extern int WritePrivateProfileStringA(string lpSection, string lpSetting, string lpValue, string lpFileName);
-
-
-        public static void SaveINISetting(string FileName, string Key, string Setting, string Value)
-        {
-            try
-            {
-                WritePrivateProfileStringA(Key, Setting, Value, FileName);
-            }
-            catch
-            {
-
-            }
-        }
-
-        public static string GetINISetting(string FileName, string Key, string Setting, string Def)
-        {
-            var temp = new string(' ', 1024);
-            GetPrivateProfileStringA(Key, Setting, Def, temp, 1024, FileName);
-            return temp.Substring(0, temp.IndexOf('\0'));
         }
 
 

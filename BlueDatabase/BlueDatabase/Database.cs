@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -404,6 +405,9 @@ namespace BlueDatabase
         /// <param name="RenameColumn">Bestenfalls: CreativePad.RenameColumnInLayout</param>
         public Database(bool readOnly, GetPassword passwordSub, GenerateLayout_Internal GenLayout, RenameColumnInLayout RenameColumn)
         {
+            var culture = new System.Globalization.CultureInfo("de-DE");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             ReadOnly = readOnly;
             _PasswordSub = passwordSub;
@@ -437,7 +441,7 @@ namespace BlueDatabase
 
 
 
-            Row.BeforeRemoveRow += Row_BeforeRemoveRow;
+            Row.RemovingRow += Row_BeforeRemoveRow;
             Row.RowAdded += Row_RowAdded;
 
             Column.ItemAdded += Column_ItemAdded;
@@ -937,8 +941,6 @@ namespace BlueDatabase
         private void Rules_ListOrItemChanged(object sender, System.EventArgs e)
         {
 
-
-
             if (_isParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
 
             if (sender == Rules)
@@ -947,15 +949,15 @@ namespace BlueDatabase
                 return;
             }
 
-
-            if (!(sender is RuleItem)) { Develop.DebugPrint(enFehlerArt.Fehler, "Typ ist kein RuleItem"); }
-
-            var RL = (RuleItem)sender;
-
-            if (!Rules.Contains(RL)) { return; }
-
-
-            AddPending(enDatabaseDataType.Rules, -1, Rules.ToString(true), false);
+            if (sender is RuleItem RL)
+            {
+                if (!Rules.Contains(RL)) { return; }
+                AddPending(enDatabaseDataType.Rules, -1, Rules.ToString(true), false);
+            }
+            else
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Typ ist kein RuleItem");
+            }
         }
 
         private void Views_ListOrItemChanged(object sender, System.EventArgs e)
@@ -1668,7 +1670,7 @@ namespace BlueDatabase
             SaveToByteList(List, tColumn.Key, 3);
             SaveToByteList(List, tRow.Key, 3);
             List.AddRange(s.ToByte());
-            var ContentSize = Cell.ContentSizeToSave(vCell, tColumn, tRow);
+            var ContentSize = Cell.ContentSizeToSave(vCell, tColumn);
             SaveToByteList(List, ContentSize.Width, 2);
             SaveToByteList(List, ContentSize.Height, 2);
 
@@ -2175,7 +2177,7 @@ namespace BlueDatabase
         }
 
 
-        public bool PermissionCheck(ListExt<string> Allowed, RowItem Row)
+        public bool PermissionCheck(ListExt<string> allowed, RowItem row)
         {
             try
             {
@@ -2188,11 +2190,11 @@ namespace BlueDatabase
 
 
                 if (IsAdministrator()) { return true; }
-                if (Allowed == null || Allowed.Count == 0) { return false; }
+                if (allowed == null || allowed.Count == 0) { return false; }
 
-                foreach (var ThisString in Allowed)
+                foreach (var ThisString in allowed)
                 {
-                    if (PermissionCheckWithoutAdmin(ThisString, Row)) { return true; }
+                    if (PermissionCheckWithoutAdmin(ThisString, row)) { return true; }
                 }
             }
             catch (Exception ex)
@@ -2710,9 +2712,9 @@ namespace BlueDatabase
 
 
 
-        public void AddPending(enDatabaseDataType Comand, ColumnItem Column, string PreviousValue, string ChangedTo, bool ExecuteNow)
+        public void AddPending(enDatabaseDataType Comand, ColumnItem column, string PreviousValue, string ChangedTo, bool ExecuteNow)
         {
-            AddPending(Comand, Column.Key, -1, PreviousValue, ChangedTo, ExecuteNow);
+            AddPending(Comand, column.Key, -1, PreviousValue, ChangedTo, ExecuteNow);
         }
 
         public void AddPending(enDatabaseDataType Comand, int ColumnKey, string ListExt, bool ExecuteNow)

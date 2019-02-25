@@ -1,4 +1,24 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+
+using BlueBasics;
 using BlueControls.DialogBoxes;
 using BlueControls.Enums;
 using BlueControls.Forms;
@@ -70,7 +90,7 @@ namespace BlueControls.Controls
         protected bool _MouseHighlight = true;
         #endregion
 
-        protected virtual void DrawControl(Graphics GR, enStates vState)
+        protected virtual void DrawControl(Graphics gr, enStates state)
         {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
         }
@@ -124,9 +144,9 @@ namespace BlueControls.Controls
             }
         }
 
-        protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified)
+        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified)
         {
-            return tbounds; //MyBase.GetScaledBounds(bounds, factor, specified)
+            return bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
         }
         #endregion
 

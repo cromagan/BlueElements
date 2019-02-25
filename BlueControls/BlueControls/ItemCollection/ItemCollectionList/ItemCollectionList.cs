@@ -30,7 +30,7 @@ using BlueControls.Enums;
 using static BlueBasics.FileOperations;
 using BlueDatabase.Enums;
 
-namespace BlueControls.ItemCollection.ItemCollectionList
+namespace BlueControls.ItemCollection
 {
     public class ItemCollectionList : ListExt<BasicListItem>, ICloneable
     {
@@ -313,7 +313,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList
         }
 
 
-        internal float HeightOfBiggestItem(enStates vState, int MaxHeight)
+        internal float HeightOfBiggestItem(int MaxHeight)
         {
             float h = 16;
 
@@ -329,7 +329,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList
             return h;
         }
 
-        internal float WidthOfBiggestItem(enStates vState, int MaxWidth)
+        internal float WidthOfBiggestItem(int MaxWidth)
         {
             float w = 16;
 
@@ -345,7 +345,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList
             return w;
         }
 
-        internal float HeigthOfAllItemsAdded(enStates vState, int MaxWidth)
+        internal float HeigthOfAllItemsAdded(int MaxWidth)
         {
             float w = 0;
 
@@ -383,8 +383,8 @@ namespace BlueControls.ItemCollection.ItemCollectionList
             if (InControl != null) { InControlWidth = InControl.Width; }
 
 
-            var BiggestWidth = WidthOfBiggestItem(enStates.Standard, InControlWidth);
-            var Bigy = HeigthOfAllItemsAdded(enStates.Standard, InControlWidth);
+            var BiggestWidth = WidthOfBiggestItem(InControlWidth);
+            var Bigy = HeigthOfAllItemsAdded(InControlWidth);
             var Sp = 1;
             var SliderWidth = 0;
             float MultiX = 0;
@@ -1178,7 +1178,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList
 
 
 
-        public void GetItemCollection(ColumnItem Column, ItemCollectionList e, RowItem vCheckedItemsAtRow, enShortenStyle Style)
+        public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem checkedItemsAtRow, enShortenStyle style, int maxItems)
         {
 
             var Marked = new List<string>();
@@ -1188,62 +1188,58 @@ namespace BlueControls.ItemCollection.ItemCollectionList
 
             e.CheckBehavior = enCheckBehavior.MultiSelection; // Es kann ja mehr als nur eines angewählt sein, auch wenn nicht erlaubt!
 
-            l.AddRange(Column.DropDownItems);
-            if (Column.DropdownWerteAndererZellenAnzeigen) { l.AddRange(Column.Contents(null)); }
+            l.AddRange(column.DropDownItems);
+            if (column.DropdownWerteAndererZellenAnzeigen) { l.AddRange(column.Contents(null)); }
 
 
-            switch (Column.Format)
+            switch (column.Format)
             {
                 case enDataFormat.Bit:
                     l.Add(true.ToPlusMinus());
                     l.Add(false.ToPlusMinus());
                     break;
+
                 case enDataFormat.Columns_für_LinkedCellDropdown:
+                    var DB = column.LinkedDatabase();
+                    if (DB != null && !string.IsNullOrEmpty(column.LinkedKeyKennung))
                     {
-                        var DB = Column.LinkedDatabase();
-                        if (DB != null && !string.IsNullOrEmpty(Column.LinkedKeyKennung))
+                        foreach (var ThisColumn in DB.Column)
                         {
-                            foreach (var ThisColumn in DB.Column)
+                            if (ThisColumn.Name.ToLower().StartsWith(column.LinkedKeyKennung.ToLower()))
                             {
-                                if (ThisColumn.Name.ToLower().StartsWith(Column.LinkedKeyKennung.ToLower()))
-                                {
-                                    l.Add(ThisColumn.Key.ToString());
-                                }
+                                l.Add(ThisColumn.Key.ToString());
                             }
                         }
-
-                        if (l.Count == 0)
-                        {
-                            Notification.Show("Keine Spalten gefunden, die<br>mit '" + Column.LinkedKeyKennung + "' beginnen.", enImageCode.Information);
-                        }
-
-                        break;
                     }
-            }
-
-            if (Column.Format == enDataFormat.Values_für_LinkedCellDropdown)
-            {
-                var DB = Column.LinkedDatabase();
-                l.AddRange(DB.Column[0].Contents(null));
-                if (l.Count == 0)
-                {
-                    Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", enImageCode.Information);
-                }
-            }
-
-            if (Column.Database.Row.Count() > 0)
-            {
-                if (vCheckedItemsAtRow != null)
-                {
-                    if (!vCheckedItemsAtRow.CellIsNullOrEmpty(Column))
+                    if (l.Count == 0)
                     {
-                        if (Column.MultiLine)
+                        Notification.Show("Keine Spalten gefunden, die<br>mit '" + column.LinkedKeyKennung + "' beginnen.", enImageCode.Information);
+                    }
+                    break;
+
+                case enDataFormat.Values_für_LinkedCellDropdown:
+                    var DB2 = column.LinkedDatabase();
+                    l.AddRange(DB2.Column[0].Contents(null));
+                    if (l.Count == 0)
+                    {
+                        Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", enImageCode.Information);
+                    }
+                    break;
+            }
+
+            if (column.Database.Row.Count() > 0)
+            {
+                if (checkedItemsAtRow != null)
+                {
+                    if (!checkedItemsAtRow.CellIsNullOrEmpty(column))
+                    {
+                        if (column.MultiLine)
                         {
-                            Marked = vCheckedItemsAtRow.CellGetList(Column);
+                            Marked = checkedItemsAtRow.CellGetList(column);
                         }
                         else
                         {
-                            Marked.Add(vCheckedItemsAtRow.CellGetString(Column));
+                            Marked.Add(checkedItemsAtRow.CellGetString(column));
                         }
                     }
 
@@ -1256,10 +1252,12 @@ namespace BlueControls.ItemCollection.ItemCollectionList
             }
 
 
-            e.AddRange(l, Column, Style);
+            if (maxItems > 0 && l.Count > maxItems) { return; }
+
+            e.AddRange(l, column, style);
 
 
-            if (vCheckedItemsAtRow != null)
+            if (checkedItemsAtRow != null)
             {
                 foreach (var t in Marked)
                 {
@@ -1268,8 +1266,5 @@ namespace BlueControls.ItemCollection.ItemCollectionList
             }
             e.Sort();
         }
-
-
-
     }
 }

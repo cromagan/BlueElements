@@ -1,13 +1,31 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.ItemCollection.ItemCollectionList;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection.ItemCollectionPad
+namespace BlueControls.ItemCollection
 {
     public class SpacerPadItem : BasicPadItem
         {
@@ -79,10 +97,10 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
                 return "SPACER";
             }
 
-            public override bool Contains(PointF P, decimal Zoomf)
+            public override bool Contains(PointF value, decimal zoomfactor)
             {
                 var mp = UsedArea().PointOf(enAlignment.Horizontal_Vertical_Center);
-                return GeometryDF.Länge(P.ToPointDF(), mp) < _Size / 2;
+                return GeometryDF.Länge(value.ToPointDF(), mp) < _Size / 2;
             }
 
 
@@ -153,19 +171,19 @@ namespace BlueControls.ItemCollection.ItemCollectionPad
             }
 
 
-            public override void GenerateInternalRelation(List<clsPointRelation> Relations)
+            public override void GenerateInternalRelation(List<clsPointRelation> relations)
             {
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_u));
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_o));
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_r));
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_l));
+                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_u));
+                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_o));
+                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_r));
+                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_l));
             }
 
             public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
             {
                 var l = new List<FlexiControl>();
 
-                var Size = new ItemCollectionList.ItemCollectionList();
+                var Size = new ItemCollectionList();
                 Size.Add(new TextListItem((mm125x * 1m).Nummer(1, 4), "Klein (1,25 mm)", enImageCode.GrößeÄndern));
                 Size.Add(new TextListItem((mm125x * 2m).Nummer(1, 4), "Normal (2,5 mm)", enImageCode.GrößeÄndern));
                 Size.Add(new TextListItem((mm125x * 4m).Nummer(1, 4), "Groß (5,0 mm)", enImageCode.GrößeÄndern));
