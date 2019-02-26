@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using BlueBasics;
+using BlueBasics.Interfaces;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.DialogBoxes;
 using BlueControls.EventArgs;
@@ -20,7 +21,7 @@ namespace BlueControls.Classes_Editor
         private FilterItem tmp;
 
 
-        protected override void ConvertObject(object ThisObject)
+        protected override void ConvertObject(IObjectWithDialog ThisObject)
         {
             tmp = (FilterItem)ThisObject;
         }

@@ -112,7 +112,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (_database != null && !_database.ReadOnly)
             {
-                if (_database.IsAdministrator() )
+                if (_database.IsAdministrator())
                 {
                     while (!_database.AllRulesOK())
                     {
@@ -137,7 +137,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             }
 
-           UpdateViewControlls();
+            UpdateViewControlls();
             Check_OrderButtons();
         }
 
@@ -281,9 +281,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (column2 != null)
             {
-
-                if (MessageBox.Show("Welche Spalte bearbeiten?",enImageCode.Frage,"Spalte in dieser Datenbank","Verlinkte Spalte")==1) { column = column2; }
-
+                if (MessageBox.Show("Welche Spalte bearbeiten?", enImageCode.Frage, "Spalte in dieser Datenbank", "Verlinkte Spalte") == 1) { column = column2; }
             }
 
 
@@ -337,13 +335,18 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
 
-            var newc = _TableView.Database.Column.Add(_TableView.Database.Column.Freename("NEUE_SPALTE"));
+            ColumnItem newc = null;
 
             if (Vorlage != null)
             {
-                newc.CopyLayout(Vorlage);
-                newc.Name = _TableView.Database.Column.Freename(Vorlage.Name);
+                newc = new ColumnItem(Vorlage, true);
             }
+            else
+            {
+                newc = new ColumnItem(_TableView.Database, true);
+            }
+
+  
 
             using (var w = new ColumnEditor(newc))
             {

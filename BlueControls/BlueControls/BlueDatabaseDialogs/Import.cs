@@ -143,7 +143,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 StartZ = 1;
 
 
-                for (var SpaltNo = 0 ; SpaltNo < Zeil[0].GetUpperBound(0)+1 ; SpaltNo++)
+                for (var SpaltNo = 0 ; SpaltNo < Zeil[0].GetUpperBound(0) + 1 ; SpaltNo++)
                 {
                     if (string.IsNullOrEmpty(Zeil[0][SpaltNo]))
                     {
@@ -155,7 +155,7 @@ namespace BlueControls.BlueDatabaseDialogs
                     var Col = _Database.Column[Zeil[0][SpaltNo]];
                     if (Col == null)
                     {
-                        Col = _Database.Column.Add(Zeil[0][SpaltNo]);
+                        Col = new ColumnItem(_Database, Zeil[0][SpaltNo], true);
                         Col.Caption = Zeil[0][SpaltNo];
                         Col.Format = enDataFormat.Text;
                     }
@@ -170,9 +170,9 @@ namespace BlueControls.BlueDatabaseDialogs
                     if (thisColumn != null && string.IsNullOrEmpty(thisColumn.Identifier)) { colsx.Add(thisColumn); }
                 }
 
-                while(colsx.Count < Zeil[0].GetUpperBound(0)+1)
+                while (colsx.Count < Zeil[0].GetUpperBound(0) + 1)
                 {
-                    var newc = _Database.Column.Add(_Database.Column.Freename("NEUE_SPALTE"));
+                    var newc = new ColumnItem(_Database, true);
                     newc.Format = enDataFormat.Text;
                     newc.MultiLine = true;
                     colsx.Add(newc);
@@ -195,7 +195,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 P?.Update(ZeilNo);
 
 
-                 var tempVar2 = Math.Min(Zeil[ZeilNo].GetUpperBound(0) + 1, colsx.Count);
+                var tempVar2 = Math.Min(Zeil[ZeilNo].GetUpperBound(0) + 1, colsx.Count);
                 for (var SpaltNo = 0 ; SpaltNo < tempVar2 ; SpaltNo++)
                 {
 

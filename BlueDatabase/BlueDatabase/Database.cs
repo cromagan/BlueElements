@@ -789,93 +789,92 @@ namespace BlueDatabase
 
 
 
-        public void CopyLayout(Database Source, bool BinsToo)
-        {
+        //public void CopyLayout(Database Source, bool BinsToo)
+        //{
 
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+        //    Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
 
-            // Fehlende Spalten hinzufügen
-            foreach (var ThisColumnItem in Source.Column)
-            {
-                if (ThisColumnItem != null && string.IsNullOrEmpty(ThisColumnItem.Identifier))
-                {
-                    var DestC = Column[ThisColumnItem.Name];
-                    if (DestC == null) { DestC = Column.Add(ThisColumnItem.Name); }
-                    DestC.CopyLayout(ThisColumnItem);
-                }
-            }
+        //    // Fehlende Spalten hinzufügen
+        //    foreach (var ThisColumnItem in Source.Column)
+        //    {
+        //        if (ThisColumnItem != null && string.IsNullOrEmpty(ThisColumnItem.Identifier))
+        //        {
+        //            var DestC = Column[ThisColumnItem.Name];
+        //            if (DestC == null) { DestC = new ColumnItem(ThisColumnItem, true); }
+        //        }
+        //    }
 
-            // Spalten, die die Quelle nicht benutzt, löschen
-            foreach (var ThisColumnItem in Column)
-            {
-                if (ThisColumnItem != null && string.IsNullOrEmpty(ThisColumnItem.Identifier))
-                {
-                    if (Source.Column[ThisColumnItem.Name] == null)
-                    {
-                        Column.Remove(ThisColumnItem);
-                    }
-                }
-            }
-
-
-            _Caption = Source.Caption;
-            _Ansicht = Source.Ansicht;
-            _Skin = Source.Skin;
-            _JoinTyp = Source.JoinTyp;
-            _VerwaisteDaten = Source.VerwaisteDaten;
-
-            Tags.Clear();
-            Tags.AddRange(Source.Tags);
+        //    // Spalten, die die Quelle nicht benutzt, löschen
+        //    foreach (var ThisColumnItem in Column)
+        //    {
+        //        if (ThisColumnItem != null && string.IsNullOrEmpty(ThisColumnItem.Identifier))
+        //        {
+        //            if (Source.Column[ThisColumnItem.Name] == null)
+        //            {
+        //                Column.Remove(ThisColumnItem);
+        //            }
+        //        }
+        //    }
 
 
-            if (BinsToo)
-            {
-                Bins.Clear();
-                Bins.AddRange(Source.Bins);
+        //    _Caption = Source.Caption;
+        //    _Ansicht = Source.Ansicht;
+        //    _Skin = Source.Skin;
+        //    _JoinTyp = Source.JoinTyp;
+        //    _VerwaisteDaten = Source.VerwaisteDaten;
 
-            }
-
-
-            DatenbankAdmin.Clear();
-            DatenbankAdmin.AddRange(Source.DatenbankAdmin);
-
-            PermissionGroups_NewRow.Clear();
-            PermissionGroups_NewRow.AddRange(Source.PermissionGroups_NewRow);
-
-            Rules.Clear();
-            foreach (var ThisRule in Source.Rules)
-            {
-                Rules.Add(new RuleItem(this, Source.Column.ChangeKeysToNames(ThisRule.ToString())));
-            }
-
-            _Export.Clear();
-            foreach (var ThisExport in Source._Export)
-            {
-                _Export.Add(new ExportDefinition(this, ThisExport.ToString(), true));
-            }
+        //    Tags.Clear();
+        //    Tags.AddRange(Source.Tags);
 
 
-            ColumnArrangements.Clear();
-            foreach (var ThisArrangement in Source.ColumnArrangements)
-            {
-                ColumnArrangements.Add(new ColumnViewCollection(this, Source.Column.ChangeKeysToNames(ThisArrangement.ToString())));
-            }
+        //    if (BinsToo)
+        //    {
+        //        Bins.Clear();
+        //        Bins.AddRange(Source.Bins);
 
-            Layouts.Clear();
-            Layouts.AddRange(Source.Layouts);
-
-            Views.Clear();
-            foreach (var ThisArrangement in Source.Views)
-            {
-                Views.Add(new ColumnViewCollection(this, Source.Column.ChangeKeysToNames(ThisArrangement.ToString())));
-            }
+        //    }
 
 
-            _sortDefinition = new RowSortDefinition(this, Source.Column.ChangeKeysToNames(Source.SortDefinition.ToString()));
+        //    DatenbankAdmin.Clear();
+        //    DatenbankAdmin.AddRange(Source.DatenbankAdmin);
+
+        //    PermissionGroups_NewRow.Clear();
+        //    PermissionGroups_NewRow.AddRange(Source.PermissionGroups_NewRow);
+
+        //    Rules.Clear();
+        //    foreach (var ThisRule in Source.Rules)
+        //    {
+        //        Rules.Add(new RuleItem(this, Source.Column.ChangeKeysToNames(ThisRule.ToString())));
+        //    }
+
+        //    _Export.Clear();
+        //    foreach (var ThisExport in Source._Export)
+        //    {
+        //        _Export.Add(new ExportDefinition(this, ThisExport.ToString(), true));
+        //    }
 
 
-            Column.Repair();
-        }
+        //    ColumnArrangements.Clear();
+        //    foreach (var ThisArrangement in Source.ColumnArrangements)
+        //    {
+        //        ColumnArrangements.Add(new ColumnViewCollection(this, Source.Column.ChangeKeysToNames(ThisArrangement.ToString())));
+        //    }
+
+        //    Layouts.Clear();
+        //    Layouts.AddRange(Source.Layouts);
+
+        //    Views.Clear();
+        //    foreach (var ThisArrangement in Source.Views)
+        //    {
+        //        Views.Add(new ColumnViewCollection(this, Source.Column.ChangeKeysToNames(ThisArrangement.ToString())));
+        //    }
+
+
+        //    _sortDefinition = new RowSortDefinition(this, Source.Column.ChangeKeysToNames(Source.SortDefinition.ToString()));
+
+
+        //    Column.Repair();
+        //}
 
 
 
@@ -1237,8 +1236,7 @@ namespace BlueDatabase
                             else
                             {
                                 // Nicht gefunden, als neu machen
-                                _Column = new ColumnItem(this, ColKey, "");
-                                Column.Add(_Column);
+                                _Column = new ColumnItem(this, ColKey, "", true);
                             }
                         }
                     }
@@ -1534,11 +1532,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.dummyComand_AddColumn:
                     var tKey = int.Parse(Inhalt);
                     _Column = Column.SearchByKey(tKey);
-                    if (_Column == null)
-                    {
-                        _Column = new ColumnItem(this, tKey, "");
-                        Column.Add(_Column);
-                    }
+                    if (_Column == null) { _Column = new ColumnItem(this, tKey, "", true); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveRow:

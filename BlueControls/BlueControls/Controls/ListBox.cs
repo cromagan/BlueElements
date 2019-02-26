@@ -38,7 +38,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls
 {
-    public partial class ListBox : IContextMenu, IBackgroundNone, IQuickInfo, IChangedFeedback
+    public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IQuickInfo, IChangedFeedback
     {
 
 
@@ -78,9 +78,8 @@ namespace BlueControls.Controls
         public event EventHandler ItemRemoved;
         public event EventHandler<BasicListItemEventArgs> ItemDoubleClick;
         public event EventHandler<BasicListItemEventArgs> ItemClick;
-        public event EventHandler<AllreadyHandledEventArgs> AddClicked;
+        public event EventHandler AddClicked;
         public event EventHandler<ListOfBasicListItemEventArgs> RemoveClicked;
-        public event EventHandler<ItemSwapEventArgs> UpOrDownClicked;
         public event EventHandler<ColumnEventArgs> NeedColumn;
         public event EventHandler Changed;
 
@@ -134,10 +133,7 @@ namespace BlueControls.Controls
             }
             set
             {
-                if (_RemoveAllowed == value)
-                {
-                    return;
-                }
+                if (_RemoveAllowed == value) { return; }
                 _RemoveAllowed = value;
                 CheckButtons();
             }
@@ -152,10 +148,7 @@ namespace BlueControls.Controls
             }
             set
             {
-                if (_AddAlloweds == value)
-                {
-                    return;
-                }
+                if (_AddAlloweds == value) { return; }
                 _AddAlloweds = value;
                 CheckButtons();
             }
@@ -182,10 +175,7 @@ namespace BlueControls.Controls
         [DefaultValue(false)]
         public bool FilterAllowed
         {
-            get
-            {
-                return _FilterAllowed;
-            }
+            get { return _FilterAllowed; }
             set
             {
                 if (_FilterAllowed == value) { return; }
@@ -537,19 +527,10 @@ namespace BlueControls.Controls
 
         private void SwapItems(BasicListItem Nr1, BasicListItem Nr2)
         {
-            var ed = new ItemSwapEventArgs(Nr1, Nr2, false);
-
-            OnUpOrDownClicked(ed);
-            if (ed.AlreadyHandled) { return; }
-
             Item.Swap(ref Nr1, ref Nr2);
             CheckButtons();
         }
 
-        private void OnUpOrDownClicked(ItemSwapEventArgs e)
-        {
-            UpOrDownClicked?.Invoke(this, e);
-        }
 
         private void Up_Click(object sender, System.EventArgs e)
         {
@@ -687,8 +668,8 @@ namespace BlueControls.Controls
                     if (ThrowCellError && ed.Column != null) { Develop.DebugPrint(enFehlerArt.Fehler, "None fehlgeschlagen, Spalte vorhanden"); }
                     return enEditTypeTable.None;
 
-                case enAddType.OnlyInternalCoded:
-                    if (ThrowCellError && ed.Column != null) { Develop.DebugPrint(enFehlerArt.Fehler, "OnlyInternalCoded fehlgeschlagen, Spalte vorhanden"); }
+                case enAddType.UserDef:
+                    if (ThrowCellError && ed.Column != null) { Develop.DebugPrint(enFehlerArt.Fehler, "UserDef fehlgeschlagen, Spalte vorhanden"); }
                     return enEditTypeTable.Textfeld; // Dummy
 
                 default:
@@ -705,42 +686,18 @@ namespace BlueControls.Controls
 
         private void Plus_Click(object sender, System.EventArgs e)
         {
-
             var Dia = GetEditType(true);
 
+            OnAddClicked();
+            if (_AddAlloweds.HasFlag(enAddType.UserDef)) { return; }
+
             var Val = "";
-            var ed = new AllreadyHandledEventArgs(false);
-
-            OnAddClicked(ed);
-
-
-            if (ed.AlreadyHandled) { return; }
-
-            if (Convert.ToBoolean(AddAllowed & enAddType.OnlyInternalCoded))
-            {
-                Develop.DebugPrint("Add Ignoriert!");
-                return;
-            }
-
-
             Suggestions.CheckBehavior = enCheckBehavior.SingleSelection;
 
             var ce = new ColumnEventArgs(null);
-            //var cr = new RowEventArgs(null);
 
             switch (Dia)
             {
-                //case enEditTypeTable.RelationEditor_InTable:
-                //    Develop.DebugPrint_NichtImplementiert();
-                //    //OnNeedColumn(ce);
-                //    //OnNeedRow(cr);
-
-                //    //var REl = new clsRelation(ce.Column, cr.Row, "");
-                //    //var nob = DialogBox.eEditClass(REl, false);
-                //    //Val = nob == REl ? string.Empty : nob.ToString();
-                //    break;
-
-
                 case enEditTypeTable.Image_Auswahl_Dialog:
 
                     string[] d1 = null;
@@ -878,9 +835,9 @@ namespace BlueControls.Controls
         //    NeedRow?.Invoke(this, e);
         //}
 
-        private void OnAddClicked(AllreadyHandledEventArgs e)
+        private void OnAddClicked()
         {
-            AddClicked?.Invoke(this, e);
+            AddClicked?.Invoke(this, System.EventArgs.Empty);
         }
 
 

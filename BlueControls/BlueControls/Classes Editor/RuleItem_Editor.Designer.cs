@@ -53,7 +53,7 @@ namespace BlueControls.Classes_Editor
             //
             //ActionSelector
             //
-            this.ActionSelector.AddAllowed = enAddType.OnlyInternalCoded;
+            this.ActionSelector.AddAllowed = enAddType.UserDef;
             this.ActionSelector.Anchor = (System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left);
             this.ActionSelector.CheckBehavior = enCheckBehavior.AlwaysSingleSelection;
             this.ActionSelector.FilterAllowed = true;
@@ -63,9 +63,9 @@ namespace BlueControls.Classes_Editor
             this.ActionSelector.RemoveAllowed = true;
             this.ActionSelector.Size = new Size(472, 216);
             this.ActionSelector.TabIndex = 5;
-            this.ActionSelector.AddClicked += new EventHandler<AllreadyHandledEventArgs>(ActionSelector_Add_Clicked);
+            this.ActionSelector.AddClicked += new EventHandler(ActionSelector_AddClicked);
             this.ActionSelector.ItemCheckedChanged += new EventHandler(ActionSelector_Item_CheckedChanged);
-            this.ActionSelector.RemoveClicked += new EventHandler<ListOfBasicListItemEventArgs>(ActionSelector_Remove_Clicked);
+            this.ActionSelector.RemoveClicked += new EventHandler<ListOfBasicListItemEventArgs>(ActionSelector_RemoveClicked);
             //
             //RuleItem_Editor
             //

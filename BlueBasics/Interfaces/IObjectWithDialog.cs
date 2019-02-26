@@ -17,23 +17,9 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
-using BlueControls.ItemCollection;
-
-namespace BlueControls.EventArgs
+namespace BlueBasics.Interfaces
 {
-    public class ItemSwapEventArgs : AllreadyHandledEventArgs
+    public interface IObjectWithDialog : IReadableText, IParseable, System.ICloneable
     {
-
-
-        public ItemSwapEventArgs(BasicListItem ItemToSwap1, BasicListItem ItemToSwap2, bool AllreadyHandled) : base(AllreadyHandled)
-        {
-            this.ItemToSwap1 = ItemToSwap1;
-            this.ItemToSwap2 = ItemToSwap2;
-        }
-
-        public BasicListItem ItemToSwap1 { get; set; }
-        public BasicListItem ItemToSwap2 { get; set; }
-
     }
 }

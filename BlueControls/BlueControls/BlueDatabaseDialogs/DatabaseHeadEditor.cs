@@ -75,7 +75,7 @@ namespace BlueControls.BlueDatabaseDialogs
             var NewRules = new ListExt<RuleItem>();
             foreach (var ThisItem in lbxRuleSelector.Item)
             {
-                var Rule = (RuleItem)((ObjectListItem)ThisItem).ObjectReadable;
+                var Rule = (RuleItem)((ObjectListItem)ThisItem).Obj;
                 NewRules.Add((RuleItem)Rule.Clone());
             }
 
@@ -169,7 +169,7 @@ namespace BlueControls.BlueDatabaseDialogs
             var NewExports = new List<ExportDefinition>();
             foreach (var ThisItem in ExportSets.Item)
             {
-                NewExports.Add((ExportDefinition)((ObjectListItem)ThisItem).ObjectReadable);
+                NewExports.Add((ExportDefinition)((ObjectListItem)ThisItem).Obj);
             }
 
             if (NewExports.IsDifferentTo(_Database._Export))
@@ -318,14 +318,11 @@ namespace BlueControls.BlueDatabaseDialogs
 
         #region  Export 
 
-        private void ExportSets_Add_Clicked(object sender, AllreadyHandledEventArgs e)
+        private void ExportSets_AddClicked(object sender, System.EventArgs e)
         {
-            e.AlreadyHandled = true;
-
             var NewExportItem = new ObjectListItem(new ExportDefinition(_Database));
             ExportSets.Item.Add(NewExportItem);
             NewExportItem.Checked = true;
-
         }
 
         private void ExportSets_Item_CheckedChanged(object sender, System.EventArgs e)
@@ -341,7 +338,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 ExportEditor.ObjectWithDialog = null;
                 return;
             }
-            var SelectedExport = (ExportDefinition)((ObjectListItem)ExportSets.Item.Checked()[0]).ObjectReadable;
+            var SelectedExport = (ExportDefinition)((ObjectListItem)ExportSets.Item.Checked()[0]).Obj;
 
             ExportEditor.ObjectWithDialog = SelectedExport;
         }
@@ -356,28 +353,26 @@ namespace BlueControls.BlueDatabaseDialogs
         #region  Regeln 
 
 
-        private void RuleSelector_Add_Clicked(object sender, AllreadyHandledEventArgs e)
+        private void lbxRuleSelector_AddClicked(object sender, System.EventArgs e)
         {
-            e.AlreadyHandled = true;
-
             var NewRuleItem = new ObjectListItem(new RuleItem(_Database));
             lbxRuleSelector.Item.Add(NewRuleItem);
             NewRuleItem.Checked = true;
 
         }
 
-        private void RuleSelector_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
+        private void lbxRuleSelector_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
         {
             if (e.Tag == null) { return; }
             e.UserMenu.Add(enContextMenuComands.Kopieren);
         }
 
-        private void RuleSelector_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
+        private void lbxRuleSelector_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
         {
             switch (e.ClickedComand.Internal())
             {
                 case "Kopieren":
-                    var ClickedRule = (RuleItem)((ObjectListItem)e.Tag).ObjectReadable;
+                    var ClickedRule = (RuleItem)((ObjectListItem)e.Tag).Obj;
                     var NewRuleItem = new ObjectListItem((RuleItem)ClickedRule.Clone());
                     lbxRuleSelector.Item.Add(NewRuleItem);
                     NewRuleItem.Checked = true;
@@ -390,10 +385,10 @@ namespace BlueControls.BlueDatabaseDialogs
         }
 
 
-        private void RuleSelector_Item_CheckedChanged(object sender, System.EventArgs e)
+        private void lbxRuleSelector_ItemCheckedChanged(object sender, System.EventArgs e)
         {
             if (lbxRuleSelector.Item.Checked().Count != 1) { return; }
-            var SelectedRule = (RuleItem)((ObjectListItem)lbxRuleSelector.Item.Checked()[0]).ObjectReadable;
+            var SelectedRule = (RuleItem)((ObjectListItem)lbxRuleSelector.Item.Checked()[0]).Obj;
             RuleItemEditor.ObjectWithDialog = SelectedRule;
         }
 
@@ -423,14 +418,14 @@ namespace BlueControls.BlueDatabaseDialogs
         #endregion
 
 
-        private void ExportSets_Remove_Clicked(object sender, ListOfBasicListItemEventArgs e)
+        private void ExportSets_RemoveClicked(object sender, ListOfBasicListItemEventArgs e)
         {
 
             foreach (var ThisItemBasic in e.Items)
             {
                 if (ThisItemBasic != null)
                 {
-                    var tempVar = (ExportDefinition)((ObjectListItem)ThisItemBasic).ObjectReadable;
+                    var tempVar = (ExportDefinition)((ObjectListItem)ThisItemBasic).Obj;
                     tempVar.DeleteAllBackups();
                 }
             }
@@ -628,58 +623,51 @@ namespace BlueControls.BlueDatabaseDialogs
             var x = new Database(true, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
             ColumnItem c;
 
-            c = x.Column.Add("Index");
+            c = new ColumnItem(x, "Index", true);
             c.Caption = "Index";
             c.Format = enDataFormat.Ganzzahl;
 
-            c = x.Column.Add("ColumnKey");
+            c = new ColumnItem(x, "ColumnKey", true);
             c.Caption = "Spalten-<br>Schlüssel";
             c.Format = enDataFormat.Ganzzahl;
 
-            c = x.Column.Add("ColumnName");
+            c = new ColumnItem(x, "ColumnName", true);
             c.Caption = "Spalten-<br>Name";
             c.Format = enDataFormat.Text;
 
-            c = x.Column.Add("ColumnCaption");
+            c = new ColumnItem(x, "ColumnCaption", true);
             c.Caption = "Spaten-<br>Beschriftung";
             c.Format = enDataFormat.Text;
 
-            c = x.Column.Add("RowKey");
+            c = new ColumnItem(x, "RowKey", true);
             c.Caption = "Zeilen-<br>Schlüssel";
             c.Format = enDataFormat.Ganzzahl;
 
-            c = x.Column.Add("RowFirst");
+            c = new ColumnItem(x, "RowFirst", true);
             c.Caption = "Zeile, Wert der<br>1. Spalte";
             c.Format = enDataFormat.Text;
 
-
-            c = x.Column.Add("Änderzeit");
+            c = new ColumnItem(x, "Änderzeit", true);
             c.Caption = "Änder-<br>Zeit";
             c.Format = enDataFormat.Text;
 
-
-
-
-
-
-            c = x.Column.Add("Änderer");
+            c = new ColumnItem(x, "Änderer", true);
             c.Caption = "Änderer";
             c.Format = enDataFormat.Text;
 
-            c = x.Column.Add("Symbol");
+            c = new ColumnItem(x, "Symbol", true);
             c.Caption = "Symbol";
             c.Format = enDataFormat.BildCode;
 
-            c = x.Column.Add("Änderung");
+            c = new ColumnItem(x, "Änderung", true);
             c.Caption = "Änderung";
             c.Format = enDataFormat.Text;
 
-
-            c = x.Column.Add("WertAlt");
+            c = new ColumnItem(x, "WertAlt", true);
             c.Caption = "Wert alt";
             c.Format = enDataFormat.Text;
 
-            c = x.Column.Add("WertNeu");
+            c = new ColumnItem(x, "WertNeu", true);
             c.Caption = "Wert neu";
             c.Format = enDataFormat.Text;
 

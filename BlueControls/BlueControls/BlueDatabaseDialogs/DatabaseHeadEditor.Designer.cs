@@ -323,7 +323,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // lbxRuleSelector
             // 
-            this.lbxRuleSelector.AddAllowed = BlueControls.Enums.enAddType.OnlyInternalCoded;
+            this.lbxRuleSelector.AddAllowed = BlueControls.Enums.enAddType.UserDef;
             this.lbxRuleSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbxRuleSelector.CheckBehavior = BlueControls.Enums.enCheckBehavior.AlwaysSingleSelection;
@@ -334,10 +334,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxRuleSelector.RemoveAllowed = true;
             this.lbxRuleSelector.Size = new System.Drawing.Size(1023, 360);
             this.lbxRuleSelector.TabIndex = 1;
-            this.lbxRuleSelector.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.RuleSelector_ContextMenuInit);
-            this.lbxRuleSelector.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.RuleSelector_ContextMenuItemClicked);
-            this.lbxRuleSelector.ItemCheckedChanged += new System.EventHandler(this.RuleSelector_Item_CheckedChanged);
-            this.lbxRuleSelector.AddClicked += new System.EventHandler<BlueControls.EventArgs.AllreadyHandledEventArgs>(this.RuleSelector_Add_Clicked);
+            this.lbxRuleSelector.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.lbxRuleSelector_ContextMenuInit);
+            this.lbxRuleSelector.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.lbxRuleSelector_ContextMenuItemClicked);
+            this.lbxRuleSelector.ItemCheckedChanged += new System.EventHandler(this.lbxRuleSelector_ItemCheckedChanged);
+            this.lbxRuleSelector.AddClicked += new System.EventHandler(this.lbxRuleSelector_AddClicked);
             // 
             // Caption14
             // 
@@ -638,7 +638,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ExportSets
             // 
-            this.ExportSets.AddAllowed = BlueControls.Enums.enAddType.Text;
+            this.ExportSets.AddAllowed = BlueControls.Enums.enAddType.UserDef;
             this.ExportSets.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -651,8 +651,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ExportSets.TabIndex = 0;
             this.ExportSets.Text = "ExportAufgaben";
             this.ExportSets.ItemCheckedChanged += new System.EventHandler(this.ExportSets_Item_CheckedChanged);
-            this.ExportSets.AddClicked += new System.EventHandler<BlueControls.EventArgs.AllreadyHandledEventArgs>(this.ExportSets_Add_Clicked);
-            this.ExportSets.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.ExportSets_Remove_Clicked);
+            this.ExportSets.AddClicked += new System.EventHandler(this.ExportSets_AddClicked);
+            this.ExportSets.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.ExportSets_RemoveClicked);
             // 
             // Tab_Sortierung
             // 

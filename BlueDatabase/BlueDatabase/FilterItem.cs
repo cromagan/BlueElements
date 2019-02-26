@@ -26,7 +26,7 @@ using BlueDatabase.Enums;
 
 namespace BlueDatabase
 {
-    public sealed class FilterItem : IParseable, ICompareKey, IReadableText, ICanBeEmpty
+    public sealed class FilterItem : IObjectWithDialog, IParseable, ICompareKey, IReadableText, ICanBeEmpty
     {
 
         #region  Variablen-Deklarationen 

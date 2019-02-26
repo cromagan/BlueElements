@@ -13,7 +13,7 @@ namespace BlueControls.Enums
         OnlySuggests = 8,
         CellDecide = 16,
 
-        OnlyInternalCoded = 32
+        UserDef = 32
 
     }
 }

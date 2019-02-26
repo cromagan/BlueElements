@@ -17,6 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
+using BlueBasics.Interfaces;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
@@ -33,7 +35,7 @@ namespace BlueControls.Classes_Editor
 
         private RuleItem tmp;
 
-        protected override void ConvertObject(object ThisObject)
+        protected override void ConvertObject(IObjectWithDialog ThisObject)
         {
             tmp = (RuleItem)ThisObject;
         }
@@ -77,14 +79,11 @@ namespace BlueControls.Classes_Editor
 
 
 
-        private void ActionSelector_Add_Clicked(object sender, AllreadyHandledEventArgs e)
+        private void ActionSelector_AddClicked(object sender, System.EventArgs e)
         {
-            e.AlreadyHandled = true;
-
-
             if (tmp== null)
             {
-                BlueControls.DialogBoxes.Notification.Show("Bitte vorher eine Regel auswählen.");
+                DialogBoxes.Notification.Show("Bitte vorher eine Regel auswählen.");
                 return;
             }
 
@@ -108,7 +107,7 @@ namespace BlueControls.Classes_Editor
                 return;
             }
 
-            var SelectedAction = (RuleActionItem)((ObjectListItem)ActionSelector.Item.Checked()[0]).ObjectReadable;
+            var SelectedAction = (RuleActionItem)((ObjectListItem)ActionSelector.Item.Checked()[0]).Obj;
             RuleActionEditor.ObjectWithDialog = SelectedAction;
         }
 
@@ -120,7 +119,7 @@ namespace BlueControls.Classes_Editor
             OnChanged(tmp);
         }
 
-        private void ActionSelector_Remove_Clicked(object sender, ListOfBasicListItemEventArgs e)
+        private void ActionSelector_RemoveClicked(object sender, ListOfBasicListItemEventArgs e)
         {
             OnChanged(tmp);
         }

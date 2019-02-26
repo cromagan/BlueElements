@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Drawing;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -86,7 +85,7 @@ namespace BlueControls.Classes_Editor
             //
             //ExportFilter
             //
-            this.ExportFilter.AddAllowed = enAddType.Text;
+            this.ExportFilter.AddAllowed = enAddType.UserDef;
             this.ExportFilter.Anchor = (System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right);
             this.ExportFilter.CheckBehavior = enCheckBehavior.MultiSelection;
             this.ExportFilter.FilterAllowed = true;
@@ -97,7 +96,7 @@ namespace BlueControls.Classes_Editor
             this.ExportFilter.Size = new Size(328, 96);
             this.ExportFilter.TabIndex = 9;
             this.ExportFilter.Changed += new EventHandler(ExportFilter_Changed);
-            this.ExportFilter.AddClicked += new EventHandler<AllreadyHandledEventArgs>(this.ExportFilter_Add_Clicked);
+            this.ExportFilter.AddClicked += new EventHandler(this.ExportFilter_Add_Clicked);
             //
             //Caption24
             //

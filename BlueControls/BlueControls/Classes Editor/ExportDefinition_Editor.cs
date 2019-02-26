@@ -21,6 +21,7 @@ using System;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
@@ -155,7 +156,7 @@ namespace BlueControls.Classes_Editor
 
         }
 
-        protected override void ConvertObject(object ThisObject)
+        protected override void ConvertObject(IObjectWithDialog ThisObject)
         {
             tmp = (ExportDefinition)ThisObject;
         }
@@ -292,11 +293,9 @@ namespace BlueControls.Classes_Editor
 
 
 
-        private void ExportFilter_Add_Clicked(object sender, AllreadyHandledEventArgs e)
+        private void ExportFilter_Add_Clicked(object sender, System.EventArgs e)
         {
             Develop.DebugPrint_NichtImplementiert();
-
-            //e.AlreadyHandled = true;
 
             //var DummyFilter = new FilterItem(tmp.Database.Column[0], enFilterType.KeinFilter, "");
             //var NewFilter = DialogBox.eEditClass(DummyFilter, false);

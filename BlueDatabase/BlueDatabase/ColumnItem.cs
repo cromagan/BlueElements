@@ -32,7 +32,7 @@ using System.Text.RegularExpressions;
 
 namespace BlueDatabase
 {
-    public sealed class ColumnItem : IReadableText, ICompareKey, ICheckable
+    public sealed class ColumnItem : IObjectWithDialog, IReadableText, ICompareKey, ICheckable
     {
         #region  Variablen-Deklarationen 
 
@@ -176,132 +176,103 @@ namespace BlueDatabase
             Invalidate_TmpVariables();
         }
 
-        private Database TMP_LinkedDatabase
+
+
+        public ColumnItem(ColumnItem Source, bool addtodatabase) : this(Source.Database, -1, Source._Name, addtodatabase)
         {
-            set
+            Caption = Source.Caption;
+            CaptionBitmap = Source.CaptionBitmap;
+
+            Format = Source.Format;
+            LineLeft = Source.LineLeft;
+            LineRight = Source.LineRight;
+            MultiLine = Source.MultiLine;
+            Quickinfo = Source.Quickinfo;
+            ForeColor = Source.ForeColor;
+            BackColor = Source.BackColor;
+
+            EditTrotzSperreErlaubt = Source.EditTrotzSperreErlaubt;
+
+
+            EditType = Source.EditType;
+            Identifier = Source.Identifier;
+
+            PermissionGroups_ChangeCell.Clear();
+            PermissionGroups_ChangeCell.AddRange(Source.PermissionGroups_ChangeCell);
+
+            Tags.Clear();
+            Tags.AddRange(Source.Tags);
+
+
+            AllowedChars = Source.AllowedChars;
+            AdminInfo = Source.AdminInfo;
+            AutoFilterErlaubt = Source.AutoFilterErlaubt;
+            AutofilterTextFilterErlaubt = Source.AutofilterTextFilterErlaubt;
+            AutoFilterErweitertErlaubt = Source.AutoFilterErweitertErlaubt;
+            IgnoreAtRowFilter = Source.IgnoreAtRowFilter;
+            DropdownBearbeitungErlaubt = Source.DropdownBearbeitungErlaubt;
+            DropdownAllesAbwählenErlaubt = Source.DropdownAllesAbwählenErlaubt;
+            TextBearbeitungErlaubt = Source.TextBearbeitungErlaubt;
+            SpellCheckingEnabled = Source.SpellCheckingEnabled;
+            DropdownWerteAndererZellenAnzeigen = Source.DropdownWerteAndererZellenAnzeigen;
+            AfterEdit_QuickSortRemoveDouble = Source.AfterEdit_QuickSortRemoveDouble;
+
+            AfterEdit_Runden = Source.AfterEdit_Runden;
+            AfterEdit_DoUCase = Source.AfterEdit_DoUCase;
+            AfterEdit_AutoCorrect = Source.AfterEdit_AutoCorrect;
+            CellInitValue = Source.CellInitValue;
+            AutoFilterJoker = Source.AutoFilterJoker;
+
+            DropDownItems.Clear();
+            DropDownItems.AddRange(Source.DropDownItems);
+
+            Replacer.Clear();
+            Replacer.AddRange(Source.Replacer);
+
+
+            CompactView = Source.CompactView;
+            ShowUndo = Source.ShowUndo;
+            ShowMultiLineInOneLine = Source.ShowMultiLineInOneLine;
+
+            Ueberschrift1 = Source.Ueberschrift1;
+            Ueberschrift2 = Source.Ueberschrift2;
+            Ueberschrift3 = Source.Ueberschrift3;
+
+            Suffix = Source.Suffix;
+
+            LinkedKeyKennung = Source.LinkedKeyKennung;
+            LinkedDatabaseFile = Source.LinkedDatabaseFile;
+            BildCode_ImageNotFound = Source.BildCode_ImageNotFound;
+            BildCode_ConstantHeight = Source.BildCode_ConstantHeight;
+            BestFile_StandardSuffix = Source.BestFile_StandardSuffix;
+            BestFile_StandardFolder = Source.BestFile_StandardFolder;
+        }
+
+
+
+        public ColumnItem(Database database, bool addtodatabase) : this(database, -1, "NewColumn", addtodatabase) { }
+
+        public ColumnItem(Database database, string columninternalname, bool addtodatabase) : this(database, -1, columninternalname, addtodatabase) { }
+
+        public ColumnItem(Database database, int columnkey, string columninternalname, bool addtodatabase)
+        {
+
+            if (!addtodatabase)
             {
-                if (value == _TMP_LinkedDatabase) { return; }
-
-                Invalidate_TmpVariables();
-
-                _TMP_LinkedDatabase = value;
-
-                if (_TMP_LinkedDatabase != null)
-                {
-                    _TMP_LinkedDatabase.RowKeyChanged += _TMP_LinkedDatabase_RowKeyChanged;
-                    _TMP_LinkedDatabase.ColumnKeyChanged += _TMP_LinkedDatabase_ColumnKeyChanged;
-                    _TMP_LinkedDatabase.ConnectedControlsStopAllWorking += _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
-                    _TMP_LinkedDatabase.Disposed += _TMP_LinkedDatabase_Disposed;
-                    _TMP_LinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
-                }
-
-            }
-        }
-
-        private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e)
-        {
-
-
-
-            if (_Format != enDataFormat.Columns_für_LinkedCellDropdown)
-            {
-                var os = e.KeyOld.ToString();
-                var ns = e.KeyNew.ToString();
-                foreach (var ThisRow in Database.Row)
-                {
-                    if (Database.Cell.GetStringBehindLinkedValue(this, ThisRow) == os)
-                    {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, ns);
-                    }
-                }
+                Develop.DebugPrint(enFehlerArt.Fehler, "Neue Spalte MUSS zur Datenbank hinzugefügt werden.");
+                // Grund: Undos müssen geloggt werden
             }
 
-            if (_Format != enDataFormat.LinkedCell)
-            {
-                var os = e.KeyOld.ToString() + "|";
-                var ns = e.KeyNew.ToString() + "|";
-                foreach (var ThisRow in Database.Row)
-                {
-                    var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
-                    if (val.StartsWith(os))
-                    {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
-                    }
-                }
-            }
-        }
-
-        private void _TMP_LinkedDatabase_RowKeyChanged(object sender, KeyChangedEventArgs e)
-        {
-            if (_Format != enDataFormat.LinkedCell)
-            {
-                var os = "|" + e.KeyOld.ToString();
-                var ns = "|" + e.KeyNew.ToString();
-                foreach (var ThisRow in Database.Row)
-                {
-                    var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
-                    if (val.EndsWith(os))
-                    {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
-                    }
-                }
-            }
-        }
-
-        private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellEventArgs e)
-        {
-
-            var tKey = CellCollection.KeyOfCell(e.Column, e.Row);
-
-            foreach (var ThisRow in Database.Row)
-            {
-                if (Database.Cell.GetStringBehindLinkedValue(this, ThisRow) == tKey)
-                {
-                    CellCollection.Invalidate_CellContentSize(this, ThisRow);
-                    Invalidate_TmpColumnContentWidth();
-                    Database.Cell.OnCellValueChanged(new CellEventArgs(this, ThisRow));
-                    ThisRow.DoAutomatic(false, true);
-                }
-            }
-        }
-
-        private void _TMP_LinkedDatabase_Disposed(object sender, System.EventArgs e)
-        {
-            Invalidate_TmpVariables();
-        }
-
-        private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, System.EventArgs e)
-        {
-            Database.OnConnectedControlsStopAllWorking();
-        }
-
-        public Database LinkedDatabase()
-        {
-            if (_TMP_LinkedDatabase != null) { return _TMP_LinkedDatabase; }
-            if (string.IsNullOrEmpty(_LinkedDatabaseFile)) { return null; }
-            TMP_LinkedDatabase = Database.Load(Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly, Database._PasswordSub, Database._GenerateLayout, Database._RenameColumnInLayout);
-            if (_TMP_LinkedDatabase != null) { _TMP_LinkedDatabase.UserGroup = Database.UserGroup; }
-            return _TMP_LinkedDatabase;
-        }
-
-        /// <summary>
-        /// Bevorzugt diesem Code benutzen: var newcolumn = _Database.Column.Add(_Database.Column.Freename("NEUE_SPALTE"));
-        /// </summary>
-        /// <param name="cDatabase"></param>
-        /// <param name="Key"></param>
-        /// <param name="Name"></param>
-        public ColumnItem(Database cDatabase, int Key, string Name)
-        {
-            Database = cDatabase;
+            Database = database;
 
 
-            if (Key == -1)
+            if (columnkey == -1)
             {
                 this.Key = Database.Column.NextColumnKey();
             }
             else
             {
-                this.Key = Key;
+                this.Key = columnkey;
             }
 
 
@@ -312,7 +283,14 @@ namespace BlueDatabase
             Tags.ListOrItemChanged += Tags_ListOrItemChanged;
 
             Initialize();
-            _Name = Name;
+            Name = columninternalname;
+
+
+            if (addtodatabase)
+            {
+                database.Column.Add(this);
+            }
+
         }
 
 
@@ -1055,10 +1033,129 @@ namespace BlueDatabase
             }
         }
 
+        public bool IsParsing
+        {
+            get
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Kann nur über die Datenbank geparsed werden.");
+                return false;
+            }
+        }
+
 
 
 
         #endregion
+
+
+        private Database TMP_LinkedDatabase
+        {
+            set
+            {
+                if (value == _TMP_LinkedDatabase) { return; }
+
+                Invalidate_TmpVariables();
+
+                _TMP_LinkedDatabase = value;
+
+                if (_TMP_LinkedDatabase != null)
+                {
+                    _TMP_LinkedDatabase.RowKeyChanged += _TMP_LinkedDatabase_RowKeyChanged;
+                    _TMP_LinkedDatabase.ColumnKeyChanged += _TMP_LinkedDatabase_ColumnKeyChanged;
+                    _TMP_LinkedDatabase.ConnectedControlsStopAllWorking += _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
+                    _TMP_LinkedDatabase.Disposed += _TMP_LinkedDatabase_Disposed;
+                    _TMP_LinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
+                }
+
+            }
+        }
+
+        private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e)
+        {
+
+
+
+            if (_Format != enDataFormat.Columns_für_LinkedCellDropdown)
+            {
+                var os = e.KeyOld.ToString();
+                var ns = e.KeyNew.ToString();
+                foreach (var ThisRow in Database.Row)
+                {
+                    if (Database.Cell.GetStringBehindLinkedValue(this, ThisRow) == os)
+                    {
+                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, ns);
+                    }
+                }
+            }
+
+            if (_Format != enDataFormat.LinkedCell)
+            {
+                var os = e.KeyOld.ToString() + "|";
+                var ns = e.KeyNew.ToString() + "|";
+                foreach (var ThisRow in Database.Row)
+                {
+                    var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
+                    if (val.StartsWith(os))
+                    {
+                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
+                    }
+                }
+            }
+        }
+
+        private void _TMP_LinkedDatabase_RowKeyChanged(object sender, KeyChangedEventArgs e)
+        {
+            if (_Format != enDataFormat.LinkedCell)
+            {
+                var os = "|" + e.KeyOld.ToString();
+                var ns = "|" + e.KeyNew.ToString();
+                foreach (var ThisRow in Database.Row)
+                {
+                    var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
+                    if (val.EndsWith(os))
+                    {
+                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
+                    }
+                }
+            }
+        }
+
+        private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellEventArgs e)
+        {
+
+            var tKey = CellCollection.KeyOfCell(e.Column, e.Row);
+
+            foreach (var ThisRow in Database.Row)
+            {
+                if (Database.Cell.GetStringBehindLinkedValue(this, ThisRow) == tKey)
+                {
+                    CellCollection.Invalidate_CellContentSize(this, ThisRow);
+                    Invalidate_TmpColumnContentWidth();
+                    Database.Cell.OnCellValueChanged(new CellEventArgs(this, ThisRow));
+                    ThisRow.DoAutomatic(false, true);
+                }
+            }
+        }
+
+        private void _TMP_LinkedDatabase_Disposed(object sender, System.EventArgs e)
+        {
+            Invalidate_TmpVariables();
+        }
+
+        private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, System.EventArgs e)
+        {
+            Database.OnConnectedControlsStopAllWorking();
+        }
+
+        public Database LinkedDatabase()
+        {
+            if (_TMP_LinkedDatabase != null) { return _TMP_LinkedDatabase; }
+            if (string.IsNullOrEmpty(_LinkedDatabaseFile)) { return null; }
+            TMP_LinkedDatabase = Database.Load(Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly, Database._PasswordSub, Database._GenerateLayout, Database._RenameColumnInLayout);
+            if (_TMP_LinkedDatabase != null) { _TMP_LinkedDatabase.UserGroup = Database.UserGroup; }
+            return _TMP_LinkedDatabase;
+        }
+
 
         public void OnChanged()
         {
@@ -1600,92 +1697,6 @@ namespace BlueDatabase
 
 
 
-        public void CopyLayout(ColumnItem Source)
-        {
-
-            if (!Source.IsOk())
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Quell-Spalte fehlerhaft:\r\nQuelle: " + Source.Name + "\r\nFehler: " + Source.ErrorReason());
-            }
-
-            var old = _Name;
-            Name = Source.Name;
-            Caption = Source.Caption;
-            CaptionBitmap = Source.CaptionBitmap;
-
-            Format = Source.Format;
-            LineLeft = Source.LineLeft;
-            LineRight = Source.LineRight;
-            MultiLine = Source.MultiLine;
-            Quickinfo = Source.Quickinfo;
-            ForeColor = Source.ForeColor;
-            BackColor = Source.BackColor;
-
-            EditTrotzSperreErlaubt = Source.EditTrotzSperreErlaubt;
-
-
-            EditType = Source.EditType;
-            Identifier = Source.Identifier;
-
-            PermissionGroups_ChangeCell.Clear();
-            PermissionGroups_ChangeCell.AddRange(Source.PermissionGroups_ChangeCell);
-
-            Tags.Clear();
-            Tags.AddRange(Source.Tags);
-
-
-            AllowedChars = Source.AllowedChars;
-            AdminInfo = Source.AdminInfo;
-            AutoFilterErlaubt = Source.AutoFilterErlaubt;
-            AutofilterTextFilterErlaubt = Source.AutofilterTextFilterErlaubt;
-            AutoFilterErweitertErlaubt = Source.AutoFilterErweitertErlaubt;
-            IgnoreAtRowFilter = Source.IgnoreAtRowFilter;
-            DropdownBearbeitungErlaubt = Source.DropdownBearbeitungErlaubt;
-            DropdownAllesAbwählenErlaubt = Source.DropdownAllesAbwählenErlaubt;
-            TextBearbeitungErlaubt = Source.TextBearbeitungErlaubt;
-            SpellCheckingEnabled = Source.SpellCheckingEnabled;
-            DropdownWerteAndererZellenAnzeigen = Source.DropdownWerteAndererZellenAnzeigen;
-            AfterEdit_QuickSortRemoveDouble = Source.AfterEdit_QuickSortRemoveDouble;
-
-            AfterEdit_Runden = Source.AfterEdit_Runden;
-            AfterEdit_DoUCase = Source.AfterEdit_DoUCase;
-            AfterEdit_AutoCorrect = Source.AfterEdit_AutoCorrect;
-            CellInitValue = Source.CellInitValue;
-            AutoFilterJoker = Source.AutoFilterJoker;
-
-            DropDownItems.Clear();
-            DropDownItems.AddRange(Source.DropDownItems);
-
-            Replacer.Clear();
-            Replacer.AddRange(Source.Replacer);
-
-
-            CompactView = Source.CompactView;
-            ShowUndo = Source.ShowUndo;
-            ShowMultiLineInOneLine = Source.ShowMultiLineInOneLine;
-
-            Ueberschrift1 = Source.Ueberschrift1;
-            Ueberschrift2 = Source.Ueberschrift2;
-            Ueberschrift3 = Source.Ueberschrift3;
-
-            Suffix = Source.Suffix;
-
-            LinkedKeyKennung = Source.LinkedKeyKennung;
-            LinkedDatabaseFile = Source.LinkedDatabaseFile;
-            BildCode_ImageNotFound = Source.BildCode_ImageNotFound;
-            BildCode_ConstantHeight = Source.BildCode_ConstantHeight;
-            BestFile_StandardSuffix = Source.BestFile_StandardSuffix;
-            BestFile_StandardFolder = Source.BestFile_StandardFolder;
-
-
-
-            if (old != _Name)
-            {
-                Database.Column_NameChanged(old, this);
-            }
-
-            Invalidate_TmpVariables();
-        }
 
 
         internal void CheckFormulaEditType()
@@ -1962,6 +1973,11 @@ namespace BlueDatabase
             }
 
 
+            foreach (var thisS in PermissionGroups_ChangeCell)
+            {
+                if (thisS.Contains("|")) { return "Unerlaubtes Zeichen bei den Gruppen, die eine Zelle bearbeiten dürfen."; }
+                if (thisS.ToUpper() == "#ADMINISTRATOR") { return "'#Administrator' bei den Bearbeitern entfernen."; }
+            }
 
             if (_DropdownBearbeitungErlaubt || TMP_EditDialog == enEditTypeTable.Dropdown_Single)
             {
@@ -2554,6 +2570,21 @@ namespace BlueDatabase
 
             }
 
+        }
+
+        public void Parse(string ToParse)
+        {
+            Develop.DebugPrint(enFehlerArt.Fehler, "Kann nur über die Datenbank geparsed werden.");
+        }
+
+        public object Clone()
+        {
+            if (!IsOk())
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Quell-Spalte fehlerhaft:\r\nQuelle: " + Name + "\r\nFehler: " + ErrorReason());
+            }
+
+            return new ColumnItem(this, false);
         }
     }
 }

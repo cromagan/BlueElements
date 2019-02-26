@@ -5,7 +5,7 @@ using BlueBasics.Enums;
 
 namespace BlueControls.Controls
 {
-    public partial class ListBox : GenericControl
+    public partial class ListBox 
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

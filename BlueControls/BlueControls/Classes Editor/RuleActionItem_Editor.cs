@@ -26,6 +26,7 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueControls.Enums;
+using BlueBasics.Interfaces;
 
 namespace BlueControls.Classes_Editor
 {
@@ -40,7 +41,7 @@ namespace BlueControls.Classes_Editor
         private RuleActionItem tmp;
 
 
-        protected override void ConvertObject(object ThisObject)
+        protected override void ConvertObject(IObjectWithDialog ThisObject)
         {
             tmp = (RuleActionItem)ThisObject;
         }

@@ -180,17 +180,6 @@ namespace BlueDatabase
             return vSysRowCreator;
         }
 
-        public ColumnItem Add(string InternalName)
-        {
-            var c = new ColumnItem(Database, -1, InternalName);
-            return Add(c);
-        }
-
-        public new ColumnItem Add(ColumnItem Column)
-        {
-            base.Add(Column);
-            return Column;
-        }
 
 
 
@@ -219,9 +208,8 @@ namespace BlueDatabase
                 if (ThisColumn != null && ThisColumn.Identifier.ToUpper() == Kennung.ToUpper()) { return; }
             }
 
-            var c = new ColumnItem(Database, -1, "");
+            var c = new ColumnItem(Database, true);
             c.Load(enDatabaseDataType.co_Identifier, Kennung);
-            Add(c);
 
         }
 
