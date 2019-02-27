@@ -2548,9 +2548,6 @@ namespace BlueDatabase
                     if (DoDropDown) { return enEditTypeTable.Dropdown_Single; }
                     return enEditTypeTable.Farb_Auswahl_Dialog;
 
-                //case enDataFormat.Relation:
-                //    return enEditTypeTable.RelationEditor_InTable;
-
                 case enDataFormat.Schrift:
                     if (DoDropDown) { return enEditTypeTable.Dropdown_Single; }
                     return enEditTypeTable.Font_AuswahlDialog;

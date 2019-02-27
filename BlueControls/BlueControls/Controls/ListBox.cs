@@ -42,8 +42,6 @@ namespace BlueControls.Controls
     {
 
 
-        private string Plus_Click_LastPfad = "";
-
         public ListBox()
         {
 
@@ -80,7 +78,6 @@ namespace BlueControls.Controls
         public event EventHandler<BasicListItemEventArgs> ItemClick;
         public event EventHandler AddClicked;
         public event EventHandler<ListOfBasicListItemEventArgs> RemoveClicked;
-        public event EventHandler<ColumnEventArgs> NeedColumn;
         public event EventHandler Changed;
 
         #endregion
@@ -99,6 +96,8 @@ namespace BlueControls.Controls
                 Item.CheckBehavior = value;
             }
         }
+
+        public string LastFilePath { get; set; }
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -226,13 +225,10 @@ namespace BlueControls.Controls
 
             var nr = Item.Checked();
 
-            var tmpAddAllowed = _AddAlloweds;
-            if (GetEditType(false) == enEditTypeTable.None) { tmpAddAllowed = enAddType.None; }
-            // Bei GetEditType KEINEN Error abwerfen - es kann ja auch keine Zeile somit Zelle zugeordnet sein
 
             Down.Visible = _MoveAllowed;
             Up.Visible = _MoveAllowed;
-            Plus.Visible = tmpAddAllowed != enAddType.None;
+            Plus.Visible = (_AddAlloweds != enAddType.None);
             Minus.Visible = _RemoveAllowed;
             FilterTxt.Visible = _FilterAllowed;
             FilterCap.Visible = _FilterAllowed;
@@ -584,47 +580,14 @@ namespace BlueControls.Controls
         private void Minus_Click(object sender, System.EventArgs e)
         {
 
-            var Dia = GetEditType(true);
-
             OnRemoveClicked(new ListOfBasicListItemEventArgs(Item.Checked()));
 
-
-
-            switch (Dia)
+            foreach (var ThisItem in Item.Checked())
             {
-                //case enEditTypeTable.RelationEditor_InTable:
-                case enEditTypeTable.Textfeld:
-                case enEditTypeTable.Textfeld_mit_Auswahlknopf:
-                case enEditTypeTable.Dropdown_Single:
-                case enEditTypeTable.Image_Auswahl_Dialog:
-                case enEditTypeTable.None:
-                    foreach (var ThisItem in Item.Checked())
-                    {
-                        Item.Remove(ThisItem);
-                    }
-                    break;
-
-                case enEditTypeTable.FileHandling_InDateiSystem:
-
-
-                    if (MessageBox.Show("Datei(en) unwiderruflich <b>löschen</b>?", enImageCode.Frage, "Ja", "Nein") != 0) { return; }
-                    // Das ist eine Fake-Meldung.
-                    // In Wahrheit werden die Dateien erst beim Speichern der Datenbank gelöscht. Um Ja Sicherzusetellen, dass keine weiteren Bezüge vorhanden sind.
-
-                    foreach (var ThisItem in Item.Checked())
-                    {
-                        Item.Remove(ThisItem);
-                    }
-
-                    break;
-                default:
-
-                    Develop.DebugPrint(Dia);
-                    break;
+                Item.Remove(ThisItem);
             }
 
             CheckButtons();
-
         }
 
         private void OnRemoveClicked(ListOfBasicListItemEventArgs e)
@@ -632,208 +595,101 @@ namespace BlueControls.Controls
             RemoveClicked?.Invoke(this, e);
         }
 
-        private enEditTypeTable GetEditType(bool ThrowCellError)
+
+        public BasicListItem Add_FromFileSystem()
         {
 
-            var ed = new ColumnEventArgs(null);
-
-            OnNeedColumn(ed);
-
-
-
-            switch (_AddAlloweds)
+            using (var f = new System.Windows.Forms.OpenFileDialog())
             {
-                case enAddType.CellDecide:
-                    if (ThrowCellError && ed.Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "CellDecide fehlgeschlagen, keine Spalte vorhanden"); }
-                    if (ed.Column == null) { return enEditTypeTable.None; }
-                    return ColumnItem.UserEditDialogTypeInTable(ed.Column, false);
+                f.CheckFileExists = true;
+                f.CheckPathExists = true;
+                f.Multiselect = false;
+                f.InitialDirectory = LastFilePath;
+                f.Title = "Datei hinzufügen:";
+                f.ShowDialog();
 
-                case enAddType.Text:
-                    if (ThrowCellError && ed.Column != null) { Develop.DebugPrint(enFehlerArt.Fehler, "Texteingabe fehlgeschlagen, Spalte vorhanden"); }
-                    return enEditTypeTable.Textfeld;
+                if (f.FileNames == null || f.FileNames.Length != 1) { return null; }
 
-                case enAddType.OnlySuggests:
-                    if (ThrowCellError && ed.Column != null) { Develop.DebugPrint(enFehlerArt.Fehler, "OnlySuggests fehlgeschlagen, Spalte vorhanden"); }
-                    return enEditTypeTable.Listbox;
-
-                case enAddType.Images:
-                    if (ThrowCellError && ed.Column != null) { Develop.DebugPrint(enFehlerArt.Fehler, "ImageAdd fehlgeschlagen, Spalte vorhanden"); }
-                    return enEditTypeTable.Image_Auswahl_Dialog;
-
-                case enAddType.BinaryAndImages:
-                    if (ThrowCellError && ed.Column != null) { Develop.DebugPrint(enFehlerArt.Fehler, "BinaryAndImages fehlgeschlagen, Spalte vorhanden"); }
-                    return enEditTypeTable.FileHandling_InDateiSystem;
-
-                case enAddType.None:
-                    if (ThrowCellError && ed.Column != null) { Develop.DebugPrint(enFehlerArt.Fehler, "None fehlgeschlagen, Spalte vorhanden"); }
-                    return enEditTypeTable.None;
-
-                case enAddType.UserDef:
-                    if (ThrowCellError && ed.Column != null) { Develop.DebugPrint(enFehlerArt.Fehler, "UserDef fehlgeschlagen, Spalte vorhanden"); }
-                    return enEditTypeTable.Textfeld; // Dummy
-
-                default:
-                    Develop.DebugPrint(_AddAlloweds);
-                    return enEditTypeTable.None;
+                var x = new clsNamedBinary();
+                x.LoadFromFile(f.FileNames[0]);
+                Item.Add(x);
             }
 
+            return null;
         }
 
-        private void OnNeedColumn(ColumnEventArgs d)
+
+        public BasicListItem Add_TextBySuggestion()
         {
-            NeedColumn?.Invoke(this, d);
-        }
-
-        private void Plus_Click(object sender, System.EventArgs e)
-        {
-            var Dia = GetEditType(true);
-
-            OnAddClicked();
-            if (_AddAlloweds.HasFlag(enAddType.UserDef)) { return; }
-
-            var Val = "";
+            if (Suggestions == null || Suggestions.Count == 0)
+            {
+                MessageBox.Show("Keine (weiteren) Werte vorhanden.", enImageCode.Information, "OK");
+                return null;
+            }
             Suggestions.CheckBehavior = enCheckBehavior.SingleSelection;
 
-            var ce = new ColumnEventArgs(null);
+            var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, enAddType.None, true);
+            if (rück == null || rück.Count == 0) { return null; }
+            return Add_Text(rück[0]);
+        }
 
-            switch (Dia)
-            {
-                case enEditTypeTable.Image_Auswahl_Dialog:
-
-                    string[] d1 = null;
-                    using (var f = new System.Windows.Forms.OpenFileDialog())
-                    {
-                        f.CheckFileExists = true;
-                        f.CheckPathExists = true;
-                        f.Multiselect = false;
-                        f.InitialDirectory = Plus_Click_LastPfad;
-                        f.Title = "Datei hinzufügen:";
-                        f.ShowDialog();
-                        d1 = f.FileNames;
-                    }
-
-                    if (d1 == null || d1.Length != 1) { return; }
-                    if (FileExists(d1[0]))
-                    {
-                        if (d1[0].FileType() == enFileFormat.Image)
-                        {
-                            Item.Add(new BitmapListItem((Bitmap)modAllgemein.Image_FromFile(d1[0])));
-                            Plus_Click_LastPfad = d1[0].FilePath();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Unbekanntes Bild-Format.", enImageCode.Warnung, "OK");
-                            return;
-                        }
-                    }
-
-
-                    break;
-
-                case enEditTypeTable.FileHandling_InDateiSystem:
-                    OnNeedColumn(ce);
-                    // korrektheit der Zelle bereits geprüft
-                    if (ce.Column != null && string.IsNullOrEmpty(Plus_Click_LastPfad)) { Plus_Click_LastPfad = ce.Column.Database.Filename.FilePath(); }
-
-                    string[] d2 = null;
-                    using (var f = new System.Windows.Forms.OpenFileDialog())
-                    {
-                        f.CheckFileExists = true;
-                        f.CheckPathExists = true;
-                        f.Multiselect = true;
-                        f.InitialDirectory = Plus_Click_LastPfad;
-                        f.Title = "Datei(en) hinzufügen:";
-                        f.ShowDialog();
-                        d2 = f.FileNames;
-                    }
-
-
-                    if (d2 == null || d2.Length == 0) { return; }
-
-                    var DelList = new List<string>();
-                    for (var z = 0 ; z <= d2.GetUpperBound(0) ; z++)
-                    {
-                        if (FileExists(d2[z]))
-                        {
-
-
-                            if (ce.Column != null && ce.Column.Format == enDataFormat.Link_To_Filesystem)
-                            {
-
-                                var b = modConverter.FileToByte(d2[z]);
-
-                                if (!string.IsNullOrEmpty(ce.Column.Database.FileEncryptionKey)) { b = modAllgemein.SimpleCrypt(b, ce.Column.Database.FileEncryptionKey, 1); }
-
-                                var neu = d2[z].FileNameWithSuffix();
-                                neu = ce.Column.FreeFileName(neu.FileNameWithoutSuffix(), neu.FileSuffix());
-                                Plus_Click_LastPfad = d2[z].FilePath();
-
-                                modConverter.ByteToFile(neu, b);
-
-
-                                Item.Add(neu.FileNameWithSuffix(), ce.Column, enShortenStyle.Replaced);
-
-                            }
-                            else
-                            {
-                                var x = new clsNamedBinary();
-                                x.LoadFromFile(d2[z]);
-                                Item.Add(x);
-                            }
-
-                            DelList.Add(d2[z]);
-                        }
-
-                    }
-
-                    FileOperations.DeleteFile(DelList);
-                    return;
-
-                case enEditTypeTable.Textfeld:
-                    Val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
-                    if (string.IsNullOrEmpty(Val)) { return; }
-                    break;
-
-                case enEditTypeTable.Listbox:
-                    if (Suggestions == null || Suggestions.Count == 0)
-                    {
-                        MessageBox.Show("Keine (weiteren) Werte vorhanden.", enImageCode.Information, "OK");
-                        return;
-                    }
-
-                    var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, enAddType.None, true);
-                    if (rück == null || rück.Count == 0) { return; }
-                    Val = rück[0];
-                    break;
-
-                case enEditTypeTable.None:
-                    return;
-
-                default:
-                    Develop.DebugPrint(Dia);
-                    return;
-            }
-
-
-            if (string.IsNullOrEmpty(Val)) { return; }
+        public TextListItem Add_Text(string Val)
+        {
+            if (string.IsNullOrEmpty(Val)) { return null; }
 
             foreach (var thisItem in Item)
             {
-                if (thisItem != null && thisItem.Internal().ToUpper() == Val.ToUpper()) { return; }
+                if (thisItem != null && thisItem.Internal().ToUpper() == Val.ToUpper()) { return null; }
             }
 
             var i = new TextListItem(Val, Val);
             Item.Add(i);
             i.Checked = true;
 
+            return i;
+        }
+
+        public TextListItem Add_Text()
+        {
+            var Val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
+            return Add_Text(Val);
+        }
+
+
+
+        private void Plus_Click(object sender, System.EventArgs e)
+        {
+            OnAddClicked();
+
+            switch (_AddAlloweds)
+            {
+                case enAddType.UserDef:
+                    break;
+
+                case enAddType.Text:
+                    Add_Text();
+                    break;
+
+                case enAddType.OnlySuggests:
+                    Add_TextBySuggestion();
+                    break;
+
+                case enAddType.None:
+                    break;
+
+                case enAddType.BinarysFromFileSystem:
+                    Add_FromFileSystem();
+                    break;
+
+                default:
+                    Develop.DebugPrint(_AddAlloweds);
+                    break;
+
+            }
 
             CheckButtons();
         }
 
-        //private void OnNeedRow(RowEventArgs e)
-        //{
-        //    NeedRow?.Invoke(this, e);
-        //}
 
         private void OnAddClicked()
         {

@@ -944,24 +944,16 @@ namespace BlueControls.Controls
 
             var tx = ViewItem.Column.Caption.Replace("\r", "\r\n");
 
-
+            var FS = GR.MeasureString(tx, Column_Font.Font());
 
 
 
             if (ViewItem.Column.CaptionBitmap != null && ViewItem.Column.CaptionBitmap.Width > 10)
             {
-                // Erst das Bild
-                var Sc = Math.Min(150 / (double)ViewItem.Column.CaptionBitmap.Width, 150 / (double)ViewItem.Column.CaptionBitmap.Height);
-                var xP = (150 - ViewItem.Column.CaptionBitmap.Width * Sc) / 2;
-                var yP = (150 - ViewItem.Column.CaptionBitmap.Height * Sc - Down) / 2;
-                var pos = new Point((int)ViewItem.OrderTMP_Spalte_X1 + Convert.ToInt32((Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 150) / 2.0), HeadSize() - 4 - 18 + Down);
-
-                GR.DrawImage(ViewItem.Column.CaptionBitmap, Convert.ToInt32(pos.X + xP), Convert.ToInt32(pos.Y + yP * 2 - 150), Convert.ToInt32(150 - xP * 2), Convert.ToInt32(150 - yP * 2 - Down));
+                var pos = new Point((int)ViewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - FS.Width) / 2.0), 3 + Down);
+                GR.DrawImageInRectAspectRatio(ViewItem.Column.CaptionBitmap, (int)ViewItem.OrderTMP_Spalte_X1 +2 , (int)(pos.Y + FS.Height), (int)Column_DrawWidth(ViewItem, DisplayRectangleWOSlider)-4 , HeadSize() - (int)(pos.Y + FS.Height) - 6 - 18);
 
                 // Dann der Text
-
-                var FS = GR.MeasureString(tx, Column_Font.Font());
-                pos = new Point((int)ViewItem.OrderTMP_Spalte_X1 + Convert.ToInt32((Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - FS.Width) / 2.0), 3 + Down);
                 GR.TranslateTransform(pos.X, pos.Y);
                 GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                 GR.DrawString(tx, Column_Font.Font(), new SolidBrush(ViewItem.Column.ForeColor), 0, 0);
@@ -970,7 +962,6 @@ namespace BlueControls.Controls
             }
             else
             {
-                var FS = GR.MeasureString(tx, Column_Font.Font());
                 var pos = new Point((int)ViewItem.OrderTMP_Spalte_X1 + Convert.ToInt32((Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - FS.Height) / 2.0), HeadSize() - 4 - 18);
 
                 GR.TranslateTransform(pos.X, pos.Y);
@@ -3814,8 +3805,8 @@ namespace BlueControls.Controls
 
             if (column.CaptionBitmap != null && column.CaptionBitmap.Width > 10)
             {
-                wi = Math.Max(150, ColumnCaptionText_Size(column).Width);
-                he = 150 + ColumnCaptionText_Size(column).Height + 3;
+                wi = Math.Max(50, ColumnCaptionText_Size(column).Width + 4);
+                he = 50 + ColumnCaptionText_Size(column).Height + 3;
             }
             else
             {

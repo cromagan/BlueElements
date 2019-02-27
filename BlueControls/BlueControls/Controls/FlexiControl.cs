@@ -939,7 +939,7 @@ namespace BlueControls.Controls
 
             Control.Name = "Suggest";
 
-            Control.AddAllowed = enAddType.CellDecide;
+            Control.AddAllowed = enAddType.None;
             Control.MoveAllowed = false;
             Control.FilterAllowed = true;
             Control.RemoveAllowed = false;
@@ -1027,7 +1027,7 @@ namespace BlueControls.Controls
 
             if (FullSize)
             {
-                Control.AddAllowed = enAddType.CellDecide;
+                Control.AddAllowed = enAddType.UserDef;
                 Control.RemoveAllowed = true;
             }
             else

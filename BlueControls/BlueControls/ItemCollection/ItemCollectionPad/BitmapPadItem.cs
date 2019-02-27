@@ -121,7 +121,7 @@ namespace BlueControls.ItemCollection
             WhiteBack = true;
             Padding = 0;
             FixSize = false;
-            BildModus = enSizeModes.WeißerRand;
+            BildModus = enSizeModes.EmptySpace;
             Rotation = 0;
 
             Format = PadStyles.Undefiniert; // Kein Rahmen
@@ -484,7 +484,7 @@ namespace BlueControls.ItemCollection
             var Comms = new ItemCollectionList();
             Comms.Add(new TextListItem(Convert.ToInt32(enSizeModes.BildAbschneiden).ToString(), "Abschneiden", QuickImage.Get("BildmodusAbschneiden|32")));
             Comms.Add(new TextListItem(Convert.ToInt32(enSizeModes.Verzerren).ToString(), "Verzerren", QuickImage.Get("BildmodusVerzerren|32")));
-            Comms.Add(new TextListItem(Convert.ToInt32(enSizeModes.WeißerRand).ToString(), "Einpassen", QuickImage.Get("BildmodusEinpassen|32")));
+            Comms.Add(new TextListItem(Convert.ToInt32(enSizeModes.EmptySpace).ToString(), "Einpassen", QuickImage.Get("BildmodusEinpassen|32")));
 
             l.Add(new FlexiControl("Bild-Modus", Convert.ToInt32(BildModus).ToString(), Comms));
 

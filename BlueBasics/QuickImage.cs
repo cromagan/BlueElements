@@ -559,11 +559,11 @@ namespace BlueBasics
                 {
                     if (_height > 0)
                     {
-                        _Bitmap = bmpOri.Resize(_width, _height, enSizeModes.QuickPicGeneration, InterpolationMode.High, false);
+                        _Bitmap = bmpOri.Resize(_width, _height, enSizeModes.EmptySpace, InterpolationMode.High, false);
                     }
                     else
                     {
-                        _Bitmap = bmpOri.Resize(_width, _width, enSizeModes.QuickPicGeneration, InterpolationMode.High, false);
+                        _Bitmap = bmpOri.Resize(_width, _width, enSizeModes.EmptySpace, InterpolationMode.High, false);
                     }
                 }
                 else
@@ -706,7 +706,7 @@ namespace BlueBasics
             {
                 GR.Clear(Color.FromArgb(0, 0, 0, 0));
                 GR.InterpolationMode = InterpolationMode.High;
-                bmpTMP = bmpTMP.Resize(_Bitmap.Width, _Bitmap.Height, enSizeModes.QuickPicGeneration, InterpolationMode.High, false);
+                bmpTMP = bmpTMP.Resize(_Bitmap.Width, _Bitmap.Height, enSizeModes.EmptySpace, InterpolationMode.High, false);
                 GR.DrawImage(bmpTMP, 0, 0, _Bitmap.Width, _Bitmap.Height);
             }
         }

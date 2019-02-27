@@ -41,7 +41,7 @@ namespace BlueControls.Controls
 
 
         // Für automatisches Datenbank-Management
-        public readonly ColumnViewItem V;
+        private readonly ColumnViewItem _columview;
         private int _RowKey = -1;
 
         private bool _IsFilling;
@@ -56,7 +56,7 @@ namespace BlueControls.Controls
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Size = new Size(300, 300);
-            V = ColumnView;
+            _columview = ColumnView;
 
 
 
@@ -68,12 +68,12 @@ namespace BlueControls.Controls
 
 
 
-            V.Column.Database.Cell.CellValueChanged += Database_CellValueChanged;
-            V.Column.Database.Row.RowRemoved += Database_RowRemoved;
-            V.Column.Database.Column.ItemInternalChanged += Column_ItemInternalChanged;
-            V.Column.Database.ConnectedControlsStopAllWorking += Database_ConnectedControlsStopAllWorking;
-            V.Column.Database.Row.RowChecked += Database_RowChecked;
-            V.Column.Database.RowKeyChanged += _Database_RowKeyChanged;
+            _columview.Column.Database.Cell.CellValueChanged += Database_CellValueChanged;
+            _columview.Column.Database.Row.RowRemoved += Database_RowRemoved;
+            _columview.Column.Database.Column.ItemInternalChanged += Column_ItemInternalChanged;
+            _columview.Column.Database.ConnectedControlsStopAllWorking += Database_ConnectedControlsStopAllWorking;
+            _columview.Column.Database.Row.RowChecked += Database_RowChecked;
+            _columview.Column.Database.RowKeyChanged += _Database_RowKeyChanged;
             //V.Column.Database.ColumnKeyChanged += _Database_ColumnKeyChanged; // Columns sind als Objektverweis vermerkt
 
 
@@ -82,10 +82,10 @@ namespace BlueControls.Controls
 
         private void UpdateColumnData()
         {
-            Caption = V.Column.Caption;
-            EditType = V.Column.EditType;
-            CaptionPosition = V.ÜberschriftAnordnung;
-            QuickInfo = V.Column.QickInfoText(string.Empty);
+            Caption = _columview.Column.Caption;
+            EditType = _columview.Column.EditType;
+            CaptionPosition = _columview.ÜberschriftAnordnung;
+            QuickInfo = _columview.Column.QickInfoText(string.Empty);
         }
 
         private void Database_RowChecked(object sender, RowCheckedEventArgs e)
@@ -98,7 +98,7 @@ namespace BlueControls.Controls
             {
 
                 var X = ThisString.SplitBy("|");
-                if (V.Column != null && X[0].ToUpper() == V.Column.Name.ToUpper())
+                if (_columview.Column != null && X[0].ToUpper() == _columview.Column.Name.ToUpper())
                 {
                     if (!string.IsNullOrEmpty(InfoText)) { InfoText = InfoText + "<br><hr><br>"; }
                     NewT = NewT + X[1];
@@ -118,7 +118,7 @@ namespace BlueControls.Controls
             if (e.Row != GetRow()) { return; }
 
 
-            if (e.Column == V.Column) { Value = e.Row.CellGetString(V.Column); }
+            if (e.Column == _columview.Column) { Value = e.Row.CellGetString(_columview.Column); }
 
             CheckEnabledState();
         }
@@ -127,13 +127,13 @@ namespace BlueControls.Controls
         {
             base.RemoveAll();
 
-            if (V.Column != null)
+            if (_columview.Column != null)
             {
-                V.Column.Database.Cell.CellValueChanged -= Database_CellValueChanged;
-                V.Column.Database.Row.RowRemoved -= Database_RowRemoved;
-                V.Column.Database.Column.ItemInternalChanged -= Column_ItemInternalChanged;
-                V.Column.Database.ConnectedControlsStopAllWorking -= Database_ConnectedControlsStopAllWorking;
-                V.Column.Database.Row.RowChecked -= Database_RowChecked;
+                _columview.Column.Database.Cell.CellValueChanged -= Database_CellValueChanged;
+                _columview.Column.Database.Row.RowRemoved -= Database_RowRemoved;
+                _columview.Column.Database.Column.ItemInternalChanged -= Column_ItemInternalChanged;
+                _columview.Column.Database.ConnectedControlsStopAllWorking -= Database_ConnectedControlsStopAllWorking;
+                _columview.Column.Database.Row.RowChecked -= Database_RowChecked;
             }
 
         }
@@ -145,7 +145,7 @@ namespace BlueControls.Controls
 
         private void Column_ItemInternalChanged(object sender, ListEventArgs e)
         {
-            if ((ColumnItem)e.Item == V.Column)
+            if ((ColumnItem)e.Item == _columview.Column)
             {
                 UpdateColumnData();
                 CheckEnabledState();
@@ -174,13 +174,13 @@ namespace BlueControls.Controls
             var Row = GetRow();
 
 
-            if (V.Column == null || Row == null)
+            if (_columview.Column == null || Row == null)
             {
                 Value = string.Empty;
             }
             else
             {
-                Value = Row.CellGetString(V.Column);
+                Value = Row.CellGetString(_columview.Column);
             }
 
             CheckEnabledState();
@@ -199,20 +199,20 @@ namespace BlueControls.Controls
         {
 
             var Row = GetRow();
-            if (Parent == null || !Parent.Enabled || V.Column == null || Row == null)
+            if (Parent == null || !Parent.Enabled || _columview.Column == null || Row == null)
             {
                 Enabled = false;
                 return;
             }
 
-            Enabled = Row.Database.Cell.UserEditPossible(V.Column, Row, false); // Rechteverwaltung einfliesen lassen
+            Enabled = Row.Database.Cell.UserEditPossible(_columview.Column, Row, false); // Rechteverwaltung einfliesen lassen
         }
 
         internal RowItem GetRow()
         {
-            if (V.Column == null) { return null; }
+            if (_columview.Column == null) { return null; }
             if (_RowKey < 0) { return null; }
-            return V.Column.Database.Row.SearchByKey(_RowKey);
+            return _columview.Column.Database.Row.SearchByKey(_RowKey);
         }
 
         private void FillCellNow()
@@ -222,15 +222,15 @@ namespace BlueControls.Controls
             if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
             var Row = GetRow();
-            if (V.Column == null || Row == null) { return; }
+            if (_columview.Column == null || Row == null) { return; }
 
 
-            var OldVal = Row.CellGetString(V.Column);
+            var OldVal = Row.CellGetString(_columview.Column);
 
             if (OldVal == Value) { return; }
 
-            Row.CellSet(V.Column, Value);
-            if (OldVal != Row.CellGetString(V.Column)) { Row.DoAutomatic(false, false); }
+            Row.CellSet(_columview.Column, Value);
+            if (OldVal != Row.CellGetString(_columview.Column)) { Row.DoAutomatic(false, false); }
         }
 
 
@@ -251,9 +251,9 @@ namespace BlueControls.Controls
 
 
                     var Item2 = new ItemCollectionList();
-                    ItemCollectionList.GetItemCollection(Item2, V.Column, null, enShortenStyle.Both, 10000);
+                    ItemCollectionList.GetItemCollection(Item2, _columview.Column, null, enShortenStyle.Both, 10000);
 
-                    if (V.Column.TextBearbeitungErlaubt)
+                    if (_columview.Column.TextBearbeitungErlaubt)
                     {
                         StyleComboBox(comboBox, Item2, System.Windows.Forms.ComboBoxStyle.DropDown);
                     }
@@ -271,7 +271,7 @@ namespace BlueControls.Controls
                     break;
 
                 case TextBox textBox:
-                    StyleTextBox(textBox, V.Column.Format, V.Column.MultiLine, V.Column.AllowedChars, V.Column.SpellCheckingEnabled, V.Column.Suffix, false);
+                    StyleTextBox(textBox, _columview.Column.Format, _columview.Column.MultiLine, _columview.Column.AllowedChars, _columview.Column.SpellCheckingEnabled, _columview.Column.Suffix, false);
                     textBox.NeedDatabaseOfAdditinalSpecialChars += OnNeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus += GotFocus_TextBox;
                     textBox.TextChanged += TextBox_TextChanged;
@@ -281,9 +281,9 @@ namespace BlueControls.Controls
                 case ListBox listBox:
                     if (listBox.Name == "Main")
                     {
-                        StyleListBox(listBox, V.Column);
+                        StyleListBox(listBox, _columview.Column);
                     }
-                    listBox.NeedColumn += ListBox_NeedColumn;
+                    listBox.AddClicked += ListBox_AddClicked;
                     //listBox.NeedRow += ListBox_NeedRow;
                     break;
 
@@ -305,6 +305,7 @@ namespace BlueControls.Controls
 
         }
 
+
         private void TextBox_TextChanged(object sender, System.EventArgs e)
         {
             while (Marker.IsBusy)
@@ -313,9 +314,9 @@ namespace BlueControls.Controls
                 Develop.DoEvents();
             }
 
-            if (V == null && V.Column == null) { return; }
+            if (_columview == null && _columview.Column == null) { return; }
 
-            if (V.Column.Format != enDataFormat.RelationText) { return; }
+            if (_columview.Column.Format != enDataFormat.RelationText) { return; }
 
             Marker.RunWorkerAsync();
         }
@@ -342,7 +343,7 @@ namespace BlueControls.Controls
                     break;
 
                 case ListBox listBox:
-                    listBox.NeedColumn -= ListBox_NeedColumn;
+                    listBox.AddClicked -= ListBox_AddClicked;
                     //listBox.NeedRow -= ListBox_NeedRow;
                     break;
 
@@ -370,17 +371,17 @@ namespace BlueControls.Controls
 
         private void EasyPicConnectedDatabase(object sender, DatabaseGiveBackEventArgs e)
         {
-            if (V.Column != null) { e.Database = V.Column.Database; }
+            if (_columview.Column != null) { e.Database = _columview.Column.Database; }
         }
 
         private void GotFocus_ComboBox(object sender, System.EventArgs e)
         {
             var Row = GetRow();
-            if (V.Column == null || Row == null) { return; }
+            if (_columview.Column == null || Row == null) { return; }
             if (!string.IsNullOrEmpty(((ComboBox)sender).Text)) { return; }
 
 
-            Value = V.Column.Database.Cell.AutomaticInitalValue(V.Column, Row);
+            Value = _columview.Column.Database.Cell.AutomaticInitalValue(_columview.Column, Row);
 
         }
 
@@ -389,11 +390,11 @@ namespace BlueControls.Controls
         private void GotFocus_TextBox(object sender, System.EventArgs e)
         {
             var Row = GetRow();
-            if (V.Column == null || Row == null) { return; }
+            if (_columview.Column == null || Row == null) { return; }
             if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
 
 
-            Value = V.Column.Database.Cell.AutomaticInitalValue(V.Column, Row);
+            Value = _columview.Column.Database.Cell.AutomaticInitalValue(_columview.Column, Row);
 
         }
 
@@ -509,18 +510,18 @@ namespace BlueControls.Controls
                 {
 
                     var Row = GetRow();
-                    if (V.Column == null && Row == null) { Develop.DebugPrint_NichtImplementiert(); }
-                    if (V.Column.Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
+                    if (_columview.Column == null && Row == null) { Develop.DebugPrint_NichtImplementiert(); }
+                    if (_columview.Column.Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
 
 
                     switch (Control.SorceType)
                     {
                         case EasyPic.enSorceType.SourceNameCorrectButImageNotLoaded:
-                            Control.LoadFromDatabase(V.Column);
+                            Control.LoadFromDatabase(_columview.Column);
                             return;
 
                         case EasyPic.enSorceType.ScreenShot:
-                            var fil = TempFile(V.Column.BestFile(V.Column.Name + ".PNG"));
+                            var fil = TempFile(_columview.Column.BestFile(_columview.Column.Name + ".PNG"));
                             Control.Bitmap.Save(fil, ImageFormat.Png);
                             Control.ChangeSource(fil.FileNameWithSuffix(), EasyPic.enSorceType.DatabaseInternal);
                             Value = fil.FileNameWithSuffix();
@@ -537,7 +538,7 @@ namespace BlueControls.Controls
                             return;
 
                         case EasyPic.enSorceType.LoadedFromDisk:
-                            var fil2 = TempFile(V.Column.BestFile(V.Column.Name + ".PNG"));
+                            var fil2 = TempFile(_columview.Column.BestFile(_columview.Column.Name + ".PNG"));
 
                             if (fil2.FilePath().ToUpper() != Control.SorceName.FilePath().ToUpper())
                             {
@@ -570,10 +571,82 @@ namespace BlueControls.Controls
         //    e.Row = GetRow();
         //}
 
-        private void ListBox_NeedColumn(object sender, ColumnEventArgs e)
+        //private void ListBox_NeedColumn(object sender, ColumnEventArgs e)
+        //{
+        //    e.Column = V.Column;
+        //}
+
+        private void ListBox_AddClicked(object sender, System.EventArgs e)
         {
-            e.Column = V.Column;
+
+            var Dia = ColumnItem.UserEditDialogTypeInTable(_columview.Column, false);
+
+            var lbx = (ListBox)sender;
+
+            switch (Dia)
+            {
+                case enEditTypeTable.None:
+                    return;
+
+                case enEditTypeTable.Image_Auswahl_Dialog:
+                    lbx.Add_FromFileSystem();
+                    return;
+
+
+                case enEditTypeTable.FileHandling_InDateiSystem:
+                    // korrektheit der Zelle bereits geprüft
+                    if (_columview.Column != null && string.IsNullOrEmpty(lbx.LastFilePath)) { lbx.LastFilePath = _columview.Column.Database.Filename.FilePath(); }
+                    var DelList = new List<string>();
+                    using (var f = new System.Windows.Forms.OpenFileDialog())
+                    {
+                        f.CheckFileExists = true;
+                        f.CheckPathExists = true;
+                        f.Multiselect = true;
+                        f.InitialDirectory = lbx.LastFilePath;
+                        f.Title = "Datei(en) hinzufügen:";
+                        f.ShowDialog();
+
+                        if (f.FileNames == null || f.FileNames.Length == 0) { return; }
+
+
+                        for (var z = 0 ; z <= f.FileNames.GetUpperBound(0) ; z++)
+                        {
+                            var b = modConverter.FileToByte(f.FileNames[z]);
+
+                            if (!string.IsNullOrEmpty(_columview.Column.Database.FileEncryptionKey)) { b = modAllgemein.SimpleCrypt(b, _columview.Column.Database.FileEncryptionKey, 1); }
+
+                            var neu = f.FileNames[z].FileNameWithSuffix();
+                            neu = _columview.Column.FreeFileName(neu.FileNameWithoutSuffix(), neu.FileSuffix());
+                            lbx.LastFilePath = f.FileNames[z].FilePath();
+
+                            modConverter.ByteToFile(neu, b);
+                            lbx.Item.Add(neu.FileNameWithSuffix(), _columview.Column, enShortenStyle.Replaced);
+
+                            DelList.Add(f.FileNames[z]);
+                        }
+                    }
+
+                    DialogBoxes.FileDialogs.DeleteFile(DelList, true);
+                    return;
+
+                case enEditTypeTable.Textfeld:
+                    lbx.Add_Text();
+                    return;
+
+                case enEditTypeTable.Listbox:
+                    lbx.Add_TextBySuggestion();
+                    return;
+
+
+                default:
+                    Develop.DebugPrint(Dia);
+                    return;
+            }
+
+
         }
+
+
 
         private void Marker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {

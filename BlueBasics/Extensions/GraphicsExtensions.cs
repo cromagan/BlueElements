@@ -16,19 +16,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-namespace BlueBasics.Enums
+
+using System;
+using System.Drawing;
+
+
+namespace BlueBasics
 {
-
-    public enum enSizeModes
+    public static partial class Extensions
     {
-
-        EmptySpace = 1,
-        BildAbschneiden = 2,
-        Breite_oder_Höhe_Anpassen_OhneVergrößern = 3,
-        Breite_oder_Höhe_Anpassen_MitVergrößern = 4,
-
-        //QuickPicGeneration = 5,
-        Verzerren = 6
+        public static void DrawImageInRectAspectRatio(this Graphics GR, Bitmap bmp, int x, int y, int width, int height)
+        {
+            var Sc = Math.Min((float)width / bmp.Width, (float)height / bmp.Height);
+            var dw = (int)(bmp.Width * Sc);
+            var dh = (int)(bmp.Height * Sc);
+            GR.DrawImage(bmp, x + (width - dw) / 2, y + (height - dh) / 2, dw, dh);
+        }
     }
-
 }

@@ -586,7 +586,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // lstBinary
             // 
-            this.lstBinary.AddAllowed = BlueControls.Enums.enAddType.Images;
+            this.lstBinary.AddAllowed = BlueControls.Enums.enAddType.BinarysFromFileSystem;
             this.lstBinary.Appearance = BlueControls.Enums.enBlueListBoxAppearance.Gallery;
             this.lstBinary.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
             this.lstBinary.Dock = System.Windows.Forms.DockStyle.Fill;
