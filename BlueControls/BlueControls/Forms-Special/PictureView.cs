@@ -161,11 +161,20 @@ namespace BlueControls.Forms
 
             if (_FileList != null && Nr < _FileList.Count)
             {
-                var BMP = (Bitmap)modAllgemein.Image_FromFile(_FileList[Nr]);
-                if (BMP != null)
+                try
                 {
-                    Pad.Item.Add(new BitmapPadItem(BMP, BMP.Size));
+                    var BMP = (Bitmap)modAllgemein.Image_FromFile(_FileList[Nr]);
+                    if (BMP != null)
+                    {
+                        Pad.Item.Add(new BitmapPadItem(BMP, BMP.Size));
+                    }
+                } 
+                catch (Exception ex)
+                {
+                    Develop.DebugPrint(ex);
                 }
+
+
             }
             Ribbon.SelectedIndex = 1;
 
