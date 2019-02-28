@@ -100,6 +100,18 @@ namespace BlueDatabase
             this.Column.CheckFormulaEditType();
         }
 
+        /// <summary>
+        /// Info: Es wird keine Änderung ausgelöst
+        /// </summary>
+        public ColumnViewItem(ColumnItem Column, enÜberschriftAnordnung Überschrift)
+        {
+            Initialize();
+            this.Column = Column;
+            _ViewType = enViewType.Column;
+            _ÜberschriftAnordnung = Überschrift;
+            this.Column.CheckFormulaEditType();
+        }
+
 
 
         /// <summary>

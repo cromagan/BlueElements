@@ -41,13 +41,59 @@ namespace BlueControls.Controls
 
 
         // Für automatisches Datenbank-Management
-        private readonly ColumnViewItem _columview;
+        private ColumnViewItem _columview;
         private int _RowKey = -1;
 
         private bool _IsFilling;
 
         public event EventHandler<DatabaseGiveBackEventArgs> NeedDatabaseOfAdditinalSpecialChars;
 
+        public ColumnViewItem ColumnViewItem
+        {
+            get
+            {
+                return _columview;
+            }
+            set
+            {
+                if (_columview == value) { return; }
+
+                FillCellNow();
+
+                if (_columview != null && _columview.Column != null)
+                {
+                    _columview.Column.Database.Cell.CellValueChanged -= Database_CellValueChanged;
+                    _columview.Column.Database.Row.RowRemoved -= Database_RowRemoved;
+                    _columview.Column.Database.Column.ItemInternalChanged -= Column_ItemInternalChanged;
+                    _columview.Column.Database.ConnectedControlsStopAllWorking -= Database_ConnectedControlsStopAllWorking;
+                    _columview.Column.Database.Row.RowChecked -= Database_RowChecked;
+                    _columview.Column.Database.RowKeyChanged -= _Database_RowKeyChanged;
+                }
+
+                _columview = value;
+                UpdateColumnData();
+
+                if (_columview != null && _columview.Column != null)
+                {
+                    _columview.Column.Database.Cell.CellValueChanged += Database_CellValueChanged;
+                    _columview.Column.Database.Row.RowRemoved += Database_RowRemoved;
+                    _columview.Column.Database.Column.ItemInternalChanged += Column_ItemInternalChanged;
+                    _columview.Column.Database.ConnectedControlsStopAllWorking += Database_ConnectedControlsStopAllWorking;
+                    _columview.Column.Database.Row.RowChecked += Database_RowChecked;
+                    _columview.Column.Database.RowKeyChanged += _Database_RowKeyChanged;
+                    //V.Column.Database.ColumnKeyChanged += _Database_ColumnKeyChanged; // Columns sind als Objektverweis vermerkt
+                }
+
+                CheckEnabledState();
+            }
+        }
+
+
+        public FlexiControlForCell() : this(null)
+        {
+            // Dieser Aufruf ist für den Designer erforderlich.
+            InitializeComponent();
+        }
 
         public FlexiControlForCell(ColumnViewItem ColumnView)
         {
@@ -56,36 +102,25 @@ namespace BlueControls.Controls
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Size = new Size(300, 300);
-            _columview = ColumnView;
-
-
-
-            _Caption = ColumnView.Column.Caption;
-            _EditType = ColumnView.Column.EditType;
-            _CaptionPosition = ColumnView.ÜberschriftAnordnung;
-            Create_Control();
-
-
-
-
-            _columview.Column.Database.Cell.CellValueChanged += Database_CellValueChanged;
-            _columview.Column.Database.Row.RowRemoved += Database_RowRemoved;
-            _columview.Column.Database.Column.ItemInternalChanged += Column_ItemInternalChanged;
-            _columview.Column.Database.ConnectedControlsStopAllWorking += Database_ConnectedControlsStopAllWorking;
-            _columview.Column.Database.Row.RowChecked += Database_RowChecked;
-            _columview.Column.Database.RowKeyChanged += _Database_RowKeyChanged;
-            //V.Column.Database.ColumnKeyChanged += _Database_ColumnKeyChanged; // Columns sind als Objektverweis vermerkt
-
-
-            UpdateColumnData();
+            ColumnViewItem = ColumnView;
         }
 
         private void UpdateColumnData()
         {
-            Caption = _columview.Column.Caption;
-            EditType = _columview.Column.EditType;
-            CaptionPosition = _columview.ÜberschriftAnordnung;
-            QuickInfo = _columview.Column.QickInfoText(string.Empty);
+            if (_columview == null || _columview.Column == null)
+            {
+                CaptionPosition = enÜberschriftAnordnung.ohne;
+                Caption = string.Empty;
+                EditType = enEditTypeFormula.None;
+                QuickInfo = string.Empty;
+            }
+            else
+            {
+                CaptionPosition = _columview.ÜberschriftAnordnung;
+                Caption = _columview.Column.Caption;
+                EditType = _columview.Column.EditType;
+                QuickInfo = _columview.Column.QickInfoText(string.Empty);
+            }
         }
 
         private void Database_RowChecked(object sender, RowCheckedEventArgs e)
@@ -123,21 +158,6 @@ namespace BlueControls.Controls
             CheckEnabledState();
         }
 
-        protected override void RemoveAll()
-        {
-            base.RemoveAll();
-
-            if (_columview.Column != null)
-            {
-                _columview.Column.Database.Cell.CellValueChanged -= Database_CellValueChanged;
-                _columview.Column.Database.Row.RowRemoved -= Database_RowRemoved;
-                _columview.Column.Database.Column.ItemInternalChanged -= Column_ItemInternalChanged;
-                _columview.Column.Database.ConnectedControlsStopAllWorking -= Database_ConnectedControlsStopAllWorking;
-                _columview.Column.Database.Row.RowChecked -= Database_RowChecked;
-            }
-
-        }
-
         private void Database_ConnectedControlsStopAllWorking(object sender, System.EventArgs e)
         {
             FillCellNow();
@@ -160,7 +180,7 @@ namespace BlueControls.Controls
         /// Bewirkt, dass der Status in die Zelle zurückgeschrieben wird und anschließend wird der Zelleninhalt der neuen Zelle eingeschrieben.
         /// </summary>
         /// <param name="newRowKey"></param>
-        internal void ChangeRowKeyTo(int newRowKey)
+        public void ChangeRowKeyTo(int newRowKey)
         {
             if (newRowKey == _RowKey) { return; }
 
@@ -174,7 +194,7 @@ namespace BlueControls.Controls
             var Row = GetRow();
 
 
-            if (_columview.Column == null || Row == null)
+            if (_columview == null || _columview.Column == null || Row == null)
             {
                 Value = string.Empty;
             }
@@ -186,11 +206,6 @@ namespace BlueControls.Controls
             CheckEnabledState();
 
             _IsFilling = false;
-
-
-            //TextBox_TextChanged(null, System.EventArgs.Empty);
-
-            //Marker.RunWorkerAsync();
         }
 
 
@@ -199,7 +214,7 @@ namespace BlueControls.Controls
         {
 
             var Row = GetRow();
-            if (Parent == null || !Parent.Enabled || _columview.Column == null || Row == null)
+            if (Parent == null || !Parent.Enabled || _columview == null || _columview.Column == null || Row == null)
             {
                 Enabled = false;
                 return;
@@ -210,7 +225,7 @@ namespace BlueControls.Controls
 
         internal RowItem GetRow()
         {
-            if (_columview.Column == null) { return null; }
+            if (_columview == null || _columview.Column == null) { return null; }
             if (_RowKey < 0) { return null; }
             return _columview.Column.Database.Row.SearchByKey(_RowKey);
         }
@@ -222,7 +237,7 @@ namespace BlueControls.Controls
             if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
             var Row = GetRow();
-            if (_columview.Column == null || Row == null) { return; }
+            if (_columview == null || _columview.Column == null || Row == null) { return; }
 
 
             var OldVal = Row.CellGetString(_columview.Column);
@@ -288,10 +303,10 @@ namespace BlueControls.Controls
                     break;
 
 
-                case Button button:
+                case Button _:
                     break;
 
-                case Caption caption:
+                case Caption _:
                     break;
 
 
@@ -432,6 +447,9 @@ namespace BlueControls.Controls
                 case enEditTypeFormula.Ja_Nein_Knopf:
                     break;
 
+                case enEditTypeFormula.None:
+                    break;
+
                 default:
                     Develop.DebugPrint_NichtImplementiert();
                     break;
@@ -566,15 +584,6 @@ namespace BlueControls.Controls
         }
 
 
-        //private void ListBox_NeedRow(object sender, RowEventArgs e)
-        //{
-        //    e.Row = GetRow();
-        //}
-
-        //private void ListBox_NeedColumn(object sender, ColumnEventArgs e)
-        //{
-        //    e.Column = V.Column;
-        //}
 
         private void ListBox_AddClicked(object sender, System.EventArgs e)
         {
@@ -710,36 +719,9 @@ namespace BlueControls.Controls
                             cap = fo + ThisWord.Length;
 
                         } while (true);
-
-
-
                     }
 
-                    //for (var cap = 0 ; cap < TXB.Text.Length ; cap++)
-                    //{
-                    //    foreach (var ThisWord in Names)
-                    //    {
-                    //        if (TXB.WordStarts(ThisWord, cap))
-                    //        {
-                    //            Develop.DoEvents();
-                    //            if (Marker.CancellationPending || InitT != TXB.Text || R != GetRow()) { return; }
 
-
-                    //            if (ThisWord == myname)
-                    //            {
-                    //                Marker.ReportProgress(0, new List<object> { TXB, "Mark1", cap, cap + ThisWord.Length - 1 });
-                    //            }
-                    //            else
-                    //            {
-                    //                Marker.ReportProgress(0, new List<object> { TXB, "Mark2", cap, cap + ThisWord.Length - 1 });
-
-                    //            }
-                    //            cap += ThisWord.Length - 1; // -1 eigentlich überflüssig, weil es ja immer ein Leerzeichen sein sollte, was als nächstes kommt
-                    //            break;
-
-                    //        }
-                    //    }
-                    //}
                 }
                 catch
                 {

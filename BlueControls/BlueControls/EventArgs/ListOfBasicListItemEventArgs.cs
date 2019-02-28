@@ -31,7 +31,7 @@ namespace BlueControls.EventArgs
             this.Items = Items;
         }
 
-        public List<BasicListItem> Items { get; set; }
+        public List<BasicListItem> Items { get; }
 
 
     }

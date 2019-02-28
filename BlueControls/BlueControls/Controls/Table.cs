@@ -86,9 +86,6 @@ namespace BlueControls.Controls
 
         #region  Variablen 
 
-        private DateTime _Reasondate = DateTime.Now.AddDays(-1);
-
-
         private Database _Database;
 
 
@@ -3832,7 +3829,6 @@ namespace BlueControls.Controls
 
         private void NotEditableInfo(string Reason)
         {
-            _Reasondate = DateTime.Now;
             DialogBoxes.QuickInfo.Show("<IMAGECODE=Stift|16||1> " + Reason);
         }
 

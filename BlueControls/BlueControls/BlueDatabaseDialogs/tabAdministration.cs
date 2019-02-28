@@ -69,6 +69,7 @@ namespace BlueControls.BlueDatabaseDialogs
                     _TableView.DatabaseChanged -= _TableView_DatabaseChanged;
                     _TableView.CursorPosChanged -= _TableView_CursorPosChanged;
                     _TableView.ViewChanged -= _TableView_ViewChanged;
+                    _TableView.EnabledChanged -= _TableView_EnabledChanged;
                     ChangeDatabase(null);
                 }
                 _TableView = value;
@@ -81,8 +82,15 @@ namespace BlueControls.BlueDatabaseDialogs
                     _TableView.DatabaseChanged += _TableView_DatabaseChanged;
                     _TableView.CursorPosChanged += _TableView_CursorPosChanged;
                     _TableView.ViewChanged += _TableView_ViewChanged;
+                    _TableView.EnabledChanged += _TableView_EnabledChanged;
                 }
             }
+        }
+
+        private void _TableView_EnabledChanged(object sender, System.EventArgs e)
+        {
+            UpdateViewControlls();
+            Check_OrderButtons();
         }
 
         private void _TableView_ViewChanged(object sender, System.EventArgs e)
@@ -346,7 +354,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 newc = new ColumnItem(_TableView.Database, true);
             }
 
-  
+
 
             using (var w = new ColumnEditor(newc))
             {

@@ -32,6 +32,7 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueControls.Enums;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls
 {
@@ -47,7 +48,7 @@ namespace BlueControls.Controls
         public readonly string ValueId;
         private string _Value;
         protected enEditTypeFormula _EditType = enEditTypeFormula.None; // None ist -1 und muss gesetzt sein!
-        protected enÜberschriftAnordnung _CaptionPosition = enÜberschriftAnordnung.Ohnex;
+        protected enÜberschriftAnordnung _CaptionPosition = enÜberschriftAnordnung.ohne;
         protected string _Caption;
 
         private Bitmap _BitmapOfControl;
@@ -170,7 +171,7 @@ namespace BlueControls.Controls
             _EditType = enEditTypeFormula.Button;
             _Caption = CaptionText;
             ValueId = CaptionText;
-            _CaptionPosition = enÜberschriftAnordnung.Ohnex;
+            _CaptionPosition = enÜberschriftAnordnung.ohne;
             _Value = string.Empty;
             _Pic = Pic;
             //_Imagecode = QuickImage.Get(Pic).ToString();
@@ -509,6 +510,7 @@ namespace BlueControls.Controls
 
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Die Filling-Variable wird währenddessen umgesetzt.
+        /// sollte vor StandardBehandlung kommen, da dort das Objekt gesetzt wird und dann die Handler generiert werden.
         /// </summary>
         private void UpdateValueToControl()
         {
@@ -575,80 +577,143 @@ namespace BlueControls.Controls
 
 
 
+        protected override void OnControlAdded(ControlEventArgs e)
+        {
+            base.OnControlAdded(e);
+
+            switch (e.Control)
+            {
+                case ComboBox ComboBox:
+                    ComboBox.ItemClicked += ComboBoxItemClick;
+                    ComboBox.TextChanged += ValueChanged_ComboBox;
+                    break;
+
+                case TextBox TextBox:
+                    TextBox.TextChanged += ValueChanged_TextBox;
+                    break;
+
+                case Caption _:
+                case Line _:
+                    break;
+
+                case EasyPic _:
+                    // Control.ImageChanged += EasyPicImageChanged;
+                    // Einzig und alleine eigene Datenbank kann den dazugehörigen Wert generieren.
+                    break;
+
+                case ListBox ListBox:
+                    ListBox.ItemClick += ListBox_ItemClick;
+                    ListBox.ItemAdded += ListBox_ItemAdded;
+                    ListBox.ItemRemoved += ListBox_ItemRemoved;
+                    break;
+
+                case Button Button:
+                    switch (_EditType)
+                    {
+                        case enEditTypeFormula.Ja_Nein_Knopf:
+                            Button.CheckedChanged += YesNoButton_CheckedChanged;
+                            break;
+
+                        case enEditTypeFormula.Button:
+                            Button.Click += ComandButton_Click;
+                            break;
+
+                        case enEditTypeFormula.Farb_Auswahl_Dialog:
+                            Button.Click += ColorButton_Click;
+                            break;
+
+                        default:
+                            Develop.DebugPrint_NichtImplementiert();
+                            break;
+                    }
+                    break;
+
+                default:
+                    Develop.DebugPrint(Typ(e.Control));
+                    break;
+            }
+
+            if (e.Control is IContextMenu IContextMenu)
+            {
+                IContextMenu.ContextMenuInit += ContextMenuOfControls_Init;
+                IContextMenu.ContextMenuItemClicked += ContextMenuOfControls_ItemClicked;
+            }
+        }
 
 
+        protected override void OnControlRemoved(System.Windows.Forms.ControlEventArgs e)
+        {
+            base.OnControlRemoved(e);
+
+            switch (e.Control)
+            {
+                case ComboBox ComboBox:
+                    ComboBox.ItemClicked -= ComboBoxItemClick;
+                    ComboBox.TextChanged -= ValueChanged_ComboBox;
+                    break;
+
+                case TextBox TextBox:
+                    TextBox.TextChanged -= ValueChanged_TextBox;
+                    break;
+
+                case Caption _:
+                case Line _:
+                    break;
+
+                case EasyPic _:
+                    break;
+
+                case ListBox ListBox:
+                    ListBox.ItemClick -= ListBox_ItemClick;
+                    ListBox.ItemAdded -= ListBox_ItemAdded;
+                    ListBox.ItemRemoved -= ListBox_ItemRemoved;
+                    break;
+
+                case Button Button:
+                    switch (_EditType)
+                    {
+                        case enEditTypeFormula.Ja_Nein_Knopf:
+                            Button.CheckedChanged -= YesNoButton_CheckedChanged;
+                            break;
+
+                        case enEditTypeFormula.Button:
+                            Button.Click -= ComandButton_Click;
+                            break;
+
+                        case enEditTypeFormula.Farb_Auswahl_Dialog:
+                            Button.Click -= ColorButton_Click;
+                            break;
+
+                        default:
+                            Develop.DebugPrint_NichtImplementiert();
+                            break;
+                    }
+                    break;
+
+                default:
+                    Develop.DebugPrint(Typ(e.Control));
+                    break;
+            }
+
+            if (e.Control is IContextMenu IContextMenu)
+            {
+                IContextMenu.ContextMenuInit -= ContextMenuOfControls_Init;
+                IContextMenu.ContextMenuItemClicked -= ContextMenuOfControls_ItemClicked;
+            }
+
+        }
 
 
         /// <summary>
-        /// Entfernt alle Controlls und löst die Events auf.
+        /// Entfernt alle Controlls und löst dessen die Events auf.
         /// </summary>
         protected virtual void RemoveAll()
         {
-
             foreach (System.Windows.Forms.Control Control in Controls)
             {
-                switch (Control)
-                {
-                    case ComboBox ComboBox:
-                        ComboBox.ItemClicked -= ComboBoxItemClick;
-                        ComboBox.TextChanged -= ValueChanged_ComboBox;
-                        break;
-
-                    case TextBox TextBox:
-                        TextBox.TextChanged -= ValueChanged_TextBox;
-                        break;
-
-                    case Caption _:
-                    case Line _:
-                        break;
-
-                    case EasyPic _:
-                        break;
-
-                    case ListBox ListBox:
-                        ListBox.ItemClick -= ListBox_ItemClick;
-                        ListBox.ItemAdded -= ListBox_ItemAdded;
-                        ListBox.ItemRemoved -= ListBox_ItemRemoved;
-                        break;
-
-                    case Button Button:
-                        switch (_EditType)
-                        {
-                            case enEditTypeFormula.Ja_Nein_Knopf:
-                                Button.CheckedChanged -= YesNoButton_CheckedChanged;
-                                break;
-
-                            case enEditTypeFormula.Button:
-                                Button.Click -= ComandButton_Click;
-                                break;
-
-                            case enEditTypeFormula.Farb_Auswahl_Dialog:
-                                Button.Click -= ColorButton_Click;
-                                break;
-
-                            default:
-                                Develop.DebugPrint_NichtImplementiert();
-                                break;
-                        }
-
-                        break;
-
-                    default:
-                        Develop.DebugPrint(Typ(Control));
-                        break;
-                }
-
-                if (Control is IContextMenu IContextMenu)
-                {
-                    IContextMenu.ContextMenuInit -= ContextMenuOfControls_Init;
-                    IContextMenu.ContextMenuItemClicked -= ContextMenuOfControls_ItemClicked;
-                }
-
-
                 Control.Parent.Controls.Remove(Control);
                 Control.Dispose();
             }
-
         }
 
 
@@ -661,7 +726,7 @@ namespace BlueControls.Controls
         /// </summary>
         private void Control_Create_Caption()
         {
-            if (_CaptionPosition == enÜberschriftAnordnung.Ohnex) { return; }
+            if (_CaptionPosition == enÜberschriftAnordnung.ohne) { return; }
 
             _CaptionObject = new Caption();
             Controls.Add(_CaptionObject);
@@ -745,9 +810,6 @@ namespace BlueControls.Controls
 
             StandardBehandlung(Control);
             UpdateValueToControl();
-            //Control.ImageChanged += EasyPicImageChanged;
-            // Einzig und alleine eiene Datenbank kann den dazugehörigen Wert generieren.
-
         }
 
         /// <summary>
@@ -781,12 +843,8 @@ namespace BlueControls.Controls
 
             StyleComboBox(Control, null, System.Windows.Forms.ComboBoxStyle.DropDownList);
 
-            StandardBehandlung(Control);
             UpdateValueToControl();
-
-            Control.ItemClicked += ComboBoxItemClick;
-            Control.TextChanged += ValueChanged_ComboBox;
-
+            StandardBehandlung(Control);
             return Control;
         }
 
@@ -948,7 +1006,6 @@ namespace BlueControls.Controls
             Control.Item.Sort();
 
             StandardBehandlung(Control);
-            //UpdateValueTo_ListBox(Control);
 
             Control.Top = MainBox.Bottom;
             Control.Height = Height - Control.Top - 1;
@@ -960,9 +1017,7 @@ namespace BlueControls.Controls
 
             Control.BringToFront();
 
-            Control.ItemClick += ListBox_ItemClick;
-            Control.ItemAdded += ListBox_ItemAdded;
-            Control.ItemRemoved += ListBox_ItemRemoved;
+
 
             return Control;
         }
@@ -976,16 +1031,10 @@ namespace BlueControls.Controls
             Control.Name = "Main";
 
             StyleListBox(Control, null);
-            StandardBehandlung(Control);
             UpdateValueToControl();
-
-            Control.ItemClick += ListBox_ItemClick;
-            Control.ItemAdded += ListBox_ItemAdded;
-            Control.ItemRemoved += ListBox_ItemRemoved;
+            StandardBehandlung(Control);
 
             return Control;
-
-
         }
 
 
@@ -1243,7 +1292,6 @@ namespace BlueControls.Controls
 
             StandardBehandlung(Control);
 
-            Control.Click += ComandButton_Click;
         }
 
 
@@ -1261,7 +1309,6 @@ namespace BlueControls.Controls
             };
 
             StandardBehandlung(Control);
-            Control.Click += ColorButton_Click;
         }
 
 
@@ -1279,10 +1326,10 @@ namespace BlueControls.Controls
                 ImageCode = ""
             };
 
-            StandardBehandlung(Control);
             UpdateValueToControl();
+            StandardBehandlung(Control);
 
-            Control.CheckedChanged += YesNoButton_CheckedChanged;
+
         }
 
         /// <summary>
@@ -1332,9 +1379,8 @@ namespace BlueControls.Controls
         {
             var Control = new TextBox();
             StyleTextBox(Control, enDataFormat.Text_Ohne_Kritische_Zeichen, false, string.Empty, false, string.Empty, true);
-            StandardBehandlung(Control);
             UpdateValueToControl();
-            Control.TextChanged += ValueChanged_TextBox;
+            StandardBehandlung(Control);
             return Control;
         }
 
@@ -1401,7 +1447,7 @@ namespace BlueControls.Controls
 
             switch (_CaptionPosition)
             {
-                case enÜberschriftAnordnung.Ohnex:
+                case enÜberschriftAnordnung.ohne:
                     Control.Left = 0;
                     Control.Top = 0;
                     Control.Width = Width;
@@ -1433,12 +1479,6 @@ namespace BlueControls.Controls
             Control.Visible = true;
 
             Controls.Add(Control);
-
-            if (Control is IContextMenu IContextMenu)
-            {
-                IContextMenu.ContextMenuInit += ContextMenuOfControls_Init;
-                IContextMenu.ContextMenuItemClicked += ContextMenuOfControls_ItemClicked;
-            }
 
             DoInfoTextCaption();
         }

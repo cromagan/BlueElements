@@ -199,6 +199,7 @@ namespace BlueDatabase
                 case enAction.Substring: Co = 260; break;
                 case enAction.LinkedCell: Co = 270; break;
                 case enAction.SortiereIntelligent: Co = 290; break;
+                case enAction.KopiereAndereSpalten: Co = 295; break;
 
                 // Finaler Abschluss
                 case enAction.Sperre_die_Zelle: Co = 300; break;
@@ -378,6 +379,10 @@ namespace BlueDatabase
                     return string.Empty;
 
                 case enAction.Anmerkung:
+                    return string.Empty;
+
+                case enAction.KopiereAndereSpalten:
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Ohne Funktion!");
                     return string.Empty;
 
                 case enAction.LinkedCell:
@@ -639,6 +644,8 @@ namespace BlueDatabase
                     return QuickImage.Get(enImageCode.Uhr);
                 case enAction.SortiereIntelligent:
                     return QuickImage.Get(enImageCode.Lupe);
+                case enAction.KopiereAndereSpalten:
+                    return QuickImage.Get(enImageCode.Clipboard);
 
                 default:
                     if (_Action > 0) { Develop.DebugPrint(_Action); }
@@ -1316,6 +1323,10 @@ namespace BlueDatabase
                 case enAction.LinkedCell:
                     return "ändere die ID der verlinkten Datenbank in " + ColsUnd;
 
+                case enAction.KopiereAndereSpalten:
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Ohne Funktion!");
+                    return string.Empty;
+
                 case 0:
                     // Neue Aktion
                     break;
@@ -1671,6 +1682,10 @@ namespace BlueDatabase
 
 
                     }
+                    break;
+
+                case enAction.KopiereAndereSpalten:
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Ohne Funktion!");
                     break;
 
                 default:

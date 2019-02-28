@@ -34,7 +34,7 @@ namespace BlueControls.EventArgs
         }
 
 
-        public ItemCollectionList UserMenu { get; set; }
+        public ItemCollectionList UserMenu { get; }
 
         public object Tag { get; set; }
 
