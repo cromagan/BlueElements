@@ -250,12 +250,13 @@ namespace BlueDatabase
 
 
 
-        public ColumnItem(Database database, bool addtodatabase) : this(database, -1, "NewColumn", addtodatabase) { }
+        public ColumnItem(Database database, bool addtodatabase) : this(database, -1, string.Empty, addtodatabase) { }
 
         public ColumnItem(Database database, string columninternalname, bool addtodatabase) : this(database, -1, columninternalname, addtodatabase) { }
 
         public ColumnItem(Database database, int columnkey, string columninternalname, bool addtodatabase)
         {
+          
 
             if (!addtodatabase)
             {
@@ -264,6 +265,7 @@ namespace BlueDatabase
             }
 
             Database = database;
+
 
 
             if (columnkey == -1)
@@ -283,13 +285,10 @@ namespace BlueDatabase
             Tags.ListOrItemChanged += Tags_ListOrItemChanged;
 
             Initialize();
-            Name = columninternalname;
+            Name = Database.Column.Freename(columninternalname);
 
 
-            if (addtodatabase)
-            {
-                database.Column.Add(this);
-            }
+            if (addtodatabase) { database.Column.Add(this); }
 
         }
 

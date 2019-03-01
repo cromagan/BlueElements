@@ -170,10 +170,7 @@ namespace BlueControls.Controls
                 UpdateColumnData();
                 CheckEnabledState();
                 OnNeedRefresh();
-
             }
-
-
         }
 
         /// <summary>
@@ -776,6 +773,14 @@ namespace BlueControls.Controls
         {
             if (e.KeyOld != _RowKey) { return; }
             _RowKey = e.KeyNew;
+        }
+
+
+
+        protected override void OnRemovingAll()
+        {
+            FillCellNow();
+            base.OnRemovingAll();
         }
 
     }

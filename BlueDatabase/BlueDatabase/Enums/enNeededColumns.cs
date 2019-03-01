@@ -27,6 +27,7 @@ namespace BlueDatabase.Enums
         OnlyOne,
         MoreThanOne,
         OneOrMore,
+        TwoColumns,
 
         Assistent
     }

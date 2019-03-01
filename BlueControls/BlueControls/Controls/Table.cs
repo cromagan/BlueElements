@@ -3829,7 +3829,9 @@ namespace BlueControls.Controls
 
         private void NotEditableInfo(string Reason)
         {
-            DialogBoxes.QuickInfo.Show("<IMAGECODE=Stift|16||1> " + Reason);
+            DialogBoxes.Notification.Show(Reason, enImageCode.Kreuz);
+            // QickInfo beisst sich mit den letzten Änderungen Quickinfo
+            //DialogBoxes.QuickInfo.Show("<IMAGECODE=Stift|16||1> " + Reason);
         }
 
 

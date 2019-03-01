@@ -173,6 +173,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 while (colsx.Count < Zeil[0].GetUpperBound(0) + 1)
                 {
                     var newc = new ColumnItem(_Database, true);
+                    newc.Caption = newc.Name;
                     newc.Format = enDataFormat.Text;
                     newc.MultiLine = true;
                     colsx.Add(newc);

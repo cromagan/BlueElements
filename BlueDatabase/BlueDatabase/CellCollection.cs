@@ -433,10 +433,10 @@ namespace BlueDatabase
             return CompleteRelationText;
         }
 
-        private List<RowItem> ConnectedRows(string CompleteRelationText, RowItem Row)
+        internal static List<RowItem> ConnectedRows(string CompleteRelationText, RowItem Row)
         {
             var R = new List<RowItem>();
-            var Names = Database.Column[0].GetUcaseNamesSortedByLenght();
+            var Names = Row.Database.Column[0].GetUcaseNamesSortedByLenght();
 
             CompleteRelationText = CompleteRelationText.ToUpper();
 
@@ -444,7 +444,7 @@ namespace BlueDatabase
             {
                 if (CompleteRelationText.IndexOfWord(Names[Z], 0, RegexOptions.IgnoreCase) > -1)
                 {
-                    R.Add(Database.Row[Names[Z]]);
+                    R.Add(Row.Database.Row[Names[Z]]);
                     CompleteRelationText = CompleteRelationText.Replace(Names[Z], string.Empty);
                 }
             }

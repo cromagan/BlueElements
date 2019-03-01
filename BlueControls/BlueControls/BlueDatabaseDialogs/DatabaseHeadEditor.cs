@@ -647,11 +647,11 @@ namespace BlueControls.BlueDatabaseDialogs
             c.Caption = "Zeile, Wert der<br>1. Spalte";
             c.Format = enDataFormat.Text;
 
-            c = new ColumnItem(x, "Änderzeit", true);
+            c = new ColumnItem(x, "Aenderzeit", true);
             c.Caption = "Änder-<br>Zeit";
             c.Format = enDataFormat.Text;
 
-            c = new ColumnItem(x, "Änderer", true);
+            c = new ColumnItem(x, "Aenderer", true);
             c.Caption = "Änderer";
             c.Format = enDataFormat.Text;
 
@@ -659,7 +659,7 @@ namespace BlueControls.BlueDatabaseDialogs
             c.Caption = "Symbol";
             c.Format = enDataFormat.BildCode;
 
-            c = new ColumnItem(x, "Änderung", true);
+            c = new ColumnItem(x, "Aenderung", true);
             c.Caption = "Änderung";
             c.Format = enDataFormat.Text;
 
@@ -719,8 +719,8 @@ namespace BlueControls.BlueDatabaseDialogs
                     r.CellSet("RowFirst", Row.CellFirstString());
                 }
 
-                r.CellSet("Änderer", _Database.Works[n].User);
-                r.CellSet("ÄnderZeit", _Database.Works[n].CompareKey());
+                r.CellSet("Aenderer", _Database.Works[n].User);
+                r.CellSet("AenderZeit", _Database.Works[n].CompareKey());
 
 
 
@@ -756,7 +756,7 @@ namespace BlueControls.BlueDatabaseDialogs
                         neu = "";
                         break;
                 }
-                r.CellSet("Änderung", aenderung);
+                r.CellSet("Aenderung", aenderung);
                 r.CellSet("symbol", Symb + "|24");
 
                 r.CellSet("Wertalt", alt);

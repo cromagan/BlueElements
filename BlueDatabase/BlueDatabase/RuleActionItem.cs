@@ -382,7 +382,32 @@ namespace BlueDatabase
                     return string.Empty;
 
                 case enAction.KopiereAndereSpalten:
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Ohne Funktion!");
+                    if (ColumnFocus != null) { return string.Empty; }
+                    ColumnItem Link;
+                    ColumnItem Other;
+                    if (Columns[0].Format == enDataFormat.RelationText)
+                    {
+                        Link = Columns[0];
+                        Other = Columns[1];
+                    }
+                    else
+                    {
+                        if (Columns[1].Format != enDataFormat.RelationText) { return "Verknüpfung fehlgeschlagen, keine der Spalten ist ein 'Beziehungsformat'"; }
+                        Link = Columns[1];
+                        Other = Columns[0];
+                    }
+
+                    var X = CellCollection.ConnectedRows(Row.CellGetString(Link), Row);
+                    var V = Row.CellGetString(Other);
+                    foreach (var Thisrow in X)
+                    {
+                        if (Thisrow.CellGetString(Other) != V)
+                        {
+                            Thisrow.CellSet(Other, V);
+                            Thisrow.DoAutomatic(false, false);
+                        }
+
+                    }
                     return string.Empty;
 
                 case enAction.LinkedCell:
@@ -817,6 +842,9 @@ namespace BlueDatabase
                     return enNeededColumns.None;
                 case enAction.SortiereIntelligent:
                     return enNeededColumns.MoreThanOne;
+                case enAction.KopiereAndereSpalten:
+                    return enNeededColumns.TwoColumns;
+
 
                 default:
                     Develop.DebugPrint(Action);
@@ -880,6 +908,8 @@ namespace BlueDatabase
                 case enAction.Ist_Jünger_Als:
                     return enNeededText.OneIntegerValue;
                 case enAction.SortiereIntelligent:
+                    return enNeededText.None;
+                case enAction.KopiereAndereSpalten:
                     return enNeededText.None;
 
 
@@ -1086,6 +1116,12 @@ namespace BlueDatabase
                     break;
 
 
+                case enAction.KopiereAndereSpalten:
+                    r = r + "Diese Aktion benötigt eine Spalte vom Typ 'Relation' und eine normale Spalte. Alle mittels 'Relations' miteinander verknüpften Zeilen, erhalten den gleichen Wert der zweiten Spalte.";
+                    break;
+
+
+
 
                 default:
                     Develop.DebugPrint(Action);
@@ -1152,6 +1188,9 @@ namespace BlueDatabase
                     break;
                 case enNeededColumns.OnlyOne:
                     if (Columns.Count != 1) { return "Es muss genau eine Spalte angewählt werden"; }
+                    break;
+                case enNeededColumns.TwoColumns:
+                    if (Columns.Count != 2) { return "Es müssen genau zwei Spalten angewählt werden"; }
                     break;
                 default:
                     Develop.DebugPrint(NeededColumns(_Action));
@@ -1324,8 +1363,7 @@ namespace BlueDatabase
                     return "ändere die ID der verlinkten Datenbank in " + ColsUnd;
 
                 case enAction.KopiereAndereSpalten:
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Ohne Funktion!");
-                    return string.Empty;
+                    return "halte die Inhalte der verknüpften Spalten von " + ColsUnd + " gleich";
 
                 case 0:
                     // Neue Aktion
@@ -1634,6 +1672,7 @@ namespace BlueDatabase
                 case enAction.Ist_der_Nutzer:
                 case enAction.Ist_Jünger_Als:
                 case enAction.SortiereIntelligent:
+                case enAction.KopiereAndereSpalten:
                     break;
 
                 case enAction.Berechne:
@@ -1684,9 +1723,7 @@ namespace BlueDatabase
                     }
                     break;
 
-                case enAction.KopiereAndereSpalten:
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Ohne Funktion!");
-                    break;
+
 
                 default:
                     Develop.DebugPrint(_Action);

@@ -566,7 +566,10 @@ namespace BlueDatabase
             {
                 if (ThisAction != null)
                 {
-                    if (ThisAction.Columns.Contains(Column)) { return true; }
+                    if (ThisAction.Action != enAction.KopiereAndereSpalten && ThisAction.Action != enAction.SortiereIntelligent)
+                    {
+                        if (ThisAction.Columns.Contains(Column)) { return true; }
+                    }
                 }
             }
             return false;
