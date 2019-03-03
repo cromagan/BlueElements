@@ -752,13 +752,8 @@ namespace BlueDatabase
                         break;
 
                     case enExportTyp.EinzelnMitFormular:
-
-
-
                         foreach (var Thisrow in Database.Row)
                         {
-
-
                             if (Thisrow != null)
                             {
                                 if (Filter == null || Filter.Count() < 1 || Thisrow.MatchesTo(Filter))

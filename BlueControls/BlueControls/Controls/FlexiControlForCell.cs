@@ -46,8 +46,6 @@ namespace BlueControls.Controls
 
         private bool _IsFilling;
 
-        public event EventHandler<DatabaseGiveBackEventArgs> NeedDatabaseOfAdditinalSpecialChars;
-
         public ColumnViewItem ColumnViewItem
         {
             get
@@ -246,9 +244,11 @@ namespace BlueControls.Controls
         }
 
 
-        private void OnNeedDatabaseOfAdditinalSpecialChars(object sender, DatabaseGiveBackEventArgs e)
+        private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, DatabaseGiveBackEventArgs e)
         {
-            NeedDatabaseOfAdditinalSpecialChars?.Invoke(this, e);
+            var Row = GetRow();
+            if (_columview == null || _columview.Column == null || Row == null) { return; }
+            e.Database = _columview.Column.Database;
         }
 
 
@@ -284,7 +284,7 @@ namespace BlueControls.Controls
 
                 case TextBox textBox:
                     StyleTextBox(textBox, _columview.Column.Format, _columview.Column.MultiLine, _columview.Column.AllowedChars, _columview.Column.SpellCheckingEnabled, _columview.Column.Suffix, false);
-                    textBox.NeedDatabaseOfAdditinalSpecialChars += OnNeedDatabaseOfAdditinalSpecialChars;
+                    textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus += GotFocus_TextBox;
                     textBox.TextChanged += TextBox_TextChanged;
 
@@ -349,7 +349,7 @@ namespace BlueControls.Controls
                     break;
 
                 case TextBox textBox:
-                    textBox.NeedDatabaseOfAdditinalSpecialChars -= OnNeedDatabaseOfAdditinalSpecialChars;
+                    textBox.NeedDatabaseOfAdditinalSpecialChars -= textBox_NeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus -= GotFocus_TextBox;
                     textBox.TextChanged -= TextBox_TextChanged;
                     break;

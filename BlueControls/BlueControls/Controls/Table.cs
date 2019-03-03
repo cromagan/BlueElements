@@ -4012,7 +4012,7 @@ namespace BlueControls.Controls
         public static void CopyToClipboard(ColumnItem Column, RowItem Row, bool Meldung)
         {
 
-            if (Column.Format.CanBeCheckedByRules())
+            if (Row != null && Column.Format.CanBeCheckedByRules())
             {
                 var c = Row.CellGetString(Column);
                 c = c.Replace("\r\n", "\r");
