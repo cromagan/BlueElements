@@ -198,7 +198,6 @@ namespace BeCreative
             this.MainRibbon.IsRibbonBar = true;
             this.MainRibbon.Location = new System.Drawing.Point(0, 0);
             this.MainRibbon.Name = "MainRibbon";
-            this.MainRibbon.SelectedIndex = 1;
             this.MainRibbon.Size = new System.Drawing.Size(1212, 110);
             this.MainRibbon.TabIndex = 92;
             // 
@@ -429,7 +428,7 @@ namespace BeCreative
             this.Datenüberprüfung.ImageCode = "Zeile||||||||||Häkchen";
             this.Datenüberprüfung.Location = new System.Drawing.Point(88, 2);
             this.Datenüberprüfung.Name = "Datenüberprüfung";
-            this.Datenüberprüfung.QuickInfo = "Aktuell abgezeigt Zeilen<br>automatisch überprüfen.";
+            this.Datenüberprüfung.QuickInfo = "Aktuell angezeigte Zeilen<br>automatisch überprüfen.";
             this.Datenüberprüfung.Size = new System.Drawing.Size(80, 66);
             this.Datenüberprüfung.TabIndex = 12;
             this.Datenüberprüfung.Text = "Daten-überprüfung";

@@ -2670,7 +2670,7 @@ namespace BlueDatabase
 
 
 
-            if (_MustSave && !_MustReload && Checker_Tick_count < Count_Save && Checker_Tick_count >= Count_BackUp && IsSaveAble())
+            if (_MustBackup && !_MustReload && Checker_Tick_count < Count_Save && Checker_Tick_count >= Count_BackUp && IsSaveAble())
             {
                 Backup.RunWorkerAsync();
                 return;

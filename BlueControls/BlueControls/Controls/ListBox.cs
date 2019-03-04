@@ -18,23 +18,18 @@
 #endregion
 
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueControls.DialogBoxes;
+using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
-using BlueDatabase;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Enums;
-using BlueControls.Enums;
-using static BlueBasics.FileOperations;
+using System;
+using System.ComponentModel;
+using System.Drawing;
 
 namespace BlueControls.Controls
 {

@@ -454,8 +454,8 @@ namespace BlueControls.Controls
             set
             {
                 if (_InfoText == value) { return; }
-                RemoveAll(); // Controls and Events entfernen!
                 _InfoText = value;
+                DoInfoTextCaption();
             }
         }
 
@@ -1624,7 +1624,11 @@ namespace BlueControls.Controls
 
         private void DoInfoTextCaption()
         {
-            if (!string.IsNullOrEmpty(_InfoText) && _InfoCaption != null) { return; }
+            if (!string.IsNullOrEmpty(_InfoText) && _InfoCaption != null)
+            {
+                _InfoCaption.QuickInfo = _InfoText;
+                return;
+            }
             if (string.IsNullOrEmpty(_InfoText) && _InfoCaption == null) { return; }
 
             if (string.IsNullOrEmpty(_InfoText))
