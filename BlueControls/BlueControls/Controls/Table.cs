@@ -39,6 +39,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Linq;
 using System.Threading;
+using System.Windows.Forms;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls
@@ -948,7 +949,7 @@ namespace BlueControls.Controls
             if (ViewItem.Column.CaptionBitmap != null && ViewItem.Column.CaptionBitmap.Width > 10)
             {
                 var pos = new Point((int)ViewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - FS.Width) / 2.0), 3 + Down);
-                GR.DrawImageInRectAspectRatio(ViewItem.Column.CaptionBitmap, (int)ViewItem.OrderTMP_Spalte_X1 +2 , (int)(pos.Y + FS.Height), (int)Column_DrawWidth(ViewItem, DisplayRectangleWOSlider)-4 , HeadSize() - (int)(pos.Y + FS.Height) - 6 - 18);
+                GR.DrawImageInRectAspectRatio(ViewItem.Column.CaptionBitmap, (int)ViewItem.OrderTMP_Spalte_X1 + 2, (int)(pos.Y + FS.Height), (int)Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 4, HeadSize() - (int)(pos.Y + FS.Height) - 6 - 18);
 
                 // Dann der Text
                 GR.TranslateTransform(pos.X, pos.Y);
@@ -1608,7 +1609,7 @@ namespace BlueControls.Controls
 
                 if (!NewValue.IsFormat(CellInThisDatabaseColumn.Format, CellInThisDatabaseColumn.MultiLine))
                 {
-                    if (MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", enImageCode.Information, "Ja", "Nein") != 0)
+                    if (DialogBoxes.MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", enImageCode.Information, "Ja", "Nein") != 0)
                     {
                         CancelReason = "Abbruch, das das erwartete Format nicht eingehalten wurde.";
                     }
@@ -2417,7 +2418,7 @@ namespace BlueControls.Controls
                     case System.Windows.Forms.Keys.Home:
                         if (SliderY.Enabled)
                         {
-                            CursorPos_Set(null);
+                            CursorPos_Set(string.Empty);
                             SliderY.Value = SliderY.Minimum;
 
                         }
@@ -2426,7 +2427,7 @@ namespace BlueControls.Controls
                     case System.Windows.Forms.Keys.End:
                         if (SliderY.Enabled)
                         {
-                            CursorPos_Set(null);
+                            CursorPos_Set(string.Empty);
                             SliderY.Value = SliderY.Maximum;
                         }
                         break;
@@ -2436,6 +2437,10 @@ namespace BlueControls.Controls
                         {
                             CopyToClipboard(_CursorPosColumn, _CursorPosRow, false);
                         }
+                        break;
+
+                    case System.Windows.Forms.Keys.F2:
+                        Cell_Edit(_CursorPosColumn, _CursorPosRow, true);
                         break;
 
                     case System.Windows.Forms.Keys.V:
@@ -3067,7 +3072,7 @@ namespace BlueControls.Controls
 
             if (_ArrangementNr > 0)
             {
-                MitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
+                MitVorlage = Convert.ToBoolean(DialogBoxes.MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
             }
 
             if (_Database.ColumnArrangements.Count < 1)
@@ -3939,7 +3944,7 @@ namespace BlueControls.Controls
 
             if (i.Count < 1)
             {
-                MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", enImageCode.Information, "OK");
+                DialogBoxes.MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", enImageCode.Information, "OK");
                 return;
             }
 

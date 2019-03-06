@@ -192,9 +192,6 @@ namespace BlueControls.Controls
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _EditType = enEditTypeFormula.Textfeld;
-            _Caption = CaptionText + ":";
-            ValueId = CaptionText;
-            Value = InitialValue;
 
             var TMPMultiLine = false;
 
@@ -212,6 +209,10 @@ namespace BlueControls.Controls
                 TMPMultiLine = false;
             }
 
+
+            _Caption = CaptionText + ":";
+            ValueId = CaptionText;
+            Value = InitialValue;
 
             StyleTextBox(TextBox, Format, TMPMultiLine, string.Empty, false, string.Empty, true);
 
@@ -373,7 +374,7 @@ namespace BlueControls.Controls
         {
             get
             {
-                if (_allinitialized) { Create_Control(); }
+                if (!_allinitialized) { Create_Control(); }
                 foreach (System.Windows.Forms.Control Control in Controls)
                 {
                     if (Control is ComboBox CB) { return CB; }
@@ -386,7 +387,7 @@ namespace BlueControls.Controls
         {
             get
             {
-                if (_allinitialized) { Create_Control(); }
+                if (!_allinitialized) { Create_Control(); }
                 foreach (System.Windows.Forms.Control Control in Controls)
                 {
                     if (Control is TextBox TB) { return TB; }
@@ -399,7 +400,7 @@ namespace BlueControls.Controls
         {
             get
             {
-                if (_allinitialized) { Create_Control(); }
+                if (!_allinitialized) { Create_Control(); }
                 foreach (System.Windows.Forms.Control Control in Controls)
                 {
                     if (Control is Button BT) { return BT; }
@@ -412,7 +413,7 @@ namespace BlueControls.Controls
         {
             get
             {
-                if (_allinitialized) { Create_Control(); }
+                if (!_allinitialized) { Create_Control(); }
                 ListBoxen(out var Main, out var Suggest);
                 return Main;
             }
@@ -422,7 +423,7 @@ namespace BlueControls.Controls
         {
             get
             {
-                if (_allinitialized) { Create_Control(); }
+                if (!_allinitialized) { Create_Control(); }
                 ListBoxen(out var Main, out var Suggest);
                 return Suggest;
             }

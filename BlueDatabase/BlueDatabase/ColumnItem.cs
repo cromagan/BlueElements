@@ -1944,7 +1944,7 @@ namespace BlueDatabase
 
 
 
-            if (_EditTrotzSperreErlaubt && !_TextBearbeitungErlaubt && !_DropdownBearbeitungErlaubt) { return "Wenn die Zeilensperre ingnoriert werden soll, muss eine Bearbeitungsmethode definiert sein."; }
+            if (_EditTrotzSperreErlaubt && !_TextBearbeitungErlaubt && !_DropdownBearbeitungErlaubt) { return "Wenn die Zeilensperre ignoriert werden soll, muss eine Bearbeitungsmethode definiert sein."; }
 
 
             if (_TextBearbeitungErlaubt)

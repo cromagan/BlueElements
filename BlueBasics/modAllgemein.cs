@@ -1082,7 +1082,8 @@ namespace BlueBasics
             {
                 for (var Y = 0 ; Y < BMP.Height ; Y++)
                 {
-                    if (BMP.GetPixel(X, Y).GetBrightness() < 0.9) { BMP.SetPixel(X, Y, Color.Black); }
+                    var c = BMP.GetPixel(X, Y);
+                    if (c.A > 0.5 &&  BMP.GetPixel(X, Y).GetBrightness() < 0.9) { BMP.SetPixel(X, Y, Color.Black); }
                 }
             }
         }
