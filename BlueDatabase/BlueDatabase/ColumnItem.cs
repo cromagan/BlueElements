@@ -1141,9 +1141,9 @@ namespace BlueDatabase
             Invalidate_TmpVariables();
         }
 
-        private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, System.EventArgs e)
+        private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, DatabaseStoppedEventArgs e)
         {
-            Database.OnConnectedControlsStopAllWorking();
+            Database.OnConnectedControlsStopAllWorking(e);
         }
 
         public Database LinkedDatabase()

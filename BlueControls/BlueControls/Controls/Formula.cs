@@ -610,7 +610,7 @@ namespace BlueControls.Controls
             _Database.Reload();
 
 
-            _Database.OnConnectedControlsStopAllWorking();
+            _Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
 
             if (!_Inited) { View_Init(); }
 

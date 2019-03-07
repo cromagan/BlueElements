@@ -500,7 +500,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private static void OpenDatabaseHeadEditor(Database DB)
         {
-            DB.OnConnectedControlsStopAllWorking();
+            DB.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
             DB.Reload();
             using (var w = new DatabaseHeadEditor(DB))
             {

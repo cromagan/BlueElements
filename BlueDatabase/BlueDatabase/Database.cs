@@ -379,11 +379,14 @@ namespace BlueDatabase
 
         public event EventHandler<DatabaseChangedEventArgs> DatabaseChanged;
         public event EventHandler SortParameterChanged;
-        public event EventHandler ConnectedControlsStopAllWorking;
+        public event EventHandler<DatabaseStoppedEventArgs> ConnectedControlsStopAllWorking;
         public event EventHandler StoreView;
         public event EventHandler RestoreView;
         public event EventHandler SavedToDisk;
         public event EventHandler SaveAborded;
+        public event CancelEventHandler Exporting;
+        public event CancelEventHandler Saving;
+        public event CancelEventHandler Reloading;
         public event EventHandler<KeyChangedEventArgs> RowKeyChanged;
         public event EventHandler<KeyChangedEventArgs> ColumnKeyChanged;
 
@@ -1747,6 +1750,10 @@ namespace BlueDatabase
         {
             if (ReadOnly) { return "Datenbank wurde schreibgeschützt geöffnet"; }
 
+            var e = new CancelEventArgs(false);
+            OnSaving(e);
+            if (e.Cancel) { return "Das Programm verhindert ein Speichern."; }
+
             if (int.Parse(_LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."; }
 
             if (BlockDateiVorhanden()) { return "Beim letzten Versuch, die Datei zu speichern, ist der Speichervorgang nicht korrekt beendet worden. Speichern ist solange deaktiviert, bis ein Administrator die Freigabe zum Speichern erteilt."; }
@@ -2438,6 +2445,27 @@ namespace BlueDatabase
             SaveAborded?.Invoke(this, System.EventArgs.Empty);
         }
 
+        private void OnExporting(CancelEventArgs e)
+        {
+            Exporting?.Invoke(this, e);
+        }
+
+        private void OnSaving(CancelEventArgs e)
+        {
+            Saving?.Invoke(this, e);
+        }
+
+        /// <summary>
+        /// Das Cancel-Event wird nur berücksichtigt, wenn die Datenbank Readonly ist.
+        /// Es kann ja sein, das Berechtigungen entzogen wurden, deswegen MUSS reloaded werden
+        /// </summary>
+        /// <param name="e"></param>
+        private void OnReloading(CancelEventArgs e)
+        {
+            Reloading?.Invoke(this, e);
+        }
+
+
         //private void OnColumnArrangementsChanged()
         //{
         //    ColumnArrangementsChanged?.Invoke(this, System.EventArgs.Empty);
@@ -2449,9 +2477,11 @@ namespace BlueDatabase
         }
 
 
-        public void OnConnectedControlsStopAllWorking()
+        public void OnConnectedControlsStopAllWorking(DatabaseStoppedEventArgs e)
         {
-            ConnectedControlsStopAllWorking?.Invoke(this, System.EventArgs.Empty);
+           if (e.AllreadyStoped.Contains(this)) { return; }
+            e.AllreadyStoped.Add(this);
+            ConnectedControlsStopAllWorking?.Invoke(this, e);
         }
 
 
@@ -2507,7 +2537,7 @@ namespace BlueDatabase
         public bool Release(bool MUSTRelease)
         {
             if (ReadOnly) { return false; }
-            OnConnectedControlsStopAllWorking(); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
+            OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
 
 
             if (string.IsNullOrEmpty(Filename)) { return false; }
@@ -3235,6 +3265,12 @@ namespace BlueDatabase
         /// <param name="e"></param>
         private void BinReLoader_DoWork(object sender, DoWorkEventArgs e)
         {
+
+            var ec = new CancelEventArgs(false);
+            OnReloading(ec);
+            if (ReadOnly &&  ec.Cancel) { return; }
+
+
             if (!ReloadNeeded()) { return; }
 
             FileInfo f;
@@ -3283,6 +3319,10 @@ namespace BlueDatabase
         {
             //if (!IsSaveAble(false)) { return; }
             if (ReadOnly) { return; }
+
+            var ec = new CancelEventArgs(false);
+            OnExporting(ec);
+            if (ec.Cancel) { return; }
 
             var ReportAChange = false;
             var tmp = false;

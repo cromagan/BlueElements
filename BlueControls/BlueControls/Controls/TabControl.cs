@@ -108,7 +108,7 @@ namespace BlueControls.Controls
         #region  AutoScale deaktivieren 
         // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
 
-        private bool OnSelectedIndexChanged_isin;
+        private bool _IndexChanged = false;
 
         public void PerformAutoScale()
         {
@@ -463,12 +463,10 @@ namespace BlueControls.Controls
 
         protected override void OnSelectedIndexChanged(System.EventArgs e)
         {
-            if (OnSelectedIndexChanged_isin) { return; }
-            OnSelectedIndexChanged_isin = true;
-
+            if (_IndexChanged) { return; }
+            _IndexChanged = true;
             base.OnSelectedIndexChanged(e);
-
-            OnSelectedIndexChanged_isin = false;
+            _IndexChanged = false;
         }
 
 

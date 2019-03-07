@@ -320,7 +320,7 @@ namespace BlueControls.Controls
         public new bool Enabled
         {
             get
-            {
+            { 
                 foreach (System.Windows.Forms.Control ThisControl in Controls)
                 {
                     if (!ThisControl.Enabled) { return false; }

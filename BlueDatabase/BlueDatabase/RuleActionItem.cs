@@ -862,7 +862,7 @@ namespace BlueDatabase
             switch (Action)
             {
                 case enAction.Ist:
-                    return enNeededText.MaxOneLine;
+                    return enNeededText.DoesNotMatter;
                 case enAction.Erhält_den_Focus:
                     return enNeededText.None;
                 case enAction.Mache_einen_Vorschlag:

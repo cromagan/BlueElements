@@ -1164,7 +1164,7 @@ namespace BlueControls
                     break;
 
                 default:
-                    Develop.DebugPrint("Unbekannter HTML-Code: " + Oricode);
+                   // Develop.DebugPrint("Unbekannter HTML-Code: " + Oricode);
                     break;
             }
 

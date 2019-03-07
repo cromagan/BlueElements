@@ -129,7 +129,7 @@ namespace BlueControls.Controls
 
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
-        public new event EventHandler<CellEventArgs> DoubleClick;
+        public new event EventHandler<CellDoubleClickEventArgs> DoubleClick;
 
         public event EventHandler<RowCancelEventArgs> EditBeforeNewRow;
 
@@ -1128,7 +1128,7 @@ namespace BlueControls.Controls
                 if (ISIN_MouseDown) { return; }
                 ISIN_MouseDown = true;
 
-                _Database.OnConnectedControlsStopAllWorking();
+                _Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
 
                 CellOnCoordinate(e.X, e.Y, out _MouseOverColumn, out _MouseOverRow);
 
@@ -1259,7 +1259,7 @@ namespace BlueControls.Controls
 
         private void Cell_Edit(ColumnItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, bool WithDropDown)
         {
-            Database.OnConnectedControlsStopAllWorking();
+            Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
 
             ColumnItem ContentHolderCellColumn;
             RowItem ContentHolderCellRow;
@@ -1909,7 +1909,7 @@ namespace BlueControls.Controls
 
             if (!columnviewitem.Column.AutoFilter_möglich()) { return; }
 
-            Database.OnConnectedControlsStopAllWorking();
+            Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
             //OnBeforeAutoFilterShow(new ColumnEventArgs(columnviewitem.Column));
 
             _AutoFilter = new AutoFilter(columnviewitem.Column, Filter);
@@ -2083,7 +2083,7 @@ namespace BlueControls.Controls
 
             lock (Lock_UserAction)
             {
-                Database.OnConnectedControlsStopAllWorking();
+                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
                 Invalidate();
             }
 
@@ -2095,7 +2095,7 @@ namespace BlueControls.Controls
 
             lock (Lock_UserAction)
             {
-                Database.OnConnectedControlsStopAllWorking();
+                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
                 Invalidate();
             }
         }
@@ -2161,7 +2161,7 @@ namespace BlueControls.Controls
         }
 
 
-        private void _Database_StopAllWorking(object sender, System.EventArgs e)
+        private void _Database_StopAllWorking(object sender, DatabaseStoppedEventArgs e)
         {
             CloseAllComponents();
         }
@@ -2296,7 +2296,7 @@ namespace BlueControls.Controls
             {
                 if (ISIN_MouseWheel) { return; }
                 ISIN_MouseWheel = true;
-                Database.OnConnectedControlsStopAllWorking();
+                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
                 if (!SliderY.Visible)
                 {
                     ISIN_MouseWheel = false;
@@ -2322,7 +2322,7 @@ namespace BlueControls.Controls
                 if (ISIN_Click) { return; }
                 ISIN_Click = true;
 
-                Database.OnConnectedControlsStopAllWorking();
+                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
                 CellOnCoordinate(MousePos().X, MousePos().Y, out _MouseOverColumn, out _MouseOverRow);
 
 
@@ -2341,7 +2341,7 @@ namespace BlueControls.Controls
             {
                 if (ISIN_SizeChanged) { return; }
                 ISIN_SizeChanged = true;
-                Database.OnConnectedControlsStopAllWorking();
+                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
 
                 Invalidate_AllDraw(false);
 
@@ -2360,7 +2360,7 @@ namespace BlueControls.Controls
                 if (ISIN_KeyDown) { return; }
                 ISIN_KeyDown = true;
 
-                Database.OnConnectedControlsStopAllWorking();
+                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
 
                 switch (e.KeyCode)
                 {
@@ -2514,7 +2514,7 @@ namespace BlueControls.Controls
 
                 if (e.Button != System.Windows.Forms.MouseButtons.None)
                 {
-                    _Database.OnConnectedControlsStopAllWorking();
+                    _Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
                 }
                 else
                 {
@@ -2705,11 +2705,13 @@ namespace BlueControls.Controls
 
                 CellOnCoordinate(MousePos().X, MousePos().Y, out _MouseOverColumn, out _MouseOverRow);
 
+                var ea = new CellDoubleClickEventArgs(_MouseOverColumn, _MouseOverRow, true);
+
                 if (Mouse_IsInHead())
                 {
-                    Database.OnConnectedControlsStopAllWorking();
+                    Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
 
-                    DoubleClick?.Invoke(this, new CellEventArgs(_MouseOverColumn, _MouseOverRow));
+                    DoubleClick?.Invoke(this, ea);
                     ISIN_DoubleClick = false;
                     return;
                 }
@@ -2723,9 +2725,9 @@ namespace BlueControls.Controls
                     return;
                 }
 
-                Cell_Edit(_MouseOverColumn, _MouseOverRow, true);
+                DoubleClick?.Invoke(this, ea);
 
-                DoubleClick?.Invoke(this, new CellEventArgs(_MouseOverColumn, _MouseOverRow));
+                if (ea.StartEdit) { Cell_Edit(_MouseOverColumn, _MouseOverRow, true); }
 
                 ISIN_DoubleClick = false;
             }
@@ -2858,7 +2860,7 @@ namespace BlueControls.Controls
             {
                 if (ISIN_Resize) { return; }
                 ISIN_Resize = true;
-                Database.OnConnectedControlsStopAllWorking();
+                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
 
                 Invalidate_AllDraw(false);
                 ISIN_Resize = false;
@@ -3304,11 +3306,14 @@ namespace BlueControls.Controls
             {
                 if (ThisRowItem != null && !ThisRowItem.CellIsNullOrEmpty(Column))
                 {
-                    Column.TMP_ColumnContentWidth = Math.Max((int)Column.TMP_ColumnContentWidth, Cell_ContentSize(Column, ThisRowItem).Width);
+                    var t = Column.TMP_ColumnContentWidth; // ja, dank Multithreading kann es sein, dass hier das hier null ist
+                    if (t == null) { t = 0; }
+                    Column.TMP_ColumnContentWidth = Math.Max((int)t, Cell_ContentSize(Column, ThisRowItem).Width);
                 }
             }
 
-            return (int)Column.TMP_ColumnContentWidth;
+            if (Column.TMP_ColumnContentWidth is int w) { return w; }
+            return 0;
         }
 
 
@@ -3736,7 +3741,7 @@ namespace BlueControls.Controls
             {
                 if (ISIN_VisibleChanged) { return; }
                 ISIN_VisibleChanged = true;
-                Database.OnConnectedControlsStopAllWorking();
+                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
                 ISIN_VisibleChanged = false;
             }
 
