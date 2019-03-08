@@ -87,7 +87,7 @@ namespace BlueControls.Controls
             this.Lade.ImageCode = "Ordner|16";
             this.Lade.Location = new Point(42, 3);
             this.Lade.Name = "Lade";
-            this.Lade.QuickInfo = "Ein vorhandes Bild aus<br>dem Dateisystem wählen.";
+            this.Lade.QuickInfo = "Ein vorhandenes Bild aus<br>dem Dateisystem wählen.";
             this.Lade.Size = new Size(32, 26);
             this.Lade.TabIndex = 6;
             this.Lade.Click += new EventHandler(this.Lade_Click);

@@ -385,7 +385,7 @@ namespace BlueDatabase
         public event EventHandler SavedToDisk;
         public event EventHandler SaveAborded;
         public event CancelEventHandler Exporting;
-        public event CancelEventHandler Saving;
+        public event EventHandler<DatabaseSettingsEventHandler> LoadingLinkedDatabase;
         public event CancelEventHandler Reloading;
         public event EventHandler<KeyChangedEventArgs> RowKeyChanged;
         public event EventHandler<KeyChangedEventArgs> ColumnKeyChanged;
@@ -1750,9 +1750,6 @@ namespace BlueDatabase
         {
             if (ReadOnly) { return "Datenbank wurde schreibgeschützt geöffnet"; }
 
-            var e = new CancelEventArgs(false);
-            OnSaving(e);
-            if (e.Cancel) { return "Das Programm verhindert ein Speichern."; }
 
             if (int.Parse(_LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."; }
 
@@ -2450,9 +2447,9 @@ namespace BlueDatabase
             Exporting?.Invoke(this, e);
         }
 
-        private void OnSaving(CancelEventArgs e)
+        internal void OnLoadingLinkedDatabase(DatabaseSettingsEventHandler e)
         {
-            Saving?.Invoke(this, e);
+            LoadingLinkedDatabase?.Invoke(this, e);
         }
 
         /// <summary>
@@ -2479,8 +2476,8 @@ namespace BlueDatabase
 
         public void OnConnectedControlsStopAllWorking(DatabaseStoppedEventArgs e)
         {
-           if (e.AllreadyStoped.Contains(this)) { return; }
-            e.AllreadyStoped.Add(this);
+           if (e.AllreadyStopped.Contains(this)) { return; }
+            e.AllreadyStopped.Add(this);
             ConnectedControlsStopAllWorking?.Invoke(this, e);
         }
 

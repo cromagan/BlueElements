@@ -871,7 +871,7 @@ namespace BlueControls.Controls
         private void UpdateValueTo_EasyPic(EasyPic Control)
         {
             if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
-            Control.SetSourceName(_Value);   // den Rest muss OnChanged von FlexiControlForCell übernehmen.
+            Control.SetSourceName(_Value, true);   // den Rest muss OnChanged von FlexiControlForCell übernehmen.
         }
 
         #endregion

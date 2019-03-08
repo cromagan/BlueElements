@@ -531,28 +531,28 @@ namespace BlueControls.Controls
 
                     switch (Control.SorceType)
                     {
-                        case EasyPic.enSorceType.SourceNameCorrectButImageNotLoaded:
-                            Control.LoadFromDatabase(_columview.Column);
+                        case enSorceType.SourceNameCorrectButImageNotLoaded:
+                            Control.LoadFromDatabase(_columview.Column, false);
                             return;
 
-                        case EasyPic.enSorceType.ScreenShot:
+                        case enSorceType.ScreenShot:
                             var fil = TempFile(_columview.Column.BestFile(_columview.Column.Name + ".PNG"));
                             Control.Bitmap.Save(fil, ImageFormat.Png);
-                            Control.ChangeSource(fil.FileNameWithSuffix(), EasyPic.enSorceType.DatabaseInternal);
+                            Control.ChangeSource(fil.FileNameWithSuffix(), enSorceType.DatabaseInternal, false);
                             Value = fil.FileNameWithSuffix();
                             return;
 
-                        case EasyPic.enSorceType.DatabaseInternal:
+                        case enSorceType.DatabaseInternal:
                             // Bild geladen, evtl. noch die ZElle richtig stellen (Siehe .Screenshot). Muss deswegen sein, weil Database Internal auch woanders herkommen kann.
                             FillCellNow();
                             return;
 
-                        case EasyPic.enSorceType.Nichts:
+                        case enSorceType.Nichts:
                             Value = string.Empty;
                             FillCellNow();
                             return;
 
-                        case EasyPic.enSorceType.LoadedFromDisk:
+                        case enSorceType.LoadedFromDisk:
                             var fil2 = TempFile(_columview.Column.BestFile(_columview.Column.Name + ".PNG"));
 
                             if (fil2.FilePath().ToUpper() != Control.SorceName.FilePath().ToUpper())
@@ -563,11 +563,11 @@ namespace BlueControls.Controls
                             {
                                 fil2 = Control.SorceName;
                             }
-                            Control.ChangeSource(fil2.FileNameWithSuffix(), EasyPic.enSorceType.DatabaseInternal);
+                            Control.ChangeSource(fil2.FileNameWithSuffix(), enSorceType.DatabaseInternal, false);
                             Value = fil2.FileNameWithSuffix();
                             return;
 
-                        case EasyPic.enSorceType.EntryWithoutPic:
+                        case enSorceType.EntryWithoutPic:
                             Value = Control.SorceName;
                             // Entweder ein Dummy eintrag (Bildzeichen-Liste, wo Haupt das Bild sein sollte, aber eben nur bei den 3 Seitensichten eines da ist
                             // Oder datenbank wird von einem andern PC aus gestartet

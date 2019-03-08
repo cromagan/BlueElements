@@ -1,4 +1,23 @@
-﻿using BlueBasics.Enums;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,6 +41,7 @@ namespace BlueBasics
         private static bool _DeleteTraceLog = true;
         private static bool _IsTraceLogging;
         private static bool _ServiceStarted;
+        private readonly static DateTime _ProgrammStarted = DateTime.Now;
 
 
         public static bool IsDevelopment()
@@ -350,17 +370,17 @@ namespace BlueBasics
             TraceLogging_Start(TempFile("", AppName() + "-Trace.html"));
 
             var Check = new System.Windows.Forms.Timer();
-            Check.Tick += CloseAtNight;
+            Check.Tick += CloseAfter12Hours;
             Check.Interval = 60000;
             Check.Enabled = true;
         }
 
-        private static void CloseAtNight(object sender, System.EventArgs e)
+        private static void CloseAfter12Hours(object sender, System.EventArgs e)
         {
-            if (DateTime.Now.Hour == 4)
+            if (DateTime.Now.Subtract(_ProgrammStarted).TotalHours > 12)
             {
                 if (IsDevelopment()) { return; }
-                DebugPrint(enFehlerArt.Fehler, "Das Programm wird um 4:00 Uhr automatisch geschlossen.");
+                DebugPrint(enFehlerArt.Fehler, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
             }
         }
     }

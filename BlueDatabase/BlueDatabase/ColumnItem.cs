@@ -1150,7 +1150,11 @@ namespace BlueDatabase
         {
             if (_TMP_LinkedDatabase != null) { return _TMP_LinkedDatabase; }
             if (string.IsNullOrEmpty(_LinkedDatabaseFile)) { return null; }
-            TMP_LinkedDatabase = Database.Load(Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly, Database._PasswordSub, Database._GenerateLayout, Database._RenameColumnInLayout);
+
+            var el = new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly, Database._PasswordSub, Database._GenerateLayout, Database._RenameColumnInLayout);
+            Database.OnLoadingLinkedDatabase(el);
+
+            TMP_LinkedDatabase = Database.Load(el.Filenname , el.ReadOnly, el.PasswordSub, el.GenenerateLayout, el.RenameColumnInLayout);
             if (_TMP_LinkedDatabase != null) { _TMP_LinkedDatabase.UserGroup = Database.UserGroup; }
             return _TMP_LinkedDatabase;
         }

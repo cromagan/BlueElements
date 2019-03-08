@@ -17,20 +17,26 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
 
-namespace BlueDatabase.EventArgs
+namespace BlueControls.Enums
 {
-    public class DatabaseStoppedEventArgs : System.EventArgs
+
+    public enum enSorceType
     {
 
+        Nichts = 0,
 
-        public DatabaseStoppedEventArgs()
-        {
-            AllreadyStopped = new List<Database>();
-        }
+        DatabaseInternal = 1,
+        Downloaded = 2,
+        SetedByProperty = 3,
+        ScreenShot = 4,
 
-        public List<Database> AllreadyStopped { get; }
+        LoadedFromDiskAndResized = 5,
+        LoadedFromDisk = 6,
+
+        EntryWithoutPic = 7,
+
+        SourceNameCorrectButImageNotLoaded = 8
 
     }
 }

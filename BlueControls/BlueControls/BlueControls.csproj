@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="Allgemein.cs" />
     <Compile Include="BlueFont.cs" />
+    <Compile Include="Enums\enSorceType.cs" />
     <Compile Include="Enums\enConectorStyle.cs" />
     <Compile Include="Enums\enASCIIKey.cs" />
     <Compile Include="Enums\enComboboxStyle.cs" />

@@ -98,6 +98,7 @@
     <Compile Include="EventArgs\CellDoubleClickEventArgs.cs" />
     <Compile Include="EventArgs\CellEventArgs.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
+    <Compile Include="EventArgs\DatabaseSettingsEventHandler.cs" />
     <Compile Include="EventArgs\DatabaseStoppedEventArgs.cs" />
     <Compile Include="EventArgs\DatabaseChangedEventArgs.cs" />
     <Compile Include="EventArgs\DatabaseGiveBackEventArgs.cs" />
