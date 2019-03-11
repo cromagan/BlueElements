@@ -65,7 +65,7 @@ namespace BlueControls.Classes_Editor
             this.ActionSelector.TabIndex = 5;
             this.ActionSelector.AddClicked += new EventHandler(ActionSelector_AddClicked);
             this.ActionSelector.ItemCheckedChanged += new EventHandler(ActionSelector_Item_CheckedChanged);
-            this.ActionSelector.RemoveClicked += new EventHandler<ListOfBasicListItemEventArgs>(ActionSelector_RemoveClicked);
+            this.ActionSelector.ItemRemoving += ActionSelector_ItemRemoving;
             //
             //RuleItem_Editor
             //

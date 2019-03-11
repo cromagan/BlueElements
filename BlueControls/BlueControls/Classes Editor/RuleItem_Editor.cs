@@ -18,6 +18,7 @@
 #endregion
 
 using BlueBasics;
+using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
@@ -119,8 +120,14 @@ namespace BlueControls.Classes_Editor
             OnChanged(tmp);
         }
 
-        private void ActionSelector_RemoveClicked(object sender, ListOfBasicListItemEventArgs e)
+
+        private void ActionSelector_ItemRemoving(object sender, ListEventArgs e)
         {
+
+            if (tmp == null) { return; }
+
+            tmp.Actions.Remove((BlueDatabase.RuleActionItem)((ObjectListItem)(e.Item)).Obj);
+
             OnChanged(tmp);
         }
 

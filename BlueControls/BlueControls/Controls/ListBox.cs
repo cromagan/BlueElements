@@ -49,6 +49,7 @@ namespace BlueControls.Controls
             Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
             Item.ItemAdded += _Item_Item_Added;
             Item.ItemRemoved += _Item_ItemRemoved;
+            Item.ItemRemoving += _Item_ItemRemoving;
             _Appearance = enBlueListBoxAppearance.Listbox;
             SetDoubleBuffering();
         }
@@ -68,11 +69,11 @@ namespace BlueControls.Controls
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
         public event EventHandler ItemCheckedChanged;
         public event EventHandler<ListEventArgs> ItemAdded;
+        public event EventHandler<ListEventArgs> ItemRemoving;
         public event EventHandler ItemRemoved;
         public event EventHandler<BasicListItemEventArgs> ItemDoubleClick;
         public event EventHandler<BasicListItemEventArgs> ItemClick;
         public event EventHandler AddClicked;
-        public event EventHandler<ListOfBasicListItemEventArgs> RemoveClicked;
         public event EventHandler Changed;
 
         #endregion
@@ -575,7 +576,7 @@ namespace BlueControls.Controls
         private void Minus_Click(object sender, System.EventArgs e)
         {
 
-            OnRemoveClicked(new ListOfBasicListItemEventArgs(Item.Checked()));
+          //  OnRemoveClicked(new ListOfBasicListItemEventArgs(Item.Checked()));
 
             foreach (var ThisItem in Item.Checked())
             {
@@ -585,10 +586,10 @@ namespace BlueControls.Controls
             CheckButtons();
         }
 
-        private void OnRemoveClicked(ListOfBasicListItemEventArgs e)
-        {
-            RemoveClicked?.Invoke(this, e);
-        }
+    //    private void OnRemoveClicked(ListOfBasicListItemEventArgs e)
+    //    {
+    //       RemoveClicked?.Invoke(this, e);
+    //   }
 
 
         public BasicListItem Add_FromFileSystem()
@@ -762,7 +763,18 @@ namespace BlueControls.Controls
         {
             ItemRemoved?.Invoke(this, e);
         }
+        protected void OnItemRemoving(ListEventArgs e)
+        {
+            ItemRemoving?.Invoke(this, e);
+        }
 
+
+        private void _Item_ItemRemoving(object sender, ListEventArgs e)
+        {
+            if (IsDisposed) { return; }
+            Invalidate();
+            OnItemRemoving(e);
+        }
 
         private void _Item_ItemRemoved(object sender, System.EventArgs e)
         {

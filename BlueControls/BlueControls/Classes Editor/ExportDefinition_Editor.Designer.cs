@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -251,7 +252,7 @@ namespace BlueControls.Classes_Editor
             this.ExportDateien.RemoveAllowed = true;
             this.ExportDateien.Size = new Size(984, 232);
             this.ExportDateien.TabIndex = 0;
-            this.ExportDateien.RemoveClicked += new EventHandler<ListOfBasicListItemEventArgs>(ExportDateien_Remove_Clicked);
+            this.ExportDateien.ItemRemoving += new EventHandler<ListEventArgs>(ExportDateien_ItemRemoving);
             this.ExportDateien.Changed += new EventHandler(ExportDateien_Changed);
             //
             //ExportVerzeichnis

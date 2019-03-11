@@ -448,7 +448,7 @@ namespace BlueDatabase
             Row.RowAdded += Row_RowAdded;
 
             Column.ItemAdded += Column_ItemAdded;
-            Column.ItemRemove += Column_ItemRemove;
+            Column.ItemRemoving += Column_ItemRemoving;
             Column.ItemRemoved += Column_ItemRemoved;
 
 
@@ -741,7 +741,7 @@ namespace BlueDatabase
             CheckViewsAndArrangements();
         }
 
-        private void Column_ItemRemove(object sender, ListEventArgs e)
+        private void Column_ItemRemoving(object sender, ListEventArgs e)
         {
             var Key = ((ColumnItem)e.Item).Key;
             AddPending(enDatabaseDataType.dummyComand_RemoveColumn, Key, -1, string.Empty, Key.ToString(), false);

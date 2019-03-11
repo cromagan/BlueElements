@@ -1,14 +1,7 @@
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueControls.Classes_Editor;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
 using BlueControls.Forms;
+using System.Diagnostics;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
@@ -125,6 +118,7 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left)));
             this.PermissionGroups_NewRow.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
             this.PermissionGroups_NewRow.FilterAllowed = true;
+            this.PermissionGroups_NewRow.LastFilePath = null;
             this.PermissionGroups_NewRow.Location = new System.Drawing.Point(192, 48);
             this.PermissionGroups_NewRow.Name = "PermissionGroups_NewRow";
             this.PermissionGroups_NewRow.QuickInfo = "";
@@ -158,6 +152,7 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left)));
             this.DatenbankAdmin.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
             this.DatenbankAdmin.FilterAllowed = true;
+            this.DatenbankAdmin.LastFilePath = null;
             this.DatenbankAdmin.Location = new System.Drawing.Point(8, 46);
             this.DatenbankAdmin.Name = "DatenbankAdmin";
             this.DatenbankAdmin.QuickInfo = "";
@@ -206,6 +201,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.lbxSortierSpalten.AddAllowed = BlueControls.Enums.enAddType.OnlySuggests;
             this.lbxSortierSpalten.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
+            this.lbxSortierSpalten.LastFilePath = null;
             this.lbxSortierSpalten.Location = new System.Drawing.Point(16, 32);
             this.lbxSortierSpalten.MoveAllowed = true;
             this.lbxSortierSpalten.Name = "lbxSortierSpalten";
@@ -328,6 +324,7 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbxRuleSelector.CheckBehavior = BlueControls.Enums.enCheckBehavior.AlwaysSingleSelection;
             this.lbxRuleSelector.FilterAllowed = true;
+            this.lbxRuleSelector.LastFilePath = null;
             this.lbxRuleSelector.Location = new System.Drawing.Point(8, 8);
             this.lbxRuleSelector.Name = "lbxRuleSelector";
             this.lbxRuleSelector.QuickInfo = "";
@@ -337,6 +334,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxRuleSelector.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.lbxRuleSelector_ContextMenuInit);
             this.lbxRuleSelector.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.lbxRuleSelector_ContextMenuItemClicked);
             this.lbxRuleSelector.ItemCheckedChanged += new System.EventHandler(this.lbxRuleSelector_ItemCheckedChanged);
+            this.lbxRuleSelector.ItemRemoving += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.lbxRuleSelector_ItemRemoving);
             this.lbxRuleSelector.AddClicked += new System.EventHandler(this.lbxRuleSelector_AddClicked);
             // 
             // Caption14
@@ -380,6 +378,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);
             this.GlobalTab.Name = "GlobalTab";
+            this.GlobalTab.SelectedIndex = 2;
             this.GlobalTab.Size = new System.Drawing.Size(1047, 645);
             this.GlobalTab.TabIndex = 21;
             // 
@@ -591,6 +590,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lstBinary.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
             this.lstBinary.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstBinary.FilterAllowed = true;
+            this.lstBinary.LastFilePath = null;
             this.lstBinary.Location = new System.Drawing.Point(0, 0);
             this.lstBinary.Name = "lstBinary";
             this.lstBinary.QuickInfo = "";
@@ -643,6 +643,7 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ExportSets.FilterAllowed = true;
+            this.ExportSets.LastFilePath = null;
             this.ExportSets.Location = new System.Drawing.Point(8, 24);
             this.ExportSets.Name = "ExportSets";
             this.ExportSets.QuickInfo = "";
@@ -651,8 +652,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ExportSets.TabIndex = 0;
             this.ExportSets.Text = "ExportAufgaben";
             this.ExportSets.ItemCheckedChanged += new System.EventHandler(this.ExportSets_Item_CheckedChanged);
+            this.ExportSets.ItemRemoving += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.ExportSets_ItemRemoving);
             this.ExportSets.AddClicked += new System.EventHandler(this.ExportSets_AddClicked);
-            this.ExportSets.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.ExportSets_RemoveClicked);
             // 
             // Tab_Sortierung
             // 

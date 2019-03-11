@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using System;
 using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -10,23 +29,8 @@ namespace BlueBasics
     {
         private bool _ThrowEvents = true;
 
-        public bool ThrowEvents
-        {
-            get
-            {
-                return _ThrowEvents;
-            }
-            set
-            {
-
-                if (_ThrowEvents == value) { Develop.DebugPrint(enFehlerArt.Fehler, "Set ThrowEvents-Fehler! "); }
-
-                _ThrowEvents = value;
-            }
-        }
-
         public event EventHandler<System.EventArgs> ItemRemoved;
-        public event EventHandler<ListEventArgs> ItemRemove;
+        public event EventHandler<ListEventArgs> ItemRemoving;
         public event EventHandler<ListEventArgs> ItemAdded;
 
         public event EventHandler<ListEventArgs> ItemSeted;
@@ -43,13 +47,29 @@ namespace BlueBasics
         }
 
 
+        public bool ThrowEvents
+        {
+            get
+            {
+                return _ThrowEvents;
+            }
+            set
+            {
+
+                if (_ThrowEvents == value) { Develop.DebugPrint(enFehlerArt.Fehler, "Set ThrowEvents-Fehler! "); }
+
+                _ThrowEvents = value;
+            }
+        }
+
+
         public new void Clear()
         {
             if (Count == 0) { return; }
 
             foreach (var item in this)
             {
-                OnItemRemove(item);
+                OnItemRemoving(item);
             }
             base.Clear();
             OnItemRemoved();
@@ -65,7 +85,7 @@ namespace BlueBasics
 
         public new void Remove(T item)
         {
-            OnItemRemove(item);
+            OnItemRemoving(item);
             base.Remove(item);
             OnItemRemoved();
         }
@@ -91,7 +111,7 @@ namespace BlueBasics
 
         public new void RemoveAt(int index)
         {
-            OnItemRemove(base[index]);
+            OnItemRemoving(base[index]);
             base.RemoveAt(index);
             OnItemRemoved();
         }
@@ -128,7 +148,7 @@ namespace BlueBasics
 
                 if (base[index] != null)
                 {
-                    OnItemRemove(base[index]);
+                    OnItemRemoving(base[index]);
                     base[index] = value;
                     OnItemRemoved();
                 }
@@ -167,12 +187,12 @@ namespace BlueBasics
         /// OnListOrItemChanged wird nicht ausgelöst
         /// </summary>
         /// <param name="item"></param>
-        protected virtual void OnItemRemove(T item)
+        protected virtual void OnItemRemoving(T item)
         {
             if (item is IChangedFeedback cItem) { cItem.Changed -= CItem_Changed; }
 
             if (!_ThrowEvents) { return; }
-            ItemRemove?.Invoke(this, new ListEventArgs(item));
+            ItemRemoving?.Invoke(this, new ListEventArgs(item));
             // OnListOrItemChanged(); Wird bei REMOVED ausgelöst
         }
 

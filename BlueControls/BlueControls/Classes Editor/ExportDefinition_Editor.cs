@@ -21,6 +21,7 @@ using System;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
@@ -171,11 +172,10 @@ namespace BlueControls.Classes_Editor
             UpdateExport(true);
         }
 
-        private void ExportDateien_Remove_Clicked(object sender, ListOfBasicListItemEventArgs e)
+        private void ExportDateien_ItemRemoving(object sender, ListEventArgs e)
         {
-            foreach (var ThisItemBasic in e.Items)
-            {
-                if (ThisItemBasic != null)
+
+                if (e.Item is ItemCollection.Basics.BasicItem ThisItemBasic )
                 {
                     string fil = null;
                     if (ThisItemBasic.Internal().Contains("|"))
@@ -191,7 +191,6 @@ namespace BlueControls.Classes_Editor
 
                     if (FileExists(fil)) { FileOperations.DeleteFile(fil, false); }
                 }
-            }
         }
 
 

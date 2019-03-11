@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 using BlueControls.Controls;
 using BlueControls.DialogBoxes;
 using BlueControls.Enums;
@@ -418,18 +419,13 @@ namespace BlueControls.BlueDatabaseDialogs
         #endregion
 
 
-        private void ExportSets_RemoveClicked(object sender, ListOfBasicListItemEventArgs e)
+        private void ExportSets_ItemRemoving(object sender, ListEventArgs e)
         {
-
-            foreach (var ThisItemBasic in e.Items)
+            if (e.Item is ItemCollection.Basics.BasicItem ThisItemBasic)
             {
-                if (ThisItemBasic != null)
-                {
-                    var tempVar = (ExportDefinition)((ObjectListItem)ThisItemBasic).Obj;
-                    tempVar.DeleteAllBackups();
-                }
+                var tempVar = (ExportDefinition)((ObjectListItem)ThisItemBasic).Obj;
+                tempVar.DeleteAllBackups();
             }
-
         }
 
 
@@ -772,6 +768,16 @@ namespace BlueControls.BlueDatabaseDialogs
         {
             _Database.UnlockHard();
             MessageBox.Show("Erledigt.", enImageCode.Information, "OK");
+        }
+
+
+        private void lbxRuleSelector_ItemRemoving(object sender, ListEventArgs e)
+        {
+
+            if (RuleItemEditor.ObjectWithDialog == ((ObjectListItem)e.Item).Obj)
+            {
+                RuleItemEditor.ObjectWithDialog = null;
+            }
         }
     }
 }

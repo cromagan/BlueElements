@@ -433,26 +433,33 @@ namespace BlueDatabase
             return CompleteRelationText;
         }
 
-        internal static List<RowItem> ConnectedRows(string CompleteRelationText, RowItem Row)
+        internal static List<RowItem> ConnectedRows(string CompleteRelationTextx, RowItem Row)
         {
-            var R = new List<RowItem>();
+            var AllRows = new List<RowItem>();
             var Names = Row.Database.Column[0].GetUcaseNamesSortedByLenght();
 
-            CompleteRelationText = CompleteRelationText.ToUpper();
+            var RelationTextLine = CompleteRelationTextx.ToUpper().SplitByCR();
 
-            for (var Z = Names.Count - 1 ; Z > -1 ; Z--)
+            foreach (var thisTextLine in RelationTextLine)
             {
-                if (CompleteRelationText.IndexOfWord(Names[Z], 0, RegexOptions.IgnoreCase) > -1)
+                var tmp = thisTextLine;
+                var R = new List<RowItem>();
+
+                for (var Z = Names.Count - 1 ; Z > -1 ; Z--)
                 {
-                    R.Add(Row.Database.Row[Names[Z]]);
-                    CompleteRelationText = CompleteRelationText.Replace(Names[Z], string.Empty);
+                    if (tmp.IndexOfWord(Names[Z], 0, RegexOptions.IgnoreCase) > -1)
+                    {
+                        R.Add(Row.Database.Row[Names[Z]]);
+                        tmp = tmp.Replace(Names[Z], string.Empty);
+                    }
                 }
+                if (R.Count == 1 || R.Contains(Row)) { AllRows.AddIfNotExists(R); } // Bei mehr als einer verknüpften Reihe MUSS die die eigene Reihe dabei sein.
+
             }
 
 
-            if (R.Count > 1 && !R.Contains(Row)) { R.Clear(); } // Bei mehr als einer verknüpften Reige MUSS die diegene Reihe dabei sein.
 
-            return R;
+            return AllRows;
         }
 
 
