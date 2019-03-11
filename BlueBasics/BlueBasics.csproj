@@ -79,7 +79,7 @@
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="enSW.cs" />
+    <Compile Include="Enums\enSW.cs" />
     <Compile Include="Enums\enDataFormat.cs" />
     <Compile Include="Enums\enFehlerArt.cs" />
     <Compile Include="Extensions\DirectoryInfoExtensions.cs" />

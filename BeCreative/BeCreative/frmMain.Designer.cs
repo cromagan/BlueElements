@@ -70,7 +70,6 @@ namespace BeCreative
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.BlueFormulax = new BlueControls.Controls.Formula();
@@ -660,7 +659,6 @@ namespace BeCreative
             this.Controls.Add(this.TableView);
             this.Controls.Add(this.Zei);
             this.Controls.Add(this.MainRibbon);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(1024, 768);
             this.Name = "frmMain";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
