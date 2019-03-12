@@ -115,6 +115,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabControl = new BlueControls.Controls.TabControl();
             this.tabRegeln = new BlueControls.Controls.TabPage();
             this.gpxVerlinkteZellen = new BlueControls.Controls.GroupBox();
+            this.btnFehlerbeiFehlenderZelle = new BlueControls.Controls.Button();
             this.txbZeichenkette = new BlueControls.Controls.TextBox();
             this.capZeichenkette = new BlueControls.Controls.TextBox();
             this.line1 = new BlueControls.Controls.Line();
@@ -447,7 +448,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabRechte.Location = new System.Drawing.Point(4, 25);
             this.tabRechte.Name = "tabRechte";
             this.tabRechte.Padding = new System.Windows.Forms.Padding(3);
-            this.tabRechte.Size = new System.Drawing.Size(740, 351);
+            this.tabRechte.Size = new System.Drawing.Size(740, 404);
             this.tabRechte.TabIndex = 1;
             this.tabRechte.Text = "Rechte";
             this.tabRechte.UseVisualStyleBackColor = true;
@@ -465,7 +466,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.btnOtherValuesToo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnOtherValuesToo.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnOtherValuesToo.Location = new System.Drawing.Point(32, 311);
+            this.btnOtherValuesToo.Location = new System.Drawing.Point(32, 364);
             this.btnOtherValuesToo.Name = "btnOtherValuesToo";
             this.btnOtherValuesToo.Size = new System.Drawing.Size(368, 32);
             this.btnOtherValuesToo.TabIndex = 7;
@@ -477,6 +478,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxCellEditor.AddAllowed = BlueControls.Enums.enAddType.Text;
             this.lbxCellEditor.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
             this.lbxCellEditor.FilterAllowed = true;
+            this.lbxCellEditor.LastFilePath = null;
             this.lbxCellEditor.Location = new System.Drawing.Point(400, 48);
             this.lbxCellEditor.Name = "lbxCellEditor";
             this.lbxCellEditor.QuickInfo = "";
@@ -502,7 +504,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tbxAuswaehlbareWerte.Location = new System.Drawing.Point(32, 120);
             this.tbxAuswaehlbareWerte.MultiLine = true;
             this.tbxAuswaehlbareWerte.Name = "tbxAuswaehlbareWerte";
-            this.tbxAuswaehlbareWerte.Size = new System.Drawing.Size(360, 175);
+            this.tbxAuswaehlbareWerte.Size = new System.Drawing.Size(360, 228);
             this.tbxAuswaehlbareWerte.SpellChecking = true;
             this.tbxAuswaehlbareWerte.TabIndex = 0;
             // 
@@ -553,7 +555,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabAutoBearbeitung.Controls.Add(this.btnAutoEditAutoSort);
             this.tabAutoBearbeitung.Location = new System.Drawing.Point(4, 25);
             this.tabAutoBearbeitung.Name = "tabAutoBearbeitung";
-            this.tabAutoBearbeitung.Size = new System.Drawing.Size(740, 351);
+            this.tabAutoBearbeitung.Size = new System.Drawing.Size(740, 404);
             this.tabAutoBearbeitung.TabIndex = 6;
             this.tabAutoBearbeitung.Text = "Auto-Bearbeitung";
             // 
@@ -627,7 +629,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabFilter.Location = new System.Drawing.Point(4, 25);
             this.tabFilter.Name = "tabFilter";
             this.tabFilter.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFilter.Size = new System.Drawing.Size(740, 351);
+            this.tabFilter.Size = new System.Drawing.Size(740, 404);
             this.tabFilter.TabIndex = 2;
             this.tabFilter.Text = "Filter";
             this.tabFilter.UseVisualStyleBackColor = true;
@@ -776,7 +778,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabSonstiges.Location = new System.Drawing.Point(4, 25);
             this.tabSonstiges.Name = "tabSonstiges";
             this.tabSonstiges.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSonstiges.Size = new System.Drawing.Size(740, 422);
+            this.tabSonstiges.Size = new System.Drawing.Size(740, 404);
             this.tabSonstiges.TabIndex = 4;
             this.tabSonstiges.Text = "Sonstiges";
             this.tabSonstiges.UseVisualStyleBackColor = true;
@@ -902,7 +904,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tbxTags.Location = new System.Drawing.Point(4, 31);
             this.tbxTags.MultiLine = true;
             this.tbxTags.Name = "tbxTags";
-            this.tbxTags.Size = new System.Drawing.Size(328, 383);
+            this.tbxTags.Size = new System.Drawing.Size(328, 365);
             this.tbxTags.TabIndex = 30;
             this.tbxTags.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -1035,13 +1037,16 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabRegeln.Controls.Add(this.btnFehlerWennLeer);
             this.tabRegeln.Location = new System.Drawing.Point(4, 25);
             this.tabRegeln.Name = "tabRegeln";
-            this.tabRegeln.Size = new System.Drawing.Size(740, 363);
+            this.tabRegeln.Size = new System.Drawing.Size(740, 404);
             this.tabRegeln.TabIndex = 8;
             this.tabRegeln.Text = "Regeln";
             // 
             // gpxVerlinkteZellen
             // 
+            this.gpxVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.gpxVerlinkteZellen.CausesValidation = false;
+            this.gpxVerlinkteZellen.Controls.Add(this.btnFehlerbeiFehlenderZelle);
             this.gpxVerlinkteZellen.Controls.Add(this.txbZeichenkette);
             this.gpxVerlinkteZellen.Controls.Add(this.capZeichenkette);
             this.gpxVerlinkteZellen.Controls.Add(this.line1);
@@ -1053,17 +1058,31 @@ namespace BlueControls.BlueDatabaseDialogs
             this.gpxVerlinkteZellen.Controls.Add(this.capRowKeyInColumn);
             this.gpxVerlinkteZellen.Location = new System.Drawing.Point(8, 96);
             this.gpxVerlinkteZellen.Name = "gpxVerlinkteZellen";
-            this.gpxVerlinkteZellen.Size = new System.Drawing.Size(680, 192);
+            this.gpxVerlinkteZellen.Size = new System.Drawing.Size(728, 216);
             this.gpxVerlinkteZellen.Text = "Verlinkte Zellen:";
+            // 
+            // btnFehlerbeiFehlenderZelle
+            // 
+            this.btnFehlerbeiFehlenderZelle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFehlerbeiFehlenderZelle.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnFehlerbeiFehlenderZelle.Location = new System.Drawing.Point(8, 176);
+            this.btnFehlerbeiFehlenderZelle.Name = "btnFehlerbeiFehlenderZelle";
+            this.btnFehlerbeiFehlenderZelle.Size = new System.Drawing.Size(712, 24);
+            this.btnFehlerbeiFehlenderZelle.TabIndex = 8;
+            this.btnFehlerbeiFehlenderZelle.Text = "Zeile als Fehlerhaft markieren, wenn die Zelle in der verlinkten Datenbank nicht " +
+    "vorhanden ist.";
             // 
             // txbZeichenkette
             // 
             this.txbZeichenkette.AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+            this.txbZeichenkette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txbZeichenkette.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbZeichenkette.Location = new System.Drawing.Point(336, 136);
             this.txbZeichenkette.Name = "txbZeichenkette";
             this.txbZeichenkette.QuickInfo = resources.GetString("txbZeichenkette.QuickInfo");
-            this.txbZeichenkette.Size = new System.Drawing.Size(328, 24);
+            this.txbZeichenkette.Size = new System.Drawing.Size(376, 24);
             this.txbZeichenkette.TabIndex = 7;
             // 
             // capZeichenkette
@@ -1077,37 +1096,45 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // line1
             // 
+            this.line1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.line1.CausesValidation = false;
             this.line1.Location = new System.Drawing.Point(8, 56);
             this.line1.Name = "line1";
-            this.line1.Size = new System.Drawing.Size(664, 2);
+            this.line1.Size = new System.Drawing.Size(712, 2);
             this.line1.Text = "line1";
             // 
             // cbxTargetColumn
             // 
+            this.cbxTargetColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxTargetColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxTargetColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxTargetColumn.Location = new System.Drawing.Point(336, 72);
             this.cbxTargetColumn.Name = "cbxTargetColumn";
-            this.cbxTargetColumn.Size = new System.Drawing.Size(328, 24);
+            this.cbxTargetColumn.Size = new System.Drawing.Size(376, 24);
             this.cbxTargetColumn.TabIndex = 5;
             // 
             // cbxColumnKeyInColumn
             // 
+            this.cbxColumnKeyInColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxColumnKeyInColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxColumnKeyInColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxColumnKeyInColumn.Location = new System.Drawing.Point(336, 112);
             this.cbxColumnKeyInColumn.Name = "cbxColumnKeyInColumn";
-            this.cbxColumnKeyInColumn.Size = new System.Drawing.Size(328, 24);
+            this.cbxColumnKeyInColumn.Size = new System.Drawing.Size(376, 24);
             this.cbxColumnKeyInColumn.TabIndex = 4;
             // 
             // cbxRowKeyInColumn
             // 
+            this.cbxRowKeyInColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxRowKeyInColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxRowKeyInColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxRowKeyInColumn.Location = new System.Drawing.Point(336, 24);
             this.cbxRowKeyInColumn.Name = "cbxRowKeyInColumn";
-            this.cbxRowKeyInColumn.Size = new System.Drawing.Size(328, 24);
+            this.cbxRowKeyInColumn.Size = new System.Drawing.Size(376, 24);
             this.cbxRowKeyInColumn.TabIndex = 3;
             // 
             // btnTargetColumn
@@ -1139,30 +1166,36 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnFehlerWennUnsichtbare
             // 
+            this.btnFehlerWennUnsichtbare.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.btnFehlerWennUnsichtbare.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
             this.btnFehlerWennUnsichtbare.Location = new System.Drawing.Point(8, 64);
             this.btnFehlerWennUnsichtbare.Name = "btnFehlerWennUnsichtbare";
-            this.btnFehlerWennUnsichtbare.Size = new System.Drawing.Size(680, 16);
+            this.btnFehlerWennUnsichtbare.Size = new System.Drawing.Size(728, 16);
             this.btnFehlerWennUnsichtbare.TabIndex = 2;
             this.btnFehlerWennUnsichtbare.Text = "Wenn der Zelleninhalt dieser Spalte unsichtbare Leerzeichen oder Enter-Codes enth" +
     "ält, gib einen Fehler aus";
             // 
             // btnFormatFehler
             // 
+            this.btnFormatFehler.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.btnFormatFehler.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
             this.btnFormatFehler.Location = new System.Drawing.Point(8, 40);
             this.btnFormatFehler.Name = "btnFormatFehler";
-            this.btnFormatFehler.Size = new System.Drawing.Size(680, 16);
+            this.btnFormatFehler.Size = new System.Drawing.Size(728, 16);
             this.btnFormatFehler.TabIndex = 1;
             this.btnFormatFehler.Text = "Wenn der Zelleninhalt dieser Spalte vom eingestellen Format abweicht, gib einen F" +
     "ehler aus";
             // 
             // btnFehlerWennLeer
             // 
+            this.btnFehlerWennLeer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.btnFehlerWennLeer.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
             this.btnFehlerWennLeer.Location = new System.Drawing.Point(8, 16);
             this.btnFehlerWennLeer.Name = "btnFehlerWennLeer";
-            this.btnFehlerWennLeer.Size = new System.Drawing.Size(680, 16);
+            this.btnFehlerWennLeer.Size = new System.Drawing.Size(728, 16);
             this.btnFehlerWennLeer.TabIndex = 0;
             this.btnFehlerWennLeer.Text = "Wenn die Zelle dieser Spalte leer ist, gib einen Fehler aus";
             // 
@@ -1290,5 +1323,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbUeberschift3;
         private TextBox txbUeberschift2;
         private TextBox txbUeberschift1;
+        private Button btnFehlerbeiFehlenderZelle;
     }
 	}

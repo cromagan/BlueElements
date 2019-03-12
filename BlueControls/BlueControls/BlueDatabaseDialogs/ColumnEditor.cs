@@ -210,9 +210,12 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (R != null && _Column.Format == enDataFormat.LinkedCell)
             {
-                var o = R.Actions[0].Text.SplitByCR();
 
-                if (o.Length == 5)
+               // Info:o[5] ist ein Dummy, der immer auf  gesetzt wird. Damit werden beim Split die Dimenionen repariert.
+               // o[4] ist neu dazu gekommen, und nicht immer gesetzt. Da es vorher der Dummy war, ist es immer plus, was gut so ist, da das die vorherige standard einstellung war.
+                var o = (R.Actions[0].Text + "\r+") .SplitByCR();
+
+                if (o.Length > 4)
                 {
                     if (int.TryParse(o[0], out var RowKey)) { cbxRowKeyInColumn.Text = _Column.Database.Column.SearchByKey(RowKey).Name; }
                     if (int.TryParse(o[1], out var ColKey))
@@ -226,6 +229,7 @@ namespace BlueControls.BlueDatabaseDialogs
                         btnTargetColumn.Checked = true;
                     }
                     txbZeichenkette.Text = o[3];
+                    btnFehlerbeiFehlenderZelle.Checked = o[4].FromPlusMinus();
 
                 }
             }
@@ -465,7 +469,7 @@ namespace BlueControls.BlueDatabaseDialogs
                     if (_Column.LinkedDatabase() != null) { tmp = tmp + _Column.LinkedDatabase().Column[cbxTargetColumn.Text].Key; }
                 }
 
-                tmp = tmp + "\r" + txbZeichenkette.Text + "\r+"; // Plus, das split die Dimensionen richtig erstellt.
+                tmp = tmp + "\r" + txbZeichenkette.Text + "\r" + btnFehlerbeiFehlenderZelle.Checked.ToPlusMinus() + "\r+"; // Plus, das split die Dimensionen richtig erstellt.
                 tmpR.Actions[0].Text = tmp;
             }
 

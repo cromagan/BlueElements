@@ -420,8 +420,8 @@ namespace BlueDatabase
                         if (t != null) { LinkedDB = t.LinkedDatabase(); }
                         if (LinkedDB == null) { return "Verlinkte Datenbank der Spalte '#Spalte:" + t.Name + "' nicht gefunden."; }
 
-                        var o = _Text.SplitByCR();
-                        if (o.Length != 5) { return "Definitionsfehler in der Spalte '#Spalte:" + t.Name + "' der 'Verlinkten-Zell-Zuweisung'"; }
+                        var o = (_Text + "\r+").SplitByCR();
+                        if (o.Length < 5) { return "Definitionsfehler in der Spalte '#Spalte:" + t.Name + "' der 'Verlinkten-Zell-Zuweisung'"; }
 
                         if (!int.TryParse(o[0], out var RowKey)) { return "Spalte mit Zeilenschlüssel in der Spalte '#Spalte:" + t.Name + "' nicht definiert"; }
                         var rowC = t.Database.Column.SearchByKey(RowKey);
@@ -460,6 +460,9 @@ namespace BlueDatabase
                         else
                         {
                             Row.Database.Cell.SetValueBehindLinkedValue(t, Row, "");
+
+                            if (!o[4].FromPlusMinus()) { return string.Empty; }
+
                             return "Zelle in Zieldatenbank in Spalte '#Spalte:" + t.Name + "' nicht vorhanden";
                         }
                     }
