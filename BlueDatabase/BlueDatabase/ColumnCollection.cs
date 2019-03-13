@@ -37,13 +37,6 @@ namespace BlueDatabase
 
         private int _LastColumnKey;
 
-        private ColumnItem vSysLocked;
-        private ColumnItem vSysRowCreateDate;
-        private ColumnItem vSysRowCreator;
-        private ColumnItem _SysCorrect;
-        private ColumnItem vSysRowChanger;
-        private ColumnItem _SysRowChangeDate;
-        private ColumnItem vSysChapter;
 
         #endregion
 
@@ -123,13 +116,13 @@ namespace BlueDatabase
 
         public void ResetSystems()
         {
-            vSysLocked = null;
-            vSysRowCreateDate = null;
-            vSysRowCreator = null;
-            _SysCorrect = null;
-            vSysRowChanger = null;
-            _SysRowChangeDate = null;
-            vSysChapter = null;
+            SysLocked = null;
+            SysRowCreateDate = null;
+            SysRowCreator = null;
+            SysCorrect = null;
+            SysRowChanger = null;
+            SysRowChangeDate = null;
+            SysChapter = null;
         }
 
 
@@ -162,42 +155,26 @@ namespace BlueDatabase
 
 
 
-        public ColumnItem SysChapter()
-        {
-            return vSysChapter;
-        }
-
-        public ColumnItem SysCorrect()
-        {
-            return _SysCorrect;
-        }
-
-        public ColumnItem SysLocked()
-        {
-            return vSysLocked;
-        }
+        public ColumnItem SysChapter { get; private set; }
 
 
-        public ColumnItem SysRowChangeDate()
-        {
-            return _SysRowChangeDate;
-        }
+        public ColumnItem SysCorrect { get; private set; }
 
 
-        public ColumnItem SysRowChanger()
-        {
-            return vSysRowChanger;
-        }
+        public ColumnItem SysLocked { get; private set; }
 
-        public ColumnItem SysRowCreateDate()
-        {
-            return vSysRowCreateDate;
-        }
 
-        public ColumnItem SysRowCreator()
-        {
-            return vSysRowCreator;
-        }
+
+        public ColumnItem SysRowChangeDate { get; private set; }
+
+
+
+        public ColumnItem SysRowChanger { get; private set; }
+
+        public ColumnItem SysRowCreateDate { get; private set; }
+
+
+        public ColumnItem SysRowCreator { get; private set; }
 
 
 
@@ -261,13 +238,13 @@ namespace BlueDatabase
                     switch (ThisColumnItem.Identifier)
                     {
                         case "": break;
-                        case "System: Locked": vSysLocked = ThisColumnItem; break;
-                        case "System: Creator": vSysRowCreator = ThisColumnItem; break;
-                        case "System: Changer": vSysRowChanger = ThisColumnItem; break;
-                        case "System: Date Created": vSysRowCreateDate = ThisColumnItem; break;
-                        case "System: Correct": _SysCorrect = ThisColumnItem; break;
-                        case "System: Date Changed": _SysRowChangeDate = ThisColumnItem; break;
-                        case "System: Chapter": vSysChapter = ThisColumnItem; break;
+                        case "System: Locked": SysLocked = ThisColumnItem; break;
+                        case "System: Creator": SysRowCreator = ThisColumnItem; break;
+                        case "System: Changer": SysRowChanger = ThisColumnItem; break;
+                        case "System: Date Created": SysRowCreateDate = ThisColumnItem; break;
+                        case "System: Correct": SysCorrect = ThisColumnItem; break;
+                        case "System: Date Changed": SysRowChangeDate = ThisColumnItem; break;
+                        case "System: Chapter": SysChapter = ThisColumnItem; break;
                         default:
                             Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Kennung: " + ThisColumnItem.Identifier);
                             break;

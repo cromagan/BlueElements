@@ -332,7 +332,7 @@ namespace BlueDatabase
         }
 
 
-        public string Execute(RowItem vRow, ColumnItem ColumnFocus)
+        public string Execute(RowItem vRow, ColumnItem ColumnFocus, bool FreezeMode)
         {
 
             var Meldung = string.Empty;
@@ -346,11 +346,11 @@ namespace BlueDatabase
                     {
                         if (string.IsNullOrEmpty(Meldung))
                         {
-                            Meldung = ThisAction.Execute(vRow, ColumnFocus);
+                            Meldung = ThisAction.Execute(vRow, ColumnFocus, FreezeMode);
                         }
                         else
                         {
-                            ThisAction.Execute(vRow, ColumnFocus);
+                            ThisAction.Execute(vRow, ColumnFocus, FreezeMode);
                         }
                     }
                 }
@@ -465,9 +465,9 @@ namespace BlueDatabase
                     case enAction.Auf_eine_existierende_Datei_verweist: Co = 108; break;
                     case enAction.Auf_einen_existierenden_Pfad_verweist: Co = 109; break;
                     case enAction.Berechnung_ist_True: Co = 110; break;
-                    case enAction.Ist_Jünger_Als: Co = 111; break;
+                    //case enAction.Ist_Jünger_Als: Co = 111; break;
                     case enAction.Substring: Co = 115; break;
-                    case enAction.SortiereIntelligent: Co = 120; break;
+                    //case enAction.SortiereIntelligent: Co = 120; break;
                     case enAction.KopiereAndereSpalten: Co = 130; break;
 
                     case enAction.Erhält_den_Focus: Co = 200; break;
@@ -566,7 +566,7 @@ namespace BlueDatabase
             {
                 if (ThisAction != null)
                 {
-                    if (ThisAction.Action != enAction.KopiereAndereSpalten && ThisAction.Action != enAction.SortiereIntelligent)
+                    if (ThisAction.Action != enAction.KopiereAndereSpalten)
                     {
                         if (ThisAction.Columns.Contains(Column)) { return true; }
                     }

@@ -48,7 +48,7 @@ namespace BlueDatabase
 
         public event EventHandler<DoRowAutomaticEventArgs> DoSpecialRules;
 
-        public event EventHandler<RowEventArgs> RemovingRow;
+        public event EventHandler<RowEventArgs> RowRemoving;
 
         public event EventHandler RowRemoved;
 
@@ -148,7 +148,7 @@ namespace BlueDatabase
             var e = SearchByKey(Key);
             if (e == null) { return; }
 
-            OnBeforeRemoveRow(new RowEventArgs(e));
+            OnRowRemoving(new RowEventArgs(e));
             foreach (var ThisColumnItem in Database.Column)
             {
                 if (ThisColumnItem != null)
@@ -330,11 +330,20 @@ namespace BlueDatabase
 
         public RowItem SearchByKey(int Key)
         {
-            if (Key < 0) { return null; }
-            if (!_Internal.ContainsKey(Key)) { return null; }
-            return _Internal[Key];
-        }
+            try
+            {
+                if (Key < 0) { return null; }
+                if (!_Internal.ContainsKey(Key)) { return null; }
+                return _Internal[Key];
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
+                return SearchByKey(Key);
+            }
 
+
+        }
 
         public RowItem First()
         {
@@ -380,11 +389,11 @@ namespace BlueDatabase
             RowAdded?.Invoke(this, e);
         }
 
-        internal void OnBeforeRemoveRow(RowEventArgs e)
+        internal void OnRowRemoving(RowEventArgs e)
         {
             e.Row.RowChecked -= OnRowChecked;
             e.Row.DoSpecialRules -= OnDoSpecialRules;
-            RemovingRow?.Invoke(this, e);
+            RowRemoving?.Invoke(this, e);
         }
 
         internal void OnRowRemoved()
@@ -392,10 +401,10 @@ namespace BlueDatabase
             RowRemoved?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public bool RemovOlderThan(float InHours)
+        public bool RemoveOlderThan(float InHours)
         {
 
-            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDate(Database.Column.SysRowCreateDate()) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
+            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDate(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
 
             //foreach (var thisrowitem in _Internal.Values)
             //{

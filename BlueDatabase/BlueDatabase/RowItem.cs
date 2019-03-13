@@ -107,12 +107,17 @@ namespace BlueDatabase
 
 
 
+
         /// <summary>
         /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
         /// </summary>
         /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
         private List<string> DoRules()
         {
+
+            Database.Cell.Freeze();
+
+
             // Dann die Aktionen ausführen und fall es einen Fehler gibt, die Spalten ermitteln
             var ColumnAndErrors = new List<string>();
 
@@ -122,7 +127,7 @@ namespace BlueDatabase
                 {
                     if (ThisRule.TrifftZu(this, null))
                     {
-                        var tmpMessage = ThisRule.Execute(this, null);
+                        var tmpMessage = ThisRule.Execute(this, null, true);
 
                         if (!string.IsNullOrEmpty(tmpMessage))
                         {
@@ -166,7 +171,10 @@ namespace BlueDatabase
                 ColumnAndErrors.Add(e.FeedbackColumn.Name + "|" + e.Feedback);
             }
 
-            return ColumnAndErrors.SortedDistinctList(); 
+
+            Database.Cell.UnFreeze();
+
+            return ColumnAndErrors.SortedDistinctList();
         }
 
 
@@ -198,7 +206,7 @@ namespace BlueDatabase
                 }
             }
 
-            if (Convert.ToBoolean(cols.Count == 0) != Database.Cell.GetBoolean(Database.Column.SysCorrect(), this)) { CellSet(Database.Column.SysCorrect(), Convert.ToBoolean(cols.Count == 0)); }
+            if (Convert.ToBoolean(cols.Count == 0) != Database.Cell.GetBoolean(Database.Column.SysCorrect, this)) { CellSet(Database.Column.SysCorrect, Convert.ToBoolean(cols.Count == 0)); }
 
             OnRowChecked(new RowCheckedEventArgs(this, cols));
 
@@ -236,33 +244,33 @@ namespace BlueDatabase
         /// <param name="IsNewRow">Settzt bei True den Ersteller und das Erstelldatum.</param>
         internal void Repair(bool IsNewRow)
         {
-            if (Database.Column.SysCorrect() == null) { Database.Column.GetSystems(); }
+            if (Database.Column.SysCorrect == null) { Database.Column.GetSystems(); }
 
             if (Key < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Key < 0"); }
 
 
-            if (CellIsNullOrEmpty(Database.Column.SysLocked()))
+            if (CellIsNullOrEmpty(Database.Column.SysLocked))
             {
-                Database.Cell.SystemSet(Database.Column.SysLocked(), this, false.ToPlusMinus());
+                Database.Cell.SystemSet(Database.Column.SysLocked, this, false.ToPlusMinus(), false);
             }
 
 
-            if (CellIsNullOrEmpty(Database.Column.SysCorrect()))
+            if (CellIsNullOrEmpty(Database.Column.SysCorrect))
             {
-                Database.Cell.SystemSet(Database.Column.SysCorrect(), this, true.ToPlusMinus());
+                Database.Cell.SystemSet(Database.Column.SysCorrect, this, true.ToPlusMinus(), false);
             }
 
 
-            if (CellIsNullOrEmpty(Database.Column.SysRowChangeDate()))
+            if (CellIsNullOrEmpty(Database.Column.SysRowChangeDate))
             {
-                Database.Cell.SystemSet(Database.Column.SysRowChangeDate(), this, DateTime.Now.ToString());
+                Database.Cell.SystemSet(Database.Column.SysRowChangeDate, this, DateTime.Now.ToString(), false);
             }
 
 
             if (IsNewRow)
             {
-                Database.Cell.SystemSet(Database.Column.SysRowCreator(), this, Database.UserName);
-                Database.Cell.SystemSet(Database.Column.SysRowCreateDate(), this, DateTime.Now.ToString());
+                Database.Cell.SystemSet(Database.Column.SysRowCreator, this, Database.UserName, false);
+                Database.Cell.SystemSet(Database.Column.SysRowCreateDate, this, DateTime.Now.ToString(), false);
                 DoAutomatic(true, false);
             }
         }
@@ -306,17 +314,27 @@ namespace BlueDatabase
 
             return true;
         }
-
         public void CellSet(ColumnItem Column, bool Value)
         {
             Database.Cell.Set(Column, this, Value);
         }
+        public void CellSet(ColumnItem Column, bool Value, bool FreezeMode)
+        {
+            Database.Cell.Set(Column, this, Value, FreezeMode);
+        }
 
+        internal void CellSet(ColumnItem Column, double Value, bool FreezeMode)
+        {
+            Database.Cell.Set(Column, this, Value, FreezeMode);
+        }
         internal void CellSet(ColumnItem Column, double Value)
         {
             Database.Cell.Set(Column, this, Value);
         }
-
+        public void CellSet(ColumnItem Column, int Value, bool FreezeMode)
+        {
+            Database.Cell.Set(Column, this, Value, FreezeMode);
+        }
         public void CellSet(ColumnItem Column, int Value)
         {
             Database.Cell.Set(Column, this, Value);
@@ -401,6 +419,11 @@ namespace BlueDatabase
             Database.Cell.Set(ColumnName, this, Value);
         }
 
+        public void CellSet(string ColumnName, string Value, bool FreezeMode)
+        {
+            Database.Cell.Set(ColumnName, this, Value, FreezeMode);
+        }
+
         public string[] CellGetArray(string ColumnName)
         {
             return Database.Cell.GetArray(Database.Column[ColumnName], this);
@@ -442,14 +465,28 @@ namespace BlueDatabase
 
         }
 
+        public void CellSet(string ColumnName, List<string> Value, bool FreezeMode)
+        {
+            Database.Cell.Set(Database.Column[ColumnName], this, Value, FreezeMode);
+
+        }
+
         public void CellSet(ColumnItem Column, List<string> Value)
         {
             Database.Cell.Set(Column, this, Value);
         }
-
+        public void CellSet(ColumnItem Column, List<string> Value, bool FreezeMode)
+        {
+            Database.Cell.Set(Column, this, Value, FreezeMode);
+        }
         public void CellSet(ColumnItem Column, string Value)
         {
             Database.Cell.Set(Column, this, Value);
+        }
+
+        public void CellSet(ColumnItem Column, string Value, bool FreezeMode)
+        {
+            Database.Cell.Set(Column, this, Value, FreezeMode);
         }
 
         public void CellSet(string ColumnName, DateTime Value)

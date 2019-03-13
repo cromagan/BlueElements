@@ -468,7 +468,7 @@ namespace BlueControls.Controls
                 }
                 if (SortedRows()[Zei].TMP_Y >= HeadSize())
                 {
-                    if (!SortedRows()[Zei].CellGetBoolean(_Database.Column.SysCorrect()))
+                    if (!SortedRows()[Zei].CellGetBoolean(_Database.Column.SysCorrect))
                     {
                         GR.DrawImage(QuickImage.Get("Warnung|14||||||120||60").BMP, 3, (int)SortedRows()[Zei].TMP_Y + 1);
                     }
@@ -661,7 +661,7 @@ namespace BlueControls.Controls
                 Draw_Cell(GR, ViewItem, Row, r, enDesign.Item_Listbox, ItStat);
 
 
-                if (!Row.CellGetBoolean(_Database.Column.SysCorrect()))
+                if (!Row.CellGetBoolean(_Database.Column.SysCorrect))
                 {
                     GR.DrawImage(QuickImage.Get("Warnung|16||||||120||50").BMP, new Point(r.Right - 19, Convert.ToInt32(r.Top + (r.Height - 16) / 2.0)));
                 }
@@ -1298,7 +1298,7 @@ namespace BlueControls.Controls
             var dia = ColumnItem.UserEditDialogTypeInTable(ContentHolderCellColumn, WithDropDown);
             if (dia == enEditTypeTable.None || dia == enEditTypeTable.FileHandling_InDateiSystem)
             {
-                NotEditableInfo("Spalte kann generell nicht bearbeitet werden.");
+                NotEditableInfo("Diese Spalte kann generell nicht bearbeitet werden.");
                 return;
             }
             if (!ContentHolderCellColumn.Database.Cell.UserEditPossible(ContentHolderCellColumn, ContentHolderCellRow, false))
@@ -1795,11 +1795,11 @@ namespace BlueControls.Controls
                 {
                     ThisRow.TMP_Y = (int)(MaxY - SliderY.Value + HeadSize());
 
-                    if (ThisRow.CellGetString(_Database.Column.SysChapter()) != LastCap)
+                    if (ThisRow.CellGetString(_Database.Column.SysChapter) != LastCap)
                     {
                         ThisRow.TMP_Y += RowCaptionSizeY;
                         MaxY += RowCaptionSizeY;
-                        LastCap = ThisRow.CellGetString(_Database.Column.SysChapter());
+                        LastCap = ThisRow.CellGetString(_Database.Column.SysChapter);
 
 
                         if (string.IsNullOrEmpty(LastCap))

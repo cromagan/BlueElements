@@ -221,7 +221,7 @@ namespace BlueDatabase
             if (_Column == null) { return "Spezial-Zeilen-Filter"; }
             if (SearchValue == null || SearchValue.Count != 1) { return "Special-Wert-Filter"; }
 
-            if (_Column == Database.Column.SysCorrect())
+            if (_Column == Database.Column.SysCorrect)
             {
                 if (Convert.ToBoolean(FilterType & enFilterType.Istgleich) && SearchValue[0].FromPlusMinus()) { return "Muss fehlerfrei sein"; }
                 if (Convert.ToBoolean(FilterType & enFilterType.Istgleich) && !SearchValue[0].FromPlusMinus()) { return "Muss Fehler haben"; }

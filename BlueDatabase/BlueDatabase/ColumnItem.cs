@@ -1082,7 +1082,7 @@ namespace BlueDatabase
                 {
                     if (Database.Cell.GetStringBehindLinkedValue(this, ThisRow) == os)
                     {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, ns);
+                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, ns, false);
                     }
                 }
             }
@@ -1096,7 +1096,7 @@ namespace BlueDatabase
                     var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
                     if (val.StartsWith(os))
                     {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
+                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns), false);
                     }
                 }
             }
@@ -1113,7 +1113,7 @@ namespace BlueDatabase
                     var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
                     if (val.EndsWith(os))
                     {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
+                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns), false);
                     }
                 }
             }
@@ -1726,8 +1726,8 @@ namespace BlueDatabase
 
         public QuickImage SymbolForReadableText()
         {
-            if (this == Database.Column.SysRowChanger()) { return QuickImage.Get(enImageCode.Person); }
-            if (this == Database.Column.SysRowCreator()) { return QuickImage.Get(enImageCode.Person); }
+            if (this == Database.Column.SysRowChanger) { return QuickImage.Get(enImageCode.Person); }
+            if (this == Database.Column.SysRowCreator) { return QuickImage.Get(enImageCode.Person); }
 
 
             switch (_Format)

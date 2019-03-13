@@ -291,6 +291,10 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (MessageBox.Show("Welche Spalte bearbeiten?", enImageCode.Frage, "Spalte in dieser Datenbank", "Verlinkte Spalte") == 1) { column = column2; }
             }
+            else
+            {
+                Notification.Show("Keine aktive Verlinkung.<br>Spalte in dieser Datenbank wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Datenbank vorhanden?", enImageCode.Information);
+            }
 
 
             OpenColumnEditor(column);

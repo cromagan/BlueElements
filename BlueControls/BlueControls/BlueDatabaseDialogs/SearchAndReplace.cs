@@ -99,7 +99,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 {
                     if (!AktuelleFilterung.Checked || ThisRow.MatchesTo(_BlueTable.Filter))
                     {
-                        if (!AbgeschlosseZellen.Checked || !ThisRow.CellGetBoolean(_BlueTable.Database.Column.SysLocked())) { ro.Add(ThisRow); }
+                        if (!AbgeschlosseZellen.Checked || !ThisRow.CellGetBoolean(_BlueTable.Database.Column.SysLocked)) { ro.Add(ThisRow); }
                     }
                 }
             }

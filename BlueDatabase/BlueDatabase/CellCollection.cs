@@ -39,6 +39,10 @@ namespace BlueDatabase
         private readonly Database Database;
         private Dictionary<string, CellItem> _cells = new Dictionary<string, CellItem>();
 
+
+        private Dictionary<string, string> _freezed = null;
+        private bool _IsFreezed;
+
         #endregion
 
 
@@ -52,10 +56,9 @@ namespace BlueDatabase
 
         public void Initialize()
         {
-            //disposedValue = false;
-            //Clear();
             _cells.Clear();
-            //_cellsize.Clear();
+            _freezed = null;
+            _IsFreezed = false;
         }
 
 
@@ -72,6 +75,8 @@ namespace BlueDatabase
 
         #endregion
 
+
+
         public void Delete(ColumnItem Column, int RowKey)
         {
             var CellKey = KeyOfCell(Column.Key, RowKey);
@@ -79,7 +84,7 @@ namespace BlueDatabase
 
             var Inhalt = _cells[CellKey].Value;
             _cells.Remove(CellKey);
-            DoSpecialFormats(Column, RowKey, Inhalt);
+            DoSpecialFormats(Column, RowKey, Inhalt, false);
         }
 
         internal void Load_310(ColumnItem _Column, RowItem _Row, string Value, int Width, int Height)
@@ -117,6 +122,11 @@ namespace BlueDatabase
         public static string KeyOfCell(int ColKey, int RowKey)
         {
             return ColKey + "|" + RowKey;
+        }
+
+        public bool IsFreezed()
+        {
+            return _IsFreezed;
         }
 
 
@@ -232,7 +242,7 @@ namespace BlueDatabase
         }
 
 
-        internal void DoSpecialFormats(ColumnItem Column, int RowKey, string PreviewsValue)
+        internal void DoSpecialFormats(ColumnItem Column, int RowKey, string PreviewsValue, bool FreezeMode)
         {
             if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
 
@@ -247,7 +257,7 @@ namespace BlueDatabase
                 //    RepairRelation(Column, Database.Row.SearchByKey(RowKey), PreviewsValue);
                 //    break;
                 case enDataFormat.RelationText:
-                    RepairRelationText(Column, Database.Row.SearchByKey(RowKey), PreviewsValue);
+                    RepairRelationText(Column, Database.Row.SearchByKey(RowKey), PreviewsValue, FreezeMode);
                     break;
             }
 
@@ -264,7 +274,7 @@ namespace BlueDatabase
                             //    RelationNameChanged(ThisColumnItem, PreviewsValue, CurrentValue);
                             //    break;
                             case enDataFormat.RelationText:
-                                RelationTextNameChanged(ThisColumnItem, RowKey, PreviewsValue, CurrentValue);
+                                RelationTextNameChanged(ThisColumnItem, RowKey, PreviewsValue, CurrentValue, FreezeMode);
                                 break;
                         }
                     }
@@ -277,7 +287,7 @@ namespace BlueDatabase
             return GetString(Column, Database.Row.SearchByKey(RowKey));
         }
 
-        private void RepairRelationText(ColumnItem Column, RowItem Row, string PreviewsValue)
+        private void RepairRelationText(ColumnItem Column, RowItem Row, string PreviewsValue, bool FreezeMode)
         {
             var CurrentString = GetString(Column, Row);
             CurrentString = ChangeTextToRowId(CurrentString, string.Empty, string.Empty, -1);
@@ -286,7 +296,7 @@ namespace BlueDatabase
 
             if (CurrentString != GetString(Column, Row))
             {
-                Set(Column, Row, CurrentString);
+                Set(Column, Row, CurrentString, FreezeMode);
                 return;
             }
 
@@ -316,17 +326,17 @@ namespace BlueDatabase
                             {
                                 ex.Remove(t.ReplaceWord(ThisRow.CellFirstString(), Row.CellFirstString(), RegexOptions.IgnoreCase));
                             }
-                            ThisRow.CellSet(Column, ex.SortedDistinctList());
+                            ThisRow.CellSet(Column, ex.SortedDistinctList(), FreezeMode);
                         }
 
                     }
                 }
             }
 
-            MakeNewRelations(Column, Row, OldBZ, NewBZ);
+            MakeNewRelations(Column, Row, OldBZ, NewBZ, FreezeMode);
         }
 
-        private void MakeNewRelations(ColumnItem Column, RowItem Row, List<string> OldBZ, List<string> NewBZ)
+        private void MakeNewRelations(ColumnItem Column, RowItem Row, List<string> OldBZ, List<string> NewBZ, bool FreezeMode)
         {
             //Develop.CheckStackForOverflow();
             //// Dann die neuen Erstellen
@@ -350,7 +360,7 @@ namespace BlueDatabase
                             {
                                 ex.Add(t.ReplaceWord(ThisRow.CellFirstString(), Row.CellFirstString(), RegexOptions.IgnoreCase));
                             }
-                            ThisRow.CellSet(Column, ex.SortedDistinctList());
+                            ThisRow.CellSet(Column, ex.SortedDistinctList(), FreezeMode);
                         }
                     }
                 }
@@ -479,7 +489,10 @@ namespace BlueDatabase
             return default(DateTime);
 
         }
-
+        public void Set(ColumnItem Column, RowItem Row, List<string> Value, bool FreezeMode)
+        {
+            Set(Column, Row, Value.JoinWithCr(), FreezeMode);
+        }
         public void Set(ColumnItem Column, RowItem Row, List<string> Value)
         {
             Set(Column, Row, Value.JoinWithCr());
@@ -491,7 +504,7 @@ namespace BlueDatabase
         }
 
 
-        private void RelationTextNameChanged(ColumnItem ColumnToRepair, int RowKey, string OldValue, string NewValue)
+        private void RelationTextNameChanged(ColumnItem ColumnToRepair, int RowKey, string OldValue, string NewValue, bool FreezeMode)
         {
 
             if (string.IsNullOrEmpty(NewValue)) { return; }
@@ -510,20 +523,23 @@ namespace BlueDatabase
                             t = ChangeTextToRowId(t, OldValue, NewValue, RowKey);
                             t = ChangeTextFromRowId(t);
                             var t2 = t.SplitByCRToList().SortedDistinctList();
-                            ThisRowItem.CellSet(ColumnToRepair, t2);
+                            ThisRowItem.CellSet(ColumnToRepair, t2, FreezeMode);
                         }
 
                         if (t.ToUpper().Contains(NewValue.ToUpper()))
                         {
-                            MakeNewRelations(ColumnToRepair, ThisRowItem, new List<string>(), t.SplitByCRToList());
+                            MakeNewRelations(ColumnToRepair, ThisRowItem, new List<string>(), t.SplitByCRToList(), FreezeMode);
                         }
                     }
                 }
             }
         }
-
-
         public void Set(ColumnItem Column, RowItem Row, string Value)
+        {
+            Set(Column, Row, Value, false);
+        }
+
+        internal void Set(ColumnItem Column, RowItem Row, string Value, bool FreezeMode)
         {
             if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
             if (Row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!!<br>" + Database.Filename); }
@@ -535,11 +551,11 @@ namespace BlueDatabase
                 if (LCColumn != null) { LCrow?.Database.Cell.Set(LCColumn, LCrow, Value); }
                 return;
             }
-            SetValueBehindLinkedValue(Column, Row, Value);
+            SetValueBehindLinkedValue(Column, Row, Value, FreezeMode);
 
         }
 
-        internal void SetValueBehindLinkedValue(ColumnItem Column, RowItem Row, string Value)
+        internal void SetValueBehindLinkedValue(ColumnItem Column, RowItem Row, string Value, bool FreezeMode)
         {
             Value = Column.AutoCorrect(Value);
 
@@ -550,15 +566,15 @@ namespace BlueDatabase
 
             if (Value == OldValue) { return; }
 
-            Database.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, Column.Key, Row.Key, OldValue, Value, true);
+            Database.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, Column.Key, Row.Key, OldValue, Value, true, FreezeMode);
 
             Column._UcaseNamesSortedByLenght = null;
 
-            DoSpecialFormats(Column, Row.Key, OldValue);
+            DoSpecialFormats(Column, Row.Key, OldValue, FreezeMode);
 
 
-            SystemSet(Database.Column.SysRowChanger(), Row, Database.UserName);
-            SystemSet(Database.Column.SysRowChangeDate(), Row, DateTime.Now.ToString());
+            SystemSet(Database.Column.SysRowChanger, Row, Database.UserName, FreezeMode);
+            SystemSet(Database.Column.SysRowChangeDate, Row, DateTime.Now.ToString(), FreezeMode);
 
 
             Invalidate_CellContentSize(Column, Row);
@@ -581,7 +597,7 @@ namespace BlueDatabase
                 {
                     if (ThisRule.hasGotFocusAction(Row, Column))
                     {
-                        if (ThisRule.TrifftZu(Row, Column)) { BestW = ThisRule.Execute(Row, Column); }
+                        if (ThisRule.TrifftZu(Row, Column)) { BestW = ThisRule.Execute(Row, Column, false); }
                         if (!string.IsNullOrEmpty(BestW)) { return BestW; }
                     }
                 }
@@ -611,8 +627,13 @@ namespace BlueDatabase
         {
             Set(Column, Row, Value.ToPlusMinus());
         }
+        public void Set(ColumnItem Column, RowItem Row, bool Value, bool FreezeMode)
+        {
+            Set(Column, Row, Value.ToPlusMinus(), FreezeMode);
+        }
 
-        internal void SystemSet(ColumnItem Column, RowItem Row, string Value)
+
+        internal void SystemSet(ColumnItem Column, RowItem Row, string Value, bool FreezeMode)
         {
             if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
             if (Row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!<br>" + Database.Filename); }
@@ -632,7 +653,7 @@ namespace BlueDatabase
 
             if (Value == _String) { return; }
 
-            Database.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, Column.Key, Row.Key, _String, Value, true);
+            Database.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, Column.Key, Row.Key, _String, Value, true, FreezeMode);
 
 
         }
@@ -926,6 +947,7 @@ namespace BlueDatabase
         {
 
             if (Database.ReadOnly) { return "Datenbank wurde schreibgeschützt geöffnet"; }
+            // if (Database._IsFreezed) { return "Datenbank gerade eingefrohren."; }
 
             if (Column == null) { return "Es ist keine Spalte ausgewählt."; }
             if (Column.Database != Database) { return "Interner Fehler: Bezug der Datenbank zur Spalte ist fehlerhaft."; }
@@ -949,7 +971,7 @@ namespace BlueDatabase
             if (Row != null)
             {
                 if (Row.Database != Database) { return "Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft."; }
-                if (Column != Database.Column.SysLocked() && Row.CellGetBoolean(Database.Column.SysLocked()) && !Column.EditTrotzSperreErlaubt) { return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden."; }
+                if (Column != Database.Column.SysLocked && Row.CellGetBoolean(Database.Column.SysLocked) && !Column.EditTrotzSperreErlaubt) { return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden."; }
             }
             else
             {
@@ -991,7 +1013,10 @@ namespace BlueDatabase
         }
 
 
-
+        public void Set(ColumnItem Column, RowItem Row, int Value, bool FreezeMode)
+        {
+            Set(Column, Row, Value.ToString(), FreezeMode);
+        }
 
         public void Set(ColumnItem Column, RowItem Row, int Value)
         {
@@ -1002,6 +1027,12 @@ namespace BlueDatabase
         {
             Set(Column, Row, Value.ToString());
         }
+
+        public void Set(ColumnItem Column, RowItem Row, double Value, bool FreezeMode)
+        {
+            Set(Column, Row, Value.ToString(), FreezeMode);
+        }
+
 
         public string BestFile(ColumnItem Column, RowItem Row)
         {
@@ -1091,6 +1122,11 @@ namespace BlueDatabase
         public void Set(string ColumnName, RowItem Row, string Value)
         {
             Set(Database.Column[ColumnName], Row, Value);
+        }
+
+        public void Set(string ColumnName, RowItem Row, string Value, bool FreezeMode)
+        {
+            Set(Database.Column[ColumnName], Row, Value, FreezeMode);
         }
 
         public List<string> GetList(string ColumnName, RowItem Row)
@@ -1188,6 +1224,94 @@ namespace BlueDatabase
         {
             var CellKey = KeyOfCell(Column, Row);
             _cells[CellKey].Size = ContentSize;
+        }
+
+        internal void Freeze()
+        {
+            if (_IsFreezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank ist bereits eingefrohren"); }
+            _freezed = new Dictionary<string, string>();
+            _IsFreezed = true;
+        }
+
+        internal void UnFreeze()
+        {
+            if (!_IsFreezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank ist nicht eingefrohren"); }
+
+            var discard = true;
+            var tmp = string.Empty;
+
+            foreach (var thisv in _freezed)
+            {
+                if (_cells.ContainsKey(thisv.Key))
+                {
+                    tmp = _cells[thisv.Key].Value;
+                }
+                else
+                {
+                    tmp = string.Empty;
+                }
+
+                if (tmp != thisv.Value)
+                {
+                    DataOfCellKey(thisv.Key, out var c, out var r);
+                    if (c != Database.Column.SysRowChangeDate && c != Database.Column.SysRowChanger)
+                    {
+                        discard = false;
+                        break;
+                    }
+                }
+            }
+
+
+            if (discard)
+            {
+                //TODO: Die voerherigen Benutzerdaten wiederherstellen
+                
+                //foreach (var thisv in _freezed)
+                //{
+                //    if (_cells.ContainsKey(thisv.Key))
+                //    {
+                //        tmp = _cells[thisv.Key].Value;
+                //    }
+                //    else
+                //    {
+                //        tmp = string.Empty;
+                //    }
+
+                //    if (tmp != thisv.Value)
+                //    {
+                //        DataOfCellKey(thisv.Key, out var c, out var r);
+                //        if (c == Database.Column.SysRowChangeDate || c == Database.Column.SysRowChanger)
+                //        {
+                //           _cells.Add()
+                //            break;
+                //        }
+                //    }
+                //}
+
+                Database.ChangeWorkItems(WorkItem.ItemState.FreezedPending, WorkItem.ItemState.FreezedDiscard);
+
+            }
+            else
+            {
+                Database.ChangeWorkItems(WorkItem.ItemState.FreezedPending, WorkItem.ItemState.Pending);
+            }
+            
+
+
+
+
+        //    Develop.DebugPrint_NichtImplementiert();
+            _IsFreezed = false;
+            _freezed = null;
+
+        }
+
+        internal void AddFreeze(int columnKey, int rowKey, string previousValue)
+        {
+            var c = KeyOfCell(columnKey, rowKey);
+            if (_freezed.ContainsKey(c)) { return; } // der Ursprüngliche Wert ist bereits gesetzt
+            _freezed.Add(c, previousValue);
         }
     }
 }

@@ -33,7 +33,9 @@ namespace BlueDatabase
         internal enum ItemState
         {
             Pending = 2,
-            Undo = 3
+            Undo = 3,
+            FreezedPending = 4,
+            FreezedDiscard = 5
         }
 
         public event EventHandler Changed;
@@ -141,10 +143,19 @@ namespace BlueDatabase
 
         #endregion
 
-        public WorkItem(enDatabaseDataType Comand, int ColKey, int RowKey, string PrevipusValue, string ChangedTo, string User, string Group)
+        public WorkItem(enDatabaseDataType Comand, int ColKey, int RowKey, string PrevipusValue, string ChangedTo, string User, string Group, bool FreezedMode)
         {
 
-            _state = ItemState.Pending;
+            if (FreezedMode)
+            {
+                _state = ItemState.FreezedPending;
+            }
+            else
+            {
+                _state = ItemState.Pending;
+            }
+
+
             this.Comand = Comand;
             _colKey = ColKey;
             _rowKey = RowKey;

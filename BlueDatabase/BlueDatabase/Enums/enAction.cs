@@ -45,7 +45,7 @@ namespace BlueDatabase.Enums
 
         Ist_der_Nutzer = 25,
         Berechnung_ist_True = 26,
-        Ist_Jünger_Als = 27,
+        // Ist_Jünger_Als = 27,
 
 
         Setze_Fehlerhaft = 1001,
@@ -61,7 +61,7 @@ namespace BlueDatabase.Enums
         Substring = 1017,
 
         LinkedCell = 1018,
-        SortiereIntelligent = 1020,
+        //SortiereIntelligent = 1020,
         KopiereAndereSpalten = 1021
 
 

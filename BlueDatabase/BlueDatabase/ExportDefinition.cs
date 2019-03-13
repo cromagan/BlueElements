@@ -570,7 +570,7 @@ namespace BlueDatabase
                     if (worker != null && worker.CancellationPending) { break; }
                     if (Thisrow != null)
                     {
-                        if (Database.Cell.GetDate(Database.Column.SysRowChangeDate(), Thisrow).Subtract(_LastExportTime).TotalSeconds > 0)
+                        if (Database.Cell.GetDate(Database.Column.SysRowChangeDate, Thisrow).Subtract(_LastExportTime).TotalSeconds > 0)
                         {
                             var tmp = DeleteId(Thisrow.Key, worker);
                             if (tmp) { Did = true; }

@@ -184,7 +184,7 @@ namespace BlueDatabase
                 case enAction.Auf_eine_existierende_Datei_verweist: Co = 90; break;
                 case enAction.Auf_einen_existierenden_Pfad_verweist: Co = 100; break;
                 case enAction.Berechnung_ist_True: Co = 110; break;
-                case enAction.Ist_Jünger_Als: Co = 120; break;
+                //case enAction.Ist_Jünger_Als: Co = 120; break;
 
                 //Während der Bearbeitung
                 case enAction.Mache_einen_Vorschlag: Co = 190; break;
@@ -198,7 +198,7 @@ namespace BlueDatabase
                 case enAction.Berechne: Co = 250; break;
                 case enAction.Substring: Co = 260; break;
                 case enAction.LinkedCell: Co = 270; break;
-                case enAction.SortiereIntelligent: Co = 290; break;
+                //case enAction.SortiereIntelligent: Co = 290; break;
                 case enAction.KopiereAndereSpalten: Co = 295; break;
 
                 // Finaler Abschluss
@@ -279,7 +279,7 @@ namespace BlueDatabase
 
 
 
-        public string Execute(RowItem Row, ColumnItem ColumnFocus)
+        public string Execute(RowItem Row, ColumnItem ColumnFocus, bool FreezeMode)
         {
             if (IsBedingung()) { return string.Empty; }
 
@@ -296,7 +296,7 @@ namespace BlueDatabase
                     if (ColumnFocus != null) { return string.Empty; }
                     foreach (var t in Columns)
                     {
-                        Row.CellSet(t, _Text);
+                        Row.CellSet(t, _Text, FreezeMode);
                     }
                     return string.Empty;
 
@@ -308,7 +308,7 @@ namespace BlueDatabase
                     {
                         var w = Row.CellGetList(t);
                         w.AddRange(_Text.Split(new[] { "\r" }, StringSplitOptions.RemoveEmptyEntries));
-                        Row.CellSet(t, w.SortedDistinctList());
+                        Row.CellSet(t, w.SortedDistinctList(), FreezeMode);
                     }
                     return string.Empty;
 
@@ -318,7 +318,7 @@ namespace BlueDatabase
                     {
                         var w = Row.CellGetList(t);
                         w.RemoveString(_Text.Split(new[] { "\r" }, StringSplitOptions.RemoveEmptyEntries), false);
-                        Row.CellSet(t, w.SortedDistinctList());
+                        Row.CellSet(t, w.SortedDistinctList(), FreezeMode);
                     }
                     return string.Empty;
 
@@ -331,7 +331,7 @@ namespace BlueDatabase
                     }
 
                     x.Add(new FilterItem(ColumnFocus, enFilterType.Ungleich_MultiRowIgnorieren, ""));
-                    x.Add(new FilterItem(ColumnFocus.Database.Column.SysCorrect(), enFilterType.Istgleich, true.ToPlusMinus()));
+                    x.Add(new FilterItem(ColumnFocus.Database.Column.SysCorrect, enFilterType.Istgleich, true.ToPlusMinus()));
 
                     var r = ColumnFocus.Database.Row[x];
                     if (r == null) { return string.Empty; }
@@ -351,11 +351,11 @@ namespace BlueDatabase
                         if (t.Format == enDataFormat.Ganzzahl)
                         {
                             erg += 0.000000000000001; // 2,5 rundet sonst auf 2 ab...
-                            Row.CellSet(t, Convert.ToInt32(erg));
+                            Row.CellSet(t, (int)erg, FreezeMode);
                         }
                         else
                         {
-                            Row.CellSet(t, (double)erg);
+                            Row.CellSet(t, (double)erg, FreezeMode);
                         }
                     }
                     return string.Empty;
@@ -370,7 +370,7 @@ namespace BlueDatabase
                         {
                             return "Der Text der Spalte '#Spalte:" + t.Name + "' konnte nicht erstellt werden.";
                         }
-                        Row.CellSet(t, erg2);
+                        Row.CellSet(t, erg2, FreezeMode);
                     }
                     return string.Empty;
 
@@ -403,7 +403,7 @@ namespace BlueDatabase
                     {
                         if (Thisrow.CellGetString(Other) != V)
                         {
-                            Thisrow.CellSet(Other, V);
+                            Thisrow.CellSet(Other, V, FreezeMode);
                             Thisrow.DoAutomatic(false, false);
                         }
 
@@ -455,11 +455,11 @@ namespace BlueDatabase
 
                         if (tarC != null && tarR != null)
                         {
-                            Row.Database.Cell.SetValueBehindLinkedValue(t, Row, CellCollection.KeyOfCell(tarC, tarR));
+                            Row.Database.Cell.SetValueBehindLinkedValue(t, Row, CellCollection.KeyOfCell(tarC, tarR), FreezeMode);
                         }
                         else
                         {
-                            Row.Database.Cell.SetValueBehindLinkedValue(t, Row, "");
+                            Row.Database.Cell.SetValueBehindLinkedValue(t, Row, string.Empty, FreezeMode);
 
                             if (!o[4].FromPlusMinus()) { return string.Empty; }
 
@@ -469,56 +469,56 @@ namespace BlueDatabase
                     return string.Empty;
 
 
-                case enAction.SortiereIntelligent:
-                    //if (ColumnFocus != null) { return string.Empty; }
+                //  case enAction.SortiereIntelligent:
+                //if (ColumnFocus != null) { return string.Empty; }
 
-                    //var ALL = new List<string>();
-                    //var Calc = new List<List<string>>();
-
-
-                    //foreach (var t in Columns)
-                    //{
-                    //    ALL.AddRange(Row.CellGetList(t));
-                    //    Row.CellSet(t, string.Empty);
-                    //    var AllValsOfCol = t.Contents(null, false);
-                    //    AllValsOfCol.QuickSort();
-                    //    Calc.Add(AllValsOfCol);
-                    //}
-                    //ALL.QuickSortAndRemoveDouble();
-
-                    //if (ALL.Count == 0) { return string.Empty; }
+                //var ALL = new List<string>();
+                //var Calc = new List<List<string>>();
 
 
-                    //foreach (var ThisString in ALL)
-                    //{
-                    //    var Max = -1;
-                    //    ColumnItem Col = null;
-                    //    for (var zx = 0 ; zx < Columns.Count ; zx++)
-                    //    {
-                    //        var Curr = 0;
-                    //        foreach (var ThisSerach in Calc[zx])
-                    //        {
-                    //            if (ThisSerach.ToLower() == ThisString.ToLower()) { Curr += 1; }
-                    //        }
-                    //        if (Curr > Max)
-                    //        {
-                    //            Max = Curr;
-                    //            Col = Columns[zx];
-                    //        }
-                    //    }
+                //foreach (var t in Columns)
+                //{
+                //    ALL.AddRange(Row.CellGetList(t));
+                //    Row.CellSet(t, string.Empty,FreezeMode);
+                //    var AllValsOfCol = t.Contents(null, false);
+                //    AllValsOfCol.QuickSort();
+                //    Calc.Add(AllValsOfCol);
+                //}
+                //ALL.QuickSortAndRemoveDouble();
+
+                //if (ALL.Count == 0) { return string.Empty; }
 
 
-
-                    //    var L = Row.CellGetList(Col);
-                    //    L.Add(ThisString);
-                    //    Row.CellSet(Col, L);
-                    //}
+                //foreach (var ThisString in ALL)
+                //{
+                //    var Max = -1;
+                //    ColumnItem Col = null;
+                //    for (var zx = 0 ; zx < Columns.Count ; zx++)
+                //    {
+                //        var Curr = 0;
+                //        foreach (var ThisSerach in Calc[zx])
+                //        {
+                //            if (ThisSerach.ToLower() == ThisString.ToLower()) { Curr += 1; }
+                //        }
+                //        if (Curr > Max)
+                //        {
+                //            Max = Curr;
+                //            Col = Columns[zx];
+                //        }
+                //    }
 
 
 
+                //    var L = Row.CellGetList(Col);
+                //    L.Add(ThisString);
+                //    Row.CellSet(Col, L);
+                //}
 
-                    //return string.Empty;
-                    return "'Sortiere Intelligent' nicht fertig Programmiert";
+
+
+
+                //return string.Empty;
+                //   return "'Sortiere Intelligent' nicht fertig Programmiert";
 
 
                 default:
@@ -668,10 +668,10 @@ namespace BlueDatabase
                     return QuickImage.Get(enImageCode.Information);
                 case enAction.LinkedCell:
                     return QuickImage.Get(enImageCode.Fernglas);
-                case enAction.Ist_Jünger_Als:
-                    return QuickImage.Get(enImageCode.Uhr);
-                case enAction.SortiereIntelligent:
-                    return QuickImage.Get(enImageCode.Lupe);
+                //case enAction.Ist_Jünger_Als:
+                //    return QuickImage.Get(enImageCode.Uhr);
+                //case enAction.SortiereIntelligent:
+                //    return QuickImage.Get(enImageCode.Lupe);
                 case enAction.KopiereAndereSpalten:
                     return QuickImage.Get(enImageCode.Clipboard);
 
@@ -841,10 +841,10 @@ namespace BlueDatabase
                     return enNeededColumns.None;
                 case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
                     return enNeededColumns.OneOrMore;
-                case enAction.Ist_Jünger_Als:
-                    return enNeededColumns.None;
-                case enAction.SortiereIntelligent:
-                    return enNeededColumns.MoreThanOne;
+                //case enAction.Ist_Jünger_Als:
+                //    return enNeededColumns.None;
+                //case enAction.SortiereIntelligent:
+                //    return enNeededColumns.MoreThanOne;
                 case enAction.KopiereAndereSpalten:
                     return enNeededColumns.TwoColumns;
 
@@ -908,10 +908,10 @@ namespace BlueDatabase
                     return enNeededText.OneOrMore;
                 case enAction.Anmerkung:
                     return enNeededText.DoesNotMatter;
-                case enAction.Ist_Jünger_Als:
-                    return enNeededText.OneIntegerValue;
-                case enAction.SortiereIntelligent:
-                    return enNeededText.None;
+                //case enAction.Ist_Jünger_Als:
+                //    return enNeededText.OneIntegerValue;
+                //case enAction.SortiereIntelligent:
+                //    return enNeededText.None;
                 case enAction.KopiereAndereSpalten:
                     return enNeededText.None;
 
@@ -1047,9 +1047,9 @@ namespace BlueDatabase
                     break;
 
 
-                case enAction.Ist_Jünger_Als:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, das Erstelldatum der Zeile jünger ist, als die im Textfeld angegebene Stunden-Zahl.";
-                    break;
+                //case enAction.Ist_Jünger_Als:
+                //    r = r + "Diese Bedingung ist <i>WAHR</i>, das Erstelldatum der Zeile jünger ist, als die im Textfeld angegebene Stunden-Zahl.";
+                //    break;
 
 
                 case enAction.Wert_Dazu:
@@ -1114,9 +1114,9 @@ namespace BlueDatabase
                     MehrSpaltenAllegeamacht = true;
                     break;
 
-                case enAction.SortiereIntelligent:
-                    r = r + "Diese Aktion sortiert die Einträge der gewwählten Spalten automatisch in die richtigen Spalten ein.";
-                    break;
+                //case enAction.SortiereIntelligent:
+                //    r = r + "Diese Aktion sortiert die Einträge der gewwählten Spalten automatisch in die richtigen Spalten ein.";
+                //    break;
 
 
                 case enAction.KopiereAndereSpalten:
@@ -1343,8 +1343,8 @@ namespace BlueDatabase
                 case enAction.Substring:
                     return "ändere den Text der Zelle in " + ColsUnd + " mit einer Formel";
 
-                case enAction.SortiereIntelligent:
-                    return "Teile die Inhalte von " + ColsUnd + " intelligent auf";
+                //case enAction.SortiereIntelligent:
+                //    return "Teile die Inhalte von " + ColsUnd + " intelligent auf";
 
 
                 case enAction.Wert_Dazu:
@@ -1358,8 +1358,8 @@ namespace BlueDatabase
                     return "sperre die Bearbeitung der Zelle " + ColsUnd;
 
 
-                case enAction.Ist_Jünger_Als:
-                    return "die Zeile jünger als " + _Text + " Stunde(n) ist";
+                //case enAction.Ist_Jünger_Als:
+                //    return "die Zeile jünger als " + _Text + " Stunde(n) ist";
 
 
                 case enAction.LinkedCell:
@@ -1507,8 +1507,8 @@ namespace BlueDatabase
                     break;
 
 
-                case enAction.Ist_Jünger_Als:
-                    return DateTime.Now.Subtract(Row.CellGetDate(Row.Database.Column.SysRowCreateDate())).TotalHours < int.Parse(OneValue);
+                //case enAction.Ist_Jünger_Als:
+                //    return DateTime.Now.Subtract(Row.CellGetDate(Row.Database.Column.SysRowCreateDate())).TotalHours < int.Parse(OneValue);
 
 
 
@@ -1617,8 +1617,8 @@ namespace BlueDatabase
                         case enAction.Ist_der_Nutzer:
                             return "sie gehören zu einer bestimmten Benutzergruppe";
 
-                        case enAction.Ist_Jünger_Als:
-                            return "die Zeile ist zu jung";
+                            //case enAction.Ist_Jünger_Als:
+                            //    return "die Zeile ist zu jung";
 
                     }
                     Develop.DebugPrint(_Action);
@@ -1673,8 +1673,8 @@ namespace BlueDatabase
                 case enAction.Sperre_die_Zelle:
                 case enAction.Formatfehler_des_Zelleninhaltes:
                 case enAction.Ist_der_Nutzer:
-                case enAction.Ist_Jünger_Als:
-                case enAction.SortiereIntelligent:
+                //case enAction.Ist_Jünger_Als:
+                //case enAction.SortiereIntelligent:
                 case enAction.KopiereAndereSpalten:
                     break;
 
