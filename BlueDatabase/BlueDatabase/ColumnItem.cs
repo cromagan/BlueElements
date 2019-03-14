@@ -2176,13 +2176,13 @@ namespace BlueDatabase
 
 
 
-                TXT = TXT.Insert(" ", ",", "01234567890, \r");
+                TXT = TXT.Insert(" ", ",", "1234567890, \r");
                 TXT = TXT.Insert(" ", "!", " !?)\r");
                 TXT = TXT.Insert(" ", "?", " !?)\r");
-                TXT = TXT.Insert(" ", ".", " 01234567890.!?/)\r");
+                TXT = TXT.Insert(" ", ".", " 1234567890.!?/)\r");
                 TXT = TXT.Insert(" ", ")", " .;!?\r");
-                TXT = TXT.Insert(" ", ";", " 01234567890\r");
-                TXT = TXT.Insert(" ", ":", "01234567890 \\/\r"); // auch 3:50 Uhr
+                TXT = TXT.Insert(" ", ";", " 1234567890\r");
+                TXT = TXT.Insert(" ", ":", "1234567890 \\/\r"); // auch 3:50 Uhr
 
 
                 // H4= Normaler Text

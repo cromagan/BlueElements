@@ -41,7 +41,6 @@ namespace BlueDatabase
 
 
         private Dictionary<string, string> _freezed = null;
-        private bool _IsFreezed;
 
         #endregion
 
@@ -58,7 +57,7 @@ namespace BlueDatabase
         {
             _cells.Clear();
             _freezed = null;
-            _IsFreezed = false;
+
         }
 
 
@@ -75,6 +74,10 @@ namespace BlueDatabase
 
         #endregion
 
+
+
+
+        public bool Freezed { get; private set; }
 
 
         public void Delete(ColumnItem Column, int RowKey)
@@ -124,10 +127,7 @@ namespace BlueDatabase
             return ColKey + "|" + RowKey;
         }
 
-        public bool IsFreezed()
-        {
-            return _IsFreezed;
-        }
+
 
 
         public void DataOfCellKey(string CellKey, out ColumnItem Column, out RowItem Row)
@@ -1228,14 +1228,14 @@ namespace BlueDatabase
 
         internal void Freeze()
         {
-            if (_IsFreezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank ist bereits eingefrohren"); }
+            if (Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank ist bereits eingefrohren"); }
             _freezed = new Dictionary<string, string>();
-            _IsFreezed = true;
+            Freezed = true;
         }
 
         internal void UnFreeze()
         {
-            if (!_IsFreezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank ist nicht eingefrohren"); }
+            if (!Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank ist nicht eingefrohren"); }
 
             var discard = true;
             var tmp = string.Empty;
@@ -1265,44 +1265,34 @@ namespace BlueDatabase
 
             if (discard)
             {
-                //TODO: Die voerherigen Benutzerdaten wiederherstellen
-                
-                //foreach (var thisv in _freezed)
-                //{
-                //    if (_cells.ContainsKey(thisv.Key))
-                //    {
-                //        tmp = _cells[thisv.Key].Value;
-                //    }
-                //    else
-                //    {
-                //        tmp = string.Empty;
-                //    }
+                foreach (var thisv in _freezed)
+                {
+                    if (_cells.ContainsKey(thisv.Key))
+                    {
 
-                //    if (tmp != thisv.Value)
-                //    {
-                //        DataOfCellKey(thisv.Key, out var c, out var r);
-                //        if (c == Database.Column.SysRowChangeDate || c == Database.Column.SysRowChanger)
-                //        {
-                //           _cells.Add()
-                //            break;
-                //        }
-                //    }
-                //}
 
-                Database.ChangeWorkItems(WorkItem.ItemState.FreezedPending, WorkItem.ItemState.FreezedDiscard);
+                        if (tmp != thisv.Value)
+                        {
+                            DataOfCellKey(thisv.Key, out var c, out var r);
+                            if (c == Database.Column.SysRowChangeDate || c == Database.Column.SysRowChanger)
+                            {
+                                SystemSet(c, r, thisv.Value, true);
+                            }
+                        }
+                    }
 
+                    Database.ChangeWorkItems(enItemState.FreezedPending, enItemState.FreezedDiscard);
+
+                }
             }
             else
             {
-                Database.ChangeWorkItems(WorkItem.ItemState.FreezedPending, WorkItem.ItemState.Pending);
+                Database.ChangeWorkItems(enItemState.FreezedPending, enItemState.Pending);
             }
-            
 
 
-
-
-        //    Develop.DebugPrint_NichtImplementiert();
-            _IsFreezed = false;
+            //    Develop.DebugPrint_NichtImplementiert();
+            Freezed = false;
             _freezed = null;
 
         }

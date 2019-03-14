@@ -56,8 +56,7 @@ namespace BlueControls.Classes_Editor
             ExportFormular.Text = "";
             ExportSpaltenAnsicht.Text = "";
             ExportFilter.Item.Clear();
-            ExportDateien.Item.Clear();
-
+            lsbExportDateien.Item.Clear();
         }
 
         protected override void EnabledAndFillFormula()
@@ -103,8 +102,8 @@ namespace BlueControls.Classes_Editor
             }
 
 
-            ExportDateien.Item.Clear();
-
+            lsbExportDateien.Item.Clear();
+ 
             foreach (var t1 in tmp.BereitsExportiert)
             {
                 if (!string.IsNullOrEmpty(t1))
@@ -113,12 +112,12 @@ namespace BlueControls.Classes_Editor
 
                     if (!FileExists(t[0]))
                     {
-                        ExportDateien.Item.Add(new TextListItem(t1, t[0], QuickImage.Get(enImageCode.Kritisch), true, "0000"));
+                        lsbExportDateien.Item.Add(new TextListItem(t1, t[0], QuickImage.Get(enImageCode.Kritisch), true, "0000"));
                     }
                     else
                     {
                         var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / tmp.AutomatischLöschen).ToHTMLCode(), "");
-                        ExportDateien.Item.Add(new TextListItem(t1, t[0], q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit)));
+                        lsbExportDateien.Item.Add(new TextListItem(t1, t[0], q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit)));
                     }
                 }
             }
@@ -172,10 +171,12 @@ namespace BlueControls.Classes_Editor
             UpdateExport(true);
         }
 
-        private void ExportDateien_ItemRemoving(object sender, ListEventArgs e)
+        private void ExportDateien_RemoveClicked(object sender, ListOfBasicListItemEventArgs e)
         {
+            foreach (var thisItem in e.Items)
+            {
 
-                if (e.Item is ItemCollection.Basics.BasicItem ThisItemBasic )
+                if (thisItem is ItemCollection.Basics.BasicItem ThisItemBasic)
                 {
                     string fil = null;
                     if (ThisItemBasic.Internal().Contains("|"))
@@ -191,6 +192,7 @@ namespace BlueControls.Classes_Editor
 
                     if (FileExists(fil)) { FileOperations.DeleteFile(fil, false); }
                 }
+            }
         }
 
 
@@ -285,7 +287,7 @@ namespace BlueControls.Classes_Editor
             }
 
             tmp.BereitsExportiert.Clear();
-            tmp.BereitsExportiert.AddRange(ExportDateien.Item.ToListOfString());
+            tmp.BereitsExportiert.AddRange(lsbExportDateien.Item.ToListOfString());
 
             OnChanged(tmp);
         }

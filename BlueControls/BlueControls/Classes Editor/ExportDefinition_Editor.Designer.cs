@@ -52,7 +52,7 @@ namespace BlueControls.Classes_Editor
             this.ExportalsBild = new  Button();
             this.Caption29 = new  Caption();
             this.BlueFrame9 = new  GroupBox();
-            this.ExportDateien = new  ListBox();
+            this.lsbExportDateien = new  ListBox();
             this.ExportVerzeichnis = new  TextBox();
             this.Caption23 = new  Caption();
             this.BlueFrame3.SuspendLayout();
@@ -234,26 +234,26 @@ namespace BlueControls.Classes_Editor
             //
             this.BlueFrame9.Anchor = (System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right);
             this.BlueFrame9.CausesValidation = false;
-            this.BlueFrame9.Controls.Add(this.ExportDateien);
+            this.BlueFrame9.Controls.Add(this.lsbExportDateien);
             this.BlueFrame9.Location = new Point(16, 181);
             this.BlueFrame9.Name = "BlueFrame9";
             this.BlueFrame9.Size = new Size(1000, 264);
             this.BlueFrame9.Text = "Bereits exportierte Dateien:";
             //
-            //ExportDateien
+            //lsbExportDateien
             //
-            this.ExportDateien.AddAllowed = enAddType.None;
-            this.ExportDateien.Anchor = (System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right);
-            this.ExportDateien.CheckBehavior = enCheckBehavior.MultiSelection;
-            this.ExportDateien.FilterAllowed = true;
-            this.ExportDateien.Location = new Point(8, 24);
-            this.ExportDateien.Name = "ExportDateien";
-            this.ExportDateien.QuickInfo = "";
-            this.ExportDateien.RemoveAllowed = true;
-            this.ExportDateien.Size = new Size(984, 232);
-            this.ExportDateien.TabIndex = 0;
-            this.ExportDateien.ItemRemoving += new EventHandler<ListEventArgs>(ExportDateien_ItemRemoving);
-            this.ExportDateien.Changed += new EventHandler(ExportDateien_Changed);
+            this.lsbExportDateien.AddAllowed = enAddType.None;
+            this.lsbExportDateien.Anchor = (System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right);
+            this.lsbExportDateien.CheckBehavior = enCheckBehavior.MultiSelection;
+            this.lsbExportDateien.FilterAllowed = true;
+            this.lsbExportDateien.Location = new Point(8, 24);
+            this.lsbExportDateien.Name = "lsbExportDateien";
+            this.lsbExportDateien.QuickInfo = "";
+            this.lsbExportDateien.RemoveAllowed = true;
+            this.lsbExportDateien.Size = new Size(984, 232);
+            this.lsbExportDateien.TabIndex = 0;
+            this.lsbExportDateien.RemoveClicked += new EventHandler<ListOfBasicListItemEventArgs>(ExportDateien_RemoveClicked);
+            this.lsbExportDateien.Changed += new EventHandler(ExportDateien_Changed);
             //
             //ExportVerzeichnis
             //
@@ -307,7 +307,7 @@ namespace BlueControls.Classes_Editor
         private Button ExportalsBild;
         private Caption Caption29;
         private GroupBox BlueFrame9;
-        private ListBox ExportDateien;
+        private ListBox lsbExportDateien;
         private TextBox ExportVerzeichnis;
         private Caption Caption23;
     }

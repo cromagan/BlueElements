@@ -83,6 +83,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Expermimentell = new BlueControls.Controls.TabPage();
             this.btnFremdImport = new BlueControls.Controls.Button();
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
+            this.caption1 = new BlueControls.Controls.Caption();
+            this.txbGlobalScale = new BlueControls.Controls.TextBox();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -368,8 +370,8 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GlobalTab.Controls.Add(this.Tab_Allgemein);
-            this.GlobalTab.Controls.Add(this.Tab_Rechte);
             this.GlobalTab.Controls.Add(this.Tab_Regeln);
+            this.GlobalTab.Controls.Add(this.Tab_Rechte);
             this.GlobalTab.Controls.Add(this.Tab_Binaer);
             this.GlobalTab.Controls.Add(this.Tab_Backup);
             this.GlobalTab.Controls.Add(this.Tab_Sortierung);
@@ -378,12 +380,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);
             this.GlobalTab.Name = "GlobalTab";
-            this.GlobalTab.SelectedIndex = 2;
             this.GlobalTab.Size = new System.Drawing.Size(1047, 645);
             this.GlobalTab.TabIndex = 21;
             // 
             // Tab_Allgemein
             // 
+            this.Tab_Allgemein.Controls.Add(this.txbGlobalScale);
+            this.Tab_Allgemein.Controls.Add(this.caption1);
             this.Tab_Allgemein.Controls.Add(this.cbxVerwaisteDaten);
             this.Tab_Allgemein.Controls.Add(this.capVerwaisteDaten);
             this.Tab_Allgemein.Controls.Add(this.tbxTags);
@@ -445,7 +448,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tbxReloadVerzoegerung.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxReloadVerzoegerung.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxReloadVerzoegerung.Format = BlueBasics.Enums.enDataFormat.Ganzzahl;
-            this.tbxReloadVerzoegerung.Location = new System.Drawing.Point(168, 510);
+            this.tbxReloadVerzoegerung.Location = new System.Drawing.Point(168, 488);
             this.tbxReloadVerzoegerung.Name = "tbxReloadVerzoegerung";
             this.tbxReloadVerzoegerung.Size = new System.Drawing.Size(160, 24);
             this.tbxReloadVerzoegerung.Suffix = "Sek.";
@@ -455,7 +458,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.capJoinTyp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.capJoinTyp.CausesValidation = false;
-            this.capJoinTyp.Location = new System.Drawing.Point(8, 488);
+            this.capJoinTyp.Location = new System.Drawing.Point(8, 466);
             this.capJoinTyp.Name = "capJoinTyp";
             this.capJoinTyp.Size = new System.Drawing.Size(152, 18);
             this.capJoinTyp.Text = "Dopplte Zeilen Verhalten:";
@@ -464,7 +467,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.capReloadVerzoegerung.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.capReloadVerzoegerung.CausesValidation = false;
-            this.capReloadVerzoegerung.Location = new System.Drawing.Point(8, 512);
+            this.capReloadVerzoegerung.Location = new System.Drawing.Point(8, 490);
             this.capReloadVerzoegerung.Name = "capReloadVerzoegerung";
             this.capReloadVerzoegerung.Size = new System.Drawing.Size(136, 18);
             this.capReloadVerzoegerung.Text = "Reload-Verzögerung:";
@@ -486,7 +489,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxJoinTyp.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxJoinTyp.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxJoinTyp.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
-            this.cbxJoinTyp.Location = new System.Drawing.Point(168, 488);
+            this.cbxJoinTyp.Location = new System.Drawing.Point(168, 466);
             this.cbxJoinTyp.Name = "cbxJoinTyp";
             this.cbxJoinTyp.Size = new System.Drawing.Size(160, 24);
             this.cbxJoinTyp.TabIndex = 31;
@@ -652,7 +655,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ExportSets.TabIndex = 0;
             this.ExportSets.Text = "ExportAufgaben";
             this.ExportSets.ItemCheckedChanged += new System.EventHandler(this.ExportSets_Item_CheckedChanged);
-            this.ExportSets.ItemRemoving += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.ExportSets_ItemRemoving);
+            this.ExportSets.RemoveClicked += new System.EventHandler<EventArgs.ListOfBasicListItemEventArgs>(this.ExportSets_RemoveClicked);
             this.ExportSets.AddClicked += new System.EventHandler(this.ExportSets_AddClicked);
             // 
             // Tab_Sortierung
@@ -733,6 +736,25 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capExperimentellWarnung.Name = "capExperimentellWarnung";
             this.capExperimentellWarnung.Size = new System.Drawing.Size(488, 80);
             this.capExperimentellWarnung.Text = resources.GetString("capExperimentellWarnung.Text");
+            // 
+            // caption1
+            // 
+            this.caption1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.caption1.CausesValidation = false;
+            this.caption1.Location = new System.Drawing.Point(8, 512);
+            this.caption1.Name = "caption1";
+            this.caption1.Size = new System.Drawing.Size(144, 18);
+            this.caption1.Text = "Bevorzugtes Skalierung:";
+            // 
+            // txbGlobalScale
+            // 
+            this.txbGlobalScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbGlobalScale.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbGlobalScale.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
+            this.txbGlobalScale.Location = new System.Drawing.Point(168, 512);
+            this.txbGlobalScale.Name = "txbGlobalScale";
+            this.txbGlobalScale.Size = new System.Drawing.Size(160, 24);
+            this.txbGlobalScale.TabIndex = 39;
             // 
             // DatabaseHeadEditor
             // 
@@ -816,5 +838,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Caption capVerwaisteDaten;
         private Caption capUndoAnzahl;
         private TextBox tbxUndoAnzahl;
+        private TextBox txbGlobalScale;
+        private Caption caption1;
     }
 }

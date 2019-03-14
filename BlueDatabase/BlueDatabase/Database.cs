@@ -304,8 +304,10 @@ namespace BlueDatabase
         private string _Caption;
         private enJoinTyp _JoinTyp;
         private enVerwaisteDaten _VerwaisteDaten;
+        private string _ImportFilter;
         private enAnsicht _Ansicht;
         private int _Skin;
+        private double _GlobalScale;
 
         public readonly bool ReadOnly;
         public readonly ListExt<RuleItem> Rules = new ListExt<RuleItem>();
@@ -526,8 +528,9 @@ namespace BlueDatabase
             _JoinTyp = enJoinTyp.Zeilen_verdoppeln;
             _VerwaisteDaten = enVerwaisteDaten.Ignorieren;
             _LoadedVersion = DatabaseVersion;
+            _ImportFilter = string.Empty;
 
-
+            _GlobalScale = 1f;
             _Skin = -1; //enSkin.Unverändert;
             _Ansicht = enAnsicht.Unverändert;
 
@@ -578,6 +581,20 @@ namespace BlueDatabase
             {
                 if (_Skin == value) { return; }
                 AddPending(enDatabaseDataType.Skin, -1, -1, _Skin.ToString(), value.ToString(), true);
+            }
+        }
+
+        [Browsable(false)]
+        public double GlobalScale
+        {
+            get
+            {
+                return _GlobalScale;
+            }
+            set
+            {
+                if (_GlobalScale == value) { return; }
+                AddPending(enDatabaseDataType.GlobalScale, -1, -1, _GlobalScale.ToString(), value.ToString(), true);
             }
         }
 
@@ -713,6 +730,19 @@ namespace BlueDatabase
             {
                 if (_VerwaisteDaten == value) { return; }
                 AddPending(enDatabaseDataType.VerwaisteDaten, -1, -1, Convert.ToInt32(_VerwaisteDaten).ToString(), Convert.ToInt32(value).ToString(), true);
+            }
+        }
+
+        public string ImportFilter
+        {
+            get
+            {
+                return _ImportFilter;
+            }
+            set
+            {
+                if (_ImportFilter == value) { return; }
+                AddPending(enDatabaseDataType.ImportFilter, -1, -1, _ImportFilter, value, true);
             }
         }
 
@@ -1157,7 +1187,7 @@ namespace BlueDatabase
             //lock (Lock_Parsing)
             //{
             if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Doppelter Parse!"); }
-            if (Cell.IsFreezed()) { Develop.DebugPrint(enFehlerArt.Fehler, "FreezedModeAktiv"); }
+            if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren"); }
 
             _isParsing = true;
             Column.ThrowEvents = false;
@@ -1189,8 +1219,8 @@ namespace BlueDatabase
             var OldPendings = new List<WorkItem>();
             foreach (var ThisWork in Works)
             {
-                if (ThisWork.State == WorkItem.ItemState.Pending) { OldPendings.Add(ThisWork); }
-                if (ThisWork.State == WorkItem.ItemState.FreezedPending) { Develop.DebugPrint(enFehlerArt.Fehler, "FreezedPending vorhanden"); }
+                if (ThisWork.State == enItemState.Pending) { OldPendings.Add(ThisWork); }
+                if (ThisWork.State == enItemState.FreezedPending) { Develop.DebugPrint(enFehlerArt.Fehler, "FreezedPending vorhanden"); }
             }
 
             Works.Clear();
@@ -1415,6 +1445,9 @@ namespace BlueDatabase
                 case enDatabaseDataType.Skin:
                     _Skin = int.Parse(Inhalt);
                     break;
+                case enDatabaseDataType.GlobalScale:
+                    _GlobalScale = double.Parse(Inhalt);
+                    break;
                 case enDatabaseDataType.Ansicht:
                     _Ansicht = (enAnsicht)int.Parse(Inhalt);
                     break;
@@ -1494,6 +1527,10 @@ namespace BlueDatabase
                     _VerwaisteDaten = (enVerwaisteDaten)int.Parse(Inhalt);
                     break;
 
+                case enDatabaseDataType.ImportFilter:
+                    _ImportFilter = Inhalt;
+                    break;
+
                 case enDatabaseDataType.FileEncryptionKey:
                     _FileEncryptionKey = Inhalt;
                     break;
@@ -1517,7 +1554,7 @@ namespace BlueDatabase
                     for (var z = 0 ; z <= UIO.GetUpperBound(0) ; z++)
                     {
                         var tmpWork = new WorkItem(UIO[z]);
-                        tmpWork.State = WorkItem.ItemState.Undo; // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Desegen die alten "Pendings" zu Undos ändern.
+                        tmpWork.State = enItemState.Undo; // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Desegen die alten "Pendings" zu Undos ändern.
                         Works.Add(tmpWork);
                     }
                     break;
@@ -1750,7 +1787,7 @@ namespace BlueDatabase
         public string SavebleErrorReason()
         {
             if (ReadOnly) { return "Datenbank wurde schreibgeschützt geöffnet"; }
-            if (Cell.IsFreezed()) { return "Datenbank gerade eingefrohren."; }
+            if (Cell.Freezed) { return "Datenbank gerade eingefroren."; }
 
 
             if (int.Parse(_LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."; }
@@ -1813,7 +1850,7 @@ namespace BlueDatabase
 
             foreach (var ThisWork in Works)
             {
-                if (ThisWork.State == WorkItem.ItemState.Pending) { return true; }
+                if (ThisWork.State == enItemState.Pending) { return true; }
             }
             return false;
         }
@@ -2308,9 +2345,10 @@ namespace BlueDatabase
             SaveToByteList(l, enDatabaseDataType.PermissionGroups_NewRow, PermissionGroups_NewRow.JoinWithCr());
             SaveToByteList(l, enDatabaseDataType.DatenbankAdmin, DatenbankAdmin.JoinWithCr());
             SaveToByteList(l, enDatabaseDataType.Skin, _Skin.ToString());
+            SaveToByteList(l, enDatabaseDataType.GlobalScale, _GlobalScale.ToString());
             SaveToByteList(l, enDatabaseDataType.Ansicht, Convert.ToInt32(_Ansicht).ToString());
             SaveToByteList(l, enDatabaseDataType.ReloadDelaySecond, _ReloadDelaySecond.ToString());
-
+            SaveToByteList(l, enDatabaseDataType.ImportFilter, _ImportFilter);
 
             SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
 
@@ -2396,7 +2434,7 @@ namespace BlueDatabase
             if (!ReloadNeeded()) { return; }
 
             if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, da gerade geparst wird"); }
-            if (Cell.IsFreezed()) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, Datenbankstatus eingefrohren"); }
+            if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, Datenbankstatus eingefroren"); }
 
             //Der View-Code muss vom Table Selbst verwaltet werden. Jede Table/Formula kann ja eine eigene Ansicht haben!
             OnStoreView();
@@ -2538,10 +2576,10 @@ namespace BlueDatabase
         {
             if (ReadOnly) { return false; }
 
-            if (Cell.IsFreezed())
+            if (Cell.Freezed)
             {
                 if (!MUSTRelease) { return false; }
-                Develop.DebugPrint(enFehlerArt.Fehler, "Release unmöglich, Datenbankstatus eingefrohren");
+                Develop.DebugPrint(enFehlerArt.Fehler, "Release unmöglich, Datenbankstatus eingefroren");
             }
             OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
 
@@ -2579,9 +2617,12 @@ namespace BlueDatabase
             {
                 if (Works[z].CellKey == CellKey)
                 {
-                    t = t + Works[z].UndoTextTableMouseOver() + "<br>";
-                }
 
+                    if (Works[z].HistorischRelevant)
+                    {
+                        t = t + Works[z].UndoTextTableMouseOver() + "<br>";
+                    }
+                }
 
             }
             t = t.Trim("<br>");
@@ -2767,14 +2808,14 @@ namespace BlueDatabase
             }
 
 
-            if (Cell.IsFreezed() != FreezedMode)
+            if (Cell.Freezed != FreezedMode)
             {
                 Develop.DebugPrint(enFehlerArt.Fehler, "FreezeMode-Inkonsitent: " + Comand);
                 return;
             }
 
 
-            if (Cell.IsFreezed())
+            if (Cell.Freezed)
             {
                 if (Comand != enDatabaseDataType.ce_Value_withoutSizeData)
                 {
@@ -2804,7 +2845,7 @@ namespace BlueDatabase
             {
                 if (!string.IsNullOrEmpty(Filename))
                 {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Datei ist Readonly, " + Comand);
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Datei ist Readonly, " + Comand + ", " + Filename);
                 }
                 return;
             }
@@ -2829,7 +2870,7 @@ namespace BlueDatabase
         private void ExecutePending()
         {
             if (!_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur während des Parsens möglich"); }
-            if (Cell.IsFreezed()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefrohren!"); }
+            if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren!"); }
             if (!HasPendingChanges()) { return; }
 
 
@@ -2838,7 +2879,7 @@ namespace BlueDatabase
             foreach (var ThisPending in Works)
             {
 
-                if (ThisPending.State == WorkItem.ItemState.Pending)
+                if (ThisPending.State == enItemState.Pending)
                 {
                     if (ThisPending.Comand == enDatabaseDataType.dummyComand_AddRow)
                     {
@@ -2857,7 +2898,7 @@ namespace BlueDatabase
             foreach (var ThisPending in Works)
             {
 
-                if (ThisPending.State == WorkItem.ItemState.Pending)
+                if (ThisPending.State == enItemState.Pending)
                 {
                     switch (ThisPending.Comand)
                     {
@@ -2891,7 +2932,7 @@ namespace BlueDatabase
             // Und nun alles ausführen!
             foreach (var ThisPending in Works)
             {
-                if (ThisPending.State == WorkItem.ItemState.Pending)
+                if (ThisPending.State == enItemState.Pending)
                 {
 
                     if (ThisPending.Comand == enDatabaseDataType.co_Name)
@@ -2905,8 +2946,8 @@ namespace BlueDatabase
 
         private void ExecutePending(WorkItem ThisPendingItem)
         {
-            if (Cell.IsFreezed()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefrohren!"); }
-            if (ThisPendingItem.State == WorkItem.ItemState.Pending)
+            if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren!"); }
+            if (ThisPendingItem.State == enItemState.Pending)
             {
 
                 ColumnItem _Col = null;
@@ -2950,7 +2991,7 @@ namespace BlueDatabase
             foreach (var ThisPending in Works)
             {
 
-                if (ThisPending.State == WorkItem.ItemState.Pending)
+                if (ThisPending.State == enItemState.Pending)
                 {
                     if (ThisPending.RowKey == RowKey && ThisPending.Comand == enDatabaseDataType.ce_Value_withoutSizeData && ThisPending.ColKey == Column[0].Key)
                     {
@@ -2965,12 +3006,12 @@ namespace BlueDatabase
 
         private void ChangeRowKeyInPending(int OldKey, int NewKey)
         {
-            if (Cell.IsFreezed()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefrohren!"); }
+            if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren!"); }
 
             foreach (var ThisPending in Works)
             {
 
-                if (ThisPending.State == WorkItem.ItemState.Pending)
+                if (ThisPending.State == enItemState.Pending)
                 {
 
                     if (ThisPending.RowKey == OldKey)
@@ -3008,11 +3049,11 @@ namespace BlueDatabase
 
         private void ChangeColumnKeyInPending(int OldKey, int NewKey)
         {
-            if (Cell.IsFreezed()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefrohren!"); }
+            if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren!"); }
 
             foreach (var ThisPending in Works)
             {
-                if (ThisPending.State == WorkItem.ItemState.Pending)
+                if (ThisPending.State == enItemState.Pending)
                 {
 
                     if (ThisPending.ColKey == OldKey)
@@ -3054,7 +3095,7 @@ namespace BlueDatabase
 
 
 
-        internal void ChangeWorkItems(WorkItem.ItemState OldState, WorkItem.ItemState NewState)
+        internal void ChangeWorkItems(enItemState OldState, enItemState NewState)
         {
 
             foreach (var ThisWork in Works)
@@ -3435,7 +3476,7 @@ namespace BlueDatabase
                     break;
 
                 case "ChangePendingToUndo":
-                    ChangeWorkItems(WorkItem.ItemState.Pending, WorkItem.ItemState.Undo);
+                    ChangeWorkItems(enItemState.Pending, enItemState.Undo);
                     break;
 
 

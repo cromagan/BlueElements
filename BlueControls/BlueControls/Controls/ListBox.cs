@@ -69,11 +69,24 @@ namespace BlueControls.Controls
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
         public event EventHandler ItemCheckedChanged;
         public event EventHandler<ListEventArgs> ItemAdded;
+
+        /// <summary>
+        /// Wird vor jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
+        /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser. 
+        /// </summary>
         public event EventHandler<ListEventArgs> ItemRemoving;
+        /// <summary>
+        /// Wird nach jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
+        /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser. 
+        /// </summary>
         public event EventHandler ItemRemoved;
         public event EventHandler<BasicListItemEventArgs> ItemDoubleClick;
         public event EventHandler<BasicListItemEventArgs> ItemClick;
         public event EventHandler AddClicked;
+        /// <summary>
+        /// Wird nur ausgelöst, wenn explicit der Button gedrückt wird.
+        /// </summary>
+        public event EventHandler<ListOfBasicListItemEventArgs> RemoveClicked;
         public event EventHandler Changed;
 
         #endregion
@@ -576,7 +589,7 @@ namespace BlueControls.Controls
         private void Minus_Click(object sender, System.EventArgs e)
         {
 
-          //  OnRemoveClicked(new ListOfBasicListItemEventArgs(Item.Checked()));
+            OnRemoveClicked(new ListOfBasicListItemEventArgs(Item.Checked()));
 
             foreach (var ThisItem in Item.Checked())
             {
@@ -586,10 +599,10 @@ namespace BlueControls.Controls
             CheckButtons();
         }
 
-    //    private void OnRemoveClicked(ListOfBasicListItemEventArgs e)
-    //    {
-    //       RemoveClicked?.Invoke(this, e);
-    //   }
+        private void OnRemoveClicked(ListOfBasicListItemEventArgs e)
+        {
+           RemoveClicked?.Invoke(this, e);
+       }
 
 
         public BasicListItem Add_FromFileSystem()

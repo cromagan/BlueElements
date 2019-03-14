@@ -532,7 +532,7 @@ namespace BlueDatabase
                         var x = _BereitsExportiert[n].SplitBy("|");
                         if ((float)DateTime.Now.Subtract(DateTimeParse(x[1])).TotalDays > _AutomatischLöschen)
                         {
-                            if (FileExists(x[0])) { FileOperations.DeleteFile(x[0], false); }
+                            if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         }
                         if (!FileExists(x[0]))
                         {
@@ -589,7 +589,7 @@ namespace BlueDatabase
                         var x = _BereitsExportiert[n].SplitBy("|");
                         if (Database.Row.SearchByKey(int.Parse(x[2])) == null)
                         {
-                            if (FileExists(x[0])) { FileOperations.DeleteFile(x[0], false); }
+                            if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         }
 
 
@@ -715,11 +715,7 @@ namespace BlueDatabase
 
             }
 
-            var SingleFileExport = DateTime.Now.ToString();
-            SingleFileExport = SingleFileExport.Replace(":", "-");
-            SingleFileExport = SingleFileExport.Replace(".", "-");
-            SingleFileExport = SingleFileExport.Replace(" ", "-");
-            SingleFileExport = SavePath + Database.Filename.FileNameWithoutSuffix() + "_" + SingleFileExport;
+            var SingleFileExport = SavePath + Database.Filename.FileNameWithoutSuffix() + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
 
 
             var Added = new List<string>();
@@ -846,7 +842,7 @@ namespace BlueDatabase
                     if (_BereitsExportiert[f].EndsWith("|" + Id))
                     {
                         var x = _BereitsExportiert[f].SplitBy("|");
-                        if (FileExists(x[0])) { FileOperations.DeleteFile(x[0], false); }
+                        if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         if (!FileExists(x[0]))
                         {
                             _BereitsExportiert[f] = string.Empty;

@@ -30,19 +30,13 @@ namespace BlueDatabase
     {
 
 
-        internal enum ItemState
-        {
-            Pending = 2,
-            Undo = 3,
-            FreezedPending = 4,
-            FreezedDiscard = 5
-        }
+
 
         public event EventHandler Changed;
 
         #region  Variablen-Deklarationen 
 
-        private ItemState _state;
+        private enItemState _state;
         private int _colKey;
         private int _rowKey;
         private string _changedTo;
@@ -57,7 +51,7 @@ namespace BlueDatabase
 
         public bool IsParsing { get; private set; }
 
-        internal ItemState State
+        internal enItemState State
         {
             get
             {
@@ -140,6 +134,15 @@ namespace BlueDatabase
 
         }
 
+        public bool HistorischRelevant
+        {
+            get
+            {
+                if (State == enItemState.Pending || State == enItemState.Undo) { return true; }
+                return false;
+            }
+        }
+
 
         #endregion
 
@@ -148,11 +151,11 @@ namespace BlueDatabase
 
             if (FreezedMode)
             {
-                _state = ItemState.FreezedPending;
+                _state = enItemState.FreezedPending;
             }
             else
             {
-                _state = ItemState.Pending;
+                _state = enItemState.Pending;
             }
 
 
@@ -183,7 +186,7 @@ namespace BlueDatabase
                 switch (pair.Key)
                 {
                     case "st":
-                        _state = (ItemState)int.Parse(pair.Value);
+                        _state = (enItemState)int.Parse(pair.Value);
                         break;
 
                     case "co":

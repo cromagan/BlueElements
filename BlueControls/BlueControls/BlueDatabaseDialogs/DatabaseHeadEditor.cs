@@ -117,6 +117,16 @@ namespace BlueControls.BlueDatabaseDialogs
                 _Database.ReloadDelaySecond = 5;
             }
 
+            if (txbGlobalScale.Text.IsDouble())
+            {
+                _Database.GlobalScale = Math.Min(double.Parse(txbGlobalScale.Text), 5);
+                _Database.GlobalScale = Math.Max(0.5, _Database.GlobalScale);
+            }
+            else
+            {
+                _Database.ReloadDelaySecond = 1;
+            }
+
 
             if (tbxTags.Text != _Database.Tags.JoinWithCr())
             {
@@ -267,6 +277,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             txbCaption.Text = _Database.Caption;
             tbxReloadVerzoegerung.Text = _Database.ReloadDelaySecond.ToString();
+            txbGlobalScale.Text = _Database.GlobalScale.ToString();
 
             tbxUndoAnzahl.Text = _Database.UndoCount.ToString();
 
@@ -419,12 +430,15 @@ namespace BlueControls.BlueDatabaseDialogs
         #endregion
 
 
-        private void ExportSets_ItemRemoving(object sender, ListEventArgs e)
+        private void ExportSets_RemoveClicked(object sender, ListOfBasicListItemEventArgs e)
         {
-            if (e.Item is ItemCollection.Basics.BasicItem ThisItemBasic)
+            foreach (var thisitem in e.Items)
             {
-                var tempVar = (ExportDefinition)((ObjectListItem)ThisItemBasic).Obj;
-                tempVar.DeleteAllBackups();
+                if (thisitem is ItemCollection.Basics.BasicItem ThisItemBasic)
+                {
+                    var tempVar = (ExportDefinition)((ObjectListItem)ThisItemBasic).Obj;
+                    tempVar.DeleteAllBackups();
+                }
             }
         }
 
@@ -691,74 +705,93 @@ namespace BlueControls.BlueDatabaseDialogs
             for (var n = 0 ; n < _Database.Works.Count ; n++)
             {
 
-                var cd = _Database.Works[n].CellKey.SplitBy("|");
 
-
-                _Database.Cell.DataOfCellKey(_Database.Works[n].CellKey, out var Col, out var Row);
-
-                var r = x.Row.Add(n.ToString());
-
-                r.CellSet("ColumnKey", cd[0]);
-                r.CellSet("RowKey", cd[1]);
-
-
-
-                if (Col != null)
+                if (_Database.Works[n].HistorischRelevant)
                 {
-                    r.CellSet("ColumnName", Col.Name);
-                    r.CellSet("columnCaption", Col.Caption);
+
+                    var cd = _Database.Works[n].CellKey.SplitBy("|");
+
+
+                    _Database.Cell.DataOfCellKey(_Database.Works[n].CellKey, out var Col, out var Row);
+
+                    var r = x.Row.Add(n.ToString());
+
+                    r.CellSet("ColumnKey", cd[0]);
+                    r.CellSet("RowKey", cd[1]);
+
+
+
+                    if (Col != null)
+                    {
+                        r.CellSet("ColumnName", Col.Name);
+                        r.CellSet("columnCaption", Col.Caption);
+                    }
+
+
+                    if (Col != null && Row != null)
+                    {
+                        r.CellSet("RowFirst", Row.CellFirstString());
+                    }
+
+                    r.CellSet("Aenderer", _Database.Works[n].User);
+                    r.CellSet("AenderZeit", _Database.Works[n].CompareKey());
+
+
+
+                    var Symb = enImageCode.Fragezeichen;
+                    var alt = _Database.Works[n].PreviousValue;
+                    var neu = _Database.Works[n].ChangedTo;
+                    var aenderung = _Database.Works[n].Comand.ToString();
+
+                    switch (_Database.Works[n].Comand)
+                    {
+                        case enDatabaseDataType.ce_UTF8Value_withoutSizeData:
+                        case enDatabaseDataType.ce_Value_withoutSizeData:
+                            Symb = enImageCode.Textfeld;
+                            aenderung = "Wert geändert";
+                            break;
+
+                        case enDatabaseDataType.AutoExport:
+                            aenderung = "Export ausgeführt oder geändert";
+                            alt = "";
+                            neu = "";
+                            Symb = enImageCode.Karton;
+                            break;
+
+                        case enDatabaseDataType.dummyComand_AddRow:
+                            aenderung = "Neue Zeile";
+                            Symb = enImageCode.PlusZeichen;
+                            break;
+
+                        case enDatabaseDataType.Rules:
+                            aenderung = "Regeln verändert";
+                            Symb = enImageCode.Formel;
+                            alt = "";
+                            neu = "";
+                            break;
+
+                        case enDatabaseDataType.ColumnArrangement:
+                            aenderung = "Spalten-Anordnungen verändert";
+                            Symb = enImageCode.Spalte;
+                            alt = "";
+                            neu = "";
+                            break;
+
+                        case enDatabaseDataType.dummyComand_RemoveRow:
+                            aenderung = "Zeile gelöscht";
+                            Symb = enImageCode.MinusZeichen;
+                            break;
+
+
+
+                    }
+                    r.CellSet("Aenderung", aenderung);
+                    r.CellSet("symbol", Symb + "|24");
+
+                    r.CellSet("Wertalt", alt);
+                    r.CellSet("Wertneu", neu);
+
                 }
-
-
-                if (Col != null && Row != null)
-                {
-                    r.CellSet("RowFirst", Row.CellFirstString());
-                }
-
-                r.CellSet("Aenderer", _Database.Works[n].User);
-                r.CellSet("AenderZeit", _Database.Works[n].CompareKey());
-
-
-
-                var Symb = enImageCode.Fragezeichen;
-                var alt = _Database.Works[n].PreviousValue;
-                var neu = _Database.Works[n].ChangedTo;
-                var aenderung = _Database.Works[n].Comand.ToString();
-
-                switch (_Database.Works[n].Comand)
-                {
-                    case enDatabaseDataType.ce_UTF8Value_withoutSizeData:
-                    case enDatabaseDataType.ce_Value_withoutSizeData:
-                        Symb = enImageCode.Textfeld;
-                        aenderung = "Wert geändert";
-                        break;
-
-                    case enDatabaseDataType.AutoExport:
-                        aenderung = "Export ausgeführt oder geändert";
-                        alt = "";
-                        neu = "";
-                        Symb = enImageCode.Karton;
-                        break;
-
-                    case enDatabaseDataType.dummyComand_AddRow:
-                        aenderung = "Neue Zeile";
-                        Symb = enImageCode.PlusZeichen;
-                        break;
-
-                    case enDatabaseDataType.Rules:
-                        aenderung = "Regeln verändert";
-                        Symb = enImageCode.Formel;
-                        alt = "";
-                        neu = "";
-                        break;
-                }
-                r.CellSet("Aenderung", aenderung);
-                r.CellSet("symbol", Symb + "|24");
-
-                r.CellSet("Wertalt", alt);
-                r.CellSet("Wertneu", neu);
-
-
 
             }
             tblUndo.Database = x;

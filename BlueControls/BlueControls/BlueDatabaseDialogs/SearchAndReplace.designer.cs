@@ -104,7 +104,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption3.Location = new Point(8, 16);
             this.Caption3.Name = "Caption3";
             this.Caption3.Size = new Size(176, 48);
-            this.Caption3.Text = "<b><u>Sonder-Werte:</b></u><br>;cr; = Zeilenumbruch";
+            this.Caption3.Text = "<b><u>Sonder-Werte:</b></u><br>;cr; = Zeilenumbruch<br>;tab; = Tabulator";
             this.Caption3.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // ers

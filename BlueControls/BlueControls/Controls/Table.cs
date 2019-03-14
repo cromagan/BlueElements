@@ -3990,7 +3990,7 @@ namespace BlueControls.Controls
             for (var z = _Database.Works.Count - 1 ; z >= 0 ; z--)
             {
 
-                if (_Database.Works[z].CellKey == CellKey)
+                if (_Database.Works[z].CellKey == CellKey && _Database.Works[z].HistorischRelevant)
                 {
                     co += 1;
                     LasNr = z;

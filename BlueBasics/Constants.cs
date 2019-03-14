@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using System;
 
 
 // http://www.carlosag.net/tools/codetranslator/
@@ -40,7 +59,7 @@ namespace BlueBasics
         public const string Char_DateiSonderZeichen = "\\/:*?\"<>|\r\n";
 
 
-        public static readonly string Char_Sonderzeichen = "'()+-=$&´`^%˜°•øØμ@\\/*<>|[]{}#~µ_„\"" + (char)0 + beChrW1 + "\t";
+        public static readonly string Char_Sonderzeichen = "'()+-=$&´`^%˜°•øØμ@\\/*<>|[]{}#~µ_„\"²³€" + (char)0 + beChrW1 + "\t";
         public static readonly string Char_KritischeZeichen = Char_Sonderzeichen + Char_DateiSonderZeichen;
 
         public static readonly string Char_Steuercodes = ((char)0).ToString() + beChrW1 + (char)2 + (char)3 + (char)4 +

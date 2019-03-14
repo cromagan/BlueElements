@@ -115,8 +115,16 @@ namespace BlueDatabase
         private List<string> DoRules()
         {
 
-            Database.Cell.Freeze();
+            var DoUnfreeze = true;
 
+            if (Database.Cell.Freezed)
+            {
+                DoUnfreeze = false;
+            }
+            else
+            {
+                Database.Cell.Freeze();
+            }
 
             // Dann die Aktionen ausführen und fall es einen Fehler gibt, die Spalten ermitteln
             var ColumnAndErrors = new List<string>();
@@ -171,8 +179,7 @@ namespace BlueDatabase
                 ColumnAndErrors.Add(e.FeedbackColumn.Name + "|" + e.Feedback);
             }
 
-
-            Database.Cell.UnFreeze();
+            if (DoUnfreeze) { Database.Cell.UnFreeze(); }
 
             return ColumnAndErrors.SortedDistinctList();
         }
