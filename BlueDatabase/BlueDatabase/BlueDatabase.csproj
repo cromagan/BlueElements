@@ -101,7 +101,7 @@
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="EventArgs\DatabaseSettingsEventHandler.cs" />
     <Compile Include="EventArgs\DatabaseStoppedEventArgs.cs" />
-    <Compile Include="EventArgs\DatabaseChangedEventArgs.cs" />
+    <Compile Include="EventArgs\LoadedEventArgs.cs" />
     <Compile Include="EventArgs\DatabaseGiveBackEventArgs.cs" />
     <Compile Include="EventArgs\DoRowAutomaticEventArgs.cs" />
     <Compile Include="EventArgs\FilterEventArgs.cs" />

@@ -70,6 +70,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Allgemein.cs" />
+    <Compile Include="BlueDatabaseDialogs\Skript.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BlueDatabaseDialogs\Skript.Designer.cs">
+      <DependentUpon>Skript.cs</DependentUpon>
+    </Compile>
     <Compile Include="BlueFont.cs" />
     <Compile Include="Enums\enSorceType.cs" />
     <Compile Include="Enums\enConectorStyle.cs" />
@@ -463,6 +469,9 @@
     <Compile Include="strScreenData.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="BlueDatabaseDialogs\Skript.resx">
+      <DependentUpon>Skript.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\Caption.resx">
       <DependentUpon>Caption.cs</DependentUpon>
       <SubType>Designer</SubType>

@@ -52,7 +52,6 @@ namespace BlueControls.Controls
 
 
         public event EventHandler<RowEventArgs> ShowingRowChanged;
-        public event EventHandler DatabaseChanged;
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
@@ -94,46 +93,39 @@ namespace BlueControls.Controls
             }
             set
             {
-                if (value == null) { value = null; }
-                if (_Database != value)
+                if (_Database == value) { return; }
+
+                if (Editor.Visible) { Editor.Visible = false; }
+                ShowingRowKey = -1; // Wichtig, dass ordenlich Showing-Row to Nothing gesetzt wird, weil dann alle Fokuse durch Enabled elemeniert werden und nachträglich nix mehr ausgelöst wird.
+                Control_Remove_All();
+
+                if (_Database != null)
                 {
+                    _Database.Loaded -= _DatabaseLoaded;
+                    _Database.Row.RowChecked -= _Database_RowChecked;
+                    _Database.Column.ItemRemoved -= _Database_ColumnRemoved;
+                    _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
+                    _Database.StoreView -= _Database_StoreView;
+                    _Database.RowKeyChanged -= _Database_RowKeyChanged;
+                    _Database.RestoreView -= _Database_RestoreView;
 
-                    if (Editor.Visible) { Editor.Visible = false; }
-                    ShowingRowKey = -1; // Wichtig, daß ordenlich Showing-Row to Nothing gesetz wird, weil dann alle Fokuse durch Enabled elemeniert werden und nachträglich nix mehr ausgelöst wird.
-                    Control_Remove_All();
+                    _Database.Release(false); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
 
-                    if (_Database != null)
-                    {
-                        _Database.DatabaseChanged -= _Database_DatabaseChanged;
-                        _Database.Row.RowChecked -= _Database_RowChecked;
-                        _Database.Column.ItemRemoved -= _Database_ColumnRemoved;
-                        _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
-                        _Database.StoreView -= _Database_StoreView;
-                        _Database.RowKeyChanged -= _Database_RowKeyChanged;
-                        _Database.RestoreView -= _Database_RestoreView;
+                }
+                _Database = value;
 
-                        _Database.Release(false); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
-
-                    }
-                    _Database = value;
-
-                    if (_Database != null)
-                    {
-                        _Database.DatabaseChanged += _Database_DatabaseChanged;
-                        _Database.Row.RowChecked += _Database_RowChecked;
-                        _Database.Column.ItemRemoved += _Database_ColumnRemoved;
-                        _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
-                        _Database.StoreView += _Database_StoreView;
-                        _Database.RowKeyChanged += _Database_RowKeyChanged;
-                        _Database.RestoreView += _Database_RestoreView;
-                    }
-
-                    _Database_DatabaseChanged(this, new DatabaseChangedEventArgs(false));
-                    _Inited = false;
+                if (_Database != null)
+                {
+                    _Database.Loaded += _DatabaseLoaded;
+                    _Database.Row.RowChecked += _Database_RowChecked;
+                    _Database.Column.ItemRemoved += _Database_ColumnRemoved;
+                    _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
+                    _Database.StoreView += _Database_StoreView;
+                    _Database.RowKeyChanged += _Database_RowKeyChanged;
+                    _Database.RestoreView += _Database_RestoreView;
                 }
 
-
-
+                _Inited = false;
             }
         }
 
@@ -277,25 +269,19 @@ namespace BlueControls.Controls
         }
 
 
-        private void _Database_DatabaseChanged(object sender, DatabaseChangedEventArgs e)
+        private void _DatabaseLoaded(object sender, LoadedEventArgs e)
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(() => _Database_DatabaseChanged(sender, e)));
+                Invoke(new Action(() => _DatabaseLoaded(sender, e)));
                 return;
             }
-
             if (IsDisposed) { return; }
             _Inited = false;
             _Database?.LoadPicsIntoImageChache();
-            OnDatabaseChanged();
-
         }
 
-        private void OnDatabaseChanged()
-        {
-            DatabaseChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+
 
         private void _Database_RowChecked(object sender, RowCheckedEventArgs e)
         {

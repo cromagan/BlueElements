@@ -1,10 +1,10 @@
 ﻿namespace BlueDatabase.EventArgs
 {
-    public class DatabaseChangedEventArgs : System.EventArgs
+    public class LoadedEventArgs : System.EventArgs
     {
 
 
-        public DatabaseChangedEventArgs(bool OnlyReloaded)
+        public LoadedEventArgs(bool OnlyReloaded)
         {
             this.OnlyReloaded = OnlyReloaded;
         }

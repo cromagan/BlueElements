@@ -98,7 +98,7 @@ namespace BlueDatabase
             //TODO: In AllDatabases Aufnehmen!!!!!
 
             db.LoadFromStream(Stream);
-            db.OnDatabaseChanged(new DatabaseChangedEventArgs(false));
+            db.OnLoaded(new LoadedEventArgs(false));
             return db;
         }
 
@@ -227,7 +227,7 @@ namespace BlueDatabase
             {
                 // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
                 db.LoadFromDisk();
-                db.OnDatabaseChanged(new DatabaseChangedEventArgs(false));
+                db.OnLoaded(new LoadedEventArgs(false));
             }
 
             AllDatabases.Add(db);
@@ -304,7 +304,7 @@ namespace BlueDatabase
         private string _Caption;
         private enJoinTyp _JoinTyp;
         private enVerwaisteDaten _VerwaisteDaten;
-        private string _ImportFilter;
+        private string _ImportScript;
         private enAnsicht _Ansicht;
         private int _Skin;
         private double _GlobalScale;
@@ -379,7 +379,7 @@ namespace BlueDatabase
         #region  Event-Deklarationen 
 
 
-        public event EventHandler<DatabaseChangedEventArgs> DatabaseChanged;
+        public event EventHandler<LoadedEventArgs> Loaded;
         public event EventHandler SortParameterChanged;
         public event EventHandler<DatabaseStoppedEventArgs> ConnectedControlsStopAllWorking;
         public event EventHandler StoreView;
@@ -528,7 +528,7 @@ namespace BlueDatabase
             _JoinTyp = enJoinTyp.Zeilen_verdoppeln;
             _VerwaisteDaten = enVerwaisteDaten.Ignorieren;
             _LoadedVersion = DatabaseVersion;
-            _ImportFilter = string.Empty;
+            _ImportScript = string.Empty;
 
             _GlobalScale = 1f;
             _Skin = -1; //enSkin.Unverändert;
@@ -733,16 +733,16 @@ namespace BlueDatabase
             }
         }
 
-        public string ImportFilter
+        public string ImportScript
         {
             get
             {
-                return _ImportFilter;
+                return _ImportScript;
             }
             set
             {
-                if (_ImportFilter == value) { return; }
-                AddPending(enDatabaseDataType.ImportFilter, -1, -1, _ImportFilter, value, true);
+                if (_ImportScript == value) { return; }
+                AddPending(enDatabaseDataType.ImportScript, -1, -1, _ImportScript, value, true);
             }
         }
 
@@ -1527,8 +1527,8 @@ namespace BlueDatabase
                     _VerwaisteDaten = (enVerwaisteDaten)int.Parse(Inhalt);
                     break;
 
-                case enDatabaseDataType.ImportFilter:
-                    _ImportFilter = Inhalt;
+                case enDatabaseDataType.ImportScript:
+                    _ImportScript = Inhalt;
                     break;
 
                 case enDatabaseDataType.FileEncryptionKey:
@@ -2348,7 +2348,7 @@ namespace BlueDatabase
             SaveToByteList(l, enDatabaseDataType.GlobalScale, _GlobalScale.ToString());
             SaveToByteList(l, enDatabaseDataType.Ansicht, Convert.ToInt32(_Ansicht).ToString());
             SaveToByteList(l, enDatabaseDataType.ReloadDelaySecond, _ReloadDelaySecond.ToString());
-            SaveToByteList(l, enDatabaseDataType.ImportFilter, _ImportFilter);
+            SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
 
             SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
 
@@ -2439,7 +2439,7 @@ namespace BlueDatabase
             //Der View-Code muss vom Table Selbst verwaltet werden. Jede Table/Formula kann ja eine eigene Ansicht haben!
             OnStoreView();
             LoadFromDisk();
-            OnDatabaseChanged(new DatabaseChangedEventArgs(true));
+            OnLoaded(new LoadedEventArgs(true));
             OnStoreReView();
         }
 
@@ -2531,9 +2531,9 @@ namespace BlueDatabase
 
 
 
-        public void OnDatabaseChanged(DatabaseChangedEventArgs e)
+        public void OnLoaded(LoadedEventArgs e)
         {
-            DatabaseChanged?.Invoke(this, e);
+            Loaded?.Invoke(this, e);
         }
 
 

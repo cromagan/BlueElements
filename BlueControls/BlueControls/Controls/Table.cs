@@ -168,65 +168,65 @@ namespace BlueControls.Controls
             }
             set
             {
-
-                if (value == null) { value = null; }
-
                 if (_Database == value) { return; }
+
+                //OnDatabaseChanging();
+
+                CloseAllComponents();
+
+                _MouseOverColumn = null;
+                _MouseOverRow = null;
+                _CursorPosColumn = null;
+                _CursorPosRow = null;
+
+                if (_Database != null)
                 {
-                    CloseAllComponents();
+                    // auch Disposed Datenbanken die Bezüge entfernen!
 
-                    _MouseOverColumn = null;
-                    _MouseOverRow = null;
-                    _CursorPosColumn = null;
-                    _CursorPosRow = null;
+                    _Database.Cell.CellValueChanged -= _Database_CellValueChanged;
+                    _Database.ConnectedControlsStopAllWorking -= _Database_StopAllWorking;
+                    _Database.Loaded -= _Database_DatabaseLoaded;
+                    _Database.StoreView -= _Database_StoreView;
+                    _Database.RowKeyChanged -= _Database_RowKeyChanged;
+                    _Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
+                    _Database.RestoreView -= _Database_RestoreView;
+                    _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
+                    _Database.SortParameterChanged -= _Database_SortParameterChanged;
+                    _Database.Row.RowRemoved -= _Database_RowRemoved;
+                    _Database.Row.RowAdded -= _Database_RowRemoved;
+                    _Database.Column.ItemRemoved -= _Database_ColumnAddedOrDeleted;
+                    _Database.Column.ItemAdded -= _Database_ColumnAddedOrDeleted;
+                    _Database.SavedToDisk -= _Database_SavedToDisk;
+                    _Database.ColumnArrangements.ItemInternalChanged -= ColumnArrangements_ItemInternalChanged;
 
-                    if (_Database != null)
-                    {
-                        // auch Disposed Datenbanken die Bezüge entfernen!
-
-                        _Database.Cell.CellValueChanged -= _Database_CellValueChanged;
-                        _Database.ConnectedControlsStopAllWorking -= _Database_StopAllWorking;
-                        _Database.DatabaseChanged -= _Database_DatabaseChanged;
-                        _Database.StoreView -= _Database_StoreView;
-                        _Database.RowKeyChanged -= _Database_RowKeyChanged;
-                        _Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
-                        _Database.RestoreView -= _Database_RestoreView;
-                        _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
-                        _Database.SortParameterChanged -= _Database_SortParameterChanged;
-                        _Database.Row.RowRemoved -= _Database_RowRemoved;
-                        _Database.Row.RowAdded -= _Database_RowRemoved;
-                        _Database.Column.ItemRemoved -= _Database_ColumnAddedOrDeleted;
-                        _Database.Column.ItemAdded -= _Database_ColumnAddedOrDeleted;
-                        _Database.SavedToDisk -= _Database_SavedToDisk;
-                        _Database.ColumnArrangements.ItemInternalChanged -= ColumnArrangements_ItemInternalChanged;
-
-                        _Database.Release(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
-
-                    }
-                    _Database = value;
-
-                    if (_Database != null)
-                    {
-                        _Database.Cell.CellValueChanged += _Database_CellValueChanged;
-                        _Database.ConnectedControlsStopAllWorking += _Database_StopAllWorking;
-                        _Database.DatabaseChanged += _Database_DatabaseChanged;
-                        _Database.StoreView += _Database_StoreView;
-                        _Database.RowKeyChanged += _Database_RowKeyChanged;
-                        _Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
-                        _Database.RestoreView += _Database_RestoreView;
-                        _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
-                        _Database.SortParameterChanged += _Database_SortParameterChanged;
-                        _Database.Row.RowRemoved += _Database_RowRemoved;
-                        _Database.Row.RowAdded += _Database_RowRemoved;
-                        _Database.Column.ItemAdded += _Database_ColumnAddedOrDeleted;
-                        _Database.Column.ItemRemoved += _Database_ColumnAddedOrDeleted;
-                        _Database.SavedToDisk += _Database_SavedToDisk;
-                        _Database.ColumnArrangements.ItemInternalChanged += ColumnArrangements_ItemInternalChanged;
-                    }
-
-                    _Database_DatabaseChanged(this, new DatabaseChangedEventArgs(false));
+                    _Database.Release(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
 
                 }
+                _Database = value;
+
+                if (_Database != null)
+                {
+                    _Database.Cell.CellValueChanged += _Database_CellValueChanged;
+                    _Database.ConnectedControlsStopAllWorking += _Database_StopAllWorking;
+                    _Database.Loaded += _Database_DatabaseLoaded;
+                    _Database.StoreView += _Database_StoreView;
+                    _Database.RowKeyChanged += _Database_RowKeyChanged;
+                    _Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
+                    _Database.RestoreView += _Database_RestoreView;
+                    _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
+                    _Database.SortParameterChanged += _Database_SortParameterChanged;
+                    _Database.Row.RowRemoved += _Database_RowRemoved;
+                    _Database.Row.RowAdded += _Database_RowRemoved;
+                    _Database.Column.ItemAdded += _Database_ColumnAddedOrDeleted;
+                    _Database.Column.ItemRemoved += _Database_ColumnAddedOrDeleted;
+                    _Database.SavedToDisk += _Database_SavedToDisk;
+                    _Database.ColumnArrangements.ItemInternalChanged += ColumnArrangements_ItemInternalChanged;
+                }
+
+                _Database_DatabaseLoaded(this, new LoadedEventArgs(false));
+
+                OnDatabaseChanged();
+
             }
         }
 
@@ -2171,7 +2171,7 @@ namespace BlueControls.Controls
 
 
 
-        private void _Database_DatabaseChanged(object sender, DatabaseChangedEventArgs e)
+        private void _Database_DatabaseLoaded(object sender, LoadedEventArgs e)
         {
             // Wird auch bei einem Reload ausgeführt.
             // Es kann aber sein, dass eine Ansicht zurückgeholt wurde, und die Werte stimmen. 
@@ -2251,16 +2251,14 @@ namespace BlueControls.Controls
             Invalidate_AllDraw(true);
 
             Invalidate_RowSort();
-            OnDatabaseChanged();
             OnViewChanged();
 
             Invalidate();
         }
 
-        private void OnDatabaseChanged()
-        {
-            DatabaseChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+
+
+
 
         private void CloseAllComponents()
         {
@@ -3414,6 +3412,11 @@ namespace BlueControls.Controls
         private void OnViewChanged()
         {
             ViewChanged?.Invoke(this, System.EventArgs.Empty);
+        }
+
+        private void OnDatabaseChanged()
+        {
+            DatabaseChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
         private void OnColumnArrangementChanged()

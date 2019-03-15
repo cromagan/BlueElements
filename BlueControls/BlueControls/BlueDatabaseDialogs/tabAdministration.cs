@@ -137,12 +137,8 @@ namespace BlueControls.BlueDatabaseDialogs
                             OpenColumnEditor(ThisColumnItem, null);
 
                         }
-
                     }
-
-
                 }
-
             }
 
             UpdateViewControlls();
@@ -501,7 +497,10 @@ namespace BlueControls.BlueDatabaseDialogs
         }
 
 
-
+        /// <summary>
+        /// Löst das DatabaseLoadedEvengt aus, weil es fast einem Neuladen gleichkommt.
+        /// </summary>
+        /// <param name="DB"></param>
         private static void OpenDatabaseHeadEditor(Database DB)
         {
             DB.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
@@ -510,7 +509,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 w.ShowDialog();
             }
-            DB.OnDatabaseChanged(new DatabaseChangedEventArgs(true));
+            DB.OnLoaded(new LoadedEventArgs(true));
         }
 
         private void btnLayouts_Click(object sender, System.EventArgs e)
@@ -641,6 +640,12 @@ namespace BlueControls.BlueDatabaseDialogs
                 ViewItem.ViewType = enViewType.Column;
             }
             Check_OrderButtons();
+        }
+
+        private void btnScripting_Click(object sender, System.EventArgs e)
+        {
+            var o = new Skript(_TableView);
+            o.Show();
         }
     }
 }

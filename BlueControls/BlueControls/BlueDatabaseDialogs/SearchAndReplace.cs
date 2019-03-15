@@ -43,7 +43,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _BlueTable = table;
-            _BlueTable.CursorPosChanged -= CursorPosChanged;
+            _BlueTable.CursorPosChanged += CursorPosChanged;
             CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
 
         }
@@ -280,6 +280,12 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
             ers.Enabled = CanDo;
+        }
+
+        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            _BlueTable.CursorPosChanged -= CursorPosChanged;
         }
 
     }
