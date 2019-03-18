@@ -1215,7 +1215,7 @@ namespace BlueControls
                 case enDataFormat.BildCode:
                     if (ImageCode != null) { return ImageCode; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
                     if (Column.BildCode_ConstantHeight > 0) { Txt = Txt + "|" + Column.BildCode_ConstantHeight; }
-                    ImageCode = QuickImage.Get(Txt);
+                    ImageCode = QuickImage.Get(Column.ImagePrefix + Txt + Column.ImageSuffix);
                     if (ImageCode.IsError)
                     {
                         if (Column.BildCode_ImageNotFound != enImageNotFound.ShowErrorPic) { return null; }

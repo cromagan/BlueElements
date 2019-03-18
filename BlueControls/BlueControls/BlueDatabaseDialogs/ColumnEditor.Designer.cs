@@ -128,6 +128,11 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnFehlerWennUnsichtbare = new BlueControls.Controls.Button();
             this.btnFormatFehler = new BlueControls.Controls.Button();
             this.btnFehlerWennLeer = new BlueControls.Controls.Button();
+            this.grbBildCode = new BlueControls.Controls.GroupBox();
+            this.caption5 = new BlueControls.Controls.Caption();
+            this.caption7 = new BlueControls.Controls.Caption();
+            this.txbBildPrefix = new BlueControls.Controls.TextBox();
+            this.txbBildSuffix = new BlueControls.Controls.TextBox();
             this.tabDesign.SuspendLayout();
             this.tabRechte.SuspendLayout();
             this.tabAutoBearbeitung.SuspendLayout();
@@ -138,6 +143,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabControl.SuspendLayout();
             this.tabRegeln.SuspendLayout();
             this.gpxVerlinkteZellen.SuspendLayout();
+            this.grbBildCode.SuspendLayout();
             this.SuspendLayout();
             // 
             // ColorDia
@@ -147,6 +153,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabDesign
             // 
+            this.tabDesign.Controls.Add(this.grbBildCode);
             this.tabDesign.Controls.Add(this.capUeberschrift3);
             this.tabDesign.Controls.Add(this.capUeberschrift2);
             this.tabDesign.Controls.Add(this.capUeberschrift1);
@@ -155,10 +162,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabDesign.Controls.Add(this.txbUeberschift1);
             this.tabDesign.Controls.Add(this.txbReplacer);
             this.tabDesign.Controls.Add(this.capReplacer);
-            this.tabDesign.Controls.Add(this.cbxBildCodeImageNotfound);
-            this.tabDesign.Controls.Add(this.capBildCodeImageNotfound);
-            this.tabDesign.Controls.Add(this.capBildCodeConstHeight);
-            this.tabDesign.Controls.Add(this.txbBildCodeConstHeight);
             this.tabDesign.Controls.Add(this.btnEinzeiligDarstellen);
             this.tabDesign.Controls.Add(this.capEinheit);
             this.tabDesign.Controls.Add(this.cbxEinheit);
@@ -177,7 +180,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabDesign.Location = new System.Drawing.Point(4, 25);
             this.tabDesign.Name = "tabDesign";
             this.tabDesign.Padding = new System.Windows.Forms.Padding(3);
-            this.tabDesign.Size = new System.Drawing.Size(740, 404);
+            this.tabDesign.Size = new System.Drawing.Size(912, 487);
             this.tabDesign.TabIndex = 0;
             this.tabDesign.Text = "Design";
             this.tabDesign.UseVisualStyleBackColor = true;
@@ -247,7 +250,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbReplacer.Name = "txbReplacer";
             this.txbReplacer.QuickInfo = "Texte in der Spalte werden mit diesen Angaben <b>optisch</b> ersetzt.<br><i><u>Be" +
     "ispiel:</i></u>Beispiel-Text|Bsp.-Txt";
-            this.txbReplacer.Size = new System.Drawing.Size(292, 162);
+            this.txbReplacer.Size = new System.Drawing.Size(464, 245);
             this.txbReplacer.SpellChecking = true;
             this.txbReplacer.TabIndex = 35;
             // 
@@ -264,7 +267,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxBildCodeImageNotfound.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxBildCodeImageNotfound.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxBildCodeImageNotfound.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
-            this.cbxBildCodeImageNotfound.Location = new System.Drawing.Point(200, 360);
+            this.cbxBildCodeImageNotfound.Location = new System.Drawing.Point(200, 40);
             this.cbxBildCodeImageNotfound.Name = "cbxBildCodeImageNotfound";
             this.cbxBildCodeImageNotfound.Size = new System.Drawing.Size(160, 24);
             this.cbxBildCodeImageNotfound.TabIndex = 34;
@@ -272,7 +275,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // capBildCodeImageNotfound
             // 
             this.capBildCodeImageNotfound.CausesValidation = false;
-            this.capBildCodeImageNotfound.Location = new System.Drawing.Point(8, 360);
+            this.capBildCodeImageNotfound.Location = new System.Drawing.Point(8, 40);
             this.capBildCodeImageNotfound.Name = "capBildCodeImageNotfound";
             this.capBildCodeImageNotfound.Size = new System.Drawing.Size(184, 16);
             this.capBildCodeImageNotfound.Text = "Verhalten bei Fehler-Bildern:";
@@ -280,7 +283,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // capBildCodeConstHeight
             // 
             this.capBildCodeConstHeight.CausesValidation = false;
-            this.capBildCodeConstHeight.Location = new System.Drawing.Point(8, 320);
+            this.capBildCodeConstHeight.Location = new System.Drawing.Point(8, 16);
             this.capBildCodeConstHeight.Name = "capBildCodeConstHeight";
             this.capBildCodeConstHeight.Size = new System.Drawing.Size(184, 16);
             this.capBildCodeConstHeight.Text = "Konstante Höhe bei Bildern:";
@@ -289,7 +292,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.txbBildCodeConstHeight.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbBildCodeConstHeight.Format = BlueBasics.Enums.enDataFormat.Ganzzahl;
-            this.txbBildCodeConstHeight.Location = new System.Drawing.Point(200, 320);
+            this.txbBildCodeConstHeight.Location = new System.Drawing.Point(200, 16);
             this.txbBildCodeConstHeight.Name = "txbBildCodeConstHeight";
             this.txbBildCodeConstHeight.Size = new System.Drawing.Size(64, 24);
             this.txbBildCodeConstHeight.Suffix = "Pixel";
@@ -299,7 +302,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnEinzeiligDarstellen
             // 
             this.btnEinzeiligDarstellen.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnEinzeiligDarstellen.Location = new System.Drawing.Point(8, 288);
+            this.btnEinzeiligDarstellen.Location = new System.Drawing.Point(8, 272);
             this.btnEinzeiligDarstellen.Name = "btnEinzeiligDarstellen";
             this.btnEinzeiligDarstellen.Size = new System.Drawing.Size(296, 24);
             this.btnEinzeiligDarstellen.TabIndex = 29;
@@ -326,15 +329,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.picCaptionImage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.picCaptionImage.CausesValidation = false;
-            this.picCaptionImage.Location = new System.Drawing.Point(440, 24);
+            this.picCaptionImage.Location = new System.Drawing.Point(536, 24);
             this.picCaptionImage.MaxSize = 300;
             this.picCaptionImage.Name = "picCaptionImage";
-            this.picCaptionImage.Size = new System.Drawing.Size(292, 184);
+            this.picCaptionImage.Size = new System.Drawing.Size(368, 184);
             // 
             // Caption6
             // 
             this.Caption6.CausesValidation = false;
-            this.Caption6.Location = new System.Drawing.Point(440, 8);
+            this.Caption6.Location = new System.Drawing.Point(536, 8);
             this.Caption6.Name = "Caption6";
             this.Caption6.Size = new System.Drawing.Size(216, 24);
             this.Caption6.Text = "Spaltenbild:";
@@ -343,7 +346,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnKompakteAnzeige
             // 
             this.btnKompakteAnzeige.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnKompakteAnzeige.Location = new System.Drawing.Point(8, 264);
+            this.btnKompakteAnzeige.Location = new System.Drawing.Point(8, 248);
             this.btnKompakteAnzeige.Name = "btnKompakteAnzeige";
             this.btnKompakteAnzeige.Size = new System.Drawing.Size(296, 24);
             this.btnKompakteAnzeige.TabIndex = 28;
@@ -383,7 +386,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxRandRechts.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxRandRechts.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxRandRechts.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
-            this.cbxRandRechts.Location = new System.Drawing.Point(248, 136);
+            this.cbxRandRechts.Location = new System.Drawing.Point(336, 96);
             this.cbxRandRechts.Name = "cbxRandRechts";
             this.cbxRandRechts.Size = new System.Drawing.Size(184, 24);
             this.cbxRandRechts.TabIndex = 25;
@@ -402,7 +405,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxRandLinks.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxRandLinks.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxRandLinks.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
-            this.cbxRandLinks.Location = new System.Drawing.Point(248, 88);
+            this.cbxRandLinks.Location = new System.Drawing.Point(336, 72);
             this.cbxRandLinks.Name = "cbxRandLinks";
             this.cbxRandLinks.Size = new System.Drawing.Size(184, 24);
             this.cbxRandLinks.TabIndex = 24;
@@ -419,7 +422,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // Caption4
             // 
             this.Caption4.CausesValidation = false;
-            this.Caption4.Location = new System.Drawing.Point(248, 120);
+            this.Caption4.Location = new System.Drawing.Point(248, 96);
             this.Caption4.Name = "Caption4";
             this.Caption4.Size = new System.Drawing.Size(88, 16);
             this.Caption4.Text = "Rechter Rand:";
@@ -930,7 +933,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BlueFrame1.Controls.Add(this.tbxCaption);
             this.BlueFrame1.Location = new System.Drawing.Point(8, 8);
             this.BlueFrame1.Name = "BlueFrame1";
-            this.BlueFrame1.Size = new System.Drawing.Size(744, 104);
+            this.BlueFrame1.Size = new System.Drawing.Size(916, 104);
             this.BlueFrame1.Text = "Allgemein";
             // 
             // capInfo
@@ -977,13 +980,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tbxCaption.Location = new System.Drawing.Point(312, 32);
             this.tbxCaption.MultiLine = true;
             this.tbxCaption.Name = "tbxCaption";
-            this.tbxCaption.Size = new System.Drawing.Size(428, 64);
+            this.tbxCaption.Size = new System.Drawing.Size(600, 64);
             this.tbxCaption.TabIndex = 2;
             // 
             // btnVor
             // 
             this.btnVor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnVor.Location = new System.Drawing.Point(524, 560);
+            this.btnVor.Location = new System.Drawing.Point(696, 643);
             this.btnVor.Name = "btnVor";
             this.btnVor.Size = new System.Drawing.Size(72, 24);
             this.btnVor.TabIndex = 5;
@@ -993,7 +996,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnZurueck
             // 
             this.btnZurueck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnZurueck.Location = new System.Drawing.Point(420, 560);
+            this.btnZurueck.Location = new System.Drawing.Point(592, 643);
             this.btnZurueck.Name = "btnZurueck";
             this.btnZurueck.Size = new System.Drawing.Size(72, 24);
             this.btnZurueck.TabIndex = 4;
@@ -1003,7 +1006,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(676, 560);
+            this.btnOk.Location = new System.Drawing.Point(848, 643);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(72, 24);
             this.btnOk.TabIndex = 6;
@@ -1025,7 +1028,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabControl.HotTrack = true;
             this.tabControl.Location = new System.Drawing.Point(0, 120);
             this.tabControl.Name = "tabControl";
-            this.tabControl.Size = new System.Drawing.Size(748, 433);
+            this.tabControl.Size = new System.Drawing.Size(920, 516);
             this.tabControl.TabIndex = 15;
             this.tabControl.SelectedIndexChanged += new System.EventHandler(this.tabControl_SelectedIndexChanged);
             // 
@@ -1199,9 +1202,59 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnFehlerWennLeer.TabIndex = 0;
             this.btnFehlerWennLeer.Text = "Wenn die Zelle dieser Spalte leer ist, gib einen Fehler aus";
             // 
+            // grbBildCode
+            // 
+            this.grbBildCode.CausesValidation = false;
+            this.grbBildCode.Controls.Add(this.txbBildSuffix);
+            this.grbBildCode.Controls.Add(this.txbBildPrefix);
+            this.grbBildCode.Controls.Add(this.caption7);
+            this.grbBildCode.Controls.Add(this.caption5);
+            this.grbBildCode.Controls.Add(this.cbxBildCodeImageNotfound);
+            this.grbBildCode.Controls.Add(this.capBildCodeImageNotfound);
+            this.grbBildCode.Controls.Add(this.capBildCodeConstHeight);
+            this.grbBildCode.Controls.Add(this.txbBildCodeConstHeight);
+            this.grbBildCode.Location = new System.Drawing.Point(8, 304);
+            this.grbBildCode.Name = "grbBildCode";
+            this.grbBildCode.Size = new System.Drawing.Size(416, 176);
+            this.grbBildCode.Text = "Fomat: BildCode";
+            // 
+            // caption5
+            // 
+            this.caption5.CausesValidation = false;
+            this.caption5.Location = new System.Drawing.Point(8, 96);
+            this.caption5.Name = "caption5";
+            this.caption5.Size = new System.Drawing.Size(176, 16);
+            this.caption5.Text = "Bild-Suffix";
+            // 
+            // caption7
+            // 
+            this.caption7.CausesValidation = false;
+            this.caption7.Location = new System.Drawing.Point(8, 72);
+            this.caption7.Name = "caption7";
+            this.caption7.Size = new System.Drawing.Size(176, 16);
+            this.caption7.Text = "Bild-Präfix";
+            // 
+            // txbBildPrefix
+            // 
+            this.txbBildPrefix.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbBildPrefix.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.txbBildPrefix.Location = new System.Drawing.Point(200, 72);
+            this.txbBildPrefix.Name = "txbBildPrefix";
+            this.txbBildPrefix.Size = new System.Drawing.Size(208, 24);
+            this.txbBildPrefix.TabIndex = 36;
+            // 
+            // txbBildSuffix
+            // 
+            this.txbBildSuffix.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbBildSuffix.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.txbBildSuffix.Location = new System.Drawing.Point(200, 96);
+            this.txbBildSuffix.Name = "txbBildSuffix";
+            this.txbBildSuffix.Size = new System.Drawing.Size(208, 24);
+            this.txbBildSuffix.TabIndex = 37;
+            // 
             // ColumnEditor
             // 
-            this.ClientSize = new System.Drawing.Size(754, 588);
+            this.ClientSize = new System.Drawing.Size(926, 671);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.BlueFrame1);
             this.Controls.Add(this.btnVor);
@@ -1221,6 +1274,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabControl.ResumeLayout(false);
             this.tabRegeln.ResumeLayout(false);
             this.gpxVerlinkteZellen.ResumeLayout(false);
+            this.grbBildCode.ResumeLayout(false);
             this.ResumeLayout(false);
 
 			}
@@ -1324,5 +1378,10 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbUeberschift2;
         private TextBox txbUeberschift1;
         private Button btnFehlerbeiFehlenderZelle;
+        private GroupBox grbBildCode;
+        private TextBox txbBildSuffix;
+        private TextBox txbBildPrefix;
+        private Caption caption7;
+        private Caption caption5;
     }
 	}

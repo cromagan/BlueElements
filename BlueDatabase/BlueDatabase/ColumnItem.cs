@@ -86,6 +86,8 @@ namespace BlueDatabase
         private enImageNotFound _BildCode_ImageNotFound;
         private int _BildCode_ConstantHeight;
 
+        private string _ImagePrefix;
+        private string _ImageSuffix;
 
         private string _BestFile_StandardSuffix;
         private string _BestFile_StandardFolder;
@@ -169,6 +171,8 @@ namespace BlueDatabase
             _LinkedDatabaseFile = string.Empty;
             _BildCode_ImageNotFound = enImageNotFound.ShowErrorPic;
             _BildCode_ConstantHeight = 0;
+            _ImagePrefix = string.Empty;
+            _ImageSuffix = string.Empty;
             _BestFile_StandardSuffix = string.Empty;
             _BestFile_StandardFolder = string.Empty;
             _UcaseNamesSortedByLenght = null;
@@ -246,6 +250,10 @@ namespace BlueDatabase
             BildCode_ConstantHeight = Source.BildCode_ConstantHeight;
             BestFile_StandardSuffix = Source.BestFile_StandardSuffix;
             BestFile_StandardFolder = Source.BestFile_StandardFolder;
+
+            ImagePrefix = Source.ImagePrefix;
+            ImageSuffix = Source.ImageSuffix;
+
         }
 
 
@@ -254,9 +262,20 @@ namespace BlueDatabase
 
         public ColumnItem(Database database, string columninternalname, bool addtodatabase) : this(database, -1, columninternalname, addtodatabase) { }
 
+
+        public ColumnItem(Database database, string columninternalname, string caption, string suffix, enDataFormat format, bool addtodatabase) : this(database, -1, columninternalname, addtodatabase)
+        {
+            Caption = caption;
+            Suffix = suffix;
+            Format = format;
+
+            MultiLine = false;
+            TextBearbeitungErlaubt = true;
+        }
+
         public ColumnItem(Database database, int columnkey, string columninternalname, bool addtodatabase)
         {
-          
+
 
             if (!addtodatabase)
             {
@@ -532,7 +551,7 @@ namespace BlueDatabase
             var tmp = Contents(null);
 
 
-            for (var Z = 0 ; Z < tmp.Count ; Z++)
+            for (var Z = 0; Z < tmp.Count; Z++)
             {
                 tmp[Z] = tmp[Z].Length.Nummer(10) + tmp[Z].ToUpper();
             }
@@ -540,7 +559,7 @@ namespace BlueDatabase
 
             tmp.Sort();
 
-            for (var Z = 0 ; Z < tmp.Count ; Z++)
+            for (var Z = 0; Z < tmp.Count; Z++)
             {
                 tmp[Z] = tmp[Z].Substring(10);
             }
@@ -563,6 +582,40 @@ namespace BlueDatabase
             {
                 if (_Suffix == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_Suffix, this, _Suffix, value, true);
+                OnChanged();
+            }
+        }
+
+
+        /// <summary>
+        /// Bei dem Datenformat "BildCode" wird dieser String bei der Bildanzeige hinzugefügt
+        /// </summary>
+        public string ImagePrefix
+        {
+            get
+            {
+                return _ImagePrefix;
+            }
+            set
+            {
+                if (_ImagePrefix == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_ImagePrefix, this, _ImagePrefix, value, true);
+                OnChanged();
+            }
+        }
+        /// <summary>
+        /// Bei dem Datenformat "BildCode" wird dieser String bei der Bildanzeige hinzugefügt
+        /// </summary>
+        public string ImageSuffix
+        {
+            get
+            {
+                return _ImageSuffix;
+            }
+            set
+            {
+                if (_ImagePrefix == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_ImageSuffix, this, _ImageSuffix, value, true);
                 OnChanged();
             }
         }
@@ -1154,7 +1207,7 @@ namespace BlueDatabase
             var el = new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly, Database._PasswordSub, Database._GenerateLayout, Database._RenameColumnInLayout);
             Database.OnLoadingLinkedDatabase(el);
 
-            TMP_LinkedDatabase = Database.Load(el.Filenname , el.ReadOnly, el.PasswordSub, el.GenenerateLayout, el.RenameColumnInLayout);
+            TMP_LinkedDatabase = Database.Load(el.Filenname, el.ReadOnly, el.PasswordSub, el.GenenerateLayout, el.RenameColumnInLayout);
             if (_TMP_LinkedDatabase != null) { _TMP_LinkedDatabase.UserGroup = Database.UserGroup; }
             return _TMP_LinkedDatabase;
         }
@@ -1393,6 +1446,13 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_BildCode_ConstantHeight:
                     _BildCode_ConstantHeight = int.Parse(Wert);
                     break;
+                case enDatabaseDataType.co_ImagePrefix:
+                    _ImagePrefix = Wert;
+                    break;
+                case enDatabaseDataType.co_ImageSuffix:
+                    _ImageSuffix = Wert;
+                    break;
+
                 //case (enDatabaseDataType)172:
                 //    // TODO: FontSclae, Löschen
 
@@ -1692,6 +1752,8 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_BestFile_StandardSuffix, _BestFile_StandardSuffix, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ConstantHeight, _BildCode_ConstantHeight.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ImageNotFound, ((int)_BildCode_ImageNotFound).ToString(), Key);
+            //Database.SaveToByteList(l, enDatabaseDataType.co_ImagePrefix, _ImagePrefix, Key);
+            //Database.SaveToByteList(l, enDatabaseDataType.co_ImageSuffix, _ImageSuffix, Key);
 
             //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
             Database.SaveToByteList(l, enDatabaseDataType.co_Identifier, _Identifier, Key);
@@ -1707,7 +1769,7 @@ namespace BlueDatabase
 
             if (UserEditDialogTypeInFormula(_EditType)) { return; }// Alles OK!
 
-            for (var z = 0 ; z <= 999 ; z++)
+            for (var z = 0; z <= 999; z++)
             {
                 var w = (enEditTypeFormula)z;
                 if (w.ToString() != z.ToString())

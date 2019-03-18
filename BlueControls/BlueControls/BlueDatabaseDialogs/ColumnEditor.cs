@@ -156,6 +156,10 @@ namespace BlueControls.BlueDatabaseDialogs
             txbUeberschift2.Text = _Column.Ueberschrift2;
             txbUeberschift3.Text = _Column.Ueberschrift3;
 
+
+            txbBildSuffix.Text = _Column.ImageSuffix;
+            txbBildPrefix.Text = _Column.ImagePrefix;
+
             btnKompakteAnzeige.Checked = _Column.CompactView;
             btnLogUndo.Checked = _Column.ShowUndo;
             btnSpellChecking.Checked = _Column.SpellCheckingEnabled;
@@ -211,9 +215,9 @@ namespace BlueControls.BlueDatabaseDialogs
             if (R != null && _Column.Format == enDataFormat.LinkedCell)
             {
 
-               // Info:o[5] ist ein Dummy, der immer auf  gesetzt wird. Damit werden beim Split die Dimenionen repariert.
-               // o[4] ist neu dazu gekommen, und nicht immer gesetzt. Da es vorher der Dummy war, ist es immer plus, was gut so ist, da das die vorherige standard einstellung war.
-                var o = (R.Actions[0].Text + "\r+") .SplitByCR();
+                // Info:o[5] ist ein Dummy, der immer auf  gesetzt wird. Damit werden beim Split die Dimenionen repariert.
+                // o[4] ist neu dazu gekommen, und nicht immer gesetzt. Da es vorher der Dummy war, ist es immer plus, was gut so ist, da das die vorherige standard einstellung war.
+                var o = (R.Actions[0].Text + "\r+").SplitByCR();
 
                 if (o.Length > 4)
                 {
@@ -365,6 +369,10 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.Ueberschrift1 = txbUeberschift1.Text;
             _Column.Ueberschrift2 = txbUeberschift2.Text;
             _Column.Ueberschrift3 = txbUeberschift3.Text;
+
+            _Column.ImageSuffix = txbBildSuffix.Text;
+            _Column.ImagePrefix = txbBildPrefix.Text;
+
 
             var NewTags = tbxTags.Text.SplitByCRToList();
             if (NewTags.IsDifferentTo(_Column.Tags))
