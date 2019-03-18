@@ -799,6 +799,7 @@ namespace BlueControls
             var tmpText = ColumnItem.Draw_FormatedText_TextOf(Txt, ImageCode, column, Style);
             vAlign = Draw_FormatedText_Alignment(column, tmpText, tmpImageCode, vAlign);
 
+            if (!string.IsNullOrEmpty(column.Prefix)) { tmpText = column.Prefix + " " + tmpText; }
             if (!string.IsNullOrEmpty(column.Suffix)) { tmpText = tmpText + " " + column.Suffix; }
 
             Draw_FormatedText(GR, tmpText, tmpImageCode, vAlign, FitInRect, Child, DeleteBack, F);
@@ -924,7 +925,7 @@ namespace BlueControls
 
         public Size FormatedText_NeededSize(ColumnItem Column, string txt, QuickImage ImageCode, BlueFont F, enShortenStyle Style)
         {
-
+            if (!string.IsNullOrEmpty(Column.Prefix)) { txt = Column.Prefix + " " + txt; }
             if (!string.IsNullOrEmpty(Column.Suffix)) { txt = txt + " " + Column.Suffix; }
 
             var tmpImageCode = Draw_FormatedText_PicOf(txt, ImageCode, Column);
@@ -975,18 +976,12 @@ namespace BlueControls
         }
         internal BlueFont GetBlueFont(int _Design, enStates vState, RowItem RowOfStyle, int Stufe)
         {
-
-
             if (_Design > 10000)
             {
                 return GenericControl.Skin.GetBlueFont((PadStyles)_Design, RowOfStyle, Stufe);
             }
 
             return GenericControl.Skin.GetBlueFont((enDesign)_Design, vState, Stufe);
-
-
-
-
         }
 
         internal BlueFont GetBlueFont(PadStyles vDesign, RowItem RowOfStyle, int Stufe)
@@ -1215,7 +1210,7 @@ namespace BlueControls
                 case enDataFormat.BildCode:
                     if (ImageCode != null) { return ImageCode; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
                     if (Column.BildCode_ConstantHeight > 0) { Txt = Txt + "|" + Column.BildCode_ConstantHeight; }
-                    ImageCode = QuickImage.Get(Column.ImagePrefix + Txt + Column.ImageSuffix);
+                    ImageCode = QuickImage.Get(Column.Prefix + Txt + Column.Suffix);
                     if (ImageCode.IsError)
                     {
                         if (Column.BildCode_ImageNotFound != enImageNotFound.ShowErrorPic) { return null; }

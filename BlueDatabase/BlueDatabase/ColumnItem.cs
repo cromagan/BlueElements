@@ -86,8 +86,7 @@ namespace BlueDatabase
         private enImageNotFound _BildCode_ImageNotFound;
         private int _BildCode_ConstantHeight;
 
-        private string _ImagePrefix;
-        private string _ImageSuffix;
+        private string _Prefix;
 
         private string _BestFile_StandardSuffix;
         private string _BestFile_StandardFolder;
@@ -171,8 +170,7 @@ namespace BlueDatabase
             _LinkedDatabaseFile = string.Empty;
             _BildCode_ImageNotFound = enImageNotFound.ShowErrorPic;
             _BildCode_ConstantHeight = 0;
-            _ImagePrefix = string.Empty;
-            _ImageSuffix = string.Empty;
+            _Prefix = string.Empty;
             _BestFile_StandardSuffix = string.Empty;
             _BestFile_StandardFolder = string.Empty;
             _UcaseNamesSortedByLenght = null;
@@ -251,8 +249,7 @@ namespace BlueDatabase
             BestFile_StandardSuffix = Source.BestFile_StandardSuffix;
             BestFile_StandardFolder = Source.BestFile_StandardFolder;
 
-            ImagePrefix = Source.ImagePrefix;
-            ImageSuffix = Source.ImageSuffix;
+            Prefix = Source.Prefix;
 
         }
 
@@ -587,35 +584,17 @@ namespace BlueDatabase
         }
 
 
-        /// <summary>
-        /// Bei dem Datenformat "BildCode" wird dieser String bei der Bildanzeige hinzugefügt
-        /// </summary>
-        public string ImagePrefix
+
+        public string Prefix
         {
             get
             {
-                return _ImagePrefix;
+                return _Prefix;
             }
             set
             {
-                if (_ImagePrefix == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_ImagePrefix, this, _ImagePrefix, value, true);
-                OnChanged();
-            }
-        }
-        /// <summary>
-        /// Bei dem Datenformat "BildCode" wird dieser String bei der Bildanzeige hinzugefügt
-        /// </summary>
-        public string ImageSuffix
-        {
-            get
-            {
-                return _ImageSuffix;
-            }
-            set
-            {
-                if (_ImagePrefix == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_ImageSuffix, this, _ImageSuffix, value, true);
+                if (_Prefix == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_Prefix, this, _Prefix, value, true);
                 OnChanged();
             }
         }
@@ -1446,11 +1425,8 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_BildCode_ConstantHeight:
                     _BildCode_ConstantHeight = int.Parse(Wert);
                     break;
-                case enDatabaseDataType.co_ImagePrefix:
-                    _ImagePrefix = Wert;
-                    break;
-                case enDatabaseDataType.co_ImageSuffix:
-                    _ImageSuffix = Wert;
+                case enDatabaseDataType.co_Prefix:
+                    _Prefix = Wert;
                     break;
 
                 //case (enDatabaseDataType)172:
@@ -1752,8 +1728,8 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_BestFile_StandardSuffix, _BestFile_StandardSuffix, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ConstantHeight, _BildCode_ConstantHeight.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ImageNotFound, ((int)_BildCode_ImageNotFound).ToString(), Key);
-            //Database.SaveToByteList(l, enDatabaseDataType.co_ImagePrefix, _ImagePrefix, Key);
-            //Database.SaveToByteList(l, enDatabaseDataType.co_ImageSuffix, _ImageSuffix, Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_Prefix, _Prefix, Key);
+
 
             //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
             Database.SaveToByteList(l, enDatabaseDataType.co_Identifier, _Identifier, Key);

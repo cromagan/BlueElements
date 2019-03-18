@@ -261,6 +261,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
             ColumnItem column2 = null;
+            var PosError = false;
 
 
             switch (column.Format)
@@ -277,6 +278,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     column.Database.Cell.LinkedCellData(column, Row, out column2, out _);
+                    PosError = true;
                     break;
             }
 
@@ -289,7 +291,10 @@ namespace BlueControls.BlueDatabaseDialogs
             }
             else
             {
-                Notification.Show("Keine aktive Verlinkung.<br>Spalte in dieser Datenbank wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Datenbank vorhanden?", enImageCode.Information);
+                if (PosError)
+                {
+                    Notification.Show("Keine aktive Verlinkung.<br>Spalte in dieser Datenbank wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Datenbank vorhanden?", enImageCode.Information);
+                }
             }
 
 

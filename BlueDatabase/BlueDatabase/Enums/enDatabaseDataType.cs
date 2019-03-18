@@ -169,9 +169,7 @@ namespace BlueDatabase.Enums
         co_Ueberschrift1 = 174,
         co_Ueberschrift2 = 175,
         co_Ueberschrift3 = 176,
-        co_ImagePrefix = 177,
-        co_ImageSuffix = 178,
-
+        co_Prefix = 177,
 
 
         ce_Value_withoutSizeData = 200,

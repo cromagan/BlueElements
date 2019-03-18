@@ -159,9 +159,81 @@ namespace BlueControls.BlueDatabaseDialogs
             FillNow();
         }
 
+        private void btnClipboard_Click(object sender, System.EventArgs e)
+        {
+
+            WriteBack();
+
+            if (Database == null)
+            {
+                MessageBox.Show("Keine Datenbank angewählt, abbruch.", enImageCode.Information, "OK");
+                return;
+            }
+
+
+            if (!opbNeueZeile.Checked && !optVorhandenZeile.Checked)
+            {
+                MessageBox.Show("Vorher anwählen, ob eine neue Zeile gewünscht ist, abbruch.", enImageCode.Information, "OK");
+                return;
+            }
+
+            if (opbNeueZeile.Checked && optVorhandenZeile.Checked)
+            {
+                MessageBox.Show("Zu viele Zeilen-optionen, abbruch.", enImageCode.Information, "OK");
+                Develop.DebugPrint(enFehlerArt.Warnung, "Eigentlich nicht möglich");
+                return;
+            }
+
+            if (!System.Windows.Forms.Clipboard.ContainsText())
+            {
+                MessageBox.Show("Kkein Text im Clipboard, abbruch.", enImageCode.Information, "OK");
+                return;
+            }
+
+
+            var nt = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text));
+
+
+            if (string.IsNullOrEmpty(nt))
+            {
+                MessageBox.Show("Nur leerer Text im Clipboard, abbruch.", enImageCode.Information, "OK");
+                return;
+            }
+
+            if (optVorhandenZeile.Checked && _row == null)
+            {
+                MessageBox.Show("Keine Zeile angewählt, abbruch.", enImageCode.Information, "OK");
+                return;
+            }
+
+
+            string feh;
+
+
+            if (opbNeueZeile.Checked)
+            {
+                feh = Database.DoImportScript(nt, null, chkFehlgeschlageneSpalten.Checked);
+            }
+            else
+            {
+                feh = Database.DoImportScript(nt, _row, chkFehlgeschlageneSpalten.Checked);
+            }
+
+
+            if (!string.IsNullOrEmpty(feh))
+            {
+                MessageBox.Show("Fehler während es Imports:<br>" + feh, enImageCode.Warnung, "OK");
+                return;
+            }
+            else
+            {
+                MessageBox.Show("Erfolgreich!", enImageCode.Smiley, "OK");
+                return;
+            }
 
 
 
+        }
 
 
     }

@@ -157,8 +157,8 @@ namespace BlueControls.BlueDatabaseDialogs
             txbUeberschift3.Text = _Column.Ueberschrift3;
 
 
-            txbBildSuffix.Text = _Column.ImageSuffix;
-            txbBildPrefix.Text = _Column.ImagePrefix;
+
+            txbPrefix.Text = _Column.Prefix;
 
             btnKompakteAnzeige.Checked = _Column.CompactView;
             btnLogUndo.Checked = _Column.ShowUndo;
@@ -370,8 +370,7 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.Ueberschrift2 = txbUeberschift2.Text;
             _Column.Ueberschrift3 = txbUeberschift3.Text;
 
-            _Column.ImageSuffix = txbBildSuffix.Text;
-            _Column.ImagePrefix = txbBildPrefix.Text;
+            _Column.Prefix = txbPrefix.Text;
 
 
             var NewTags = tbxTags.Text.SplitByCRToList();

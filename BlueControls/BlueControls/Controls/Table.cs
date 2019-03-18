@@ -108,14 +108,16 @@ namespace BlueControls.Controls
         private List<RowItem> _SortedRows; // Die Sortierung der Zeile
 
         private readonly object Lock_UserAction = new object();
-        private static BlueFont Column_Font;
-        private static BlueFont Chapter_Font;
-        private static BlueFont Cell_Font;
-        private static BlueFont NewRow_Font;
+        private BlueFont _Column_Font;
+        private BlueFont _Chapter_Font;
+        private BlueFont _Cell_Font;
+        private BlueFont _NewRow_Font;
+
+        private static BlueFont _Cell_Font1;
 
         private FontSelectDialog _FDia = null;
 
-
+        private double _FontScale = 1f;
         private string _StoredView = string.Empty;
         #endregion
 
@@ -203,6 +205,8 @@ namespace BlueControls.Controls
 
                 }
                 _Database = value;
+                if (_Database != null) { _FontScale = _Database.GlobalScale; }
+                InitializeSkin();
 
                 if (_Database != null)
                 {
@@ -253,6 +257,37 @@ namespace BlueControls.Controls
             }
         }
 
+
+        [DefaultValue(1.0f)]
+        public double FontScale
+        {
+            get
+            {
+                return _FontScale;
+            }
+            set
+            {
+
+
+                if (value == FontScale) { return; }
+
+                CloseAllComponents();
+                FontScale = value;
+
+                if (!SliderX.Visible)
+                {
+                    SliderX.Minimum = 0;
+                    SliderX.Maximum = 0;
+                    SliderX.Value = 0;
+                }
+                InitializeSkin();
+                Invalidate_HeadSize();
+                Invalidate_AllDraw(false);
+                Invalidate_RowSort(); // Neue Zeilen evtl.
+                Invalidate();
+                OnViewChanged();
+            }
+        }
 
 
         [DefaultValue(enBlueTableAppearance.Standard)]
@@ -307,10 +342,11 @@ namespace BlueControls.Controls
 
         protected override void InitializeSkin()
         {
-            Column_Font = Skin.GetBlueFont(enDesign.Table_Column, enStates.Standard);
-            Chapter_Font = Skin.GetBlueFont(enDesign.Table_Cell_Chapter, enStates.Standard);
-            Cell_Font = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
-            NewRow_Font = Skin.GetBlueFont(enDesign.Table_Cell_New, enStates.Standard);
+            _Cell_Font1 = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
+            _Cell_Font = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard).Scale(_FontScale);
+            _Column_Font = Skin.GetBlueFont(enDesign.Table_Column, enStates.Standard).Scale(_FontScale);
+            _Chapter_Font = Skin.GetBlueFont(enDesign.Table_Cell_Chapter, enStates.Standard).Scale(_FontScale);
+            _NewRow_Font = Skin.GetBlueFont(enDesign.Table_Cell_New, enStates.Standard).Scale(_FontScale);
         }
 
 
@@ -417,7 +453,7 @@ namespace BlueControls.Controls
             // Durchlauf 0 = Spalten
             // Durchlauf 1 = Permanente Spalten
 
-            for (var Durchlauf = 0 ; Durchlauf < 2 ; Durchlauf++)
+            for (var Durchlauf = 0; Durchlauf < 2; Durchlauf++)
             {
 
 
@@ -443,7 +479,7 @@ namespace BlueControls.Controls
                             Draw_Cursor(GR, ViewItem, DisplayRectangleWOSlider);
 
                             // Zeilen Zeichnen (Alle Zellen)
-                            for (var Zei = FirstVisibleRow ; Zei <= LastVisibleRow ; Zei++)
+                            for (var Zei = FirstVisibleRow; Zei <= LastVisibleRow; Zei++)
                             {
                                 Draw_Cell(GR, ViewItem, SortedRows()[Zei], DisplayRectangleWOSlider);
                             }
@@ -460,11 +496,11 @@ namespace BlueControls.Controls
 
             // ZEilenlinien, Überschriften und "Warn-Symbol" Zeichnen
 
-            for (var Zei = FirstVisibleRow ; Zei <= LastVisibleRow ; Zei++)
+            for (var Zei = FirstVisibleRow; Zei <= LastVisibleRow; Zei++)
             {
                 if (!string.IsNullOrEmpty(SortedRows()[Zei].TMP_Chapter))
                 {
-                    GR.DrawString(SortedRows()[Zei].TMP_Chapter, Chapter_Font.Font(), Chapter_Font.Brush_Color_Main, 0, (int)SortedRows()[Zei].TMP_Y - RowCaptionFontY);
+                    GR.DrawString(SortedRows()[Zei].TMP_Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, (int)SortedRows()[Zei].TMP_Y - RowCaptionFontY);
                 }
                 if (SortedRows()[Zei].TMP_Y >= HeadSize())
                 {
@@ -492,7 +528,7 @@ namespace BlueControls.Controls
                 var ViewItem = _Database.ColumnArrangements[_ArrangementNr][Database.Column[0]];
                 if (IsOnScreen(ViewItem, DisplayRectangleWOSlider))
                 {
-                    Skin.Draw_FormatedText(GR, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, 16), enAlignment.Left, new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)ViewItem._TMP_DrawWidth - 2, 16 - 2), this, false, NewRow_Font);
+                    Skin.Draw_FormatedText(GR, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, 16), enAlignment.Left, new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)ViewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font);
                     //GR.DrawString("[Neue Zeile]", NewRow_Font.Font(), NewRow_Font.Brush_Color_Main, (int)ViewItem.OrderTMP_Spalte_X1, Convert.ToInt32(-SliderY.Value + HeadSize()));
                 }
             }
@@ -517,7 +553,7 @@ namespace BlueControls.Controls
 
             var PermaX = 0;
 
-            for (var X = 0 ; X < _Database.ColumnArrangements[_ArrangementNr].Count() + 1 ; X++)
+            for (var X = 0; X < _Database.ColumnArrangements[_ArrangementNr].Count() + 1; X++)
             {
                 if (X < _Database.ColumnArrangements[_ArrangementNr].Count())
                 {
@@ -543,7 +579,7 @@ namespace BlueControls.Controls
                 {
 
 
-                    for (var u = 0 ; u < 3 ; u++)
+                    for (var u = 0; u < 3; u++)
                     {
                         var N = ViewItem?.Column.Ueberschrift(u);
                         var V = BVI[u]?.Column.Ueberschrift(u);
@@ -571,7 +607,7 @@ namespace BlueControls.Controls
                                     GR.FillRectangle(new SolidBrush(BVI[u].Column.BackColor), r);
                                     GR.FillRectangle(new SolidBrush(Color.FromArgb(80, 200, 200, 200)), r);
                                     GR.DrawRectangle(Skin.Pen_LinieKräftig, r);
-                                    Skin.Draw_FormatedText(GR, V, null, enAlignment.Horizontal_Vertical_Center, r, this, false, Column_Font);
+                                    Skin.Draw_FormatedText(GR, V, null, enAlignment.Horizontal_Vertical_Center, r, this, false, _Column_Font);
                                 }
                             }
 
@@ -635,7 +671,7 @@ namespace BlueControls.Controls
 
             var r = new Rectangle();
             // Zeilen Zeichnen (Alle Zellen)
-            for (var Zeiv = vFirstVisibleRow ; Zeiv <= vLastVisibleRow ; Zeiv++)
+            for (var Zeiv = vFirstVisibleRow; Zeiv <= vLastVisibleRow; Zeiv++)
             {
                 var Row = SortedRows()[Zeiv];
 
@@ -668,7 +704,7 @@ namespace BlueControls.Controls
 
                 if (!string.IsNullOrEmpty(Row.TMP_Chapter))
                 {
-                    GR.DrawString(Row.TMP_Chapter, Chapter_Font.Font(), Chapter_Font.Brush_Color_Main, 0, (int)Row.TMP_Y - RowCaptionFontY);
+                    GR.DrawString(Row.TMP_Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, (int)Row.TMP_Y - RowCaptionFontY);
                 }
 
 
@@ -705,7 +741,7 @@ namespace BlueControls.Controls
 
         private void Draw_Cell(Graphics GR, ColumnViewItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, Rectangle DisplayRectangleWOSlider)
         {
-            Draw_Cell(GR, CellInThisDatabaseColumn, CellInThisDatabaseRow, DisplayRectangleWOSlider, Cell_Font);
+            Draw_Cell(GR, CellInThisDatabaseColumn, CellInThisDatabaseRow, DisplayRectangleWOSlider, _Cell_Font);
         }
 
 
@@ -732,7 +768,7 @@ namespace BlueControls.Controls
                 else
                 {
                     var y = 0;
-                    for (var z = 0 ; z <= MEI.GetUpperBound(0) ; z++)
+                    for (var z = 0; z <= MEI.GetUpperBound(0); z++)
                     {
                         Draw_Cell_OnLine(GR, MEI[z], CellInThisDatabaseColumn, CellInThisDatabaseRow, ContentHolderCellColumn, Convert.ToBoolean(z == MEI.GetUpperBound(0)), DisplayRectangleWOSlider, vfont, y);
                         y += Skin.FormatedText_NeededSize(CellInThisDatabaseColumn.Column, MEI[z], null, vfont, enShortenStyle.Replaced).Height;
@@ -784,7 +820,7 @@ namespace BlueControls.Controls
 
             if (Onlyhead) { yPos = HeadSize(); }
 
-            for (z = 0 ; z <= 1 ; z++)
+            for (z = 0; z <= 1; z++)
             {
                 var xPos = 0;
                 enColumnLineStyle Lin = 0;
@@ -841,7 +877,7 @@ namespace BlueControls.Controls
             if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) { return; }
 
 
-            if (Column_Font == null) { return; }
+            if (_Column_Font == null) { return; }
             GR.FillRectangle(new SolidBrush(ViewItem.Column.BackColor), (int)ViewItem.OrderTMP_Spalte_X1, 0, Column_DrawWidth(ViewItem, DisplayRectangleWOSlider), HeadSize());
 
 
@@ -942,7 +978,7 @@ namespace BlueControls.Controls
 
             var tx = ViewItem.Column.Caption.Replace("\r", "\r\n");
 
-            var FS = GR.MeasureString(tx, Column_Font.Font());
+            var FS = GR.MeasureString(tx, _Column_Font.Font());
 
 
 
@@ -954,7 +990,7 @@ namespace BlueControls.Controls
                 // Dann der Text
                 GR.TranslateTransform(pos.X, pos.Y);
                 GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                GR.DrawString(tx, Column_Font.Font(), new SolidBrush(ViewItem.Column.ForeColor), 0, 0);
+                GR.DrawString(tx, _Column_Font.Font(), new SolidBrush(ViewItem.Column.ForeColor), 0, 0);
                 GR.TranslateTransform(-pos.X, -pos.Y);
 
             }
@@ -966,7 +1002,7 @@ namespace BlueControls.Controls
 
                 GR.RotateTransform(-90);
                 GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                GR.DrawString(tx, Column_Font.Font(), new SolidBrush(ViewItem.Column.ForeColor), 0, 0);
+                GR.DrawString(tx, _Column_Font.Font(), new SolidBrush(ViewItem.Column.ForeColor), 0, 0);
                 GR.TranslateTransform(-pos.X, -pos.Y);
                 GR.ResetTransform();
             }
@@ -3447,7 +3483,7 @@ namespace BlueControls.Controls
 
             if (vcolumn.TMP_AutoFilterSinnvoll != null) { return (bool)vcolumn.TMP_AutoFilterSinnvoll; }
 
-            for (var rowcount = 0 ; rowcount <= SortedRows().Count - 2 ; rowcount++)
+            for (var rowcount = 0; rowcount <= SortedRows().Count - 2; rowcount++)
             {
                 if (SortedRows()[rowcount].CellGetString(vcolumn.Column) != SortedRows()[rowcount + 1].CellGetString(vcolumn.Column))
                 {
@@ -3690,10 +3726,10 @@ namespace BlueControls.Controls
         {
 
             if (Column.TMP_CaptionText_Size.Width > 0) { return Column.TMP_CaptionText_Size; }
-            if (Column_Font == null) { return new SizeF(16, 16); }
+            if (_Column_Font == null) { return new SizeF(16, 16); }
 
 
-            Column.TMP_CaptionText_Size = DummyGraphics().MeasureString(Column.Caption.Replace("\r", "\r\n"), Column_Font.Font());
+            Column.TMP_CaptionText_Size = DummyGraphics().MeasureString(Column.Caption.Replace("\r", "\r\n"), _Column_Font.Font());
             return Column.TMP_CaptionText_Size;
         }
 
@@ -3885,17 +3921,18 @@ namespace BlueControls.Controls
                 var TMP = Column.Database.Cell.GetArray(Column, Row);
                 if (Column.ShowMultiLineInOneLine)
                 {
-                    _ContentSize = Skin.FormatedText_NeededSize(Column, TMP.JoinWith("; "), null, Cell_Font, enShortenStyle.Replaced);
+                    _ContentSize = Skin.FormatedText_NeededSize(Column, TMP.JoinWith("; "), null, _Cell_Font1, enShortenStyle.Replaced);
                 }
                 else
                 {
 
                     var TMPSize = Size.Empty;
-                    for (var z = 0 ; z <= TMP.GetUpperBound(0) ; z++)
+                    for (var z = 0; z <= TMP.GetUpperBound(0); z++)
                     {
+                        if (!string.IsNullOrEmpty(Column.Prefix)) { TMP[z] = Column.Prefix + " " + TMP[z]; }
                         if (!string.IsNullOrEmpty(Column.Suffix)) { TMP[z] = TMP[z] + " " + Column.Suffix; }
 
-                        TMPSize = Skin.FormatedText_NeededSize(Column, TMP[z], null, Cell_Font, enShortenStyle.Replaced);
+                        TMPSize = Skin.FormatedText_NeededSize(Column, TMP[z], null, _Cell_Font1, enShortenStyle.Replaced);
                         if (TMPSize.Width > _ContentSize.Width) { _ContentSize.Width = TMPSize.Width; }
 
                         if (TMPSize.Height > 16)
@@ -3916,7 +3953,7 @@ namespace BlueControls.Controls
             {
 
                 var _String = Column.Database.Cell.GetString(Column, Row);
-                _ContentSize = Skin.FormatedText_NeededSize(Column, _String, null, Cell_Font, enShortenStyle.Replaced);
+                _ContentSize = Skin.FormatedText_NeededSize(Column, _String, null, _Cell_Font1, enShortenStyle.Replaced);
             }
 
 
@@ -3990,7 +4027,7 @@ namespace BlueControls.Controls
             var co = 0;
 
 
-            for (var z = _Database.Works.Count - 1 ; z >= 0 ; z--)
+            for (var z = _Database.Works.Count - 1; z >= 0; z--)
             {
 
                 if (_Database.Works[z].CellKey == CellKey && _Database.Works[z].HistorischRelevant)

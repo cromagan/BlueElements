@@ -377,7 +377,7 @@ namespace BlueDatabase
 
 
 
-            for (var Z = Names.Count - 1 ; Z > -1 ; Z--)
+            for (var Z = Names.Count - 1; Z > -1; Z--)
             {
 
 
@@ -455,7 +455,7 @@ namespace BlueDatabase
                 var tmp = thisTextLine;
                 var R = new List<RowItem>();
 
-                for (var Z = Names.Count - 1 ; Z > -1 ; Z--)
+                for (var Z = Names.Count - 1; Z > -1; Z--)
                 {
                     if (tmp.IndexOfWord(Names[Z], 0, RegexOptions.IgnoreCase) > -1)
                     {
@@ -755,7 +755,7 @@ namespace BlueDatabase
 
             if (!TMPMultiLine)
             {
-                for (FiltNachNr = 0 ; FiltNachNr < Filter.SearchValue.Count ; FiltNachNr++)
+                for (FiltNachNr = 0; FiltNachNr < Filter.SearchValue.Count; FiltNachNr++)
                 {
                     BedingungErfüllt = CompareValues(_String, Filter.SearchValue[FiltNachNr], Typ, Column);
                     if (Oder && BedingungErfüllt) { return true; }
@@ -777,7 +777,7 @@ namespace BlueDatabase
             // bevor sie bei einem UND ein False zurückgibt
 
 
-            for (FiltNachNr = 0 ; FiltNachNr < Filter.SearchValue.Count ; FiltNachNr++)
+            for (FiltNachNr = 0; FiltNachNr < Filter.SearchValue.Count; FiltNachNr++)
             {
                 foreach (var t in VorhandenWerte)
                 {
@@ -1214,12 +1214,19 @@ namespace BlueDatabase
             var CellKey = KeyOfCell(Column, Row);
             if (_cells.ContainsKey(CellKey))
             {
-                return Column.Database.Cell._cells[CellKey].Size;
+                var x = Column.Database.Cell._cells[CellKey].Size;
+                return new Size((int)(x.Width * Database.GlobalScale), (int)(x.Height * Database.GlobalScale));
 
             }
             return Size.Empty;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Column"></param>
+        /// <param name="Row"></param>
+        /// <param name="ContentSize">MUSS im Scale 1:1 sein</param>
         public void SetSizeOfCellContent(ColumnItem Column, RowItem Row, Size ContentSize)
         {
             var CellKey = KeyOfCell(Column, Row);

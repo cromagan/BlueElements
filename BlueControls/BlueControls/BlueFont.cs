@@ -106,7 +106,7 @@ namespace BlueControls
             _CharSize = new SizeF[0];
 
             _CharSize = new SizeF[256];
-            for (var z = 0 ; z <= _CharSize.GetUpperBound(0) ; z++)
+            for (var z = 0; z <= _CharSize.GetUpperBound(0); z++)
             {
                 _CharSize[z] = new SizeF(-1, -1);
             }
@@ -294,7 +294,7 @@ namespace BlueControls
             if (vChar >= ExtChar.ImagesStart)
             {
                 var BNR = QuickImage.Get((int)vChar - (int)ExtChar.ImagesStart);
-                if (BNR==null) { return new SizeF(0, 0); }
+                if (BNR == null) { return new SizeF(0, 0); }
                 return new SizeF(BNR.BMP.Width + 1, BNR.BMP.Height + 1);
             }
 
@@ -415,7 +415,7 @@ namespace BlueControls
             var gr = Graphics.FromImage(bmp);
 
 
-            for (var du = 0 ; du <= 1 ; du++)
+            for (var du = 0; du <= 1; du++)
             {
                 gr.Clear(Color.White);
                 if (du == 1)
@@ -427,9 +427,9 @@ namespace BlueControls
                 var miny = Convert.ToInt32(f.Height / 2.0);
 
                 //var tempVar = (int)(f.Width - 1);
-                for (var x = 1 ; x <= (int)(f.Width - 1) ; x++)
+                for (var x = 1; x <= (int)(f.Width - 1); x++)
                 {
-                    for (var y = (int)(f.Height - 1) ; y >= miny ; y--)
+                    for (var y = (int)(f.Height - 1); y >= miny; y--)
                     {
                         if (y > miny && bmp.GetPixel(x, y).R == 0) { miny = y; }
 
@@ -466,6 +466,11 @@ namespace BlueControls
             _Code = ToString(FontName, FontSize, Bold, Italic, Underline, StrikeOut, Outline, _Color_Main.ToHTMLCode(), Color_Outline.ToHTMLCode(), Kapitälchen, OnlyUpper, OnlyLower);
         }
 
+        internal BlueFont Scale(double fontScale)
+        {
+            if (Math.Abs(1 - fontScale) < 0.01) { return this; }
+            return Get(FontName, (float)(FontSize * fontScale), Bold, Italic, Underline, StrikeOut, Outline, Color_Main, Color_Outline, Kapitälchen, OnlyUpper, OnlyLower);
+        }
 
         private Pen GeneratePen(float cZoom)
         {
