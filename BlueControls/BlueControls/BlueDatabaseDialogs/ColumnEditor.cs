@@ -61,7 +61,7 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxRandLinks.Item.AddRange(typeof(enColumnLineStyle));
             cbxRandRechts.Item.AddRange(typeof(enColumnLineStyle));
             cbxBildCodeImageNotfound.Item.AddRange(typeof(enImageNotFound));
-
+            cbxFehlendesZiel.Item.AddRange(typeof(enFehlendesZiel));
 
             cbxLinkedDatabase.Item.Clear();
             if (!string.IsNullOrEmpty(_Column.Database.Filename))
@@ -233,7 +233,7 @@ namespace BlueControls.BlueDatabaseDialogs
                         btnTargetColumn.Checked = true;
                     }
                     txbZeichenkette.Text = o[3];
-                    btnFehlerbeiFehlenderZelle.Checked = o[4].FromPlusMinus();
+                    cbxFehlendesZiel.Text = o[4];
 
                 }
             }
@@ -476,7 +476,7 @@ namespace BlueControls.BlueDatabaseDialogs
                     if (_Column.LinkedDatabase() != null) { tmp = tmp + _Column.LinkedDatabase().Column[cbxTargetColumn.Text].Key; }
                 }
 
-                tmp = tmp + "\r" + txbZeichenkette.Text + "\r" + btnFehlerbeiFehlenderZelle.Checked.ToPlusMinus() + "\r+"; // Plus, das split die Dimensionen richtig erstellt.
+                tmp = tmp + "\r" + txbZeichenkette.Text + "\r" + cbxFehlendesZiel.Text + "\r+"; // Plus, das split die Dimensionen richtig erstellt.
                 tmpR.Actions[0].Text = tmp;
             }
 

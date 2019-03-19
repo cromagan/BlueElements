@@ -30,13 +30,13 @@ namespace BlueControls.BlueDatabaseDialogs
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColumnEditor));
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabDesign = new BlueControls.Controls.TabPage();
-            this.grbBildCode = new BlueControls.Controls.GroupBox();
             this.txbPrefix = new BlueControls.Controls.TextBox();
-            this.caption7 = new BlueControls.Controls.Caption();
+            this.grbBildCode = new BlueControls.Controls.GroupBox();
             this.cbxBildCodeImageNotfound = new BlueControls.Controls.ComboBox();
             this.capBildCodeImageNotfound = new BlueControls.Controls.Caption();
             this.capBildCodeConstHeight = new BlueControls.Controls.Caption();
             this.txbBildCodeConstHeight = new BlueControls.Controls.TextBox();
+            this.caption7 = new BlueControls.Controls.Caption();
             this.capUeberschrift3 = new BlueControls.Controls.Caption();
             this.capUeberschrift2 = new BlueControls.Controls.Caption();
             this.capUeberschrift1 = new BlueControls.Controls.Caption();
@@ -118,7 +118,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabControl = new BlueControls.Controls.TabControl();
             this.tabRegeln = new BlueControls.Controls.TabPage();
             this.gpxVerlinkteZellen = new BlueControls.Controls.GroupBox();
-            this.btnFehlerbeiFehlenderZelle = new BlueControls.Controls.Button();
+            this.caption5 = new BlueControls.Controls.Caption();
             this.txbZeichenkette = new BlueControls.Controls.TextBox();
             this.capZeichenkette = new BlueControls.Controls.TextBox();
             this.line1 = new BlueControls.Controls.Line();
@@ -131,6 +131,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnFehlerWennUnsichtbare = new BlueControls.Controls.Button();
             this.btnFormatFehler = new BlueControls.Controls.Button();
             this.btnFehlerWennLeer = new BlueControls.Controls.Button();
+            this.cbxFehlendesZiel = new BlueControls.Controls.ComboBox();
             this.tabDesign.SuspendLayout();
             this.grbBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -185,6 +186,14 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabDesign.Text = "Design";
             this.tabDesign.UseVisualStyleBackColor = true;
             // 
+            // txbPrefix
+            // 
+            this.txbPrefix.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbPrefix.Location = new System.Drawing.Point(56, 96);
+            this.txbPrefix.Name = "txbPrefix";
+            this.txbPrefix.Size = new System.Drawing.Size(168, 24);
+            this.txbPrefix.TabIndex = 36;
+            // 
             // grbBildCode
             // 
             this.grbBildCode.CausesValidation = false;
@@ -196,23 +205,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grbBildCode.Name = "grbBildCode";
             this.grbBildCode.Size = new System.Drawing.Size(416, 88);
             this.grbBildCode.Text = "Fomat: BildCode";
-            // 
-            // txbPrefix
-            // 
-            this.txbPrefix.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbPrefix.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
-            this.txbPrefix.Location = new System.Drawing.Point(56, 96);
-            this.txbPrefix.Name = "txbPrefix";
-            this.txbPrefix.Size = new System.Drawing.Size(168, 24);
-            this.txbPrefix.TabIndex = 36;
-            // 
-            // caption7
-            // 
-            this.caption7.CausesValidation = false;
-            this.caption7.Location = new System.Drawing.Point(8, 96);
-            this.caption7.Name = "caption7";
-            this.caption7.Size = new System.Drawing.Size(48, 16);
-            this.caption7.Text = "Präfix:";
             // 
             // cbxBildCodeImageNotfound
             // 
@@ -250,6 +242,14 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbBildCodeConstHeight.Suffix = "Pixel";
             this.txbBildCodeConstHeight.TabIndex = 32;
             this.txbBildCodeConstHeight.Text = "0";
+            // 
+            // caption7
+            // 
+            this.caption7.CausesValidation = false;
+            this.caption7.Location = new System.Drawing.Point(8, 96);
+            this.caption7.Name = "caption7";
+            this.caption7.Size = new System.Drawing.Size(48, 16);
+            this.caption7.Text = "Präfix:";
             // 
             // capUeberschrift3
             // 
@@ -340,7 +340,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // capEinheit
             // 
             this.capEinheit.CausesValidation = false;
-            this.capEinheit.Location = new System.Drawing.Point(8, 64);
+            this.capEinheit.Location = new System.Drawing.Point(8, 56);
             this.capEinheit.Name = "capEinheit";
             this.capEinheit.Size = new System.Drawing.Size(48, 32);
             this.capEinheit.Text = "Einheit:<br>(Suffix)";
@@ -348,7 +348,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // cbxEinheit
             // 
             this.cbxEinheit.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxEinheit.Location = new System.Drawing.Point(56, 64);
+            this.cbxEinheit.Location = new System.Drawing.Point(56, 56);
             this.cbxEinheit.Name = "cbxEinheit";
             this.cbxEinheit.Size = new System.Drawing.Size(168, 24);
             this.cbxEinheit.TabIndex = 31;
@@ -1078,7 +1078,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.gpxVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gpxVerlinkteZellen.CausesValidation = false;
-            this.gpxVerlinkteZellen.Controls.Add(this.btnFehlerbeiFehlenderZelle);
+            this.gpxVerlinkteZellen.Controls.Add(this.cbxFehlendesZiel);
+            this.gpxVerlinkteZellen.Controls.Add(this.caption5);
             this.gpxVerlinkteZellen.Controls.Add(this.txbZeichenkette);
             this.gpxVerlinkteZellen.Controls.Add(this.capZeichenkette);
             this.gpxVerlinkteZellen.Controls.Add(this.line1);
@@ -1090,20 +1091,16 @@ namespace BlueControls.BlueDatabaseDialogs
             this.gpxVerlinkteZellen.Controls.Add(this.capRowKeyInColumn);
             this.gpxVerlinkteZellen.Location = new System.Drawing.Point(8, 96);
             this.gpxVerlinkteZellen.Name = "gpxVerlinkteZellen";
-            this.gpxVerlinkteZellen.Size = new System.Drawing.Size(900, 216);
+            this.gpxVerlinkteZellen.Size = new System.Drawing.Size(900, 256);
             this.gpxVerlinkteZellen.Text = "Verlinkte Zellen:";
             // 
-            // btnFehlerbeiFehlenderZelle
+            // caption5
             // 
-            this.btnFehlerbeiFehlenderZelle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFehlerbeiFehlenderZelle.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnFehlerbeiFehlenderZelle.Location = new System.Drawing.Point(8, 176);
-            this.btnFehlerbeiFehlenderZelle.Name = "btnFehlerbeiFehlenderZelle";
-            this.btnFehlerbeiFehlenderZelle.Size = new System.Drawing.Size(884, 24);
-            this.btnFehlerbeiFehlenderZelle.TabIndex = 8;
-            this.btnFehlerbeiFehlenderZelle.Text = "Zeile als Fehlerhaft markieren, wenn die Zelle in der verlinkten Datenbank nicht " +
-    "vorhanden ist.";
+            this.caption5.CausesValidation = false;
+            this.caption5.Location = new System.Drawing.Point(8, 224);
+            this.caption5.Name = "caption5";
+            this.caption5.Size = new System.Drawing.Size(320, 23);
+            this.caption5.Text = "Zeile nicht gefunden in Zieldatenbank:";
             // 
             // txbZeichenkette
             // 
@@ -1231,6 +1228,17 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnFehlerWennLeer.TabIndex = 0;
             this.btnFehlerWennLeer.Text = "Wenn die Zelle dieser Spalte leer ist, gib einen Fehler aus";
             // 
+            // cbxFehlendesZiel
+            // 
+            this.cbxFehlendesZiel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbxFehlendesZiel.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxFehlendesZiel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxFehlendesZiel.Location = new System.Drawing.Point(336, 224);
+            this.cbxFehlendesZiel.Name = "cbxFehlendesZiel";
+            this.cbxFehlendesZiel.Size = new System.Drawing.Size(548, 24);
+            this.cbxFehlendesZiel.TabIndex = 9;
+            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(926, 671);
@@ -1356,9 +1364,10 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbUeberschift3;
         private TextBox txbUeberschift2;
         private TextBox txbUeberschift1;
-        private Button btnFehlerbeiFehlenderZelle;
         private GroupBox grbBildCode;
         private TextBox txbPrefix;
         private Caption caption7;
+        private Caption caption5;
+        private ComboBox cbxFehlendesZiel;
     }
 	}

@@ -453,6 +453,12 @@ namespace BlueDatabase
 
                         var tarR = LinkedDB.Row[Row.CellGetString(rowC)];
 
+                        if (tarC != null && tarR == null && o[4] == ((int)enFehlendesZiel.ZeileAnlegen).ToString())
+                        {
+                            tarR = LinkedDB.Row.Add(Row.CellGetString(rowC));
+                        }
+
+
                         if (tarC != null && tarR != null)
                         {
                             Row.Database.Cell.SetValueBehindLinkedValue(t, Row, CellCollection.KeyOfCell(tarC, tarR), FreezeMode);
@@ -461,7 +467,7 @@ namespace BlueDatabase
                         {
                             Row.Database.Cell.SetValueBehindLinkedValue(t, Row, string.Empty, FreezeMode);
 
-                            if (!o[4].FromPlusMinus()) { return string.Empty; }
+                            if (o[4] == ((int)enFehlendesZiel.Ignorieren).ToString()) { return string.Empty; }
 
                             return "Zelle in Zieldatenbank in Spalte '#Spalte:" + t.Name + "' nicht vorhanden";
                         }
@@ -1253,7 +1259,7 @@ namespace BlueDatabase
             if (!string.IsNullOrEmpty(dd)) { return "Aktion fehlerhaft: " + dd; }
 
 
-            for (var z = 0 ; z < Columns.Count ; z++)
+            for (var z = 0; z < Columns.Count; z++)
             {
                 if (z == Columns.Count - 2)
                 {
@@ -1436,7 +1442,7 @@ namespace BlueDatabase
                 w = _Text.SplitByCR();
             }
 
-            for (var wtz = 0 ; wtz <= w.GetUpperBound(0) ; wtz++)
+            for (var wtz = 0; wtz <= w.GetUpperBound(0); wtz++)
             {
                 if (Columns.Count > 0)
                 {
@@ -1575,7 +1581,7 @@ namespace BlueDatabase
 
             // Es werden nur Bedingungen abgefragt, weil es nur Sinn macht, einen Fehlertext generieren zu lassen.
 
-            for (var z = 0 ; z <= AllValue.GetUpperBound(0) ; z++)
+            for (var z = 0; z <= AllValue.GetUpperBound(0); z++)
             {
                 if (TrifftZu(Row, Column, AllValue[z], ColumnFocus))
                 {
