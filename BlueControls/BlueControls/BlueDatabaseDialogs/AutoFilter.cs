@@ -77,7 +77,10 @@ namespace BlueControls.BlueDatabaseDialogs
 
             var List_FilterString = Column.Autofilter_ItemList(vFilter);
 
-            Width = Math.Max(TXTBox.Width + GenericControl.Skin.Padding * 2, Table.tmpColumnContentWidth(Column));
+
+            var F = GenericControl.Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
+
+            Width = Math.Max(TXTBox.Width + GenericControl.Skin.Padding * 2, Table.tmpColumnContentWidth(Column, F, 1f));
 
             FiltItems.Item.Clear();
             FiltItems.CheckBehavior = enCheckBehavior.MultiSelection;
@@ -96,7 +99,7 @@ namespace BlueControls.BlueDatabaseDialogs
             FiltItems.Item.ComputeAllItemPositions(new Size(10, 10), true, false, enBlueListBoxAppearance.Autofilter, null, null);
             var PrefSize = FiltItems.Item.MaximumBounds();
             FiltItems.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Top;
-            FiltItems.Width = Math.Min(Table.tmpColumnContentWidth(Column), Width - GenericControl.Skin.PaddingSmal * 2);
+            FiltItems.Width = Math.Min(Table.tmpColumnContentWidth(Column, F, 1f), Width - GenericControl.Skin.PaddingSmal * 2);
 
             FiltItems.Width = Math.Max(FiltItems.Width, PrefSize.Width);
             FiltItems.Height = Math.Max(FiltItems.Height, PrefSize.Height);

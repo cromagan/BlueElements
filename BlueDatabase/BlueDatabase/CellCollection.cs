@@ -1226,7 +1226,7 @@ namespace BlueDatabase
         /// </summary>
         /// <param name="Column"></param>
         /// <param name="Row"></param>
-        /// <param name="ContentSize">MUSS im Scale 1:1 sein</param>
+        /// <param name="ContentSize">Wird im Scale der Datenbank gespeichert, da es ja Benutzerübergreifend ist</param>
         public void SetSizeOfCellContent(ColumnItem Column, RowItem Row, Size ContentSize)
         {
             var CellKey = KeyOfCell(Column, Row);

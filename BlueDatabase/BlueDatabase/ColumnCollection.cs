@@ -216,7 +216,7 @@ namespace BlueDatabase
             Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
 
 
-            for (var ColumnCount = 0 ; ColumnCount < Count ; ColumnCount++)
+            for (var ColumnCount = 0; ColumnCount < Count; ColumnCount++)
             {
                 if (this[ColumnCount] != null && !string.IsNullOrEmpty(this[ColumnCount].Name))
                 {
@@ -291,12 +291,12 @@ namespace BlueDatabase
             GetSystems();
 
 
-            for (var s1 = 0 ; s1 < Count ; s1++)
+            for (var s1 = 0; s1 < Count; s1++)
             {
                 if (base[s1] != null)
                 {
 
-                    for (var s2 = s1 + 1 ; s2 < Count ; s2++)
+                    for (var s2 = s1 + 1; s2 < Count; s2++)
                     {
                         if (base[s2] != null)
                         {
@@ -446,6 +446,7 @@ namespace BlueDatabase
             da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
 
             da.Add("       <tr bgcolor=\"#dddddd\"BORDERCOLOR=\"#cccccc\" > ");
+            da.Add("              <th align=left>#</th>");
             da.Add("              <th align=left width =\"1%\">Name</th>");
             da.Add("              <th align=left>Beschriftung</th>");
             da.Add("              <th align=left>Datenformat</th>");
@@ -456,13 +457,16 @@ namespace BlueDatabase
             da.Add("      </tr>");
 
 
-
+            var lfdn = 0;
             foreach (var ThisColumnItem in Database.Column)
             {
+
                 if (ThisColumnItem != null)
                 {
+                    lfdn += 1;
 
                     da.Add("       <tr BORDERCOLOR=\"#cccccc\">");
+                    da.Add("              <th align=left>" + lfdn.ToString() + "</th>");
                     da.Add("              <th align=left>" + ThisColumnItem.Name + "</th>");
                     da.Add("              <th align=left>" + ThisColumnItem.Caption.Replace("\r", "<br>") + "</th>");
                     da.Add("              <th align=left>" + ThisColumnItem.Format + "</th>");
