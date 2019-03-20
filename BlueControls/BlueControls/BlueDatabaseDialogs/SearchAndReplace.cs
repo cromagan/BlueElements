@@ -29,7 +29,7 @@ using BlueDatabase.EventArgs;
 namespace BlueControls.BlueDatabaseDialogs
 {
 
-    internal sealed partial class SearchAndReplace
+    internal sealed partial class SearchAndReplace : BlueControls.Forms.Form
     {
 
         private readonly Table _BlueTable;

@@ -2487,6 +2487,14 @@ namespace BlueControls.Controls
                         }
                         break;
 
+                    case System.Windows.Forms.Keys.F:
+                        if (e.Modifiers == System.Windows.Forms.Keys.Control)
+                        {
+                            var x = new Search(this);
+                            x.Show();
+                        }
+                        break;
+
                     case System.Windows.Forms.Keys.F2:
                         Cell_Edit(_CursorPosColumn, _CursorPosRow, true);
                         break;
@@ -3156,9 +3164,9 @@ namespace BlueControls.Controls
 
         public bool EnsureVisible(ColumnItem Column, RowItem Row)
         {
-            if (!EnsureVisible(_Database.ColumnArrangements[_ArrangementNr][Column])) { return false; }
-            if (!EnsureVisible(Row)) { return false; }
-            return true;
+            var ok1 = EnsureVisible(_Database.ColumnArrangements[_ArrangementNr][Column]);
+            var ok2 = EnsureVisible(Row);
+            return ok1 && ok2;
         }
 
         private bool EnsureVisible(RowItem vRow)
@@ -3170,7 +3178,7 @@ namespace BlueControls.Controls
 
 
             var r = DisplayRectangleWithoutSlider();
-
+            ComputeAllCellPositions();
 
             if (vRow.TMP_Y < HeadSize())
             {
@@ -3193,6 +3201,8 @@ namespace BlueControls.Controls
             if (ViewItem.OrderTMP_Spalte_X1 == null && !ComputeAllCellPositions()) { return false; }
 
             var r = DisplayRectangleWithoutSlider();
+            ComputeAllCellPositions();
+
 
             if (ViewItem.ViewType == enViewType.PermanentColumn)
             {
@@ -4083,6 +4093,103 @@ namespace BlueControls.Controls
                 System.Windows.Forms.Clipboard.SetDataObject(c, true);
                 if (Meldung) { Notification.Show("<b>" + c + "</b><br>ist nun in der Zwischenablage.", enImageCode.Kopieren); }
             }
+        }
+
+
+        public static void SearchNextText(string searchTXT, Table TableView, ColumnItem column, RowItem row, out ColumnItem foundColumn, out RowItem foundRow)
+        {
+            searchTXT = searchTXT.Trim();
+
+            var ca = TableView.Database.ColumnArrangements[TableView.Arrangement];
+
+            if (row == null) { row = TableView.View_RowFirst(); }
+            if (column == null) { column = ca[0].Column; }
+
+            var rowsChecked = 0;
+
+            if (string.IsNullOrEmpty(searchTXT))
+            {
+                DialogBoxes.MessageBox.Show("Bitte Text zum Suchen eingeben.", enImageCode.Information, "OK");
+                foundColumn = null;
+                foundRow = null;
+                return;
+            }
+
+
+
+
+            do
+            {
+
+                column = ca.NextVisible(column);
+                if (column == null)
+                {
+                    column = ca[0].Column;
+
+                    if (rowsChecked > TableView.Database.Row.Count() + 1)
+                    {
+                        foundColumn = null;
+                        foundRow = null;
+                        return;
+                    }
+
+                    rowsChecked++;
+                    row = TableView.View_NextRow(row);
+                    if (row == null) { row = TableView.View_RowFirst(); }
+
+                }
+
+
+
+                var ContentHolderCellColumn = column;
+                var ContenHolderCellRow = row;
+
+                if (column.Format == enDataFormat.LinkedCell)
+                {
+                    column.Database.Cell.LinkedCellData(column, row, out ContentHolderCellColumn, out ContenHolderCellRow);
+                }
+
+
+                var IsT = string.Empty;
+
+                if (ContenHolderCellRow !=null && ContentHolderCellColumn != null)
+                {
+                    IsT = ContenHolderCellRow.CellGetString(ContentHolderCellColumn);
+                }
+
+
+                if (!string.IsNullOrEmpty(IsT))
+                {
+
+
+                    if (ContentHolderCellColumn.Format == enDataFormat.Text_mit_Formatierung)
+                    {
+                        var l = new ExtText(enDesign.TextBox, enStates.Standard);
+                        l.HtmlText = IsT;
+                        IsT = l.PlainText;
+                    }
+
+
+                    // Allgemeine Prüfung
+                    if (IsT.ToLower().Contains(searchTXT.ToLower()))
+                    {
+                        foundColumn = column;
+                        foundRow = row;
+                        return;
+                    }
+
+                    // Spezielle Format-Prüfung
+                    var SuchT2 = CellItem.CleanFormat(searchTXT, ContentHolderCellColumn, ContenHolderCellRow);
+                    IsT = CellItem.CleanFormat(IsT, ContentHolderCellColumn, ContenHolderCellRow);
+                    if (!string.IsNullOrEmpty(SuchT2) && !string.IsNullOrEmpty(IsT) && IsT.ToLower().Contains(SuchT2.ToLower()))
+                    {
+                        foundColumn = column;
+                        foundRow = row;
+                        return;
+                    }
+                }
+
+            } while (true);
         }
     }
 }

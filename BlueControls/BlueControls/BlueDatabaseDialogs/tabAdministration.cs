@@ -394,6 +394,9 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 _TableView.Database.Column.Swap(_TableView.CursorPosColumn(), _TableView.CursorPosColumn().Previous());
             }
+
+            _TableView.EnsureVisible(_TableView.CursorPosColumn(), _TableView.CursorPosRow());
+            Check_OrderButtons();
         }
 
         private void btnSpalteNachRechts_Click(object sender, System.EventArgs e)
@@ -409,6 +412,8 @@ namespace BlueControls.BlueDatabaseDialogs
                 _TableView.Database.Column.Swap(_TableView.CursorPosColumn(), _TableView.CursorPosColumn().Next());
             }
 
+            _TableView.EnsureVisible(_TableView.CursorPosColumn(), _TableView.CursorPosRow());
+            Check_OrderButtons();
         }
 
 

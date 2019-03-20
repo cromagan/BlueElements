@@ -142,7 +142,7 @@ namespace BlueDatabase
 
 
 
-        private static void DoSingleCodex(string CodeNr, ref string tx, RowItem vRow, ColumnItem Col, ref enDataFormat fo, ref int Wi, ref int He, ref Bitmap I, ref string BT, string Code, ref bool Ended)
+        private static void DoSingleCodex(string CodeNr, ref string tx, RowItem row, ColumnItem column, ref enDataFormat format, ref int Wi, ref int He, ref Bitmap I, ref string BT, string Code, ref bool Ended)
         {
 
             switch (CodeNr.Substring(0, 3))
@@ -151,18 +151,18 @@ namespace BlueDatabase
                     if (CodeNr.Substring(0, 3) == "000") // Spaltenname für Textersetzung
                     {
 
-                        if (vRow != null)
+                        if (row != null)
                         {
-                            Col = vRow.Database.Column[CodeNr.Substring(3)];
-                            if (Col == null || !Col.ExportableTextformatForLayout())
+                            column = row.Database.Column[CodeNr.Substring(3)];
+                            if (column == null || !column.ExportableTextformatForLayout())
                             {
                                 tx = "/FehlerTS/" + Code;
                                 Ended = true;
                                 return;
                             }
 
-                            tx = vRow.CellGetString(Col);
-                            fo = Col.Format;
+                            tx = row.CellGetString(column);
+                            format = column.Format;
                         }
 
                         if (!string.IsNullOrEmpty(tx))
@@ -190,54 +190,50 @@ namespace BlueDatabase
                 case "001": // Spaltenname für Bild
 
 
-                    if (vRow != null)
+                    if (row != null)
                     {
-                        Col = vRow.Database.Column[CodeNr.Substring(3)];
-                        if (Col == null)
+                        column = row.Database.Column[CodeNr.Substring(3)];
+                        if (column == null)
                         {
                             tx = "/FehlerTS/" + Code;
                             Ended = true;
                             return;
                         }
-                        tx = vRow.CellGetString(Col);
-                        fo = Col.Format;
-                        switch (Col.Format)
+                        tx = row.CellGetString(column);
+                        format = column.Format;
+                        switch (column.Format)
                         {
                             case enDataFormat.Binärdaten_Bild:
-                                I = vRow.CellGetBitmap(Col);
+                                I = row.CellGetBitmap(column);
                                 //break; case Is = enDataFormat.Link_To_BlueDataSystem
                                 //    I = Nothing
                                 //    vRow.Database.DataSystem.File_Load(tx, I)
 
                                 break;
                             case enDataFormat.Link_To_Filesystem:
-                                I = (Bitmap)modAllgemein.Image_FromFile(vRow.CellBestFile(Col));
+                                I = (Bitmap)modAllgemein.Image_FromFile(row.CellBestFile(column));
 
 
                                 break;
                         }
                     }
 
-                    if (I == null)
-                    {
-                        I = QuickImage.Get(enImageCode.Warnung, 32).BMP;
-                    }
+                    if (I == null) { I = QuickImage.Get(enImageCode.Warnung, 32).BMP; }
 
                     break;
 
                 case "003": // Spaltenname für Bedingugnen
-
-                    if (vRow != null)
+                    if (row != null)
                     {
-                        Col = vRow.Database.Column[CodeNr.Substring(3)];
-                        if (Col == null || !Col.ExportableTextformatForLayout())
+                        column = row.Database.Column[CodeNr.Substring(3)];
+                        if (column == null || !column.ExportableTextformatForLayout())
                         {
                             tx = "/FehlerTS/" + Code;
                             Ended = true;
                             return;
                         }
-                        fo = Col.Format;
-                        BT = vRow.CellGetString(Col);
+                        format = column.Format;
+                        BT = row.CellGetString(column);
                     }
 
                     break;
@@ -264,9 +260,8 @@ namespace BlueDatabase
                     break;
 
                 case "103": // Vortext
-
                     var ts = tx.SplitByCR();
-                    for (var tz = 0 ; tz <= ts.GetUpperBound(0) ; tz++)
+                    for (var tz = 0; tz <= ts.GetUpperBound(0); tz++)
                     {
                         ts[tz] = CodeNr.Substring(3) + ts[tz];
                     }
@@ -275,27 +270,22 @@ namespace BlueDatabase
 
                 case "104": // Nachtext
                     var ts2 = tx.SplitByCR();
-                    for (var tz = 0 ; tz <= ts2.GetUpperBound(0) ; tz++)
+                    for (var tz = 0; tz <= ts2.GetUpperBound(0); tz++)
                     {
                         ts2[tz] = ts2[tz] + CodeNr.Substring(3);
                     }
                     tx = string.Join("\r", ts2);
-
-
                     break;
+
                 case "105":
-
-
                     if (!string.IsNullOrEmpty(tx))
                     {
                         tx = tx.Replace("<H3>", CodeNr.Substring(3) + "<H3>");
                         tx = tx.Replace("<H2>", CodeNr.Substring(3) + "<H2>");
                         tx = tx.Replace("<H1>", CodeNr.Substring(3) + "<H1>");
                     }
-
-
-
                     break;
+
                 case "106":
                     if (!string.IsNullOrEmpty(tx))
                     {
@@ -385,9 +375,9 @@ namespace BlueDatabase
                 case "107":
 
                     var ts3 = tx.SplitByCR();
-                    for (var tz = 0 ; tz <= ts3.GetUpperBound(0) ; tz++)
+                    for (var tz = 0; tz <= ts3.GetUpperBound(0); tz++)
                     {
-                        ts3[tz] = DataFormat.CleanFormat(ts3[tz], fo);
+                        ts3[tz] = CellItem.CleanFormat(ts3[tz], column, row);
                     }
                     tx = string.Join("\r", ts3);
                     break;
@@ -434,6 +424,7 @@ namespace BlueDatabase
                         tx = tx.Replace("Messerspitze", "Msp.");
                         tx = tx.Replace("Portionen", "Port.");
                         tx = tx.Replace("Portion", "Port.");
+                        tx = tx.Replace("ein halbes ", "1/2 ", RegexOptions.IgnoreCase);
                         tx = tx.Replace("eine halbe ", "1/2 ", RegexOptions.IgnoreCase);
                         tx = tx.Replace("ein halber ", "1/2 ", RegexOptions.IgnoreCase);
                         tx = tx.Replace("ein drittel ", "1/3 ", RegexOptions.IgnoreCase);
@@ -451,7 +442,7 @@ namespace BlueDatabase
                         tx = tx.Replace("zwei TL", "2 TL", RegexOptions.IgnoreCase);
 
 
-                        for (var t = 0 ; t <= A.GetUpperBound(0) ; t++)
+                        for (var t = 0; t <= A.GetUpperBound(0); t++)
                         {
                             tx = tx.Replace("gerieben" + A[t], "ger.");
                             //tx = tx.Replace("groß" + A[t], "gr.");

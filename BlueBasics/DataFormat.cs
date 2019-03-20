@@ -1,3 +1,22 @@
+#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -10,62 +29,6 @@ namespace BlueBasics
     {
 
 
-        public static string CleanFormat(string IsText, enDataFormat Format)
-        {
-            // Nur für die Suche und wenn Telefonnummern bereinigt werden müssen
-
-            if (string.IsNullOrEmpty(IsText)) { return string.Empty; }
-
-
-            switch (Format)
-            {
-                case enDataFormat.Text:
-                case enDataFormat.InternetAdresse:
-                case enDataFormat.RelationText:
-                    return IsText;
-
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.BildCode:
-                    return IsText.ReduceToChars(AllowedChars(Format));
-
-
-                case enDataFormat.Email:
-                    return IsText.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + "@_-.");
-
-                case enDataFormat.Telefonnummer:
-                    if (IsText.ReduceToChars("+/().- " + Constants.Char_Numerals) != IsText) { return string.Empty; }
-                    return IsText.ReduceToChars(Constants.Char_Numerals + "+");
-
-
-                case enDataFormat.Datum_und_Uhrzeit:
-                    if (IsText.Length == 6) { IsText = IsText + "1800"; }
-                    if (!IsText.IsFormat(Format)) { return string.Empty; }
-                    if (IsText.Length != 10) { return string.Empty; }// Nicht definiert!
-                    return DateTimeParse(IsText).Year.Nummer(4) + "-" + DateTimeParse(IsText).Month.Nummer(2) + "-" + DateTimeParse(IsText).Day.Nummer(2);
-
-                case enDataFormat.Link_To_Filesystem:
-                    return IsText;
-
-
-                case enDataFormat.Ganzzahl:
-                    if (IsText.ReduceToChars("- " + Constants.Char_Numerals) != IsText) { return string.Empty; }
-                    return IsText.ReduceToChars("-" + Constants.Char_Numerals).TrimStart('0');
-
-                case enDataFormat.Gleitkommazahl:
-                    if (IsText.ReduceToChars(Constants.Char_Numerals + "-,. ") != IsText) { return string.Empty; }
-                    IsText = IsText.ReduceToChars(Constants.Char_Numerals + "-,.").Replace(".", ","); if (IsText == ",") { return string.Empty; }
-                    return IsText;
-
-                case enDataFormat.Bit:
-                    return string.Empty;
-
-                default:
-                    Develop.DebugPrint(Format);
-                    return IsText;
-            }
-
-        }
 
 
         public static bool MultilinePossible(this enDataFormat format)

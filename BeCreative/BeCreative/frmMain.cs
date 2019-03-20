@@ -153,16 +153,7 @@ namespace BeCreative
         private void SuchB_Click(object sender, EventArgs e)
         {
             BlueFormulax.HideViewEditor();
-
-            var CheckRow = BlueFormulax.ShowingRow;
-            RowItem GefRow = null;
-
             var SuchtT = such.Text.Trim();
-
-            if (CheckRow == null) { CheckRow = TableView.View_RowFirst(); }
-
-            var Count = 0;
-
 
             if (string.IsNullOrEmpty(SuchtT))
             {
@@ -170,61 +161,77 @@ namespace BeCreative
                 return;
             }
 
-            do
-            {
-
-                if (Count > TableView.Database.Row.Count() + 1) { break; }
-                if (GefRow != null && GefRow != BlueFormulax.ShowingRow) { break; }
-
-                Count += 1;
-                CheckRow = TableView.View_NextRow(CheckRow);
-                if (CheckRow == null) { CheckRow = TableView.View_RowFirst(); }
-
-                foreach (var ThisColumnItem in TableView.Database.Column)
-                {
-                    if (ThisColumnItem != null)
-                    {
-                        if (!ThisColumnItem.IgnoreAtRowFilter)
-                        {
-                            var IsT = CheckRow.CellGetString(ThisColumnItem);
 
 
-                            if (!string.IsNullOrEmpty(IsT))
-                            {
+            Table.SearchNextText(SuchtT, TableView, null, BlueFormulax.ShowingRow, out var found, out var GefRow);
 
 
-                                if (ThisColumnItem.Format == enDataFormat.Text_mit_Formatierung)
-                                {
-                                    var l = new ExtText(enDesign.TextBox, enStates.Standard);
-                                    l.HtmlText = IsT;
-                                    IsT = l.PlainText;
-                                }
+            //var CheckRow = BlueFormulax.ShowingRow;
+            //RowItem GefRow = null;
 
 
-                                // Allgemeine Prüfung
-                                if (IsT.ToLower().Contains(SuchtT.ToLower()))
-                                {
-                                    GefRow = CheckRow;
-                                }
+            //if (CheckRow == null) { CheckRow = TableView.View_RowFirst(); }
 
-                                // Spezielle Format-Prüfung
-                                var SuchT2 = DataFormat.CleanFormat(SuchtT, ThisColumnItem.Format);
-                                IsT = DataFormat.CleanFormat(IsT, ThisColumnItem.Format);
-                                if (!string.IsNullOrEmpty(SuchT2) && !string.IsNullOrEmpty(IsT))
-                                {
+            //var Count = 0;
 
-                                    if (IsT.ToLower().Contains(SuchT2.ToLower()))
-                                    {
-                                        GefRow = CheckRow;
-                                    }
-                                }
 
-                            }
-                        }
-                    }
-                }
 
-            } while (true);
+
+            //do
+            //{
+
+            //    if (Count > TableView.Database.Row.Count() + 1) { break; }
+            //    if (GefRow != null && GefRow != BlueFormulax.ShowingRow) { break; }
+
+            //    Count += 1;
+            //    CheckRow = TableView.View_NextRow(CheckRow);
+            //    if (CheckRow == null) { CheckRow = TableView.View_RowFirst(); }
+
+            //    foreach (var ThisColumnItem in TableView.Database.Column)
+            //    {
+            //        if (ThisColumnItem != null)
+            //        {
+            //            if (!ThisColumnItem.IgnoreAtRowFilter)
+            //            {
+            //                var IsT = CheckRow.CellGetString(ThisColumnItem);
+
+
+            //                if (!string.IsNullOrEmpty(IsT))
+            //                {
+
+
+            //                    if (ThisColumnItem.Format == enDataFormat.Text_mit_Formatierung)
+            //                    {
+            //                        var l = new ExtText(enDesign.TextBox, enStates.Standard);
+            //                        l.HtmlText = IsT;
+            //                        IsT = l.PlainText;
+            //                    }
+
+
+            //                    // Allgemeine Prüfung
+            //                    if (IsT.ToLower().Contains(SuchtT.ToLower()))
+            //                    {
+            //                        GefRow = CheckRow;
+            //                    }
+
+            //                    // Spezielle Format-Prüfung
+            //                    var SuchT2 = DataFormat.CleanFormat(SuchtT, ThisColumnItem.Format);
+            //                    IsT = DataFormat.CleanFormat(IsT, ThisColumnItem.Format);
+            //                    if (!string.IsNullOrEmpty(SuchT2) && !string.IsNullOrEmpty(IsT))
+            //                    {
+
+            //                        if (IsT.ToLower().Contains(SuchT2.ToLower()))
+            //                        {
+            //                            GefRow = CheckRow;
+            //                        }
+            //                    }
+
+            //                }
+            //            }
+            //        }
+            //    }
+
+            //} while (true);
 
 
             if (GefRow == null)
@@ -366,7 +373,7 @@ namespace BeCreative
 
             tmpDatabase = Database.Load(Datei, false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
 
-                        if (tmpDatabase == null)            {                return;            }
+            if (tmpDatabase == null) { return; }
 
             DatabaseSet(tmpDatabase);
         }
@@ -653,11 +660,11 @@ namespace BeCreative
             switch (bu.Name)
             {
                 case "SaveAs":
-                        if (_Database == null) { return; }
-                        break;
+                    if (_Database == null) { return; }
+                    break;
                 case "NeuDB":
-                        if (_Database != null) { SetDatabasetoNothing(); }
-                        break;
+                    if (_Database != null) { SetDatabasetoNothing(); }
+                    break;
                 default:
                     DebugPrint(enFehlerArt.Fehler, "Ungültiger Aufruf!");
                     break;
