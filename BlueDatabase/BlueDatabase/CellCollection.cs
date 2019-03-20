@@ -1199,15 +1199,15 @@ namespace BlueDatabase
         }
 
 
-        public string GetStringForExport(ColumnItem Column, RowItem Row)
+        public string GetValueCompleteReadable(ColumnItem Column, RowItem Row, enShortenStyle style)
         {
-            return ColumnItem.ForHTMLExport(Column, Database.Cell.GetString(Column, Row));
+            return CellItem.ValueCompleteReadable(Column, Row, style);
         }
 
-        public string GetStringForExport(string Column, RowItem Row)
-        {
-            return GetStringForExport(Database.Column[Column], Row);
-        }
+        //public string GetStringForExport(string Column, RowItem Row)
+        //{
+        //    return GetStringForExport(Database.Column[Column], Row);
+        //}
 
         public Size GetSizeOfCellContent(ColumnItem Column, RowItem Row)
         {

@@ -1067,7 +1067,6 @@ namespace BlueControls.Controls
             }
 
             Skin.Draw_FormatedText(GR, ContentHolderColumnStyle, DrawString, null, enAlignment.Top_Left, r, null, false, vfont, enShortenStyle.Replaced);
-
         }
 
 
@@ -4179,9 +4178,8 @@ namespace BlueControls.Controls
                     }
 
                     // Spezielle Format-Prüfung
-                    var SuchT2 = CellItem.CleanFormat(searchTXT, ContentHolderCellColumn, ContenHolderCellRow);
-                    IsT = CellItem.CleanFormat(IsT, ContentHolderCellColumn, ContenHolderCellRow);
-                    if (!string.IsNullOrEmpty(SuchT2) && !string.IsNullOrEmpty(IsT) && IsT.ToLower().Contains(SuchT2.ToLower()))
+                    var Ist = CellItem.ValueCompleteReadable(ContentHolderCellColumn, ContenHolderCellRow, enShortenStyle.Both);
+                    if (!string.IsNullOrEmpty(Ist) && IsT.ToLower().Contains(searchTXT.ToLower()))
                     {
                         foundColumn = column;
                         foundRow = row;

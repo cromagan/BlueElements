@@ -2359,193 +2359,24 @@ namespace BlueDatabase
         }
 
 
-        public static string ForHTMLExport(ColumnItem Column, string Einstiegstext)
-        {
-            switch (Column.Format)
-            {
-
-                case enDataFormat.Text:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Telefonnummer:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
-                case enDataFormat.BildCode:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                case enDataFormat.RelationText:
-                    // hier nix.
-                    break;
-
-
-                case enDataFormat.Bit:
-                    if (Einstiegstext == true.ToPlusMinus())
-                    {
-                        return "Ja";
-                    }
-                    else if (Einstiegstext == false.ToPlusMinus())
-                    {
-                        return "Nein";
-                    }
-                    else if (Einstiegstext == "o" || Einstiegstext == "O")
-                    {
-                        return "Neutral";
-                    }
-                    else if (Einstiegstext == "?")
-                    {
-                        return "Unbekannt";
-                    }
-                    else
-                    {
-                        return Einstiegstext;
-                    }
-
-
-                case enDataFormat.Gleitkommazahl:
-                    Einstiegstext = Einstiegstext.Replace(".", ",");
-                    break;
-
-                case enDataFormat.Binärdaten_Bild:
-                case enDataFormat.Binärdaten:
-                case enDataFormat.Farbcode:
-                    Einstiegstext = "?";
-                    break;
-
-
-                case enDataFormat.LinkedCell:
-                    Develop.DebugPrint("Fremdzelle dürfte hier nicht ankommen");
-                    break;
-
-
-                //case enDataFormat.Relation:
-                //    var tmp = new clsRelation(Column, null, Einstiegstext);
-                //    return tmp.ReadableText();
-
-
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                    return Draw_FormatedText_TextOf(Einstiegstext, null, Column, enShortenStyle.Unreplaced);
-
-                default:
-                    Develop.DebugPrint(Column.Format);
-                    return "???";
-            }
 
 
 
 
-            Einstiegstext = Einstiegstext.Replace("\r\n", "<br>");
-            Einstiegstext = Einstiegstext.Replace("\r", "<br>");
-            Einstiegstext = Einstiegstext.Replace("\n", "<br>");
-            Einstiegstext = Einstiegstext.Trim();
-            Einstiegstext = Einstiegstext.Trim("<br>");
-            Einstiegstext = Einstiegstext.Trim();
-            Einstiegstext = Einstiegstext.Trim("<br>");
-
-            return Einstiegstext;
-
-        }
-
-        public static string Draw_FormatedText_TextOf(string Txt, QuickImage ImageCode, ColumnItem Column, enShortenStyle Style)
-        {
-            switch (Column.Format)
-            {
-                case enDataFormat.Text:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Binärdaten:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.Telefonnummer:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                case enDataFormat.RelationText:
-                    if (Txt == null || string.IsNullOrEmpty(Txt)) { return string.Empty; }
-                    Txt = ColumnReplace(Txt, Column, Style);
-                    return Txt.Replace("\r\n", " ");
-
-
-                case enDataFormat.BildCode:
-                    if (Column.CompactView) { return string.Empty; }
-                    Txt = ColumnReplace(Txt, Column, Style);
-                    return Txt; //modFormat.ForHTMLExportx(Nothing, Format, Txt)
-
-
-                case enDataFormat.Bit:
-                    if (Column.CompactView) { return string.Empty; }
-                    return ForHTMLExport(Column, Txt);
-
-
-                //case enDataFormat.Relation:
-                //    if (!string.IsNullOrEmpty(Txt))
-                //    {
-                //        if (ImageCode != null) { return Txt; }
-
-                //        if (!Txt.Contains("{") && !Txt.Contains("|")) { return Txt; }
-
-                //        var x = new clsRelation(Column, null, Txt);
-
-                //        if (Column.CompactView) { return x.Sec; }
-                //        return x.ReadableText();
-                //    }
-                //    return string.Empty;
-
-
-                case enDataFormat.Farbcode:
-                    if (Column.CompactView) { return string.Empty; }
-                    if (!string.IsNullOrEmpty(Txt) && Txt.IsFormat(enDataFormat.Farbcode))
-                    {
-                        var col = Color.FromArgb(int.Parse(Txt));
-                        return col.ColorName();
-                    }
-                    return Txt;
-
-                case enDataFormat.Binärdaten_Bild:
-                    return string.Empty;
-
-
-                case enDataFormat.Schrift:
-                    Develop.DebugPrint_NichtImplementiert();
-                    //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return Txt; }
-
-                    //if (Column.CompactView) { return string.Empty; }
-                    //return BlueFont.Get(Txt).ReadableText();
-                    return string.Empty;
-
-                case enDataFormat.LinkedCell:
-                    // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
-                    if (Txt == null || string.IsNullOrEmpty(Txt)) { return string.Empty; }
-                    Txt = ColumnReplace(Txt, Column, Style);
-                    return Txt.Replace("\r\n", " ");
-
-
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                    // Hier kommt die Spalten-ID  an
-                    if (string.IsNullOrEmpty(Txt)) { return string.Empty; }
-                    if (!int.TryParse(Txt, out var ColKey)) { return "Columkey kann nicht geparsed werden"; }
-                    var LinkedDatabase = Column.LinkedDatabase();
-                    if (LinkedDatabase == null) { return "Datenbankverknüpfung fehlt"; }
-                    var C = LinkedDatabase.Column.SearchByKey(ColKey);
-                    if (C == null) { return "Columnkey nicht gefunden"; }
-                    Txt = ColumnReplace(C.ReadableText(), Column, Style);
-                    return Txt;
-
-                default:
-                    Develop.DebugPrint(Column.Format);
-                    return Txt;
-            }
-
-
-        }
-
-
+        /// <summary>
+        /// Fügt Präfix und Suffix hinzu und ersteztt den Text nach dem geünschten Stil.
+        /// </summary>
+        /// <param name="newTXT"></param>
+        /// <param name="Column"></param>
+        /// <param name="Style"></param>
+        /// <returns></returns>
         public static string ColumnReplace(string newTXT, ColumnItem Column, enShortenStyle Style)
         {
-            if (Style == enShortenStyle.Unreplaced || Column.Replacer.Count == 0) { return newTXT; }
+
+            if (!string.IsNullOrEmpty(Column.Prefix)) { newTXT = Column.Prefix + " " + newTXT; }
+            if (!string.IsNullOrEmpty(Column.Suffix)) { newTXT = newTXT + " " + Column.Suffix; }
+
+            if (Style == enShortenStyle.Unreplaced || Style == enShortenStyle.HTML || Column.Replacer.Count == 0) { return newTXT; }
 
             var OT = newTXT;
 

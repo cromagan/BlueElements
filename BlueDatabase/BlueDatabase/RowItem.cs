@@ -409,16 +409,16 @@ namespace BlueDatabase
             return Database.Cell.GetString(ColumnName, this);
         }
 
-        public string CellGetStringForExport(ColumnItem Column)
+        public string CellGetValueCompleteReadable(ColumnItem Column, enShortenStyle style)
         {
-            return Database.Cell.GetStringForExport(Column, this);
+            return Database.Cell.GetValueCompleteReadable(Column, this, style);
         }
 
 
-        public string CellGetStringForExport(string ColumnName)
-        {
-            return Database.Cell.GetStringForExport(ColumnName, this);
-        }
+        //public string CellGetStringForExport(string ColumnName)
+        //{
+        //    return Database.Cell.GetStringForExport(ColumnName, this);
+        //}
 
 
         public void CellSet(string ColumnName, string Value)

@@ -796,11 +796,8 @@ namespace BlueControls
         public void Draw_FormatedText(Graphics GR, ColumnItem column, string Txt, QuickImage ImageCode, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, BlueFont F, enShortenStyle Style)
         {
             var tmpImageCode = Draw_FormatedText_PicOf(Txt, ImageCode, column);
-            var tmpText = ColumnItem.Draw_FormatedText_TextOf(Txt, ImageCode, column, Style);
+            var tmpText = CellItem.ValueReadable(Txt, column, Style);
             vAlign = Draw_FormatedText_Alignment(column, tmpText, tmpImageCode, vAlign);
-
-            if (!string.IsNullOrEmpty(column.Prefix)) { tmpText = column.Prefix + " " + tmpText; }
-            if (!string.IsNullOrEmpty(column.Suffix)) { tmpText = tmpText + " " + column.Suffix; }
 
             Draw_FormatedText(GR, tmpText, tmpImageCode, vAlign, FitInRect, Child, DeleteBack, F);
         }
@@ -929,7 +926,7 @@ namespace BlueControls
             if (!string.IsNullOrEmpty(Column.Suffix)) { txt = txt + " " + Column.Suffix; }
 
             var tmpImageCode = Draw_FormatedText_PicOf(txt, ImageCode, Column);
-            var tmpText = ColumnItem.Draw_FormatedText_TextOf(txt, ImageCode, Column, Style);
+            var tmpText = CellItem.ValueReadable(txt, Column, Style);
 
             return FormatedText_NeededSize(tmpText, tmpImageCode, F);
 

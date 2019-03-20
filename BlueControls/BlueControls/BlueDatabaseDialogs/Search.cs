@@ -17,9 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.DialogBoxes;
@@ -33,7 +30,7 @@ namespace BlueControls.BlueDatabaseDialogs
     {
 
         private readonly Table _BlueTable;
-        private bool IsWorking;
+
 
         private RowItem _row = null;
         private ColumnItem _col = null;
@@ -87,6 +84,8 @@ namespace BlueControls.BlueDatabaseDialogs
                 return;
             }
 
+
+            SuchtT = SuchtT.Replace(";cr;", "\r").Replace(";tab;", "\t");
 
 
             Table.SearchNextText(SuchtT, _BlueTable, _col, _row, out var found, out var GefRow);
