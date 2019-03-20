@@ -211,7 +211,7 @@ namespace BlueBasics
                     return Constants.Char_Numerals + "-,";
 
                 case enDataFormat.Datum_und_Uhrzeit:
-                    return Constants.Char_Numerals + ":.";
+                    return Constants.Char_Numerals + " :.";
 
                 case enDataFormat.Telefonnummer:
                     return Constants.Char_Numerals + "+ /-";
@@ -336,6 +336,7 @@ namespace BlueBasics
 
                 case enDataFormat.Datum_und_Uhrzeit:
                     if (il == 19) { return true; }
+                    if (il == 16) { return true; } // 01.01.2011 11:11
                     return Convert.ToBoolean(il == 10);
 
                 case enDataFormat.Bit:
@@ -453,6 +454,7 @@ namespace BlueBasics
                 case enDataFormat.Datum_und_Uhrzeit:
                     if (new Regex(@"^\d{2}.\d{2}.\d{4}$").IsMatch(TXT)) { return true; }
                     if (new Regex(@"^\d{2}.\d{2}.\d{4} \d{2}:\d{2}:\d{2}$").IsMatch(TXT)) { return true; }
+                    if (new Regex(@"^\d{2}.\d{2}.\d{4} \d{2}:\d{2}$").IsMatch(TXT)) { return true; }
                     return false;
 
                 case enDataFormat.InternetAdresse:

@@ -1199,9 +1199,9 @@ namespace BlueDatabase
         }
 
 
-        public string GetValueCompleteReadable(ColumnItem Column, RowItem Row, enShortenStyle style)
+        public List<string> ValuesReadable(ColumnItem Column, RowItem Row, enShortenStyle style)
         {
-            return CellItem.ValueCompleteReadable(Column, Row, style);
+            return CellItem.ValuesReadable(Column, Row, style);
         }
 
         //public string GetStringForExport(string Column, RowItem Row)

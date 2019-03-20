@@ -3954,9 +3954,6 @@ namespace BlueControls.Controls
                     var TMPSize = Size.Empty;
                     for (var z = 0; z <= TMP.GetUpperBound(0); z++)
                     {
-                        if (!string.IsNullOrEmpty(Column.Prefix)) { TMP[z] = Column.Prefix + " " + TMP[z]; }
-                        if (!string.IsNullOrEmpty(Column.Suffix)) { TMP[z] = TMP[z] + " " + Column.Suffix; }
-
                         TMPSize = Skin.FormatedText_NeededSize(Column, TMP[z], null, CellFont, enShortenStyle.Replaced);
                         if (TMPSize.Width > _ContentSize.Width) { _ContentSize.Width = TMPSize.Width; }
 
@@ -4102,7 +4099,7 @@ namespace BlueControls.Controls
             var ca = TableView.Database.ColumnArrangements[TableView.Arrangement];
 
             if (row == null) { row = TableView.View_RowFirst(); }
-            if (column == null) { column = ca[0].Column; }
+            if (column == null) { column = TableView.Database.Column.SysLocked; }
 
             var rowsChecked = 0;
 
@@ -4120,7 +4117,17 @@ namespace BlueControls.Controls
             do
             {
 
-                column = ca.NextVisible(column);
+                if (TableView.Design == enBlueTableAppearance.OnlyMainColumnWithoutHead)
+                {
+                    column = column.Next();
+                }
+                else
+                {
+                    column = ca.NextVisible(column);
+                }
+
+
+
                 if (column == null)
                 {
                     column = ca[0].Column;
@@ -4178,7 +4185,7 @@ namespace BlueControls.Controls
                     }
 
                     // Spezielle Format-Prüfung
-                    var Ist = CellItem.ValueCompleteReadable(ContentHolderCellColumn, ContenHolderCellRow, enShortenStyle.Both);
+                    var Ist = CellItem.ValuesReadable(ContentHolderCellColumn, ContenHolderCellRow, enShortenStyle.Both).JoinWithCr();
                     if (!string.IsNullOrEmpty(Ist) && IsT.ToLower().Contains(searchTXT.ToLower()))
                     {
                         foundColumn = column;

@@ -3299,7 +3299,7 @@ namespace BlueControls.Controls
 
                     if (!RemoveMe)
                     {
-                        if (_ExternalRelations[z].Points[0] == _ExternalRelations[z].Points[1]) { RemoveMe = true; }
+                        if (_ExternalRelations[z].Points.Count != 2 || _ExternalRelations[z].Points[0] == _ExternalRelations[z].Points[1]) { RemoveMe = true; }
                     }
                 }
 

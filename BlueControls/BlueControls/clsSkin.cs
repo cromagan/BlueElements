@@ -922,14 +922,10 @@ namespace BlueControls
 
         public Size FormatedText_NeededSize(ColumnItem Column, string txt, QuickImage ImageCode, BlueFont F, enShortenStyle Style)
         {
-            if (!string.IsNullOrEmpty(Column.Prefix)) { txt = Column.Prefix + " " + txt; }
-            if (!string.IsNullOrEmpty(Column.Suffix)) { txt = txt + " " + Column.Suffix; }
-
             var tmpImageCode = Draw_FormatedText_PicOf(txt, ImageCode, Column);
             var tmpText = CellItem.ValueReadable(txt, Column, Style);
 
             return FormatedText_NeededSize(tmpText, tmpImageCode, F);
-
         }
 
         public Size FormatedText_NeededSize(string tmpText, QuickImage tmpImageCode, BlueFont F)

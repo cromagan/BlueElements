@@ -2190,7 +2190,7 @@ namespace BlueDatabase
 
                             if (LCrow != null && LCColumn != null)
                             {
-                                da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">" + LCrow.CellGetValueCompleteReadable(LCColumn, enShortenStyle.HTML) + "</th>");
+                                da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">" + LCrow.CellGetValuesReadable(LCColumn, enShortenStyle.HTML).JoinWith("<br>") + "</th>");
                             }
                             else
                             {

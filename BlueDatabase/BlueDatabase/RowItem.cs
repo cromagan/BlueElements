@@ -409,9 +409,9 @@ namespace BlueDatabase
             return Database.Cell.GetString(ColumnName, this);
         }
 
-        public string CellGetValueCompleteReadable(ColumnItem Column, enShortenStyle style)
+        public List<string> CellGetValuesReadable(ColumnItem Column, enShortenStyle style)
         {
-            return Database.Cell.GetValueCompleteReadable(Column, this, style);
+            return Database.Cell.ValuesReadable(Column, this, style);
         }
 
 

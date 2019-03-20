@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueDatabase
@@ -81,35 +82,33 @@ namespace BlueDatabase
 
 
         /// <summary>
-        /// Gibt den kompletten Inhalt der Zelle als lesbaren Text zurück. Jede Zeile für sich richtig formatiert.
+        /// Jede Zeile für sich richtig formatiert.
         /// </summary>
         /// <returns></returns>
-        public static string ValueCompleteReadable(ColumnItem column, RowItem Row, enShortenStyle Style)
+        public static List<string> ValuesReadable(ColumnItem column, RowItem Row, enShortenStyle Style)
         {
 
             if (column.Format == enDataFormat.LinkedCell)
             {
-              column.Database.Cell.LinkedCellData(column, Row, out var LCColumn, out var LCrow);
-                if (LCColumn != null && LCrow != null) { return ValueCompleteReadable(column, Row, Style); }
-                return string.Empty;
+                column.Database.Cell.LinkedCellData(column, Row, out var LCColumn, out var LCrow);
+                if (LCColumn != null && LCrow != null) { return ValuesReadable(column, Row, Style); }
+                return new List<string>();
             }
 
+            var ret = new List<string>();
 
             if (!column.MultiLine)
             {
-                return ValueReadable(Row.CellGetString(column), column, Style);
+                ret.Add(ValueReadable(Row.CellGetString(column), column, Style));
+                return ret;
             }
 
             var x = Row.CellGetList(column);
-            string txt = string.Empty;
-
             foreach (var thisstring in x)
             {
-                if (!string.IsNullOrEmpty(txt)) { txt = txt + "\r"; }
-
-                txt = txt + ValueReadable(thisstring, column, Style);
+                ret.Add(ValueReadable(thisstring, column, Style));
             }
-            return txt;
+            return ret;
         }
 
 
@@ -215,14 +214,14 @@ namespace BlueDatabase
                 case enDataFormat.BildCode:
                     if (column.CompactView && Style != enShortenStyle.HTML) { return string.Empty; }
                     Txt = ColumnItem.ColumnReplace(Txt, column, Style);
-                    return Txt; 
+                    return Txt;
 
 
                 case enDataFormat.Bit:
                     if (column.CompactView && Style != enShortenStyle.HTML) { return string.Empty; }
                     if (Txt == true.ToPlusMinus())
                     {
-                        Txt =  "Ja";
+                        Txt = "Ja";
                     }
                     else if (Txt == false.ToPlusMinus())
                     {
@@ -248,7 +247,7 @@ namespace BlueDatabase
                     if (!string.IsNullOrEmpty(Txt) && Txt.IsFormat(enDataFormat.Farbcode))
                     {
                         var col = Color.FromArgb(int.Parse(Txt));
-                        Txt =  col.ColorName();
+                        Txt = col.ColorName();
                     }
                     Txt = ColumnItem.ColumnReplace(Txt, column, Style);
                     return Txt;
@@ -274,7 +273,7 @@ namespace BlueDatabase
                     if (LinkedDatabase == null) { return "Datenbankverknüpfung fehlt"; }
                     var C = LinkedDatabase.Column.SearchByKey(ColKey);
                     if (C == null) { return "Columnkey nicht gefunden"; }
-  
+
                     Txt = ColumnItem.ColumnReplace(C.ReadableText(), column, Style);
                     return Txt;
 

@@ -167,7 +167,7 @@ namespace BlueControls
                         }
                         if (!added)
                         {
-                            Develop.DebugPrint(enFehlerArt.Fehler, "Punkt nicht gefunden: " + pair.Value);
+                            Develop.DebugPrint(enFehlerArt.Warnung, "Punkt nicht gefunden: " + pair.Value);
                         }
 
                         break;
@@ -406,7 +406,11 @@ namespace BlueControls
 
 
             if (_relationtype == enRelationType.None) { Develop.DebugPrint(enFehlerArt.Fehler, "Der Type None ist nicht erlaubt"); }
-            if (Points.Count != 2) { Develop.DebugPrint(enFehlerArt.Fehler, "Genau " + 2 + " Punkte erwartet"); }
+            if (Points.Count != 2)
+            {
+                Develop.DebugPrint(enFehlerArt.Warnung, "Genau " + 2 + " Punkte erwartet");
+                return;
+            }
 
             switch (_relationtype)
             {
