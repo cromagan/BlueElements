@@ -107,10 +107,12 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (string.IsNullOrEmpty(_Column.Identifier))
             {
+                btnStandard.Enabled = false;
                 capInfo.Text = "<Imagecode=" + _Column.SymbolForReadableText() + "> Normale Spalte (Key: " + _Column.Key + ")";
             }
             else
             {
+                btnStandard.Enabled = true;
                 capInfo.Text = "<Imagecode=" + _Column.SymbolForReadableText() + "> " + _Column.Identifier + " (Key: " + _Column.Key + ")";
             }
 
@@ -635,6 +637,14 @@ namespace BlueControls.BlueDatabaseDialogs
             btnSpellChecking.Enabled = tmpFormat.SpellCheckingPossible();
             if (!tmpFormat.SpellCheckingPossible()) { btnSpellChecking.Checked = false; }
 
+        }
+
+        private void btnStandard_Click(object sender, System.EventArgs e)
+        {
+            if (!AllOk()) { return; }
+
+            _Column.StandardWerteNachKennung(true);
+            Column_DatenAuslesen(_Column);
         }
     }
 }

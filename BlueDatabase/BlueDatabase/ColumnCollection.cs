@@ -206,6 +206,7 @@ namespace BlueDatabase
 
             var c = new ColumnItem(Database, true);
             c.Load(enDatabaseDataType.co_Identifier, Kennung);
+            c.StandardWerteNachKennung(true);
 
         }
 

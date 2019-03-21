@@ -159,6 +159,11 @@ namespace BlueDatabase
         }
 
 
+        public void InsertAt(int index, ColumnItem Column)
+        {
+            _Internal.Insert(index, new ColumnViewItem(Column, enViewType.Column));
+        }
+
         public void Clear()
         {
             _Internal.Clear();
@@ -240,7 +245,7 @@ namespace BlueDatabase
 
 
             var OK = true;
-            for (var z = 0 ; z < OfDatabase.Column.Count ; z++)
+            for (var z = 0; z < OfDatabase.Column.Count; z++)
             {
 
                 if (z >= _Internal.Count)
@@ -465,7 +470,7 @@ namespace BlueDatabase
 
             if (_Internal == null || _Internal.Count == 0) { return; }
 
-            for (var z = 0 ; z < _Internal.Count ; z++)
+            for (var z = 0; z < _Internal.Count; z++)
             {
                 if (_Internal[z].Column == null || !Database.Column.Contains(_Internal[z].Column))
                 {

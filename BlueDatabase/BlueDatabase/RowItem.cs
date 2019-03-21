@@ -192,7 +192,7 @@ namespace BlueDatabase
         /// <param name="IsNewRow"></param>
         /// <param name="DoFemdZelleInvalidate"></param>
         /// <param name="ShowMessageBox"></param>
-        public string DoAutomatic(bool IsNewRow, bool DoFemdZelleInvalidate)
+        public string DoAutomatic(bool IsNewRow, bool DoFemdZelleInvalidate, bool FreezeMode)
         {
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
             var cols = DoRules();
@@ -203,7 +203,7 @@ namespace BlueDatabase
             {
                 if (ThisColum != null)
                 {
-                    if (IsNewRow && !string.IsNullOrEmpty(ThisColum.CellInitValue)) { CellSet(ThisColum, ThisColum.CellInitValue); }
+                    if (IsNewRow && !string.IsNullOrEmpty(ThisColum.CellInitValue)) { CellSet(ThisColum, ThisColum.CellInitValue, FreezeMode); }
 
                     if (DoFemdZelleInvalidate && ThisColum.LinkedDatabase() != null)
                     {
@@ -213,9 +213,9 @@ namespace BlueDatabase
                 }
             }
 
-            if (Convert.ToBoolean(cols.Count == 0) != Database.Cell.GetBoolean(Database.Column.SysCorrect, this)) { CellSet(Database.Column.SysCorrect, Convert.ToBoolean(cols.Count == 0)); }
+            if (Convert.ToBoolean(cols.Count == 0) != Database.Cell.GetBoolean(Database.Column.SysCorrect, this)) { CellSet(Database.Column.SysCorrect, Convert.ToBoolean(cols.Count == 0), FreezeMode); }
 
-            OnRowChecked(new RowCheckedEventArgs(this, cols));
+            OnRowChecked(new RowCheckedEventArgs(this, cols, FreezeMode));
 
 
             var _Info = new List<string>();
@@ -278,7 +278,7 @@ namespace BlueDatabase
             {
                 Database.Cell.SystemSet(Database.Column.SysRowCreator, this, Database.UserName, false);
                 Database.Cell.SystemSet(Database.Column.SysRowCreateDate, this, DateTime.Now.ToString(), false);
-                DoAutomatic(true, false);
+                DoAutomatic(true, false, false);
             }
         }
 

@@ -500,19 +500,19 @@ namespace BlueControls.Controls
                 {
                     GR.DrawString(SortedRows()[Zei].TMP_Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, (int)SortedRows()[Zei].TMP_Y - RowCaptionFontY);
                 }
-                if (SortedRows()[Zei].TMP_Y >= HeadSize())
-                {
-                    if (!SortedRows()[Zei].CellGetBoolean(_Database.Column.SysCorrect))
-                    {
-                        GR.DrawImage(QuickImage.Get("Warnung|14||||||120||60").BMP, 3, (int)SortedRows()[Zei].TMP_Y + 1);
-                    }
-                    //else if (!SortedRows()[Zei].CellGetBoolean(_Database.Column.SysLocked()))
-                    //{
-                    //    GR.DrawImage(QuickImage.Get("Schlüssel|8|||FF0000|||120||60").BMP, 3, (int)SortedRows()[Zei].TMP_Y + 1);
-                    //}
+                //if (SortedRows()[Zei].TMP_Y >= HeadSize())
+                //{
+                //    if (!SortedRows()[Zei].CellGetBoolean(_Database.Column.SysCorrect))
+                //    {
+                //        GR.DrawImage(QuickImage.Get("Warnung|14||||||120||60").BMP, 3, (int)SortedRows()[Zei].TMP_Y + 1);
+                //    }
+                //    //else if (!SortedRows()[Zei].CellGetBoolean(_Database.Column.SysLocked()))
+                //    //{
+                //    //    GR.DrawImage(QuickImage.Get("Schlüssel|8|||FF0000|||120||60").BMP, 3, (int)SortedRows()[Zei].TMP_Y + 1);
+                //    //}
 
 
-                }
+                //}
 
                 Draw_Line(GR, SortedRows()[Zei], DisplayRectangleWOSlider, _Database.ColumnArrangements[_ArrangementNr].LastThisViewItem());
             }
@@ -1679,7 +1679,7 @@ namespace BlueControls.Controls
 
 
                 CursorPos_Set(CellInThisDatabaseColumn, CellInThisDatabaseRow, false);
-                CellInThisDatabaseRow.DoAutomatic(false, true);
+                CellInThisDatabaseRow.DoAutomatic(false, true, false);
 
                 // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
                 // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
@@ -4022,7 +4022,7 @@ namespace BlueControls.Controls
 
 
             Database.Cell.Set(Column, Row, v[0].Substring(5));
-            Row.DoAutomatic(false, true);
+            Row.DoAutomatic(false, true, false);
         }
 
 
@@ -4092,13 +4092,13 @@ namespace BlueControls.Controls
         }
 
 
-        public static void SearchNextText(string searchTXT, Table TableView, ColumnItem column, RowItem row, out ColumnItem foundColumn, out RowItem foundRow)
+        public static void SearchNextText(string searchTXT, Table TableView, ColumnItem column, RowItem row, out ColumnItem foundColumn, out RowItem foundRow, bool VereinfachteSuche)
         {
             searchTXT = searchTXT.Trim();
 
             var ca = TableView.Database.ColumnArrangements[TableView.Arrangement];
 
-            if (row == null) { row = TableView.View_RowFirst(); }
+            if (row == null) { row = TableView.View_RowLast(); }
             if (column == null) { column = TableView.Database.Column.SysLocked; }
 
             var rowsChecked = 0;
@@ -4156,41 +4156,51 @@ namespace BlueControls.Controls
                 }
 
 
-                var IsT = string.Empty;
+                var _Ist1 = string.Empty;
 
                 if (ContenHolderCellRow !=null && ContentHolderCellColumn != null)
                 {
-                    IsT = ContenHolderCellRow.CellGetString(ContentHolderCellColumn);
+                    _Ist1 = ContenHolderCellRow.CellGetString(ContentHolderCellColumn);
                 }
 
 
-                if (!string.IsNullOrEmpty(IsT))
+                if (!string.IsNullOrEmpty(_Ist1))
                 {
-
-
                     if (ContentHolderCellColumn.Format == enDataFormat.Text_mit_Formatierung)
                     {
                         var l = new ExtText(enDesign.TextBox, enStates.Standard);
-                        l.HtmlText = IsT;
-                        IsT = l.PlainText;
+                        l.HtmlText = _Ist1;
+                        _Ist1 = l.PlainText;
                     }
 
 
                     // Allgemeine Prüfung
-                    if (IsT.ToLower().Contains(searchTXT.ToLower()))
+                    if (_Ist1.ToLower().Contains(searchTXT.ToLower()))
                     {
                         foundColumn = column;
                         foundRow = row;
                         return;
                     }
 
-                    // Spezielle Format-Prüfung
-                    var Ist = CellItem.ValuesReadable(ContentHolderCellColumn, ContenHolderCellRow, enShortenStyle.Both).JoinWithCr();
-                    if (!string.IsNullOrEmpty(Ist) && IsT.ToLower().Contains(searchTXT.ToLower()))
+                    // Prüfung mit und ohne Ersetzungen / Prefix / Suffix
+                    var _Ist2 = CellItem.ValuesReadable(ContentHolderCellColumn, ContenHolderCellRow, enShortenStyle.Both).JoinWithCr();
+                    if (!string.IsNullOrEmpty(_Ist2) && _Ist2.ToLower().Contains(searchTXT.ToLower()))
                     {
                         foundColumn = column;
                         foundRow = row;
                         return;
+                    }
+
+                    if (VereinfachteSuche)
+                    {
+                        var _Ist3 = _Ist2.StarkeVereinfachung();
+                        var _searchTXT3 = searchTXT.StarkeVereinfachung();
+                        if (!string.IsNullOrEmpty(_Ist3) && _Ist3.ToLower().Contains(_searchTXT3.ToLower()))
+                        {
+                            foundColumn = column;
+                            foundRow = row;
+                            return;
+                        }
                     }
                 }
 

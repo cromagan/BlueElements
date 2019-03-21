@@ -1163,7 +1163,7 @@ namespace BlueDatabase
                     CellCollection.Invalidate_CellContentSize(this, ThisRow);
                     Invalidate_TmpColumnContentWidth();
                     Database.Cell.OnCellValueChanged(new CellEventArgs(this, ThisRow));
-                    ThisRow.DoAutomatic(false, true);
+                    ThisRow.DoAutomatic(false, true, false);
                 }
             }
         }
@@ -1327,7 +1327,7 @@ namespace BlueDatabase
                     break;
                 case enDatabaseDataType.co_Identifier:
                     _Identifier = Wert;
-                    StandardWerteNachKennungx();
+                    StandardWerteNachKennung(false);
                     Database.Column.GetSystems();
                     break;
                 case enDatabaseDataType.co_EditType:
@@ -1468,70 +1468,83 @@ namespace BlueDatabase
             return string.Empty;
         }
 
-        private void StandardWerteNachKennungx()
+        public void StandardWerteNachKennung(bool SetAll)
         {
-            if (string.IsNullOrEmpty(_Identifier))
+            if (string.IsNullOrEmpty(_Identifier)) { return; }
+
+            //if (SetAll && !IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Ausserhalb des parsens!"); }
+
+            // ACHTUNG: Die SetAll Befehle OHNE _, die müssen geloggt werden.
+
+            if (SetAll)
             {
-                return;
+                LineLeft = enColumnLineStyle.Dünn;
+                LineRight = enColumnLineStyle.Ohne;
+                ForeColor = Color.FromArgb(0, 0, 0);
+                CaptionBitmap = null;
             }
-
-            _LineLeft = enColumnLineStyle.Dünn;
-            _LineRight = enColumnLineStyle.Ohne;
-            _ForeColor = Color.FromArgb(0, 0, 0);
-
-
-            _CaptionBitmap = null;
 
             switch (_Identifier)
             {
                 case "System: Creator":
                     _Name = "SYS_Creator";
-                    _Caption = "Ersteller";
-                    _DropdownBearbeitungErlaubt = true;
-                    _DropdownWerteAndererZellenAnzeigen = true;
-                    _SpellCheckingEnabled = false;
                     _Format = enDataFormat.Text_Ohne_Kritische_Zeichen;
-                    _ForeColor = Color.FromArgb(0, 0, 128);
-                    _BackColor = Color.FromArgb(185, 186, 255);
+
+                    if (SetAll)
+                    {
+                        Caption = "Ersteller";
+                        DropdownBearbeitungErlaubt = true;
+                        DropdownWerteAndererZellenAnzeigen = true;
+                        SpellCheckingEnabled = false;
+                        ForeColor = Color.FromArgb(0, 0, 128);
+                        BackColor = Color.FromArgb(185, 186, 255);
+                    }
                     break;
 
                 case "System: Changer":
                     _Name = "SYS_Changer";
-                    _Caption = "Änderer";
                     _Format = enDataFormat.Text_Ohne_Kritische_Zeichen;
                     _SpellCheckingEnabled = false;
                     _TextBearbeitungErlaubt = false;
                     _DropdownBearbeitungErlaubt = false;
                     _ShowUndo = false;
                     PermissionGroups_ChangeCell.Clear();
-                    _ForeColor = Color.FromArgb(0, 128, 0);
-                    _BackColor = Color.FromArgb(185, 255, 185);
+                    if (SetAll)
+                    {
+                        Caption = "Änderer";
+                        ForeColor = Color.FromArgb(0, 128, 0);
+                        BackColor = Color.FromArgb(185, 255, 185);
+                    }
                     break;
 
                 case "System: Chapter":
                     _Name = "SYS_Chapter";
-                    if (string.IsNullOrEmpty(_Caption)) { _Caption = "Kapitel"; }
-                    //_SpellCheckingEnabled = false;
                     _Format = enDataFormat.Text_Ohne_Kritische_Zeichen;
                     if (_MultiLine) { _ShowMultiLineInOneLine = true; }
-                    _ForeColor = Color.FromArgb(0, 0, 0);
-                    _BackColor = Color.FromArgb(255, 255, 150);
-                    _LineLeft = enColumnLineStyle.Dick;
+                    if (SetAll)
+                    {
+                        Caption = "Kapitel";
+                        ForeColor = Color.FromArgb(0, 0, 0);
+                        BackColor = Color.FromArgb(255, 255, 150);
+                        LineLeft = enColumnLineStyle.Dick;
+                    }
                     break;
 
                 case "System: Date Created":
                     _Name = "SYS_CreateDate";
-                    _Caption = "Erstell-Datum";
                     _SpellCheckingEnabled = false;
                     _Format = enDataFormat.Datum_und_Uhrzeit;
-                    _ForeColor = Color.FromArgb(0, 0, 128);
-                    _BackColor = Color.FromArgb(185, 185, 255);
-                    _LineLeft = enColumnLineStyle.Dick;
+                    if (SetAll)
+                    {
+                        Caption = "Erstell-Datum";
+                        ForeColor = Color.FromArgb(0, 0, 128);
+                        BackColor = Color.FromArgb(185, 185, 255);
+                        LineLeft = enColumnLineStyle.Dick;
+                    }
                     break;
 
                 case "System: Date Changed":
                     _Name = "SYS_ChangeDate";
-                    _Caption = "Änder-Datum";
                     _SpellCheckingEnabled = false;
                     _ShowUndo = false;
                     _Format = enDataFormat.Datum_und_Uhrzeit;
@@ -1539,9 +1552,13 @@ namespace BlueDatabase
                     _SpellCheckingEnabled = false;
                     _DropdownBearbeitungErlaubt = false;
                     PermissionGroups_ChangeCell.Clear();
-                    _ForeColor = Color.FromArgb(0, 128, 0);
-                    _BackColor = Color.FromArgb(185, 255, 185);
-                    _LineLeft = enColumnLineStyle.Dick;
+                    if (SetAll)
+                    {
+                        Caption = "Änder-Datum";
+                        ForeColor = Color.FromArgb(0, 128, 0);
+                        BackColor = Color.FromArgb(185, 255, 185);
+                        LineLeft = enColumnLineStyle.Dick;
+                    }
                     break;
 
                 case "System: Correct":
@@ -1549,26 +1566,31 @@ namespace BlueDatabase
                     _Caption = "Fehlerfrei";
                     _SpellCheckingEnabled = false;
                     _Format = enDataFormat.Bit;
-                    _ForeColor = Color.FromArgb(128, 0, 0);
-                    _BackColor = Color.FromArgb(255, 185, 185);
-                    _LineLeft = enColumnLineStyle.Dick;
+                    if (SetAll)
+                    {
+                        ForeColor = Color.FromArgb(128, 0, 0);
+                        BackColor = Color.FromArgb(255, 185, 185);
+                        LineLeft = enColumnLineStyle.Dick;
+                    }
                     break;
 
                 case "System: Locked":
                     _Name = "SYS_Locked";
-                    _Caption = "Abgeschlossen";
                     _SpellCheckingEnabled = false;
                     _Format = enDataFormat.Bit;
-                    _QuickInfo = "Eine abgeschlossene Zeile kann<br>nicht mehr bearbeitet werden.";
-
                     if (_TextBearbeitungErlaubt || _DropdownBearbeitungErlaubt)
                     {
+                        _QuickInfo = "Eine abgeschlossene Zeile kann<br>nicht mehr bearbeitet werden.";
                         _TextBearbeitungErlaubt = false;
                         _DropdownBearbeitungErlaubt = true;
                         _EditTrotzSperreErlaubt = true;
                     }
-                    _ForeColor = Color.FromArgb(128, 0, 0);
-                    _BackColor = Color.FromArgb(255, 185, 185);
+                    if (SetAll)
+                    {
+                        Caption = "Abgeschlossen";
+                        ForeColor = Color.FromArgb(128, 0, 0);
+                        BackColor = Color.FromArgb(255, 185, 185);
+                    }
                     break;
 
                 case "System: State":
@@ -1773,6 +1795,7 @@ namespace BlueDatabase
                 case enDataFormat.Link_To_Filesystem: return QuickImage.Get(enImageCode.Datei, 16);
                 //case enDataFormat.Relation: return QuickImage.Get(enImageCode.Herz, 16);
                 case enDataFormat.RelationText: return QuickImage.Get(enImageCode.Herz, 16);
+                case enDataFormat.KeyForSame: return QuickImage.Get(enImageCode.Istgleich, 16);
                 case enDataFormat.Datum_und_Uhrzeit: return QuickImage.Get(enImageCode.Uhr, 16);
                 case enDataFormat.Bit: return QuickImage.Get(enImageCode.Häkchen, 16);
                 case enDataFormat.Farbcode: return QuickImage.Get(enImageCode.Pinsel, 16);
@@ -1855,6 +1878,7 @@ namespace BlueDatabase
                 case enDataFormat.BildCode:
                 case enDataFormat.LinkedCell:
                 case enDataFormat.RelationText:
+                case enDataFormat.KeyForSame:
                     if (_TextBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind, um die Anzeieg zu gewährleisten.
                     if (_MultiLine && EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return false; }
                     if (_DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }

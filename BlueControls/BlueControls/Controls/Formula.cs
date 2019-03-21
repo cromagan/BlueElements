@@ -167,7 +167,7 @@ namespace BlueControls.Controls
 
                 OnShowingRowChanged(new RowEventArgs(ShowingRow));
 
-                ShowingRow?.DoAutomatic(false, false);
+                ShowingRow?.DoAutomatic(false, false, false);
                 ResumeAllLayout();
             }
         }

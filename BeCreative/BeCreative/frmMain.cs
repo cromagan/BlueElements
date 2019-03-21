@@ -163,7 +163,7 @@ namespace BeCreative
 
 
 
-            Table.SearchNextText(SuchtT, TableView, null, BlueFormulax.ShowingRow, out var found, out var GefRow);
+            Table.SearchNextText(SuchtT, TableView, null, BlueFormulax.ShowingRow, out var found, out var GefRow, true);
 
 
             //var CheckRow = BlueFormulax.ShowingRow;
@@ -867,7 +867,7 @@ namespace BeCreative
                     break;
 
                 case "Fehlersuche":
-                    MessageBox.Show(Row.DoAutomatic(false, true));
+                    MessageBox.Show(Row.DoAutomatic(false, true, false));
                     break;
 
                 case "ZeileLöschen":
@@ -1005,7 +1005,7 @@ namespace BeCreative
 
         private void Datenüberprüfung_Click(object sender, EventArgs e)
         {
-            TableView.Database.Row.DoAutomatic(TableView.Filter);
+            TableView.Database.Row.DoAutomatic(TableView.Filter, false);
         }
 
 

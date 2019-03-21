@@ -102,7 +102,12 @@ namespace BlueBasics
 
         }
 
-        public new void Insert(int index, T item) { Develop.DebugPrint_NichtImplementiert(); }
+        public new void Insert(int index, T item)
+        {
+            if (index > Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch!"); }
+            base.Insert(index, item);
+            OnItemAdded(item);
+        }
 
         public new void InsertRange(int index, IEnumerable<T> collection) { Develop.DebugPrint_NichtImplementiert(); }
 

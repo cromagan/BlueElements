@@ -129,7 +129,7 @@ namespace BlueControls.ItemCollection
         protected override string GetCompareKey()
         {
             // Die hauptklasse frägt nach diesem Kompare-Key
-            var txt = CellItem.ValueReadable(_Internal, _StyleLikeThis, enShortenStyle.Unreplaced);
+            var txt = CellItem.ValueReadable(_Internal, _StyleLikeThis, enShortenStyle.HTML);
             return DataFormat.CompareKey(txt, _StyleLikeThis.Format) + "|" + _Internal;
         }
 

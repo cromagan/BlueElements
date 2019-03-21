@@ -2928,6 +2928,7 @@ namespace BlueControls.Controls
                 case enDataFormat.Telefonnummer:
                 case enDataFormat.Email:
                 case enDataFormat.RelationText:
+                case enDataFormat.KeyForSame:
                     ParseVariable(VariableName, enValueType.Text, Row.CellGetString(Column));
                     break;
 

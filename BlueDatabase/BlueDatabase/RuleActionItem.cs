@@ -385,26 +385,36 @@ namespace BlueDatabase
                     if (ColumnFocus != null) { return string.Empty; }
                     ColumnItem Link;
                     ColumnItem Other;
-                    if (Columns[0].Format == enDataFormat.RelationText)
+
+                    if (Columns[0].Format == enDataFormat.RelationText || Columns[0].Format == enDataFormat.KeyForSame)
                     {
                         Link = Columns[0];
                         Other = Columns[1];
                     }
                     else
                     {
-                        if (Columns[1].Format != enDataFormat.RelationText) { return "Verknüpfung fehlgeschlagen, keine der Spalten ist ein 'Beziehungsformat'"; }
+                        if (Columns[1].Format != enDataFormat.RelationText && Columns[1].Format != enDataFormat.KeyForSame) { return "Verknüpfung fehlgeschlagen, keine der Spalten ist ein 'Beziehungsformat/Schlüsselformat'"; }
                         Link = Columns[1];
                         Other = Columns[0];
                     }
 
-                    var X = CellCollection.ConnectedRows(Row.CellGetString(Link), Row);
+                    List<RowItem> LinkRows = null;
+                    if (Link.Format == enDataFormat.RelationText)
+                    {
+                        LinkRows = CellCollection.ConnectedRowsOfRelations(Row.CellGetString(Link), Row);
+                    }
+                    else
+                    {
+                        LinkRows = RowCollection.MatchesTo(new FilterItem(Link, enFilterType.Istgleich_GroßKleinEgal, Row.CellGetString(Link)));
+                    }
+
                     var V = Row.CellGetString(Other);
-                    foreach (var Thisrow in X)
+                    foreach (var Thisrow in LinkRows)
                     {
                         if (Thisrow.CellGetString(Other) != V)
                         {
                             Thisrow.CellSet(Other, V, FreezeMode);
-                            Thisrow.DoAutomatic(false, false);
+                            Thisrow.DoAutomatic(false, false, FreezeMode);
                         }
 
                     }

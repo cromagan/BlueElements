@@ -35,6 +35,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbSuchText = new BlueControls.Controls.TextBox();
             this.grpSonderzeichen = new BlueControls.Controls.GroupBox();
             this.caption1 = new BlueControls.Controls.Caption();
+            this.btnAehnliches = new BlueControls.Controls.Button();
             this.btnSuchSpalte = new BlueControls.Controls.Button();
             this.grpSonderzeichen.SuspendLayout();
             this.SuspendLayout();
@@ -63,7 +64,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbSuchText.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbSuchText.Location = new System.Drawing.Point(8, 24);
             this.txbSuchText.Name = "txbSuchText";
-            this.txbSuchText.Size = new System.Drawing.Size(568, 32);
+            this.txbSuchText.Size = new System.Drawing.Size(568, 24);
             this.txbSuchText.TabIndex = 2;
             this.txbSuchText.TextChanged += new System.EventHandler(this.txbSuchText_TextChanged);
             this.txbSuchText.Enter += new System.EventHandler(this.txbSuchText_Enter);
@@ -72,7 +73,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.grpSonderzeichen.CausesValidation = false;
             this.grpSonderzeichen.Controls.Add(this.capSonderzeichen);
-            this.grpSonderzeichen.Location = new System.Drawing.Point(8, 64);
+            this.grpSonderzeichen.Location = new System.Drawing.Point(8, 56);
             this.grpSonderzeichen.Name = "grpSonderzeichen";
             this.grpSonderzeichen.Size = new System.Drawing.Size(144, 56);
             this.grpSonderzeichen.Text = "Sonderzeichen";
@@ -85,9 +86,17 @@ namespace BlueControls.BlueDatabaseDialogs
             this.caption1.Size = new System.Drawing.Size(136, 16);
             this.caption1.Text = "Suchtext:";
             // 
+            // btnAehnliches
+            // 
+            this.btnAehnliches.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnAehnliches.Location = new System.Drawing.Point(192, 56);
+            this.btnAehnliches.Name = "btnAehnliches";
+            this.btnAehnliches.Size = new System.Drawing.Size(384, 16);
+            this.btnAehnliches.TabIndex = 6;
+            this.btnAehnliches.Text = "auch Ähnliches finden (z.B. ue = ü)";
+            // 
             // btnSuchSpalte
             // 
-            this.btnSuchSpalte.Enabled = false;
             this.btnSuchSpalte.ImageCode = "Lupe|20|||||||||Spalte";
             this.btnSuchSpalte.Location = new System.Drawing.Point(192, 80);
             this.btnSuchSpalte.Name = "btnSuchSpalte";
@@ -98,12 +107,14 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Search
             // 
-            this.ClientSize = new System.Drawing.Size(584, 128);
+            this.ClientSize = new System.Drawing.Size(584, 117);
+            this.Controls.Add(this.btnAehnliches);
             this.Controls.Add(this.txbSuchText);
             this.Controls.Add(this.btnSuchSpalte);
             this.Controls.Add(this.caption1);
             this.Controls.Add(this.grpSonderzeichen);
             this.Controls.Add(this.btnSuchInCell);
+            this.Design = BlueControls.Enums.enDesign.Form_Standard;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "Search";
             this.ShowInTaskbar = false;
@@ -119,6 +130,7 @@ namespace BlueControls.BlueDatabaseDialogs
 			private Caption capSonderzeichen;
 			private GroupBox grpSonderzeichen;
         private Caption caption1;
+        private Button btnAehnliches;
         private Button btnSuchSpalte;
     }
 	}

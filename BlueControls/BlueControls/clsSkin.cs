@@ -1166,24 +1166,29 @@ namespace BlueControls
 
         #endregion
 
-        public static QuickImage Draw_FormatedText_PicOf(string Txt, QuickImage ImageCode, ColumnItem Column)
+        public static QuickImage Draw_FormatedText_PicOf(string Txt, QuickImage ImageCode, ColumnItem column)
         {
 
-            switch (Column.Format)
+            switch (column.Format)
             {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Text_Ohne_Kritische_Zeichen:
                 case enDataFormat.RelationText:
+                case enDataFormat.KeyForSame:
                     return ImageCode; // z.B. KontextMenu
 
                 case enDataFormat.Bit:
                     if (Txt == true.ToPlusMinus())
                     {
+                        if (column == column.Database.Column.SysCorrect) { return QuickImage.Get("Häkchen|16||||||||80"); }
+                        //if (column == column.Database.Column.SysLocked) { return QuickImage.Get(enImageCode.Schloss, 16,"00AA00",string.Empty); }
                         return QuickImage.Get(enImageCode.Häkchen, 16);
                     }
                     else if (Txt == false.ToPlusMinus())
                     {
+                        if (column == column.Database.Column.SysCorrect) { return QuickImage.Get(enImageCode.Warnung, 16); }
+                        //if (column == column.Database.Column.SysLocked) { return QuickImage.Get(enImageCode.Schlüssel, 16, "FFBB00", string.Empty); }
                         return QuickImage.Get(enImageCode.Kreuz, 16);
                     }
                     else if (Txt == "o" || Txt == "O")
@@ -1202,13 +1207,13 @@ namespace BlueControls
 
                 case enDataFormat.BildCode:
                     if (ImageCode != null) { return ImageCode; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
-                    if (Column.BildCode_ConstantHeight > 0) { Txt = Txt + "|" + Column.BildCode_ConstantHeight; }
-                    ImageCode = QuickImage.Get(Column.Prefix + Txt + Column.Suffix);
+                    if (column.BildCode_ConstantHeight > 0) { Txt = Txt + "|" + column.BildCode_ConstantHeight; }
+                    ImageCode = QuickImage.Get(column.Prefix + Txt + column.Suffix);
                     if (ImageCode.IsError)
                     {
-                        if (Column.BildCode_ImageNotFound != enImageNotFound.ShowErrorPic) { return null; }
+                        if (column.BildCode_ImageNotFound != enImageNotFound.ShowErrorPic) { return null; }
                         Txt = "Fragezeichen||||||200|||80";
-                        if (Column.BildCode_ConstantHeight > 0) { Txt = "Fragezeichen|" + Column.BildCode_ConstantHeight + "|||||200|||80"; }
+                        if (column.BildCode_ConstantHeight > 0) { Txt = "Fragezeichen|" + column.BildCode_ConstantHeight + "|||||200|||80"; }
                     }
 
 

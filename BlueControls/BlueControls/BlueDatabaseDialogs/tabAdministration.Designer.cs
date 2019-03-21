@@ -59,6 +59,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnAktuelleAnsichtLoeschen = new BlueControls.Controls.Button();
             this.grpTabellenAnsicht = new BlueControls.Controls.GroupBox();
             this.btnScripting = new BlueControls.Controls.Button();
+            this.btnPosEingeben = new BlueControls.Controls.Button();
             this.grpAllgemein.SuspendLayout();
             this.grpAktuelleSpalte.SuspendLayout();
             this.grpAktuelleAnsicht.SuspendLayout();
@@ -117,7 +118,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnVorherigeVersion.ImageCode = "Uhr";
             this.btnVorherigeVersion.Location = new System.Drawing.Point(168, 0);
             this.btnVorherigeVersion.Name = "btnVorherigeVersion";
-            this.btnVorherigeVersion.Size = new System.Drawing.Size(56, 72);
+            this.btnVorherigeVersion.Size = new System.Drawing.Size(64, 72);
             this.btnVorherigeVersion.TabIndex = 42;
             this.btnVorherigeVersion.Text = "Vorherige Version";
             this.btnVorherigeVersion.Click += new System.EventHandler(this.btnVorherigeVersion_Click);
@@ -147,6 +148,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // grpAktuelleSpalte
             // 
             this.grpAktuelleSpalte.CausesValidation = false;
+            this.grpAktuelleSpalte.Controls.Add(this.btnPosEingeben);
             this.grpAktuelleSpalte.Controls.Add(this.btnPermanent);
             this.grpAktuelleSpalte.Controls.Add(this.btnSpalteDauerhaftloeschen);
             this.grpAktuelleSpalte.Controls.Add(this.btnSpalteAusblenden);
@@ -162,9 +164,10 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnPermanent
             // 
             this.btnPermanent.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnPermanent.Location = new System.Drawing.Point(296, 0);
+            this.btnPermanent.Location = new System.Drawing.Point(112, 0);
             this.btnPermanent.Name = "btnPermanent";
-            this.btnPermanent.Size = new System.Drawing.Size(96, 24);
+            this.btnPermanent.QuickInfo = "Die aktuelle Spalte wird immer<br>angezeigt und nicht verschoben.";
+            this.btnPermanent.Size = new System.Drawing.Size(112, 24);
             this.btnPermanent.TabIndex = 9;
             this.btnPermanent.Text = "permanent";
             this.btnPermanent.CheckedChanged += new System.EventHandler(this.btnPermanent_CheckedChanged);
@@ -172,7 +175,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnSpalteDauerhaftloeschen
             // 
             this.btnSpalteDauerhaftloeschen.ImageCode = "Papierkorb|16|||FF0000";
-            this.btnSpalteDauerhaftloeschen.Location = new System.Drawing.Point(112, 46);
+            this.btnSpalteDauerhaftloeschen.Location = new System.Drawing.Point(224, 24);
             this.btnSpalteDauerhaftloeschen.Name = "btnSpalteDauerhaftloeschen";
             this.btnSpalteDauerhaftloeschen.Size = new System.Drawing.Size(136, 22);
             this.btnSpalteDauerhaftloeschen.TabIndex = 8;
@@ -182,7 +185,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnSpalteAusblenden
             // 
             this.btnSpalteAusblenden.ImageCode = "Lupe|16||1";
-            this.btnSpalteAusblenden.Location = new System.Drawing.Point(112, 24);
+            this.btnSpalteAusblenden.Location = new System.Drawing.Point(224, 0);
             this.btnSpalteAusblenden.Name = "btnSpalteAusblenden";
             this.btnSpalteAusblenden.Size = new System.Drawing.Size(112, 22);
             this.btnSpalteAusblenden.TabIndex = 7;
@@ -191,12 +194,13 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnSpalteBearbeiten
             // 
-            this.btnSpalteBearbeiten.ImageCode = "Spalte|16|||||||||Stift";
-            this.btnSpalteBearbeiten.Location = new System.Drawing.Point(112, 2);
+            this.btnSpalteBearbeiten.ImageCode = "Stift|16|||||||||Spalte";
+            this.btnSpalteBearbeiten.Location = new System.Drawing.Point(224, 48);
             this.btnSpalteBearbeiten.Name = "btnSpalteBearbeiten";
-            this.btnSpalteBearbeiten.Size = new System.Drawing.Size(176, 22);
+            this.btnSpalteBearbeiten.QuickInfo = "Eigenschaften der Spalte bearbeiten";
+            this.btnSpalteBearbeiten.Size = new System.Drawing.Size(144, 22);
             this.btnSpalteBearbeiten.TabIndex = 6;
-            this.btnSpalteBearbeiten.Text = "Eigenschaften bearbeiten";
+            this.btnSpalteBearbeiten.Text = "Eigenschaften bearb.";
             this.btnSpalteBearbeiten.Click += new System.EventHandler(this.btnSpalteBearbeiten_Click);
             // 
             // btnSpalteNachRechts
@@ -229,15 +233,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpAktuelleAnsicht.Controls.Add(this.btnAlleSpaltenEinblenden);
             this.grpAktuelleAnsicht.Controls.Add(this.btnBerechtigungsgruppen);
             this.grpAktuelleAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAktuelleAnsicht.Location = new System.Drawing.Point(736, 0);
+            this.grpAktuelleAnsicht.Location = new System.Drawing.Point(744, 0);
             this.grpAktuelleAnsicht.Name = "grpAktuelleAnsicht";
-            this.grpAktuelleAnsicht.Size = new System.Drawing.Size(272, 81);
+            this.grpAktuelleAnsicht.Size = new System.Drawing.Size(264, 81);
             this.grpAktuelleAnsicht.Text = "Aktuelle Ansicht";
             // 
             // btnSystemspaltenAusblenden
             // 
             this.btnSystemspaltenAusblenden.ImageCode = "Lupe|16||1";
-            this.btnSystemspaltenAusblenden.Location = new System.Drawing.Point(88, 24);
+            this.btnSystemspaltenAusblenden.Location = new System.Drawing.Point(80, 24);
             this.btnSystemspaltenAusblenden.Name = "btnSystemspaltenAusblenden";
             this.btnSystemspaltenAusblenden.Size = new System.Drawing.Size(176, 22);
             this.btnSystemspaltenAusblenden.TabIndex = 33;
@@ -250,7 +254,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSpalteEinblenden.ImageCode = "Lupe";
             this.btnSpalteEinblenden.Location = new System.Drawing.Point(8, 2);
             this.btnSpalteEinblenden.Name = "btnSpalteEinblenden";
-            this.btnSpalteEinblenden.Size = new System.Drawing.Size(72, 66);
+            this.btnSpalteEinblenden.Size = new System.Drawing.Size(64, 66);
             this.btnSpalteEinblenden.TabIndex = 7;
             this.btnSpalteEinblenden.Text = "Spalte einblenden";
             this.btnSpalteEinblenden.Click += new System.EventHandler(this.SpalteEinblenden_Click);
@@ -258,7 +262,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnAlleSpaltenEinblenden
             // 
             this.btnAlleSpaltenEinblenden.ImageCode = "Lupe|16|||FF0000";
-            this.btnAlleSpaltenEinblenden.Location = new System.Drawing.Point(88, 2);
+            this.btnAlleSpaltenEinblenden.Location = new System.Drawing.Point(80, 2);
             this.btnAlleSpaltenEinblenden.Name = "btnAlleSpaltenEinblenden";
             this.btnAlleSpaltenEinblenden.Size = new System.Drawing.Size(176, 22);
             this.btnAlleSpaltenEinblenden.TabIndex = 3;
@@ -268,7 +272,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnBerechtigungsgruppen
             // 
             this.btnBerechtigungsgruppen.ImageCode = "Schild|16";
-            this.btnBerechtigungsgruppen.Location = new System.Drawing.Point(88, 46);
+            this.btnBerechtigungsgruppen.Location = new System.Drawing.Point(80, 46);
             this.btnBerechtigungsgruppen.Name = "btnBerechtigungsgruppen";
             this.btnBerechtigungsgruppen.Size = new System.Drawing.Size(176, 22);
             this.btnBerechtigungsgruppen.TabIndex = 32;
@@ -284,7 +288,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpAnsichtsVerwaltung.Controls.Add(this.btnNeueAnsichtErstellen);
             this.grpAnsichtsVerwaltung.Controls.Add(this.btnAktuelleAnsichtLoeschen);
             this.grpAnsichtsVerwaltung.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAnsichtsVerwaltung.Location = new System.Drawing.Point(432, 0);
+            this.grpAnsichtsVerwaltung.Location = new System.Drawing.Point(440, 0);
             this.grpAnsichtsVerwaltung.Name = "grpAnsichtsVerwaltung";
             this.grpAnsichtsVerwaltung.Size = new System.Drawing.Size(304, 81);
             this.grpAnsichtsVerwaltung.Text = "Ansichtverwaltung";
@@ -349,7 +353,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpTabellenAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpTabellenAnsicht.Location = new System.Drawing.Point(200, 0);
             this.grpTabellenAnsicht.Name = "grpTabellenAnsicht";
-            this.grpTabellenAnsicht.Size = new System.Drawing.Size(232, 81);
+            this.grpTabellenAnsicht.Size = new System.Drawing.Size(240, 81);
             this.grpTabellenAnsicht.Text = "Tabellen-Ansicht";
             // 
             // btnScripting
@@ -362,6 +366,19 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnScripting.TabIndex = 43;
             this.btnScripting.Text = "Import-Skript";
             this.btnScripting.Click += new System.EventHandler(this.btnScripting_Click);
+            // 
+            // btnPosEingeben
+            // 
+            this.btnPosEingeben.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnPosEingeben.ImageCode = "Summe|16";
+            this.btnPosEingeben.Location = new System.Drawing.Point(112, 24);
+            this.btnPosEingeben.Name = "btnPosEingeben";
+            this.btnPosEingeben.QuickInfo = "Verschiebt die aktuelle Spalte an eine Position.<br>Die Spaltennummerierung wird " +
+    "berücksichtigt.";
+            this.btnPosEingeben.Size = new System.Drawing.Size(112, 24);
+            this.btnPosEingeben.TabIndex = 10;
+            this.btnPosEingeben.Text = "Pos. eingeben";
+            this.btnPosEingeben.Click += new System.EventHandler(this.btnPosEingeben_Click);
             // 
             // tabAdministration
             // 
@@ -412,5 +429,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private GroupBox grpTabellenAnsicht;
         private Button btnPermanent;
         private Button btnScripting;
+        private Button btnPosEingeben;
     }
 }

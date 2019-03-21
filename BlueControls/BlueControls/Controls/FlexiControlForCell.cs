@@ -240,7 +240,7 @@ namespace BlueControls.Controls
             if (OldVal == Value) { return; }
 
             Row.CellSet(_columview.Column, Value);
-            if (OldVal != Row.CellGetString(_columview.Column)) { Row.DoAutomatic(false, false); }
+            if (OldVal != Row.CellGetString(_columview.Column)) { Row.DoAutomatic(false, false, false); }
         }
 
 

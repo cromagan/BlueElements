@@ -37,7 +37,7 @@ using static BlueBasics.modAllgemein;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
-    public partial class tabAdministration : TabPage // System.Windows.Forms.UserControl
+    public partial class tabAdministration : TabPage // System.Windows.Forms.UserControl //
     {
 
         private Table _TableView;
@@ -478,6 +478,9 @@ namespace BlueControls.BlueDatabaseDialogs
                 btnSpalteNachRechts.Enabled = Convert.ToBoolean(IndexOfViewItem >= 0) && Convert.ToBoolean(IndexOfViewItem < _TableView.Database.ColumnArrangements[_TableView.Arrangement].Count() - 1);
 
 
+
+                btnPosEingeben.Enabled = _TableView.Arrangement > 0;
+
                 if (_TableView.PermanentPossible(ViewItem) && _TableView.NonPermanentPossible(ViewItem))
                 {
                     btnPermanent.Enabled = true;
@@ -657,5 +660,37 @@ namespace BlueControls.BlueDatabaseDialogs
             var o = new Skript(_TableView);
             o.Show();
         }
+
+        private void btnPosEingeben_Click(object sender, System.EventArgs e)
+        {
+
+            if (_TableView.Arrangement < 0) { return; }
+
+            var c = _TableView.CursorPosColumn();
+
+            if (c == null) { return; }
+
+
+            var p = InputBox.Show("<b>" + _TableView.CursorPosColumn().ReadableText() + "</b><br>Auf welche Position verschieben?<br>Info: Nummerierung beginnt mit 1", "", enDataFormat.Ganzzahl);
+
+
+            if (int.TryParse(p, out var index))
+            {
+                if (index < 1) { return; }
+                index--;
+                var ViewItem = _TableView.Database.ColumnArrangements[_TableView.Arrangement][c];
+
+                if (ViewItem != null)
+                {
+                    _TableView.Database.ColumnArrangements[_TableView.Arrangement].Remove(ViewItem);
+                }
+
+                if (index >= _TableView.Database.ColumnArrangements[_TableView.Arrangement].Count()) { index = _TableView.Database.ColumnArrangements[_TableView.Arrangement].Count() ; }
+                _TableView.Database.ColumnArrangements[_TableView.Arrangement].InsertAt(index, c);
+                _TableView.CursorPos_Set(c, _TableView.CursorPosRow(), true);
+                Check_OrderButtons();
+            }
+        }
     }
 }
+

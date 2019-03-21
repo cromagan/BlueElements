@@ -1438,7 +1438,7 @@ namespace BlueDatabase
             //CheckRules();
 
             //Defekte Ansichten reparieren - Teil 1
-            for (var z = 0 ; z <= 1 ; z++)
+            for (var z = 0; z <= 1; z++)
             {
                 if (ColumnArrangements.Count < z + 1)
                 {
@@ -1561,7 +1561,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.Rules:
                     Rules.Clear();
                     var RU = Inhalt.SplitByCR();
-                    for (var z = 0 ; z <= RU.GetUpperBound(0) ; z++)
+                    for (var z = 0; z <= RU.GetUpperBound(0); z++)
                     {
                         Rules.Add(new RuleItem(this, RU[z]));
                     }
@@ -1635,7 +1635,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.UndoInOne:
                     Works.Clear();
                     var UIO = Inhalt.SplitByCR();
-                    for (var z = 0 ; z <= UIO.GetUpperBound(0) ; z++)
+                    for (var z = 0; z <= UIO.GetUpperBound(0); z++)
                     {
                         var tmpWork = new WorkItem(UIO[z]);
                         tmpWork.State = enItemState.Undo; // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Desegen die alten "Pendings" zu Undos ändern.
@@ -1707,6 +1707,8 @@ namespace BlueDatabase
         {
 
 
+            if (string.IsNullOrEmpty(OldName)) { return; }
+
             // Cells ----------------------------------------------
             //   Cell.ChangeCaptionName(OldName, cColumnItem.Name, cColumnItem)
 
@@ -1717,7 +1719,7 @@ namespace BlueDatabase
             // Layouts -----------------------------------------
             if (Layouts != null && Layouts.Count > 0)
             {
-                for (var cc = 0 ; cc < Layouts.Count ; cc++)
+                for (var cc = 0; cc < Layouts.Count; cc++)
                 {
                     Layouts[cc] = _RenameColumnInLayout(this, Layouts[cc], OldName, cColumnItem);
                 }
@@ -1740,6 +1742,32 @@ namespace BlueDatabase
             {
                 ThisRule?.RenameColumn(OldName, cColumnItem);
             }
+
+            // ImportScript -----------------------------------------
+            var x = ImportScript.FromNonCritical().SplitByCRToList();
+            var xn = new List<string>();
+
+            foreach (var thisstring in x)
+            {
+                if (!string.IsNullOrEmpty(thisstring))
+                {
+                    var x2 = thisstring.SplitBy("|");
+                    if (x2.Length > 2 && x2[1].ToUpper() == OldName.ToUpper())
+                        {
+                        x2[1] = cColumnItem.Name.ToUpper();
+                        xn.Add(x2.JoinWith("|"));
+                    }
+                    else
+                    {
+                        xn.Add(thisstring);
+                    }
+                }
+            }
+            ImportScript = xn.JoinWithCr().ToNonCritical();
+
+
+
+
         }
 
 
@@ -2011,7 +2039,7 @@ namespace BlueDatabase
 
                     break;
                 case enFirstRow.ColumnCaption:
-                    for (var ColNr = 0 ; ColNr < ColList.Count ; ColNr++)
+                    for (var ColNr = 0; ColNr < ColList.Count; ColNr++)
                     {
                         if (ColList[ColNr] != null)
                         {
@@ -2024,7 +2052,7 @@ namespace BlueDatabase
 
                     break;
                 case enFirstRow.ColumnInternalName:
-                    for (var ColNr = 0 ; ColNr < ColList.Count ; ColNr++)
+                    for (var ColNr = 0; ColNr < ColList.Count; ColNr++)
                     {
                         if (ColList[ColNr] != null)
                         {
@@ -2048,7 +2076,7 @@ namespace BlueDatabase
             {
                 if (ThisRow != null)
                 {
-                    for (var ColNr = 0 ; ColNr < ColList.Count ; ColNr++)
+                    for (var ColNr = 0; ColNr < ColList.Count; ColNr++)
                     {
                         if (ColList[ColNr] != null)
                         {
@@ -2697,7 +2725,7 @@ namespace BlueDatabase
 
             var t = "";
 
-            for (var z = Works.Count - 1 ; z >= 0 ; z--)
+            for (var z = Works.Count - 1; z >= 0; z--)
             {
                 if (Works[z].CellKey == CellKey)
                 {

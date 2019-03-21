@@ -267,6 +267,39 @@ namespace BlueBasics
 
 
 
+        public static string StarkeVereinfachung(this string TXT)
+        {
+            TXT = TXT.ToLower().ReduceToChars(Constants.Char_Numerals + Constants.Char_Buchstaben + " ,");
+
+            TXT = TXT.Replace("ä", "ae");
+            TXT = TXT.Replace("ö", "oe");
+            TXT = TXT.Replace("ü", "ue");
+
+            TXT = TXT.Replace("á", "a");
+            TXT = TXT.Replace("ó", "o");
+            TXT = TXT.Replace("ú", "u");
+            TXT = TXT.Replace("í", "i");
+            TXT = TXT.Replace("é", "e");
+
+            TXT = TXT.Replace("à", "a");
+            TXT = TXT.Replace("ò", "o");
+            TXT = TXT.Replace("ù", "u");
+            TXT = TXT.Replace("ì", "i");
+            TXT = TXT.Replace("è", "e");
+
+            TXT = TXT.Replace("â", "a");
+            TXT = TXT.Replace("ô", "o");
+            TXT = TXT.Replace("û", "u");
+            TXT = TXT.Replace("î", "i");
+            TXT = TXT.Replace("ê", "e");
+
+            TXT = TXT.Replace("ž", "z");
+
+            TXT = TXT.Replace("ß", "ss");
+
+            return TXT;
+        }
+
 
         /// <summary>
         /// Löscht alle Zeichen - außder dem erlaubten - aus dem String. Gross- und Kleinschreibung wird unterschieden. 

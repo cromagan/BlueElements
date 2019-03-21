@@ -310,7 +310,7 @@ namespace BlueDatabase
                 if (!NewBZ.Contains(t))
                 {
 
-                    var X = ConnectedRows(t, Row);
+                    var X = ConnectedRowsOfRelations(t, Row);
                     foreach (var ThisRow in X)
                     {
 
@@ -346,7 +346,7 @@ namespace BlueDatabase
             {
                 if (!OldBZ.Contains(t))
                 {
-                    var X = ConnectedRows(t, Row);
+                    var X = ConnectedRowsOfRelations(t, Row);
                     foreach (var ThisRow in X)
                     {
                         if (ThisRow != Row)
@@ -443,12 +443,13 @@ namespace BlueDatabase
             return CompleteRelationText;
         }
 
-        internal static List<RowItem> ConnectedRows(string CompleteRelationTextx, RowItem Row)
+
+        internal static List<RowItem> ConnectedRowsOfRelations(string CompleteRelationText, RowItem Row)
         {
             var AllRows = new List<RowItem>();
             var Names = Row.Database.Column[0].GetUcaseNamesSortedByLenght();
 
-            var RelationTextLine = CompleteRelationTextx.ToUpper().SplitByCR();
+            var RelationTextLine = CompleteRelationText.ToUpper().SplitByCR();
 
             foreach (var thisTextLine in RelationTextLine)
             {
