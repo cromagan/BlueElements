@@ -24,15 +24,12 @@ namespace BlueDatabase.EventArgs
 {
     public class RowCheckedEventArgs : RowEventArgs
     {
-        public RowCheckedEventArgs(RowItem Row, List<string> ColumnsWithErrors, bool FreezeMode) : base(Row)
+        public RowCheckedEventArgs(RowItem Row, List<string> ColumnsWithErrors) : base(Row)
         {
             this.ColumnsWithErrors = ColumnsWithErrors;
-            this.FreezeMode = FreezeMode;
         }
 
         public List<string> ColumnsWithErrors { get; set; }
-
-        public bool FreezeMode { get; set; }
 
     }
 }

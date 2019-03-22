@@ -199,7 +199,7 @@ namespace BlueDatabase
                 case enAction.Substring: Co = 260; break;
                 case enAction.LinkedCell: Co = 270; break;
                 //case enAction.SortiereIntelligent: Co = 290; break;
-                case enAction.KopiereAndereSpalten: Co = 295; break;
+              //  case enAction.KopiereAndereSpalten: Co = 295; break;
 
                 // Finaler Abschluss
                 case enAction.Sperre_die_Zelle: Co = 300; break;
@@ -381,44 +381,44 @@ namespace BlueDatabase
                 case enAction.Anmerkung:
                     return string.Empty;
 
-                case enAction.KopiereAndereSpalten:
-                    if (ColumnFocus != null) { return string.Empty; }
-                    ColumnItem Link;
-                    ColumnItem Other;
+                //case enAction.KopiereAndereSpalten:
+                //    if (ColumnFocus != null) { return string.Empty; }
+                //    ColumnItem Link;
+                //    ColumnItem Other;
 
-                    if (Columns[0].Format == enDataFormat.RelationText || Columns[0].Format == enDataFormat.KeyForSame)
-                    {
-                        Link = Columns[0];
-                        Other = Columns[1];
-                    }
-                    else
-                    {
-                        if (Columns[1].Format != enDataFormat.RelationText && Columns[1].Format != enDataFormat.KeyForSame) { return "Verknüpfung fehlgeschlagen, keine der Spalten ist ein 'Beziehungsformat/Schlüsselformat'"; }
-                        Link = Columns[1];
-                        Other = Columns[0];
-                    }
+                //    if (Columns[0].Format == enDataFormat.RelationText || Columns[0].Format == enDataFormat.KeyForSame)
+                //    {
+                //        Link = Columns[0];
+                //        Other = Columns[1];
+                //    }
+                //    else
+                //    {
+                //        if (Columns[1].Format != enDataFormat.RelationText && Columns[1].Format != enDataFormat.KeyForSame) { return "Verknüpfung fehlgeschlagen, keine der Spalten ist ein 'Beziehungsformat/Schlüsselformat'"; }
+                //        Link = Columns[1];
+                //        Other = Columns[0];
+                //    }
 
-                    List<RowItem> LinkRows = null;
-                    if (Link.Format == enDataFormat.RelationText)
-                    {
-                        LinkRows = CellCollection.ConnectedRowsOfRelations(Row.CellGetString(Link), Row);
-                    }
-                    else
-                    {
-                        LinkRows = RowCollection.MatchesTo(new FilterItem(Link, enFilterType.Istgleich_GroßKleinEgal, Row.CellGetString(Link)));
-                    }
+                //    List<RowItem> LinkRows = null;
+                //    if (Link.Format == enDataFormat.RelationText)
+                //    {
+                //        LinkRows = CellCollection.ConnectedRowsOfRelations(Row.CellGetString(Link), Row);
+                //    }
+                //    else
+                //    {
+                //        LinkRows = RowCollection.MatchesTo(new FilterItem(Link, enFilterType.Istgleich_GroßKleinEgal, Row.CellGetString(Link)));
+                //    }
 
-                    var V = Row.CellGetString(Other);
-                    foreach (var Thisrow in LinkRows)
-                    {
-                        if (Thisrow.CellGetString(Other) != V)
-                        {
-                            Thisrow.CellSet(Other, V, FreezeMode);
-                            Thisrow.DoAutomatic(false, false, FreezeMode);
-                        }
+                //    var V = Row.CellGetString(Other);
+                //    foreach (var Thisrow in LinkRows)
+                //    {
+                //        if (Thisrow.CellGetString(Other) != V)
+                //        {
+                //            Thisrow.CellSet(Other, V, FreezeMode);
+                //            Thisrow.DoAutomatic(false, false, FreezeMode);
+                //        }
 
-                    }
-                    return string.Empty;
+                //    }
+                //    return string.Empty;
 
                 case enAction.LinkedCell:
                     if (ColumnFocus != null) { return string.Empty; }
@@ -688,8 +688,8 @@ namespace BlueDatabase
                 //    return QuickImage.Get(enImageCode.Uhr);
                 //case enAction.SortiereIntelligent:
                 //    return QuickImage.Get(enImageCode.Lupe);
-                case enAction.KopiereAndereSpalten:
-                    return QuickImage.Get(enImageCode.Clipboard);
+                //case enAction.KopiereAndereSpalten:
+                //    return QuickImage.Get(enImageCode.Clipboard);
 
                 default:
                     if (_Action > 0) { Develop.DebugPrint(_Action); }
@@ -861,8 +861,8 @@ namespace BlueDatabase
                 //    return enNeededColumns.None;
                 //case enAction.SortiereIntelligent:
                 //    return enNeededColumns.MoreThanOne;
-                case enAction.KopiereAndereSpalten:
-                    return enNeededColumns.TwoColumns;
+                //case enAction.KopiereAndereSpalten:
+                //    return enNeededColumns.TwoColumns;
 
 
                 default:
@@ -928,8 +928,8 @@ namespace BlueDatabase
                 //    return enNeededText.OneIntegerValue;
                 //case enAction.SortiereIntelligent:
                 //    return enNeededText.None;
-                case enAction.KopiereAndereSpalten:
-                    return enNeededText.None;
+                //case enAction.KopiereAndereSpalten:
+                //    return enNeededText.None;
 
 
 
@@ -1135,9 +1135,9 @@ namespace BlueDatabase
                 //    break;
 
 
-                case enAction.KopiereAndereSpalten:
-                    r = r + "Diese Aktion benötigt eine Spalte vom Typ 'Relation' und eine normale Spalte. Alle mittels 'Relations' miteinander verknüpften Zeilen, erhalten den gleichen Wert der zweiten Spalte.";
-                    break;
+                //case enAction.KopiereAndereSpalten:
+                //    r = r + "Diese Aktion benötigt eine Spalte vom Typ 'Relation' und eine normale Spalte. Alle mittels 'Relations' miteinander verknüpften Zeilen, erhalten den gleichen Wert der zweiten Spalte.";
+                //    break;
 
 
 
@@ -1381,8 +1381,8 @@ namespace BlueDatabase
                 case enAction.LinkedCell:
                     return "ändere die ID der verlinkten Datenbank in " + ColsUnd;
 
-                case enAction.KopiereAndereSpalten:
-                    return "halte die Inhalte der verknüpften Spalten von " + ColsUnd + " gleich";
+                //case enAction.KopiereAndereSpalten:
+                //    return "halte die Inhalte der verknüpften Spalten von " + ColsUnd + " gleich";
 
                 case 0:
                     // Neue Aktion
@@ -1691,7 +1691,7 @@ namespace BlueDatabase
                 case enAction.Ist_der_Nutzer:
                 //case enAction.Ist_Jünger_Als:
                 //case enAction.SortiereIntelligent:
-                case enAction.KopiereAndereSpalten:
+                //case enAction.KopiereAndereSpalten:
                     break;
 
                 case enAction.Berechne:

@@ -82,7 +82,6 @@
     <Compile Include="Enums\enSW.cs" />
     <Compile Include="Enums\enDataFormat.cs" />
     <Compile Include="Enums\enFehlerArt.cs" />
-    <Compile Include="Extensions\DirectoryInfoExtensions.cs" />
     <Compile Include="Extensions\GraphicsExtensions.cs" />
     <Compile Include="Interfaces\IObjectWithDialog.cs" />
     <Compile Include="ListExt.cs" />

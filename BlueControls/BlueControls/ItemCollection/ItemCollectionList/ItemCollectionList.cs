@@ -1261,7 +1261,7 @@ namespace BlueControls.ItemCollection
             {
                 foreach (var t in Marked)
                 {
-                    e[t].Checked = true;
+                    if (e[t] is BasicListItem bli) { bli.Checked = true; }
                 }
             }
             e.Sort();

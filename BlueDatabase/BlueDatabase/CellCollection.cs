@@ -253,11 +253,12 @@ namespace BlueDatabase
 
             switch (Column.Format)
             {
-                //case enDataFormat.Relation:
-                //    RepairRelation(Column, Database.Row.SearchByKey(RowKey), PreviewsValue);
-                //    break;
                 case enDataFormat.RelationText:
                     RepairRelationText(Column, Database.Row.SearchByKey(RowKey), PreviewsValue, FreezeMode);
+                    SetSameValueOfKey(Column, RowKey, CurrentValue, FreezeMode);
+                    break;
+                case enDataFormat.KeyForSame:
+                    SetSameValueOfKey(Column, RowKey, CurrentValue, FreezeMode);
                     break;
             }
 
@@ -278,6 +279,80 @@ namespace BlueDatabase
                                 break;
                         }
                     }
+                }
+            }
+
+            if (Column.KeyColumnKey > -1)
+            {
+                ChangeValueOfKey(CurrentValue, Column, RowKey, FreezeMode);
+            }
+
+
+        }
+
+        private void ChangeValueOfKey(string currentvalue, ColumnItem column, int rowKey, bool freezeMode)
+        {
+            var keyc = Database.Column.SearchByKey(column.KeyColumnKey);
+            if (keyc is null) { return; }
+
+            List<RowItem> Rows = null;
+            var ownRow = Database.Row.SearchByKey(rowKey);
+            if (keyc.Format == enDataFormat.RelationText)
+            {
+                Rows = CellCollection.ConnectedRowsOfRelations(ownRow.CellGetString(keyc), ownRow);
+            }
+            else
+            {
+                Rows = RowCollection.MatchesTo(new FilterItem(keyc, enFilterType.Istgleich_GroﬂKleinEgal, ownRow.CellGetString(keyc)));
+            }
+            Rows.Remove(ownRow);
+            if (Rows.Count < 1) { return; }
+
+
+            foreach (var thisRow in Rows)
+            {
+                thisRow.CellSet(column, currentvalue, freezeMode);
+            }
+
+
+        }
+
+        private void SetSameValueOfKey(ColumnItem column, int rowKey, string currentvalue, bool freezeMode)
+        {
+
+            List<RowItem> Rows = null;
+            RowItem ownRow = null;
+
+
+            foreach (var ThisColumn in Database.Column)
+            {
+
+                if (ThisColumn.KeyColumnKey == column.Key)
+                {
+
+                    if (Rows == null)
+                    {
+                        ownRow = Database.Row.SearchByKey(rowKey);
+
+                        if (column.Format == enDataFormat.RelationText)
+                        {
+                            Rows = CellCollection.ConnectedRowsOfRelations(currentvalue, ownRow);
+                        }
+                        else
+                        {
+                            Rows = RowCollection.MatchesTo(new FilterItem(column, enFilterType.Istgleich_GroﬂKleinEgal, currentvalue));
+                        }
+                        Rows.Remove(ownRow);
+                        if (Rows.Count < 1)
+                        {
+                            ownRow.CellSet(ThisColumn, string.Empty, freezeMode);
+                        }
+                        else
+                        {
+                            ownRow.CellSet(ThisColumn, Rows[0].CellGetString(ThisColumn), freezeMode);
+                        }
+                    }
+
                 }
             }
         }

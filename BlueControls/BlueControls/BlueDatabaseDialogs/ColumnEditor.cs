@@ -200,8 +200,35 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxLinkedDatabase.Text = _Column.LinkedDatabaseFile;
             txbLinkedKeyKennung.Text = _Column.LinkedKeyKennung;
 
-            RegelTabVorbereiten(false);
 
+
+            cbxSchlüsselspalte.Item.Clear();
+            cbxSchlüsselspalte.Item.Add("#Ohne");
+            foreach (var ThisColumn in _Column.Database.Column)
+            {
+                if (ThisColumn.Format == enDataFormat.RelationText || ThisColumn.Format == enDataFormat.KeyForSame)
+                {
+                    cbxSchlüsselspalte.Item.Add(ThisColumn);
+                }
+            }
+            if (_Column.KeyColumnKey < 0)
+            {
+                cbxSchlüsselspalte.Text = "#Ohne";
+            }
+            else
+            {
+                var c = _Column.Database.Column.SearchByKey(_Column.KeyColumnKey);
+                if (c != null)
+                {
+                    cbxSchlüsselspalte.Text = c.Name;
+                }
+                else
+                {
+                    cbxSchlüsselspalte.Text = "#Ohne";
+                }
+            }
+
+            RegelTabVorbereiten(false);
 
 
             btnFehlerWennLeer.Checked = _Column.Database.Rules_Has(_Column, "Leer-Fehler") != null;
@@ -408,6 +435,18 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
 
+
+            var c = _Column.Database.Column[cbxSchlüsselspalte.Text];
+
+            if (c is null)
+            {
+                _Column.KeyColumnKey = -1;
+            }
+            else
+            {
+                _Column.KeyColumnKey = c.Key;
+            }
+            
 
             // Regel: Wenn Leer, gib Fehler aus
             var tmpR = _Column.Database.Rules_Has(_Column, "Leer-Fehler");

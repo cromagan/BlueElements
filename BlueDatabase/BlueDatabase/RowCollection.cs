@@ -275,7 +275,7 @@ namespace BlueDatabase
         }
 
 
-        public void DoAutomatic(FilterCollection Filter, bool FreezeMode)
+        public void DoAutomatic(FilterCollection Filter)
         {
             foreach (var ThisRowItem in _Internal)
             {
@@ -284,7 +284,7 @@ namespace BlueDatabase
                     //eProgressbar("Datenüberprüfung...", rc, _Internal.Count - 1, null);
                     if (ThisRowItem.Value.MatchesTo(Filter))
                     {
-                        ThisRowItem.Value.DoAutomatic(false, true, FreezeMode);
+                        ThisRowItem.Value.DoAutomatic(false, true);
                     }
                 }
             }

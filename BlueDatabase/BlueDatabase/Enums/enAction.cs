@@ -62,7 +62,7 @@ namespace BlueDatabase.Enums
 
         LinkedCell = 1018,
         //SortiereIntelligent = 1020,
-        KopiereAndereSpalten = 1021
+    //    KopiereAndereSpalten = 1021
 
 
 

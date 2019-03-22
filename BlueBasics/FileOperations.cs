@@ -22,6 +22,8 @@ using System.Collections.Generic;
 using System.IO;
 using static BlueBasics.modAllgemein;
 using BlueBasics.Enums;
+using System.Security.Permissions;
+using System.Security;
 
 namespace BlueBasics
 {
@@ -78,7 +80,7 @@ namespace BlueBasics
         /// <returns>True, wenn mindestens eine Datei gelöscht wurde.</returns>
         public static bool DeleteFile(List<string> filelist)
         {
-            for (var Z = 0 ; Z < filelist.Count ; Z++)
+            for (var Z = 0; Z < filelist.Count; Z++)
             {
                 if (!FileExists(filelist[Z])) { filelist[Z] = string.Empty; }
             }
@@ -192,12 +194,22 @@ namespace BlueBasics
             return File.Exists(file);
         }
 
+        //public static bool CanWriteInDirectory(string directory)
+        //{
+        //    if (string.IsNullOrEmpty(directory)) { return false; }
+        //    var di = new DirectoryInfo(directory);
+        //    return di.Writable();
+        //}
+
+
         public static bool CanWriteInDirectory(string directory)
         {
-            if (string.IsNullOrEmpty(directory)) { return false; }
-            var di = new DirectoryInfo(directory);
-            return di.Writable();
+            var permission = new FileIOPermission(FileIOPermissionAccess.Write, directory);
+            var permissionSet = new PermissionSet(PermissionState.None);
+            permissionSet.AddPermission(permission);
+            return permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet);
         }
+
 
         public static bool CanWrite(string Datei, double TryItForSeconds)
         {

@@ -98,6 +98,8 @@ namespace BlueDatabase
 
         private string _CellInitValue;
 
+        private int _KeyColumnKey;
+
         public SizeF TMP_CaptionText_Size = new SizeF(-1, -1);
         internal Database _TMP_LinkedDatabase;
         public int? TMP_ColumnContentWidth = null;
@@ -134,6 +136,8 @@ namespace BlueDatabase
             _ForeColor = Color.Black;
             _BackColor = Color.White;
             _CellInitValue = string.Empty;
+            _KeyColumnKey = -1;
+
 
 
             _EditType = enEditTypeFormula.Textfeld;
@@ -224,6 +228,7 @@ namespace BlueDatabase
             AfterEdit_AutoCorrect = Source.AfterEdit_AutoCorrect;
             CellInitValue = Source.CellInitValue;
             AutoFilterJoker = Source.AutoFilterJoker;
+            KeyColumnKey = Source.KeyColumnKey;
 
             DropDownItems.Clear();
             DropDownItems.AddRange(Source.DropDownItems);
@@ -897,6 +902,19 @@ namespace BlueDatabase
                 OnChanged();
             }
         }
+        public int KeyColumnKey
+        {
+            get
+            {
+                return _KeyColumnKey;
+            }
+            set
+            {
+                if (_KeyColumnKey == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_KeyColumnKey, this, _KeyColumnKey.ToString(), value.ToString(), true);
+                OnChanged();
+            }
+        }
 
 
         public int AfterEdit_Runden
@@ -1163,7 +1181,7 @@ namespace BlueDatabase
                     CellCollection.Invalidate_CellContentSize(this, ThisRow);
                     Invalidate_TmpColumnContentWidth();
                     Database.Cell.OnCellValueChanged(new CellEventArgs(this, ThisRow));
-                    ThisRow.DoAutomatic(false, true, false);
+                    ThisRow.DoAutomatic(false, true);
                 }
             }
         }
@@ -1447,10 +1465,15 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_EditTrotzSperreErlaubt:
                     _EditTrotzSperreErlaubt = Wert.FromPlusMinus();
                     break;
+
                 case enDatabaseDataType.co_CellInitValue:
                     _CellInitValue = Wert;
-
                     break;
+
+                case enDatabaseDataType.co_KeyColumnKey:
+                    _KeyColumnKey = int.Parse(Wert);
+                    break;
+
                 default:
                     if (Art.ToString() == Convert.ToInt32(Art).ToString())
                     {
@@ -1751,7 +1774,7 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ConstantHeight, _BildCode_ConstantHeight.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ImageNotFound, ((int)_BildCode_ImageNotFound).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Prefix, _Prefix, Key);
-
+            Database.SaveToByteList(l, enDatabaseDataType.co_KeyColumnKey, _KeyColumnKey.ToString(), Key); 
 
             //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
             Database.SaveToByteList(l, enDatabaseDataType.co_Identifier, _Identifier, Key);
@@ -2117,6 +2140,14 @@ namespace BlueDatabase
                     _Format != enDataFormat.Text_Ohne_Kritische_Zeichen &&
                     _Format != enDataFormat.Columns_für_LinkedCellDropdown &&
                     _Format != enDataFormat.BildCode) { return "Format unterstützt keine Ersetzungen."; }
+            }
+
+            if (_KeyColumnKey>-1)
+            {
+                if (_Format == enDataFormat.RelationText || _Format == enDataFormat.KeyForSame) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben."; }
+                var c = Database.Column.SearchByKey(_KeyColumnKey);
+                if (c== null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
+                if  (c.Format != enDataFormat.RelationText && c.Format != enDataFormat.KeyForSame) { return "Die verknüpfte Schlüsselspalte hat das falsche Format."; }
             }
 
             return string.Empty;

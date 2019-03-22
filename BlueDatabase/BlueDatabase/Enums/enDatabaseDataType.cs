@@ -170,6 +170,7 @@ namespace BlueDatabase.Enums
         co_Ueberschrift2 = 175,
         co_Ueberschrift3 = 176,
         co_Prefix = 177,
+        co_KeyColumnKey = 178,
 
 
         ce_Value_withoutSizeData = 200,

@@ -39,7 +39,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Linq;
 using System.Threading;
-using System.Windows.Forms;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls
@@ -1679,7 +1678,7 @@ namespace BlueControls.Controls
 
 
                 CursorPos_Set(CellInThisDatabaseColumn, CellInThisDatabaseRow, false);
-                CellInThisDatabaseRow.DoAutomatic(false, true, false);
+                CellInThisDatabaseRow.DoAutomatic(false, true);
 
                 // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
                 // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
@@ -2411,6 +2410,32 @@ namespace BlueControls.Controls
 
                 switch (e.KeyCode)
                 {
+                    case System.Windows.Forms.Keys.X:
+                        if (e.Modifiers == System.Windows.Forms.Keys.Control)
+                        {
+                            CopyToClipboard(_CursorPosColumn, _CursorPosRow, true);
+
+                            if (_CursorPosRow.CellIsNullOrEmpty(_CursorPosColumn))
+                            {
+                                ISIN_KeyDown = false;
+                                return;
+                            }
+
+                            var l2 = _Database.Cell.UserEditErrorReason(_CursorPosColumn, _CursorPosRow, false);
+
+                            if (string.IsNullOrEmpty(l2))
+                            {
+                                UserEdited(string.Empty, _CursorPosColumn, _CursorPosRow, true);
+                            }
+                            else
+                            {
+                                NotEditableInfo(l2);
+                            }
+ 
+
+                        }
+                           break;
+
                     case System.Windows.Forms.Keys.Delete:
                         if (_CursorPosRow.CellIsNullOrEmpty(_CursorPosColumn))
                         {
@@ -4022,7 +4047,7 @@ namespace BlueControls.Controls
 
 
             Database.Cell.Set(Column, Row, v[0].Substring(5));
-            Row.DoAutomatic(false, true, false);
+            Row.DoAutomatic(false, true);
         }
 
 
@@ -4158,7 +4183,7 @@ namespace BlueControls.Controls
 
                 var _Ist1 = string.Empty;
 
-                if (ContenHolderCellRow !=null && ContentHolderCellColumn != null)
+                if (ContenHolderCellRow != null && ContentHolderCellColumn != null)
                 {
                     _Ist1 = ContenHolderCellRow.CellGetString(ContentHolderCellColumn);
                 }

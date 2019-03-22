@@ -468,7 +468,7 @@ namespace BlueDatabase
                     //case enAction.Ist_Jünger_Als: Co = 111; break;
                     case enAction.Substring: Co = 115; break;
                     //case enAction.SortiereIntelligent: Co = 120; break;
-                    case enAction.KopiereAndereSpalten: Co = 130; break;
+                    //case enAction.KopiereAndereSpalten: Co = 130; break;
 
                     case enAction.Erhält_den_Focus: Co = 200; break;
 
@@ -566,10 +566,10 @@ namespace BlueDatabase
             {
                 if (ThisAction != null)
                 {
-                    if (ThisAction.Action != enAction.KopiereAndereSpalten)
-                    {
+                    //if (ThisAction.Action != enAction.KopiereAndereSpalten)
+                    //{
                         if (ThisAction.Columns.Contains(Column)) { return true; }
-                    }
+                    //}
                 }
             }
             return false;
