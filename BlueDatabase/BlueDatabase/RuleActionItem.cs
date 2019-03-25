@@ -461,6 +461,10 @@ namespace BlueDatabase
                             return "Spalte mit Spaltenschlüssel/Zielspalte in der Spalte '#Spalte:" + t.Name + "' nicht definiert";
                         }
 
+                        if (Row.CellIsNullOrEmpty(rowC))
+                        {
+                            return "Kein Schlüssel angegeben."; // RowAdded Ereigniss löst ein DoRules aus. Und da ist noch kein Wert gesetzt.
+                        }
                         var tarR = LinkedDB.Row[Row.CellGetString(rowC)];
 
                         if (tarC != null && tarR == null && o[4] == ((int)enFehlendesZiel.ZeileAnlegen).ToString())

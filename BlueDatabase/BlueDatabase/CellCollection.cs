@@ -343,14 +343,14 @@ namespace BlueDatabase
                             Rows = RowCollection.MatchesTo(new FilterItem(column, enFilterType.Istgleich_GroﬂKleinEgal, currentvalue));
                         }
                         Rows.Remove(ownRow);
-                        if (Rows.Count < 1)
-                        {
-                            ownRow.CellSet(ThisColumn, string.Empty, freezeMode);
-                        }
-                        else
-                        {
-                            ownRow.CellSet(ThisColumn, Rows[0].CellGetString(ThisColumn), freezeMode);
-                        }
+                    }
+                    if (Rows.Count < 1)
+                    {
+                        ownRow.CellSet(ThisColumn, string.Empty, freezeMode);
+                    }
+                    else
+                    {
+                        ownRow.CellSet(ThisColumn, Rows[0].CellGetString(ThisColumn), freezeMode);
                     }
 
                 }

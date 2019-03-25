@@ -39,30 +39,30 @@ namespace BlueControls.Controls
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.BB = new  Button();
+            this.btnDropDown = new  Button();
             this.SuspendLayout();
             // 
-            // BB
+            // btnDropDown
             // 
-            this.BB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.btnDropDown.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
                                               | System.Windows.Forms.AnchorStyles.Right)));
-            this.BB.ImageCode = "Pfeil_Unten_Scrollbar";
-            this.BB.Location = new Point(476, 0);
-            this.BB.Name = "BB";
-            this.BB.Size = new Size(24, 150);
-            this.BB.TabIndex = 1;
-            this.BB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.BB_MouseUp);
-            this.BB.LostFocus += new EventHandler(this.BB_LostFocus);
+            this.btnDropDown.ImageCode = "Pfeil_Unten_Scrollbar";
+            this.btnDropDown.Location = new Point(476, 0);
+            this.btnDropDown.Name = "btnDropDown";
+            this.btnDropDown.Size = new Size(24, 150);
+            this.btnDropDown.TabIndex = 1;
+            this.btnDropDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnDropDown_MouseUp);
+            this.btnDropDown.LostFocus += new EventHandler(this.btnDropDown_LostFocus);
             // 
             // ComboBox
             // 
-            this.Controls.Add(this.BB);
+            this.Controls.Add(this.btnDropDown);
             this.Name = "ComboBox";
             this.Size = new Size(500, 150);
             this.ResumeLayout(false);
 
         }
 
-        internal Button BB;
+        internal Button btnDropDown;
     }
 }

@@ -41,7 +41,8 @@ namespace BlueControls.Controls
 
 
 
-        private string Initialtext;
+        private string _Initialtext;
+        private bool _btnDropDownIsIn = false;
 
 
         public ComboBox()
@@ -195,11 +196,11 @@ namespace BlueControls.Controls
             if (_DrawStyle == enComboboxStyle.RibbonBar)
             {
 
-                if (string.IsNullOrEmpty(Initialtext) && !string.IsNullOrEmpty(Text)) { Initialtext = Text; }
+                if (string.IsNullOrEmpty(_Initialtext) && !string.IsNullOrEmpty(Text)) { _Initialtext = Text; }
 
                 SetAlternateStyle();
                 RowItem tempVar = null;
-                Button.DrawButton(this, gr, ref tempVar, enDesign.Ribbonbar_Button, state, QuickImage.Get(_ImageCode), enAlignment.VerticalCenter_Left, true, null, Initialtext, DisplayRectangle);
+                Button.DrawButton(this, gr, ref tempVar, enDesign.Ribbonbar_Button, state, QuickImage.Get(_ImageCode), enAlignment.VerticalCenter_Left, true, null, _Initialtext, DisplayRectangle);
                 return;
             }
 
@@ -207,7 +208,7 @@ namespace BlueControls.Controls
 
 
 
-            BB.Enabled = Item.Count > 0;
+            btnDropDown.Enabled = Item.Count > 0;
 
             enDesign vType = 0;
             if (ParentType() == enPartentType.RibbonGroupBox || ParentType() == enPartentType.RibbonPage)
@@ -282,7 +283,7 @@ namespace BlueControls.Controls
 
 
 
-            BB.Invalidate();
+            btnDropDown.Invalidate();
             Skin.Draw_Border(TMPGR, vType, state, DisplayRectangle);
 
             gr.DrawImage(_BitmapOfControl, 0, 0);
@@ -300,18 +301,24 @@ namespace BlueControls.Controls
 
             FloatingInputBoxListBoxStyle.Close(this);
 
-            BB.Enabled = Enabled;
-            BB.Invalidate();
+            btnDropDown.Enabled = Enabled;
+            btnDropDown.Invalidate();
         }
 
 
 
-        private void BB_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void btnDropDown_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
+
+            if (_btnDropDownIsIn) { return; }
+
             if (IsDisposed) { return; }
             if (!Enabled) { return; }
             //if (DropDownMenu != null) { return; }
             if (Item.Count == 0) { return; }
+
+            _btnDropDownIsIn = true;
+
             int X, Y;
 
 
@@ -337,7 +344,7 @@ namespace BlueControls.Controls
             DropDownMenu.Cancel += DropDownMenu_Cancel;
             DropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
 
-
+            _btnDropDownIsIn = false;
 
 
         }
@@ -348,7 +355,7 @@ namespace BlueControls.Controls
         {
             base.OnGotFocus(e);
 
-            if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) { BB.Focus(); }
+            if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) { btnDropDown.Focus(); }
             FloatingInputBoxListBoxStyle.Close(this);
 
         }
@@ -368,14 +375,14 @@ namespace BlueControls.Controls
                 // nicht bei rechts, ansonsten gibt's evtl. Kontextmenü (von der Textbox aus gesteuert) UND den Auswahldialog
                 if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList)
                 {
-                    BB_MouseUp(this, e);
+                    btnDropDown_MouseUp(this, e);
                 }
             }
 
         }
 
 
-        private void BB_LostFocus(object sender, System.EventArgs e)
+        private void btnDropDown_LostFocus(object sender, System.EventArgs e)
         {
             CheckLostFocus(e);
         }
@@ -385,9 +392,9 @@ namespace BlueControls.Controls
 
             try
             {
-                if (BB == null) { return; }
+                if (btnDropDown == null) { return; }
 
-                if (!BB.Focused && !Focused() && !FloatingInputBoxListBoxStyle.IsShowing(this)) { base.OnLostFocus(e); }
+                if (!btnDropDown.Focused && !Focused() && !FloatingInputBoxListBoxStyle.IsShowing(this)) { base.OnLostFocus(e); }
 
             }
             catch (Exception)
@@ -422,7 +429,7 @@ namespace BlueControls.Controls
         {
             Cursor = System.Windows.Forms.Cursors.Arrow;
             _DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            BB.Visible = false;
+            btnDropDown.Visible = false;
         }
 
         protected override void OnMouseEnter(System.EventArgs e)
