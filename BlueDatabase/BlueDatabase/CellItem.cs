@@ -285,7 +285,7 @@ namespace BlueDatabase
                     if (column.BildCode_ConstantHeight > 0) { code = code + "|" + column.BildCode_ConstantHeight; }
                     defaultImage = QuickImage.Get(code);
 
-                    if (!defaultImage.IsError) { return defaultImage; }
+                    if (defaultImage != null && !defaultImage.IsError) { return defaultImage; }
 
                     if (column.BildCode_ImageNotFound != enImageNotFound.ShowErrorPic) { return null; }
 
