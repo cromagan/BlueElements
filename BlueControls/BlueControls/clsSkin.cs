@@ -795,9 +795,11 @@ namespace BlueControls
         /// <param name="F"></param>
         public void Draw_FormatedText(Graphics GR, ColumnItem column, string Txt, QuickImage ImageCode, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, BlueFont F, enShortenStyle Style)
         {
-            var tmpImageCode = Draw_FormatedText_PicOf(Txt, ImageCode, column);
-            var tmpText = CellItem.ValueReadable(Txt, column, Style);
-            vAlign = Draw_FormatedText_Alignment(column, tmpText, tmpImageCode, vAlign);
+            var tmpImageCode = CellItem.StandardImage(column, Txt, ImageCode);
+            var tmpText = CellItem.ValueReadable(column, Txt, Style);
+
+ 
+            vAlign = CellItem.StandardAlignment(column, vAlign);
 
             Draw_FormatedText(GR, tmpText, tmpImageCode, vAlign, FitInRect, Child, DeleteBack, F);
         }
@@ -922,8 +924,9 @@ namespace BlueControls
 
         public Size FormatedText_NeededSize(ColumnItem Column, string txt, QuickImage ImageCode, BlueFont F, enShortenStyle Style)
         {
-            var tmpImageCode = Draw_FormatedText_PicOf(txt, ImageCode, Column);
-            var tmpText = CellItem.ValueReadable(txt, Column, Style);
+            var tmpText = CellItem.ValueReadable(Column, txt, Style);
+            var tmpImageCode = CellItem.StandardImage(Column, tmpText, ImageCode);
+
 
             return FormatedText_NeededSize(tmpText, tmpImageCode, F);
         }
@@ -1165,124 +1168,6 @@ namespace BlueControls
         }
 
         #endregion
-
-        public static QuickImage Draw_FormatedText_PicOf(string Txt, QuickImage ImageCode, ColumnItem column)
-        {
-
-            switch (column.Format)
-            {
-                case enDataFormat.Text:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
-                    return ImageCode; // z.B. KontextMenu
-
-                case enDataFormat.Bit:
-                    if (Txt == true.ToPlusMinus())
-                    {
-                        if (column == column.Database.Column.SysCorrect) { return QuickImage.Get("Häkchen|16||||||||80"); }
-                        //if (column == column.Database.Column.SysLocked) { return QuickImage.Get(enImageCode.Schloss, 16,"00AA00",string.Empty); }
-                        return QuickImage.Get(enImageCode.Häkchen, 16);
-                    }
-                    else if (Txt == false.ToPlusMinus())
-                    {
-                        if (column == column.Database.Column.SysCorrect) { return QuickImage.Get(enImageCode.Warnung, 16); }
-                        //if (column == column.Database.Column.SysLocked) { return QuickImage.Get(enImageCode.Schlüssel, 16, "FFBB00", string.Empty); }
-                        return QuickImage.Get(enImageCode.Kreuz, 16);
-                    }
-                    else if (Txt == "o" || Txt == "O")
-                    {
-                        return QuickImage.Get(enImageCode.Kreis2, 16);
-                    }
-                    else if (Txt == "?")
-                    {
-                        return QuickImage.Get(enImageCode.Fragezeichen, 16);
-                    }
-                    else
-                    {
-                        return QuickImage.Get(enImageCode.Kritisch, 16);
-                    }
-
-
-                case enDataFormat.BildCode:
-                    if (ImageCode != null) { return ImageCode; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
-                    if (column.BildCode_ConstantHeight > 0) { Txt = Txt + "|" + column.BildCode_ConstantHeight; }
-                    ImageCode = QuickImage.Get(column.Prefix + Txt + column.Suffix);
-                    if (ImageCode.IsError)
-                    {
-                        if (column.BildCode_ImageNotFound != enImageNotFound.ShowErrorPic) { return null; }
-                        Txt = "Fragezeichen||||||200|||80";
-                        if (column.BildCode_ConstantHeight > 0) { Txt = "Fragezeichen|" + column.BildCode_ConstantHeight + "|||||200|||80"; }
-                    }
-
-
-                    return QuickImage.Get(Txt);
-
-
-                case enDataFormat.Farbcode:
-
-                    if (!string.IsNullOrEmpty(Txt) && Txt.IsFormat(enDataFormat.Farbcode))
-                    {
-                        var col = Color.FromArgb(int.Parse(Txt));
-                        return QuickImage.Get(enImageCode.Kreis, 16, "", col.ToHTMLCode());
-                    }
-                    return null;
-
-
-                //case enDataFormat.Relation:
-                //    if (ImageCode != null) { return ImageCode; }
-                //    if (!string.IsNullOrEmpty(Txt)) { return new clsRelation(Column, null, Txt).SymbolForReadableText(); }
-                //    return null;
-
-
-
-                case enDataFormat.Link_To_Filesystem:
-                    if (ImageCode != null) { return ImageCode; }
-                    if (Txt.FileType() == enFileFormat.Unknown) { return null; }
-                    return QuickImage.Get(Txt.FileType(), 48);
-
-                case enDataFormat.Schrift:
-                    Develop.DebugPrint_NichtImplementiert();
-                    //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return ImageCode; }
-                    //return BlueFont.Get(Txt).SymbolForReadableText();
-                    return null;
-
-                case enDataFormat.LinkedCell:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                    return null;
-
-                default:
-                    return null;
-
-            }
-
-
-
-
-        }
-
-
-
-        public static enAlignment Draw_FormatedText_Alignment(ColumnItem Column, string Txt, QuickImage ImageCode, enAlignment Aling)
-        {
-
-            switch (Column.Format)
-            {
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                    return enAlignment.Top_Right;
-
-                case enDataFormat.Bit:
-                    if (Column.CompactView) { return enAlignment.Top_HorizontalCenter; }
-                    return enAlignment.Top_Left;
-
-                default:
-                    return Aling;
-            }
-
-        }
 
 
 

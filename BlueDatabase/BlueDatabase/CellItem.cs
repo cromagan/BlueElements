@@ -100,27 +100,28 @@ namespace BlueDatabase
 
             if (!column.MultiLine)
             {
-                ret.Add(ValueReadable(Row.CellGetString(column), column, Style));
+                ret.Add(ValueReadable(column, Row.CellGetString(column), Style));
                 return ret;
             }
 
             var x = Row.CellGetList(column);
             foreach (var thisstring in x)
             {
-                ret.Add(ValueReadable(thisstring, column, Style));
+                ret.Add(ValueReadable(column, thisstring, Style));
             }
             return ret;
         }
 
 
+
         /// <summary>
         /// Gibt eine einzelne Zeile richtig formatiert zurück. Zeilenumbrüche werden eleminiert.
         /// </summary>
-        /// <param name="Txt"></param>
         /// <param name="column"></param>
+        /// <param name="Txt"></param>
         /// <param name="Style"></param>
         /// <returns></returns>
-        public static string ValueReadable(string Txt, ColumnItem column, enShortenStyle Style)
+        public static string ValueReadable(ColumnItem column, string Txt, enShortenStyle Style)
         {
 
             switch (column.Format)
@@ -235,6 +236,132 @@ namespace BlueDatabase
 
             return Txt;
         }
+
+
+
+        public static QuickImage StandardImage(ColumnItem column, string Txt, QuickImage defaultImage)
+        {
+
+            switch (column.Format)
+            {
+                case enDataFormat.Text:
+                case enDataFormat.Text_mit_Formatierung:
+                case enDataFormat.Text_Ohne_Kritische_Zeichen:
+                case enDataFormat.RelationText:
+                case enDataFormat.KeyForSame:
+                    return defaultImage; // z.B. KontextMenu
+
+                case enDataFormat.Bit:
+                    if (Txt == true.ToPlusMinus())
+                    {
+                        if (column == column.Database.Column.SysCorrect) { return QuickImage.Get("Häkchen|16||||||||80"); }
+                        //if (column == column.Database.Column.SysLocked) { return QuickImage.Get(enImageCode.Schloss, 16,"00AA00",string.Empty); }
+                        return QuickImage.Get(enImageCode.Häkchen, 16);
+                    }
+                    else if (Txt == false.ToPlusMinus())
+                    {
+                        if (column == column.Database.Column.SysCorrect) { return QuickImage.Get(enImageCode.Warnung, 16); }
+                        //if (column == column.Database.Column.SysLocked) { return QuickImage.Get(enImageCode.Schlüssel, 16, "FFBB00", string.Empty); }
+                        return QuickImage.Get(enImageCode.Kreuz, 16);
+                    }
+                    else if (Txt == "o" || Txt == "O")
+                    {
+                        return QuickImage.Get(enImageCode.Kreis2, 16);
+                    }
+                    else if (Txt == "?")
+                    {
+                        return QuickImage.Get(enImageCode.Fragezeichen, 16);
+                    }
+                    else
+                    {
+                        return QuickImage.Get(enImageCode.Kritisch, 16);
+                    }
+
+
+                case enDataFormat.BildCode:
+                    if (defaultImage != null || column == null) { return defaultImage; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
+
+                    var code = column.Prefix + Txt + column.Suffix;
+                    if (column.BildCode_ConstantHeight > 0) { code = code + "|" + column.BildCode_ConstantHeight; }
+                    defaultImage = QuickImage.Get(code);
+
+                    if (!defaultImage.IsError) { return defaultImage; }
+
+                    if (column.BildCode_ImageNotFound != enImageNotFound.ShowErrorPic) { return null; }
+
+                    if (column.BildCode_ConstantHeight > 0)
+                    {
+                        return QuickImage.Get("Fragezeichen|" + column.BildCode_ConstantHeight + "|||||200|||80");
+                    }
+                    else
+                    {
+                        return QuickImage.Get("Fragezeichen||||||200|||80");
+                    }
+
+                case enDataFormat.Farbcode:
+
+                    if (!string.IsNullOrEmpty(Txt) && Txt.IsFormat(enDataFormat.Farbcode))
+                    {
+                        var col = Color.FromArgb(int.Parse(Txt));
+                        return QuickImage.Get(enImageCode.Kreis, 16, "", col.ToHTMLCode());
+                    }
+                    return null;
+
+
+                //case enDataFormat.Relation:
+                //    if (ImageCode != null) { return ImageCode; }
+                //    if (!string.IsNullOrEmpty(Txt)) { return new clsRelation(Column, null, Txt).SymbolForReadableText(); }
+                //    return null;
+
+
+
+                case enDataFormat.Link_To_Filesystem:
+                    if (defaultImage != null) { return defaultImage; }
+                    if (Txt.FileType() == enFileFormat.Unknown) { return null; }
+                    return QuickImage.Get(Txt.FileType(), 48);
+
+                case enDataFormat.Schrift:
+                    Develop.DebugPrint_NichtImplementiert();
+                    //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return ImageCode; }
+                    //return BlueFont.Get(Txt).SymbolForReadableText();
+                    return null;
+
+                case enDataFormat.LinkedCell:
+                case enDataFormat.Columns_für_LinkedCellDropdown:
+                case enDataFormat.Values_für_LinkedCellDropdown:
+                    return null;
+
+                default:
+                    return null;
+
+            }
+
+
+
+
+        }
+
+
+
+        public static enAlignment StandardAlignment(ColumnItem column, enAlignment defaultalign)
+        {
+
+            switch (column.Format)
+            {
+                case enDataFormat.Ganzzahl:
+                case enDataFormat.Gleitkommazahl:
+                    return enAlignment.Top_Right;
+
+                case enDataFormat.Bit:
+                    if (column.CompactView) { return enAlignment.Top_HorizontalCenter; }
+                    return enAlignment.Top_Left;
+
+                default:
+                    return defaultalign;
+            }
+
+        }
+
 
 
 

@@ -377,7 +377,7 @@ namespace BlueDatabase
                     var ts3 = tx.SplitByCR();
                     for (var tz = 0; tz <= ts3.GetUpperBound(0); tz++)
                     {
-                        ts3[tz] =  CellItem.ValueReadable(ts3[tz], column, enShortenStyle.HTML);
+                        ts3[tz] =  CellItem.ValueReadable(column, ts3[tz], enShortenStyle.HTML);
                     }
                     tx = string.Join("\r", ts3);
                     break;
