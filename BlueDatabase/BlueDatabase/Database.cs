@@ -189,6 +189,10 @@ namespace BlueDatabase
             {
                 row = Row.Add(DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
             }
+            else
+            {
+                if (row.CellGetBoolean(row.Database.Column.SysLocked)) { return "Die Zeile ist gesperrt (abgeschlosen)."; }
+            }
 
 
 
@@ -1753,7 +1757,7 @@ namespace BlueDatabase
                 {
                     var x2 = thisstring.SplitBy("|");
                     if (x2.Length > 2 && x2[1].ToUpper() == OldName.ToUpper())
-                        {
+                    {
                         x2[1] = cColumnItem.Name.ToUpper();
                         xn.Add(x2.JoinWith("|"));
                     }

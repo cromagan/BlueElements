@@ -69,7 +69,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
             else
             {
-                txbImportSkript.Enabled = true;
+                txbImportSkript.Enabled = _Database.IsAdministrator();
                 txbImportSkript.Text = _Database.ImportScript.FromNonCritical();
             }
         }
@@ -179,14 +179,14 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (opbNeueZeile.Checked && optVorhandenZeile.Checked)
             {
-                MessageBox.Show("Zu viele Zeilen-optionen, abbruch.", enImageCode.Information, "OK");
+                MessageBox.Show("Zu viele Zeilen-Optionen, abbruch.", enImageCode.Information, "OK");
                 Develop.DebugPrint(enFehlerArt.Warnung, "Eigentlich nicht möglich");
                 return;
             }
 
             if (!System.Windows.Forms.Clipboard.ContainsText())
             {
-                MessageBox.Show("Kkein Text im Clipboard, abbruch.", enImageCode.Information, "OK");
+                MessageBox.Show("Kein Text im Clipboard, abbruch.", enImageCode.Information, "OK");
                 return;
             }
 

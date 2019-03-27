@@ -9,7 +9,7 @@ namespace BlueControls.BlueDatabaseDialogs
     {
 
 
-        internal sealed partial class Search 
+    public sealed partial class Search 
         {
 			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
 			[DebuggerNonUserCode()]

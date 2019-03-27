@@ -28,7 +28,7 @@ using BlueDatabase.EventArgs;
 namespace BlueControls.BlueDatabaseDialogs
 {
 
-    internal sealed partial class Search : BlueControls.Forms.Form
+    public sealed partial class Search : BlueControls.Forms.Form
     {
 
         private readonly Table _BlueTable;
