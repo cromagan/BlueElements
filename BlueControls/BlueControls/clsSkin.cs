@@ -925,7 +925,7 @@ namespace BlueControls
         public Size FormatedText_NeededSize(ColumnItem Column, string txt, QuickImage ImageCode, BlueFont F, enShortenStyle Style)
         {
             var tmpText = CellItem.ValueReadable(Column, txt, Style);
-            var tmpImageCode = CellItem.StandardImage(Column, tmpText, ImageCode);
+            var tmpImageCode = CellItem.StandardImage(Column, txt, ImageCode);
 
 
             return FormatedText_NeededSize(tmpText, tmpImageCode, F);

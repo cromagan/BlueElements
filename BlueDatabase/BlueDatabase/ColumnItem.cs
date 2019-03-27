@@ -2110,7 +2110,8 @@ namespace BlueDatabase
 
             if (!string.IsNullOrEmpty(_Suffix))
             {
-                if (!_Format.IsZahl()) { return "Format unterstützt keine Einheit."; }
+                //d
+                //if (!_Format.IsZahl()) { return "Format unterstützt keine Einheit."; }
                 if (_MultiLine) { return "Einheiten und Mehrzeilig darf nicht kombiniert werden."; }
             }
 
@@ -2148,7 +2149,18 @@ namespace BlueDatabase
                 var c = Database.Column.SearchByKey(_KeyColumnKey);
                 if (c== null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
                 if  (c.Format != enDataFormat.RelationText && c.Format != enDataFormat.KeyForSame) { return "Die verknüpfte Schlüsselspalte hat das falsche Format."; }
+
+
             }
+
+
+            if (this.IsFirst())
+            {
+                if (_KeyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
+                if (_Format == enDataFormat.RelationText) { return "Die (intern) erste Spalte kann nicht das Format RelationText haben."; }
+            }
+
+       
 
             return string.Empty;
         }

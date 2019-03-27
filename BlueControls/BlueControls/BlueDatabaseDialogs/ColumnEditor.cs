@@ -426,7 +426,9 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.CaptionBitmap = picCaptionImage.Bitmap;
 
 
-            _Column.BildCode_ConstantHeight = int.Parse(txbBildCodeConstHeight.Text);
+
+            int.TryParse(txbBildCodeConstHeight.Text, out var Res);
+            _Column.BildCode_ConstantHeight = Res;
             _Column.BildCode_ImageNotFound = (enImageNotFound)int.Parse(cbxBildCodeImageNotfound.Text);
             _Column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
             _Column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
@@ -446,7 +448,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 _Column.KeyColumnKey = c.Key;
             }
-            
+
 
             // Regel: Wenn Leer, gib Fehler aus
             var tmpR = _Column.Database.Rules_Has(_Column, "Leer-Fehler");
