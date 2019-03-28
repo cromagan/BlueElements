@@ -258,12 +258,12 @@ namespace BlueDatabase
 
         public override string ToString()
         {
-            var Result = "{Type=" + Convert.ToInt32(_ViewType);
+            var Result = "{Type=" + (int)(_ViewType);
             if (Column != null) { Result = Result + ", " + Column.ParsableColumnKey(); }
             if (_Spalte_X1 > 0) { Result = Result + ", X=" + _Spalte_X1; }
             if (_Spalte_Width > 1) { Result = Result + ", Width=" + _Spalte_Width; }
             if (_Spalte_Height > 1) { Result = Result + ", Height=" + _Spalte_Height; }
-            if (_‹berschriftAnordnung != en‹berschriftAnordnung.‹ber_dem_Feld) { Result = Result + ", Caption=" + Convert.ToInt32(_‹berschriftAnordnung); }
+            if (_‹berschriftAnordnung != en‹berschriftAnordnung.‹ber_dem_Feld) { Result = Result + ", Caption=" + (int)(_‹berschriftAnordnung); }
             return Result + "}";
         }
 

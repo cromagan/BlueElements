@@ -38,7 +38,7 @@ namespace BlueDatabase.Enums
         Auf_eine_existierende_Datei_verweist = 20,
         Auf_einen_existierenden_Pfad_verweist = 21,
 
-        Erhält_den_Focus = 22,
+       // Erhält_den_Focus = 22,
 
         Unsichtbare_Zeichen_am_Ende_Enthält = 23,
 
@@ -52,15 +52,15 @@ namespace BlueDatabase.Enums
         Wert_Dazu = 1003,
         Wert_Weg = 1004,
         Wert_Setzen = 1005,
-        Mache_einen_Vorschlag = 1007,
+        //Mache_einen_Vorschlag = 1007,
 
         Berechne = 1009,
 
         Sperre_die_Zelle = 1011,
 
-        Substring = 1017,
+        Substring = 1017
 
-        LinkedCell = 1018,
+       // LinkedCell = 1018,
         //SortiereIntelligent = 1020,
     //    KopiereAndereSpalten = 1021
 

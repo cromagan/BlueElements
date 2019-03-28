@@ -419,11 +419,11 @@ namespace BlueControls.ItemCollection
 
             foreach (var ThisPoint in x)
             {
-                x1 = Convert.ToInt32(Math.Min(ThisPoint.X, x1));
-                y1 = Convert.ToInt32(Math.Min(ThisPoint.Y, y1));
+                x1 = (int)(Math.Min(ThisPoint.X, x1));
+                y1 = (int)(Math.Min(ThisPoint.Y, y1));
 
-                x2 = Convert.ToInt32(Math.Max(ThisPoint.X, x2));
-                y2 = Convert.ToInt32(Math.Max(ThisPoint.Y, y2));
+                x2 = (int)(Math.Max(ThisPoint.X, x2));
+                y2 = (int)(Math.Max(ThisPoint.Y, y2));
             }
 
             return new RectangleDF(x1, y1, x2 - x1, y2 - y1);

@@ -666,18 +666,23 @@ namespace BlueDatabase
 
             if (!string.IsNullOrEmpty(Column.CellInitValue)) { return string.Empty; }
 
-            var BestW = "";
-            foreach (var ThisRule in Database.Rules)
-            {
-                if (ThisRule != null)
-                {
-                    if (ThisRule.hasGotFocusAction(Row, Column))
-                    {
-                        if (ThisRule.TrifftZu(Row, Column)) { BestW = ThisRule.Execute(Row, Column, false); }
-                        if (!string.IsNullOrEmpty(BestW)) { return BestW; }
-                    }
-                }
-            }
+
+            // _VorschlagColumnKey abfragen
+
+            Develop.DebugPrint_NichtImplementiert();
+
+            //var BestW = "";
+            //foreach (var ThisRule in Database.Rules)
+            //{
+            //    if (ThisRule != null)
+            //    {
+            //        if (ThisRule.hasGotFocusAction(Row, Column))
+            //        {
+            //            if (ThisRule.TrifftZu(Row, Column)) { BestW = ThisRule.Execute(Row, Column, false); }
+            //            if (!string.IsNullOrEmpty(BestW)) { return BestW; }
+            //        }
+            //    }
+            //}
             return string.Empty;
         }
 

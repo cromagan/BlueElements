@@ -233,11 +233,11 @@ namespace BlueControls.ItemCollection
 
                 if (IsIn == enBlueListBoxAppearance.Gallery || IsIn == enBlueListBoxAppearance.FileSystem)
                 {
-                    SetCoordinates(new Rectangle(Convert.ToInt32(X), Convert.ToInt32(Y), Convert.ToInt32(MultiX), Convert.ToInt32(MultiX * 0.8)));
+                    SetCoordinates(new Rectangle((int)(X), (int)(Y), (int)(MultiX), (int)(MultiX * 0.8)));
                 }
                 else
                 {
-                    SetCoordinates(new Rectangle(Convert.ToInt32(X), Convert.ToInt32(Y), Convert.ToInt32(MultiX - SliderWidth), Convert.ToInt32(MaxWidth * 0.8)));
+                    SetCoordinates(new Rectangle((int)(X), (int)(Y), (int)(MultiX - SliderWidth), (int)(MaxWidth * 0.8)));
                 }
 
             }

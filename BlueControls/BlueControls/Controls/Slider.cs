@@ -412,11 +412,11 @@ namespace BlueControls.Controls
 
                 if (_Orientation == enOrientation.Waagerecht)
                 {
-                    _Slider = new Rectangle(Convert.ToInt32(_ClickArea.Left + Proz * (_ClickArea.Width - But1.Width)), 0, But1.Width, But1.Height);
+                    _Slider = new Rectangle((int)(_ClickArea.Left + Proz * (_ClickArea.Width - But1.Width)), 0, But1.Width, But1.Height);
                 }
                 else
                 {
-                    _Slider = new Rectangle(0, Convert.ToInt32(_ClickArea.Top + Proz * (_ClickArea.Height - But1.Height)), But1.Width, But1.Height);
+                    _Slider = new Rectangle(0, (int)(_ClickArea.Top + Proz * (_ClickArea.Height - But1.Height)), But1.Width, But1.Height);
                 }
 
                 _SliderContainsMouse = _Slider.Contains(MousePos());

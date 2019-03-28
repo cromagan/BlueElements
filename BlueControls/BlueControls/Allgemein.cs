@@ -114,7 +114,7 @@ namespace BlueControls
             //{
 
             //    SizeF s = GenericControl.Skin.FormatedText_NeededSize(ThisCap, null, GenericControl.Skin.BlueFont(enDesign.Item_Listbox, vState));
-            //    Rectangle r = new Rectangle(Convert.ToInt32(DCoordinates.Left + DCoordinates.Width / 2.0 - s.Width / 2.0), (int)(DCoordinates.Bottom - s.Height) - 3, (int)s.Width, (int)s.Height);
+            //    Rectangle r = new Rectangle((int)(DCoordinates.Left + DCoordinates.Width / 2.0 - s.Width / 2.0), (int)(DCoordinates.Bottom - s.Height) - 3, (int)s.Width, (int)s.Height);
 
             //    r = new Rectangle(r.Left - trp.X, r.Top - trp.Y, r.Width, r.Height);
             //    //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);

@@ -71,7 +71,7 @@ namespace BlueControls.Controls
 
             if (wProzent > 0)
             {
-                var r = new Rectangle(DisplayRectangle.X, DisplayRectangle.Y, Convert.ToInt32(Math.Truncate(DisplayRectangle.Width * wProzent / 100.0)), DisplayRectangle.Height);
+                var r = new Rectangle(DisplayRectangle.X, DisplayRectangle.Y, (int)(Math.Truncate(DisplayRectangle.Width * wProzent / 100.0)), DisplayRectangle.Height);
                 //r = New Rectangle(DisplayRectangle)
                 //r.Width = CInt(r.Width * wProzent / 100)
 

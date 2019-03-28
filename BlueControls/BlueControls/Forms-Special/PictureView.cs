@@ -214,10 +214,10 @@ namespace BlueControls.Forms
                 {
                     var OpScNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
 
-                    Width = Convert.ToInt32(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width / 1.5);
-                    Height = Convert.ToInt32(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height / 1.5);
-                    Left = Convert.ToInt32(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Left + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width - Width) / 2.0);
-                    Top = Convert.ToInt32(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Top + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height - Height) / 2.0);
+                    Width = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width / 1.5);
+                    Height = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height / 1.5);
+                    Left = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Left + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width - Width) / 2.0);
+                    Top = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Top + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height - Height) / 2.0);
 
                 }
                 else
@@ -420,7 +420,7 @@ namespace BlueControls.Forms
 
             PadDesign.Text = Pad.SheetStyle;
 
-            SchriftGröße.Text = Convert.ToInt32(Pad.SheetStyleScale * 100).Nummer(3);
+            SchriftGröße.Text = ((int)(Pad.SheetStyleScale * 100)).Nummer(3);
 
 
             //     Nur70.Checked = CBool(Pad.SheetStyleScale = 0.7F)

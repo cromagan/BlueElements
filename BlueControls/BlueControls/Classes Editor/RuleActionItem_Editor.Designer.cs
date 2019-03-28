@@ -61,7 +61,7 @@ namespace BlueControls.Classes_Editor
             this.Rule_Aktion.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.Rule_Aktion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.Rule_Aktion.Enabled = false;
-            this.Rule_Aktion.Format = enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.Rule_Aktion.Format = enDataFormat.Text;
             this.Rule_Aktion.Location = new Point(63, 15);
             this.Rule_Aktion.Name = "Rule_Aktion";
             this.Rule_Aktion.Size = new Size(415, 22);

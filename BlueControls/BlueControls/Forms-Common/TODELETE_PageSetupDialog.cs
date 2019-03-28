@@ -138,11 +138,11 @@ namespace BlueControls.Forms
 
 
             OriD.DefaultPageSettings.Landscape = Querformat.Checked;
-            OriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", Convert.ToInt32(float.Parse(Breite.Text) / 0.254), Convert.ToInt32(float.Parse(Höhe.Text) / 0.254));
-            OriD.DefaultPageSettings.Margins.Top = Convert.ToInt32(float.Parse(Oben.Text) / 0.254);
-            OriD.DefaultPageSettings.Margins.Bottom = Convert.ToInt32(float.Parse(Unten.Text) / 0.254);
-            OriD.DefaultPageSettings.Margins.Left = Convert.ToInt32(float.Parse(Links.Text) / 0.254);
-            OriD.DefaultPageSettings.Margins.Right = Convert.ToInt32(float.Parse(Rechts.Text) / 0.254);
+            OriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(float.Parse(Breite.Text) / 0.254), (int)(float.Parse(Höhe.Text) / 0.254));
+            OriD.DefaultPageSettings.Margins.Top = (int)(float.Parse(Oben.Text) / 0.254);
+            OriD.DefaultPageSettings.Margins.Bottom = (int)(float.Parse(Unten.Text) / 0.254);
+            OriD.DefaultPageSettings.Margins.Left = (int)(float.Parse(Links.Text) / 0.254);
+            OriD.DefaultPageSettings.Margins.Right = (int)(float.Parse(Rechts.Text) / 0.254);
         }
 
         private void canc_Click(object sender, System.EventArgs e)
@@ -345,7 +345,7 @@ namespace BlueControls.Forms
                 var u = (float)(float.Parse(Unten.Text) * Z);
 
 
-                var i = new Bitmap(Convert.ToInt32(br * Z - 1), Convert.ToInt32(ho * Z - 1));
+                var i = new Bitmap((int)(br * Z - 1), (int)(ho * Z - 1));
 
                 var gr = Graphics.FromImage(i);
 

@@ -60,7 +60,7 @@ namespace BlueBasics
 
 
         public static readonly string Char_Sonderzeichen = "'()+-=$&´`^%˜°•øØμ@\\/*<>|[]{}#~µ_„\"²³€" + (char)0 + beChrW1 + "\t";
-        public static readonly string Char_KritischeZeichen = Char_Sonderzeichen + Char_DateiSonderZeichen;
+      //  public static readonly string Char_KritischeZeichen = Char_Sonderzeichen + Char_DateiSonderZeichen;
 
         public static readonly string Char_Steuercodes = ((char)0).ToString() + beChrW1 + (char)2 + (char)3 + (char)4 +
                                                (char)5 + (char)6 + (char)7 + (char)8 + "\t" +

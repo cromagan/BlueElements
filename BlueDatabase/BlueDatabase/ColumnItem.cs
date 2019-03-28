@@ -98,6 +98,40 @@ namespace BlueDatabase
 
         private string _CellInitValue;
 
+        /// <summary>
+        /// Die zu Suchende ZEile ist in dieser Spalte zu finden
+        /// </summary>
+        private int _LinkedCell_RowKey;
+        /// <summary>
+        /// Die Quell-Spalte (aus der verlinkten Datenbank) ist immer
+        /// </summary>
+        private int _LinkedCell_ColumnKey;
+        /// <summary>
+        /// Die zu suchende Spalte ist in dieser Spalte zu finden
+        /// </summary>
+        private int _LinkedCell_ColumnValueFoundIn;
+        /// <summary>
+        /// ...zusätzlich folgende Zeichenkette hinzufügen
+        /// </summary>
+        private string _LinkedCell_ColumnValueAdd;
+        /// <summary>
+        /// Zeile nicht gefunden in der Datenbank
+        /// </summary>
+        private enFehlendesZiel _LinkedCell_Behaviour;
+
+        private bool _ZellenZusammenfassen;
+
+        private int _DropDownKey;
+
+        private int _VorschlagsColumn;
+
+        private enAlignment _Align;
+
+        public readonly ListExt<string> Regex = new ListExt<string>();
+
+        private string _SortMask;
+
+
         private int _KeyColumnKey;
 
         public SizeF TMP_CaptionText_Size = new SizeF(-1, -1);
@@ -106,7 +140,7 @@ namespace BlueDatabase
 
         internal List<string> _UcaseNamesSortedByLenght = null;
 
-        public const string AllowedCharsInternalName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.[]()";
+        public const string AllowedCharsInternalName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"; // Klammern, Semikolon etc. verboten, da es im Regeln bei Substring verwendet wird
 
         #endregion
 
@@ -136,6 +170,20 @@ namespace BlueDatabase
             _ForeColor = Color.Black;
             _BackColor = Color.White;
             _CellInitValue = string.Empty;
+            _LinkedCell_RowKey = -1;
+            _LinkedCell_ColumnKey = -1;
+            _LinkedCell_ColumnValueFoundIn = -1;
+            _LinkedCell_ColumnValueAdd = string.Empty;
+            _LinkedCell_Behaviour = enFehlendesZiel.Undefiniert;
+
+            _SortMask = string.Empty;
+            _ZellenZusammenfassen = false;
+            _DropDownKey = -1;
+            _VorschlagsColumn = -1;
+            _Align = enAlignment.Left;
+
+
+
             _KeyColumnKey = -1;
 
 
@@ -229,12 +277,26 @@ namespace BlueDatabase
             CellInitValue = Source.CellInitValue;
             AutoFilterJoker = Source.AutoFilterJoker;
             KeyColumnKey = Source.KeyColumnKey;
+            LinkedCell_RowKey = Source.LinkedCell_RowKey;
+            LinkedCell_ColumnKey = Source.LinkedCell_ColumnKey;
+            LinkedCell_ColumnValueFoundIn = Source.LinkedCell_ColumnValueFoundIn;
+            LinkedCell_ColumnValueAdd = Source.LinkedCell_ColumnValueAdd;
+            LinkedCell_Behaviour = Source.LinkedCell_Behaviour;
+            ZellenZusammenfassen = Source.ZellenZusammenfassen;
+            DropdownKey = Source.DropdownKey;
+            VorschlagsColumn = Source.VorschlagsColumn;
+            Align = Source.Align;
+            SortMask = Source.SortMask;
+
 
             DropDownItems.Clear();
             DropDownItems.AddRange(Source.DropDownItems);
 
             Replacer.Clear();
             Replacer.AddRange(Source.Replacer);
+
+            Regex.Clear();
+            Regex.AddRange(Source.Regex);
 
 
             CompactView = Source.CompactView;
@@ -301,6 +363,7 @@ namespace BlueDatabase
 
             DropDownItems.ListOrItemChanged += DropDownItems_ListOrItemChanged;
             Replacer.ListOrItemChanged += Replacer_ListOrItemChanged;
+            Regex.ListOrItemChanged += Regex_ListOrItemChanged;
             PermissionGroups_ChangeCell.ListOrItemChanged += PermissionGroups_ChangeCell_ListOrItemChanged;
 
             Tags.ListOrItemChanged += Tags_ListOrItemChanged;
@@ -412,7 +475,7 @@ namespace BlueDatabase
         {
             get
             {
-                return _MultiLine && _Format.MultilinePossible();
+                return _MultiLine;
             }
             set
             {
@@ -425,6 +488,22 @@ namespace BlueDatabase
 
             }
         }
+
+
+        public bool ZellenZusammenfassen
+        {
+            get
+            {
+                return _ZellenZusammenfassen;
+            }
+            set
+            {
+                if (_ZellenZusammenfassen == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_ZellenZusammenfassen, this, _ZellenZusammenfassen.ToPlusMinus(), value.ToPlusMinus(), true);
+                OnChanged();
+            }
+        }
+
 
         public string QickInfoText(string AdditionalText)
         {
@@ -711,6 +790,35 @@ namespace BlueDatabase
         }
 
 
+        public enFehlendesZiel LinkedCell_Behaviour
+        {
+            get
+            {
+                return _LinkedCell_Behaviour;
+            }
+            set
+            {
+                if (_LinkedCell_Behaviour == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_LinkedCell_Behaviour, this, ((int)_LinkedCell_Behaviour).ToString(), ((int)value).ToString(), true);
+                OnChanged();
+            }
+        }
+
+        public enAlignment Align
+        {
+            get
+            {
+                return _Align;
+            }
+            set
+            {
+                if (_Align == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_Align, this, ((int)_Align).ToString(), ((int)value).ToString(), true);
+                OnChanged();
+            }
+        }
+
+
         public bool AutoFilterErlaubt
         {
             get
@@ -902,6 +1010,114 @@ namespace BlueDatabase
                 OnChanged();
             }
         }
+
+
+        public string SortMask
+        {
+            get
+            {
+                return _SortMask;
+            }
+            set
+            {
+                if (_SortMask == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_SortMask, this, _SortMask, value, true);
+                OnChanged();
+            }
+        }
+
+
+        public int DropdownKey
+        {
+            get
+            {
+                return _DropDownKey;
+            }
+            set
+            {
+                if (_DropDownKey == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_DropDownKey, this, _DropDownKey.ToString(), value.ToString(), true);
+                OnChanged();
+            }
+        }
+
+        public int VorschlagsColumn
+        {
+            get
+            {
+                return _VorschlagsColumn;
+            }
+            set
+            {
+                if (_VorschlagsColumn == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_VorschlagColumn, this, _VorschlagsColumn.ToString(), value.ToString(), true);
+                OnChanged();
+            }
+        }
+
+
+        public int LinkedCell_RowKey
+        {
+            get
+            {
+                return _LinkedCell_RowKey;
+            }
+            set
+            {
+                if (_LinkedCell_RowKey == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_LinkedCell_RowKey, this, _LinkedCell_RowKey.ToString(), value.ToString(), true);
+                OnChanged();
+            }
+        }
+
+
+        public int LinkedCell_ColumnKey
+        {
+            get
+            {
+                return _LinkedCell_ColumnKey;
+            }
+            set
+            {
+                if (_LinkedCell_ColumnKey == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnKey, this, _LinkedCell_ColumnKey.ToString(), value.ToString(), true);
+                OnChanged();
+            }
+        }
+
+        public int LinkedCell_ColumnValueFoundIn
+        {
+            get
+            {
+                return _LinkedCell_ColumnValueFoundIn;
+            }
+            set
+            {
+                if (_LinkedCell_ColumnValueFoundIn == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, this, _LinkedCell_ColumnValueFoundIn.ToString(), value.ToString(), true);
+                OnChanged();
+            }
+        }
+
+        public string LinkedCell_ColumnValueAdd
+        {
+            get
+            {
+                return _LinkedCell_ColumnValueAdd;
+            }
+            set
+            {
+                if (_BestFile_StandardFolder == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnValueAdd, this, _LinkedCell_ColumnValueAdd, value, true);
+                OnChanged();
+            }
+        }
+
+
+
+        /// <summary>
+        /// Hält Werte, dieser Spalte gleich, bezugnehmend der KeyColumn(key)
+        /// </summary>
         public int KeyColumnKey
         {
             get
@@ -1003,7 +1219,7 @@ namespace BlueDatabase
             set
             {
                 if (_Format == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_Format, this, Convert.ToInt32(_Format).ToString(), Convert.ToInt32(value).ToString(), true);
+                Database.AddPending(enDatabaseDataType.co_Format, this, ((int)_Format).ToString(), ((int)value).ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -1063,7 +1279,7 @@ namespace BlueDatabase
             set
             {
                 if (_LineLeft == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_LineLeft, this, Convert.ToInt32(_LineLeft).ToString(), Convert.ToInt32(value).ToString(), true);
+                Database.AddPending(enDatabaseDataType.co_LineLeft, this, ((int)_LineLeft).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -1077,7 +1293,7 @@ namespace BlueDatabase
             set
             {
                 if (_LineRight == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_LinieRight, this, Convert.ToInt32(_LineRight).ToString(), Convert.ToInt32(value).ToString(), true);
+                Database.AddPending(enDatabaseDataType.co_LinieRight, this, ((int)_LineRight).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -1303,179 +1519,73 @@ namespace BlueDatabase
             switch (Art)
             {
 
-                case enDatabaseDataType.co_Name:
-                    _Name = Wert;
-                    Invalidate_TmpVariables();
-                    break;
-                case enDatabaseDataType.co_Caption:
-                    _Caption = Wert;
-                    break;
-                case enDatabaseDataType.co_Format:
-                    _Format = (enDataFormat)int.Parse(Wert);
-
-                    if (_Format == (enDataFormat)65) { _Format = enDataFormat.RelationText; } //TODO: Bei zeiten löschen (10.12.2018) 
-
-                    break;
-                case enDatabaseDataType.co_ForeColor:
-                    _ForeColor = Color.FromArgb(int.Parse(Wert));
-                    break;
-                case enDatabaseDataType.co_BackColor:
-                    _BackColor = Color.FromArgb(int.Parse(Wert));
-                    break;
-                case enDatabaseDataType.co_LineLeft:
-                    _LineLeft = (enColumnLineStyle)Convert.ToInt32(Wert);
-                    break;
-                case enDatabaseDataType.co_LinieRight:
-                    _LineRight = (enColumnLineStyle)Convert.ToInt32(Wert);
-                    break;
-                case enDatabaseDataType.co_QuickInfo:
-                    _QuickInfo = Wert;
-                    break;
-                case enDatabaseDataType.co_Ueberschrift1:
-                    _Ueberschrift1 = Wert;
-                    break;
-                case enDatabaseDataType.co_Ueberschrift2:
-                    _Ueberschrift2 = Wert;
-                    break;
-                case enDatabaseDataType.co_Ueberschrift3:
-                    _Ueberschrift3 = Wert;
-                    break;
-                case enDatabaseDataType.co_CaptionBitmap:
-                    _CaptionBitmap = modConverter.StringToBitmap(Wert);
-                    break;
+                case enDatabaseDataType.co_Name: _Name = Wert; Invalidate_TmpVariables(); break;
+                case enDatabaseDataType.co_Caption: _Caption = Wert; break;
+                case enDatabaseDataType.co_Format: _Format = (enDataFormat)int.Parse(Wert); break;
+                case enDatabaseDataType.co_ForeColor: _ForeColor = Color.FromArgb(int.Parse(Wert)); break;
+                case enDatabaseDataType.co_BackColor: _BackColor = Color.FromArgb(int.Parse(Wert)); break;
+                case enDatabaseDataType.co_LineLeft: _LineLeft = (enColumnLineStyle)int.Parse(Wert); break;
+                case enDatabaseDataType.co_LinieRight: _LineRight = (enColumnLineStyle)int.Parse(Wert); break;
+                case enDatabaseDataType.co_QuickInfo: _QuickInfo = Wert; break;
+                case enDatabaseDataType.co_Ueberschrift1: _Ueberschrift1 = Wert; break;
+                case enDatabaseDataType.co_Ueberschrift2: _Ueberschrift2 = Wert; break;
+                case enDatabaseDataType.co_Ueberschrift3: _Ueberschrift3 = Wert; break;
+                case enDatabaseDataType.co_CaptionBitmap: _CaptionBitmap = modConverter.StringToBitmap(Wert); break;
                 case enDatabaseDataType.co_Identifier:
                     _Identifier = Wert;
                     StandardWerteNachKennung(false);
                     Database.Column.GetSystems();
                     break;
-                case enDatabaseDataType.co_EditType:
-                    _EditType = (enEditTypeFormula)Convert.ToInt32(Wert);
-                    break;
-                case enDatabaseDataType.co_MultiLine:
-                    _MultiLine = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_DropDownItems:
-                    DropDownItems.SplitByCR_QuickSortAndRemoveDouble(Wert);
-                    break;
-                case enDatabaseDataType.co_Replacer:
-                    Replacer.SplitByCR(Wert);
-                    break;
-                case enDatabaseDataType.co_Tags:
-                    Tags.SplitByCR_QuickSortAndRemoveDouble(Wert);
-                    break;
-                //case enDatabaseDataType.co_TagsInternal_ALT:
-                //    break;
-                case enDatabaseDataType.co_AutoFilterJoker:
-                    _AutoFilterJoker = Wert;
-                    break;
-                case enDatabaseDataType.co_PermissionGroups_ChangeCell:
-                    PermissionGroups_ChangeCell.SplitByCR_QuickSortAndRemoveDouble(Wert);
-                    break;
-                case enDatabaseDataType.co_AllowedChars:
-                    _AllowedChars = Wert;
-                    break;
-                case enDatabaseDataType.co_AutoFilterErlaubt:
-                    _AutofilterErlaubt = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_AutoFilterTextFilterErlaubt:
-                    _AutofilterTextFilterErlaubt = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_AutoFilterErweitertErlaubt:
-                    _AutoFilterErweitertErlaubt = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_BeiZeilenfilterIgnorieren:
-                    _IgnoreAtRowFilter = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_CompactView:
-                    _CompactView = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_ShowUndo:
-                    _ShowUndo = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_ShowMultiLineInOneLine:
-                    _ShowMultiLineInOneLine = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_TextBearbeitungErlaubt:
-                    _TextBearbeitungErlaubt = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_DropdownBearbeitungErlaubt:
-                    _DropdownBearbeitungErlaubt = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_SpellCheckingEnabled:
-                    _SpellCheckingEnabled = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_DropdownAllesAbwählenErlaubt:
-                    _DropdownAllesAbwählenErlaubt = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_DropdownWerteAndererZellenAnzeigen:
-                    _DropdownWerteAndererZellenAnzeigen = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble:
-                    _AfterEdit_QuickSortRemoveDouble = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_AfterEdit_Runden:
-                    _AfterEdit_Runden = int.Parse(Wert);
-                    break;
-                case enDatabaseDataType.co_AfterEdit_DoUcase:
-                    _AfterEdit_DoUCase = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_AfterEdit_AutoCorrect:
-                    _AfterEdit_AutoCorrect = Wert.FromPlusMinus();
-                    break;
-                case enDatabaseDataType.co_AdminInfo:
-                    _AdminInfo = Wert;
-                    break;
-                case enDatabaseDataType.co_Suffix:
-                    _Suffix = Wert;
-                    break;
-                case enDatabaseDataType.co_LinkedDatabase:
-                    _LinkedDatabaseFile = Wert;
-                    break;
-                case enDatabaseDataType.co_LinkKeyKennung:
-                    _LinkedKeyKennung = Wert;
-                    break;
-                case enDatabaseDataType.co_BestFile_StandardSuffix:
-                    _BestFile_StandardSuffix = Wert;
-                    break;
-                case enDatabaseDataType.co_BestFile_StandardFolder:
-                    _BestFile_StandardFolder = Wert;
-                    break;
-                case enDatabaseDataType.co_BildCode_ConstantHeight:
-                    _BildCode_ConstantHeight = int.Parse(Wert);
-                    break;
-                case enDatabaseDataType.co_Prefix:
-                    _Prefix = Wert;
-                    break;
-
-                //case (enDatabaseDataType)172:
-                //    // TODO: FontSclae, Löschen
-
-                //    break;
-                case enDatabaseDataType.co_BildCode_ImageNotFound:
-                    if (Wert == "-")
-                    {
-                        _BildCode_ImageNotFound = enImageNotFound.NoImage;
-                    }
-                    else
-                    {
-                        _BildCode_ImageNotFound = (enImageNotFound)int.Parse(Wert);
-                    }
-                    break;
-
-                case enDatabaseDataType.co_EditTrotzSperreErlaubt:
-                    _EditTrotzSperreErlaubt = Wert.FromPlusMinus();
-                    break;
-
-                case enDatabaseDataType.co_CellInitValue:
-                    _CellInitValue = Wert;
-                    break;
-
-                case enDatabaseDataType.co_KeyColumnKey:
-                    _KeyColumnKey = int.Parse(Wert);
-                    break;
+                case enDatabaseDataType.co_EditType: _EditType = (enEditTypeFormula)int.Parse(Wert); break;
+                case enDatabaseDataType.co_MultiLine: _MultiLine = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_DropDownItems: DropDownItems.SplitByCR_QuickSortAndRemoveDouble(Wert); break;
+                case enDatabaseDataType.co_Replacer: Replacer.SplitByCR(Wert); break;
+                case enDatabaseDataType.co_Regex: Regex.SplitByCR(Wert); break;
+                case enDatabaseDataType.co_Tags: Tags.SplitByCR_QuickSortAndRemoveDouble(Wert); break;
+                case enDatabaseDataType.co_AutoFilterJoker: _AutoFilterJoker = Wert; break;
+                case enDatabaseDataType.co_PermissionGroups_ChangeCell: PermissionGroups_ChangeCell.SplitByCR_QuickSortAndRemoveDouble(Wert); break;
+                case enDatabaseDataType.co_AllowedChars: _AllowedChars = Wert; break;
+                case enDatabaseDataType.co_AutoFilterErlaubt: _AutofilterErlaubt = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_AutoFilterTextFilterErlaubt: _AutofilterTextFilterErlaubt = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_AutoFilterErweitertErlaubt: _AutoFilterErweitertErlaubt = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_BeiZeilenfilterIgnorieren: _IgnoreAtRowFilter = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_CompactView: _CompactView = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_ShowUndo: _ShowUndo = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_ShowMultiLineInOneLine: _ShowMultiLineInOneLine = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_TextBearbeitungErlaubt: _TextBearbeitungErlaubt = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_DropdownBearbeitungErlaubt: _DropdownBearbeitungErlaubt = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_SpellCheckingEnabled: _SpellCheckingEnabled = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_DropdownAllesAbwählenErlaubt: _DropdownAllesAbwählenErlaubt = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_DropdownWerteAndererZellenAnzeigen: _DropdownWerteAndererZellenAnzeigen = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble: _AfterEdit_QuickSortRemoveDouble = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_AfterEdit_Runden: _AfterEdit_Runden = int.Parse(Wert); break;
+                case enDatabaseDataType.co_AfterEdit_DoUcase: _AfterEdit_DoUCase = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_AfterEdit_AutoCorrect: _AfterEdit_AutoCorrect = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_AdminInfo: _AdminInfo = Wert; break;
+                case enDatabaseDataType.co_Suffix: _Suffix = Wert; break;
+                case enDatabaseDataType.co_LinkedDatabase: _LinkedDatabaseFile = Wert; break;
+                case enDatabaseDataType.co_LinkKeyKennung: _LinkedKeyKennung = Wert; break;
+                case enDatabaseDataType.co_BestFile_StandardSuffix: _BestFile_StandardSuffix = Wert; break;
+                case enDatabaseDataType.co_BestFile_StandardFolder: _BestFile_StandardFolder = Wert; break;
+                case enDatabaseDataType.co_BildCode_ConstantHeight: _BildCode_ConstantHeight = int.Parse(Wert); break;
+                case enDatabaseDataType.co_Prefix: _Prefix = Wert; break;
+                case enDatabaseDataType.co_BildCode_ImageNotFound: _BildCode_ImageNotFound = (enImageNotFound)int.Parse(Wert); break;
+                case enDatabaseDataType.co_EditTrotzSperreErlaubt: _EditTrotzSperreErlaubt = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_CellInitValue: _CellInitValue = Wert; break;
+                case enDatabaseDataType.co_KeyColumnKey: _KeyColumnKey = int.Parse(Wert); break;
+                case enDatabaseDataType.co_LinkedCell_RowKey: _LinkedCell_RowKey = int.Parse(Wert); break;
+                case enDatabaseDataType.co_LinkedCell_ColumnKey: _LinkedCell_ColumnKey = int.Parse(Wert); break;
+                case enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn: _LinkedCell_ColumnValueFoundIn = int.Parse(Wert); break;
+                case enDatabaseDataType.co_LinkedCell_ColumnValueAdd: _LinkedCell_ColumnValueAdd = Wert; break;
+                case enDatabaseDataType.co_LinkedCell_Behaviour: _LinkedCell_Behaviour = (enFehlendesZiel)int.Parse(Wert); break;
+                case enDatabaseDataType.co_SortMask: _SortMask = Wert; break;
+                case enDatabaseDataType.co_ZellenZusammenfassen: _ZellenZusammenfassen = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_DropDownKey: _DropDownKey = int.Parse(Wert); break;
+                case enDatabaseDataType.co_VorschlagColumn: _VorschlagsColumn = int.Parse(Wert); break;
+                case enDatabaseDataType.co_Align: _Align = (enAlignment)int.Parse(Wert); break;
 
                 default:
-                    if (Art.ToString() == Convert.ToInt32(Art).ToString())
+                    if (Art.ToString() == ((int)Art).ToString())
                     {
                         Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + Art + "' nicht definiert.<br>Wert: " + Wert + "<br>Datei: " + Database.Filename);
                     }
@@ -1511,7 +1621,7 @@ namespace BlueDatabase
             {
                 case "System: Creator":
                     _Name = "SYS_Creator";
-                    _Format = enDataFormat.Text_Ohne_Kritische_Zeichen;
+                    _Format = enDataFormat.Text;
 
                     if (SetAll)
                     {
@@ -1526,7 +1636,7 @@ namespace BlueDatabase
 
                 case "System: Changer":
                     _Name = "SYS_Changer";
-                    _Format = enDataFormat.Text_Ohne_Kritische_Zeichen;
+                    _Format = enDataFormat.Text;
                     _SpellCheckingEnabled = false;
                     _TextBearbeitungErlaubt = false;
                     _DropdownBearbeitungErlaubt = false;
@@ -1542,7 +1652,7 @@ namespace BlueDatabase
 
                 case "System: Chapter":
                     _Name = "SYS_Chapter";
-                    _Format = enDataFormat.Text_Ohne_Kritische_Zeichen;
+                    _Format = enDataFormat.Text;
                     if (_MultiLine) { _ShowMultiLineInOneLine = true; }
                     if (SetAll)
                     {
@@ -1728,7 +1838,7 @@ namespace BlueDatabase
         {
             Database.SaveToByteList(l, enDatabaseDataType.co_Name, _Name, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Caption, _Caption, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Format, Convert.ToInt32(_Format).ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_Format, ((int)_Format).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Ueberschrift1, _Ueberschrift1, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Ueberschrift2, _Ueberschrift2, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Ueberschrift3, _Ueberschrift3, Key);
@@ -1750,11 +1860,12 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_ShowUndo, _ShowUndo.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_ForeColor, _ForeColor.ToArgb().ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BackColor, _BackColor.ToArgb().ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_LineLeft, Convert.ToInt32(_LineLeft).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_LinieRight, Convert.ToInt32(_LineRight).ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_LineLeft, ((int)_LineLeft).ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_LinieRight, ((int)_LineRight).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropdownBearbeitungErlaubt, _DropdownBearbeitungErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropDownItems, DropDownItems.JoinWithCr(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Replacer, Replacer.JoinWithCr(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_Regex, Regex.JoinWithCr(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropdownAllesAbwählenErlaubt, _DropdownAllesAbwählenErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, _DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_QuickInfo, _QuickInfo, Key);
@@ -1762,7 +1873,7 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_CaptionBitmap, modConverter.BitmapToString(_CaptionBitmap, ImageFormat.Png), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AllowedChars, _AllowedChars, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_PermissionGroups_ChangeCell, PermissionGroups_ChangeCell.JoinWithCr(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_EditType, Convert.ToInt32(_EditType).ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_EditType, ((int)_EditType).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Tags, Tags.JoinWithCr(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_EditTrotzSperreErlaubt, _EditTrotzSperreErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Suffix, _Suffix, Key);
@@ -1774,7 +1885,17 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ConstantHeight, _BildCode_ConstantHeight.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ImageNotFound, ((int)_BildCode_ImageNotFound).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Prefix, _Prefix, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_KeyColumnKey, _KeyColumnKey.ToString(), Key); 
+            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_RowKey, _LinkedCell_RowKey.ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_KeyColumnKey, _KeyColumnKey.ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, _LinkedCell_ColumnValueFoundIn.ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueAdd, _LinkedCell_ColumnValueAdd, Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_Behaviour, ((int)_LinkedCell_Behaviour).ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_ZellenZusammenfassen, _ZellenZusammenfassen.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_DropDownKey, _DropDownKey.ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_VorschlagColumn, _VorschlagsColumn.ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_Align, ((int)_Align).ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_SortMask, _SortMask, Key);
+
 
             //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
             Database.SaveToByteList(l, enDatabaseDataType.co_Identifier, _Identifier, Key);
@@ -1824,12 +1945,7 @@ namespace BlueDatabase
                 case enDataFormat.Farbcode: return QuickImage.Get(enImageCode.Pinsel, 16);
                 case enDataFormat.Ganzzahl: return QuickImage.Get(enImageCode.Ganzzahl, 16);
                 case enDataFormat.Gleitkommazahl: return QuickImage.Get(enImageCode.Gleitkommazahl, 16);
-                case enDataFormat.Email: return QuickImage.Get(enImageCode.Brief, 16);
-                case enDataFormat.InternetAdresse: return QuickImage.Get(enImageCode.Globus, 16);
-                case enDataFormat.Binärdaten: return QuickImage.Get(enImageCode.Binärdaten, 16);
-                case enDataFormat.Binärdaten_Bild: return QuickImage.Get(enImageCode.Bild, 16);
                 case enDataFormat.BildCode: return QuickImage.Get(enImageCode.Smiley, 16);
-                case enDataFormat.Telefonnummer: return QuickImage.Get(enImageCode.Telefon, 16);
                 case enDataFormat.LinkedCell: return QuickImage.Get(enImageCode.Fernglas, 16);
                 case enDataFormat.Columns_für_LinkedCellDropdown: return QuickImage.Get(enImageCode.Fernglas, 16, "FF0000", "");
                 case enDataFormat.Values_für_LinkedCellDropdown: return QuickImage.Get(enImageCode.Fernglas, 16, "00FF00", "");
@@ -1890,13 +2006,9 @@ namespace BlueDatabase
             {
 
                 case enDataFormat.Text:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
                 case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Telefonnummer:
-                case enDataFormat.Email:
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.Datum_und_Uhrzeit:
                 case enDataFormat.BildCode:
                 case enDataFormat.LinkedCell:
@@ -1942,9 +2054,6 @@ namespace BlueDatabase
                     return false;
 
 
-                case enDataFormat.Binärdaten:
-                    return false;
-
                 //case enDataFormat.Relation:
                 //    switch (EditType_To_Check)
                 //    {
@@ -1960,8 +2069,6 @@ namespace BlueDatabase
                     if (EditType_To_Check == enEditTypeFormula.Farb_Auswahl_Dialog) { return true; }
                     return false;
 
-                case enDataFormat.Binärdaten_Bild:
-                    return false;
 
 
                 case enDataFormat.Schrift:
@@ -2138,17 +2245,16 @@ namespace BlueDatabase
             if (Replacer.Count > 0)
             {
                 if (_Format != enDataFormat.Text &&
-                    _Format != enDataFormat.Text_Ohne_Kritische_Zeichen &&
                     _Format != enDataFormat.Columns_für_LinkedCellDropdown &&
                     _Format != enDataFormat.BildCode) { return "Format unterstützt keine Ersetzungen."; }
             }
 
-            if (_KeyColumnKey>-1)
+            if (_KeyColumnKey > -1)
             {
                 if (_Format == enDataFormat.RelationText || _Format == enDataFormat.KeyForSame) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben."; }
                 var c = Database.Column.SearchByKey(_KeyColumnKey);
-                if (c== null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
-                if  (c.Format != enDataFormat.RelationText && c.Format != enDataFormat.KeyForSame) { return "Die verknüpfte Schlüsselspalte hat das falsche Format."; }
+                if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
+                if (c.Format != enDataFormat.RelationText && c.Format != enDataFormat.KeyForSame) { return "Die verknüpfte Schlüsselspalte hat das falsche Format."; }
 
 
             }
@@ -2160,7 +2266,7 @@ namespace BlueDatabase
                 if (_Format == enDataFormat.RelationText) { return "Die (intern) erste Spalte kann nicht das Format RelationText haben."; }
             }
 
-       
+
 
             return string.Empty;
         }
@@ -2189,6 +2295,11 @@ namespace BlueDatabase
         private void Replacer_ListOrItemChanged(object sender, System.EventArgs e)
         {
             Database.AddPending(enDatabaseDataType.co_Replacer, Key, Replacer.JoinWithCr(), false);
+        }
+
+        private void Regex_ListOrItemChanged(object sender, System.EventArgs e)
+        {
+            Database.AddPending(enDatabaseDataType.co_Regex, Key, Regex.JoinWithCr(), false);
         }
 
         private void PermissionGroups_ChangeCell_ListOrItemChanged(object sender, System.EventArgs e)
@@ -2469,16 +2580,11 @@ namespace BlueDatabase
 
             switch (Format)
             {
-                case enDataFormat.Binärdaten:
-                    return enEditTypeTable.None;
 
                 case enDataFormat.Bit:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     return enEditTypeTable.Dropdown_Single;
-
-                case enDataFormat.Binärdaten_Bild:
-                    return enEditTypeTable.Image_Auswahl_Dialog;
 
                 case enDataFormat.Link_To_Filesystem:
                     return enEditTypeTable.FileHandling_InDateiSystem;

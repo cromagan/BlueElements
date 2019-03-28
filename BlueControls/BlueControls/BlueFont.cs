@@ -424,7 +424,7 @@ namespace BlueControls
                 }
                 gr.DrawString("Z", tmpfont, Brushes.Black, 0, 0);
 
-                var miny = Convert.ToInt32(f.Height / 2.0);
+                var miny = (int)(f.Height / 2.0);
 
                 //var tempVar = (int)(f.Width - 1);
                 for (var x = 1; x <= (int)(f.Width - 1); x++)

@@ -231,7 +231,7 @@ namespace BlueControls.ItemCollection
             var t = string.Empty;
             if (Art != enConectorStyle.Direct)
             {
-                t = t + "Connection=" + Convert.ToInt32(Art) + ", ";
+                t = t + "Connection=" + (int)(Art) + ", ";
             }
             return t;
         }
@@ -438,13 +438,13 @@ namespace BlueControls.ItemCollection
             {
 
 
-                if (Convert.ToInt32(_TempPoints[P1].X) == Convert.ToInt32(_TempPoints[P1 + 1].X) && Convert.ToInt32(_TempPoints[P1].X) == Convert.ToInt32(_TempPoints[P1 + 2].X))
+                if ((int)(_TempPoints[P1].X) == (int)(_TempPoints[P1 + 1].X) && (int)(_TempPoints[P1].X) == (int)(_TempPoints[P1 + 2].X))
                 {
                     _TempPoints.RemoveAt(P1 + 1);
                     return true;
                 }
 
-                if (Convert.ToInt32(_TempPoints[P1].Y) == Convert.ToInt32(_TempPoints[P1 + 1].Y) && Convert.ToInt32(_TempPoints[P1].Y) == Convert.ToInt32(_TempPoints[P1 + 2].Y))
+                if ((int)(_TempPoints[P1].Y) == (int)(_TempPoints[P1 + 1].Y) && (int)(_TempPoints[P1].Y) == (int)(_TempPoints[P1 + 2].Y))
                 {
                     _TempPoints.RemoveAt(P1 + 1);
                     return true;
@@ -453,7 +453,7 @@ namespace BlueControls.ItemCollection
 
             if (P1 > 0 && P1 < _TempPoints.Count - 3)
             {
-                if (Convert.ToInt32(_TempPoints[P1].X) == Convert.ToInt32(_TempPoints[P1 + 1].X) && Convert.ToInt32(_TempPoints[P1 + 1].Y) == Convert.ToInt32(_TempPoints[P1 + 2].Y))
+                if ((int)(_TempPoints[P1].X) == (int)(_TempPoints[P1 + 1].X) && (int)(_TempPoints[P1 + 1].Y) == (int)(_TempPoints[P1 + 2].Y))
                 {
                     if (!IsVerdeckt(_TempPoints[P1 + 2].X, _TempPoints[P1].Y))
                     {
@@ -472,7 +472,7 @@ namespace BlueControls.ItemCollection
                     }
                 }
 
-                if (Convert.ToInt32(_TempPoints[P1].Y) == Convert.ToInt32(_TempPoints[P1 + 1].Y) && Convert.ToInt32(_TempPoints[P1 + 1].X) == Convert.ToInt32(_TempPoints[P1 + 2].X))
+                if ((int)(_TempPoints[P1].Y) == (int)(_TempPoints[P1 + 1].Y) && (int)(_TempPoints[P1 + 1].X) == (int)(_TempPoints[P1 + 2].X))
                 {
                     if (!IsVerdeckt(_TempPoints[P1].X, _TempPoints[P1 + 2].Y))
                     {
@@ -735,12 +735,12 @@ namespace BlueControls.ItemCollection
 
             if (P1 >= _TempPoints.Count - 1) { return false; }
 
-            if (Convert.ToInt32(_TempPoints[P1].X) == Convert.ToInt32(_TempPoints[P1 + 1].X) || Convert.ToInt32(_TempPoints[P1].Y) == Convert.ToInt32(_TempPoints[P1 + 1].Y)) { return false; }
+            if ((int)(_TempPoints[P1].X) == (int)(_TempPoints[P1 + 1].X) || (int)(_TempPoints[P1].Y) == (int)(_TempPoints[P1 + 1].Y)) { return false; }
 
             PointDF NP1;
             PointDF NP2;
 
-            if (Convert.ToInt32(_TempPoints[P1].X - _TempPoints[P1 + 1].X) > Convert.ToInt32(_TempPoints[P1].Y - _TempPoints[P1 + 1].Y))
+            if ((int)(_TempPoints[P1].X - _TempPoints[P1 + 1].X) > (int)(_TempPoints[P1].Y - _TempPoints[P1 + 1].Y))
             {
 
 
@@ -799,24 +799,24 @@ namespace BlueControls.ItemCollection
 
 
             var Verhalt = new ItemCollectionList();
-            Verhalt.Add(new TextListItem(Convert.ToInt32(enConectorStyle.Direct).ToString(), "Linie direkt zwischen zwei Punkten", QuickImage.Get(enImageCode.Linie)));
-            Verhalt.Add(new TextListItem(Convert.ToInt32(enConectorStyle.Ausweichenx).ToString(), "Linie soll Objekten ausweichen", QuickImage.Get(enImageCode.Linie)));
-            Verhalt.Add(new TextListItem(Convert.ToInt32(enConectorStyle.AusweichenUndGerade).ToString(), "Linie soll Objekten ausweichen und rechtwinklig sein", QuickImage.Get(enImageCode.Linie)));
-            l.Add(new FlexiControl("Linien-Verhalten", Convert.ToInt32(Art).ToString(), Verhalt));
+            Verhalt.Add(new TextListItem(((int)enConectorStyle.Direct).ToString(), "Linie direkt zwischen zwei Punkten", QuickImage.Get(enImageCode.Linie)));
+            Verhalt.Add(new TextListItem(((int)enConectorStyle.Ausweichenx).ToString(), "Linie soll Objekten ausweichen", QuickImage.Get(enImageCode.Linie)));
+            Verhalt.Add(new TextListItem(((int)enConectorStyle.AusweichenUndGerade).ToString(), "Linie soll Objekten ausweichen und rechtwinklig sein", QuickImage.Get(enImageCode.Linie)));
+            l.Add(new FlexiControl("Linien-Verhalten", ((int)Art).ToString(), Verhalt));
 
             var Rahms = new ItemCollectionList();
             //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Kapitel, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Standard).ToString(), "Standard", GenericControl.Skin.GetBlueFont(PadStyles.Style_Standard, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_StandardFett).ToString(), "Standard Fett", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardFett, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardAlternativ, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GenericControl.Skin.GetBlueFont(PadStyles.Style_KleinerZusatz, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Kapitel, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_Standard).ToString(), "Standard", GenericControl.Skin.GetBlueFont(PadStyles.Style_Standard, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardFett, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardAlternativ, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GenericControl.Skin.GetBlueFont(PadStyles.Style_KleinerZusatz, Parent.SheetStyle).SymbolOfLine()));
             Rahms.Sort();
 
 
-            l.Add(new FlexiControl("Stil", Convert.ToInt32(Format).ToString(), Rahms));
+            l.Add(new FlexiControl("Stil", ((int)Format).ToString(), Rahms));
             return l;
         }
 

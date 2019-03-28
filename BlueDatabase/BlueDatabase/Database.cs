@@ -325,14 +325,14 @@ namespace BlueDatabase
             return db;
         }
 
-        public RuleItem Rules_Has(ColumnItem column, string SystemKey)
-        {
-            foreach (var Rule in Rules)
-            {
-                if (Rule.SystemKey == column.Key + "|" + SystemKey) { return Rule; }
-            }
-            return null;
-        }
+        //public RuleItem Rules_Has(ColumnItem column, string SystemKey)
+        //{
+        //    foreach (var Rule in Rules)
+        //    {
+        //        if (Rule.SystemKey == column.Key + "|" + SystemKey) { return Rule; }
+        //    }
+        //    return null;
+        //}
 
         public static void ReleaseAll(bool MUSTRelease)
         {
@@ -696,7 +696,7 @@ namespace BlueDatabase
             set
             {
                 if (_Ansicht == value) { return; }
-                AddPending(enDatabaseDataType.Ansicht, -1, -1, Convert.ToInt32(_Ansicht).ToString(), Convert.ToInt32(value).ToString(), true);
+                AddPending(enDatabaseDataType.Ansicht, -1, -1, ((int)_Ansicht).ToString(), ((int)value).ToString(), true);
             }
         }
 
@@ -804,7 +804,7 @@ namespace BlueDatabase
             set
             {
                 if (_JoinTyp == value) { return; }
-                AddPending(enDatabaseDataType.JoinTyp, -1, -1, Convert.ToInt32(_JoinTyp).ToString(), Convert.ToInt32(value).ToString(), true);
+                AddPending(enDatabaseDataType.JoinTyp, -1, -1, ((int)_JoinTyp).ToString(), ((int)value).ToString(), true);
             }
         }
 
@@ -817,7 +817,7 @@ namespace BlueDatabase
             set
             {
                 if (_VerwaisteDaten == value) { return; }
-                AddPending(enDatabaseDataType.VerwaisteDaten, -1, -1, Convert.ToInt32(_VerwaisteDaten).ToString(), Convert.ToInt32(value).ToString(), true);
+                AddPending(enDatabaseDataType.VerwaisteDaten, -1, -1, ((int)_VerwaisteDaten).ToString(), ((int)value).ToString(), true);
             }
         }
 
@@ -863,17 +863,17 @@ namespace BlueDatabase
             var Key = ((ColumnItem)e.Item).Key;
             AddPending(enDatabaseDataType.dummyComand_RemoveColumn, Key, -1, string.Empty, Key.ToString(), false);
 
-            var L = new List<RuleItem>();
-            foreach (var ThisRule in Rules)
-            {
-                if (ThisRule.SystemKey.StartsWith(Key + "|"))
-                {
-                    L.Add(ThisRule);
-                }
-            }
+            //var L = new List<RuleItem>();
+            //foreach (var ThisRule in Rules)
+            //{
+            //    if (ThisRule.SystemKey.StartsWith(Key + "|"))
+            //    {
+            //        L.Add(ThisRule);
+            //    }
+            //}
 
-            if (L.Count == 0) { return; }
-            Rules.Remove(L);
+            //if (L.Count == 0) { return; }
+            //Rules.Remove(L);
         }
 
 
@@ -2455,14 +2455,14 @@ namespace BlueDatabase
             SaveToByteList(l, enDatabaseDataType.CreateDate, _CreateDate);
 
             SaveToByteList(l, enDatabaseDataType.Caption, _Caption);
-            SaveToByteList(l, enDatabaseDataType.JoinTyp, Convert.ToInt32(_JoinTyp).ToString());
-            SaveToByteList(l, enDatabaseDataType.VerwaisteDaten, Convert.ToInt32(_VerwaisteDaten).ToString());
+            SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString());
+            SaveToByteList(l, enDatabaseDataType.VerwaisteDaten,((int)_VerwaisteDaten).ToString());
             SaveToByteList(l, enDatabaseDataType.Tags, Tags.JoinWithCr());
             SaveToByteList(l, enDatabaseDataType.PermissionGroups_NewRow, PermissionGroups_NewRow.JoinWithCr());
             SaveToByteList(l, enDatabaseDataType.DatenbankAdmin, DatenbankAdmin.JoinWithCr());
             SaveToByteList(l, enDatabaseDataType.Skin, _Skin.ToString());
             SaveToByteList(l, enDatabaseDataType.GlobalScale, _GlobalScale.ToString());
-            SaveToByteList(l, enDatabaseDataType.Ansicht, Convert.ToInt32(_Ansicht).ToString());
+            SaveToByteList(l, enDatabaseDataType.Ansicht,((int)_Ansicht).ToString());
             SaveToByteList(l, enDatabaseDataType.ReloadDelaySecond, _ReloadDelaySecond.ToString());
             SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
 

@@ -166,7 +166,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // Private Sub Arrangement_Add()
             SaveCurrentLayout();
 
-            var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text_Ohne_Kritische_Zeichen);
+            var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
             using (var c = new CreativePad())
             {
@@ -228,7 +228,7 @@ namespace BlueControls.BlueDatabaseDialogs
             SaveCurrentLayout();
             if (LoadedLayout < 0) { return; }
 
-            var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Caption, enDataFormat.Text_Ohne_Kritische_Zeichen);
+            var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Caption, enDataFormat.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
             Pad.Caption = ex;
 

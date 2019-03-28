@@ -276,7 +276,7 @@ namespace BlueControls
                 }
                 if (_Font.Underline)
                 {
-                    GR.DrawLine(_Font.Pen(czoom), DrawX, Convert.ToInt32(DrawY + _Font.Oberlänge(czoom) + (_Font.Pen(1f).Width + 1) * czoom + 0.5), DrawX + (1 + Size.Width) * czoom, Convert.ToInt32(DrawY + _Font.Oberlänge(czoom) + (_Font.Pen(1f).Width + 1) * czoom + 0.5));
+                    GR.DrawLine(_Font.Pen(czoom), DrawX, (int)(DrawY + _Font.Oberlänge(czoom) + (_Font.Pen(1f).Width + 1) * czoom + 0.5), DrawX + (1 + Size.Width) * czoom, (int)(DrawY + _Font.Oberlänge(czoom) + (_Font.Pen(1f).Width + 1) * czoom + 0.5));
                 }
 
                 if (IsCap)
@@ -309,7 +309,7 @@ namespace BlueControls
 
                     if (_Font.StrikeOut)
                     {
-                        GR.DrawLine(_Font.Pen(czoom), DrawX - 1, Convert.ToInt32(DrawY + Size.Height * 0.55), Convert.ToInt32(DrawX + 1 + Size.Width), Convert.ToInt32(DrawY + Size.Height * 0.55));
+                        GR.DrawLine(_Font.Pen(czoom), DrawX - 1, (int)(DrawY + Size.Height * 0.55), (int)(DrawX + 1 + Size.Width), (int)(DrawY + Size.Height * 0.55));
                     }
 
 

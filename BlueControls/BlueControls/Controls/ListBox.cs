@@ -314,7 +314,7 @@ namespace BlueControls.Controls
         private BasicListItem MouseOverNode(int X, int Y)
         {
             if (ButtonsVisible() && Y >= Height - Plus.Height) { return null; }
-            return Item[X, Convert.ToInt32(Y + SliderY.Value)];
+            return Item[X, (int)(Y + SliderY.Value)];
         }
 
 
@@ -428,7 +428,7 @@ namespace BlueControls.Controls
             if (SliderY.Visible) { PaintModXx = SliderY.Width; }
 
             var BorderCoords = new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width - PaintModXx, DisplayRectangle.Height - PaintModYx);
-            var VisArea = new Rectangle(BorderCoords.X, Convert.ToInt32(BorderCoords.Y + SliderY.Value), BorderCoords.Width, BorderCoords.Height);
+            var VisArea = new Rectangle(BorderCoords.X, (int)(BorderCoords.Y + SliderY.Value), BorderCoords.Width, BorderCoords.Height);
 
 
             if (BorderCoords.Height > 0)
@@ -456,7 +456,7 @@ namespace BlueControls.Controls
                     if (!ThisItem.Enabled) { vStateItem = enStates.Standard_Disabled; }
                     if (ThisItem.Checked) { vStateItem |= enStates.Checked; }
 
-                    ThisItem.Draw(gr, 0, Convert.ToInt32(SliderY.Value), vStateItem, true, FilterTxt.Text);
+                    ThisItem.Draw(gr, 0, (int)(SliderY.Value), vStateItem, true, FilterTxt.Text);
                 }
 
             }

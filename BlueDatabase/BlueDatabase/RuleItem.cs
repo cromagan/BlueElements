@@ -32,7 +32,6 @@ namespace BlueDatabase
 
         #region  Variablen-Deklarationen 
         public readonly Database Database;
-        private string _SystemKey = string.Empty;
         #endregion
 
 
@@ -46,7 +45,6 @@ namespace BlueDatabase
 
         private void Initialize()
         {
-            _SystemKey = string.Empty;
             if (Actions.Count > 0) { Actions.Clear(); }
             Actions.ListOrItemChanged += Actions_ListOrItemChanged;
         }
@@ -64,11 +62,10 @@ namespace BlueDatabase
             Initialize();
         }
 
-        public RuleItem(ColumnItem column, string SystemKey)
+        public RuleItem(ColumnItem column)
         {
             Database = column.Database;
             Initialize();
-            _SystemKey = column.Key + "|" + SystemKey;
         }
 
 
@@ -80,18 +77,6 @@ namespace BlueDatabase
         public bool IsParsing { get; private set; }
 
         public ListExt<RuleActionItem> Actions { get; } = new ListExt<RuleActionItem>();
-
-
-        public string SystemKey
-        {
-            get { return _SystemKey; }
-            set
-            {
-                if (_SystemKey == value) { return; }
-                _SystemKey = value;
-                OnChanged();
-            }
-        }
 
 
         #endregion
@@ -109,7 +94,7 @@ namespace BlueDatabase
 
             var Result = "";
 
-            if (!string.IsNullOrEmpty(_SystemKey)) { Result = Result + "SK=" + _SystemKey.ToNonCritical() + ", "; }
+         //   if (!string.IsNullOrEmpty(_SystemKey)) { Result = Result + "SK=" + _SystemKey.ToNonCritical() + ", "; }
 
 
             foreach (var ThisAction in Actions)
@@ -136,8 +121,8 @@ namespace BlueDatabase
             {
                 switch (pair.Key)
                 {
-                    case "sk":
-                        _SystemKey = pair.Value.FromNonCritical();
+                    case "sk": // TODO: alt 28.03.2019 , löschen
+                      //  _SystemKey = pair.Value.FromNonCritical();
                         break;
 
                     case "aktion":
@@ -158,9 +143,9 @@ namespace BlueDatabase
 
         public string ErrorReason()
         {
-            var VorschlagsRegel = false;
+            //var VorschlagsRegel = false;
 
-            if (!string.IsNullOrEmpty(_SystemKey)) { return string.Empty; }
+         //   if (!string.IsNullOrEmpty(_SystemKey)) { return string.Empty; }
 
             var Dann = AnzahlDanns();
 
@@ -173,25 +158,25 @@ namespace BlueDatabase
                 {
                     if (!ThisAction.IsOk()) { return "Eine Aktion ist fehlerhaft."; }
 
-                    switch (ThisAction.Action)
-                    {
+                    //switch (ThisAction.Action)
+                    //{
 
-                        case enAction.Erhält_den_Focus:
-                            VorschlagsRegel = true;
-                            break;
-                    }
+                    //    case enAction.Erhält_den_Focus:
+                    //        VorschlagsRegel = true;
+                    //        break;
+                    //}
                 }
             }
 
-            if (VorschlagsRegel)
-            {
-                if (Dann != 1) { return "Eine Regel für eine neue Zeile oder einen Vorschlag benötigt genau eine 'Dann-Aktion'."; }
+            //if (VorschlagsRegel)
+            //{
+            //    if (Dann != 1) { return "Eine Regel für eine neue Zeile oder einen Vorschlag benötigt genau eine 'Dann-Aktion'."; }
 
-                foreach (var ThisAction in Actions)
-                {
-                    if (ThisAction != null && !ThisAction.IsBedingung() && ThisAction.Action != enAction.Mache_einen_Vorschlag) { return "Nur 'Mache einen Vorschlag' bei neuen Focus-Aktionen möglich."; }
-                }
-            }
+            //    foreach (var ThisAction in Actions)
+            //    {
+            //        if (ThisAction != null && !ThisAction.IsBedingung() && ThisAction.Action != enAction.Mache_einen_Vorschlag) { return "Nur 'Mache einen Vorschlag' bei neuen Focus-Aktionen möglich."; }
+            //    }
+            //}
 
             return string.Empty;
         }
@@ -322,17 +307,17 @@ namespace BlueDatabase
         }
 
 
-        public bool TrifftZu(RowItem vRow, ColumnItem ColumnFocus)
+        public bool TrifftZu(RowItem vRow)
         {
             foreach (var ThisAction in Actions)
             {
-                if (ThisAction != null && ThisAction.IsBedingung() && !ThisAction.TrifftZu(vRow, ColumnFocus)) { return false; }
+                if (ThisAction != null && ThisAction.IsBedingung() && !ThisAction.TrifftZu(vRow)) { return false; }
             }
             return true;
         }
 
 
-        public string Execute(RowItem vRow, ColumnItem ColumnFocus, bool FreezeMode)
+        public string Execute(RowItem vRow, bool FreezeMode)
         {
 
             var Meldung = string.Empty;
@@ -346,17 +331,16 @@ namespace BlueDatabase
                     {
                         if (string.IsNullOrEmpty(Meldung))
                         {
-                            Meldung = ThisAction.Execute(vRow, ColumnFocus, FreezeMode);
+                            Meldung = ThisAction.Execute(vRow, FreezeMode);
                         }
                         else
                         {
-                            ThisAction.Execute(vRow, ColumnFocus, FreezeMode);
+                            ThisAction.Execute(vRow, FreezeMode);
                         }
                     }
                 }
             }
 
-            if (ColumnFocus != null) { return Meldung; }
             if (string.IsNullOrEmpty(Meldung)) { return string.Empty; }
             //if (FeedbackMode == enControlAccesMode.NoFeedBack)
             //{
@@ -368,7 +352,7 @@ namespace BlueDatabase
 
             foreach (var ThisAction in Actions)
             {
-                if (ThisAction != null && ThisAction.IsBedingung()) { e.Add(ThisAction.TrifftZuText(vRow, null)); }
+                if (ThisAction != null && ThisAction.IsBedingung()) { e.Add(ThisAction.TrifftZuText(vRow)); }
             }
 
             e = e.SortedDistinctList();
@@ -449,7 +433,6 @@ namespace BlueDatabase
                     case enAction.Wert_Dazu: Co = 20; break;
                     case enAction.Wert_Weg: Co = 30; break;
 
-                    case enAction.LinkedCell: Co = 35; break;
 
                     case enAction.Berechne: Co = 37; break;
 
@@ -465,14 +448,7 @@ namespace BlueDatabase
                     case enAction.Auf_eine_existierende_Datei_verweist: Co = 108; break;
                     case enAction.Auf_einen_existierenden_Pfad_verweist: Co = 109; break;
                     case enAction.Berechnung_ist_True: Co = 110; break;
-                    //case enAction.Ist_Jünger_Als: Co = 111; break;
                     case enAction.Substring: Co = 115; break;
-                    //case enAction.SortiereIntelligent: Co = 120; break;
-                    //case enAction.KopiereAndereSpalten: Co = 130; break;
-
-                    case enAction.Erhält_den_Focus: Co = 200; break;
-
-                    case enAction.Mache_einen_Vorschlag: Co = 300; break;
 
                     default:
                         Co = 0;
@@ -502,26 +478,6 @@ namespace BlueDatabase
         }
 
 
-        public bool hasGotFocusAction(RowItem vRow, ColumnItem vColumn)
-        {
-
-            foreach (var ThisAction in Actions)
-            {
-                if (ThisAction != null)
-                {
-                    if (ThisAction.Action == enAction.Erhält_den_Focus)
-                    {
-                        if (ThisAction.TrifftZu(vRow, vColumn))
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-
 
         public object Clone()
         {
@@ -549,7 +505,7 @@ namespace BlueDatabase
                 {
                     if (ThisAction.Action == enAction.Sperre_die_Zelle && ThisAction.Columns.Contains(Column))
                     {
-                        var Match = TrifftZu(Row, null);
+                        var Match = TrifftZu(Row);
                         if (Match) { return true; }
                     }
                 }

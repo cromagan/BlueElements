@@ -139,7 +139,7 @@ namespace BlueDatabase
 
                 default:
 
-                    if (Art.ToString() == Convert.ToInt32(Art).ToString())
+                    if (Art.ToString() == ((int)Art).ToString())
                     {
                         Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + Art + "' nicht definiert.<br>Wert: " + Wert + "<br>Datei: " + Database.Filename);
                     }

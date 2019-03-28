@@ -51,8 +51,8 @@ namespace BlueControls.DialogBoxes
             capTXT.Text = Text;
 
 
-            var He = Math.Min(capTXT.TextRequiredSize().Height, Convert.ToInt32(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-            var Wi = Math.Min(capTXT.TextRequiredSize().Width, Convert.ToInt32(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+            var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+            var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
 
 
             this.Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
@@ -184,8 +184,8 @@ namespace BlueControls.DialogBoxes
 
 
                 Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - Width - GenericControl.Skin.Padding * 2;
-                Region = new Region(new Rectangle(0, 0, Width, Convert.ToInt32(Math.Truncate(Height * _Proz))));
-                Top = Convert.ToInt32(Math.Truncate(System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - Height * _Proz));
+                Region = new Region(new Rectangle(0, 0, Width, (int)(Math.Truncate(Height * _Proz))));
+                Top = (int)(Math.Truncate(System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - Height * _Proz));
                 Opacity = _Proz;
 
 
@@ -275,8 +275,8 @@ namespace BlueControls.DialogBoxes
         //        if (this.Design == enDesign.Form_DesktopBenachrichtigung)
         //        {
         //            Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - Width - GenericControl.Skin.Padding * 2;
-        //            Region = new Region(new Rectangle(0, 0, Width, Convert.ToInt32(Math.Truncate(Height * _Proz))));
-        //            Top = Convert.ToInt32(Math.Truncate(System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - Height * _Proz));
+        //            Region = new Region(new Rectangle(0, 0, Width, (int)(Math.Truncate(Height * _Proz))));
+        //            Top = (int)(Math.Truncate(System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - Height * _Proz));
         //            Opacity = _Proz;
         //        }
         //        else
@@ -284,7 +284,7 @@ namespace BlueControls.DialogBoxes
         //            Opacity = _Proz;
         //            if (Going)
         //            {
-        //                Top -= Convert.ToInt32((1 - _Proz) * 5);
+        //                Top -= (int)((1 - _Proz) * 5);
         //            }
         //        }
 

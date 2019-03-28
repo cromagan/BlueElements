@@ -526,7 +526,7 @@ namespace BlueControls.Controls
                 if (IsOnScreen(ViewItem, DisplayRectangleWOSlider))
                 {
                     Skin.Draw_FormatedText(GR, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, (int)(16 * Database.GlobalScale)), enAlignment.Left, new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)ViewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font);
-                    //GR.DrawString("[Neue Zeile]", NewRow_Font.Font(), NewRow_Font.Brush_Color_Main, (int)ViewItem.OrderTMP_Spalte_X1, Convert.ToInt32(-SliderY.Value + HeadSize()));
+                    //GR.DrawString("[Neue Zeile]", NewRow_Font.Font(), NewRow_Font.Brush_Color_Main, (int)ViewItem.OrderTMP_Spalte_X1, (int)(-SliderY.Value + HeadSize()));
                 }
             }
 
@@ -696,7 +696,7 @@ namespace BlueControls.Controls
 
                 if (!Row.CellGetBoolean(_Database.Column.SysCorrect))
                 {
-                    GR.DrawImage(QuickImage.Get("Warnung|16||||||120||50").BMP, new Point(r.Right - 19, Convert.ToInt32(r.Top + (r.Height - 16) / 2.0)));
+                    GR.DrawImage(QuickImage.Get("Warnung|16||||||120||50").BMP, new Point(r.Right - 19, (int)(r.Top + (r.Height - 16) / 2.0)));
                 }
 
                 if (!string.IsNullOrEmpty(Row.TMP_Chapter))
@@ -1009,7 +1009,7 @@ namespace BlueControls.Controls
             }
             else
             {
-                var pos = new Point((int)ViewItem.OrderTMP_Spalte_X1 + Convert.ToInt32((Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - FS.Height) / 2.0), HeadSize() - 4 - 18);
+                var pos = new Point((int)ViewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - FS.Height) / 2.0), HeadSize() - 4 - 18);
 
                 GR.TranslateTransform(pos.X, pos.Y);
 
@@ -1825,7 +1825,7 @@ namespace BlueControls.Controls
                         {
                             if (SliderX.Visible)
                             {
-                                ThisViewItem.OrderTMP_Spalte_X1 = Convert.ToInt32(MaxX - SliderX.Value);
+                                ThisViewItem.OrderTMP_Spalte_X1 = (int)(MaxX - SliderX.Value);
                             }
                             else
                             {
@@ -3164,13 +3164,13 @@ namespace BlueControls.Controls
 
             if (MitVorlage)
             {
-                e = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text_Ohne_Kritische_Zeichen);
+                e = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
                 if (string.IsNullOrEmpty(e)) { return; }
                 _Database.ColumnArrangements.Add(new ColumnViewCollection(_Database, _Database.ColumnArrangements[_ArrangementNr].ToString(), e));
             }
             else
             {
-                e = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text_Ohne_Kritische_Zeichen);
+                e = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
                 if (string.IsNullOrEmpty(e)) { return; }
                 _Database.ColumnArrangements.Add(new ColumnViewCollection(_Database, "", e));
             }

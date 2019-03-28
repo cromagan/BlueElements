@@ -457,7 +457,7 @@ namespace BlueControls
                     }
                     else
                     {
-                        IsY += Convert.ToInt32(Row_SetOnLine(ZB_Char, Akt) * _Zeilenabstand);
+                        IsY += (int)(Row_SetOnLine(ZB_Char, Akt) * _Zeilenabstand);
                         RI.Add(ZB_Char + ";" + Akt);
                     }
 
@@ -658,7 +658,7 @@ namespace BlueControls
                     break;
 
                 case enMarkState.Ringelchen:
-                    GR.DrawLine(new Pen(Color.Red, 3 * czoom), StartX, Convert.ToInt32(StartY + Chars[MarkStart].Size.Height * czoom * 0.9), EndX, Convert.ToInt32(StartY + Chars[MarkStart].Size.Height * czoom * 0.9));
+                    GR.DrawLine(new Pen(Color.Red, 3 * czoom), StartX, (int)(StartY + Chars[MarkStart].Size.Height * czoom * 0.9), EndX, (int)(StartY + Chars[MarkStart].Size.Height * czoom * 0.9));
                     break;
 
                 case enMarkState.Field:
@@ -720,7 +720,7 @@ namespace BlueControls
                 He = Chars[CharPos - 1].Size.Height;
             }
 
-            return new Rectangle(Convert.ToInt32(X), Convert.ToInt32(Y - 1), 0, Convert.ToInt32(He + 2));
+            return new Rectangle((int)(X), (int)(Y - 1), 0, (int)(He + 2));
         }
 
 
@@ -1112,51 +1112,51 @@ namespace BlueControls
 
                 //case "PROGRESSBAR":
                 //    Position += 1;
-                //    Chars.Add(new ExtChar(Convert.ToInt32((int)enEtxtCodes.ProgressBar0 + int.Parse(Attribut)), _Design, _State, PF, Stufe, MarkState));
+                //    Chars.Add(new ExtChar((int)((int)enEtxtCodes.ProgressBar0 + int.Parse(Attribut)), _Design, _State, PF, Stufe, MarkState));
                 //    break;
 
 
                 case "H7":
                     Stufe = 7;
-                    PF = GenericControl.Skin.GetBlueFont(Convert.ToInt32(_Design), _State, _Row, Stufe);
+                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
 
                 case "H6":
                     Stufe = 6;
-                    PF = GenericControl.Skin.GetBlueFont(Convert.ToInt32(_Design), _State, _Row, Stufe);
+                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
 
                 case "H5":
                     Stufe = 5;
-                    PF = GenericControl.Skin.GetBlueFont(Convert.ToInt32(_Design), _State, _Row, Stufe);
+                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
 
                 case "H4":
                     Stufe = 4;
-                    PF = GenericControl.Skin.GetBlueFont(Convert.ToInt32(_Design), _State, _Row, Stufe);
+                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "H3":
                     Stufe = 3;
-                    PF = GenericControl.Skin.GetBlueFont(Convert.ToInt32(_Design), _State, _Row, Stufe);
+                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
 
                 case "H2":
                     Stufe = 2;
-                    PF = GenericControl.Skin.GetBlueFont(Convert.ToInt32(_Design), _State, _Row, Stufe);
+                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "H1":
                     Stufe = 1;
-                    PF = GenericControl.Skin.GetBlueFont(Convert.ToInt32(_Design), _State, _Row, Stufe);
+                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "MARKSTATE":
-                    MarkState = (enMarkState)Convert.ToInt32(Attribut);
+                    MarkState = (enMarkState)int.Parse(Attribut);
                     break;
 
                 case "":
@@ -1391,7 +1391,7 @@ namespace BlueControls
             }
             else if (!string.IsNullOrEmpty(img))
             {
-                var x = QuickImage.Get(img, Convert.ToInt32(tmpFont.Oberlänge(1)));
+                var x = QuickImage.Get(img, (int)(tmpFont.Oberlänge(1)));
                 Chars.Insert(Position, new ExtChar((char)(QuickImage.GetIndex(x) + ExtChar.ImagesStart), _Design, tmpState, tmpFont, tmpStufe, tmpMarkState));
             }
             else

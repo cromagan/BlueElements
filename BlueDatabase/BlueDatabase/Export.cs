@@ -203,13 +203,13 @@ namespace BlueDatabase
                         format = column.Format;
                         switch (column.Format)
                         {
-                            case enDataFormat.Binärdaten_Bild:
-                                I = row.CellGetBitmap(column);
-                                //break; case Is = enDataFormat.Link_To_BlueDataSystem
-                                //    I = Nothing
-                                //    vRow.Database.DataSystem.File_Load(tx, I)
+                            //case enDataFormat.Binärdaten_Bild:
+                            //    I = row.CellGetBitmap(column);
+                            //    //break; case Is = enDataFormat.Link_To_BlueDataSystem
+                            //    //    I = Nothing
+                            //    //    vRow.Database.DataSystem.File_Load(tx, I)
 
-                                break;
+                            //    break;
                             case enDataFormat.Link_To_Filesystem:
                                 I = (Bitmap)modAllgemein.Image_FromFile(row.CellBestFile(column));
 

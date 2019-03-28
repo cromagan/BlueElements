@@ -22,6 +22,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Controls;
 using BlueControls.DialogBoxes;
 using BlueControls.ItemCollection;
 using BlueDatabase;
@@ -63,6 +64,14 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxBildCodeImageNotfound.Item.AddRange(typeof(enImageNotFound));
             cbxFehlendesZiel.Item.AddRange(typeof(enFehlendesZiel));
 
+            // cbxAlign.Item.AddRange(typeof(enAlignment));
+            if (cbxAlign.Item.Count == 0)
+            {
+                cbxAlign.Item.Add(new TextListItem(((int)enAlignment.Left).ToString(), "links"));
+                cbxAlign.Item.Add(new TextListItem(((int)enAlignment.VerticalCenter).ToString(), "mittig"));
+                cbxAlign.Item.Add(new TextListItem(((int)enAlignment.Left).ToString(), "rechts"));
+            }
+
             cbxLinkedDatabase.Item.Clear();
             if (!string.IsNullOrEmpty(_Column.Database.Filename))
             {
@@ -83,6 +92,9 @@ namespace BlueControls.BlueDatabaseDialogs
                 cbxEinheit.Item.Add(new TextListItem("dm", enImageCode.Lineal));
                 cbxEinheit.Item.Add(new TextListItem("m", enImageCode.Lineal));
                 cbxEinheit.Item.Add(new TextListItem("km", enImageCode.Lineal));
+
+                cbxEinheit.Item.Add(new TextListItem("mm²", enImageCode.GrößeÄndern));
+                cbxEinheit.Item.Add(new TextListItem("m²", enImageCode.GrößeÄndern));
 
                 cbxEinheit.Item.Add(new TextListItem("µg", enImageCode.Gewicht));
                 cbxEinheit.Item.Add(new TextListItem("mg", enImageCode.Gewicht));
@@ -127,10 +139,12 @@ namespace BlueControls.BlueDatabaseDialogs
             T_Colorx.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", _Column.ForeColor.ToHTMLCode()).ToString();
             btnMultiline.Checked = _Column.MultiLine;
 
-            cbxFormat.Text = Convert.ToInt32(_Column.Format).ToString();
+            cbxFormat.Text = ((int)_Column.Format).ToString();
 
-            cbxRandLinks.Text = Convert.ToInt32(_Column.LineLeft).ToString();
-            cbxRandRechts.Text = Convert.ToInt32(_Column.LineRight).ToString();
+            cbxRandLinks.Text = ((int)_Column.LineLeft).ToString();
+            cbxRandRechts.Text = ((int)_Column.LineRight).ToString();
+
+            cbxAlign.Text = ((int)_Column.Align).ToString();
 
             AutoFilterMöglich.Checked = _Column.AutoFilterErlaubt;
             AutoFilterTXT.Checked = _Column.AutofilterTextFilterErlaubt;
@@ -170,6 +184,7 @@ namespace BlueControls.BlueDatabaseDialogs
             tbxAuswaehlbareWerte.Text = _Column.DropDownItems.JoinWithCr();
 
             txbReplacer.Text = _Column.Replacer.JoinWithCr();
+            txbRegex.Text = _Column.Regex.JoinWithCr();
 
             tbxTags.Text = _Column.Tags.JoinWithCr();
 
@@ -201,6 +216,11 @@ namespace BlueControls.BlueDatabaseDialogs
             txbLinkedKeyKennung.Text = _Column.LinkedKeyKennung;
 
 
+            txbZeichenkette.Text = _Column.LinkedCell_ColumnValueAdd;
+            butZusammenfassen.Checked = _Column.ZellenZusammenfassen;
+            cbxFehlendesZiel.Text = ((int)_Column.LinkedCell_Behaviour).ToString();
+            txbSortMask.Text = _Column.SortMask;
+
 
             cbxSchlüsselspalte.Item.Clear();
             cbxSchlüsselspalte.Item.Add("#Ohne");
@@ -211,62 +231,93 @@ namespace BlueControls.BlueDatabaseDialogs
                     cbxSchlüsselspalte.Item.Add(ThisColumn);
                 }
             }
-            if (_Column.KeyColumnKey < 0)
+
+            SetKeyTo(_Column.Database, cbxSchlüsselspalte, _Column.KeyColumnKey);
+            SetKeyTo(_Column.Database, cbxRowKeyInColumn, _Column.LinkedCell_RowKey);
+            SetKeyTo(_Column.LinkedDatabase(), cbxTargetColumn, _Column.LinkedCell_ColumnKey);
+            SetKeyTo(_Column.Database, cbxColumnKeyInColumn, _Column.LinkedCell_ColumnValueFoundIn);
+            SetKeyTo(_Column.Database, cbxDropDownKey, _Column.DropdownKey);
+            SetKeyTo(_Column.Database, cbxVorschlag, _Column.VorschlagsColumn);
+
+
+            //RegelTabVorbereiten(false);
+
+
+            //btnFehlerWennLeer.Checked = _Column.Database.Rules_Has(_Column, "Leer-Fehler") != null;
+            //btnFormatFehler.Checked = _Column.Database.Rules_Has(_Column, "Format-Fehler") != null;
+            //btnFehlerWennUnsichtbare.Checked = _Column.Database.Rules_Has(_Column, "Unsichtbare-Zeichen-Fehler") != null;
+
+
+            //var R = _Column.Database.Rules_Has(_Column, "Verlinkung");
+            //cbxRowKeyInColumn.Text = string.Empty;
+            //cbxColumnKeyInColumn.Text = string.Empty;
+            //cbxTargetColumn.Text = string.Empty;
+
+            //if (R != null && _Column.Format == enDataFormat.LinkedCell)
+            //{
+
+            //    // Info:o[5] ist ein Dummy, der immer auf  gesetzt wird. Damit werden beim Split die Dimenionen repariert.
+            //    // o[4] ist neu dazu gekommen, und nicht immer gesetzt. Da es vorher der Dummy war, ist es immer plus, was gut so ist, da das die vorherige standard einstellung war.
+            //    var o = (R.Actions[0].Text + "\r+").SplitByCR();
+
+            //    if (o.Length > 4)
+            //    {
+            //        if (int.TryParse(o[0], out var RowKey)) { cbxRowKeyInColumn.Text = _Column.Database.Column.SearchByKey(RowKey).Name; }
+            //        if (int.TryParse(o[1], out var ColKey))
+            //        {
+            //            cbxColumnKeyInColumn.Text = _Column.Database.Column.SearchByKey(ColKey).Name;
+            //            btnColumnKeyInColumn.Checked = true;
+            //        }
+            //        if (int.TryParse(o[2], out var TarCol))
+            //        {
+            //            cbxTargetColumn.Text = _Column.LinkedDatabase().Column.SearchByKey(TarCol).Name;
+            //            btnTargetColumn.Checked = true;
+            //        }
+            //        txbZeichenkette.Text = o[3];
+            //        cbxFehlendesZiel.Text = o[4];
+
+            //    }
+            //}
+        }
+
+        private void SetKeyTo(Database database, ComboBox combobox, int columnKey)
+        {
+            if (columnKey < 0)
             {
-                cbxSchlüsselspalte.Text = "#Ohne";
+                combobox.Text = "#Ohne";
             }
             else
             {
-                var c = _Column.Database.Column.SearchByKey(_Column.KeyColumnKey);
+                var c = database.Column.SearchByKey(columnKey);
                 if (c != null)
                 {
-                    cbxSchlüsselspalte.Text = c.Name;
+                    combobox.Text = c.Name;
                 }
                 else
                 {
-                    cbxSchlüsselspalte.Text = "#Ohne";
-                }
-            }
-
-            RegelTabVorbereiten(false);
-
-
-            btnFehlerWennLeer.Checked = _Column.Database.Rules_Has(_Column, "Leer-Fehler") != null;
-            btnFormatFehler.Checked = _Column.Database.Rules_Has(_Column, "Format-Fehler") != null;
-            btnFehlerWennUnsichtbare.Checked = _Column.Database.Rules_Has(_Column, "Unsichtbare-Zeichen-Fehler") != null;
-
-
-            var R = _Column.Database.Rules_Has(_Column, "Verlinkung");
-            cbxRowKeyInColumn.Text = string.Empty;
-            cbxColumnKeyInColumn.Text = string.Empty;
-            cbxTargetColumn.Text = string.Empty;
-
-            if (R != null && _Column.Format == enDataFormat.LinkedCell)
-            {
-
-                // Info:o[5] ist ein Dummy, der immer auf  gesetzt wird. Damit werden beim Split die Dimenionen repariert.
-                // o[4] ist neu dazu gekommen, und nicht immer gesetzt. Da es vorher der Dummy war, ist es immer plus, was gut so ist, da das die vorherige standard einstellung war.
-                var o = (R.Actions[0].Text + "\r+").SplitByCR();
-
-                if (o.Length > 4)
-                {
-                    if (int.TryParse(o[0], out var RowKey)) { cbxRowKeyInColumn.Text = _Column.Database.Column.SearchByKey(RowKey).Name; }
-                    if (int.TryParse(o[1], out var ColKey))
-                    {
-                        cbxColumnKeyInColumn.Text = _Column.Database.Column.SearchByKey(ColKey).Name;
-                        btnColumnKeyInColumn.Checked = true;
-                    }
-                    if (int.TryParse(o[2], out var TarCol))
-                    {
-                        cbxTargetColumn.Text = _Column.LinkedDatabase().Column.SearchByKey(TarCol).Name;
-                        btnTargetColumn.Checked = true;
-                    }
-                    txbZeichenkette.Text = o[3];
-                    cbxFehlendesZiel.Text = o[4];
-
+                    combobox.Text = "#Ohne";
                 }
             }
         }
+
+        private int ColumKeyFrom(Database database, string columnName)
+        {
+
+            if (database == null) { return -1; }
+
+            var c = database.Column[columnName];
+
+            if (c is null)
+            {
+                return -1;
+            }
+            else
+            {
+                return c.Key;
+            }
+
+        }
+
 
         private bool AllOk()
         {
@@ -308,7 +359,7 @@ namespace BlueControls.BlueDatabaseDialogs
         }
 
 
-        private void OkBut_Click(object sender, System.EventArgs e)
+        private void btnOk_Click(object sender, System.EventArgs e)
         {
             if (!AllOk()) { return; }
             Close();
@@ -324,7 +375,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             _Column.Caption = tbxCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
 
-            _Column.Format = (enDataFormat)Convert.ToInt32(cbxFormat.Text);
+            _Column.Format = (enDataFormat)int.Parse(cbxFormat.Text);
 
             _Column.Quickinfo = tbxQuickinfo.Text.Replace("\r", "<BR>");
             _Column.AdminInfo = tbxAdminInfo.Text.Replace("\r", "<BR>");
@@ -333,8 +384,8 @@ namespace BlueControls.BlueDatabaseDialogs
 
             _Column.BackColor = QuickImage.Get(H_Colorx.ImageCode).ChangeGreenTo.FromHTMLCode();
             _Column.ForeColor = QuickImage.Get(T_Colorx.ImageCode).ChangeGreenTo.FromHTMLCode();
-            _Column.LineLeft = (enColumnLineStyle)Convert.ToInt32(cbxRandLinks.Text);
-            _Column.LineRight = (enColumnLineStyle)Convert.ToInt32(cbxRandRechts.Text);
+            _Column.LineLeft = (enColumnLineStyle)int.Parse(cbxRandLinks.Text);
+            _Column.LineRight = (enColumnLineStyle)int.Parse(cbxRandRechts.Text);
 
 
             _Column.MultiLine = btnMultiline.Checked;
@@ -410,8 +461,12 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
 
-
-
+            var NewRegex = txbRegex.Text.SplitByCRToList();
+            if (NewRegex.IsDifferentTo(_Column.Regex))
+            {
+                _Column.Regex.Clear();
+                _Column.Regex.AddRange(NewRegex);
+            }
 
 
             _Column.TextBearbeitungErlaubt = btnEditableStandard.Checked;
@@ -432,96 +487,97 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.BildCode_ImageNotFound = (enImageNotFound)int.Parse(cbxBildCodeImageNotfound.Text);
             _Column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
             _Column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
-            _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
+            _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
             _Column.LinkedKeyKennung = txbLinkedKeyKennung.Text;
 
 
+            _Column.KeyColumnKey = ColumKeyFrom(_Column.Database, cbxSchlüsselspalte.Text);
 
 
-            var c = _Column.Database.Column[cbxSchlüsselspalte.Text];
-
-            if (c is null)
-            {
-                _Column.KeyColumnKey = -1;
-            }
-            else
-            {
-                _Column.KeyColumnKey = c.Key;
-            }
-
-
-            // Regel: Wenn Leer, gib Fehler aus
-            var tmpR = _Column.Database.Rules_Has(_Column, "Leer-Fehler");
-            if (!btnFehlerWennLeer.Checked && tmpR != null) { _Column.Database.Rules.Remove(tmpR); }
-            if (btnFehlerWennLeer.Checked && tmpR == null)
-            {
-                tmpR = new RuleItem(_Column, "Leer-Fehler");
-                tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.Ist, string.Empty, _Column));
-                tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.Setze_Fehlerhaft, string.Empty, null));
-                _Column.Database.Rules.Add(tmpR);
-            }
-
-            // Regel: Wenn Format Fehlerhaft, gib Fehler aus
-            tmpR = _Column.Database.Rules_Has(_Column, "Format-Fehler");
-            if (!btnFormatFehler.Checked && tmpR != null) { _Column.Database.Rules.Remove(tmpR); }
-            if (btnFormatFehler.Checked && tmpR == null)
-            {
-                tmpR = new RuleItem(_Column, "Format-Fehler");
-                tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.Formatfehler_des_Zelleninhaltes, string.Empty, _Column));
-                tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.Setze_Fehlerhaft, string.Empty, null));
-                _Column.Database.Rules.Add(tmpR);
-            }
-
-            // Regel: Wenn Unsichtbare vorhanden, gib Fehler aus
-            tmpR = _Column.Database.Rules_Has(_Column, "Unsichtbare-Zeichen-Fehler");
-            if (!btnFehlerWennUnsichtbare.Checked && tmpR != null) { _Column.Database.Rules.Remove(tmpR); }
-            if (btnFehlerWennUnsichtbare.Checked && tmpR == null)
-            {
-                tmpR = new RuleItem(_Column, "Unsichtbare-Zeichen-Fehler");
-                tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.Unsichtbare_Zeichen_am_Ende_Enthält, string.Empty, _Column));
-                tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.Setze_Fehlerhaft, string.Empty, null));
-                _Column.Database.Rules.Add(tmpR);
-            }
+            _Column.LinkedCell_RowKey = ColumKeyFrom(_Column.Database, cbxRowKeyInColumn.Text);
+            _Column.LinkedCell_ColumnKey = ColumKeyFrom(_Column.LinkedDatabase(), cbxTargetColumn.Text); // LINKED DATABASE
+            _Column.LinkedCell_ColumnValueFoundIn = ColumKeyFrom(_Column.Database, cbxColumnKeyInColumn.Text);
+            _Column.LinkedCell_ColumnValueAdd = txbZeichenkette.Text;
+            _Column.LinkedCell_Behaviour = (enFehlendesZiel)int.Parse(cbxFehlendesZiel.Text);
+            _Column.ZellenZusammenfassen = butZusammenfassen.Checked;
+            _Column.DropdownKey = ColumKeyFrom(_Column.Database, cbxDropDownKey.Text);
+            _Column.VorschlagsColumn = ColumKeyFrom(_Column.Database, cbxVorschlag.Text);
+            _Column.Align = (enAlignment)int.Parse(cbxAlign.Text);
+            _Column.SortMask = txbSortMask.Text;
 
 
+            //// Regel: Wenn Leer, gib Fehler aus
+            //var tmpR = _Column.Database.Rules_Has(_Column, "Leer-Fehler");
+            //if (!btnFehlerWennLeer.Checked && tmpR != null) { _Column.Database.Rules.Remove(tmpR); }
+            //if (btnFehlerWennLeer.Checked && tmpR == null)
+            //{
+            //    tmpR = new RuleItem(_Column, "Leer-Fehler");
+            //    tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.Ist, string.Empty, _Column));
+            //    tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.Setze_Fehlerhaft, string.Empty, null));
+            //    _Column.Database.Rules.Add(tmpR);
+            //}
 
-            // Regel: Verlinkung richtig stellen:
-            tmpR = _Column.Database.Rules_Has(_Column, "Verlinkung");
-            if (_Column.Format != enDataFormat.LinkedCell && tmpR != null)
-            {
-                _Column.Database.Rules.Remove(tmpR);
-                tmpR = null;
-            }
-            if (_Column.Format == enDataFormat.LinkedCell && tmpR == null)
-            {
-                tmpR = new RuleItem(_Column, "Verlinkung");
-                tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.LinkedCell, string.Empty, _Column));
-                _Column.Database.Rules.Add(tmpR);
-            }
+            //// Regel: Wenn Format Fehlerhaft, gib Fehler aus
+            //tmpR = _Column.Database.Rules_Has(_Column, "Format-Fehler");
+            //if (!btnFormatFehler.Checked && tmpR != null) { _Column.Database.Rules.Remove(tmpR); }
+            //if (btnFormatFehler.Checked && tmpR == null)
+            //{
+            //    tmpR = new RuleItem(_Column, "Format-Fehler");
+            //    tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.Formatfehler_des_Zelleninhaltes, string.Empty, _Column));
+            //    tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.Setze_Fehlerhaft, string.Empty, null));
+            //    _Column.Database.Rules.Add(tmpR);
+            //}
 
-            if (tmpR != null)
-            {
-                var tmp = string.Empty;
+            //// Regel: Wenn Unsichtbare vorhanden, gib Fehler aus
+            //tmpR = _Column.Database.Rules_Has(_Column, "Unsichtbare-Zeichen-Fehler");
+            //if (!btnFehlerWennUnsichtbare.Checked && tmpR != null) { _Column.Database.Rules.Remove(tmpR); }
+            //if (btnFehlerWennUnsichtbare.Checked && tmpR == null)
+            //{
+            //    tmpR = new RuleItem(_Column, "Unsichtbare-Zeichen-Fehler");
+            //    tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.Unsichtbare_Zeichen_am_Ende_Enthält, string.Empty, _Column));
+            //    tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.Setze_Fehlerhaft, string.Empty, null));
+            //    _Column.Database.Rules.Add(tmpR);
+            //}
 
-                if (!string.IsNullOrEmpty(cbxRowKeyInColumn.Text))
-                {
-                    tmp = tmp + _Column.Database.Column[cbxRowKeyInColumn.Text].Key;
-                }
-                tmp = tmp + "\r";
 
-                if (btnColumnKeyInColumn.Checked && !string.IsNullOrEmpty(cbxColumnKeyInColumn.Text))
-                {
-                    tmp = tmp + _Column.Database.Column[cbxColumnKeyInColumn.Text].Key;
-                }
-                tmp = tmp + "\r";
-                if (btnTargetColumn.Checked && !string.IsNullOrEmpty(cbxTargetColumn.Text))
-                {
-                    if (_Column.LinkedDatabase() != null) { tmp = tmp + _Column.LinkedDatabase().Column[cbxTargetColumn.Text].Key; }
-                }
 
-                tmp = tmp + "\r" + txbZeichenkette.Text + "\r" + cbxFehlendesZiel.Text + "\r+"; // Plus, das split die Dimensionen richtig erstellt.
-                tmpR.Actions[0].Text = tmp;
-            }
+            //// Regel: Verlinkung richtig stellen:
+            //tmpR = _Column.Database.Rules_Has(_Column, "Verlinkung");
+            //if (_Column.Format != enDataFormat.LinkedCell && tmpR != null)
+            //{
+            //    _Column.Database.Rules.Remove(tmpR);
+            //    tmpR = null;
+            //}
+            //if (_Column.Format == enDataFormat.LinkedCell && tmpR == null)
+            //{
+            //    tmpR = new RuleItem(_Column, "Verlinkung");
+            //    tmpR.Actions.Add(new RuleActionItem(tmpR, enAction.LinkedCell, string.Empty, _Column));
+            //    _Column.Database.Rules.Add(tmpR);
+            //}
+
+            //if (tmpR != null)
+            //{
+            //    var tmp = string.Empty;
+
+            //    if (!string.IsNullOrEmpty(cbxRowKeyInColumn.Text))
+            //    {
+            //        tmp = tmp + _Column.Database.Column[cbxRowKeyInColumn.Text].Key;
+            //    }
+            //    tmp = tmp + "\r";
+
+            //    if (btnColumnKeyInColumn.Checked && !string.IsNullOrEmpty(cbxColumnKeyInColumn.Text))
+            //    {
+            //        tmp = tmp + _Column.Database.Column[cbxColumnKeyInColumn.Text].Key;
+            //    }
+            //    tmp = tmp + "\r";
+            //    if (btnTargetColumn.Checked && !string.IsNullOrEmpty(cbxTargetColumn.Text))
+            //    {
+            //        if (_Column.LinkedDatabase() != null) { tmp = tmp + _Column.LinkedDatabase().Column[cbxTargetColumn.Text].Key; }
+            //    }
+
+            //    tmp = tmp + "\r" + txbZeichenkette.Text + "\r" + cbxFehlendesZiel.Text + "\r+"; // Plus, das split die Dimensionen richtig erstellt.
+            //    tmpR.Actions[0].Text = tmp;
+            //}
 
             _Column.Database.Rules.Sort();
         }
@@ -553,7 +609,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
 
-        private void Minus_Click(object sender, System.EventArgs e)
+        private void btnZurueck_Click(object sender, System.EventArgs e)
         {
 
             if (!AllOk()) { return; }
@@ -567,7 +623,7 @@ namespace BlueControls.BlueDatabaseDialogs
             Column_DatenAuslesen(_Column.Previous());
         }
 
-        private void Plus_Click(object sender, System.EventArgs e)
+        private void btnVor_Click(object sender, System.EventArgs e)
         {
             if (!AllOk()) { return; }
 
@@ -589,72 +645,68 @@ namespace BlueControls.BlueDatabaseDialogs
             if (!AllOk()) { e.Cancel = true; }
         }
 
-        private void tabControl_SelectedIndexChanged(object sender, System.EventArgs e)
-        {
-            RegelTabVorbereiten(true);
-        }
 
 
-        private void RegelTabVorbereiten(bool Einlesen)
-        {
-            if (tabControl.SelectedIndex < 0) { return; }
+        //private void RegelTabVorbereiten(bool Einlesen)
+        //{
+        //    if (tabControl.SelectedIndex < 0) { return; }
 
 
-            var xtab = tabControl.TabPages[tabControl.SelectedIndex];
-            if (xtab.Text != "Regeln") { return; }
+        //    var xtab = tabControl.TabPages[tabControl.SelectedIndex];
+        //    if (xtab.Text != "Regeln") { return; }
 
 
-            if (Einlesen && !AllOk())
-            {
-                tabControl.SelectedIndex = 0;
-                return;
-            }
+        //    if (Einlesen && !AllOk())
+        //    {
+        //        tabControl.SelectedIndex = 0;
+        //        return;
+        //    }
 
-            cbxColumnKeyInColumn.Item.Clear();
-            cbxTargetColumn.Item.Clear();
-            cbxRowKeyInColumn.Item.Clear();
+        //    cbxColumnKeyInColumn.Item.Clear();
+        //    cbxTargetColumn.Item.Clear();
+        //    cbxRowKeyInColumn.Item.Clear();
 
 
-            if (_Column.Format == enDataFormat.LinkedCell)
-            {
-                gpxVerlinkteZellen.Enabled = true;
-                foreach (var ThisLinkedColumn in _Column.LinkedDatabase().Column)
-                {
-                    if (ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) { cbxTargetColumn.Item.Add(ThisLinkedColumn); }
+        //    if (_Column.Format == enDataFormat.LinkedCell)
+        //    {
+        //        gpxVerlinkteZellen.Enabled = true;
+        //        foreach (var ThisLinkedColumn in _Column.LinkedDatabase().Column)
+        //        {
+        //            if (ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) { cbxTargetColumn.Item.Add(ThisLinkedColumn); }
 
-                }
+        //        }
 
-                foreach (var ThisColumn in _Column.Database.Column)
-                {
-                    if (ThisColumn.Format.CanBeChangedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) { cbxRowKeyInColumn.Item.Add(ThisColumn); }
-                    if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxRowKeyInColumn.Item.Add(ThisColumn); }
-                    if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxColumnKeyInColumn.Item.Add(ThisColumn); }
-                }
-            }
-            else
-            {
-                gpxVerlinkteZellen.Enabled = false;
-            }
+        //        foreach (var ThisColumn in _Column.Database.Column)
+        //        {
+        //            if (ThisColumn.Format.CanBeChangedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) { cbxRowKeyInColumn.Item.Add(ThisColumn); }
+        //            if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxRowKeyInColumn.Item.Add(ThisColumn); }
+        //            if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxColumnKeyInColumn.Item.Add(ThisColumn); }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        gpxVerlinkteZellen.Enabled = false;
+        //    }
 
-            cbxRowKeyInColumn.Item.Sort();
-            cbxColumnKeyInColumn.Item.Sort();
-            cbxTargetColumn.Item.Sort();
+        //    cbxRowKeyInColumn.Item.Sort();
+        //    cbxColumnKeyInColumn.Item.Sort();
+        //    cbxTargetColumn.Item.Sort();
 
-            cbxColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Item.Count > 0;
-            btnColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Enabled;
-            txbZeichenkette.Enabled = cbxColumnKeyInColumn.Enabled;
-            if (!btnColumnKeyInColumn.Enabled) { btnTargetColumn.Checked = true; } // Nicht perfekt die Lösung :-(
+        //    cbxColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Item.Count > 0;
+        //    btnColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Enabled;
+        //    txbZeichenkette.Enabled = cbxColumnKeyInColumn.Enabled;
+        //    if (!btnColumnKeyInColumn.Enabled) { btnTargetColumn.Checked = true; } // Nicht perfekt die Lösung :-(
 
-            cbxTargetColumn.Enabled = cbxTargetColumn.Item.Count > 0;
-            btnTargetColumn.Enabled = cbxTargetColumn.Enabled;
-            if (!btnTargetColumn.Enabled) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
+        //    cbxTargetColumn.Enabled = cbxTargetColumn.Item.Count > 0;
+        //    btnTargetColumn.Enabled = cbxTargetColumn.Enabled;
+        //    if (!btnTargetColumn.Enabled) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
 
-            cbxRowKeyInColumn.Enabled = cbxRowKeyInColumn.Item.Count > 0;
-        }
+        //    cbxRowKeyInColumn.Enabled = cbxRowKeyInColumn.Item.Count > 0;
+        //}
 
         private void cbxFormat_TextChanged(object sender, System.EventArgs e)
         {
-            var tmpFormat = (enDataFormat)Convert.ToInt32(cbxFormat.Text);
+            var tmpFormat = (enDataFormat)int.Parse(cbxFormat.Text);
 
             // Verknüpfte Datenbank
             capLinkedDatabase.Enabled = tmpFormat.NeedTargetDatabase();

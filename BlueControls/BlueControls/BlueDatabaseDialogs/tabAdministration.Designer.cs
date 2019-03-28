@@ -316,7 +316,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.cbxInternalColumnArrangementSelector.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxInternalColumnArrangementSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxInternalColumnArrangementSelector.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.cbxInternalColumnArrangementSelector.Format = BlueBasics.Enums.enDataFormat.Text;
             this.cbxInternalColumnArrangementSelector.Location = new System.Drawing.Point(16, 46);
             this.cbxInternalColumnArrangementSelector.Name = "cbxInternalColumnArrangementSelector";
             this.cbxInternalColumnArrangementSelector.Size = new System.Drawing.Size(112, 22);

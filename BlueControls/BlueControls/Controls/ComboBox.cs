@@ -269,7 +269,7 @@ namespace BlueControls.Controls
 
                 i.Parent.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
 
-                var ymod = -Convert.ToInt32((DisplayRectangle.Height - i.SizeUntouchedForListBox().Height) / 2.0);
+                var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox().Height) / 2.0);
                 i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, (int)i.SizeUntouchedForListBox().Height));
 
 

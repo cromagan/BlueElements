@@ -133,9 +133,9 @@ namespace BlueDatabase
             {
                 if (ThisRule != null)
                 {
-                    if (ThisRule.TrifftZu(this, null))
+                    if (ThisRule.TrifftZu(this))
                     {
-                        var tmpMessage = ThisRule.Execute(this, null, true);
+                        var tmpMessage = ThisRule.Execute(this, true);
 
                         if (!string.IsNullOrEmpty(tmpMessage))
                         {

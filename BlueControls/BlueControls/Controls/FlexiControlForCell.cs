@@ -594,11 +594,6 @@ namespace BlueControls.Controls
                 case enEditTypeTable.None:
                     return;
 
-                case enEditTypeTable.Image_Auswahl_Dialog:
-                    lbx.Add_FromFileSystem();
-                    return;
-
-
                 case enEditTypeTable.FileHandling_InDateiSystem:
                     // korrektheit der Zelle bereits geprüft
                     if (_columview.Column != null && string.IsNullOrEmpty(lbx.LastFilePath)) { lbx.LastFilePath = _columview.Column.Database.Filename.FilePath(); }

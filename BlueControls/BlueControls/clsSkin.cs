@@ -199,7 +199,7 @@ namespace BlueControls
 
             if (SkinRow_LastType != vDesign || SkinRow_LastState != vState || SkinRow_LastRow == null)
             {
-                SkinRow_LastRow = SkinDB.Row[new FilterItem(SkinDB.Column[0], enFilterType.Istgleich, Convert.ToInt32(vDesign).ToString()), new FilterItem(SkinDB.Column[1], enFilterType.Istgleich, Convert.ToInt32(vState).ToString())];
+                SkinRow_LastRow = SkinDB.Row[new FilterItem(SkinDB.Column[0], enFilterType.Istgleich, ((int)vDesign).ToString()), new FilterItem(SkinDB.Column[1], enFilterType.Istgleich, ((int)vState).ToString())];
             }
 
 
@@ -540,7 +540,7 @@ namespace BlueControls
         {
 
             var r = Math.Min(RMinus, Math.Min(rect.Width, rect.Height) - 1);
-            var r2 = Convert.ToInt32(Math.Truncate(r / 2.0));
+            var r2 = (int)(Math.Truncate(r / 2.0));
             r = r2 * 2;
 
             GR.FillEllipse(b, new Rectangle(rect.Left, rect.Top - 1, r, r));
@@ -776,7 +776,6 @@ namespace BlueControls
             BlueFont f = null;
             if (!string.IsNullOrEmpty(Txt)) { f = GetBlueFont(SkinRow); }
 
-            //var State = (enStates)Convert.ToInt32(Value(SkinRow, "Status", "-1"));
             Draw_FormatedText(GR, column, Txt, QI, vAlign, FitInRect, Child, DeleteBack, f, Style);
         }
 
@@ -843,7 +842,7 @@ namespace BlueControls
             BlueFont f = null;
             if (!string.IsNullOrEmpty(TXT)) { f = GetBlueFont(SkinRow); }
 
-            var State = (enStates)Convert.ToInt32(Value(SkinRow, "Status", "-1"));
+            var State = (enStates)int.Parse(Value(SkinRow, "Status", "-1"));
             QuickImage tmpImage = null;
             if (QI != null) { tmpImage = QuickImage.Get(QI, AdditionalState(State)); }
 
@@ -903,14 +902,14 @@ namespace BlueControls
 
             if (DeleteBack)
             {
-                if (!string.IsNullOrEmpty(TXT)) { Draw_Back_Transparent(GR, new Rectangle(Convert.ToInt32(FitInRect.X + pSize.Width + XP - 1), Convert.ToInt32(FitInRect.Y + YP2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2)), Child); }
+                if (!string.IsNullOrEmpty(TXT)) { Draw_Back_Transparent(GR, new Rectangle((int)(FitInRect.X + pSize.Width + XP - 1), (int)(FitInRect.Y + YP2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2)), Child); }
 
-                if (QI != null) { Draw_Back_Transparent(GR, new Rectangle(Convert.ToInt32(FitInRect.X + XP), Convert.ToInt32(FitInRect.Y + YP1), (int)pSize.Width, (int)pSize.Height), Child); }
+                if (QI != null) { Draw_Back_Transparent(GR, new Rectangle((int)(FitInRect.X + XP), (int)(FitInRect.Y + YP1), (int)pSize.Width, (int)pSize.Height), Child); }
             }
 
             try
             {
-                if (QI != null) { GR.DrawImage(QI.BMP, Convert.ToInt32(FitInRect.X + XP), Convert.ToInt32(FitInRect.Y + YP1)); }
+                if (QI != null) { GR.DrawImage(QI.BMP, (int)(FitInRect.X + XP), (int)(FitInRect.Y + YP1)); }
                 if (!string.IsNullOrEmpty(TXT)) { GR.DrawString(TXT, F.Font(), F.Brush_Color_Main, FitInRect.X + pSize.Width + XP, FitInRect.Y + YP2); }
             }
             catch (Exception ex)
@@ -1085,7 +1084,7 @@ namespace BlueControls
             if (StyleDB == null) { InitStyles(); }
             if (StyleDB == null || RowOfStyle == null) { return BlueFont.Get(ErrorFont); }
 
-            return GetBlueFont(StyleDB, Convert.ToInt32(vFormat).ToString(), RowOfStyle);
+            return GetBlueFont(StyleDB, ((int)vFormat).ToString(), RowOfStyle);
         }
 
         public BlueFont GetBlueFont(Database StyleDB, string ColumnName, RowItem Row)

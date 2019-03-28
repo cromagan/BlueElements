@@ -124,7 +124,7 @@ namespace BlueControls.ItemCollection
 
         public override bool Contains(PointF value, decimal zoomfactor)
         {
-            return UsedArea().Contains(Convert.ToInt32(value.X), Convert.ToInt32(value.Y));
+            return UsedArea().Contains((int)(value.X), (int)(value.Y));
         }
 
 
@@ -146,7 +146,7 @@ namespace BlueControls.ItemCollection
 
                 if (_tmpBitmap != null)
                 {
-                    if (_tmpBitmap.Width != Convert.ToInt32(r.Width * cZoom) || Convert.ToInt32(r.Height * cZoom) != _tmpBitmap.Height)
+                    if (_tmpBitmap.Width != (int)(r.Width * cZoom) || (int)(r.Height * cZoom) != _tmpBitmap.Height)
                     {
                         _tmpBitmap.Dispose();
                         _tmpBitmap = null;
@@ -155,7 +155,7 @@ namespace BlueControls.ItemCollection
 
                 if (_tmpBitmap == null)
                 {
-                    _tmpBitmap = new Bitmap(Math.Abs(Convert.ToInt32(r.Width * cZoom)), Math.Abs(Convert.ToInt32(r.Height * cZoom)));
+                    _tmpBitmap = new Bitmap(Math.Abs((int)(r.Width * cZoom)), Math.Abs((int)(r.Height * cZoom)));
                 }
                 PadInternal.Width = _tmpBitmap.Width;
                 PadInternal.Height = _tmpBitmap.Height;
@@ -327,7 +327,7 @@ namespace BlueControls.ItemCollection
             y = Math.Max(y, int.MinValue / 2.0m);
 
 
-            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, Convert.ToInt32(x), Convert.ToInt32(y), e.Delta);
+            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)(x), (int)(y), e.Delta);
 
 
             PadInternal.MouseDown(e2);
@@ -366,7 +366,7 @@ namespace BlueControls.ItemCollection
             y = Math.Max(y, int.MinValue / 2.0m);
 
 
-            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, Convert.ToInt32(x), Convert.ToInt32(y), e.Delta);
+            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)(x), (int)(y), e.Delta);
 
 
             PadInternal.MouseMove(e2);
@@ -403,7 +403,7 @@ namespace BlueControls.ItemCollection
             y = Math.Max(y, int.MinValue / 2.0m);
 
 
-            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, Convert.ToInt32(x), Convert.ToInt32(y), e.Delta);
+            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)(x), (int)(y), e.Delta);
 
 
             PadInternal.DoMouseUp(e2);

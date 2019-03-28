@@ -40,10 +40,6 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Telefonnummer:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.RelationText:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Link_To_Filesystem:
@@ -80,13 +76,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Binärdaten_Bild:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Binärdaten:
-                case enDataFormat.Telefonnummer:
                 case enDataFormat.Farbcode:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
@@ -104,7 +94,6 @@ namespace BlueBasics
             switch (format)
             {
                 case enDataFormat.Text:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.RelationText:
                 case enDataFormat.KeyForSame:
@@ -124,10 +113,6 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Telefonnummer:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.LinkedCell:
                 case enDataFormat.RelationText:
@@ -198,11 +183,7 @@ namespace BlueBasics
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
                 case enDataFormat.KeyForSame:
-                    return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_KritischeZeichen + Constants.Char_Sonderzeichen + Constants.Char_Steuercodes + Constants.Char_Numerals + Constants.Char_Satzeichen;
-
-
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                    return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + Constants.Char_Satzeichen + "() + -";
+                    return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + Constants.Char_Satzeichen + Constants.Char_Sonderzeichen;
 
                 case enDataFormat.Bit:
                     return "+-";
@@ -217,21 +198,9 @@ namespace BlueBasics
                 case enDataFormat.Datum_und_Uhrzeit:
                     return Constants.Char_Numerals + " :.";
 
-                case enDataFormat.Telefonnummer:
-                    return Constants.Char_Numerals + "+ /-";
-
-                case enDataFormat.Email:
-                    return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + "_.-@";
-
-                case enDataFormat.InternetAdresse:
-                    return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + "=_?&:./-+@%";
-
                 case enDataFormat.Link_To_Filesystem:
-                    return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_KritischeZeichen + Constants.Char_Numerals + ",./:_ +-()'";
+                    return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + ",./:_ +-()'";
 
-                case enDataFormat.Binärdaten_Bild:
-                case enDataFormat.Binärdaten:
-                    return string.Empty;
 
                 default:
                     Develop.DebugPrint(format);
@@ -252,10 +221,6 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Telefonnummer:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
@@ -277,16 +242,10 @@ namespace BlueBasics
             switch (format)
             {
                 case enDataFormat.Text:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
                 case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Telefonnummer:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.BildCode:
-                case enDataFormat.Binärdaten_Bild:
-                case enDataFormat.Binärdaten:
                 case enDataFormat.RelationText:
                 case enDataFormat.KeyForSame:
                 case enDataFormat.Farbcode:
@@ -323,22 +282,12 @@ namespace BlueBasics
             {
 
                 case enDataFormat.Text:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.RelationText:
                 case enDataFormat.KeyForSame:
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                    return true;
-
-                case enDataFormat.Telefonnummer:
-                case enDataFormat.InternetAdresse:
-                    if (il < 1) { return false; }
-                    return true;
-
-                case enDataFormat.Email:
-                    if (il < 6) { return false; }
                     return true;
 
                 case enDataFormat.Datum_und_Uhrzeit:
@@ -371,9 +320,6 @@ namespace BlueBasics
             {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.BildCode:
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
@@ -391,8 +337,6 @@ namespace BlueBasics
                 case enDataFormat.Farbcode:
                     return true; // Macht Alls der Text_SchabloneCheck
 
-                case enDataFormat.Telefonnummer:
-                    return true;
 
                 default:
                     Develop.DebugPrint(Format);
@@ -414,7 +358,6 @@ namespace BlueBasics
             {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
                 case enDataFormat.BildCode:
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
@@ -423,19 +366,6 @@ namespace BlueBasics
                 case enDataFormat.KeyForSame:
                     return true;
 
-                case enDataFormat.Telefonnummer:
-                    if (!TXT.StartsWith("+")) { return false; }
-                    if (TXT.Contains("  ")) { return false; }
-                    if (TXT.CountString("/") != 1) { return false; }
-                    if (TXT.CountString("+") > 1) { return false; }
-                    if (TXT.StartsWith("+0")) { return false; }
-                    if (TXT.StartsWith("+ 0")) { return false; }
-                    return new Regex(@"^\+[0-9 ]+/[0-9 -]+$").IsMatch(TXT);
-
-                case enDataFormat.Email:
-                    if (TXT.CountString("@") != 1) { return false; }
-                    if (TXT.CountString(".") < 1) { return false; }
-                    return new Regex(@"[^@]+@.+\.[^.]+").IsMatch(TXT);
 
                 case enDataFormat.Bit:
                     return Convert.ToBoolean(TXT.Length == 1);
@@ -466,13 +396,6 @@ namespace BlueBasics
                     if (new Regex(@"^\d{2}.\d{2}.\d{4} \d{2}:\d{2}$").IsMatch(TXT)) { return true; }
                     return false;
 
-                case enDataFormat.InternetAdresse:
-                    // WWW nicht akzeptieren, weil falls eine Download-Routine was runterladen will, braucht man das HTTP ja
-                    if (TXT.ToUpper().StartsWith("HTTP://")) { return true; }
-                    if (TXT.ToUpper().StartsWith("HTTPS://")) { return true; }
-                    if (TXT.ToUpper().StartsWith("FTP://")) { return true; }
-                    if (TXT.ToUpper().StartsWith("FILE://")) { return true; }
-                    return false;
 
                 default:
                     Develop.DebugPrint(Format);
@@ -506,17 +429,13 @@ namespace BlueBasics
                     }
 
                 case enDataFormat.Bit:
-                case enDataFormat.Telefonnummer:
                 case enDataFormat.Farbcode:
                 case enDataFormat.Schrift:
                     return Constants.SecondSortChar + IsValue;
 
                 case enDataFormat.Text:
                 case enDataFormat.BildCode:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
                 case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.InternetAdresse:
-                case enDataFormat.Email:
                 case enDataFormat.Link_To_Filesystem:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
@@ -580,11 +499,6 @@ namespace BlueBasics
                     }
 
 
-                case enDataFormat.Binärdaten:
-                case enDataFormat.Binärdaten_Bild:
-                    return string.Empty;
-
-
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     // Fremdzellen setzen sich aus verschiedenen Spalten zusammen, also nur ganz primitives zurückgeben
@@ -613,11 +527,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Telefonnummer:
                 case enDataFormat.Farbcode:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Link_To_Filesystem:
@@ -640,7 +550,6 @@ namespace BlueBasics
             switch (format)
             {
                 case enDataFormat.Text:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
                 case enDataFormat.RelationText:
                 case enDataFormat.KeyForSame:
                 case enDataFormat.Text_mit_Formatierung:
@@ -688,11 +597,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Telefonnummer:
                 case enDataFormat.Farbcode:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.LinkedCell:
@@ -726,12 +631,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Binärdaten_Bild:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Telefonnummer:
                 case enDataFormat.Farbcode:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.RelationText:
                 case enDataFormat.KeyForSame:
                 case enDataFormat.Schrift:
@@ -755,10 +655,6 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Telefonnummer:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Link_To_Filesystem:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
@@ -782,11 +678,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Telefonnummer:
                 case enDataFormat.Farbcode:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
@@ -808,13 +700,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Binärdaten_Bild:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
-                case enDataFormat.Binärdaten:
-                case enDataFormat.Telefonnummer:
                 case enDataFormat.Farbcode:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:

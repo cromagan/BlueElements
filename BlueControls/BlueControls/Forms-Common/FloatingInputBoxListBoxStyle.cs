@@ -95,8 +95,8 @@ namespace BlueControls.DialogBoxes
             var itemsClone = (ItemCollectionList)ItemsOri.Clone();
 
 
-            var He = Convert.ToInt32(itemsClone.HeigthOfAllItemsAdded(int.MaxValue));
-            var Wi = Convert.ToInt32(itemsClone.WidthOfBiggestItem(int.MaxValue));
+            var He = (int)(itemsClone.HeigthOfAllItemsAdded(int.MaxValue));
+            var Wi = (int)(itemsClone.WidthOfBiggestItem(int.MaxValue));
 
             if (AddNewAllowed != enAddType.None) { He += 24; }
 
@@ -123,8 +123,8 @@ namespace BlueControls.DialogBoxes
 
             Wi = Math.Max(Wi, MinWidth);
 
-            var MaxWi = Convert.ToInt32(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7);
-            var MaxHe = Convert.ToInt32(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7);
+            var MaxWi = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7);
+            var MaxHe = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7);
 
 
 

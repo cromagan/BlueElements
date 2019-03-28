@@ -53,6 +53,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption11 = new BlueControls.Controls.Caption();
             this.GlobalTab = new BlueControls.Controls.TabControl();
             this.Tab_Allgemein = new BlueControls.Controls.TabPage();
+            this.txbGlobalScale = new BlueControls.Controls.TextBox();
+            this.caption1 = new BlueControls.Controls.Caption();
             this.cbxVerwaisteDaten = new BlueControls.Controls.ComboBox();
             this.capVerwaisteDaten = new BlueControls.Controls.Caption();
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
@@ -64,11 +66,11 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxBevorzugtesSkin = new BlueControls.Controls.ComboBox();
             this.capAnsicht = new BlueControls.Controls.Caption();
             this.capBevorzugtesSkin = new BlueControls.Controls.Caption();
+            this.Tab_Regeln = new BlueControls.Controls.TabPage();
             this.Tab_Rechte = new BlueControls.Controls.TabPage();
             this.grpDateiVerschluesselung = new BlueControls.Controls.GroupBox();
             this.capDateiverschluesselungInfo = new BlueControls.Controls.Caption();
             this.btnDateiSchluessel = new BlueControls.Controls.Button();
-            this.Tab_Regeln = new BlueControls.Controls.TabPage();
             this.Tab_Binaer = new BlueControls.Controls.TabPage();
             this.lstBinary = new BlueControls.Controls.ListBox();
             this.Tab_Backup = new BlueControls.Controls.TabPage();
@@ -83,15 +85,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Expermimentell = new BlueControls.Controls.TabPage();
             this.btnFremdImport = new BlueControls.Controls.Button();
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
-            this.caption1 = new BlueControls.Controls.Caption();
-            this.txbGlobalScale = new BlueControls.Controls.TextBox();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.Tab_Allgemein.SuspendLayout();
+            this.Tab_Regeln.SuspendLayout();
             this.Tab_Rechte.SuspendLayout();
             this.grpDateiVerschluesselung.SuspendLayout();
-            this.Tab_Regeln.SuspendLayout();
             this.Tab_Binaer.SuspendLayout();
             this.Tab_Backup.SuspendLayout();
             this.grpExport.SuspendLayout();
@@ -193,7 +193,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // txbKennwort
             // 
             this.txbKennwort.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbKennwort.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.txbKennwort.Format = BlueBasics.Enums.enDataFormat.Text;
             this.txbKennwort.Location = new System.Drawing.Point(8, 56);
             this.txbKennwort.Name = "txbKennwort";
             this.txbKennwort.Size = new System.Drawing.Size(216, 22);
@@ -412,12 +412,31 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.Text = "Allgemein";
             this.Tab_Allgemein.UseVisualStyleBackColor = true;
             // 
+            // txbGlobalScale
+            // 
+            this.txbGlobalScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbGlobalScale.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbGlobalScale.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
+            this.txbGlobalScale.Location = new System.Drawing.Point(168, 512);
+            this.txbGlobalScale.Name = "txbGlobalScale";
+            this.txbGlobalScale.Size = new System.Drawing.Size(160, 24);
+            this.txbGlobalScale.TabIndex = 39;
+            // 
+            // caption1
+            // 
+            this.caption1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.caption1.CausesValidation = false;
+            this.caption1.Location = new System.Drawing.Point(8, 512);
+            this.caption1.Name = "caption1";
+            this.caption1.Size = new System.Drawing.Size(144, 18);
+            this.caption1.Text = "Bevorzugtes Skalierung:";
+            // 
             // cbxVerwaisteDaten
             // 
             this.cbxVerwaisteDaten.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cbxVerwaisteDaten.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxVerwaisteDaten.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxVerwaisteDaten.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.cbxVerwaisteDaten.Format = BlueBasics.Enums.enDataFormat.Text;
             this.cbxVerwaisteDaten.Location = new System.Drawing.Point(168, 582);
             this.cbxVerwaisteDaten.Name = "cbxVerwaisteDaten";
             this.cbxVerwaisteDaten.Size = new System.Drawing.Size(160, 24);
@@ -477,7 +496,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxAnsicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cbxAnsicht.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxAnsicht.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxAnsicht.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.cbxAnsicht.Format = BlueBasics.Enums.enDataFormat.Text;
             this.cbxAnsicht.Location = new System.Drawing.Point(168, 558);
             this.cbxAnsicht.Name = "cbxAnsicht";
             this.cbxAnsicht.Size = new System.Drawing.Size(160, 24);
@@ -488,7 +507,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxJoinTyp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cbxJoinTyp.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxJoinTyp.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxJoinTyp.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.cbxJoinTyp.Format = BlueBasics.Enums.enDataFormat.Text;
             this.cbxJoinTyp.Location = new System.Drawing.Point(168, 466);
             this.cbxJoinTyp.Name = "cbxJoinTyp";
             this.cbxJoinTyp.Size = new System.Drawing.Size(160, 24);
@@ -499,7 +518,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxBevorzugtesSkin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cbxBevorzugtesSkin.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxBevorzugtesSkin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxBevorzugtesSkin.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.cbxBevorzugtesSkin.Format = BlueBasics.Enums.enDataFormat.Text;
             this.cbxBevorzugtesSkin.Location = new System.Drawing.Point(168, 534);
             this.cbxBevorzugtesSkin.Name = "cbxBevorzugtesSkin";
             this.cbxBevorzugtesSkin.Size = new System.Drawing.Size(160, 24);
@@ -522,6 +541,18 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capBevorzugtesSkin.Name = "capBevorzugtesSkin";
             this.capBevorzugtesSkin.Size = new System.Drawing.Size(112, 18);
             this.capBevorzugtesSkin.Text = "Bevorzugtes Skin:";
+            // 
+            // Tab_Regeln
+            // 
+            this.Tab_Regeln.Controls.Add(this.RuleItemEditor);
+            this.Tab_Regeln.Controls.Add(this.lbxRuleSelector);
+            this.Tab_Regeln.Location = new System.Drawing.Point(4, 25);
+            this.Tab_Regeln.Name = "Tab_Regeln";
+            this.Tab_Regeln.Padding = new System.Windows.Forms.Padding(3);
+            this.Tab_Regeln.Size = new System.Drawing.Size(1039, 616);
+            this.Tab_Regeln.TabIndex = 3;
+            this.Tab_Regeln.Text = "Regeln";
+            this.Tab_Regeln.UseVisualStyleBackColor = true;
             // 
             // Tab_Rechte
             // 
@@ -564,18 +595,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnDateiSchluessel.TabIndex = 1;
             this.btnDateiSchluessel.Text = "Dateien ";
             this.btnDateiSchluessel.Click += new System.EventHandler(this.DateienSchlüssel_Click);
-            // 
-            // Tab_Regeln
-            // 
-            this.Tab_Regeln.Controls.Add(this.RuleItemEditor);
-            this.Tab_Regeln.Controls.Add(this.lbxRuleSelector);
-            this.Tab_Regeln.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Regeln.Name = "Tab_Regeln";
-            this.Tab_Regeln.Padding = new System.Windows.Forms.Padding(3);
-            this.Tab_Regeln.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Regeln.TabIndex = 3;
-            this.Tab_Regeln.Text = "Regeln";
-            this.Tab_Regeln.UseVisualStyleBackColor = true;
             // 
             // Tab_Binaer
             // 
@@ -655,8 +674,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ExportSets.TabIndex = 0;
             this.ExportSets.Text = "ExportAufgaben";
             this.ExportSets.ItemCheckedChanged += new System.EventHandler(this.ExportSets_Item_CheckedChanged);
-            this.ExportSets.RemoveClicked += new System.EventHandler<EventArgs.ListOfBasicListItemEventArgs>(this.ExportSets_RemoveClicked);
             this.ExportSets.AddClicked += new System.EventHandler(this.ExportSets_AddClicked);
+            this.ExportSets.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.ExportSets_RemoveClicked);
             // 
             // Tab_Sortierung
             // 
@@ -737,25 +756,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capExperimentellWarnung.Size = new System.Drawing.Size(488, 80);
             this.capExperimentellWarnung.Text = resources.GetString("capExperimentellWarnung.Text");
             // 
-            // caption1
-            // 
-            this.caption1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.caption1.CausesValidation = false;
-            this.caption1.Location = new System.Drawing.Point(8, 512);
-            this.caption1.Name = "caption1";
-            this.caption1.Size = new System.Drawing.Size(144, 18);
-            this.caption1.Text = "Bevorzugtes Skalierung:";
-            // 
-            // txbGlobalScale
-            // 
-            this.txbGlobalScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbGlobalScale.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbGlobalScale.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
-            this.txbGlobalScale.Location = new System.Drawing.Point(168, 512);
-            this.txbGlobalScale.Name = "txbGlobalScale";
-            this.txbGlobalScale.Size = new System.Drawing.Size(160, 24);
-            this.txbGlobalScale.TabIndex = 39;
-            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1050, 677);
@@ -770,9 +770,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpKennwort.ResumeLayout(false);
             this.GlobalTab.ResumeLayout(false);
             this.Tab_Allgemein.ResumeLayout(false);
+            this.Tab_Regeln.ResumeLayout(false);
             this.Tab_Rechte.ResumeLayout(false);
             this.grpDateiVerschluesselung.ResumeLayout(false);
-            this.Tab_Regeln.ResumeLayout(false);
             this.Tab_Binaer.ResumeLayout(false);
             this.Tab_Backup.ResumeLayout(false);
             this.grpExport.ResumeLayout(false);

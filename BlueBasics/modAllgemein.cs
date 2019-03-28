@@ -169,8 +169,8 @@ namespace BlueBasics
         {
             CollectGarbage();
 
-            var w = Math.Max(Convert.ToInt32(_Pic.Width - Left + Right), 1);
-            var h = Math.Max(Convert.ToInt32(_Pic.Height - Top + Bottom), 1);
+            var w = Math.Max((int)(_Pic.Width - Left + Right), 1);
+            var h = Math.Max((int)(_Pic.Height - Top + Bottom), 1);
 
             var _BMP2 = new Bitmap(w, h);
             using (var GR = Graphics.FromImage(_BMP2))
@@ -381,18 +381,18 @@ namespace BlueBasics
 
             if (!SwapX)
             {
-                x = 150 - Convert.ToInt32(w1 / 2.0);
-                if (Point.X < Screenshot.Width / 2.0) { x = Screenshot.Width - 150 - Convert.ToInt32(w1 / 2.0); }
+                x = 150 - (int)(w1 / 2.0);
+                if (Point.X < Screenshot.Width / 2.0) { x = Screenshot.Width - 150 - (int)(w1 / 2.0); }
             }
             else
             {
-                x = Screenshot.Width - 150 - Convert.ToInt32(w1 / 2.0);
-                if (Point.X < Screenshot.Width / 2.0) { x = 150 - Convert.ToInt32(w1 / 2.0); }
+                x = Screenshot.Width - 150 - (int)(w1 / 2.0);
+                if (Point.X < Screenshot.Width / 2.0) { x = 150 - (int)(w1 / 2.0); }
             }
 
 
-            var y = 150 - Convert.ToInt32(w1 / 2.0);
-            if (Point.Y < Screenshot.Height / 2.0) { y = Screenshot.Height - 150 - Convert.ToInt32(w1 / 2.0); }
+            var y = 150 - (int)(w1 / 2.0);
+            if (Point.Y < Screenshot.Height / 2.0) { y = Screenshot.Height - 150 - (int)(w1 / 2.0); }
 
             var r = new Rectangle(x, y, w1, w1);
 
@@ -483,8 +483,8 @@ namespace BlueBasics
 
 
             var tempPoly_RoundRec = new GraphicsPath();
-            if (radius > height / 2.0 + 2) { radius = Convert.ToInt32(height / 2.0) + 2; }
-            if (radius > width / 2.0 + 2) { radius = Convert.ToInt32(width / 2.0) + 2; }
+            if (radius > height / 2.0 + 2) { radius = (int)(height / 2.0) + 2; }
+            if (radius > width / 2.0 + 2) { radius = (int)(width / 2.0) + 2; }
 
             tempPoly_RoundRec.AddLine(x + radius, y, x + width - radius, y);
 

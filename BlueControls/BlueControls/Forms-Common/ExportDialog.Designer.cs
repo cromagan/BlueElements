@@ -126,7 +126,7 @@ namespace BlueControls.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.FrmDrucken_Layout1.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.FrmDrucken_Layout1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.FrmDrucken_Layout1.Format = BlueBasics.Enums.enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.FrmDrucken_Layout1.Format = BlueBasics.Enums.enDataFormat.Text;
             this.FrmDrucken_Layout1.Location = new System.Drawing.Point(96, 8);
             this.FrmDrucken_Layout1.Name = "FrmDrucken_Layout1";
             this.FrmDrucken_Layout1.Size = new System.Drawing.Size(618, 24);

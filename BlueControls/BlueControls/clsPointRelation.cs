@@ -184,7 +184,7 @@ namespace BlueControls
         public override string ToString()
         {
 
-            var t = "{Type=" + Convert.ToInt32(_relationtype) +
+            var t = "{Type=" + (int)(_relationtype) +
                        ", Value=" + _Richtmaß;
 
 

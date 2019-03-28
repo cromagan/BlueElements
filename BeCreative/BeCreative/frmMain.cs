@@ -600,7 +600,7 @@ namespace BeCreative
                     TableView.Dock = System.Windows.Forms.DockStyle.None;
 
                     BlueFormulax.Dock = System.Windows.Forms.DockStyle.Right;
-                    BlueFormulax.Width = Convert.ToInt32(MinimumSize.Width / 2.0);
+                    BlueFormulax.Width = (int)(MinimumSize.Width / 2.0);
 
                     TableView.BringToFront();
                     TableView.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -615,7 +615,7 @@ namespace BeCreative
                     TableView.Dock = System.Windows.Forms.DockStyle.None;
 
                     BlueFormulax.Dock = System.Windows.Forms.DockStyle.Top;
-                    BlueFormulax.Height = Convert.ToInt32(MinimumSize.Height / 2.0);
+                    BlueFormulax.Height = (int)(MinimumSize.Height / 2.0);
 
                     TableView.BringToFront();
                     TableView.Dock = System.Windows.Forms.DockStyle.Fill;

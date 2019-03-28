@@ -66,7 +66,7 @@ namespace BlueControls.Forms
             // Views
             // 
             this.Views.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.Views.Format = enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.Views.Format = enDataFormat.Text;
             this.Views.Location = new Point(112, 2);
             this.Views.Name = "Views";
             this.Views.Size = new Size(152, 22);

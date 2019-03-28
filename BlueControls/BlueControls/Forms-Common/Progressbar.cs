@@ -1,4 +1,23 @@
-﻿using BlueControls.Forms;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using BlueControls.Forms;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -26,8 +45,8 @@ namespace BlueControls.DialogBoxes
         {
             InitializeComponent();
             capTXT.Text = Text;
-            var He = Math.Min(capTXT.TextRequiredSize().Height, Convert.ToInt32(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-            var Wi = Math.Min(capTXT.TextRequiredSize().Width, Convert.ToInt32(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+            var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+            var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
             this.Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
         }
 
@@ -105,7 +124,7 @@ namespace BlueControls.DialogBoxes
         //        frmProgressBar.Width = Math.Max(frmProgressBar._Caption1.Width + GenericControl.Skin.Padding * 2, frmProgressBar.Width);
         //        if (Parentform != null)
         //        {
-        //            frmProgressBar.Left = Convert.ToInt32(Parentform.Left + (Parentform.Width - frmProgressBar.Width) / 2.0);
+        //            frmProgressBar.Left = (int)(Parentform.Left + (Parentform.Width - frmProgressBar.Width) / 2.0);
         //        }
         //        else
         //        {
@@ -118,7 +137,7 @@ namespace BlueControls.DialogBoxes
         //        frmProgressBar.Height = Math.Max(frmProgressBar._Caption1.Height + GenericControl.Skin.Padding * 2, frmProgressBar.Height);
         //        if (Parentform != null)
         //        {
-        //            frmProgressBar.Top = Convert.ToInt32(Parentform.Top + (Parentform.Height - frmProgressBar.Height) / 2.0);
+        //            frmProgressBar.Top = (int)(Parentform.Top + (Parentform.Height - frmProgressBar.Height) / 2.0);
         //        }
         //        else
         //        {
@@ -155,7 +174,7 @@ namespace BlueControls.DialogBoxes
                 {
                     var d = eProgressbar_TimeDic[Math.Max(0, Current - 100)];
                     var ts = DateTime.Now.Subtract(d).TotalSeconds;
-                    tmpCalculatedSeconds = Convert.ToInt32(ts / Math.Min(Current, 100) * (Count - Current));
+                    tmpCalculatedSeconds = (int)(ts / Math.Min(Current, 100) * (Count - Current));
                 }
                 else
                 {
@@ -215,7 +234,7 @@ namespace BlueControls.DialogBoxes
                 }
             }
 
-            var PRT = Convert.ToInt32(PR * 100);
+            var PRT = (int)(PR * 100);
             if (PRT > 100) { PRT = 100; }
             if (PRT < 0) { PRT = 0; }
 
@@ -231,11 +250,11 @@ namespace BlueControls.DialogBoxes
             }
             else if (eProgressbar_LastCalulatedSeconds > 94)
             {
-                T = "<br>" + PRT + " % - Geschätzte Restzeit:   " + Convert.ToInt32(eProgressbar_LastCalulatedSeconds / 60) + " Minuten<tab>";
+                T = "<br>" + PRT + " % - Geschätzte Restzeit:   " + (int)(eProgressbar_LastCalulatedSeconds / 60) + " Minuten<tab>";
             }
             else if (eProgressbar_LastCalulatedSeconds > 10)
             {
-                T = "<br>" + PRT + " % - Geschätzte Restzeit: " + Convert.ToInt32(eProgressbar_LastCalulatedSeconds / 5) * 5 + " Sekunden<tab>";
+                T = "<br>" + PRT + " % - Geschätzte Restzeit: " + (int)(eProgressbar_LastCalulatedSeconds / 5) * 5 + " Sekunden<tab>";
             }
             else if (eProgressbar_LastCalulatedSeconds > 0)
             {

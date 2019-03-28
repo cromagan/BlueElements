@@ -453,7 +453,7 @@ namespace BlueBasics
             C = C + "|";
             if (Height > 0 && Width != Height) { C = C + Height; }
             C = C + "|";
-            if (Effekt != enImageCodeEffect.Ohne) { C = C + Convert.ToInt32(Effekt); }
+            if (Effekt != enImageCodeEffect.Ohne) { C = C + (int)(Effekt); }
             C = C + "|";
             C = C + Färbung;
             C = C + "|";

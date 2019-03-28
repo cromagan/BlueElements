@@ -171,6 +171,18 @@ namespace BlueDatabase.Enums
         co_Ueberschrift3 = 176,
         co_Prefix = 177,
         co_KeyColumnKey = 178,
+        co_LinkedCell_RowKey=179,
+        co_LinkedCell_ColumnKey=180,
+        co_LinkedCell_ColumnValueFoundIn=181,
+        co_LinkedCell_ColumnValueAdd=182,
+        co_LinkedCell_Behaviour = 183,
+        co_DropDownKey =184,
+        co_VorschlagColumn=185,
+        co_Align = 186,
+        co_Regex = 187,
+        co_SortMask = 188,
+        co_ZellenZusammenfassen = 189,
+
 
 
         ce_Value_withoutSizeData = 200,

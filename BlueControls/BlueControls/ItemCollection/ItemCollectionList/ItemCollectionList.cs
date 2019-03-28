@@ -349,7 +349,7 @@ namespace BlueControls.ItemCollection
         {
             float w = 0;
 
-            var maxh = Convert.ToInt32(MaxWidth * 0.8);
+            var maxh = (int)(MaxWidth * 0.8);
 
             foreach (var ThisItem in this)
             {
@@ -407,31 +407,31 @@ namespace BlueControls.ItemCollection
             switch (GalleryStyle)
             {
                 case enBlueListBoxAppearance.Gallery:
-                    Sp = Convert.ToInt32(Math.Truncate(Max.Width / 350.0));
+                    Sp = (int)(Math.Truncate(Max.Width / 350.0));
                     if (Sp > 10) { Sp = 10; }
                     if (Sp < 1) { Sp = 1; }
 
                     if (SliderY != null)
                     {
-                        MultiX = Convert.ToInt32(Math.Truncate((Max.Width - SliderY.Width) / (double)Sp));
+                        MultiX = (int)(Math.Truncate((Max.Width - SliderY.Width) / (double)Sp));
                     }
                     else
                     {
-                        MultiX = Convert.ToInt32(Math.Truncate(Max.Width / (double)Sp));
+                        MultiX = (int)(Math.Truncate(Max.Width / (double)Sp));
                     }
                     break;
 
                 case enBlueListBoxAppearance.FileSystem:
 
-                    Sp = Convert.ToInt32(Math.Truncate(Max.Width / 110.0));
+                    Sp = (int)(Math.Truncate(Max.Width / 110.0));
                     if (Sp < 1) { Sp = 1; }
                     if (SliderY != null)
                     {
-                        MultiX = Convert.ToInt32(Math.Truncate((Max.Width - SliderY.Width) / (double)Sp));
+                        MultiX = (int)(Math.Truncate((Max.Width - SliderY.Width) / (double)Sp));
                     }
                     else
                     {
-                        MultiX = Convert.ToInt32(Math.Truncate(Max.Width / (double)Sp));
+                        MultiX = (int)(Math.Truncate(Max.Width / (double)Sp));
                     }
                     break;
 
@@ -467,14 +467,14 @@ namespace BlueControls.ItemCollection
                             }
                         }
 
-                        Max = new SizeF(Convert.ToInt32(Max.Width + BiggestWidth / 2), Max.Height + 100);
+                        Max = new SizeF((int)(Max.Width + BiggestWidth / 2), Max.Height + 100);
                     }
 
 
                     // Wenn die Maximale Höhe aller Items Größer als der Draw-Bereich ist, versuche, es auf mehrere Spalten aufzuteilen.
                     if (Bigy > Max.Height)
                     {
-                        Sp = Convert.ToInt32(Math.Truncate(Max.Width / (BiggestWidth + GenericControl.Skin.PaddingSmal)));
+                        Sp = (int)(Math.Truncate(Max.Width / (BiggestWidth + GenericControl.Skin.PaddingSmal)));
                         if (Sp > 1 && !MustBeOneColumn)
                         {
                             if (Bigy / Sp > Max.Height)
@@ -490,7 +490,7 @@ namespace BlueControls.ItemCollection
 
                         do
                         {
-                            MultiX = Convert.ToInt32(Math.Truncate(Max.Width / (double)Sp));
+                            MultiX = (int)(Math.Truncate(Max.Width / (double)Sp));
                             if (Sp == 1)
                             {
                                 break;
@@ -591,7 +591,7 @@ namespace BlueControls.ItemCollection
                     {
                         // Oben nach Unten, Texte und alles andere
                         CY += YVal;
-                        if (IsZ > Convert.ToInt32(Math.Truncate((Count - 1) / (double)Sp)))
+                        if (IsZ > (int)(Math.Truncate((Count - 1) / (double)Sp)))
                         {
                             IsZ = 0;
                             CY = 0;

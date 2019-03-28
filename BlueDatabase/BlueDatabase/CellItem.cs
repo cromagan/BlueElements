@@ -128,13 +128,8 @@ namespace BlueDatabase
             {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Binärdaten:
                 case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.Telefonnummer:
-                case enDataFormat.Email:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Values_für_LinkedCellDropdown:
@@ -191,9 +186,6 @@ namespace BlueDatabase
                     Txt = ColumnItem.ColumnReplace(Txt, column, Style);
                     break;
 
-                case enDataFormat.Binärdaten_Bild:
-                    return string.Empty;
-
 
                 case enDataFormat.Schrift:
                     if (Style == enShortenStyle.HTML) { break; }
@@ -246,7 +238,6 @@ namespace BlueDatabase
             {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
                 case enDataFormat.RelationText:
                 case enDataFormat.KeyForSame:
                     return defaultImage; // z.B. KontextMenu

@@ -636,7 +636,7 @@ namespace BlueControls.Controls
 
             foreach (var t in nt)
             {
-                var a = (enASCIIKey)Convert.ToInt32(t);
+                var a = (enASCIIKey)t;
                 if (_eTxt.InsertChar(a, _Cursor_CharPos))
                 {
                     _Cursor_CharPos += 1;
@@ -684,7 +684,7 @@ namespace BlueControls.Controls
             switch ((int)e.KeyChar)
             {
                 case (int)enASCIIKey.ENTER:
-                    KeyPress((enASCIIKey)Convert.ToInt32(e.KeyChar));
+                    KeyPress((enASCIIKey)e.KeyChar);
                     OnEnter();
                     return;
 
@@ -697,7 +697,7 @@ namespace BlueControls.Controls
                     return;
 
                 default:
-                    KeyPress((enASCIIKey)Convert.ToInt32(e.KeyChar));
+                    KeyPress((enASCIIKey)e.KeyChar);
                     break;
             }
 
@@ -1102,7 +1102,7 @@ namespace BlueControls.Controls
                 if (cc == MaE || _eTxt.Chars[cc].Pos.X < _eTxt.Chars[TmpcharS].Pos.X || Math.Abs(_eTxt.Chars[cc].Pos.Y - _eTxt.Chars[TmpcharS].Pos.Y) > 0.001) //Jetzt ist der Zeitpunkt zum Zeichen/start setzen
                 {
 
-                    var r = new Rectangle(Convert.ToInt32(_eTxt.Chars[TmpcharS].Pos.X + _eTxt.Left), Convert.ToInt32(_eTxt.Chars[TmpcharS].Pos.Y + 2 + _eTxt.Top), Convert.ToInt32(_eTxt.Chars[cc - 1].Pos.X + _eTxt.Chars[cc - 1].Size.Width - _eTxt.Chars[TmpcharS].Pos.X), Convert.ToInt32(_eTxt.Chars[cc - 1].Pos.Y + _eTxt.Chars[cc - 1].Size.Height - _eTxt.Chars[TmpcharS].Pos.Y));
+                    var r = new Rectangle((int)(_eTxt.Chars[TmpcharS].Pos.X + _eTxt.Left), (int)(_eTxt.Chars[TmpcharS].Pos.Y + 2 + _eTxt.Top), (int)(_eTxt.Chars[cc - 1].Pos.X + _eTxt.Chars[cc - 1].Size.Width - _eTxt.Chars[TmpcharS].Pos.X), (int)(_eTxt.Chars[cc - 1].Pos.Y + _eTxt.Chars[cc - 1].Size.Height - _eTxt.Chars[TmpcharS].Pos.Y));
 
                     if (r.Width < 2) { r = new Rectangle(r.Left, r.Top, 2, r.Height); }
 
@@ -1190,7 +1190,7 @@ namespace BlueControls.Controls
 
                     if (SliderY.Visible)
                     {
-                        _eTxt.Top = Convert.ToInt32(-SliderY.Value);
+                        _eTxt.Top = (int)(-SliderY.Value);
                         _eTxt.MaxWidth = DisplayRectangle.Width - Skin.PaddingSmal * 2 - SliderY.Width;
                         SliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
                     }
@@ -1541,7 +1541,7 @@ namespace BlueControls.Controls
                                 if (!Dictionary.IsWordOk(wort))
                                 {
                                     if (SpellChecker.CancellationPending) { return; }
-                                    SpellChecker.ReportProgress(Convert.ToInt32(woEnd / (double)_eTxt.Chars.Count * 100), "Mark;" + woStart + ";" + (woEnd - 1));
+                                    SpellChecker.ReportProgress((int)(woEnd / (double)_eTxt.Chars.Count * 100), "Mark;" + woStart + ";" + (woEnd - 1));
                                 }
                             }
 

@@ -6,7 +6,7 @@
         None = -1,
         Textfeld = 1,
         FileHandling_InDateiSystem = 2,
-        Image_Auswahl_Dialog = 3,
+        //Image_Auswahl_Dialog = 3,
         Listbox = 4,
         Farb_Auswahl_Dialog = 5,
         //RelationEditor_InTable = 6,

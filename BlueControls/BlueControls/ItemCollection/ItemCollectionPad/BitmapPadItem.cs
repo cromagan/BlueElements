@@ -149,7 +149,7 @@ namespace BlueControls.ItemCollection
 
         public override bool Contains(PointF value, decimal zoomfactor)
         {
-            return UsedArea().Contains(Convert.ToInt32(value.X), Convert.ToInt32(value.Y));
+            return UsedArea().Contains((int)(value.X), (int)(value.Y));
         }
 
 
@@ -318,7 +318,7 @@ namespace BlueControls.ItemCollection
         protected override string ToStringLevel2()
         {
             var t = "";
-            t = t + "Modus=" + Convert.ToInt32(BildModus) + ", ";
+            t = t + "Modus=" + (int)(BildModus) + ", ";
             if (!string.IsNullOrEmpty(_PlaceHolderString))
             {
                 t = t + "Placeholder=" + _PlaceHolderString.ToNonCritical() + ", ";
@@ -482,11 +482,11 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl(true));
 
             var Comms = new ItemCollectionList();
-            Comms.Add(new TextListItem(Convert.ToInt32(enSizeModes.BildAbschneiden).ToString(), "Abschneiden", QuickImage.Get("BildmodusAbschneiden|32")));
-            Comms.Add(new TextListItem(Convert.ToInt32(enSizeModes.Verzerren).ToString(), "Verzerren", QuickImage.Get("BildmodusVerzerren|32")));
-            Comms.Add(new TextListItem(Convert.ToInt32(enSizeModes.EmptySpace).ToString(), "Einpassen", QuickImage.Get("BildmodusEinpassen|32")));
+            Comms.Add(new TextListItem(((int)enSizeModes.BildAbschneiden).ToString(), "Abschneiden", QuickImage.Get("BildmodusAbschneiden|32")));
+            Comms.Add(new TextListItem(((int)enSizeModes.Verzerren).ToString(), "Verzerren", QuickImage.Get("BildmodusVerzerren|32")));
+            Comms.Add(new TextListItem(((int)enSizeModes.EmptySpace).ToString(), "Einpassen", QuickImage.Get("BildmodusEinpassen|32")));
 
-            l.Add(new FlexiControl("Bild-Modus", Convert.ToInt32(BildModus).ToString(), Comms));
+            l.Add(new FlexiControl("Bild-Modus", ((int)BildModus).ToString(), Comms));
 
 
             l.Add(new FlexiControl(true));
@@ -494,18 +494,18 @@ namespace BlueControls.ItemCollection
 
 
             var Rahms = new ItemCollectionList();
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Undefiniert).ToString(), "Ohne Rahmen", enImageCode.Kreuz));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Kapitel, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Standard).ToString(), "Standard", GenericControl.Skin.GetBlueFont(PadStyles.Style_Standard, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_StandardFett).ToString(), "Standard Fett", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardFett, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardAlternativ, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GenericControl.Skin.GetBlueFont(PadStyles.Style_KleinerZusatz, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Undefiniert).ToString(), "Ohne Rahmen", enImageCode.Kreuz));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Kapitel, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_Standard).ToString(), "Standard", GenericControl.Skin.GetBlueFont(PadStyles.Style_Standard, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardFett, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardAlternativ, Parent.SheetStyle).SymbolOfLine()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GenericControl.Skin.GetBlueFont(PadStyles.Style_KleinerZusatz, Parent.SheetStyle).SymbolOfLine()));
             Rahms.Sort();
 
 
-            l.Add(new FlexiControl("Umrandung", Convert.ToInt32(Format).ToString(), Rahms));
+            l.Add(new FlexiControl("Umrandung", ((int)Format).ToString(), Rahms));
 
 
             l.Add(new FlexiControl("Hintergrund weiß füllen", WhiteBack));

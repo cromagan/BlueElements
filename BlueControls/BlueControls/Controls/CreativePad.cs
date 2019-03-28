@@ -711,7 +711,7 @@ namespace BlueControls.Controls
         internal Rectangle DruckbereichRect()
         {
             if (P_rLO == null) { return new Rectangle(0, 0, 0, 0); }
-            return new Rectangle(Convert.ToInt32(P_rLO.X), Convert.ToInt32(P_rLO.Y), Convert.ToInt32(P_rRU.X - P_rLO.X), Convert.ToInt32(P_rRU.Y - P_rLO.Y));
+            return new Rectangle((int)P_rLO.X, (int)P_rLO.Y, (int)(P_rRU.X - P_rLO.X), (int)(P_rRU.Y - P_rLO.Y));
         }
 
 
@@ -763,17 +763,17 @@ namespace BlueControls.Controls
 
             do
             {
-                if (Convert.ToInt32(r.Width * Scale) > 10000)
+                if ((int)(r.Width * Scale) > 10000)
                 {
                     Scale = Scale * 0.5m;
                     //  MieseQuali = True
                 }
-                else if (Convert.ToInt32(r.Height * Scale) > 10000)
+                else if ((int)(r.Height * Scale) > 10000)
                 {
                     Scale = Scale * 0.5m;
                     //  MieseQuali = True
                 }
-                else if (Convert.ToInt32(r.Height * Scale) * Convert.ToInt32(r.Height * Scale) > 60000000)
+                else if ((int)(r.Height * Scale) * (int)(r.Height * Scale) > 60000000)
                 {
                     Scale = Scale * 0.5m;
                     //         MieseQuali = True
@@ -789,7 +789,7 @@ namespace BlueControls.Controls
 
 
 
-            var I = new Bitmap(Convert.ToInt32(r.Width * Scale), Convert.ToInt32(r.Height * Scale));
+            var I = new Bitmap((int)(r.Width * Scale), (int)(r.Height * Scale));
 
 
             using (var gr = Graphics.FromImage(I))
@@ -1081,19 +1081,19 @@ namespace BlueControls.Controls
             if (_SheetSizeInMM.Width > 0 && _SheetSizeInMM.Height > 0)
             {
                 Skin.Draw_Back(TMPGR, enDesign.Table_And_Pad, vState, DisplayRectangle, this, true);
-                var tx = Convert.ToInt32(P_LO.X * _Zoom - X);
-                var ty = Convert.ToInt32(P_LO.Y * _Zoom - Y);
-                var tx2 = Convert.ToInt32(P_RU.X * _Zoom - X);
-                var ty2 = Convert.ToInt32(P_RU.Y * _Zoom - Y);
+                var tx = (int)(P_LO.X * _Zoom - X);
+                var ty = (int)(P_LO.Y * _Zoom - Y);
+                var tx2 = (int)(P_RU.X * _Zoom - X);
+                var ty2 = (int)(P_RU.Y * _Zoom - Y);
 
                 var R = new Rectangle(tx, ty, tx2 - tx, ty2 - ty);
                 TMPGR.FillRectangle(Brushes.White, R);
                 TMPGR.DrawRectangle(PenGray, R);
 
-                var rtx = Convert.ToInt32(P_rLO.X * _Zoom - X);
-                var rty = Convert.ToInt32(P_rLO.Y * _Zoom - Y);
-                var rtx2 = Convert.ToInt32(P_rRU.X * _Zoom - X);
-                var rty2 = Convert.ToInt32(P_rRU.Y * _Zoom - Y);
+                var rtx = (int)(P_rLO.X * _Zoom - X);
+                var rty = (int)(P_rLO.Y * _Zoom - Y);
+                var rtx2 = (int)(P_rRU.X * _Zoom - X);
+                var rty2 = (int)(P_rRU.Y * _Zoom - Y);
                 var Rr = new Rectangle(rtx, rty, rtx2 - rtx, rty2 - rty);
                 if (!_ShowInPrintMode)
                 {
@@ -1270,13 +1270,13 @@ namespace BlueControls.Controls
 
             if (SliderShowing)
             {
-                w = Convert.ToInt32(Width - SliderY.Width - r.Width * _Zoom);
-                h = Convert.ToInt32(Height - SliderX.Height - r.Height * _Zoom);
+                w = (int)(Width - SliderY.Width - r.Width * _Zoom);
+                h = (int)(Height - SliderX.Height - r.Height * _Zoom);
             }
             else
             {
-                w = Convert.ToInt32(Width - r.Width * _Zoom);
-                h = Convert.ToInt32(Height - r.Height * _Zoom);
+                w = (int)(Width - r.Width * _Zoom);
+                h = (int)(Height - r.Height * _Zoom);
             }
 
 
@@ -1836,13 +1836,13 @@ namespace BlueControls.Controls
             if (DoX)
             {
                 Value = MasterPoint.X + MouseMovedTo;
-                Value = Convert.ToInt32(Value / Multi) * Multi;
+                Value = (int)(Value / Multi) * Multi;
                 // Formel umgestellt
                 return Value - MasterPoint.X;
             }
 
             Value = MasterPoint.Y + MouseMovedTo;
-            Value = Convert.ToInt32(Value / Multi) * Multi;
+            Value = (int)(Value / Multi) * Multi;
             return Value - MasterPoint.Y;
         }
 
@@ -2677,7 +2677,7 @@ namespace BlueControls.Controls
             //   e.HasMorePages = False
             var i = ToBitmap(2).Resize(e.PageBounds.Width, e.PageBounds.Height, enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern, InterpolationMode.HighQualityBicubic, true);
             if (i == null) { return; }
-            e.Graphics.DrawImage(i, Convert.ToInt32((e.PageBounds.Width - i.Width) / 2.0), Convert.ToInt32((e.PageBounds.Height - i.Height) / 2.0), i.Width, i.Height);
+            e.Graphics.DrawImage(i, (int)((e.PageBounds.Width - i.Width) / 2.0), (int)((e.PageBounds.Height - i.Height) / 2.0), i.Width, i.Height);
         }
 
         private void OnPrintPage(PrintPageEventArgs e)
@@ -2702,18 +2702,18 @@ namespace BlueControls.Controls
 
             if (DruckerDokument.DefaultPageSettings.Landscape)
             {
-                SheetSizeInMM = new SizeF(Convert.ToInt32(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), Convert.ToInt32(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
+                SheetSizeInMM = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
 
-                RandinMM = new System.Windows.Forms.Padding(Convert.ToInt32(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), Convert.ToInt32(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), Convert.ToInt32(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), Convert.ToInt32(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+                RandinMM = new System.Windows.Forms.Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
 
 
             }
             else
             {
                 // Hochformat
-                SheetSizeInMM = new SizeF(Convert.ToInt32(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100), Convert.ToInt32(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
+                SheetSizeInMM = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
 
-                RandinMM = new System.Windows.Forms.Padding(Convert.ToInt32(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), Convert.ToInt32(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), Convert.ToInt32(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), Convert.ToInt32(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+                RandinMM = new System.Windows.Forms.Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
 
 
 
@@ -2735,11 +2735,11 @@ namespace BlueControls.Controls
 
 
             OriD.DefaultPageSettings.Landscape = false;
-            OriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", Convert.ToInt32(SheetSizeInMM.Width / 25.4 * 100), Convert.ToInt32(SheetSizeInMM.Height / 25.4 * 100));
-            OriD.DefaultPageSettings.Margins.Top = Convert.ToInt32(RandinMM.Top / 25.4 * 100);
-            OriD.DefaultPageSettings.Margins.Bottom = Convert.ToInt32(RandinMM.Bottom / 25.4 * 100);
-            OriD.DefaultPageSettings.Margins.Left = Convert.ToInt32(RandinMM.Left / 25.4 * 100);
-            OriD.DefaultPageSettings.Margins.Right = Convert.ToInt32(RandinMM.Right / 25.4 * 100);
+            OriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(SheetSizeInMM.Width / 25.4 * 100), (int)(SheetSizeInMM.Height / 25.4 * 100));
+            OriD.DefaultPageSettings.Margins.Top = (int)(RandinMM.Top / 25.4 * 100);
+            OriD.DefaultPageSettings.Margins.Bottom = (int)(RandinMM.Bottom / 25.4 * 100);
+            OriD.DefaultPageSettings.Margins.Left = (int)(RandinMM.Left / 25.4 * 100);
+            OriD.DefaultPageSettings.Margins.Right = (int)(RandinMM.Right / 25.4 * 100);
 
 
 
@@ -2751,9 +2751,9 @@ namespace BlueControls.Controls
             }
 
 
-            SheetSizeInMM = new SizeF(Convert.ToInt32(OriD.DefaultPageSettings.PaperSize.Width * 25.4 / 100), Convert.ToInt32(OriD.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
+            SheetSizeInMM = new SizeF((int)(OriD.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(OriD.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
 
-            RandinMM = new System.Windows.Forms.Padding(Convert.ToInt32(OriD.DefaultPageSettings.Margins.Left * 25.4 / 100), Convert.ToInt32(OriD.DefaultPageSettings.Margins.Top * 25.4 / 100), Convert.ToInt32(OriD.DefaultPageSettings.Margins.Right * 25.4 / 100), Convert.ToInt32(OriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+            RandinMM = new System.Windows.Forms.Padding((int)(OriD.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
 
             GenPoints();
         }
@@ -2776,7 +2776,7 @@ namespace BlueControls.Controls
             var done = false;
             foreach (PaperSize ps in DruckerDokument.PrinterSettings.PaperSizes)
             {
-                if (ps.Width == Convert.ToInt32(SheetSizeInMM.Width / 25.4 * 100) && ps.Height == Convert.ToInt32(SheetSizeInMM.Height / 25.4 * 100))
+                if (ps.Width == (int)(SheetSizeInMM.Width / 25.4 * 100) && ps.Height == (int)(SheetSizeInMM.Height / 25.4 * 100))
                 {
                     done = true;
                     DruckerDokument.DefaultPageSettings.PaperSize = ps;
@@ -2786,11 +2786,11 @@ namespace BlueControls.Controls
 
             if (!done)
             {
-                DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", Convert.ToInt32(SheetSizeInMM.Width / 25.4 * 100), Convert.ToInt32(SheetSizeInMM.Height / 25.4 * 100));
+                DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)(SheetSizeInMM.Width / 25.4 * 100), (int)(SheetSizeInMM.Height / 25.4 * 100));
             }
 
             DruckerDokument.OriginAtMargins = true;
-            DruckerDokument.DefaultPageSettings.Margins = new Margins(Convert.ToInt32(RandinMM.Left / 25.4 * 100), Convert.ToInt32(RandinMM.Right / 25.4 * 100), Convert.ToInt32(RandinMM.Top / 25.4 * 100), Convert.ToInt32(RandinMM.Bottom / 25.4 * 100));
+            DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(RandinMM.Left / 25.4 * 100), (int)(RandinMM.Right / 25.4 * 100), (int)(RandinMM.Top / 25.4 * 100), (int)(RandinMM.Bottom / 25.4 * 100));
         }
 
         public void SaveAsBitmap(string Title, string OptionalFileName)
@@ -2919,14 +2919,10 @@ namespace BlueControls.Controls
             {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.InternetAdresse:
                 case enDataFormat.Gleitkommazahl:
-                case enDataFormat.Text_Ohne_Kritische_Zeichen:
                 case enDataFormat.Datum_und_Uhrzeit:
                 case enDataFormat.Bit:
                 case enDataFormat.Ganzzahl:
-                case enDataFormat.Telefonnummer:
-                case enDataFormat.Email:
                 case enDataFormat.RelationText:
                 case enDataFormat.KeyForSame:
                     ParseVariable(VariableName, enValueType.Text, Row.CellGetString(Column));
@@ -3084,7 +3080,7 @@ namespace BlueControls.Controls
             }
 
 
-            for (var Durch = 0 ; Durch <= 1 ; Durch++)
+            for (var Durch = 0; Durch <= 1; Durch++)
             {
 
                 do

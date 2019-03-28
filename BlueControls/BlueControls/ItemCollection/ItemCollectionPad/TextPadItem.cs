@@ -223,9 +223,9 @@ namespace BlueControls.ItemCollection
 
             if (Rotation != 0) { t = t + "Rotation=" + Rotation + ", "; }
 
-            if (_Format != enDataFormat.Text) { t = t + "Format=" + Convert.ToInt32(_Format) + ", "; }
+            if (_Format != enDataFormat.Text) { t = t + "Format=" + (int)(_Format) + ", "; }
 
-            if (_Align != enAlignment.Top_Left) { t = t + "Alignment=" + Convert.ToInt32(_Align) + ", "; }
+            if (_Align != enAlignment.Top_Left) { t = t + "Alignment=" + (int)(_Align) + ", "; }
 
             t = t + "Fixsize=" + FixSize.ToPlusMinus() + ", ";
             t = t + "AdditionalScale=" + ZusatzScale.ToString().ToNonCritical();
@@ -516,25 +516,25 @@ namespace BlueControls.ItemCollection
 
             var Rahms = new ItemCollectionList();
             //  Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Kapitel, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Standard).ToString(), "Standard", GenericControl.Skin.GetBlueFont(PadStyles.Style_Standard, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_StandardFett).ToString(), "Standard Fett", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardFett, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardAlternativ, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GenericControl.Skin.GetBlueFont(PadStyles.Style_KleinerZusatz, Parent.SheetStyle).SymbolForReadableText()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolForReadableText()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolForReadableText()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Kapitel, Parent.SheetStyle).SymbolForReadableText()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_Standard).ToString(), "Standard", GenericControl.Skin.GetBlueFont(PadStyles.Style_Standard, Parent.SheetStyle).SymbolForReadableText()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardFett, Parent.SheetStyle).SymbolForReadableText()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardAlternativ, Parent.SheetStyle).SymbolForReadableText()));
+            Rahms.Add(new TextListItem(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GenericControl.Skin.GetBlueFont(PadStyles.Style_KleinerZusatz, Parent.SheetStyle).SymbolForReadableText()));
             Rahms.Sort();
-            l.Add(new FlexiControl("Stil", Convert.ToInt32(Format).ToString(), Rahms));
+            l.Add(new FlexiControl("Stil", ((int)Format).ToString(), Rahms));
 
 
 
 
             var Aursicht = new ItemCollectionList();
-            Aursicht.Add(new TextListItem(Convert.ToInt32(enAlignment.Top_Left).ToString(), "Linksbündig ausrichten", enImageCode.Linksbündig));
-            Aursicht.Add(new TextListItem(Convert.ToInt32(enAlignment.Top_HorizontalCenter).ToString(), "Zentrieren", enImageCode.Zentrieren));
-            Aursicht.Add(new TextListItem(Convert.ToInt32(enAlignment.Top_Right).ToString(), "Rechtsbündig ausrichten", enImageCode.Rechtsbündig));
+            Aursicht.Add(new TextListItem(((int)enAlignment.Top_Left).ToString(), "Linksbündig ausrichten", enImageCode.Linksbündig));
+            Aursicht.Add(new TextListItem(((int)enAlignment.Top_HorizontalCenter).ToString(), "Zentrieren", enImageCode.Zentrieren));
+            Aursicht.Add(new TextListItem(((int)enAlignment.Top_Right).ToString(), "Rechtsbündig ausrichten", enImageCode.Rechtsbündig));
             Aursicht.Sort();
-            l.Add(new FlexiControl("Ausrichtung", Convert.ToInt32(_Align).ToString(), Aursicht));
+            l.Add(new FlexiControl("Ausrichtung", ((int)_Align).ToString(), Aursicht));
             l.Add(new FlexiControl("Skalierung", ZusatzScale.ToString(), enDataFormat.Gleitkommazahl, 1));
 
 

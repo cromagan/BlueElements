@@ -95,7 +95,7 @@ namespace BlueControls.ItemCollection
             protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack)
             {
 
-                GR.DrawLine(GenericControl.Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard).Pen(1f), PositionModified.Left, Convert.ToInt32(PositionModified.Top + PositionModified.Height / 2.0), PositionModified.Right, Convert.ToInt32(PositionModified.Top + PositionModified.Height / 2.0));
+                GR.DrawLine(GenericControl.Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard).Pen(1f), PositionModified.Left, (int)(PositionModified.Top + PositionModified.Height / 2.0), PositionModified.Right, (int)(PositionModified.Top + PositionModified.Height / 2.0));
             }
 
 
@@ -108,7 +108,7 @@ namespace BlueControls.ItemCollection
 
             public override void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth)
             {
-                SetCoordinates(new Rectangle(Convert.ToInt32(X), Convert.ToInt32(Y) + 2, Convert.ToInt32(MultiX - SliderWidth), 4));
+                SetCoordinates(new Rectangle((int)(X), (int)(Y) + 2, (int)(MultiX - SliderWidth), 4));
             }
 
             public override SizeF QuickAndDirtySize(int PreferedHeigth)

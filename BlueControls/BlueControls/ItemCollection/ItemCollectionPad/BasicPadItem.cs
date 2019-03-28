@@ -233,7 +233,7 @@ namespace BlueControls.ItemCollection
             }
 
 
-            t = t + "Format=" + Convert.ToInt32(Format) + ", ";
+            t = t + "Format=" + (int)(Format) + ", ";
             t = t + "Print=" + _PrintMe.ToPlusMinus() + ", ";
 
             foreach (var ThisPoint in PointList())
@@ -387,7 +387,7 @@ namespace BlueControls.ItemCollection
         internal Rectangle DrawingKoordinates(decimal cZoom, decimal MoveX, decimal MoveY)
         {
             var f = UsedArea();
-            return new Rectangle(Convert.ToInt32(f.Left * cZoom - MoveX), Convert.ToInt32(f.Top * cZoom - MoveY), Convert.ToInt32(f.Width * cZoom), Convert.ToInt32(f.Height * cZoom));
+            return new Rectangle((int)(f.Left * cZoom - MoveX), (int)(f.Top * cZoom - MoveY), (int)(f.Width * cZoom), (int)(f.Height * cZoom));
         }
 
 

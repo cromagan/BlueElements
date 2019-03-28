@@ -178,7 +178,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.Layout1.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.Layout1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Layout1.Format = enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.Layout1.Format = enDataFormat.Text;
             this.Layout1.Location = new Point(8, 24);
             this.Layout1.Name = "Layout1";
             this.Layout1.Size = new Size(216, 22);
@@ -189,7 +189,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.Spaltx.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.Spaltx.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Spaltx.Format = enDataFormat.Text_Ohne_Kritische_Zeichen;
+            this.Spaltx.Format = enDataFormat.Text;
             this.Spaltx.Location = new Point(168, 24);
             this.Spaltx.Name = "Spaltx";
             this.Spaltx.Size = new Size(232, 22);

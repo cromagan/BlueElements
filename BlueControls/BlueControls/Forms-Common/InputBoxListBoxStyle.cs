@@ -67,7 +67,7 @@ namespace BlueControls.DialogBoxes
 
             if (Items == null || Items.Count == 0)
             {
-                return InputBox.Show(TXT, "", enDataFormat.Text_Ohne_Kritische_Zeichen);
+                return InputBox.Show(TXT, "", enDataFormat.Text);
             }
 
 

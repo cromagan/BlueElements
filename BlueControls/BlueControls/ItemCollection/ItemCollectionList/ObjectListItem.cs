@@ -159,7 +159,7 @@ namespace BlueControls.ItemCollection
 
         public override void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth)
         {
-            SetCoordinates(new Rectangle(Convert.ToInt32(X), Convert.ToInt32(Y), Convert.ToInt32(MultiX - SliderWidth), (int)SizeUntouchedForListBox().Height));
+            SetCoordinates(new Rectangle((int)(X), (int)(Y), (int)(MultiX - SliderWidth), (int)SizeUntouchedForListBox().Height));
         }
 
         public override SizeF QuickAndDirtySize(int PreferedHeigth)

@@ -95,7 +95,7 @@ namespace BlueControls.ItemCollection
                 var p = DCoordinates.PointOf(enAlignment.Bottom_HorizontalCenter);
 
 
-                GR.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), new Rectangle(Convert.ToInt32(p.X - l.Width / 2.0), (int)(p.Y - l.Height * 2), (int)l.Width, (int)l.Height));
+                GR.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), new Rectangle((int)(p.X - l.Width / 2.0), (int)(p.Y - l.Height * 2), (int)l.Width, (int)l.Height));
 
                 GR.DrawString(Anzeige, f, Brushes.Black, new PointF((float)(p.X - l.Width / 2.0), p.Y - l.Height * 2));
 
@@ -131,7 +131,7 @@ namespace BlueControls.ItemCollection
 
             public override bool Contains(PointF value, decimal zoomfactor)
             {
-                return UsedArea().Contains(Convert.ToInt32(value.X), Convert.ToInt32(value.Y));
+                return UsedArea().Contains((int)(value.X), (int)(value.Y));
             }
 
 

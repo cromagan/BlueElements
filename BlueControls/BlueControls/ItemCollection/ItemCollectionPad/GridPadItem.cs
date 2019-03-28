@@ -149,13 +149,13 @@ namespace BlueControls.ItemCollection
                 {
                     do
                     {
-                        GR.DrawLine(p, po.X + Convert.ToInt32(ex), 0, po.X + Convert.ToInt32(ex), SizeOfParentControl.Height);
-                        GR.DrawLine(p, 0, po.Y + Convert.ToInt32(ex), SizeOfParentControl.Width, po.Y + Convert.ToInt32(ex));
+                        GR.DrawLine(p, po.X + (int)(ex), 0, po.X + (int)(ex), SizeOfParentControl.Height);
+                        GR.DrawLine(p, 0, po.Y + (int)(ex), SizeOfParentControl.Width, po.Y + (int)(ex));
 
                         if (ex > 0)
                         {
-                            GR.DrawLine(p, po.X - Convert.ToInt32(ex), 0, po.X - Convert.ToInt32(ex), SizeOfParentControl.Height);
-                            GR.DrawLine(p, 0, po.Y - Convert.ToInt32(ex), SizeOfParentControl.Width, po.Y - Convert.ToInt32(ex));
+                            GR.DrawLine(p, po.X - (int)(ex), 0, po.X - (int)(ex), SizeOfParentControl.Height);
+                            GR.DrawLine(p, 0, po.Y - (int)(ex), SizeOfParentControl.Width, po.Y - (int)(ex));
                         }
 
                         ex = ex + mo;
@@ -221,17 +221,17 @@ namespace BlueControls.ItemCollection
 
                 var Rahms = new ItemCollectionList();
                 //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
-                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolOfLine()));
-                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolOfLine()));
-                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Kapitel, Parent.SheetStyle).SymbolOfLine()));
-                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_Standard).ToString(), "Standard", GenericControl.Skin.GetBlueFont(PadStyles.Style_Standard, Parent.SheetStyle).SymbolOfLine()));
-                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_StandardFett).ToString(), "Standard Fett", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardFett, Parent.SheetStyle).SymbolOfLine()));
-                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardAlternativ, Parent.SheetStyle).SymbolOfLine()));
-                Rahms.Add(new TextListItem(Convert.ToInt32(PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GenericControl.Skin.GetBlueFont(PadStyles.Style_KleinerZusatz, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Kapitel, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(((int)PadStyles.Style_Standard).ToString(), "Standard", GenericControl.Skin.GetBlueFont(PadStyles.Style_Standard, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardFett, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardAlternativ, Parent.SheetStyle).SymbolOfLine()));
+                Rahms.Add(new TextListItem(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GenericControl.Skin.GetBlueFont(PadStyles.Style_KleinerZusatz, Parent.SheetStyle).SymbolOfLine()));
                 Rahms.Sort();
 
 
-                l.Add(new FlexiControl("Stil", Convert.ToInt32(Format).ToString(), Rahms));
+                l.Add(new FlexiControl("Stil", ((int)Format).ToString(), Rahms));
                 return l;
             }
 

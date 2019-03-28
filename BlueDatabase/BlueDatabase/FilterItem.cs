@@ -152,7 +152,7 @@ namespace BlueDatabase
             if (!IsOk()) { return string.Empty; }
 
 
-            var Result = "{Type=" + Convert.ToInt32(_FilterType);
+            var Result = "{Type=" + (int)(_FilterType);
 
             if (_Column != null) { Result = Result + ", " + _Column.ParsableColumnKey(); }
 

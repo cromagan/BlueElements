@@ -406,7 +406,7 @@ namespace BlueDatabase
             var Result = "{";
 
             Result = Result + "Destination=" + _Verzeichnis.ToNonCritical() + ", ";
-            Result = Result + "Type=" + Convert.ToInt32(_Typ) + ", ";
+            Result = Result + "Type=" + (int)(_Typ) + ", ";
             Result = Result + "LastExportTime=" + _LastExportTime + ", ";
 
             Result = Result + "Interval=" + _Intervall + ", ";

@@ -37,21 +37,21 @@ namespace BlueBasics.Enums
 
         // Date_GermanFormat = 15
         Datum_und_Uhrzeit = 16,
-        Binärdaten_Bild = 19,
+        //Binärdaten_Bild = 19,
 
         //Passwort = 20, // String
-        Text_Ohne_Kritische_Zeichen = 21,
+      //  Text_Ohne_Kritische_Zeichen = 21,
 
 
-        Binärdaten = 39,
+       // Binärdaten = 39,
 
 
         // Link_To_BlueDataSystem = 42
-        Telefonnummer = 43, // Spezielle Formate
+       // Telefonnummer = 43, // Spezielle Formate
 
         Farbcode = 45, // Color
-        Email = 46, // Spezielle Formate
-        InternetAdresse = 47, // Spezielle Formate
+        //Email = 46, // Spezielle Formate
+        //InternetAdresse = 47, // Spezielle Formate
 
 
         //Relation = 65,

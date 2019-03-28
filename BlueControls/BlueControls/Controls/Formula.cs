@@ -824,7 +824,7 @@ namespace BlueControls.Controls
 
             if (ViewItem != null)
             {
-                cbxCaptionPosition.Text = Convert.ToInt32(ViewItem.ÜberschriftAnordnung).ToString();
+                cbxCaptionPosition.Text = ((int)ViewItem.ÜberschriftAnordnung).ToString();
 
                 if (ViewItem.Column != null)
                 {
@@ -845,7 +845,7 @@ namespace BlueControls.Controls
                         }
                     }
 
-                    cbxControlType.Text = Convert.ToInt32(ViewItem.Column.EditType).ToString();
+                    cbxControlType.Text = ((int)ViewItem.Column.EditType).ToString();
 
                 }
                 else
@@ -961,7 +961,7 @@ namespace BlueControls.Controls
 
                 case "#ViewRename":
                     if (CurrView == null || CurrView == _Database.Views[0]) { return; }
-                    var n = InputBox.Show("Umbenennen:", CurrView.Name, enDataFormat.Text_Ohne_Kritische_Zeichen);
+                    var n = InputBox.Show("Umbenennen:", CurrView.Name, enDataFormat.Text);
                     if (!string.IsNullOrEmpty(n)) { CurrView.Name = n; }
                     ColumnsEinfärben();
                     break;
@@ -1082,7 +1082,7 @@ namespace BlueControls.Controls
 
         private void Arrangement_Add()
         {
-            var e = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enDataFormat.Text_Ohne_Kritische_Zeichen);
+            var e = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enDataFormat.Text);
             if (string.IsNullOrEmpty(e)) { return; }
 
             _Database.Views.Add(new ColumnViewCollection(_Database, "", e));

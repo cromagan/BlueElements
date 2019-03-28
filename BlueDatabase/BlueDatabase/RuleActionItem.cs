@@ -171,7 +171,7 @@ namespace BlueDatabase
                 case enAction.Anmerkung: Co = 5; break;
 
                 //Bedingungen
-                case enAction.Erhält_den_Focus: Co = 8; break;
+                //case enAction.Erhält_den_Focus: Co = 8; break;
                 case enAction.Ist_der_Nutzer: Co = 10; break;
                 case enAction.Ist: Co = 20; break;
                 case enAction.Ist_Nicht: Co = 30; break;
@@ -187,7 +187,7 @@ namespace BlueDatabase
                 //case enAction.Ist_Jünger_Als: Co = 120; break;
 
                 //Während der Bearbeitung
-                case enAction.Mache_einen_Vorschlag: Co = 190; break;
+                //case enAction.Mache_einen_Vorschlag: Co = 190; break;
 
                 // Einfache Aktionen
                 case enAction.Wert_Setzen: Co = 200; break;
@@ -197,7 +197,7 @@ namespace BlueDatabase
                 // Interaktion mit andern Zellen / Datenbanken
                 case enAction.Berechne: Co = 250; break;
                 case enAction.Substring: Co = 260; break;
-                case enAction.LinkedCell: Co = 270; break;
+                //case enAction.LinkedCell: Co = 270; break;
                 //case enAction.SortiereIntelligent: Co = 290; break;
               //  case enAction.KopiereAndereSpalten: Co = 295; break;
 
@@ -218,7 +218,7 @@ namespace BlueDatabase
         public override string ToString()
         {
 
-            var Result = "{Action=" + Convert.ToInt32(_Action);
+            var Result = "{Action=" + (int)(_Action);
 
             foreach (var t in Columns)
             {
@@ -279,7 +279,7 @@ namespace BlueDatabase
 
 
 
-        public string Execute(RowItem Row, ColumnItem ColumnFocus, bool FreezeMode)
+        public string Execute(RowItem Row, bool FreezeMode)
         {
             if (IsBedingung()) { return string.Empty; }
 
@@ -288,12 +288,10 @@ namespace BlueDatabase
             switch (_Action)
             {
                 case enAction.Setze_Fehlerhaft:
-                    if (ColumnFocus != null) { return string.Empty; }
-                    if (string.IsNullOrEmpty(_Text)) { return "*"; }
+                     if (string.IsNullOrEmpty(_Text)) { return "*"; }
                     return _Text;
 
                 case enAction.Wert_Setzen:
-                    if (ColumnFocus != null) { return string.Empty; }
                     foreach (var t in Columns)
                     {
                         Row.CellSet(t, _Text, FreezeMode);
@@ -302,7 +300,6 @@ namespace BlueDatabase
 
 
                 case enAction.Wert_Dazu:
-                    if (ColumnFocus != null) { return string.Empty; }
 
                     foreach (var t in Columns)
                     {
@@ -313,7 +310,6 @@ namespace BlueDatabase
                     return string.Empty;
 
                 case enAction.Wert_Weg:
-                    if (ColumnFocus != null) { return string.Empty; }
                     foreach (var t in Columns)
                     {
                         var w = Row.CellGetList(t);
@@ -322,24 +318,23 @@ namespace BlueDatabase
                     }
                     return string.Empty;
 
-                case enAction.Mache_einen_Vorschlag:
-                    if (ColumnFocus == null) { return string.Empty; }
-                    var x = new FilterCollection(Columns[0].Database);
-                    foreach (var t in Columns)
-                    {
-                        x.Add(new FilterItem(t, enFilterType.Istgleich_GroßKleinEgal | enFilterType.MultiRowIgnorieren, Row.CellGetString(t)));
-                    }
+                //case enAction.Mache_einen_Vorschlag:
+                //    if (ColumnFocus == null) { return string.Empty; }
+                //    var x = new FilterCollection(Columns[0].Database);
+                //    foreach (var t in Columns)
+                //    {
+                //        x.Add(new FilterItem(t, enFilterType.Istgleich_GroßKleinEgal | enFilterType.MultiRowIgnorieren, Row.CellGetString(t)));
+                //    }
 
-                    x.Add(new FilterItem(ColumnFocus, enFilterType.Ungleich_MultiRowIgnorieren, ""));
-                    x.Add(new FilterItem(ColumnFocus.Database.Column.SysCorrect, enFilterType.Istgleich, true.ToPlusMinus()));
+                //    x.Add(new FilterItem(ColumnFocus, enFilterType.Ungleich_MultiRowIgnorieren, ""));
+                //    x.Add(new FilterItem(ColumnFocus.Database.Column.SysCorrect, enFilterType.Istgleich, true.ToPlusMinus()));
 
-                    var r = ColumnFocus.Database.Row[x];
-                    if (r == null) { return string.Empty; }
-                    return ColumnFocus.Database.Cell.GetString(ColumnFocus, r);
+                //    var r = ColumnFocus.Database.Row[x];
+                //    if (r == null) { return string.Empty; }
+                //    return ColumnFocus.Database.Cell.GetString(ColumnFocus, r);
 
 
                 case enAction.Berechne:
-                    if (ColumnFocus != null) { return string.Empty; }
                     foreach (var t in Columns)
                     {
                         var erg = MatheErgebnis(_Text, Row);
@@ -361,7 +356,6 @@ namespace BlueDatabase
                     return string.Empty;
 
                 case enAction.Substring:
-                    if (ColumnFocus != null) { return string.Empty; }
 
                     foreach (var t in Columns)
                     {
@@ -420,73 +414,73 @@ namespace BlueDatabase
                 //    }
                 //    return string.Empty;
 
-                case enAction.LinkedCell:
-                    if (ColumnFocus != null) { return string.Empty; }
+                //case enAction.LinkedCell:
+                //    if (ColumnFocus != null) { return string.Empty; }
 
 
-                    foreach (var t in Columns)
-                    {
-                        Database LinkedDB = null;
-                        if (t != null) { LinkedDB = t.LinkedDatabase(); }
-                        if (LinkedDB == null) { return "Verlinkte Datenbank der Spalte '#Spalte:" + t.Name + "' nicht gefunden."; }
+                //    foreach (var t in Columns)
+                //    {
+                //        Database LinkedDB = null;
+                //        if (t != null) { LinkedDB = t.LinkedDatabase(); }
+                //        if (LinkedDB == null) { return "Verlinkte Datenbank der Spalte '#Spalte:" + t.Name + "' nicht gefunden."; }
 
-                        var o = (_Text + "\r+").SplitByCR();
-                        if (o.Length < 5) { return "Definitionsfehler in der Spalte '#Spalte:" + t.Name + "' der 'Verlinkten-Zell-Zuweisung'"; }
+                //        var o = (_Text + "\r+").SplitByCR();
+                //        if (o.Length < 5) { return "Definitionsfehler in der Spalte '#Spalte:" + t.Name + "' der 'Verlinkten-Zell-Zuweisung'"; }
 
-                        if (!int.TryParse(o[0], out var RowKey)) { return "Spalte mit Zeilenschlüssel in der Spalte '#Spalte:" + t.Name + "' nicht definiert"; }
-                        var rowC = t.Database.Column.SearchByKey(RowKey);
-                        if (rowC == null) { return "Die Spalte für den Zeilenschlüssel in der Spalte '#Spalte:" + t.Name + "' existiert nicht"; }
+                //        if (!int.TryParse(o[0], out var RowKey)) { return "Spalte mit Zeilenschlüssel in der Spalte '#Spalte:" + t.Name + "' nicht definiert"; }
+                //        var rowC = t.Database.Column.SearchByKey(RowKey);
+                //        if (rowC == null) { return "Die Spalte für den Zeilenschlüssel in der Spalte '#Spalte:" + t.Name + "' existiert nicht"; }
 
-                        ColumnItem tarC = null;
+                //        ColumnItem tarC = null;
 
-                        if (int.TryParse(o[1], out var ColumnKey))
-                        {
-                            var c = t.Database.Column.SearchByKey(ColumnKey);
-                            if (c == null) { return "Die Spalte für den Spaltenschlüssel in der Spalte '#Spalte:" + t.Name + "' existiert nicht"; }
-                            if (!int.TryParse(Row.CellGetString(c), out var colKey)) { return "Der Text Spalte in 'ColumnKeyInColumn'  in der Spalte '#Spalte:" + t.Name + "'  ist fehlerhaft"; }
-                            tarC = LinkedDB.Column.SearchByKey(colKey);
+                //        if (int.TryParse(o[1], out var ColumnKey))
+                //        {
+                //            var c = t.Database.Column.SearchByKey(ColumnKey);
+                //            if (c == null) { return "Die Spalte für den Spaltenschlüssel in der Spalte '#Spalte:" + t.Name + "' existiert nicht"; }
+                //            if (!int.TryParse(Row.CellGetString(c), out var colKey)) { return "Der Text Spalte in 'ColumnKeyInColumn'  in der Spalte '#Spalte:" + t.Name + "'  ist fehlerhaft"; }
+                //            tarC = LinkedDB.Column.SearchByKey(colKey);
 
-                            if (!string.IsNullOrEmpty(o[3]))
-                            {
-                                tarC = LinkedDB.Column[o[3] + tarC.Name];
-                            }
+                //            if (!string.IsNullOrEmpty(o[3]))
+                //            {
+                //                tarC = LinkedDB.Column[o[3] + tarC.Name];
+                //            }
 
-                        }
-                        else if (int.TryParse(o[2], out var TargetColumnKey))
-                        {
-                            tarC = LinkedDB.Column.SearchByKey(TargetColumnKey);
-                        }
-                        else
-                        {
-                            return "Spalte mit Spaltenschlüssel/Zielspalte in der Spalte '#Spalte:" + t.Name + "' nicht definiert";
-                        }
+                //        }
+                //        else if (int.TryParse(o[2], out var TargetColumnKey))
+                //        {
+                //            tarC = LinkedDB.Column.SearchByKey(TargetColumnKey);
+                //        }
+                //        else
+                //        {
+                //            return "Spalte mit Spaltenschlüssel/Zielspalte in der Spalte '#Spalte:" + t.Name + "' nicht definiert";
+                //        }
 
-                        if (Row.CellIsNullOrEmpty(rowC))
-                        {
-                            return "Kein Schlüssel angegeben."; // RowAdded Ereigniss löst ein DoRules aus. Und da ist noch kein Wert gesetzt.
-                        }
-                        var tarR = LinkedDB.Row[Row.CellGetString(rowC)];
+                //        if (Row.CellIsNullOrEmpty(rowC))
+                //        {
+                //            return "Kein Schlüssel angegeben."; // RowAdded Ereigniss löst ein DoRules aus. Und da ist noch kein Wert gesetzt.
+                //        }
+                //        var tarR = LinkedDB.Row[Row.CellGetString(rowC)];
 
-                        if (tarC != null && tarR == null && o[4] == ((int)enFehlendesZiel.ZeileAnlegen).ToString())
-                        {
-                            tarR = LinkedDB.Row.Add(Row.CellGetString(rowC));
-                        }
+                //        if (tarC != null && tarR == null && o[4] == ((int)enFehlendesZiel.ZeileAnlegen).ToString())
+                //        {
+                //            tarR = LinkedDB.Row.Add(Row.CellGetString(rowC));
+                //        }
 
 
-                        if (tarC != null && tarR != null)
-                        {
-                            Row.Database.Cell.SetValueBehindLinkedValue(t, Row, CellCollection.KeyOfCell(tarC, tarR), FreezeMode);
-                        }
-                        else
-                        {
-                            Row.Database.Cell.SetValueBehindLinkedValue(t, Row, string.Empty, FreezeMode);
+                //        if (tarC != null && tarR != null)
+                //        {
+                //            Row.Database.Cell.SetValueBehindLinkedValue(t, Row, CellCollection.KeyOfCell(tarC, tarR), FreezeMode);
+                //        }
+                //        else
+                //        {
+                //            Row.Database.Cell.SetValueBehindLinkedValue(t, Row, string.Empty, FreezeMode);
 
-                            if (o[4] == ((int)enFehlendesZiel.Ignorieren).ToString()) { return string.Empty; }
+                //            if (o[4] == ((int)enFehlendesZiel.Ignorieren).ToString()) { return string.Empty; }
 
-                            return "Zelle in Zieldatenbank in Spalte '#Spalte:" + t.Name + "' nicht vorhanden";
-                        }
-                    }
-                    return string.Empty;
+                //            return "Zelle in Zieldatenbank in Spalte '#Spalte:" + t.Name + "' nicht vorhanden";
+                //        }
+                //    }
+                //    return string.Empty;
 
 
                 //  case enAction.SortiereIntelligent:
@@ -672,10 +666,10 @@ namespace BlueDatabase
                     return QuickImage.Get(enImageCode.Ordner, 16, "00FF00", "");
                 case enAction.Auf_einen_existierenden_Pfad_verweist:
                     return QuickImage.Get(enImageCode.Ordner);
-                case enAction.Erhält_den_Focus:
-                    return QuickImage.Get(enImageCode.Gänsefüßchen);
-                case enAction.Mache_einen_Vorschlag:
-                    return QuickImage.Get(enImageCode.Sonne);
+                //case enAction.Erhält_den_Focus:
+                //    return QuickImage.Get(enImageCode.Gänsefüßchen);
+                //case enAction.Mache_einen_Vorschlag:
+                //    return QuickImage.Get(enImageCode.Sonne);
                 case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
                     return QuickImage.Get(enImageCode.Blitz);
                 case enAction.Sperre_die_Zelle:
@@ -686,8 +680,8 @@ namespace BlueDatabase
                     return QuickImage.Get(enImageCode.Binärdaten);
                 case enAction.Anmerkung:
                     return QuickImage.Get(enImageCode.Information);
-                case enAction.LinkedCell:
-                    return QuickImage.Get(enImageCode.Fernglas);
+                //case enAction.LinkedCell:
+                //    return QuickImage.Get(enImageCode.Fernglas);
                 //case enAction.Ist_Jünger_Als:
                 //    return QuickImage.Get(enImageCode.Uhr);
                 //case enAction.SortiereIntelligent:
@@ -818,10 +812,10 @@ namespace BlueDatabase
             {
                 case enAction.Ist:
                     return enNeededColumns.OneOrMore;
-                case enAction.Erhält_den_Focus:
-                    return enNeededColumns.OnlyOne;
-                case enAction.Mache_einen_Vorschlag:
-                    return enNeededColumns.OneOrMore;
+                //case enAction.Erhält_den_Focus:
+                //    return enNeededColumns.OnlyOne;
+                //case enAction.Mache_einen_Vorschlag:
+                //    return enNeededColumns.OneOrMore;
                 case enAction.Ist_Nicht:
                     return enNeededColumns.OneOrMore;
                 case enAction.Enthält_ungültige_Zeichen:
@@ -886,10 +880,10 @@ namespace BlueDatabase
             {
                 case enAction.Ist:
                     return enNeededText.DoesNotMatter;
-                case enAction.Erhält_den_Focus:
-                    return enNeededText.None;
-                case enAction.Mache_einen_Vorschlag:
-                    return enNeededText.None;
+                //case enAction.Erhält_den_Focus:
+                //    return enNeededText.None;
+                //case enAction.Mache_einen_Vorschlag:
+                //    return enNeededText.None;
                 case enAction.Ist_Nicht:
                     return enNeededText.MaxOneLine;
                 case enAction.Enthält_ungültige_Zeichen:
@@ -1048,10 +1042,10 @@ namespace BlueDatabase
                             "Dateinamen oder Dateinamen mit Dateipfaden sind nicht <i>WAHR</i>.";
                     break;
 
-                case enAction.Erhält_den_Focus:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn das Bearbeitungsfeld in der Formularansicht den Fokus erhält.<br>" +
-                            "Nur in Kombination mit <b>Vorschlag machen</b> erlaubt.";
-                    break;
+                //case enAction.Erhält_den_Focus:
+                //    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn das Bearbeitungsfeld in der Formularansicht den Fokus erhält.<br>" +
+                //            "Nur in Kombination mit <b>Vorschlag machen</b> erlaubt.";
+                //    break;
 
                 case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
                     r = r + "Diese Bedingung ist <i>WAHR</i>, wenn am Ende des <b>Inhalts der Zelle</b> Leerzeichen oder Zeilenumbruchcodes sind. <br>" +
@@ -1089,11 +1083,11 @@ namespace BlueDatabase
                     MehrSpaltenAllegeamacht = true;
                     break;
 
-                case enAction.Mache_einen_Vorschlag:
-                    r = r + "Diese Aktion benötigt die vorherige Bedingung <b>erhält den Focus</b>.<br>" +
-                            "Die hier angegebenen Spalten werden verglichen, ob diese bereits in einer Zeile der Datenbank vorkommen.<br>" +
-                            "Falls ja, wird der Wert, der in dieser Zeile enthalten ist, in das Feld im Formular geschrieben.";
-                    break;
+                //case enAction.Mache_einen_Vorschlag:
+                //    r = r + "Diese Aktion benötigt die vorherige Bedingung <b>erhält den Focus</b>.<br>" +
+                //            "Die hier angegebenen Spalten werden verglichen, ob diese bereits in einer Zeile der Datenbank vorkommen.<br>" +
+                //            "Falls ja, wird der Wert, der in dieser Zeile enthalten ist, in das Feld im Formular geschrieben.";
+                //    break;
 
                 case enAction.Berechne:
                     r = r + "Diese Aktion berechnet einen Wert. Dazu muss hier im Textfeld eine Formel eingegeben werden.<br>" +
@@ -1178,7 +1172,7 @@ namespace BlueDatabase
 
         public string ErrorReason()
         {
-            if (_Action == enAction.LinkedCell) { return string.Empty; }
+            //if (_Action == enAction.LinkedCell) { return string.Empty; }
 
             foreach (var t in Columns)
             {
@@ -1307,14 +1301,14 @@ namespace BlueDatabase
                     if (string.IsNullOrEmpty(_Text)) { return "die Zelle in " + ColsOder + " leer ist"; }
                     return "die gesamte Zelle in " + ColsOder + " genau der Wert '" + _Text.Replace("\r", "' oder '") + "' ist";
 
-                case enAction.Erhält_den_Focus:
-                    return "die Zelle in " + ColsOder + " den Focus erhält";
+                //case enAction.Erhält_den_Focus:
+                //    return "die Zelle in " + ColsOder + " den Focus erhält";
 
                 case enAction.Berechnung_ist_True:
                     return "die Formel '" + _Text + "' WAHR ist";
 
-                case enAction.Mache_einen_Vorschlag:
-                    return "mache einen Vorschlag, bezugnehmend auf " + ColsUnd + "";
+                //case enAction.Mache_einen_Vorschlag:
+                //    return "mache einen Vorschlag, bezugnehmend auf " + ColsUnd + "";
 
 
                 case enAction.Ist_Nicht:
@@ -1382,8 +1376,8 @@ namespace BlueDatabase
                 //    return "die Zeile jünger als " + _Text + " Stunde(n) ist";
 
 
-                case enAction.LinkedCell:
-                    return "ändere die ID der verlinkten Datenbank in " + ColsUnd;
+                //case enAction.LinkedCell:
+                //    return "ändere die ID der verlinkten Datenbank in " + ColsUnd;
 
                 //case enAction.KopiereAndereSpalten:
                 //    return "halte die Inhalte der verknüpften Spalten von " + ColsUnd + " gleich";
@@ -1398,7 +1392,7 @@ namespace BlueDatabase
             return string.Empty;
         }
 
-        public string TrifftZuText(RowItem vRow, ColumnItem ColumnFocus)
+        public string TrifftZuText(RowItem vRow)
         {
 
             string[] w = null;
@@ -1419,13 +1413,13 @@ namespace BlueDatabase
             {
                 foreach (var t1 in Columns)
                 {
-                    t = t + TrifftZuText(vRow, t1, w, ColumnFocus);
+                    t = t + TrifftZuText(vRow, t1, w);
                     if (!string.IsNullOrEmpty(t)) { break; }
                 }
             }
             else
             {
-                t = t + TrifftZuText(vRow, null, w, ColumnFocus) + "\r";
+                t = t + TrifftZuText(vRow, null, w) + "\r";
             }
 
             do
@@ -1440,7 +1434,7 @@ namespace BlueDatabase
             return t;
         }
 
-        public bool TrifftZu(RowItem vRow, ColumnItem ColumnFocus)
+        public bool TrifftZu(RowItem vRow)
         {
             if (!IsBedingung()) { return true; }
 
@@ -1462,19 +1456,19 @@ namespace BlueDatabase
                 {
                     foreach (var t in Columns)
                     {
-                        if (TrifftZu(vRow, t, w[wtz], ColumnFocus)) { return true; }
+                        if (TrifftZu(vRow, t, w[wtz])) { return true; }
                     }
                 }
                 else
                 {
-                    if (TrifftZu(vRow, null, w[wtz], ColumnFocus)) { return true; }
+                    if (TrifftZu(vRow, null, w[wtz])) { return true; }
                 }
             }
 
             return false;
         }
 
-        private bool TrifftZu(RowItem Row, ColumnItem Column, string OneValue, ColumnItem ColumnFocus)
+        private bool TrifftZu(RowItem Row, ColumnItem Column, string OneValue)
         {
 
             switch (_Action)
@@ -1575,8 +1569,8 @@ namespace BlueDatabase
                 case enAction.Ist_der_Nutzer:
                     return Row.Database.PermissionCheckWithoutAdmin(OneValue, Row);
 
-                case enAction.Erhält_den_Focus:
-                    return Convert.ToBoolean(ColumnFocus == Column);
+                //case enAction.Erhält_den_Focus:
+                //    return Convert.ToBoolean(ColumnFocus == Column);
 
                 case enAction.Berechnung_ist_True:
                     return Convert.ToBoolean(MatheErgebnis(_Text, Row) == -1);
@@ -1590,14 +1584,14 @@ namespace BlueDatabase
             return false;
         }
 
-        private string TrifftZuText(RowItem Row, ColumnItem Column, string[] AllValue, ColumnItem ColumnFocus)
+        private string TrifftZuText(RowItem Row, ColumnItem Column, string[] AllValue)
         {
 
             // Es werden nur Bedingungen abgefragt, weil es nur Sinn macht, einen Fehlertext generieren zu lassen.
 
             for (var z = 0; z <= AllValue.GetUpperBound(0); z++)
             {
-                if (TrifftZu(Row, Column, AllValue[z], ColumnFocus))
+                if (TrifftZu(Row, Column, AllValue[z]))
                 {
 
                     switch (_Action)
@@ -1681,8 +1675,8 @@ namespace BlueDatabase
                 case enAction.Auf_eine_existierende_Datei_verweist:
                 case enAction.Auf_einen_existierenden_Pfad_verweist:
                 case enAction.Enthält:
-                case enAction.Erhält_den_Focus:
-                case enAction.Mache_einen_Vorschlag:
+                //case enAction.Erhält_den_Focus:
+                //case enAction.Mache_einen_Vorschlag:
                 case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
                 case enAction.Setze_Fehlerhaft:
                 case enAction.Enthält_Zeichenkette:
@@ -1731,20 +1725,20 @@ namespace BlueDatabase
                     }
                     break;
 
-                case enAction.LinkedCell:
-                    if (!string.IsNullOrEmpty(_Text))
-                    {
-                        var o = _Text.SplitByCR();
+                //case enAction.LinkedCell:
+                //    if (!string.IsNullOrEmpty(_Text))
+                //    {
+                //        var o = _Text.SplitByCR();
 
-                        if (o.Length == 3)
-                        {
-                            if (!int.TryParse(o[0], out var RowKey)) { l.Add(Columns[0].Database.Column.SearchByKey(RowKey)); }
-                            if (!int.TryParse(o[1], out var ColKey)) { l.Add(Columns[0].Database.Column.SearchByKey(ColKey)); }
-                        }
+                //        if (o.Length == 3)
+                //        {
+                //            if (!int.TryParse(o[0], out var RowKey)) { l.Add(Columns[0].Database.Column.SearchByKey(RowKey)); }
+                //            if (!int.TryParse(o[1], out var ColKey)) { l.Add(Columns[0].Database.Column.SearchByKey(ColKey)); }
+                //        }
 
 
-                    }
-                    break;
+                //    }
+                //    break;
 
 
 

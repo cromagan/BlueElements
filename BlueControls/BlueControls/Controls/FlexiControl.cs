@@ -242,8 +242,8 @@ namespace BlueControls.Controls
 
             list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
             var s = DummyGraphics().MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
-            var x = Math.Max(Convert.ToInt32(list.WidthOfBiggestItem(500) + 20 + s.Width), 200);
-            var y = Math.Max(Convert.ToInt32(list.HeightOfBiggestItem(100)) + Skin.PaddingSmal * 2, 24);
+            var x = Math.Max((int)(list.WidthOfBiggestItem(500) + 20 + s.Width), 200);
+            var y = Math.Max((int)(list.HeightOfBiggestItem(100)) + Skin.PaddingSmal * 2, 24);
 
             Size = new Size(x, y);
             _Value = InitialValue;
@@ -1407,7 +1407,7 @@ namespace BlueControls.Controls
                     }
                     else
                     {
-                        Control.ImageCode = "Kreis|24|||" + Color.FromArgb(Convert.ToInt32(_Value)).ToHTMLCode();
+                        Control.ImageCode = "Kreis|24|||" + Color.FromArgb(int.Parse(_Value)).ToHTMLCode();
                     }
                     break;
 
@@ -1429,7 +1429,7 @@ namespace BlueControls.Controls
         private TextBox Control_Create_TextBox()
         {
             var Control = new TextBox();
-            StyleTextBox(Control, enDataFormat.Text_Ohne_Kritische_Zeichen, false, string.Empty, false, string.Empty, true);
+            StyleTextBox(Control, enDataFormat.Text, false, string.Empty, false, string.Empty, true);
             UpdateValueToControl();
             StandardBehandlung(Control);
             return Control;

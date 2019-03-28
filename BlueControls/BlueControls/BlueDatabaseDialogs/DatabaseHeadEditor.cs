@@ -200,19 +200,19 @@ namespace BlueControls.BlueDatabaseDialogs
 
             cbxJoinTyp.Item.Clear();
             cbxJoinTyp.Item.AddRange(typeof(enJoinTyp));
-            cbxJoinTyp.Text = Convert.ToInt32(_Database.JoinTyp).ToString();
+            cbxJoinTyp.Text = ((int)_Database.JoinTyp).ToString();
 
             cbxVerwaisteDaten.Item.Clear();
             cbxVerwaisteDaten.Item.AddRange(typeof(enVerwaisteDaten));
-            cbxVerwaisteDaten.Text = Convert.ToInt32(_Database.VerwaisteDaten).ToString();
+            cbxVerwaisteDaten.Text = ((int)_Database.VerwaisteDaten).ToString();
 
             cbxBevorzugtesSkin.Item.Clear();
             cbxBevorzugtesSkin.Item.AddRange(typeof(enSkin));
-            cbxBevorzugtesSkin.Text = Convert.ToInt32(_Database.Skin).ToString();
+            cbxBevorzugtesSkin.Text = _Database.Skin.ToString();
 
             cbxAnsicht.Item.Clear();
             cbxAnsicht.Item.AddRange(typeof(enAnsicht));
-            cbxAnsicht.Text = Convert.ToInt32(_Database.Ansicht).ToString();
+            cbxAnsicht.Text = ((int)_Database.Ansicht).ToString();
 
 
             PermissionGroups_NewRow.Item.Clear();
@@ -251,7 +251,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 if (ThisRule != null)
                 {
                     var obj = new ObjectListItem(ThisRule);
-                    obj.Enabled = string.IsNullOrEmpty(ThisRule.SystemKey);
+                    //obj.Enabled = string.IsNullOrEmpty(ThisRule.SystemKey);
                     lbxRuleSelector.Item.Add(obj);
                 }
             }
@@ -465,7 +465,7 @@ namespace BlueControls.BlueDatabaseDialogs
             switch (e.ClickedComand.Internal())
             {
                 case "Umbenennen":
-                    var n = InputBox.Show("<b><u>Bild umbenennen:</u></b><br><br>Achtung! Dadruch können Bezüge<br> in Texten und Spalten verlorengehen!", l.Caption, enDataFormat.Text_Ohne_Kritische_Zeichen);
+                    var n = InputBox.Show("<b><u>Bild umbenennen:</u></b><br><br>Achtung! Dadruch können Bezüge<br> in Texten und Spalten verlorengehen!", l.Caption, enDataFormat.Text);
                     if (!string.IsNullOrEmpty(n)) { l.Caption = n; }
                     break;
 

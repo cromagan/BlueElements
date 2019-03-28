@@ -71,20 +71,20 @@ namespace BlueControls.Classes_Editor
 
                 var Ac = (enAction)z;
 
-                if (Ac.ToString() != z.ToString())
-                {
+                //if (Ac.ToString() != z.ToString())
+                //{
 
 
-                    if (Ac != enAction.LinkedCell)
-                    {
+                //    if (Ac != enAction.LinkedCell)
+                //    {
 
-                        var t = string.Empty;
-                        QuickImage s = null;
-                        RuleActionItem.MaximalText(tmp.Rule.Database, Ac, ref t, ref s);
+                //        var t = string.Empty;
+                //        QuickImage s = null;
+                //        RuleActionItem.MaximalText(tmp.Rule.Database, Ac, ref t, ref s);
 
-                        Rule_Aktion.Item.Add(new TextListItem(z.ToString(), t, s));
-                    }
-                }
+                //        Rule_Aktion.Item.Add(new TextListItem(z.ToString(), t, s));
+                //    }
+                //}
             }
 
 
@@ -198,7 +198,7 @@ namespace BlueControls.Classes_Editor
                 return;
             }
 
-            tmp.Action = (enAction)Convert.ToInt32(Rule_Aktion.Text);
+            tmp.Action = (enAction)int.Parse(Rule_Aktion.Text);
 
             var l = Rule_Aktion_Columns.Item.Checked().ToListOfString();
             tmp.Columns.Clear(); // = New List(Of ColumnItem)

@@ -178,7 +178,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void Rename_Click(object sender, System.EventArgs e)
         {
-            var n = InputBox.Show("Umbenennen:", _TableView.Database.ColumnArrangements[_TableView.Arrangement].Name, enDataFormat.Text_Ohne_Kritische_Zeichen);
+            var n = InputBox.Show("Umbenennen:", _TableView.Database.ColumnArrangements[_TableView.Arrangement].Name, enDataFormat.Text);
             if (!string.IsNullOrEmpty(n)) { _TableView.Database.ColumnArrangements[_TableView.Arrangement].Name = n; }
         }
 

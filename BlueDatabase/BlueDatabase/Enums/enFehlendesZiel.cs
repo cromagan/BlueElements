@@ -21,7 +21,7 @@ namespace BlueDatabase.Enums
 {
     public enum enFehlendesZiel
     {
-        FehlerAusgeben = 0,
+        Undefiniert = 0,
         Ignorieren = 1,
         ZeileAnlegen = 2
     }
