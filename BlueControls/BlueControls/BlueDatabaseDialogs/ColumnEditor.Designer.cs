@@ -30,8 +30,11 @@ namespace BlueControls.BlueDatabaseDialogs
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColumnEditor));
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabDesign = new BlueControls.Controls.TabPage();
+            this.butZusammenfassen = new BlueControls.Controls.Button();
+            this.cbxAlign = new BlueControls.Controls.ComboBox();
             this.txbReplacer = new BlueControls.Controls.TextBox();
             this.btnStandard = new BlueControls.Controls.Button();
+            this.capAlign = new BlueControls.Controls.Caption();
             this.txbPrefix = new BlueControls.Controls.TextBox();
             this.caption7 = new BlueControls.Controls.Caption();
             this.capUeberschrift3 = new BlueControls.Controls.Caption();
@@ -56,27 +59,34 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption1 = new BlueControls.Controls.Caption();
             this.Caption4 = new BlueControls.Controls.Caption();
             this.btnMultiline = new BlueControls.Controls.Button();
-            this.grbBildCode = new BlueControls.Controls.GroupBox();
+            this.grpBildCode = new BlueControls.Controls.GroupBox();
             this.cbxBildCodeImageNotfound = new BlueControls.Controls.ComboBox();
             this.capBildCodeImageNotfound = new BlueControls.Controls.Caption();
             this.capBildCodeConstHeight = new BlueControls.Controls.Caption();
             this.txbBildCodeConstHeight = new BlueControls.Controls.TextBox();
             this.tabRechte = new BlueControls.Controls.TabPage();
-            this.btnIgnoreLock = new BlueControls.Controls.Button();
+            this.grpAuswahlmenuOptionen = new BlueControls.Controls.GroupBox();
             this.btnOtherValuesToo = new BlueControls.Controls.Button();
-            this.lbxCellEditor = new BlueControls.Controls.ListBox();
-            this.btnEditableStandard = new BlueControls.Controls.Button();
             this.tbxAuswaehlbareWerte = new BlueControls.Controls.TextBox();
-            this.Caption9 = new BlueControls.Controls.Caption();
             this.Caption15 = new BlueControls.Controls.Caption();
             this.btnCanBeEmpty = new BlueControls.Controls.Button();
+            this.cbxDropDownKey = new BlueControls.Controls.ComboBox();
+            this.capDropDownKey = new BlueControls.Controls.Caption();
+            this.btnIgnoreLock = new BlueControls.Controls.Button();
+            this.lbxCellEditor = new BlueControls.Controls.ListBox();
+            this.btnEditableStandard = new BlueControls.Controls.Button();
+            this.Caption9 = new BlueControls.Controls.Caption();
             this.btnEditableDropdown = new BlueControls.Controls.Button();
             this.tabAutoBearbeitung = new BlueControls.Controls.TabPage();
+            this.cbxSchlüsselspalte = new BlueControls.Controls.ComboBox();
             this.tbxInitValue = new BlueControls.Controls.TextBox();
             this.Caption12 = new BlueControls.Controls.Caption();
+            this.capSchlüsselspalte = new BlueControls.Controls.Caption();
             this.btnAutoEditKleineFehler = new BlueControls.Controls.Button();
             this.btnAutoEditToUpper = new BlueControls.Controls.Button();
             this.tbxRunden = new BlueControls.Controls.TextBox();
+            this.cbxVorschlag = new BlueControls.Controls.ComboBox();
+            this.capVorschlag = new BlueControls.Controls.Caption();
             this.Caption11 = new BlueControls.Controls.Caption();
             this.btnAutoEditAutoSort = new BlueControls.Controls.Button();
             this.tabFilter = new BlueControls.Controls.TabPage();
@@ -93,10 +103,12 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption17 = new BlueControls.Controls.Caption();
             this.QI_Vorschau = new BlueControls.Controls.Button();
             this.tabSonstiges = new BlueControls.Controls.TabPage();
-            this.cbxSchlüsselspalte = new BlueControls.Controls.ComboBox();
-            this.capSchlüsselspalte = new BlueControls.Controls.Caption();
+            this.txbSortMask = new BlueControls.Controls.TextBox();
             this.btnSpellChecking = new BlueControls.Controls.Button();
+            this.txbRegex = new BlueControls.Controls.TextBox();
+            this.capSortiermaske = new BlueControls.Controls.Caption();
             this.btnLogUndo = new BlueControls.Controls.Button();
+            this.capRegex = new BlueControls.Controls.Caption();
             this.tbxAllowedChars = new BlueControls.Controls.TextBox();
             this.Caption13 = new BlueControls.Controls.Caption();
             this.tbxTags = new BlueControls.Controls.TextBox();
@@ -120,10 +132,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
             this.tabSpezial = new BlueControls.Controls.TabPage();
-            this.groupBox2 = new BlueControls.Controls.GroupBox();
-            this.grpLinkedCell = new BlueControls.Controls.GroupBox();
-            this.groupBox1 = new BlueControls.Controls.GroupBox();
-            this.gpxVerlinkteZellen = new BlueControls.Controls.GroupBox();
+            this.grpLinkToFileSystem = new BlueControls.Controls.GroupBox();
+            this.grpLinkedDatabase = new BlueControls.Controls.GroupBox();
+            this.grpColumnsForLinkedDatabase = new BlueControls.Controls.GroupBox();
+            this.grpVerlinkteZellen = new BlueControls.Controls.GroupBox();
             this.cbxFehlendesZiel = new BlueControls.Controls.ComboBox();
             this.caption5 = new BlueControls.Controls.Caption();
             this.txbZeichenkette = new BlueControls.Controls.TextBox();
@@ -135,21 +147,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnTargetColumn = new BlueControls.Controls.Button();
             this.btnColumnKeyInColumn = new BlueControls.Controls.Button();
             this.capRowKeyInColumn = new BlueControls.Controls.Caption();
-            this.tabRegeln = new BlueControls.Controls.TabPage();
-            this.txbSortMask = new BlueControls.Controls.TextBox();
-            this.capSortiermaske = new BlueControls.Controls.Caption();
-            this.txbRegex = new BlueControls.Controls.TextBox();
-            this.capRegex = new BlueControls.Controls.Caption();
-            this.cbxAlign = new BlueControls.Controls.ComboBox();
-            this.capAlign = new BlueControls.Controls.Caption();
-            this.cbxVorschlag = new BlueControls.Controls.ComboBox();
-            this.capVorschlag = new BlueControls.Controls.Caption();
-            this.cbxDropDownKey = new BlueControls.Controls.ComboBox();
-            this.capDropDownKey = new BlueControls.Controls.Caption();
-            this.butZusammenfassen = new BlueControls.Controls.Button();
             this.tabDesign.SuspendLayout();
-            this.grbBildCode.SuspendLayout();
+            this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
+            this.grpAuswahlmenuOptionen.SuspendLayout();
             this.tabAutoBearbeitung.SuspendLayout();
             this.tabFilter.SuspendLayout();
             this.tabQuickInfo.SuspendLayout();
@@ -157,11 +158,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BlueFrame1.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabSpezial.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.grpLinkedCell.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.gpxVerlinkteZellen.SuspendLayout();
-            this.tabRegeln.SuspendLayout();
+            this.grpLinkToFileSystem.SuspendLayout();
+            this.grpLinkedDatabase.SuspendLayout();
+            this.grpColumnsForLinkedDatabase.SuspendLayout();
+            this.grpVerlinkteZellen.SuspendLayout();
             this.SuspendLayout();
             // 
             // ColorDia
@@ -171,8 +171,11 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabDesign
             // 
+            this.tabDesign.Controls.Add(this.butZusammenfassen);
+            this.tabDesign.Controls.Add(this.cbxAlign);
             this.tabDesign.Controls.Add(this.txbReplacer);
             this.tabDesign.Controls.Add(this.btnStandard);
+            this.tabDesign.Controls.Add(this.capAlign);
             this.tabDesign.Controls.Add(this.txbPrefix);
             this.tabDesign.Controls.Add(this.caption7);
             this.tabDesign.Controls.Add(this.capUeberschrift3);
@@ -205,6 +208,24 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabDesign.Text = "Design";
             this.tabDesign.UseVisualStyleBackColor = true;
             // 
+            // butZusammenfassen
+            // 
+            this.butZusammenfassen.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.butZusammenfassen.Location = new System.Drawing.Point(8, 200);
+            this.butZusammenfassen.Name = "butZusammenfassen";
+            this.butZusammenfassen.Size = new System.Drawing.Size(360, 16);
+            this.butZusammenfassen.TabIndex = 12;
+            this.butZusammenfassen.Text = "Zeilen optisch zusammenfassen bei gleichen Werten";
+            // 
+            // cbxAlign
+            // 
+            this.cbxAlign.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxAlign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxAlign.Location = new System.Drawing.Point(384, 136);
+            this.cbxAlign.Name = "cbxAlign";
+            this.cbxAlign.Size = new System.Drawing.Size(128, 24);
+            this.cbxAlign.TabIndex = 7;
+            // 
             // txbReplacer
             // 
             this.txbReplacer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -228,6 +249,14 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnStandard.TabIndex = 39;
             this.btnStandard.Text = "Standard herstellen";
             this.btnStandard.Click += new System.EventHandler(this.btnStandard_Click);
+            // 
+            // capAlign
+            // 
+            this.capAlign.CausesValidation = false;
+            this.capAlign.Location = new System.Drawing.Point(384, 120);
+            this.capAlign.Name = "capAlign";
+            this.capAlign.Size = new System.Drawing.Size(104, 16);
+            this.capAlign.Text = "Ausrichtung:";
             // 
             // txbPrefix
             // 
@@ -439,17 +468,17 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnMultiline.TabIndex = 7;
             this.btnMultiline.Text = "Mehrere Einträge pro Zelle erlaubt (mehrzeilig)";
             // 
-            // grbBildCode
+            // grpBildCode
             // 
-            this.grbBildCode.CausesValidation = false;
-            this.grbBildCode.Controls.Add(this.cbxBildCodeImageNotfound);
-            this.grbBildCode.Controls.Add(this.capBildCodeImageNotfound);
-            this.grbBildCode.Controls.Add(this.capBildCodeConstHeight);
-            this.grbBildCode.Controls.Add(this.txbBildCodeConstHeight);
-            this.grbBildCode.Location = new System.Drawing.Point(8, 16);
-            this.grbBildCode.Name = "grbBildCode";
-            this.grbBildCode.Size = new System.Drawing.Size(416, 73);
-            this.grbBildCode.Text = "Fomat: BildCode";
+            this.grpBildCode.CausesValidation = false;
+            this.grpBildCode.Controls.Add(this.cbxBildCodeImageNotfound);
+            this.grpBildCode.Controls.Add(this.capBildCodeImageNotfound);
+            this.grpBildCode.Controls.Add(this.capBildCodeConstHeight);
+            this.grpBildCode.Controls.Add(this.txbBildCodeConstHeight);
+            this.grpBildCode.Location = new System.Drawing.Point(456, 8);
+            this.grpBildCode.Name = "grpBildCode";
+            this.grpBildCode.Size = new System.Drawing.Size(440, 104);
+            this.grpBildCode.Text = "Fomat: BildCode";
             // 
             // cbxBildCodeImageNotfound
             // 
@@ -457,7 +486,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxBildCodeImageNotfound.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxBildCodeImageNotfound.Location = new System.Drawing.Point(200, 40);
             this.cbxBildCodeImageNotfound.Name = "cbxBildCodeImageNotfound";
-            this.cbxBildCodeImageNotfound.Size = new System.Drawing.Size(208, 24);
+            this.cbxBildCodeImageNotfound.Size = new System.Drawing.Size(232, 24);
             this.cbxBildCodeImageNotfound.TabIndex = 34;
             // 
             // capBildCodeImageNotfound
@@ -489,14 +518,11 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabRechte
             // 
+            this.tabRechte.Controls.Add(this.grpAuswahlmenuOptionen);
             this.tabRechte.Controls.Add(this.btnIgnoreLock);
-            this.tabRechte.Controls.Add(this.btnOtherValuesToo);
             this.tabRechte.Controls.Add(this.lbxCellEditor);
             this.tabRechte.Controls.Add(this.btnEditableStandard);
-            this.tabRechte.Controls.Add(this.tbxAuswaehlbareWerte);
             this.tabRechte.Controls.Add(this.Caption9);
-            this.tabRechte.Controls.Add(this.Caption15);
-            this.tabRechte.Controls.Add(this.btnCanBeEmpty);
             this.tabRechte.Controls.Add(this.btnEditableDropdown);
             this.tabRechte.Location = new System.Drawing.Point(4, 25);
             this.tabRechte.Name = "tabRechte";
@@ -506,74 +532,49 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabRechte.Text = "Rechte";
             this.tabRechte.UseVisualStyleBackColor = true;
             // 
-            // btnIgnoreLock
+            // grpAuswahlmenuOptionen
             // 
-            this.btnIgnoreLock.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnIgnoreLock.Location = new System.Drawing.Point(400, 200);
-            this.btnIgnoreLock.Name = "btnIgnoreLock";
-            this.btnIgnoreLock.Size = new System.Drawing.Size(288, 40);
-            this.btnIgnoreLock.TabIndex = 27;
-            this.btnIgnoreLock.Text = "Die Bearbeitung ist auch möglich, wenn die Zeile abgeschlossen ist.";
+            this.grpAuswahlmenuOptionen.CausesValidation = false;
+            this.grpAuswahlmenuOptionen.Controls.Add(this.btnOtherValuesToo);
+            this.grpAuswahlmenuOptionen.Controls.Add(this.tbxAuswaehlbareWerte);
+            this.grpAuswahlmenuOptionen.Controls.Add(this.Caption15);
+            this.grpAuswahlmenuOptionen.Controls.Add(this.btnCanBeEmpty);
+            this.grpAuswahlmenuOptionen.Controls.Add(this.cbxDropDownKey);
+            this.grpAuswahlmenuOptionen.Controls.Add(this.capDropDownKey);
+            this.grpAuswahlmenuOptionen.Location = new System.Drawing.Point(32, 80);
+            this.grpAuswahlmenuOptionen.Name = "grpAuswahlmenuOptionen";
+            this.grpAuswahlmenuOptionen.Size = new System.Drawing.Size(536, 392);
+            this.grpAuswahlmenuOptionen.Text = "Auswahlmenü-Optionen:";
             // 
             // btnOtherValuesToo
             // 
-            this.btnOtherValuesToo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnOtherValuesToo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOtherValuesToo.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnOtherValuesToo.Location = new System.Drawing.Point(32, 447);
+            this.btnOtherValuesToo.Location = new System.Drawing.Point(8, 304);
             this.btnOtherValuesToo.Name = "btnOtherValuesToo";
-            this.btnOtherValuesToo.Size = new System.Drawing.Size(368, 32);
+            this.btnOtherValuesToo.Size = new System.Drawing.Size(512, 32);
             this.btnOtherValuesToo.TabIndex = 7;
             this.btnOtherValuesToo.Text = "Auch Werte, die in anderen Zellen derselben Spalte vorhanden sind, werden zum Aus" +
-    "wählen vorgschlagen.";
-            // 
-            // lbxCellEditor
-            // 
-            this.lbxCellEditor.AddAllowed = BlueControls.Enums.enAddType.Text;
-            this.lbxCellEditor.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
-            this.lbxCellEditor.FilterAllowed = true;
-            this.lbxCellEditor.LastFilePath = null;
-            this.lbxCellEditor.Location = new System.Drawing.Point(400, 48);
-            this.lbxCellEditor.Name = "lbxCellEditor";
-            this.lbxCellEditor.QuickInfo = "";
-            this.lbxCellEditor.RemoveAllowed = true;
-            this.lbxCellEditor.Size = new System.Drawing.Size(264, 144);
-            this.lbxCellEditor.TabIndex = 26;
-            // 
-            // btnEditableStandard
-            // 
-            this.btnEditableStandard.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnEditableStandard.Location = new System.Drawing.Point(8, 16);
-            this.btnEditableStandard.Name = "btnEditableStandard";
-            this.btnEditableStandard.Size = new System.Drawing.Size(384, 48);
-            this.btnEditableStandard.TabIndex = 4;
-            this.btnEditableStandard.Text = "Benutzer-Bearbeitung mit der <b>Standard-Methode</b> erlaubt<br><i>Wenn neue Wert" +
-    "e erlaubt sein sollen, muss hier ein Häkchen gesetzt werden.";
+    "wählen vorgschlagen";
             // 
             // tbxAuswaehlbareWerte
             // 
-            this.tbxAuswaehlbareWerte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.tbxAuswaehlbareWerte.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxAuswaehlbareWerte.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbxAuswaehlbareWerte.Location = new System.Drawing.Point(32, 120);
+            this.tbxAuswaehlbareWerte.Location = new System.Drawing.Point(8, 64);
             this.tbxAuswaehlbareWerte.MultiLine = true;
             this.tbxAuswaehlbareWerte.Name = "tbxAuswaehlbareWerte";
-            this.tbxAuswaehlbareWerte.Size = new System.Drawing.Size(360, 311);
+            this.tbxAuswaehlbareWerte.Size = new System.Drawing.Size(520, 231);
             this.tbxAuswaehlbareWerte.SpellChecking = true;
             this.tbxAuswaehlbareWerte.TabIndex = 0;
-            // 
-            // Caption9
-            // 
-            this.Caption9.CausesValidation = false;
-            this.Caption9.Location = new System.Drawing.Point(400, 16);
-            this.Caption9.Name = "Caption9";
-            this.Caption9.Size = new System.Drawing.Size(264, 32);
-            this.Caption9.Text = "<b>Folgende Benutzergruppen dürfen den Inhalt der Zellen bearbeiten:";
-            this.Caption9.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // Caption15
             // 
             this.Caption15.CausesValidation = false;
-            this.Caption15.Location = new System.Drawing.Point(32, 104);
+            this.Caption15.Location = new System.Drawing.Point(8, 48);
             this.Caption15.Name = "Caption15";
             this.Caption15.Size = new System.Drawing.Size(216, 16);
             this.Caption15.Text = "<b><u>Immer auswählbare Werte:";
@@ -582,28 +583,94 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnCanBeEmpty
             // 
             this.btnCanBeEmpty.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnCanBeEmpty.Location = new System.Drawing.Point(32, 80);
+            this.btnCanBeEmpty.Location = new System.Drawing.Point(8, 24);
             this.btnCanBeEmpty.Name = "btnCanBeEmpty";
-            this.btnCanBeEmpty.Size = new System.Drawing.Size(184, 16);
+            this.btnCanBeEmpty.Size = new System.Drawing.Size(328, 16);
             this.btnCanBeEmpty.TabIndex = 6;
-            this.btnCanBeEmpty.Text = "Alles abwählen erlaubt";
+            this.btnCanBeEmpty.Text = "Alles abwählen erlaubt (leere Zelle möglich)";
+            // 
+            // cbxDropDownKey
+            // 
+            this.cbxDropDownKey.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbxDropDownKey.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxDropDownKey.Location = new System.Drawing.Point(232, 344);
+            this.cbxDropDownKey.Name = "cbxDropDownKey";
+            this.cbxDropDownKey.Size = new System.Drawing.Size(296, 24);
+            this.cbxDropDownKey.TabIndex = 3;
+            // 
+            // capDropDownKey
+            // 
+            this.capDropDownKey.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.capDropDownKey.CausesValidation = false;
+            this.capDropDownKey.Location = new System.Drawing.Point(24, 336);
+            this.capDropDownKey.Name = "capDropDownKey";
+            this.capDropDownKey.Size = new System.Drawing.Size(208, 40);
+            this.capDropDownKey.Text = "...aber nur, wenn der Inhalt dieser Spalte gleich ist:";
+            this.capDropDownKey.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // btnIgnoreLock
+            // 
+            this.btnIgnoreLock.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnIgnoreLock.Location = new System.Drawing.Point(592, 328);
+            this.btnIgnoreLock.Name = "btnIgnoreLock";
+            this.btnIgnoreLock.Size = new System.Drawing.Size(288, 32);
+            this.btnIgnoreLock.TabIndex = 27;
+            this.btnIgnoreLock.Text = "Die Bearbeitung ist auch möglich, wenn die Zeile abgeschlossen ist.";
+            // 
+            // lbxCellEditor
+            // 
+            this.lbxCellEditor.AddAllowed = BlueControls.Enums.enAddType.Text;
+            this.lbxCellEditor.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
+            this.lbxCellEditor.FilterAllowed = true;
+            this.lbxCellEditor.LastFilePath = null;
+            this.lbxCellEditor.Location = new System.Drawing.Point(576, 48);
+            this.lbxCellEditor.Name = "lbxCellEditor";
+            this.lbxCellEditor.QuickInfo = "";
+            this.lbxCellEditor.RemoveAllowed = true;
+            this.lbxCellEditor.Size = new System.Drawing.Size(328, 272);
+            this.lbxCellEditor.TabIndex = 26;
+            // 
+            // btnEditableStandard
+            // 
+            this.btnEditableStandard.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnEditableStandard.Location = new System.Drawing.Point(8, 16);
+            this.btnEditableStandard.Name = "btnEditableStandard";
+            this.btnEditableStandard.Size = new System.Drawing.Size(544, 32);
+            this.btnEditableStandard.TabIndex = 4;
+            this.btnEditableStandard.Text = "Benutzer-Bearbeitung mit der <b>Standard-Methode</b> erlauben<br><i>Wenn neue Wer" +
+    "te erlaubt sein sollen, muss hier ein Häkchen gesetzt werden.";
+            // 
+            // Caption9
+            // 
+            this.Caption9.CausesValidation = false;
+            this.Caption9.Location = new System.Drawing.Point(576, 16);
+            this.Caption9.Name = "Caption9";
+            this.Caption9.Size = new System.Drawing.Size(328, 32);
+            this.Caption9.Text = "<b>Folgende Benutzergruppen dürfen den Inhalt der Zellen bearbeiten:";
+            this.Caption9.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnEditableDropdown
             // 
             this.btnEditableDropdown.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnEditableDropdown.Location = new System.Drawing.Point(8, 64);
+            this.btnEditableDropdown.Location = new System.Drawing.Point(8, 56);
             this.btnEditableDropdown.Name = "btnEditableDropdown";
-            this.btnEditableDropdown.Size = new System.Drawing.Size(328, 16);
+            this.btnEditableDropdown.Size = new System.Drawing.Size(544, 16);
             this.btnEditableDropdown.TabIndex = 5;
-            this.btnEditableDropdown.Text = "Benutzer-Bearbeitung mit <b>Auswahl-Menü</b> erlaubt";
+            this.btnEditableDropdown.Text = "Benutzer-Bearbeitung mit <b>Auswahl-Menü (Dropdown-Menü)</b> erlauben";
             // 
             // tabAutoBearbeitung
             // 
+            this.tabAutoBearbeitung.Controls.Add(this.cbxSchlüsselspalte);
             this.tabAutoBearbeitung.Controls.Add(this.tbxInitValue);
             this.tabAutoBearbeitung.Controls.Add(this.Caption12);
+            this.tabAutoBearbeitung.Controls.Add(this.capSchlüsselspalte);
             this.tabAutoBearbeitung.Controls.Add(this.btnAutoEditKleineFehler);
             this.tabAutoBearbeitung.Controls.Add(this.btnAutoEditToUpper);
             this.tabAutoBearbeitung.Controls.Add(this.tbxRunden);
+            this.tabAutoBearbeitung.Controls.Add(this.cbxVorschlag);
+            this.tabAutoBearbeitung.Controls.Add(this.capVorschlag);
             this.tabAutoBearbeitung.Controls.Add(this.Caption11);
             this.tabAutoBearbeitung.Controls.Add(this.btnAutoEditAutoSort);
             this.tabAutoBearbeitung.Location = new System.Drawing.Point(4, 25);
@@ -612,12 +679,25 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabAutoBearbeitung.TabIndex = 6;
             this.tabAutoBearbeitung.Text = "Auto-Bearbeitung";
             // 
+            // cbxSchlüsselspalte
+            // 
+            this.cbxSchlüsselspalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbxSchlüsselspalte.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxSchlüsselspalte.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxSchlüsselspalte.Location = new System.Drawing.Point(408, 304);
+            this.cbxSchlüsselspalte.Name = "cbxSchlüsselspalte";
+            this.cbxSchlüsselspalte.Size = new System.Drawing.Size(496, 24);
+            this.cbxSchlüsselspalte.TabIndex = 35;
+            // 
             // tbxInitValue
             // 
+            this.tbxInitValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxInitValue.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxInitValue.Location = new System.Drawing.Point(8, 32);
             this.tbxInitValue.Name = "tbxInitValue";
-            this.tbxInitValue.Size = new System.Drawing.Size(568, 24);
+            this.tbxInitValue.Size = new System.Drawing.Size(896, 24);
             this.tbxInitValue.TabIndex = 15;
             // 
             // Caption12
@@ -627,6 +707,16 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption12.Name = "Caption12";
             this.Caption12.Size = new System.Drawing.Size(568, 16);
             this.Caption12.Text = "Wenn eine neue Zeile erstellt wird, folgenden Wert in die Zelle schreiben:";
+            // 
+            // capSchlüsselspalte
+            // 
+            this.capSchlüsselspalte.CausesValidation = false;
+            this.capSchlüsselspalte.Location = new System.Drawing.Point(8, 304);
+            this.capSchlüsselspalte.Name = "capSchlüsselspalte";
+            this.capSchlüsselspalte.Size = new System.Drawing.Size(392, 40);
+            this.capSchlüsselspalte.Text = "Die Werte der Zelle gleichhalten, wenn die Schlüsselspalte den gleichen Wert enth" +
+    "ält:";
+            this.capSchlüsselspalte.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnAutoEditKleineFehler
             // 
@@ -653,6 +743,26 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tbxRunden.Name = "tbxRunden";
             this.tbxRunden.Size = new System.Drawing.Size(88, 24);
             this.tbxRunden.TabIndex = 11;
+            // 
+            // cbxVorschlag
+            // 
+            this.cbxVorschlag.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbxVorschlag.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxVorschlag.Location = new System.Drawing.Point(408, 256);
+            this.cbxVorschlag.Name = "cbxVorschlag";
+            this.cbxVorschlag.Size = new System.Drawing.Size(496, 24);
+            this.cbxVorschlag.TabIndex = 5;
+            // 
+            // capVorschlag
+            // 
+            this.capVorschlag.CausesValidation = false;
+            this.capVorschlag.Location = new System.Drawing.Point(8, 256);
+            this.capVorschlag.Name = "capVorschlag";
+            this.capVorschlag.Size = new System.Drawing.Size(392, 40);
+            this.capVorschlag.Text = "Zelle automatisch befüllen, wenn diese leer ist und sie bearbeitet wird. Basieren" +
+    "d auf gleichen Werten in dieser Spalte:";
+            this.capVorschlag.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // Caption11
             // 
@@ -814,10 +924,12 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabSonstiges
             // 
-            this.tabSonstiges.Controls.Add(this.cbxSchlüsselspalte);
-            this.tabSonstiges.Controls.Add(this.capSchlüsselspalte);
+            this.tabSonstiges.Controls.Add(this.txbSortMask);
             this.tabSonstiges.Controls.Add(this.btnSpellChecking);
+            this.tabSonstiges.Controls.Add(this.txbRegex);
+            this.tabSonstiges.Controls.Add(this.capSortiermaske);
             this.tabSonstiges.Controls.Add(this.btnLogUndo);
+            this.tabSonstiges.Controls.Add(this.capRegex);
             this.tabSonstiges.Controls.Add(this.tbxAllowedChars);
             this.tabSonstiges.Controls.Add(this.Caption13);
             this.tabSonstiges.Controls.Add(this.tbxTags);
@@ -830,52 +942,70 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabSonstiges.Text = "Sonstiges allgemein";
             this.tabSonstiges.UseVisualStyleBackColor = true;
             // 
-            // cbxSchlüsselspalte
+            // txbSortMask
             // 
-            this.cbxSchlüsselspalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.txbSortMask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxSchlüsselspalte.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxSchlüsselspalte.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxSchlüsselspalte.Location = new System.Drawing.Point(512, 216);
-            this.cbxSchlüsselspalte.Name = "cbxSchlüsselspalte";
-            this.cbxSchlüsselspalte.Size = new System.Drawing.Size(400, 24);
-            this.cbxSchlüsselspalte.TabIndex = 35;
-            // 
-            // capSchlüsselspalte
-            // 
-            this.capSchlüsselspalte.CausesValidation = false;
-            this.capSchlüsselspalte.Location = new System.Drawing.Point(512, 168);
-            this.capSchlüsselspalte.Name = "capSchlüsselspalte";
-            this.capSchlüsselspalte.Size = new System.Drawing.Size(392, 40);
-            this.capSchlüsselspalte.Text = "Die Werte der Zelle gleichhalten, wenn die Schlüsselspalte den gleichen Wert enth" +
-    "ält:";
-            this.capSchlüsselspalte.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.txbSortMask.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbSortMask.Enabled = false;
+            this.txbSortMask.Location = new System.Drawing.Point(512, 304);
+            this.txbSortMask.MultiLine = true;
+            this.txbSortMask.Name = "txbSortMask";
+            this.txbSortMask.Size = new System.Drawing.Size(392, 64);
+            this.txbSortMask.TabIndex = 11;
             // 
             // btnSpellChecking
             // 
             this.btnSpellChecking.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSpellChecking.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnSpellChecking.Location = new System.Drawing.Point(513, 128);
+            this.btnSpellChecking.Location = new System.Drawing.Point(512, 248);
             this.btnSpellChecking.Name = "btnSpellChecking";
             this.btnSpellChecking.Size = new System.Drawing.Size(352, 16);
             this.btnSpellChecking.TabIndex = 33;
             this.btnSpellChecking.Text = "Rechtschreibprüfung aktivieren";
             // 
+            // txbRegex
+            // 
+            this.txbRegex.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbRegex.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbRegex.Location = new System.Drawing.Point(512, 120);
+            this.txbRegex.MultiLine = true;
+            this.txbRegex.Name = "txbRegex";
+            this.txbRegex.Size = new System.Drawing.Size(392, 96);
+            this.txbRegex.TabIndex = 9;
+            // 
+            // capSortiermaske
+            // 
+            this.capSortiermaske.CausesValidation = false;
+            this.capSortiermaske.Location = new System.Drawing.Point(512, 288);
+            this.capSortiermaske.Name = "capSortiermaske";
+            this.capSortiermaske.Size = new System.Drawing.Size(152, 24);
+            this.capSortiermaske.Text = "Sortiermaske:";
+            // 
             // btnLogUndo
             // 
             this.btnLogUndo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnLogUndo.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnLogUndo.Location = new System.Drawing.Point(513, 104);
+            this.btnLogUndo.Location = new System.Drawing.Point(512, 224);
             this.btnLogUndo.Name = "btnLogUndo";
             this.btnLogUndo.Size = new System.Drawing.Size(352, 16);
             this.btnLogUndo.TabIndex = 32;
             this.btnLogUndo.Text = "Undo wird geloggt";
             // 
+            // capRegex
+            // 
+            this.capRegex.CausesValidation = false;
+            this.capRegex.Location = new System.Drawing.Point(512, 104);
+            this.capRegex.Name = "capRegex";
+            this.capRegex.Size = new System.Drawing.Size(388, 17);
+            this.capRegex.Text = "Das Format muss mit dieser Regex-Maske übereinstimmen:";
+            // 
             // tbxAllowedChars
             // 
             this.tbxAllowedChars.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxAllowedChars.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbxAllowedChars.Location = new System.Drawing.Point(513, 48);
+            this.tbxAllowedChars.Location = new System.Drawing.Point(512, 48);
             this.tbxAllowedChars.Name = "tbxAllowedChars";
             this.tbxAllowedChars.Size = new System.Drawing.Size(391, 48);
             this.tbxAllowedChars.TabIndex = 30;
@@ -916,9 +1046,9 @@ namespace BlueControls.BlueDatabaseDialogs
             // txbLinkedKeyKennung
             // 
             this.txbLinkedKeyKennung.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbLinkedKeyKennung.Location = new System.Drawing.Point(280, 24);
+            this.txbLinkedKeyKennung.Location = new System.Drawing.Point(240, 24);
             this.txbLinkedKeyKennung.Name = "txbLinkedKeyKennung";
-            this.txbLinkedKeyKennung.Size = new System.Drawing.Size(120, 24);
+            this.txbLinkedKeyKennung.Size = new System.Drawing.Size(232, 24);
             this.txbLinkedKeyKennung.TabIndex = 40;
             // 
             // capLinkedKeyKennung
@@ -932,10 +1062,11 @@ namespace BlueControls.BlueDatabaseDialogs
             // cbxLinkedDatabase
             // 
             this.cbxLinkedDatabase.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxLinkedDatabase.Location = new System.Drawing.Point(172, 25);
+            this.cbxLinkedDatabase.Location = new System.Drawing.Point(172, 24);
             this.cbxLinkedDatabase.Name = "cbxLinkedDatabase";
-            this.cbxLinkedDatabase.Size = new System.Drawing.Size(232, 24);
+            this.cbxLinkedDatabase.Size = new System.Drawing.Size(708, 24);
             this.cbxLinkedDatabase.TabIndex = 38;
+            this.cbxLinkedDatabase.TextChanged += new System.EventHandler(this.cbxLinkedDatabase_TextChanged);
             // 
             // capLinkedDatabase
             // 
@@ -958,7 +1089,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbBestFileStandardSuffix.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbBestFileStandardSuffix.Location = new System.Drawing.Point(280, 72);
             this.txbBestFileStandardSuffix.Name = "txbBestFileStandardSuffix";
-            this.txbBestFileStandardSuffix.Size = new System.Drawing.Size(120, 24);
+            this.txbBestFileStandardSuffix.Size = new System.Drawing.Size(152, 24);
             this.txbBestFileStandardSuffix.TabIndex = 36;
             // 
             // capBestFileStandardFolder
@@ -974,7 +1105,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbBestFileStandardFolder.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbBestFileStandardFolder.Location = new System.Drawing.Point(8, 40);
             this.txbBestFileStandardFolder.Name = "txbBestFileStandardFolder";
-            this.txbBestFileStandardFolder.Size = new System.Drawing.Size(392, 24);
+            this.txbBestFileStandardFolder.Size = new System.Drawing.Size(424, 24);
             this.txbBestFileStandardFolder.TabIndex = 34;
             // 
             // BlueFrame1
@@ -1082,79 +1213,77 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabControl.Controls.Add(this.tabQuickInfo);
             this.tabControl.Controls.Add(this.tabSonstiges);
             this.tabControl.Controls.Add(this.tabSpezial);
-            this.tabControl.Controls.Add(this.tabRegeln);
             this.tabControl.HotTrack = true;
             this.tabControl.Location = new System.Drawing.Point(0, 120);
             this.tabControl.Name = "tabControl";
-            this.tabControl.SelectedIndex = 7;
             this.tabControl.Size = new System.Drawing.Size(920, 516);
             this.tabControl.TabIndex = 15;
             // 
             // tabSpezial
             // 
-            this.tabSpezial.Controls.Add(this.groupBox2);
-            this.tabSpezial.Controls.Add(this.grpLinkedCell);
-            this.tabSpezial.Controls.Add(this.grbBildCode);
+            this.tabSpezial.Controls.Add(this.grpLinkToFileSystem);
+            this.tabSpezial.Controls.Add(this.grpLinkedDatabase);
+            this.tabSpezial.Controls.Add(this.grpBildCode);
             this.tabSpezial.Location = new System.Drawing.Point(4, 25);
             this.tabSpezial.Name = "tabSpezial";
             this.tabSpezial.Size = new System.Drawing.Size(912, 487);
             this.tabSpezial.TabIndex = 9;
             this.tabSpezial.Text = "Spezial-Formate";
             // 
-            // groupBox2
+            // grpLinkToFileSystem
             // 
-            this.groupBox2.CausesValidation = false;
-            this.groupBox2.Controls.Add(this.capBestFileStandardFolder);
-            this.groupBox2.Controls.Add(this.txbBestFileStandardFolder);
-            this.groupBox2.Controls.Add(this.txbBestFileStandardSuffix);
-            this.groupBox2.Controls.Add(this.capBestFileStandardSuffix);
-            this.groupBox2.Location = new System.Drawing.Point(456, 8);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(416, 104);
-            this.groupBox2.Text = "Format: Link To Filesystem";
+            this.grpLinkToFileSystem.CausesValidation = false;
+            this.grpLinkToFileSystem.Controls.Add(this.capBestFileStandardFolder);
+            this.grpLinkToFileSystem.Controls.Add(this.txbBestFileStandardFolder);
+            this.grpLinkToFileSystem.Controls.Add(this.txbBestFileStandardSuffix);
+            this.grpLinkToFileSystem.Controls.Add(this.capBestFileStandardSuffix);
+            this.grpLinkToFileSystem.Location = new System.Drawing.Point(8, 8);
+            this.grpLinkToFileSystem.Name = "grpLinkToFileSystem";
+            this.grpLinkToFileSystem.Size = new System.Drawing.Size(440, 104);
+            this.grpLinkToFileSystem.Text = "Format: Link To Filesystem";
             // 
-            // grpLinkedCell
+            // grpLinkedDatabase
             // 
-            this.grpLinkedCell.CausesValidation = false;
-            this.grpLinkedCell.Controls.Add(this.groupBox1);
-            this.grpLinkedCell.Controls.Add(this.gpxVerlinkteZellen);
-            this.grpLinkedCell.Controls.Add(this.cbxLinkedDatabase);
-            this.grpLinkedCell.Controls.Add(this.capLinkedDatabase);
-            this.grpLinkedCell.Location = new System.Drawing.Point(8, 104);
-            this.grpLinkedCell.Name = "grpLinkedCell";
-            this.grpLinkedCell.Size = new System.Drawing.Size(848, 376);
-            this.grpLinkedCell.Text = "Format: LinkedCell (und dessen Columns / Values)";
+            this.grpLinkedDatabase.CausesValidation = false;
+            this.grpLinkedDatabase.Controls.Add(this.grpColumnsForLinkedDatabase);
+            this.grpLinkedDatabase.Controls.Add(this.grpVerlinkteZellen);
+            this.grpLinkedDatabase.Controls.Add(this.cbxLinkedDatabase);
+            this.grpLinkedDatabase.Controls.Add(this.capLinkedDatabase);
+            this.grpLinkedDatabase.Location = new System.Drawing.Point(8, 120);
+            this.grpLinkedDatabase.Name = "grpLinkedDatabase";
+            this.grpLinkedDatabase.Size = new System.Drawing.Size(888, 360);
+            this.grpLinkedDatabase.Text = "Format: LinkedCell (und dessen Columns / Values)";
             // 
-            // groupBox1
+            // grpColumnsForLinkedDatabase
             // 
-            this.groupBox1.CausesValidation = false;
-            this.groupBox1.Controls.Add(this.txbLinkedKeyKennung);
-            this.groupBox1.Controls.Add(this.capLinkedKeyKennung);
-            this.groupBox1.Location = new System.Drawing.Point(8, 48);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(488, 56);
-            this.groupBox1.Text = "Format: Columns_für_LinkedCellDropdown";
+            this.grpColumnsForLinkedDatabase.CausesValidation = false;
+            this.grpColumnsForLinkedDatabase.Controls.Add(this.txbLinkedKeyKennung);
+            this.grpColumnsForLinkedDatabase.Controls.Add(this.capLinkedKeyKennung);
+            this.grpColumnsForLinkedDatabase.Location = new System.Drawing.Point(8, 64);
+            this.grpColumnsForLinkedDatabase.Name = "grpColumnsForLinkedDatabase";
+            this.grpColumnsForLinkedDatabase.Size = new System.Drawing.Size(872, 56);
+            this.grpColumnsForLinkedDatabase.Text = "Format: Columns_für_LinkedCellDropdown";
             // 
-            // gpxVerlinkteZellen
+            // grpVerlinkteZellen
             // 
-            this.gpxVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.grpVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gpxVerlinkteZellen.CausesValidation = false;
-            this.gpxVerlinkteZellen.Controls.Add(this.cbxFehlendesZiel);
-            this.gpxVerlinkteZellen.Controls.Add(this.caption5);
-            this.gpxVerlinkteZellen.Controls.Add(this.txbZeichenkette);
-            this.gpxVerlinkteZellen.Controls.Add(this.capZeichenkette);
-            this.gpxVerlinkteZellen.Controls.Add(this.line1);
-            this.gpxVerlinkteZellen.Controls.Add(this.cbxTargetColumn);
-            this.gpxVerlinkteZellen.Controls.Add(this.cbxColumnKeyInColumn);
-            this.gpxVerlinkteZellen.Controls.Add(this.cbxRowKeyInColumn);
-            this.gpxVerlinkteZellen.Controls.Add(this.btnTargetColumn);
-            this.gpxVerlinkteZellen.Controls.Add(this.btnColumnKeyInColumn);
-            this.gpxVerlinkteZellen.Controls.Add(this.capRowKeyInColumn);
-            this.gpxVerlinkteZellen.Location = new System.Drawing.Point(8, 120);
-            this.gpxVerlinkteZellen.Name = "gpxVerlinkteZellen";
-            this.gpxVerlinkteZellen.Size = new System.Drawing.Size(816, 256);
-            this.gpxVerlinkteZellen.Text = "Verlinkte Zellen:";
+            this.grpVerlinkteZellen.CausesValidation = false;
+            this.grpVerlinkteZellen.Controls.Add(this.cbxFehlendesZiel);
+            this.grpVerlinkteZellen.Controls.Add(this.caption5);
+            this.grpVerlinkteZellen.Controls.Add(this.txbZeichenkette);
+            this.grpVerlinkteZellen.Controls.Add(this.capZeichenkette);
+            this.grpVerlinkteZellen.Controls.Add(this.line1);
+            this.grpVerlinkteZellen.Controls.Add(this.cbxTargetColumn);
+            this.grpVerlinkteZellen.Controls.Add(this.cbxColumnKeyInColumn);
+            this.grpVerlinkteZellen.Controls.Add(this.cbxRowKeyInColumn);
+            this.grpVerlinkteZellen.Controls.Add(this.btnTargetColumn);
+            this.grpVerlinkteZellen.Controls.Add(this.btnColumnKeyInColumn);
+            this.grpVerlinkteZellen.Controls.Add(this.capRowKeyInColumn);
+            this.grpVerlinkteZellen.Location = new System.Drawing.Point(8, 128);
+            this.grpVerlinkteZellen.Name = "grpVerlinkteZellen";
+            this.grpVerlinkteZellen.Size = new System.Drawing.Size(872, 224);
+            this.grpVerlinkteZellen.Text = "Format: Verlinkte Zellen";
             // 
             // cbxFehlendesZiel
             // 
@@ -1162,15 +1291,15 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxFehlendesZiel.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxFehlendesZiel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxFehlendesZiel.Location = new System.Drawing.Point(336, 224);
+            this.cbxFehlendesZiel.Location = new System.Drawing.Point(336, 192);
             this.cbxFehlendesZiel.Name = "cbxFehlendesZiel";
-            this.cbxFehlendesZiel.Size = new System.Drawing.Size(464, 24);
+            this.cbxFehlendesZiel.Size = new System.Drawing.Size(520, 24);
             this.cbxFehlendesZiel.TabIndex = 9;
             // 
             // caption5
             // 
             this.caption5.CausesValidation = false;
-            this.caption5.Location = new System.Drawing.Point(8, 224);
+            this.caption5.Location = new System.Drawing.Point(8, 192);
             this.caption5.Name = "caption5";
             this.caption5.Size = new System.Drawing.Size(320, 23);
             this.caption5.Text = "Zeile nicht gefunden in Zieldatenbank:";
@@ -1184,7 +1313,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbZeichenkette.Location = new System.Drawing.Point(336, 136);
             this.txbZeichenkette.Name = "txbZeichenkette";
             this.txbZeichenkette.QuickInfo = resources.GetString("txbZeichenkette.QuickInfo");
-            this.txbZeichenkette.Size = new System.Drawing.Size(464, 24);
+            this.txbZeichenkette.Size = new System.Drawing.Size(520, 24);
             this.txbZeichenkette.TabIndex = 7;
             // 
             // capZeichenkette
@@ -1203,7 +1332,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.line1.CausesValidation = false;
             this.line1.Location = new System.Drawing.Point(8, 56);
             this.line1.Name = "line1";
-            this.line1.Size = new System.Drawing.Size(800, 2);
+            this.line1.Size = new System.Drawing.Size(856, 2);
             this.line1.Text = "line1";
             // 
             // cbxTargetColumn
@@ -1214,7 +1343,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxTargetColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxTargetColumn.Location = new System.Drawing.Point(336, 72);
             this.cbxTargetColumn.Name = "cbxTargetColumn";
-            this.cbxTargetColumn.Size = new System.Drawing.Size(464, 24);
+            this.cbxTargetColumn.Size = new System.Drawing.Size(520, 24);
             this.cbxTargetColumn.TabIndex = 5;
             // 
             // cbxColumnKeyInColumn
@@ -1225,7 +1354,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxColumnKeyInColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxColumnKeyInColumn.Location = new System.Drawing.Point(336, 112);
             this.cbxColumnKeyInColumn.Name = "cbxColumnKeyInColumn";
-            this.cbxColumnKeyInColumn.Size = new System.Drawing.Size(464, 24);
+            this.cbxColumnKeyInColumn.Size = new System.Drawing.Size(520, 24);
             this.cbxColumnKeyInColumn.TabIndex = 4;
             // 
             // cbxRowKeyInColumn
@@ -1236,7 +1365,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxRowKeyInColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxRowKeyInColumn.Location = new System.Drawing.Point(336, 24);
             this.cbxRowKeyInColumn.Name = "cbxRowKeyInColumn";
-            this.cbxRowKeyInColumn.Size = new System.Drawing.Size(464, 24);
+            this.cbxRowKeyInColumn.Size = new System.Drawing.Size(520, 24);
             this.cbxRowKeyInColumn.TabIndex = 3;
             // 
             // btnTargetColumn
@@ -1266,120 +1395,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capRowKeyInColumn.Size = new System.Drawing.Size(320, 16);
             this.capRowKeyInColumn.Text = "Die zu suchende Zeile ist in dieser Spalte zu finden:";
             // 
-            // tabRegeln
-            // 
-            this.tabRegeln.Controls.Add(this.butZusammenfassen);
-            this.tabRegeln.Controls.Add(this.txbSortMask);
-            this.tabRegeln.Controls.Add(this.capSortiermaske);
-            this.tabRegeln.Controls.Add(this.txbRegex);
-            this.tabRegeln.Controls.Add(this.capRegex);
-            this.tabRegeln.Controls.Add(this.cbxAlign);
-            this.tabRegeln.Controls.Add(this.capAlign);
-            this.tabRegeln.Controls.Add(this.cbxVorschlag);
-            this.tabRegeln.Controls.Add(this.capVorschlag);
-            this.tabRegeln.Controls.Add(this.cbxDropDownKey);
-            this.tabRegeln.Controls.Add(this.capDropDownKey);
-            this.tabRegeln.Location = new System.Drawing.Point(4, 25);
-            this.tabRegeln.Name = "tabRegeln";
-            this.tabRegeln.Size = new System.Drawing.Size(912, 487);
-            this.tabRegeln.TabIndex = 8;
-            this.tabRegeln.Text = "Regeln";
-            // 
-            // txbSortMask
-            // 
-            this.txbSortMask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbSortMask.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbSortMask.Location = new System.Drawing.Point(528, 200);
-            this.txbSortMask.MultiLine = true;
-            this.txbSortMask.Name = "txbSortMask";
-            this.txbSortMask.Size = new System.Drawing.Size(264, 64);
-            this.txbSortMask.TabIndex = 11;
-            // 
-            // capSortiermaske
-            // 
-            this.capSortiermaske.CausesValidation = false;
-            this.capSortiermaske.Location = new System.Drawing.Point(528, 168);
-            this.capSortiermaske.Name = "capSortiermaske";
-            this.capSortiermaske.Size = new System.Drawing.Size(152, 24);
-            this.capSortiermaske.Text = "Sortiermaske";
-            // 
-            // txbRegex
-            // 
-            this.txbRegex.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbRegex.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbRegex.Location = new System.Drawing.Point(520, 72);
-            this.txbRegex.MultiLine = true;
-            this.txbRegex.Name = "txbRegex";
-            this.txbRegex.Size = new System.Drawing.Size(264, 64);
-            this.txbRegex.TabIndex = 9;
-            // 
-            // capRegex
-            // 
-            this.capRegex.CausesValidation = false;
-            this.capRegex.Location = new System.Drawing.Point(520, 40);
-            this.capRegex.Name = "capRegex";
-            this.capRegex.Size = new System.Drawing.Size(152, 24);
-            this.capRegex.Text = "Regex";
-            // 
-            // cbxAlign
-            // 
-            this.cbxAlign.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxAlign.Location = new System.Drawing.Point(224, 208);
-            this.cbxAlign.Name = "cbxAlign";
-            this.cbxAlign.Size = new System.Drawing.Size(248, 24);
-            this.cbxAlign.TabIndex = 7;
-            // 
-            // capAlign
-            // 
-            this.capAlign.CausesValidation = false;
-            this.capAlign.Location = new System.Drawing.Point(64, 208);
-            this.capAlign.Name = "capAlign";
-            this.capAlign.Size = new System.Drawing.Size(152, 24);
-            this.capAlign.Text = "Ausrichtung";
-            // 
-            // cbxVorschlag
-            // 
-            this.cbxVorschlag.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxVorschlag.Location = new System.Drawing.Point(216, 152);
-            this.cbxVorschlag.Name = "cbxVorschlag";
-            this.cbxVorschlag.Size = new System.Drawing.Size(248, 24);
-            this.cbxVorschlag.TabIndex = 5;
-            // 
-            // capVorschlag
-            // 
-            this.capVorschlag.CausesValidation = false;
-            this.capVorschlag.Location = new System.Drawing.Point(56, 152);
-            this.capVorschlag.Name = "capVorschlag";
-            this.capVorschlag.Size = new System.Drawing.Size(152, 24);
-            this.capVorschlag.Text = "Initialtext Vorschläge mit gleichen Einträgen von:";
-            // 
-            // cbxDropDownKey
-            // 
-            this.cbxDropDownKey.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxDropDownKey.Location = new System.Drawing.Point(216, 88);
-            this.cbxDropDownKey.Name = "cbxDropDownKey";
-            this.cbxDropDownKey.Size = new System.Drawing.Size(248, 24);
-            this.cbxDropDownKey.TabIndex = 3;
-            // 
-            // capDropDownKey
-            // 
-            this.capDropDownKey.CausesValidation = false;
-            this.capDropDownKey.Location = new System.Drawing.Point(56, 88);
-            this.capDropDownKey.Name = "capDropDownKey";
-            this.capDropDownKey.Size = new System.Drawing.Size(152, 24);
-            this.capDropDownKey.Text = "Vorschläge mit gleichen Einträgen von:";
-            // 
-            // butZusammenfassen
-            // 
-            this.butZusammenfassen.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.butZusammenfassen.Location = new System.Drawing.Point(64, 24);
-            this.butZusammenfassen.Name = "butZusammenfassen";
-            this.butZusammenfassen.Size = new System.Drawing.Size(360, 24);
-            this.butZusammenfassen.TabIndex = 12;
-            this.butZusammenfassen.Text = "Zeilen optisch zusammenfassen bei gleichen Werten";
-            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(926, 671);
@@ -1393,8 +1408,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Text = "Spalten-Eigenschaften";
             this.TopMost = true;
             this.tabDesign.ResumeLayout(false);
-            this.grbBildCode.ResumeLayout(false);
+            this.grpBildCode.ResumeLayout(false);
             this.tabRechte.ResumeLayout(false);
+            this.grpAuswahlmenuOptionen.ResumeLayout(false);
             this.tabAutoBearbeitung.ResumeLayout(false);
             this.tabFilter.ResumeLayout(false);
             this.tabQuickInfo.ResumeLayout(false);
@@ -1402,11 +1418,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BlueFrame1.ResumeLayout(false);
             this.tabControl.ResumeLayout(false);
             this.tabSpezial.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.grpLinkedCell.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.gpxVerlinkteZellen.ResumeLayout(false);
-            this.tabRegeln.ResumeLayout(false);
+            this.grpLinkToFileSystem.ResumeLayout(false);
+            this.grpLinkedDatabase.ResumeLayout(false);
+            this.grpColumnsForLinkedDatabase.ResumeLayout(false);
+            this.grpVerlinkteZellen.ResumeLayout(false);
             this.ResumeLayout(false);
 
 			}
@@ -1486,8 +1501,7 @@ namespace BlueControls.BlueDatabaseDialogs
             private TextBox txbBestFileStandardSuffix;
             private Caption capBestFileStandardFolder;
             private TextBox txbBestFileStandardFolder;
-            private TabPage tabRegeln;
-            private GroupBox gpxVerlinkteZellen;
+            private GroupBox grpVerlinkteZellen;
             private ComboBox cbxTargetColumn;
             private ComboBox cbxColumnKeyInColumn;
             private ComboBox cbxRowKeyInColumn;
@@ -1505,7 +1519,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbUeberschift3;
         private TextBox txbUeberschift2;
         private TextBox txbUeberschift1;
-        private GroupBox grbBildCode;
+        private GroupBox grpBildCode;
         private TextBox txbPrefix;
         private Caption caption7;
         private Caption caption5;
@@ -1513,11 +1527,11 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnStandard;
         private Button btnKompakteAnzeige;
         private TabPage tabSpezial;
-        private GroupBox groupBox2;
-        private GroupBox grpLinkedCell;
+        private GroupBox grpLinkToFileSystem;
+        private GroupBox grpLinkedDatabase;
         private ComboBox cbxSchlüsselspalte;
         private Caption capSchlüsselspalte;
-        private GroupBox groupBox1;
+        private GroupBox grpColumnsForLinkedDatabase;
         private TextBox txbSortMask;
         private Caption capSortiermaske;
         private TextBox txbRegex;
@@ -1529,5 +1543,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private ComboBox cbxDropDownKey;
         private Caption capDropDownKey;
         private Button butZusammenfassen;
+        private GroupBox grpAuswahlmenuOptionen;
     }
 	}

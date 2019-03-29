@@ -320,7 +320,21 @@ namespace BlueDatabase
 
         }
 
+        internal void CheckIfIAmAKeyColumn()
+        {
+            I_Am_A_Key_For_Other_Column = false;
 
+            foreach (var ThisColumn in Database.Column)
+            {
+
+                if (ThisColumn.KeyColumnKey == Key) { I_Am_A_Key_For_Other_Column = true; } // Werte Gleichhalten
+                if (ThisColumn.LinkedCell_RowKey == Key) { I_Am_A_Key_For_Other_Column = true; } // LinkdeCells pflegen
+                if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = true; } // LinkdeCells pflegen
+                if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown) { I_Am_A_Key_For_Other_Column = true; } 
+            }
+
+
+        }
 
         public ColumnItem(Database database, bool addtodatabase) : this(database, -1, string.Empty, addtodatabase) { }
 
@@ -387,6 +401,8 @@ namespace BlueDatabase
 
 
         public int Key { get; }
+
+        public bool I_Am_A_Key_For_Other_Column {get; private set; }
 
         public string Caption
         {
@@ -1127,7 +1143,15 @@ namespace BlueDatabase
             set
             {
                 if (_KeyColumnKey == value) { return; }
+
+                var c = Database.Column.SearchByKey(_KeyColumnKey);
+                if (c != null) { c.CheckIfIAmAKeyColumn(); }
+
                 Database.AddPending(enDatabaseDataType.co_KeyColumnKey, this, _KeyColumnKey.ToString(), value.ToString(), true);
+
+                c = Database.Column.SearchByKey(_KeyColumnKey);
+                if (c != null) { c.CheckIfIAmAKeyColumn(); }
+
                 OnChanged();
             }
         }
@@ -1937,9 +1961,7 @@ namespace BlueDatabase
             switch (_Format)
             {
                 case enDataFormat.Link_To_Filesystem: return QuickImage.Get(enImageCode.Datei, 16);
-                //case enDataFormat.Relation: return QuickImage.Get(enImageCode.Herz, 16);
                 case enDataFormat.RelationText: return QuickImage.Get(enImageCode.Herz, 16);
-                case enDataFormat.KeyForSame: return QuickImage.Get(enImageCode.Istgleich, 16);
                 case enDataFormat.Datum_und_Uhrzeit: return QuickImage.Get(enImageCode.Uhr, 16);
                 case enDataFormat.Bit: return QuickImage.Get(enImageCode.Häkchen, 16);
                 case enDataFormat.Farbcode: return QuickImage.Get(enImageCode.Pinsel, 16);
@@ -2013,7 +2035,6 @@ namespace BlueDatabase
                 case enDataFormat.BildCode:
                 case enDataFormat.LinkedCell:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                     if (_TextBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind, um die Anzeieg zu gewährleisten.
                     if (_MultiLine && EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return false; }
                     if (_DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
@@ -2251,10 +2272,10 @@ namespace BlueDatabase
 
             if (_KeyColumnKey > -1)
             {
-                if (_Format == enDataFormat.RelationText || _Format == enDataFormat.KeyForSame) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben."; }
+                if (_Format == enDataFormat.RelationText || I_Am_A_Key_For_Other_Column) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben."; }
                 var c = Database.Column.SearchByKey(_KeyColumnKey);
                 if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
-                if (c.Format != enDataFormat.RelationText && c.Format != enDataFormat.KeyForSame) { return "Die verknüpfte Schlüsselspalte hat das falsche Format."; }
+                if (c.Format != enDataFormat.RelationText && I_Am_A_Key_For_Other_Column) { return "Die verknüpfte Schlüsselspalte hat das falsche Format."; }
 
 
             }
@@ -2270,7 +2291,6 @@ namespace BlueDatabase
 
             return string.Empty;
         }
-
 
 
         public bool IsOk()

@@ -134,7 +134,6 @@ namespace BlueDatabase
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                 case enDataFormat.LinkedCell:  // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
                     if (Txt == null || string.IsNullOrEmpty(Txt)) { return string.Empty; }
                     Txt = ColumnItem.ColumnReplace(Txt, column, Style);
@@ -239,7 +238,6 @@ namespace BlueDatabase
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                     return defaultImage; // z.B. KontextMenu
 
                 case enDataFormat.Bit:

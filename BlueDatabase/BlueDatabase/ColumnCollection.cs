@@ -274,12 +274,14 @@ namespace BlueDatabase
 
 
             // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
+            // Den Wert Am I a Key Column ermitteln
             foreach (var ThisColumnItem in this)
             {
 
                 if (ThisColumnItem != null)
                 {
                     _LastColumnKey = Math.Max(_LastColumnKey, ThisColumnItem.Key);
+                    ThisColumnItem.CheckIfIAmAKeyColumn();
                 }
             }
 

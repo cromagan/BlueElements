@@ -64,7 +64,6 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxBildCodeImageNotfound.Item.AddRange(typeof(enImageNotFound));
             cbxFehlendesZiel.Item.AddRange(typeof(enFehlendesZiel));
 
-            // cbxAlign.Item.AddRange(typeof(enAlignment));
             if (cbxAlign.Item.Count == 0)
             {
                 cbxAlign.Item.Add(new TextListItem(((int)enAlignment.Left).ToString(), "links"));
@@ -222,15 +221,40 @@ namespace BlueControls.BlueDatabaseDialogs
             txbSortMask.Text = _Column.SortMask;
 
 
+
             cbxSchlüsselspalte.Item.Clear();
             cbxSchlüsselspalte.Item.Add("#Ohne");
+            cbxColumnKeyInColumn.Item.Clear();
+            cbxRowKeyInColumn.Item.Clear();
+            cbxDropDownKey.Item.Clear();
+            cbxDropDownKey.Item.Add("#Ohne");
+            cbxVorschlag.Item.Clear();
+            cbxVorschlag.Item.Add("#Ohne");
+
             foreach (var ThisColumn in _Column.Database.Column)
             {
-                if (ThisColumn.Format == enDataFormat.RelationText || ThisColumn.Format == enDataFormat.KeyForSame)
-                {
-                    cbxSchlüsselspalte.Item.Add(ThisColumn);
-                }
+                if ((ThisColumn.Format == enDataFormat.RelationText || !ThisColumn.MultiLine) && ThisColumn.Format.CanBeChangedByRules()) { cbxSchlüsselspalte.Item.Add(ThisColumn); }
+                if (ThisColumn.Format.CanBeChangedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) { cbxRowKeyInColumn.Item.Add(ThisColumn); }
+                if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxRowKeyInColumn.Item.Add(ThisColumn); }
+                if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxColumnKeyInColumn.Item.Add(ThisColumn); }
             }
+
+            cbxSchlüsselspalte.Item.Sort();
+            cbxRowKeyInColumn.Item.Sort();
+            cbxColumnKeyInColumn.Item.Sort();
+            cbxVorschlag.Item.Sort();
+            cbxDropDownKey.Item.Sort();
+
+
+
+            cbxColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Item.Count > 0;
+            btnColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Enabled;
+            txbZeichenkette.Enabled = cbxColumnKeyInColumn.Enabled;
+            if (!btnColumnKeyInColumn.Enabled) { btnTargetColumn.Checked = true; } // Nicht perfekt die Lösung :-(
+            if (!btnTargetColumn.Enabled) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
+            cbxRowKeyInColumn.Enabled = cbxRowKeyInColumn.Item.Count > 0;
+
+
 
             SetKeyTo(_Column.Database, cbxSchlüsselspalte, _Column.KeyColumnKey);
             SetKeyTo(_Column.Database, cbxRowKeyInColumn, _Column.LinkedCell_RowKey);
@@ -238,7 +262,6 @@ namespace BlueControls.BlueDatabaseDialogs
             SetKeyTo(_Column.Database, cbxColumnKeyInColumn, _Column.LinkedCell_ColumnValueFoundIn);
             SetKeyTo(_Column.Database, cbxDropDownKey, _Column.DropdownKey);
             SetKeyTo(_Column.Database, cbxVorschlag, _Column.VorschlagsColumn);
-
 
             //RegelTabVorbereiten(false);
 
@@ -484,7 +507,11 @@ namespace BlueControls.BlueDatabaseDialogs
 
             int.TryParse(txbBildCodeConstHeight.Text, out var Res);
             _Column.BildCode_ConstantHeight = Res;
-            _Column.BildCode_ImageNotFound = (enImageNotFound)int.Parse(cbxBildCodeImageNotfound.Text);
+
+
+            int.TryParse(cbxBildCodeImageNotfound.Text, out var ImNF);
+            _Column.BildCode_ImageNotFound = (enImageNotFound)ImNF;
+
             _Column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
             _Column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
             _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
@@ -647,76 +674,27 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
 
-        //private void RegelTabVorbereiten(bool Einlesen)
-        //{
-        //    if (tabControl.SelectedIndex < 0) { return; }
-
-
-        //    var xtab = tabControl.TabPages[tabControl.SelectedIndex];
-        //    if (xtab.Text != "Regeln") { return; }
-
-
-        //    if (Einlesen && !AllOk())
-        //    {
-        //        tabControl.SelectedIndex = 0;
-        //        return;
-        //    }
-
-        //    cbxColumnKeyInColumn.Item.Clear();
-        //    cbxTargetColumn.Item.Clear();
-        //    cbxRowKeyInColumn.Item.Clear();
-
-
-        //    if (_Column.Format == enDataFormat.LinkedCell)
-        //    {
-        //        gpxVerlinkteZellen.Enabled = true;
-        //        foreach (var ThisLinkedColumn in _Column.LinkedDatabase().Column)
-        //        {
-        //            if (ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) { cbxTargetColumn.Item.Add(ThisLinkedColumn); }
-
-        //        }
-
-        //        foreach (var ThisColumn in _Column.Database.Column)
-        //        {
-        //            if (ThisColumn.Format.CanBeChangedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) { cbxRowKeyInColumn.Item.Add(ThisColumn); }
-        //            if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxRowKeyInColumn.Item.Add(ThisColumn); }
-        //            if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxColumnKeyInColumn.Item.Add(ThisColumn); }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        gpxVerlinkteZellen.Enabled = false;
-        //    }
-
-        //    cbxRowKeyInColumn.Item.Sort();
-        //    cbxColumnKeyInColumn.Item.Sort();
-        //    cbxTargetColumn.Item.Sort();
-
-        //    cbxColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Item.Count > 0;
-        //    btnColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Enabled;
-        //    txbZeichenkette.Enabled = cbxColumnKeyInColumn.Enabled;
-        //    if (!btnColumnKeyInColumn.Enabled) { btnTargetColumn.Checked = true; } // Nicht perfekt die Lösung :-(
-
-        //    cbxTargetColumn.Enabled = cbxTargetColumn.Item.Count > 0;
-        //    btnTargetColumn.Enabled = cbxTargetColumn.Enabled;
-        //    if (!btnTargetColumn.Enabled) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
-
-        //    cbxRowKeyInColumn.Enabled = cbxRowKeyInColumn.Item.Count > 0;
-        //}
 
         private void cbxFormat_TextChanged(object sender, System.EventArgs e)
         {
+            ButtonCheck();
+        }
+
+        private void btnStandard_Click(object sender, System.EventArgs e)
+        {
+            if (!AllOk()) { return; }
+
+            _Column.StandardWerteNachKennung(true);
+            Column_DatenAuslesen(_Column);
+        }
+
+
+
+        private void ButtonCheck()
+        {
             var tmpFormat = (enDataFormat)int.Parse(cbxFormat.Text);
 
-            // Verknüpfte Datenbank
-            capLinkedDatabase.Enabled = tmpFormat.NeedTargetDatabase();
-            cbxLinkedDatabase.Enabled = tmpFormat.NeedTargetDatabase();
-            if (!tmpFormat.NeedTargetDatabase()) { cbxLinkedDatabase.Text = string.Empty; }
 
-            // LinkedKey-Kennung
-            capLinkedKeyKennung.Enabled = tmpFormat.NeedLinkedKeyKennung();
-            txbLinkedKeyKennung.Enabled = tmpFormat.NeedLinkedKeyKennung();
-            if (!tmpFormat.NeedLinkedKeyKennung()) { txbLinkedKeyKennung.Text = string.Empty; }
 
             // Mehrzeilig
             btnMultiline.Enabled = tmpFormat.MultilinePossible();
@@ -730,14 +708,70 @@ namespace BlueControls.BlueDatabaseDialogs
             btnSpellChecking.Enabled = tmpFormat.SpellCheckingPossible();
             if (!tmpFormat.SpellCheckingPossible()) { btnSpellChecking.Checked = false; }
 
+
+            // Format: Bildcode
+            grpBildCode.Enabled = tmpFormat == enDataFormat.BildCode;
+            if (tmpFormat != enDataFormat.BildCode)
+            {
+                txbBildCodeConstHeight.Text = string.Empty;
+                cbxBildCodeImageNotfound.Text = string.Empty;
+            }
+
+            // Format: LinkToFileSystem
+            grpLinkToFileSystem.Enabled = tmpFormat == enDataFormat.Link_To_Filesystem;
+            if (tmpFormat != enDataFormat.BildCode)
+            {
+                txbBestFileStandardFolder.Text = string.Empty;
+                txbBestFileStandardSuffix.Text = string.Empty;
+            }
+
+            // LinkedDatabase - Verknüpfte Datenbank
+            grpLinkedDatabase.Enabled = tmpFormat.NeedTargetDatabase();
+            if (!tmpFormat.NeedTargetDatabase())
+            {
+                cbxLinkedDatabase.Text = string.Empty;
+            }
+
+
+            // Format: Columns für Linked Database / LinkedKey-Kennung
+            grpColumnsForLinkedDatabase.Enabled = tmpFormat.NeedLinkedKeyKennung();
+            if (!tmpFormat.NeedLinkedKeyKennung()) { txbLinkedKeyKennung.Text = string.Empty; }
+
+            // Format: LinkedCell
+            grpVerlinkteZellen.Enabled = tmpFormat == enDataFormat.LinkedCell;
+
         }
 
-        private void btnStandard_Click(object sender, System.EventArgs e)
+        /// <summary>
+        /// Kümmert sich um erlaubte Spalten für LinkedCell
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cbxLinkedDatabase_TextChanged(object sender, System.EventArgs e)
         {
-            if (!AllOk()) { return; }
 
-            _Column.StandardWerteNachKennung(true);
-            Column_DatenAuslesen(_Column);
+            cbxTargetColumn.Item.Clear();
+
+            _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
+
+            if (_Column.LinkedDatabase() != null)
+            {
+                foreach (var ThisLinkedColumn in _Column.LinkedDatabase().Column)
+                {
+                    if (!ThisLinkedColumn.IsFirst() &&  ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) { cbxTargetColumn.Item.Add(ThisLinkedColumn); }
+
+                }
+                cbxTargetColumn.Item.Sort();
+            }
+
+            cbxTargetColumn.Enabled = cbxTargetColumn.Item.Count > 0;
+            btnTargetColumn.Enabled = cbxTargetColumn.Enabled;
+
+            if (!cbxTargetColumn.Enabled)
+            {
+                cbxTargetColumn.Text = string.Empty;
+                btnTargetColumn.Checked = false;
+            }
         }
     }
 }

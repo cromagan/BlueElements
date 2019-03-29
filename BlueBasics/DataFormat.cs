@@ -81,7 +81,6 @@ namespace BlueBasics
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                case enDataFormat.KeyForSame:
                     return true;
                 default:
                     return false;
@@ -96,7 +95,6 @@ namespace BlueBasics
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                     return true;
                 default: return false;
             }
@@ -116,7 +114,6 @@ namespace BlueBasics
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.LinkedCell:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                     return true;
 
                 default:
@@ -182,7 +179,6 @@ namespace BlueBasics
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                     return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + Constants.Char_Satzeichen + Constants.Char_Sonderzeichen;
 
                 case enDataFormat.Bit:
@@ -228,7 +224,6 @@ namespace BlueBasics
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                case enDataFormat.KeyForSame:
                     return true;
                 default:
                     return false;
@@ -247,7 +242,6 @@ namespace BlueBasics
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                 case enDataFormat.Farbcode:
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
@@ -284,7 +278,6 @@ namespace BlueBasics
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
@@ -326,7 +319,6 @@ namespace BlueBasics
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.Bit:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                     return true;
 
                 case enDataFormat.Datum_und_Uhrzeit:
@@ -363,7 +355,6 @@ namespace BlueBasics
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                     return true;
 
 
@@ -439,7 +430,6 @@ namespace BlueBasics
                 case enDataFormat.Link_To_Filesystem:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                     if (string.IsNullOrEmpty(IsValue)) { return string.Empty; }
 
                     IsValue = IsValue.ToLower();
@@ -535,7 +525,6 @@ namespace BlueBasics
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                     return true;
                 default:
                     return false;
@@ -551,7 +540,6 @@ namespace BlueBasics
             {
                 case enDataFormat.Text:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                 case enDataFormat.Text_mit_Formatierung:
                     return true;
                 default:
@@ -602,7 +590,6 @@ namespace BlueBasics
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.LinkedCell:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                     return true;
                 default:
                     return false;
@@ -633,7 +620,6 @@ namespace BlueBasics
                 case enDataFormat.Datum_und_Uhrzeit:
                 case enDataFormat.Farbcode:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Link_To_Filesystem:
@@ -660,7 +646,6 @@ namespace BlueBasics
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
-                case enDataFormat.KeyForSame:
                     return true;
                 default:
                     return false;
@@ -682,7 +667,6 @@ namespace BlueBasics
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.KeyForSame:
                     return true;
                 default:
                     return false;
@@ -708,7 +692,6 @@ namespace BlueBasics
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                case enDataFormat.KeyForSame:
                     return true;
                 default:
                     return false;
