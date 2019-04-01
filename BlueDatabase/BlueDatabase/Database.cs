@@ -47,29 +47,7 @@ namespace BlueDatabase
         public static List<Database> AllDatabases = new List<Database>();
 
 
-        /// <summary>
-        /// Prüft, ob die Datenbank bereits geladen ist. 
-        /// Lädt die Datenbank oder gibt die Datenbank, die breits im Speicher ist zurück.
-        /// </summary>
-        /// <param name="cFileName"></param>
-        /// <param name="ReadOnly"></param>
-        /// <param name="passwordSub"></param>
-        /// <param name="GenLayout"></param>
-        /// <param name="RenameColumn"></param>
-        /// <returns></returns>
-        public static Database Load(string cFileName, bool ReadOnly, GetPassword passwordSub, GenerateLayout_Internal GenLayout, RenameColumnInLayout RenameColumn)
-        {
-            var d = GetByFilename(cFileName);
-            if (d != null) { return d; }
-            return Load_Internal(cFileName, ReadOnly, passwordSub, GenLayout, RenameColumn);
-        }
 
-        public static Database Load(string cFileName, bool ReadOnly)
-        {
-            var d = GetByFilename(cFileName);
-            if (d != null) { return d; }
-            return Load_Internal(cFileName, ReadOnly, null, null, null);
-        }
 
 
         public static List<Database> GetByCaption(string Caption)
@@ -163,7 +141,14 @@ namespace BlueDatabase
 
                     }
 
-                    if (FileExists(pf)) { return Load(pf, false, passwordSub, GenLayout, RenameColumn); }
+                    if (FileExists(pf))
+                    {
+                        var tmp = Database.GetByFilename(pf);
+                        if (tmp != null) { return null; }
+                        tmp = new Database(false, passwordSub, GenLayout, RenameColumn);
+                        tmp.LoadFromDisk(pf);
+                        return tmp;
+                    }
 
                 } while (pf != string.Empty);
             }
@@ -266,7 +251,7 @@ namespace BlueDatabase
 
         }
 
-        private static Database GetByFilename(string cFileName)
+        public static Database GetByFilename(string cFileName)
         {
             cFileName = modConverter.SerialNr2Path(cFileName);
 
@@ -282,19 +267,24 @@ namespace BlueDatabase
 
 
 
-        private static Database Load_Internal(string fileName, bool readOnly, GetPassword passwordSub, GenerateLayout_Internal GenLayout, RenameColumnInLayout RenameColumn)
+        public void LoadFromDisk(string fileName)
         {
+
+            if (fileName.ToUpper() == Filename.ToUpper()) { return; }
+
+            if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(enFehlerArt.Fehler, "Geladene Datenbanken können nicht als neue Datenbank geladen werden."); }
 
             if (string.IsNullOrEmpty(fileName)) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname nicht angegeben!"); }
             fileName = modConverter.SerialNr2Path(fileName);
 
             if (!FileExists(fileName))
             {
-                if (!readOnly) { Develop.DebugPrint(enFehlerArt.Warnung, "Datenbank existiert nicht: " + fileName); } // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
-                return null;
+                Develop.DebugPrint(enFehlerArt.Warnung, "Datenbank existiert nicht: " + fileName);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
+                ReadOnly = true;
+                return;
             }
 
-            if (!CanWriteInDirectory(fileName.FilePath())) { readOnly = true; }
+            if (!CanWriteInDirectory(fileName.FilePath())) { ReadOnly = true; }
 
 
 
@@ -302,31 +292,28 @@ namespace BlueDatabase
 
             foreach (var ThisDatabase in AllDatabases)
             {
-
                 if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == fileName.ToLower())
                 {
-                    if (ThisDatabase.ReadOnly == readOnly) { return ThisDatabase; }
-
                     ThisDatabase.Release(true);
+                    Develop.DebugPrint(enFehlerArt.Fehler, "Doppletes Laden von " + fileName);
                 }
             }
 
-            var db = new Database(readOnly, passwordSub, GenLayout, RenameColumn);
 
-            db.Filename = fileName;
-            if (FileExists(fileName))
-            {
-                // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
-                db.LoadFromDisk();
-                if (int.Parse(db.LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { db.ReadOnly = true; }
-                db.OnLoaded(new LoadedEventArgs(false));
-            }
 
-            AllDatabases.Add(db);
+            Filename = fileName;
 
-            if (db.ReloadNeeded()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank nicht aktuell"); }
+            // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
+            LoadFromDisk();
 
-            return db;
+            OnLoaded(new LoadedEventArgs(false));
+
+
+            AllDatabases.Add(this);
+
+            if (ReloadNeeded()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank nicht aktuell"); }
+
+
         }
 
         //public RuleItem Rules_Has(ColumnItem column, string SystemKey)
@@ -484,6 +471,12 @@ namespace BlueDatabase
         public event EventHandler<KeyChangedEventArgs> RowKeyChanged;
         public event EventHandler<KeyChangedEventArgs> ColumnKeyChanged;
 
+        /// <summary>
+        /// Wird ausgegeben, sobals isparsed false ist, noch vor den automatischen reperaturen.
+        /// Diese Event kann verwendet werden, um die Datenbank zu reparieren, bevor sich automatische Dialoge öffnen.
+        /// </summary>
+        public event EventHandler Parsed;
+
         public delegate string GetPassword();
         public delegate string RenameColumnInLayout(Database database, string LayoutCode, string OldName, ColumnItem Column);
         public delegate void GenerateLayout_Internal(RowItem Row, int LayoutNr, bool DirectPrint, bool DirectSave, string OptionalFilename);
@@ -550,7 +543,7 @@ namespace BlueDatabase
             Initialize();
             _isParsing = false;
 
-            Filename = "";
+            Filename = string.Empty;
 
 
             UserGroup = "#Administrator";
@@ -1181,7 +1174,7 @@ namespace BlueDatabase
         /// Lädt die Datenbank von der Festplatte.
         /// Es die parallelen Threads benutzt. Diese Routine wartet aber, bis die Daten sichern neu geladen wurden.
         /// Falls die Datenbank bereits geladen wurde, und kein Reload nötig ist, wird die Datenbank nicht geladen.
-        /// Der Unterschied zum Reload ist, dass bei einem Reload Stor und Restore Events ausgelöst werden.
+        /// Der Unterschied zum Reload ist, dass bei einem Reload Store und Restore Events ausgelöst werden.
         /// </summary>
         private void LoadFromDisk()
         {
@@ -1425,10 +1418,13 @@ namespace BlueDatabase
             Column.ThrowEvents = true;
             _isParsing = false;
 
+
+            if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { ReadOnly = true; }
+
             //Repair NACH ExecutePendung, vielleicht ist es schon repariert
             //Repair NACH _isParsing, da es auch abgespeichert werden soll
+            OnParsed();
             Repair();
-
         }
 
 
@@ -2601,6 +2597,11 @@ namespace BlueDatabase
         private void OnSaveAborded()
         {
             SaveAborded?.Invoke(this, System.EventArgs.Empty);
+        }
+
+        private void OnParsed()
+        {
+            Parsed?.Invoke(this, System.EventArgs.Empty);
         }
 
         private void OnExporting(CancelEventArgs e)

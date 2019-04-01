@@ -240,7 +240,12 @@ namespace BlueControls.ItemCollection
                     return true;
 
                 case "database":
-                    ParseLevel2_TMPDatabase = Database.Load(pair.Value, false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
+                    ParseLevel2_TMPDatabase = Database.GetByFilename(pair.Value);
+                    if (ParseLevel2_TMPDatabase== null)
+                    {
+                        ParseLevel2_TMPDatabase= new Database(false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
+                        ParseLevel2_TMPDatabase.LoadFromDisk(pair.Value);
+                    }
                     return true;
 
                 case "rowid": // TODO: alt

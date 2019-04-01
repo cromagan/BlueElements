@@ -629,7 +629,14 @@ namespace BlueControls.BlueDatabaseDialogs
                 return;
             }
 
-            _TableView.Database = Database.Load(Files[0], true, _TableView.Database._PasswordSub, _TableView.Database._GenerateLayout, _TableView.Database._RenameColumnInLayout);
+            var tmp = Database.GetByFilename(Files[0]);
+            if (tmp == null)
+            {
+                tmp = new Database( true, _TableView.Database._PasswordSub, _TableView.Database._GenerateLayout, _TableView.Database._RenameColumnInLayout);
+                tmp.LoadFromDisk(Files[0]);
+            }
+
+            _TableView.Database = tmp;
 
             _originalDB = _merker;
             btnVorherigeVersion.Text = "zurück";

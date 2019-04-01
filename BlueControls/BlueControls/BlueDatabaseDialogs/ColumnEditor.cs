@@ -225,7 +225,9 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxSchlüsselspalte.Item.Clear();
             cbxSchlüsselspalte.Item.Add("#Ohne");
             cbxColumnKeyInColumn.Item.Clear();
+            cbxColumnKeyInColumn.Item.Add("#Ohne");
             cbxRowKeyInColumn.Item.Clear();
+            cbxRowKeyInColumn.Item.Add("#Ohne");
             cbxDropDownKey.Item.Clear();
             cbxDropDownKey.Item.Add("#Ohne");
             cbxVorschlag.Item.Clear();

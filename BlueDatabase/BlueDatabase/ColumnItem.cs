@@ -140,7 +140,7 @@ namespace BlueDatabase
 
         internal List<string> _UcaseNamesSortedByLenght = null;
 
-        public const string AllowedCharsInternalName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"; // Klammern, Semikolon etc. verboten, da es im Regeln bei Substring verwendet wird
+        public const string AllowedCharsInternalName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"; // Klammern, Semikolon etc. verboten, da es im Regeln bei Substring verwendet wird
 
         #endregion
 
@@ -1442,9 +1442,26 @@ namespace BlueDatabase
             if (string.IsNullOrEmpty(_LinkedDatabaseFile)) { return null; }
 
             var el = new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly, Database._PasswordSub, Database._GenerateLayout, Database._RenameColumnInLayout);
-            Database.OnLoadingLinkedDatabase(el);
 
-            TMP_LinkedDatabase = Database.Load(el.Filenname, el.ReadOnly, el.PasswordSub, el.GenenerateLayout, el.RenameColumnInLayout);
+            _TMP_LinkedDatabase = Database.GetByFilename(el.Filenname);
+            if (_TMP_LinkedDatabase == null)
+            {
+                Database.OnLoadingLinkedDatabase(el);
+            }
+
+            _TMP_LinkedDatabase = Database.GetByFilename(el.Filenname); // Event wird ausgelöst, Multitasking pfuscht rein, nochmal prüfen!!!!
+
+            
+            if (_TMP_LinkedDatabase == null)
+            {
+                if (FileExists(el.Filenname))
+                {
+
+                    _TMP_LinkedDatabase = new Database(el.ReadOnly, el.PasswordSub, el.GenenerateLayout, el.RenameColumnInLayout);
+                    _TMP_LinkedDatabase.LoadFromDisk(el.Filenname);
+                }
+            }
+
             if (_TMP_LinkedDatabase != null) { _TMP_LinkedDatabase.UserGroup = Database.UserGroup; }
             return _TMP_LinkedDatabase;
         }
@@ -2129,7 +2146,7 @@ namespace BlueDatabase
 
             // Diese Routine ist nicht ganz so streng und erlaubgt auch Ä' und so.
             // Beim Editor eingeben wird das allerdings unterbunden.
-            if (!Name.ContainsOnlyChars(AllowedCharsInternalName)) { return "Spaltenname enthält ungültige Zeichen."; }
+            if (!Name.ContainsOnlyChars(AllowedCharsInternalName)) { return "Spaltenname enthält ungültige Zeichen. Erlaubt sind A-Z, 0-9 und _"; }
 
 
             foreach (var ThisColumn in Database.Column)
@@ -2300,7 +2317,7 @@ namespace BlueDatabase
                 if (LinkedCell_ColumnValueFoundIn < 0 && LinkedCell_ColumnKey < 0) { return "Information fehlt, welche Spalte der Zieldatenbank verwendet werden soll."; }
                 if (LinkedCell_ColumnValueFoundIn > -1 && LinkedCell_ColumnKey > -1) { return "Doppelte Informationen, welche Spalte der Zieldatenbank verwendet werden soll."; }
                 if (LinkedCell_Behaviour == enFehlendesZiel.Undefiniert) { return "Verhalten, was mit Zeilen passieren soll, die in der Zieldatenbank nicht existiert, fehlt."; }
-                if (LinkedCell_ColumnValueFoundIn <0 && !string.IsNullOrEmpty(LinkedCell_ColumnValueAdd)) { return "Falsche Ziel-Spalte ODER Spalten-Vortext flasch."; }
+                if (LinkedCell_ColumnValueFoundIn < 0 && !string.IsNullOrEmpty(LinkedCell_ColumnValueAdd)) { return "Falsche Ziel-Spalte ODER Spalten-Vortext flasch."; }
             }
 
 

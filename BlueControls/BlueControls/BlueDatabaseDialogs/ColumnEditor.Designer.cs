@@ -1403,6 +1403,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Controls.Add(this.btnVor);
             this.Controls.Add(this.btnZurueck);
             this.Controls.Add(this.btnOk);
+            this.Design = BlueControls.Enums.enDesign.Form_Standard;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "ColumnEditor";
             this.Text = "Spalten-Eigenschaften";
