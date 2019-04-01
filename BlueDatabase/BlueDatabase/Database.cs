@@ -43,7 +43,7 @@ namespace BlueDatabase
     {
         #region  Shareds 
 
-        public static readonly string DatabaseVersion = "3.30";
+        public static readonly string DatabaseVersion = "3.31";
         public static List<Database> AllDatabases = new List<Database>();
 
 
@@ -297,6 +297,9 @@ namespace BlueDatabase
             if (!CanWriteInDirectory(fileName.FilePath())) { readOnly = true; }
 
 
+
+
+
             foreach (var ThisDatabase in AllDatabases)
             {
 
@@ -315,6 +318,7 @@ namespace BlueDatabase
             {
                 // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
                 db.LoadFromDisk();
+                if (int.Parse(db.LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { db.ReadOnly = true; }
                 db.OnLoaded(new LoadedEventArgs(false));
             }
 
@@ -388,7 +392,7 @@ namespace BlueDatabase
         private string _GlobalShowPass;
         private string _FileEncryptionKey;
 
-        private string _LoadedVersion;
+        public string LoadedVersion { get; private set; }
         private string _Caption;
         private enJoinTyp _JoinTyp;
         private enVerwaisteDaten _VerwaisteDaten;
@@ -397,7 +401,7 @@ namespace BlueDatabase
         private int _Skin;
         private double _GlobalScale;
 
-        public readonly bool ReadOnly;
+        public bool ReadOnly { get; private set; }
         public readonly ListExt<RuleItem> Rules = new ListExt<RuleItem>();
         public readonly ListExt<ColumnViewCollection> ColumnArrangements = new ListExt<ColumnViewCollection>();
         public readonly ListExt<ColumnViewCollection> Views = new ListExt<ColumnViewCollection>();
@@ -615,7 +619,7 @@ namespace BlueDatabase
             _Caption = string.Empty;
             _JoinTyp = enJoinTyp.Zeilen_verdoppeln;
             _VerwaisteDaten = enVerwaisteDaten.Ignorieren;
-            _LoadedVersion = DatabaseVersion;
+            LoadedVersion = DatabaseVersion;
             _ImportScript = string.Empty;
 
             _GlobalScale = 1f;
@@ -1375,7 +1379,7 @@ namespace BlueDatabase
                         if (B[Pointer] != 1 || B[Pointer + 1] != 3 || B[Pointer + 2] != 0 || B[Pointer + 3] != 0 || B[Pointer + 4] != 2 || B[Pointer + 5] != 79 || B[Pointer + 6] != 75 || B[Pointer + 7] != 1)
                         {
                             Filename = "";
-                            _LoadedVersion = "9.99";
+                            LoadedVersion = "9.99";
                             //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", enImageCode.Kritisch, "OK");
                             break;
                         }
@@ -1391,7 +1395,7 @@ namespace BlueDatabase
 
                 if (!string.IsNullOrEmpty(_Fehler))
                 {
-                    _LoadedVersion = "9.99";
+                    LoadedVersion = "9.99";
                     Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + Filename + "<br>Meldung: " + _Fehler);
                 }
 
@@ -1492,11 +1496,11 @@ namespace BlueDatabase
                 case enDatabaseDataType.Formatkennung:
                     break;
                 case enDatabaseDataType.Version:
-                    _LoadedVersion = Inhalt.Trim();
-                    if (_LoadedVersion != DatabaseVersion)
+                    LoadedVersion = Inhalt.Trim();
+                    if (LoadedVersion != DatabaseVersion)
                     {
                         Initialize();
-                        _LoadedVersion = Inhalt.Trim();
+                        LoadedVersion = Inhalt.Trim();
                     }
                     else
                     {
@@ -1680,7 +1684,7 @@ namespace BlueDatabase
                     return "";
 
                 default:
-                    _LoadedVersion = "9.99";
+                    LoadedVersion = "9.99";
                     if (!ReadOnly)
                     {
                         Develop.DebugPrint(enFehlerArt.Fehler, "Laden von Datentyp \'" + Art + "\' nicht definiert.<br>Wert: " + Inhalt + "<br>Datei: " + Filename);
@@ -1906,7 +1910,7 @@ namespace BlueDatabase
             if (Cell.Freezed) { return "Datenbank gerade eingefroren."; }
 
 
-            if (int.Parse(_LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."; }
+            if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."; }
 
             if (BlockDateiVorhanden()) { return "Beim letzten Versuch, die Datei zu speichern, ist der Speichervorgang nicht korrekt beendet worden. Speichern ist solange deaktiviert, bis ein Administrator die Freigabe zum Speichern erteilt."; }
 
@@ -2456,13 +2460,13 @@ namespace BlueDatabase
 
             SaveToByteList(l, enDatabaseDataType.Caption, _Caption);
             SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString());
-            SaveToByteList(l, enDatabaseDataType.VerwaisteDaten,((int)_VerwaisteDaten).ToString());
+            SaveToByteList(l, enDatabaseDataType.VerwaisteDaten, ((int)_VerwaisteDaten).ToString());
             SaveToByteList(l, enDatabaseDataType.Tags, Tags.JoinWithCr());
             SaveToByteList(l, enDatabaseDataType.PermissionGroups_NewRow, PermissionGroups_NewRow.JoinWithCr());
             SaveToByteList(l, enDatabaseDataType.DatenbankAdmin, DatenbankAdmin.JoinWithCr());
             SaveToByteList(l, enDatabaseDataType.Skin, _Skin.ToString());
             SaveToByteList(l, enDatabaseDataType.GlobalScale, _GlobalScale.ToString());
-            SaveToByteList(l, enDatabaseDataType.Ansicht,((int)_Ansicht).ToString());
+            SaveToByteList(l, enDatabaseDataType.Ansicht, ((int)_Ansicht).ToString());
             SaveToByteList(l, enDatabaseDataType.ReloadDelaySecond, _ReloadDelaySecond.ToString());
             SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
 

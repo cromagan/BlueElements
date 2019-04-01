@@ -71,20 +71,13 @@ namespace BlueControls.Classes_Editor
 
                 var Ac = (enAction)z;
 
-                //if (Ac.ToString() != z.ToString())
-                //{
-
-
-                //    if (Ac != enAction.LinkedCell)
-                //    {
-
-                //        var t = string.Empty;
-                //        QuickImage s = null;
-                //        RuleActionItem.MaximalText(tmp.Rule.Database, Ac, ref t, ref s);
-
-                //        Rule_Aktion.Item.Add(new TextListItem(z.ToString(), t, s));
-                //    }
-                //}
+                if (Ac.ToString() != z.ToString())
+                {
+                        var t = string.Empty;
+                        QuickImage s = null;
+                        RuleActionItem.MaximalText(tmp.Rule.Database, Ac, ref t, ref s);
+                        Rule_Aktion.Item.Add(new TextListItem(z.ToString(), t, s));
+                }
             }
 
 

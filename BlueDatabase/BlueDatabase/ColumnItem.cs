@@ -330,7 +330,7 @@ namespace BlueDatabase
                 if (ThisColumn.KeyColumnKey == Key) { I_Am_A_Key_For_Other_Column = true; } // Werte Gleichhalten
                 if (ThisColumn.LinkedCell_RowKey == Key) { I_Am_A_Key_For_Other_Column = true; } // LinkdeCells pflegen
                 if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = true; } // LinkdeCells pflegen
-                if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown) { I_Am_A_Key_For_Other_Column = true; } 
+                if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown) { I_Am_A_Key_For_Other_Column = true; }
             }
 
 
@@ -402,7 +402,7 @@ namespace BlueDatabase
 
         public int Key { get; }
 
-        public bool I_Am_A_Key_For_Other_Column {get; private set; }
+        public bool I_Am_A_Key_For_Other_Column { get; private set; }
 
         public string Caption
         {
@@ -1123,7 +1123,7 @@ namespace BlueDatabase
             }
             set
             {
-                if (_BestFile_StandardFolder == value) { return; }
+                if (_LinkedCell_ColumnValueAdd == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnValueAdd, this, _LinkedCell_ColumnValueAdd, value, true);
                 OnChanged();
             }
@@ -1545,7 +1545,11 @@ namespace BlueDatabase
 
                 case enDatabaseDataType.co_Name: _Name = Wert; Invalidate_TmpVariables(); break;
                 case enDatabaseDataType.co_Caption: _Caption = Wert; break;
-                case enDatabaseDataType.co_Format: _Format = (enDataFormat)int.Parse(Wert); break;
+                case enDatabaseDataType.co_Format:
+                    _Format = (enDataFormat)int.Parse(Wert);
+                    if (Wert == "21") { _Format = enDataFormat.Text; }
+                    break;
+
                 case enDatabaseDataType.co_ForeColor: _ForeColor = Color.FromArgb(int.Parse(Wert)); break;
                 case enDatabaseDataType.co_BackColor: _BackColor = Color.FromArgb(int.Parse(Wert)); break;
                 case enDatabaseDataType.co_LineLeft: _LineLeft = (enColumnLineStyle)int.Parse(Wert); break;
@@ -1909,8 +1913,9 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ConstantHeight, _BildCode_ConstantHeight.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ImageNotFound, ((int)_BildCode_ImageNotFound).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Prefix, _Prefix, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_RowKey, _LinkedCell_RowKey.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_KeyColumnKey, _KeyColumnKey.ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_RowKey, _LinkedCell_RowKey.ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnKey, _LinkedCell_ColumnKey.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, _LinkedCell_ColumnValueFoundIn.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueAdd, _LinkedCell_ColumnValueAdd, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_Behaviour, ((int)_LinkedCell_Behaviour).ToString(), Key);
@@ -2287,6 +2292,16 @@ namespace BlueDatabase
                 if (_Format == enDataFormat.RelationText) { return "Die (intern) erste Spalte kann nicht das Format RelationText haben."; }
             }
 
+
+
+            if (_Format == enDataFormat.LinkedCell)
+            {
+                if (LinkedCell_RowKey < 0) { return "Die Angabe der Spalte, aus der der Schlüsselwert geholt wird, fehlt."; }
+                if (LinkedCell_ColumnValueFoundIn < 0 && LinkedCell_ColumnKey < 0) { return "Information fehlt, welche Spalte der Zieldatenbank verwendet werden soll."; }
+                if (LinkedCell_ColumnValueFoundIn > -1 && LinkedCell_ColumnKey > -1) { return "Doppelte Informationen, welche Spalte der Zieldatenbank verwendet werden soll."; }
+                if (LinkedCell_Behaviour == enFehlendesZiel.Undefiniert) { return "Verhalten, was mit Zeilen passieren soll, die in der Zieldatenbank nicht existiert, fehlt."; }
+                if (LinkedCell_ColumnValueFoundIn <0 && !string.IsNullOrEmpty(LinkedCell_ColumnValueAdd)) { return "Falsche Ziel-Spalte ODER Spalten-Vortext flasch."; }
+            }
 
 
             return string.Empty;

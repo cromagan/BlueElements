@@ -522,8 +522,20 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             _Column.LinkedCell_RowKey = ColumKeyFrom(_Column.Database, cbxRowKeyInColumn.Text);
-            _Column.LinkedCell_ColumnKey = ColumKeyFrom(_Column.LinkedDatabase(), cbxTargetColumn.Text); // LINKED DATABASE
-            _Column.LinkedCell_ColumnValueFoundIn = ColumKeyFrom(_Column.Database, cbxColumnKeyInColumn.Text);
+
+            if (btnTargetColumn.Checked)
+            {
+                _Column.LinkedCell_ColumnKey = ColumKeyFrom(_Column.LinkedDatabase(), cbxTargetColumn.Text); // LINKED DATABASE
+                _Column.LinkedCell_ColumnValueFoundIn = -1;
+            }
+            else
+            {
+                _Column.LinkedCell_ColumnKey = -1;
+                _Column.LinkedCell_ColumnValueFoundIn = ColumKeyFrom(_Column.Database, cbxColumnKeyInColumn.Text);
+
+            }
+
+
             _Column.LinkedCell_ColumnValueAdd = txbZeichenkette.Text;
             _Column.LinkedCell_Behaviour = (enFehlendesZiel)int.Parse(cbxFehlendesZiel.Text);
             _Column.ZellenZusammenfassen = butZusammenfassen.Checked;
@@ -758,7 +770,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 foreach (var ThisLinkedColumn in _Column.LinkedDatabase().Column)
                 {
-                    if (!ThisLinkedColumn.IsFirst() &&  ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) { cbxTargetColumn.Item.Add(ThisLinkedColumn); }
+                    if (!ThisLinkedColumn.IsFirst() && ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) { cbxTargetColumn.Item.Add(ThisLinkedColumn); }
 
                 }
                 cbxTargetColumn.Item.Sort();

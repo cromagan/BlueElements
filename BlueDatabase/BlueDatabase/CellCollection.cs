@@ -755,9 +755,15 @@ namespace BlueDatabase
             if (!string.IsNullOrEmpty(Column.CellInitValue)) { return string.Empty; }
 
 
+
+            if (Column.VorschlagsColumn>-1)
+            {
+            Develop.DebugPrint_NichtImplementiert();
+
+            }
+
             // _VorschlagColumnKey abfragen
 
-            Develop.DebugPrint_NichtImplementiert();
 
             //var BestW = "";
             //foreach (var ThisRule in Database.Rules)
