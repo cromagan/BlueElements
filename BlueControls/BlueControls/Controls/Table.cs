@@ -749,7 +749,7 @@ namespace BlueControls.Controls
             var toDraw = ContentHolderCellRow.CellGetString(ContentHolderCellColumn);
 
 
-            if (string.IsNullOrEmpty(toDraw)) { return; }
+            if (toDraw == null) { toDraw = string.Empty; }
 
             if (!ContentHolderCellColumn.MultiLine || !toDraw.Contains("\r"))
             {
@@ -2431,10 +2431,10 @@ namespace BlueControls.Controls
                             {
                                 NotEditableInfo(l2);
                             }
- 
+
 
                         }
-                           break;
+                        break;
 
                     case System.Windows.Forms.Keys.Delete:
                         if (_CursorPosRow.CellIsNullOrEmpty(_CursorPosColumn))
@@ -4189,43 +4189,41 @@ namespace BlueControls.Controls
                 }
 
 
-                if (!string.IsNullOrEmpty(_Ist1))
+
+                if (ContentHolderCellColumn.Format == enDataFormat.Text_mit_Formatierung)
                 {
-                    if (ContentHolderCellColumn.Format == enDataFormat.Text_mit_Formatierung)
-                    {
-                        var l = new ExtText(enDesign.TextBox, enStates.Standard);
-                        l.HtmlText = _Ist1;
-                        _Ist1 = l.PlainText;
-                    }
+                    var l = new ExtText(enDesign.TextBox, enStates.Standard);
+                    l.HtmlText = _Ist1;
+                    _Ist1 = l.PlainText;
+                }
 
 
-                    // Allgemeine Prüfung
-                    if (_Ist1.ToLower().Contains(searchTXT.ToLower()))
+                // Allgemeine Prüfung
+                if (!string.IsNullOrEmpty(_Ist1) && _Ist1.ToLower().Contains(searchTXT.ToLower()))
+                {
+                    foundColumn = column;
+                    foundRow = row;
+                    return;
+                }
+
+                // Prüfung mit und ohne Ersetzungen / Prefix / Suffix
+                var _Ist2 = CellItem.ValuesReadable(ContentHolderCellColumn, ContenHolderCellRow, enShortenStyle.Both).JoinWithCr();
+                if (!string.IsNullOrEmpty(_Ist2) && _Ist2.ToLower().Contains(searchTXT.ToLower()))
+                {
+                    foundColumn = column;
+                    foundRow = row;
+                    return;
+                }
+
+                if (VereinfachteSuche)
+                {
+                    var _Ist3 = _Ist2.StarkeVereinfachung();
+                    var _searchTXT3 = searchTXT.StarkeVereinfachung();
+                    if (!string.IsNullOrEmpty(_Ist3) && _Ist3.ToLower().Contains(_searchTXT3.ToLower()))
                     {
                         foundColumn = column;
                         foundRow = row;
                         return;
-                    }
-
-                    // Prüfung mit und ohne Ersetzungen / Prefix / Suffix
-                    var _Ist2 = CellItem.ValuesReadable(ContentHolderCellColumn, ContenHolderCellRow, enShortenStyle.Both).JoinWithCr();
-                    if (!string.IsNullOrEmpty(_Ist2) && _Ist2.ToLower().Contains(searchTXT.ToLower()))
-                    {
-                        foundColumn = column;
-                        foundRow = row;
-                        return;
-                    }
-
-                    if (VereinfachteSuche)
-                    {
-                        var _Ist3 = _Ist2.StarkeVereinfachung();
-                        var _searchTXT3 = searchTXT.StarkeVereinfachung();
-                        if (!string.IsNullOrEmpty(_Ist3) && _Ist3.ToLower().Contains(_searchTXT3.ToLower()))
-                        {
-                            foundColumn = column;
-                            foundRow = row;
-                            return;
-                        }
                     }
                 }
 

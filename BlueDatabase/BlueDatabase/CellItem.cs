@@ -109,6 +109,14 @@ namespace BlueDatabase
             {
                 ret.Add(ValueReadable(column, thisstring, Style));
             }
+
+            if (x.Count ==0)
+            {
+                var tmp = ValueReadable(column, string.Empty, Style);
+                if (!string.IsNullOrEmpty(tmp)) { ret.Add(tmp); }
+            }
+
+
             return ret;
         }
 
@@ -135,7 +143,7 @@ namespace BlueDatabase
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
                 case enDataFormat.LinkedCell:  // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
-                    if (Txt == null || string.IsNullOrEmpty(Txt)) { return string.Empty; }
+                    //if (Txt == null || string.IsNullOrEmpty(Txt)) { return string.Empty; }
                     Txt = ColumnItem.ColumnReplace(Txt, column, Style);
                     Txt = Txt.Replace("\r\n", " ");
                     break;
@@ -269,6 +277,7 @@ namespace BlueDatabase
 
                 case enDataFormat.BildCode:
                     if (defaultImage != null || column == null) { return defaultImage; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
+                    if(string.IsNullOrEmpty(Txt)) { return null; }
 
                     var code = column.Prefix + Txt + column.Suffix;
                     if (column.BildCode_ConstantHeight > 0) { code = code + "|" + column.BildCode_ConstantHeight; }

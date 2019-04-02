@@ -756,9 +756,9 @@ namespace BlueDatabase
 
 
 
-            if (Column.VorschlagsColumn>-1)
+            if (Column.VorschlagsColumn > -1)
             {
-            Develop.DebugPrint_NichtImplementiert();
+                Develop.DebugPrint_NichtImplementiert();
 
             }
 
@@ -919,6 +919,11 @@ namespace BlueDatabase
                     Pause(1, true);
                     return MatchesTo(Column, Row, Filter);
                 }
+            }
+            else
+            {
+                _String = string.Empty;
+                if (Typ.HasFlag(enFilterType.Instr)) { _String = ColumnItem.ColumnReplace(string.Empty, Column, enShortenStyle.Both); }
             }
 
 

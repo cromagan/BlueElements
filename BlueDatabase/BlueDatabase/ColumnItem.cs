@@ -1451,7 +1451,7 @@ namespace BlueDatabase
 
             _TMP_LinkedDatabase = Database.GetByFilename(el.Filenname); // Event wird ausgelöst, Multitasking pfuscht rein, nochmal prüfen!!!!
 
-            
+
             if (_TMP_LinkedDatabase == null)
             {
                 if (FileExists(el.Filenname))
@@ -1744,6 +1744,10 @@ namespace BlueDatabase
                     _Caption = "Fehlerfrei";
                     _SpellCheckingEnabled = false;
                     _Format = enDataFormat.Bit;
+                    _AutoFilterErweitertErlaubt = false;
+                    _AutoFilterJoker = string.Empty;
+                    _AutofilterTextFilterErlaubt = false;
+                    _IgnoreAtRowFilter = true;
                     if (SetAll)
                     {
                         ForeColor = Color.FromArgb(128, 0, 0);
@@ -1756,6 +1760,10 @@ namespace BlueDatabase
                     _Name = "SYS_Locked";
                     _SpellCheckingEnabled = false;
                     _Format = enDataFormat.Bit;
+                    _AutoFilterErweitertErlaubt = false;
+                    _AutoFilterJoker = string.Empty;
+                    _AutofilterTextFilterErlaubt = false;
+                    _IgnoreAtRowFilter = true;
                     if (_TextBearbeitungErlaubt || _DropdownBearbeitungErlaubt)
                     {
                         _QuickInfo = "Eine abgeschlossene Zeile kann<br>nicht mehr bearbeitet werden.";
@@ -2290,6 +2298,10 @@ namespace BlueDatabase
                 if (_Format != enDataFormat.Text &&
                     _Format != enDataFormat.Columns_für_LinkedCellDropdown &&
                     _Format != enDataFormat.BildCode) { return "Format unterstützt keine Ersetzungen."; }
+
+                if (_AutoFilterErweitertErlaubt ) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
+                //if (_AutofilterTextFilterErlaubt) { return "Entweder 'Ersetzungen' oder 'Texteingabe bei Autofilter'"; }
+                if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Entweder 'Ersetzungen' oder 'Autofilter Joker'"; }
             }
 
             if (_KeyColumnKey > -1)
@@ -2318,6 +2330,17 @@ namespace BlueDatabase
                 if (LinkedCell_ColumnValueFoundIn > -1 && LinkedCell_ColumnKey > -1) { return "Doppelte Informationen, welche Spalte der Zieldatenbank verwendet werden soll."; }
                 if (LinkedCell_Behaviour == enFehlendesZiel.Undefiniert) { return "Verhalten, was mit Zeilen passieren soll, die in der Zieldatenbank nicht existiert, fehlt."; }
                 if (LinkedCell_ColumnValueFoundIn < 0 && !string.IsNullOrEmpty(LinkedCell_ColumnValueAdd)) { return "Falsche Ziel-Spalte ODER Spalten-Vortext flasch."; }
+            }
+
+
+            if (_Format == enDataFormat.Bit)
+            {
+
+                if (_AutoFilterErweitertErlaubt) { return "Format unterstützt keinen 'erweiternden Autofilter'"; }
+                if (_AutofilterTextFilterErlaubt) { return "Format unterstützt keine 'Texteingabe bei Autofilter'"; }
+                if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Format unterstützt keinen 'Autofilter Joker'"; }
+                if (!_IgnoreAtRowFilter) { return "Format muss bei Zeilenfilter ignoriert werden.'"; }
+
             }
 
 
@@ -2602,22 +2625,34 @@ namespace BlueDatabase
         /// <returns></returns>
         public static string ColumnReplace(string newTXT, ColumnItem Column, enShortenStyle Style)
         {
+            if (!string.IsNullOrEmpty(newTXT))
+            {
+                if (!string.IsNullOrEmpty(Column.Prefix)) { newTXT = Column.Prefix + " " + newTXT; }
+                if (!string.IsNullOrEmpty(Column.Suffix)) { newTXT = newTXT + " " + Column.Suffix; }
+            }
 
-            if (!string.IsNullOrEmpty(Column.Prefix)) { newTXT = Column.Prefix + " " + newTXT; }
-            if (!string.IsNullOrEmpty(Column.Suffix)) { newTXT = newTXT + " " + Column.Suffix; }
-
-            if (Style == enShortenStyle.Unreplaced || Style == enShortenStyle.HTML || Column.Replacer.Count == 0) { return newTXT; }
+            if (Style == enShortenStyle.Unreplaced || Column.Replacer.Count == 0) { return newTXT; }
 
             var OT = newTXT;
 
             foreach (var ThisString in Column.Replacer)
             {
                 var x = ThisString.SplitBy("|");
-                if (x.Length == 2) { newTXT = newTXT.Replace(x[0], x[1]); }
+                if (x.Length == 2)
+                {
+                    if (string.IsNullOrEmpty(x[0]))
+                    {
+                        if (string.IsNullOrEmpty(newTXT)) { newTXT = x[1]; }
+                    }
+                    else
+                    {
+                        newTXT = newTXT.Replace(x[0], x[1]);
+                    }
+                }
                 if (x.Length == 1 && !ThisString.StartsWith("|")) { newTXT = newTXT.Replace(x[0], string.Empty); }
             }
 
-            if (Style == enShortenStyle.Replaced || OT == newTXT) { return newTXT; }
+            if (Style == enShortenStyle.Replaced || Style == enShortenStyle.HTML || OT == newTXT) { return newTXT; }
             return OT + " (" + newTXT + ")";
         }
 

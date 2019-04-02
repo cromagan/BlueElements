@@ -252,8 +252,6 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Item.Count > 0;
             btnColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Enabled;
             txbZeichenkette.Enabled = cbxColumnKeyInColumn.Enabled;
-            if (!btnColumnKeyInColumn.Enabled) { btnTargetColumn.Checked = true; } // Nicht perfekt die Lösung :-(
-            if (!btnTargetColumn.Enabled) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
             cbxRowKeyInColumn.Enabled = cbxRowKeyInColumn.Item.Count > 0;
 
 
@@ -264,6 +262,11 @@ namespace BlueControls.BlueDatabaseDialogs
             SetKeyTo(_Column.Database, cbxColumnKeyInColumn, _Column.LinkedCell_ColumnValueFoundIn);
             SetKeyTo(_Column.Database, cbxDropDownKey, _Column.DropdownKey);
             SetKeyTo(_Column.Database, cbxVorschlag, _Column.VorschlagsColumn);
+
+            if (btnColumnKeyInColumn.Enabled && _Column.LinkedCell_ColumnValueFoundIn >-1) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
+            if (btnTargetColumn.Enabled && _Column.LinkedCell_ColumnKey > -1) { btnTargetColumn.Checked = true; } // Nicht perfekt die Lösung :-(
+
+
 
             //RegelTabVorbereiten(false);
 

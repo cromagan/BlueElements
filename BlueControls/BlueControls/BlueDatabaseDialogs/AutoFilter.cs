@@ -128,8 +128,22 @@ namespace BlueControls.BlueDatabaseDialogs
                 sFilter.Item.Add(new TextListItem("filterlöschen", "Filter löschen", QuickImage.Get("Trichter|16||1"), false, Constants.FirstSortChar + "01"));
             }
 
-            sFilter.Item.Add(new TextListItem("filterleere", "leere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02"));
-            sFilter.Item.Add(new TextListItem("filternichtleere", "nicht leere", QuickImage.Get("TasteABC|20|16"), true, Constants.FirstSortChar + "03"));
+
+            var tmp = CellItem.ValueReadable(Column, string.Empty, enShortenStyle.Replaced);
+
+
+            if (string.IsNullOrEmpty(tmp))
+            {
+                sFilter.Item.Add(new TextListItem("filterleere", "leere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02"));
+                sFilter.Item.Add(new TextListItem("filternichtleere", "nicht leere", QuickImage.Get("TasteABC|20|16"), true, Constants.FirstSortChar + "03"));
+            }
+            else
+            {
+                sFilter.Item.Add(new TextListItem("filterleere", tmp + " (= leere)", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02"));
+                sFilter.Item.Add(new TextListItem("filternichtleere", "nicht leere", QuickImage.Get("TasteABC|20|16"), false, Constants.FirstSortChar + "03"));
+            }
+
+
 
 
 
