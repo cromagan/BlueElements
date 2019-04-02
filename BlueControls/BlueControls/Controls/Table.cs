@@ -440,95 +440,102 @@ namespace BlueControls.Controls
             Skin.Draw_Back(GR, enDesign.Table_And_Pad, State, DisplayRectangle, this, true);
 
 
-
+            /// Maximale Rechten Pixel der Permanenten Columns ermitteln
             var PermaX = 0;
+            foreach (var ViewItem in _Database.ColumnArrangements[_ArrangementNr])
+            {
+                if (ViewItem?.Column != null && ViewItem?.ViewType == enViewType.PermanentColumn)
+                {
+                    PermaX = Math.Max(PermaX, (int)ViewItem.OrderTMP_Spalte_X1 + (int)ViewItem._TMP_DrawWidth);
+                }
+            }
 
-
-            // Durchlauf 0 = Spalten
-            // Durchlauf 1 = Permanente Spalten
-
+            /// Hintergründe Zeichnen
+            // 0 = Spalten, 1 = Permanente Spalten
             for (var Durchlauf = 0; Durchlauf < 2; Durchlauf++)
             {
-                var lfdno = 0;
+                foreach (var ViewItem in _Database.ColumnArrangements[_ArrangementNr])
+                {
+                    if (DrawThisTurn(Durchlauf, ViewItem, DisplayRectangleWOSlider, PermaX))
+                    {
 
+                        // Den Body-Hintergrund Zeichnen
+                        Draw_Column_Body(GR, ViewItem, DisplayRectangleWOSlider);
+
+                    }
+                }
+            }
+
+            // 0 = Spalten, 1 = Permanente Spalten
+            var FirstColumn = true;
+            for (var Durchlauf = 0; Durchlauf < 2; Durchlauf++)
+            {
+                foreach (var ViewItem in _Database.ColumnArrangements[_ArrangementNr])
+                {
+                    if (DrawThisTurn(Durchlauf, ViewItem, DisplayRectangleWOSlider, PermaX))
+                    {
+
+                        // Den Cursor zeichnen
+                        Draw_Cursor(GR, ViewItem, DisplayRectangleWOSlider);
+
+
+                        //  Neue Zeile 
+                        if (UserEdit_NewRowAllowed() && ViewItem == _Database.ColumnArrangements[_ArrangementNr][Database.Column[0]])
+                        {
+                            Skin.Draw_FormatedText(GR, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, (int)(16 * Database.GlobalScale)), enAlignment.Left, new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)ViewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font);
+                        }
+
+
+                        // Zeilen Zeichnen (Alle Zellen)
+                        for (var Zei = FirstVisibleRow; Zei <= LastVisibleRow; Zei++)
+                        {
+                            Draw_Cell(GR, ViewItem, SortedRows()[Zei], DisplayRectangleWOSlider);
+
+
+                            if (FirstColumn)
+                            {
+                                // Zeilenlinien und Überschriften zeichnen
+                                if (!string.IsNullOrEmpty(SortedRows()[Zei].TMP_Chapter))
+                                {
+                                    GR.DrawString(SortedRows()[Zei].TMP_Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, (int)SortedRows()[Zei].TMP_Y - RowCaptionFontY);
+                                }
+                                Draw_Line(GR, SortedRows()[Zei], DisplayRectangleWOSlider, _Database.ColumnArrangements[_ArrangementNr].LastThisViewItem());
+                            }
+
+                        }
+                        FirstColumn = false;
+
+
+                    }
+                }
+            }
+
+
+
+
+            /// 
+            /// Spaltenkopf Zeichnen
+            // 0 = Spalten, 1 = Permanente Spalten
+            var lfdno = 0;
+            for (var Durchlauf = 0; Durchlauf < 2; Durchlauf++)
+            {
                 foreach (var ViewItem in _Database.ColumnArrangements[_ArrangementNr])
                 {
                     if (ViewItem?.Column != null)
                     {
                         lfdno += 1;
-                        if (IsOnScreen(ViewItem, DisplayRectangleWOSlider))
+                        if (DrawThisTurn(Durchlauf, ViewItem, DisplayRectangleWOSlider, PermaX))
                         {
-                            if (ViewItem.ViewType == enViewType.PermanentColumn)
-                            {
-                                PermaX = Math.Max(PermaX, (int)ViewItem.OrderTMP_Spalte_X1 + (int)ViewItem._TMP_DrawWidth);
-                            }
-
-
-                            if ((Durchlauf == 0 & ViewItem.ViewType != enViewType.PermanentColumn && (int)ViewItem.OrderTMP_Spalte_X1 + (int)ViewItem._TMP_DrawWidth > PermaX) ||
-                                (Durchlauf == 1 & ViewItem.ViewType == enViewType.PermanentColumn))
-                            {
-
-                                // Den Body-Hintergrund Zeichnen
-                                Draw_Column_Body(GR, ViewItem, DisplayRectangleWOSlider);
-
-                                // Den Cursor zeichnen
-                                Draw_Cursor(GR, ViewItem, DisplayRectangleWOSlider);
-
-                                // Zeilen Zeichnen (Alle Zellen)
-                                for (var Zei = FirstVisibleRow; Zei <= LastVisibleRow; Zei++)
-                                {
-                                    Draw_Cell(GR, ViewItem, SortedRows()[Zei], DisplayRectangleWOSlider);
-                                }
-
-
-                                Draw_Column_Head(GR, ViewItem, DisplayRectangleWOSlider, lfdno);
-                            }
+                            Draw_Column_Head(GR, ViewItem, DisplayRectangleWOSlider, lfdno);
                         }
                     }
                 }
-
             }
 
+
+
+            /// Überschriften 1-3 Zeichnen
             Draw_Column_Head_Captions(GR);
-
-            // ZEilenlinien, Überschriften und "Warn-Symbol" Zeichnen
-
-            for (var Zei = FirstVisibleRow; Zei <= LastVisibleRow; Zei++)
-            {
-                if (!string.IsNullOrEmpty(SortedRows()[Zei].TMP_Chapter))
-                {
-                    GR.DrawString(SortedRows()[Zei].TMP_Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, (int)SortedRows()[Zei].TMP_Y - RowCaptionFontY);
-                }
-                //if (SortedRows()[Zei].TMP_Y >= HeadSize())
-                //{
-                //    if (!SortedRows()[Zei].CellGetBoolean(_Database.Column.SysCorrect))
-                //    {
-                //        GR.DrawImage(QuickImage.Get("Warnung|14||||||120||60").BMP, 3, (int)SortedRows()[Zei].TMP_Y + 1);
-                //    }
-                //    //else if (!SortedRows()[Zei].CellGetBoolean(_Database.Column.SysLocked()))
-                //    //{
-                //    //    GR.DrawImage(QuickImage.Get("Schlüssel|8|||FF0000|||120||60").BMP, 3, (int)SortedRows()[Zei].TMP_Y + 1);
-                //    //}
-
-
-                //}
-
-                Draw_Line(GR, SortedRows()[Zei], DisplayRectangleWOSlider, _Database.ColumnArrangements[_ArrangementNr].LastThisViewItem());
-            }
-
-
-
-
-            //  Neue Zeile & Linienabgrenzungen- Zeichnen
-            if (UserEdit_NewRowAllowed())
-            {
-                var ViewItem = _Database.ColumnArrangements[_ArrangementNr][Database.Column[0]];
-                if (IsOnScreen(ViewItem, DisplayRectangleWOSlider))
-                {
-                    Skin.Draw_FormatedText(GR, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, (int)(16 * Database.GlobalScale)), enAlignment.Left, new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)ViewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font);
-                    //GR.DrawString("[Neue Zeile]", NewRow_Font.Font(), NewRow_Font.Brush_Color_Main, (int)ViewItem.OrderTMP_Spalte_X1, (int)(-SliderY.Value + HeadSize()));
-                }
-            }
 
 
 
@@ -538,6 +545,28 @@ namespace BlueControls.Controls
             if (Database.ReloadNeeded()) { GR.DrawImage(QuickImage.Get(enImageCode.Uhr, 16).BMP, 8, 8); }
             if (Database.HasPendingChanges()) { GR.DrawImage(QuickImage.Get(enImageCode.Stift, 16).BMP, 16, 8); }
             if (Database.ReadOnly) { GR.DrawImage(QuickImage.Get(enImageCode.Schloss, 32).BMP, 16, 8); }
+
+
+
+
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Durchlauf">0 = Spalten, 1 = Permanente Spalten</param>
+        /// <param name="ViewItem"></param>
+        /// <param name="PermaX"></param>
+        /// <returns></returns>
+        private bool DrawThisTurn(int Durchlauf, ColumnViewItem ViewItem, Rectangle DisplayRectangleWOSlider, int PermaX)
+        {
+            if (ViewItem == null || ViewItem.Column == null) { return false; }
+            if (!IsOnScreen(ViewItem, DisplayRectangleWOSlider)) { return false; }
+
+            if (Durchlauf == 0 && ViewItem.ViewType != enViewType.PermanentColumn && (int)ViewItem.OrderTMP_Spalte_X1 + (int)ViewItem._TMP_DrawWidth > PermaX) { return true; }
+            if (Durchlauf == 1 && ViewItem.ViewType == enViewType.PermanentColumn) { return true; }
+            return false;
         }
 
 
