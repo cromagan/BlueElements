@@ -369,9 +369,14 @@ namespace BeCreative
             LoadTab.FileName = Datei;
 
 
-            Database tmpDatabase = null;
+            Database tmpDatabase = Database.GetByFilename(Datei);
 
-            tmpDatabase = Database.Load(Datei, false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
+            if (tmpDatabase == null)
+            {
+                tmpDatabase = new Database( false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
+                tmpDatabase.LoadFromDisk(Datei);
+            }
+
 
             if (tmpDatabase == null) { return; }
 

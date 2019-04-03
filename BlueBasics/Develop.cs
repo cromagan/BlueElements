@@ -227,7 +227,7 @@ namespace BlueBasics
                         break;
 
                     case enFehlerArt.Warnung:
-                        if (IsDevelopment()) { Debugger.Break(); }
+                       if (IsDevelopment()) { Debugger.Break(); }
 
                         Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
                         _DeleteTraceLog = false;
