@@ -246,7 +246,7 @@ namespace BlueDatabase
         {
             if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
 
-            var CurrentValue = GetString(Column, RowKey);
+            var CurrentValue = GetString(Column, Database.Row.SearchByKey(RowKey));
 
             if (CurrentValue == PreviewsValue) { return; }
 
@@ -445,10 +445,6 @@ namespace BlueDatabase
         }
 
 
-        private string GetString(ColumnItem Column, int RowKey)
-        {
-            return GetString(Column, Database.Row.SearchByKey(RowKey));
-        }
 
         private void RepairRelationText(ColumnItem Column, RowItem Row, string PreviewsValue, bool FreezeMode)
         {
@@ -659,12 +655,7 @@ namespace BlueDatabase
         }
         public void Set(ColumnItem Column, RowItem Row, List<string> Value)
         {
-            Set(Column, Row, Value.JoinWithCr());
-        }
-
-        public List<string> GetList(ColumnItem Column, int RowKey)
-        {
-            return GetList(Column, Database.Row.SearchByKey(RowKey));
+            Set(Column, Row, Value.JoinWithCr(), false);
         }
 
 
@@ -698,12 +689,9 @@ namespace BlueDatabase
                 }
             }
         }
-        public void Set(ColumnItem Column, RowItem Row, string Value)
-        {
-            Set(Column, Row, Value, false);
-        }
 
-        internal void Set(ColumnItem Column, RowItem Row, string Value, bool FreezeMode)
+
+        public void Set(ColumnItem Column, RowItem Row, string Value, bool FreezeMode)
         {
             if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
             if (Row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!!<br>" + Database.Filename); }
@@ -712,7 +700,7 @@ namespace BlueDatabase
             if (Column.Format == enDataFormat.LinkedCell)
             {
                 LinkedCellData(Column, Row, out var LCColumn, out var LCrow);
-                if (LCColumn != null) { LCrow?.Database.Cell.Set(LCColumn, LCrow, Value); }
+                if (LCColumn != null) { LCrow?.Database.Cell.Set(LCColumn, LCrow, Value, false); }
                 return;
             }
             SetValueBehindLinkedValue(Column, Row, Value, FreezeMode);
@@ -800,7 +788,7 @@ namespace BlueDatabase
 
         public void Set(ColumnItem Column, RowItem Row, bool Value)
         {
-            Set(Column, Row, Value.ToPlusMinus());
+            Set(Column, Row, Value.ToPlusMinus(), false);
         }
         public void Set(ColumnItem Column, RowItem Row, bool Value, bool FreezeMode)
         {
@@ -977,10 +965,6 @@ namespace BlueDatabase
                           //}
         }
 
-        public bool IsNullOrEmpty(int ColumnIndex, RowItem Row)
-        {
-            return IsNullOrEmpty(Database.Column[ColumnIndex], Row);
-        }
 
         public Point GetPoint(ColumnItem Column, RowItem Row)
         {
@@ -991,15 +975,15 @@ namespace BlueDatabase
 
         public void Set(ColumnItem Column, RowItem Row, DateTime Value)
         {
-            Set(Column, Row, Value.ToString("dd/MM/yyyy HH:mm:ss"));
+            Set(Column, Row, Value.ToString("dd/MM/yyyy HH:mm:ss"), false);
         }
 
         public void Set(ColumnItem Column, RowItem Row, Point Value)
         {
             // {X=253,Y=194} MUSS ES SEIN, prüfen
-            Set(Column, Row, Value.ToString());
+            Set(Column, Row, Value.ToString(), false);
         }
-        internal void Set(string ColumnName, RowItem Row, Point Value)
+        public void Set(string ColumnName, RowItem Row, Point Value)
         {
             Set(Database.Column[ColumnName], Row, Value);
         }
@@ -1071,7 +1055,7 @@ namespace BlueDatabase
             return _cells[CellKey].Value;
         }
 
-        internal string GetStringBehindLinkedValue(ColumnItem Column, RowItem Row)
+        public string GetStringBehindLinkedValue(ColumnItem Column, RowItem Row)
         {
             if (Column == null || Row == null) { return string.Empty; }
             var CellKey = KeyOfCell(Column, Row);
@@ -1187,12 +1171,6 @@ namespace BlueDatabase
             return string.Empty;
         }
 
-        public List<string> GetList(int ColumnIndex, RowItem Row)
-        {
-            return GetList(Database.Column[ColumnIndex], Row);
-        }
-
-
         public void Set(ColumnItem Column, RowItem Row, int Value, bool FreezeMode)
         {
             Set(Column, Row, Value.ToString(), FreezeMode);
@@ -1200,12 +1178,12 @@ namespace BlueDatabase
 
         public void Set(ColumnItem Column, RowItem Row, int Value)
         {
-            Set(Column, Row, Value.ToString());
+            Set(Column, Row, Value.ToString(), false);
         }
 
         public void Set(ColumnItem Column, RowItem Row, double Value)
         {
-            Set(Column, Row, Value.ToString());
+            Set(Column, Row, Value.ToString(), false);
         }
 
         public void Set(ColumnItem Column, RowItem Row, double Value, bool FreezeMode)
@@ -1285,14 +1263,6 @@ namespace BlueDatabase
             return modConverter.StringToBitmap(GetString(Column, Row));
         }
 
-        internal string GetString(int ColumnKey, RowItem Row)
-        {
-            return GetString(Database.Column[ColumnKey], Row);
-        }
-        internal void Set(int ColumnKey, RowItem Row, string Value)
-        {
-            Set(Database.Column[ColumnKey], Row, Value);
-        }
 
         internal string CompareKey(ColumnItem Column, RowItem Row)
         {
@@ -1301,7 +1271,7 @@ namespace BlueDatabase
 
         public void Set(string ColumnName, RowItem Row, string Value)
         {
-            Set(Database.Column[ColumnName], Row, Value);
+            Set(Database.Column[ColumnName], Row, Value, false);
         }
 
         public void Set(string ColumnName, RowItem Row, string Value, bool FreezeMode)

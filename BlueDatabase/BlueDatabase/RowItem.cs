@@ -75,21 +75,6 @@ namespace BlueDatabase
             Initialize();
         }
 
-        public string CellFirstString()
-        {
-            return Database.Cell.GetString(0, this);
-        }
-
-        public List<string> CellGetList(string ColumnName)
-        {
-            return Database.Cell.GetList(Database.Column[ColumnName], this);
-        }
-
-        public string CellBestFile(string ColumnName)
-        {
-            return Database.Cell.BestFile(Database.Column[ColumnName], this);
-        }
-
         #endregion
 
 
@@ -349,7 +334,7 @@ namespace BlueDatabase
 
         public void CellSet(string ColumnName, Point Value)
         {
-            Database.Cell.Set(ColumnName, this, Value);
+            Database.Cell.Set(Database.Column[ColumnName], this, Value);
         }
 
         private bool RowFilterMatch(string Search)
@@ -396,17 +381,31 @@ namespace BlueDatabase
             return Database.Cell.IsNullOrEmpty(Database.Column[ColumnName], this);
         }
 
+        public string CellFirstString()
+        {
+            return Database.Cell.GetString(Database.Column[0], this);
+        }
+
+        public List<string> CellGetList(string ColumnName)
+        {
+            return Database.Cell.GetList(Database.Column[ColumnName], this);
+        }
+
+        public string CellBestFile(string ColumnName)
+        {
+            return Database.Cell.BestFile(Database.Column[ColumnName], this);
+        }
 
 
 
         public int CellGetInteger(string ColumnName)
         {
-            return Database.Cell.GetInteger(ColumnName, this);
+            return Database.Cell.GetInteger(Database.Column[ColumnName], this);
         }
 
         public string CellGetString(string ColumnName)
         {
-            return Database.Cell.GetString(ColumnName, this);
+            return Database.Cell.GetString(Database.Column[ColumnName], this);
         }
 
         public List<string> CellGetValuesReadable(ColumnItem Column, enShortenStyle style)
@@ -415,20 +414,15 @@ namespace BlueDatabase
         }
 
 
-        //public string CellGetStringForExport(string ColumnName)
-        //{
-        //    return Database.Cell.GetStringForExport(ColumnName, this);
-        //}
-
 
         public void CellSet(string ColumnName, string Value)
         {
-            Database.Cell.Set(ColumnName, this, Value);
+            Database.Cell.Set(Database.Column[ColumnName], this, Value, false);
         }
 
         public void CellSet(string ColumnName, string Value, bool FreezeMode)
         {
-            Database.Cell.Set(ColumnName, this, Value, FreezeMode);
+            Database.Cell.Set(Database.Column[ColumnName], this, Value, FreezeMode);
         }
 
         public string[] CellGetArray(string ColumnName)
@@ -463,12 +457,12 @@ namespace BlueDatabase
 
         public void CellSet(string ColumnName, bool Value)
         {
-            Database.Cell.Set(Database.Column[ColumnName], this, Value);
+            Database.Cell.Set(Database.Column[ColumnName], this, Value, false);
         }
 
         public void CellSet(string ColumnName, List<string> Value)
         {
-            Database.Cell.Set(Database.Column[ColumnName], this, Value);
+            Database.Cell.Set(Database.Column[ColumnName], this, Value, false);
 
         }
 
@@ -480,7 +474,7 @@ namespace BlueDatabase
 
         public void CellSet(ColumnItem Column, List<string> Value)
         {
-            Database.Cell.Set(Column, this, Value);
+            Database.Cell.Set(Column, this, Value, false);
         }
         public void CellSet(ColumnItem Column, List<string> Value, bool FreezeMode)
         {
@@ -488,7 +482,7 @@ namespace BlueDatabase
         }
         public void CellSet(ColumnItem Column, string Value)
         {
-            Database.Cell.Set(Column, this, Value);
+            Database.Cell.Set(Column, this, Value, false);
         }
 
         public void CellSet(ColumnItem Column, string Value, bool FreezeMode)
@@ -503,7 +497,7 @@ namespace BlueDatabase
 
         public void CellSet(string ColumnName, int Value)
         {
-            Database.Cell.Set(Database.Column[ColumnName], this, Value);
+            Database.Cell.Set(Database.Column[ColumnName], this, Value, false);
         }
 
         public bool CellIsNullOrEmpty(string ColumnName)
@@ -533,12 +527,12 @@ namespace BlueDatabase
 
         public decimal CellGetDecimal(string ColumnName)
         {
-            return Database.Cell.GetDecimal(ColumnName, this);
+            return Database.Cell.GetDecimal(Database.Column[ColumnName], this);
         }
 
         public void CellSet(string ColumnName, double Value)
         {
-            Database.Cell.Set(ColumnName, this, Value);
+            Database.Cell.Set(Database.Column[ColumnName], this, Value, false);
         }
 
         public Point CellGetPoint(ColumnItem Column)
@@ -554,12 +548,6 @@ namespace BlueDatabase
         public string CellBestFile(ColumnItem Column)
         {
             return Database.Cell.BestFile(Column, this);
-        }
-
-        public bool CellIsNullOrEmpty(int ColumnIndex)
-        {
-            return Database.Cell.IsNullOrEmpty(ColumnIndex, this);
-
         }
 
         public Bitmap CellGetBitmap(ColumnItem Column)
@@ -589,7 +577,7 @@ namespace BlueDatabase
 
         public DateTime CellGetDate(string ColumnName)
         {
-            return Database.Cell.GetDate(ColumnName, this);
+            return Database.Cell.GetDate(Database.Column[ColumnName], this);
         }
 
         public DateTime CellGetDate(ColumnItem Column)
