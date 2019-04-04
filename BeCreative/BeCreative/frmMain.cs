@@ -872,7 +872,7 @@ namespace BeCreative
                     break;
 
                 case "Fehlersuche":
-                    MessageBox.Show(Row.DoAutomatic(false, true));
+                    MessageBox.Show(Row.DoAutomatic(false, true, true));
                     break;
 
                 case "ZeileLöschen":
@@ -1010,7 +1010,7 @@ namespace BeCreative
 
         private void Datenüberprüfung_Click(object sender, EventArgs e)
         {
-            TableView.Database.Row.DoAutomatic(TableView.Filter);
+            TableView.Database.Row.DoAutomatic(TableView.Filter, true);
         }
 
 

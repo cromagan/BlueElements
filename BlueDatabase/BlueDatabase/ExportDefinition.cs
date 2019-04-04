@@ -624,7 +624,7 @@ namespace BlueDatabase
             }
             if (!string.IsNullOrEmpty(Database.GlobalShowPass) && _Typ != enExportTyp.DatenbankOriginalFormat)
             {
-                return "Es können von passwortgeschützten Datenbanken nur Exporte im Originalformat stattfinden.";
+                return "Von passwortgeschützten Datenbanken können nur Exporte im Originalformat stattfinden.";
             }
 
 
@@ -679,6 +679,11 @@ namespace BlueDatabase
                 return "Das Zielverzeichnis existiert nicht.";
             }
 
+
+            if (CanWriteInDirectory(_Verzeichnis))
+            {
+                return "Sie besitzen im Zielverzeichnis keine Schreibrechte.";
+            }
 
 
             return string.Empty;

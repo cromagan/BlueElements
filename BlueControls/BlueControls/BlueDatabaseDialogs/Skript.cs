@@ -35,6 +35,8 @@ namespace BlueControls.BlueDatabaseDialogs
         private Database _Database;
         private RowItem _row = null;
 
+        private string _DidImport = string.Empty;
+
         public Skript(Table table)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -71,7 +73,18 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 txbImportSkript.Enabled = _Database.IsAdministrator();
                 txbImportSkript.Text = _Database.ImportScript.FromNonCritical();
+
+                chkFehlgeschlageneSpalten.Visible = _Database.IsAdministrator();
+                chkFehlgeschlageneSpalten.Enabled = _Database.IsAdministrator();
+
+                if (!_Database.IsAdministrator())
+                {
+                    chkFehlgeschlageneSpalten.Checked = false;
+                }
             }
+
+
+
         }
 
         private void _BlueTable_DatabaseChanged(object sender, System.EventArgs e)
@@ -113,32 +126,45 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void CursorPosChanged(object sender, CellEventArgs e)
         {
-
-
+            var ok = true;
             if (e.Row == null)
             {
-                optVorhandenZeile.Enabled = false;
                 optVorhandenZeile.Text = "Aktuell angewählte Zeile überschreiben";
+                ok = false;
+            }
+            else
+            {
+                optVorhandenZeile.Text = "Aktuell angewählte Zeile  <b>(" + e.Row.CellFirstString() + ")</b> überschreiben";
+
+                if (!Database.IsAdministrator())
+                {
+                    foreach (var ThisColumn in Database.Column)
+                    {
+                        if (ThisColumn != Database.Column.SysRowChangeDate && ThisColumn != Database.Column.SysRowChanger)
+                        {
+                            if (!Database.Cell.UserEditPossible(ThisColumn, e.Row, false)) { ok = false; }
+                        }
+                    }
+                }
+
+
+
+                if (e.Row.CellGetBoolean(Database.Column.SysLocked)) { ok = false; }
+
+
+            }
+
+            optVorhandenZeile.Enabled = ok;
+
+            if (!ok)
+            {
                 optVorhandenZeile.Checked = false;
                 _row = null;
             }
             else
             {
-                optVorhandenZeile.Enabled = true;
-                optVorhandenZeile.Text = "Aktuell angewählte Zeile  <b>(" + e.Row.CellFirstString() + ")</b> überschreiben";
                 _row = e.Row;
             }
-
-            //if (e.Column == null)
-            //{
-            //    NurinAktuellerSpalte.Text = "Nur in der <b>aktuell gewählten Spalte</b> ersetzen.";
-            //}
-            //else
-            //{
-            //    NurinAktuellerSpalte.Text = "Nur in Spalte <b>'" + e.Column.ReadableText() + "'</b> ersetzen.";
-            //}
-
-            //Checkbuttons();
         }
 
 
@@ -207,6 +233,18 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
 
+
+
+            var _newdid = nt + "\r" + _DidImport;
+
+            if (_newdid == _DidImport && opbNeueZeile.Checked)
+            {
+                if (MessageBox.Show("Es wurde bereits eine neue Zeile mit diesen Werten angelegt.\r<b>Noch eine anlegen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            }
+
+
+
+
             string feh;
 
 
@@ -230,11 +268,6 @@ namespace BlueControls.BlueDatabaseDialogs
                 MessageBox.Show("Erfolgreich!", enImageCode.Smiley, "OK");
                 return;
             }
-
-
-
         }
-
-
     }
 }

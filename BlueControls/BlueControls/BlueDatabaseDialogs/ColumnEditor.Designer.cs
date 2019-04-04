@@ -147,6 +147,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnTargetColumn = new BlueControls.Controls.Button();
             this.btnColumnKeyInColumn = new BlueControls.Controls.Button();
             this.capRowKeyInColumn = new BlueControls.Controls.Caption();
+            this.txbAutoRemove = new BlueControls.Controls.TextBox();
+            this.capAutoRemove = new BlueControls.Controls.Caption();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -662,6 +664,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabAutoBearbeitung
             // 
+            this.tabAutoBearbeitung.Controls.Add(this.txbAutoRemove);
+            this.tabAutoBearbeitung.Controls.Add(this.capAutoRemove);
             this.tabAutoBearbeitung.Controls.Add(this.cbxSchlüsselspalte);
             this.tabAutoBearbeitung.Controls.Add(this.tbxInitValue);
             this.tabAutoBearbeitung.Controls.Add(this.Caption12);
@@ -1395,6 +1399,24 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capRowKeyInColumn.Size = new System.Drawing.Size(320, 16);
             this.capRowKeyInColumn.Text = "Die zu suchende Zeile ist in dieser Spalte zu finden:";
             // 
+            // txbAutoRemove
+            // 
+            this.txbAutoRemove.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbAutoRemove.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbAutoRemove.Location = new System.Drawing.Point(8, 376);
+            this.txbAutoRemove.Name = "txbAutoRemove";
+            this.txbAutoRemove.Size = new System.Drawing.Size(896, 24);
+            this.txbAutoRemove.TabIndex = 37;
+            // 
+            // capAutoRemove
+            // 
+            this.capAutoRemove.CausesValidation = false;
+            this.capAutoRemove.Location = new System.Drawing.Point(8, 360);
+            this.capAutoRemove.Name = "capAutoRemove";
+            this.capAutoRemove.Size = new System.Drawing.Size(568, 16);
+            this.capAutoRemove.Text = "Folgende Zeichen automatisch aus der Eingabe löschen:";
+            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(926, 671);
@@ -1403,7 +1425,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Controls.Add(this.btnVor);
             this.Controls.Add(this.btnZurueck);
             this.Controls.Add(this.btnOk);
-            this.Design = BlueControls.Enums.enDesign.Form_Standard;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "ColumnEditor";
             this.Text = "Spalten-Eigenschaften";
@@ -1545,5 +1566,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Caption capDropDownKey;
         private Button butZusammenfassen;
         private GroupBox grpAuswahlmenuOptionen;
+        internal TextBox txbAutoRemove;
+        internal Caption capAutoRemove;
     }
 	}

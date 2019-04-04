@@ -1163,6 +1163,9 @@ namespace BlueControls.Controls
 
             if (_eTxt == null) { GenerateETXT(true); }
 
+
+            var ShowSlider = false;
+
             if (state == enStates.Checked_Disabled)
             {
                 Develop.DebugPrint("Checked Disabled");
@@ -1187,38 +1190,12 @@ namespace BlueControls.Controls
             {
                 case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
                     _eTxt.Autoumbruch = true;
-
-                    if (SliderY.Visible)
-                    {
-                        _eTxt.Top = (int)(-SliderY.Value);
-                        _eTxt.MaxWidth = DisplayRectangle.Width - Skin.PaddingSmal * 2 - SliderY.Width;
-                        SliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
-                    }
-                    else
-                    {
-                        _eTxt.Top = Skin.PaddingSmal;
-                        _eTxt.MaxWidth = Width - Skin.PaddingSmal * 2;
-                    }
-
-                    if (Convert.ToBoolean(_eTxt.Height() > Height) != SliderY.Visible)
-                    {
-                        SliderY.Visible = Convert.ToBoolean(_eTxt.Height() > Height);
-
-
-                        SliderY.Width = 18;
-                        SliderY.Height = Height;
-                        SliderY.Left = Width - SliderY.Width;
-                        SliderY.Top = 0;
-
-                        // Mache Vorab-Routinen können den Slider nicht umschalten, deshalb hier nochmal die Kontrolle
-                        if (Convert.ToBoolean(_eTxt.Height() > Height) == SliderY.Visible) { DrawControl(gr, state); }
-                        return;
-                    }
-
-
+                    ShowSlider = true;
                     break;
+
                 case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
                     var hp = HotPosition();
+                    ShowSlider = true;
 
                     if (hp < 0)
                     {
@@ -1259,6 +1236,7 @@ namespace BlueControls.Controls
                     }
 
                     break;
+
                 case enSteuerelementVerhalten.Steuerelement_Anpassen:
                     if (this is ComboBox)
                     {
@@ -1273,6 +1251,7 @@ namespace BlueControls.Controls
 
 
                     break;
+
                 case enSteuerelementVerhalten.Text_Abschneiden:
                     _eTxt.MaxWidth = Width - Skin.PaddingSmal * 2;
                     _eTxt.MaxHeight = Height; // Sollte Egal sein........
@@ -1283,7 +1262,40 @@ namespace BlueControls.Controls
                     Develop.DebugPrint(_Verhalten);
                     break;
             }
-            //   End If
+
+            if ( ShowSlider)
+            {
+                if (SliderY.Visible)
+                {
+                    _eTxt.Top = (int)(-SliderY.Value);
+                    _eTxt.MaxWidth = DisplayRectangle.Width - Skin.PaddingSmal * 2 - SliderY.Width;
+                    SliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
+                }
+                else
+                {
+                    _eTxt.Top = Skin.PaddingSmal;
+                    _eTxt.MaxWidth = Width - Skin.PaddingSmal * 2;
+                }
+
+                if (_eTxt.Height() > Height != SliderY.Visible)
+                {
+                    SliderY.Visible = true;
+
+
+                    SliderY.Width = 18;
+                    SliderY.Height = Height;
+                    SliderY.Left = Width - SliderY.Width;
+                    SliderY.Top = 0;
+
+                    // Mache Vorab-Routinen können den Slider nicht umschalten, deshalb hier nochmal die Kontrolle
+                    if (Convert.ToBoolean(_eTxt.Height() > Height) == SliderY.Visible) { DrawControl(gr, state); }
+                    return;
+                }
+
+            }
+
+
+
 
 
             // ERST HIER! Manche Routinen ändern die Größe des Textfeldes.

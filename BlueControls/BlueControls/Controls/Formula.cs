@@ -167,7 +167,7 @@ namespace BlueControls.Controls
 
                 OnShowingRowChanged(new RowEventArgs(ShowingRow));
 
-                ShowingRow?.DoAutomatic(false, false);
+                ShowingRow?.DoAutomatic(false, false, false);
                 ResumeAllLayout();
             }
         }
@@ -295,7 +295,7 @@ namespace BlueControls.Controls
 
 
 
-            for (var cc = 0 ; cc < e.ColumnsWithErrors.Count ; cc++)
+            for (var cc = 0; cc < e.ColumnsWithErrors.Count; cc++)
             {
                 p = e.ColumnsWithErrors[cc].Split('|');
 
@@ -414,7 +414,7 @@ namespace BlueControls.Controls
                         ObjPX.X = ThisViewItem.Spalte_X1 * WidthInPixelOfColumn + ThisViewItem.Spalte_X1 * Skin.PaddingSmal + MoveIn;
 
                         ObjPX.Y = MoveIn;
-                        for (var z = ThisViewItem.Spalte_X1 ; z < ThisViewItem.Spalte_X1 + ThisViewItem.Width ; z++) // Spalte_X2
+                        for (var z = ThisViewItem.Spalte_X1; z < ThisViewItem.Spalte_X1 + ThisViewItem.Width; z++) // Spalte_X2
                         {
                             ObjPX.Y = Math.Max(_BelegterBereichTop[z], ObjPX.Y);
                         }
@@ -439,7 +439,7 @@ namespace BlueControls.Controls
                         }
 
 
-                        for (var z = ThisViewItem.Spalte_X1 ; z < ThisViewItem.Spalte_X1 + ThisViewItem.Width ; z++) // Spalte_X2
+                        for (var z = ThisViewItem.Spalte_X1; z < ThisViewItem.Spalte_X1 + ThisViewItem.Width; z++) // Spalte_X2
                         {
                             _BelegterBereichTop[z] = Math.Max(_BelegterBereichTop[z], ObjPX.Bottom);
                         }
@@ -627,7 +627,7 @@ namespace BlueControls.Controls
             var ItC = 0;
 
 
-            for (ItC = -1 ; ItC <= Tabs.TabCount + 100 ; ItC++)
+            for (ItC = -1; ItC <= Tabs.TabCount + 100; ItC++)
             {
                 string Nam = null;
                 switch (ItC)
@@ -832,7 +832,7 @@ namespace BlueControls.Controls
                     if (Blinki)
                     {
                         cbxControlType.Item.Clear();
-                        for (var z = 0 ; z <= 999 ; z++)
+                        for (var z = 0; z <= 999; z++)
                         {
                             var w = (enEditTypeFormula)z;
                             if (w.ToString() != z.ToString())

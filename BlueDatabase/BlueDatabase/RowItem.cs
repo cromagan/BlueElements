@@ -172,12 +172,11 @@ namespace BlueDatabase
 
         /// <summary>
         /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
-        /// Z.b: Runden, Großschreibung wird nicht korrigiert, das wird vor dem Setzen bei CellSet bereits korrigiert.
+        /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
         /// </summary>
         /// <param name="IsNewRow"></param>
         /// <param name="DoFemdZelleInvalidate"></param>
-        /// <param name="ShowMessageBox"></param>
-        public string DoAutomatic(bool IsNewRow, bool DoFemdZelleInvalidate)
+        public string DoAutomatic(bool IsNewRow, bool DoFemdZelleInvalidate, bool FullCheck)
         {
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
             var cols = DoRules();
@@ -189,6 +188,25 @@ namespace BlueDatabase
                 if (ThisColum != null)
                 {
                     if (IsNewRow && !string.IsNullOrEmpty(ThisColum.CellInitValue)) { CellSet(ThisColum, ThisColum.CellInitValue); }
+
+                    if (FullCheck)
+                    {
+                        var x = CellGetString(ThisColum);
+                        var x2 = ThisColum.AutoCorrect(x);
+
+                        if (ThisColum.Format != enDataFormat.LinkedCell && x != x2)
+                        {
+                            Database.Cell.Set(ThisColum, this, x2, false);
+                        }
+                        else
+                        {
+                            if (!ThisColum.IsFirst())
+                            {
+
+                                Database.Cell.DoSpecialFormats(ThisColum, Key, CellGetString(ThisColum), false, true);
+                            }
+                        }
+                    }
 
                     if (DoFemdZelleInvalidate && ThisColum.LinkedDatabase() != null)
                     {
@@ -263,7 +281,7 @@ namespace BlueDatabase
             {
                 Database.Cell.SystemSet(Database.Column.SysRowCreator, this, Database.UserName, false);
                 Database.Cell.SystemSet(Database.Column.SysRowCreateDate, this, DateTime.Now.ToString(), false);
-                DoAutomatic(true, false);
+                DoAutomatic(true, false, false);
             }
         }
 

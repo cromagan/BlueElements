@@ -87,7 +87,7 @@ namespace BlueDatabase
 
             var Inhalt = _cells[CellKey].Value;
             _cells.Remove(CellKey);
-            DoSpecialFormats(Column, RowKey, Inhalt, false);
+            DoSpecialFormats(Column, RowKey, Inhalt, false, false);
         }
 
         internal void Load_310(ColumnItem _Column, RowItem _Row, string Value, int Width, int Height)
@@ -242,13 +242,14 @@ namespace BlueDatabase
         }
 
 
-        internal void DoSpecialFormats(ColumnItem Column, int RowKey, string PreviewsValue, bool FreezeMode)
+        public void DoSpecialFormats(ColumnItem Column, int RowKey, string PreviewsValue, bool FreezeMode, bool DoAlways)
         {
             if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
 
             var CurrentValue = GetString(Column, Database.Row.SearchByKey(RowKey));
 
-            if (CurrentValue == PreviewsValue) { return; }
+
+            if (!DoAlways && CurrentValue == PreviewsValue) { return; }
 
 
             switch (Column.Format)
@@ -257,9 +258,16 @@ namespace BlueDatabase
                     RepairRelationText(Column, Database.Row.SearchByKey(RowKey), PreviewsValue, FreezeMode);
                     SetSameValueOfKey(Column, RowKey, CurrentValue, FreezeMode);
                     break;
+                case enDataFormat.LinkedCell:
+                    if (DoAlways)
+                    {
+                        RepairLinkedCellValue(Column, Database.Row.SearchByKey(RowKey), false);
+                    }
+                    break;
+
             }
 
-            if (Column.I_Am_A_Key_For_Other_Column)
+            if (!string.IsNullOrEmpty(Column.I_Am_A_Key_For_Other_Column))
             {
                 SetSameValueOfKey(Column, RowKey, CurrentValue, FreezeMode);
             }
@@ -722,7 +730,7 @@ namespace BlueDatabase
 
             Column._UcaseNamesSortedByLenght = null;
 
-            DoSpecialFormats(Column, Row.Key, OldValue, FreezeMode);
+            DoSpecialFormats(Column, Row.Key, OldValue, FreezeMode, false);
 
 
             SystemSet(Database.Column.SysRowChanger, Row, Database.UserName, FreezeMode);

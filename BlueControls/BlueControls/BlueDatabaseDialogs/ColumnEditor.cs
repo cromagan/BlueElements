@@ -220,6 +220,7 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxFehlendesZiel.Text = ((int)_Column.LinkedCell_Behaviour).ToString();
             txbSortMask.Text = _Column.SortMask;
 
+            txbAutoRemove.Text = _Column.AutoRemove;
 
 
             cbxSchlüsselspalte.Item.Clear();
@@ -548,7 +549,7 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.VorschlagsColumn = ColumKeyFrom(_Column.Database, cbxVorschlag.Text);
             _Column.Align = (enAlignment)int.Parse(cbxAlign.Text);
             _Column.SortMask = txbSortMask.Text;
-
+            _Column.AutoRemove = txbAutoRemove.Text;
 
             //// Regel: Wenn Leer, gib Fehler aus
             //var tmpR = _Column.Database.Rules_Has(_Column, "Leer-Fehler");

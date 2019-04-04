@@ -182,6 +182,7 @@ namespace BlueDatabase.Enums
         co_Regex = 187,
         co_SortMask = 188,
         co_ZellenZusammenfassen = 189,
+        co_AutoRemove = 190,
 
 
 

@@ -131,6 +131,7 @@ namespace BlueDatabase
 
         private string _SortMask;
 
+        private string _AutoRemove;
 
         private int _KeyColumnKey;
 
@@ -207,6 +208,7 @@ namespace BlueDatabase
             _AfterEdit_Runden = -1;
             _AfterEdit_AutoCorrect = false;
             _AfterEdit_DoUCase = false;
+            _AutoRemove = string.Empty;
             _AutoFilterJoker = string.Empty;
 
             _SpellCheckingEnabled = false;
@@ -274,6 +276,7 @@ namespace BlueDatabase
             AfterEdit_Runden = Source.AfterEdit_Runden;
             AfterEdit_DoUCase = Source.AfterEdit_DoUCase;
             AfterEdit_AutoCorrect = Source.AfterEdit_AutoCorrect;
+            AutoRemove = Source.AutoRemove;
             CellInitValue = Source.CellInitValue;
             AutoFilterJoker = Source.AutoFilterJoker;
             KeyColumnKey = Source.KeyColumnKey;
@@ -322,18 +325,18 @@ namespace BlueDatabase
 
         internal void CheckIfIAmAKeyColumn()
         {
-            I_Am_A_Key_For_Other_Column = false;
+            I_Am_A_Key_For_Other_Column = string.Empty;
 
             foreach (var ThisColumn in Database.Column)
             {
 
-                if (ThisColumn.KeyColumnKey == Key) { I_Am_A_Key_For_Other_Column = true; } // Werte Gleichhalten
-                if (ThisColumn.LinkedCell_RowKey == Key) { I_Am_A_Key_For_Other_Column = true; } // LinkdeCells pflegen
-                if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = true; } // LinkdeCells pflegen
-                if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown) { I_Am_A_Key_For_Other_Column = true; }
+                if (ThisColumn.KeyColumnKey == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
+                if (ThisColumn.LinkedCell_RowKey == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+                if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+
             }
 
-
+            if (_Format == enDataFormat.Columns_für_LinkedCellDropdown) { I_Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
         }
 
         public ColumnItem(Database database, bool addtodatabase) : this(database, -1, string.Empty, addtodatabase) { }
@@ -402,7 +405,7 @@ namespace BlueDatabase
 
         public int Key { get; }
 
-        public bool I_Am_A_Key_For_Other_Column { get; private set; }
+        public string I_Am_A_Key_For_Other_Column { get; private set; }
 
         public string Caption
         {
@@ -1042,6 +1045,20 @@ namespace BlueDatabase
             }
         }
 
+        public string AutoRemove
+        {
+            get
+            {
+                return _AutoRemove;
+            }
+            set
+            {
+                if (_AutoRemove == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_AutoRemove, this, _AutoRemove, value, true);
+                OnChanged();
+            }
+        }
+
 
         public int DropdownKey
         {
@@ -1421,7 +1438,7 @@ namespace BlueDatabase
                     CellCollection.Invalidate_CellContentSize(this, ThisRow);
                     Invalidate_TmpColumnContentWidth();
                     Database.Cell.OnCellValueChanged(new CellEventArgs(this, ThisRow));
-                    ThisRow.DoAutomatic(false, true);
+                    ThisRow.DoAutomatic(false, true, false);
                 }
             }
         }
@@ -1606,6 +1623,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_AfterEdit_Runden: _AfterEdit_Runden = int.Parse(Wert); break;
                 case enDatabaseDataType.co_AfterEdit_DoUcase: _AfterEdit_DoUCase = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_AfterEdit_AutoCorrect: _AfterEdit_AutoCorrect = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_AutoRemove: _AutoRemove = Wert; break;
                 case enDatabaseDataType.co_AdminInfo: _AdminInfo = Wert; break;
                 case enDatabaseDataType.co_Suffix: _Suffix = Wert; break;
                 case enDatabaseDataType.co_LinkedDatabase: _LinkedDatabaseFile = Wert; break;
@@ -1901,6 +1919,7 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_DoUcase, _AfterEdit_DoUCase.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_AutoCorrect, _AfterEdit_AutoCorrect.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_Runden, _AfterEdit_Runden.ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_AutoRemove, _AutoRemove, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErlaubt, _AutofilterErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterTextFilterErlaubt, _AutofilterTextFilterErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErweitertErlaubt, _AutoFilterErweitertErlaubt.ToPlusMinus(), Key);
@@ -2307,10 +2326,14 @@ namespace BlueDatabase
 
             if (_KeyColumnKey > -1)
             {
-                if (_Format == enDataFormat.RelationText || I_Am_A_Key_For_Other_Column) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben."; }
+  
+                if (_Format == enDataFormat.RelationText || _Format == enDataFormat.LinkedCell || _Format == enDataFormat.Values_für_LinkedCellDropdown ) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben, Format prüfen."; }
+
+                if (!string.IsNullOrEmpty(I_Am_A_Key_For_Other_Column)) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben: " + I_Am_A_Key_For_Other_Column; }
+
                 var c = Database.Column.SearchByKey(_KeyColumnKey);
                 if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
-                if (c.Format != enDataFormat.RelationText && I_Am_A_Key_For_Other_Column) { return "Die verknüpfte Schlüsselspalte hat das falsche Format."; }
+                //if (c.Format == enDataFormat.RelationText) { return "Die verknüpfte Schlüsselspalte hat das falsche Format."; }
 
 
             }
@@ -2424,6 +2447,12 @@ namespace BlueDatabase
             {
                 erg = Math.Round(erg, _AfterEdit_Runden);
                 Value = erg.ToString();
+            }
+
+
+            if (!string.IsNullOrEmpty(_AutoRemove))
+            {
+                Value = Value.RemoveChars(_AutoRemove);
             }
 
 

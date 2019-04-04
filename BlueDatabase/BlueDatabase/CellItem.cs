@@ -110,7 +110,7 @@ namespace BlueDatabase
                 ret.Add(ValueReadable(column, thisstring, Style));
             }
 
-            if (x.Count ==0)
+            if (x.Count == 0)
             {
                 var tmp = ValueReadable(column, string.Empty, Style);
                 if (!string.IsNullOrEmpty(tmp)) { ret.Add(tmp); }
@@ -269,6 +269,10 @@ namespace BlueDatabase
                     {
                         return QuickImage.Get(enImageCode.Fragezeichen, 16);
                     }
+                    else if (string.IsNullOrEmpty(Txt))
+                    {
+                        return null;
+                    }
                     else
                     {
                         return QuickImage.Get(enImageCode.Kritisch, 16);
@@ -277,7 +281,7 @@ namespace BlueDatabase
 
                 case enDataFormat.BildCode:
                     if (defaultImage != null || column == null) { return defaultImage; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
-                    if(string.IsNullOrEmpty(Txt)) { return null; }
+                    if (string.IsNullOrEmpty(Txt)) { return null; }
 
                     var code = column.Prefix + Txt + column.Suffix;
                     if (column.BildCode_ConstantHeight > 0) { code = code + "|" + column.BildCode_ConstantHeight; }
