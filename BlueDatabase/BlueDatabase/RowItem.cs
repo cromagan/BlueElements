@@ -181,7 +181,6 @@ namespace BlueDatabase
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
             var cols = DoRules();
 
-
             // Dann die Abschließenden Korrekturen vornehmen
             foreach (var ThisColum in Database.Column)
             {
@@ -206,6 +205,9 @@ namespace BlueDatabase
                                 Database.Cell.DoSpecialFormats(ThisColum, Key, CellGetString(ThisColum), false, true);
                             }
                         }
+                        CellCollection.Invalidate_CellContentSize(ThisColum, this);
+                        ThisColum.Invalidate_TmpColumnContentWidth();
+                        DoFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
                     }
 
                     if (DoFemdZelleInvalidate && ThisColum.LinkedDatabase() != null)

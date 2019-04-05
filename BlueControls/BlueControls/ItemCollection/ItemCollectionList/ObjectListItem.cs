@@ -115,7 +115,7 @@ namespace BlueControls.ItemCollection
 
         public override SizeF SizeUntouchedForListBox()
         {
-            return GenericControl.Skin.FormatedText_NeededSize(Obj.ReadableText(), Obj.SymbolForReadableText(), GenericControl.Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard));
+            return GenericControl.Skin.FormatedText_NeededSize(Obj.ReadableText(), Obj.SymbolForReadableText(), GenericControl.Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), 16);
         }
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack)

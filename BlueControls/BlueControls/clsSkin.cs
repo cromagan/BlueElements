@@ -921,16 +921,16 @@ namespace BlueControls
 
 
 
-        public Size FormatedText_NeededSize(ColumnItem Column, string txt, QuickImage ImageCode, BlueFont F, enShortenStyle Style)
+        public Size FormatedText_NeededSize(ColumnItem Column, string txt, QuickImage ImageCode, BlueFont F, enShortenStyle Style, int MinSize)
         {
             var tmpText = CellItem.ValueReadable(Column, txt, Style);
             var tmpImageCode = CellItem.StandardImage(Column, txt, ImageCode);
 
 
-            return FormatedText_NeededSize(tmpText, tmpImageCode, F);
+            return FormatedText_NeededSize(tmpText, tmpImageCode, F, MinSize);
         }
 
-        public Size FormatedText_NeededSize(string tmpText, QuickImage tmpImageCode, BlueFont F)
+        public Size FormatedText_NeededSize(string tmpText, QuickImage tmpImageCode, BlueFont F, int MinSize)
         {
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
@@ -944,7 +944,7 @@ namespace BlueControls
             {
                 if (tmpImageCode == null)
                 {
-                    return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, 16)); // 16 muss es sein, weil Multi-Line den Multiplikator von 16 nimmt
+                    return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, MinSize));
                 }
 
                 return new Size((int)(tSize.Width + 2 + pSize.Width + 1), Math.Max((int)tSize.Height, (int)pSize.Height));
@@ -955,7 +955,7 @@ namespace BlueControls
                 return new Size((int)pSize.Width, (int)pSize.Height);
             }
 
-            return new Size(16, 16);
+            return new Size(MinSize, MinSize);
         }
 
         private Graphics DummyGraphics()

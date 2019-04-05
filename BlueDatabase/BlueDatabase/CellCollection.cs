@@ -1372,10 +1372,8 @@ namespace BlueDatabase
             var CellKey = KeyOfCell(Column, Row);
             if (_cells.ContainsKey(CellKey))
             {
-                var x = Column.Database.Cell._cells[CellKey].Size;
-                return new Size((int)(x.Width * Database.GlobalScale), (int)(x.Height * Database.GlobalScale));
-
-            }
+                return Column.Database.Cell._cells[CellKey].Size;
+             }
             return Size.Empty;
         }
 

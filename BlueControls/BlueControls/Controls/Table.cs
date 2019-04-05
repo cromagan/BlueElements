@@ -88,6 +88,8 @@ namespace BlueControls.Controls
         private BlueFont _Chapter_Font;
         private BlueFont _Cell_Font;
         private BlueFont _NewRow_Font;
+        private int Pix16 = 16;
+        private int Pix18 = 18;
 
         private FontSelectDialog _FDia = null;
 
@@ -344,9 +346,24 @@ namespace BlueControls.Controls
             _Column_Font = Skin.GetBlueFont(enDesign.Table_Column, enStates.Standard).Scale(FontScale);
             _Chapter_Font = Skin.GetBlueFont(enDesign.Table_Cell_Chapter, enStates.Standard).Scale(FontScale);
             _NewRow_Font = Skin.GetBlueFont(enDesign.Table_Cell_New, enStates.Standard).Scale(FontScale);
+            if (Database != null)
+            {
+                Pix16 = GetPix(16, _Cell_Font, Database.GlobalScale);
+                Pix18 = GetPix(18, _Cell_Font, Database.GlobalScale);
+
+            }
+            else
+            {
+                Pix16 = 16;
+                Pix18 = 18;
+            }
+
         }
 
-
+        private static int GetPix(int Pix, BlueFont F, double Scale)
+        {
+            return Skin.FormatedText_NeededSize("@|", null, F, (int)(Pix * Scale + 0.5)).Height;
+        }
 
         protected override void DrawControl(Graphics gr, enStates state)
         {
@@ -468,7 +485,7 @@ namespace BlueControls.Controls
             //  Neue Zeile 
             if (UserEdit_NewRowAllowed() && ViewItem == _Database.ColumnArrangements[_ArrangementNr][Database.Column[0]])
             {
-                Skin.Draw_FormatedText(GR, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, (int)(16 * Database.GlobalScale)), enAlignment.Left, new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)ViewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font);
+                Skin.Draw_FormatedText(GR, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, Pix16), enAlignment.Left, new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)ViewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font);
             }
 
 
@@ -496,14 +513,14 @@ namespace BlueControls.Controls
                                 y = HeadSize();
                             }
                         }
-                        GR.DrawLine(Skin.Pen_LinieDünn, 0, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, y);
+                        GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, y);
                         Draw_CellTransparent(GR, ViewItem, CurrentRow, DisplayRectangleWOSlider, _Cell_Font);
                         Drawn = ToDraw;
                     }
                 }
                 else
                 {
-                    GR.DrawLine(Skin.Pen_LinieDünn, 0, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, y);
+                    GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, y);
                     Draw_CellTransparent(GR, ViewItem, CurrentRow, DisplayRectangleWOSlider, _Cell_Font);
                 }
 
@@ -798,7 +815,7 @@ namespace BlueControls.Controls
                     for (var z = 0; z <= MEI.GetUpperBound(0); z++)
                     {
                         Draw_CellTransparentDirect_OneLine(GR, MEI[z], CellInThisDatabaseColumn, CellInThisDatabaseRow, ContentHolderCellColumn, Convert.ToBoolean(z == MEI.GetUpperBound(0)), DisplayRectangleWOSlider, vfont, y);
-                        y += Skin.FormatedText_NeededSize(CellInThisDatabaseColumn.Column, MEI[z], null, vfont, enShortenStyle.Replaced).Height;
+                        y += Skin.FormatedText_NeededSize(CellInThisDatabaseColumn.Column, MEI[z], null, vfont, enShortenStyle.Replaced, Pix16 - 1).Height;
                     }
                 }
             }
@@ -1098,9 +1115,12 @@ namespace BlueControls.Controls
         {
 
 
-            var r = new Rectangle((int)CellInThisDatabaseColumn.OrderTMP_Spalte_X1, (int)CellInThisDatabaseRow.TMP_Y + Y, Column_DrawWidth(CellInThisDatabaseColumn, DisplayRectangleWOSlider), 16);
+            var r = new Rectangle((int)CellInThisDatabaseColumn.OrderTMP_Spalte_X1,
+                                  (int)CellInThisDatabaseRow.TMP_Y + Y,
+                                  Column_DrawWidth(CellInThisDatabaseColumn, DisplayRectangleWOSlider), 
+                                  Pix16);
 
-            if (r.Bottom > CellInThisDatabaseRow.TMP_Y + Row_DrawHeight(CellInThisDatabaseRow, DisplayRectangleWOSlider) - 16)
+            if (r.Bottom > CellInThisDatabaseRow.TMP_Y + Row_DrawHeight(CellInThisDatabaseRow, DisplayRectangleWOSlider) - Pix16)
             {
                 if (r.Bottom > CellInThisDatabaseRow.TMP_Y + Row_DrawHeight(CellInThisDatabaseRow, DisplayRectangleWOSlider)) { return; }
                 if (!IsLastRow) { DrawString = "..."; }// Die Letzte Zeile noch ganz hinschreiben
@@ -1530,7 +1550,7 @@ namespace BlueControls.Controls
             {
                 // Neue Zeile...
                 Box.Location = new Point((int)ViewItemx.OrderTMP_Spalte_X1, HeadSize());
-                Box.Size = new Size(Column_DrawWidth(ViewItemx, DisplayRectangle) + AddWith, (int)(18 * _Database.GlobalScale));
+                Box.Size = new Size(Column_DrawWidth(ViewItemx, DisplayRectangle) + AddWith, Pix18);
                 Box.Text = "";
             }
 
@@ -1753,7 +1773,7 @@ namespace BlueControls.Controls
                 var DisplayR = DisplayRectangleWithoutSlider();
 
 
-                if (UserEdit_NewRowAllowed()) { MaxY += (int)(18 * _Database.GlobalScale); }
+                if (UserEdit_NewRowAllowed()) { MaxY += Pix18; }
 
 
                 // Kommt vor, dass spontan doch geparsed wird...
@@ -3338,7 +3358,7 @@ namespace BlueControls.Controls
         }
 
 
-        public static int tmpColumnContentWidth(ColumnItem Column, BlueFont CellFont, double Scale)
+        public static int tmpColumnContentWidth(ColumnItem Column, BlueFont CellFont,int Pix16)
         {
 
             if (Column.TMP_ColumnContentWidth != null) { return (int)Column.TMP_ColumnContentWidth; }
@@ -3351,7 +3371,7 @@ namespace BlueControls.Controls
                 {
                     var t = Column.TMP_ColumnContentWidth; // ja, dank Multithreading kann es sein, dass hier das hier null ist
                     if (t == null) { t = 0; }
-                    Column.TMP_ColumnContentWidth = Math.Max((int)t, Cell_ContentSize(Column, ThisRowItem, CellFont, Scale).Width);
+                    Column.TMP_ColumnContentWidth = Math.Max((int)t, Cell_ContentSize(Column, ThisRowItem, CellFont, Pix16).Width);
                 }
             }
 
@@ -3388,11 +3408,11 @@ namespace BlueControls.Controls
 
                 if (ViewItem.ViewType == enViewType.PermanentColumn)
                 {
-                    ViewItem._TMP_DrawWidth = Math.Min(tmpColumnContentWidth(ViewItem.Column, _Cell_Font, Database.GlobalScale), (int)(DisplayRectangleWOSlider.Width * 0.3));
+                    ViewItem._TMP_DrawWidth = Math.Min(tmpColumnContentWidth(ViewItem.Column, _Cell_Font, Pix16), (int)(DisplayRectangleWOSlider.Width * 0.3));
                 }
                 else
                 {
-                    ViewItem._TMP_DrawWidth = Math.Min(tmpColumnContentWidth(ViewItem.Column, _Cell_Font, Database.GlobalScale), (int)(DisplayRectangleWOSlider.Width * 0.75));
+                    ViewItem._TMP_DrawWidth = Math.Min(tmpColumnContentWidth(ViewItem.Column, _Cell_Font, Pix16), (int)(DisplayRectangleWOSlider.Width * 0.75));
                 }
             }
 
@@ -3403,9 +3423,9 @@ namespace BlueControls.Controls
         }
         private int Row_DrawHeight(RowItem vrow, Rectangle DisplayRectangleWOSlider)
         {
-            if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(_Database.Column[0], vrow, _Cell_Font, _Database.GlobalScale).Height; }
+            if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(_Database.Column[0], vrow, _Cell_Font, Pix16).Height; }
             if (vrow.TMP_DrawHeight != null) { return (int)vrow.TMP_DrawHeight; }
-            var tmp = 18; // Der Scale wird gleich noch dazu gerechnet
+            var tmp = Pix18; 
 
             foreach (var ThisViewItem in _Database.ColumnArrangements[_ArrangementNr])
             {
@@ -3413,12 +3433,12 @@ namespace BlueControls.Controls
                 {
                     if (!vrow.CellIsNullOrEmpty(ThisViewItem.Column))
                     {
-                        tmp = Math.Max(tmp, Cell_ContentSize(ThisViewItem.Column, vrow, _Cell_Font, _Database.GlobalScale).Height);
+                        tmp = Math.Max(tmp, Cell_ContentSize(ThisViewItem.Column, vrow, _Cell_Font, Pix16).Height);
                     }
                 }
             }
             vrow.TMP_DrawHeight = Math.Min(tmp, (int)(DisplayRectangleWOSlider.Height * 0.9) - HeadSize());
-            vrow.TMP_DrawHeight = Math.Max((int)vrow.TMP_DrawHeight, (int)(18 * _Database.GlobalScale));
+            vrow.TMP_DrawHeight = Math.Max((int)vrow.TMP_DrawHeight, Pix18);
 
             return (int)vrow.TMP_DrawHeight;
         }
@@ -3731,7 +3751,7 @@ namespace BlueControls.Controls
         {
 
             if (Column.TMP_CaptionText_Size.Width > 0) { return Column.TMP_CaptionText_Size; }
-            if (_Column_Font == null) { return new SizeF(16, 16); }
+            if (_Column_Font == null) { return new SizeF(Pix16, Pix16); }
 
 
             Column.TMP_CaptionText_Size = DummyGraphics().MeasureString(Column.Caption.Replace("\r", "\r\n"), _Column_Font.Font());
@@ -3904,16 +3924,14 @@ namespace BlueControls.Controls
 
 
 
-        public static Size Cell_ContentSize(ColumnItem Column, RowItem Row, BlueFont CellFont, double Scale)
+        public static Size Cell_ContentSize(ColumnItem Column, RowItem Row, BlueFont CellFont, int Pix16)
         {
-
-            var siz16 = (int)(16 * Scale);
 
             if (Column.Format == enDataFormat.LinkedCell)
             {
                 Column.Database.Cell.LinkedCellData(Column, Row, out var LCColumn, out var LCrow);
-                if (LCColumn != null && LCrow != null) { return Cell_ContentSize(LCColumn, LCrow, CellFont, Scale); }
-                return new Size(siz16, siz16);
+                if (LCColumn != null && LCrow != null) { return Cell_ContentSize(LCColumn, LCrow, CellFont, Pix16); }
+                return new Size(Pix16, Pix16);
             }
 
 
@@ -3926,7 +3944,7 @@ namespace BlueControls.Controls
                 var TMP = Column.Database.Cell.GetArray(Column, Row);
                 if (Column.ShowMultiLineInOneLine)
                 {
-                    _ContentSize = Skin.FormatedText_NeededSize(Column, TMP.JoinWith("; "), null, CellFont, enShortenStyle.Replaced);
+                    _ContentSize = Skin.FormatedText_NeededSize(Column, TMP.JoinWith("; "), null, CellFont, enShortenStyle.Replaced, Pix16);
                 }
                 else
                 {
@@ -3934,17 +3952,9 @@ namespace BlueControls.Controls
                     var TMPSize = Size.Empty;
                     for (var z = 0; z <= TMP.GetUpperBound(0); z++)
                     {
-                        TMPSize = Skin.FormatedText_NeededSize(Column, TMP[z], null, CellFont, enShortenStyle.Replaced);
-                        if (TMPSize.Width > _ContentSize.Width) { _ContentSize.Width = TMPSize.Width; }
-
-                        if (TMPSize.Height > siz16)
-                        {
-                            _ContentSize.Height += TMPSize.Height;
-                        }
-                        else
-                        {
-                            _ContentSize.Height += siz16;
-                        }
+                        TMPSize = Skin.FormatedText_NeededSize(Column, TMP[z], null, CellFont, enShortenStyle.Replaced, Pix16);
+                        _ContentSize.Width = Math.Max(TMPSize.Width, _ContentSize.Width);
+                        _ContentSize.Height += Math.Max(TMPSize.Height, Pix16);
 
                     }
 
@@ -3955,12 +3965,12 @@ namespace BlueControls.Controls
             {
 
                 var _String = Column.Database.Cell.GetString(Column, Row);
-                _ContentSize = Skin.FormatedText_NeededSize(Column, _String, null, CellFont, enShortenStyle.Replaced);
+                _ContentSize = Skin.FormatedText_NeededSize(Column, _String, null, CellFont, enShortenStyle.Replaced, Pix16);
             }
 
 
-            if (_ContentSize.Width < siz16) { _ContentSize.Width = siz16; }
-            if (_ContentSize.Height < siz16) { _ContentSize.Height = siz16; }
+            _ContentSize.Width = Math.Max(_ContentSize.Width, Pix16);
+            _ContentSize.Height = Math.Max(_ContentSize.Height, Pix16);
 
 
             if (clsSkin.Scale == 1) { Column.Database.Cell.SetSizeOfCellContent(Column, Row, _ContentSize); }
