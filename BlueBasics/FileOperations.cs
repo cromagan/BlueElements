@@ -48,7 +48,7 @@ namespace BlueBasics
                 if (tries > 5)
                 {
                     if (!toBeSure) { return false; }
-                    if (DateTime.Now.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(enFehlerArt.Fehler, "Befehl konnte nicht ausgeführt werden."); }
+                    if (DateTime.Now.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(enFehlerArt.Fehler, "Befehl konnte nicht ausgeführt werden, "  + file1 + " " + file2); }
                 }
             }
 
