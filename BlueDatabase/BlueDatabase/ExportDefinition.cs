@@ -680,7 +680,7 @@ namespace BlueDatabase
             }
 
 
-            if (CanWriteInDirectory(_Verzeichnis))
+            if (!CanWriteInDirectory(_Verzeichnis))
             {
                 return "Sie besitzen im Zielverzeichnis keine Schreibrechte.";
             }

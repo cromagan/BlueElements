@@ -107,7 +107,7 @@ namespace BlueControls.BlueDatabaseDialogs
             var neuZ = 0;
 
 
-            for (var z = 0 ; z <= ein.GetUpperBound(0) ; z++)
+            for (var z = 0; z <= ein.GetUpperBound(0); z++)
             {
                 if (EliminateMultipleSplitter)
                 {
@@ -131,8 +131,8 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
 
-            var colsx = new List<ColumnItem>();
-            RowItem R = null;
+            var columns = new List<ColumnItem>();
+            RowItem row = null;
             var StartZ = 0;
 
             // -------------------------------------
@@ -143,7 +143,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 StartZ = 1;
 
 
-                for (var SpaltNo = 0 ; SpaltNo < Zeil[0].GetUpperBound(0) + 1 ; SpaltNo++)
+                for (var SpaltNo = 0; SpaltNo < Zeil[0].GetUpperBound(0) + 1; SpaltNo++)
                 {
                     if (string.IsNullOrEmpty(Zeil[0][SpaltNo]))
                     {
@@ -159,7 +159,7 @@ namespace BlueControls.BlueDatabaseDialogs
                         Col.Caption = Zeil[0][SpaltNo];
                         Col.Format = enDataFormat.Text;
                     }
-                    colsx.Add(Col);
+                    columns.Add(Col);
 
                 }
             }
@@ -167,16 +167,16 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 foreach (var thisColumn in _Database.Column)
                 {
-                    if (thisColumn != null && string.IsNullOrEmpty(thisColumn.Identifier)) { colsx.Add(thisColumn); }
+                    if (thisColumn != null && string.IsNullOrEmpty(thisColumn.Identifier)) { columns.Add(thisColumn); }
                 }
 
-                while (colsx.Count < Zeil[0].GetUpperBound(0) + 1)
+                while (columns.Count < Zeil[0].GetUpperBound(0) + 1)
                 {
                     var newc = new ColumnItem(_Database, true);
                     newc.Caption = newc.Name;
                     newc.Format = enDataFormat.Text;
                     newc.MultiLine = true;
-                    colsx.Add(newc);
+                    columns.Add(newc);
                 }
 
             }
@@ -191,29 +191,32 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (!SilentMode) { P = Progressbar.Show("Importiere...", Zeil.Count - 1); }
 
-            for (var ZeilNo = StartZ ; ZeilNo < Zeil.Count ; ZeilNo++)
+            for (var ZeilNo = StartZ; ZeilNo < Zeil.Count; ZeilNo++)
             {
                 P?.Update(ZeilNo);
 
 
-                var tempVar2 = Math.Min(Zeil[ZeilNo].GetUpperBound(0) + 1, colsx.Count);
-                for (var SpaltNo = 0 ; SpaltNo < tempVar2 ; SpaltNo++)
+                var tempVar2 = Math.Min(Zeil[ZeilNo].GetUpperBound(0) + 1, columns.Count);
+                row = null;
+                for (var SpaltNo = 0; SpaltNo < tempVar2; SpaltNo++)
                 {
 
                     if (SpaltNo == 0)
                     {
-                        R = null;
-                        if (ZeileZuordnen && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo])) { R = _Database.Row[Zeil[ZeilNo][SpaltNo]]; }
-                        if (R == null)
+                        row = null;
+                        if (ZeileZuordnen && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo])) { row = _Database.Row[Zeil[ZeilNo][SpaltNo]]; }
+                        if (row == null && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo]))
                         {
-                            R = _Database.Row.Add(Zeil[ZeilNo][SpaltNo]);
+                            row = _Database.Row.Add(Zeil[ZeilNo][SpaltNo]);
                             neuZ += 1;
                         }
                     }
                     else
                     {
-
-                        R.CellSet(colsx[SpaltNo], Zeil[ZeilNo][SpaltNo].SplitBy("|").JoinWithCr());
+                        if (row != null)
+                        {
+                            row.CellSet(columns[SpaltNo], Zeil[ZeilNo][SpaltNo].SplitBy("|").JoinWithCr());
+                        }
                     }
 
                 }
