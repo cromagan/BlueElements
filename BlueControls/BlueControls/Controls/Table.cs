@@ -506,22 +506,23 @@ namespace BlueControls.Controls
                     if (Drawn != ToDraw)
                     {
 
-                        if (y < HeadSize() && Zei < SortedRows().Count)
+                        if (y - 2 < HeadSize() && Zei < SortedRows().Count)
                         {
                             if (Database.Cell.GetStringBehindLinkedValue(ViewItem.Column, SortedRows()[Zei + 1]) == ToDraw)
                             {
                                 y = HeadSize();
                             }
                         }
+
                         GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, y);
-                        Draw_CellTransparent(GR, ViewItem, CurrentRow, DisplayRectangleWOSlider, _Cell_Font);
+                        Draw_CellTransparent(GR, ViewItem, CurrentRow, y, DisplayRectangleWOSlider, _Cell_Font);
                         Drawn = ToDraw;
                     }
                 }
                 else
                 {
                     GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, y);
-                    Draw_CellTransparent(GR, ViewItem, CurrentRow, DisplayRectangleWOSlider, _Cell_Font);
+                    Draw_CellTransparent(GR, ViewItem, CurrentRow, y, DisplayRectangleWOSlider, _Cell_Font);
                 }
 
 
@@ -789,7 +790,7 @@ namespace BlueControls.Controls
         }
 
         /// Zeichnet die gesamte Zelle ohne Hintergrund. Die verlinkte Zelle ist bereits bekannt.
-        private void Draw_CellTransparentDirect(Graphics GR, ColumnViewItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, ColumnItem ContentHolderCellColumn, RowItem ContentHolderCellRow, Rectangle DisplayRectangleWOSlider, BlueFont vfont)
+        private void Draw_CellTransparentDirect(Graphics GR, ColumnViewItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, int RowY, ColumnItem ContentHolderCellColumn, RowItem ContentHolderCellRow, Rectangle DisplayRectangleWOSlider, BlueFont vfont)
         {
 
 
@@ -800,21 +801,21 @@ namespace BlueControls.Controls
 
             if (!ContentHolderCellColumn.MultiLine || !toDraw.Contains("\r"))
             {
-                Draw_CellTransparentDirect_OneLine(GR, toDraw, CellInThisDatabaseColumn, CellInThisDatabaseRow, ContentHolderCellColumn, true, DisplayRectangleWOSlider, vfont, 0);
+                Draw_CellTransparentDirect_OneLine(GR, toDraw, CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY, ContentHolderCellColumn, true, DisplayRectangleWOSlider, vfont);
             }
             else
             {
                 var MEI = toDraw.SplitByCR();
                 if (ContentHolderCellColumn.ShowMultiLineInOneLine)
                 {
-                    Draw_CellTransparentDirect_OneLine(GR, MEI.JoinWith("; "), CellInThisDatabaseColumn, CellInThisDatabaseRow, ContentHolderCellColumn, true, DisplayRectangleWOSlider, vfont, 0);
+                    Draw_CellTransparentDirect_OneLine(GR, MEI.JoinWith("; "), CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY, ContentHolderCellColumn, true, DisplayRectangleWOSlider, vfont);
                 }
                 else
                 {
                     var y = 0;
                     for (var z = 0; z <= MEI.GetUpperBound(0); z++)
                     {
-                        Draw_CellTransparentDirect_OneLine(GR, MEI[z], CellInThisDatabaseColumn, CellInThisDatabaseRow, ContentHolderCellColumn, Convert.ToBoolean(z == MEI.GetUpperBound(0)), DisplayRectangleWOSlider, vfont, y);
+                        Draw_CellTransparentDirect_OneLine(GR, MEI[z], CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY + y, ContentHolderCellColumn, Convert.ToBoolean(z == MEI.GetUpperBound(0)), DisplayRectangleWOSlider, vfont);
                         y += Skin.FormatedText_NeededSize(CellInThisDatabaseColumn.Column, MEI[z], null, vfont, enShortenStyle.Replaced, Pix16 - 1).Height;
                     }
                 }
@@ -832,7 +833,7 @@ namespace BlueControls.Controls
         /// <param name="CellInThisDatabaseRow"></param>
         /// <param name="DisplayRectangleWOSlider"></param>
         /// <param name="vfont"></param>
-        private void Draw_CellTransparent(Graphics GR, ColumnViewItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, Rectangle DisplayRectangleWOSlider, BlueFont vfont)
+        private void Draw_CellTransparent(Graphics GR, ColumnViewItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, int RowY, Rectangle DisplayRectangleWOSlider, BlueFont vfont)
         {
 
             if (CellInThisDatabaseRow == null) { return; }
@@ -842,12 +843,12 @@ namespace BlueControls.Controls
                 Database.Cell.LinkedCellData(CellInThisDatabaseColumn.Column, CellInThisDatabaseRow, out var ContentHolderCellColumn, out var ContenHolderCellRow);
                 if (ContentHolderCellColumn != null && ContenHolderCellRow != null)
                 {
-                    Draw_CellTransparentDirect(GR, CellInThisDatabaseColumn, CellInThisDatabaseRow, ContentHolderCellColumn, ContenHolderCellRow, DisplayRectangleWOSlider, vfont);
+                    Draw_CellTransparentDirect(GR, CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY, ContentHolderCellColumn, ContenHolderCellRow, DisplayRectangleWOSlider, vfont);
                 }
                 return;
             }
 
-            Draw_CellTransparentDirect(GR, CellInThisDatabaseColumn, CellInThisDatabaseRow, CellInThisDatabaseColumn.Column, CellInThisDatabaseRow, DisplayRectangleWOSlider, vfont);
+            Draw_CellTransparentDirect(GR, CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY, CellInThisDatabaseColumn.Column, CellInThisDatabaseRow, DisplayRectangleWOSlider, vfont);
         }
 
         private void Draw_Column_Body(Graphics GR, ColumnViewItem CellInThisDatabaseColumn, Rectangle DisplayRectangleWOSlider)
@@ -1106,23 +1107,23 @@ namespace BlueControls.Controls
             if (f == null) { return; }
 
 
-            Draw_CellTransparent(GR, Column, Row, DisplayRectangleWOSlider, f);
+            Draw_CellTransparent(GR, Column, Row, (int)Row.TMP_Y, DisplayRectangleWOSlider, f);
 
         }
 
         /// Zeichnet die eine Zeile der Zelle ohne Hintergrund und prüft noch, ob der verlinkte Inhalt gezeichnet werden soll.
-        private void Draw_CellTransparentDirect_OneLine(Graphics GR, string DrawString, ColumnViewItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, ColumnItem ContentHolderColumnStyle, bool IsLastRow, Rectangle DisplayRectangleWOSlider, BlueFont vfont, int Y)
+        private void Draw_CellTransparentDirect_OneLine(Graphics GR, string DrawString, ColumnViewItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, int Y, ColumnItem ContentHolderColumnStyle, bool IsLastRow, Rectangle DisplayRectangleWOSlider, BlueFont vfont)
         {
 
 
             var r = new Rectangle((int)CellInThisDatabaseColumn.OrderTMP_Spalte_X1,
-                                  (int)CellInThisDatabaseRow.TMP_Y + Y,
-                                  Column_DrawWidth(CellInThisDatabaseColumn, DisplayRectangleWOSlider), 
+                                   Y,
+                                  Column_DrawWidth(CellInThisDatabaseColumn, DisplayRectangleWOSlider),
                                   Pix16);
 
-            if (r.Bottom > CellInThisDatabaseRow.TMP_Y + Row_DrawHeight(CellInThisDatabaseRow, DisplayRectangleWOSlider) - Pix16)
+            if (r.Bottom > Y + Row_DrawHeight(CellInThisDatabaseRow, DisplayRectangleWOSlider) - Pix16)
             {
-                if (r.Bottom > CellInThisDatabaseRow.TMP_Y + Row_DrawHeight(CellInThisDatabaseRow, DisplayRectangleWOSlider)) { return; }
+                if (r.Bottom > Y + Row_DrawHeight(CellInThisDatabaseRow, DisplayRectangleWOSlider)) { return; }
                 if (!IsLastRow) { DrawString = "..."; }// Die Letzte Zeile noch ganz hinschreiben
             }
 
@@ -3358,7 +3359,7 @@ namespace BlueControls.Controls
         }
 
 
-        public static int tmpColumnContentWidth(ColumnItem Column, BlueFont CellFont,int Pix16)
+        public static int tmpColumnContentWidth(ColumnItem Column, BlueFont CellFont, int Pix16)
         {
 
             if (Column.TMP_ColumnContentWidth != null) { return (int)Column.TMP_ColumnContentWidth; }
@@ -3425,7 +3426,7 @@ namespace BlueControls.Controls
         {
             if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(_Database.Column[0], vrow, _Cell_Font, Pix16).Height; }
             if (vrow.TMP_DrawHeight != null) { return (int)vrow.TMP_DrawHeight; }
-            var tmp = Pix18; 
+            var tmp = Pix18;
 
             foreach (var ThisViewItem in _Database.ColumnArrangements[_ArrangementNr])
             {
