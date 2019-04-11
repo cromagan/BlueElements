@@ -328,6 +328,9 @@ namespace BlueControls.BlueDatabaseDialogs
         private void btnNeueSpalteErstellen_Click(object sender, System.EventArgs e)
         {
 
+
+            if (_TableView.Database.ReadOnly) { return; }
+
             var Vorlage = _TableView.CursorPosColumn();
 
             if (Vorlage != null && !string.IsNullOrEmpty(Vorlage.Identifier)) { Vorlage = null; }
@@ -436,7 +439,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
             }
 
-            if (_TableView.Design != enBlueTableAppearance.Standard || !_TableView.Enabled || !_TableView.Visible)
+            if (_TableView.Design != enBlueTableAppearance.Standard || !_TableView.Enabled || !_TableView.Visible || _TableView.Database.ReadOnly)
             {
                 enTabellenAnsicht = false;
                 enAnsichtsVerwaltung = false;
@@ -564,11 +567,10 @@ namespace BlueControls.BlueDatabaseDialogs
             btnVorherigeVersion.Enabled = false;
 
 
-            if (_TableView.Database.ReadOnly)
+            if (_originalDB != null && _TableView.Database != _originalDB )
             {
                 _TableView.Database = _originalDB;
                 _originalDB = null;
-                //MessageBox.Show("Nicht möglich", enImageCode.Information, "OK");
                 btnVorherigeVersion.Text = "Vorherige Version";
                 btnVorherigeVersion.Enabled = true;
                 return;

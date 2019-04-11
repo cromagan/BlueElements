@@ -85,7 +85,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnAutoEditKleineFehler = new BlueControls.Controls.Button();
             this.btnAutoEditToUpper = new BlueControls.Controls.Button();
             this.tbxRunden = new BlueControls.Controls.TextBox();
-            this.cbxVorschlag = new BlueControls.Controls.ComboBox();
+            this.cbxVorschlagSpalte = new BlueControls.Controls.ComboBox();
             this.capVorschlag = new BlueControls.Controls.Caption();
             this.Caption11 = new BlueControls.Controls.Caption();
             this.btnAutoEditAutoSort = new BlueControls.Controls.Button();
@@ -673,7 +673,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabAutoBearbeitung.Controls.Add(this.btnAutoEditKleineFehler);
             this.tabAutoBearbeitung.Controls.Add(this.btnAutoEditToUpper);
             this.tabAutoBearbeitung.Controls.Add(this.tbxRunden);
-            this.tabAutoBearbeitung.Controls.Add(this.cbxVorschlag);
+            this.tabAutoBearbeitung.Controls.Add(this.cbxVorschlagSpalte);
             this.tabAutoBearbeitung.Controls.Add(this.capVorschlag);
             this.tabAutoBearbeitung.Controls.Add(this.Caption11);
             this.tabAutoBearbeitung.Controls.Add(this.btnAutoEditAutoSort);
@@ -748,15 +748,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tbxRunden.Size = new System.Drawing.Size(88, 24);
             this.tbxRunden.TabIndex = 11;
             // 
-            // cbxVorschlag
+            // cbxVorschlagSpalte
             // 
-            this.cbxVorschlag.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.cbxVorschlagSpalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxVorschlag.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxVorschlag.Location = new System.Drawing.Point(408, 256);
-            this.cbxVorschlag.Name = "cbxVorschlag";
-            this.cbxVorschlag.Size = new System.Drawing.Size(496, 24);
-            this.cbxVorschlag.TabIndex = 5;
+            this.cbxVorschlagSpalte.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxVorschlagSpalte.Location = new System.Drawing.Point(408, 256);
+            this.cbxVorschlagSpalte.Name = "cbxVorschlagSpalte";
+            this.cbxVorschlagSpalte.Size = new System.Drawing.Size(496, 24);
+            this.cbxVorschlagSpalte.TabIndex = 5;
             // 
             // capVorschlag
             // 
@@ -1560,7 +1560,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Caption capRegex;
         private ComboBox cbxAlign;
         private Caption capAlign;
-        private ComboBox cbxVorschlag;
+        private ComboBox cbxVorschlagSpalte;
         private Caption capVorschlag;
         private ComboBox cbxDropDownKey;
         private Caption capDropDownKey;

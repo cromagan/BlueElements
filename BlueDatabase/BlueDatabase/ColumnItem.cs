@@ -2193,6 +2193,59 @@ namespace BlueDatabase
             TMP_EditDialog = UserEditDialogTypeInTable(_Format, false, true, _MultiLine);
 
 
+            switch (_Format)
+            {
+
+                case enDataFormat.Bit:
+                    if (_AutoFilterErweitertErlaubt) { return "Format unterstützt keinen 'erweiternden Autofilter'"; }
+                    if (_AutofilterTextFilterErlaubt) { return "Format unterstützt keine 'Texteingabe bei Autofilter'"; }
+                    if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Format unterstützt keinen 'Autofilter Joker'"; }
+                    if (!_IgnoreAtRowFilter) { return "Format muss bei Zeilenfilter ignoriert werden.'"; }
+                    break;
+
+                case enDataFormat.RelationText:
+                    if (!_MultiLine) { return "Bei diesem Format muss mehrzeilig ausgewählt werden."; }
+                    if (KeyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
+                    if (this.IsFirst()) { return "Diese Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
+                    if (!string.IsNullOrEmpty(_CellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
+                    if (_VorschlagsColumn > 0) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
+
+                    break;
+
+                case enDataFormat.LinkedCell:
+                    if (!string.IsNullOrEmpty(_CellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
+                    if (KeyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
+                    if (this.IsFirst()) { return "Diese Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
+                    if (LinkedCell_RowKey < 0) { return "Die Angabe der Spalte, aus der der Schlüsselwert geholt wird, fehlt."; }
+                    if (LinkedCell_ColumnValueFoundIn < 0 && LinkedCell_ColumnKey < 0) { return "Information fehlt, welche Spalte der Zieldatenbank verwendet werden soll."; }
+                    if (LinkedCell_ColumnValueFoundIn > -1 && LinkedCell_ColumnKey > -1) { return "Doppelte Informationen, welche Spalte der Zieldatenbank verwendet werden soll."; }
+                    if (LinkedCell_Behaviour == enFehlendesZiel.Undefiniert) { return "Verhalten, was mit Zeilen passieren soll, die in der Zieldatenbank nicht existiert, fehlt."; }
+                    if (LinkedCell_ColumnValueFoundIn < 0 && !string.IsNullOrEmpty(LinkedCell_ColumnValueAdd)) { return "Falsche Ziel-Spalte ODER Spalten-Vortext flasch."; }
+                    if (_VorschlagsColumn > 0) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
+                    break;
+
+                case enDataFormat.Values_für_LinkedCellDropdown:
+                    if (!string.IsNullOrEmpty(_CellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
+                    if (KeyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
+                    if (_VorschlagsColumn > 0) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
+                    break;
+
+
+                case enDataFormat.Link_To_Filesystem:
+                    if (!string.IsNullOrEmpty(_CellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
+                    if (_MultiLine && !_AfterEdit_QuickSortRemoveDouble) { return "Format muss sortiert werden."; }
+                    if (_VorschlagsColumn > 0) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
+                    break;
+
+
+                case enDataFormat.Text_mit_Formatierung:
+                    if (_AfterEdit_QuickSortRemoveDouble) { return "Format darf nicht sortiert werden."; }
+                    break;
+
+            }
+
+
+
             if (_MultiLine)
             {
                 if (!_Format.MultilinePossible()) { return "Format unterstützt keine mehrzeiligen Texte."; }
@@ -2200,8 +2253,6 @@ namespace BlueDatabase
             }
             else
             {
-                //if (_Format == enDataFormat.Relation) { return "Bei Beziehungen muss mehrzeilig ausgewählt werden."; }
-                if (_Format == enDataFormat.RelationText) { return "Bei Beziehungen muss mehrzeilig ausgewählt werden."; }
                 if (_ShowMultiLineInOneLine) { return "Wenn mehrzeilige Texte einzeilig dargestellt werden sollen, muss mehrzeilig angewählt sein."; }
                 if (_AfterEdit_QuickSortRemoveDouble) { return "Sortierung kann nur bei mehrzeiligen Feldern erfolgen."; }
             }
@@ -2217,7 +2268,6 @@ namespace BlueDatabase
             {
                 if (TMP_EditDialog == enEditTypeTable.Dropdown_Single) { return "Format unterstützt nur Dropdown-Menü."; }
                 if (TMP_EditDialog == enEditTypeTable.None) { return "Format unterstützt keine Standard-Bearbeitung."; }
-
             }
             else
             {
@@ -2226,7 +2276,6 @@ namespace BlueDatabase
 
             if (_DropdownBearbeitungErlaubt)
             {
-                //if (TMP_EditDialog == enEditTypeTable.RelationEditor_InTable) { return "Format unterstützt nur die Standard-Bearbeitung."; }
                 if (_SpellCheckingEnabled) { return "Entweder Dropdownmenü oder Rechtschreibprüfung."; }
                 if (TMP_EditDialog == enEditTypeTable.None) { return "Format unterstützt keine Auswahlmenü-Bearbeitung."; }
             }
@@ -2273,22 +2322,9 @@ namespace BlueDatabase
 
 
 
-            if (_Format == enDataFormat.Link_To_Filesystem)
-            {
-                if (_MultiLine && !_AfterEdit_QuickSortRemoveDouble) { return "Format muss sortiert werden."; }
-            }
-
-
-            if (_Format == enDataFormat.Text_mit_Formatierung)
-            {
-                if (_AfterEdit_QuickSortRemoveDouble) { return "Format darf nicht sortiert werden."; }
-            }
-
 
             if (!string.IsNullOrEmpty(_Suffix))
             {
-                //d
-                //if (!_Format.IsZahl()) { return "Format unterstützt keine Einheit."; }
                 if (_MultiLine) { return "Einheiten und Mehrzeilig darf nicht kombiniert werden."; }
             }
 
@@ -2320,21 +2356,14 @@ namespace BlueDatabase
                     _Format != enDataFormat.Ganzzahl) { return "Format unterstützt keine Ersetzungen."; }
 
                 if (_AutoFilterErweitertErlaubt) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
-                //if (_AutofilterTextFilterErlaubt) { return "Entweder 'Ersetzungen' oder 'Texteingabe bei Autofilter'"; }
                 if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Entweder 'Ersetzungen' oder 'Autofilter Joker'"; }
             }
 
             if (_KeyColumnKey > -1)
             {
-  
-                if (_Format == enDataFormat.RelationText || _Format == enDataFormat.LinkedCell || _Format == enDataFormat.Values_für_LinkedCellDropdown ) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben, Format prüfen."; }
-
                 if (!string.IsNullOrEmpty(I_Am_A_Key_For_Other_Column)) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben: " + I_Am_A_Key_For_Other_Column; }
-
                 var c = Database.Column.SearchByKey(_KeyColumnKey);
                 if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
-                //if (c.Format == enDataFormat.RelationText) { return "Die verknüpfte Schlüsselspalte hat das falsche Format."; }
-
 
             }
 
@@ -2342,30 +2371,12 @@ namespace BlueDatabase
             if (this.IsFirst())
             {
                 if (_KeyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
-                if (_Format == enDataFormat.RelationText) { return "Die (intern) erste Spalte kann nicht das Format RelationText haben."; }
-            }
-
-
-
-            if (_Format == enDataFormat.LinkedCell)
-            {
-                if (LinkedCell_RowKey < 0) { return "Die Angabe der Spalte, aus der der Schlüsselwert geholt wird, fehlt."; }
-                if (LinkedCell_ColumnValueFoundIn < 0 && LinkedCell_ColumnKey < 0) { return "Information fehlt, welche Spalte der Zieldatenbank verwendet werden soll."; }
-                if (LinkedCell_ColumnValueFoundIn > -1 && LinkedCell_ColumnKey > -1) { return "Doppelte Informationen, welche Spalte der Zieldatenbank verwendet werden soll."; }
-                if (LinkedCell_Behaviour == enFehlendesZiel.Undefiniert) { return "Verhalten, was mit Zeilen passieren soll, die in der Zieldatenbank nicht existiert, fehlt."; }
-                if (LinkedCell_ColumnValueFoundIn < 0 && !string.IsNullOrEmpty(LinkedCell_ColumnValueAdd)) { return "Falsche Ziel-Spalte ODER Spalten-Vortext flasch."; }
-            }
-
-
-            if (_Format == enDataFormat.Bit)
-            {
-
-                if (_AutoFilterErweitertErlaubt) { return "Format unterstützt keinen 'erweiternden Autofilter'"; }
-                if (_AutofilterTextFilterErlaubt) { return "Format unterstützt keine 'Texteingabe bei Autofilter'"; }
-                if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Format unterstützt keinen 'Autofilter Joker'"; }
-                if (!_IgnoreAtRowFilter) { return "Format muss bei Zeilenfilter ignoriert werden.'"; }
 
             }
+
+
+
+
 
 
             return string.Empty;

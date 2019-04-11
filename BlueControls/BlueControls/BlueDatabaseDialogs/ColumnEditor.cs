@@ -231,13 +231,18 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxRowKeyInColumn.Item.Add("#Ohne");
             cbxDropDownKey.Item.Clear();
             cbxDropDownKey.Item.Add("#Ohne");
-            cbxVorschlag.Item.Clear();
-            cbxVorschlag.Item.Add("#Ohne");
+            cbxVorschlagSpalte.Item.Clear();
+            cbxVorschlagSpalte.Item.Add("#Ohne");
 
             foreach (var ThisColumn in _Column.Database.Column)
             {
                 if ((ThisColumn.Format == enDataFormat.RelationText || !ThisColumn.MultiLine) && ThisColumn.Format.CanBeChangedByRules()) { cbxSchlüsselspalte.Item.Add(ThisColumn); }
-                if (ThisColumn.Format.CanBeChangedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) { cbxRowKeyInColumn.Item.Add(ThisColumn); }
+                if (ThisColumn.Format.CanBeChangedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase())
+                {
+                    cbxRowKeyInColumn.Item.Add(ThisColumn);
+                    cbxDropDownKey.Item.Add(ThisColumn);
+                    cbxVorschlagSpalte.Item.Add(ThisColumn);
+                }
                 if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxRowKeyInColumn.Item.Add(ThisColumn); }
                 if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxColumnKeyInColumn.Item.Add(ThisColumn); }
             }
@@ -245,7 +250,7 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxSchlüsselspalte.Item.Sort();
             cbxRowKeyInColumn.Item.Sort();
             cbxColumnKeyInColumn.Item.Sort();
-            cbxVorschlag.Item.Sort();
+            cbxVorschlagSpalte.Item.Sort();
             cbxDropDownKey.Item.Sort();
 
 
@@ -262,7 +267,7 @@ namespace BlueControls.BlueDatabaseDialogs
             SetKeyTo(_Column.LinkedDatabase(), cbxTargetColumn, _Column.LinkedCell_ColumnKey);
             SetKeyTo(_Column.Database, cbxColumnKeyInColumn, _Column.LinkedCell_ColumnValueFoundIn);
             SetKeyTo(_Column.Database, cbxDropDownKey, _Column.DropdownKey);
-            SetKeyTo(_Column.Database, cbxVorschlag, _Column.VorschlagsColumn);
+            SetKeyTo(_Column.Database, cbxVorschlagSpalte, _Column.VorschlagsColumn);
 
             if (btnColumnKeyInColumn.Enabled && _Column.LinkedCell_ColumnValueFoundIn >-1) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
             if (btnTargetColumn.Enabled && _Column.LinkedCell_ColumnKey > -1) { btnTargetColumn.Checked = true; } // Nicht perfekt die Lösung :-(
@@ -546,7 +551,7 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.LinkedCell_Behaviour = (enFehlendesZiel)int.Parse(cbxFehlendesZiel.Text);
             _Column.ZellenZusammenfassen = butZusammenfassen.Checked;
             _Column.DropdownKey = ColumKeyFrom(_Column.Database, cbxDropDownKey.Text);
-            _Column.VorschlagsColumn = ColumKeyFrom(_Column.Database, cbxVorschlag.Text);
+            _Column.VorschlagsColumn = ColumKeyFrom(_Column.Database, cbxVorschlagSpalte.Text);
             _Column.Align = (enAlignment)int.Parse(cbxAlign.Text);
             _Column.SortMask = txbSortMask.Text;
             _Column.AutoRemove = txbAutoRemove.Text;

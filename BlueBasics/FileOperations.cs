@@ -24,6 +24,8 @@ using static BlueBasics.modAllgemein;
 using BlueBasics.Enums;
 using System.Security.Permissions;
 using System.Security;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 namespace BlueBasics
 {
@@ -35,6 +37,9 @@ namespace BlueBasics
         private static string CanWrite_LastFile = string.Empty;
 
         private delegate bool DoThis(string file1, string file2);
+
+        private static string LastCheck = string.Empty;
+        private static bool LastErg = false;
 
 
         private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure)
@@ -48,7 +53,7 @@ namespace BlueBasics
                 if (tries > 5)
                 {
                     if (!toBeSure) { return false; }
-                    if (DateTime.Now.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(enFehlerArt.Fehler, "Befehl konnte nicht ausgeführt werden, "  + file1 + " " + file2); }
+                    if (DateTime.Now.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(enFehlerArt.Fehler, "Befehl konnte nicht ausgeführt werden, " + file1 + " " + file2); }
                 }
             }
 
@@ -194,20 +199,66 @@ namespace BlueBasics
             return File.Exists(file);
         }
 
-        //public static bool CanWriteInDirectory(string directory)
+        //public static bool CanWriteInDirectory(string DirectoryPath)
         //{
-        //    if (string.IsNullOrEmpty(directory)) { return false; }
-        //    var di = new DirectoryInfo(directory);
-        //    return di.Writable();
+        //    if (string.IsNullOrEmpty(DirectoryPath)) { return false; }
+
+        //    var AccessRight = FileSystemRights.CreateFiles;
+
+        //    var Allow = false;
+        //    var Deny = false;
+
+        //    try
+        //    {
+        //        var rules = Directory.GetAccessControl(DirectoryPath).GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
+        //        var identity = WindowsIdentity.GetCurrent();
+
+        //        foreach (FileSystemAccessRule rule in rules)
+        //        {
+        //            if (identity.Groups.Contains(rule.IdentityReference))
+        //            {
+        //                if ((AccessRight & rule.FileSystemRights) == AccessRight)
+        //                {
+        //                    if (rule.AccessControlType == AccessControlType.Allow) { Allow = true; }
+        //                    if (rule.AccessControlType == AccessControlType.Deny) { Deny = true; }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+
+        //    return Allow && !Deny;
         //}
 
 
-        public static bool CanWriteInDirectory(string directory)
+        public static bool CanWriteInDirectory(string DirectoryPath)
         {
-            var permission = new FileIOPermission(FileIOPermissionAccess.Write, directory);
-            var permissionSet = new PermissionSet(PermissionState.None);
-            permissionSet.AddPermission(permission);
-            return permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet);
+
+
+
+            if (string.IsNullOrEmpty(DirectoryPath)) { return false; }
+
+
+            if (LastCheck == DirectoryPath.ToUpper()) { return LastErg; }
+
+            LastCheck = DirectoryPath.ToUpper();
+            LastErg = false;
+
+
+            try
+            {
+                using (var fs = File.Create(Path.Combine(DirectoryPath, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose))
+                { }
+                LastErg = true;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
 

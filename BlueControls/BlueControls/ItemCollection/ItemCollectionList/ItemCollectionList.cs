@@ -228,7 +228,7 @@ namespace BlueControls.ItemCollection
 
         public void Check(string[] vItems, bool Checked)
         {
-            for (var z = 0 ; z <= vItems.GetUpperBound(0) ; z++)
+            for (var z = 0; z <= vItems.GetUpperBound(0); z++)
             {
                 if (this[vItems[z]] != null)
                 {
@@ -445,7 +445,7 @@ namespace BlueControls.ItemCollection
                         else
                         {
                             var TestSP = 0;
-                            for (TestSP = 10 ; TestSP >= 1 ; TestSP--)
+                            for (TestSP = 10; TestSP >= 1; TestSP--)
                             {
                                 Max = new SizeF(BiggestWidth * TestSP + TestSP * GenericControl.Skin.PaddingSmal, Bigy / TestSP);
 
@@ -828,7 +828,7 @@ namespace BlueControls.ItemCollection
         public void AddRange(Database vLayoutDatabase, bool vDoDiscLayouts, string vAdditionalLayoutPath)
         {
 
-            for (var z = 0 ; z < vLayoutDatabase.Layouts.Count ; z++)
+            for (var z = 0; z < vLayoutDatabase.Layouts.Count; z++)
             {
                 using (var p = new CreativePad())
                 {
@@ -1189,7 +1189,20 @@ namespace BlueControls.ItemCollection
             e.CheckBehavior = enCheckBehavior.MultiSelection; // Es kann ja mehr als nur eines angewählt sein, auch wenn nicht erlaubt!
 
             l.AddRange(column.DropDownItems);
-            if (column.DropdownWerteAndererZellenAnzeigen) { l.AddRange(column.Contents(null)); }
+            if (column.DropdownWerteAndererZellenAnzeigen)
+            {
+                if (column.DropdownKey >= 0 && checkedItemsAtRow != null)
+                {
+                    var cc = column.Database.Column.SearchByKey(column.DropdownKey);
+                    var F = new FilterCollection(column.Database);
+                    F.Add(new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc)));
+                    l.AddRange(column.Contents(F));
+                }
+                else
+                {
+                    l.AddRange(column.Contents(null));
+                }
+            }
 
 
             switch (column.Format)
