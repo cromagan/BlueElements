@@ -218,6 +218,9 @@ namespace BlueDatabase
                 }
             }
 
+            TMP_Y = null;
+            TMP_DrawHeight = null;
+
             if (Convert.ToBoolean(cols.Count == 0) != Database.Cell.GetBoolean(Database.Column.SysCorrect, this)) { CellSet(Database.Column.SysCorrect, Convert.ToBoolean(cols.Count == 0)); }
 
             OnRowChecked(new RowCheckedEventArgs(this, cols));
@@ -313,13 +316,13 @@ namespace BlueDatabase
             return true;
         }
 
-        public bool MatchesTo(FilterCollection Filter)
+        public bool MatchesTo(FilterCollection filter)
         {
             if (Database == null) { return false; }
 
-            if (Filter == null || Filter.Count() == 0) { return true; }
+            if (filter == null || filter.Count() == 0) { return true; }
 
-            foreach (var ThisFilter in Filter)
+            foreach (var ThisFilter in filter)
             {
                 if (!MatchesTo(ThisFilter)) { return false; }
             }

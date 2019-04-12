@@ -393,7 +393,7 @@ namespace BlueControls.Controls
             if (!string.IsNullOrEmpty(((ComboBox)sender).Text)) { return; }
 
 
-            Value = _columview.Column.Database.Cell.AutomaticInitalValue(_columview.Column, Row);
+            Value = CellCollection.AutomaticInitalValue(_columview.Column, Row);
 
         }
 
@@ -406,7 +406,7 @@ namespace BlueControls.Controls
             if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
 
 
-            Value = _columview.Column.Database.Cell.AutomaticInitalValue(_columview.Column, Row);
+            Value = CellCollection.AutomaticInitalValue(_columview.Column, Row);
 
         }
 

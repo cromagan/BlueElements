@@ -431,25 +431,25 @@ namespace BlueDatabase
         }
 
 
-        public List<RowItem> CalculateSortedRows(FilterCollection Filter, RowSortDefinition tmpSortDefinition)
+        public static List<RowItem> CalculateSortedRows(Database database, FilterCollection Filter, RowSortDefinition rowSortDefinition)
         {
             var TMP = new List<string>();
             var _tmpSortedRows = new List<RowItem>();
 
 
-            foreach (var ThisRowItem in Database.Row)
+            foreach (var ThisRowItem in database.Row)
             {
                 if (ThisRowItem != null)
                 {
                     if (ThisRowItem.MatchesTo(Filter))
                     {
-                        if (tmpSortDefinition == null)
+                        if (rowSortDefinition == null)
                         {
                             TMP.Add(ThisRowItem.CompareKey(null));
                         }
                         else
                         {
-                            TMP.Add(ThisRowItem.CompareKey(tmpSortDefinition.Columns));
+                            TMP.Add(ThisRowItem.CompareKey(rowSortDefinition.Columns));
                         }
                     }
                 }
@@ -460,14 +460,14 @@ namespace BlueDatabase
 
 
             var cc = 0;
-            if (tmpSortDefinition == null || !tmpSortDefinition.Reverse)
+            if (rowSortDefinition == null || !rowSortDefinition.Reverse)
             {
                 foreach (var t in TMP)
                 {
                     if (!string.IsNullOrEmpty(t))
                     {
                         cc = t.IndexOf(Constants.SecondSortChar + "<key>");
-                        _tmpSortedRows.Add(Database.Row.SearchByKey(int.Parse(t.Substring(cc + 6))));
+                        _tmpSortedRows.Add(database.Row.SearchByKey(int.Parse(t.Substring(cc + 6))));
                     }
                 }
             }
@@ -478,7 +478,7 @@ namespace BlueDatabase
                     if (!string.IsNullOrEmpty(TMP[z]))
                     {
                         cc = TMP[z].IndexOf(Constants.SecondSortChar + "<key>");
-                        _tmpSortedRows.Add(Database.Row.SearchByKey(int.Parse(TMP[z].Substring(cc + 6))));
+                        _tmpSortedRows.Add(database.Row.SearchByKey(int.Parse(TMP[z].Substring(cc + 6))));
                     }
                 }
 

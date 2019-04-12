@@ -177,7 +177,7 @@ namespace BlueDatabase
 
 
 
-        public void LinkedCellData(ColumnItem Column, RowItem Row, out ColumnItem LinkedColumn, out RowItem LinkedRow)
+        public static void LinkedCellData(ColumnItem Column, RowItem Row, out ColumnItem LinkedColumn, out RowItem LinkedRow)
         {
 
             LinkedColumn = null;
@@ -186,7 +186,7 @@ namespace BlueDatabase
 
             if (LinkedDatabase == null) { return; }
 
-            var Key = GetStringBehindLinkedValue(Column, Row);
+            var Key = Column.Database.Cell.GetStringBehindLinkedValue(Column, Row);
 
             if (string.IsNullOrEmpty(Key)) { return; }
 
@@ -744,39 +744,32 @@ namespace BlueDatabase
         }
 
 
-        public string AutomaticInitalValue(ColumnItem Column, RowItem Row)
+        public static string AutomaticInitalValue(ColumnItem column, RowItem row)
         {
+            if (column == null || row == null) { return string.Empty; }
 
-
-            if (!string.IsNullOrEmpty(Column.CellInitValue)) { return string.Empty; }
-
-
-
-            if (Column.VorschlagsColumn > -1)
+            if (column.Format == enDataFormat.LinkedCell)
             {
-                Develop.DebugPrint_NichtImplementiert();
-
+                LinkedCellData(column, row, out var column1, out var row1);
+                return AutomaticInitalValue(column1, row1);
             }
 
-            // _VorschlagColumnKey abfragen
+
+            if (column.VorschlagsColumn < 0) { return string.Empty; }
 
 
-            //var BestW = "";
-            //foreach (var ThisRule in Database.Rules)
-            //{
-            //    if (ThisRule != null)
-            //    {
-            //        if (ThisRule.hasGotFocusAction(Row, Column))
-            //        {
-            //            if (ThisRule.TrifftZu(Row, Column)) { BestW = ThisRule.Execute(Row, Column, false); }
-            //            if (!string.IsNullOrEmpty(BestW)) { return BestW; }
-            //        }
-            //    }
-            //}
-            return string.Empty;
+            var cc = column.Database.Column.SearchByKey(column.VorschlagsColumn);
+            if (cc == null) { return string.Empty; }
+
+            var F = new FilterCollection(column.Database);
+            F.Add(new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, row.CellGetString(cc)));
+            F.Add(new FilterItem(column, enFilterType.Ungleich_MultiRowIgnorieren, string.Empty));
+
+            var rows = RowCollection.CalculateSortedRows(column.Database, F, null);
+            rows.Remove(row);
+            if (rows.Count == 0) { return string.Empty; }
+            return rows[0].CellGetString(column);
         }
-
-
 
 
         internal static void Invalidate_CellContentSize(ColumnItem Column, RowItem Row)
@@ -1373,7 +1366,7 @@ namespace BlueDatabase
             if (_cells.ContainsKey(CellKey))
             {
                 return Column.Database.Cell._cells[CellKey].Size;
-             }
+            }
             return Size.Empty;
         }
 

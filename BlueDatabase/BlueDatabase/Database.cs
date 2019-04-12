@@ -2118,7 +2118,7 @@ namespace BlueDatabase
         {
             //    Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
-            return Export_CSV(FirstRow, ColumnArrangements[ArrNr].ListOfUsedColumn(), Row.CalculateSortedRows(Filter, SortDefinition));
+            return Export_CSV(FirstRow, ColumnArrangements[ArrNr].ListOfUsedColumn(), RowCollection.CalculateSortedRows(this, Filter, SortDefinition));
         }
 
 
@@ -2140,7 +2140,7 @@ namespace BlueDatabase
         public void Export_HTML(string vFilename, int ArrNr, FilterCollection Filter)
         {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            Export_HTML(vFilename, ColumnArrangements[ArrNr].ListOfUsedColumn(), Row.CalculateSortedRows(Filter, SortDefinition), false);
+            Export_HTML(vFilename, ColumnArrangements[ArrNr].ListOfUsedColumn(), RowCollection.CalculateSortedRows(this, Filter, SortDefinition), false);
         }
 
         /// <summary>
@@ -2218,7 +2218,7 @@ namespace BlueDatabase
 
                             var LCColumn = ThisColumn;
                             var LCrow = ThisRow;
-                            if (ThisColumn.Format == enDataFormat.LinkedCell) { Cell.LinkedCellData(ThisColumn, ThisRow, out LCColumn, out LCrow); }
+                            if (ThisColumn.Format == enDataFormat.LinkedCell) { CellCollection.LinkedCellData(ThisColumn, ThisRow, out LCColumn, out LCrow); }
 
                             if (LCrow != null && LCColumn != null)
                             {

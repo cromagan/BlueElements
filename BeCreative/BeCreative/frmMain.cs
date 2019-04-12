@@ -369,11 +369,11 @@ namespace BeCreative
             LoadTab.FileName = Datei;
 
 
-            Database tmpDatabase = Database.GetByFilename(Datei);
+            var tmpDatabase = Database.GetByFilename(Datei);
 
             if (tmpDatabase == null)
             {
-                tmpDatabase = new Database( false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
+                tmpDatabase = new Database(false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
                 tmpDatabase.LoadFromDisk(Datei);
             }
 
@@ -467,6 +467,11 @@ namespace BeCreative
         private void AlleFilterAus_Click(object sender, EventArgs e)
         {
             ZeilenFilter_TextFeld.Text = string.Empty;
+
+            if (TableView.Filter != null)
+            {
+                TableView.Filter.Clear();
+            }
         }
 
 

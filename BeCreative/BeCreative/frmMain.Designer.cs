@@ -294,7 +294,6 @@ namespace BeCreative
             this.LastDatabases.DrawStyle = BlueControls.Enums.enComboboxStyle.RibbonBar;
             this.LastDatabases.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.LastDatabases.Enabled = false;
-            this.LastDatabases.Format = BlueBasics.Enums.enDataFormat.Text;
             this.LastDatabases.ImageCode = "Ordner";
             this.LastDatabases.Location = new System.Drawing.Point(128, 2);
             this.LastDatabases.Name = "LastDatabases";

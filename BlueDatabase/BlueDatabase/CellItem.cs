@@ -91,7 +91,7 @@ namespace BlueDatabase
 
             if (column.Format == enDataFormat.LinkedCell)
             {
-                column.Database.Cell.LinkedCellData(column, Row, out var LCColumn, out var LCrow);
+                CellCollection.LinkedCellData(column, Row, out var LCColumn, out var LCrow);
                 if (LCColumn != null && LCrow != null) { return ValuesReadable(column, Row, Style); }
                 return new List<string>();
             }

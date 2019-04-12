@@ -22,10 +22,6 @@ using System.Collections.Generic;
 using System.IO;
 using static BlueBasics.modAllgemein;
 using BlueBasics.Enums;
-using System.Security.Permissions;
-using System.Security;
-using System.Security.AccessControl;
-using System.Security.Principal;
 
 namespace BlueBasics
 {
