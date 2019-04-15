@@ -22,18 +22,18 @@ using System;
 namespace BlueBasics.Enums
 {
     [Flags]
-    public enum enAlignment : byte
+    public enum enAlignment : int
     {
         // Undefiniert = CByte(TextFormatFlags.none)
-        Left = (byte)System.Windows.Forms.TextFormatFlags.Left,
-        Right = (byte)System.Windows.Forms.TextFormatFlags.Right,
+        Left = System.Windows.Forms.TextFormatFlags.Left,
+        Right = System.Windows.Forms.TextFormatFlags.Right,
 
-        HorizontalCenter = (byte)System.Windows.Forms.TextFormatFlags.HorizontalCenter,
+        HorizontalCenter = System.Windows.Forms.TextFormatFlags.HorizontalCenter,
 
         Top = System.Windows.Forms.TextFormatFlags.Top,
-        Bottom = (byte)System.Windows.Forms.TextFormatFlags.Bottom,
+        Bottom = System.Windows.Forms.TextFormatFlags.Bottom,
 
-        VerticalCenter = (byte)System.Windows.Forms.TextFormatFlags.VerticalCenter,
+        VerticalCenter = System.Windows.Forms.TextFormatFlags.VerticalCenter,
 
         //DehnenLR = 64
         //DehnenOU = 128

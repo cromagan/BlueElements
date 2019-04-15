@@ -755,53 +755,6 @@ namespace BlueControls
 
         #endregion
 
-        /// <summary>
-        /// Bild wird auf Disabled geändert
-        /// </summary>
-        /// <param name="column"></param>
-        /// <param name="Txt"></param>
-        /// <param name="QI"></param>
-        /// <param name="GR"></param>
-        /// <param name="FitInRect"></param>
-        /// <param name="vAlign"></param>
-        /// <param name="Child"></param>
-        /// <param name="DeleteBack"></param>
-        /// <param name="SkinRow"></param>
-        public void Draw_FormatedText(ColumnItem column, string Txt, QuickImage QI, Graphics GR, Rectangle FitInRect, enAlignment vAlign, System.Windows.Forms.Control Child, bool DeleteBack, RowItem SkinRow, enShortenStyle Style)
-        {
-            if (string.IsNullOrEmpty(Txt) && QI == null) { return; }
-
-            if (SkinRow == null) { return; }
-
-            BlueFont f = null;
-            if (!string.IsNullOrEmpty(Txt)) { f = GetBlueFont(SkinRow); }
-
-            Draw_FormatedText(GR, column, Txt, QI, vAlign, FitInRect, Child, DeleteBack, f, Style);
-        }
-
-
-        /// <summary>
-        /// Stati (Disabled) werden nicht mehr geändert
-        /// </summary>
-        /// <param name="GR"></param>
-        /// <param name="column"></param>
-        /// <param name="Txt"></param>
-        /// <param name="ImageCode"></param>
-        /// <param name="vAlign"></param>
-        /// <param name="FitInRect"></param>
-        /// <param name="Child"></param>
-        /// <param name="DeleteBack"></param>
-        /// <param name="F"></param>
-        public void Draw_FormatedText(Graphics GR, ColumnItem column, string Txt, QuickImage ImageCode, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, BlueFont F, enShortenStyle Style)
-        {
-            var tmpImageCode = CellItem.StandardImage(column, Txt, ImageCode);
-            var tmpText = CellItem.ValueReadable(column, Txt, Style);
-
- 
-            vAlign = CellItem.StandardAlignment(column, vAlign);
-
-            Draw_FormatedText(GR, tmpText, tmpImageCode, vAlign, FitInRect, Child, DeleteBack, F);
-        }
 
 
 
@@ -921,14 +874,7 @@ namespace BlueControls
 
 
 
-        public Size FormatedText_NeededSize(ColumnItem Column, string txt, QuickImage ImageCode, BlueFont F, enShortenStyle Style, int MinSize)
-        {
-            var tmpText = CellItem.ValueReadable(Column, txt, Style);
-            var tmpImageCode = CellItem.StandardImage(Column, txt, ImageCode);
 
-
-            return FormatedText_NeededSize(tmpText, tmpImageCode, F, MinSize);
-        }
 
         public Size FormatedText_NeededSize(string tmpText, QuickImage tmpImageCode, BlueFont F, int MinSize)
         {

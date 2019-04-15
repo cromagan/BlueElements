@@ -345,8 +345,17 @@ namespace BlueDatabase
 
 
 
-        public static enAlignment StandardAlignment(ColumnItem column, enAlignment defaultalign)
+        public static enAlignment StandardAlignment(ColumnItem column)
         {
+
+
+            switch (column.Align)
+            {
+                case enAlignmentHorizontal.Links: return enAlignment.Top_Left;
+                case enAlignmentHorizontal.Rechts: return enAlignment.Top_Right;
+                case enAlignmentHorizontal.Zentriert:  return enAlignment.HorizontalCenter;
+            }
+
 
             switch (column.Format)
             {
@@ -359,7 +368,7 @@ namespace BlueDatabase
                     return enAlignment.Top_Left;
 
                 default:
-                    return defaultalign;
+                    return enAlignment.Top_Left;
             }
 
         }

@@ -125,7 +125,7 @@ namespace BlueDatabase
 
         private int _VorschlagsColumn;
 
-        private enAlignment _Align;
+        private enAlignmentHorizontal _Align;
 
         public readonly ListExt<string> Regex = new ListExt<string>();
 
@@ -181,7 +181,7 @@ namespace BlueDatabase
             _ZellenZusammenfassen = false;
             _DropDownKey = -1;
             _VorschlagsColumn = -1;
-            _Align = enAlignment.Left;
+            _Align = enAlignmentHorizontal.Keine_Präferenz;
 
 
 
@@ -823,7 +823,7 @@ namespace BlueDatabase
             }
         }
 
-        public enAlignment Align
+        public enAlignmentHorizontal Align
         {
             get
             {
@@ -1645,7 +1645,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_ZellenZusammenfassen: _ZellenZusammenfassen = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_DropDownKey: _DropDownKey = int.Parse(Wert); break;
                 case enDatabaseDataType.co_VorschlagColumn: _VorschlagsColumn = int.Parse(Wert); break;
-                case enDatabaseDataType.co_Align: _Align = (enAlignment)int.Parse(Wert); break;
+                case enDatabaseDataType.co_Align: _Align = (enAlignmentHorizontal)int.Parse(Wert); break;
 
                 default:
                     if (Art.ToString() == ((int)Art).ToString())

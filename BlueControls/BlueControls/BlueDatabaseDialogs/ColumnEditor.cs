@@ -63,13 +63,15 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxRandRechts.Item.AddRange(typeof(enColumnLineStyle));
             cbxBildCodeImageNotfound.Item.AddRange(typeof(enImageNotFound));
             cbxFehlendesZiel.Item.AddRange(typeof(enFehlendesZiel));
+            cbxAlign.Item.AddRange(typeof(enAlignmentHorizontal));
 
-            if (cbxAlign.Item.Count == 0)
-            {
-                cbxAlign.Item.Add(new TextListItem(((int)enAlignment.Left).ToString(), "links"));
-                cbxAlign.Item.Add(new TextListItem(((int)enAlignment.VerticalCenter).ToString(), "mittig"));
-                cbxAlign.Item.Add(new TextListItem(((int)enAlignment.Left).ToString(), "rechts"));
-            }
+
+            //if (cbxAlign.Item.Count == 0)
+            //{
+            //    cbxAlign.Item.Add(new TextListItem(((int)enAlignment.Left).ToString(), "links"));
+            //    cbxAlign.Item.Add(new TextListItem(((int)enAlignment.VerticalCenter).ToString(), "mittig"));
+            //    cbxAlign.Item.Add(new TextListItem(((int)enAlignment.Left).ToString(), "rechts"));
+            //}
 
             cbxLinkedDatabase.Item.Clear();
             if (!string.IsNullOrEmpty(_Column.Database.Filename))
@@ -552,7 +554,7 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.ZellenZusammenfassen = butZusammenfassen.Checked;
             _Column.DropdownKey = ColumKeyFrom(_Column.Database, cbxDropDownKey.Text);
             _Column.VorschlagsColumn = ColumKeyFrom(_Column.Database, cbxVorschlagSpalte.Text);
-            _Column.Align = (enAlignment)int.Parse(cbxAlign.Text);
+            _Column.Align = (enAlignmentHorizontal)int.Parse(cbxAlign.Text);
             _Column.SortMask = txbSortMask.Text;
             _Column.AutoRemove = txbAutoRemove.Text;
 
