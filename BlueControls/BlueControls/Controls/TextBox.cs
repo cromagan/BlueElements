@@ -1096,7 +1096,7 @@ namespace BlueControls.Controls
 
             var TmpcharS = MaS;
 
-            for (var cc = MaS ; cc <= MaE ; cc++)
+            for (var cc = MaS; cc <= MaE; cc++)
             {
 
                 if (cc == MaE || _eTxt.Chars[cc].Pos.X < _eTxt.Chars[TmpcharS].Pos.X || Math.Abs(_eTxt.Chars[cc].Pos.Y - _eTxt.Chars[TmpcharS].Pos.Y) > 0.001) //Jetzt ist der Zeitpunkt zum Zeichen/start setzen
@@ -1164,7 +1164,7 @@ namespace BlueControls.Controls
             if (_eTxt == null) { GenerateETXT(true); }
 
 
-            var ShowSlider = false;
+            var sliderPossible = false;
 
             if (state == enStates.Checked_Disabled)
             {
@@ -1190,12 +1190,12 @@ namespace BlueControls.Controls
             {
                 case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
                     _eTxt.Autoumbruch = true;
-                    ShowSlider = true;
+                    sliderPossible = true;
                     break;
 
                 case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
                     var hp = HotPosition();
-                    ShowSlider = true;
+                    sliderPossible = true;
 
                     if (hp < 0)
                     {
@@ -1230,11 +1230,7 @@ namespace BlueControls.Controls
                         }
                     }
 
-                    if (_eTxt.Left > Skin.PaddingSmal)
-                    {
-                        _eTxt.Left = Skin.PaddingSmal;
-                    }
-
+                    if (_eTxt.Left > Skin.PaddingSmal) { _eTxt.Left = Skin.PaddingSmal; }
                     break;
 
                 case enSteuerelementVerhalten.Steuerelement_Anpassen:
@@ -1246,60 +1242,67 @@ namespace BlueControls.Controls
                     {
                         Width = Math.Max(_eTxt.Width() + Skin.PaddingSmal * 3, Width);
                     }
-
                     Height = Math.Max(_eTxt.Height() + Skin.PaddingSmal * 2, Height);
-
-
                     break;
 
                 case enSteuerelementVerhalten.Text_Abschneiden:
                     _eTxt.MaxWidth = Width - Skin.PaddingSmal * 2;
                     _eTxt.MaxHeight = Height; // Sollte Egal sein........
-
-
                     break;
+
                 default:
                     Develop.DebugPrint(_Verhalten);
                     break;
             }
 
-            if ( ShowSlider)
+            if (sliderPossible)
             {
-                if (SliderY.Visible)
+                bool newState;
+
+                if (_Multiline)
                 {
-                    _eTxt.Top = (int)(-SliderY.Value);
-                    _eTxt.MaxWidth = DisplayRectangle.Width - Skin.PaddingSmal * 2 - SliderY.Width;
-                    SliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
+                    newState=  _eTxt.Height() > (Height - 16);
                 }
                 else
                 {
-                    _eTxt.Top = Skin.PaddingSmal;
-                    _eTxt.MaxWidth = Width - Skin.PaddingSmal * 2;
+                    newState= _eTxt.Height() > Height;
                 }
 
-                if (_eTxt.Height() > Height != SliderY.Visible)
+
+                if (SliderY.Visible != newState)
                 {
-                    SliderY.Visible = true;
+                    SliderY.Visible = newState;
+                    if (newState)
+                    {
+                        SliderY.Width = 18;
+                        SliderY.Height = Height;
+                        SliderY.Left = Width - SliderY.Width;
+                        SliderY.Top = 0;
+                    }
 
-
-                    SliderY.Width = 18;
-                    SliderY.Height = Height;
-                    SliderY.Left = Width - SliderY.Width;
-                    SliderY.Top = 0;
-
-                    // Mache Vorab-Routinen können den Slider nicht umschalten, deshalb hier nochmal die Kontrolle
-                    if (Convert.ToBoolean(_eTxt.Height() > Height) == SliderY.Visible) { DrawControl(gr, state); }
-                    return;
                 }
+            }
 
+
+            if (SliderY.Visible)
+            {
+                _eTxt.Top = (int)-SliderY.Value;
+                _eTxt.MaxWidth = DisplayRectangle.Width - Skin.PaddingSmal * 2 - SliderY.Width;
+                SliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
+            }
+            else
+            {
+                _eTxt.Top = Skin.PaddingSmal;
+                _eTxt.MaxWidth = Width - Skin.PaddingSmal * 2;
             }
 
 
 
-
-
             // ERST HIER! Manche Routinen ändern die Größe des Textfeldes.
-            if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
+            if (_BitmapOfControl == null)
+            {
+                _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
+            }
 
 
             var TMPGR = Graphics.FromImage(_BitmapOfControl);
@@ -1322,11 +1325,9 @@ namespace BlueControls.Controls
                 }
                 else
                 {
-
                     Skin.Draw_FormatedText(TMPGR, "[in " + _Suffix + "]", _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false);
                 }
             }
-
 
             Skin.Draw_Border(TMPGR, _eTxt.Design, state, DisplayRectangle);
 
@@ -1334,9 +1335,7 @@ namespace BlueControls.Controls
 
             TMPGR.Dispose();
 
-
             if (_MustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(true) && !SpellChecker.CancellationPending && !SpellChecker.IsBusy) { SpellChecker.RunWorkerAsync(); }
-
         }
 
 

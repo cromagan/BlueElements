@@ -1711,7 +1711,7 @@ namespace BlueDatabase
                     break;
 
                 case enAction.Substring:
-                    if (!string.IsNullOrEmpty(_Text))
+                    if (!string.IsNullOrEmpty(_Text) && Columns.Count > 0 )
                     {
                         foreach (var thisColumnItem in Columns[0].Database.Column)
                         {

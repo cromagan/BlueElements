@@ -220,7 +220,7 @@ namespace BlueControls.Controls
             // 
             // EUnten
             // 
-            this.EUnten.ImageCode = "Pfeil_Oben|16||4|0088FF";
+            this.EUnten.ImageCode = "Pfeil_Unten|16||4|0088FF";
             this.EUnten.Location = new System.Drawing.Point(24, 80);
             this.EUnten.Name = "EUnten";
             this.EUnten.Size = new System.Drawing.Size(32, 32);

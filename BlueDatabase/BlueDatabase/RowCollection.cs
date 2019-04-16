@@ -75,52 +75,48 @@ namespace BlueDatabase
 
         #region  Properties 
 
-        public RowItem this[FilterItem Filter]
+
+        /// <summary>
+        /// Durchsucht die erste (interne) Spalte der Datenbank nach dem hier angegebenen Prmärschlüssel.
+        /// </summary>
+        /// <param name="primärSchlüssel">Der Primärschlüssel, nach dem gesucht werden soll. Groß/Kleinschreibung wird ignoriert.</param>
+        /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
+        public RowItem this[string primärSchlüssel]
         {
             get
             {
-                var d = new FilterCollection(Filter.Database);
-                d.Add(Filter);
+                return this[new FilterItem(Database.Column[0], enFilterType.Istgleich_GroßKleinEgal | enFilterType.MultiRowIgnorieren, primärSchlüssel)];
+            }
+        }
+
+        public RowItem this[FilterItem filter]
+        {
+            get
+            {
+                var d = new FilterCollection(filter.Database);
+                d.Add(filter);
                 return this[d];
             }
         }
 
 
-
-        public RowItem this[string ValueOfFirstColumn]
+        public RowItem this[FilterItem filter1, FilterItem filter2]
         {
             get
             {
-                return this[new FilterItem(Database.Column[0], enFilterType.Istgleich_GroßKleinEgal | enFilterType.MultiRowIgnorieren, ValueOfFirstColumn)];
-            }
-        }
-
-        public RowItem this[FilterItem Filter1, FilterItem Filter2]
-        {
-            get
-            {
-                var d = new FilterCollection(Filter1.Database);
-                d.Add(Filter1);
-                d.Add(Filter2);
+                var d = new FilterCollection(filter1.Database);
+                d.Add(filter1);
+                d.Add(filter2);
                 return this[d];
-                //}
             }
         }
 
-        public RowItem this[FilterCollection Filter]
+        public RowItem this[FilterCollection filter]
         {
             get
             {
                 if (Database == null) { return null; }
-
-                return _Internal.Values.FirstOrDefault(ThisRow => ThisRow != null && ThisRow.MatchesTo(Filter));
-
-                //foreach (var ThisRow in _Internal.Values)
-                //{
-                //    if (ThisRow != null && ThisRow.MatchesTo(Filter)) { return ThisRow; }
-                //}
-
-                //return null;
+                return _Internal.Values.FirstOrDefault(ThisRow => ThisRow != null && ThisRow.MatchesTo(filter));
             }
         }
 

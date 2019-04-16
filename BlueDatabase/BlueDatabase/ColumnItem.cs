@@ -1460,6 +1460,18 @@ namespace BlueDatabase
 
             var el = new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly, Database._PasswordSub, Database._GenerateLayout, Database._RenameColumnInLayout);
 
+
+            if (FileExists(_LinkedDatabaseFile))
+            {
+                el = new DatabaseSettingsEventHandler(this, _LinkedDatabaseFile, Database.ReadOnly, Database._PasswordSub, Database._GenerateLayout, Database._RenameColumnInLayout);
+
+            }
+            else
+            {
+                el = new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly, Database._PasswordSub, Database._GenerateLayout, Database._RenameColumnInLayout);
+
+            }
+
             _TMP_LinkedDatabase = Database.GetByFilename(el.Filenname);
             if (_TMP_LinkedDatabase == null)
             {
@@ -2287,7 +2299,7 @@ namespace BlueDatabase
                 if (PermissionGroups_ChangeCell.Count > 0) { return "Bearbeitungsberechtigungen entfernen, wenn keine Bearbeitung erlaubt ist."; }
             }
 
-            if (!string.IsNullOrEmpty(_CellInitValue) && _VorschlagsColumn >-1) { return "InitialWert und Vorschlagspalten-Initial-Text gemeinsam nicht möglich"; }
+            if (!string.IsNullOrEmpty(_CellInitValue) && _VorschlagsColumn > -1) { return "InitialWert und Vorschlagspalten-Initial-Text gemeinsam nicht möglich"; }
 
             foreach (var thisS in PermissionGroups_ChangeCell)
             {
