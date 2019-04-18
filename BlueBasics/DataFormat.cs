@@ -138,12 +138,6 @@ namespace BlueBasics
             {
                 var ex = Txt.SplitByCR();
                 return ex.All(ThisString => string.IsNullOrEmpty(ThisString) || ThisString.IsFormat(Format));
-                //var ex = Txt.SplitByCR();
-                //foreach (var ThisString in ex)
-                //{
-                //    if (!string.IsNullOrEmpty(ThisString) && !ThisString.IsFormat(Format)) { return false; }
-                //}
-                //return true;
             }
 
             return Txt.IsFormat(Format);
@@ -175,7 +169,6 @@ namespace BlueBasics
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.BildCode:
-                case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
@@ -196,6 +189,10 @@ namespace BlueBasics
 
                 case enDataFormat.Link_To_Filesystem:
                     return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + ",./:_ +-()'";
+
+                case enDataFormat.LinkedCell:
+                    Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
+                    return string.Empty;
 
 
                 default:
@@ -278,7 +275,6 @@ namespace BlueBasics
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.RelationText:
-                case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     return true;
@@ -297,6 +293,11 @@ namespace BlueBasics
                 case enDataFormat.BildCode:
                     return Convert.ToBoolean(il > 0);
 
+
+                case enDataFormat.LinkedCell:
+                    Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
+                    return true;
+
                 default:
                     Develop.DebugPrint(format);
                     return true;
@@ -314,7 +315,6 @@ namespace BlueBasics
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.BildCode:
-                case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.Bit:
@@ -328,6 +328,10 @@ namespace BlueBasics
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Farbcode:
                     return true; // Macht Alls der Text_SchabloneCheck
+
+                case enDataFormat.LinkedCell:
+                    Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
+                    return true;
 
 
                 default:
@@ -351,7 +355,6 @@ namespace BlueBasics
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.BildCode:
-                case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
@@ -387,6 +390,9 @@ namespace BlueBasics
                     if (new Regex(@"^\d{2}.\d{2}.\d{4} \d{2}:\d{2}$").IsMatch(TXT)) { return true; }
                     return false;
 
+                case enDataFormat.LinkedCell:
+                    Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
+                    return true;
 
                 default:
                     Develop.DebugPrint(Format);

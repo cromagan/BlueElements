@@ -1274,7 +1274,7 @@ namespace BlueControls.Controls
             if (Row == null)
             {
                 // Neue Zeile!
-                UserEdited(ToAdd, Column, null, false);
+                UserEdited(this, ToAdd, Column, null, false);
                 return;
             }
 
@@ -1297,7 +1297,7 @@ namespace BlueControls.Controls
                 if (!string.IsNullOrEmpty(ToRemove)) { E.RemoveString(ToRemove, false); }
                 if (!string.IsNullOrEmpty(ToAdd)) { E.Add(ToAdd); }
 
-                UserEdited(E.JoinWithCr(), Column, Row, false);
+                UserEdited(this, E.JoinWithCr(), Column, Row, false);
             }
             else
             {
@@ -1306,13 +1306,13 @@ namespace BlueControls.Controls
                 {
                     if (ToAdd == Row.CellGetString(Column))
                     {
-                        UserEdited("", Column, Row, false);
+                        UserEdited(this, string.Empty, Column, Row, false);
                         return;
                     }
                 }
 
 
-                UserEdited(ToAdd, Column, Row, false);
+                UserEdited(this, ToAdd, Column, Row, false);
             }
 
 
@@ -1513,7 +1513,7 @@ namespace BlueControls.Controls
 
             ColDia.ShowDialog();
 
-            UserEdited(Color.FromArgb(255, ColDia.Color).ToArgb().ToString(), CellInThisDatabaseColumn, CellInThisDatabaseRow, false);
+            UserEdited(this, Color.FromArgb(255, ColDia.Color).ToArgb().ToString(), CellInThisDatabaseColumn, CellInThisDatabaseRow, false);
         }
 
         private bool Cell_Edit_TextBox(ColumnItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, ColumnItem ContentHolderCellColumn, RowItem ContentHolderCellRow, TextBox Box, int AddWith, int IsHeight)
@@ -1646,40 +1646,64 @@ namespace BlueControls.Controls
 
 
 
-        private void UserEdited(string NewValue, ColumnItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, bool FormatWarnung)
+        private static void UserEdited(Table table, string newValue, ColumnItem column, RowItem row, bool formatWarnung)
         {
 
-
-            if (CellInThisDatabaseRow == null && CellInThisDatabaseColumn != Database.Column[0])
+            if (column == null)
             {
-
-                NotEditableInfo("Neue Zeilen müssen mit der ersten Spalte beginnen");
+                table.NotEditableInfo("Keine Spalte angegeben.");
                 return;
             }
 
 
-            NewValue = CellInThisDatabaseColumn.AutoCorrect(NewValue);
-
-
-            if (CellInThisDatabaseRow != null)
+            if (column.Format == enDataFormat.LinkedCell)
             {
-                if (NewValue == CellInThisDatabaseRow.CellGetString(CellInThisDatabaseColumn)) { return; }
+                BlueDatabase.CellCollection.LinkedCellData(column, row, out var LCColumn, out var LCrow);
+                if (LCColumn == null || LCrow == null)
+                {
+                    table.NotEditableInfo("Zelle in verlinkter Datenbank nicht vorhanden.");
+                    return;
+                }
+                UserEdited(table, newValue, LCColumn, LCrow, formatWarnung);
+                if (table.Database == column.Database) { table.CursorPos_Set(column, row, false); }
+                return;
+            }
+
+
+
+
+
+
+            if (row == null && column != column.Database.Column[0])
+            {
+
+                table.NotEditableInfo("Neue Zeilen müssen mit der ersten Spalte beginnen");
+                return;
+            }
+
+
+            newValue = column.AutoCorrect(newValue);
+
+
+            if (row != null)
+            {
+                if (newValue == row.CellGetString(column)) { return; }
             }
             else
             {
-                if (string.IsNullOrEmpty(NewValue)) { return; }
+                if (string.IsNullOrEmpty(newValue)) { return; }
             }
 
 
-            var ed = new BeforeNewValueEventArgs(CellInThisDatabaseColumn, CellInThisDatabaseRow, NewValue, "");
-            OnEditBeforeNewValueSet(ed);
+            var ed = new BeforeNewValueEventArgs(column, row, newValue, string.Empty);
+            table.OnEditBeforeNewValueSet(ed);
             var CancelReason = ed.CancelReason;
 
 
-            if (string.IsNullOrEmpty(CancelReason) && FormatWarnung && !string.IsNullOrEmpty(NewValue))
+            if (string.IsNullOrEmpty(CancelReason) && formatWarnung && !string.IsNullOrEmpty(newValue))
             {
 
-                if (!NewValue.IsFormat(CellInThisDatabaseColumn.Format, CellInThisDatabaseColumn.MultiLine))
+                if (!newValue.IsFormat(column.Format, column.MultiLine))
                 {
                     if (DialogBoxes.MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", enImageCode.Information, "Ja", "Nein") != 0)
                     {
@@ -1691,18 +1715,18 @@ namespace BlueControls.Controls
 
             if (string.IsNullOrEmpty(CancelReason))
             {
-                if (CellInThisDatabaseRow == null)
+                if (row == null)
                 {
-                    CellInThisDatabaseRow = _Database.Row.Add(NewValue);
+                    row = column.Database.Row.Add(newValue);
                 }
                 else
                 {
-                    CellInThisDatabaseRow.CellSet(CellInThisDatabaseColumn, NewValue);
+                    row.CellSet(column, newValue);
                 }
 
+                if (table.Database == column.Database) { table.CursorPos_Set(column, row, false); }
 
-                CursorPos_Set(CellInThisDatabaseColumn, CellInThisDatabaseRow, false);
-                CellInThisDatabaseRow.DoAutomatic(false, true, false);
+                row.DoAutomatic(false, true, false);
 
                 // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
                 // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
@@ -1710,9 +1734,7 @@ namespace BlueControls.Controls
             }
             else
             {
-                NotEditableInfo(CancelReason);
-
-
+                table.NotEditableInfo(CancelReason);
             }
 
         }
@@ -1744,7 +1766,7 @@ namespace BlueControls.Controls
             BTBxx.Tag = null;
             BTBxx.Visible = false;
 
-            UserEdited(w, column, row, true);
+            UserEdited(this, w, column, row, true);
 
             Focus();
 
@@ -2426,7 +2448,7 @@ namespace BlueControls.Controls
 
                             if (string.IsNullOrEmpty(l2))
                             {
-                                UserEdited(string.Empty, _CursorPosColumn, _CursorPosRow, true);
+                                UserEdited(this, string.Empty, _CursorPosColumn, _CursorPosRow, true);
                             }
                             else
                             {
@@ -2448,7 +2470,7 @@ namespace BlueControls.Controls
 
                         if (string.IsNullOrEmpty(l))
                         {
-                            UserEdited(string.Empty, _CursorPosColumn, _CursorPosRow, true);
+                            UserEdited(this, string.Empty, _CursorPosColumn, _CursorPosRow, true);
                         }
                         else
                         {
@@ -2556,7 +2578,7 @@ namespace BlueControls.Controls
 
                                 if (string.IsNullOrEmpty(l2))
                                 {
-                                    UserEdited(ntxt, _CursorPosColumn, _CursorPosRow, true);
+                                    UserEdited(this, ntxt, _CursorPosColumn, _CursorPosRow, true);
                                 }
                                 else
                                 {
