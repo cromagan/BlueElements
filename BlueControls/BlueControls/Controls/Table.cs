@@ -493,7 +493,7 @@ namespace BlueControls.Controls
 
 
             // Zeilen Zeichnen (Alle Zellen)
-            for (var Zei = FirstVisibleRow; Zei <= LastVisibleRow; Zei++)
+            for (var Zei = FirstVisibleRow ; Zei <= LastVisibleRow ; Zei++)
             {
                 var CurrentRow = SortedRows()[Zei];
                 var y = (int)CurrentRow.TMP_Y;
@@ -620,7 +620,7 @@ namespace BlueControls.Controls
 
             var PermaX = 0;
 
-            for (var X = 0; X < _Database.ColumnArrangements[_ArrangementNr].Count() + 1; X++)
+            for (var X = 0 ; X < _Database.ColumnArrangements[_ArrangementNr].Count() + 1 ; X++)
             {
                 if (X < _Database.ColumnArrangements[_ArrangementNr].Count())
                 {
@@ -646,7 +646,7 @@ namespace BlueControls.Controls
                 {
 
 
-                    for (var u = 0; u < 3; u++)
+                    for (var u = 0 ; u < 3 ; u++)
                     {
                         var N = ViewItem?.Column.Ueberschrift(u);
                         var V = BVI[u]?.Column.Ueberschrift(u);
@@ -721,7 +721,7 @@ namespace BlueControls.Controls
 
             var r = new Rectangle();
             // Zeilen Zeichnen (Alle Zellen)
-            for (var Zeiv = vFirstVisibleRow; Zeiv <= vLastVisibleRow; Zeiv++)
+            for (var Zeiv = vFirstVisibleRow ; Zeiv <= vLastVisibleRow ; Zeiv++)
             {
                 var Row = SortedRows()[Zeiv];
 
@@ -813,7 +813,7 @@ namespace BlueControls.Controls
                 else
                 {
                     var y = 0;
-                    for (var z = 0; z <= MEI.GetUpperBound(0); z++)
+                    for (var z = 0 ; z <= MEI.GetUpperBound(0) ; z++)
                     {
                         Draw_CellTransparentDirect_OneLine(GR, MEI[z], CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY + y, ContentHolderCellColumn, Convert.ToBoolean(z == MEI.GetUpperBound(0)), DisplayRectangleWOSlider, vfont);
                         y += FormatedText_NeededSize(CellInThisDatabaseColumn.Column, MEI[z], null, vfont, enShortenStyle.Replaced, Pix16 - 1).Height;
@@ -867,7 +867,7 @@ namespace BlueControls.Controls
 
             if (Onlyhead) { yPos = HeadSize(); }
 
-            for (z = 0; z <= 1; z++)
+            for (z = 0 ; z <= 1 ; z++)
             {
                 var xPos = 0;
                 enColumnLineStyle Lin = 0;
@@ -1021,9 +1021,9 @@ namespace BlueControls.Controls
 
             if (_ShowNumber)
             {
-                for (var x = -1; x < 2; x++)
+                for (var x = -1 ; x < 2 ; x++)
                 {
-                    for (var y = -1; y < 2; y++)
+                    for (var y = -1 ; y < 2 ; y++)
                     {
                         GR.DrawString("#" + lfdNo.ToString(), _Column_Font.Font(), Brushes.Black, (int)ViewItem.OrderTMP_Spalte_X1 + x, ViewItem._TMP_AutoFilterLocation.Top + y);
 
@@ -3539,7 +3539,7 @@ namespace BlueControls.Controls
 
             if (vcolumn.TMP_AutoFilterSinnvoll != null) { return (bool)vcolumn.TMP_AutoFilterSinnvoll; }
 
-            for (var rowcount = 0; rowcount <= SortedRows().Count - 2; rowcount++)
+            for (var rowcount = 0 ; rowcount <= SortedRows().Count - 2 ; rowcount++)
             {
                 if (SortedRows()[rowcount].CellGetString(vcolumn.Column) != SortedRows()[rowcount + 1].CellGetString(vcolumn.Column))
                 {
@@ -3981,7 +3981,7 @@ namespace BlueControls.Controls
                 {
 
                     var TMPSize = Size.Empty;
-                    for (var z = 0; z <= TMP.GetUpperBound(0); z++)
+                    for (var z = 0 ; z <= TMP.GetUpperBound(0) ; z++)
                     {
                         TMPSize = FormatedText_NeededSize(Column, TMP[z], null, CellFont, enShortenStyle.Replaced, Pix16);
                         _ContentSize.Width = Math.Max(TMPSize.Width, _ContentSize.Width);
@@ -4066,7 +4066,7 @@ namespace BlueControls.Controls
             var co = 0;
 
 
-            for (var z = _Database.Works.Count - 1; z >= 0; z--)
+            for (var z = _Database.Works.Count - 1 ; z >= 0 ; z--)
             {
 
                 if (_Database.Works[z].CellKey == CellKey && _Database.Works[z].HistorischRelevant)
@@ -4118,6 +4118,13 @@ namespace BlueControls.Controls
             searchTXT = searchTXT.Trim();
 
             var ca = TableView.Database.ColumnArrangements[TableView.Arrangement];
+
+
+            if (TableView.Design == enBlueTableAppearance.OnlyMainColumnWithoutHead)
+            {
+                ca = TableView.Database.ColumnArrangements[0];
+            }
+
 
             if (row == null) { row = TableView.View_RowLast(); }
             if (column == null) { column = TableView.Database.Column.SysLocked; }

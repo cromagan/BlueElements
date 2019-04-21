@@ -2676,7 +2676,7 @@ namespace BlueDatabase
 
                         foreach (var thisTmp in tmp)
                         {
-                            Column_All.AddIfNotExists(ThisColumnItem.BestFile(thisTmp).ToLower());
+                            Column_All.AddIfNotExists(ThisColumnItem.BestFile(thisTmp, false).ToLower());
                         }
                     }
 

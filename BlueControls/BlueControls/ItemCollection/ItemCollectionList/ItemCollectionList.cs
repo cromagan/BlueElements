@@ -759,7 +759,7 @@ namespace BlueControls.ItemCollection
             {
                 if (ColumnStyle.Format == enDataFormat.Link_To_Filesystem && Value.FileType() == enFileFormat.Image)
                 {
-                    Add(new BitmapListItem(Value, Value, ColumnStyle.BestFile(Value), ColumnStyle.Database.FileEncryptionKey));
+                    Add(new BitmapListItem(Value, Value, ColumnStyle.BestFile(Value, false), ColumnStyle.Database.FileEncryptionKey));
                 }
                 else
                 {

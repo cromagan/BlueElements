@@ -211,7 +211,7 @@ namespace BlueDatabase
 
                             //    break;
                             case enDataFormat.Link_To_Filesystem:
-                                I = (Bitmap)modAllgemein.Image_FromFile(row.CellBestFile(column));
+                                I = (Bitmap)modAllgemein.Image_FromFile(column.BestFile(row.CellGetString(column), false));
 
 
                                 break;
@@ -261,7 +261,7 @@ namespace BlueDatabase
 
                 case "103": // Vortext
                     var ts = tx.SplitByCR();
-                    for (var tz = 0; tz <= ts.GetUpperBound(0); tz++)
+                    for (var tz = 0 ; tz <= ts.GetUpperBound(0) ; tz++)
                     {
                         ts[tz] = CodeNr.Substring(3) + ts[tz];
                     }
@@ -270,7 +270,7 @@ namespace BlueDatabase
 
                 case "104": // Nachtext
                     var ts2 = tx.SplitByCR();
-                    for (var tz = 0; tz <= ts2.GetUpperBound(0); tz++)
+                    for (var tz = 0 ; tz <= ts2.GetUpperBound(0) ; tz++)
                     {
                         ts2[tz] = ts2[tz] + CodeNr.Substring(3);
                     }
@@ -375,9 +375,9 @@ namespace BlueDatabase
                 case "107":
 
                     var ts3 = tx.SplitByCR();
-                    for (var tz = 0; tz <= ts3.GetUpperBound(0); tz++)
+                    for (var tz = 0 ; tz <= ts3.GetUpperBound(0) ; tz++)
                     {
-                        ts3[tz] =  CellItem.ValueReadable(column, ts3[tz], enShortenStyle.HTML);
+                        ts3[tz] = CellItem.ValueReadable(column, ts3[tz], enShortenStyle.HTML);
                     }
                     tx = string.Join("\r", ts3);
                     break;
@@ -442,7 +442,7 @@ namespace BlueDatabase
                         tx = tx.Replace("zwei TL", "2 TL", RegexOptions.IgnoreCase);
 
 
-                        for (var t = 0; t <= A.GetUpperBound(0); t++)
+                        for (var t = 0 ; t <= A.GetUpperBound(0) ; t++)
                         {
                             tx = tx.Replace("gerieben" + A[t], "ger.");
                             //tx = tx.Replace("groß" + A[t], "gr.");

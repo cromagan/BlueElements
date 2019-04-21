@@ -29,6 +29,7 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using static BlueBasics.FileOperations;
 using System.Text.RegularExpressions;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase
 {
@@ -322,6 +323,8 @@ namespace BlueDatabase
             Prefix = Source.Prefix;
 
         }
+
+
 
         internal void CheckIfIAmAKeyColumn()
         {
@@ -651,7 +654,7 @@ namespace BlueDatabase
             var tmp = Contents(null);
 
 
-            for (var Z = 0; Z < tmp.Count; Z++)
+            for (var Z = 0 ; Z < tmp.Count ; Z++)
             {
                 tmp[Z] = tmp[Z].Length.Nummer(10) + tmp[Z].ToUpper();
             }
@@ -659,7 +662,7 @@ namespace BlueDatabase
 
             tmp.Sort();
 
-            for (var Z = 0; Z < tmp.Count; Z++)
+            for (var Z = 0 ; Z < tmp.Count ; Z++)
             {
                 tmp[Z] = tmp[Z].Substring(10);
             }
@@ -1996,7 +1999,7 @@ namespace BlueDatabase
 
             if (UserEditDialogTypeInFormula(_EditType)) { return; }// Alles OK!
 
-            for (var z = 0; z <= 999; z++)
+            for (var z = 0 ; z <= 999 ; z++)
             {
                 var w = (enEditTypeFormula)z;
                 if (w.ToString() != z.ToString())
@@ -2431,23 +2434,23 @@ namespace BlueDatabase
             Database.AddPending(enDatabaseDataType.co_PermissionGroups_ChangeCell, Key, PermissionGroups_ChangeCell.JoinWithCr(), false);
         }
 
-        public string FreeFileName(string Wunschname, string Suffix)
-        {
+        //public string BestFile(string Wunschname, string Suffix)
+        //{
 
 
-            if (string.IsNullOrEmpty(Wunschname))
-            {
-                Wunschname = "Data" + Key + "-" + DateTime.Now;
-                Wunschname = Wunschname.Replace(":", "-").Replace(".", "-").Trim('-').Replace(" ", "_");
-            }
-            Wunschname = Wunschname.RemoveChars(Constants.Char_DateiSonderZeichen);
+        //    if (string.IsNullOrEmpty(Wunschname))
+        //    {
+        //        Wunschname = "Data" + Key + "-" + DateTime.Now;
+        //        Wunschname = Wunschname.Replace(":", "-").Replace(".", "-").Trim('-').Replace(" ", "_");
+        //    }
+        //    Wunschname = Wunschname.RemoveChars(Constants.Char_DateiSonderZeichen);
 
-            var NeuerName = BestFile(Wunschname); // Nächstbesten Namen holen
+        //    var NeuerName = BestFile(Wunschname); // Nächstbesten Namen holen
 
-            NeuerName = TempFile(NeuerName.FilePath(), NeuerName.FileNameWithoutSuffix(), Suffix); // TempFile kümmert sich um den Index hinten drann
+        //    NeuerName = TempFile(NeuerName.FilePath(), NeuerName.FileNameWithoutSuffix(), Suffix); // TempFile kümmert sich um den Index hinten drann
 
-            return NeuerName;
-        }
+        //    return NeuerName;
+        //}
 
 
         public string AutoCorrect(string Value)
@@ -2592,52 +2595,82 @@ namespace BlueDatabase
         }
 
 
-        public string NewPureBestFile(string FileNameWithoutPath)
+        ///// <summary>
+        ///// Gibt einen Dateinamen zurück der in dieser Spalte noch nicht benutzt wurde und auf der Festplatte nicht existiert
+        ///// </summary>
+        ///// <param name="FileNameWithoutPath"></param>
+        ///// <returns></returns>
+        //public string NewPureBestFile(string FileNameWithoutPath)
+        //{
+        //    do
+        //    {
+        //        Database.Reload();
+        //        var n = TempFile(BestFile(FileNameWithoutPath + "_" + DateTime.Now.ToString().ReduceToChars(Constants.Char_Numerals))).FileNameWithoutSuffix();
+        //        if (Database.Row[new FilterItem(this, enFilterType.Istgleich_GroßKleinEgal, n)] == null && !FileExists(n)) { return n; }
+
+        //    } while (true);
+
+
+        //}
+
+        public string SimplyFile(string fullFileName)
         {
-            do
-            {
-                Database.Reload();
-                var n = TempFile(BestFile(FileNameWithoutPath + "_" + DateTime.Now.ToString().ReduceToChars(Constants.Char_Numerals))).FileNameWithoutSuffix();
-                if (Database.Row[new FilterItem(this, enFilterType.Istgleich_GroßKleinEgal, n)] == null) { return n; }
-
-            } while (true);
-
-
-        }
-
-        public string BestFile(string FileNameWithoutPath)
-        {
-
             if (_Format != enDataFormat.Link_To_Filesystem)
             {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!");
             }
 
-            FileNameWithoutPath = FileNameWithoutPath.RemoveChars(Constants.Char_DateiSonderZeichen);
+            var tmpfile = fullFileName.FileNameWithoutSuffix();
+            if (BestFile(tmpfile, false).ToLower() == fullFileName.ToLower()) { return tmpfile; }
+
+            tmpfile = fullFileName.FileNameWithSuffix();
+            if (BestFile(tmpfile, false).ToLower() == fullFileName.ToLower()) { return tmpfile; }
+
+            return fullFileName;
+        }
+
+
+        /// <summary>
+        /// Gibt den Dateinamen zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt.
+        /// Ein evtl. fehelender Pfad und ein evtl. fehelendes Suffix werden ergänzt. Es wird nicht auf die Existenz der Datei geprüft.
+        /// </summary>
+        /// <param name="FileNameWithoutPath"></param>
+        /// <returns></returns>
+        public string BestFile(string FileNameWithoutPath, bool MustBeFree)
+        {
+
+            if (_Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!"); }
+
+            //FileNameWithoutPath = FileNameWithoutPath.RemoveChars(Constants.Char_DateiSonderZeichen); // Falls ein Korrekter Pfad übergeben wurde, würde er hier verstümmelt werden
             if (string.IsNullOrEmpty(FileNameWithoutPath)) { return string.Empty; }
 
-            if (FileNameWithoutPath.Contains("\r"))
-            {
-                Develop.DebugPrint_NichtImplementiert();
-            }
+            if (FileNameWithoutPath.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
 
 
+
+            // Wenn FileNameWithoutPath kein Suffix hat, das Standard Suffix hinzufügen
             if (string.IsNullOrEmpty(FileNameWithoutPath.FileSuffix()))
             {
                 FileNameWithoutPath = (FileNameWithoutPath + "." + _BestFile_StandardSuffix).TrimEnd(".");
             }
 
-
+            // Den Standardfolder benutzen. Falls dieser fehlt, 'Files' benutzen.
             var Fold = _BestFile_StandardFolder.Trim("\\");
             if (string.IsNullOrEmpty(Fold)) { Fold = "Files"; }
 
 
-            if (Fold.Substring(1, 1) != ":" && Fold.Substring(0, 1) != "\\")
-            {
-                Fold = Database.Filename.FilePath() + Fold;
-            }
+            // Ist nur ein Unterferzeichniss angegeben, den Datenbankpfad benutzen und das Unterverzeichniss anhängen
+            if (Fold.Substring(1, 1) != ":" && Fold.Substring(0, 1) != "\\") { Fold = Database.Filename.FilePath() + Fold; }
 
-            return Fold.TrimEnd("\\") + "\\" + FileNameWithoutPath;
+
+            if (MustBeFree)
+            {
+                return TempFile(Fold.TrimEnd("\\") + "\\", FileNameWithoutPath);
+            }
+            else
+            {
+                return Fold.TrimEnd("\\") + "\\" + FileNameWithoutPath;
+            }
 
 
         }

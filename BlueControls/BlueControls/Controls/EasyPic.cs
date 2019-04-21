@@ -494,55 +494,55 @@ namespace BlueControls.Controls
         }
 
 
-        /// <summary>
-        /// Lädt das Bild aus einer Datenbank verknüpfung. Events werden ausgelöst.
-        /// </summary>
-        /// <param name="FullFileName"></param>
-        public void LoadFromDatabase(string FullFileName)
-        {
+        ///// <summary>
+        ///// Lädt das Bild aus einer Datenbank verknüpfung. Events werden ausgelöst.
+        ///// </summary>
+        ///// <param name="FullFileName"></param>
+        //public void LoadFromDatabase(string FullFileName)
+        //{
 
-            _Bitmap = (Bitmap)modAllgemein.Image_FromFile(SorceName);
-            SorceType = enSorceType.DatabaseInternal;
-            SorceName = FullFileName.FileNameWithSuffix();
-            OnImageChanged();
-        }
+        //    _Bitmap = (Bitmap)modAllgemein.Image_FromFile(SorceName);
+        //    SorceType = enSorceType.DatabaseInternal;
+        //    SorceName = FullFileName.FileNameWithSuffix();
+        //    OnImageChanged();
+        //}
 
-        /// <summary>
-        /// Lädt das Bild nach. Der SourceName muss korrekt sein und der Typ muss SourceNameCorrectButImageNotLoaded sein.
-        /// </summary>
-        /// <param name="Column"></param>
-        public void LoadFromDatabase(ColumnItem Column, bool ThrowEvent)
-        {
-            if (SorceType != enSorceType.SourceNameCorrectButImageNotLoaded) { Develop.DebugPrint_NichtImplementiert(); }
-
-
-            if (string.IsNullOrEmpty(SorceName))
-            {
-                SorceType = enSorceType.Nichts;
-                _Bitmap = null;
-                if (ThrowEvent) { OnImageChanged(); }
-                return;
-            }
+        ///// <summary>
+        ///// Lädt das Bild nach. Der SourceName muss korrekt sein und der Typ muss SourceNameCorrectButImageNotLoaded sein.
+        ///// </summary>
+        ///// <param name="Column"></param>
+        //public void LoadFromDatabase(ColumnItem Column, bool ThrowEvent)
+        //{
+        //    if (SorceType != enSorceType.SourceNameCorrectButImageNotLoaded) { Develop.DebugPrint_NichtImplementiert(); }
 
 
-            var Filename = Column.BestFile(SorceName);
+        //    if (string.IsNullOrEmpty(SorceName))
+        //    {
+        //        SorceType = enSorceType.Nichts;
+        //        _Bitmap = null;
+        //        if (ThrowEvent) { OnImageChanged(); }
+        //        return;
+        //    }
 
-            _Bitmap = (Bitmap)modAllgemein.Image_FromFile(Filename);
+
+        //    var Filename = Column.BestFile(SorceName);
+
+        //    _Bitmap = (Bitmap)modAllgemein.Image_FromFile(Filename);
 
 
-            if (_Bitmap != null)
-            {
-                SorceType = enSorceType.DatabaseInternal;
-            }
-            else
-            {
-                SorceType = enSorceType.EntryWithoutPic;
-            }
+        //    if (_Bitmap != null)
+        //    {
+        //        SorceType = enSorceType.DatabaseInternal;
+        //    }
+        //    else
+        //    {
+        //        SorceType = enSorceType.EntryWithoutPic;
+        //    }
 
-            ZoomFitInvalidateAndCheckButtons();
-            if (ThrowEvent) { OnImageChanged(); }
+        //    ZoomFitInvalidateAndCheckButtons();
+        //    if (ThrowEvent) { OnImageChanged(); }
 
-        }
+        //}
 
         private void AusDatenbank_Click(object sender, System.EventArgs e)
         {
@@ -570,23 +570,11 @@ namespace BlueControls.Controls
 
             if (string.IsNullOrEmpty(n)) { return; }
 
-            LoadFromDatabase(n);
+            FromFile(n);
             OnImageChanged();
 
         }
 
-        /// <summary>
-        /// Entfernt das Bild, setzt den SourceName und markiert das Bild als "SourceNameCorrectButImageNotLoaded".
-        /// </summary>
-        /// <param name="SourceName"></param>
-        internal void SetSourceName(string SourceName, bool ThrowEvent)
-        {
-            SorceName = SourceName;
-            SorceType = enSorceType.SourceNameCorrectButImageNotLoaded;
-            _Bitmap = null;
-            ZoomFitInvalidateAndCheckButtons();
-            if (ThrowEvent) { OnImageChanged(); }
 
-        }
     }
 }

@@ -2929,7 +2929,7 @@ namespace BlueControls.Controls
 
                 case enDataFormat.Link_To_Filesystem:
 
-                    var f = Row.CellBestFile(Column);
+                    var f = Column.BestFile(Row.CellGetString(Column), false);
 
                     if (FileExists(f))
                     {
@@ -3079,7 +3079,7 @@ namespace BlueControls.Controls
             }
 
 
-            for (var Durch = 0; Durch <= 1; Durch++)
+            for (var Durch = 0 ; Durch <= 1 ; Durch++)
             {
 
                 do

@@ -494,6 +494,10 @@ namespace BlueControls.Controls
         }
 
 
+        [DefaultValue("")]
+        public string FileEncryptionKey { get; set; }
+
+
         #endregion
 
 
@@ -865,13 +869,12 @@ namespace BlueControls.Controls
         }
 
         /// <summary>
-        /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Das Bild wird nicht geladen, das muss eine übergeordnete Instanz übernehmen.
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling  muss TRUE sein.
         /// </summary>
         private void UpdateValueTo_EasyPic(EasyPic Control)
         {
             if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
-            Control.SetSourceName(_Value, true);   // den Rest muss OnChanged von FlexiControlForCell übernehmen.
+            Control.FromFile(_Value);  
         }
 
         #endregion
@@ -1213,74 +1216,41 @@ namespace BlueControls.Controls
             else
             {
 
-                // Zu viele im Main zu den Suggests schieben
+                // Zu viele im Mains aus der Liste löschen
                 foreach (var ThisString in _Ist)
                 {
                     if (!_Soll.Contains(ThisString)) { Main.Item.Remove(ThisString); }
                 }
 
-                // Evtl. Suggests in die Mainlist verschieben.
+                // und die Mains auffüllen
                 foreach (var ThisString in _Soll)
                 {
-                    if (!_Ist.Contains(ThisString)) { Main.Item.Add(ThisString); }
+                    if (!_Ist.Contains(ThisString))
+                    {
+
+                        if(BlueBasics.FileOperations.FileExists(ThisString))
+                        {
+
+                            if (ThisString.FileType() == enFileFormat.Image)
+                            {
+                                Main.Item.Add(new BitmapListItem(ThisString, ThisString.FileNameWithoutSuffix(), ThisString, FileEncryptionKey));
+                            }
+                            else
+                            {
+                                Main.Item.Add(new TextListItem(ThisString, ThisString.FileNameWithSuffix(), QuickImage.Get(ThisString.FileType(), 48)));
+                            }
+
+
+                        }
+                        else
+                        {
+                            Main.Item.Add(ThisString);
+                        }
+
+
+                    }
                 }
             }
-
-
-
-            //RowItem Row = GetRow();
-
-            //if (Column is null || Row is null || DataFormat.TextboxEditPossible(Column.Format))
-            //{
-
-            //    // Items von der Auswahl zurückspielen zu den Suggests
-            //    if (Suggest != null)
-            //    {
-            //        while (Main.Item.Count > 0)
-            //        {
-            //            MoveItemBetweenList(Main, Suggest, Main.Item[0].Internal());
-            //        }
-            //    }
-
-            //    // Items zum Haupt hinzufügen
-            //    List<string> Vals = new List<string>(_Value.SplitByCR());
-            //    foreach (string ThisString in Vals)
-            //    {
-            //        MoveItemBetweenList(Suggest, Main, ThisString);
-            //    }
-
-            //    return;
-            //}
-            //else if (Column.Format.TextboxEditPossible())
-            //{
-            //    Main.Item.Clear();
-            //    Main.Item.AddRange(Row.CellGetList(Column));
-            //}
-            //else if (Column.Format == enDataFormat.Link_To_Filesystem)
-            //{
-            //    Main.Item.Clear();
-            //    //' Erst mal Ohne Bestfile. Weil ansonsten beim Rückspeichern der komplette Pfad rückgespeichert wird
-            //    Main.Item.AddRange(Row.CellGetList(Column), Column, enShortenStyletyle.Replaced);
-            //}
-            //else if (Column.Format == enDataFormat.Relation)
-            //{
-            //    Main.Item.Clear();
-            //    List<string> w = Row.CellGetList(Column);
-            //    w.QuickSortAndRemoveDouble();
-            //    for (int z = 0 ; z < w.Count ; z++)
-            //    {
-            //        Main.Item.Add(new ObjectListItem(new clsRelation(Column, Row, w[z])));
-            //    }
-            //}
-            //else
-            //{
-            //    DebugPrint(enFehlerArt.Fehler, "Unbekannte Methode");
-            //}
-
-
-            //Main.Item.QuickSort();
-
-
 
         }
 

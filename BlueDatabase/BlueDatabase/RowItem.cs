@@ -414,11 +414,6 @@ namespace BlueDatabase
             return Database.Cell.GetList(Database.Column[ColumnName], this);
         }
 
-        public string CellBestFile(string ColumnName)
-        {
-            return Database.Cell.BestFile(Database.Column[ColumnName], this);
-        }
-
 
 
         public int CellGetInteger(string ColumnName)
@@ -533,15 +528,6 @@ namespace BlueDatabase
         }
 
 
-        public string CellGetBestFile(string ColumnName)
-        {
-            return Database.Cell.BestFile(Database.Column[ColumnName], this);
-        }
-
-        public string CellGetBestFile(ColumnItem Column)
-        {
-            return Database.Cell.BestFile(Column, this);
-        }
 
         public double CellGetDouble(ColumnItem Column)
         {
@@ -567,11 +553,6 @@ namespace BlueDatabase
             return Database.Cell.GetPoint(Database.Column[ColumnName], this);
         }
 
-
-        public string CellBestFile(ColumnItem Column)
-        {
-            return Database.Cell.BestFile(Column, this);
-        }
 
         public Bitmap CellGetBitmap(ColumnItem Column)
         {

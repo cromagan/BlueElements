@@ -1193,11 +1193,6 @@ namespace BlueDatabase
         }
 
 
-        public string BestFile(ColumnItem Column, RowItem Row)
-        {
-            return Column.BestFile(GetString(Column, Row));
-        }
-
         public string[] GetArray(ColumnItem Column, RowItem Row)
         {
             return GetString(Column, Row).SplitByCR();

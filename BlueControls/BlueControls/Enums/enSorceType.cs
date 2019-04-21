@@ -26,7 +26,7 @@ namespace BlueControls.Enums
 
         Nichts = 0,
 
-        DatabaseInternal = 1,
+        //DatabaseInternal = 1,
         Downloaded = 2,
         SetedByProperty = 3,
         ScreenShot = 4,
@@ -34,9 +34,9 @@ namespace BlueControls.Enums
         LoadedFromDiskAndResized = 5,
         LoadedFromDisk = 6,
 
-        EntryWithoutPic = 7,
+        EntryWithoutPic = 7
 
-        SourceNameCorrectButImageNotLoaded = 8
+        //SourceNameCorrectButImageNotLoadedx = 8
 
     }
 }

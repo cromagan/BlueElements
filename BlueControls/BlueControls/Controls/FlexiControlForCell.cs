@@ -111,6 +111,7 @@ namespace BlueControls.Controls
                 Caption = string.Empty;
                 EditType = enEditTypeFormula.None;
                 QuickInfo = string.Empty;
+                FileEncryptionKey = string.Empty;
             }
             else
             {
@@ -118,6 +119,7 @@ namespace BlueControls.Controls
                 Caption = _columview.Column.Caption;
                 EditType = _columview.Column.EditType;
                 QuickInfo = _columview.Column.QickInfoText(string.Empty);
+                FileEncryptionKey = _columview.Column.Database.FileEncryptionKey;
             }
         }
 
@@ -151,9 +153,55 @@ namespace BlueControls.Controls
             if (e.Row != GetRow()) { return; }
 
 
-            if (e.Column == _columview.Column) { Value = e.Row.CellGetString(_columview.Column); }
+            if (e.Column == _columview.Column) { SetValueFromCell(e.Row); }
 
             CheckEnabledState();
+        }
+
+        private void SetValueFromCell(RowItem row)
+        {
+
+
+            if (_columview == null || _columview.Column == null || row == null)
+            {
+                Value = string.Empty;
+                return;
+            }
+
+
+
+            switch (_columview.Column.Format)
+            {
+                case enDataFormat.Link_To_Filesystem:
+                    var tmp = row.CellGetList(_columview.Column);
+                    var tmp2 = new List<string>();
+                    foreach (var file in tmp)
+                    {
+                        var tmpF = _columview.Column.BestFile(file, false);
+                        if (FileExists(tmpF))
+                        {
+                            tmp2.Add(tmpF);
+                        }
+                        else
+                        {
+                            tmp2.Add(file);
+                        }
+                    }
+
+                    Value = tmp2.JoinWithCr();
+
+
+                    break;
+
+                default:
+                    Value = row.CellGetString(_columview.Column);
+                    break;
+
+
+            }
+
+
+
         }
 
         private void Database_ConnectedControlsStopAllWorking(object sender, System.EventArgs e)
@@ -186,17 +234,7 @@ namespace BlueControls.Controls
 
             _RowKey = newRowKey;
 
-            var Row = GetRow();
-
-
-            if (_columview == null || _columview.Column == null || Row == null)
-            {
-                Value = string.Empty;
-            }
-            else
-            {
-                Value = Row.CellGetString(_columview.Column);
-            }
+            SetValueFromCell(GetRow());
 
             CheckEnabledState();
 
@@ -237,9 +275,38 @@ namespace BlueControls.Controls
 
             var OldVal = Row.CellGetString(_columview.Column);
 
-            if (OldVal == Value) { return; }
 
-            Row.CellSet(_columview.Column, Value);
+
+
+            string NewValue = string.Empty;
+
+            switch (_columview.Column.Format)
+            {
+                case enDataFormat.Link_To_Filesystem:
+                    var tmp = Value.SplitByCRToList();
+                    var tmp2 = new List<string>();
+
+                    foreach (var file in tmp)
+                    {
+                        tmp2.Add(_columview.Column.SimplyFile(file));
+                    }
+                    NewValue = tmp2.JoinWithCr();
+                    break;
+
+                default:
+                    NewValue = Value;
+                    break;
+
+
+            }
+
+
+
+
+
+            if (OldVal == NewValue) { return; }
+
+            Row.CellSet(_columview.Column, NewValue);
             if (OldVal != Row.CellGetString(_columview.Column)) { Row.DoAutomatic(false, false, false); }
         }
 
@@ -393,7 +460,8 @@ namespace BlueControls.Controls
             if (!string.IsNullOrEmpty(((ComboBox)sender).Text)) { return; }
 
 
-            Value = CellCollection.AutomaticInitalValue(_columview.Column, Row);
+
+            Value = CellCollection.AutomaticInitalValue(_columview.Column, Row);   // TODO: SetValue(FromCell) benutzen
 
         }
 
@@ -406,7 +474,7 @@ namespace BlueControls.Controls
             if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
 
 
-            Value = CellCollection.AutomaticInitalValue(_columview.Column, Row);
+            Value = CellCollection.AutomaticInitalValue(_columview.Column, Row);   // TODO: SetValue(FromCell) benutzen
 
         }
 
@@ -531,29 +599,30 @@ namespace BlueControls.Controls
 
                     switch (Control.SorceType)
                     {
-                        case enSorceType.SourceNameCorrectButImageNotLoaded:
-                            Control.LoadFromDatabase(_columview.Column, false);
-                            return;
-
                         case enSorceType.ScreenShot:
-                            var fil = TempFile(_columview.Column.BestFile(_columview.Column.Name + ".PNG"));
+                            var fil = _columview.Column.BestFile(_columview.Column.Name + ".PNG", true);
                             Control.Bitmap.Save(fil, ImageFormat.Png);
-                            Control.ChangeSource(fil.FileNameWithSuffix(), enSorceType.DatabaseInternal, false);
-                            Value = fil.FileNameWithSuffix();
-                            return;
-
-                        case enSorceType.DatabaseInternal:
-                            // Bild geladen, evtl. noch die ZElle richtig stellen (Siehe .Screenshot). Muss deswegen sein, weil Database Internal auch woanders herkommen kann.
-                            FillCellNow();
+                            Control.ChangeSource(fil, enSorceType.LoadedFromDisk, false);
+                            Value = fil;   // Ruft rekursiv DoEasyPicValueChanged und springt zu LoadedFromDisk
                             return;
 
                         case enSorceType.Nichts:
-                            Value = string.Empty;
+                            Value = string.Empty;   // TODO: SetValue(FromCell) benutzen
                             FillCellNow();
                             return;
 
                         case enSorceType.LoadedFromDisk:
-                            var fil2 = TempFile(_columview.Column.BestFile(_columview.Column.Name + ".PNG"));
+                            if (Control.SorceName != _columview.Column.SimplyFile(Control.SorceName))
+                            {
+                                // DEr name kann nur vereifacht werden, wenn es bereits im richtigen Verzeichniss ist. Name wird vereinfacht (ungleich) - bereits im richtigen verzeichniss!
+                                Value = Control.SorceName;
+                                FillCellNow();
+                                return;
+                            }
+
+
+
+                            var fil2 = _columview.Column.BestFile(_columview.Column.Name + ".PNG", true);
 
                             if (fil2.FilePath().ToUpper() != Control.SorceName.FilePath().ToUpper())
                             {
@@ -563,12 +632,12 @@ namespace BlueControls.Controls
                             {
                                 fil2 = Control.SorceName;
                             }
-                            Control.ChangeSource(fil2.FileNameWithSuffix(), enSorceType.DatabaseInternal, false);
-                            Value = fil2.FileNameWithSuffix();
+                            Control.ChangeSource(fil2, enSorceType.LoadedFromDisk, false);
+                            Value = fil2;    // Ruft rekursiv DoEasyPicValueChanged und springt zu LoadedFromDisk
                             return;
 
                         case enSorceType.EntryWithoutPic:
-                            Value = Control.SorceName;
+                            Value = Control.SorceName;   // TODO: SetValue(FromCell) benutzen
                             // Entweder ein Dummy eintrag (Bildzeichen-Liste, wo Haupt das Bild sein sollte, aber eben nur bei den 3 Seitensichten eines da ist
                             // Oder datenbank wird von einem andern PC aus gestartet
                             return;
@@ -617,7 +686,7 @@ namespace BlueControls.Controls
                             if (!string.IsNullOrEmpty(_columview.Column.Database.FileEncryptionKey)) { b = modAllgemein.SimpleCrypt(b, _columview.Column.Database.FileEncryptionKey, 1); }
 
                             var neu = f.FileNames[z].FileNameWithSuffix();
-                            neu = _columview.Column.FreeFileName(neu.FileNameWithoutSuffix(), neu.FileSuffix());
+                            neu = _columview.Column.BestFile(neu.FileNameWithSuffix(), true);
                             lbx.LastFilePath = f.FileNames[z].FilePath();
 
                             modConverter.ByteToFile(neu, b);
