@@ -654,7 +654,7 @@ namespace BlueDatabase
             var tmp = Contents(null);
 
 
-            for (var Z = 0 ; Z < tmp.Count ; Z++)
+            for (var Z = 0; Z < tmp.Count; Z++)
             {
                 tmp[Z] = tmp[Z].Length.Nummer(10) + tmp[Z].ToUpper();
             }
@@ -662,7 +662,7 @@ namespace BlueDatabase
 
             tmp.Sort();
 
-            for (var Z = 0 ; Z < tmp.Count ; Z++)
+            for (var Z = 0; Z < tmp.Count; Z++)
             {
                 tmp[Z] = tmp[Z].Substring(10);
             }
@@ -1999,7 +1999,7 @@ namespace BlueDatabase
 
             if (UserEditDialogTypeInFormula(_EditType)) { return; }// Alles OK!
 
-            for (var z = 0 ; z <= 999 ; z++)
+            for (var z = 0; z <= 999; z++)
             {
                 var w = (enEditTypeFormula)z;
                 if (w.ToString() != z.ToString())
@@ -2455,6 +2455,13 @@ namespace BlueDatabase
 
         public string AutoCorrect(string Value)
         {
+
+            if (Format == enDataFormat.Link_To_Filesystem)
+            {
+                Value = SimplyFile(Value);
+            }
+
+
             if (_AfterEdit_DoUCase)
             {
                 Value = Value.ToUpper();
@@ -2482,7 +2489,6 @@ namespace BlueDatabase
             {
                 Value = Value.RemoveChars(_AutoRemove);
             }
-
 
             return Value;
         }
@@ -2595,23 +2601,6 @@ namespace BlueDatabase
         }
 
 
-        ///// <summary>
-        ///// Gibt einen Dateinamen zurück der in dieser Spalte noch nicht benutzt wurde und auf der Festplatte nicht existiert
-        ///// </summary>
-        ///// <param name="FileNameWithoutPath"></param>
-        ///// <returns></returns>
-        //public string NewPureBestFile(string FileNameWithoutPath)
-        //{
-        //    do
-        //    {
-        //        Database.Reload();
-        //        var n = TempFile(BestFile(FileNameWithoutPath + "_" + DateTime.Now.ToString().ReduceToChars(Constants.Char_Numerals))).FileNameWithoutSuffix();
-        //        if (Database.Row[new FilterItem(this, enFilterType.Istgleich_GroßKleinEgal, n)] == null && !FileExists(n)) { return n; }
-
-        //    } while (true);
-
-
-        //}
 
         public string SimplyFile(string fullFileName)
         {
@@ -2631,27 +2620,27 @@ namespace BlueDatabase
 
 
         /// <summary>
-        /// Gibt den Dateinamen zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt.
-        /// Ein evtl. fehelender Pfad und ein evtl. fehelendes Suffix werden ergänzt. Es wird nicht auf die Existenz der Datei geprüft.
+        /// Gibt den Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt.
         /// </summary>
-        /// <param name="FileNameWithoutPath"></param>
-        /// <returns></returns>
-        public string BestFile(string FileNameWithoutPath, bool MustBeFree)
+        /// <param name="Filename">Der Dateiname. Ein evtl. fehlender Pfad und ein evtl. fehlendes Suffix werden ergänzt. </param>
+        /// <param name="MustBeFree">Wenn True wird ein Dateiname zurückgegeben, der noch nicht im Verzeichnis vorhanden ist.</param>
+        /// <returns> Gibt den Dateinamen mit Pfad und Suffix zurück</returns>
+        public string BestFile(string Filename, bool MustBeFree)
         {
 
             if (_Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!"); }
 
             //FileNameWithoutPath = FileNameWithoutPath.RemoveChars(Constants.Char_DateiSonderZeichen); // Falls ein Korrekter Pfad übergeben wurde, würde er hier verstümmelt werden
-            if (string.IsNullOrEmpty(FileNameWithoutPath)) { return string.Empty; }
+            if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
 
-            if (FileNameWithoutPath.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
+            if (Filename.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
 
 
 
             // Wenn FileNameWithoutPath kein Suffix hat, das Standard Suffix hinzufügen
-            if (string.IsNullOrEmpty(FileNameWithoutPath.FileSuffix()))
+            if (string.IsNullOrEmpty(Filename.FileSuffix()))
             {
-                FileNameWithoutPath = (FileNameWithoutPath + "." + _BestFile_StandardSuffix).TrimEnd(".");
+                Filename = (Filename + "." + _BestFile_StandardSuffix).TrimEnd(".");
             }
 
             // Den Standardfolder benutzen. Falls dieser fehlt, 'Files' benutzen.
@@ -2665,11 +2654,13 @@ namespace BlueDatabase
 
             if (MustBeFree)
             {
-                return TempFile(Fold.TrimEnd("\\") + "\\", FileNameWithoutPath);
+                Develop.DebugPrint_NichtImplementiert();
+                Auch in DB nicht enthalten!
+                return TempFile(Fold.TrimEnd("\\") + "\\", Filename);
             }
             else
             {
-                return Fold.TrimEnd("\\") + "\\" + FileNameWithoutPath;
+                return Fold.TrimEnd("\\") + "\\" + Filename;
             }
 
 
