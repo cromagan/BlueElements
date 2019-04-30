@@ -119,7 +119,7 @@ namespace BlueControls
 
         public string CompareKey()
         {
-            return Order.Nummer(5) + "|" + ((int)_relationtype).Nummer(3);
+            return Order.ToString(Constants.Format_Integer5) + "|" + ((int)_relationtype).ToString(Constants.Format_Integer3);
         }
 
 

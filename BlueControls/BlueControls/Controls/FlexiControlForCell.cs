@@ -600,7 +600,7 @@ namespace BlueControls.Controls
                     switch (Control.SorceType)
                     {
                         case enSorceType.ScreenShot:
-                            var fil = _columview.Column.BestFile(_columview.Column.Name + ".PNG", true);
+                            var fil = _columview.Column.BestFile(_columview.Column.Name + ".png", true);
                             Control.Bitmap.Save(fil, ImageFormat.Png);
                             Control.ChangeSource(fil, enSorceType.LoadedFromDisk, false);
                             Value = fil;   // Ruft rekursiv DoEasyPicValueChanged und springt zu LoadedFromDisk
@@ -622,7 +622,7 @@ namespace BlueControls.Controls
 
 
 
-                            var fil2 = _columview.Column.BestFile(_columview.Column.Name + ".PNG", true);
+                            var fil2 = _columview.Column.BestFile(_columview.Column.Name + ".png", true);
 
                             if (fil2.FilePath().ToUpper() != Control.SorceName.FilePath().ToUpper())
                             {

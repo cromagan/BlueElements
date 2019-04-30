@@ -63,7 +63,7 @@ namespace BlueControls.Controls
                     if (NR < MaxCount)
                     {
                         Vis = true;
-                        Item.Add(new TextListItem(false, LastD[Z], (NR + 1).Nummer(2) + ": " + LastD[Z].FileNameWithSuffix(), NR.Nummer(3)));
+                        Item.Add(new TextListItem(false, LastD[Z], (NR + 1).ToString(Constants.Format_Integer2) + ": " + LastD[Z].FileNameWithSuffix(), NR.ToString(Constants.Format_Integer3)));
                     }
                 }
             }

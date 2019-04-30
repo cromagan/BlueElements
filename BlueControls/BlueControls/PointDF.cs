@@ -635,8 +635,8 @@ namespace BlueControls
 
         internal string CompareKey()
         {
-            if (_x > int.MaxValue / 10.0m || _y > int.MaxValue / 10.0m || _x < int.MinValue / 10.0m || _y < int.MinValue / 10.0m) { return _order.Nummer(10) + "|ZZZ-ZZZ"; }
-            return _order.Nummer(10) + "|" + ((int)(_y * 10)).Nummer(10) + "-" + ((int)(_x * 10)).Nummer(10);
+            if (_x > int.MaxValue / 10.0m || _y > int.MaxValue / 10.0m || _x < int.MinValue / 10.0m || _y < int.MinValue / 10.0m) { return _order.ToString(Constants.Format_Integer10) + "|ZZZ-ZZZ"; }
+            return _order.ToString(Constants.Format_Integer10) + "|" + ((int)(_y * 10)).ToString(Constants.Format_Integer10) + "-" + ((int)(_x * 10)).ToString(Constants.Format_Integer10);
         }
 
 

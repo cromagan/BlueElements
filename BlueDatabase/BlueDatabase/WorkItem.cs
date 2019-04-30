@@ -295,7 +295,7 @@ namespace BlueDatabase
         public string CompareKey()
         {
 
-            return Date.ToString("yyyy/MM/dd HH:mm:ss.fff") + ColKey;
+            return Date.ToString(Constants.Format_Date) + ColKey;
 
         }
 

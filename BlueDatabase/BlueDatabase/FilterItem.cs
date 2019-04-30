@@ -211,7 +211,7 @@ namespace BlueDatabase
 
         public string CompareKey()
         {
-            return ((int)_FilterType).Nummer(10);
+            return ((int)_FilterType).ToString(Constants.Format_Integer10);
         }
 
         public string ReadableText()

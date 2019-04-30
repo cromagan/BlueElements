@@ -212,7 +212,7 @@ namespace BlueDatabase
 
 
             // um wirklich die Reihenfolge immer gleich zu halen auch ein ToString
-            return (Co + 1).Nummer(3) + (MaxColumnIndex + 1).Nummer(3) + ToString();
+            return (Co + 1).ToString(Constants.Format_Integer3) + (MaxColumnIndex + 1).ToString(Constants.Format_Integer3) + ToString();
         }
 
         public override string ToString()

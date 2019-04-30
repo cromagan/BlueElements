@@ -172,7 +172,7 @@ namespace BlueDatabase
 
             if (row == null)
             {
-                row = Row.Add(DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
+                row = Row.Add(DateTime.Now.ToString(Constants.Format_Date));
             }
             else
             {

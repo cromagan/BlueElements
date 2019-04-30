@@ -461,7 +461,7 @@ namespace BlueDatabase
             }
 
             // um wirklich die Reihenfolge immer gleich zu halen auch ein ToString
-            return (MaxColumnIndex + 1).Nummer(3) + (MaxCode + 1).Nummer(3) + ToString();
+            return (MaxColumnIndex + 1).ToString(Constants.Format_Integer3) + (MaxCode + 1).ToString(Constants.Format_Integer3) + ToString();
 
 
         }

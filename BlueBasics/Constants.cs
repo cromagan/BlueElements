@@ -60,7 +60,7 @@ namespace BlueBasics
 
 
         public static readonly string Char_Sonderzeichen = "'()+-=$&´`^%˜°•øØμ@\\/*<>|[]{}#~µ_„\"²³€" + (char)0 + beChrW1 + "\t";
-      //  public static readonly string Char_KritischeZeichen = Char_Sonderzeichen + Char_DateiSonderZeichen;
+        //  public static readonly string Char_KritischeZeichen = Char_Sonderzeichen + Char_DateiSonderZeichen;
 
         public static readonly string Char_Steuercodes = ((char)0).ToString() + beChrW1 + (char)2 + (char)3 + (char)4 +
                                                (char)5 + (char)6 + (char)7 + (char)8 + "\t" +
@@ -78,5 +78,17 @@ namespace BlueBasics
 
         public static Random GlobalRND = new Random();
 
+
+        public const string Format_Date = "yyyy/MM/dd HH:mm:ss.fff";
+        public const string Format_Date2 = "yyyy/MM/dd HH:mm:ss";
+        public const string Format_Date3 = "yyyy/MM/dd";
+        public const string Format_Integer20 = "00000000000000000000";
+        public const string Format_Integer10 = "0000000000";
+        public const string Format_Integer7 = "0000000";
+        public const string Format_Integer6 = "000000";
+        public const string Format_Integer5 = "00000";
+        public const string Format_Integer4 = "0000";
+        public const string Format_Integer3 = "000";
+        public const string Format_Integer2 = "00";
     }
 }

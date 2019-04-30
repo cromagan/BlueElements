@@ -541,27 +541,8 @@ namespace BlueBasics
 
         #region  Nummer 
 
-        /// <summary>
-        ///  Eingabe Integer, Rückgabe des Wertes als String.
-        /// </summary>
-        /// <param name="Nr">Der Value.</param>
-        /// <param name="Stellen">
-        /// Muss-Länge des Rückgabestrings. Es werden führende Nullen aufgefüllt.
-        /// Falls die Numeral bereits Länger ist als die Anzahl der Stellen ist, wird der String nicht getrimmt.
-        /// </param>
-        /// <returns>Der Value als String - evtl. mit führenden Nullen.</returns>
-        /// <remarks></remarks>
-        public static string Nummer(this int Nr, int Stellen)
-        {
-            return Nummer(Nr.ToString(), Stellen);
-        }
 
 
-
-        public static string Nummer(this long Nr, int Stellen)
-        {
-            return Nummer(Nr.ToString(), Stellen);
-        }
 
 
 

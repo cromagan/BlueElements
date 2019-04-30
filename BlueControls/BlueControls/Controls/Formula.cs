@@ -667,7 +667,7 @@ namespace BlueControls.Controls
                 }
                 else
                 {
-                    if (lbxColumns.Item[intName] == null) { lbxColumns.Item.Add(new TextListItem(true, intName, Nam, (ItC + 1).Nummer(3) + "|A")); }
+                    if (lbxColumns.Item[intName] == null) { lbxColumns.Item.Add(new TextListItem(true, intName, Nam, (ItC + 1).ToString(Constants.Format_Integer3) + "|A")); }
                 }
             }
 
@@ -713,7 +713,7 @@ namespace BlueControls.Controls
                                 Sort = _Database.Views.IndexOf(cv) + 1;
                             }
 
-                            ThisItem.UserDefCompareKey = Sort.Nummer(3) + "|Z" + ThisItem.CompareKey(); // ObjectReadable.ReadableText
+                            ThisItem.UserDefCompareKey = Sort.ToString(Constants.Format_Integer3) + "|Z" + ThisItem.CompareKey(); // ObjectReadable.ReadableText
                         }
 
                     }

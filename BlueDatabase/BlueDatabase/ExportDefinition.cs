@@ -302,7 +302,7 @@ namespace BlueDatabase
 
         public string CompareKey()
         {
-            return ((int)_Typ).Nummer(3) + "|" + _Verzeichnis + "|" + _ExportFormular + "|" + _Intervall + "|" + _AutomatischLöschen;
+            return ((int)_Typ).ToString(Constants.Format_Integer3) + "|" + _Verzeichnis + "|" + _ExportFormular + "|" + _Intervall + "|" + _AutomatischLöschen;
         }
 
 

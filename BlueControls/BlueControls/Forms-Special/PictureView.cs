@@ -420,7 +420,7 @@ namespace BlueControls.Forms
 
             PadDesign.Text = Pad.SheetStyle;
 
-            SchriftGröße.Text = ((int)(Pad.SheetStyleScale * 100)).Nummer(3);
+            SchriftGröße.Text = ((int)(Pad.SheetStyleScale * 100)).ToString(Constants.Format_Integer3);
 
 
             //     Nur70.Checked = CBool(Pad.SheetStyleScale = 0.7F)

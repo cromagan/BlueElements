@@ -113,7 +113,7 @@ namespace BlueControls
 
                     if (di < Word.Length / 2.0 || di < w.Length / 2.0)
                     {
-                        l.Add(di.Nummer(5) + w);
+                        l.Add(di.ToString(Constants.Format_Integer5) + w);
                     }
 
                 }

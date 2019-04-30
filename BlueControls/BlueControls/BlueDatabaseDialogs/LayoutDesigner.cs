@@ -179,7 +179,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             LoadedLayout = -1; //Database.PrintViews.Count - 1
 
-            LoadLayout((Database.Layouts.Count - 1).Nummer(1));
+            LoadLayout((Database.Layouts.Count - 1).ToString());
 
 
 

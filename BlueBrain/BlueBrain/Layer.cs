@@ -127,7 +127,7 @@ namespace BlueBrain
             {
                 if (t.Value > 0 && !string.IsNullOrEmpty(t.Name))
                 {
-                    H.Add(((long)(t.Value * Multi)).Nummer(20) + "\r" + t.Name);
+                    H.Add(((long)(t.Value * Multi)).ToString(Constants.Format_Integer20) + "\r" + t.Name);
                     Al += t.Value * Multi;
                 }
             }

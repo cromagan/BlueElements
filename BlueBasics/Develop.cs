@@ -248,7 +248,7 @@ namespace BlueBasics
                         break;
                 }
 
-                Trace.WriteLine("<br>" + DateTime.Now.Hour.Nummer(2) + ":" + DateTime.Now.Minute.Nummer(2) + ":" + DateTime.Now.Second.Nummer(2) + "." + DateTime.Now.Millisecond.Nummer(4) + "<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
+                Trace.WriteLine("<br>" + DateTime.Now.ToString(Constants.Format_Date) + "<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
                 Trace.WriteLine("<th ALIGN=LEFT>");
                 for (var z = 0 ; z <= Math.Min(Nr + 2, strace.FrameCount - 2) ; z++)
                 {

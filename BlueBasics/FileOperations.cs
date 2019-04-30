@@ -359,7 +359,7 @@ namespace BlueBasics
                 z++;
                 if (z > 0)
                 {
-                    filename = Pfad + Wunschname + "_" + z.Nummer(5) + "." + Suffix;
+                    filename = Pfad + Wunschname + "_" + z.ToString(Constants.Format_Integer5) + "." + Suffix;
                 }
                 else
                 {

@@ -656,7 +656,7 @@ namespace BlueDatabase
 
             for (var Z = 0; Z < tmp.Count; Z++)
             {
-                tmp[Z] = tmp[Z].Length.Nummer(10) + tmp[Z].ToUpper();
+                tmp[Z] = tmp[Z].Length.ToString(Constants.Format_Integer10) + tmp[Z].ToUpper();
             }
 
 
@@ -2249,7 +2249,11 @@ namespace BlueDatabase
                 case enDataFormat.Link_To_Filesystem:
                     if (!string.IsNullOrEmpty(_CellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
                     if (_MultiLine && !_AfterEdit_QuickSortRemoveDouble) { return "Format muss sortiert werden."; }
-                    if (_VorschlagsColumn > 0) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
+                    if (_VorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
+                    if (!string.IsNullOrEmpty(_AutoRemove)) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
+                    if (_AfterEdit_AutoCorrect) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
+                    if (_AfterEdit_DoUCase) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
+                    if (_AfterEdit_Runden != -1) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
                     break;
 
 
@@ -2434,23 +2438,6 @@ namespace BlueDatabase
             Database.AddPending(enDatabaseDataType.co_PermissionGroups_ChangeCell, Key, PermissionGroups_ChangeCell.JoinWithCr(), false);
         }
 
-        //public string BestFile(string Wunschname, string Suffix)
-        //{
-
-
-        //    if (string.IsNullOrEmpty(Wunschname))
-        //    {
-        //        Wunschname = "Data" + Key + "-" + DateTime.Now;
-        //        Wunschname = Wunschname.Replace(":", "-").Replace(".", "-").Trim('-').Replace(" ", "_");
-        //    }
-        //    Wunschname = Wunschname.RemoveChars(Constants.Char_DateiSonderZeichen);
-
-        //    var NeuerName = BestFile(Wunschname); // Nächstbesten Namen holen
-
-        //    NeuerName = TempFile(NeuerName.FilePath(), NeuerName.FileNameWithoutSuffix(), Suffix); // TempFile kümmert sich um den Index hinten drann
-
-        //    return NeuerName;
-        //}
 
 
         public string AutoCorrect(string Value)
@@ -2610,9 +2597,11 @@ namespace BlueDatabase
             }
 
             var tmpfile = fullFileName.FileNameWithoutSuffix();
+            if (tmpfile.ToLower() == fullFileName.ToLower()) { return tmpfile; }
             if (BestFile(tmpfile, false).ToLower() == fullFileName.ToLower()) { return tmpfile; }
 
             tmpfile = fullFileName.FileNameWithSuffix();
+            if (tmpfile.ToLower() == fullFileName.ToLower()) { return tmpfile; }
             if (BestFile(tmpfile, false).ToLower() == fullFileName.ToLower()) { return tmpfile; }
 
             return fullFileName;
@@ -2620,48 +2609,101 @@ namespace BlueDatabase
 
 
         /// <summary>
+        /// Gibt den Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt. Existiert in keiner Spalte und auch nicht auf der Festplatte.
+        /// </summary>
+        public string BestFile()
+        {
+            return BestFile(string.Empty, true);
+        }
+
+        /// <summary>
         /// Gibt den Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt.
         /// </summary>
-        /// <param name="Filename">Der Dateiname. Ein evtl. fehlender Pfad und ein evtl. fehlendes Suffix werden ergänzt. </param>
+        /// <param name="filenameo">Der Dateiname. Ein evtl. fehlender Pfad und ein evtl. fehlendes Suffix werden ergänzt. </param>
         /// <param name="MustBeFree">Wenn True wird ein Dateiname zurückgegeben, der noch nicht im Verzeichnis vorhanden ist.</param>
         /// <returns> Gibt den Dateinamen mit Pfad und Suffix zurück</returns>
-        public string BestFile(string Filename, bool MustBeFree)
+        public string BestFile(string filenameo, bool mustBeFree)
         {
 
             if (_Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!"); }
 
             //FileNameWithoutPath = FileNameWithoutPath.RemoveChars(Constants.Char_DateiSonderZeichen); // Falls ein Korrekter Pfad übergeben wurde, würde er hier verstümmelt werden
-            if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
+            if (string.IsNullOrEmpty(filenameo))
+            {
+                if (!mustBeFree) { return string.Empty; }
+                filenameo = (_Name + DateTime.Now.ToString(Constants.Format_Date)).RemoveChars(Constants.Char_DateiSonderZeichen + " .");
+            }
 
-            if (Filename.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
+            if (filenameo.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
 
 
 
             // Wenn FileNameWithoutPath kein Suffix hat, das Standard Suffix hinzufügen
-            if (string.IsNullOrEmpty(Filename.FileSuffix()))
+            var suffix = filenameo.FileSuffix();
+            var filename = filenameo;
+            if (string.IsNullOrEmpty(suffix))
             {
-                Filename = (Filename + "." + _BestFile_StandardSuffix).TrimEnd(".");
-            }
-
-            // Den Standardfolder benutzen. Falls dieser fehlt, 'Files' benutzen.
-            var Fold = _BestFile_StandardFolder.Trim("\\");
-            if (string.IsNullOrEmpty(Fold)) { Fold = "Files"; }
-
-
-            // Ist nur ein Unterferzeichniss angegeben, den Datenbankpfad benutzen und das Unterverzeichniss anhängen
-            if (Fold.Substring(1, 1) != ":" && Fold.Substring(0, 1) != "\\") { Fold = Database.Filename.FilePath() + Fold; }
-
-
-            if (MustBeFree)
-            {
-                Develop.DebugPrint_NichtImplementiert();
-                Auch in DB nicht enthalten!
-                return TempFile(Fold.TrimEnd("\\") + "\\", Filename);
+                suffix = _BestFile_StandardSuffix;
             }
             else
             {
-                return Fold.TrimEnd("\\") + "\\" + Filename;
+                filename = filenameo.FileNameWithoutSuffix();
             }
+
+            // Den Standardfolder benutzen. Falls dieser fehlt, 'Files' benutzen.
+            var directory = _BestFile_StandardFolder.Trim("\\");
+            if (string.IsNullOrEmpty(directory)) { directory = "Files"; }
+
+
+            // Ist nur ein Unterferzeichniss angegeben, den Datenbankpfad benutzen und das Unterverzeichniss anhängen
+            if (directory.Substring(1, 1) != ":" && directory.Substring(0, 1) != "\\") { directory = Database.Filename.FilePath() + directory; }
+
+
+
+            if (!mustBeFree)
+            {
+                return (directory.TrimEnd("\\") + "\\" + filename + "." + suffix.ToLower()).TrimEnd(".");
+            }
+
+
+            var ok = false;
+            var nr = -1;
+
+            do
+            {
+                nr++;
+                var tmpname = filename;
+                if (nr > 0) { tmpname = tmpname + "_" + nr.ToString(Constants.Format_Integer5); }
+                ok = true;
+
+                foreach (var columnitem in Database.Column)
+                {
+                    if (columnitem.Format == enDataFormat.Link_To_Filesystem)
+                    {
+
+                        var r = Database.Row[new FilterItem(columnitem, enFilterType.Istgleich_GroßKleinEgal, tmpname)];
+                        if (r != null)
+                        {
+                            ok = false;
+                            break;
+                        }
+                    }
+
+                }
+
+                if (ok)
+                {
+                    var tmp = (directory.TrimEnd("\\") + "\\" + tmpname + "." + suffix.ToLower()).TrimEnd(".");
+                    if (!FileExists(tmp)) { return tmp; }
+                }
+
+
+            } while (true);
+
+
+
+
+
 
 
         }
