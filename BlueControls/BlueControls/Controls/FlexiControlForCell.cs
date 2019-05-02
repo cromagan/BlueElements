@@ -322,7 +322,23 @@ namespace BlueControls.Controls
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)
         {
             base.OnControlAdded(e);
+            var column1 = _columview.Column;
+            if (column1.Format == enDataFormat.LinkedCell)
+            {
+                column1 = null;
 
+                if (_columview.Column.LinkedDatabase() != null && _columview.Column.LinkedCell_ColumnKey > -1)
+                {
+                    column1 = _columview.Column.LinkedDatabase().Column.SearchByKey(_columview.Column.LinkedCell_ColumnKey);
+                }
+
+                if (column1 == null)
+                {
+                    Develop.DebugPrint("Column nicht gefunden");
+                    return;
+                }
+
+            }
 
             switch (e.Control)
             {
@@ -330,9 +346,9 @@ namespace BlueControls.Controls
 
 
                     var Item2 = new ItemCollectionList();
-                    ItemCollectionList.GetItemCollection(Item2, _columview.Column, null, enShortenStyle.Both, 10000);
+                    ItemCollectionList.GetItemCollection(Item2, column1, null, enShortenStyle.Both, 10000);
 
-                    if (_columview.Column.TextBearbeitungErlaubt)
+                    if (column1.TextBearbeitungErlaubt)
                     {
                         StyleComboBox(comboBox, Item2, System.Windows.Forms.ComboBoxStyle.DropDown);
                     }
@@ -350,7 +366,8 @@ namespace BlueControls.Controls
                     break;
 
                 case TextBox textBox:
-                    StyleTextBox(textBox, _columview.Column.Format, _columview.Column.MultiLine, _columview.Column.AllowedChars, _columview.Column.SpellCheckingEnabled, _columview.Column.Suffix, false);
+
+                    StyleTextBox(textBox, column1.Format, column1.MultiLine, column1.AllowedChars, column1.SpellCheckingEnabled, column1.Suffix, false);
                     textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus += GotFocus_TextBox;
                     textBox.TextChanged += TextBox_TextChanged;
@@ -360,7 +377,7 @@ namespace BlueControls.Controls
                 case ListBox listBox:
                     if (listBox.Name == "Main")
                     {
-                        StyleListBox(listBox, _columview.Column);
+                        StyleListBox(listBox, column1);
                     }
                     listBox.AddClicked += ListBox_AddClicked;
                     //listBox.NeedRow += ListBox_NeedRow;
@@ -679,7 +696,7 @@ namespace BlueControls.Controls
                         if (f.FileNames == null || f.FileNames.Length == 0) { return; }
 
 
-                        for (var z = 0 ; z <= f.FileNames.GetUpperBound(0) ; z++)
+                        for (var z = 0; z <= f.FileNames.GetUpperBound(0); z++)
                         {
                             var b = modConverter.FileToByte(f.FileNames[z]);
 

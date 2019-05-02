@@ -1475,13 +1475,14 @@ namespace BlueDatabase
 
             }
 
-            _TMP_LinkedDatabase = Database.GetByFilename(el.Filenname);
+            TMP_LinkedDatabase = Database.GetByFilename(el.Filenname); // Wichtig, NICHT _TMP_LinkedDatabase
             if (_TMP_LinkedDatabase == null)
             {
                 Database.OnLoadingLinkedDatabase(el);
             }
 
-            _TMP_LinkedDatabase = Database.GetByFilename(el.Filenname); // Event wird ausgelöst, Multitasking pfuscht rein, nochmal prüfen!!!!
+            // Wichtig, NICHT _TMP_LinkedDatabase
+            TMP_LinkedDatabase = Database.GetByFilename(el.Filenname); // Event wird ausgelöst, Multitasking pfuscht rein, nochmal prüfen!!!!
 
 
             if (_TMP_LinkedDatabase == null)
@@ -1489,7 +1490,7 @@ namespace BlueDatabase
                 if (FileExists(el.Filenname))
                 {
 
-                    _TMP_LinkedDatabase = new Database(el.ReadOnly, el.PasswordSub, el.GenenerateLayout, el.RenameColumnInLayout);
+                    TMP_LinkedDatabase = new Database(el.ReadOnly, el.PasswordSub, el.GenenerateLayout, el.RenameColumnInLayout); // Wichtig, NICHT _TMP_LinkedDatabase
                     _TMP_LinkedDatabase.LoadFromDisk(el.Filenname);
                 }
             }
@@ -2097,7 +2098,6 @@ namespace BlueDatabase
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.Datum_und_Uhrzeit:
                 case enDataFormat.BildCode:
-                case enDataFormat.LinkedCell:
                 case enDataFormat.RelationText:
                     if (_TextBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind, um die Anzeieg zu gewährleisten.
                     if (_MultiLine && EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return false; }
@@ -2109,6 +2109,22 @@ namespace BlueDatabase
                     if (EditType_To_Check == enEditTypeFormula.nur_als_Text_anzeigen) { return true; }
 
                     return false;
+
+
+                case enDataFormat.LinkedCell:
+                   if (EditType_To_Check == enEditTypeFormula.None) { return true; }
+                    if (EditType_To_Check != enEditTypeFormula.Textfeld && 
+                        EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
+                    if (Database.IsParsing()) { return true; }
+
+                    if (LinkedDatabase() == null ) { return false; }
+                    if (_LinkedCell_ColumnKey < 0 ) { return false; }
+
+                    var col = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
+                    if(col == null) { return false; }
+
+                    return col.UserEditDialogTypeInFormula(enEditTypeFormula.Textfeld);
+
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
