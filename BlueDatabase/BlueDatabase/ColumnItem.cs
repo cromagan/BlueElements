@@ -2414,6 +2414,15 @@ namespace BlueDatabase
 
 
 
+            if(_Format != enDataFormat.LinkedCell)
+            {
+                if( _LinkedCell_RowKey >-1 ) { return "Nur Verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
+                if (_LinkedCell_ColumnKey > -1) { return "Nur Verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
+                if (_LinkedCell_ColumnValueFoundIn > -1) { return "Nur Verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
+                if (_LinkedCell_Behaviour != enFehlendesZiel.Undefiniert) { return "Nur Verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
+            }
+
+
 
 
             return string.Empty;
