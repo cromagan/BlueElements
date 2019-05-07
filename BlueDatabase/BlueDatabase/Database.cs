@@ -1803,8 +1803,11 @@ namespace BlueDatabase
         {
 
             if (string.IsNullOrEmpty(vCell.Value.Value)) { return; }
-
+            
             Cell.DataOfCellKey(vCell.Key, out var tColumn, out var tRow);
+
+
+            if (!tColumn.SaveContent) { return; }
 
             var s = vCell.Value.Value;
             var tx = enDatabaseDataType.ce_Value_withSizeData;

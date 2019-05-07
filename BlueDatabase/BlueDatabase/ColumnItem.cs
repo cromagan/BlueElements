@@ -133,6 +133,7 @@ namespace BlueDatabase
         private string _SortMask;
 
         private string _AutoRemove;
+        private bool _SaveContent;
 
         private int _KeyColumnKey;
 
@@ -211,6 +212,7 @@ namespace BlueDatabase
             _AfterEdit_DoUCase = false;
             _AutoRemove = string.Empty;
             _AutoFilterJoker = string.Empty;
+            _SaveContent = true;
 
             _SpellCheckingEnabled = false;
 
@@ -278,6 +280,7 @@ namespace BlueDatabase
             AfterEdit_DoUCase = Source.AfterEdit_DoUCase;
             AfterEdit_AutoCorrect = Source.AfterEdit_AutoCorrect;
             AutoRemove = Source.AutoRemove;
+            SaveContent = Source.SaveContent;
             CellInitValue = Source.CellInitValue;
             AutoFilterJoker = Source.AutoFilterJoker;
             KeyColumnKey = Source.KeyColumnKey;
@@ -1062,6 +1065,20 @@ namespace BlueDatabase
             }
         }
 
+        public bool SaveContent
+        {
+            get
+            {
+                return _SaveContent;
+            }
+            set
+            {
+                if (_SaveContent == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_SaveContent, this, _SaveContent.ToPlusMinus(), value.ToPlusMinus(), true);
+                OnChanged();
+            }
+        }
+
 
         public int DropdownKey
         {
@@ -1639,6 +1656,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_AfterEdit_Runden: _AfterEdit_Runden = int.Parse(Wert); break;
                 case enDatabaseDataType.co_AfterEdit_DoUcase: _AfterEdit_DoUCase = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_AfterEdit_AutoCorrect: _AfterEdit_AutoCorrect = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_SaveContent: _SaveContent = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_AutoRemove: _AutoRemove = Wert; break;
                 case enDatabaseDataType.co_AdminInfo: _AdminInfo = Wert; break;
                 case enDatabaseDataType.co_Suffix: _Suffix = Wert; break;
@@ -1936,6 +1954,7 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_AutoCorrect, _AfterEdit_AutoCorrect.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_Runden, _AfterEdit_Runden.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoRemove, _AutoRemove, Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_SaveContent, _SaveContent.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErlaubt, _AutofilterErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterTextFilterErlaubt, _AutofilterTextFilterErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErweitertErlaubt, _AutoFilterErweitertErlaubt.ToPlusMinus(), Key);
@@ -2216,6 +2235,10 @@ namespace BlueDatabase
             }
 
             if (string.IsNullOrEmpty(_Caption)) { return "Spalten Beschriftung fehlt."; }
+
+
+            if (!_SaveContent && string.IsNullOrEmpty(_Identifier)) { return "Inhalt der Spalte muss gespeichert werden."; }
+            if (!_SaveContent && _ShowUndo) { return "Wenn der Inhalt der Spalte nicht gespeichert wird, darf auch kein Undo geloggt werden."; }
 
 
             if (((int)_Format).ToString() == _Format.ToString()) { return "Format fehlerhaft."; }

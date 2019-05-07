@@ -78,6 +78,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption9 = new BlueControls.Controls.Caption();
             this.btnEditableDropdown = new BlueControls.Controls.Button();
             this.tabAutoBearbeitung = new BlueControls.Controls.TabPage();
+            this.txbAutoRemove = new BlueControls.Controls.TextBox();
+            this.capAutoRemove = new BlueControls.Controls.Caption();
             this.cbxSchlüsselspalte = new BlueControls.Controls.ComboBox();
             this.tbxInitValue = new BlueControls.Controls.TextBox();
             this.Caption12 = new BlueControls.Controls.Caption();
@@ -103,6 +105,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption17 = new BlueControls.Controls.Caption();
             this.QI_Vorschau = new BlueControls.Controls.Button();
             this.tabSonstiges = new BlueControls.Controls.TabPage();
+            this.butSaveContent = new BlueControls.Controls.Button();
             this.txbSortMask = new BlueControls.Controls.TextBox();
             this.btnSpellChecking = new BlueControls.Controls.Button();
             this.txbRegex = new BlueControls.Controls.TextBox();
@@ -147,8 +150,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnTargetColumn = new BlueControls.Controls.Button();
             this.btnColumnKeyInColumn = new BlueControls.Controls.Button();
             this.capRowKeyInColumn = new BlueControls.Controls.Caption();
-            this.txbAutoRemove = new BlueControls.Controls.TextBox();
-            this.capAutoRemove = new BlueControls.Controls.Caption();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -683,6 +684,24 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabAutoBearbeitung.TabIndex = 6;
             this.tabAutoBearbeitung.Text = "Auto-Bearbeitung";
             // 
+            // txbAutoRemove
+            // 
+            this.txbAutoRemove.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbAutoRemove.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbAutoRemove.Location = new System.Drawing.Point(8, 376);
+            this.txbAutoRemove.Name = "txbAutoRemove";
+            this.txbAutoRemove.Size = new System.Drawing.Size(896, 24);
+            this.txbAutoRemove.TabIndex = 37;
+            // 
+            // capAutoRemove
+            // 
+            this.capAutoRemove.CausesValidation = false;
+            this.capAutoRemove.Location = new System.Drawing.Point(8, 360);
+            this.capAutoRemove.Name = "capAutoRemove";
+            this.capAutoRemove.Size = new System.Drawing.Size(568, 16);
+            this.capAutoRemove.Text = "Folgende Zeichen automatisch aus der Eingabe löschen:";
+            // 
             // cbxSchlüsselspalte
             // 
             this.cbxSchlüsselspalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -928,6 +947,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabSonstiges
             // 
+            this.tabSonstiges.Controls.Add(this.butSaveContent);
             this.tabSonstiges.Controls.Add(this.txbSortMask);
             this.tabSonstiges.Controls.Add(this.btnSpellChecking);
             this.tabSonstiges.Controls.Add(this.txbRegex);
@@ -945,6 +965,16 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabSonstiges.TabIndex = 4;
             this.tabSonstiges.Text = "Sonstiges allgemein";
             this.tabSonstiges.UseVisualStyleBackColor = true;
+            // 
+            // butSaveContent
+            // 
+            this.butSaveContent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.butSaveContent.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.butSaveContent.Location = new System.Drawing.Point(512, 376);
+            this.butSaveContent.Name = "butSaveContent";
+            this.butSaveContent.Size = new System.Drawing.Size(352, 24);
+            this.butSaveContent.TabIndex = 34;
+            this.butSaveContent.Text = "Inhalte der Zellen auf Festplatte speichern und laden";
             // 
             // txbSortMask
             // 
@@ -1399,24 +1429,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capRowKeyInColumn.Size = new System.Drawing.Size(320, 16);
             this.capRowKeyInColumn.Text = "Die zu suchende Zeile ist in dieser Spalte zu finden:";
             // 
-            // txbAutoRemove
-            // 
-            this.txbAutoRemove.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbAutoRemove.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbAutoRemove.Location = new System.Drawing.Point(8, 376);
-            this.txbAutoRemove.Name = "txbAutoRemove";
-            this.txbAutoRemove.Size = new System.Drawing.Size(896, 24);
-            this.txbAutoRemove.TabIndex = 37;
-            // 
-            // capAutoRemove
-            // 
-            this.capAutoRemove.CausesValidation = false;
-            this.capAutoRemove.Location = new System.Drawing.Point(8, 360);
-            this.capAutoRemove.Name = "capAutoRemove";
-            this.capAutoRemove.Size = new System.Drawing.Size(568, 16);
-            this.capAutoRemove.Text = "Folgende Zeichen automatisch aus der Eingabe löschen:";
-            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(926, 671);
@@ -1568,5 +1580,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private GroupBox grpAuswahlmenuOptionen;
         internal TextBox txbAutoRemove;
         internal Caption capAutoRemove;
+        private Button butSaveContent;
     }
 	}

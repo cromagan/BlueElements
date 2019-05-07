@@ -803,6 +803,8 @@ namespace BlueDatabase
             if (Row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!<br>" + Database.Filename); }
             if (string.IsNullOrEmpty(Column.Identifier)) { Develop.DebugPrint(enFehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + ToString()); }
 
+            if (!Column.SaveContent) { return; }
+
             var CellKey = KeyOfCell(Column, Row);
             var _String = string.Empty;
 
@@ -1112,10 +1114,10 @@ namespace BlueDatabase
         {
 
             if (Database.ReadOnly) { return "Datenbank wurde schreibgeschützt geöffnet"; }
-            // if (Database._IsFreezed) { return "Datenbank gerade eingefrohren."; }
-
             if (Column == null) { return "Es ist keine Spalte ausgewählt."; }
             if (Column.Database != Database) { return "Interner Fehler: Bezug der Datenbank zur Spalte ist fehlerhaft."; }
+
+            if (!Column.SaveContent) { return "Der Spalteninhalt wird nicht gespeichert."; }
 
             if (Column.Format == enDataFormat.LinkedCell)
             {

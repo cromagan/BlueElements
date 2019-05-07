@@ -223,6 +223,7 @@ namespace BlueControls.BlueDatabaseDialogs
             txbSortMask.Text = _Column.SortMask;
 
             txbAutoRemove.Text = _Column.AutoRemove;
+            butSaveContent.Checked = _Column.SaveContent;
 
 
             cbxSchlüsselspalte.Item.Clear();
@@ -271,7 +272,7 @@ namespace BlueControls.BlueDatabaseDialogs
             SetKeyTo(_Column.Database, cbxDropDownKey, _Column.DropdownKey);
             SetKeyTo(_Column.Database, cbxVorschlagSpalte, _Column.VorschlagsColumn);
 
-            if (btnColumnKeyInColumn.Enabled && _Column.LinkedCell_ColumnValueFoundIn >-1) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
+            if (btnColumnKeyInColumn.Enabled && _Column.LinkedCell_ColumnValueFoundIn > -1) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
             if (btnTargetColumn.Enabled && _Column.LinkedCell_ColumnKey > -1) { btnTargetColumn.Checked = true; } // Nicht perfekt die Lösung :-(
 
 
@@ -557,6 +558,7 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.Align = (enAlignmentHorizontal)int.Parse(cbxAlign.Text);
             _Column.SortMask = txbSortMask.Text;
             _Column.AutoRemove = txbAutoRemove.Text;
+            _Column.SaveContent = butSaveContent.Checked;
 
             //// Regel: Wenn Leer, gib Fehler aus
             //var tmpR = _Column.Database.Rules_Has(_Column, "Leer-Fehler");
