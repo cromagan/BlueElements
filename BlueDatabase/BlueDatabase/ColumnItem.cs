@@ -2413,7 +2413,8 @@ namespace BlueDatabase
                 if (_Format != enDataFormat.Text &&
                     _Format != enDataFormat.Columns_für_LinkedCellDropdown &&
                     _Format != enDataFormat.BildCode &&
-                    _Format != enDataFormat.Ganzzahl) { return "Format unterstützt keine Ersetzungen."; }
+                    _Format != enDataFormat.Ganzzahl  &&
+                    _Format != enDataFormat.Gleitkommazahl) { return "Format unterstützt keine Ersetzungen."; }
 
                 if (_AutoFilterErweitertErlaubt) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
                 if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Entweder 'Ersetzungen' oder 'Autofilter Joker'"; }

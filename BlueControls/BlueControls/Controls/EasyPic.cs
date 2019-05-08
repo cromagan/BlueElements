@@ -209,7 +209,7 @@ namespace BlueControls.Controls
         private void DelP_Click(object sender, System.EventArgs e)
         {
             if (MessageBox.Show("Bild wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            DeleteImage();
+            Clear();
         }
 
         private void Lade_Click(object sender, System.EventArgs e)
@@ -231,7 +231,7 @@ namespace BlueControls.Controls
 
             if (!FileExists(Filename))
             {
-                DeleteImage();
+                Clear();
                 return;
             }
 
@@ -283,7 +283,7 @@ namespace BlueControls.Controls
         }
 
 
-        public void DeleteImage()
+        public void Clear()
         {
             if (_Bitmap != null || SorceType != enSorceType.Nichts || !string.IsNullOrEmpty(SorceName))
             {
