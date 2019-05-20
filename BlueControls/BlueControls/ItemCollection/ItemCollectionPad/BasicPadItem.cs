@@ -60,7 +60,7 @@ namespace BlueControls.ItemCollection
         public abstract void GenerateInternalRelation(List<clsPointRelation> relations);
 
 
-        internal abstract void KeepInternalLogic();
+        protected abstract void KeepInternalLogic();
 
 
         /// <summary>

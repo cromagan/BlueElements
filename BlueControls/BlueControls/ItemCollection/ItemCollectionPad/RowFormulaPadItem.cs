@@ -311,7 +311,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        internal override void KeepInternalLogic()
+        protected override void KeepInternalLogic()
         {
             p_RO.SetTo(p_RU.X, p_LO.Y);
             p_LU.SetTo(p_LO.X, p_RU.Y);

@@ -398,7 +398,7 @@ namespace BlueControls.ItemCollection
             _Winkel = GeometryDF.Winkelx(Point1, Point2);
         }
 
-        internal override void KeepInternalLogic()
+        protected override void KeepInternalLogic()
         {
             //Gegeben sind:
             // Point1, Point2 und Textpoint

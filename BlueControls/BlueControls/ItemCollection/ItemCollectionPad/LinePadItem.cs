@@ -789,7 +789,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        internal override void KeepInternalLogic()
+        protected override void KeepInternalLogic()
         {
             CalcTempPoints();
         }

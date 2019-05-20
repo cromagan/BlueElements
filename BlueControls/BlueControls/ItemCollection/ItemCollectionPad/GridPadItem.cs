@@ -204,7 +204,7 @@ namespace BlueControls.ItemCollection
                 return "Grid=" + GridShow + ", ";
             }
 
-            internal override void KeepInternalLogic()
+        protected override void KeepInternalLogic()
             {
                 //Nix
             }

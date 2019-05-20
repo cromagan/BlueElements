@@ -362,7 +362,7 @@ namespace BlueControls.ItemCollection
             return nt;
         }
 
-        internal override void KeepInternalLogic()
+        protected override void KeepInternalLogic()
         {
 
             if (Format != PadStyles.Undefiniert)
