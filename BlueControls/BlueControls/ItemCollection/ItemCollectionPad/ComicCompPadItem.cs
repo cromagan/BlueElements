@@ -600,7 +600,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        internal override void KeepInternalLogic()
+        protected override void KeepInternalLogic()
         {
             var Mitte = MiddlePoint();
             var WP12 = AngelOfMiddleLine();

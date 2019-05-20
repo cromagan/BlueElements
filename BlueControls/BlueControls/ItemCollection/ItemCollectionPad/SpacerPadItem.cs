@@ -162,7 +162,7 @@ namespace BlueControls.ItemCollection
             }
 
 
-            internal override void KeepInternalLogic()
+        protected override void KeepInternalLogic()
             {
                 p_o.SetTo(p_m.X, p_m.Y - _Size * Parent.SheetStyleScale / 2);
                 p_u.SetTo(p_m.X, p_m.Y + _Size * Parent.SheetStyleScale / 2);
