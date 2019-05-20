@@ -686,6 +686,8 @@ namespace BlueControls.Controls
                 IContextMenu.ContextMenuInit += ContextMenuOfControls_Init;
                 IContextMenu.ContextMenuItemClicked += ContextMenuOfControls_ItemClicked;
             }
+
+            SetQuickInfo();
         }
 
 

@@ -33,6 +33,11 @@ namespace BlueControls.DialogBoxes
             this.formToEdit = new BlueControls.Controls.Formula();
             this.SuspendLayout();
             // 
+            // butOK
+            // 
+            this.butOK.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            this.butOK.Location = new System.Drawing.Point(72, 213);
+            // 
             // formToEdit
             // 
             this.formToEdit.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -40,14 +45,15 @@ namespace BlueControls.DialogBoxes
             this.formToEdit.Location = new System.Drawing.Point(8, 8);
             this.formToEdit.MinimumSize = new System.Drawing.Size(320, 350);
             this.formToEdit.Name = "formToEdit";
-            this.formToEdit.Size = new System.Drawing.Size(592, 352);
+            this.formToEdit.Size = new System.Drawing.Size(592, 648);
             this.formToEdit.TabIndex = 4;
             // 
             // EditBoxRow
             // 
-            this.ClientSize = new System.Drawing.Size(612, 457);
+            this.ClientSize = new System.Drawing.Size(612, 663);
             this.Controls.Add(this.formToEdit);
             this.Name = "EditBoxRow";
+            this.Controls.SetChildIndex(this.butOK, 0);
             this.Controls.SetChildIndex(this.formToEdit, 0);
             this.ResumeLayout(false);
 
