@@ -246,7 +246,7 @@ namespace BlueControls.DialogBoxes
             }
             else if (eProgressbar_LastCalulatedSeconds < -10)
             {
-                T = "<br>Restzeit unbekannt<tab>";
+                T = "<br>Restzeit wird ermittelt<tab>";
             }
             else if (eProgressbar_LastCalulatedSeconds > 94)
             {

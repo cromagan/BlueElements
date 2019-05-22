@@ -18,21 +18,25 @@
 #endregion
 
 
-
 namespace BlueDatabase.EventArgs
 {
-    public class KeyChangedEventArgs : System.EventArgs
+    public class ProgressbarEventArgs : System.EventArgs
     {
-
-
-        public KeyChangedEventArgs(int KeyOld, int KeyNew)
+        public ProgressbarEventArgs(string name, int current, int count, bool beginns, bool ends)
         {
-            this.KeyOld = KeyOld;
-            this.KeyNew = KeyNew;
+            this.Name = name;
+            this.Current = current;
+            this.Count = count;
+            this.Beginns = beginns;
+            this.Ends = ends;
         }
 
-        public int KeyOld { get; set; }
-        public int KeyNew { get; set; }
+        public int Count { get; private set; }
+        public int Current { get; private set; }
 
+        public string Name { get; private set; }
+
+        public bool Beginns { get; private set; }
+        public bool Ends { get; private set; }
     }
 }

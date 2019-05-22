@@ -273,18 +273,22 @@ namespace BlueDatabase
 
         public void DoAutomatic(FilterCollection Filter, bool FullCheck)
         {
-            foreach (var ThisRowItem in _Internal)
+            var x = CalculateSortedRows(Database, Filter, null);
+
+
+            if (x.Count() == 0) { return; }
+            Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", 0, x.Count(), true, false));
+
+            var c = 0;
+
+            foreach (var ThisRowItem in x)
             {
-                if (ThisRowItem.Value != null)
-                {
-                    //eProgressbar("Datenüberprüfung...", rc, _Internal.Count - 1, null);
-                    if (ThisRowItem.Value.MatchesTo(Filter))
-                    {
-                        ThisRowItem.Value.DoAutomatic(false, true, FullCheck);
-                    }
-                }
+                c++;
+                Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", c, x.Count(), false, false));
+                ThisRowItem.DoAutomatic(false, true, FullCheck);
             }
-            //P?.Close();
+
+            Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", x.Count(), x.Count(), false, true));
         }
 
 
@@ -469,7 +473,7 @@ namespace BlueDatabase
             }
             else
             {
-                for (var z = TMP.Count - 1 ; z > -1 ; z--)
+                for (var z = TMP.Count - 1; z > -1; z--)
                 {
                     if (!string.IsNullOrEmpty(TMP[z]))
                     {

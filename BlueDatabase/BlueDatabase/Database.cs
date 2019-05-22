@@ -205,6 +205,13 @@ namespace BlueDatabase
             return string.Empty;
         }
 
+
+        internal void OnProgressbarInfo(ProgressbarEventArgs e)
+        {
+            ProgressbarInfo?.Invoke(this, e);
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -470,6 +477,7 @@ namespace BlueDatabase
         public event CancelEventHandler Reloading;
         public event EventHandler<KeyChangedEventArgs> RowKeyChanged;
         public event EventHandler<KeyChangedEventArgs> ColumnKeyChanged;
+        public event EventHandler<ProgressbarEventArgs> ProgressbarInfo;
 
         /// <summary>
         /// Wird ausgegeben, sobals isparsed false ist, noch vor den automatischen reperaturen.
@@ -1803,7 +1811,7 @@ namespace BlueDatabase
         {
 
             if (string.IsNullOrEmpty(vCell.Value.Value)) { return; }
-            
+
             Cell.DataOfCellKey(vCell.Key, out var tColumn, out var tRow);
 
 
