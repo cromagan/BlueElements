@@ -1130,16 +1130,15 @@ namespace BlueControls.Controls
 
 
             var FullSize = Item.Count == 0;
-
+            Control.AddAllowed = enAddType.UserDef;
 
             if (FullSize)
             {
-                Control.AddAllowed = enAddType.UserDef;
                 Control.RemoveAllowed = true;
             }
             else
             {
-                Control.AddAllowed = enAddType.None;
+
                 Control.RemoveAllowed = false;
             }
 
@@ -1179,7 +1178,7 @@ namespace BlueControls.Controls
             if (!FullSize)
             {
                 Control.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-                Control.Height = 16 * Zeil;
+                Control.Height = 16 * Zeil + 24;
 
             }
 

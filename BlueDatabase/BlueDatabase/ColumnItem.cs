@@ -2494,7 +2494,17 @@ namespace BlueDatabase
 
             if (Format == enDataFormat.Link_To_Filesystem)
             {
-                Value = SimplyFile(Value);
+                var l = new List<string>(Value.SplitByCR());
+                var l2 = new List<string>();
+
+                foreach(var thisFile in l)
+                {
+                    l2.Add(SimplyFile(thisFile));
+                }
+
+
+
+                Value = l2.SortedDistinctList().JoinWithCr();
             }
 
 

@@ -76,6 +76,7 @@ namespace BlueDatabase
             if (string.IsNullOrEmpty(Text)) { return Text; }
             if (string.IsNullOrEmpty(VariableName)) { return Text; }
             if (Text.Length < VariableName.Length + 4) { return Text; }
+            ColumnItem Col = null;
 
 
             do
@@ -120,12 +121,12 @@ namespace BlueDatabase
 
                     c[z] = c[z].FromNonCritical().FromNonCritical().GenerateSlash();
 
-                    enDataFormat tempVar = 0;
+    
                     var tempVar2 = 0;
                     var tempVar3 = 0;
                     Bitmap tempVar4 = null;
                     string tempVar5 = null;
-                    DoSingleCodex(c[z], ref TX, null, null, ref tempVar, ref tempVar2, ref tempVar3, ref tempVar4, ref tempVar5, Ges, ref Ended);
+                    DoSingleCode(c[z], ref TX, null, ref Col,  ref tempVar2, ref tempVar3, ref tempVar4, ref tempVar5, Ges, ref Ended);
 
 
                 } while (!Ended);
@@ -142,7 +143,7 @@ namespace BlueDatabase
 
 
 
-        private static void DoSingleCodex(string CodeNr, ref string tx, RowItem row, ColumnItem column, ref enDataFormat format, ref int Wi, ref int He, ref Bitmap I, ref string BT, string Code, ref bool Ended)
+        private static void DoSingleCode(string CodeNr, ref string tx, RowItem row, ref ColumnItem column, ref int Wi, ref int He, ref Bitmap I, ref string BT, string Code, ref bool Ended)
         {
 
             switch (CodeNr.Substring(0, 3))
@@ -162,7 +163,6 @@ namespace BlueDatabase
                             }
 
                             tx = row.CellGetString(column);
-                            format = column.Format;
                         }
 
                         if (!string.IsNullOrEmpty(tx))
@@ -200,7 +200,6 @@ namespace BlueDatabase
                             return;
                         }
                         tx = row.CellGetString(column);
-                        format = column.Format;
                         switch (column.Format)
                         {
                             //case enDataFormat.Binärdaten_Bild:
@@ -232,7 +231,6 @@ namespace BlueDatabase
                             Ended = true;
                             return;
                         }
-                        format = column.Format;
                         BT = row.CellGetString(column);
                     }
 
@@ -576,13 +574,12 @@ namespace BlueDatabase
             var z = -1;
             var Tx = "";
             var BT = "";
-            enDataFormat Fo = 0;
             var Ended = false;
 
 
 
             //http://de.selfhtml.org/html/referenz/zeichen.htm#benannte_iso8859_1
-
+            ColumnItem Col= null;
             do
             {
                 z += 1;
@@ -591,7 +588,7 @@ namespace BlueDatabase
 
                 c[z] = c[z].FromNonCritical().FromNonCritical().GenerateSlash();
 
-                DoSingleCodex(c[z], ref Tx, vRow, null, ref Fo, ref Wi, ref He, ref I, ref BT, Code, ref Ended);
+                DoSingleCode(c[z], ref Tx, vRow, ref Col, ref Wi, ref He, ref I, ref BT, Code, ref Ended);
 
                 if (Ended) { return Tx; }
 
