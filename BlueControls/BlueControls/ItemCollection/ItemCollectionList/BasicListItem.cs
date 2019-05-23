@@ -41,7 +41,7 @@ namespace BlueControls.ItemCollection
 
             protected abstract string GetCompareKey();
 
-            protected abstract void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack);
+            protected abstract void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate);
 
 
             protected abstract bool FilterMatchLVL2(string FilterText);
@@ -180,7 +180,7 @@ namespace BlueControls.ItemCollection
 
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Argumente von öffentlichen Methoden validieren", MessageId = "0")]
-        public void Draw(Graphics GR, int xModifier, int YModifier, enStates vState, bool DrawBorderAndBack, string FilterText)
+        public void Draw(Graphics GR, int xModifier, int YModifier, enStates vState, bool DrawBorderAndBack, string FilterText, bool Translate)
             {
 
 
@@ -193,7 +193,7 @@ namespace BlueControls.ItemCollection
 
 
 
-                DrawExplicit(GR, PositionModified, vState, DrawBorderAndBack);
+                DrawExplicit(GR, PositionModified, vState, DrawBorderAndBack, Translate);
 
 
                 if (DrawBorderAndBack)

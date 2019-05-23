@@ -118,7 +118,7 @@ namespace BlueControls.ItemCollection
             return GenericControl.Skin.FormatedText_NeededSize(Obj.ReadableText(), Obj.SymbolForReadableText(), GenericControl.Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), 16);
         }
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack)
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate)
         {
 
             if (DrawBorderAndBack)
@@ -128,11 +128,11 @@ namespace BlueControls.ItemCollection
 
             if (Obj == null)
             {
-                GenericControl.Skin.Draw_FormatedText(GR, "Objekt nicht vorhanden", Parent.ItemDesign, vState, QuickImage.Get(enImageCode.Kritisch, 16), enAlignment.VerticalCenter_Left, PositionModified, null, false);
+                GenericControl.Skin.Draw_FormatedText(GR, "Objekt nicht vorhanden", Parent.ItemDesign, vState, QuickImage.Get(enImageCode.Kritisch, 16), enAlignment.VerticalCenter_Left, PositionModified, null, false, Translate);
             }
             else
             {
-                GenericControl.Skin.Draw_FormatedText(GR, Obj.ReadableText(), Parent.ItemDesign, vState, Obj.SymbolForReadableText(), enAlignment.VerticalCenter_Left, PositionModified, null, false);
+                GenericControl.Skin.Draw_FormatedText(GR, Obj.ReadableText(), Parent.ItemDesign, vState, Obj.SymbolForReadableText(), enAlignment.VerticalCenter_Left, PositionModified, null, false, false);
             }
 
             if (DrawBorderAndBack)

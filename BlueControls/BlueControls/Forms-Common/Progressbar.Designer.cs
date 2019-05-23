@@ -40,6 +40,7 @@ namespace BlueControls.DialogBoxes
             this.capTXT.Location = new System.Drawing.Point(8, 8);
             this.capTXT.Name = "capTXT";
             this.capTXT.Size = new System.Drawing.Size(1, 1);
+            this.capTXT.Translate = false;
             this.capTXT.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Steuerelement_Anpassen;
             // 
             // Progressbar

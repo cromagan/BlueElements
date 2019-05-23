@@ -237,7 +237,7 @@ namespace BlueControls.ItemCollection
             return GenericControl.Skin.FormatedText_NeededSize(_ReadableText, _Symbol, GenericControl.Skin.GetBlueFont(tempDesign(), enStates.Standard), 16);
         }
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack)
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate)
         {
 
             var tmpd = tempDesign();
@@ -247,7 +247,7 @@ namespace BlueControls.ItemCollection
                 GenericControl.Skin.Draw_Back(GR, tmpd, vState, PositionModified, null, false);
             }
 
-            GenericControl.Skin.Draw_FormatedText(GR, _ReadableText, tmpd, vState, _Symbol, enAlignment.VerticalCenter_Left, PositionModified, null, false);
+            GenericControl.Skin.Draw_FormatedText(GR, _ReadableText, tmpd, vState, _Symbol, enAlignment.VerticalCenter_Left, PositionModified, null, false, Translate);
 
             if (DrawBorderAndBack)
             {

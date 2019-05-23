@@ -1321,11 +1321,11 @@ namespace BlueControls.Controls
                 if (_eTxt.Chars.Count > 0)
                 {
                     r.X += 2;
-                    Skin.Draw_FormatedText(TMPGR, _Suffix, _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false);
+                    Skin.Draw_FormatedText(TMPGR, _Suffix, _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, false);
                 }
                 else
                 {
-                    Skin.Draw_FormatedText(TMPGR, "[in " + _Suffix + "]", _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false);
+                    Skin.Draw_FormatedText(TMPGR, "[in " + _Suffix + "]", _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, Translate);
                 }
             }
 
@@ -1903,7 +1903,7 @@ namespace BlueControls.Controls
                 ThisContextMenu.Add(new LineListItem());
                 ThisContextMenu.Add(enContextMenuComands.Abbruch);
                 AbortSpellChecking();
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, Infos, this);
+                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, Infos, this, Translate);
                 _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
             }
         }

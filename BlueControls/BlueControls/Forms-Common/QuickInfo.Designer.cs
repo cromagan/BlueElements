@@ -31,6 +31,7 @@ namespace BlueControls.DialogBoxes
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QuickInfo));
             this.capTXT = new BlueControls.Controls.Caption();
             this.timQI = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
@@ -42,6 +43,7 @@ namespace BlueControls.DialogBoxes
             this.capTXT.Name = "capTXT";
             this.capTXT.Size = new System.Drawing.Size(16, 16);
             this.capTXT.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Steuerelement_Anpassen;
+            this.capTXT.Translate = false;
             // 
             // timQI
             // 
@@ -50,9 +52,10 @@ namespace BlueControls.DialogBoxes
             // 
             // QuickInfo
             // 
+            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(86, 65);
             this.Controls.Add(this.capTXT);
-            this.Design = enDesign.Form_QuickInfo;
+            this.Design = BlueControls.Enums.enDesign.Form_QuickInfo;
             this.Name = "QuickInfo";
             this.Text = "QuickInfo";
             this.ResumeLayout(false);

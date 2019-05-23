@@ -36,6 +36,7 @@ namespace BlueControls
 {
     public sealed class clsSkin
     {
+        public static Database Translation = null;
         private Database SkinDB; //(modAllgemein.UserName, "#Administrator")
         private readonly enImageCodeEffect[] ST = new enImageCodeEffect[1];
         internal Pen Pen_LinieDünn;
@@ -770,9 +771,9 @@ namespace BlueControls
         /// <param name="FitInRect"></param>
         /// <param name="Child"></param>
         /// <param name="DeleteBack"></param>
-        public void Draw_FormatedText(Graphics GR, string txt, enDesign vDesign, enStates vState, QuickImage ImageCode, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack)
+        public void Draw_FormatedText(Graphics GR, string txt, enDesign vDesign, enStates vState, QuickImage ImageCode, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, bool Translate)
         {
-            Draw_FormatedText(GR, txt, ImageCode, SkinRow(vDesign, vState), vAlign, FitInRect, Child, DeleteBack);
+            Draw_FormatedText(GR, txt, ImageCode, SkinRow(vDesign, vState), vAlign, FitInRect, Child, DeleteBack, Translate);
         }
 
         /// <summary>
@@ -786,7 +787,7 @@ namespace BlueControls
         /// <param name="FitInRect"></param>
         /// <param name="Child"></param>
         /// <param name="DeleteBack"></param>
-        public void Draw_FormatedText(Graphics GR, string TXT, QuickImage QI, RowItem SkinRow, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack)
+        public void Draw_FormatedText(Graphics GR, string TXT, QuickImage QI, RowItem SkinRow, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, bool Translate)
         {
             if (string.IsNullOrEmpty(TXT) && QI == null) { return; }
 
@@ -799,7 +800,7 @@ namespace BlueControls
             QuickImage tmpImage = null;
             if (QI != null) { tmpImage = QuickImage.Get(QI, AdditionalState(State)); }
 
-            Draw_FormatedText(GR, TXT, tmpImage, vAlign, FitInRect, Child, DeleteBack, f);
+            Draw_FormatedText(GR, TXT, tmpImage, vAlign, FitInRect, Child, DeleteBack, f, Translate);
         }
 
 
@@ -814,7 +815,7 @@ namespace BlueControls
         /// <param name="Child"></param>
         /// <param name="DeleteBack"></param>
         /// <param name="F"></param>
-        public void Draw_FormatedText(Graphics GR, string TXT, QuickImage QI, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, BlueFont F)
+        public void Draw_FormatedText(Graphics GR, string TXT, QuickImage QI, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, BlueFont F, bool Translate)
         {
 
 
@@ -829,6 +830,13 @@ namespace BlueControls
             float YP2 = 0;
 
             if (QI != null) { pSize = QI.BMP.Size; }
+
+
+            if (Translation != null && Translate)
+            {
+                TXT = DoTranslate(TXT, Translate);
+            }
+
 
 
             if (F != null)
@@ -872,9 +880,22 @@ namespace BlueControls
             }
         }
 
+        public static string DoTranslate(string tXT, bool DoTranslate)
+        {
+            if (Translation == null || !DoTranslate ) { return tXT; }
+            if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
 
+            var r = Translation.Row[tXT];
+            if (r == null)
+            {
+                r = Translation.Row.Add(tXT);
+            }
 
+            var t = r.CellGetString("Translation");
+            if (string.IsNullOrEmpty(t)) { return tXT; }
 
+            return t;
+        }
 
         public Size FormatedText_NeededSize(string tmpText, QuickImage tmpImageCode, BlueFont F, int MinSize)
         {

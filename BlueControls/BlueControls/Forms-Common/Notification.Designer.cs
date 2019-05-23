@@ -43,6 +43,7 @@ namespace BlueControls.DialogBoxes
             this.capTXT.Name = "capTXT";
             this.capTXT.Size = new System.Drawing.Size(10, 10);
             this.capTXT.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Steuerelement_Anpassen;
+            this.capTXT.Translate = false;
             this.capTXT.Click += new System.EventHandler(this.capTXT_Click);
             // 
             // timNote
@@ -55,7 +56,7 @@ namespace BlueControls.DialogBoxes
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(86, 65);
             this.Controls.Add(this.capTXT);
-            this.Design = enDesign.Form_DesktopBenachrichtigung;
+            this.Design = BlueControls.Enums.enDesign.Form_DesktopBenachrichtigung;
             this.Name = "Notification";
             this.ResumeLayout(false);
 

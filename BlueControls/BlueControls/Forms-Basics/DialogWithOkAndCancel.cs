@@ -65,6 +65,7 @@ namespace BlueControls.DialogBoxes
             if (!string.IsNullOrEmpty(TXT))
             {
                 capText.Visible = true;
+                capText.Translate = false;
                 capText.Text = TXT;
                 capText.Refresh();
                 wi = wi + capText.Width;

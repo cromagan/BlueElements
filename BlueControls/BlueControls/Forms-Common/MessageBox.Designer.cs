@@ -40,6 +40,7 @@ namespace BlueControls.DialogBoxes
             this.capText.Name = "capText";
             this.capText.Size = new System.Drawing.Size(16, 16);
             this.capText.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Steuerelement_Anpassen;
+            this.capText.Translate = false;
             // 
             // MessageBox
             // 
@@ -49,7 +50,7 @@ namespace BlueControls.DialogBoxes
             this.ClientSize = new System.Drawing.Size(104, 98);
             this.CloseButtonEnabled = false;
             this.Controls.Add(this.capText);
-            this.Design = enDesign.Form_MsgBox;
+            this.Design = BlueControls.Enums.enDesign.Form_MsgBox;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "MessageBox";
             this.ShowIcon = false;

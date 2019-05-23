@@ -456,7 +456,7 @@ namespace BlueControls.Controls
                     if (!ThisItem.Enabled) { vStateItem = enStates.Standard_Disabled; }
                     if (ThisItem.Checked) { vStateItem |= enStates.Checked; }
 
-                    ThisItem.Draw(gr, 0, (int)(SliderY.Value), vStateItem, true, FilterTxt.Text);
+                    ThisItem.Draw(gr, 0, (int)(SliderY.Value), vStateItem, true, FilterTxt.Text, Translate);
                 }
 
             }
@@ -723,7 +723,7 @@ namespace BlueControls.Controls
                 UserMenu.Add(new LineListItem());
                 UserMenu.Add(enContextMenuComands.Abbruch);
 
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(UserMenu, ND, this);
+                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(UserMenu, ND, this, Translate);
                 _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
             }
 

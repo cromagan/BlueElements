@@ -491,7 +491,7 @@ namespace BlueControls.Controls
             //  Neue Zeile 
             if (UserEdit_NewRowAllowed() && ViewItem == _Database.ColumnArrangements[_ArrangementNr][Database.Column[0]])
             {
-                Skin.Draw_FormatedText(GR, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, Pix16), enAlignment.Left, new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)ViewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font);
+                Skin.Draw_FormatedText(GR, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, Pix16), enAlignment.Left, new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)ViewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font, Translate);
             }
 
 
@@ -680,7 +680,7 @@ namespace BlueControls.Controls
                                     GR.FillRectangle(new SolidBrush(BVI[u].Column.BackColor), r);
                                     GR.FillRectangle(new SolidBrush(Color.FromArgb(80, 200, 200, 200)), r);
                                     GR.DrawRectangle(Skin.Pen_LinieKräftig, r);
-                                    Skin.Draw_FormatedText(GR, V, null, enAlignment.Horizontal_Vertical_Center, r, this, false, _Column_Font);
+                                    Skin.Draw_FormatedText(GR, V, null, enAlignment.Horizontal_Vertical_Center, r, this, false, _Column_Font, Translate);
                                 }
                             }
 
@@ -1046,7 +1046,7 @@ namespace BlueControls.Controls
             }
 
             var tx = ViewItem.Column.Caption.Replace("\r", "\r\n");
-
+            tx = clsSkin.DoTranslate(tx, Translate);
             var FS = GR.MeasureString(tx, _Column_Font.Font());
 
 
@@ -1638,7 +1638,7 @@ namespace BlueControls.Controls
                 t.Sort();
             }
 
-            var _DropDownMenu = FloatingInputBoxListBoxStyle.Show(t, CellCollection.KeyOfCell(CellInThisDatabaseColumn, CellInThisDatabaseRow), this);
+            var _DropDownMenu = FloatingInputBoxListBoxStyle.Show(t, CellCollection.KeyOfCell(CellInThisDatabaseColumn, CellInThisDatabaseRow), this, Translate);
             _DropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
             Develop.Debugprint_BackgroundThread();
         }
@@ -3911,7 +3911,7 @@ namespace BlueControls.Controls
             {
                 ThisContextMenu.Add(new LineListItem());
                 ThisContextMenu.Add(enContextMenuComands.Abbruch);
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, CellCollection.KeyOfCell(OverColumn, OverRow), this);
+                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, CellCollection.KeyOfCell(OverColumn, OverRow), this, Translate);
                 _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
             }
 
@@ -4030,7 +4030,7 @@ namespace BlueControls.Controls
             _ContentSize.Height = Math.Max(_ContentSize.Height, Pix16);
 
 
-            if (clsSkin.Scale == 1) { Column.Database.Cell.SetSizeOfCellContent(Column, Row, _ContentSize); }
+            if (clsSkin.Scale == 1 && clsSkin.Translation == null) { Column.Database.Cell.SetSizeOfCellContent(Column, Row, _ContentSize); }
 
             return _ContentSize;
         }
@@ -4282,7 +4282,7 @@ namespace BlueControls.Controls
             var tmpText = CellItem.ValueReadable(column, Txt, Style);
             var tmpAlign = CellItem.StandardAlignment(column);
 
-            Skin.Draw_FormatedText(GR, tmpText, tmpImageCode, tmpAlign, FitInRect, Child, DeleteBack, F);
+            Skin.Draw_FormatedText(GR, tmpText, tmpImageCode, tmpAlign, FitInRect, Child, DeleteBack, F, false);
         }
 
         /// <summary>

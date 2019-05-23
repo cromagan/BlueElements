@@ -171,7 +171,7 @@ namespace BlueControls.Controls
                 ThisContextMenu.Add(new LineListItem());
                 ThisContextMenu.Add(enContextMenuComands.Abbruch);
 
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, null, this);
+                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, null, this, Translate);
                 _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
             }
 

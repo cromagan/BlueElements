@@ -47,7 +47,6 @@ namespace BlueControls.Controls
         protected RowItem tmpSkinRow;
 
 
-
         private enPartentType _MyParentType = enPartentType.Unbekannt;
 
         protected GenericControl()
@@ -88,6 +87,7 @@ namespace BlueControls.Controls
         #region  Standard-Variablen 
         private bool _MousePressing;
         protected bool _MouseHighlight = true;
+        private bool _translate = true;
         #endregion
 
         protected virtual void DrawControl(Graphics gr, enStates state)
@@ -99,6 +99,12 @@ namespace BlueControls.Controls
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
         }
 
+        [DefaultValue(true)]
+        public bool Translate
+        {
+            get { return _translate; }
+            set { _translate = value; }
+        }
 
         #region  AutoScale deaktivieren 
         // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx

@@ -2136,7 +2136,7 @@ namespace BlueControls.Controls
             {
                 ThisContextMenu.Add(new LineListItem());
                 ThisContextMenu.Add(enContextMenuComands.Abbruch);
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, _HotItem, this);
+                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, _HotItem, this, Translate);
                 _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
             }
         }

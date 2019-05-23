@@ -278,7 +278,7 @@ namespace BlueControls.Controls
 
 
 
-            string NewValue = string.Empty;
+            var NewValue = string.Empty;
 
             switch (_columview.Column.Format)
             {

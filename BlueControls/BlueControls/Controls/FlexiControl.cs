@@ -829,6 +829,7 @@ namespace BlueControls.Controls
 
             if (_CaptionObject == null) { return; }
             _CaptionObject.Width = Width;
+            _CaptionObject.Translate = false;
             _CaptionObject.Text = _Caption + " <i>" + _Value;
 
 
@@ -1522,7 +1523,7 @@ namespace BlueControls.Controls
                 UserMenu.Add(new LineListItem());
                 UserMenu.Add(enContextMenuComands.Abbruch);
 
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(UserMenu, null, this);
+                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(UserMenu, null, this, Translate);
                 _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
             }
         }

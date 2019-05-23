@@ -38,7 +38,7 @@ namespace BlueControls.DialogBoxes
             InitializeComponent();
         }
 
-        private FloatingInputBoxListBoxStyle(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl) : base(ConnectedControl)
+        private FloatingInputBoxListBoxStyle(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) : base(ConnectedControl)
 
         {
             InitializeComponent();
@@ -48,7 +48,7 @@ namespace BlueControls.DialogBoxes
             Xpos -= GenericControl.Skin.PaddingSmal;
             Ypos -= GenericControl.Skin.PaddingSmal;
 
-            Generate_ListBox1(Items, SteuerWi, enAddType.None);
+            Generate_ListBox1(Items, SteuerWi, enAddType.None, Translate);
 
             //UnloadLostFocus = true;
 
@@ -76,20 +76,20 @@ namespace BlueControls.DialogBoxes
         private bool _MouseWasDown = false;
 
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl)
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate)
         {
-            return new FloatingInputBoxListBoxStyle(Items, System.Windows.Forms.Cursor.Position.X - 8, System.Windows.Forms.Cursor.Position.Y - 8, -1, Tag, ConnectedControl);
+            return new FloatingInputBoxListBoxStyle(Items, System.Windows.Forms.Cursor.Position.X - 8, System.Windows.Forms.Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
         }
 
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl)
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl ,bool Translate)
         {
-            return new FloatingInputBoxListBoxStyle(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl);
+            return new FloatingInputBoxListBoxStyle(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
         }
 
         #region  ListBox1 
 
-        public void Generate_ListBox1(ItemCollectionList ItemsOri, int MinWidth, enAddType AddNewAllowed)
+        public void Generate_ListBox1(ItemCollectionList ItemsOri, int MinWidth, enAddType AddNewAllowed, bool Translate)
         {
 
             var itemsClone = (ItemCollectionList)ItemsOri.Clone();
@@ -102,6 +102,7 @@ namespace BlueControls.DialogBoxes
 
 
             lstbx.Appearance = (enBlueListBoxAppearance)itemsClone.ControlDesign;
+            lstbx.Translate = Translate;
 
 
 

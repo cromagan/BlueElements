@@ -320,7 +320,7 @@ namespace BlueControls.Controls
                     if (gr == null) { return; }
                     clsSkin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
-                    Skin.Draw_FormatedText(gr, _Text, null, tmpSkinRow, enAlignment.Top_Left, new Rectangle(), null, false);
+                    Skin.Draw_FormatedText(gr, _Text, null, tmpSkinRow, enAlignment.Top_Left, new Rectangle(), null, false, Translate);
                     return;
                 }
 
@@ -328,7 +328,9 @@ namespace BlueControls.Controls
                 if (eText == null)
                 {
                     eText = new ExtText(_design, state, tmpSkinRow);
-                    eText.HtmlText = _Text;
+
+
+                    eText.HtmlText = clsSkin.DoTranslate(_Text, Translate);
                     //eText.Zeilenabstand = _Zeilenabstand;
                 }
                 eText.State = state;
@@ -377,7 +379,7 @@ namespace BlueControls.Controls
                 UserMenu.Add(new LineListItem());
                 UserMenu.Add(enContextMenuComands.Abbruch);
 
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(UserMenu, null, this);
+                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(UserMenu, null, this, Translate);
                 _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
             }
         }

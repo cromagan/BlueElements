@@ -131,7 +131,7 @@ namespace BlueControls.Controls
                 //  vState = enStates.Standard_Disabled
                 Skin.Draw_Back(TMPGR, enDesign.RibbonBar_Frame, state, DisplayRectangle, this, true);
                 Skin.Draw_Border(TMPGR, enDesign.RibbonBar_Frame, state, DisplayRectangle);
-                Skin.Draw_FormatedText(TMPGR, _Text, enDesign.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width, DisplayRectangle.Height + 2), this, false);
+                Skin.Draw_FormatedText(TMPGR, _Text, enDesign.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width, DisplayRectangle.Height + 2), this, false, Translate);
 
                 if (Dock != System.Windows.Forms.DockStyle.Left)
                 {
@@ -151,7 +151,7 @@ namespace BlueControls.Controls
                 if (Height > 33)
                 {
                     Skin.Draw_Border(TMPGR, enDesign.Frame, state, DisplayRectangle);
-                    Skin.Draw_FormatedText(TMPGR, _Text, enDesign.Frame, state, null, enAlignment.Top_Left, r, this, true);
+                    Skin.Draw_FormatedText(TMPGR, _Text, enDesign.Frame, state, null, enAlignment.Top_Left, r, this, true, Translate);
                 }
 
             }

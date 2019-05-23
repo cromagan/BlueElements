@@ -92,8 +92,8 @@ namespace BlueControls.ItemCollection
                 return Pos.Size;
             }
 
-            protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack)
-            {
+            protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate)
+        {
 
                 GR.DrawLine(GenericControl.Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard).Pen(1f), PositionModified.Left, (int)(PositionModified.Top + PositionModified.Height / 2.0), PositionModified.Right, (int)(PositionModified.Top + PositionModified.Height / 2.0));
             }

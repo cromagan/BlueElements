@@ -273,7 +273,7 @@ namespace BlueControls.Controls
                 i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, (int)i.SizeUntouchedForListBox().Height));
 
 
-                i.Draw(TMPGR, 0, 0, state, false, string.Empty);
+                i.Draw(TMPGR, 0, 0, state, false, string.Empty, Translate);
 
                 i.Parent.Appearance = l;
                 i.SetCoordinates(r);
@@ -340,7 +340,7 @@ namespace BlueControls.Controls
 
             if (_DrawStyle != enComboboxStyle.RibbonBar && Item[Text] != null) { Item[Text].Checked = true; }
 
-            var DropDownMenu = FloatingInputBoxListBoxStyle.Show(Item, X, Y, Width, null, this);
+            var DropDownMenu = FloatingInputBoxListBoxStyle.Show(Item, X, Y, Width, null, this, Translate);
             DropDownMenu.Cancel += DropDownMenu_Cancel;
             DropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
 

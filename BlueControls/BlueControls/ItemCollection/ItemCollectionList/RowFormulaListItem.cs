@@ -145,8 +145,8 @@ namespace BlueControls.ItemCollection
             }
 
 
-            protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack)
-            {
+            protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate)
+        {
                 if (_tmpBMP == null) { GeneratePic(); }
 
                 if (DrawBorderAndBack)

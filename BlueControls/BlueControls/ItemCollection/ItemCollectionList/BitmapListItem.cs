@@ -264,7 +264,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack)
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate)
         {
 
             if (DrawBorderAndBack)
@@ -334,7 +334,7 @@ namespace BlueControls.ItemCollection
                     //r = new Rectangle(r.Left - trp.X, r.Top - trp.Y, r.Width, r.Height);
                     //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);
                     //GenericControl.Skin.Draw_Border(GR, enDesign.Item_Listbox_Unterschrift, vState, r);
-                    GenericControl.Skin.Draw_FormatedText(GR, ThisCap, enDesign.Item_Listbox, vState, null, enAlignment.Horizontal_Vertical_Center, r, null, false);
+                    GenericControl.Skin.Draw_FormatedText(GR, ThisCap, enDesign.Item_Listbox, vState, null, enAlignment.Horizontal_Vertical_Center, r, null, false, false);
 
                 }
             }
