@@ -65,6 +65,7 @@ namespace BlueControls.Classes_Editor
             this.Rule_Aktion.Location = new Point(63, 15);
             this.Rule_Aktion.Name = "Rule_Aktion";
             this.Rule_Aktion.Size = new Size(415, 22);
+            this.Rule_Aktion.Translate = false;
             this.Rule_Aktion.TabIndex = 12;
             //
             //BlueLine1

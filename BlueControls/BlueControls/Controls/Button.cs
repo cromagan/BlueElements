@@ -30,7 +30,8 @@ using BlueDatabase;
 
 namespace BlueControls.Controls
 {
-    [Designer(typeof(ButtonDesigner))][DefaultEvent("Click")]
+    [Designer(typeof(ButtonDesigner))]
+    [DefaultEvent("Click")]
     public sealed class Button : GenericControl, IQuickInfo, IBackgroundNone
     {
 
@@ -76,7 +77,9 @@ namespace BlueControls.Controls
         #region  QuickInfo 
         // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
         private string _QuickInfo = "";
-        [Category("Darstellung")][DefaultValue("")][Description("QuickInfo des Steuerelementes - im extTXT-Format")]
+        [Category("Darstellung")]
+        [DefaultValue("")]
+        [Description("QuickInfo des Steuerelementes - im extTXT-Format")]
         public string QuickInfo
         {
             get
@@ -98,7 +101,9 @@ namespace BlueControls.Controls
 
 
 
-        [Category("Darstellung")][Editor(typeof(QuickPicSelector), typeof(UITypeEditor))][DefaultValue("")]
+        [Category("Darstellung")]
+        [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
+        [DefaultValue("")]
         public string ImageCode
         {
             get
@@ -114,7 +119,9 @@ namespace BlueControls.Controls
             }
         }
 
-        [Category("Darstellung")][DefaultValue("")][Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
+        [Category("Darstellung")]
+        [DefaultValue("")]
+        [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
         public string ImageCode_Checked
         {
             get
@@ -437,7 +444,7 @@ namespace BlueControls.Controls
                 etxt.MaxHeight = 22;
                 etxt.MaxWidth = DisplayRectangle.Width;
                 etxt.Ausrichtung = enAlignment.Horizontal_Vertical_Center;
-                etxt.HtmlText = vtext;
+                etxt.HtmlText = clsSkin.DoTranslate(vtext, Translate);
                 etxt.Draw(GR, 1);
 
 
@@ -456,7 +463,7 @@ namespace BlueControls.Controls
                 etxt.State = vStatex;
                 etxt.MaxHeight = DisplayRectangle.Height;
                 etxt.MaxWidth = DisplayRectangle.Width;
-                etxt.HtmlText = tt;
+                etxt.HtmlText = clsSkin.DoTranslate(tt, Translate);
                 etxt.Draw(GR, 1);
 
             }

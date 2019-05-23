@@ -243,6 +243,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbReplacer.Size = new System.Drawing.Size(904, 221);
             this.txbReplacer.SpellChecking = true;
             this.txbReplacer.TabIndex = 35;
+            this.txbReplacer.Translate = false;
             // 
             // btnStandard
             // 
@@ -573,6 +574,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tbxAuswaehlbareWerte.Size = new System.Drawing.Size(520, 231);
             this.tbxAuswaehlbareWerte.SpellChecking = true;
             this.tbxAuswaehlbareWerte.TabIndex = 0;
+            this.tbxAuswaehlbareWerte.Translate = false;
             // 
             // Caption15
             // 
@@ -634,6 +636,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxCellEditor.RemoveAllowed = true;
             this.lbxCellEditor.Size = new System.Drawing.Size(328, 272);
             this.lbxCellEditor.TabIndex = 26;
+            this.lbxCellEditor.Translate = false;
             // 
             // btnEditableStandard
             // 
@@ -900,6 +903,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tbxAdminInfo.Size = new System.Drawing.Size(344, 428);
             this.tbxAdminInfo.SpellChecking = true;
             this.tbxAdminInfo.TabIndex = 3;
+            this.tbxAdminInfo.Translate = false;
             this.tbxAdminInfo.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // tbxQuickinfo
@@ -914,6 +918,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tbxQuickinfo.Size = new System.Drawing.Size(544, 428);
             this.tbxQuickinfo.SpellChecking = true;
             this.tbxQuickinfo.TabIndex = 0;
+            this.tbxQuickinfo.Translate = false;
             this.tbxQuickinfo.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // Caption18

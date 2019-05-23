@@ -193,7 +193,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // txbKennwort
             // 
             this.txbKennwort.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbKennwort.Format = BlueBasics.Enums.enDataFormat.Text;
             this.txbKennwort.Location = new System.Drawing.Point(8, 56);
             this.txbKennwort.Name = "txbKennwort";
             this.txbKennwort.Size = new System.Drawing.Size(216, 22);
@@ -306,6 +305,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capInfo.Name = "capInfo";
             this.capInfo.Size = new System.Drawing.Size(599, 90);
             this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capInfo.Translate = false;
             // 
             // RuleItemEditor
             // 
@@ -333,6 +333,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxRuleSelector.RemoveAllowed = true;
             this.lbxRuleSelector.Size = new System.Drawing.Size(1023, 360);
             this.lbxRuleSelector.TabIndex = 1;
+            this.lbxRuleSelector.Translate = false;
             this.lbxRuleSelector.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.lbxRuleSelector_ContextMenuInit);
             this.lbxRuleSelector.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.lbxRuleSelector_ContextMenuItemClicked);
             this.lbxRuleSelector.ItemCheckedChanged += new System.EventHandler(this.lbxRuleSelector_ItemCheckedChanged);
@@ -436,7 +437,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxVerwaisteDaten.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cbxVerwaisteDaten.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxVerwaisteDaten.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxVerwaisteDaten.Format = BlueBasics.Enums.enDataFormat.Text;
             this.cbxVerwaisteDaten.Location = new System.Drawing.Point(168, 582);
             this.cbxVerwaisteDaten.Name = "cbxVerwaisteDaten";
             this.cbxVerwaisteDaten.Size = new System.Drawing.Size(160, 24);
@@ -496,7 +496,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxAnsicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cbxAnsicht.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxAnsicht.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxAnsicht.Format = BlueBasics.Enums.enDataFormat.Text;
             this.cbxAnsicht.Location = new System.Drawing.Point(168, 558);
             this.cbxAnsicht.Name = "cbxAnsicht";
             this.cbxAnsicht.Size = new System.Drawing.Size(160, 24);
@@ -507,7 +506,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxJoinTyp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cbxJoinTyp.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxJoinTyp.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxJoinTyp.Format = BlueBasics.Enums.enDataFormat.Text;
             this.cbxJoinTyp.Location = new System.Drawing.Point(168, 466);
             this.cbxJoinTyp.Name = "cbxJoinTyp";
             this.cbxJoinTyp.Size = new System.Drawing.Size(160, 24);
@@ -518,7 +516,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxBevorzugtesSkin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cbxBevorzugtesSkin.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxBevorzugtesSkin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxBevorzugtesSkin.Format = BlueBasics.Enums.enDataFormat.Text;
             this.cbxBevorzugtesSkin.Location = new System.Drawing.Point(168, 534);
             this.cbxBevorzugtesSkin.Name = "cbxBevorzugtesSkin";
             this.cbxBevorzugtesSkin.Size = new System.Drawing.Size(160, 24);

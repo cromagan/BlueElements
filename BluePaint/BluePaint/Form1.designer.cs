@@ -31,27 +31,27 @@ namespace BluePaint
         /// </summary>
         private void InitializeComponent()
         {
-            this.TabControl1 = new TabControl();
-            this.Tab_Start = new TabPage();
-            this.Tab_Werkzeug = new TabPage();
-            this.OK = new Button();
-            this.GroupBox4 = new GroupBox();
-            this.Dummy = new Button();
-            this.Screenshot = new Button();
-            this.GroupBox2 = new GroupBox();
-            this.Kontrast = new Button();
-            this.Spiegeln = new Button();
-            this.Bruchlinie = new Button();
-            this.Clipping = new Button();
-            this.GroupBox3 = new GroupBox();
-            this.Zeichnen = new Button();
-            this.Radiergummi = new Button();
-            this.Steuerung = new GroupBox();
-            this.Rückg = new Button();
+            this.TabControl1 = new BlueControls.Controls.TabControl();
+            this.Tab_Start = new BlueControls.Controls.TabPage();
+            this.Tab_Werkzeug = new BlueControls.Controls.TabPage();
+            this.OK = new BlueControls.Controls.Button();
+            this.GroupBox4 = new BlueControls.Controls.GroupBox();
+            this.Dummy = new BlueControls.Controls.Button();
+            this.Screenshot = new BlueControls.Controls.Button();
+            this.GroupBox2 = new BlueControls.Controls.GroupBox();
+            this.Kontrast = new BlueControls.Controls.Button();
+            this.Spiegeln = new BlueControls.Controls.Button();
+            this.Bruchlinie = new BlueControls.Controls.Button();
+            this.Clipping = new BlueControls.Controls.Button();
+            this.GroupBox3 = new BlueControls.Controls.GroupBox();
+            this.Zeichnen = new BlueControls.Controls.Button();
+            this.Radiergummi = new BlueControls.Controls.Button();
+            this.Steuerung = new BlueControls.Controls.GroupBox();
+            this.Rückg = new BlueControls.Controls.Button();
             this.P = new System.Windows.Forms.PictureBox();
             this.Split = new System.Windows.Forms.SplitContainer();
-            this.BLupe = new GroupBox();
-            this.InfoText = new Caption();
+            this.BLupe = new BlueControls.Controls.GroupBox();
+            this.InfoText = new BlueControls.Controls.Caption();
             this.Lupe = new System.Windows.Forms.PictureBox();
             this.TabControl1.SuspendLayout();
             this.Tab_Werkzeug.SuspendLayout();
@@ -294,13 +294,14 @@ namespace BluePaint
             // 
             // InfoText
             // 
-            this.InfoText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.InfoText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.InfoText.CausesValidation = false;
             this.InfoText.Location = new System.Drawing.Point(160, 16);
             this.InfoText.Name = "InfoText";
             this.InfoText.Size = new System.Drawing.Size(104, 144);
+            this.InfoText.Translate = false;
             // 
             // Lupe
             // 

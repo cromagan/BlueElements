@@ -17,7 +17,7 @@ namespace BlueControls.Classes_Editor
         {
             try
             {
-                if (disposing )
+                if (disposing)
                 {
 
                 }
@@ -35,26 +35,26 @@ namespace BlueControls.Classes_Editor
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.BlueFrame3 = new  GroupBox();
-            this.Caption1 = new  Caption();
-            this.ExportFilter = new  ListBox();
-            this.Caption24 = new  Caption();
-            this.ExportIntervall = new  TextBox();
-            this.Caption26 = new  Caption();
-            this.ExportAutomatischLöschen = new  TextBox();
-            this.Caption27 = new  Caption();
-            this.BlueFrame2 = new  GroupBox();
-            this.ExportSpaltenAnsicht = new  ComboBox();
-            this.ExportFormular = new  ComboBox();
-            this.ExportOriginalFormat = new  Button();
-            this.ExportHTMLFormat = new  Button();
-            this.ExportCSVFormat = new  Button();
-            this.ExportalsBild = new  Button();
-            this.Caption29 = new  Caption();
-            this.BlueFrame9 = new  GroupBox();
-            this.lsbExportDateien = new  ListBox();
-            this.ExportVerzeichnis = new  TextBox();
-            this.Caption23 = new  Caption();
+            this.BlueFrame3 = new GroupBox();
+            this.Caption1 = new Caption();
+            this.ExportFilter = new ListBox();
+            this.Caption24 = new Caption();
+            this.ExportIntervall = new TextBox();
+            this.Caption26 = new Caption();
+            this.ExportAutomatischLöschen = new TextBox();
+            this.Caption27 = new Caption();
+            this.BlueFrame2 = new GroupBox();
+            this.ExportSpaltenAnsicht = new ComboBox();
+            this.ExportFormular = new ComboBox();
+            this.ExportOriginalFormat = new Button();
+            this.ExportHTMLFormat = new Button();
+            this.ExportCSVFormat = new Button();
+            this.ExportalsBild = new Button();
+            this.Caption29 = new Caption();
+            this.BlueFrame9 = new GroupBox();
+            this.lsbExportDateien = new ListBox();
+            this.ExportVerzeichnis = new TextBox();
+            this.Caption23 = new Caption();
             this.BlueFrame3.SuspendLayout();
             this.BlueFrame2.SuspendLayout();
             this.BlueFrame9.SuspendLayout();
@@ -96,6 +96,7 @@ namespace BlueControls.Classes_Editor
             this.ExportFilter.RemoveAllowed = true;
             this.ExportFilter.Size = new Size(328, 96);
             this.ExportFilter.TabIndex = 9;
+            this.ExportFilter.Translate = false;
             this.ExportFilter.Changed += new EventHandler(ExportFilter_Changed);
             this.ExportFilter.AddClicked += new EventHandler(this.ExportFilter_Add_Clicked);
             //
@@ -286,7 +287,7 @@ namespace BlueControls.Classes_Editor
             this.BlueFrame2.ResumeLayout(false);
             this.BlueFrame9.ResumeLayout(false);
             this.ResumeLayout(false);
-           
+
         }
 
 
