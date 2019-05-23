@@ -406,7 +406,7 @@ namespace BlueControls.Controls
         }
 
 
-        internal static void DrawButton(System.Windows.Forms.Control con, Graphics GR, ref RowItem _SkinRow, enDesign vButtonTypex, enStates vStatex, QuickImage p, enAlignment Align, bool PicHeight44, ExtText etxt, string vtext, Rectangle DisplayRectangle)
+        internal static void DrawButton(System.Windows.Forms.Control con, Graphics GR, ref RowItem _SkinRow, enDesign vButtonTypex, enStates vStatex, QuickImage p, enAlignment Align, bool PicHeight44, ExtText etxt, string vtext, Rectangle DisplayRectangle, bool Translate)
         {
 
             if (_SkinRow == null) { _SkinRow = Skin.SkinRow(vButtonTypex, vStatex); }
@@ -545,19 +545,19 @@ namespace BlueControls.Controls
                     {
                         case enPartentType.RibbonPage:
                         case enPartentType.RibbonGroupBox:
-                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle);
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                             break;
                         case enPartentType.Slider:
-                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_SliderDesign, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle);
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_SliderDesign, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                             break;
                         case enPartentType.ComboBox:
-                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_ComboBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle);
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_ComboBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                             break;
                         case enPartentType.RibbonBarCombobox:
-                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_Combobox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle);
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_Combobox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                             break;
                         default:
-                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle);
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                             break;
                     }
 
@@ -565,52 +565,52 @@ namespace BlueControls.Controls
                 case enButtonStyle.Optionbox:
                     if (DesignToolbar)
                     {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_OptionButton, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle);
+                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_OptionButton, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                     }
                     else if (DesignText)
                     {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.OptionButton_TextStyle, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle);
+                        DrawButton(this, gr, ref tmpSkinRow, enDesign.OptionButton_TextStyle, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                     }
                     else
                     {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_OptionButton, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle);
+                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_OptionButton, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                     }
                     break;
 
                 case enButtonStyle.Checkbox:
                     if (DesignToolbar)
                     {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle);
+                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                     }
                     else if (DesignText)
                     {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.CheckBox_TextStyle, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle);
+                        DrawButton(this, gr, ref tmpSkinRow, enDesign.CheckBox_TextStyle, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                     }
                     else
                     {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle);
+                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                     }
                     break;
 
                 case enButtonStyle.Yes_or_No:
                     if (DesignToolbar)
                     {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle);
+                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                     }
                     else
                     {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle);
+                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                     }
                     break;
 
                 case enButtonStyle.Pic1_or_Pic2:
                     if (DesignToolbar)
                     {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle);
+                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                     }
                     else
                     {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle);
+                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                     }
                     break;
 

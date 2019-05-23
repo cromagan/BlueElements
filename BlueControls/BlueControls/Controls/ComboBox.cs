@@ -200,7 +200,7 @@ namespace BlueControls.Controls
 
                 SetAlternateStyle();
                 RowItem tempVar = null;
-                Button.DrawButton(this, gr, ref tempVar, enDesign.Ribbonbar_Button, state, QuickImage.Get(_ImageCode), enAlignment.VerticalCenter_Left, true, null, _Initialtext, DisplayRectangle);
+                Button.DrawButton(this, gr, ref tempVar, enDesign.Ribbonbar_Button, state, QuickImage.Get(_ImageCode), enAlignment.VerticalCenter_Left, true, null, _Initialtext, DisplayRectangle, Translate);
                 return;
             }
 

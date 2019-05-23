@@ -406,13 +406,13 @@ namespace BlueControls.Controls
             if (_IsRibbonBar)
             {
                 GenericControl.Skin.Draw_Back(graphics, enDesign.RibbonBar_Head, tmpState, r, this, true);
-                GenericControl.Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.RibbonBar_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, Translate);
+                GenericControl.Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.RibbonBar_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
                 GenericControl.Skin.Draw_Border(graphics, enDesign.RibbonBar_Head, tmpState, r);
             }
             else
             {
                 GenericControl.Skin.Draw_Back(graphics, enDesign.TabStrip_Head, tmpState, r, this, true);
-                GenericControl.Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.TabStrip_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, Translate);
+                GenericControl.Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.TabStrip_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
                 GenericControl.Skin.Draw_Border(graphics, enDesign.TabStrip_Head, tmpState, r);
             }
 
@@ -491,7 +491,7 @@ namespace BlueControls.Controls
                 UserMenu.Add(new LineListItem());
                 UserMenu.Add(enContextMenuComands.Abbruch);
 
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(UserMenu, _HotTab, this, Translate);
+                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(UserMenu, _HotTab, this, true);
                 _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
             }
 
