@@ -23,11 +23,11 @@ namespace BlueControls.DialogBoxes
 
             if (Pic != enImageCode.None)
             {
-                capText.Text = "<ImageCode=" + QuickImage.Get(Pic, 32) + "> <zbx_store><top>" + TXT;
+                capText.Text = "<ImageCode=" + QuickImage.Get(Pic, 32) + "> <zbx_store><top>" + clsSkin.DoTranslate(TXT, false);
             }
             else
             {
-                capText.Text = TXT;
+                capText.Text = clsSkin.DoTranslate(TXT, false);
             }
 
             Size = new System.Drawing.Size(capText.Left * 2 + capText.Width + BorderWidth, capText.Top * 3 + capText.Height + 35 + BorderHeight);

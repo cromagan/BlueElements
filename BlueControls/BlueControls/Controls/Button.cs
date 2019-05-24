@@ -457,13 +457,13 @@ namespace BlueControls.Controls
             {
 
 
-                var tt = "<ImageCode=" + Skin.PicCode(_SkinRow) + "> <zbx_store><top>" + vtext; //Skin.ZusatzTextAdder(vText, vButtonType, vState)
+                var tt = "<ImageCode=" + Skin.PicCode(_SkinRow) + "> <zbx_store><top>" + clsSkin.DoTranslate(vtext, Translate); //Skin.ZusatzTextAdder(vText, vButtonType, vState)
 
                 if (etxt == null) { etxt = new ExtText(vButtonTypex, vStatex, _SkinRow); }
                 etxt.State = vStatex;
                 etxt.MaxHeight = DisplayRectangle.Height;
                 etxt.MaxWidth = DisplayRectangle.Width;
-                etxt.HtmlText = clsSkin.DoTranslate(tt, Translate);
+                etxt.HtmlText = tt;
                 etxt.Draw(GR, 1);
 
             }

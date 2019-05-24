@@ -1171,6 +1171,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capInfo.Size = new System.Drawing.Size(280, 19);
             this.capInfo.Text = "NR";
             this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capInfo.Translate = false;
             // 
             // Caption3
             // 

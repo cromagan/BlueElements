@@ -882,19 +882,34 @@ namespace BlueControls
 
         public static string DoTranslate(string tXT, bool DoTranslate)
         {
-            if (Translation == null || !DoTranslate ) { return tXT; }
+            if (Translation == null) { return tXT; }
             if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
+
+            var addend = string.Empty;
+
+            if (tXT.EndsWith(":"))
+            {
+                tXT = tXT.TrimEnd(":");
+                addend = ":";
+            }
+
+
 
             var r = Translation.Row[tXT];
             if (r == null)
             {
+                if (!DoTranslate) { return tXT + addend; }
+                if (tXT.ToLower().Contains("imagecode")) { return tXT + addend; }
+                if (tXT.ContainsChars(Constants.Char_Numerals)) { return tXT + addend; }
+
+
                 r = Translation.Row.Add(tXT);
             }
 
             var t = r.CellGetString("Translation");
-            if (string.IsNullOrEmpty(t)) { return tXT; }
+            if (string.IsNullOrEmpty(t)) { return tXT + addend; }
 
-            return t;
+            return t + addend;
         }
 
         public Size FormatedText_NeededSize(string tmpText, QuickImage tmpImageCode, BlueFont F, int MinSize)
