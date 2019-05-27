@@ -47,11 +47,10 @@ namespace BlueControls.ItemCollection.Basics
             Initialize();
         }
 
-        protected void Initialize()
+        protected virtual void Initialize()
         {
             _Internal = UniqueInternal();
             _Tags = new List<string>();
-            InitializeLevel2();
         }
 
 
@@ -89,9 +88,6 @@ namespace BlueControls.ItemCollection.Basics
 
             return false;
         }
-
-        protected abstract void InitializeLevel2();
-
 
 
 

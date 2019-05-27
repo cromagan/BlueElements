@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+
+using System;
 using BlueBasics;
 using BlueBasics.Enums;
 
@@ -21,21 +40,20 @@ namespace BlueControls
             Height = 0M;
         }
 
-        public RectangleDF(decimal cX, decimal cY, decimal cWidth, decimal cHeight)
+        public RectangleDF(decimal x, decimal y, decimal width, decimal height)
         {
-            X = cX;
-            Y = cY;
-            Width = cWidth;
-            Height = cHeight;
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
         }
 
         public decimal Left
         {
             get
             { return X; }
-
-
         }
+
         public decimal Top
         {
             get
@@ -54,19 +72,12 @@ namespace BlueControls
 
         public void Inflate(int XVal, int YVal)
         {
-
             X += XVal;
             Y += YVal;
             Width += XVal * 2;
             Height += YVal * 2;
 
-
-
         }
-
-
-
-
 
         public PointDF PointOf(enAlignment P)
         {
@@ -115,41 +126,24 @@ namespace BlueControls
 
             var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
 
-            if (Erg == llo)
-            {
-                return LO;
-            }
-
-            if (Erg == lro)
-            {
-                return rO;
-            }
-
-            if (Erg == llu)
-            {
-                return lu;
-            }
-
-            if (Erg == lru)
-            {
-                return ru;
-            }
+            if (Erg == llo) { return LO; }
+            if (Erg == lro) { return rO; }
+            if (Erg == llu) { return lu; }
+            if (Erg == lru) { return ru; }
 
             return null;
 
         }
 
 
-        internal bool Contains(PointDF P)
+        public bool Contains(PointDF P)
         {
             return Contains(P.X, P.Y);
         }
 
 
-        internal bool Contains(decimal PX, decimal PY)
+        public bool Contains(decimal PX, decimal PY)
         {
-
-
             if (PX < X) { return false; }
             if (PY < Y) { return false; }
             if (PX > X + Width) { return false; }

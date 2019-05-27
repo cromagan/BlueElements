@@ -145,8 +145,10 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override void InitializeLevel2()
+        protected override void Initialize()
         {
+            base.Initialize();
+            base.Initialize();
             _caption = string.Empty;
             _captiontmp.Clear();
             _Bitmap = null;
@@ -322,7 +324,7 @@ namespace BlueControls.ItemCollection
                 foreach (var ThisCap in _captiontmp)
                 {
                     c--;
-                    var s = GenericControl.Skin.FormatedText_NeededSize(ThisCap, null, GenericControl.Skin.GetBlueFont(enDesign.Item_Listbox, vState),16);
+                    var s = GenericControl.Skin.FormatedText_NeededSize(ThisCap, null, GenericControl.Skin.GetBlueFont(enDesign.Item_Listbox, vState), 16);
                     var r = new Rectangle((int)(DCoordinates.Left + (DCoordinates.Width - s.Width) / 2.0), (int)(DCoordinates.Bottom - s.Height) - 3, (int)s.Width, (int)s.Height);
 
                     r.X = r.X - trp.X;

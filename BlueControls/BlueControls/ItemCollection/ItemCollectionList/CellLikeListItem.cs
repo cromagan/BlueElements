@@ -76,8 +76,10 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override void InitializeLevel2()
+        protected override void Initialize()
         {
+            base.Initialize();
+            base.Initialize();
             _StyleLikeThis = null;
         }
 
@@ -105,7 +107,7 @@ namespace BlueControls.ItemCollection
 
         public override SizeF SizeUntouchedForListBox()
         {
-            return Table.FormatedText_NeededSize(_StyleLikeThis, _Internal, null, GenericControl.Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style,16);
+            return Table.FormatedText_NeededSize(_StyleLikeThis, _Internal, null, GenericControl.Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16);
         }
 
 

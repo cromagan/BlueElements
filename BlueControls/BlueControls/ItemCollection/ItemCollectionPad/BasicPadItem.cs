@@ -31,9 +31,8 @@ namespace BlueControls.ItemCollection
 {
     public abstract class BasicPadItem : BasicItem, IParseable
     {
-        protected abstract bool ParseLevel2(KeyValuePair<string, string> pair);
+        protected abstract bool ParseExplicit(KeyValuePair<string, string> pair);
 
-        protected abstract string ToStringLevel2();
 
         /// <summary>
         ///  Falls das Element über Kordinaten gesetzt werden kann, ist diese mit dieser Routine möglich.
@@ -208,7 +207,7 @@ namespace BlueControls.ItemCollection
                         break;
 
                     default:
-                        if (!ParseLevel2(pair)) { Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key); }
+                        if (!ParseExplicit(pair)) { Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key); }
                         break;
                 }
             }
@@ -244,8 +243,6 @@ namespace BlueControls.ItemCollection
 
             if (RemoveToo.Count > 0) { t = t + "RemoveToo=" + RemoveToo.JoinWithCr().ToNonCritical() + ", "; }
 
-
-            t = t + ToStringLevel2();
 
             return t.Trim(", ") + "}";
         }

@@ -109,8 +109,9 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void InitializeLevel2()
+        protected override void Initialize()
         {
+            base.Initialize();
             Bitmap = null;
             Overlays = new List<QuickImage>();
             p_LO = new PointDF(this, "LO", 0, 0, false, true, true);
@@ -280,7 +281,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override bool ParseLevel2(KeyValuePair<string, string> pair)
+        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
         {
             switch (pair.Key)
             {
@@ -315,9 +316,10 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override string ToStringLevel2()
+        public override string ToString()
         {
-            var t = "";
+            var t = base.ToString();
+            t = t.Substring(0, t.Length - 1) + ", ";
             t = t + "Modus=" + (int)(BildModus) + ", ";
             if (!string.IsNullOrEmpty(_PlaceHolderString))
             {
@@ -346,7 +348,7 @@ namespace BlueControls.ItemCollection
                 t = t + "Image=" + modConverter.BitmapToBase64(Bitmap, ImageFormat.Png) + ", ";
             }
 
-            return t.Trim(", ");
+            return t.Trim(", ") + "}";
         }
 
 

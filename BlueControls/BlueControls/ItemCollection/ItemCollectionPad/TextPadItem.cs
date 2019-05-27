@@ -109,8 +109,9 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void InitializeLevel2()
+        protected override void Initialize()
         {
+            base.Initialize();
 
             p_LO = new PointDF(this, "LO", 0, 0, false, true, true);
             p_RO = new PointDF(this, "RO", 0, 0);
@@ -182,7 +183,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseLevel2(KeyValuePair<string, string> pair)
+        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
         {
             switch (pair.Key)
             {
@@ -215,9 +216,10 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override string ToStringLevel2()
+        public override string ToString()
         {
-            var t = "";
+            var t = base.ToString();
+            t = t.Substring(0, t.Length - 1) + ", ";
 
             if (!string.IsNullOrEmpty(_ReadableText)) { t = t + "ReadableText=" + _ReadableText.ToNonCritical() + ", "; }
 
@@ -231,7 +233,7 @@ namespace BlueControls.ItemCollection
             t = t + "AdditionalScale=" + ZusatzScale.ToString().ToNonCritical();
 
 
-            return t.Trim(", ");
+            return t.Trim(", ") + "}";
         }
 
 
@@ -320,7 +322,7 @@ namespace BlueControls.ItemCollection
                 var Vor = "";
                 var Nach = "";
 
-                for (var tec = 0 ; tec <= l.GetUpperBound(0) ; tec++)
+                for (var tec = 0; tec <= l.GetUpperBound(0); tec++)
                 {
 
                     if (l[tec].Length > 3)

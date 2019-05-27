@@ -88,8 +88,9 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void InitializeLevel2()
+        protected override void Initialize()
         {
+            base.Initialize();
             Point1 = new PointDF(this, "Punkt 1", 0, 0);
             Point2 = new PointDF(this, "Punkt 2", 0, 0);
 
@@ -124,7 +125,7 @@ namespace BlueControls.ItemCollection
 
             if (_TempPoints.Count == 0) { return false; }
 
-            for (var z = 0 ; z <= _TempPoints.Count - 2 ; z++)
+            for (var z = 0; z <= _TempPoints.Count - 2; z++)
             {
                 if (value.DistanzZuStrecke(_TempPoints[z], _TempPoints[z + 1]) < ne) { return true; }
             }
@@ -186,7 +187,7 @@ namespace BlueControls.ItemCollection
             }
 
 
-            for (var z = 0 ; z <= _TempPoints.Count - 2 ; z++)
+            for (var z = 0; z <= _TempPoints.Count - 2; z++)
             {
                 GR.DrawLine(GenericControl.Skin.GetBlueFont(Format, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(cZoom, MoveX, MoveY), _TempPoints[z + 1].ZoomAndMove(cZoom, MoveX, MoveY));
             }
@@ -206,7 +207,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseLevel2(KeyValuePair<string, string> pair)
+        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
         {
 
             _LastRecalc = DateTime.Now.AddHours(-1);
@@ -226,14 +227,16 @@ namespace BlueControls.ItemCollection
 
         }
 
-        protected override string ToStringLevel2()
+        public override string ToString()
         {
-            var t = string.Empty;
+            var t = base.ToString();
+            t = t.Substring(0, t.Length - 1) + ", ";
+
             if (Art != enConectorStyle.Direct)
             {
                 t = t + "Connection=" + (int)(Art) + ", ";
             }
-            return t;
+            return t + "}";
         }
 
 
@@ -297,7 +300,7 @@ namespace BlueControls.ItemCollection
                     break;
                 }
 
-                for (var z = 0 ; z < _TempPoints.Count ; z++)
+                for (var z = 0; z < _TempPoints.Count; z++)
                 {
                     if (LöscheVerdeckte(z))
                     {

@@ -35,7 +35,7 @@ namespace BlueControls.ItemCollection
     {
 
 
-        private Database ParseLevel2_TMPDatabase;
+        private Database ParseExplicit_TMPDatabase;
 
 
 
@@ -85,8 +85,9 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override void InitializeLevel2()
+        protected override void Initialize()
         {
+            base.Initialize();
             p_LO = new PointDF(this, "LO", 0, 0, false, true, true);
             p_RO = new PointDF(this, "RO", 0, 0);
             p_RU = new PointDF(this, "RU", 0, 0);
@@ -227,7 +228,7 @@ namespace BlueControls.ItemCollection
             return new RectangleDF(p_LO.X, p_LO.Y, p_RU.X - p_LO.X, p_RU.Y - p_LO.Y);
         }
 
-        protected override bool ParseLevel2(KeyValuePair<string, string> pair)
+        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
         {
 
             switch (pair.Key)
@@ -240,18 +241,18 @@ namespace BlueControls.ItemCollection
                     return true;
 
                 case "database":
-                    ParseLevel2_TMPDatabase = Database.GetByFilename(pair.Value);
-                    if (ParseLevel2_TMPDatabase== null)
+                    ParseExplicit_TMPDatabase = Database.GetByFilename(pair.Value);
+                    if (ParseExplicit_TMPDatabase == null)
                     {
-                        ParseLevel2_TMPDatabase= new Database(false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
-                        ParseLevel2_TMPDatabase.LoadFromDisk(pair.Value);
+                        ParseExplicit_TMPDatabase = new Database(false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
+                        ParseExplicit_TMPDatabase.LoadFromDisk(pair.Value);
                     }
                     return true;
 
                 case "rowid": // TODO: alt
                 case "rowkey":
-                    _Row = ParseLevel2_TMPDatabase.Row.SearchByKey(int.Parse(pair.Value));
-                    if (_Row != null) { ParseLevel2_TMPDatabase = null; }
+                    _Row = ParseExplicit_TMPDatabase.Row.SearchByKey(int.Parse(pair.Value));
+                    if (_Row != null) { ParseExplicit_TMPDatabase = null; }
                     return true;
 
                 case "firstvalue":
@@ -266,8 +267,8 @@ namespace BlueControls.ItemCollection
                         return true; // Alles beim Alten
                     }
 
-                    _Row = ParseLevel2_TMPDatabase.Row[n];
-                    ParseLevel2_TMPDatabase = null;
+                    _Row = ParseExplicit_TMPDatabase.Row[n];
+                    ParseExplicit_TMPDatabase = null;
 
                     if (_Row == null)
                     {
@@ -275,7 +276,7 @@ namespace BlueControls.ItemCollection
                     }
                     else
                     {
-                        MessageBox.Show("<b><u>Eintrag neu gefunde:</b></u><br>" + n, enImageCode.Warnung, "OK");
+                        MessageBox.Show("<b><u>Eintrag neu gefunden:</b></u><br>" + n, enImageCode.Warnung, "OK");
                     }
 
 
@@ -287,9 +288,11 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override string ToStringLevel2()
+        public override string ToString()
         {
-            var t = "";
+            var t = base.ToString();
+            t = t.Substring(0, t.Length - 1) + ", ";
+
             t = t + "Layout=" + _LayoutNr + ", ";
 
             if (_Row != null)
@@ -299,7 +302,7 @@ namespace BlueControls.ItemCollection
                 t = t + "FirstValue=" + _Row.CellFirstString().ToNonCritical() + ", ";
             }
 
-            return t.Trim(", ");
+            return t.Trim(", ") + "}";
         }
 
 
@@ -462,7 +465,7 @@ namespace BlueControls.ItemCollection
 
 
             var Layouts = new ItemCollectionList();
-            for (var z = 0 ; z < Row.Database.Layouts.Count ; z++)
+            for (var z = 0; z < Row.Database.Layouts.Count; z++)
             {
                 using (var p = new CreativePad())
                 {

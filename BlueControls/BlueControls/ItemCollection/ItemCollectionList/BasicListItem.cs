@@ -74,7 +74,7 @@ namespace BlueControls.ItemCollection
             }
 
 
-            public new void Initialize()
+            protected override void Initialize()
             {
                 base.Initialize();
 

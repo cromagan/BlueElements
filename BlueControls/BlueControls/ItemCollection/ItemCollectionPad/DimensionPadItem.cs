@@ -116,8 +116,9 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override void InitializeLevel2()
+        protected override void Initialize()
         {
+            base.Initialize();
             Text1 = "";
             Text2 = "";
             NachKomma = 1;
@@ -170,7 +171,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseLevel2(KeyValuePair<string, string> pair)
+        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
         {
             switch (pair.Key)
             {
@@ -216,14 +217,18 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override string ToStringLevel2()
+        public override string ToString()
         {
-            return "Text1=" + Text1.ToNonCritical() +
+            var t = base.ToString();
+            t = t.Substring(0, t.Length - 1) + ", ";
+
+            return t +
+                   ", Text1=" + Text1.ToNonCritical() +
                    ", Text2=" + Text2.ToNonCritical() +
                    ", Decimal=" + NachKomma +
                    ", Prefix=" + Prefix.ToNonCritical() +
                    ", Suffix=" + Suffix.ToNonCritical() +
-                   ", AdditionalScale=" + ZusatzScale.ToString().ToNonCritical();
+                   ", AdditionalScale=" + ZusatzScale.ToString().ToNonCritical() + "}";
         }
 
 
@@ -285,7 +290,7 @@ namespace BlueControls.ItemCollection
 
 
 
-            if ((decimal)sz1.Width + PfeilG * 2m <  Geometry.Länge(P1, P2))
+            if ((decimal)sz1.Width + PfeilG * 2m < Geometry.Länge(P1, P2))
             {
                 DrawPfeil(GR, P1, Convert.ToDouble(_Winkel), f.Color_Main, PfeilG);
                 DrawPfeil(GR, P2, Convert.ToDouble(_Winkel + 180), f.Color_Main, PfeilG);

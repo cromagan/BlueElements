@@ -76,8 +76,9 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override void InitializeLevel2()
+        protected override void Initialize()
         {
+            base.Initialize();
             Obj = null;
         }
 

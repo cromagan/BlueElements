@@ -123,8 +123,9 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void InitializeLevel2()
+        protected override void Initialize()
         {
+            base.Initialize();
             P1 = new PointDF(this, "Punkt1", 0, 0, false, true, true);
             P2 = new PointDF(this, "Punkt2", 0, 0);
             _Bitmap = null;
@@ -326,7 +327,7 @@ namespace BlueControls.ItemCollection
             var RUt = BerRU.ZoomAndMove(cZoom, MoveX, MoveY);
             var lUt = BerLU.ZoomAndMove(cZoom, MoveX, MoveY);
 
-            PointF[] destPara2 = {LOt, rOt, lUt};
+            PointF[] destPara2 = { LOt, rOt, lUt };
 
             if (_Bitmap != null)
             {
@@ -435,13 +436,13 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseLevel2(KeyValuePair<string, string> pair)
+        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
         {
             switch (pair.Key)
             {
                 case "additionalpoints":
                     AdditionalPoints.Clear();
-                    for (var z = 1 ; z <= int.Parse(pair.Value) ; z++)
+                    for (var z = 1; z <= int.Parse(pair.Value); z++)
                     {
                         var p = new PointDF(this, "Zusatz" + z, 0, 0, false, true);
                         AdditionalPoints.Add(p);
@@ -483,9 +484,10 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override string ToStringLevel2()
+        public override string ToString()
         {
-            var t = "";
+            var t = base.ToString();
+            t = t.Substring(0, t.Length - 1) + ", ";
 
             t = t + "AdditionalPoints=" + AdditionalPoints.Count + ", ";
 
@@ -499,7 +501,7 @@ namespace BlueControls.ItemCollection
 
 
             if (_Bitmap != null) { t = t + "Bitmap=" + modConverter.BitmapToBase64(_Bitmap, ImageFormat.Png) + ", "; }
-            return t.Trim(", ");
+            return t.Trim(", ") + "}";
         }
 
 
@@ -713,19 +715,19 @@ namespace BlueControls.ItemCollection
             var MinX = float.MaxValue;
             var MinY = float.MaxValue;
 
-            for (var z = 0 ; z <= 3 ; z++)
+            for (var z = 0; z <= 3; z++)
             {
                 MinX = Math.Min(p[z].X, MinX);
                 MinY = Math.Min(p[z].Y, MinY);
             }
 
-            for (var z = 0 ; z <= 3 ; z++)
+            for (var z = 0; z <= 3; z++)
             {
                 p[z].X -= MinX;
                 p[z].Y -= MinY;
             }
 
-            PointF[] destPara2 = {p[0], p[1], p[2]}; //LO,RO,RU
+            PointF[] destPara2 = { p[0], p[1], p[2] }; //LO,RO,RU
             if (_Bitmap != null)
             {
                 gr.DrawImage(_Bitmap, destPara2, new RectangleF(0, 0, _Bitmap.Width, _Bitmap.Height), GraphicsUnit.Pixel);

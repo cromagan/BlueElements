@@ -61,7 +61,7 @@ namespace BlueControls.ItemCollection
             { }
 
 
-            protected override void InitializeLevel2() { }
+   
 
             #endregion
 

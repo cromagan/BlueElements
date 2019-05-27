@@ -161,8 +161,10 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override void InitializeLevel2()
+        protected override void Initialize()
         {
+            base.Initialize();
+            base.Initialize();
             _ReadableText = string.Empty;
             _Symbol = null;
             _IsCaption = false;

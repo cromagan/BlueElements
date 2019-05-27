@@ -60,8 +60,9 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override void InitializeLevel2()
+        protected override void Initialize()
         {
+            base.Initialize();
             Childs = new List<CookPadItem>();
             Middlex = new PointDF(this, "Middle", 0, 0);
             Anzeige = string.Empty;
@@ -147,15 +148,12 @@ namespace BlueControls.ItemCollection
             return new RectangleDF(Middlex.X - 30, Middlex.Y - 30, 60, 60);
         }
 
-        protected override bool ParseLevel2(KeyValuePair<string, string> pair)
+        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
         {
             return false;
         }
 
-        protected override string ToStringLevel2()
-        {
-            return string.Empty;
-        }
+
 
         public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
         {

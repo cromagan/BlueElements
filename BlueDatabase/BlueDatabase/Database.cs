@@ -368,7 +368,7 @@ namespace BlueDatabase
 
         private bool _CheckedAndReloadNeed;
 
-        private DateTime _LoadedFileDate;
+        private string _LastSaveCode;
         private DateTime _UserEditedAktion;
 
 
@@ -631,7 +631,7 @@ namespace BlueDatabase
             _sortDefinition = null;
 
             _CheckedAndReloadNeed = true;
-            _LoadedFileDate = new DateTime(1900, 1, 1);
+            _LastSaveCode = string.Empty;
             _UserEditedAktion = new DateTime(1900, 1, 1);
         }
 
@@ -1171,7 +1171,9 @@ namespace BlueDatabase
                 x.Close();
             }
             Filename = NewFileName;
-            _LoadedFileDate = new FileInfo(Filename).LastWriteTime;
+
+            var f = new FileInfo(Filename);
+            _LastSaveCode = f.LastWriteTime.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
             _CheckedAndReloadNeed = false;
         }
 
@@ -1938,6 +1940,12 @@ namespace BlueDatabase
 
             if (DateTime.Now.Subtract(SavebleErrorReason_WindowsOnly_lastChecked).TotalSeconds < 0) { return "Windows blockiert die Datenbank-Datei."; }
 
+
+            var f = new FileInfo(Filename);
+            if (DateTime.Now.Subtract(f.LastWriteTime).TotalSeconds < 2) { return "Anderer Speichervorgang noch nicht abgeschlossen."; }
+
+
+
             if (!CanWrite(Filename, 0.5))
             {
                 SavebleErrorReason_WindowsOnly_lastChecked = DateTime.Now.AddSeconds(5);
@@ -1961,7 +1969,10 @@ namespace BlueDatabase
             if (_CheckedAndReloadNeed) { return true; }
 
 
-            if (new FileInfo(Filename).LastWriteTime.CompareTo(_LoadedFileDate) != 0)
+            var f = new FileInfo(Filename);
+            var nc = f.LastWriteTime.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
+
+            if (nc != _LastSaveCode)
             {
                 _CheckedAndReloadNeed = true;
                 return true;
@@ -3529,7 +3540,8 @@ namespace BlueDatabase
             _BLoaded.AddRange(_tmp);
 
             BinReLoader.ReportProgress(0, _BLoaded); // 0 = Parsen
-            BinReLoader.ReportProgress(100, f.LastWriteTime); // 100 = Abschluß
+
+            BinReLoader.ReportProgress(100, f.LastWriteTime.ToString(Constants.Format_Date) + "-" + f.Length.ToString()); // 100 = Abschluß
         }
 
         private void Backup_DoWork(object sender, DoWorkEventArgs e)
@@ -3603,7 +3615,8 @@ namespace BlueDatabase
                     break;
 
                 case "GetFileState":
-                    _LoadedFileDate = new FileInfo(Filename).LastWriteTime;
+                    var f = new FileInfo(Filename);
+                    _LastSaveCode = f.LastWriteTime.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
                     _CheckedAndReloadNeed = false;
                     break;
 
@@ -3648,7 +3661,7 @@ namespace BlueDatabase
 
                 case 100:
                     _CheckedAndReloadNeed = false;
-                    _LoadedFileDate = (DateTime)e.UserState; // initialize setzt zurück
+                    _LastSaveCode = (string)e.UserState; // initialize setzt zurück
                     break;
 
                 default:
