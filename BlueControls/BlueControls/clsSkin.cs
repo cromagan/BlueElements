@@ -893,7 +893,7 @@ namespace BlueControls
                 addend = ":";
             }
 
-
+            tXT = tXT.Replace("\r\n", "\r");
 
             var r = Translation.Row[tXT];
             if (r == null)

@@ -1045,8 +1045,8 @@ namespace BlueControls.Controls
                 ViewItem._TMP_AutoFilterLocation = new Rectangle(0, 0, 0, 0);
             }
 
-            var tx = ViewItem.Column.Caption.Replace("\r", "\r\n");
-            tx = clsSkin.DoTranslate(tx, Translate);
+            var tx = ViewItem.Column.Caption;
+            tx = clsSkin.DoTranslate(tx, Translate).Replace("\r", "\r\n");
             var FS = GR.MeasureString(tx, _Column_Font.Font());
 
 
