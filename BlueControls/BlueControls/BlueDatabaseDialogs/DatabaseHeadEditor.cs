@@ -494,8 +494,7 @@ namespace BlueControls.BlueDatabaseDialogs
             if (string.IsNullOrEmpty(_Database.FileEncryptionKey))
 
             {
-                var random = new Random();
-                NewKey = new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyz הצü#_-<>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 10).Select(s => s[random.Next(s.Length)]).ToArray());
+                NewKey = new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyz הצü#_-<>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 10).Select(s => s[Constants.GlobalRND.Next(s.Length)]).ToArray());
                 foreach (var ThisFile in lLCase)
                 {
                     var b = modConverter.FileToByte(ThisFile);

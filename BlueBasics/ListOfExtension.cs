@@ -143,10 +143,9 @@ namespace BlueBasics
 
         public static void Shuffle<T>(this IList<T> list)
         {
-            var r = new Random();
             for (var i = 0 ; i < list.Count ; i++)
             {
-                var index = r.Next(i, list.Count);
+                var index = Constants.GlobalRND.Next(i, list.Count);
                 if (i != index)
                 {
                     var tempVar = list[i];

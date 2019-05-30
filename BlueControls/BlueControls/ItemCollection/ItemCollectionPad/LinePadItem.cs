@@ -261,8 +261,8 @@ namespace BlueControls.ItemCollection
             {
                 if (DateTime.Now.Subtract(_LastRecalc).TotalSeconds > 5)
                 {
-                    var r = new Random();
-                    if (DateTime.Now.Subtract(_LastRecalc).TotalSeconds > 5 + r.Next(10))
+  
+                    if (DateTime.Now.Subtract(_LastRecalc).TotalSeconds > 5 + Constants.GlobalRND.Next(10))
                     {
                         _TempPoints = null;
                     }

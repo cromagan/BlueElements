@@ -31,6 +31,7 @@ namespace BlueBasics
             Formel = Formel.Replace(" ", "");
             if (string.IsNullOrEmpty(Formel)) { return null; }
             Formel = Formel.Replace("INT(", "XNT(0,");
+            Formel = Formel.Replace("RND()", "XND(0,1)");
             return ErgebnisCore(Formel);
         }
 
@@ -125,6 +126,12 @@ namespace BlueBasics
                             }
 
                             break;
+
+                        case "XND(":
+                            if (Att2.Length != 2) { return null; }
+                            Replacer = Constants.GlobalRND.NextDouble();
+                            break;
+
                         default:
                             return null;
                     }
