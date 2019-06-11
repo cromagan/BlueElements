@@ -183,13 +183,11 @@ namespace BlueControls.BlueDatabaseDialogs
                 NewExports.Add((ExportDefinition)((ObjectListItem)ThisItem).Obj);
             }
 
-            if (NewExports.IsDifferentTo(_Database._Export))
+            if (NewExports.IsDifferentTo(_Database.Export))
             {
-                _Database._Export.Clear();
-                _Database._Export.AddRange(NewExports);
+                _Database.Export.Clear();
+                _Database.Export.AddRange(NewExports);
             }
-            _Database.AddPending(enDatabaseDataType.AutoExport, -1, _Database._Export.ToString(true), false);
-
         }
 
 
@@ -264,7 +262,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // Exports ----------------
             ExportSets.Item.Clear();
 
-            foreach (var ThisSet in _Database._Export)
+            foreach (var ThisSet in _Database.Export)
             {
                 if (ThisSet != null)
                 {
@@ -612,7 +610,8 @@ namespace BlueControls.BlueDatabaseDialogs
 
                 if (Such == Art)
                 {
-                    _Database.AddPending(Art, -1, -1, "", Inhalt, true);
+                    _Database.InjectCommand(Art, Inhalt);
+                    //_Database.AddPending(Art, -1, -1, "", Inhalt, true);
 
                     MessageBox.Show("<b>Importiert:</b><br>" + Inhalt, enImageCode.Information, "OK");
 

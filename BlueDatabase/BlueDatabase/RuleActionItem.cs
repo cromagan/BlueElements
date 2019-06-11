@@ -172,7 +172,7 @@ namespace BlueDatabase
 
                 //Bedingungen
                 //case enAction.Erhält_den_Focus: Co = 8; break;
-                case enAction.Ist_der_Nutzer: Co = 10; break;
+                //case enAction.Ist_der_Nutzer: Co = 10; break;
                 case enAction.Ist: Co = 20; break;
                 case enAction.Ist_Nicht: Co = 30; break;
                 case enAction.Enthält: Co = 40; break;
@@ -674,8 +674,8 @@ namespace BlueDatabase
                     return QuickImage.Get(enImageCode.Blitz);
                 case enAction.Sperre_die_Zelle:
                     return QuickImage.Get("Stift|16||1");
-                case enAction.Ist_der_Nutzer:
-                    return QuickImage.Get(enImageCode.Person);
+                //case enAction.Ist_der_Nutzer:
+                //    return QuickImage.Get(enImageCode.Person);
                 case enAction.Berechnung_ist_True:
                     return QuickImage.Get(enImageCode.Binärdaten);
                 case enAction.Anmerkung:
@@ -849,8 +849,8 @@ namespace BlueDatabase
                     return enNeededColumns.OneOrMore;
                 case enAction.Anmerkung:
                     return enNeededColumns.DoesNotMatter;
-                case enAction.Ist_der_Nutzer:
-                    return enNeededColumns.None;
+                //case enAction.Ist_der_Nutzer:
+                //    return enNeededColumns.None;
                 case enAction.Berechnung_ist_True:
                     return enNeededColumns.None;
                 case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
@@ -918,8 +918,8 @@ namespace BlueDatabase
                     return enNeededText.OneOrMore;
                 case enAction.Wert_Weg:
                     return enNeededText.OneOrMore;
-                case enAction.Ist_der_Nutzer:
-                    return enNeededText.OneOrMore;
+                //case enAction.Ist_der_Nutzer:
+                //    return enNeededText.OneOrMore;
                 case enAction.Anmerkung:
                     return enNeededText.DoesNotMatter;
                 //case enAction.Ist_Jünger_Als:
@@ -1053,12 +1053,12 @@ namespace BlueDatabase
                     EineSpalteWahrUmWahrzusein = true;
                     break;
 
-                case enAction.Ist_der_Nutzer:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der Benutzer zu einer Benutzergruppe gehört, die im Text definiert ist.<br>" +
-                            "Hier trifft die Benutzergruppe #Administrator nicht automatisch und muss separat angegeben werden.<br>" +
-                            "Einzelne Nutzer können direkt mit #USER:Max Mustermann angesprochen werden.";
-                    MehrereTexteReichtEiner = true;
-                    break;
+                //case enAction.Ist_der_Nutzer:
+                //    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der Benutzer zu einer Benutzergruppe gehört, die im Text definiert ist.<br>" +
+                //            "Hier trifft die Benutzergruppe #Administrator nicht automatisch und muss separat angegeben werden.<br>" +
+                //            "Einzelne Nutzer können direkt mit #USER:Max Mustermann angesprochen werden.";
+                //    MehrereTexteReichtEiner = true;
+                //    break;
 
 
                 //case enAction.Ist_Jünger_Als:
@@ -1337,8 +1337,8 @@ namespace BlueDatabase
                 case enAction.Enthält_NICHT_Zeichenkette:
                     return "die Zelle in " + ColsOder + " NICHT die Zeichenkette '" + _Text.Replace("\r", "' oder '") + "' enthält";
 
-                case enAction.Ist_der_Nutzer:
-                    return "einer der Nutzer '" + _Text.Replace("\r", "' oder '") + "' ist";
+                //case enAction.Ist_der_Nutzer:
+                //    return "einer der Nutzer '" + _Text.Replace("\r", "' oder '") + "' ist";
 
                 case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
                     return "die Zelle in  " + ColsOder + " am Ende Leerzeichen oder Enter-Codes enthält";
@@ -1566,8 +1566,8 @@ namespace BlueDatabase
                     if (Column == null) { return false; }
                     return PathExists(Column.Database.Cell.GetString(Column, Row));
 
-                case enAction.Ist_der_Nutzer:
-                    return Row.Database.PermissionCheckWithoutAdmin(OneValue, Row);
+                //case enAction.Ist_der_Nutzer:
+                //    return Row.Database.PermissionCheckWithoutAdmin(OneValue, Row);
 
                 //case enAction.Erhält_den_Focus:
                 //    return Convert.ToBoolean(ColumnFocus == Column);
@@ -1628,8 +1628,8 @@ namespace BlueDatabase
                         case enAction.Enthält_NICHT_Zeichenkette:
                             return "beim Wert in '#Spalte:" + Column.Name + "' fehlt eine Zeichenkette";
 
-                        case enAction.Ist_der_Nutzer:
-                            return "sie gehören zu einer bestimmten Benutzergruppe";
+                        //case enAction.Ist_der_Nutzer:
+                        //    return "sie gehören zu einer bestimmten Benutzergruppe";
 
                             //case enAction.Ist_Jünger_Als:
                             //    return "die Zeile ist zu jung";
@@ -1686,7 +1686,7 @@ namespace BlueDatabase
                 case enAction.Wert_Setzen:
                 case enAction.Sperre_die_Zelle:
                 case enAction.Formatfehler_des_Zelleninhaltes:
-                case enAction.Ist_der_Nutzer:
+                //case enAction.Ist_der_Nutzer:
                 //case enAction.Ist_Jünger_Als:
                 //case enAction.SortiereIntelligent:
                 //case enAction.KopiereAndereSpalten:

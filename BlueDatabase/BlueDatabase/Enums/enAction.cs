@@ -43,7 +43,7 @@ namespace BlueDatabase.Enums
         Unsichtbare_Zeichen_am_Ende_Enthält = 23,
 
 
-        Ist_der_Nutzer = 25,
+        //Ist_der_Nutzer = 25,
         Berechnung_ist_True = 26,
         // Ist_Jünger_Als = 27,
 

@@ -525,7 +525,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 w.ShowDialog();
             }
-            DB.OnLoaded(new LoadedEventArgs(true));
+           // DB.OnLoaded(new LoadedEventArgs(true));
         }
 
         private void btnLayouts_Click(object sender, System.EventArgs e)
@@ -584,7 +584,7 @@ namespace BlueControls.BlueDatabaseDialogs
             var L = new ItemCollectionList();
 
 
-            foreach (var ThisExport in _TableView.Database._Export)
+            foreach (var ThisExport in _TableView.Database.Export)
             {
                 if (ThisExport.Typ == enExportTyp.DatenbankOriginalFormat)
                 {

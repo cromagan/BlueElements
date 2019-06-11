@@ -426,7 +426,7 @@ namespace BlueDatabase
                 {
                     case 0: Co = 1; break; // Neue Action
                     case enAction.Anmerkung: Co = 2; break;
-                    case enAction.Ist_der_Nutzer: Co = 3; break;
+                    //case enAction.Ist_der_Nutzer: Co = 3; break;
                     case enAction.Setze_Fehlerhaft: Co = 4; break;
                     case enAction.Sperre_die_Zelle: Co = 5; break;
                     case enAction.Wert_Setzen: Co = 10; break;
