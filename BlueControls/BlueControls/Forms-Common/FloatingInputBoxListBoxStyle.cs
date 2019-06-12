@@ -55,7 +55,7 @@ namespace BlueControls.DialogBoxes
             Position_SetWindowIntoScreen(modAllgemein.PointOnScreenNr(new Point(Xpos, Ypos)), Xpos, Ypos);
 
 
-            Develop.DoEvents();
+            //Develop.DoEvents();
             Show();
 
 
