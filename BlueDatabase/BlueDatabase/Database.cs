@@ -2249,6 +2249,10 @@ namespace BlueDatabase
                     if (PermissionCheckWithoutAdmin(ThisString, row)) { return true; }
                 }
             }
+            catch (NullReferenceException _)
+            {
+                return false;
+            }
             catch (Exception ex)
             {
                 Develop.DebugPrint(enFehlerArt.Warnung, ex);
