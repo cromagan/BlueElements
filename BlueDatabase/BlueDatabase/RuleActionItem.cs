@@ -1305,7 +1305,7 @@ namespace BlueDatabase
                 //    return "die Zelle in " + ColsOder + " den Focus erhält";
 
                 case enAction.Berechnung_ist_True:
-                    return "die Formel '" + _Text + "' WAHR ist";
+                    return "die mathematische Berechnung der Formel '" + _Text + "' WAHR ist";
 
                 //case enAction.Mache_einen_Vorschlag:
                 //    return "mache einen Vorschlag, bezugnehmend auf " + ColsUnd + "";
@@ -1696,7 +1696,7 @@ namespace BlueDatabase
                 case enAction.Berechnung_ist_True:
                     if (!string.IsNullOrEmpty(_Text))
                     {
-                        foreach (var thisColumnItem in Columns[0].Database.Column)
+                        foreach (var thisColumnItem in Rule.Database.Column)
                         {
                             if (thisColumnItem != null)
                             {
@@ -1713,7 +1713,7 @@ namespace BlueDatabase
                 case enAction.Substring:
                     if (!string.IsNullOrEmpty(_Text) && Columns.Count > 0 )
                     {
-                        foreach (var thisColumnItem in Columns[0].Database.Column)
+                        foreach (var thisColumnItem in Rule.Database.Column)
                         {
                             if (thisColumnItem != null)
                             {
