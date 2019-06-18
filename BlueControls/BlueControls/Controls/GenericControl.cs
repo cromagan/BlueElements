@@ -261,7 +261,7 @@ namespace BlueControls.Controls
         {
             if (InvokeRequired)
             {
-                return (Point)Invoke(new Action(() => MousePos()));
+                return (Point)Invoke(new Func<Point>(() =>  MousePos()));
             }
 
             Develop.DebugPrint_Disposed(IsDisposed);

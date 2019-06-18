@@ -712,7 +712,7 @@ namespace BlueControls.Controls
 
             if (InvokeRequired)
             {
-                return (bool)Invoke(new Action(() => WordStarts(word, position)));
+                return (bool)Invoke(new Func<bool>(() => WordStarts(word, position)));
             }
 
             try

@@ -2233,11 +2233,14 @@ namespace BlueDatabase
 
         public bool PermissionCheck(ListExt<string> allowed, RowItem row)
         {
+
+
+
             try
             {
                 if (InvokeRequired)
                 {
-                    return (bool)Invoke(new Action(() => PermissionCheck(allowed, row)));
+                    return (bool)Invoke(new Func<bool>(() => PermissionCheck(allowed, row)));
                 }
 
 
@@ -2249,9 +2252,13 @@ namespace BlueDatabase
                     if (PermissionCheckWithoutAdmin(ThisString, row)) { return true; }
                 }
             }
-            catch (NullReferenceException _)
+            catch (NullReferenceException ex)
             {
                 return false;
+            }
+            catch (InvalidAsynchronousStateException)
+            {
+                return false; // Zielthread nicht mehr vorhanden
             }
             catch (Exception ex)
             {
