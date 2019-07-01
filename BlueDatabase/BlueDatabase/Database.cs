@@ -2252,14 +2252,14 @@ namespace BlueDatabase
                     if (PermissionCheckWithoutAdmin(ThisString, row)) { return true; }
                 }
             }
-            catch (NullReferenceException ex)
-            {
-                return false;
-            }
-            catch (InvalidAsynchronousStateException)
-            {
-                return false; // Zielthread nicht mehr vorhanden
-            }
+            //catch (NullReferenceException ex)
+            //{
+            //    return false;
+            //}
+            //catch (InvalidAsynchronousStateException)
+            //{
+            //    return false; // Zielthread nicht mehr vorhanden
+            //}
             catch (Exception ex)
             {
                 Develop.DebugPrint(enFehlerArt.Warnung, ex);
