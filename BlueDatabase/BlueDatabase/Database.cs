@@ -3213,7 +3213,6 @@ namespace BlueDatabase
         /// </summary>
         public void WaitParsed()
         {
-
             if (!Thread.CurrentThread.IsBackground)
             {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Darf nur von einem BackgroundThread aufgerufen werden!");
@@ -3223,11 +3222,7 @@ namespace BlueDatabase
             {
                 Develop.DoEvents();
             }
-
-
-
         }
-
         private void BinaryWriter_ReportProgressAndWait(int percentProcess, string UserState)
         {
 
@@ -3371,6 +3366,7 @@ namespace BlueDatabase
             if (!ReloadNeeded()) { return; }
 
             FileInfo f;
+            string tmpLastSaveCode;
             byte[] _tmp = null;
 
             var StartTime = DateTime.Now;
@@ -3384,15 +3380,13 @@ namespace BlueDatabase
                         return;
                     }
 
-                    ////if (!BlockDateiVorhanden())
-                    //{
                     _tmp = File.ReadAllBytes(Filename);
                     f = new FileInfo(Filename);
+                    tmpLastSaveCode = GetFileInfo(true);
 
                     Pause(0.5, false);
 
                     if (new FileInfo(Filename).Length == _tmp.Length) { break; }
-                    //}
                 }
                 catch (Exception ex)
                 {
@@ -3408,9 +3402,41 @@ namespace BlueDatabase
             var _BLoaded = new List<byte>();
             _BLoaded.AddRange(_tmp);
 
-            BinReLoader.ReportProgress(0, _BLoaded); // 0 = Parsen
 
-            BinReLoader.ReportProgress(100, GetFileInfo(true)); // 100 = Abschluß
+            // Letztes WorkItem speichern, als Kontrolle
+            var LWI = string.Empty;
+            if (Works != null && Works.Count > 0) { LWI = Works[Works.Count - 1].ToString(); }
+
+
+
+            while (_isParsing) { Develop.DoEvents(); }
+            BinReLoader.ReportProgress(1, _BLoaded);
+            while (!_isParsing) { Develop.DoEvents(); }
+            while (_isParsing) { Develop.DoEvents(); }
+            BinReLoader.ReportProgress(0, tmpLastSaveCode);
+
+
+
+
+            // Leztes WorkItem suchen. Auch Ohne LogUndo MUSS es vorhanden sein.
+            if (!string.IsNullOrEmpty(LWI))
+            {
+                var ok = false;
+                foreach (var ThisWorkItem in Works)
+                {
+                    if (ThisWorkItem.ToString() == LWI)
+                    {
+                        ok = true;
+                        break;
+                    }
+                }
+
+                if (!ok)
+                {
+                    Develop.DebugPrint(enFehlerArt.Fehler, "WorkItem verschwunden: " + LWI);
+                }
+            }
+
         }
 
         private void Backup_DoWork(object sender, DoWorkEventArgs e)
@@ -3523,11 +3549,11 @@ namespace BlueDatabase
         {
             switch (e.ProgressPercentage)
             {
-                case 0:
+                case 1:
                     Parse((List<byte>)e.UserState);
                     break;
 
-                case 100:
+                case 0:
                     _CheckedAndReloadNeed = false;
                     _LastSaveCode = (string)e.UserState; // initialize setzt zurück
                     break;
