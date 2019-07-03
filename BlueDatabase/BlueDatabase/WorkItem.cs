@@ -114,7 +114,7 @@ namespace BlueDatabase
 
         public string User { get; private set; }
 
-        public string Group { get; private set; }
+        // public string Group { get; private set; }
 
         public string PreviousValue { get; private set; }
 
@@ -166,7 +166,7 @@ namespace BlueDatabase
             PreviousValue = PrevipusValue;
             _changedTo = ChangedTo;
             this.User = User;
-            this.Group = Group;
+            //  this.Group = Group;
 
             Date = DateTime.Now;
         }
@@ -240,7 +240,7 @@ namespace BlueDatabase
 
                     case "group":
                     case "g":
-                        Group = pair.Value.FromNonCritical();
+                        //  Group = pair.Value.FromNonCritical();
                         break;
 
                     case "previousvalue":
@@ -270,10 +270,10 @@ namespace BlueDatabase
                    ", RK=" + _rowKey +
                    ", D=" + Date +
                    ", U=" + User.ToNonCritical() +
-                   ", G=" + Group.ToNonCritical() +
                    ", PV=" + PreviousValue.ToNonCritical() +
                    ", CT=" + _changedTo.ToNonCritical() +
                    "}";
+            // ", G=" + Group.ToNonCritical() +
         }
 
         public string UndoTextTableMouseOver()
@@ -310,5 +310,10 @@ namespace BlueDatabase
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
+        internal bool LogsUndo(Database database)
+        {
+            return database.Column.SearchByKey(ColKey) is ColumnItem C && C.ShowUndo;
+
+        }
     }
 }

@@ -1532,7 +1532,7 @@ namespace BlueDatabase
                     for (var z = 0; z <= UIO.GetUpperBound(0); z++)
                     {
                         var tmpWork = new WorkItem(UIO[z]);
-                        tmpWork.State = enItemState.Undo; // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Desegen die alten "Pendings" zu Undos ändern.
+                        tmpWork.State = enItemState.Undo; // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Deswegen die alten "Pendings" zu Undos ändern.
                         Works.Add(tmpWork);
                     }
                     break;
@@ -2419,7 +2419,7 @@ namespace BlueDatabase
                 }
                 else
                 {
-                    if (Column.SearchByKey(thisWorkItem.ColKey) is ColumnItem C && C.ShowUndo)
+                    if (thisWorkItem.LogsUndo(this))
                     {
                         Works2.Add(thisWorkItem.ToString());
                     }
@@ -3405,7 +3405,20 @@ namespace BlueDatabase
 
             // Letztes WorkItem speichern, als Kontrolle
             var LWI = string.Empty;
-            if (Works != null && Works.Count > 0) { LWI = Works[Works.Count - 1].ToString(); }
+            if (Works != null && Works.Count > 0)
+            {
+                var c = 0;
+                do
+                {
+                    c += 1;
+                    if (c > 20 || Works.Count - c < 20) { break; }
+                    var wn = Works.Count - c;
+                    if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { LWI = Works[wn].ToString(); }
+
+                } while (string.IsNullOrEmpty(LWI));
+
+                
+            }
 
 
 
@@ -3433,7 +3446,7 @@ namespace BlueDatabase
 
                 if (!ok)
                 {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "WorkItem verschwunden: " + LWI);
+                    Develop.DebugPrint(enFehlerArt.Fehler, "WorkItem verschwunden: " + LWI + "<br>" + Filename);
                 }
             }
 
