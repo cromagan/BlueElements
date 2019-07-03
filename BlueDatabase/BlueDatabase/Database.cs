@@ -3446,7 +3446,7 @@ namespace BlueDatabase
 
                 if (!ok)
                 {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "WorkItem verschwunden: " + LWI + "<br>" + Filename);
+                    Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden: " + LWI + "<br>" + Filename);
                 }
             }
 

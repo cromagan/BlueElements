@@ -2131,16 +2131,16 @@ namespace BlueDatabase
 
 
                 case enDataFormat.LinkedCell:
-                   if (EditType_To_Check == enEditTypeFormula.None) { return true; }
-                    if (EditType_To_Check != enEditTypeFormula.Textfeld && 
+                    if (EditType_To_Check == enEditTypeFormula.None) { return true; }
+                    if (EditType_To_Check != enEditTypeFormula.Textfeld &&
                         EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
                     if (Database.IsParsing()) { return true; }
 
-                    if (LinkedDatabase() == null ) { return false; }
-                    if (_LinkedCell_ColumnKey < 0 ) { return false; }
+                    if (LinkedDatabase() == null) { return false; }
+                    if (_LinkedCell_ColumnKey < 0) { return false; }
 
                     var col = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
-                    if(col == null) { return false; }
+                    if (col == null) { return false; }
 
                     return col.UserEditDialogTypeInFormula(enEditTypeFormula.Textfeld);
 
@@ -2276,6 +2276,7 @@ namespace BlueDatabase
                     if (LinkedCell_Behaviour == enFehlendesZiel.Undefiniert) { return "Verhalten, was mit Zeilen passieren soll, die in der Zieldatenbank nicht existiert, fehlt."; }
                     if (LinkedCell_ColumnValueFoundIn < 0 && !string.IsNullOrEmpty(LinkedCell_ColumnValueAdd)) { return "Falsche Ziel-Spalte ODER Spalten-Vortext flasch."; }
                     if (_VorschlagsColumn > 0) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
+                    if (!_MultiLine) { return "Diese Format muss mehrzeilig sein, da es von der Ziel-Spalte gesteuert wird."; }
                     break;
 
                 case enDataFormat.Values_für_LinkedCellDropdown:
@@ -2413,7 +2414,7 @@ namespace BlueDatabase
                 if (_Format != enDataFormat.Text &&
                     _Format != enDataFormat.Columns_für_LinkedCellDropdown &&
                     _Format != enDataFormat.BildCode &&
-                    _Format != enDataFormat.Ganzzahl  &&
+                    _Format != enDataFormat.Ganzzahl &&
                     _Format != enDataFormat.Gleitkommazahl) { return "Format unterstützt keine Ersetzungen."; }
 
                 if (_AutoFilterErweitertErlaubt) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
@@ -2438,9 +2439,9 @@ namespace BlueDatabase
 
 
 
-            if(_Format != enDataFormat.LinkedCell)
+            if (_Format != enDataFormat.LinkedCell)
             {
-                if( _LinkedCell_RowKey >-1 ) { return "Nur Verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
+                if (_LinkedCell_RowKey > -1) { return "Nur Verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
                 if (_LinkedCell_ColumnKey > -1) { return "Nur Verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
                 if (_LinkedCell_ColumnValueFoundIn > -1) { return "Nur Verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
                 if (_LinkedCell_Behaviour != enFehlendesZiel.Undefiniert) { return "Nur Verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
@@ -2497,7 +2498,7 @@ namespace BlueDatabase
                 var l = new List<string>(Value.SplitByCR());
                 var l2 = new List<string>();
 
-                foreach(var thisFile in l)
+                foreach (var thisFile in l)
                 {
                     l2.Add(SimplyFile(thisFile));
                 }
