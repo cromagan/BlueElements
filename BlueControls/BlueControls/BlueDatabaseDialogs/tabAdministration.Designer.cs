@@ -161,6 +161,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpAktuelleSpalte.Name = "grpAktuelleSpalte";
             this.grpAktuelleSpalte.Size = new System.Drawing.Size(432, 81);
             this.grpAktuelleSpalte.Text = "Gewählte Spalte";
+            this.grpAktuelleSpalte.Translate = false;
             // 
             // btnPosEingeben
             // 

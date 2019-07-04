@@ -901,7 +901,7 @@ namespace BlueDatabase
                 try
                 {
                     _String = _cells[CellKey].Value;
-                    if (Typ.HasFlag(enFilterType.Instr)) { _String = ColumnItem.ColumnReplace(_String, Column, enShortenStyle.Both); }
+                    if (Typ.HasFlag(enFilterType.Instr)) { _String = LanguageTool.ColumnReplace(_String, Column, enShortenStyle.Both); }
                 }
                 catch (Exception ex)
                 {
@@ -914,7 +914,7 @@ namespace BlueDatabase
             else
             {
                 _String = string.Empty;
-                if (Typ.HasFlag(enFilterType.Instr)) { _String = ColumnItem.ColumnReplace(string.Empty, Column, enShortenStyle.Both); }
+                if (Typ.HasFlag(enFilterType.Instr)) { _String = LanguageTool.ColumnReplace(string.Empty, Column, enShortenStyle.Both); }
             }
 
 

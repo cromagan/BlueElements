@@ -330,7 +330,7 @@ namespace BlueControls.Controls
                     eText = new ExtText(_design, state, tmpSkinRow);
 
 
-                    eText.HtmlText = clsSkin.DoTranslate(_Text, Translate);
+                    eText.HtmlText = BlueDatabase.LanguageTool.DoTranslate(_Text, Translate);
                     //eText.Zeilenabstand = _Zeilenabstand;
                 }
                 eText.State = state;

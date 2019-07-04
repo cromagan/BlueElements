@@ -115,6 +115,7 @@
     <Compile Include="ExportDefinition.cs" />
     <Compile Include="FilterCollection.cs" />
     <Compile Include="FilterItem.cs" />
+    <Compile Include="LanguageTool.cs" />
     <Compile Include="RowCollection.cs" />
     <Compile Include="RowItem.cs" />
     <Compile Include="RowSortDefinition.cs" />

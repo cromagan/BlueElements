@@ -1458,7 +1458,7 @@ namespace BlueDatabase
                     CellCollection.Invalidate_CellContentSize(this, ThisRow);
                     Invalidate_TmpColumnContentWidth();
                     Database.Cell.OnCellValueChanged(new CellEventArgs(this, ThisRow));
-                    ThisRow.DoAutomatic(false, true, false);
+                    ThisRow.DoAutomatic(true, false);
                 }
             }
         }
@@ -2797,45 +2797,7 @@ namespace BlueDatabase
 
 
 
-        /// <summary>
-        /// Fügt Präfix und Suffix hinzu und ersteztt den Text nach dem geünschten Stil.
-        /// </summary>
-        /// <param name="newTXT"></param>
-        /// <param name="Column"></param>
-        /// <param name="Style"></param>
-        /// <returns></returns>
-        public static string ColumnReplace(string newTXT, ColumnItem Column, enShortenStyle Style)
-        {
-            if (!string.IsNullOrEmpty(newTXT))
-            {
-                if (!string.IsNullOrEmpty(Column.Prefix)) { newTXT = Column.Prefix + " " + newTXT; }
-                if (!string.IsNullOrEmpty(Column.Suffix)) { newTXT = newTXT + " " + Column.Suffix; }
-            }
 
-            if (Style == enShortenStyle.Unreplaced || Column.Replacer.Count == 0) { return newTXT; }
-
-            var OT = newTXT;
-
-            foreach (var ThisString in Column.Replacer)
-            {
-                var x = ThisString.SplitBy("|");
-                if (x.Length == 2)
-                {
-                    if (string.IsNullOrEmpty(x[0]))
-                    {
-                        if (string.IsNullOrEmpty(newTXT)) { newTXT = x[1]; }
-                    }
-                    else
-                    {
-                        newTXT = newTXT.Replace(x[0], x[1]);
-                    }
-                }
-                if (x.Length == 1 && !ThisString.StartsWith("|")) { newTXT = newTXT.Replace(x[0], string.Empty); }
-            }
-
-            if (Style == enShortenStyle.Replaced || Style == enShortenStyle.HTML || OT == newTXT) { return newTXT; }
-            return OT + " (" + newTXT + ")";
-        }
 
         public static enEditTypeTable UserEditDialogTypeInTable(ColumnItem vColumn, bool DoDropDown)
         {

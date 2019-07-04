@@ -199,10 +199,10 @@ namespace BlueControls.Controls
                     _Database.RestoreView -= _Database_RestoreView;
                     _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
                     _Database.SortParameterChanged -= _Database_SortParameterChanged;
-                    _Database.Row.RowRemoved -= _Database_RowRemoved;
-                    _Database.Row.RowAdded -= _Database_RowRemoved;
-                    _Database.Column.ItemRemoved -= _Database_ColumnAddedOrDeleted;
-                    _Database.Column.ItemAdded -= _Database_ColumnAddedOrDeleted;
+                    _Database.Row.RowRemoved -= _Database_RowCountChanged;
+                    _Database.Row.RowAdded -= _Database_RowCountChanged;
+                    _Database.Column.ItemRemoved -= _Database_ColumnCountChanged;
+                    _Database.Column.ItemAdded -= _Database_ColumnCountChanged;
                     _Database.SavedToDisk -= _Database_SavedToDisk;
                     _Database.ColumnArrangements.ItemInternalChanged -= ColumnArrangements_ItemInternalChanged;
                     _Database.ProgressbarInfo -= _Database_ProgressbarInfo;
@@ -224,10 +224,10 @@ namespace BlueControls.Controls
                     _Database.RestoreView += _Database_RestoreView;
                     _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
                     _Database.SortParameterChanged += _Database_SortParameterChanged;
-                    _Database.Row.RowRemoved += _Database_RowRemoved;
-                    _Database.Row.RowAdded += _Database_RowRemoved;
-                    _Database.Column.ItemAdded += _Database_ColumnAddedOrDeleted;
-                    _Database.Column.ItemRemoved += _Database_ColumnAddedOrDeleted;
+                    _Database.Row.RowRemoved += _Database_RowCountChanged;
+                    _Database.Row.RowAdded += _Database_RowCountChanged;
+                    _Database.Column.ItemAdded += _Database_ColumnCountChanged;
+                    _Database.Column.ItemRemoved += _Database_ColumnCountChanged;
                     _Database.SavedToDisk += _Database_SavedToDisk;
                     _Database.ColumnArrangements.ItemInternalChanged += ColumnArrangements_ItemInternalChanged;
                     _Database.ProgressbarInfo += _Database_ProgressbarInfo;
@@ -1046,7 +1046,7 @@ namespace BlueControls.Controls
             }
 
             var tx = ViewItem.Column.Caption;
-            tx = clsSkin.DoTranslate(tx, Translate).Replace("\r", "\r\n");
+            tx = BlueDatabase.LanguageTool.DoTranslate(tx, Translate).Replace("\r", "\r\n");
             var FS = GR.MeasureString(tx, _Column_Font.Font());
 
 
@@ -1732,7 +1732,7 @@ namespace BlueControls.Controls
 
                 if (table.Database == column.Database) { table.CursorPos_Set(column, row, false); }
 
-                row.DoAutomatic(false, true, false);
+                row.DoAutomatic(true, false);
 
                 // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
                 // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
@@ -3818,13 +3818,13 @@ namespace BlueControls.Controls
 
 
 
-        private void _Database_RowRemoved(object sender, System.EventArgs e)
+        private void _Database_RowCountChanged(object sender, System.EventArgs e)
         {
             Invalidate_RowSort();
             Invalidate();
         }
 
-        private void _Database_ColumnAddedOrDeleted(object sender, System.EventArgs e)
+        private void _Database_ColumnCountChanged(object sender, System.EventArgs e)
         {
             Invalidate_HeadSize();
             Invalidate_AllDraw(true);
@@ -4030,7 +4030,7 @@ namespace BlueControls.Controls
             _ContentSize.Height = Math.Max(_ContentSize.Height, Pix16);
 
 
-            if (clsSkin.Scale == 1 && clsSkin.Translation == null) { Column.Database.Cell.SetSizeOfCellContent(Column, Row, _ContentSize); }
+            if (clsSkin.Scale == 1 && LanguageTool.Translation == null) { Column.Database.Cell.SetSizeOfCellContent(Column, Row, _ContentSize); }
 
             return _ContentSize;
         }
@@ -4069,7 +4069,7 @@ namespace BlueControls.Controls
 
 
             Database.Cell.Set(Column, Row, v[0].Substring(5), false);
-            Row.DoAutomatic(false, true, true);
+            Row.DoAutomatic(true, true);
         }
 
 

@@ -176,7 +176,7 @@ namespace BlueDatabase
         /// </summary>
         /// <param name="IsNewRow"></param>
         /// <param name="DoFemdZelleInvalidate"></param>
-        public string DoAutomatic(bool IsNewRow, bool DoFemdZelleInvalidate, bool FullCheck)
+        public string DoAutomatic(bool DoFemdZelleInvalidate, bool FullCheck)
         {
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
             var cols = DoRules();
@@ -186,7 +186,6 @@ namespace BlueDatabase
             {
                 if (ThisColum != null)
                 {
-                    if (IsNewRow && !string.IsNullOrEmpty(ThisColum.CellInitValue)) { CellSet(ThisColum, ThisColum.CellInitValue); }
 
                     if (FullCheck)
                     {
@@ -256,8 +255,7 @@ namespace BlueDatabase
         /// <summary>
         /// Überprüft auf ungültige Werte in einer Zelle und korrigiert diese. Es werden keine Regeln ausgelöst.
         /// </summary>
-        /// <param name="IsNewRow">Settzt bei True den Ersteller und das Erstelldatum.</param>
-        internal void Repair(bool IsNewRow)
+        internal void Repair()
         {
             if (Database.Column.SysCorrect == null) { Database.Column.GetSystems(); }
 
@@ -279,14 +277,6 @@ namespace BlueDatabase
             if (CellIsNullOrEmpty(Database.Column.SysRowChangeDate))
             {
                 Database.Cell.SystemSet(Database.Column.SysRowChangeDate, this, DateTime.Now.ToString(), false);
-            }
-
-
-            if (IsNewRow)
-            {
-                Database.Cell.SystemSet(Database.Column.SysRowCreator, this, Database.UserName, false);
-                Database.Cell.SystemSet(Database.Column.SysRowCreateDate, this, DateTime.Now.ToString(), false);
-                DoAutomatic(true, false, false);
             }
         }
 
@@ -374,7 +364,7 @@ namespace BlueDatabase
                     if (!ThisColumnItem.IgnoreAtRowFilter)
                     {
                         var _String = CellGetString(ThisColumnItem);
-                        _String = ColumnItem.ColumnReplace(_String, ThisColumnItem, enShortenStyle.Both);
+                        _String = LanguageTool.ColumnReplace(_String, ThisColumnItem, enShortenStyle.Both);
                         if (!string.IsNullOrEmpty(_String) && _String.ToUpper().Contains(Search)) { return true; }
                     }
                 }

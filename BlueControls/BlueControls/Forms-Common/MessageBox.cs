@@ -1,4 +1,22 @@
-﻿using BlueBasics;
+﻿#region BlueElements - a collection of useful tools, database and controls
+// Authors: 
+// Christian Peter
+// 
+// Copyright (c) 2019 Christian Peter
+// https://github.com/cromagan/BlueElements
+// 
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
+// DEALINGS IN THE SOFTWARE. 
+#endregion
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 
@@ -23,11 +41,11 @@ namespace BlueControls.DialogBoxes
 
             if (Pic != enImageCode.None)
             {
-                capText.Text = "<ImageCode=" + QuickImage.Get(Pic, 32) + "> <zbx_store><top>" + clsSkin.DoTranslate(TXT, false);
+                capText.Text = "<ImageCode=" + QuickImage.Get(Pic, 32) + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(TXT, false);
             }
             else
             {
-                capText.Text = clsSkin.DoTranslate(TXT, false);
+                capText.Text = BlueDatabase.LanguageTool.DoTranslate(TXT, false);
             }
 
             Size = new System.Drawing.Size(capText.Left * 2 + capText.Width + BorderWidth, capText.Top * 3 + capText.Height + 35 + BorderHeight);

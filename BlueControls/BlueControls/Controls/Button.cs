@@ -444,7 +444,7 @@ namespace BlueControls.Controls
                 etxt.MaxHeight = 22;
                 etxt.MaxWidth = DisplayRectangle.Width;
                 etxt.Ausrichtung = enAlignment.Horizontal_Vertical_Center;
-                etxt.HtmlText = clsSkin.DoTranslate(vtext, Translate);
+                etxt.HtmlText = BlueDatabase.LanguageTool.DoTranslate(vtext, Translate);
                 etxt.Draw(GR, 1);
 
 
@@ -457,7 +457,7 @@ namespace BlueControls.Controls
             {
 
 
-                var tt = "<ImageCode=" + Skin.PicCode(_SkinRow) + "> <zbx_store><top>" + clsSkin.DoTranslate(vtext, Translate); //Skin.ZusatzTextAdder(vText, vButtonType, vState)
+                var tt = "<ImageCode=" + Skin.PicCode(_SkinRow) + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(vtext, Translate); //Skin.ZusatzTextAdder(vText, vButtonType, vState)
 
                 if (etxt == null) { etxt = new ExtText(vButtonTypex, vStatex, _SkinRow); }
                 etxt.State = vStatex;

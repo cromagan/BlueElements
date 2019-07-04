@@ -267,6 +267,19 @@ namespace BlueDatabase
 
             Row.CellSet(Database.Column[0], ValueOfCellInFirstColumn);
 
+
+            Database.Cell.SystemSet(Database.Column.SysRowCreator, Row, Database.UserName, false);
+            Database.Cell.SystemSet(Database.Column.SysRowCreateDate, Row, DateTime.Now.ToString(), false);
+
+            // Dann die Inital-Werte reinschreiben
+            foreach (var ThisColum in Database.Column)
+            {
+                if (ThisColum != null && !string.IsNullOrEmpty(ThisColum.CellInitValue)) { Row.CellSet(ThisColum, ThisColum.CellInitValue); }
+            }
+
+            Row.DoAutomatic(false, false);
+
+
             return Row;
         }
 
@@ -285,7 +298,7 @@ namespace BlueDatabase
             {
                 c++;
                 Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", c, x.Count(), false, false));
-                ThisRowItem.DoAutomatic(false, true, FullCheck);
+                ThisRowItem.DoAutomatic(true, FullCheck);
             }
 
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", x.Count(), x.Count(), false, true));
@@ -308,7 +321,7 @@ namespace BlueDatabase
             {
                 if (ThisRowItem != null)
                 {
-                    ThisRowItem.Repair(false);
+                    ThisRowItem.Repair();
                     _LastRowKey = Math.Max(_LastRowKey, ThisRowItem.Key); // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
                 }
 

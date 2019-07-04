@@ -891,7 +891,6 @@ namespace BlueDatabase
             if (!IsParsing())
             {
                 AddPending(enDatabaseDataType.dummyComand_AddRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
-                e.Row.Repair(true);
             }
         }
 

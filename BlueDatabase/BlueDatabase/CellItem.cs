@@ -144,14 +144,14 @@ namespace BlueDatabase
                 case enDataFormat.RelationText:
                 case enDataFormat.LinkedCell:  // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
                     //if (Txt == null || string.IsNullOrEmpty(Txt)) { return string.Empty; }
-                    Txt = ColumnItem.ColumnReplace(Txt, column, Style);
+                    Txt = LanguageTool.ColumnReplace(Txt, column, Style);
                     Txt = Txt.Replace("\r\n", " ");
                     break;
 
 
                 case enDataFormat.BildCode:
                     if (column.CompactView && Style != enShortenStyle.HTML) { return string.Empty; }
-                    Txt = ColumnItem.ColumnReplace(Txt, column, Style);
+                    Txt = LanguageTool.ColumnReplace(Txt, column, Style);
                     break;
 
 
@@ -178,7 +178,7 @@ namespace BlueDatabase
                     {
                         Txt = "Unbekannt";
                     }
-                    Txt = ColumnItem.ColumnReplace(Txt, column, Style);
+                    Txt = LanguageTool.ColumnReplace(Txt, column, Style);
                     break;
 
 
@@ -190,7 +190,7 @@ namespace BlueDatabase
                         var col = Color.FromArgb(int.Parse(Txt));
                         Txt = col.ColorName();
                     }
-                    Txt = ColumnItem.ColumnReplace(Txt, column, Style);
+                    Txt = LanguageTool.ColumnReplace(Txt, column, Style);
                     break;
 
 
@@ -212,7 +212,7 @@ namespace BlueDatabase
                     var C = LinkedDatabase.Column.SearchByKey(ColKey);
                     if (C == null) { return "Columnkey nicht gefunden"; }
 
-                    Txt = ColumnItem.ColumnReplace(C.ReadableText(), column, Style);
+                    Txt = LanguageTool.ColumnReplace(C.ReadableText(), column, Style);
                     break;
 
                 default:
