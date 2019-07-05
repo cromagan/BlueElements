@@ -143,16 +143,16 @@ namespace BlueBasics
 
         public static void Shuffle<T>(this IList<T> list)
         {
-            for (var i = 0 ; i < list.Count ; i++)
+            for (var i1 = 0; i1 < list.Count; i1++)
             {
-                var index = Constants.GlobalRND.Next(i, list.Count);
-                if (i != index)
+                var i2 = Constants.GlobalRND.Next(i1, list.Count);
+                if (i1 != i2)
                 {
-                    var tempVar = list[i];
-                    var tempVar2 = list[index];
-                    modAllgemein.Swap(ref tempVar, ref tempVar2);
-                    list[index] = tempVar2;
-                    list[i] = tempVar;
+                    var v1 = list[i1];
+                    var v2 = list[i2];
+                    // modAllgemein.Swap(ref tempVar, ref tempVar2);
+                    list[i1] = v2;
+                    list[i2] = v1;
                 }
             }
         }
@@ -285,7 +285,7 @@ namespace BlueBasics
         public static void RemoveString(this List<string> L, string[] Value, bool CaseSensitive)
         {
 
-            for (var z = 0 ; z <= Value.GetUpperBound(0) ; z++)
+            for (var z = 0; z <= Value.GetUpperBound(0); z++)
             {
                 L.RemoveString(Value[z], CaseSensitive);
             }
@@ -322,7 +322,7 @@ namespace BlueBasics
             var uTagName = TagNamex.ToUpper() + ":";
             var Found = -1;
 
-            for (var z = 0 ; z < _String.Count ; z++)
+            for (var z = 0; z < _String.Count; z++)
             {
                 if (_String.ElementAtOrDefault(z).Length > uTagName.Length + 1 && _String.ElementAtOrDefault(z).Substring(0, uTagName.Length + 1).ToUpper() == uTagName + " ")
                 {
@@ -354,7 +354,7 @@ namespace BlueBasics
 
 
 
-        public static bool AddIfNotExists<T>(this List<T> L, BindingList<T> Values) 
+        public static bool AddIfNotExists<T>(this List<T> L, BindingList<T> Values)
         {
             if (Values == null || Values.Count == 0) { return false; }
 
@@ -371,7 +371,7 @@ namespace BlueBasics
         }
 
 
-        public static bool AddIfNotExists<T>(this List<T> L, List<T> Values) 
+        public static bool AddIfNotExists<T>(this List<T> L, List<T> Values)
         {
             if (Values == null || Values.Count == 0) { return false; }
 
@@ -387,7 +387,7 @@ namespace BlueBasics
             return ok1;
         }
 
-        public static bool AddIfNotExists<T>(this List<T> L, T Value) 
+        public static bool AddIfNotExists<T>(this List<T> L, T Value)
         {
 
             if (!L.Contains(Value))

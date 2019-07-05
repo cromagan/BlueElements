@@ -1113,11 +1113,11 @@ namespace BlueDatabase
         public string UserEditErrorReason(ColumnItem Column, RowItem Row, bool DateiRechtePrüfen)
         {
 
-            if (Database.ReadOnly) { return "Datenbank wurde schreibgeschützt geöffnet"; }
-            if (Column == null) { return "Es ist keine Spalte ausgewählt."; }
-            if (Column.Database != Database) { return "Interner Fehler: Bezug der Datenbank zur Spalte ist fehlerhaft."; }
+            if (Database.ReadOnly) { return LanguageTool.DoTranslate( "Datenbank wurde schreibgeschützt geöffnet", true); }
+            if (Column == null) { return LanguageTool.DoTranslate("Es ist keine Spalte ausgewählt.", true); }
+            if (Column.Database != Database) { return LanguageTool.DoTranslate("Interner Fehler: Bezug der Datenbank zur Spalte ist fehlerhaft.", true); }
 
-            if (!Column.SaveContent) { return "Der Spalteninhalt wird nicht gespeichert."; }
+            if (!Column.SaveContent) { return LanguageTool.DoTranslate("Der Spalteninhalt wird nicht gespeichert.", true); }
 
             if (Column.Format == enDataFormat.LinkedCell)
             {
@@ -1125,25 +1125,25 @@ namespace BlueDatabase
                 if (LCColumn != null && LCrow != null)
                 {
                     var tmp = LCrow.Database.Cell.UserEditErrorReason(LCColumn, LCrow, DateiRechtePrüfen);
-                    if (!string.IsNullOrEmpty(tmp)) { return "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp; }
+                    if (!string.IsNullOrEmpty(tmp)) { return LanguageTool.DoTranslate("Die verlinkte Zelle kann nicht bearbeitet werden: ", true) + tmp; }
                     return string.Empty;
                 }
-                if (LCColumn == null) { return "Die Spalte ist in der Quell-Datenbank nicht vorhanden."; }
-                if (LCrow == null) { return "Neue Zeilen können bei verlinkten Zellen nicht erstellt werden."; }
+                if (LCColumn == null) { return LanguageTool.DoTranslate("Die Spalte ist in der Quell-Datenbank nicht vorhanden.", true); }
+                if (LCrow == null) { return LanguageTool.DoTranslate("Neue Zeilen können bei verlinkten Zellen nicht erstellt werden.", true); }
 
 
-                return "Die Zeile ist in der Quell-Datenbank nicht vorhanden.";
+                return LanguageTool.DoTranslate("Die Zeile ist in der Quell-Datenbank nicht vorhanden.", true); 
             }
 
             if (Row != null)
             {
-                if (Row.Database != Database) { return "Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft."; }
-                if (Column != Database.Column.SysLocked && Row.CellGetBoolean(Database.Column.SysLocked) && !Column.EditTrotzSperreErlaubt) { return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden."; }
+                if (Row.Database != Database) { return LanguageTool.DoTranslate("Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft.", true); }
+                if (Column != Database.Column.SysLocked && Row.CellGetBoolean(Database.Column.SysLocked) && !Column.EditTrotzSperreErlaubt) { return LanguageTool.DoTranslate("Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.", true); }
             }
             else
             {
                 //Auf neue Zeile wird geprüft
-                if (!Column.IsFirst()) { return "Neue Zeilen müssen mit der ersten Spalte beginnen."; }
+                if (!Column.IsFirst()) { return LanguageTool.DoTranslate("Neue Zeilen müssen mit der ersten Spalte beginnen.", true); }
             }
 
 
@@ -1152,7 +1152,7 @@ namespace BlueDatabase
 
             if (!Column.TextBearbeitungErlaubt && !Column.DropdownBearbeitungErlaubt)
             {
-                return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
+                return LanguageTool.DoTranslate("Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.", true);
             }
 
             if (ColumnItem.UserEditDialogTypeInTable(Column.Format, false, true, Column.MultiLine) == enEditTypeTable.None)
@@ -1165,12 +1165,12 @@ namespace BlueDatabase
             {
                 if (ThisRule != null)
                 {
-                    if (ThisRule.WillAlwaysCellOverride(Column)) { return "Diese Zelle wird von automatischen Regeln befüllt."; }
-                    if (ThisRule.BlockEditing(Column, Row)) { return "Eine Regel sperrt diese Zelle."; }
+                    if (ThisRule.WillAlwaysCellOverride(Column)) { return LanguageTool.DoTranslate("Diese Zelle wird von automatischen Regeln befüllt.", true); }
+                    if (ThisRule.BlockEditing(Column, Row)) { return LanguageTool.DoTranslate("Eine Regel sperrt diese Zelle.", true); }
                 }
             }
 
-            if (!Database.PermissionCheck(Column.PermissionGroups_ChangeCell, Row)) { return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern."; }
+            if (!Database.PermissionCheck(Column.PermissionGroups_ChangeCell, Row)) { return LanguageTool.DoTranslate("Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.", true); }
             return string.Empty;
         }
 
