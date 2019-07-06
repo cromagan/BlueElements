@@ -117,7 +117,7 @@ namespace BlueControls.Forms
 
         private void EinWahl_Click(object sender, System.EventArgs e)
         {
-            using (var fr = new TableView(Database))
+            using (var fr = new frmTableView(Database))
             {
                 Liste = fr.GetFilteredItems();
             }
@@ -337,6 +337,8 @@ namespace BlueControls.Forms
             Tabs.TabPages[3].Enabled = false;
             Tabs.TabPages[4].Enabled = true;
             Tabs.SelectedIndex = 4;
+
+            Button_PageSetup_Click(null, System.EventArgs.Empty);
             GeneratePrintPad(0);
 
 
@@ -401,7 +403,6 @@ namespace BlueControls.Forms
         private void PrintPad_PrintPage(object sender, PrintPageEventArgs e)
         {
             ItemNrForPrint = GeneratePrintPad(ItemNrForPrint);
-
 
             e.HasMorePages = Convert.ToBoolean(ItemNrForPrint < Liste.Count);
 

@@ -877,7 +877,7 @@ namespace BeCreative
                     break;
 
                 case "Fehlersuche":
-                    MessageBox.Show(Row.DoAutomatic(false, true, true));
+                    MessageBox.Show(Row.DoAutomatic(true, true));
                     break;
 
                 case "ZeileLöschen":

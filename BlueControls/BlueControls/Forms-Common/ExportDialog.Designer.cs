@@ -126,7 +126,6 @@ namespace BlueControls.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.FrmDrucken_Layout1.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.FrmDrucken_Layout1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.FrmDrucken_Layout1.Format = BlueBasics.Enums.enDataFormat.Text;
             this.FrmDrucken_Layout1.Location = new System.Drawing.Point(96, 8);
             this.FrmDrucken_Layout1.Name = "FrmDrucken_Layout1";
             this.FrmDrucken_Layout1.Size = new System.Drawing.Size(618, 24);
@@ -369,12 +368,13 @@ namespace BlueControls.Forms
             // 
             // Exported
             // 
-            this.Exported.AddAllowed = enAddType.None;
+            this.Exported.AddAllowed = BlueControls.Enums.enAddType.None;
             this.Exported.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Exported.CheckBehavior = BlueControls.Enums.enCheckBehavior.NoSelection;
             this.Exported.FilterAllowed = true;
+            this.Exported.LastFilePath = null;
             this.Exported.Location = new System.Drawing.Point(8, 40);
             this.Exported.Name = "Exported";
             this.Exported.QuickInfo = "";
@@ -397,7 +397,7 @@ namespace BlueControls.Forms
             // 
             // Vorschau
             // 
-            this.Vorschau.ImageCode = "Datei||||||||||Lupe";
+            this.Vorschau.ImageCode = "Datei|36|||||||||Lupe";
             this.Vorschau.Location = new System.Drawing.Point(184, 8);
             this.Vorschau.Name = "Vorschau";
             this.Vorschau.Size = new System.Drawing.Size(168, 48);
@@ -419,12 +419,12 @@ namespace BlueControls.Forms
             // 
             // Button_PageSetup
             // 
-            this.Button_PageSetup.ImageCode = "SeiteEinrichten";
+            this.Button_PageSetup.ImageCode = "SeiteEinrichten|36";
             this.Button_PageSetup.Location = new System.Drawing.Point(8, 8);
             this.Button_PageSetup.Name = "Button_PageSetup";
             this.Button_PageSetup.Size = new System.Drawing.Size(168, 48);
             this.Button_PageSetup.TabIndex = 13;
-            this.Button_PageSetup.Text = "Drucker einreichten";
+            this.Button_PageSetup.Text = "Drucker einrichten";
             this.Button_PageSetup.Click += new System.EventHandler(this.Button_PageSetup_Click);
             // 
             // PrintPad
