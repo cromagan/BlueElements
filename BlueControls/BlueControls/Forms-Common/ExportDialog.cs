@@ -392,9 +392,8 @@ namespace BlueControls.Forms
             GeneratePrintPad(0);
         }
 
-        private void Druckenxxx_Click(object sender, System.EventArgs e)
+        private void btnDrucken_Click(object sender, System.EventArgs e)
         {
-            ItemNrForPrint = 0;
             PrintPad.Print();
             // Den Rest mach 'PrintPad.PrintPage'
         }
@@ -402,7 +401,13 @@ namespace BlueControls.Forms
 
         private void PrintPad_PrintPage(object sender, PrintPageEventArgs e)
         {
+
+            var l = Liste.Count;
+
             ItemNrForPrint = GeneratePrintPad(ItemNrForPrint);
+
+
+            if (l == Liste.Count) { return; }
 
             e.HasMorePages = Convert.ToBoolean(ItemNrForPrint < Liste.Count);
 
@@ -419,6 +424,7 @@ namespace BlueControls.Forms
 
         private void Vorschau_Click(object sender, System.EventArgs e)
         {
+            //ItemNrForPrint = 0;
             PrintPad.ShowPrintPreview();
         }
 
@@ -507,6 +513,9 @@ namespace BlueControls.Forms
 
         }
 
-
+        private void PrintPad_BeginnPrint(object sender, PrintEventArgs e)
+        {
+            ItemNrForPrint = 0;
+        }
     }
 }

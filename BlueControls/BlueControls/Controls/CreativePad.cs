@@ -157,6 +157,9 @@ namespace BlueControls.Controls
         public event EventHandler NeedRefresh;
 
         public event PrintPageEventHandler PrintPage;
+
+        public event PrintEventHandler BeginnPrint;
+        public event PrintEventHandler EndPrint;
         #endregion
 
 
@@ -2666,18 +2669,20 @@ namespace BlueControls.Controls
         }
 
 
-        private void PrintDocument1_PrintPage(object sender, PrintPageEventArgs e)
+        private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e)
         {
             e.HasMorePages = false;
 
             OnPrintPage(e);
 
 
-
-            //   e.HasMorePages = False
-            var i = ToBitmap(2).Resize(e.PageBounds.Width, e.PageBounds.Height, enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern, InterpolationMode.HighQualityBicubic, true);
+            var i = ToBitmap(5);// .Resize(e.PageBounds.Width, e.PageBounds.Height, enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern, InterpolationMode.HighQualityBicubic, true);
             if (i == null) { return; }
-            e.Graphics.DrawImage(i, (int)((e.PageBounds.Width - i.Width) / 2.0), (int)((e.PageBounds.Height - i.Height) / 2.0), i.Width, i.Height);
+
+
+            e.Graphics.DrawImageInRectAspectRatio(i,0,0, e.PageBounds.Width, e.PageBounds.Height);
+
+//            e.Graphics.DrawImage(i, (e.PageBounds.Width - i.Width) / 2, (e.PageBounds.Height - i.Height) / 2, e.PageBounds.Width, e.PageBounds.Height);
         }
 
         private void OnPrintPage(PrintPageEventArgs e)
@@ -2764,10 +2769,7 @@ namespace BlueControls.Controls
         {
 
 
-            if (RepairPrinterData_Prepaired)
-            {
-                return;
-            }
+            if (RepairPrinterData_Prepaired) { return; }
 
             RepairPrinterData_Prepaired = true;
 
@@ -2788,7 +2790,7 @@ namespace BlueControls.Controls
             {
                 DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)(SheetSizeInMM.Width / 25.4 * 100), (int)(SheetSizeInMM.Height / 25.4 * 100));
             }
-
+            DruckerDokument.DefaultPageSettings.PrinterResolution = DruckerDokument.DefaultPageSettings.PrinterSettings.PrinterResolutions[0];
             DruckerDokument.OriginAtMargins = true;
             DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(RandinMM.Left / 25.4 * 100), (int)(RandinMM.Right / 25.4 * 100), (int)(RandinMM.Top / 25.4 * 100), (int)(RandinMM.Bottom / 25.4 * 100));
         }
@@ -3494,8 +3496,27 @@ namespace BlueControls.Controls
             return R;
         }
 
+        private void DruckerDokument_BeginPrint(object sender, PrintEventArgs e)
+        {
+            OnBeginnPrint(e);
+        }
+
+        private void DruckerDokument_EndPrint(object sender, PrintEventArgs e)
+        {
+            OnEndPrint(e);
+        }
 
 
+
+        private void OnBeginnPrint(PrintEventArgs e)
+        {
+            BeginnPrint?.Invoke(this, e);
+        }
+
+        private void OnEndPrint(PrintEventArgs e)
+        {
+            EndPrint?.Invoke(this, e);
+        }
 
 
 

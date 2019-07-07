@@ -19,11 +19,11 @@ namespace BlueControls.Controls
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            ComponentResourceManager resources = new ComponentResourceManager(typeof(CreativePad));
-            this.SliderY = new  Slider();
-            this.SliderX = new  Slider();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreativePad));
+            this.SliderY = new BlueControls.Controls.Slider();
+            this.SliderX = new BlueControls.Controls.Slider();
             this.PrintPreviewDialog1 = new System.Windows.Forms.PrintPreviewDialog();
-            this.DruckerDokument = new PrintDocument();
+            this.DruckerDokument = new System.Drawing.Printing.PrintDocument();
             this.PrintDialog1 = new System.Windows.Forms.PrintDialog();
             this.PicsSave = new System.Windows.Forms.SaveFileDialog();
             this.SuspendLayout();
@@ -32,35 +32,37 @@ namespace BlueControls.Controls
             // 
             this.SliderY.CausesValidation = false;
             this.SliderY.Dock = System.Windows.Forms.DockStyle.Right;
-            this.SliderY.Location = new Point(480, 0);
+            this.SliderY.Location = new System.Drawing.Point(480, 0);
             this.SliderY.Name = "SliderY";
-            this.SliderY.Orientation = enOrientation.Senkrecht;
-            this.SliderY.Size = new Size(18, 362);
-            this.SliderY.ValueChanged += new EventHandler(this.SliderY_ValueChanged);
+            this.SliderY.Orientation = BlueBasics.Enums.enOrientation.Senkrecht;
+            this.SliderY.Size = new System.Drawing.Size(18, 362);
+            this.SliderY.ValueChanged += new System.EventHandler(this.SliderY_ValueChanged);
             // 
             // SliderX
             // 
             this.SliderX.CausesValidation = false;
             this.SliderX.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.SliderX.Location = new Point(0, 344);
+            this.SliderX.Location = new System.Drawing.Point(0, 344);
             this.SliderX.Name = "SliderX";
-            this.SliderX.Size = new Size(480, 18);
-            this.SliderX.ValueChanged += new EventHandler(this.SliderX_ValueChanged);
+            this.SliderX.Size = new System.Drawing.Size(480, 18);
+            this.SliderX.ValueChanged += new System.EventHandler(this.SliderX_ValueChanged);
             // 
             // PrintPreviewDialog1
             // 
-            this.PrintPreviewDialog1.AutoScrollMargin = new Size(0, 0);
-            this.PrintPreviewDialog1.AutoScrollMinSize = new Size(0, 0);
-            this.PrintPreviewDialog1.ClientSize = new Size(400, 300);
+            this.PrintPreviewDialog1.AutoScrollMargin = new System.Drawing.Size(0, 0);
+            this.PrintPreviewDialog1.AutoScrollMinSize = new System.Drawing.Size(0, 0);
+            this.PrintPreviewDialog1.ClientSize = new System.Drawing.Size(400, 300);
             this.PrintPreviewDialog1.Document = this.DruckerDokument;
             this.PrintPreviewDialog1.Enabled = true;
-            this.PrintPreviewDialog1.Icon = ((Icon)(resources.GetObject("PrintPreviewDialog1.Icon")));
+            this.PrintPreviewDialog1.Icon = ((System.Drawing.Icon)(resources.GetObject("PrintPreviewDialog1.Icon")));
             this.PrintPreviewDialog1.Name = "PrintPreviewDialog1";
             this.PrintPreviewDialog1.Visible = false;
             // 
             // DruckerDokument
             // 
-            this.DruckerDokument.PrintPage += new PrintPageEventHandler(this.PrintDocument1_PrintPage);
+            this.DruckerDokument.BeginPrint += new System.Drawing.Printing.PrintEventHandler(this.DruckerDokument_BeginPrint);
+            this.DruckerDokument.EndPrint += new System.Drawing.Printing.PrintEventHandler(this.DruckerDokument_EndPrint);
+            this.DruckerDokument.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.DruckerDokument_PrintPage);
             // 
             // PrintDialog1
             // 
@@ -69,16 +71,15 @@ namespace BlueControls.Controls
             // PicsSave
             // 
             this.PicsSave.Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|BMP Windows Bitmap" +
-                                   "|*.bmp";
+    "|*.bmp";
             this.PicsSave.Title = "Bitte neuen Dateinamen der Datei wählen.";
-            this.PicsSave.FileOk += new CancelEventHandler(this.PicsSave_FileOk);
+            this.PicsSave.FileOk += new System.ComponentModel.CancelEventHandler(this.PicsSave_FileOk);
             // 
             // CreativePad
             // 
             this.Controls.Add(this.SliderX);
             this.Controls.Add(this.SliderY);
-            this.Name = "CreativePad";
-            this.Size = new Size(498, 362);
+            this.Size = new System.Drawing.Size(498, 362);
             this.ResumeLayout(false);
 
         }

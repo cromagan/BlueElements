@@ -62,7 +62,7 @@ namespace BlueControls.Forms
             this.Exported = new BlueControls.Controls.ListBox();
             this.TabDrucken = new BlueControls.Controls.TabPage();
             this.Vorschau = new BlueControls.Controls.Button();
-            this.Druckenxxx = new BlueControls.Controls.Button();
+            this.btnDrucken = new BlueControls.Controls.Button();
             this.Button_PageSetup = new BlueControls.Controls.Button();
             this.PrintPad = new BlueControls.Controls.CreativePad();
             this.Tabs.SuspendLayout();
@@ -262,7 +262,7 @@ namespace BlueControls.Forms
             // Caption2
             // 
             this.Caption2.CausesValidation = false;
-            this.Caption2.Location = new System.Drawing.Point(8, 32);
+            this.Caption2.Location = new System.Drawing.Point(16, 32);
             this.Caption2.Name = "Caption2";
             this.Caption2.Size = new System.Drawing.Size(280, 24);
             this.Caption2.Text = "<b><u>Art des Exportes:";
@@ -386,7 +386,7 @@ namespace BlueControls.Forms
             // TabDrucken
             // 
             this.TabDrucken.Controls.Add(this.Vorschau);
-            this.TabDrucken.Controls.Add(this.Druckenxxx);
+            this.TabDrucken.Controls.Add(this.btnDrucken);
             this.TabDrucken.Controls.Add(this.Button_PageSetup);
             this.TabDrucken.Controls.Add(this.PrintPad);
             this.TabDrucken.Location = new System.Drawing.Point(4, 25);
@@ -405,17 +405,17 @@ namespace BlueControls.Forms
             this.Vorschau.Text = "Vorschau";
             this.Vorschau.Click += new System.EventHandler(this.Vorschau_Click);
             // 
-            // Druckenxxx
+            // btnDrucken
             // 
-            this.Druckenxxx.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Druckenxxx.ImageCode = "Drucker|24";
-            this.Druckenxxx.Location = new System.Drawing.Point(600, 633);
-            this.Druckenxxx.Name = "Druckenxxx";
-            this.Druckenxxx.QuickInfo = "Öffnet den Drucker-Dialog.";
-            this.Druckenxxx.Size = new System.Drawing.Size(112, 48);
-            this.Druckenxxx.TabIndex = 14;
-            this.Druckenxxx.Text = "Drucken";
-            this.Druckenxxx.Click += new System.EventHandler(this.Druckenxxx_Click);
+            this.btnDrucken.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDrucken.ImageCode = "Drucker|24";
+            this.btnDrucken.Location = new System.Drawing.Point(600, 633);
+            this.btnDrucken.Name = "btnDrucken";
+            this.btnDrucken.QuickInfo = "Öffnet den Drucker-Dialog.";
+            this.btnDrucken.Size = new System.Drawing.Size(112, 48);
+            this.btnDrucken.TabIndex = 14;
+            this.btnDrucken.Text = "Drucken";
+            this.btnDrucken.Click += new System.EventHandler(this.btnDrucken_Click);
             // 
             // Button_PageSetup
             // 
@@ -448,6 +448,7 @@ namespace BlueControls.Forms
             this.PrintPad.Size = new System.Drawing.Size(706, 568);
             this.PrintPad.TabIndex = 2;
             this.PrintPad.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.PrintPad_PrintPage);
+            this.PrintPad.BeginnPrint += new System.Drawing.Printing.PrintEventHandler(this.PrintPad_BeginnPrint);
             // 
             // ExportDialog
             // 
@@ -455,6 +456,7 @@ namespace BlueControls.Forms
             this.Controls.Add(this.Tabs);
             this.Controls.Add(this.c_Layoutx);
             this.Controls.Add(this.Caption3);
+            this.Design = BlueControls.Enums.enDesign.Form_Standard;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;
             this.Name = "ExportDialog";
@@ -500,7 +502,7 @@ namespace BlueControls.Forms
 			internal Button WeiterAktion;
 			internal CreativePad PrintPad;
 			internal Button Button_PageSetup;
-			private Button Druckenxxx;
+			private Button btnDrucken;
 			private Button Vorschau;
 		}
 	}
