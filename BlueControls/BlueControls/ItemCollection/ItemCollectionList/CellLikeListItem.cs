@@ -107,7 +107,7 @@ namespace BlueControls.ItemCollection
 
         public override SizeF SizeUntouchedForListBox()
         {
-            return Table.FormatedText_NeededSize(_StyleLikeThis, _Internal, null, GenericControl.Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16);
+            return Table.FormatedText_NeededSize(_StyleLikeThis, _Internal, null, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16);
         }
 
 
@@ -116,14 +116,14 @@ namespace BlueControls.ItemCollection
 
             if (DrawBorderAndBack)
             {
-                GenericControl.Skin.Draw_Back(GR, Parent.ItemDesign, vState, PositionModified, null, false);
+                Skin.Draw_Back(GR, Parent.ItemDesign, vState, PositionModified, null, false);
             }
 
-            Table.Draw_FormatedText(_StyleLikeThis, _Internal, null, GR, PositionModified, null, false, GenericControl.Skin.SkinRow(Parent.ItemDesign, vState), _style);
+            Table.Draw_FormatedText(_StyleLikeThis, _Internal, null, GR, PositionModified, null, false, Skin.SkinRow(Parent.ItemDesign, vState), _style);
 
             if (DrawBorderAndBack)
             {
-                GenericControl.Skin.Draw_Border(GR, Parent.ItemDesign, vState, PositionModified);
+                Skin.Draw_Border(GR, Parent.ItemDesign, vState, PositionModified);
             }
         }
 

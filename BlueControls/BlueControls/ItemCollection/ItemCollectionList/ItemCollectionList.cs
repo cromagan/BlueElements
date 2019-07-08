@@ -447,7 +447,7 @@ namespace BlueControls.ItemCollection
                             var TestSP = 0;
                             for (TestSP = 10; TestSP >= 1; TestSP--)
                             {
-                                Max = new SizeF(BiggestWidth * TestSP + TestSP * GenericControl.Skin.PaddingSmal, Bigy / TestSP);
+                                Max = new SizeF(BiggestWidth * TestSP + TestSP * Skin.PaddingSmal, Bigy / TestSP);
 
                                 // Wenn die MindestWidth nicht abgefragt wird, wird die Width nachher erhöht erhöhe sich die Spalten. Und dann ist die Height falsch
                                 if (Max.Width > 150 && Max.Width < 500 && Max.Height < 500 && Count / (double)TestSP > TestSP)
@@ -463,7 +463,7 @@ namespace BlueControls.ItemCollection
                             if (TestSP < 2 && WouldBeGood > 0)
                             {
                                 TestSP = WouldBeGood;
-                                Max = new SizeF(BiggestWidth * TestSP + TestSP * GenericControl.Skin.PaddingSmal, Bigy / TestSP);
+                                Max = new SizeF(BiggestWidth * TestSP + TestSP * Skin.PaddingSmal, Bigy / TestSP);
                             }
                         }
 
@@ -474,7 +474,7 @@ namespace BlueControls.ItemCollection
                     // Wenn die Maximale Höhe aller Items Größer als der Draw-Bereich ist, versuche, es auf mehrere Spalten aufzuteilen.
                     if (Bigy > Max.Height)
                     {
-                        Sp = (int)(Math.Truncate(Max.Width / (BiggestWidth + GenericControl.Skin.PaddingSmal)));
+                        Sp = (int)(Math.Truncate(Max.Width / (BiggestWidth + Skin.PaddingSmal)));
                         if (Sp > 1 && !MustBeOneColumn)
                         {
                             if (Bigy / Sp > Max.Height)
@@ -496,7 +496,7 @@ namespace BlueControls.ItemCollection
                                 break;
                             }
 
-                            if (MultiX < BiggestWidth + GenericControl.Skin.PaddingSmal)
+                            if (MultiX < BiggestWidth + Skin.PaddingSmal)
                             {
                                 Sp -= 1;
                             }

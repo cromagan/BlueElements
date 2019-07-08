@@ -739,11 +739,11 @@ namespace BlueControls
 
             if ((int)_Design > 10000)
             {
-                BF = GenericControl.Skin.GetBlueFont((PadStyles)_Design, _Row);
+                BF = Skin.GetBlueFont((PadStyles)_Design, _Row);
             }
             else
             {
-                BF = GenericControl.Skin.GetBlueFont(_Design, _State);
+                BF = Skin.GetBlueFont(_Design, _State);
             }
 
             if (BF == null)
@@ -1118,41 +1118,41 @@ namespace BlueControls
 
                 case "H7":
                     Stufe = 7;
-                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
 
                 case "H6":
                     Stufe = 6;
-                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
 
                 case "H5":
                     Stufe = 5;
-                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
 
                 case "H4":
                     Stufe = 4;
-                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "H3":
                     Stufe = 3;
-                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
 
                 case "H2":
                     Stufe = 2;
-                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "H1":
                     Stufe = 1;
-                    PF = GenericControl.Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "MARKSTATE":
@@ -1362,7 +1362,7 @@ namespace BlueControls
 
             if (tmpFont == null)
             {
-                tmpFont = GenericControl.Skin.GetBlueFont(_Design, _State);
+                tmpFont = Skin.GetBlueFont(_Design, _State);
                 tmpState = _State;
                 tmpStufe = 4;
                 tmpMarkState = enMarkState.None;

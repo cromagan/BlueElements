@@ -236,7 +236,7 @@ namespace BlueControls.ItemCollection
 
         public override SizeF SizeUntouchedForListBox()
         {
-            return GenericControl.Skin.FormatedText_NeededSize(_ReadableText, _Symbol, GenericControl.Skin.GetBlueFont(tempDesign(), enStates.Standard), 16);
+            return Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(), enStates.Standard), 16);
         }
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate)
@@ -246,14 +246,14 @@ namespace BlueControls.ItemCollection
 
             if (DrawBorderAndBack)
             {
-                GenericControl.Skin.Draw_Back(GR, tmpd, vState, PositionModified, null, false);
+                Skin.Draw_Back(GR, tmpd, vState, PositionModified, null, false);
             }
 
-            GenericControl.Skin.Draw_FormatedText(GR, _ReadableText, tmpd, vState, _Symbol, enAlignment.VerticalCenter_Left, PositionModified, null, false, Translate);
+            Skin.Draw_FormatedText(GR, _ReadableText, tmpd, vState, _Symbol, enAlignment.VerticalCenter_Left, PositionModified, null, false, Translate);
 
             if (DrawBorderAndBack)
             {
-                GenericControl.Skin.Draw_Border(GR, tmpd, vState, PositionModified);
+                Skin.Draw_Border(GR, tmpd, vState, PositionModified);
             }
         }
 

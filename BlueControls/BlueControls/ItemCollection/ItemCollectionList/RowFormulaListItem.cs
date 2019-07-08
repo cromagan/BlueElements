@@ -152,7 +152,7 @@ namespace BlueControls.ItemCollection
 
             if (DrawBorderAndBack)
             {
-                GenericControl.Skin.Draw_Back(GR, Parent.ItemDesign, vState, PositionModified, null, false);
+                Skin.Draw_Back(GR, Parent.ItemDesign, vState, PositionModified, null, false);
             }
 
 
@@ -166,7 +166,7 @@ namespace BlueControls.ItemCollection
 
             if (DrawBorderAndBack)
             {
-                GenericControl.Skin.Draw_Border(GR, Parent.ItemDesign, vState, PositionModified);
+                Skin.Draw_Border(GR, Parent.ItemDesign, vState, PositionModified);
             }
         }
 

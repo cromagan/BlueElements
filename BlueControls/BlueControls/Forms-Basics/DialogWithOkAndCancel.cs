@@ -33,15 +33,15 @@ namespace BlueControls.DialogBoxes
 
             if (CancelPossible)
             {
-                butAbbrechen.Left = MinWidth - GenericControl.Skin.Padding - butAbbrechen.Width - BorderWidth;
-                butOK.Left = butAbbrechen.Left - GenericControl.Skin.Padding - butOK.Width;
+                butAbbrechen.Left = MinWidth - Skin.Padding - butAbbrechen.Width - BorderWidth;
+                butOK.Left = butAbbrechen.Left - Skin.Padding - butOK.Width;
             }
             else
             {
                 butAbbrechen.Visible = false;
                 butAbbrechen.Enabled = false;
 
-                butOK.Left = MinWidth - GenericControl.Skin.Padding - butOK.Width - BorderWidth;
+                butOK.Left = MinWidth - Skin.Padding - butOK.Width - BorderWidth;
             }
 
 
@@ -59,8 +59,8 @@ namespace BlueControls.DialogBoxes
 
         public void Setup(string TXT, GenericControl CenterControl, int MinWidth, bool CancelPossible, bool Sizeable)
         {
-            var wi = GenericControl.Skin.Padding * 2;
-            var he = GenericControl.Skin.Padding * 2;
+            var wi = Skin.Padding * 2;
+            var he = Skin.Padding * 2;
 
             if (!string.IsNullOrEmpty(TXT))
             {
@@ -76,7 +76,7 @@ namespace BlueControls.DialogBoxes
             if (CenterControl != null)
             {
                 CenterControl.Top = he;
-                he = he + CenterControl.Height + GenericControl.Skin.Padding;
+                he = he + CenterControl.Height + Skin.Padding;
             }
 
 

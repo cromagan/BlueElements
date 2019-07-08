@@ -101,7 +101,7 @@ namespace BlueControls.Forms
                 FSize.Item.AddRange(FSList);
                 FSize.Item.Sort();
 
-                Font = BlueFont.Get(clsSkin.DummyStandardFont); //, False, False, False, False, False, "000000", "", False)
+                Font = BlueFont.Get(Skin.DummyStandardFont); //, False, False, False, False, False, "000000", "", False)
 
                 UpdateSampleText();
             }
@@ -117,7 +117,7 @@ namespace BlueControls.Forms
                 {
 
                     Adding = true;
-                    if (value == null) { value = BlueFont.Get(clsSkin.DummyStandardFont); }
+                    if (value == null) { value = BlueFont.Get(Skin.DummyStandardFont); }
 
 
                     if (FName.Item[value.FontName] == null) { FName.Item.Add(new TextListItem(value.FontName, value.FontName, QuickImage.Get(enImageCode.Warnung, 20))); }

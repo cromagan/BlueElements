@@ -271,7 +271,7 @@ namespace BlueControls.ItemCollection
 
             if (DrawBorderAndBack)
             {
-                GenericControl.Skin.Draw_Back(GR, Parent.ItemDesign, vState, PositionModified, null, false);
+                Skin.Draw_Back(GR, Parent.ItemDesign, vState, PositionModified, null, false);
             }
             var DCoordinates = PositionModified;
             DCoordinates.Inflate(-_padding, -_padding);
@@ -324,7 +324,7 @@ namespace BlueControls.ItemCollection
                 foreach (var ThisCap in _captiontmp)
                 {
                     c--;
-                    var s = GenericControl.Skin.FormatedText_NeededSize(ThisCap, null, GenericControl.Skin.GetBlueFont(enDesign.Item_Listbox, vState), 16);
+                    var s = Skin.FormatedText_NeededSize(ThisCap, null, Skin.GetBlueFont(enDesign.Item_Listbox, vState), 16);
                     var r = new Rectangle((int)(DCoordinates.Left + (DCoordinates.Width - s.Width) / 2.0), (int)(DCoordinates.Bottom - s.Height) - 3, (int)s.Width, (int)s.Height);
 
                     r.X = r.X - trp.X;
@@ -336,7 +336,7 @@ namespace BlueControls.ItemCollection
                     //r = new Rectangle(r.Left - trp.X, r.Top - trp.Y, r.Width, r.Height);
                     //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);
                     //GenericControl.Skin.Draw_Border(GR, enDesign.Item_Listbox_Unterschrift, vState, r);
-                    GenericControl.Skin.Draw_FormatedText(GR, ThisCap, enDesign.Item_Listbox, vState, null, enAlignment.Horizontal_Vertical_Center, r, null, false, false);
+                    Skin.Draw_FormatedText(GR, ThisCap, enDesign.Item_Listbox, vState, null, enAlignment.Horizontal_Vertical_Center, r, null, false, false);
 
                 }
             }
@@ -348,7 +348,7 @@ namespace BlueControls.ItemCollection
 
             if (DrawBorderAndBack)
             {
-                GenericControl.Skin.Draw_Border(GR, Parent.ItemDesign, vState, PositionModified);
+                Skin.Draw_Border(GR, Parent.ItemDesign, vState, PositionModified);
             }
 
         }

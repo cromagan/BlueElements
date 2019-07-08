@@ -127,7 +127,7 @@ namespace BlueControls.ItemCollection
         {
             if (Format == PadStyles.Undefiniert) { return; }
 
-            var c = GenericControl.Skin.GetBlueFont(Format, Parent.SheetStyle).Color_Main;
+            var c = Skin.GetBlueFont(Format, Parent.SheetStyle).Color_Main;
 
 
             var p = new Pen(Color.FromArgb(30, c.R, c.G, c.B), 1);
@@ -221,20 +221,7 @@ namespace BlueControls.ItemCollection
         public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
         {
             var l = new List<FlexiControl>();
-
-            var Rahms = new ItemCollectionList();
-            //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Kapitel, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Standard).ToString(), "Standard", GenericControl.Skin.GetBlueFont(PadStyles.Style_Standard, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardFett, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardAlternativ, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GenericControl.Skin.GetBlueFont(PadStyles.Style_KleinerZusatz, Parent.SheetStyle).SymbolOfLine()));
-            Rahms.Sort();
-
-
-            l.Add(new FlexiControl("Stil", ((int)Format).ToString(), Rahms));
+            l.Add(new FlexiControl("Stil", ((int)Format).ToString(), Skin.GetRahmenArt(Parent.SheetStyle)));
             return l;
         }
 

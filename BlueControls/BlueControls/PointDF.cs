@@ -495,8 +495,8 @@ namespace BlueControls
 
             var r = new Rectangle((int)(tx - 4), (int)(ty - 4), 9, 9);
 
-            GenericControl.Skin.Draw_Back(GR, Type, State, r, null, false);
-            GenericControl.Skin.Draw_Border(GR, Type, State, r);
+            Skin.Draw_Back(GR, Type, State, r, null, false);
+            Skin.Draw_Border(GR, Type, State, r);
 
 
             if (CreativePad.Debug_ShowPointOrder)

@@ -260,8 +260,8 @@ namespace BlueControls.Forms
 
             var TMPGR = Graphics.FromImage(BackgroundImage);
 
-            GenericControl.Skin.Draw_Back(TMPGR, Design, enStates.Standard, DisplayRectangle, null, false);
-            GenericControl.Skin.Draw_Border(TMPGR, Design, enStates.Standard, DisplayRectangle);
+            Skin.Draw_Back(TMPGR, Design, enStates.Standard, DisplayRectangle, null, false);
+            Skin.Draw_Border(TMPGR, Design, enStates.Standard, DisplayRectangle);
         }
 
 

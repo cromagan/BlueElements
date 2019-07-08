@@ -270,7 +270,7 @@ namespace BlueControls.ItemCollection
 
             if (Format == PadStyles.Undefiniert) { return; }
             var geszoom = cZoom * Parent.SheetStyleScale * ZusatzScale;
-            var f = GenericControl.Skin.GetBlueFont(Format, Parent.SheetStyle);
+            var f = Skin.GetBlueFont(Format, Parent.SheetStyle);
 
             var PfeilG = (decimal)f.Font(geszoom).Size * 0.8m;
             var pen2 = f.Pen(cZoom);
@@ -347,7 +347,7 @@ namespace BlueControls.ItemCollection
             if (Format == PadStyles.Undefiniert) { return new RectangleDF(0, 0, 0, 0); }
             var geszoom = Parent.SheetStyleScale * ZusatzScale;
 
-            var f = GenericControl.Skin.GetBlueFont(Format, Parent.SheetStyle);
+            var f = Skin.GetBlueFont(Format, Parent.SheetStyle);
 
             var sz1 = DummyGraphics().MeasureString(AngezeigterText1(), f.Font(geszoom));
             var sz2 = DummyGraphics().MeasureString(Text2, f.Font(geszoom));
@@ -449,19 +449,8 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl("Text (unten)", Text2, enDataFormat.Text, 1));
 
 
-            //   l.Add(New BlueFlexiControl(enFlexiblEditType.YesNo, "Immer waagerecht", ImmerWaagerecht.ToPlusMinus()))
 
-            var Rahms = new ItemCollectionList();
-            //  Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Haupt, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Untertitel, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GenericControl.Skin.GetBlueFont(PadStyles.Style_Überschrift_Kapitel, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Standard).ToString(), "Standard", GenericControl.Skin.GetBlueFont(PadStyles.Style_Standard, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardFett, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GenericControl.Skin.GetBlueFont(PadStyles.Style_StandardAlternativ, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GenericControl.Skin.GetBlueFont(PadStyles.Style_KleinerZusatz, Parent.SheetStyle).SymbolForReadableText()));
-            Rahms.Sort();
-            l.Add(new FlexiControl("Stil", ((int)Format).ToString(), Rahms));
+            l.Add(new FlexiControl("Stil", ((int)Format).ToString(), Skin.GetFonts(Parent.SheetStyle)));
 
             l.Add(new FlexiControl("Skalierung", ZusatzScale.ToString(), enDataFormat.Gleitkommazahl, 1));
             return l;

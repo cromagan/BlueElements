@@ -43,7 +43,7 @@ namespace BlueControls.Controls
 {
     public class GenericControl : System.Windows.Forms.Control
     {
-        public static readonly clsSkin Skin = new clsSkin();
+        protected static readonly Skin Skin = Skin.Instance;
         protected RowItem tmpSkinRow;
 
 
@@ -219,11 +219,11 @@ namespace BlueControls.Controls
             {
                 if (!Visible && !IgnoreVisible) { return; }
 
-                if (!Skin.IsReady())
+                if (Skin.SkinDB == null)
                 {
                     if (DesignMode)
                     {
-                        Skin.Skin = enSkin.Windows_10;
+                        Skin.SkinDesign = enSkin.Windows_10;
                     }
                     else
                     {

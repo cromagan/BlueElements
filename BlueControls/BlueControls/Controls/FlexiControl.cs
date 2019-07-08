@@ -511,7 +511,7 @@ namespace BlueControls.Controls
 
             var TMPGR = Graphics.FromImage(_BitmapOfControl);
 
-            clsSkin.Draw_Back_Transparent(TMPGR, ClientRectangle, this);
+            Skin.Draw_Back_Transparent(TMPGR, ClientRectangle, this);
 
 
             if (_Color.A != 0 && state != enStates.Standard_Disabled)

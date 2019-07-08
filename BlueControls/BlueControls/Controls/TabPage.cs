@@ -52,7 +52,7 @@ namespace BlueControls.Controls
             SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
 
-            GenericControl.Skin.SkinChanged += SkinChanged;
+            Skin.Instance.SkinChanged += SkinChanged;
 
         }
 
@@ -70,7 +70,7 @@ namespace BlueControls.Controls
                 //    components.Dispose()
                 //End If
             }
-            GenericControl.Skin.SkinChanged -= SkinChanged;
+            Skin.Instance.SkinChanged -= SkinChanged;
             base.Dispose(disposing);
         }
 
@@ -153,7 +153,7 @@ namespace BlueControls.Controls
 
         private void DoDraw(Graphics GR)
         {
-            if (!GenericControl.Skin.IsReady()) { return; }
+            if (Skin.SkinDB == null) { return; }
 
             if (Width < 1 || Height < 1) { return; }
 
@@ -168,13 +168,13 @@ namespace BlueControls.Controls
             {
                 if (((TabControl)Parent).IsRibbonBar)
                 {
-                    TMPGR.Clear(GenericControl.Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard));
-                    GenericControl.Skin.Draw_Back(TMPGR, enDesign.RibbonBar_Body, enStates.Standard, ClientRectangle, this, true);
+                    TMPGR.Clear(Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard));
+                    Skin.Draw_Back(TMPGR, enDesign.RibbonBar_Body, enStates.Standard, ClientRectangle, this, true);
                 }
                 else
                 {
-                    TMPGR.Clear(GenericControl.Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard));
-                    GenericControl.Skin.Draw_Back(TMPGR, enDesign.TabStrip_Body, enStates.Standard, ClientRectangle, this, true);
+                    TMPGR.Clear(Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard));
+                    Skin.Draw_Back(TMPGR, enDesign.TabStrip_Body, enStates.Standard, ClientRectangle, this, true);
                 }
             }
 

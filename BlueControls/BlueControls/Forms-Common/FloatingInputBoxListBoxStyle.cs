@@ -45,8 +45,8 @@ namespace BlueControls.DialogBoxes
             this.Tag = Tag;
             Design = Items.ControlDesign;
 
-            Xpos -= GenericControl.Skin.PaddingSmal;
-            Ypos -= GenericControl.Skin.PaddingSmal;
+            Xpos -= Skin.PaddingSmal;
+            Ypos -= Skin.PaddingSmal;
 
             Generate_ListBox1(Items, SteuerWi, enAddType.None, Translate);
 
@@ -110,8 +110,8 @@ namespace BlueControls.DialogBoxes
                 lstbx.Appearance == enBlueListBoxAppearance.Gallery ||
                 lstbx.Appearance == enBlueListBoxAppearance.FileSystem)
             {
-                He += GenericControl.Skin.PaddingSmal * 2;
-                He = Math.Max(He, 5 * 16 + GenericControl.Skin.PaddingSmal * 2 + 24);
+                He += Skin.PaddingSmal * 2;
+                He = Math.Max(He, 5 * 16 + Skin.PaddingSmal * 2 + 24);
                 Wi = Math.Max(Wi, 250);
             }
             else

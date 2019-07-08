@@ -78,9 +78,9 @@ namespace BlueControls.BlueDatabaseDialogs
             var List_FilterString = Column.Autofilter_ItemList(vFilter);
 
 
-            var F = GenericControl.Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
+            var F = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
 
-            Width = Math.Max(TXTBox.Width + GenericControl.Skin.Padding * 2, Table.tmpColumnContentWidth(Column, F, 16));
+            Width = Math.Max(TXTBox.Width + Skin.Padding * 2, Table.tmpColumnContentWidth(Column, F, 16));
 
             FiltItems.Item.Clear();
             FiltItems.CheckBehavior = enCheckBehavior.MultiSelection;
@@ -99,12 +99,12 @@ namespace BlueControls.BlueDatabaseDialogs
             FiltItems.Item.ComputeAllItemPositions(new Size(10, 10), true, false, enBlueListBoxAppearance.Autofilter, null, null);
             var PrefSize = FiltItems.Item.MaximumBounds();
             FiltItems.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Top;
-            FiltItems.Width = Math.Min(Table.tmpColumnContentWidth(Column, F, 16), Width - GenericControl.Skin.PaddingSmal * 2);
+            FiltItems.Width = Math.Min(Table.tmpColumnContentWidth(Column, F, 16), Width - Skin.PaddingSmal * 2);
 
             FiltItems.Width = Math.Max(FiltItems.Width, PrefSize.Width);
             FiltItems.Height = Math.Max(FiltItems.Height, PrefSize.Height);
 
-            FiltItems.Width = Math.Max(FiltItems.Width, Width - GenericControl.Skin.PaddingSmal * 2);
+            FiltItems.Width = Math.Max(FiltItems.Width, Width - Skin.PaddingSmal * 2);
 
             FiltItems.Height = Math.Min(FiltItems.Height, 560);
 
@@ -158,8 +158,8 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
 
-            Width = Math.Max(FiltItems.Right + GenericControl.Skin.PaddingSmal * 2, Width);
-            Height = FiltItems.Bottom + GenericControl.Skin.PaddingSmal;
+            Width = Math.Max(FiltItems.Right + Skin.PaddingSmal * 2, Width);
+            Height = FiltItems.Bottom + Skin.PaddingSmal;
 
 
             if (vFilter != null)

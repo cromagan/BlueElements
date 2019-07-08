@@ -4030,7 +4030,7 @@ namespace BlueControls.Controls
             _ContentSize.Height = Math.Max(_ContentSize.Height, Pix16);
 
 
-            if (clsSkin.Scale == 1 && LanguageTool.Translation == null) { Column.Database.Cell.SetSizeOfCellContent(Column, Row, _ContentSize); }
+            if (Skin.Scale == 1 && LanguageTool.Translation == null) { Column.Database.Cell.SetSizeOfCellContent(Column, Row, _ContentSize); }
 
             return _ContentSize;
         }

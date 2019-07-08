@@ -200,7 +200,7 @@ namespace BlueControls.ItemCollection
                 {
                     if (!string.IsNullOrEmpty(FilterText) && !FilterMatch(FilterText))
                     {
-                        var c1 = GenericControl.Skin.Color_Back(Parent.ControlDesign, enStates.Standard); // Standard asl notlösung, um nicnt doppelt checken zu müssen
+                        var c1 = Skin.Color_Back(Parent.ControlDesign, enStates.Standard); // Standard asl notlösung, um nicnt doppelt checken zu müssen
                         c1 = c1.SetAlpha(160);
                         GR.FillRectangle(new SolidBrush(c1), PositionModified);
                     }

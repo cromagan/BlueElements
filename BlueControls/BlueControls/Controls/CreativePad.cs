@@ -581,8 +581,8 @@ namespace BlueControls.Controls
         {
             get
             {
-                if (clsSkin.StyleDB == null) { clsSkin.InitStyles(); }
-                if (clsSkin.StyleDB == null) { return string.Empty; }
+                if (Skin.StyleDB == null) { Skin.InitStyles(); }
+                if (Skin.StyleDB == null) { return string.Empty; }
                 if (_SheetStyle == null) { return string.Empty; }
 
                 return _SheetStyle.CellFirstString();
@@ -594,11 +594,11 @@ namespace BlueControls.Controls
 
                 if (!_isParsing && value == SheetStyle) { return; }
 
-                if (clsSkin.StyleDB == null) { clsSkin.InitStyles(); }
+                if (Skin.StyleDB == null) { Skin.InitStyles(); }
 
 
-                _SheetStyle = clsSkin.StyleDB.Row[value];
-                if (_SheetStyle == null) { _SheetStyle = clsSkin.StyleDB.Row.First(); }// Einfach die Erste nehmen
+                _SheetStyle = Skin.StyleDB.Row[value];
+                if (_SheetStyle == null) { _SheetStyle = Skin.StyleDB.Row.First(); }// Einfach die Erste nehmen
 
 
                 Item.SheetStyle = _SheetStyle;
@@ -2571,11 +2571,11 @@ namespace BlueControls.Controls
             _ExternalRelations.Clear();
 
 
-            if (clsSkin.StyleDB == null) { clsSkin.InitStyles(); }
+            if (Skin.StyleDB == null) { Skin.InitStyles(); }
             _SheetStyle = null;
             _SheetStyleScale = 1.0m;
 
-            if (clsSkin.StyleDB != null) { _SheetStyle = clsSkin.StyleDB.Row.First(); }
+            if (Skin.StyleDB != null) { _SheetStyle = Skin.StyleDB.Row.First(); }
 
             Item.SheetStyle = _SheetStyle;
             Item.SheetStyleScale = _SheetStyleScale;

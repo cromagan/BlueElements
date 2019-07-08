@@ -131,7 +131,7 @@ namespace BlueControls
 
             if (Math.Abs(Zoom - 1) < 0.001m && SizeOK(_Font.Size)) { return _Font; }
 
-            var GR = _FontOL.Size * (float)Zoom / clsSkin.Scale;
+            var GR = _FontOL.Size * (float)Zoom / Skin.Scale;
 
 
             if (SizeOK(GR))
@@ -153,7 +153,7 @@ namespace BlueControls
 
             if (Math.Abs(Zoom - 1) < 0.001 && SizeOK(_FontOL.Size)) { return _FontOL; }
 
-            var GR = _FontOL.Size * Zoom / clsSkin.Scale;
+            var GR = _FontOL.Size * Zoom / Skin.Scale;
 
 
             if (SizeOK(GR))
@@ -165,7 +165,7 @@ namespace BlueControls
         }
         public Font FontWithoutLinesForCapitals(float Zoom)
         {
-            return new Font(_FontOL.Name, _FontOL.Size * Zoom * 0.8F / clsSkin.Scale, _FontOL.Style, _FontOL.Unit);
+            return new Font(_FontOL.Name, _FontOL.Size * Zoom * 0.8F / Skin.Scale, _FontOL.Style, _FontOL.Unit);
         }
 
 
@@ -272,7 +272,7 @@ namespace BlueControls
 
             try
             {
-                DummyGraphics().DrawString("x", new Font(_Font.Name, S / clsSkin.Scale, _Font.Style, _Font.Unit), Brushes.Black, 0, 0);
+                DummyGraphics().DrawString("x", new Font(_Font.Name, S / Skin.Scale, _Font.Style, _Font.Unit), Brushes.Black, 0, 0);
                 TestesOK = S;
                 return true;
 
@@ -403,13 +403,13 @@ namespace BlueControls
             IsParsing = false;
 
 
-            _Font = new Font(FontName, FontSize / clsSkin.Scale, ftst);
-            _FontOL = new Font(FontName, FontSize / clsSkin.Scale, ftst2);
+            _Font = new Font(FontName, FontSize / Skin.Scale, ftst);
+            _FontOL = new Font(FontName, FontSize / Skin.Scale, ftst2);
 
             // Die Oberlänge immer berechnen, Symbole benötigen die exacte höhe
             var Multi = 50 / _FontOL.Size; // Zu große Schriften verursachen bei manchen Fonts Fehler!!!
 
-            var tmpfont = new Font(_FontOL.Name, _FontOL.Size * Multi / clsSkin.Scale, _FontOL.Style);
+            var tmpfont = new Font(_FontOL.Name, _FontOL.Size * Multi / Skin.Scale, _FontOL.Style);
             var f = DummyGraphics().MeasureString("Z", tmpfont);
             var bmp = new Bitmap((int)(f.Width + 1), (int)(f.Height + 1));
             var gr = Graphics.FromImage(bmp);
@@ -420,7 +420,7 @@ namespace BlueControls
                 gr.Clear(Color.White);
                 if (du == 1)
                 {
-                    tmpfont = new Font(_FontOL.Name, _FontOL.Size * Multi * 0.8F / clsSkin.Scale, _FontOL.Style);
+                    tmpfont = new Font(_FontOL.Name, _FontOL.Size * Multi * 0.8F / Skin.Scale, _FontOL.Style);
                 }
                 gr.DrawString("Z", tmpfont, Brushes.Black, 0, 0);
 
@@ -599,14 +599,14 @@ namespace BlueControls
                 gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
 
-                var etxt = new ExtText(enDesign.TextBox, enStates.Standard);
-                etxt.MaxHeight = 500;
-                etxt.MaxWidth = 500;
-                etxt.PlainText = Text;
-                etxt.Draw(gr, 1);
+                //var etxt = new ExtText(enDesign.TextBox, enStates.Standard);
+                //etxt.MaxHeight = 500;
+                //etxt.MaxWidth = 500;
+                //etxt.PlainText = Text;
+                //etxt.Draw(gr, 1);
+                Skin.Draw_FormatedText(gr, Text, null, enAlignment.Top_Left, new Rectangle(0,0,1000,1000), null, false, this, false);
 
-
-                //  gr.DrawString("Text", Font(), Brush_Color_Main, 0, 0) ', System.Drawing.StringFormat.GenericTypographic)
+               // gr.DrawString("Text", Font(), Brush_Color_Main, 0, 0) ', System.Drawing.StringFormat.GenericTypographic)
             }
 
 

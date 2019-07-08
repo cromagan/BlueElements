@@ -467,7 +467,7 @@ namespace BlueControls.Controls
                 if (tmp == enDesign.ListBox) { Skin.Draw_Border(gr, tmp, vStateBox, BorderCoords); }
             }
 
-            if (PaintModYx > 0) { clsSkin.Draw_Back_Transparent(gr, new Rectangle(0, BorderCoords.Bottom, Width, PaintModYx), this); }
+            if (PaintModYx > 0) { Skin.Draw_Back_Transparent(gr, new Rectangle(0, BorderCoords.Bottom, Width, PaintModYx), this); }
         }
 
         private void SliderY_ValueChange(object sender, System.EventArgs e)

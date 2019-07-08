@@ -59,7 +59,7 @@ namespace BlueControls
 
             if (MaxLines < 1) { MaxLines = 100; }
 
-            var F = GenericControl.Skin.GetBlueFont(design, state);
+            var F = Skin.GetBlueFont(design, state);
 
 
 

@@ -221,12 +221,12 @@ namespace BlueControls.ItemCollection
                         break;
 
                     case "sheetstyle":
-                        if (clsSkin.StyleDB == null)
+                        if (Skin.StyleDB == null)
                         {
-                            clsSkin.InitStyles();
+                            Skin.InitStyles();
                         }
 
-                        _sheetStyle = clsSkin.StyleDB.Row[pair.Value];
+                        _sheetStyle = Skin.StyleDB.Row[pair.Value];
                         break;
 
                     case "sheetstylescale":

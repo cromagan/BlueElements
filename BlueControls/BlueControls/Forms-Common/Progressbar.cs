@@ -117,11 +117,11 @@ namespace BlueControls.DialogBoxes
         //    _PrBarText = txt;
 
 
-        //    frmProgressBar.Generate_Caption(txt, GenericControl.Skin.Padding, GenericControl.Skin.Padding);
+        //    frmProgressBar.Generate_Caption(txt, Skin.Padding, Skin.Padding);
 
-        //    if (frmProgressBar._Caption1.Width + GenericControl.Skin.Padding * 2 != frmProgressBar.Width)
+        //    if (frmProgressBar._Caption1.Width + Skin.Padding * 2 != frmProgressBar.Width)
         //    {
-        //        frmProgressBar.Width = Math.Max(frmProgressBar._Caption1.Width + GenericControl.Skin.Padding * 2, frmProgressBar.Width);
+        //        frmProgressBar.Width = Math.Max(frmProgressBar._Caption1.Width + Skin.Padding * 2, frmProgressBar.Width);
         //        if (Parentform != null)
         //        {
         //            frmProgressBar.Left = (int)(Parentform.Left + (Parentform.Width - frmProgressBar.Width) / 2.0);
@@ -132,9 +132,9 @@ namespace BlueControls.DialogBoxes
         //        }
         //    }
 
-        //    if (frmProgressBar._Caption1.Height + GenericControl.Skin.Padding * 2 != frmProgressBar.Height)
+        //    if (frmProgressBar._Caption1.Height + Skin.Padding * 2 != frmProgressBar.Height)
         //    {
-        //        frmProgressBar.Height = Math.Max(frmProgressBar._Caption1.Height + GenericControl.Skin.Padding * 2, frmProgressBar.Height);
+        //        frmProgressBar.Height = Math.Max(frmProgressBar._Caption1.Height + Skin.Padding * 2, frmProgressBar.Height);
         //        if (Parentform != null)
         //        {
         //            frmProgressBar.Top = (int)(Parentform.Top + (Parentform.Height - frmProgressBar.Height) / 2.0);
@@ -285,8 +285,8 @@ namespace BlueControls.DialogBoxes
             if (Text != capTXT.Text)
             {
                 capTXT.Text = Text;
-                var Wi = Math.Max(Size.Width, capTXT.Width + BlueControls.Controls.GenericControl.Skin.Padding * 2);
-                var He = Math.Max(Size.Height, capTXT.Height + BlueControls.Controls.GenericControl.Skin.Padding * 2);
+                var Wi = Math.Max(Size.Width, capTXT.Width + Skin.Padding * 2);
+                var He = Math.Max(Size.Height, capTXT.Height + Skin.Padding * 2);
 
                 Size = new Size(Wi, He);
                 Refresh();

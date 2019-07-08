@@ -248,7 +248,7 @@ namespace BlueControls.Forms
 
 
             PadDesign.Item.Clear();
-            PadDesign.Item.AddRange(clsSkin.AllStyles());
+            PadDesign.Item.AddRange(Skin.AllStyles());
 
             if (string.IsNullOrEmpty(DesignName))
             {

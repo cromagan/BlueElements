@@ -37,7 +37,6 @@ using System.IO;
 using static BlueBasics.Develop;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modAllgemein;
-using static BlueControls.clsSkin;
 
 namespace BeCreative
 {
@@ -396,9 +395,9 @@ namespace BeCreative
 
             SuspendLayout();
 
-            if (_Database.Skin != (int)enSkin.Unverändert && (int)GenericControl.Skin.Skin != _Database.Skin)
+            if (_Database.Skin != (int)enSkin.Unverändert && (int)Skin.Instance.SkinDesign != _Database.Skin)
             {
-                GenericControl.Skin.Skin = (enSkin)_Database.Skin;
+                Skin.Instance.SkinDesign = (enSkin)_Database.Skin;
                 Refresh();
             }
 

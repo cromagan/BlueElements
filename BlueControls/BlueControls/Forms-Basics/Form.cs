@@ -146,7 +146,7 @@ namespace BlueControls.Forms
 
         protected override void OnClosed(System.EventArgs e)
         {
-            GenericControl.Skin.SkinChanged -= SkinChanged;
+            Skin.Instance.SkinChanged -= SkinChanged;
             _Closed = true;
             base.OnClosed(e);
         }
@@ -179,10 +179,9 @@ namespace BlueControls.Forms
 
         protected override void OnLoad(System.EventArgs e)
         {
-            BackColor = GenericControl.Skin.Color_Back(_design, enStates.Standard);
+            BackColor = Skin.Color_Back(_design, enStates.Standard);
             base.OnLoad(e);
-            GenericControl.Skin.SkinChanged += SkinChanged;
-            //Develop.Debugprint_BackgroundThread();
+            Skin.Instance.SkinChanged += SkinChanged;
         }
 
 
@@ -203,7 +202,7 @@ namespace BlueControls.Forms
 
         private void SkinChanged(object sender, System.EventArgs e)
         {
-            BackColor = GenericControl.Skin.Color_Back(_design, enStates.Standard);
+            BackColor = Skin.Color_Back(_design, enStates.Standard);
             SuspendLayout();
             Invalidate();
             ResumeLayout();
@@ -220,7 +219,7 @@ namespace BlueControls.Forms
 
         public List<Button> Generate_Buttons(string[] Names)
         {
-            var MyX = this.Width - GenericControl.Skin.Padding - BorderWidth;
+            var MyX = this.Width - Skin.Padding - BorderWidth;
             var erT = new ExtText(enDesign.Button, enStates.Standard);
             var Buts = new List<Button>();
 
@@ -262,9 +261,9 @@ namespace BlueControls.Forms
                             break;
                     }
 
-                    B.Size = new Size(erT.Width() + GenericControl.Skin.Padding * W, erT.Height() + GenericControl.Skin.Padding * 2);
-                    B.Location = new Point(MyX - B.Width, this.Height - BorderHeight - GenericControl.Skin.Padding - B.Height);
-                    MyX = B.Location.X - GenericControl.Skin.Padding;
+                    B.Size = new Size(erT.Width() + Skin.Padding * W, erT.Height() + Skin.Padding * 2);
+                    B.Location = new Point(MyX - B.Width, this.Height - BorderHeight - Skin.Padding - B.Height);
+                    MyX = B.Location.X - Skin.Padding;
 
                     B.ButtonStyle = enButtonStyle.Button;
                     B.Visible = true;

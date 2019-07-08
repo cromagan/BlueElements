@@ -195,7 +195,7 @@ namespace BlueControls
             }
             else
             {
-                _Font = GenericControl.Skin.GetBlueFont(vDesign, vState, vStufe);
+                _Font = Skin.GetBlueFont(vDesign, vState, vStufe);
             }
         }
 

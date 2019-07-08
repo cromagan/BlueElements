@@ -235,7 +235,7 @@
     <Compile Include="Extended Text\ExtChar.cs" />
     <Compile Include="Extended Text\ExtText.cs" />
     <Compile Include="clsPointRelation.cs" />
-    <Compile Include="clsSkin.cs" />
+    <Compile Include="Skin.cs" />
     <Compile Include="Controls\ComboBox.cs">
       <SubType>Component</SubType>
     </Compile>

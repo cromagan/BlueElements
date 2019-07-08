@@ -17,17 +17,17 @@ namespace BlueControls.DialogBoxes
         {
             InitializeComponent();
 
-            var top = GenericControl.Skin.Padding;
-            var we = GenericControl.Skin.Padding * 2;
+            var top = Skin.Padding;
+            var we = Skin.Padding * 2;
 
             foreach (var ThisFlexi in Flexis)
             {
                 Controls.Add(ThisFlexi);
-                ThisFlexi.Left = GenericControl.Skin.Padding;
+                ThisFlexi.Left = Skin.Padding;
                 ThisFlexi.Top = top;
                 ThisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-                top = top + GenericControl.Skin.Padding + ThisFlexi.Height;
-                we = Math.Max(we, ThisFlexi.Width + GenericControl.Skin.Padding * 2);
+                top = top + Skin.Padding + ThisFlexi.Height;
+                we = Math.Max(we, ThisFlexi.Width + Skin.Padding * 2);
 
                 ThisFlexi.ButtonClicked += FlexiButtonClick;
             }

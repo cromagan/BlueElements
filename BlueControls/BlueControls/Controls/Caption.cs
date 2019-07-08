@@ -318,7 +318,7 @@ namespace BlueControls.Controls
                 if (QuickModePossible())
                 {
                     if (gr == null) { return; }
-                    clsSkin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+                    Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
                     Skin.Draw_FormatedText(gr, _Text, null, tmpSkinRow, enAlignment.Top_Left, new Rectangle(), null, false, Translate);
                     return;
@@ -351,7 +351,7 @@ namespace BlueControls.Controls
 
             if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird
 
-            clsSkin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+            Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
             if (!string.IsNullOrEmpty(_Text)) { eText.Draw(gr, 1); }
         }

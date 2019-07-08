@@ -773,7 +773,7 @@ namespace BlueControls.Controls
 
         protected override void DrawControl(Graphics gr, enStates state)
         {
-            clsSkin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+            Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
         }
 
 

@@ -66,7 +66,7 @@ namespace BlueControls.Controls
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
 
 
-            GenericControl.Skin.SkinChanged += SkinChanged;
+            Skin.Instance.SkinChanged += SkinChanged;
 
         }
 
@@ -74,7 +74,7 @@ namespace BlueControls.Controls
         protected override void Dispose(bool NowDisposing)
         {
 
-            GenericControl.Skin.SkinChanged -= SkinChanged;
+            Skin.Instance.SkinChanged -= SkinChanged;
             base.Dispose(NowDisposing);
         }
 
@@ -339,7 +339,7 @@ namespace BlueControls.Controls
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
         {
 
-            if (!GenericControl.Skin.IsReady()) { return; }
+            if (Skin.SkinDB == null) { return; }
 
 
             if (IsRibbonBar)
@@ -348,11 +348,11 @@ namespace BlueControls.Controls
                 SendToBack();
                 Dock = System.Windows.Forms.DockStyle.Top;
 
-                GenericControl.Skin.Draw_Back(e.Graphics, enDesign.RibbonBar_Back, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
+                Skin.Draw_Back(e.Graphics, enDesign.RibbonBar_Back, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
             }
             else
             {
-                GenericControl.Skin.Draw_Back(e.Graphics, enDesign.TabStrip_Back, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
+                Skin.Draw_Back(e.Graphics, enDesign.TabStrip_Back, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
             }
 
 
@@ -405,15 +405,15 @@ namespace BlueControls.Controls
 
             if (_IsRibbonBar)
             {
-                GenericControl.Skin.Draw_Back(graphics, enDesign.RibbonBar_Head, tmpState, r, this, true);
-                GenericControl.Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.RibbonBar_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
-                GenericControl.Skin.Draw_Border(graphics, enDesign.RibbonBar_Head, tmpState, r);
+                Skin.Draw_Back(graphics, enDesign.RibbonBar_Head, tmpState, r, this, true);
+                Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.RibbonBar_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
+                Skin.Draw_Border(graphics, enDesign.RibbonBar_Head, tmpState, r);
             }
             else
             {
-                GenericControl.Skin.Draw_Back(graphics, enDesign.TabStrip_Head, tmpState, r, this, true);
-                GenericControl.Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.TabStrip_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
-                GenericControl.Skin.Draw_Border(graphics, enDesign.TabStrip_Head, tmpState, r);
+                Skin.Draw_Back(graphics, enDesign.TabStrip_Head, tmpState, r, this, true);
+                Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.TabStrip_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
+                Skin.Draw_Border(graphics, enDesign.TabStrip_Head, tmpState, r);
             }
 
 
@@ -433,13 +433,13 @@ namespace BlueControls.Controls
 
             if (_IsRibbonBar)
             {
-                GenericControl.Skin.Draw_Back(graphics, enDesign.RibbonBar_Body, w, r, this, true);
-                GenericControl.Skin.Draw_Border(graphics, enDesign.RibbonBar_Body, w, r);
+                Skin.Draw_Back(graphics, enDesign.RibbonBar_Body, w, r, this, true);
+                Skin.Draw_Border(graphics, enDesign.RibbonBar_Body, w, r);
             }
             else
             {
-                GenericControl.Skin.Draw_Back(graphics, enDesign.TabStrip_Body, w, r, this, true);
-                GenericControl.Skin.Draw_Border(graphics, enDesign.TabStrip_Body, w, r);
+                Skin.Draw_Back(graphics, enDesign.TabStrip_Body, w, r, this, true);
+                Skin.Draw_Border(graphics, enDesign.TabStrip_Body, w, r);
             }
 
 
