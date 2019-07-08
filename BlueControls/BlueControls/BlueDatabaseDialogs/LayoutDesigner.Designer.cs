@@ -8,79 +8,79 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 
 namespace BlueControls.BlueDatabaseDialogs
+{
+
+
+    internal partial class LayoutDesigner : PictureView
     {
+        //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
+        [DebuggerNonUserCode()]
+        protected override void Dispose(bool disposing)
+        {
+            try
+            {
+                if (disposing)
+                {
 
-
-        internal partial class LayoutDesigner : PictureView
-		{
-			//Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
-			[DebuggerNonUserCode()]
-			protected override void Dispose(bool disposing)
-			{
-				try
-				{
-					if (disposing )
-					{
-
-					}
-				}
-				finally
-				{
-					base.Dispose(disposing);
-				}
-			}
+                }
+            }
+            finally
+            {
+                base.Dispose(disposing);
+            }
+        }
 
 
 
-			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
-			[DebuggerStepThrough()]
-			private void InitializeComponent()
-			{
-            this.DatenbankVER = new  GroupBox();
-            this.NamB = new  Button();
-            this.weg = new  Button();
-            this.Hinzu = new  Button();
-            this.Captionxx1 = new  Caption();
-            this.Layout1 = new  ComboBox();
-            this.Spaltx = new  ComboBox();
-            this.Caption4 = new  Caption();
-            this.Code = new  TextBox();
-            this.Clip = new  Button();
-            this.BlueFrame2 = new  GroupBox();
-            this.Caption11 = new  Caption();
-            this.FomAx = new  TabControl();
-            this.txt = new  TabPage();
-            this.Abkürz = new  Button();
-            this.ÜberschriftS = new  Button();
-            this.Leer = new  ComboBox();
-            this.Nachtext = new  TextBox();
-            this.ZeilUmbruch = new  ComboBox();
-            this.Vortext = new  TextBox();
-            this.HtmlSonderzeichen = new  Button();
-            this.LeerLösch = new  Button();
-            this.Spezialvormat = new  Button();
-            this.ZeilCap = new  Caption();
-            this.Caption10 = new  Caption();
-            this.Caption9 = new  Caption();
-            this.Caption7 = new  Caption();
-            this.Pic = new  TabPage();
-            this.Base64 = new  Button();
-            this.Abma = new  GroupBox();
-            this.GroMi = new  Button();
-            this.Caption6 = new  Caption();
-            this.Caption5 = new  Caption();
-            this.ExactMi = new  Button();
-            this.Mxx = new  Button();
-            this.Wi = new  TextBox();
-            this.He = new  TextBox();
-            this.ex2 = new  TabPage();
-            this.BefE2 = new  ListBox();
-            this.BlueFrame1 = new  GroupBox();
-            this.LayBearb = new  Button();
-            this.LayVZ = new  Button();
-            this.LayOpen = new  Button();
+        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        [DebuggerStepThrough()]
+        private void InitializeComponent()
+        {
+            this.DatenbankVER = new GroupBox();
+            this.NamB = new Button();
+            this.weg = new Button();
+            this.Hinzu = new Button();
+            this.Captionxx1 = new Caption();
+            this.Layout1 = new ComboBox();
+            this.Spaltx = new ComboBox();
+            this.Caption4 = new Caption();
+            this.Code = new TextBox();
+            this.Clip = new Button();
+            this.BlueFrame2 = new GroupBox();
+            this.Caption11 = new Caption();
+            this.FomAx = new TabControl();
+            this.txt = new TabPage();
+            this.Abkürz = new Button();
+            this.ÜberschriftS = new Button();
+            this.Leer = new ComboBox();
+            this.Nachtext = new TextBox();
+            this.ZeilUmbruch = new ComboBox();
+            this.Vortext = new TextBox();
+            this.HtmlSonderzeichen = new Button();
+            this.LeerLösch = new Button();
+            this.Spezialvormat = new Button();
+            this.ZeilCap = new Caption();
+            this.Caption10 = new Caption();
+            this.Caption9 = new Caption();
+            this.Caption7 = new Caption();
+            this.Pic = new TabPage();
+            this.Base64 = new Button();
+            this.Abma = new GroupBox();
+            this.GroMi = new Button();
+            this.Caption6 = new Caption();
+            this.Caption5 = new Caption();
+            this.ExactMi = new Button();
+            this.Mxx = new Button();
+            this.Wi = new TextBox();
+            this.He = new TextBox();
+            this.ex2 = new TabPage();
+            this.BefE2 = new ListBox();
+            this.BlueFrame1 = new GroupBox();
+            this.LayBearb = new Button();
+            this.LayVZ = new Button();
+            this.LayOpen = new Button();
             this.Ribbon.SuspendLayout();
             this.Page_Control.SuspendLayout();
             this.Page_Start.SuspendLayout();
@@ -534,7 +534,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BefE2.QuickInfo = "";
             this.BefE2.Size = new Size(456, 232);
             this.BefE2.TabIndex = 0;
-            this.BefE2.ItemCheckedChanged += new  EventHandler(this.BefE2_Item_CheckedChanged);
+            this.BefE2.ItemCheckedChanged += new EventHandler(this.BefE2_Item_CheckedChanged);
             // 
             // BlueFrame1
             // 
@@ -606,49 +606,49 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BlueFrame1.ResumeLayout(false);
             this.ResumeLayout(false);
 
-			}
-			internal GroupBox DatenbankVER;
-			internal Button NamB;
-			internal Button weg;
-			internal Button Hinzu;
-			internal Caption Captionxx1;
-			internal ComboBox Layout1;
-			private Button Clip;
-			private TextBox Code;
-			private Caption Caption4;
-			private ComboBox Spaltx;
-			private GroupBox BlueFrame2;
-			private Caption Caption11;
-			private TabControl FomAx;
-			private TabPage txt;
-			private ComboBox Leer;
-			private TextBox Nachtext;
-			private ComboBox ZeilUmbruch;
-			private TextBox Vortext;
-			private Button HtmlSonderzeichen;
-			private Button LeerLösch;
-			private Button Spezialvormat;
-			private Caption ZeilCap;
-			private Caption Caption10;
-			private Caption Caption9;
-			private Caption Caption7;
-			private TabPage Pic;
-			private Button Base64;
-			private GroupBox Abma;
-			private Button GroMi;
-			private Caption Caption6;
-			private Caption Caption5;
-			private Button ExactMi;
-			private Button Mxx;
-			private TextBox Wi;
-			private TextBox He;
-			private TabPage ex2;
-			private ListBox BefE2;
-			internal GroupBox BlueFrame1;
-			private Button LayBearb;
-			private Button LayVZ;
-			private Button LayOpen;
-			private Button ÜberschriftS;
-			private Button Abkürz;
-		}
-	}
+        }
+        internal GroupBox DatenbankVER;
+        internal Button NamB;
+        internal Button weg;
+        internal Button Hinzu;
+        internal Caption Captionxx1;
+        internal ComboBox Layout1;
+        private Button Clip;
+        private TextBox Code;
+        private Caption Caption4;
+        private ComboBox Spaltx;
+        private GroupBox BlueFrame2;
+        private Caption Caption11;
+        private TabControl FomAx;
+        private TabPage txt;
+        private ComboBox Leer;
+        private TextBox Nachtext;
+        private ComboBox ZeilUmbruch;
+        private TextBox Vortext;
+        private Button HtmlSonderzeichen;
+        private Button LeerLösch;
+        private Button Spezialvormat;
+        private Caption ZeilCap;
+        private Caption Caption10;
+        private Caption Caption9;
+        private Caption Caption7;
+        private TabPage Pic;
+        private Button Base64;
+        private GroupBox Abma;
+        private Button GroMi;
+        private Caption Caption6;
+        private Caption Caption5;
+        private Button ExactMi;
+        private Button Mxx;
+        private TextBox Wi;
+        private TextBox He;
+        private TabPage ex2;
+        private ListBox BefE2;
+        internal GroupBox BlueFrame1;
+        private Button LayBearb;
+        private Button LayVZ;
+        private Button LayOpen;
+        private Button ÜberschriftS;
+        private Button Abkürz;
+    }
+}

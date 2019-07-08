@@ -141,9 +141,12 @@ namespace BlueControls.ItemCollection
 
                 var r = UsedArea();
 
-                if (r.Width * cZoom > 5000) { return; }
+                while (r.Width* cZoom > 10000 || r.Height * cZoom > 10000)
+                {
+                    cZoom = cZoom * 0.8m; // Kann ruhig verändert werden, tut nix zur Sache, DKoordinates reichen
+                    //return;
+                }
 
-                if (r.Height * cZoom > 5000) { return; }
 
                 if (_tmpBitmap != null)
                 {
@@ -177,10 +180,11 @@ namespace BlueControls.ItemCollection
 
             if (_tmpBitmap != null)
             {
-                var scale = (float)Math.Min(DCoordinates.Width / (double)_tmpBitmap.Width, DCoordinates.Height / (double)_tmpBitmap.Height);
-                var r2 = new RectangleF((DCoordinates.Width - _tmpBitmap.Width * scale) / 2 + DCoordinates.Left, (DCoordinates.Height - _tmpBitmap.Height * scale) / 2 + DCoordinates.Top, _tmpBitmap.Width * scale, _tmpBitmap.Height * scale);
+                //var scale = (float)Math.Min(DCoordinates.Width / (double)_tmpBitmap.Width, DCoordinates.Height / (double)_tmpBitmap.Height);
+                //var r2 = new RectangleF((DCoordinates.Width - _tmpBitmap.Width * scale) / 2 + DCoordinates.Left, (DCoordinates.Height - _tmpBitmap.Height * scale) / 2 + DCoordinates.Top, _tmpBitmap.Width * scale, _tmpBitmap.Height * scale);
 
-                GR.DrawImage(_tmpBitmap, r2, new RectangleF(0, 0, _tmpBitmap.Width, _tmpBitmap.Height), GraphicsUnit.Pixel);
+                //GR.DrawImage(_tmpBitmap, r2, new RectangleF(0, 0, _tmpBitmap.Width, _tmpBitmap.Height), GraphicsUnit.Pixel);
+                GR.DrawImageInRectAspectRatio(_tmpBitmap, DCoordinates);
             }
 
             if (!ForPrinting)

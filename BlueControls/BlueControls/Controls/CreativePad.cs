@@ -762,25 +762,20 @@ namespace BlueControls.Controls
             var r = MaxBounds();
             if (r.Width == 0) { return null; }
 
-            //  Dim MieseQuali As Boolean = False
 
             do
             {
-                if ((int)(r.Width * Scale) > 10000)
+                if ((int)(r.Width * Scale) > 15000)
                 {
-                    Scale = Scale * 0.5m;
-                    //  MieseQuali = True
+                    Scale = Scale * 0.8m;
                 }
-                else if ((int)(r.Height * Scale) > 10000)
+                else if ((int)(r.Height * Scale) > 15000)
                 {
-                    Scale = Scale * 0.5m;
-                    //  MieseQuali = True
+                    Scale = Scale * 0.8m;
                 }
-                else if ((int)(r.Height * Scale) * (int)(r.Height * Scale) > 60000000)
+                else if ((int)(r.Height * Scale) * (int)(r.Height * Scale) > 90000000)
                 {
-                    Scale = Scale * 0.5m;
-                    //         MieseQuali = True
-
+                    Scale = Scale * 0.8m;
                 }
                 else
                 {
@@ -801,8 +796,7 @@ namespace BlueControls.Controls
 
                 Draw(gr, Scale, r.Left * Scale, r.Top * Scale, true, true);
 
-                //       If MieseQuali Then gr.DrawString("Qualität musste herabgesetzt werden!", New Font("Arial", 100), Brushes.Red, 0, 0)
-            }
+                }
 
 
             return I;
@@ -2676,14 +2670,10 @@ namespace BlueControls.Controls
             OnPrintPage(e);
 
 
-            var i = ToBitmap(5);// .Resize(e.PageBounds.Width, e.PageBounds.Height, enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern, InterpolationMode.HighQualityBicubic, true);
+            var i = ToBitmap(3);
             if (i == null) { return; }
-
-
             e.Graphics.DrawImageInRectAspectRatio(i,0,0, e.PageBounds.Width, e.PageBounds.Height);
-
-//            e.Graphics.DrawImage(i, (e.PageBounds.Width - i.Width) / 2, (e.PageBounds.Height - i.Height) / 2, e.PageBounds.Width, e.PageBounds.Height);
-        }
+       }
 
         private void OnPrintPage(PrintPageEventArgs e)
         {

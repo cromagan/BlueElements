@@ -402,53 +402,22 @@ namespace BlueControls.Forms
         private void PrintPad_PrintPage(object sender, PrintPageEventArgs e)
         {
 
-            var l = Liste.Count;
+            var l = ItemNrForPrint;
 
             ItemNrForPrint = GeneratePrintPad(ItemNrForPrint);
 
 
-            if (l == Liste.Count) { return; }
+            if (l == ItemNrForPrint) { return; }
 
             e.HasMorePages = Convert.ToBoolean(ItemNrForPrint < Liste.Count);
-
-            //If ItenNrForPrint >= Liste.Count Then
-            //    e.HasMorePages = False
-            //    'MessageBox.Show("Alle Druckaufträge abgeschickt", enImageCode.Information, "OK")
-            //    'Exit Sub
-            //End If
-
-
         }
 
 
 
         private void Vorschau_Click(object sender, System.EventArgs e)
         {
-            //ItemNrForPrint = 0;
             PrintPad.ShowPrintPreview();
         }
-
-
-        //Shared Sub Print(Row As RowItem)
-        //    If Row Is Nothing Then
-        //        MessageBox.Show("Kein Eintrag gewählt.", enImageCode.Information, "OK")
-        //        Exit Sub
-        //    End If
-
-        //    If Row.Database.Layouts.Count = 0 Then
-        //        MessageBox.Show("Kein druckbaren Layouts vorhanden.", enImageCode.Information, "OK")
-        //        Exit Sub
-        //    End If
-
-        //    'Dim x As String = Row.Cell(Row.Database.Column.SysLastUsedLayout).String
-
-        //    'If x.IsLong Then
-        //    '    GenerateLayout_Internal(Row, Integer.Parse(x), True, False, String.Empty)
-        //    'Else
-        //    MessageBox.Show("Bitte erweitertes Drucken<br> und richtiges Layout wählen.", enImageCode.Information, "OK")
-        //    '    GenerateLayout_Internal(Row, 0, True, False, String.Empty)
-        //    '  End If
-        //End Sub
 
 
 
@@ -476,10 +445,10 @@ namespace BlueControls.Forms
             var DruckB = PrintPad.DruckbereichRect();
 
 
-            var tempVar = (int)(Math.Floor(DruckB.Width / (double)OneItem.Width));
+            var tempVar = Math.Max(1,(int)(Math.Floor(DruckB.Width / (double)OneItem.Width + 0.01)));
             for (var x = 0 ; x < tempVar ; x++)
             {
-                var tempVar2 = (int)(Math.Floor(DruckB.Height / (double)OneItem.Height));
+                var tempVar2 = Math.Max(1, (int)(Math.Floor(DruckB.Height / (double)OneItem.Height +0.01)));
                 for (var y = 0 ; y < tempVar2 ; y++)
                 {
 
@@ -494,10 +463,7 @@ namespace BlueControls.Forms
 
                     StartNr += 1;
 
-                    if (FrmDrucken_Einzeln.Checked || StartNr >= Liste.Count)
-                    {
-                        break;
-                    }
+                    if (FrmDrucken_Einzeln.Checked || StartNr >= Liste.Count) { break; }
                 }
 
                 if (FrmDrucken_Einzeln.Checked || StartNr >= Liste.Count)

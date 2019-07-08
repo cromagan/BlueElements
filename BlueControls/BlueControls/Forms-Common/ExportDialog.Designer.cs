@@ -424,7 +424,7 @@ namespace BlueControls.Forms
             this.Button_PageSetup.Name = "Button_PageSetup";
             this.Button_PageSetup.Size = new System.Drawing.Size(168, 48);
             this.Button_PageSetup.TabIndex = 13;
-            this.Button_PageSetup.Text = "Drucker einrichten";
+            this.Button_PageSetup.Text = "Seite einrichten";
             this.Button_PageSetup.Click += new System.EventHandler(this.Button_PageSetup_Click);
             // 
             // PrintPad
@@ -456,7 +456,6 @@ namespace BlueControls.Forms
             this.Controls.Add(this.Tabs);
             this.Controls.Add(this.c_Layoutx);
             this.Controls.Add(this.Caption3);
-            this.Design = BlueControls.Enums.enDesign.Form_Standard;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;
             this.Name = "ExportDialog";

@@ -343,13 +343,11 @@ namespace BlueControls
                 {
                     var l = QuickImage.Get((int)_Char - ImagesStart);
 
+                    if (l == null || l.Width == 0) { l = QuickImage.Get("Warnung|16"); }
+
                     if (l.Width > 0)
                     {
                         GR.DrawImage(QuickImage.Get(l.Name, (int)(l.Width * czoom)).BMP, (int)DrawX, (int)DrawY);
-                    }
-                    else
-                    {
-                        Develop.DebugPrint_NichtImplementiert();
                     }
 
                 }
