@@ -421,23 +421,23 @@ namespace BlueDatabase
 
         }
 
-        internal string ChangeKeysToNames(string OriginalString)
-        {
+        //internal string ChangeKeysToNames(string OriginalString)
+        //{
 
-            foreach (var ThisColumn in this)
-            {
-                if (ThisColumn != null)
-                {
+        //    foreach (var ThisColumn in this)
+        //    {
+        //        if (ThisColumn != null)
+        //        {
 
-                    OriginalString = OriginalString.Replace(ParsableColumnKey(ThisColumn) + ",", "ColumnName=" + ThisColumn.Name.ToNonCritical() + ",");
-                    OriginalString = OriginalString.Replace(ParsableColumnKey(ThisColumn) + "}", "ColumnName=" + ThisColumn.Name.ToNonCritical() + "}");
-                    OriginalString = OriginalString.Replace(ParsableColumnKey(ThisColumn) + " ", "ColumnName=" + ThisColumn.Name.ToNonCritical() + " ");
-                }
-            }
+        //            OriginalString = OriginalString.Replace(ParsableColumnKey(ThisColumn) + ",", "ColumnName=" + ThisColumn.Name.ToNonCritical() + ",");
+        //            OriginalString = OriginalString.Replace(ParsableColumnKey(ThisColumn) + "}", "ColumnName=" + ThisColumn.Name.ToNonCritical() + "}");
+        //            OriginalString = OriginalString.Replace(ParsableColumnKey(ThisColumn) + " ", "ColumnName=" + ThisColumn.Name.ToNonCritical() + " ");
+        //        }
+        //    }
 
-            return OriginalString;
+        //    return OriginalString;
 
-        }
+        //}
 
         public void GenerateOverView()
         {

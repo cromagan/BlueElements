@@ -2872,7 +2872,7 @@ namespace BlueDatabase
             if (RowKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
             if (ColumnKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
 
-            Works.Add(new WorkItem(Comand, ColumnKey, RowKey, PreviousValue, ChangedTo, UserName, UserGroup, FreezedMode));
+            Works.Add(new WorkItem(Comand, ColumnKey, RowKey, PreviousValue, ChangedTo, UserName, FreezedMode));
 
 
         }
@@ -3153,58 +3153,58 @@ namespace BlueDatabase
 
 
 
-        private string PreviewsFile()
-        {
+        //private string PreviewsFile()
+        //{
 
-            var L = new List<string>();
+        //    var L = new List<string>();
 
-            foreach (var ThisExport in Export)
-            {
+        //    foreach (var ThisExport in Export)
+        //    {
 
-                if (ThisExport.Typ == enExportTyp.DatenbankOriginalFormat)
-                {
-                    L.AddRange(ThisExport.BereitsExportiert);
-                }
-            }
+        //        if (ThisExport.Typ == enExportTyp.DatenbankOriginalFormat)
+        //        {
+        //            L.AddRange(ThisExport.BereitsExportiert);
+        //        }
+        //    }
 
-            L = L.SortedDistinctList();
+        //    L = L.SortedDistinctList();
 
-            if (L.Count == 0) { return string.Empty; }
-
-
-            var Neues = string.Empty;
-            var NeuestDate = DateTime.Now.AddDays(-10000);
+        //    if (L.Count == 0) { return string.Empty; }
 
 
-
-            foreach (var ThisString in L)
-            {
-
-                if (ThisString.Contains("|"))
-                {
-                    var x = ThisString.SplitBy("|");
-                    if (x.GetUpperBound(0) == 1)
-                    {
+        //    var Neues = string.Empty;
+        //    var NeuestDate = DateTime.Now.AddDays(-10000);
 
 
-                        var d = DateTimeParse(x[1]).Subtract(NeuestDate);
 
-                        if (d.TotalDays > 0)
-                        {
+        //    foreach (var ThisString in L)
+        //    {
 
-                            if (FileExists(x[0]))
-                            {
-                                Neues = x[0];
-                                NeuestDate = DateTimeParse(x[1]);
-                            }
-                        }
-                    }
-                }
-            }
+        //        if (ThisString.Contains("|"))
+        //        {
+        //            var x = ThisString.SplitBy("|");
+        //            if (x.GetUpperBound(0) == 1)
+        //            {
 
-            return Neues;
 
-        }
+        //                var d = DateTimeParse(x[1]).Subtract(NeuestDate);
+
+        //                if (d.TotalDays > 0)
+        //                {
+
+        //                    if (FileExists(x[0]))
+        //                    {
+        //                        Neues = x[0];
+        //                        NeuestDate = DateTimeParse(x[1]);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return Neues;
+
+        //}
 
 
         /// <summary>
@@ -3364,7 +3364,7 @@ namespace BlueDatabase
 
             if (!ReloadNeeded()) { return; }
 
-            FileInfo f;
+
             string tmpLastSaveCode;
             byte[] _tmp = null;
 
@@ -3380,7 +3380,6 @@ namespace BlueDatabase
                     }
 
                     _tmp = File.ReadAllBytes(Filename);
-                    f = new FileInfo(Filename);
                     tmpLastSaveCode = GetFileInfo(true);
 
                     Pause(0.5, false);

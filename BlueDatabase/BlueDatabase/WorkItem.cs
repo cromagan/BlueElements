@@ -146,7 +146,7 @@ namespace BlueDatabase
 
         #endregion
 
-        public WorkItem(enDatabaseDataType Comand, int ColKey, int RowKey, string PrevipusValue, string ChangedTo, string User, string Group, bool FreezedMode)
+        public WorkItem(enDatabaseDataType Comand, int ColKey, int RowKey, string PreviousValue, string ChangedTo, string User, bool FreezedMode)
         {
 
             if (FreezedMode)
@@ -163,7 +163,7 @@ namespace BlueDatabase
             _colKey = ColKey;
             _rowKey = RowKey;
 
-            PreviousValue = PrevipusValue;
+            this.PreviousValue = PreviousValue;
             _changedTo = ChangedTo;
             this.User = User;
             //  this.Group = Group;

@@ -29,7 +29,7 @@ namespace BlueDatabase.EventArgs
             this.ColumnsWithErrors = ColumnsWithErrors;
         }
 
-        public List<string> ColumnsWithErrors { get; set; }
+        public List<string> ColumnsWithErrors { get; }
 
     }
 }

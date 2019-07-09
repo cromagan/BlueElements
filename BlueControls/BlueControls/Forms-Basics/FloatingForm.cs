@@ -180,7 +180,7 @@ namespace BlueControls.Forms
             {
                 modFernsteuerung.ShowWindow(Handle, (int)modFernsteuerung.enSW.ShowNoActivate);
             }
-            catch (ObjectDisposedException _)
+            catch (ObjectDisposedException)
             {
                 // kommt vor, wenn der Aufbau zu lange dauert. Ignorierbar.
             }

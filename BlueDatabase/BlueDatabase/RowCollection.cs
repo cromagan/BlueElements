@@ -336,11 +336,6 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.LastRowKey, _LastRowKey.ToString());
         }
 
-        internal bool ContainsKey(int RowKey)
-        {
-            return _Internal.ContainsKey(RowKey);
-        }
-
         public RowItem SearchByKey(int Key)
         {
             try

@@ -37,7 +37,9 @@ namespace BlueControls
 {
     public sealed class Skin
     {
-        public static Database SkinDB; 
+        public static Database SkinDB;
+        public static Database StyleDB;
+
         private static readonly enImageCodeEffect[] ST = new enImageCodeEffect[1];
         internal Pen Pen_LinieDünn;
         internal Pen Pen_LinieKräftig;
@@ -46,13 +48,12 @@ namespace BlueControls
         private string _SkinString = string.Empty;
 
 
-        public static float Scale = (float)Math.Round(System.Windows.Forms.SystemInformation.VirtualScreen.Width / System.Windows.SystemParameters.VirtualScreenWidth, 2);
+        public static readonly float Scale = (float)Math.Round(System.Windows.Forms.SystemInformation.VirtualScreen.Width / System.Windows.SystemParameters.VirtualScreenWidth, 2);
 
 
         public static string ErrorFont = "<Name=Arial, Size=8, Color=FF0000>";
         public static string DummyStandardFont = "<Name=Arial, Size=10>";
 
-        public static Database StyleDB;
 
         public static readonly int PaddingSmal = 3; // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
         public static readonly int Padding = 9;
@@ -95,11 +96,6 @@ namespace BlueControls
             }
         }
 
-
-        public string SkinString()
-        {
-            return _SkinString;
-        }
 
 
         private void LoadSkin()
