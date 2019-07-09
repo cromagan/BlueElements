@@ -36,8 +36,8 @@ namespace BluePaint
         private void SpiegelnH_Click(object sender, System.EventArgs e)
         {
             CollectGarbage();
-            Bitmap ni = new Bitmap(_Pic.Width, _Pic.Height);
-            Graphics gr = Graphics.FromImage(ni);
+            var ni = new Bitmap(_Pic.Width, _Pic.Height);
+            var gr = Graphics.FromImage(ni);
             gr.PixelOffsetMode = PixelOffsetMode.Half;
             gr.DrawImage(_Pic.Image_Clone(), 0, ni.Height, ni.Width, -ni.Height);
             gr.Dispose();
@@ -48,8 +48,8 @@ namespace BluePaint
         private void SpiegelnV_Click(object sender, System.EventArgs e)
         {
             CollectGarbage();
-            Bitmap ni = new Bitmap(_Pic.Width, _Pic.Height);
-            Graphics gr = Graphics.FromImage(ni);
+            var ni = new Bitmap(_Pic.Width, _Pic.Height);
+            var gr = Graphics.FromImage(ni);
             gr.PixelOffsetMode = PixelOffsetMode.Half;
             gr.DrawImage(_Pic.Image_Clone(), ni.Width, 0, -ni.Width, ni.Height);
             gr.Dispose();

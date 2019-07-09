@@ -532,6 +532,9 @@ namespace BlueControls.Controls
                 case enEditTypeFormula.None:
                     break;
 
+                case enEditTypeFormula.Farb_Auswahl_Dialog:
+                    break;
+
                 default:
                     Develop.DebugPrint_NichtImplementiert();
                     break;

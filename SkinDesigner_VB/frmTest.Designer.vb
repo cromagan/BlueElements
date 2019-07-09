@@ -1,9 +1,12 @@
-﻿Imports BlueElements
-Imports BlueElements.BlueControls
+﻿Imports BlueControls.Controls
+Imports BlueElements
+Imports BlueControls
+Imports BlueControls.Enums
+Imports BlueBasics.Enums
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmTest
-    Inherits Forms.Form
+    Inherits BlueControls.Forms.Form
 
     'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
     <System.Diagnostics.DebuggerNonUserCode()>
@@ -25,81 +28,81 @@ Partial Class frmTest
     'Das Bearbeiten mit dem Code-Editor ist nicht möglich.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.BlueButton24 = New BlueElements.BlueControls.Button()
-        Me.BlueButton25 = New BlueElements.BlueControls.Button()
-        Me.BlueButton22 = New BlueElements.BlueControls.Button()
-        Me.BlueButton23 = New BlueElements.BlueControls.Button()
-        Me.BlueFrame5 = New BlueElements.BlueControls.GroupBox()
-        Me.BlueCaption7 = New BlueElements.BlueControls.Caption()
-        Me.BlueButton18 = New BlueElements.BlueControls.Button()
-        Me.BlueButton20 = New BlueElements.BlueControls.Button()
-        Me.BlueProgressbar1 = New BlueElements.BlueControls.ProgressBar()
-        Me.BlueFrame4 = New BlueElements.BlueControls.GroupBox()
-        Me.BlueCaption1 = New BlueElements.BlueControls.Caption()
-        Me.BlueCaption6 = New BlueElements.BlueControls.Caption()
-        Me.BlueCaption5 = New BlueElements.BlueControls.Caption()
-        Me.BlueFrame3 = New BlueElements.BlueControls.GroupBox()
-        Me.BlueCaption10 = New BlueElements.BlueControls.Caption()
-        Me.BlueCaption4 = New BlueElements.BlueControls.Caption()
-        Me.BlueButton17 = New BlueElements.BlueControls.Button()
-        Me.BlueButton19 = New BlueElements.BlueControls.Button()
-        Me.BlueButton21 = New BlueElements.BlueControls.Button()
-        Me.BlueSelectBox2 = New BlueElements.BlueControls.ComboBox()
-        Me.BlueTextBox4 = New BlueElements.BlueControls.TextBox()
-        Me.BlueSelectBox4 = New BlueElements.BlueControls.ComboBox()
-        Me.BlueSelectBox3 = New BlueElements.BlueControls.ComboBox()
-        Me.BlueListBox2 = New BlueElements.BlueControls.ListBox()
-        Me.BlueListBox1 = New BlueElements.BlueControls.ListBox()
-        Me.BlueButton9 = New BlueElements.BlueControls.Button()
-        Me.BlueButton10 = New BlueElements.BlueControls.Button()
-        Me.BlueButton11 = New BlueElements.BlueControls.Button()
-        Me.BlueButton12 = New BlueElements.BlueControls.Button()
-        Me.BlueButton7 = New BlueElements.BlueControls.Button()
-        Me.BlueButton8 = New BlueElements.BlueControls.Button()
-        Me.BlueButton6 = New BlueElements.BlueControls.Button()
-        Me.BlueButton5 = New BlueElements.BlueControls.Button()
-        Me.BlueTable1 = New BlueElements.BlueControls.Table()
-        Me.BlueTextBox2 = New BlueElements.BlueControls.TextBox()
-        Me.BlueButton4 = New BlueElements.BlueControls.Button()
-        Me.BlueButton3 = New BlueElements.BlueControls.Button()
-        Me.BlueCategory1 = New BlueElements.BlueControls.ListBox()
-        Me.BlueTextBox1 = New BlueElements.BlueControls.TextBox()
-        Me.BlueFrame2 = New BlueElements.BlueControls.GroupBox()
-        Me.BlueCaption2 = New BlueElements.BlueControls.Caption()
-        Me.BlueFrame1 = New BlueElements.BlueControls.GroupBox()
-        Me.BlueCaption11 = New BlueElements.BlueControls.Caption()
-        Me.BlueCaption3 = New BlueElements.BlueControls.Caption()
-        Me.BlueButton16 = New BlueElements.BlueControls.Button()
-        Me.BlueButton14 = New BlueElements.BlueControls.Button()
-        Me.BlueButton1 = New BlueElements.BlueControls.Button()
-        Me.BlueSelectBox1 = New BlueElements.BlueControls.ComboBox()
-        Me.BlueTextBox3 = New BlueElements.BlueControls.TextBox()
-        Me.But1_Body = New BlueElements.BlueControls.GroupBox()
-        Me.BlueCaption12 = New BlueElements.BlueControls.Caption()
-        Me.BlueButton26 = New BlueElements.BlueControls.Button()
-        Me.BlueButton29 = New BlueElements.BlueControls.Button()
-        Me.BlueButton30 = New BlueElements.BlueControls.Button()
-        Me.BlueButton31 = New BlueElements.BlueControls.Button()
-        Me.BlueCaption8 = New BlueElements.BlueControls.Caption()
-        Me.BlueTabControl1 = New BlueElements.BlueControls.TabControl()
-        Me.BlueTabPage1 = New BlueElements.BlueControls.TabPage()
-        Me.BlueCreativePad2 = New BlueElements.BlueControls.CreativePad()
-        Me.BlueCreativePad1 = New BlueElements.BlueControls.CreativePad()
-        Me.BlueEasyPic1 = New BlueElements.BlueControls.EasyPic()
-        Me.BlueEasyPic2 = New BlueElements.BlueControls.EasyPic()
-        Me.BlueTabPage2 = New BlueElements.BlueControls.TabPage()
-        Me.BlueTabPage3 = New BlueElements.BlueControls.TabPage()
-        Me.BlueTabPage4 = New BlueElements.BlueControls.TabPage()
-        Me.BlueButton2 = New BlueElements.BlueControls.Button()
-        Me.BlueTextBox5 = New BlueElements.BlueControls.TextBox()
-        Me.BlueTextBox6 = New BlueElements.BlueControls.TextBox()
-        Me.BlueButton13 = New BlueElements.BlueControls.Button()
-        Me.BlueSlider1 = New BlueElements.BlueControls.Slider()
-        Me.BlueSlider2 = New BlueElements.BlueControls.Slider()
-        Me.BlueSlider3 = New BlueElements.BlueControls.Slider()
-        Me.BlueSlider4 = New BlueElements.BlueControls.Slider()
-        Me.BlueButton15 = New BlueElements.BlueControls.Button()
-        Me.BlueButton27 = New BlueElements.BlueControls.Button()
+        Me.BlueButton24 = New Button()
+        Me.BlueButton25 = New Button()
+        Me.BlueButton22 = New Button()
+        Me.BlueButton23 = New Button()
+        Me.BlueFrame5 = New GroupBox()
+        Me.BlueCaption7 = New Caption()
+        Me.BlueButton18 = New Button()
+        Me.BlueButton20 = New Button()
+        Me.BlueProgressbar1 = New ProgressBar()
+        Me.BlueFrame4 = New GroupBox()
+        Me.BlueCaption1 = New Caption()
+        Me.BlueCaption6 = New Caption()
+        Me.BlueCaption5 = New Caption()
+        Me.BlueFrame3 = New GroupBox()
+        Me.BlueCaption10 = New Caption()
+        Me.BlueCaption4 = New Caption()
+        Me.BlueButton17 = New Button()
+        Me.BlueButton19 = New Button()
+        Me.BlueButton21 = New Button()
+        Me.BlueSelectBox2 = New ComboBox()
+        Me.BlueTextBox4 = New TextBox()
+        Me.BlueSelectBox4 = New ComboBox()
+        Me.BlueSelectBox3 = New ComboBox()
+        Me.BlueListBox2 = New ListBox()
+        Me.BlueListBox1 = New ListBox()
+        Me.BlueButton9 = New Button()
+        Me.BlueButton10 = New Button()
+        Me.BlueButton11 = New Button()
+        Me.BlueButton12 = New Button()
+        Me.BlueButton7 = New Button()
+        Me.BlueButton8 = New Button()
+        Me.BlueButton6 = New Button()
+        Me.BlueButton5 = New Button()
+        Me.BlueTable1 = New Table()
+        Me.BlueTextBox2 = New TextBox()
+        Me.BlueButton4 = New Button()
+        Me.BlueButton3 = New Button()
+        Me.BlueCategory1 = New ListBox()
+        Me.BlueTextBox1 = New TextBox()
+        Me.BlueFrame2 = New GroupBox()
+        Me.BlueCaption2 = New Caption()
+        Me.BlueFrame1 = New GroupBox()
+        Me.BlueCaption11 = New Caption()
+        Me.BlueCaption3 = New Caption()
+        Me.BlueButton16 = New Button()
+        Me.BlueButton14 = New Button()
+        Me.BlueButton1 = New Button()
+        Me.BlueSelectBox1 = New ComboBox()
+        Me.BlueTextBox3 = New TextBox()
+        Me.But1_Body = New GroupBox()
+        Me.BlueCaption12 = New Caption()
+        Me.BlueButton26 = New Button()
+        Me.BlueButton29 = New Button()
+        Me.BlueButton30 = New Button()
+        Me.BlueButton31 = New Button()
+        Me.BlueCaption8 = New Caption()
+        Me.BlueTabControl1 = New TabControl()
+        Me.BlueTabPage1 = New TabPage()
+        Me.BlueCreativePad2 = New CreativePad()
+        Me.BlueCreativePad1 = New CreativePad()
+        Me.BlueEasyPic1 = New EasyPic()
+        Me.BlueEasyPic2 = New EasyPic()
+        Me.BlueTabPage2 = New TabPage()
+        Me.BlueTabPage3 = New TabPage()
+        Me.BlueTabPage4 = New TabPage()
+        Me.BlueButton2 = New Button()
+        Me.BlueTextBox5 = New TextBox()
+        Me.BlueTextBox6 = New TextBox()
+        Me.BlueButton13 = New Button()
+        Me.BlueSlider1 = New Slider()
+        Me.BlueSlider2 = New Slider()
+        Me.BlueSlider3 = New Slider()
+        Me.BlueSlider4 = New Slider()
+        Me.BlueButton15 = New Button()
+        Me.BlueButton27 = New Button()
         Me.BlueFrame5.SuspendLayout()
         Me.BlueFrame4.SuspendLayout()
         Me.BlueFrame3.SuspendLayout()
@@ -112,7 +115,7 @@ Partial Class frmTest
         '
         'BlueButton24
         '
-        Me.BlueButton24.ButtonStyle = BlueElements.enButtonStyle.Optionbox_Text
+        Me.BlueButton24.ButtonStyle = enButtonStyle.Optionbox_Text
         Me.BlueButton24.Checked = True
         Me.BlueButton24.Enabled = False
         Me.BlueButton24.Location = New System.Drawing.Point(208, 304)
@@ -123,7 +126,7 @@ Partial Class frmTest
         '
         'BlueButton25
         '
-        Me.BlueButton25.ButtonStyle = BlueElements.enButtonStyle.Checkbox_Text
+        Me.BlueButton25.ButtonStyle = enButtonStyle.Checkbox_Text
         Me.BlueButton25.Checked = True
         Me.BlueButton25.Enabled = False
         Me.BlueButton25.Location = New System.Drawing.Point(136, 304)
@@ -134,7 +137,7 @@ Partial Class frmTest
         '
         'BlueButton22
         '
-        Me.BlueButton22.ButtonStyle = BlueElements.enButtonStyle.Optionbox
+        Me.BlueButton22.ButtonStyle = enButtonStyle.Optionbox
         Me.BlueButton22.Checked = True
         Me.BlueButton22.Enabled = False
         Me.BlueButton22.Location = New System.Drawing.Point(208, 192)
@@ -145,7 +148,7 @@ Partial Class frmTest
         '
         'BlueButton23
         '
-        Me.BlueButton23.ButtonStyle = BlueElements.enButtonStyle.Checkbox
+        Me.BlueButton23.ButtonStyle = enButtonStyle.Checkbox
         Me.BlueButton23.Checked = True
         Me.BlueButton23.Enabled = False
         Me.BlueButton23.Location = New System.Drawing.Point(136, 192)
@@ -178,7 +181,7 @@ Partial Class frmTest
         '
         'BlueButton18
         '
-        Me.BlueButton18.ButtonStyle = BlueElements.enButtonStyle.Optionbox
+        Me.BlueButton18.ButtonStyle = enButtonStyle.Optionbox
         Me.BlueButton18.Checked = True
         Me.BlueButton18.Enabled = False
         Me.BlueButton18.Location = New System.Drawing.Point(120, 3)
@@ -189,7 +192,7 @@ Partial Class frmTest
         '
         'BlueButton20
         '
-        Me.BlueButton20.ButtonStyle = BlueElements.enButtonStyle.Checkbox
+        Me.BlueButton20.ButtonStyle = enButtonStyle.Checkbox
         Me.BlueButton20.Checked = True
         Me.BlueButton20.Enabled = False
         Me.BlueButton20.Location = New System.Drawing.Point(61, 3)
@@ -226,7 +229,7 @@ Partial Class frmTest
         Me.BlueCaption1.Name = "BlueCaption1"
         Me.BlueCaption1.Size = New System.Drawing.Size(96, 24)
         Me.BlueCaption1.Text = "Caption"
-        Me.BlueCaption1.TextAnzeigeVerhalten = BlueElements.enSteuerelementVerhalten.Scrollen_mit_Textumbruch
+        Me.BlueCaption1.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch
         '
         'BlueCaption6
         '
@@ -235,7 +238,7 @@ Partial Class frmTest
         Me.BlueCaption6.Name = "BlueCaption6"
         Me.BlueCaption6.Size = New System.Drawing.Size(56, 24)
         Me.BlueCaption6.Text = "Disabled"
-        Me.BlueCaption6.TextAnzeigeVerhalten = BlueElements.enSteuerelementVerhalten.Scrollen_mit_Textumbruch
+        Me.BlueCaption6.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch
         '
         'BlueCaption5
         '
@@ -244,7 +247,7 @@ Partial Class frmTest
         Me.BlueCaption5.Name = "BlueCaption5"
         Me.BlueCaption5.Size = New System.Drawing.Size(56, 24)
         Me.BlueCaption5.Text = "Standard"
-        Me.BlueCaption5.TextAnzeigeVerhalten = BlueElements.enSteuerelementVerhalten.Scrollen_mit_Textumbruch
+        Me.BlueCaption5.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch
         '
         'BlueFrame3
         '
@@ -270,7 +273,7 @@ Partial Class frmTest
         Me.BlueCaption10.Name = "BlueCaption10"
         Me.BlueCaption10.Size = New System.Drawing.Size(96, 16)
         Me.BlueCaption10.Text = "Caption"
-        Me.BlueCaption10.TextAnzeigeVerhalten = BlueElements.enSteuerelementVerhalten.Scrollen_mit_Textumbruch
+        Me.BlueCaption10.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch
         '
         'BlueCaption4
         '
@@ -283,7 +286,7 @@ Partial Class frmTest
         '
         'BlueButton17
         '
-        Me.BlueButton17.ButtonStyle = BlueElements.enButtonStyle.Optionbox
+        Me.BlueButton17.ButtonStyle = enButtonStyle.Optionbox
         Me.BlueButton17.Enabled = False
         Me.BlueButton17.Location = New System.Drawing.Point(178, 3)
         Me.BlueButton17.Name = "BlueButton17"
@@ -293,7 +296,7 @@ Partial Class frmTest
         '
         'BlueButton19
         '
-        Me.BlueButton19.ButtonStyle = BlueElements.enButtonStyle.Checkbox
+        Me.BlueButton19.ButtonStyle = enButtonStyle.Checkbox
         Me.BlueButton19.Enabled = False
         Me.BlueButton19.Location = New System.Drawing.Point(119, 3)
         Me.BlueButton19.Name = "BlueButton19"
@@ -314,7 +317,7 @@ Partial Class frmTest
         '
         Me.BlueSelectBox2.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.BlueSelectBox2.Enabled = False
-        Me.BlueSelectBox2.Format = DataFormat.enDataFormat.Text_Ohne_Kritische_Zeichen
+        Me.BlueSelectBox2.Format = enDataFormat.Text
         Me.BlueSelectBox2.Location = New System.Drawing.Point(245, 3)
         Me.BlueSelectBox2.MultiLine = True
         Me.BlueSelectBox2.Name = "BlueSelectBox2"
@@ -336,7 +339,7 @@ Partial Class frmTest
         '
         Me.BlueSelectBox4.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.BlueSelectBox4.Enabled = False
-        Me.BlueSelectBox4.Format = DataFormat.enDataFormat.Text_Ohne_Kritische_Zeichen
+        Me.BlueSelectBox4.Format = enDataFormat.Text
         Me.BlueSelectBox4.Location = New System.Drawing.Point(280, 160)
         Me.BlueSelectBox4.MultiLine = True
         Me.BlueSelectBox4.Name = "BlueSelectBox4"
@@ -347,7 +350,7 @@ Partial Class frmTest
         'BlueSelectBox3
         '
         Me.BlueSelectBox3.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.BlueSelectBox3.Format = DataFormat.enDataFormat.Text_Ohne_Kritische_Zeichen
+        Me.BlueSelectBox3.Format = enDataFormat.Text
         Me.BlueSelectBox3.Location = New System.Drawing.Point(280, 128)
         Me.BlueSelectBox3.MultiLine = True
         Me.BlueSelectBox3.Name = "BlueSelectBox3"
@@ -357,7 +360,7 @@ Partial Class frmTest
         '
         'BlueListBox2
         '
-        Me.BlueListBox2.AddAllowed = BlueElements.BlueControls.ListBox.enAddType.Text
+        Me.BlueListBox2.AddAllowed = enAddType.Text
         Me.BlueListBox2.Enabled = False
         Me.BlueListBox2.Location = New System.Drawing.Point(424, 336)
         Me.BlueListBox2.Name = "BlueListBox2"
@@ -368,7 +371,7 @@ Partial Class frmTest
         '
         'BlueListBox1
         '
-        Me.BlueListBox1.AddAllowed = BlueElements.BlueControls.ListBox.enAddType.Text
+        Me.BlueListBox1.AddAllowed = enAddType.Text
         Me.BlueListBox1.Location = New System.Drawing.Point(424, 208)
         Me.BlueListBox1.Name = "BlueListBox1"
         Me.BlueListBox1.QuickInfo = ""
@@ -378,7 +381,7 @@ Partial Class frmTest
         '
         'BlueButton9
         '
-        Me.BlueButton9.ButtonStyle = BlueElements.enButtonStyle.Optionbox_Text
+        Me.BlueButton9.ButtonStyle = enButtonStyle.Optionbox_Text
         Me.BlueButton9.Enabled = False
         Me.BlueButton9.Location = New System.Drawing.Point(208, 280)
         Me.BlueButton9.Name = "BlueButton9"
@@ -388,7 +391,7 @@ Partial Class frmTest
         '
         'BlueButton10
         '
-        Me.BlueButton10.ButtonStyle = BlueElements.enButtonStyle.Checkbox_Text
+        Me.BlueButton10.ButtonStyle = enButtonStyle.Checkbox_Text
         Me.BlueButton10.Enabled = False
         Me.BlueButton10.Location = New System.Drawing.Point(136, 280)
         Me.BlueButton10.Name = "BlueButton10"
@@ -398,7 +401,7 @@ Partial Class frmTest
         '
         'BlueButton11
         '
-        Me.BlueButton11.ButtonStyle = BlueElements.enButtonStyle.Optionbox_Text
+        Me.BlueButton11.ButtonStyle = enButtonStyle.Optionbox_Text
         Me.BlueButton11.Location = New System.Drawing.Point(208, 256)
         Me.BlueButton11.Name = "BlueButton11"
         Me.BlueButton11.Size = New System.Drawing.Size(64, 16)
@@ -407,7 +410,7 @@ Partial Class frmTest
         '
         'BlueButton12
         '
-        Me.BlueButton12.ButtonStyle = BlueElements.enButtonStyle.Checkbox_Text
+        Me.BlueButton12.ButtonStyle = enButtonStyle.Checkbox_Text
         Me.BlueButton12.Location = New System.Drawing.Point(136, 256)
         Me.BlueButton12.Name = "BlueButton12"
         Me.BlueButton12.Size = New System.Drawing.Size(64, 16)
@@ -416,7 +419,7 @@ Partial Class frmTest
         '
         'BlueButton7
         '
-        Me.BlueButton7.ButtonStyle = BlueElements.enButtonStyle.Optionbox
+        Me.BlueButton7.ButtonStyle = enButtonStyle.Optionbox
         Me.BlueButton7.Enabled = False
         Me.BlueButton7.Location = New System.Drawing.Point(208, 160)
         Me.BlueButton7.Name = "BlueButton7"
@@ -426,7 +429,7 @@ Partial Class frmTest
         '
         'BlueButton8
         '
-        Me.BlueButton8.ButtonStyle = BlueElements.enButtonStyle.Checkbox
+        Me.BlueButton8.ButtonStyle = enButtonStyle.Checkbox
         Me.BlueButton8.Enabled = False
         Me.BlueButton8.Location = New System.Drawing.Point(136, 160)
         Me.BlueButton8.Name = "BlueButton8"
@@ -436,7 +439,7 @@ Partial Class frmTest
         '
         'BlueButton6
         '
-        Me.BlueButton6.ButtonStyle = BlueElements.enButtonStyle.Optionbox
+        Me.BlueButton6.ButtonStyle = enButtonStyle.Optionbox
         Me.BlueButton6.Location = New System.Drawing.Point(208, 128)
         Me.BlueButton6.Name = "BlueButton6"
         Me.BlueButton6.Size = New System.Drawing.Size(32, 24)
@@ -445,7 +448,7 @@ Partial Class frmTest
         '
         'BlueButton5
         '
-        Me.BlueButton5.ButtonStyle = BlueElements.enButtonStyle.Checkbox
+        Me.BlueButton5.ButtonStyle = enButtonStyle.Checkbox
         Me.BlueButton5.Location = New System.Drawing.Point(136, 128)
         Me.BlueButton5.Name = "BlueButton5"
         Me.BlueButton5.Size = New System.Drawing.Size(64, 24)
@@ -489,8 +492,8 @@ Partial Class frmTest
         '
         'BlueCategory1
         '
-        Me.BlueCategory1.AddAllowed = BlueElements.BlueControls.ListBox.enAddType.Text
-        Me.BlueCategory1.CheckBehavior = BlueElements.enCheckBehavior.MultiSelection
+        Me.BlueCategory1.AddAllowed = enAddType.Text
+        Me.BlueCategory1.CheckBehavior = enCheckBehavior.MultiSelection
         Me.BlueCategory1.Location = New System.Drawing.Point(8, 440)
         Me.BlueCategory1.Name = "BlueCategory1"
         Me.BlueCategory1.QuickInfo = ""
@@ -524,7 +527,7 @@ Partial Class frmTest
         Me.BlueCaption2.Name = "BlueCaption2"
         Me.BlueCaption2.Size = New System.Drawing.Size(96, 24)
         Me.BlueCaption2.Text = "Caption"
-        Me.BlueCaption2.TextAnzeigeVerhalten = BlueElements.enSteuerelementVerhalten.Scrollen_mit_Textumbruch
+        Me.BlueCaption2.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch
         '
         'BlueFrame1
         '
@@ -550,7 +553,7 @@ Partial Class frmTest
         Me.BlueCaption11.Name = "BlueCaption11"
         Me.BlueCaption11.Size = New System.Drawing.Size(96, 16)
         Me.BlueCaption11.Text = "Caption"
-        Me.BlueCaption11.TextAnzeigeVerhalten = BlueElements.enSteuerelementVerhalten.Scrollen_mit_Textumbruch
+        Me.BlueCaption11.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch
         '
         'BlueCaption3
         '
@@ -562,7 +565,7 @@ Partial Class frmTest
         '
         'BlueButton16
         '
-        Me.BlueButton16.ButtonStyle = BlueElements.enButtonStyle.Optionbox
+        Me.BlueButton16.ButtonStyle = enButtonStyle.Optionbox
         Me.BlueButton16.Location = New System.Drawing.Point(179, 3)
         Me.BlueButton16.Name = "BlueButton16"
         Me.BlueButton16.Size = New System.Drawing.Size(64, 34)
@@ -571,7 +574,7 @@ Partial Class frmTest
         '
         'BlueButton14
         '
-        Me.BlueButton14.ButtonStyle = BlueElements.enButtonStyle.Checkbox
+        Me.BlueButton14.ButtonStyle = enButtonStyle.Checkbox
         Me.BlueButton14.Location = New System.Drawing.Point(120, 3)
         Me.BlueButton14.Name = "BlueButton14"
         Me.BlueButton14.Size = New System.Drawing.Size(56, 34)
@@ -589,7 +592,7 @@ Partial Class frmTest
         'BlueSelectBox1
         '
         Me.BlueSelectBox1.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.BlueSelectBox1.Format = DataFormat.enDataFormat.Text_Ohne_Kritische_Zeichen
+        Me.BlueSelectBox1.Format = enDataFormat.Text
         Me.BlueSelectBox1.Location = New System.Drawing.Point(246, 3)
         Me.BlueSelectBox1.MultiLine = True
         Me.BlueSelectBox1.Name = "BlueSelectBox1"
@@ -623,7 +626,7 @@ Partial Class frmTest
         Me.BlueCaption12.Name = "BlueCaption12"
         Me.BlueCaption12.Size = New System.Drawing.Size(96, 16)
         Me.BlueCaption12.Text = "Caption"
-        Me.BlueCaption12.TextAnzeigeVerhalten = BlueElements.enSteuerelementVerhalten.Scrollen_mit_Textumbruch
+        Me.BlueCaption12.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch
         '
         'BlueButton26
         '
@@ -651,7 +654,7 @@ Partial Class frmTest
         '
         'BlueButton31
         '
-        Me.BlueButton31.ButtonStyle = BlueElements.enButtonStyle.Optionbox_Text
+        Me.BlueButton31.ButtonStyle = enButtonStyle.Optionbox_Text
         Me.BlueButton31.Location = New System.Drawing.Point(208, 232)
         Me.BlueButton31.Name = "BlueButton31"
         Me.BlueButton31.Size = New System.Drawing.Size(64, 16)
@@ -665,7 +668,7 @@ Partial Class frmTest
         Me.BlueCaption8.Name = "BlueCaption8"
         Me.BlueCaption8.Size = New System.Drawing.Size(56, 32)
         Me.BlueCaption8.Text = "Disabled<br>Checked"
-        Me.BlueCaption8.TextAnzeigeVerhalten = BlueElements.enSteuerelementVerhalten.Scrollen_mit_Textumbruch
+        Me.BlueCaption8.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch
         '
         'BlueTabControl1
         '
@@ -771,7 +774,7 @@ Partial Class frmTest
         'BlueTextBox5
         '
         Me.BlueTextBox5.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.BlueTextBox5.Format = DataFormat.enDataFormat.Text_Ohne_Kritische_Zeichen
+        Me.BlueTextBox5.Format = enDataFormat.Text
         Me.BlueTextBox5.Location = New System.Drawing.Point(472, 128)
         Me.BlueTextBox5.Name = "BlueTextBox5"
         Me.BlueTextBox5.Size = New System.Drawing.Size(88, 24)
@@ -782,7 +785,7 @@ Partial Class frmTest
         '
         Me.BlueTextBox6.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.BlueTextBox6.Enabled = False
-        Me.BlueTextBox6.Format = DataFormat.enDataFormat.Text_Ohne_Kritische_Zeichen
+        Me.BlueTextBox6.Format = enDataFormat.Text
         Me.BlueTextBox6.Location = New System.Drawing.Point(472, 160)
         Me.BlueTextBox6.Name = "BlueTextBox6"
         Me.BlueTextBox6.Size = New System.Drawing.Size(88, 24)
@@ -791,7 +794,7 @@ Partial Class frmTest
         '
         'BlueButton13
         '
-        Me.BlueButton13.ButtonStyle = BlueElements.enButtonStyle.Optionbox
+        Me.BlueButton13.ButtonStyle = enButtonStyle.Optionbox
         Me.BlueButton13.Location = New System.Drawing.Point(240, 128)
         Me.BlueButton13.Name = "BlueButton13"
         Me.BlueButton13.Size = New System.Drawing.Size(32, 24)
@@ -821,7 +824,7 @@ Partial Class frmTest
         Me.BlueSlider3.Enabled = False
         Me.BlueSlider3.Location = New System.Drawing.Point(400, 336)
         Me.BlueSlider3.Name = "BlueSlider3"
-        Me.BlueSlider3.Orientation = BlueElements.enOrientation.Senkrecht
+        Me.BlueSlider3.Orientation = enOrientation.Senkrecht
         Me.BlueSlider3.Size = New System.Drawing.Size(24, 160)
         Me.BlueSlider3.Text = "BlueSlider3"
         '
@@ -830,7 +833,7 @@ Partial Class frmTest
         Me.BlueSlider4.CausesValidation = False
         Me.BlueSlider4.Location = New System.Drawing.Point(376, 336)
         Me.BlueSlider4.Name = "BlueSlider4"
-        Me.BlueSlider4.Orientation = BlueElements.enOrientation.Senkrecht
+        Me.BlueSlider4.Orientation = enOrientation.Senkrecht
         Me.BlueSlider4.Size = New System.Drawing.Size(24, 160)
         Me.BlueSlider4.Text = "BlueSlider4"
         '

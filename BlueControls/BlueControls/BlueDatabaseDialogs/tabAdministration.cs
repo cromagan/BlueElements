@@ -517,7 +517,7 @@ namespace BlueControls.BlueDatabaseDialogs
         /// Löst das DatabaseLoadedEvengt aus, weil es fast einem Neuladen gleichkommt.
         /// </summary>
         /// <param name="DB"></param>
-        private static void OpenDatabaseHeadEditor(Database DB)
+        public static void OpenDatabaseHeadEditor(Database DB)
         {
             DB.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
             DB.Reload();

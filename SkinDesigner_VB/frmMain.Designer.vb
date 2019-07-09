@@ -1,9 +1,9 @@
-Imports BlueElements
-Imports BlueElements.BlueControls
+Imports BlueControls.Controls
+Imports BlueControls.Enums
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmMain
-    Inherits Forms.Form
+    Inherits BlueControls.Forms.Form
 
     'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
     <System.Diagnostics.DebuggerNonUserCode()>
@@ -28,35 +28,35 @@ Partial Class frmMain
         Me.VS1 = New System.Windows.Forms.PictureBox()
         Me.VS3 = New System.Windows.Forms.PictureBox()
         Me.VS2 = New System.Windows.Forms.PictureBox()
-        Me.Dis0 = New BlueElements.BlueControls.ComboBox()
-        Me.BlueCaption2 = New BlueElements.BlueControls.Caption()
-        Me.LöAn = New BlueElements.BlueControls.Button()
-        Me.FilterAus = New BlueElements.BlueControls.Button()
-        Me.BlueButton3 = New BlueElements.BlueControls.Button()
-        Me.TabView = New BlueElements.BlueControls.Table()
-        Me.F0 = New BlueElements.BlueControls.Formula()
-        Me.F1 = New BlueElements.BlueControls.Formula()
+        Me.Dis0 = New ComboBox()
+        Me.BlueCaption2 = New Caption()
+        Me.LöAn = New Button()
+        Me.FilterAus = New Button()
+        Me.BlueButton3 = New Button()
+        Me.TabView = New Table()
+        Me.F0 = New Formula()
+        Me.F1 = New Formula()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.Panel3 = New System.Windows.Forms.Panel()
-        Me.Button1 = New BlueElements.BlueControls.Button()
-        Me.Kopf2 = New BlueElements.BlueControls.Button()
-        Me.SymHinzu = New BlueElements.BlueControls.Button()
-        Me.Zeig1 = New BlueElements.BlueControls.Button()
-        Me.BlueCaption1 = New BlueElements.BlueControls.Caption()
-        Me.Dis1 = New BlueElements.BlueControls.ComboBox()
+        Me.Button1 = New Button()
+        Me.Kopf2 = New Button()
+        Me.SymHinzu = New Button()
+        Me.Zeig1 = New Button()
+        Me.BlueCaption1 = New Caption()
+        Me.Dis1 = New ComboBox()
         Me.VS32 = New System.Windows.Forms.PictureBox()
         Me.VS22 = New System.Windows.Forms.PictureBox()
         Me.VS12 = New System.Windows.Forms.PictureBox()
         Me.Panel1 = New System.Windows.Forms.Panel()
-        Me.Kopf1 = New BlueElements.BlueControls.Button()
-        Me.Zeig0 = New BlueElements.BlueControls.Button()
-        Me.Bindung0 = New BlueElements.BlueControls.Caption()
+        Me.Kopf1 = New Button()
+        Me.Zeig0 = New Button()
+        Me.Bindung0 = New Caption()
         Me.Panel2 = New System.Windows.Forms.Panel()
-        Me.BlueTabControl1 = New BlueElements.BlueControls.TabControl()
-        Me.BlueTabPage1 = New BlueElements.BlueControls.TabPage()
-        Me.BlueFrame3 = New BlueElements.BlueControls.GroupBox()
-        Me.BlueFrame2 = New BlueElements.BlueControls.GroupBox()
-        Me.BlueFrame1 = New BlueElements.BlueControls.GroupBox()
+        Me.BlueTabControl1 = New TabControl()
+        Me.BlueTabPage1 = New TabPage()
+        Me.BlueFrame3 = New GroupBox()
+        Me.BlueFrame2 = New GroupBox()
+        Me.BlueFrame1 = New GroupBox()
         CType(Me.VS1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.VS3, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.VS2, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -101,7 +101,7 @@ Partial Class frmMain
         'Dis0
         '
         Me.Dis0.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.Dis0.Format = BlueElements.DataFormat.enDataFormat.Text_Ohne_Kritische_Zeichen
+        Me.Dis0.Format = BlueBasics.Enums.enDataFormat.Text
         Me.Dis0.Location = New System.Drawing.Point(112, 8)
         Me.Dis0.Name = "Dis0"
         Me.Dis0.Size = New System.Drawing.Size(120, 24)
@@ -114,7 +114,7 @@ Partial Class frmMain
         Me.BlueCaption2.Name = "BlueCaption2"
         Me.BlueCaption2.Size = New System.Drawing.Size(96, 16)
         Me.BlueCaption2.Text = "Disabled Effekt:"
-        Me.BlueCaption2.TextAnzeigeVerhalten = BlueElements.enSteuerelementVerhalten.Scrollen_mit_Textumbruch
+        Me.BlueCaption2.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch
         '
         'LöAn
         '
@@ -247,12 +247,12 @@ Partial Class frmMain
         Me.BlueCaption1.Name = "BlueCaption1"
         Me.BlueCaption1.Size = New System.Drawing.Size(96, 16)
         Me.BlueCaption1.Text = "Disabled Effekt:"
-        Me.BlueCaption1.TextAnzeigeVerhalten = BlueElements.enSteuerelementVerhalten.Scrollen_mit_Textumbruch
+        Me.BlueCaption1.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch
         '
         'Dis1
         '
         Me.Dis1.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.Dis1.Format = BlueElements.DataFormat.enDataFormat.Text_Ohne_Kritische_Zeichen
+        Me.Dis1.Format = BlueBasics.Enums.enDataFormat.Text
         Me.Dis1.Location = New System.Drawing.Point(120, 8)
         Me.Dis1.Name = "Dis1"
         Me.Dis1.Size = New System.Drawing.Size(120, 24)

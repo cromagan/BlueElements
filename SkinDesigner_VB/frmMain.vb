@@ -9,6 +9,9 @@ Imports BlueControls.Enums
 Imports BlueControls.EventArgs
 Imports BlueBasics.Enums
 Imports BlueControls.Controls
+Imports BlueDatabase.EventArgs
+Imports BlueDatabase.Enums
+Imports BlueControls.DialogBoxes
 
 Class frmMain
 
@@ -22,46 +25,51 @@ Class frmMain
     Private Sub frmMain_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
 
 
-        For z As Integer = 0 To DB.GetUpperBound(0)
-            With DB(z)
-                ToEnum(.Column("Control"), GetType(enDesign))
-                ToEnum(.Column("Status"), GetType(enStates))
-                ToEnum(.Column("Border_Style"), GetType(enRahmenArt))
-                ToEnum(.Column("Draw_Back"), GetType(enHintegrundArt))
-                '   ToEnum(.Column("Draw_Text"), GetType(enFont))
-                ToEnum(.Column("Kontur"), GetType(enKontur))
-                .Row.DoAutomatic(Nothing)
+        'For z As Integer = 0 To DB.GetUpperBound(0)
+        '    With DB(z)
+        '        ToEnum(.Column("Control"), GetType(enDesign))
+        '        ToEnum(.Column("Status"), GetType(enStates))
+        '        ToEnum(.Column("Border_Style"), GetType(enRahmenArt))
+        '        ToEnum(.Column("Draw_Back"), GetType(enHintergrundArt))
+        '        '   ToEnum(.Column("Draw_Text"), GetType(enFont))
+        '        ToEnum(.Column("Kontur"), GetType(enKontur))
+        '        .Row.DoAutomatic(Nothing, True)
 
-                .Release()
-            End With
-        Next
-
+        '        .Release()
+        '    End With
+        'Next
+        BlueDatabase.Database.ReleaseAll(True)
     End Sub
 
-    Public Sub ToEnum(ByVal Col As ColumnItem, ByRef t As System.Type)
-        Col.ShowUndo = False
+    'Public Sub ToEnum(ByVal Col As ColumnItem, ByRef t As System.Type)
+    '    Col.ShowUndo = False
 
-        For Each ThisRowItem As RowItem In Col.Database.Row
-            If ThisRowItem IsNot Nothing Then
-                If Not ThisRowItem.CellIsNullOrEmpty(Col) Then
-                    ThisRowItem.CellSet(Col, CInt(Val(System.Enum.Parse(t, ThisRowItem.CellGetString(Col)))))
-                End If
-            End If
-        Next
-        Col.DropDownItems.Clear()
-    End Sub
+    '    For Each ThisRowItem As RowItem In Col.Database.Row
+    '        If ThisRowItem IsNot Nothing Then
+    '            If Not ThisRowItem.CellIsNullOrEmpty(Col) Then
+    '                ThisRowItem.CellSet(Col, CInt(Val(System.Enum.Parse(t, ThisRowItem.CellGetString(Col)))))
+    '            End If
+    '        End If
+    '    Next
+    '    Col.DropDownItems.Clear()
+    'End Sub
 
 
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
 
         Dim pf As String = System.Reflection.Assembly.GetEntryAssembly.Location.FilePath
-        pf = pf.PathParent(3) & "BlueElements\Ressourcen\Skin\"
+        pf = pf.PathParent(3) & "BlueControls\BlueControls\Ressourcen\Skin\"
 
         ReDim DB(2)
-        DB(0) = Database.Load(pf & "Windows10.skn", False) ' MUSS IMMER  Windows10 BLEIBEN! VORLAGE!
-        DB(2) = Database.Load(pf & "XP.skn", False)
-        DB(1) = Database.Load(pf & "GlossyCyan.skn", False)
+        DB(0) = New Database(False, AddressOf Table.Database_NeedPassword, AddressOf CreativePad.GenerateLayoutFromRow, AddressOf CreativePad.RenameColumnInLayout) ' MUSS IMMER  Windows10 BLEIBEN! VORLAGE!
+        DB(0).LoadFromDisk(pf & "Windows10.skn")
+
+        DB(2) = New Database(False, AddressOf Table.Database_NeedPassword, AddressOf CreativePad.GenerateLayoutFromRow, AddressOf CreativePad.RenameColumnInLayout)
+        DB(2).LoadFromDisk(pf & "XP.skn")
+
+        DB(1) = New Database(False, AddressOf Table.Database_NeedPassword, AddressOf CreativePad.GenerateLayoutFromRow, AddressOf CreativePad.RenameColumnInLayout)
+        DB(1).LoadFromDisk(pf & "GlossyCyan.skn")
 
 
         For z As Integer = 0 To DB.GetUpperBound(0)
@@ -70,7 +78,7 @@ Class frmMain
                 ToReadable(.Column("Control"), GetType(enDesign))
                 ToReadable(.Column("Status"), GetType(enStates))
                 ToReadable(.Column("Border_Style"), GetType(enRahmenArt))
-                ToReadable(.Column("Draw_Back"), GetType(enHintegrundArt))
+                ToReadable(.Column("Draw_Back"), GetType(enHintergrundArt))
                 ToReadable(.Column("Kontur"), GetType(enKontur))
             End With
         Next
@@ -90,7 +98,7 @@ Class frmMain
 
 
         For z As Integer = DB.GetUpperBound(0) To 1 Step -1 ' Rückwärts, um dir richtigen Fehlermeldungen zu bekommen
-            DB(z).CopyLayout(DB(0), False)
+            'DB(z).CopyLayout(DB(0), False)
 
 
             Dim r As RowItem
@@ -111,7 +119,7 @@ Class frmMain
                         r.CellSet("Font", String.Empty)
                     Else
                         If r.CellIsNullOrEmpty("Font") Then
-                            eNotification(DB(z).Filename.FileNameWithoutSuffix & "<br>" & ThisRowItem.CellGetString(ThisRowItem.Database.Column(0)) & "<br>" & ThisRowItem.CellGetString(ThisRowItem.Database.Column(1)) & "<br>Schrift prüfen", enImageCode.Warnung)
+                            Notification.Show(DB(z).Filename.FileNameWithoutSuffix & "<br>" & ThisRowItem.CellGetString(ThisRowItem.Database.Column(0)) & "<br>" & ThisRowItem.CellGetString(ThisRowItem.Database.Column(1)) & "<br>Schrift prüfen", enImageCode.Warnung)
                         End If
                     End If
 
@@ -170,7 +178,7 @@ Class frmMain
 
 
     Private Sub SK_ContextMenu_Init(sender As Object, e As ContextMenuInitEventArgs) Handles TabView.ContextMenuInit
-        Dim CellKey As String = CStr(e.MouseOver)
+        Dim CellKey As String = CStr(e.Tag)
         If (String.IsNullOrEmpty(CellKey)) Then Exit Sub
         Dim Column As ColumnItem = Nothing
         Dim Row As RowItem = Nothing
@@ -184,7 +192,7 @@ Class frmMain
 
                 e.UserMenu.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten)
 
-                e.UserMenu.Add(New LineListItem)
+                e.UserMenu.Add(New BlueControls.ItemCollection.LineListItem)
                 e.UserMenu.Add(enContextMenuComands.InhaltLöschen)
                 e.UserMenu.Add(enContextMenuComands.SuchenUndErsetzen)
 
@@ -211,7 +219,7 @@ Class frmMain
     End Sub
 
     Private Sub SK_ContextMenu_ItemClicked(sender As Object, e As ContextMenuItemClickedEventArgs) Handles TabView.ContextMenuItemClicked
-        Dim CellKey As String = CStr(e.MouseOver)
+        Dim CellKey As String = CStr(e.Tag)
         If (String.IsNullOrEmpty(CellKey)) Then Exit Sub
         Dim Column As ColumnItem = Nothing
         Dim Row As RowItem = Nothing
@@ -221,7 +229,7 @@ Class frmMain
         Select Case e.ClickedComand.Internal
             Case Is = "ZeileLöschen"
                 If Row IsNot Nothing Then
-                    If eMsgBox("Zeile löschen?", enImageCode.Frage, "Ja", "Nein") = 0 Then
+                    If MessageBox.Show("Zeile löschen?", enImageCode.Frage, "Ja", "Nein") = 0 Then
                         TabView.Database.Row.Remove(Row)
                     End If
                 End If
@@ -243,7 +251,7 @@ Class frmMain
 
 
             Case Is = "ZellenInhaltKopieren"
-                Row.Database.Cell.CopyToClipboard(Column, Row, True)
+                Table.CopyToClipboard(Column, Row, True)
 
             Case Is = "ZellenInhaltPaste"
                 If Not System.Windows.Forms.Clipboard.GetDataObject.GetDataPresent(
@@ -386,28 +394,52 @@ Class frmMain
     Public Sub ToReadable(ByVal Col As ColumnItem, ByRef t As System.Type)
         Col.ShowUndo = False
 
+        Col.Replacer.Clear()
 
-        Dim te As String
+        Dim items As Array
+        items = System.Enum.GetValues(t)
+        Dim item As String
+        For Each item In items
 
-        For Each ThisRowItem As RowItem In Col.Database.Row
-            If ThisRowItem IsNot Nothing Then
-                If Not ThisRowItem.CellIsNullOrEmpty(Col) Then
+            Dim l As Long = 0
+            If Long.TryParse(item, l) Then
+                Dim te As String = System.Enum.GetName(t, l)
 
-
-                    Dim l As Long = 0
-
-                    If Long.TryParse(ThisRowItem.CellGetString(Col), l) Then
-                        te = System.Enum.GetName(t, ThisRowItem.CellInteger(Col))
-                        If Not String.IsNullOrEmpty(te) Then ThisRowItem.CellSet(Col, te)
-                    End If
-
+                If Not String.IsNullOrEmpty(te) Then
+                    Col.Replacer.Add(item & "|" & te)
                 End If
+
             End If
+
+
         Next
 
+        Col.ShowUndo = True
 
-        Col.DropDownItems.Clear()
-        Col.DropDownItems.AddRange(System.Enum.GetNames(t))
+        'Dim x As String() = t.GetEnumNames()
+        'Dim x2 As String() = t.GetEnumValues()
+
+        'Dim te As String
+
+        'For Each ThisRowItem As RowItem In Col.Database.Row
+        '    If ThisRowItem IsNot Nothing Then
+        '        If Not ThisRowItem.CellIsNullOrEmpty(Col) Then
+
+
+        '            Dim l As Long = 0
+
+        '            If Long.TryParse(ThisRowItem.CellGetString(Col), l) Then
+        '                te = System.Enum.GetName(t, ThisRowItem.CellInteger(Col))
+        '                If Not String.IsNullOrEmpty(te) Then ThisRowItem.CellSet(Col, te)
+        '            End If
+
+        '        End If
+        '    End If
+        'Next
+
+
+        'Col.DropDownItems.Clear()
+        'Col.DropDownItems.AddRange(System.Enum.GetNames(t))
 
 
     End Sub
@@ -418,33 +450,34 @@ Class frmMain
 
 
 
-    Private Sub BlueButton1_Click(Sender As System.Object, e As EventArgs) Handles LöAn.Click
-        TabView.Database.Row.Remove(TabView.Filter, True)
-    End Sub
+    'Private Sub BlueButton1_Click(Sender As System.Object, e As EventArgs) Handles LöAn.Click
+    '    TabView.Database.Row.Remove(TabView.Filter, True)
+    'End Sub
 
-    Private Sub Zeig0_Click(Sender As System.Object, e As EventArgs) Handles Zeig0.Click
-        Dim s As String = TabView.ViewToString
-        TabView.Database = DB(0)
-        TabView.ParseView(s)
-    End Sub
+    'Private Sub Zeig0_Click(Sender As System.Object, e As EventArgs) Handles Zeig0.Click
+    '    Dim s As String = TabView.ViewToString
+    '    TabView.Database = DB(0)
+    '    TabView.ParseView(s)
+    'End Sub
 
-    Private Sub Zeig1_Click(Sender As System.Object, e As EventArgs) Handles Zeig1.Click
-        Dim s As String = TabView.ViewToString
-        TabView.Database = DB(1)
-        TabView.ParseView(s)
-    End Sub
+    'Private Sub Zeig1_Click(Sender As System.Object, e As EventArgs) Handles Zeig1.Click
+    '    Dim s As String = TabView.ViewToString
+    '    TabView.Database = DB(1)
+    '    TabView.ParseView(s)
+    'End Sub
 
 
 
     Private Sub Kopf1_Click(sender As Object, e As EventArgs) Handles Kopf1.Click
-        DB(0).EditHead()
+        BlueControls.BlueDatabaseDialogs.tabAdministration.OpenDatabaseHeadEditor(DB(0))
+
     End Sub
 
     Private Sub Kopf2_Click(sender As Object, e As EventArgs) Handles Kopf2.Click
 
-        eMsgBox("Diese Datenbank wird mit den Kopfeigenschaften von Windows 10 Skin überschrieben.<br>Nur die Binärdaten können hier abgeändert werden.", enImageCode.Information, "OK")
+        MessageBox.Show("Diese Datenbank wird mit den Kopfeigenschaften von Windows 10 Skin überschrieben.<br>Nur die Binärdaten können hier abgeändert werden.", enImageCode.Information, "OK")
 
-        DB(1).EditHead()
+        BlueControls.BlueDatabaseDialogs.tabAdministration.OpenDatabaseHeadEditor(DB(0))
     End Sub
 
 End Class

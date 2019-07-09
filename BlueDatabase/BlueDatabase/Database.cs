@@ -327,6 +327,12 @@ namespace BlueDatabase
         public static void ReleaseAll(bool MUSTRelease)
         {
 
+            if (MUSTRelease)
+            {
+                ReleaseAll(false); // Beenden, was geht, dann erst der muss
+            }
+
+
             var x = AllDatabases.Count;
 
             foreach (var ThisDatabase in AllDatabases)

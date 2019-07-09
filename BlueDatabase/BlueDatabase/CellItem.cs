@@ -196,12 +196,12 @@ namespace BlueDatabase
 
                 case enDataFormat.Schrift:
                     if (Style == enShortenStyle.HTML) { break; }
-                    Develop.DebugPrint_NichtImplementiert();
+                //    Develop.DebugPrint_NichtImplementiert();
                     //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return Txt; }
 
                     //if (Column.CompactView) { return string.Empty; }
                     //return BlueFont.Get(Txt).ReadableText();
-                    return string.Empty;
+                    return Txt;
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     // Hier kommt die Spalten-ID  an
@@ -323,10 +323,10 @@ namespace BlueDatabase
                     return QuickImage.Get(Txt.FileType(), 48);
 
                 case enDataFormat.Schrift:
-                    Develop.DebugPrint_NichtImplementiert();
-                    //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return ImageCode; }
-                    //return BlueFont.Get(Txt).SymbolForReadableText();
-                    return null;
+                  //  Develop.DebugPrint_NichtImplementiert();
+                    //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return defaultImage; }
+                    // return Skin.BlueFont.Get(Txt).SymbolForReadableText();
+                    return defaultImage;
 
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:

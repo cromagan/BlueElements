@@ -257,7 +257,7 @@ namespace BlueControls.Controls
             OnImageChanged();
         }
 
-        internal void SetBitmap(Bitmap BMP)
+        public void SetBitmap(Bitmap BMP)
         {
             _Bitmap = BMP;
             SorceType = enSorceType.SetedByProperty;

@@ -1,27 +1,23 @@
 ﻿Imports System
-Imports BlueElements
-Imports BlueElements.EventArgs
-Imports BlueElements.Forms
-Imports BlueElements.ItemCollection
 Imports System.Collections.Generic
-Imports BlueElements.BlueDatabase
-Imports BlueElements.BlueControls
-Imports BlueElements.ItemCollectionBasic
-Imports BlueElements.modConverter
-Imports BlueElements.modAllgemein
-Imports BlueElements.Forms.DialogBox
-Imports BlueElements.DataFormat
+Imports BlueBasics
+Imports BlueBasics.Enums
+Imports BlueControls
+Imports BlueControls.Enums
+Imports BlueControls.DialogBoxes
+Imports BlueControls.EventArgs
+Imports BlueControls.ItemCollection
 
 Public Class frmTest
 
 
 
     Private Sub BlueButton26_Click(ByVal Sender As System.Object, ByVal e As EventArgs) Handles BlueButton26.Click
-        eInputBox("Hallo Welt!", "", enDataFormat.Text)
+        InputBox.Show("Hallo Welt!", "", enDataFormat.Text)
     End Sub
 
     Private Sub BlueButton29_Click(ByVal Sender As System.Object, ByVal e As EventArgs) Handles BlueButton29.Click
-        eNotification("Hallo Welt!", enImageCode.Wolke)
+        Notification.Show("Hallo Welt!", enImageCode.Wolke)
     End Sub
 
     Private Sub BlueButton30_Click(ByVal Sender As System.Object, ByVal e As EventArgs) Handles BlueButton30.Click
@@ -54,8 +50,8 @@ Public Class frmTest
 
 
 
-        BlueEasyPic1.Bitmap = QuickImage.Get(enImageCode.Sonne, 32).BMP
-        BlueEasyPic2.Bitmap = QuickImage.Get(enImageCode.Wolke, 32).BMP
+        'BlueEasyPic1.SetBitmap(QuickImage.Get(enImageCode.Sonne, 32).BMP)
+        'BlueEasyPic2.SetBitmap(QuickImage.Get(enImageCode.Wolke, 32).BMP)
 
 
 
@@ -89,7 +85,7 @@ Public Class frmTest
     End Sub
 
     Private Sub BlueButton15_Click(ByVal Sender As System.Object, ByVal e As EventArgs) Handles BlueButton15.Click
-        eMsgBox("Test!", enImageCode.Sonne, "OK")
+        MessageBox.Show("Test!", enImageCode.Sonne, "OK")
     End Sub
 
     Private Sub BlueButton27_Click(ByVal Sender As System.Object, ByVal e As EventArgs) Handles BlueButton27.Click
@@ -102,15 +98,14 @@ Public Class frmTest
         BlueButton27.Enabled = False
 
 
-        For z As Integer = 0 To 15
-            eProgressbar("Test, 15 Sekunden", z, 15, Me)
+        ' For z As Integer = 0 To 15
+        Dim X As Progressbar = Progressbar.Show("Test, 15 Sekunden")
 
-            Pause(1, True)
+        '    Pause(1, True)
 
-        Next
+        'Next
 
-
-        eProgressbar_Destroy()
+        X.Close()
 
         isin = False
 

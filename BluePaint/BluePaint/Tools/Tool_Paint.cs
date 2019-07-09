@@ -39,15 +39,15 @@ namespace BluePaint
 
         public override void MouseMove(System.Windows.Forms.MouseEventArgs e)
         {
-            SolidBrush Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
+            var Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
 
             if (e.Button == System.Windows.Forms. MouseButtons.Left)
             {
 
                 if (IsInsidePic(e))
                 {
-                    Graphics gr = Graphics.FromImage(_Pic);
-                    Rectangle r = new Rectangle(e.X - 1, e.Y - 1, 3, 3);
+                    var gr = Graphics.FromImage(_Pic);
+                    var r = new Rectangle(e.X - 1, e.Y - 1, 3, 3);
                     gr.FillEllipse(Brushes.Black, r);
                     OnPicChangedByTool();
                 }
@@ -59,8 +59,8 @@ namespace BluePaint
                 if (IsInsidePic(e))
                 {
                     ClearPreviewPic();
-                    Graphics gr = Graphics.FromImage(_PicPreview);
-                    Rectangle r = new Rectangle(e.X - 1, e.Y - 1, 3, 3);
+                    var gr = Graphics.FromImage(_PicPreview);
+                    var r = new Rectangle(e.X - 1, e.Y - 1, 3, 3);
                     gr.FillEllipse(Brush_RotTransp, r);
                 }
 

@@ -113,22 +113,12 @@ namespace BlueControls
                 return;
             }
 
-            GetEffects();
-
-        }
-
-
-        private void GetEffects()
-        {
-
             ST[0] = (enImageCodeEffect)int.Parse(SkinDB.Tags[0]);
             Pen_LinieDünn = new Pen(Color_Border(enDesign.Table_Lines_thin, enStates.Standard));
             Pen_LinieKräftig = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard));
             Pen_LinieDick = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard), 3);
 
             OnSkinChanged();
-
-
         }
 
         private void OnSkinChanged()
