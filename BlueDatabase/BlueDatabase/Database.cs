@@ -144,7 +144,7 @@ namespace BlueDatabase
                     if (FileExists(pf))
                     {
                         var tmp = Database.GetByFilename(pf);
-                        if (tmp != null) { return null; }
+                        if (tmp != null) { return tmp; }
                         tmp = new Database(false, passwordSub, GenLayout, RenameColumn);
                         tmp.LoadFromDisk(pf);
                         return tmp;

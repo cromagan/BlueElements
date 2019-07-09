@@ -339,7 +339,7 @@ namespace BlueControls.Controls
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
         {
 
-            if (Skin.SkinDB == null) { return; }
+            if (!Skin.IsReady()) { return; }
 
 
             if (IsRibbonBar)

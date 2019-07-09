@@ -37,7 +37,8 @@ namespace BlueControls
 {
     public sealed class Skin
     {
-        public static Database SkinDB;
+        private static Database SkinDB;
+        private static bool loaded = false;
         public static Database StyleDB;
 
         private static readonly enImageCodeEffect[] ST = new enImageCodeEffect[1];
@@ -100,6 +101,7 @@ namespace BlueControls
 
         private void LoadSkin()
         {
+            loaded = false;
             _SkinString = _Skin.ToString();
             _SkinString = _SkinString.Replace("_", "");
             _SkinString = _SkinString.Replace(" ", "");
@@ -113,11 +115,14 @@ namespace BlueControls
                 return;
             }
 
+           // SkinDB.WaitParsed();
+
+    
             ST[0] = (enImageCodeEffect)int.Parse(SkinDB.Tags[0]);
             Pen_LinieDünn = new Pen(Color_Border(enDesign.Table_Lines_thin, enStates.Standard));
             Pen_LinieKräftig = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard));
             Pen_LinieDick = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard), 3);
-
+            loaded = true;
             OnSkinChanged();
         }
 
@@ -125,6 +130,13 @@ namespace BlueControls
         {
             SkinChanged?.Invoke(this, System.EventArgs.Empty);
         }
+
+
+        public static bool IsReady()
+        {
+            return loaded;
+        }
+
 
         public static enImageCodeEffect AdditionalState(enStates vState)
         {
@@ -176,18 +188,14 @@ namespace BlueControls
             if (SkinDB == null) { return null; }
 
 
-            if (SkinRow_LastType != vDesign || SkinRow_LastState != vState || SkinRow_LastRow == null)
-            {
-                SkinRow_LastRow = SkinDB.Row[new FilterItem(SkinDB.Column[0], enFilterType.Istgleich, ((int)vDesign).ToString()), new FilterItem(SkinDB.Column[1], enFilterType.Istgleich, ((int)vState).ToString())];
-            }
+            if (SkinRow_LastType == vDesign && SkinRow_LastState == vState && SkinRow_LastRow == null) { return SkinRow_LastRow; }
 
-
-            if (SkinRow_LastRow == null) { Develop.DebugPrint("Unbekanntes Skin: " + SkinDB.Filename.FileNameWithoutSuffix() + "/" + vDesign + "/" + vState); }
-
-
+            SkinRow_LastRow = SkinDB.Row[new FilterItem(SkinDB.Column[0], enFilterType.Istgleich, ((int)vDesign).ToString()),
+                                         new FilterItem(SkinDB.Column[1], enFilterType.Istgleich, ((int)vState).ToString())];
             SkinRow_LastState = vState;
             SkinRow_LastType = vDesign;
 
+            if (SkinRow_LastRow == null) { Develop.DebugPrint("Unbekanntes Skin: " + SkinDB.Filename.FileNameWithoutSuffix() + "/" + vDesign + "/" + vState); }
 
             return SkinRow_LastRow;
         }

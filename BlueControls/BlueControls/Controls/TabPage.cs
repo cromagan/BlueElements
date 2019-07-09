@@ -153,7 +153,7 @@ namespace BlueControls.Controls
 
         private void DoDraw(Graphics GR)
         {
-            if (Skin.SkinDB == null) { return; }
+            if (!Skin.IsReady()) { return; }
 
             if (Width < 1 || Height < 1) { return; }
 

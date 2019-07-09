@@ -98,7 +98,7 @@ Class frmMain
 
 
         For z As Integer = DB.GetUpperBound(0) To 1 Step -1 ' Rückwärts, um dir richtigen Fehlermeldungen zu bekommen
-            'DB(z).CopyLayout(DB(0), False)
+            ' DB(z).CopyLayout(DB(0), False)
 
 
             Dim r As RowItem
@@ -268,6 +268,10 @@ Class frmMain
             Case Is = "InhaltLöschen"
                 Row.CellSet(Column, String.Empty)
 
+            Case "SpaltenEigenschaftenBearbeiten"
+                BlueControls.BlueDatabaseDialogs.tabAdministration.OpenColumnEditor(Column)
+
+
             Case Else
                 Develop.DebugPrint(e.ClickedComand)
 
@@ -392,9 +396,8 @@ Class frmMain
 
 
     Public Sub ToReadable(ByVal Col As ColumnItem, ByRef t As System.Type)
-        Col.ShowUndo = False
 
-        Col.Replacer.Clear()
+        Dim li As New List(Of String)
 
         Dim items As Array
         items = System.Enum.GetValues(t)
@@ -406,7 +409,7 @@ Class frmMain
                 Dim te As String = System.Enum.GetName(t, l)
 
                 If Not String.IsNullOrEmpty(te) Then
-                    Col.Replacer.Add(item & "|" & te)
+                    li.Add(item & "|" & te)
                 End If
 
             End If
@@ -414,34 +417,12 @@ Class frmMain
 
         Next
 
-        Col.ShowUndo = True
+        li.Reverse()
 
-        'Dim x As String() = t.GetEnumNames()
-        'Dim x2 As String() = t.GetEnumValues()
-
-        'Dim te As String
-
-        'For Each ThisRowItem As RowItem In Col.Database.Row
-        '    If ThisRowItem IsNot Nothing Then
-        '        If Not ThisRowItem.CellIsNullOrEmpty(Col) Then
-
-
-        '            Dim l As Long = 0
-
-        '            If Long.TryParse(ThisRowItem.CellGetString(Col), l) Then
-        '                te = System.Enum.GetName(t, ThisRowItem.CellInteger(Col))
-        '                If Not String.IsNullOrEmpty(te) Then ThisRowItem.CellSet(Col, te)
-        '            End If
-
-        '        End If
-        '    End If
-        'Next
-
-
-        'Col.DropDownItems.Clear()
-        'Col.DropDownItems.AddRange(System.Enum.GetNames(t))
-
-
+        If Col.Replacer.IsDifferentTo(li) Then
+            Col.Replacer.Clear()
+            Col.Replacer.AddRange(li)
+        End If
     End Sub
 
 

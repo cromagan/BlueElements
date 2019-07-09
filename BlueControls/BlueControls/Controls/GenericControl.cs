@@ -87,7 +87,7 @@ namespace BlueControls.Controls
         #region  Standard-Variablen 
         private bool _MousePressing;
         protected bool _MouseHighlight = true;
-        private bool _translate = true;
+
         #endregion
 
         protected virtual void DrawControl(Graphics gr, enStates state)
@@ -100,11 +100,8 @@ namespace BlueControls.Controls
         }
 
         [DefaultValue(true)]
-        public bool Translate
-        {
-            get { return _translate; }
-            set { _translate = value; }
-        }
+        public bool Translate { get; set; }
+
 
         #region  AutoScale deaktivieren 
         // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
@@ -219,7 +216,7 @@ namespace BlueControls.Controls
             {
                 if (!Visible && !IgnoreVisible) { return; }
 
-                if (Skin.SkinDB == null)
+                if (!Skin.IsReady())
                 {
                     if (DesignMode)
                     {
