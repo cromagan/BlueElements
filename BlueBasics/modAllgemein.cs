@@ -112,11 +112,20 @@ namespace BlueBasics
             if (string.IsNullOrEmpty(DateiName)) { return null; }
             if (!FileExists(DateiName)) { return null; }
 
-            var fs = new FileStream(DateiName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            var IM = Image.FromStream(fs);
-            fs.Close();
-            fs.Dispose();
-            return IM;
+            try
+            {
+                var fs = new FileStream(DateiName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                var IM = Image.FromStream(fs);
+                fs.Close();
+                fs.Dispose();
+                return IM;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+
         }
 
         public static Bitmap Invert(Bitmap source)

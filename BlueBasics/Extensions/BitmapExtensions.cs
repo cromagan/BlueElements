@@ -50,6 +50,8 @@ namespace BlueBasics
 
         public static Bitmap Image_Clone(this Bitmap SourceBMP)
         {
+            if (SourceBMP == null) { return null; }
+
             var bmp = new Bitmap(SourceBMP.Width, SourceBMP.Height, PixelFormat.Format32bppArgb);
             using (var g = Graphics.FromImage(bmp))
             {

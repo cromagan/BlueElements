@@ -229,17 +229,11 @@ namespace BlueControls.ItemCollection
 
             var ne = 5 / zoomfactor;
 
-            if (value.DistanzZuStrecke(P1, P2) < ne)
-            {
-                return true;
-            }
+            if (value.DistanzZuStrecke(P1, P2) < ne) { return true; }
 
             foreach (var Thispoint in PointList())
             {
-                if (Geometry.Länge(value, Thispoint.ToPointF()) < ne)
-                {
-                    return true;
-                }
+                if (Geometry.Länge(value, Thispoint.ToPointF()) < ne) { return true; }
             }
 
 
@@ -442,7 +436,7 @@ namespace BlueControls.ItemCollection
             {
                 case "additionalpoints":
                     AdditionalPoints.Clear();
-                    for (var z = 1; z <= int.Parse(pair.Value); z++)
+                    for (var z = 1 ; z <= int.Parse(pair.Value) ; z++)
                     {
                         var p = new PointDF(this, "Zusatz" + z, 0, 0, false, true);
                         AdditionalPoints.Add(p);
@@ -715,13 +709,13 @@ namespace BlueControls.ItemCollection
             var MinX = float.MaxValue;
             var MinY = float.MaxValue;
 
-            for (var z = 0; z <= 3; z++)
+            for (var z = 0 ; z <= 3 ; z++)
             {
                 MinX = Math.Min(p[z].X, MinX);
                 MinY = Math.Min(p[z].Y, MinY);
             }
 
-            for (var z = 0; z <= 3; z++)
+            for (var z = 0 ; z <= 3 ; z++)
             {
                 p[z].X -= MinX;
                 p[z].Y -= MinY;

@@ -132,7 +132,10 @@ namespace BlueControls.ItemCollection
 
         public override bool Contains(PointF value, decimal zoomfactor)
         {
-            return UsedArea().Contains((int)(value.X), (int)(value.Y));
+            var tmp = UsedArea();
+            var ne = (int)(5 / zoomfactor);
+            tmp.Inflate(-ne, -ne);
+            return tmp.Contains(value.ToPointDF());
         }
 
 

@@ -244,7 +244,10 @@ namespace BlueControls.ItemCollection
 
         public override bool Contains(PointF value, decimal zoomfactor)
         {
-            return UsedArea().Contains((int)value.X, (int)value.Y);
+            var tmp = UsedArea();
+            var ne = (int)(5 / zoomfactor);
+            tmp.Inflate(-ne, -ne);
+            return tmp.Contains(value.ToPointDF());
         }
 
         public override List<PointDF> PointList()
@@ -264,10 +267,11 @@ namespace BlueControls.ItemCollection
             if (p_LO == null || p_RU == null) { return new RectangleDF(); }
 
 
-            if ((int)(p_RU.X - p_LO.X) < 5) { p_RU.X += 5M; }
-            if ((int)(p_RU.Y - p_LO.Y) < 5) { p_RU.Y += 5M; }
+            //if ((int)(p_RU.X - p_LO.X) < 5) { p_RU.X += 5M; }
+            //if ((int)(p_RU.Y - p_LO.Y) < 5) { p_RU.Y += 5M; }
 
-            return new RectangleDF(p_LO.X, p_LO.Y, p_RU.X - p_LO.X, p_RU.Y - p_LO.Y);
+            return new RectangleDF(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
+
         }
 
         protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
