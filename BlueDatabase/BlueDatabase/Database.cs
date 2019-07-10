@@ -1959,7 +1959,11 @@ namespace BlueDatabase
                     {
                         if (ColList[ColNr] != null)
                         {
-                            sb.Append(ColList[ColNr].ReadableText().Replace("; ", "|"));
+                            var tmp = ColList[ColNr].ReadableText();
+                            tmp = tmp.Replace(";", "|");
+                            tmp = tmp.Replace(" |", "|");
+                            tmp = tmp.Replace("| ", "|");
+                            sb.Append(tmp);
                             if (ColNr < ColList.Count - 1) { sb.Append(";"); }
                         }
                     }
@@ -1996,11 +2000,14 @@ namespace BlueDatabase
                     {
                         if (ColList[ColNr] != null)
                         {
-                            sb.Append(Cell.GetString(ColList[ColNr], ThisRow).Replace("\r", "|"));
-                            if (ColNr < ColList.Count - 1)
-                            {
-                                sb.Append(";");
-                            }
+                            var tmp = Cell.GetString(ColList[ColNr], ThisRow);
+                            tmp = tmp.Replace("\r\n", "|");
+                            tmp = tmp.Replace("\r", "|");
+                            tmp = tmp.Replace("\n", "|");
+                            tmp = tmp.Replace(";", "<sk>");
+
+                            sb.Append(tmp);
+                            if (ColNr < ColList.Count - 1) { sb.Append(";"); }
                         }
                     }
                     sb.Append("\r\n");
@@ -3421,7 +3428,7 @@ namespace BlueDatabase
 
                 } while (string.IsNullOrEmpty(LWI));
 
-                
+
             }
 
 
@@ -3439,18 +3446,24 @@ namespace BlueDatabase
             if (!string.IsNullOrEmpty(LWI))
             {
                 var ok = false;
+                var ok2 = string.Empty;
                 foreach (var ThisWorkItem in Works)
                 {
-                    if (ThisWorkItem.ToString() == LWI)
+                    var tmp = ThisWorkItem.ToString();
+                    if (tmp == LWI)
                     {
                         ok = true;
                         break;
+                    }
+                    else if (tmp.Substring(7) == LWI.Substring(7))
+                    {
+                        ok2 = tmp;
                     }
                 }
 
                 if (!ok)
                 {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden: " + LWI + "<br>" + Filename);
+                    Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + LWI + "<br>" + Filename + "<br>" + ok2);
                 }
             }
 
