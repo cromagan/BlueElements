@@ -38,7 +38,6 @@ namespace BlueControls
     public sealed class Skin
     {
         private static Database SkinDB;
-        private static bool loaded = false;
         public static Database StyleDB;
 
         private static readonly enImageCodeEffect[] ST = new enImageCodeEffect[1];
@@ -79,7 +78,7 @@ namespace BlueControls
         private Skin()
         {
             _Skin = enSkin.Windows_10;
-            LoadSkin();
+            LoadSkin(); // SkinChanged wird NICHT ausgelöst
         }
 
 
@@ -101,7 +100,6 @@ namespace BlueControls
 
         private void LoadSkin()
         {
-            loaded = false;
             _SkinString = _Skin.ToString();
             _SkinString = _SkinString.Replace("_", "");
             _SkinString = _SkinString.Replace(" ", "");
@@ -114,15 +112,12 @@ namespace BlueControls
                 LoadSkin();
                 return;
             }
-
-           // SkinDB.WaitParsed();
-
     
             ST[0] = (enImageCodeEffect)int.Parse(SkinDB.Tags[0]);
             Pen_LinieDünn = new Pen(Color_Border(enDesign.Table_Lines_thin, enStates.Standard));
             Pen_LinieKräftig = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard));
             Pen_LinieDick = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard), 3);
-            loaded = true;
+
             OnSkinChanged();
         }
 
@@ -132,10 +127,7 @@ namespace BlueControls
         }
 
 
-        public static bool IsReady()
-        {
-            return loaded;
-        }
+
 
 
         public static enImageCodeEffect AdditionalState(enStates vState)
@@ -156,7 +148,7 @@ namespace BlueControls
 
         private static string Value(RowItem Row, string vColumnName, string StandardValue)
         {
-            if (Instance == null || Row == null) { return StandardValue; }
+            if (SkinDB == null || Row == null) { return StandardValue; }
             string w = null;
             if (Row != null)
             {

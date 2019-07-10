@@ -216,7 +216,7 @@ namespace BlueControls.Controls
             {
                 if (!Visible && !IgnoreVisible) { return; }
 
-                if (!Skin.IsReady())
+                if (Skin.Instance == null)
                 {
                     if (DesignMode)
                     {
