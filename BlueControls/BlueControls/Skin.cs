@@ -60,9 +60,6 @@ namespace BlueControls
 
         private enSkin _Skin;
 
-        private static Bitmap DummyBMP;
-        private static Graphics DummyGR;
-
         private static enStates SkinRow_LastState = enStates.Undefiniert;
         private static enDesign SkinRow_LastType = enDesign.Undefiniert;
         private static RowItem SkinRow_LastRow;
@@ -901,7 +898,7 @@ namespace BlueControls
             if (F == null) { return new Size(3, 3); }
 
             if (tmpImageCode != null) { pSize = tmpImageCode.BMP.Size; }
-            if (!string.IsNullOrEmpty(tmpText)) { tSize = DummyGraphics().MeasureString(tmpText, F.Font()); }
+            if (!string.IsNullOrEmpty(tmpText)) { tSize = System.Windows.Forms.TextRenderer.MeasureText(tmpText, F.Font()); }
 
             if (!string.IsNullOrEmpty(tmpText))
             {
@@ -921,17 +918,7 @@ namespace BlueControls
             return new Size(MinSize, MinSize);
         }
 
-        private static Graphics DummyGraphics()
-        {
 
-            if (DummyGR == null)
-            {
-                DummyBMP = new Bitmap(1, 1);
-                DummyGR = Graphics.FromImage(DummyBMP);
-            }
-            return DummyGR;
-
-        }
         internal BlueFont GetBlueFont(int _Design, enStates vState, RowItem RowOfStyle, int Stufe)
         {
             if (_Design > 10000)

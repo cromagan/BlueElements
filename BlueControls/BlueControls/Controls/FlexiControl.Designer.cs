@@ -14,7 +14,6 @@ namespace BlueControls.Controls
                 if (disposing && components != null)
                 {
                     _InfoText = string.Empty;
-                    if (DummyBMP != null  ) { DummyBMP.Dispose(); }
                     if (_BitmapOfControl != null) { _BitmapOfControl.Dispose(); }
                     //DoInfoTextButton(); // Events entfernen!
                     RemoveAll(); // Events entfernen!

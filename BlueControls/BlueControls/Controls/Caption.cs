@@ -52,11 +52,6 @@ namespace BlueControls.Controls
 
 
 
-        private Bitmap _DummyBMP;
-        private Graphics _DummyGR;
-
-
-
         #endregion
 
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
@@ -389,23 +384,14 @@ namespace BlueControls.Controls
             ContextMenuInit?.Invoke(this, e);
         }
 
-        private Graphics DummyGraphics()
-        {
-            if (_DummyGR == null)
-            {
-                _DummyBMP = new Bitmap(1, 1);
-                _DummyGR = Graphics.FromImage(_DummyBMP);
-            }
-            return _DummyGR;
 
-        }
 
         public Size TextRequiredSize()
         {
             if (QuickModePossible())
             {
                 if (_design == enDesign.Undefiniert) { GetDesign(); }
-                var s = DummyGraphics().MeasureString(_Text, Skin.GetBlueFont(_design, enStates.Standard).Font());
+                var s = System.Windows.Forms.TextRenderer.MeasureText(_Text, Skin.GetBlueFont(_design, enStates.Standard).Font());
                 return new Size((int)(s.Width + 1), (int)(s.Height + 1));
             }
 

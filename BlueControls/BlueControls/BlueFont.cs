@@ -59,9 +59,6 @@ namespace BlueControls
         private float TestesOK = float.MinValue;
 
 
-        private Bitmap DummyBMP;
-        private Graphics DummyGR;
-
         private QuickImage SymbolForReadableText_sym;
         private QuickImage NameInStyle_sym;
         private Bitmap SampleText_sym;
@@ -106,7 +103,7 @@ namespace BlueControls
             _CharSize = new SizeF[0];
 
             _CharSize = new SizeF[256];
-            for (var z = 0; z <= _CharSize.GetUpperBound(0); z++)
+            for (var z = 0 ; z <= _CharSize.GetUpperBound(0) ; z++)
             {
                 _CharSize[z] = new SizeF(-1, -1);
             }
@@ -272,7 +269,7 @@ namespace BlueControls
 
             try
             {
-                DummyGraphics().DrawString("x", new Font(_Font.Name, S / Skin.Scale, _Font.Style, _Font.Unit), Brushes.Black, 0, 0);
+                System.Windows.Forms.TextRenderer.MeasureText("x", new Font(_Font.Name, S / Skin.Scale, _Font.Style, _Font.Unit));
                 TestesOK = S;
                 return true;
 
@@ -308,20 +305,20 @@ namespace BlueControls
 
             if (Kapitälchen && char.ToUpper(c) != c)
             {
-                return new SizeF((DummyGraphics().MeasureString("." + char.ToUpper(c) + ".", _FontOL).Width - _WidthOf2Points) * 0.8F, _Zeilenabstand);
+                return new SizeF((System.Windows.Forms.TextRenderer.MeasureText("." + char.ToUpper(c) + ".", _FontOL).Width - _WidthOf2Points) * 0.8F, _Zeilenabstand);
             }
 
             if (OnlyUpper)
             {
-                return new SizeF(DummyGraphics().MeasureString("." + char.ToUpper(c) + ".", _FontOL).Width - _WidthOf2Points, _Zeilenabstand);
+                return new SizeF(System.Windows.Forms.TextRenderer.MeasureText("." + char.ToUpper(c) + ".", _FontOL).Width - _WidthOf2Points, _Zeilenabstand);
             }
 
             if (OnlyLower)
             {
-                return new SizeF(DummyGraphics().MeasureString("." + char.ToLower(c) + ".", _FontOL).Width - _WidthOf2Points, _Zeilenabstand);
+                return new SizeF(System.Windows.Forms.TextRenderer.MeasureText("." + char.ToLower(c) + ".", _FontOL).Width - _WidthOf2Points, _Zeilenabstand);
             }
 
-            return new SizeF(DummyGraphics().MeasureString("." + c + ".", _FontOL).Width - _WidthOf2Points, _Zeilenabstand);
+            return new SizeF(System.Windows.Forms.TextRenderer.MeasureText("." + c + ".", _FontOL).Width - _WidthOf2Points, _Zeilenabstand);
         }
 
 
@@ -410,12 +407,12 @@ namespace BlueControls
             var Multi = 50 / _FontOL.Size; // Zu große Schriften verursachen bei manchen Fonts Fehler!!!
 
             var tmpfont = new Font(_FontOL.Name, _FontOL.Size * Multi / Skin.Scale, _FontOL.Style);
-            var f = DummyGraphics().MeasureString("Z", tmpfont);
+            var f = System.Windows.Forms.TextRenderer.MeasureText("Z", tmpfont);
             var bmp = new Bitmap((int)(f.Width + 1), (int)(f.Height + 1));
             var gr = Graphics.FromImage(bmp);
 
 
-            for (var du = 0; du <= 1; du++)
+            for (var du = 0 ; du <= 1 ; du++)
             {
                 gr.Clear(Color.White);
                 if (du == 1)
@@ -427,9 +424,9 @@ namespace BlueControls
                 var miny = (int)(f.Height / 2.0);
 
                 //var tempVar = (int)(f.Width - 1);
-                for (var x = 1; x <= (int)(f.Width - 1); x++)
+                for (var x = 1 ; x <= (f.Width - 1) ; x++)
                 {
-                    for (var y = (int)(f.Height - 1); y >= miny; y--)
+                    for (var y = (f.Height - 1) ; y >= miny ; y--)
                     {
                         if (y > miny && bmp.GetPixel(x, y).R == 0) { miny = y; }
 
@@ -451,7 +448,7 @@ namespace BlueControls
             gr.Dispose();
             tmpfont.Dispose();
 
-            _WidthOf2Points = DummyGraphics().MeasureString("..", _FontOL).Width;
+            _WidthOf2Points = System.Windows.Forms.TextRenderer.MeasureText("..", _FontOL).Width;
 
             ///http://www.vb-helper.com/howto_net_rainbow_text.html
             ///https://msdn.microsoft.com/de-de/library/xwf9s90b(v=vs.90).aspx
@@ -569,7 +566,7 @@ namespace BlueControls
         private Bitmap Symbol(string Text, bool Transparent)
         {
 
-            var s = DummyGraphics().MeasureString(Text, Font());
+            var s = System.Windows.Forms.TextRenderer.MeasureText(Text, Font());
             var bmp = new Bitmap((int)(s.Width + 1), (int)(s.Height + 1));
 
 
@@ -604,9 +601,9 @@ namespace BlueControls
                 //etxt.MaxWidth = 500;
                 //etxt.PlainText = Text;
                 //etxt.Draw(gr, 1);
-                Skin.Draw_FormatedText(gr, Text, null, enAlignment.Top_Left, new Rectangle(0,0,1000,1000), null, false, this, false);
+                Skin.Draw_FormatedText(gr, Text, null, enAlignment.Top_Left, new Rectangle(0, 0, 1000, 1000), null, false, this, false);
 
-               // gr.DrawString("Text", Font(), Brush_Color_Main, 0, 0) ', System.Drawing.StringFormat.GenericTypographic)
+                // gr.DrawString("Text", Font(), Brush_Color_Main, 0, 0) ', System.Drawing.StringFormat.GenericTypographic)
             }
 
 
@@ -675,19 +672,6 @@ namespace BlueControls
             return SymbolOfLine_sym;
         }
 
-
-
-        internal Graphics DummyGraphics()
-        {
-
-            if (DummyGR == null)
-            {
-                DummyBMP = new Bitmap(1, 1);
-                DummyGR = Graphics.FromImage(DummyBMP);
-            }
-            return DummyGR;
-
-        }
 
 
         public void OnChanged()

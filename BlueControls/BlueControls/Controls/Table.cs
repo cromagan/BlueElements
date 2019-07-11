@@ -111,9 +111,6 @@ namespace BlueControls.Controls
         private bool ISIN_Resize;
         private bool ISIN_VisibleChanged;
 
-        private Bitmap DummyBMP;
-        private Graphics DummyGR;
-
         private const int RowCaptionFontY = 26;
         private const int RowCaptionSizeY = 50;
         private const int ColumnCaptionSizeY = 22;
@@ -3791,7 +3788,7 @@ namespace BlueControls.Controls
             if (_Column_Font == null) { return new SizeF(Pix16, Pix16); }
 
 
-            Column.TMP_CaptionText_Size = DummyGraphics().MeasureString(Column.Caption.Replace("\r", "\r\n"), _Column_Font.Font());
+            Column.TMP_CaptionText_Size = System.Windows.Forms.TextRenderer.MeasureText(Column.Caption.Replace("\r", "\r\n"), _Column_Font.Font());
             return Column.TMP_CaptionText_Size;
         }
 
@@ -3961,20 +3958,6 @@ namespace BlueControls.Controls
             DialogBoxes.Notification.Show(Reason, enImageCode.Kreuz);
             // QickInfo beisst sich mit den letzten Änderungen Quickinfo
             //DialogBoxes.QuickInfo.Show("<IMAGECODE=Stift|16||1> " + Reason);
-        }
-
-
-
-
-        private Graphics DummyGraphics()
-        {
-
-            if (DummyGR == null)
-            {
-                DummyBMP = new Bitmap(1, 1);
-                DummyGR = Graphics.FromImage(DummyBMP);
-            }
-            return DummyGR;
         }
 
 

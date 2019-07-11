@@ -349,8 +349,8 @@ namespace BlueControls.ItemCollection
 
             var f = Skin.GetBlueFont(Format, Parent.SheetStyle);
 
-            var sz1 = DummyGraphics().MeasureString(AngezeigterText1(), f.Font(geszoom));
-            var sz2 = DummyGraphics().MeasureString(Text2, f.Font(geszoom));
+            var sz1 = System.Windows.Forms.TextRenderer.MeasureText(AngezeigterText1(), f.Font(geszoom));
+            var sz2 = System.Windows.Forms.TextRenderer.MeasureText(Text2, f.Font(geszoom));
 
             var P1_x = decimal.MaxValue;
             var P1_y = decimal.MaxValue;

@@ -16,7 +16,6 @@ namespace BlueControls.Controls
             {
                 if (disposing)
                 {
-                    if (DummyBMP != null) { DummyBMP.Dispose(); }
                     Database = null; // Wichtig (nicht _Database) um Events zu lösen
                 }
             }

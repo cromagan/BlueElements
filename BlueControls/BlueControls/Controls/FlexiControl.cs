@@ -55,9 +55,6 @@ namespace BlueControls.Controls
         private bool _GeneratingBitmapOfControl;
 
 
-        private Bitmap DummyBMP;
-        private Graphics DummyGR;
-
         private Color _Color = Color.Transparent;
         private Caption _CaptionObject;
         private Caption _InfoCaption;
@@ -145,7 +142,7 @@ namespace BlueControls.Controls
             ValueId = string.Empty;
 
 
-            var s = DummyGraphics().MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+            var s = System.Windows.Forms.TextRenderer.MeasureText(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
 
             Size = new Size((int)(s.Width + 2), (int)(s.Height + 2));
 
@@ -241,7 +238,7 @@ namespace BlueControls.Controls
 
 
             list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
-            var s = DummyGraphics().MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+            var s = System.Windows.Forms.TextRenderer.MeasureText(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
             var x = Math.Max((int)(list.WidthOfBiggestItem(500) + 20 + s.Width), 200);
             var y = Math.Max((int)(list.HeightOfBiggestItem(100)) + Skin.PaddingSmal * 2, 24);
 
@@ -1627,18 +1624,6 @@ namespace BlueControls.Controls
                 _InfoCaption.BringToFront();
             }
 
-
-        }
-
-        private Graphics DummyGraphics()
-        {
-
-            if (DummyGR == null)
-            {
-                DummyBMP = new Bitmap(1, 1);
-                DummyGR = Graphics.FromImage(DummyBMP);
-            }
-            return DummyGR;
 
         }
 

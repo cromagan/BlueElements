@@ -31,22 +31,6 @@ namespace BlueControls
     public static class Allgemein
     {
 
-        private static Bitmap DummyBMP;
-        private static Graphics DummyGR;
-
-        private static Graphics DummyGraphics()
-        {
-
-            if (DummyGR == null)
-            {
-                DummyBMP = new Bitmap(1, 1);
-                DummyGR = Graphics.FromImage(DummyBMP);
-            }
-            return DummyGR;
-
-        }
-
-
 
         public static List<string> SplitByWidth(this string Text, float MaxWidth, int MaxLines, enDesign design, enStates state)
         {
@@ -68,7 +52,7 @@ namespace BlueControls
             {
                 pos++;
                 var ToTEst = Rest.Substring(0, pos);
-                var s = DummyGraphics().MeasureString(ToTEst, F.Font());
+                var s = System.Windows.Forms.TextRenderer.MeasureText(ToTEst, F.Font());
 
 
                 if (pos < Rest.Length && Convert.ToChar(Rest.Substring(pos, 1)).isPossibleLineBreak()) { FoundCut = pos; }
@@ -131,7 +115,7 @@ namespace BlueControls
         public static string TrimByWidth(this string TXT, float MaxWidth, BlueFont F)
         {
             if (F == null) { return TXT; }
-            var tSize = DummyGraphics().MeasureString(TXT, F.Font());
+            var tSize = System.Windows.Forms.TextRenderer.MeasureText(TXT, F.Font());
 
             if (tSize.Width - 1 > MaxWidth && TXT.Length > 1)
             {
@@ -142,7 +126,7 @@ namespace BlueControls
                 do
                 {
                     Middle = (int)(Min + (Max - Min) / 2.0);
-                    tSize = DummyGraphics().MeasureString(TXT.Substring(0, Middle) + "...", F.Font());
+                    tSize = System.Windows.Forms.TextRenderer.MeasureText(TXT.Substring(0, Middle) + "...", F.Font());
 
                     if (tSize.Width + 3 > MaxWidth)
                     {

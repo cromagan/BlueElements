@@ -105,9 +105,6 @@ namespace BlueControls.ItemCollection
         // Der Begriff "Formatierung" stammt von word (=Format) auf englisch
         private PadStyles _Format = PadStyles.Undefiniert;
 
-        private Bitmap DummyBMP;
-        private Graphics DummyGR;
-
         public List<string> RemoveToo = new List<string>();
 
 
@@ -400,16 +397,5 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected Graphics DummyGraphics()
-        {
-
-            if (DummyGR == null)
-            {
-                DummyBMP = new Bitmap(1, 1);
-                DummyGR = Graphics.FromImage(DummyBMP);
-            }
-            return DummyGR;
-
-        }
     }
 }

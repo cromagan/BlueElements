@@ -44,7 +44,6 @@ namespace BlueControls.Controls
     {
 
         private bool ComputeOrders_isin;
-        private int RepairAll_OldItemc = -9999;
         private bool RepairPrinterData_Prepaired;
 
 
@@ -82,10 +81,6 @@ namespace BlueControls.Controls
         private bool _KeyboardEditEnabled = true;
         private bool _MouseEditEnabled = true;
         private bool _KontextMenuEnabled = true;
-
-        private Bitmap DummyBMP;
-        private Graphics DummyGR;
-
 
 
         public readonly int DPI = 300;
@@ -2613,36 +2608,24 @@ namespace BlueControls.Controls
 
             if (Levelx == 0)
             {
-                RepairAll_OldItemc = Itemc + 1; // Löst eine Kettenreaktion aus
+                //RepairAll_OldItemc = Itemc + 1; // Löst eine Kettenreaktion aus
                 Item.RecomputePointAndRelations();
                 InvalidateOrder();
             }
 
 
-            if (Itemc != RepairAll_OldItemc)
-            {
-                DrawCreativePadToBitmap(DummyGraphics(), enStates.Standard);
-                modAllgemein.CollectGarbage();
-            }
+            //if (Itemc != RepairAll_OldItemc)
+            //{
+            //    DrawCreativePadToBitmap(DummyGraphics(), enStates.Standard);
+            //    modAllgemein.CollectGarbage();
+            //}
 
-            RepairAll_OldItemc = Itemc;
+            //RepairAll_OldItemc = Itemc;
 
 
             return PerformAll(Item, Levelx, AllowBigChanges);
         }
 
-
-        private Graphics DummyGraphics()
-        {
-
-            if (DummyGR == null)
-            {
-                DummyBMP = new Bitmap(1, 1);
-                DummyGR = Graphics.FromImage(DummyBMP);
-            }
-            return DummyGR;
-
-        }
 
 
         public void Print()

@@ -12,7 +12,6 @@ namespace BlueControls.Controls
             {
                 if (disposing)
                 {
-                    if (_DummyBMP != null) { _DummyBMP.Dispose(); }
                     eText = null;
                 }
             }
