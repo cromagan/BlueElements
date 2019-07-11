@@ -29,7 +29,7 @@ using System.Drawing;
 
 namespace BlueControls
 {
-    public sealed class clsPointRelation : IComparable, ICompareKey, IParseable
+    public sealed class clsPointRelation : IComparable, ICompareKey, IParseable, ICheckable
     {
 
         private enRelationType _relationtype;
@@ -356,6 +356,8 @@ namespace BlueControls
             var Multi = 10;
             if (!StrongMode) { Multi = 300; }
 
+            if (!IsOk()) { return false; }
+
 
             switch (_relationtype)
             {
@@ -400,17 +402,10 @@ namespace BlueControls
 
         public void InitRelationData(bool Parsing)
         {
+            if (!IsOk()) { return; }
 
-            if (Points == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Keine Punkte übergeben!"); }
             if (!Parsing || string.IsNullOrEmpty(_Richtmaß)) { _Richtmaß = GetRichtmaß(); }
 
-
-            if (_relationtype == enRelationType.None) { Develop.DebugPrint(enFehlerArt.Fehler, "Der Type None ist nicht erlaubt"); }
-            if (Points.Count != 2)
-            {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Genau " + 2 + " Punkte erwartet");
-                return;
-            }
 
             switch (_relationtype)
             {
@@ -562,8 +557,8 @@ namespace BlueControls
                     {
                         Flex.SetTo(Flex.X, Fix.Y);
                     }
-
                     break;
+
                 case enRelationType.PositionZueinander:
                     var w = _Richtmaß.SplitBy(";");
 
@@ -575,8 +570,8 @@ namespace BlueControls
                     {
                         Flex.SetTo(Fix.X - decimal.Parse(w[0]), Fix.Y - decimal.Parse(w[1]));
                     }
-
                     break;
+
                 case enRelationType.YPositionZueinander:
                     if (Fix == Points[1])
                     {
@@ -586,13 +581,13 @@ namespace BlueControls
                     {
                         Flex.SetTo(Flex.X, Fix.Y - decimal.Parse(_Richtmaß));
                     }
-
                     break;
+
                 case enRelationType.AbstandZueinander:
                     var wi = GeometryDF.Winkelx(Fix, Flex);
                     Flex.SetTo(Fix, decimal.Parse(_Richtmaß), wi);
-
                     break;
+
                 default:
                     Develop.DebugPrint(_relationtype);
                     break;
@@ -787,6 +782,50 @@ namespace BlueControls
             OnChanged();
         }
 
+        /// <summary>
+        /// Prüft, ob die Beziehung einen Fehler enthält, der ein Löschen der Beziehung erfordert.
+        /// Um zu prüfen, ob die Punkte zueinander stimmen, muss Performs benutzt werden.
+        /// </summary>
+        /// <returns></returns>
+        public bool IsOk()
+        {
+            return string.IsNullOrEmpty(ErrorReason());
+        }
 
+        /// <summary>
+        /// Prüft, ob die Beziehung einen Fehler enthält, der ein Löschen der Beziehung erfordert.
+        /// Um zu prüfen, ob die Punkte zueinander stimmen, muss Performs benutzt werden.
+        /// </summary>
+        /// <returns></returns>
+        public string ErrorReason()
+        {
+            if (Points == null) { return "Keine Punkte definiert."; }
+            if (Points.Count < 2) { return "Zu wenige Punkte definiert."; }
+            if (Points[0] == Points[1]) { return "Die Punkte verweisen auf sich selbst."; }
+            if (_relationtype == enRelationType.None) { return "Der Type None ist nicht erlaubt"; }
+
+            foreach (var Thispoint in Points)
+            {
+                if (Thispoint == null)
+                {
+                    return "Einer der Punkte ist null.";
+                }
+                else
+                {
+                    if (Thispoint.Parent == null)
+                    {
+                        return "Der Punkt hat kein Parent.";
+                    }
+                    //else
+                    //{
+                    //    if (Thispoint.Parent is BasicPadItem item)
+                    //    {
+                    //        if (!Item.Contains(item)) { RemoveMe = true; }
+                    //    }
+                    //}
+                }
+            }
+            return string.Empty;
+        }
     }
 }

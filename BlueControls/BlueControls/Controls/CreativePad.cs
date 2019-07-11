@@ -1441,12 +1441,17 @@ namespace BlueControls.Controls
 
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ThisItemCol"></param>
+        /// <param name="Level">             Level 0 gibt es nicht;
+        /// Level 1 = Normal / Reparier nur die neuen Sachen ;
+        /// Level 2 = Leicht / Reparier nur die neuen Sachen mit schnelleren Abbruchbedingungen</param>
+        /// <param name="AllowBigChanges"></param>
+        /// <returns></returns>
         public bool PerformAll(ItemCollectionPad ThisItemCol, int Level, bool AllowBigChanges)
         {
-            // Level 0 gibt es nicht
-            // Level 1 = Normal / Reparier nur die neuen Sachen
-            // Level 2 = Leicht / Reparier nur die neuen Sachen mit schnelleren Abbruchbedingungen
 
             var ThisRelations = AllRelations();
             //var ThisPoints = AllPoints();
@@ -2457,38 +2462,37 @@ namespace BlueControls.Controls
                         break;
                     case "items":
                         Item.Parse(PairValuexxx);
-
                         break;
+
                     case "relation":
                         _ExternalRelations.Add(new clsPointRelation(PairValuexxx, AllPoints()));
-                        InvalidateOrder();
-
+                        InvalidateOrder();                  
                         break;
+
                     case "caption":
                         Caption = PairValuexxx.FromNonCritical();
-
                         break;
+
                     case "style":
-
                         SheetStyle = PairValuexxx;
-
                         break;
+
                     case "fontscale":
                         SheetStyleScale = decimal.Parse(PairValuexxx);
-
                         break;
+
                     case "grid":
                         _Grid = PairValuexxx.FromPlusMinus();
-
                         break;
+
                     case "gridshow":
                         _GridShow = float.Parse(PairValuexxx);
                         break;
+
                     case "gridsnap":
                         _Gridsnap = float.Parse(PairValuexxx);
-
-
                         break;
+
                     default:
                         Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + T);
                         break;
@@ -2586,27 +2590,19 @@ namespace BlueControls.Controls
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Level">Level 0 = Hart / Reparier alles mit Gewalt; 
+        /// Level 1 = Normal / Reparier nur die neuen Sachen;
+        ///  Level 2 = Leicht / Reparier nur die neuen Sachen mit schnelleren Abbruchbedingungen</param>
+        /// <param name="AllowBigChanges"></param>
+        /// <returns></returns>
 
-
-        public bool RepairAll(int Levelx, bool AllowBigChanges)
+        public bool RepairAll(int Level, bool AllowBigChanges)
         {
-            // Level 0 = Hart / Reparier alles mit Gewalt
-            // Level 1 = Normal / Reparier nur die neuen Sachen
-            // Level 2 = Leicht / Reparier nur die neuen Sachen mit schnelleren Abbruchbedingungen
 
-            var Itemc = 0;
-
-
-            if (Item == null)
-            {
-                Itemc = -2;
-            }
-            else
-            {
-                Itemc = Item.Count - 1;
-            }
-
-            if (Levelx == 0)
+            if (Level == 0)
             {
                 //RepairAll_OldItemc = Itemc + 1; // Löst eine Kettenreaktion aus
                 Item.RecomputePointAndRelations();
@@ -2623,7 +2619,7 @@ namespace BlueControls.Controls
             //RepairAll_OldItemc = Itemc;
 
 
-            return PerformAll(Item, Levelx, AllowBigChanges);
+            return PerformAll(Item, Level, AllowBigChanges);
         }
 
 
@@ -3243,38 +3239,8 @@ namespace BlueControls.Controls
             {
                 z += 1;
                 if (z > _ExternalRelations.Count - 1) { break; }
-                var RemoveMe = false;
 
-
-                foreach (var Thispoint in _ExternalRelations[z].Points)
-                {
-                    if (Thispoint == null)
-                    {
-                        RemoveMe = true;
-                    }
-                    else
-                    {
-                        if (Thispoint.Parent == null)
-                        {
-                            RemoveMe = true;
-                        }
-                        else
-                        {
-                            if (Thispoint.Parent is BasicPadItem item)
-                            {
-                                if (!Item.Contains(item)) { RemoveMe = true; }
-                            }
-                        }
-                    }
-
-
-                    if (!RemoveMe)
-                    {
-                        if (_ExternalRelations[z].Points.Count != 2 || _ExternalRelations[z].Points[0] == _ExternalRelations[z].Points[1]) { RemoveMe = true; }
-                    }
-                }
-
-                if (RemoveMe)
+                if (!_ExternalRelations[z].IsOk())
                 {
                     _ExternalRelations.Remove(_ExternalRelations[z]);
                     z = -1;
