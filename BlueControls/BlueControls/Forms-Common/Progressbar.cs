@@ -165,7 +165,7 @@ namespace BlueControls.DialogBoxes
             if (PR > 1) { PR = 1; }
             if (PR < 0) { PR = 0; }
 
-            if (double.IsNaN(PR)) { PR = 0; } 
+            if (double.IsNaN(PR)) { PR = 0; }
 
 
             if (Current > 0)
@@ -240,7 +240,11 @@ namespace BlueControls.DialogBoxes
 
 
             string T = null;
-            if (Current <= 3)
+            if (Count < 1)
+            {
+                T = string.Empty;
+            }
+            else if (Current <= 3)
             {
                 T = "<br>Restzeit wird ermittelt<tab>";
             }
