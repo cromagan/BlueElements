@@ -3788,7 +3788,7 @@ namespace BlueControls.Controls
             if (_Column_Font == null) { return new SizeF(Pix16, Pix16); }
 
 
-            Column.TMP_CaptionText_Size = System.Windows.Forms.TextRenderer.MeasureText(Column.Caption.Replace("\r", "\r\n"), _Column_Font.Font());
+            Column.TMP_CaptionText_Size = BlueFont.MeasureString(Column.Caption.Replace("\r", "\r\n"), _Column_Font.Font());
             return Column.TMP_CaptionText_Size;
         }
 

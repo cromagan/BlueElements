@@ -560,6 +560,7 @@ namespace BlueControls.Forms
             this.SchriftGröße.Name = "SchriftGröße";
             this.SchriftGröße.Size = new System.Drawing.Size(72, 22);
             this.SchriftGröße.TabIndex = 3;
+            this.SchriftGröße.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.SchriftGröße_ItemClicked);
             // 
             // sscchrifthgöße
             // 

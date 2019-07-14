@@ -823,10 +823,10 @@ namespace BlueDatabase
                         DidAndOk = true;
                     }
                 }
-                else
-                {
-                    Develop.DebugPrint("Backup verschwunden:<br>" + ThisString + "<br><br>" + ToString());
-                }
+                //else
+                //{
+                //    Develop.DebugPrint("Backup verschwunden:<br>" + ThisString + "<br><br>" + ToString());
+                //}
             }
 
             _LastExportTime = tim;

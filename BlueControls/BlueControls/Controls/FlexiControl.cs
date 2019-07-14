@@ -120,7 +120,7 @@ namespace BlueControls.Controls
             _Caption = Caption + ":";
             ValueId = Caption;
             _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-            _Value = Value.ToPlusMinus();
+            this.Value = Value.ToPlusMinus();
 
             Size = new Size(200, 22);
         }
@@ -142,7 +142,7 @@ namespace BlueControls.Controls
             ValueId = string.Empty;
 
 
-            var s = System.Windows.Forms.TextRenderer.MeasureText(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+            var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
 
             Size = new Size((int)(s.Width + 2), (int)(s.Height + 2));
 
@@ -238,7 +238,7 @@ namespace BlueControls.Controls
 
 
             list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
-            var s = System.Windows.Forms.TextRenderer.MeasureText(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+            var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
             var x = Math.Max((int)(list.WidthOfBiggestItem(500) + 20 + s.Width), 200);
             var y = Math.Max((int)(list.HeightOfBiggestItem(100)) + Skin.PaddingSmal * 2, 24);
 

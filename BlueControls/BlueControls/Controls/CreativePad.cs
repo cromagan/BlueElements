@@ -2785,6 +2785,12 @@ namespace BlueControls.Controls
 
             var i = ToBitmap(1);
 
+            if (i== null)
+            {
+               // Develop.DebugPrint(enFehlerArt.Warnung, "Bild ist null: " + Filename);
+                return;
+            }
+
 
             switch (Filename.FileSuffix().ToUpper())
             {

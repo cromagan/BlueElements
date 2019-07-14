@@ -52,7 +52,7 @@ namespace BlueControls
             {
                 pos++;
                 var ToTEst = Rest.Substring(0, pos);
-                var s = System.Windows.Forms.TextRenderer.MeasureText(ToTEst, F.Font());
+                var s = BlueFont.MeasureString(ToTEst, F.Font());
 
 
                 if (pos < Rest.Length && Convert.ToChar(Rest.Substring(pos, 1)).isPossibleLineBreak()) { FoundCut = pos; }
@@ -115,7 +115,7 @@ namespace BlueControls
         public static string TrimByWidth(this string TXT, float MaxWidth, BlueFont F)
         {
             if (F == null) { return TXT; }
-            var tSize = System.Windows.Forms.TextRenderer.MeasureText(TXT, F.Font());
+            var tSize = BlueFont.MeasureString(TXT, F.Font());
 
             if (tSize.Width - 1 > MaxWidth && TXT.Length > 1)
             {
@@ -126,7 +126,7 @@ namespace BlueControls
                 do
                 {
                     Middle = (int)(Min + (Max - Min) / 2.0);
-                    tSize = System.Windows.Forms.TextRenderer.MeasureText(TXT.Substring(0, Middle) + "...", F.Font());
+                    tSize = BlueFont.MeasureString(TXT.Substring(0, Middle) + "...", F.Font());
 
                     if (tSize.Width + 3 > MaxWidth)
                     {

@@ -493,8 +493,7 @@ namespace BlueControls.Forms
             CheckBezMode();
         }
 
-
-        private void SchriftGröße_TextChanged(object sender, System.EventArgs e)
+        private void SchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             Pad.SheetStyleScale = decimal.Parse(SchriftGröße.Text) / 100m;
         }

@@ -898,7 +898,7 @@ namespace BlueControls
             if (F == null) { return new Size(3, 3); }
 
             if (tmpImageCode != null) { pSize = tmpImageCode.BMP.Size; }
-            if (!string.IsNullOrEmpty(tmpText)) { tSize = System.Windows.Forms.TextRenderer.MeasureText(tmpText, F.Font()); }
+            if (!string.IsNullOrEmpty(tmpText)) { tSize = BlueFont.MeasureString(tmpText, F.Font()); }
 
             if (!string.IsNullOrEmpty(tmpText))
             {
