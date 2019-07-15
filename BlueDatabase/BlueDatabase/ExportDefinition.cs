@@ -47,7 +47,8 @@ namespace BlueDatabase
         private enExportTyp _Typ;
         private float _Intervall;
         private float _AutomatischLöschen;
-        private string _ExportFormular;
+        private string _ExportFormular; // TODO: Ersetzen mit _ExportFormularID
+        private string _ExportFormularID;
         private int _ExportSpaltenAnsicht;
         public ListExt<string> _BereitsExportiert;
         private DateTime _LastExportTime;
@@ -134,6 +135,20 @@ namespace BlueDatabase
             {
                 if (_ExportFormular == value) { return; }
                 _ExportFormular = value;
+                OnChanged();
+            }
+        }
+
+        public string ExportFormularID
+        {
+            get
+            {
+                return _ExportFormularID;
+            }
+            set
+            {
+                if (_ExportFormularID == value) { return; }
+                _ExportFormularID = value;
                 OnChanged();
             }
         }
@@ -275,6 +290,9 @@ namespace BlueDatabase
                     case "exportformula":
                         _ExportFormular = pair.Value.FromNonCritical();
                         break;
+                    case "exid":
+                        _ExportFormularID = pair.Value.FromNonCritical();
+                        break;
                     case "exportcolumnorder":
                         _ExportSpaltenAnsicht = int.Parse(pair.Value);
                         break;
@@ -302,7 +320,7 @@ namespace BlueDatabase
 
         public string CompareKey()
         {
-            return ((int)_Typ).ToString(Constants.Format_Integer3) + "|" + _Verzeichnis + "|" + _ExportFormular + "|" + _Intervall + "|" + _AutomatischLöschen;
+            return ((int)_Typ).ToString(Constants.Format_Integer3) + "|" + _Verzeichnis + "|" + _ExportFormularID + "|" + _Intervall + "|" + _AutomatischLöschen;
         }
 
 

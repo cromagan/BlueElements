@@ -74,6 +74,7 @@ namespace BlueControls.Controls
         private PointDF _MouseDownx;
 
         public string Caption = "";
+        private string ID = string.Empty;
 
 
         private BasicPadItem _GivesMouseComandsTo;
@@ -84,14 +85,6 @@ namespace BlueControls.Controls
 
 
         public readonly int DPI = 300;
-
-
-        private PointDF P_LO;
-        private PointDF P_LU;
-        private PointDF P_RU;
-        private PointDF P_RO;
-
-
 
         private PointDF P_rLO;
         private PointDF P_rLU;
@@ -669,17 +662,10 @@ namespace BlueControls.Controls
         public List<PointDF> AllPoints()
         {
 
-
             var P = new List<PointDF>();
 
-
-            if (P_LO != null)
+            if (P_rLO != null)
             {
-                P.AddIfNotExists(P_LO);
-                P.AddIfNotExists(P_LU);
-                P.AddIfNotExists(P_RU);
-                P.AddIfNotExists(P_RO);
-
                 P.AddIfNotExists(P_rLO);
                 P.AddIfNotExists(P_rLU);
                 P.AddIfNotExists(P_rRU);
@@ -791,7 +777,7 @@ namespace BlueControls.Controls
 
                 Draw(gr, Scale, r.Left * Scale, r.Top * Scale, true, true);
 
-                }
+            }
 
 
             return I;
@@ -1073,12 +1059,12 @@ namespace BlueControls.Controls
             if (_SheetSizeInMM.Width > 0 && _SheetSizeInMM.Height > 0)
             {
                 Skin.Draw_Back(TMPGR, enDesign.Table_And_Pad, vState, DisplayRectangle, this, true);
-                var tx = (int)(P_LO.X * _Zoom - X);
-                var ty = (int)(P_LO.Y * _Zoom - Y);
-                var tx2 = (int)(P_RU.X * _Zoom - X);
-                var ty2 = (int)(P_RU.Y * _Zoom - Y);
+                var SSW = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI), 1);
+                var SSH = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Height, DPI), 1);
+                var LO = new PointDF(0m, 0m).ZoomAndMove(_Zoom, X, Y);
+                var RU = new PointDF(SSW, SSH).ZoomAndMove(_Zoom, X, Y);
 
-                var R = new Rectangle(tx, ty, tx2 - tx, ty2 - ty);
+                var R = new Rectangle((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
                 TMPGR.FillRectangle(Brushes.White, R);
                 TMPGR.DrawRectangle(PenGray, R);
 
@@ -2146,34 +2132,22 @@ namespace BlueControls.Controls
         public void GenPoints()
         {
 
-
             if (Math.Abs(_SheetSizeInMM.Width) < 0.001 || Math.Abs(_SheetSizeInMM.Height) < 0.001)
             {
-                if (P_LO != null)
+                if (P_rLO != null)
                 {
-                    P_LO = null;
-                    P_RO = null;
-                    P_RU = null;
-                    P_LU = null;
-
                     P_rLO = null;
                     P_rRO = null;
                     P_rRU = null;
                     P_rLU = null;
-
-
                 }
 
                 return;
             }
 
 
-            if (P_LO == null)
+            if (P_rLO == null)
             {
-                P_LO = new PointDF(this, "Rand LO", 0, 0, true);
-                P_LU = new PointDF(this, "Rand LU", 0, 0, true);
-                P_RU = new PointDF(this, "Rand RU", 0, 0, true);
-                P_RO = new PointDF(this, "Rand RO", 0, 0, true);
 
                 P_rLO = new PointDF(this, "Druckbereich LO", 0, 0, true);
                 P_rRO = new PointDF(this, "Druckbereich RO", 0, 0, true);
@@ -2189,19 +2163,10 @@ namespace BlueControls.Controls
             var ro = Math.Round(modConverter.mmToPixel(_RandinMM.Top, DPI), 1);
             var ru = Math.Round(modConverter.mmToPixel(_RandinMM.Bottom, DPI), 1);
 
-            P_LO.SetTo(0, 0);
-            P_RO.SetTo(SSW, 0);
-            P_RU.SetTo(SSW, SSH);
-            P_LU.SetTo(0, SSH);
-
             P_rLO.SetTo(rl, ro);
             P_rRO.SetTo(SSW - rr, ro);
             P_rRU.SetTo(SSW - rr, SSH - ru);
             P_rLU.SetTo(rl, SSH - ru);
-
-
-
-
         }
 
         private clsPointRelation AddOneAutoRelation(enRelationType rel, PointDF Snap1, PointDF SnaP2)
@@ -2447,50 +2412,56 @@ namespace BlueControls.Controls
                 Beg += 1;
                 if (Beg > Value.Length) { break; }
                 var T = Value.ParseTag(Beg);
-                var PairValuexxx = Value.ParseValue(T, Beg);
+                var pvalue = Value.ParseValue(T, Beg);
 
-                Beg = Beg + T.Length + PairValuexxx.Length + 2;
+                Beg = Beg + T.Length + pvalue.Length + 2;
                 switch (T)
                 {
                     case "sheetsize":
-                        _SheetSizeInMM = Extensions.SizeFParse(PairValuexxx);
+                        _SheetSizeInMM = Extensions.SizeFParse(pvalue);
                         GenPoints();
                         break;
+
                     case "printarea":
-                        _RandinMM = Extensions.PaddingParse(PairValuexxx);
+                        _RandinMM = Extensions.PaddingParse(pvalue);
                         GenPoints();
                         break;
+
                     case "items":
-                        Item.Parse(PairValuexxx);
+                        Item.Parse(pvalue);
                         break;
 
                     case "relation":
-                        _ExternalRelations.Add(new clsPointRelation(PairValuexxx, AllPoints()));
-                        InvalidateOrder();                  
+                        _ExternalRelations.Add(new clsPointRelation(pvalue, AllPoints()));
+                        InvalidateOrder();
                         break;
 
                     case "caption":
-                        Caption = PairValuexxx.FromNonCritical();
+                        Caption = pvalue.FromNonCritical();
+                        break;
+
+                    case "id":
+                        ID = pvalue.FromNonCritical();
                         break;
 
                     case "style":
-                        SheetStyle = PairValuexxx;
+                        SheetStyle = pvalue;
                         break;
 
                     case "fontscale":
-                        SheetStyleScale = decimal.Parse(PairValuexxx);
+                        SheetStyleScale = decimal.Parse(pvalue);
                         break;
 
                     case "grid":
-                        _Grid = PairValuexxx.FromPlusMinus();
+                        _Grid = pvalue.FromPlusMinus();
                         break;
 
                     case "gridshow":
-                        _GridShow = float.Parse(PairValuexxx);
+                        _GridShow = float.Parse(pvalue);
                         break;
 
                     case "gridsnap":
-                        _Gridsnap = float.Parse(PairValuexxx);
+                        _Gridsnap = float.Parse(pvalue);
                         break;
 
                     default:
@@ -2559,6 +2530,9 @@ namespace BlueControls.Controls
 
 
             Caption = "";
+
+            ID = DateTime.UtcNow.ToString(Constants.Format_Date);
+
 
             _NewAutoRelations.Clear();
             _ExternalRelations.Clear();
@@ -2651,8 +2625,8 @@ namespace BlueControls.Controls
 
             var i = ToBitmap(3);
             if (i == null) { return; }
-            e.Graphics.DrawImageInRectAspectRatio(i,0,0, e.PageBounds.Width, e.PageBounds.Height);
-       }
+            e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
+        }
 
         private void OnPrintPage(PrintPageEventArgs e)
         {
@@ -2785,9 +2759,9 @@ namespace BlueControls.Controls
 
             var i = ToBitmap(1);
 
-            if (i== null)
+            if (i == null)
             {
-               // Develop.DebugPrint(enFehlerArt.Warnung, "Bild ist null: " + Filename);
+                // Develop.DebugPrint(enFehlerArt.Warnung, "Bild ist null: " + Filename);
                 return;
             }
 
@@ -3056,7 +3030,7 @@ namespace BlueControls.Controls
             }
 
 
-            for (var Durch = 0 ; Durch <= 1 ; Durch++)
+            for (var Durch = 0; Durch <= 1; Durch++)
             {
 
                 do

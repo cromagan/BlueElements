@@ -74,8 +74,8 @@ namespace BlueControls
         {
             X += XVal;
             Y += YVal;
-            Width += XVal * 2;
-            Height += YVal * 2;
+            Width -= XVal * 2;
+            Height -= YVal * 2;
 
         }
 
