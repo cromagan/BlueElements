@@ -416,6 +416,12 @@ namespace BlueDatabase
 
         private RowSortDefinition _sortDefinition;
         private bool _isParsing;
+        private int _ParsedAndRepairedCount = 0;
+
+        /// <summary>
+        /// Variable nur temporär für den BinReloader, um mögliche Datenverluste zu entdecken.
+        /// </summary>
+        string _LastWorkItem = string.Empty;
 
         /// <summary>
         /// Variable wird einzig und allein vom BinWriter verändert.
@@ -566,7 +572,6 @@ namespace BlueDatabase
 
             Row.Initialize();
 
-            Cell.RemoveOrphans();
 
             Works.Clear();
 
@@ -1311,15 +1316,17 @@ namespace BlueDatabase
 
 
             Column.ThrowEvents = true;
-            _isParsing = false;
-
 
             if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { ReadOnly = true; }
+
+            _isParsing = false;
 
             //Repair NACH ExecutePendung, vielleicht ist es schon repariert
             //Repair NACH _isParsing, da es auch abgespeichert werden soll
             OnParsed();
             Repair();
+
+            _ParsedAndRepairedCount++;
         }
 
 
@@ -3040,7 +3047,15 @@ namespace BlueDatabase
 
                     if (ThisPending.RowKey == OldKey)
                     {
-                        ThisPending.RowKey = NewKey;
+                        if (ThisPending.ToString() == _LastWorkItem) { _LastWorkItem = "X"; }
+
+                        ThisPending.RowKey = NewKey; // Generell den Schlüssel ändern
+
+                        if (_LastWorkItem == "X")
+                        {
+                            _LastWorkItem = ThisPending.ToString();
+                            Develop.DebugPrint(enFehlerArt.Info, "LastWorkitem geändert: " + _LastWorkItem);
+                        }
 
                         switch (ThisPending.Comand)
                         {
@@ -3053,9 +3068,7 @@ namespace BlueDatabase
                                 if (ThisPending.ChangedTo.Contains("RowKey=" + OldKey)) { Develop.DebugPrint("Replace machen (New): " + OldKey); }
                                 break;
                         }
-
                     }
-
                 }
 
                 OnRowKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
@@ -3082,7 +3095,17 @@ namespace BlueDatabase
 
                     if (ThisPending.ColKey == OldKey)
                     {
-                        ThisPending.ColKey = NewKey;
+                        if (ThisPending.ToString() == _LastWorkItem) { _LastWorkItem = "X"; }
+
+                        ThisPending.ColKey = NewKey; // Generell den Schlüssel ändern
+
+                        if (_LastWorkItem == "X")
+                        {
+                            _LastWorkItem = ThisPending.ToString();
+                            Develop.DebugPrint(enFehlerArt.Info, "LastWorkitem geändert: " + _LastWorkItem);
+                        }
+
+
 
                         switch (ThisPending.Comand)
                         {
@@ -3415,7 +3438,6 @@ namespace BlueDatabase
 
 
             // Letztes WorkItem speichern, als Kontrolle
-            var LWI = string.Empty;
             if (Works != null && Works.Count > 0)
             {
                 var c = 0;
@@ -3424,9 +3446,9 @@ namespace BlueDatabase
                     c += 1;
                     if (c > 20 || Works.Count - c < 20) { break; }
                     var wn = Works.Count - c;
-                    if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { LWI = Works[wn].ToString(); }
+                    if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { _LastWorkItem = Works[wn].ToString(); }
 
-                } while (string.IsNullOrEmpty(LWI));
+                } while (string.IsNullOrEmpty(_LastWorkItem));
 
 
             }
@@ -3434,28 +3456,28 @@ namespace BlueDatabase
 
 
             while (_isParsing) { Develop.DoEvents(); }
+            var tmpParsCount = _ParsedAndRepairedCount;
             BinReLoader.ReportProgress(1, _BLoaded);
-            while (!_isParsing) { Develop.DoEvents(); }
-            while (_isParsing) { Develop.DoEvents(); }
+            while (tmpParsCount == _ParsedAndRepairedCount || _isParsing) { Develop.DoEvents(); }
             BinReLoader.ReportProgress(0, tmpLastSaveCode);
 
 
 
 
             // Leztes WorkItem suchen. Auch Ohne LogUndo MUSS es vorhanden sein.
-            if (!string.IsNullOrEmpty(LWI))
+            if (!string.IsNullOrEmpty(_LastWorkItem))
             {
                 var ok = false;
                 var ok2 = string.Empty;
                 foreach (var ThisWorkItem in Works)
                 {
                     var tmp = ThisWorkItem.ToString();
-                    if (tmp == LWI)
+                    if (tmp == _LastWorkItem)
                     {
                         ok = true;
                         break;
                     }
-                    else if (tmp.Substring(7) == LWI.Substring(7))
+                    else if (tmp.Substring(7) == _LastWorkItem.Substring(7))
                     {
                         ok2 = tmp;
                     }
@@ -3463,7 +3485,7 @@ namespace BlueDatabase
 
                 if (!ok)
                 {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + LWI + "<br>" + Filename + "<br>" + ok2);
+                    Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br>" + ok2);
                 }
             }
 
@@ -3531,8 +3553,9 @@ namespace BlueDatabase
                     break;
 
                 case "Reload":
-                    if (BinReLoader.IsBusy) { return; }
-                    BinReLoader.RunWorkerAsync();
+                    var tmpParesd = _ParsedAndRepairedCount;
+                    if (!BinReLoader.IsBusy) { BinReLoader.RunWorkerAsync(); }
+                    while (_ParsedAndRepairedCount == tmpParesd || _isParsing || BinReLoader.IsBusy) { Develop.DoEvents(); }
                     break;
 
                 case "GetBinData":
