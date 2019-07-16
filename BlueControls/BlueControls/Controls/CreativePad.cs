@@ -74,8 +74,13 @@ namespace BlueControls.Controls
         private PointDF _MouseDownx;
 
         public string Caption = "";
-        private string ID = string.Empty;
 
+        public string ID = string.Empty;
+
+        /// <summary>
+        /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter
+        /// </summary>
+        int IDCount = 0;
 
         private BasicPadItem _GivesMouseComandsTo;
 
@@ -2363,6 +2368,9 @@ namespace BlueControls.Controls
 
             var t = "{";
 
+
+            if (!string.IsNullOrEmpty(ID)) { t = t + "ID=" + ID.ToNonCritical() + ", "; }
+
             if (!string.IsNullOrEmpty(Caption)) { t = t + "Caption=" + Caption.ToNonCritical() + ", "; }
 
             if (_SheetStyle != null) { t = t + "Style=" + _SheetStyle.CellFirstString().ToNonCritical() + ", "; }
@@ -2397,7 +2405,14 @@ namespace BlueControls.Controls
 
         }
 
-        public void ParseData(string Value, bool NeedPrinterData)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Value"></param>
+        /// <param name="NeedPrinterData"></param>
+        /// <param name="GetID">Ob die ID, die in den Daten gespeichert ist, verwendet werden soll. Muss false sein, wenn ein Layout kopiert wird, um eine neue ID zu erhalten.</param>
+        public void ParseData(string Value, bool NeedPrinterData, bool GetID)
         {
 
             Initialize();
@@ -2441,7 +2456,7 @@ namespace BlueControls.Controls
                         break;
 
                     case "id":
-                        ID = pvalue.FromNonCritical();
+                        if (GetID) { ID = pvalue.FromNonCritical(); }
                         break;
 
                     case "style":
@@ -2531,7 +2546,9 @@ namespace BlueControls.Controls
 
             Caption = "";
 
-            ID = DateTime.UtcNow.ToString(Constants.Format_Date);
+            IDCount++;
+
+            ID = "#" + DateTime.UtcNow.ToString(Constants.Format_Date) + IDCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
 
 
             _NewAutoRelations.Clear();
@@ -2956,10 +2973,10 @@ namespace BlueControls.Controls
 
 
 
-        public void GenerateFromRow(int LayoutNr, RowItem Row, bool NeedPrinterData)
+        public void GenerateFromRow(string LayoutID, RowItem Row, bool NeedPrinterData)
         {
-
-            ParseData(Row.Database.Layouts[LayoutNr], NeedPrinterData);
+            var LayoutNr = Row.Database.LayoutIDToIndex(LayoutID);
+            ParseData(Row.Database.Layouts[LayoutNr], NeedPrinterData, true);
             ResetVariables();
             ParseVariableAndSpecialCodes(Row);
 
@@ -3371,7 +3388,7 @@ namespace BlueControls.Controls
             }
         }
 
-        public static void GenerateLayoutFromRow(RowItem Row, int LayoutNr, bool DirectPrint, bool DirectSave, string OptionalFilename)
+        public static void GenerateLayoutFromRow(RowItem Row, string LayoutID, bool DirectPrint, bool DirectSave, string OptionalFilename)
         {
 
 
@@ -3392,7 +3409,7 @@ namespace BlueControls.Controls
             }
             else
             {
-                PadForCreation.GenerateFromRow(LayoutNr, Row, false);
+                PadForCreation.GenerateFromRow(LayoutID, Row, false);
                 if (DirectSave)
                 {
                     PadForCreation.SaveAsBitmap(Row.CellFirstString(), OptionalFilename);
@@ -3408,7 +3425,7 @@ namespace BlueControls.Controls
         public static string RenameColumnInLayout(Database database, string LayoutCode, string OldName, ColumnItem Column)
         {
             var Padx = new CreativePad(); // TODO: Creative-Pad unabhängig eines Controls erstellen.
-            Padx.ParseData(LayoutCode, false);
+            Padx.ParseData(LayoutCode, false, true);
             Padx.RenameColumn(OldName, Column);
             var R = Padx.DataToString();
             Padx.Dispose();

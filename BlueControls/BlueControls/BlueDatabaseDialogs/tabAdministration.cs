@@ -155,10 +155,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             if (string.IsNullOrEmpty(cbxInternalColumnArrangementSelector.Text)) { return; }
-
             _TableView.Arrangement = int.Parse(e.Item.Internal());
-
-            _TableView.CursorPos_Set(_TableView.CursorPosKey(), true);
             Check_OrderButtons();
         }
 
@@ -525,7 +522,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 w.ShowDialog();
             }
-           // DB.OnLoaded(new LoadedEventArgs(true));
+            // DB.OnLoaded(new LoadedEventArgs(true));
         }
 
         private void btnLayouts_Click(object sender, System.EventArgs e)
@@ -567,7 +564,7 @@ namespace BlueControls.BlueDatabaseDialogs
             btnVorherigeVersion.Enabled = false;
 
 
-            if (_originalDB != null && _TableView.Database != _originalDB )
+            if (_originalDB != null && _TableView.Database != _originalDB)
             {
                 _TableView.Database = _originalDB;
                 _originalDB = null;
@@ -634,7 +631,7 @@ namespace BlueControls.BlueDatabaseDialogs
             var tmp = Database.GetByFilename(Files[0]);
             if (tmp == null)
             {
-                tmp = new Database( true, _TableView.Database._PasswordSub, _TableView.Database._GenerateLayout, _TableView.Database._RenameColumnInLayout);
+                tmp = new Database(true, _TableView.Database._PasswordSub, _TableView.Database._GenerateLayout, _TableView.Database._RenameColumnInLayout);
                 tmp.LoadFromDisk(Files[0]);
             }
 
@@ -694,7 +691,7 @@ namespace BlueControls.BlueDatabaseDialogs
                     _TableView.Database.ColumnArrangements[_TableView.Arrangement].Remove(ViewItem);
                 }
 
-                if (index >= _TableView.Database.ColumnArrangements[_TableView.Arrangement].Count()) { index = _TableView.Database.ColumnArrangements[_TableView.Arrangement].Count() ; }
+                if (index >= _TableView.Database.ColumnArrangements[_TableView.Arrangement].Count()) { index = _TableView.Database.ColumnArrangements[_TableView.Arrangement].Count(); }
                 _TableView.Database.ColumnArrangements[_TableView.Arrangement].InsertAt(index, c);
                 _TableView.CursorPos_Set(c, _TableView.CursorPosRow(), true);
                 Check_OrderButtons();

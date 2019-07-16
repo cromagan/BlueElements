@@ -47,7 +47,6 @@ namespace BlueDatabase
         private enExportTyp _Typ;
         private float _Intervall;
         private float _AutomatischLöschen;
-        private string _ExportFormular; // TODO: Ersetzen mit _ExportFormularID
         private string _ExportFormularID;
         private int _ExportSpaltenAnsicht;
         public ListExt<string> _BereitsExportiert;
@@ -125,19 +124,7 @@ namespace BlueDatabase
             }
         }
 
-        public string ExportFormular
-        {
-            get
-            {
-                return _ExportFormular;
-            }
-            set
-            {
-                if (_ExportFormular == value) { return; }
-                _ExportFormular = value;
-                OnChanged();
-            }
-        }
+
 
         public string ExportFormularID
         {
@@ -207,7 +194,7 @@ namespace BlueDatabase
             _Typ = enExportTyp.DatenbankOriginalFormat;
             _Intervall = 1;
             _AutomatischLöschen = 30;
-            _ExportFormular = string.Empty;
+            _ExportFormularID = string.Empty;
             _ExportSpaltenAnsicht = 0;
             Filter = new FilterCollection(Database);
             Filter.Changed += _Filter_Changed;
@@ -288,7 +275,7 @@ namespace BlueDatabase
                         _AutomatischLöschen = float.Parse(pair.Value);
                         break;
                     case "exportformula":
-                        _ExportFormular = pair.Value.FromNonCritical();
+                       // _ExportFormular = pair.Value.FromNonCritical(); ALT, 16.07.2019
                         break;
                     case "exid":
                         _ExportFormularID = pair.Value.FromNonCritical();
@@ -368,7 +355,7 @@ namespace BlueDatabase
 
             if (_Typ == enExportTyp.EinzelnMitFormular)
             {
-                if (!string.IsNullOrEmpty(_ExportFormular))
+                if (!string.IsNullOrEmpty(_ExportFormularID))
                 {
                     t = t + " mit einem gewählten Formular. Einträge werden immer aktualisiert und gelöschte Einträge auch gelöscht.";
                 }
@@ -442,7 +429,7 @@ namespace BlueDatabase
             }
             else
             {
-                Result = Result + "ExportFormula=" + _ExportFormular.ToNonCritical() + ", ";
+                Result = Result + "exid=" + _ExportFormularID.ToNonCritical() + ", ";
             }
 
             if (Filter.Count() > 0)
@@ -648,28 +635,24 @@ namespace BlueDatabase
 
             if (_Typ == enExportTyp.EinzelnMitFormular)
             {
-                if (string.IsNullOrEmpty(_ExportFormular))
+                if (string.IsNullOrEmpty(_ExportFormularID))
                 {
                     return "Layout-Vorlage nicht definiert.";
                 }
 
 
-                if (_ExportFormular.IsNumeral())
+                if (_ExportFormularID.StartsWith("#"))
                 {
-                    var c = int.Parse(_ExportFormular);
 
-                    if (c < 0)
-                    {
-                        return "Layout-Vorlage nicht gewählt.";
-                    }
-                    if (c > Database.Layouts.Count - 1)
+                    var LNo = Database.LayoutIDToIndex(_ExportFormularID);
+                    if (LNo <0)
                     {
                         return "Layout-Vorlage nicht vorhanden.";
                     }
                 }
                 else
                 {
-                    if (!FileExists(_ExportFormular))
+                    if (!FileExists(_ExportFormularID))
                     {
                         return "Layout-Vorlage existiert nicht.";
                     }
@@ -792,15 +775,15 @@ namespace BlueDatabase
 
                                     if (!Found)
                                     {
-                                        if (_ExportFormular.IsLong())
+                                        if (_ExportFormularID.StartsWith("#"))
                                         {
                                             SingleFileExport = TempFile(SavePath, Thisrow.CellFirstString(), "PNG");
-                                            Export.SaveAsBitmap(Thisrow, int.Parse(_ExportFormular), SingleFileExport, _GenerateLayout);
+                                            Export.SaveAsBitmap(Thisrow, _ExportFormularID, SingleFileExport, _GenerateLayout);
                                         }
                                         else
                                         {
-                                            SingleFileExport = TempFile(SavePath, Thisrow.CellFirstString(), _ExportFormular.FileSuffix());
-                                            Export.SaveAs(Thisrow, _ExportFormular, SingleFileExport);
+                                            SingleFileExport = TempFile(SavePath, Thisrow.CellFirstString(), _ExportFormularID.FileSuffix());
+                                            Export.SaveAs(Thisrow, _ExportFormularID, SingleFileExport);
                                         }
                                         Added.Add(SingleFileExport + "|" + tim + "|" + Thisrow.Key);
 

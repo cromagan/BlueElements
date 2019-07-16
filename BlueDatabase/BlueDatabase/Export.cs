@@ -40,14 +40,14 @@ namespace BlueDatabase
 
 
 
-        public static List<string> SaveAsBitmap(List<RowItem> Row, int LayoutNo, string Path, GenerateLayout_Internal _GenerateLayout)
+        public static List<string> SaveAsBitmap(List<RowItem> Row, string LayoutID, string Path, GenerateLayout_Internal _GenerateLayout)
         {
             var l = new List<string>();
 
             foreach (var ThisRow in Row)
             {
                 var FN = TempFile(Path, ThisRow.CellFirstString(), "PNG");
-                _GenerateLayout(ThisRow, LayoutNo, false, true, FN);
+                _GenerateLayout(ThisRow, LayoutID, false, true, FN);
                 l.Add(FN);
             }
 
@@ -56,9 +56,9 @@ namespace BlueDatabase
 
 
 
-        public static void SaveAsBitmap(RowItem Row, int LayoutNo, string optionalFilename, GenerateLayout_Internal _GenerateLayout)
+        public static void SaveAsBitmap(RowItem Row, string LayoutID, string optionalFilename, GenerateLayout_Internal _GenerateLayout)
         {
-            _GenerateLayout(Row, LayoutNo, false, true, optionalFilename);
+            _GenerateLayout(Row, LayoutID, false, true, optionalFilename);
         }
 
 

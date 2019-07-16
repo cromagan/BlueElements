@@ -34,7 +34,7 @@ namespace BlueControls.BlueDatabaseDialogs
     {
         public readonly Database Database;
 
-        private int LoadedLayout = -1;
+        private string LoadedLayout = string.Empty;
         private string _AdditionalLayoutPath = "";
 
 
@@ -90,7 +90,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 Layout1.Enabled = false;
                 Layout1.Text = string.Empty;
-                LoadedLayout = -1;
+                LoadedLayout = string.Empty;
             }
 
 
@@ -102,20 +102,20 @@ namespace BlueControls.BlueDatabaseDialogs
                 Hinzu.Enabled = true;
                 if (Database.Layouts.Count == 0)
                 {
-                    LoadedLayout = -1;
+                    LoadedLayout = string.Empty;
                 }
             }
             else
             {
 
                 Hinzu.Enabled = true;
-                LoadedLayout = -1;
+                LoadedLayout = string.Empty;
             }
 
 
             if (FileExists(Layout1.Text))
             {
-                LoadedLayout = -1;
+                LoadedLayout = string.Empty;
                 LayBearb.Enabled = true;
                 LayOpen.Enabled = true;
                 Page_Control.Enabled = false;
@@ -131,7 +131,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 Base64.Enabled = false;
             }
 
-            if (LoadedLayout >= 0)
+            if (!string.IsNullOrEmpty(LoadedLayout))
             {
                 Page_Control.Enabled = true;
 
@@ -168,18 +168,18 @@ namespace BlueControls.BlueDatabaseDialogs
 
             var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
-            using (var c = new CreativePad())
-            {
-                c.Caption = ex;
-                Database.Layouts.Add(c.DataToString());
-            }
+            var c = new CreativePad();
+
+            c.Caption = ex;
+            Database.Layouts.Add(c.DataToString());
+
 
             befülleLayoutDropdown();
 
 
-            LoadedLayout = -1; //Database.PrintViews.Count - 1
+            LoadedLayout = string.Empty;
 
-            LoadLayout((Database.Layouts.Count - 1).ToString());
+            LoadLayout(c.ID);
 
 
 
@@ -192,30 +192,29 @@ namespace BlueControls.BlueDatabaseDialogs
             SaveCurrentLayout();
 
 
-            if (LoadedLayout < 0)
-            {
-                return;
-            }
+            if (string.IsNullOrEmpty(LoadedLayout)) { return; }
 
 
             if (MessageBox.Show("Layout <b>'" + Pad.Caption + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
 
             Pad.Item.Clear();
-            Database.Layouts.RemoveAt(LoadedLayout);
-            LoadedLayout = -1;
+            var ind = Database.LayoutIDToIndex(LoadedLayout);
+
+            Database.Layouts.RemoveAt(ind);
+            LoadedLayout = string.Empty;
 
 
             befülleLayoutDropdown();
 
 
-            if (Database.Layouts.Count > 0)
-            {
-                LoadLayout("0");
-            }
-            else
-            {
-                Layout1.Text = string.Empty;
-            }
+            //if (Database.Layouts.Count > 0)
+            //{
+            //    LoadLayout("0");
+            //}
+            //else
+            //{
+            Layout1.Text = string.Empty;
+            //}
 
 
 
@@ -226,7 +225,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private void NamB_Click(object sender, System.EventArgs e)
         {
             SaveCurrentLayout();
-            if (LoadedLayout < 0) { return; }
+            if (string.IsNullOrEmpty(LoadedLayout)) { return; }
 
             var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Caption, enDataFormat.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
@@ -252,9 +251,9 @@ namespace BlueControls.BlueDatabaseDialogs
 
             Layout1.Text = LA;
 
-            if (LA.Contains(":"))
+            if (!LA.StartsWith("#"))
             {
-                LoadedLayout = -1;
+                LoadedLayout = string.Empty;
                 Pad.Item.Clear();
                 Pad.SheetSizeInMM = SizeF.Empty;
                 var x = new TextPadItem("x", "Layout aus Dateisystem");
@@ -267,8 +266,9 @@ namespace BlueControls.BlueDatabaseDialogs
             else
             {
                 Pad.Enabled = true;
-                LoadedLayout = int.Parse(LA);
-                Pad.ParseData(Database.Layouts[LoadedLayout], true);
+                LoadedLayout = LA;
+                var ind = Database.LayoutIDToIndex(LoadedLayout);
+                Pad.ParseData(Database.Layouts[ind], true, true);
             }
 
 
@@ -280,14 +280,15 @@ namespace BlueControls.BlueDatabaseDialogs
         private void SaveCurrentLayout()
         {
             if (Database == null) { return; }
-            if (LoadedLayout < 0) { return; }
+            if (string.IsNullOrEmpty(LoadedLayout)) { return; }
 
             var newl = Pad.DataToString();
-            if (Database.Layouts[LoadedLayout] == newl) { return; }
-            //   If Not Database.Editablexx("Layout konnte nicht gespeichert werden") Then Exit Sub
 
-            Database.Layouts[LoadedLayout] = newl;
-            // Das eventx prüft die Exporte auf Gültigkeit
+            var ind = Database.LayoutIDToIndex(LoadedLayout);
+
+            if (Database.Layouts[ind] == newl) { return; }
+
+            Database.Layouts[ind] = newl;
             Pad.ZoomFit();
         }
 
@@ -572,7 +573,7 @@ namespace BlueControls.BlueDatabaseDialogs
             if (Database != null)
             {
                 Layout1.Item.Clear();
-                Layout1.Item.AddRange(Database, true, _AdditionalLayoutPath);
+                Layout1.Item.AddLayoutsOf(Database, true, _AdditionalLayoutPath);
             }
         }
     }

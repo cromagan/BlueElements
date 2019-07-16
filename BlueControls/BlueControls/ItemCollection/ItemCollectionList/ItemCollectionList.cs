@@ -825,15 +825,15 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public void AddRange(Database vLayoutDatabase, bool vDoDiscLayouts, string vAdditionalLayoutPath)
+        public void AddLayoutsOf(Database vLayoutDatabase, bool vDoDiscLayouts, string vAdditionalLayoutPath)
         {
 
             for (var z = 0; z < vLayoutDatabase.Layouts.Count; z++)
             {
                 using (var p = new CreativePad())
                 {
-                    p.ParseData(vLayoutDatabase.Layouts[z], false);
-                    Add(new TextListItem(z.ToString(), p.Caption, enImageCode.Stern));
+                    p.ParseData(vLayoutDatabase.Layouts[z], false, true);
+                    Add(new TextListItem(p.ID, p.Caption, enImageCode.Stern));
                 }
             }
 

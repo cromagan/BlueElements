@@ -45,7 +45,7 @@ namespace BlueControls.Classes_Editor
             this.Caption27 = new Caption();
             this.BlueFrame2 = new GroupBox();
             this.ExportSpaltenAnsicht = new ComboBox();
-            this.ExportFormular = new ComboBox();
+            this.cbxExportFormularID = new ComboBox();
             this.ExportOriginalFormat = new Button();
             this.ExportHTMLFormat = new Button();
             this.ExportCSVFormat = new Button();
@@ -150,7 +150,7 @@ namespace BlueControls.Classes_Editor
             //
             this.BlueFrame2.CausesValidation = false;
             this.BlueFrame2.Controls.Add(this.ExportSpaltenAnsicht);
-            this.BlueFrame2.Controls.Add(this.ExportFormular);
+            this.BlueFrame2.Controls.Add(this.cbxExportFormularID);
             this.BlueFrame2.Controls.Add(this.ExportOriginalFormat);
             this.BlueFrame2.Controls.Add(this.ExportHTMLFormat);
             this.BlueFrame2.Controls.Add(this.ExportCSVFormat);
@@ -170,18 +170,18 @@ namespace BlueControls.Classes_Editor
             this.ExportSpaltenAnsicht.Name = "ExportSpaltenAnsicht";
             this.ExportSpaltenAnsicht.Size = new Size(144, 22);
             this.ExportSpaltenAnsicht.TabIndex = 7;
-            this.ExportSpaltenAnsicht.ItemClicked += new EventHandler<BasicListItemEventArgs>(ExportFormular_Item_Click);
+            this.ExportSpaltenAnsicht.ItemClicked += new EventHandler<BasicListItemEventArgs>(cbxExportFormularID_ItemClicked);
             //
-            //ExportFormular
+            //cbxExportFormularID
             //
-            this.ExportFormular.Anchor = (System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right);
-            this.ExportFormular.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.ExportFormular.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.ExportFormular.Location = new Point(264, 90);
-            this.ExportFormular.Name = "ExportFormular";
-            this.ExportFormular.Size = new Size(144, 22);
-            this.ExportFormular.TabIndex = 11;
-            this.ExportFormular.ItemClicked += new EventHandler<BasicListItemEventArgs>(ExportFormular_Item_Click);
+            this.cbxExportFormularID.Anchor = (System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right);
+            this.cbxExportFormularID.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxExportFormularID.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxExportFormularID.Location = new Point(264, 90);
+            this.cbxExportFormularID.Name = "cbxExportFormularID";
+            this.cbxExportFormularID.Size = new Size(144, 22);
+            this.cbxExportFormularID.TabIndex = 11;
+            this.cbxExportFormularID.ItemClicked += new EventHandler<BasicListItemEventArgs>(cbxExportFormularID_ItemClicked);
             //
             //ExportOriginalFormat
             //
@@ -301,7 +301,7 @@ namespace BlueControls.Classes_Editor
         private Caption Caption27;
         private GroupBox BlueFrame2;
         private ComboBox ExportSpaltenAnsicht;
-        private ComboBox ExportFormular;
+        private ComboBox cbxExportFormularID;
         private Button ExportOriginalFormat;
         private Button ExportHTMLFormat;
         private Button ExportCSVFormat;

@@ -491,7 +491,7 @@ namespace BlueDatabase
 
         public delegate string GetPassword();
         public delegate string RenameColumnInLayout(Database database, string LayoutCode, string OldName, ColumnItem Column);
-        public delegate void GenerateLayout_Internal(RowItem Row, int LayoutNr, bool DirectPrint, bool DirectSave, string OptionalFilename);
+        public delegate void GenerateLayout_Internal(RowItem Row, string LayoutID, bool DirectPrint, bool DirectSave, string OptionalFilename);
 
         #endregion
 
@@ -563,6 +563,18 @@ namespace BlueDatabase
 
             Checker.Enabled = true;
         }
+
+        public int LayoutIDToIndex(string exportFormularID)
+        {
+
+            for (var z = 0; z < Layouts.Count; z++)
+            {
+                if (Layouts[z].Contains("ID=" + exportFormularID + ",")) { return z; }
+            }
+
+            return -1;
+        }
+
         private void Initialize()
         {
 
@@ -912,7 +924,16 @@ namespace BlueDatabase
 
         private void Layouts_ItemSeted(object sender, ListEventArgs e)
         {
-            if (e != null) { InvalidateExports(Layouts.IndexOf((string)e.Item)); }
+            if (e != null)
+            {
+                var x = (string)e.Item;
+                if (!x.StartsWith("{ID=#")) { Develop.DebugPrint("ID nicht gefunden: " + x); }
+                var ko = x.IndexOf(", ");
+
+                var id = x.Substring(4, ko - 4);
+
+                InvalidateExports(id);
+            }
         }
 
 
@@ -940,6 +961,17 @@ namespace BlueDatabase
             }
 
 
+
+            for (var z = 0; z< Layouts.Count; z++)
+            {
+
+                if (!Layouts[z].StartsWith("{ID=#"))
+                {
+
+                    Layouts[z] = "{ID=#Converted" + z.ToString() + ", " + Layouts[z].Substring(1) ;
+
+                }
+            }
         }
 
 
@@ -2644,10 +2676,13 @@ namespace BlueDatabase
         #region  Undo 
 
 
-        public string UndoText(string CellKey)
+        public string UndoText(ColumnItem column, RowItem row)
         {
 
             if (Works == null || Works.Count == 0) { return string.Empty; }
+
+
+            var CellKey = CellCollection.KeyOfCell(column, row);
 
             var t = "";
 
@@ -3154,7 +3189,7 @@ namespace BlueDatabase
 
 
 
-        private void InvalidateExports(int LayoutNo)
+        private void InvalidateExports(string LayoutID)
         {
             if (ReadOnly) { return; }
 
@@ -3167,13 +3202,10 @@ namespace BlueDatabase
                 {
                     if (ThisExport.Typ == enExportTyp.EinzelnMitFormular)
                     {
-                        if (int.TryParse(ThisExport.ExportFormular, out var r))
+                        if (ThisExport.ExportFormularID == LayoutID)
                         {
-                            if (r == LayoutNo)
-                            {
-                                Done = true;
-                                ThisExport.LastExportTime = new DateTime(1900, 1, 1);
-                            }
+                            Done = true;
+                            ThisExport.LastExportTime = new DateTime(1900, 1, 1);
                         }
                     }
                 }
@@ -3301,15 +3333,16 @@ namespace BlueDatabase
             var BlockDatei = Blockdateiname();
 
             // BlockDatei erstellen
+            var done = false;
             try
             {
                 if (FileExists(tBackup))
                 {
-                    RenameFile(tBackup, BlockDatei, true);
+                    done = RenameFile(tBackup, BlockDatei, true);
                 }
                 else
                 {
-                    CopyFile(Filename, BlockDatei, true);
+                    done = CopyFile(Filename, BlockDatei, true);
                 }
             }
             catch (Exception ex)
@@ -3318,7 +3351,20 @@ namespace BlueDatabase
                 return;
             }
 
-            if (!BlockDateiVorhanden()) { Develop.DebugPrint("Block-Datei Konflikt 1"); }
+
+            if (!done)
+            {
+                // Letztens aufgetreten, dass eine Blockdatei schon vorhanden war. Anscheinden Zeitgleiche Kopie?
+                Develop.DebugPrint("Befehl anscheinend abgebrochen"); 
+                return;
+            }
+
+
+            if (!BlockDateiVorhanden())
+            {
+                Develop.DebugPrint("Block-Datei Konflikt 1");
+                return;
+            }
 
             // Im Parallelen-Process, Reload-Needed ist auch ein Dateizugriff
             if (ReloadNeeded()) { BinaryWriter_ReportProgressAndWait(5, "Reload"); }

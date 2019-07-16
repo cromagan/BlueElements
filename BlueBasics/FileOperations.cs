@@ -144,7 +144,7 @@ namespace BlueBasics
                 return false;
             }
 
-            return (!FileExists(ThisFile));
+            return !FileExists(ThisFile);
         }
 
 
@@ -166,8 +166,9 @@ namespace BlueBasics
                 return false;
             }
 
-            return (FileExists(newName) && !FileExists(oldName));
+            return FileExists(newName) && !FileExists(oldName);
         }
+
         private static bool TryCopyFile(string source, string target)
         {
             if (source == target) { return true; }
@@ -184,7 +185,7 @@ namespace BlueBasics
                 return false;
             }
 
-            return (FileExists(target));
+            return FileExists(target);
         }
 
 

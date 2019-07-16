@@ -227,7 +227,7 @@ namespace BlueControls.ItemCollection
                     return true;
                 case "data":
                     PadInternal = new CreativePad();
-                    PadInternal.ParseData(pair.Value, false);
+                    PadInternal.ParseData(pair.Value, false, true);
                     return true;
                 case "checked":
                     return true;

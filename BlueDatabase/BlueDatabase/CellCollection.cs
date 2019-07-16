@@ -96,7 +96,7 @@ namespace BlueDatabase
             if (_Row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Row konnte nicht generiert werden."); }
             if (_Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Column konnte nicht generiert werden."); }
 
-            var CellKey = KeyOfCell(_Column.Key, _Row.Key);
+            var CellKey = KeyOfCell(_Column, _Row);
 
             if (_cells.ContainsKey(CellKey))
             {
@@ -1068,6 +1068,10 @@ namespace BlueDatabase
 
         public static string KeyOfCell(ColumnItem Column, RowItem Row)
         {
+            // Alte verweise eleminieren.
+            if (Column != null) { Column = Column.Database.Column.SearchByKey(Column.Key); } 
+            if (Row != null) { Row = Row.Database.Row.SearchByKey(Row.Key); }
+
             if (Column == null && Row == null) { return string.Empty; }
 
             if (Column == null) { return KeyOfCell(-1, Row.Key); }

@@ -134,7 +134,7 @@ namespace BlueControls.Forms
             _Title = Title;
             Pad.Item.Clear();
 
-            Pad.ParseData(CodeToParse, true);
+            Pad.ParseData(CodeToParse, true, true);
 
 
             var Count = 0;
@@ -397,7 +397,7 @@ namespace BlueControls.Forms
             Pad.Item.Clear();
             var t = modAllgemein.LoadFromDisk(na);
 
-            Pad.ParseData(t, true);
+            Pad.ParseData(t, true, false);
             Pad.ZoomFit();
             Ribbon.SelectedIndex = 1;
         }

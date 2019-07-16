@@ -33,7 +33,7 @@ namespace BlueControls.ItemCollection
 
         private RowItem _Row;
         private Bitmap _tmpBMP;
-        private int _LayoutNr;
+        private string _LayoutID;
 
         #endregion
 
@@ -54,18 +54,18 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public RowFormulaListItem(RowItem cRow, string cUserDefCompareKey)
+        public RowFormulaListItem(RowItem row, string userDefCompareKey)
         {
-            _Row = cRow;
-            UserDefCompareKey = cUserDefCompareKey;
+            _Row = row;
+            UserDefCompareKey = userDefCompareKey;
         }
 
 
-        public RowFormulaListItem(RowItem cRow, int clayoutNr, string cUserDefCompareKey)
+        public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey)
         {
-            _Row = cRow;
-            _LayoutNr = clayoutNr;
-            UserDefCompareKey = cUserDefCompareKey;
+            _Row = row;
+            _LayoutID = layoutID;
+            UserDefCompareKey = userDefCompareKey;
         }
 
 
@@ -81,18 +81,18 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        public int LayoutNr
+        public string LayoutID
         {
             get
             {
-                return _LayoutNr;
+                return _LayoutID;
             }
             set
             {
 
-                if (value == _LayoutNr) { return; }
+                if (value == _LayoutID) { return; }
 
-                _LayoutNr = value;
+                _LayoutID = value;
 
 
                 if (_tmpBMP != null)
@@ -177,7 +177,7 @@ namespace BlueControls.ItemCollection
         private void GeneratePic()
         {
 
-            if (Row == null || _LayoutNr < 0 || _LayoutNr > Row.Database.Layouts.Count - 1)
+            if (Row == null || string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#"))
             {
                 _tmpBMP = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
                 return;
@@ -186,7 +186,7 @@ namespace BlueControls.ItemCollection
 
             var _pad = new CreativePad();
 
-            _pad.GenerateFromRow(_LayoutNr, _Row, false);
+            _pad.GenerateFromRow(_LayoutID, _Row, false);
 
             var re = _pad.MaxBounds();
 

@@ -53,7 +53,7 @@ namespace BlueControls.Classes_Editor
 
             ExportVerzeichnis.Text = "";
             ExportAutomatischLöschen.Text = "";
-            ExportFormular.Text = "";
+            cbxExportFormularID.Text = "";
             ExportSpaltenAnsicht.Text = "";
             ExportFilter.Item.Clear();
             lsbExportDateien.Item.Clear();
@@ -87,7 +87,7 @@ namespace BlueControls.Classes_Editor
             ExportIntervall.Text = tmp.Intervall.ToString();
             ExportAutomatischLöschen.Text = tmp.AutomatischLöschen.ToString();
 
-            ExportFormular.Text = tmp.ExportFormular;
+            cbxExportFormularID.Text = tmp.ExportFormularID;
 
             ExportSpaltenAnsicht.Text = tmp.ExportSpaltenAnsicht.ToString();
 
@@ -131,8 +131,8 @@ namespace BlueControls.Classes_Editor
         protected override void PrepaireFormula()
         {
 
-            ExportFormular.Item.Clear();
-            ExportFormular.Item.AddRange(tmp.Database, true, string.Empty);
+            cbxExportFormularID.Item.Clear();
+            cbxExportFormularID.Item.AddLayoutsOf(tmp.Database, true, string.Empty);
 
 
             ExportSpaltenAnsicht.Item.Clear();
@@ -166,7 +166,7 @@ namespace BlueControls.Classes_Editor
             UpdateExport(true);
         }
 
-        private void ExportFormular_Item_Click(object sender, BasicListItemEventArgs e)
+        private void cbxExportFormularID_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             UpdateExport(true);
         }
@@ -215,7 +215,7 @@ namespace BlueControls.Classes_Editor
             {
                 ExportIntervall.Enabled = true;
                 ExportSpaltenAnsicht.Enabled = false;
-                ExportFormular.Enabled = false;
+                cbxExportFormularID.Enabled = false;
                 ExportAutomatischLöschen.Enabled = true;
                 ExportFilter.Enabled = false;
 
@@ -224,7 +224,7 @@ namespace BlueControls.Classes_Editor
             {
                 ExportIntervall.Enabled = true;
                 ExportSpaltenAnsicht.Enabled = true;
-                ExportFormular.Enabled = false;
+                cbxExportFormularID.Enabled = false;
                 ExportAutomatischLöschen.Enabled = true;
                 ExportFilter.Enabled = true;
 
@@ -233,7 +233,7 @@ namespace BlueControls.Classes_Editor
             {
                 ExportIntervall.Enabled = false;
                 ExportSpaltenAnsicht.Enabled = false;
-                ExportFormular.Enabled = true;
+                cbxExportFormularID.Enabled = true;
                 ExportAutomatischLöschen.Enabled = false;
                 ExportFilter.Enabled = true;
 
@@ -276,7 +276,7 @@ namespace BlueControls.Classes_Editor
             {
                 tmp.AutomatischLöschen = float.Parse(ExportAutomatischLöschen.Text);
             }
-            tmp.ExportFormular = ExportFormular.Text;
+            tmp.ExportFormularID = cbxExportFormularID.Text;
 
             tmp.ExportSpaltenAnsicht = int.Parse(ExportSpaltenAnsicht.Text);
 

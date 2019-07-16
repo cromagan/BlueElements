@@ -4,13 +4,6 @@
         <name>BeCreative</name>
     </assembly>
     <members>
-        <member name="M:BeCreative.frmMain.SuchEintragNoSave(BlueBasics.Enums.enDirection)">
-            <summary>
-            
-            </summary>
-            <param name="Richtung"></param>
-            <returns>Den CellKey</returns>
-        </member>
         <member name="T:BeCreative.Properties.Resources">
             <summary>
               Eine stark typisierte Ressourcenklasse zum Suchen von lokalisierten Zeichenfolgen usw.

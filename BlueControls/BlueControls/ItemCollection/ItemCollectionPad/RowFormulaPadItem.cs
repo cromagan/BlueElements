@@ -54,7 +54,7 @@ namespace BlueControls.ItemCollection
 
         private RowItem _Row;
         private Bitmap _tmpBMP;
-        private int _LayoutNr;
+        private string _LayoutID;
 
 
 
@@ -76,10 +76,10 @@ namespace BlueControls.ItemCollection
             _Row = cRow;
         }
 
-        public RowFormulaPadItem(RowItem cRow, int LayoutNo)
+        public RowFormulaPadItem(RowItem cRow, string LayoutID)
         {
             _Row = cRow;
-            _LayoutNr = LayoutNo;
+            _LayoutID = LayoutID;
 
         }
 
@@ -104,21 +104,18 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        public int LayoutNrx
+        public string LayoutID
         {
             get
             {
-                return _LayoutNr;
+                return _LayoutID;
             }
             set
             {
 
-                if (value == _LayoutNr)
-                {
-                    return;
-                }
+                if (value == _LayoutID) { return; }
 
-                _LayoutNr = value;
+                _LayoutID = value;
 
 
                 if (_tmpBMP != null)
@@ -239,8 +236,8 @@ namespace BlueControls.ItemCollection
                 case "checked":
                     return true;
 
-                case "layout":
-                    _LayoutNr = int.Parse(pair.Value);
+                case "layoutid":
+                    _LayoutID = pair.Value.FromNonCritical();
                     return true;
 
                 case "database":
@@ -296,7 +293,7 @@ namespace BlueControls.ItemCollection
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
-            t = t + "Layout=" + _LayoutNr + ", ";
+            t = t + "LayoutID=" + _LayoutID.ToNonCritical() + ", ";
 
             if (_Row != null)
             {
@@ -378,7 +375,7 @@ namespace BlueControls.ItemCollection
         private void GeneratePic(bool SizeChangeAllowed)
         {
 
-            if (Row == null || _LayoutNr < 0 || _LayoutNr > Row.Database.Layouts.Count - 1)
+            if (Row == null || string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#"))
             {
                 _tmpBMP = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
                 KeepInternalLogic();
@@ -388,7 +385,7 @@ namespace BlueControls.ItemCollection
 
             var _pad = new CreativePad();
 
-            _pad.GenerateFromRow(_LayoutNr, _Row, false);
+            _pad.GenerateFromRow(_LayoutID, _Row, false);
 
             var re = _pad.MaxBounds();
 
@@ -472,12 +469,12 @@ namespace BlueControls.ItemCollection
             {
                 using (var p = new CreativePad())
                 {
-                    p.ParseData(Row.Database.Layouts[z], false);
+                    p.ParseData(Row.Database.Layouts[z], false, true);
                     Layouts.Add(new TextListItem(z.ToString(), p.Caption, enImageCode.Stern));
                 }
             }
 
-            l.Add(new FlexiControl("Layout", _LayoutNr.ToString(), Layouts));
+            l.Add(new FlexiControl("LayoutId", _LayoutID, Layouts));
 
             return l;
         }
@@ -494,11 +491,11 @@ namespace BlueControls.ItemCollection
             }
 
 
-            var newl = int.Parse(Tags.TagGet("Layout"));
+            var newl = Tags.TagGet("LayoutId");
 
-            if (newl != _LayoutNr)
+            if (newl != _LayoutID)
             {
-                _LayoutNr = newl;
+                _LayoutID = newl;
                 GeneratePic(true);
                 if (_tmpBMP != null)
                 {

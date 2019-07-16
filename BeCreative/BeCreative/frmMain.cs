@@ -69,44 +69,44 @@ namespace BeCreative
         private void zurück_Click(object sender, EventArgs e)
         {
             BlueFormulax.HideViewEditor();
-            TableView.CursorPos_Set(SuchEintragNoSave(enDirection.Oben));
+            SuchEintragNoSave(enDirection.Oben, out var column, out var row);
+            TableView.CursorPos_Set(column, row, false);
         }
 
         private void vor_Click(object sender, EventArgs e)
         {
             BlueFormulax.HideViewEditor();
-            TableView.CursorPos_Set(SuchEintragNoSave(enDirection.Unten));
+            SuchEintragNoSave(enDirection.Unten, out var column, out var row);
+            TableView.CursorPos_Set(column, row, false);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Richtung"></param>
-        /// <returns>Den CellKey</returns>
-        private string SuchEintragNoSave(enDirection Richtung)
+
+        private void SuchEintragNoSave(enDirection Richtung, out ColumnItem column, out RowItem row)
         {
 
-            if (TableView.Database.Row.Count() < 1) { return null; }
+            column = TableView.Database.Column[0];
+            row = null;
+
+            if (TableView.Database.Row.Count() < 1) { return; }
 
 
             // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
-            RowItem nr = null;
+
 
             if (Convert.ToBoolean(Richtung & enDirection.Unten))
             {
-                nr = TableView.View_NextRow(BlueFormulax.ShowingRow);
-                if (nr == null) { nr = TableView.View_RowFirst(); }
+                row = TableView.View_NextRow(BlueFormulax.ShowingRow);
+                if (row == null) { row = TableView.View_RowFirst(); }
             }
 
             if (Convert.ToBoolean(Richtung & enDirection.Oben))
             {
-                nr = TableView.View_PreviousRow(BlueFormulax.ShowingRow);
-                if (nr == null) { nr = TableView.View_RowLast(); }
+                row = TableView.View_PreviousRow(BlueFormulax.ShowingRow);
+                if (row == null) { row = TableView.View_RowLast(); }
             }
 
-            if (nr == null) { nr = TableView.View_RowFirst(); }
+            if (row == null) { row = TableView.View_RowFirst(); }
 
-            return CellCollection.KeyOfCell(TableView.Database.Column[0].Key, nr.Key);
         }
 
 
@@ -317,8 +317,10 @@ namespace BeCreative
                 var tmpr = BlueFormulax.ShowingRow;
                 if (MessageBox.Show("Soll der Eintrag<br><b>" + tmpr.CellFirstString() + "</b><br>wirklich <b>gelöscht</b> werden?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
 
-                var vCell = SuchEintragNoSave(enDirection.Unten);
-                TableView.CursorPos_Set(vCell);
+
+
+                SuchEintragNoSave(enDirection.Unten, out var column, out var row);
+                TableView.CursorPos_Set(column, row, false);
                 TableView.Database.Row.Remove(tmpr);
             }
             else
@@ -640,7 +642,7 @@ namespace BeCreative
             {
                 if (TableView.Database != null)
                 {
-                    if (string.IsNullOrEmpty(TableView.CursorPosKey()) && TableView.View_RowFirst() != null)
+                    if (TableView.CursorPosRow() == null && TableView.View_RowFirst() != null)
                     {
                         TableView.CursorPos_Set(TableView.Database.Column[0], TableView.View_RowFirst(), false);
 

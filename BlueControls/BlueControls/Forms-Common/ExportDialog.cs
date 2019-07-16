@@ -169,7 +169,7 @@ namespace BlueControls.Forms
             {
 
                 TmpPad.ShowInPrintMode = true;
-                TmpPad.GenerateFromRow(int.Parse(FrmDrucken_Layout1.Text), Liste[0], false);
+                TmpPad.GenerateFromRow(FrmDrucken_Layout1.Text, Liste[0], false);
                 TmpPad.ZoomFit();
             }
 
@@ -237,7 +237,7 @@ namespace BlueControls.Forms
         {
             if (Database != null)
             {
-                FrmDrucken_Layout1.Item.AddRange(Database, Speichern.Checked, _AdditionalLayoutPath);
+                FrmDrucken_Layout1.Item.AddLayoutsOf(Database, Speichern.Checked, _AdditionalLayoutPath);
             }
         }
 
@@ -290,7 +290,7 @@ namespace BlueControls.Forms
 
                 if (FrmDrucken_Layout1.Text.IsLong())
                 {
-                    l = Export.SaveAsBitmap(Liste, int.Parse(FrmDrucken_Layout1.Text), ZielPfad, CreativePad.GenerateLayoutFromRow);
+                    l = Export.SaveAsBitmap(Liste, FrmDrucken_Layout1.Text, ZielPfad, CreativePad.GenerateLayoutFromRow);
                 }
                 else
                 {
@@ -432,7 +432,7 @@ namespace BlueControls.Forms
 
             var tmp = new CreativePad();
 
-            tmp.GenerateFromRow(int.Parse(FrmDrucken_Layout1.Text), Liste[0], false);
+            tmp.GenerateFromRow(FrmDrucken_Layout1.Text, Liste[0], false);
 
             var OneItem = tmp.MaxBounds();
 
@@ -454,7 +454,7 @@ namespace BlueControls.Forms
 
 
                     var It = new ChildPadItem();
-                    It.PadInternal.GenerateFromRow(int.Parse(FrmDrucken_Layout1.Text), Liste[StartNr], false);
+                    It.PadInternal.GenerateFromRow(FrmDrucken_Layout1.Text, Liste[StartNr], false);
 
                     //Dim it As New RowFormulaPadItem(Liste(StartNr), Integer.Parse(FrmDrucken_Layout1.Text))
                     PrintPad.Item.Add(It);

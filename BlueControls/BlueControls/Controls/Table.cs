@@ -392,7 +392,7 @@ namespace BlueControls.Controls
             lock (Lock_UserAction)
             {
                 //if (_InvalidExternal) { FillExternalControls(); }
-                if (Convert.ToBoolean(state & enStates.Standard_Disabled)) { CursorPos_Set(string.Empty, false); }
+                if (Convert.ToBoolean(state & enStates.Standard_Disabled)) { CursorPos_Set(null, null, false); }
 
                 var DisplayRectangleWOSlider = DisplayRectangleWithoutSlider();
 
@@ -1180,17 +1180,6 @@ namespace BlueControls.Controls
             return _CursorPosRow;
         }
 
-        public string CursorPosKey()
-        {
-            return CellCollection.KeyOfCell(_CursorPosColumn, _CursorPosRow);
-        }
-
-        public string MouseOverKey()
-        {
-            return CellCollection.KeyOfCell(_MouseOverColumn, _MouseOverRow);
-        }
-
-
         public void Export_HTML(string Filename = "", bool Execute = true)
         {
             if (_Database == null) { return; }
@@ -1781,12 +1770,10 @@ namespace BlueControls.Controls
         /// <remarks></remarks>
         private void Cursor_Move(enDirection Richtung)
         {
-
             if (_Database == null) { return; }
-            CursorPos_Set(Neighbour(_CursorPosColumn, _CursorPosRow, Richtung));
+            Neighbour(_CursorPosColumn, _CursorPosRow, Richtung, out var _newCol, out var _newRow);
 
-            if (Richtung != enDirection.Nichts) { EnsureVisible(_CursorPosColumn, _CursorPosRow); }
-
+            CursorPos_Set(_newCol, _newRow, Richtung != enDirection.Nichts);
         }
 
 
@@ -2500,7 +2487,7 @@ namespace BlueControls.Controls
                     case System.Windows.Forms.Keys.PageDown:
                         if (SliderY.Enabled)
                         {
-                            CursorPos_Set(string.Empty);
+                            CursorPos_Set(null, null, false);
                             SliderY.Value += SliderY.LargeChange;
                         }
                         break;
@@ -2508,7 +2495,7 @@ namespace BlueControls.Controls
                     case System.Windows.Forms.Keys.PageUp: //Bildab
                         if (SliderY.Enabled)
                         {
-                            CursorPos_Set(string.Empty);
+                            CursorPos_Set(null, null, false);
                             SliderY.Value -= SliderY.LargeChange;
                         }
                         break;
@@ -2516,7 +2503,7 @@ namespace BlueControls.Controls
                     case System.Windows.Forms.Keys.Home:
                         if (SliderY.Enabled)
                         {
-                            CursorPos_Set(string.Empty);
+                            CursorPos_Set(null, null, false);
                             SliderY.Value = SliderY.Minimum;
 
                         }
@@ -2525,7 +2512,7 @@ namespace BlueControls.Controls
                     case System.Windows.Forms.Keys.End:
                         if (SliderY.Enabled)
                         {
-                            CursorPos_Set(string.Empty);
+                            CursorPos_Set(null, null, false);
                             SliderY.Value = SliderY.Maximum;
                         }
                         break;
@@ -2671,7 +2658,7 @@ namespace BlueControls.Controls
 
                         else if (_Database.IsAdministrator())
                         {
-                            T = Database.UndoText(MouseOverKey());
+                            T = Database.UndoText(_MouseOverColumn, _MouseOverRow);
                         }
                     }
 
@@ -2738,7 +2725,7 @@ namespace BlueControls.Controls
 
 
 
-                if (CursorPosKey() != MouseOverKey()) { DialogBoxes.QuickInfo.Close(); }
+                if (_CursorPosColumn != _MouseOverColumn || _CursorPosRow != _MouseOverRow) { DialogBoxes.QuickInfo.Close(); }
 
 
 
@@ -2822,10 +2809,14 @@ namespace BlueControls.Controls
                     return;
                 }
 
-                var c1 = MouseOverKey();
+                var col = _MouseOverColumn;
+                var row = _MouseOverRow;
 
                 CellOnCoordinate(MousePos().X, MousePos().Y, out _MouseOverColumn, out _MouseOverRow);
-                if (c1 != MouseOverKey()) // Da hat das eventx z.B. die Zeile gelöscht
+    
+
+
+                if (col != _MouseOverColumn || row != _MouseOverRow) // Da hat das eventx z.B. die Zeile gelöscht
                 {
                     ISIN_DoubleClick = false;
                     return;
@@ -2883,36 +2874,23 @@ namespace BlueControls.Controls
 
 
 
-        public void CursorPos_Set(ColumnItem Column, RowItem Row, bool EnsureVisible)
-        {
-            CursorPos_Set(CellCollection.KeyOfCell(Column, Row), EnsureVisible);
-        }
-
-
-        public void CursorPos_Set(string CellKey)
-        {
-            CursorPos_Set(CellKey, false);
-        }
-
-
-
-        public void CursorPos_Set(string CellKey, bool EnsureVisiblex)
+        public void CursorPos_Set(ColumnItem column, RowItem row, bool ensureVisible)
         {
 
-            if (CellKey == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Null bei CellKeys nicht erlaubt"); }
-            if (CellKey == CursorPosKey()) { return; }
+            if (column != null) { column = Database.Column.SearchByKey(column.Key); }
+            if (row != null) { row = Database.Row.SearchByKey(row.Key); }
 
-            _Database.Cell.DataOfCellKey(CellKey, out _CursorPosColumn, out _CursorPosRow);
+            if (_CursorPosColumn == column && _CursorPosRow == row) { return; }
 
+            _CursorPosColumn = column;
+            _CursorPosRow = row;
 
-            if (EnsureVisiblex) { EnsureVisible(_CursorPosColumn, _CursorPosRow); }
+            if (ensureVisible) { EnsureVisible(_CursorPosColumn, _CursorPosRow); }
             Invalidate();
 
             OnCursorPosChanged(new CellEventArgs(_CursorPosColumn, _CursorPosRow));
-
-            //Check_OrderButtons();
-
         }
+
 
         private void OnCursorPosChanged(CellEventArgs e)
         {
@@ -3054,7 +3032,7 @@ namespace BlueControls.Controls
 
             }
 
-            x = x + ", CursorPos=" + CursorPosKey();
+            x = x + ", CursorPos=" + CellCollection.KeyOfCell(_CursorPosColumn, _CursorPosRow);
 
             return x + "}";
         }
@@ -3073,34 +3051,35 @@ namespace BlueControls.Controls
                 Beg += 1;
                 if (Beg > Value.Length) { break; }
                 var T = Value.ParseTag(Beg);
-                var PairValuexxx = Value.ParseValue(T, Beg);
-                Beg = Beg + T.Length + PairValuexxx.Length + 2;
+                var pairValue = Value.ParseValue(T, Beg);
+                Beg = Beg + T.Length + pairValue.Length + 2;
                 switch (T)
                 {
                     case "arrangementnr":
-                        Arrangement = int.Parse(PairValuexxx);
+                        Arrangement = int.Parse(pairValue);
                         break;
 
                     case "filters":
-                        Filter.Parse(PairValuexxx);
+                        Filter.Parse(pairValue);
                         break;
 
                     case "sliderx":
-                        SliderX.Maximum = Math.Max(SliderX.Maximum, int.Parse(PairValuexxx));
-                        SliderX.Value = int.Parse(PairValuexxx);
+                        SliderX.Maximum = Math.Max(SliderX.Maximum, int.Parse(pairValue));
+                        SliderX.Value = int.Parse(pairValue);
                         break;
 
                     case "slidery":
-                        SliderY.Maximum = Math.Max(SliderY.Maximum, int.Parse(PairValuexxx));
-                        SliderY.Value = int.Parse(PairValuexxx);
+                        SliderY.Maximum = Math.Max(SliderY.Maximum, int.Parse(pairValue));
+                        SliderY.Value = int.Parse(pairValue);
                         break;
 
                     case "cursorpos":
-                        CursorPos_Set(PairValuexxx);
+                        Database.Cell.DataOfCellKey(pairValue, out var column, out var row);
+                        CursorPos_Set(column, row, false);
                         break;
 
                     case "tempsort":
-                        _sortDefinitionTemporary = new RowSortDefinition(_Database, PairValuexxx);
+                        _sortDefinitionTemporary = new RowSortDefinition(_Database, pairValue);
                         break;
 
                     default:
@@ -3285,6 +3264,7 @@ namespace BlueControls.Controls
                     Invalidate_AllDraw(false);
                     Invalidate();
                     OnViewChanged();
+                    CursorPos_Set(_CursorPosColumn, _CursorPosRow, true);
                 }
 
             }
@@ -3688,59 +3668,61 @@ namespace BlueControls.Controls
 
 
         /// <summary>
-        /// Berechnet die Zelle, ausgehend von einer Zellenposition. Dabei wird die Columns und Zeilensortierung berücksichtigt. 
+        /// Berechnet die Zelle, ausgehend von einer Zellenposition. Dabei wird die Columns und Zeilensortierung berücksichtigt.
+        /// Gibt des keine Nachbarszelle, wird die Eingangszelle zurückgegeben.
         /// </summary>
         /// <remarks></remarks>
-        private string Neighbour(ColumnItem column, RowItem row, enDirection Direction)
+        private void Neighbour(ColumnItem column, RowItem row, enDirection Direction, out ColumnItem NewColumn, out RowItem NewRow)
         {
 
-
+            NewColumn = column;
+            NewRow = row;
 
 
 
             if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead)
             {
-                if (Direction != enDirection.Oben && Direction != enDirection.Unten) { return CellCollection.KeyOfCell(_Database.Column[0], row); }
+                if (Direction != enDirection.Oben && Direction != enDirection.Unten)
+                {
+                    NewColumn = _Database.Column[0];
+                    return;
+                }
             }
 
 
 
-            if (column != null)
+            if (NewColumn != null)
             {
                 if (Convert.ToBoolean(Direction & enDirection.Links))
                 {
-                    if (_Database.ColumnArrangements[_ArrangementNr].PreviousVisible(column) != null)
+                    if (_Database.ColumnArrangements[_ArrangementNr].PreviousVisible(NewColumn) != null)
                     {
-                        column = _Database.ColumnArrangements[_ArrangementNr].PreviousVisible(column);
+                        NewColumn = _Database.ColumnArrangements[_ArrangementNr].PreviousVisible(NewColumn);
                     }
                 }
 
                 if (Convert.ToBoolean(Direction & enDirection.Rechts))
                 {
-                    if (_Database.ColumnArrangements[_ArrangementNr].NextVisible(column) != null)
+                    if (_Database.ColumnArrangements[_ArrangementNr].NextVisible(NewColumn) != null)
                     {
-                        column = _Database.ColumnArrangements[_ArrangementNr].NextVisible(column);
+                        NewColumn = _Database.ColumnArrangements[_ArrangementNr].NextVisible(NewColumn);
                     }
                 }
             }
 
-            if (row != null)
+            if (NewRow != null)
             {
                 if (Convert.ToBoolean(Direction & enDirection.Oben))
                 {
-                    if (View_PreviousRow(row) != null) { row = View_PreviousRow(row); }
+                    if (View_PreviousRow(NewRow) != null) { NewRow = View_PreviousRow(NewRow); }
                 }
 
                 if (Convert.ToBoolean(Direction & enDirection.Unten))
                 {
-                    if (View_NextRow(row) != null) { row = View_NextRow(row); }
+                    if (View_NextRow(NewRow) != null) { NewRow = View_NextRow(NewRow); }
                 }
 
             }
-
-
-            return CellCollection.KeyOfCell(column, row);
-
         }
 
 
@@ -3818,6 +3800,7 @@ namespace BlueControls.Controls
         private void _Database_RowCountChanged(object sender, System.EventArgs e)
         {
             Invalidate_RowSort();
+            CursorPos_Set(_CursorPosColumn, _CursorPosRow, false);
             Invalidate();
         }
 
@@ -3826,6 +3809,7 @@ namespace BlueControls.Controls
             Invalidate_HeadSize();
             Invalidate_AllDraw(true);
             Invalidate_RowSort();
+            CursorPos_Set(_CursorPosColumn, _CursorPosRow, false);
             Invalidate();
         }
 
@@ -3895,10 +3879,10 @@ namespace BlueControls.Controls
 
             var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
             var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
-            var OverColumn = OnCoordinateColumn(e.X);
-            var OverRow = OnCoordinateRow(e.Y);
 
-            OnContextMenuInit(new ContextMenuInitEventArgs(CellCollection.KeyOfCell(OverColumn, OverRow), UserMenu));
+            CellOnCoordinate(e.X, e.Y, out _MouseOverColumn, out _MouseOverRow);
+ 
+            OnContextMenuInit(new ContextMenuInitEventArgs(CellCollection.KeyOfCell(_MouseOverColumn, _MouseOverRow), UserMenu));
 
 
             if (ThisContextMenu.Count > 0 && UserMenu.Count > 0) { ThisContextMenu.Add(new LineListItem()); }
@@ -3908,7 +3892,7 @@ namespace BlueControls.Controls
             {
                 ThisContextMenu.Add(new LineListItem());
                 ThisContextMenu.Add(enContextMenuComands.Abbruch);
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, CellCollection.KeyOfCell(OverColumn, OverRow), this, Translate);
+                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, CellCollection.KeyOfCell(_MouseOverColumn, _MouseOverRow), this, Translate);
                 _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
             }
 
