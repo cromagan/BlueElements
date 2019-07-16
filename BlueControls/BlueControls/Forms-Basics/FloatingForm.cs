@@ -253,6 +253,8 @@ namespace BlueControls.Forms
             // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
 
 
+            if (IsDisposed) { return; }
+
             if (BackgroundImage == null || Width != BackgroundImage.Width || Height != BackgroundImage.Height)
             {
                 BackgroundImage = new Bitmap(Width, Height);

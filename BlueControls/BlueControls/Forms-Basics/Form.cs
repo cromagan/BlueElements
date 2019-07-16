@@ -57,7 +57,7 @@ namespace BlueControls.Forms
 
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
         {
-            if (!_Closed) { base.OnPaint(e); }
+            if (!_Closed && !IsDisposed) { base.OnPaint(e); }
         }
 
 

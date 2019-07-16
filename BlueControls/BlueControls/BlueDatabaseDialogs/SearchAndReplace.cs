@@ -174,7 +174,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
             P?.Close();
-            MessageBox.Show(count + " Ersetzungen vorgenommen.", enImageCode.Information, "OK");
+            MessageBox.Show(count + " Ersetzung(en) vorgenommen.", enImageCode.Information, "OK");
 
 
             IsWorking = false;

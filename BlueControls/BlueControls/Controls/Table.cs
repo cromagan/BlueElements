@@ -567,6 +567,11 @@ namespace BlueControls.Controls
 
         private void Draw_Table_Std(Graphics GR, enStates State, Rectangle DisplayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow)
         {
+
+            try
+            {
+
+
             if (_Database.ColumnArrangements == null || _ArrangementNr >= _Database.ColumnArrangements.Count) { return; }   // Kommt vor, dass spontan doch geparsed wird...
 
             Skin.Draw_Back(GR, enDesign.Table_And_Pad, State, DisplayRectangle, this, true);
@@ -608,6 +613,11 @@ namespace BlueControls.Controls
 
 
 
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
+            }
 
 
         }

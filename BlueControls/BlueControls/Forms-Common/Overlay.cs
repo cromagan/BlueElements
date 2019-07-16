@@ -68,6 +68,8 @@ namespace BlueControls
 
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
         {
+            if (IsDisposed) { return; }
+
             base.OnPaint(e);
 
             switch (Modus)

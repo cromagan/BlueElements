@@ -154,6 +154,7 @@ namespace BlueControls.Controls
         private void DoDraw(Graphics GR)
         {
             if (Skin.Instance == null) { return; }
+            if (IsDisposed) { return; }
 
             if (Width < 1 || Height < 1) { return; }
 

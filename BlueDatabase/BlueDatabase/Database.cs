@@ -962,13 +962,13 @@ namespace BlueDatabase
 
 
 
-            for (var z = 0; z< Layouts.Count; z++)
+            for (var z = 0; z < Layouts.Count; z++)
             {
 
                 if (!Layouts[z].StartsWith("{ID=#"))
                 {
 
-                    Layouts[z] = "{ID=#Converted" + z.ToString() + ", " + Layouts[z].Substring(1) ;
+                    Layouts[z] = "{ID=#Converted" + z.ToString() + ", " + Layouts[z].Substring(1);
 
                 }
             }
@@ -3332,17 +3332,17 @@ namespace BlueDatabase
             var tBackup = Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
             var BlockDatei = Blockdateiname();
 
-            // BlockDatei erstellen
+            // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
             var done = false;
             try
             {
                 if (FileExists(tBackup))
                 {
-                    done = RenameFile(tBackup, BlockDatei, true);
+                    done = RenameFile(tBackup, BlockDatei, false);
                 }
                 else
                 {
-                    done = CopyFile(Filename, BlockDatei, true);
+                    done = CopyFile(Filename, BlockDatei, false);
                 }
             }
             catch (Exception ex)
@@ -3355,14 +3355,14 @@ namespace BlueDatabase
             if (!done)
             {
                 // Letztens aufgetreten, dass eine Blockdatei schon vorhanden war. Anscheinden Zeitgleiche Kopie?
-                Develop.DebugPrint("Befehl anscheinend abgebrochen"); 
+                Develop.DebugPrint("Befehl anscheinend abgebrochen:\r\n" + Filename);
                 return;
             }
 
 
             if (!BlockDateiVorhanden())
             {
-                Develop.DebugPrint("Block-Datei Konflikt 1");
+                Develop.DebugPrint("Block-Datei Konflikt 1\r\n" + Filename);
                 return;
             }
 
@@ -3509,30 +3509,37 @@ namespace BlueDatabase
 
 
 
-
-            // Leztes WorkItem suchen. Auch Ohne LogUndo MUSS es vorhanden sein.
-            if (!string.IsNullOrEmpty(_LastWorkItem))
+            try
             {
-                var ok = false;
-                var ok2 = string.Empty;
-                foreach (var ThisWorkItem in Works)
-                {
-                    var tmp = ThisWorkItem.ToString();
-                    if (tmp == _LastWorkItem)
-                    {
-                        ok = true;
-                        break;
-                    }
-                    else if (tmp.Substring(7) == _LastWorkItem.Substring(7))
-                    {
-                        ok2 = tmp;
-                    }
-                }
 
-                if (!ok)
+                // Leztes WorkItem suchen. Auch Ohne LogUndo MUSS es vorhanden sein.
+                if (!string.IsNullOrEmpty(_LastWorkItem))
                 {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br>" + ok2);
+                    var ok = false;
+                    var ok2 = string.Empty;
+                    foreach (var ThisWorkItem in Works)
+                    {
+                        var tmp = ThisWorkItem.ToString();
+                        if (tmp == _LastWorkItem)
+                        {
+                            ok = true;
+                            break;
+                        }
+                        else if (tmp.Substring(7) == _LastWorkItem.Substring(7))
+                        {
+                            ok2 = tmp;
+                        }
+                    }
+
+                    if (!ok)
+                    {
+                        Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br>" + ok2);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
             }
 
         }
