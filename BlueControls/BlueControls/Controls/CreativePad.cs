@@ -21,7 +21,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
-using BlueControls.DialogBoxes;
+using BlueControls.Forms;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
@@ -397,7 +397,7 @@ namespace BlueControls.Controls
                         if (!thisPoint.CanMove(Relations))
                         {
                             Invalidate();
-                            DialogBoxes.QuickInfo.Show("Dieser Punkt ist fest definiert<br>und kann nicht verschoben werden.");
+                            Forms.QuickInfo.Show("Dieser Punkt ist fest definiert<br>und kann nicht verschoben werden.");
                             return;
                         }
 

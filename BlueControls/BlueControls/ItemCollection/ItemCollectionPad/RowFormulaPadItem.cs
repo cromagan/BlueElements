@@ -21,7 +21,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.DialogBoxes;
+using BlueControls.Forms;
 using BlueControls.Enums;
 using BlueControls.ItemCollection;
 using BlueDatabase;

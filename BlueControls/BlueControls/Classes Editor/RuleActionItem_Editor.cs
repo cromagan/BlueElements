@@ -20,7 +20,7 @@
 using System;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.DialogBoxes;
+using BlueControls.Forms;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;

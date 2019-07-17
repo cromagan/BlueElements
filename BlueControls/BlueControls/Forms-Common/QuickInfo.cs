@@ -22,7 +22,7 @@ using BlueControls.Forms;
 using System;
 using System.Drawing;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
     public partial class QuickInfo : FloatingForm
     {
@@ -36,12 +36,12 @@ namespace BlueControls.DialogBoxes
 
         private int Counter = 0;
 
-        public QuickInfo()
+        private QuickInfo()
         {
             InitializeComponent();
         }
 
-        public QuickInfo(string Text)
+        private QuickInfo(string Text)
         {
             InitializeComponent();
 

@@ -1,18 +1,18 @@
 ﻿using BlueBasics.Enums;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
-    public partial class InputBox : DialogBoxes.DialogWithOkAndCancel
+    public partial class InputBox : Forms.DialogWithOkAndCancel
     {
 
         string GiveBack = string.Empty;
 
-        public InputBox()
+        private InputBox()
         {
             InitializeComponent();
         }
 
-        public InputBox(string TXT, string VorschlagsText, enDataFormat Textformat, bool BigMultiLineBox)
+        private InputBox(string TXT, string VorschlagsText, enDataFormat Textformat, bool BigMultiLineBox)
         {
             InitializeComponent();
 

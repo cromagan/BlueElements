@@ -23,19 +23,19 @@ using BlueControls.Enums;
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
-    public partial class InputBoxListBoxStyle : DialogBoxes.DialogWithOkAndCancel
+    public partial class InputBoxListBoxStyle : Forms.DialogWithOkAndCancel
     {
 
         List<string> GiveBack = null;
 
-        public InputBoxListBoxStyle()
+        private InputBoxListBoxStyle()
         {
             InitializeComponent();
         }
 
-        public InputBoxListBoxStyle(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl)
+        private InputBoxListBoxStyle(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl)
         {
             InitializeComponent();
 

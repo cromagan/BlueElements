@@ -19,7 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.DialogBoxes;
+using BlueControls.Forms;
 using BluePaint.EventArgs;
 using System;
 using System.Drawing;

@@ -25,7 +25,7 @@ using BlueControls.ItemCollection;
 using System;
 using System.Drawing;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
 
     /// <summary>
@@ -33,7 +33,7 @@ namespace BlueControls.DialogBoxes
     /// </summary>
     public partial class FloatingInputBoxListBoxStyle : BlueControls.Forms.FloatingForm
     {
-        public FloatingInputBoxListBoxStyle()
+        private FloatingInputBoxListBoxStyle()
         {
             InitializeComponent();
         }

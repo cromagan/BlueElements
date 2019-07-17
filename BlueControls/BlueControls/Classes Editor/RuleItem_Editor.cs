@@ -84,7 +84,7 @@ namespace BlueControls.Classes_Editor
         {
             if (tmp== null)
             {
-                DialogBoxes.Notification.Show("Bitte vorher eine Regel auswählen.");
+                Forms.Notification.Show("Bitte vorher eine Regel auswählen.");
                 return;
             }
 

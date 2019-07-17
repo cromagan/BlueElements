@@ -3,12 +3,12 @@ using BlueControls.Controls;
 using System;
 using System.Collections.Generic;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
-    public partial class EditBoxFlexiControl : DialogBoxes.DialogWithOkAndCancel
+    public partial class EditBoxFlexiControl : Forms.DialogWithOkAndCancel
     {
 
-        public EditBoxFlexiControl()
+        private EditBoxFlexiControl()
         {
             InitializeComponent();
         }

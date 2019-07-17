@@ -24,7 +24,7 @@ using System.IO;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.DialogBoxes;
+using BlueControls.Forms;
 using BlueDatabase;
 using BlueControls.Enums;
 using static BlueBasics.FileOperations;

@@ -716,7 +716,7 @@ namespace BlueControls.Controls
                         }
                     }
 
-                    DialogBoxes.FileDialogs.DeleteFile(DelList, true);
+                    Forms.FileDialogs.DeleteFile(DelList, true);
                     return;
 
                 case enEditTypeTable.Textfeld:

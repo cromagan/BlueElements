@@ -1,7 +1,7 @@
 ﻿using BlueControls.Enums;
 using System.Drawing;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
     partial class InputBoxListBoxStyle
     {

@@ -22,7 +22,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueControls.BlueDatabaseDialogs;
-using BlueControls.DialogBoxes;
+using BlueControls.Forms;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -1707,7 +1707,7 @@ namespace BlueControls.Controls
 
                 if (!newValue.IsFormat(column.Format, column.MultiLine))
                 {
-                    if (DialogBoxes.MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", enImageCode.Information, "Ja", "Nein") != 0)
+                    if (Forms.MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", enImageCode.Information, "Ja", "Nein") != 0)
                     {
                         CancelReason = "Abbruch, das das erwartete Format nicht eingehalten wurde.";
                     }
@@ -2603,7 +2603,7 @@ namespace BlueControls.Controls
 
             if (_Database == null)
             {
-                DialogBoxes.QuickInfo.Close();
+                Forms.QuickInfo.Close();
                 return;
             }
 
@@ -2679,11 +2679,11 @@ namespace BlueControls.Controls
 
                     if (!string.IsNullOrEmpty(T))
                     {
-                        DialogBoxes.QuickInfo.Show(T);
+                        Forms.QuickInfo.Show(T);
                     }
                     else
                     {
-                        DialogBoxes.QuickInfo.Close();
+                        Forms.QuickInfo.Close();
                     }
 
 
@@ -2726,7 +2726,7 @@ namespace BlueControls.Controls
 
                 if (_Database == null)
                 {
-                    DialogBoxes.QuickInfo.Close();
+                    Forms.QuickInfo.Close();
                     ISIN_MouseUp = false;
                     return;
                 }
@@ -2735,7 +2735,7 @@ namespace BlueControls.Controls
 
 
 
-                if (_CursorPosColumn != _MouseOverColumn || _CursorPosRow != _MouseOverRow) { DialogBoxes.QuickInfo.Close(); }
+                if (_CursorPosColumn != _MouseOverColumn || _CursorPosRow != _MouseOverRow) { Forms.QuickInfo.Close(); }
 
 
 
@@ -3158,7 +3158,7 @@ namespace BlueControls.Controls
 
             if (_ArrangementNr > 0)
             {
-                MitVorlage = Convert.ToBoolean(DialogBoxes.MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
+                MitVorlage = Convert.ToBoolean(Forms.MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
             }
 
             if (_Database.ColumnArrangements.Count < 1)
@@ -3949,7 +3949,7 @@ namespace BlueControls.Controls
 
         private void NotEditableInfo(string Reason)
         {
-            DialogBoxes.Notification.Show(Reason, enImageCode.Kreuz);
+            Forms.Notification.Show(Reason, enImageCode.Kreuz);
             // QickInfo beisst sich mit den letzten Änderungen Quickinfo
             //DialogBoxes.QuickInfo.Show("<IMAGECODE=Stift|16||1> " + Reason);
         }
@@ -4031,7 +4031,7 @@ namespace BlueControls.Controls
 
             if (i.Count < 1)
             {
-                DialogBoxes.MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", enImageCode.Information, "OK");
+                Forms.MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", enImageCode.Information, "OK");
                 return;
             }
 
@@ -4136,7 +4136,7 @@ namespace BlueControls.Controls
 
             if (string.IsNullOrEmpty(searchTXT))
             {
-                DialogBoxes.MessageBox.Show("Bitte Text zum Suchen eingeben.", enImageCode.Information, "OK");
+                Forms.MessageBox.Show("Bitte Text zum Suchen eingeben.", enImageCode.Information, "OK");
                 foundColumn = null;
                 foundRow = null;
                 return;

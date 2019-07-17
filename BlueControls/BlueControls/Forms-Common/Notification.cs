@@ -24,7 +24,7 @@ using BlueControls.Forms;
 using System;
 using System.Drawing;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
     public partial class Notification : FloatingForm
     {
@@ -38,12 +38,12 @@ namespace BlueControls.DialogBoxes
         internal int FloatInAndOutMilliSek = -999;
 
 
-        public Notification()
+        private Notification()
         {
             InitializeComponent();
         }
 
-        public Notification(string Text)
+        private Notification(string Text)
         {
             InitializeComponent();
 

@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
     public partial class Progressbar : FloatingForm
     {
@@ -36,12 +36,12 @@ namespace BlueControls.DialogBoxes
         private int _count = 0;
         private string _baseText = string.Empty;
 
-        public Progressbar()
+        private Progressbar()
         {
             InitializeComponent();
         }
 
-        public Progressbar(string Text)
+        private Progressbar(string Text)
         {
             InitializeComponent();
             capTXT.Text = Text;
@@ -59,11 +59,6 @@ namespace BlueControls.DialogBoxes
             return P;
         }
 
-        //public static Progressbar Show(string Text, System.Windows.Forms.Form Parentform)
-        //{
-        //    return new Progressbar(Text);
-        //}
-
         public static Progressbar Show(string Text, int Count)
         {
             var P = new Progressbar(Text);
@@ -74,80 +69,6 @@ namespace BlueControls.DialogBoxes
             P.BringToFront();
             return P;
         }
-        //public static Progressbar Show(string Text, int Current, int Count, System.Windows.Forms.Form Parentform)
-        //{
-        //    return new Progressbar(CalculateText(Text, Current,Count));
-        //}
-
-
-        //#region  eProgressbar 
-
-
-        //private static string _PrBarText = "";
-
-
-
-        //public static void eProgressbar(string txt, System.Windows.Forms.Form Parentform)
-        //{
-
-        //    if (string.IsNullOrEmpty(txt))
-        //    {
-        //        P?.Close();
-        //        return;
-        //    }
-
-        //    if (frmProgressBar == null || frmProgressBar.IsDisposed)
-        //    {
-        //        frmProgressBar = new DialogBox(true, null);
-        //        frmProgressBar.Design = enDesign.Form_BitteWarten;
-        //        frmProgressBar.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-        //    }
-        //    else
-        //    {
-        //        if (_PrBarText == txt) { return; }
-
-        //        if (frmProgressBar.InvokeRequired)
-        //        {
-        //            P?.Close();
-        //            eProgressbar(txt, Parentform);
-        //            return;
-        //        }
-        //    }
-
-        //    _PrBarText = txt;
-
-
-        //    frmProgressBar.Generate_Caption(txt, Skin.Padding, Skin.Padding);
-
-        //    if (frmProgressBar._Caption1.Width + Skin.Padding * 2 != frmProgressBar.Width)
-        //    {
-        //        frmProgressBar.Width = Math.Max(frmProgressBar._Caption1.Width + Skin.Padding * 2, frmProgressBar.Width);
-        //        if (Parentform != null)
-        //        {
-        //            frmProgressBar.Left = (int)(Parentform.Left + (Parentform.Width - frmProgressBar.Width) / 2.0);
-        //        }
-        //        else
-        //        {
-        //            frmProgressBar.Position_CenterScreen(Point.Empty);
-        //        }
-        //    }
-
-        //    if (frmProgressBar._Caption1.Height + Skin.Padding * 2 != frmProgressBar.Height)
-        //    {
-        //        frmProgressBar.Height = Math.Max(frmProgressBar._Caption1.Height + Skin.Padding * 2, frmProgressBar.Height);
-        //        if (Parentform != null)
-        //        {
-        //            frmProgressBar.Top = (int)(Parentform.Top + (Parentform.Height - frmProgressBar.Height) / 2.0);
-        //        }
-        //        else
-        //        {
-        //            frmProgressBar.Position_CenterScreen(Point.Empty);
-        //        }
-        //    }
-
-
-        //    frmProgressBar.ShowFloating();
-        //}
 
         private string CalculateText(string BaseText, int Current, int Count)
         {
@@ -187,34 +108,12 @@ namespace BlueControls.DialogBoxes
             }
 
 
-            //if (Current > 3 && tmpCalculatedSeconds > 6 && PR < 0.7)
-            //{
-            //    NeedToShow = true;
-            //}
-            //if (Current > 3 && tmpCalculatedSeconds > 20)
-            //{
-            //    NeedToShow = true;
-            //}
-            //if (eProgressbar_Showed)
-            //{
-            //    NeedToShow = true;
-            //}
-
-
             eProgressbar_LastCurrent = Current;
 
             if (!eProgressbar_TimeDic.ContainsKey(Current))
             {
                 eProgressbar_TimeDic.Add(Current, DateTime.Now);
             }
-
-            //if (!NeedToShow)
-            //{
-            //    P?.Close();
-            //    return;
-            //}
-
-            //eProgressbar_Showed = true;
 
 
             if (eProgressbar_LastCalulatedSeconds != tmpCalculatedSeconds && DateTime.Now.Subtract(eProgressbar_LastTimeUpdate).TotalSeconds > 5)

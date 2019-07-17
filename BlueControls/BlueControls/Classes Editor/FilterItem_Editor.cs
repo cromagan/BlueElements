@@ -2,7 +2,7 @@
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.BlueDatabaseDialogs;
-using BlueControls.DialogBoxes;
+using BlueControls.Forms;
 using BlueControls.EventArgs;
 using BlueDatabase;
 using BlueDatabase.Enums;

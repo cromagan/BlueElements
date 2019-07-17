@@ -90,7 +90,7 @@ namespace BlueControls.Controls
             {
                 if (_QuickInfo != value)
                 {
-                    DialogBoxes.QuickInfo.Close();
+                    Forms.QuickInfo.Close();
                     _QuickInfo = value;
                 }
             }

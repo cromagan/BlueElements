@@ -1,4 +1,4 @@
-﻿using BlueControls.DialogBoxes;
+﻿using BlueControls.Forms;
 using System;
 using System.Diagnostics;
 using System.Drawing;

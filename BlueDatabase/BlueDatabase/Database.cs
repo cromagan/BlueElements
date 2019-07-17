@@ -3531,9 +3531,9 @@ namespace BlueDatabase
                         }
                     }
 
-                    if (!ok)
+                    if (!ok && string.IsNullOrEmpty(ok2))
                     {
-                        Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br>" + ok2);
+                        Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename);
                     }
                 }
             }

@@ -3,7 +3,7 @@ using BlueBasics.Enums;
 using System.Collections.Generic;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
     public static class FileDialogs
     {

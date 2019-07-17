@@ -22,7 +22,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
-using BlueControls.DialogBoxes;
+using BlueControls.Forms;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
@@ -213,7 +213,7 @@ namespace BlueControls.Controls
             {
                 if (_QuickInfo != value)
                 {
-                    DialogBoxes.QuickInfo.Close();
+                    Forms.QuickInfo.Close();
                     _QuickInfo = value;
                 }
             }

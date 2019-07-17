@@ -1,6 +1,6 @@
 ﻿using BlueControls.Enums;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
     partial class MessageBox
     {

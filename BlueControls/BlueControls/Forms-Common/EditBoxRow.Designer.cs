@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
     partial class EditBoxRow
     {

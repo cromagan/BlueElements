@@ -20,19 +20,19 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
     public partial class MessageBox : Forms.Form
     {
 
         Button Pressed = null;
 
-        public MessageBox()
+        private MessageBox()
         {
             InitializeComponent();
         }
 
-        public MessageBox(string TXT, enImageCode Pic, params string[] Buttons)
+        private MessageBox(string TXT, enImageCode Pic, params string[] Buttons)
         {
             InitializeComponent();
 

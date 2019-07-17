@@ -25,7 +25,7 @@ using System.Drawing.Imaging;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
-using BlueControls.DialogBoxes;
+using BlueControls.Forms;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
@@ -270,7 +270,7 @@ namespace BlueControls.Controls
             {
                 if (_QuickInfo != value)
                 {
-                    DialogBoxes.QuickInfo.Close();
+                    Forms.QuickInfo.Close();
                     _QuickInfo = value;
                     SetQuickInfo();
                 }

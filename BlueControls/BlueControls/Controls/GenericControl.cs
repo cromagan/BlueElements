@@ -19,7 +19,7 @@
 
 
 using BlueBasics;
-using BlueControls.DialogBoxes;
+using BlueControls.Forms;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
@@ -367,7 +367,7 @@ namespace BlueControls.Controls
 
                 _MousePressing = true;
 
-                DialogBoxes.QuickInfo.Close();
+                Forms.QuickInfo.Close();
 
                 if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { Focus(); }
                 tmpSkinRow = null;
@@ -386,7 +386,7 @@ namespace BlueControls.Controls
 
             if (this is IQuickInfo tempVar)
             {
-                if (!string.IsNullOrEmpty(tempVar.QuickInfo)) { DialogBoxes.QuickInfo.Close(); }
+                if (!string.IsNullOrEmpty(tempVar.QuickInfo)) { Forms.QuickInfo.Close(); }
             }
 
         }
@@ -406,7 +406,7 @@ namespace BlueControls.Controls
                 {
                     if (!ContainsMouse())
                     {
-                        if (!string.IsNullOrEmpty(tempVar.QuickInfo)) { DialogBoxes.QuickInfo.Close(); }
+                        if (!string.IsNullOrEmpty(tempVar.QuickInfo)) { Forms.QuickInfo.Close(); }
                     }
                     else
                     {
@@ -460,7 +460,7 @@ namespace BlueControls.Controls
             if (this is IQuickInfo tempVar)
             {
                 if (string.IsNullOrEmpty(tempVar.QuickInfo)) { return; }
-                DialogBoxes.QuickInfo.Show(tempVar.QuickInfo);
+                Forms.QuickInfo.Show(tempVar.QuickInfo);
             }
         }
 

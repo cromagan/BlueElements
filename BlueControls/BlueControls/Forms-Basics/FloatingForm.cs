@@ -17,7 +17,7 @@ namespace BlueControls.Forms
         private readonly System.Windows.Forms.Control _ConnectedControl = null;
 
 
-        public FloatingForm()
+        protected FloatingForm()
         {
 
 
@@ -28,7 +28,7 @@ namespace BlueControls.Forms
 
         }
 
-        public FloatingForm(System.Windows.Forms.Control ConnectedControl)
+        protected FloatingForm(System.Windows.Forms.Control ConnectedControl)
         {
 
 

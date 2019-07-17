@@ -3,7 +3,7 @@ using BlueControls.Controls;
 using System;
 using static BlueBasics.Develop;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
     public partial class DialogWithOkAndCancel : Forms.Form
     {

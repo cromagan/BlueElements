@@ -21,7 +21,7 @@ using System;
 using System.Collections.Generic;
 using BlueBasics.Enums;
 using static BlueBasics.Extensions;
-using BlueControls.DialogBoxes;
+using BlueControls.Forms;
 using BlueDatabase;
 
 namespace BlueControls.BlueDatabaseDialogs
@@ -227,7 +227,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (!SilentMode)
             {
-                BlueControls.DialogBoxes.MessageBox.Show("<b>Import abgeschlossen.</b>\r\n" + neuZ.ToString() + " neue Zeilen erstellt.");
+                BlueControls.Forms.MessageBox.Show("<b>Import abgeschlossen.</b>\r\n" + neuZ.ToString() + " neue Zeilen erstellt.");
             }
 
         }

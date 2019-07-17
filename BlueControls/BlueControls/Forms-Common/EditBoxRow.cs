@@ -1,17 +1,17 @@
 ﻿using BlueDatabase;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
-    public partial class EditBoxRow : DialogBoxes.DialogWithOkAndCancel
+    public partial class EditBoxRow : Forms.DialogWithOkAndCancel
     {
 
 
-        public EditBoxRow()
+        private EditBoxRow()
         {
             InitializeComponent();
         }
 
-        public EditBoxRow(string TXT, RowItem row)
+        private EditBoxRow(string TXT, RowItem row)
         {
             InitializeComponent();
             formToEdit.Database = row.Database;
@@ -33,9 +33,6 @@ namespace BlueControls.DialogBoxes
             {
                 MB.Show();
             }
-
-
-
         }
 
 

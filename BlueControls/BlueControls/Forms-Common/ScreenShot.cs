@@ -25,7 +25,8 @@ using System.Drawing.Drawing2D;
 using System.Runtime.CompilerServices;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.DialogBoxes;
+using BlueControls.Enums;
+using BlueControls.Forms;
 
 namespace BlueControls
 {
@@ -37,21 +38,12 @@ namespace BlueControls
 
 
 
-        public ScreenShot()
+        private ScreenShot()
         {
             InitializeComponent();
         }
 
-        private enum enSelectModus
-        {
-            Unbekannt = 0,
 
-            //Position = 1
-            Rechteck = 2
-
-            //  Height = 3
-
-        }
 
 
 

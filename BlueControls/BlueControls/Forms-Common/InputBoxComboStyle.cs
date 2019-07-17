@@ -21,19 +21,19 @@
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
-namespace BlueControls.DialogBoxes
+namespace BlueControls.Forms
 {
-    public partial class InputBoxComboStyle : DialogBoxes.DialogWithOkAndCancel
+    public partial class InputBoxComboStyle : Forms.DialogWithOkAndCancel
     {
 
         string GiveBack = string.Empty;
 
-        public InputBoxComboStyle()
+        private InputBoxComboStyle()
         {
             InitializeComponent();
         }
 
-        public InputBoxComboStyle(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt)
+        private InputBoxComboStyle(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt)
         {
             InitializeComponent();
 

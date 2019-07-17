@@ -83,6 +83,7 @@
       <DependentUpon>Skript.cs</DependentUpon>
     </Compile>
     <Compile Include="BlueFont.cs" />
+    <Compile Include="Enums\enSelectModus.cs" />
     <Compile Include="Enums\enTableDrawColumn.cs" />
     <Compile Include="Enums\enTableDrawType.cs" />
     <Compile Include="Enums\enSorceType.cs" />
