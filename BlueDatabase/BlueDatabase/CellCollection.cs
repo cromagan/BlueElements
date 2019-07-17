@@ -978,7 +978,7 @@ namespace BlueDatabase
 
         public void Set(ColumnItem Column, RowItem Row, DateTime Value)
         {
-            Set(Column, Row, Value.ToString("dd/MM/yyyy HH:mm:ss"), false);
+            Set(Column, Row, Value.ToString(Constants.Format_Date5), false);
         }
 
         public void Set(ColumnItem Column, RowItem Row, Point Value)

@@ -628,7 +628,7 @@ namespace BlueDatabase
 
 
             _Creator = UserName;
-            _CreateDate = DateTime.Now.ToString();
+            _CreateDate = DateTime.Now.ToString(Constants.Format_Date5);
 
             _ReloadDelaySecond = 600;
             _UndoCount = 300;

@@ -721,11 +721,12 @@ namespace BlueDatabase
 
             }
 
-            var SingleFileExport = SavePath + Database.Filename.FileNameWithoutSuffix() + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            var SingleFileExport = SavePath + Database.Filename.FileNameWithoutSuffix() + "_" + DateTime.Now.ToString(Constants.Format_Date4);
 
 
             var Added = new List<string>();
-            var tim = DateTime.Now;
+            var tim2 = DateTime.Now;
+            var tim = tim2.ToString(Constants.Format_Date5);
 
             try
             {
@@ -830,7 +831,7 @@ namespace BlueDatabase
                 //}
             }
 
-            _LastExportTime = tim;
+            _LastExportTime = tim2;
             return DidAndOk;
         }
 

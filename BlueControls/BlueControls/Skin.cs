@@ -695,9 +695,9 @@ namespace BlueControls
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Develop.DebugPrint(ex);
+                // Develop.DebugPrint(ex);
             }
         }
 

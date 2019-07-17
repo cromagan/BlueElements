@@ -726,10 +726,12 @@ namespace BlueBasics
         public static bool DateTimeTryParse(string Value, out DateTime DT)
         {
 
-            if (DateTime.TryParseExact(Value, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
-            if (DateTime.TryParseExact(Value, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
+            if (DateTime.TryParseExact(Value, Constants.Format_Date5, CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
+            if (DateTime.TryParseExact(Value, Constants.Format_Date6, CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
             if (DateTime.TryParseExact(Value, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
             if (DateTime.TryParseExact(Value, "dd.MM.yyyy H:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
+            if (DateTime.TryParseExact(Value, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
+            if (DateTime.TryParseExact(Value, "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
 
             return false;
 

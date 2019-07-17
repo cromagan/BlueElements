@@ -344,7 +344,7 @@ namespace BlueBasics
         {
             if (string.IsNullOrEmpty(Pfad)) { Pfad = Path.GetTempPath(); }
             if (string.IsNullOrEmpty(Suffix)) { Suffix = "tmp"; }
-            if (string.IsNullOrEmpty(Wunschname)) { Wunschname = UserName() + DateTime.Now.ToShortTimeString(); }
+            if (string.IsNullOrEmpty(Wunschname)) { Wunschname = UserName() + DateTime.Now.ToString(Constants.Format_Date6); }
 
             var z = -1;
             Pfad = Pfad.TrimEnd("\\") + "\\";
