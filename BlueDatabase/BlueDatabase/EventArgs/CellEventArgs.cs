@@ -24,14 +24,12 @@ namespace BlueDatabase.EventArgs
     {
 
 
-        public CellEventArgs(ColumnItem Column, RowItem Row)
+        public CellEventArgs(CellItem cell)
         {
-            this.Column = Column;
-            this.Row = Row;
+            this.Cell = cell;
 
         }
 
-        public ColumnItem Column { get; set; }
-        public RowItem Row { get; set; }
+        public CellItem Cell { get; set; }
     }
 }

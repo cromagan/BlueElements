@@ -247,11 +247,11 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
 
-        public static void OpenColumnEditor(ColumnItem column, RowItem Row)
+        public static void OpenColumnEditor(ColumnItem columnReal, RowItem row)
         {
             if (column == null) { return; }
 
-            if (Row == null)
+            if (row == null)
             {
                 OpenColumnEditor(column);
                 return;
@@ -265,7 +265,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
-                    var Txt = Row.CellGetString(column);
+                    var Txt = row.CellGetString(column);
                     if (int.TryParse(Txt, out var ColKey))
                     {
                         column2 = column.LinkedDatabase().Column.SearchByKey(ColKey);
@@ -274,7 +274,9 @@ namespace BlueControls.BlueDatabaseDialogs
 
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                    CellCollection.LinkedCellData(column, Row, out column2, out _);
+                    var LCcell = CellCollection.LinkedCellData(column, row);
+                    if (LCcell != null) { column2 = LCcell.Column; }
+
                     PosError = true;
                     break;
             }

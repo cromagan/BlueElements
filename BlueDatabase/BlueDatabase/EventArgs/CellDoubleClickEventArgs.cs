@@ -23,7 +23,7 @@ namespace BlueDatabase.EventArgs
     {
 
 
-        public CellDoubleClickEventArgs(ColumnItem Column, RowItem Row, bool StartEdit)  : base(Column,Row)
+        public CellDoubleClickEventArgs(CellItem Cell, bool StartEdit) : base(Cell)
         {
             this.StartEdit = StartEdit;
 

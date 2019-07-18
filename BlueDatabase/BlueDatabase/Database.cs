@@ -1738,14 +1738,14 @@ namespace BlueDatabase
         internal void SaveToByteList(List<byte> List, KeyValuePair<string, CellItem> vCell)
         {
 
-            if (string.IsNullOrEmpty(vCell.Value.Value)) { return; }
+            if (string.IsNullOrEmpty(vCell.Value.String)) { return; }
 
             Cell.DataOfCellKey(vCell.Key, out var tColumn, out var tRow);
 
 
             if (!tColumn.SaveContent) { return; }
 
-            var s = vCell.Value.Value;
+            var s = vCell.Value.String;
             var tx = enDatabaseDataType.ce_Value_withSizeData;
 
             if (tColumn.Format.NeedUTF8())
@@ -2178,7 +2178,10 @@ namespace BlueDatabase
 
                             var LCColumn = ThisColumn;
                             var LCrow = ThisRow;
-                            if (ThisColumn.Format == enDataFormat.LinkedCell) { CellCollection.LinkedCellData(ThisColumn, ThisRow, out LCColumn, out LCrow); }
+                            if (ThisColumn.Format == enDataFormat.LinkedCell)
+                            {
+                                var LCcell = CellCollection.LinkedCellData(column, row);
+                                    }
 
                             if (LCrow != null && LCColumn != null)
                             {

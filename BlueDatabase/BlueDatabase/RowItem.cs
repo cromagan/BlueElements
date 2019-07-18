@@ -264,19 +264,19 @@ namespace BlueDatabase
 
             if (CellIsNullOrEmpty(Database.Column.SysLocked))
             {
-                Database.Cell.SystemSet(Database.Column.SysLocked, this, false.ToPlusMinus(), false);
+                Database.Cell.Set(Database.Column.SysLocked, this, false.ToPlusMinus(), false);
             }
 
 
             if (CellIsNullOrEmpty(Database.Column.SysCorrect))
             {
-                Database.Cell.SystemSet(Database.Column.SysCorrect, this, true.ToPlusMinus(), false);
+                Database.Cell.Set(Database.Column.SysCorrect, this, true.ToPlusMinus(), false);
             }
 
 
             if (CellIsNullOrEmpty(Database.Column.SysRowChangeDate))
             {
-                Database.Cell.SystemSet(Database.Column.SysRowChangeDate, this, DateTime.Now.ToString(), false);
+                Database.Cell.Set(Database.Column.SysRowChangeDate, this, DateTime.Now.ToString(), false);
             }
         }
 
