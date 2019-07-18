@@ -732,6 +732,7 @@ namespace BlueBasics
             if (DateTime.TryParseExact(Value, "dd.MM.yyyy H:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
             if (DateTime.TryParseExact(Value, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
             if (DateTime.TryParseExact(Value, "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
+            if (DateTime.TryParseExact(Value, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
 
             return false;
 

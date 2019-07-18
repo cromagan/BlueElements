@@ -301,7 +301,7 @@ namespace BlueDatabase
             {
                 if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == fileName.ToLower())
                 {
-                    ThisDatabase.Release(true);
+                    ThisDatabase.Release(true, 180);
                     Develop.DebugPrint(enFehlerArt.Fehler, "Doppletes Laden von " + fileName);
                 }
             }
@@ -324,12 +324,12 @@ namespace BlueDatabase
         }
 
 
-        public static void ReleaseAll(bool MUSTRelease)
+        public static void ReleaseAll(bool MUSTRelease, int MaxWaitSeconds)
         {
 
             if (MUSTRelease)
             {
-                ReleaseAll(false); // Beenden, was geht, dann erst der muss
+                ReleaseAll(false, MaxWaitSeconds); // Beenden, was geht, dann erst der muss
             }
 
 
@@ -337,12 +337,12 @@ namespace BlueDatabase
 
             foreach (var ThisDatabase in AllDatabases)
             {
-                ThisDatabase?.Release(MUSTRelease);
+                ThisDatabase?.Release(MUSTRelease, MaxWaitSeconds);
 
                 if (x != AllDatabases.Count)
                 {
                     // Die Auflistung wurde verändert! Selten, aber kann passieren!
-                    ReleaseAll(MUSTRelease);
+                    ReleaseAll(MUSTRelease, MaxWaitSeconds);
                     return;
                 }
             }
@@ -371,7 +371,7 @@ namespace BlueDatabase
 
 
 
-        public List<WorkItem> Works;
+        public ListExt<WorkItem> Works;
 
         private readonly List<string> FilesAfterLoadingLCase;
 
@@ -474,6 +474,7 @@ namespace BlueDatabase
         public event EventHandler<DatabaseStoppedEventArgs> ConnectedControlsStopAllWorking;
         public event EventHandler StoreView;
         public event EventHandler RestoreView;
+        public event EventHandler ViewChanged;
         public event EventHandler SavedToDisk;
         public event EventHandler SaveAborded;
         public event CancelEventHandler Exporting;
@@ -523,7 +524,7 @@ namespace BlueDatabase
             Column = new ColumnCollection(this);
             Row = new RowCollection(this);
 
-            Works = new List<WorkItem>();
+            Works = new ListExt<WorkItem>();
 
             FilesAfterLoadingLCase = new List<string>();
 
@@ -704,6 +705,7 @@ namespace BlueDatabase
             {
                 if (_GlobalScale == value) { return; }
                 AddPending(enDatabaseDataType.GlobalScale, -1, -1, _GlobalScale.ToString(), value.ToString(), true);
+                Cell.InvalidateAllSizes();
             }
         }
 
@@ -1066,7 +1068,7 @@ namespace BlueDatabase
 
             if (NewFileName.ToUpper() == Filename.ToUpper()) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
 
-            Release(true); // Original-Datenbank speichern, die ist ja dann weg.
+            Release(true, 180); // Original-Datenbank speichern, die ist ja dann weg.
             var l = ToListOfByte();
             using (var x = new FileStream(NewFileName, FileMode.Create, FileAccess.Write, FileShare.None))
             {
@@ -1817,7 +1819,7 @@ namespace BlueDatabase
             if (IsSaveAble() && !BlockDateiVorhanden()) { return; }
             Reload();
             if (BlockDateiVorhanden()) { DeleteFile(Blockdateiname(), true); }
-            Release(true);
+            Release(true, 180);
         }
 
         private string Blockdateiname()
@@ -2525,6 +2527,12 @@ namespace BlueDatabase
             RestoreView?.Invoke(this, System.EventArgs.Empty);
         }
 
+
+        internal void OnViewChanged()
+        {
+            ViewChanged?.Invoke(this, System.EventArgs.Empty);
+        }
+
         private void OnStoreView()
         {
             StoreView?.Invoke(this, System.EventArgs.Empty);
@@ -2642,7 +2650,7 @@ namespace BlueDatabase
         /// Ist die Datei in Bearbeitung wird diese freigegeben. Zu guter letzt werden PendingChanges fest gespeichert.
         /// Dadurch ist evtl. ein Reload nötig. Ein Reload wird nur bei Pending Changes ausgelöst!
         /// </summary>
-        public bool Release(bool MUSTRelease)
+        public bool Release(bool MUSTRelease, int MaxWaitSeconds)
         {
             if (ReadOnly) { return false; }
 
@@ -2656,7 +2664,7 @@ namespace BlueDatabase
 
             if (string.IsNullOrEmpty(Filename)) { return false; }
 
-
+            MaxWaitSeconds = Math.Min(MaxWaitSeconds, 40);
             var D = DateTime.Now; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
 
 
@@ -2664,8 +2672,15 @@ namespace BlueDatabase
 
             while (HasPendingChanges())
             {
+
                 if (!BinSaver.IsBusy) { BinSaver.RunWorkerAsync(); }
                 Develop.DoEvents();
+                if (DateTime.Now.Subtract(D).TotalSeconds > MaxWaitSeconds)
+                {
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Datenank nicht freigegeben...." + Filename);
+                    return false;
+                } // KAcke, Da liegt ein größerer Fehler vor...
+                if (!MUSTRelease && DateTime.Now.Subtract(D).TotalSeconds > 20 && !BlockDateiVorhanden()) { return false; } // Wenn der Saver hängt.... kommt auch vor :-(
                 if (DateTime.Now.Subtract(D).TotalSeconds > 30 && !BinSaver.IsBusy && HasPendingChanges() && BlockDateiVorhanden()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank aufgrund der Blockdatei nicht freigegeben: " + Filename); }
             }
             return true;
@@ -3484,6 +3499,7 @@ namespace BlueDatabase
 
 
             // Letztes WorkItem speichern, als Kontrolle
+            var WVorher = string.Empty;
             if (Works != null && Works.Count > 0)
             {
                 var c = 0;
@@ -3495,8 +3511,7 @@ namespace BlueDatabase
                     if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { _LastWorkItem = Works[wn].ToString(); }
 
                 } while (string.IsNullOrEmpty(_LastWorkItem));
-
-
+                WVorher = Works.ToString();
             }
 
 
@@ -3533,7 +3548,7 @@ namespace BlueDatabase
 
                     if (!ok && string.IsNullOrEmpty(ok2))
                     {
-                        Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename);
+                        Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br><br>Vorher:<br>" + WVorher + "<br><br>Nachher:<br>" + Works.ToString());
                     }
                 }
             }

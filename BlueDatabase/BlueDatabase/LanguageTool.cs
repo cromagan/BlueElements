@@ -122,6 +122,7 @@ namespace BlueDatabase
             var r = Translation.Row[txt];
             if (r == null)
             {
+                if (r.Database.ReadOnly) { English = German; return German; }
                 if (!mustTranslate) { English = German; return German; }
                 r = Translation.Row.Add(txt);
             }

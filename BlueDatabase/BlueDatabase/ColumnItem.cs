@@ -688,6 +688,7 @@ namespace BlueDatabase
             {
                 if (_Suffix == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_Suffix, this, _Suffix, value, true);
+                Invalidate_ColumAndContent();
                 OnChanged();
             }
         }
@@ -704,6 +705,7 @@ namespace BlueDatabase
             {
                 if (_Prefix == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_Prefix, this, _Prefix, value, true);
+                Invalidate_ColumAndContent();
                 OnChanged();
             }
         }
@@ -778,6 +780,7 @@ namespace BlueDatabase
             {
                 if (_BildCode_ConstantHeight == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_BildCode_ConstantHeight, this, _BildCode_ConstantHeight.ToString(), value.ToString(), true);
+                Invalidate_ColumAndContent();
                 OnChanged();
             }
         }
@@ -1119,6 +1122,7 @@ namespace BlueDatabase
             {
                 if (_LinkedCell_RowKey == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_RowKey, this, _LinkedCell_RowKey.ToString(), value.ToString(), true);
+                Invalidate_ColumAndContent();
                 OnChanged();
             }
         }
@@ -1134,6 +1138,7 @@ namespace BlueDatabase
             {
                 if (_LinkedCell_ColumnKey == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnKey, this, _LinkedCell_ColumnKey.ToString(), value.ToString(), true);
+                Invalidate_ColumAndContent();
                 OnChanged();
             }
         }
@@ -1148,6 +1153,7 @@ namespace BlueDatabase
             {
                 if (_LinkedCell_ColumnValueFoundIn == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, this, _LinkedCell_ColumnValueFoundIn.ToString(), value.ToString(), true);
+                Invalidate_ColumAndContent();
                 OnChanged();
             }
         }
@@ -1162,6 +1168,7 @@ namespace BlueDatabase
             {
                 if (_LinkedCell_ColumnValueAdd == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnValueAdd, this, _LinkedCell_ColumnValueAdd, value, true);
+                Invalidate_ColumAndContent();
                 OnChanged();
             }
         }
@@ -1911,6 +1918,7 @@ namespace BlueDatabase
             {
                 if (ThisRow != null) { CellCollection.Invalidate_CellContentSize(this, ThisRow); }
             }
+            Database.OnViewChanged();
         }
 
         /// <summary>
@@ -2465,27 +2473,33 @@ namespace BlueDatabase
         private void Tags_ListOrItemChanged(object sender, System.EventArgs e)
         {
             Database.AddPending(enDatabaseDataType.co_Tags, Key, Tags.JoinWithCr(), false);
+            OnChanged();
         }
 
 
         private void DropDownItems_ListOrItemChanged(object sender, System.EventArgs e)
         {
             Database.AddPending(enDatabaseDataType.co_DropDownItems, Key, DropDownItems.JoinWithCr(), false);
+            OnChanged();
         }
 
         private void Replacer_ListOrItemChanged(object sender, System.EventArgs e)
         {
             Database.AddPending(enDatabaseDataType.co_Replacer, Key, Replacer.JoinWithCr(), false);
+            Invalidate_ColumAndContent();
+            OnChanged();
         }
 
         private void Regex_ListOrItemChanged(object sender, System.EventArgs e)
         {
             Database.AddPending(enDatabaseDataType.co_Regex, Key, Regex.JoinWithCr(), false);
+            OnChanged();
         }
 
         private void PermissionGroups_ChangeCell_ListOrItemChanged(object sender, System.EventArgs e)
         {
             Database.AddPending(enDatabaseDataType.co_PermissionGroups_ChangeCell, Key, PermissionGroups_ChangeCell.JoinWithCr(), false);
+            OnChanged();
         }
 
 

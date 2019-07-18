@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueControls;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
-using BlueControls.DialogBoxes;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -60,7 +59,7 @@ namespace BeCreative
 
             if (_Database != null)
             {
-                _Database.Release(false);
+                _Database.Release(false, 180);
                 _Database = null;
             }
         }
@@ -1045,7 +1044,7 @@ namespace BeCreative
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
         {
             SetDatabasetoNothing();
-            Database.ReleaseAll(true);
+            Database.ReleaseAll(true, 180);
             base.OnFormClosing(e);
         }
 

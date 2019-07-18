@@ -715,6 +715,16 @@ namespace BlueDatabase
 
         }
 
+        internal void InvalidateAllSizes()
+        {
+            
+            foreach (var ThisColumn in Database.Column)
+            {
+                ThisColumn.Invalidate_ColumAndContent();
+            }
+
+        }
+
         internal void SetValueBehindLinkedValue(ColumnItem Column, RowItem Row, string Value, bool FreezeMode)
         {
             Value = Column.AutoCorrect(Value);

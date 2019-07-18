@@ -109,7 +109,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 {
 
                     _Database.Loaded -= _DatabaseLoaded;
-                    _Database.Release(false); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
+                    _Database.Release(false, 180); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
 
                 }
                 _Database = value;

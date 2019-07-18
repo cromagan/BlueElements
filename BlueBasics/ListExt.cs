@@ -248,5 +248,28 @@ namespace BlueBasics
             OnListOrItemChanged();
 
         }
+
+
+        public override string ToString()
+        {
+
+            if (typeof(IParseable).IsAssignableFrom(typeof(T)))
+            {
+                var a = new System.Text.StringBuilder();
+
+                foreach (IParseable thisP in this)
+                {
+                    if (thisP != null)
+                    {
+                        a.Append(thisP.ToString());
+                        a.Append("\r");
+                    }
+                }
+
+                return a.ToString().TrimCr();
+            }
+
+            return base.ToString();
+        }
     }
 }

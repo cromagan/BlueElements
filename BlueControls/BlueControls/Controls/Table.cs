@@ -191,6 +191,7 @@ namespace BlueControls.Controls
                     _Database.ConnectedControlsStopAllWorking -= _Database_StopAllWorking;
                     _Database.Loaded -= _Database_DatabaseLoaded;
                     _Database.StoreView -= _Database_StoreView;
+                    _Database.ViewChanged -= _Database_ViewChanged;
                     _Database.RowKeyChanged -= _Database_RowKeyChanged;
                     _Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
                     _Database.RestoreView -= _Database_RestoreView;
@@ -198,13 +199,13 @@ namespace BlueControls.Controls
                     _Database.SortParameterChanged -= _Database_SortParameterChanged;
                     _Database.Row.RowRemoved -= _Database_RowCountChanged;
                     _Database.Row.RowAdded -= _Database_RowCountChanged;
-                    _Database.Column.ItemRemoved -= _Database_ColumnCountChanged;
-                    _Database.Column.ItemAdded -= _Database_ColumnCountChanged;
+                    _Database.Column.ItemRemoved -= _Database_ViewChanged;
+                    _Database.Column.ItemAdded -= _Database_ViewChanged;
                     _Database.SavedToDisk -= _Database_SavedToDisk;
                     _Database.ColumnArrangements.ItemInternalChanged -= ColumnArrangements_ItemInternalChanged;
                     _Database.ProgressbarInfo -= _Database_ProgressbarInfo;
 
-                    _Database.Release(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
+                    _Database.Release(false, 180);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
 
                 }
                 _Database = value;
@@ -216,6 +217,7 @@ namespace BlueControls.Controls
                     _Database.ConnectedControlsStopAllWorking += _Database_StopAllWorking;
                     _Database.Loaded += _Database_DatabaseLoaded;
                     _Database.StoreView += _Database_StoreView;
+                    _Database.ViewChanged += _Database_ViewChanged;
                     _Database.RowKeyChanged += _Database_RowKeyChanged;
                     _Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
                     _Database.RestoreView += _Database_RestoreView;
@@ -223,8 +225,8 @@ namespace BlueControls.Controls
                     _Database.SortParameterChanged += _Database_SortParameterChanged;
                     _Database.Row.RowRemoved += _Database_RowCountChanged;
                     _Database.Row.RowAdded += _Database_RowCountChanged;
-                    _Database.Column.ItemAdded += _Database_ColumnCountChanged;
-                    _Database.Column.ItemRemoved += _Database_ColumnCountChanged;
+                    _Database.Column.ItemAdded += _Database_ViewChanged;
+                    _Database.Column.ItemRemoved += _Database_ViewChanged;
                     _Database.SavedToDisk += _Database_SavedToDisk;
                     _Database.ColumnArrangements.ItemInternalChanged += ColumnArrangements_ItemInternalChanged;
                     _Database.ProgressbarInfo += _Database_ProgressbarInfo;
@@ -572,44 +574,44 @@ namespace BlueControls.Controls
             {
 
 
-            if (_Database.ColumnArrangements == null || _ArrangementNr >= _Database.ColumnArrangements.Count) { return; }   // Kommt vor, dass spontan doch geparsed wird...
+                if (_Database.ColumnArrangements == null || _ArrangementNr >= _Database.ColumnArrangements.Count) { return; }   // Kommt vor, dass spontan doch geparsed wird...
 
-            Skin.Draw_Back(GR, enDesign.Table_And_Pad, State, DisplayRectangle, this, true);
+                Skin.Draw_Back(GR, enDesign.Table_And_Pad, State, DisplayRectangle, this, true);
 
 
-            /// Maximale Rechten Pixel der Permanenten Columns ermitteln
-            var PermaX = 0;
-            foreach (var ViewItem in _Database.ColumnArrangements[_ArrangementNr])
-            {
-                if (ViewItem != null && ViewItem.Column != null && ViewItem.ViewType == enViewType.PermanentColumn)
+                /// Maximale Rechten Pixel der Permanenten Columns ermitteln
+                var PermaX = 0;
+                foreach (var ViewItem in _Database.ColumnArrangements[_ArrangementNr])
                 {
-                    PermaX = Math.Max(PermaX, (int)ViewItem.OrderTMP_Spalte_X1 + (int)ViewItem._TMP_DrawWidth);
+                    if (ViewItem != null && ViewItem.Column != null && ViewItem.ViewType == enViewType.PermanentColumn)
+                    {
+                        PermaX = Math.Max(PermaX, (int)ViewItem.OrderTMP_Spalte_X1 + (int)ViewItem._TMP_DrawWidth);
+                    }
                 }
-            }
 
 
-            Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnBackBody, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-            Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.Cells, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-            Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnHead, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnBackBody, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.Cells, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnHead, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
 
-            Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-            Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.Cells, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-            Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnHead, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-
-
-
-
-            /// Überschriften 1-3 Zeichnen
-            Draw_Column_Head_Captions(GR);
+                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.Cells, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnHead, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
 
 
 
-            Skin.Draw_Border(GR, enDesign.Table_And_Pad, State, DisplayRectangleWOSlider);
+
+                /// Überschriften 1-3 Zeichnen
+                Draw_Column_Head_Captions(GR);
 
 
-            if (Database.ReloadNeeded()) { GR.DrawImage(QuickImage.Get(enImageCode.Uhr, 16).BMP, 8, 8); }
-            if (Database.HasPendingChanges()) { GR.DrawImage(QuickImage.Get(enImageCode.Stift, 16).BMP, 16, 8); }
-            if (Database.ReadOnly) { GR.DrawImage(QuickImage.Get(enImageCode.Schloss, 32).BMP, 16, 8); }
+
+                Skin.Draw_Border(GR, enDesign.Table_And_Pad, State, DisplayRectangleWOSlider);
+
+
+                if (Database.ReloadNeeded()) { GR.DrawImage(QuickImage.Get(enImageCode.Uhr, 16).BMP, 8, 8); }
+                if (Database.HasPendingChanges()) { GR.DrawImage(QuickImage.Get(enImageCode.Stift, 16).BMP, 16, 8); }
+                if (Database.ReadOnly) { GR.DrawImage(QuickImage.Get(enImageCode.Schloss, 32).BMP, 16, 8); }
 
 
 
@@ -2823,7 +2825,7 @@ namespace BlueControls.Controls
                 var row = _MouseOverRow;
 
                 CellOnCoordinate(MousePos().X, MousePos().Y, out _MouseOverColumn, out _MouseOverRow);
-    
+
 
 
                 if (col != _MouseOverColumn || row != _MouseOverRow) // Da hat das eventx z.B. die Zeile gelöscht
@@ -3291,7 +3293,7 @@ namespace BlueControls.Controls
 
         private ColumnItem OnCoordinateColumn(int Xpos)
         {
-            if (_Database.ColumnArrangements.Count - 1 < _ArrangementNr) { return null; }
+            if (_Database == null || _Database.ColumnArrangements.Count - 1 < _ArrangementNr) { return null; }
 
             foreach (var ThisViewItem in _Database.ColumnArrangements[_ArrangementNr])
             {
@@ -3550,7 +3552,7 @@ namespace BlueControls.Controls
 
         private RowItem OnCoordinateRow(int YPos)
         {
-            if (YPos <= HeadSize()) { return null; }
+            if (_Database == null || YPos <= HeadSize()) { return null; }
 
 
             foreach (var ThisRowItem in _Database.Row)
@@ -3814,8 +3816,9 @@ namespace BlueControls.Controls
             Invalidate();
         }
 
-        private void _Database_ColumnCountChanged(object sender, System.EventArgs e)
+        private void _Database_ViewChanged(object sender, System.EventArgs e)
         {
+            InitializeSkin(); // Sicher ist sicher, um die neuen Schrift-Größen zu haben.
             Invalidate_HeadSize();
             Invalidate_AllDraw(true);
             Invalidate_RowSort();
@@ -3891,7 +3894,7 @@ namespace BlueControls.Controls
             var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
 
             CellOnCoordinate(e.X, e.Y, out _MouseOverColumn, out _MouseOverRow);
- 
+
             OnContextMenuInit(new ContextMenuInitEventArgs(CellCollection.KeyOfCell(_MouseOverColumn, _MouseOverRow), UserMenu));
 
 
