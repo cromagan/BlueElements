@@ -150,6 +150,7 @@ namespace BlueDatabase
 
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Changed;
+        public event EventHandler<KeyChangedEventArgs> KeyChanged;
         #endregion
 
 
@@ -1393,82 +1394,18 @@ namespace BlueDatabase
 
                 if (_TMP_LinkedDatabase != null)
                 {
-                    _TMP_LinkedDatabase.RowKeyChanged += _TMP_LinkedDatabase_RowKeyChanged;
-                    _TMP_LinkedDatabase.ColumnKeyChanged += _TMP_LinkedDatabase_ColumnKeyChanged;
+                    //_TMP_LinkedDatabase.RowKeyChanged += _TMP_LinkedDatabase_RowKeyChanged;
+                    //_TMP_LinkedDatabase.ColumnKeyChanged += _TMP_LinkedDatabase_ColumnKeyChanged;
                     _TMP_LinkedDatabase.ConnectedControlsStopAllWorking += _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
                     _TMP_LinkedDatabase.Disposed += _TMP_LinkedDatabase_Disposed;
-                    _TMP_LinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
+                    //_TMP_LinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
                 }
 
             }
         }
 
-        private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e)
-        {
 
 
-
-            if (_Format != enDataFormat.Columns_für_LinkedCellDropdown)
-            {
-                var os = e.KeyOld.ToString();
-                var ns = e.KeyNew.ToString();
-                foreach (var ThisRow in Database.Row)
-                {
-                    if (Database.Cell.GetStringBehindLinkedValue(this, ThisRow) == os)
-                    {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, ns, false);
-                    }
-                }
-            }
-
-            if (_Format != enDataFormat.LinkedCell)
-            {
-                var os = e.KeyOld.ToString() + "|";
-                var ns = e.KeyNew.ToString() + "|";
-                foreach (var ThisRow in Database.Row)
-                {
-                    var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
-                    if (val.StartsWith(os))
-                    {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns), false);
-                    }
-                }
-            }
-        }
-
-        private void _TMP_LinkedDatabase_RowKeyChanged(object sender, KeyChangedEventArgs e)
-        {
-            if (_Format != enDataFormat.LinkedCell)
-            {
-                var os = "|" + e.KeyOld.ToString();
-                var ns = "|" + e.KeyNew.ToString();
-                foreach (var ThisRow in Database.Row)
-                {
-                    var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
-                    if (val.EndsWith(os))
-                    {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns), false);
-                    }
-                }
-            }
-        }
-
-        private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellEventArgs e)
-        {
-
-            var tKey = CellCollection.KeyOfCell(e.Column, e.Row);
-
-            foreach (var ThisRow in Database.Row)
-            {
-                if (Database.Cell.GetStringBehindLinkedValue(this, ThisRow) == tKey)
-                {
-                    CellCollection.Invalidate_CellContentSize(this, ThisRow);
-                    Invalidate_TmpColumnContentWidth();
-                    Database.Cell.OnCellValueChanged(new CellEventArgs(this, ThisRow));
-                    ThisRow.DoAutomatic(true, false);
-                }
-            }
-        }
 
         private void _TMP_LinkedDatabase_Disposed(object sender, System.EventArgs e)
         {
@@ -1936,11 +1873,11 @@ namespace BlueDatabase
 
             if (_TMP_LinkedDatabase != null)
             {
-                _TMP_LinkedDatabase.RowKeyChanged -= _TMP_LinkedDatabase_RowKeyChanged;
-                _TMP_LinkedDatabase.ColumnKeyChanged -= _TMP_LinkedDatabase_ColumnKeyChanged;
+                //_TMP_LinkedDatabase.RowKeyChanged -= _TMP_LinkedDatabase_RowKeyChanged;
+                //_TMP_LinkedDatabase.ColumnKeyChanged -= _TMP_LinkedDatabase_ColumnKeyChanged;
                 _TMP_LinkedDatabase.ConnectedControlsStopAllWorking -= _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
                 _TMP_LinkedDatabase.Disposed -= _TMP_LinkedDatabase_Disposed;
-                _TMP_LinkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
+                //_TMP_LinkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
                 _TMP_LinkedDatabase = null;
             }
 

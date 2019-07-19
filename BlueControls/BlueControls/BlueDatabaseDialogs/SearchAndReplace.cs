@@ -44,7 +44,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _BlueTable = table;
             _BlueTable.CursorPosChanged += CursorPosChanged;
-            CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
+            CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPos()));
 
         }
 
@@ -54,13 +54,13 @@ namespace BlueControls.BlueDatabaseDialogs
         private void CursorPosChanged(object sender, CellEventArgs e)
         {
 
-            if (e.Column == null)
+            if (e.Cell.Column == null)
             {
                 NurinAktuellerSpalte.Text = "Nur in der <b>aktuell gewählten Spalte</b> ersetzen.";
             }
             else
             {
-                NurinAktuellerSpalte.Text = "Nur in Spalte <b>'" + e.Column.ReadableText() + "'</b> ersetzen.";
+                NurinAktuellerSpalte.Text = "Nur in Spalte <b>'" + e.Cell.Column.ReadableText() + "'</b> ersetzen.";
             }
 
             Checkbuttons();
@@ -82,7 +82,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (NurinAktuellerSpalte.Checked)
             {
-                sp.Add(_BlueTable.CursorPosColumn());
+                sp.Add(_BlueTable.CursorPos().Column);
             }
             else
             {
@@ -262,13 +262,13 @@ namespace BlueControls.BlueDatabaseDialogs
             {
 
 
-                if (_BlueTable.CursorPosColumn() == null)
+                if (_BlueTable.CursorPos().Column == null)
                 {
                     CanDo = false;
                 }
                 else
                 {
-                    if (!_BlueTable.CursorPosColumn().Format.CanBeChangedByRules()) { CanDo = false; }
+                    if (!_BlueTable.CursorPos().Column.Format.CanBeChangedByRules()) { CanDo = false; }
                 }
             }
 

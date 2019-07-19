@@ -18,23 +18,21 @@
 #endregion
 
 
+
 namespace BlueDatabase.EventArgs
 {
-    public class CellCancelEventArgs : System.EventArgs
+    public class CellKeyChangedEventArgs : System.EventArgs
     {
 
 
-        public CellCancelEventArgs(ColumnItem column, RowItem row, string cancelReason)
+        public CellKeyChangedEventArgs(string KeyOld, string KeyNew)
         {
-            this.CancelReason = cancelReason;
-            this.Row = row;
-            this.Column = column;
+            this.KeyOld = KeyOld;
+            this.KeyNew = KeyNew;
         }
 
-        public string CancelReason { get; set; }
-        public RowItem Row { get; set; }
-        public ColumnItem Column { get; set; }
-
+        public string KeyOld { get; set; }
+        public string KeyNew { get; set; }
 
     }
 }

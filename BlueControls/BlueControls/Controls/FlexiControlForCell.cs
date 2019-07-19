@@ -150,10 +150,10 @@ namespace BlueControls.Controls
         private void Database_CellValueChanged(object sender, CellEventArgs e)
         {
 
-            if (e.Row != GetRow()) { return; }
+            if (e.Cell.Row != GetRow()) { return; }
 
 
-            if (e.Column == _columview.Column) { SetValueFromCell(e.Row); }
+            if (e.Cell.Column == _columview.Column) { SetValueFromCell(e.Cell.Row); }
 
             CheckEnabledState();
         }
@@ -253,7 +253,7 @@ namespace BlueControls.Controls
                 return;
             }
 
-            Enabled = Row.Database.Cell.UserEditPossible(_columview.Column, Row, false); // Rechteverwaltung einfliesen lassen
+            Enabled = CellCollection.UserEditPossible(_columview.Column, Row, false); // Rechteverwaltung einfliesen lassen
         }
 
         internal RowItem GetRow()
@@ -478,7 +478,7 @@ namespace BlueControls.Controls
 
 
 
-            Value = CellCollection.AutomaticInitalValue(_columview.Column, Row);   // TODO: SetValue(FromCell) benutzen
+            Value = CellCollection.AutomaticInitalValue(Row.Database.Cell[ _columview.Column, Row]);   // TODO: SetValue(FromCell) benutzen
 
         }
 
@@ -491,7 +491,7 @@ namespace BlueControls.Controls
             if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
 
 
-            Value = CellCollection.AutomaticInitalValue(_columview.Column, Row);   // TODO: SetValue(FromCell) benutzen
+            Value = CellCollection.AutomaticInitalValue(Row.Database.Cell[_columview.Column, Row]);   // TODO: SetValue(FromCell) benutzen
 
         }
 

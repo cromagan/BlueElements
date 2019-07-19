@@ -409,36 +409,6 @@ namespace BlueDatabase
             RowRemoved?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public bool RemoveOlderThan(float InHours)
-        {
-
-            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDate(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
-
-            //foreach (var thisrowitem in _Internal.Values)
-            //{
-            //    if (thisrowitem != null)
-            //    {
-            //        var D = thisrowitem.CellGetDate(Database.Column.SysRowCreateDate());
-            //        if (DateTime.Now.Subtract(D).TotalHours > InHours) { x.Add(thisrowitem.Key); }
-            //    }
-            //}
-
-
-
-
-            if (x.Count == 0) { return false; }
-
-
-
-            foreach (int ThisKey in x)
-            {
-                Remove(ThisKey);
-            }
-
-            return true;
-        }
-
-
         public static List<RowItem> CalculateSortedRows(Database database, FilterCollection Filter, RowSortDefinition rowSortDefinition)
         {
             var TMP = new List<string>();

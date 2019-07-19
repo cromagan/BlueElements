@@ -46,7 +46,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _BlueTable = table;
             _BlueTable.CursorPosChanged += CursorPosChanged;
-            CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
+            CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPos()));
 
         }
 
@@ -56,8 +56,8 @@ namespace BlueControls.BlueDatabaseDialogs
         private void CursorPosChanged(object sender, CellEventArgs e)
         {
 
-            _row = e.Row;
-            _col = e.Column;
+            _row = e.Cell.Row;
+            _col = e.Cell.Column;
         }
 
 
@@ -126,7 +126,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 return;
             }
 
-            _BlueTable.CursorPos_Set(found, _row, true);
+            _BlueTable.CursorPos_Set(_BlueTable.Database.Cell[found, _row], true);
 
             txbSuchText.Focus();
         }
@@ -161,7 +161,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 return;
             }
 
-            _BlueTable.CursorPos_Set(found, GefRow, true);
+            _BlueTable.CursorPos_Set(_BlueTable.Database.Cell[found, GefRow], true);
 
             txbSuchText.Focus();
 

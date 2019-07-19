@@ -46,6 +46,7 @@ namespace BlueDatabase
 
         public event EventHandler<RowCheckedEventArgs> RowChecked;
         public event EventHandler<DoRowAutomaticEventArgs> DoSpecialRules;
+        public event EventHandler<KeyChangedEventArgs> KeyChanged;
 
 
         #region  Construktor + Initialize 
@@ -84,13 +85,184 @@ namespace BlueDatabase
         #endregion
 
 
+        #region +++ get / set ++
+
+        #region Get/Set String
 
 
+        public string CellGetString(string columnName)
+        {
+            return Database.Cell.GetString(Database.Column[columnName], this);
+        }
+
+        public string CellGetString(ColumnItem column)
+        {
+            return Database.Cell.GetString(column, this);
+        }
+
+        public void CellSet(string columnName, string value)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, false);
+        }
+
+        public void CellSet(string columnName, string value, bool freezeMode)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
+        }
+
+        public void CellSet(ColumnItem column, string value)
+        {
+            Database.Cell.Set(column, this, value, false);
+        }
+
+        public void CellSet(ColumnItem column, string value, bool freezeMode)
+        {
+            Database.Cell.Set(column, this, value, freezeMode);
+        }
+
+        #endregion
+
+        #region Get/Set Boolean
 
 
+        public bool CellGetBoolean(string columnName)
+        {
+            return Database.Cell.GetBoolean(Database.Column[columnName], this);
+        }
+
+        public bool CellGetBoolean(ColumnItem column)
+        {
+            return Database.Cell.GetBoolean(column, this);
+        }
+
+        public void CellSet(string columnName, bool value)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, false);
+        }
+
+        public void CellSet(string columnName, bool value, bool freezeMode)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
+        }
+
+        public void CellSet(ColumnItem column, bool value)
+        {
+            Database.Cell.Set(column, this, value, false);
+        }
+
+        public void CellSet(ColumnItem column, bool value, bool freezeMode)
+        {
+            Database.Cell.Set(column, this, value, freezeMode);
+        }
+
+        #endregion
+
+        #region Get/Set List<String>
 
 
+        public List<string> CellGetList(string columnName)
+        {
+            return Database.Cell.GetList(Database.Column[columnName], this);
+        }
 
+        public List<string> CellGetList(ColumnItem column)
+        {
+            return Database.Cell.GetList(column, this);
+        }
+
+        public void CellSet(string columnName, List<string> value)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, false);
+        }
+
+        public void CellSet(string columnName, List<string> value, bool freezeMode)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
+        }
+
+        public void CellSet(ColumnItem column, List<string> value)
+        {
+            Database.Cell.Set(column, this, value, false);
+        }
+
+        public void CellSet(ColumnItem column, List<string> value, bool freezeMode)
+        {
+            Database.Cell.Set(column, this, value, freezeMode);
+        }
+
+        #endregion
+
+        #region Get/Set Double
+
+
+        public double CellGetDouble(string columnName)
+        {
+            return Database.Cell.GetDouble(Database.Column[columnName], this);
+        }
+
+        public double CellGetDouble(ColumnItem column)
+        {
+            return Database.Cell.GetDouble(column, this);
+        }
+
+        public void CellSet(string columnName, double value)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, false);
+        }
+
+        public void CellSet(string columnName, double value, bool freezeMode)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
+        }
+
+        public void CellSet(ColumnItem column, double value)
+        {
+            Database.Cell.Set(column, this, value, false);
+        }
+
+        public void CellSet(ColumnItem column, double value, bool freezeMode)
+        {
+            Database.Cell.Set(column, this, value, freezeMode);
+        }
+
+        #endregion
+
+        #region Get/Set Integer
+
+
+        public int CellGetInteger(string columnName)
+        {
+            return Database.Cell.GetInteger(Database.Column[columnName], this);
+        }
+
+        public int CellGetInteger(ColumnItem column)
+        {
+            return Database.Cell.GetInteger(column, this);
+        }
+
+        public void CellSet(string columnName, int value)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, false);
+        }
+
+        public void CellSet(string columnName, int value, bool freezeMode)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
+        }
+
+        public void CellSet(ColumnItem column, int value)
+        {
+            Database.Cell.Set(column, this, value, false);
+        }
+
+        public void CellSet(ColumnItem column, int value, bool freezeMode)
+        {
+            Database.Cell.Set(column, this, value, freezeMode);
+        }
+
+        #endregion
+
+        #endregion
 
 
         /// <summary>
@@ -319,36 +491,9 @@ namespace BlueDatabase
 
             return true;
         }
-        public void CellSet(ColumnItem Column, bool Value)
-        {
-            Database.Cell.Set(Column, this, Value);
-        }
-        public void CellSet(ColumnItem Column, bool Value, bool FreezeMode)
-        {
-            Database.Cell.Set(Column, this, Value, FreezeMode);
-        }
 
-        internal void CellSet(ColumnItem Column, double Value, bool FreezeMode)
-        {
-            Database.Cell.Set(Column, this, Value, FreezeMode);
-        }
-        internal void CellSet(ColumnItem Column, double Value)
-        {
-            Database.Cell.Set(Column, this, Value);
-        }
-        public void CellSet(ColumnItem Column, int Value, bool FreezeMode)
-        {
-            Database.Cell.Set(Column, this, Value, FreezeMode);
-        }
-        public void CellSet(ColumnItem Column, int Value)
-        {
-            Database.Cell.Set(Column, this, Value);
-        }
 
-        public void CellSet(string ColumnName, Point Value)
-        {
-            Database.Cell.Set(Database.Column[ColumnName], this, Value);
-        }
+
 
         private bool RowFilterMatch(string Search)
         {
@@ -391,7 +536,7 @@ namespace BlueDatabase
 
         public bool IsNullOrEmpty(string ColumnName)
         {
-            return Database.Cell.IsNullOrEmpty(Database.Column[ColumnName], this);
+            return CellCollection.IsNullOrEmpty(Database.Column[ColumnName], this);
         }
 
         public string CellFirstString()
@@ -399,185 +544,41 @@ namespace BlueDatabase
             return Database.Cell.GetString(Database.Column[0], this);
         }
 
-        public List<string> CellGetList(string ColumnName)
-        {
-            return Database.Cell.GetList(Database.Column[ColumnName], this);
-        }
 
 
 
-        public int CellGetInteger(string ColumnName)
-        {
-            return Database.Cell.GetInteger(Database.Column[ColumnName], this);
-        }
-
-        public string CellGetString(string ColumnName)
-        {
-            return Database.Cell.GetString(Database.Column[ColumnName], this);
-        }
-
-        public List<string> CellGetValuesReadable(ColumnItem Column, enShortenStyle style)
-        {
-            return Database.Cell.ValuesReadable(Column, this, style);
-        }
 
 
 
-        public void CellSet(string ColumnName, string Value)
-        {
-            Database.Cell.Set(Database.Column[ColumnName], this, Value, false);
-        }
 
-        public void CellSet(string ColumnName, string Value, bool FreezeMode)
-        {
-            Database.Cell.Set(Database.Column[ColumnName], this, Value, FreezeMode);
-        }
 
-        public string[] CellGetArray(string ColumnName)
-        {
-            return Database.Cell.GetArray(Database.Column[ColumnName], this);
-        }
 
-        public List<string> CellGetList(ColumnItem Column)
-        {
-            return Database.Cell.GetList(Column, this);
-        }
 
-        public double CellGetDouble(string ColumnName)
-        {
-            return Database.Cell.GetDouble(Database.Column[ColumnName], this);
-        }
 
-        public bool CellGetBoolean(ColumnItem Column)
-        {
-            return Database.Cell.GetBoolean(Column, this);
-        }
 
-        public string CellGetString(ColumnItem Column)
-        {
-            return Database.Cell.GetString(Column, this);
-        }
 
-        public bool CellGetBoolean(string ColumnName)
-        {
-            return Database.Cell.GetBoolean(Database.Column[ColumnName], this);
-        }
 
-        public void CellSet(string ColumnName, bool Value)
-        {
-            Database.Cell.Set(Database.Column[ColumnName], this, Value, false);
-        }
 
-        public void CellSet(string ColumnName, List<string> Value)
-        {
-            Database.Cell.Set(Database.Column[ColumnName], this, Value, false);
 
-        }
 
-        public void CellSet(string ColumnName, List<string> Value, bool FreezeMode)
-        {
-            Database.Cell.Set(Database.Column[ColumnName], this, Value, FreezeMode);
 
-        }
 
-        public void CellSet(ColumnItem Column, List<string> Value)
-        {
-            Database.Cell.Set(Column, this, Value, false);
-        }
-        public void CellSet(ColumnItem Column, List<string> Value, bool FreezeMode)
-        {
-            Database.Cell.Set(Column, this, Value, FreezeMode);
-        }
-        public void CellSet(ColumnItem Column, string Value)
-        {
-            Database.Cell.Set(Column, this, Value, false);
-        }
-
-        public void CellSet(ColumnItem Column, string Value, bool FreezeMode)
-        {
-            Database.Cell.Set(Column, this, Value, FreezeMode);
-        }
-
-        public void CellSet(string ColumnName, DateTime Value)
-        {
-            Database.Cell.Set(Database.Column[ColumnName], this, Value);
-        }
-
-        public void CellSet(string ColumnName, int Value)
-        {
-            Database.Cell.Set(Database.Column[ColumnName], this, Value, false);
-        }
 
         public bool CellIsNullOrEmpty(string ColumnName)
         {
-            return Database.Cell.IsNullOrEmpty(Database.Column[ColumnName], this);
+            return CellCollection.IsNullOrEmpty(Database.Column[ColumnName], this);
         }
         public bool CellIsNullOrEmpty(ColumnItem Column)
         {
-            return Database.Cell.IsNullOrEmpty(Column, this);
+            return CellCollection.IsNullOrEmpty(Column, this);
         }
 
 
 
-        public double CellGetDouble(ColumnItem Column)
-        {
-            return Database.Cell.GetDouble(Column, this);
-        }
-
-        public decimal CellGetDecimal(string ColumnName)
-        {
-            return Database.Cell.GetDecimal(Database.Column[ColumnName], this);
-        }
-
-        public void CellSet(string ColumnName, double Value)
-        {
-            Database.Cell.Set(Database.Column[ColumnName], this, Value, false);
-        }
-
-        public Point CellGetPoint(ColumnItem Column)
-        {
-            return Database.Cell.GetPoint(Column, this);
-        }
-        public Point CellGetPoint(string ColumnName)
-        {
-            return Database.Cell.GetPoint(Database.Column[ColumnName], this);
-        }
 
 
-        public Bitmap CellGetBitmap(ColumnItem Column)
-        {
-            return Database.Cell.GetBitmap(Column, this);
-        }
 
-        public int CellGetColorBGR(ColumnItem Column)
-        {
-            return Database.Cell.GetColorBGR(Column, this);
-        }
 
-        public int CellGetInteger(ColumnItem Column)
-        {
-            return Database.Cell.GetInteger(Column, this);
-        }
-
-        public Color CellGetColor(ColumnItem Column)
-        {
-            return Database.Cell.GetColor(Column, this);
-        }
-
-        //public BlueFont CellGetBlueFont(ColumnItem Column)
-        //{
-        //    return Database.Cell.GetBlueFont(Column, this);
-        //}
-
-        public DateTime CellGetDate(string ColumnName)
-        {
-            return Database.Cell.GetDate(Database.Column[ColumnName], this);
-        }
-
-        public DateTime CellGetDate(ColumnItem Column)
-        {
-            return Database.Cell.GetDate(Column, this);
-        }
 
 
         internal void OnRowChecked(RowCheckedEventArgs e)

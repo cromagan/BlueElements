@@ -641,12 +641,12 @@ namespace BeCreative
             {
                 if (TableView.Database != null)
                 {
-                    if (TableView.CursorPos().RowReal == null && TableView.View_RowFirst() != null)
+                    if (TableView.CursorPos()?.RowReal == null && TableView.View_RowFirst() != null)
                     {
                         TableView.CursorPos_Set(TableView.Database.Cell[TableView.Database.Column[0], TableView.View_RowFirst()], false);
 
                     }
-                    if (TableView.CursorPos().RowReal != null) { BlueFormulax.ShowingRowKey = TableView.CursorPos().RowReal.Key; }
+                    if (TableView.CursorPos()?.RowReal != null) { BlueFormulax.ShowingRowKey = TableView.CursorPos().RowReal.Key; }
                 }
             }
             else
@@ -926,7 +926,7 @@ namespace BeCreative
                     break;
 
                 case "VorherigenInhaltWiederherstellen":
-                    TableView.DoUndo(cell.Column, cell.Row);
+                    TableView.DoUndo(cell);
                     break;
 
                 case "ContentPaste":

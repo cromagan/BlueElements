@@ -496,10 +496,12 @@ namespace BlueControls.Controls
 
 
             // Zeilen Zeichnen (Alle Zellen)
-            for (var Zei = FirstVisibleRow ; Zei <= LastVisibleRow ; Zei++)
+            for (var Zei = FirstVisibleRow; Zei <= LastVisibleRow; Zei++)
             {
                 var CurrentRow = SortedRows()[Zei];
                 var y = (int)CurrentRow.TMP_Y;
+                var x = (int)ViewItem.OrderTMP_Spalte_X1;
+                var wi = Column_DrawWidth(ViewItem, DisplayRectangleWOSlider);
                 GR.SmoothingMode = SmoothingMode.None;
 
                 if (ViewItem.Column.ZellenZusammenfassen)
@@ -517,11 +519,11 @@ namespace BlueControls.Controls
                             }
                         }
 
-                        GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, y);
+                        GR.DrawLine(Skin.Pen_LinieDünn, x, y, x + wi - 1, y);
 
                         if (string.IsNullOrEmpty(ToDraw))
                         {
-                            Draw_CellTransparentDirect(GR, Database.Cell[ViewItem.Column, CurrentRow], y, DisplayRectangleWOSlider, _Cell_Font);
+                            Draw_CellTransparentDirect(GR, Database.Cell[ViewItem.Column, CurrentRow], y, DisplayRectangleWOSlider, _Cell_Font, x, wi);
                         }
 
                         Drawn = ToDraw;
@@ -529,11 +531,11 @@ namespace BlueControls.Controls
                 }
                 else
                 {
-                    GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, y);
+                    GR.DrawLine(Skin.Pen_LinieDünn, x, y, x + wi - 1, y);
 
-                    if (!Database.Cell.IsNullOrEmpty(ViewItem.Column, CurrentRow))
+                    if (!CellCollection.IsNullOrEmpty(ViewItem.Column, CurrentRow))
                     {
-                        Draw_CellTransparentDirect(GR, Database.Cell[ViewItem.Column, CurrentRow], y, DisplayRectangleWOSlider, _Cell_Font);
+                        Draw_CellTransparentDirect(GR, Database.Cell[ViewItem.Column, CurrentRow], y, DisplayRectangleWOSlider, _Cell_Font, x, wi);
                     }
                 }
 
@@ -642,7 +644,7 @@ namespace BlueControls.Controls
 
             var PermaX = 0;
 
-            for (var X = 0 ; X < _Database.ColumnArrangements[_ArrangementNr].Count() + 1 ; X++)
+            for (var X = 0; X < _Database.ColumnArrangements[_ArrangementNr].Count() + 1; X++)
             {
                 if (X < _Database.ColumnArrangements[_ArrangementNr].Count())
                 {
@@ -668,7 +670,7 @@ namespace BlueControls.Controls
                 {
 
 
-                    for (var u = 0 ; u < 3 ; u++)
+                    for (var u = 0; u < 3; u++)
                     {
                         var N = ViewItem?.Column.Ueberschrift(u);
                         var V = BVI[u]?.Column.Ueberschrift(u);
@@ -743,11 +745,11 @@ namespace BlueControls.Controls
 
             var r = new Rectangle();
             // Zeilen Zeichnen (Alle Zellen)
-            for (var Zeiv = vFirstVisibleRow ; Zeiv <= vLastVisibleRow ; Zeiv++)
+            for (var Zeiv = vFirstVisibleRow; Zeiv <= vLastVisibleRow; Zeiv++)
             {
                 var Row = SortedRows()[Zeiv];
 
-                var ViewItem = _Database.ColumnArrangements[0][Col];
+                // var ViewItem = _Database.ColumnArrangements[0][Col];
 
                 r = new Rectangle(0, (int)Row.TMP_Y, DisplayRectangleWithoutSlider().Width, Row_DrawHeight(Row, DisplayRectangleWOSlider));
 
@@ -764,9 +766,9 @@ namespace BlueControls.Controls
                     }
                 }
 
-                ViewItem.OrderTMP_Spalte_X1 = 0;
+                // ViewItem.OrderTMP_Spalte_X1 = 0;
 
-                Draw_CellListBox(GR, Database.Cell[ViewItem.Column, Row], r, enDesign.Item_Listbox, ItStat);
+                Draw_CellListBox(GR, Database.Cell[Database.Column[0], Row], r, enDesign.Item_Listbox, ItStat, 0, (int)Database.Column[0].TMP_ColumnContentWidth);
 
 
                 if (!Row.CellGetBoolean(_Database.Column.SysCorrect))
@@ -812,7 +814,7 @@ namespace BlueControls.Controls
         }
 
         /// Zeichnet die gesamte Zelle ohne Hintergrund. Die verlinkte Zelle ist bereits bekannt.
-        private void Draw_CellTransparentDirect(Graphics GR, CellItem VisibleCell, int RowY, Rectangle DisplayRectangleWOSlider, BlueFont vfont)
+        private void Draw_CellTransparentDirect(Graphics GR, CellItem VisibleCell, int RowY, Rectangle DisplayRectangleWOSlider, BlueFont vfont, int ColumnX, int ColumnWidth)
         {
 
 
@@ -823,21 +825,21 @@ namespace BlueControls.Controls
 
             if (!VisibleCell.ColumnReal.MultiLine || !toDraw.Contains("\r"))
             {
-                Draw_CellTransparentDirect_OneLine(GR, toDraw, VisibleCell, RowY, true, DisplayRectangleWOSlider, vfont);
+                Draw_CellTransparentDirect_OneLine(GR, toDraw, VisibleCell, RowY, true, DisplayRectangleWOSlider, vfont, ColumnX, ColumnWidth);
             }
             else
             {
                 var MEI = toDraw.SplitByCR();
                 if (VisibleCell.ColumnReal.ShowMultiLineInOneLine)
                 {
-                    Draw_CellTransparentDirect_OneLine(GR, MEI.JoinWith("; "), VisibleCell, RowY, true, DisplayRectangleWOSlider, vfont);
+                    Draw_CellTransparentDirect_OneLine(GR, MEI.JoinWith("; "), VisibleCell, RowY, true, DisplayRectangleWOSlider, vfont, ColumnX, ColumnWidth);
                 }
                 else
                 {
                     var y = 0;
-                    for (var z = 0 ; z <= MEI.GetUpperBound(0) ; z++)
+                    for (var z = 0; z <= MEI.GetUpperBound(0); z++)
                     {
-                        Draw_CellTransparentDirect_OneLine(GR, MEI[z], VisibleCell, RowY + y, Convert.ToBoolean(z == MEI.GetUpperBound(0)), DisplayRectangleWOSlider, vfont);
+                        Draw_CellTransparentDirect_OneLine(GR, MEI[z], VisibleCell, RowY + y, Convert.ToBoolean(z == MEI.GetUpperBound(0)), DisplayRectangleWOSlider, vfont, ColumnX, ColumnWidth);
                         y += FormatedText_NeededSize(VisibleCell.Column, MEI[z], null, vfont, enShortenStyle.Replaced, Pix16 - 1).Height;
                     }
                 }
@@ -881,7 +883,7 @@ namespace BlueControls.Controls
         {
 
             GR.SmoothingMode = SmoothingMode.None;
-            GR.FillRectangle(new SolidBrush(VisibleCellColumn.Column.BackColor), (int)VisibleCellColumn.OrderTMP_Spalte_X1, HeadSize(), Column_DrawWidth(VisibleCell.Column, DisplayRectangleWOSlider), DisplayRectangleWOSlider.Height);
+            GR.FillRectangle(new SolidBrush(VisibleCellColumn.Column.BackColor), (int)VisibleCellColumn.OrderTMP_Spalte_X1, HeadSize(), Column_DrawWidth(VisibleCellColumn, DisplayRectangleWOSlider), DisplayRectangleWOSlider.Height);
             Draw_Border(GR, VisibleCellColumn, DisplayRectangleWOSlider, false);
         }
 
@@ -893,7 +895,7 @@ namespace BlueControls.Controls
 
             if (Onlyhead) { yPos = HeadSize(); }
 
-            for (z = 0 ; z <= 1 ; z++)
+            for (z = 0; z <= 1; z++)
             {
                 var xPos = 0;
                 enColumnLineStyle Lin = 0;
@@ -1047,9 +1049,9 @@ namespace BlueControls.Controls
 
             if (_ShowNumber)
             {
-                for (var x = -1 ; x < 2 ; x++)
+                for (var x = -1; x < 2; x++)
                 {
-                    for (var y = -1 ; y < 2 ; y++)
+                    for (var y = -1; y < 2; y++)
                     {
                         GR.DrawString("#" + lfdNo.ToString(), _Column_Font.Font(), Brushes.Black, (int)ViewItem.OrderTMP_Spalte_X1 + x, ViewItem._TMP_AutoFilterLocation.Top + y);
 
@@ -1123,7 +1125,7 @@ namespace BlueControls.Controls
         /// <param name="DisplayRectangleWOSlider"></param>
         /// <param name="vDesign"></param>
         /// <param name="vState"></param>
-        private void Draw_CellListBox(Graphics GR, CellItem Cell, Rectangle DisplayRectangleWOSlider, enDesign vDesign, enStates vState)
+        private void Draw_CellListBox(Graphics GR, CellItem Cell, Rectangle DisplayRectangleWOSlider, enDesign vDesign, enStates vState, int ColumnX, int ColumnWidth)
         {
 
             Skin.Draw_Back(GR, vDesign, vState, DisplayRectangleWOSlider, null, false);
@@ -1133,19 +1135,22 @@ namespace BlueControls.Controls
             if (f == null) { return; }
 
 
-            Draw_CellTransparentDirect(GR, Cell, (int)Cell.Row.TMP_Y, DisplayRectangleWOSlider, f);
+            Draw_CellTransparentDirect(GR, Cell, (int)Cell.Row.TMP_Y, DisplayRectangleWOSlider, f, ColumnX, ColumnWidth);
 
         }
 
         /// Zeichnet die eine Zeile der Zelle ohne Hintergrund und prüft noch, ob der verlinkte Inhalt gezeichnet werden soll.
-        private void Draw_CellTransparentDirect_OneLine(Graphics GR, string DrawString, CellItem VisibleCell, int Y, bool IsLastRow, Rectangle DisplayRectangleWOSlider, BlueFont vfont)
+        private void Draw_CellTransparentDirect_OneLine(Graphics GR, string DrawString, CellItem VisibleCell, int Y, bool IsLastRow, Rectangle DisplayRectangleWOSlider, BlueFont vfont, int ColumnX, int ColumnWidth)
         {
 
 
-            var r = new Rectangle((int)VisibleCell.Column.OrderTMP_Spalte_X1,
-                                   Y,
-                                  Column_DrawWidth(VisibleCell.Column, DisplayRectangleWOSlider),
-                                  Pix16);
+            //var r = new Rectangle((int)VisibleCell.Column.OrderTMP_Spalte_X1,
+            //                       Y,
+            //                      Column_DrawWidth(VisibleCell.Column, DisplayRectangleWOSlider),
+            //                      Pix16);
+
+            var r = new Rectangle(ColumnX, Y, ColumnWidth, Pix16);
+
 
             if (r.Bottom > Y + Row_DrawHeight(VisibleCell.Row, DisplayRectangleWOSlider) - Pix16)
             {
@@ -1368,9 +1373,9 @@ namespace BlueControls.Controls
                 NotEditableInfo("Diese Spalte kann generell nicht bearbeitet werden.");
                 return;
             }
-            if (!VisibleCell.UserEditPossible(false))
+            if (!CellCollection.UserEditPossible(VisibleCell.ColumnReal, VisibleCell.RowReal, false))
             {
-                NotEditableInfo(VisibleCell.UserEditErrorReason(false));
+                NotEditableInfo(CellCollection.UserEditErrorReason(VisibleCell.ColumnReal, VisibleCell.RowReal, false));
                 return;
             }
 
@@ -1455,13 +1460,9 @@ namespace BlueControls.Controls
                 //    Cell_Edit_Relations(VisibleCell.Column, VisibleCell.Row);
                 //    break;
                 case enEditTypeTable.Farb_Auswahl_Dialog:
-                    if (VisibleCell.Column != ContentHolderCell.Column || VisibleCell.Row != ContentHolderCell.Row)
-                    {
-                        NotEditableInfo("Ziel-Spalte ist kein Textformat");
-                        return;
-                    }
-                    Cell_Edit_Color(VisibleCell.Column, VisibleCell.Row);
+                    Cell_Edit_Color(VisibleCell);
                     break;
+
                 case enEditTypeTable.Font_AuswahlDialog:
                     Develop.DebugPrint_NichtImplementiert();
                     //if (VisibleCell.Column != ContentHolderCell.Column || VisibleCell.Row != ContentHolderCell.Row)
@@ -1505,7 +1506,7 @@ namespace BlueControls.Controls
                 {
                     if (ThisRowItem.CellGetInteger(ContentCell.Column) != 0)
                     {
-                        ColList.Add(ThisRowItem.CellGetColorBGR(ContentCell.Column));
+                        ColList.Add(ContentCell.Database.Cell[ContentCell.Column, ThisRowItem].GetColorBGR());
                     }
                 }
             }
@@ -1747,9 +1748,9 @@ namespace BlueControls.Controls
         private void Cursor_Move(enDirection Richtung)
         {
             if (_Database == null) { return; }
-            Neighbour(_CursorPos, Richtung, out var _newCol, out var _newRow);
+            var c = Neighbour(_CursorPos, Richtung);
 
-            CursorPos_Set(_newCol, _newRow, Richtung != enDirection.Nichts);
+            CursorPos_Set(c, Richtung != enDirection.Nichts);
         }
 
 
@@ -2156,14 +2157,14 @@ namespace BlueControls.Controls
 
             if (AreRowsSorted())
             {
-                if (Filter.Uses(e.Column) || SortUsed() == null || SortUsed().UsedForRowSort(e.Column) || Filter.MayHasRowFilter(e.Column))
+                if (Filter.Uses(e.Cell.Column) || SortUsed() == null || SortUsed().UsedForRowSort(e.Cell.Column) || Filter.MayHasRowFilter(e.Cell.Column))
                 {
                     Invalidate_RowSort();
                 }
             }
 
-            Invalidatex_DrawWidth(e.Column);
-            Invalidate_TMPDrawHeight(e.Row);
+            Invalidatex_DrawWidth(e.Cell.Column);
+            Invalidate_TMPDrawHeight(e.Cell.Row);
 
             Invalidate();
 
@@ -2399,17 +2400,17 @@ namespace BlueControls.Controls
                         {
                             CopyToClipboard(_CursorPos, true);
 
-                            if (_CursorPosRow.CellIsNullOrEmpty(_CursorPosColumn))
+                            if (string.IsNullOrEmpty(_CursorPos.GetString()))
                             {
                                 ISIN_KeyDown = false;
                                 return;
                             }
 
-                            var l2 = _Database.Cell.UserEditErrorReason(_CursorPos, false);
+                            var l2 = CellCollection.UserEditErrorReason(_CursorPos.ColumnReal, _CursorPos.RowReal, false);
 
                             if (string.IsNullOrEmpty(l2))
                             {
-                                UserEdited(this, string.Empty, _CursorPos, true);
+                                UserEdited(this, string.Empty, _CursorPos.ColumnReal, _CursorPos.RowReal, true);
                             }
                             else
                             {
@@ -2421,17 +2422,17 @@ namespace BlueControls.Controls
                         break;
 
                     case System.Windows.Forms.Keys.Delete:
-                        if (_CursorPosRow.CellIsNullOrEmpty(_CursorPosColumn))
+                        if (string.IsNullOrEmpty(_CursorPos.GetString()))
                         {
                             ISIN_KeyDown = false;
                             return;
                         }
 
-                        var l = _Database.Cell.UserEditErrorReason(_CursorPos, false);
+                        var l = CellCollection.UserEditErrorReason(_CursorPos.ColumnReal, _CursorPos.RowReal, false);
 
                         if (string.IsNullOrEmpty(l))
                         {
-                            UserEdited(this, string.Empty, _CursorPos, true);
+                            UserEdited(this, string.Empty, _CursorPos.ColumnReal, _CursorPos.RowReal, true);
                         }
                         else
                         {
@@ -2458,7 +2459,7 @@ namespace BlueControls.Controls
                     case System.Windows.Forms.Keys.PageDown:
                         if (SliderY.Enabled)
                         {
-                            CursorPos_Set(null, null, false);
+                            CursorPos_Set(null, false);
                             SliderY.Value += SliderY.LargeChange;
                         }
                         break;
@@ -2466,7 +2467,7 @@ namespace BlueControls.Controls
                     case System.Windows.Forms.Keys.PageUp: //Bildab
                         if (SliderY.Enabled)
                         {
-                            CursorPos_Set(null, null, false);
+                            CursorPos_Set(null, false);
                             SliderY.Value -= SliderY.LargeChange;
                         }
                         break;
@@ -2474,7 +2475,7 @@ namespace BlueControls.Controls
                     case System.Windows.Forms.Keys.Home:
                         if (SliderY.Enabled)
                         {
-                            CursorPos_Set(null, null, false);
+                            CursorPos_Set(null, false);
                             SliderY.Value = SliderY.Minimum;
 
                         }
@@ -2483,7 +2484,7 @@ namespace BlueControls.Controls
                     case System.Windows.Forms.Keys.End:
                         if (SliderY.Enabled)
                         {
-                            CursorPos_Set(null, null, false);
+                            CursorPos_Set(null, false);
                             SliderY.Value = SliderY.Maximum;
                         }
                         break;
@@ -2510,10 +2511,10 @@ namespace BlueControls.Controls
                     case System.Windows.Forms.Keys.V:
                         if (e.Modifiers == System.Windows.Forms.Keys.Control)
                         {
-                            if (_CursorPosColumn != null && _CursorPosRow != null)
+                            if (_CursorPos != null)
                             {
 
-                                if (!_CursorPosColumn.Format.TextboxEditPossible() && _CursorPosColumn.Format != enDataFormat.Columns_für_LinkedCellDropdown && _CursorPosColumn.Format != enDataFormat.Values_für_LinkedCellDropdown)
+                                if (!_CursorPos.Column.Format.TextboxEditPossible() && _CursorPos.Column.Format != enDataFormat.Columns_für_LinkedCellDropdown && _CursorPos.Column.Format != enDataFormat.Values_für_LinkedCellDropdown)
                                 {
                                     NotEditableInfo("Die Zelle hat kein passendes Format.");
                                     ISIN_KeyDown = false;
@@ -2528,18 +2529,18 @@ namespace BlueControls.Controls
                                 }
 
                                 var ntxt = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.UnicodeText));
-                                if (_CursorPosRow.CellGetString(_CursorPosColumn) == ntxt)
+                                if (_CursorPos.GetString() == ntxt)
                                 {
                                     ISIN_KeyDown = false;
                                     return;
                                 }
 
 
-                                var l2 = _Database.Cell.UserEditErrorReason(_CursorPos, false);
+                                var l2 = CellCollection.UserEditErrorReason(_CursorPos.ColumnReal, _CursorPos.RowReal, false);
 
                                 if (string.IsNullOrEmpty(l2))
                                 {
-                                    UserEdited(this, ntxt, _CursorPos, true);
+                                    UserEdited(this, ntxt, _CursorPos.ColumnReal, _CursorPos.RowReal, true);
                                 }
                                 else
                                 {
@@ -2588,7 +2589,7 @@ namespace BlueControls.Controls
                     {
                         T = _MouseOver.ColumnReal.QickInfoText(string.Empty);
                     }
-                    else if (_MouseOver.Column != null && _MouseOver.Row != null)
+                    else if (_MouseOver?.Column != null && _MouseOver?.Row != null)
                     {
                         if (_MouseOver.Database != _MouseOver.DatabaseReal)
 
@@ -2619,7 +2620,7 @@ namespace BlueControls.Controls
 
                     else if (_Database.IsAdministrator())
                     {
-                        T = Database.UndoText(_MouseOver.Column, _MouseOver.Row);
+                        T = Database.UndoText(_MouseOver?.Column, _MouseOver?.Row);
                     }
 
 
@@ -2836,7 +2837,7 @@ namespace BlueControls.Controls
 
         public void CursorPos_Set(CellItem cell, bool ensureVisible)
         {
-            if (_CursorPos.Column == cell.ColumnReal && _CursorPos.Row == cell.RowReal) { return; }
+            if (_CursorPos?.Column == cell.ColumnReal && _CursorPos?.Row == cell.RowReal) { return; }
 
             _CursorPos = cell;
 
@@ -2988,7 +2989,17 @@ namespace BlueControls.Controls
 
             }
 
-            x = x + ", CursorPos=" + CellCollection.KeyOfCell(_CursorPos);
+
+            if (_CursorPos != null)
+            {
+                x = x + ", CursorPos=" + _CursorPos.CellKeyReal();
+            }
+            else
+            {
+                x = x + ", CursorPos=#";
+            }
+
+
 
             return x + "}";
         }
@@ -3031,7 +3042,7 @@ namespace BlueControls.Controls
 
                     case "cursorpos":
                         Database.Cell.DataOfCellKey(pairValue, out var column, out var row);
-                        CursorPos_Set(column, row, false);
+                        CursorPos_Set(Database.Cell[column, row], false);
                         break;
 
                     case "tempsort":
@@ -3485,7 +3496,7 @@ namespace BlueControls.Controls
 
             if (vcolumn.TMP_AutoFilterSinnvoll != null) { return (bool)vcolumn.TMP_AutoFilterSinnvoll; }
 
-            for (var rowcount = 0 ; rowcount <= SortedRows().Count - 2 ; rowcount++)
+            for (var rowcount = 0; rowcount <= SortedRows().Count - 2; rowcount++)
             {
                 if (SortedRows()[rowcount].CellGetString(vcolumn.Column) != SortedRows()[rowcount + 1].CellGetString(vcolumn.Column))
                 {
@@ -3635,11 +3646,11 @@ namespace BlueControls.Controls
         /// Gibt des keine Nachbarszelle, wird die Eingangszelle zurückgegeben.
         /// </summary>
         /// <remarks></remarks>
-        private void Neighbour(ColumnItem column, RowItem row, enDirection Direction, out ColumnItem NewColumn, out RowItem NewRow)
+        private CellItem Neighbour(CellItem c, enDirection Direction)
         {
 
-            NewColumn = column;
-            NewRow = row;
+            var NewColumn = c.Column;
+            var NewRow = c.Row;
 
 
 
@@ -3647,8 +3658,7 @@ namespace BlueControls.Controls
             {
                 if (Direction != enDirection.Oben && Direction != enDirection.Unten)
                 {
-                    NewColumn = _Database.Column[0];
-                    return;
+                    return _Database.Cell[_Database.Column[0], NewRow];
                 }
             }
 
@@ -3686,6 +3696,8 @@ namespace BlueControls.Controls
                 }
 
             }
+
+            return _Database.Cell[NewColumn, NewRow];
         }
 
 
@@ -3750,7 +3762,7 @@ namespace BlueControls.Controls
             if (_Database.ColumnArrangements[_ArrangementNr][_Database.Column[0]] == null) { return false; }
             if (!_Database.PermissionCheck(_Database.PermissionGroups_NewRow, null)) { return false; }
 
-            if (!_Database.Cell.UserEditPossible(_Database.Column[0], null, false)) { return false; }
+            if (!CellCollection.UserEditPossible(_Database.Column[0], null, false)) { return false; }
             return true;
         }
 
@@ -3844,9 +3856,9 @@ namespace BlueControls.Controls
             var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
             var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
 
-            CellOnCoordinate(e.X, e.Y, out _MouseOverColumn, out _MouseOverRow);
+            _MouseOver = CellOnCoordinate(e.X, e.Y);
 
-            OnContextMenuInit(new ContextMenuInitEventArgs(CellCollection.KeyOfCell(_MouseOverColumn, _MouseOverRow), UserMenu));
+            OnContextMenuInit(new ContextMenuInitEventArgs(_MouseOver.CellKeyReal(), UserMenu));
 
 
             if (ThisContextMenu.Count > 0 && UserMenu.Count > 0) { ThisContextMenu.Add(new LineListItem()); }
@@ -3856,7 +3868,7 @@ namespace BlueControls.Controls
             {
                 ThisContextMenu.Add(new LineListItem());
                 ThisContextMenu.Add(enContextMenuComands.Abbruch);
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, CellCollection.KeyOfCell(_MouseOverColumn, _MouseOverRow), this, Translate);
+                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, _MouseOver.CellKeyReal(), this, Translate);
                 _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
             }
 
@@ -3915,23 +3927,17 @@ namespace BlueControls.Controls
         public static Size Cell_ContentSize(ColumnItem column, RowItem row, BlueFont CellFont, int Pix16)
         {
 
+            if (CellCollection.IsNullOrEmpty(column, row)) { return new Size(Pix16, Pix16); }
+
             var cell = column.Database.Cell[column, row];
-
-            if (column.Format == enDataFormat.LinkedCell)
-            {
-                var LCcell = CellCollection.LinkedCellData(column, row);
-                if (LCcell != null) { return Cell_ContentSize(LCcell.Column, LCcell.Row, CellFont, Pix16); }
-                return new Size(Pix16, Pix16);
-            }
+            if (cell.Size.Width > 0 && cell.Size.Height > 0) { return cell.Size; }
 
 
-            var _ContentSize = column.Database.Cell.GetSizeOfCellContent(column, row);
-            if (_ContentSize.Width > 0 && _ContentSize.Height > 0) { return _ContentSize; }
-
+            var _ContentSize = Size.Empty;
 
             if (column.MultiLine)
             {
-                var TMP = column.Database.Cell.GetArray(column, row);
+                var TMP = cell.GetList();
                 if (column.ShowMultiLineInOneLine)
                 {
                     _ContentSize = FormatedText_NeededSize(column, TMP.JoinWith("; "), null, CellFont, enShortenStyle.Replaced, Pix16);
@@ -3940,12 +3946,11 @@ namespace BlueControls.Controls
                 {
 
                     var TMPSize = Size.Empty;
-                    for (var z = 0 ; z <= TMP.GetUpperBound(0) ; z++)
+                    foreach (var thisTMP in TMP)
                     {
-                        TMPSize = FormatedText_NeededSize(column, TMP[z], null, CellFont, enShortenStyle.Replaced, Pix16);
+                        TMPSize = FormatedText_NeededSize(column, thisTMP, null, CellFont, enShortenStyle.Replaced, Pix16);
                         _ContentSize.Width = Math.Max(TMPSize.Width, _ContentSize.Width);
                         _ContentSize.Height += Math.Max(TMPSize.Height, Pix16);
-
                     }
 
                 }
@@ -3969,21 +3974,21 @@ namespace BlueControls.Controls
         }
 
 
-        public void DoUndo(ColumnItem column, RowItem row)
+        public void DoUndo(CellItem cell)
         {
-            if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
-            if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!<br>" + Database.Filename); }
+            //if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
+            //if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!<br>" + Database.Filename); }
 
-            if (column.Format == enDataFormat.LinkedCell)
-            {
-                var LCcell = CellCollection.LinkedCellData(column, row);
-                if (LCcell != null) { DoUndo(LCcell.Column, LCcell.Row); }
-                return;
-            }
+            //if (column.Format == enDataFormat.LinkedCell)
+            //{
+            //    var LCcell = CellCollection.LinkedCellData(column, row);
+            //    if (LCcell != null) { DoUndo(LCcell.Column, LCcell.Row); }
+            //    return;
+            //}
 
-            var CellKey = CellCollection.KeyOfCell(column, row);
+            var CellKey = CellCollection.KeyOfCell(cell.Column, cell.Row);
 
-            var i = UndoItems(CellKey);
+            var i = UndoItems(cell.Database, CellKey);
 
             if (i.Count < 1)
             {
@@ -4000,14 +4005,22 @@ namespace BlueControls.Controls
             if (v[0] == "Cancel") { return; } // =Aktueller Eintrag angeklickt
 
 
+            cell.Set(v[0].Substring(5), false);
+            //  Database.Cell.Set(column, row, v[0].Substring(5), false);
 
-            Database.Cell.Set(column, row, v[0].Substring(5), false);
-            row.DoAutomatic(true, true);
+            cell.Row.DoAutomatic(true, true);
+
+            if (cell.RowReal != cell.Row)
+            {
+                cell.RowReal.DoAutomatic(true, true);
+            }
+
+
         }
 
 
 
-        public ItemCollectionList UndoItems(string CellKey)
+        public static ItemCollectionList UndoItems(Database _Database, string CellKey)
         {
             var i = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu)
             {
@@ -4025,7 +4038,7 @@ namespace BlueControls.Controls
             var co = 0;
 
 
-            for (var z = _Database.Works.Count - 1 ; z >= 0 ; z--)
+            for (var z = _Database.Works.Count - 1; z >= 0; z--)
             {
 
                 if (_Database.Works[z].CellKey == CellKey && _Database.Works[z].HistorischRelevant)
@@ -4134,19 +4147,22 @@ namespace BlueControls.Controls
 
 
 
-                var ContentHolderCell = column.Database.Cell[column, row];
+                CellItem ContentHolderCell = null;
+                if (!CellCollection.IsNullOrEmpty(column,row))
+                {
+                    ContentHolderCell = column.Database.Cell[column, row]; 
+                }
 
-
-                if (column.Format == enDataFormat.LinkedCell) { ContentHolderCell = CellCollection.LinkedCellData(column, row); }
+                //if (column.Format == enDataFormat.LinkedCell) { ContentHolderCell = CellCollection.LinkedCellData(column, row); }
 
 
                 var _Ist1 = string.Empty;
 
-                if (ContentHolderCell != null) { _Ist1 = ContentHolderCell.String; }
+                if (ContentHolderCell != null) { _Ist1 = ContentHolderCell.GetString(); }
 
 
 
-                if (ContentHolderCell.Column.Format == enDataFormat.Text_mit_Formatierung)
+                if (ContentHolderCell != null && ContentHolderCell.Column.Format == enDataFormat.Text_mit_Formatierung)
                 {
                     var l = new ExtText(enDesign.TextBox, enStates.Standard);
                     l.HtmlText = _Ist1;
@@ -4163,7 +4179,7 @@ namespace BlueControls.Controls
                 }
 
                 // Prüfung mit und ohne Ersetzungen / Prefix / Suffix
-                var _Ist2 = CellItem.ValuesReadable(ContentHolderCell.Column, ContentHolderCell.Row, enShortenStyle.Both).JoinWithCr();
+                var _Ist2 = ContentHolderCell.ValuesReadable(enShortenStyle.Both).JoinWithCr();
                 if (!string.IsNullOrEmpty(_Ist2) && _Ist2.ToLower().Contains(searchTXT.ToLower()))
                 {
                     foundColumn = column;
