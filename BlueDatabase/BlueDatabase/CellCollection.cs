@@ -89,7 +89,7 @@ namespace BlueDatabase
         {
             get
             {
-                return _cells[KeyOfCell(colum, row)];
+                return this[KeyOfCell(colum, row)];
             }
         }
 
@@ -1301,7 +1301,7 @@ namespace BlueDatabase
             e.Cell.Column._UcaseNamesSortedByLenght = null;
             CellValueChanged?.Invoke(this, e);
         }
-
+        
 
 
 

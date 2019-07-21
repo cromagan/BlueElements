@@ -33,7 +33,7 @@ namespace BlueControls.Forms
             private readonly Database Database;
             private readonly ColumnItem Col;
 
-            private bool RelationsValid;
+           // private bool RelationsValid;
 
 
             //   Dim ItS As New Size(60, 80)
@@ -121,7 +121,7 @@ namespace BlueControls.Forms
 
                 i2.InDenVordergrund();
 
-                RelationsValid = false;
+                //RelationsValid = false;
 
                 return i2;
             }

@@ -80,7 +80,7 @@ namespace BlueDatabase
 
 
         #region  Properties 
-        public int Key { get; }
+        public int Key { get; private set; }
 
         #endregion
 
@@ -450,6 +450,21 @@ namespace BlueDatabase
             {
                 Database.Cell.Set(Database.Column.SysRowChangeDate, this, DateTime.Now.ToString(), false);
             }
+        }
+
+        internal void ChangeKeyTo(int newKey)
+        {
+            if (newKey == Key) { return; }
+            var Ok = Key;
+
+            Key = newKey;
+            OnKeyChanged(Ok,newKey);
+
+        }
+
+        private void OnKeyChanged(int ok, int newKey)
+        {
+            KeyChanged?.Invoke(this, new KeyChangedEventArgs(ok, newKey));
         }
 
         public bool MatchesTo(FilterItem Filter)

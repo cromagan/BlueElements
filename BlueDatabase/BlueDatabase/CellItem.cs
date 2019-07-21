@@ -1033,6 +1033,7 @@ namespace BlueDatabase
         internal void OnValueChanged()
         {
             ValueChanged?.Invoke(this, System.EventArgs.Empty);
+            DatabaseReal.Cell.OnCellValueChanged(new CellEventArgs(this)); // TODO: Über Events korrekt lösen!!!!
         }
 
         private void _ColumnReal_KeyChanged(object sender, KeyChangedEventArgs e)

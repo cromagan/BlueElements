@@ -410,7 +410,7 @@ namespace BlueDatabase
 
 
 
-        public int Key { get; }
+        public int Key { get; private set; }
 
         public string I_Am_A_Key_For_Other_Column { get; private set; }
 
@@ -495,6 +495,21 @@ namespace BlueDatabase
                 Database.AddPending(enDatabaseDataType.co_EditType, this, ((int)_EditType).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
+        }
+
+        internal void ChangeKeyTo(int newKey)
+        {
+            if (newKey == Key) { return; }
+            var Ok = Key;
+
+            Key = newKey;
+            OnKeyChanged(Ok, newKey);
+
+        }
+
+        private void OnKeyChanged(int ok, int newKey)
+        {
+            KeyChanged?.Invoke(this, new KeyChangedEventArgs(ok, newKey));
         }
 
         public bool MultiLine

@@ -480,8 +480,6 @@ namespace BlueDatabase
         public event CancelEventHandler Exporting;
         public event EventHandler<DatabaseSettingsEventHandler> LoadingLinkedDatabase;
         public event CancelEventHandler Reloading;
-        public event EventHandler<KeyChangedEventArgs> RowKeyChanged;
-        public event EventHandler<KeyChangedEventArgs> ColumnKeyChanged;
         public event EventHandler<ProgressbarEventArgs> ProgressbarInfo;
 
         /// <summary>
@@ -3106,16 +3104,18 @@ namespace BlueDatabase
                     }
                 }
 
-                OnRowKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
+                Row.ChangeKey(OldKey, NewKey);
+
+               // OnRowKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
 
 
             }
         }
 
-        private void OnRowKeyChanged(KeyChangedEventArgs e)
-        {
-            RowKeyChanged?.Invoke(this, e);
-        }
+        //private void OnRowKeyChanged(KeyChangedEventArgs e)
+        //{
+        //    RowKeyChanged?.Invoke(this, e);
+        //}
 
 
 
@@ -3164,15 +3164,16 @@ namespace BlueDatabase
 
                 }
 
-                OnColumnKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
+                Column.ChangeKey(OldKey, NewKey);
+               // OnColumnKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
 
             }
         }
 
-        private void OnColumnKeyChanged(KeyChangedEventArgs e)
-        {
-            ColumnKeyChanged?.Invoke(this, e);
-        }
+        //private void OnColumnKeyChanged(KeyChangedEventArgs e)
+        //{
+        //    ColumnKeyChanged?.Invoke(this, e);
+        //}
 
 
 

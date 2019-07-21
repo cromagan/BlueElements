@@ -53,6 +53,8 @@ namespace BlueDatabase
         public event EventHandler RowRemoved;
 
         public event EventHandler<RowEventArgs> RowAdded;
+
+        public event EventHandler<KeyChangedEventArgs> KeyChanged;
         #endregion
 
 
@@ -143,6 +145,8 @@ namespace BlueDatabase
 
             var e = SearchByKey(Key);
             if (e == null) { return; }
+
+            e.KeyChanged -= Row_KeyChanged;
 
             OnRowRemoving(new RowEventArgs(e));
             foreach (var ThisColumnItem in Database.Column)
@@ -238,7 +242,20 @@ namespace BlueDatabase
             if (!_Internal.TryAdd(Row.Key, Row)) { Develop.DebugPrint(enFehlerArt.Fehler, "Add Failed"); }
 
             OnRowAdded(new RowEventArgs(Row));
+
+            Row.KeyChanged += Row_KeyChanged;
+
             return Row;
+        }
+
+        private void Row_KeyChanged(object sender, KeyChangedEventArgs e)
+        {
+            OnKeyChanged(new KeyChangedEventArgs(e.KeyOld, e.KeyNew));
+        }
+
+        private void OnKeyChanged(KeyChangedEventArgs e)
+        {
+            KeyChanged?.Invoke(this, e);
         }
 
         private void OnRowChecked(object sender, RowCheckedEventArgs e)
@@ -451,7 +468,7 @@ namespace BlueDatabase
             }
             else
             {
-                for (var z = TMP.Count - 1; z > -1; z--)
+                for (var z = TMP.Count - 1 ; z > -1 ; z--)
                 {
                     if (!string.IsNullOrEmpty(TMP[z]))
                     {
@@ -476,6 +493,16 @@ namespace BlueDatabase
                 }
             }
             return l;
+        }
+
+        internal void ChangeKey(int oldKey, int newKey)
+        {
+
+            foreach (var ThisRowItem in this)
+            {
+                if (ThisRowItem.Key == oldKey) { ThisRowItem.ChangeKeyTo(newKey); }
+            }
+
         }
     }
 }
