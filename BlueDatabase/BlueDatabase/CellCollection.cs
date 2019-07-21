@@ -93,6 +93,22 @@ namespace BlueDatabase
             }
         }
 
+
+        public CellItem this[string cellkey]
+        {
+            get
+            {
+                if (!_cells.ContainsKey(cellkey))
+                {
+                    DataOfCellKey(cellkey, out var column, out var row);
+                    var c = new CellItem(column, row);
+                    _cells.Add(cellkey, c);
+                }
+                return _cells[cellkey];
+            }
+        }
+
+
         /// <summary>
         ///  Gibt zurück, ob die Zelle bearbeitet werden kann.
         ///  Optional zusätzlich mit den Dateirechten.
@@ -117,7 +133,7 @@ namespace BlueDatabase
         public static string UserEditErrorReason(ColumnItem Column, RowItem Row, bool DateiRechtePrüfen)
         {
 
-            if (IsNullOrEmpty(Column, Row))
+            if (!IsNullOrEmpty(Column, Row))
             {
                 var c = Column.Database.Cell[Column, Row];
 
@@ -179,19 +195,6 @@ namespace BlueDatabase
         }
 
 
-        public CellItem this[string cellkey]
-        {
-            get
-            {
-                if (!_cells.ContainsKey(cellkey))
-                {
-                    DataOfCellKey(cellkey, out var column, out var row);
-                    var c = new CellItem(column, row);
-                    _cells.Add(cellkey, c);
-                }
-                return _cells[cellkey];
-            }
-        }
 
         public bool Freezed { get; private set; }
 

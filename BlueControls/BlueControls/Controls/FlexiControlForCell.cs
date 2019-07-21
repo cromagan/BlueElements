@@ -82,7 +82,16 @@ namespace BlueControls.Controls
             }
             set
             {
+                if (value == _ColKey) { return; }
+                FillCellNow();
+
+                _IsFilling = true;
+                _ColKey = value;
                 GetTmpVariables();
+                UpdateColumnData();
+                SetValueFromCell();
+                CheckEnabledState();
+                _IsFilling = false;
             }
         }
 
@@ -106,6 +115,7 @@ namespace BlueControls.Controls
                     _Database.Row.RowChecked -= Database_RowChecked;
                 }
 
+                _Database = value;
                 GetTmpVariables();
                 UpdateColumnData();
 
@@ -232,6 +242,7 @@ namespace BlueControls.Controls
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Size = new Size(300, 300);
+            CaptionPosition = captionPosition;
             Database = database;
             ColumnKey = columnKey;
         }
@@ -693,13 +704,15 @@ namespace BlueControls.Controls
         /// </summary>
         private void DoEasyPicValueChanged()
         {
+
+            if (_tmpCell == null) { return; }
+
             foreach (System.Windows.Forms.Control ThisControl in Controls)
             {
 
                 if (ThisControl is EasyPic Control)
                 {
 
-                    if (_tmpCell == null) { Develop.DebugPrint_NichtImplementiert(); }
                     if (_tmpColumn.Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
 
 

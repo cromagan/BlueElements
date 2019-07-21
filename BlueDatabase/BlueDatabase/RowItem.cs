@@ -434,22 +434,22 @@ namespace BlueDatabase
             if (Key < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Key < 0"); }
 
 
-            if (CellIsNullOrEmpty(Database.Column.SysLocked))
-            {
-                Database.Cell.Set(Database.Column.SysLocked, this, false.ToPlusMinus(), false);
-            }
+            //if (CellIsNullOrEmpty(Database.Column.SysLocked))
+            //{
+            //    Database.Cell.Set(Database.Column.SysLocked, this, false.ToPlusMinus(), false);
+            //}
 
 
-            if (CellIsNullOrEmpty(Database.Column.SysCorrect))
-            {
-                Database.Cell.Set(Database.Column.SysCorrect, this, true.ToPlusMinus(), false);
-            }
+            //if (CellIsNullOrEmpty(Database.Column.SysCorrect))
+            //{
+            //    Database.Cell.Set(Database.Column.SysCorrect, this, true.ToPlusMinus(), false);
+            //}
 
 
-            if (CellIsNullOrEmpty(Database.Column.SysRowChangeDate))
-            {
-                Database.Cell.Set(Database.Column.SysRowChangeDate, this, DateTime.Now.ToString(), false);
-            }
+            //if (CellIsNullOrEmpty(Database.Column.SysRowChangeDate))
+            //{
+            //    Database.Cell.Set(Database.Column.SysRowChangeDate, this, DateTime.Now.ToString(), false);
+            //}
         }
 
         internal void ChangeKeyTo(int newKey)

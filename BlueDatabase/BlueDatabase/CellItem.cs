@@ -44,8 +44,9 @@ namespace BlueDatabase
 
         internal CellItem(ColumnItem column, RowItem row)
         {
-            _RowReal = row;
-            _ColumnReal = column;
+            RowReal = row;
+            ColumnReal = column;
+            GetLinkedData();
         }
         #endregion
 
@@ -241,8 +242,8 @@ namespace BlueDatabase
             DatabaseReal.Cell.DoSpecialFormats(ColumnReal, RowReal.Key, OldValue, freezedMode, false);
 
 
-            DatabaseReal.Cell.Set(Database.Column.SysRowChanger, Row, Database.UserName, freezedMode);
-            DatabaseReal.Cell.Set(Database.Column.SysRowChangeDate, Row, DateTime.Now.ToString(), freezedMode);
+            if (Database.Column.SysRowChanger.SaveContent) { DatabaseReal.Cell.Set(Database.Column.SysRowChanger, Row, Database.UserName, freezedMode); }
+            if (Database.Column.SysRowChangeDate.SaveContent) { DatabaseReal.Cell.Set(Database.Column.SysRowChangeDate, Row, DateTime.Now.ToString(), freezedMode); }
 
 
 

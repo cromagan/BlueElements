@@ -97,7 +97,6 @@
     <Compile Include="Enums\enÜberschriftAnordnung.cs" />
     <Compile Include="EventArgs\BeforeNewValueEventArgs.cs" />
     <Compile Include="EventArgs\CellCancelEventArgs.cs" />
-    <Compile Include="EventArgs\CellDoubleClickEventArgs.cs" />
     <Compile Include="EventArgs\CellEventArgs.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="EventArgs\DatabaseSettingsEventHandler.cs" />

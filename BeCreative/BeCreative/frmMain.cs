@@ -112,7 +112,7 @@ namespace BeCreative
         private void TableView_CursorPosChanged(object sender, CellEventArgs e)
         {
 
-            if (e.Cell.ColumnReal == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Cell.RowReal == null)
+            if (e.Cell == null || e.Cell.ColumnReal == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Cell.RowReal == null)
             {
                 BlueFormulax.ShowingRowKey = -1;
             }
@@ -806,50 +806,49 @@ namespace BeCreative
 
         private void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e)
         {
-            var CellKey = string.Empty;
-            if (e.Tag is string s) { CellKey = s; }
-            if (string.IsNullOrEmpty(CellKey)) { return; }
 
+            var l = (List<object>)e.Tag;
+            var column = (ColumnItem)l[0];
+            var row = (RowItem)l[1];
 
-            var cell = TableView.Database.Cell[CellKey];
 
             if (_Ansicht != enAnsicht.Überschriften_und_Formular)
             {
 
                 e.UserMenu.Add(new TextListItem(true, "Sortierung"));
-                e.UserMenu.Add(enContextMenuComands.SpaltenSortierungAZ, cell.Column != null && cell.Column.Format.CanBeChangedByRules());
-                e.UserMenu.Add(enContextMenuComands.SpaltenSortierungZA, cell.Column != null && cell.Column.Format.CanBeChangedByRules());
+                e.UserMenu.Add(enContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeChangedByRules());
+                e.UserMenu.Add(enContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeChangedByRules());
 
                 e.UserMenu.Add(new LineListItem());
 
 
                 e.UserMenu.Add(new TextListItem(true, "Zelle"));
-                e.UserMenu.Add(new TextListItem("ContentCopy", "Inhalt Kopieren", enImageCode.Kopieren, cell.Column != null && cell.Column.Format.CanBeChangedByRules()));
-                e.UserMenu.Add(new TextListItem("ContentPaste", "Inhalt Einfügen", enImageCode.Clipboard, cell.Column != null && cell.Column.Format.CanBeChangedByRules()));
+                e.UserMenu.Add(new TextListItem("ContentCopy", "Inhalt Kopieren", enImageCode.Kopieren, column != null && column.Format.CanBeChangedByRules()));
+                e.UserMenu.Add(new TextListItem("ContentPaste", "Inhalt Einfügen", enImageCode.Clipboard, column != null && column.Format.CanBeChangedByRules()));
 
-                e.UserMenu.Add(new TextListItem("ContentDelete", "Inhalt löschen", enImageCode.Radiergummi, cell.Column != null && cell.Column.Format.CanBeChangedByRules()));
-                e.UserMenu.Add(enContextMenuComands.VorherigenInhaltWiederherstellen, cell.Column != null && cell.Column.Format.CanBeChangedByRules() && cell.Column.ShowUndo);
+                e.UserMenu.Add(new TextListItem("ContentDelete", "Inhalt löschen", enImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules()));
+                e.UserMenu.Add(enContextMenuComands.VorherigenInhaltWiederherstellen, column != null && column.Format.CanBeChangedByRules() && column.ShowUndo);
 
-                e.UserMenu.Add(enContextMenuComands.SuchenUndErsetzen, cell.Column != null && cell.Column.Format.CanBeChangedByRules());
+                e.UserMenu.Add(enContextMenuComands.SuchenUndErsetzen, column != null && column.Format.CanBeChangedByRules());
 
                 e.UserMenu.Add(new LineListItem());
 
                 e.UserMenu.Add(new TextListItem(true, "Spalte"));
-                e.UserMenu.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten, cell.Column != null);
+                e.UserMenu.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten, column != null);
 
-                e.UserMenu.Add(new TextListItem("ColumnContentDelete", "Inhalte aller angezeigten Zellen dieser Spalte löschen", enImageCode.Radiergummi, cell.Column != null && cell.Column.Format.CanBeChangedByRules()));
+                e.UserMenu.Add(new TextListItem("ColumnContentDelete", "Inhalte aller angezeigten Zellen dieser Spalte löschen", enImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules()));
 
-                e.UserMenu.Add(new TextListItem("Summe", "Summe", enImageCode.Summe, cell.Column != null));
+                e.UserMenu.Add(new TextListItem("Summe", "Summe", enImageCode.Summe, column != null));
 
 
                 e.UserMenu.Add(new LineListItem());
 
             }
             e.UserMenu.Add(new TextListItem(true, "Zeile"));
-            e.UserMenu.Add(enContextMenuComands.ZeileLöschen, cell.RowReal != null);
+            e.UserMenu.Add(enContextMenuComands.ZeileLöschen, row != null);
 
 
-            e.UserMenu.Add(new TextListItem("Fehlersuche", "Fehler anzeigen", enImageCode.Kritisch, cell.RowReal != null));
+            e.UserMenu.Add(new TextListItem("Fehlersuche", "Fehler anzeigen", enImageCode.Kritisch, row != null));
 
 
         }
@@ -861,48 +860,49 @@ namespace BeCreative
 
             var bt = (Table)sender;
 
-            var CellKey = string.Empty;
-            if (e.Tag is string s) { CellKey = s; }
-            if (string.IsNullOrEmpty(CellKey)) { return; }
-            var cell = TableView.Database.Cell[CellKey];
+            var l = (List<object>)e.Tag;
+            var column = (ColumnItem)l[0];
+            var row = (RowItem)l[1];
+
+            var ce = bt.Database.Cell[column, row];
 
 
             switch (e.ClickedComand.Internal())
             {
 
                 case "SpaltenSortierungAZ":
-                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, cell.ColumnReal.Name, false);
+                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, column.Name, false);
                     break;
 
                 case "SpaltenSortierungZA":
-                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, cell.ColumnReal.Name, true);
+                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, column.Name, true);
                     break;
 
                 case "Fehlersuche":
-                    MessageBox.Show(cell.RowReal.DoAutomatic(true, true));
+                    MessageBox.Show(row.DoAutomatic(true, true));
                     break;
 
                 case "ZeileLöschen":
-                    if (cell.RowReal != null)
+                    if (row != null)
                     {
                         if (MessageBox.Show("Zeile löschen?", enImageCode.Frage, "Ja", "Nein") == 0)
                         {
-                            bt.Database.Row.Remove(cell.RowReal);
+                            bt.Database.Row.Remove(row);
                         }
                     }
                     break;
 
                 case "ContentDelete":
-                    TableView.Database.Cell.Delete(cell.Column, cell.Row.Key);
+                    TableView.Database.Cell.Delete(column, row.Key);
                     break;
 
                 case "SpaltenEigenschaftenBearbeiten":
-                    tabAdministration.OpenColumnEditor(cell.ColumnReal);
+                    tabAdministration.OpenColumnEditor(column);
                     CheckButtons();
                     break;
 
                 case "ContentCopy":
-                    Table.CopyToClipboard(cell, true);
+                    Table.CopyToClipboard(ce, true);
                     break;
 
                 case "SuchenUndErsetzen":
@@ -914,7 +914,7 @@ namespace BeCreative
                     break;
 
                 case "Summe":
-                    var summe = cell.ColumnReal.Summe(TableView.Filter);
+                    var summe = column.Summe(TableView.Filter);
                     if (!summe.HasValue)
                     {
                         MessageBox.Show("Die Summe konnte nicht berechnet werden.", enImageCode.Summe, "OK");
@@ -926,20 +926,20 @@ namespace BeCreative
                     break;
 
                 case "VorherigenInhaltWiederherstellen":
-                    TableView.DoUndo(cell);
+                    TableView.DoUndo(ce);
                     break;
 
                 case "ContentPaste":
                     //     bt.Database.BeginnEdit()
-                    cell.Set( Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text)));
+                    ce.Set(Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text)));
                     break;
 
                 case "ColumnContentDelete":
-                    if (cell.ColumnReal != null)
+                    if (column != null)
                     {
                         if (MessageBox.Show("Angezeite Inhalt dieser Spalte löschen?", enImageCode.Frage, "Ja", "Nein") == 0)
                         {
-                            cell.ColumnReal.DeleteContents(TableView.Filter);
+                            column.DeleteContents(TableView.Filter);
                         }
                     }
 

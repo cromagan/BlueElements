@@ -17,19 +17,25 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueDatabase.EventArgs
+using BlueDatabase;
+
+namespace BlueControls.EventArgs
 {
-    public class CellDoubleClickEventArgs : CellEventArgs
+    public class TableDoubleClickEventArgs : System.EventArgs
     {
 
 
-        public CellDoubleClickEventArgs(CellItem Cell, bool StartEdit) : base(Cell)
+        public TableDoubleClickEventArgs(ColumnItem column, RowItem row, bool startEdit)
         {
-            this.StartEdit = StartEdit;
-
+            this.StartEdit = startEdit;
+            this.Row = row;
+            this.Column = column;
         }
 
         public bool StartEdit { get; set; }
+        public RowItem Row { get; set; }
+        public ColumnItem Column { get; set; }
+
 
     }
 }
