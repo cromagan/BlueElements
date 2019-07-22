@@ -262,6 +262,76 @@ namespace BlueDatabase
 
         #endregion
 
+        #region Get/Set DateTime
+
+
+        public DateTime CellGetDate(string columnName)
+        {
+            return Database.Cell.GetDate(Database.Column[columnName], this);
+        }
+
+        public DateTime CellGetDate(ColumnItem column)
+        {
+            return Database.Cell.GetDate(column, this);
+        }
+
+        public void CellSet(string columnName, DateTime value)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, false);
+        }
+
+        public void CellSet(string columnName, DateTime value, bool freezeMode)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
+        }
+
+        public void CellSet(ColumnItem column, DateTime value)
+        {
+            Database.Cell.Set(column, this, value, false);
+        }
+
+        public void CellSet(ColumnItem column, DateTime value, bool freezeMode)
+        {
+            Database.Cell.Set(column, this, value, freezeMode);
+        }
+
+        #endregion
+
+        #region Get/Set Point
+
+
+        public Point CellGetPoint(string columnName)
+        {
+            return Database.Cell.GetPoint(Database.Column[columnName], this);
+        }
+
+        public Point CellGetPoint(ColumnItem column)
+        {
+            return Database.Cell.GetPoint(column, this);
+        }
+
+        public void CellSet(string columnName, Point value)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, false);
+        }
+
+        public void CellSet(string columnName, Point value, bool freezeMode)
+        {
+            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
+        }
+
+        public void CellSet(ColumnItem column, Point value)
+        {
+            Database.Cell.Set(column, this, value, false);
+        }
+
+        public void CellSet(ColumnItem column, Point value, bool freezeMode)
+        {
+            Database.Cell.Set(column, this, value, freezeMode);
+        }
+
+        #endregion
+
         #endregion
 
 

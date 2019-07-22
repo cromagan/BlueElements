@@ -149,6 +149,7 @@ namespace BlueDatabase
 
 
         #region  Event-Deklarationen + Delegaten 
+        public event EventHandler LinkDataChanged;
         public event EventHandler Changed;
         public event EventHandler<KeyChangedEventArgs> KeyChanged;
         #endregion
@@ -727,7 +728,9 @@ namespace BlueDatabase
         }
 
 
-
+        /// <summary>
+        /// Wenn auf eine exteren Datenbank verweisen wird, ist hier das Dateiname zu finden.
+        /// </summary>
         public string LinkedDatabaseFile
         {
             get
@@ -740,10 +743,14 @@ namespace BlueDatabase
                 Database.AddPending(enDatabaseDataType.co_LinkedDatabase, this, _LinkedDatabaseFile, value, true);
                 Invalidate_TmpVariables();
                 OnChanged();
+                OnLinkDataChanged();
             }
         }
 
 
+        /// <summary>
+        /// Bei Dropdownmenu-Spalten fremde Datenbankn werden Spalten mit mit diesem Anfang benutzt.
+        /// </summary>
         public string LinkedKeyKennung
         {
             get
@@ -755,6 +762,7 @@ namespace BlueDatabase
                 if (_LinkedKeyKennung == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkKeyKennung, this, _LinkedKeyKennung, value, true);
                 OnChanged();
+                OnLinkDataChanged();
             }
         }
 
@@ -834,6 +842,9 @@ namespace BlueDatabase
         }
 
 
+        /// <summary>
+        /// Was mit Zellen in der Ziel-Datenbank passieren soll, wenn diese in der Verlinkten Dankenbank nicht vorhanden ist.
+        /// </summary>
         public enFehlendesZiel LinkedCell_Behaviour
         {
             get
@@ -845,6 +856,7 @@ namespace BlueDatabase
                 if (_LinkedCell_Behaviour == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_Behaviour, this, ((int)_LinkedCell_Behaviour).ToString(), ((int)value).ToString(), true);
                 OnChanged();
+                OnLinkDataChanged();
             }
         }
 
@@ -1070,6 +1082,10 @@ namespace BlueDatabase
             }
         }
 
+
+        /// <summary>
+        /// Welche Zeichen automatisch entfernt werden bei Zelleninhaltsbearbeitungen.
+        /// </summary>
         public string AutoRemove
         {
             get
@@ -1128,6 +1144,9 @@ namespace BlueDatabase
         }
 
 
+        /// <summary>
+        /// Die zu suchende Zeile ist in dieser Spalte zu finden.
+        /// </summary>
         public int LinkedCell_RowKey
         {
             get
@@ -1140,10 +1159,14 @@ namespace BlueDatabase
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_RowKey, this, _LinkedCell_RowKey.ToString(), value.ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
+                OnLinkDataChanged();
             }
         }
 
 
+        /// <summary>
+        /// Die Quell-Spalte (aus der verlinkten Datenbank) ist immer:
+        /// </summary>
         public int LinkedCell_ColumnKey
         {
             get
@@ -1156,9 +1179,14 @@ namespace BlueDatabase
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnKey, this, _LinkedCell_ColumnKey.ToString(), value.ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
+                OnLinkDataChanged();
             }
         }
 
+
+        /// <summary>
+        /// Die zu suchende Spalte (aus der verlinkten Datenbank) ist in dieser Spalte zu finden:
+        /// </summary>
         public int LinkedCell_ColumnValueFoundIn
         {
             get
@@ -1171,9 +1199,14 @@ namespace BlueDatabase
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, this, _LinkedCell_ColumnValueFoundIn.ToString(), value.ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
+                OnLinkDataChanged();
             }
         }
 
+
+        /// <summary>
+        /// Der zu suchenden Spalte wird diese Zeichenkette vorangestellt
+        /// </summary>
         public string LinkedCell_ColumnValueAdd
         {
             get
@@ -1186,6 +1219,7 @@ namespace BlueDatabase
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnValueAdd, this, _LinkedCell_ColumnValueAdd, value, true);
                 Invalidate_ColumAndContent();
                 OnChanged();
+                OnLinkDataChanged();
             }
         }
 
@@ -1306,6 +1340,8 @@ namespace BlueDatabase
                 Database.AddPending(enDatabaseDataType.co_Format, this, ((int)_Format).ToString(), ((int)value).ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
+                if (_Format == enDataFormat.LinkedCell) { OnLinkDataChanged(); }
+
             }
         }
 
@@ -1476,6 +1512,11 @@ namespace BlueDatabase
         }
 
 
+
+        public void OnLinkDataChanged()
+        {
+            LinkDataChanged?.Invoke(this, System.EventArgs.Empty);
+        }
         public void OnChanged()
         {
             Changed?.Invoke(this, System.EventArgs.Empty);

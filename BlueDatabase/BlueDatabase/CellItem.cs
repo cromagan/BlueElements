@@ -36,17 +36,21 @@ namespace BlueDatabase
     public class CellItem
     {
         string _value = string.Empty;
-        RowItem _RowReal = null;
-        ColumnItem _ColumnReal = null;
+        RowItem _Row = null;
+        ColumnItem _Column = null;
+
+        Database _OldLinkedDatabase = null;
 
 
         #region Konstruktor
 
         internal CellItem(ColumnItem column, RowItem row)
         {
-            RowReal = row;
-            ColumnReal = column;
-            GetLinkedData();
+            if (row == null || column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Ungültige Angaben"); }
+
+            Row = row;
+            Column = column;
+            GetLinkedData(false);
         }
         #endregion
 
@@ -62,73 +66,73 @@ namespace BlueDatabase
 
         public Size Size { get; set; }
 
-        public ColumnItem ColumnReal
+        public ColumnItem Column
         {
             get
             {
-                return _ColumnReal;
+                return _Column;
             }
             private set
             {
-                if (_ColumnReal == value) { return; }
+                if (_Column == value) { return; }
 
-                if (_ColumnReal != null)
+                if (_Column != null)
                 {
-                    _ColumnReal.KeyChanged -= _ColumnReal_KeyChanged;
+                    _Column.KeyChanged -= _ColumnReal_KeyChanged;
+                    _Column.LinkDataChanged -= _ColumnReal_LinkDataChanged;
+
                 }
 
-                _ColumnReal = value;
+                _Column = value;
 
-                if (_ColumnReal != null)
+                if (_Column != null)
                 {
-                    _ColumnReal.KeyChanged += _ColumnReal_KeyChanged;
+                    _Column.KeyChanged += _ColumnReal_KeyChanged;
+                    _Column.LinkDataChanged += _ColumnReal_LinkDataChanged;
                 }
 
             }
         }
 
 
-
-        public RowItem RowReal
+        public RowItem Row
         {
             get
             {
-                return _RowReal;
+                return _Row;
             }
             private set
             {
-                if (_RowReal == value) { return; }
+                if (_Row == value) { return; }
 
-                if (_RowReal != null)
+                if (_Row != null)
                 {
-                    _RowReal.KeyChanged -= _RowReal_KeyChanged;
+                    _Row.KeyChanged -= _RowReal_KeyChanged;
                 }
 
-                _RowReal = value;
+                _Row = value;
 
-                if (_RowReal != null)
+                if (_Row != null)
                 {
-                    _RowReal.KeyChanged += _RowReal_KeyChanged;
+                    _Row.KeyChanged += _RowReal_KeyChanged;
                 }
 
 
             }
         }
-        public Database DatabaseReal
+
+
+
+        public Database Database
         {
             get
             {
-                return _ColumnReal.Database;
+                return _Column.Database;
             }
         }
 
-        //public ColumnItem ColumnLinked { get; private set; }
 
-
-        /// <summary>
-        /// Enthält die verlinkte Zelle. Falls das Form keine Verlinkung ist, wird 'this' zurückgegeben.
-        /// </summary>
-        private CellItem CellLinked { get; set; }
+        public CellItem CellLinked { get; private set; }
 
 
         //public Color BackColor { get; set; }
@@ -139,68 +143,35 @@ namespace BlueDatabase
         //public byte Symbol { get; set; }
 
 
-        /// <summary>
-        /// Gibt bevorzugt die verlinkte Spalte zurück. Falls es keine verlinkte Zelle ist, die unverlinkte Spalte.
-        /// </summary>
-        public ColumnItem Column
-        {
-            get
-            {
-                if (CellLinked == null) { return null; ; }
-                return CellLinked.ColumnReal;
-            }
 
+
+
+        private void _ColumnReal_LinkDataChanged(object sender, System.EventArgs e)
+        {
+            if (Column.Format != enDataFormat.LinkedCell) { return; }
+            GetLinkedData(true);
         }
 
-        /// <summary>
-        /// Gibt bevorzugt die verlinkte Zeile zurück. Falls es keine verlinkte Zelle ist, die unverlinkte Zeile.
-        /// </summary>
-        public RowItem Row
+        private void LinkedDB_Cell_CellRemoved(object sender, CellKeyEventArgs e)
         {
-            get
+            if (Column.Format != enDataFormat.LinkedCell) { return; }
+            if (e.CellKey == GetString())
             {
-                if (CellLinked == null) { return null; ; }
-                return CellLinked.RowReal;
-            }
-
-        }
-
-        /// <summary>
-        /// Gibt bevorzugt die verlinkte Datenbank zurück. Falls es keine verlinkte Zelle ist, die unverlinkte Datenbank.
-        /// </summary>
-        public Database Database
-        {
-            get
-            {
-                if (CellLinked == null) { return null; }
-                return CellLinked.DatabaseReal;
+                GetLinkedData(true);
             }
 
         }
 
 
-
-
-
-        /// <summary>
-        /// Wird nur im Ausnahmefall benutzt, wenn z.B: die Koordinaten der verlinkung gespeichert werden müssen.
-        /// </summary>
-        public string GetStringReal()
+        private void LinkedDB_Cell_CellAdded(object sender, CellEventArgs e)
         {
+            if (Column.Format != enDataFormat.LinkedCell) { return; }
 
-            return _value;
+            if (string.IsNullOrEmpty(GetString()))
+            {
+                GetLinkedData(true);
+            }
         }
-
-        public void SetReal(string value, bool freezeMode)
-        {
-            if (_value == value) { return; }
-            Database.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, ColumnReal.Key, RowReal.Key, _value, value, false, freezeMode);
-            _value = value;
-            GetLinkedData();
-            OnValueChanged();
-        }
-
-
 
 
         #region +++ Get / Set +++
@@ -212,8 +183,13 @@ namespace BlueDatabase
         /// </summary>
         public string GetString()
         {
-            if (CellLinked == null) { return string.Empty; }
-            return CellLinked.GetStringReal();
+            if (Column.Format == enDataFormat.LinkedCell)
+            {
+                if (CellLinked != null) { return CellLinked.GetString(); }
+                return string.Empty;
+            }
+
+            return _value;
         }
         public void Set(string Value)
         {
@@ -223,9 +199,16 @@ namespace BlueDatabase
         public void Set(string value, bool freezedMode)
         {
 
-            var OldValue = GetStringReal();
+            if (Column.Format == enDataFormat.LinkedCell)
+            {
+                CellLinked.Set(value);
+                return;
+            }
 
-            value = ColumnReal.AutoCorrect(value);
+
+            var OldValue = _value;
+
+            value = Column.AutoCorrect(value);
 
             //    var CellKey = KeyOfCell(Column.Key, Row.Key);
             //    var OldValue = string.Empty;
@@ -234,24 +217,20 @@ namespace BlueDatabase
 
             if (value == OldValue) { return; }
 
-            DatabaseReal.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, ColumnReal.Key, RowReal.Key, OldValue, value, true, freezedMode);
-            GetLinkedData();
-
-            ColumnReal._UcaseNamesSortedByLenght = null;
-
-            DatabaseReal.Cell.DoSpecialFormats(ColumnReal, RowReal.Key, OldValue, freezedMode, false);
+            Database.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, Column.Key, Row.Key, OldValue, value, true, freezedMode);
 
 
-            if (Database.Column.SysRowChanger.SaveContent) { DatabaseReal.Cell.Set(Database.Column.SysRowChanger, Row, Database.UserName, freezedMode); }
-            if (Database.Column.SysRowChangeDate.SaveContent) { DatabaseReal.Cell.Set(Database.Column.SysRowChangeDate, Row, DateTime.Now.ToString(), freezedMode); }
+            GetLinkedData(true);
+
+            Column._UcaseNamesSortedByLenght = null;
+
+            Database.Cell.DoSpecialFormats(Column, Row.Key, OldValue, freezedMode, false);
 
 
+            if (Database.Column.SysRowChanger.SaveContent) { Database.Cell.Set(Database.Column.SysRowChanger, Row, Database.UserName, freezedMode); }
+            if (Database.Column.SysRowChangeDate.SaveContent) { Database.Cell.Set(Database.Column.SysRowChangeDate, Row, DateTime.Now.ToString(), freezedMode); }
 
-            if (CellLinked == null)
-            {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Keine verlinkte Zelle");
-                return;
-            }
+
 
 
 
@@ -488,39 +467,71 @@ namespace BlueDatabase
         #endregion
 
 
-        public static List<string> ValuesReadable(ColumnItem column, RowItem row, enShortenStyle style)
+        //public static List<string> ValuesReadable(ColumnItem column, RowItem row, enShortenStyle style)
+        //{
+        //    if (CellCollection.IsNullOrEmpty(column, row)) { return null; }
+
+        //    //return ValuesReadable(Column, Row, style);
+
+        //    return column.Database.Cell[column, row].ValuesReadable(style);
+        //}
+
+
+
+        private void GetLinkedData(bool SearchIndex)
         {
-            if (CellCollection.IsNullOrEmpty(column, row)) { return null; }
-
-            //return ValuesReadable(Column, Row, style);
-
-            return column.Database.Cell[column, row].ValuesReadable(style);
-        }
-
-
-
-        private void GetLinkedData()
-        {
-            CellLinked = this;
-
-
-            if (ColumnReal.Format != enDataFormat.LinkedCell) { return; }
-
-            var LinkedDatabase = ColumnReal.LinkedDatabase();
-            if (LinkedDatabase == null)
-            {
-                CellLinked = null;
-                return;
-            }
-
 
             if (CellLinked != null)
             {
                 CellLinked.ValueChanged -= CellLinked_ValueChanged;
                 CellLinked.KeyChanged -= CellLinked_KeyChanged;
             }
+            if (_OldLinkedDatabase != null)
+            {
+                _OldLinkedDatabase.Cell.CellAdded -= LinkedDB_Cell_CellAdded;
+                _OldLinkedDatabase.Cell.CellRemoved -= LinkedDB_Cell_CellRemoved;
+            }
 
-            CellLinked = LinkedDatabase.Cell[_value];
+
+
+            CellLinked = null;
+            _OldLinkedDatabase = null;
+
+
+            if (Column.Format == enDataFormat.LinkedCell)
+            {
+                _OldLinkedDatabase = Column.LinkedDatabase();
+                if (_OldLinkedDatabase == null)
+                {
+                    return;
+                }
+                else
+                {
+                    _OldLinkedDatabase.Cell.CellAdded += LinkedDB_Cell_CellAdded;
+                    _OldLinkedDatabase.Cell.CellRemoved += LinkedDB_Cell_CellRemoved;
+                }
+
+
+                if (SearchIndex)
+                {
+
+                    var oval = _value;
+
+                    _value = RepairLinkedCellValuex(false);
+
+                    if (!Database.IsParsing())
+                    {
+                        Database.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, Column.Key, Row.Key, oval, _value, false, false);
+                    }
+                }
+
+
+                if (!string.IsNullOrEmpty(_value))
+                {
+                    CellLinked = _OldLinkedDatabase.Cell[_value];
+                }
+            }
+
 
             if (CellLinked != null)
             {
@@ -542,14 +553,22 @@ namespace BlueDatabase
         /// <returns></returns>
         public List<string> ValuesReadable(enShortenStyle Style)
         {
+
+            if (Column.Format == enDataFormat.LinkedCell)
+            {
+                if (CellLinked != null) { return CellLinked.ValuesReadable(Style); }
+                return new List<string>();
+            }
+
+
             if (GetString() == null) { return new List<string>(); }
 
 
             var ret = new List<string>();
 
-            if (!CellLinked.ColumnReal.MultiLine)
+            if (!CellLinked.Column.MultiLine)
             {
-                ret.Add(ValueReadable(CellLinked.ColumnReal, CellLinked.GetString(), Style));
+                ret.Add(ValueReadable(CellLinked.Column, CellLinked.GetString(), Style));
                 return ret;
             }
 
@@ -582,10 +601,10 @@ namespace BlueDatabase
                 Size = Size.Empty;
             }
 
-            ColumnReal = column;
-            RowReal = row;
-           // DatabaseReal = row.Database;
-            GetLinkedData();
+            Column = column;
+            Row = row;
+            // DatabaseReal = row.Database;
+            GetLinkedData(false);
         }
 
 
@@ -843,7 +862,7 @@ namespace BlueDatabase
 
         public string CellKeyReal()
         {
-            return CellCollection.KeyOfCell(ColumnReal, RowReal);
+            return CellCollection.KeyOfCell(Column, Row);
         }
 
         //public string GetString()
@@ -1015,36 +1034,37 @@ namespace BlueDatabase
         {
             InvalidateSize();
             OnValueChanged();
-
-
-            //Invalidate_TmpColumnContentWidth();
-            //Database.Cell.OnCellValueChanged(new CellEventArgs(this, ThisRow));
-            //ThisRow.DoAutomatic(true, false);
-
         }
 
 
         private void CellLinked_KeyChanged(object sender, CellKeyChangedEventArgs e)
         {
-            if (e.KeyNew != _value) { Develop.DebugPrint(enFehlerArt.Fehler, "Key Inkonstostentz"); }
-            SetReal(e.KeyNew, false);
+            if (e.KeyNew != _value) { Develop.DebugPrint(enFehlerArt.Fehler, "Key Inkonsistent"); }
+            GetLinkedData(true);
+            //            RepairLinkedCellValue(false);
+            //_value = e.KeyNew;
+
+            //SetReal(e.KeyNew, false);
         }
 
 
         internal void OnValueChanged()
         {
             ValueChanged?.Invoke(this, System.EventArgs.Empty);
-            DatabaseReal.Cell.OnCellValueChanged(new CellEventArgs(this)); // TODO: Über Events korrekt lösen!!!!
+            Database.Cell.OnCellValueChanged(new CellEventArgs(this)); // TODO: Über Events korrekt lösen!!!!
         }
 
         private void _ColumnReal_KeyChanged(object sender, KeyChangedEventArgs e)
         {
-            OnKeyChanged(CellCollection.KeyOfCell(e.KeyOld, _RowReal.Key));
+            OnKeyChanged(CellCollection.KeyOfCell(e.KeyOld, _Row.Key));
         }
         private void _RowReal_KeyChanged(object sender, KeyChangedEventArgs e)
         {
-            OnKeyChanged(CellCollection.KeyOfCell(_ColumnReal.Key, e.KeyOld));
+            OnKeyChanged(CellCollection.KeyOfCell(_Column.Key, e.KeyOld));
         }
+
+
+
 
         private void OnKeyChanged(string oldkey)
         {
@@ -1057,15 +1077,15 @@ namespace BlueDatabase
             //internal void SaveToByteList(List<byte> List, KeyValuePair<string, CellItem> vCell)
             //{
 
-            if (string.IsNullOrEmpty(GetStringReal())) { return; }
+            if (string.IsNullOrEmpty(GetString())) { return; }
 
 
-            if (!ColumnReal.SaveContent) { return; }
+            if (!Column.SaveContent) { return; }
 
-            var s = GetStringReal();
+            var s = GetString();
             var tx = enDatabaseDataType.ce_Value_withSizeData;
 
-            if (ColumnReal.Format.NeedUTF8())
+            if (Column.Format.NeedUTF8())
             {
                 s = modConverter.StringtoUTF8(s);
                 tx = enDatabaseDataType.ce_UTF8Value_withSizeData;
@@ -1073,12 +1093,12 @@ namespace BlueDatabase
 
             List.Add((byte)enRoutinen.CellFormat_OLD);
             List.Add((byte)tx);
-            Database.SaveToByteList(List, s.Length, 3);
-            Database.SaveToByteList(List, ColumnReal.Key, 3);
-            Database.SaveToByteList(List, RowReal.Key, 3);
+            BlueDatabase.Database.SaveToByteList(List, s.Length, 3);
+            BlueDatabase.Database.SaveToByteList(List, Column.Key, 3);
+            BlueDatabase.Database.SaveToByteList(List, Row.Key, 3);
             List.AddRange(s.ToByte());
-            Database.SaveToByteList(List, Size.Width, 2);
-            Database.SaveToByteList(List, Size.Height, 2);
+            BlueDatabase.Database.SaveToByteList(List, Size.Width, 2);
+            BlueDatabase.Database.SaveToByteList(List, Size.Height, 2);
 
             //}
             //;
@@ -1133,6 +1153,89 @@ namespace BlueDatabase
         //        }
         //    }
         //}
+
+        internal string RepairLinkedCellValuex(bool FreezeMode)
+        {
+
+            if (Column.Format != enDataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falsches Format! " + Column.Database.Filename + " " + Column.Name); }
+            var targetColumnKey = -1;
+            var targetRowKey = -1;
+
+            if (Column.LinkedDatabase() == null) { return Ergebnis("Die verlinkte Datenbank existiert nicht"); }
+            if (Column.LinkedDatabase() == Database) { return Ergebnis("Die Datenbank ist nicht verlinkt"); }
+
+
+            ///
+            /// Spaltenschlüssel in der Ziel-Datenbank ermitteln
+            ///
+            if (Column.LinkedCell_ColumnKey >= 0)
+            {
+                // Fixe angabe
+                targetColumnKey = Column.LinkedCell_ColumnKey;
+            }
+            else
+            {
+                // Spalte aus einer Spalte lesen
+                var LinkedCell_ColumnValueFoundInColumn = Column.Database.Column.SearchByKey(Column.LinkedCell_ColumnValueFoundIn);
+                if (LinkedCell_ColumnValueFoundInColumn == null) { return Ergebnis("Die Spalte, aus der der Spaltenschlüssel kommen soll, existiert nicht."); }
+
+                if (!int.TryParse(Row.CellGetString(LinkedCell_ColumnValueFoundInColumn), out var colKey)) { return Ergebnis("Der Text Spalte der Spalte, aus der der Spaltenschlüssel kommen soll, ist fehlerhaft."); }
+
+                if (string.IsNullOrEmpty(Column.LinkedCell_ColumnValueAdd))
+                {   // Ohne Vorsatz
+                    targetColumnKey = colKey;
+                }
+                else
+                {
+                    // Mit Vorsatz
+                    var tarCx = Column.LinkedDatabase().Column.SearchByKey(colKey);
+                    var tarCxn = Column.LinkedDatabase().Column[Column.LinkedCell_ColumnValueAdd + tarCx.Name];
+                    if (tarCxn != null) { targetColumnKey = tarCxn.Key; }
+                }
+            }
+
+            if (targetColumnKey < 0) { return Ergebnis("Die Spalte ist in der verlinkten Datenbank nicht vorhanden."); }
+
+
+            ///
+            /// Zeilenschlüssel lesen
+            ///   
+            var LinkedCell_RowColumn = Database.Column.SearchByKey(Column.LinkedCell_RowKey);
+            if (LinkedCell_RowColumn == null) { return Ergebnis("Die Spalte, aus der der Zeilenschlüssel kommen soll, existiert nicht."); }
+
+            if (Row.CellIsNullOrEmpty(LinkedCell_RowColumn)) { return Ergebnis("Kein Zeilenschlüssel angegeben."); }
+
+            var tarR = Column.LinkedDatabase().Row[Row.CellGetString(LinkedCell_RowColumn)];
+
+            if (tarR == null && Column.LinkedCell_Behaviour == enFehlendesZiel.ZeileAnlegen)
+            {
+                tarR = Column.LinkedDatabase().Row.Add(Row.CellGetString(LinkedCell_RowColumn));
+            }
+
+            if (tarR == null) { return Ergebnis("Die Zeile ist in der Zieldatenbank nicht vorhanden."); }
+
+            targetRowKey = tarR.Key;
+
+            return Ergebnis(string.Empty);
+
+            /// --------Subroutine---------------------------
+            string Ergebnis(string fehler)
+            {
+                if (string.IsNullOrEmpty(fehler))
+                {
+                    return CellCollection.KeyOfCell(targetColumnKey, targetRowKey);
+                    // SetReal(, FreezeMode);
+                }
+                else
+                {
+                    return string.Empty;
+                    //SetReal(string.Empty, FreezeMode);
+                }
+
+                //  return fehler;
+            }
+
+        }
 
 
 

@@ -322,7 +322,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (_TableView.Database.ReadOnly) { return; }
 
-            var Vorlage = _TableView.CursorPos().Column;
+            var Vorlage = _TableView.CursorPos()?.Column;
 
             if (Vorlage != null && !string.IsNullOrEmpty(Vorlage.Identifier)) { Vorlage = null; }
             if (Vorlage != null)

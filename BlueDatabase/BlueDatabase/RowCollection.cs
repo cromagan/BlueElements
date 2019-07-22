@@ -504,5 +504,25 @@ namespace BlueDatabase
             }
 
         }
+
+        public bool RemoveOlderThan(float InHours)
+        {
+
+            if (!Database.Column.SysRowCreateDate.SaveContent) { return false; }
+
+            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDate(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
+
+
+            if (x.Count == 0) { return false; }
+
+
+
+            foreach (int ThisKey in x)
+            {
+                Remove(ThisKey);
+            }
+
+            return true;
+        }
     }
 }

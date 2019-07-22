@@ -112,13 +112,13 @@ namespace BeCreative
         private void TableView_CursorPosChanged(object sender, CellEventArgs e)
         {
 
-            if (e.Cell == null || e.Cell.ColumnReal == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Cell.RowReal == null)
+            if (e.Cell == null || e.Cell.Column == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Cell.Row == null)
             {
                 BlueFormulax.ShowingRowKey = -1;
             }
             else
             {
-                BlueFormulax.ShowingRowKey = e.Cell.RowReal.Key;
+                BlueFormulax.ShowingRowKey = e.Cell.Row.Key;
             }
 
 
@@ -641,12 +641,12 @@ namespace BeCreative
             {
                 if (TableView.Database != null)
                 {
-                    if (TableView.CursorPos()?.RowReal == null && TableView.View_RowFirst() != null)
+                    if (TableView.CursorPos()?.Row == null && TableView.View_RowFirst() != null)
                     {
                         TableView.CursorPos_Set(TableView.Database.Cell[TableView.Database.Column[0], TableView.View_RowFirst()], false);
 
                     }
-                    if (TableView.CursorPos()?.RowReal != null) { BlueFormulax.ShowingRowKey = TableView.CursorPos().RowReal.Key; }
+                    if (TableView.CursorPos()?.Row != null) { BlueFormulax.ShowingRowKey = TableView.CursorPos().Row.Key; }
                 }
             }
             else

@@ -1247,7 +1247,7 @@ namespace BlueDatabase
             foreach (var thisCell in Cell._cells)
             {
                 
-                if (!string.IsNullOrEmpty(thisCell.Value.GetStringReal()))
+                if (!string.IsNullOrEmpty(thisCell.Value.GetString()))
                 {
                     Oldcells.Add(thisCell.Key, thisCell.Value);
                 }
@@ -3318,6 +3318,8 @@ namespace BlueDatabase
         private void BinSaver_DoWork(object sender, DoWorkEventArgs e)
         {
             if (ReadOnly) { return; }
+
+            if (true) { return; }
 
             var f = SavebleErrorReason();
 
