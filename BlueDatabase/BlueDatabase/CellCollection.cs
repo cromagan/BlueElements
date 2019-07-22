@@ -834,11 +834,6 @@ namespace BlueDatabase
 
         }
 
-        public string[] GetArray(string ColumnName, RowItem Row)
-        {
-            return GetArray(Database.Column[ColumnName], Row);
-        }
-
         public bool MatchesTo(ColumnItem Column, RowItem Row, FilterItem Filter)
         {
             //lock (Database.Lock_Parsing)
@@ -1091,8 +1086,7 @@ namespace BlueDatabase
 
         public List<string> GetList(ColumnItem Column, RowItem Row)
         {
-            var _String = GetArray(Column, Row);
-            return new List<string>(_String);
+            return GetString(Column, Row).SplitByCRToList();
         }
 
 
@@ -1209,10 +1203,7 @@ namespace BlueDatabase
         }
 
 
-        public string[] GetArray(ColumnItem Column, RowItem Row)
-        {
-            return GetString(Column, Row).SplitByCR();
-        }
+
 
         public double GetDouble(ColumnItem Column, RowItem Row)
         {

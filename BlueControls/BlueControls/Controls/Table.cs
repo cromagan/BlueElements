@@ -3978,7 +3978,7 @@ namespace BlueControls.Controls
 
             if (Column.MultiLine)
             {
-                var TMP = Column.Database.Cell.GetArray(Column, Row);
+                var TMP = Column.Database.Cell.GetList(Column, Row);
                 if (Column.ShowMultiLineInOneLine)
                 {
                     _ContentSize = FormatedText_NeededSize(Column, TMP.JoinWith("; "), null, CellFont, enShortenStyle.Replaced, Pix16);
@@ -3987,9 +3987,9 @@ namespace BlueControls.Controls
                 {
 
                     var TMPSize = Size.Empty;
-                    for (var z = 0; z <= TMP.GetUpperBound(0); z++)
+                    foreach (var ThisString in TMP)
                     {
-                        TMPSize = FormatedText_NeededSize(Column, TMP[z], null, CellFont, enShortenStyle.Replaced, Pix16);
+                        TMPSize = FormatedText_NeededSize(Column, ThisString, null, CellFont, enShortenStyle.Replaced, Pix16);
                         _ContentSize.Width = Math.Max(TMPSize.Width, _ContentSize.Width);
                         _ContentSize.Height += Math.Max(TMPSize.Height, Pix16);
 

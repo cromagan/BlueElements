@@ -433,10 +433,6 @@ namespace BlueDatabase
             Database.Cell.Set(Database.Column[ColumnName], this, Value, FreezeMode);
         }
 
-        public string[] CellGetArray(string ColumnName)
-        {
-            return Database.Cell.GetArray(Database.Column[ColumnName], this);
-        }
 
         public List<string> CellGetList(ColumnItem Column)
         {
