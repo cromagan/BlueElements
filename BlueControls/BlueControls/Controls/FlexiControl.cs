@@ -46,7 +46,7 @@ namespace BlueControls.Controls
         private bool _IsFilling;
 
         public readonly string ValueId;
-        private string _Value = string.Empty;
+        private string _Value;
         protected enEditTypeFormula _EditType = enEditTypeFormula.None; // None ist -1 und muss gesetzt sein!
         protected enÜberschriftAnordnung _CaptionPosition = enÜberschriftAnordnung.ohne;
         protected string _Caption;

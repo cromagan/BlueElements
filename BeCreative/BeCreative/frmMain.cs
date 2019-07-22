@@ -69,14 +69,14 @@ namespace BeCreative
         {
             BlueFormulax.HideViewEditor();
             SuchEintragNoSave(enDirection.Oben, out var column, out var row);
-            TableView.CursorPos_Set(TableView.Database.Cell[column, row], false);
+            TableView.CursorPos_Set(column, row, false);
         }
 
         private void vor_Click(object sender, EventArgs e)
         {
             BlueFormulax.HideViewEditor();
             SuchEintragNoSave(enDirection.Unten, out var column, out var row);
-            TableView.CursorPos_Set(TableView.Database.Cell[column, row], false);
+            TableView.CursorPos_Set(column, row, false);
         }
 
 
@@ -112,19 +112,19 @@ namespace BeCreative
         private void TableView_CursorPosChanged(object sender, CellEventArgs e)
         {
 
-            if (e.Cell == null || e.Cell.Column == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Cell.Row == null)
+            if (e.Column == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Row == null)
             {
                 BlueFormulax.ShowingRowKey = -1;
             }
             else
             {
-                BlueFormulax.ShowingRowKey = e.Cell.Row.Key;
+                BlueFormulax.ShowingRowKey = e.Row.Key;
             }
 
 
             if (_Ansicht == enAnsicht.Überschriften_und_Formular)
             {
-                TableView.EnsureVisible(e.Cell);
+                TableView.EnsureVisible(e.Column, e.Row);
             }
 
         }
@@ -244,7 +244,7 @@ namespace BeCreative
                 }
                 else
                 {
-                    TableView.CursorPos_Set(TableView.Database.Cell[_Database.Column[0], GefRow], true);
+                    TableView.CursorPos_Set(_Database.Column[0], GefRow, true);
                 }
             }
         }
@@ -266,7 +266,7 @@ namespace BeCreative
             }
 
 
-            TableView.CursorPos_Set(TableView.Database.Cell[_Database.Column[0], vRow], true);
+            TableView.CursorPos_Set(_Database.Column[0], vRow, true);
         }
 
         private string NameRepair(string IstName, RowItem vRow)
@@ -319,7 +319,7 @@ namespace BeCreative
 
 
                 SuchEintragNoSave(enDirection.Unten, out var column, out var row);
-                TableView.CursorPos_Set(TableView.Database.Cell[column, row], false);
+                TableView.CursorPos_Set(column, row, false);
                 TableView.Database.Row.Remove(tmpr);
             }
             else
@@ -414,7 +414,7 @@ namespace BeCreative
 
             if (TableView.View_RowFirst() != null)
             {
-                TableView.CursorPos_Set(TableView.Database.Cell[TableView.Database.Column[0], TableView.View_RowFirst()], false);
+                TableView.CursorPos_Set(TableView.Database.Column[0], TableView.View_RowFirst(), false);
             }
 
             ResumeLayout();
@@ -641,12 +641,12 @@ namespace BeCreative
             {
                 if (TableView.Database != null)
                 {
-                    if (TableView.CursorPos()?.Row == null && TableView.View_RowFirst() != null)
+                    if (TableView.CursorPosRow() == null && TableView.View_RowFirst() != null)
                     {
-                        TableView.CursorPos_Set(TableView.Database.Cell[TableView.Database.Column[0], TableView.View_RowFirst()], false);
+                        TableView.CursorPos_Set(TableView.Database.Column[0], TableView.View_RowFirst(), false);
 
                     }
-                    if (TableView.CursorPos()?.Row != null) { BlueFormulax.ShowingRowKey = TableView.CursorPos().Row.Key; }
+                    if (TableView.CursorPosRow() != null) { BlueFormulax.ShowingRowKey = TableView.CursorPosRow().Key; }
                 }
             }
             else
@@ -806,49 +806,48 @@ namespace BeCreative
 
         private void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e)
         {
-
-            var l = (List<object>)e.Tag;
-            var column = (ColumnItem)l[0];
-            var row = (RowItem)l[1];
-
+            var CellKey = string.Empty;
+            if (e.Tag is string s) { CellKey = s; }
+            if (string.IsNullOrEmpty(CellKey)) { return; }
+            TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
 
             if (_Ansicht != enAnsicht.Überschriften_und_Formular)
             {
 
                 e.UserMenu.Add(new TextListItem(true, "Sortierung"));
-                e.UserMenu.Add(enContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeChangedByRules());
-                e.UserMenu.Add(enContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeChangedByRules());
+                e.UserMenu.Add(enContextMenuComands.SpaltenSortierungAZ, Column != null && Column.Format.CanBeChangedByRules());
+                e.UserMenu.Add(enContextMenuComands.SpaltenSortierungZA, Column != null && Column.Format.CanBeChangedByRules());
 
                 e.UserMenu.Add(new LineListItem());
 
 
                 e.UserMenu.Add(new TextListItem(true, "Zelle"));
-                e.UserMenu.Add(new TextListItem("ContentCopy", "Inhalt Kopieren", enImageCode.Kopieren, column != null && column.Format.CanBeChangedByRules()));
-                e.UserMenu.Add(new TextListItem("ContentPaste", "Inhalt Einfügen", enImageCode.Clipboard, column != null && column.Format.CanBeChangedByRules()));
+                e.UserMenu.Add(new TextListItem("ContentCopy", "Inhalt Kopieren", enImageCode.Kopieren, Column != null && Column.Format.CanBeChangedByRules()));
+                e.UserMenu.Add(new TextListItem("ContentPaste", "Inhalt Einfügen", enImageCode.Clipboard, Column != null && Column.Format.CanBeChangedByRules()));
 
-                e.UserMenu.Add(new TextListItem("ContentDelete", "Inhalt löschen", enImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules()));
-                e.UserMenu.Add(enContextMenuComands.VorherigenInhaltWiederherstellen, column != null && column.Format.CanBeChangedByRules() && column.ShowUndo);
+                e.UserMenu.Add(new TextListItem("ContentDelete", "Inhalt löschen", enImageCode.Radiergummi, Column != null && Column.Format.CanBeChangedByRules()));
+                e.UserMenu.Add(enContextMenuComands.VorherigenInhaltWiederherstellen, Column != null && Column.Format.CanBeChangedByRules() && Column.ShowUndo);
 
-                e.UserMenu.Add(enContextMenuComands.SuchenUndErsetzen, column != null && column.Format.CanBeChangedByRules());
+                e.UserMenu.Add(enContextMenuComands.SuchenUndErsetzen, Column != null && Column.Format.CanBeChangedByRules());
 
                 e.UserMenu.Add(new LineListItem());
 
                 e.UserMenu.Add(new TextListItem(true, "Spalte"));
-                e.UserMenu.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten, column != null);
+                e.UserMenu.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten, Column != null);
 
-                e.UserMenu.Add(new TextListItem("ColumnContentDelete", "Inhalte aller angezeigten Zellen dieser Spalte löschen", enImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules()));
+                e.UserMenu.Add(new TextListItem("ColumnContentDelete", "Inhalte aller angezeigten Zellen dieser Spalte löschen", enImageCode.Radiergummi, Column != null && Column.Format.CanBeChangedByRules()));
 
-                e.UserMenu.Add(new TextListItem("Summe", "Summe", enImageCode.Summe, column != null));
+                e.UserMenu.Add(new TextListItem("Summe", "Summe", enImageCode.Summe, Column != null));
 
 
                 e.UserMenu.Add(new LineListItem());
 
             }
             e.UserMenu.Add(new TextListItem(true, "Zeile"));
-            e.UserMenu.Add(enContextMenuComands.ZeileLöschen, row != null);
+            e.UserMenu.Add(enContextMenuComands.ZeileLöschen, Row != null);
 
 
-            e.UserMenu.Add(new TextListItem("Fehlersuche", "Fehler anzeigen", enImageCode.Kritisch, row != null));
+            e.UserMenu.Add(new TextListItem("Fehlersuche", "Fehler anzeigen", enImageCode.Kritisch, Row != null));
 
 
         }
@@ -860,49 +859,48 @@ namespace BeCreative
 
             var bt = (Table)sender;
 
-            var l = (List<object>)e.Tag;
-            var column = (ColumnItem)l[0];
-            var row = (RowItem)l[1];
-
-            var ce = bt.Database.Cell[column, row];
+            var CellKey = string.Empty;
+            if (e.Tag is string s) { CellKey = s; }
+            if (string.IsNullOrEmpty(CellKey)) { return; }
+            TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
 
 
             switch (e.ClickedComand.Internal())
             {
 
                 case "SpaltenSortierungAZ":
-                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, column.Name, false);
+                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, Column.Name, false);
                     break;
 
                 case "SpaltenSortierungZA":
-                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, column.Name, true);
+                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, Column.Name, true);
                     break;
 
                 case "Fehlersuche":
-                    MessageBox.Show(row.DoAutomatic(true, true));
+                    MessageBox.Show(Row.DoAutomatic(true, true));
                     break;
 
                 case "ZeileLöschen":
-                    if (row != null)
+                    if (Row != null)
                     {
                         if (MessageBox.Show("Zeile löschen?", enImageCode.Frage, "Ja", "Nein") == 0)
                         {
-                            bt.Database.Row.Remove(row);
+                            bt.Database.Row.Remove(Row);
                         }
                     }
                     break;
 
                 case "ContentDelete":
-                    TableView.Database.Cell.Delete(column, row.Key);
+                    TableView.Database.Cell.Delete(Column, Row.Key);
                     break;
 
                 case "SpaltenEigenschaftenBearbeiten":
-                    tabAdministration.OpenColumnEditor(column);
+                    tabAdministration.OpenColumnEditor(Column);
                     CheckButtons();
                     break;
 
                 case "ContentCopy":
-                    Table.CopyToClipboard(ce, true);
+                    Table.CopyToClipboard(Column, Row, true);
                     break;
 
                 case "SuchenUndErsetzen":
@@ -914,7 +912,7 @@ namespace BeCreative
                     break;
 
                 case "Summe":
-                    var summe = column.Summe(TableView.Filter);
+                    var summe = Column.Summe(TableView.Filter);
                     if (!summe.HasValue)
                     {
                         MessageBox.Show("Die Summe konnte nicht berechnet werden.", enImageCode.Summe, "OK");
@@ -926,20 +924,20 @@ namespace BeCreative
                     break;
 
                 case "VorherigenInhaltWiederherstellen":
-                    TableView.DoUndo(ce);
+                    TableView.DoUndo(Column, Row);
                     break;
 
                 case "ContentPaste":
                     //     bt.Database.BeginnEdit()
-                    ce.Set(Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text)));
+                    Row.CellSet(Column, Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text)));
                     break;
 
                 case "ColumnContentDelete":
-                    if (column != null)
+                    if (Column != null)
                     {
                         if (MessageBox.Show("Angezeite Inhalt dieser Spalte löschen?", enImageCode.Frage, "Ja", "Nein") == 0)
                         {
-                            column.DeleteContents(TableView.Filter);
+                            Column.DeleteContents(TableView.Filter);
                         }
                     }
 

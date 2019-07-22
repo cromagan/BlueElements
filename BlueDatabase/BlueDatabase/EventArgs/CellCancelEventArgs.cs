@@ -20,21 +20,16 @@
 
 namespace BlueDatabase.EventArgs
 {
-    public class CellCancelEventArgs : System.EventArgs
+    public class CellCancelEventArgs : CellEventArgs
     {
 
 
-        public CellCancelEventArgs(ColumnItem column, RowItem row, string cancelReason)
+        public CellCancelEventArgs(ColumnItem Column, RowItem Row, string CancelReason) : base(Column, Row)
         {
-            this.CancelReason = cancelReason;
-            this.Row = row;
-            this.Column = column;
+            this.CancelReason = CancelReason;
         }
 
         public string CancelReason { get; set; }
-        public RowItem Row { get; set; }
-        public ColumnItem Column { get; set; }
-
 
     }
 }

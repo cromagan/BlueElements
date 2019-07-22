@@ -97,12 +97,11 @@
     <Compile Include="Enums\enÜberschriftAnordnung.cs" />
     <Compile Include="EventArgs\BeforeNewValueEventArgs.cs" />
     <Compile Include="EventArgs\CellCancelEventArgs.cs" />
-    <Compile Include="EventArgs\CellKeyEventArgs.cs" />
+    <Compile Include="EventArgs\CellDoubleClickEventArgs.cs" />
     <Compile Include="EventArgs\CellEventArgs.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="EventArgs\DatabaseSettingsEventHandler.cs" />
     <Compile Include="EventArgs\DatabaseStoppedEventArgs.cs" />
-    <Compile Include="EventArgs\CellKeyChangedEventArgs.cs" />
     <Compile Include="EventArgs\LoadedEventArgs.cs" />
     <Compile Include="EventArgs\DatabaseGiveBackEventArgs.cs" />
     <Compile Include="EventArgs\DoRowAutomaticEventArgs.cs" />

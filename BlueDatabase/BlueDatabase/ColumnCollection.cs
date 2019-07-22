@@ -23,7 +23,6 @@ using BlueBasics;
 using BlueDatabase.Enums;
 using static BlueBasics.FileOperations;
 using BlueBasics.Enums;
-using BlueDatabase.EventArgs;
 
 namespace BlueDatabase
 {
@@ -43,7 +42,7 @@ namespace BlueDatabase
 
 
         #region  Event-Deklarationen + Delegaten 
-        public event EventHandler<KeyChangedEventArgs> KeyChanged;
+
         #endregion
 
 
@@ -218,7 +217,7 @@ namespace BlueDatabase
             Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
 
 
-            for (var ColumnCount = 0 ; ColumnCount < Count ; ColumnCount++)
+            for (var ColumnCount = 0; ColumnCount < Count; ColumnCount++)
             {
                 if (this[ColumnCount] != null && !string.IsNullOrEmpty(this[ColumnCount].Name))
                 {
@@ -227,27 +226,6 @@ namespace BlueDatabase
             }
         }
 
-        protected override void OnItemAdded(ColumnItem item)
-        {
-            base.OnItemAdded(item);
-            item.KeyChanged += Item_KeyChanged;
-        }
-
-        private void Item_KeyChanged(object sender, KeyChangedEventArgs e)
-        {
-            OnKeyChanged(new KeyChangedEventArgs(e.KeyOld, e.KeyNew));
-        }
-
-        private void OnKeyChanged(KeyChangedEventArgs e)
-        {
-            KeyChanged?.Invoke(this, e);
-        }
-
-        protected override void OnItemRemoving(ColumnItem item)
-        {
-            item.KeyChanged -= Item_KeyChanged;
-            base.OnItemRemoving(item);
-        }
 
         public void GetSystems()
         {
@@ -316,12 +294,12 @@ namespace BlueDatabase
             GetSystems();
 
 
-            for (var s1 = 0 ; s1 < Count ; s1++)
+            for (var s1 = 0; s1 < Count; s1++)
             {
                 if (base[s1] != null)
                 {
 
-                    for (var s2 = s1 + 1 ; s2 < Count ; s2++)
+                    for (var s2 = s1 + 1; s2 < Count; s2++)
                     {
                         if (base[s2] != null)
                         {
@@ -532,14 +510,6 @@ namespace BlueDatabase
             } while (this[TestName] != null);
 
             return TestName;
-        }
-
-        internal void ChangeKey(int oldKey, int newKey)
-        {
-            foreach (var ThisColumnItem in this)
-            {
-                if (ThisColumnItem.Key == oldKey) { ThisColumnItem.ChangeKeyTo( newKey); }
-            }
         }
     }
 }

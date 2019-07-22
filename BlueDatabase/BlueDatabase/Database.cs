@@ -480,6 +480,8 @@ namespace BlueDatabase
         public event CancelEventHandler Exporting;
         public event EventHandler<DatabaseSettingsEventHandler> LoadingLinkedDatabase;
         public event CancelEventHandler Reloading;
+        public event EventHandler<KeyChangedEventArgs> RowKeyChanged;
+        public event EventHandler<KeyChangedEventArgs> ColumnKeyChanged;
         public event EventHandler<ProgressbarEventArgs> ProgressbarInfo;
 
         /// <summary>
@@ -1227,36 +1229,20 @@ namespace BlueDatabase
             var ColKey = 0;
             var RowKey = 0;
 
-            // ------ Columns-Klassen aufheben ---------------
+
             var ColumnsOld = new List<ColumnItem>();
             ColumnsOld.AddRange(Column);
             Column.Clear();
 
-            //  -------- Pendings ausheben -------------------
+
             var OldPendings = new List<WorkItem>();
             foreach (var ThisWork in Works)
             {
                 if (ThisWork.State == enItemState.Pending) { OldPendings.Add(ThisWork); }
                 if (ThisWork.State == enItemState.FreezedPending) { Develop.DebugPrint(enFehlerArt.Fehler, "FreezedPending vorhanden"); }
             }
+
             Works.Clear();
-
-            // ----------- Cells aufheben --------------------
-            var Oldcells = new Dictionary<string, CellItem>();
-            //var OldCells = new Dictionary<string, CellItem cell>();
-            foreach (var thisCell in Cell._cells)
-            {
-                
-                if (!string.IsNullOrEmpty(thisCell.Value.GetString()))
-                {
-                    Oldcells.Add(thisCell.Key, thisCell.Value);
-                }
-
-            }
-            Cell._cells.Clear();
-
-
-
             do
             {
                 if (Pointer >= B.Count) { break; }
@@ -1329,7 +1315,7 @@ namespace BlueDatabase
                 }
 
 
-                var _Fehler = ParseThis(Art, Inhalt, _Column, _Row, X, Y, Oldcells);
+                var _Fehler = ParseThis(Art, Inhalt, _Column, _Row, X, Y);
 
                 if (Art == enDatabaseDataType.EOF) { break; }
 
@@ -1424,7 +1410,7 @@ namespace BlueDatabase
 
 
 
-        private string ParseThis(enDatabaseDataType Art, string Inhalt, ColumnItem _Column, RowItem _Row, int X, int Y, Dictionary<string, CellItem> OldCells)
+        private string ParseThis(enDatabaseDataType Art, string Inhalt, ColumnItem _Column, RowItem _Row, int X, int Y)
         {
 
 
@@ -1452,7 +1438,7 @@ namespace BlueDatabase
                     {
                         //Cell.RemoveOrphans();
                         Row.RemoveNullOrEmpty();
-                        //Cell.SetAllValuesToEmpty();
+                        Cell.SetAllValuesToEmpty();
                     }
                     break;
 
@@ -1578,7 +1564,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.ce_UTF8Value_withSizeData:
                 case enDatabaseDataType.ce_Value_withoutSizeData:
                     if (Art == enDatabaseDataType.ce_UTF8Value_withSizeData) { Inhalt = modConverter.UTF8toString(Inhalt); }
-                    Cell.Load_310(_Column, _Row, Inhalt, X, Y, OldCells);
+                    Cell.Load_310(_Column, _Row, Inhalt, X, Y);
                     break;
 
                 case enDatabaseDataType.UndoCount:
@@ -1741,7 +1727,7 @@ namespace BlueDatabase
         }
 
 
-        internal static void SaveToByteList(List<byte> List, enDatabaseDataType DatabaseDataType, string Content)
+        internal void SaveToByteList(List<byte> List, enDatabaseDataType DatabaseDataType, string Content)
         {
             List.Add((byte)enRoutinen.DatenAllgemein);
             List.Add((byte)DatabaseDataType);
@@ -1749,10 +1735,39 @@ namespace BlueDatabase
             List.AddRange(Content.ToByte());
         }
 
+        internal void SaveToByteList(List<byte> List, KeyValuePair<string, CellItem> vCell)
+        {
+
+            if (string.IsNullOrEmpty(vCell.Value.Value)) { return; }
+
+            Cell.DataOfCellKey(vCell.Key, out var tColumn, out var tRow);
 
 
+            if (!tColumn.SaveContent) { return; }
 
-        internal static void SaveToByteList(List<byte> List, enDatabaseDataType DatabaseDataType, string Content, int TargetColumNr)
+            var s = vCell.Value.Value;
+            var tx = enDatabaseDataType.ce_Value_withSizeData;
+
+            if (tColumn.Format.NeedUTF8())
+            {
+                s = modConverter.StringtoUTF8(s);
+                tx = enDatabaseDataType.ce_UTF8Value_withSizeData;
+            }
+
+            List.Add((byte)enRoutinen.CellFormat_OLD);
+            List.Add((byte)tx);
+            SaveToByteList(List, s.Length, 3);
+            SaveToByteList(List, tColumn.Key, 3);
+            SaveToByteList(List, tRow.Key, 3);
+            List.AddRange(s.ToByte());
+            var ContentSize = Cell.ContentSizeToSave(vCell, tColumn);
+            SaveToByteList(List, ContentSize.Width, 2);
+            SaveToByteList(List, ContentSize.Height, 2);
+
+        }
+
+
+        internal void SaveToByteList(List<byte> List, enDatabaseDataType DatabaseDataType, string Content, int TargetColumNr)
         {
             List.Add((byte)enRoutinen.Column);
             List.Add((byte)DatabaseDataType);
@@ -1762,17 +1777,17 @@ namespace BlueDatabase
             List.AddRange(Content.ToByte());
         }
 
-        internal static int NummerCode3(List<byte> b, int pointer)
+        private static int NummerCode3(List<byte> b, int pointer)
         {
             return b[pointer] * 65025 + b[pointer + 1] * 255 + b[pointer + 2];
         }
 
-        internal static int NummerCode2(List<byte> b, int pointer)
+        private static int NummerCode2(List<byte> b, int pointer)
         {
             return b[pointer] * 255 + b[pointer + 1];
         }
 
-        internal static void SaveToByteList(List<byte> List, int NrToAdd, int ByteAnzahl)
+        private void SaveToByteList(List<byte> List, int NrToAdd, int ByteAnzahl)
         {
 
             switch (ByteAnzahl)
@@ -2161,11 +2176,13 @@ namespace BlueDatabase
                         if (ThisColumn != null)
                         {
 
+                            var LCColumn = ThisColumn;
+                            var LCrow = ThisRow;
+                            if (ThisColumn.Format == enDataFormat.LinkedCell) { CellCollection.LinkedCellData(ThisColumn, ThisRow, out LCColumn, out LCrow); }
 
-
-                            if  (!CellCollection.IsNullOrEmpty(ThisColumn,ThisRow))
+                            if (LCrow != null && LCColumn != null)
                             {
-                                da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">" + Cell[ThisColumn,ThisRow].ValuesReadable(enShortenStyle.HTML).JoinWith("<br>") + "</th>");
+                                da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">" + LCrow.CellGetValuesReadable(LCColumn, enShortenStyle.HTML).JoinWith("<br>") + "</th>");
                             }
                             else
                             {
@@ -2901,7 +2918,7 @@ namespace BlueDatabase
 
             if (ExecuteNow)
             {
-                ParseThis(Comand, ChangedTo, Column.SearchByKey(ColumnKey), Row.SearchByKey(RowKey), -1, -1, null);
+                ParseThis(Comand, ChangedTo, Column.SearchByKey(ColumnKey), Row.SearchByKey(RowKey), -1, -1);
             }
 
             if (_isParsing) { return; }
@@ -3044,7 +3061,7 @@ namespace BlueDatabase
                         }
                     }
                 }
-                ParseThis(ThisPendingItem.Comand, ThisPendingItem.ChangedTo, _Col, _Row, 0, 0, null);
+                ParseThis(ThisPendingItem.Comand, ThisPendingItem.ChangedTo, _Col, _Row, 0, 0);
             }
         }
 
@@ -3104,18 +3121,16 @@ namespace BlueDatabase
                     }
                 }
 
-                Row.ChangeKey(OldKey, NewKey);
-
-               // OnRowKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
+                OnRowKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
 
 
             }
         }
 
-        //private void OnRowKeyChanged(KeyChangedEventArgs e)
-        //{
-        //    RowKeyChanged?.Invoke(this, e);
-        //}
+        private void OnRowKeyChanged(KeyChangedEventArgs e)
+        {
+            RowKeyChanged?.Invoke(this, e);
+        }
 
 
 
@@ -3164,16 +3179,15 @@ namespace BlueDatabase
 
                 }
 
-                Column.ChangeKey(OldKey, NewKey);
-               // OnColumnKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
+                OnColumnKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
 
             }
         }
 
-        //private void OnColumnKeyChanged(KeyChangedEventArgs e)
-        //{
-        //    ColumnKeyChanged?.Invoke(this, e);
-        //}
+        private void OnColumnKeyChanged(KeyChangedEventArgs e)
+        {
+            ColumnKeyChanged?.Invoke(this, e);
+        }
 
 
 
@@ -3318,8 +3332,6 @@ namespace BlueDatabase
         private void BinSaver_DoWork(object sender, DoWorkEventArgs e)
         {
             if (ReadOnly) { return; }
-
-            if (true) { return; }
 
             var f = SavebleErrorReason();
 

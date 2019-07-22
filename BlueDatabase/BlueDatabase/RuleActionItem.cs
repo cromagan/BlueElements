@@ -1597,7 +1597,7 @@ namespace BlueDatabase
                     switch (_Action)
                     {
                         case enAction.Enthält:
-                            var ex = Column.Database.Cell.GetList(Column, Row);
+                            var ex = Column.Database.Cell.GetArray(Column, Row);
                             if (ex.Contains(AllValue[z], false)) { return "'" + AllValue[z] + "' in '#Spalte:" + Column.Name + "' ist nicht erlaubt"; }
                             break;
 

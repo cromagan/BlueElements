@@ -106,7 +106,6 @@
     <Compile Include="Enums\enWndProc.cs" />
     <Compile Include="Enums\PadStyles.cs" />
     <Compile Include="Enums\TabControlHitTest.cs" />
-    <Compile Include="EventArgs\TableDoubleClickEventArgs.cs" />
     <Compile Include="Forms-Basics\DialogWithOkAndCancel.cs">
       <SubType>Form</SubType>
     </Compile>

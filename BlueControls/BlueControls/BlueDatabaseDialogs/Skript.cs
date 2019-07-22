@@ -25,7 +25,6 @@ using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
-using static BlueDatabase.CellCollection;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
@@ -51,7 +50,7 @@ namespace BlueControls.BlueDatabaseDialogs
             _BlueTable.DatabaseChanged += _BlueTable_DatabaseChanged;
             //_BlueTable.DatabaseChanging += _BlueTable_DatabaseChanging;
 
-            CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPos()));
+            CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
         }
 
         private void WriteBack()
@@ -128,14 +127,14 @@ namespace BlueControls.BlueDatabaseDialogs
         private void CursorPosChanged(object sender, CellEventArgs e)
         {
             var ok = true;
-            if (e.Cell.Row == null)
+            if (e.Row == null)
             {
                 optVorhandenZeile.Text = "Aktuell angewählte Zeile überschreiben";
                 ok = false;
             }
             else
             {
-                optVorhandenZeile.Text = "Aktuell angewählte Zeile  <b>(" + e.Cell.Row.CellFirstString() + ")</b> überschreiben";
+                optVorhandenZeile.Text = "Aktuell angewählte Zeile  <b>(" + e.Row.CellFirstString() + ")</b> überschreiben";
 
                 if (!Database.IsAdministrator())
                 {
@@ -143,14 +142,14 @@ namespace BlueControls.BlueDatabaseDialogs
                     {
                         if (ThisColumn != Database.Column.SysRowChangeDate && ThisColumn != Database.Column.SysRowChanger)
                         {
-                            if (!CellCollection.UserEditPossible(ThisColumn, e.Cell.Row, false)) { ok = false; }
+                            if (!Database.Cell.UserEditPossible(ThisColumn, e.Row, false)) { ok = false; }
                         }
                     }
                 }
 
 
 
-                if (e.Cell.Row.CellGetBoolean(Database.Column.SysLocked)) { ok = false; }
+                if (e.Row.CellGetBoolean(Database.Column.SysLocked)) { ok = false; }
 
 
             }
@@ -164,7 +163,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
             else
             {
-                _row = e.Cell.Row;
+                _row = e.Row;
             }
         }
 

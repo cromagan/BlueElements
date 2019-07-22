@@ -106,7 +106,7 @@ namespace BlueControls.Controls
                     _Database.Column.ItemRemoved -= _Database_ColumnRemoved;
                     _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
                     _Database.StoreView -= _Database_StoreView;
-                    _Database.Row.KeyChanged -= _Database_RowKeyChanged;
+                    _Database.RowKeyChanged -= _Database_RowKeyChanged;
                     _Database.RestoreView -= _Database_RestoreView;
 
                     _Database.Release(false, 180); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
@@ -121,7 +121,7 @@ namespace BlueControls.Controls
                     _Database.Column.ItemRemoved += _Database_ColumnRemoved;
                     _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
                     _Database.StoreView += _Database_StoreView;
-                    _Database.Row.KeyChanged += _Database_RowKeyChanged;
+                    _Database.RowKeyChanged += _Database_RowKeyChanged;
                     _Database.RestoreView += _Database_RestoreView;
                 }
 
@@ -162,12 +162,7 @@ namespace BlueControls.Controls
 
                 _ShowingRowKey = value;
 
-                foreach (var thisFlex in _Control)
-                {
-                    if (thisFlex != null && !thisFlex.IsDisposed) { thisFlex.RowKey = _ShowingRowKey; }
-                }
-
-
+                ChangeRowKeyTo(_ShowingRowKey);
                 Controls_SetCorrectEnabledState_All();
 
                 OnShowingRowChanged(new RowEventArgs(ShowingRow));
@@ -182,6 +177,13 @@ namespace BlueControls.Controls
             ShowingRowChanged?.Invoke(this, e);
         }
 
+        private void ChangeRowKeyTo(int newRowKey)
+        {
+            foreach (var thisFlex in _Control)
+            {
+                if (thisFlex != null && !thisFlex.IsDisposed) { thisFlex.ChangeRowKeyTo(newRowKey); }
+            }
+        }
 
 
 
@@ -470,7 +472,7 @@ namespace BlueControls.Controls
             if (cd?.Column == null) { return; }
 
             Develop.Debugprint_BackgroundThread();
-            var btb = new FlexiControlForCell(cd.Column.Database, cd.Column.Key, cd.ÜberschriftAnordnung);
+            var btb = new FlexiControlForCell(cd);
             btb.TabIndex = TabIndex + 10000;
             btb.Tag = cd;
 

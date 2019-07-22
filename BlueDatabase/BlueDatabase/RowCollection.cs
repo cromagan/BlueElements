@@ -53,8 +53,6 @@ namespace BlueDatabase
         public event EventHandler RowRemoved;
 
         public event EventHandler<RowEventArgs> RowAdded;
-
-        public event EventHandler<KeyChangedEventArgs> KeyChanged;
         #endregion
 
 
@@ -145,8 +143,6 @@ namespace BlueDatabase
 
             var e = SearchByKey(Key);
             if (e == null) { return; }
-
-            e.KeyChanged -= Row_KeyChanged;
 
             OnRowRemoving(new RowEventArgs(e));
             foreach (var ThisColumnItem in Database.Column)
@@ -242,20 +238,7 @@ namespace BlueDatabase
             if (!_Internal.TryAdd(Row.Key, Row)) { Develop.DebugPrint(enFehlerArt.Fehler, "Add Failed"); }
 
             OnRowAdded(new RowEventArgs(Row));
-
-            Row.KeyChanged += Row_KeyChanged;
-
             return Row;
-        }
-
-        private void Row_KeyChanged(object sender, KeyChangedEventArgs e)
-        {
-            OnKeyChanged(new KeyChangedEventArgs(e.KeyOld, e.KeyNew));
-        }
-
-        private void OnKeyChanged(KeyChangedEventArgs e)
-        {
-            KeyChanged?.Invoke(this, e);
         }
 
         private void OnRowChecked(object sender, RowCheckedEventArgs e)
@@ -285,8 +268,8 @@ namespace BlueDatabase
             Row.CellSet(Database.Column[0], ValueOfCellInFirstColumn);
 
 
-            Database.Cell.Set(Database.Column.SysRowCreator, Row, Database.UserName, false);
-            Database.Cell.Set(Database.Column.SysRowCreateDate, Row, DateTime.Now.ToString(), false);
+            Database.Cell.SystemSet(Database.Column.SysRowCreator, Row, Database.UserName, false);
+            Database.Cell.SystemSet(Database.Column.SysRowCreateDate, Row, DateTime.Now.ToString(), false);
 
             // Dann die Inital-Werte reinschreiben
             foreach (var ThisColum in Database.Column)
@@ -426,6 +409,36 @@ namespace BlueDatabase
             RowRemoved?.Invoke(this, System.EventArgs.Empty);
         }
 
+        public bool RemoveOlderThan(float InHours)
+        {
+
+            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDate(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
+
+            //foreach (var thisrowitem in _Internal.Values)
+            //{
+            //    if (thisrowitem != null)
+            //    {
+            //        var D = thisrowitem.CellGetDate(Database.Column.SysRowCreateDate());
+            //        if (DateTime.Now.Subtract(D).TotalHours > InHours) { x.Add(thisrowitem.Key); }
+            //    }
+            //}
+
+
+
+
+            if (x.Count == 0) { return false; }
+
+
+
+            foreach (int ThisKey in x)
+            {
+                Remove(ThisKey);
+            }
+
+            return true;
+        }
+
+
         public static List<RowItem> CalculateSortedRows(Database database, FilterCollection Filter, RowSortDefinition rowSortDefinition)
         {
             var TMP = new List<string>();
@@ -468,7 +481,7 @@ namespace BlueDatabase
             }
             else
             {
-                for (var z = TMP.Count - 1 ; z > -1 ; z--)
+                for (var z = TMP.Count - 1; z > -1; z--)
                 {
                     if (!string.IsNullOrEmpty(TMP[z]))
                     {
@@ -493,36 +506,6 @@ namespace BlueDatabase
                 }
             }
             return l;
-        }
-
-        internal void ChangeKey(int oldKey, int newKey)
-        {
-
-            foreach (var ThisRowItem in this)
-            {
-                if (ThisRowItem.Key == oldKey) { ThisRowItem.ChangeKeyTo(newKey); }
-            }
-
-        }
-
-        public bool RemoveOlderThan(float InHours)
-        {
-
-            if (!Database.Column.SysRowCreateDate.SaveContent) { return false; }
-
-            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDate(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
-
-
-            if (x.Count == 0) { return false; }
-
-
-
-            foreach (int ThisKey in x)
-            {
-                Remove(ThisKey);
-            }
-
-            return true;
         }
     }
 }
