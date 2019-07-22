@@ -142,7 +142,7 @@ namespace BlueControls.BlueDatabaseDialogs
                     {
                         if (ThisColumn != Database.Column.SysRowChangeDate && ThisColumn != Database.Column.SysRowChanger)
                         {
-                            if (!Database.Cell.UserEditPossible(ThisColumn, e.Row, false)) { ok = false; }
+                            if (!CellCollection.UserEditPossible(ThisColumn, e.Row, false)) { ok = false; }
                         }
                     }
                 }

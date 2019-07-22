@@ -1369,9 +1369,9 @@ namespace BlueControls.Controls
                 NotEditableInfo("Diese Spalte kann generell nicht bearbeitet werden.");
                 return;
             }
-            if (!ContentHolderCellColumn.Database.Cell.UserEditPossible(ContentHolderCellColumn, ContentHolderCellRow, false))
+            if (!CellCollection.UserEditPossible(ContentHolderCellColumn, ContentHolderCellRow, false))
             {
-                NotEditableInfo(ContentHolderCellColumn.Database.Cell.UserEditErrorReason(ContentHolderCellColumn, ContentHolderCellRow, false));
+                NotEditableInfo(CellCollection.UserEditErrorReason(ContentHolderCellColumn, ContentHolderCellRow, false));
                 return;
             }
 
@@ -2446,7 +2446,7 @@ namespace BlueControls.Controls
                                 return;
                             }
 
-                            var l2 = _Database.Cell.UserEditErrorReason(_CursorPosColumn, _CursorPosRow, false);
+                            var l2 = CellCollection.UserEditErrorReason(_CursorPosColumn, _CursorPosRow, false);
 
                             if (string.IsNullOrEmpty(l2))
                             {
@@ -2468,7 +2468,7 @@ namespace BlueControls.Controls
                             return;
                         }
 
-                        var l = _Database.Cell.UserEditErrorReason(_CursorPosColumn, _CursorPosRow, false);
+                        var l = CellCollection.UserEditErrorReason(_CursorPosColumn, _CursorPosRow, false);
 
                         if (string.IsNullOrEmpty(l))
                         {
@@ -2576,7 +2576,7 @@ namespace BlueControls.Controls
                                 }
 
 
-                                var l2 = _Database.Cell.UserEditErrorReason(_CursorPosColumn, _CursorPosRow, false);
+                                var l2 = CellCollection.UserEditErrorReason(_CursorPosColumn, _CursorPosRow, false);
 
                                 if (string.IsNullOrEmpty(l2))
                                 {
@@ -3799,7 +3799,7 @@ namespace BlueControls.Controls
             if (_Database.ColumnArrangements[_ArrangementNr][_Database.Column[0]] == null) { return false; }
             if (!_Database.PermissionCheck(_Database.PermissionGroups_NewRow, null)) { return false; }
 
-            if (!_Database.Cell.UserEditPossible(_Database.Column[0], null, false)) { return false; }
+            if (!CellCollection.UserEditPossible(_Database.Column[0], null, false)) { return false; }
             return true;
         }
 

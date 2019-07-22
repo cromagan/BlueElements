@@ -1104,12 +1104,12 @@ namespace BlueDatabase
         /// <param name="Row"></param>
         /// <param name="DateiRechtePrüfen"></param>
         /// <returns></returns>
-        public bool UserEditPossible(ColumnItem Column, RowItem Row, bool DateiRechtePrüfen)
+        public static bool UserEditPossible(ColumnItem Column, RowItem Row, bool DateiRechtePrüfen)
         {
             if (Column.Format == enDataFormat.LinkedCell)
             {
                 LinkedCellData(Column, Row, out var LCColumn, out var LCrow);
-                if (LCColumn != null && LCrow != null) { return LCrow.Database.Cell.UserEditPossible(LCColumn, LCrow, DateiRechtePrüfen); }
+                if (LCColumn != null && LCrow != null) { return UserEditPossible(LCColumn, LCrow, DateiRechtePrüfen); }
                 return false;
             }
 
@@ -1124,12 +1124,12 @@ namespace BlueDatabase
         /// <param name="DateiRechtePrüfen"></param>
         /// <param name="Column"></param>
         /// <returns></returns>
-        public string UserEditErrorReason(ColumnItem Column, RowItem Row, bool DateiRechtePrüfen)
+        public static string UserEditErrorReason(ColumnItem Column, RowItem Row, bool DateiRechtePrüfen)
         {
-
-            if (Database.ReadOnly) { return LanguageTool.DoTranslate( "Datenbank wurde schreibgeschützt geöffnet", true); }
             if (Column == null) { return LanguageTool.DoTranslate("Es ist keine Spalte ausgewählt.", true); }
-            if (Column.Database != Database) { return LanguageTool.DoTranslate("Interner Fehler: Bezug der Datenbank zur Spalte ist fehlerhaft.", true); }
+            if (Column.Database.ReadOnly) { return LanguageTool.DoTranslate( "Datenbank wurde schreibgeschützt geöffnet", true); }
+
+
 
             if (!Column.SaveContent) { return LanguageTool.DoTranslate("Der Spalteninhalt wird nicht gespeichert.", true); }
 
@@ -1138,7 +1138,7 @@ namespace BlueDatabase
                 LinkedCellData(Column, Row, out var LCColumn, out var LCrow);
                 if (LCColumn != null && LCrow != null)
                 {
-                    var tmp = LCrow.Database.Cell.UserEditErrorReason(LCColumn, LCrow, DateiRechtePrüfen);
+                    var tmp = UserEditErrorReason(LCColumn, LCrow, DateiRechtePrüfen);
                     if (!string.IsNullOrEmpty(tmp)) { return LanguageTool.DoTranslate("Die verlinkte Zelle kann nicht bearbeitet werden: ", true) + tmp; }
                     return string.Empty;
                 }
@@ -1151,8 +1151,8 @@ namespace BlueDatabase
 
             if (Row != null)
             {
-                if (Row.Database != Database) { return LanguageTool.DoTranslate("Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft.", true); }
-                if (Column != Database.Column.SysLocked && Row.CellGetBoolean(Database.Column.SysLocked) && !Column.EditTrotzSperreErlaubt) { return LanguageTool.DoTranslate("Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.", true); }
+                if (Row.Database != Column.Database) { return LanguageTool.DoTranslate("Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft.", true); }
+                if (Column != Column.Database.Column.SysLocked && Row.CellGetBoolean(Column.Database.Column.SysLocked) && !Column.EditTrotzSperreErlaubt) { return LanguageTool.DoTranslate("Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.", true); }
             }
             else
             {
@@ -1175,7 +1175,7 @@ namespace BlueDatabase
             }
 
 
-            foreach (var ThisRule in Database.Rules)
+            foreach (var ThisRule in Column.Database.Rules)
             {
                 if (ThisRule != null)
                 {
@@ -1184,7 +1184,7 @@ namespace BlueDatabase
                 }
             }
 
-            if (!Database.PermissionCheck(Column.PermissionGroups_ChangeCell, Row)) { return LanguageTool.DoTranslate("Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.", true); }
+            if (!Column.Database.PermissionCheck(Column.PermissionGroups_ChangeCell, Row)) { return LanguageTool.DoTranslate("Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.", true); }
             return string.Empty;
         }
 

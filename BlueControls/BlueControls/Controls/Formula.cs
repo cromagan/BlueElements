@@ -162,7 +162,12 @@ namespace BlueControls.Controls
 
                 _ShowingRowKey = value;
 
-                ChangeRowKeyTo(_ShowingRowKey);
+                foreach (var thisFlex in _Control)
+                {
+                    if (thisFlex != null && !thisFlex.IsDisposed) { thisFlex.RowKey = _ShowingRowKey; }
+                }
+
+
                 Controls_SetCorrectEnabledState_All();
 
                 OnShowingRowChanged(new RowEventArgs(ShowingRow));
@@ -177,13 +182,6 @@ namespace BlueControls.Controls
             ShowingRowChanged?.Invoke(this, e);
         }
 
-        private void ChangeRowKeyTo(int newRowKey)
-        {
-            foreach (var thisFlex in _Control)
-            {
-                if (thisFlex != null && !thisFlex.IsDisposed) { thisFlex.ChangeRowKeyTo(newRowKey); }
-            }
-        }
 
 
 
@@ -472,7 +470,7 @@ namespace BlueControls.Controls
             if (cd?.Column == null) { return; }
 
             Develop.Debugprint_BackgroundThread();
-            var btb = new FlexiControlForCell(cd);
+            var btb = new FlexiControlForCell(cd.Column.Database, cd.Column.Key, cd.ÜberschriftAnordnung);
             btb.TabIndex = TabIndex + 10000;
             btb.Tag = cd;
 
