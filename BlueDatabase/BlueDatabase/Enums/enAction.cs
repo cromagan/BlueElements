@@ -58,11 +58,16 @@ namespace BlueDatabase.Enums
 
         Sperre_die_Zelle = 1011,
 
-        Substring = 1017
+        Substring = 1017,
 
-       // LinkedCell = 1018,
+
+        // LinkedCell = 1018,
         //SortiereIntelligent = 1020,
-    //    KopiereAndereSpalten = 1021
+        //    KopiereAndereSpalten = 1021
+
+
+        Skript = 2000
+
 
 
 

@@ -3500,6 +3500,7 @@ namespace BlueDatabase
 
             // Letztes WorkItem speichern, als Kontrolle
             var WVorher = string.Empty;
+            _LastWorkItem = string.Empty;
             if (Works != null && Works.Count > 0)
             {
                 var c = 0;

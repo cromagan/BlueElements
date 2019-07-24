@@ -204,6 +204,10 @@ namespace BlueDatabase
                 // Finaler Abschluss
                 case enAction.Sperre_die_Zelle: Co = 300; break;
                 case enAction.Setze_Fehlerhaft: Co = 310; break;
+
+
+
+                case enAction.Skript: Co = 400; break;
                 default:
                     Develop.DebugPrint(_Action);
                     break;
@@ -366,6 +370,9 @@ namespace BlueDatabase
                         }
                         Row.CellSet(t, erg2, FreezeMode);
                     }
+                    return string.Empty;
+
+                case enAction.Skript:
                     return string.Empty;
 
 
@@ -689,6 +696,9 @@ namespace BlueDatabase
                 //case enAction.KopiereAndereSpalten:
                 //    return QuickImage.Get(enImageCode.Clipboard);
 
+                case enAction.Skript:
+                    return QuickImage.Get(enImageCode.Skript);
+
                 default:
                     if (_Action > 0) { Develop.DebugPrint(_Action); }
                     return QuickImage.Get(enImageCode.Kritisch);
@@ -861,6 +871,8 @@ namespace BlueDatabase
                 //    return enNeededColumns.MoreThanOne;
                 //case enAction.KopiereAndereSpalten:
                 //    return enNeededColumns.TwoColumns;
+                case enAction.Skript:
+                    return enNeededColumns.None;
 
 
                 default:
@@ -921,6 +933,9 @@ namespace BlueDatabase
                 //case enAction.Ist_der_Nutzer:
                 //    return enNeededText.OneOrMore;
                 case enAction.Anmerkung:
+                    return enNeededText.DoesNotMatter;
+
+                case enAction.Skript:
                     return enNeededText.DoesNotMatter;
                 //case enAction.Ist_Jünger_Als:
                 //    return enNeededText.OneIntegerValue;
@@ -1126,6 +1141,11 @@ namespace BlueDatabase
                 case enAction.Sperre_die_Zelle:
                     r = r + "Diese Aktion sperrt die <b>manuelle</b> Bearbeitung für dieser Zelle.";
                     MehrSpaltenAllegeamacht = true;
+                    break;
+
+                case enAction.Skript:
+                    r = r + " ";
+                    //MehrSpaltenAllegeamacht = true;
                     break;
 
                 //case enAction.SortiereIntelligent:
@@ -1370,6 +1390,11 @@ namespace BlueDatabase
 
                 case enAction.Sperre_die_Zelle:
                     return "sperre die Bearbeitung der Zelle " + ColsUnd;
+
+
+
+                case enAction.Skript:
+                    return "#### Skript ####";
 
 
                 //case enAction.Ist_Jünger_Als:
@@ -1739,6 +1764,9 @@ namespace BlueDatabase
 
                 //    }
                 //    break;
+
+                case enAction.Skript:
+                    break;
 
 
 
