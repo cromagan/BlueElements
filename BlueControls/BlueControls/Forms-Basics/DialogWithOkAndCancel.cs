@@ -18,6 +18,13 @@ namespace BlueControls.Forms
         {
             InitializeComponent();
             SetTopLevel(true);
+
+
+            if (Owner == null)
+            {
+                StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            }
+
         }
 
 

@@ -82,6 +82,7 @@ namespace BlueControls.Controls
 
         private enBlueTableAppearance _Design = enBlueTableAppearance.Standard;
         private List<RowItem> _SortedRows; // Die Sortierung der Zeile
+        private List<RowItem> _SortedRowsBefore = new List<RowItem>(); // Die Sortierung der Zeile
 
         private readonly object Lock_UserAction = new object();
         private BlueFont _Column_Font;
@@ -2892,6 +2893,12 @@ namespace BlueControls.Controls
             if (column != null) { column = Database.Column.SearchByKey(column.Key); }
             if (row != null) { row = Database.Row.SearchByKey(row.Key); }
 
+            if (_Database.ColumnArrangements[_ArrangementNr][column]== null || !SortedRows().Contains(row))
+            {
+                column = null;
+                row = null;
+            }
+
             if (_CursorPosColumn == column && _CursorPosRow == row) { return; }
 
             _CursorPosColumn = column;
@@ -3486,7 +3493,14 @@ namespace BlueControls.Controls
         {
             if (AreRowsSorted()) { return _SortedRows; }
             _SortedRows = RowCollection.CalculateSortedRows(Database, Filter, SortUsed());
-            OnRowsSorted();
+
+            if (!_SortedRows.SequenceEqual(_SortedRowsBefore))
+            {
+                _SortedRowsBefore.Clear();
+                if (_SortedRows != null) { _SortedRowsBefore.AddRange(_SortedRows); }
+                OnRowsSorted();
+            }
+
             return SortedRows(); // Rekursiver aufruf. Manchmal funktiniert OnRowsSorted nicht...
         }
 

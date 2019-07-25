@@ -27,10 +27,15 @@ namespace BlueControls.Forms
 
         Button Pressed = null;
 
-        private MessageBox()
-        {
-            InitializeComponent();
-        }
+        //private MessageBox()
+        //{
+        //    InitializeComponent();
+
+        //    if (Owner == null)
+        //    {
+        //        StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+        //    }
+        //}
 
         private MessageBox(string TXT, enImageCode Pic, params string[] Buttons)
         {
@@ -65,6 +70,11 @@ namespace BlueControls.Forms
                 }
             }
             Pressed = null;
+
+            if (Owner == null)
+            {
+                StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            }
         }
 
         private void ThisButton_Click(object sender, System.EventArgs e)
