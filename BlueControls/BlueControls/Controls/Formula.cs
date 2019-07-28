@@ -70,7 +70,7 @@ namespace BlueControls.Controls
                 {
                     _ShowingRowKey = 0;
                     Database = null; // Wichtig,  (nicht _Database) um events zu lösen.
-                    components?.Dispose();
+                    //components?.Dispose();
 
                 }
             }

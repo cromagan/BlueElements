@@ -21,7 +21,6 @@
 using BlueBasics;
 using BlueControls.Forms;
 using BlueControls.Enums;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using System;

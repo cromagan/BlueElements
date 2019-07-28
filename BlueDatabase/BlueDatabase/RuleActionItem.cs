@@ -373,6 +373,11 @@ namespace BlueDatabase
                     return string.Empty;
 
                 case enAction.Skript:
+                    var sc = new BlueScript.Script();
+                    sc.ScriptText = _Text;
+                   // sc.Execute();
+
+
                     return string.Empty;
 
 

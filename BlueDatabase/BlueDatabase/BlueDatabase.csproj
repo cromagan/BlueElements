@@ -138,6 +138,10 @@
       <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
       <Name>BlueBasics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\BlueScript\BlueScript\BlueScript.csproj">
+      <Project>{3acc6ee6-b919-4952-8502-f62baeeefc60}</Project>
+      <Name>BlueScript</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
