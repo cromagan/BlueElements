@@ -2354,7 +2354,11 @@ namespace BlueDatabase
                 if (PermissionGroups_ChangeCell.Count > 0) { return "Bearbeitungsberechtigungen entfernen, wenn keine Bearbeitung erlaubt ist."; }
             }
 
-            if (!string.IsNullOrEmpty(_CellInitValue) && _VorschlagsColumn > -1) { return "InitialWert und Vorschlagspalten-Initial-Text gemeinsam nicht möglich"; }
+            if (!string.IsNullOrEmpty(_CellInitValue))
+            {
+                if (this.IsFirst()) { return "Die erste Spalte darf keinen InitialWert haben."; }
+                if (_VorschlagsColumn > -1) { return "InitialWert und Vorschlagspalten-Initial-Text gemeinsam nicht möglich"; }
+            }
 
             foreach (var thisS in PermissionGroups_ChangeCell)
             {
