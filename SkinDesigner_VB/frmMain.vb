@@ -11,7 +11,7 @@ Imports BlueBasics.Enums
 Imports BlueControls.Controls
 Imports BlueDatabase.EventArgs
 Imports BlueDatabase.Enums
-Imports BlueControls.DialogBoxes
+Imports BlueControls.Forms
 
 Class frmMain
 
@@ -38,7 +38,7 @@ Class frmMain
         '        .Release()
         '    End With
         'Next
-        BlueDatabase.Database.ReleaseAll(True)
+        BlueDatabase.Database.ReleaseAll(True, 60)
     End Sub
 
     'Public Sub ToEnum(ByVal Col As ColumnItem, ByRef t As System.Type)
@@ -75,11 +75,11 @@ Class frmMain
         For z As Integer = 0 To DB.GetUpperBound(0)
             With DB(z)
                 .UnlockHard()
-                ToReadable(.Column("Control"), GetType(enDesign))
-                ToReadable(.Column("Status"), GetType(enStates))
-                ToReadable(.Column("Border_Style"), GetType(enRahmenArt))
-                ToReadable(.Column("Draw_Back"), GetType(enHintergrundArt))
-                ToReadable(.Column("Kontur"), GetType(enKontur))
+                .Column("Control").GetValuesFromEnum(GetType(enDesign), 0, 9999)
+                .Column("Status").GetValuesFromEnum(GetType(enStates), 0, 9999)
+                .Column("Border_Style").GetValuesFromEnum(GetType(enRahmenArt), 0, 9999)
+                .Column("Draw_Back").GetValuesFromEnum(GetType(enHintergrundArt), 0, 9999)
+                .Column("Kontur").GetValuesFromEnum(GetType(enKontur), 0, 9999)
             End With
         Next
 
@@ -393,37 +393,6 @@ Class frmMain
 
 
 
-
-
-    Public Sub ToReadable(ByVal Col As ColumnItem, ByRef t As System.Type)
-
-        Dim li As New List(Of String)
-
-        Dim items As Array
-        items = System.Enum.GetValues(t)
-        Dim item As String
-        For Each item In items
-
-            Dim l As Long = 0
-            If Long.TryParse(item, l) Then
-                Dim te As String = System.Enum.GetName(t, l)
-
-                If Not String.IsNullOrEmpty(te) Then
-                    li.Add(item & "|" & te)
-                End If
-
-            End If
-
-
-        Next
-
-        li.Reverse()
-
-        If Col.Replacer.IsDifferentTo(li) Then
-            Col.Replacer.Clear()
-            Col.Replacer.AddRange(li)
-        End If
-    End Sub
 
 
 

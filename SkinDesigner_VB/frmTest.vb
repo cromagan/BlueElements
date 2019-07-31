@@ -4,7 +4,7 @@ Imports BlueBasics
 Imports BlueBasics.Enums
 Imports BlueControls
 Imports BlueControls.Enums
-Imports BlueControls.DialogBoxes
+Imports BlueControls.Forms
 Imports BlueControls.EventArgs
 Imports BlueControls.ItemCollection
 

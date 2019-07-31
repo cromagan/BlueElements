@@ -2876,5 +2876,52 @@ namespace BlueDatabase
 
             return new ColumnItem(this, false);
         }
+
+
+        /// <summary>
+        /// Füllt die Ersetzungen mittels eines Übergebenen Enums aus.
+        /// </summary>
+        /// <param name="t">Beispiel: GetType(enDesign)</param>
+        /// <param name="zumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
+        /// <param name="zumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
+        public void GetValuesFromEnum(System.Type t, int zumDropdownHinzuAb, int zumDropdownHinzuBis)
+        {
+            var NewReplacer = new List<string>();
+            var NewAuswahl = new List<string>();
+            var items = System.Enum.GetValues(t);
+
+            foreach (var thisItem in items)
+            {
+
+                var te = System.Enum.GetName(t, thisItem);
+                var th = (int)thisItem;
+
+                if (!string.IsNullOrEmpty(te))
+                {
+                    NewReplacer.Add(th.ToString() + "|" + te);
+                    if (th >= zumDropdownHinzuAb &&  th < zumDropdownHinzuBis)
+                    {
+                        NewAuswahl.Add(th.ToString());
+                    }
+                }
+            }
+
+            NewReplacer.Reverse();
+
+            if (Replacer.IsDifferentTo(NewReplacer))
+            {
+                Replacer.Clear();
+                Replacer.AddRange(NewReplacer);
+            }
+
+
+            if (DropDownItems.IsDifferentTo(NewAuswahl))
+            {
+                DropDownItems.Clear();
+                DropDownItems.AddRange(NewAuswahl);
+            }
+
+
+        }
     }
 }
