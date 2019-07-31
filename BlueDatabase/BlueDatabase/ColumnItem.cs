@@ -2882,9 +2882,9 @@ namespace BlueDatabase
         /// Füllt die Ersetzungen mittels eines Übergebenen Enums aus.
         /// </summary>
         /// <param name="t">Beispiel: GetType(enDesign)</param>
-        /// <param name="zumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
-        /// <param name="zumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
-        public void GetValuesFromEnum(System.Type t, int zumDropdownHinzuAb, int zumDropdownHinzuBis)
+        /// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
+        /// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
+        public void GetValuesFromEnum(System.Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis)
         {
             var NewReplacer = new List<string>();
             var NewAuswahl = new List<string>();
@@ -2899,7 +2899,7 @@ namespace BlueDatabase
                 if (!string.IsNullOrEmpty(te))
                 {
                     NewReplacer.Add(th.ToString() + "|" + te);
-                    if (th >= zumDropdownHinzuAb &&  th < zumDropdownHinzuBis)
+                    if (th >= ZumDropdownHinzuAb &&  th < ZumDropdownHinzuBis)
                     {
                         NewAuswahl.Add(th.ToString());
                     }
