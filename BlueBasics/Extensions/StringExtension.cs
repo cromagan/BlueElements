@@ -156,7 +156,7 @@ namespace BlueBasics
         public static bool ContainsOnlyChars(this string TXT, string Chars)
         {
             return !TXT.Where((t, z) => !Chars.Contains(TXT.Substring(z, 1))).Any();
-       }
+        }
 
         /// <summary>
         /// Teilt einen String, der geparsed werden kann in seine Bestandteile auf.
@@ -218,9 +218,12 @@ namespace BlueBasics
             var FirstCharAfterEquals = TXT.ToLower().IndexOf(OffTag.ToLower() + "=", StartIndex);
 
             if (FirstCharAfterEquals < 0) { return string.Empty; }
-            FirstCharAfterEquals = FirstCharAfterEquals + OffTag.Length;
+            FirstCharAfterEquals = FirstCharAfterEquals + OffTag.Length + 1;
 
-            do { FirstCharAfterEquals += 1; } while (TXT.Substring(FirstCharAfterEquals, 1) == " ");
+            //while (TXT.Substring(FirstCharAfterEquals, 1) == " ")
+            //{
+            //    FirstCharAfterEquals += 1;
+            //}
 
             var OpenBraketCount = 0;
             var CurrentChar = FirstCharAfterEquals - 1; // Wird im ersten Step wieder erhöht
@@ -338,7 +341,7 @@ namespace BlueBasics
         /// <remarks></remarks>
         public static string RemoveChars(this string TXT, string Chars)
         {
-            for (var z = 0 ; z < Chars.Length ; z++)
+            for (var z = 0; z < Chars.Length; z++)
             {
                 TXT = TXT.Replace(Chars.Substring(z, 1), string.Empty);
             }
@@ -654,7 +657,7 @@ namespace BlueBasics
 
         public static string PathParent(this string Pfad, int AnzahlParents)
         {
-            for (var z = 1 ; z <= AnzahlParents ; z++)
+            for (var z = 1; z <= AnzahlParents; z++)
             {
                 Pfad = Pfad.PathParent();
             }
@@ -849,7 +852,7 @@ namespace BlueBasics
 
                 startIndex = input.IndexOf(value, startIndex);
 
-                if (startIndex <0) { return -1; }
+                if (startIndex < 0) { return -1; }
 
                 if (startIndex > 0 && startIndex < input.Length - value.Length)
                 {
@@ -968,7 +971,7 @@ namespace BlueBasics
         public static int CountString(this string Text, string value)
         {
             var Anz = 0;
-            for (var z = 0 ; z <= Text.Length - value.Length ; z++)
+            for (var z = 0; z <= Text.Length - value.Length; z++)
             {
                 if (Text.Substring(z, value.Length) == value) { Anz += 1; }
             }

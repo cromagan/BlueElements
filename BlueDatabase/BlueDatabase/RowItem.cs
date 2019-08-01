@@ -178,6 +178,9 @@ namespace BlueDatabase
         /// <param name="DoFemdZelleInvalidate"></param>
         public string DoAutomatic(bool DoFemdZelleInvalidate, bool FullCheck)
         {
+
+            if (Database.ReadOnly) { return "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"; }
+
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
             var cols = DoRules();
 
