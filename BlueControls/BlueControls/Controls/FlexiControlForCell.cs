@@ -311,6 +311,9 @@ namespace BlueControls.Controls
             if (_IsFilling) { return; }
 
             if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
+            GetTmpVariables(); // Falls der Key inzwischen nicht mehr in der Collection ist, deswegen neu prüfen. RowREmoved greift zwar, kann aber durchaus erst nach RowSortesd/CursorposChanges auftreten.
+
+
             if (_tmpColumn == null || _tmpRow == null) { return; }
 
             var OldVal = _tmpRow.CellGetString(_tmpColumn);

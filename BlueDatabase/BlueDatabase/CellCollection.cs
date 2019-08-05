@@ -727,6 +727,11 @@ namespace BlueDatabase
 
         internal void SetValueBehindLinkedValue(ColumnItem Column, RowItem Row, string Value, bool FreezeMode)
         {
+
+
+            if (Column == null || Database.Column.SearchByKey(Column.Key) == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
+            if (Row == null || Database.Row.SearchByKey(Row.Key) == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!!<br>" + Database.Filename); }
+
             Value = Column.AutoCorrect(Value);
 
             var CellKey = KeyOfCell(Column.Key, Row.Key);
