@@ -381,8 +381,12 @@ namespace BlueControls.Forms
             var t = Pad.DataToString();
             modAllgemein.SaveToDiskx(SaveTab.FileName, t, false);
 
-            LastBCRFiles.AddFileName(SaveTab.FileName);
+            LastBCRFiles.AddFileName(SaveTab.FileName, string.Empty);
         }
+
+
+
+        //protected override OnItem
 
         private void LastBCRFiles_Item_Click(object sender, BasicListItemEventArgs e)
         {
@@ -392,7 +396,7 @@ namespace BlueControls.Forms
 
         private void LoadFile(string na)
         {
-            LastBCRFiles.AddFileName(na);
+            LastBCRFiles.AddFileName(na, string.Empty);
 
             Pad.Item.Clear();
             var t = modAllgemein.LoadFromDisk(na);

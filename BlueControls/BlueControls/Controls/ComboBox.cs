@@ -183,7 +183,7 @@ namespace BlueControls.Controls
 
         }
 
-        private void OnItemClicked(BasicListItemEventArgs e)
+        protected virtual void OnItemClicked(BasicListItemEventArgs e)
         {
             ItemClicked?.Invoke(this, e);
         }

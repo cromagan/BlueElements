@@ -233,6 +233,12 @@ namespace BlueBasics
         public static void Save(this List<string> L, string DateiName, bool ExecuteAfter)
         {
             var t = L.JoinWith("\r\n").TrimEnd("\r\n");
+
+            if (!FileOperations.PathExists(DateiName.FilePath()))
+            {
+                System.IO.Directory.CreateDirectory(DateiName.FilePath());
+            }
+
             modAllgemein.SaveToDiskx(DateiName, t, ExecuteAfter);
         }
 

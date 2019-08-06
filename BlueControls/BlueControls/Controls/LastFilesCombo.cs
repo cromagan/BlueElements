@@ -20,8 +20,10 @@
 
 using BlueBasics;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.FileOperations;
 
@@ -29,10 +31,65 @@ namespace BlueControls.Controls
 {
     public sealed class LastFilesCombo : ComboBox
     {
-        private int MaxCount = 20;
-        private List<string> LastD = new List<string>();
-        private string SaveFile;
 
+        private List<string> LastD = new List<string>();
+
+        public string _filename = string.Empty;
+        public bool _mustExists = true;
+        public int _maxCount = 20;
+
+        /// <summary>
+        /// Wohin die Datei gespeichtert werden soll, welche Dateien zuletzt benutzt wurden.
+        /// </summary>
+        /// 
+        [DefaultValue("")]
+        public string Filename
+        {
+            get
+            {
+                return _filename;
+            }
+            set
+            {
+                if (_filename == value) { return; }
+                _filename = value;
+                LoadFromDisk();
+                GenerateMenu();
+            }
+        }
+
+
+        [DefaultValue(true)]
+        public bool MustExist
+        {
+            get
+            {
+                return _mustExists;
+            }
+            set
+            {
+                if (_mustExists == value) { return; }
+                _mustExists = value;
+                GenerateMenu();
+
+            }
+        }
+
+        [DefaultValue(20)]
+        public int MaxCount
+        {
+            get
+            {
+                return _maxCount;
+            }
+            set
+            {
+                if (_maxCount == value) { return; }
+                _maxCount = value;
+                GenerateMenu();
+
+            }
+        }
 
 
         public LastFilesCombo()
@@ -54,16 +111,39 @@ namespace BlueControls.Controls
             Item.Clear();
             NR = -1;
 
-            for (var Z = LastD.Count - 1 ; Z >= 0 ; Z--)
+            for (var Z = LastD.Count - 1; Z >= 0; Z--)
             {
-                if (FileExists(LastD[Z]))
+                if (!_mustExists || FileExists(LastD[Z]))
                 {
                     NR += 1;
 
                     if (NR < MaxCount)
                     {
                         Vis = true;
-                        Item.Add(new TextListItem(false, LastD[Z], (NR + 1).ToString(Constants.Format_Integer2) + ": " + LastD[Z].FileNameWithSuffix(), NR.ToString(Constants.Format_Integer3)));
+
+
+                        var show = (NR + 1).ToString(Constants.Format_Integer3) + ": ";
+
+
+                        var x = (LastD[Z] + "|").SplitBy("|");
+
+                        if (_mustExists)
+                        {
+                            show = show + x[0].FileNameWithSuffix();
+                        }
+                        else
+                        {
+                            show = show + x[0];
+                        }
+
+                        if (!string.IsNullOrEmpty(x[1]))
+                        {
+                            show = show + " - " + x[1];
+                        }
+                        
+                        var it = new TextListItem(false, x[0], show, NR.ToString(Constants.Format_Integer3));
+                        it.Tags.Add(x[1]);
+                        Item.Add(it);
                     }
                 }
             }
@@ -74,16 +154,17 @@ namespace BlueControls.Controls
         }
 
 
-        public void AddFileName(string FileName)
+        public void AddFileName(string FileName, string AdditionalText)
         {
-            if (FileExists(FileName))
+
+            var s = FileName + "|" + AdditionalText;
+
+            if (!_mustExists || FileExists(FileName))
             {
-                if (LastD.Count > 0)
-                {
-                    LastD.RemoveString(FileName, false);
-                }
-                LastD.Add(FileName);
-                LastD.Save(SaveFile, false);
+                if (LastD.Count > 0) { LastD.RemoveString(FileName, false); }
+                if (LastD.Count > 0) { LastD.RemoveString(s, false); }
+                LastD.Add(s);
+                LastD.Save(SaveFile(), false);
             }
             GenerateMenu();
         }
@@ -98,34 +179,46 @@ namespace BlueControls.Controls
         protected override void OnHandleCreated(System.EventArgs e)
         {
             base.OnHandleCreated(e);
-
-            MaxCount = 20;
-            SaveFile = System.Windows.Forms.Application.StartupPath + "\\" + Name + "-Files.laf";
-            LastD = new List<string>();
-
-            if (FileExists(SaveFile))
-            {
-                var t = modAllgemein.LoadFromDisk(SaveFile);
-                t = t.RemoveChars("\n");
-                LastD.AddRange(t.SplitByCR());
-            }
-
+            LoadFromDisk();
             GenerateMenu();
         }
 
 
+        private string SaveFile()
+        {
+            if (!string.IsNullOrEmpty(_filename)) { return _filename; }
+
+            return System.Windows.Forms.Application.StartupPath + "\\" + Name + "-Files.laf";
+        }
 
 
+        private void LoadFromDisk()
+        {
+            LastD = new List<string>();
 
-
+            if (FileExists(SaveFile()))
+            {
+                var t = modAllgemein.LoadFromDisk(SaveFile());
+                t = t.RemoveChars("\n");
+                LastD.AddRange(t.SplitByCR());
+            }
+        }
 
 
         private void SetLastFilesStyle()
         {
             DrawStyle = enComboboxStyle.RibbonBar;
-            ImageCode = "Ordner";
-            Text = "zuletzt geöffnete Dateien";
+
+            if (string.IsNullOrEmpty(ImageCode)) { ImageCode = "Ordner"; }
+            if (string.IsNullOrEmpty(Text)) { Text = "zuletzt geöffnete Dateien"; }
         }
 
+
+
+        protected override void OnItemClicked(BasicListItemEventArgs e)
+        {
+            base.OnItemClicked(e);
+            AddFileName(e.Item.Internal(), e.Item.Tags[0]);
+        }
     }
 }
