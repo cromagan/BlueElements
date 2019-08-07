@@ -165,13 +165,6 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        public enum enMovePoints
-        {
-            LO_to_RU = 0,
-            MO_to_MU = 1
-
-        }
-
         public void ImageChanged()
         {
 
@@ -436,7 +429,7 @@ namespace BlueControls.ItemCollection
             {
                 case "additionalpoints":
                     AdditionalPoints.Clear();
-                    for (var z = 1 ; z <= int.Parse(pair.Value) ; z++)
+                    for (var z = 1; z <= int.Parse(pair.Value); z++)
                     {
                         var p = new PointDF(this, "Zusatz" + z, 0, 0, false, true);
                         AdditionalPoints.Add(p);
@@ -709,13 +702,13 @@ namespace BlueControls.ItemCollection
             var MinX = float.MaxValue;
             var MinY = float.MaxValue;
 
-            for (var z = 0 ; z <= 3 ; z++)
+            for (var z = 0; z <= 3; z++)
             {
                 MinX = Math.Min(p[z].X, MinX);
                 MinY = Math.Min(p[z].Y, MinY);
             }
 
-            for (var z = 0 ; z <= 3 ; z++)
+            for (var z = 0; z <= 3; z++)
             {
                 p[z].X -= MinX;
                 p[z].Y -= MinY;

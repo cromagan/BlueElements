@@ -628,7 +628,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private void GenerateUndoTabelle()
         {
 
-            var x = new Database(true, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
+            var x = new Database(true);
             ColumnItem c;
 
             c = new ColumnItem(x, "Index", true);

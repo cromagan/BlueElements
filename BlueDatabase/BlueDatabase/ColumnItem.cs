@@ -1485,17 +1485,17 @@ namespace BlueDatabase
             if (_TMP_LinkedDatabase != null) { return _TMP_LinkedDatabase; }
             if (string.IsNullOrEmpty(_LinkedDatabaseFile)) { return null; }
 
-            var el = new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly, Database._PasswordSub, Database._GenerateLayout, Database._RenameColumnInLayout);
+            var el = new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly);
 
 
             if (FileExists(_LinkedDatabaseFile))
             {
-                el = new DatabaseSettingsEventHandler(this, _LinkedDatabaseFile, Database.ReadOnly, Database._PasswordSub, Database._GenerateLayout, Database._RenameColumnInLayout);
+                el = new DatabaseSettingsEventHandler(this, _LinkedDatabaseFile, Database.ReadOnly);
 
             }
             else
             {
-                el = new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly, Database._PasswordSub, Database._GenerateLayout, Database._RenameColumnInLayout);
+                el = new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly);
 
             }
 
@@ -1514,7 +1514,7 @@ namespace BlueDatabase
                 if (FileExists(el.Filenname))
                 {
 
-                    TMP_LinkedDatabase = new Database(el.ReadOnly, el.PasswordSub, el.GenenerateLayout, el.RenameColumnInLayout); // Wichtig, NICHT _TMP_LinkedDatabase
+                    TMP_LinkedDatabase = new Database(el.ReadOnly); // Wichtig, NICHT _TMP_LinkedDatabase
                     _TMP_LinkedDatabase.LoadFromDisk(el.Filenname);
                 }
             }

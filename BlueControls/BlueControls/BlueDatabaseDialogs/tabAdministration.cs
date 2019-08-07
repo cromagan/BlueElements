@@ -111,12 +111,10 @@ namespace BlueControls.BlueDatabaseDialogs
             Check_OrderButtons();
         }
 
-        private void ChangeDatabase(Database database)
+        public static void CheckDatabase(object sender, LoadedEventArgs e)
         {
-            _originalDB = null;
-            btnVorherigeVersion.Text = "Vorherige Version";
 
-            _database = database;
+            var _database = (Database)sender;
 
             if (_database != null && !_database.ReadOnly)
             {
@@ -140,6 +138,17 @@ namespace BlueControls.BlueDatabaseDialogs
                     }
                 }
             }
+        }
+
+        private void ChangeDatabase(Database database)
+        {
+            _originalDB = null;
+            btnVorherigeVersion.Text = "Vorherige Version";
+
+            _database = database;
+
+            CheckDatabase(database, null);
+
 
             UpdateViewControlls();
             Check_OrderButtons();
@@ -631,7 +640,7 @@ namespace BlueControls.BlueDatabaseDialogs
             var tmp = Database.GetByFilename(Files[0]);
             if (tmp == null)
             {
-                tmp = new Database(true, _TableView.Database._PasswordSub, _TableView.Database._GenerateLayout, _TableView.Database._RenameColumnInLayout);
+                tmp = new Database(true);
                 tmp.LoadFromDisk(Files[0]);
             }
 

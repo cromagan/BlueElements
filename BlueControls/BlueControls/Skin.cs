@@ -101,7 +101,7 @@ namespace BlueControls
             _SkinString = _SkinString.Replace("_", "");
             _SkinString = _SkinString.Replace(" ", "");
 
-            SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", Convert.ToBoolean(_Skin == enSkin.Windows_10), Convert.ToBoolean(Develop.AppName() == "SkinDesigner"), Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
+            SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", Convert.ToBoolean(_Skin == enSkin.Windows_10), Convert.ToBoolean(Develop.AppName() == "SkinDesigner"));
             if (SkinDB == null)
             {
                 Develop.DebugPrint("Skin '" + _SkinString + "' konnte nicht geladen werden!");
@@ -1107,7 +1107,7 @@ namespace BlueControls
 
         public static void InitStyles()
         {
-            StyleDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
+            StyleDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false);
         }
 
         #endregion

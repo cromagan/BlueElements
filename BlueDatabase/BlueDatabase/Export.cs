@@ -29,6 +29,7 @@ using static BlueDatabase.Database;
 using static BlueBasics.FileOperations;
 using System.Text.RegularExpressions;
 using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 
 namespace BlueDatabase
 {
@@ -40,14 +41,14 @@ namespace BlueDatabase
 
 
 
-        public static List<string> SaveAsBitmap(List<RowItem> Row, string LayoutID, string Path, GenerateLayout_Internal _GenerateLayout)
+        public static List<string> SaveAsBitmap(List<RowItem> Row, string LayoutID, string Path)
         {
             var l = new List<string>();
 
             foreach (var ThisRow in Row)
             {
                 var FN = TempFile(Path, ThisRow.CellFirstString(), "PNG");
-                _GenerateLayout(ThisRow, LayoutID, false, true, FN);
+                ThisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(ThisRow, LayoutID, false, true, FN));
                 l.Add(FN);
             }
 
@@ -56,9 +57,9 @@ namespace BlueDatabase
 
 
 
-        public static void SaveAsBitmap(RowItem Row, string LayoutID, string optionalFilename, GenerateLayout_Internal _GenerateLayout)
+        public static void SaveAsBitmap(RowItem Row, string LayoutID, string optionalFilename)
         {
-            _GenerateLayout(Row, LayoutID, false, true, optionalFilename);
+            Row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(Row, LayoutID, false, true, optionalFilename));
         }
 
 

@@ -17,32 +17,27 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using static BlueDatabase.Database;
 
 namespace BlueDatabase.EventArgs
 {
-    public class DatabaseSettingsEventHandler : System.EventArgs
+    public class GenerateLayoutInternalEventargs : System.EventArgs
     {
-
-
-        public DatabaseSettingsEventHandler(ColumnItem ExecutingColumn, string Filenname, bool ReadOnly)
+        public GenerateLayoutInternalEventargs(RowItem row, string layoutID, bool directPrint, bool directSave, string optionalFilename)
         {
-            this.ExecutingColumn = ExecutingColumn;
-            this.Filenname = Filenname;
-            this.ReadOnly = ReadOnly;
-            //this.PasswordSub = PasswordSub;
-            //this.GenenerateLayout = GenLayout;
-            //this.RenameColumnInLayout = RenameColumn;
+            Row = row;
+            LayoutID = layoutID;
+            DirectPrint = directPrint;
+            DirectSave = directSave;
+            OptionalFilename = optionalFilename;
+            Handled = false;
         }
 
-        public ColumnItem ExecutingColumn { get;  }
-        public string Filenname { get; }
 
-        public bool ReadOnly { get; set; }
-
-        //public GetPassword PasswordSub { get; set; }
-        //public GenerateLayout_Internal GenenerateLayout { get; set; }
-
-        //public RenameColumnInLayout RenameColumnInLayout { get; set; }
+        public bool Handled { get; set; }
+        public RowItem Row { get; set; }
+        public string LayoutID { get; set; }
+        public bool DirectPrint { get; set; }
+        public bool DirectSave { get; set; }
+        public string OptionalFilename { get; set; }
     }
 }

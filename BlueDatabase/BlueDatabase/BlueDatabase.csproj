@@ -98,6 +98,9 @@
     <Compile Include="EventArgs\BeforeNewValueEventArgs.cs" />
     <Compile Include="EventArgs\CellCancelEventArgs.cs" />
     <Compile Include="EventArgs\CellDoubleClickEventArgs.cs" />
+    <Compile Include="EventArgs\GenerateLayoutInternalEventargs.cs" />
+    <Compile Include="EventArgs\RenameColumnInLayoutEventArgs.cs" />
+    <Compile Include="EventArgs\PasswordEventArgs.cs" />
     <Compile Include="EventArgs\CellEventArgs.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="EventArgs\DatabaseSettingsEventHandler.cs" />

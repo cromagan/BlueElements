@@ -161,6 +161,7 @@ namespace BlueControls.Forms
         protected override void OnCreateControl()
         {
             Develop.StartService();
+            Table.StartDatabaseService();
             base.OnCreateControl();
         }
 

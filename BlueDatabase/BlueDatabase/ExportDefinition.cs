@@ -693,7 +693,7 @@ namespace BlueDatabase
 
         //#endregion
 
-        internal bool DoBackUp(BackgroundWorker worker, GenerateLayout_Internal _GenerateLayout)
+        internal bool DoBackUp(BackgroundWorker worker)
         {
 
             if (!IsOk()) { return false; }
@@ -779,7 +779,7 @@ namespace BlueDatabase
                                         if (_ExportFormularID.StartsWith("#"))
                                         {
                                             SingleFileExport = TempFile(SavePath, Thisrow.CellFirstString(), "PNG");
-                                            Export.SaveAsBitmap(Thisrow, _ExportFormularID, SingleFileExport, _GenerateLayout);
+                                            Export.SaveAsBitmap(Thisrow, _ExportFormularID, SingleFileExport);
                                         }
                                         else
                                         {

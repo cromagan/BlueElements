@@ -36,6 +36,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Printing;
 using static BlueBasics.FileOperations;
+using BlueDatabase.EventArgs;
 
 namespace BlueControls.Controls
 {
@@ -3388,12 +3389,13 @@ namespace BlueControls.Controls
             }
         }
 
-        public static void GenerateLayoutFromRow(RowItem Row, string LayoutID, bool DirectPrint, bool DirectSave, string OptionalFilename)
+        public static void GenerateLayoutFromRow(object sender, GenerateLayoutInternalEventargs e)
         {
 
+            if (e.Handled) { return; }
+            e.Handled = true;
 
-
-            if (!DirectPrint && !DirectSave)
+            if (!e.DirectPrint && !e.DirectSave)
             {
                 Develop.DebugPrint_NichtImplementiert();
                 //Dim x As New PictureView(Row.Database.Layouts(LayoutNr), Row.CellFirst().String)
@@ -3409,12 +3411,12 @@ namespace BlueControls.Controls
             }
             else
             {
-                PadForCreation.GenerateFromRow(LayoutID, Row, false);
-                if (DirectSave)
+                PadForCreation.GenerateFromRow(e.LayoutID, e.Row, false);
+                if (e.DirectSave)
                 {
-                    PadForCreation.SaveAsBitmap(Row.CellFirstString(), OptionalFilename);
+                    PadForCreation.SaveAsBitmap(e.Row.CellFirstString(), e.OptionalFilename);
                 }
-                if (DirectPrint)
+                if (e.DirectPrint)
                 {
                     PadForCreation.Print();
                 }
@@ -3422,14 +3424,15 @@ namespace BlueControls.Controls
         }
 
 
-        public static string RenameColumnInLayout(Database database, string LayoutCode, string OldName, ColumnItem Column)
+        public static void RenameColumnInLayout(object sender, RenameColumnInLayoutEventArgs e)
         {
+            if (e.Handled) { return; }
+            e.Handled = true;
             var Padx = new CreativePad(); // TODO: Creative-Pad unabhängig eines Controls erstellen.
-            Padx.ParseData(LayoutCode, false, true);
-            Padx.RenameColumn(OldName, Column);
-            var R = Padx.DataToString();
+            Padx.ParseData(e.LayoutCode, false, true);
+            Padx.RenameColumn(e.OldName, e.Column);
+            e.LayoutCode = Padx.DataToString();
             Padx.Dispose();
-            return R;
         }
 
         private void DruckerDokument_BeginPrint(object sender, PrintEventArgs e)

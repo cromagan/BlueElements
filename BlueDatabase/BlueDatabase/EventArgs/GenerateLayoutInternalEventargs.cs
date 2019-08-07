@@ -17,32 +17,22 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using static BlueDatabase.Database;
 
 namespace BlueDatabase.EventArgs
 {
-    public class DatabaseSettingsEventHandler : System.EventArgs
+    public class RenameColumnInLayoutEventArgs : System.EventArgs
     {
-
-
-        public DatabaseSettingsEventHandler(ColumnItem ExecutingColumn, string Filenname, bool ReadOnly)
+        public RenameColumnInLayoutEventArgs(string layoutCode, string oldName, ColumnItem column)
         {
-            this.ExecutingColumn = ExecutingColumn;
-            this.Filenname = Filenname;
-            this.ReadOnly = ReadOnly;
-            //this.PasswordSub = PasswordSub;
-            //this.GenenerateLayout = GenLayout;
-            //this.RenameColumnInLayout = RenameColumn;
+            Column = column;
+            OldName = oldName;
+            LayoutCode = layoutCode;
+            Handled = false;
         }
 
-        public ColumnItem ExecutingColumn { get;  }
-        public string Filenname { get; }
-
-        public bool ReadOnly { get; set; }
-
-        //public GetPassword PasswordSub { get; set; }
-        //public GenerateLayout_Internal GenenerateLayout { get; set; }
-
-        //public RenameColumnInLayout RenameColumnInLayout { get; set; }
+        public bool Handled { get; set; }
+        public ColumnItem Column { get; set; }
+        public string OldName { get; set; }
+        public string LayoutCode { get; set; }
     }
 }

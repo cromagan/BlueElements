@@ -59,6 +59,10 @@ namespace BlueControls.Controls
         }
 
 
+        /// <summary>
+        ///  Wird DatabaseAdded gehandlet?
+        /// </summary>
+        private static bool ServiceStarted = false;
 
         #region  Variablen 
 
@@ -145,6 +149,30 @@ namespace BlueControls.Controls
         public event EventHandler ColumnArrangementChanged;
 
         public event EventHandler ViewChanged;
+
+        internal static void StartDatabaseService()
+        {
+            if (ServiceStarted) { return; }
+            ServiceStarted = true;
+
+
+            Database.DatabaseAdded += Database_DatabaseAdded;
+
+        }
+
+        private static void Database_DatabaseAdded(object sender, DatabaseGiveBackEventArgs e)
+        {
+
+            e.Database.NeedPassword += Database_NeedPassword;
+            e.Database.GenerateLayoutInternal += CreativePad.GenerateLayoutFromRow;
+            e.Database.RenameColumnInLayout += CreativePad.RenameColumnInLayout;
+            e.Database.Loaded += tabAdministration.CheckDatabase;
+
+
+
+        }
+
+
 
         public event EventHandler RowsSorted;
 
@@ -1150,10 +1178,11 @@ namespace BlueControls.Controls
         #endregion
 
 
-        public static string Database_NeedPassword()
+        public static void Database_NeedPassword(object sender, PasswordEventArgs e)
         {
-
-            return InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, enDataFormat.Text);
+            if (e.Handled) { return; }
+            e.Handled = true;
+            e.Password = InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, enDataFormat.Text);
         }
 
         private void ColumnArrangements_ItemInternalChanged(object sender, ListEventArgs e)

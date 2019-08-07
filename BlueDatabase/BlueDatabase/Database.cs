@@ -65,13 +65,13 @@ namespace BlueDatabase
         }
 
 
-        private static Database Load(Stream Stream, GetPassword passwordSub, GenerateLayout_Internal GenLayout, RenameColumnInLayout RenameColumn)
+        private static Database Load(Stream Stream)
         {
             if (Stream == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname nicht angegeben!"); }
 
 
 
-            var db = new Database(true, passwordSub, GenLayout, RenameColumn);
+            var db = new Database(true);
 
             //TODO: In AllDatabases Aufnehmen!!!!!
 
@@ -80,17 +80,7 @@ namespace BlueDatabase
             return db;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="assembly"></param>
-        /// <param name="Name"></param>
-        /// <param name="BlueBasicsSubDir"></param>
-        /// <param name="FehlerAusgeben"></param>
-        /// <param name="MustBeStream"></param>
-        /// <param name="passwordSub">Bestenfalls: Table.Database_NeedPassword</param>
-        /// <returns></returns>
-        public static Database LoadResource(Assembly assembly, string Name, string BlueBasicsSubDir, bool FehlerAusgeben, bool MustBeStream, GetPassword passwordSub, GenerateLayout_Internal GenLayout, RenameColumnInLayout RenameColumn)
+        public static Database LoadResource(Assembly assembly, string Name, string BlueBasicsSubDir, bool FehlerAusgeben, bool MustBeStream)
         {
 
             if (Develop.IsHostRunning() && !MustBeStream)
@@ -145,7 +135,7 @@ namespace BlueDatabase
                     {
                         var tmp = Database.GetByFilename(pf);
                         if (tmp != null) { return tmp; }
-                        tmp = new Database(false, passwordSub, GenLayout, RenameColumn);
+                        tmp = new Database(false);
                         tmp.LoadFromDisk(pf);
                         return tmp;
                     }
@@ -154,7 +144,7 @@ namespace BlueDatabase
             }
 
             var d = modAllgemein.GetEmmbedResource(assembly, Name);
-            if (d != null) { return Load(d, null, null, null); }
+            if (d != null) { return Load(d); }
 
             if (FehlerAusgeben) { Develop.DebugPrint(enFehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + BlueBasicsSubDir + " - " + Name); }
 
@@ -310,19 +300,27 @@ namespace BlueDatabase
 
             Filename = fileName;
 
+
             // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
             LoadFromDisk();
 
             OnLoaded(new LoadedEventArgs(false));
 
 
-            AllDatabases.Add(this);
+
 
             if (ReloadNeeded()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank nicht aktuell"); }
 
 
+
         }
 
+        private static void OnDatabaseAdded(Database database)
+        {
+            var e = new DatabaseGiveBackEventArgs();
+            e.Database = database;
+            DatabaseAdded?.Invoke(null, e);
+        }
 
         public static void ReleaseAll(bool MUSTRelease, int MaxWaitSeconds)
         {
@@ -444,20 +442,20 @@ namespace BlueDatabase
 
 
 
-        /// <summary>
-        /// Table würde eine Statische Routine enthalten, die dafür geeignet wäre.
-        /// </summary>
-        public readonly GetPassword _PasswordSub;
+        ///// <summary>
+        ///// Table würde eine Statische Routine enthalten, die dafür geeignet wäre.
+        ///// </summary>
+        //public readonly GetPassword _PasswordSub;
 
-        /// <summary>
-        /// Creative-Pad würde eine Statische Routine enthalten, die dafür geeignet wäre.
-        /// </summary>
-        public readonly GenerateLayout_Internal _GenerateLayout;
+        ///// <summary>
+        ///// Creative-Pad würde eine Statische Routine enthalten, die dafür geeignet wäre.
+        ///// </summary>
+        //public readonly GenerateLayout_Internal _GenerateLayout;
 
-        /// <summary>
-        /// Creative-Pad würde eine Statische Routine enthalten, die dafür geeignet wäre.
-        /// </summary>
-        public readonly RenameColumnInLayout _RenameColumnInLayout;
+        ///// <summary>
+        ///// Creative-Pad würde eine Statische Routine enthalten, die dafür geeignet wäre.
+        ///// </summary>
+        //public readonly RenameColumnInLayout _RenameColumnInLayout;
 
 
 
@@ -484,38 +482,39 @@ namespace BlueDatabase
         public event EventHandler<KeyChangedEventArgs> ColumnKeyChanged;
         public event EventHandler<ProgressbarEventArgs> ProgressbarInfo;
 
+        public event EventHandler<PasswordEventArgs> NeedPassword;
+        public event EventHandler<RenameColumnInLayoutEventArgs> RenameColumnInLayout;
+        public event EventHandler<GenerateLayoutInternalEventargs> GenerateLayoutInternal;
+
+
+        public static event EventHandler<DatabaseGiveBackEventArgs> DatabaseAdded;
+
         /// <summary>
         /// Wird ausgegeben, sobals isparsed false ist, noch vor den automatischen reperaturen.
         /// Diese Event kann verwendet werden, um die Datenbank zu reparieren, bevor sich automatische Dialoge öffnen.
         /// </summary>
         public event EventHandler Parsed;
 
-        public delegate string GetPassword();
-        public delegate string RenameColumnInLayout(Database database, string LayoutCode, string OldName, ColumnItem Column);
-        public delegate void GenerateLayout_Internal(RowItem Row, string LayoutID, bool DirectPrint, bool DirectSave, string OptionalFilename);
+        //public delegate string GetPassword();
+        //public delegate string RenameColumnInLayout(Database database, string LayoutCode, string OldName, ColumnItem Column);
+        //public delegate void GenerateLayout_Internal(RowItem Row, string LayoutID, bool DirectPrint, bool DirectSave, string OptionalFilename);
 
         #endregion
 
 
         #region  Construktor + Initialize 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="readOnly"></param>
-        /// <param name="passwordSub">Bestenfalls: Table.Database_NeedPassword</param>
-        /// <param name="GenLayout">Bestenfalls: CreativePad.Generate_Layout</param>
-        /// <param name="RenameColumn">Bestenfalls: CreativePad.RenameColumnInLayout</param>
-        public Database(bool readOnly, GetPassword passwordSub, GenerateLayout_Internal GenLayout, RenameColumnInLayout RenameColumn)
+
+        public Database(bool readOnly)
         {
+            AllDatabases.Add(this);
+            OnDatabaseAdded(this);
+
             var culture = new System.Globalization.CultureInfo("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             ReadOnly = readOnly;
-            _PasswordSub = passwordSub;
-            _GenerateLayout = GenLayout;
-            _RenameColumnInLayout = RenameColumn;
 
             CreateControl();
             InitializeComponent();
@@ -1300,9 +1299,10 @@ namespace BlueDatabase
                 {
                     if (Inhalt.FromPlusMinus())
                     {
-                        var Pass = _PasswordSub();
+                        var e = new PasswordEventArgs();
+                        OnNeedPassword(e);
 
-                        B = modAllgemein.SimpleCrypt(B, Pass, -1, Pointer, B.Count - 1);
+                        B = modAllgemein.SimpleCrypt(B, e.Password, -1, Pointer, B.Count - 1);
                         if (B[Pointer] != 1 || B[Pointer + 1] != 3 || B[Pointer + 2] != 0 || B[Pointer + 3] != 0 || B[Pointer + 4] != 2 || B[Pointer + 5] != 79 || B[Pointer + 6] != 75 || B[Pointer + 7] != 1)
                         {
                             Filename = "";
@@ -1661,7 +1661,11 @@ namespace BlueDatabase
             {
                 for (var cc = 0; cc < Layouts.Count; cc++)
                 {
-                    Layouts[cc] = _RenameColumnInLayout(this, Layouts[cc], OldName, cColumnItem);
+
+                    var e = new RenameColumnInLayoutEventArgs(Layouts[cc], OldName, cColumnItem);
+                    OnRenameColumnInLayout(e);
+
+                    Layouts[cc] = e.LayoutCode;
                 }
             }
 
@@ -2594,10 +2598,13 @@ namespace BlueDatabase
         }
 
 
-        //private void OnColumnArrangementsChanged()
-        //{
-        //    ColumnArrangementsChanged?.Invoke(this, System.EventArgs.Empty);
-        //}
+        internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventargs e)
+        {
+            GenerateLayoutInternal?.Invoke(this, e);
+        }
+
+
+
 
         private void OnSortParameterChanged()
         {
@@ -2615,6 +2622,11 @@ namespace BlueDatabase
         private void OnLoaded(LoadedEventArgs e)
         {
             Loaded?.Invoke(this, e);
+        }
+
+        private void OnRenameColumnInLayout(RenameColumnInLayoutEventArgs e)
+        {
+            RenameColumnInLayout?.Invoke(this, e);
         }
 
 
@@ -3132,6 +3144,11 @@ namespace BlueDatabase
             RowKeyChanged?.Invoke(this, e);
         }
 
+        private void OnNeedPassword(PasswordEventArgs e)
+        {
+            NeedPassword?.Invoke(this, e);
+        }
+
 
 
         private void ChangeColumnKeyInPending(int OldKey, int NewKey)
@@ -3592,7 +3609,7 @@ namespace BlueDatabase
                 {
                     foreach (var ThisExport in Export)
                     {
-                        if (ThisExport != null) { tmp = ThisExport.DoBackUp(Backup, _GenerateLayout); }
+                        if (ThisExport != null) { tmp = ThisExport.DoBackUp(Backup); }
                         if (tmp) { ReportAChange = true; }
                     }
 

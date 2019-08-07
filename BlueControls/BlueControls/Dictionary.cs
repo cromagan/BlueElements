@@ -42,7 +42,7 @@ namespace BlueControls
 
         private static void Init()
         {
-            _DictWords = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
+            _DictWords = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false);
         }
 
 

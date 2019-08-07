@@ -290,7 +290,7 @@ namespace BlueControls.Forms
 
                 if (FrmDrucken_Layout1.Text.IsLong())
                 {
-                    l = Export.SaveAsBitmap(Liste, FrmDrucken_Layout1.Text, ZielPfad, CreativePad.GenerateLayoutFromRow);
+                    l = Export.SaveAsBitmap(Liste, FrmDrucken_Layout1.Text, ZielPfad);
                 }
                 else
                 {
