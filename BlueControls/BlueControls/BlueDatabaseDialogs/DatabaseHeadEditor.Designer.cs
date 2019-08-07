@@ -305,7 +305,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capInfo.Name = "capInfo";
             this.capInfo.Size = new System.Drawing.Size(599, 90);
             this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            this.capInfo.Translate = false;
             // 
             // RuleItemEditor
             // 
@@ -333,7 +332,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxRuleSelector.RemoveAllowed = true;
             this.lbxRuleSelector.Size = new System.Drawing.Size(1023, 360);
             this.lbxRuleSelector.TabIndex = 1;
-            this.lbxRuleSelector.Translate = false;
             this.lbxRuleSelector.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.lbxRuleSelector_ContextMenuInit);
             this.lbxRuleSelector.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.lbxRuleSelector_ContextMenuItemClicked);
             this.lbxRuleSelector.ItemCheckedChanged += new System.EventHandler(this.lbxRuleSelector_ItemCheckedChanged);

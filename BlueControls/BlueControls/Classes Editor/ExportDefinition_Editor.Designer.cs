@@ -96,7 +96,6 @@ namespace BlueControls.Classes_Editor
             this.ExportFilter.RemoveAllowed = true;
             this.ExportFilter.Size = new Size(328, 96);
             this.ExportFilter.TabIndex = 9;
-            this.ExportFilter.Translate = false;
             this.ExportFilter.Changed += new EventHandler(ExportFilter_Changed);
             this.ExportFilter.AddClicked += new EventHandler(this.ExportFilter_Add_Clicked);
             //

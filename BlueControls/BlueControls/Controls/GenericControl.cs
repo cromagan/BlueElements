@@ -65,6 +65,7 @@ namespace BlueControls.Controls
 
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
 
+            Translate = true;
 
             InitializeSkin();
             Skin.SkinChanged += SkinChanged;

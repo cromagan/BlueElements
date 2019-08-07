@@ -27,7 +27,7 @@ using BlueBasics.Enums;
 
 namespace BlueControls.ItemCollection
 {
-    public class ItemCollectionPad : ListExt<BasicPadItem>, IParseable
+    public class ItemCollectionPad: ListExt<BasicPadItem>, IParseable
     {
         #region  Variablen-Deklarationen 
 

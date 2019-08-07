@@ -181,6 +181,7 @@
     <Compile Include="Forms-Common\Notification.Designer.cs">
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
+    <Compile Include="ItemCollection\ItemCollectionPad\BasicPadItemTwoPoints.cs" />
     <Compile Include="SystemInputHook.cs" />
     <Compile Include="Controls\BrainDrawer.cs">
       <SubType>Component</SubType>

@@ -365,7 +365,7 @@ namespace BeCreative
             }
 
 
-            LastDatabases.AddFileName(Datei);
+            LastDatabases.AddFileName(Datei, string.Empty);
             LoadTab.FileName = Datei;
 
 
