@@ -203,6 +203,7 @@ namespace BlueControls.Controls
         {
             get
             {
+                Develop.DebugPrint_InvokeRequired(this.InvokeRequired, false);
                 return base.SelectedIndex;
             }
             set
