@@ -235,7 +235,13 @@ namespace BlueControls.ItemCollection
         public string AngezeigterText1()
         {
             if (!string.IsNullOrEmpty(Text1)) { return Text1; }
-            return Prefix + LängeInMM() + Suffix;
+            var s = LängeInMM().ToString();
+
+            s = s.TrimEnd("0");
+            s = s.TrimEnd(",");
+            s = s.TrimEnd(".");
+
+            return Prefix + s + Suffix;
         }
 
 

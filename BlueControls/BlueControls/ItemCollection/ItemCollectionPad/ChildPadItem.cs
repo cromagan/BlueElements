@@ -144,7 +144,7 @@ namespace BlueControls.ItemCollection
 
                 var r = UsedArea();
 
-                while (r.Width* cZoom > 10000 || r.Height * cZoom > 10000)
+                while (r.Width* cZoom > 8000 || r.Height * cZoom > 8000)
                 {
                     cZoom = cZoom * 0.8m; // Kann ruhig verändert werden, tut nix zur Sache, DKoordinates reichen
                 }
@@ -156,6 +156,7 @@ namespace BlueControls.ItemCollection
                     {
                         _tmpBitmap.Dispose();
                         _tmpBitmap = null;
+                        modAllgemein.CollectGarbage();
                     }
                 }
 
