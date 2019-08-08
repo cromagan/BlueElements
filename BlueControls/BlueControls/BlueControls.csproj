@@ -125,6 +125,12 @@
     <Compile Include="Forms-Common\EditBoxRow.Designer.cs">
       <DependentUpon>EditBoxRow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms-Common\frmTableView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms-Common\frmTableView.Designer.cs">
+      <DependentUpon>frmTableView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms-Common\InputBoxListBoxStyle.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -374,12 +380,6 @@
     <Compile Include="Forms-Special\RelationDiagram.Designer.cs">
       <DependentUpon>RelationDiagram.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\TODELETE_TableView.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\TODELETE_TableView.Designer.cs">
-      <DependentUpon>TODELETE_TableView.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controls\Formula.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -575,6 +575,10 @@
       <DependentUpon>EditBoxRow.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms-Common\frmTableView.resx">
+      <DependentUpon>frmTableView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms-Common\InputBoxListBoxStyle.resx">
       <DependentUpon>InputBoxListBoxStyle.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -633,10 +637,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms-Special\RelationDiagram.resx">
       <DependentUpon>RelationDiagram.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\TODELETE_TableView.resx">
-      <DependentUpon>TODELETE_TableView.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\Formula.resx">

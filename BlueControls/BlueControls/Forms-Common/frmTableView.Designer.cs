@@ -40,9 +40,9 @@ using TabPage = BlueControls.Controls.TabPage;
 using TextBox = BlueControls.Controls.TextBox;
 
 
-namespace BeCreative
+namespace BlueControls.Forms
 {
-    public partial class frmMain : Form
+    public partial class frmTableView : Form
     {
         //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
 
@@ -72,65 +72,65 @@ namespace BeCreative
         {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.BlueFormulax = new BlueControls.Controls.Formula();
+            this.Formula = new BlueControls.Controls.Formula();
             this.TableView = new BlueControls.Controls.Table();
             this.cbxColumnArr = new BlueControls.Controls.ComboBox();
             this.Zei = new BlueControls.Controls.Caption();
             this.MainRibbon = new BlueControls.Controls.TabControl();
             this.tabDatei = new BlueControls.Controls.TabPage();
-            this.BlueFrame12 = new BlueControls.Controls.GroupBox();
+            this.grpInformation = new BlueControls.Controls.GroupBox();
             this.Copyright = new BlueControls.Controls.Caption();
-            this.ÜberDiesesProgramm = new BlueControls.Controls.Button();
-            this.BlueFrame2 = new BlueControls.Controls.GroupBox();
-            this.Ordn = new BlueControls.Controls.Button();
-            this.TemporärenSpeicherortÖffnen = new BlueControls.Controls.Button();
-            this.BlueFrame1 = new BlueControls.Controls.GroupBox();
-            this.LastDatabases = new BlueControls.Controls.LastFilesCombo();
-            this.Öffnen = new BlueControls.Controls.Button();
-            this.SaveAs = new BlueControls.Controls.Button();
+            this.btnInformation = new BlueControls.Controls.Button();
+            this.grpOrdner = new BlueControls.Controls.GroupBox();
+            this.btnDatenbanken = new BlueControls.Controls.Button();
+            this.btnTemporärenSpeicherortÖffnen = new BlueControls.Controls.Button();
+            this.grpDatei = new BlueControls.Controls.GroupBox();
+            this.btnLetzteDateien = new BlueControls.Controls.LastFilesCombo();
+            this.btnOeffnen = new BlueControls.Controls.Button();
+            this.btnSaveAs = new BlueControls.Controls.Button();
             this.NeuDB = new BlueControls.Controls.Button();
             this.tabStart = new BlueControls.Controls.TabPage();
-            this.BlueFrame5 = new BlueControls.Controls.GroupBox();
+            this.grpAnsicht = new BlueControls.Controls.GroupBox();
             this.SpaltAnsichtCap = new BlueControls.Controls.Caption();
             this.Ansicht3 = new BlueControls.Controls.Button();
             this.Ansicht2 = new BlueControls.Controls.Button();
             this.Ansicht1 = new BlueControls.Controls.Button();
             this.Ansicht0 = new BlueControls.Controls.Button();
-            this.BlueFrame4 = new BlueControls.Controls.GroupBox();
+            this.grpBearbeitung = new BlueControls.Controls.GroupBox();
             this.Datenüberprüfung = new BlueControls.Controls.Button();
             this.AngezeigteZeilenLöschen = new BlueControls.Controls.Button();
             this.SuchenUndErsetzen = new BlueControls.Controls.Button();
-            this.FormulaViewBar = new BlueControls.Controls.GroupBox();
+            this.grpFormularSteuerung = new BlueControls.Controls.GroupBox();
             this.SuchB = new BlueControls.Controls.Button();
             this.such = new BlueControls.Controls.TextBox();
             this.Vorwärts = new BlueControls.Controls.Button();
             this.zurück = new BlueControls.Controls.Button();
-            this.TableViewBar = new BlueControls.Controls.GroupBox();
+            this.grpFilter = new BlueControls.Controls.GroupBox();
             this.btnTextLöschen = new BlueControls.Controls.Button();
             this.AlleFilterAus = new BlueControls.Controls.Button();
             this.ZeilenFilter_TextFeld = new BlueControls.Controls.TextBox();
-            this.BlueFrame13 = new BlueControls.Controls.GroupBox();
-            this.Neu = new BlueControls.Controls.Button();
-            this.Drucken = new BlueControls.Controls.ComboBox();
-            this.löschen = new BlueControls.Controls.Button();
+            this.grpAllgemein = new BlueControls.Controls.GroupBox();
+            this.btnNeu = new BlueControls.Controls.Button();
+            this.btnDrucken = new BlueControls.Controls.ComboBox();
+            this.btnLoeschen = new BlueControls.Controls.Button();
             this.tabExtras = new BlueControls.Controls.TabPage();
-            this.BlueFrame6 = new BlueControls.Controls.GroupBox();
+            this.grpEditor = new BlueControls.Controls.GroupBox();
             this.AllgemeinerEditor = new BlueControls.Controls.Button();
             this.BeziehungsEditor = new BlueControls.Controls.Button();
             this.tabAdmin = new BlueControls.BlueDatabaseDialogs.tabAdministration();
             this.MainRibbon.SuspendLayout();
             this.tabDatei.SuspendLayout();
-            this.BlueFrame12.SuspendLayout();
-            this.BlueFrame2.SuspendLayout();
-            this.BlueFrame1.SuspendLayout();
+            this.grpInformation.SuspendLayout();
+            this.grpOrdner.SuspendLayout();
+            this.grpDatei.SuspendLayout();
             this.tabStart.SuspendLayout();
-            this.BlueFrame5.SuspendLayout();
-            this.BlueFrame4.SuspendLayout();
-            this.FormulaViewBar.SuspendLayout();
-            this.TableViewBar.SuspendLayout();
-            this.BlueFrame13.SuspendLayout();
+            this.grpAnsicht.SuspendLayout();
+            this.grpBearbeitung.SuspendLayout();
+            this.grpFormularSteuerung.SuspendLayout();
+            this.grpFilter.SuspendLayout();
+            this.grpAllgemein.SuspendLayout();
             this.tabExtras.SuspendLayout();
-            this.BlueFrame6.SuspendLayout();
+            this.grpEditor.SuspendLayout();
             this.SuspendLayout();
             // 
             // LoadTab
@@ -144,13 +144,13 @@ namespace BeCreative
             this.SaveTab.Filter = "*.MDB Datenbanken|*.MDB|*.* Alle Dateien|*";
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
             // 
-            // BlueFormulax
+            // Formula
             // 
-            this.BlueFormulax.Location = new System.Drawing.Point(200, 144);
-            this.BlueFormulax.MinimumSize = new System.Drawing.Size(320, 350);
-            this.BlueFormulax.Name = "BlueFormulax";
-            this.BlueFormulax.Size = new System.Drawing.Size(856, 352);
-            this.BlueFormulax.TabIndex = 75;
+            this.Formula.Location = new System.Drawing.Point(200, 144);
+            this.Formula.MinimumSize = new System.Drawing.Size(320, 350);
+            this.Formula.Name = "Formula";
+            this.Formula.Size = new System.Drawing.Size(856, 352);
+            this.Formula.TabIndex = 75;
             // 
             // TableView
             // 
@@ -202,25 +202,25 @@ namespace BeCreative
             // 
             // tabDatei
             // 
-            this.tabDatei.Controls.Add(this.BlueFrame12);
-            this.tabDatei.Controls.Add(this.BlueFrame2);
-            this.tabDatei.Controls.Add(this.BlueFrame1);
+            this.tabDatei.Controls.Add(this.grpInformation);
+            this.tabDatei.Controls.Add(this.grpOrdner);
+            this.tabDatei.Controls.Add(this.grpDatei);
             this.tabDatei.Location = new System.Drawing.Point(4, 25);
             this.tabDatei.Name = "tabDatei";
             this.tabDatei.Size = new System.Drawing.Size(1204, 81);
             this.tabDatei.TabIndex = 0;
             this.tabDatei.Text = "Datei";
             // 
-            // BlueFrame12
+            // grpInformation
             // 
-            this.BlueFrame12.CausesValidation = false;
-            this.BlueFrame12.Controls.Add(this.Copyright);
-            this.BlueFrame12.Controls.Add(this.ÜberDiesesProgramm);
-            this.BlueFrame12.Dock = System.Windows.Forms.DockStyle.Left;
-            this.BlueFrame12.Location = new System.Drawing.Point(488, 0);
-            this.BlueFrame12.Name = "BlueFrame12";
-            this.BlueFrame12.Size = new System.Drawing.Size(280, 81);
-            this.BlueFrame12.Text = "Information";
+            this.grpInformation.CausesValidation = false;
+            this.grpInformation.Controls.Add(this.Copyright);
+            this.grpInformation.Controls.Add(this.btnInformation);
+            this.grpInformation.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpInformation.Location = new System.Drawing.Point(488, 0);
+            this.grpInformation.Name = "grpInformation";
+            this.grpInformation.Size = new System.Drawing.Size(280, 81);
+            this.grpInformation.Text = "Information";
             // 
             // Copyright
             // 
@@ -231,96 +231,96 @@ namespace BeCreative
             this.Copyright.Text = "(c) Christian Peter";
             this.Copyright.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // ÜberDiesesProgramm
+            // btnInformation
             // 
-            this.ÜberDiesesProgramm.ImageCode = "Information";
-            this.ÜberDiesesProgramm.Location = new System.Drawing.Point(8, 2);
-            this.ÜberDiesesProgramm.Name = "ÜberDiesesProgramm";
-            this.ÜberDiesesProgramm.QuickInfo = "Über dieses Programm";
-            this.ÜberDiesesProgramm.Size = new System.Drawing.Size(80, 66);
-            this.ÜberDiesesProgramm.TabIndex = 27;
-            this.ÜberDiesesProgramm.Text = "Information";
-            this.ÜberDiesesProgramm.Click += new System.EventHandler(this.ÜberDiesesProgramm_Click);
+            this.btnInformation.ImageCode = "Information";
+            this.btnInformation.Location = new System.Drawing.Point(8, 2);
+            this.btnInformation.Name = "btnInformation";
+            this.btnInformation.QuickInfo = "Über dieses Programm";
+            this.btnInformation.Size = new System.Drawing.Size(80, 66);
+            this.btnInformation.TabIndex = 27;
+            this.btnInformation.Text = "Information";
+            this.btnInformation.Click += new System.EventHandler(this.ÜberDiesesProgramm_Click);
             // 
-            // BlueFrame2
+            // grpOrdner
             // 
-            this.BlueFrame2.CausesValidation = false;
-            this.BlueFrame2.Controls.Add(this.Ordn);
-            this.BlueFrame2.Controls.Add(this.TemporärenSpeicherortÖffnen);
-            this.BlueFrame2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.BlueFrame2.Location = new System.Drawing.Point(304, 0);
-            this.BlueFrame2.Name = "BlueFrame2";
-            this.BlueFrame2.Size = new System.Drawing.Size(184, 81);
-            this.BlueFrame2.Text = "Ordner";
+            this.grpOrdner.CausesValidation = false;
+            this.grpOrdner.Controls.Add(this.btnDatenbanken);
+            this.grpOrdner.Controls.Add(this.btnTemporärenSpeicherortÖffnen);
+            this.grpOrdner.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpOrdner.Location = new System.Drawing.Point(304, 0);
+            this.grpOrdner.Name = "grpOrdner";
+            this.grpOrdner.Size = new System.Drawing.Size(184, 81);
+            this.grpOrdner.Text = "Ordner";
             // 
-            // Ordn
+            // btnDatenbanken
             // 
-            this.Ordn.ImageCode = "Ordner";
-            this.Ordn.Location = new System.Drawing.Point(8, 2);
-            this.Ordn.Name = "Ordn";
-            this.Ordn.QuickInfo = "Speicherort der Datenbanken öffnen";
-            this.Ordn.Size = new System.Drawing.Size(88, 66);
-            this.Ordn.TabIndex = 27;
-            this.Ordn.Text = "Datenbanken-Pfad";
-            this.Ordn.Click += new System.EventHandler(this.Ordn_Click);
+            this.btnDatenbanken.ImageCode = "Ordner";
+            this.btnDatenbanken.Location = new System.Drawing.Point(8, 2);
+            this.btnDatenbanken.Name = "btnDatenbanken";
+            this.btnDatenbanken.QuickInfo = "Speicherort der Datenbanken öffnen";
+            this.btnDatenbanken.Size = new System.Drawing.Size(88, 66);
+            this.btnDatenbanken.TabIndex = 27;
+            this.btnDatenbanken.Text = "Datenbanken-Pfad";
+            this.btnDatenbanken.Click += new System.EventHandler(this.Ordn_Click);
             // 
-            // TemporärenSpeicherortÖffnen
+            // btnTemporärenSpeicherortÖffnen
             // 
-            this.TemporärenSpeicherortÖffnen.ImageCode = "Ordner||||0000ff||126";
-            this.TemporärenSpeicherortÖffnen.Location = new System.Drawing.Point(96, 2);
-            this.TemporärenSpeicherortÖffnen.Name = "TemporärenSpeicherortÖffnen";
-            this.TemporärenSpeicherortÖffnen.QuickInfo = "Temporären Speicherort öffnen";
-            this.TemporärenSpeicherortÖffnen.Size = new System.Drawing.Size(80, 66);
-            this.TemporärenSpeicherortÖffnen.TabIndex = 26;
-            this.TemporärenSpeicherortÖffnen.Text = "Temporärer Speicherort";
-            this.TemporärenSpeicherortÖffnen.Click += new System.EventHandler(this.TemporärenSpeicherortÖffnen_Click);
+            this.btnTemporärenSpeicherortÖffnen.ImageCode = "Ordner||||0000ff||126";
+            this.btnTemporärenSpeicherortÖffnen.Location = new System.Drawing.Point(96, 2);
+            this.btnTemporärenSpeicherortÖffnen.Name = "btnTemporärenSpeicherortÖffnen";
+            this.btnTemporärenSpeicherortÖffnen.QuickInfo = "Temporären Speicherort öffnen";
+            this.btnTemporärenSpeicherortÖffnen.Size = new System.Drawing.Size(80, 66);
+            this.btnTemporärenSpeicherortÖffnen.TabIndex = 26;
+            this.btnTemporärenSpeicherortÖffnen.Text = "Temporärer Speicherort";
+            this.btnTemporärenSpeicherortÖffnen.Click += new System.EventHandler(this.TemporärenSpeicherortÖffnen_Click);
             // 
-            // BlueFrame1
+            // grpDatei
             // 
-            this.BlueFrame1.CausesValidation = false;
-            this.BlueFrame1.Controls.Add(this.LastDatabases);
-            this.BlueFrame1.Controls.Add(this.Öffnen);
-            this.BlueFrame1.Controls.Add(this.SaveAs);
-            this.BlueFrame1.Controls.Add(this.NeuDB);
-            this.BlueFrame1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.BlueFrame1.Location = new System.Drawing.Point(0, 0);
-            this.BlueFrame1.Name = "BlueFrame1";
-            this.BlueFrame1.Size = new System.Drawing.Size(304, 81);
-            this.BlueFrame1.Text = "Datei";
+            this.grpDatei.CausesValidation = false;
+            this.grpDatei.Controls.Add(this.btnLetzteDateien);
+            this.grpDatei.Controls.Add(this.btnOeffnen);
+            this.grpDatei.Controls.Add(this.btnSaveAs);
+            this.grpDatei.Controls.Add(this.NeuDB);
+            this.grpDatei.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpDatei.Location = new System.Drawing.Point(0, 0);
+            this.grpDatei.Name = "grpDatei";
+            this.grpDatei.Size = new System.Drawing.Size(304, 81);
+            this.grpDatei.Text = "Datei";
             // 
-            // LastDatabases
+            // btnLetzteDateien
             // 
-            this.LastDatabases.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.LastDatabases.DrawStyle = BlueControls.Enums.enComboboxStyle.RibbonBar;
-            this.LastDatabases.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.LastDatabases.Enabled = false;
-            this.LastDatabases.ImageCode = "Ordner";
-            this.LastDatabases.Location = new System.Drawing.Point(128, 2);
-            this.LastDatabases.Name = "LastDatabases";
-            this.LastDatabases.Size = new System.Drawing.Size(104, 66);
-            this.LastDatabases.TabIndex = 1;
-            this.LastDatabases.Text = "zuletzt geöffnete Dateien";
-            this.LastDatabases.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.LastDatabases_Item_Click);
+            this.btnLetzteDateien.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.btnLetzteDateien.DrawStyle = BlueControls.Enums.enComboboxStyle.RibbonBar;
+            this.btnLetzteDateien.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.btnLetzteDateien.Enabled = false;
+            this.btnLetzteDateien.ImageCode = "Ordner";
+            this.btnLetzteDateien.Location = new System.Drawing.Point(128, 2);
+            this.btnLetzteDateien.Name = "btnLetzteDateien";
+            this.btnLetzteDateien.Size = new System.Drawing.Size(104, 66);
+            this.btnLetzteDateien.TabIndex = 1;
+            this.btnLetzteDateien.Text = "zuletzt geöffnete Dateien";
+            this.btnLetzteDateien.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.LastDatabases_Item_Click);
             // 
-            // Öffnen
+            // btnOeffnen
             // 
-            this.Öffnen.ImageCode = "Ordner";
-            this.Öffnen.Location = new System.Drawing.Point(72, 2);
-            this.Öffnen.Name = "Öffnen";
-            this.Öffnen.Size = new System.Drawing.Size(56, 66);
-            this.Öffnen.TabIndex = 1;
-            this.Öffnen.Text = "Öffnen";
-            this.Öffnen.Click += new System.EventHandler(this.Öffne_Click);
+            this.btnOeffnen.ImageCode = "Ordner";
+            this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
+            this.btnOeffnen.Name = "btnOeffnen";
+            this.btnOeffnen.Size = new System.Drawing.Size(56, 66);
+            this.btnOeffnen.TabIndex = 1;
+            this.btnOeffnen.Text = "Öffnen";
+            this.btnOeffnen.Click += new System.EventHandler(this.Öffne_Click);
             // 
-            // SaveAs
+            // btnSaveAs
             // 
-            this.SaveAs.ImageCode = "Diskette";
-            this.SaveAs.Location = new System.Drawing.Point(232, 2);
-            this.SaveAs.Name = "SaveAs";
-            this.SaveAs.Size = new System.Drawing.Size(64, 66);
-            this.SaveAs.TabIndex = 4;
-            this.SaveAs.Text = "Speichern unter";
-            this.SaveAs.Click += new System.EventHandler(this.NeuDBSaveAs_Click);
+            this.btnSaveAs.ImageCode = "Diskette";
+            this.btnSaveAs.Location = new System.Drawing.Point(232, 2);
+            this.btnSaveAs.Name = "btnSaveAs";
+            this.btnSaveAs.Size = new System.Drawing.Size(64, 66);
+            this.btnSaveAs.TabIndex = 4;
+            this.btnSaveAs.Text = "Speichern unter";
+            this.btnSaveAs.Click += new System.EventHandler(this.NeuDBSaveAs_Click);
             // 
             // NeuDB
             // 
@@ -334,31 +334,31 @@ namespace BeCreative
             // 
             // tabStart
             // 
-            this.tabStart.Controls.Add(this.BlueFrame5);
-            this.tabStart.Controls.Add(this.BlueFrame4);
-            this.tabStart.Controls.Add(this.FormulaViewBar);
-            this.tabStart.Controls.Add(this.TableViewBar);
-            this.tabStart.Controls.Add(this.BlueFrame13);
+            this.tabStart.Controls.Add(this.grpAnsicht);
+            this.tabStart.Controls.Add(this.grpBearbeitung);
+            this.tabStart.Controls.Add(this.grpFormularSteuerung);
+            this.tabStart.Controls.Add(this.grpFilter);
+            this.tabStart.Controls.Add(this.grpAllgemein);
             this.tabStart.Location = new System.Drawing.Point(4, 25);
             this.tabStart.Name = "tabStart";
             this.tabStart.Size = new System.Drawing.Size(1204, 81);
             this.tabStart.TabIndex = 1;
             this.tabStart.Text = "Start";
             // 
-            // BlueFrame5
+            // grpAnsicht
             // 
-            this.BlueFrame5.CausesValidation = false;
-            this.BlueFrame5.Controls.Add(this.cbxColumnArr);
-            this.BlueFrame5.Controls.Add(this.SpaltAnsichtCap);
-            this.BlueFrame5.Controls.Add(this.Ansicht3);
-            this.BlueFrame5.Controls.Add(this.Ansicht2);
-            this.BlueFrame5.Controls.Add(this.Ansicht1);
-            this.BlueFrame5.Controls.Add(this.Ansicht0);
-            this.BlueFrame5.Dock = System.Windows.Forms.DockStyle.Left;
-            this.BlueFrame5.Location = new System.Drawing.Point(936, 0);
-            this.BlueFrame5.Name = "BlueFrame5";
-            this.BlueFrame5.Size = new System.Drawing.Size(464, 81);
-            this.BlueFrame5.Text = "Ansichten-Auswahl";
+            this.grpAnsicht.CausesValidation = false;
+            this.grpAnsicht.Controls.Add(this.cbxColumnArr);
+            this.grpAnsicht.Controls.Add(this.SpaltAnsichtCap);
+            this.grpAnsicht.Controls.Add(this.Ansicht3);
+            this.grpAnsicht.Controls.Add(this.Ansicht2);
+            this.grpAnsicht.Controls.Add(this.Ansicht1);
+            this.grpAnsicht.Controls.Add(this.Ansicht0);
+            this.grpAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAnsicht.Location = new System.Drawing.Point(936, 0);
+            this.grpAnsicht.Name = "grpAnsicht";
+            this.grpAnsicht.Size = new System.Drawing.Size(464, 81);
+            this.grpAnsicht.Text = "Ansichten-Auswahl";
             // 
             // SpaltAnsichtCap
             // 
@@ -409,17 +409,17 @@ namespace BeCreative
             this.Ansicht0.Text = "Nur Tabelle";
             this.Ansicht0.Click += new System.EventHandler(this.Ansicht_Click);
             // 
-            // BlueFrame4
+            // grpBearbeitung
             // 
-            this.BlueFrame4.CausesValidation = false;
-            this.BlueFrame4.Controls.Add(this.Datenüberprüfung);
-            this.BlueFrame4.Controls.Add(this.AngezeigteZeilenLöschen);
-            this.BlueFrame4.Controls.Add(this.SuchenUndErsetzen);
-            this.BlueFrame4.Dock = System.Windows.Forms.DockStyle.Left;
-            this.BlueFrame4.Location = new System.Drawing.Point(688, 0);
-            this.BlueFrame4.Name = "BlueFrame4";
-            this.BlueFrame4.Size = new System.Drawing.Size(248, 81);
-            this.BlueFrame4.Text = "Bearbeitung";
+            this.grpBearbeitung.CausesValidation = false;
+            this.grpBearbeitung.Controls.Add(this.Datenüberprüfung);
+            this.grpBearbeitung.Controls.Add(this.AngezeigteZeilenLöschen);
+            this.grpBearbeitung.Controls.Add(this.SuchenUndErsetzen);
+            this.grpBearbeitung.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpBearbeitung.Location = new System.Drawing.Point(688, 0);
+            this.grpBearbeitung.Name = "grpBearbeitung";
+            this.grpBearbeitung.Size = new System.Drawing.Size(248, 81);
+            this.grpBearbeitung.Text = "Bearbeitung";
             // 
             // Datenüberprüfung
             // 
@@ -453,19 +453,19 @@ namespace BeCreative
             this.SuchenUndErsetzen.Text = "Suchen und ersetzen";
             this.SuchenUndErsetzen.Click += new System.EventHandler(this.SuchenUndErsetzen_Click);
             // 
-            // FormulaViewBar
+            // grpFormularSteuerung
             // 
-            this.FormulaViewBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(233)))), ((int)(((byte)(216)))));
-            this.FormulaViewBar.CausesValidation = false;
-            this.FormulaViewBar.Controls.Add(this.SuchB);
-            this.FormulaViewBar.Controls.Add(this.such);
-            this.FormulaViewBar.Controls.Add(this.Vorwärts);
-            this.FormulaViewBar.Controls.Add(this.zurück);
-            this.FormulaViewBar.Dock = System.Windows.Forms.DockStyle.Left;
-            this.FormulaViewBar.Location = new System.Drawing.Point(448, 0);
-            this.FormulaViewBar.Name = "FormulaViewBar";
-            this.FormulaViewBar.Size = new System.Drawing.Size(240, 81);
-            this.FormulaViewBar.Text = "Formular-Ansicht-Steuerung";
+            this.grpFormularSteuerung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(233)))), ((int)(((byte)(216)))));
+            this.grpFormularSteuerung.CausesValidation = false;
+            this.grpFormularSteuerung.Controls.Add(this.SuchB);
+            this.grpFormularSteuerung.Controls.Add(this.such);
+            this.grpFormularSteuerung.Controls.Add(this.Vorwärts);
+            this.grpFormularSteuerung.Controls.Add(this.zurück);
+            this.grpFormularSteuerung.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpFormularSteuerung.Location = new System.Drawing.Point(448, 0);
+            this.grpFormularSteuerung.Name = "grpFormularSteuerung";
+            this.grpFormularSteuerung.Size = new System.Drawing.Size(240, 81);
+            this.grpFormularSteuerung.Text = "Formular-Ansicht-Steuerung";
             // 
             // SuchB
             // 
@@ -513,18 +513,18 @@ namespace BeCreative
             this.zurück.Text = "zurück";
             this.zurück.Click += new System.EventHandler(this.zurück_Click);
             // 
-            // TableViewBar
+            // grpFilter
             // 
-            this.TableViewBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(233)))), ((int)(((byte)(216)))));
-            this.TableViewBar.CausesValidation = false;
-            this.TableViewBar.Controls.Add(this.btnTextLöschen);
-            this.TableViewBar.Controls.Add(this.AlleFilterAus);
-            this.TableViewBar.Controls.Add(this.ZeilenFilter_TextFeld);
-            this.TableViewBar.Dock = System.Windows.Forms.DockStyle.Left;
-            this.TableViewBar.Location = new System.Drawing.Point(208, 0);
-            this.TableViewBar.Name = "TableViewBar";
-            this.TableViewBar.Size = new System.Drawing.Size(240, 81);
-            this.TableViewBar.Text = "Filter";
+            this.grpFilter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(233)))), ((int)(((byte)(216)))));
+            this.grpFilter.CausesValidation = false;
+            this.grpFilter.Controls.Add(this.btnTextLöschen);
+            this.grpFilter.Controls.Add(this.AlleFilterAus);
+            this.grpFilter.Controls.Add(this.ZeilenFilter_TextFeld);
+            this.grpFilter.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpFilter.Location = new System.Drawing.Point(208, 0);
+            this.grpFilter.Name = "grpFilter";
+            this.grpFilter.Size = new System.Drawing.Size(240, 81);
+            this.grpFilter.Text = "Filter";
             // 
             // btnTextLöschen
             // 
@@ -557,70 +557,70 @@ namespace BeCreative
             this.ZeilenFilter_TextFeld.TextChanged += new System.EventHandler(this.ZeilenFilter_TextFeld_TextChanged);
             this.ZeilenFilter_TextFeld.Enter += new System.EventHandler(this.ZeilenFilter_TextFeld_Enter);
             // 
-            // BlueFrame13
+            // grpAllgemein
             // 
-            this.BlueFrame13.CausesValidation = false;
-            this.BlueFrame13.Controls.Add(this.Neu);
-            this.BlueFrame13.Controls.Add(this.Drucken);
-            this.BlueFrame13.Controls.Add(this.löschen);
-            this.BlueFrame13.Dock = System.Windows.Forms.DockStyle.Left;
-            this.BlueFrame13.Location = new System.Drawing.Point(0, 0);
-            this.BlueFrame13.Name = "BlueFrame13";
-            this.BlueFrame13.Size = new System.Drawing.Size(208, 81);
-            this.BlueFrame13.Text = "Allgemein";
+            this.grpAllgemein.CausesValidation = false;
+            this.grpAllgemein.Controls.Add(this.btnNeu);
+            this.grpAllgemein.Controls.Add(this.btnDrucken);
+            this.grpAllgemein.Controls.Add(this.btnLoeschen);
+            this.grpAllgemein.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAllgemein.Location = new System.Drawing.Point(0, 0);
+            this.grpAllgemein.Name = "grpAllgemein";
+            this.grpAllgemein.Size = new System.Drawing.Size(208, 81);
+            this.grpAllgemein.Text = "Allgemein";
             // 
-            // Neu
+            // btnNeu
             // 
-            this.Neu.ImageCode = "PlusZeichen";
-            this.Neu.Location = new System.Drawing.Point(8, 2);
-            this.Neu.Name = "Neu";
-            this.Neu.Size = new System.Drawing.Size(56, 66);
-            this.Neu.TabIndex = 2;
-            this.Neu.Text = "Neu";
-            this.Neu.Click += new System.EventHandler(this.Neu_Click);
+            this.btnNeu.ImageCode = "PlusZeichen";
+            this.btnNeu.Location = new System.Drawing.Point(8, 2);
+            this.btnNeu.Name = "btnNeu";
+            this.btnNeu.Size = new System.Drawing.Size(56, 66);
+            this.btnNeu.TabIndex = 2;
+            this.btnNeu.Text = "Neu";
+            this.btnNeu.Click += new System.EventHandler(this.Neu_Click);
             // 
-            // Drucken
+            // btnDrucken
             // 
-            this.Drucken.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.Drucken.DrawStyle = BlueControls.Enums.enComboboxStyle.RibbonBar;
-            this.Drucken.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Drucken.ImageCode = "Drucker";
-            this.Drucken.Location = new System.Drawing.Point(120, 2);
-            this.Drucken.Name = "Drucken";
-            this.Drucken.Size = new System.Drawing.Size(80, 66);
-            this.Drucken.TabIndex = 12;
-            this.Drucken.Text = "Drucken bzw. Export";
-            this.Drucken.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Drucken_Item_Click);
+            this.btnDrucken.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.btnDrucken.DrawStyle = BlueControls.Enums.enComboboxStyle.RibbonBar;
+            this.btnDrucken.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.btnDrucken.ImageCode = "Drucker";
+            this.btnDrucken.Location = new System.Drawing.Point(120, 2);
+            this.btnDrucken.Name = "btnDrucken";
+            this.btnDrucken.Size = new System.Drawing.Size(80, 66);
+            this.btnDrucken.TabIndex = 12;
+            this.btnDrucken.Text = "Drucken bzw. Export";
+            this.btnDrucken.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Drucken_Item_Click);
             // 
-            // löschen
+            // btnLoeschen
             // 
-            this.löschen.ImageCode = "Papierkorb";
-            this.löschen.Location = new System.Drawing.Point(64, 2);
-            this.löschen.Name = "löschen";
-            this.löschen.Size = new System.Drawing.Size(56, 66);
-            this.löschen.TabIndex = 3;
-            this.löschen.Text = "löschen";
-            this.löschen.Click += new System.EventHandler(this.LöscheZeile);
+            this.btnLoeschen.ImageCode = "Papierkorb";
+            this.btnLoeschen.Location = new System.Drawing.Point(64, 2);
+            this.btnLoeschen.Name = "btnLoeschen";
+            this.btnLoeschen.Size = new System.Drawing.Size(56, 66);
+            this.btnLoeschen.TabIndex = 3;
+            this.btnLoeschen.Text = "löschen";
+            this.btnLoeschen.Click += new System.EventHandler(this.LöscheZeile);
             // 
             // tabExtras
             // 
-            this.tabExtras.Controls.Add(this.BlueFrame6);
+            this.tabExtras.Controls.Add(this.grpEditor);
             this.tabExtras.Location = new System.Drawing.Point(4, 25);
             this.tabExtras.Name = "tabExtras";
             this.tabExtras.Size = new System.Drawing.Size(1204, 81);
             this.tabExtras.TabIndex = 3;
             this.tabExtras.Text = "Extras";
             // 
-            // BlueFrame6
+            // grpEditor
             // 
-            this.BlueFrame6.CausesValidation = false;
-            this.BlueFrame6.Controls.Add(this.AllgemeinerEditor);
-            this.BlueFrame6.Controls.Add(this.BeziehungsEditor);
-            this.BlueFrame6.Dock = System.Windows.Forms.DockStyle.Left;
-            this.BlueFrame6.Location = new System.Drawing.Point(0, 0);
-            this.BlueFrame6.Name = "BlueFrame6";
-            this.BlueFrame6.Size = new System.Drawing.Size(152, 81);
-            this.BlueFrame6.Text = "Editoren";
+            this.grpEditor.CausesValidation = false;
+            this.grpEditor.Controls.Add(this.AllgemeinerEditor);
+            this.grpEditor.Controls.Add(this.BeziehungsEditor);
+            this.grpEditor.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpEditor.Location = new System.Drawing.Point(0, 0);
+            this.grpEditor.Name = "grpEditor";
+            this.grpEditor.Size = new System.Drawing.Size(152, 81);
+            this.grpEditor.Text = "Editoren";
             // 
             // AllgemeinerEditor
             // 
@@ -651,88 +651,80 @@ namespace BeCreative
             this.tabAdmin.TabIndex = 5;
             this.tabAdmin.Text = "Administration";
             // 
-            // frmMain
+            // frmTableView
             // 
             this.ClientSize = new System.Drawing.Size(1212, 730);
-            this.Controls.Add(this.BlueFormulax);
+            this.Controls.Add(this.Formula);
             this.Controls.Add(this.TableView);
             this.Controls.Add(this.Zei);
             this.Controls.Add(this.MainRibbon);
             this.MinimumSize = new System.Drawing.Size(1024, 768);
-            this.Name = "frmMain";
+            this.Name = "frmTableView";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.MainRibbon.ResumeLayout(false);
             this.tabDatei.ResumeLayout(false);
-            this.BlueFrame12.ResumeLayout(false);
-            this.BlueFrame2.ResumeLayout(false);
-            this.BlueFrame1.ResumeLayout(false);
+            this.grpInformation.ResumeLayout(false);
+            this.grpOrdner.ResumeLayout(false);
+            this.grpDatei.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
-            this.BlueFrame5.ResumeLayout(false);
-            this.BlueFrame4.ResumeLayout(false);
-            this.FormulaViewBar.ResumeLayout(false);
-            this.TableViewBar.ResumeLayout(false);
-            this.BlueFrame13.ResumeLayout(false);
+            this.grpAnsicht.ResumeLayout(false);
+            this.grpBearbeitung.ResumeLayout(false);
+            this.grpFormularSteuerung.ResumeLayout(false);
+            this.grpFilter.ResumeLayout(false);
+            this.grpAllgemein.ResumeLayout(false);
             this.tabExtras.ResumeLayout(false);
-            this.BlueFrame6.ResumeLayout(false);
+            this.grpEditor.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
 
-        [STAThread]
-        static void Main()
-        {
-            var culture = new System.Globalization.CultureInfo("de-DE");
-            CultureInfo.DefaultThreadCurrentCulture = culture;
-            CultureInfo.DefaultThreadCurrentUICulture = culture;
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmMain());
-        }
+
         private Table TableView;
-        private GroupBox FormulaViewBar;
+        private GroupBox grpFormularSteuerung;
         private Button SuchB;
         private TextBox such;
         private Button Vorwärts;
         private Button zurück;
-        private Button löschen;
-        private Button Neu;
+        private Button btnLoeschen;
+        private Button btnNeu;
         private TextBox ZeilenFilter_TextFeld;
         private Button AlleFilterAus;
-        private GroupBox TableViewBar;
-        private ComboBox Drucken;
-        private Formula BlueFormulax;
-        private Button Öffnen;
+        private GroupBox grpFilter;
+        private ComboBox btnDrucken;
+        private Formula Formula;
+        private Button btnOeffnen;
         private OpenFileDialog LoadTab;
         private Button NeuDB;
         private SaveFileDialog SaveTab;
         private Caption SpaltAnsichtCap;
         private ComboBox cbxColumnArr;
-        private Button SaveAs;
+        private Button btnSaveAs;
         private Button SuchenUndErsetzen;
         private Button AngezeigteZeilenLöschen;
         private Caption Zei;
-        private Button ÜberDiesesProgramm;
+        private Button btnInformation;
         private Button Ansicht0;
         private Button Ansicht1;
         private Button Ansicht2;
         private Button Ansicht3;
-        private Button TemporärenSpeicherortÖffnen;
+        private Button btnTemporärenSpeicherortÖffnen;
         private Button BeziehungsEditor;
         internal TabPage tabDatei;
         internal TabPage tabStart;
         internal TabPage tabExtras;
-        internal Button Ordn;
+        internal Button btnDatenbanken;
         internal Button Datenüberprüfung;
-        internal LastFilesCombo LastDatabases;
+        internal LastFilesCombo btnLetzteDateien;
         private Caption Copyright;
         private Button AllgemeinerEditor;
-        private GroupBox BlueFrame13;
-        private GroupBox BlueFrame12;
-        private GroupBox BlueFrame6;
-        private GroupBox BlueFrame5;
-        private GroupBox BlueFrame4;
-        private GroupBox BlueFrame2;
-        private GroupBox BlueFrame1;
+        private GroupBox grpAllgemein;
+        private GroupBox grpInformation;
+        private GroupBox grpEditor;
+        private GroupBox grpAnsicht;
+        private GroupBox grpBearbeitung;
+        private GroupBox grpOrdner;
+        private GroupBox grpDatei;
         private TabControl MainRibbon;
         private tabAdministration tabAdmin;
         private Button btnTextLöschen;

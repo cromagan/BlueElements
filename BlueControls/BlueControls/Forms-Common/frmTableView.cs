@@ -19,12 +19,10 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -37,16 +35,54 @@ using static BlueBasics.Develop;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modAllgemein;
 
-namespace BeCreative
+namespace BlueControls.Forms
 {
-    public partial class frmMain
+    public partial class frmTableView
     {
-        public frmMain()
+        public frmTableView() : this(null, true, true, false) { }
+        public frmTableView(Database Database) : this(Database, false, false, false) { }
+
+        public frmTableView(Database database, bool loadTabVisible, bool adminTabVisible, bool changeSkin)
         {
+            ChangeSkin = changeSkin;
             InitializeComponent();
-            tabAdmin.Table = TableView;
+
+
+            Copyright.Text = "(c) 2010-" + DateTime.Now.Year + " Christian Peter";
+
+            btnDrucken.Item.Clear();
+            btnDrucken.Item.Add(new TextListItem("erweitert", "Drucken bzw. Export", QuickImage.Get(enImageCode.Drucker, 28)));
+            btnDrucken.Item.Add(new LineListItem());
+            btnDrucken.Item.Add(new TextListItem("csv", "CSV-Format für Excel in die Zwischenablage", QuickImage.Get(enImageCode.Excel, 28)));
+            btnDrucken.Item.Add(new TextListItem("html", "HTML-Format für Internet-Seiten", QuickImage.Get(enImageCode.Globus, 28)));
+            btnDrucken.Item.Add(new LineListItem());
+            btnDrucken.Item.Add(new TextListItem("editor", "Layout-Editor öffnen", QuickImage.Get(enImageCode.Layout, 28)));
+
+
+            if (!adminTabVisible)
+            {
+                this.MainRibbon.Controls.Remove(tabAdmin);
+                this.MainRibbon.Controls.Remove(tabExtras);
+                grpAllgemein.Visible = false;
+                grpBearbeitung.Visible = false;
+            }
+            else
+            {
+                tabAdmin.Table = TableView;
+
+            }
+
+
+            if (!loadTabVisible)
+            {
+                this.MainRibbon.Controls.Remove(tabDatei);
+            }
+
+
+            DatabaseSet(database);
         }
 
+        private bool ChangeSkin = false;
         private Database _Database;
         private enAnsicht _Ansicht = enAnsicht.Nur_Tabelle;
         private const string _Version = "1.0001";
@@ -54,7 +90,7 @@ namespace BeCreative
 
         private void SetDatabasetoNothing()
         {
-            BlueFormulax.Database = null;
+            Formula.Database = null;
             TableView.Database = null;
 
             if (_Database != null)
@@ -65,16 +101,16 @@ namespace BeCreative
         }
 
 
-        private void zurück_Click(object sender, EventArgs e)
+        private void zurück_Click(object sender, System.EventArgs e)
         {
-            BlueFormulax.HideViewEditor();
+            Formula.HideViewEditor();
             SuchEintragNoSave(enDirection.Oben, out var column, out var row);
             TableView.CursorPos_Set(column, row, false);
         }
 
-        private void vor_Click(object sender, EventArgs e)
+        private void vor_Click(object sender, System.EventArgs e)
         {
-            BlueFormulax.HideViewEditor();
+            Formula.HideViewEditor();
             SuchEintragNoSave(enDirection.Unten, out var column, out var row);
             TableView.CursorPos_Set(column, row, false);
         }
@@ -94,13 +130,13 @@ namespace BeCreative
 
             if (Convert.ToBoolean(Richtung & enDirection.Unten))
             {
-                row = TableView.View_NextRow(BlueFormulax.ShowingRow);
+                row = TableView.View_NextRow(Formula.ShowingRow);
                 if (row == null) { row = TableView.View_RowFirst(); }
             }
 
             if (Convert.ToBoolean(Richtung & enDirection.Oben))
             {
-                row = TableView.View_PreviousRow(BlueFormulax.ShowingRow);
+                row = TableView.View_PreviousRow(Formula.ShowingRow);
                 if (row == null) { row = TableView.View_RowLast(); }
             }
 
@@ -114,11 +150,11 @@ namespace BeCreative
 
             if (e.Column == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Row == null)
             {
-                BlueFormulax.ShowingRowKey = -1;
+                Formula.ShowingRowKey = -1;
             }
             else
             {
-                BlueFormulax.ShowingRowKey = e.Row.Key;
+                Formula.ShowingRowKey = e.Row.Key;
             }
 
 
@@ -138,19 +174,19 @@ namespace BeCreative
             }
         }
 
-        private void such_Enter(object sender, EventArgs e)
+        private void such_Enter(object sender, System.EventArgs e)
         {
             if (SuchB.Enabled) { SuchB_Click(SuchB, null); }
         }
 
-        private void such_TextChanged(object sender, EventArgs e)
+        private void such_TextChanged(object sender, System.EventArgs e)
         {
             Check_SuchButton();
         }
 
-        private void SuchB_Click(object sender, EventArgs e)
+        private void SuchB_Click(object sender, System.EventArgs e)
         {
-            BlueFormulax.HideViewEditor();
+            Formula.HideViewEditor();
             var SuchtT = such.Text.Trim();
 
             if (string.IsNullOrEmpty(SuchtT))
@@ -161,7 +197,7 @@ namespace BeCreative
 
 
 
-            Table.SearchNextText(SuchtT, TableView, null, BlueFormulax.ShowingRow, out var found, out var GefRow, true);
+            Table.SearchNextText(SuchtT, TableView, null, Formula.ShowingRow, out var found, out var GefRow, true);
 
 
             //var CheckRow = BlueFormulax.ShowingRow;
@@ -238,7 +274,7 @@ namespace BeCreative
             }
             else
             {
-                if (GefRow == BlueFormulax.ShowingRow)
+                if (GefRow == Formula.ShowingRow)
                 {
                     MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!", enImageCode.Information, "OK");
                 }
@@ -250,7 +286,7 @@ namespace BeCreative
         }
 
 
-        private void Neu_Click(object sender, EventArgs e)
+        private void Neu_Click(object sender, System.EventArgs e)
         {
             RowItem vRow = null;
 
@@ -299,21 +335,21 @@ namespace BeCreative
         }
 
 
-        public void LöscheZeile(object sender, EventArgs e)
+        public void LöscheZeile(object sender, System.EventArgs e)
         {
 
-            BlueFormulax.HideViewEditor();
+            Formula.HideViewEditor();
 
             if (Ansicht1.Checked)
             {
-                if (BlueFormulax.ShowingRow == null)
+                if (Formula.ShowingRow == null)
                 {
                     MessageBox.Show("Kein Eintrag gewählt.", enImageCode.Information, "OK");
                     return;
                 }
 
 
-                var tmpr = BlueFormulax.ShowingRow;
+                var tmpr = Formula.ShowingRow;
                 if (MessageBox.Show("Soll der Eintrag<br><b>" + tmpr.CellFirstString() + "</b><br>wirklich <b>gelöscht</b> werden?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
 
 
@@ -324,7 +360,7 @@ namespace BeCreative
             }
             else
             {
-                BlueFormulax.ShowingRowKey = -1;
+                Formula.ShowingRowKey = -1;
                 TableView.Database.Row.Remove(TableView.Filter);
             }
         }
@@ -365,7 +401,7 @@ namespace BeCreative
             }
 
 
-            LastDatabases.AddFileName(Datei, string.Empty);
+            btnLetzteDateien.AddFileName(Datei, string.Empty);
             LoadTab.FileName = Datei;
 
 
@@ -373,8 +409,8 @@ namespace BeCreative
 
             if (tmpDatabase == null)
             {
-                tmpDatabase = new Database(false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout);
-                tmpDatabase.LoadFromDisk(Datei);
+                tmpDatabase = new Database(false);
+                tmpDatabase.Load(Datei);
             }
 
 
@@ -384,11 +420,11 @@ namespace BeCreative
         }
 
 
-        public void DatabaseSet(Database cDatabase)
+        private void DatabaseSet(Database cDatabase)
         {
             _Database = cDatabase;
             TableView.Database = cDatabase;
-            BlueFormulax.Database = cDatabase;
+            Formula.Database = cDatabase;
 
 
             StandardTabx();
@@ -396,16 +432,25 @@ namespace BeCreative
 
             SuspendLayout();
 
-            if (_Database.Skin != (int)enSkin.Unverändert && (int)Skin.Instance.SkinDesign != _Database.Skin)
+            if (_Database == null)
             {
-                Skin.Instance.SkinDesign = (enSkin)_Database.Skin;
-                Refresh();
+                SetDatabasetoNothing();
+            }
+            else
+            {
+
+                if (_Database.Skin != (int)enSkin.Unverändert && (int)Skin.Instance.SkinDesign != _Database.Skin)
+                {
+                    Skin.Instance.SkinDesign = (enSkin)_Database.Skin;
+                    Refresh();
+                }
+
+                if (_Database.Ansicht != enAnsicht.Unverändert)
+                {
+                    _Ansicht = _Database.Ansicht;
+                }
             }
 
-            if (_Database.Ansicht != enAnsicht.Unverändert)
-            {
-                _Ansicht = _Database.Ansicht;
-            }
             InitView();
             CheckButtons();
 
@@ -424,9 +469,9 @@ namespace BeCreative
 
 
 
-        private void ZeilenFilter_TextFeld_TextChanged(object sender, EventArgs e)
+        private void ZeilenFilter_TextFeld_TextChanged(object sender, System.EventArgs e)
         {
-            if (TableViewBar.Visible == false) { return; }
+            if (grpFilter.Visible == false) { return; }
 
             var NeuerT = ZeilenFilter_TextFeld.Text.TrimStart();
 
@@ -447,7 +492,7 @@ namespace BeCreative
             Filter_ZeilenFilterSetzen();
         }
 
-        private void ZeilenFilter_TextFeld_Enter(object sender, EventArgs e)
+        private void ZeilenFilter_TextFeld_Enter(object sender, System.EventArgs e)
         {
             Filter_ZeilenFilterSetzen();
         }
@@ -464,7 +509,7 @@ namespace BeCreative
 
         }
 
-        private void AlleFilterAus_Click(object sender, EventArgs e)
+        private void AlleFilterAus_Click(object sender, System.EventArgs e)
         {
             ZeilenFilter_TextFeld.Text = string.Empty;
 
@@ -476,19 +521,10 @@ namespace BeCreative
 
 
 
-        protected override void OnLoad(EventArgs e)
+        protected override void OnLoad(System.EventArgs e)
         {
             base.OnLoad(e);
 
-            Copyright.Text = "(c) 2010-" + DateTime.Now.Year + " Christian Peter";
-
-            Drucken.Item.Clear();
-            Drucken.Item.Add(new TextListItem("erweitert", "Drucken bzw. Export", QuickImage.Get(enImageCode.Drucker, 28)));
-            Drucken.Item.Add(new LineListItem());
-            Drucken.Item.Add(new TextListItem("csv", "CSV-Format für Excel in die Zwischenablage", QuickImage.Get(enImageCode.Excel, 28)));
-            Drucken.Item.Add(new TextListItem("html", "HTML-Format für Internet-Seiten", QuickImage.Get(enImageCode.Globus, 28)));
-            Drucken.Item.Add(new LineListItem());
-            Drucken.Item.Add(new TextListItem("editor", "Layout-Editor öffnen", QuickImage.Get(enImageCode.Layout, 28)));
 
             CheckButtons();
             CaptionAnzeige();
@@ -511,9 +547,9 @@ namespace BeCreative
                     var Ara = new List<RowItem>();
 
 
-                    if (BlueFormulax.ShowingRow != null)
+                    if (Formula.ShowingRow != null)
                     {
-                        Ara.Add(BlueFormulax.ShowingRow);
+                        Ara.Add(Formula.ShowingRow);
                     }
                     else
                     {
@@ -546,9 +582,10 @@ namespace BeCreative
             }
         }
 
-        protected override void OnShown(EventArgs e)
+        protected override void OnShown(System.EventArgs e)
         {
             base.OnShown(e);
+            MainRibbon.SelectedIndex = 0;
             InitView();
         }
 
@@ -558,7 +595,7 @@ namespace BeCreative
         private void InitView()
         {
 
-            BlueFormulax.HideViewEditor();
+            Formula.HideViewEditor();
 
 
             Ansicht0.Checked = _Ansicht == enAnsicht.Nur_Tabelle;
@@ -572,60 +609,60 @@ namespace BeCreative
             switch (_Ansicht)
             {
                 case enAnsicht.Nur_Tabelle:
-                    FormulaViewBar.Visible = false;
-                    TableViewBar.Visible = true;
+                    grpFormularSteuerung.Visible = false;
+                    grpFilter.Visible = true;
 
-                    BlueFormulax.Visible = false;
+                    Formula.Visible = false;
 
-                    BlueFormulax.Dock = System.Windows.Forms.DockStyle.None;
+                    Formula.Dock = System.Windows.Forms.DockStyle.None;
                     TableView.Dock = System.Windows.Forms.DockStyle.None;
 
 
                     TableView.Design = enBlueTableAppearance.Standard;
 
 
-                    BlueFormulax.Dock = System.Windows.Forms.DockStyle.None;
+                    Formula.Dock = System.Windows.Forms.DockStyle.None;
                     TableView.Dock = System.Windows.Forms.DockStyle.Fill;
                     break;
 
                 case enAnsicht.Überschriften_und_Formular:
-                    FormulaViewBar.Visible = true;
-                    TableViewBar.Visible = false;
+                    grpFormularSteuerung.Visible = true;
+                    grpFilter.Visible = false;
                     TableView.Design = enBlueTableAppearance.OnlyMainColumnWithoutHead;
-                    BlueFormulax.Visible = true;
+                    Formula.Visible = true;
 
                     TableView.Dock = System.Windows.Forms.DockStyle.Left;
                     TableView.Width = 250;
 
-                    BlueFormulax.BringToFront();
-                    BlueFormulax.Dock = System.Windows.Forms.DockStyle.Fill;
+                    Formula.BringToFront();
+                    Formula.Dock = System.Windows.Forms.DockStyle.Fill;
                     break;
 
                 case enAnsicht.Tabelle_und_Formular_nebeneinander:
-                    FormulaViewBar.Visible = false;
-                    TableViewBar.Visible = true;
+                    grpFormularSteuerung.Visible = false;
+                    grpFilter.Visible = true;
                     TableView.Design = enBlueTableAppearance.Standard;
-                    BlueFormulax.Visible = true;
+                    Formula.Visible = true;
 
                     TableView.Dock = System.Windows.Forms.DockStyle.None;
 
-                    BlueFormulax.Dock = System.Windows.Forms.DockStyle.Right;
-                    BlueFormulax.Width = (int)(MinimumSize.Width / 2.0);
+                    Formula.Dock = System.Windows.Forms.DockStyle.Right;
+                    Formula.Width = (int)(MinimumSize.Width / 2.0);
 
                     TableView.BringToFront();
                     TableView.Dock = System.Windows.Forms.DockStyle.Fill;
                     break;
 
                 case enAnsicht.Tabelle_und_Formular_übereinander:
-                    FormulaViewBar.Visible = false;
-                    TableViewBar.Visible = true;
+                    grpFormularSteuerung.Visible = false;
+                    grpFilter.Visible = true;
                     TableView.Design = enBlueTableAppearance.Standard;
-                    BlueFormulax.Visible = true;
+                    Formula.Visible = true;
 
                     TableView.Dock = System.Windows.Forms.DockStyle.None;
 
-                    BlueFormulax.Dock = System.Windows.Forms.DockStyle.Top;
-                    BlueFormulax.Height = (int)(MinimumSize.Height / 2.0);
+                    Formula.Dock = System.Windows.Forms.DockStyle.Top;
+                    Formula.Height = (int)(MinimumSize.Height / 2.0);
 
                     TableView.BringToFront();
                     TableView.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -646,12 +683,12 @@ namespace BeCreative
                         TableView.CursorPos_Set(TableView.Database.Column[0], TableView.View_RowFirst(), false);
 
                     }
-                    if (TableView.CursorPosRow() != null) { BlueFormulax.ShowingRowKey = TableView.CursorPosRow().Key; }
+                    if (TableView.CursorPosRow() != null) { Formula.ShowingRowKey = TableView.CursorPosRow().Key; }
                 }
             }
             else
             {
-                BlueFormulax.ShowingRowKey = -1;
+                Formula.ShowingRowKey = -1;
             }
         }
 
@@ -662,7 +699,7 @@ namespace BeCreative
         }
 
 
-        private void NeuDBSaveAs_Click(object sender, EventArgs e)
+        private void NeuDBSaveAs_Click(object sender, System.EventArgs e)
         {
 
             var bu = (Button)sender;
@@ -690,7 +727,7 @@ namespace BeCreative
 
             if (bu.Name == "NeuDB")
             {
-                DatabaseSet(new Database(false, Table.Database_NeedPassword, CreativePad.GenerateLayoutFromRow, CreativePad.RenameColumnInLayout)); // Ab jetzt in der Variable _Database zu finden
+                DatabaseSet(new Database(false)); // Ab jetzt in der Variable _Database zu finden
             }
 
             if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
@@ -727,17 +764,17 @@ namespace BeCreative
 
             NeuDB.Enabled = true;
 
-            Öffnen.Enabled = true;
+            btnOeffnen.Enabled = true;
 
 
-            Neu.Enabled = DatenbankDa && _Ansicht == enAnsicht.Überschriften_und_Formular && _Database.PermissionCheck(_Database.PermissionGroups_NewRow, null);
-            löschen.Enabled = DatenbankDa;
-            Drucken.Enabled = DatenbankDa;
+            btnNeu.Enabled = DatenbankDa && _Ansicht == enAnsicht.Überschriften_und_Formular && _Database.PermissionCheck(_Database.PermissionGroups_NewRow, null);
+            btnLoeschen.Enabled = DatenbankDa;
+            btnDrucken.Enabled = DatenbankDa;
             Ansicht0.Enabled = DatenbankDa;
             Ansicht1.Enabled = DatenbankDa;
             Ansicht2.Enabled = DatenbankDa;
             Ansicht3.Enabled = DatenbankDa;
-            Ordn.Enabled = DatenbankDa && !string.IsNullOrEmpty(_Database.Filename);
+            btnDatenbanken.Enabled = DatenbankDa && !string.IsNullOrEmpty(_Database.Filename);
 
 
 
@@ -769,13 +806,13 @@ namespace BeCreative
 
 
 
-            SaveAs.Enabled = DatenbankDa;
+            btnSaveAs.Enabled = DatenbankDa;
 
 
 
 
-            Drucken.Item["csv"].Enabled = DatenbankDa && TableView.Design != enBlueTableAppearance.OnlyMainColumnWithoutHead;
-            Drucken.Item["html"].Enabled = DatenbankDa && TableView.Design != enBlueTableAppearance.OnlyMainColumnWithoutHead;
+            btnDrucken.Item["csv"].Enabled = DatenbankDa && TableView.Design != enBlueTableAppearance.OnlyMainColumnWithoutHead;
+            btnDrucken.Item["html"].Enabled = DatenbankDa && TableView.Design != enBlueTableAppearance.OnlyMainColumnWithoutHead;
 
 
 
@@ -792,12 +829,12 @@ namespace BeCreative
 
 
 
-        private void SuchenUndErsetzen_Click(object sender, EventArgs e)
+        private void SuchenUndErsetzen_Click(object sender, System.EventArgs e)
         {
             TableView.OpenSearchAndReplace();
         }
 
-        private void AngezeigteZeilenLöschen_Click(object sender, EventArgs e)
+        private void AngezeigteZeilenLöschen_Click(object sender, System.EventArgs e)
         {
             TableView.Database.Row.Remove(TableView.Filter);
             CheckButtons();
@@ -950,7 +987,7 @@ namespace BeCreative
             }
         }
 
-        private void TableView_RowsSorted(object sender, EventArgs e)
+        private void TableView_RowsSorted(object sender, System.EventArgs e)
         {
             if (TableView.Database.Column[0] != null)
             {
@@ -965,18 +1002,18 @@ namespace BeCreative
         }
 
 
-        private void Öffne_Click(object sender, EventArgs e)
+        private void Öffne_Click(object sender, System.EventArgs e)
         {
             LoadTab.ShowDialog();
         }
 
 
-        private void ÜberDiesesProgramm_Click(object sender, EventArgs e)
+        private void ÜberDiesesProgramm_Click(object sender, System.EventArgs e)
         {
             MessageBox.Show("(c) Christian Peter<br>V " + _Version, enImageCode.Information, "OK");
         }
 
-        private void Ansicht_Click(object sender, EventArgs e)
+        private void Ansicht_Click(object sender, System.EventArgs e)
         {
             _Ansicht = (enAnsicht)int.Parse(((Button)sender).Name.Substring(7, 1));
 
@@ -985,7 +1022,7 @@ namespace BeCreative
             CheckButtons();
         }
 
-        private void TemporärenSpeicherortÖffnen_Click(object sender, EventArgs e)
+        private void TemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e)
         {
             StandardTabx();
             ExecuteFile(Path.GetTempPath());
@@ -993,7 +1030,7 @@ namespace BeCreative
 
 
 
-        private void BeziehungsEditor_Click(object sender, EventArgs e)
+        private void BeziehungsEditor_Click(object sender, System.EventArgs e)
         {
 
             Hide();
@@ -1006,14 +1043,14 @@ namespace BeCreative
         }
 
 
-        private void Ordn_Click(object sender, EventArgs e)
+        private void Ordn_Click(object sender, System.EventArgs e)
         {
             StandardTabx();
             ExecuteFile(_Database.Filename.FilePath());
         }
 
 
-        private void Datenüberprüfung_Click(object sender, EventArgs e)
+        private void Datenüberprüfung_Click(object sender, System.EventArgs e)
         {
             TableView.Database.Row.DoAutomatic(TableView.Filter, true);
         }
@@ -1052,7 +1089,7 @@ namespace BeCreative
 
 
 
-        private void AllgemeinerEditor_Click(object sender, EventArgs e)
+        private void AllgemeinerEditor_Click(object sender, System.EventArgs e)
         {
             Hide();
 
@@ -1068,7 +1105,7 @@ namespace BeCreative
 
 
 
-        private void TableView_ColumnArrangementChanged(object sender, EventArgs e)
+        private void TableView_ColumnArrangementChanged(object sender, System.EventArgs e)
         {
             TableView.WriteColumnArrangementsInto(cbxColumnArr);
         }
@@ -1079,14 +1116,24 @@ namespace BeCreative
             TableView.Arrangement = int.Parse(e.Item.Internal());
         }
 
-        private void TableView_ViewChanged(object sender, EventArgs e)
+        private void TableView_ViewChanged(object sender, System.EventArgs e)
         {
             TableView.WriteColumnArrangementsInto(cbxColumnArr);
         }
 
-        private void btnTextLöschen_Click(object sender, EventArgs e)
+        private void btnTextLöschen_Click(object sender, System.EventArgs e)
         {
             ZeilenFilter_TextFeld.Text = string.Empty;
         }
+
+
+
+        public List<RowItem> GetFilteredItems()
+        {
+            ShowDialog();
+            return TableView.SortedRows();
+        }
+
+
     }
 }
