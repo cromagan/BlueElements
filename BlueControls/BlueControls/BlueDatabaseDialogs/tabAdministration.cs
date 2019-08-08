@@ -526,7 +526,7 @@ namespace BlueControls.BlueDatabaseDialogs
         public static void OpenDatabaseHeadEditor(Database DB)
         {
             DB.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
-            DB.Reload();
+            DB.Load_Reload();
             using (var w = new DatabaseHeadEditor(DB))
             {
                 w.ShowDialog();
@@ -641,7 +641,7 @@ namespace BlueControls.BlueDatabaseDialogs
             if (tmp == null)
             {
                 tmp = new Database(true);
-                tmp.LoadFromDisk(Files[0]);
+                tmp.Load(Files[0]);
             }
 
             _TableView.Database = tmp;

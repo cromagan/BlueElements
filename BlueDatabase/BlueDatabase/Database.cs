@@ -76,7 +76,6 @@ namespace BlueDatabase
             //TODO: In AllDatabases Aufnehmen!!!!!
 
             db.LoadFromStream(Stream);
-            db.OnLoaded(new LoadedEventArgs(false));
             return db;
         }
 
@@ -136,7 +135,7 @@ namespace BlueDatabase
                         var tmp = Database.GetByFilename(pf);
                         if (tmp != null) { return tmp; }
                         tmp = new Database(false);
-                        tmp.LoadFromDisk(pf);
+                        tmp.Load(pf);
                         return tmp;
                     }
 
@@ -264,7 +263,7 @@ namespace BlueDatabase
 
 
 
-        public void LoadFromDisk(string fileName)
+        public void Load(string fileName)
         {
 
             if (fileName.ToUpper() == Filename.ToUpper()) { return; }
@@ -302,17 +301,9 @@ namespace BlueDatabase
 
 
             // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
-            LoadFromDisk();
-
-            OnLoaded(new LoadedEventArgs(false));
-
-
-
+            Load_Reload();
 
             if (ReloadNeeded()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank nicht aktuell"); }
-
-
-
         }
 
         private static void OnDatabaseAdded(Database database)
@@ -466,18 +457,18 @@ namespace BlueDatabase
 
         #region  Event-Deklarationen 
 
-
         public event EventHandler<LoadedEventArgs> Loaded;
+        public event EventHandler<LoadingEventArgs> Loading;
         public event EventHandler SortParameterChanged;
         public event EventHandler<DatabaseStoppedEventArgs> ConnectedControlsStopAllWorking;
-        public event EventHandler StoreView;
-        public event EventHandler RestoreView;
+        //public event EventHandler StoreView;
+        //public event EventHandler RestoreView;
         public event EventHandler ViewChanged;
         public event EventHandler SavedToDisk;
         public event EventHandler SaveAborded;
         public event CancelEventHandler Exporting;
         public event EventHandler<DatabaseSettingsEventHandler> LoadingLinkedDatabase;
-        public event CancelEventHandler Reloading;
+
         public event EventHandler<KeyChangedEventArgs> RowKeyChanged;
         public event EventHandler<KeyChangedEventArgs> ColumnKeyChanged;
         public event EventHandler<ProgressbarEventArgs> ProgressbarInfo;
@@ -1103,27 +1094,6 @@ namespace BlueDatabase
 
 
 
-        /// <summary>
-        /// Lädt die Datenbank von der Festplatte.
-        /// Es die parallelen Threads benutzt. Diese Routine wartet aber, bis die Daten sichern neu geladen wurden.
-        /// Falls die Datenbank bereits geladen wurde, und kein Reload nötig ist, wird die Datenbank nicht geladen.
-        /// Der Unterschied zum Reload ist, dass bei einem Reload Store und Restore Events ausgelöst werden.
-        /// </summary>
-        private void LoadFromDisk()
-        {
-            // Stelle sicher, dass der Prozess nicht läuft- Nur Sicherheitshalber, sollte eigentlich eh nicht sein.
-            while (BinReLoader.IsBusy) { Develop.DoEvents(); }
-
-            // Nun starte den Prozess
-            BinReLoader.RunWorkerAsync();
-
-            // Stelle Sicher, dass er auch läuft
-            while (!BinReLoader.IsBusy) { Develop.DoEvents(); }
-
-            // Und nun warte, bis er fertig ist :-)
-            while (BinReLoader.IsBusy) { Develop.DoEvents(); }
-        }
-
 
         public void Parse(List<byte> _BLoaded, ref int Pointer, ref enDatabaseDataType Art, ref int ColNR, ref int RowNR, ref string Wert, ref int X, ref int Y)
         {
@@ -1718,6 +1688,9 @@ namespace BlueDatabase
         private void LoadFromStream(Stream Stream)
         {
 
+
+            OnLoading(new LoadingEventArgs(false));
+
             var _BLoaded = new List<byte>();
 
 
@@ -1728,6 +1701,9 @@ namespace BlueDatabase
             }
 
             Parse(_BLoaded);
+
+
+            OnLoaded(new LoadedEventArgs(false));
         }
 
 
@@ -1821,7 +1797,7 @@ namespace BlueDatabase
         {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             if (IsSaveAble() && !BlockDateiVorhanden()) { return; }
-            Reload();
+            Load_Reload();
             if (BlockDateiVorhanden()) { DeleteFile(Blockdateiname(), true); }
             Release(true, 180);
         }
@@ -2506,11 +2482,11 @@ namespace BlueDatabase
         /// <summary>
         /// Führt - falls nötig - einen Reload der Datenbank aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
         /// </summary>
-        public void Reload()
+        public void Load_Reload()
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(() => Reload()));
+                Invoke(new Action(() => Load_Reload()));
                 return;
             }
 
@@ -2520,16 +2496,29 @@ namespace BlueDatabase
             if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, Datenbankstatus eingefroren"); }
 
             //Der View-Code muss vom Table Selbst verwaltet werden. Jede Table/Formula kann ja eine eigene Ansicht haben!
-            OnStoreView();
-            LoadFromDisk();
-            OnLoaded(new LoadedEventArgs(true));
-            OnStoreReView();
+            // Stelle sicher, dass der Prozess nicht läuft- Nur Sicherheitshalber, sollte eigentlich eh nicht sein.
+            while (BinReLoader.IsBusy) { Develop.DoEvents(); }
+
+            BinReLoader_DoWork(null, null);
+
+            //q
+
+            //// Nun starte den Prozess
+            //BinReLoader.RunWorkerAsync();
+
+            //// Stelle Sicher, dass er auch läuft
+            //while (!BinReLoader.IsBusy) { Develop.DoEvents(); }
+
+            //// Und nun warte, bis er fertig ist :-)
+            //while (BinReLoader.IsBusy) { Develop.DoEvents(); }
+
+
         }
 
-        private void OnStoreReView()
-        {
-            RestoreView?.Invoke(this, System.EventArgs.Empty);
-        }
+        //private void OnStoreReView()
+        //{
+        //    RestoreView?.Invoke(this, System.EventArgs.Empty);
+        //}
 
 
         internal void OnViewChanged()
@@ -2537,10 +2526,10 @@ namespace BlueDatabase
             ViewChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
-        private void OnStoreView()
-        {
-            StoreView?.Invoke(this, System.EventArgs.Empty);
-        }
+        //private void OnStoreView()
+        //{
+        //    StoreView?.Invoke(this, System.EventArgs.Empty);
+        //}
 
         private void SetFileDate()
         {
@@ -2586,18 +2575,6 @@ namespace BlueDatabase
         {
             LoadingLinkedDatabase?.Invoke(this, e);
         }
-
-        /// <summary>
-        /// Das Cancel-Event wird nur berücksichtigt, wenn die Datenbank Readonly ist.
-        /// Es kann ja sein, das Berechtigungen entzogen wurden, deswegen MUSS reloaded werden
-        /// </summary>
-        /// <param name="e"></param>
-        private void OnReloading(CancelEventArgs e)
-        {
-            Reloading?.Invoke(this, e);
-        }
-
-
         internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventargs e)
         {
             GenerateLayoutInternal?.Invoke(this, e);
@@ -2622,6 +2599,11 @@ namespace BlueDatabase
         private void OnLoaded(LoadedEventArgs e)
         {
             Loaded?.Invoke(this, e);
+        }
+
+        private void OnLoading(LoadingEventArgs e)
+        {
+            Loading?.Invoke(this, e);
         }
 
         private void OnRenameColumnInLayout(RenameColumnInLayoutEventArgs e)
@@ -3471,13 +3453,15 @@ namespace BlueDatabase
         private void BinReLoader_DoWork(object sender, DoWorkEventArgs e)
         {
 
-            var ec = new CancelEventArgs(false);
-            OnReloading(ec);
-            if (ReadOnly && ec.Cancel) { return; }
+            var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
 
 
-            if (!ReloadNeeded()) { return; }
+            if (OnlyReload && !ReloadNeeded()) { return; }
 
+            var ec = new LoadingEventArgs(OnlyReload);
+            OnLoading(ec);
+            
+            if (OnlyReload && ReadOnly && ec.Cancel) { return; }
 
             string tmpLastSaveCode;
             byte[] _tmp = null;
@@ -3575,6 +3559,7 @@ namespace BlueDatabase
                 Develop.DebugPrint(ex);
             }
 
+            OnLoaded(new LoadedEventArgs(OnlyReload));
         }
 
         private void Backup_DoWork(object sender, DoWorkEventArgs e)
@@ -3639,9 +3624,11 @@ namespace BlueDatabase
                     break;
 
                 case "Reload":
-                    var tmpParesd = _ParsedAndRepairedCount;
-                    if (!BinReLoader.IsBusy) { BinReLoader.RunWorkerAsync(); }
-                    while (_ParsedAndRepairedCount == tmpParesd || _isParsing || BinReLoader.IsBusy) { Develop.DoEvents(); }
+                    if (BinReLoader.IsBusy) { Develop.DoEvents(); }
+                    BinReLoader_DoWork(null, null);
+                    //var tmpParesd = _ParsedAndRepairedCount;
+
+                    //while (_ParsedAndRepairedCount == tmpParesd || _isParsing || BinReLoader.IsBusy) { Develop.DoEvents(); }
                     break;
 
                 case "GetBinData":

@@ -1515,7 +1515,7 @@ namespace BlueDatabase
                 {
 
                     TMP_LinkedDatabase = new Database(el.ReadOnly); // Wichtig, NICHT _TMP_LinkedDatabase
-                    _TMP_LinkedDatabase.LoadFromDisk(el.Filenname);
+                    _TMP_LinkedDatabase.Load(el.Filenname);
                 }
             }
 

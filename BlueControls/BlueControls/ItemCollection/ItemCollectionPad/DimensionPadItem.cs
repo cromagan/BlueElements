@@ -311,7 +311,7 @@ namespace BlueControls.ItemCollection
             if (TextWinkel > 90 && TextWinkel <= 270) { TextWinkel = (float)(_Winkel - 180); }
 
 
-
+            if (geszoom < 0.15m) { return; } // Schrift zu klein, würde abstürzen
 
 
             var Mitte1 = new PointDF(Mitte, (decimal)(sz1.Height / 2.1), (decimal)(TextWinkel + 90));

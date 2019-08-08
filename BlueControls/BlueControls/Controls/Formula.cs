@@ -101,13 +101,14 @@ namespace BlueControls.Controls
 
                 if (_Database != null)
                 {
+                    _Database.Loading -= _Database_StoreView;
                     _Database.Loaded -= _DatabaseLoaded;
                     _Database.Row.RowChecked -= _Database_RowChecked;
                     _Database.Column.ItemRemoved -= _Database_ColumnRemoved;
                     _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
-                    _Database.StoreView -= _Database_StoreView;
+                    //_Database.StoreView -= _Database_StoreView;
                     _Database.RowKeyChanged -= _Database_RowKeyChanged;
-                    _Database.RestoreView -= _Database_RestoreView;
+                    //_Database.RestoreView -= _Database_RestoreView;
 
                     _Database.Release(false, 180); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
 
@@ -116,13 +117,14 @@ namespace BlueControls.Controls
 
                 if (_Database != null)
                 {
+                    _Database.Loading += _Database_StoreView;
                     _Database.Loaded += _DatabaseLoaded;
                     _Database.Row.RowChecked += _Database_RowChecked;
                     _Database.Column.ItemRemoved += _Database_ColumnRemoved;
                     _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
-                    _Database.StoreView += _Database_StoreView;
+                    //_Database.StoreView += _Database_StoreView;
                     _Database.RowKeyChanged += _Database_RowKeyChanged;
-                    _Database.RestoreView += _Database_RestoreView;
+                    //_Database.RestoreView += _Database_RestoreView;
                 }
 
                 _Inited = false;
@@ -277,6 +279,7 @@ namespace BlueControls.Controls
             if (IsDisposed) { return; }
             _Inited = false;
             _Database?.LoadPicsIntoImageChache();
+            ShowingRowKey = SavedRowKey;
         }
 
 
@@ -591,7 +594,7 @@ namespace BlueControls.Controls
 
             if (!_Database.IsAdministrator()) { return; }
 
-            _Database.Reload();
+            _Database.Load_Reload();
 
 
             _Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
@@ -1418,8 +1421,9 @@ namespace BlueControls.Controls
         {
             ContextMenuItemClicked?.Invoke(this, e);
         }
-        private void _Database_StoreView(object sender, System.EventArgs e)
+        private void _Database_StoreView(object sender, LoadingEventArgs e)
         {
+            if (e.OnlyReloaded) { return; }
             SavedRowKey = ShowingRowKey;
         }
 
@@ -1433,10 +1437,7 @@ namespace BlueControls.Controls
         }
 
 
-        private void _Database_RestoreView(object sender, System.EventArgs e)
-        {
-            ShowingRowKey = SavedRowKey;
-        }
+
 
         #endregion
     }

@@ -61,7 +61,7 @@ namespace BlueControls.Controls
         private bool _GeneratingBitmapOfControl;
 
         private decimal _Zoom = 1;
-        private decimal _ZoomMinx = 1;
+        private decimal _ZoomMin = 1;
 
         private bool _Fitting = true;
 
@@ -798,7 +798,7 @@ namespace BlueControls.Controls
             if (r.Width < 0.01m || r.Height < 0.01m)
             {
                 _Zoom = 1;
-                _ZoomMinx = _Zoom;
+                _ZoomMin = _Zoom;
                 ComputeSliders(SliderShowing);
                 return;
             }
@@ -807,25 +807,25 @@ namespace BlueControls.Controls
 
             if (SliderShowing)
             {
-                _ZoomMinx = Math.Min((Width - SliderY.Width - 32) / r.Width, (Height - SliderX.Height - 32) / r.Height);
+                _ZoomMin = Math.Min((Width - SliderY.Width - 32) / r.Width, (Height - SliderX.Height - 32) / r.Height);
             }
             else
             {
-                _ZoomMinx = Math.Min(Width / r.Width, Height / r.Height);
+                _ZoomMin = Math.Min(Width / r.Width, Height / r.Height);
             }
 
 
 
-            _ZoomMinx = Math.Max(_ZoomMinx, 0.01m);
+           // _ZoomMin = Math.Max(_ZoomMin, 0.0001m);
 
 
             if (_Fitting && !MousePressing())
             {
-                _Zoom = _ZoomMinx;
+                _Zoom = _ZoomMin;
             }
 
 
-            _Zoom = Math.Max(_Zoom, _ZoomMinx / 5);
+            _Zoom = Math.Max(_Zoom, _ZoomMin / 5);
 
 
 
@@ -996,7 +996,7 @@ namespace BlueControls.Controls
 
 
 
-            _Zoom = Math.Max(_ZoomMinx / 1.2m, _Zoom);
+            _Zoom = Math.Max(_ZoomMin / 1.2m, _Zoom);
             _Zoom = Math.Min(10, _Zoom);
 
             ComputeSliders(true);

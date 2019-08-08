@@ -147,7 +147,6 @@ namespace BlueControls.ItemCollection
                 while (r.Width* cZoom > 10000 || r.Height * cZoom > 10000)
                 {
                     cZoom = cZoom * 0.8m; // Kann ruhig verändert werden, tut nix zur Sache, DKoordinates reichen
-                    //return;
                 }
 
 
@@ -203,7 +202,6 @@ namespace BlueControls.ItemCollection
             l.Add(p_RU);
             l.Add(p_LU);
             l.Add(p_RO);
-
             return l;
         }
 

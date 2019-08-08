@@ -218,11 +218,10 @@ namespace BlueControls.Controls
                     _Database.Cell.CellValueChanged -= _Database_CellValueChanged;
                     _Database.ConnectedControlsStopAllWorking -= _Database_StopAllWorking;
                     _Database.Loaded -= _Database_DatabaseLoaded;
-                    _Database.StoreView -= _Database_StoreView;
+                    _Database.Loading -= _Database_StoreView;
                     _Database.ViewChanged -= _Database_ViewChanged;
                     _Database.RowKeyChanged -= _Database_RowKeyChanged;
                     _Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
-                    _Database.RestoreView -= _Database_RestoreView;
                     _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
                     _Database.SortParameterChanged -= _Database_SortParameterChanged;
                     _Database.Row.RowRemoved -= _Database_RowCountChanged;
@@ -244,11 +243,10 @@ namespace BlueControls.Controls
                     _Database.Cell.CellValueChanged += _Database_CellValueChanged;
                     _Database.ConnectedControlsStopAllWorking += _Database_StopAllWorking;
                     _Database.Loaded += _Database_DatabaseLoaded;
-                    _Database.StoreView += _Database_StoreView;
+                    _Database.Loading += _Database_StoreView;
                     _Database.ViewChanged += _Database_ViewChanged;
                     _Database.RowKeyChanged += _Database_RowKeyChanged;
                     _Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
-                    _Database.RestoreView += _Database_RestoreView;
                     _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
                     _Database.SortParameterChanged += _Database_SortParameterChanged;
                     _Database.Row.RowRemoved += _Database_RowCountChanged;
@@ -1362,7 +1360,7 @@ namespace BlueControls.Controls
             RowItem ContentHolderCellRow;
 
 
-            if (Database.ReloadNeeded()) { Database.Reload(); }
+            if (Database.ReloadNeeded()) { Database.Load_Reload(); }
 
             if (CellInThisDatabaseColumn == null)
             {
@@ -2356,6 +2354,16 @@ namespace BlueControls.Controls
             OnViewChanged();
 
             Invalidate();
+
+
+            if (e.OnlyReloaded)
+            {
+                if (string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View Empty!"); }
+
+                ParseView(_StoredView);
+                _StoredView = string.Empty;
+            }
+
         }
 
 
@@ -3163,14 +3171,7 @@ namespace BlueControls.Controls
             _StoredView = ColumnCollection.ChangeKeysInString(_StoredView, e.KeyOld, e.KeyNew);
         }
 
-        private void _Database_RestoreView(object sender, System.EventArgs e)
-        {
-            if (string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View Empty!"); }
 
-            ParseView(_StoredView);
-            _StoredView = string.Empty;
-
-        }
 
         #endregion
 
@@ -3930,7 +3931,7 @@ namespace BlueControls.Controls
 
             if (_Database.IsParsing()) { return; }
 
-            Database?.Reload();
+            Database?.Load_Reload();
 
 
             var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
