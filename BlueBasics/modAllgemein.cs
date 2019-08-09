@@ -764,7 +764,7 @@ namespace BlueBasics
         }
 
 
-        public static void SaveToDiskx(string DateiName, string Text2Save, bool ExecuteAfter)
+        public static void SaveToDisk(string DateiName, string Text2Save, bool ExecuteAfter)
         {
 
             switch (DateiName.FileType())

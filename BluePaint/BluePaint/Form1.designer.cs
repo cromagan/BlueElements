@@ -1,5 +1,4 @@
-﻿using BlueControls;
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
 
 namespace BluePaint
 {

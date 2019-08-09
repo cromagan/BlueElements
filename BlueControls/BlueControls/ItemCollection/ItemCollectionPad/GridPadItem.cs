@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -150,13 +149,13 @@ namespace BlueControls.ItemCollection
             {
                 do
                 {
-                    GR.DrawLine(p, po.X + (int)(ex), 0, po.X + (int)(ex), SizeOfParentControl.Height);
-                    GR.DrawLine(p, 0, po.Y + (int)(ex), SizeOfParentControl.Width, po.Y + (int)(ex));
+                    GR.DrawLine(p, po.X + (int)ex, 0, po.X + (int)ex, SizeOfParentControl.Height);
+                    GR.DrawLine(p, 0, po.Y + (int)ex, SizeOfParentControl.Width, po.Y + (int)ex);
 
                     if (ex > 0)
                     {
-                        GR.DrawLine(p, po.X - (int)(ex), 0, po.X - (int)(ex), SizeOfParentControl.Height);
-                        GR.DrawLine(p, 0, po.Y - (int)(ex), SizeOfParentControl.Width, po.Y - (int)(ex));
+                        GR.DrawLine(p, po.X - (int)ex, 0, po.X - (int)ex, SizeOfParentControl.Height);
+                        GR.DrawLine(p, 0, po.Y - (int)ex, SizeOfParentControl.Width, po.Y - (int)ex);
                     }
 
                     ex = ex + mo;

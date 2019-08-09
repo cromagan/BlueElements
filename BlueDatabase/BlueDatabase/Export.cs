@@ -787,7 +787,7 @@ namespace BlueDatabase
             tmpSave = tmpSave + Foot;
             if (!string.IsNullOrEmpty(SaveFile)) // Dateien ohne SUfiix-Angabe könenn nicht gespeichert werden
             {
-                modAllgemein.SaveToDiskx(SaveFile, tmpSave, false);
+                modAllgemein.SaveToDisk(SaveFile, tmpSave, false);
             }
 
             return tmpSave;

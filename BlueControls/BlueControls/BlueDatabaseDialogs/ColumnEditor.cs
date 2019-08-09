@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using BlueBasics;

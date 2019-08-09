@@ -23,7 +23,6 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueControls.Enums;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
@@ -469,7 +468,7 @@ namespace BlueControls.ItemCollection
             {
                 using (var p = new CreativePad())
                 {
-                    p.ParseData(Row.Database.Layouts[z], false, true);
+                    p.ParseData(Row.Database.Layouts[z], false, string.Empty);
                     Layouts.Add(new TextListItem(z.ToString(), p.Caption, enImageCode.Stern));
                 }
             }

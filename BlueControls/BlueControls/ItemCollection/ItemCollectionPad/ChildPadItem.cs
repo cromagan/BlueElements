@@ -226,7 +226,7 @@ namespace BlueControls.ItemCollection
                     return true;
                 case "data":
                     PadInternal = new CreativePad();
-                    PadInternal.ParseData(pair.Value, false, true);
+                    PadInternal.ParseData(pair.Value, false, string.Empty);
                     return true;
                 case "checked":
                     return true;
@@ -335,7 +335,7 @@ namespace BlueControls.ItemCollection
             y = Math.Max(y, int.MinValue / 2.0m);
 
 
-            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)(x), (int)(y), e.Delta);
+            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
 
 
             PadInternal.MouseDown(e2);
@@ -374,7 +374,7 @@ namespace BlueControls.ItemCollection
             y = Math.Max(y, int.MinValue / 2.0m);
 
 
-            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)(x), (int)(y), e.Delta);
+            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
 
 
             PadInternal.MouseMove(e2);
@@ -411,7 +411,7 @@ namespace BlueControls.ItemCollection
             y = Math.Max(y, int.MinValue / 2.0m);
 
 
-            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)(x), (int)(y), e.Delta);
+            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
 
 
             PadInternal.DoMouseUp(e2);

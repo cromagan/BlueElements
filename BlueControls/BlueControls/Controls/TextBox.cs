@@ -733,7 +733,7 @@ namespace BlueControls.Controls
 
                 var tt = _eTxt.ConvertCharToPlainText(position, position + word.Length - 1);
 
-                return (word.ToUpper() == tt.ToUpper());
+                return word.ToUpper() == tt.ToUpper();
 
             }
             catch (Exception)

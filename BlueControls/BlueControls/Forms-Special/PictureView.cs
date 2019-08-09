@@ -20,7 +20,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -63,7 +62,6 @@ namespace BlueControls.Forms
             InitWindow(MitScreenResize, AdditionalText, WindowCaption, -1, "");
 
 
-            Area_Dateisystem.Visible = false;
             Area_KomponenteHinzufügen.Visible = false;
             Area_Assistent.Visible = false;
             Area_Design.Visible = false;
@@ -89,7 +87,6 @@ namespace BlueControls.Forms
             InitWindow(false, "", "", -1, "");
 
 
-            Area_Dateisystem.Visible = false;
             Area_KomponenteHinzufügen.Visible = false;
             Area_Assistent.Visible = false;
             Area_Design.Visible = false;
@@ -112,7 +109,6 @@ namespace BlueControls.Forms
 
             InitWindow(MitScreenResize, AdditionalText, WindowCaption, OpenOnScreen, "");
 
-            Area_Dateisystem.Visible = false;
             Area_KomponenteHinzufügen.Visible = false;
             Area_Assistent.Visible = false;
             Area_Design.Visible = false;
@@ -124,34 +120,34 @@ namespace BlueControls.Forms
             Pad.KeyboardEditEnabled = false;
         }
 
-        public PictureView(string CodeToParse, string Title)
-        {
+        //public PictureView(string CodeToParse, string Title)
+        //{
 
-            // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
-            InitializeComponent();
+        //    // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        //    InitializeComponent();
 
-            _FileList = null;
-            _Title = Title;
-            Pad.Item.Clear();
+        //    _FileList = null;
+        //    _Title = Title;
+        //    Pad.Item.Clear();
 
-            Pad.ParseData(CodeToParse, true, true);
-
-
-            var Count = 0;
+        //    Pad.ParseData(CodeToParse, true, true);
 
 
-            do
-            {
-                Count += 1;
-                if (Pad.RepairAll(0, true)) { break; }
-                if (Count > 10) { break; }
-            } while (true);
-
-            Pad.RepairAll(1, true);
+        //    var Count = 0;
 
 
-            InitWindow(false, Title, Title, -1, Pad.SheetStyle);
-        }
+        //    do
+        //    {
+        //        Count += 1;
+        //        if (Pad.RepairAll(0, true)) { break; }
+        //        if (Count > 10) { break; }
+        //    } while (true);
+
+        //    Pad.RepairAll(1, true);
+
+
+        //    InitWindow(false, Title, Title, -1, Pad.SheetStyle);
+        //}
 
 
         protected void LoadPic(int Nr)
@@ -313,24 +309,7 @@ namespace BlueControls.Forms
         }
 
 
-        private void LoadDisk_Click(object sender, System.EventArgs e)
-        {
-            LoadTab.ShowDialog();
-        }
 
-
-        private void SaveDisk_Click(object sender, System.EventArgs e)
-        {
-
-            SaveTab.ShowDialog();
-        }
-
-        private void DelAll_Click(object sender, System.EventArgs e)
-        {
-            Pad.Item.Clear();
-            Pad.ZoomFit();
-            Ribbon.SelectedIndex = 1;
-        }
 
         private void AddLine_Click(object sender, System.EventArgs e)
         {
@@ -368,43 +347,12 @@ namespace BlueControls.Forms
             Pad.Item.Add(b);
         }
 
-        private void LoadTab_FileOk(object sender, CancelEventArgs e)
-        {
-            LoadFile(LoadTab.FileName);
-            Ribbon.SelectedIndex = 1;
-        }
-
-        private void SaveTab_FileOk(object sender, CancelEventArgs e)
-        {
-
-
-            var t = Pad.DataToString();
-            modAllgemein.SaveToDiskx(SaveTab.FileName, t, false);
-
-            LastBCRFiles.AddFileName(SaveTab.FileName, string.Empty);
-        }
 
 
 
         //protected override OnItem
 
-        private void LastBCRFiles_Item_Click(object sender, BasicListItemEventArgs e)
-        {
-            LoadFile(e.Item.Internal());
-        }
 
-
-        private void LoadFile(string na)
-        {
-            LastBCRFiles.AddFileName(na, string.Empty);
-
-            Pad.Item.Clear();
-            var t = modAllgemein.LoadFromDisk(na);
-
-            Pad.ParseData(t, true, false);
-            Pad.ZoomFit();
-            Ribbon.SelectedIndex = 1;
-        }
 
 
         private void Bild_Click(object sender, System.EventArgs e)
@@ -506,5 +454,6 @@ namespace BlueControls.Forms
         {
             Pad.ShowWorkingAreaSetup();
         }
+
     }
 }

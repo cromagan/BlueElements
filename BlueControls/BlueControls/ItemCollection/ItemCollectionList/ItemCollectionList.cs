@@ -832,7 +832,7 @@ namespace BlueControls.ItemCollection
             {
                 using (var p = new CreativePad())
                 {
-                    p.ParseData(vLayoutDatabase.Layouts[z], false, true);
+                    p.ParseData(vLayoutDatabase.Layouts[z], false, string.Empty);
                     Add(new TextListItem(p.ID, p.Caption, enImageCode.Stern));
                 }
             }

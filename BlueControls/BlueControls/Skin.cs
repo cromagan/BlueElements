@@ -26,7 +26,6 @@ using System.Drawing.Text;
 using System.Reflection;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueControls.Enums;
@@ -516,7 +515,7 @@ namespace BlueControls
         {
 
             var r = Math.Min(RMinus, Math.Min(rect.Width, rect.Height) - 1);
-            var r2 = (int)(Math.Truncate(r / 2.0));
+            var r2 = (int)Math.Truncate(r / 2.0);
             r = r2 * 2;
 
             GR.FillEllipse(b, new Rectangle(rect.Left, rect.Top - 1, r, r));

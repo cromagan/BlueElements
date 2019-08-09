@@ -26,7 +26,6 @@ using System.IO;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using static BlueDatabase.Database;
 using BlueDatabase.Enums;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modAllgemein;
@@ -411,7 +410,7 @@ namespace BlueDatabase
             var Result = "{";
 
             Result = Result + "Destination=" + _Verzeichnis.ToNonCritical() + ", ";
-            Result = Result + "Type=" + (int)(_Typ) + ", ";
+            Result = Result + "Type=" + (int)_Typ + ", ";
             Result = Result + "LastExportTime=" + _LastExportTime + ", ";
 
             Result = Result + "Interval=" + _Intervall + ", ";
@@ -743,7 +742,7 @@ namespace BlueDatabase
                     case enExportTyp.DatenbankCSVFormat:
                         if (_Intervall > (float)DateTime.Now.Subtract(_LastExportTime).TotalDays) { return false; }
                         SingleFileExport = TempFile(SingleFileExport + ".CSV");
-                        if (!FileExists(SingleFileExport)) { modAllgemein.SaveToDiskx(SingleFileExport, Database.Export_CSV(enFirstRow.ColumnInternalName, _ExportSpaltenAnsicht, Filter), false); }
+                        if (!FileExists(SingleFileExport)) { modAllgemein.SaveToDisk(SingleFileExport, Database.Export_CSV(enFirstRow.ColumnInternalName, _ExportSpaltenAnsicht, Filter), false); }
                         Added.Add(SingleFileExport + "|" + tim);
                         break;
 

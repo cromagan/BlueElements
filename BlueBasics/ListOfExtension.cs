@@ -239,7 +239,7 @@ namespace BlueBasics
                 System.IO.Directory.CreateDirectory(DateiName.FilePath());
             }
 
-            modAllgemein.SaveToDiskx(DateiName, t, ExecuteAfter);
+            modAllgemein.SaveToDisk(DateiName, t, ExecuteAfter);
         }
 
 

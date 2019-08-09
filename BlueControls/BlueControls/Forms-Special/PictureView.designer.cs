@@ -45,11 +45,6 @@ namespace BlueControls.Forms
             this.Button_PageSetup = new BlueControls.Controls.Button();
             this.Bild = new BlueControls.Controls.Button();
             this.Drucken = new BlueControls.Controls.Button();
-            this.Area_Dateisystem = new BlueControls.Controls.GroupBox();
-            this.LastBCRFiles = new BlueControls.Controls.LastFilesCombo();
-            this.DelAll = new BlueControls.Controls.Button();
-            this.LoadDisk = new BlueControls.Controls.Button();
-            this.SaveDisk = new BlueControls.Controls.Button();
             this.Page_Control = new BlueControls.Controls.TabPage();
             this.Area_KomponenteHinzufügen = new BlueControls.Controls.GroupBox();
             this.AddText = new BlueControls.Controls.Button();
@@ -75,13 +70,10 @@ namespace BlueControls.Forms
             this.sscchrifthgöße = new BlueControls.Controls.Caption();
             this.PadDesign = new BlueControls.Controls.ComboBox();
             this.ssss = new BlueControls.Controls.Caption();
-            this.LoadTab = new System.Windows.Forms.OpenFileDialog();
-            this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.Area_Seiten.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.Page_Start.SuspendLayout();
             this.Area_Drucken.SuspendLayout();
-            this.Area_Dateisystem.SuspendLayout();
             this.Page_Control.SuspendLayout();
             this.Area_KomponenteHinzufügen.SuspendLayout();
             this.Area_Werkzeuge.SuspendLayout();
@@ -200,7 +192,6 @@ namespace BlueControls.Forms
             // Page_Start
             // 
             this.Page_Start.Controls.Add(this.Area_Drucken);
-            this.Page_Start.Controls.Add(this.Area_Dateisystem);
             this.Page_Start.Location = new System.Drawing.Point(4, 25);
             this.Page_Start.Name = "Page_Start";
             this.Page_Start.Size = new System.Drawing.Size(1326, 81);
@@ -215,7 +206,7 @@ namespace BlueControls.Forms
             this.Area_Drucken.Controls.Add(this.Bild);
             this.Area_Drucken.Controls.Add(this.Drucken);
             this.Area_Drucken.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Area_Drucken.Location = new System.Drawing.Point(320, 0);
+            this.Area_Drucken.Location = new System.Drawing.Point(0, 0);
             this.Area_Drucken.Name = "Area_Drucken";
             this.Area_Drucken.Size = new System.Drawing.Size(296, 81);
             this.Area_Drucken.Text = "Drucken";
@@ -260,64 +251,6 @@ namespace BlueControls.Forms
             this.Drucken.TabIndex = 10;
             this.Drucken.Text = "Drucken";
             this.Drucken.Click += new System.EventHandler(this.Drucken_Click);
-            // 
-            // Area_Dateisystem
-            // 
-            this.Area_Dateisystem.CausesValidation = false;
-            this.Area_Dateisystem.Controls.Add(this.LastBCRFiles);
-            this.Area_Dateisystem.Controls.Add(this.DelAll);
-            this.Area_Dateisystem.Controls.Add(this.LoadDisk);
-            this.Area_Dateisystem.Controls.Add(this.SaveDisk);
-            this.Area_Dateisystem.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Area_Dateisystem.Location = new System.Drawing.Point(0, 0);
-            this.Area_Dateisystem.Name = "Area_Dateisystem";
-            this.Area_Dateisystem.Size = new System.Drawing.Size(320, 81);
-            this.Area_Dateisystem.Text = "Dateisystem";
-            // 
-            // LastBCRFiles
-            // 
-            this.LastBCRFiles.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.LastBCRFiles.DrawStyle = BlueControls.Enums.enComboboxStyle.RibbonBar;
-            this.LastBCRFiles.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.LastBCRFiles.Enabled = false;
-            this.LastBCRFiles.ImageCode = "Ordner";
-            this.LastBCRFiles.Location = new System.Drawing.Point(144, 2);
-            this.LastBCRFiles.Name = "LastBCRFiles";
-            this.LastBCRFiles.Size = new System.Drawing.Size(104, 66);
-            this.LastBCRFiles.TabIndex = 11;
-            this.LastBCRFiles.Text = "zuletzt geöffnete Dateien";
-            this.LastBCRFiles.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.LastBCRFiles_Item_Click);
-            // 
-            // DelAll
-            // 
-            this.DelAll.ImageCode = "Datei";
-            this.DelAll.Location = new System.Drawing.Point(8, 2);
-            this.DelAll.Name = "DelAll";
-            this.DelAll.Size = new System.Drawing.Size(64, 66);
-            this.DelAll.TabIndex = 10;
-            this.DelAll.Text = "Neu";
-            this.DelAll.Click += new System.EventHandler(this.DelAll_Click);
-            // 
-            // LoadDisk
-            // 
-            this.LoadDisk.ImageCode = "Ordner";
-            this.LoadDisk.Location = new System.Drawing.Point(80, 2);
-            this.LoadDisk.Name = "LoadDisk";
-            this.LoadDisk.QuickInfo = "Eine Datei von ihrem<br>Computer öffnen";
-            this.LoadDisk.Size = new System.Drawing.Size(64, 66);
-            this.LoadDisk.TabIndex = 9;
-            this.LoadDisk.Text = "Öffnen";
-            this.LoadDisk.Click += new System.EventHandler(this.LoadDisk_Click);
-            // 
-            // SaveDisk
-            // 
-            this.SaveDisk.ImageCode = "Diskette";
-            this.SaveDisk.Location = new System.Drawing.Point(248, 2);
-            this.SaveDisk.Name = "SaveDisk";
-            this.SaveDisk.Size = new System.Drawing.Size(64, 66);
-            this.SaveDisk.TabIndex = 8;
-            this.SaveDisk.Text = "Speichern";
-            this.SaveDisk.Click += new System.EventHandler(this.SaveDisk_Click);
             // 
             // Page_Control
             // 
@@ -589,25 +522,12 @@ namespace BlueControls.Forms
             this.ssss.Text = "Design:";
             this.ssss.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             // 
-            // LoadTab
-            // 
-            this.LoadTab.DefaultExt = "BCR";
-            this.LoadTab.Filter = "*.BCR BCR-Datei|*.BCR|*.* Alle Dateien|*";
-            this.LoadTab.Title = "Bitte Datei zum Laden wählen:";
-            this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
-            // 
-            // SaveTab
-            // 
-            this.SaveTab.DefaultExt = "BCR";
-            this.SaveTab.Filter = "*.BCR BCR-Datei|*.BCR|*.* Alle Dateien|*";
-            this.SaveTab.Title = "Bitte neuen Dateinamen der Datei wählen.";
-            this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.SaveTab_FileOk);
-            // 
             // PictureView
             // 
             this.ClientSize = new System.Drawing.Size(1334, 681);
             this.Controls.Add(this.Pad);
             this.Controls.Add(this.Ribbon);
+            this.Design = BlueControls.Enums.enDesign.Form_Standard;
             this.Name = "PictureView";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "(c) Christian Peter";
@@ -616,7 +536,6 @@ namespace BlueControls.Forms
             this.Ribbon.ResumeLayout(false);
             this.Page_Start.ResumeLayout(false);
             this.Area_Drucken.ResumeLayout(false);
-            this.Area_Dateisystem.ResumeLayout(false);
             this.Page_Control.ResumeLayout(false);
             this.Area_KomponenteHinzufügen.ResumeLayout(false);
             this.Area_Werkzeuge.ResumeLayout(false);
@@ -637,8 +556,6 @@ namespace BlueControls.Forms
 			private Button AddLine;
 			public CreativePad Pad;
 			protected TabControl Ribbon;
-			private System.Windows.Forms.OpenFileDialog LoadTab;
-			private System.Windows.Forms.SaveFileDialog SaveTab;
 			protected TabPage Page_Control;
 			protected TabPage Page_Start;
 			protected Caption InfoText;
@@ -651,10 +568,6 @@ namespace BlueControls.Forms
 			protected GroupBox Area_Assistent;
 			private Button ZoomFitBut;
 			private Button ZoomIn;
-			private Button LoadDisk;
-			private Button SaveDisk;
-			private Button DelAll;
-			private LastFilesCombo LastBCRFiles;
 			private Button Drucken;
 			private Button Bild;
 			private Button Vorschau;
@@ -667,7 +580,6 @@ namespace BlueControls.Forms
 			private TextBox RasterAnzeige;
 			private Button Bez_None;
 			private Button Bez_Direkt;
-			protected internal GroupBox Area_Dateisystem;
 			internal ComboBox SchriftGröße;
 			internal Caption sscchrifthgöße;
 			protected internal Button Button_PageSetup;

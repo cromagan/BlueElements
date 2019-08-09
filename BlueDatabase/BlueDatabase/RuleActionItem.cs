@@ -222,7 +222,7 @@ namespace BlueDatabase
         public override string ToString()
         {
 
-            var Result = "{Action=" + (int)(_Action);
+            var Result = "{Action=" + (int)_Action;
 
             foreach (var t in Columns)
             {

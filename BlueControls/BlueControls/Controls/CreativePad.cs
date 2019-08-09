@@ -32,7 +32,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Printing;
 using static BlueBasics.FileOperations;
@@ -816,7 +815,7 @@ namespace BlueControls.Controls
 
 
 
-           // _ZoomMin = Math.Max(_ZoomMin, 0.0001m);
+            // _ZoomMin = Math.Max(_ZoomMin, 0.0001m);
 
 
             if (_Fitting && !MousePressing())
@@ -2410,25 +2409,27 @@ namespace BlueControls.Controls
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="Value"></param>
-        /// <param name="NeedPrinterData"></param>
-        /// <param name="GetID">Ob die ID, die in den Daten gespeichert ist, verwendet werden soll. Muss false sein, wenn ein Layout kopiert wird, um eine neue ID zu erhalten.</param>
-        public void ParseData(string Value, bool NeedPrinterData, bool GetID)
+        /// <param name="value"></param>
+        /// <param name="needPrinterData"></param>
+        /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
+        public void ParseData(string value, bool needPrinterData, string useThisID)
         {
 
             Initialize();
-            if (string.IsNullOrEmpty(Value) || Value.Length < 3) { return; }
-            if (Value.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
+            if (string.IsNullOrEmpty(value) || value.Length < 3) { return; }
+            if (value.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
 
             _isParsing = true;
             var Beg = 0;
 
+            ID = useThisID;
+
             do
             {
                 Beg += 1;
-                if (Beg > Value.Length) { break; }
-                var T = Value.ParseTag(Beg);
-                var pvalue = Value.ParseValue(T, Beg);
+                if (Beg > value.Length) { break; }
+                var T = value.ParseTag(Beg);
+                var pvalue = value.ParseValue(T, Beg);
 
                 Beg = Beg + T.Length + pvalue.Length + 2;
                 switch (T)
@@ -2457,7 +2458,7 @@ namespace BlueControls.Controls
                         break;
 
                     case "id":
-                        if (GetID) { ID = pvalue.FromNonCritical(); }
+                        if (string.IsNullOrEmpty(ID)) { ID = pvalue.FromNonCritical(); }
                         break;
 
                     case "style":
@@ -2499,7 +2500,7 @@ namespace BlueControls.Controls
 
             RepairAll(0, true);
 
-            if (NeedPrinterData) { RepairPrinterData(); }
+            if (needPrinterData) { RepairPrinterData(); }
 
             OnParsed();
 
@@ -2977,7 +2978,7 @@ namespace BlueControls.Controls
         public void GenerateFromRow(string LayoutID, RowItem Row, bool NeedPrinterData)
         {
             var LayoutNr = Row.Database.LayoutIDToIndex(LayoutID);
-            ParseData(Row.Database.Layouts[LayoutNr], NeedPrinterData, true);
+            ParseData(Row.Database.Layouts[LayoutNr], NeedPrinterData, string.Empty);
             ResetVariables();
             ParseVariableAndSpecialCodes(Row);
 
@@ -3429,7 +3430,7 @@ namespace BlueControls.Controls
             if (e.Handled) { return; }
             e.Handled = true;
             var Padx = new CreativePad(); // TODO: Creative-Pad unabhängig eines Controls erstellen.
-            Padx.ParseData(e.LayoutCode, false, true);
+            Padx.ParseData(e.LayoutCode, false, string.Empty);
             Padx.RenameColumn(e.OldName, e.Column);
             e.LayoutCode = Padx.DataToString();
             Padx.Dispose();

@@ -17,21 +17,12 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
-using System.Windows.Forms;
-using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueDatabase.EventArgs;
 using Button = BlueControls.Controls.Button;
 using ComboBox = BlueControls.Controls.ComboBox;
-using Form = BlueControls.Forms.Form;
 using GroupBox = BlueControls.Controls.GroupBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
