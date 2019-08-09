@@ -1485,7 +1485,7 @@ namespace BlueDatabase
             if (_TMP_LinkedDatabase != null) { return _TMP_LinkedDatabase; }
             if (string.IsNullOrEmpty(_LinkedDatabaseFile)) { return null; }
 
-            var el = new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly);
+            DatabaseSettingsEventHandler el = null;
 
 
             if (FileExists(_LinkedDatabaseFile))
@@ -1499,14 +1499,15 @@ namespace BlueDatabase
 
             }
 
-            TMP_LinkedDatabase = Database.GetByFilename(el.Filenname); // Wichtig, NICHT _TMP_LinkedDatabase
+            TMP_LinkedDatabase = Database.GetByFilename(el.Filenname, true); 
             if (_TMP_LinkedDatabase == null)
             {
                 Database.OnLoadingLinkedDatabase(el);
             }
 
-            // Wichtig, NICHT _TMP_LinkedDatabase
-            TMP_LinkedDatabase = Database.GetByFilename(el.Filenname); // Event wird ausgelöst, Multitasking pfuscht rein, nochmal prüfen!!!!
+
+
+            TMP_LinkedDatabase = Database.GetByFilename(el.Filenname, true); // Event wird ausgelöst, Multitasking pfuscht rein, nochmal prüfen!!!!
 
 
             if (_TMP_LinkedDatabase == null)

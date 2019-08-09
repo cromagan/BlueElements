@@ -637,7 +637,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 return;
             }
 
-            var tmp = Database.GetByFilename(Files[0]);
+            var tmp = Database.GetByFilename(Files[0], false);
             if (tmp == null)
             {
                 tmp = new Database(true);

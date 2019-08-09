@@ -132,7 +132,7 @@ namespace BlueDatabase
 
                     if (FileExists(pf))
                     {
-                        var tmp = Database.GetByFilename(pf);
+                        var tmp = Database.GetByFilename(pf, false);
                         if (tmp != null) { return tmp; }
                         tmp = new Database(false);
                         tmp.Load(pf);
@@ -247,14 +247,25 @@ namespace BlueDatabase
 
         }
 
-        public static Database GetByFilename(string cFileName)
+        public static Database GetByFilename(string filePath, bool checkOnlyFilenameToo)
         {
-            cFileName = modConverter.SerialNr2Path(cFileName);
+            filePath = modConverter.SerialNr2Path(filePath);
 
             foreach (var ThisDatabase in AllDatabases)
             {
-                if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == cFileName.ToLower()) { return ThisDatabase; }
+                if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == filePath.ToLower()) { return ThisDatabase; }
             }
+
+
+            if (checkOnlyFilenameToo)
+            {
+                foreach (var ThisDatabase in AllDatabases)
+                {
+                    if (ThisDatabase != null && ThisDatabase.Filename.ToLower().FileNameWithSuffix() == filePath.ToLower().FileNameWithSuffix()) { return ThisDatabase; }
+                }
+            }
+
+
 
             return null;
 
@@ -3460,7 +3471,7 @@ namespace BlueDatabase
 
             var ec = new LoadingEventArgs(OnlyReload);
             OnLoading(ec);
-            
+
             if (OnlyReload && ReadOnly && ec.Cancel) { return; }
 
             string tmpLastSaveCode;

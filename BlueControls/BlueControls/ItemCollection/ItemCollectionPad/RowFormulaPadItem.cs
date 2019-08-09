@@ -240,7 +240,7 @@ namespace BlueControls.ItemCollection
                     return true;
 
                 case "database":
-                    ParseExplicit_TMPDatabase = Database.GetByFilename(pair.Value);
+                    ParseExplicit_TMPDatabase = Database.GetByFilename(pair.Value, false);
                     if (ParseExplicit_TMPDatabase == null)
                     {
                         ParseExplicit_TMPDatabase = new Database(false);
