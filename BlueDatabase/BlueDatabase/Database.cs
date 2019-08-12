@@ -3380,7 +3380,7 @@ namespace BlueDatabase
             if (!done)
             {
                 // Letztens aufgetreten, dass eine Blockdatei schon vorhanden war. Anscheinden Zeitgleiche Kopie?
-                Develop.DebugPrint("Befehl anscheinend abgebrochen:\r\n" + Filename);
+                Develop.DebugPrint(enFehlerArt.Info, "Befehl anscheinend abgebrochen:\r\n" + Filename);
                 return;
             }
 

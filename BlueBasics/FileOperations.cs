@@ -68,7 +68,7 @@ namespace BlueBasics
             }
             catch (Exception ex)
             {
-                Develop.DebugPrint(ex); //"Ordner " + Pfad + " konnte nicht gelöscht werden.<br>" + ex.Message);
+                Develop.DebugPrint(enFehlerArt.Info, ex);
             }
 
             return !PathExists(Pfad);
@@ -130,7 +130,7 @@ namespace BlueBasics
             }
             catch (Exception ex)
             {
-                Develop.DebugPrint(ex);
+                Develop.DebugPrint(enFehlerArt.Info, ex);
             }
 
             try
@@ -140,7 +140,7 @@ namespace BlueBasics
             }
             catch (Exception ex)
             {
-                Develop.DebugPrint(ex);
+                Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
 
@@ -162,7 +162,7 @@ namespace BlueBasics
             }
             catch (Exception ex)
             {
-                Develop.DebugPrint(ex);
+                Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
 
@@ -181,7 +181,7 @@ namespace BlueBasics
             }
             catch (Exception ex)
             {
-                Develop.DebugPrint(ex);
+                Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
 
