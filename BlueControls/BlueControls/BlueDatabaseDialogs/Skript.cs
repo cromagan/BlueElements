@@ -18,7 +18,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;

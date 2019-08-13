@@ -125,7 +125,7 @@ namespace BlueControls.ItemCollection
             BildModus = enSizeModes.EmptySpace;
             Rotation = 0;
 
-            Format = PadStyles.Undefiniert; // Kein Rahmen
+            Style = PadStyles.Undefiniert; // Kein Rahmen
         }
 
 
@@ -231,11 +231,11 @@ namespace BlueControls.ItemCollection
             }
 
 
-            if (Format != PadStyles.Undefiniert)
+            if (Style != PadStyles.Undefiniert)
             {
                 if (Parent.SheetStyleScale > 0 && Parent.SheetStyle != null)
                 {
-                    GR.DrawRectangle(Skin.GetBlueFont(Format, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), r1);
+                    GR.DrawRectangle(Skin.GetBlueFont(Style, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), r1);
                 }
             }
 
@@ -497,7 +497,7 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl(true));
 
 
-            l.Add(new FlexiControl("Umrandung", ((int)Format).ToString(),  Skin.GetRahmenArt(Parent.SheetStyle)));
+            l.Add(new FlexiControl("Umrandung", ((int)Style).ToString(),  Skin.GetRahmenArt(Parent.SheetStyle)));
 
 
             l.Add(new FlexiControl("Hintergrund weiß füllen", WhiteBack));
@@ -583,7 +583,7 @@ namespace BlueControls.ItemCollection
             WhiteBack = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
             Rotation = int.Parse(Tags.TagGet("Drehwinkel"));
             BildModus = (enSizeModes)int.Parse(Tags.TagGet("Bild-Modus"));
-            Format = (PadStyles)int.Parse(Tags.TagGet("Umrandung"));
+            Style = (PadStyles)int.Parse(Tags.TagGet("Umrandung"));
             _PlaceHolderString = Tags.TagGet("Platzhalter für Layout").FromNonCritical();
 
         }

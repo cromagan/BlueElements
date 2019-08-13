@@ -23,7 +23,6 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.ItemCollection.Basics;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -102,8 +101,7 @@ namespace BlueControls.ItemCollection
 
         private readonly List<clsPointRelation> _InternalRelations = new List<clsPointRelation>();
 
-        // Der Begriff "Formatierung" stammt von word (=Format) auf englisch
-        private PadStyles _Format = PadStyles.Undefiniert;
+        private PadStyles _Style = PadStyles.Undefiniert;
 
         public List<string> RemoveToo = new List<string>();
 
@@ -122,16 +120,16 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public PadStyles Format
+        public PadStyles Style
         {
             get
             {
-                return _Format;
+                return _Style;
             }
             set
             {
-                if (_Format == value) { return; }
-                _Format = value;
+                if (_Style == value) { return; }
+                _Style = value;
                 OnChanged();
             }
 
@@ -194,9 +192,10 @@ namespace BlueControls.ItemCollection
                         }
                         break;
 
-                    case "format":
+                   // case "format": // = Textformat!!!
                     case "design":
-                        _Format = (PadStyles)int.Parse(pair.Value);
+                    case "style":
+                        _Style = (PadStyles)int.Parse(pair.Value);
                         break;
 
                     case "removetoo":
@@ -229,7 +228,7 @@ namespace BlueControls.ItemCollection
             }
 
 
-            t = t + "Format=" + (int)(Format) + ", ";
+            t = t + "Style=" + (int)_Style + ", ";
             t = t + "Print=" + _PrintMe.ToPlusMinus() + ", ";
 
             foreach (var ThisPoint in PointList())

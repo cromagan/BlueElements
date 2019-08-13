@@ -159,14 +159,14 @@ namespace BlueDatabase
 
             var cmds = _ImportScript.FromNonCritical().SplitByCRToList();
 
-            if (row == null)
-            {
-                row = Row.Add(DateTime.Now.ToString(Constants.Format_Date));
-            }
-            else
-            {
-                if (row.CellGetBoolean(row.Database.Column.SysLocked)) { return "Die Zeile ist gesperrt (abgeschlosen)."; }
-            }
+            //if (row == null)
+            //{
+            //    row = Row.Add(DateTime.Now.ToString(Constants.Format_Date));
+            //}
+            //else
+            //{
+            if (row != null && row.CellGetBoolean(row.Database.Column.SysLocked)) { return "Die Zeile ist gesperrt (abgeschlossen)."; }
+            //}
 
 
 
@@ -174,23 +174,23 @@ namespace BlueDatabase
             {
                 var feh = DoImportScript(TextToImport, thiscmd.Replace(";cr;", "\r").Replace(";tab;", "\t").SplitBy("|"), row);
 
-                if (!string.IsNullOrEmpty(feh))
+                if (feh.Item3 == null) { return "Es konnte keine neue Zeile erzeugt werden."; }
+
+                if (row == null)
                 {
-                    if (feh.StartsWith("!"))
-                    {
-                        return feh.Substring(1) + "<br><br>Zeile:<br>" + thiscmd;
-                    }
+                    row = feh.Item3;
+                }
+                else
+                {
+                    if (row != feh.Item3) { return "Zeilen-Inkonsistenz festgestellt."; }
+                }
 
-                    if (MeldeFehlgeschlageneZeilen)
-                    {
-                        return feh + "<br><br>Zeile:<br>" + thiscmd;
-                    }
-
+                if (!string.IsNullOrEmpty(feh.Item1))
+                {
+                    if (feh.Item2) { return feh.Item1 + "<br><br>Zeile:<br>" + thiscmd; }
+                    if (MeldeFehlgeschlageneZeilen) { return feh.Item1  + "<br><br>Zeile:<br>" + thiscmd; }
                 }
             }
-
-
-
             return string.Empty;
         }
 
@@ -207,42 +207,49 @@ namespace BlueDatabase
         /// <param name="textToImport"></param>
         /// <param name="cmd"></param>
         /// <returns>Wenn Erfolgreich wird nichts zurückgegeben. Schwere Fehler beginnen mit einem !</returns>
-        private string DoImportScript(string textToImport, string[] cmd, RowItem row)
+        private Tuple<string, bool, RowItem> DoImportScript(string textToImport, string[] cmd, RowItem row)
         {
-            if (row == null) { return "!Keine Zeile angegeben."; }
 
-            if (cmd == null) { return "!Kein Befehl übergeben"; }
-            if (cmd.GetUpperBound(0) != 3) { return "!Format muss 4 | haben."; }
+            if (cmd == null) { return Tuple.Create("Kein Befehl übergeben", true, row); }
+            if (cmd.GetUpperBound(0) != 3) { return Tuple.Create("Format muss 4 | haben.", true, row); }
 
             var c = Column[cmd[1]];
-            if (c == null) { return "!Spalte nicht in der Datenbank gefunden."; }
+            if (c == null) { return Tuple.Create("Spalte nicht in der Datenbank gefunden.", true, row); }
 
-            if (string.IsNullOrEmpty(cmd[2])) { return "!Suchtext 'vorher' ist nicht angegeben"; }
-            if (string.IsNullOrEmpty(cmd[3])) { return "!Suchtext 'nachher' ist nicht angegeben"; }
+            if (string.IsNullOrEmpty(cmd[2])) { return Tuple.Create("Suchtext 'vorher' ist nicht angegeben", true, row); }
+            if (string.IsNullOrEmpty(cmd[3])) { return Tuple.Create("Suchtext 'nachher' ist nicht angegeben", true, row); }
 
             var vh = textToImport.IndexOf(cmd[2]);
-            if (vh < 0) { return "Suchtext 'vorher' im Text nicht vorhanden."; }
+            if (vh < 0) { return Tuple.Create("Suchtext 'vorher' im Text nicht vorhanden.", false, row); }
 
             var nh = textToImport.IndexOf(cmd[3], vh + cmd[2].Length);
-            if (nh < 0) { return "Suchtext 'nachher' im Text nicht vorhanden."; }
+            if (nh < 0) { return Tuple.Create("Suchtext 'nachher' im Text nicht vorhanden.", false, row); }
 
             var txt = textToImport.Substring(vh + cmd[2].Length, nh - vh - cmd[2].Length);
 
             switch (cmd[0].ToUpper())
             {
                 case "IMPORT1":
-                    row.CellSet(c, txt);
-                    return string.Empty;
+                    if (c.IsFirst() && row == null)
+                    {
+                        row = Row.Add(txt);
+                    }
+                    else
+                    {
+                        if (row == null) { return Tuple.Create("Keine Zeile angegeben.", true, row); }
+                        row.CellSet(c, txt);
+                    }
+                    return Tuple.Create(string.Empty, false, row);
 
                 case "IMPORT2":
+                    if (row == null) { return Tuple.Create("Keine Zeile angegeben.", true, row); }
                     var l = row.CellGetList(c);
                     l.Add(txt);
                     row.CellSet(c, l);
-                    return string.Empty;
-
+                    return Tuple.Create(string.Empty, false, row);
 
                 default:
-                    return "!Befehl nicht erkannt.";
+                    return Tuple.Create("Befehl nicht erkannt.", true, row);
             }
 
         }
@@ -3527,13 +3534,22 @@ namespace BlueDatabase
                 WVorher = Works.ToString();
             }
 
+            if (sender is BackgroundWorker w)
+            {
+                while (_isParsing) { Develop.DoEvents(); }
+                var tmpParsCount = _ParsedAndRepairedCount;
+                w.ReportProgress(1, _BLoaded);
+                while (tmpParsCount == _ParsedAndRepairedCount || _isParsing) { Develop.DoEvents(); }
+                w.ReportProgress(0, tmpLastSaveCode);
+
+            }
+            else
+            {
+                BinReLoader_ProgressChanged(null, new ProgressChangedEventArgs(1, _BLoaded));
+                BinReLoader_ProgressChanged(null, new ProgressChangedEventArgs(0, tmpLastSaveCode));
+            }
 
 
-            while (_isParsing) { Develop.DoEvents(); }
-            var tmpParsCount = _ParsedAndRepairedCount;
-            BinReLoader.ReportProgress(1, _BLoaded);
-            while (tmpParsCount == _ParsedAndRepairedCount || _isParsing) { Develop.DoEvents(); }
-            BinReLoader.ReportProgress(0, tmpLastSaveCode);
 
 
 

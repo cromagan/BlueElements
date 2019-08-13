@@ -23,7 +23,6 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
@@ -58,7 +57,7 @@ namespace BlueControls.ItemCollection
 
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
-        public decimal ZusatzScale = 3.07m;
+        public decimal AdditionalScale = 3.07m;
 
 
         #endregion
@@ -121,7 +120,7 @@ namespace BlueControls.ItemCollection
             _ReadableText = string.Empty;
             _VariableText = string.Empty;
 
-            Format = PadStyles.Undefiniert;
+            Style = PadStyles.Undefiniert;
 
             FixSize = false;
             etxt = null;
@@ -209,7 +208,7 @@ namespace BlueControls.ItemCollection
                     return true;
 
                 case "additionalscale":
-                    ZusatzScale = decimal.Parse(pair.Value.FromNonCritical());
+                    AdditionalScale = decimal.Parse(pair.Value.FromNonCritical());
                     return true;
             }
             return false;
@@ -225,12 +224,12 @@ namespace BlueControls.ItemCollection
 
             if (Rotation != 0) { t = t + "Rotation=" + Rotation + ", "; }
 
-            if (_Format != enDataFormat.Text) { t = t + "Format=" + (int)(_Format) + ", "; }
+            if (_Format != enDataFormat.Text) { t = t + "Format=" + (int)_Format + ", "; }
 
-            if (_Align != enAlignment.Top_Left) { t = t + "Alignment=" + (int)(_Align) + ", "; }
+            if (_Align != enAlignment.Top_Left) { t = t + "Alignment=" + (int)_Align + ", "; }
 
             t = t + "Fixsize=" + FixSize.ToPlusMinus() + ", ";
-            t = t + "AdditionalScale=" + ZusatzScale.ToString().ToNonCritical();
+            t = t + "AdditionalScale=" + AdditionalScale.ToString().ToNonCritical();
 
 
             return t.Trim(", ") + "}";
@@ -277,14 +276,14 @@ namespace BlueControls.ItemCollection
         protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
 
-            if (Format == PadStyles.Undefiniert) { return; }
+            if (Style == PadStyles.Undefiniert) { return; }
 
             etxt.Left = DCoordinates.Left;
             etxt.Top = DCoordinates.Top;
 
             if (!string.IsNullOrEmpty(_ReadableText) || !ForPrinting)
             {
-                etxt.Draw(GR, (float)(cZoom * ZusatzScale * Parent.SheetStyleScale));
+                etxt.Draw(GR, (float)(cZoom * AdditionalScale * Parent.SheetStyleScale));
             }
 
             if (!ForPrinting)
@@ -371,7 +370,7 @@ namespace BlueControls.ItemCollection
         protected override void KeepInternalLogic()
         {
 
-            if (Format != PadStyles.Undefiniert)
+            if (Style != PadStyles.Undefiniert)
             {
 
                 if (etxt == null)
@@ -383,7 +382,7 @@ namespace BlueControls.ItemCollection
                     }
                     else
                     {
-                        etxt = new ExtText(Format, Parent.SheetStyle);
+                        etxt = new ExtText(Style, Parent.SheetStyle);
                     }
                     etxt.Autoumbruch = true;
                     etxt.Ausrichtung = _Align;
@@ -403,11 +402,11 @@ namespace BlueControls.ItemCollection
                 // da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
                 // muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
 
-                etxt.MaxWidth = (int)(UsedArea().Width / ZusatzScale / Parent.SheetStyleScale); // CInt(DCoordinates.Width / CSng(cZoom * (ausgleich + 0.05)))
+                etxt.MaxWidth = (int)(UsedArea().Width / AdditionalScale / Parent.SheetStyleScale); // CInt(DCoordinates.Width / CSng(cZoom * (ausgleich + 0.05)))
                 etxt.MaxHeight = 10000; //CInt(DCoordinates.Height / cZoom)
 
-                p_RU.Y = Math.Max(p_LO.Y + etxt.Height() * ZusatzScale * Parent.SheetStyleScale, p_LO.Y + 10);
-                p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * ZusatzScale * Parent.SheetStyleScale);
+                p_RU.Y = Math.Max(p_LO.Y + etxt.Height() * AdditionalScale * Parent.SheetStyleScale, p_LO.Y + 10);
+                p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * AdditionalScale * Parent.SheetStyleScale);
             }
 
 
@@ -520,7 +519,7 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl("Text", _VariableText, enDataFormat.Text, 5));
             l.Add(new FlexiControl("Drehwinkel", Rotation.ToString(), enDataFormat.Ganzzahl, 1));
 
-            l.Add(new FlexiControl("Stil", ((int)Format).ToString(), Skin.GetFonts(Parent.SheetStyle)));
+            l.Add(new FlexiControl("Stil", ((int)Style).ToString(), Skin.GetFonts(Parent.SheetStyle)));
 
 
 
@@ -531,7 +530,7 @@ namespace BlueControls.ItemCollection
             Aursicht.Add(new TextListItem(((int)enAlignment.Top_Right).ToString(), "Rechtsbündig ausrichten", enImageCode.Rechtsbündig));
             Aursicht.Sort();
             l.Add(new FlexiControl("Ausrichtung", ((int)_Align).ToString(), Aursicht));
-            l.Add(new FlexiControl("Skalierung", ZusatzScale.ToString(), enDataFormat.Gleitkommazahl, 1));
+            l.Add(new FlexiControl("Skalierung", AdditionalScale.ToString(), enDataFormat.Gleitkommazahl, 1));
 
 
             return l;
@@ -555,9 +554,9 @@ namespace BlueControls.ItemCollection
 
             var tmps = (PadStyles)int.Parse(Tags.TagGet("Stil"));
 
-            if (tmps != Format)
+            if (tmps != Style)
             {
-                Format = tmps;
+                Style = tmps;
                 etxt = null;
             }
 
@@ -571,7 +570,7 @@ namespace BlueControls.ItemCollection
             }
 
 
-            ZusatzScale = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
+            AdditionalScale = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
 
 
         }

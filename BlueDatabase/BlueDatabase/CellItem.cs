@@ -145,6 +145,7 @@ namespace BlueDatabase
                     //if (Txt == null || string.IsNullOrEmpty(Txt)) { return string.Empty; }
                     Txt = LanguageTool.ColumnReplace(Txt, column, Style);
                     Txt = Txt.Replace("\r\n", " ");
+                    Txt = Txt.Replace("\r", " ");
                     break;
 
 
@@ -222,8 +223,8 @@ namespace BlueDatabase
             if (Style != enShortenStyle.HTML) { return Txt; }
 
 
-            if (Txt.Contains("\r")) { Develop.DebugPrint(enFehlerArt.Warnung, "\\r enthalten:" + Txt); }
-            if (Txt.Contains("\n")) { Develop.DebugPrint(enFehlerArt.Warnung, "\\n enthalten:" + Txt); }
+            if (Txt.Contains("\r")) { Develop.DebugPrint(enFehlerArt.Info, "\\r enthalten:" + Txt); }
+            if (Txt.Contains("\n")) { Develop.DebugPrint(enFehlerArt.Info, "\\n enthalten:" + Txt); }
 
 
             while (Txt.StartsWith(" ") || Txt.StartsWith("<br>") || Txt.EndsWith(" ") || Txt.EndsWith("<br>"))

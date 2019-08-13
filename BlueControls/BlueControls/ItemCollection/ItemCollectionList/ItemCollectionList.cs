@@ -407,31 +407,31 @@ namespace BlueControls.ItemCollection
             switch (GalleryStyle)
             {
                 case enBlueListBoxAppearance.Gallery:
-                    Sp = (int)(Math.Truncate(Max.Width / 350.0));
+                    Sp = (int)Math.Truncate(Max.Width / 350.0);
                     if (Sp > 10) { Sp = 10; }
                     if (Sp < 1) { Sp = 1; }
 
                     if (SliderY != null)
                     {
-                        MultiX = (int)(Math.Truncate((Max.Width - SliderY.Width) / (double)Sp));
+                        MultiX = (int)Math.Truncate((Max.Width - SliderY.Width) / (double)Sp);
                     }
                     else
                     {
-                        MultiX = (int)(Math.Truncate(Max.Width / (double)Sp));
+                        MultiX = (int)Math.Truncate(Max.Width / (double)Sp);
                     }
                     break;
 
                 case enBlueListBoxAppearance.FileSystem:
 
-                    Sp = (int)(Math.Truncate(Max.Width / 110.0));
+                    Sp = (int)Math.Truncate(Max.Width / 110.0);
                     if (Sp < 1) { Sp = 1; }
                     if (SliderY != null)
                     {
-                        MultiX = (int)(Math.Truncate((Max.Width - SliderY.Width) / (double)Sp));
+                        MultiX = (int)Math.Truncate((Max.Width - SliderY.Width) / (double)Sp);
                     }
                     else
                     {
-                        MultiX = (int)(Math.Truncate(Max.Width / (double)Sp));
+                        MultiX = (int)Math.Truncate(Max.Width / (double)Sp);
                     }
                     break;
 
@@ -474,7 +474,7 @@ namespace BlueControls.ItemCollection
                     // Wenn die Maximale Höhe aller Items Größer als der Draw-Bereich ist, versuche, es auf mehrere Spalten aufzuteilen.
                     if (Bigy > Max.Height)
                     {
-                        Sp = (int)(Math.Truncate(Max.Width / (BiggestWidth + Skin.PaddingSmal)));
+                        Sp = (int)Math.Truncate(Max.Width / (BiggestWidth + Skin.PaddingSmal));
                         if (Sp > 1 && !MustBeOneColumn)
                         {
                             if (Bigy / Sp > Max.Height)
@@ -490,7 +490,7 @@ namespace BlueControls.ItemCollection
 
                         do
                         {
-                            MultiX = (int)(Math.Truncate(Max.Width / (double)Sp));
+                            MultiX = (int)Math.Truncate(Max.Width / (double)Sp);
                             if (Sp == 1)
                             {
                                 break;
@@ -591,7 +591,7 @@ namespace BlueControls.ItemCollection
                     {
                         // Oben nach Unten, Texte und alles andere
                         CY += YVal;
-                        if (IsZ > (int)(Math.Truncate((Count - 1) / (double)Sp)))
+                        if (IsZ > (int)Math.Truncate((Count - 1) / (double)Sp))
                         {
                             IsZ = 0;
                             CY = 0;

@@ -53,7 +53,7 @@ namespace BlueControls.ItemCollection
 
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
-        public decimal ZusatzScale = 3.07m;
+        public decimal AdditionalScale = 3.07m;
 
         public string Prefix = "";
         public string Suffix = "";
@@ -123,7 +123,7 @@ namespace BlueControls.ItemCollection
             Text2 = "";
             NachKomma = 1;
             //  ImmerWaagerecht = True
-            Format = PadStyles.Style_StandardAlternativ;
+            Style = PadStyles.Style_StandardAlternativ;
 
             Point1.Parent = this;
             Point2.Parent = this;
@@ -209,7 +209,7 @@ namespace BlueControls.ItemCollection
                     return true;
 
                 case "additionalscale":
-                    ZusatzScale = decimal.Parse(pair.Value.FromNonCritical());
+                    AdditionalScale = decimal.Parse(pair.Value.FromNonCritical());
                     return true;
             }
 
@@ -228,7 +228,7 @@ namespace BlueControls.ItemCollection
                    ", Decimal=" + NachKomma +
                    ", Prefix=" + Prefix.ToNonCritical() +
                    ", Suffix=" + Suffix.ToNonCritical() +
-                   ", AdditionalScale=" + ZusatzScale.ToString().ToNonCritical() + "}";
+                   ", AdditionalScale=" + AdditionalScale.ToString().ToNonCritical() + "}";
         }
 
 
@@ -274,9 +274,9 @@ namespace BlueControls.ItemCollection
         protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
 
-            if (Format == PadStyles.Undefiniert) { return; }
-            var geszoom = cZoom * Parent.SheetStyleScale * ZusatzScale;
-            var f = Skin.GetBlueFont(Format, Parent.SheetStyle);
+            if (Style == PadStyles.Undefiniert) { return; }
+            var geszoom = cZoom * Parent.SheetStyleScale * AdditionalScale;
+            var f = Skin.GetBlueFont(Style, Parent.SheetStyle);
 
             var PfeilG = (decimal)f.Font(geszoom).Size * 0.8m;
             var pen2 = f.Pen(cZoom);
@@ -350,10 +350,10 @@ namespace BlueControls.ItemCollection
 
         public override RectangleDF UsedArea()
         {
-            if (Format == PadStyles.Undefiniert) { return new RectangleDF(0, 0, 0, 0); }
-            var geszoom = Parent.SheetStyleScale * ZusatzScale;
+            if (Style == PadStyles.Undefiniert) { return new RectangleDF(0, 0, 0, 0); }
+            var geszoom = Parent.SheetStyleScale * AdditionalScale;
 
-            var f = Skin.GetBlueFont(Format, Parent.SheetStyle);
+            var f = Skin.GetBlueFont(Style, Parent.SheetStyle);
 
             var sz1 = BlueFont.MeasureString(AngezeigterText1(), f.Font(geszoom));
             var sz2 = BlueFont.MeasureString(Text2, f.Font(geszoom));
@@ -456,9 +456,9 @@ namespace BlueControls.ItemCollection
 
 
 
-            l.Add(new FlexiControl("Stil", ((int)Format).ToString(), Skin.GetFonts(Parent.SheetStyle)));
+            l.Add(new FlexiControl("Stil", ((int)Style).ToString(), Skin.GetFonts(Parent.SheetStyle)));
 
-            l.Add(new FlexiControl("Skalierung", ZusatzScale.ToString(), enDataFormat.Gleitkommazahl, 1));
+            l.Add(new FlexiControl("Skalierung", AdditionalScale.ToString(), enDataFormat.Gleitkommazahl, 1));
             return l;
         }
 
@@ -470,9 +470,9 @@ namespace BlueControls.ItemCollection
 
             Suffix = Tags.TagGet("Suffix").FromNonCritical();
             Prefix = Tags.TagGet("Präfix").FromNonCritical();
-            ZusatzScale = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
+            AdditionalScale = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
 
-            Format = (PadStyles)int.Parse(Tags.TagGet("Stil"));
+            Style = (PadStyles)int.Parse(Tags.TagGet("Stil"));
         }
 
 

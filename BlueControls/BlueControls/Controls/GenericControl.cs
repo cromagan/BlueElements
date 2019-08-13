@@ -600,8 +600,8 @@ namespace BlueControls.Controls
             TabIndex = 0;
             CausesValidation = false;
             SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
-            SetStyle(System.Windows.Forms.ControlStyles.StandardClick, false);
-            SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
+            //SetStyle(System.Windows.Forms.ControlStyles.StandardClick, false);
+            //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
         }
 
         protected Form ParentForm()

@@ -220,7 +220,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 Pad.SheetSizeInMM = SizeF.Empty;
                 var x = new TextPadItem("x", "Layout aus Dateisystem");
                 Pad.Item.Add(x);
-                x.Format = Enums.PadStyles.Style_Überschrift_Haupt;
+                x.Style = Enums.PadStyles.Style_Überschrift_Haupt;
                 x.SetCoordinates(new RectangleDF(0, 0, 1000, 400));
 
                 Pad.Enabled = false;
