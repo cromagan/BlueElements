@@ -991,6 +991,8 @@ namespace BlueControls
 
             if (Stufe != 4 && vDesign != enDesign.TextBox)
             {
+                if (vDesign == enDesign.Form_QuickInfo ) { return GetBlueFont(vDesign, vState); } // QuickInfo kann jeden Text enthatlten
+
                 Develop.DebugPrint(enFehlerArt.Warnung, "Design unbekannt: " + (int)vDesign);
                 return GetBlueFont(vDesign, vState);
             }

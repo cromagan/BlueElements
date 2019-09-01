@@ -113,19 +113,17 @@ namespace BlueControls.Controls
 
             for (var Z = LastD.Count - 1; Z >= 0; Z--)
             {
-                if (!_mustExists || FileExists(LastD[Z]))
+
+                var x = (LastD[Z]).SplitBy("|");
+
+                if (!_mustExists || FileExists(x[0]))
                 {
                     NR += 1;
 
                     if (NR < MaxCount)
                     {
                         Vis = true;
-
-
                         var show = (NR + 1).ToString(Constants.Format_Integer3) + ": ";
-
-
-                        var x = (LastD[Z] + "|").SplitBy("|");
 
                         if (_mustExists)
                         {
@@ -136,13 +134,21 @@ namespace BlueControls.Controls
                             show = show + x[0];
                         }
 
-                        if (!string.IsNullOrEmpty(x[1]))
+                        if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]))
                         {
                             show = show + " - " + x[1];
                         }
-                        
+
                         var it = new TextListItem(false, x[0], show, NR.ToString(Constants.Format_Integer3));
-                        it.Tags.Add(x[1]);
+                        if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]))
+                        {
+                            it.Tags.Add(x[1]);
+                        }
+                        else
+                        {
+                            it.Tags.Add(string.Empty);
+                        }
+
                         Item.Add(it);
                     }
                 }

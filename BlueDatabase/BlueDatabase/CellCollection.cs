@@ -1386,6 +1386,8 @@ namespace BlueDatabase
         public void SetSizeOfCellContent(ColumnItem Column, RowItem Row, Size ContentSize)
         {
             var CellKey = KeyOfCell(Column, Row);
+            if (!_cells.ContainsKey(CellKey)) { return; }
+
             _cells[CellKey].Size = ContentSize;
         }
 
