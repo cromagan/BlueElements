@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using BlueControls.Forms;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

@@ -25,7 +25,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using BlueBasics;
 using BlueBasics.Enums;
-using static BlueDatabase.Database;
 using static BlueBasics.FileOperations;
 using System.Text.RegularExpressions;
 using BlueDatabase.Enums;

@@ -18,9 +18,7 @@
 #endregion
 
 using BlueBasics;
-using BlueControls.Controls;
 using BlueControls.Enums;
-using System;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BlueControls.Enums
+﻿namespace BlueControls.Enums
 {
     public enum enBlueListBoxAppearance
     {

@@ -103,7 +103,7 @@ namespace BlueControls.Forms
         /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
         public static bool DeleteFile(string File, bool Rückfrage)
         {
-            List<string> f = new List<string>();
+            var f = new List<string>();
             f.Add(File);
             return DeleteFile(f, Rückfrage);
         }

@@ -21,7 +21,6 @@ using System;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;

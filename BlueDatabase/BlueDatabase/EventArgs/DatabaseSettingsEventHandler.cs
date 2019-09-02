@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using static BlueDatabase.Database;
 
 namespace BlueDatabase.EventArgs
 {
