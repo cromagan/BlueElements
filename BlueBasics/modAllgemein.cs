@@ -37,6 +37,7 @@ using BlueBasics.Enums;
 using Microsoft.Win32;
 using static BlueBasics.FileOperations;
 using System.Globalization;
+using System.Windows.Media.Imaging;
 
 namespace BlueBasics
 {
@@ -83,9 +84,9 @@ namespace BlueBasics
             var Schnitt = new Rectangle(Koord1.Location, Koord1.Size);
             Schnitt.Intersect(Koord2);
 
-            for (var x = Schnitt.Left ; x < Schnitt.Right ; x += Accuracy)
+            for (var x = Schnitt.Left; x < Schnitt.Right; x += Accuracy)
             {
-                for (var y = Schnitt.Top ; y < Schnitt.Bottom ; y += Accuracy)
+                for (var y = Schnitt.Top; y < Schnitt.Bottom; y += Accuracy)
                 {
                     if (!Image1.GetPixel(x - Koord1.X, y - Koord1.Y).IsNearWhite(0.9) && !Image2.GetPixel(x - Koord2.X, y - Koord2.Y).IsNearWhite(0.9))
                     {
@@ -99,6 +100,98 @@ namespace BlueBasics
 
 
 
+
+        public static List<Bitmap> SplitTiff(string fileName)
+        {
+
+            // Open a Stream and decode a TIFF image
+            var imageStreamSource = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            var l = new List<Bitmap>();
+            try
+            {
+
+
+
+                var decoder = new TiffBitmapDecoder(imageStreamSource, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
+
+
+
+                //var fi = new FileInfo(fileName);
+                //using (Stream documentStream = fi.OpenRead())
+                //{
+
+                //    var originalFileDecoder = new TiffBitmapDecoder(documentStream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.None);
+
+
+                foreach (var frame in decoder.Frames)
+                {
+                    l.Add(GetBitmap(frame));
+
+                    //var newFileEncoder = new TiffBitmapEncoder();
+                    //newFileEncoder.Frames.Add(frame);
+
+                    //using (var stream = File.Create("c:\\tiffs\\" + Guid.NewGuid().ToString() + ".tiff"))
+                    //{
+                    //    newFileEncoder.Save(stream);
+                    //}
+
+
+                    //// Draw the Image
+                    //var myImage = new System.Windows.Controls.Image();
+                    //myImage.Source = frame;
+                    //myImage.Stretch = System.Windows.Media.Stretch.None;
+                    //myImage.Margin = new System.Windows.Thickness(20);
+
+
+                    //Bitmap v = (Bitmap)myImage;
+                    //var newFileEncoder = new TiffBitmapEncoder();
+                    //newFileEncoder.Frames.Add(frame);
+
+                    //newFileEncoder.
+
+                    //    using (var stream = File.Create("c:\\tiffs\\" + Guid.NewGuid().ToString() + ".tiff"))
+                    //{
+                    //    newFileEncoder.Save(stream);
+                    //}
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
+                l.Clear();
+
+            }
+
+            imageStreamSource.Close();
+            imageStreamSource.Dispose();
+
+            return l;
+        }
+
+        //public static Bitmap GetBitmap(BitmapSource source)
+        //{
+        //    var bmp = new Bitmap(source.PixelWidth, source.PixelHeight, PixelFormat.Format32bppPArgb);
+        //    var data = bmp.LockBits(new Rectangle(Point.Empty, bmp.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
+        //    source.CopyPixels(System.Windows.Int32Rect.Empty, data.Scan0, data.Height * data.Stride, data.Stride);
+        //    bmp.UnlockBits(data);
+        //    return bmp;
+        //}
+
+        public static Bitmap GetBitmap(BitmapSource bitmapsource)
+        {
+            Bitmap bitmap;
+            using (var outStream = new MemoryStream())
+            {
+                BitmapEncoder enc = new BmpBitmapEncoder();
+                enc.Frames.Add(BitmapFrame.Create(bitmapsource));
+                enc.Save(outStream);
+                bitmap = new Bitmap(outStream);
+            }
+            return bitmap;
+        }
 
 
         /// <summary>
@@ -211,7 +304,7 @@ namespace BlueBasics
 
             do
             {
-                for (Y = 0 ; Y < _Pic.Height ; Y++)
+                for (Y = 0; Y < _Pic.Height; Y++)
                 {
                     if (!_Pic.GetPixel(x, Y).IsNearWhite(MinBrightness))
                     {
@@ -233,7 +326,7 @@ namespace BlueBasics
             ExitNow = false;
             do
             {
-                for (Y = 0 ; Y < _Pic.Height ; Y++)
+                for (Y = 0; Y < _Pic.Height; Y++)
                 {
                     if (!_Pic.GetPixel(x, Y).IsNearWhite(MinBrightness))
                     {
@@ -254,7 +347,7 @@ namespace BlueBasics
             ExitNow = false;
             do
             {
-                for (x = 0 ; x < _Pic.Width ; x++)
+                for (x = 0; x < _Pic.Width; x++)
                 {
                     if (!_Pic.GetPixel(x, Y).IsNearWhite(MinBrightness))
                     {
@@ -275,7 +368,7 @@ namespace BlueBasics
             ExitNow = false;
             do
             {
-                for (x = 0 ; x < _Pic.Width ; x++)
+                for (x = 0; x < _Pic.Width; x++)
                 {
                     if (!_Pic.GetPixel(x, Y).IsNearWhite(MinBrightness))
                     {
@@ -406,7 +499,7 @@ namespace BlueBasics
             var r = new Rectangle(x, y, w1, w1);
 
 
-            for (var z = 5 ; z >= 0 ; z--)
+            for (var z = 5; z >= 0; z--)
             {
                 r.Inflate(1, 1);
                 // r.Expand(0, 0, 1, 1)
@@ -443,7 +536,7 @@ namespace BlueBasics
             var y2 = int.MinValue;
 
 
-            for (var zSC = 0 ; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0) ; zSC++)
+            for (var zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++)
             {
                 x1 = Math.Min(x1, System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Left);
                 y1 = Math.Min(y1, System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Top);
@@ -567,7 +660,7 @@ namespace BlueBasics
 
             var x = new StringBuilder();
 
-            for (var z = 1 ; z <= Stellen - Nr.Length ; z++)
+            for (var z = 1; z <= Stellen - Nr.Length; z++)
             {
                 x.Append("0");
             }
@@ -932,7 +1025,7 @@ namespace BlueBasics
         public static int PointOnScreenNr(Point CP)
         {
 
-            for (var zSC = 0 ; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0) ; zSC++)
+            for (var zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++)
             {
                 if (CP.X >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Left && CP.Y >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Top && CP.X < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Right && CP.Y < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Bottom)
                 {
@@ -958,7 +1051,7 @@ namespace BlueBasics
 
             var nn = "";
 
-            for (var z = 0 ; z <= name.Length - 21 ; z++)
+            for (var z = 0; z <= name.Length - 21; z++)
             {
                 nn = nn + name.Substring(z, 1);
             }
@@ -1034,19 +1127,19 @@ namespace BlueBasics
 
 
 
-            for (var i = 0 ; i <= l1 ; i++)
+            for (var i = 0; i <= l1; i++)
             {
                 d[i, 0] = i;
             }
 
-            for (var j = 0 ; j <= l2 ; j++)
+            for (var j = 0; j <= l2; j++)
             {
                 d[0, j] = j;
             }
 
-            for (var i = 1 ; i <= l1 ; i++)
+            for (var i = 1; i <= l1; i++)
             {
-                for (var j = 1 ; j <= l2 ; j++)
+                for (var j = 1; j <= l2; j++)
                 {
 
                     var cost = 0;
@@ -1071,12 +1164,12 @@ namespace BlueBasics
 
         public static void IntensifyBitmap(ref Bitmap BMP)
         {
-            for (var X = 0 ; X < BMP.Width ; X++)
+            for (var X = 0; X < BMP.Width; X++)
             {
-                for (var Y = 0 ; Y < BMP.Height ; Y++)
+                for (var Y = 0; Y < BMP.Height; Y++)
                 {
                     var c = BMP.GetPixel(X, Y);
-                    if (c.A > 0.5 &&  BMP.GetPixel(X, Y).GetBrightness() < 0.9) { BMP.SetPixel(X, Y, Color.Black); }
+                    if (c.A > 0.5 && BMP.GetPixel(X, Y).GetBrightness() < 0.9) { BMP.SetPixel(X, Y, Color.Black); }
                 }
             }
         }
@@ -1111,7 +1204,7 @@ namespace BlueBasics
             if (string.IsNullOrEmpty(Pass)) { return b; }
             if (End <= Start) { return b; }
 
-            for (var z = Start ; z <= End ; z++)
+            for (var z = Start; z <= End; z++)
             {
                 var TMP = b[z] + Pass[z % Pass.Length] * Direction;
                 if (TMP < 0) { TMP += 256; }
@@ -1133,7 +1226,7 @@ namespace BlueBasics
             if (string.IsNullOrEmpty(Pass)) { return b; }
             if (End <= Start) { return b; }
 
-            for (var z = Start ; z <= End ; z++)
+            for (var z = Start; z <= End; z++)
             {
                 var TMP = b[z] + Pass[z % Pass.Length] * Direction;
                 if (TMP < 0) { TMP += 256; }
