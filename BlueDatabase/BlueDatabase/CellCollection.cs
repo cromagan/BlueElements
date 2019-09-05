@@ -208,24 +208,31 @@ namespace BlueDatabase
 
         internal bool RemoveOrphans()
         {
-            var RemoveKeys = new List<string>();
-
-            foreach (var pair in _cells)
+            try
             {
-                if (!string.IsNullOrEmpty(pair.Value.Value))
+                var RemoveKeys = new List<string>();
+
+                foreach (var pair in _cells)
                 {
-                    DataOfCellKey(pair.Key, out var Column, out var Row);
-                    if (Column == null || Row == null) { RemoveKeys.Add(pair.Key); }
+                    if (!string.IsNullOrEmpty(pair.Value.Value))
+                    {
+                        DataOfCellKey(pair.Key, out var Column, out var Row);
+                        if (Column == null || Row == null) { RemoveKeys.Add(pair.Key); }
+                    }
                 }
+
+                if (RemoveKeys.Count == 0) { return false; }
+
+                foreach (var ThisKey in RemoveKeys)
+                {
+                    _cells.Remove(ThisKey);
+                }
+                return true;
             }
-
-            if (RemoveKeys.Count == 0) { return false; }
-
-            foreach (var ThisKey in RemoveKeys)
+            catch
             {
-                _cells.Remove(ThisKey);
+                return RemoveOrphans();
             }
-            return true;
         }
 
 
@@ -717,7 +724,7 @@ namespace BlueDatabase
 
         internal void InvalidateAllSizes()
         {
-            
+
             foreach (var ThisColumn in Database.Column)
             {
                 ThisColumn.Invalidate_ColumAndContent();
@@ -839,12 +846,10 @@ namespace BlueDatabase
 
         }
 
-        public bool MatchesTo(ColumnItem Column, RowItem Row, FilterItem Filter)
+        public bool MatchesTo(ColumnItem column, RowItem row, FilterItem filter)
         {
-            //lock (Database.Lock_Parsing)
-            //{
             //Grundlegendes zu UND und ODER:
-            //Ein Filter kann mehrere Werte heben, diese müssen ein Attrribut UND oder ODER haben.
+            //Ein Filter kann mehrere Werte haben, diese müssen ein Attribut UND oder ODER haben.
             //Bei UND müssen alle Werte des Filters im Multiline vorkommen.
             //Bei ODER muss ein Wert des Filters im Multiline vorkommen.
             //Beispiel: UND-Filter mit C & D
@@ -854,128 +859,144 @@ namespace BlueDatabase
             //Deswegen muss beim einem UND-Filter nur EINER der Zellenwerte zutreffen. 
 
 
+            //if (Filter.FilterType == enFilterType.KeinFilter) { Develop.DebugPrint(enFehlerArt.Fehler, "Kein Filter angegeben: " + ToString()); }
 
-            if (Filter.FilterType == enFilterType.KeinFilter) { Develop.DebugPrint(enFehlerArt.Fehler, "Kein Filter angegeben: " + ToString()); }
-
-            if (Column.Format == enDataFormat.LinkedCell)
+            try
             {
-                LinkedCellData(Column, Row, out var LCColumn, out var LCrow);
-                if (LCColumn != null && LCrow != null) { return LCrow.Database.Cell.MatchesTo(LCColumn, LCrow, Filter); }
-                return false;
-            }
+
+                var Typ = filter.FilterType;
 
 
-            var TMPMultiLine = false;
-            var Typ = Filter.FilterType;
-            var BedingungErfüllt = false;
-            int FiltNachNr;
+                // Oder-Flag ermitteln --------------------------------------------
+                var Oder = Typ.HasFlag(enFilterType.ODER);
+                if (Oder) { Typ = Typ ^ enFilterType.ODER; }
+                // Und-Flag Ermitteln --------------------------------------------
+                var Und = Typ.HasFlag(enFilterType.UND);
+                if (Und) { Typ = Typ ^ enFilterType.UND; }
 
-
-            var Oder = Convert.ToBoolean(Typ & enFilterType.ODER);
-            if (Oder) { Typ = Typ ^ enFilterType.ODER; }
-            var Und = Convert.ToBoolean(Typ & enFilterType.UND);
-            if (Und) { Typ = Typ ^ enFilterType.UND; }
-
-
-            if (Und && Oder) { Develop.DebugPrint(enFehlerArt.Fehler, "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
-
-            if (Column != null) { TMPMultiLine = Column.MultiLine; }
-
-
-            if (Convert.ToBoolean(Typ & enFilterType.MultiRowIgnorieren))
-            {
-                TMPMultiLine = false;
-                Typ = Typ ^ enFilterType.MultiRowIgnorieren;
-            }
-
-
-            if (Typ == enFilterType.KeinFilter)
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "'Kein Filter' wurde übergeben: " + ToString());
-            }
-
-
-            if (Filter.SearchValue.Count < 2)
-            {
-                Oder = true;
-                Und = false; // Wenn nur EIN Eintrag gecheckt wird, ist es EGAL, ob UND oder ODER.
-            }
-
-
-
-            var _String = string.Empty;
-            var CellKey = KeyOfCell(Column, Row);
-
-            if (_cells.ContainsKey(CellKey))
-            {
-                try
+                if (filter.SearchValue.Count < 2)
                 {
-                    _String = _cells[CellKey].Value;
-                    if (Typ.HasFlag(enFilterType.Instr)) { _String = LanguageTool.ColumnReplace(_String, Column, enShortenStyle.Both); }
-                }
-                catch (Exception ex)
-                {
-                    _String = string.Empty;
-                    Develop.DebugPrint(ex);
-                    Pause(1, true);
-                    return MatchesTo(Column, Row, Filter);
-                }
-            }
-            else
-            {
-                _String = string.Empty;
-                if (Typ.HasFlag(enFilterType.Instr)) { _String = LanguageTool.ColumnReplace(string.Empty, Column, enShortenStyle.Both); }
-            }
-
-
-            if (_String is null) { _String = string.Empty; }
-
-
-
-            if (TMPMultiLine && !_String.Contains("\r")) { TMPMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multinline behandel werden.
-
-            if (!TMPMultiLine)
-            {
-                for (FiltNachNr = 0; FiltNachNr < Filter.SearchValue.Count; FiltNachNr++)
-                {
-                    BedingungErfüllt = CompareValues(_String, Filter.SearchValue[FiltNachNr], Typ, Column);
-                    if (Oder && BedingungErfüllt) { return true; }
-                    if (Und && BedingungErfüllt == false) { return false; } // Bei diesem UND hier müssen allezutreffen, deshalb kann getrost bei einem False dieses zurückgegeben werden.
+                    Oder = true;
+                    Und = false; // Wenn nur EIN Eintrag gecheckt wird, ist es EGAL, ob UND oder ODER.
                 }
 
-                return BedingungErfüllt;
-            }
-
-            var VorhandenWerte = new List<string>(_String.SplitByCR());
-            if (VorhandenWerte.Count == 0) // Um den Filter, der nach 'Leere' Sucht, zu befriediegen
-            {
-                VorhandenWerte.Add("");
-            }
+                //if (Und && Oder) { Develop.DebugPrint(enFehlerArt.Fehler, "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
 
 
-            // Diese Reihenfolge der For Next ist unglaublich wichtig:
-            // Sind wenigere VORHANDEN vorhanden als FilterWerte, dann durchsucht diese Routine zu wenig Einträge,
-            // bevor sie bei einem UND ein False zurückgibt
-
-
-            for (FiltNachNr = 0; FiltNachNr < Filter.SearchValue.Count; FiltNachNr++)
-            {
-                foreach (var t in VorhandenWerte)
+                // Tatsächlichen String ermitteln --------------------------------------------
+                var _String = string.Empty;
+                var fColumn = column;
+                if (column.Format == enDataFormat.LinkedCell)
                 {
-                    BedingungErfüllt = CompareValues(t, Filter.SearchValue[FiltNachNr], Typ, Column);
-                    if (Oder && BedingungErfüllt) { return true; }// Irgendein vorhandener Value trifft zu!!! Super!!!
-                    if (Und && BedingungErfüllt) { break; }// Irgend ein vorhandener Value trifft zu, restliche Prüfung uninteresant
+                    LinkedCellData(column, row, out var LCColumn, out var LCrow);
+                    if (LCColumn != null && LCrow != null)
+                    {
+                        _String = LCrow.CellGetString(LCColumn);
+                        fColumn = LCColumn;
+                    }
+
+                }
+                else
+                {
+                    var CellKey = KeyOfCell(column, row);
+                    if (_cells.ContainsKey(CellKey))
+                    {
+                        _String = _cells[CellKey].Value;
+                    }
+                    else
+                    {
+                        _String = string.Empty;
+                    }
+
+                }
+                if (_String is null) { _String = string.Empty; }
+                if (Typ.HasFlag(enFilterType.Instr)) { _String = LanguageTool.ColumnReplace(_String, fColumn, enShortenStyle.Both); }
+
+
+
+
+
+                // Multiline-Typ ermitteln  --------------------------------------------
+                var TMPMultiLine = false;
+                if (column != null) { TMPMultiLine = column.MultiLine; }
+
+
+                if (Typ.HasFlag(enFilterType.MultiRowIgnorieren))
+                {
+                    TMPMultiLine = false;
+                    Typ = Typ ^ enFilterType.MultiRowIgnorieren;
+                }
+                if (TMPMultiLine && !_String.Contains("\r")) { TMPMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multinline behandel werden.
+
+
+
+
+
+
+                //if (Typ == enFilterType.KeinFilter)
+                //{
+                //    Develop.DebugPrint(enFehlerArt.Fehler, "'Kein Filter' wurde übergeben: " + ToString());
+                //}
+
+
+
+
+
+
+
+
+
+                if (!TMPMultiLine)
+                {
+                    var BedingungErfüllt = false;
+                    for (var FiltNachNr = 0; FiltNachNr < filter.SearchValue.Count; FiltNachNr++)
+                    {
+                        BedingungErfüllt = CompareValues(_String, filter.SearchValue[FiltNachNr], Typ);
+                        if (Oder && BedingungErfüllt) { return true; }
+                        if (Und && BedingungErfüllt == false) { return false; } // Bei diesem UND hier müssen allezutreffen, deshalb kann getrost bei einem False dieses zurückgegeben werden.
+                    }
+
+                    return BedingungErfüllt;
                 }
 
-                if (Und && BedingungErfüllt == false) // Einzelne UND konnte nicht erfüllt werden...
+                var VorhandenWerte = new List<string>(_String.SplitByCR());
+                if (VorhandenWerte.Count == 0) // Um den Filter, der nach 'Leere' Sucht, zu befriediegen
                 {
-                    return false;
+                    VorhandenWerte.Add("");
                 }
-            }
-            if (Und) { return true; } // alle"Und" stimmen!
 
-            return false; // Gar kein "Oder" trifft zu...
-                          //}
+
+                // Diese Reihenfolge der For Next ist unglaublich wichtig:
+                // Sind wenigere VORHANDEN vorhanden als FilterWerte, dann durchsucht diese Routine zu wenig Einträge,
+                // bevor sie bei einem UND ein False zurückgibt
+
+
+                for (var FiltNachNr = 0; FiltNachNr < filter.SearchValue.Count; FiltNachNr++)
+                {
+                    var BedingungErfüllt = false;
+                    foreach (var t in VorhandenWerte)
+                    {
+                        BedingungErfüllt = CompareValues(t, filter.SearchValue[FiltNachNr], Typ);
+                        if (Oder && BedingungErfüllt) { return true; }// Irgendein vorhandener Value trifft zu!!! Super!!!
+                        if (Und && BedingungErfüllt) { break; }// Irgend ein vorhandener Value trifft zu, restliche Prüfung uninteresant
+                    }
+
+                    if (Und && !BedingungErfüllt) // Einzelne UND konnte nicht erfüllt werden...
+                    {
+                        return false;
+                    }
+                }
+                if (Und) { return true; } // alle "Und" stimmen!
+
+                return false; // Gar kein "Oder" trifft zu...
+
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
+                Pause(1, true);
+                return MatchesTo(column, row, filter);
+            }
         }
 
 
@@ -1002,9 +1023,9 @@ namespace BlueDatabase
         }
 
 
-        private bool CompareValues(string IstValue, string FilterValue, enFilterType Typ, ColumnItem Column)
+        private bool CompareValues(string IstValue, string FilterValue, enFilterType Typ)
         {
-            if (Column.Format == enDataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Fremdzellenzugriff"); }
+           // if (Column.Format == enDataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Fremdzellenzugriff"); }
             if (Typ.HasFlag(enFilterType.GroßKleinEgal))
             {
                 IstValue = IstValue.ToUpper();
@@ -1079,7 +1100,7 @@ namespace BlueDatabase
         public static string KeyOfCell(ColumnItem Column, RowItem Row)
         {
             // Alte verweise eleminieren.
-            if (Column != null) { Column = Column.Database.Column.SearchByKey(Column.Key); } 
+            if (Column != null) { Column = Column.Database.Column.SearchByKey(Column.Key); }
             if (Row != null) { Row = Row.Database.Row.SearchByKey(Row.Key); }
 
             if (Column == null && Row == null) { return string.Empty; }
@@ -1126,7 +1147,7 @@ namespace BlueDatabase
         public static string UserEditErrorReason(ColumnItem Column, RowItem Row, bool DateiRechtePrüfen)
         {
             if (Column == null) { return LanguageTool.DoTranslate("Es ist keine Spalte ausgewählt.", true); }
-            if (Column.Database.ReadOnly) { return LanguageTool.DoTranslate( "Datenbank wurde schreibgeschützt geöffnet", true); }
+            if (Column.Database.ReadOnly) { return LanguageTool.DoTranslate("Datenbank wurde schreibgeschützt geöffnet", true); }
 
 
 
@@ -1142,10 +1163,10 @@ namespace BlueDatabase
                     return string.Empty;
                 }
                 if (LCColumn == null) { return LanguageTool.DoTranslate("Die Spalte ist in der Quell-Datenbank nicht vorhanden.", true); }
-                if (LCrow == null) { return LanguageTool.DoTranslate("Neue Zeilen können bei verlinkten Zellen nicht erstellt werden.", true); }
+                if (LCrow == null) { return LanguageTool.DoTranslate("Die Zeile ist in der Quell-Datenbank nicht vorhanden.", true); }
 
 
-                return LanguageTool.DoTranslate("Die Zeile ist in der Quell-Datenbank nicht vorhanden.", true); 
+                return LanguageTool.DoTranslate("Die Zeile ist in der Quell-Datenbank nicht vorhanden.", true);
             }
 
             if (Row != null)
@@ -1335,18 +1356,11 @@ namespace BlueDatabase
         internal void SaveToByteList(ref List<byte> l)
         {
 
-            try
-            {
-                RemoveOrphans();
+            RemoveOrphans();
 
-                foreach (var ThisString in _cells)
-                {
-                    Database.SaveToByteList(l, ThisString);
-                }
-            }
-            catch (Exception ex)
+            foreach (var ThisString in _cells)
             {
-                Develop.DebugPrint(enFehlerArt.Fehler, ex);
+                Database.SaveToByteList(l, ThisString);
             }
         }
 

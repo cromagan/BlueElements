@@ -344,9 +344,9 @@ namespace BlueDatabase
                 if (!_Internal.ContainsKey(Key)) { return null; }
                 return _Internal[Key];
             }
-            catch (Exception ex)
+            catch
             {
-                Develop.DebugPrint(ex);
+               // Develop.DebugPrint(ex);
                 return SearchByKey(Key);
             }
 

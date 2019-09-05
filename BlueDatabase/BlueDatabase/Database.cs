@@ -188,7 +188,7 @@ namespace BlueDatabase
                 if (!string.IsNullOrEmpty(feh.Item1))
                 {
                     if (feh.Item2) { return feh.Item1 + "<br><br>Zeile:<br>" + thiscmd; }
-                    if (MeldeFehlgeschlageneZeilen) { return feh.Item1  + "<br><br>Zeile:<br>" + thiscmd; }
+                    if (MeldeFehlgeschlageneZeilen) { return feh.Item1 + "<br><br>Zeile:<br>" + thiscmd; }
                 }
             }
             return string.Empty;
@@ -2389,112 +2389,121 @@ namespace BlueDatabase
 
         private List<byte> ToListOfByte()
         {
-            var CryptPos = -1;
-            var l = new List<byte>();
 
-            // Wichtig, Reihenfolge und Länge NIE verändern!
-            SaveToByteList(l, enDatabaseDataType.Formatkennung, "BlueDatabase");
-            SaveToByteList(l, enDatabaseDataType.Version, DatabaseVersion);
-            SaveToByteList(l, enDatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        "); // Die Werbung dient als Dummy-Platzhalter, falls doch mal was vergessen wurde...
-
-            // Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
-            if (string.IsNullOrEmpty(_GlobalShowPass))
+            try
             {
-                SaveToByteList(l, enDatabaseDataType.CryptionState, false.ToPlusMinus());
-            }
-            else
-            {
-                SaveToByteList(l, enDatabaseDataType.CryptionState, true.ToPlusMinus());
-                CryptPos = l.Count;
-                SaveToByteList(l, enDatabaseDataType.CryptionTest, "OK");
-            }
+                var CryptPos = -1;
+                var l = new List<byte>();
 
+                // Wichtig, Reihenfolge und Länge NIE verändern!
+                SaveToByteList(l, enDatabaseDataType.Formatkennung, "BlueDatabase");
+                SaveToByteList(l, enDatabaseDataType.Version, DatabaseVersion);
+                SaveToByteList(l, enDatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        "); // Die Werbung dient als Dummy-Platzhalter, falls doch mal was vergessen wurde...
 
-            SaveToByteList(l, enDatabaseDataType.GlobalShowPass, _GlobalShowPass);
-            SaveToByteList(l, enDatabaseDataType.FileEncryptionKey, _FileEncryptionKey);
-            SaveToByteList(l, enDatabaseDataType.Creator, _Creator);
-            SaveToByteList(l, enDatabaseDataType.CreateDate, _CreateDate);
-
-            SaveToByteList(l, enDatabaseDataType.Caption, _Caption);
-            SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString());
-            SaveToByteList(l, enDatabaseDataType.VerwaisteDaten, ((int)_VerwaisteDaten).ToString());
-            SaveToByteList(l, enDatabaseDataType.Tags, Tags.JoinWithCr());
-            SaveToByteList(l, enDatabaseDataType.PermissionGroups_NewRow, PermissionGroups_NewRow.JoinWithCr());
-            SaveToByteList(l, enDatabaseDataType.DatenbankAdmin, DatenbankAdmin.JoinWithCr());
-            SaveToByteList(l, enDatabaseDataType.Skin, _Skin.ToString());
-            SaveToByteList(l, enDatabaseDataType.GlobalScale, _GlobalScale.ToString());
-            SaveToByteList(l, enDatabaseDataType.Ansicht, ((int)_Ansicht).ToString());
-            SaveToByteList(l, enDatabaseDataType.ReloadDelaySecond, _ReloadDelaySecond.ToString());
-            SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
-
-            SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
-
-
-            Column.SaveToByteList(l);
-            Row.SaveToByteList(l);
-
-            Cell.SaveToByteList(ref l);
-
-            if (SortDefinition == null)
-            {
-                // Ganz neue Datenbank
-                SaveToByteList(l, enDatabaseDataType.SortDefinition, "");
-            }
-            else
-            {
-                SaveToByteList(l, enDatabaseDataType.SortDefinition, _sortDefinition.ToString());
-            }
-
-
-            SaveToByteList(l, enDatabaseDataType.Rules, Rules.ToString(true));
-
-
-
-            SaveToByteList(l, enDatabaseDataType.ColumnArrangement, ColumnArrangements.ToString(true));
-
-            SaveToByteList(l, enDatabaseDataType.Views, Views.ToString(true));
-
-            SaveToByteList(l, enDatabaseDataType.Layouts, Layouts.JoinWithCr());
-
-            SaveToByteList(l, enDatabaseDataType.AutoExport, Export.ToString(true));
-
-            // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
-            // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
-            // Status des Work-Items ist egal, da es beim LADEN automatisch auf 'Undo' gesetzt wird.
-            var Works2 = new List<string>();
-            foreach (var thisWorkItem in Works)
-            {
-                if (thisWorkItem.Comand != enDatabaseDataType.ce_Value_withoutSizeData)
+                // Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
+                if (string.IsNullOrEmpty(_GlobalShowPass))
                 {
-                    Works2.Add(thisWorkItem.ToString());
+                    SaveToByteList(l, enDatabaseDataType.CryptionState, false.ToPlusMinus());
                 }
                 else
                 {
-                    if (thisWorkItem.LogsUndo(this))
+                    SaveToByteList(l, enDatabaseDataType.CryptionState, true.ToPlusMinus());
+                    CryptPos = l.Count;
+                    SaveToByteList(l, enDatabaseDataType.CryptionTest, "OK");
+                }
+
+
+                SaveToByteList(l, enDatabaseDataType.GlobalShowPass, _GlobalShowPass);
+                SaveToByteList(l, enDatabaseDataType.FileEncryptionKey, _FileEncryptionKey);
+                SaveToByteList(l, enDatabaseDataType.Creator, _Creator);
+                SaveToByteList(l, enDatabaseDataType.CreateDate, _CreateDate);
+
+                SaveToByteList(l, enDatabaseDataType.Caption, _Caption);
+                SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString());
+                SaveToByteList(l, enDatabaseDataType.VerwaisteDaten, ((int)_VerwaisteDaten).ToString());
+                SaveToByteList(l, enDatabaseDataType.Tags, Tags.JoinWithCr());
+                SaveToByteList(l, enDatabaseDataType.PermissionGroups_NewRow, PermissionGroups_NewRow.JoinWithCr());
+                SaveToByteList(l, enDatabaseDataType.DatenbankAdmin, DatenbankAdmin.JoinWithCr());
+                SaveToByteList(l, enDatabaseDataType.Skin, _Skin.ToString());
+                SaveToByteList(l, enDatabaseDataType.GlobalScale, _GlobalScale.ToString());
+                SaveToByteList(l, enDatabaseDataType.Ansicht, ((int)_Ansicht).ToString());
+                SaveToByteList(l, enDatabaseDataType.ReloadDelaySecond, _ReloadDelaySecond.ToString());
+                SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
+
+                SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
+
+
+                Column.SaveToByteList(l);
+                Row.SaveToByteList(l);
+
+                Cell.SaveToByteList(ref l);
+
+                if (SortDefinition == null)
+                {
+                    // Ganz neue Datenbank
+                    SaveToByteList(l, enDatabaseDataType.SortDefinition, "");
+                }
+                else
+                {
+                    SaveToByteList(l, enDatabaseDataType.SortDefinition, _sortDefinition.ToString());
+                }
+
+
+                SaveToByteList(l, enDatabaseDataType.Rules, Rules.ToString(true));
+
+
+
+                SaveToByteList(l, enDatabaseDataType.ColumnArrangement, ColumnArrangements.ToString(true));
+
+                SaveToByteList(l, enDatabaseDataType.Views, Views.ToString(true));
+
+                SaveToByteList(l, enDatabaseDataType.Layouts, Layouts.JoinWithCr());
+
+                SaveToByteList(l, enDatabaseDataType.AutoExport, Export.ToString(true));
+
+                // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
+                // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
+                // Status des Work-Items ist egal, da es beim LADEN automatisch auf 'Undo' gesetzt wird.
+                var Works2 = new List<string>();
+                foreach (var thisWorkItem in Works)
+                {
+                    if (thisWorkItem.Comand != enDatabaseDataType.ce_Value_withoutSizeData)
                     {
                         Works2.Add(thisWorkItem.ToString());
                     }
+                    else
+                    {
+                        if (thisWorkItem.LogsUndo(this))
+                        {
+                            Works2.Add(thisWorkItem.ToString());
+                        }
+                    }
                 }
+
+
+
+                SaveToByteList(l, enDatabaseDataType.UndoCount, _UndoCount.ToString());
+
+                if (Works2.Count > _UndoCount) { Works2.RemoveRange(0, Works2.Count - _UndoCount); }
+
+
+                SaveToByteList(l, enDatabaseDataType.UndoInOne, Works2.JoinWithCr());
+
+                SaveToByteList(l, enDatabaseDataType.EOF, "END");
+
+
+
+                if (CryptPos > 0)
+                {
+                    return modAllgemein.SimpleCrypt(l, _GlobalShowPass, 1, CryptPos, l.Count - 1);
+                }
+                return l;
+
             }
-
-
-
-            SaveToByteList(l, enDatabaseDataType.UndoCount, _UndoCount.ToString());
-
-            if (Works2.Count > _UndoCount) { Works2.RemoveRange(0, Works2.Count - _UndoCount); }
-
-
-            SaveToByteList(l, enDatabaseDataType.UndoInOne, Works2.JoinWithCr());
-
-            SaveToByteList(l, enDatabaseDataType.EOF, "END");
-
-
-
-            if (CryptPos > 0)
+            catch
             {
-                return modAllgemein.SimpleCrypt(l, _GlobalShowPass, 1, CryptPos, l.Count - 1);
+                return ToListOfByte();
             }
-            return l;
         }
 
         /// <summary>
