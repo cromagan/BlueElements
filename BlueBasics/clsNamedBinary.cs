@@ -175,12 +175,12 @@ namespace BlueBasics
                 return;
             }
 
-            if (!ToParse.StartsWith("{"))
-            {
-                ParseOldFormat(ToParse);
-                IsParsing = false;
-                return;
-            }
+            //if (!ToParse.StartsWith("{"))
+            //{
+            //    ParseOldFormat(ToParse);
+            //    IsParsing = false;
+            //    return;
+            //}
 
 
             foreach (var pair in ToParse.GetAllTags())
@@ -204,37 +204,37 @@ namespace BlueBasics
             IsParsing = false;
         }
 
-        private void ParseOldFormat(string Value)
-        {
+        //private void ParseOldFormat(string Value)
+        //{
 
-            Develop.DebugPrint_NichtImplementiert();   // Todo: Diese Routine löschen
-            if (Value.Substring(1, 3) == "PNG")
-            {
-                _picture = modConverter.StringToBitmap(Value);
-                return;
-            }
+        //    Develop.DebugPrint_NichtImplementiert();   // Todo: Diese Routine löschen
+        //    if (Value.Substring(1, 3) == "PNG")
+        //    {
+        //        _picture = modConverter.StringToBitmap(Value);
+        //        return;
+        //    }
 
-            switch (Value.Substring(0, 9))
-            {
-                case "NamedPNG#":
-                {
-                    var x = Value.IndexOf("\r");
-                    _name = Value.Substring(9, x - 9);
-                    _picture = modConverter.StringToBitmap(Value.Substring(x + 1));
-                    return;
-                }
-                case "NamedBIN#":
-                {
-                    var x = Value.IndexOf("\r");
-                    _name = Value.Substring(9, x - 9);
-                    _binary = Value.Substring(x + 1);
-                    return;
-                }
-                default:
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Kann nicht geparsed werden: " + Value.Substring(0, 20));
-                    break;
-            }
-        }
+        //    switch (Value.Substring(0, 9))
+        //    {
+        //        case "NamedPNG#":
+        //        {
+        //            var x = Value.IndexOf("\r");
+        //            _name = Value.Substring(9, x - 9);
+        //            _picture = modConverter.StringToBitmap(Value.Substring(x + 1));
+        //            return;
+        //        }
+        //        case "NamedBIN#":
+        //        {
+        //            var x = Value.IndexOf("\r");
+        //            _name = Value.Substring(9, x - 9);
+        //            _binary = Value.Substring(x + 1);
+        //            return;
+        //        }
+        //        default:
+        //            Develop.DebugPrint(enFehlerArt.Fehler, "Kann nicht geparsed werden: " + Value.Substring(0, 20));
+        //            break;
+        //    }
+        //}
 
 
         public override string ToString()

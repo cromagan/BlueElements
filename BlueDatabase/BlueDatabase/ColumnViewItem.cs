@@ -297,11 +297,11 @@ namespace BlueDatabase
                         _Spalte_Height = int.Parse(pair.Value);
                         break;
 
-                    case "caption": // Alt
+                    case "caption": // Todo: Alt 06.09.2019
                         _‹berschriftAnordnung = (en‹berschriftAnordnung)int.Parse(pair.Value);
                         break;
 
-                    case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt
+                    case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
                         _ViewType = enViewType.PermanentColumn;
                         break;
 

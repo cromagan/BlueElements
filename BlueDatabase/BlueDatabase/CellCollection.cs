@@ -161,8 +161,8 @@ namespace BlueDatabase
 
             if (Column.Format == enDataFormat.LinkedCell)
             {
-                LinkedCellData(Column, Row, out var LCColumn, out var LCrow);
-                if (LCColumn != null && LCrow != null) { return LCrow.CellIsNullOrEmpty(LCColumn); }
+                var LinkedData = LinkedCellData(Column, Row, false, false);
+                if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return LinkedData.Item2.CellIsNullOrEmpty(LinkedData.Item1); }
                 return true;
             }
 
@@ -177,25 +177,121 @@ namespace BlueDatabase
 
 
 
-        public static void LinkedCellData(ColumnItem Column, RowItem Row, out ColumnItem LinkedColumn, out RowItem LinkedRow)
+        public static Tuple<ColumnItem, RowItem> LinkedCellData(ColumnItem column, RowItem row, bool freezemode, bool RepairEmpties)
         {
 
-            LinkedColumn = null;
-            LinkedRow = null;
-            var LinkedDatabase = Column.LinkedDatabase();
+            if (column == null || row == null) { return new Tuple<ColumnItem, RowItem>(null, null); }
+            if (column.Format != enDataFormat.LinkedCell) { return new Tuple<ColumnItem, RowItem>(null, null); }
 
-            if (LinkedDatabase == null) { return; }
+            var LinkedDatabase = column.LinkedDatabase();
 
-            var Key = Column.Database.Cell.GetStringBehindLinkedValue(Column, Row);
+            if (LinkedDatabase == null) { return new Tuple<ColumnItem, RowItem>(null, null); }
 
-            if (string.IsNullOrEmpty(Key)) { return; }
+
+            if (RepairEmpties)
+            {
+                return RepairLinkedCellValue(LinkedDatabase, column, row, freezemode);
+            }
+
+
+            var Key = column.Database.Cell.GetStringBehindLinkedValue(column, row);
+
+            if (string.IsNullOrEmpty(Key)) { return new Tuple<ColumnItem, RowItem>(null, null); }
 
             var V = Key.SplitBy("|");
 
-            if (V.Length != 2) { return; }
+            if (V.Length != 2) { return RepairLinkedCellValue(LinkedDatabase, column, row, freezemode); }
 
-            LinkedColumn = LinkedDatabase.Column.SearchByKey(int.Parse(V[0]));
-            LinkedRow = LinkedDatabase.Row.SearchByKey(int.Parse(V[1]));
+            var LinkedColumn = LinkedDatabase.Column.SearchByKey(int.Parse(V[0]));
+            var LinkedRow = LinkedDatabase.Row.SearchByKey(int.Parse(V[1]));
+
+            if (KeyOfCell(LinkedColumn, LinkedRow) == Key) { return new Tuple<ColumnItem, RowItem>(LinkedColumn, LinkedRow); }
+
+            return RepairLinkedCellValue(LinkedDatabase, column, row, freezemode);
+        }
+
+        private static Tuple<ColumnItem, RowItem> RepairLinkedCellValue(Database LinkedDatabase, ColumnItem column, RowItem row, bool FreezeMode)
+        {
+            // if (column.Format != enDataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falsches Format! " + Database.Filename + " " + column.Name); }
+            // var targetColumnKeyx = -1;
+            //var targetRowKey = -1;
+
+            //if (column.LinkedDatabase() == null) { return Ergebnis("Die verlinkte Datenbank existiert nicht"); }
+            ColumnItem targetColumn = null;
+            RowItem targetRow = null;
+
+            ///
+            /// Spaltenschlüssel in der Ziel-Datenbank ermitteln
+            ///
+            if (column.LinkedCell_ColumnKey >= 0)
+            {
+                // Fixe angabe
+                targetColumn = LinkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKey);
+            }
+            else
+            {
+                // Spalte aus einer Spalte lesen
+                var LinkedCell_ColumnValueFoundInColumn = column.Database.Column.SearchByKey(column.LinkedCell_ColumnValueFoundIn);
+                if (LinkedCell_ColumnValueFoundInColumn == null) { return Ergebnis("Die Spalte, aus der der Spaltenschlüssel kommen soll, existiert nicht."); }
+
+                if (!int.TryParse(row.CellGetString(LinkedCell_ColumnValueFoundInColumn), out var colKey)) { return Ergebnis("Der Text Spalte der Spalte, aus der der Spaltenschlüssel kommen soll, ist fehlerhaft."); }
+
+                if (string.IsNullOrEmpty(column.LinkedCell_ColumnValueAdd))
+                {   // Ohne Vorsatz
+                    targetColumn = LinkedDatabase.Column.SearchByKey(colKey);
+                }
+                else
+                {
+                    // Mit Vorsatz
+                    var tarCx = LinkedDatabase.Column.SearchByKey(colKey);
+                    if (tarCx == null) { return Ergebnis("Die Spalte, aus der der Spaltenschlüssel (mit anschließenden Zusatz) kommen soll, existiert nicht."); }
+                    targetColumn = LinkedDatabase.Column[column.LinkedCell_ColumnValueAdd + tarCx.Name];
+
+                }
+            }
+
+
+            if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
+
+            //  if (targetColumnKeyx < 0) { return Ergebnis("Die Spalte ist in der verlinkten Datenbank nicht vorhanden."); }
+            //var targetColumn = LinkedDatabase.Column[targetColumnKeyx];
+            //if (targetColumn == null) { return Ergebnis("Die Spalte ist in der verlinkten Datenbank nicht vorhanden."); }
+
+            ///
+            /// Zeilenschlüssel lesen
+            ///   
+            var LinkedCell_RowColumn = column.Database.Column.SearchByKey(column.LinkedCell_RowKey);
+            if (LinkedCell_RowColumn == null) { return Ergebnis("Die Spalte, aus der der Zeilenschlüssel kommen soll, existiert nicht."); }
+
+            if (row.CellIsNullOrEmpty(LinkedCell_RowColumn)) { return Ergebnis("Kein Zeilenschlüssel angegeben."); }
+
+            targetRow = LinkedDatabase.Row[row.CellGetString(LinkedCell_RowColumn)];
+
+            if (targetRow == null && column.LinkedCell_Behaviour == enFehlendesZiel.ZeileAnlegen)
+            {
+                targetRow = LinkedDatabase.Row.Add(row.CellGetString(LinkedCell_RowColumn));
+            }
+
+            if (targetRow == null) { return Ergebnis("Die Zeile ist in der Zieldatenbank nicht vorhanden."); }
+
+            return Ergebnis(string.Empty);
+
+            /// --------Subroutine---------------------------
+            Tuple<ColumnItem, RowItem> Ergebnis(string fehler)
+            {
+                if (string.IsNullOrEmpty(fehler))
+                {
+                    column.Database.Cell.SetValueBehindLinkedValue(column, row, CellCollection.KeyOfCell(targetColumn.Key, targetRow.Key), FreezeMode);
+                    return new Tuple<ColumnItem, RowItem>(targetColumn, targetRow);
+
+                }
+                else
+                {
+                    column.Database.Cell.SetValueBehindLinkedValue(column, row, string.Empty, FreezeMode);
+                    return new Tuple<ColumnItem, RowItem>(null, null);
+                }
+            }
+
         }
 
 
@@ -268,7 +364,7 @@ namespace BlueDatabase
                 case enDataFormat.LinkedCell:
                     if (DoAlways)
                     {
-                        RepairLinkedCellValue(Column, Database.Row.SearchByKey(RowKey), false);
+                        LinkedCellData(Column, Database.Row.SearchByKey(RowKey), FreezeMode, true); // Repariert auch Cellbezüge
                     }
                     break;
 
@@ -347,7 +443,7 @@ namespace BlueDatabase
 
                 if (ThisColumn.LinkedCell_RowKey == column.Key || ThisColumn.LinkedCell_ColumnValueFoundIn == column.Key)
                 {
-                    RepairLinkedCellValue(ThisColumn, ownRow, freezeMode);
+                    LinkedCellData(ThisColumn, ownRow, freezeMode, true); // Repariert auch Zellbezüge
                 }
 
 
@@ -380,84 +476,7 @@ namespace BlueDatabase
         }
 
 
-        private string RepairLinkedCellValue(ColumnItem column, RowItem row, bool FreezeMode)
-        {
-            if (column.Format != enDataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falsches Format! " + Database.Filename + " " + column.Name); }
-            var targetColumnKey = -1;
-            var targetRowKey = -1;
 
-            if (column.LinkedDatabase() == null) { return Ergebnis("Die verlinkte Datenbank existiert nicht"); }
-
-
-            ///
-            /// Spaltenschlüssel in der Ziel-Datenbank ermitteln
-            ///
-            if (column.LinkedCell_ColumnKey >= 0)
-            {
-                // Fixe angabe
-                targetColumnKey = column.LinkedCell_ColumnKey;
-            }
-            else
-            {
-                // Spalte aus einer Spalte lesen
-                var LinkedCell_ColumnValueFoundInColumn = Database.Column.SearchByKey(column.LinkedCell_ColumnValueFoundIn);
-                if (LinkedCell_ColumnValueFoundInColumn == null) { return Ergebnis("Die Spalte, aus der der Spaltenschlüssel kommen soll, existiert nicht."); }
-
-                if (!int.TryParse(row.CellGetString(LinkedCell_ColumnValueFoundInColumn), out var colKey)) { return Ergebnis("Der Text Spalte der Spalte, aus der der Spaltenschlüssel kommen soll, ist fehlerhaft."); }
-
-                if (string.IsNullOrEmpty(column.LinkedCell_ColumnValueAdd))
-                {   // Ohne Vorsatz
-                    targetColumnKey = colKey;
-                }
-                else
-                {
-                    // Mit Vorsatz
-                    var tarCx = column.LinkedDatabase().Column.SearchByKey(colKey);
-                    var tarCxn = column.LinkedDatabase().Column[column.LinkedCell_ColumnValueAdd + tarCx.Name];
-                    if (tarCxn != null) { targetColumnKey = tarCxn.Key; }
-                }
-            }
-
-            if (targetColumnKey < 0) { return Ergebnis("Die Spalte ist in der verlinkten Datenbank nicht vorhanden."); }
-
-
-            ///
-            /// Zeilenschlüssel lesen
-            ///   
-            var LinkedCell_RowColumn = Database.Column.SearchByKey(column.LinkedCell_RowKey);
-            if (LinkedCell_RowColumn == null) { return Ergebnis("Die Spalte, aus der der Zeilenschlüssel kommen soll, existiert nicht."); }
-
-            if (row.CellIsNullOrEmpty(LinkedCell_RowColumn)) { return Ergebnis("Kein Zeilenschlüssel angegeben."); }
-
-            var tarR = column.LinkedDatabase().Row[row.CellGetString(LinkedCell_RowColumn)];
-
-            if (tarR == null && column.LinkedCell_Behaviour == enFehlendesZiel.ZeileAnlegen)
-            {
-                tarR = column.LinkedDatabase().Row.Add(row.CellGetString(LinkedCell_RowColumn));
-            }
-
-            if (tarR == null) { return Ergebnis("Die Zeile ist in der Zieldatenbank nicht vorhanden."); }
-
-            targetRowKey = tarR.Key;
-
-            return Ergebnis(string.Empty);
-
-            /// --------Subroutine---------------------------
-            string Ergebnis(string fehler)
-            {
-                if (string.IsNullOrEmpty(fehler))
-                {
-                    SetValueBehindLinkedValue(column, row, CellCollection.KeyOfCell(targetColumnKey, targetRowKey), FreezeMode);
-                }
-                else
-                {
-                    SetValueBehindLinkedValue(column, row, string.Empty, FreezeMode);
-                }
-
-                return fehler;
-            }
-
-        }
 
 
 
@@ -706,19 +725,19 @@ namespace BlueDatabase
         }
 
 
-        public void Set(ColumnItem Column, RowItem Row, string Value, bool FreezeMode)
+        public void Set(ColumnItem column, RowItem row, string value, bool freezemode)
         {
-            if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
-            if (Row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!!<br>" + Database.Filename); }
+            if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
+            if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!!<br>" + Database.Filename); }
 
 
-            if (Column.Format == enDataFormat.LinkedCell)
+            if (column.Format == enDataFormat.LinkedCell)
             {
-                LinkedCellData(Column, Row, out var LCColumn, out var LCrow);
-                if (LCColumn != null) { LCrow?.Database.Cell.Set(LCColumn, LCrow, Value, false); }
+                var LinkedData = LinkedCellData(column, row, freezemode, true);
+                LinkedData.Item2?.Database.Cell.Set(LinkedData.Item1, LinkedData.Item2, value, false);
                 return;
             }
-            SetValueBehindLinkedValue(Column, Row, Value, FreezeMode);
+            SetValueBehindLinkedValue(column, row, value, freezemode);
 
         }
 
@@ -772,8 +791,8 @@ namespace BlueDatabase
 
             if (column.Format == enDataFormat.LinkedCell)
             {
-                LinkedCellData(column, row, out var column1, out var row1);
-                return AutomaticInitalValue(column1, row1);
+                var LinkedData = LinkedCellData(column, row, false, true);
+                return AutomaticInitalValue(LinkedData.Item1, LinkedData.Item2);
             }
 
 
@@ -888,11 +907,11 @@ namespace BlueDatabase
                 var fColumn = column;
                 if (column.Format == enDataFormat.LinkedCell)
                 {
-                    LinkedCellData(column, row, out var LCColumn, out var LCrow);
-                    if (LCColumn != null && LCrow != null)
+                    var LinkedData = LinkedCellData(column, row, false, false);
+                    if (LinkedData.Item1 != null && LinkedData.Item2 != null)
                     {
-                        _String = LCrow.CellGetString(LCColumn);
-                        fColumn = LCColumn;
+                        _String = LinkedData.Item2.CellGetString(LinkedData.Item1);
+                        fColumn = LinkedData.Item1;
                     }
 
                 }
@@ -1025,7 +1044,7 @@ namespace BlueDatabase
 
         private bool CompareValues(string IstValue, string FilterValue, enFilterType Typ)
         {
-           // if (Column.Format == enDataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Fremdzellenzugriff"); }
+            // if (Column.Format == enDataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Fremdzellenzugriff"); }
             if (Typ.HasFlag(enFilterType.GroßKleinEgal))
             {
                 IstValue = IstValue.ToUpper();
@@ -1077,8 +1096,8 @@ namespace BlueDatabase
 
             if (Column.Format == enDataFormat.LinkedCell)
             {
-                LinkedCellData(Column, Row, out var LCColumn, out var LCrow);
-                if (LCColumn != null && LCrow != null) { return LCrow.Database.Cell.GetString(LCColumn, LCrow); }
+                var LinkedData = LinkedCellData(Column, Row, false, false);
+                if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return LinkedData.Item2.Database.Cell.GetString(LinkedData.Item1, LinkedData.Item2); }
                 return string.Empty;
             }
 
@@ -1128,8 +1147,8 @@ namespace BlueDatabase
         {
             if (Column.Format == enDataFormat.LinkedCell)
             {
-                LinkedCellData(Column, Row, out var LCColumn, out var LCrow);
-                if (LCColumn != null && LCrow != null) { return UserEditPossible(LCColumn, LCrow, DateiRechtePrüfen); }
+                var LinkedData = LinkedCellData(Column, Row, false, true);
+                if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return UserEditPossible(LinkedData.Item1, LinkedData.Item2, DateiRechtePrüfen); }
                 return false;
             }
 
@@ -1155,17 +1174,15 @@ namespace BlueDatabase
 
             if (Column.Format == enDataFormat.LinkedCell)
             {
-                LinkedCellData(Column, Row, out var LCColumn, out var LCrow);
-                if (LCColumn != null && LCrow != null)
+                var LinkedData = LinkedCellData(Column, Row, false, true);
+                if (LinkedData.Item1 != null && LinkedData.Item2 != null)
                 {
-                    var tmp = UserEditErrorReason(LCColumn, LCrow, DateiRechtePrüfen);
+                    var tmp = UserEditErrorReason(LinkedData.Item1, LinkedData.Item2, DateiRechtePrüfen);
                     if (!string.IsNullOrEmpty(tmp)) { return LanguageTool.DoTranslate("Die verlinkte Zelle kann nicht bearbeitet werden: ", true) + tmp; }
                     return string.Empty;
                 }
-                if (LCColumn == null) { return LanguageTool.DoTranslate("Die Spalte ist in der Quell-Datenbank nicht vorhanden.", true); }
-                if (LCrow == null) { return LanguageTool.DoTranslate("Die Zeile ist in der Quell-Datenbank nicht vorhanden.", true); }
-
-
+                if (LinkedData.Item1 == null) { return LanguageTool.DoTranslate("Die Spalte ist in der Quell-Datenbank nicht vorhanden.", true); }
+                // if (LinkedData.Item2 == null) { return LanguageTool.DoTranslate("Die Zeile ist in der Quell-Datenbank nicht vorhanden.", true); }
                 return LanguageTool.DoTranslate("Die Zeile ist in der Quell-Datenbank nicht vorhanden.", true);
             }
 

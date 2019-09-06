@@ -458,7 +458,7 @@ namespace BlueControls.ItemCollection
 
                 case "image":
                 case "bitmap":
-                    // TODO: image entfernen
+                    // TODO: image entfernen 06.09.2019
                     _Bitmap = modConverter.Base64ToBitmap(pair.Value);
                     return true;
 

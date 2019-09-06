@@ -108,7 +108,7 @@ namespace BlueControls
                 LoadSkin();
                 return;
             }
-    
+
             ST[0] = (enImageCodeEffect)int.Parse(SkinDB.Tags[0]);
             Pen_LinieDünn = new Pen(Color_Border(enDesign.Table_Lines_thin, enStates.Standard));
             Pen_LinieKräftig = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard));
@@ -694,9 +694,9 @@ namespace BlueControls
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Develop.DebugPrint(ex);
+                Develop.DebugPrint(ex);
             }
         }
 
@@ -991,7 +991,7 @@ namespace BlueControls
 
             if (Stufe != 4 && vDesign != enDesign.TextBox)
             {
-                if (vDesign == enDesign.Form_QuickInfo ) { return GetBlueFont(vDesign, vState); } // QuickInfo kann jeden Text enthatlten
+                if (vDesign == enDesign.Form_QuickInfo) { return GetBlueFont(vDesign, vState); } // QuickInfo kann jeden Text enthatlten
 
                 Develop.DebugPrint(enFehlerArt.Warnung, "Design unbekannt: " + (int)vDesign);
                 return GetBlueFont(vDesign, vState);

@@ -283,7 +283,8 @@ namespace BlueControls.BlueDatabaseDialogs
 
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                    CellCollection.LinkedCellData(column, Row, out column2, out _);
+                    var LinkedData = CellCollection.LinkedCellData(column, Row, false, true);
+                    column2 = LinkedData.Item1;
                     PosError = true;
                     break;
             }

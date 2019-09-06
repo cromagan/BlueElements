@@ -264,6 +264,7 @@ namespace BlueDatabase
 
             if (Key < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Key < 0"); }
 
+            if (Database.ReadOnly) { return; }
 
             if (CellIsNullOrEmpty(Database.Column.SysLocked))
             {

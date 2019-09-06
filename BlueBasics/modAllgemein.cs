@@ -101,7 +101,7 @@ namespace BlueBasics
 
 
 
-        public static List<Bitmap> SplitTiff(string fileName)
+        public static List<Bitmap> SplitTiff(string fileName, int MaxSize)
         {
 
             // Open a Stream and decode a TIFF image
@@ -110,11 +110,7 @@ namespace BlueBasics
             try
             {
 
-
-
                 var decoder = new TiffBitmapDecoder(imageStreamSource, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
-
-
 
                 //var fi = new FileInfo(fileName);
                 //using (Stream documentStream = fi.OpenRead())
@@ -125,7 +121,7 @@ namespace BlueBasics
 
                 foreach (var frame in decoder.Frames)
                 {
-                    l.Add(GetBitmap(frame));
+                    l.Add(GetBitmap(frame, MaxSize));
 
                     //var newFileEncoder = new TiffBitmapEncoder();
                     //newFileEncoder.Frames.Add(frame);
@@ -180,8 +176,11 @@ namespace BlueBasics
         //    return bmp;
         //}
 
-        public static Bitmap GetBitmap(BitmapSource bitmapsource)
+        public static Bitmap GetBitmap(BitmapSource bitmapsource, int MaxSize)
         {
+            CollectGarbage();
+            Pause(0.1, true);
+
             Bitmap bitmap;
             using (var outStream = new MemoryStream())
             {
@@ -190,6 +189,12 @@ namespace BlueBasics
                 enc.Save(outStream);
                 bitmap = new Bitmap(outStream);
             }
+
+            if (MaxSize > 0)
+            {
+                return bitmap.Resize(MaxSize, MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
+            }
+
             return bitmap;
         }
 

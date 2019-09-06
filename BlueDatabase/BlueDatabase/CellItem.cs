@@ -90,9 +90,10 @@ namespace BlueDatabase
 
             if (column.Format == enDataFormat.LinkedCell)
             {
-                CellCollection.LinkedCellData(column, Row, out var LCColumn, out var LCrow);
-                if (LCColumn != null && LCrow != null) { return ValuesReadable(column, Row, Style); }
-                return new List<string>();
+                //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
+                //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
+                //return new List<string>();
+                Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell sollte hier nicht ankommen.");
             }
 
             var ret = new List<string>();
@@ -196,7 +197,7 @@ namespace BlueDatabase
 
                 case enDataFormat.Schrift:
                     if (Style == enShortenStyle.HTML) { break; }
-                //    Develop.DebugPrint_NichtImplementiert();
+                    //    Develop.DebugPrint_NichtImplementiert();
                     //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return Txt; }
 
                     //if (Column.CompactView) { return string.Empty; }
@@ -323,7 +324,7 @@ namespace BlueDatabase
                     return QuickImage.Get(Txt.FileType(), 48);
 
                 case enDataFormat.Schrift:
-                  //  Develop.DebugPrint_NichtImplementiert();
+                    //  Develop.DebugPrint_NichtImplementiert();
                     //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return defaultImage; }
                     // return Skin.BlueFont.Get(Txt).SymbolForReadableText();
                     return defaultImage;
@@ -353,7 +354,7 @@ namespace BlueDatabase
             {
                 case enAlignmentHorizontal.Links: return enAlignment.Top_Left;
                 case enAlignmentHorizontal.Rechts: return enAlignment.Top_Right;
-                case enAlignmentHorizontal.Zentriert:  return enAlignment.HorizontalCenter;
+                case enAlignmentHorizontal.Zentriert: return enAlignment.HorizontalCenter;
             }
 
 

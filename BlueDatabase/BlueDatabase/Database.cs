@@ -2176,7 +2176,12 @@ namespace BlueDatabase
 
                             var LCColumn = ThisColumn;
                             var LCrow = ThisRow;
-                            if (ThisColumn.Format == enDataFormat.LinkedCell) { CellCollection.LinkedCellData(ThisColumn, ThisRow, out LCColumn, out LCrow); }
+                            if (ThisColumn.Format == enDataFormat.LinkedCell)
+                            {
+                                var LinkedData = CellCollection.LinkedCellData(ThisColumn, ThisRow, false, false);
+                                LCColumn = LinkedData.Item1;
+                                LCrow = LinkedData.Item2;
+                            }
 
                             if (LCrow != null && LCColumn != null)
                             {

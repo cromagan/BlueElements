@@ -250,7 +250,7 @@ namespace BlueDatabase
             {
                 switch (pair.Key)
                 {
-                    case "identifier": //TODO: Identifier entferneen, altlasts
+                    case "identifier": //TODO: Identifier entferneen, altlast. 06.09.2019
                         if (pair.Value != "Action") { Develop.DebugPrint(enFehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value); }
                         break;
 

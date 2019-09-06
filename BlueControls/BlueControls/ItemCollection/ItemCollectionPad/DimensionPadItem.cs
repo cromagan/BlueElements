@@ -175,7 +175,7 @@ namespace BlueControls.ItemCollection
         {
             switch (pair.Key)
             {
-                case "text": // TODO: Alt
+                case "text": // TODO: Alt 06.09.2019
                 case "text1":
                     Text1 = pair.Value.FromNonCritical();
                     return true;
@@ -184,23 +184,23 @@ namespace BlueControls.ItemCollection
                     Text2 = pair.Value.FromNonCritical();
                     return true;
 
-                case "color": // TODO: Alt
+                case "color": // TODO: Alt 06.09.2019
                     return true;
 
-                case "fontsize": // TODO: Alt
+                case "fontsize": // TODO: Alt 06.09.2019
                     return true;
 
-                case "accuracy": // TODO: Alt
+                case "accuracy": // TODO: Alt 06.09.2019
                     return true;
 
                 case "decimal":
                     NachKomma = int.Parse(pair.Value);
                     return true;
 
-                case "checked": // TODO: Alt
+                case "checked": // TODO: Alt 06.09.2019
                     return true;
 
-                case "prefix": // TODO: Alt
+                case "prefix": // TODO: Alt 06.09.2019
                     Prefix = pair.Value.FromNonCritical();
                     return true;
 
