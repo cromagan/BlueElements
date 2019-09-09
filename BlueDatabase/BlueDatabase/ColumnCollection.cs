@@ -452,6 +452,7 @@ namespace BlueDatabase
             da.Add("              <th align=left>#</th>");
             da.Add("              <th align=left width =\"1%\">Name</th>");
             da.Add("              <th align=left>Beschriftung</th>");
+            da.Add("              <th align=left>Überschriften</th>");
             da.Add("              <th align=left>Datenformat</th>");
             da.Add("              <th align=left>Quickinfo</th>");
             da.Add("              <th align=left>Admin-Info</th>");
@@ -472,6 +473,7 @@ namespace BlueDatabase
                     da.Add("              <th align=left>" + lfdn.ToString() + "</th>");
                     da.Add("              <th align=left>" + ThisColumnItem.Name + "</th>");
                     da.Add("              <th align=left>" + ThisColumnItem.Caption.Replace("\r", "<br>") + "</th>");
+                    da.Add("              <th align=left>" + (ThisColumnItem.Ueberschrift1 + "/" +ThisColumnItem.Ueberschrift2 + "/" + ThisColumnItem.Ueberschrift3 + "/").TrimEnd("/")  + " </th>");
                     da.Add("              <th align=left>" + ThisColumnItem.Format + "</th>");
                     da.Add("              <th align=left>" + ThisColumnItem.Quickinfo.Replace("\r", "<br>") + "</th>");
                     da.Add("              <th align=left>" + ThisColumnItem.AdminInfo.Replace("\r", "<br>") + "</th>");

@@ -611,6 +611,14 @@ namespace BlueControls.Controls
                 {
                     if (ViewItem != null && ViewItem.Column != null && ViewItem.ViewType == enViewType.PermanentColumn)
                     {
+
+                        if (ViewItem._TMP_DrawWidth == null)
+                        {
+                            // Veränderte Werte!
+                            DrawControl(GR, State);
+                            return;
+                        }
+
                         PermaX = Math.Max(PermaX, (int)ViewItem.OrderTMP_Spalte_X1 + (int)ViewItem._TMP_DrawWidth);
                     }
                 }
@@ -881,7 +889,7 @@ namespace BlueControls.Controls
 
             if (CellInThisDatabaseColumn.Column.Format == enDataFormat.LinkedCell)
             {
-                var LinkedData = CellCollection.LinkedCellData(CellInThisDatabaseColumn.Column, CellInThisDatabaseRow, false, false);
+                var LinkedData = CellCollection.LinkedCellData(CellInThisDatabaseColumn.Column, CellInThisDatabaseRow, false, false, false);
                 if (LinkedData.Item1 != null && LinkedData.Item2 != null)
                 {
                     Draw_CellTransparentDirect(GR, CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY, LinkedData.Item1, LinkedData.Item2, DisplayRectangleWOSlider, vfont);
@@ -1379,8 +1387,12 @@ namespace BlueControls.Controls
 
             if (CellInThisDatabaseColumn.Format == enDataFormat.LinkedCell)
             {
-                var LinkedData = CellCollection.LinkedCellData(CellInThisDatabaseColumn, CellInThisDatabaseRow, false, true);
-                if (LinkedData.Item1 == null) { return; }
+                var LinkedData = CellCollection.LinkedCellData(CellInThisDatabaseColumn, CellInThisDatabaseRow, false, true, true);
+                if (LinkedData.Item1 == null)
+                {
+                    NotEditableInfo("In verknüpfter Datenbank nicht vorhanden");
+                    return;
+                }
                 ContentHolderCellColumn = LinkedData.Item1;
                 ContentHolderCellRow = LinkedData.Item2;
             }
@@ -1691,7 +1703,7 @@ namespace BlueControls.Controls
 
             if (column.Format == enDataFormat.LinkedCell)
             {
-                var LinkedData = CellCollection.LinkedCellData(column, row, false, true);
+                var LinkedData = CellCollection.LinkedCellData(column, row, false, true, false);
                 if (LinkedData.Item1 == null || LinkedData.Item2 == null)
                 {
                     table.NotEditableInfo("Zelle in verlinkter Datenbank nicht vorhanden.");
@@ -2688,7 +2700,7 @@ namespace BlueControls.Controls
 
                                     case enDataFormat.LinkedCell:
                                     case enDataFormat.Values_für_LinkedCellDropdown:
-                                        var LinkedData = CellCollection.LinkedCellData(_MouseOverColumn, _MouseOverRow, false, false);
+                                        var LinkedData = CellCollection.LinkedCellData(_MouseOverColumn, _MouseOverRow, false, false, false);
                                         if (LinkedData.Item1 != null) { T = LinkedData.Item1.QickInfoText(_MouseOverColumn.ReadableText() + " bei " + LinkedData.Item1.ReadableText() + ":"); }
                                         break;
 
@@ -4012,7 +4024,7 @@ namespace BlueControls.Controls
 
             if (Column.Format == enDataFormat.LinkedCell)
             {
-                var LinkedData = CellCollection.LinkedCellData(Column, Row, false, false);
+                var LinkedData = CellCollection.LinkedCellData(Column, Row, false, false, false);
                 if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return Cell_ContentSize(LinkedData.Item1, LinkedData.Item2, CellFont, Pix16); }
                 return new Size(Pix16, Pix16);
             }
@@ -4069,7 +4081,7 @@ namespace BlueControls.Controls
 
             if (Column.Format == enDataFormat.LinkedCell)
             {
-                var LinkedData = CellCollection.LinkedCellData(Column, Row, false, true);
+                var LinkedData = CellCollection.LinkedCellData(Column, Row, false, true, false);
                 if (LinkedData.Item1 != null && LinkedData.Item2 != null) { DoUndo(LinkedData.Item1, LinkedData.Item2); }
                 return;
             }
@@ -4232,7 +4244,7 @@ namespace BlueControls.Controls
 
                 if (column.Format == enDataFormat.LinkedCell)
                 {
-                    var LinkedData = CellCollection.LinkedCellData(column, row, false, false);
+                    var LinkedData = CellCollection.LinkedCellData(column, row, false, false, false);
                     ContentHolderCellColumn = LinkedData.Item1;
                     ContenHolderCellRow = LinkedData.Item2;
                 }

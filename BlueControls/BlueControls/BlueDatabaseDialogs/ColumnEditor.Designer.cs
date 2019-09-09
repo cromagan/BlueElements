@@ -139,7 +139,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpLinkedDatabase = new BlueControls.Controls.GroupBox();
             this.grpColumnsForLinkedDatabase = new BlueControls.Controls.GroupBox();
             this.grpVerlinkteZellen = new BlueControls.Controls.GroupBox();
-            this.cbxFehlendesZiel = new BlueControls.Controls.ComboBox();
             this.caption5 = new BlueControls.Controls.Caption();
             this.txbZeichenkette = new BlueControls.Controls.TextBox();
             this.capZeichenkette = new BlueControls.Controls.TextBox();
@@ -1303,7 +1302,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.grpVerlinkteZellen.CausesValidation = false;
-            this.grpVerlinkteZellen.Controls.Add(this.cbxFehlendesZiel);
             this.grpVerlinkteZellen.Controls.Add(this.caption5);
             this.grpVerlinkteZellen.Controls.Add(this.txbZeichenkette);
             this.grpVerlinkteZellen.Controls.Add(this.capZeichenkette);
@@ -1318,17 +1316,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpVerlinkteZellen.Name = "grpVerlinkteZellen";
             this.grpVerlinkteZellen.Size = new System.Drawing.Size(872, 224);
             this.grpVerlinkteZellen.Text = "Format: Verlinkte Zellen";
-            // 
-            // cbxFehlendesZiel
-            // 
-            this.cbxFehlendesZiel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxFehlendesZiel.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxFehlendesZiel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxFehlendesZiel.Location = new System.Drawing.Point(336, 192);
-            this.cbxFehlendesZiel.Name = "cbxFehlendesZiel";
-            this.cbxFehlendesZiel.Size = new System.Drawing.Size(520, 24);
-            this.cbxFehlendesZiel.TabIndex = 9;
             // 
             // caption5
             // 
@@ -1557,7 +1544,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbPrefix;
         private Caption caption7;
         private Caption caption5;
-        private ComboBox cbxFehlendesZiel;
         private Button btnStandard;
         private Button btnKompakteAnzeige;
         private TabPage tabSpezial;

@@ -175,7 +175,7 @@ namespace BlueDatabase.Enums
         co_LinkedCell_ColumnKey=180,
         co_LinkedCell_ColumnValueFoundIn=181,
         co_LinkedCell_ColumnValueAdd=182,
-        co_LinkedCell_Behaviour = 183,
+        //co_LinkedCell_Behaviour = 183,
         co_DropDownKey =184,
         co_VorschlagColumn=185,
         co_Align = 186,

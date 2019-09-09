@@ -161,7 +161,7 @@ namespace BlueDatabase
 
             if (Column.Format == enDataFormat.LinkedCell)
             {
-                var LinkedData = LinkedCellData(Column, Row, false, false);
+                var LinkedData = LinkedCellData(Column, Row, false, false, false);
                 if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return LinkedData.Item2.CellIsNullOrEmpty(LinkedData.Item1); }
                 return true;
             }
@@ -177,7 +177,7 @@ namespace BlueDatabase
 
 
 
-        public static Tuple<ColumnItem, RowItem> LinkedCellData(ColumnItem column, RowItem row, bool freezemode, bool RepairEmpties)
+        public static Tuple<ColumnItem, RowItem> LinkedCellData(ColumnItem column, RowItem row, bool freezemode, bool RepairEmpties, bool AddRowIfNotExists)
         {
 
             if (column == null || row == null) { return new Tuple<ColumnItem, RowItem>(null, null); }
@@ -190,7 +190,7 @@ namespace BlueDatabase
 
             if (RepairEmpties)
             {
-                return RepairLinkedCellValue(LinkedDatabase, column, row, freezemode);
+                return RepairLinkedCellValue(LinkedDatabase, column, row, freezemode, AddRowIfNotExists);
             }
 
 
@@ -200,17 +200,17 @@ namespace BlueDatabase
 
             var V = Key.SplitBy("|");
 
-            if (V.Length != 2) { return RepairLinkedCellValue(LinkedDatabase, column, row, freezemode); }
+            if (V.Length != 2) { return RepairLinkedCellValue(LinkedDatabase, column, row, freezemode, AddRowIfNotExists); }
 
             var LinkedColumn = LinkedDatabase.Column.SearchByKey(int.Parse(V[0]));
             var LinkedRow = LinkedDatabase.Row.SearchByKey(int.Parse(V[1]));
 
             if (KeyOfCell(LinkedColumn, LinkedRow) == Key) { return new Tuple<ColumnItem, RowItem>(LinkedColumn, LinkedRow); }
 
-            return RepairLinkedCellValue(LinkedDatabase, column, row, freezemode);
+            return RepairLinkedCellValue(LinkedDatabase, column, row, freezemode, AddRowIfNotExists);
         }
 
-        private static Tuple<ColumnItem, RowItem> RepairLinkedCellValue(Database LinkedDatabase, ColumnItem column, RowItem row, bool FreezeMode)
+        private static Tuple<ColumnItem, RowItem> RepairLinkedCellValue(Database LinkedDatabase, ColumnItem column, RowItem row, bool FreezeMode, bool AddRowIfNotExists)
         {
             // if (column.Format != enDataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falsches Format! " + Database.Filename + " " + column.Name); }
             // var targetColumnKeyx = -1;
@@ -267,7 +267,7 @@ namespace BlueDatabase
 
             targetRow = LinkedDatabase.Row[row.CellGetString(LinkedCell_RowColumn)];
 
-            if (targetRow == null && column.LinkedCell_Behaviour == enFehlendesZiel.ZeileAnlegen)
+            if (targetRow == null && AddRowIfNotExists)
             {
                 targetRow = LinkedDatabase.Row.Add(row.CellGetString(LinkedCell_RowColumn));
             }
@@ -364,7 +364,7 @@ namespace BlueDatabase
                 case enDataFormat.LinkedCell:
                     if (DoAlways)
                     {
-                        LinkedCellData(Column, Database.Row.SearchByKey(RowKey), FreezeMode, true); // Repariert auch Cellbezüge
+                        LinkedCellData(Column, Database.Row.SearchByKey(RowKey), FreezeMode, true, false); // Repariert auch Cellbezüge
                     }
                     break;
 
@@ -443,7 +443,7 @@ namespace BlueDatabase
 
                 if (ThisColumn.LinkedCell_RowKey == column.Key || ThisColumn.LinkedCell_ColumnValueFoundIn == column.Key)
                 {
-                    LinkedCellData(ThisColumn, ownRow, freezeMode, true); // Repariert auch Zellbezüge
+                    LinkedCellData(ThisColumn, ownRow, freezeMode, true, false); // Repariert auch Zellbezüge
                 }
 
 
@@ -733,7 +733,7 @@ namespace BlueDatabase
 
             if (column.Format == enDataFormat.LinkedCell)
             {
-                var LinkedData = LinkedCellData(column, row, freezemode, true);
+                var LinkedData = LinkedCellData(column, row, freezemode, true, true);
                 LinkedData.Item2?.Database.Cell.Set(LinkedData.Item1, LinkedData.Item2, value, false);
                 return;
             }
@@ -791,7 +791,7 @@ namespace BlueDatabase
 
             if (column.Format == enDataFormat.LinkedCell)
             {
-                var LinkedData = LinkedCellData(column, row, false, true);
+                var LinkedData = LinkedCellData(column, row, false, true, true);
                 return AutomaticInitalValue(LinkedData.Item1, LinkedData.Item2);
             }
 
@@ -907,7 +907,7 @@ namespace BlueDatabase
                 var fColumn = column;
                 if (column.Format == enDataFormat.LinkedCell)
                 {
-                    var LinkedData = LinkedCellData(column, row, false, false);
+                    var LinkedData = LinkedCellData(column, row, false, false, false);
                     if (LinkedData.Item1 != null && LinkedData.Item2 != null)
                     {
                         _String = LinkedData.Item2.CellGetString(LinkedData.Item1);
@@ -1096,7 +1096,7 @@ namespace BlueDatabase
 
             if (Column.Format == enDataFormat.LinkedCell)
             {
-                var LinkedData = LinkedCellData(Column, Row, false, false);
+                var LinkedData = LinkedCellData(Column, Row, false, false, false);
                 if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return LinkedData.Item2.Database.Cell.GetString(LinkedData.Item1, LinkedData.Item2); }
                 return string.Empty;
             }
@@ -1147,7 +1147,7 @@ namespace BlueDatabase
         {
             if (Column.Format == enDataFormat.LinkedCell)
             {
-                var LinkedData = LinkedCellData(Column, Row, false, true);
+                var LinkedData = LinkedCellData(Column, Row, false, true, false);
                 if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return UserEditPossible(LinkedData.Item1, LinkedData.Item2, DateiRechtePrüfen); }
                 return false;
             }
@@ -1174,7 +1174,7 @@ namespace BlueDatabase
 
             if (Column.Format == enDataFormat.LinkedCell)
             {
-                var LinkedData = LinkedCellData(Column, Row, false, true);
+                var LinkedData = LinkedCellData(Column, Row, false, true, false);
                 if (LinkedData.Item1 != null && LinkedData.Item2 != null)
                 {
                     var tmp = UserEditErrorReason(LinkedData.Item1, LinkedData.Item2, DateiRechtePrüfen);
