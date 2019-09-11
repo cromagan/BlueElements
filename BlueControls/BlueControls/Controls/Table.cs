@@ -2583,7 +2583,7 @@ namespace BlueControls.Controls
                     case System.Windows.Forms.Keys.C:
                         if (e.Modifiers == System.Windows.Forms.Keys.Control)
                         {
-                            CopyToClipboard(_CursorPosColumn, _CursorPosRow, false);
+                            CopyToClipboard(_CursorPosColumn, _CursorPosRow, true);
                         }
                         break;
 
@@ -4164,16 +4164,32 @@ namespace BlueControls.Controls
 
         public static void CopyToClipboard(ColumnItem Column, RowItem Row, bool Meldung)
         {
-
-            if (Row != null && Column.Format.CanBeCheckedByRules())
+            try
             {
-                var c = Row.CellGetString(Column);
-                c = c.Replace("\r\n", "\r");
-                c = c.Replace("\r", "\r\n");
 
-                System.Windows.Forms.Clipboard.SetDataObject(c, true);
-                if (Meldung) { Notification.Show("<b>" + c + "</b><br>ist nun in der Zwischenablage.", enImageCode.Kopieren); }
+
+                if (Row != null && Column.Format.CanBeCheckedByRules())
+                {
+                    var c = Row.CellGetString(Column);
+                    c = c.Replace("\r\n", "\r");
+                    c = c.Replace("\r", "\r\n");
+
+                    System.Windows.Forms.Clipboard.SetDataObject(c, true);
+                    if (Meldung) { Notification.Show("<b>" + c + LanguageTool.DoTranslate("</b><br>ist nun in der Zwischenablage.", true), enImageCode.Kopieren); }
+                }
+                else
+                {
+                    if (Meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Spalte nicht möglich.", true), enImageCode.Warnung); }
+                }
+
             }
+            catch
+            {
+                if (Meldung) { Notification.Show(LanguageTool.DoTranslate("Unerwarteter Fehler beim Kopieren.", true), enImageCode.Warnung); }
+            }
+
+
+
         }
 
 

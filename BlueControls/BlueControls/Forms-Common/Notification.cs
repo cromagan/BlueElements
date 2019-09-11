@@ -66,7 +66,7 @@ namespace BlueControls.Forms
 
         public static void Show(string Text)
         {
-            //Close();
+            CloseAll();
             if (string.IsNullOrEmpty(Text)) { return; }
             var x = new Notification(Text);
             x.Show();
@@ -87,7 +87,26 @@ namespace BlueControls.Forms
 
 
 
+        public static void CloseAll()
+        {
 
+            foreach (var ThisForm in AllBoxes)
+            {
+                if (!ThisForm.IsDisposed && ThisForm is Notification )
+                {
+                    try
+                    {
+                        ThisForm.Close();
+                        CloseAll();
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        Develop.DebugPrint(ex);
+                    }
+                }
+            }
+        }
 
 
         public new void Close()
