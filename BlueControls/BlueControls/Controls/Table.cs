@@ -3849,6 +3849,9 @@ namespace BlueControls.Controls
 
             if (Thread.CurrentThread.IsBackground) { return false; }
 
+            if (_Database == null) { return false; }
+            if (!Enabled) { return false; }
+
             if (_Database.Column[0] == null) { return false; }
 
             if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) { return false; }

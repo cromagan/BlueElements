@@ -66,7 +66,7 @@ namespace BlueControls.Controls
         //<Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Never)>
 
         private System.Windows.Forms.ComboBoxStyle _DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
-        private enComboboxStyle _DrawStyle = enComboboxStyle.Standard;
+        private enComboboxStyle _DrawStyle = enComboboxStyle.TextBox;
         private string _ImageCode = "";
 
 
@@ -82,16 +82,13 @@ namespace BlueControls.Controls
         {
             get
             {
-                if (_DrawStyle == enComboboxStyle.Standard)
-                {
-                    return string.Empty;
-                }
+                if (_DrawStyle == enComboboxStyle.TextBox) { return string.Empty; }
                 return _ImageCode;
             }
             set
             {
 
-                if (_DrawStyle == enComboboxStyle.Standard) { value = string.Empty; }
+                if (_DrawStyle == enComboboxStyle.TextBox) { value = string.Empty; }
                 if (_ImageCode == value) { return; }
 
                 _ImageCode = value;
@@ -122,7 +119,7 @@ namespace BlueControls.Controls
             }
         }
 
-        [DefaultValue(enComboboxStyle.Standard)]
+        [DefaultValue(enComboboxStyle.TextBox)]
         public enComboboxStyle DrawStyle
         {
             get
@@ -131,14 +128,11 @@ namespace BlueControls.Controls
             }
             set
             {
-                if (_DrawStyle == value)
-                {
-                    return;
-                }
+                if (_DrawStyle == value) { return; }
 
                 _DrawStyle = value;
 
-                if (DrawStyle == enComboboxStyle.RibbonBar)
+                if (DrawStyle != enComboboxStyle.TextBox)
                 {
                     SetAlternateStyle();
                 }
@@ -435,7 +429,7 @@ namespace BlueControls.Controls
         protected override void OnMouseEnter(System.EventArgs e)
         {
             base.OnMouseEnter(e);
-            if (_DrawStyle == enComboboxStyle.Standard || !Enabled) { return; }
+            if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
             Invalidate();
         }
 
@@ -443,7 +437,7 @@ namespace BlueControls.Controls
         protected override void OnMouseLeave(System.EventArgs e)
         {
             base.OnMouseLeave(e);
-            if (_DrawStyle == enComboboxStyle.Standard || !Enabled) { return; }
+            if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
             Invalidate();
         }
 

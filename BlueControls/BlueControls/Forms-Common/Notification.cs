@@ -201,8 +201,8 @@ namespace BlueControls.Forms
 
 
                 Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - Width - Skin.Padding * 2;
-                Region = new Region(new Rectangle(0, 0, Width, (int)(Math.Truncate(Height * _Proz))));
-                Top = (int)(Math.Truncate(System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - Height * _Proz));
+                Region = new Region(new Rectangle(0, 0, Width, (int)Math.Truncate(Height * _Proz)));
+                Top = (int)Math.Truncate(System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - Height * _Proz);
                 Opacity = _Proz;
 
 

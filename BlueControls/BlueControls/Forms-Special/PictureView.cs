@@ -46,11 +46,11 @@ namespace BlueControls.Forms
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-            InitWindow(false, "", "", -1, "");
+            InitWindow(false, "", -1, "");
         }
 
 
-        public PictureView(List<string> FileList, bool MitScreenResize, string AdditionalText, string WindowCaption)
+        public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption)
         {
 
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
@@ -59,7 +59,7 @@ namespace BlueControls.Forms
             _FileList = FileList;
             LoadPic(0);
 
-            InitWindow(MitScreenResize, AdditionalText, WindowCaption, -1, "");
+            InitWindow(MitScreenResize, WindowCaption, -1, "");
 
 
             Area_KomponenteHinzufügen.Visible = false;
@@ -84,7 +84,7 @@ namespace BlueControls.Forms
             Pad.Item.Add(new BitmapPadItem((Bitmap)BMP.Clone(), BMP.Size));
 
 
-            InitWindow(false, "", "", -1, "");
+            InitWindow(false, "", -1, "");
 
 
             Area_KomponenteHinzufügen.Visible = false;
@@ -98,7 +98,7 @@ namespace BlueControls.Forms
         }
 
 
-        public PictureView(List<string> FileList, bool MitScreenResize, string AdditionalText, string WindowCaption, int OpenOnScreen)
+        public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption, int OpenOnScreen)
         {
 
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
@@ -107,7 +107,7 @@ namespace BlueControls.Forms
             _FileList = FileList;
             LoadPic(0);
 
-            InitWindow(MitScreenResize, AdditionalText, WindowCaption, OpenOnScreen, "");
+            InitWindow(MitScreenResize, WindowCaption, OpenOnScreen, "");
 
             Area_KomponenteHinzufügen.Visible = false;
             Area_Assistent.Visible = false;
@@ -197,7 +197,7 @@ namespace BlueControls.Forms
         }
 
 
-        private void InitWindow(bool FitWindowToBest, string AdditionalText, string WindowCaption, int OpenOnScreen, string DesignName)
+        private void InitWindow(bool FitWindowToBest, string WindowCaption, int OpenOnScreen, string DesignName)
         {
             //    Me.ShowInTaskbar = False
 
@@ -232,15 +232,6 @@ namespace BlueControls.Forms
             }
 
 
-            if (!string.IsNullOrEmpty(AdditionalText))
-            {
-                InfoText.Text = "<b>" + AdditionalText;
-                InfoText.Visible = true;
-            }
-            else
-            {
-                InfoText.Visible = false;
-            }
 
 
             PadDesign.Item.Clear();

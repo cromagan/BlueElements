@@ -1,16 +1,10 @@
-using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
-using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
 
 namespace BlueControls.Forms
-    {
+{
 
-        public partial class PictureView : Form
+    public partial class PictureView : Form
         {
 			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
 			[DebuggerNonUserCode()]
@@ -33,7 +27,6 @@ namespace BlueControls.Forms
             this.Area_Seiten = new BlueControls.Controls.GroupBox();
             this.Rechts = new BlueControls.Controls.Button();
             this.Links = new BlueControls.Controls.Button();
-            this.InfoText = new BlueControls.Controls.Caption();
             this.ZoomOut = new BlueControls.Controls.Button();
             this.ZoomIn = new BlueControls.Controls.Button();
             this.ZoomFitBut = new BlueControls.Controls.Button();
@@ -113,17 +106,6 @@ namespace BlueControls.Forms
             this.Links.TabIndex = 5;
             this.Links.Text = "zurück";
             this.Links.Click += new System.EventHandler(this.Links_Click);
-            // 
-            // InfoText
-            // 
-            this.InfoText.CausesValidation = false;
-            this.InfoText.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoText.Location = new System.Drawing.Point(528, 0);
-            this.InfoText.Margin = new System.Windows.Forms.Padding(10);
-            this.InfoText.Name = "InfoText";
-            this.InfoText.Padding = new System.Windows.Forms.Padding(10);
-            this.InfoText.Size = new System.Drawing.Size(798, 81);
-            this.InfoText.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             // 
             // ZoomOut
             // 
@@ -254,7 +236,6 @@ namespace BlueControls.Forms
             // 
             // Page_Control
             // 
-            this.Page_Control.Controls.Add(this.InfoText);
             this.Page_Control.Controls.Add(this.Area_KomponenteHinzufügen);
             this.Page_Control.Controls.Add(this.Area_Werkzeuge);
             this.Page_Control.Controls.Add(this.Area_Seiten);
@@ -558,7 +539,6 @@ namespace BlueControls.Forms
 			protected TabControl Ribbon;
 			protected TabPage Page_Control;
 			protected TabPage Page_Start;
-			protected Caption InfoText;
 			protected GroupBox Area_Seiten;
 			protected GroupBox Area_Werkzeuge;
 			protected GroupBox Area_KomponenteHinzufügen;

@@ -60,11 +60,6 @@ namespace BlueControls.Forms
             // 
             this.Page_Control.Size = new Size(1282, 81);
             // 
-            // InfoText
-            // 
-            this.InfoText.Location = new Point(1322, 0);
-            this.InfoText.Size = new Size(0, 81);
-            // 
             // Area_Seiten
             // 
             this.Area_Seiten.Visible = false;

@@ -114,7 +114,7 @@ namespace BlueControls.Controls
             for (var Z = LastD.Count - 1; Z >= 0; Z--)
             {
 
-                var x = (LastD[Z]).SplitBy("|");
+                var x = LastD[Z].SplitBy("|");
 
                 if (!_mustExists || FileExists(x[0]))
                 {
@@ -213,7 +213,7 @@ namespace BlueControls.Controls
 
         private void SetLastFilesStyle()
         {
-            DrawStyle = enComboboxStyle.RibbonBar;
+           // DrawStyle = enComboboxStyle.RibbonBar;
 
             if (string.IsNullOrEmpty(ImageCode)) { ImageCode = "Ordner"; }
             if (string.IsNullOrEmpty(Text)) { Text = "zuletzt geöffnete Dateien"; }

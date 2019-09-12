@@ -1363,6 +1363,8 @@ namespace BlueControls.Controls
 
             OnContextMenuInit(e);
 
+            if (_Database == null) { return; }
+
             if (e.UserMenu.Count > 0) { e.UserMenu.Add(new LineListItem()); }
 
 
