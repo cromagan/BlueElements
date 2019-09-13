@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace BlueControls.Controls
 {
-    public partial class ComboBox : TextBox
+    public partial class ComboBox 
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

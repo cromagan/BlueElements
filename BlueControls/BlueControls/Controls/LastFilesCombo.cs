@@ -37,6 +37,13 @@ namespace BlueControls.Controls
         public string _filename = string.Empty;
         public bool _mustExists = true;
         public int _maxCount = 20;
+        public string _specialcommand = string.Empty;
+
+
+        #region  Events 
+        public event System.EventHandler SpecialCommandClicked;
+        #endregion
+
 
         /// <summary>
         /// Wohin die Datei gespeichtert werden soll, welche Dateien zuletzt benutzt wurden.
@@ -54,6 +61,25 @@ namespace BlueControls.Controls
                 if (_filename == value) { return; }
                 _filename = value;
                 LoadFromDisk();
+                GenerateMenu();
+            }
+        }
+
+        /// <summary>
+        /// Wenn an erster Stelle ein besonderer Befehl stehen soll. Das Event SpecialCommandClicked wird anstelle ItemClicked ausgelöst.
+        /// </summary>
+        /// 
+        [DefaultValue("")]
+        public string SpecialCommand
+        {
+            get
+            {
+                return _specialcommand;
+            }
+            set
+            {
+                if (_specialcommand == value) { return; }
+                _specialcommand = value;
                 GenerateMenu();
             }
         }
@@ -108,7 +134,17 @@ namespace BlueControls.Controls
 
             var Vis = false;
 
+
             Item.Clear();
+
+
+            if (!string.IsNullOrEmpty(_specialcommand))
+            {
+                Item.Add(new TextListItem("#SPECIAL#", _specialcommand, QuickImage.Get(ImageCode)));
+            }
+
+
+
             NR = -1;
 
             for (var Z = LastD.Count - 1; Z >= 0; Z--)
@@ -213,8 +249,10 @@ namespace BlueControls.Controls
 
         private void SetLastFilesStyle()
         {
-           // DrawStyle = enComboboxStyle.RibbonBar;
-
+            if (DrawStyle == enComboboxStyle.TextBox)
+            {
+                DrawStyle = enComboboxStyle.Button;
+            }
             if (string.IsNullOrEmpty(ImageCode)) { ImageCode = "Ordner"; }
             if (string.IsNullOrEmpty(Text)) { Text = "zuletzt geöffnete Dateien"; }
         }
@@ -223,8 +261,23 @@ namespace BlueControls.Controls
 
         protected override void OnItemClicked(BasicListItemEventArgs e)
         {
+
+            if (!string.IsNullOrEmpty(_specialcommand) && e.Item.Internal() == "#SPECIAL#")
+            {
+                OnSpecialCommandClicked();
+                return;
+            }
+
             base.OnItemClicked(e);
             AddFileName(e.Item.Internal(), e.Item.Tags[0]);
         }
+
+
+        private void OnSpecialCommandClicked()
+        {
+            SpecialCommandClicked?.Invoke(this, System.EventArgs.Empty);
+        }
+
+
     }
 }

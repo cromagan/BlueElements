@@ -22,8 +22,8 @@ namespace BlueControls.Enums
 {
     public enum enComboboxStyle
     {
-        TextBox = 1,
-        RibbonBar = 2,
-        Button = 3
+        TextBox = enDesign.TextBox,
+        RibbonBar = enDesign.Ribbonbar_Button,
+        Button = enDesign.Button
     }
 }
