@@ -1,11 +1,10 @@
 ﻿using System.Diagnostics;
-using System.Drawing;
 
 namespace BlueControls.Forms
 {
 
 
-    public partial class Form : System.Windows.Forms.Form
+    public partial class Form 
     {
         //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

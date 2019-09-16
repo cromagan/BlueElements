@@ -26,14 +26,14 @@ using BlueControls.Enums;
 
 namespace BlueControls.Forms
 {
-    public partial class Form : BlueControls.Interfaces.IDesignAble
+    public partial class Form : System.Windows.Forms.Form, BlueControls.Interfaces.IDesignAble
     {
         public Form()
         {
             InitializeComponent();
         }
 
-        private bool _Closed;
+        protected bool _Closed;
 
         /// <summary>
         /// Die Dicke des linken und rechen Randes einer Form in Pixel

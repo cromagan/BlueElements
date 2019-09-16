@@ -489,7 +489,7 @@ namespace BlueControls.Controls
                 }
                 else
                 {
-                    _Cursor_CharPos = Cursor_PosAt(ri.Left + _eTxt.Left, ri.Top + ri.Height / 2.0 + _eTxt.Chars[_Cursor_CharPos].Size.Height + _eTxt.Top);
+                    _Cursor_CharPos = Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + ri.Height / 2.0 + _eTxt.Chars[_Cursor_CharPos].Size.Height + _eTxt.DrawingPos.Y);
                 }
 
 
@@ -500,7 +500,7 @@ namespace BlueControls.Controls
                 {
                     if (_eTxt.Chars.Count > 0)
                     {
-                        _Cursor_CharPos = Cursor_PosAt(ri.Left + _eTxt.Left, ri.Top + ri.Height / 2.0 - _eTxt.Chars[_Cursor_CharPos - 1].Size.Height + _eTxt.Top);
+                        _Cursor_CharPos = Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + ri.Height / 2.0 - _eTxt.Chars[_Cursor_CharPos - 1].Size.Height + _eTxt.DrawingPos.Y);
                     }
                     else
                     {
@@ -510,7 +510,7 @@ namespace BlueControls.Controls
                 }
                 else
                 {
-                    _Cursor_CharPos = Cursor_PosAt(ri.Left + _eTxt.Left, ri.Top + ri.Height / 2.0 - _eTxt.Chars[_Cursor_CharPos].Size.Height + _eTxt.Top);
+                    _Cursor_CharPos = Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + ri.Height / 2.0 - _eTxt.Chars[_Cursor_CharPos].Size.Height + _eTxt.DrawingPos.Y);
                 }
 
             }
@@ -992,10 +992,9 @@ namespace BlueControls.Controls
                     SliderY.Value = 0;
                 }
 
-                _eTxt.Left = Skin.PaddingSmal;
-                _eTxt.Top = Skin.PaddingSmal;
-                _eTxt.MaxHeight = -1;
-                _eTxt.MaxWidth = -1;
+                _eTxt.DrawingPos.X = Skin.PaddingSmal;
+                _eTxt.DrawingPos.Y = Skin.PaddingSmal;
+                _eTxt.DrawingArea = new Rectangle(0, 0, -1, -1);
                 _eTxt.Autoumbruch = false;
             }
 
@@ -1102,7 +1101,7 @@ namespace BlueControls.Controls
                 if (cc == MaE || _eTxt.Chars[cc].Pos.X < _eTxt.Chars[TmpcharS].Pos.X || Math.Abs(_eTxt.Chars[cc].Pos.Y - _eTxt.Chars[TmpcharS].Pos.Y) > 0.001) //Jetzt ist der Zeitpunkt zum Zeichen/start setzen
                 {
 
-                    var r = new Rectangle((int)(_eTxt.Chars[TmpcharS].Pos.X + _eTxt.Left), (int)(_eTxt.Chars[TmpcharS].Pos.Y + 2 + _eTxt.Top), (int)(_eTxt.Chars[cc - 1].Pos.X + _eTxt.Chars[cc - 1].Size.Width - _eTxt.Chars[TmpcharS].Pos.X), (int)(_eTxt.Chars[cc - 1].Pos.Y + _eTxt.Chars[cc - 1].Size.Height - _eTxt.Chars[TmpcharS].Pos.Y));
+                    var r = new Rectangle((int)(_eTxt.Chars[TmpcharS].Pos.X + _eTxt.DrawingPos.X), (int)(_eTxt.Chars[TmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y), (int)(_eTxt.Chars[cc - 1].Pos.X + _eTxt.Chars[cc - 1].Size.Width - _eTxt.Chars[TmpcharS].Pos.X), (int)(_eTxt.Chars[cc - 1].Pos.Y + _eTxt.Chars[cc - 1].Size.Height - _eTxt.Chars[TmpcharS].Pos.Y));
 
                     if (r.Width < 2) { r = new Rectangle(r.Left, r.Top, 2, r.Height); }
 
@@ -1203,34 +1202,34 @@ namespace BlueControls.Controls
                     }
                     else if (hp == 0)
                     {
-                        _eTxt.Left = Skin.PaddingSmal;
+                        _eTxt.DrawingPos.X = Skin.PaddingSmal;
                     }
                     else if (hp > _eTxt.Chars.Count - 1)
                     {
                         if (_eTxt.Width() > Width - Skin.PaddingSmal * 2)
                         {
-                            _eTxt.Left = Width - _eTxt.Width() - Skin.PaddingSmal * 2;
+                            _eTxt.DrawingPos.X = Width - _eTxt.Width() - Skin.PaddingSmal * 2;
                         }
                         else
                         {
-                            _eTxt.Left = Skin.PaddingSmal;
+                            _eTxt.DrawingPos.X = Skin.PaddingSmal;
                         }
                     }
                     else
                     {
                         var r = _eTxt.CursorPixelPosx(hp);
 
-                        if (r.X > Width - Skin.PaddingSmal * 4 - _eTxt.Left)
+                        if (r.X > Width - Skin.PaddingSmal * 4 - _eTxt.DrawingPos.X)
                         {
-                            _eTxt.Left = Width - Skin.PaddingSmal * 4 - r.X + 1;
+                            _eTxt.DrawingPos.X = Width - Skin.PaddingSmal * 4 - r.X + 1;
                         }
-                        else if (r.X + _eTxt.Left < Skin.PaddingSmal * 2)
+                        else if (r.X + _eTxt.DrawingPos.X < Skin.PaddingSmal * 2)
                         {
-                            _eTxt.Left = Skin.PaddingSmal * 2 - r.X + 1;
+                            _eTxt.DrawingPos.X = Skin.PaddingSmal * 2 - r.X + 1;
                         }
                     }
 
-                    if (_eTxt.Left > Skin.PaddingSmal) { _eTxt.Left = Skin.PaddingSmal; }
+                    if (_eTxt.DrawingPos.X > Skin.PaddingSmal) { _eTxt.DrawingPos.X = Skin.PaddingSmal; }
                     break;
 
                 case enSteuerelementVerhalten.Steuerelement_Anpassen:
@@ -1261,11 +1260,11 @@ namespace BlueControls.Controls
 
                 if (_Multiline)
                 {
-                    newState=  _eTxt.Height() > (Height - 16);
+                    newState = _eTxt.Height() > (Height - 16);
                 }
                 else
                 {
-                    newState= _eTxt.Height() > Height;
+                    newState = _eTxt.Height() > Height;
                 }
 
 
@@ -1286,13 +1285,13 @@ namespace BlueControls.Controls
 
             if (SliderY.Visible)
             {
-                _eTxt.Top = (int)-SliderY.Value;
+                _eTxt.DrawingPos.Y = (int)-SliderY.Value;
                 _eTxt.MaxWidth = DisplayRectangle.Width - Skin.PaddingSmal * 2 - SliderY.Width;
                 SliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
             }
             else
             {
-                _eTxt.Top = Skin.PaddingSmal;
+                _eTxt.DrawingPos.Y = Skin.PaddingSmal;
                 _eTxt.MaxWidth = Width - Skin.PaddingSmal * 2;
             }
 
@@ -1316,7 +1315,7 @@ namespace BlueControls.Controls
 
             if (!string.IsNullOrEmpty(_Suffix))
             {
-                var r = new Rectangle(_eTxt.Width() + _eTxt.Left, _eTxt.Top, 1000, 1000);
+                var r = new Rectangle(_eTxt.Width() + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
 
                 if (_eTxt.Chars.Count > 0)
                 {
@@ -1346,7 +1345,7 @@ namespace BlueControls.Controls
 
             var r = _eTxt.CursorPixelPosx(_Cursor_CharPos);
 
-            GR.DrawLine(new Pen(Color.Black), r.Left + _eTxt.Left, r.Top + _eTxt.Top, r.Left + _eTxt.Left, r.Bottom + _eTxt.Top);
+            GR.DrawLine(new Pen(Color.Black), r.Left + _eTxt.DrawingPos.X, r.Top + _eTxt.DrawingPos.Y, r.Left + _eTxt.DrawingPos.X, r.Bottom + _eTxt.DrawingPos.Y);
         }
 
         private void SliderY_ValueChange(object sender, System.EventArgs e)
@@ -1414,18 +1413,18 @@ namespace BlueControls.Controls
             if (_eTxt == null) { return -1; }
 
             // Das geht am Einfachsten.... 
-            if (PixX < _eTxt.Left && PixY < _eTxt.Top) { return 0; }
+            if (PixX < _eTxt.DrawingPos.X && PixY < _eTxt.DrawingPos.Y) { return 0; }
 
 
-            PixX = Math.Max(PixX, _eTxt.Left);
-            PixY = Math.Max(PixY, _eTxt.Top);
-            PixX = Math.Min(PixX, _eTxt.Left + _eTxt.Width());
-            PixY = Math.Min(PixY, _eTxt.Top + _eTxt.Height());
+            PixX = Math.Max(PixX, _eTxt.DrawingPos.X);
+            PixY = Math.Max(PixY, _eTxt.DrawingPos.Y);
+            PixX = Math.Min(PixX, _eTxt.DrawingPos.X + _eTxt.Width());
+            PixY = Math.Min(PixY, _eTxt.DrawingPos.Y + _eTxt.Height());
 
             var c = _eTxt.Char_Search(PixX, PixY);
             if (c < 0) { c = 0; }
 
-            if (c < _eTxt.Chars.Count && PixX > _eTxt.Left + _eTxt.Chars[c].Pos.X + _eTxt.Chars[c].Size.Width / 2.0) { return c + 1; }
+            if (c < _eTxt.Chars.Count && PixX > _eTxt.DrawingPos.X + _eTxt.Chars[c].Pos.X + _eTxt.Chars[c].Size.Width / 2.0) { return c + 1; }
 
             return c;
         }

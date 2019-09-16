@@ -118,8 +118,10 @@ namespace BlueControls
         }
 
 
-        public bool IsVisible(int MaxWidth, int MaxHeight)
+        public bool IsVisible(Rectangle DrawingArea)
         {
+            if (DrawingArea.Width == -1 || DrawingArea.Height ==-1 ) { return true; }
+
             if (MaxWidth > 0 && Pos.X > MaxWidth) { return false; }
             if (MaxHeight > 0 && Pos.Y > MaxHeight) { return false; }
 
@@ -237,13 +239,13 @@ namespace BlueControls
 
 
 
-        public void Draw(Graphics GR, int XPosMod, int YPosMod, float czoom)
+        public void Draw(Graphics GR, Point PosModificator, float czoom)
         {
 
             if (_Char < 20) { return; }
 
-            var DrawX = Pos.X * czoom + XPosMod;
-            var DrawY = Pos.Y * czoom + YPosMod;
+            var DrawX = Pos.X * czoom + PosModificator.X;
+            var DrawY = Pos.Y * czoom + PosModificator.Y;
 
             Font f = null;
 

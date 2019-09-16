@@ -57,8 +57,6 @@ namespace BlueControls
     {
         #region  Variablen-Deklarationen 
 
-        public int Top;
-        public int Left;
         public enAlignment Ausrichtung;
         public bool Multiline;
         public string AllowedChars;
@@ -68,12 +66,13 @@ namespace BlueControls
         private bool _AutoUmbruch;
         private double _Zeilenabstand = 1;
         private double vZBX_Pixel;
-        private int _MaxWidth;
-        private int _MaxHeight;
+        private int LineBreakWidth;
         private int vWidth;
         private int vHeight;
         private bool vPositionCorrect;
 
+        private Rectangle _DrawingArea;
+        public Point DrawingPos;
 
         private string _TMPHtmlText = string.Empty;
         private string _TMPPlainText = string.Empty;
@@ -95,16 +94,16 @@ namespace BlueControls
             _Design = enDesign.Undefiniert;
             _State = enStates.Standard;
             _Row = null;
-            Top = 0;
-            Left = 0;
+            DrawingPos = new Point(0, 0);
             Ausrichtung = enAlignment.Top_Left;
             Multiline = true;
             _AutoUmbruch = true;
             AllowedChars = string.Empty;
             Chars = new List<ExtChar>();
             vZBX_Pixel = 0;
-            _MaxWidth = -1;
-            _MaxHeight = -1;
+            _DrawingArea = new Rectangle(0, 0, -1, -1);
+            LineBreakWidth = -1;
+
             vWidth = 0;
             vHeight = 0;
             vPositionCorrect = true;
@@ -171,44 +170,46 @@ namespace BlueControls
             }
         }
 
-
         /// <summary>
         ///     Gibt den Maximalen Zeichenbereich zurück, oder legt diesen fest.
         /// </summary>
         /// <remarks></remarks>
-        public int MaxWidth
+        public int LineBreakWidth
         {
             get
             {
-                return _MaxWidth;
+                return _LineBreakWidth;
             }
             set
             {
 
-                if (_MaxWidth == value) { return; }
-                _MaxWidth = value;
+                if (_LineBreakWidth == value) { return; }
+                _LineBreakWidth = value;
                 ResetPosition(false);
             }
         }
 
 
+
         /// <summary>
-        ///     Gibt den Maximalen Zeichenbereich zurück, oder legt diesen fest.
+        /// Gibt den Zeichenbereich zurück, oder legt diesen fest.
         /// </summary>
         /// <remarks></remarks>
-        public int MaxHeight
+        public Rectangle DrawingArea
         {
             get
             {
-                return _MaxWidth;
+                return _DrawingArea;
             }
             set
             {
-                if (_MaxHeight == value) { return; }
-                _MaxHeight = value;
+
+                if (_DrawingArea.ToString() == value.ToString()) { return; }
+                _DrawingArea = new Rectangle(value.X, value.Y, value.Width, value.Height);
                 ResetPosition(false);
             }
         }
+
 
 
         public string HtmlText
@@ -424,7 +425,7 @@ namespace BlueControls
 
                     if (Akt > ZB_Char && Autoumbruch)
                     {
-                        if (IsX + Chars[Akt].Size.Width + 0.5 > _MaxWidth)
+                        if (IsX + Chars[Akt].Size.Width + 0.5 > _LineBreakWidth)
                         {
                             Akt = WordBreaker(Akt, ZB_Char);
                             IsX = vZBX_Pixel;
@@ -486,7 +487,7 @@ namespace BlueControls
                     if (Convert.ToBoolean(Ausrichtung & enAlignment.HorizontalCenter)) { KX = (_MaxWidth - Chars[Z2].Pos.X - Chars[Z2].Size.Width) / 2; }
 
                     var Z3 = 0;
-                    for (Z3 = Z1 ; Z3 <= Z2 ; Z3++)
+                    for (Z3 = Z1; Z3 <= Z2; Z3++)
                     {
                         Chars[Z3].Pos.X += KX;
                         Chars[Z3].Pos.Y += KY;
@@ -506,12 +507,12 @@ namespace BlueControls
             float Abstand = 0;
 
 
-            for (var z = Von ; z <= Nach ; z++)
+            for (var z = Von; z <= Nach; z++)
             {
                 Abstand = Math.Max(Abstand, Chars[z].Size.Height);
             }
 
-            for (var z = Von ; z <= Nach ; z++)
+            for (var z = Von; z <= Nach; z++)
             {
                 if (Chars[z].Char != ExtChar.Top)
                 {
@@ -580,33 +581,33 @@ namespace BlueControls
             if (!vPositionCorrect) { return; }
 
 
-            DrawStates(GR, czoom, Left, Top);
+            DrawStates(GR, czoom);
 
 
             foreach (var t in Chars)
             {
-                if (t.Char > 0 && t.IsVisible(_MaxWidth, _MaxHeight)) { t.Draw(GR, Left, Top, czoom); }
+                if (t.Char > 0 && t.IsVisible(_MaxWidth - DrawingPos.X, _MaxHeight)) { t.Draw(GR, DrawingPos, czoom); }
             }
 
 
         }
-        private void DrawStates(Graphics GR, float czoom, int XPosMod, int YPosMod)
+        private void DrawStates(Graphics GR, float czoom)
         {
-            DrawState(GR, czoom, XPosMod, YPosMod, enMarkState.Field);
-            DrawState(GR, czoom, XPosMod, YPosMod, enMarkState.MyOwn);
-            DrawState(GR, czoom, XPosMod, YPosMod, enMarkState.Other);
-            DrawState(GR, czoom, XPosMod, YPosMod, enMarkState.Ringelchen);
+            DrawState(GR, czoom, enMarkState.Field);
+            DrawState(GR, czoom, enMarkState.MyOwn);
+            DrawState(GR, czoom, enMarkState.Other);
+            DrawState(GR, czoom, enMarkState.Ringelchen);
         }
 
 
 
 
-        private void DrawState(Graphics GR, float czoom, int XPosMod, int YPosMod, enMarkState state)
+        private void DrawState(Graphics GR, float czoom, enMarkState state)
         {
 
             var tmas = -1;
 
-            for (var Pos = 0 ; Pos < Chars.Count ; Pos++)
+            for (var Pos = 0; Pos < Chars.Count; Pos++)
             {
                 var tempVar = Chars[Pos];
                 var marked = tempVar.Marking.HasFlag(state);
@@ -623,11 +624,11 @@ namespace BlueControls
                     {
                         if (Pos == Chars.Count - 1)
                         {
-                            DrawZone(GR, czoom, XPosMod, YPosMod, state, tmas, Pos);
+                            DrawZone(GR, czoom, state, tmas, Pos);
                         }
                         else
                         {
-                            DrawZone(GR, czoom, XPosMod, YPosMod, state, tmas, Pos - 1);
+                            DrawZone(GR, czoom, state, tmas, Pos - 1);
                         }
 
                         tmas = -1;
@@ -642,13 +643,13 @@ namespace BlueControls
 
 
 
-        private void DrawZone(Graphics GR, float czoom, int XPosMod, int YPosMod, enMarkState ThisState, int MarkStart, int MarkEnd)
+        private void DrawZone(Graphics GR, float czoom, enMarkState ThisState, int MarkStart, int MarkEnd)
         {
 
-            var StartX = Chars[MarkStart].Pos.X * czoom + XPosMod;
-            var StartY = Chars[MarkStart].Pos.Y * czoom + YPosMod;
-            var EndX = Chars[MarkEnd].Pos.X * czoom + XPosMod + Chars[MarkEnd].Size.Width * czoom;
-            var Endy = Chars[MarkEnd].Pos.Y * czoom + YPosMod + Chars[MarkEnd].Size.Height * czoom;
+            var StartX = Chars[MarkStart].Pos.X * czoom + DrawingPos.X;
+            var StartY = Chars[MarkStart].Pos.Y * czoom + DrawingPos.Y;
+            var EndX = Chars[MarkEnd].Pos.X * czoom + DrawingPos.X + Chars[MarkEnd].Size.Width * czoom;
+            var Endy = Chars[MarkEnd].Pos.Y * czoom + DrawingPos.Y + Chars[MarkEnd].Size.Height * czoom;
 
 
             switch (ThisState)
@@ -1163,7 +1164,7 @@ namespace BlueControls
                     break;
 
                 default:
-                   // Develop.DebugPrint("Unbekannter HTML-Code: " + Oricode);
+                    // Develop.DebugPrint("Unbekannter HTML-Code: " + Oricode);
                     break;
             }
 
@@ -1232,8 +1233,8 @@ namespace BlueControls
 
                 if (Chars[cZ].Char > 0 && Chars[cZ].Size.Width > 0)
                 {
-                    var X = Convert.ToBoolean(PixX >= Left + Chars[cZ].Pos.X && PixX <= Left + Chars[cZ].Pos.X + Chars[cZ].Size.Width);
-                    var Y = Convert.ToBoolean(PixY >= Top + Chars[cZ].Pos.Y && PixY <= Top + Chars[cZ].Pos.Y + Chars[cZ].Size.Height);
+                    var X = Convert.ToBoolean(PixX >= DrawingPos.X + Chars[cZ].Pos.X && PixX <= DrawingPos.X + Chars[cZ].Pos.X + Chars[cZ].Size.Width);
+                    var Y = Convert.ToBoolean(PixY >= DrawingPos.Y + Chars[cZ].Pos.Y && PixY <= DrawingPos.Y + Chars[cZ].Pos.Y + Chars[cZ].Size.Height);
 
                     //If PixX >= Left + vChars(cZ).Pos.X AndAlso PixX <= Left + vChars(cZ).Pos.X + vChars(cZ).Size.Width Then X = True
                     //If PixY >= Top + vChars(cZ).Pos.Y AndAlso PixY <= Top + vChars(cZ).Pos.Y + vChars(cZ).Size.Height Then Y = True
@@ -1247,7 +1248,7 @@ namespace BlueControls
                     double TmpDi;
                     if (X == false && Y)
                     {
-                        TmpDi = Math.Abs(PixX - (Left + Chars[cZ].Pos.X + Chars[cZ].Size.Width / 2.0));
+                        TmpDi = Math.Abs(PixX - (DrawingPos.X + Chars[cZ].Pos.X + Chars[cZ].Size.Width / 2.0));
                         if (TmpDi < XDi)
                         {
                             XNr = cZ;
@@ -1256,7 +1257,7 @@ namespace BlueControls
                     }
                     else if (X && Y == false)
                     {
-                        TmpDi = Math.Abs(PixY - (Top + Chars[cZ].Pos.Y + Chars[cZ].Size.Height / 2.0));
+                        TmpDi = Math.Abs(PixY - (DrawingPos.Y + Chars[cZ].Pos.Y + Chars[cZ].Size.Height / 2.0));
                         if (TmpDi < YDi)
                         {
                             YNr = cZ;
@@ -1298,8 +1299,8 @@ namespace BlueControls
 
         public void Delete(int Von, int Bis)
         {
-          var tempVar = Bis - Von;
-            for (var z = 1 ; z <= tempVar ; z++)
+            var tempVar = Bis - Von;
+            for (var z = 1; z <= tempVar; z++)
             {
                 if (Von < Chars.Count)
                 {
@@ -1409,7 +1410,7 @@ namespace BlueControls
         {
             try
             {
-                for (var z = first ; z <= last ; z++)
+                for (var z = first; z <= last; z++)
                 {
                     if (z >= Chars.Count) { return; }
 
@@ -1441,7 +1442,7 @@ namespace BlueControls
 
         public void Check(int Von, int Bis, bool Checkstat)
         {
-            for (var cc = Von ; cc <= Bis ; cc++)
+            for (var cc = Von; cc <= Bis; cc++)
             {
                 if (Chars[cc].State != enStates.Undefiniert)
                 {
@@ -1465,7 +1466,7 @@ namespace BlueControls
 
         public void StufeÄndern(int Von, int Bis, int stufe)
         {
-            for (var cc = Von ; cc <= Bis ; cc++)
+            for (var cc = Von; cc <= Bis; cc++)
             {
                 Chars[cc].Stufe = stufe;
             }
