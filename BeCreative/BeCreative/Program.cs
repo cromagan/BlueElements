@@ -21,6 +21,7 @@ namespace WindowsFormsApp1
             CultureInfo.DefaultThreadCurrentUICulture = culture;
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new BlueControls.Forms.frmTableView(null, true, true, true));
+            BlueBasics.Develop.TraceLogging_End();
         }
     }
 }

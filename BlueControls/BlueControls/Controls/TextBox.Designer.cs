@@ -49,7 +49,6 @@ namespace BlueControls.Controls
         {
             this.components = new Container();
             this.Blinker = new System.Windows.Forms.Timer(this.components);
-            this.SliderY = new Slider();
             this.SpellChecker = new BackgroundWorker();
             this.SuspendLayout();
             //
@@ -57,24 +56,6 @@ namespace BlueControls.Controls
             //
             Blinker.Interval = 500;
             Blinker.Tick += new EventHandler(Blinker_Tick);
-            //
-            //SliderY
-            //
-            SliderY.Dock = System.Windows.Forms.DockStyle.Right;
-            SliderY.LargeChange = 10.0D;
-            SliderY.Location = new Point(132, 0);
-            SliderY.Maximum = 100.0D;
-            SliderY.Minimum = 0.0D;
-            SliderY.MouseChange = 1.0D;
-            SliderY.Name = "SliderY";
-            SliderY.Orientation = enOrientation.Senkrecht;
-            SliderY.Size = new Size(18, 150);
-            SliderY.SmallChange = 48.0D;
-            SliderY.TabIndex = 0;
-            SliderY.TabStop = false;
-            SliderY.Value = 0.0D;
-            SliderY.Visible = false;
-            SliderY.ValueChanged += new EventHandler(SliderY_ValueChange);
             //
             //SpellChecker
             //
@@ -86,14 +67,12 @@ namespace BlueControls.Controls
             //
             //TextBox
             //
-            this.Controls.Add(SliderY);
             this.Cursor = System.Windows.Forms.Cursors.IBeam;
             Name = "TextBox";
             this.ResumeLayout(false);
         }
 
         internal System.Windows.Forms.Timer Blinker;
-        internal Slider SliderY;
         internal BackgroundWorker SpellChecker;
     }
 }

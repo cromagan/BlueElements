@@ -63,13 +63,16 @@ namespace BlueControls
         private enDesign _Design;
         private RowItem _Row;
         private enStates _State;
-        private bool _AutoUmbruch;
         private double _Zeilenabstand = 1;
         private double vZBX_Pixel;
-        private int LineBreakWidth;
-        private int vWidth;
-        private int vHeight;
-        private bool vPositionCorrect;
+
+
+        /// <summary>
+        /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll.
+        /// </summary>
+        private int _LineBreakWidth;
+        private int? _Width = null;
+        private int? _Height = null;
 
         private Rectangle _DrawingArea;
         public Point DrawingPos;
@@ -97,16 +100,14 @@ namespace BlueControls
             DrawingPos = new Point(0, 0);
             Ausrichtung = enAlignment.Top_Left;
             Multiline = true;
-            _AutoUmbruch = true;
             AllowedChars = string.Empty;
             Chars = new List<ExtChar>();
             vZBX_Pixel = 0;
             _DrawingArea = new Rectangle(0, 0, -1, -1);
-            LineBreakWidth = -1;
+            _LineBreakWidth = -1;
 
-            vWidth = 0;
-            vHeight = 0;
-            vPositionCorrect = true;
+            _Width = null;
+            _Height = null;
             _Zeilenabstand = 1;
             _TMPHtmlText = string.Empty;
             _TMPPlainText = string.Empty;
@@ -142,20 +143,6 @@ namespace BlueControls
 
         public List<ExtChar> Chars { get; private set; }
 
-        public bool Autoumbruch
-        {
-            get
-            {
-                return _AutoUmbruch;
-            }
-            set
-            {
-                if (value == _AutoUmbruch) { return; }
-                _AutoUmbruch = value;
-                ResetPosition(false);
-            }
-        }
-
         public double Zeilenabstand
         {
             get
@@ -171,9 +158,8 @@ namespace BlueControls
         }
 
         /// <summary>
-        ///     Gibt den Maximalen Zeichenbereich zurück, oder legt diesen fest.
+        /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll.
         /// </summary>
-        /// <remarks></remarks>
         public int LineBreakWidth
         {
             get
@@ -206,7 +192,7 @@ namespace BlueControls
 
                 if (_DrawingArea.ToString() == value.ToString()) { return; }
                 _DrawingArea = new Rectangle(value.X, value.Y, value.Width, value.Height);
-                ResetPosition(false);
+                ResetPosition(false); // Alingemenmts hängen davon ab
             }
         }
 
@@ -329,14 +315,14 @@ namespace BlueControls
 
         private void ResetPosition(bool AndTmpText)
         {
-            vPositionCorrect = false;
-            vWidth = 0;
-            vHeight = 0;
+
+            _Width = null;
+            _Height = null;
 
             if (AndTmpText)
             {
                 _TMPHtmlText = string.Empty;
-                _TMPHtmlText = string.Empty;
+                _TMPPlainText = string.Empty;
             }
         }
 
@@ -355,16 +341,12 @@ namespace BlueControls
             double IsX = 0;
             double IsY = 0;
             var RI = new List<string>();
-            vWidth = -1;
-            vHeight = -1;
+            _Width = 0;
+            _Height = 0;
 
-            if (_AutoUmbruch && _MaxWidth < 1) { return; }
+            // if (_AutoUmbruch && _MaxWidth < 1) { return; }
 
-            if (Chars.Count == 0)
-            {
-                vPositionCorrect = true;
-                return;
-            }
+            if (Chars.Count == 0) { return; }
 
             vZBX_Pixel = 0;
             IsX = vZBX_Pixel;
@@ -423,7 +405,7 @@ namespace BlueControls
                 if (!Chars[Akt].isSpace())
                 {
 
-                    if (Akt > ZB_Char && Autoumbruch)
+                    if (Akt > ZB_Char && _LineBreakWidth > 0)
                     {
                         if (IsX + Chars[Akt].Size.Width + 0.5 > _LineBreakWidth)
                         {
@@ -436,8 +418,8 @@ namespace BlueControls
                     }
 
 
-                    vWidth = Math.Max(vWidth, (int)(IsX + Chars[Akt].Size.Width + 0.5));
-                    vHeight = Math.Max(vHeight, (int)(IsY + Chars[Akt].Size.Height + 0.5));
+                    _Width = Math.Max((int)_Width, (int)(IsX + Chars[Akt].Size.Width + 0.5));
+                    _Height = Math.Max((int)_Height, (int)(IsY + Chars[Akt].Size.Height + 0.5));
                 }
 
                 Chars[Akt].Pos.X = (float)IsX;
@@ -474,8 +456,8 @@ namespace BlueControls
             if (Ausrichtung != enAlignment.Top_Left)
             {
                 float KY = 0;
-                if (Convert.ToBoolean(Ausrichtung & enAlignment.VerticalCenter)) { KY = (float)((_MaxHeight - vHeight) / 2.0); }
-                if (Convert.ToBoolean(Ausrichtung & enAlignment.Bottom)) { KY = _MaxHeight - vHeight; }
+                if (Convert.ToBoolean(Ausrichtung & enAlignment.VerticalCenter)) { KY = (float)((_DrawingArea.Height - (int)_Height) / 2.0); }
+                if (Convert.ToBoolean(Ausrichtung & enAlignment.Bottom)) { KY = _DrawingArea.Height - (int)_Height; }
 
                 foreach (var t in RI)
                 {
@@ -483,8 +465,8 @@ namespace BlueControls
                     var Z1 = int.Parse(o[0]);
                     var Z2 = int.Parse(o[1]);
                     float KX = 0;
-                    if (Convert.ToBoolean(Ausrichtung & enAlignment.Right)) { KX = _MaxWidth - Chars[Z2].Pos.X - Chars[Z2].Size.Width; }
-                    if (Convert.ToBoolean(Ausrichtung & enAlignment.HorizontalCenter)) { KX = (_MaxWidth - Chars[Z2].Pos.X - Chars[Z2].Size.Width) / 2; }
+                    if (Convert.ToBoolean(Ausrichtung & enAlignment.Right)) { KX = _DrawingArea.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width; }
+                    if (Convert.ToBoolean(Ausrichtung & enAlignment.HorizontalCenter)) { KX = (_DrawingArea.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width) / 2; }
 
                     var Z3 = 0;
                     for (Z3 = Z1; Z3 <= Z2; Z3++)
@@ -496,7 +478,6 @@ namespace BlueControls
             }
 
 
-            vPositionCorrect = true;
         }
 
 
@@ -576,17 +557,13 @@ namespace BlueControls
         public void Draw(Graphics GR, float czoom)
         {
 
-            if (!vPositionCorrect) { ReBreak(); }
-            if (!vPositionCorrect) { ReBreak(); }
-            if (!vPositionCorrect) { return; }
-
+            while (_Width == null) { ReBreak(); }
 
             DrawStates(GR, czoom);
 
-
             foreach (var t in Chars)
             {
-                if (t.Char > 0 && t.IsVisible(_MaxWidth - DrawingPos.X, _MaxHeight)) { t.Draw(GR, DrawingPos, czoom); }
+                if (t.Char > 0 && t.IsVisible(_DrawingArea, DrawingPos)) { t.Draw(GR, DrawingPos, czoom); }
             }
 
 
@@ -683,7 +660,7 @@ namespace BlueControls
         public Rectangle CursorPixelPosx(int CharPos)
         {
 
-            if (!vPositionCorrect) { ReBreak(); }
+            while (_Width == null) { ReBreak(); }
 
             if (CharPos > Chars.Count + 1) { CharPos = Chars.Count + 1; }
             if (Chars.Count > 0 && CharPos < 0) { CharPos = 0; }
@@ -1182,24 +1159,24 @@ namespace BlueControls
 
         public int Width()
         {
-            if (!vPositionCorrect) { ReBreak(); }
-            return vWidth;
+            while (_Width == null) { ReBreak(); }
+            return (int)_Width;
         }
 
         public int Height()
         {
-            if (!vPositionCorrect) { ReBreak(); }
-            return vHeight;
+            while (_Width == null) { ReBreak(); }
+            return (int)_Height;
         }
 
         public Size LastSize()
         {
 
-            if (!vPositionCorrect) { ReBreak(); }
+            while (_Width == null) { ReBreak(); }
 
-            if (vWidth < 5 || vHeight < 5) { return new Size(32, 16); }
+            if ((int)_Width < 5 || (int)_Height < 5) { return new Size(32, 16); }
 
-            return new Size(vWidth, vHeight);
+            return new Size((int)_Width, (int)_Height);
         }
 
 

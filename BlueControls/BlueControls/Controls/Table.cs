@@ -1405,7 +1405,7 @@ namespace BlueControls.Controls
 
             if (!ContentHolderCellColumn.DropdownBearbeitungErlaubt) { WithDropDown = false; }
             var dia = ColumnItem.UserEditDialogTypeInTable(ContentHolderCellColumn, WithDropDown);
-            if (dia == enEditTypeTable.None || dia == enEditTypeTable.FileHandling_InDateiSystem)
+            if (dia == enEditTypeTable.None)
             {
                 NotEditableInfo("Diese Spalte kann generell nicht bearbeitet werden.");
                 return;

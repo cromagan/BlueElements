@@ -33,7 +33,7 @@ namespace BlueControls.Forms
             InitializeComponent();
         }
 
-        protected bool _Closed;
+        public bool IsClosed { get; private set; }
 
         /// <summary>
         /// Die Dicke des linken und rechen Randes einer Form in Pixel
@@ -57,7 +57,7 @@ namespace BlueControls.Forms
 
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
         {
-            if (!_Closed && !IsDisposed) { base.OnPaint(e); }
+            if (!IsClosed && !IsDisposed) { base.OnPaint(e); }
         }
 
 
@@ -144,19 +144,20 @@ namespace BlueControls.Forms
         #endregion
 
 
-        protected override void OnClosed(System.EventArgs e)
-        {
-            Skin.Instance.SkinChanged -= SkinChanged;
-            _Closed = true;
-            base.OnClosed(e);
-        }
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
         {
-            if (_Closed) { return; }
+            //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.form.closed?view=netframework-4.8
+            if (IsClosed) { return; }
             base.OnFormClosing(e);
-            if (!e.Cancel) { _Closed = true; }
+            if (!e.Cancel)
+            {
+                IsClosed = true;
+                Skin.Instance.SkinChanged -= SkinChanged;
+            }
         }
+
+
 
         protected override void OnCreateControl()
         {
@@ -169,12 +170,12 @@ namespace BlueControls.Forms
 
         protected override void OnResize(System.EventArgs e)
         {
-            if (!_Closed) { base.OnResize(e); }
+            if (!IsClosed) { base.OnResize(e); }
         }
 
         protected override void OnSizeChanged(System.EventArgs e)
         {
-            if (!_Closed) { base.OnSizeChanged(e); }
+            if (!IsClosed) { base.OnSizeChanged(e); }
         }
 
 
@@ -188,17 +189,17 @@ namespace BlueControls.Forms
 
         protected override void OnResizeBegin(System.EventArgs e)
         {
-            if (!_Closed) { base.OnResizeBegin(e); }
+            if (!IsClosed) { base.OnResizeBegin(e); }
         }
 
         protected override void OnResizeEnd(System.EventArgs e)
         {
-            if (!_Closed) { base.OnResizeEnd(e); }
+            if (!IsClosed) { base.OnResizeEnd(e); }
         }
 
         protected override void OnInvalidated(System.Windows.Forms.InvalidateEventArgs e)
         {
-            if (!_Closed) { base.OnInvalidated(e); }
+            if (!IsClosed) { base.OnInvalidated(e); }
         }
 
         private void SkinChanged(object sender, System.EventArgs e)
@@ -224,13 +225,13 @@ namespace BlueControls.Forms
             var erT = new ExtText(enDesign.Button, enStates.Standard);
             var Buts = new List<Button>();
 
-            for (var Z = Names.GetUpperBound(0) ; Z > -1 ; Z--)
+            for (var Z = Names.GetUpperBound(0); Z > -1; Z--)
             {
                 if (!string.IsNullOrEmpty(Names[Z]))
                 {
                     var B = new Button();
 
-                    erT.Autoumbruch = false;
+                    erT.LineBreakWidth = -1;
                     erT.PlainText = Names[Z];
                     B = new Button();
                     B.Name = Z.ToString();

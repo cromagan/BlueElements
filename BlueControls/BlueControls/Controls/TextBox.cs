@@ -69,6 +69,7 @@ namespace BlueControls.Controls
         private bool _Multiline;
         private bool _MustCheck = true;
         private string _Suffix = string.Empty;
+        private Slider _SliderY = null;
 
         private DateTime _LastUserActionForSpellChecking = DateTime.Now;
 
@@ -158,8 +159,13 @@ namespace BlueControls.Controls
                 if (_Verhalten == value) { return; }
                 _Verhalten = value;
 
-                SliderY.Visible = false;
-                SliderY.Value = 0;
+                if (_SliderY != null)
+                {
+                    _SliderY.Visible = false;
+                    _SliderY.Value = 0;
+                }
+
+
                 Invalidate();
             }
         }
@@ -279,8 +285,11 @@ namespace BlueControls.Controls
 
                 _Multiline = value;
                 GenerateETXT(false);
-                SliderY.Visible = false;
-                SliderY.Value = 0;
+                if (_SliderY != null)
+                {
+                    _SliderY.Visible = false;
+                    _SliderY.Value = 0;
+                }
                 Invalidate();
             }
         }
@@ -866,7 +875,7 @@ namespace BlueControls.Controls
         public new bool Focused()
         {
             if (base.Focused) { return true; }
-            if (SliderY.Focused()) { return true; }
+            if (_SliderY != null && _SliderY.Focused()) { return true; }
             return false;
         }
 
@@ -986,16 +995,16 @@ namespace BlueControls.Controls
             if (ResetCoords)
             {
                 // Hier Standard-Werte Setzen, die Draw-Routine setzt bei Bedarf um
-                if (SliderY != null)
+                if (_SliderY != null)
                 {
-                    SliderY.Visible = false;
-                    SliderY.Value = 0;
+                    _SliderY.Visible = false;
+                    _SliderY.Value = 0;
                 }
 
                 _eTxt.DrawingPos.X = Skin.PaddingSmal;
                 _eTxt.DrawingPos.Y = Skin.PaddingSmal;
                 _eTxt.DrawingArea = new Rectangle(0, 0, -1, -1);
-                _eTxt.Autoumbruch = false;
+                _eTxt.LineBreakWidth = -1;
             }
 
 
@@ -1163,7 +1172,7 @@ namespace BlueControls.Controls
             if (_eTxt == null) { GenerateETXT(true); }
 
 
-            var sliderPossible = false;
+
 
             if (state == enStates.Checked_Disabled)
             {
@@ -1174,8 +1183,8 @@ namespace BlueControls.Controls
 
             if (state == enStates.Standard_Disabled)
             {
-                if (_MarkStart > -1) { Develop.DebugPrint("Markstart:" + _MarkStart); }
-                if (_MarkEnd > -1) { Develop.DebugPrint("_MarkEnd:" + _MarkStart); }
+                if (_MarkStart > -1) { Develop.DebugPrint("Disabled & Markstart:" + _MarkStart); }
+                if (_MarkEnd > -1) { Develop.DebugPrint("Disabled & MarkEnd:" + _MarkStart); }
                 MarkClear();
             }
 
@@ -1185,16 +1194,33 @@ namespace BlueControls.Controls
             _eTxt.Design = GetDesign();
             _eTxt.State = state;
 
+
+
+            var sliderVisible = false;
+            var effectWidth = Width;
+            if (_Multiline)
+            {
+                sliderVisible = _eTxt.Height() > (Height - 16);
+            }
+            else
+            {
+                sliderVisible = _eTxt.Height() > Height;
+            }
+
+            if (sliderVisible) { effectWidth = Width - 18; }
+
+
             switch (_Verhalten)
             {
                 case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
-                    _eTxt.Autoumbruch = true;
-                    sliderPossible = true;
+                    _eTxt.LineBreakWidth = effectWidth - Skin.PaddingSmal * 2;
+                    _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
                     break;
 
                 case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
                     var hp = HotPosition();
-                    sliderPossible = true;
+                    _eTxt.LineBreakWidth = -1;
+                    _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
 
                     if (hp < 0)
                     {
@@ -1233,6 +1259,9 @@ namespace BlueControls.Controls
                     break;
 
                 case enSteuerelementVerhalten.Steuerelement_Anpassen:
+                    sliderVisible = false;
+                    _eTxt.LineBreakWidth = -1;
+
                     if (this is ComboBox)
                     {
                         Width = Math.Max(_eTxt.Width() + Skin.PaddingSmal * 3 + 20, Width);
@@ -1242,11 +1271,17 @@ namespace BlueControls.Controls
                         Width = Math.Max(_eTxt.Width() + Skin.PaddingSmal * 3, Width);
                     }
                     Height = Math.Max(_eTxt.Height() + Skin.PaddingSmal * 2, Height);
+
+
+                    _eTxt.DrawingArea = new Rectangle(0, 0, Width, Height);
+
+
                     break;
 
                 case enSteuerelementVerhalten.Text_Abschneiden:
-                    _eTxt.MaxWidth = Width - Skin.PaddingSmal * 2;
-                    _eTxt.MaxHeight = Height; // Sollte Egal sein........
+                    sliderVisible = false;
+                    _eTxt.LineBreakWidth = -1;
+                    _eTxt.DrawingArea = new Rectangle(0, 0, Width, Height);
                     break;
 
                 default:
@@ -1254,45 +1289,28 @@ namespace BlueControls.Controls
                     break;
             }
 
-            if (sliderPossible)
+            if (sliderVisible)
             {
-                bool newState;
+                GetSlider();
 
-                if (_Multiline)
-                {
-                    newState = _eTxt.Height() > (Height - 16);
-                }
-                else
-                {
-                    newState = _eTxt.Height() > Height;
-                }
+                _SliderY.Visible = true;
 
-
-                if (SliderY.Visible != newState)
-                {
-                    SliderY.Visible = newState;
-                    if (newState)
-                    {
-                        SliderY.Width = 18;
-                        SliderY.Height = Height;
-                        SliderY.Left = Width - SliderY.Width;
-                        SliderY.Top = 0;
-                    }
-
-                }
-            }
-
-
-            if (SliderY.Visible)
-            {
-                _eTxt.DrawingPos.Y = (int)-SliderY.Value;
-                _eTxt.MaxWidth = DisplayRectangle.Width - Skin.PaddingSmal * 2 - SliderY.Width;
-                SliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
+                _SliderY.Width = 18;
+                _SliderY.Height = Height;
+                _SliderY.Left = Width - _SliderY.Width;
+                _SliderY.Top = 0;
+                _eTxt.DrawingPos.Y = (int)-_SliderY.Value;
+                _SliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
             }
             else
             {
+                if (_SliderY != null)
+                {
+                    _SliderY.Visible = false;
+                    _SliderY.Value = 0;
+                }
+
                 _eTxt.DrawingPos.Y = Skin.PaddingSmal;
-                _eTxt.MaxWidth = Width - Skin.PaddingSmal * 2;
             }
 
 
@@ -1357,12 +1375,9 @@ namespace BlueControls.Controls
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e)
         {
             base.OnMouseWheel(e);
-            if (!SliderY.Visible) { return; }
+            if (_SliderY == null || !_SliderY.Visible) { return; }
             _LastUserActionForSpellChecking = DateTime.Now;
-
-            SliderY.DoMouseWheel(e);
-
-
+            _SliderY.DoMouseWheel(e);
         }
 
 
@@ -1917,5 +1932,36 @@ namespace BlueControls.Controls
             MarkClear();
             base.OnEnabledChanged(e);
         }
+
+
+        private Slider GetSlider()
+        {
+
+            if (_SliderY != null) { return _SliderY; }
+
+            _SliderY = new Slider();
+
+            _SliderY.Dock = System.Windows.Forms.DockStyle.Right;
+            _SliderY.LargeChange = 10.0D;
+            _SliderY.Location = new Point(Width - 18, 0);
+            _SliderY.Maximum = 100.0D;
+            _SliderY.Minimum = 0.0D;
+            _SliderY.MouseChange = 1.0D;
+            _SliderY.Name = "SliderY";
+            _SliderY.Orientation = enOrientation.Senkrecht;
+            _SliderY.Size = new Size(18, Height);
+            _SliderY.SmallChange = 48.0D;
+            _SliderY.TabIndex = 0;
+            _SliderY.TabStop = false;
+            _SliderY.Value = 0.0D;
+            _SliderY.Visible = true;
+            _SliderY.ValueChanged += new EventHandler(SliderY_ValueChange);
+            Controls.Add(_SliderY);
+
+            return _SliderY;
+        }
+
+
+
     }
 }

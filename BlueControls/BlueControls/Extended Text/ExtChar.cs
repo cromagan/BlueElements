@@ -118,15 +118,15 @@ namespace BlueControls
         }
 
 
-        public bool IsVisible(Rectangle DrawingArea)
+        public bool IsVisible(Rectangle DrawingArea, Point DrawingPos)
         {
-            if (DrawingArea.Width == -1 || DrawingArea.Height ==-1 ) { return true; }
+            if (DrawingArea.Width < 1 && DrawingArea.Height < 1) { return true; }
 
-            if (MaxWidth > 0 && Pos.X > MaxWidth) { return false; }
-            if (MaxHeight > 0 && Pos.Y > MaxHeight) { return false; }
+            if (DrawingArea.Width > 0 && Pos.X + DrawingPos.X > DrawingArea.Right) { return false; }
+            if (DrawingArea.Height > 0 && Pos.Y + DrawingPos.Y > DrawingArea.Bottom) { return false; }
 
-            if (Pos.X + Size.Width < -1) { return false; }
-            if (Pos.Y + Size.Height < -1) { return false; }
+            if (Pos.X + DrawingPos.X + Size.Width < DrawingArea.Left) { return false; }
+            if (Pos.Y + DrawingPos.Y + Size.Height < DrawingArea.Top) { return false; }
 
             return true;
         }
@@ -290,9 +290,9 @@ namespace BlueControls
                 {
                     if (_Font.Outline)
                     {
-                        for (var PX = -1 ; PX <= 1 ; PX++)
+                        for (var PX = -1; PX <= 1; PX++)
                         {
-                            for (var PY = -1 ; PY <= 1 ; PY++)
+                            for (var PY = -1; PY <= 1; PY++)
                             {
                                 GR.DrawString(c.ToString(), f, _Font.Brush_Color_Outline, DrawX + PX, DrawY + PY, StringFormat.GenericTypographic);
                             }

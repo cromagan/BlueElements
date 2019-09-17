@@ -188,7 +188,7 @@ namespace BlueBasics
                     return Constants.Char_Numerals + " :.";
 
                 case enDataFormat.Link_To_Filesystem:
-                    return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + ",./:_ +-()'";
+                    return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + ",.\\:_ +-()'";
 
                 case enDataFormat.LinkedCell:
                     Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
@@ -298,6 +298,10 @@ namespace BlueBasics
                     Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
                     return true;
 
+                case enDataFormat.Link_To_Filesystem:
+                    return Convert.ToBoolean(il < 257);
+
+
                 default:
                     Develop.DebugPrint(format);
                     return true;
@@ -319,6 +323,7 @@ namespace BlueBasics
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.Bit:
                 case enDataFormat.RelationText:
+                case enDataFormat.Link_To_Filesystem:
                     return true;
 
                 case enDataFormat.Datum_und_Uhrzeit:
@@ -358,6 +363,7 @@ namespace BlueBasics
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
+                case enDataFormat.Link_To_Filesystem:
                     return true;
 
 

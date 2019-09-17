@@ -329,19 +329,30 @@ namespace BlueControls.Controls
                     //eText.Zeilenabstand = _Zeilenabstand;
                 }
                 eText.State = state;
+                eText.Multiline = true;
 
-                if (Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen))
+                switch (_TextAnzeigeverhalten)
                 {
-                    eText.Autoumbruch = false;
-                    Size = eText.LastSize();
-                }
-                else
-                {
-                    eText.Autoumbruch = Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Scrollen_mit_Textumbruch);
-                    eText.MaxWidth = base.Size.Width;
-                    eText.MaxHeight = base.Size.Height;
-                }
 
+                    case enSteuerelementVerhalten.Steuerelement_Anpassen:
+                        eText.LineBreakWidth = -1;
+                        Size = eText.LastSize();
+                        break;
+
+                    case enSteuerelementVerhalten.Text_Abschneiden:
+                        eText.LineBreakWidth = -1;
+                        break;
+
+                    case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
+                        eText.LineBreakWidth = base.Size.Width;
+                        eText.DrawingArea = new Rectangle(0,0, base.Size.Width, base.Size.Height);
+                        break;
+
+                    case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
+                        eText.LineBreakWidth = -1;
+                        eText.DrawingArea = new Rectangle(0, 0, base.Size.Width, base.Size.Height);
+                        break;
+                }
             }
 
             if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird

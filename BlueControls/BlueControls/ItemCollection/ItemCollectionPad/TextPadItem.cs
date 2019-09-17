@@ -278,8 +278,7 @@ namespace BlueControls.ItemCollection
 
             if (Style == PadStyles.Undefiniert) { return; }
 
-            etxt.Left = DCoordinates.Left;
-            etxt.Top = DCoordinates.Top;
+            etxt.DrawingPos = new Point(DCoordinates.Left, DCoordinates.Top);
 
             if (!string.IsNullOrEmpty(_ReadableText) || !ForPrinting)
             {
@@ -384,8 +383,7 @@ namespace BlueControls.ItemCollection
                     {
                         etxt = new ExtText(Style, Parent.SheetStyle);
                     }
-                    etxt.Autoumbruch = true;
-                    etxt.Ausrichtung = _Align;
+
 
                     if (!string.IsNullOrEmpty(_ReadableText))
                     {
@@ -401,9 +399,11 @@ namespace BlueControls.ItemCollection
 
                 // da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
                 // muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
+                etxt.DrawingArea =
 
-                etxt.MaxWidth = (int)(UsedArea().Width / AdditionalScale / Parent.SheetStyleScale); // CInt(DCoordinates.Width / CSng(cZoom * (ausgleich + 0.05)))
-                etxt.MaxHeight = 10000; //CInt(DCoordinates.Height / cZoom)
+                etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / Parent.SheetStyleScale), -1);
+                etxt.LineBreakWidth = etxt.DrawingArea.Width;
+                etxt.Ausrichtung = _Align;
 
                 p_RU.Y = Math.Max(p_LO.Y + etxt.Height() * AdditionalScale * Parent.SheetStyleScale, p_LO.Y + 10);
                 p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * AdditionalScale * Parent.SheetStyleScale);

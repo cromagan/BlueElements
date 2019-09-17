@@ -213,7 +213,6 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
         #region  Variablen 
-        private bool isClosed;
 
         private readonly ColumnItem Column;
 
@@ -234,8 +233,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void CloseAndDispose(string Comand, FilterItem NewFilter)
         {
-            if (isClosed) { return; }
-            isClosed = true;
+            if (IsClosed) { return; }
             Close();
             OnFilterComand(new FilterComandEventArgs(Comand, Column, NewFilter));
 
@@ -302,7 +300,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private void Something_LostFocus(object sender, System.EventArgs e)
         {
 
-            if (isClosed) { return; }
+            if (IsClosed) { return; }
 
             if (TXTBox.Focused()) { return; }
             if (Focused) { return; }

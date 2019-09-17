@@ -1072,11 +1072,6 @@ namespace BlueControls.Forms
         }
 
 
-        protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e)
-        {
-            TraceLogging_End();
-            base.OnFormClosed(e);
-        }
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
         {

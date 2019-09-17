@@ -139,7 +139,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpLinkedDatabase = new BlueControls.Controls.GroupBox();
             this.grpColumnsForLinkedDatabase = new BlueControls.Controls.GroupBox();
             this.grpVerlinkteZellen = new BlueControls.Controls.GroupBox();
-            this.caption5 = new BlueControls.Controls.Caption();
             this.txbZeichenkette = new BlueControls.Controls.TextBox();
             this.capZeichenkette = new BlueControls.Controls.TextBox();
             this.line1 = new BlueControls.Controls.Line();
@@ -1302,7 +1301,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.grpVerlinkteZellen.CausesValidation = false;
-            this.grpVerlinkteZellen.Controls.Add(this.caption5);
             this.grpVerlinkteZellen.Controls.Add(this.txbZeichenkette);
             this.grpVerlinkteZellen.Controls.Add(this.capZeichenkette);
             this.grpVerlinkteZellen.Controls.Add(this.line1);
@@ -1316,14 +1314,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpVerlinkteZellen.Name = "grpVerlinkteZellen";
             this.grpVerlinkteZellen.Size = new System.Drawing.Size(872, 224);
             this.grpVerlinkteZellen.Text = "Format: Verlinkte Zellen";
-            // 
-            // caption5
-            // 
-            this.caption5.CausesValidation = false;
-            this.caption5.Location = new System.Drawing.Point(8, 192);
-            this.caption5.Name = "caption5";
-            this.caption5.Size = new System.Drawing.Size(320, 23);
-            this.caption5.Text = "Zeile nicht gefunden in Zieldatenbank:";
             // 
             // txbZeichenkette
             // 
@@ -1543,7 +1533,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private GroupBox grpBildCode;
         private TextBox txbPrefix;
         private Caption caption7;
-        private Caption caption5;
         private Button btnStandard;
         private Button btnKompakteAnzeige;
         private TabPage tabSpezial;

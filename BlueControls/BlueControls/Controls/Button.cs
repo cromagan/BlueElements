@@ -440,9 +440,9 @@ namespace BlueControls.Controls
                 if (etxt == null) { etxt = new ExtText(vButtonTypex, vStatex, _SkinRow); }
                 etxt.State = vStatex; // Fall es nicht nothing ist
                 etxt.Zeilenabstand = 0.65;
-                etxt.Top = 43;
-                etxt.MaxHeight = 22;
-                etxt.MaxWidth = DisplayRectangle.Width;
+                etxt.DrawingPos = new Point(0,43);
+                etxt.DrawingArea = new Rectangle(0, 43, DisplayRectangle.Width, 22);
+                etxt.LineBreakWidth = DisplayRectangle.Width - Skin.PaddingSmal/2;
                 etxt.Ausrichtung = enAlignment.Horizontal_Vertical_Center;
                 etxt.HtmlText = BlueDatabase.LanguageTool.DoTranslate(vtext, Translate);
                 etxt.Draw(GR, 1);
@@ -461,8 +461,9 @@ namespace BlueControls.Controls
 
                 if (etxt == null) { etxt = new ExtText(vButtonTypex, vStatex, _SkinRow); }
                 etxt.State = vStatex;
-                etxt.MaxHeight = DisplayRectangle.Height;
-                etxt.MaxWidth = DisplayRectangle.Width;
+                etxt.LineBreakWidth = DisplayRectangle.Width;
+                //etxt.MaxHeight = DisplayRectangle.Height;
+                //etxt.MaxWidth = DisplayRectangle.Width;
                 etxt.HtmlText = tt;
                 etxt.Draw(GR, 1);
 
