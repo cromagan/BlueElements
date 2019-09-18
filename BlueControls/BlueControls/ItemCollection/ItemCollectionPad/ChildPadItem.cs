@@ -144,7 +144,7 @@ namespace BlueControls.ItemCollection
 
                 var r = UsedArea();
 
-                while (r.Width* cZoom > 8000 || r.Height * cZoom > 8000)
+                while (r.Width * cZoom > 8000 || r.Height * cZoom > 8000)
                 {
                     cZoom = cZoom * 0.8m; // Kann ruhig verändert werden, tut nix zur Sache, DKoordinates reichen
                 }
@@ -345,15 +345,15 @@ namespace BlueControls.ItemCollection
 
         public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY)
         {
-            if (PadInternal.Item.Count == 0)
-            {
-                return false;
-            }
+            if (PadInternal.Item.Count == 0) { return false; }
 
 
             var l1 = DrawingKoordinates(cZoom, MoveX, MoveY);
             var l2 = PadInternal.MaxBounds();
-            var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
+            decimal tZo = 1;
+            if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
+
+
             PadInternal.SetZoom(1);
 
             // Coordinaten auf Maßstab 1/1 scalieren

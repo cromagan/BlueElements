@@ -83,7 +83,7 @@ namespace BlueDatabase
 
             var Inhalt = _cells[CellKey].Value;
             _cells.Remove(CellKey);
-            DoSpecialFormats(Column, RowKey, Inhalt, false, false);
+          //  DoSpecialFormats(Column, RowKey, Inhalt, false, false, true);
         }
 
         internal void Load_310(ColumnItem _Column, RowItem _Row, string Value, int Width, int Height)
@@ -326,7 +326,14 @@ namespace BlueDatabase
 
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Column"></param>
+        /// <param name="RowKey"></param>
+        /// <param name="PreviewsValue"></param>
+        /// <param name="FreezeMode"></param>
+        /// <param name="DoAlways">Auch wenn der PreviewsValue gleich dem CurrentValue ist, wird die Routine durchberechnet</param>
         public void DoSpecialFormats(ColumnItem Column, int RowKey, string PreviewsValue, bool FreezeMode, bool DoAlways)
         {
             if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
@@ -381,14 +388,22 @@ namespace BlueDatabase
             if (Column.KeyColumnKey > -1)
             {
                 ChangeValueOfKey(CurrentValue, Column, RowKey, FreezeMode);
+
             }
 
 
         }
 
+        /// <summary>
+        /// Ändert bei allen Zeilen - die den gleichen Key (KeyColumn, Relation) benutzen wie diese Zeile - den Inhalt der Zellen ab um diese gleich zu halten.
+        /// </summary>
+        /// <param name="currentvalue"></param>
+        /// <param name="column"></param>
+        /// <param name="rowKey"></param>
+        /// <param name="freezeMode"></param>
         private void ChangeValueOfKey(string currentvalue, ColumnItem column, int rowKey, bool freezeMode)
         {
-            var keyc = Database.Column.SearchByKey(column.KeyColumnKey);
+            var keyc = Database.Column.SearchByKey(column.KeyColumnKey); // Schlüsselspalte für diese Spalte bestimmen
             if (keyc is null) { return; }
 
             List<RowItem> Rows = null;
@@ -413,6 +428,14 @@ namespace BlueDatabase
 
         }
 
+
+        /// <summary>
+        /// Ändert bei allen anderen Spalten den Inhalt der Zelle ab (um diese gleich zuhalten), wenn diese Spalte der Key für die anderen ist.
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="rowKey"></param>
+        /// <param name="currentvalue"></param>
+        /// <param name="freezeMode"></param>
         private void SetSameValueOfKey(ColumnItem column, int rowKey, string currentvalue, bool freezeMode)
         {
 
@@ -461,7 +484,13 @@ namespace BlueDatabase
 
 
 
-
+        /// <summary>
+        /// Ändert die anderen Zeilen dieser Spalte, so dass der verknüpfte Text bei dieser und den anderen Spalten gleich ist ab.
+        /// </summary>
+        /// <param name="Column"></param>
+        /// <param name="Row"></param>
+        /// <param name="PreviewsValue"></param>
+        /// <param name="FreezeMode"></param>
         private void RepairRelationText(ColumnItem Column, RowItem Row, string PreviewsValue, bool FreezeMode)
         {
             var CurrentString = GetString(Column, Row);
