@@ -596,6 +596,7 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxDropDownKey.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxDropDownKey.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxDropDownKey.Location = new System.Drawing.Point(232, 344);
             this.cbxDropDownKey.Name = "cbxDropDownKey";
             this.cbxDropDownKey.Size = new System.Drawing.Size(296, 24);
@@ -770,6 +771,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxVorschlagSpalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxVorschlagSpalte.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxVorschlagSpalte.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxVorschlagSpalte.Location = new System.Drawing.Point(408, 256);
             this.cbxVorschlagSpalte.Name = "cbxVorschlagSpalte";
             this.cbxVorschlagSpalte.Size = new System.Drawing.Size(496, 24);

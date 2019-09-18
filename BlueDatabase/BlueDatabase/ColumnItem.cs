@@ -2678,7 +2678,8 @@ namespace BlueDatabase
 
 
         /// <summary>
-        /// Gibt den Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt. Existiert in keiner Spalte und auch nicht auf der Festplatte.
+        /// Gibt den Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt.
+        /// Existiert in keiner Spalte und auch nicht auf der Festplatte.
         /// </summary>
         public string BestFile()
         {
@@ -2688,35 +2689,35 @@ namespace BlueDatabase
         /// <summary>
         /// Gibt den Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt.
         /// </summary>
-        /// <param name="filenameo">Der Dateiname. Ein evtl. fehlender Pfad und ein evtl. fehlendes Suffix werden ergänzt. </param>
-        /// <param name="MustBeFree">Wenn True wird ein Dateiname zurückgegeben, der noch nicht im Verzeichnis vorhanden ist.</param>
+        /// <param name="filename">Der Dateiname. Ein evtl. fehlender Pfad und ein evtl. fehlendes Suffix werden ergänzt. </param>
+        /// <param name="mustBeFree">Wenn True wird ein Dateiname zurückgegeben, der noch nicht im Verzeichnis vorhanden ist.</param>
         /// <returns> Gibt den Dateinamen mit Pfad und Suffix zurück</returns>
-        public string BestFile(string filenameo, bool mustBeFree)
+        public string BestFile(string filename, bool mustBeFree)
         {
 
             if (_Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!"); }
 
             //FileNameWithoutPath = FileNameWithoutPath.RemoveChars(Constants.Char_DateiSonderZeichen); // Falls ein Korrekter Pfad übergeben wurde, würde er hier verstümmelt werden
-            if (string.IsNullOrEmpty(filenameo))
+            if (string.IsNullOrEmpty(filename))
             {
                 if (!mustBeFree) { return string.Empty; }
-                filenameo = (_Name + DateTime.Now.ToString(Constants.Format_Date)).RemoveChars(Constants.Char_DateiSonderZeichen + " .");
+                filename = (_Name + DateTime.Now.ToString(Constants.Format_Date)).RemoveChars(Constants.Char_DateiSonderZeichen + " .");
             }
 
-            if (filenameo.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
+            if (filename.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
 
 
 
             // Wenn FileNameWithoutPath kein Suffix hat, das Standard Suffix hinzufügen
-            var suffix = filenameo.FileSuffix();
-            var filename = filenameo;
+            var suffix = filename.FileSuffix();
+            var cleanfilename = filename;
             if (string.IsNullOrEmpty(suffix))
             {
                 suffix = _BestFile_StandardSuffix;
             }
             else
             {
-                filename = filenameo.FileNameWithoutSuffix();
+                cleanfilename = filename.FileNameWithoutSuffix();
             }
 
             // Den Standardfolder benutzen. Falls dieser fehlt, 'Files' benutzen.
@@ -2731,7 +2732,7 @@ namespace BlueDatabase
 
             if (!mustBeFree)
             {
-                return (directory.TrimEnd("\\") + "\\" + filename + "." + suffix.ToLower()).TrimEnd(".");
+                return (directory.TrimEnd("\\") + "\\" + cleanfilename + "." + suffix.ToLower()).TrimEnd(".");
             }
 
 
@@ -2741,7 +2742,7 @@ namespace BlueDatabase
             do
             {
                 nr++;
-                var tmpname = filename;
+                var tmpname = cleanfilename;
                 if (nr > 0) { tmpname = tmpname + "_" + nr.ToString(Constants.Format_Integer5); }
                 ok = true;
 
@@ -2768,13 +2769,6 @@ namespace BlueDatabase
 
 
             } while (true);
-
-
-
-
-
-
-
         }
 
 
@@ -2787,7 +2781,6 @@ namespace BlueDatabase
 
         public List<string> Autofilter_ItemList(FilterCollection vFilter)
         {
-
             if (vFilter == null || vFilter.Count() < 0) { return Contents(null); }
 
             var tfilter = new FilterCollection(Database);
@@ -2798,15 +2791,7 @@ namespace BlueDatabase
             }
 
             return Contents(tfilter);
-
         }
-
-
-
-
-
-
-
 
         public static enEditTypeTable UserEditDialogTypeInTable(ColumnItem vColumn, bool DoDropDown)
         {

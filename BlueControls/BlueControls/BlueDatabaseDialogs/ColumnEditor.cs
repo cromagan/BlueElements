@@ -236,8 +236,8 @@ namespace BlueControls.BlueDatabaseDialogs
 
             foreach (var ThisColumn in _Column.Database.Column)
             {
-                if ((ThisColumn.Format == enDataFormat.RelationText || !ThisColumn.MultiLine) && ThisColumn.Format.CanBeChangedByRules()) { cbxSchlüsselspalte.Item.Add(ThisColumn); }
-                if (ThisColumn.Format.CanBeChangedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase())
+                if ((ThisColumn.Format == enDataFormat.RelationText || !ThisColumn.MultiLine) && ThisColumn.Format.CanBeCheckedByRules()) { cbxSchlüsselspalte.Item.Add(ThisColumn); }
+                if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase())
                 {
                     cbxRowKeyInColumn.Item.Add(ThisColumn);
                     cbxDropDownKey.Item.Add(ThisColumn);

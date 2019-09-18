@@ -62,14 +62,14 @@ Class frmMain
         pf = pf.PathParent(3) & "BlueControls\BlueControls\Ressourcen\Skin\"
 
         ReDim DB(2)
-        DB(0) = New Database(False, AddressOf Table.Database_NeedPassword, AddressOf CreativePad.GenerateLayoutFromRow, AddressOf CreativePad.RenameColumnInLayout) ' MUSS IMMER  Windows10 BLEIBEN! VORLAGE!
-        DB(0).LoadFromDisk(pf & "Windows10.skn")
+        DB(0) = New Database(False) ' MUSS IMMER  Windows10 BLEIBEN! VORLAGE!
+        DB(0).Load(pf & "Windows10.skn")
 
-        DB(2) = New Database(False, AddressOf Table.Database_NeedPassword, AddressOf CreativePad.GenerateLayoutFromRow, AddressOf CreativePad.RenameColumnInLayout)
-        DB(2).LoadFromDisk(pf & "XP.skn")
+        DB(2) = New Database(False)
+        DB(2).Load(pf & "XP.skn")
 
-        DB(1) = New Database(False, AddressOf Table.Database_NeedPassword, AddressOf CreativePad.GenerateLayoutFromRow, AddressOf CreativePad.RenameColumnInLayout)
-        DB(1).LoadFromDisk(pf & "GlossyCyan.skn")
+        DB(1) = New Database(False)
+        DB(1).Load(pf & "GlossyCyan.skn")
 
 
         For z As Integer = 0 To DB.GetUpperBound(0)

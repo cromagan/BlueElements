@@ -1552,7 +1552,7 @@ namespace BlueDatabase
 
 
                 //case enAction.Ist_Jünger_Als:
-                //    return DateTime.Now.Subtract(Row.CellGetDate(Row.Database.Column.SysRowCreateDate())).TotalHours < int.Parse(OneValue);
+                //    return DateTime.Now.Subtract(Row.CellGetDateTime(Row.Database.Column.SysRowCreateDate())).TotalHours < int.Parse(OneValue);
 
 
 

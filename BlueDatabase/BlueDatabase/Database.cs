@@ -2076,7 +2076,7 @@ namespace BlueDatabase
         {
             //    Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
-            return Export_CSV(FirstRow, ColumnArrangements[ArrNr].ListOfUsedColumn(), RowCollection.CalculateSortedRows(this, Filter, SortDefinition));
+            return Export_CSV(FirstRow, ColumnArrangements[ArrNr].ListOfUsedColumn(), Row.CalculateSortedRows(Filter, SortDefinition));
         }
 
 
@@ -2098,7 +2098,7 @@ namespace BlueDatabase
         public void Export_HTML(string vFilename, int ArrNr, FilterCollection Filter)
         {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            Export_HTML(vFilename, ColumnArrangements[ArrNr].ListOfUsedColumn(), RowCollection.CalculateSortedRows(this, Filter, SortDefinition), false);
+            Export_HTML(vFilename, ColumnArrangements[ArrNr].ListOfUsedColumn(), Row.CalculateSortedRows(Filter, SortDefinition), false);
         }
 
         /// <summary>

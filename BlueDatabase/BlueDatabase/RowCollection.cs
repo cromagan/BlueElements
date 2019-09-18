@@ -286,7 +286,7 @@ namespace BlueDatabase
 
         public void DoAutomatic(FilterCollection Filter, bool FullCheck)
         {
-            var x = CalculateSortedRows(Database, Filter, null);
+            var x = CalculateSortedRows(Filter, null);
 
 
             if (x.Count() == 0) { return; }
@@ -412,13 +412,13 @@ namespace BlueDatabase
         public bool RemoveOlderThan(float InHours)
         {
 
-            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDate(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
+            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
 
             //foreach (var thisrowitem in _Internal.Values)
             //{
             //    if (thisrowitem != null)
             //    {
-            //        var D = thisrowitem.CellGetDate(Database.Column.SysRowCreateDate());
+            //        var D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate());
             //        if (DateTime.Now.Subtract(D).TotalHours > InHours) { x.Add(thisrowitem.Key); }
             //    }
             //}
@@ -439,13 +439,13 @@ namespace BlueDatabase
         }
 
 
-        public static List<RowItem> CalculateSortedRows(Database database, FilterCollection Filter, RowSortDefinition rowSortDefinition)
+        public List<RowItem> CalculateSortedRows(FilterCollection Filter, RowSortDefinition rowSortDefinition)
         {
             var TMP = new List<string>();
             var _tmpSortedRows = new List<RowItem>();
 
 
-            foreach (var ThisRowItem in database.Row)
+            foreach (var ThisRowItem in Database.Row)
             {
                 if (ThisRowItem != null)
                 {
@@ -475,7 +475,7 @@ namespace BlueDatabase
                     if (!string.IsNullOrEmpty(t))
                     {
                         cc = t.IndexOf(Constants.SecondSortChar + "<key>");
-                        _tmpSortedRows.Add(database.Row.SearchByKey(int.Parse(t.Substring(cc + 6))));
+                        _tmpSortedRows.Add(Database.Row.SearchByKey(int.Parse(t.Substring(cc + 6))));
                     }
                 }
             }
@@ -486,7 +486,7 @@ namespace BlueDatabase
                     if (!string.IsNullOrEmpty(TMP[z]))
                     {
                         cc = TMP[z].IndexOf(Constants.SecondSortChar + "<key>");
-                        _tmpSortedRows.Add(database.Row.SearchByKey(int.Parse(TMP[z].Substring(cc + 6))));
+                        _tmpSortedRows.Add(Database.Row.SearchByKey(int.Parse(TMP[z].Substring(cc + 6))));
                     }
                 }
 
