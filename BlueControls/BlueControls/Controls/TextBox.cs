@@ -1004,7 +1004,7 @@ namespace BlueControls.Controls
                 _eTxt.DrawingPos.X = Skin.PaddingSmal;
                 _eTxt.DrawingPos.Y = Skin.PaddingSmal;
                 _eTxt.DrawingArea = new Rectangle(0, 0, -1, -1);
-                _eTxt.LineBreakWidth = -1;
+                _eTxt.TextDimensions = Size.Empty;
             }
 
 
@@ -1213,13 +1213,13 @@ namespace BlueControls.Controls
             switch (_Verhalten)
             {
                 case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
-                    _eTxt.LineBreakWidth = effectWidth - Skin.PaddingSmal * 2;
+                    _eTxt.TextDimensions = new Size(effectWidth - Skin.PaddingSmal * 2, -1);
                     _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
                     break;
 
                 case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
                     var hp = HotPosition();
-                    _eTxt.LineBreakWidth = -1;
+                    _eTxt.TextDimensions = Size.Empty;
                     _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
 
                     if (hp < 0)
@@ -1260,7 +1260,7 @@ namespace BlueControls.Controls
 
                 case enSteuerelementVerhalten.Steuerelement_Anpassen:
                     sliderVisible = false;
-                    _eTxt.LineBreakWidth = -1;
+                    _eTxt.TextDimensions = Size.Empty;
 
                     if (this is ComboBox)
                     {
@@ -1280,7 +1280,7 @@ namespace BlueControls.Controls
 
                 case enSteuerelementVerhalten.Text_Abschneiden:
                     sliderVisible = false;
-                    _eTxt.LineBreakWidth = -1;
+                    _eTxt.TextDimensions = Size.Empty;
                     _eTxt.DrawingArea = new Rectangle(0, 0, Width, Height);
                     break;
 

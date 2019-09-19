@@ -67,14 +67,17 @@ namespace BlueControls
         private double vZBX_Pixel;
 
 
-        /// <summary>
-        /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll.
-        /// </summary>
-        private int _LineBreakWidth;
+
+        private Size _TextDimensions;
         private int? _Width = null;
         private int? _Height = null;
-
-        private Rectangle _DrawingArea;
+        /// <summary>
+        /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaleiert sein.
+        /// </summary>
+        public Rectangle DrawingArea;
+        /// <summary>
+        /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaleiert sein.
+        /// </summary>
         public Point DrawingPos;
 
         private string _TMPHtmlText = string.Empty;
@@ -103,8 +106,8 @@ namespace BlueControls
             AllowedChars = string.Empty;
             Chars = new List<ExtChar>();
             vZBX_Pixel = 0;
-            _DrawingArea = new Rectangle(0, 0, -1, -1);
-            _LineBreakWidth = -1;
+            DrawingArea = new Rectangle(0, 0, -1, -1);
+            _TextDimensions = Size.Empty;
 
             _Width = null;
             _Height = null;
@@ -158,43 +161,25 @@ namespace BlueControls
         }
 
         /// <summary>
-        /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll.
+        /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll. Auch das Alingement richtet sich nach diesen Größen.
         /// </summary>
-        public int LineBreakWidth
+        public Size TextDimensions
         {
             get
             {
-                return _LineBreakWidth;
+                return _TextDimensions;
             }
             set
             {
 
-                if (_LineBreakWidth == value) { return; }
-                _LineBreakWidth = value;
+                if (_TextDimensions.Width == value.Width && _TextDimensions.Height == value.Height) { return; }
+                _TextDimensions = value;
                 ResetPosition(false);
             }
         }
 
 
 
-        /// <summary>
-        /// Gibt den Zeichenbereich zurück, oder legt diesen fest.
-        /// </summary>
-        /// <remarks></remarks>
-        public Rectangle DrawingArea
-        {
-            get
-            {
-                return _DrawingArea;
-            }
-            set
-            {
-
-                if (_DrawingArea.ToString() == value.ToString()) { return; }
-                _DrawingArea = new Rectangle(value.X, value.Y, value.Width, value.Height);
-                ResetPosition(false); // Alingemenmts hängen davon ab
-            }
-        }
 
 
 
@@ -405,9 +390,9 @@ namespace BlueControls
                 if (!Chars[Akt].isSpace())
                 {
 
-                    if (Akt > ZB_Char && _LineBreakWidth > 0)
+                    if (Akt > ZB_Char && _TextDimensions.Width > 0)
                     {
-                        if (IsX + Chars[Akt].Size.Width + 0.5 > _LineBreakWidth)
+                        if (IsX + Chars[Akt].Size.Width + 0.5 > _TextDimensions.Width)
                         {
                             Akt = WordBreaker(Akt, ZB_Char);
                             IsX = vZBX_Pixel;
@@ -456,8 +441,8 @@ namespace BlueControls
             if (Ausrichtung != enAlignment.Top_Left)
             {
                 float KY = 0;
-                if (Convert.ToBoolean(Ausrichtung & enAlignment.VerticalCenter)) { KY = (float)((_DrawingArea.Height - (int)_Height) / 2.0); }
-                if (Convert.ToBoolean(Ausrichtung & enAlignment.Bottom)) { KY = _DrawingArea.Height - (int)_Height; }
+                if (Convert.ToBoolean(Ausrichtung & enAlignment.VerticalCenter)) { KY = (float)((_TextDimensions.Height - (int)_Height) / 2.0); }
+                if (Convert.ToBoolean(Ausrichtung & enAlignment.Bottom)) { KY = _TextDimensions.Height - (int)_Height; }
 
                 foreach (var t in RI)
                 {
@@ -465,8 +450,8 @@ namespace BlueControls
                     var Z1 = int.Parse(o[0]);
                     var Z2 = int.Parse(o[1]);
                     float KX = 0;
-                    if (Convert.ToBoolean(Ausrichtung & enAlignment.Right)) { KX = _DrawingArea.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width; }
-                    if (Convert.ToBoolean(Ausrichtung & enAlignment.HorizontalCenter)) { KX = (_DrawingArea.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width) / 2; }
+                    if (Convert.ToBoolean(Ausrichtung & enAlignment.Right)) { KX = _TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width; }
+                    if (Convert.ToBoolean(Ausrichtung & enAlignment.HorizontalCenter)) { KX = (_TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width) / 2; }
 
                     var Z3 = 0;
                     for (Z3 = Z1; Z3 <= Z2; Z3++)
@@ -554,16 +539,16 @@ namespace BlueControls
         #endregion
 
 
-        public void Draw(Graphics GR, float czoom)
+        public void Draw(Graphics gr, float zoom)
         {
 
             while (_Width == null) { ReBreak(); }
 
-            DrawStates(GR, czoom);
+            DrawStates(gr, zoom);
 
             foreach (var t in Chars)
             {
-                if (t.Char > 0 && t.IsVisible(_DrawingArea, DrawingPos)) { t.Draw(GR, DrawingPos, czoom); }
+                if (t.Char > 0 && t.IsVisible(zoom, DrawingPos, DrawingArea)) { t.Draw(gr, DrawingPos, zoom); }
             }
 
 

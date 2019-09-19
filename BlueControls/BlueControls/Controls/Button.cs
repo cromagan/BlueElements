@@ -440,13 +440,12 @@ namespace BlueControls.Controls
                 if (etxt == null) { etxt = new ExtText(vButtonTypex, vStatex, _SkinRow); }
                 etxt.State = vStatex; // Fall es nicht nothing ist
                 etxt.Zeilenabstand = 0.65;
-                etxt.DrawingPos = new Point(0,43);
-                etxt.DrawingArea = new Rectangle(0, 43, DisplayRectangle.Width, 22);
-                etxt.LineBreakWidth = DisplayRectangle.Width - Skin.PaddingSmal/2;
+                etxt.DrawingPos = new Point(0, 43);
+                //etxt.DrawingArea = DisplayRectangle;
+                etxt.TextDimensions = new Size(DisplayRectangle.Width - Skin.PaddingSmal / 2, 22);
                 etxt.Ausrichtung = enAlignment.Horizontal_Vertical_Center;
                 etxt.HtmlText = BlueDatabase.LanguageTool.DoTranslate(vtext, Translate);
                 etxt.Draw(GR, 1);
-
 
             }
             else if (vButtonTypex != enDesign.OptionButton_TextStyle && vButtonTypex != enDesign.CheckBox_TextStyle)
@@ -461,7 +460,7 @@ namespace BlueControls.Controls
 
                 if (etxt == null) { etxt = new ExtText(vButtonTypex, vStatex, _SkinRow); }
                 etxt.State = vStatex;
-                etxt.LineBreakWidth = DisplayRectangle.Width;
+                etxt.TextDimensions = DisplayRectangle.Size;
                 //etxt.MaxHeight = DisplayRectangle.Height;
                 //etxt.MaxWidth = DisplayRectangle.Width;
                 etxt.HtmlText = tt;

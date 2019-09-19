@@ -335,24 +335,23 @@ namespace BlueControls.Controls
                 {
 
                     case enSteuerelementVerhalten.Steuerelement_Anpassen:
-                        eText.LineBreakWidth = -1;
+                        eText.TextDimensions = Size.Empty;
                         Size = eText.LastSize();
                         break;
 
                     case enSteuerelementVerhalten.Text_Abschneiden:
-                        eText.LineBreakWidth = -1;
+                        eText.TextDimensions = Size.Empty;
                         break;
 
                     case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
-                        eText.LineBreakWidth = base.Size.Width;
-                        eText.DrawingArea = new Rectangle(0,0, base.Size.Width, base.Size.Height);
+                        eText.TextDimensions = new Size( base.Size.Width,-1);
                         break;
 
                     case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
-                        eText.LineBreakWidth = -1;
-                        eText.DrawingArea = new Rectangle(0, 0, base.Size.Width, base.Size.Height);
+                        eText.TextDimensions = Size.Empty;
                         break;
                 }
+                eText.DrawingArea = base.ClientRectangle;
             }
 
             if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird

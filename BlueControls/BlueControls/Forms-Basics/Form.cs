@@ -231,7 +231,7 @@ namespace BlueControls.Forms
                 {
                     var B = new Button();
 
-                    erT.LineBreakWidth = -1;
+                    erT.TextDimensions = Size.Empty;
                     erT.PlainText = Names[Z];
                     B = new Button();
                     B.Name = Z.ToString();

@@ -118,15 +118,21 @@ namespace BlueControls
         }
 
 
-        public bool IsVisible(Rectangle DrawingArea, Point DrawingPos)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="zoom"></param>
+        /// <param name="drawingPos">Muss bereits Skaliert sein</param>
+        /// <returns></returns>
+        public bool IsVisible(float zoom, Point drawingPos, Rectangle drawingArea)
         {
-            if (DrawingArea.Width < 1 && DrawingArea.Height < 1) { return true; }
+            if (drawingArea.Width < 1 && drawingArea.Height < 1) { return true; }
 
-            if (DrawingArea.Width > 0 && Pos.X + DrawingPos.X > DrawingArea.Right) { return false; }
-            if (DrawingArea.Height > 0 && Pos.Y + DrawingPos.Y > DrawingArea.Bottom) { return false; }
+            if (drawingArea.Width > 0 && Pos.X * zoom + drawingPos.X > drawingArea.Right) { return false; }
+            if (drawingArea.Height > 0 && Pos.Y * zoom + drawingPos.Y > drawingArea.Bottom) { return false; }
 
-            if (Pos.X + DrawingPos.X + Size.Width < DrawingArea.Left) { return false; }
-            if (Pos.Y + DrawingPos.Y + Size.Height < DrawingArea.Top) { return false; }
+            if ((Pos.X + Size.Width) * zoom + drawingPos.X < drawingArea.Left) { return false; }
+            if ((Pos.Y + Size.Height) * zoom + drawingPos.Y < drawingArea.Top) { return false; }
 
             return true;
         }
