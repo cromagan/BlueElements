@@ -254,15 +254,15 @@ namespace BlueControls.Forms
 
             if (IsClosed || IsDisposed) { return; }
 
-            //if (BackgroundImage == null || Width != BackgroundImage.Width || Height != BackgroundImage.Height)
-            //{
-            //    BackgroundImage = new Bitmap(Width, Height, Format32bppPArgb );
-            //}
+            if (BackgroundImage == null || Width != BackgroundImage.Width || Height != BackgroundImage.Height)
+            {
+                BackgroundImage = new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+            }
 
-            //var TMPGR = Graphics.FromImage(BackgroundImage);
+            var TMPGR = Graphics.FromImage(BackgroundImage);
 
-            Skin.Draw_Back(e.Graphics, Design, enStates.Standard, DisplayRectangle, null, false);
-            Skin.Draw_Border(e.Graphics, Design, enStates.Standard, DisplayRectangle);
+            Skin.Draw_Back(TMPGR, Design, enStates.Standard, DisplayRectangle, null, false);
+            Skin.Draw_Border(TMPGR, Design, enStates.Standard, DisplayRectangle);
         }
 
 

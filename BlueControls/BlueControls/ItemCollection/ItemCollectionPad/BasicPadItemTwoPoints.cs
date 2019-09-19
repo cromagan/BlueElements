@@ -135,8 +135,11 @@ namespace BlueControls.ItemCollection
 
         public override void SetCoordinates(RectangleDF r)
         {
-            //TODO: Koordinaten setzen
-            //p_m.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));
+
+            p_ML.SetTo(r.PointOf(enAlignment.VerticalCenter_Left));
+            p_MR.SetTo(r.PointOf(enAlignment.VerticalCenter_Right));
+
+
             RecomputePointAndRelations();
         }
 
