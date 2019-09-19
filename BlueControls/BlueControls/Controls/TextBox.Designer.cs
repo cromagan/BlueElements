@@ -7,7 +7,7 @@ using BlueControls.Enums;
 
 namespace BlueControls.Controls
 {
-    public partial class TextBox : GenericControl
+    public partial class TextBox 
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
@@ -17,7 +17,7 @@ namespace BlueControls.Controls
             {
                 if (disposing && components != null)
                 {
-                    if (_BitmapOfControl != null) { _BitmapOfControl.Dispose(); }
+                    //if (_BitmapOfControl != null) { _BitmapOfControl.Dispose(); }
                     components.Dispose();
                 }
             }

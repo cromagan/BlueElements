@@ -34,7 +34,7 @@ using BlueControls.Enums;
 namespace BlueControls.Controls
 {
     [DefaultEvent("TextChanged")]
-    public partial class TextBox : IBackgroundBitmap, IContextMenu, IQuickInfo
+    public partial class TextBox : GenericControl, IBackgroundBitmap, IContextMenu, IQuickInfo
     {
 
 

@@ -30,6 +30,7 @@ using BlueDatabase.Enums;
 using static BlueBasics.FileOperations;
 using System.Collections.Generic;
 using BlueControls.Enums;
+using System;
 
 namespace BlueControls.Controls
 {
@@ -113,6 +114,7 @@ namespace BlueControls.Controls
                     _Database.ConnectedControlsStopAllWorking -= Database_ConnectedControlsStopAllWorking;
                     _Database.Row.RowChecked -= Database_RowChecked;
                     _Database.RowKeyChanged -= _Database_RowKeyChanged;
+                    _Database.Loaded -= _Database_Loaded;
                 }
 
                 _Database = value;
@@ -127,6 +129,7 @@ namespace BlueControls.Controls
                     _Database.ConnectedControlsStopAllWorking += Database_ConnectedControlsStopAllWorking;
                     _Database.Row.RowChecked += Database_RowChecked;
                     _Database.RowKeyChanged += _Database_RowKeyChanged;
+                    _Database.Loaded += _Database_Loaded;
                     //V.Column.Database.ColumnKeyChanged += _Database_ColumnKeyChanged; // Columns sind als Objektverweis vermerkt
 
                 }
@@ -135,6 +138,17 @@ namespace BlueControls.Controls
             }
         }
 
+        private void _Database_Loaded(object sender, LoadedEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => _Database_Loaded(sender, e)));
+                return;
+            }
+
+            UpdateColumnData();
+            SetValueFromCell();
+        }
 
         private void GetTmpVariables()
         {

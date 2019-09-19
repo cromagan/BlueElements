@@ -148,6 +148,13 @@ namespace BlueControls.Forms
         private void TableView_CursorPosChanged(object sender, CellEventArgs e)
         {
 
+
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => TableView_CursorPosChanged(sender, e)));
+                return;
+            }
+
             if (e.Column == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Row == null)
             {
                 Formula.ShowingRowKey = -1;

@@ -272,7 +272,7 @@ namespace BlueControls
             var VersY = 0;
 
 
-            for (var z = 1 ; z < AllS.Count ; z++)
+            for (var z = 1; z < AllS.Count; z++)
             {
 
                 VersX = VersX + AllS[z].HookP1.X - AllS[z].HookP2.X;
@@ -298,7 +298,7 @@ namespace BlueControls
             VersX = MinX * -1;
             VersY = MinY * -1;
 
-            for (var z = 0 ; z < AllS.Count ; z++)
+            for (var z = 0; z < AllS.Count; z++)
             {
 
                 VersX = VersX + AllS[z].HookP1.X - AllS[z].HookP2.X;
@@ -593,7 +593,7 @@ namespace BlueControls
         {
             ScreenShotBMP = GrabAllScreens();
 
-            BackgroundImage = new Bitmap(ScreenShotBMP.Width, ScreenShotBMP.Height);
+            BackgroundImage = new Bitmap(ScreenShotBMP.Width, ScreenShotBMP.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
 
             using (var GR = Graphics.FromImage(BackgroundImage))
             {
