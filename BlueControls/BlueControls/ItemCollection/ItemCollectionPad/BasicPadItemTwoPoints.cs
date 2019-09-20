@@ -104,7 +104,7 @@ namespace BlueControls.ItemCollection
             p_UR.SetTo(p_MR, breitePix / 2, winkel - 90);
             p_OR.SetTo(p_MR, breitePix / 2, winkel + 90);
 
-            winkel = GeometryDF.Winkelx(p_ML, p_MR);
+            winkel = GeometryDF.Winkel(p_ML, p_MR);
         }
 
         public override void GenerateInternalRelation(List<clsPointRelation> relations)

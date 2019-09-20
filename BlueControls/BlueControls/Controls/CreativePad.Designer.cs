@@ -1,9 +1,5 @@
-﻿using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
+﻿using System.Diagnostics;
 using System.Drawing.Printing;
-using BlueBasics.Enums;
 
 
 namespace BlueControls.Controls

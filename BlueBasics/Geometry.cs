@@ -81,14 +81,14 @@ namespace BlueBasics
         }
 
 
-        public static decimal Winkelx(PointF Sp, PointF EP)
+        public static decimal Winkel(PointF Sp, PointF EP)
         {
-            return Winkelx((decimal)Sp.X, (decimal)Sp.Y, (decimal)EP.X, (decimal)EP.Y);
+            return Winkel((decimal)Sp.X, (decimal)Sp.Y, (decimal)EP.X, (decimal)EP.Y);
         }
 
 
 
-        public static decimal Winkelx(decimal X1, decimal Y1, decimal X2, decimal Y2)
+        public static decimal Winkel(decimal X1, decimal Y1, decimal X2, decimal Y2)
         {
 
             // http://de.wikipedia.org/wiki/Polarkoordinaten

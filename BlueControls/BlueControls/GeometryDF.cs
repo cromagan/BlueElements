@@ -155,9 +155,9 @@ namespace BlueControls
             }
         }
 
-        public static decimal Winkelx(PointDF Sp, PointDF EP)
+        public static decimal Winkel(PointDF Sp, PointDF EP)
         {
-            return Geometry.Winkelx(Sp.X, Sp.Y, EP.X, EP.Y);
+            return Geometry.Winkel(Sp.X, Sp.Y, EP.X, EP.Y);
         }
         public static PointDF PointOnLine(PointDF Maus, decimal P_X, decimal P_Y, decimal Q_X, decimal Q_Y)
         {

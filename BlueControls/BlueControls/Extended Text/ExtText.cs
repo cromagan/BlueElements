@@ -682,7 +682,7 @@ namespace BlueControls
                 He = Chars[CharPos - 1].Size.Height;
             }
 
-            return new Rectangle((int)(X), (int)(Y - 1), 0, (int)(He + 2));
+            return new Rectangle((int)X, (int)(Y - 1), 0, (int)(He + 2));
         }
 
 
@@ -1060,7 +1060,7 @@ namespace BlueControls
                     QuickImage x = null;
                     if (!Attribut.Contains("|") && PF != null)
                     {
-                        x = QuickImage.Get(Attribut, (int)(PF.Oberlänge(1)));
+                        x = QuickImage.Get(Attribut, (int)PF.Oberlänge(1));
                     }
                     else
                     {

@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Runtime.CompilerServices;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -115,7 +116,7 @@ namespace BlueControls
 
                     var r = modAllgemein.RectangleOfAllScreens();
 
-                    var b = new Bitmap(r.Width, r.Height);
+                    var b = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
 
                     using (var GR = Graphics.FromImage(b))
                     {
@@ -289,7 +290,7 @@ namespace BlueControls
             modAllgemein.CollectGarbage();
 
 
-            var bmp = new Bitmap(maxx - MinX, maxy - MinY);
+            var bmp = new Bitmap(maxx - MinX, maxy - MinY, PixelFormat.Format32bppPArgb);
             var gr = Graphics.FromImage(bmp);
             gr.Clear(Color.White);
 
@@ -426,7 +427,7 @@ namespace BlueControls
                         return;
                     }
 
-                    ClipedArea = new Bitmap(r.Width, r.Height);
+                    ClipedArea = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
 
                     using (var GR = Graphics.FromImage(ClipedArea))
                     {
@@ -446,7 +447,7 @@ namespace BlueControls
 
                     //    r.Expand(CInt(r.Height * 0.2), 0)
 
-                    //    ClipedArea = New Bitmap(r.Width, r.Height)
+                    //    ClipedArea = New Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb)
 
                     //    Using GR As Graphics = Graphics.FromImage(ClipedArea)
                     //        GR.Clear(Color.Black)
@@ -593,7 +594,7 @@ namespace BlueControls
         {
             ScreenShotBMP = GrabAllScreens();
 
-            BackgroundImage = new Bitmap(ScreenShotBMP.Width, ScreenShotBMP.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+            BackgroundImage = new Bitmap(ScreenShotBMP.Width, ScreenShotBMP.Height, PixelFormat.Format32bppPArgb);
 
             using (var GR = Graphics.FromImage(BackgroundImage))
             {

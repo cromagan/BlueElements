@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.Forms;
 
 namespace BlueControls.BlueDatabaseDialogs

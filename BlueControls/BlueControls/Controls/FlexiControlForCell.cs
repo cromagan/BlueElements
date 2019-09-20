@@ -231,12 +231,9 @@ namespace BlueControls.Controls
 
         private void Database_CellValueChanged(object sender, CellEventArgs e)
         {
+            if (e.Row != _tmpRow || e.Column != _tmpColumn) { return; }
 
-            if (e.Row != _tmpRow) { return; }
-
-
-            if (e.Column == _tmpColumn) { SetValueFromCell(); }
-
+            SetValueFromCell();
             CheckEnabledState();
         }
 
@@ -247,6 +244,7 @@ namespace BlueControls.Controls
             if (_tmpColumn == null || _tmpRow == null)
             {
                 Value = string.Empty;
+                InfoText = string.Empty;
                 return;
             }
 
@@ -272,7 +270,10 @@ namespace BlueControls.Controls
 
                     Value = tmp2.JoinWithCr();
 
-
+                    if (Value.ToUpper() != tmp2.JoinWithCr().ToUpper())
+                    {
+                        Develop.DebugPrint(enFehlerArt.Warnung, "Werte ungleich: " + Value + " - " + tmp2.JoinWithCr());
+                    }
                     break;
 
                 default:
@@ -408,7 +409,7 @@ namespace BlueControls.Controls
 
                 case EasyPic easyPic:
                     easyPic.ConnectedDatabase += EasyPicConnectedDatabase;
-                    easyPic.ImageChanged += EasyPicImageChanged2;
+                    easyPic.ImageChanged += EasyPicImageChanged;
                     break;
 
                 case TextBox textBox:
@@ -475,7 +476,7 @@ namespace BlueControls.Controls
 
                 case EasyPic easyPic:
                     easyPic.ConnectedDatabase -= EasyPicConnectedDatabase;
-                    easyPic.ImageChanged -= EasyPicImageChanged2;
+                    easyPic.ImageChanged -= EasyPicImageChanged;
                     break;
 
                 case TextBox textBox:
@@ -505,146 +506,9 @@ namespace BlueControls.Controls
 
 
 
-        private void EasyPicImageChanged2(object sender, System.EventArgs e)
+        private void EasyPicImageChanged(object sender, System.EventArgs e)
         {
-            DoEasyPicValueChanged();
-        }
 
-
-        private void EasyPicConnectedDatabase(object sender, DatabaseGiveBackEventArgs e)
-        {
-            e.Database = _Database;
-        }
-
-        private void GotFocus_ComboBox(object sender, System.EventArgs e)
-        {
-            if (_tmpColumn == null || _tmpRow == null) { return; }
-            if (!string.IsNullOrEmpty(((ComboBox)sender).Text)) { return; }
-            Value = CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow);   // TODO: SetValue(FromCell) benutzen
-        }
-
-
-
-        private void GotFocus_TextBox(object sender, System.EventArgs e)
-        {
-            if (_tmpColumn == null || _tmpRow == null) { return; }
-            if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
-
-
-            Value = CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow);   // TODO: SetValue(FromCell) benutzen
-        }
-
-
-
-
-        protected override void OnValueChanged()
-        {
-            base.OnValueChanged();
-            FillCellNow();
-
-
-            switch (EditType)
-            {
-                case enEditTypeFormula.EasyPic:
-                    DoEasyPicValueChanged();
-                    break;
-
-                case enEditTypeFormula.Gallery:
-                case enEditTypeFormula.Listbox_1_Zeile:
-                case enEditTypeFormula.Listbox_3_Zeilen:
-                case enEditTypeFormula.Listbox_6_Zeilen:
-                    DoListBoxValueChanged();
-                    break;
-
-                case enEditTypeFormula.Textfeld_mit_Auswahlknopf:
-                    break;
-
-                case enEditTypeFormula.Textfeld:
-                    break;
-
-                case enEditTypeFormula.nur_als_Text_anzeigen:
-                    break;
-
-                case enEditTypeFormula.Ja_Nein_Knopf:
-                    break;
-
-                case enEditTypeFormula.None:
-                    break;
-
-                case enEditTypeFormula.Farb_Auswahl_Dialog:
-                    break;
-
-                default:
-                    Develop.DebugPrint_NichtImplementiert();
-                    break;
-
-
-            }
-
-        }
-
-
-        private void DoListBoxValueChanged()
-        {
-            //ListBoxen(out ListBox Main, out ListBox Suggest);
-            //RowItem Row = GetRow();
-
-            //if (V.Column is null || Row is null || DataFormat.TextboxEditPossible(V.Column.Format))
-            //{
-
-            //    // Items von der Auswahl zurückspielen zu den Suggests
-            //    if (Suggest != null)
-            //    {
-            //        while (Main.Item.Count > 0)
-            //        {
-            //            MoveItemBetweenList(Main, Suggest, Main.Item[0].Internal());
-            //        }
-            //    }
-
-            //    // Items zum Haupt hinzufügen
-            //    List<string> Vals = new List<string>(Value.SplitByCR());
-            //    foreach (string ThisString in Vals)
-            //    {
-            //        MoveItemBetweenList(Suggest, Main, ThisString);
-            //    }
-
-            //    return;
-            //}
-            //else if (V.Column.Format.TextboxEditPossible())
-            //{
-            //    Main.Item.Clear();
-            //    Main.Item.AddRange(Row.CellGetList(V.Column));
-            //}
-            //else if (V.Column.Format == enDataFormat.Link_To_Filesystem)
-            //{
-            //    Main.Item.Clear();
-            //    //' Erst mal Ohne Bestfile. Weil ansonsten beim Rückspeichern der komplette Pfad rückgespeichert wird
-            //    Main.Item.AddRange(Row.CellGetList(V.Column), V.Column, enShortenStyletyle.Replaced);
-            //}
-            //else if (V.Column.Format == enDataFormat.Relation)
-            //{
-            //    Main.Item.Clear();
-            //    List<string> w = Row.CellGetList(V.Column);
-            //    w.QuickSortAndRemoveDouble();
-            //    for (int z = 0 ; z < w.Count ; z++)
-            //    {
-            //        Main.Item.Add(new ObjectListItem(new clsRelation(V.Column, Row, w[z])));
-            //    }
-            //}
-            //else
-            //{
-            //    DebugPrint(enFehlerArt.Fehler, "Unbekannte Methode");
-            //}
-
-
-            //Main.Item.QuickSort();
-        }
-
-        /// <summary>
-        /// Sucht passendes Bild oder setzt den Value in die Datebank.
-        /// </summary>
-        private void DoEasyPicValueChanged()
-        {
             foreach (System.Windows.Forms.Control ThisControl in Controls)
             {
 
@@ -707,6 +571,38 @@ namespace BlueControls.Controls
             Develop.DebugPrint_NichtImplementiert();
         }
 
+
+        private void EasyPicConnectedDatabase(object sender, DatabaseGiveBackEventArgs e)
+        {
+            e.Database = _Database;
+        }
+
+        private void GotFocus_ComboBox(object sender, System.EventArgs e)
+        {
+            if (_tmpColumn == null || _tmpRow == null) { return; }
+            if (!string.IsNullOrEmpty(((ComboBox)sender).Text)) { return; }
+            Value = CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow);   // TODO: SetValue(FromCell) benutzen
+        }
+
+
+
+        private void GotFocus_TextBox(object sender, System.EventArgs e)
+        {
+            if (_tmpColumn == null || _tmpRow == null) { return; }
+            if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
+
+
+            Value = CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow);   // TODO: SetValue(FromCell) benutzen
+        }
+
+
+
+
+        protected override void OnValueChanged()
+        {
+            base.OnValueChanged();
+            FillCellNow();
+        }
 
 
         private void ListBox_AddClicked(object sender, System.EventArgs e)
@@ -873,12 +769,12 @@ namespace BlueControls.Controls
                     break;
 
                 case "Mark1":
-                    TXB.Mark(enMarkState.MyOwn, (int)x[2], (int)(x[3]));
+                    TXB.Mark(enMarkState.MyOwn, (int)x[2], (int)x[3]);
                     TXB.Invalidate();
                     break;
 
                 case "Mark2":
-                    TXB.Mark(enMarkState.Other, (int)x[2], (int)(x[3]));
+                    TXB.Mark(enMarkState.Other, (int)x[2], (int)x[3]);
                     TXB.Invalidate();
                     break;
 

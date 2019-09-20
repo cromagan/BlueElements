@@ -228,7 +228,7 @@ namespace BlueBasics
         public static void CartesianToPolar(PointF ko, ref double r, ref double Win)
         {
             r = Math.Sqrt(ko.X * ko.X + ko.Y * ko.Y);
-            Win = Convert.ToDouble(Geometry.Winkelx(0M, 0M, (decimal)ko.X, (decimal)ko.Y));
+            Win = Convert.ToDouble(Geometry.Winkel(0M, 0M, (decimal)ko.X, (decimal)ko.Y));
         }
 
 

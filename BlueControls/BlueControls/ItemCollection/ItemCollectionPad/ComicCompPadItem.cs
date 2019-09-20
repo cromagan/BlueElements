@@ -191,7 +191,7 @@ namespace BlueControls.ItemCollection
         {
             _EinpassModus = false;
 
-            _Winkel = Convert.ToDouble(360 - GeometryDF.Winkelx(P2, P1));
+            _Winkel = Convert.ToDouble(360 - GeometryDF.Winkel(P2, P1));
             _W1 = 0M;
             _L1 = 0M;
             _W2 = 0M;
@@ -241,7 +241,7 @@ namespace BlueControls.ItemCollection
 
         public decimal AngelOfMiddleLine()
         {
-            return GeometryDF.Winkelx(P1, P2);
+            return GeometryDF.Winkel(P1, P2);
         }
 
 
@@ -256,7 +256,7 @@ namespace BlueControls.ItemCollection
             {
                 // Einpassmodus bleiben die Eckpunkte so wie sie sind, _Winkel, _W1, _W2, _L1, _L2 und evtl. _Lenght passen sich an
                 // Deswegen dürfen die BER Koordinaten nicht bewegt werden
-                var TMP = GeometryDF.Winkelx(BerLO, BerRO);
+                var TMP = GeometryDF.Winkel(BerLO, BerRO);
                 _Winkel = Convert.ToDouble(TMP - WP12 - 360);
                 if (_Winkel <= -360)
                 {
@@ -268,10 +268,10 @@ namespace BlueControls.ItemCollection
                 }
 
                 _L1 = GeometryDF.Länge(P1, BerLO);
-                _W1 = GeometryDF.Winkelx(P1, BerLO) + (360 - TMP);
+                _W1 = GeometryDF.Winkel(P1, BerLO) + (360 - TMP);
 
                 _L2 = GeometryDF.Länge(P2, BerRU);
-                _W2 = GeometryDF.Winkelx(P2, BerRU) + (360 - TMP);
+                _W2 = GeometryDF.Winkel(P2, BerRU) + (360 - TMP);
 
                 if (_Length > 0M)
                 {
@@ -280,7 +280,7 @@ namespace BlueControls.ItemCollection
 
                 foreach (var thispoint in AdditionalPoints)
                 {
-                    thispoint.Tag = GeometryDF.Länge(Mitte, thispoint) + ";" + (GeometryDF.Winkelx(Mitte, thispoint) - WP12);
+                    thispoint.Tag = GeometryDF.Länge(Mitte, thispoint) + ";" + (GeometryDF.Winkel(Mitte, thispoint) - WP12);
                 }
 
             }
@@ -293,7 +293,7 @@ namespace BlueControls.ItemCollection
                 BerRU = new PointDF(P2, _L2, _W2 + w);
 
                 var L = GeometryDF.Länge(BerLO, BerRU); // Hypothenuse
-                var Alpha = Convert.ToDecimal(GeometryDF.Winkelx(BerLO, BerRU) - w);
+                var Alpha = Convert.ToDecimal(GeometryDF.Winkel(BerLO, BerRU) - w);
                 var ImLänge = Geometry.Cosinus((double)Alpha) * (double)L;
 
                 BerRO = new PointDF(BerLO, (decimal)ImLänge, w);
@@ -665,7 +665,7 @@ namespace BlueControls.ItemCollection
             var ps_Mitte = MiddlePoint();
             var ps_P = new PointDF(x, y);
 
-            AddPointCartesian(Name, Convert.ToDouble(GeometryDF.Länge(ps_Mitte, ps_P)), Convert.ToDouble(GeometryDF.Winkelx(ps_Mitte, ps_P) - 270));
+            AddPointCartesian(Name, Convert.ToDouble(GeometryDF.Länge(ps_Mitte, ps_P)), Convert.ToDouble(GeometryDF.Winkel(ps_Mitte, ps_P) - 270));
         }
 
         public void AddPointAbsolute(decimal x, decimal y)
@@ -676,7 +676,7 @@ namespace BlueControls.ItemCollection
         public void AddPointAbsolute(PointDF Vorlage)
         {
             var ps_Mitte = MiddlePoint();
-            AddPointCartesian(Vorlage.Name, Convert.ToDouble(GeometryDF.Länge(ps_Mitte, Vorlage)), Convert.ToDouble(GeometryDF.Winkelx(ps_Mitte, Vorlage) - 270));
+            AddPointCartesian(Vorlage.Name, Convert.ToDouble(GeometryDF.Länge(ps_Mitte, Vorlage)), Convert.ToDouble(GeometryDF.Winkel(ps_Mitte, Vorlage) - 270));
         }
 
 

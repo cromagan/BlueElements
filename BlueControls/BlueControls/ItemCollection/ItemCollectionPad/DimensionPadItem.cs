@@ -73,9 +73,20 @@ namespace BlueControls.ItemCollection
         public DimensionPadItem()
         { }
 
-        public DimensionPadItem(string cInternal, PointDF cPoint1, PointDF cPoint2, int AbstandinMM, int InitialDPI)
+
+        public DimensionPadItem(string cInternal, PointDF cPoint1, PointDF cPoint2, int AbstandinMM, int InitialDPI) : this(cPoint1, cPoint2, AbstandinMM, InitialDPI)
         {
             _Internal = cInternal;
+
+            if (string.IsNullOrEmpty(_Internal))
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
+            }
+        }
+
+
+        public DimensionPadItem(PointDF cPoint1, PointDF cPoint2, int AbstandinMM, int InitialDPI)
+        {
             Point1.SetTo(cPoint1.X, cPoint1.Y);
             Point2.SetTo(cPoint2.X, cPoint2.Y);
 
@@ -132,31 +143,11 @@ namespace BlueControls.ItemCollection
             _SchnittPunkt2.Parent = this;
             _Bezugslinie1.Parent = this;
             _Bezugslinie2.Parent = this;
-            //                private readonly PointDF Point1 = new PointDF(this, "Punkt 1", 0, 0, false, false);
-            //private readonly PointDF Point2 = new PointDF(this, "Punkt 2", 0, 0, false, false);
-            //private readonly PointDF TextPointx = new PointDF(this, "Mitte Text", 0, 0, false, false);
-
-            //private readonly PointDF _SchnittPunkt1 = new PointDF(this, "Schnittpunkt 1, Zeigt der Pfeil hin", 0, 0);
-            //private readonly PointDF _SchnittPunkt2 = new PointDF(this, "Schnittpunkt 2, Zeigt der Pfeil hin", 0, 0);
-
-            //private readonly PointDF _Bezugslinie1 = new PointDF(this, "Bezugslinie 1, Ende der Hilfslinie", 0, 0);
-            //private readonly PointDF _Bezugslinie2 = new PointDF(this, "Bezugslinie 2, Ende der Hilfslinien", 0, 0);
-
-
-
 
         }
 
 
-        //Sub New()
-
-        //    Initialize()
-
-
-        //End Sub
-
-
-        #endregion
+       #endregion
 
 
         #region  Properties 
@@ -406,7 +397,7 @@ namespace BlueControls.ItemCollection
         private void ComputeData()
         {
             _Länge = GeometryDF.Länge(Point1, Point2);
-            _Winkel = GeometryDF.Winkelx(Point1, Point2);
+            _Winkel = GeometryDF.Winkel(Point1, Point2);
         }
 
         protected override void KeepInternalLogic()
@@ -416,7 +407,7 @@ namespace BlueControls.ItemCollection
 
             var MaßL = 0M;
             var tmppW = -90;
-            var MHLAb = modConverter.mmToPixel(1.5M, ItemCollectionPad.DPI); // Den Abstand der Maßhilsfline, in echten MM
+            var MHLAb = modConverter.mmToPixel(1.5M * AdditionalScale / 3.07m, ItemCollectionPad.DPI); // Den Abstand der Maßhilsfline, in echten MM
             ComputeData();
 
             MaßL = TextPointx.DistanzZuLinie(Point1, Point2);

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
-using BlueBasics.Enums;
-using BlueControls.Enums;
 
 namespace BlueControls.Controls
 {

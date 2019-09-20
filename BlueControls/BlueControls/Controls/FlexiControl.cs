@@ -358,6 +358,13 @@ namespace BlueControls.Controls
                 if (_IsFilling) { return; }
 
 
+                //if (_Value != null && _Value.StartsWith("HAUPT201909") && string.IsNullOrEmpty(value))
+                //{
+                //    _Value = value;
+
+                //}
+
+
                 _Value = value;
 
                 UpdateValueToControl();
@@ -406,25 +413,25 @@ namespace BlueControls.Controls
             }
         }
 
-        public ListBox ListBoxMain
-        {
-            get
-            {
-                if (!_allinitialized) { Create_Control(); }
-                ListBoxen(out var Main, out var Suggest);
-                return Main;
-            }
-        }
+        //public ListBox ListBoxMain
+        //{
+        //    get
+        //    {
+        //        if (!_allinitialized) { Create_Control(); }
+        //        ListBoxen(out var Main, out var Suggest);
+        //        return Main;
+        //    }
+        //}
 
-        public ListBox ListBoxSuggest
-        {
-            get
-            {
-                if (!_allinitialized) { Create_Control(); }
-                ListBoxen(out var Main, out var Suggest);
-                return Suggest;
-            }
-        }
+        //public ListBox ListBoxSuggest
+        //{
+        //    get
+        //    {
+        //        if (!_allinitialized) { Create_Control(); }
+        //        ListBoxen(out var Main, out var Suggest);
+        //        return Suggest;
+        //    }
+        //}
 
         [DefaultValue(enEditTypeFormula.None)]
         public enEditTypeFormula EditType

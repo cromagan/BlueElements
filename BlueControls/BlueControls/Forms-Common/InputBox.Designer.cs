@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-
+﻿
 namespace BlueControls.Forms
 {
     partial class InputBox

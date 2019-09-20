@@ -25,9 +25,7 @@ namespace BlueControls.Enums
     {
 
         Nichts = 0,
-
-        //DatabaseInternal = 1,
-        Downloaded = 2,
+        //Downloaded = 2,
         SetedByProperty = 3,
         ScreenShot = 4,
 
@@ -36,7 +34,6 @@ namespace BlueControls.Enums
 
         EntryWithoutPic = 7
 
-        //SourceNameCorrectButImageNotLoadedx = 8
 
     }
 }

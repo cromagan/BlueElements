@@ -48,10 +48,6 @@ namespace BlueControls.Controls
 
         private int _Richt;
 
-        //private int _X;
-        //private int _Y;
-        //private float _Zoom = 1;
-
         public EasyPic()
         {
 
@@ -76,8 +72,7 @@ namespace BlueControls.Controls
             get => _MaxSize;
             set
             {
-                if (value == 0) { value = 1; }
-                if (value < -1) { value = -1; }
+                if (value < 1) { value = -1; }
                 _MaxSize = value;
             }
         }
@@ -100,18 +95,6 @@ namespace BlueControls.Controls
             {
                 if (_Bitmap == null && value == null) { return; }
                 _Bitmap = value;
-
-                if (_Bitmap == null)
-                {
-                    SorceType = enSorceType.Nichts;
-                }
-                else
-                {
-                    SorceType = enSorceType.SetedByProperty;
-                }
-
-                SorceName = string.Empty;
-                OnImageChanged();
                 ZoomFitInvalidateAndCheckButtons();
             }
         }
@@ -224,11 +207,41 @@ namespace BlueControls.Controls
             FromFile(OpenDia.FileName);
         }
 
+
+
+
+
+
+
+        private void ZoomFitInvalidateAndCheckButtons()
+        {
+            _Richt = -1;
+            _PanelMover.Enabled = true;
+
+            if (_Bitmap == null)
+            {
+                DelP.Enabled = false;
+
+                Invalidate();
+                return;
+            }
+            DelP.Enabled = true;
+            Invalidate();
+        }
+
+
+
+
+
+        #region " 3er Modifikatoren mit Eventauslösung "
+
+
         public void FromFile(string Filename)
         {
 
             if (!FileExists(Filename))
             {
+                //Develop.DebugPrint(enFehlerArt.Fehler, "Datei Existiert nicht: " + Filename);
                 Clear();
                 return;
             }
@@ -251,7 +264,6 @@ namespace BlueControls.Controls
             }
 
             ZoomFitInvalidateAndCheckButtons();
-
             OnImageChanged();
         }
 
@@ -264,21 +276,6 @@ namespace BlueControls.Controls
             OnImageChanged();
         }
 
-        private void ZoomFitInvalidateAndCheckButtons()
-        {
-            _Richt = -1;
-            _PanelMover.Enabled = true;
-
-            if (_Bitmap == null)
-            {
-                DelP.Enabled = false;
-
-                Invalidate();
-                return;
-            }
-            DelP.Enabled = true;
-            Invalidate();
-        }
 
 
         public void Clear()
@@ -292,6 +289,7 @@ namespace BlueControls.Controls
                 OnImageChanged();
             }
         }
+        #endregion
 
 
         protected override void InitializeSkin()
@@ -491,56 +489,6 @@ namespace BlueControls.Controls
             ContextMenuInit?.Invoke(this, e);
         }
 
-
-        ///// <summary>
-        ///// Lädt das Bild aus einer Datenbank verknüpfung. Events werden ausgelöst.
-        ///// </summary>
-        ///// <param name="FullFileName"></param>
-        //public void LoadFromDatabase(string FullFileName)
-        //{
-
-        //    _Bitmap = (Bitmap)modAllgemein.Image_FromFile(SorceName);
-        //    SorceType = enSorceType.DatabaseInternal;
-        //    SorceName = FullFileName.FileNameWithSuffix();
-        //    OnImageChanged();
-        //}
-
-        ///// <summary>
-        ///// Lädt das Bild nach. Der SourceName muss korrekt sein und der Typ muss SourceNameCorrectButImageNotLoaded sein.
-        ///// </summary>
-        ///// <param name="Column"></param>
-        //public void LoadFromDatabase(ColumnItem Column, bool ThrowEvent)
-        //{
-        //    if (SorceType != enSorceType.SourceNameCorrectButImageNotLoaded) { Develop.DebugPrint_NichtImplementiert(); }
-
-
-        //    if (string.IsNullOrEmpty(SorceName))
-        //    {
-        //        SorceType = enSorceType.Nichts;
-        //        _Bitmap = null;
-        //        if (ThrowEvent) { OnImageChanged(); }
-        //        return;
-        //    }
-
-
-        //    var Filename = Column.BestFile(SorceName);
-
-        //    _Bitmap = (Bitmap)modAllgemein.Image_FromFile(Filename);
-
-
-        //    if (_Bitmap != null)
-        //    {
-        //        SorceType = enSorceType.DatabaseInternal;
-        //    }
-        //    else
-        //    {
-        //        SorceType = enSorceType.EntryWithoutPic;
-        //    }
-
-        //    ZoomFitInvalidateAndCheckButtons();
-        //    if (ThrowEvent) { OnImageChanged(); }
-
-        //}
 
         private void AusDatenbank_Click(object sender, System.EventArgs e)
         {

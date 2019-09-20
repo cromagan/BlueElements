@@ -454,7 +454,7 @@ namespace BlueControls
                         return "-1";
                     }
 
-                    tmp = Math.Round(Geometry.Winkelx(Math.Round(Points[0].X, 2), Math.Round(Points[0].Y, 2), Math.Round(Points[1].X, 2), Math.Round(Points[1].Y, 2)), 2);
+                    tmp = Math.Round(Geometry.Winkel(Math.Round(Points[0].X, 2), Math.Round(Points[0].Y, 2), Math.Round(Points[1].X, 2), Math.Round(Points[1].Y, 2)), 2);
                     switch (tmp)
                     {
                         case 0M:
@@ -584,7 +584,7 @@ namespace BlueControls
                     break;
 
                 case enRelationType.AbstandZueinander:
-                    var wi = GeometryDF.Winkelx(Fix, Flex);
+                    var wi = GeometryDF.Winkel(Fix, Flex);
                     Flex.SetTo(Fix, decimal.Parse(_Richtmaß), wi);
                     break;
 

@@ -129,6 +129,7 @@ namespace BlueControls.Controls
 
 
 
+        public event EventHandler<RowEventArgs> RowAdded;
 
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
 
@@ -225,7 +226,7 @@ namespace BlueControls.Controls
                     _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
                     _Database.SortParameterChanged -= _Database_SortParameterChanged;
                     _Database.Row.RowRemoved -= _Database_RowCountChanged;
-                    _Database.Row.RowAdded -= _Database_RowCountChanged;
+                    _Database.Row.RowAdded -= _Database_Row_RowAdded;
                     _Database.Column.ItemRemoved -= _Database_ViewChanged;
                     _Database.Column.ItemAdded -= _Database_ViewChanged;
                     _Database.SavedToDisk -= _Database_SavedToDisk;
@@ -250,7 +251,7 @@ namespace BlueControls.Controls
                     _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
                     _Database.SortParameterChanged += _Database_SortParameterChanged;
                     _Database.Row.RowRemoved += _Database_RowCountChanged;
-                    _Database.Row.RowAdded += _Database_RowCountChanged;
+                    _Database.Row.RowAdded += _Database_Row_RowAdded;
                     _Database.Column.ItemAdded += _Database_ViewChanged;
                     _Database.Column.ItemRemoved += _Database_ViewChanged;
                     _Database.SavedToDisk += _Database_SavedToDisk;
@@ -264,6 +265,15 @@ namespace BlueControls.Controls
 
             }
         }
+
+        private void _Database_Row_RowAdded(object sender, RowEventArgs e)
+        {
+
+            OnRowAdded(sender, e);
+            _Database_RowCountChanged(sender, e);
+
+        }
+
 
 
 
@@ -2150,6 +2160,12 @@ namespace BlueControls.Controls
         private void OnAutoFilterClicked(FilterEventArgs e)
         {
             AutoFilterClicked?.Invoke(this, e);
+        }
+
+
+        private void OnRowAdded(object sender, RowEventArgs e)
+        {
+            RowAdded?.Invoke(sender, e);
         }
 
 
