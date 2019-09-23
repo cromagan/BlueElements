@@ -35,28 +35,19 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection
 {
-    public class BitmapPadItem : BasicPadItem, ICloneable, ICanHaveColumnVariables
+    public class BitmapPadItem : FormPadItemRectangle, ICloneable, ICanHaveColumnVariables
     {
 
 
         #region  Variablen-Deklarationen 
 
-        internal PointDF p_LO;
-        internal PointDF p_RO;
-        internal PointDF p_RU;
-        internal PointDF p_LU;
 
         public bool WhiteBack;
         public int Padding;
-        public bool FixSize;
         public List<QuickImage> Overlays;
         public enSizeModes BildModus;
 
-
         private string _PlaceHolderString;
-        public int Rotation;
-
-
         #endregion
 
 
@@ -114,17 +105,9 @@ namespace BlueControls.ItemCollection
             base.Initialize();
             Bitmap = null;
             Overlays = new List<QuickImage>();
-            p_LO = new PointDF(this, "LO", 0, 0, false, true, true);
-            p_RO = new PointDF(this, "RO", 0, 0);
-            p_RU = new PointDF(this, "RU", 0, 0);
-            p_LU = new PointDF(this, "LU", 0, 0);
-
             WhiteBack = true;
             Padding = 0;
-            FixSize = false;
             BildModus = enSizeModes.EmptySpace;
-            Rotation = 0;
-
             Style = PadStyles.Undefiniert; // Kein Rahmen
         }
 
@@ -146,14 +129,6 @@ namespace BlueControls.ItemCollection
         protected override string ClassId()
         {
             return "IMAGE";
-        }
-
-        public override bool Contains(PointF value, decimal zoomfactor)
-        {
-            var tmp = UsedArea();
-            var ne = (int)(5 / zoomfactor);
-            tmp.Inflate(-ne, -ne);
-            return tmp.Contains(value.ToPointDF());
         }
 
 
@@ -263,26 +238,6 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public override List<PointDF> PointList()
-        {
-            var l = new List<PointDF>();
-            l.Add(p_LO);
-            l.Add(p_RU);
-            l.Add(p_LU);
-            l.Add(p_RO);
-            return l;
-        }
-
-
-        public override RectangleDF UsedArea()
-        {
-            if (p_LO == null || p_RU == null) { return new RectangleDF(); }
-            return new RectangleDF(Math.Min( p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
-        }
-
-
-
-
 
         protected override bool ParseExplicit(KeyValuePair<string, string> pair)
         {
@@ -296,24 +251,18 @@ namespace BlueControls.ItemCollection
                 case "whiteback":
                     WhiteBack = pair.Value.FromPlusMinus();
                     return true;
-                case "fixsize":
-                    FixSize = pair.Value.FromPlusMinus();
-                    return true;
                 case "padding":
                     Padding = int.Parse(pair.Value);
                     return true;
                 case "image":
                     Bitmap = modConverter.Base64ToBitmap(pair.Value);
                     return true;
-                case "rotation":
-                    Rotation = int.Parse(pair.Value);
-                    return true;
                 case "placeholder":
                     _PlaceHolderString = pair.Value.FromNonCritical();
                     return true;
+                default:
+                    return base.ParseExplicit(pair);
             }
-
-            return false;
         }
 
 
@@ -329,15 +278,7 @@ namespace BlueControls.ItemCollection
                 t = t + "Placeholder=" + _PlaceHolderString.ToNonCritical() + ", ";
             }
 
-            if (Rotation != 0)
-            {
-                t = t + "Rotation=" + Rotation + ", ";
-            }
-
-
             t = t + "WhiteBack=" + WhiteBack.ToPlusMinus() + ", ";
-            t = t + "Fixsize=" + FixSize.ToPlusMinus() + ", ";
-
 
             foreach (var thisQI in Overlays)
             {
@@ -355,13 +296,6 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void SetCoordinates(RectangleDF r)
-        {
-            p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
-            p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
-            RecomputePointAndRelations();
-        }
-
 
 
         public object Clone()
@@ -378,30 +312,9 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void KeepInternalLogic()
-        {
-            p_RO.SetTo(p_RU.X, p_LO.Y);
-            p_LU.SetTo(p_LO.X, p_RU.Y);
-        }
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> relations)
-        {
-            if (FixSize)
-            {
-                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
-                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
-                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
-            }
-            else
-            {
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
 
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
-            }
-        }
 
         public bool ParseVariable(string VariableName, enValueType ValueType, string Value)
         {
@@ -468,21 +381,7 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl("Datei laden", enImageCode.Ordner));
             l.Add(new FlexiControl(true));
             l.Add(new FlexiControl("Platzhalter für Layout", _PlaceHolderString, enDataFormat.Text, 2));
-            l.Add(new FlexiControl(true));
-            l.Add(new FlexiControl("Drehwinkel", Rotation.ToString(), enDataFormat.Ganzzahl, 1));
 
-            var Relations = ((CreativePad)sender).AllRelations();
-
-            if (!FixSize && !p_LO.CanMove(Relations) && !p_RU.CanMove(Relations))
-            {
-                l.Add(new FlexiControl(true));
-                l.Add(new FlexiControl("Objekt fest definiert,<br>Größe kann nicht fixiert werden"));
-            }
-            else
-            {
-                l.Add(new FlexiControl("Größe fixiert", FixSize));
-                l.Add(new FlexiControl("Skalieren", enImageCode.Formel));
-            }
 
             l.Add(new FlexiControl(true));
 
@@ -497,10 +396,12 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl(true));
 
 
-            l.Add(new FlexiControl("Umrandung", ((int)Style).ToString(),  Skin.GetRahmenArt(Parent.SheetStyle)));
+            l.Add(new FlexiControl("Umrandung", ((int)Style).ToString(), Skin.GetRahmenArt(Parent.SheetStyle)));
 
 
             l.Add(new FlexiControl("Hintergrund weiß füllen", WhiteBack));
+
+            l.AddRange(base.GetStyleOptions(sender, e));
 
             return l;
 
@@ -511,6 +412,8 @@ namespace BlueControls.ItemCollection
 
         public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         {
+
+            base.DoStyleCommands(sender, Tags, ref CloseMenu);
 
             if (Tags.TagGet("Bildschirmbereich wählen").FromPlusMinus())
             {
@@ -574,14 +477,8 @@ namespace BlueControls.ItemCollection
             }
 
 
-            var nFixSize = Tags.TagGet("Größe fixiert").FromPlusMinus();
-            if (nFixSize != FixSize)
-            {
-                FixSize = nFixSize;
-                ClearInternalRelations();
-            }
+
             WhiteBack = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
-            Rotation = int.Parse(Tags.TagGet("Drehwinkel"));
             BildModus = (enSizeModes)int.Parse(Tags.TagGet("Bild-Modus"));
             Style = (PadStyles)int.Parse(Tags.TagGet("Umrandung"));
             _PlaceHolderString = Tags.TagGet("Platzhalter für Layout").FromNonCritical();

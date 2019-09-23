@@ -83,6 +83,7 @@
       <DependentUpon>Skript.cs</DependentUpon>
     </Compile>
     <Compile Include="BlueFont.cs" />
+    <Compile Include="Enums\enSymbol.cs" />
     <Compile Include="Enums\enMovePoints.cs" />
     <Compile Include="Enums\enSelectModus.cs" />
     <Compile Include="Enums\enTableDrawColumn.cs" />
@@ -188,7 +189,9 @@
     <Compile Include="Forms-Common\Notification.Designer.cs">
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
-    <Compile Include="ItemCollection\ItemCollectionPad\BasicPadItemTwoPoints.cs" />
+    <Compile Include="ItemCollection\Basics\BasicPadItemTwoPoints.cs" />
+    <Compile Include="ItemCollection\Basics\FormPadItemRectangle.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />
     <Compile Include="SystemInputHook.cs" />
     <Compile Include="Controls\BrainDrawer.cs">
       <SubType>Component</SubType>

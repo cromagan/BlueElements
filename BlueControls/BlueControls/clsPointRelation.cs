@@ -449,7 +449,7 @@ namespace BlueControls
                     break;
                 case enRelationType.WaagerechtSenkrecht:
 
-                    if (Math.Abs(Points[0].X) > 99999 || Math.Abs(Points[0].Y) > 99999)
+                    if (Math.Abs(Points[0].X) > 9999999 || Math.Abs(Points[0].Y) > 9999999)
                     {
                         return "-1";
                     }

@@ -76,7 +76,7 @@ namespace BlueDatabase
         public FilterItem(ColumnItem Column, enFilterType FilterType, string SearchValue)
         {
 
-            if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Columm == null)"); }
+            if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Columm == null;" + FilterType.ToString() + ";" + SearchValue); }
 
             Database = Column.Database;
             Initialize();

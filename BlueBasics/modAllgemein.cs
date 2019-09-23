@@ -624,6 +624,35 @@ namespace BlueBasics
             return tempPoly_Rechteck;
         }
 
+
+
+        public static GraphicsPath Poly_Arrow(Rectangle rect)
+        {
+            GraphicsPath p = null;
+            p = new GraphicsPath();
+
+
+
+            /// --------+  >
+            ///         | /
+            ///         |/
+            ///        
+
+            var plusOben = new PointF((float)(rect.Left + rect.Width * 0.5), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y - rect.Height * 0.18));
+            var plusUnten = new PointF((float)(rect.Left + rect.Width * 0.5), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y + rect.Height * 0.18));
+
+            p.AddLine(rect.PointOf(enAlignment.VerticalCenter_Right), new PointF(plusUnten.X, rect.Bottom));
+            p.AddLine(p.GetLastPoint(), plusUnten);
+            p.AddLine(p.GetLastPoint(), new PointF(rect.Left, plusUnten.Y));
+            p.AddLine(p.GetLastPoint(), new PointF(rect.Left, plusOben.Y));
+            p.AddLine(p.GetLastPoint(), plusOben);
+            p.AddLine(p.GetLastPoint(), new PointF(plusOben.X, rect.Top));
+
+
+            p.CloseFigure();
+            return p;
+        }
+
         private static void Poly_AddRad90(GraphicsPath GP, int MxX, int MxY, int Radius, int GradStart)
         {
             GP.AddArc(MxX, MxY, Radius, Radius, GradStart, 90);

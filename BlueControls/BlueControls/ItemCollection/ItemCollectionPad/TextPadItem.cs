@@ -32,28 +32,21 @@ using System.Text.RegularExpressions;
 
 namespace BlueControls.ItemCollection
 {
-    public class TextPadItem : BasicPadItem, ICanHaveColumnVariables
+    public class TextPadItem : FormPadItemRectangle, ICanHaveColumnVariables
     {
 
 
 
 
         #region  Variablen-Deklarationen 
-
-        internal PointDF p_LO;
-        internal PointDF p_RO;
-        internal PointDF p_RU;
-        internal PointDF p_LU;
-
         private string _VariableText;
         private string _ReadableText;
-        public bool FixSize;
         private enAlignment _Align;
         private enDataFormat _Format = enDataFormat.Text;
 
         private ExtText etxt;
 
-        public int Rotation;
+
 
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
@@ -112,17 +105,12 @@ namespace BlueControls.ItemCollection
         {
             base.Initialize();
 
-            p_LO = new PointDF(this, "LO", 0, 0, false, true, true);
-            p_RO = new PointDF(this, "RO", 0, 0);
-            p_RU = new PointDF(this, "RU", 0, 0);
-            p_LU = new PointDF(this, "LU", 0, 0);
 
             _ReadableText = string.Empty;
             _VariableText = string.Empty;
 
             Style = PadStyles.Undefiniert;
 
-            FixSize = false;
             etxt = null;
             _Align = enAlignment.Top_Left;
         }
@@ -195,14 +183,6 @@ namespace BlueControls.ItemCollection
                     _Align = (enAlignment)byte.Parse(pair.Value);
                     return true;
 
-                case "fixsize":
-                    FixSize = pair.Value.FromPlusMinus();
-                    return true;
-
-                case "rotation":
-                    Rotation = int.Parse(pair.Value);
-                    return true;
-
                 case "format":
                     _Format = (enDataFormat)int.Parse(pair.Value);
                     return true;
@@ -210,8 +190,9 @@ namespace BlueControls.ItemCollection
                 case "additionalscale":
                     AdditionalScale = decimal.Parse(pair.Value.FromNonCritical());
                     return true;
+                default:
+                    return base.ParseExplicit(pair);               
             }
-            return false;
         }
 
 
@@ -219,19 +200,10 @@ namespace BlueControls.ItemCollection
         {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-
             if (!string.IsNullOrEmpty(_ReadableText)) { t = t + "ReadableText=" + _ReadableText.ToNonCritical() + ", "; }
-
-            if (Rotation != 0) { t = t + "Rotation=" + Rotation + ", "; }
-
             if (_Format != enDataFormat.Text) { t = t + "Format=" + (int)_Format + ", "; }
-
             if (_Align != enAlignment.Top_Left) { t = t + "Alignment=" + (int)_Align + ", "; }
-
-            t = t + "Fixsize=" + FixSize.ToPlusMinus() + ", ";
             t = t + "AdditionalScale=" + AdditionalScale.ToString().ToNonCritical();
-
-
             return t.Trim(", ") + "}";
         }
 
@@ -241,37 +213,7 @@ namespace BlueControls.ItemCollection
             return "TEXT";
         }
 
-        public override bool Contains(PointF value, decimal zoomfactor)
-        {
-            var tmp = UsedArea();
-            var ne = (int)(5 / zoomfactor);
-            tmp.Inflate(-ne, -ne);
-            return tmp.Contains(value.ToPointDF());
-        }
 
-        public override List<PointDF> PointList()
-        {
-            var l = new List<PointDF>();
-            l.Add(p_LO);
-            l.Add(p_RU);
-            l.Add(p_LU);
-            l.Add(p_RO);
-            return l;
-        }
-
-
-        public override RectangleDF UsedArea()
-        {
-
-            if (p_LO == null || p_RU == null) { return new RectangleDF(); }
-
-
-            //if ((int)(p_RU.X - p_LO.X) < 5) { p_RU.X += 5M; }
-            //if ((int)(p_RU.Y - p_LO.Y) < 5) { p_RU.Y += 5M; }
-
-            return new RectangleDF(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
-
-        }
 
         protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
@@ -292,12 +234,7 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public override void SetCoordinates(RectangleDF r)
-        {
-            p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
-            p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
-            RecomputePointAndRelations();
-        }
+
 
 
         private string ChangeText(string tmpBody)
@@ -411,42 +348,11 @@ namespace BlueControls.ItemCollection
             }
 
 
-            p_RO.SetTo(p_RU.X, p_LO.Y);
-            p_LU.SetTo(p_LO.X, p_RU.Y);
-
-
-            if ((p_RU.Y - p_LO.Y) * 0.2m > p_RU.X - p_LO.X)
-            {
-            }
+            base.KeepInternalLogic();
         }
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> relations)
-        {
 
-
-            p_LU.X = p_LO.X;
-            p_RO.Y = p_LO.Y;
-            p_RU.X = p_RO.X;
-            p_RU.Y = p_LU.Y;
-
-            if (FixSize)
-            {
-                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
-                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
-                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
-            }
-            else
-            {
-                relations.Add(new clsPointRelation(enRelationType.YPositionZueinander, p_LO, p_RU));
-
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
-
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
-            }
-        }
 
 
         public bool ParseVariable(string VariableName, enValueType ValueType, string Value)
@@ -518,7 +424,7 @@ namespace BlueControls.ItemCollection
             var l = new List<FlexiControl>();
 
             l.Add(new FlexiControl("Text", _VariableText, enDataFormat.Text, 5));
-            l.Add(new FlexiControl("Drehwinkel", Rotation.ToString(), enDataFormat.Ganzzahl, 1));
+
 
             l.Add(new FlexiControl("Stil", ((int)Style).ToString(), Skin.GetFonts(Parent.SheetStyle)));
 
@@ -534,13 +440,15 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl("Skalierung", AdditionalScale.ToString(), enDataFormat.Gleitkommazahl, 1));
 
 
+            l.AddRange(base.GetStyleOptions(sender, e));
+
             return l;
         }
 
         public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         {
 
-
+            base.DoStyleCommands(sender, Tags, ref CloseMenu);
 
             var txt = Tags.TagGet("text").FromNonCritical();
 
