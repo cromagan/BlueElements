@@ -24,7 +24,7 @@ namespace BlueControls.Forms
 			[DebuggerStepThrough()]
 			private void InitializeComponent()
 			{
-            this.Area_Seiten = new BlueControls.Controls.GroupBox();
+            this.grpSeiten = new BlueControls.Controls.GroupBox();
             this.Rechts = new BlueControls.Controls.Button();
             this.Links = new BlueControls.Controls.Button();
             this.ZoomOut = new BlueControls.Controls.Button();
@@ -39,13 +39,13 @@ namespace BlueControls.Forms
             this.Bild = new BlueControls.Controls.Button();
             this.Drucken = new BlueControls.Controls.Button();
             this.Page_Control = new BlueControls.Controls.TabPage();
-            this.Area_KomponenteHinzufügen = new BlueControls.Controls.GroupBox();
-            this.AddText = new BlueControls.Controls.Button();
-            this.AddImage = new BlueControls.Controls.Button();
-            this.AddDistance = new BlueControls.Controls.Button();
-            this.AddDimension = new BlueControls.Controls.Button();
-            this.AddLine = new BlueControls.Controls.Button();
-            this.Area_Werkzeuge = new BlueControls.Controls.GroupBox();
+            this.grpKomponenteHinzufügen = new BlueControls.Controls.GroupBox();
+            this.btnAddText = new BlueControls.Controls.Button();
+            this.btnAddImage = new BlueControls.Controls.Button();
+            this.btnAddDistance = new BlueControls.Controls.Button();
+            this.btnAddDimension = new BlueControls.Controls.Button();
+            this.btnAddLine = new BlueControls.Controls.Button();
+            this.grpWerkzeuge = new BlueControls.Controls.GroupBox();
             this.Auswahl = new BlueControls.Controls.Button();
             this.Page_Settings = new BlueControls.Controls.TabPage();
             this.Area_Assistent = new BlueControls.Controls.GroupBox();
@@ -63,29 +63,31 @@ namespace BlueControls.Forms
             this.sscchrifthgöße = new BlueControls.Controls.Caption();
             this.PadDesign = new BlueControls.Controls.ComboBox();
             this.ssss = new BlueControls.Controls.Caption();
-            this.Area_Seiten.SuspendLayout();
+            this.btnAddUnterStufe = new BlueControls.Controls.Button();
+            this.btnAddSymbol = new BlueControls.Controls.Button();
+            this.grpSeiten.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.Page_Start.SuspendLayout();
             this.Area_Drucken.SuspendLayout();
             this.Page_Control.SuspendLayout();
-            this.Area_KomponenteHinzufügen.SuspendLayout();
-            this.Area_Werkzeuge.SuspendLayout();
+            this.grpKomponenteHinzufügen.SuspendLayout();
+            this.grpWerkzeuge.SuspendLayout();
             this.Page_Settings.SuspendLayout();
             this.Area_Assistent.SuspendLayout();
             this.Area_Design.SuspendLayout();
             this.SuspendLayout();
             // 
-            // Area_Seiten
+            // grpSeiten
             // 
-            this.Area_Seiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(233)))), ((int)(((byte)(216)))));
-            this.Area_Seiten.CausesValidation = false;
-            this.Area_Seiten.Controls.Add(this.Rechts);
-            this.Area_Seiten.Controls.Add(this.Links);
-            this.Area_Seiten.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Area_Seiten.Location = new System.Drawing.Point(0, 0);
-            this.Area_Seiten.Name = "Area_Seiten";
-            this.Area_Seiten.Size = new System.Drawing.Size(112, 81);
-            this.Area_Seiten.Text = "Seiten";
+            this.grpSeiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(233)))), ((int)(((byte)(216)))));
+            this.grpSeiten.CausesValidation = false;
+            this.grpSeiten.Controls.Add(this.Rechts);
+            this.grpSeiten.Controls.Add(this.Links);
+            this.grpSeiten.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpSeiten.Location = new System.Drawing.Point(0, 0);
+            this.grpSeiten.Name = "grpSeiten";
+            this.grpSeiten.Size = new System.Drawing.Size(112, 81);
+            this.grpSeiten.Text = "Seiten";
             // 
             // Rechts
             // 
@@ -168,6 +170,7 @@ namespace BlueControls.Forms
             this.Ribbon.IsRibbonBar = true;
             this.Ribbon.Location = new System.Drawing.Point(0, 0);
             this.Ribbon.Name = "Ribbon";
+            this.Ribbon.SelectedIndex = 1;
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
             this.Ribbon.TabIndex = 2;
             // 
@@ -236,91 +239,93 @@ namespace BlueControls.Forms
             // 
             // Page_Control
             // 
-            this.Page_Control.Controls.Add(this.Area_KomponenteHinzufügen);
-            this.Page_Control.Controls.Add(this.Area_Werkzeuge);
-            this.Page_Control.Controls.Add(this.Area_Seiten);
+            this.Page_Control.Controls.Add(this.grpKomponenteHinzufügen);
+            this.Page_Control.Controls.Add(this.grpWerkzeuge);
+            this.Page_Control.Controls.Add(this.grpSeiten);
             this.Page_Control.Location = new System.Drawing.Point(4, 25);
             this.Page_Control.Name = "Page_Control";
             this.Page_Control.Size = new System.Drawing.Size(1326, 81);
             this.Page_Control.TabIndex = 0;
             this.Page_Control.Text = "Steuerung";
             // 
-            // Area_KomponenteHinzufügen
+            // grpKomponenteHinzufügen
             // 
-            this.Area_KomponenteHinzufügen.CausesValidation = false;
-            this.Area_KomponenteHinzufügen.Controls.Add(this.AddText);
-            this.Area_KomponenteHinzufügen.Controls.Add(this.AddImage);
-            this.Area_KomponenteHinzufügen.Controls.Add(this.AddDistance);
-            this.Area_KomponenteHinzufügen.Controls.Add(this.AddDimension);
-            this.Area_KomponenteHinzufügen.Controls.Add(this.AddLine);
-            this.Area_KomponenteHinzufügen.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Area_KomponenteHinzufügen.Location = new System.Drawing.Point(352, 0);
-            this.Area_KomponenteHinzufügen.Name = "Area_KomponenteHinzufügen";
-            this.Area_KomponenteHinzufügen.Size = new System.Drawing.Size(176, 81);
-            this.Area_KomponenteHinzufügen.Text = "Komponente hinzufügen";
+            this.grpKomponenteHinzufügen.CausesValidation = false;
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddSymbol);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddUnterStufe);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddText);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddImage);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDistance);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDimension);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddLine);
+            this.grpKomponenteHinzufügen.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpKomponenteHinzufügen.Location = new System.Drawing.Point(352, 0);
+            this.grpKomponenteHinzufügen.Name = "grpKomponenteHinzufügen";
+            this.grpKomponenteHinzufügen.Size = new System.Drawing.Size(264, 81);
+            this.grpKomponenteHinzufügen.Text = "Komponente hinzufügen";
             // 
-            // AddText
+            // btnAddText
             // 
-            this.AddText.ImageCode = "Textfeld|16";
-            this.AddText.Location = new System.Drawing.Point(8, 2);
-            this.AddText.Name = "AddText";
-            this.AddText.Size = new System.Drawing.Size(80, 22);
-            this.AddText.TabIndex = 4;
-            this.AddText.Text = "Text";
-            this.AddText.Click += new System.EventHandler(this.AddText_Click);
+            this.btnAddText.ImageCode = "Textfeld|16";
+            this.btnAddText.Location = new System.Drawing.Point(8, 2);
+            this.btnAddText.Name = "btnAddText";
+            this.btnAddText.Size = new System.Drawing.Size(80, 22);
+            this.btnAddText.TabIndex = 4;
+            this.btnAddText.Text = "Text";
+            this.btnAddText.Click += new System.EventHandler(this.AddText_Click);
             // 
-            // AddImage
+            // btnAddImage
             // 
-            this.AddImage.ImageCode = "Bild|16";
-            this.AddImage.Location = new System.Drawing.Point(8, 24);
-            this.AddImage.Name = "AddImage";
-            this.AddImage.Size = new System.Drawing.Size(80, 22);
-            this.AddImage.TabIndex = 2;
-            this.AddImage.Text = "Bild";
-            this.AddImage.Click += new System.EventHandler(this.AddImage_Click);
+            this.btnAddImage.ImageCode = "Bild|16";
+            this.btnAddImage.Location = new System.Drawing.Point(8, 24);
+            this.btnAddImage.Name = "btnAddImage";
+            this.btnAddImage.Size = new System.Drawing.Size(80, 22);
+            this.btnAddImage.TabIndex = 2;
+            this.btnAddImage.Text = "Bild";
+            this.btnAddImage.Click += new System.EventHandler(this.btnAddImage_Click);
             // 
-            // AddDistance
+            // btnAddDistance
             // 
-            this.AddDistance.ImageCode = "Kreis2|16|||||124|0";
-            this.AddDistance.Location = new System.Drawing.Point(96, 46);
-            this.AddDistance.Name = "AddDistance";
-            this.AddDistance.Size = new System.Drawing.Size(72, 22);
-            this.AddDistance.TabIndex = 5;
-            this.AddDistance.Text = "Distanz";
-            this.AddDistance.Click += new System.EventHandler(this.AddDistance_Click);
+            this.btnAddDistance.ImageCode = "Kreis2|16|||||124|0";
+            this.btnAddDistance.Location = new System.Drawing.Point(96, 46);
+            this.btnAddDistance.Name = "btnAddDistance";
+            this.btnAddDistance.Size = new System.Drawing.Size(72, 22);
+            this.btnAddDistance.TabIndex = 5;
+            this.btnAddDistance.Text = "Distanz";
+            this.btnAddDistance.Click += new System.EventHandler(this.btnAddDistance_Click);
             // 
-            // AddDimension
+            // btnAddDimension
             // 
-            this.AddDimension.ImageCode = "Bemaßung|16";
-            this.AddDimension.Location = new System.Drawing.Point(96, 2);
-            this.AddDimension.Name = "AddDimension";
-            this.AddDimension.Size = new System.Drawing.Size(72, 22);
-            this.AddDimension.TabIndex = 6;
-            this.AddDimension.Text = "Maß";
-            this.AddDimension.Click += new System.EventHandler(this.AddDimension_Click);
+            this.btnAddDimension.ImageCode = "Bemaßung|16";
+            this.btnAddDimension.Location = new System.Drawing.Point(96, 2);
+            this.btnAddDimension.Name = "btnAddDimension";
+            this.btnAddDimension.Size = new System.Drawing.Size(72, 22);
+            this.btnAddDimension.TabIndex = 6;
+            this.btnAddDimension.Text = "Maß";
+            this.btnAddDimension.Click += new System.EventHandler(this.btnAddDimension_Click);
             // 
-            // AddLine
+            // btnAddLine
             // 
-            this.AddLine.ImageCode = "Linie|16";
-            this.AddLine.Location = new System.Drawing.Point(96, 24);
-            this.AddLine.Name = "AddLine";
-            this.AddLine.Size = new System.Drawing.Size(72, 22);
-            this.AddLine.TabIndex = 7;
-            this.AddLine.Text = "Linie";
-            this.AddLine.Click += new System.EventHandler(this.AddLine_Click);
+            this.btnAddLine.ImageCode = "Linie|16";
+            this.btnAddLine.Location = new System.Drawing.Point(96, 24);
+            this.btnAddLine.Name = "btnAddLine";
+            this.btnAddLine.Size = new System.Drawing.Size(72, 22);
+            this.btnAddLine.TabIndex = 7;
+            this.btnAddLine.Text = "Linie";
+            this.btnAddLine.Click += new System.EventHandler(this.btnAddLine_Click);
             // 
-            // Area_Werkzeuge
+            // grpWerkzeuge
             // 
-            this.Area_Werkzeuge.CausesValidation = false;
-            this.Area_Werkzeuge.Controls.Add(this.Auswahl);
-            this.Area_Werkzeuge.Controls.Add(this.ZoomFitBut);
-            this.Area_Werkzeuge.Controls.Add(this.ZoomOut);
-            this.Area_Werkzeuge.Controls.Add(this.ZoomIn);
-            this.Area_Werkzeuge.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Area_Werkzeuge.Location = new System.Drawing.Point(112, 0);
-            this.Area_Werkzeuge.Name = "Area_Werkzeuge";
-            this.Area_Werkzeuge.Size = new System.Drawing.Size(240, 81);
-            this.Area_Werkzeuge.Text = "Werkzeuge";
+            this.grpWerkzeuge.CausesValidation = false;
+            this.grpWerkzeuge.Controls.Add(this.Auswahl);
+            this.grpWerkzeuge.Controls.Add(this.ZoomFitBut);
+            this.grpWerkzeuge.Controls.Add(this.ZoomOut);
+            this.grpWerkzeuge.Controls.Add(this.ZoomIn);
+            this.grpWerkzeuge.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpWerkzeuge.Location = new System.Drawing.Point(112, 0);
+            this.grpWerkzeuge.Name = "grpWerkzeuge";
+            this.grpWerkzeuge.Size = new System.Drawing.Size(240, 81);
+            this.grpWerkzeuge.Text = "Werkzeuge";
             // 
             // Auswahl
             // 
@@ -503,23 +508,42 @@ namespace BlueControls.Forms
             this.ssss.Text = "Design:";
             this.ssss.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             // 
+            // btnAddUnterStufe
+            // 
+            this.btnAddUnterStufe.ImageCode = "Datei|16";
+            this.btnAddUnterStufe.Location = new System.Drawing.Point(168, 2);
+            this.btnAddUnterStufe.Name = "btnAddUnterStufe";
+            this.btnAddUnterStufe.Size = new System.Drawing.Size(88, 22);
+            this.btnAddUnterStufe.TabIndex = 8;
+            this.btnAddUnterStufe.Text = "Unterstufe";
+            this.btnAddUnterStufe.Click += new System.EventHandler(this.btnAddUnterStufe_Click);
+            // 
+            // btnAddSymbol
+            // 
+            this.btnAddSymbol.ImageCode = "Formel|16";
+            this.btnAddSymbol.Location = new System.Drawing.Point(8, 46);
+            this.btnAddSymbol.Name = "btnAddSymbol";
+            this.btnAddSymbol.Size = new System.Drawing.Size(80, 22);
+            this.btnAddSymbol.TabIndex = 9;
+            this.btnAddSymbol.Text = "Symbol";
+            this.btnAddSymbol.Click += new System.EventHandler(this.btnAddSymbol_Click);
+            // 
             // PictureView
             // 
             this.ClientSize = new System.Drawing.Size(1334, 681);
             this.Controls.Add(this.Pad);
             this.Controls.Add(this.Ribbon);
-            this.Design = BlueControls.Enums.enDesign.Form_Standard;
             this.Name = "PictureView";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "(c) Christian Peter";
             this.TopMost = true;
-            this.Area_Seiten.ResumeLayout(false);
+            this.grpSeiten.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.Page_Start.ResumeLayout(false);
             this.Area_Drucken.ResumeLayout(false);
             this.Page_Control.ResumeLayout(false);
-            this.Area_KomponenteHinzufügen.ResumeLayout(false);
-            this.Area_Werkzeuge.ResumeLayout(false);
+            this.grpKomponenteHinzufügen.ResumeLayout(false);
+            this.grpWerkzeuge.ResumeLayout(false);
             this.Page_Settings.ResumeLayout(false);
             this.Area_Assistent.ResumeLayout(false);
             this.Area_Design.ResumeLayout(false);
@@ -530,18 +554,18 @@ namespace BlueControls.Forms
 			private Button Rechts;
 			private Button ZoomOut;
 			private Button Auswahl;
-			private Button AddText;
-			private Button AddImage;
-			private Button AddDistance;
-			private Button AddDimension;
-			private Button AddLine;
+			private Button btnAddText;
+			private Button btnAddImage;
+			private Button btnAddDistance;
+			private Button btnAddDimension;
+			private Button btnAddLine;
 			public CreativePad Pad;
 			protected TabControl Ribbon;
 			protected TabPage Page_Control;
 			protected TabPage Page_Start;
-			protected GroupBox Area_Seiten;
-			protected GroupBox Area_Werkzeuge;
-			protected GroupBox Area_KomponenteHinzufügen;
+			protected GroupBox grpSeiten;
+			protected GroupBox grpWerkzeuge;
+			protected GroupBox grpKomponenteHinzufügen;
 			protected GroupBox Area_Drucken;
 			protected GroupBox Area_Design;
 			private Caption ssss;
@@ -567,5 +591,7 @@ namespace BlueControls.Forms
 
 
             private TabPage Page_Settings;
-        }
+        private Button btnAddUnterStufe;
+        private Button btnAddSymbol;
+    }
 	}

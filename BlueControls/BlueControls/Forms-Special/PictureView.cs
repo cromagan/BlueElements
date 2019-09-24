@@ -62,7 +62,7 @@ namespace BlueControls.Forms
             InitWindow(MitScreenResize, WindowCaption, -1, "");
 
 
-            Area_KomponenteHinzufügen.Visible = false;
+            grpKomponenteHinzufügen.Visible = false;
             Area_Assistent.Visible = false;
             Area_Design.Visible = false;
 
@@ -87,7 +87,7 @@ namespace BlueControls.Forms
             InitWindow(false, "", -1, "");
 
 
-            Area_KomponenteHinzufügen.Visible = false;
+            grpKomponenteHinzufügen.Visible = false;
             Area_Assistent.Visible = false;
             Area_Design.Visible = false;
 
@@ -109,10 +109,10 @@ namespace BlueControls.Forms
 
             InitWindow(MitScreenResize, WindowCaption, OpenOnScreen, "");
 
-            Area_KomponenteHinzufügen.Visible = false;
+            grpKomponenteHinzufügen.Visible = false;
             Area_Assistent.Visible = false;
             Area_Design.Visible = false;
-            Area_Seiten.Visible = FileList != null && FileList.Count > 1;
+            grpSeiten.Visible = FileList != null && FileList.Count > 1;
 
             ZoomIn.Checked = true;
             Auswahl.Enabled = false;
@@ -175,7 +175,7 @@ namespace BlueControls.Forms
             Ribbon.SelectedIndex = 1;
 
 
-            Area_Seiten.Visible = _FileList != null && _FileList.Count > 1;
+            grpSeiten.Visible = _FileList != null && _FileList.Count > 1;
 
             if (_FileList == null || _FileList.Count == 0)
             {
@@ -184,7 +184,7 @@ namespace BlueControls.Forms
             }
             else
             {
-                Area_Seiten.Enabled = true;
+                grpSeiten.Enabled = true;
                 Links.Enabled = Convert.ToBoolean(_NR > 0);
                 Rechts.Enabled = Convert.ToBoolean(_NR < _FileList.Count - 1);
 
@@ -201,7 +201,7 @@ namespace BlueControls.Forms
         {
             //    Me.ShowInTaskbar = False
 
-            if (_FileList == null || _FileList.Count < 2) { Area_Seiten.Enabled = false; }
+            if (_FileList == null || _FileList.Count < 2) { grpSeiten.Enabled = false; }
 
 
             if (FitWindowToBest)
@@ -302,20 +302,20 @@ namespace BlueControls.Forms
 
 
 
-        private void AddLine_Click(object sender, System.EventArgs e)
+        private void btnAddLine_Click(object sender, System.EventArgs e)
         {
             var b = new LinePadItem(PadStyles.Style_Standard, new Point(300, 300), new Point(400, 300));
             Pad.Item.Add(b);
         }
 
-        private void AddDistance_Click(object sender, System.EventArgs e)
+        private void btnAddDistance_Click(object sender, System.EventArgs e)
         {
             var b = new SpacerPadItem(Pad.Item);
             Pad.Item.Add(b);
             b.SetCoordinates(new RectangleDF(10, 10, 20, 20));
         }
 
-        private void AddImage_Click(object sender, System.EventArgs e)
+        private void btnAddImage_Click(object sender, System.EventArgs e)
         {
             var b = new BitmapPadItem(QuickImage.Get(enImageCode.Fragezeichen).BMP, new Size(1000, 1000));
             Pad.Item.Add(b);
@@ -332,7 +332,7 @@ namespace BlueControls.Forms
         }
 
 
-        private void AddDimension_Click(object sender, System.EventArgs e)
+        private void btnAddDimension_Click(object sender, System.EventArgs e)
         {
             var b = new DimensionPadItem(new PointF(300, 300), new PointF(400, 300), 30, Pad.DPI);
             Pad.Item.Add(b);
@@ -446,5 +446,18 @@ namespace BlueControls.Forms
             Pad.ShowWorkingAreaSetup();
         }
 
+        private void btnAddUnterStufe_Click(object sender, System.EventArgs e)
+        {
+            var b = new ChildPadItem();
+            b.SetCoordinates(new RectangleDF(100, 100, 300, 300));
+            Pad.Item.Add(b);
+        }
+
+        private void btnAddSymbol_Click(object sender, System.EventArgs e)
+        {
+            var b = new SymbolPadItem();
+            b.SetCoordinates(new RectangleDF(100, 100, 300, 300));
+            Pad.Item.Add(b);
+        }
     }
 }

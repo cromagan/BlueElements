@@ -240,12 +240,14 @@ namespace BlueControls.Controls
             list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
             var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
             var x = Math.Max((int)(list.WidthOfBiggestItem(500) + 20 + s.Width), 200);
-            var y = Math.Max((int)(list.HeightOfBiggestItem(100)) + Skin.PaddingSmal * 2, 24);
+            var y = Math.Max((int)(list.HeightOfBiggestItem(100) + Skin.PaddingSmal * 2), 24);
 
             Size = new Size(x, y);
-            _Value = InitialValue;
+
 
             StyleComboBox(ComboBox, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
+
+            Value = InitialValue;
         }
 
 

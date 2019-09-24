@@ -346,6 +346,10 @@ namespace BlueControls.ItemCollection
             {
                 i = new ComicCompPadItem();
             }
+            else if (Code.ToLower().StartsWith("{classid=symbol,"))
+            {
+                i = new SymbolPadItem();
+            }
             else
             {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Unbekanntes Item: " + Code);

@@ -203,7 +203,7 @@ namespace BlueControls.ItemCollection
             if (!string.IsNullOrEmpty(_ReadableText)) { t = t + "ReadableText=" + _ReadableText.ToNonCritical() + ", "; }
             if (_Format != enDataFormat.Text) { t = t + "Format=" + (int)_Format + ", "; }
             if (_Align != enAlignment.Top_Left) { t = t + "Alignment=" + (int)_Align + ", "; }
-            t = t + "AdditionalScale=" + AdditionalScale.ToString().ToNonCritical();
+            t = t + "AdditionalScale=" + AdditionalScale.ToString().ToNonCritical() + ", ";
             return t.Trim(", ") + "}";
         }
 
@@ -220,13 +220,25 @@ namespace BlueControls.ItemCollection
 
             if (Style == PadStyles.Undefiniert) { return; }
 
-            etxt.DrawingPos = new Point(DCoordinates.Left, DCoordinates.Top);
+
+
+            var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            GR.TranslateTransform(trp.X, trp.Y);
+            GR.RotateTransform(-Rotation);
+
+
+            etxt.DrawingPos = new Point(DCoordinates.Left - trp.X, DCoordinates.Top - trp.Y);
             etxt.DrawingArea = Rectangle.Empty; // new Rectangle(DCoordinates.Left, DCoordinates.Top, DCoordinates.Width, DCoordinates.Height);
 
             if (!string.IsNullOrEmpty(_ReadableText) || !ForPrinting)
             {
                 etxt.Draw(GR, (float)(cZoom * AdditionalScale * Parent.SheetStyleScale));
             }
+
+
+            GR.TranslateTransform(-trp.X, -trp.Y);
+            GR.ResetTransform();
+
 
             if (!ForPrinting)
             {

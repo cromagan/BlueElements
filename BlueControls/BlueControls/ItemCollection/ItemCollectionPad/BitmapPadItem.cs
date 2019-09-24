@@ -179,7 +179,7 @@ namespace BlueControls.ItemCollection
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
 
             GR.TranslateTransform(trp.X, trp.Y);
-            GR.RotateTransform(Rotation);
+            GR.RotateTransform(-Rotation);
 
 
             r1 = new Rectangle(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);
@@ -272,7 +272,7 @@ namespace BlueControls.ItemCollection
         {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-            t = t + "Modus=" + (int)(BildModus) + ", ";
+            t = t + "Modus=" + (int)BildModus + ", ";
             if (!string.IsNullOrEmpty(_PlaceHolderString))
             {
                 t = t + "Placeholder=" + _PlaceHolderString.ToNonCritical() + ", ";

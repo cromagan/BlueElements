@@ -114,7 +114,7 @@ namespace BlueControls.ItemCollection
             }
             else
             {
-                relations.Add(new clsPointRelation(enRelationType.YPositionZueinander, p_LO, p_RU));
+                //relations.Add(new clsPointRelation(enRelationType.YPositionZueinander, p_LO, p_RU));
 
                 relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
                 relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
@@ -141,7 +141,6 @@ namespace BlueControls.ItemCollection
             else
             {
                 l.Add(new FlexiControl("Größe fixiert", FixSize));
-                l.Add(new FlexiControl("Skalieren", enImageCode.Formel));
             }
 
 

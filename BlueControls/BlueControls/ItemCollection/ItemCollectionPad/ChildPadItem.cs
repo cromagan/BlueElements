@@ -32,7 +32,7 @@ using System.Runtime.CompilerServices;
 
 namespace BlueControls.ItemCollection
 {
-    public class ChildPadItem : BasicPadItem, IMouseAndKeyHandle, ICanHaveColumnVariables
+    public class ChildPadItem : FormPadItemRectangle, IMouseAndKeyHandle, ICanHaveColumnVariables
     {
 
 
@@ -40,12 +40,7 @@ namespace BlueControls.ItemCollection
 
         #region  Variablen-Deklarationen 
 
-        internal PointDF p_LO;
-        internal PointDF p_RO;
-        internal PointDF p_RU;
-        internal PointDF p_LU;
 
-        public bool FixSize;
 
         private Bitmap _tmpBitmap;
 
@@ -92,11 +87,6 @@ namespace BlueControls.ItemCollection
         {
             base.Initialize();
             PadInternal = new CreativePad();
-            p_LO = new PointDF(this, "LO", 0, 0, false, true, true);
-            p_RO = new PointDF(this, "RO", 0, 0);
-            p_RU = new PointDF(this, "RU", 0, 0);
-            p_LU = new PointDF(this, "LU", 0, 0);
-            FixSize = true;
             _tmpBitmap = null;
         }
 
@@ -123,17 +113,13 @@ namespace BlueControls.ItemCollection
             return "CHILDPAD";
         }
 
-        public override bool Contains(PointF value, decimal zoomfactor)
-        {
-            var tmp = UsedArea();
-            var ne = (int)(5 / zoomfactor);
-            tmp.Inflate(-ne, -ne);
-            return tmp.Contains(value.ToPointDF());
-        }
-
 
         protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
+
+            var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            GR.TranslateTransform(trp.X, trp.Y);
+            GR.RotateTransform(-Rotation);
 
             if (PadInternal != null)
             {
@@ -187,8 +173,11 @@ namespace BlueControls.ItemCollection
                 //var r2 = new RectangleF((DCoordinates.Width - _tmpBitmap.Width * scale) / 2 + DCoordinates.Left, (DCoordinates.Height - _tmpBitmap.Height * scale) / 2 + DCoordinates.Top, _tmpBitmap.Width * scale, _tmpBitmap.Height * scale);
 
                 //GR.DrawImage(_tmpBitmap, r2, new RectangleF(0, 0, _tmpBitmap.Width, _tmpBitmap.Height), GraphicsUnit.Pixel);
-                GR.DrawImageInRectAspectRatio(_tmpBitmap, DCoordinates);
+                GR.DrawImageInRectAspectRatio(_tmpBitmap, new Rectangle(-DCoordinates.Width / 2, -DCoordinates.Height / 2, DCoordinates.Width, DCoordinates.Height));
             }
+
+            GR.TranslateTransform(-trp.X, -trp.Y);
+            GR.ResetTransform();
 
             if (!ForPrinting)
             {
@@ -196,22 +185,7 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public override List<PointDF> PointList()
-        {
-            var l = new List<PointDF>();
-            l.Add(p_LO);
-            l.Add(p_RU);
-            l.Add(p_LU);
-            l.Add(p_RO);
-            return l;
-        }
 
-
-        public override RectangleDF UsedArea()
-        {
-            if (p_LO == null || p_RU == null) { return new RectangleDF(); }
-            return new RectangleDF(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
-        }
 
 
         protected override bool ParseExplicit(KeyValuePair<string, string> pair)
@@ -230,10 +204,10 @@ namespace BlueControls.ItemCollection
                     return true;
                 case "checked":
                     return true;
+                default:
+                    return base.ParseExplicit(pair);
 
             }
-
-            return false;
         }
 
 
@@ -241,15 +215,6 @@ namespace BlueControls.ItemCollection
         {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-
-            if (FixSize)
-            {
-                t = t + "Fixsize=True, ";
-            }
-            else
-            {
-                t = t + "Fixsize=False, ";
-            }
 
             if (PadInternal != null)
             {
@@ -260,46 +225,9 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void SetCoordinates(RectangleDF r)
-        {
-
-            p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
-            p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
-            RecomputePointAndRelations();
-        }
 
 
-        protected override void KeepInternalLogic()
-        {
-            p_RO.SetTo(p_RU.X, p_LO.Y);
-            p_LU.SetTo(p_LO.X, p_RU.Y);
-        }
 
-
-        public override void GenerateInternalRelation(List<clsPointRelation> relations)
-        {
-
-
-            p_LU.X = p_LO.X;
-            p_RO.Y = p_LO.Y;
-            p_RU.X = p_RO.X;
-            p_RU.Y = p_LU.Y;
-
-            if (FixSize)
-            {
-                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
-                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
-                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
-            }
-            else
-            {
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
-
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
-            }
-        }
 
         private void _Pad_NeedRefresh(object sender, System.EventArgs e)
         {
@@ -464,30 +392,15 @@ namespace BlueControls.ItemCollection
 
             var l = new List<FlexiControl>();
 
-            if (sender is CreativePad CP)
-            {
-                var Relations = CP.AllRelations();
 
-                if (!FixSize && !p_LO.CanMove(Relations) && !p_RU.CanMove(Relations))
-                {
-                    l.Add(new FlexiControl("Objekt fest definiert,<br>Größe kann nicht fixiert werden"));
-                }
-                else
-                {
-                    l.Add(new FlexiControl("Größe fixiert", FixSize));
-                }
-            }
+            l.AddRange(base.GetStyleOptions(sender, e));
             return l;
         }
 
         public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         {
-            var nFixSize = Tags.TagGet("Größe fixiert").FromPlusMinus();
-            if (nFixSize != FixSize)
-            {
-                FixSize = nFixSize;
-                ClearInternalRelations();
-            }
+            base.DoStyleCommands(sender, Tags, ref CloseMenu);
+
         }
     }
 }

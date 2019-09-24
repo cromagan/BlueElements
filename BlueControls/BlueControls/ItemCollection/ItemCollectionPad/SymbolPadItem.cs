@@ -28,7 +28,7 @@ using BlueControls.Enums;
 
 namespace BlueControls.ItemCollection
 {
-   public class SymbolPadItem : FormPadItemRectangle
+    public class SymbolPadItem : FormPadItemRectangle
     {
         public override void DesignOrStyleChanged()
         {
@@ -50,15 +50,15 @@ namespace BlueControls.ItemCollection
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
 
             GR.TranslateTransform(trp.X, trp.Y);
-            GR.RotateTransform(Rotation);
+            GR.RotateTransform(-Rotation);
 
 
             GraphicsPath p = null;
 
 
             var d2 = DCoordinates;
-            d2.X = -DCoordinates.Width/2;
-            d2.Y = -DCoordinates.Height / 2; 
+            d2.X = -DCoordinates.Width / 2;
+            d2.Y = -DCoordinates.Height / 2;
 
             switch (Symbol)
             {
@@ -133,5 +133,35 @@ namespace BlueControls.ItemCollection
             Symbol = (enSymbol)int.Parse(Tags.TagGet("Symbol"));
             Style = (PadStyles)int.Parse(Tags.TagGet("Farbe"));
         }
+
+
+        public override string ToString()
+        {
+            var t = base.ToString();
+            t = t.Substring(0, t.Length - 1) + ", ";
+            t = t + "Symbol=" + (int)Symbol + ", ";
+            t = t + "Fill=" + Gefuellt.ToPlusMinus() + ", ";
+
+            return t.Trim(", ") + "}";
+        }
+
+
+        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
+        {
+            switch (pair.Key)
+            {
+                case "symbol":
+                    Symbol = (enSymbol)int.Parse(pair.Value);
+                    return true;
+                case "fill":
+                    Gefuellt = pair.Value.FromPlusMinus();
+                    return true;
+                default:
+                    return base.ParseExplicit(pair);
+            }
+        }
+
+
+
     }
 }

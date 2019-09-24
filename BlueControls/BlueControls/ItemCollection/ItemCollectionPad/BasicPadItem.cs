@@ -203,7 +203,7 @@ namespace BlueControls.ItemCollection
                         break;
 
                     default:
-                        if (!ParseExplicit(pair)) { Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key); }
+                        if (!ParseExplicit(pair)) { Develop.DebugPrint(enFehlerArt.Warnung, "Tag unbekannt: " + pair.Key); }
                         break;
                 }
             }

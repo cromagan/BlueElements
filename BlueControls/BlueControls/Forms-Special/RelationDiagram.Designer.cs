@@ -39,7 +39,7 @@ namespace BlueControls.Forms
             this.Ribbon.SuspendLayout();
             this.Page_Control.SuspendLayout();
             this.Page_Start.SuspendLayout();
-            this.Area_KomponenteHinzufügen.SuspendLayout();
+            this.grpKomponenteHinzufügen.SuspendLayout();
             this.Area_Drucken.SuspendLayout();
             this.Area_Design.SuspendLayout();
             this.SuspendLayout();
@@ -62,13 +62,13 @@ namespace BlueControls.Forms
             // 
             // Area_Seiten
             // 
-            this.Area_Seiten.Visible = false;
+            this.grpSeiten.Visible = false;
             // 
             // Area_KomponenteHinzufügen
             // 
-            this.Area_KomponenteHinzufügen.Controls.Add(this.Hinzu);
-            this.Area_KomponenteHinzufügen.Size = new Size(256, 81);
-            this.Area_KomponenteHinzufügen.Controls.SetChildIndex(this.Hinzu, 0);
+            this.grpKomponenteHinzufügen.Controls.Add(this.Hinzu);
+            this.grpKomponenteHinzufügen.Size = new Size(256, 81);
+            this.grpKomponenteHinzufügen.Controls.SetChildIndex(this.Hinzu, 0);
             // 
             // Area_Design
             // 
@@ -102,7 +102,7 @@ namespace BlueControls.Forms
             this.Ribbon.ResumeLayout(false);
             this.Page_Control.ResumeLayout(false);
             this.Page_Start.ResumeLayout(false);
-            this.Area_KomponenteHinzufügen.ResumeLayout(false);
+            this.grpKomponenteHinzufügen.ResumeLayout(false);
             this.Area_Drucken.ResumeLayout(false);
             this.Area_Design.ResumeLayout(false);
             this.ResumeLayout(false);
