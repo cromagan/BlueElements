@@ -48,13 +48,11 @@ namespace BlueControls.ItemCollection
         private CreativePad _PadInternal;
         public CreativePad PadInternal
         {
-            [DebuggerNonUserCode]
             get
             {
                 return _PadInternal;
             }
             [MethodImpl(MethodImplOptions.Synchronized)]
-            [DebuggerNonUserCode]
             set
             {
                 if (_PadInternal != null)
@@ -86,7 +84,7 @@ namespace BlueControls.ItemCollection
         protected override void Initialize()
         {
             base.Initialize();
-            PadInternal = new CreativePad();
+            PadInternal = null; // new CreativePad();
             _tmpBitmap = null;
         }
 
@@ -127,18 +125,17 @@ namespace BlueControls.ItemCollection
                 PadInternal.SheetStyle = Parent.SheetStyle.CellFirstString();
                 PadInternal.SheetStyleScale = Parent.SheetStyleScale;
 
+                //var r = UsedArea();
 
-                var r = UsedArea();
-
-                while (r.Width * cZoom > 8000 || r.Height * cZoom > 8000)
-                {
-                    cZoom = cZoom * 0.8m; // Kann ruhig verändert werden, tut nix zur Sache, DKoordinates reichen
-                }
+                //while (r.Width * cZoom > 8000 || r.Height * cZoom > 8000)
+                //{
+                //    cZoom = cZoom * 0.8m; // Kann ruhig verändert werden, tut nix zur Sache, DKoordinates reichen
+                //}
 
 
                 if (_tmpBitmap != null)
                 {
-                    if (_tmpBitmap.Width != (int)(r.Width * cZoom) || (int)(r.Height * cZoom) != _tmpBitmap.Height)
+                    if (_tmpBitmap.Width != DCoordinates.Width || DCoordinates.Height != _tmpBitmap.Height)
                     {
                         _tmpBitmap.Dispose();
                         _tmpBitmap = null;
@@ -148,16 +145,18 @@ namespace BlueControls.ItemCollection
 
                 if (_tmpBitmap == null)
                 {
-                    _tmpBitmap = new Bitmap(Math.Abs((int)(r.Width * cZoom)), Math.Abs((int)(r.Height * cZoom)));
+                    _tmpBitmap = new Bitmap(Math.Abs(DCoordinates.Width), Math.Abs(DCoordinates.Height));
                 }
-                PadInternal.Width = _tmpBitmap.Width;
-                PadInternal.Height = _tmpBitmap.Height;
-                PadInternal.ZoomFitWithoutSliders();
+                //PadInternal.Width = _tmpBitmap.Width;
+                //PadInternal.Height = _tmpBitmap.Height;
+                //  PadInternal.ZoomFitWithoutSliders();
+
+                var v = PadInternal.ZoomFitAndSliderValues(false, _tmpBitmap.Size, -1);
 
                 PadInternal.ShowInPrintMode = ForPrinting;
                 if (ForPrinting) { PadInternal.Unselect(); }
 
-                PadInternal.DrawCreativePadToBitmap(Graphics.FromImage(_tmpBitmap), enStates.Standard);
+                PadInternal.DrawCreativePadToBitmap(_tmpBitmap, enStates.Standard, v.Item1, v.Item2, v.Item3);
 
 
             }
@@ -173,7 +172,7 @@ namespace BlueControls.ItemCollection
                 //var r2 = new RectangleF((DCoordinates.Width - _tmpBitmap.Width * scale) / 2 + DCoordinates.Left, (DCoordinates.Height - _tmpBitmap.Height * scale) / 2 + DCoordinates.Top, _tmpBitmap.Width * scale, _tmpBitmap.Height * scale);
 
                 //GR.DrawImage(_tmpBitmap, r2, new RectangleF(0, 0, _tmpBitmap.Width, _tmpBitmap.Height), GraphicsUnit.Pixel);
-                GR.DrawImageInRectAspectRatio(_tmpBitmap, new Rectangle(-DCoordinates.Width / 2, -DCoordinates.Height / 2, DCoordinates.Width, DCoordinates.Height));
+                GR.DrawImage(_tmpBitmap, new Rectangle(-DCoordinates.Width / 2, -DCoordinates.Height / 2, DCoordinates.Width, DCoordinates.Height));
             }
 
             GR.TranslateTransform(-trp.X, -trp.Y);

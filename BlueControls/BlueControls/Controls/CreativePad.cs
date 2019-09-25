@@ -780,7 +780,7 @@ namespace BlueControls.Controls
             {
                 gr.Clear(Color.White);
 
-                Draw(gr, Scale, r.Left * Scale, r.Top * Scale, true, true);
+                Draw(gr, Scale, r.Left * Scale, r.Top * Scale, Size.Empty, true);
 
             }
 
@@ -788,34 +788,59 @@ namespace BlueControls.Controls
             return I;
         }
 
-        private void ZoomFitInvalidateAndCheckButtons(bool SliderShowing)
+        public Tuple<decimal, int, int> ZoomFitAndSliderValues(bool SliderShowing, Size s, decimal ZoomToUse)
         {
-
 
             var r = MaxBounds();
 
-            if (r.Width < 0.01m || r.Height < 0.01m)
-            {
-                _Zoom = 1;
-                _ZoomMin = _Zoom;
-                ComputeSliders(SliderShowing);
-                return;
-            }
+            if (r.Width < 0.01m || r.Height < 0.01m) { return new Tuple<decimal, int, int>(1, 0, 0); }
 
 
+            decimal tmpZoom = 1;
 
             if (SliderShowing)
             {
-                _ZoomMin = Math.Min((Width - SliderY.Width - 32) / r.Width, (Height - SliderX.Height - 32) / r.Height);
+                tmpZoom = Math.Min((s.Width - SliderY.Width - 32) / r.Width, (s.Height - SliderX.Height - 32) / r.Height);
             }
             else
             {
-                _ZoomMin = Math.Min(Width / r.Width, Height / r.Height);
+                tmpZoom = Math.Min(s.Width / r.Width, s.Height / r.Height);
             }
 
 
+            if (ZoomToUse < 0) { ZoomToUse = tmpZoom; }
 
-            // _ZoomMin = Math.Max(_ZoomMin, 0.0001m);
+            var w = 0;
+            var h = 0;
+
+            if (SliderShowing)
+            {
+                w = (int)(s.Width - SliderY.Width - r.Width * ZoomToUse);
+                h = (int)(s.Height - SliderX.Height - r.Height * ZoomToUse);
+            }
+            else
+            {
+                w = (int)(s.Width - r.Width * ZoomToUse);
+                h = (int)(s.Height - r.Height * ZoomToUse);
+            }
+
+
+            return new Tuple<decimal, int, int>(tmpZoom, w, h);
+        }
+
+
+
+
+        private void ZoomFitInvalidateAndCheckButtons()
+        {
+
+
+
+
+            var ZoomData = ZoomFitAndSliderValues(true, Size, -1);
+
+            _ZoomMin = ZoomData.Item1;
+
 
 
             if (_Fitting && !MousePressing())
@@ -828,7 +853,7 @@ namespace BlueControls.Controls
 
 
 
-            ComputeSliders(SliderShowing);
+            ComputeSliders(true);
 
 
         }
@@ -848,19 +873,15 @@ namespace BlueControls.Controls
         public void ZoomFit()
         {
             _Fitting = true;
-            ZoomFitInvalidateAndCheckButtons(true);
+            ZoomFitInvalidateAndCheckButtons();
         }
 
 
-        public void ZoomFitWithoutSliders()
-        {
-            _Fitting = true;
-            //SliderX.Value = 0
-            //SliderY.Value = 0
-            //SliderX.Visible = False
-            //SliderY.Visible = False
-            ZoomFitInvalidateAndCheckButtons(false);
-        }
+        //public void ZoomFitWithoutSliders()
+        //{
+        //    _Fitting = true;
+        //    ZoomFitInvalidateAndCheckButtons(false);
+        //}
 
 
 
@@ -1021,7 +1042,7 @@ namespace BlueControls.Controls
 
         }
 
-        private void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, bool Drawall, bool ForPrinting)
+        private void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, Size SizeOfParentControl, bool ForPrinting)
         {
 
             if (_SheetStyle == null || _SheetStyleScale < 0.1m) { return; }
@@ -1035,14 +1056,8 @@ namespace BlueControls.Controls
             {
                 if (thisItem != null)
                 {
-                    if (Drawall)
-                    {
-                        thisItem.Draw(GR, cZoom, MoveX, MoveY, 0, Size.Empty, ForPrinting);
-                    }
-                    else
-                    {
-                        thisItem.Draw(GR, cZoom, MoveX, MoveY, 0, Size, ForPrinting);
-                    }
+                    thisItem.Draw(GR, cZoom, MoveX, MoveY, 0, SizeOfParentControl, ForPrinting);
+
                 }
             }
 
@@ -1055,28 +1070,29 @@ namespace BlueControls.Controls
         }
 
 
-        internal void DrawCreativePadToBitmap(Graphics TMPGR, enStates vState)
+        internal void DrawCreativePadToBitmap(Bitmap BMP, enStates vState, decimal zoomf, decimal X, decimal Y)
         {
 
-            var X = (decimal)SliderX.Value;
-            var Y = (decimal)SliderY.Value;
+            var TMPGR = Graphics.FromImage(BMP);
+
+
 
             if (_SheetSizeInMM.Width > 0 && _SheetSizeInMM.Height > 0)
             {
                 Skin.Draw_Back(TMPGR, enDesign.Table_And_Pad, vState, DisplayRectangle, this, true);
                 var SSW = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI), 1);
                 var SSH = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Height, DPI), 1);
-                var LO = new PointDF(0m, 0m).ZoomAndMove(_Zoom, X, Y);
-                var RU = new PointDF(SSW, SSH).ZoomAndMove(_Zoom, X, Y);
+                var LO = new PointDF(0m, 0m).ZoomAndMove(zoomf, X, Y);
+                var RU = new PointDF(SSW, SSH).ZoomAndMove(zoomf, X, Y);
 
                 var R = new Rectangle((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
                 TMPGR.FillRectangle(Brushes.White, R);
                 TMPGR.DrawRectangle(PenGray, R);
 
-                var rtx = (int)(P_rLO.X * _Zoom - X);
-                var rty = (int)(P_rLO.Y * _Zoom - Y);
-                var rtx2 = (int)(P_rRU.X * _Zoom - X);
-                var rty2 = (int)(P_rRU.Y * _Zoom - Y);
+                var rtx = (int)(P_rLO.X * zoomf - X);
+                var rty = (int)(P_rLO.Y * zoomf - Y);
+                var rtx2 = (int)(P_rRU.X * zoomf - X);
+                var rty2 = (int)(P_rRU.Y * zoomf - Y);
                 var Rr = new Rectangle(rtx, rty, rtx2 - rtx, rty2 - rty);
                 if (!_ShowInPrintMode)
                 {
@@ -1091,7 +1107,7 @@ namespace BlueControls.Controls
 
 
 
-            Draw(TMPGR, _Zoom, X, Y, false, _ShowInPrintMode);
+            Draw(TMPGR, zoomf, X, Y, BMP.Size, _ShowInPrintMode);
 
 
             var Relations = AllRelations();
@@ -1099,7 +1115,7 @@ namespace BlueControls.Controls
             // Erst Beziehungen, weil die die Grauen Punkte zeichnet
             foreach (var ThisRelation in Relations)
             {
-                ThisRelation.Draw(TMPGR, _Zoom, X, Y, Relations.IndexOf(ThisRelation));
+                ThisRelation.Draw(TMPGR, zoomf, X, Y, Relations.IndexOf(ThisRelation));
             }
 
 
@@ -1109,7 +1125,7 @@ namespace BlueControls.Controls
                 // Alle Punkte mit Order anzeigen
                 foreach (var ThisPoint in _Points)
                 {
-                    ThisPoint.Draw(TMPGR, _Zoom, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                    ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
                 }
             }
 
@@ -1126,11 +1142,11 @@ namespace BlueControls.Controls
             {
                 if (ThisPoint.CanMove(Relations))
                 {
-                    ThisPoint.Draw(TMPGR, _Zoom, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard);
+                    ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard);
                 }
                 else
                 {
-                    ThisPoint.Draw(TMPGR, _Zoom, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                    ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
                 }
             }
 
@@ -1139,8 +1155,8 @@ namespace BlueControls.Controls
             {
 
 
-                var P1 = ThisRelation.Points[0].ZoomAndMove(_Zoom, X, Y);
-                var P2 = ThisRelation.Points[1].ZoomAndMove(_Zoom, X, Y);
+                var P1 = ThisRelation.Points[0].ZoomAndMove(zoomf, X, Y);
+                var P2 = ThisRelation.Points[1].ZoomAndMove(zoomf, X, Y);
 
                 if (ThisRelation.RelationType == enRelationType.WaagerechtSenkrecht)
                 {
@@ -1159,10 +1175,12 @@ namespace BlueControls.Controls
 
             if (_GivesMouseComandsTo != null)
             {
-                var DCoordinates = _GivesMouseComandsTo.DrawingKoordinates(_Zoom, X, Y);
+                var DCoordinates = _GivesMouseComandsTo.DrawingKoordinates(zoomf, X, Y);
 
                 TMPGR.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
             }
+
+            TMPGR.Dispose();
 
         }
 
@@ -1175,15 +1193,9 @@ namespace BlueControls.Controls
                 _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
             }
 
-            var TMPGR = Graphics.FromImage(_BitmapOfControl);
-
-            DrawCreativePadToBitmap(gr, state);
-
-            TMPGR.Dispose();
-
+            DrawCreativePadToBitmap(_BitmapOfControl, state, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value);
 
             gr.DrawImage(_BitmapOfControl, 0, 0);
-
 
             Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, DisplayRectangle);
 
@@ -1204,7 +1216,7 @@ namespace BlueControls.Controls
             Unselect();
             InvalidateOrder();
             Changed = true;
-            ZoomFitInvalidateAndCheckButtons(true);
+            ZoomFitInvalidateAndCheckButtons();
             Invalidate();
         }
 
@@ -1227,7 +1239,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            ZoomFitInvalidateAndCheckButtons(true);
+            ZoomFitInvalidateAndCheckButtons();
             base.OnSizeChanged(e);
         }
 
@@ -1248,22 +1260,11 @@ namespace BlueControls.Controls
 
             if (r.Width == 0) { return; }
 
-            var w = 0; //= CInt((Me.Width - SliderY.Width) - r.Width * _Zoom)
-            var h = 0; //= CInt((Me.Height - SliderX.Height) - r.Height * _Zoom)
-
-            if (SliderShowing)
-            {
-                w = (int)(Width - SliderY.Width - r.Width * _Zoom);
-                h = (int)(Height - SliderX.Height - r.Height * _Zoom);
-            }
-            else
-            {
-                w = (int)(Width - r.Width * _Zoom);
-                h = (int)(Height - r.Height * _Zoom);
-            }
+            var v = ZoomFitAndSliderValues(SliderShowing, Size, _Zoom);
 
 
-            if (w < 0)
+
+            if (v.Item2 < 0)
             {
                 SliderX.Enabled = true;
                 SliderX.Minimum = (double)(r.Left * _Zoom - Width * 0.6m);
@@ -1276,14 +1277,13 @@ namespace BlueControls.Controls
 
                 if (MousePressing() == false)
                 {
-
-                    SliderX.Minimum = (double)(r.Left * _Zoom - w / 2m);
-                    SliderX.Maximum = (double)(r.Left * _Zoom - w / 2m);
-                    SliderX.Value = (double)(r.Left * _Zoom - w / 2m);
+                    SliderX.Minimum = (double)(r.Left * _Zoom - v.Item2 / 2m);
+                    SliderX.Maximum = (double)(r.Left * _Zoom - v.Item2 / 2m);
+                    SliderX.Value = (double)(r.Left * _Zoom - v.Item2 / 2m);
                 }
             }
 
-            if (h < 0)
+            if (v.Item3 < 0)
             {
                 SliderY.Enabled = true;
                 SliderY.Minimum = (double)(r.Top * _Zoom - Height * 0.6m);
@@ -1295,9 +1295,9 @@ namespace BlueControls.Controls
                 SliderY.Enabled = false;
                 if (MousePressing() == false)
                 {
-                    SliderY.Minimum = (double)(r.Top * _Zoom - h / 2m);
-                    SliderY.Maximum = (double)(r.Top * _Zoom - h / 2m);
-                    SliderY.Value = (double)(r.Top * _Zoom - h / 2m);
+                    SliderY.Minimum = (double)(r.Top * _Zoom - v.Item3 / 2m);
+                    SliderY.Maximum = (double)(r.Top * _Zoom - v.Item3 / 2m);
+                    SliderY.Value = (double)(r.Top * _Zoom - v.Item3 / 2m);
                 }
             }
 
