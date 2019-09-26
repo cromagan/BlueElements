@@ -399,7 +399,11 @@ namespace BlueControls.ItemCollection
 
             if (_tmpBMP == null) { _tmpBMP = new Bitmap((int)re.Width, (int)re.Height); }
 
-            var v = _pad.ZoomFitAndSliderValues(false, _tmpBMP.Size, -1);
+
+            var zoomv = _pad.ZoomFitValue(false, _tmpBMP.Size);
+            var centerpos = _pad.CenterPos(false, _tmpBMP.Size, zoomv);
+            var slidervalues = _pad.SliderValues(zoomv, centerpos);
+
             _pad.ShowInPrintMode = true;
             _pad.Unselect();
 
@@ -407,7 +411,7 @@ namespace BlueControls.ItemCollection
             if (Parent.SheetStyle != null) { _pad.SheetStyle = Parent.SheetStyle.CellFirstString(); }
 
 
-            _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, v.Item1, v.Item2, v.Item3);
+            _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y);
 
 
             if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + _tmpBMP.Width, p_LO.Y + _tmpBMP.Height); }

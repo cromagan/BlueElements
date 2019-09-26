@@ -200,16 +200,15 @@ namespace BlueControls.ItemCollection
             }
 
             if (_tmpBMP == null) { _tmpBMP = new Bitmap((int)re.Width, (int)re.Height); }
-            //_pad.Width = _tmpBMP.Width;
-            //_pad.Height = _tmpBMP.Height;
-            //_pad.ZoomFitWithoutSliders();
 
-            var v = _pad.ZoomFitAndSliderValues(false, _tmpBMP.Size, -1);
+            var zoomv = _pad.ZoomFitValue(false, _tmpBMP.Size);
+            var centerpos = _pad.CenterPos(false, _tmpBMP.Size, zoomv);
+            var slidervalues = _pad.SliderValues(zoomv, centerpos);
 
             _pad.ShowInPrintMode = true;
             _pad.Unselect();
 
-            _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, v.Item1, v.Item2, v.Item3);
+            _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y);
 
 
 

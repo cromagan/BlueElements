@@ -71,7 +71,7 @@ namespace BlueControls.Controls
         private System.Windows.Forms.Padding _RandinMM = System.Windows.Forms.Padding.Empty;
 
 
-        private PointDF _MouseDownx;
+        private PointDF _MouseDown;
 
         public string Caption = "";
 
@@ -370,7 +370,7 @@ namespace BlueControls.Controls
 
         internal new void MouseDown(System.Windows.Forms.MouseEventArgs e)
         {
-            _MouseDownx = null;
+            _MouseDown = null;
 
 
             var Ho = HotItem(e);
@@ -405,7 +405,7 @@ namespace BlueControls.Controls
                         Sel_P.Add(thisPoint);
                         _OrdersValid = false;
                         ComputeMovingData();
-                        _MouseDownx = new PointDF(e.X / _Zoom, e.Y / _Zoom);
+                        _MouseDown = new PointDF(e.X / _Zoom, e.Y / _Zoom);
                         Invalidate();
                         return;
                     }
@@ -432,7 +432,7 @@ namespace BlueControls.Controls
 
             }
 
-            _MouseDownx = new PointDF(e.X / _Zoom, e.Y / _Zoom);
+            _MouseDown = new PointDF(e.X / _Zoom, e.Y / _Zoom);
         }
 
         internal new void MouseMove(System.Windows.Forms.MouseEventArgs e)
@@ -472,7 +472,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            if (_MouseDownx != null && e.Button == System.Windows.Forms.MouseButtons.Left)
+            if (_MouseDown != null && e.Button == System.Windows.Forms.MouseButtons.Left)
             {
                 if (_MouseEditEnabled)
                 {
@@ -496,7 +496,7 @@ namespace BlueControls.Controls
             }
 
 
-            _MouseDownx = null;
+            _MouseDown = null;
 
 
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
@@ -788,44 +788,59 @@ namespace BlueControls.Controls
             return I;
         }
 
-        public Tuple<decimal, int, int> ZoomFitAndSliderValues(bool SliderShowing, Size s, decimal ZoomToUse)
+
+
+        public decimal ZoomFitValue(bool sliderShowing, Size sizeOfPaintArea)
         {
-
             var r = MaxBounds();
+            if (r.Width < 0.01m || r.Height < 0.01m) { return 1m; }
 
-            if (r.Width < 0.01m || r.Height < 0.01m) { return new Tuple<decimal, int, int>(1, 0, 0); }
-
-
-            decimal tmpZoom = 1;
-
-            if (SliderShowing)
+            if (sliderShowing)
             {
-                tmpZoom = Math.Min((s.Width - SliderY.Width - 32) / r.Width, (s.Height - SliderX.Height - 32) / r.Height);
+                return Math.Min((sizeOfPaintArea.Width - SliderY.Width - 32) / r.Width, (sizeOfPaintArea.Height - SliderX.Height - 32) / r.Height);
             }
             else
             {
-                tmpZoom = Math.Min(s.Width / r.Width, s.Height / r.Height);
+                return Math.Min(sizeOfPaintArea.Width / r.Width, sizeOfPaintArea.Height / r.Height);
             }
+        }
 
 
-            if (ZoomToUse < 0) { ZoomToUse = tmpZoom; }
-
+        /// <summary>
+        /// Gibt den Versatz der Linken oben Ecke aller Objekte zurück, um mittig zu sein.
+        /// </summary>
+        /// <param name="SliderShowing"></param>
+        /// <param name="sizeOfPaintArea"></param>
+        /// <param name="ZoomToUse"></param>
+        /// <returns></returns>
+        public Point CenterPos(bool SliderShowing, Size sizeOfPaintArea, decimal ZoomToUse)
+        {
+            var r = MaxBounds();
             var w = 0;
             var h = 0;
 
             if (SliderShowing)
             {
-                w = (int)(s.Width - SliderY.Width - r.Width * ZoomToUse);
-                h = (int)(s.Height - SliderX.Height - r.Height * ZoomToUse);
+                w = (int)(sizeOfPaintArea.Width - SliderY.Width - r.Width * ZoomToUse);
+                h = (int)(sizeOfPaintArea.Height - SliderX.Height - r.Height * ZoomToUse);
             }
             else
             {
-                w = (int)(s.Width - r.Width * ZoomToUse);
-                h = (int)(s.Height - r.Height * ZoomToUse);
+                w = (int)(sizeOfPaintArea.Width - r.Width * ZoomToUse);
+                h = (int)(sizeOfPaintArea.Height - r.Height * ZoomToUse);
             }
 
+            return new Point(w, h);
+        }
 
-            return new Tuple<decimal, int, int>(tmpZoom, w, h);
+
+        internal PointF SliderValues(decimal ZoomToUse, Point TopLeftPos)
+        {
+
+            var r = MaxBounds();
+            return new PointF((float)(r.Left * ZoomToUse - TopLeftPos.X / 2m), (float)(r.Top * ZoomToUse - TopLeftPos.Y / 2m));
+
+
         }
 
 
@@ -833,29 +848,11 @@ namespace BlueControls.Controls
 
         private void ZoomFitInvalidateAndCheckButtons()
         {
+            _ZoomMin = ZoomFitValue(true, Size);
 
-
-
-
-            var ZoomData = ZoomFitAndSliderValues(true, Size, -1);
-
-            _ZoomMin = ZoomData.Item1;
-
-
-
-            if (_Fitting && !MousePressing())
-            {
-                _Zoom = _ZoomMin;
-            }
-
-
+            if (_Fitting && !MousePressing()) { _Zoom = _ZoomMin; }
             _Zoom = Math.Max(_Zoom, _ZoomMin / 5);
-
-
-
             ComputeSliders(true);
-
-
         }
 
         public void ZoomIn(System.Windows.Forms.MouseEventArgs e)
@@ -1194,11 +1191,8 @@ namespace BlueControls.Controls
             }
 
             DrawCreativePadToBitmap(_BitmapOfControl, state, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value);
-
             gr.DrawImage(_BitmapOfControl, 0, 0);
-
             Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, DisplayRectangle);
-
         }
 
 
@@ -1260,11 +1254,12 @@ namespace BlueControls.Controls
 
             if (r.Width == 0) { return; }
 
-            var v = ZoomFitAndSliderValues(SliderShowing, Size, _Zoom);
+            var p = CenterPos(SliderShowing, Size, _Zoom);
+            var sliderv = SliderValues(_Zoom, p);
 
 
 
-            if (v.Item2 < 0)
+            if (p.X < 0)
             {
                 SliderX.Enabled = true;
                 SliderX.Minimum = (double)(r.Left * _Zoom - Width * 0.6m);
@@ -1277,13 +1272,13 @@ namespace BlueControls.Controls
 
                 if (MousePressing() == false)
                 {
-                    SliderX.Minimum = (double)(r.Left * _Zoom - v.Item2 / 2m);
-                    SliderX.Maximum = (double)(r.Left * _Zoom - v.Item2 / 2m);
-                    SliderX.Value = (double)(r.Left * _Zoom - v.Item2 / 2m);
+                    SliderX.Minimum = sliderv.X;
+                    SliderX.Maximum = sliderv.X;
+                    SliderX.Value = sliderv.X;
                 }
             }
 
-            if (v.Item3 < 0)
+            if (p.Y < 0)
             {
                 SliderY.Enabled = true;
                 SliderY.Minimum = (double)(r.Top * _Zoom - Height * 0.6m);
@@ -1295,9 +1290,9 @@ namespace BlueControls.Controls
                 SliderY.Enabled = false;
                 if (MousePressing() == false)
                 {
-                    SliderY.Minimum = (double)(r.Top * _Zoom - v.Item3 / 2m);
-                    SliderY.Maximum = (double)(r.Top * _Zoom - v.Item3 / 2m);
-                    SliderY.Value = (double)(r.Top * _Zoom - v.Item3 / 2m);
+                    SliderY.Minimum = sliderv.Y;
+                    SliderY.Maximum = sliderv.Y;
+                    SliderY.Value = sliderv.Y;
                 }
             }
 
@@ -1725,7 +1720,7 @@ namespace BlueControls.Controls
 
         private void MoveItems(PointDF MouseMovedTo)
         {
-            if (_MouseDownx == null) { return; }
+            if (_MouseDown == null) { return; }
 
             PointDF PMoveX = null;
             PointDF PMoveY = null;
@@ -1734,8 +1729,8 @@ namespace BlueControls.Controls
 
             _NewAutoRelations.Clear();
 
-            var MoveX = MouseMovedTo.X - _MouseDownx.X;
-            var MoveY = MouseMovedTo.Y - _MouseDownx.Y;
+            var MoveX = MouseMovedTo.X - _MouseDown.X;
+            var MoveY = MouseMovedTo.Y - _MouseDown.Y;
 
 
 
@@ -1785,7 +1780,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            _MouseDownx = new PointDF(_MouseDownx.X + MoveX, _MouseDownx.Y + MoveY);
+            _MouseDown = new PointDF(_MouseDown.X + MoveX, _MouseDown.Y + MoveY);
         }
 
 
@@ -1883,7 +1878,7 @@ namespace BlueControls.Controls
             var dr = new Rectangle(0, 0, Width - SliderY.Width, Height - SliderX.Height);
 
 
-            var WillMoveTo = new PointDF(PointToTest.X + MouseMovedTo.X - _MouseDownx.X, PointToTest.Y + MouseMovedTo.Y - _MouseDownx.Y);
+            var WillMoveTo = new PointDF(PointToTest.X + MouseMovedTo.X - _MouseDown.X, PointToTest.Y + MouseMovedTo.Y - _MouseDown.Y);
 
             var _Points = AllPoints();
 
