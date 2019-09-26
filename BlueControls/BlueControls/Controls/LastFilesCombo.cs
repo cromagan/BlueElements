@@ -201,6 +201,11 @@ namespace BlueControls.Controls
 
             var s = FileName + "|" + AdditionalText;
 
+
+            s = s.Replace("\r\n", ";");
+            s = s.Replace("\r", ";");
+            s = s.Replace("\n", ";");
+
             if (!_mustExists || FileExists(FileName))
             {
                 if (LastD.Count > 0) { LastD.RemoveString(FileName, false); }

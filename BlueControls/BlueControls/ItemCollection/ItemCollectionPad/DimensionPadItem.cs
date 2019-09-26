@@ -54,7 +54,7 @@ namespace BlueControls.ItemCollection
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
         public decimal AdditionalScale = 3.07m;
-        public bool ZoomAbhaengig = true;
+
 
         public string Prefix = "";
         public string Suffix = "";
@@ -204,9 +204,6 @@ namespace BlueControls.ItemCollection
                     AdditionalScale = decimal.Parse(pair.Value.FromNonCritical());
                     return true;
 
-                case "zoomabh":
-                    ZoomAbhaengig = pair.Value.FromPlusMinus();
-                    return true;
             }
 
             return false;
@@ -224,7 +221,6 @@ namespace BlueControls.ItemCollection
                    ", Decimal=" + NachKomma +
                    ", Prefix=" + Prefix.ToNonCritical() +
                    ", Suffix=" + Suffix.ToNonCritical() +
-                   ", Zoomabh=" + ZoomAbhaengig.ToPlusMinus() +
                    ", AdditionalScale=" + AdditionalScale.ToString().ToNonCritical() + "}";
         }
 
@@ -276,9 +272,7 @@ namespace BlueControls.ItemCollection
 
 
 
-            var geszoom = Parent.SheetStyleScale * AdditionalScale;
-
-            if(ZoomAbhaengig) { geszoom = geszoom * cZoom; }
+            var geszoom = Parent.SheetStyleScale * AdditionalScale * cZoom; 
 
 
             var f = Skin.GetBlueFont(Style, Parent.SheetStyle);
@@ -464,7 +458,6 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl("Stil", ((int)Style).ToString(), Skin.GetFonts(Parent.SheetStyle)));
 
             l.Add(new FlexiControl("Skalierung", AdditionalScale.ToString(), enDataFormat.Gleitkommazahl, 1));
-            l.Add(new FlexiControl("Zoomabhängig", ZoomAbhaengig));
             return l;
         }
 
@@ -479,7 +472,6 @@ namespace BlueControls.ItemCollection
             AdditionalScale = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
 
             Style = (PadStyles)int.Parse(Tags.TagGet("Stil"));
-            ZoomAbhaengig = Tags.TagGet("Zoomabhängig").FromPlusMinus();
         }
 
 

@@ -386,7 +386,7 @@ namespace BlueControls.ItemCollection
 
             _pad.GenerateFromRow(_LayoutID, _Row, false);
 
-            var re = _pad.MaxBounds();
+            var re = _pad.MaxBounds(null);
 
             if (_tmpBMP != null)
             {
@@ -399,10 +399,11 @@ namespace BlueControls.ItemCollection
 
             if (_tmpBMP == null) { _tmpBMP = new Bitmap((int)re.Width, (int)re.Height); }
 
+            var mb = _pad.MaxBounds(null);
 
-            var zoomv = _pad.ZoomFitValue(false, _tmpBMP.Size);
-            var centerpos = _pad.CenterPos(false, _tmpBMP.Size, zoomv);
-            var slidervalues = _pad.SliderValues(zoomv, centerpos);
+            var zoomv = _pad.ZoomFitValue(mb, false, _tmpBMP.Size);
+            var centerpos = _pad.CenterPos(mb ,false, _tmpBMP.Size, zoomv);
+            var slidervalues = _pad.SliderValues(mb, zoomv, centerpos);
 
             _pad.ShowInPrintMode = true;
             _pad.Unselect();
@@ -411,7 +412,7 @@ namespace BlueControls.ItemCollection
             if (Parent.SheetStyle != null) { _pad.SheetStyle = Parent.SheetStyle.CellFirstString(); }
 
 
-            _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y);
+            _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y, null);
 
 
             if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + _tmpBMP.Width, p_LO.Y + _tmpBMP.Height); }

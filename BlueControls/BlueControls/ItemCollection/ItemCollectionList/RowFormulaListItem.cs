@@ -188,27 +188,28 @@ namespace BlueControls.ItemCollection
 
             _pad.GenerateFromRow(_LayoutID, _Row, false);
 
-            var re = _pad.MaxBounds();
+            var mb = _pad.MaxBounds(null);
 
             if (_tmpBMP != null)
             {
-                if (_tmpBMP.Width != re.Width || _tmpBMP.Height != re.Height)
+                if (_tmpBMP.Width != mb.Width || _tmpBMP.Height != mb.Height)
                 {
                     _tmpBMP.Dispose();
                     _tmpBMP = null;
                 }
             }
 
-            if (_tmpBMP == null) { _tmpBMP = new Bitmap((int)re.Width, (int)re.Height); }
+            if (_tmpBMP == null) { _tmpBMP = new Bitmap((int)mb.Width, (int)mb.Height); }
 
-            var zoomv = _pad.ZoomFitValue(false, _tmpBMP.Size);
-            var centerpos = _pad.CenterPos(false, _tmpBMP.Size, zoomv);
-            var slidervalues = _pad.SliderValues(zoomv, centerpos);
+
+            var zoomv = _pad.ZoomFitValue(mb, false, _tmpBMP.Size);
+            var centerpos = _pad.CenterPos(mb, false, _tmpBMP.Size, zoomv);
+            var slidervalues = _pad.SliderValues(mb, zoomv, centerpos);
 
             _pad.ShowInPrintMode = true;
             _pad.Unselect();
 
-            _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y);
+            _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y, null);
 
 
 

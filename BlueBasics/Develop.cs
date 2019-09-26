@@ -20,6 +20,7 @@
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -42,6 +43,9 @@ namespace BlueBasics
         private static bool _IsTraceLogging;
         private static bool _ServiceStarted;
         private readonly static DateTime _ProgrammStarted = DateTime.Now;
+
+        [DefaultValue(false)]
+        public static bool Exited { get; private set; }
 
 
         public static bool IsDevelopment()
@@ -99,6 +103,7 @@ namespace BlueBasics
 
         public static void AbortExe()
         {
+            Exited = true;
             // http://geekswithblogs.net/mtreadwell/archive/2004/06/06/6123.aspx
             Environment.Exit(-1);
             System.Windows.Forms.Application.Exit();
@@ -227,7 +232,7 @@ namespace BlueBasics
                         break;
 
                     case enFehlerArt.Warnung:
-                       if (IsDevelopment()) { Debugger.Break(); }
+                        if (IsDevelopment()) { Debugger.Break(); }
 
                         Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
                         _DeleteTraceLog = false;
@@ -250,7 +255,7 @@ namespace BlueBasics
 
                 Trace.WriteLine("<br>" + DateTime.Now.ToString(Constants.Format_Date) + "<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
                 Trace.WriteLine("<th ALIGN=LEFT>");
-                for (var z = 0 ; z <= Math.Min(Nr + 2, strace.FrameCount - 2) ; z++)
+                for (var z = 0; z <= Math.Min(Nr + 2, strace.FrameCount - 2); z++)
                 {
                     if (!strace.GetFrame(z).GetMethod().Name.Contains("DebugPrint"))
                     {

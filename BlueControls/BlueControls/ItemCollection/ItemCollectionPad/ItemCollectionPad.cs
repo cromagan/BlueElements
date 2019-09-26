@@ -27,7 +27,7 @@ using BlueBasics.Enums;
 
 namespace BlueControls.ItemCollection
 {
-    public class ItemCollectionPad: ListExt<BasicPadItem>, IParseable
+    public class ItemCollectionPad : ListExt<BasicPadItem>, IParseable
     {
         #region  Variablen-Deklarationen 
 
@@ -388,15 +388,12 @@ namespace BlueControls.ItemCollection
         {
             if (string.IsNullOrEmpty(cItem.Internal()))
             {
-                Develop.DebugPrint(enFehlerArt.Fehler,
-                    "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + cItem.Internal());
+                Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + cItem.Internal());
             }
 
             if (this[cItem.Internal()] != null)
             {
-                Develop.DebugPrint(enFehlerArt.Fehler,
-                    "Der Auflistung soll ein Item hinzugefügt werden, welches aber schon vorhanden ist: " +
-                    cItem.Internal());
+                Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches aber schon vorhanden ist: " + cItem.Internal());
             }
 
             cItem.Parent = this;
@@ -437,7 +434,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public RectangleDF MaximumBounds()
+        public RectangleDF MaximumBounds(List<BasicPadItem> ZoomItems)
         {
             var x1 = decimal.MaxValue;
             var y1 = decimal.MaxValue;
@@ -451,12 +448,15 @@ namespace BlueControls.ItemCollection
             {
                 if (ThisItem != null)
                 {
-                    x1 = Math.Min(x1, ThisItem.UsedArea().Left);
-                    y1 = Math.Min(y1, ThisItem.UsedArea().Top);
+                    if (ZoomItems == null || ZoomItems.Contains(ThisItem))
+                    {
+                        x1 = Math.Min(x1, ThisItem.UsedArea().Left);
+                        y1 = Math.Min(y1, ThisItem.UsedArea().Top);
 
-                    x2 = Math.Max(x2, ThisItem.UsedArea().Right);
-                    y2 = Math.Max(y2, ThisItem.UsedArea().Bottom);
-                    Done = true;
+                        x2 = Math.Max(x2, ThisItem.UsedArea().Right);
+                        y2 = Math.Max(y2, ThisItem.UsedArea().Bottom);
+                        Done = true;
+                    }
                 }
             }
 

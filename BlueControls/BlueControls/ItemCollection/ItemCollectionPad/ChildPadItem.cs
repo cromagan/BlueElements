@@ -69,6 +69,10 @@ namespace BlueControls.ItemCollection
             }
         }
 
+
+        public List<BasicPadItem> VisibleItems = null;
+        public List<BasicPadItem> ZoomItems = null;
+
         #endregion
 
 
@@ -148,14 +152,16 @@ namespace BlueControls.ItemCollection
                     _tmpBMP = new Bitmap(Math.Abs(DCoordinates.Width), Math.Abs(DCoordinates.Height));
                 }
 
-                var zoomv = PadInternal.ZoomFitValue(false, _tmpBMP.Size);
-                var centerpos = PadInternal.CenterPos(false, _tmpBMP.Size, zoomv);
-                var slidervalues = PadInternal.SliderValues(zoomv, centerpos);
+                var mb = PadInternal.MaxBounds(ZoomItems);
+
+                var zoomv = PadInternal.ZoomFitValue(mb, false, _tmpBMP.Size);
+                var centerpos = PadInternal.CenterPos(mb, false, _tmpBMP.Size, zoomv);
+                var slidervalues = PadInternal.SliderValues(mb, zoomv, centerpos);
 
                 PadInternal.ShowInPrintMode = ForPrinting;
                 if (ForPrinting) { PadInternal.Unselect(); }
 
-                PadInternal.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y);
+                PadInternal.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y, VisibleItems);
             }
 
             //If ForPrinting AndAlso _Pad IsNot Nothing Then
@@ -237,7 +243,7 @@ namespace BlueControls.ItemCollection
 
 
             var l1 = DrawingKoordinates(cZoom, MoveX, MoveY);
-            var l2 = PadInternal.MaxBounds();
+            var l2 = PadInternal.MaxBounds(ZoomItems);
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
 
@@ -273,7 +279,7 @@ namespace BlueControls.ItemCollection
 
 
             var l1 = DrawingKoordinates(cZoom, MoveX, MoveY);
-            var l2 = PadInternal.MaxBounds();
+            var l2 = PadInternal.MaxBounds(ZoomItems);
             decimal tZo = 1;
             if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
 
@@ -313,7 +319,7 @@ namespace BlueControls.ItemCollection
 
 
             var l1 = DrawingKoordinates(cZoom, MoveX, MoveY);
-            var l2 = PadInternal.MaxBounds();
+            var l2 = PadInternal.MaxBounds(ZoomItems);
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
 

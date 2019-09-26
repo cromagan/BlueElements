@@ -434,7 +434,7 @@ namespace BlueControls.Forms
 
             tmp.GenerateFromRow(FrmDrucken_Layout1.Text, Liste[0], false);
 
-            var OneItem = tmp.MaxBounds();
+            var OneItem = tmp.MaxBounds(null);
 
             PrintPad.SheetStyle = tmp.SheetStyle;
             PrintPad.SheetStyleScale = tmp.SheetStyleScale;
