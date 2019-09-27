@@ -624,6 +624,34 @@ namespace BlueBasics
             return tempPoly_Rechteck;
         }
 
+        public static GraphicsPath Poly_Bruchlinie(Rectangle rect)
+        {
+            GraphicsPath p = null;
+            p = new GraphicsPath();
+            p.AddLine(rect.PointOf(enAlignment.Top_Left), rect.PointOf(enAlignment.Top_Right));
+            p.AddLine(p.GetLastPoint(), rect.PointOf(enAlignment.Bottom_Right));
+            p.AddLine(p.GetLastPoint(), rect.PointOf(enAlignment.Bottom_Left));
+
+
+            var versX = rect.Width / 6;
+            var versY = -rect.Height / 10;
+
+            var pu = p.GetLastPoint();
+
+            for (var z = 0; z < 10; z++)
+            {
+                pu.Y += versY;
+                pu.X += versX;
+                versX *= -1;
+
+                p.AddLine(p.GetLastPoint(), pu);
+            }
+
+            p.CloseFigure();
+            return p;
+
+        }
+
 
 
         public static GraphicsPath Poly_Arrow(Rectangle rect)

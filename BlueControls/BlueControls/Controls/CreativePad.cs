@@ -780,7 +780,10 @@ namespace BlueControls.Controls
             {
                 gr.Clear(Color.White);
 
-                Draw(gr, Scale, r.Left * Scale, r.Top * Scale, Size.Empty, true, null);
+                if (!Draw(gr, Scale, r.Left * Scale, r.Top * Scale, Size.Empty, true, null))
+                {
+                    return ToBitmap(Scale);
+                }
 
             }
 
@@ -1036,26 +1039,35 @@ namespace BlueControls.Controls
 
         }
 
-        private void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, Size SizeOfParentControl, bool ForPrinting, List<BasicPadItem> VisibleItems)
+        private bool Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, Size SizeOfParentControl, bool ForPrinting, List<BasicPadItem> VisibleItems)
         {
 
-            if (_SheetStyle == null || _SheetStyleScale < 0.1m) { return; }
 
-            ComputeOrders();
-
-            //   DoRepairIfNeeded
-
-
-            foreach (var thisItem in Item)
+            try
             {
-                if (thisItem != null)
+                if (_SheetStyle == null || _SheetStyleScale < 0.1m) { return true; }
+
+                ComputeOrders();
+
+                foreach (var thisItem in Item)
                 {
-                    if (VisibleItems == null || VisibleItems.Contains(thisItem))
+                    if (thisItem != null)
                     {
-                        thisItem.Draw(GR, cZoom, MoveX, MoveY, 0, SizeOfParentControl, ForPrinting);
+                        if (VisibleItems == null || VisibleItems.Contains(thisItem))
+                        {
+                            thisItem.Draw(GR, cZoom, MoveX, MoveY, 0, SizeOfParentControl, ForPrinting);
+                        }
                     }
                 }
+                return true;
             }
+            catch
+            {
+                modAllgemein.CollectGarbage();
+                return false;
+            }
+
+
         }
 
         protected override void InitializeSkin()
@@ -1067,115 +1079,124 @@ namespace BlueControls.Controls
         internal void DrawCreativePadToBitmap(Bitmap BMP, enStates vState, decimal zoomf, decimal X, decimal Y, List<BasicPadItem> VisibleItems)
         {
 
-            var TMPGR = Graphics.FromImage(BMP);
-
-
-
-            if (_SheetSizeInMM.Width > 0 && _SheetSizeInMM.Height > 0)
+            try
             {
-                Skin.Draw_Back(TMPGR, enDesign.Table_And_Pad, vState, DisplayRectangle, this, true);
-                var SSW = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI), 1);
-                var SSH = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Height, DPI), 1);
-                var LO = new PointDF(0m, 0m).ZoomAndMove(zoomf, X, Y);
-                var RU = new PointDF(SSW, SSH).ZoomAndMove(zoomf, X, Y);
 
-                var R = new Rectangle((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
-                TMPGR.FillRectangle(Brushes.White, R);
-                TMPGR.DrawRectangle(PenGray, R);
+                var TMPGR = Graphics.FromImage(BMP);
 
-                var rtx = (int)(P_rLO.X * zoomf - X);
-                var rty = (int)(P_rLO.Y * zoomf - Y);
-                var rtx2 = (int)(P_rRU.X * zoomf - X);
-                var rty2 = (int)(P_rRU.Y * zoomf - Y);
-                var Rr = new Rectangle(rtx, rty, rtx2 - rtx, rty2 - rty);
-                if (!_ShowInPrintMode)
+
+
+                if (_SheetSizeInMM.Width > 0 && _SheetSizeInMM.Height > 0)
                 {
-                    TMPGR.DrawRectangle(PenGray, Rr);
-                }
+                    Skin.Draw_Back(TMPGR, enDesign.Table_And_Pad, vState, DisplayRectangle, this, true);
+                    var SSW = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI), 1);
+                    var SSH = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Height, DPI), 1);
+                    var LO = new PointDF(0m, 0m).ZoomAndMove(zoomf, X, Y);
+                    var RU = new PointDF(SSW, SSH).ZoomAndMove(zoomf, X, Y);
 
-            }
-            else
-            {
-                TMPGR.Clear(Color.White);
-            }
+                    var R = new Rectangle((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
+                    TMPGR.FillRectangle(Brushes.White, R);
+                    TMPGR.DrawRectangle(PenGray, R);
 
+                    var rtx = (int)(P_rLO.X * zoomf - X);
+                    var rty = (int)(P_rLO.Y * zoomf - Y);
+                    var rtx2 = (int)(P_rRU.X * zoomf - X);
+                    var rty2 = (int)(P_rRU.Y * zoomf - Y);
+                    var Rr = new Rectangle(rtx, rty, rtx2 - rtx, rty2 - rty);
+                    if (!_ShowInPrintMode)
+                    {
+                        TMPGR.DrawRectangle(PenGray, Rr);
+                    }
 
-
-            Draw(TMPGR, zoomf, X, Y, BMP.Size, _ShowInPrintMode, VisibleItems);
-
-
-            var Relations = AllRelations();
-
-            // Erst Beziehungen, weil die die Grauen Punkte zeichnet
-            foreach (var ThisRelation in Relations)
-            {
-                ThisRelation.Draw(TMPGR, zoomf, X, Y, Relations.IndexOf(ThisRelation));
-            }
-
-
-            if (Debug_ShowPointOrder)
-            {
-                var _Points = AllPoints();
-                // Alle Punkte mit Order anzeigen
-                foreach (var ThisPoint in _Points)
-                {
-                    ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
-                }
-            }
-
-
-
-
-
-
-            //     If _ItemsEditable Then
-
-            // Dann die selectiereren Punkte
-
-            foreach (var ThisPoint in Sel_P)
-            {
-                if (ThisPoint.CanMove(Relations))
-                {
-                    ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard);
                 }
                 else
                 {
-                    ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                    TMPGR.Clear(Color.White);
                 }
-            }
 
 
-            foreach (var ThisRelation in _NewAutoRelations)
-            {
 
-
-                var P1 = ThisRelation.Points[0].ZoomAndMove(zoomf, X, Y);
-                var P2 = ThisRelation.Points[1].ZoomAndMove(zoomf, X, Y);
-
-                if (ThisRelation.RelationType == enRelationType.WaagerechtSenkrecht)
+                if (!Draw(TMPGR, zoomf, X, Y, BMP.Size, _ShowInPrintMode, VisibleItems))
                 {
-                    TMPGR.DrawEllipse(new Pen(Color.Green, 3), P1.X - 4, P1.Y - 3, 7, 7);
-                    TMPGR.DrawEllipse(new Pen(Color.Green, 3), P2.X - 4, P2.Y - 3, 7, 7);
-                    TMPGR.DrawLine(new Pen(Color.Green, 1), P1, P2);
+                    DrawCreativePadToBitmap(BMP, vState, zoomf, X, Y, VisibleItems);
+                    return;
                 }
-                else
+
+
+                var Relations = AllRelations();
+
+                // Erst Beziehungen, weil die die Grauen Punkte zeichnet
+                foreach (var ThisRelation in Relations)
                 {
-                    TMPGR.DrawEllipse(new Pen(Color.Green, 3), P1.X - 4, P1.Y - 4, 7, 7);
-                    TMPGR.DrawEllipse(new Pen(Color.Green, 3), P1.X - 8, P1.Y - 8, 15, 15);
+                    ThisRelation.Draw(TMPGR, zoomf, X, Y, Relations.IndexOf(ThisRelation));
                 }
+
+
+                if (Debug_ShowPointOrder)
+                {
+                    var _Points = AllPoints();
+                    // Alle Punkte mit Order anzeigen
+                    foreach (var ThisPoint in _Points)
+                    {
+                        ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                    }
+                }
+
+
+                //     If _ItemsEditable Then
+
+                // Dann die selectiereren Punkte
+
+                foreach (var ThisPoint in Sel_P)
+                {
+                    if (ThisPoint.CanMove(Relations))
+                    {
+                        ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard);
+                    }
+                    else
+                    {
+                        ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                    }
+                }
+
+
+                foreach (var ThisRelation in _NewAutoRelations)
+                {
+
+
+                    var P1 = ThisRelation.Points[0].ZoomAndMove(zoomf, X, Y);
+                    var P2 = ThisRelation.Points[1].ZoomAndMove(zoomf, X, Y);
+
+                    if (ThisRelation.RelationType == enRelationType.WaagerechtSenkrecht)
+                    {
+                        TMPGR.DrawEllipse(new Pen(Color.Green, 3), P1.X - 4, P1.Y - 3, 7, 7);
+                        TMPGR.DrawEllipse(new Pen(Color.Green, 3), P2.X - 4, P2.Y - 3, 7, 7);
+                        TMPGR.DrawLine(new Pen(Color.Green, 1), P1, P2);
+                    }
+                    else
+                    {
+                        TMPGR.DrawEllipse(new Pen(Color.Green, 3), P1.X - 4, P1.Y - 4, 7, 7);
+                        TMPGR.DrawEllipse(new Pen(Color.Green, 3), P1.X - 8, P1.Y - 8, 15, 15);
+                    }
+                }
+
+
+
+                if (_GivesMouseComandsTo != null)
+                {
+                    var DCoordinates = _GivesMouseComandsTo.DrawingKoordinates(zoomf, X, Y);
+
+                    TMPGR.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
+                }
+
+                TMPGR.Dispose();
+
+
             }
-
-
-
-            if (_GivesMouseComandsTo != null)
+            catch
             {
-                var DCoordinates = _GivesMouseComandsTo.DrawingKoordinates(zoomf, X, Y);
-
-                TMPGR.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
+                DrawCreativePadToBitmap(BMP, vState, zoomf, X, Y, VisibleItems);
             }
-
-            TMPGR.Dispose();
-
         }
 
 

@@ -40,8 +40,17 @@ namespace BlueControls.ItemCollection
             return "Symbol";
         }
 
-        public enSymbol Symbol = enSymbol.Ohne;
+        public enSymbol Symbol = enSymbol.Pfeil;
         public bool Gefuellt = true;
+        public bool WhiteBack = true;
+
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+            Symbol = enSymbol.Pfeil;
+            WhiteBack = true;
+        }
 
 
         protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
@@ -58,6 +67,7 @@ namespace BlueControls.ItemCollection
 
             var d2 = DCoordinates;
             d2.X = -DCoordinates.Width / 2;
+            d2.X = -DCoordinates.Width / 2;
             d2.Y = -DCoordinates.Height / 2;
 
             switch (Symbol)
@@ -69,14 +79,23 @@ namespace BlueControls.ItemCollection
                     p = modAllgemein.Poly_Arrow(d2);
                     break;
 
+                case enSymbol.Bruchlinie:
+                    p = modAllgemein.Poly_Bruchlinie(d2);
+                    break;
+
                 default:
                     Develop.DebugPrint(Symbol);
                     break;
 
             }
 
+
+            if (WhiteBack) { GR.FillPath(Brushes.White, p); }
+
+
             if (p != null && Style != PadStyles.Undefiniert)
             {
+
 
                 var f = Skin.GetBlueFont(Style, Parent.SheetStyle);
 
@@ -86,6 +105,7 @@ namespace BlueControls.ItemCollection
                 }
                 else
                 {
+
                     GR.DrawPath(f.Pen(cZoom * Parent.SheetStyleScale), p);
                 }
             }
@@ -112,14 +132,17 @@ namespace BlueControls.ItemCollection
             var Comms = new ItemCollectionList();
             Comms.Add(new TextListItem(((int)enSymbol.Ohne).ToString(), "Ohne", QuickImage.Get("Datei|32")));
             Comms.Add(new TextListItem(((int)enSymbol.Pfeil).ToString(), "Pfeil", QuickImage.Get("Pfeil_Rechts|32")));
+            Comms.Add(new TextListItem(((int)enSymbol.Bruchlinie).ToString(), "Bruchlinie"));
             l.Add(new FlexiControl(true));
             l.Add(new FlexiControl("Symbol", ((int)Symbol).ToString(), Comms));
 
-
-            l.Add(new FlexiControl("Farbe", ((int)Style).ToString(), Skin.GetRahmenArt(Parent.SheetStyle)));
+            var x = Skin.GetRahmenArt(Parent.SheetStyle);
+            x.Add(new TextListItem("-1", "Ohne"));
+            l.Add(new FlexiControl("Farbe", ((int)Style).ToString(), x));
 
 
             l.Add(new FlexiControl("Gefüllt", Gefuellt));
+            l.Add(new FlexiControl("Hintergrund weiß füllen", WhiteBack));
 
             l.AddRange(base.GetStyleOptions(sender, e));
 
@@ -132,6 +155,7 @@ namespace BlueControls.ItemCollection
             Gefuellt = Tags.TagGet("Gefüllt").FromPlusMinus();
             Symbol = (enSymbol)int.Parse(Tags.TagGet("Symbol"));
             Style = (PadStyles)int.Parse(Tags.TagGet("Farbe"));
+            WhiteBack = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
         }
 
 
@@ -141,6 +165,7 @@ namespace BlueControls.ItemCollection
             t = t.Substring(0, t.Length - 1) + ", ";
             t = t + "Symbol=" + (int)Symbol + ", ";
             t = t + "Fill=" + Gefuellt.ToPlusMinus() + ", ";
+            t = t + "WhiteBack=" + WhiteBack.ToPlusMinus() + ", ";
 
             return t.Trim(", ") + "}";
         }
@@ -155,6 +180,9 @@ namespace BlueControls.ItemCollection
                     return true;
                 case "fill":
                     Gefuellt = pair.Value.FromPlusMinus();
+                    return true;
+                case "whiteback":
+                    WhiteBack = pair.Value.FromPlusMinus();
                     return true;
                 default:
                     return base.ParseExplicit(pair);

@@ -364,7 +364,7 @@ namespace BlueDatabase
                     foreach (var t in Columns)
                     {
                         var erg2 = StringErgebnis(_Text, Row);
-                        if (string.IsNullOrEmpty(erg2))
+                        if (erg2 == _Text)
                         {
                             return "Der Text der Spalte '#Spalte:" + t.Name + "' konnte nicht erstellt werden.";
                         }
@@ -561,39 +561,42 @@ namespace BlueDatabase
         }
 
 
-        private string StringErgebnis(string Formel, RowItem Row)
+        private string StringErgebnis(string formel, RowItem Row)
         {
+
+            var erg = formel;
+
             // Variablen ersetzen
             foreach (var thisColumnItem in Row.Database.Column)
             {
                 if (thisColumnItem != null)
                 {
                     var w = Row.CellGetString(thisColumnItem);
-                    Formel = Formel.Replace("&" + thisColumnItem.Name.ToUpper() + ";", w, RegexOptions.IgnoreCase);
+                    erg = erg.Replace("&" + thisColumnItem.Name.ToUpper() + ";", w, RegexOptions.IgnoreCase);
 
 
-                    while (Formel.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + "("))
+                    while (erg.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + "("))
                     {
-                        var x = Formel.ToUpper().IndexOf("&" + thisColumnItem.Name.ToUpper() + "(");
+                        var x = erg.ToUpper().IndexOf("&" + thisColumnItem.Name.ToUpper() + "(");
 
-                        var x2 = Formel.IndexOf(")", x);
-                        if (x2 < x) { return string.Empty; }
+                        var x2 = erg.IndexOf(")", x);
+                        if (x2 < x) { return erg; }
 
-                        var ww = Formel.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
+                        var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
                         ww = ww.Replace(" ", string.Empty).ToUpper();
                         var vals = ww.SplitBy(",");
-                        if (vals.Length != 2) { return string.Empty; }
-                        if (vals[0] != "L") { return string.Empty; }
-                        if (!int.TryParse(vals[1], out var Stellen)) { return string.Empty; }
+                        if (vals.Length != 2) { return formel; }
+                        if (vals[0] != "L") { return formel; }
+                        if (!int.TryParse(vals[1], out var Stellen)) { return formel; }
 
                         var newW = w.Substring(0, Math.Min(Stellen, w.Length));
-                        Formel = Formel.Replace(Formel.Substring(x, x2 - x + 1), newW);
+                        erg = erg.Replace(erg.Substring(x, x2 - x + 1), newW);
                     }
                 }
             }
 
 
-            return Formel;
+            return erg;
         }
 
         private static double? MatheErgebnis(string Formel, RowItem Row)
@@ -1197,7 +1200,7 @@ namespace BlueDatabase
 
         public string ErrorReason()
         {
-            //if (_Action == enAction.LinkedCell) { return string.Empty; }
+            if (_Action == enAction.Sperre_die_Zelle) { return string.Empty; }
 
             foreach (var t in Columns)
             {
