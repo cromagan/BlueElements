@@ -1382,8 +1382,8 @@ namespace BlueControls.Controls
 
             if (CellInThisDatabaseColumn == null)
             {
-                NotEditableInfo("Interner Zellenfehler");
-                return;
+                //NotEditableInfo("Interner Zellenfehler");
+                return; // Klick ins Leere
             }
 
             var ViewItem = _Database.ColumnArrangements[_ArrangementNr][CellInThisDatabaseColumn];
@@ -2959,7 +2959,7 @@ namespace BlueControls.Controls
             if (column != null) { column = Database.Column.SearchByKey(column.Key); }
             if (row != null) { row = Database.Row.SearchByKey(row.Key); }
 
-            if (_Database.ColumnArrangements[_ArrangementNr][column] == null || !SortedRows().Contains(row))
+            if (_Database.ColumnArrangements.Count ==0 || _Database.ColumnArrangements[_ArrangementNr][column] == null || !SortedRows().Contains(row))
             {
                 column = null;
                 row = null;

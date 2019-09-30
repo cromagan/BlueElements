@@ -723,8 +723,8 @@ namespace BlueControls.Controls
 
             } while (true);
 
-            lbxColumns.Item.Sort();
-            lbxColumns.Refresh();
+           // lbxColumns.Item.Sort();
+            lbxColumns.Invalidate();
         }
 
 
@@ -914,17 +914,14 @@ namespace BlueControls.Controls
                         _Database.Views[0]?.Remove(ViewItem);
                         CurrView?.Remove(ViewItem);
                     }
-                    ColumnsEinfärben();
                     break;
 
                 case "#AddColumnToHead":
                     _Database.Views[0].Add(Column, false);
-                    ColumnsEinfärben();
                     break;
 
                 case "#AddColumnToBody":
                     CurrView?.Add(Column, false);
-                    ColumnsEinfärben();
                     break;
 
                 case "SpaltenEigenschaftenBearbeiten":
@@ -964,12 +961,10 @@ namespace BlueControls.Controls
                     if (CurrView == null || CurrView == _Database.Views[0]) { return; }
                     var n = InputBox.Show("Umbenennen:", CurrView.Name, enDataFormat.Text);
                     if (!string.IsNullOrEmpty(n)) { CurrView.Name = n; }
-                    ColumnsEinfärben();
                     break;
 
                 case "#ViewAdd":
                     Arrangement_Add();
-                    ColumnsEinfärben();
                     break;
 
                 case "#ChangeViewCaption":
@@ -1320,10 +1315,10 @@ namespace BlueControls.Controls
             if (e.Button == System.Windows.Forms.MouseButtons.Right) { ContextMenu_Show(sender, e); }
         }
 
-        private void Tabs_SelectedIndexChanged(object sender, System.EventArgs e)
-        {
-            if (Editor.Visible) { ColumnsEinfärben(); }
-        }
+        //private void Tabs_SelectedIndexChanged(object sender, System.EventArgs e)
+        //{
+        //    if (Editor.Visible) { ColumnsEinfärben(); }
+        //}
 
         private FlexiControlForCell ControlOf(ColumnViewItem ThisViewItem)
         {

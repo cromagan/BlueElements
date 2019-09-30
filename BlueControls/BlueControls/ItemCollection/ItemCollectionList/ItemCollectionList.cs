@@ -41,9 +41,10 @@ namespace BlueControls.ItemCollection
         private bool _CellposCorrect = true;
         private bool _Validating;
 
-        private enBlueListBoxAppearance _Appearancex;
-        private enDesign _ControlDesignx;
-        private enDesign _ItemDesignx;
+        private enBlueListBoxAppearance _Appearance;
+        private enDesign _ControlDesign;
+        private enDesign _ItemDesign;
+        private bool _AutoSort;
 
         private SizeF ComputeAllItemPositions_lastF = Size.Empty;
 
@@ -52,8 +53,6 @@ namespace BlueControls.ItemCollection
 
 
         #region  Properties 
-
-
 
         public enCheckBehavior CheckBehavior
         {
@@ -66,14 +65,9 @@ namespace BlueControls.ItemCollection
 
                 if (value == _CheckBehavior) { return; }
                 _CheckBehavior = value;
-                if (ValidateCheckStates(null))
-                {
-                    InvalidateView();
-                }
+                ValidateCheckStates(null);
             }
         }
-
-
 
         /// <summary>
         /// Itemdesign wird durch Appearance gesetzt
@@ -83,11 +77,10 @@ namespace BlueControls.ItemCollection
         {
             get
             {
-                if (_ItemDesignx == enDesign.Undefiniert) { Develop.DebugPrint(enFehlerArt.Fehler, "ItemDesign undefiniert!"); }
-                return _ItemDesignx;
+                if (_ItemDesign == enDesign.Undefiniert) { Develop.DebugPrint(enFehlerArt.Fehler, "ItemDesign undefiniert!"); }
+                return _ItemDesign;
             }
         }
-
 
         /// <summary>
         /// ControlDesign wird durch Appearance gesetzt
@@ -97,84 +90,32 @@ namespace BlueControls.ItemCollection
         {
             get
             {
-                if (_ControlDesignx == enDesign.Undefiniert) { Develop.DebugPrint(enFehlerArt.Fehler, "ControlDesign undefiniert!"); }
-                return _ControlDesignx;
+                if (_ControlDesign == enDesign.Undefiniert) { Develop.DebugPrint(enFehlerArt.Fehler, "ControlDesign undefiniert!"); }
+                return _ControlDesign;
             }
         }
-
 
         public enBlueListBoxAppearance Appearance
         {
             get
             {
-                return _Appearancex;
+                return _Appearance;
             }
             set
             {
-                if (value == _Appearancex && _ItemDesignx != enDesign.Undefiniert) { return; }
-                _Appearancex = value;
+                if (value == _Appearance && _ItemDesign != enDesign.Undefiniert) { return; }
+                _Appearance = value;
 
 
                 GetDesigns();
 
 
                 DesignOrStyleChanged();
-                InvalidateView();
+                OnNeedRefresh();
             }
         }
-
-
-
 
         #endregion
-
-
-
-
-        private void GetDesigns()
-        {
-            _ControlDesignx = (enDesign)_Appearancex;
-
-            switch (_Appearancex)
-            {
-                case enBlueListBoxAppearance.Autofilter:
-                    _ItemDesignx = enDesign.Item_Autofilter;
-                    break;
-
-                case enBlueListBoxAppearance.DropdownSelectbox:
-                    _ItemDesignx = enDesign.Item_DropdownMenu;
-                    break;
-
-                case enBlueListBoxAppearance.Gallery:
-                    _ItemDesignx = enDesign.Item_Listbox;
-                    _ControlDesignx = enDesign.ListBox;
-                    break;
-
-                case enBlueListBoxAppearance.FileSystem:
-                    _ItemDesignx = enDesign.Item_Listbox;
-                    _ControlDesignx = enDesign.ListBox;
-                    break;
-
-                case enBlueListBoxAppearance.Listbox:
-                    _ItemDesignx = enDesign.Item_Listbox;
-                    _ControlDesignx = enDesign.ListBox;
-                    break;
-
-                case enBlueListBoxAppearance.KontextMenu:
-                    _ItemDesignx = enDesign.Item_KontextMenu;
-                    break;
-
-                case enBlueListBoxAppearance.ComboBox_Textbox:
-                    _ItemDesignx = enDesign.ComboBox_Textbox;
-                    break;
-
-                default:
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Unbekanntes Design: " + _Appearancex);
-                    break;
-            }
-        }
-
-
 
         #region  Construktor + Initialize 
 
@@ -188,7 +129,7 @@ namespace BlueControls.ItemCollection
         public ItemCollectionList(enBlueListBoxAppearance Design)
         {
             Initialize();
-            _Appearancex = Design;
+            _Appearance = Design;
             GetDesigns();
         }
 
@@ -196,22 +137,63 @@ namespace BlueControls.ItemCollection
         private void Initialize()
         {
             _CellposCorrect = true;
-            _Appearancex = enBlueListBoxAppearance.Listbox;
-            _ItemDesignx = enDesign.Undefiniert;
-            _ControlDesignx = enDesign.Undefiniert;
+            _Appearance = enBlueListBoxAppearance.Listbox;
+            _ItemDesign = enDesign.Undefiniert;
+            _ControlDesign = enDesign.Undefiniert;
             _CheckBehavior = enCheckBehavior.SingleSelection;
         }
 
         #endregion
 
-
-
-
         #region  Event-Deklarationen + Delegaten 
-
         public event EventHandler ItemCheckedChanged;
-
+        public event EventHandler NeedRefresh;
         #endregion
+
+        private void GetDesigns()
+        {
+            _ControlDesign = (enDesign)_Appearance;
+            _AutoSort = true;
+
+            switch (_Appearance)
+            {
+                case enBlueListBoxAppearance.Autofilter:
+                    _ItemDesign = enDesign.Item_Autofilter;
+                    break;
+
+                case enBlueListBoxAppearance.DropdownSelectbox:
+                    _ItemDesign = enDesign.Item_DropdownMenu;
+                    break;
+
+                case enBlueListBoxAppearance.Gallery:
+                    _ItemDesign = enDesign.Item_Listbox;
+                    _ControlDesign = enDesign.ListBox;
+                    break;
+
+                case enBlueListBoxAppearance.FileSystem:
+                    _ItemDesign = enDesign.Item_Listbox;
+                    _ControlDesign = enDesign.ListBox;
+                    break;
+
+                case enBlueListBoxAppearance.Listbox:
+                    _ItemDesign = enDesign.Item_Listbox;
+                    _ControlDesign = enDesign.ListBox;
+                    break;
+
+                case enBlueListBoxAppearance.KontextMenu:
+                    _ItemDesign = enDesign.Item_KontextMenu;
+                    _AutoSort = false;
+                    break;
+
+                case enBlueListBoxAppearance.ComboBox_Textbox:
+                    _ItemDesign = enDesign.ComboBox_Textbox;
+                    break;
+
+                default:
+                    Develop.DebugPrint(enFehlerArt.Fehler, "Unbekanntes Design: " + _Appearance);
+                    break;
+            }
+        }
 
 
 
@@ -278,26 +260,33 @@ namespace BlueControls.ItemCollection
 
             CheckVariable = value;
 
-            DoEventX_ItemCheckedChanged(This);
-        }
 
-        internal void DoEventX_ItemCheckedChanged(BasicListItem ThisItem)
-        {
             if (_Validating) { return; }
 
 
-            if (ThisItem.Checked == false) { ThisItem = null; }
-
-            ValidateCheckStates(ThisItem);
-
-            InvalidateView();
+            ValidateCheckStates(This);
 
             OnItemCheckedChanged();
+            OnNeedRefresh();
         }
+
+
 
         private void OnItemCheckedChanged()
         {
             ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
+        }
+
+        private void OnNeedRefresh()
+        {
+            NeedRefresh?.Invoke(this, System.EventArgs.Empty);
+        }
+
+        protected override void OnListOrItemChanged()
+        {
+            base.OnListOrItemChanged();
+            _CellposCorrect = false;
+            OnNeedRefresh();
         }
 
         public List<BasicListItem> Checked()
@@ -365,7 +354,7 @@ namespace BlueControls.ItemCollection
 
         internal void ComputeAllItemPositions(SizeF Max, bool CanChangeSize, bool MustBeOneColumn, enBlueListBoxAppearance GalleryStyle, System.Windows.Forms.Control InControl, Slider SliderY)
         {
-            if (_ItemDesignx == enDesign.Undefiniert) { GetDesigns(); }
+            if (_ItemDesign == enDesign.Undefiniert) { GetDesigns(); }
 
 
 
@@ -376,7 +365,7 @@ namespace BlueControls.ItemCollection
             }
             if (_CellposCorrect) { return; }
 
-            //if (MustBeOneColumn) { GalleryStyle = false; }
+  
 
 
             var InControlWidth = int.MaxValue;
@@ -561,6 +550,15 @@ namespace BlueControls.ItemCollection
             var Maxy = int.MinValue;
 
 
+
+
+            if (_AutoSort)
+            {
+                Sort();
+            }
+
+
+
             foreach (var ThisItem in this)
             {
                 // PaintmodX kann immer angezogen werden, da es eh nur bei einspaltigen Listboxen verändert wird!
@@ -568,7 +566,7 @@ namespace BlueControls.ItemCollection
                 {
 
 
-                    ThisItem.ComputePositionForListBox(_Appearancex, CX, CY, MultiX, SliderWidth, InControlWidth);
+                    ThisItem.ComputePositionForListBox(_Appearance, CX, CY, MultiX, SliderWidth, InControlWidth);
                     var YVal = ThisItem.Pos.Height;
 
 
@@ -889,11 +887,11 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private void InvalidateView()
-        {
-            _CellposCorrect = false;
-            OnListOrItemChanged();
-        }
+        //private void InvalidateView()
+        //{
+        //    _CellposCorrect = false;
+        //    OnListOrItemChanged();
+        //}
 
 
 
@@ -989,7 +987,7 @@ namespace BlueControls.ItemCollection
         {
             cItem.Parent = this;
             base.Add(cItem);
-            InvalidateView();
+            OnNeedRefresh();
         }
 
 
@@ -1026,7 +1024,8 @@ namespace BlueControls.ItemCollection
         {
             if (cItem == null) { return; }
             base.Remove(cItem);
-            InvalidateView();
+            _CellposCorrect = false;
+            OnNeedRefresh();
         }
 
 
@@ -1034,7 +1033,8 @@ namespace BlueControls.ItemCollection
         {
             if (Count == 0) { return; }
             base.Clear();
-            InvalidateView();
+            _CellposCorrect = false;
+            OnNeedRefresh();
         }
 
 
@@ -1083,14 +1083,11 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private bool ValidateCheckStates(BasicListItem ThisMustBeChecked)
+        private void ValidateCheckStates(BasicListItem ThisMustBeChecked)
         {
 
             _Validating = true;
             var SomethingDonex = false;
-
-
-            if (ThisMustBeChecked != null && !ThisMustBeChecked.Checked) { Develop.DebugPrint(enFehlerArt.Fehler, "ThisMustBeChecked ist nicht checked!"); }
 
             var Done = false;
             BasicListItem F = null;
@@ -1158,13 +1155,13 @@ namespace BlueControls.ItemCollection
 
             _Validating = false;
 
-            return SomethingDonex;
+            if (SomethingDonex) { OnNeedRefresh(); }
         }
 
         public object Clone()
         {
 
-            var x = new ItemCollectionList(_Appearancex);
+            var x = new ItemCollectionList(_Appearance);
             x.CheckBehavior = _CheckBehavior;
 
 

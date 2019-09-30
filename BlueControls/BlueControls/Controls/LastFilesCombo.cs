@@ -140,7 +140,7 @@ namespace BlueControls.Controls
 
             if (!string.IsNullOrEmpty(_specialcommand))
             {
-                Item.Add(new TextListItem("#SPECIAL#", _specialcommand, QuickImage.Get(ImageCode)));
+                Item.Add(new TextListItem("#SPECIAL#", _specialcommand, QuickImage.Get(ImageCode), true, "!"));
             }
 
 

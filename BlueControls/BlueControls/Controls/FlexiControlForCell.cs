@@ -231,10 +231,21 @@ namespace BlueControls.Controls
 
         private void Database_CellValueChanged(object sender, CellEventArgs e)
         {
-            if (e.Row != _tmpRow || e.Column != _tmpColumn) { return; }
+            if (e.Row != _tmpRow) { return; }
 
-            SetValueFromCell();
-            CheckEnabledState();
+
+            if (e.Column == _tmpColumn)
+            {
+                SetValueFromCell();
+                CheckEnabledState();
+            }
+
+
+            if (e.Column == e.Column.Database.Column.SysLocked)
+            {
+                CheckEnabledState();
+            }
+
         }
 
         private void SetValueFromCell()

@@ -56,7 +56,6 @@ namespace BlueControls.Controls
             this.Tabs.SelectedIndex = -1;
             this.Tabs.Size = new System.Drawing.Size(128, 112);
             this.Tabs.TabIndex = 2;
-            this.Tabs.SelectedIndexChanged += new System.EventHandler(this.Tabs_SelectedIndexChanged);
             this.Tabs.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Tabs_MouseUp);
             // 
             // Editor

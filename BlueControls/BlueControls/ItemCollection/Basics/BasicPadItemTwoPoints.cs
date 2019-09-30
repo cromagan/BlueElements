@@ -26,16 +26,22 @@ namespace BlueControls.ItemCollection
 {
     public abstract class BasicPadItemTwoPoints : BasicPadItem
     {
-        protected PointDF p_ML;
-        protected PointDF p_MR;
+        //protected PointDF p_ML;
+        //protected PointDF p_MR;
         protected decimal winkel;
         private decimal _laengePix;
         private decimal _breitePix;
+
+
+        public PointDF p_ML { get; protected set; }
+        public PointDF p_MR { get; protected set; }
 
         public PointDF p_OL { get; private set; }
         public PointDF p_OR { get; private set; }
         public PointDF p_UL { get; private set; }
         public PointDF p_UR { get; private set; }
+
+
 
 
         public decimal laengePix

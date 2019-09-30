@@ -831,6 +831,12 @@ namespace BlueControls.Forms
             AlleFilterAus.Enabled = DatenbankDa;
 
 
+            if (LanguageTool.Translation != null)
+            {
+                ZeilenFilter_TextFeld.Enabled = false;
+            }
+
+
         }
 
 
