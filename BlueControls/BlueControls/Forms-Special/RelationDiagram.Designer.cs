@@ -8,7 +8,7 @@ using BlueControls.EventArgs;
 namespace BlueControls.Forms
     {
 
-        public partial class RelationDiagram : PictureView
+        public partial class RelationDiagram : PadEditor
 		{
 			//Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
 			[DebuggerNonUserCode()]
@@ -59,10 +59,6 @@ namespace BlueControls.Forms
             // Page_Control
             // 
             this.Page_Control.Size = new Size(1282, 81);
-            // 
-            // Area_Seiten
-            // 
-            this.grpSeiten.Visible = false;
             // 
             // Area_KomponenteHinzufügen
             // 

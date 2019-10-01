@@ -217,21 +217,10 @@ namespace BlueControls
             if (Performs(true)) { return; }
 
 
-            //If Points(1).Name <> "U" Then Exit Sub
-
-            //  Points(0).Y = Points(1).Y - 10
-            //  Points(1).Y = Points(0).Y - 10
-
-            //    Points(0).X = Points(1).X - 20
-
-            //   Points(1).X = Points(0).X - 20
-
             var c = Color.FromArgb(50, 255, 0, 0);
             var p = new Pen(c);
-            // Dim b As New SolidBrush(c)
 
-
-            //      ThisPoint.Draw(TMPGR, _Zoom, CSng(SliderX.Value), CSng(SliderY.Value), enDesign.Button_EckpunktSchieber, enStates.Standard)
+ 
             foreach (var thispoint in Points)
             {
                 thispoint.Draw(GR, cZoom, MoveX, MoveY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);

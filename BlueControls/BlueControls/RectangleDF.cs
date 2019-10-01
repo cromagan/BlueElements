@@ -18,6 +18,7 @@
 #endregion
 
 using System;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 
@@ -151,5 +152,12 @@ namespace BlueControls
 
             return true;
         }
+
+
+        public Rectangle ZoomAndMoveRect(decimal cZoom, decimal MoveX, decimal MoveY)
+        {
+            return new Rectangle((int)(X * cZoom - MoveX), (int)(Y * cZoom - MoveY), (int)(Width * cZoom), (int)(Height * cZoom));
+        }
+
     }
 }

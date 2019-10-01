@@ -158,12 +158,12 @@ namespace BluePaint
 
             if (_Pic == null)
             {
-                Rückg.Enabled = false;
+                btnRückgänig.Enabled = false;
                 return;
             }
 
             _PicUndo = _Pic.Image_Clone();
-            Rückg.Enabled = true;
+            btnRückgänig.Enabled = true;
 
         }
 
@@ -263,7 +263,7 @@ namespace BluePaint
             {
                 return;
             }
-            Rückg.Enabled = false;
+            btnRückgänig.Enabled = false;
 
 
             BlueBasics.modAllgemein.Swap(ref _Pic, ref _PicUndo);
@@ -436,6 +436,11 @@ namespace BluePaint
         private void Dummy_Click(object sender, System.EventArgs e)
         {
             SetTool(new Tool_DummyGenerator(), true);
+        }
+
+        private void GroupBox3_Click(object sender, System.EventArgs e)
+        {
+
         }
     }
 

@@ -210,11 +210,10 @@ namespace BlueControls.Controls
 
         private void DoDraw(Graphics GR, bool IgnoreVisible)
         {
-            if (Develop.Exited || IsDisposed) { return; }
+            if (Develop.Exited || IsDisposed || !Visible) { return; }
 
             lock (this)
             {
-                if (!Visible && !IgnoreVisible) { return; }
 
                 if (Skin.Instance == null)
                 {

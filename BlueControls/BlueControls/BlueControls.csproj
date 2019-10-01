@@ -83,6 +83,12 @@
       <DependentUpon>Skript.cs</DependentUpon>
     </Compile>
     <Compile Include="BlueFont.cs" />
+    <Compile Include="Controls\ZoomPic.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ZoomPic.Designer.cs">
+      <DependentUpon>ZoomPic.cs</DependentUpon>
+    </Compile>
     <Compile Include="Enums\enSymbol.cs" />
     <Compile Include="Enums\enMovePoints.cs" />
     <Compile Include="Enums\enSelectModus.cs" />
@@ -180,6 +186,12 @@
     </Compile>
     <Compile Include="Forms-Basics\FloatingForm.Designer.cs">
       <DependentUpon>FloatingForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms-Special\PictureView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms-Special\PictureView.designer.cs">
+      <DependentUpon>PictureView.cs</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Interfaces\IDesignAble.cs" />
@@ -371,11 +383,11 @@
     <Compile Include="Forms-Common\TODELETE_PageSetupDialog.Designer.cs">
       <DependentUpon>TODELETE_PageSetupDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Special\PictureView.cs">
+    <Compile Include="Forms-Special\PadEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Special\PictureView.designer.cs">
-      <DependentUpon>PictureView.cs</DependentUpon>
+    <Compile Include="Forms-Special\PadEditor.designer.cs">
+      <DependentUpon>PadEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms-Special\RelationDiagram.cs">
       <SubType>Form</SubType>
@@ -481,6 +493,12 @@
       <DependentUpon>TextBox.cs</DependentUpon>
     </Compile>
     <Compile Include="strScreenData.cs" />
+    <Compile Include="Controls\ZoomPad.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ZoomPad.Designer.cs">
+      <DependentUpon>ZoomPad.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="BlueDatabaseDialogs\Search.resx">
@@ -634,9 +652,12 @@
       <DependentUpon>TODELETE_PageSetupDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms-Special\PadEditor.resx">
+      <DependentUpon>PadEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms-Special\PictureView.resx">
       <DependentUpon>PictureView.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms-Special\RelationDiagram.resx">
       <DependentUpon>RelationDiagram.cs</DependentUpon>
@@ -665,6 +686,9 @@
     <EmbeddedResource Include="Controls\TextBox.resx">
       <DependentUpon>TextBox.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ZoomPad.resx">
+      <DependentUpon>ZoomPad.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

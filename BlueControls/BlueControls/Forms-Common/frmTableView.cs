@@ -1101,7 +1101,7 @@ namespace BlueControls.Forms
         {
             Hide();
 
-            var r = new PictureView
+            var r = new PadEditor
             {
                 WindowState = System.Windows.Forms.FormWindowState.Maximized
             };

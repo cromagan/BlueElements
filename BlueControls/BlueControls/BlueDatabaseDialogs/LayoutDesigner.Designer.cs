@@ -6,7 +6,7 @@ namespace BlueControls.BlueDatabaseDialogs
 {
 
 
-    internal partial class LayoutDesigner : PictureView
+    internal partial class LayoutDesigner : PadEditor
     {
         //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

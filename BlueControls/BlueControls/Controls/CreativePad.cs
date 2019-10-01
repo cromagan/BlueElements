@@ -40,38 +40,19 @@ using BlueDatabase.EventArgs;
 namespace BlueControls.Controls
 {
     [DefaultEvent("Click")]
-    public sealed partial class CreativePad : IBackgroundBitmap, IContextMenu
+    public sealed partial class CreativePad : ZoomPad, IContextMenu
     {
 
         private bool ComputeOrders_isin;
         private bool RepairPrinterData_Prepaired;
 
-
-
-
         public static bool Debug_ShowPointOrder = false;
         public static bool Debug_ShowRelationOrder = false;
-
-        internal static readonly Pen PenGray = new Pen(Color.FromArgb(40, 0, 0, 0));
-        internal static readonly Pen PenGrayLarge = new Pen(Color.FromArgb(40, 0, 0, 0), 5);
-
-
-        private Bitmap _BitmapOfControl;
-        private bool _GeneratingBitmapOfControl;
-
-        private decimal _Zoom = 1;
-        private decimal _ZoomMin = 1;
-
-        private bool _Fitting = true;
-
         private bool _isParsing;
 
 
         private SizeF _SheetSizeInMM = SizeF.Empty;
         private System.Windows.Forms.Padding _RandinMM = System.Windows.Forms.Padding.Empty;
-
-
-        private PointDF _MouseDown;
 
         public string Caption = "";
 
@@ -368,179 +349,12 @@ namespace BlueControls.Controls
             }
         }
 
-        internal new void MouseDown(System.Windows.Forms.MouseEventArgs e)
-        {
-            _MouseDown = null;
-
-
-            var Ho = HotItem(e);
-
-            if (Ho is IMouseAndKeyHandle ho2)
-            {
-                if (ho2.MouseDown(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value))
-                {
-                    _GivesMouseComandsTo = Ho;
-                    return;
-                }
-            }
-
-
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
-            {
-                var p = MousePos11(e);
-                foreach (var thisPoint in Sel_P)
-                {
-
-                    if (GeometryDF.Länge(thisPoint, new PointDF(p)) < 5m / _Zoom)
-                    {
-                        var Relations = AllRelations();
-                        if (!thisPoint.CanMove(Relations))
-                        {
-                            Invalidate();
-                            Forms.QuickInfo.Show("Dieser Punkt ist fest definiert<br>und kann nicht verschoben werden.");
-                            return;
-                        }
-
-                        Unselect();
-                        Sel_P.Add(thisPoint);
-                        _OrdersValid = false;
-                        ComputeMovingData();
-                        _MouseDown = new PointDF(e.X / _Zoom, e.Y / _Zoom);
-                        Invalidate();
-                        return;
-                    }
-                }
 
 
 
-                if ((ModifierKeys & System.Windows.Forms.Keys.Control) <= 0 && Sel_P.Count > 0)
-                {
-                    Unselect();
-
-                    if (HotItem(e) == null) { ComputeMovingData(); }
-                    Invalidate();
-
-                }
-
-                if (Ho != null)
-                {
-                    Sel_P.AddIfNotExists(Ho.PointList());
-                    _OrdersValid = false;
-                    ComputeMovingData();
-                    Invalidate();
-                }
-
-            }
-
-            _MouseDown = new PointDF(e.X / _Zoom, e.Y / _Zoom);
-        }
-
-        internal new void MouseMove(System.Windows.Forms.MouseEventArgs e)
-        {
-
-            var ho = HotItem(e);
-            if (_GivesMouseComandsTo != null)
-            {
-                if (e.Button == System.Windows.Forms.MouseButtons.None && ho != _GivesMouseComandsTo)
-                {
-                    _GivesMouseComandsTo = null;
-                    Invalidate();
-                }
-                else
-                {
-                    if (!((IMouseAndKeyHandle)_GivesMouseComandsTo).MouseMove(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value))
-                    {
-                        _GivesMouseComandsTo = null;
-                        Invalidate();
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                if (ho is IMouseAndKeyHandle Ho2)
-                {
-                    if (Ho2.MouseMove(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value))
-                    {
-                        _GivesMouseComandsTo = ho;
-                        Invalidate();
-                        return;
-                    }
-                }
-            }
-
-            if (_MouseDown != null && e.Button == System.Windows.Forms.MouseButtons.Left)
-            {
-                if (_MouseEditEnabled)
-                {
-                    MoveItems(new PointDF(e.X / _Zoom, e.Y / _Zoom));
-                }
-            }
-        }
-
-        internal void DoMouseUp(System.Windows.Forms.MouseEventArgs e)
-        {
-            if (_GivesMouseComandsTo != null)
-            {
-                if (!((IMouseAndKeyHandle)_GivesMouseComandsTo).MouseUp(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value))
-                {
-                    _GivesMouseComandsTo = null;
-                }
-                else
-                {
-                    return;
-                }
-            }
 
 
-            _MouseDown = null;
 
-
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
-            {
-                //   AmRasterAusrichten()
-
-                foreach (var Thispoint in Sel_P)
-                {
-                    if (Thispoint.Parent is BasicPadItem item)
-                    {
-                        Sel_P.AddIfNotExists(item.PointList());
-                        _OrdersValid = false;
-                        Invalidate();
-                        break;
-                    }
-                }
-
-                if (Convert.ToBoolean(_AutoRelation | enAutoRelationMode.NurBeziehungenErhalten) && _NewAutoRelations.Count > 0)
-                {
-                    _ExternalRelations.AddRange(_NewAutoRelations);
-                    InvalidateOrder();
-                    RepairAll(0, false);
-                }
-
-            }
-
-            _NewAutoRelations.Clear();
-
-            RepairAll(1, false);
-
-            if (e.Button == System.Windows.Forms.MouseButtons.Right)
-            {
-                if (_KontextMenuEnabled)
-                {
-                    ContextMenu_Show(this, e);
-                }
-            }
-
-
-            ComputeMovingData();
-
-            Invalidate(); // Damit auch snap-Punkte wieder gelöscht werden
-
-        }
 
 
         private PointDF Getbetterpoint(double X, double Y, PointDF notPoint, bool MustUsableForAutoRelation)
@@ -703,7 +517,10 @@ namespace BlueControls.Controls
             return new Rectangle((int)P_rLO.X, (int)P_rLO.Y, (int)(P_rRU.X - P_rLO.X), (int)(P_rRU.Y - P_rLO.Y));
         }
 
-
+        protected override RectangleDF MaxBounds()
+        {
+            return MaxBounds(null);
+        }
 
         internal RectangleDF MaxBounds(List<BasicPadItem> ZoomItems)
         {
@@ -793,91 +610,9 @@ namespace BlueControls.Controls
 
 
 
-        public decimal ZoomFitValue(RectangleDF MaxBounds, bool sliderShowing, Size sizeOfPaintArea)
-        {
-            if (MaxBounds.Width < 0.01m || MaxBounds.Height < 0.01m) { return 1m; }
-
-            if (sliderShowing)
-            {
-                return Math.Min((sizeOfPaintArea.Width - SliderY.Width - 32) / MaxBounds.Width, (sizeOfPaintArea.Height - SliderX.Height - 32) / MaxBounds.Height);
-            }
-            else
-            {
-                return Math.Min(sizeOfPaintArea.Width / MaxBounds.Width, sizeOfPaintArea.Height / MaxBounds.Height);
-            }
-        }
-
-
-        /// <summary>
-        /// Gibt den Versatz der Linken oben Ecke aller Objekte zurück, um mittig zu sein.
-        /// </summary>
-        /// <param name="SliderShowing"></param>
-        /// <param name="sizeOfPaintArea"></param>
-        /// <param name="ZoomToUse"></param>
-        /// <returns></returns>
-        public Point CenterPos(RectangleDF MaxBounds, bool SliderShowing, Size sizeOfPaintArea, decimal ZoomToUse)
-        {
-            var w = 0;
-            var h = 0;
-
-            if (SliderShowing)
-            {
-                w = (int)(sizeOfPaintArea.Width - SliderY.Width - MaxBounds.Width * ZoomToUse);
-                h = (int)(sizeOfPaintArea.Height - SliderX.Height - MaxBounds.Height * ZoomToUse);
-            }
-            else
-            {
-                w = (int)(sizeOfPaintArea.Width - MaxBounds.Width * ZoomToUse);
-                h = (int)(sizeOfPaintArea.Height - MaxBounds.Height * ZoomToUse);
-            }
-
-            return new Point(w, h);
-        }
-
-
-        internal PointF SliderValues(RectangleDF MaxBounds, decimal ZoomToUse, Point TopLeftPos)
-        {
-            return new PointF((float)(MaxBounds.Left * ZoomToUse - TopLeftPos.X / 2m), (float)(MaxBounds.Top * ZoomToUse - TopLeftPos.Y / 2m));
-        }
 
 
 
-
-        private void ZoomFitInvalidateAndCheckButtons()
-        {
-            var mb = MaxBounds(null);
-
-            _ZoomMin = ZoomFitValue(mb, true, Size);
-
-            if (_Fitting && !MousePressing()) { _Zoom = _ZoomMin; }
-            _Zoom = Math.Max(_Zoom, _ZoomMin / 5);
-            ComputeSliders(mb);
-        }
-
-        public void ZoomIn(System.Windows.Forms.MouseEventArgs e)
-        {
-            var x = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, e.X, e.Y, 1);
-            OnMouseWheel(x);
-        }
-
-        public void ZoomOut(System.Windows.Forms.MouseEventArgs e)
-        {
-            var x = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, e.X, e.Y, -1);
-            OnMouseWheel(x);
-        }
-
-        public void ZoomFit()
-        {
-            _Fitting = true;
-            ZoomFitInvalidateAndCheckButtons();
-        }
-
-
-        //public void ZoomFitWithoutSliders()
-        //{
-        //    _Fitting = true;
-        //    ZoomFitInvalidateAndCheckButtons(false);
-        //}
 
 
 
@@ -901,8 +636,11 @@ namespace BlueControls.Controls
         }
 
 
-        public new void KeyUp(System.Windows.Forms.KeyEventArgs e)
+
+        protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => DoKeyUp(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        public void DoKeyUp(System.Windows.Forms.KeyEventArgs e)
         {
+            base.OnKeyUp(e);
             if (!_KeyboardEditEnabled) { return; }
 
             if (_GivesMouseComandsTo != null)
@@ -961,83 +699,190 @@ namespace BlueControls.Controls
             }
         }
 
-        protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e)
-        {
-            base.OnKeyUp(e);
-            KeyUp(e);
-        }
-
-
-        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e)
+        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) => DoMouseDown(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        internal void DoMouseDown(System.Windows.Forms.MouseEventArgs e)
         {
             base.OnMouseDown(e);
 
-            MouseDown(e);
+
+            var Ho = HotItem(e);
+
+            if (Ho is IMouseAndKeyHandle ho2)
+            {
+                if (ho2.MouseDown(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value))
+                {
+                    _GivesMouseComandsTo = Ho;
+                    return;
+                }
+            }
 
 
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            {
+                var p = MousePos11(e);
+                foreach (var thisPoint in Sel_P)
+                {
+
+                    if (GeometryDF.Länge(thisPoint, new PointDF(p)) < 5m / _Zoom)
+                    {
+                        var Relations = AllRelations();
+                        if (!thisPoint.CanMove(Relations))
+                        {
+                            Invalidate();
+                            Forms.QuickInfo.Show("Dieser Punkt ist fest definiert<br>und kann nicht verschoben werden.");
+                            return;
+                        }
+
+                        Unselect();
+                        Sel_P.Add(thisPoint);
+                        _OrdersValid = false;
+                        ComputeMovingData();
+                        Invalidate();
+                        return;
+                    }
+                }
+
+
+
+                if ((ModifierKeys & System.Windows.Forms.Keys.Control) <= 0 && Sel_P.Count > 0)
+                {
+                    Unselect();
+
+                    if (HotItem(e) == null) { ComputeMovingData(); }
+                    Invalidate();
+
+                }
+
+                if (Ho != null)
+                {
+                    Sel_P.AddIfNotExists(Ho.PointList());
+                    _OrdersValid = false;
+                    ComputeMovingData();
+                    Invalidate();
+                }
+
+            }
         }
 
-
-        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e)
+        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => DoMouseMove(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        internal void DoMouseMove(System.Windows.Forms.MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            MouseMove(e);
-
-        }
-
-
-        private PointF MousePos11(System.Windows.Forms.MouseEventArgs e)
-        {
-            return new PointF((float)((decimal)(e.X + SliderX.Value) / _Zoom), (float)((decimal)(e.Y + SliderY.Value) / _Zoom));
-        }
-
-
-        protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e)
-        {
-            base.OnMouseWheel(e);
-
-            _Fitting = false;
-
-            var m = MousePos11(e);
-
-            if (e.Delta > 0)
+            var ho = HotItem(e);
+            if (_GivesMouseComandsTo != null)
             {
-                _Zoom = _Zoom * 1.5m;
+                if (e.Button == System.Windows.Forms.MouseButtons.None && ho != _GivesMouseComandsTo)
+                {
+                    _GivesMouseComandsTo = null;
+                    Invalidate();
+                }
+                else
+                {
+                    if (!((IMouseAndKeyHandle)_GivesMouseComandsTo).MouseMove(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value))
+                    {
+                        _GivesMouseComandsTo = null;
+                        Invalidate();
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
             }
             else
             {
-                _Zoom = _Zoom * (1m / 1.5m);
+                if (ho is IMouseAndKeyHandle Ho2)
+                {
+                    if (Ho2.MouseMove(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value))
+                    {
+                        _GivesMouseComandsTo = ho;
+                        Invalidate();
+                        return;
+                    }
+                }
+            }
+
+            if (_MouseDown != null && e.Button == System.Windows.Forms.MouseButtons.Left)
+            {
+                if (_MouseEditEnabled)
+                {
+                    MoveItems(new PointDF(e.X / _Zoom, e.Y / _Zoom));
+                }
+            }
+        }
+
+
+        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => DoMouseUp(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        internal void DoMouseUp(System.Windows.Forms.MouseEventArgs e)
+        {
+
+
+
+            if (_GivesMouseComandsTo != null)
+            {
+                if (!((IMouseAndKeyHandle)_GivesMouseComandsTo).MouseUp(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value))
+                {
+                    _GivesMouseComandsTo = null;
+                }
+                else
+                {
+                    return;
+                }
             }
 
 
 
 
-            _Zoom = Math.Max(_ZoomMin / 1.2m, _Zoom);
-            _Zoom = Math.Min(10, _Zoom);
-            var mb = MaxBounds(null);
 
-            ComputeSliders(mb);
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            {
+                //   AmRasterAusrichten()
+
+                foreach (var Thispoint in Sel_P)
+                {
+                    if (Thispoint.Parent is BasicPadItem item)
+                    {
+                        Sel_P.AddIfNotExists(item.PointList());
+                        _OrdersValid = false;
+                        Invalidate();
+                        break;
+                    }
+                }
+
+                if (Convert.ToBoolean(_AutoRelation | enAutoRelationMode.NurBeziehungenErhalten) && _NewAutoRelations.Count > 0)
+                {
+                    _ExternalRelations.AddRange(_NewAutoRelations);
+                    InvalidateOrder();
+                    RepairAll(0, false);
+                }
+
+            }
+
+            _NewAutoRelations.Clear();
+
+            RepairAll(1, false);
+
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                if (_KontextMenuEnabled)
+                {
+                    ContextMenu_Show(this, e);
+                }
+            }
 
 
-            // M Beeinhaltet den Punkt, wo die Maus hinzeigt Maßstabunabhängig.
+            ComputeMovingData();
 
-            // Der Slider ist abhängig vom Maßsstab - sowie die echten Mauskoordinaten ebenfalls.
-
-            // Deswegen die M mit dem neuen Zoom-Faktor berechnen umrechen, um auch Masstababhängig zu sein
-            // Die Verschiebung der echten Mauskoordinaten berechnen und den Slider auf den Wert setzen.
-
-
-
-            SliderX.Value = m.X * (float)_Zoom - e.X;
-            SliderY.Value = m.Y * (float)_Zoom - e.Y;
-
-            // Alte Berechnung für Mittig Setzen
-            //SliderX.Value = (m.X * _Zoom) - (Width / 2) - SliderY.Width
-            //SliderY.Value = (m.Y * _Zoom) - (Height / 2) - SliderX.Height
-
-
+            Invalidate(); // Damit auch snap-Punkte wieder gelöscht werden
 
         }
+
+
+
+
+
+
+
 
         private bool Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, Size SizeOfParentControl, bool ForPrinting, List<BasicPadItem> VisibleItems)
         {
@@ -1184,7 +1029,7 @@ namespace BlueControls.Controls
 
                 if (_GivesMouseComandsTo != null)
                 {
-                    var DCoordinates = _GivesMouseComandsTo.DrawingKoordinates(zoomf, X, Y);
+                    var DCoordinates = _GivesMouseComandsTo.UsedArea().ZoomAndMoveRect(zoomf, X, Y);
 
                     TMPGR.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
                 }
@@ -1214,21 +1059,13 @@ namespace BlueControls.Controls
         }
 
 
-        public Bitmap BitmapOfControl()
-        {
-            if (_GeneratingBitmapOfControl) { return null; }
-            _GeneratingBitmapOfControl = true;
-            if (_BitmapOfControl == null) { Refresh(); }
-            _GeneratingBitmapOfControl = false;
-            return _BitmapOfControl;
-        }
 
         private void _Item_ItemRemoved(object sender, System.EventArgs e)
         {
             Unselect();
             InvalidateOrder();
             Changed = true;
-            ZoomFitInvalidateAndCheckButtons();
+            ZoomFit();
             Invalidate();
         }
 
@@ -1240,81 +1077,7 @@ namespace BlueControls.Controls
         }
 
 
-        protected override void OnSizeChanged(System.EventArgs e)
-        {
-            if (_BitmapOfControl != null)
-            {
-                if (_BitmapOfControl.Width < Width || _BitmapOfControl.Height < Height)
-                {
-                    _BitmapOfControl.Dispose();
-                    _BitmapOfControl = null;
-                }
-            }
 
-            ZoomFitInvalidateAndCheckButtons();
-            base.OnSizeChanged(e);
-        }
-
-        private void SliderX_ValueChanged(object sender, System.EventArgs e)
-        {
-            Invalidate();
-        }
-
-        private void SliderY_ValueChanged(object sender, System.EventArgs e)
-        {
-            Invalidate();
-        }
-
-        private void ComputeSliders(RectangleDF maxBounds)
-        {
-
-
-            if (maxBounds.Width == 0) { return; }
-
-            var p = CenterPos(maxBounds, true, Size, _Zoom);
-            var sliderv = SliderValues(maxBounds, _Zoom, p);
-
-
-
-            if (p.X < 0)
-            {
-                SliderX.Enabled = true;
-                SliderX.Minimum = (double)(maxBounds.Left * _Zoom - Width * 0.6m);
-                SliderX.Maximum = (double)(maxBounds.Right * _Zoom - Width + Width * 0.6m);
-
-            }
-            else
-            {
-                SliderX.Enabled = false;
-
-                if (MousePressing() == false)
-                {
-                    SliderX.Minimum = sliderv.X;
-                    SliderX.Maximum = sliderv.X;
-                    SliderX.Value = sliderv.X;
-                }
-            }
-
-            if (p.Y < 0)
-            {
-                SliderY.Enabled = true;
-                SliderY.Minimum = (double)(maxBounds.Top * _Zoom - Height * 0.6m);
-                SliderY.Maximum = (double)(maxBounds.Bottom * _Zoom - Height + Height * 0.6m);
-
-            }
-            else
-            {
-                SliderY.Enabled = false;
-                if (MousePressing() == false)
-                {
-                    SliderY.Minimum = sliderv.Y;
-                    SliderY.Maximum = sliderv.Y;
-                    SliderY.Value = sliderv.Y;
-                }
-            }
-
-            Invalidate();
-        }
 
 
         private bool MoveSelectedPoints(decimal X, decimal Y)
@@ -1949,13 +1712,10 @@ namespace BlueControls.Controls
 
 
 
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e)
-        {
-            base.OnMouseUp(e);
-            DoMouseUp(e);
 
 
-        }
+
+
 
 
         private void ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
@@ -2841,19 +2601,7 @@ namespace BlueControls.Controls
             NeedRefresh?.Invoke(this, System.EventArgs.Empty); // Invalidate-Befehl weitergeben an untergeordnete Steuerelemente
         }
 
-        public void SetZoom(decimal Zoom)
-        {
-            _Zoom = Zoom;
 
-            SliderX.Minimum = 0;
-            SliderX.Maximum = 0;
-            SliderX.Value = 0;
-
-            SliderY.Minimum = 0;
-            SliderY.Maximum = 0;
-            SliderY.Value = 0;
-
-        }
 
         public bool ParseVariable(string VariableName, enValueType ValueType, string Value)
         {

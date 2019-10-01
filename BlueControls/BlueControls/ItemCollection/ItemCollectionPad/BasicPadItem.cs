@@ -325,7 +325,7 @@ namespace BlueControls.ItemCollection
 
             if (ForPrinting && !_PrintMe) { return; }
 
-            var DCoordinates = DrawingKoordinates(cZoom, MoveX, MoveY);
+            var DCoordinates = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
 
 
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
@@ -377,16 +377,12 @@ namespace BlueControls.ItemCollection
         }
 
 
-        internal Rectangle DrawingKoordinates(decimal cZoom, decimal MoveX, decimal MoveY)
-        {
-            var f = UsedArea();
-            return new Rectangle((int)(f.Left * cZoom - MoveX), (int)(f.Top * cZoom - MoveY), (int)(f.Width * cZoom), (int)(f.Height * cZoom));
-        }
+
 
 
         public void DrawOutline(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, Color c)
         {
-            GR.DrawRectangle(new Pen(c), DrawingKoordinates(cZoom, MoveX, MoveY));
+            GR.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY));
         }
 
         protected bool IsInDrawingArea(Rectangle DrawingKoordinates, Size SizeOfParentControl)

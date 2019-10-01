@@ -4,7 +4,7 @@ using System.Drawing.Printing;
 
 namespace BlueControls.Controls
 {
-    public partial class CreativePad : GenericControl
+    public partial class CreativePad 
 
     {
 
@@ -16,32 +16,11 @@ namespace BlueControls.Controls
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreativePad));
-            this.SliderY = new BlueControls.Controls.Slider();
-            this.SliderX = new BlueControls.Controls.Slider();
             this.PrintPreviewDialog1 = new System.Windows.Forms.PrintPreviewDialog();
             this.DruckerDokument = new System.Drawing.Printing.PrintDocument();
             this.PrintDialog1 = new System.Windows.Forms.PrintDialog();
             this.PicsSave = new System.Windows.Forms.SaveFileDialog();
             this.SuspendLayout();
-            // 
-            // SliderY
-            // 
-            this.SliderY.CausesValidation = false;
-            this.SliderY.Dock = System.Windows.Forms.DockStyle.Right;
-            this.SliderY.Location = new System.Drawing.Point(480, 0);
-            this.SliderY.Name = "SliderY";
-            this.SliderY.Orientation = BlueBasics.Enums.enOrientation.Senkrecht;
-            this.SliderY.Size = new System.Drawing.Size(18, 362);
-            this.SliderY.ValueChanged += new System.EventHandler(this.SliderY_ValueChanged);
-            // 
-            // SliderX
-            // 
-            this.SliderX.CausesValidation = false;
-            this.SliderX.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.SliderX.Location = new System.Drawing.Point(0, 344);
-            this.SliderX.Name = "SliderX";
-            this.SliderX.Size = new System.Drawing.Size(480, 18);
-            this.SliderX.ValueChanged += new System.EventHandler(this.SliderX_ValueChanged);
             // 
             // PrintPreviewDialog1
             // 
@@ -73,14 +52,10 @@ namespace BlueControls.Controls
             // 
             // CreativePad
             // 
-            this.Controls.Add(this.SliderX);
-            this.Controls.Add(this.SliderY);
             this.Size = new System.Drawing.Size(498, 362);
             this.ResumeLayout(false);
 
         }
-        private Slider SliderY;
-        private Slider SliderX;
         private System.Windows.Forms.PrintPreviewDialog PrintPreviewDialog1;
         private PrintDocument DruckerDokument;
         private System.Windows.Forms.PrintDialog PrintDialog1;

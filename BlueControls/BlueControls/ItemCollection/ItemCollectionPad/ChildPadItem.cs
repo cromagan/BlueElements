@@ -242,7 +242,7 @@ namespace BlueControls.ItemCollection
             if (PadInternal.Item.Count == 0) { return false; }
 
 
-            var l1 = DrawingKoordinates(cZoom, MoveX, MoveY);
+            var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
             var l2 = PadInternal.MaxBounds(ZoomItems);
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
@@ -268,7 +268,7 @@ namespace BlueControls.ItemCollection
             var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
 
 
-            PadInternal.MouseDown(e2);
+            PadInternal.DoMouseDown(e2);
 
             return true;
         }
@@ -278,7 +278,7 @@ namespace BlueControls.ItemCollection
             if (PadInternal.Item.Count == 0) { return false; }
 
 
-            var l1 = DrawingKoordinates(cZoom, MoveX, MoveY);
+            var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
             var l2 = PadInternal.MaxBounds(ZoomItems);
             decimal tZo = 1;
             if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
@@ -307,7 +307,7 @@ namespace BlueControls.ItemCollection
             var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
 
 
-            PadInternal.MouseMove(e2);
+            PadInternal.DoMouseMove(e2);
 
             return true;
         }
@@ -318,7 +318,7 @@ namespace BlueControls.ItemCollection
             if (PadInternal.Item.Count == 0) { return false; }
 
 
-            var l1 = DrawingKoordinates(cZoom, MoveX, MoveY);
+            var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
             var l2 = PadInternal.MaxBounds(ZoomItems);
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
@@ -367,7 +367,7 @@ namespace BlueControls.ItemCollection
         public bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY)
         {
             if (PadInternal.Item.Count == 0) { return false; }
-            PadInternal.KeyUp(e);
+            PadInternal.DoKeyUp(e);
             return true;
         }
 
