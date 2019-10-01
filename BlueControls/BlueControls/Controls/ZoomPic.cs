@@ -80,13 +80,29 @@ namespace BlueControls.Controls
             {
 
                 var r = MaxBounds().ZoomAndMoveRect(_Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value);
+                TMPGR.PixelOffsetMode = PixelOffsetMode.Half;
+
+                if (_Zoom <1)
+                {
+                    TMPGR.SmoothingMode = SmoothingMode.AntiAlias;
+                    TMPGR.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                }
+                else
+                {
+                    TMPGR.SmoothingMode = SmoothingMode.HighSpeed;
+                    TMPGR.InterpolationMode = InterpolationMode.NearestNeighbor;
+                }
+
+
 
                 TMPGR.DrawImage(BMP, r);
 
             }
 
+
+            Skin.Draw_Border(TMPGR, enDesign.Table_And_Pad, state, new Rectangle(0,0,Size.Width- SliderY.Width, Size.Height- SliderX.Height));
             gr.DrawImage(_BitmapOfControl, 0, 0);
-            Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, DisplayRectangle);
+
         }
 
     }
