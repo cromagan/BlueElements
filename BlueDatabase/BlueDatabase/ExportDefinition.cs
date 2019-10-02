@@ -256,39 +256,79 @@ namespace BlueDatabase
             Initialize();
             _BereitsExportiert.ThrowEvents = false;
 
+            var shortener = string.Empty;
+
 
             foreach (var pair in ToParse.GetAllTags())
             {
                 switch (pair.Key)
                 {
-                    case "destination":
+                    case "sho":
+                        shortener = pair.Value.FromNonCritical();
+                        break;
+
+                    case "dest":
+                    case "destination":// ALT, 02.10.2019
                         _Verzeichnis = pair.Value.FromNonCritical();
                         break;
-                    case "type":
+
+                    case "typ":
+                    case "type":// ALT, 02.10.2019
                         _Typ = (enExportTyp)int.Parse(pair.Value);
                         break;
+
+                    case "itv": // ALT, 02.10.2019
                     case "interval":
                         _Intervall = float.Parse(pair.Value);
                         break;
-                    case "autodelete":
+
+                    case "aud":
+                    case "autodelete":// ALT, 02.10.2019
                         _AutomatischLöschen = float.Parse(pair.Value);
                         break;
+
                     case "exportformula":
-                       // _ExportFormular = pair.Value.FromNonCritical(); ALT, 16.07.2019
+                        // _ExportFormular = pair.Value.FromNonCritical(); ALT, 16.07.2019
                         break;
+
                     case "exid":
                         _ExportFormularID = pair.Value.FromNonCritical();
                         break;
-                    case "exportcolumnorder":
+
+                    case "exc":
+                    case "exportcolumnorder": // ALT, 02.10.2019
                         _ExportSpaltenAnsicht = int.Parse(pair.Value);
                         break;
-                    case "filter":
+
+                    case "flt":
+                    case "filter": // ALT, 02.10.2019
                         Filter = new FilterCollection(Database, pair.Value);
                         break;
-                    case "exported":
+
+                    case "exported": // ALT, 02.10.2019
                         _BereitsExportiert.AddRange(pair.Value.FromNonCritical().SplitBy("#"));
+                        break;
+
+                    case "exp":
+                       var tmp = pair.Value.FromNonCritical().SplitBy("#");
+                        _BereitsExportiert.Clear();
+
+                        foreach (var thise in tmp)
+                        {
+                            if (thise.StartsWith("@"))
+                            {
+                                _BereitsExportiert.Add(shortener +  thise.TrimStart("@"));
+                            }
+                            else
+                            {
+                                _BereitsExportiert.Add(thise);
+                            }
+                        }
 
                         break;
+
+
+                    case "let":
                     case "lastexporttime":
                         _LastExportTime = DateTimeParse(pair.Value);
                         break;
@@ -407,6 +447,8 @@ namespace BlueDatabase
 
         public override string ToString()
         {
+
+
             var Result = "{";
 
             Result = Result + "Destination=" + _Verzeichnis.ToNonCritical() + ", ";
@@ -443,6 +485,98 @@ namespace BlueDatabase
 
 
             return Result.TrimEnd(", ") + "}";
+        }
+        public string ToString_new()
+        {
+
+            var shortener = GetShortener();
+
+            var Result = "{";
+            Result = Result + "sho=" + shortener.ToNonCritical() + ", ";
+            Result = Result + "dest=" + _Verzeichnis.ToNonCritical() + ", ";
+            Result = Result + "typ=" + (int)_Typ + ", ";
+            Result = Result + "let=" + _LastExportTime.ToString(Constants.Format_Date5) + ", ";
+
+            Result = Result + "itv=" + _Intervall + ", ";
+
+            if (_Typ == enExportTyp.DatenbankCSVFormat || _Typ == enExportTyp.DatenbankHTMLFormat || _Typ == enExportTyp.DatenbankOriginalFormat)
+            {
+                Result = Result + "aud=" + _AutomatischLöschen + ", ";
+
+
+                if (_Typ != enExportTyp.DatenbankOriginalFormat)
+                {
+                    Result = Result + "exc=" + _ExportSpaltenAnsicht + ", ";
+                }
+
+            }
+            else
+            {
+                Result = Result + "exid=" + _ExportFormularID.ToNonCritical() + ", ";
+            }
+
+            if (Filter.Count() > 0)
+            {
+                Result = Result + "flt=" + Filter + ", ";
+            }
+
+            if (_BereitsExportiert.Count > 0)
+            {
+                Result = Result + "exp=";
+                foreach (var thise in _BereitsExportiert)
+                {
+                    if (!string.IsNullOrEmpty(shortener) && thise.StartsWith(shortener))
+                    {
+                        Result = Result + "@" + thise.TrimStart(shortener) + "#";
+                    }
+                    else
+                    {
+                        Result = Result + thise + "#";
+                    }
+                }
+
+                Result = Result.TrimEnd("#") + ", ";
+            }
+
+            return Result.TrimEnd(", ") + "}";
+        }
+
+        private string GetShortener()
+        {
+
+            if (_BereitsExportiert.Count < 2) { return string.Empty; }
+
+            var ze = 1;
+
+            var last = string.Empty;
+
+            do
+            {
+                foreach (var thiss in _BereitsExportiert)
+                {
+
+                    if (ze > thiss.Length - 2) { return thiss.Substring(0, ze - 1); }
+
+                    if (!string.IsNullOrEmpty(last))
+                    {
+                        if (thiss.Substring(0, ze) != last) { return thiss.Substring(0, ze - 1); }
+                    }
+                    else
+                    {
+                        last = thiss.Substring(0, ze);
+                    }
+
+
+
+                }
+                ze++;
+                last = string.Empty;
+            }
+            while (true);
+
+
+
+
         }
 
         //#region IDisposable Support
@@ -497,7 +631,7 @@ namespace BlueDatabase
 
         public void DeleteAllBackups()
         {
-            for (var n = 0 ; n < _BereitsExportiert.Count ; n++)
+            for (var n = 0; n < _BereitsExportiert.Count; n++)
             {
                 if (!string.IsNullOrEmpty(_BereitsExportiert[n]))
                 {
@@ -527,7 +661,7 @@ namespace BlueDatabase
 
             if (_Typ == enExportTyp.DatenbankCSVFormat || _Typ == enExportTyp.DatenbankHTMLFormat || _Typ == enExportTyp.DatenbankOriginalFormat)
             {
-                for (var n = 0 ; n < _BereitsExportiert.Count ; n++)
+                for (var n = 0; n < _BereitsExportiert.Count; n++)
                 {
                     if (worker != null && worker.CancellationPending) { break; }
 
@@ -585,7 +719,7 @@ namespace BlueDatabase
 
                 // Gelöschte Einträge der Datenbank auch hier löschen
                 // Zusätzlich Einträge löschen, die nicht mehr auf der Festplatte sind.
-                for (var n = 0 ; n < _BereitsExportiert.Count ; n++)
+                for (var n = 0; n < _BereitsExportiert.Count; n++)
                 {
                     if (worker != null && worker.CancellationPending) { break; }
                     if (!string.IsNullOrEmpty(_BereitsExportiert[n]))
@@ -644,7 +778,7 @@ namespace BlueDatabase
                 {
 
                     var LNo = Database.LayoutIDToIndex(_ExportFormularID);
-                    if (LNo <0)
+                    if (LNo < 0)
                     {
                         return "Layout-Vorlage nicht vorhanden.";
                     }
@@ -691,6 +825,8 @@ namespace BlueDatabase
 
 
         //#endregion
+
+
 
         internal bool DoBackUp(BackgroundWorker worker)
         {
@@ -824,10 +960,6 @@ namespace BlueDatabase
                         DidAndOk = true;
                     }
                 }
-                //else
-                //{
-                //    Develop.DebugPrint("Backup verschwunden:<br>" + ThisString + "<br><br>" + ToString());
-                //}
             }
 
             _LastExportTime = tim2;
@@ -839,7 +971,7 @@ namespace BlueDatabase
 
             var Did = false;
 
-            for (var f = 0 ; f < _BereitsExportiert.Count ; f++)
+            for (var f = 0; f < _BereitsExportiert.Count; f++)
             {
                 if (Worker.CancellationPending) { break; }
 
