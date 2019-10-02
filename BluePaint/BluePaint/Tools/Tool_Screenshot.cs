@@ -34,6 +34,7 @@ namespace BluePaint
         {
 
             DoScreenShot();
+            OnZoomFit();
         }
 
         private void DoScreenShot()
@@ -51,6 +52,7 @@ namespace BluePaint
         public override void ToolFirstShown()
         {
             DoScreenShot();
+            OnZoomFit();
         }
     }
 }

@@ -36,6 +36,7 @@ namespace BluePaint
         private void Erstellen_Click(object sender, System.EventArgs e)
         {
             CreateDummy();
+            OnZoomFit();
         }
 
         private void CreateDummy()

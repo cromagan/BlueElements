@@ -19,21 +19,9 @@
 
 
 using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Forms;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
-using BlueDatabase.EventArgs;
 using System;
-using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using static BlueBasics.FileOperations;
-using static BlueBasics.Extensions;
-using System.Windows.Forms;
 
 namespace BlueControls.Controls
 {
@@ -55,7 +43,7 @@ namespace BlueControls.Controls
         protected bool _GeneratingBitmapOfControl;
 
         protected decimal _Zoom = 1;
-        protected decimal _ZoomMin = 1;
+        protected decimal _ZoomFit = 1;
 
         protected bool _Fitting = true;
 
@@ -67,6 +55,7 @@ namespace BlueControls.Controls
         /// </summary>
         protected PointDF _MouseDown;
 
+       
         //  protected RectangleDF MaxBounds { get; set; }
 
 
@@ -101,10 +90,10 @@ namespace BlueControls.Controls
 
             var mb = MaxBounds();
 
-            _ZoomMin = ZoomFitValue(mb, true, Size);
+            _ZoomFit = ZoomFitValue(mb, true, Size);
 
-            if (_Fitting && !MousePressing()) { _Zoom = _ZoomMin; }
-            _Zoom = Math.Max(_Zoom, _ZoomMin / 5);
+            if (_Fitting && !MousePressing()) { _Zoom = _ZoomFit; }
+            _Zoom = Math.Max(_Zoom, _ZoomFit / 1.2m);
             ComputeSliders(mb);
         }
 
@@ -126,7 +115,7 @@ namespace BlueControls.Controls
         }
 
 
-        protected PointDF MousePos11(System.Windows.Forms.MouseEventArgs e)
+        public PointDF MousePos11(System.Windows.Forms.MouseEventArgs e)
         {
             return new PointDF((decimal)(e.X + SliderX.Value) / _Zoom, (decimal)(e.Y + SliderY.Value) / _Zoom);
         }
@@ -169,8 +158,8 @@ namespace BlueControls.Controls
 
 
 
-            _Zoom = Math.Max(_ZoomMin / 1.2m, _Zoom);
-            _Zoom = Math.Min(10, _Zoom);
+            _Zoom = Math.Max(_ZoomFit / 1.2m, _Zoom);
+            _Zoom = Math.Min(20, _Zoom);
 
             var mb = MaxBounds();
 
@@ -324,9 +313,6 @@ namespace BlueControls.Controls
 
             return new Point(w, h);
         }
-
-
-
 
 
     }

@@ -151,11 +151,14 @@ namespace BluePaint
             CollectGarbage();
 
             CheckMinMax();
+
+            OnZoomFit();
         }
 
         private void AutoZ_Click(object sender, System.EventArgs e)
         {
             _AutoCropping = true;
+            OnZoomFit();
 
             modAllgemein.GetAutoValuesForCrop(_Pic, out var Left, out var Right, out var Top, out var Bottom, 0.9);
 

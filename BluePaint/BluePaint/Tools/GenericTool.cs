@@ -34,6 +34,8 @@ namespace BluePaint
             InitializeComponent();
         }
 
+        public event System.EventHandler ZoomFit;
+
         public event System.EventHandler HideMainWindow;
 
         public event System.EventHandler ShowMainWindow;
@@ -86,6 +88,13 @@ namespace BluePaint
         {
 
             HideMainWindow?.Invoke(this, System.EventArgs.Empty);
+        }
+
+
+        protected virtual void OnZoomFit()
+        {
+
+            ZoomFit?.Invoke(this, System.EventArgs.Empty);
         }
 
 

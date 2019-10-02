@@ -32,6 +32,7 @@ namespace BluePaint
         {
             this.TabControl1 = new BlueControls.Controls.TabControl();
             this.Tab_Start = new BlueControls.Controls.TabPage();
+            this.grpDatei = new BlueControls.Controls.GroupBox();
             this.Tab_Werkzeug = new BlueControls.Controls.TabPage();
             this.btnOK = new BlueControls.Controls.Button();
             this.grpNeu = new BlueControls.Controls.GroupBox();
@@ -46,13 +47,13 @@ namespace BluePaint
             this.btnZeichnen = new BlueControls.Controls.Button();
             this.btnRadiergummi = new BlueControls.Controls.Button();
             this.grpSteuerung = new BlueControls.Controls.GroupBox();
+            this.btnZoomFit = new BlueControls.Controls.Button();
             this.btnRückgänig = new BlueControls.Controls.Button();
-            this.P = new System.Windows.Forms.PictureBox();
+            this.P = new BlueControls.Controls.ZoomPic();
             this.Split = new System.Windows.Forms.SplitContainer();
             this.BLupe = new BlueControls.Controls.GroupBox();
             this.InfoText = new BlueControls.Controls.Caption();
             this.Lupe = new System.Windows.Forms.PictureBox();
-            this.grpDatei = new BlueControls.Controls.GroupBox();
             this.TabControl1.SuspendLayout();
             this.Tab_Start.SuspendLayout();
             this.Tab_Werkzeug.SuspendLayout();
@@ -60,7 +61,6 @@ namespace BluePaint
             this.grpSonstiges.SuspendLayout();
             this.grpZeichnen.SuspendLayout();
             this.grpSteuerung.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.P)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Split)).BeginInit();
             this.Split.Panel1.SuspendLayout();
             this.Split.Panel2.SuspendLayout();
@@ -91,6 +91,15 @@ namespace BluePaint
             this.Tab_Start.TabIndex = 0;
             this.Tab_Start.Text = "Start";
             // 
+            // grpDatei
+            // 
+            this.grpDatei.CausesValidation = false;
+            this.grpDatei.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpDatei.Location = new System.Drawing.Point(0, 0);
+            this.grpDatei.Name = "grpDatei";
+            this.grpDatei.Size = new System.Drawing.Size(288, 81);
+            this.grpDatei.Text = "Dateisystem";
+            // 
             // Tab_Werkzeug
             // 
             this.Tab_Werkzeug.Controls.Add(this.btnOK);
@@ -107,7 +116,7 @@ namespace BluePaint
             // btnOK
             // 
             this.btnOK.ImageCode = "Häkchen";
-            this.btnOK.Location = new System.Drawing.Point(624, 0);
+            this.btnOK.Location = new System.Drawing.Point(680, 0);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(56, 72);
             this.btnOK.TabIndex = 1;
@@ -120,7 +129,7 @@ namespace BluePaint
             this.grpNeu.Controls.Add(this.btnDummy);
             this.grpNeu.Controls.Add(this.btnScreenshot);
             this.grpNeu.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpNeu.Location = new System.Drawing.Point(464, 0);
+            this.grpNeu.Location = new System.Drawing.Point(520, 0);
             this.grpNeu.Name = "grpNeu";
             this.grpNeu.Size = new System.Drawing.Size(152, 81);
             this.grpNeu.Text = "Neu";
@@ -153,7 +162,7 @@ namespace BluePaint
             this.grpSonstiges.Controls.Add(this.btnBruchlinie);
             this.grpSonstiges.Controls.Add(this.btnClipping);
             this.grpSonstiges.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpSonstiges.Location = new System.Drawing.Point(224, 0);
+            this.grpSonstiges.Location = new System.Drawing.Point(280, 0);
             this.grpSonstiges.Name = "grpSonstiges";
             this.grpSonstiges.Size = new System.Drawing.Size(240, 81);
             this.grpSonstiges.Text = "Sonstiges";
@@ -205,11 +214,10 @@ namespace BluePaint
             this.grpZeichnen.Controls.Add(this.btnZeichnen);
             this.grpZeichnen.Controls.Add(this.btnRadiergummi);
             this.grpZeichnen.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpZeichnen.Location = new System.Drawing.Point(88, 0);
+            this.grpZeichnen.Location = new System.Drawing.Point(144, 0);
             this.grpZeichnen.Name = "grpZeichnen";
             this.grpZeichnen.Size = new System.Drawing.Size(136, 81);
             this.grpZeichnen.Text = "Zeichnen";
-            this.grpZeichnen.Click += new System.EventHandler(this.GroupBox3_Click);
             // 
             // btnZeichnen
             // 
@@ -234,12 +242,23 @@ namespace BluePaint
             // grpSteuerung
             // 
             this.grpSteuerung.CausesValidation = false;
+            this.grpSteuerung.Controls.Add(this.btnZoomFit);
             this.grpSteuerung.Controls.Add(this.btnRückgänig);
             this.grpSteuerung.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpSteuerung.Location = new System.Drawing.Point(0, 0);
             this.grpSteuerung.Name = "grpSteuerung";
-            this.grpSteuerung.Size = new System.Drawing.Size(88, 81);
+            this.grpSteuerung.Size = new System.Drawing.Size(144, 81);
             this.grpSteuerung.Text = "Steuerung";
+            // 
+            // btnZoomFit
+            // 
+            this.btnZoomFit.ImageCode = "ZoomFit";
+            this.btnZoomFit.Location = new System.Drawing.Point(88, 2);
+            this.btnZoomFit.Name = "btnZoomFit";
+            this.btnZoomFit.Size = new System.Drawing.Size(48, 66);
+            this.btnZoomFit.TabIndex = 8;
+            this.btnZoomFit.Text = "ein-passen";
+            this.btnZoomFit.Click += new System.EventHandler(this.btnZoomFit_Click);
             // 
             // btnRückgänig
             // 
@@ -254,17 +273,18 @@ namespace BluePaint
             // 
             // P
             // 
+            this.P.AlwaysSmooth = false;
             this.P.Dock = System.Windows.Forms.DockStyle.Fill;
             this.P.Location = new System.Drawing.Point(0, 0);
             this.P.Name = "P";
             this.P.Size = new System.Drawing.Size(722, 340);
             this.P.TabIndex = 2;
             this.P.TabStop = false;
-            this.P.SizeChanged += new System.EventHandler(this.P_SizeChanged);
-            this.P.MouseDown += new System.Windows.Forms.MouseEventHandler(this.P_MouseDown);
-            this.P.MouseLeave += new System.EventHandler(this.P_MouseLeave);
-            this.P.MouseMove += new System.Windows.Forms.MouseEventHandler(this.P_MouseMove);
-            this.P.MouseUp += new System.Windows.Forms.MouseEventHandler(this.P_MouseUp);
+            this.P.Translate = false;
+            this.P.ImageMouseDown += new System.EventHandler<System.Windows.Forms.MouseEventArgs>(this.P_ImageMouseDown);
+            this.P.ImageMouseMove += new System.EventHandler<System.Windows.Forms.MouseEventArgs>(this.P_ImageMouseMove);
+            this.P.ImageMouseUp += new System.EventHandler<System.Windows.Forms.MouseEventArgs>(this.P_ImageMouseUp);
+            this.P.ImageMouseLeave += new System.EventHandler(this.P_ImageMouseLeave);
             // 
             // Split
             // 
@@ -314,15 +334,6 @@ namespace BluePaint
             this.Lupe.TabIndex = 3;
             this.Lupe.TabStop = false;
             // 
-            // grpDatei
-            // 
-            this.grpDatei.CausesValidation = false;
-            this.grpDatei.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpDatei.Location = new System.Drawing.Point(0, 0);
-            this.grpDatei.Name = "grpDatei";
-            this.grpDatei.Size = new System.Drawing.Size(288, 81);
-            this.grpDatei.Text = "Dateisystem";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -340,7 +351,6 @@ namespace BluePaint
             this.grpSonstiges.ResumeLayout(false);
             this.grpZeichnen.ResumeLayout(false);
             this.grpSteuerung.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.P)).EndInit();
             this.Split.Panel1.ResumeLayout(false);
             this.Split.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Split)).EndInit();
@@ -354,7 +364,7 @@ namespace BluePaint
         internal TabControl TabControl1;
         internal TabPage Tab_Start;
         internal TabPage Tab_Werkzeug;
-        internal System.Windows.Forms.PictureBox P;
+        internal ZoomPic P;
         internal GroupBox grpSonstiges;
         internal Button btnClipping;
         internal Button btnScreenshot;
@@ -376,5 +386,6 @@ namespace BluePaint
         #endregion
 
         private GroupBox grpDatei;
+        private Button btnZoomFit;
     }
 }

@@ -105,11 +105,13 @@ namespace BlueControls.Forms
             // 
             // Pad
             // 
+            this.Pad.AlwaysSmooth = true;
             this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Pad.Location = new System.Drawing.Point(0, 110);
             this.Pad.Name = "Pad";
             this.Pad.Size = new System.Drawing.Size(1334, 571);
             this.Pad.TabIndex = 0;
+            this.Pad.Translate = false;
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon

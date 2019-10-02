@@ -39,6 +39,7 @@
             this.SliderX.Location = new System.Drawing.Point(0, 221);
             this.SliderX.Name = "SliderX";
             this.SliderX.Size = new System.Drawing.Size(365, 18);
+            this.SliderX.ValueChanged += new System.EventHandler(this.SliderX_ValueChanged);
             // 
             // SliderY
             // 
@@ -48,12 +49,12 @@
             this.SliderY.Name = "SliderY";
             this.SliderY.Orientation = BlueBasics.Enums.enOrientation.Senkrecht;
             this.SliderY.Size = new System.Drawing.Size(18, 239);
+            this.SliderY.ValueChanged += new System.EventHandler(this.SliderY_ValueChanged);
             // 
             // ZoomPad
             // 
             this.Controls.Add(this.SliderX);
             this.Controls.Add(this.SliderY);
-            this.Name = "ZoomPad";
             this.Size = new System.Drawing.Size(383, 239);
             this.ResumeLayout(false);
 
