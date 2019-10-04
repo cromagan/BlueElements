@@ -645,7 +645,7 @@ namespace BlueControls.Controls
 
             if (_GivesMouseComandsTo != null)
             {
-                if (((IMouseAndKeyHandle)_GivesMouseComandsTo).KeyUp(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value)) { return; }
+                if (((IMouseAndKeyHandle)_GivesMouseComandsTo).KeyUp(this, e, _Zoom, _MoveX, _MoveY)) { return; }
             }
 
 
@@ -709,7 +709,7 @@ namespace BlueControls.Controls
 
             if (Ho is IMouseAndKeyHandle ho2)
             {
-                if (ho2.MouseDown(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value))
+                if (ho2.MouseDown(this, e, _Zoom, _MoveX, _MoveY))
                 {
                     _GivesMouseComandsTo = Ho;
                     return;
@@ -719,7 +719,7 @@ namespace BlueControls.Controls
 
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
-                var p = MousePos11(e);
+                var p = KoordinatesUnscaled(e);
                 foreach (var thisPoint in Sel_P)
                 {
 
@@ -778,7 +778,7 @@ namespace BlueControls.Controls
                 }
                 else
                 {
-                    if (!((IMouseAndKeyHandle)_GivesMouseComandsTo).MouseMove(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value))
+                    if (!((IMouseAndKeyHandle)_GivesMouseComandsTo).MouseMove(this, e, _Zoom, _MoveX, _MoveY))
                     {
                         _GivesMouseComandsTo = null;
                         Invalidate();
@@ -793,7 +793,7 @@ namespace BlueControls.Controls
             {
                 if (ho is IMouseAndKeyHandle Ho2)
                 {
-                    if (Ho2.MouseMove(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value))
+                    if (Ho2.MouseMove(this, e, _Zoom, _MoveX, _MoveY))
                     {
                         _GivesMouseComandsTo = ho;
                         Invalidate();
@@ -820,7 +820,7 @@ namespace BlueControls.Controls
 
             if (_GivesMouseComandsTo != null)
             {
-                if (!((IMouseAndKeyHandle)_GivesMouseComandsTo).MouseUp(this, e, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value))
+                if (!((IMouseAndKeyHandle)_GivesMouseComandsTo).MouseUp(this, e, _Zoom, _MoveX, _MoveY))
                 {
                     _GivesMouseComandsTo = null;
                 }
@@ -1053,7 +1053,7 @@ namespace BlueControls.Controls
                 _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
             }
 
-            DrawCreativePadToBitmap(_BitmapOfControl, state, _Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value, null);
+            DrawCreativePadToBitmap(_BitmapOfControl, state, _Zoom, _MoveX, _MoveY, null);
             gr.DrawImage(_BitmapOfControl, 0, 0);
             Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, DisplayRectangle);
         }
@@ -1652,10 +1652,11 @@ namespace BlueControls.Controls
             if (PointToTest == null) { return; }
 
 
-            var sX = (decimal)SliderX.Value;
-            var sY = (decimal)SliderY.Value;
+            //var sX = (decimal)SliderX.Value;
+            //var sY = (decimal)SliderY.Value;
 
-            var dr = new Rectangle(0, 0, Width - SliderY.Width, Height - SliderX.Height);
+
+            var dr = AviablePaintArea();
 
 
             var WillMoveTo = new PointDF(PointToTest.X + MouseMovedTo.X - _MouseDown.X, PointToTest.Y + MouseMovedTo.Y - _MouseDown.Y);
@@ -1664,7 +1665,7 @@ namespace BlueControls.Controls
 
             foreach (var ThisPoint in _Points)
             {
-                if (ThisPoint != null && ThisPoint.CanUsedForAutoRelation && ThisPoint.IsOnScreen(_Zoom, sX, sY, dr))
+                if (ThisPoint != null && ThisPoint.CanUsedForAutoRelation && ThisPoint.IsOnScreen(_Zoom, _MoveX, _MoveY, dr))
                 {
 
                     if (PointToTest.Parent == null || ThisPoint.Parent != PointToTest.Parent)
@@ -1798,7 +1799,7 @@ namespace BlueControls.Controls
         {
 
 
-            var P = new Point((int)((decimal)(e.X + SliderX.Value) / _Zoom), (int)((decimal)(e.Y + SliderY.Value) / _Zoom));
+            var P = new Point((int)((decimal)(e.X + _MoveX) / _Zoom), (int)((decimal)(e.Y + _MoveY) / _Zoom));
 
             var l = new List<BasicPadItem>();
 

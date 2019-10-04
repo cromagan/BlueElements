@@ -47,6 +47,9 @@ namespace BlueControls.Controls
 
         protected bool _Fitting = true;
 
+        protected decimal _MoveX = -1;
+        protected decimal _MoveY = -1;
+
 
 
         /// <summary>
@@ -55,14 +58,14 @@ namespace BlueControls.Controls
         /// </summary>
         protected PointDF _MouseDown;
 
-       
+
         //  protected RectangleDF MaxBounds { get; set; }
 
 
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            _MouseDown = MousePos11(e);
+            _MouseDown = KoordinatesUnscaled(e);
         }
 
 
@@ -115,7 +118,13 @@ namespace BlueControls.Controls
         }
 
 
-        public PointDF MousePos11(System.Windows.Forms.MouseEventArgs e)
+        /// <summary>
+        /// Berechnet Maus Koordinaten des Steuerelements in in Koordinaten um, als ob auf dem unscalierten Inhalt direkt gewählt werden würde.
+        /// Falls die Maus-Koordinaten ausserhalb der grenzen sind, wird nichts getrimmt.
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        public PointDF KoordinatesUnscaled(System.Windows.Forms.MouseEventArgs e)
         {
             return new PointDF((decimal)(e.X + SliderX.Value) / _Zoom, (decimal)(e.Y + SliderY.Value) / _Zoom);
         }
@@ -144,7 +153,7 @@ namespace BlueControls.Controls
 
             _Fitting = false;
 
-            var m = MousePos11(e);
+            var m = KoordinatesUnscaled(e);
 
             if (e.Delta > 0)
             {
@@ -208,11 +217,13 @@ namespace BlueControls.Controls
 
         private void SliderX_ValueChanged(object sender, System.EventArgs e)
         {
+            _MoveX = (decimal)SliderX.Value;
             Invalidate();
         }
 
         private void SliderY_ValueChanged(object sender, System.EventArgs e)
         {
+            _MoveY = (decimal)SliderX.Value;
             Invalidate();
         }
 
@@ -300,6 +311,7 @@ namespace BlueControls.Controls
             var w = 0;
             var h = 0;
 
+
             if (SliderShowing)
             {
                 w = (int)(sizeOfPaintArea.Width - SliderY.Width - MaxBounds.Width * ZoomToUse);
@@ -315,5 +327,22 @@ namespace BlueControls.Controls
         }
 
 
+
+        public Rectangle AviablePaintArea()
+        {
+
+            var wi = Size.Width;
+            if (SliderY.Visible) { wi -= SliderY.Width; }
+
+            var he = Size.Width;
+            if (SliderX.Visible) { he -= SliderX.Height; }
+
+            return new Rectangle(0, 0, wi, he);
+
+        }
+
+
+
     }
 }
+

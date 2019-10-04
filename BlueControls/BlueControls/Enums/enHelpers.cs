@@ -17,14 +17,23 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+
 using System;
 
-namespace BlueBasics.Enums
+namespace BlueControls.Enums
 {
     [Flags]
-    public enum enOrientation
+    public enum enHelpers
     {
-        Waagerecht = 1,
-        Senkrecht = 2
+        Ohne = 0,
+        SmallCircle = 1,
+        SymetricalHorizontal =2,
+        SymetricalVertical =4,
+        MouseDownPoint = 8,
+        HorizontalLine =16,
+        VerticalLine = 32,
+        DrawToPoint =64
+
+
     }
 }

@@ -62,7 +62,7 @@
 
         #endregion
 
-        protected Controls.Slider SliderX;
-        protected Controls.Slider SliderY;
+        private Controls.Slider SliderX;
+        private Controls.Slider SliderY;
     }
 }

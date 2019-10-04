@@ -23,10 +23,10 @@ namespace BlueControls.Enums
 
     public enum enSelectModus
     {
-        Unbekannt = 0,
+        Ohne = 0,
 
-        //Position = 1
-        Rechteck = 2
+        Point = 1,
+        Line = 2
 
         //  Height = 3
 

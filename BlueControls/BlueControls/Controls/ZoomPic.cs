@@ -139,7 +139,8 @@ namespace BlueControls.Controls
         {
             base.OnMouseDown(e);
 
-            var mc = MouseToPixelKoordsOnImage(e);
+            var P = KoordinatesUnscaled(e);
+            var mc = new MouseEventArgs(e.Button,e.Clicks, (int)P.X, (int)P.Y, e.Delta);
 
             if (IsInBitmap(mc))
             {
@@ -173,7 +174,8 @@ namespace BlueControls.Controls
         {
             base.OnMouseUp(e);
 
-            var mc = MouseToPixelKoordsOnImage(e);
+            var P = KoordinatesUnscaled(e);
+            var mc = new MouseEventArgs(e.Button, e.Clicks, (int)P.X, (int)P.Y, e.Delta);
 
             if (IsInBitmap(mc))
             {
@@ -219,7 +221,8 @@ namespace BlueControls.Controls
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            var mc = MouseToPixelKoordsOnImage(e);
+            var P = KoordinatesUnscaled(e);
+            var mc = new MouseEventArgs(e.Button, e.Clicks, (int)P.X, (int)P.Y, e.Delta);
 
             if (!IsInBitmap(mc))
             {
@@ -241,39 +244,40 @@ namespace BlueControls.Controls
 
 
 
-        /// <summary>
-        /// Berechnet Maus Koordinaten auf dem Großen Bild
-        /// in in Koordinaten um, als ob auf dem Bild direkt gewählt werden würde.
-        /// </summary>
-        /// <remarks>
-        /// </remarks>
-        private MouseEventArgs MouseToPixelKoordsOnImage(System.Windows.Forms.MouseEventArgs e)
-        {
+        ///// <summary>
+        ///// Berechnet Maus Koordinaten auf dem Großen Bild
+        ///// in in Koordinaten um, als ob auf dem Bild direkt gewählt werden würde.
+        ///// Falls die Maus-Koordinaten ausserhalb des tatsächlichen Bildes sind
+        ///// </summary>
+        ///// <remarks>
+        ///// </remarks>
+        //protected MouseEventArgs MouseToPixelKoordsOnImage(System.Windows.Forms.MouseEventArgs e)
+        //{
 
-            if (_Zoom < 0.01m || BMP == null) { return null; }
+        //    if (_Zoom < 0.01m ) { return null; }
 
-            var r = MaxBounds().ZoomAndMoveRect(_Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value);
-
-
-            var x1 = Convert.ToInt32(Convert.ToSingle(Math.Floor((e.X - r.Left) / _Zoom)));
-            var y1 = Convert.ToInt32(Convert.ToSingle(Math.Floor((e.Y - r.Top) / _Zoom)));
-
-            //if (TrimIntoPic)
-            //{
-            //    x1 = Math.Max(0, x1);
-            //    y1 = Math.Max(0, y1);
-
-            //    x1 = Math.Min(BMP.Width, x1);
-            //    y1 = Math.Min(BMP.Height, y1);
-
-            //}
+        //    //var r = MaxBounds().ZoomAndMoveRect(_Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value);
 
 
-            return new MouseEventArgs(e.Button, e.Clicks, x1, y1, e.Delta);
+        //    //var x1 = Convert.ToInt32(Math.Floor((e.X - r.Left) / _Zoom));
+        //    //var y1 = Convert.ToInt32(Math.Floor((e.Y - r.Top) / _Zoom));
 
-            //            return new Point(x1, y1);
+        //    //if (TrimIntoPic)
+        //    //{
+        //    //    x1 = Math.Max(0, x1);
+        //    //    y1 = Math.Max(0, y1);
 
-        }
+        //    //    x1 = Math.Min(BMP.Width, x1);
+        //    //    y1 = Math.Min(BMP.Height, y1);
+
+        //    //}
+
+
+        //    return new MouseEventArgs(e.Button, e.Clicks, x1, y1, e.Delta);
+
+        //    //            return new Point(x1, y1);
+
+        //}
 
 
 

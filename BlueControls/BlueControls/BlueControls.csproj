@@ -89,6 +89,13 @@
     <Compile Include="Controls\ZoomPic.Designer.cs">
       <DependentUpon>ZoomPic.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ZoomPicWithPoints.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ZoomPicWithPoints.Designer.cs">
+      <DependentUpon>ZoomPicWithPoints.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Enums\enHelpers.cs" />
     <Compile Include="Enums\enSymbol.cs" />
     <Compile Include="Enums\enMovePoints.cs" />
     <Compile Include="Enums\enSelectModus.cs" />

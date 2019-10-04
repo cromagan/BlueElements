@@ -50,7 +50,7 @@ namespace BlueControls
 
 
         #region  +++ Deklarationen +++ 
-        private enSelectModus Modus = enSelectModus.Unbekannt;
+        //private enSelectModus Modus = enSelectModus.Unbekannt;
 
         private bool MousesWasUp;
         private Bitmap ClipedArea;
@@ -339,8 +339,6 @@ namespace BlueControls
                 PrepareForm();
 
 
-                Modus = enSelectModus.Rechteck;
-
                 var r = modAllgemein.RectangleOfAllScreens();
 
                 Left = r.Left;
@@ -414,57 +412,22 @@ namespace BlueControls
 
             FeedBack.Point2 = new Point(e.X, e.Y);
 
-
             var r = FeedBack.GrabedArea();
 
+            if (r.Width < 2 || r.Height < 2) { return; }
 
-            switch (Modus)
+            ClipedArea = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
+
+            using (var GR = Graphics.FromImage(ClipedArea))
             {
-                case enSelectModus.Rechteck:
-
-                    if (r.Width < 2 || r.Height < 2)
-                    {
-                        return;
-                    }
-
-                    ClipedArea = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
-
-                    using (var GR = Graphics.FromImage(ClipedArea))
-                    {
-                        GR.Clear(Color.Black);
-                        GR.DrawImage(ScreenShotBMP, 0, 0, r, GraphicsUnit.Pixel);
-                    }
-
-
-                    Close();
-
-                    //break; case enSelectModus.Position
-                    //    Close()
-
-
-                    //break; case Is = enSelectModus.Height
-                    //    If r.Height < 2 Then Exit Sub
-
-                    //    r.Expand(CInt(r.Height * 0.2), 0)
-
-                    //    ClipedArea = New Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb)
-
-                    //    Using GR As Graphics = Graphics.FromImage(ClipedArea)
-                    //        GR.Clear(Color.Black)
-                    //        GR.DrawImage(ScreenShot, 0, 0, r.ToRect, GraphicsUnit.Pixel)
-                    //    End Using
-
-
-                    //    Me.Close()
-
-
-                    break;
-                default:
-                    Develop.DebugPrint(Modus);
-
-
-                    break;
+                GR.Clear(Color.Black);
+                GR.DrawImage(ScreenShotBMP, 0, 0, r, GraphicsUnit.Pixel);
             }
+
+
+            Close();
+
+
 
 
         }
@@ -500,44 +463,30 @@ namespace BlueControls
 
 
 
-                    switch (Modus)
+
+
+                    PrintText(GR, e);
+
+
+                    modAllgemein.Magnify(ScreenShotBMP, new Point(e.X, e.Y), GR, false);
+
+
+                    if (e.Button != System.Windows.Forms.MouseButtons.None)
                     {
-                        case enSelectModus.Rechteck:
+                        GR.DrawLine(new Pen(Color.Red), 0, FeedBack.Point1.Y, Width, FeedBack.Point1.Y);
+                        GR.DrawLine(new Pen(Color.Red), FeedBack.Point1.X, 0, FeedBack.Point1.X, Height);
 
-                            PrintText(GR, e);
+                        GR.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
+                        GR.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
 
-
-                            modAllgemein.Magnify(ScreenShotBMP, new Point(e.X, e.Y), GR, false);
-
-
-                            if (e.Button != System.Windows.Forms.MouseButtons.None)
-                            {
-                                GR.DrawLine(new Pen(Color.Red), 0, FeedBack.Point1.Y, Width, FeedBack.Point1.Y);
-                                GR.DrawLine(new Pen(Color.Red), FeedBack.Point1.X, 0, FeedBack.Point1.X, Height);
-
-                                GR.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
-                                GR.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
-
-                            }
-                            else
-                            {
-                                GR.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
-                                GR.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
-                            }
-
-                            break;
-                        default:
-                            Develop.DebugPrint(Modus);
-                            break;
+                    }
+                    else
+                    {
+                        GR.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
+                        GR.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
                     }
 
-
-
-
                 }
-
-
-
 
                 Refresh();
 
