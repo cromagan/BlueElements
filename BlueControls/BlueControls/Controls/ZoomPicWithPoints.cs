@@ -11,6 +11,9 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using static BlueBasics.modAllgemein;
 using static BlueBasics.FileOperations;
+using BlueControls.ItemCollection;
+using static BlueBasics.Extensions;
+using BlueBasics;
 
 namespace BlueControls.Controls
 {
@@ -26,56 +29,9 @@ namespace BlueControls.Controls
 
 
         public List<string> Tags = new List<string>();
-
-
-        private enOrientation _MittelLinie = (enOrientation)(-1);
-
-
-
+        private enSelectModus _SelectModus = enSelectModus.Ohne;
         public string Feedback = string.Empty;
 
-        private enSelectModus _SelectModus = enSelectModus.Ohne;
-
-
-        private enHelpers _Helper = enHelpers.Ohne;
-
-
-        [DefaultValue((enOrientation)(-1))]
-        public enOrientation Mittellinie
-        {
-            get
-            {
-                return _MittelLinie;
-            }
-            set
-            {
-
-
-                if (_MittelLinie == value) { return; }
-                _MittelLinie = value;
-                Invalidate();
-            }
-
-        }
-
-
-        [DefaultValue(enHelpers.Ohne)]
-        public enHelpers Helper
-        {
-            get
-            {
-                return _Helper;
-            }
-            set
-            {
-
-
-                if (_Helper == value) { return; }
-                _Helper = value;
-                Invalidate();
-            }
-
-        }
 
         [DefaultValue(enSelectModus.Ohne)]
         public enSelectModus SelectModus
@@ -113,7 +69,9 @@ namespace BlueControls.Controls
         protected override void DrawControl(Graphics gr, enStates state)
         {
 
-            // Bild und Hintergrund
+
+
+            // Bild, Overlay und Hintergrund
             base.DrawControl(gr, state);
 
 
@@ -124,23 +82,6 @@ namespace BlueControls.Controls
             }
 
 
-            // Mittellinie
-            var PicturePos = base.MaxBounds();
-
-            if (_MittelLinie.HasFlag(enOrientation.Waagerecht))
-            {
-                var p1 = PicturePos.PointOf(enAlignment.VerticalCenter_Left).ZoomAndMove(_Zoom, _MoveX, _MoveY);
-                var p2 = PicturePos.PointOf(enAlignment.VerticalCenter_Right).ZoomAndMove(_Zoom, _MoveX, _MoveY);
-                gr.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
-                gr.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
-            }
-            if (_MittelLinie.HasFlag(enOrientation.Senkrecht))
-            {
-                var p1 = PicturePos.PointOf(enAlignment.Top_HorizontalCenter).ZoomAndMove(_Zoom, _MoveX, _MoveY);
-                var p2 = PicturePos.PointOf(enAlignment.Bottom_HorizontalCenter).ZoomAndMove(_Zoom, _MoveX, _MoveY);
-                gr.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
-                gr.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
-            }
 
 
             // Hilfslinien
@@ -159,15 +100,194 @@ namespace BlueControls.Controls
 
         public void LoadData(string PathOfPicture)
         {
+            var x = LoadFromDisk(PathOfPicture);
+
+            BMP = x.Item1;
+            Tags = x.Item2;
+
+
+
+            GeneratePointsFromTags();
+
+            Invalidate();
+
+        }
+
+        private void GeneratePointsFromTags()
+        {
+            var Names = Tags.TagGet("AllPointNames").FromNonCritical().SplitByCRToList();
+
+            points.Clear();
+
+            foreach (var thisO in Names)
+            {
+                var s = Tags.TagGet(thisO);
+                points.Add(new PointDF(null, s));
+            }
+        }
+
+        public static BitmapListItem GenerateBitmapListItem(string PathOfPicture)
+        {
+            var x = LoadFromDisk(PathOfPicture);
+            return GenerateBitmapListItem(x.Item1, x.Item2);
+        }
+
+        public static BitmapListItem GenerateBitmapListItem(Bitmap B, List<string> T)
+        {
+            var FilenamePNG = T.TagGet("Image-File");
+            var i = new BitmapListItem(FilenamePNG, FilenamePNG.FileNameWithoutSuffix(), FilenamePNG, string.Empty);
+            i.Padding = 10;
+            i.Tags.AddRange(T);
+            return i;
+        }
+
+
+
+        public BitmapListItem GenerateBitmapListItem()
+        {
+            WritePointsInTags();
+            return ZoomPicWithPoints.GenerateBitmapListItem(BMP, Tags);
+        }
+
+        private void WritePointsInTags()
+        {
+
+            var Old = Tags.TagGet("AllPointNames").FromNonCritical().SplitByCRToList();
+
+            foreach (var thisO in Old)
+            {
+                Tags.TagSet(thisO, string.Empty);
+                Tags.TagSet(thisO + "-X", string.Empty);
+                Tags.TagSet(thisO + "-Y", string.Empty);
+            }
+
+
+
+            var s = string.Empty;
+
+            foreach (var ThisP in points)
+            {
+                s = s + ThisP.Name + "|";
+                Tags.TagSet(ThisP.Name, ThisP.ToString());
+                Tags.TagSet(ThisP.Name + "-X", ThisP.X.ToString());
+                Tags.TagSet(ThisP.Name + "-Y", ThisP.Y.ToString());
+            }
+
+
+            Tags.TagSet("AllPointNames", s.ToNonCritical());
+
+        }
+
+        public PointDF GetPoint(string name)
+        {
+            foreach (var thisp in points)
+            {
+                if (thisp != null && thisp.Name.ToUpper() == name.ToUpper()) { return thisp; }
+            }
+            return null;
+
+        }
+
+        public void PointClear()
+        {
+            points.Clear();
+            Invalidate();
+        }
+
+        public void PointSet(string name, int x, int y)
+        {
+            PointSet(name, (decimal)x, (decimal)y);
+        }
+
+        public void PointSet(string name, double x, double y)
+        {
+            PointSet(name, (decimal)x, (decimal)y);
+        }
+
+        public void PointSet(string name, decimal x, decimal y)
+        {
+
+            var p = GetPoint(name);
+
+            if (p == null)
+            {
+                p = new PointDF(name, x, y);
+                points.Add(p);
+                Invalidate();
+                return;
+            }
+
+
+            if (p.X != x || p.Y != y)
+            {
+                p.X = x;
+                p.Y = y;
+                Invalidate();
+            }
+        }
+
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            Invalidate();
+        }
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            Invalidate(); // Mousedown bereits in _MouseDown gespeichert
+
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+
+        }
+
+        protected override void OnMouseEnter(System.EventArgs e)
+        {
+            base.OnMouseEnter(e);
+
+        }
+
+        protected override void OnMouseLeave(System.EventArgs e)
+        {
+            base.OnMouseLeave(e);
+
+
+        }
+
+
+
+        public static Tuple<Bitmap, List<string>> LoadFromDisk(string PathOfPicture)
+        {
+
+
+
+            Bitmap B = null;
+            var T = new List<string>();
 
 
             if (FileExists(PathOfPicture))
             {
-                BMP = (Bitmap)Image_FromFile(PathOfPicture);
+                B = (Bitmap)Image_FromFile(PathOfPicture);
             }
 
+            var FilenameTXT = PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
+
+
+            if (FileExists(FilenameTXT))
+            {
+                T = modAllgemein.LoadFromDisk(FilenameTXT).SplitByCRToList();
+            }
+
+
+            T.TagSet("Image-File", PathOfPicture);
+
+            return new Tuple<Bitmap, List<string>>(B, T);
+
         }
-
     }
-
 }

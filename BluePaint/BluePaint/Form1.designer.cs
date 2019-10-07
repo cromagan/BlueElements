@@ -53,7 +53,6 @@ namespace BluePaint
             this.Split = new System.Windows.Forms.SplitContainer();
             this.BLupe = new BlueControls.Controls.GroupBox();
             this.InfoText = new BlueControls.Controls.Caption();
-            this.Lupe = new System.Windows.Forms.PictureBox();
             this.TabControl1.SuspendLayout();
             this.Tab_Start.SuspendLayout();
             this.Tab_Werkzeug.SuspendLayout();
@@ -66,7 +65,6 @@ namespace BluePaint
             this.Split.Panel2.SuspendLayout();
             this.Split.SuspendLayout();
             this.BLupe.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Lupe)).BeginInit();
             this.SuspendLayout();
             // 
             // TabControl1
@@ -166,7 +164,6 @@ namespace BluePaint
             this.grpSonstiges.Name = "grpSonstiges";
             this.grpSonstiges.Size = new System.Drawing.Size(240, 81);
             this.grpSonstiges.Text = "Sonstiges";
-            this.grpSonstiges.Click += new System.EventHandler(this.GroupBox2_Click);
             // 
             // btnKontrast
             // 
@@ -276,6 +273,7 @@ namespace BluePaint
             this.P.AlwaysSmooth = false;
             this.P.Dock = System.Windows.Forms.DockStyle.Fill;
             this.P.Location = new System.Drawing.Point(0, 0);
+            this.P.Mittellinie = BlueBasics.Enums.enOrientation.Ohne;
             this.P.Name = "P";
             this.P.Size = new System.Drawing.Size(722, 340);
             this.P.TabIndex = 2;
@@ -308,7 +306,6 @@ namespace BluePaint
             // 
             this.BLupe.CausesValidation = false;
             this.BLupe.Controls.Add(this.InfoText);
-            this.BLupe.Controls.Add(this.Lupe);
             this.BLupe.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.BLupe.Location = new System.Drawing.Point(0, 176);
             this.BLupe.Name = "BLupe";
@@ -321,18 +318,10 @@ namespace BluePaint
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.InfoText.CausesValidation = false;
-            this.InfoText.Location = new System.Drawing.Point(160, 16);
+            this.InfoText.Location = new System.Drawing.Point(8, 16);
             this.InfoText.Name = "InfoText";
-            this.InfoText.Size = new System.Drawing.Size(104, 144);
+            this.InfoText.Size = new System.Drawing.Size(256, 144);
             this.InfoText.Translate = false;
-            // 
-            // Lupe
-            // 
-            this.Lupe.Location = new System.Drawing.Point(8, 16);
-            this.Lupe.Name = "Lupe";
-            this.Lupe.Size = new System.Drawing.Size(144, 144);
-            this.Lupe.TabIndex = 3;
-            this.Lupe.TabStop = false;
             // 
             // Form1
             // 
@@ -356,7 +345,6 @@ namespace BluePaint
             ((System.ComponentModel.ISupportInitialize)(this.Split)).EndInit();
             this.Split.ResumeLayout(false);
             this.BLupe.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.Lupe)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -380,7 +368,6 @@ namespace BluePaint
         internal GroupBox grpSteuerung;
         internal Button btnOK;
         internal GroupBox BLupe;
-        internal System.Windows.Forms.PictureBox Lupe;
         internal Caption InfoText;
         internal Button btnDummy;
         #endregion

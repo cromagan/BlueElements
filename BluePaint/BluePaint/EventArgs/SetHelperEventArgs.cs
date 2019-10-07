@@ -16,27 +16,25 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
+using BlueBasics.Enums;
+using BlueControls.Enums;
+using System.Drawing;
 
-
-using System;
-
-namespace BlueControls.Enums
+namespace BluePaint.EventArgs
 {
-    [Flags]
-    public enum enHelpers
+    public class SetHelperEventArgs : System.EventArgs
     {
-        Ohne = 0,
-        SmallCircle = 1,
-        SymetricalHorizontal = 2,
-        SymetricalVertical = 4,
-        MouseDownPoint = 8,
-        HorizontalLine = 16,
-        VerticalLine = 32,
-        DrawToPoint = 64,
-        FilledRectancle = 128,
 
-        HorizontalVerticalLine = HorizontalLine | VerticalLine
 
+        public SetHelperEventArgs(enOrientation mittellinie, enHelpers helper)
+        {
+            this.Mittellinie = mittellinie;
+            this.Helper = helper;
+        }
+
+        public enOrientation Mittellinie { get; set; }
+
+        public enHelpers Helper { get; set; }
 
     }
 }

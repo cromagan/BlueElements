@@ -18,6 +18,7 @@
 #endregion
 
 
+using BlueBasics.Enums;
 using BlueControls.Enums;
 using System;
 using System.ComponentModel;
@@ -34,6 +35,53 @@ namespace BlueControls.Controls
 
         public Bitmap BMP = null;
         public Bitmap OverlayBMP = null;
+
+        static Pen Pen_RotTransp = new Pen(Color.FromArgb(50, 255, 0, 0));
+        static Brush Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
+
+        private enOrientation _MittelLinie = enOrientation.Ohne;
+
+        private enHelpers _Helper = enHelpers.Ohne;
+
+
+        [DefaultValue((enOrientation)(-1))]
+        public enOrientation Mittellinie
+        {
+            get
+            {
+                return _MittelLinie;
+            }
+            set
+            {
+
+
+                if (_MittelLinie == value) { return; }
+                _MittelLinie = value;
+                Invalidate();
+            }
+
+        }
+
+
+        [DefaultValue(enHelpers.Ohne)]
+        public enHelpers Helper
+        {
+            get
+            {
+                return _Helper;
+            }
+            set
+            {
+
+
+                if (_Helper == value) { return; }
+                _Helper = value;
+                Invalidate();
+            }
+
+        }
+
+
 
 
         [DefaultValue(true)]
@@ -98,7 +146,7 @@ namespace BlueControls.Controls
             if (BMP != null)
             {
 
-                var r = MaxBounds().ZoomAndMoveRect(_Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value);
+                var r = MaxBounds().ZoomAndMoveRect(_Zoom, _MoveX, _MoveY);
 
 
                 if (_Zoom < 1 || _AlwaysSmooth)
@@ -121,6 +169,7 @@ namespace BlueControls.Controls
 
                 if (OverlayBMP != null)
                 {
+                    PrepareOverlay();
                     TMPGR.DrawImage(OverlayBMP, r);
                 }
 
@@ -128,22 +177,82 @@ namespace BlueControls.Controls
             }
 
 
+
             Skin.Draw_Border(TMPGR, enDesign.Table_And_Pad, state, new Rectangle(0, 0, Size.Width - SliderY.Width, Size.Height - SliderX.Height));
             gr.DrawImage(_BitmapOfControl, 0, 0);
 
         }
 
+        private void PrepareOverlay()
+        {
+            //OverlayBMP = (BMP.Clone();
 
+
+            var TMPGR = Graphics.FromImage(OverlayBMP);
+
+            // Mittellinie
+            var PicturePos = MaxBounds();
+
+            if (_MittelLinie.HasFlag(enOrientation.Waagerecht))
+            {
+                var p1 = PicturePos.PointOf(enAlignment.VerticalCenter_Left).ToPointF();
+                var p2 = PicturePos.PointOf(enAlignment.VerticalCenter_Right).ToPointF();
+
+                //var p1 = new Point(0, (int)(OverlayBMP.Height / 2));
+                //var p2 = new Point(OverlayBMP.Width, (int)(OverlayBMP.Height / 2));
+
+                TMPGR.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
+                TMPGR.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
+            }
+
+            if (_MittelLinie.HasFlag(enOrientation.Senkrecht))
+            {
+                var p1 = PicturePos.PointOf(enAlignment.Top_HorizontalCenter).ToPointF();
+                var p2 = PicturePos.PointOf(enAlignment.Bottom_HorizontalCenter).ToPointF();
+                //var p1 = new Point((int)(OverlayBMP.Width / 2),0);
+                //var p2 = new Point((int)(OverlayBMP.Width / 2), OverlayBMP.Height);
+                TMPGR.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
+                TMPGR.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
+            }
+
+
+            if (MousePos_1_1.IsEmpty) { return; }
+
+
+            if (_Helper.HasFlag(enHelpers.HorizontalLine))
+            {
+                TMPGR.DrawLine(Pen_RotTransp, (int)MousePos_1_1.X, 0, (int)MousePos_1_1.X, OverlayBMP.Height);
+
+            }
+            if (_Helper.HasFlag(enHelpers.VerticalLine))
+            {
+                TMPGR.DrawLine(Pen_RotTransp, 0, (int)MousePos_1_1.Y, OverlayBMP.Width, (int)MousePos_1_1.Y);
+
+            }
+
+
+
+            if (_Helper.HasFlag(enHelpers.FilledRectancle))
+            {
+                if (!MouseDownPos_1_1.IsEmpty)
+                {
+
+                    var r = new Rectangle(Math.Min(MouseDownPos_1_1.X, MousePos_1_1.X), Math.Min(MouseDownPos_1_1.Y, MousePos_1_1.Y), Math.Abs(MouseDownPos_1_1.X - MousePos_1_1.X) + 1, Math.Abs(MouseDownPos_1_1.Y - MousePos_1_1.Y) + 1);
+                    //var r = new Rectangle((int)Math.Min(MouseDownPos_1_1.X, MousePos_1_1.X), (int)Math.Min(MouseDownPos_1_1.Y, MousePos_1_1.Y), (int)Math.Abs(MouseDownPos_1_1.X - MousePos_1_1.X) + 1, (int)Math.Abs(MouseDownPos_1_1.Y - MousePos_1_1.Y) + 1);
+                    TMPGR.FillRectangle(Brush_RotTransp, r);
+                }
+            }
+
+
+        }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
 
-            var P = KoordinatesUnscaled(e);
-            var mc = new MouseEventArgs(e.Button,e.Clicks, (int)P.X, (int)P.Y, e.Delta);
-
-            if (IsInBitmap(mc))
+            if (IsInBitmap())
             {
+                var mc = new MouseEventArgs(e.Button, e.Clicks, (int)MousePos_1_1.X, (int)MousePos_1_1.Y, e.Delta);
                 OnImageMouseDown(mc);
             }
 
@@ -159,13 +268,14 @@ namespace BlueControls.Controls
             ImageMouseUp?.Invoke(this, e);
         }
 
-        private bool IsInBitmap(MouseEventArgs e)
+        private bool IsInBitmap()
         {
             if (BMP == null) { return false; }
+            if (MousePos_1_1 == null) { return false; }
 
-            if (e.X < 0 || e.Y < 0) { return false; }
+            if (MousePos_1_1.X < 0 || MousePos_1_1.Y < 0) { return false; }
 
-            if (e.X > BMP.Width || e.Y > BMP.Height) { return false; }
+            if (MousePos_1_1.X > BMP.Width || MousePos_1_1.Y > BMP.Height) { return false; }
             return true;
 
         }
@@ -174,11 +284,12 @@ namespace BlueControls.Controls
         {
             base.OnMouseUp(e);
 
-            var P = KoordinatesUnscaled(e);
-            var mc = new MouseEventArgs(e.Button, e.Clicks, (int)P.X, (int)P.Y, e.Delta);
 
-            if (IsInBitmap(mc))
+
+
+            if (IsInBitmap())
             {
+                var mc = new MouseEventArgs(e.Button, e.Clicks, (int)MousePos_1_1.X, (int)MousePos_1_1.Y, e.Delta);
                 OnImageMouseUp(mc);
             }
 
@@ -221,15 +332,15 @@ namespace BlueControls.Controls
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            var P = KoordinatesUnscaled(e);
-            var mc = new MouseEventArgs(e.Button, e.Clicks, (int)P.X, (int)P.Y, e.Delta);
 
-            if (!IsInBitmap(mc))
+
+            if (!IsInBitmap())
             {
                 ChangeIsInPic(false, null);
                 return;
             }
 
+            var mc = new MouseEventArgs(e.Button, e.Clicks, (int)MousePos_1_1.X, (int)MousePos_1_1.Y, e.Delta);
             ChangeIsInPic(true, mc);
 
             OnImageMouseMove(mc);

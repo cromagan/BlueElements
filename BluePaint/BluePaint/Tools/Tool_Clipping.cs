@@ -61,8 +61,6 @@ namespace BluePaint
             var Pen_Blau = new Pen(Color.FromArgb(150, 0, 0, 255));
             ClearPreviewPic();
             var NP = PointInsidePic(e);
-
-            ClearPreviewPic();
             var gr = Graphics.FromImage(_PicPreview);
             DrawZusatz();
 
@@ -122,7 +120,7 @@ namespace BluePaint
             }
             if (Recht.Value != 0)
             {
-                gr.FillRectangle(Brush_Blau, new Rectangle(_PicPreview.Width + Convert.ToInt32(Recht.Value), 0, (int)(-Recht.Value), _PicPreview.Height));
+                gr.FillRectangle(Brush_Blau, new Rectangle(_PicPreview.Width + Convert.ToInt32(Recht.Value), 0, (int)-Recht.Value, _PicPreview.Height));
             }
 
             if (Oben.Value != 0)
@@ -131,7 +129,7 @@ namespace BluePaint
             }
             if (Unten.Value != 0)
             {
-                gr.FillRectangle(Brush_Blau, new Rectangle(0, _PicPreview.Height + Convert.ToInt32(Unten.Value), _PicPreview.Width, (int)(-Unten.Value)));
+                gr.FillRectangle(Brush_Blau, new Rectangle(0, _PicPreview.Height + Convert.ToInt32(Unten.Value), _PicPreview.Width, (int)-Unten.Value));
             }
 
 

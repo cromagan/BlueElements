@@ -46,6 +46,9 @@ namespace BluePaint
 
         public event System.EventHandler<BitmapEventArgs> OverridePic;
 
+        public event System.EventHandler<SetHelperEventArgs> SetHelper;
+
+
 
         protected Bitmap _Pic;
         protected Bitmap _PicPreview;
@@ -112,6 +115,14 @@ namespace BluePaint
         }
 
 
+
+        protected virtual void OnSetHelper(SetHelperEventArgs e)
+        {
+
+            SetHelper?.Invoke(this, e);
+        }
+
+
         protected virtual void OnPicChangedByTool()
         {
 
@@ -158,6 +169,7 @@ namespace BluePaint
 
             var gr = Graphics.FromImage(_PicPreview);
             gr.Clear(Color.FromArgb(0, 0, 0, 0));
+            gr.Dispose();
 
         }
 

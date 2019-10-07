@@ -22,6 +22,7 @@ using BlueBasics;
 using BlueControls.Interfaces;
 using System;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls
 {
@@ -53,10 +54,14 @@ namespace BlueControls.Controls
 
 
         /// <summary>
-        /// Die Koordinaten, an der Stelle der Mausknopd gedrückt wurde.
-        /// Umgerechnet auf Zoom und Slider unabhängige Koordinaten.
+        /// Die Koordinaten, an der Stelle der Mausknopf gedrückt wurde. Zoom und Slider wurden eingerechnet, dass die Koordinaten Massstabsunabhängis sind.
         /// </summary>
-        protected PointDF _MouseDown;
+        public Point MouseDownPos_1_1;
+
+        /// <summary>
+        /// Die Koordinaten, an der die der Mauspfeil zuletzt war. Zoom und Slider wurden eingerechnet, dass die Koordinaten Massstabsunabhängis sind.
+        /// </summary>
+        public Point MousePos_1_1;
 
 
         //  protected RectangleDF MaxBounds { get; set; }
@@ -65,15 +70,31 @@ namespace BlueControls.Controls
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            _MouseDown = KoordinatesUnscaled(e);
+            MousePos_1_1 = KoordinatesUnscaled(e);
+            MouseDownPos_1_1 = KoordinatesUnscaled(e);
         }
 
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            _MouseDown = null;
+            MousePos_1_1 = KoordinatesUnscaled(e);
+            MouseDownPos_1_1 = Point.Empty;
         }
+
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            MousePos_1_1 = KoordinatesUnscaled(e);
+        }
+
+        protected override void OnMouseLeave(System.EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            MousePos_1_1 = Point.Empty;
+        }
+
 
         public void ZoomIn(System.Windows.Forms.MouseEventArgs e)
         {
@@ -124,9 +145,9 @@ namespace BlueControls.Controls
         /// </summary>
         /// <remarks>
         /// </remarks>
-        public PointDF KoordinatesUnscaled(System.Windows.Forms.MouseEventArgs e)
+        protected Point KoordinatesUnscaled(System.Windows.Forms.MouseEventArgs e)
         {
-            return new PointDF((decimal)(e.X + SliderX.Value) / _Zoom, (decimal)(e.Y + SliderY.Value) / _Zoom);
+            return new Point((int)((e.X + SliderX.Value) / (double)_Zoom), (int)((e.Y + SliderY.Value) / (double)_Zoom));
         }
 
 
@@ -223,7 +244,7 @@ namespace BlueControls.Controls
 
         private void SliderY_ValueChanged(object sender, System.EventArgs e)
         {
-            _MoveY = (decimal)SliderX.Value;
+            _MoveY = (decimal)SliderY.Value;
             Invalidate();
         }
 

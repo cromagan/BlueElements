@@ -24,6 +24,7 @@ namespace BlueBasics.Enums
     [Flags]
     public enum enOrientation
     {
+        Ohne = 0,
         Waagerecht = 1,
         Senkrecht = 2
     }

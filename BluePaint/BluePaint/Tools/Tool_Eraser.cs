@@ -20,6 +20,7 @@
 using System;
 using System.Drawing;
 using BlueControls.Controls;
+using BluePaint.EventArgs;
 
 namespace BluePaint
 {
@@ -62,7 +63,7 @@ namespace BluePaint
             var Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
             var Pen_RotTransp = new Pen(Color.FromArgb(50, 255, 0, 0));
             var NP = PointInsidePic(e);
-
+            ClearPreviewPic();
 
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
@@ -76,17 +77,15 @@ namespace BluePaint
 
                 if (DrawBox.Checked)
                 {
-                    ClearPreviewPic();
-                    var gr = Graphics.FromImage(_PicPreview);
-                    var r = new Rectangle(Math.Min(_MouseDown.X, NP.X), Math.Min(_MouseDown.Y, NP.Y), Math.Abs(_MouseDown.X - NP.X) + 1, Math.Abs(_MouseDown.Y - NP.Y) + 1);
-                    gr.FillRectangle(Brush_RotTransp, r);
+
+                    OnSetHelper(new SetHelperEventArgs(BlueBasics.Enums.enOrientation.Ohne, BlueControls.Enums.enHelpers.FilledRectancle));
                 }
 
             }
 
             if (Razi.Checked)
             {
-                ClearPreviewPic();
+                OnSetHelper(new SetHelperEventArgs(BlueBasics.Enums.enOrientation.Ohne, BlueControls.Enums.enHelpers.Ohne));
                 var gr = Graphics.FromImage(_PicPreview);
                 var r = new Rectangle(NP.X - 4, NP.Y - 4, 9, 9);
                 gr.FillEllipse(Brush_RotTransp, r);
@@ -95,12 +94,7 @@ namespace BluePaint
 
             if (DrawBox.Checked && e.Button == System.Windows.Forms.MouseButtons.None)
             {
-
-                ClearPreviewPic();
-                var gr = Graphics.FromImage(_PicPreview);
-
-                gr.DrawLine(Pen_RotTransp, NP.X, 0, NP.X, _Pic.Height);
-                gr.DrawLine(Pen_RotTransp, 0, NP.Y, _Pic.Width, NP.Y);
+                OnSetHelper(new SetHelperEventArgs(BlueBasics.Enums.enOrientation.Ohne, BlueControls.Enums.enHelpers.HorizontalVerticalLine ));
             }
 
             OnPicChangedByTool();

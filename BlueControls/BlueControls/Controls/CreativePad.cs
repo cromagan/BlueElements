@@ -802,7 +802,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            if (_MouseDown != null && e.Button == System.Windows.Forms.MouseButtons.Left)
+            if (MouseDownPos_1_1 != null && e.Button == System.Windows.Forms.MouseButtons.Left)
             {
                 if (_MouseEditEnabled)
                 {
@@ -1500,7 +1500,7 @@ namespace BlueControls.Controls
 
         private void MoveItems(PointDF MouseMovedTo)
         {
-            if (_MouseDown == null) { return; }
+            if (MouseDownPos_1_1 == null) { return; }
 
             PointDF PMoveX = null;
             PointDF PMoveY = null;
@@ -1509,8 +1509,8 @@ namespace BlueControls.Controls
 
             _NewAutoRelations.Clear();
 
-            var MoveX = MouseMovedTo.X - _MouseDown.X;
-            var MoveY = MouseMovedTo.Y - _MouseDown.Y;
+            var MoveX = MouseMovedTo.X - MouseDownPos_1_1.X;
+            var MoveY = MouseMovedTo.Y - MouseDownPos_1_1.Y;
 
 
 
@@ -1560,7 +1560,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            _MouseDown = new PointDF(_MouseDown.X + MoveX, _MouseDown.Y + MoveY);
+            MouseDownPos_1_1 = new Point((int)(MouseDownPos_1_1.X + MoveX), (int)( MouseDownPos_1_1.Y + MoveY));
         }
 
 
@@ -1659,7 +1659,7 @@ namespace BlueControls.Controls
             var dr = AviablePaintArea();
 
 
-            var WillMoveTo = new PointDF(PointToTest.X + MouseMovedTo.X - _MouseDown.X, PointToTest.Y + MouseMovedTo.Y - _MouseDown.Y);
+            var WillMoveTo = new PointDF(PointToTest.X + MouseMovedTo.X - MouseDownPos_1_1.X, PointToTest.Y + MouseMovedTo.Y - MouseDownPos_1_1.Y);
 
             var _Points = AllPoints();
 

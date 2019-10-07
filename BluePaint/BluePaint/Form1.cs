@@ -81,10 +81,13 @@ namespace BluePaint
                 CurrentTool.PicChangedByTool -= CurrentTool_PicChangedByTool;
                 CurrentTool.OverridePic -= CurrentTool_OverridePic;
                 CurrentTool.ForceUndoSaving -= CurrentTool_ForceUndoSaving;
+                CurrentTool.SetHelper -= CurrentTool_SetHelper;
                 CurrentTool = null;
             }
 
 
+            P.Helper = BlueControls.Enums.enHelpers.Ohne;
+            P.Mittellinie = enOrientation.Ohne;
 
 
             if (NewTool != null)
@@ -101,6 +104,7 @@ namespace BluePaint
                 CurrentTool.PicChangedByTool += CurrentTool_PicChangedByTool;
                 CurrentTool.OverridePic += CurrentTool_OverridePic;
                 CurrentTool.ForceUndoSaving += CurrentTool_ForceUndoSaving;
+                CurrentTool.SetHelper += CurrentTool_SetHelper;
 
 
                 if (DoInitalizingAction)
@@ -109,6 +113,14 @@ namespace BluePaint
                 }
 
             }
+
+
+        }
+
+        private void CurrentTool_SetHelper(object sender, SetHelperEventArgs e)
+        {
+            P.Mittellinie = e.Mittellinie;
+            P.Helper = e.Helper;
 
 
         }
@@ -325,7 +337,7 @@ namespace BluePaint
                 InfoText.Text = "";
 
             }
-            ShowLupe(e);
+            //ShowLupe(e);
         }
 
         private void P_ImageMouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -347,11 +359,6 @@ namespace BluePaint
 
         }
 
-        private void GroupBox2_Click(object sender, System.EventArgs e)
-        {
-
-        }
-
         private void OK_Click(object sender, System.EventArgs e)
         {
             this.Close();
@@ -360,54 +367,54 @@ namespace BluePaint
 
         private void P_ImageMouseLeave(object sender, System.EventArgs e)
         {
-            ShowLupe(null);
+            //ShowLupe(null);
 
             InfoText.Text = "";
 
         }
 
-        public void ShowLupe(System.Windows.Forms.MouseEventArgs e)
-        {
+        //public void ShowLupe(System.Windows.Forms.MouseEventArgs e)
+        //{
 
-            if (Lupe.Image == null || Lupe.Image.Width != Lupe.Width || Lupe.Image.Height != Lupe.Height)
-            {
-                Lupe.Image = new Bitmap(Lupe.Width, Lupe.Height);
-            }
-
-
-            var gr = Graphics.FromImage(Lupe.Image);
-            gr.Clear(Color.White);
-            if (e == null) { return; }
+        //    if (Lupe.Image == null || Lupe.Image.Width != Lupe.Width || Lupe.Image.Height != Lupe.Height)
+        //    {
+        //        Lupe.Image = new Bitmap(Lupe.Width, Lupe.Height);
+        //    }
 
 
-            var r = new Rectangle(0, 0, Lupe.Width, Lupe.Height);
+        //    var gr = Graphics.FromImage(Lupe.Image);
+        //    gr.Clear(Color.White);
+        //    if (e == null) { return; }
 
 
-            gr.InterpolationMode = InterpolationMode.NearestNeighbor;
-            gr.PixelOffsetMode = PixelOffsetMode.Half;
-
-            gr.DrawImage(P.BMP, r, new Rectangle(e.X - 7, e.Y - 7, 15, 15), GraphicsUnit.Pixel);
-
-            if (P.OverlayBMP != null)
-            {
-                gr.DrawImage(P.OverlayBMP, r, new Rectangle(e.X - 7, e.Y - 7, 15, 15), GraphicsUnit.Pixel);
-            }
+        //    var r = new Rectangle(0, 0, Lupe.Width, Lupe.Height);
 
 
-            var Mitte = r.PointOf(enAlignment.Horizontal_Vertical_Center);
-            gr.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X, Mitte.Y - 7, Mitte.X, Mitte.Y + 6);
-            gr.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X - 7, Mitte.Y, Mitte.X + 6, Mitte.Y);
+        //    gr.InterpolationMode = InterpolationMode.NearestNeighbor;
+        //    gr.PixelOffsetMode = PixelOffsetMode.Half;
 
-            gr.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), Mitte.X, r.Top, Mitte.X, r.Bottom);
-            gr.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), r.Left, Mitte.Y, r.Right, Mitte.Y);
+        //    gr.DrawImage(P.BMP, r, new Rectangle(e.X - 7, e.Y - 7, 15, 15), GraphicsUnit.Pixel);
 
-            gr.DrawLine(Pens.Red, Mitte.X, Mitte.Y - 6, Mitte.X, Mitte.Y + 5);
-            gr.DrawLine(Pens.Red, Mitte.X - 6, Mitte.Y, Mitte.X + 5, Mitte.Y);
+        //    if (P.OverlayBMP != null)
+        //    {
+        //        gr.DrawImage(P.OverlayBMP, r, new Rectangle(e.X - 7, e.Y - 7, 15, 15), GraphicsUnit.Pixel);
+        //    }
 
 
-            Lupe.Refresh();
+        //    var Mitte = r.PointOf(enAlignment.Horizontal_Vertical_Center);
+        //    gr.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X, Mitte.Y - 7, Mitte.X, Mitte.Y + 6);
+        //    gr.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X - 7, Mitte.Y, Mitte.X + 6, Mitte.Y);
 
-        }
+        //    gr.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), Mitte.X, r.Top, Mitte.X, r.Bottom);
+        //    gr.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), r.Left, Mitte.Y, r.Right, Mitte.Y);
+
+        //    gr.DrawLine(Pens.Red, Mitte.X, Mitte.Y - 6, Mitte.X, Mitte.Y + 5);
+        //    gr.DrawLine(Pens.Red, Mitte.X - 6, Mitte.Y, Mitte.X + 5, Mitte.Y);
+
+
+        //    Lupe.Refresh();
+
+        //}
 
         private void Dummy_Click(object sender, System.EventArgs e)
         {

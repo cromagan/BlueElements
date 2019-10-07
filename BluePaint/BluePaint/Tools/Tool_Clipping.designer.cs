@@ -1,7 +1,4 @@
-﻿using BlueControls;
-using BlueControls.Controls;
-
-using BlueBasics;
+﻿using BlueControls.Controls;
 using BlueBasics.Enums;
 
 namespace BluePaint
