@@ -18,17 +18,25 @@
 #endregion
 
 
-namespace BlueControls.Enums
+using System.Drawing;
+
+namespace BlueControls.EventArgs
 {
-
-    public enum enSelectModus
+  public  class AdditionalDrawing : System.EventArgs
     {
-        Ohne = 0,
+        public AdditionalDrawing(Graphics gr, decimal zoom, decimal movex, decimal movey)
+        {
+            this.G = gr;
+            this.Zoom = zoom;
+            this.MoveX = movex;
+            this.MoveY = movey;
 
-        Point = 1,
-        Line = 2
-
-        //  Height = 3
+        }
+        
+        public Graphics G { get;  }
+        public decimal Zoom { get; }
+        public decimal MoveX { get; }
+        public decimal MoveY { get; }
 
     }
 }

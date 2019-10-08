@@ -490,8 +490,8 @@ namespace BlueControls
 
         public void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, enDesign Type, enStates State)
         {
-            var tx = _x * cZoom - MoveX;
-            var ty = _y * cZoom - MoveY;
+            var tx = _x * cZoom - MoveX + cZoom / 2;
+            var ty = _y * cZoom - MoveY + cZoom / 2;
 
             var r = new Rectangle((int)(tx - 4), (int)(ty - 4), 9, 9);
 

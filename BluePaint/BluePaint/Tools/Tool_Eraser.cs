@@ -20,7 +20,7 @@
 using System;
 using System.Drawing;
 using BlueControls.Controls;
-using BluePaint.EventArgs;
+using BlueControls.EventArgs;
 
 namespace BluePaint
 {
@@ -43,12 +43,12 @@ namespace BluePaint
 
         }
 
-        public override void MouseDown(System.Windows.Forms.MouseEventArgs e)
+        public override void MouseDown(MouseEventArgs1_1 e)
         {
             OnForceUndoSaving();
 
             ClearPreviewPic();
-            _MouseDown = PointInsidePic(e);
+            _MouseDown = new Point(e.TrimmedX, e.TrimmedY);
 
 
             if (Razi.Checked)
@@ -58,12 +58,12 @@ namespace BluePaint
 
         }
 
-        public override void MouseMove(System.Windows.Forms.MouseEventArgs e)
+        public override void MouseMove(MouseEventArgs1_1 e)
         {
             var Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
             var Pen_RotTransp = new Pen(Color.FromArgb(50, 255, 0, 0));
-            var NP = PointInsidePic(e);
-            ClearPreviewPic();
+            //var NP = PointInsidePic(e);
+
 
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
@@ -71,45 +71,52 @@ namespace BluePaint
                 if (Razi.Checked)
                 {
                     var gr = Graphics.FromImage(_Pic);
-                    var r = new Rectangle(NP.X - 4, NP.Y - 4, 9, 9);
+                    var r = new Rectangle(e.TrimmedX - 4, e.TrimmedY - 4, 9, 9);
                     gr.FillEllipse(Brushes.White, r);
                 }
 
                 if (DrawBox.Checked)
                 {
-
-                    OnSetHelper(new SetHelperEventArgs(BlueBasics.Enums.enOrientation.Ohne, BlueControls.Enums.enHelpers.FilledRectancle));
+                    ClearPreviewPic();
+                    var gr = Graphics.FromImage(_PicPreview);
+                    var r = new Rectangle(Math.Min(_MouseDown.X, e.TrimmedX), Math.Min(_MouseDown.Y, e.TrimmedY), Math.Abs(_MouseDown.X - e.TrimmedX) + 1, Math.Abs(_MouseDown.Y - e.TrimmedY) + 1);
+                    gr.FillRectangle(Brush_RotTransp, r);
                 }
 
             }
 
             if (Razi.Checked)
             {
-                OnSetHelper(new SetHelperEventArgs(BlueBasics.Enums.enOrientation.Ohne, BlueControls.Enums.enHelpers.Ohne));
+                ClearPreviewPic();
                 var gr = Graphics.FromImage(_PicPreview);
-                var r = new Rectangle(NP.X - 4, NP.Y - 4, 9, 9);
+                var r = new Rectangle(e.TrimmedX - 4, e.TrimmedY - 4, 9, 9);
                 gr.FillEllipse(Brush_RotTransp, r);
             }
 
 
             if (DrawBox.Checked && e.Button == System.Windows.Forms.MouseButtons.None)
             {
-                OnSetHelper(new SetHelperEventArgs(BlueBasics.Enums.enOrientation.Ohne, BlueControls.Enums.enHelpers.HorizontalVerticalLine ));
+
+                ClearPreviewPic();
+                var gr = Graphics.FromImage(_PicPreview);
+
+                gr.DrawLine(Pen_RotTransp, e.TrimmedX, 0, e.TrimmedX, _Pic.Height);
+                gr.DrawLine(Pen_RotTransp, 0, e.TrimmedY, _Pic.Width, e.TrimmedY);
             }
 
             OnPicChangedByTool();
         }
 
-        public override void MouseUp(System.Windows.Forms.MouseEventArgs e)
+        public override void MouseUp(MouseEventArgs1_1 e)
         {
 
-            var NP = PointInsidePic(e);
+            //var NP = PointInsidePic(e);
 
 
             if (Eleminate.Checked)
             {
 
-                if (IsInsidePic(e))
+                if (e.IsInPic)
                 {
                     var cc = _Pic.GetPixel(e.X, e.Y).ToArgb();
 
@@ -118,9 +125,9 @@ namespace BluePaint
                         return;
                     }
 
-                    for (var x = 0 ; x < _Pic.Width ; x++)
+                    for (var x = 0; x < _Pic.Width; x++)
                     {
-                        for (var y = 0 ; y < _Pic.Height ; y++)
+                        for (var y = 0; y < _Pic.Height; y++)
                         {
                             if (_Pic.GetPixel(x, y).ToArgb() == cc)
                             {
@@ -143,7 +150,7 @@ namespace BluePaint
                 using (var gr = Graphics.FromImage(_Pic))
                 {
 
-                    var r = new Rectangle(Math.Min(_MouseDown.X, NP.X), Math.Min(_MouseDown.Y, NP.Y), Math.Abs(_MouseDown.X - NP.X) + 1, Math.Abs(_MouseDown.Y - NP.Y) + 1);
+                    var r = new Rectangle(Math.Min(_MouseDown.X, e.TrimmedX), Math.Min(_MouseDown.Y, e.TrimmedY), Math.Abs(_MouseDown.X - e.TrimmedX) + 1, Math.Abs(_MouseDown.Y - e.TrimmedY) + 1);
                     gr.FillRectangle(Brushes.White, r);
                 }
 

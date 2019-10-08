@@ -14,6 +14,7 @@ using static BlueBasics.FileOperations;
 using BlueControls.ItemCollection;
 using static BlueBasics.Extensions;
 using BlueBasics;
+using BlueControls.EventArgs;
 
 namespace BlueControls.Controls
 {
@@ -28,26 +29,62 @@ namespace BlueControls.Controls
         List<PointDF> points = new List<PointDF>();
 
 
+
+        public event EventHandler PointSetByUser;
+
         public List<string> Tags = new List<string>();
-        private enSelectModus _SelectModus = enSelectModus.Ohne;
+       // private enSelectModus _SelectModus = enSelectModus.Ohne;
         public string Feedback = string.Empty;
 
+        private bool _PointAdding = false;
 
-        [DefaultValue(enSelectModus.Ohne)]
-        public enSelectModus SelectModus
+
+
+        static Pen Pen_RotTransp = new Pen(Color.FromArgb(200, 255, 0, 0));
+        static Brush Brush_RotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
+
+        private enOrientation _MittelLinie = enOrientation.Ohne;
+
+        private enHelpers _Helper = enHelpers.Ohne;
+
+
+        [DefaultValue((enOrientation)(-1))]
+        public enOrientation Mittellinie
         {
             get
             {
-                return _SelectModus;
+                return _MittelLinie;
             }
             set
             {
-                if (_SelectModus == value) { return; }
-                _SelectModus = value;
+
+
+                if (_MittelLinie == value) { return; }
+                _MittelLinie = value;
                 Invalidate();
             }
 
         }
+
+
+        [DefaultValue(enHelpers.Ohne)]
+        public enHelpers Helper
+        {
+            get
+            {
+                return _Helper;
+            }
+            set
+            {
+
+
+                if (_Helper == value) { return; }
+                _Helper = value;
+                Invalidate();
+            }
+
+        }
+
 
 
         protected override RectangleDF MaxBounds()
@@ -68,29 +105,22 @@ namespace BlueControls.Controls
 
         protected override void DrawControl(Graphics gr, enStates state)
         {
-
-
-
-            // Bild, Overlay und Hintergrund
+            PrepareOverlay();
             base.DrawControl(gr, state);
+        }
 
 
-            /// Punkre
+        protected override void OnDoAdditionalDrawing(AdditionalDrawing e)
+        {
+            base.OnDoAdditionalDrawing(e);
+
+              /// Punkte
             foreach (var ThisPoint in points)
             {
-                ThisPoint.Draw(gr, _Zoom, _MoveX, _MoveY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                ThisPoint.Draw(e.G, e.Zoom, e.MoveX, e.MoveY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
             }
 
 
-
-
-            // Hilfslinien
-
-
-            //if (_Helper.HasFlag(enHelpers.SymetricalHorizontal))
-            //    {
-
-            //}
 
 
         }
@@ -213,6 +243,7 @@ namespace BlueControls.Controls
             {
                 p = new PointDF(name, x, y);
                 points.Add(p);
+                WritePointsInTags();
                 Invalidate();
                 return;
             }
@@ -224,6 +255,9 @@ namespace BlueControls.Controls
                 p.Y = y;
                 Invalidate();
             }
+
+            WritePointsInTags();
+
         }
 
 
@@ -289,5 +323,126 @@ namespace BlueControls.Controls
             return new Tuple<Bitmap, List<string>>(B, T);
 
         }
+
+        private void PrepareOverlay()
+        {
+            //OverlayBMP = (BMP.Clone();
+
+            if (BMP== null) { return; }
+
+
+            if (OverlayBMP == null || OverlayBMP.Width != BMP.Width || OverlayBMP.Height != BMP.Height)
+            {
+                OverlayBMP = new Bitmap(BMP.Width, BMP.Height);
+            }
+
+
+            var TMPGR = Graphics.FromImage(OverlayBMP);
+
+            TMPGR.Clear(Color.Transparent);
+
+            // Mittellinie
+            var PicturePos = base.MaxBounds();
+
+            if (_MittelLinie.HasFlag(enOrientation.Waagerecht))
+            {
+                var p1 = PicturePos.PointOf(enAlignment.VerticalCenter_Left).ToPointF();
+                var p2 = PicturePos.PointOf(enAlignment.VerticalCenter_Right).ToPointF();
+
+                //var p1 = new Point(0, (int)(OverlayBMP.Height / 2));
+                //var p2 = new Point(OverlayBMP.Width, (int)(OverlayBMP.Height / 2));
+
+                TMPGR.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
+                TMPGR.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
+            }
+
+            if (_MittelLinie.HasFlag(enOrientation.Senkrecht))
+            {
+                var p1 = PicturePos.PointOf(enAlignment.Top_HorizontalCenter).ToPointF();
+                var p2 = PicturePos.PointOf(enAlignment.Bottom_HorizontalCenter).ToPointF();
+                //var p1 = new Point((int)(OverlayBMP.Width / 2),0);
+                //var p2 = new Point((int)(OverlayBMP.Width / 2), OverlayBMP.Height);
+                TMPGR.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
+                TMPGR.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
+            }
+
+
+            if (MousePos_1_1.IsEmpty) { return; }
+
+
+            if (_Helper.HasFlag(enHelpers.HorizontalLine))
+            {
+                TMPGR.DrawLine(Pen_RotTransp, MousePos_1_1.X, 0, MousePos_1_1.X, OverlayBMP.Height);
+
+            }
+            if (_Helper.HasFlag(enHelpers.VerticalLine))
+            {
+                TMPGR.DrawLine(Pen_RotTransp, 0, MousePos_1_1.Y, OverlayBMP.Width, MousePos_1_1.Y);
+
+            }
+
+
+            if (_Helper.HasFlag(enHelpers.SymetricalHorizontal))
+            {
+                var h = (int)(BMP.Width / 2);
+                var x = Math.Abs(h - MousePos_1_1.X);
+
+                TMPGR.DrawLine(Pen_RotTransp, h-x, MousePos_1_1.Y, h+x, MousePos_1_1.Y);
+
+            }
+
+
+
+            if (_Helper.HasFlag(enHelpers.FilledRectancle))
+            {
+                if (!MouseDownPos_1_1.IsEmpty)
+                {
+
+                    var r = new Rectangle(Math.Min(MouseDownPos_1_1.X, MousePos_1_1.X), Math.Min(MouseDownPos_1_1.Y, MousePos_1_1.Y), Math.Abs(MouseDownPos_1_1.X - MousePos_1_1.X) + 1, Math.Abs(MouseDownPos_1_1.Y - MousePos_1_1.Y) + 1);
+                    //var r = new Rectangle((int)Math.Min(MouseDownPos_1_1.X, MousePos_1_1.X), (int)Math.Min(MouseDownPos_1_1.Y, MousePos_1_1.Y), (int)Math.Abs(MouseDownPos_1_1.X - MousePos_1_1.X) + 1, (int)Math.Abs(MouseDownPos_1_1.Y - MousePos_1_1.Y) + 1);
+                    TMPGR.FillRectangle(Brush_RotTransp, r);
+                }
+            }
+
+
+        }
+
+        public void LetUserAddAPoint(string pointName, enHelpers helper, enOrientation mittelline)
+        {
+
+            _MittelLinie = mittelline;
+            _Helper = helper;
+            Feedback = pointName;
+            _PointAdding = true;
+            Invalidate();
+
+        }
+
+
+
+        protected override void OnImageMouseUp(MouseEventArgs1_1 e)
+        {
+
+
+            if (_PointAdding  && ! string.IsNullOrEmpty(Feedback))
+            {
+                PointSet(Feedback, e.X, e.Y);
+                _PointAdding = false;
+                OnPointSetByUser();
+            } 
+
+            base.OnImageMouseUp(e); // erst nachher, dass die MouseUpRoutine das Feedback nicht änddern kann
+
+            //Feedback = string.Empty;
+
+        }
+
+
+        protected virtual void OnPointSetByUser()
+        {
+            PointSetByUser?.Invoke(this, System.EventArgs.Empty);
+        }
+
+
     }
 }

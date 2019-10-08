@@ -120,6 +120,7 @@ namespace BlueControls.Controls
 
 
 
+
         private static readonly CreativePad PadForCreation = new CreativePad();
 
         #region  Events 
@@ -185,6 +186,7 @@ namespace BlueControls.Controls
                 Invalidate();
             }
         }
+
 
         [DefaultValue(true)]
         public bool KeyboardEditEnabled
@@ -1560,7 +1562,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            MouseDownPos_1_1 = new Point((int)(MouseDownPos_1_1.X + MoveX), (int)( MouseDownPos_1_1.Y + MoveY));
+            MouseDownPos_1_1 = new Point((int)(MouseDownPos_1_1.X + MoveX), (int)(MouseDownPos_1_1.Y + MoveY));
         }
 
 
@@ -2502,8 +2504,7 @@ namespace BlueControls.Controls
 
         private void RepairPrinterData()
         {
-
-
+       
             if (RepairPrinterData_Prepaired) { return; }
 
             RepairPrinterData_Prepaired = true;

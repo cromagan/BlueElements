@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueControls.EventArgs;
 using System.Drawing;
 
 namespace BluePaint
@@ -30,21 +31,21 @@ namespace BluePaint
         }
 
 
-        public override void MouseDown(System.Windows.Forms.MouseEventArgs e)
+        public override void MouseDown(MouseEventArgs1_1 e)
         {
             OnForceUndoSaving();
             ClearPreviewPic();
             MouseMove(e);
         }
 
-        public override void MouseMove(System.Windows.Forms.MouseEventArgs e)
+        public override void MouseMove(MouseEventArgs1_1 e)
         {
             var Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
 
             if (e.Button == System.Windows.Forms. MouseButtons.Left)
             {
 
-                if (IsInsidePic(e))
+                if (e.IsInPic)
                 {
                     var gr = Graphics.FromImage(_Pic);
                     var r = new Rectangle(e.X - 1, e.Y - 1, 3, 3);
@@ -56,7 +57,7 @@ namespace BluePaint
             else
             {
 
-                if (IsInsidePic(e))
+                if (e.IsInPic)
                 {
                     ClearPreviewPic();
                     var gr = Graphics.FromImage(_PicPreview);

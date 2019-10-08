@@ -26,6 +26,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using BlueControls.EventArgs;
 
 namespace BlueControls.Controls
 {
@@ -36,50 +37,7 @@ namespace BlueControls.Controls
         public Bitmap BMP = null;
         public Bitmap OverlayBMP = null;
 
-        static Pen Pen_RotTransp = new Pen(Color.FromArgb(50, 255, 0, 0));
-        static Brush Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
 
-        private enOrientation _MittelLinie = enOrientation.Ohne;
-
-        private enHelpers _Helper = enHelpers.Ohne;
-
-
-        [DefaultValue((enOrientation)(-1))]
-        public enOrientation Mittellinie
-        {
-            get
-            {
-                return _MittelLinie;
-            }
-            set
-            {
-
-
-                if (_MittelLinie == value) { return; }
-                _MittelLinie = value;
-                Invalidate();
-            }
-
-        }
-
-
-        [DefaultValue(enHelpers.Ohne)]
-        public enHelpers Helper
-        {
-            get
-            {
-                return _Helper;
-            }
-            set
-            {
-
-
-                if (_Helper == value) { return; }
-                _Helper = value;
-                Invalidate();
-            }
-
-        }
 
 
 
@@ -98,13 +56,14 @@ namespace BlueControls.Controls
         }
 
 
-        public event EventHandler<System.Windows.Forms.MouseEventArgs> ImageMouseEnter;
-        public event EventHandler<System.Windows.Forms.MouseEventArgs> ImageMouseDown;
-        public event EventHandler<System.Windows.Forms.MouseEventArgs> ImageMouseMove;
-        public event EventHandler<System.Windows.Forms.MouseEventArgs> ImageMouseUp;
-        public event EventHandler ImageMouseLeave;
+        //public event EventHandler<MouseEventArgs1_1> ImageMouseEnter;
+        public event EventHandler<MouseEventArgs1_1> ImageMouseDown;
+        public event EventHandler<MouseEventArgs1_1> ImageMouseMove;
+        public event EventHandler<MouseEventArgs1_1> ImageMouseUp;
+        public event EventHandler<AdditionalDrawing> DoAdditionalDrawing;
+        //public event EventHandler ImageMouseLeave;
 
-        private bool _IsInPic = false;
+        //private bool _IsInPic = false;
 
         private bool _AlwaysSmooth = false;
 
@@ -169,7 +128,6 @@ namespace BlueControls.Controls
 
                 if (OverlayBMP != null)
                 {
-                    PrepareOverlay();
                     TMPGR.DrawImage(OverlayBMP, r);
                 }
 
@@ -178,92 +136,55 @@ namespace BlueControls.Controls
 
 
 
-            Skin.Draw_Border(TMPGR, enDesign.Table_And_Pad, state, new Rectangle(0, 0, Size.Width - SliderY.Width, Size.Height - SliderX.Height));
+            OnDoAdditionalDrawing(new AdditionalDrawing(TMPGR, _Zoom, _MoveX, _MoveY));
+
+
+            Skin.Draw_Border(TMPGR, enDesign.Table_And_Pad, state, new Rectangle(1, 1, Size.Width - SliderY.Width, Size.Height - SliderX.Height));
             gr.DrawImage(_BitmapOfControl, 0, 0);
 
         }
 
-        private void PrepareOverlay()
+
+        protected virtual void OnDoAdditionalDrawing(AdditionalDrawing e)
         {
-            //OverlayBMP = (BMP.Clone();
-
-
-            var TMPGR = Graphics.FromImage(OverlayBMP);
-
-            // Mittellinie
-            var PicturePos = MaxBounds();
-
-            if (_MittelLinie.HasFlag(enOrientation.Waagerecht))
-            {
-                var p1 = PicturePos.PointOf(enAlignment.VerticalCenter_Left).ToPointF();
-                var p2 = PicturePos.PointOf(enAlignment.VerticalCenter_Right).ToPointF();
-
-                //var p1 = new Point(0, (int)(OverlayBMP.Height / 2));
-                //var p2 = new Point(OverlayBMP.Width, (int)(OverlayBMP.Height / 2));
-
-                TMPGR.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
-                TMPGR.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
-            }
-
-            if (_MittelLinie.HasFlag(enOrientation.Senkrecht))
-            {
-                var p1 = PicturePos.PointOf(enAlignment.Top_HorizontalCenter).ToPointF();
-                var p2 = PicturePos.PointOf(enAlignment.Bottom_HorizontalCenter).ToPointF();
-                //var p1 = new Point((int)(OverlayBMP.Width / 2),0);
-                //var p2 = new Point((int)(OverlayBMP.Width / 2), OverlayBMP.Height);
-                TMPGR.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
-                TMPGR.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
-            }
-
-
-            if (MousePos_1_1.IsEmpty) { return; }
-
-
-            if (_Helper.HasFlag(enHelpers.HorizontalLine))
-            {
-                TMPGR.DrawLine(Pen_RotTransp, (int)MousePos_1_1.X, 0, (int)MousePos_1_1.X, OverlayBMP.Height);
-
-            }
-            if (_Helper.HasFlag(enHelpers.VerticalLine))
-            {
-                TMPGR.DrawLine(Pen_RotTransp, 0, (int)MousePos_1_1.Y, OverlayBMP.Width, (int)MousePos_1_1.Y);
-
-            }
-
-
-
-            if (_Helper.HasFlag(enHelpers.FilledRectancle))
-            {
-                if (!MouseDownPos_1_1.IsEmpty)
-                {
-
-                    var r = new Rectangle(Math.Min(MouseDownPos_1_1.X, MousePos_1_1.X), Math.Min(MouseDownPos_1_1.Y, MousePos_1_1.Y), Math.Abs(MouseDownPos_1_1.X - MousePos_1_1.X) + 1, Math.Abs(MouseDownPos_1_1.Y - MousePos_1_1.Y) + 1);
-                    //var r = new Rectangle((int)Math.Min(MouseDownPos_1_1.X, MousePos_1_1.X), (int)Math.Min(MouseDownPos_1_1.Y, MousePos_1_1.Y), (int)Math.Abs(MouseDownPos_1_1.X - MousePos_1_1.X) + 1, (int)Math.Abs(MouseDownPos_1_1.Y - MousePos_1_1.Y) + 1);
-                    TMPGR.FillRectangle(Brush_RotTransp, r);
-                }
-            }
-
-
+            DoAdditionalDrawing?.Invoke(this, e);
         }
+
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
 
-            if (IsInBitmap())
-            {
-                var mc = new MouseEventArgs(e.Button, e.Clicks, (int)MousePos_1_1.X, (int)MousePos_1_1.Y, e.Delta);
-                OnImageMouseDown(mc);
-            }
+
+            OnImageMouseDown(GenerateNewMouseEventArgs(e));
 
         }
 
-        private void OnImageMouseDown(MouseEventArgs e)
+
+        private MouseEventArgs1_1 GenerateNewMouseEventArgs(MouseEventArgs e)
+        {
+
+            var p = PointInsidePic(MousePos_1_1.X, MousePos_1_1.Y);
+
+            //if (IsInBitmap())
+            //{
+            return new MouseEventArgs1_1(e.Button, e.Clicks, MousePos_1_1.X, MousePos_1_1.Y, e.Delta, p.X, p.Y, IsInBitmap());
+
+            //    //    x1 = Math.Max(0, x1);
+            //    //    y1 = Math.Max(0, y1);
+
+            //    //    x1 = Math.Min(BMP.Width, x1);
+            //    //    y1 = Math.Min(BMP.Height, y1);
+
+            // }
+        }
+
+        protected virtual void OnImageMouseDown(MouseEventArgs1_1 e)
         {
             ImageMouseDown?.Invoke(this, e);
         }
 
-        private void OnImageMouseUp(MouseEventArgs e)
+        protected virtual void OnImageMouseUp(MouseEventArgs1_1 e)
         {
             ImageMouseUp?.Invoke(this, e);
         }
@@ -283,72 +204,63 @@ namespace BlueControls.Controls
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
-
-
-
-
-            if (IsInBitmap())
-            {
-                var mc = new MouseEventArgs(e.Button, e.Clicks, (int)MousePos_1_1.X, (int)MousePos_1_1.Y, e.Delta);
-                OnImageMouseUp(mc);
-            }
-
+            OnImageMouseUp(GenerateNewMouseEventArgs(e));
         }
 
 
-        protected override void OnMouseLeave(System.EventArgs e)
-        {
-            base.OnMouseLeave(e);
-            ChangeIsInPic(false, null);
-        }
+        //protected override void OnMouseLeave(System.EventArgs e)
+        //{
+        //    base.OnMouseLeave(e);
+        //    ChangeIsInPic(false, null);
+        //}
 
-        private void ChangeIsInPic(bool NewState, MouseEventArgs e)
-        {
+        //private void ChangeIsInPic(bool NewState, MouseEventArgs e)
+        //{
 
-            if (!NewState && _IsInPic)
-            {
-                _IsInPic = false;
-                OnImageMouseLeave();
-            }
+        //    if (!NewState && _IsInPic)
+        //    {
+        //        _IsInPic = false;
+        //        OnImageMouseLeave();
+        //    }
 
-            if (NewState && !_IsInPic)
-            {
-                _IsInPic = true;
-                OnImageMouseEnter(e);
-            }
+        //    if (NewState && !_IsInPic)
+        //    {
+        //        _IsInPic = true;
+        //        OnImageMouseEnter(e);
+        //    }
 
-        }
+        //}
 
-        protected void OnImageMouseEnter(MouseEventArgs e)
-        {
-            ImageMouseEnter?.Invoke(this, e);
-        }
+        //protected void OnImageMouseEnter(MouseEventArgs e)
+        //{
+        //    ImageMouseEnter?.Invoke(this, e);
+        //}
 
-        protected void OnImageMouseLeave()
-        {
-            ImageMouseLeave?.Invoke(this, System.EventArgs.Empty);
-        }
+        //protected void OnImageMouseLeave()
+        //{
+        //    ImageMouseLeave?.Invoke(this, System.EventArgs.Empty);
+        //}
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
 
 
-            if (!IsInBitmap())
-            {
-                ChangeIsInPic(false, null);
-                return;
-            }
+            //if (!IsInBitmap())
+            //{
+            //    ChangeIsInPic(false, null);
+            //    return;
+            //}
 
-            var mc = new MouseEventArgs(e.Button, e.Clicks, (int)MousePos_1_1.X, (int)MousePos_1_1.Y, e.Delta);
-            ChangeIsInPic(true, mc);
+            //var mc = new MouseEventArgs1_1((int)MousePos_1_1.X, (int)MousePos_1_1.Y, IsInBitmap);
 
-            OnImageMouseMove(mc);
+
+            OnImageMouseMove(GenerateNewMouseEventArgs(e));
 
 
         }
 
-        private void OnImageMouseMove(MouseEventArgs e)
+        protected virtual void OnImageMouseMove(MouseEventArgs1_1 e)
         {
             ImageMouseMove?.Invoke(this, e);
         }
@@ -389,6 +301,23 @@ namespace BlueControls.Controls
         //    //            return new Point(x1, y1);
 
         //}
+
+        public Point PointInsidePic(int x, int y)
+        {
+
+            if (BMP == null) { return Point.Empty; }
+
+
+
+            x = Math.Max(0, x);
+            y = Math.Max(0, y);
+
+            x = Math.Min(BMP.Width - 1, x);
+            y = Math.Min(BMP.Height - 1, y);
+
+            return new Point(x, y);
+
+        }
 
 
 

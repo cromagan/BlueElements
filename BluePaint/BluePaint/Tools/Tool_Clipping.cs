@@ -24,6 +24,7 @@ using static BlueBasics.modAllgemein;
 using static BlueBasics.Develop;
 using BluePaint.EventArgs;
 using BlueBasics.Enums;
+using BlueControls.EventArgs;
 
 namespace BluePaint
 {
@@ -49,23 +50,23 @@ namespace BluePaint
         }
 
 
-        public override void MouseDown(System.Windows.Forms.MouseEventArgs e)
+        public override void MouseDown(MouseEventArgs1_1 e)
         {
             CheckMinMax();
-            _MouseDown = PointInsidePic(e);
+            //_MouseDown = PointInsidePic(e);
             MouseMove(e);
         }
 
-        public override void MouseMove(System.Windows.Forms.MouseEventArgs e)
+        public override void MouseMove(MouseEventArgs1_1 e)
         {
             var Pen_Blau = new Pen(Color.FromArgb(150, 0, 0, 255));
             ClearPreviewPic();
-            var NP = PointInsidePic(e);
+            //var NP = PointInsidePic(e);
             var gr = Graphics.FromImage(_PicPreview);
             DrawZusatz();
 
-            gr.DrawLine(Pen_Blau, NP.X, 0, NP.X, _Pic.Height);
-            gr.DrawLine(Pen_Blau, 0, NP.Y, _Pic.Width, NP.Y);
+            gr.DrawLine(Pen_Blau, e.TrimmedX, 0, e.TrimmedX, _Pic.Height);
+            gr.DrawLine(Pen_Blau, 0, e.TrimmedY, _Pic.Width, e.TrimmedY);
 
             if (e.Button == System.Windows.Forms. MouseButtons.Left)
             {
@@ -76,16 +77,16 @@ namespace BluePaint
 
         }
 
-        public override void MouseUp(System.Windows.Forms.MouseEventArgs e)
+        public override void MouseUp(MouseEventArgs1_1 e)
         {
             
             _AutoCropping = true;
-            var NP = PointInsidePic(e);
+         //   var NP = PointInsidePic(e);
 
-            Links.Value = Math.Min(NP.X, _MouseDown.X) + 1;
-            Recht.Value = -(_Pic.Width - Math.Max(NP.X, _MouseDown.X));
-            Oben.Value = Math.Min(NP.Y, _MouseDown.Y) + 1;
-            Unten.Value = -(_Pic.Height - Math.Max(NP.Y, _MouseDown.Y));
+            Links.Value = Math.Min(e.TrimmedX, _MouseDown.X) + 1;
+            Recht.Value = -(_Pic.Width - Math.Max(e.TrimmedX, _MouseDown.X));
+            Oben.Value = Math.Min(e.TrimmedY, _MouseDown.Y) + 1;
+            Unten.Value = -(_Pic.Height - Math.Max(e.TrimmedY, _MouseDown.Y));
 
             _AutoCropping = false;
             ValueChanged(this, System.EventArgs.Empty);

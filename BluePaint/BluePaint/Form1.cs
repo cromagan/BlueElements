@@ -65,8 +65,8 @@ namespace BluePaint
             if (P.OverlayBMP != null)
             {
                 var gr = Graphics.FromImage(P.OverlayBMP);
-                gr.Clear(Color.FromArgb(0, 0, 0, 0));
-                P.Refresh();
+                gr.Clear(Color.Transparent);
+                P.Invalidate();
             }
 
 
@@ -81,13 +81,10 @@ namespace BluePaint
                 CurrentTool.PicChangedByTool -= CurrentTool_PicChangedByTool;
                 CurrentTool.OverridePic -= CurrentTool_OverridePic;
                 CurrentTool.ForceUndoSaving -= CurrentTool_ForceUndoSaving;
-                CurrentTool.SetHelper -= CurrentTool_SetHelper;
                 CurrentTool = null;
             }
 
 
-            P.Helper = BlueControls.Enums.enHelpers.Ohne;
-            P.Mittellinie = enOrientation.Ohne;
 
 
             if (NewTool != null)
@@ -104,7 +101,6 @@ namespace BluePaint
                 CurrentTool.PicChangedByTool += CurrentTool_PicChangedByTool;
                 CurrentTool.OverridePic += CurrentTool_OverridePic;
                 CurrentTool.ForceUndoSaving += CurrentTool_ForceUndoSaving;
-                CurrentTool.SetHelper += CurrentTool_SetHelper;
 
 
                 if (DoInitalizingAction)
@@ -117,14 +113,6 @@ namespace BluePaint
 
         }
 
-        private void CurrentTool_SetHelper(object sender, SetHelperEventArgs e)
-        {
-            P.Mittellinie = e.Mittellinie;
-            P.Helper = e.Helper;
-
-
-        }
-
         private void CurrentTool_ZoomFit(object sender, System.EventArgs e)
         {
             P.ZoomFit();
@@ -132,7 +120,7 @@ namespace BluePaint
 
         private void CurrentTool_PicChangedByTool(object sender, System.EventArgs e)
         {
-            P.Refresh();
+            P.Invalidate();
         }
 
         private void CurrentTool_HideMainWindow(object sender, System.EventArgs e)
@@ -298,7 +286,7 @@ namespace BluePaint
 
 
 
-        private void P_ImageMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e)
         {
 
 
@@ -309,7 +297,7 @@ namespace BluePaint
         }
 
 
-        private void P_ImageMouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void P_ImageMouseMove(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e)
         {
 
 
@@ -318,17 +306,12 @@ namespace BluePaint
                 CurrentTool.MouseMove(e);
             }
 
-
-            if (P.BMP == null)
+            if (e.IsInPic)
             {
-                return;
-            }
-            if (e.X >= 0 && e.Y >= 0 && e.X < P.BMP.Width && e.Y < P.BMP.Height)
-            {
-                var c = P.BMP.GetPixel(e.X, e.Y);
+                var c = P.BMP.GetPixel(e.TrimmedX, e.TrimmedY);
 
-                InfoText.Text = "X: " + e.X +
-                               "<br>Y: " + e.Y +
+                InfoText.Text = "X: " + e.TrimmedX +
+                               "<br>Y: " + e.TrimmedY +
                                "<br>Farbe: " + c.ToHTMLCode().ToUpper();
 
             }
@@ -337,10 +320,10 @@ namespace BluePaint
                 InfoText.Text = "";
 
             }
-            //ShowLupe(e);
+           // ShowLupe(e);
         }
 
-        private void P_ImageMouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e)
         {
             if (CurrentTool != null)
             {
@@ -365,7 +348,7 @@ namespace BluePaint
         }
 
 
-        private void P_ImageMouseLeave(object sender, System.EventArgs e)
+        private void P_MouseLeave(object sender, System.EventArgs e)
         {
             //ShowLupe(null);
 

@@ -273,16 +273,15 @@ namespace BluePaint
             this.P.AlwaysSmooth = false;
             this.P.Dock = System.Windows.Forms.DockStyle.Fill;
             this.P.Location = new System.Drawing.Point(0, 0);
-            this.P.Mittellinie = BlueBasics.Enums.enOrientation.Ohne;
             this.P.Name = "P";
             this.P.Size = new System.Drawing.Size(722, 340);
             this.P.TabIndex = 2;
             this.P.TabStop = false;
             this.P.Translate = false;
-            this.P.ImageMouseDown += new System.EventHandler<System.Windows.Forms.MouseEventArgs>(this.P_ImageMouseDown);
-            this.P.ImageMouseMove += new System.EventHandler<System.Windows.Forms.MouseEventArgs>(this.P_ImageMouseMove);
-            this.P.ImageMouseUp += new System.EventHandler<System.Windows.Forms.MouseEventArgs>(this.P_ImageMouseUp);
-            this.P.ImageMouseLeave += new System.EventHandler(this.P_ImageMouseLeave);
+            this.P.ImageMouseDown += new System.EventHandler<BlueControls.EventArgs.MouseEventArgs1_1>(this.P_ImageMouseDown);
+            this.P.ImageMouseMove += new System.EventHandler<BlueControls.EventArgs.MouseEventArgs1_1>(this.P_ImageMouseMove);
+            this.P.ImageMouseUp += new System.EventHandler<BlueControls.EventArgs.MouseEventArgs1_1>(this.P_ImageMouseUp);
+            this.P.MouseLeave += new System.EventHandler(this.P_MouseLeave);
             // 
             // Split
             // 

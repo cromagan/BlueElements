@@ -98,7 +98,6 @@
     <Compile Include="Enums\enHelpers.cs" />
     <Compile Include="Enums\enSymbol.cs" />
     <Compile Include="Enums\enMovePoints.cs" />
-    <Compile Include="Enums\enSelectModus.cs" />
     <Compile Include="Enums\enTableDrawColumn.cs" />
     <Compile Include="Enums\enTableDrawType.cs" />
     <Compile Include="Enums\enSorceType.cs" />
@@ -121,6 +120,8 @@
     <Compile Include="Enums\enWndProc.cs" />
     <Compile Include="Enums\PadStyles.cs" />
     <Compile Include="Enums\TabControlHitTest.cs" />
+    <Compile Include="EventArgs\AdditionalDrawing.cs" />
+    <Compile Include="EventArgs\MouseEventArgs1_1.cs" />
     <Compile Include="Forms-Basics\DialogWithOkAndCancel.cs">
       <SubType>Form</SubType>
     </Compile>
