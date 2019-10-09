@@ -184,6 +184,10 @@ namespace BlueControls.Controls
             ImageMouseDown?.Invoke(this, e);
         }
 
+        /// <summary>
+        /// Zuerst ImageMouseUp, dann MouseUp
+        /// </summary>
+        /// <param name="e"></param>
         protected virtual void OnImageMouseUp(MouseEventArgs1_1 e)
         {
             ImageMouseUp?.Invoke(this, e);
@@ -201,10 +205,14 @@ namespace BlueControls.Controls
 
         }
 
+        /// <summary>
+        /// Zuerst ImageMouseUp, dann MouseUp
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            base.OnMouseUp(e);
             OnImageMouseUp(GenerateNewMouseEventArgs(e));
+            base.OnMouseUp(e);
         }
 
 

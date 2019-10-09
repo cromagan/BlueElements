@@ -33,7 +33,7 @@ namespace BlueControls.Controls
         public event EventHandler PointSetByUser;
 
         public List<string> Tags = new List<string>();
-       // private enSelectModus _SelectModus = enSelectModus.Ohne;
+        // private enSelectModus _SelectModus = enSelectModus.Ohne;
         public string Feedback = string.Empty;
 
         private bool _PointAdding = false;
@@ -114,7 +114,7 @@ namespace BlueControls.Controls
         {
             base.OnDoAdditionalDrawing(e);
 
-              /// Punkte
+            /// Punkte
             foreach (var ThisPoint in points)
             {
                 ThisPoint.Draw(e.G, e.Zoom, e.MoveX, e.MoveY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
@@ -145,7 +145,7 @@ namespace BlueControls.Controls
 
         private void GeneratePointsFromTags()
         {
-            var Names = Tags.TagGet("AllPointNames").FromNonCritical().SplitByCRToList();
+            var Names = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
 
             points.Clear();
 
@@ -164,10 +164,11 @@ namespace BlueControls.Controls
 
         public static BitmapListItem GenerateBitmapListItem(Bitmap B, List<string> T)
         {
-            var FilenamePNG = T.TagGet("Image-File");
+            var FilenamePNG = T.TagGet("ImageFile");
             var i = new BitmapListItem(FilenamePNG, FilenamePNG.FileNameWithoutSuffix(), FilenamePNG, string.Empty);
             i.Padding = 10;
             i.Tags.AddRange(T);
+            i.Bitmap = B;
             return i;
         }
 
@@ -182,13 +183,13 @@ namespace BlueControls.Controls
         private void WritePointsInTags()
         {
 
-            var Old = Tags.TagGet("AllPointNames").FromNonCritical().SplitByCRToList();
+            var Old = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
 
             foreach (var thisO in Old)
             {
                 Tags.TagSet(thisO, string.Empty);
-                Tags.TagSet(thisO + "-X", string.Empty);
-                Tags.TagSet(thisO + "-Y", string.Empty);
+                //Tags.TagSet(thisO + "-X", string.Empty);
+                //Tags.TagSet(thisO + "-Y", string.Empty);
             }
 
 
@@ -199,12 +200,12 @@ namespace BlueControls.Controls
             {
                 s = s + ThisP.Name + "|";
                 Tags.TagSet(ThisP.Name, ThisP.ToString());
-                Tags.TagSet(ThisP.Name + "-X", ThisP.X.ToString());
-                Tags.TagSet(ThisP.Name + "-Y", ThisP.Y.ToString());
+                //Tags.TagSet(ThisP.Name + "-X", ThisP.X.ToString());
+                //Tags.TagSet(ThisP.Name + "-Y", ThisP.Y.ToString());
             }
 
 
-            Tags.TagSet("AllPointNames", s.ToNonCritical());
+            Tags.TagSet("AllPointNames", s.TrimEnd("|").ToNonCritical());
 
         }
 
@@ -294,6 +295,14 @@ namespace BlueControls.Controls
         }
 
 
+        public static string FilenameTXT(string PathOfPicture)
+        {
+
+            return PathOfPicture.FilePath() + PathOfPicture.FileNameWithoutSuffix() + ".txt";
+
+//            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
+        }
+
 
         public static Tuple<Bitmap, List<string>> LoadFromDisk(string PathOfPicture)
         {
@@ -309,16 +318,16 @@ namespace BlueControls.Controls
                 B = (Bitmap)Image_FromFile(PathOfPicture);
             }
 
-            var FilenameTXT = PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
+            var ftxt = FilenameTXT(PathOfPicture);
 
 
-            if (FileExists(FilenameTXT))
+            if (FileExists(ftxt))
             {
-                T = modAllgemein.LoadFromDisk(FilenameTXT).SplitByCRToList();
+                T = modAllgemein.LoadFromDisk(ftxt).SplitByCRToList();
             }
 
 
-            T.TagSet("Image-File", PathOfPicture);
+            T.TagSet("ImageFile", PathOfPicture);
 
             return new Tuple<Bitmap, List<string>>(B, T);
 
@@ -328,7 +337,7 @@ namespace BlueControls.Controls
         {
             //OverlayBMP = (BMP.Clone();
 
-            if (BMP== null) { return; }
+            if (BMP == null) { return; }
 
 
             if (OverlayBMP == null || OverlayBMP.Width != BMP.Width || OverlayBMP.Height != BMP.Height)
@@ -387,7 +396,7 @@ namespace BlueControls.Controls
                 var h = (int)(BMP.Width / 2);
                 var x = Math.Abs(h - MousePos_1_1.X);
 
-                TMPGR.DrawLine(Pen_RotTransp, h-x, MousePos_1_1.Y, h+x, MousePos_1_1.Y);
+                TMPGR.DrawLine(Pen_RotTransp, h - x, MousePos_1_1.Y, h + x, MousePos_1_1.Y);
 
             }
 
@@ -424,12 +433,12 @@ namespace BlueControls.Controls
         {
 
 
-            if (_PointAdding  && ! string.IsNullOrEmpty(Feedback))
+            if (_PointAdding && !string.IsNullOrEmpty(Feedback))
             {
                 PointSet(Feedback, e.X, e.Y);
                 _PointAdding = false;
                 OnPointSetByUser();
-            } 
+            }
 
             base.OnImageMouseUp(e); // erst nachher, dass die MouseUpRoutine das Feedback nicht änddern kann
 
@@ -443,6 +452,30 @@ namespace BlueControls.Controls
             PointSetByUser?.Invoke(this, System.EventArgs.Empty);
         }
 
+        public void SaveData()
+        {
+            WritePointsInTags();
+            var Path = Tags.TagGet("ImageFile");
 
+
+            var pathtxt = FilenameTXT(Path);
+
+
+            if (BMP != null)
+            {
+                BMP.Save(Path, System.Drawing.Imaging.ImageFormat.Png);
+
+            }
+
+            if (Tags != null)
+            {
+                Tags.TagSet("Erstellt", modAllgemein.UserName());
+                Tags.TagSet("Datum", DateTime.Now.ToString());
+                Tags.Save(pathtxt, false);
+            }
+
+
+
+        }
     }
 }

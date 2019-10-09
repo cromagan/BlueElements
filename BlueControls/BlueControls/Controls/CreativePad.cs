@@ -65,9 +65,9 @@ namespace BlueControls.Controls
 
         private BasicPadItem _GivesMouseComandsTo;
 
-        private bool _KeyboardEditEnabled = true;
-        private bool _MouseEditEnabled = true;
-        private bool _KontextMenuEnabled = true;
+        //private bool _KeyboardEditEnabled = true;
+        //private bool _MouseEditEnabled = true;
+        //private bool _KontextMenuEnabled = true;
 
 
         public readonly int DPI = 300;
@@ -188,46 +188,46 @@ namespace BlueControls.Controls
         }
 
 
-        [DefaultValue(true)]
-        public bool KeyboardEditEnabled
-        {
-            get
-            {
-                return _KeyboardEditEnabled;
-            }
-            set
-            {
-                _KeyboardEditEnabled = value;
-                EigenschaftenDurchschleifen();
-            }
-        }
+        //[DefaultValue(true)]
+        //public bool KeyboardEditEnabled
+        //{
+        //    get
+        //    {
+        //        return _KeyboardEditEnabled;
+        //    }
+        //    set
+        //    {
+        //        _KeyboardEditEnabled = value;
+        //        EigenschaftenDurchschleifen();
+        //    }
+        //}
 
-        [DefaultValue(true)]
-        public bool MouseEditEnabled
-        {
-            get
-            {
-                return _MouseEditEnabled;
-            }
-            set
-            {
-                _MouseEditEnabled = value;
-                EigenschaftenDurchschleifen();
-            }
-        }
-        [DefaultValue(true)]
-        public bool KontextMenuEnabled
-        {
-            get
-            {
-                return _KontextMenuEnabled;
-            }
-            set
-            {
-                _KontextMenuEnabled = value;
-                EigenschaftenDurchschleifen();
-            }
-        }
+        //[DefaultValue(true)]
+        //public bool MouseEditEnabled
+        //{
+        //    get
+        //    {
+        //        return _MouseEditEnabled;
+        //    }
+        //    set
+        //    {
+        //        _MouseEditEnabled = value;
+        //        EigenschaftenDurchschleifen();
+        //    }
+        //}
+        //[DefaultValue(true)]
+        //public bool KontextMenuEnabled
+        //{
+        //    get
+        //    {
+        //        return _KontextMenuEnabled;
+        //    }
+        //    set
+        //    {
+        //        _KontextMenuEnabled = value;
+        //        EigenschaftenDurchschleifen();
+        //    }
+        //}
 
 
 
@@ -643,7 +643,7 @@ namespace BlueControls.Controls
         public void DoKeyUp(System.Windows.Forms.KeyEventArgs e)
         {
             base.OnKeyUp(e);
-            if (!_KeyboardEditEnabled) { return; }
+
 
             if (_GivesMouseComandsTo != null)
             {
@@ -806,10 +806,8 @@ namespace BlueControls.Controls
 
             if (MouseDownPos_1_1 != null && e.Button == System.Windows.Forms.MouseButtons.Left)
             {
-                if (_MouseEditEnabled)
-                {
-                    MoveItems(new PointDF(e.X / _Zoom, e.Y / _Zoom));
-                }
+                MoveItems(new PointDF(e.X / _Zoom, e.Y / _Zoom));
+
             }
         }
 
@@ -866,10 +864,9 @@ namespace BlueControls.Controls
 
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
-                if (_KontextMenuEnabled)
-                {
-                    ContextMenu_Show(this, e);
-                }
+
+                ContextMenu_Show(this, e);
+
             }
 
 
@@ -1073,7 +1070,7 @@ namespace BlueControls.Controls
 
         private void _Item_ItemAdded(object sender, ListEventArgs e)
         {
-            EigenschaftenDurchschleifen();
+            //EigenschaftenDurchschleifen();
             Changed = true;
             InvalidateOrder();
         }
@@ -2504,7 +2501,7 @@ namespace BlueControls.Controls
 
         private void RepairPrinterData()
         {
-       
+
             if (RepairPrinterData_Prepaired) { return; }
 
             RepairPrinterData_Prepaired = true;
@@ -3136,21 +3133,21 @@ namespace BlueControls.Controls
 
         }
 
-        public void EigenschaftenDurchschleifen()
-        {
+        //public void EigenschaftenDurchschleifen()
+        //{
 
-            foreach (var ThisItem in Item)
-            {
+        //    foreach (var ThisItem in Item)
+        //    {
 
-                if (ThisItem is ChildPadItem tempVar)
-                {
+        //        if (ThisItem is ChildPadItem tempVar)
+        //        {
 
-                    tempVar.PadInternal.KeyboardEditEnabled = _KeyboardEditEnabled;
-                    tempVar.PadInternal.MouseEditEnabled = _MouseEditEnabled;
-                    tempVar.PadInternal.KontextMenuEnabled = _KontextMenuEnabled;
-                }
-            }
-        }
+        //            tempVar.PadInternal.KeyboardEditEnabled = _KeyboardEditEnabled;
+        //            tempVar.PadInternal.MouseEditEnabled = _MouseEditEnabled;
+        //            tempVar.PadInternal.KontextMenuEnabled = _KontextMenuEnabled;
+        //        }
+        //    }
+        //}
 
         public static void GenerateLayoutFromRow(object sender, GenerateLayoutInternalEventargs e)
         {
