@@ -117,7 +117,7 @@ namespace BlueControls.Controls
             /// Punkte
             foreach (var ThisPoint in points)
             {
-                ThisPoint.Draw(e.G, e.Zoom, e.MoveX, e.MoveY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                ThisPoint.Draw(e.G, e.Zoom, e.MoveX, e.MoveY, enDesign.Button_EckpunktSchieber, enStates.Standard);
             }
 
 
@@ -265,7 +265,7 @@ namespace BlueControls.Controls
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            Invalidate();
+            Invalidate();           
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -291,7 +291,7 @@ namespace BlueControls.Controls
         {
             base.OnMouseLeave(e);
 
-
+            Invalidate();
         }
 
 
@@ -340,6 +340,11 @@ namespace BlueControls.Controls
             if (BMP == null) { return; }
 
 
+            var e = new PositionEventArgs(MousePos_1_1.X, MousePos_1_1.Y);
+            OnOverwriteMouseImageData(e);
+
+
+
             if (OverlayBMP == null || OverlayBMP.Width != BMP.Width || OverlayBMP.Height != BMP.Height)
             {
                 OverlayBMP = new Bitmap(BMP.Width, BMP.Height);
@@ -381,22 +386,22 @@ namespace BlueControls.Controls
 
             if (_Helper.HasFlag(enHelpers.HorizontalLine))
             {
-                TMPGR.DrawLine(Pen_RotTransp, MousePos_1_1.X, 0, MousePos_1_1.X, OverlayBMP.Height);
+                TMPGR.DrawLine(Pen_RotTransp, 0, e.Y, OverlayBMP.Width, e.Y);
 
             }
             if (_Helper.HasFlag(enHelpers.VerticalLine))
             {
-                TMPGR.DrawLine(Pen_RotTransp, 0, MousePos_1_1.Y, OverlayBMP.Width, MousePos_1_1.Y);
-
+                TMPGR.DrawLine(Pen_RotTransp, e.X, 0, e.X, OverlayBMP.Height);
             }
 
+    
 
             if (_Helper.HasFlag(enHelpers.SymetricalHorizontal))
             {
                 var h = (int)(BMP.Width / 2);
-                var x = Math.Abs(h - MousePos_1_1.X);
+                var x = Math.Abs(h - e.X);
 
-                TMPGR.DrawLine(Pen_RotTransp, h - x, MousePos_1_1.Y, h + x, MousePos_1_1.Y);
+                TMPGR.DrawLine(Pen_RotTransp, h - x, e.Y, h + x, e.Y);
 
             }
 
@@ -407,11 +412,13 @@ namespace BlueControls.Controls
                 if (!MouseDownPos_1_1.IsEmpty)
                 {
 
-                    var r = new Rectangle(Math.Min(MouseDownPos_1_1.X, MousePos_1_1.X), Math.Min(MouseDownPos_1_1.Y, MousePos_1_1.Y), Math.Abs(MouseDownPos_1_1.X - MousePos_1_1.X) + 1, Math.Abs(MouseDownPos_1_1.Y - MousePos_1_1.Y) + 1);
-                    //var r = new Rectangle((int)Math.Min(MouseDownPos_1_1.X, MousePos_1_1.X), (int)Math.Min(MouseDownPos_1_1.Y, MousePos_1_1.Y), (int)Math.Abs(MouseDownPos_1_1.X - MousePos_1_1.X) + 1, (int)Math.Abs(MouseDownPos_1_1.Y - MousePos_1_1.Y) + 1);
+                    var r = new Rectangle(Math.Min(MouseDownPos_1_1.X, e.X), Math.Min(MouseDownPos_1_1.Y, e.Y), Math.Abs(MouseDownPos_1_1.X - e.X) + 1, Math.Abs(MouseDownPos_1_1.Y - e.Y) + 1);
+                    //var r = new Rectangle((int)Math.Min(MouseDownPos_1_1.X, e.X), (int)Math.Min(MouseDownPos_1_1.Y, e.Y), (int)Math.Abs(MouseDownPos_1_1.X - e.X) + 1, (int)Math.Abs(MouseDownPos_1_1.Y - MousePos_1_1.Y) + 1);
                     TMPGR.FillRectangle(Brush_RotTransp, r);
                 }
             }
+
+            //TMPGR.DrawString(e.ToString(), new Font("Arial", 10), Brushes.Red, new Point(0, 0));
 
 
         }

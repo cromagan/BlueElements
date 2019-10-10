@@ -24,9 +24,9 @@ namespace BlueControls.Forms
 			[DebuggerStepThrough()]
 			private void InitializeComponent()
 			{
-            this.ZoomOut = new BlueControls.Controls.Button();
-            this.ZoomIn = new BlueControls.Controls.Button();
-            this.ZoomFitBut = new BlueControls.Controls.Button();
+            this.btnZoomOut = new BlueControls.Controls.Button();
+            this.btnZoomIn = new BlueControls.Controls.Button();
+            this.btnZoomFit = new BlueControls.Controls.Button();
             this.Pad = new BlueControls.Controls.CreativePad();
             this.Ribbon = new BlueControls.Controls.TabControl();
             this.Page_Start = new BlueControls.Controls.TabPage();
@@ -45,7 +45,7 @@ namespace BlueControls.Forms
             this.btnAddDimension = new BlueControls.Controls.Button();
             this.btnAddLine = new BlueControls.Controls.Button();
             this.grpWerkzeuge = new BlueControls.Controls.GroupBox();
-            this.Auswahl = new BlueControls.Controls.Button();
+            this.btnAuswahl = new BlueControls.Controls.Button();
             this.Page_Settings = new BlueControls.Controls.TabPage();
             this.Area_Assistent = new BlueControls.Controls.GroupBox();
             this.Bez_None = new BlueControls.Controls.Button();
@@ -73,35 +73,35 @@ namespace BlueControls.Forms
             this.Area_Design.SuspendLayout();
             this.SuspendLayout();
             // 
-            // ZoomOut
+            // btnZoomOut
             // 
-            this.ZoomOut.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox;
-            this.ZoomOut.ImageCode = "LupeMinus";
-            this.ZoomOut.Location = new System.Drawing.Point(120, 2);
-            this.ZoomOut.Name = "ZoomOut";
-            this.ZoomOut.Size = new System.Drawing.Size(56, 66);
-            this.ZoomOut.TabIndex = 2;
-            this.ZoomOut.Text = "kleiner";
+            this.btnZoomOut.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox;
+            this.btnZoomOut.ImageCode = "LupeMinus";
+            this.btnZoomOut.Location = new System.Drawing.Point(120, 2);
+            this.btnZoomOut.Name = "btnZoomOut";
+            this.btnZoomOut.Size = new System.Drawing.Size(56, 66);
+            this.btnZoomOut.TabIndex = 2;
+            this.btnZoomOut.Text = "kleiner";
             // 
-            // ZoomIn
+            // btnZoomIn
             // 
-            this.ZoomIn.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox;
-            this.ZoomIn.ImageCode = "LupePlus";
-            this.ZoomIn.Location = new System.Drawing.Point(176, 2);
-            this.ZoomIn.Name = "ZoomIn";
-            this.ZoomIn.Size = new System.Drawing.Size(56, 66);
-            this.ZoomIn.TabIndex = 1;
-            this.ZoomIn.Text = "größer";
+            this.btnZoomIn.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox;
+            this.btnZoomIn.ImageCode = "LupePlus";
+            this.btnZoomIn.Location = new System.Drawing.Point(176, 2);
+            this.btnZoomIn.Name = "btnZoomIn";
+            this.btnZoomIn.Size = new System.Drawing.Size(56, 66);
+            this.btnZoomIn.TabIndex = 1;
+            this.btnZoomIn.Text = "größer";
             // 
-            // ZoomFitBut
+            // btnZoomFit
             // 
-            this.ZoomFitBut.ImageCode = "ZoomFit";
-            this.ZoomFitBut.Location = new System.Drawing.Point(8, 2);
-            this.ZoomFitBut.Name = "ZoomFitBut";
-            this.ZoomFitBut.Size = new System.Drawing.Size(48, 66);
-            this.ZoomFitBut.TabIndex = 0;
-            this.ZoomFitBut.Text = "ein-passen";
-            this.ZoomFitBut.Click += new System.EventHandler(this.ZoomFitBut_Click);
+            this.btnZoomFit.ImageCode = "ZoomFit";
+            this.btnZoomFit.Location = new System.Drawing.Point(8, 2);
+            this.btnZoomFit.Name = "btnZoomFit";
+            this.btnZoomFit.Size = new System.Drawing.Size(48, 66);
+            this.btnZoomFit.TabIndex = 0;
+            this.btnZoomFit.Text = "ein-passen";
+            this.btnZoomFit.Click += new System.EventHandler(this.btnZoomFit_Click);
             // 
             // Pad
             // 
@@ -300,26 +300,26 @@ namespace BlueControls.Forms
             // grpWerkzeuge
             // 
             this.grpWerkzeuge.CausesValidation = false;
-            this.grpWerkzeuge.Controls.Add(this.Auswahl);
-            this.grpWerkzeuge.Controls.Add(this.ZoomFitBut);
-            this.grpWerkzeuge.Controls.Add(this.ZoomOut);
-            this.grpWerkzeuge.Controls.Add(this.ZoomIn);
+            this.grpWerkzeuge.Controls.Add(this.btnAuswahl);
+            this.grpWerkzeuge.Controls.Add(this.btnZoomFit);
+            this.grpWerkzeuge.Controls.Add(this.btnZoomOut);
+            this.grpWerkzeuge.Controls.Add(this.btnZoomIn);
             this.grpWerkzeuge.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpWerkzeuge.Location = new System.Drawing.Point(0, 0);
             this.grpWerkzeuge.Name = "grpWerkzeuge";
             this.grpWerkzeuge.Size = new System.Drawing.Size(240, 81);
             this.grpWerkzeuge.Text = "Werkzeuge";
             // 
-            // Auswahl
+            // btnAuswahl
             // 
-            this.Auswahl.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox;
-            this.Auswahl.Checked = true;
-            this.Auswahl.ImageCode = "Mauspfeil";
-            this.Auswahl.Location = new System.Drawing.Point(64, 2);
-            this.Auswahl.Name = "Auswahl";
-            this.Auswahl.Size = new System.Drawing.Size(56, 66);
-            this.Auswahl.TabIndex = 3;
-            this.Auswahl.Text = "wählen";
+            this.btnAuswahl.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox;
+            this.btnAuswahl.Checked = true;
+            this.btnAuswahl.ImageCode = "Mauspfeil";
+            this.btnAuswahl.Location = new System.Drawing.Point(64, 2);
+            this.btnAuswahl.Name = "btnAuswahl";
+            this.btnAuswahl.Size = new System.Drawing.Size(56, 66);
+            this.btnAuswahl.TabIndex = 3;
+            this.btnAuswahl.Text = "wählen";
             // 
             // Page_Settings
             // 
@@ -512,8 +512,8 @@ namespace BlueControls.Forms
             this.ResumeLayout(false);
 
 			}
-			private Button ZoomOut;
-			private Button Auswahl;
+			private Button btnZoomOut;
+			private Button btnAuswahl;
 			private Button btnAddText;
 			private Button btnAddImage;
 			private Button btnAddDistance;
@@ -529,8 +529,8 @@ namespace BlueControls.Forms
 			protected GroupBox Area_Design;
 			private Caption ssss;
 			protected GroupBox Area_Assistent;
-			private Button ZoomFitBut;
-			private Button ZoomIn;
+			private Button btnZoomFit;
+			private Button btnZoomIn;
 			private Button Drucken;
 			private Button Bild;
 			private Button Vorschau;

@@ -61,6 +61,7 @@ namespace BlueControls.Controls
         public event EventHandler<MouseEventArgs1_1> ImageMouseMove;
         public event EventHandler<MouseEventArgs1_1> ImageMouseUp;
         public event EventHandler<AdditionalDrawing> DoAdditionalDrawing;
+        public event EventHandler<PositionEventArgs> OverwriteMouseImageData;
         //public event EventHandler ImageMouseLeave;
 
         //private bool _IsInPic = false;
@@ -141,7 +142,6 @@ namespace BlueControls.Controls
 
             Skin.Draw_Border(TMPGR, enDesign.Table_And_Pad, state, new Rectangle(1, 1, Size.Width - SliderY.Width, Size.Height - SliderX.Height));
             gr.DrawImage(_BitmapOfControl, 0, 0);
-
         }
 
 
@@ -154,29 +154,24 @@ namespace BlueControls.Controls
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-
-
             OnImageMouseDown(GenerateNewMouseEventArgs(e));
-
         }
 
 
         private MouseEventArgs1_1 GenerateNewMouseEventArgs(MouseEventArgs e)
         {
 
-            var p = PointInsidePic(MousePos_1_1.X, MousePos_1_1.Y);
+            var en = new PositionEventArgs(MousePos_1_1.X, MousePos_1_1.Y);
+            OnOverwriteMouseImageData(en);
 
-            //if (IsInBitmap())
-            //{
-            return new MouseEventArgs1_1(e.Button, e.Clicks, MousePos_1_1.X, MousePos_1_1.Y, e.Delta, p.X, p.Y, IsInBitmap());
+            var p = PointInsidePic(en.X, en.Y);
+            return new MouseEventArgs1_1(e.Button, e.Clicks, en.X, en.Y, e.Delta, p.X, p.Y, IsInBitmap(en.X, en.Y));
 
-            //    //    x1 = Math.Max(0, x1);
-            //    //    y1 = Math.Max(0, y1);
+        }
 
-            //    //    x1 = Math.Min(BMP.Width, x1);
-            //    //    y1 = Math.Min(BMP.Height, y1);
-
-            // }
+        protected void OnOverwriteMouseImageData(PositionEventArgs e)
+        {
+            OverwriteMouseImageData?.Invoke(this, e);
         }
 
         protected virtual void OnImageMouseDown(MouseEventArgs1_1 e)
@@ -193,16 +188,20 @@ namespace BlueControls.Controls
             ImageMouseUp?.Invoke(this, e);
         }
 
+
+        private bool IsInBitmap(int X, int Y)
+        {
+            if (BMP == null) { return false; }
+            if (X < 0 || Y < 0) { return false; }
+            if (X > BMP.Width || Y > BMP.Height) { return false; }
+            return true;
+        }
+
         private bool IsInBitmap()
         {
             if (BMP == null) { return false; }
             if (MousePos_1_1 == null) { return false; }
-
-            if (MousePos_1_1.X < 0 || MousePos_1_1.Y < 0) { return false; }
-
-            if (MousePos_1_1.X > BMP.Width || MousePos_1_1.Y > BMP.Height) { return false; }
-            return true;
-
+            return IsInBitmap(MousePos_1_1.X, MousePos_1_1.Y);
         }
 
         /// <summary>

@@ -147,7 +147,7 @@ namespace BlueControls.Controls
         /// </remarks>
         protected Point KoordinatesUnscaled(System.Windows.Forms.MouseEventArgs e)
         {
-            return new Point((int)((e.X + SliderX.Value) / (double)_Zoom), (int)((e.Y + SliderY.Value) / (double)_Zoom));
+            return new Point((int)((e.X + _MoveX) / _Zoom), (int)((e.Y + _MoveY) / _Zoom));
         }
 
 

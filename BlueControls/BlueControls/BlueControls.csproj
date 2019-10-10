@@ -121,6 +121,7 @@
     <Compile Include="Enums\PadStyles.cs" />
     <Compile Include="Enums\TabControlHitTest.cs" />
     <Compile Include="EventArgs\AdditionalDrawing.cs" />
+    <Compile Include="EventArgs\PositionEventArgs.cs" />
     <Compile Include="EventArgs\MouseEventArgs1_1.cs" />
     <Compile Include="Forms-Basics\DialogWithOkAndCancel.cs">
       <SubType>Form</SubType>

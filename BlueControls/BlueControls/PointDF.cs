@@ -510,7 +510,7 @@ namespace BlueControls
 
         public PointF ZoomAndMove(decimal Zoom, decimal MoveX, decimal MoveY)
         {
-            return new PointF((float)(_x * Zoom - MoveX), (float)(_y * Zoom - MoveY));
+            return new PointF((float)(_x * Zoom - MoveX + Zoom/2), (float)(_y * Zoom - MoveY + Zoom / 2));
         }
 
 

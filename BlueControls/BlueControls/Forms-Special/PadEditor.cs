@@ -121,7 +121,7 @@ namespace BlueControls.Forms
 
 
 
-        private void ZoomFitBut_Click(object sender, System.EventArgs e)
+        private void btnZoomFit_Click(object sender, System.EventArgs e)
         {
             Pad.ZoomFit();
         }
@@ -130,8 +130,8 @@ namespace BlueControls.Forms
 
         private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (ZoomIn.Checked) { Pad.ZoomIn(e); }
-            if (ZoomOut.Checked) { Pad.ZoomOut(e); }
+            if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
+            if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
         }
 
 
