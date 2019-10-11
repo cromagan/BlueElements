@@ -98,10 +98,16 @@ namespace BluePaint
             {
 
                 ClearPreviewPic();
-                var gr = Graphics.FromImage(_PicPreview);
 
-                gr.DrawLine(Pen_RotTransp, e.TrimmedX, 0, e.TrimmedX, _Pic.Height);
-                gr.DrawLine(Pen_RotTransp, 0, e.TrimmedY, _Pic.Width, e.TrimmedY);
+
+                if (_PicPreview != null)
+                {
+                    var gr = Graphics.FromImage(_PicPreview);
+
+                    gr.DrawLine(Pen_RotTransp, e.TrimmedX, 0, e.TrimmedX, _Pic.Height);
+                    gr.DrawLine(Pen_RotTransp, 0, e.TrimmedY, _Pic.Width, e.TrimmedY);
+                }
+
             }
 
             OnPicChangedByTool();

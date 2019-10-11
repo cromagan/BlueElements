@@ -320,7 +320,7 @@ namespace BlueControls.Controls
 
             if (GetStyle(System.Windows.Forms.ControlStyles.Selectable))
             {
-                if (_MousePressing) { OnMouseUp(new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0)); }
+                //if (_MousePressing) { OnMouseUp(new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0)); }
                 _MouseHighlight = false;
                 tmpSkinRow = null;
                 base.OnLostFocus(e);

@@ -276,18 +276,6 @@ namespace BlueControls.Controls
 
         }
 
-        protected override void OnMouseUp(MouseEventArgs e)
-        {
-            base.OnMouseUp(e);
-
-        }
-
-        protected override void OnMouseEnter(System.EventArgs e)
-        {
-            base.OnMouseEnter(e);
-
-        }
-
         protected override void OnMouseLeave(System.EventArgs e)
         {
             base.OnMouseLeave(e);
@@ -406,6 +394,24 @@ namespace BlueControls.Controls
 
             }
 
+            if (_Helper.HasFlag(enHelpers.MouseDownPoint))
+            {
+
+                TMPGR.DrawEllipse(Pen_RotTransp, new Rectangle(e.X - 3, e.Y - 3, 6, 6));
+
+                if (!MouseDownPos_1_1.IsEmpty)
+                {
+                    TMPGR.DrawEllipse(Pen_RotTransp, new Rectangle(MouseDownPos_1_1.X - 3, MouseDownPos_1_1.Y - 3, 6, 6));
+                    TMPGR.DrawLine(Pen_RotTransp, new Point(e.X,e.Y), MouseDownPos_1_1);
+                }
+
+                //var h = (int)(BMP.Width / 2);
+                //var x = Math.Abs(h - e.X);
+
+                //TMPGR.DrawLine(Pen_RotTransp, h - x, e.Y, h + x, e.Y);
+
+            }
+
 
 
             if (_Helper.HasFlag(enHelpers.FilledRectancle))
@@ -422,6 +428,15 @@ namespace BlueControls.Controls
             //TMPGR.DrawString(e.ToString(), new Font("Arial", 10), Brushes.Red, new Point(0, 0));
 
 
+        }
+
+        public void PointRemove(string name)
+        {
+            var p = GetPoint(name);
+            if (p== null) { return; }
+            points.Remove(p);
+            WritePointsInTags();
+            Invalidate();
         }
 
         public void LetUserAddAPoint(string pointName, enHelpers helper, enOrientation mittelline)

@@ -303,6 +303,16 @@ namespace BlueBasics
 
         public static void GetAutoValuesForCrop(Bitmap _Pic, out int Left, out int Right, out int Top, out int Bottom, double MinBrightness)
         {
+
+            if (_Pic == null)
+            {
+                Left = 0;
+                Right = 0;
+                Top = 0;
+                Bottom = 0;
+                return;
+            }
+
             var x = 0;
             var Y = 0;
             var ExitNow = false;

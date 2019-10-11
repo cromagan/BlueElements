@@ -137,7 +137,12 @@ namespace BluePaint
         {
             CurrentTool_ForceUndoSaving(this, System.EventArgs.Empty);
             P.BMP = e.BMP;
-            P.OverlayBMP = new Bitmap(P.BMP.Width, P.BMP.Height);
+
+            if (P.BMP != null)
+            {
+                P.OverlayBMP = new Bitmap(P.BMP.Width, P.BMP.Height);
+            }
+
             P.Refresh();
 
 
@@ -320,7 +325,7 @@ namespace BluePaint
                 InfoText.Text = "";
 
             }
-           // ShowLupe(e);
+            // ShowLupe(e);
         }
 
         private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e)
