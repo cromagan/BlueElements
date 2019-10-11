@@ -806,7 +806,7 @@ namespace BlueControls.Controls
 
             if (MouseDownPos_1_1 != null && e.Button == System.Windows.Forms.MouseButtons.Left)
             {
-                MoveItems(new PointDF(e.X / _Zoom, e.Y / _Zoom));
+                MoveItems();
 
             }
         }
@@ -1497,7 +1497,7 @@ namespace BlueControls.Controls
 
 
 
-        private void MoveItems(PointDF MouseMovedTo)
+        private void MoveItems()
         {
             if (MouseDownPos_1_1 == null) { return; }
 
@@ -1508,9 +1508,10 @@ namespace BlueControls.Controls
 
             _NewAutoRelations.Clear();
 
-            var MoveX = MouseMovedTo.X - MouseDownPos_1_1.X;
-            var MoveY = MouseMovedTo.Y - MouseDownPos_1_1.Y;
+            var MoveX = (decimal)(MousePos_1_1.X - MouseDownPos_1_1.X);
+            var MoveY = (decimal)(MousePos_1_1.Y - MouseDownPos_1_1.Y);
 
+            var MouseMovedTo = new PointDF(MousePos_1_1);
 
 
             if (Move_X.Count > 0)

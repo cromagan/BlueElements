@@ -106,7 +106,7 @@ namespace BlueControls.Controls
             if (BMP != null)
             {
 
-                var r = MaxBounds().ZoomAndMoveRect(_Zoom, _MoveX, _MoveY);
+                var r =  new RectangleDF(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(_Zoom, _MoveX, _MoveY);
 
 
                 if (_Zoom < 1 || _AlwaysSmooth)

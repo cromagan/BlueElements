@@ -222,6 +222,7 @@ namespace BlueControls.Controls
         public void PointClear()
         {
             points.Clear();
+            WritePointsInTags();
             Invalidate();
         }
 

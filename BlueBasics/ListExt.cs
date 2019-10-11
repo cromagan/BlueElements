@@ -253,23 +253,33 @@ namespace BlueBasics
         public override string ToString()
         {
 
-            if (typeof(IParseable).IsAssignableFrom(typeof(T)))
+            try
             {
-                var a = new System.Text.StringBuilder();
-
-                foreach (IParseable thisP in this)
+                if (typeof(IParseable).IsAssignableFrom(typeof(T)))
                 {
-                    if (thisP != null)
+                    var a = new System.Text.StringBuilder();
+
+                    foreach (IParseable thisP in this)
                     {
-                        a.Append(thisP.ToString());
-                        a.Append("\r");
+                        if (thisP != null)
+                        {
+                            a.Append(thisP.ToString());
+                            a.Append("\r");
+                        }
                     }
+
+                    return a.ToString().TrimCr();
                 }
 
-                return a.ToString().TrimCr();
+                return base.ToString();
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
+                return ToString();
             }
 
-            return base.ToString();
+
         }
     }
 }

@@ -117,8 +117,9 @@ namespace BlueControls.Controls
             _ZoomFit = ZoomFitValue(mb, true, Size);
 
             if (_Fitting && !MousePressing()) { _Zoom = _ZoomFit; }
-            _Zoom = Math.Max(_Zoom, _ZoomFit / 1.2m);
+            _Zoom = _ZoomFit; // Math.Max(_Zoom, _ZoomFit / 1.2m);
             ComputeSliders(mb);
+            Invalidate();
         }
 
 
