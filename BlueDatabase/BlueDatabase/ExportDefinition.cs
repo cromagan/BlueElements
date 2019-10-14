@@ -445,48 +445,48 @@ namespace BlueDatabase
             }
         }
 
+        //public override string ToString()
+        //{
+
+
+        //    var Result = "{";
+
+        //    Result = Result + "Destination=" + _Verzeichnis.ToNonCritical() + ", ";
+        //    Result = Result + "Type=" + (int)_Typ + ", ";
+        //    Result = Result + "LastExportTime=" + _LastExportTime + ", ";
+
+        //    Result = Result + "Interval=" + _Intervall + ", ";
+
+        //    if (_Typ == enExportTyp.DatenbankCSVFormat || _Typ == enExportTyp.DatenbankHTMLFormat || _Typ == enExportTyp.DatenbankOriginalFormat)
+        //    {
+        //        Result = Result + "AutoDelete=" + _AutomatischLöschen + ", ";
+
+
+        //        if (_Typ != enExportTyp.DatenbankOriginalFormat)
+        //        {
+        //            Result = Result + "ExportColumnOrder=" + _ExportSpaltenAnsicht + ", ";
+        //        }
+
+        //    }
+        //    else
+        //    {
+        //        Result = Result + "exid=" + _ExportFormularID.ToNonCritical() + ", ";
+        //    }
+
+        //    if (Filter.Count() > 0)
+        //    {
+        //        Result = Result + "Filter=" + Filter + ", ";
+        //    }
+
+        //    if (_BereitsExportiert.Count > 0)
+        //    {
+        //        Result = Result + "Exported=" + _BereitsExportiert.JoinWith("#").ToNonCritical() + ", ";
+        //    }
+
+
+        //    return Result.TrimEnd(", ") + "}";
+        //}
         public override string ToString()
-        {
-
-
-            var Result = "{";
-
-            Result = Result + "Destination=" + _Verzeichnis.ToNonCritical() + ", ";
-            Result = Result + "Type=" + (int)_Typ + ", ";
-            Result = Result + "LastExportTime=" + _LastExportTime + ", ";
-
-            Result = Result + "Interval=" + _Intervall + ", ";
-
-            if (_Typ == enExportTyp.DatenbankCSVFormat || _Typ == enExportTyp.DatenbankHTMLFormat || _Typ == enExportTyp.DatenbankOriginalFormat)
-            {
-                Result = Result + "AutoDelete=" + _AutomatischLöschen + ", ";
-
-
-                if (_Typ != enExportTyp.DatenbankOriginalFormat)
-                {
-                    Result = Result + "ExportColumnOrder=" + _ExportSpaltenAnsicht + ", ";
-                }
-
-            }
-            else
-            {
-                Result = Result + "exid=" + _ExportFormularID.ToNonCritical() + ", ";
-            }
-
-            if (Filter.Count() > 0)
-            {
-                Result = Result + "Filter=" + Filter + ", ";
-            }
-
-            if (_BereitsExportiert.Count > 0)
-            {
-                Result = Result + "Exported=" + _BereitsExportiert.JoinWith("#").ToNonCritical() + ", ";
-            }
-
-
-            return Result.TrimEnd(", ") + "}";
-        }
-        public string ToString_new()
         {
 
             var shortener = GetShortener();

@@ -34,6 +34,8 @@ namespace BluePaint
 
         private void btnKontrastErhoehen_Click(object sender, System.EventArgs e)
         {
+            if (_Pic == null ) { return; }
+
             OnForceUndoSaving();
 
             var ca = new Color();
@@ -58,6 +60,7 @@ namespace BluePaint
 
         private void btnGraustufen_Click(object sender, System.EventArgs e)
         {
+            if (_Pic == null) { return; }
             OnForceUndoSaving();
             _Pic = modAllgemein.Grayscale(_Pic);
             OnPicChangedByTool();
@@ -65,6 +68,7 @@ namespace BluePaint
 
         private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e)
         {
+            if (_Pic == null) { return; }
             OnForceUndoSaving();
 
 
@@ -87,7 +91,7 @@ namespace BluePaint
 
         private void btnPixelHinzu_Click(object sender, System.EventArgs e)
         {
-
+            if (_Pic == null) { return; }
             OnForceUndoSaving();
 
             for (var x = 0 ; x < _Pic.Width - 1 ; x++)

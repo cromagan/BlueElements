@@ -274,6 +274,8 @@ namespace BlueBasics
         /// <returns></returns>
         public static Bitmap Crop(Bitmap _Pic, int Left, int Right, int Top, int Bottom)
         {
+            if (_Pic == null) { return null; }
+
             CollectGarbage();
 
             var w = Math.Max((int)(_Pic.Width - Left + Right), 1);

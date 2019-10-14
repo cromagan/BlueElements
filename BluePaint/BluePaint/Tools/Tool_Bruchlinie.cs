@@ -39,6 +39,8 @@ namespace BluePaint
 
         private void Bruch_Click(object sender, System.EventArgs e)
         {
+            if (_Pic == null ) { return; }
+
             var von = new Point();
             var Nach = new Point();
 

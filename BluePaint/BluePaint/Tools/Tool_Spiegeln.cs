@@ -35,6 +35,8 @@ namespace BluePaint
 
         private void SpiegelnH_Click(object sender, System.EventArgs e)
         {
+            if (_Pic == null ) { return; }
+
             CollectGarbage();
             var ni = new Bitmap(_Pic.Width, _Pic.Height);
             var gr = Graphics.FromImage(ni);
@@ -47,6 +49,7 @@ namespace BluePaint
 
         private void SpiegelnV_Click(object sender, System.EventArgs e)
         {
+            if (_Pic == null) { return; }
             CollectGarbage();
             var ni = new Bitmap(_Pic.Width, _Pic.Height);
             var gr = Graphics.FromImage(ni);

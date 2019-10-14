@@ -62,7 +62,9 @@ namespace BluePaint
         {
             var Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
             var Pen_RotTransp = new Pen(Color.FromArgb(50, 255, 0, 0));
-            //var NP = PointInsidePic(e);
+
+            if (_Pic == null || _PicPreview== null) { return; }
+
 
 
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
@@ -116,7 +118,7 @@ namespace BluePaint
         public override void MouseUp(MouseEventArgs1_1 e)
         {
 
-            //var NP = PointInsidePic(e);
+            if (_Pic == null || _PicPreview == null) { return; }
 
 
             if (Eleminate.Checked)

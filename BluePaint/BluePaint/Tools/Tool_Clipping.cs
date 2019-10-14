@@ -59,6 +59,8 @@ namespace BluePaint
 
         public override void MouseMove(MouseEventArgs1_1 e)
         {
+            if (_Pic == null || _PicPreview == null) { return; }
+
             var Pen_Blau = new Pen(Color.FromArgb(150, 0, 0, 255));
             ClearPreviewPic();
             //var NP = PointInsidePic(e);
@@ -79,7 +81,7 @@ namespace BluePaint
 
         public override void MouseUp(MouseEventArgs1_1 e)
         {
-            
+            if (_Pic == null || _PicPreview == null) { return; }
             _AutoCropping = true;
          //   var NP = PointInsidePic(e);
 

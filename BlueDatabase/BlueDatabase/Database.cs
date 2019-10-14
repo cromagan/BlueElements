@@ -1464,7 +1464,7 @@ namespace BlueDatabase
                     _Ansicht = (enAnsicht)int.Parse(Inhalt);
                     break;
                 case enDatabaseDataType.Tags:
-                    Tags.SplitByCR_QuickSortAndRemoveDouble(Inhalt);
+                    Tags.SplitByCR(Inhalt);
                     break;
                 case enDatabaseDataType.BinaryDataInOne:
                     Bins.Clear();

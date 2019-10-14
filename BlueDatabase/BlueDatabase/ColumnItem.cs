@@ -1625,7 +1625,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_DropDownItems: DropDownItems.SplitByCR_QuickSortAndRemoveDouble(Wert); break;
                 case enDatabaseDataType.co_Replacer: Replacer.SplitByCR(Wert); break;
                 case enDatabaseDataType.co_Regex: Regex.SplitByCR(Wert); break;
-                case enDatabaseDataType.co_Tags: Tags.SplitByCR_QuickSortAndRemoveDouble(Wert); break;
+                case enDatabaseDataType.co_Tags: Tags.SplitByCR(Wert); break;
                 case enDatabaseDataType.co_AutoFilterJoker: _AutoFilterJoker = Wert; break;
                 case enDatabaseDataType.co_PermissionGroups_ChangeCell: PermissionGroups_ChangeCell.SplitByCR_QuickSortAndRemoveDouble(Wert); break;
                 case enDatabaseDataType.co_AllowedChars: _AllowedChars = Wert; break;
@@ -2701,7 +2701,7 @@ namespace BlueDatabase
             if (string.IsNullOrEmpty(filename))
             {
                 if (!mustBeFree) { return string.Empty; }
-                filename = (_Name + DateTime.Now.ToString(Constants.Format_Date)).RemoveChars(Constants.Char_DateiSonderZeichen + " .");
+                filename = (_Name.Substring(1,1) + DateTime.Now.ToString("mm.fff")).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
             }
 
             if (filename.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
@@ -2743,7 +2743,7 @@ namespace BlueDatabase
             {
                 nr++;
                 var tmpname = cleanfilename;
-                if (nr > 0) { tmpname = tmpname + "_" + nr.ToString(Constants.Format_Integer5); }
+                if (nr > 0) { tmpname = tmpname + nr.ToString(Constants.Format_Integer2); }
                 ok = true;
 
                 foreach (var columnitem in Database.Column)
