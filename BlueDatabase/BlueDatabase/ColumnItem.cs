@@ -2701,7 +2701,7 @@ namespace BlueDatabase
             if (string.IsNullOrEmpty(filename))
             {
                 if (!mustBeFree) { return string.Empty; }
-                filename = (_Name.Substring(1,1) + DateTime.Now.ToString("mm.fff")).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
+                filename = (_Name.Substring(0,1) + DateTime.Now.ToString("mm.fff")).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
             }
 
             if (filename.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }

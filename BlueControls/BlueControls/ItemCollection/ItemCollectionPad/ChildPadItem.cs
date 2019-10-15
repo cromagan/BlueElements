@@ -241,9 +241,12 @@ namespace BlueControls.ItemCollection
         {
             if (PadInternal.Item.Count == 0) { return false; }
 
-
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
             var l2 = PadInternal.MaxBounds(ZoomItems);
+
+            
+            if (l1.Width <=0 || l2.Height <=0) { return false; }
+
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
 
@@ -277,9 +280,11 @@ namespace BlueControls.ItemCollection
         {
             if (PadInternal.Item.Count == 0) { return false; }
 
-
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
             var l2 = PadInternal.MaxBounds(ZoomItems);
+
+            if (l1.Width <= 0 || l2.Height <= 0) { return false; }
+
             decimal tZo = 1;
             if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
 
@@ -317,9 +322,11 @@ namespace BlueControls.ItemCollection
 
             if (PadInternal.Item.Count == 0) { return false; }
 
-
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
             var l2 = PadInternal.MaxBounds(ZoomItems);
+
+            if (l1.Width <= 0 || l2.Height <= 0) { return false; }
+
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
 
