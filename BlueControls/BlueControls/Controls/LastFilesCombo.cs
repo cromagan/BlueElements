@@ -152,40 +152,45 @@ namespace BlueControls.Controls
 
                 var x = LastD[Z].SplitBy("|");
 
-                if (!_mustExists || FileExists(x[0]))
+
+                if (x == null || x.count < 1 || !string.IsNullOrEmpty(x[0]))
                 {
-                    NR += 1;
-
-                    if (NR < MaxCount)
+                    if (!_mustExists || FileExists(x[0]))
                     {
-                        Vis = true;
-                        var show = (NR + 1).ToString(Constants.Format_Integer3) + ": ";
+                        NR += 1;
 
-                        if (_mustExists)
+                        if (NR < MaxCount)
                         {
-                            show = show + x[0].FileNameWithSuffix();
-                        }
-                        else
-                        {
-                            show = show + x[0];
+                            Vis = true;
+                            var show = (NR + 1).ToString(Constants.Format_Integer3) + ": ";
+
+                            if (_mustExists)
+                            {
+                                show = show + x[0].FileNameWithSuffix();
+                            }
+                            else
+                            {
+                                show = show + x[0];
+                            }
+
+                            if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]))
+                            {
+                                show = show + " - " + x[1];
+                            }
+
+                            var it = new TextListItem(false, x[0], show, NR.ToString(Constants.Format_Integer3));
+                            if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]))
+                            {
+                                it.Tags.Add(x[1]);
+                            }
+                            else
+                            {
+                                it.Tags.Add(string.Empty);
+                            }
+                            Item.Add(it);
                         }
 
-                        if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]))
-                        {
-                            show = show + " - " + x[1];
-                        }
 
-                        var it = new TextListItem(false, x[0], show, NR.ToString(Constants.Format_Integer3));
-                        if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]))
-                        {
-                            it.Tags.Add(x[1]);
-                        }
-                        else
-                        {
-                            it.Tags.Add(string.Empty);
-                        }
-
-                        Item.Add(it);
                     }
                 }
             }
