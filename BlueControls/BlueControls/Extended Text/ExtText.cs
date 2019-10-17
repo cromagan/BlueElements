@@ -1080,41 +1080,41 @@ namespace BlueControls
 
                 case "H7":
                     Stufe = 7;
-                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
 
                 case "H6":
                     Stufe = 6;
-                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
 
                 case "H5":
                     Stufe = 5;
-                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
 
                 case "H4":
                     Stufe = 4;
-                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "H3":
                     Stufe = 3;
-                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
 
                 case "H2":
                     Stufe = 2;
-                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "H1":
                     Stufe = 1;
-                    PF = Skin.Instance.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "MARKSTATE":

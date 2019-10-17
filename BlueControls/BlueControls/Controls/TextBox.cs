@@ -1348,6 +1348,9 @@ namespace BlueControls.Controls
 
             Skin.Draw_Border(TMPGR, _eTxt.Design, state, DisplayRectangle);
 
+
+      
+
             gr.DrawImage(_BitmapOfControl, 0, 0);
 
             TMPGR.Dispose();

@@ -34,17 +34,17 @@ using BlueControls.ItemCollection;
 
 namespace BlueControls
 {
-    public sealed class Skin
+    public static class Skin
     {
-        private static Database SkinDB;
+        public static Database SkinDB;
         public static Database StyleDB;
 
         private static readonly enImageCodeEffect[] ST = new enImageCodeEffect[1];
-        internal Pen Pen_LinieDünn;
-        internal Pen Pen_LinieKräftig;
-        internal Pen Pen_LinieDick;
+        internal static Pen Pen_LinieDünn;
+        internal static Pen Pen_LinieKräftig;
+        internal static Pen Pen_LinieDick;
 
-        private string _SkinString = string.Empty;
+        private static string _SkinString = string.Empty;
 
 
         public static readonly float Scale = (float)Math.Round(System.Windows.Forms.SystemInformation.VirtualScreen.Width / System.Windows.SystemParameters.VirtualScreenWidth, 2);
@@ -57,28 +57,47 @@ namespace BlueControls
         public static readonly int PaddingSmal = 3; // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
         public static readonly int Padding = 9;
 
-        private enSkin _Skin;
+        private static enSkin _Skin = enSkin.Windows_10;
 
         private static enStates SkinRow_LastState = enStates.Undefiniert;
         private static enDesign SkinRow_LastType = enDesign.Undefiniert;
         private static RowItem SkinRow_LastRow;
 
 
-        public static readonly Skin Instance = new Skin();
+        //public static readonly Skin Instance = new Skin();
 
 
-        public event EventHandler SkinChanged;
+        public static event EventHandler SkinChanged;
 
 
+        private static ColumnItem ColX1 = null;
+        private static ColumnItem ColX2 = null;
+        private static ColumnItem ColY2 = null;
+        private static ColumnItem ColY1 = null;
 
-        private Skin()
-        {
-            _Skin = enSkin.Windows_10;
-            LoadSkin(); // SkinChanged wird NICHT ausgelöst
-        }
+        private static ColumnItem col_Color_Back_1 = null;
+        private static ColumnItem col_Color_Back_2 = null;
+        private static ColumnItem col_Color_Back_3 = null;
+        private static ColumnItem col_Color_Border_1 = null;
+        private static ColumnItem col_Color_Border_2 = null;
+        private static ColumnItem col_Color_Border_3 = null;
+        private static ColumnItem col_Kontur = null;
+        private static ColumnItem col_Draw_Back = null;
+        private static ColumnItem col_Verlauf_Mitte = null;
+        private static ColumnItem col_Border_Style = null;
+
+        private static ColumnItem col_Status = null;
+        private static ColumnItem col_Font = null;
+        private static ColumnItem col_StandardPic = null;
+
+        //private Skin()
+        //{
+        //    _Skin = enSkin.Windows_10;
+        //    LoadSkin(); // SkinChanged wird NICHT ausgelöst
+        //}
 
 
-        public enSkin SkinDesign
+        public static enSkin SkinDesign
         {
             get
             {
@@ -94,7 +113,7 @@ namespace BlueControls
 
 
 
-        private void LoadSkin()
+        public static void LoadSkin()
         {
             _SkinString = _Skin.ToString();
             _SkinString = _SkinString.Replace("_", "");
@@ -109,17 +128,43 @@ namespace BlueControls
                 return;
             }
 
+
+
+
+
+            ColX1 = SkinDB.Column["X1"];
+            ColX2 = SkinDB.Column["X2"];
+            ColY1 = SkinDB.Column["Y1"];
+            ColY2 = SkinDB.Column["Y2"];
+
+            col_Color_Back_1 = SkinDB.Column["Color_Back_1"];
+            col_Color_Back_2 = SkinDB.Column["Color_Back_2"];
+            col_Color_Back_3 = SkinDB.Column["Color_Back_3"];
+            col_Color_Border_1 = SkinDB.Column["Color_Border_1"];
+            col_Color_Border_2 = SkinDB.Column["Color_Border_2"];
+            col_Color_Border_3 = SkinDB.Column["Color_Border_3"];
+            col_Kontur = SkinDB.Column["Kontur"];
+            col_Draw_Back = SkinDB.Column["Draw_Back"];
+            col_Verlauf_Mitte = SkinDB.Column["Verlauf_Mitte"];
+            col_Border_Style = SkinDB.Column["Border_Style"];
+
+            col_Status = SkinDB.Column["Status"];
+            col_Font = SkinDB.Column["Font"];
+            col_StandardPic = SkinDB.Column["StandardPic"];
+
+
             ST[0] = (enImageCodeEffect)int.Parse(SkinDB.Tags[0]);
             Pen_LinieDünn = new Pen(Color_Border(enDesign.Table_Lines_thin, enStates.Standard));
             Pen_LinieKräftig = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard));
             Pen_LinieDick = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard), 3);
 
+
             OnSkinChanged();
         }
 
-        private void OnSkinChanged()
+        private static void OnSkinChanged()
         {
-            SkinChanged?.Invoke(this, System.EventArgs.Empty);
+            SkinChanged?.Invoke(null, System.EventArgs.Empty);
         }
 
 
@@ -134,38 +179,56 @@ namespace BlueControls
 
         public static Color Color_Back(enDesign vDesign, enStates vState)
         {
-            return Color.FromArgb(int.Parse(Value(SkinRow(vDesign, vState), "Color_Back_1", "0")));
+            return Color.FromArgb(Value(SkinRow(vDesign, vState), col_Color_Back_1, 0));
         }
 
-        internal Color Color_Border(enDesign vDesign, enStates vState)
+        internal static Color Color_Border(enDesign vDesign, enStates vState)
         {
-            return Color.FromArgb(int.Parse(Value(SkinRow(vDesign, vState), "Color_Border_1", "0")));
+            return Color.FromArgb(Value(SkinRow(vDesign, vState), col_Color_Border_1, 0));
         }
 
-        private static string Value(RowItem Row, string vColumnName, string StandardValue)
+        private static int Value(RowItem row, ColumnItem column, int defaultValue)
         {
-            if (SkinDB == null || Row == null) { return StandardValue; }
-            string w = null;
-            if (Row != null)
-            {
-                w = Row.CellGetString(vColumnName);
-            }
-            else
-            {
-                w = string.Empty; // Kommt vor, wenn die Datenbank nicht savable ist, dann ist die Lastzeile bei einer newRow trotzdem nothing!
-            }
+            if (SkinDB == null || row == null) { return defaultValue; }
 
 
-            if (string.IsNullOrEmpty(w))
-            {
-                if (string.IsNullOrEmpty(StandardValue))
-                {
-                    Develop.DebugPrint("Skin-Fehler: " + Row.Database.Filename + " - " + vColumnName + " - " + Row.CellFirstString());
-                }
-                return StandardValue;
-            }
+            //if (row.CellIsNullOrEmpty(column))
+            //{
+            //    Develop.DebugPrint("Skin-Fehler: " + row.Database.Filename + " - " + column.Caption + " - " + row.CellFirstString());
+            //    return defaultValue;
+            //}
 
-            return w;
+            return row.CellGetInteger(column);
+        }
+
+        private static float Value(RowItem row, ColumnItem column, float defaultValue)
+        {
+            if (SkinDB == null || row == null) { return defaultValue; }
+
+
+            //if (row.CellIsNullOrEmpty(column))
+            //{
+            //    Develop.DebugPrint("Skin-Fehler: " + row.Database.Filename + " - " + column.Caption + " - " + row.CellFirstString());
+            //    return defaultValue;
+            //}
+
+            return (float)row.CellGetDouble(column);
+        }
+
+
+
+        private static string Value(RowItem row, ColumnItem column, string defaultValue)
+        {
+            if (SkinDB == null || row == null) { return defaultValue; }
+
+
+            //if (row.CellIsNullOrEmpty(column))
+            //{
+            //    Develop.DebugPrint("Skin-Fehler: " + row.Database.Filename + " - " + column.Caption + " - " + row.CellFirstString());
+            //    return defaultValue;
+            //}
+
+            return row.CellGetString(column);
         }
 
 
@@ -204,49 +267,35 @@ namespace BlueControls
             try
             {
                 var Need = true;
-                var X1 = 0;
-                var Y1 = 0;
-                var X2 = 0;
-                var Y2 = 0;
+                var Pads = System.Windows.Forms.Padding.Empty;
+
                 var HA = enHintergrundArt.Ohne;
 
                 if (!NeedTransparenz || cControl == null) { Need = false; }
 
 
-                var Kon = (enKontur)int.Parse(Value(cRow, "Kontur", "-1"));
+                var Kon = (enKontur)Value(cRow, col_Kontur, -1);
                 if (Kon == enKontur.Unbekannt) { Kon = enKontur.Rechteck; }
 
                 if (Kon != enKontur.Ohne)
                 {
 
-                    HA = (enHintergrundArt)int.Parse(Value(cRow, "Draw_Back", "-1"));
+                    HA = (enHintergrundArt)Value(cRow, col_Draw_Back, -1);
 
-                    X1 = int.Parse(Value(cRow, "X1", "0"));
-                    Y1 = int.Parse(Value(cRow, "Y1", "0"));
-                    X2 = int.Parse(Value(cRow, "X2", "0"));
-                    Y2 = int.Parse(Value(cRow, "Y2", "0"));
+                    Pads = Paddings(cRow);
 
-
-                    if (HA != enHintergrundArt.Ohne)
+                    if (Need && HA != enHintergrundArt.Ohne)
                     {
-                        if (Kon == enKontur.Rechteck && X1 >= 0 && X2 >= 0 && Y1 >= 0 && Y2 >= 0) { Need = false; }
-                        if (Kon == enKontur.Rechteck_R4 && X1 >= 1 && X2 >= 1 && Y1 >= 1 && Y2 >= 1) { Need = false; }
+                        if (Kon == enKontur.Rechteck && Pads.Left >= 0 && Pads.Right >= 0 && Pads.Top >= 0 && Pads.Bottom >= 0) { Need = false; }
+                        if (Kon == enKontur.Rechteck_R4 && Pads.Left >= 1 && Pads.Right >= 1 && Pads.Top >= 1 && Pads.Bottom >= 1) { Need = false; }
                     }
 
                 }
-
 
                 if (Need) { Draw_Back_Transparent(GR, r, cControl); }
 
                 if (HA == enHintergrundArt.Ohne || Kon == enKontur.Ohne) { return; }
 
-
-                r.X -= X1;
-                r.Y -= Y1;
-                r.Width += X1 + X2;
-                r.Height += Y1 + Y2;
-
-                if (r.Width < 1 || r.Height < 1) { return; }// Durchaus möglich, Creative-Pad, usereingabe
 
                 GraphicsPath PathX = null;
 
@@ -257,37 +306,40 @@ namespace BlueControls
                         break;
 
                     case enHintergrundArt.Solide:
-                        PathX = Kontur(Kon, r);
-                        var BrushX = new SolidBrush(Color.FromArgb(int.Parse(Value(cRow, "Color_Back_1", "0"))));
+                        PathX = Kontur(Kon, r, Pads);
+                        if (PathX == null) { return; }
+                        var BrushX = new SolidBrush(Color.FromArgb(Value(cRow, col_Color_Back_1, 0)));
                         GR.FillPath(BrushX, PathX);
                         break;
 
                     case enHintergrundArt.Verlauf_Vertical_2:
-                        PathX = Kontur(Kon, r);
-                        var c1 = Color.FromArgb(int.Parse(Value(cRow, "Color_Back_1", "0")));
-                        var c2 = Color.FromArgb(int.Parse(Value(cRow, "Color_Back_2", "0")));
+                        PathX = Kontur(Kon, r, Pads);
+                        if (PathX == null) { return; }
+                        var c1 = Color.FromArgb(Value(cRow, col_Color_Back_1, 0));
+                        var c2 = Color.FromArgb(Value(cRow, col_Color_Back_2, 0));
                         var lgb = new LinearGradientBrush(r, c1, c2, LinearGradientMode.Vertical);
                         GR.FillPath(lgb, PathX);
                         break;
 
                     case enHintergrundArt.Verlauf_Vertical_3:
-                        Draw_Back_Verlauf_Vertical_3(GR, cRow, r);
+                        Draw_Back_Verlauf_Vertical_3(GR, cRow, r, Pads);
                         break;
 
                     case enHintergrundArt.Verlauf_Horizontal_2:
-                        Draw_Back_Verlauf_Horizontal_2(GR, cRow, r);
+                        Draw_Back_Verlauf_Horizontal_2(GR, cRow, r, Pads);
                         break;
 
                     case enHintergrundArt.Verlauf_Horizontal_3:
-                        Draw_Back_Verlauf_Horizontal_3(GR, cRow, r);
+                        Draw_Back_Verlauf_Horizontal_3(GR, cRow, r, Pads);
                         break;
 
                     case enHintergrundArt.Verlauf_Diagonal_3:
-                        PathX = Kontur(Kon, r);
-                        var cx1 = Color.FromArgb(int.Parse(Value(cRow, "Color_Back_1", "0")));
-                        var cx2 = Color.FromArgb(int.Parse(Value(cRow, "Color_Back_2", "0")));
-                        var cx3 = Color.FromArgb(int.Parse(Value(cRow, "Color_Back_3", "0")));
-                        var PR = float.Parse(Value(cRow, "Verlauf_Mitte", "0,7"));
+                        PathX = Kontur(Kon, r, Pads);
+                        if (PathX == null) { return; }
+                        var cx1 = Color.FromArgb(Value(cRow, col_Color_Back_1, 0));
+                        var cx2 = Color.FromArgb(Value(cRow, col_Color_Back_2, 0));
+                        var cx3 = Color.FromArgb(Value(cRow, col_Color_Back_3, 0));
+                        var PR = Value(cRow, col_Verlauf_Mitte, 0.7f);
                         var lgb2 = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Bottom), cx1, cx3);
                         var cb = new ColorBlend();
                         cb.Colors = new[] { cx1, cx2, cx3 };
@@ -299,15 +351,15 @@ namespace BlueControls
                         break;
 
                     case enHintergrundArt.Glossy:
-                        Draw_Back_Glossy(GR, cRow, r);
+                        Draw_Back_Glossy(GR, cRow, r, Pads);
                         break;
 
                     case enHintergrundArt.GlossyPressed:
-                        Draw_Back_GlossyPressed(GR, cRow, r);
+                        Draw_Back_GlossyPressed(GR, cRow, r, Pads);
                         break;
 
                     case enHintergrundArt.Verlauf_Vertikal_Glanzpunkt:
-                        Draw_Back_Verlauf_Vertical_Glanzpunkt(GR, cRow, r);
+                        Draw_Back_Verlauf_Vertical_Glanzpunkt(GR, cRow, r, Pads);
                         break;
 
                     case enHintergrundArt.Unbekannt:
@@ -382,15 +434,15 @@ namespace BlueControls
 
         }
 
-        private static void Draw_Back_Verlauf_Vertical_Glanzpunkt(Graphics GR, RowItem Row, Rectangle r)
+        private static void Draw_Back_Verlauf_Vertical_Glanzpunkt(Graphics GR, RowItem Row, Rectangle r, System.Windows.Forms.Padding pads)
         {
-
+            r = ModifyRectangle(r, pads);
             LinearGradientBrush lgb = null;
             var cb = new ColorBlend();
 
-            var c1 = Color.FromArgb(int.Parse(Value(Row, "Color_Back_1", "0")));
-            var c2 = Color.FromArgb(int.Parse(Value(Row, "Color_Back_2", "0")));
-            var PR = float.Parse(Value(Row, "Verlauf_Mitte", "0,05").Replace(".", ","));
+            var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
+            var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
+            var PR = Value(Row, col_Verlauf_Mitte, 0.05f);
 
 
             if (PR < 0.06F) { PR = 0.06F; }
@@ -412,25 +464,26 @@ namespace BlueControls
             GR.FillRectangle(lgb, r);
         }
 
-        private static void Draw_Back_Verlauf_Horizontal_2(Graphics GR, RowItem Row, Rectangle r)
+        private static void Draw_Back_Verlauf_Horizontal_2(Graphics GR, RowItem Row, Rectangle r, System.Windows.Forms.Padding pads)
         {
-            var c1 = Color.FromArgb(int.Parse(Value(Row, "Color_Back_1", "0")));
-            var c2 = Color.FromArgb(int.Parse(Value(Row, "Color_Back_2", "0")));
+            r = ModifyRectangle(r, pads);
+            var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
+            var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
             var lgb = new LinearGradientBrush(r, c1, c2, LinearGradientMode.Horizontal);
             GR.FillRectangle(lgb, r);
 
         }
 
-        private static void Draw_Back_Verlauf_Horizontal_3(Graphics GR, RowItem Row, Rectangle r)
+        private static void Draw_Back_Verlauf_Horizontal_3(Graphics GR, RowItem Row, Rectangle r, System.Windows.Forms.Padding pads)
         {
-
+            r = ModifyRectangle(r, pads);
             LinearGradientBrush lgb = null;
             var cb = new ColorBlend();
 
-            var c1 = Color.FromArgb(int.Parse(Value(Row, "Color_Back_1", "0")));
-            var c2 = Color.FromArgb(int.Parse(Value(Row, "Color_Back_2", "0")));
-            var c3 = Color.FromArgb(int.Parse(Value(Row, "Color_Back_3", "0")));
-            var PR = float.Parse(Value(Row, "Verlauf_Mitte", "0,5"));
+            var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
+            var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
+            var c3 = Color.FromArgb(Value(Row, col_Color_Back_3, 0));
+            var PR = Value(Row, col_Verlauf_Mitte, 0.5f);
 
 
             lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Top), c1, c3);
@@ -445,10 +498,10 @@ namespace BlueControls
             GR.DrawLine(new Pen(c3), r.Left, r.Bottom - 1, r.Right, r.Bottom - 1);
         }
 
-        private static void Draw_Back_Glossy(Graphics GR, RowItem Row, Rectangle r)
+        private static void Draw_Back_Glossy(Graphics GR, RowItem Row, Rectangle r, System.Windows.Forms.Padding pads)
         {
-
-            var col1 = Color.FromArgb(int.Parse(Value(Row, "Color_Back_1", "0")));
+            r = ModifyRectangle(r, pads);
+            var col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
 
 
             var cb = new ColorBlend();
@@ -478,9 +531,10 @@ namespace BlueControls
 
         }
 
-        private static void Draw_Back_GlossyPressed(Graphics GR, RowItem Row, Rectangle r)
+        private static void Draw_Back_GlossyPressed(Graphics GR, RowItem Row, Rectangle r, System.Windows.Forms.Padding pads)
         {
-            var col1 = Color.FromArgb(int.Parse(Value(Row, "Color_Back_1", "0")));
+            r = ModifyRectangle(r, pads);
+            var col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
 
             LinearGradientBrush lgb = null;
             var cb = new ColorBlend();
@@ -531,9 +585,18 @@ namespace BlueControls
         #endregion
 
 
-        private static GraphicsPath Kontur(enKontur Kon, Rectangle r)
+        private static Rectangle ModifyRectangle(Rectangle orr, System.Windows.Forms.Padding pads)
+        {
+            return new Rectangle(orr.Left + pads.Left, orr.Top + pads.Top, orr.Width - pads.Left - pads.Right, orr.Height - pads.Top - pads.Bottom);
+        }
+
+
+        private static GraphicsPath Kontur(enKontur Kon, Rectangle r, System.Windows.Forms.Padding pads)
         {
 
+            r = ModifyRectangle(r, pads);
+
+            if (r.Width < 1 || r.Height < 1) { return null; }
 
             switch (Kon)
             {
@@ -577,38 +640,38 @@ namespace BlueControls
         }
 
 
+
+        private static System.Windows.Forms.Padding Paddings(RowItem Row)
+        {
+
+            return new System.Windows.Forms.Padding(Value(Row, ColX1, 0), Value(Row, ColY1, 0), Value(Row, ColX2, 0), Value(Row, ColY2, 0));
+
+
+        }
+
         public static void Draw_Border(Graphics GR, RowItem Row, Rectangle r)
         {
 
             if (Row == null) { return; }
 
-            var Kon = (enKontur)int.Parse(Value(Row, "Kontur", "-1"));
+            var Kon = (enKontur)Value(Row, col_Kontur, -1);
             if (Kon == enKontur.Ohne) { return; }
 
-            var Rahm = (enRahmenArt)int.Parse(Value(Row, "Border_Style", "-1"));
+            var Rahm = (enRahmenArt)Value(Row, col_Border_Style, -1);
             if (Rahm == enRahmenArt.Ohne) { return; }
 
 
-            if (Kon == enKontur.Unbekannt)
-            {
-                Kon = enKontur.Rechteck;
-                r.Width -= 1;
-                r.Height = -1;
-            }
-            else
-            {
-                r.X -= int.Parse(Value(Row, "X1", "0"));
-                r.Y -= int.Parse(Value(Row, "Y1", "0"));
-                r.Width += int.Parse(Value(Row, "X1", "0")) + int.Parse(Value(Row, "X2", "0")) - 1;
-                r.Height += int.Parse(Value(Row, "y1", "0")) + int.Parse(Value(Row, "Y2", "0")) - 1;
-            }
+            if (Kon == enKontur.Unbekannt) { return; }
 
-            if (r.Width < 1 || r.Height < 1) { return; }
+            var Pads = Paddings(Row);
+
+
 
 
             // PathX kann durch die ganzen Expand mal zu klein werden, dann wird nothing zurückgegeben
             GraphicsPath PathX = null;
             Pen PenX = null;
+
             try
             {
 
@@ -616,77 +679,94 @@ namespace BlueControls
                 switch (Rahm)
                 {
                     case enRahmenArt.Solide_1px:
-                        PathX = Kontur(Kon, r);
-                        PenX = new Pen(Color.FromArgb(int.Parse(Value(Row, "Color_Border_1", "0"))));
-                        if (PathX != null) { GR.DrawPath(PenX, PathX); }
+                        PathX = Kontur(Kon, r, Pads);
+                        if (PathX == null) { return; }
+
+                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_1, 0)));
+                        GR.DrawPath(PenX, PathX);
                         break;
 
                     case enRahmenArt.Solide_1px_FocusDotLine:
-                        PathX = Kontur(Kon, r);
-                        PenX = new Pen(Color.FromArgb(int.Parse(Value(Row, "Color_Border_1", "0"))));
+                        PathX = Kontur(Kon, r, Pads);
+                        if (PathX == null) { return; }
+
+                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_1, 0)));
                         GR.DrawPath(PenX, PathX);
                         r.Inflate(-3, -3);
 
-                        PathX = Kontur(Kon, r);
-                        PenX = new Pen(Color.FromArgb(int.Parse(Value(Row, "Color_Border_3", "0"))));
+                        PathX = Kontur(Kon, r, Pads);
+                        if (PathX == null) { return; }
+
+                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_3, 0)));
                         PenX.DashStyle = DashStyle.Dot;
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
 
                     case enRahmenArt.FocusDotLine:
-                        PenX = new Pen(Color.FromArgb(int.Parse(Value(Row, "Color_Border_3", "0"))));
+                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_3, 0)));
                         PenX.DashStyle = DashStyle.Dot;
                         r.Inflate(-3, -3);
-                        PathX = Kontur(Kon, r);
+
+                        PathX = Kontur(Kon, r, Pads);
+                        if (PathX == null) { return; }
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
 
                         break;
 
                     case enRahmenArt.Solide_3px:
-                        PathX = Kontur(Kon, r);
-                        PenX = new Pen(Color.FromArgb(int.Parse(Value(Row, "Color_Border_1", "0"))), 3);
-                        if (PathX != null) { GR.DrawPath(PenX, PathX); }
+                        PathX = Kontur(Kon, r, Pads);
+                        if (PathX == null) { return; }
+
+                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_1, 0)), 3);
+                        GR.DrawPath(PenX, PathX);
                         break;
 
                     case enRahmenArt.Solide_1px_DuoColor:
-                        PathX = Kontur(Kon, r);
+                        PathX = Kontur(Kon, r, Pads);
+                        if (PathX == null) { return; }
+
                         r.Inflate(-1, -1);
+
                         Draw_Border_DuoColor(GR, Row, r, false);
-                        PenX = new Pen(Color.FromArgb(int.Parse(Value(Row, "Color_Border_1", "0"))));
-                        if (PathX != null) { GR.DrawPath(PenX, PathX); }
+                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_1, 0)));
+                        GR.DrawPath(PenX, PathX);
                         break;
 
                     case enRahmenArt.Solide_1px_DuoColor_NurOben:
-                        PathX = Kontur(Kon, r);
+                        PathX = Kontur(Kon, r, Pads);
+                        if (PathX == null) { return; }
+
                         r.Inflate(-1, -1);
                         Draw_Border_DuoColor(GR, Row, r, true);
-                        PenX = new Pen(Color.FromArgb(int.Parse(Value(Row, "Color_Border_1", "0"))));
+                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_1, 0)));
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
 
                     case enRahmenArt.ShadowBox:
-                        PathX = Kontur(Kon, r);
-                        PenX = new Pen(Color.FromArgb(int.Parse(Value(Row, "Color_Border_3", "0"))), 1);
-                        if (PathX != null) { GR.DrawPath(PenX, PathX); }
+                        PathX = Kontur(Kon, r, Pads);
+                        if (PathX == null) { return; }
+                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_3, 0)), 1);
+                        GR.DrawPath(PenX, PathX);
 
 
                         r.Width -= 1;
                         r.Height -= 1;
 
-                        PathX = Kontur(Kon, r);
-                        PenX = new Pen(Color.FromArgb(int.Parse(Value(Row, "Color_Border_2", "0"))), 1);
+                        PathX = Kontur(Kon, r, Pads);
+                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_2, 0)), 1);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
 
 
                         r.Width -= 1;
                         r.Height -= 1;
-                        PathX = Kontur(Kon, r);
-                        PenX = new Pen(Color.FromArgb(int.Parse(Value(Row, "Color_Border_1", "0"))), 1);
+                        PathX = Kontur(Kon, r, Pads);
+                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_1, 0)), 1);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
 
                     default:
-                        PathX = Kontur(Kon, r);
+                        PathX = Kontur(Kon, r, Pads);
+                        if (PathX == null) { return; }
                         PenX = new Pen(Color.Red);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         Develop.DebugPrint(Rahm);
@@ -706,8 +786,8 @@ namespace BlueControls
 
             LinearGradientBrush lgb = null;
             // Dim cb As New ColorBlend
-            var c1 = Color.FromArgb(int.Parse(Value(Row, "Color_Border_2", "0")));
-            var c2 = Color.FromArgb(int.Parse(Value(Row, "Color_Border_3", "0")));
+            var c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
+            var c2 = Color.FromArgb(Value(Row, col_Color_Border_3, 0));
 
             lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Height), c1, c2);
             lgb.GammaCorrection = true;
@@ -770,7 +850,7 @@ namespace BlueControls
             BlueFont f = null;
             if (!string.IsNullOrEmpty(TXT)) { f = GetBlueFont(SkinRow); }
 
-            var State = (enStates)int.Parse(Value(SkinRow, "Status", "-1"));
+            var State = (enStates)Value(SkinRow, col_Status, -1);
             QuickImage tmpImage = null;
             if (QI != null) { tmpImage = QuickImage.Get(QI, AdditionalState(State)); }
 
@@ -918,7 +998,7 @@ namespace BlueControls
         }
 
 
-        internal BlueFont GetBlueFont(int _Design, enStates vState, RowItem RowOfStyle, int Stufe)
+        internal static BlueFont GetBlueFont(int _Design, enStates vState, RowItem RowOfStyle, int Stufe)
         {
             if (_Design > 10000)
             {
@@ -1064,20 +1144,20 @@ namespace BlueControls
 
         public static BlueFont GetBlueFont(RowItem Row)
         {
-            return BlueFont.Get(Value(Row, "Font", ErrorFont));
+            return BlueFont.Get(Value(Row, col_Font, ErrorFont));
         }
 
 
-        private static void Draw_Back_Verlauf_Vertical_3(Graphics GR, RowItem Row, Rectangle r)
+        private static void Draw_Back_Verlauf_Vertical_3(Graphics GR, RowItem Row, Rectangle r, System.Windows.Forms.Padding pads)
         {
-
+            r = ModifyRectangle(r, pads);
             LinearGradientBrush lgb = null;
             var cb = new ColorBlend();
 
-            var c1 = Color.FromArgb(int.Parse(Value(Row, "Color_Back_1", "0")));
-            var c2 = Color.FromArgb(int.Parse(Value(Row, "Color_Back_2", "0")));
-            var c3 = Color.FromArgb(int.Parse(Value(Row, "Color_Back_3", "0")));
-            var PR = float.Parse(Value(Row, "Verlauf_Mitte", "0,5"));
+            var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
+            var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
+            var c3 = Color.FromArgb(Value(Row, col_Color_Back_3, 0));
+            var PR = Value(Row, col_Verlauf_Mitte, 0.5f);
             lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c3);
 
             cb.Colors = new[] { c1, c2, c3 };
@@ -1090,9 +1170,9 @@ namespace BlueControls
         }
 
 
-        public string PicCode(RowItem _Row)
+        public static string PicCode(RowItem _Row)
         {
-            return Value(_Row, "StandardPic", "Kreuz|16");
+            return Value(_Row, col_StandardPic, "Kreuz|16");
         }
 
 

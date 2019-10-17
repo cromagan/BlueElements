@@ -66,7 +66,7 @@ namespace BlueControls.Controls
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
 
 
-            Skin.Instance.SkinChanged += SkinChanged;
+            Skin.SkinChanged += SkinChanged;
 
         }
 
@@ -74,7 +74,7 @@ namespace BlueControls.Controls
         protected override void Dispose(bool NowDisposing)
         {
 
-            Skin.Instance.SkinChanged -= SkinChanged;
+            Skin.SkinChanged -= SkinChanged;
             base.Dispose(NowDisposing);
         }
 
@@ -340,7 +340,7 @@ namespace BlueControls.Controls
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
         {
 
-            if (Skin.Instance == null) { return; }
+            if (Skin.SkinDB == null) { return; }
 
 
             if (IsRibbonBar)

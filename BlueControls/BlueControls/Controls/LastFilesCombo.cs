@@ -153,7 +153,7 @@ namespace BlueControls.Controls
                 var x = LastD[Z].SplitBy("|");
 
 
-                if (x == null || x.count < 1 || !string.IsNullOrEmpty(x[0]))
+                if (x == null || x.GetUpperBound(0) < 0 || !string.IsNullOrEmpty(x[0]))
                 {
                     if (!_mustExists || FileExists(x[0]))
                     {

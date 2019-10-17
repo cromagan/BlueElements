@@ -118,7 +118,13 @@ namespace BlueControls.Forms
             {
                 if (value == _design) { return; }
                 _design = value;
+
+                if (Skin.SkinDB == null) { Skin.LoadSkin(); }
+
                 SkinChanged(this, System.EventArgs.Empty);
+
+
+
             }
         }
 
@@ -153,7 +159,7 @@ namespace BlueControls.Forms
             if (!e.Cancel)
             {
                 IsClosed = true;
-                Skin.Instance.SkinChanged -= SkinChanged;
+                Skin.SkinChanged -= SkinChanged;
             }
         }
 
@@ -183,7 +189,7 @@ namespace BlueControls.Forms
         {
             BackColor = Skin.Color_Back(_design, enStates.Standard);
             base.OnLoad(e);
-            Skin.Instance.SkinChanged += SkinChanged;
+            Skin.SkinChanged += SkinChanged;
         }
 
 
@@ -205,9 +211,7 @@ namespace BlueControls.Forms
         private void SkinChanged(object sender, System.EventArgs e)
         {
             BackColor = Skin.Color_Back(_design, enStates.Standard);
-            SuspendLayout();
             Invalidate();
-            ResumeLayout();
         }
 
 

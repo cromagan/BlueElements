@@ -446,9 +446,9 @@ namespace BlueControls.Forms
             else
             {
 
-                if (_Database.Skin != (int)enSkin.Unverändert && (int)Skin.Instance.SkinDesign != _Database.Skin)
+                if (_Database.Skin != (int)enSkin.Unverändert && (int)Skin.SkinDesign != _Database.Skin)
                 {
-                    Skin.Instance.SkinDesign = (enSkin)_Database.Skin;
+                    Skin.SkinDesign = (enSkin)_Database.Skin;
                     Refresh();
                 }
 

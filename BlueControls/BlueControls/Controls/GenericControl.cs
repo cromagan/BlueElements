@@ -42,7 +42,7 @@ namespace BlueControls.Controls
 {
     public class GenericControl : System.Windows.Forms.Control
     {
-        protected static readonly Skin Skin = Skin.Instance;
+        //protected static readonly Skin Skin = Skin.Instance;
         protected RowItem tmpSkinRow;
 
 
@@ -215,7 +215,7 @@ namespace BlueControls.Controls
             lock (this)
             {
 
-                if (Skin.Instance == null)
+                if (Skin.SkinDB == null)
                 {
                     if (DesignMode)
                     {
@@ -601,6 +601,16 @@ namespace BlueControls.Controls
             SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
             //SetStyle(System.Windows.Forms.ControlStyles.StandardClick, false);
             //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
+        }
+
+
+
+       public override Rectangle DisplayRectangle
+        {
+
+
+            get{ return new Rectangle(0, 0, Width - 1, Height - 1); }
+       
         }
 
         protected Form ParentForm()

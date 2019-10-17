@@ -52,7 +52,7 @@ namespace BlueControls.Controls
             SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
 
-            Skin.Instance.SkinChanged += SkinChanged;
+            Skin.SkinChanged += SkinChanged;
 
         }
 
@@ -70,7 +70,7 @@ namespace BlueControls.Controls
                 //    components.Dispose()
                 //End If
             }
-            Skin.Instance.SkinChanged -= SkinChanged;
+            Skin.SkinChanged -= SkinChanged;
             base.Dispose(disposing);
         }
 
@@ -153,7 +153,7 @@ namespace BlueControls.Controls
 
         private void DoDraw(Graphics GR)
         {
-            if (Skin.Instance == null) { return; }
+            if (Skin.SkinDB == null) { return; }
             if (IsDisposed) { return; }
 
             if (Width < 1 || Height < 1) { return; }
