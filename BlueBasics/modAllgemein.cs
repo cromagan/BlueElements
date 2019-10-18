@@ -632,7 +632,7 @@ namespace BlueBasics
             GraphicsPath tempPoly_Rechteck = null;
             tempPoly_Rechteck = new GraphicsPath();
             tempPoly_Rechteck.AddRectangle(rect);
-           // tempPoly_Rechteck.CloseFigure();
+            tempPoly_Rechteck.CloseFigure();
             return tempPoly_Rechteck;
         }
 

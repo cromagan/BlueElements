@@ -244,8 +244,8 @@ namespace BlueControls.ItemCollection
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
             var l2 = PadInternal.MaxBounds(ZoomItems);
 
-            
-            if (l1.Width <=0 || l2.Height <=0) { return false; }
+
+            if (l1.Width <= 0 || l2.Height <= 0) { return false; }
 
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
@@ -374,7 +374,7 @@ namespace BlueControls.ItemCollection
         public bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY)
         {
             if (PadInternal.Item.Count == 0) { return false; }
-            PadInternal.DoKeyUp(e);
+            PadInternal.DoKeyUp(e, false);
             return true;
         }
 

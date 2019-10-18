@@ -63,12 +63,7 @@ namespace BlueControls.Controls
         /// </summary>
         int IDCount = 0;
 
-        private BasicPadItem _GivesMouseComandsTo;
-
-        //private bool _KeyboardEditEnabled = true;
-        //private bool _MouseEditEnabled = true;
-        //private bool _KontextMenuEnabled = true;
-
+        private IMouseAndKeyHandle _GivesMouseComandsTo;
 
         public readonly int DPI = 300;
 
@@ -639,10 +634,14 @@ namespace BlueControls.Controls
 
 
 
-        protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => DoKeyUp(e); // Kann nicht public gemacht werden, deswegen Umleitung
-        public void DoKeyUp(System.Windows.Forms.KeyEventArgs e)
+        protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => DoKeyUp(e, true); // Kann nicht public gemacht werden, deswegen Umleitung
+        public void DoKeyUp(System.Windows.Forms.KeyEventArgs e, bool hasbase)
         {
-            base.OnKeyUp(e);
+
+            // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
+            // Wird ein Objekt gelöscht, wird anschließend das OnKeyUp Ereignis nicht mehr ausgelöst.
+
+            if (hasbase) { base.OnKeyUp(e); }
 
 
             if (_GivesMouseComandsTo != null)
@@ -713,7 +712,7 @@ namespace BlueControls.Controls
             {
                 if (ho2.MouseDown(this, e, _Zoom, _MoveX, _MoveY))
                 {
-                    _GivesMouseComandsTo = Ho;
+                    _GivesMouseComandsTo = ho2;
                     return;
                 }
             }
@@ -797,7 +796,7 @@ namespace BlueControls.Controls
                 {
                     if (Ho2.MouseMove(this, e, _Zoom, _MoveX, _MoveY))
                     {
-                        _GivesMouseComandsTo = ho;
+                        _GivesMouseComandsTo = Ho2;
                         Invalidate();
                         return;
                     }
@@ -815,7 +814,7 @@ namespace BlueControls.Controls
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => DoMouseUp(e); // Kann nicht public gemacht werden, deswegen Umleitung
         internal void DoMouseUp(System.Windows.Forms.MouseEventArgs e)
         {
-
+            base.OnMouseUp(e);
 
 
             if (_GivesMouseComandsTo != null)
@@ -1026,9 +1025,9 @@ namespace BlueControls.Controls
 
 
 
-                if (_GivesMouseComandsTo != null)
+                if (_GivesMouseComandsTo is BasicPadItem PA)
                 {
-                    var DCoordinates = _GivesMouseComandsTo.UsedArea().ZoomAndMoveRect(zoomf, X, Y);
+                    var DCoordinates = PA.UsedArea().ZoomAndMoveRect(zoomf, X, Y);
 
                     TMPGR.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
                 }

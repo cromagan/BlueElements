@@ -30,6 +30,8 @@ namespace BlueControls.Forms
     {
         public Form()
         {
+
+            if (Skin.SkinDB == null) { Skin.LoadSkin(); }
             InitializeComponent();
         }
 
@@ -211,9 +213,10 @@ namespace BlueControls.Forms
         private void SkinChanged(object sender, System.EventArgs e)
         {
             BackColor = Skin.Color_Back(_design, enStates.Standard);
+            SuspendLayout();
             Invalidate();
+            ResumeLayout();
         }
-
 
 
 

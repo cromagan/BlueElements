@@ -603,16 +603,6 @@ namespace BlueControls.Controls
             //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
         }
 
-
-
-       public override Rectangle DisplayRectangle
-        {
-
-
-            get{ return new Rectangle(0, 0, Width - 1, Height - 1); }
-       
-        }
-
         protected Form ParentForm()
         {
             Develop.DebugPrint_Disposed(IsDisposed);
