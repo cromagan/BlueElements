@@ -95,6 +95,8 @@ namespace BlueControls.Controls
         private int Pix16 = 16;
         private int Pix18 = 18;
 
+        private Rectangle tmpCursorRect = Rectangle.Empty;
+
         private FontSelectDialog _FDia = null;
 
         private bool _ShowNumber = false;
@@ -519,8 +521,18 @@ namespace BlueControls.Controls
 
         private void Draw_Column_Cells(Graphics GR, ColumnViewItem ViewItem, Rectangle DisplayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow, int lfdno)
         {
-            // Den Cursor zeichnen
-            Draw_Cursor(GR, ViewItem, DisplayRectangleWOSlider);
+
+
+            // Die Cursorposition ermittleln
+            if (!Thread.CurrentThread.IsBackground && _CursorPosColumn != null && _CursorPosRow != null && ViewItem.Column == _CursorPosColumn)
+            {
+                if (IsOnScreen(_CursorPosColumn, _CursorPosRow, DisplayRectangleWOSlider))
+                {
+                    tmpCursorRect = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)_CursorPosRow.TMP_Y + 1, Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, Row_DrawHeight(_CursorPosRow, DisplayRectangleWOSlider) - 1);
+
+                }
+            }
+
 
 
             //  Neue Zeile 
@@ -584,6 +596,8 @@ namespace BlueControls.Controls
                     //}
                 }
             }
+
+
         }
 
         private void SliderSchalten(Rectangle DisplayR, int MaxX, int MaxY)
@@ -608,7 +622,7 @@ namespace BlueControls.Controls
 
             try
             {
-
+                tmpCursorRect = Rectangle.Empty;
 
                 if (_Database.ColumnArrangements == null || _ArrangementNr >= _Database.ColumnArrangements.Count) { return; }   // Kommt vor, dass spontan doch geparsed wird...
 
@@ -647,6 +661,10 @@ namespace BlueControls.Controls
 
                 /// Überschriften 1-3 Zeichnen
                 Draw_Column_Head_Captions(GR);
+
+
+                // Den Cursor zeichnen
+                Draw_Cursor(GR, DisplayRectangleWOSlider);
 
 
 
@@ -747,25 +765,28 @@ namespace BlueControls.Controls
             }
         }
 
-        private void Draw_Cursor(Graphics GR, ColumnViewItem ViewItem, Rectangle DisplayRectangleWOSlider)
+        private void Draw_Cursor(Graphics GR,  Rectangle DisplayRectangleWOSlider)
         {
-            if (!Thread.CurrentThread.IsBackground && _CursorPosColumn != null && _CursorPosRow != null && ViewItem.Column == _CursorPosColumn)
+
+            if (tmpCursorRect.Width < 1) { return; }
+
+
+
+            if (Focused())
             {
-                if (IsOnScreen(_CursorPosColumn, _CursorPosRow, DisplayRectangleWOSlider))
-                {
-                    var r = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)_CursorPosRow.TMP_Y + 1, Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, Row_DrawHeight(_CursorPosRow, DisplayRectangleWOSlider) - 1);
-                    if (Focused())
-                    {
-                        Skin.Draw_Back(GR, enDesign.Table_Cursor, enStates.Standard_HasFocus, r, this, false);
-                        Skin.Draw_Border(GR, enDesign.Table_Cursor, enStates.Standard_HasFocus, r);
-                    }
-                    else
-                    {
-                        Skin.Draw_Back(GR, enDesign.Table_Cursor, enStates.Standard, r, this, false);
-                        Skin.Draw_Border(GR, enDesign.Table_Cursor, enStates.Standard, r);
-                    }
-                }
+                var pen = new Pen(Skin.Color_Border(enDesign.Table_Cursor, enStates.Standard_HasFocus));
+                GR.DrawRectangle(pen, new Rectangle(-1, tmpCursorRect.Top, DisplayRectangleWOSlider.Width + 2, tmpCursorRect.Height));
+
+                Skin.Draw_Back(GR, enDesign.Table_Cursor, enStates.Standard_HasFocus, tmpCursorRect, this, false);
+                Skin.Draw_Border(GR, enDesign.Table_Cursor, enStates.Standard_HasFocus, tmpCursorRect);
             }
+            else
+            {
+                Skin.Draw_Back(GR, enDesign.Table_Cursor, enStates.Standard, tmpCursorRect, this, false);
+                Skin.Draw_Border(GR, enDesign.Table_Cursor, enStates.Standard, tmpCursorRect);
+            }
+
+
         }
 
 
@@ -2959,7 +2980,7 @@ namespace BlueControls.Controls
             if (column != null) { column = Database.Column.SearchByKey(column.Key); }
             if (row != null) { row = Database.Row.SearchByKey(row.Key); }
 
-            if (_Database.ColumnArrangements.Count ==0 || _Database.ColumnArrangements[_ArrangementNr][column] == null || !SortedRows().Contains(row))
+            if (_Database.ColumnArrangements.Count == 0 || _Database.ColumnArrangements[_ArrangementNr][column] == null || !SortedRows().Contains(row))
             {
                 column = null;
                 row = null;
