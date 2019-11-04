@@ -107,57 +107,55 @@ namespace BlueBasics
             // Open a Stream and decode a TIFF image
             var imageStreamSource = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             var l = new List<Bitmap>();
+            var frames = 1;
+
             try
             {
 
                 var decoder = new TiffBitmapDecoder(imageStreamSource, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
-
-                //var fi = new FileInfo(fileName);
-                //using (Stream documentStream = fi.OpenRead())
-                //{
-
-                //    var originalFileDecoder = new TiffBitmapDecoder(documentStream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.None);
-
+                frames = decoder.Frames.Count;
 
                 foreach (var frame in decoder.Frames)
                 {
                     l.Add(GetBitmap(frame, MaxSize));
-
-                    //var newFileEncoder = new TiffBitmapEncoder();
-                    //newFileEncoder.Frames.Add(frame);
-
-                    //using (var stream = File.Create("c:\\tiffs\\" + Guid.NewGuid().ToString() + ".tiff"))
-                    //{
-                    //    newFileEncoder.Save(stream);
-                    //}
-
-
-                    //// Draw the Image
-                    //var myImage = new System.Windows.Controls.Image();
-                    //myImage.Source = frame;
-                    //myImage.Stretch = System.Windows.Media.Stretch.None;
-                    //myImage.Margin = new System.Windows.Thickness(20);
-
-
-                    //Bitmap v = (Bitmap)myImage;
-                    //var newFileEncoder = new TiffBitmapEncoder();
-                    //newFileEncoder.Frames.Add(frame);
-
-                    //newFileEncoder.
-
-                    //    using (var stream = File.Create("c:\\tiffs\\" + Guid.NewGuid().ToString() + ".tiff"))
-                    //{
-                    //    newFileEncoder.Save(stream);
-                    //}
-
                 }
 
-
             }
-            catch (Exception ex)
+            catch 
             {
-                Develop.DebugPrint(ex);
-                l.Clear();
+
+
+                try
+                {
+                    l.Clear();
+                    CollectGarbage();
+
+                    var x = (Bitmap)Image_FromFile(fileName);
+                    l.Add(x.Resize(MaxSize, MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
+
+
+                    if (frames > 1)
+                    {
+                        var x2 = new Bitmap(200, 200);
+                        var gr = Graphics.FromImage(x2);
+                        gr.Clear(Color.White);
+                        gr.DrawString("Weitere Blätter vorhanden!", new Font("Arial", 9), Brushes.Red, new Point(0, 0));
+                        l.Add(x2);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    l.Clear();
+                    CollectGarbage();
+                    var x2 = new Bitmap(200, 200);
+                    var gr = Graphics.FromImage(x2);
+                    gr.Clear(Color.White);
+                    gr.DrawString("Vorschaubild fehlgeschlagen!", new Font("Arial", 9), Brushes.Red, new Point(0, 0));
+                    l.Add(x2);
+
+
+                    Develop.DebugPrint(ex);
+                }
 
             }
 

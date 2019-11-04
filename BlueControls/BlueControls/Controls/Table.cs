@@ -528,8 +528,8 @@ namespace BlueControls.Controls
             {
                 if (IsOnScreen(_CursorPosColumn, _CursorPosRow, DisplayRectangleWOSlider))
                 {
-                    tmpCursorRect = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)_CursorPosRow.TMP_Y + 1, Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, Row_DrawHeight(_CursorPosRow, DisplayRectangleWOSlider) - 1);
-
+                    tmpCursorRect = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1, (int)_CursorPosRow.TMP_Y+1, Column_DrawWidth(ViewItem, DisplayRectangleWOSlider), Row_DrawHeight(_CursorPosRow, DisplayRectangleWOSlider)-1);
+                    Draw_Cursor(GR, DisplayRectangleWOSlider, false);
                 }
             }
 
@@ -650,10 +650,15 @@ namespace BlueControls.Controls
 
                 Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnBackBody, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
                 Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.Cells, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnHead, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+
 
                 Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
                 Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.Cells, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+
+                // Den CursorLines zeichnen
+                Draw_Cursor(GR, DisplayRectangleWOSlider, true);
+
+                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnHead, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
                 Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnHead, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
 
 
@@ -663,8 +668,7 @@ namespace BlueControls.Controls
                 Draw_Column_Head_Captions(GR);
 
 
-                // Den Cursor zeichnen
-                Draw_Cursor(GR, DisplayRectangleWOSlider);
+
 
 
 
@@ -765,25 +769,25 @@ namespace BlueControls.Controls
             }
         }
 
-        private void Draw_Cursor(Graphics GR,  Rectangle DisplayRectangleWOSlider)
+        private void Draw_Cursor(Graphics GR, Rectangle DisplayRectangleWOSlider, bool OnlyCursorLines)
         {
 
             if (tmpCursorRect.Width < 1) { return; }
 
+            var stat = enStates.Standard;
 
+            if (Focused()) { stat = enStates.Standard_HasFocus; }
 
-            if (Focused())
+            if (OnlyCursorLines)
             {
-                var pen = new Pen(Skin.Color_Border(enDesign.Table_Cursor, enStates.Standard_HasFocus));
-                GR.DrawRectangle(pen, new Rectangle(-1, tmpCursorRect.Top, DisplayRectangleWOSlider.Width + 2, tmpCursorRect.Height));
-
-                Skin.Draw_Back(GR, enDesign.Table_Cursor, enStates.Standard_HasFocus, tmpCursorRect, this, false);
-                Skin.Draw_Border(GR, enDesign.Table_Cursor, enStates.Standard_HasFocus, tmpCursorRect);
+                var pen = new Pen(Skin.Color_Border(enDesign.Table_Cursor, stat).SetAlpha(80));
+                GR.DrawRectangle(pen, new Rectangle(-1, tmpCursorRect.Top - 1, DisplayRectangleWOSlider.Width + 2, tmpCursorRect.Height + 1));
             }
             else
             {
-                Skin.Draw_Back(GR, enDesign.Table_Cursor, enStates.Standard, tmpCursorRect, this, false);
-                Skin.Draw_Border(GR, enDesign.Table_Cursor, enStates.Standard, tmpCursorRect);
+
+                Skin.Draw_Back(GR, enDesign.Table_Cursor, stat, tmpCursorRect, this, false);
+                Skin.Draw_Border(GR, enDesign.Table_Cursor, stat, tmpCursorRect);
             }
 
 
