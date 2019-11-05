@@ -310,14 +310,14 @@ namespace BlueDatabase
                         break;
 
                     case "exp":
-                       var tmp = pair.Value.FromNonCritical().SplitBy("#");
+                        var tmp = pair.Value.FromNonCritical().SplitBy("#");
                         _BereitsExportiert.Clear();
 
                         foreach (var thise in tmp)
                         {
                             if (thise.StartsWith("@"))
                             {
-                                _BereitsExportiert.Add(shortener +  thise.TrimStart("@"));
+                                _BereitsExportiert.Add(shortener + thise.TrimStart("@"));
                             }
                             else
                             {
@@ -725,7 +725,7 @@ namespace BlueDatabase
                     if (!string.IsNullOrEmpty(_BereitsExportiert[n]))
                     {
                         var x = _BereitsExportiert[n].SplitBy("|");
-                        if (Database.Row.SearchByKey(int.Parse(x[2])) == null)
+                        if (x.GetUpperBound(0) > 1 && Database.Row.SearchByKey(int.Parse(x[2])) == null)
                         {
                             if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         }
