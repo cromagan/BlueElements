@@ -1033,8 +1033,6 @@ namespace BlueControls.Controls
                 }
 
                 TMPGR.Dispose();
-
-
             }
             catch
             {
@@ -1080,8 +1078,6 @@ namespace BlueControls.Controls
 
         private bool MoveSelectedPoints(decimal X, decimal Y)
         {
-
-
             Item.RecomputePointAndRelations();
             var Relations = AllRelations();
             var _Points = AllPoints();
