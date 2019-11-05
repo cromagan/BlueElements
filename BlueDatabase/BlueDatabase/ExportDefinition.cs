@@ -856,7 +856,7 @@ namespace BlueDatabase
 
             }
 
-            var SingleFileExport = SavePath + Database.Filename.FileNameWithoutSuffix() + "_" + DateTime.Now.ToString(Constants.Format_Date4);
+            var SingleFileExport = SavePath + Database.Filename.FileNameWithoutSuffix().StarkeVereinfachung(string.Empty) + "_" + DateTime.Now.ToString(Constants.Format_Date4);
 
 
             var Added = new List<string>();
@@ -913,12 +913,12 @@ namespace BlueDatabase
                                     {
                                         if (_ExportFormularID.StartsWith("#"))
                                         {
-                                            SingleFileExport = TempFile(SavePath, Thisrow.CellFirstString(), "PNG");
+                                            SingleFileExport = TempFile(SavePath, Thisrow.CellFirstString().StarkeVereinfachung(" "), "PNG");
                                             Export.SaveAsBitmap(Thisrow, _ExportFormularID, SingleFileExport);
                                         }
                                         else
                                         {
-                                            SingleFileExport = TempFile(SavePath, Thisrow.CellFirstString(), _ExportFormularID.FileSuffix());
+                                            SingleFileExport = TempFile(SavePath, Thisrow.CellFirstString().StarkeVereinfachung(" "), _ExportFormularID.FileSuffix());
                                             Export.SaveAs(Thisrow, _ExportFormularID, SingleFileExport);
                                         }
                                         Added.Add(SingleFileExport + "|" + tim + "|" + Thisrow.Key);

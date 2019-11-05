@@ -4346,8 +4346,8 @@ namespace BlueControls.Controls
 
                 if (VereinfachteSuche)
                 {
-                    var _Ist3 = _Ist2.StarkeVereinfachung();
-                    var _searchTXT3 = searchTXT.StarkeVereinfachung();
+                    var _Ist3 = _Ist2.StarkeVereinfachung(" ,");
+                    var _searchTXT3 = searchTXT.StarkeVereinfachung(" ,");
                     if (!string.IsNullOrEmpty(_Ist3) && _Ist3.ToLower().Contains(_searchTXT3.ToLower()))
                     {
                         foundColumn = column;

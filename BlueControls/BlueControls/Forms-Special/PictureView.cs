@@ -73,6 +73,10 @@ namespace BlueControls.Forms
 
             InitWindow(false, "", -1, "");
 
+            Pad.BMP = BMP;
+
+            Pad.ZoomFit();
+
             ZoomIn.Checked = true;
             Auswahl.Enabled = false;
         }

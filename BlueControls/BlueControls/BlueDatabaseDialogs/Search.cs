@@ -102,8 +102,8 @@ namespace BlueControls.BlueDatabaseDialogs
 
                     if (btnAehnliches.Checked)
                     {
-                        var _Ist3 = _Ist1.StarkeVereinfachung();
-                        var _searchTXT3 = searchT.StarkeVereinfachung();
+                        var _Ist3 = _Ist1.StarkeVereinfachung(" ,");
+                        var _searchTXT3 = searchT.StarkeVereinfachung(" ,");
                         if (!string.IsNullOrEmpty(_Ist3) && _Ist3.ToLower().Contains(_searchTXT3.ToLower()))
                         {
                             break;
