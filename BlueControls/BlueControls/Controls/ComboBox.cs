@@ -34,7 +34,9 @@ using System.Drawing.Imaging;
 
 namespace BlueControls.Controls
 {
-    [DefaultEvent("Item_Click")]
+
+    [Designer(typeof(BasicDesigner))]
+    [DefaultEvent("ItemClicked")]
     public partial class ComboBox : TextBox
     {
 

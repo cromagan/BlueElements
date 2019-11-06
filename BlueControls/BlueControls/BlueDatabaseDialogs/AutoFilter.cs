@@ -259,7 +259,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         }
 
-        private void FiltItems_Item_Click(object sender, BasicListItemEventArgs e)
+        private void FiltItems_ItemClicked(object sender, BasicListItemEventArgs e)
         {
 
             if (MultiAuswahlUND || MultiAuswahlODER) { return; }
@@ -368,7 +368,7 @@ namespace BlueControls.BlueDatabaseDialogs
             CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Instr | enFilterType.GroßKleinEgal, TXTBox.Text));
         }
 
-        private void sFilter_Item_Click(object sender, BasicListItemEventArgs e)
+        private void sFilter_ItemClicked(object sender, BasicListItemEventArgs e)
         {
 
 

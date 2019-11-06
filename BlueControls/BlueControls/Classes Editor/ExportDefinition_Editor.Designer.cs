@@ -96,8 +96,8 @@ namespace BlueControls.Classes_Editor
             this.ExportFilter.RemoveAllowed = true;
             this.ExportFilter.Size = new Size(328, 96);
             this.ExportFilter.TabIndex = 9;
-            this.ExportFilter.Changed += new EventHandler(ExportFilter_Changed);
-            this.ExportFilter.AddClicked += new EventHandler(this.ExportFilter_Add_Clicked);
+            this.ExportFilter.ListOrItemChanged += new EventHandler(ExportFilter_ListOrItemChanged);
+            this.ExportFilter.AddClicked += new EventHandler(this.ExportFilter_AddClicked);
             //
             //Caption24
             //
@@ -253,7 +253,7 @@ namespace BlueControls.Classes_Editor
             this.lsbExportDateien.Size = new Size(984, 232);
             this.lsbExportDateien.TabIndex = 0;
             this.lsbExportDateien.RemoveClicked += new EventHandler<ListOfBasicListItemEventArgs>(ExportDateien_RemoveClicked);
-            this.lsbExportDateien.Changed += new EventHandler(ExportDateien_Changed);
+            this.lsbExportDateien.ListOrItemChanged += new EventHandler(ExportDateien_ListOrItemChanged);
             //
             //ExportVerzeichnis
             //

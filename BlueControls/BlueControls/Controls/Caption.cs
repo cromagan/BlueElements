@@ -27,9 +27,13 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
+
+    [Designer(typeof(BasicDesigner))]
+    [DefaultEvent("Click")]
     public partial class Caption : GenericControl, IContextMenu, IQuickInfo, IBackgroundNone
     {
         public Caption()

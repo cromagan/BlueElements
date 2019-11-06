@@ -140,7 +140,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
 
-        private void Auswahl_Item_Click(object sender, BasicListItemEventArgs e)
+        private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e)
         {
 
             var x = e.Item.Internal().SplitBy("|");

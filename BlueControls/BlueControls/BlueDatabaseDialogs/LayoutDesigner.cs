@@ -199,7 +199,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         }
 
-        private void Layout1_Item_Click(object sender, BasicListItemEventArgs e)
+        private void Layout1_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             LoadLayout(e.Item.Internal());
         }
@@ -454,7 +454,7 @@ namespace BlueControls.BlueDatabaseDialogs
         }
 
 
-        private void Spalt_Item_Click(object sender, BasicListItemEventArgs e)
+        private void Spalt_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             AndereSpalteGewählt();
         }

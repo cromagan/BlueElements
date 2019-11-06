@@ -381,7 +381,7 @@ namespace BlueControls.Forms
             this.Exported.Size = new System.Drawing.Size(704, 593);
             this.Exported.TabIndex = 88;
             this.Exported.Text = "Exported";
-            this.Exported.ItemClick += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Exported_Item_Click);
+            this.Exported.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Exported_ItemClicked);
             // 
             // TabDrucken
             // 

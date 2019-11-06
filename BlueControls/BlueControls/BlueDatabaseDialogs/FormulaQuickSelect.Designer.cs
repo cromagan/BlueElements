@@ -86,7 +86,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Auswahl.QuickInfo = "";
             this.Auswahl.Size = new Size(312, 288);
             this.Auswahl.TabIndex = 3;
-            this.Auswahl.ItemClick += new EventHandler<BasicListItemEventArgs>(this.Auswahl_Item_Click);
+            this.Auswahl.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.Auswahl_ItemClicked);
             // 
             // Caption3
             // 

@@ -539,7 +539,7 @@ namespace BlueControls.Forms
         }
 
 
-        private void Drucken_Item_Click(object sender, BasicListItemEventArgs e)
+        private void Drucken_ItemClicked(object sender, BasicListItemEventArgs e)
         {
 
 
@@ -1072,7 +1072,7 @@ namespace BlueControls.Forms
 
 
 
-        private void LastDatabases_Item_Click(object sender, BasicListItemEventArgs e)
+        private void LastDatabases_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             DatabaseSet(e.Item.Internal());
         }

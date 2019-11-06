@@ -49,7 +49,7 @@ namespace BlueControls.Forms
             this.List.QuickInfo = "";
             this.List.Size = new Size(943, 673);
             this.List.TabIndex = 0;
-            this.List.ItemClick += new EventHandler<BasicListItemEventArgs>(this.List_Item_Click);
+            this.List.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.List_ItemClicked);
             // 
             // ItemSelect
             // 

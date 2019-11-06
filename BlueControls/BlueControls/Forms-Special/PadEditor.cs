@@ -214,7 +214,7 @@ namespace BlueControls.Forms
             Pad.ShowPrintPreview();
         }
 
-        private void PadDesign_Item_Click(object sender, BasicListItemEventArgs e)
+        private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             Pad.SheetStyle = e.Item.Internal();
         }

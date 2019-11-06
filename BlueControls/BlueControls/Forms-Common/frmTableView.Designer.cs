@@ -291,7 +291,7 @@ namespace BlueControls.Forms
             this.btnLetzteDateien.Size = new System.Drawing.Size(104, 66);
             this.btnLetzteDateien.TabIndex = 1;
             this.btnLetzteDateien.Text = "zuletzt geöffnete Dateien";
-            this.btnLetzteDateien.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.LastDatabases_Item_Click);
+            this.btnLetzteDateien.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.LastDatabases_ItemClicked);
             // 
             // btnOeffnen
             // 
@@ -581,7 +581,7 @@ namespace BlueControls.Forms
             this.btnDrucken.Size = new System.Drawing.Size(80, 66);
             this.btnDrucken.TabIndex = 12;
             this.btnDrucken.Text = "Drucken bzw. Export";
-            this.btnDrucken.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Drucken_Item_Click);
+            this.btnDrucken.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Drucken_ItemClicked);
             // 
             // btnLoeschen
             // 

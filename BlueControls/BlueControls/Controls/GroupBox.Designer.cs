@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace BlueControls.Controls
 {
-    public partial class GroupBox : GenericControl
+    public partial class GroupBox 
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

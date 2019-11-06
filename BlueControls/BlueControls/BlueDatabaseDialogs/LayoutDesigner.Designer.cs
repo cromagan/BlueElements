@@ -190,7 +190,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Layout1.Name = "Layout1";
             this.Layout1.Size = new System.Drawing.Size(216, 22);
             this.Layout1.TabIndex = 0;
-            this.Layout1.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Layout1_Item_Click);
+            this.Layout1.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Layout1_ItemClicked);
             // 
             // Spaltx
             // 
@@ -200,7 +200,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Spaltx.Name = "Spaltx";
             this.Spaltx.Size = new System.Drawing.Size(232, 22);
             this.Spaltx.TabIndex = 3;
-            this.Spaltx.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Spalt_Item_Click);
+            this.Spaltx.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Spalt_ItemClicked);
             // 
             // Caption4
             // 

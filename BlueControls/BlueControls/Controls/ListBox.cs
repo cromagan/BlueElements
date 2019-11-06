@@ -21,7 +21,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
 using BlueControls.Forms;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -30,10 +29,14 @@ using BlueControls.ItemCollection;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
-    public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IQuickInfo, IChangedFeedback
+
+    [Designer(typeof(BasicDesigner))]
+    [DefaultEvent("ItemClick")]
+    public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IQuickInfo
     {
 
 
@@ -81,13 +84,13 @@ namespace BlueControls.Controls
         /// </summary>
         public event EventHandler ItemRemoved;
         public event EventHandler<BasicListItemEventArgs> ItemDoubleClick;
-        public event EventHandler<BasicListItemEventArgs> ItemClick;
+        public event EventHandler<BasicListItemEventArgs> ItemClicked;
         public event EventHandler AddClicked;
         /// <summary>
         /// Wird nur ausgelöst, wenn explicit der Button gedrückt wird.
         /// </summary>
         public event EventHandler<ListOfBasicListItemEventArgs> RemoveClicked;
-        public event EventHandler Changed;
+        public event EventHandler ListOrItemChanged;
 
         #endregion
 
@@ -336,7 +339,7 @@ namespace BlueControls.Controls
                         {
                             if (ND.IsClickable()) { ND.Checked = !ND.Checked; }
                         }
-                        OnItemClick(new BasicListItemEventArgs(ND));
+                        OnItemClicked(new BasicListItemEventArgs(ND));
 
                     }
                     break;
@@ -348,9 +351,9 @@ namespace BlueControls.Controls
 
         }
 
-        private void OnItemClick(BasicListItemEventArgs e)
+        private void OnItemClicked(BasicListItemEventArgs e)
         {
-            ItemClick?.Invoke(this, e);
+            ItemClicked?.Invoke(this, e);
         }
 
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e)
@@ -480,7 +483,7 @@ namespace BlueControls.Controls
         {
             if (IsDisposed) { return; }
             Invalidate();
-            OnChanged();
+            OnListOrItemChanged();
         }
 
 
@@ -801,9 +804,9 @@ namespace BlueControls.Controls
             Invalidate();
         }
 
-        public void OnChanged()
+        public void OnListOrItemChanged()
         {
-            Changed?.Invoke(this, System.EventArgs.Empty);
+            ListOrItemChanged?.Invoke(this, System.EventArgs.Empty);
         }
     }
 }

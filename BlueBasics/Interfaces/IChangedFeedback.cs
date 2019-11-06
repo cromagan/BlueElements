@@ -25,7 +25,7 @@ namespace BlueBasics.Interfaces
     {
 
         /// <summary>
-        /// Wird ausgelöst, wenn sich ein Objet verändert.
+        /// Wird ausgelöst, wenn sich ein Objekt verändert.
         /// Wird nicht bei der Neuerstellung des Objektes oder beim Parsen ausgelöst.
         /// </summary>
         event EventHandler Changed;

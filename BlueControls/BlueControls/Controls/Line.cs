@@ -18,6 +18,7 @@
 #endregion
 
 using BlueBasics.Enums;
+using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System.ComponentModel;
@@ -25,6 +26,8 @@ using System.Drawing;
 
 namespace BlueControls.Controls
 {
+
+    [Designer(typeof(BasicDesigner))]
     public class Line : GenericControl, IBackgroundNone
     {
         public Line()

@@ -37,7 +37,7 @@ namespace BlueControls.Forms
         private BasicListItem ClickedItem;
 
 
-        private void List_Item_Click(object sender, BasicListItemEventArgs e)
+        private void List_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             ClickedItem = e.Item;
             Close();

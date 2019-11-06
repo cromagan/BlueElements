@@ -151,7 +151,7 @@ namespace BlueControls.Forms
             Close();
         }
 
-        private void Format_Item_Click(object sender, BasicListItemEventArgs e)
+        private void Format_ItemClicked(object sender, BasicListItemEventArgs e)
         {
 
             if (Doing) { return; }

@@ -638,7 +638,7 @@ namespace BlueControls.Controls
             switch (e.Control)
             {
                 case ComboBox ComboBox:
-                    ComboBox.ItemClicked += ComboBoxItemClick;
+                    ComboBox.ItemClicked += ComboBoxItemClicked;
                     ComboBox.TextChanged += ValueChanged_ComboBox;
                     break;
 
@@ -656,7 +656,7 @@ namespace BlueControls.Controls
                     break;
 
                 case ListBox ListBox:
-                    ListBox.ItemClick += ListBox_ItemClick;
+                    ListBox.ItemClicked += ListBox_ItemClicked;
                     ListBox.ItemAdded += ListBox_ItemAdded;
                     ListBox.ItemRemoved += ListBox_ItemRemoved;
                     break;
@@ -704,7 +704,7 @@ namespace BlueControls.Controls
             switch (e.Control)
             {
                 case ComboBox ComboBox:
-                    ComboBox.ItemClicked -= ComboBoxItemClick;
+                    ComboBox.ItemClicked -= ComboBoxItemClicked;
                     ComboBox.TextChanged -= ValueChanged_ComboBox;
                     break;
 
@@ -720,7 +720,7 @@ namespace BlueControls.Controls
                     break;
 
                 case ListBox ListBox:
-                    ListBox.ItemClick -= ListBox_ItemClick;
+                    ListBox.ItemClicked -= ListBox_ItemClicked;
                     ListBox.ItemAdded -= ListBox_ItemAdded;
                     ListBox.ItemRemoved -= ListBox_ItemRemoved;
                     break;
@@ -892,7 +892,7 @@ namespace BlueControls.Controls
         #region  ComboBox 
 
 
-        private void ComboBoxItemClick(object sender, BasicListItemEventArgs e)
+        private void ComboBoxItemClicked(object sender, BasicListItemEventArgs e)
         {
             Value = e.Item.Internal();
         }
@@ -946,7 +946,7 @@ namespace BlueControls.Controls
 
 
         #region  ListBox 
-        private void ListBox_ItemClick(object sender, BasicListItemEventArgs e)
+        private void ListBox_ItemClicked(object sender, BasicListItemEventArgs e)
         {
 
             ListBoxen(out var Main, out var Suggest);
@@ -1007,7 +1007,7 @@ namespace BlueControls.Controls
                 if (Main.Item.Contains((BasicListItem)e.Item)) { return; } // Es soll gerade aus dem Main entfernt werden, also Wirklich im Suggest lassen
                 if (Suggest.Item.Contains((BasicListItem)e.Item)) { return; } // Es soll gerade aus dem Main entfernt werden, also Wirklich im Suggest lassen
 
-                ListBox_ItemClick(Suggest, new BasicListItemEventArgs((BasicListItem)e.Item)); // Gleich nach oben schieben
+                ListBox_ItemClicked(Suggest, new BasicListItemEventArgs((BasicListItem)e.Item)); // Gleich nach oben schieben
                 return;
             }
             Value = Main.Item.ToListOfString().JoinWithCr();

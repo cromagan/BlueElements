@@ -30,9 +30,12 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase.EventArgs;
 using BlueControls.Enums;
+using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
+
+    [Designer(typeof(BasicDesigner))]
     [DefaultEvent("TextChanged")]
     public partial class TextBox : GenericControl, IBackgroundBitmap, IContextMenu, IQuickInfo
     {

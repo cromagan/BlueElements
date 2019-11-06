@@ -195,7 +195,7 @@ namespace BlueControls.Classes_Editor
         }
 
 
-        private void ExportFilter_Changed(object sender, System.EventArgs e)
+        private void ExportFilter_ListOrItemChanged(object sender, System.EventArgs e)
         {
             UpdateExport(false);
         }
@@ -293,7 +293,7 @@ namespace BlueControls.Classes_Editor
 
 
 
-        private void ExportFilter_Add_Clicked(object sender, System.EventArgs e)
+        private void ExportFilter_AddClicked(object sender, System.EventArgs e)
         {
             Develop.DebugPrint_NichtImplementiert();
 
@@ -311,7 +311,7 @@ namespace BlueControls.Classes_Editor
 
         }
 
-        private void ExportDateien_Changed(object sender, System.EventArgs e)
+        private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e)
         {
             UpdateExport(false);
         }

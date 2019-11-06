@@ -84,7 +84,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.FiltItems.QuickInfo = "";
             this.FiltItems.Size = new System.Drawing.Size(150, 12);
             this.FiltItems.TabIndex = 5;
-            this.FiltItems.ItemClick += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.FiltItems_Item_Click);
+            this.FiltItems.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.FiltItems_ItemClicked);
             this.FiltItems.LostFocus += new System.EventHandler(this.Something_LostFocus);
             // 
             // sFilter
@@ -99,7 +99,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.sFilter.Size = new System.Drawing.Size(150, 72);
             this.sFilter.TabIndex = 1;
             this.sFilter.Text = "Standard";
-            this.sFilter.ItemClick += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.sFilter_Item_Click);
+            this.sFilter.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.sFilter_ItemClicked);
             this.sFilter.LostFocus += new System.EventHandler(this.Something_LostFocus);
             // 
             // Was

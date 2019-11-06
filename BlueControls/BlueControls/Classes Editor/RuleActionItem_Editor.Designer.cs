@@ -101,8 +101,8 @@ namespace BlueControls.Classes_Editor
             this.Rule_Aktion_Columns.QuickInfo = "";
             this.Rule_Aktion_Columns.Size = new Size(216, 129);
             this.Rule_Aktion_Columns.TabIndex = 14;
-            this.Rule_Aktion_Columns.ItemClick += new EventHandler<BasicListItemEventArgs>(Rule_Aktion_Columns_Item_Click);
-            this.Rule_Aktion.ItemClicked += new EventHandler<BasicListItemEventArgs>(Rule_Aktion_Item_Click);
+            this.Rule_Aktion_Columns.ItemClicked += new EventHandler<BasicListItemEventArgs>(Rule_Aktion_Columns_ItemClicked);
+            this.Rule_Aktion.ItemClicked += new EventHandler<BasicListItemEventArgs>(Rule_Aktion_ItemClicked);
             this.Rule_Aktion.TextChanged += new EventHandler(Rule_Aktion_TextChanged);
             //
             //Caption12

@@ -201,7 +201,7 @@ namespace BlueControls.Forms
             this.Format.Name = "Format";
             this.Format.Size = new Size(288, 24);
             this.Format.TabIndex = 1;
-            this.Format.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.Format_Item_Click);
+            this.Format.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.Format_ItemClicked);
             // 
             // Breite
             // 

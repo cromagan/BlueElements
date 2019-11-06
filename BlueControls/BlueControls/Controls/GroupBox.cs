@@ -29,7 +29,7 @@ using BlueControls.Interfaces;
 namespace BlueControls.Controls
 {
     [Designer("System.Windows.Forms.Design.ParentControlDesigner,System.Design", typeof(IDesigner))]
-    public partial class GroupBox : IBackgroundBitmap
+    public partial class GroupBox : GenericControl, IBackgroundBitmap
     {
         public GroupBox()
         {

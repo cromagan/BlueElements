@@ -856,7 +856,7 @@ namespace BlueDatabase
 
             }
 
-            var SingleFileExport = SavePath + Database.Filename.FileNameWithoutSuffix().StarkeVereinfachung(string.Empty) + "_" + DateTime.Now.ToString(Constants.Format_Date4);
+            var SingleFileExport = SavePath + Database.Filename.FileNameWithoutSuffix().StarkeVereinfachung(" _-+") + "_" + DateTime.Now.ToString(Constants.Format_Date4);
 
 
             var Added = new List<string>();

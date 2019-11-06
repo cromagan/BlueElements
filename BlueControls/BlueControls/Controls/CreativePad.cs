@@ -36,9 +36,12 @@ using System.Drawing.Imaging;
 using System.Drawing.Printing;
 using static BlueBasics.FileOperations;
 using BlueDatabase.EventArgs;
+using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
+
+    [Designer(typeof(BasicDesigner))]
     [DefaultEvent("Click")]
     public sealed partial class CreativePad : ZoomPad, IContextMenu
     {

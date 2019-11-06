@@ -151,7 +151,7 @@ namespace BlueControls.Forms
 
         }
 
-        private void ListBox1_Item_Click(object sender, BasicListItemEventArgs e)
+        private void ListBox1_ItemClicked(object sender, BasicListItemEventArgs e)
         {
 
             // Selectet Chanched bringt nix, da es ja drum geht, ob eine Node angeklickt wurde.

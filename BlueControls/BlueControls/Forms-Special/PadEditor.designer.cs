@@ -480,7 +480,7 @@ namespace BlueControls.Forms
             this.PadDesign.Name = "PadDesign";
             this.PadDesign.Size = new System.Drawing.Size(168, 22);
             this.PadDesign.TabIndex = 1;
-            this.PadDesign.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.PadDesign_Item_Click);
+            this.PadDesign.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.PadDesign_ItemClicked);
             // 
             // ssss
             // 

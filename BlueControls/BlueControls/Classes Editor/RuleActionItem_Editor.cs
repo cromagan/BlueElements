@@ -208,12 +208,12 @@ namespace BlueControls.Classes_Editor
             OnChanged(tmp);
         }
 
-        private void Rule_Aktion_Columns_Item_Click(object sender, BasicListItemEventArgs e)
+        private void Rule_Aktion_Columns_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             WriteBack();
         }
 
-        private void Rule_Aktion_Item_Click(object sender, BasicListItemEventArgs e)
+        private void Rule_Aktion_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             WriteBack();
         }
