@@ -310,14 +310,14 @@ namespace BlueDatabase
                         break;
 
                     case "exp":
-                       var tmp = pair.Value.FromNonCritical().SplitBy("#");
+                        var tmp = pair.Value.FromNonCritical().SplitBy("#");
                         _BereitsExportiert.Clear();
 
                         foreach (var thise in tmp)
                         {
                             if (thise.StartsWith("@"))
                             {
-                                _BereitsExportiert.Add(shortener +  thise.TrimStart("@"));
+                                _BereitsExportiert.Add(shortener + thise.TrimStart("@"));
                             }
                             else
                             {
@@ -725,7 +725,7 @@ namespace BlueDatabase
                     if (!string.IsNullOrEmpty(_BereitsExportiert[n]))
                     {
                         var x = _BereitsExportiert[n].SplitBy("|");
-                        if (Database.Row.SearchByKey(int.Parse(x[2])) == null)
+                        if (x.GetUpperBound(0) > 1 && Database.Row.SearchByKey(int.Parse(x[2])) == null)
                         {
                             if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         }
@@ -856,7 +856,7 @@ namespace BlueDatabase
 
             }
 
-            var SingleFileExport = SavePath + Database.Filename.FileNameWithoutSuffix() + "_" + DateTime.Now.ToString(Constants.Format_Date4);
+            var SingleFileExport = SavePath + Database.Filename.FileNameWithoutSuffix().StarkeVereinfachung(string.Empty) + "_" + DateTime.Now.ToString(Constants.Format_Date4);
 
 
             var Added = new List<string>();
@@ -913,12 +913,12 @@ namespace BlueDatabase
                                     {
                                         if (_ExportFormularID.StartsWith("#"))
                                         {
-                                            SingleFileExport = TempFile(SavePath, Thisrow.CellFirstString(), "PNG");
+                                            SingleFileExport = TempFile(SavePath, Thisrow.CellFirstString().StarkeVereinfachung(" "), "PNG");
                                             Export.SaveAsBitmap(Thisrow, _ExportFormularID, SingleFileExport);
                                         }
                                         else
                                         {
-                                            SingleFileExport = TempFile(SavePath, Thisrow.CellFirstString(), _ExportFormularID.FileSuffix());
+                                            SingleFileExport = TempFile(SavePath, Thisrow.CellFirstString().StarkeVereinfachung(" "), _ExportFormularID.FileSuffix());
                                             Export.SaveAs(Thisrow, _ExportFormularID, SingleFileExport);
                                         }
                                         Added.Add(SingleFileExport + "|" + tim + "|" + Thisrow.Key);

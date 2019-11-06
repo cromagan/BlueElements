@@ -270,9 +270,9 @@ namespace BlueBasics
 
 
 
-        public static string StarkeVereinfachung(this string TXT)
+        public static string StarkeVereinfachung(this string TXT, string AdditinalAllowed)
         {
-            TXT = TXT.ToLower().ReduceToChars(Constants.Char_Numerals + Constants.Char_Buchstaben + " ,");
+            TXT = TXT.ToLower().ReduceToChars(Constants.Char_Numerals + Constants.Char_Buchstaben + AdditinalAllowed);
 
             TXT = TXT.Replace("ä", "ae");
             TXT = TXT.Replace("ö", "oe");
