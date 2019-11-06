@@ -36,7 +36,7 @@ namespace BlueControls.Controls
 {
 
     [Designer(typeof(BasicDesigner))]
-    [DefaultEvent("ItemClicked")]
+    [DefaultEvent("TextChanged")]
     public partial class ComboBox : TextBox
     {
 

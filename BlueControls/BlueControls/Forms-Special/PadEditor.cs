@@ -37,7 +37,7 @@ namespace BlueControls.Forms
         private readonly string _Title = string.Empty;
 
 
-        public PadEditor()
+        public PadEditor() : base()
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.

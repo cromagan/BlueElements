@@ -28,7 +28,7 @@ namespace BlueControls.Forms
 {
     public partial class Form : System.Windows.Forms.Form, BlueControls.Interfaces.IDesignAble
     {
-        public Form()
+        public Form(): base()
         {
 
             if (Skin.SkinDB == null) { Skin.LoadSkin(); }
