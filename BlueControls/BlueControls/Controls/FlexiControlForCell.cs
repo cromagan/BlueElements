@@ -31,9 +31,12 @@ using static BlueBasics.FileOperations;
 using System.Collections.Generic;
 using BlueControls.Enums;
 using System;
+using BlueControls.Designer_Support;
+using System.ComponentModel;
 
 namespace BlueControls.Controls
 {
+    [Designer(typeof(BasicDesigner))]
     public partial class FlexiControlForCell : FlexiControl, IContextMenu
     {
 
@@ -45,8 +48,6 @@ namespace BlueControls.Controls
         private int _RowKey = -1;
         private Database _Database = null;
 
-
-        private bool _IsFilling;
 
         private ColumnItem _tmpColumn = null;
         private RowItem _tmpRow = null;
@@ -64,12 +65,10 @@ namespace BlueControls.Controls
                 if (value == _RowKey) { return; }
                 FillCellNow();
 
-                _IsFilling = true;
                 _RowKey = value;
                 GetTmpVariables();
                 SetValueFromCell();
                 CheckEnabledState();
-                _IsFilling = false;
             }
         }
 
@@ -84,13 +83,11 @@ namespace BlueControls.Controls
                 if (value == _ColKey) { return; }
                 FillCellNow();
 
-                _IsFilling = true;
                 _ColKey = value;
                 GetTmpVariables();
                 UpdateColumnData();
                 SetValueFromCell();
-                CheckEnabledState();
-                _IsFilling = false;
+
             }
         }
 

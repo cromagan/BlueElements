@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using System;
 using System.ComponentModel;
@@ -24,6 +25,7 @@ using System.Drawing;
 
 namespace BlueControls.Controls
 {
+    [Designer(typeof(BasicDesigner))]
     public class ProgressBar : GenericControl
     {
         private int wProzent = 100;

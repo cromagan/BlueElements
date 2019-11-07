@@ -39,9 +39,12 @@ using System.Drawing.Text;
 using System.Linq;
 using System.Threading;
 using static BlueBasics.FileOperations;
+using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
+    [Designer(typeof(BasicDesigner))]
+    [DefaultEvent("CursorPosChanged")]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public partial class Table : GenericControl, IContextMenu, IBackgroundNone

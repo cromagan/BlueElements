@@ -19,13 +19,16 @@
 
 
 using BlueBasics;
+using BlueControls.Designer_Support;
 using BlueControls.Interfaces;
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls
 {
+    [Designer(typeof(BasicDesigner))]
     public partial class ZoomPad : GenericControl, IBackgroundBitmap
     {
         public ZoomPad()

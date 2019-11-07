@@ -35,7 +35,7 @@ namespace BlueControls.Controls
 {
 
     [Designer(typeof(BasicDesigner))]
-    [DefaultEvent("ItemClick")]
+    [DefaultEvent("ItemClicked")]
     public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IQuickInfo
     {
 

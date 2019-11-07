@@ -33,9 +33,12 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueControls.Enums;
 using System.Windows.Forms;
+using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
+    [Designer(typeof(BasicDesigner))]
+    [DefaultEvent("ValueChanged")]
     public partial class FlexiControl : IQuickInfo, IBackgroundBitmap
     {
 
@@ -43,7 +46,7 @@ namespace BlueControls.Controls
         /// <summary>
         /// Wenn True, wird ValueChanged NICHT ausgelöst
         /// </summary>
-        private bool _IsFilling;
+        protected bool _IsFilling;
 
         public readonly string ValueId;
         private string _Value;
@@ -54,7 +57,7 @@ namespace BlueControls.Controls
         private Bitmap _BitmapOfControl;
         private bool _GeneratingBitmapOfControl;
 
-
+        private int _ControlX = -1;
         private Color _Color = Color.Transparent;
         private Caption _CaptionObject;
         private Caption _InfoCaption;
@@ -319,7 +322,7 @@ namespace BlueControls.Controls
         public new bool Enabled
         {
             get
-            { 
+            {
                 foreach (System.Windows.Forms.Control ThisControl in Controls)
                 {
                     if (!ThisControl.Enabled) { return false; }
@@ -451,6 +454,24 @@ namespace BlueControls.Controls
         }
 
 
+
+
+        [DefaultValue(-1)]
+        public int ControlX
+        {
+            get
+            {
+                return _ControlX;
+            }
+            set
+            {
+                if (_ControlX == value) { return; }
+                RemoveAll(); // Controls and Events entfernen!
+                _ControlX = value;
+            }
+        }
+
+
         [DefaultValue("")]
         public string InfoText
         {
@@ -469,7 +490,7 @@ namespace BlueControls.Controls
 
 
 
-        [DefaultValue(enÜberschriftAnordnung.Über_dem_Feld)]
+        [DefaultValue(enÜberschriftAnordnung.ohne)]
         public enÜberschriftAnordnung CaptionPosition
         {
             get
@@ -883,7 +904,7 @@ namespace BlueControls.Controls
         private void UpdateValueTo_EasyPic(EasyPic Control)
         {
             if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
-            Control.FromFile(_Value);  
+            Control.FromFile(_Value);
         }
 
         #endregion
@@ -1236,7 +1257,7 @@ namespace BlueControls.Controls
                     if (!_Ist.Contains(ThisString))
                     {
 
-                        if(BlueBasics.FileOperations.FileExists(ThisString))
+                        if (BlueBasics.FileOperations.FileExists(ThisString))
                         {
 
                             if (ThisString.FileType() == enFileFormat.Image)
@@ -1484,9 +1505,9 @@ namespace BlueControls.Controls
                     break;
 
                 case enÜberschriftAnordnung.Links_neben_Dem_Feld:
-                    Control.Left = _CaptionObject.Width;
+                    Control.Left = Math.Max(_ControlX,_CaptionObject.Width);
                     Control.Top = 0;
-                    Control.Width = Width - _CaptionObject.Width;
+                    Control.Width = Width - Control.Left;
                     Control.Height = Height;
                     break;
 

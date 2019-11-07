@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -15,9 +11,11 @@ using BlueControls.ItemCollection;
 using static BlueBasics.Extensions;
 using BlueBasics;
 using BlueControls.EventArgs;
+using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
+    [Designer(typeof(BasicDesigner))]
     public partial class ZoomPicWithPoints : ZoomPic
     {
         public ZoomPicWithPoints()

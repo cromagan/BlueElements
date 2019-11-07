@@ -18,7 +18,6 @@
 #endregion
 
 
-using BlueBasics.Enums;
 using BlueControls.Enums;
 using System;
 using System.ComponentModel;
@@ -27,10 +26,11 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using BlueControls.EventArgs;
+using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
-
+    [Designer(typeof(BasicDesigner))]
     public partial class ZoomPic : ZoomPad
     {
 

@@ -33,9 +33,11 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using static BlueBasics.FileOperations;
 using static BlueBasics.Extensions;
+using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
+    [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ImageChanged")]
     public sealed partial class EasyPic : IContextMenu, IBackgroundNone
     {

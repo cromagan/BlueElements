@@ -19,6 +19,7 @@
 
 
 using BlueBasics;
+using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
@@ -29,6 +30,8 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls
 {
+    [Designer(typeof(BasicDesigner))]
+    [DefaultEvent("ItemClicked")]
     public sealed class LastFilesCombo : ComboBox
     {
 

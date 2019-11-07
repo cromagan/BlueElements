@@ -123,6 +123,9 @@
     <Compile Include="EventArgs\AdditionalDrawing.cs" />
     <Compile Include="EventArgs\PositionEventArgs.cs" />
     <Compile Include="EventArgs\MouseEventArgs1_1.cs" />
+    <Compile Include="Controls\FlexiControlForProperty.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms-Basics\DialogWithOkAndCancel.cs">
       <SubType>Form</SubType>
     </Compile>

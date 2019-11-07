@@ -33,9 +33,11 @@ using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Enums;
 using BlueControls.Enums;
+using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
+    [Designer(typeof(BasicDesigner))]
     public partial class Formula : GenericControl, IBackgroundNone, IContextMenu
     {
 

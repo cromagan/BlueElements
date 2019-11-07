@@ -33,7 +33,7 @@ using System.Drawing.Design;
 using System.Runtime.InteropServices;
 
 namespace BlueControls.Controls
-{
+{   
     [ToolboxBitmap(typeof(System.Windows.Forms.TabControl))]
     [Designer(typeof(TabControlDesigner))]
     public sealed class TabControl : System.Windows.Forms.TabControl, IContextMenu, IBackgroundNone

@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 using BlueBasics.Enums;
+using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System;
@@ -25,6 +26,7 @@ using System.Drawing;
 
 namespace BlueControls.Controls
 {
+    [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
     public partial class Slider : IBackgroundNone
     {
