@@ -79,10 +79,19 @@
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="clsMultiUserFile.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="clsSerializeable.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Enums\enAlignmentHorizontal.cs" />
     <Compile Include="Enums\enSW.cs" />
     <Compile Include="Enums\enDataFormat.cs" />
     <Compile Include="Enums\enFehlerArt.cs" />
+    <Compile Include="EventArgs\DatabaseStoppedEventArgs.cs" />
+    <Compile Include="EventArgs\LoadedEventArgs.cs" />
+    <Compile Include="EventArgs\LoadingEventArgs.cs" />
     <Compile Include="Extensions\GraphicsExtensions.cs" />
     <Compile Include="Interfaces\IObjectWithDialog.cs" />
     <Compile Include="ListExt.cs" />
@@ -146,6 +155,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="clsMultiUserFile.resx">
+      <DependentUpon>clsMultiUserFile.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

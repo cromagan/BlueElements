@@ -17,9 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
-
-namespace BlueDatabase.EventArgs
+namespace BlueBasics.EventArgs
 {
     public class LoadingEventArgs : LoadedEventArgs
     {

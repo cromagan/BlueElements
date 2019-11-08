@@ -690,7 +690,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 }
             }
 
-            x.Repair();
+            x.RepairAfterParse();
 
             x.ColumnArrangements[1].HideSystemColumns();
 

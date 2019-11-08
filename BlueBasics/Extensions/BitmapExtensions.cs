@@ -129,9 +129,19 @@ namespace BlueBasics
                         var tmp = (Bitmap)_BMPx.GetThumbnailImage((int)(_BMPx.Width / 4.0), (int)(_BMPx.Height / 4.0), null, IntPtr.Zero);
                         GR.DrawImage(tmp, (int)((_Width - nw) / 2.0), (int)((_Height - nh) / 2.0), nw, nh);
                     }
-                    else if (_BMPx.Width > 10000 && nw < 4000)
+                    else if (_BMPx.Width > 15000 && nw < 4000)
                     {
-                        var tmp = (Bitmap)_BMPx.GetThumbnailImage((int)(_BMPx.Width / 2.0), (int)(_BMPx.Height / 2.0), null, IntPtr.Zero);
+                        var tmp = (Bitmap)_BMPx.GetThumbnailImage((int)(_BMPx.Width / 3.0), (int)(_BMPx.Height / 3.0), null, IntPtr.Zero);
+                        GR.DrawImage(tmp, (int)((_Width - nw) / 2.0), (int)((_Height - nh) / 2.0), nw, nh);
+                    }
+                    else if (_BMPx.Width > 10000 && nw < 2500)
+                    {
+                        var tmp = (Bitmap)_BMPx.GetThumbnailImage((int)(_BMPx.Width / 3.0), (int)(_BMPx.Height / 3.0), null, IntPtr.Zero);
+                        GR.DrawImage(tmp, (int)((_Width - nw) / 2.0), (int)((_Height - nh) / 2.0), nw, nh);
+                    }
+                    else if (_BMPx.Width > 8000 && nw < 2000)
+                    {
+                        var tmp = (Bitmap)_BMPx.GetThumbnailImage((int)(_BMPx.Width / 2.5), (int)(_BMPx.Height / 2.5), null, IntPtr.Zero);
                         GR.DrawImage(tmp, (int)((_Width - nw) / 2.0), (int)((_Height - nh) / 2.0), nw, nh);
                     }
                     else
@@ -145,6 +155,7 @@ namespace BlueBasics
             }
             catch
             {
+                if (!CollectGarbage) { modAllgemein.CollectGarbage(); }
                 if (_SizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern)
                 {
                     return (Bitmap)_BMPx.GetThumbnailImage(nw, nh, null, IntPtr.Zero);

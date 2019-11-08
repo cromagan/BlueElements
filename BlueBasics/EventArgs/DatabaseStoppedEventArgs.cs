@@ -17,20 +17,20 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using System.Collections.Generic;
 
-
-namespace BlueDatabase.EventArgs
+namespace BlueBasics.EventArgs
 {
-    public class LoadedEventArgs : System.EventArgs
+    public class DatabaseStoppedEventArgs : System.EventArgs
     {
 
 
-        public LoadedEventArgs(bool OnlyReloaded)
+        public DatabaseStoppedEventArgs()
         {
-            this.OnlyReloaded = OnlyReloaded;
+            AllreadyStopped = new List<string>();
         }
 
-        public bool OnlyReloaded { get; set; }
+        public List<string> AllreadyStopped { get; }
 
     }
 }

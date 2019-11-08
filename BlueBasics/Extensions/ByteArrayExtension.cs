@@ -16,6 +16,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
+using System.Collections.Generic;
 using System.Text;
 
 namespace BlueBasics
@@ -26,5 +27,16 @@ namespace BlueBasics
         {
             return Encoding.Default.GetString(b);
         }
+
+        public static string ToStringConvertUTF8(this List<byte> b )
+        {
+            return Encoding.UTF8.GetString(b.ToArray());
+        }
+
+        public static string ToStringConvert(this List<byte> b)
+        {
+            return Encoding.Default.GetString(b.ToArray());
+        }
+
     }
 }

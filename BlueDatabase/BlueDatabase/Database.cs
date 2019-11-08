@@ -25,21 +25,19 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using static BlueBasics.FileOperations;
-using static BlueBasics.modAllgemein;
 
 
 namespace BlueDatabase
 {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public sealed class Database : System.Windows.Forms.Control
+    public sealed class Database : BlueBasics.clsMultiUserFile
     {
         #region  Shareds 
 
@@ -281,48 +279,6 @@ namespace BlueDatabase
 
 
 
-        public void Load(string fileName)
-        {
-
-            if (fileName.ToUpper() == Filename.ToUpper()) { return; }
-
-            if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(enFehlerArt.Fehler, "Geladene Datenbanken können nicht als neue Datenbank geladen werden."); }
-
-            if (string.IsNullOrEmpty(fileName)) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname nicht angegeben!"); }
-            fileName = modConverter.SerialNr2Path(fileName);
-
-            if (!FileExists(fileName))
-            {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Datenbank existiert nicht: " + fileName);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
-                ReadOnly = true;
-                return;
-            }
-
-            if (!CanWriteInDirectory(fileName.FilePath())) { ReadOnly = true; }
-
-
-
-
-
-            foreach (var ThisDatabase in AllDatabases)
-            {
-                if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == fileName.ToLower())
-                {
-                    ThisDatabase.Release(true, 180);
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Doppletes Laden von " + fileName);
-                }
-            }
-
-
-
-            Filename = fileName;
-
-
-            // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
-            Load_Reload();
-
-            if (ReloadNeeded()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank nicht aktuell"); }
-        }
 
         private static void OnDatabaseAdded(Database database)
         {
@@ -359,10 +315,8 @@ namespace BlueDatabase
 
 
         #region  Variablen-Deklarationen 
-        internal System.Windows.Forms.Timer Checker;
+
         private IContainer components;
-        private BackgroundWorker BinReLoader;
-        private BackgroundWorker BinSaver;
         private BackgroundWorker Backup;
 
 
@@ -371,10 +325,8 @@ namespace BlueDatabase
         public readonly RowCollection Row;
 
 
-        private bool _CheckedAndReloadNeed;
 
-        private string _LastSaveCode;
-        private DateTime _UserEditedAktion;
+
 
 
 
@@ -386,7 +338,7 @@ namespace BlueDatabase
         private string _CreateDate;
         private int _UndoCount;
 
-        private int _ReloadDelaySecond;
+
 
         private string _GlobalShowPass;
         private string _FileEncryptionKey;
@@ -400,7 +352,7 @@ namespace BlueDatabase
         private int _Skin;
         private double _GlobalScale;
 
-        public bool ReadOnly { get; private set; }
+
         public readonly ListExt<RuleItem> Rules = new ListExt<RuleItem>();
         public readonly ListExt<ColumnViewCollection> ColumnArrangements = new ListExt<ColumnViewCollection>();
         public readonly ListExt<ColumnViewCollection> Views = new ListExt<ColumnViewCollection>();
@@ -418,23 +370,17 @@ namespace BlueDatabase
         public readonly ListExt<string> Layouts = new ListExt<string>(); // Print Views werden nicht immer benötigt. Deswegen werden sie als String gespeichert. Der Richtige Typ wäre CreativePad
 
         public string UserGroup = "#Administrator";
-        public readonly string UserName = modAllgemein.UserName().ToUpper();
+
 
 
         private RowSortDefinition _sortDefinition;
-        private bool _isParsing;
-        private int _ParsedAndRepairedCount = 0;
+
 
         /// <summary>
         /// Variable nur temporär für den BinReloader, um mögliche Datenverluste zu entdecken.
         /// </summary>
         string _LastWorkItem = string.Empty;
 
-        /// <summary>
-        /// Variable wird einzig und allein vom BinWriter verändert.
-        /// Kein Reset oder Initalize verändert den Inhalt.
-        /// </summary>
-        private List<byte> Writer_BinaryData;
 
         /// <summary>
         /// Variable wird einzig und allein vom BinWriter verändert.
@@ -442,48 +388,16 @@ namespace BlueDatabase
         /// </summary>
         private List<string> Writer_FilesToDeleteLCase;
 
-        /// <summary>
-        /// Feedback-Variable, ob der Process abgeschlossen wurde. Erhällt immer den reporteden UserState, wenn Fertig.
-        /// Variable wird einzig und allein vom BinWriter verändert.
-        /// Kein Reset oder Initalize verändert den Inhalt.
-        /// </summary>
-        private string Writer_ProcessDone = string.Empty;
-
-
-
-        ///// <summary>
-        ///// Table würde eine Statische Routine enthalten, die dafür geeignet wäre.
-        ///// </summary>
-        //public readonly GetPassword _PasswordSub;
-
-        ///// <summary>
-        ///// Creative-Pad würde eine Statische Routine enthalten, die dafür geeignet wäre.
-        ///// </summary>
-        //public readonly GenerateLayout_Internal _GenerateLayout;
-
-        ///// <summary>
-        ///// Creative-Pad würde eine Statische Routine enthalten, die dafür geeignet wäre.
-        ///// </summary>
-        //public readonly RenameColumnInLayout _RenameColumnInLayout;
-
-
-
+        private string WVorher = string.Empty;
 
 
         #endregion
 
 
         #region  Event-Deklarationen 
-
-        public event EventHandler<LoadedEventArgs> Loaded;
-        public event EventHandler<LoadingEventArgs> Loading;
         public event EventHandler SortParameterChanged;
-        public event EventHandler<DatabaseStoppedEventArgs> ConnectedControlsStopAllWorking;
-        //public event EventHandler StoreView;
-        //public event EventHandler RestoreView;
         public event EventHandler ViewChanged;
-        public event EventHandler SavedToDisk;
-        public event EventHandler SaveAborded;
+
         public event CancelEventHandler Exporting;
         public event EventHandler<DatabaseSettingsEventHandler> LoadingLinkedDatabase;
 
@@ -495,18 +409,7 @@ namespace BlueDatabase
         public event EventHandler<RenameColumnInLayoutEventArgs> RenameColumnInLayout;
         public event EventHandler<GenerateLayoutInternalEventargs> GenerateLayoutInternal;
 
-
         public static event EventHandler<DatabaseGiveBackEventArgs> DatabaseAdded;
-
-        /// <summary>
-        /// Wird ausgegeben, sobals isparsed false ist, noch vor den automatischen reperaturen.
-        /// Diese Event kann verwendet werden, um die Datenbank zu reparieren, bevor sich automatische Dialoge öffnen.
-        /// </summary>
-        public event EventHandler Parsed;
-
-        //public delegate string GetPassword();
-        //public delegate string RenameColumnInLayout(Database database, string LayoutCode, string OldName, ColumnItem Column);
-        //public delegate void GenerateLayout_Internal(RowItem Row, string LayoutID, bool DirectPrint, bool DirectSave, string OptionalFilename);
 
         #endregion
 
@@ -514,7 +417,7 @@ namespace BlueDatabase
         #region  Construktor + Initialize 
 
 
-        public Database(bool readOnly)
+        public Database(bool readOnly) : base(readOnly)
         {
             AllDatabases.Add(this);
             OnDatabaseAdded(this);
@@ -523,7 +426,6 @@ namespace BlueDatabase
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            ReadOnly = readOnly;
 
             CreateControl();
             InitializeComponent();
@@ -536,7 +438,7 @@ namespace BlueDatabase
 
             FilesAfterLoadingLCase = new List<string>();
 
-            Checker_Tick_count = 0;
+
 
 
             ColumnArrangements.ListOrItemChanged += ColumnArrangements_ListOrItemChanged;
@@ -561,16 +463,14 @@ namespace BlueDatabase
             Column.ItemRemoved += Column_ItemRemoved;
 
 
-            _isParsing = true;
+            //  _isParsing = true;
             Initialize();
-            _isParsing = false;
-
-            Filename = string.Empty;
+            // _isParsing = false;
 
 
             UserGroup = "#Administrator";
 
-            Checker.Enabled = true;
+
         }
 
         public int LayoutIDToIndex(string exportFormularID)
@@ -593,41 +493,20 @@ namespace BlueDatabase
 
             Row.Initialize();
 
-
             Works.Clear();
 
             ColumnArrangements.Clear();
 
-
             Layouts.Clear();
-
-
-
             Views.Clear();
-
-
 
             Rules.Clear();
 
-
-
             PermissionGroups_NewRow.Clear();
-
-
-
             Tags.Clear();
-
-
-
             Export.Clear();
 
-
-
             Bins.Clear();
-
-            //_TryMode.Clear();
-
-
 
             DatenbankAdmin.Clear();
 
@@ -655,21 +534,14 @@ namespace BlueDatabase
 
             _sortDefinition = null;
 
-            _CheckedAndReloadNeed = true;
-            _LastSaveCode = string.Empty;
-            _UserEditedAktion = new DateTime(1900, 1, 1);
+
+  
         }
 
 
         #endregion
 
         #region  Properties 
-
-        public string Filename { get; private set; }
-
-
-
-
 
 
 
@@ -885,7 +757,7 @@ namespace BlueDatabase
 
         private void Column_ItemRemoved(object sender, System.EventArgs e)
         {
-            if (_isParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Parsing Falsch!"); }
+            if (IsParsing()) { Develop.DebugPrint(enFehlerArt.Warnung, "Parsing Falsch!"); }
             CheckViewsAndArrangements();
         }
 
@@ -894,17 +766,6 @@ namespace BlueDatabase
             var Key = ((ColumnItem)e.Item).Key;
             AddPending(enDatabaseDataType.dummyComand_RemoveColumn, Key, -1, string.Empty, Key.ToString(), false);
 
-            //var L = new List<RuleItem>();
-            //foreach (var ThisRule in Rules)
-            //{
-            //    if (ThisRule.SystemKey.StartsWith(Key + "|"))
-            //    {
-            //        L.Add(ThisRule);
-            //    }
-            //}
-
-            //if (L.Count == 0) { return; }
-            //Rules.Remove(L);
         }
 
 
@@ -990,45 +851,45 @@ namespace BlueDatabase
 
         private void DatabaseTags_ListOrItemChanged(object sender, System.EventArgs e)
         {
-            if (_isParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.Tags, -1, Tags.JoinWithCr(), false);
         }
 
         private void DatabaseAdmin_ListOrItemChanged(object sender, System.EventArgs e)
         {
-            if (_isParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.DatenbankAdmin, -1, DatenbankAdmin.JoinWithCr(), false);
         }
 
         private void PermissionGroups_NewRow_ListOrItemChanged(object sender, System.EventArgs e)
         {
-            if (_isParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.PermissionGroups_NewRow, -1, PermissionGroups_NewRow.JoinWithCr(), false);
         }
 
         private void Layouts_ListOrItemChanged(object sender, System.EventArgs e)
         {
-            if (_isParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.Layouts, -1, Layouts.JoinWithCr(), false);
         }
 
         private void Bins_ListOrItemChanged(object sender, System.EventArgs e)
         {
 
-            if (_isParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.BinaryDataInOne, -1, Bins.ToString(true), false);
         }
 
         private void Export_ListOrItemChanged(object sender, System.EventArgs e)
         {
-            if (_isParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.AutoExport, -1, Export.ToString(true), false);
         }
 
         private void Rules_ListOrItemChanged(object sender, System.EventArgs e)
         {
 
-            if (_isParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
 
             if (sender == Rules)
             {
@@ -1049,7 +910,7 @@ namespace BlueDatabase
 
         private void Views_ListOrItemChanged(object sender, System.EventArgs e)
         {
-            if (_isParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.Views, -1, Views.ToString(true), false);
         }
 
@@ -1058,57 +919,11 @@ namespace BlueDatabase
 
         private void ColumnArrangements_ListOrItemChanged(object sender, System.EventArgs e)
         {
-            if (_isParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.ColumnArrangement, -1, ColumnArrangements.ToString(true), false);
-            //OnColumnArrangementsChanged();
         }
 
 
-
-
-
-
-
-
-        public void SaveAsAndChangeTo(string NewFileName)
-        {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-
-            if (NewFileName.ToUpper() == Filename.ToUpper()) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
-
-            Release(true, 180); // Original-Datenbank speichern, die ist ja dann weg.
-            var l = ToListOfByte();
-            using (var x = new FileStream(NewFileName, FileMode.Create, FileAccess.Write, FileShare.None))
-            {
-                x.Write(l.ToArray(), 0, l.ToArray().Length);
-                x.Flush();
-                x.Close();
-            }
-            Filename = NewFileName;
-
-
-            _LastSaveCode = GetFileInfo(true);
-            _CheckedAndReloadNeed = false;
-        }
-
-
-        private string GetFileInfo(bool MustDo)
-        {
-
-            try
-            {
-                var f = new FileInfo(Filename);
-                return f.LastWriteTime.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
-            }
-            catch
-            {
-                if (!MustDo) { return string.Empty; }
-                Pause(0.5, false);
-                return GetFileInfo(MustDo);
-            }
-
-
-        }
 
 
 
@@ -1183,22 +998,17 @@ namespace BlueDatabase
 
 
 
-        public bool IsParsing()
-        {
-            return _isParsing;
-        }
 
-        private void Parse(List<byte> B)
+
+        protected override void ParseExternal(List<byte> B)
         {
-            //lock (Lock_Parsing)
-            //{
-            if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Doppelter Parse!"); }
+
             if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren"); }
 
-            _isParsing = true;
+
             Column.ThrowEvents = false;
 
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+
 
             enDatabaseDataType Art = 0;
             var Pointer = 0;
@@ -1293,7 +1103,7 @@ namespace BlueDatabase
                         B = modAllgemein.SimpleCrypt(B, e.Password, -1, Pointer, B.Count - 1);
                         if (B[Pointer] != 1 || B[Pointer + 1] != 3 || B[Pointer + 2] != 0 || B[Pointer + 3] != 0 || B[Pointer + 4] != 2 || B[Pointer + 5] != 79 || B[Pointer + 6] != 75 || B[Pointer + 7] != 1)
                         {
-                            Filename = "";
+                            RemoveFilename();
                             LoadedVersion = "9.99";
                             //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", enImageCode.Kritisch, "OK");
                             break;
@@ -1339,20 +1149,15 @@ namespace BlueDatabase
 
             Column.ThrowEvents = true;
 
-            if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { ReadOnly = true; }
+            if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
 
-            _isParsing = false;
 
-            //Repair NACH ExecutePendung, vielleicht ist es schon repariert
-            //Repair NACH _isParsing, da es auch abgespeichert werden soll
-            OnParsed();
-            Repair();
-
-            _ParsedAndRepairedCount++;
         }
 
 
-        public void Repair()
+
+
+        public override void RepairAfterParse()
         {
 
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
@@ -1703,26 +1508,7 @@ namespace BlueDatabase
         }
 
 
-        private void LoadFromStream(Stream Stream)
-        {
 
-
-            OnLoading(new LoadingEventArgs(false));
-
-            var _BLoaded = new List<byte>();
-
-
-            using (var r = new BinaryReader(Stream))
-            {
-                _BLoaded.AddRange(r.ReadBytes((int)Stream.Length));
-                r.Close();
-            }
-
-            Parse(_BLoaded);
-
-
-            OnLoaded(new LoadedEventArgs(false));
-        }
 
 
         internal void SaveToByteList(List<byte> List, enDatabaseDataType DatabaseDataType, string Content)
@@ -1811,107 +1597,35 @@ namespace BlueDatabase
         }
 
 
-        public void UnlockHard()
-        {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            if (IsSaveAble() && !BlockDateiVorhanden()) { return; }
-            Load_Reload();
-            if (BlockDateiVorhanden()) { DeleteFile(Blockdateiname(), true); }
-            Release(true, 180);
-        }
 
-        private string Blockdateiname()
-        {
-            if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
-            return Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
-        }
-
-        public bool BlockDateiVorhanden()
-        {
-            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            return FileExists(Blockdateiname());
-        }
 
 
         /// <summary>
         /// Gibt einen Fehlergrund zurück, wenn gerade eben kein Speicherzugriff auf die Datei möglich ist.
         /// </summary>
         /// <returns></returns>
-        private string SavebleErrorReason()
+        protected override string SavebleErrorReason()
         {
-            if (ReadOnly) { return "Datenbank wurde schreibgeschützt geöffnet"; }
+
+            var f = base.SavebleErrorReason();
+
+            if (!string.IsNullOrEmpty(f)) { return f; }
+
             if (Cell.Freezed) { return "Datenbank gerade eingefroren."; }
 
 
             if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."; }
 
-            if (BlockDateiVorhanden()) { return "Beim letzten Versuch, die Datei zu speichern, ist der Speichervorgang nicht korrekt beendet worden. Speichern ist solange deaktiviert, bis ein Administrator die Freigabe zum Speichern erteilt."; }
-
-
-            if (BinReLoader.IsBusy) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
             if (Backup.IsBusy) { return "Speichern aktuell nicht möglich, da gerade Sicherheitskopien erstellt werden."; }
-
-            //var f = NeedEditLockReason(null, null);
-            //if (!string.IsNullOrEmpty(f)) { return f; }
-
-
-            if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
-            if (!FileExists(Filename)) { return string.Empty; }
-
-
-
-            if (!CanWriteInDirectory(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datenbank keine Schreibrechte."; }
-
-            if (DateTime.Now.Subtract(SavebleErrorReason_WindowsOnly_lastChecked).TotalSeconds < 0) { return "Windows blockiert die Datenbank-Datei."; }
-
-
-            try
-            {
-                var f = new FileInfo(Filename);
-                if (DateTime.Now.Subtract(f.LastWriteTime).TotalSeconds < 2) { return "Anderer Speichervorgang noch nicht abgeschlossen."; }
-            }
-            catch
-            {
-                return "Dateizugriffsfehler.";
-            }
-
-
-
-            if (!CanWrite(Filename, 0.5))
-            {
-                SavebleErrorReason_WindowsOnly_lastChecked = DateTime.Now.AddSeconds(5);
-                return "Windows blockiert die Datenbank-Datei.";
-            }
-
 
 
             return string.Empty;
         }
 
 
-        public bool ReloadNeeded()
-        {
-
-            //        Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
 
-            if (string.IsNullOrEmpty(Filename)) { return false; }
-
-            if (_CheckedAndReloadNeed) { return true; }
-
-
-
-            if (GetFileInfo(false) != _LastSaveCode)
-            {
-                _CheckedAndReloadNeed = true;
-                return true;
-            }
-
-
-            return false;
-        }
-
-        public bool HasPendingChanges()
+        public override bool HasPendingChanges()
         {
             if (ReadOnly) { return false; }
 
@@ -1922,23 +1636,6 @@ namespace BlueDatabase
             return false;
         }
 
-        /// <summary>
-        /// Prüft ob gerade eben Speicherzugriff auf die Datei möglich ist.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsSaveAble()
-        {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-
-            var w = SavebleErrorReason();
-            if (!string.IsNullOrEmpty(w))
-            {
-                //if (ShowErrorMessage) { Notification.Show("<b><u>Datenbank speichern nicht möglich:</b></u><br><br>" + w + "<br><br><i>Datei: " + _FileName.FileNameWithSuffix(), enImageCode.Kritisch); }
-                return false;
-            }
-
-            return true;
-        }
 
 
 
@@ -2392,7 +2089,7 @@ namespace BlueDatabase
         }
 
 
-        private List<byte> ToListOfByte()
+        protected override List<byte> ToListOfByte()
         {
 
             try
@@ -2511,41 +2208,7 @@ namespace BlueDatabase
             }
         }
 
-        /// <summary>
-        /// Führt - falls nötig - einen Reload der Datenbank aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
-        /// </summary>
-        public void Load_Reload()
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => Load_Reload()));
-                return;
-            }
 
-            if (!ReloadNeeded()) { return; }
-
-            if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, da gerade geparst wird"); }
-            if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, Datenbankstatus eingefroren"); }
-
-            //Der View-Code muss vom Table Selbst verwaltet werden. Jede Table/Formula kann ja eine eigene Ansicht haben!
-            // Stelle sicher, dass der Prozess nicht läuft- Nur Sicherheitshalber, sollte eigentlich eh nicht sein.
-            while (BinReLoader.IsBusy) { Develop.DoEvents(); }
-
-            BinReLoader_DoWork(null, null);
-
-            //q
-
-            //// Nun starte den Prozess
-            //BinReLoader.RunWorkerAsync();
-
-            //// Stelle Sicher, dass er auch läuft
-            //while (!BinReLoader.IsBusy) { Develop.DoEvents(); }
-
-            //// Und nun warte, bis er fertig ist :-)
-            //while (BinReLoader.IsBusy) { Develop.DoEvents(); }
-
-
-        }
 
         //private void OnStoreReView()
         //{
@@ -2563,40 +2226,8 @@ namespace BlueDatabase
         //    StoreView?.Invoke(this, System.EventArgs.Empty);
         //}
 
-        private void SetFileDate()
-        {
-            var starttime = DateTime.Now;
-            do
-            {
-                try
-                {
-                    File.SetLastAccessTime(Filename, DateTime.Now);
-                    break;
-                }
-                catch
-                {
-                    if (DateTime.Now.Subtract(starttime).TotalSeconds > 60)
-                    {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Wartezeit überschritten, ich konnte dem System nicht mitteilen, dass die Datenbank aktualisiert wurde.<br>" + Filename);
-                    }
-                }
-            } while (true);
-        }
 
 
-        private void OnSavedToDisk()
-        {
-            SavedToDisk?.Invoke(this, System.EventArgs.Empty);
-        }
-        private void OnSaveAborded()
-        {
-            SaveAborded?.Invoke(this, System.EventArgs.Empty);
-        }
-
-        private void OnParsed()
-        {
-            Parsed?.Invoke(this, System.EventArgs.Empty);
-        }
 
         private void OnExporting(CancelEventArgs e)
         {
@@ -2621,22 +2252,10 @@ namespace BlueDatabase
         }
 
 
-        public void OnConnectedControlsStopAllWorking(DatabaseStoppedEventArgs e)
-        {
-            if (e.AllreadyStopped.Contains(this)) { return; }
-            e.AllreadyStopped.Add(this);
-            ConnectedControlsStopAllWorking?.Invoke(this, e);
-        }
 
-        private void OnLoaded(LoadedEventArgs e)
-        {
-            Loaded?.Invoke(this, e);
-        }
 
-        private void OnLoading(LoadingEventArgs e)
-        {
-            Loading?.Invoke(this, e);
-        }
+
+
 
         private void OnRenameColumnInLayout(RenameColumnInLayoutEventArgs e)
         {
@@ -2671,46 +2290,7 @@ namespace BlueDatabase
             return Column_All.SortedDistinctList();
         }
 
-        /// <summary>
-        /// Angehängte Formulare werden aufgefordert, ihre Bearbeitung zu beenden. Geöffnete Benutzereingaben werden geschlossen.
-        /// Ist die Datei in Bearbeitung wird diese freigegeben. Zu guter letzt werden PendingChanges fest gespeichert.
-        /// Dadurch ist evtl. ein Reload nötig. Ein Reload wird nur bei Pending Changes ausgelöst!
-        /// </summary>
-        public bool Release(bool MUSTRelease, int MaxWaitSeconds)
-        {
-            if (ReadOnly) { return false; }
 
-            if (Cell.Freezed)
-            {
-                if (!MUSTRelease) { return false; }
-                Develop.DebugPrint(enFehlerArt.Fehler, "Release unmöglich, Datenbankstatus eingefroren");
-            }
-            OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
-
-
-            if (string.IsNullOrEmpty(Filename)) { return false; }
-
-            MaxWaitSeconds = Math.Min(MaxWaitSeconds, 40);
-            var D = DateTime.Now; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
-
-
-            if (!MUSTRelease && BlockDateiVorhanden()) { return false; }
-
-            while (HasPendingChanges())
-            {
-
-                if (!BinSaver.IsBusy) { BinSaver.RunWorkerAsync(); }
-                Develop.DoEvents();
-                if (DateTime.Now.Subtract(D).TotalSeconds > MaxWaitSeconds)
-                {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Datenank nicht freigegeben...." + Filename);
-                    return false;
-                } // KAcke, Da liegt ein größerer Fehler vor...
-                if (!MUSTRelease && DateTime.Now.Subtract(D).TotalSeconds > 20 && !BlockDateiVorhanden()) { return false; } // Wenn der Saver hängt.... kommt auch vor :-(
-                if (DateTime.Now.Subtract(D).TotalSeconds > 30 && !BinSaver.IsBusy && HasPendingChanges() && BlockDateiVorhanden()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank aufgrund der Blockdatei nicht freigegeben: " + Filename); }
-            }
-            return true;
-        }
 
 
 
@@ -2767,119 +2347,22 @@ namespace BlueDatabase
 
         private void InitializeComponent()
         {
-            components = new Container();
-            Checker = new System.Windows.Forms.Timer(components);
-            BinReLoader = new BackgroundWorker();
-            BinSaver = new BackgroundWorker();
-            Backup = new BackgroundWorker();
-            SuspendLayout();
-            // 
-            // Checker
-            // 
-            Checker.Interval = 1000;
-            Checker.Tick += Checker_Tick;
-            // 
-            // BinReLoader
-            // 
-            BinReLoader.WorkerReportsProgress = true;
-            BinReLoader.DoWork += BinReLoader_DoWork;
-            BinReLoader.ProgressChanged += BinReLoader_ProgressChanged;
-            // 
-            // BinSaver
-            // 
-            BinSaver.WorkerReportsProgress = true;
-            BinSaver.DoWork += BinSaver_DoWork;
-            BinSaver.ProgressChanged += BinSaver_ProgressChanged;
+            this.Backup = new System.ComponentModel.BackgroundWorker();
+            this.SuspendLayout();
             // 
             // Backup
             // 
-            Backup.WorkerReportsProgress = true;
-            Backup.WorkerSupportsCancellation = true;
-            Backup.DoWork += Backup_DoWork;
-            Backup.ProgressChanged += Backup_ProgressChanged;
-            ResumeLayout(false);
+            this.Backup.WorkerReportsProgress = true;
+            this.Backup.WorkerSupportsCancellation = true;
+            this.Backup.DoWork += new System.ComponentModel.DoWorkEventHandler(this.Backup_DoWork);
+            this.Backup.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.Backup_ProgressChanged);
+            this.ResumeLayout(false);
 
         }
 
 
-        private DateTime SavebleErrorReason_WindowsOnly_lastChecked = DateTime.Now.AddSeconds(-30);
-        private int Checker_Tick_count;
-
-        private void Checker_Tick(object sender, System.EventArgs e)
-        {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
-            if (BinReLoader.IsBusy) { return; }
-            if (BinSaver.IsBusy) { return; }
-            if (string.IsNullOrEmpty(Filename)) { return; }
 
 
-            // Ausstehende Arbeiten ermittelen
-            var _MustReload = ReloadNeeded();
-            var _MustSave = HasPendingChanges();
-            var _MustBackup = _MustSave;
-            foreach (var ThisExport in Export)
-            {
-                if (ThisExport != null)
-                {
-                    if (ThisExport.Typ == enExportTyp.EinzelnMitFormular) { _MustBackup = true; }
-                    if (ThisExport.LastExportTime.Subtract(DateTime.Now).TotalDays > 10) { _MustBackup = true; }
-                }
-            }
-
-            Checker_Tick_count += 1;
-            if (!_MustReload && !_MustSave && !_MustBackup)
-            {
-                Checker_Tick_count = 0;
-                return;
-            }
-
-            // Zeiten berechnen 
-            _ReloadDelaySecond = Math.Max(_ReloadDelaySecond, 10);
-            var Count_BackUp = Math.Min((int)(_ReloadDelaySecond / 10.0) + 1, 10); // Soviele Sekunden können vergehen, bevor Backups gemacht werden. Der Wert muss kleiner sein, als Count_Save
-            var Count_Save = Count_BackUp * 2 + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
-            var Count_UserWork = Count_Save / 5 + 2; // Soviele Sekunden hat die User-Bearbeitung vorrang. Verhindert, dass die Bearbeitung des Users spontan abgebrochen wird.
-
-
-
-            if (DateTime.Now.Subtract(_UserEditedAktion).TotalSeconds < Count_UserWork) { return; } // Benutzer arbeiten lassen
-            if (Checker_Tick_count > Count_Save && _MustSave && Backup.IsBusy && !Backup.CancellationPending) { Backup.CancelAsync(); }
-            if (Checker_Tick_count > _ReloadDelaySecond && Backup.IsBusy && !Backup.CancellationPending && _MustReload) { Backup.CancelAsync(); }
-            if (Backup.IsBusy) { return; }
-
-
-
-            if (_MustBackup && !_MustReload && Checker_Tick_count < Count_Save && Checker_Tick_count >= Count_BackUp && IsSaveAble())
-            {
-                Backup.RunWorkerAsync();
-                return;
-            }
-
-
-            if (_MustReload && _MustSave)
-            {
-                // Checker_Tick_count nicht auf 0 setzen, dass der Saver noch stimmt.
-                BinReLoader.RunWorkerAsync();
-                return;
-            }
-
-
-
-            if (_MustSave && Checker_Tick_count > Count_Save)
-            {
-                BinSaver.RunWorkerAsync();
-                Checker_Tick_count = 0;
-                return;
-            }
-
-
-            // Überhaupt nix besonderes. Ab und zu mal Reloaden
-            if (_MustReload && Checker_Tick_count > _ReloadDelaySecond)
-            {
-                BinReLoader.RunWorkerAsync();
-                Checker_Tick_count = 0;
-            }
-
-        }
 
         /// <summary>
         /// Fügt Comandos manuell hinzu. Vorsicht: Kann Datenbank beschädigen
@@ -2947,7 +2430,7 @@ namespace BlueDatabase
                 ParseThis(Comand, ChangedTo, Column.SearchByKey(ColumnKey), Row.SearchByKey(RowKey), -1, -1);
             }
 
-            if (_isParsing) { return; }
+            if (IsParsing()) { return; }
             if (ReadOnly)
             {
                 if (!string.IsNullOrEmpty(Filename))
@@ -2963,7 +2446,7 @@ namespace BlueDatabase
 
             // Keine Doppelten Rausfiltern, ansonstn stimmen die Undo nicht mehr
 
-            _UserEditedAktion = DateTime.Now;
+            UserEditedAktion = DateTime.Now;
 
             if (RowKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
             if (ColumnKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
@@ -2976,7 +2459,7 @@ namespace BlueDatabase
 
         private void ExecutePending()
         {
-            if (!_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur während des Parsens möglich"); }
+            if (!IsParsing()) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur während des Parsens möglich"); }
             if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren!"); }
             if (!HasPendingChanges()) { return; }
 
@@ -3321,287 +2804,9 @@ namespace BlueDatabase
         //}
 
 
-        /// <summary>
-        /// Darf nur von einem Background-Thread aufgerufen werden.
-        /// </summary>
-        public void WaitParsed()
-        {
-            if (!Thread.CurrentThread.IsBackground)
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Darf nur von einem BackgroundThread aufgerufen werden!");
-            }
-
-            while (_isParsing)
-            {
-                Develop.DoEvents();
-            }
-        }
-        private void BinaryWriter_ReportProgressAndWait(int percentProcess, string UserState)
-        {
-
-            if (UserState == Writer_ProcessDone)
-            {
-                BinSaver.ReportProgress(0, "ResetProcess");
-                do
-                {
-                    Develop.DoEvents();
-                } while (Writer_ProcessDone == "ResetProcess");
-            }
-
-
-            BinSaver.ReportProgress(percentProcess, UserState);
-
-            do
-            {
-                Develop.DoEvents();
-            } while (Writer_ProcessDone != UserState);
-
-
-        }
-
-
-        private void BinSaver_DoWork(object sender, DoWorkEventArgs e)
-        {
-            if (ReadOnly) { return; }
-
-            var f = SavebleErrorReason();
-
-            if (!string.IsNullOrEmpty(f))
-            {
-                Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datenbank abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + f);
-                OnSaveAborded();
-                return;
-            }
-
-            if (string.IsNullOrEmpty(Filename)) { return; }
-
-            var tBackup = Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
-            var BlockDatei = Blockdateiname();
-
-            // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
-            var done = false;
-            try
-            {
-                if (FileExists(tBackup))
-                {
-                    done = RenameFile(tBackup, BlockDatei, false);
-                }
-                else
-                {
-                    done = CopyFile(Filename, BlockDatei, false);
-                }
-            }
-            catch (Exception ex)
-            {
-                Develop.DebugPrint(enFehlerArt.Warnung, ex);
-                return;
-            }
-
-
-            if (!done)
-            {
-                // Letztens aufgetreten, dass eine Blockdatei schon vorhanden war. Anscheinden Zeitgleiche Kopie?
-                Develop.DebugPrint(enFehlerArt.Info, "Befehl anscheinend abgebrochen:\r\n" + Filename);
-                return;
-            }
-
-
-            if (!BlockDateiVorhanden())
-            {
-                Develop.DebugPrint("Block-Datei Konflikt 1\r\n" + Filename);
-                return;
-            }
-
-            // Im Parallelen-Process, Reload-Needed ist auch ein Dateizugriff
-            if (ReloadNeeded()) { BinaryWriter_ReportProgressAndWait(5, "Reload"); }
-
-            BinaryWriter_ReportProgressAndWait(10, "GetBinData");
-
-            //OK, nun gehts rund: Haupt-Datei wird zum Backup kopiert.
-            CopyFile(Filename, tBackup, true);
-
-            // Und hier wird nun die neue Datei als TMP erzeugt erzeugt.
-            var count = 0;
-            var TMP = TempFile(Filename + "-" + UserName);
-
-            do
-            {
-                try
-                {
-                    using (var x = new FileStream(TMP, FileMode.Create, FileAccess.Write, FileShare.None))
-                    {
-                        x.Write(Writer_BinaryData.ToArray(), 0, Writer_BinaryData.ToArray().Length);
-                        x.Flush();
-                        x.Close();
-                    }
-                    SetFileDate();
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    count += 1;
-                    if (count > 30)
-                    {
-                        Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datenbank abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + ex.Message);
-                        DeleteFile(BlockDatei, true);
-                        DeleteFile(TMP, true);
-                        return;
-                    }
-                    Develop.DoEvents();
-                }
-            } while (true);
-
-            // --- Haupt-Datei löschen ---
-            DeleteFile(Filename, true);
-
-
-            // --- TmpFile wird zum Haupt ---
-            RenameFile(TMP, Filename, true);
-
-            // Und nun den Block entfernen
-            CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
-            DeleteFile(BlockDatei, true);
 
 
 
-
-            BinaryWriter_ReportProgressAndWait(15, "GetFileState");
-            BinaryWriter_ReportProgressAndWait(20, "ChangePendingToUndo");
-            BinaryWriter_ReportProgressAndWait(25, "GetLoadedFiles");
-
-            if (Writer_FilesToDeleteLCase.Count > 0)
-            {
-                if (_VerwaisteDaten == enVerwaisteDaten.Löschen) { DeleteFile(Writer_FilesToDeleteLCase); }
-            }
-            OnSavedToDisk();
-        }
-
-        /// <summary>
-        /// Diese Routine ist ein Paraleller Process.
-        /// Er prüft, ob Daten Reloaded werden müssen. Falls KEINE Daten da sind, werden sie geladen.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void BinReLoader_DoWork(object sender, DoWorkEventArgs e)
-        {
-
-            var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
-
-
-            if (OnlyReload && !ReloadNeeded()) { return; }
-
-            var ec = new LoadingEventArgs(OnlyReload);
-            OnLoading(ec);
-
-            if (OnlyReload && ReadOnly && ec.Cancel) { return; }
-
-            string tmpLastSaveCode;
-            byte[] _tmp = null;
-
-            var StartTime = DateTime.Now;
-            do
-            {
-                try
-                {
-                    if (string.IsNullOrEmpty(Filename))
-                    {
-                        Develop.DebugPrint(enFehlerArt.Warnung, "Dateiname ist leer: " + Caption);
-                        return;
-                    }
-
-                    _tmp = File.ReadAllBytes(Filename);
-                    tmpLastSaveCode = GetFileInfo(true);
-
-                    Pause(0.5, false);
-
-                    if (new FileInfo(Filename).Length == _tmp.Length) { break; }
-                }
-                catch (Exception ex)
-                {
-                    // Home Office kann lange blokieren....
-                    if (DateTime.Now.Subtract(StartTime).TotalSeconds > 300)
-                    {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
-                    }
-                }
-            } while (true);
-
-
-            var _BLoaded = new List<byte>();
-            _BLoaded.AddRange(_tmp);
-
-
-            // Letztes WorkItem speichern, als Kontrolle
-            var WVorher = string.Empty;
-            _LastWorkItem = string.Empty;
-            if (Works != null && Works.Count > 0)
-            {
-                var c = 0;
-                do
-                {
-                    c += 1;
-                    if (c > 20 || Works.Count - c < 20) { break; }
-                    var wn = Works.Count - c;
-                    if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { _LastWorkItem = Works[wn].ToString(); }
-
-                } while (string.IsNullOrEmpty(_LastWorkItem));
-                WVorher = Works.ToString();
-            }
-
-            if (sender is BackgroundWorker w)
-            {
-                while (_isParsing) { Develop.DoEvents(); }
-                var tmpParsCount = _ParsedAndRepairedCount;
-                w.ReportProgress(1, _BLoaded);
-                while (tmpParsCount == _ParsedAndRepairedCount || _isParsing) { Develop.DoEvents(); }
-                w.ReportProgress(0, tmpLastSaveCode);
-
-            }
-            else
-            {
-                BinReLoader_ProgressChanged(null, new ProgressChangedEventArgs(1, _BLoaded));
-                BinReLoader_ProgressChanged(null, new ProgressChangedEventArgs(0, tmpLastSaveCode));
-            }
-
-
-
-
-
-            try
-            {
-
-                // Leztes WorkItem suchen. Auch Ohne LogUndo MUSS es vorhanden sein.
-                if (!string.IsNullOrEmpty(_LastWorkItem))
-                {
-                    var ok = false;
-                    var ok2 = string.Empty;
-                    foreach (var ThisWorkItem in Works)
-                    {
-                        var tmp = ThisWorkItem.ToString();
-                        if (tmp == _LastWorkItem)
-                        {
-                            ok = true;
-                            break;
-                        }
-                        else if (tmp.Substring(7) == _LastWorkItem.Substring(7))
-                        {
-                            ok2 = tmp;
-                        }
-                    }
-
-                    if (!ok && string.IsNullOrEmpty(ok2))
-                    {
-                        Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br><br>Vorher:<br>" + WVorher + "<br><br>Nachher:<br>" + Works.ToString());
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Develop.DebugPrint(ex);
-            }
-
-            OnLoaded(new LoadedEventArgs(OnlyReload));
-        }
 
         private void Backup_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -3655,83 +2860,9 @@ namespace BlueDatabase
             }
         }
 
-        private void BinSaver_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-
-            switch ((string)e.UserState)
-            {
-
-                case "ResetProcess":
-                    break;
-
-                case "Reload":
-                    if (BinReLoader.IsBusy) { Develop.DoEvents(); }
-                    BinReLoader_DoWork(null, null);
-                    //var tmpParesd = _ParsedAndRepairedCount;
-
-                    //while (_ParsedAndRepairedCount == tmpParesd || _isParsing || BinReLoader.IsBusy) { Develop.DoEvents(); }
-                    break;
-
-                case "GetBinData":
-                    Writer_BinaryData = ToListOfByte();
-                    break;
-
-                case "GetFileState":
-                    _LastSaveCode = GetFileInfo(true);
-                    _CheckedAndReloadNeed = false;
-                    break;
-
-                case "ChangePendingToUndo":
-                    ChangeWorkItems(enItemState.Pending, enItemState.Undo);
-                    break;
-
-
-                case "GetLoadedFiles":
-                    var FilesNewLCase = AllConnectedFilesLCase();
-                    FilesAfterLoadingLCase.Remove(FilesNewLCase);
-
-                    // Hier erst reintun, dass der Worker nicht zu früh reagiert!
-                    Writer_FilesToDeleteLCase = new List<string>();
-                    Writer_FilesToDeleteLCase.AddRange(FilesAfterLoadingLCase);
-
-                    FilesAfterLoadingLCase.Clear();
-                    FilesAfterLoadingLCase.AddRange(FilesNewLCase);
-                    break;
-
-
-                default:
-                    Develop.DebugPrint_NichtImplementiert();
-                    break;
-
-            }
-
-
-            Writer_ProcessDone = (string)e.UserState;
 
 
 
-        }
-
-        private void BinReLoader_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            switch (e.ProgressPercentage)
-            {
-                case 1:
-                    Parse((List<byte>)e.UserState);
-                    break;
-
-                case 0:
-                    _CheckedAndReloadNeed = false;
-                    _LastSaveCode = (string)e.UserState; // initialize setzt zurück
-                    break;
-
-                default:
-                    Develop.DebugPrint_NichtImplementiert();
-                    break;
-
-            }
-
-        }
 
         private void Backup_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -3763,6 +2894,152 @@ namespace BlueDatabase
             }
             return true;
         }
+
+
+
+        protected override void PrepeareDataForCheckingBeforeLoad()
+        {
+            // Letztes WorkItem speichern, als Kontrolle
+            WVorher = string.Empty;
+            _LastWorkItem = string.Empty;
+            if (Works != null && Works.Count > 0)
+            {
+                var c = 0;
+                do
+                {
+                    c += 1;
+                    if (c > 20 || Works.Count - c < 20) { break; }
+                    var wn = Works.Count - c;
+                    if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { _LastWorkItem = Works[wn].ToString(); }
+
+                } while (string.IsNullOrEmpty(_LastWorkItem));
+                WVorher = Works.ToString();
+            }
+        }
+
+
+        protected override void CheckDataAfterReload()
+        {
+
+
+            try
+            {
+
+                // Leztes WorkItem suchen. Auch Ohne LogUndo MUSS es vorhanden sein.
+                if (!string.IsNullOrEmpty(_LastWorkItem))
+                {
+                    var ok = false;
+                    var ok2 = string.Empty;
+                    foreach (var ThisWorkItem in Works)
+                    {
+                        var tmp = ThisWorkItem.ToString();
+                        if (tmp == _LastWorkItem)
+                        {
+                            ok = true;
+                            break;
+                        }
+                        else if (tmp.Substring(7) == _LastWorkItem.Substring(7))
+                        {
+                            ok2 = tmp;
+                        }
+                    }
+
+                    if (!ok && string.IsNullOrEmpty(ok2))
+                    {
+                        Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br><br>Vorher:<br>" + WVorher + "<br><br>Nachher:<br>" + Works.ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
+            }
+        }
+
+
+        protected override void DoWorkInParallelBinSaverThread()
+        {
+            if (Writer_FilesToDeleteLCase.Count > 0)
+            {
+                if (_VerwaisteDaten == enVerwaisteDaten.Löschen) { DeleteFile(Writer_FilesToDeleteLCase); }
+            }
+        }
+
+        protected override void DoWorkInSerialSavingThread()
+        {
+
+            ChangeWorkItems(enItemState.Pending, enItemState.Undo);
+
+
+
+            var FilesNewLCase = AllConnectedFilesLCase();
+            FilesAfterLoadingLCase.Remove(FilesNewLCase);
+
+            // Hier erst reintun, dass der Worker nicht zu früh reagiert!
+            Writer_FilesToDeleteLCase = new List<string>();
+            Writer_FilesToDeleteLCase.AddRange(FilesAfterLoadingLCase);
+
+            FilesAfterLoadingLCase.Clear();
+            FilesAfterLoadingLCase.AddRange(FilesNewLCase);
+
+        }
+
+        protected override bool SomethingBlocking()
+        {
+            if (Cell.Freezed)
+            {
+                Develop.DebugPrint(enFehlerArt.Warnung, "Reload unmöglich, Datenbankstatus eingefroren");
+                return true;
+            }
+            return false;
+        }
+
+        protected override void CheckFileWillBeLoadedErrors(string fileName)
+        {
+            foreach (var ThisDatabase in AllDatabases)
+            {
+                if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == fileName.ToLower())
+                {
+                    ThisDatabase.Release(true, 180);
+                    Develop.DebugPrint(enFehlerArt.Fehler, "Doppletes Laden von " + fileName);
+                }
+            }
+        }
+
+        protected override bool IsThereBackgroundWorkToDo(bool mustSave)
+        {
+            if (mustSave) { return true; }
+
+            foreach (var ThisExport in Export)
+            {
+                if (ThisExport != null)
+                {
+                    if (ThisExport.Typ == enExportTyp.EinzelnMitFormular) { return true; }
+                    if (ThisExport.LastExportTime.Subtract(DateTime.Now).TotalDays > 10) { return true; }
+                }
+            }
+
+            return false;
+        }
+
+
+        protected override void CancelBackGroundWork()
+        {
+            if (Backup.IsBusy && !Backup.CancellationPending) { Backup.CancelAsync(); }
+        }
+
+
+        protected override bool IsBackgroundWorkerBusy()
+        {
+            return Backup.IsBusy;
+        }
+
+        protected override void StartBackgroundWorker()
+        {
+            if (!Backup.IsBusy) { Backup.RunWorkerAsync(); }
+        }
+
+
 
     }
 }
