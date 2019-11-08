@@ -66,6 +66,13 @@ namespace BlueBasics
             return Encoding.Default.GetBytes(TXT);
         }
 
+        public static List<byte> ToByteList(this string TXT)
+        {
+            var x = new List<byte>();
+            x.AddRange(Encoding.Default.GetBytes(TXT));
+            return x;
+        }
+
         public static bool isPossibleLineBreak(this char value)
         {
             const string TR = " ?!%/\\}])-.,;_°~|\r\n\t";

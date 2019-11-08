@@ -532,6 +532,11 @@ namespace BlueBasics
         }
 
         protected abstract List<byte> ToListOfByte();
+
+
+        /// <summary>
+        ///  Der Richtige Ort, um das "PendingChanges" flag auf false zu setzen.
+        /// </summary>
         protected abstract void DoWorkInSerialSavingThread();
 
         /// <summary>
@@ -560,20 +565,6 @@ namespace BlueBasics
             BinReLoader_DoWork(null, null);
 
             Checker.Enabled = true;
-
-            //q
-
-            //// Nun starte den Prozess
-            //BinReLoader.RunWorkerAsync();
-
-            //// Stelle Sicher, dass er auch läuft
-            //while (!BinReLoader.IsBusy) { Develop.DoEvents(); }
-
-            //// Und nun warte, bis er fertig ist :-)
-            //while (BinReLoader.IsBusy) { Develop.DoEvents(); }
-
-
-
         }
 
         protected abstract bool SomethingBlocking();
@@ -607,7 +598,7 @@ namespace BlueBasics
             // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
             Load_Reload();
 
-            if (ReloadNeeded()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank nicht aktuell"); }
+            if (ReloadNeeded()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datei nicht korrekt geladen (nicht mehr aktuell)"); }
         }
 
         protected abstract void CheckFileWillBeLoadedErrors(string fileName);

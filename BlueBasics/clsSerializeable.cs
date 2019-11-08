@@ -16,6 +16,7 @@ namespace BlueBasics
 
 
         public T obj = default(T);
+        public bool HasChanges = true;
 
 
         public clsSerializeable() : base(false)
@@ -45,30 +46,47 @@ namespace BlueBasics
 
         protected override void DoWorkInSerialSavingThread()
         {
-
+            HasChanges = false;
         }
 
         public override bool HasPendingChanges()
         {
-            throw new NotImplementedException();
+            return HasChanges;
         }
 
         protected override void ParseExternal(List<byte> bLoaded)
         {
 
-            //        https://stackoverflow.com/questions/2341566/deserializing-properties-into-a-pre-existing-object
+            // https://stackoverflow.com/questions/2341566/deserializing-properties-into-a-pre-existing-object
+            // https://stackoverflow.com/questions/2081612/net-determine-the-type-of-this-class-in-its-static-method
 
-            //  var tx = this.GetType();
-            var x = DeserializeString<T>(bLoaded.ToStringConvertUTF8());
+            var Result = default(T);
+            var XmlContent = bLoaded.ToStringConvert(); // NICHT von UTF8 konvertieren, das macht der XML-Deserializer von alleine
+
+            var _byteOrderMarkUtf8 = System.Text.Encoding.UTF8.GetString(System.Text.Encoding.UTF8.GetPreamble());
+            if (XmlContent.StartsWith(_byteOrderMarkUtf8))
+            {
+                var lastIndexOfUtf8 = _byteOrderMarkUtf8.Length - 1;
+                XmlContent = XmlContent.Remove(0, lastIndexOfUtf8);
+            }
 
 
-            // var t = MethodBase.GetCurrentMethod().DeclaringType; // https://stackoverflow.com/questions/2081612/net-determine-the-type-of-this-class-in-its-static-method
-            var members = FormatterServices.GetSerializableMembers(typeof(T)); // typeof(clsSerializeable)
-            FormatterServices.PopulateObjectMembers(obj, members, FormatterServices.GetObjectData(x, members));
 
-            // Object state is back
-            //  Console.WriteLine("{0}, {1}", book.Title, book.Author);
+            while (!XmlContent.StartsWith("<"))
+            {
+                XmlContent = XmlContent.Substring(1);
+            }
 
+            var Serializer = new XmlSerializer(typeof(T));
+            var StringReader = new StringReader(XmlContent);
+
+            Result = (T)Serializer.Deserialize(StringReader);
+
+            StringReader.Close();
+            StringReader.Dispose();
+
+            var members = FormatterServices.GetSerializableMembers(typeof(T)); 
+            FormatterServices.PopulateObjectMembers(obj, members, FormatterServices.GetObjectData(Result, members));
         }
 
         protected override void PrepeareDataForCheckingBeforeLoad()
@@ -83,7 +101,34 @@ namespace BlueBasics
 
         protected override List<byte> ToListOfByte()
         {
-            throw new NotImplementedException();
+
+   
+            var Serializer = new XmlSerializer(typeof(T), string.Empty);
+            var MemoryStream = new MemoryStream();
+            var TextWriter = new XmlTextWriter(MemoryStream, System.Text.Encoding.UTF8);
+            TextWriter.Indentation = 4;
+            TextWriter.IndentChar = ' ';
+            TextWriter.Formatting = Formatting.Indented;
+
+            //var XmlNamespace = new XmlSerializerNamespaces();
+            //XmlNamespace.Add(string.Empty, string.Empty);
+
+
+            Serializer.Serialize(TextWriter, obj);
+
+            var Result = System.Text.Encoding.UTF8.GetString(MemoryStream.ToArray()).ToByteList(); // NICHT nach UTF8 konvertieren, das machte der XML-Serializer bereits von alleine
+
+            
+
+            TextWriter.Close();
+            MemoryStream.Close();
+            MemoryStream.Dispose();
+
+
+            //ParseExternal(Result);
+
+            return Result;
+
         }
 
         protected override void StartBackgroundWorker()
@@ -107,91 +152,91 @@ namespace BlueBasics
         }
 
 
-        private static void SerializeObject<U>(string FileName, U DataObject)
-        {
-            var Serializer = new XmlSerializer(typeof(U));
-            var FileStream = new FileStream(FileName, FileMode.Create);
-            var TextWriter = new XmlTextWriter(FileStream, System.Text.Encoding.UTF8);
-            TextWriter.Indentation = 4;
-            TextWriter.IndentChar = ' ';
-            TextWriter.Formatting = Formatting.Indented;
+        //private static void SerializeObject<U>(string FileName, U DataObject)
+        //{
+        //    var Serializer = new XmlSerializer(typeof(U));
+        //    var FileStream = new FileStream(FileName, FileMode.Create);
+        //    var TextWriter = new XmlTextWriter(FileStream, System.Text.Encoding.UTF8);
+        //    TextWriter.Indentation = 4;
+        //    TextWriter.IndentChar = ' ';
+        //    TextWriter.Formatting = Formatting.Indented;
 
-            Serializer.Serialize(TextWriter, DataObject);
+        //    Serializer.Serialize(TextWriter, DataObject);
 
-            TextWriter.Close();
-            FileStream.Close();
-            FileStream.Dispose();
+        //    TextWriter.Close();
+        //    FileStream.Close();
+        //    FileStream.Dispose();
 
-        }
+        //}
 
-        private static string SerializeObject<U>(U DataObject)
-        {
+        //private static string SerializeObject<U>(U DataObject)
+        //{
 
-            string Result = null;
-            var Serializer = new XmlSerializer(typeof(U), string.Empty);
-            var MemoryStream = new MemoryStream();
-            var TextWriter = new XmlTextWriter(MemoryStream, System.Text.Encoding.UTF8);
-            TextWriter.Indentation = 4;
-            TextWriter.IndentChar = ' ';
-            TextWriter.Formatting = Formatting.Indented;
+        //    string Result = null;
+        //    var Serializer = new XmlSerializer(typeof(U), string.Empty);
+        //    var MemoryStream = new MemoryStream();
+        //    var TextWriter = new XmlTextWriter(MemoryStream, System.Text.Encoding.UTF8);
+        //    TextWriter.Indentation = 4;
+        //    TextWriter.IndentChar = ' ';
+        //    TextWriter.Formatting = Formatting.Indented;
 
-            var XmlNamespace = new XmlSerializerNamespaces();
-            XmlNamespace.Add(string.Empty, string.Empty);
+        //    var XmlNamespace = new XmlSerializerNamespaces();
+        //    XmlNamespace.Add(string.Empty, string.Empty);
 
-            Serializer.Serialize(TextWriter, DataObject, XmlNamespace);
+        //    Serializer.Serialize(TextWriter, DataObject, XmlNamespace);
 
-            Result = System.Text.Encoding.UTF8.GetString(MemoryStream.ToArray());
+        //    Result = System.Text.Encoding.UTF8.GetString(MemoryStream.ToArray());
 
-            TextWriter.Close();
-            MemoryStream.Close();
-            MemoryStream.Dispose();
+        //    TextWriter.Close();
+        //    MemoryStream.Close();
+        //    MemoryStream.Dispose();
 
-            return Result;
+        //    return Result;
 
-        }
+        //}
 
-        public static U DeserializeObject<U>(string FileName)
-        {
+        //public static U DeserializeObject<U>(string FileName)
+        //{
 
-            var Result = default(U);
-            var Serializer = new XmlSerializer(typeof(U));
-            var FileStream = new FileStream(FileName, FileMode.Open, FileAccess.Read);
-            var TextReader = new XmlTextReader(FileStream);
+        //    var Result = default(U);
+        //    var Serializer = new XmlSerializer(typeof(U));
+        //    var FileStream = new FileStream(FileName, FileMode.Open, FileAccess.Read);
+        //    var TextReader = new XmlTextReader(FileStream);
 
-            Result = (U)Serializer.Deserialize(TextReader);
+        //    Result = (U)Serializer.Deserialize(TextReader);
 
-            TextReader.Close();
-            FileStream.Close();
-            FileStream.Dispose();
+        //    TextReader.Close();
+        //    FileStream.Close();
+        //    FileStream.Dispose();
 
-            return Result;
+        //    return Result;
 
-        }
-
-
-
-        private static U DeserializeString<U>(string XmlContent)
-        {
-
-            var Result = default(U);
+        //}
 
 
-            while (!XmlContent.StartsWith("<"))
-            {
-                XmlContent = XmlContent.Substring(1);
-            }
 
-            var Serializer = new XmlSerializer(typeof(U));
-            var StringReader = new StringReader(XmlContent);
+        //private static U DeserializeString<U>(string XmlContent)
+        //{
 
-            Result = (U)Serializer.Deserialize(StringReader);
+        //    var Result = default(U);
 
-            StringReader.Close();
-            StringReader.Dispose();
 
-            return Result;
+        //    while (!XmlContent.StartsWith("<"))
+        //    {
+        //        XmlContent = XmlContent.Substring(1);
+        //    }
 
-        }
+        //    var Serializer = new XmlSerializer(typeof(U));
+        //    var StringReader = new StringReader(XmlContent);
+
+        //    Result = (U)Serializer.Deserialize(StringReader);
+
+        //    StringReader.Close();
+        //    StringReader.Dispose();
+
+        //    return Result;
+
+        //}
 
 
         ////https://www.jerriepelser.com/blog/deserialize-different-json-object-same-class/
