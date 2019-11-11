@@ -83,6 +83,9 @@
       <DependentUpon>Skript.cs</DependentUpon>
     </Compile>
     <Compile Include="BlueFont.cs" />
+    <Compile Include="clsSerializeableMultiUserFile.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\ZoomPic.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -213,6 +216,7 @@
     <Compile Include="Forms-Common\Notification.Designer.cs">
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\ILastSavedBy.cs" />
     <Compile Include="ItemCollection\Basics\BasicPadItemTwoPoints.cs" />
     <Compile Include="ItemCollection\Basics\FormPadItemRectangle.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />

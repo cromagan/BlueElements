@@ -10,7 +10,7 @@ using static BlueBasics.FileOperations;
 using static BlueBasics.modAllgemein;
 
 
-namespace BlueBasics
+namespace BlueBasics.MultiUserFile
 {
     public abstract class clsMultiUserFile : System.Windows.Forms.Control
     {
@@ -21,7 +21,6 @@ namespace BlueBasics
 
         private bool _CheckedAndReloadNeed;
 
-        public readonly string UserName = modAllgemein.UserName().ToUpper();
 
         private string _LastSaveCode;
         public bool ReadOnly { get; private set; }
@@ -36,23 +35,22 @@ namespace BlueBasics
             this.Checker = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
-            // Checker
-            // 
-            Checker.Enabled = false;
-            Checker.Interval = 1000;
-            Checker.Tick += Checker_Tick;
-            // 
             // BinReLoader
             // 
-            BinReLoader.WorkerReportsProgress = true;
-            BinReLoader.DoWork += BinReLoader_DoWork;
-            BinReLoader.ProgressChanged += BinReLoader_ProgressChanged;
+            this.BinReLoader.WorkerReportsProgress = true;
+            this.BinReLoader.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BinReLoader_DoWork);
+            this.BinReLoader.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BinReLoader_ProgressChanged);
             // 
             // BinSaver
             // 
-            BinSaver.WorkerReportsProgress = true;
-            BinSaver.DoWork += BinSaver_DoWork;
-            BinSaver.ProgressChanged += BinSaver_ProgressChanged;
+            this.BinSaver.WorkerReportsProgress = true;
+            this.BinSaver.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BinSaver_DoWork);
+            this.BinSaver.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BinSaver_ProgressChanged);
+            // 
+            // Checker
+            // 
+            this.Checker.Interval = 1000;
+            this.Checker.Tick += new System.EventHandler(this.Checker_Tick);
             this.ResumeLayout(false);
 
         }
@@ -162,6 +160,7 @@ namespace BlueBasics
                     _tmp = File.ReadAllBytes(Filename);
                     tmpLastSaveCode = GetFileInfo(true);
 
+
                     Pause(0.5, false);
 
                     if (new FileInfo(Filename).Length == _tmp.Length) { break; }
@@ -179,6 +178,7 @@ namespace BlueBasics
 
             var _BLoaded = new List<byte>();
             _BLoaded.AddRange(_tmp);
+            ThisIsOnDisk(_BLoaded);
 
 
             PrepeareDataForCheckingBeforeLoad();
@@ -208,7 +208,17 @@ namespace BlueBasics
             OnLoaded(new LoadedEventArgs(OnlyReload));
         }
 
+        /// <summary>
+        /// gibt die Möglichkeit, Fehler in ein Protokoll zu schreiben, wenn nach dem Reload eine Inkonsitenz aufgetreten ist.
+        /// Nicht für Reperaturzwecke gedacht.
+        /// </summary>
         protected abstract void CheckDataAfterReload();
+
+
+
+        /// <summary>
+        /// Gibt die Möglichkeit, vor einem Reload Daten zu speichern. Diese kann nach dem Reload mit CheckDataAfterReload zu prüfen, ob alles geklappt hat.
+        /// </summary>
         protected abstract void PrepeareDataForCheckingBeforeLoad();
 
 
@@ -365,7 +375,7 @@ namespace BlueBasics
 
             // Und hier wird nun die neue Datei als TMP erzeugt erzeugt.
             var count = 0;
-            var TMP = TempFile(Filename + "-" + UserName);
+            var TMP = TempFile(Filename + "-" + modAllgemein.UserName().ToUpper());
 
             do
             {
@@ -401,6 +411,10 @@ namespace BlueBasics
             // --- TmpFile wird zum Haupt ---
             RenameFile(TMP, Filename, true);
 
+
+            // ---- Steuerelemente Sagen, was gespeichert wurde
+            ThisIsOnDisk(Writer_BinaryData);
+
             // Und nun den Block entfernen
             CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
             DeleteFile(BlockDatei, true);
@@ -418,9 +432,11 @@ namespace BlueBasics
 
             DoWorkInParallelBinSaverThread();
 
+            BinaryWriter_ReportProgressAndWait(30, "EventSaved");
 
-            OnSavedToDisk();
         }
+
+        protected abstract void ThisIsOnDisk(List<byte> binaryData);
 
         protected virtual string SavebleErrorReason()
         {
@@ -503,7 +519,7 @@ namespace BlueBasics
                     break;
 
                 case "GetBinData":
-                    Writer_BinaryData = ToListOfByte();
+                    Writer_BinaryData = ToListOfByte(true);
                     break;
 
                 case "GetFileState":
@@ -515,7 +531,9 @@ namespace BlueBasics
                     DoWorkInSerialSavingThread();
                     break;
 
-
+                case "EventSaved":
+                    OnSavedToDisk();
+                    break;
 
 
                 default:
@@ -531,7 +549,7 @@ namespace BlueBasics
 
         }
 
-        protected abstract List<byte> ToListOfByte();
+        protected abstract List<byte> ToListOfByte(bool willSave);
 
 
         /// <summary>
@@ -554,7 +572,7 @@ namespace BlueBasics
 
             if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, da gerade geparst wird"); }
 
-            if (SomethingBlocking()) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, vererbte Klasse gab Fehler zurück"); }
+            if (isSomethingDiscOperatingsBlocking()) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, vererbte Klasse gab Fehler zurück"); }
 
 
 
@@ -567,7 +585,7 @@ namespace BlueBasics
             Checker.Enabled = true;
         }
 
-        protected abstract bool SomethingBlocking();
+        protected abstract bool isSomethingDiscOperatingsBlocking();
 
         public void Load(string fileName)
         {
@@ -589,7 +607,7 @@ namespace BlueBasics
             if (!CanWriteInDirectory(fileName.FilePath())) { ReadOnly = true; }
 
 
-            CheckFileWillBeLoadedErrors(fileName);
+            if (!IsFileAllowedToLoad(fileName)) { return; }
 
 
             Filename = fileName;
@@ -601,7 +619,7 @@ namespace BlueBasics
             if (ReloadNeeded()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datei nicht korrekt geladen (nicht mehr aktuell)"); }
         }
 
-        protected abstract void CheckFileWillBeLoadedErrors(string fileName);
+        protected abstract bool IsFileAllowedToLoad(string fileName);
 
         public void SaveAsAndChangeTo(string NewFileName)
         {
@@ -610,14 +628,18 @@ namespace BlueBasics
             if (NewFileName.ToUpper() == Filename.ToUpper()) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
 
             Release(true, 180); // Original-Datenbank speichern, die ist ja dann weg.
-            var l = ToListOfByte();
+
+            Filename = NewFileName;
+            var l = ToListOfByte(true);
+
             using (var x = new FileStream(NewFileName, FileMode.Create, FileAccess.Write, FileShare.None))
             {
                 x.Write(l.ToArray(), 0, l.ToArray().Length);
                 x.Flush();
                 x.Close();
             }
-            Filename = NewFileName;
+
+            ThisIsOnDisk(l);
 
 
             _LastSaveCode = GetFileInfo(true);
@@ -628,7 +650,7 @@ namespace BlueBasics
         {
             Loading?.Invoke(this, e);
         }
-        private void OnLoaded(LoadedEventArgs e)
+        protected virtual void OnLoaded(LoadedEventArgs e)
         {
             Loaded?.Invoke(this, e);
         }
@@ -673,7 +695,7 @@ namespace BlueBasics
         {
             if (ReadOnly) { return false; }
 
-            if (SomethingBlocking())
+            if (isSomethingDiscOperatingsBlocking())
             {
                 if (!MUSTRelease) { return false; }
                 Develop.DebugPrint(enFehlerArt.Fehler, "Release unmöglich, Datenbankstatus eingefroren");
@@ -830,8 +852,8 @@ namespace BlueBasics
 
 
             if (DateTime.Now.Subtract(UserEditedAktion).TotalSeconds < Count_UserWork) { return; } // Benutzer arbeiten lassen
-            if (Checker_Tick_count > Count_Save && _MustSave) { CancelBackGroundWork(); }
-            if (Checker_Tick_count > _ReloadDelaySecond && _MustReload) { CancelBackGroundWork(); }
+            if (Checker_Tick_count > Count_Save && _MustSave) { CancelBackGroundWorker(); }
+            if (Checker_Tick_count > _ReloadDelaySecond && _MustReload) { CancelBackGroundWorker(); }
             if (IsBackgroundWorkerBusy()) { return; }
 
 
@@ -871,7 +893,7 @@ namespace BlueBasics
 
         protected abstract void StartBackgroundWorker();
         protected abstract bool IsBackgroundWorkerBusy();
-        protected abstract void CancelBackGroundWork();
+        protected abstract void CancelBackGroundWorker();
         protected abstract bool IsThereBackgroundWorkToDo(bool mustSave);
     }
 }

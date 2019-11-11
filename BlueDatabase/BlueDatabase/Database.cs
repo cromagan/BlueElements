@@ -37,7 +37,7 @@ namespace BlueDatabase
 {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public sealed class Database : BlueBasics.clsMultiUserFile
+    public sealed class Database : BlueBasics.MultiUserFile.clsMultiUserFile
     {
         #region  Shareds 
 
@@ -370,7 +370,7 @@ namespace BlueDatabase
         public readonly ListExt<string> Layouts = new ListExt<string>(); // Print Views werden nicht immer benötigt. Deswegen werden sie als String gespeichert. Der Richtige Typ wäre CreativePad
 
         public string UserGroup = "#Administrator";
-
+        public readonly string UserName = modAllgemein.UserName().ToUpper();
 
 
         private RowSortDefinition _sortDefinition;
@@ -535,7 +535,7 @@ namespace BlueDatabase
             _sortDefinition = null;
 
 
-  
+
         }
 
 
@@ -2085,11 +2085,11 @@ namespace BlueDatabase
         public new string ToString()
         {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            return ToListOfByte().ToArray().ToStringConvert();
+            return ToListOfByte(false).ToArray().ToStringConvert();
         }
 
 
-        protected override List<byte> ToListOfByte()
+        protected override List<byte> ToListOfByte(bool willSave)
         {
 
             try
@@ -2204,7 +2204,7 @@ namespace BlueDatabase
             }
             catch
             {
-                return ToListOfByte();
+                return ToListOfByte(willSave);
             }
         }
 
@@ -2984,7 +2984,7 @@ namespace BlueDatabase
 
         }
 
-        protected override bool SomethingBlocking()
+        protected override bool isSomethingDiscOperatingsBlocking()
         {
             if (Cell.Freezed)
             {
@@ -2994,7 +2994,7 @@ namespace BlueDatabase
             return false;
         }
 
-        protected override void CheckFileWillBeLoadedErrors(string fileName)
+        protected override bool IsFileAllowedToLoad(string fileName)
         {
             foreach (var ThisDatabase in AllDatabases)
             {
@@ -3002,8 +3002,11 @@ namespace BlueDatabase
                 {
                     ThisDatabase.Release(true, 180);
                     Develop.DebugPrint(enFehlerArt.Fehler, "Doppletes Laden von " + fileName);
+                    return false;
                 }
             }
+
+            return true;
         }
 
         protected override bool IsThereBackgroundWorkToDo(bool mustSave)
@@ -3023,7 +3026,7 @@ namespace BlueDatabase
         }
 
 
-        protected override void CancelBackGroundWork()
+        protected override void CancelBackGroundWorker()
         {
             if (Backup.IsBusy && !Backup.CancellationPending) { Backup.CancelAsync(); }
         }
@@ -3039,6 +3042,10 @@ namespace BlueDatabase
             if (!Backup.IsBusy) { Backup.RunWorkerAsync(); }
         }
 
+        protected override void ThisIsOnDisk(List<byte> binaryData)
+        {
+            //Uninterresant
+        }
 
 
     }

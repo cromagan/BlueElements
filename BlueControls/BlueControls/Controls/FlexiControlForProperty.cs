@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using BlueBasics;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace BlueControls.Controls
 {
@@ -12,6 +14,8 @@ namespace BlueControls.Controls
         private PropertyInfo propInfo;
         private object _propertyObject;
         private string _propertyName;
+        private bool _addGroupboxText;
+        private string _propertynamecpl;
 
 
         public string PropertyName
@@ -31,6 +35,27 @@ namespace BlueControls.Controls
 
             }
         }
+
+
+        [DefaultValue(false)]
+        public bool AddGroupboxText
+        {
+            get { return _addGroupboxText; }
+            set
+            {
+                if (_addGroupboxText == value) { return; }
+
+                FillPropertyNow();
+
+                _addGroupboxText = value;
+                GetTmpVariables();
+                UpdateControlData();
+                SetValueFromProperty();
+                CheckEnabledState();
+
+            }
+        }
+
 
         public object PropertyObject
         {
@@ -60,9 +85,22 @@ namespace BlueControls.Controls
                 return;
             }
 
-        //    propInfo = typeof(_propertyObject).GetProperty(_propertyName);
 
-            propInfo = _propertyObject.GetType().GetProperty(_propertyName);
+            _propertynamecpl = _propertyName;
+
+            if (_addGroupboxText && Parent is GroupBox grp)
+            {
+                _propertynamecpl = _propertynamecpl + "_" + grp.Text;
+            }
+
+
+            _propertynamecpl = _propertynamecpl.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + "/\\ _");
+            _propertynamecpl = _propertynamecpl.Replace(" ", "_");
+            _propertynamecpl = _propertynamecpl.Replace("/", "_");
+            _propertynamecpl = _propertynamecpl.Replace("\\", "_");
+            _propertynamecpl = _propertynamecpl.Replace("__", "_");
+
+            propInfo = _propertyObject.GetType().GetProperty(_propertynamecpl);
         }
 
 
@@ -121,23 +159,60 @@ namespace BlueControls.Controls
 
         private void UpdateControlData()
         {
-            Caption = _propertyName.Replace("_", " ") + ":";
 
-            //if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null)
-            //{
-            //    Caption = string.Empty;
-                //EditType = enEditTypeFormula.None;
-                QuickInfo = string.Empty;
+
+            if (!string.IsNullOrEmpty(_propertyName))
+            {
+
+
+
+                var x = _propertyName.SplitBy("__");
+                Caption = x[0].Replace("_", " ") + ":";
+
+
+                var qi = _propertyName.Replace("_", " ");
+
+
+                if (_addGroupboxText && Parent is GroupBox grp)
+                {
+                    qi = qi + " " + grp.Text.TrimEnd(":");
+                }
+
+
+                QuickInfo = qi.Replace("  "," ");
                 FileEncryptionKey = string.Empty;
-            //}
-            //else
-            //{
-            //    Caption = _propertyName.Replace("_"," ") + ":";
-            //    //EditType = _tmpColumn.EditType;
-            //    //QuickInfo = _tmpColumn.QickInfoText(string.Empty);
-            //    //FileEncryptionKey = _Database.FileEncryptionKey;
-            //}
+            }
+
+            else
+            {
+                Caption = "[unbekannt]";
+                QuickInfo = string.Empty;
+            }
+
+
         }
+
+
+        public static void SetAllFlexControls(GroupBox _in, object _to, bool rekursiv)
+        {
+
+            if (_in == null || _in.IsDisposed) { return; }
+
+            foreach (var thisc in _in.Controls)
+            {
+
+                if (thisc is GroupBox gr)
+                {
+                    if (rekursiv) { SetAllFlexControls(gr, _to, rekursiv); }
+                }
+                else if (thisc is FlexiControlForProperty flx)
+                {
+                    flx.PropertyObject = _to;
+                }
+            }
+
+        }
+
 
     }
 }

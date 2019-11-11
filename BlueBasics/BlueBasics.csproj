@@ -79,10 +79,8 @@
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="clsMultiUserFile.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="clsSerializeable.cs">
+    <Compile Include="Interfaces\ILastSavedBy.cs" />
+    <Compile Include="MultiUserFile\clsMultiUserFile.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Enums\enAlignmentHorizontal.cs" />
@@ -115,7 +113,7 @@
     <Compile Include="FileOperations.cs" />
     <Compile Include="Interfaces\IChangedFeedback.cs" />
     <Compile Include="Interfaces\ICheckable.cs" />
-    <Compile Include="Extensions\ICollectionExtension.cs" />
+    <Compile Include="Extensions\CollectionExtension.cs" />
     <Compile Include="Interfaces\ICompareKey.cs" />
     <Compile Include="Interfaces\IntegerArrayExtension.cs" />
     <Compile Include="Interfaces\IParseable.cs" />
@@ -155,7 +153,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="clsMultiUserFile.resx">
+    <EmbeddedResource Include="MultiUserFile\clsMultiUserFile.resx">
       <DependentUpon>clsMultiUserFile.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

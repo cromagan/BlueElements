@@ -5,26 +5,35 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Reflection;
+using BlueBasics.Interfaces;
+using BlueBasics.EventArgs;
+using BlueBasics.MultiUserFile;
+using BlueBasics;
 
-namespace BlueBasics
+namespace BlueControls
 {
 
     //https://social.msdn.microsoft.com/Forums/de-DE/68cdcd22-745e-49e8-8cad-dc7c3c7b8839/c-xml-datei-elemente-lesen-schreiben-ndern-erweitern
 
-    public class clsSerializeable<T> : clsMultiUserFile
+    public sealed class clsSerializeableMultiUserFile<T> : clsMultiUserFile where T : ILastSavedBy
     {
 
 
+        private string _dataOnDisk = string.Empty;
+        private bool _FirstLoad = true;
+        private string _OtherUser = string.Empty;
+
+
         public T obj = default(T);
-        public bool HasChanges = true;
 
 
-        public clsSerializeable() : base(false)
+
+        public clsSerializeableMultiUserFile() : base(false)
         {
             obj = (T)Activator.CreateInstance(typeof(T));
         }
 
-        protected override bool SomethingBlocking()
+        protected override bool isSomethingDiscOperatingsBlocking()
         {
             return false;
         }
@@ -34,9 +43,9 @@ namespace BlueBasics
 
         }
 
-        protected override void CheckFileWillBeLoadedErrors(string fileName)
+        protected override bool IsFileAllowedToLoad(string fileName)
         {
-
+            return true;
         }
 
         protected override void DoWorkInParallelBinSaverThread()
@@ -46,12 +55,13 @@ namespace BlueBasics
 
         protected override void DoWorkInSerialSavingThread()
         {
-            HasChanges = false;
+
         }
 
         public override bool HasPendingChanges()
         {
-            return HasChanges;
+            return _dataOnDisk != ToListOfByte(false).ToStringConvert();
+
         }
 
         protected override void ParseExternal(List<byte> bLoaded)
@@ -85,7 +95,7 @@ namespace BlueBasics
             StringReader.Close();
             StringReader.Dispose();
 
-            var members = FormatterServices.GetSerializableMembers(typeof(T)); 
+            var members = FormatterServices.GetSerializableMembers(typeof(T));
             FormatterServices.PopulateObjectMembers(obj, members, FormatterServices.GetObjectData(Result, members));
         }
 
@@ -99,10 +109,16 @@ namespace BlueBasics
 
         }
 
-        protected override List<byte> ToListOfByte()
+        protected override List<byte> ToListOfByte(bool willSave)
         {
 
-   
+            if (willSave)
+            {
+                obj.LastSavedBy = modAllgemein.UserName();
+            }
+
+
+
             var Serializer = new XmlSerializer(typeof(T), string.Empty);
             var MemoryStream = new MemoryStream();
             var TextWriter = new XmlTextWriter(MemoryStream, System.Text.Encoding.UTF8);
@@ -118,7 +134,7 @@ namespace BlueBasics
 
             var Result = System.Text.Encoding.UTF8.GetString(MemoryStream.ToArray()).ToByteList(); // NICHT nach UTF8 konvertieren, das machte der XML-Serializer bereits von alleine
 
-            
+
 
             TextWriter.Close();
             MemoryStream.Close();
@@ -141,7 +157,7 @@ namespace BlueBasics
             return false;
         }
 
-        protected override void CancelBackGroundWork()
+        protected override void CancelBackGroundWorker()
         {
 
         }
@@ -150,6 +166,16 @@ namespace BlueBasics
         {
             return false;
         }
+
+        protected override void ThisIsOnDisk(List<byte> binaryData)
+        {
+            _dataOnDisk = binaryData.ToStringConvert();
+        }
+
+
+
+
+
 
 
         //private static void SerializeObject<U>(string FileName, U DataObject)
@@ -261,5 +287,29 @@ namespace BlueBasics
         //}
 
 
+
+
+        protected override void OnLoaded(LoadedEventArgs e)
+        {
+            base.OnLoaded(e);
+
+            if (_FirstLoad)
+            {
+                _FirstLoad = false;
+                return;
+            }
+
+            if (obj.LastSavedBy != modAllgemein.UserName())
+            {
+
+
+                if (_OtherUser != obj.LastSavedBy)
+                {
+                    _OtherUser = obj.LastSavedBy;
+                    Forms.MessageBox.Show("<b><u>Achtung:</u></b><br>Sie und '<b>" + obj.LastSavedBy + "</b>' bearbeiten<br>gerade gleichzeitig '<b>" + obj.Beschreibung +
+                       "</b>'.<br><br>Bitte koordinieren sie die Bearbeitung - <br>Daten werden <u>nicht</u> automatisch zusammengefügt.", BlueBasics.Enums.enImageCode.Warnung, "OK");
+                }
+            }
+        }
     }
 }

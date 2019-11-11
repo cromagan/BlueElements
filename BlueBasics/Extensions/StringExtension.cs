@@ -142,6 +142,7 @@ namespace BlueBasics
 
         public static bool IsLong(this string TXT)
         {
+            if (TXT is null) { return false; }
             return TXT.IsFormat(enDataFormat.Ganzzahl);
         }
 
