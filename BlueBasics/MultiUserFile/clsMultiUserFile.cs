@@ -797,7 +797,7 @@ namespace BlueBasics.MultiUserFile
         public void OnConnectedControlsStopAllWorking(DatabaseStoppedEventArgs e)
         {
             if (e.AllreadyStopped.Contains(Filename.ToLower())) { return; }
-            e.AllreadyStopped.Add(Filename);
+            e.AllreadyStopped.Add(Filename.ToLower());
             ConnectedControlsStopAllWorking?.Invoke(this, e);
         }
 

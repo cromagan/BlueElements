@@ -16,6 +16,8 @@ namespace BlueControls.Controls
         private string _propertyName;
         private bool _addGroupboxText;
         private string _propertynamecpl;
+        bool _AutoQuickInfo = true;
+        bool _AutoCaption = true;
 
 
         public string PropertyName
@@ -55,6 +57,47 @@ namespace BlueControls.Controls
 
             }
         }
+
+
+
+        [DefaultValue(true)]
+        public bool AutoCaption
+        {
+            get { return _AutoCaption; }
+            set
+            {
+                if (_AutoCaption == value) { return; }
+
+                FillPropertyNow();
+
+                _AutoCaption = value;
+                GetTmpVariables();
+                UpdateControlData();
+                SetValueFromProperty();
+                CheckEnabledState();
+
+            }
+        }
+
+        [DefaultValue(true)]
+        public bool AutoQuickInfo
+        {
+            get { return _AutoQuickInfo; }
+            set
+            {
+                if (_AutoQuickInfo == value) { return; }
+
+                FillPropertyNow();
+
+                _AutoQuickInfo = value;
+                GetTmpVariables();
+                UpdateControlData();
+                SetValueFromProperty();
+                CheckEnabledState();
+
+            }
+        }
+
 
 
         public object PropertyObject
@@ -167,7 +210,7 @@ namespace BlueControls.Controls
 
 
                 var x = _propertyName.SplitBy("__");
-                Caption = x[0].Replace("_", " ") + ":";
+                if (_AutoCaption) { Caption = x[0].Replace("_", " ") + ":"; }
 
 
                 var qi = _propertyName.Replace("_", " ");
@@ -179,21 +222,21 @@ namespace BlueControls.Controls
                 }
 
 
-                QuickInfo = qi.Replace("  "," ");
+                if (_AutoQuickInfo) { QuickInfo = qi.Replace("  ", " "); };
                 FileEncryptionKey = string.Empty;
             }
 
             else
             {
-                Caption = "[unbekannt]";
-                QuickInfo = string.Empty;
+                if (_AutoCaption) { Caption = "[unbekannt]"; }
+                if (_AutoQuickInfo) { QuickInfo = string.Empty; }
             }
 
 
         }
 
 
-        public static void SetAllFlexControls(GroupBox _in, object _to, bool rekursiv)
+        public static void SetAllFlexControls(System.Windows.Forms.Control _in, object _to, bool rekursiv)
         {
 
             if (_in == null || _in.IsDisposed) { return; }

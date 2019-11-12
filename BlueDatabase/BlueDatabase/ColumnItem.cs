@@ -2856,7 +2856,7 @@ namespace BlueDatabase
 
 
         /// <summary>
-        /// Füllt die Ersetzungen mittels eines Übergebenen Enums aus.
+        /// Füllt die Ersetzungen mittels eines übergebenen Enums aus.
         /// </summary>
         /// <param name="t">Beispiel: GetType(enDesign)</param>
         /// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>

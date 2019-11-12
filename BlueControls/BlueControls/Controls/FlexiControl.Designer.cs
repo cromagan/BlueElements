@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace BlueControls.Controls
 {
-    public partial class FlexiControl : GenericControl
+    public partial class FlexiControl 
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

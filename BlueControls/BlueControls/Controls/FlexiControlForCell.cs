@@ -398,7 +398,7 @@ namespace BlueControls.Controls
             switch (e.Control)
             {
                 case ComboBox comboBox:
-
+                    Suffix = column1.Suffix;
 
                     var Item2 = new ItemCollectionList();
                     ItemCollectionList.GetItemCollection(Item2, column1, null, enShortenStyle.Both, 10000);
@@ -421,8 +421,9 @@ namespace BlueControls.Controls
                     break;
 
                 case TextBox textBox:
+                    Suffix = column1.Suffix;
 
-                    StyleTextBox(textBox, column1.Format, column1.MultiLine, column1.AllowedChars, column1.SpellCheckingEnabled, column1.Suffix, false);
+                    StyleTextBox(textBox, column1.Format, column1.MultiLine, column1.AllowedChars, column1.SpellCheckingEnabled, false);
                     textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus += GotFocus_TextBox;
                     textBox.TextChanged += TextBox_TextChanged;

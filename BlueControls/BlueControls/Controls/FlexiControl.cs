@@ -34,12 +34,13 @@ using BlueDatabase.Enums;
 using BlueControls.Enums;
 using System.Windows.Forms;
 using BlueControls.Designer_Support;
+using System.Collections.Generic;
 
 namespace BlueControls.Controls
 {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
-    public partial class FlexiControl : IQuickInfo, IBackgroundBitmap
+    public partial class FlexiControl : GenericControl, IQuickInfo, IBackgroundBitmap
     {
 
 
@@ -63,7 +64,12 @@ namespace BlueControls.Controls
         private Caption _InfoCaption;
         private string _InfoText = string.Empty;
 
+
+        private string _Suffix = string.Empty;
+
         private bool _allinitialized = false;
+
+        public event EventHandler<ControlInitedEventArgs> ControlInited;
 
         public event EventHandler RemovingAll;
 
@@ -214,7 +220,7 @@ namespace BlueControls.Controls
             ValueId = CaptionText;
             Value = InitialValue;
 
-            StyleTextBox(TextBox, Format, TMPMultiLine, string.Empty, false, string.Empty, true);
+            StyleTextBox(TextBox, Format, TMPMultiLine, string.Empty, false, true);
 
         }
 
@@ -284,10 +290,7 @@ namespace BlueControls.Controls
         #endregion
 
 
-        protected virtual void OnNeedRefresh()
-        {
-            NeedRefresh?.Invoke(this, System.EventArgs.Empty);
-        }
+
 
 
 
@@ -378,6 +381,25 @@ namespace BlueControls.Controls
             }
         }
 
+        [DefaultValue("")]
+        public string Suffix
+        {
+            get
+            {
+                return _Suffix;
+            }
+            set
+            {
+
+                if (_Suffix == value) { return; }
+                _Suffix = value;
+
+
+                RemoveAll(); // Controls and Events entfernen!
+
+            }
+        }
+
 
         public ComboBox ComboBox
         {
@@ -455,7 +477,9 @@ namespace BlueControls.Controls
 
 
 
-
+        /// <summary>
+        /// Ab welchen Wert in Pixel das Eingabesteuerelement beginnen darf.
+        /// </summary>
         [DefaultValue(-1)]
         public int ControlX
         {
@@ -788,11 +812,15 @@ namespace BlueControls.Controls
         {
 
             if (!_allinitialized) { OnRemovingAll(); }
+
             foreach (System.Windows.Forms.Control Control in Controls)
             {
-                Control.Parent.Controls.Remove(Control);
+                //Control.Parent.Controls.Remove(Control);
+              //  OnControlRemoved(new ControlEventArgs(Control));
+                Control.Visible = false;
                 Control.Dispose();
             }
+            Controls.Clear();
 
             _allinitialized = false;
             Invalidate();
@@ -803,7 +831,15 @@ namespace BlueControls.Controls
             RemovingAll?.Invoke(this, System.EventArgs.Empty);
         }
 
+        protected virtual void OnNeedRefresh()
+        {
+            NeedRefresh?.Invoke(this, System.EventArgs.Empty);
+        }
 
+        protected virtual void OnControlInited(ControlInitedEventArgs e)
+        {
+            ControlInited?.Invoke(this, e);
+        }
 
 
         #region  Caption 
@@ -935,6 +971,7 @@ namespace BlueControls.Controls
 
         protected void StyleComboBox(ComboBox Control, ItemCollectionList list, System.Windows.Forms.ComboBoxStyle Style)
         {
+            Control.Suffix = _Suffix;
             Control.DropDownStyle = Style;
             Control.Item.Clear();
             Control.Item.AddRange(list);
@@ -1428,7 +1465,7 @@ namespace BlueControls.Controls
         private TextBox Control_Create_TextBox()
         {
             var Control = new TextBox();
-            StyleTextBox(Control, enDataFormat.Text, false, string.Empty, false, string.Empty, true);
+            StyleTextBox(Control, enDataFormat.Text, false, string.Empty, false, true);
             UpdateValueToControl();
             StandardBehandlung(Control);
             return Control;
@@ -1437,13 +1474,13 @@ namespace BlueControls.Controls
 
 
 
-        protected void StyleTextBox(TextBox Control, enDataFormat Format, bool Multiline, string AllowedChars, bool SpellChecking, string Suffix, bool InstantChange)
+        protected void StyleTextBox(TextBox Control, enDataFormat Format, bool Multiline, string AllowedChars, bool SpellChecking, bool InstantChange)
         {
+            Control.Suffix = _Suffix;
             Control.Format = Format;
             Control.AllowedChars = AllowedChars;
             Control.MultiLine = Multiline;
             Control.SpellChecking = SpellChecking;
-            Control.Suffix = Suffix;
             Control.InstantChangedEvent = InstantChange;
 
             if (Multiline || Height > 20)
@@ -1505,7 +1542,7 @@ namespace BlueControls.Controls
                     break;
 
                 case enÜberschriftAnordnung.Links_neben_Dem_Feld:
-                    Control.Left = Math.Max(_ControlX,_CaptionObject.Width);
+                    Control.Left = Math.Max(_ControlX, _CaptionObject.Width);
                     Control.Top = 0;
                     Control.Width = Width - Control.Left;
                     Control.Height = Height;
@@ -1531,6 +1568,9 @@ namespace BlueControls.Controls
             Controls.Add(Control);
 
             DoInfoTextCaption();
+
+
+            OnControlInited(new ControlInitedEventArgs(Control));
         }
 
 
