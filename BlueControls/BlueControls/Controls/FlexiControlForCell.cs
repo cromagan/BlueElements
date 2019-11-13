@@ -168,7 +168,7 @@ namespace BlueControls.Controls
         public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
+           // InitializeComponent();
         }
 
         public FlexiControlForCell(Database database, int columnKey, enÜberschriftAnordnung captionPosition)
@@ -395,11 +395,12 @@ namespace BlueControls.Controls
 
             }
 
+
+            Suffix = column1.Suffix;
+
             switch (e.Control)
             {
                 case ComboBox comboBox:
-                    Suffix = column1.Suffix;
-
                     var Item2 = new ItemCollectionList();
                     ItemCollectionList.GetItemCollection(Item2, column1, null, enShortenStyle.Both, 10000);
 
@@ -421,8 +422,6 @@ namespace BlueControls.Controls
                     break;
 
                 case TextBox textBox:
-                    Suffix = column1.Suffix;
-
                     StyleTextBox(textBox, column1.Format, column1.MultiLine, column1.AllowedChars, column1.SpellCheckingEnabled, false);
                     textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus += GotFocus_TextBox;
@@ -450,11 +449,7 @@ namespace BlueControls.Controls
                 default:
                     Develop.DebugPrint(enFehlerArt.Fehler, "Control unbekannt");
                     break;
-
-
             }
-
-
         }
 
 

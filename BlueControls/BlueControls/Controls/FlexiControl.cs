@@ -50,7 +50,7 @@ namespace BlueControls.Controls
         protected bool _IsFilling;
 
         public readonly string ValueId;
-        private string _Value;
+        private string _Value = string.Empty;
         protected enEditTypeFormula _EditType = enEditTypeFormula.None; // None ist -1 und muss gesetzt sein!
         protected enÜberschriftAnordnung _CaptionPosition = enÜberschriftAnordnung.ohne;
         protected string _Caption;
@@ -68,9 +68,6 @@ namespace BlueControls.Controls
         private string _Suffix = string.Empty;
 
         private bool _allinitialized = false;
-
-        public event EventHandler<ControlInitedEventArgs> ControlInited;
-
         public event EventHandler RemovingAll;
 
         public event EventHandler NeedRefresh;
@@ -176,8 +173,9 @@ namespace BlueControls.Controls
             _Value = string.Empty;
             Size = new Size(200, 30);
 
-            Button.ImageCode = QuickImage.Get(Pic).ToString();
-            //_Imagecode = QuickImage.Get(Pic).ToString();
+            var c = CreateSubControls();
+
+            ((Button)c).ImageCode = QuickImage.Get(Pic).ToString();
 
 
 
@@ -218,10 +216,13 @@ namespace BlueControls.Controls
 
             _Caption = CaptionText + ":";
             ValueId = CaptionText;
+
+
+            var c = CreateSubControls();
+
+            StyleTextBox((TextBox)c, Format, TMPMultiLine, string.Empty, false, true);
+
             Value = InitialValue;
-
-            StyleTextBox(TextBox, Format, TMPMultiLine, string.Empty, false, true);
-
         }
 
         /// <summary>
@@ -254,7 +255,9 @@ namespace BlueControls.Controls
             Size = new Size(x, y);
 
 
-            StyleComboBox(ComboBox, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
+            var c = CreateSubControls();
+
+            StyleComboBox((ComboBox)c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
 
             Value = InitialValue;
         }
@@ -359,9 +362,12 @@ namespace BlueControls.Controls
             set
             {
 
-                if (!_allinitialized) { Create_Control(); }
 
                 if (_Value == value) { return; }
+
+
+
+                //  if (!_allinitialized) { CreateSubControls(); }
 
                 if (_IsFilling) { return; }
 
@@ -381,6 +387,10 @@ namespace BlueControls.Controls
             }
         }
 
+
+        /// <summary>
+        /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
+        /// </summary>
         [DefaultValue("")]
         public string Suffix
         {
@@ -401,44 +411,44 @@ namespace BlueControls.Controls
         }
 
 
-        public ComboBox ComboBox
-        {
-            get
-            {
-                if (!_allinitialized) { Create_Control(); }
-                foreach (System.Windows.Forms.Control Control in Controls)
-                {
-                    if (Control is ComboBox CB) { return CB; }
-                }
-                return null;
-            }
-        }
+        //public ComboBox ComboBox
+        //{
+        //    get
+        //    {
+        //        if (!_allinitialized) { CreateSubControls(); }
+        //        foreach (System.Windows.Forms.Control Control in Controls)
+        //        {
+        //            if (Control is ComboBox CB) { return CB; }
+        //        }
+        //        return null;
+        //    }
+        //}
 
-        public TextBox TextBox
-        {
-            get
-            {
-                if (!_allinitialized) { Create_Control(); }
-                foreach (System.Windows.Forms.Control Control in Controls)
-                {
-                    if (Control is TextBox TB) { return TB; }
-                }
-                return null;
-            }
+        //public TextBox TextBox
+        //{
+        //    get
+        //    {
+        //        if (!_allinitialized) { CreateSubControls(); }
+        //        foreach (System.Windows.Forms.Control Control in Controls)
+        //        {
+        //            if (Control is TextBox TB) { return TB; }
+        //        }
+        //        return null;
+        //    }
 
-        }
-        public Button Button
-        {
-            get
-            {
-                if (!_allinitialized) { Create_Control(); }
-                foreach (System.Windows.Forms.Control Control in Controls)
-                {
-                    if (Control is Button BT) { return BT; }
-                }
-                return null;
-            }
-        }
+        //}
+        //public Button Button
+        //{
+        //    get
+        //    {
+        //        if (!_allinitialized) { CreateSubControls(); }
+        //        foreach (System.Windows.Forms.Control Control in Controls)
+        //        {
+        //            if (Control is Button BT) { return BT; }
+        //        }
+        //        return null;
+        //    }
+        //}
 
         //public ListBox ListBoxMain
         //{
@@ -572,7 +582,7 @@ namespace BlueControls.Controls
             }
 
 
-            if (!_allinitialized) { Create_Control(); }
+            if (!_allinitialized) { CreateSubControls(); }
 
 
             if (_EditType == enEditTypeFormula.Listbox_6_Zeilen || _EditType == enEditTypeFormula.Listbox_1_Zeile || _EditType == enEditTypeFormula.Listbox_3_Zeilen)
@@ -611,7 +621,7 @@ namespace BlueControls.Controls
         /// </summary>
         private void UpdateValueToControl()
         {
-            if (!_allinitialized) { CreateControl(); }
+            if (!_allinitialized) { CreateSubControls(); }
 
             _IsFilling = true;
 
@@ -811,17 +821,25 @@ namespace BlueControls.Controls
         protected virtual void RemoveAll()
         {
 
-            if (!_allinitialized) { OnRemovingAll(); }
 
-            foreach (System.Windows.Forms.Control Control in Controls)
+            if (Controls.Count > 0) { OnRemovingAll(); }
+
+            OnRemovingAll();
+
+            while (Controls.Count > 0)
             {
-                //Control.Parent.Controls.Remove(Control);
-              //  OnControlRemoved(new ControlEventArgs(Control));
-                Control.Visible = false;
-                Control.Dispose();
+                Controls[0].Visible = false;
+                Controls[0].Dispose(); // Dispose entfernt da Control aus der Collection
+                                       // Controls.Remove(Controls[0]);
             }
-            Controls.Clear();
 
+            //foreach (System.Windows.Forms.Control ThisControl in Controls)
+            //{
+            //    //Control.Parent.Controls.Remove(Control);
+            //    //  OnControlRemoved(new ControlEventArgs(Control));
+
+            //}
+            Controls.Clear();
             _allinitialized = false;
             Invalidate();
         }
@@ -834,11 +852,6 @@ namespace BlueControls.Controls
         protected virtual void OnNeedRefresh()
         {
             NeedRefresh?.Invoke(this, System.EventArgs.Empty);
-        }
-
-        protected virtual void OnControlInited(ControlInitedEventArgs e)
-        {
-            ControlInited?.Invoke(this, e);
         }
 
 
@@ -907,13 +920,15 @@ namespace BlueControls.Controls
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
-        private void Control_Create_Line()
+        private Line Control_Create_Line()
         {
             var Control = new Line
             {
                 Orientation = enOrientation.Waagerecht
             };
             StandardBehandlung(Control);
+
+            return Control;
         }
 
         #endregion
@@ -926,12 +941,14 @@ namespace BlueControls.Controls
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
-        private void Control_Create_EasyPic()
+        private EasyPic Control_Create_EasyPic()
         {
             var Control = new EasyPic();
 
             StandardBehandlung(Control);
             UpdateValueToControl();
+
+            return Control;
         }
 
         /// <summary>
@@ -1403,7 +1420,7 @@ namespace BlueControls.Controls
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
-        private void Control_Create_ButtonYesNo()
+        private Button Control_Create_ButtonYesNo()
         {
             var Control = new Button
             {
@@ -1416,7 +1433,7 @@ namespace BlueControls.Controls
             UpdateValueToControl();
             StandardBehandlung(Control);
 
-
+            return Control;
         }
 
         /// <summary>
@@ -1546,6 +1563,7 @@ namespace BlueControls.Controls
                     Control.Top = 0;
                     Control.Width = Width - Control.Left;
                     Control.Height = Height;
+                    if (_CaptionObject.Width < 4) { Develop.DebugPrint("Caption Width zu klein"); }
                     break;
 
                 case enÜberschriftAnordnung.Über_dem_Feld:
@@ -1554,6 +1572,8 @@ namespace BlueControls.Controls
                     Control.Top = _CaptionObject.Height;
                     Control.Width = Width;
                     Control.Height = Height - _CaptionObject.Height;
+                    if (_CaptionObject.Height < 4) { Develop.DebugPrint("Caption Height zu klein"); }
+
                     break;
 
                 default:
@@ -1569,8 +1589,6 @@ namespace BlueControls.Controls
 
             DoInfoTextCaption();
 
-
-            OnControlInited(new ControlInitedEventArgs(Control));
         }
 
 
@@ -1702,43 +1720,46 @@ namespace BlueControls.Controls
         /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
         /// Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
-        protected void Create_Control()
+        protected GenericControl CreateSubControls()
         {
+
             if (_allinitialized)
             {
                 Develop.DebugPrint(enFehlerArt.Warnung, "Bereits initialisiert");
-                return;
+                return null;
             }
+
+
+            if (Width < 10 || Height < 10)
+            {
+                Develop.DebugPrint(enFehlerArt.Warnung, "Width / Height zu klein");
+                return null;
+            }
+
             _allinitialized = true;
 
             switch (_EditType)
             {
                 case enEditTypeFormula.Line:
-                    Control_Create_Line();
-                    break;
+                    return Control_Create_Line();
 
                 case enEditTypeFormula.Textfeld:
-                    Control_Create_TextBox();
-                    break;
+                    return Control_Create_TextBox();
 
                 case enEditTypeFormula.EasyPic:
-                    Control_Create_EasyPic();
-                    break;
+                    return Control_Create_EasyPic();
 
                 case enEditTypeFormula.Gallery:
                 case enEditTypeFormula.Listbox_1_Zeile:
                 case enEditTypeFormula.Listbox_3_Zeilen:
                 case enEditTypeFormula.Listbox_6_Zeilen:
-                    Control_Create_MainListBox();
-                    break;
+                    return Control_Create_MainListBox();
 
                 case enEditTypeFormula.Textfeld_mit_Auswahlknopf:
-                    Control_Create_ComboBox();
-                    break;
+                    return Control_Create_ComboBox();
 
                 case enEditTypeFormula.Ja_Nein_Knopf:
-                    Control_Create_ButtonYesNo();
-                    break;
+                    return Control_Create_ButtonYesNo();
 
                 case enEditTypeFormula.None:
                     break;
@@ -1746,7 +1767,7 @@ namespace BlueControls.Controls
                 case enEditTypeFormula.nur_als_Text_anzeigen:
                     _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
                     Control_Create_Caption();
-                    break;
+                    return null;
 
                 case enEditTypeFormula.Farb_Auswahl_Dialog:
                     Control_Create_ButtonColor();
@@ -1758,8 +1779,10 @@ namespace BlueControls.Controls
 
                 default:
                     Develop.DebugPrint(_EditType);
-                    break;
+                    return null;
             }
+
+            return null;
         }
 
 

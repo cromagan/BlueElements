@@ -1,6 +1,7 @@
 ﻿using BlueBasics;
 using System.ComponentModel;
 using System.Reflection;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls
 {
@@ -100,6 +101,7 @@ namespace BlueControls.Controls
 
 
 
+        [DefaultValue(null)]
         public object PropertyObject
         {
             get { return _propertyObject; }
@@ -254,6 +256,14 @@ namespace BlueControls.Controls
                 }
             }
 
+        }
+
+
+
+        protected override void OnControlAdded(ControlEventArgs e)
+        {
+            CheckEnabledState();
+            base.OnControlAdded(e);
         }
 
 
