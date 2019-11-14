@@ -168,7 +168,7 @@ namespace BlueControls.Controls
         public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
-           // InitializeComponent();
+            // InitializeComponent();
         }
 
         public FlexiControlForCell(Database database, int columnKey, enÜberschriftAnordnung captionPosition)
@@ -397,6 +397,7 @@ namespace BlueControls.Controls
 
 
             Suffix = column1.Suffix;
+            Format = column1.Format;
 
             switch (e.Control)
             {
@@ -422,7 +423,7 @@ namespace BlueControls.Controls
                     break;
 
                 case TextBox textBox:
-                    StyleTextBox(textBox, column1.Format, column1.MultiLine, column1.AllowedChars, column1.SpellCheckingEnabled, false);
+                    StyleTextBox(textBox, column1.MultiLine, column1.AllowedChars, column1.SpellCheckingEnabled, false);
                     textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus += GotFocus_TextBox;
                     textBox.TextChanged += TextBox_TextChanged;

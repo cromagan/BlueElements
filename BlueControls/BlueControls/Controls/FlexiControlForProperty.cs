@@ -1,4 +1,5 @@
 ﻿using BlueBasics;
+using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows.Forms;
@@ -19,7 +20,32 @@ namespace BlueControls.Controls
         private string _propertynamecpl;
         bool _AutoQuickInfo = true;
         bool _AutoCaption = true;
+        bool _FehlerWennLeer = true;
+        bool _FehlerFormatCheck = true;
+        Timer Checker = new Timer();
 
+
+
+        public FlexiControlForProperty() : base()
+        {
+
+            GenFehlerText();
+
+
+            Checker.Tick += Checker_Tick;
+
+            Checker.Interval = 1000;
+            Checker.Enabled = true;
+
+
+        }
+
+        private void Checker_Tick(object sender, System.EventArgs e)
+        {
+            if (_IsFilling) { return; }
+            if (!_allinitialized) { return; }
+            SetValueFromProperty();
+        }
 
         public string PropertyName
         {
@@ -36,6 +62,32 @@ namespace BlueControls.Controls
                 SetValueFromProperty();
                 CheckEnabledState();
 
+            }
+        }
+
+        [DefaultValue(true)]
+        public bool FehlerWennLeer
+        {
+            get { return _FehlerWennLeer; }
+            set
+            {
+                if (_FehlerWennLeer == value) { return; }
+                _FehlerWennLeer = value;
+                GenFehlerText();
+            }
+        }
+
+
+
+        [DefaultValue(true)]
+        public bool FehlerFormatCheck
+        {
+            get { return _FehlerFormatCheck; }
+            set
+            {
+                if (_FehlerFormatCheck == value) { return; }
+                _FehlerFormatCheck = value;
+                GenFehlerText();
             }
         }
 
@@ -170,6 +222,7 @@ namespace BlueControls.Controls
         private void FillPropertyNow()
         {
             if (_IsFilling) { return; }
+            if (!_allinitialized) { return; }
 
             if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
@@ -199,6 +252,7 @@ namespace BlueControls.Controls
         {
             base.OnValueChanged();
             FillPropertyNow();
+            GenFehlerText();
         }
 
 
@@ -266,6 +320,23 @@ namespace BlueControls.Controls
             base.OnControlAdded(e);
         }
 
+        private void GenFehlerText()
+        {
+
+            if (_FehlerWennLeer &&  string.IsNullOrEmpty(Value))
+            {
+                InfoText = "Dieses Feld darf nicht leer sein.";
+            }
+            if (_FehlerFormatCheck && !Value.IsFormat(Format))
+            {
+                InfoText = "Der Wert entspricht nicht dem erwarteten Format.";
+            }
+            else
+            {
+                InfoText = string.Empty;
+            }
+
+        }
 
     }
 }

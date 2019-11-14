@@ -66,8 +66,9 @@ namespace BlueControls.Controls
 
 
         private string _Suffix = string.Empty;
+        private enDataFormat _Format = enDataFormat.Text;
 
-        private bool _allinitialized = false;
+        protected bool _allinitialized = false;
         public event EventHandler RemovingAll;
 
         public event EventHandler NeedRefresh;
@@ -113,9 +114,9 @@ namespace BlueControls.Controls
         /// <summary>
         /// Erstellt einen Ja/Nein-Knopf.
         /// </summary>
-        /// <param name="Caption"></param>
-        /// <param name="Value"></param>
-        public FlexiControl(string Caption, bool Value)
+        /// <param name="caption"></param>
+        /// <param name="value"></param>
+        public FlexiControl(string caption, bool value)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -123,10 +124,10 @@ namespace BlueControls.Controls
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _EditType = enEditTypeFormula.Ja_Nein_Knopf;
-            _Caption = Caption + ":";
-            ValueId = Caption;
+            _Caption = caption + ":";
+            ValueId = caption;
             _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-            this.Value = Value.ToPlusMinus();
+            this.Value = value.ToPlusMinus();
 
             Size = new Size(200, 22);
         }
@@ -216,11 +217,12 @@ namespace BlueControls.Controls
 
             _Caption = CaptionText + ":";
             ValueId = CaptionText;
+            _Format = Format;
 
 
             var c = CreateSubControls();
 
-            StyleTextBox((TextBox)c, Format, TMPMultiLine, string.Empty, false, true);
+            StyleTextBox((TextBox)c, TMPMultiLine, string.Empty, false, true);
 
             Value = InitialValue;
         }
@@ -286,7 +288,7 @@ namespace BlueControls.Controls
                 {
                     Forms.QuickInfo.Close();
                     _QuickInfo = value;
-                    SetQuickInfo();
+                    UpdateControls();
                 }
             }
         }
@@ -357,11 +359,13 @@ namespace BlueControls.Controls
         {
             get
             {
+                if (_Value == null) { return string.Empty; }
+
                 return _Value;
             }
             set
             {
-
+                if (value == null) { value = string.Empty; }
 
                 if (_Value == value) { return; }
 
@@ -405,70 +409,43 @@ namespace BlueControls.Controls
                 _Suffix = value;
 
 
-                RemoveAll(); // Controls and Events entfernen!
+                UpdateControls();
 
             }
         }
 
 
-        //public ComboBox ComboBox
-        //{
-        //    get
-        //    {
-        //        if (!_allinitialized) { CreateSubControls(); }
-        //        foreach (System.Windows.Forms.Control Control in Controls)
-        //        {
-        //            if (Control is ComboBox CB) { return CB; }
-        //        }
-        //        return null;
-        //    }
-        //}
 
-        //public TextBox TextBox
-        //{
-        //    get
-        //    {
-        //        if (!_allinitialized) { CreateSubControls(); }
-        //        foreach (System.Windows.Forms.Control Control in Controls)
-        //        {
-        //            if (Control is TextBox TB) { return TB; }
-        //        }
-        //        return null;
-        //    }
+        /// <summary>
+        /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
+        /// </summary>
+        [DefaultValue(enDataFormat.Text)]
+        public enDataFormat Format
+        {
+            get
+            {
+                return _Format;
+            }
+            set
+            {
 
-        //}
-        //public Button Button
-        //{
-        //    get
-        //    {
-        //        if (!_allinitialized) { CreateSubControls(); }
-        //        foreach (System.Windows.Forms.Control Control in Controls)
-        //        {
-        //            if (Control is Button BT) { return BT; }
-        //        }
-        //        return null;
-        //    }
-        //}
+                if (_Format == value) { return; }
+                _Format = value;
 
-        //public ListBox ListBoxMain
-        //{
-        //    get
-        //    {
-        //        if (!_allinitialized) { Create_Control(); }
-        //        ListBoxen(out var Main, out var Suggest);
-        //        return Main;
-        //    }
-        //}
 
-        //public ListBox ListBoxSuggest
-        //{
-        //    get
-        //    {
-        //        if (!_allinitialized) { Create_Control(); }
-        //        ListBoxen(out var Main, out var Suggest);
-        //        return Suggest;
-        //    }
-        //}
+                UpdateControls();
+
+            }
+        }
+
+
+
+
+
+
+
+
+
 
         [DefaultValue(enEditTypeFormula.None)]
         public enEditTypeFormula EditType
@@ -672,16 +649,6 @@ namespace BlueControls.Controls
         }
 
 
-        private void SetQuickInfo()
-        {
-            foreach (System.Windows.Forms.Control Control in Controls)
-            {
-                if (Control != _InfoCaption)
-                {
-                    if (Control is IQuickInfo QI) { QI.QuickInfo = _QuickInfo; }
-                }
-            }
-        }
 
 
 
@@ -748,7 +715,7 @@ namespace BlueControls.Controls
                 IContextMenu.ContextMenuItemClicked += ContextMenuOfControls_ItemClicked;
             }
 
-            SetQuickInfo();
+            UpdateControls();
         }
 
 
@@ -988,6 +955,7 @@ namespace BlueControls.Controls
 
         protected void StyleComboBox(ComboBox Control, ItemCollectionList list, System.Windows.Forms.ComboBoxStyle Style)
         {
+            Control.Format = _Format;
             Control.Suffix = _Suffix;
             Control.DropDownStyle = Style;
             Control.Item.Clear();
@@ -1482,7 +1450,7 @@ namespace BlueControls.Controls
         private TextBox Control_Create_TextBox()
         {
             var Control = new TextBox();
-            StyleTextBox(Control, enDataFormat.Text, false, string.Empty, false, true);
+            StyleTextBox(Control, false, string.Empty, false, true);
             UpdateValueToControl();
             StandardBehandlung(Control);
             return Control;
@@ -1491,10 +1459,10 @@ namespace BlueControls.Controls
 
 
 
-        protected void StyleTextBox(TextBox Control, enDataFormat Format, bool Multiline, string AllowedChars, bool SpellChecking, bool InstantChange)
+        protected void StyleTextBox(TextBox Control, bool Multiline, string AllowedChars, bool SpellChecking, bool InstantChange)
         {
+            Control.Format = _Format;
             Control.Suffix = _Suffix;
-            Control.Format = Format;
             Control.AllowedChars = AllowedChars;
             Control.MultiLine = Multiline;
             Control.SpellChecking = SpellChecking;
@@ -1782,10 +1750,66 @@ namespace BlueControls.Controls
                     return null;
             }
 
+            UpdateControls();
+
             return null;
         }
 
 
 
+
+
+        private void UpdateControls()
+        {
+
+
+            foreach (System.Windows.Forms.Control Control in Controls)
+            {
+
+
+                if (Control != _InfoCaption)
+                {
+                    if (Control is IQuickInfo QI) { QI.QuickInfo = _QuickInfo; }
+                }
+
+
+                switch (Control)
+                {
+
+                    case ComboBox ComboBox:
+                        ComboBox.Suffix = _Suffix;
+                        ComboBox.Format = _Format;
+
+                        break;
+
+                    case TextBox TextBox:
+                        TextBox.Suffix = _Suffix;
+                        TextBox.Format = _Format;
+                        break;
+
+                    case EasyPic _:
+                           break;
+
+                    case ListBox _:
+                        //if (ListBox.Name == "Main") { UpdateValueTo_ListBox(); }
+                        break;
+
+                    case Button _:
+                        //UpdateValueTo_Button(Button);
+                        break;
+
+                    case Caption _:
+                        //UpdateValueTo_Caption();
+                        break;
+
+                    case Line _:
+                        break;
+
+                    default:
+                        Develop.DebugPrint(Typ(Control));
+                        break;
+                }
+            }
+        }
     }
 }
