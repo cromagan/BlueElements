@@ -319,7 +319,7 @@ namespace BlueControls.Controls
                     if (gr == null) { return; }
                     Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
-                    Skin.Draw_FormatedText(gr, _Text, null, tmpSkinRow, enAlignment.Top_Left, new Rectangle(), null, false, Translate);
+                    Skin.Draw_FormatedText(gr, _Text, null, tmpSkinRow, state, enAlignment.Top_Left, new Rectangle(), null, false, Translate);
                     return;
                 }
 

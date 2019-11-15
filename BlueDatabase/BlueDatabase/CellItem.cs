@@ -239,7 +239,7 @@ namespace BlueDatabase
 
 
 
-        public static QuickImage StandardImage(ColumnItem column, string Txt, QuickImage defaultImage)
+        public static QuickImage StandardImage(ColumnItem column, string Txt)
         {
 
             switch (column.Format)
@@ -247,7 +247,7 @@ namespace BlueDatabase
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.RelationText:
-                    return defaultImage; // z.B. KontextMenu
+                    return null; // z.B. KontextMenu
 
                 case enDataFormat.Bit:
                     if (Txt == true.ToPlusMinus())
@@ -281,12 +281,12 @@ namespace BlueDatabase
 
 
                 case enDataFormat.BildCode:
-                    if (defaultImage != null || column == null) { return defaultImage; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
+                    if ( column == null) { return null; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
                     if (string.IsNullOrEmpty(Txt)) { return null; }
 
                     var code = column.Prefix + Txt + column.Suffix;
                     if (column.BildCode_ConstantHeight > 0) { code = code + "|" + column.BildCode_ConstantHeight; }
-                    defaultImage = QuickImage.Get(code);
+                   var defaultImage = QuickImage.Get(code);
 
                     if (defaultImage != null && !defaultImage.IsError) { return defaultImage; }
 
@@ -319,7 +319,6 @@ namespace BlueDatabase
 
 
                 case enDataFormat.Link_To_Filesystem:
-                    if (defaultImage != null) { return defaultImage; }
                     if (Txt.FileType() == enFileFormat.Unknown) { return null; }
                     return QuickImage.Get(Txt.FileType(), 48);
 
@@ -327,7 +326,7 @@ namespace BlueDatabase
                     //  Develop.DebugPrint_NichtImplementiert();
                     //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return defaultImage; }
                     // return Skin.BlueFont.Get(Txt).SymbolForReadableText();
-                    return defaultImage;
+                    return null;
 
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:

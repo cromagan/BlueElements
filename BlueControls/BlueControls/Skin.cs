@@ -173,7 +173,7 @@ namespace BlueControls
 
         public static enImageCodeEffect AdditionalState(enStates vState)
         {
-            if (Convert.ToBoolean(vState & enStates.Standard_Disabled)) { return ST[0]; }
+            if (vState.HasFlag(enStates.Standard_Disabled)) { return ST[0]; }
             return enImageCodeEffect.Ohne;
         }
 
@@ -817,7 +817,7 @@ namespace BlueControls
         /// <param name="DeleteBack"></param>
         public static void Draw_FormatedText(Graphics GR, string txt, enDesign vDesign, enStates vState, QuickImage ImageCode, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, bool Translate)
         {
-            Draw_FormatedText(GR, txt, ImageCode, SkinRow(vDesign, vState), vAlign, FitInRect, Child, DeleteBack, Translate);
+            Draw_FormatedText(GR, txt, ImageCode, SkinRow(vDesign, vState), vState, vAlign, FitInRect, Child, DeleteBack, Translate);
         }
 
         /// <summary>
@@ -831,7 +831,7 @@ namespace BlueControls
         /// <param name="FitInRect"></param>
         /// <param name="Child"></param>
         /// <param name="DeleteBack"></param>
-        public static void Draw_FormatedText(Graphics GR, string TXT, QuickImage QI, RowItem SkinRow, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, bool Translate)
+        public static void Draw_FormatedText(Graphics GR, string TXT, QuickImage QI, RowItem SkinRow, enStates State, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, bool Translate)
         {
             if (string.IsNullOrEmpty(TXT) && QI == null) { return; }
 
@@ -840,7 +840,7 @@ namespace BlueControls
             BlueFont f = null;
             if (!string.IsNullOrEmpty(TXT)) { f = GetBlueFont(SkinRow); }
 
-            var State = (enStates)Value(SkinRow, col_Status, -1);
+          //  var State = (enStates)Value(SkinRow, col_Status, -1);
             QuickImage tmpImage = null;
             if (QI != null) { tmpImage = QuickImage.Get(QI, AdditionalState(State)); }
 

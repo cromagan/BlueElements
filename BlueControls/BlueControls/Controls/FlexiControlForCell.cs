@@ -194,7 +194,7 @@ namespace BlueControls.Controls
             }
             else
             {
-                Caption = _tmpColumn.Caption;
+                Caption = _tmpColumn.Caption.Replace("\r", " ").Replace("\n", " ").Replace("  ", " ").TrimEnd(":") + ":";
                 EditType = _tmpColumn.EditType;
                 QuickInfo = _tmpColumn.QickInfoText(string.Empty);
                 FileEncryptionKey = _Database.FileEncryptionKey;

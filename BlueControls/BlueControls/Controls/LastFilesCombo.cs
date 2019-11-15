@@ -181,7 +181,7 @@ namespace BlueControls.Controls
                                 show = show + " - " + x[1];
                             }
 
-                            var it = new TextListItem(false, x[0], show, NR.ToString(Constants.Format_Integer3));
+                            var it = new TextListItem(x[0], show, false, NR.ToString(Constants.Format_Integer3));
                             if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]))
                             {
                                 it.Tags.Add(x[1]);

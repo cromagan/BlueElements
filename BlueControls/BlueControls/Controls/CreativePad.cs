@@ -1848,7 +1848,7 @@ namespace BlueControls.Controls
 
             if (UserMenu.Count > 0)
             {
-                ThisContextMenu.Add(new TextListItem(true, "Allgemein"));
+                ThisContextMenu.Add(new TextListItem("Allgemein", true));
                 ThisContextMenu.AddRange(UserMenu);
             }
 
@@ -1856,7 +1856,7 @@ namespace BlueControls.Controls
 
             if (_HotItem != null)
             {
-                ThisContextMenu.Add(new TextListItem(true, "Allgemeine Element-Aktionen"));
+                ThisContextMenu.Add(new TextListItem("Allgemeine Element-Aktionen", true));
                 ThisContextMenu.Add(new TextListItem("#Erweitert", "Objekt bearbeiten", enImageCode.Stift));
                 ThisContextMenu.Add(new LineListItem());
 

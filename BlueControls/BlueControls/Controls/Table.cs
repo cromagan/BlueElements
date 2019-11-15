@@ -531,7 +531,7 @@ namespace BlueControls.Controls
             {
                 if (IsOnScreen(_CursorPosColumn, _CursorPosRow, DisplayRectangleWOSlider))
                 {
-                    tmpCursorRect = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1, (int)_CursorPosRow.TMP_Y+1, Column_DrawWidth(ViewItem, DisplayRectangleWOSlider), Row_DrawHeight(_CursorPosRow, DisplayRectangleWOSlider)-1);
+                    tmpCursorRect = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1, (int)_CursorPosRow.TMP_Y + 1, Column_DrawWidth(ViewItem, DisplayRectangleWOSlider), Row_DrawHeight(_CursorPosRow, DisplayRectangleWOSlider) - 1);
                     Draw_Cursor(GR, DisplayRectangleWOSlider, false);
                 }
             }
@@ -903,7 +903,7 @@ namespace BlueControls.Controls
                     for (var z = 0; z <= MEI.GetUpperBound(0); z++)
                     {
                         Draw_CellTransparentDirect_OneLine(GR, MEI[z], CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY + y, ContentHolderCellColumn, Convert.ToBoolean(z == MEI.GetUpperBound(0)), DisplayRectangleWOSlider, vfont);
-                        y += FormatedText_NeededSize(CellInThisDatabaseColumn.Column, MEI[z], null, vfont, enShortenStyle.Replaced, Pix16 - 1).Height;
+                        y += FormatedText_NeededSize(CellInThisDatabaseColumn.Column, MEI[z], vfont, enShortenStyle.Replaced, Pix16 - 1).Height;
                     }
                 }
             }
@@ -1214,7 +1214,9 @@ namespace BlueControls.Controls
                 if (!IsLastRow) { DrawString = "..."; }// Die Letzte Zeile noch ganz hinschreiben
             }
 
-            Draw_FormatedText(GR, ContentHolderColumnStyle, DrawString, null, r, null, false, vfont, enShortenStyle.Replaced);
+            var tmpImageCode = CellItem.StandardImage(ContentHolderColumnStyle, DrawString);
+
+            Draw_FormatedText(GR, ContentHolderColumnStyle, DrawString, tmpImageCode, r, false, vfont, enShortenStyle.Replaced);
         }
 
 
@@ -4086,7 +4088,7 @@ namespace BlueControls.Controls
                 var TMP = Column.Database.Cell.GetList(Column, Row);
                 if (Column.ShowMultiLineInOneLine)
                 {
-                    _ContentSize = FormatedText_NeededSize(Column, TMP.JoinWith("; "), null, CellFont, enShortenStyle.Replaced, Pix16);
+                    _ContentSize = FormatedText_NeededSize(Column, TMP.JoinWith("; "), CellFont, enShortenStyle.Replaced, Pix16);
                 }
                 else
                 {
@@ -4094,7 +4096,7 @@ namespace BlueControls.Controls
                     var TMPSize = Size.Empty;
                     foreach (var ThisString in TMP)
                     {
-                        TMPSize = FormatedText_NeededSize(Column, ThisString, null, CellFont, enShortenStyle.Replaced, Pix16);
+                        TMPSize = FormatedText_NeededSize(Column, ThisString, CellFont, enShortenStyle.Replaced, Pix16);
                         _ContentSize.Width = Math.Max(TMPSize.Width, _ContentSize.Width);
                         _ContentSize.Height += Math.Max(TMPSize.Height, Pix16);
 
@@ -4107,7 +4109,7 @@ namespace BlueControls.Controls
             {
 
                 var _String = Column.Database.Cell.GetString(Column, Row);
-                _ContentSize = FormatedText_NeededSize(Column, _String, null, CellFont, enShortenStyle.Replaced, Pix16);
+                _ContentSize = FormatedText_NeededSize(Column, _String, CellFont, enShortenStyle.Replaced, Pix16);
             }
 
 
@@ -4368,7 +4370,7 @@ namespace BlueControls.Controls
 
 
         /// <summary>
-        /// Stati (Disabled) werden nicht mehr geändert
+        /// Zeichnet den Text und das Bild ohne weitere Modifikation
         /// </summary>
         /// <param name="GR"></param>
         /// <param name="column"></param>
@@ -4379,43 +4381,48 @@ namespace BlueControls.Controls
         /// <param name="Child"></param>
         /// <param name="DeleteBack"></param>
         /// <param name="F"></param>
-        private static void Draw_FormatedText(Graphics GR, ColumnItem column, string Txt, QuickImage ImageCode, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, BlueFont F, enShortenStyle Style)
+        private static void Draw_FormatedText(Graphics GR, ColumnItem column, string Txt, QuickImage ImageCode, Rectangle FitInRect, bool DeleteBack, BlueFont F, enShortenStyle Style)
         {
-            var tmpImageCode = CellItem.StandardImage(column, Txt, ImageCode);
+
             var tmpText = CellItem.ValueReadable(column, Txt, Style);
             var tmpAlign = CellItem.StandardAlignment(column);
 
-            Skin.Draw_FormatedText(GR, tmpText, tmpImageCode, tmpAlign, FitInRect, Child, DeleteBack, F, false);
+            Skin.Draw_FormatedText(GR, tmpText, ImageCode, tmpAlign, FitInRect, null, DeleteBack, F, false);
         }
 
+
         /// <summary>
-        /// Bild wird auf Disabled geändert
+        /// Status des Bildes (Disabled) wird geändert
         /// </summary>
-        /// <param name="column"></param>
-        /// <param name="Txt"></param>
-        /// <param name="QI"></param>
-        /// <param name="GR"></param>
-        /// <param name="FitInRect"></param>
-        /// <param name="vAlign"></param>
-        /// <param name="Child"></param>
-        /// <param name="DeleteBack"></param>
-        /// <param name="SkinRow"></param>
-        public static void Draw_FormatedText(ColumnItem column, string Txt, QuickImage QI, Graphics GR, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, RowItem SkinRow, enShortenStyle Style)
+        public static void Draw_FormatedText(ColumnItem column, string Txt, Graphics GR, Rectangle FitInRect, bool DeleteBack, enShortenStyle Style, enDesign vDesign, enStates vState)
         {
-            if (string.IsNullOrEmpty(Txt) && QI == null) { return; }
+            if (string.IsNullOrEmpty(Txt)) { return; }
+
+            var SkinRow = Skin.SkinRow(vDesign, vState);
 
             if (SkinRow == null) { return; }
 
             BlueFont f = null;
             if (!string.IsNullOrEmpty(Txt)) { f = Skin.GetBlueFont(SkinRow); }
 
-            Draw_FormatedText(GR, column, Txt, QI, FitInRect, Child, DeleteBack, f, Style);
+
+
+            var tmpImage = CellItem.StandardImage(column, Txt);
+
+
+            if (tmpImage != null)
+            {
+                tmpImage = QuickImage.Get(tmpImage, Skin.AdditionalState(vState));
+            }
+
+
+            Draw_FormatedText(GR, column, Txt, tmpImage, FitInRect, DeleteBack, f, Style);
         }
 
-        public static Size FormatedText_NeededSize(ColumnItem Column, string txt, QuickImage ImageCode, BlueFont F, enShortenStyle Style, int MinSize)
+        public static Size FormatedText_NeededSize(ColumnItem Column, string txt, BlueFont F, enShortenStyle Style, int MinSize)
         {
             var tmpText = CellItem.ValueReadable(Column, txt, Style);
-            var tmpImageCode = CellItem.StandardImage(Column, txt, ImageCode);
+            var tmpImageCode = CellItem.StandardImage(Column, txt);
 
 
             return Skin.FormatedText_NeededSize(tmpText, tmpImageCode, F, MinSize);

@@ -323,18 +323,26 @@ namespace BlueControls.Controls
         private void GenFehlerText()
         {
 
-            if (_FehlerWennLeer &&  string.IsNullOrEmpty(Value))
+            if (_FehlerWennLeer && string.IsNullOrEmpty(Value))
             {
                 InfoText = "Dieses Feld darf nicht leer sein.";
+                return;
             }
+
+
+            if (string.IsNullOrEmpty(Value))
+            {
+                InfoText = string.Empty;
+                return;
+            }
+
             if (_FehlerFormatCheck && !Value.IsFormat(Format))
             {
                 InfoText = "Der Wert entspricht nicht dem erwarteten Format.";
+                return;
             }
-            else
-            {
-                InfoText = string.Empty;
-            }
+
+            InfoText = string.Empty;
 
         }
 

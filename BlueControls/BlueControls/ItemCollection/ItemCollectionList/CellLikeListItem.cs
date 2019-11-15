@@ -60,28 +60,16 @@ namespace BlueControls.ItemCollection
         //public CellLikeListItem() : base() { }
 
 
-        public CellLikeListItem(string vInternalAndReadableText, ColumnItem vColumnStyle, enShortenStyle Style, bool vEnabled = true)
+        public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled)
         {
-            _Internal = vInternalAndReadableText;
-            _StyleLikeThis = vColumnStyle;
-            _style = Style;
+            _Internal = internalAndReadableText;
+            _StyleLikeThis = columnStyle;
+            _style = style;
 
-            _Enabled = vEnabled;
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
+            _Enabled = enabled;
         }
 
 
-
-
-        protected override void Initialize()
-        {
-            base.Initialize();
-            base.Initialize();
-            _StyleLikeThis = null;
-        }
 
 
         #endregion
@@ -107,7 +95,7 @@ namespace BlueControls.ItemCollection
 
         public override SizeF SizeUntouchedForListBox()
         {
-            return Table.FormatedText_NeededSize(_StyleLikeThis, _Internal, null, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16);
+            return Table.FormatedText_NeededSize(_StyleLikeThis, _Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16);
         }
 
 
@@ -119,7 +107,7 @@ namespace BlueControls.ItemCollection
                 Skin.Draw_Back(GR, Parent.ItemDesign, vState, PositionModified, null, false);
             }
 
-            Table.Draw_FormatedText(_StyleLikeThis, _Internal, null, GR, PositionModified, null, false, Skin.SkinRow(Parent.ItemDesign, vState), _style);
+            Table.Draw_FormatedText(_StyleLikeThis, _Internal, GR, PositionModified, false, _style, Parent.ItemDesign, vState);
 
             if (DrawBorderAndBack)
             {

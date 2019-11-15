@@ -45,128 +45,74 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-        public TextListItem()
-        { }
+
+        public TextListItem(string internalname, string readableText, bool isCaption, string userDefCompareKey) : this(internalname, readableText, null, isCaption, true, enDataFormat.Text, userDefCompareKey) { }
 
 
-        public TextListItem(string vInternalAndReadableText, bool vEnabled = true)
+
+        public TextListItem(string internalAndReadableText, bool isCaption) : this(internalAndReadableText, internalAndReadableText, null, isCaption, true, enDataFormat.Text, string.Empty) { }
+
+
+
+
+
+        public TextListItem(string internalAndReadableText) : this(internalAndReadableText, internalAndReadableText, null, false, true, enDataFormat.Text, string.Empty) { }
+
+
+
+        public TextListItem(string internalAndReadableText, enDataFormat format) : this(internalAndReadableText, internalAndReadableText, null, false, true, format, string.Empty) { }
+
+
+        public TextListItem(string internalAndReadableText, enImageCode symbol) : this(internalAndReadableText, internalAndReadableText, symbol, false, true, enDataFormat.Text, string.Empty) { }
+
+
+
+        public TextListItem(string internalname, string readableText, bool enabled) : this(internalname, readableText, null, false, enabled, enDataFormat.Text, string.Empty) { }
+
+        public TextListItem(string internalname, string readableText, enImageCode symbol, bool enabled) : this(internalname, readableText, symbol, false, enabled, enDataFormat.Text, string.Empty) { }
+
+        public TextListItem(string internalname, string readableText, enImageCode symbol, bool enabled, string userDefCompareKey) : this(internalname, readableText, symbol, false, enabled, enDataFormat.Text, userDefCompareKey) { }
+
+        public TextListItem(string internalname, string readableText, QuickImage symbol, bool enabled) : this(internalname, readableText, symbol, false, enabled, enDataFormat.Text, string.Empty) { }
+
+        public TextListItem(string internalname, string readableText, QuickImage symbol, bool enabled, string userDefCompareKey) : this(internalname, readableText, symbol, false, enabled, enDataFormat.Text, userDefCompareKey) { }
+
+
+
+
+
+        public TextListItem(string internalname, string readableText) : this(internalname, readableText, null, false, true, enDataFormat.Text, string.Empty) { }
+
+        public TextListItem(string internalname, string readableText, enImageCode symbol) : this(internalname, readableText, symbol, false, true, enDataFormat.Text, string.Empty) { }
+
+
+        public TextListItem(string internalname, string readableText, QuickImage symbol) : this(internalname, readableText, symbol, false, true, enDataFormat.Text, string.Empty) { }
+
+
+
+
+        public TextListItem(string internalname, string readableText, enImageCode symbol, bool isCaption, bool enabled, enDataFormat format, string userDefCompareKey) : this(internalname, readableText, null, isCaption, enabled, format, userDefCompareKey)
         {
-            _Internal = vInternalAndReadableText;
-            _ReadableText = vInternalAndReadableText;
-            _Enabled = vEnabled;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
+            _Symbol = QuickImage.Get(symbol, 16);
+            //if (_Symbol != null) { _SymbolDisabled = QuickImage.Get(_Symbol, Skin.AdditionalState(enStates.Standard_Disabled)); }
         }
 
-
-        public TextListItem(bool IsCaption, string vInternalAndReadableText)
+        public TextListItem(string internalname, string readableText, QuickImage symbol, bool isCaption, bool enabled, enDataFormat format, string userDefCompareKey) : base()
         {
-            _Internal = vInternalAndReadableText;
-            _ReadableText = vInternalAndReadableText;
+            _IsCaption = isCaption;
+            _Internal = internalname;
+            _ReadableText = readableText;
+            _Symbol = symbol;
+            //if (_Symbol != null) { _SymbolDisabled = QuickImage.Get(_Symbol, Skin.AdditionalState(enStates.Standard_Disabled)); }
 
-            _IsCaption = IsCaption;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        }
-
-        public TextListItem(bool IsCaption, string vInternal, string vReadableText, string cUserDefCompareKey)
-        {
-            _Internal = vInternal;
-            _ReadableText = vReadableText;
-            _IsCaption = IsCaption;
-            UserDefCompareKey = cUserDefCompareKey;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        }
-
-
-        public TextListItem(string vInternal, string vReadableText, enDataFormat cFormat)
-        {
-            _Internal = vInternal;
-            _ReadableText = vReadableText;
-            _Format = cFormat;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        }
-
-        public TextListItem(string vInternalAndReadableText, enDataFormat cFormat, bool vEnabled = true)
-        {
-            _Internal = vInternalAndReadableText;
-            _ReadableText = vInternalAndReadableText;
-            _Enabled = vEnabled;
-            _Format = cFormat;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        }
-
-
-        public TextListItem(string vInternalAndReadableText, enImageCode vSymbol, bool vEnabled = true)
-        {
-            _Internal = vInternalAndReadableText;
-            _ReadableText = vInternalAndReadableText;
-            _Symbol = QuickImage.Get(vSymbol);
-            _Enabled = vEnabled;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        }
-
-
-        public TextListItem(string vInternal, string vReadableText, bool vEnabled = true)
-        {
-            _Internal = vInternal;
-            _ReadableText = vReadableText;
-            _Enabled = vEnabled;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        }
-
-
-        public TextListItem(string vInternal, string vReadableText, enImageCode vSymbol, bool vEnabled = true)
-        {
-            _Internal = vInternal;
-            _ReadableText = vReadableText;
-            _Symbol = QuickImage.Get(vSymbol);
-            _Enabled = vEnabled;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        }
-
-
-        public TextListItem(string vInternal, string vReadableText, enImageCode vSymbol, bool vEnabled, string cUserDefCompareKey)
-        {
-            _Internal = vInternal;
-            _ReadableText = vReadableText;
-            _Symbol = QuickImage.Get(vSymbol);
-            _Enabled = vEnabled;
-            UserDefCompareKey = cUserDefCompareKey;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        }
-
-
-        public TextListItem(string vInternal, string vReadableText, QuickImage vSymbol, bool vEnabled, string cUserDefCompareKey)
-        {
-            _Internal = vInternal;
-            _ReadableText = vReadableText;
-            _Symbol = vSymbol;
-            _Enabled = vEnabled;
-            UserDefCompareKey = cUserDefCompareKey;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        }
-
-
-        public TextListItem(string vInternal, string vReadableText, QuickImage vSymbol, bool vEnabled = true)
-        {
-            _Internal = vInternal;
-            _ReadableText = vReadableText;
-            _Symbol = vSymbol;
-            _Enabled = vEnabled;
+            _Enabled = enabled;
+            _Format = format;
+            UserDefCompareKey = userDefCompareKey;
             if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
         }
 
 
 
-
-
-        protected override void Initialize()
-        {
-            base.Initialize();
-            base.Initialize();
-            _ReadableText = string.Empty;
-            _Symbol = null;
-            _IsCaption = false;
-        }
 
 
         #endregion
@@ -196,12 +142,12 @@ namespace BlueControls.ItemCollection
             {
                 return _Symbol;
             }
-            set
-            {
-                if (value == _Symbol) { return; }
-                _Symbol = value;
-                OnChanged();
-            }
+            //set
+            //{
+            //    if (value == _Symbolx) { return; }
+            //    _Symbolx = value;
+            //    OnChanged();
+            //}
         }
 
 
@@ -287,10 +233,15 @@ namespace BlueControls.ItemCollection
 
         protected override BasicListItem CloneLVL2()
         {
-            var x = new TextListItem(_Internal, _ReadableText, _Format);
-            x._Symbol = _Symbol;
-            x._IsCaption = _IsCaption;
-            return x;
+
+            //Develop.DebugPrint_NichtImplementiert();
+            ////var x = new TextListItem(_Internal, _ReadableText, _Format, true);
+            ////x._Symbolx = _Symbolx;
+            ////x._IsCaption = _IsCaption;
+            //return null;
+
+            return new TextListItem(_Internal, _ReadableText, _Symbol, _IsCaption, _Enabled, _Format, UserDefCompareKey);
+
         }
 
         protected override bool FilterMatchLVL2(string FilterText)

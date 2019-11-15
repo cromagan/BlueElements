@@ -435,7 +435,7 @@ namespace BlueControls.Controls
 
                 var Zoom = Math.Min((con.Width - 6) / (double)p.BMP.Width, 28 / (double)p.BMP.Height);
                 var p2 = QuickImage.Get(QuickImage.GenerateCode(p.Name, (int)(p.BMP.Width * Zoom), (int)(p.BMP.Height * Zoom), p.Effekt, p.Färbung, p.ChangeGreenTo, p.Sättigung, p.Helligkeit, p.DrehWinkel, p.Transparenz, p.Zweitsymbol));
-                Skin.Draw_FormatedText(GR, "", p2, _SkinRow, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, con.Width, 44), con, false, Translate);
+                Skin.Draw_FormatedText(GR, "", p2, _SkinRow, vStatex, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, con.Width, 44), con, false, Translate);
 
                 if (etxt == null) { etxt = new ExtText(vButtonTypex, vStatex, _SkinRow); }
                 etxt.State = vStatex; // Fall es nicht nothing ist
@@ -450,7 +450,7 @@ namespace BlueControls.Controls
             }
             else if (vButtonTypex != enDesign.OptionButton_TextStyle && vButtonTypex != enDesign.CheckBox_TextStyle)
             {
-                Skin.Draw_FormatedText(GR, vtext, p, _SkinRow, Align, DisplayRectangle, con, false, Translate);
+                Skin.Draw_FormatedText(GR, vtext, p, _SkinRow, vStatex, Align, DisplayRectangle, con, false, Translate);
             }
             else
             {

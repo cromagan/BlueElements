@@ -670,7 +670,7 @@ namespace BlueControls.Controls
                 }
                 else
                 {
-                    if (lbxColumns.Item[intName] == null) { lbxColumns.Item.Add(new TextListItem(true, intName, Nam, (ItC + 1).ToString(Constants.Format_Integer3) + "|A")); }
+                    if (lbxColumns.Item[intName] == null) { lbxColumns.Item.Add(new TextListItem(intName, Nam, true, (ItC + 1).ToString(Constants.Format_Integer3) + "|A")); }
                 }
             }
 
@@ -725,7 +725,7 @@ namespace BlueControls.Controls
 
             } while (true);
 
-           // lbxColumns.Item.Sort();
+            // lbxColumns.Item.Sort();
             lbxColumns.Invalidate();
         }
 
@@ -1371,7 +1371,19 @@ namespace BlueControls.Controls
             if (_Database.IsAdministrator())
             {
                 e.UserMenu.Add(new LineListItem());
-                e.UserMenu.Add(new TextListItem("#Ansicht", "Formular bearbeiten", QuickImage.Get(enImageCode.Stift), _Database != null));
+                e.UserMenu.Add(new TextListItem("#Ansicht", "Formular bearbeiten", QuickImage.Get(enImageCode.Textfeld), _Database != null));
+
+                ColumnItem col = null;
+
+                if (sender is FlexiControlForCell flxc)
+                {
+                    col = _Database?.Column.SearchByKey(flxc.ColumnKey);
+                }
+
+                e.UserMenu.Add(new TextListItem("#ColumnEdit", "Spalte bearbeiten", QuickImage.Get(enImageCode.Spalte), col != null));
+
+
+
             }
         }
 
@@ -1404,6 +1416,25 @@ namespace BlueControls.Controls
                 case "#ansicht":
                     ShowViewEditor();
                     return;
+
+                case "#columnedit":
+
+                    ColumnItem col = null;
+
+                    if (sender is FlexiControlForCell flxc)
+                    {
+                        col = _Database?.Column.SearchByKey(flxc.ColumnKey);
+                    }
+
+                    if (col != null)
+                    {
+                        tabAdministration.OpenColumnEditor(col);
+                    }
+
+                    //e.UserMenu.Add(new TextListItem("#ColumnEdit", "Spalte bearbeiten", QuickImage.Get(enImageCode.Spalte), col != null));
+
+                    return;
+
             }
 
             // So, wir gehen mal davon aus, dass wir nun die Item-Spezfischen Dingens abgefangen haben und geben nun weiter, als ob es vom BlueFormula kommt.

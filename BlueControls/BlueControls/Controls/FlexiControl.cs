@@ -34,7 +34,6 @@ using BlueDatabase.Enums;
 using BlueControls.Enums;
 using System.Windows.Forms;
 using BlueControls.Designer_Support;
-using System.Collections.Generic;
 
 namespace BlueControls.Controls
 {
@@ -69,6 +68,7 @@ namespace BlueControls.Controls
         private enDataFormat _Format = enDataFormat.Text;
 
         protected bool _allinitialized = false;
+        protected bool _enabled = false;
         public event EventHandler RemovingAll;
 
         public event EventHandler NeedRefresh;
@@ -331,14 +331,16 @@ namespace BlueControls.Controls
         {
             get
             {
-                foreach (System.Windows.Forms.Control ThisControl in Controls)
-                {
-                    if (!ThisControl.Enabled) { return false; }
-                }
-                return true;
+                return _enabled;
             }
             set
             {
+
+                if (_enabled == value) { return; }
+
+                _enabled = value;
+
+
                 foreach (System.Windows.Forms.Control ThisControl in Controls)
                 {
                     if (ThisControl.Name == "Info")
@@ -791,8 +793,6 @@ namespace BlueControls.Controls
 
             if (Controls.Count > 0) { OnRemovingAll(); }
 
-            OnRemovingAll();
-
             while (Controls.Count > 0)
             {
                 Controls[0].Visible = false;
@@ -830,6 +830,8 @@ namespace BlueControls.Controls
             if (_CaptionPosition == enÜberschriftAnordnung.ohne) { return; }
 
             _CaptionObject = new Caption();
+            _CaptionObject.Enabled = _enabled;
+
             Controls.Add(_CaptionObject);
 
             _CaptionObject.TextAnzeigeVerhalten = enSteuerelementVerhalten.Text_Abschneiden; // nicht enSteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
@@ -891,6 +893,7 @@ namespace BlueControls.Controls
         {
             var Control = new Line
             {
+                Enabled = _enabled,
                 Orientation = enOrientation.Waagerecht
             };
             StandardBehandlung(Control);
@@ -911,6 +914,7 @@ namespace BlueControls.Controls
         private EasyPic Control_Create_EasyPic()
         {
             var Control = new EasyPic();
+            Control.Enabled = _enabled;
 
             StandardBehandlung(Control);
             UpdateValueToControl();
@@ -955,6 +959,7 @@ namespace BlueControls.Controls
 
         protected void StyleComboBox(ComboBox Control, ItemCollectionList list, System.Windows.Forms.ComboBoxStyle Style)
         {
+            Control.Enabled = _enabled;
             Control.Format = _Format;
             Control.Suffix = _Suffix;
             Control.DropDownStyle = Style;
@@ -1098,6 +1103,7 @@ namespace BlueControls.Controls
         private ListBox Control_Create_SuggestListBox(ListBox MainBox, ItemCollectionList List)
         {
             var Control = new ListBox();
+            Control.Enabled = _enabled;
             Control.Item.Clear();
             Control.Item.AddRange(List);
             Control.Item.CheckBehavior = enCheckBehavior.NoSelection;
@@ -1135,6 +1141,7 @@ namespace BlueControls.Controls
         private ListBox Control_Create_MainListBox()
         {
             var Control = new ListBox();
+            Control.Enabled = _enabled;
             Control.Name = "Main";
 
             StyleListBox(Control, null);
@@ -1147,6 +1154,8 @@ namespace BlueControls.Controls
 
         protected void StyleListBox(ListBox Control, ColumnItem Column)
         {
+            Control.Enabled = _enabled;
+
             Control.Item.Clear();
             Control.Item.CheckBehavior = enCheckBehavior.MultiSelection;
 
@@ -1356,6 +1365,7 @@ namespace BlueControls.Controls
         {
             var Control = new Button
             {
+                Enabled = _enabled,
                 Name = "ComandButton",
                 Checked = false,
                 ButtonStyle = enButtonStyle.Button,
@@ -1374,6 +1384,7 @@ namespace BlueControls.Controls
         {
             var Control = new Button
             {
+                Enabled = _enabled,
                 Name = "ColorButton",
                 Checked = false,
                 ButtonStyle = enButtonStyle.Button,
@@ -1392,6 +1403,7 @@ namespace BlueControls.Controls
         {
             var Control = new Button
             {
+                Enabled = _enabled,
                 Name = "YesNoButton",
                 ButtonStyle = enButtonStyle.Yes_or_No,
                 Text = "",
@@ -1461,6 +1473,7 @@ namespace BlueControls.Controls
 
         protected void StyleTextBox(TextBox Control, bool Multiline, string AllowedChars, bool SpellChecking, bool InstantChange)
         {
+            Control.Enabled = _enabled;
             Control.Format = _Format;
             Control.Suffix = _Suffix;
             Control.AllowedChars = AllowedChars;
@@ -1706,28 +1719,38 @@ namespace BlueControls.Controls
 
             _allinitialized = true;
 
+
+            GenericControl c = null;
+
+
             switch (_EditType)
             {
                 case enEditTypeFormula.Line:
-                    return Control_Create_Line();
+                    c = Control_Create_Line();
+                    break;
 
                 case enEditTypeFormula.Textfeld:
-                    return Control_Create_TextBox();
+                    c = Control_Create_TextBox();
+                    break;
 
                 case enEditTypeFormula.EasyPic:
-                    return Control_Create_EasyPic();
+                    c = Control_Create_EasyPic();
+                    break;
 
                 case enEditTypeFormula.Gallery:
                 case enEditTypeFormula.Listbox_1_Zeile:
                 case enEditTypeFormula.Listbox_3_Zeilen:
                 case enEditTypeFormula.Listbox_6_Zeilen:
-                    return Control_Create_MainListBox();
+                    c = Control_Create_MainListBox();
+                    break;
 
                 case enEditTypeFormula.Textfeld_mit_Auswahlknopf:
-                    return Control_Create_ComboBox();
+                    c = Control_Create_ComboBox();
+                    break;
 
                 case enEditTypeFormula.Ja_Nein_Knopf:
-                    return Control_Create_ButtonYesNo();
+                    c = Control_Create_ButtonYesNo();
+                    break;
 
                 case enEditTypeFormula.None:
                     break;
@@ -1735,7 +1758,7 @@ namespace BlueControls.Controls
                 case enEditTypeFormula.nur_als_Text_anzeigen:
                     _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
                     Control_Create_Caption();
-                    return null;
+                    break;
 
                 case enEditTypeFormula.Farb_Auswahl_Dialog:
                     Control_Create_ButtonColor();
@@ -1752,7 +1775,7 @@ namespace BlueControls.Controls
 
             UpdateControls();
 
-            return null;
+            return c;
         }
 
 
@@ -1788,7 +1811,7 @@ namespace BlueControls.Controls
                         break;
 
                     case EasyPic _:
-                           break;
+                        break;
 
                     case ListBox _:
                         //if (ListBox.Name == "Main") { UpdateValueTo_ListBox(); }

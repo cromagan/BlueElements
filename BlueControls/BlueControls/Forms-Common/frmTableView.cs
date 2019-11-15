@@ -864,14 +864,14 @@ namespace BlueControls.Forms
             if (_Ansicht != enAnsicht.Überschriften_und_Formular)
             {
 
-                e.UserMenu.Add(new TextListItem(true, "Sortierung"));
+                e.UserMenu.Add(new TextListItem("Sortierung", true));
                 e.UserMenu.Add(enContextMenuComands.SpaltenSortierungAZ, Column != null && Column.Format.CanBeChangedByRules());
                 e.UserMenu.Add(enContextMenuComands.SpaltenSortierungZA, Column != null && Column.Format.CanBeChangedByRules());
 
                 e.UserMenu.Add(new LineListItem());
 
 
-                e.UserMenu.Add(new TextListItem(true, "Zelle"));
+                e.UserMenu.Add(new TextListItem("Zelle", true));
                 e.UserMenu.Add(new TextListItem("ContentCopy", "Inhalt Kopieren", enImageCode.Kopieren, Column != null && Column.Format.CanBeChangedByRules()));
                 e.UserMenu.Add(new TextListItem("ContentPaste", "Inhalt Einfügen", enImageCode.Clipboard, Column != null && Column.Format.CanBeChangedByRules()));
 
@@ -882,7 +882,7 @@ namespace BlueControls.Forms
 
                 e.UserMenu.Add(new LineListItem());
 
-                e.UserMenu.Add(new TextListItem(true, "Spalte"));
+                e.UserMenu.Add(new TextListItem("Spalte", true));
                 e.UserMenu.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten, Column != null);
 
                 e.UserMenu.Add(new TextListItem("ColumnContentDelete", "Inhalte aller angezeigten Zellen dieser Spalte löschen", enImageCode.Radiergummi, Column != null && Column.Format.CanBeChangedByRules()));
@@ -893,7 +893,7 @@ namespace BlueControls.Forms
                 e.UserMenu.Add(new LineListItem());
 
             }
-            e.UserMenu.Add(new TextListItem(true, "Zeile"));
+            e.UserMenu.Add(new TextListItem("Zeile", true));
             e.UserMenu.Add(enContextMenuComands.ZeileLöschen, Row != null);
 
 

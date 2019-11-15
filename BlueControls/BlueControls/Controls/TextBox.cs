@@ -1838,7 +1838,7 @@ namespace BlueControls.Controls
             var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
 
             var Infos = new List<string>();
-            Infos.TagSet("CursorposBevoreKlick", _Cursor_CharPos.ToString());
+            Infos.TagSet("CursorPosBeforeClick", _Cursor_CharPos.ToString());
             var tmp = Cursor_PosAt(e.X, e.Y);
             Infos.TagSet("Char", tmp.ToString());
             Infos.TagSet("MarkStart", _MarkStart.ToString());
@@ -1851,7 +1851,7 @@ namespace BlueControls.Controls
 
             if (_SpellChecking && !Dictionary.IsWordOk(tmpWord))
             {
-                ThisContextMenu.Add(new TextListItem(true, "Rechtschreibprüfung"));
+                ThisContextMenu.Add(new TextListItem("Rechtschreibprüfung", true));
 
 
                 if (Dictionary.IsSpellChecking)

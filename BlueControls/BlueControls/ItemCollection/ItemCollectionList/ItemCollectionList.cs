@@ -761,7 +761,7 @@ namespace BlueControls.ItemCollection
                 }
                 else
                 {
-                    Add(new CellLikeListItem(Value, ColumnStyle, Style));
+                    Add(new CellLikeListItem(Value, ColumnStyle, Style, true));
 
                 }
             }
