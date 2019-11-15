@@ -48,6 +48,7 @@ namespace BlueControls.Controls
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Item = new ItemCollectionList();
+            CheckAutoSort();
             Item.ListOrItemChanged += _Item_ListOrItemChanged;
             Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
             Item.ItemAdded += _Item_Item_Added;
@@ -130,7 +131,9 @@ namespace BlueControls.Controls
             }
             set
             {
+                if (_Appearance == value) { return; }
                 _Appearance = value;
+                CheckAutoSort();
             }
         }
 
@@ -177,7 +180,7 @@ namespace BlueControls.Controls
                 if (_MoveAllowed == value) { return; }
                 _MoveAllowed = value;
                 if (_MoveAllowed) { _FilterAllowed = false; }
-
+                CheckAutoSort();
                 CheckButtons();
             }
         }
@@ -189,6 +192,7 @@ namespace BlueControls.Controls
             get { return _FilterAllowed; }
             set
             {
+                if (_MoveAllowed) { value = false; }
                 if (_FilterAllowed == value) { return; }
                 _FilterAllowed = value;
                 CheckButtons();
@@ -808,5 +812,19 @@ namespace BlueControls.Controls
         {
             ListOrItemChanged?.Invoke(this, System.EventArgs.Empty);
         }
+
+        private void DoSortIfNessecery()
+        {
+            dd
+            if (_MoveAllowed)
+            {
+                Item.Sort = false;
+            }
+
+        }
+
+
+
+
     }
 }

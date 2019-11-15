@@ -54,7 +54,7 @@ namespace BlueControls.Controls
             // Down
             // 
             this.Down.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Down.ImageCode = "Pfeil_Oben|16||4|00FF00";
+            this.Down.ImageCode = "Pfeil_Unten|16";
             this.Down.Location = new Point(24, 144);
             this.Down.Name = "Down";
             this.Down.Size = new Size(24, 24);
@@ -64,7 +64,7 @@ namespace BlueControls.Controls
             // Up
             // 
             this.Up.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Up.ImageCode = "Pfeil_Oben|16|||00FF00";
+            this.Up.ImageCode = "Pfeil_Oben|16";
             this.Up.Location = new Point(0, 144);
             this.Up.Name = "Up";
             this.Up.Size = new Size(24, 24);

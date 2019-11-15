@@ -44,7 +44,6 @@ namespace BlueControls.ItemCollection
         private enBlueListBoxAppearance _Appearance;
         private enDesign _ControlDesign;
         private enDesign _ItemDesign;
-        private bool _AutoSort;
 
         private SizeF ComputeAllItemPositions_lastF = Size.Empty;
 
