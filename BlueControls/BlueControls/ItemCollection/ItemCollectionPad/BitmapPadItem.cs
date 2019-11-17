@@ -396,7 +396,7 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl(true));
 
 
-            l.Add(new FlexiControl("Umrandung", ((int)Style).ToString(), Skin.GetRahmenArt(Parent.SheetStyle)));
+            l.Add(new FlexiControl("Umrandung", ((int)Style).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, true)));
 
 
             l.Add(new FlexiControl("Hintergrund weiß füllen", WhiteBack));

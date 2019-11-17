@@ -478,9 +478,6 @@ namespace BlueControls.Controls
             var btb = new FlexiControlForCell(cd.Column.Database, cd.Column.Key, cd.ÜberschriftAnordnung);
             btb.TabIndex = TabIndex + 10000;
             btb.Tag = cd;
-
-            btb.ContextMenuInit += ContextMenuOfControls_Init;
-            btb.ContextMenuItemClicked += ContextMenuOfControls_ItemClicked;
             btb.NeedRefresh += Btb_IAmInvalid;
 
             vParent.Controls.Add(btb);
@@ -696,7 +693,7 @@ namespace BlueControls.Controls
                         var ThisItem = (ObjectListItem)lbxColumns.Item[ItC];
 
 
-                        var co = _Database.Column[ThisItem.Internal()];
+                        var co = _Database.Column[ThisItem.Internal];
 
                         if (co == null)
                         {
@@ -725,7 +722,7 @@ namespace BlueControls.Controls
 
             } while (true);
 
-            // lbxColumns.Item.Sort();
+            lbxColumns.Item.Sort();
             lbxColumns.Invalidate();
         }
 
@@ -817,7 +814,7 @@ namespace BlueControls.Controls
             ColumnViewItem ViewItem = null;
             if (lbxColumns.Item.Checked().Count == 1)
             {
-                ViewItem = SearchViewItem(_Database.Column[lbxColumns.Item.Checked()[0].Internal()]);
+                ViewItem = SearchViewItem(_Database.Column[lbxColumns.Item.Checked()[0].Internal]);
             }
 
             x1.Enabled = ViewItem != null;
@@ -860,12 +857,12 @@ namespace BlueControls.Controls
 
         private void lbxColumns_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
         {
-            var item = (BasicListItem)e.Tag;
+            var item = (BasicListItem)e.HotItem;
             if (item == null) { return; }
 
             item.Checked = true;
 
-            var cd = SearchViewItem(_Database.Column[item.Internal()]);
+            var cd = SearchViewItem(_Database.Column[item.Internal]);
 
             if (cd == null)
             {
@@ -879,28 +876,12 @@ namespace BlueControls.Controls
 
         }
 
+
         private void lbxColumns_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
         {
-            DoColumnArrangementCommand(e.ClickedComand.Internal(), ((BasicListItem)e.Tag).Internal());
-        }
+            //if (_Database.Views.Count == 0) { _Database.Views.Add(new ColumnViewCollection(_Database, "")); }
 
-        private string EditorSelectedColumn()
-        {
-            if (lbxColumns.Item.Checked().Count != 1) { return string.Empty; }
-            return lbxColumns.Item.Checked()[0].Internal();
-        }
-
-
-        private void lbxColumns_ItemCheckedChanged(object sender, System.EventArgs e)
-        {
-            Editor_CheckButtons(true);
-        }
-
-        private void DoColumnArrangementCommand(string ClickedComand, string ColumnName)
-        {
-            if (_Database.Views.Count == 0) { _Database.Views.Add(new ColumnViewCollection(_Database, "")); }
-
-            var Column = _Database.Column[ColumnName];
+            var Column = _Database.Column[((BasicListItem)e.HotItem).Internal];
 
             var View = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
@@ -908,7 +889,7 @@ namespace BlueControls.Controls
             var CurrView = CurrentView();
 
 
-            switch (ClickedComand)
+            switch (e.ClickedComand)
             {
                 case "#RemoveColumnFromView":
                     if (ViewItem != null)
@@ -926,114 +907,25 @@ namespace BlueControls.Controls
                     CurrView?.Add(Column, false);
                     break;
 
-                case "SpaltenEigenschaftenBearbeiten":
-                    using (var w = new ColumnEditor(_Database.Column[ColumnName]))
-                    {
-                        w.ShowDialog();
-                        _Database.Column[ColumnName].Invalidate_ColumAndContent();
-                    }
-                    break;
-
-                case "#Berechtigung":
-                    if (CurrView == null || CurrView == _Database.Views[0]) { return; }
-                    var aa = new ItemCollectionList();
-                    aa.AddRange(_Database.Permission_AllUsed(true));
-                    aa.CheckBehavior = enCheckBehavior.MultiSelection;
-                    aa.Check(CurrView.PermissionGroups_Show, true);
-
-                    if (CurrView == _Database.Views[1])
-                    {
-                        aa["#Everybody"].Enabled = false;
-                        aa["#Everybody"].Checked = true;
-                    }
-                    aa.Sort();
-
-                    var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
-                    if (b == null) { return; }
-
-
-                    CurrView.PermissionGroups_Show.Clear();
-                    CurrView.PermissionGroups_Show.AddRange(b.ToArray());
-
-                    CurrView.PermissionGroups_Show.RemoveString("#Administrator", false);
-                    if (CurrView == _Database.Views[1]) { CurrView.PermissionGroups_Show.Add("#Everybody"); }
-                    break;
-
-                case "#ViewRename":
-                    if (CurrView == null || CurrView == _Database.Views[0]) { return; }
-                    var n = InputBox.Show("Umbenennen:", CurrView.Name, enDataFormat.Text);
-                    if (!string.IsNullOrEmpty(n)) { CurrView.Name = n; }
-                    break;
-
-                case "#ViewAdd":
-                    Arrangement_Add();
-                    break;
-
-                case "#ChangeViewCaption":
-                    if (ViewItem != null) { ViewItem.ÜberschriftAnordnung = (enÜberschriftAnordnung)int.Parse(cbxCaptionPosition.Text); }
-                    break;
-
-                case "#ChangeControlType":
-                    if (ViewItem != null) { ViewItem.Column.EditType = (enEditTypeFormula)int.Parse(cbxControlType.Text); }
-                    break;
-
-                case "#X1_O":
-                    if (ViewItem != null) { View.Swap(ViewItem, ViewItem.PreviewsVisible(View)); }
-                    break;
-
-                case "#X1_U":
-                    if (ViewItem != null) { View.Swap(ViewItem, ViewItem.NextVisible(View)); }
-                    break;
-
-                case "#X1_L":
-                    ViewItem?.KoordÄndern(-1, 0, 0);
-                    break;
-
-                case "#X1_R":
-                    ViewItem?.KoordÄndern(1, 0, 0);
-                    break;
-
-                case "#X2_O":
-                    ViewItem?.KoordÄndern(0, 0, -1);
-                    break;
-
-                case "#X2_U":
-                    ViewItem?.KoordÄndern(0, 0, 1);
-                    break;
-
-                case "#X2_L":
-                    ViewItem?.KoordÄndern(0, -1, 0);
-                    break;
-
-                case "#X2_R":
-                    ViewItem?.KoordÄndern(0, 1, 0);
-                    break;
-
-                case "#ViewMoveRight":
-                    Arrangement_Swap(1);
-                    break;
-
-                case "#ViewMoveLeft":
-                    Arrangement_Swap(-1);
-                    break;
-
-                case "#ViewDelete":
-                    if (CurrView == null) { return; }
-                    var i = _Database.Views.IndexOf(CurrView);
-                    if (i < 1) { return; } // 0 darf auch nicht gelöscht werden
-                    if (MessageBox.Show("Ansicht <b>'" + CurrView.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-                    _Database.Views.RemoveAt(i);
-                    ColumnsEinfärben();
-                    break;
-
-                default:
-                    Develop.DebugPrint(ClickedComand);
-                    break;
             }
 
             RedoView();
             ColumnsEinfärben();
         }
+
+
+        private string EditorSelectedColumn()
+        {
+            if (lbxColumns.Item.Checked().Count != 1) { return string.Empty; }
+            return lbxColumns.Item.Checked()[0].Internal;
+        }
+
+
+        private void lbxColumns_ItemCheckedChanged(object sender, System.EventArgs e)
+        {
+            Editor_CheckButtons(true);
+        }
+
 
 
         private void RedoView()
@@ -1078,83 +970,222 @@ namespace BlueControls.Controls
             _Inited = false;
         }
 
-        private void Arrangement_Add()
-        {
-            var e = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enDataFormat.Text);
-            if (string.IsNullOrEmpty(e)) { return; }
 
-            _Database.Views.Add(new ColumnViewCollection(_Database, "", e));
-        }
 
 
         private void Rename_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#ViewRename", null);
+            var CurrView = CurrentView();
+            if (CurrView == null || CurrView == _Database.Views[0]) { return; }
+            var n = InputBox.Show("Umbenennen:", CurrView.Name, enDataFormat.Text);
+            if (!string.IsNullOrEmpty(n)) { CurrView.Name = n; }
+
+
+            RedoView();
+            ColumnsEinfärben();
+
         }
         private void Rechte_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#Berechtigung", null);
+            var CurrView = CurrentView();
+
+
+            var aa = new ItemCollectionList();
+            aa.AddRange(_Database.Permission_AllUsed(true));
+            aa.CheckBehavior = enCheckBehavior.MultiSelection;
+            aa.Check(CurrView.PermissionGroups_Show, true);
+
+            if (CurrView == _Database.Views[1])
+            {
+                aa["#Everybody"].Enabled = false;
+                aa["#Everybody"].Checked = true;
+            }
+            aa.Sort();
+
+            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
+            if (b == null) { return; }
+
+
+            CurrView.PermissionGroups_Show.Clear();
+            CurrView.PermissionGroups_Show.AddRange(b.ToArray());
+
+            CurrView.PermissionGroups_Show.RemoveString("#Administrator", false);
+            if (CurrView == _Database.Views[1]) { CurrView.PermissionGroups_Show.Add("#Everybody"); }
         }
+
+
         private void OrderDelete_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#ViewDelete", null);
+            var CurrView = CurrentView();
+
+            if (CurrView == null) { return; }
+            var i = _Database.Views.IndexOf(CurrView);
+            if (i < 1) { return; } // 0 darf auch nicht gelöscht werden
+            if (MessageBox.Show("Ansicht <b>'" + CurrView.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            _Database.Views.RemoveAt(i);
+
+
+            RedoView();
+            ColumnsEinfärben();
+
+
         }
 
 
         private void OrderAdd_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#ViewAdd", null);
+
+            var ex = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enDataFormat.Text);
+            if (string.IsNullOrEmpty(ex)) { return; }
+
+            _Database.Views.Add(new ColumnViewCollection(_Database, "", ex));
+
+            RedoView();
+            ColumnsEinfärben();
         }
 
         private void cbxCaptionPosition_ItemClicked(object sender, BasicListItemEventArgs e)
         {
-            DoColumnArrangementCommand("#ChangeViewCaption", EditorSelectedColumn());
+
+            var Column = _Database.Column[EditorSelectedColumn()];
+            var View = SearchColumnView(Column);
+            var ViewItem = SearchViewItem(Column);
+
+
+            if (ViewItem != null) { ViewItem.ÜberschriftAnordnung = (enÜberschriftAnordnung)int.Parse(cbxCaptionPosition.Text); }
+
+
+            RedoView();
+            ColumnsEinfärben();
         }
 
         private void cbxControlType_ItemClicked(object sender, BasicListItemEventArgs e)
         {
-            DoColumnArrangementCommand("#ChangeControlType", EditorSelectedColumn());
+            var Column = _Database.Column[EditorSelectedColumn()];
+            var View = SearchColumnView(Column);
+            var ViewItem = SearchViewItem(Column);
+
+            if (ViewItem != null) { ViewItem.Column.EditType = (enEditTypeFormula)int.Parse(cbxControlType.Text); }
+
+            RedoView();
+            ColumnsEinfärben();
         }
 
 
         private void SLinks_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#X1_L", EditorSelectedColumn());
+            var Column = _Database.Column[EditorSelectedColumn()];
+            var View = SearchColumnView(Column);
+            var ViewItem = SearchViewItem(Column);
+
+            ViewItem?.KoordÄndern(-1, 0, 0);
+
+            RedoView();
+            ColumnsEinfärben();
         }
 
         private void SRechts_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#X1_R", EditorSelectedColumn());
+            var Column = _Database.Column[EditorSelectedColumn()];
+            var View = SearchColumnView(Column);
+            var ViewItem = SearchViewItem(Column);
+
+            ViewItem?.KoordÄndern(1, 0, 0);
+
+            RedoView();
+            ColumnsEinfärben();
         }
 
         private void SOben_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#X1_O", EditorSelectedColumn());
+            var Column = _Database.Column[EditorSelectedColumn()];
+            var View = SearchColumnView(Column);
+            var ViewItem = SearchViewItem(Column);
+
+
+            if (ViewItem != null) { View.Swap(ViewItem, ViewItem.PreviewsVisible(View)); }
+
+            RedoView();
+            ColumnsEinfärben();
         }
 
         private void SUnten_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#X1_U", EditorSelectedColumn());
+            var Column = _Database.Column[EditorSelectedColumn()];
+            var View = SearchColumnView(Column);
+            var ViewItem = SearchViewItem(Column);
+
+            if (ViewItem != null) { View.Swap(ViewItem, ViewItem.NextVisible(View)); }
+
+            RedoView();
+            ColumnsEinfärben();
+
+
         }
 
         private void EOben_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#X2_O", EditorSelectedColumn());
+            var Column = _Database.Column[EditorSelectedColumn()];
+            var View = SearchColumnView(Column);
+            var ViewItem = SearchViewItem(Column);
+
+            ViewItem?.KoordÄndern(0, 0, -1);
+
+            RedoView();
+            ColumnsEinfärben();
+
+
+
         }
 
         private void EUnten_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#X2_U", EditorSelectedColumn());
+
+            var Column = _Database.Column[EditorSelectedColumn()];
+            var View = SearchColumnView(Column);
+            var ViewItem = SearchViewItem(Column);
+
+            ViewItem?.KoordÄndern(0, 0, 1);
+
+
+            RedoView();
+            ColumnsEinfärben();
+
+
+
         }
 
         private void ELinks_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#X2_L", EditorSelectedColumn());
+            var Column = _Database.Column[EditorSelectedColumn()];
+            var View = SearchColumnView(Column);
+            var ViewItem = SearchViewItem(Column);
+
+            ViewItem?.KoordÄndern(0, -1, 0);
+
+
+            RedoView();
+            ColumnsEinfärben();
+
+
+
         }
 
         private void ERechts_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#X2_R", EditorSelectedColumn());
+            var Column = _Database.Column[EditorSelectedColumn()];
+            var View = SearchColumnView(Column);
+            var ViewItem = SearchViewItem(Column);
+
+            ViewItem?.KoordÄndern(0, 1, 0);
+
+            RedoView();
+            ColumnsEinfärben();
+
+
+
+
+
         }
 
 
@@ -1235,8 +1266,6 @@ namespace BlueControls.Controls
 
                 default:
                     var tempVar = (FlexiControlForCell)vObject;
-                    tempVar.ContextMenuInit -= ContextMenuOfControls_Init;
-                    tempVar.ContextMenuItemClicked -= ContextMenuOfControls_ItemClicked;
                     tempVar.NeedRefresh -= Btb_IAmInvalid;
                     break;
             }
@@ -1247,12 +1276,12 @@ namespace BlueControls.Controls
 
         private void Li_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#ViewMoveLeft", null);
+            Arrangement_Swap(-1);
         }
 
         private void Re_Click(object sender, System.EventArgs e)
         {
-            DoColumnArrangementCommand("#ViewMoveRight", null);
+            Arrangement_Swap(1);
         }
 
 
@@ -1314,7 +1343,7 @@ namespace BlueControls.Controls
 
         private void Tabs_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Right) { ContextMenu_Show(sender, e); }
+            if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
         }
 
         //private void Tabs_SelectedIndexChanged(object sender, System.EventArgs e)
@@ -1334,120 +1363,70 @@ namespace BlueControls.Controls
 
         #region  ContextMenu 
 
-        public void ContextMenu_Show(object sender, System.Windows.Forms.MouseEventArgs e)
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
         {
-            // Diese Routine wird aufgerufen, wenn NICHT auf ein Element geklickz wird.
-            // Um die Menüse immer gleich zu halten, wird aber zum kontextmeü-Init der Elemente weitergeleitet
+            HotItem = null;
 
-            var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
-
-
-            ContextMenuOfControls_Init(sender, new ContextMenuInitEventArgs(null, ThisContextMenu));
-
-            if (ThisContextMenu.Count > 0)
+            if (_Database == null)
             {
-                ThisContextMenu.Add(new LineListItem());
-                ThisContextMenu.Add(enContextMenuComands.Abbruch);
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, null, this, Translate);
-                _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
+                Cancel = true;
+                return;
             }
 
-        }
-        private void ContextMenuOfControls_Init(object sender, ContextMenuInitEventArgs e)
-        {
-            // Eigentlich ist das die Routine, wo nur Bfehele hinzugefügt werden der Elemente.
-            // Es wird aber AUCH mißbraucht vom Kontextmenu des Blueformula. Dann ist der sender nothing, zum unterscheiden
-
-            OnContextMenuInit(e);
-
-            if (_Database == null) { return; }
-
-            if (e.UserMenu.Count > 0) { e.UserMenu.Add(new LineListItem()); }
 
 
-            e.UserMenu.Add(new TextListItem("#Schnelleingabe", "Allgemeine Schnelleingabe öffnen", QuickImage.Get(enImageCode.Lupe), _Database != null && ShowingRow != null));
+
+            Items.Add(new TextListItem("#Schnelleingabe", "Allgemeine Schnelleingabe öffnen", QuickImage.Get(enImageCode.Lupe), _Database != null && ShowingRow != null));
 
 
             if (_Database.IsAdministrator())
             {
-                e.UserMenu.Add(new LineListItem());
-                e.UserMenu.Add(new TextListItem("#Ansicht", "Formular bearbeiten", QuickImage.Get(enImageCode.Textfeld), _Database != null));
+                Items.Add(new LineListItem());
+                Items.Add(new TextListItem("#Ansicht", "Formular bearbeiten", QuickImage.Get(enImageCode.Textfeld), _Database != null));
 
-                ColumnItem col = null;
 
-                if (sender is FlexiControlForCell flxc)
-                {
-                    col = _Database?.Column.SearchByKey(flxc.ColumnKey);
-                }
-
-                e.UserMenu.Add(new TextListItem("#ColumnEdit", "Spalte bearbeiten", QuickImage.Get(enImageCode.Spalte), col != null));
 
 
 
             }
         }
 
-        private void ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
+
+
+
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
         {
-            // Diese Routine wird aufgerufen, wenn NICHT auf ein Element geklickt wird.
-            // Um die Menüse immer gleich zu halten, wird aber zum Clicked Ereigis der Elemente weitergeleitet
-            ContextMenuOfControls_ItemClicked(null, e);
-        }
 
 
+            if (_Database == null) { return true; }
 
-        private void ContextMenuOfControls_ItemClicked(object sender, ContextMenuItemClickedEventArgs e)
-        {
-            FloatingInputBoxListBoxStyle.Close(this);
-
-            if (_Database == null) { return; }
-
-            switch (e.ClickedComand.Internal().ToLower())
+            switch (e.ClickedComand.ToLower())
             {
-                case "abbruch":
-                    return;
 
                 case "#schnelleingabe":
-                    if (ShowingRow == null) { return; }
+                    if (ShowingRow == null) { return true; }
                     var sh = new FormulaQuickSelect(ShowingRow);
                     sh.ShowDialog();
-                    return;
+                    return true;
 
                 case "#ansicht":
                     ShowViewEditor();
-                    return;
+                    return true;
 
-                case "#columnedit":
 
-                    ColumnItem col = null;
-
-                    if (sender is FlexiControlForCell flxc)
-                    {
-                        col = _Database?.Column.SearchByKey(flxc.ColumnKey);
-                    }
-
-                    if (col != null)
-                    {
-                        tabAdministration.OpenColumnEditor(col);
-                    }
-
-                    //e.UserMenu.Add(new TextListItem("#ColumnEdit", "Spalte bearbeiten", QuickImage.Get(enImageCode.Spalte), col != null));
-
-                    return;
 
             }
 
-            // So, wir gehen mal davon aus, dass wir nun die Item-Spezfischen Dingens abgefangen haben und geben nun weiter, als ob es vom BlueFormula kommt.
-            OnContextMenuItemClicked(new ContextMenuItemClickedEventArgs(null, e.ClickedComand));
+            return false;
 
         }
 
-        private void OnContextMenuInit(ContextMenuInitEventArgs e)
+        public void OnContextMenuInit(ContextMenuInitEventArgs e)
         {
             ContextMenuInit?.Invoke(this, e);
         }
 
-        private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
         {
             ContextMenuItemClicked?.Invoke(this, e);
         }

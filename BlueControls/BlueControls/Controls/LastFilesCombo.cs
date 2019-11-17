@@ -275,14 +275,14 @@ namespace BlueControls.Controls
         protected override void OnItemClicked(BasicListItemEventArgs e)
         {
 
-            if (!string.IsNullOrEmpty(_specialcommand) && e.Item.Internal() == "#SPECIAL#")
+            if (!string.IsNullOrEmpty(_specialcommand) && e.Item.Internal == "#SPECIAL#")
             {
                 OnSpecialCommandClicked();
                 return;
             }
 
             base.OnItemClicked(e);
-            AddFileName(e.Item.Internal(), e.Item.Tags[0]);
+            AddFileName(e.Item.Internal, e.Item.Tags[0]);
         }
 
 

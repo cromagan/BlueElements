@@ -60,7 +60,7 @@ namespace BlueControls.Forms
 
             if (ClickedItem != null)
             {
-                return ClickedItem.Internal();
+                return ClickedItem.Internal;
             }
 
 

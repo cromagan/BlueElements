@@ -146,9 +146,12 @@ namespace BlueControls.ItemCollection
             Parse(CodeToParse);
         }
 
-        public override string Internal()
+        public override string Internal
         {
-            return _Internal;
+            get
+            {
+                return _Internal;
+            }
         }
 
 
@@ -192,7 +195,7 @@ namespace BlueControls.ItemCollection
                         }
                         break;
 
-                   // case "format": // = Textformat!!!
+                    // case "format": // = Textformat!!!
                     case "design":
                     case "style":
                         _Style = (PadStyles)int.Parse(pair.Value);

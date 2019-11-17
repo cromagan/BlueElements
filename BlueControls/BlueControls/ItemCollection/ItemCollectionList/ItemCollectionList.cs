@@ -152,7 +152,6 @@ namespace BlueControls.ItemCollection
         private void GetDesigns()
         {
             _ControlDesign = (enDesign)_Appearance;
-            _AutoSort = true;
 
             switch (_Appearance)
             {
@@ -181,7 +180,6 @@ namespace BlueControls.ItemCollection
 
                 case enBlueListBoxAppearance.KontextMenu:
                     _ItemDesign = enDesign.Item_KontextMenu;
-                    _AutoSort = false;
                     break;
 
                 case enBlueListBoxAppearance.ComboBox_Textbox:
@@ -551,10 +549,10 @@ namespace BlueControls.ItemCollection
 
 
 
-            if (_AutoSort)
-            {
-                Sort();
-            }
+            //if (_AutoSort)
+            //{
+            //    Sort();
+            //}
 
 
 
@@ -878,7 +876,7 @@ namespace BlueControls.ItemCollection
                         l.Add(new clsNamedBinary(BI.Caption, BI.Bitmap));
                         break;
                     case TextListItem TI:
-                        l.Add(new clsNamedBinary(TI.Text, TI.Internal()));
+                        l.Add(new clsNamedBinary(TI.Text, TI.Internal));
                         break;
                 }
             }
@@ -1075,7 +1073,7 @@ namespace BlueControls.ItemCollection
 
                 foreach (var ThisItem in this)
                 {
-                    if (ThisItem != null && Internal.ToUpper() == ThisItem.Internal().ToUpper()) { return ThisItem; }
+                    if (ThisItem != null && Internal.ToUpper() == ThisItem.Internal.ToUpper()) { return ThisItem; }
                 }
                 return null;
             }

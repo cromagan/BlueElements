@@ -808,7 +808,7 @@ namespace BlueControls.ItemCollection
 
 
 
-            l.Add(new FlexiControl("Stil", ((int)Style).ToString(), Skin.GetRahmenArt(Parent.SheetStyle)));
+            l.Add(new FlexiControl("Stil", ((int)Style).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, false)));
             return l;
         }
 

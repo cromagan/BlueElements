@@ -438,7 +438,7 @@ namespace BlueControls
                 switch (_parent)
                 {
                     case BasicPadItem _:
-                        t = t + "ParentName=" + ((BasicPadItem)_parent).Internal().ToNonCritical() + ", ";
+                        t = t + "ParentName=" + ((BasicPadItem)_parent).Internal.ToNonCritical() + ", ";
                         break;
                     case CreativePad _:
                         t = t + "ParentType=Main, ";

@@ -30,6 +30,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using BlueControls.Designer_Support;
+using System.Collections.Generic;
 
 namespace BlueControls.Controls
 {
@@ -48,7 +49,6 @@ namespace BlueControls.Controls
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Item = new ItemCollectionList();
-            CheckAutoSort();
             Item.ListOrItemChanged += _Item_ListOrItemChanged;
             Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
             Item.ItemAdded += _Item_Item_Added;
@@ -133,7 +133,6 @@ namespace BlueControls.Controls
             {
                 if (_Appearance == value) { return; }
                 _Appearance = value;
-                CheckAutoSort();
             }
         }
 
@@ -180,7 +179,6 @@ namespace BlueControls.Controls
                 if (_MoveAllowed == value) { return; }
                 _MoveAllowed = value;
                 if (_MoveAllowed) { _FilterAllowed = false; }
-                CheckAutoSort();
                 CheckButtons();
             }
         }
@@ -306,14 +304,12 @@ namespace BlueControls.Controls
         }
 
 
-        private void ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
         {
-            FloatingInputBoxListBoxStyle.Close(this);
-            if (e.ClickedComand.Internal().ToLower() == "abbruch") { return; }
-            OnContextMenuItemClicked(e);
+            return false;
         }
 
-        private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
         {
             ContextMenuItemClicked?.Invoke(this, e);
         }
@@ -349,7 +345,7 @@ namespace BlueControls.Controls
                     break;
 
                 case System.Windows.Forms.MouseButtons.Right:
-                    ContextMenu_Show(this, e);
+                    FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
                     break;
             }
 
@@ -573,7 +569,7 @@ namespace BlueControls.Controls
 
             var LN = -1;
 
-            for (var z = Item.Count - 1 ; z >= 0 ; z--)
+            for (var z = Item.Count - 1; z >= 0; z--)
             {
                 if (Item[z] != null)
                 {
@@ -608,8 +604,8 @@ namespace BlueControls.Controls
 
         private void OnRemoveClicked(ListOfBasicListItemEventArgs e)
         {
-           RemoveClicked?.Invoke(this, e);
-       }
+            RemoveClicked?.Invoke(this, e);
+        }
 
 
         public BasicListItem Add_FromFileSystem()
@@ -655,7 +651,7 @@ namespace BlueControls.Controls
 
             foreach (var thisItem in Item)
             {
-                if (thisItem != null && thisItem.Internal().ToUpper() == Val.ToUpper()) { return null; }
+                if (thisItem != null && thisItem.Internal.ToUpper() == Val.ToUpper()) { return null; }
             }
 
             var i = new TextListItem(Val, Val);
@@ -713,29 +709,17 @@ namespace BlueControls.Controls
         }
 
 
-        public void ContextMenu_Show(object sender, System.Windows.Forms.MouseEventArgs e)
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
         {
             var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
 
 
 
-            var ND = MouseOverNode(e.X, e.Y);
+            HotItem = MouseOverNode(e.X, e.Y);
 
-            OnContextMenuInit(new ContextMenuInitEventArgs(ND, UserMenu));
-
-
-
-            if (UserMenu.Count > 0)
-            {
-                UserMenu.Add(new LineListItem());
-                UserMenu.Add(enContextMenuComands.Abbruch);
-
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(UserMenu, ND, this, Translate);
-                _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
-            }
 
         }
-        private void OnContextMenuInit(ContextMenuInitEventArgs e)
+        public void OnContextMenuInit(ContextMenuInitEventArgs e)
         {
             ContextMenuInit?.Invoke(this, e);
         }
@@ -813,15 +797,7 @@ namespace BlueControls.Controls
             ListOrItemChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
-        private void DoSortIfNessecery()
-        {
-            dd
-            if (_MoveAllowed)
-            {
-                Item.Sort = false;
-            }
 
-        }
 
 
 

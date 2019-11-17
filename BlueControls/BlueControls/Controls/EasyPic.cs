@@ -34,6 +34,7 @@ using System.Drawing.Imaging;
 using static BlueBasics.FileOperations;
 using static BlueBasics.Extensions;
 using BlueControls.Designer_Support;
+using System.Collections.Generic;
 
 namespace BlueControls.Controls
 {
@@ -131,32 +132,17 @@ namespace BlueControls.Controls
 
 
 
-        public void ContextMenu_Show(object sender, System.Windows.Forms.MouseEventArgs e)
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
         {
 
-            var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+            HotItem = null;
 
             if (_Bitmap != null)
             {
-                ThisContextMenu.Add(new TextListItem("ExF", "Externes Fenster öffnen"));
-                ThisContextMenu.Add(enContextMenuComands.Speichern);
+                Items.Add(new TextListItem("ExF", "Externes Fenster öffnen"));
+                Items.Add(enContextMenuComands.Speichern);
             }
 
-            var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
-
-            OnContextMenuInit(new ContextMenuInitEventArgs(null, UserMenu));
-
-            if (ThisContextMenu.Count > 0 && UserMenu.Count > 0) { ThisContextMenu.Add(new LineListItem()); }
-            if (UserMenu.Count > 0) { ThisContextMenu.AddRange(UserMenu); }
-
-            if (ThisContextMenu.Count > 0)
-            {
-                ThisContextMenu.Add(new LineListItem());
-                ThisContextMenu.Add(enContextMenuComands.Abbruch);
-
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, null, this, Translate);
-                _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
-            }
 
         }
 
@@ -378,21 +364,21 @@ namespace BlueControls.Controls
             base.OnMouseUp(e);
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
-                ContextMenu_Show(this, e);
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
             }
         }
 
-        private void ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
         {
 
-            FloatingInputBoxListBoxStyle.Close(this);
+  
 
-            switch (e.ClickedComand.Internal())
+            switch (e.ClickedComand)
             {
                 case "ExF":
                     var epv = new PictureView(_Bitmap);
                     epv.Show();
-                    return;
+                    return true;
 
                 case "Speichern":
                     var SavOrt = new System.Windows.Forms.FolderBrowserDialog();
@@ -401,7 +387,7 @@ namespace BlueControls.Controls
                     if (!PathExists(SavOrt.SelectedPath))
                     {
                         MessageBox.Show("Abbruch!", enImageCode.Warnung, "OK");
-                        return;
+                        return true;
                     }
 
                     var NDT = TempFile(SavOrt.SelectedPath + "\\Bild.png");
@@ -409,19 +395,14 @@ namespace BlueControls.Controls
                     _Bitmap.Save(NDT, ImageFormat.Png);
 
                     modAllgemein.ExecuteFile(NDT);
+                    return true;
 
-                    return;
-
-                case "abbruch":
-                    break;
-
-                default:
-                    OnContextMenuItemClicked(e);
-                    break;
             }
+
+            return false;
         }
 
-        private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
         {
             ContextMenuItemClicked?.Invoke(this, e);
         }
@@ -486,7 +467,7 @@ namespace BlueControls.Controls
             ZoomFitInvalidateAndCheckButtons();
         }
 
-        private void OnContextMenuInit(ContextMenuInitEventArgs e)
+        public void OnContextMenuInit(ContextMenuInitEventArgs e)
         {
             ContextMenuInit?.Invoke(this, e);
         }

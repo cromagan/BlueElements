@@ -33,6 +33,9 @@ using BlueControls.Enums;
 using System;
 using BlueControls.Designer_Support;
 using System.ComponentModel;
+using BlueControls.EventArgs;
+using System.Windows.Forms;
+using BlueControls.BlueDatabaseDialogs;
 
 namespace BlueControls.Controls
 {
@@ -52,7 +55,8 @@ namespace BlueControls.Controls
         private ColumnItem _tmpColumn = null;
         private RowItem _tmpRow = null;
 
-
+        public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+        public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
         public int RowKey
         {
@@ -806,5 +810,73 @@ namespace BlueControls.Controls
             base.OnRemovingAll();
         }
 
+        public void GetContextMenuItems(MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
+        {
+
+            GetTmpVariables();
+
+            if (_tmpColumn != null && _tmpColumn.Database.IsAdministrator())
+            {
+                Items.Add(new TextListItem("#ColumnEdit", "Spalte bearbeiten", QuickImage.Get(enImageCode.Spalte), _tmpColumn != null));
+            }
+
+
+            if (Parent is Formula f)
+            {
+
+                var x = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+
+                f.GetContextMenuItems(null, x, out var _, Tags, ref Cancel, ref Translate);
+
+                if (x.Count > 0)
+                {
+                    if (Items.Count > 0)
+                    {
+                        Items.Add(new LineListItem());
+                    }
+
+                    Items.AddRange(x);
+                }
+            }
+
+            HotItem = _tmpColumn;
+        }
+
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
+        {
+
+            switch (e.ClickedComand)
+            {
+                case "#columnedit":
+                    if (e.HotItem is ColumnItem col)
+                    {
+                        tabAdministration.OpenColumnEditor(col);
+                    }
+
+                    return true;
+
+                default:
+
+                    if (Parent is Formula f)
+                    {
+                        return f.ContextMenuItemClickedInternalProcessig(sender, e);
+                    }
+                    break;
+            }
+
+            return false;
+
+
+        }
+
+        public void OnContextMenuInit(ContextMenuInitEventArgs e)
+        {
+            ContextMenuInit?.Invoke(this, e);
+        }
+
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
+        {
+            ContextMenuItemClicked?.Invoke(this, e);
+        }
     }
 }

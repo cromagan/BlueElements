@@ -220,7 +220,7 @@ namespace BlueControls.ItemCollection
         public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
         {
             var l = new List<FlexiControl>();
-            l.Add(new FlexiControl("Stil", ((int)Style).ToString(), Skin.GetRahmenArt(Parent.SheetStyle)));
+            l.Add(new FlexiControl("Stil", ((int)Style).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, false)));
             return l;
         }
 

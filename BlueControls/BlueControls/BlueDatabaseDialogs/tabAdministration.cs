@@ -165,7 +165,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             if (string.IsNullOrEmpty(cbxInternalColumnArrangementSelector.Text)) { return; }
-            _TableView.Arrangement = int.Parse(e.Item.Internal());
+            _TableView.Arrangement = int.Parse(e.Item.Internal);
             Check_OrderButtons();
         }
 

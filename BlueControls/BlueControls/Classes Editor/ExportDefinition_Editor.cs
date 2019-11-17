@@ -178,14 +178,14 @@ namespace BlueControls.Classes_Editor
                 if (thisItem is ItemCollection.Basics.BasicItem ThisItemBasic)
                 {
                     string fil = null;
-                    if (ThisItemBasic.Internal().Contains("|"))
+                    if (ThisItemBasic.Internal.Contains("|"))
                     {
-                        var f = ThisItemBasic.Internal().SplitBy("|");
+                        var f = ThisItemBasic.Internal.SplitBy("|");
                         fil = f[0];
                     }
                     else
                     {
-                        fil = ThisItemBasic.Internal();
+                        fil = ThisItemBasic.Internal;
 
                     }
 
@@ -282,7 +282,7 @@ namespace BlueControls.Classes_Editor
             tmp.Filter.Clear();
             foreach (ObjectListItem thisFilter in ExportFilter.Item)
             {
-                tmp.Filter.Add(new FilterItem(tmp.Database, thisFilter.Internal()));
+                tmp.Filter.Add(new FilterItem(tmp.Database, thisFilter.Internal));
             }
 
             tmp.BereitsExportiert.Clear();

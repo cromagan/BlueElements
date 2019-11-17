@@ -25,7 +25,6 @@ using System.Drawing.Imaging;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
-using BlueControls.Forms;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
@@ -75,10 +74,6 @@ namespace BlueControls.Controls
         public event EventHandler ButtonClicked;
         public event EventHandler ValueChanged;
 
-        public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
-        public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
-
-
 
         #region  Constructor 
 
@@ -127,9 +122,14 @@ namespace BlueControls.Controls
             _Caption = caption + ":";
             ValueId = caption;
             _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+
+            var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+
+            Size = new Size((int)s.Width + 30, 22);
+
+            CreateSubControls();
             this.Value = value.ToPlusMinus();
 
-            Size = new Size(200, 22);
         }
 
 
@@ -172,13 +172,14 @@ namespace BlueControls.Controls
             ValueId = CaptionText;
             _CaptionPosition = enÜberschriftAnordnung.ohne;
             _Value = string.Empty;
-            Size = new Size(200, 30);
+
+
+            var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+            Size = new Size((int)s.Width + 50, 30);
 
             var c = CreateSubControls();
 
             ((Button)c).ImageCode = QuickImage.Get(Pic).ToString();
-
-
 
         }
 
@@ -711,12 +712,6 @@ namespace BlueControls.Controls
                     break;
             }
 
-            if (e.Control is IContextMenu IContextMenu)
-            {
-                IContextMenu.ContextMenuInit += ContextMenuOfControls_Init;
-                IContextMenu.ContextMenuItemClicked += ContextMenuOfControls_ItemClicked;
-            }
-
             UpdateControls();
         }
 
@@ -773,12 +768,6 @@ namespace BlueControls.Controls
                 default:
                     Develop.DebugPrint(Typ(e.Control));
                     break;
-            }
-
-            if (e.Control is IContextMenu IContextMenu)
-            {
-                IContextMenu.ContextMenuInit -= ContextMenuOfControls_Init;
-                IContextMenu.ContextMenuItemClicked -= ContextMenuOfControls_ItemClicked;
             }
 
         }
@@ -939,7 +928,7 @@ namespace BlueControls.Controls
 
         private void ComboBoxItemClicked(object sender, BasicListItemEventArgs e)
         {
-            Value = e.Item.Internal();
+            Value = e.Item.Internal;
         }
 
 
@@ -1005,11 +994,11 @@ namespace BlueControls.Controls
 
             if (sender == Main)
             {
-                MoveItemBetweenList(Main, Suggest, e.Item.Internal());
+                MoveItemBetweenList(Main, Suggest, e.Item.Internal);
             }
             else
             {
-                MoveItemBetweenList(Suggest, Main, e.Item.Internal());
+                MoveItemBetweenList(Suggest, Main, e.Item.Internal);
             }
 
         }
@@ -1175,7 +1164,7 @@ namespace BlueControls.Controls
                         again = false;
                         foreach (var ThisItem in Item)
                         {
-                            if (!Column.DropDownItems.Contains(ThisItem.Internal()))
+                            if (!Column.DropDownItems.Contains(ThisItem.Internal))
                             {
                                 again = true;
                                 Item.Remove(ThisItem);
@@ -1361,7 +1350,7 @@ namespace BlueControls.Controls
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
-        private void Control_Create_ButtonComand()
+        private Button Control_Create_ButtonComand()
         {
             var Control = new Button
             {
@@ -1374,13 +1363,14 @@ namespace BlueControls.Controls
 
             StandardBehandlung(Control);
 
+            return Control;
         }
 
 
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
-        private void Control_Create_ButtonColor()
+        private Button Control_Create_ButtonColor()
         {
             var Control = new Button
             {
@@ -1392,6 +1382,8 @@ namespace BlueControls.Controls
             };
 
             StandardBehandlung(Control);
+
+            return Control;
         }
 
 
@@ -1573,58 +1565,6 @@ namespace BlueControls.Controls
         }
 
 
-
-
-
-        public void ContextMenu_Show(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
-
-
-            OnContextMenuInit(new ContextMenuInitEventArgs(null, UserMenu));
-
-            if (UserMenu.Count > 0)
-            {
-                UserMenu.Add(new LineListItem());
-                UserMenu.Add(enContextMenuComands.Abbruch);
-
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(UserMenu, null, this, Translate);
-                _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
-            }
-        }
-
-        protected virtual void OnContextMenuInit(ContextMenuInitEventArgs e)
-        {
-            ContextMenuInit?.Invoke(this, e);
-        }
-
-
-        private void ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
-        {
-            FloatingInputBoxListBoxStyle.Close(this);
-            if (e.ClickedComand.Internal().ToLower() == "abbruch") { return; }
-
-            OnContextMenuItemClicked(e);
-        }
-
-        protected virtual void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
-        {
-            ContextMenuItemClicked?.Invoke(this, e);
-        }
-
-        private void ContextMenuOfControls_ItemClicked(object sender, ContextMenuItemClickedEventArgs e)
-        {
-            OnContextMenuItemClicked(e);
-        }
-
-
-        private void ContextMenuOfControls_Init(object sender, ContextMenuInitEventArgs e)
-        {
-
-            OnContextMenuInit(e);
-        }
-
-
         protected virtual void OnValueChanged()
         {
             ValueChanged?.Invoke(this, System.EventArgs.Empty);
@@ -1711,7 +1651,7 @@ namespace BlueControls.Controls
             }
 
 
-            if (Width < 10 || Height < 10)
+            if (Width < 5 || Height < 5)
             {
                 Develop.DebugPrint(enFehlerArt.Warnung, "Width / Height zu klein");
                 return null;
@@ -1761,11 +1701,11 @@ namespace BlueControls.Controls
                     break;
 
                 case enEditTypeFormula.Farb_Auswahl_Dialog:
-                    Control_Create_ButtonColor();
+                    c = Control_Create_ButtonColor();
                     break;
 
                 case enEditTypeFormula.Button:
-                    Control_Create_ButtonComand();
+                    c = Control_Create_ButtonComand();
                     break;
 
                 default:

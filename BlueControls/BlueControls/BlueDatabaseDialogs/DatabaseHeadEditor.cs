@@ -372,16 +372,16 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void lbxRuleSelector_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
         {
-            if (e.Tag == null) { return; }
+            if (e.HotItem == null) { return; }
             e.UserMenu.Add(enContextMenuComands.Kopieren);
         }
 
         private void lbxRuleSelector_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
         {
-            switch (e.ClickedComand.Internal())
+            switch (e.ClickedComand)
             {
                 case "Kopieren":
-                    var ClickedRule = (RuleItem)((ObjectListItem)e.Tag).Obj;
+                    var ClickedRule = (RuleItem)((ObjectListItem)e.HotItem).Obj;
                     var NewRuleItem = new ObjectListItem((RuleItem)ClickedRule.Clone());
                     lbxRuleSelector.Item.Add(NewRuleItem);
                     NewRuleItem.Checked = true;
@@ -443,8 +443,8 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void Bilder_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
         {
-            if (e.Tag == null) { return; }
-            if (!(e.Tag is BitmapListItem)) { return; }
+            if (e.HotItem == null) { return; }
+            if (!(e.HotItem is BitmapListItem)) { return; }
             e.UserMenu.Add(enContextMenuComands.Umbenennen);
         }
 
@@ -452,14 +452,14 @@ namespace BlueControls.BlueDatabaseDialogs
         private void Bilder_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
         {
 
-            if (e.Tag == null) { return; }
+            if (e.HotItem == null) { return; }
 
-            if (!(e.Tag is BitmapListItem)) { return; }
+            if (!(e.HotItem is BitmapListItem)) { return; }
 
-            var l = (BitmapListItem)e.Tag;
+            var l = (BitmapListItem)e.HotItem;
 
 
-            switch (e.ClickedComand.Internal())
+            switch (e.ClickedComand)
             {
                 case "Umbenennen":
                     var n = InputBox.Show("<b><u>Bild umbenennen:</u></b><br><br>Achtung! Dadruch können Bezüge<br> in Texten und Spalten verlorengehen!", l.Caption, enDataFormat.Text);

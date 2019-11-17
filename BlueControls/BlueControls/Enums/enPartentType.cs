@@ -18,34 +18,50 @@
 #endregion
 
 
-using BlueControls.ItemCollection;
-using System.Collections.Generic;
-
-namespace BlueControls.EventArgs
+namespace BlueControls.Enums
 {
-    public class ContextMenuInitEventArgs : System.EventArgs
+
+    public enum enPartentType
     {
+        Unbekannt = -1,
+
+        Nothing = 1,
+        GroupBox = 2,
+        RibbonBarCombobox = 3,
+        Slider = 4,
+        ComboBox = 5,
+        //    RibbonBar = 6
+        MsgBox = 7,
+
+        TextBox = 8,
+        ListBox = 9,
+        EasyPic = 10,
+        Button = 11,
+        Line = 12,
+        Caption = 13,
+
+        TabPage = 14,
+        TabControl = 15,
+        Formula = 16,
+
+        RibbonControl = 17,
+        RibbonPage = 18,
 
 
-        public ContextMenuInitEventArgs(object HotItem, List<string> Tags, ItemCollectionList UserMenu)
-        {
-            this.UserMenu = UserMenu;
-            this.HotItem = HotItem;
-            this.Tags = Tags;
-            this.Translate = true;
-            this.Cancel = false;
+        RibbonGroupBox = 19,
 
+        LastFilesCombo = 20,
 
-        }
-        public bool Cancel { get; }
+        Form = 21,
 
-        public bool Translate { get; }
+        Table = 22,
 
-        public ItemCollectionList UserMenu { get; }
+        Panel = 23,
 
-        public object HotItem { get; }
+        FlexiControl = 24,
 
-        public List<string> Tags { get; }
+        FlexiControlForCell = 25
+
 
     }
 }

@@ -374,7 +374,7 @@ namespace BlueControls.Forms
 
         private void Exported_ItemClicked(object sender, BasicListItemEventArgs e)
         {
-            modAllgemein.ExecuteFile(e.Item.Internal());
+            modAllgemein.ExecuteFile(e.Item.Internal);
         }
 
         private void FrmDrucken_Drucken_Click(object sender, System.EventArgs e)

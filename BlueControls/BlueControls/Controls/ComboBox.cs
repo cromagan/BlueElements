@@ -159,10 +159,10 @@ namespace BlueControls.Controls
 
             FloatingInputBoxListBoxStyle.Close(this);
 
-            if (!string.IsNullOrEmpty(e.ClickedComand.Internal()))
+            if (!string.IsNullOrEmpty(e.ClickedComand))
             {
-                Text = e.ClickedComand.Internal();
-                OnItemClicked(new BasicListItemEventArgs(Item[e.ClickedComand.Internal()]));
+                Text = e.ClickedComand;
+                OnItemClicked(new BasicListItemEventArgs(Item[e.ClickedComand]));
 
             }
 

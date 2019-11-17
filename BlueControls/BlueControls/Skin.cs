@@ -840,18 +840,23 @@ namespace BlueControls
             BlueFont f = null;
             if (!string.IsNullOrEmpty(TXT)) { f = GetBlueFont(SkinRow); }
 
-          //  var State = (enStates)Value(SkinRow, col_Status, -1);
+            //  var State = (enStates)Value(SkinRow, col_Status, -1);
             QuickImage tmpImage = null;
             if (QI != null) { tmpImage = QuickImage.Get(QI, AdditionalState(State)); }
 
             Draw_FormatedText(GR, TXT, tmpImage, vAlign, FitInRect, Child, DeleteBack, f, Translate);
         }
 
-        public static ItemCollectionList GetRahmenArt(RowItem SheetStyle)
+        public static ItemCollectionList GetRahmenArt(RowItem SheetStyle, bool MitOhne)
         {
 
             var Rahms = new ItemCollectionList();
-            //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
+            if (MitOhne)
+            {
+                Rahms.Add(new TextListItem(((int)PadStyles.Undefiniert).ToString(), "Ohne Rahmen", enImageCode.Kreuz));
+            }
+
+
             Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolOfLine()));
             Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolOfLine()));
             Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolOfLine()));

@@ -36,7 +36,7 @@ namespace BlueControls.Forms
             MinWidth = Math.Max(this.Width, MinWidth);
 
 
-            Size = new System.Drawing.Size(MinWidth, BottomOfLowestControl + butOK.Height + BorderHeight);
+            Size = new System.Drawing.Size(MinWidth, BottomOfLowestControl + butOK.Height + BorderHeight + Skin.Padding);
 
             if (CancelPossible)
             {

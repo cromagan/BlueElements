@@ -543,7 +543,7 @@ namespace BlueControls.Forms
         {
 
 
-            switch (e.Item.Internal())
+            switch (e.Item.Internal)
             {
 
                 case "erweitert":
@@ -856,8 +856,7 @@ namespace BlueControls.Forms
 
         private void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e)
         {
-            var CellKey = string.Empty;
-            if (e.Tag is string s) { CellKey = s; }
+            var CellKey = e.Tags.TagGet("Cellkey");
             if (string.IsNullOrEmpty(CellKey)) { return; }
             TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
 
@@ -903,19 +902,19 @@ namespace BlueControls.Forms
         }
 
 
-        private void TableView_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
+        public void TableView_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
         {
 
 
             var bt = (Table)sender;
 
-            var CellKey = string.Empty;
-            if (e.Tag is string s) { CellKey = s; }
+            var CellKey = e.Tags.TagGet("CellKey");
+
             if (string.IsNullOrEmpty(CellKey)) { return; }
             TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
 
 
-            switch (e.ClickedComand.Internal())
+            switch (e.ClickedComand)
             {
 
                 case "SpaltenSortierungAZ":
@@ -994,10 +993,10 @@ namespace BlueControls.Forms
 
                     break;
 
-                default:
-                    DebugPrint(e.ClickedComand);
-                    break;
+
             }
+
+
         }
 
         private void TableView_RowsSorted(object sender, System.EventArgs e)
@@ -1074,7 +1073,7 @@ namespace BlueControls.Forms
 
         private void LastDatabases_ItemClicked(object sender, BasicListItemEventArgs e)
         {
-            DatabaseSet(e.Item.Internal());
+            DatabaseSet(e.Item.Internal);
         }
 
 
@@ -1121,7 +1120,7 @@ namespace BlueControls.Forms
         private void cbxColumnArr_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             if (string.IsNullOrEmpty(cbxColumnArr.Text)) { return; }
-            TableView.Arrangement = int.Parse(e.Item.Internal());
+            TableView.Arrangement = int.Parse(e.Item.Internal);
         }
 
         private void TableView_ViewChanged(object sender, System.EventArgs e)

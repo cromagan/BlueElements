@@ -20,8 +20,10 @@
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Forms
@@ -81,7 +83,7 @@ namespace BlueControls.Forms
         }
 
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl ,bool Translate)
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate)
         {
             return new FloatingInputBoxListBoxStyle(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
         }
@@ -169,7 +171,7 @@ namespace BlueControls.Forms
 
                 if (lstbx.Appearance != enBlueListBoxAppearance.Listbox && lstbx.Appearance != enBlueListBoxAppearance.Gallery && lstbx.Appearance != enBlueListBoxAppearance.FileSystem)
                 {
-                    OnItemClicked(new ContextMenuItemClickedEventArgs(this.Tag, e.Item));
+                    OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.Internal, this.Tag, null)); // Das Tag hier ist eigentlich das HotItem
                     if (!IsDisposed) { Close(); }
                     return;
                 }
@@ -225,5 +227,89 @@ namespace BlueControls.Forms
         }
 
 
+        public static void ContextMenuShow(IContextMenu Control, System.Windows.Forms.MouseEventArgs e)
+        {
+
+            FloatingInputBoxListBoxStyle.Close(enBlueListBoxAppearance.KontextMenu);
+            FloatingInputBoxListBoxStyle.Close(Control);
+
+            var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+            var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+            var tags = new List<string>();
+            var Cancel = false;
+            var Translate = true;
+
+            Control.GetContextMenuItems(e, ThisContextMenu, out var HotItem, tags, ref Cancel, ref Translate);
+
+            if (Cancel) { return; }
+
+
+            var ec = new ContextMenuInitEventArgs(HotItem, tags, UserMenu);
+            Control.OnContextMenuInit(ec);
+
+            if (ec.Cancel) { return; }
+
+            if (!ec.Translate) { Translate = false; }
+
+            if (ThisContextMenu.Count > 0 && UserMenu.Count > 0) { ThisContextMenu.Add(new LineListItem()); }
+            if (UserMenu.Count > 0) { ThisContextMenu.AddRange(UserMenu); }
+
+
+
+            if (ThisContextMenu.Count > 0)
+            {
+                ThisContextMenu.Add(new LineListItem());
+                ThisContextMenu.Add(enContextMenuComands.Abbruch);
+
+                var Infos = new List<object>();
+                Infos.Add(UserMenu);
+                Infos.Add(HotItem);
+                Infos.Add(tags);
+                Infos.Add(Control);
+
+                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, Infos, (System.Windows.Forms.Control)Control, Translate);
+                _ContextMenu.ItemClicked += _ContextMenu_ItemClicked;
+            }
+
+        }
+
+        private static void _ContextMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e)
+        {
+            var Infos = (List<object>)e.HotItem;
+            var UserMmenu = (ItemCollectionList)Infos[0];
+            var HotItem = Infos[1];
+            var Tags = (List<string>)Infos[2];
+            var ob = (IContextMenu)Infos[3];
+
+            FloatingInputBoxListBoxStyle.Close(enBlueListBoxAppearance.KontextMenu);
+            FloatingInputBoxListBoxStyle.Close(ob);
+
+
+            if (e.ClickedComand.ToLower() == "abbruch") { return; }
+
+
+
+            var ex = new ContextMenuItemClickedEventArgs(e.ClickedComand, HotItem, Tags);
+            var done = false;
+
+            if (UserMmenu[e.ClickedComand] == null)
+            {
+                done = ob.ContextMenuItemClickedInternalProcessig(sender, ex);
+            }
+            else
+            {
+                done = true; //keine Prüfung implementiert
+                ob.OnContextMenuItemClicked(ex);
+            }
+
+            if (!done)
+            {
+                Develop.DebugPrint("Kontextmenu-Befehl nicht ausgeführt: " + e.ClickedComand);
+            }
+
+
+
+
+        }
     }
 }

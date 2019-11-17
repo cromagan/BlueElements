@@ -59,23 +59,26 @@ namespace BlueControls.ItemCollection
             { }
 
 
-   
-
-            #endregion
 
 
-            #region  Properties 
+        #endregion
 
 
-            #endregion
+        #region  Properties 
 
-            public override string Internal()
+
+        #endregion
+
+        public override string Internal
+        {
+            get
             {
                 return _Internal;
             }
+        }
 
 
-            public override SizeF SizeUntouchedForListBox()
+        public override SizeF SizeUntouchedForListBox()
             {
 
                 if (Pos.X == 0 && Pos.X == 0 && Pos.Width == 0 && Pos.Height == 0)

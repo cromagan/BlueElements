@@ -28,6 +28,7 @@ using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueControls.Designer_Support;
+using System.Collections.Generic;
 
 namespace BlueControls.Controls
 {
@@ -218,17 +219,17 @@ namespace BlueControls.Controls
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            if (e.Button == System.Windows.Forms.MouseButtons.Right) { ContextMenu_Show(this, e); }
+            if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
         }
 
-        private void ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
+
+
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
         {
-            FloatingInputBoxListBoxStyle.Close(this);
-            if (e.ClickedComand.Internal().ToLower() == "abbruch") { return; }
-            OnContextMenuItemClicked(e);
+            return false;
         }
 
-        private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
         {
             ContextMenuItemClicked?.Invoke(this, e);
         }
@@ -348,7 +349,7 @@ namespace BlueControls.Controls
                         break;
 
                     case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
-                        eText.TextDimensions = new Size( base.Size.Width,-1);
+                        eText.TextDimensions = new Size(base.Size.Width, -1);
                         break;
 
                     case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
@@ -375,25 +376,12 @@ namespace BlueControls.Controls
 
 
 
-        public void ContextMenu_Show(object sender, System.Windows.Forms.MouseEventArgs e)
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
         {
-            var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
-
-            OnContextMenuInit(new ContextMenuInitEventArgs(null, UserMenu));
-
-
-
-            if (UserMenu.Count > 0)
-            {
-                UserMenu.Add(new LineListItem());
-                UserMenu.Add(enContextMenuComands.Abbruch);
-
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(UserMenu, null, this, Translate);
-                _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
-            }
+            HotItem = null;
         }
 
-        private void OnContextMenuInit(ContextMenuInitEventArgs e)
+        public void OnContextMenuInit(ContextMenuInitEventArgs e)
         {
             ContextMenuInit?.Invoke(this, e);
         }

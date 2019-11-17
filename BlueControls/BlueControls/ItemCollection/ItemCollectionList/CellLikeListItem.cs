@@ -79,9 +79,12 @@ namespace BlueControls.ItemCollection
 
         #endregion
 
-        public override string Internal()
+        public override string Internal
         {
-            return _Internal;
+            get
+            {
+                return _Internal;
+            }
         }
 
 

@@ -255,9 +255,12 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override string Internal()
+        public override string Internal
         {
-            return _Internal;
+            get
+            {
+                return _Internal;
+            }
         }
         public override void DesignOrStyleChanged()
         {
@@ -448,7 +451,7 @@ namespace BlueControls.ItemCollection
 
         protected override string GetCompareKey()
         {
-            return Internal();
+            return Internal;
         }
 
 

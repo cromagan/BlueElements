@@ -201,7 +201,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void Layout1_ItemClicked(object sender, BasicListItemEventArgs e)
         {
-            LoadLayout(e.Item.Internal());
+            LoadLayout(e.Item.Internal);
         }
 
 
@@ -284,7 +284,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
             else
             {
-                Nam = i.Internal();
+                Nam = i.Internal;
             }
 
 
@@ -334,7 +334,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
             else if (FomAx.SelectedIndex == 2)
             {
-                if (BefE2.Item.Checked().Count == 1) { Code.Text = BefE2.Item.Checked()[0].Internal(); }
+                if (BefE2.Item.Checked().Count == 1) { Code.Text = BefE2.Item.Checked()[0].Internal; }
             }
             else
             {
@@ -388,7 +388,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 switch (i)
                 {
                     case TextListItem _:
-                        Nam = i.Internal();
+                        Nam = i.Internal;
                         TextB = true; //Not String.IsNullOrEmpty(.Text)
                         //  If TextB Then
                         //  MultiL = False
@@ -475,7 +475,7 @@ namespace BlueControls.BlueDatabaseDialogs
             if (Spaltx.Item.Count > 0)
             {
                 Spaltx.Enabled = true;
-                Spaltx.Text = Spaltx.Item[0].Internal();
+                Spaltx.Text = Spaltx.Item[0].Internal;
             }
             else
             {
@@ -573,7 +573,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e)
         {
-            LoadFile(e.Item.Internal());
+            LoadFile(e.Item.Internal);
         }
 
 

@@ -159,9 +159,9 @@ namespace BlueControls
             {
                 if (ThisItem != null)
                 {
-                    if (!string.IsNullOrEmpty(ThisItem.Internal()))
+                    if (!string.IsNullOrEmpty(ThisItem.Internal))
                     {
-                        w.Add(ThisItem.Internal());
+                        w.Add(ThisItem.Internal);
                     }
                 }
             }

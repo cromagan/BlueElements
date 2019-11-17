@@ -272,7 +272,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             var l = new List<string>
                 {
-                    e.Item.Internal()
+                    e.Item.Internal
                 };
 
 
@@ -372,7 +372,7 @@ namespace BlueControls.BlueDatabaseDialogs
         {
 
 
-            switch (e.Item.Internal().ToLower())
+            switch (e.Item.Internal.ToLower())
             {
                 case "filterleere":
                     {
@@ -503,7 +503,7 @@ namespace BlueControls.BlueDatabaseDialogs
                     }
                 default:
                     {
-                        Develop.DebugPrint("Unbekannter Filter: " + e.Item.Internal());
+                        Develop.DebugPrint("Unbekannter Filter: " + e.Item.Internal);
 
                         break;
                     }

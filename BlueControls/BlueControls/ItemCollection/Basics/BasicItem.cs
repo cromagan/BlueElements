@@ -78,13 +78,13 @@ namespace BlueControls.ItemCollection.Basics
 
 
 
-        public abstract string Internal();
+        public abstract string Internal { get; }
 
 
         public bool IsNullOrEmpty()
         {
             // Nicht das interne Abfragen, sondern das der Items!
-            if (string.IsNullOrEmpty(Internal())) { return true; }
+            if (string.IsNullOrEmpty(Internal)) { return true; }
 
             return false;
         }

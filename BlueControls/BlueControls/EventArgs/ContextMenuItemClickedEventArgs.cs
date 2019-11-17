@@ -19,6 +19,7 @@
 
 
 using BlueControls.ItemCollection;
+using System.Collections.Generic;
 
 namespace BlueControls.EventArgs
 {
@@ -26,16 +27,18 @@ namespace BlueControls.EventArgs
     {
 
 
-        public ContextMenuItemClickedEventArgs(object Tag, BasicListItem ClickedComand)
+        public ContextMenuItemClickedEventArgs(string ClickedComand, object HotItem, List<string> Tags)
         {
-            this.Tag = Tag;
+            this.HotItem = HotItem;
+            this.Tags = Tags;
             this.ClickedComand = ClickedComand;
         }
 
 
 
-        public BasicListItem ClickedComand { get; set; }
-        public object Tag { get; set; }
+        public string ClickedComand { get;  }
+        public object HotItem { get;  }
+        public List<string> Tags { get; }
 
 
     }

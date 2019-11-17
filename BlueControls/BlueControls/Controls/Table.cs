@@ -1330,17 +1330,17 @@ namespace BlueControls.Controls
         {
 
             FloatingInputBoxListBoxStyle.Close(this);
-            if (string.IsNullOrEmpty(e.ClickedComand.Internal())) { return; }
+            if (string.IsNullOrEmpty(e.ClickedComand)) { return; }
 
 
             var CellKey = string.Empty;
-            if (e.Tag is string s) { CellKey = s; }
+            if (e.HotItem is string s) { CellKey = s; }
             if (string.IsNullOrEmpty(CellKey)) { return; }
             Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
 
 
 
-            var ToAdd = e.ClickedComand.Internal();
+            var ToAdd = e.ClickedComand;
             var ToRemove = string.Empty;
 
 
@@ -2212,26 +2212,15 @@ namespace BlueControls.Controls
 
 
 
-        private void ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
         {
-            FloatingInputBoxListBoxStyle.Close(this);
-            if (e.ClickedComand.Internal().ToLower() == "abbruch") { return; }
-
-            if (e.ClickedComand.Internal().Substring(0, 1) == "*") { return; }
-
-
-            var CellKey = string.Empty;
-            if (e.Tag is string s) { CellKey = s; }
-
-            //Database.Cell.DataOfCellKey(CellKey, out _, out _);
-
-
-
-            //if (DoInternalContextMenuComand(e.ClickedComand.Internal(), Column, Row)) { return; }
-
-            OnContextMenuItemClicked(e);
+            return false;
         }
 
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
+        {
+            ContextMenuItemClicked?.Invoke(this, e);
+        }
         #endregion
 
 
@@ -2268,10 +2257,7 @@ namespace BlueControls.Controls
 
 
 
-        private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
-        {
-            ContextMenuItemClicked?.Invoke(this, e);
-        }
+
 
         private void _Database_CellValueChanged(object sender, CellEventArgs e)
         {
@@ -2882,7 +2868,7 @@ namespace BlueControls.Controls
 
                 if (e.Button == System.Windows.Forms.MouseButtons.Right)
                 {
-                    ContextMenu_Show(this, e);
+                    FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
                 }
 
 
@@ -3989,38 +3975,47 @@ namespace BlueControls.Controls
 
         }
 
-        public void ContextMenu_Show(object sender, System.Windows.Forms.MouseEventArgs e)
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
         {
+            HotItem = null;
 
-            if (_Database.IsParsing()) { return; }
+            if (_Database.IsParsing())
+            {
+                Cancel = true;
+                return;
+            }
 
             Database?.Load_Reload();
 
 
-            var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
-            var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+
 
             CellOnCoordinate(e.X, e.Y, out _MouseOverColumn, out _MouseOverRow);
 
-            OnContextMenuInit(new ContextMenuInitEventArgs(CellCollection.KeyOfCell(_MouseOverColumn, _MouseOverRow), UserMenu));
+            Tags.TagSet("CellKey", CellCollection.KeyOfCell(_MouseOverColumn, _MouseOverRow));
 
-
-            if (ThisContextMenu.Count > 0 && UserMenu.Count > 0) { ThisContextMenu.Add(new LineListItem()); }
-            if (UserMenu.Count > 0) { ThisContextMenu.AddRange(UserMenu.ToList()); }
-
-            if (ThisContextMenu.Count > 0)
+            if (_MouseOverColumn != null)
             {
-                ThisContextMenu.Add(new LineListItem());
-                ThisContextMenu.Add(enContextMenuComands.Abbruch);
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, CellCollection.KeyOfCell(_MouseOverColumn, _MouseOverRow), this, Translate);
-                _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
+                Tags.TagSet("ColumnKey", _MouseOverColumn.Key.ToString());
             }
+
+
+            if (_MouseOverRow != null)
+            {
+                Tags.TagSet("RowKey", _MouseOverRow.Key.ToString());
+            }
+
+
+
+
+            //OnContextMenuInit(new ContextMenuInitEventArgs(, UserMenu));
+
 
 
         }
 
 
-        private void OnContextMenuInit(ContextMenuInitEventArgs e)
+        public void OnContextMenuInit(ContextMenuInitEventArgs e)
         {
             ContextMenuInit?.Invoke(this, e);
         }

@@ -80,10 +80,10 @@ namespace BlueControls.BlueDatabaseDialogs
                                             foreach (var thisItem in dummy)
                                             {
 
-                                                if (thisItem.Internal().ToLower().Contains(t))
+                                                if (thisItem.Internal.ToLower().Contains(t))
                                                 {
 
-                                                    var ni = new TextListItem(ThisColumn.Name.ToUpper() + "|" + thisItem.Internal(), ThisColumn.ReadableText() + ": " + thisItem.Internal());
+                                                    var ni = new TextListItem(ThisColumn.Name.ToUpper() + "|" + thisItem.Internal, ThisColumn.ReadableText() + ": " + thisItem.Internal);
                                                     Auswahl.Item.Add(ni);
 
                                                     ni.Checked = thisItem.Checked;
@@ -129,23 +129,12 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             Für.Text = "<b>" + Row.CellFirstString();
-
-
-
-
-
         }
-
-
-
-
 
         private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e)
         {
 
-            var x = e.Item.Internal().SplitBy("|");
-
-
+            var x = e.Item.Internal.SplitBy("|");
 
 
             if (Row.Database.Column[x[0]].MultiLine)

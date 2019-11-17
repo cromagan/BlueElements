@@ -136,8 +136,7 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl(true));
             l.Add(new FlexiControl("Symbol", ((int)Symbol).ToString(), Comms));
 
-            var x = Skin.GetRahmenArt(Parent.SheetStyle);
-            x.Add(new TextListItem("-1", "Ohne"));
+            var x = Skin.GetRahmenArt(Parent.SheetStyle, true);
             l.Add(new FlexiControl("Farbe", ((int)Style).ToString(), x));
 
 

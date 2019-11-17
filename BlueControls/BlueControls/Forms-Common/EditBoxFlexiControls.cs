@@ -13,26 +13,34 @@ namespace BlueControls.Forms
             InitializeComponent();
         }
 
-        public EditBoxFlexiControl(List<FlexiControl> Flexis)
+        private EditBoxFlexiControl(List<FlexiControl> Flexis) : this()
         {
-            InitializeComponent();
 
             var top = Skin.Padding;
-            var we = Skin.Padding * 2;
+            var we = 300 + Skin.Padding * 4;
 
             foreach (var ThisFlexi in Flexis)
             {
                 Controls.Add(ThisFlexi);
+                ThisFlexi.Enabled = true;
                 ThisFlexi.Left = Skin.Padding;
                 ThisFlexi.Top = top;
                 ThisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
                 top = top + Skin.Padding + ThisFlexi.Height;
-                we = Math.Max(we, ThisFlexi.Width + Skin.Padding * 2);
+                we = Math.Max(we, ThisFlexi.Width + Skin.Padding * 4);
 
                 ThisFlexi.ButtonClicked += FlexiButtonClick;
             }
 
-            Setup(300, top, true, false);
+            we = Math.Min(we, 1500);
+
+            foreach (var ThisFlexi in Flexis)
+            {
+                ThisFlexi.Width = Width - Skin.Padding * 4;
+            }
+
+
+            Setup(we, top, true, false);
         }
 
 

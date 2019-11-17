@@ -90,7 +90,7 @@ namespace BlueControls.Forms
 
             if (string.IsNullOrEmpty(DesignName))
             {
-                PadDesign.Text = PadDesign.Item[0].Internal();
+                PadDesign.Text = PadDesign.Item[0].Internal;
             }
             else
             {
@@ -216,7 +216,7 @@ namespace BlueControls.Forms
 
         private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e)
         {
-            Pad.SheetStyle = e.Item.Internal();
+            Pad.SheetStyle = e.Item.Internal;
         }
 
 

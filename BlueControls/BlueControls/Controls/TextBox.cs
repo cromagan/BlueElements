@@ -816,7 +816,7 @@ namespace BlueControls.Controls
                         MarkClear();
                         if (e.Button == System.Windows.Forms.MouseButtons.Right)
                         {
-                            ContextMenu_Show(this, e);
+                            FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
                         }
                     }
                     else
@@ -825,7 +825,7 @@ namespace BlueControls.Controls
                         Selection_Repair(true);
                         if (e.Button == System.Windows.Forms.MouseButtons.Right)
                         {
-                            ContextMenu_Show(this, e);
+                            FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
                         }
                     }
                 }
@@ -1352,7 +1352,7 @@ namespace BlueControls.Controls
             Skin.Draw_Border(TMPGR, _eTxt.Design, state, DisplayRectangle);
 
 
-      
+
 
             gr.DrawImage(_BitmapOfControl, 0, 0);
 
@@ -1654,26 +1654,24 @@ namespace BlueControls.Controls
         }
 
 
-        private void ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
         {
 
             Focus();
 
             var NewWord = "";
 
-            var cTags = (List<string>)e.Tag;
+
+            _MarkStart = int.Parse(e.Tags.TagGet("MarkStart"));
+            _MarkEnd = int.Parse(e.Tags.TagGet("MarkEnd"));
+            _Cursor_CharPos = int.Parse(e.Tags.TagGet("Cursorpos"));
 
 
-            _MarkStart = int.Parse(cTags.TagGet("MarkStart"));
-            _MarkEnd = int.Parse(cTags.TagGet("MarkEnd"));
-            _Cursor_CharPos = int.Parse(cTags.TagGet("Cursorpos"));
+            var tmp = e.ClickedComand;
 
-
-            var tmp = e.ClickedComand.Internal();
-
-            if (e.ClickedComand.Internal().StartsWith("#ChangeTo:"))
+            if (e.ClickedComand.StartsWith("#ChangeTo:"))
             {
-                NewWord = e.ClickedComand.Internal().Substring(10);
+                NewWord = e.ClickedComand.Substring(10);
                 tmp = "#ChangeTo";
             }
 
@@ -1681,16 +1679,16 @@ namespace BlueControls.Controls
             switch (tmp)
             {
                 case "#SpellAdd":
-                    Dictionary.WordAdd(cTags.TagGet("Word"));
+                    Dictionary.WordAdd(e.Tags.TagGet("Word"));
                     _MustCheck = true;
                     Invalidate();
-                    return;
+                    return true;
 
                 case "#SpellAddLower":
-                    Dictionary.WordAdd(cTags.TagGet("Word".ToLower()));
+                    Dictionary.WordAdd(e.Tags.TagGet("Word".ToLower()));
                     _MustCheck = true;
                     Invalidate();
-                    return;
+                    return true;
 
                 case "#SpellChecking":
                     FloatingInputBoxListBoxStyle.Close(this);
@@ -1701,7 +1699,7 @@ namespace BlueControls.Controls
                         _MustCheck = true;
                         Invalidate();
                     }
-                    return;
+                    return true;
 
                 case "#SpellChecking2":
                     FloatingInputBoxListBoxStyle.Close(this);
@@ -1717,38 +1715,38 @@ namespace BlueControls.Controls
                 case "Ausschneiden":
                     Clipboard_Copy();
                     Char_DelBereich(-1, -1);
-                    return;
+                    return true;
 
                 case "Kopieren":
                     Clipboard_Copy();
-                    return;
+                    return true;
 
                 case "Einfügen":
                     Clipboard_Paste();
-                    return;
+                    return true;
 
                 case "#Caption":
-                    if (_MarkStart < 0 || _MarkEnd < 0) { return; }
+                    if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
                     Selection_Repair(true);
                     _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 3);
-                    return;
+                    return true;
 
                 case "#NoCaption":
-                    if (_MarkStart < 0 || _MarkEnd < 0) { return; }
+                    if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
                     Selection_Repair(true);
                     _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 4);
-                    return;
+                    return true;
 
                 case "#Bold":
-                    if (_MarkStart < 0 || _MarkEnd < 0) { return; }
+                    if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
                     Selection_Repair(true);
                     _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 7);
-                    return;
+                    return true;
 
 
                 case "#Sonderzeichen":
                     AddSpecialChar();
-                    return;
+                    return true;
 
                 case "#ChangeTo":
                     var ws = _eTxt.WordStart(_Cursor_CharPos);
@@ -1760,19 +1758,17 @@ namespace BlueControls.Controls
                     InsertText(NewWord);
 
                     _Cursor_CharPos = _eTxt.WordEnd(_Cursor_CharPos);
-                    return;
+                    return true;
 
-                    //default:
-                    // Kein Else, weil das UserMenu am Ende noch abgefragt wird
+
 
             }
 
-            FloatingInputBoxListBoxStyle.Close(this);
-            OnContextMenuItemClicked(e);
+            return false;
         }
 
 
-        private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
         {
             ContextMenuItemClicked?.Invoke(this, e);
         }
@@ -1832,32 +1828,31 @@ namespace BlueControls.Controls
         }
 
 
-        public void ContextMenu_Show(object sender, System.Windows.Forms.MouseEventArgs e)
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
         {
-            var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
-            var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+            AbortSpellChecking();
+            HotItem = null;
 
-            var Infos = new List<string>();
-            Infos.TagSet("CursorPosBeforeClick", _Cursor_CharPos.ToString());
+            Tags.TagSet("CursorPosBeforeClick", _Cursor_CharPos.ToString());
             var tmp = Cursor_PosAt(e.X, e.Y);
-            Infos.TagSet("Char", tmp.ToString());
-            Infos.TagSet("MarkStart", _MarkStart.ToString());
-            Infos.TagSet("MarkEnd", _MarkEnd.ToString());
-            Infos.TagSet("Cursorpos", _Cursor_CharPos.ToString());
+            Tags.TagSet("Char", tmp.ToString());
+            Tags.TagSet("MarkStart", _MarkStart.ToString());
+            Tags.TagSet("MarkEnd", _MarkEnd.ToString());
+            Tags.TagSet("Cursorpos", _Cursor_CharPos.ToString());
 
             var tmpWord = _eTxt.Word(tmp);
-            Infos.TagSet("Word", tmpWord);
+            Tags.TagSet("Word", tmpWord);
 
 
             if (_SpellChecking && !Dictionary.IsWordOk(tmpWord))
             {
-                ThisContextMenu.Add(new TextListItem("Rechtschreibprüfung", true));
+                Items.Add(new TextListItem("Rechtschreibprüfung", true));
 
 
                 if (Dictionary.IsSpellChecking)
                 {
-                    ThisContextMenu.Add(new TextListItem("Gerade ausgelastet...", "Gerade ausgelastet...", false));
-                    ThisContextMenu.Add(new LineListItem());
+                    Items.Add(new TextListItem("Gerade ausgelastet...", "Gerade ausgelastet...", false));
+                    Items.Add(new LineListItem());
                 }
                 else
                 {
@@ -1866,23 +1861,23 @@ namespace BlueControls.Controls
                     {
                         foreach (var ThisS in sim)
                         {
-                            ThisContextMenu.Add(new TextListItem("#ChangeTo:" + ThisS, " - " + ThisS));
+                            Items.Add(new TextListItem("#ChangeTo:" + ThisS, " - " + ThisS));
                         }
 
-                        ThisContextMenu.Add(new LineListItem());
+                        Items.Add(new LineListItem());
                     }
 
 
 
-                    ThisContextMenu.Add(new TextListItem("#SpellAdd", "'" + tmpWord + "' ins Wörterbuch aufnehmen", Dictionary.IsWriteable()));
+                    Items.Add(new TextListItem("#SpellAdd", "'" + tmpWord + "' ins Wörterbuch aufnehmen", Dictionary.IsWriteable()));
                     if (tmpWord.ToLower() != tmpWord)
                     {
-                        ThisContextMenu.Add(new TextListItem("#SpellAddLower", "'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", Dictionary.IsWriteable()));
+                        Items.Add(new TextListItem("#SpellAddLower", "'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", Dictionary.IsWriteable()));
                     }
 
-                    ThisContextMenu.Add(new TextListItem("#SpellChecking", "Schnelle Rechtschreibprüfung", Dictionary.IsWriteable()));
-                    ThisContextMenu.Add(new TextListItem("#SpellChecking2", "Alle Wörter sind ok", Dictionary.IsWriteable()));
-                    ThisContextMenu.Add(new LineListItem());
+                    Items.Add(new TextListItem("#SpellChecking", "Schnelle Rechtschreibprüfung", Dictionary.IsWriteable()));
+                    Items.Add(new TextListItem("#SpellChecking2", "Alle Wörter sind ok", Dictionary.IsWriteable()));
+                    Items.Add(new LineListItem());
                 }
 
             }
@@ -1890,45 +1885,31 @@ namespace BlueControls.Controls
 
             if (!(this is ComboBox cbx) || cbx.DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown)
             {
-                ThisContextMenu.Add(enContextMenuComands.Ausschneiden, Convert.ToBoolean(_MarkStart >= 0) && Enabled);
-                ThisContextMenu.Add(enContextMenuComands.Kopieren, Convert.ToBoolean(_MarkStart >= 0));
-                ThisContextMenu.Add(enContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
+                Items.Add(enContextMenuComands.Ausschneiden, Convert.ToBoolean(_MarkStart >= 0) && Enabled);
+                Items.Add(enContextMenuComands.Kopieren, Convert.ToBoolean(_MarkStart >= 0));
+                Items.Add(enContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
 
 
                 if (_Format == enDataFormat.Text_mit_Formatierung)
                 {
-                    ThisContextMenu.Add(new LineListItem());
-                    ThisContextMenu.Add(new TextListItem("#Sonderzeichen", "Sonderzeichen einfügen", QuickImage.Get(enImageCode.Sonne, 16), _Cursor_CharPos > -1));
+                    Items.Add(new LineListItem());
+                    Items.Add(new TextListItem("#Sonderzeichen", "Sonderzeichen einfügen", QuickImage.Get(enImageCode.Sonne, 16), _Cursor_CharPos > -1));
 
                     if (Convert.ToBoolean(_MarkEnd > -1))
                     {
-                        ThisContextMenu.Add(new LineListItem());
-                        ThisContextMenu.Add(new TextListItem("#Caption", "Als Überschrift markieren", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _MarkEnd > -1));
-                        ThisContextMenu.Add(new TextListItem("#Bold", "Fettschrift", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1)));
-                        ThisContextMenu.Add(new TextListItem("#NoCaption", "Als normalen Text markieren", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1)));
+                        Items.Add(new LineListItem());
+                        Items.Add(new TextListItem("#Caption", "Als Überschrift markieren", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _MarkEnd > -1));
+                        Items.Add(new TextListItem("#Bold", "Fettschrift", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1)));
+                        Items.Add(new TextListItem("#NoCaption", "Als normalen Text markieren", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1)));
                     }
                 }
             }
 
 
-            OnContextMenuInit(new ContextMenuInitEventArgs(Infos, UserMenu));
 
-            if (ThisContextMenu.Count > 0 && UserMenu.Count > 0) { ThisContextMenu.Add(new LineListItem()); }
-            if (UserMenu.Count > 0) { ThisContextMenu.AddRange(UserMenu); }
-
-
-
-            if (ThisContextMenu.Count > 0)
-            {
-                ThisContextMenu.Add(new LineListItem());
-                ThisContextMenu.Add(enContextMenuComands.Abbruch);
-                AbortSpellChecking();
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, Infos, this, Translate);
-                _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
-            }
         }
 
-        private void OnContextMenuInit(ContextMenuInitEventArgs e)
+        public void OnContextMenuInit(ContextMenuInitEventArgs e)
         {
             ContextMenuInit?.Invoke(this, e);
         }

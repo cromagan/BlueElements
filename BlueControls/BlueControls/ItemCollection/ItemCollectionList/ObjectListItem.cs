@@ -64,14 +64,15 @@ namespace BlueControls.ItemCollection
 
         }
 
-        public override string Internal()
+
+        public override string Internal
         {
-            if (Obj is ColumnItem item) { return item.Name; }
-            return Obj.ToString();
+            get
+            {
+                if (Obj is ColumnItem item) { return item.Name; }
+                return Obj.ToString();
+            }
         }
-
-
-
 
         protected override void Initialize()
         {

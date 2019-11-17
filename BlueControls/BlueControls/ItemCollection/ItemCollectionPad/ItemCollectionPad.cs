@@ -153,7 +153,7 @@ namespace BlueControls.ItemCollection
                 {
                     if (ThisItem != null)
                     {
-                        if (Internal.ToUpper() == ThisItem.Internal().ToUpper())
+                        if (Internal.ToUpper() == ThisItem.Internal.ToUpper())
                         {
                             return ThisItem;
                         }
@@ -386,14 +386,14 @@ namespace BlueControls.ItemCollection
 
         public new void Add(BasicPadItem cItem)
         {
-            if (string.IsNullOrEmpty(cItem.Internal()))
+            if (string.IsNullOrEmpty(cItem.Internal))
             {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + cItem.Internal());
+                Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + cItem.Internal);
             }
 
-            if (this[cItem.Internal()] != null)
+            if (this[cItem.Internal] != null)
             {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches aber schon vorhanden ist: " + cItem.Internal());
+                Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches aber schon vorhanden ist: " + cItem.Internal);
             }
 
             cItem.Parent = this;

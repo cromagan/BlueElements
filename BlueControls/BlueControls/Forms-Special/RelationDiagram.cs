@@ -128,12 +128,12 @@ namespace BlueControls.Forms
 
             private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
             {
-                if (e.Tag == null) { return; }
+                if (e.HotItem == null) { return; }
 
                 //Dim i As BasicItem = DirectCast(MouseOver, BasicItem)
 
 
-                if (!(e.Tag is RowFormulaPadItem)) { return; }
+                if (!(e.HotItem is RowFormulaPadItem)) { return; }
 
 
                 e.UserMenu.Add(new TextListItem("Bez+", "Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", enImageCode.PlusZeichen));
@@ -147,14 +147,14 @@ namespace BlueControls.Forms
             private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
             {
 
-                if (e.Tag == null) { return; }
+                if (e.HotItem == null) { return; }
 
-                if (!(e.Tag is RowFormulaPadItem)) { return; }
+                if (!(e.HotItem is RowFormulaPadItem)) { return; }
 
-                var i = (RowFormulaPadItem)e.Tag;
+                var i = (RowFormulaPadItem)e.HotItem;
 
 
-                switch (e.ClickedComand.Internal())
+                switch (e.ClickedComand)
                 {
                     case "Bez+":
                         BezPlus(i, -1);
@@ -308,7 +308,7 @@ namespace BlueControls.Forms
             //{
             //    if (ThisItem is LinePadItem)
             //    {
-            //        if (ThisItem.Internal() == id) { return; }
+            //        if (ThisItem.Internal == id) { return; }
             //    }
             //}
 

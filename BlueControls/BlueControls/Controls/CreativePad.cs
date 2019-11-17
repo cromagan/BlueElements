@@ -867,7 +867,7 @@ namespace BlueControls.Controls
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
 
-                ContextMenu_Show(this, e);
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
 
             }
 
@@ -1717,20 +1717,20 @@ namespace BlueControls.Controls
 
 
 
-        private void ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
         {
-            FloatingInputBoxListBoxStyle.Close(this);
+
             BasicPadItem thisItem = null;
 
-            if (e.Tag is BasicPadItem item) { thisItem = item; }
-            if (e.ClickedComand.Internal().ToLower() == "abbruch") { return; }
+            if (e.HotItem is BasicPadItem item) { thisItem = item; }
+
             Changed = true;
 
             var Done = false;
 
             if (thisItem != null)
             {
-                switch (e.ClickedComand.Internal().ToLower())
+                switch (e.ClickedComand.ToLower())
                 {
                     case "#erweitert":
                         Done = true;
@@ -1777,7 +1777,7 @@ namespace BlueControls.Controls
 
             }
 
-            if (!Done) { OnContextMenuItemClicked(new ContextMenuItemClickedEventArgs(thisItem, e.ClickedComand)); }
+            //if (!Done) { Done = thisItem.ContextMenuItemClicked(new ContextMenuItemClickedEventArgs(e.ClickedComand, null, e.Tags)); }
 
 
 
@@ -1786,9 +1786,11 @@ namespace BlueControls.Controls
             RepairAll(0, false); // Da könnte sich ja alles geändert haben...
             Invalidate();
 
+            return Done;
+
         }
 
-        private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
         {
             ContextMenuItemClicked?.Invoke(this, e);
         }
@@ -1836,50 +1838,38 @@ namespace BlueControls.Controls
         }
 
 
-        public void ContextMenu_Show(object sender, System.Windows.Forms.MouseEventArgs e)
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
         {
-            var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
-            var _HotItem = HotItem(e);
-            var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
 
-            OnContextMenuInit(new ContextMenuInitEventArgs(_HotItem, UserMenu));
+             HotItem = this.HotItem(e);
 
 
-
-            if (UserMenu.Count > 0)
+            if (HotItem != null)
             {
-                ThisContextMenu.Add(new TextListItem("Allgemein", true));
-                ThisContextMenu.AddRange(UserMenu);
-            }
+                Items.Add(new TextListItem("Allgemeine Element-Aktionen", true));
+                Items.Add(new TextListItem("#Erweitert", "Objekt bearbeiten", enImageCode.Stift));
+                Items.Add(new LineListItem());
 
 
-
-            if (_HotItem != null)
-            {
-                ThisContextMenu.Add(new TextListItem("Allgemeine Element-Aktionen", true));
-                ThisContextMenu.Add(new TextListItem("#Erweitert", "Objekt bearbeiten", enImageCode.Stift));
-                ThisContextMenu.Add(new LineListItem());
-
-
-                ThisContextMenu.Add(new TextListItem("#ExterneBeziehungen", "Objektübergreifende Punkt-Beziehungen aufheben", enImageCode.Kreuz));
-                if (_HotItem.PrintMe)
+                Items.Add(new TextListItem("#ExterneBeziehungen", "Objektübergreifende Punkt-Beziehungen aufheben", enImageCode.Kreuz));
+                if (((BasicPadItem)HotItem).PrintMe)
                 {
-                    ThisContextMenu.Add(new TextListItem("#PrintMeNot", "Objekt nicht drucken", QuickImage.Get("Drucker|16||1")));
+                    Items.Add(new TextListItem("#PrintMeNot", "Objekt nicht drucken", QuickImage.Get("Drucker|16||1")));
                 }
                 else
                 {
-                    ThisContextMenu.Add(new TextListItem("#PrintMe", "Objekt drucken", enImageCode.Drucker));
+                    Items.Add(new TextListItem("#PrintMe", "Objekt drucken", enImageCode.Drucker));
                 }
 
 
-                ThisContextMenu.Add(new TextListItem("#Duplicate", "Objekt duplizieren", enImageCode.Kopieren, _HotItem is ICloneable));
+                Items.Add(new TextListItem("#Duplicate", "Objekt duplizieren", enImageCode.Kopieren, HotItem is ICloneable));
 
 
-                ThisContextMenu.Add(new LineListItem());
-                ThisContextMenu.Add(new TextListItem("#Vordergrund", "In den Vordergrund", enImageCode.InDenVordergrund));
-                ThisContextMenu.Add(new TextListItem("#Hintergrund", "In den Hintergrund", enImageCode.InDenHintergrund));
-                ThisContextMenu.Add(new TextListItem("#Vorne", "Eine Ebene nach vorne", enImageCode.EbeneNachVorne));
-                ThisContextMenu.Add(new TextListItem("#Hinten", "Eine Ebene nach hinten", enImageCode.EbeneNachHinten));
+                Items.Add(new LineListItem());
+                Items.Add(new TextListItem("#Vordergrund", "In den Vordergrund", enImageCode.InDenVordergrund));
+                Items.Add(new TextListItem("#Hintergrund", "In den Hintergrund", enImageCode.InDenHintergrund));
+                Items.Add(new TextListItem("#Vorne", "Eine Ebene nach vorne", enImageCode.EbeneNachVorne));
+                Items.Add(new TextListItem("#Hinten", "Eine Ebene nach hinten", enImageCode.EbeneNachHinten));
             }
 
 
@@ -1889,18 +1879,9 @@ namespace BlueControls.Controls
                 Thispoint?.Store();
             }
 
-
-
-            if (ThisContextMenu.Count > 0)
-            {
-                ThisContextMenu.Add(new LineListItem());
-                ThisContextMenu.Add(enContextMenuComands.Abbruch);
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, _HotItem, this, Translate);
-                _ContextMenu.ItemClicked += ContextMenuItemClickedInternalProcessig;
-            }
         }
 
-        private void OnContextMenuInit(ContextMenuInitEventArgs e)
+        public void OnContextMenuInit(ContextMenuInitEventArgs e)
         {
             ContextMenuInit?.Invoke(this, e);
         }
