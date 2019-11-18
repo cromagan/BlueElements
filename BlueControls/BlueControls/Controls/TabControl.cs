@@ -33,7 +33,7 @@ using System.Drawing.Design;
 using System.Runtime.InteropServices;
 
 namespace BlueControls.Controls
-{   
+{
     [ToolboxBitmap(typeof(System.Windows.Forms.TabControl))]
     [Designer(typeof(TabControlDesigner))]
     public sealed class TabControl : System.Windows.Forms.TabControl, IContextMenu, IBackgroundNone
@@ -315,7 +315,7 @@ namespace BlueControls.Controls
 
         private System.Windows.Forms.TabPage TestTab(Point pt)
         {
-            for (var index = 0 ; index < TabCount ; index++)
+            for (var index = 0; index < TabCount; index++)
             {
                 if (GetTabRect(index).Contains(pt.X, pt.Y))
                 {
@@ -366,13 +366,13 @@ namespace BlueControls.Controls
 
 
 
-            for (var id = 0 ; id < TabCount ; id++)
+            for (var id = 0; id < TabCount; id++)
             {
                 if (id != SelectedIndex) { DrawTabHead(e.Graphics, id); }
             }
 
 
-            for (var id = 0 ; id < TabCount ; id++)
+            for (var id = 0; id < TabCount; id++)
             {
                 if (id == SelectedIndex)
                 {
@@ -387,37 +387,44 @@ namespace BlueControls.Controls
 
         private void DrawTabHead(Graphics graphics, int id)
         {
-            var tmpState = enStates.Standard;
-            if (!TabPages[id].Enabled) { tmpState = enStates.Standard_Disabled; }
 
-
-            if (id == SelectedIndex) { tmpState |= enStates.Checked; }
-
-
-            if (TabPages[id].Enabled && _HotTab == TabPages[id]) { tmpState |= enStates.Standard_MouseOver; }
-
-
-
-
-            var r = GetTabRect(id);
-
-            r.Y -= 2;
-            r.X += 1;
-
-            if (_IsRibbonBar)
+            try
             {
-                Skin.Draw_Back(graphics, enDesign.RibbonBar_Head, tmpState, r, this, true);
-                Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.RibbonBar_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
-                Skin.Draw_Border(graphics, enDesign.RibbonBar_Head, tmpState, r);
+                var tmpState = enStates.Standard;
+                if (!TabPages[id].Enabled) { tmpState = enStates.Standard_Disabled; }
+
+
+                if (id == SelectedIndex) { tmpState |= enStates.Checked; }
+
+
+                if (TabPages[id].Enabled && _HotTab == TabPages[id]) { tmpState |= enStates.Standard_MouseOver; }
+
+
+
+
+                var r = GetTabRect(id);
+
+                r.Y -= 2;
+                r.X += 1;
+
+                if (_IsRibbonBar)
+                {
+                    Skin.Draw_Back(graphics, enDesign.RibbonBar_Head, tmpState, r, this, true);
+                    Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.RibbonBar_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
+                    Skin.Draw_Border(graphics, enDesign.RibbonBar_Head, tmpState, r);
+                }
+                else
+                {
+                    Skin.Draw_Back(graphics, enDesign.TabStrip_Head, tmpState, r, this, true);
+                    Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.TabStrip_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
+                    Skin.Draw_Border(graphics, enDesign.TabStrip_Head, tmpState, r);
+                }
+
             }
-            else
+            catch
             {
-                Skin.Draw_Back(graphics, enDesign.TabStrip_Head, tmpState, r, this, true);
-                Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.TabStrip_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
-                Skin.Draw_Border(graphics, enDesign.TabStrip_Head, tmpState, r);
+
             }
-
-
 
 
         }

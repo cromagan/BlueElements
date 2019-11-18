@@ -68,7 +68,7 @@ namespace BlueControls.ItemCollection
                 }
             }
         }
-
+        private string _Name;
 
         public List<BasicPadItem> VisibleItems = null;
         public List<BasicPadItem> ZoomItems = null;
@@ -79,6 +79,22 @@ namespace BlueControls.ItemCollection
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
+
+
+        public string Name
+        {
+            get
+            {
+                return _Name;
+            }
+            set
+            {
+                if (value == _Name) { return; }
+                _Name = value;
+                OnChanged();
+            }
+        }
+
 
 
         #region  Construktor + Initialize 
@@ -197,8 +213,8 @@ namespace BlueControls.ItemCollection
                 case "fixsize":
                     FixSize = pair.Value.FromPlusMinus();
                     return true;
-                case "modus": // Alt
-                              // BildModus = CType(Integer.Parse(pair.Value), enSizeModes)
+                case "name":
+                    _Name = pair.Value.FromNonCritical();
                     return true;
                 case "data":
                     PadInternal = new CreativePad();
@@ -217,6 +233,13 @@ namespace BlueControls.ItemCollection
         {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
+
+
+            if (!string.IsNullOrEmpty(_Name))
+            {
+                t = t + "Name=" + _Name.ToNonCritical() + ", ";
+            }
+
 
             if (PadInternal != null)
             {
@@ -401,6 +424,7 @@ namespace BlueControls.ItemCollection
 
             var l = new List<FlexiControl>();
 
+            l.Add(new FlexiControl("Name", _Name, enDataFormat.Text, 1));
 
             l.AddRange(base.GetStyleOptions(sender, e));
             return l;
@@ -408,6 +432,8 @@ namespace BlueControls.ItemCollection
 
         public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         {
+            _Name = Tags.TagGet("name").FromNonCritical();
+
             base.DoStyleCommands(sender, Tags, ref CloseMenu);
 
         }

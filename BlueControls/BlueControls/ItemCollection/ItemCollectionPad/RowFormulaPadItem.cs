@@ -427,8 +427,8 @@ namespace BlueControls.ItemCollection
 
 
 
-        //    If ClickedComand.Internal.StartsWith("Layout;") Then
-        //        _LayoutNr = Integer.Parse(ClickedComand.Internal.Substring(7))
+        //    If ClickedComand.StartsWith("Layout;") Then
+        //        _LayoutNr = Integer.Parse(ClickedComand.Substring(7))
         //        GeneratePic(True)
 
         //        If _tmpBMP Is Nothing Then Return True
@@ -444,7 +444,7 @@ namespace BlueControls.ItemCollection
         //    End If
 
 
-        //   switch (ClickedComand.Internal
+        //   switch (ClickedComand
         //        Case Is = "Bearbeiten"
         //            eInputBox("Datensatz bearbeiten:", _Row)
         //            GeneratePic(True)

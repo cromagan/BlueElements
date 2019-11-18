@@ -68,6 +68,7 @@ namespace BlueControls.Controls
 
         protected bool _allinitialized = false;
         protected bool _enabled = false;
+        protected bool _InstantChangedEvent = true;
         public event EventHandler RemovingAll;
 
         public event EventHandler NeedRefresh;
@@ -219,11 +220,11 @@ namespace BlueControls.Controls
             _Caption = CaptionText + ":";
             ValueId = CaptionText;
             _Format = Format;
-
+            _InstantChangedEvent = true;
 
             var c = CreateSubControls();
 
-            StyleTextBox((TextBox)c, TMPMultiLine, string.Empty, false, true);
+            StyleTextBox((TextBox)c, TMPMultiLine, string.Empty, false);
 
             Value = InitialValue;
         }
@@ -417,6 +418,28 @@ namespace BlueControls.Controls
             }
         }
 
+
+        /// <summary>
+        /// Falls das Steuerelement eine InstantChangeEvent unterstützt, wird dieses umgesetzt
+        /// </summary>
+        [DefaultValue(true)]
+        public bool InstantChangedEvent
+        {
+            get
+            {
+                return _InstantChangedEvent;
+            }
+            set
+            {
+
+                if (_InstantChangedEvent == value) { return; }
+                _InstantChangedEvent = value;
+
+
+                UpdateControls();
+
+            }
+        }
 
 
         /// <summary>
@@ -1454,7 +1477,8 @@ namespace BlueControls.Controls
         private TextBox Control_Create_TextBox()
         {
             var Control = new TextBox();
-            StyleTextBox(Control, false, string.Empty, false, true);
+            _InstantChangedEvent = true;
+            StyleTextBox(Control, false, string.Empty, false);
             UpdateValueToControl();
             StandardBehandlung(Control);
             return Control;
@@ -1463,7 +1487,7 @@ namespace BlueControls.Controls
 
 
 
-        protected void StyleTextBox(TextBox Control, bool Multiline, string AllowedChars, bool SpellChecking, bool InstantChange)
+        protected void StyleTextBox(TextBox Control, bool Multiline, string AllowedChars, bool SpellChecking)
         {
             Control.Enabled = _enabled;
             Control.Format = _Format;
@@ -1471,7 +1495,7 @@ namespace BlueControls.Controls
             Control.AllowedChars = AllowedChars;
             Control.MultiLine = Multiline;
             Control.SpellChecking = SpellChecking;
-            Control.InstantChangedEvent = InstantChange;
+            Control.InstantChangedEvent = _InstantChangedEvent;
 
             if (Multiline || Height > 20)
             {
@@ -1490,9 +1514,11 @@ namespace BlueControls.Controls
         private void UpdateValueTo_TextBox(TextBox Control)
         {
             if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
+
+
             Control.InstantChangedEvent = true;
             Control.Text = _Value;
-            Control.InstantChangedEvent = false;
+            Control.InstantChangedEvent = _InstantChangedEvent;
         }
 
 
@@ -1742,12 +1768,14 @@ namespace BlueControls.Controls
                     case ComboBox ComboBox:
                         ComboBox.Suffix = _Suffix;
                         ComboBox.Format = _Format;
+                        ComboBox.InstantChangedEvent = _InstantChangedEvent;
 
                         break;
 
                     case TextBox TextBox:
                         TextBox.Suffix = _Suffix;
                         TextBox.Format = _Format;
+                        TextBox.InstantChangedEvent = _InstantChangedEvent;
                         break;
 
                     case EasyPic _:

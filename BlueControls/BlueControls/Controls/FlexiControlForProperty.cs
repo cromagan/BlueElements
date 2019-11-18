@@ -250,9 +250,9 @@ namespace BlueControls.Controls
 
         protected override void OnValueChanged()
         {
+            FillPropertyNow(); // erst befüllen, bevor das Event ausgelöst wird
+            GenFehlerText(); // erst Standard fehler Text, bevor das Event ausgelöst wird
             base.OnValueChanged();
-            FillPropertyNow();
-            GenFehlerText();
         }
 
 
