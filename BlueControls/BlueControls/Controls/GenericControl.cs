@@ -257,7 +257,7 @@ namespace BlueControls.Controls
         {
             if (InvokeRequired)
             {
-                return (Point)Invoke(new Func<Point>(() =>  MousePos()));
+                return (Point)Invoke(new Func<Point>(() => MousePos()));
             }
 
             Develop.DebugPrint_Disposed(IsDisposed);
@@ -368,8 +368,14 @@ namespace BlueControls.Controls
 
                 Forms.QuickInfo.Close();
 
-                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { Focus(); }
-                tmpSkinRow = null;
+                if (Enabled)
+                {
+                    tmpSkinRow = null;
+                    if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { Focus(); }
+                }
+
+
+
                 base.OnMouseDown(e);
 
             }
@@ -379,7 +385,7 @@ namespace BlueControls.Controls
         protected override void OnMouseLeave(System.EventArgs e)
         {
             if (IsDisposed) { return; }
-            tmpSkinRow = null;
+            if (Enabled) { tmpSkinRow = null; }
             base.OnMouseLeave(e);
 
 
@@ -422,7 +428,10 @@ namespace BlueControls.Controls
         {
             if (IsDisposed) { return; }
             if (!_MousePressing) { return; }
+
             _MousePressing = false;
+            if (Enabled) { tmpSkinRow = null; }
+
             tmpSkinRow = null;
             base.OnMouseUp(e);
         }
@@ -438,7 +447,8 @@ namespace BlueControls.Controls
         protected override void OnMouseEnter(System.EventArgs e)
         {
             if (IsDisposed) { return; }
-            tmpSkinRow = null;
+
+            if (Enabled) { tmpSkinRow = null; }
             base.OnMouseEnter(e);
             ShowQuickInfo();
         }

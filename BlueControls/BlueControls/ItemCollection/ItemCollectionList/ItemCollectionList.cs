@@ -647,6 +647,37 @@ namespace BlueControls.ItemCollection
             _CellposCorrect = true;
         }
 
+        /// <summary>
+        /// Füllt die Ersetzungen mittels eines Übergebenen Enums aus.
+        /// </summary>
+        /// <param name="t">Beispiel: GetType(enDesign)</param>
+        /// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
+        /// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
+        public void GetValuesFromEnum(System.Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis)
+        {
+
+            var items = System.Enum.GetValues(t);
+
+            Clear();
+
+            foreach (var thisItem in items)
+            {
+
+                var te = System.Enum.GetName(t, thisItem);
+                var th = (int)thisItem;
+
+                if (!string.IsNullOrEmpty(te))
+                {
+                    //NewReplacer.Add(th.ToString() + "|" + te);
+                    if (th >= ZumDropdownHinzuAb && th < ZumDropdownHinzuBis)
+                    {
+                        Add(new TextListItem(th.ToString(), te));
+                    }
+                }
+            }
+
+        }
+
         #region  Add / AddRange / AddBasicLevel 
 
 

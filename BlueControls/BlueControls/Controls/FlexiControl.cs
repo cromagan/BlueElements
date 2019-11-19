@@ -686,7 +686,7 @@ namespace BlueControls.Controls
             switch (e.Control)
             {
                 case ComboBox ComboBox:
-                    ComboBox.ItemClicked += ComboBoxItemClicked;
+                    //ComboBox.ItemClicked += ComboBoxItemClicked;
                     ComboBox.TextChanged += ValueChanged_ComboBox;
                     break;
 
@@ -746,7 +746,7 @@ namespace BlueControls.Controls
             switch (e.Control)
             {
                 case ComboBox ComboBox:
-                    ComboBox.ItemClicked -= ComboBoxItemClicked;
+                    //ComboBox.ItemClicked -= ComboBoxItemClicked;
                     ComboBox.TextChanged -= ValueChanged_ComboBox;
                     break;
 
@@ -949,10 +949,10 @@ namespace BlueControls.Controls
         #region  ComboBox 
 
 
-        private void ComboBoxItemClicked(object sender, BasicListItemEventArgs e)
-        {
-            Value = e.Item.Internal;
-        }
+        //private void ComboBoxItemClicked(object sender, BasicListItemEventArgs e)
+        //{
+        //    Value = e.Item.Internal;
+        //}
 
 
         /// <summary>

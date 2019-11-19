@@ -346,6 +346,18 @@ namespace BlueControls.Controls
 
         }
 
+        public ComboBox GetComboBox()
+        {
+
+            if (!_allinitialized) { return null; }
+
+
+            foreach (var thiscon in this.Controls)
+            {
+                if (thiscon is ComboBox cbx) { return cbx; }
+            }
+            return null;
+        }
     }
 }
 

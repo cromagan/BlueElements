@@ -31,7 +31,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Imaging;
-using System.Collections.Generic;
 
 namespace BlueControls.Controls
 {
@@ -65,7 +64,7 @@ namespace BlueControls.Controls
         private bool _btnDropDownIsIn = false;
         private System.Windows.Forms.ComboBoxStyle _DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
         private enComboboxStyle _DrawStyle = enComboboxStyle.TextBox;
-        private string _ImageCode = "";
+        private string _ImageCode = string.Empty;
 
 
         #endregion
@@ -171,6 +170,7 @@ namespace BlueControls.Controls
 
         protected virtual void OnItemClicked(BasicListItemEventArgs e)
         {
+
             ItemClicked?.Invoke(this, e);
         }
 
@@ -332,9 +332,16 @@ namespace BlueControls.Controls
 
         protected override void OnGotFocus(System.EventArgs e)
         {
-            base.OnGotFocus(e);
 
-            if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) { btnDropDown.Focus(); }
+            if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList)
+            {
+                btnDropDown.Focus();
+            }
+            else
+            {
+                base.OnGotFocus(e);
+            }
+
             FloatingInputBoxListBoxStyle.Close(this);
         }
 
@@ -346,7 +353,7 @@ namespace BlueControls.Controls
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e)
         {
-            base.OnMouseUp(e);
+
 
             if (e.Button != System.Windows.Forms.MouseButtons.Right)
             {
@@ -355,7 +362,17 @@ namespace BlueControls.Controls
                 {
                     btnDropDown_MouseUp(this, e);
                 }
+                else
+                {
+                    base.OnMouseUp(e);
+                }
             }
+            else
+            {
+                base.OnMouseUp(e);
+            }
+
+
         }
 
 
@@ -407,20 +424,20 @@ namespace BlueControls.Controls
             }
         }
 
-        protected override void OnMouseEnter(System.EventArgs e)
-        {
-            base.OnMouseEnter(e);
-            if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
-            Invalidate();
-        }
+        //protected override void OnMouseEnter(System.EventArgs e)
+        //{
+        //    base.OnMouseEnter(e);
+        //    if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
+        //    Invalidate();
+        //}
 
 
-        protected override void OnMouseLeave(System.EventArgs e)
-        {
-            base.OnMouseLeave(e);
-            if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
-            Invalidate();
-        }
+        //protected override void OnMouseLeave(System.EventArgs e)
+        //{
+        //    base.OnMouseLeave(e);
+        //    if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
+        //    Invalidate();
+        //}
 
 
         protected override void OnTextChanged(System.EventArgs e)
@@ -437,36 +454,6 @@ namespace BlueControls.Controls
         }
 
 
-        /// <summary>
-        /// Füllt die Ersetzungen mittels eines Übergebenen Enums aus.
-        /// </summary>
-        /// <param name="t">Beispiel: GetType(enDesign)</param>
-        /// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
-        /// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
-        public void GetValuesFromEnum(System.Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis)
-        {
-            //var NewReplacer = new List<string>();
-            //var NewAuswahl = new List<string>();
-            var items = System.Enum.GetValues(t);
 
-            Item.Clear();
-
-            foreach (var thisItem in items)
-            {
-
-                var te = System.Enum.GetName(t, thisItem);
-                var th = (int)thisItem;
-
-                if (!string.IsNullOrEmpty(te))
-                {
-                    //NewReplacer.Add(th.ToString() + "|" + te);
-                    if (th >= ZumDropdownHinzuAb && th < ZumDropdownHinzuBis)
-                    {
-                        Item.Add(new TextListItem(th.ToString(), te));
-                    }
-                }
-            }
-
-        }
     }
 }
