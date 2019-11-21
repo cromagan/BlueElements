@@ -187,12 +187,12 @@ namespace BlueControls.ItemCollection
             var l = new List<FlexiControl>();
 
             var Size = new ItemCollectionList();
-            Size.Add(new TextListItem((mm125x * 1m).Nummer(1, 4), "Klein (1,25 mm)", enImageCode.GrößeÄndern));
-            Size.Add(new TextListItem((mm125x * 2m).Nummer(1, 4), "Normal (2,5 mm)", enImageCode.GrößeÄndern));
-            Size.Add(new TextListItem((mm125x * 4m).Nummer(1, 4), "Groß (5,0 mm)", enImageCode.GrößeÄndern));
-            Size.Add(new TextListItem((mm125x * 5m).Nummer(1, 4), "Sehr groß (10,0 mm)", enImageCode.GrößeÄndern));
+            Size.Add(new TextListItem((mm125x * 1m).ToString(Constants.Format_Float4), "Klein (1,25 mm)", enImageCode.GrößeÄndern));
+            Size.Add(new TextListItem((mm125x * 2m).ToString(Constants.Format_Float4), "Normal (2,5 mm)", enImageCode.GrößeÄndern));
+            Size.Add(new TextListItem((mm125x * 4m).ToString(Constants.Format_Float4), "Groß (5,0 mm)", enImageCode.GrößeÄndern));
+            Size.Add(new TextListItem((mm125x * 5m).ToString(Constants.Format_Float4), "Sehr groß (10,0 mm)", enImageCode.GrößeÄndern));
 
-            l.Add(new FlexiControl("Größe Distanzhalter", _Size.Nummer(1, 4), Size));
+            l.Add(new FlexiControl("Größe Distanzhalter", _Size.ToString(Constants.Format_Float4), Size));
 
 
             return l;

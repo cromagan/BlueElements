@@ -86,7 +86,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public DimensionPadItem(PointDF cPoint1, PointDF cPoint2, int AbstandinMM, int InitialDPI)
+        public DimensionPadItem(PointDF cPoint1, PointDF cPoint2, int AbstandinMM, int InitialDPI) : base()
         {
             Point1.SetTo(cPoint1.X, cPoint1.Y);
             Point2.SetTo(cPoint2.X, cPoint2.Y);
@@ -103,25 +103,25 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public DimensionPadItem(PointF cPoint1, PointF cPoint2, int AbstandInMM, int InitialDPI)
+        public DimensionPadItem(PointF cPoint1, PointF cPoint2, int AbstandInMM, int InitialDPI) : this(new PointDF(cPoint1), new PointDF(cPoint2), AbstandInMM, InitialDPI)
         {
-            Point1.SetTo(cPoint1.X, cPoint1.Y);
-            Point2.SetTo(cPoint2.X, cPoint2.Y);
+            //Point1.SetTo(cPoint1.X, cPoint1.Y);
+            //Point2.SetTo(cPoint2.X, cPoint2.Y);
 
-            ComputeData();
-
-
-            var a = GeometryDF.PolarToCartesian(modConverter.mmToPixel(AbstandInMM, InitialDPI), Convert.ToDouble(_Winkel - 90));
-
-            TextPointx.SetTo(Point1, _Länge / 2, _Winkel);
-            TextPointx.X += a.X;
-            TextPointx.Y += a.Y;
+            //ComputeData();
 
 
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
+            //var a = GeometryDF.PolarToCartesian(modConverter.mmToPixel(AbstandInMM, InitialDPI), Convert.ToDouble(_Winkel - 90));
+
+            //TextPointx.SetTo(Point1, _Länge / 2, _Winkel);
+            //TextPointx.X += a.X;
+            //TextPointx.Y += a.Y;
+
+
+            //if (string.IsNullOrEmpty(_Internal))
+            //{
+            //    Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
+            //}
         }
 
 
@@ -131,10 +131,10 @@ namespace BlueControls.ItemCollection
         protected override void Initialize()
         {
             base.Initialize();
-            Text1 = "";
-            Text2 = "";
+            Text1 = string.Empty;
+            Text2 = string.Empty;
             NachKomma = 1;
-            //  ImmerWaagerecht = True
+
             Style = PadStyles.Style_StandardAlternativ;
 
             Point1.Parent = this;
@@ -148,7 +148,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-       #endregion
+        #endregion
 
 
         #region  Properties 
@@ -272,7 +272,7 @@ namespace BlueControls.ItemCollection
 
 
 
-            var geszoom = Parent.SheetStyleScale * AdditionalScale * cZoom; 
+            var geszoom = Parent.SheetStyleScale * AdditionalScale * cZoom;
 
 
             var f = Skin.GetBlueFont(Style, Parent.SheetStyle);
@@ -357,6 +357,9 @@ namespace BlueControls.ItemCollection
             var sz1 = BlueFont.MeasureString(AngezeigterText1(), f.Font(geszoom));
             var sz2 = BlueFont.MeasureString(Text2, f.Font(geszoom));
 
+            var maxrad = (decimal)(Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height)) / 2 + 10);
+
+
             var P1_x = decimal.MaxValue;
             var P1_y = decimal.MaxValue;
             var P2_x = decimal.MinValue;
@@ -367,29 +370,29 @@ namespace BlueControls.ItemCollection
             P1_x = Math.Min(P1_x, _Bezugslinie1.X);
             P1_x = Math.Min(P1_x, Point2.X);
             P1_x = Math.Min(P1_x, _Bezugslinie2.X);
-            P1_x = Math.Min(P1_x, TextPointx.X - (decimal)sz1.Width / 2m - 10);
-            P1_x = Math.Min(P1_x, TextPointx.X - (decimal)sz2.Width / 2m - 10);
+            P1_x = Math.Min(P1_x, TextPointx.X - maxrad);
+            //P1_x = Math.Min(P1_x, TextPointx.X - (decimal)sz2.Width / 2m - 10);
 
             P1_y = Math.Min(P1_y, Point1.Y);
             P1_y = Math.Min(P1_y, _Bezugslinie1.Y);
             P1_y = Math.Min(P1_y, Point2.Y);
             P1_y = Math.Min(P1_y, _Bezugslinie2.Y);
-            P1_y = Math.Min(P1_y, TextPointx.Y - (decimal)sz1.Height / 2m - 10);
-            P1_y = Math.Min(P1_y, TextPointx.Y - (decimal)sz2.Height / 2m - 10);
+            P1_y = Math.Min(P1_y, TextPointx.Y - maxrad);
+            // P1_y = Math.Min(P1_y, TextPointx.Y - (decimal)sz2.Height / 2m - 10);
 
             P2_x = Math.Max(P2_x, Point1.X);
             P2_x = Math.Max(P2_x, _Bezugslinie1.X);
             P2_x = Math.Max(P2_x, Point2.X);
             P2_x = Math.Max(P2_x, _Bezugslinie2.X);
-            P2_x = Math.Max(P2_x, TextPointx.X + (decimal)sz1.Width / 2m + 10);
-            P2_x = Math.Max(P2_x, TextPointx.X + (decimal)sz2.Width / 2m + 10);
+            P2_x = Math.Max(P2_x, TextPointx.X + maxrad);
+            // P2_x = Math.Max(P2_x, TextPointx.X + (decimal)sz2.Width / 2m + 10);
 
             P2_y = Math.Max(P2_y, Point1.Y);
             P2_y = Math.Max(P2_y, _Bezugslinie1.Y);
             P2_y = Math.Max(P2_y, Point2.Y);
             P2_y = Math.Max(P2_y, _Bezugslinie2.Y);
-            P2_y = Math.Max(P2_y, TextPointx.Y + (decimal)sz1.Height / 2m + 10);
-            P2_y = Math.Max(P2_y, TextPointx.Y + (decimal)sz2.Height / 2m + 10);
+            P2_y = Math.Max(P2_y, TextPointx.Y + maxrad);
+            // P2_y = Math.Max(P2_y, TextPointx.Y + (decimal)sz2.Height / 2m + 10);
 
             return new RectangleDF(P1_x - 2, P1_y - 2, P2_x - P1_x + 4, P2_y - P1_y + 4); // die Sicherheits koordinaten damit nicht linien abgeschnitten werden
         }

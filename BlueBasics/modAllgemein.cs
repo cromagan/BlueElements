@@ -741,54 +741,54 @@ namespace BlueBasics
             return M + x;
         }
 
-        public static string Nummer(this decimal Nr, int Stellen, int NachKomma)
-        {
-            return Nummer(Nr.ToString(), Stellen, NachKomma);
-        }
+        //public static string Nummer(this decimal Nr, int Stellen, int NachKomma)
+        //{
+        //    return Nummer(Nr.ToString(), Stellen, NachKomma);
+        //}
 
-        public static string Nummer(this double Nr, int Stellen, int NachKomma)
-        {
-            return Nummer(Nr.ToString(), Stellen, NachKomma);
-        }
+        //public static string Nummer(this double Nr, int Stellen, int NachKomma)
+        //{
+        //    return Nummer(Nr.ToString(), Stellen, NachKomma);
+        //}
 
-        public static string Nummer(this string Nrs, int Stellen, int NachKomma)
-        {
+        //public static string Nummer(this string Nrs, int Stellen, int NachKomma)
+        //{
 
-            if (!Nrs.Contains(","))
-            {
-                Nrs = Nrs + ",0";
-            }
+        //    if (!Nrs.Contains(","))
+        //    {
+        //        Nrs = Nrs + ",0";
+        //    }
 
-            var T = Nrs.Split(',');
+        //    var T = Nrs.Split(',');
 
-            T[0] = Nummer(T[0], Stellen);
+        //    T[0] = Nummer(T[0], Stellen);
 
-            if (T[1].Length > NachKomma)
-            {
-                T[1] = T[1].TrimEnd('0');
-            }
+        //    if (T[1].Length > NachKomma)
+        //    {
+        //        T[1] = T[1].TrimEnd('0');
+        //    }
 
 
-            do
-            {
-                if (T[1].Length < NachKomma)
-                {
-                    T[1] = T[1] + "0";
-                }
-                else
-                {
-                    break;
-                }
-            } while (true);
+        //    do
+        //    {
+        //        if (T[1].Length < NachKomma)
+        //        {
+        //            T[1] = T[1] + "0";
+        //        }
+        //        else
+        //        {
+        //            break;
+        //        }
+        //    } while (true);
 
-            if (T[1].Length > 0)
-            {
-                return T[0] + "," + T[1];
-            }
+        //    if (T[1].Length > 0)
+        //    {
+        //        return T[0] + "," + T[1];
+        //    }
 
-            return T[0];
+        //    return T[0];
 
-        }
+        //}
 
 
 

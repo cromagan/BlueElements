@@ -481,7 +481,7 @@ namespace BlueBasics
 
                     if (IsValue.IsDouble())
                     {
-                        return CompareKey_S_OK + double.Parse(IsValue).Nummer(10, 1);
+                        return CompareKey_S_OK + double.Parse(IsValue).ToString(Constants.Format_Float10_1);
                     }
                     else
                     {

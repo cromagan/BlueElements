@@ -94,5 +94,11 @@ namespace BlueBasics
         public const string Format_Integer4 = "0000";
         public const string Format_Integer3 = "000";
         public const string Format_Integer2 = "00";
+
+        public const string Format_Float1 = "0.#"; // 1 Nachkomma
+        public const string Format_Float2 = "0.##"; // 2 Nachkomma
+        public const string Format_Float3 = "0.###"; // 3 Nachkomma
+        public const string Format_Float4 = "0.####"; // 4 Nachkomma
+        public const string Format_Float10_1 = "0000000000.#"; 
     }
 }
