@@ -679,6 +679,7 @@ namespace BlueBasics
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
+                case enDataFormat.LinkedCell:
                     return true;
                 default:
                     return false;
