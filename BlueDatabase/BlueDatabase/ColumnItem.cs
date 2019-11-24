@@ -2812,7 +2812,7 @@ namespace BlueDatabase
                     return enEditTypeTable.Dropdown_Single;
 
                 case enDataFormat.Link_To_Filesystem:
-                    return enEditTypeTable.Textfeld;
+                    return enEditTypeTable.FileHandling_InDateiSystem;
 
                 case enDataFormat.Farbcode:
                     if (DoDropDown) { return enEditTypeTable.Dropdown_Single; }
