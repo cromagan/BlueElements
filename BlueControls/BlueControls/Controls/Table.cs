@@ -3573,7 +3573,8 @@ namespace BlueControls.Controls
             {
                 _SortedRowsBefore.Clear();
                 if (_SortedRows != null) { _SortedRowsBefore.AddRange(_SortedRows); }
-                CursorPos_Set(null, null, true);
+                EnsureVisible(_CursorPosColumn, _CursorPosRow);
+      //          CursorPos_Set(null, null, true);
                 OnRowsSorted();
             }
 
