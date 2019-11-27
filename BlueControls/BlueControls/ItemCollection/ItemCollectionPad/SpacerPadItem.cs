@@ -57,15 +57,10 @@ namespace BlueControls.ItemCollection
 
 
 
-        public SpacerPadItem(ItemCollectionPad vparent)
+        public SpacerPadItem(ItemCollectionPad vparent) : base(string.Empty)
         {
             Parent = vparent;
-        }
 
-
-        protected override void Initialize()
-        {
-            base.Initialize();
 
             mm125x = Math.Round(modConverter.mmToPixel(1.25M, ItemCollectionPad.DPI), 1);
 
@@ -75,7 +70,11 @@ namespace BlueControls.ItemCollection
             p_l = new PointDF(this, "L", 0, 0);
             p_r = new PointDF(this, "R", 0, 0);
             p_m = new PointDF(this, "M", 0, 0, false, true, true);
+
         }
+
+
+
 
 
         #endregion

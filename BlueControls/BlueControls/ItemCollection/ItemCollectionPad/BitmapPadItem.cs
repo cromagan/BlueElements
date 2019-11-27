@@ -59,51 +59,23 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-        public BitmapPadItem()
-        { }
+        public BitmapPadItem() : this(string.Empty, null, Size.Empty) { }
 
-        public BitmapPadItem(string cInternal, string FileToLoad)
-        {
-            _Internal = cInternal;
-            Bitmap = (Bitmap)modAllgemein.Image_FromFile(FileToLoad);
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
-        public BitmapPadItem(string cInternal, Bitmap BMP)
-        {
-            _Internal = cInternal;
-            Bitmap = BMP;
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
-        public BitmapPadItem(Bitmap BMP, Size size)
-        {
-            Bitmap = BMP;
+        public BitmapPadItem(string internalname, string FileToLoad) : this(internalname, (Bitmap)modAllgemein.Image_FromFile(FileToLoad), Size.Empty) { }
 
+        public BitmapPadItem(string internalname, Bitmap bmp) : this(internalname, bmp, Size.Empty) { }
+
+        public BitmapPadItem(Bitmap bmp, Size size) : this(string.Empty, bmp, size) { }
+
+        public BitmapPadItem(Bitmap bmp) : this(string.Empty, bmp, Size.Empty) { }
+
+        public BitmapPadItem(string internalname, Bitmap bmp, Size size) : base(internalname)
+        {
+
+
+            Bitmap = bmp;
             SetCoordinates(new RectangleDF(0, 0, size.Width, size.Height));
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
-        public BitmapPadItem(Bitmap BMP)
-        {
-            Bitmap = BMP;
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
 
-
-        protected override void Initialize()
-        {
-            base.Initialize();
-            Bitmap = null;
             Overlays = new List<QuickImage>();
             WhiteBack = true;
             Padding = 0;

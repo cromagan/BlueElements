@@ -2946,7 +2946,10 @@ namespace BlueDatabase
 
                     if (!ok && string.IsNullOrEmpty(ok2))
                     {
-                        Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br><br>Vorher:<br>" + WVorher + "<br><br>Nachher:<br>" + Works.ToString());
+                        if (!Filename.Contains("AutoVue"))
+                        {
+                            Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br><br>Vorher:<br>" + WVorher + "<br><br>Nachher:<br>" + Works.ToString());
+                        }
                     }
                 }
             }

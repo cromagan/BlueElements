@@ -59,112 +59,48 @@ namespace BlueControls.ItemCollection
 
 
 
-        public BitmapListItem()
-        { }
+        public BitmapListItem() : this(string.Empty, string.Empty, string.Empty, null, string.Empty) { }
 
 
-        public BitmapListItem(string intern, string caption)
+        public BitmapListItem(string internalname, string caption) : this(internalname, caption, string.Empty, null, string.Empty) { }
+
+
+
+        public BitmapListItem(Bitmap BMP, string caption) : this(string.Empty, caption, string.Empty, BMP, string.Empty) { }
+
+
+
+        public BitmapListItem(string internalname, Bitmap BMP) : this(internalname, string.Empty, string.Empty, BMP, string.Empty) { }
+
+
+        private BitmapListItem(string internalname, string caption, string Filename, Bitmap bmp, string EncryptionKey) : base(internalname)
         {
-            _Internal = intern;
-            _caption = caption;
-            _captiontmp.Clear();
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
-
-
-        public BitmapListItem(Bitmap BMP, string caption)
-        {
-            _Bitmap = BMP;
-            _caption = caption;
-            _captiontmp.Clear();
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
-
-
-        public BitmapListItem(string intern, Bitmap BMP)
-        {
-            _Internal = intern;
-            _Bitmap = BMP;
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
-
-        public BitmapListItem(Bitmap BMP)
-        {
-            _Bitmap = BMP;
-
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
-
-
-        public BitmapListItem(string intern, string caption, string Filename, string EncryptionKey)
-        {
-            _Internal = intern;
 
             _caption = caption;
             _captiontmp.Clear();
 
+            if (bmp != null && !string.IsNullOrEmpty(Filename))
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Filename UND bmp angekommen!");
+            }
+
+
+            _Bitmap = bmp;
             _ImageFilename = Filename;
             _EncryptionKey = EncryptionKey;
 
-
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
-
-
-        public BitmapListItem(string intern, string caption, QuickImage QI)
-        {
-            _Internal = intern;
-
-            _caption = caption;
-            _captiontmp.Clear();
-
-            _Bitmap = QI.BMP;
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
-
-
-
-
-
-        protected override void Initialize()
-        {
-            base.Initialize();
-            base.Initialize();
-            _caption = string.Empty;
-            _captiontmp.Clear();
-            _Bitmap = null;
-
-            _ImageFilename = string.Empty;
-            //_ImageDatassystem = Nothing
-
+            _padding = 0;
 
             _overlays.Clear();
             _overlays.ListOrItemChanged += _overlays_ListOrItemChanged;
-
-
-            _padding = 0;
-
-
-            _EncryptionKey = string.Empty;
         }
+
+
+        public BitmapListItem(string internalname, string caption, string Filename, string EncryptionKey) : this(internalname, caption, Filename, null, EncryptionKey) { }
+
+
+        public BitmapListItem(string internalname, string caption, QuickImage QI) : this(internalname, caption, string.Empty, QI.BMP, string.Empty) { }
+
 
         private void _overlays_ListOrItemChanged(object sender, System.EventArgs e)
         {
@@ -255,13 +191,6 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override string Internal
-        {
-            get
-            {
-                return _Internal;
-            }
-        }
         public override void DesignOrStyleChanged()
         {
             // Keine Variablen zum Reseten, ein Invalidate reicht
@@ -455,14 +384,10 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override BasicListItem CloneLVL2()
-        {
-            Develop.DebugPrint_NichtImplementiert();
-            return null;
-        }
 
-        protected override bool FilterMatchLVL2(string FilterText)
+        public override bool FilterMatch(string FilterText)
         {
+            if (base.FilterMatch(FilterText)) { return true; }
             if (Caption.ToUpper().Contains(FilterText.ToUpper())) { return true; }
             if (_ImageFilename.ToUpper().Contains(FilterText.ToUpper())) { return true; }
             return false;

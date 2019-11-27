@@ -63,40 +63,38 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
-        public LinePadItem()
-        { }
-        public LinePadItem(PadStyles vFormat, Point cPoint1, Point cPoint2)
+        public LinePadItem() : this(PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
+        public LinePadItem(PadStyles vFormat, Point cPoint1, Point cPoint2) : base(string.Empty)
         {
-            Point1.SetTo(cPoint1);
-            Point2.SetTo(cPoint2);
-            Style = vFormat;
-        }
 
-
-        public LinePadItem(string vInternal, PadStyles vFormat, enConectorStyle vArt, PointDF cPoint1, PointDF cPoint2)
-        {
-            _Internal = vInternal;
-            Point1.SetTo(cPoint1);
-            Point2.SetTo(cPoint2);
-            Style = vFormat;
-            Art = vArt;
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
-
-
-        protected override void Initialize()
-        {
-            base.Initialize();
             Point1 = new PointDF(this, "Punkt 1", 0, 0);
             Point2 = new PointDF(this, "Punkt 2", 0, 0);
+
+            Point1.SetTo(cPoint1);
+            Point2.SetTo(cPoint2);
+            Style = vFormat;
 
             _TempPoints = new List<PointDF>();
             Style = PadStyles.Style_Standard;
             Art = enConectorStyle.Direct;
+
         }
+
+
+        //public LinePadItem(string vInternal, PadStyles vFormat, enConectorStyle vArt, PointDF cPoint1, PointDF cPoint2)
+        //{
+        //    _Internal = vInternal;
+        //    Point1.SetTo(cPoint1);
+        //    Point2.SetTo(cPoint2);
+        //    Style = vFormat;
+        //    Art = vArt;
+        //    if (string.IsNullOrEmpty(_Internal))
+        //    {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
+        //    }
+        //}
+
+
 
 
         #endregion
@@ -233,7 +231,7 @@ namespace BlueControls.ItemCollection
 
             if (Art != enConectorStyle.Direct)
             {
-                t = t + "Connection=" + (int)(Art) + ", ";
+                t = t + "Connection=" + (int)Art + ", ";
             }
             return t + "}";
         }
@@ -260,7 +258,7 @@ namespace BlueControls.ItemCollection
             {
                 if (DateTime.Now.Subtract(_LastRecalc).TotalSeconds > 5)
                 {
-  
+
                     if (DateTime.Now.Subtract(_LastRecalc).TotalSeconds > 5 + Constants.GlobalRND.Next(10))
                     {
                         _TempPoints = null;
@@ -440,13 +438,13 @@ namespace BlueControls.ItemCollection
             {
 
 
-                if ((int)(_TempPoints[P1].X) == (int)(_TempPoints[P1 + 1].X) && (int)(_TempPoints[P1].X) == (int)(_TempPoints[P1 + 2].X))
+                if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X && (int)_TempPoints[P1].X == (int)_TempPoints[P1 + 2].X)
                 {
                     _TempPoints.RemoveAt(P1 + 1);
                     return true;
                 }
 
-                if ((int)(_TempPoints[P1].Y) == (int)(_TempPoints[P1 + 1].Y) && (int)(_TempPoints[P1].Y) == (int)(_TempPoints[P1 + 2].Y))
+                if ((int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y && (int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 2].Y)
                 {
                     _TempPoints.RemoveAt(P1 + 1);
                     return true;
@@ -455,7 +453,7 @@ namespace BlueControls.ItemCollection
 
             if (P1 > 0 && P1 < _TempPoints.Count - 3)
             {
-                if ((int)(_TempPoints[P1].X) == (int)(_TempPoints[P1 + 1].X) && (int)(_TempPoints[P1 + 1].Y) == (int)(_TempPoints[P1 + 2].Y))
+                if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X && (int)_TempPoints[P1 + 1].Y == (int)_TempPoints[P1 + 2].Y)
                 {
                     if (!IsVerdeckt(_TempPoints[P1 + 2].X, _TempPoints[P1].Y))
                     {
@@ -474,7 +472,7 @@ namespace BlueControls.ItemCollection
                     }
                 }
 
-                if ((int)(_TempPoints[P1].Y) == (int)(_TempPoints[P1 + 1].Y) && (int)(_TempPoints[P1 + 1].X) == (int)(_TempPoints[P1 + 2].X))
+                if ((int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y && (int)_TempPoints[P1 + 1].X == (int)_TempPoints[P1 + 2].X)
                 {
                     if (!IsVerdeckt(_TempPoints[P1].X, _TempPoints[P1 + 2].Y))
                     {
@@ -489,13 +487,9 @@ namespace BlueControls.ItemCollection
                                 return true;
                             }
                         }
-
                     }
                 }
-
             }
-
-
             return false;
         }
 
@@ -503,14 +497,8 @@ namespace BlueControls.ItemCollection
         private bool WeicheAus(int P1)
         {
 
-            if (_TempPoints.Count > 100)
-            {
-                return false;
-            }
-            if (P1 >= _TempPoints.Count - 1)
-            {
-                return false;
-            }
+            if (_TempPoints.Count > 100) { return false; }
+            if (P1 >= _TempPoints.Count - 1) { return false; }
             //   If _TempPoints.Count > 4 Then Return False
 
             foreach (var ThisItemBasic in Parent)
@@ -737,7 +725,7 @@ namespace BlueControls.ItemCollection
 
             if (P1 >= _TempPoints.Count - 1) { return false; }
 
-            if ((int)(_TempPoints[P1].X) == (int)(_TempPoints[P1 + 1].X) || (int)(_TempPoints[P1].Y) == (int)(_TempPoints[P1 + 1].Y)) { return false; }
+            if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X || (int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y) { return false; }
 
             PointDF NP1;
             PointDF NP2;

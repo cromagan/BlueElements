@@ -1,5 +1,4 @@
-﻿using BlueBasics;
-using BlueBasics.Enums;
+﻿using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using System;
 using System.Collections.Generic;

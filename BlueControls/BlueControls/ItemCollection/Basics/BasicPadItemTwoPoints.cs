@@ -77,22 +77,12 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        protected override void Initialize()
-        {
-            base.Initialize();
-            p_ML = new PointDF(this, "ML", 0, 0);
-            p_MR = new PointDF(this, "MR", 1000, 0);
-        }
-
-
-        public BasicPadItemTwoPoints(ItemCollectionPad vparent)
+        public BasicPadItemTwoPoints(ItemCollectionPad vparent) : base(string.Empty)
         {
             Parent = vparent;
-            p_ML = new PointDF(this, "L", 0, 0);
-            p_MR = new PointDF(this, "R", (int)laengePix, 0);
-            //  this.KeepInternalLogic();
-
-        }
+            p_ML = new PointDF(this, "ML", 0, 0);
+            p_MR = new PointDF(this, "MR", 1000, 0);
+           }
 
         protected override void KeepInternalLogic()
         {

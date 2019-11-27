@@ -57,11 +57,8 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-
-
-        protected override void Initialize()
+        public CookPadItem(): base(string.Empty)
         {
-            base.Initialize();
             Childs = new List<CookPadItem>();
             Middlex = new PointDF(this, "Middle", 0, 0);
             Anzeige = string.Empty;
@@ -69,6 +66,7 @@ namespace BlueControls.ItemCollection
             Container = null;
             Childs.Clear();
         }
+
 
 
         #endregion

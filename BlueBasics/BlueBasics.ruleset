@@ -589,12 +589,20 @@
     <Rule Id="IDE0004WithoutSuggestion" Action="Warning" />
     <Rule Id="IDE0005" Action="Warning" />
     <Rule Id="IDE0011WithoutSuggestion" Action="Error" />
-    <Rule Id="IDE0028" Action="None" />
+    <Rule Id="IDE0021" Action="None" />
+    <Rule Id="IDE0022" Action="None" />
+    <Rule Id="IDE0023" Action="None" />
+    <Rule Id="IDE0024" Action="None" />
+    <Rule Id="IDE0025" Action="None" />
+    <Rule Id="IDE0026" Action="None" />
+    <Rule Id="IDE0027" Action="None" />
+    <Rule Id="IDE0028" Action="Info" />
     <Rule Id="IDE0028WithoutSuggestion" Action="Info" />
-    <Rule Id="IDE0031" Action="Info" />
+    <Rule Id="IDE0031" Action="Warning" />
     <Rule Id="IDE0031WithoutSuggestion" Action="Warning" />
     <Rule Id="IDE0039" Action="Info" />
     <Rule Id="IDE0039WithoutSuggestion" Action="Warning" />
+    <Rule Id="IDE0041" Action="Warning" />
     <Rule Id="IDE0041WithoutSuggestion" Action="Warning" />
     <Rule Id="IDE0047WithoutSuggestion" Action="Warning" />
     <Rule Id="IDE0048WithoutSuggestion" Action="Warning" />

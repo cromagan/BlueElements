@@ -213,7 +213,7 @@ namespace BlueControls.Controls
                 return;
             }
 
-            i.Parent = Item; // Um den Stil zu wissen
+            i.SetParent(Item); // Um den Stil zu wissen
 
 
             if (Focused() && _DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown)

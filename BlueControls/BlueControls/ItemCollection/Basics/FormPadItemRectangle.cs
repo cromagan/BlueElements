@@ -20,13 +20,9 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
 
 namespace BlueControls.ItemCollection
 {
@@ -48,17 +44,11 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        #region  Construktor + Initialize 
+        #region  Construktor 
 
 
-        public FormPadItemRectangle()
-        { }
-
-
-
-        protected override void Initialize()
+        public FormPadItemRectangle(string internalname) : base(internalname)
         {
-            base.Initialize();
             p_LO = new PointDF(this, "LO", 0, 0, false, true, true);
             p_RO = new PointDF(this, "RO", 0, 0);
             p_RU = new PointDF(this, "RU", 0, 0);

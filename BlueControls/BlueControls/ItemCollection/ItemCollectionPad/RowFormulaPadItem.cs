@@ -65,28 +65,16 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        #region  Construktor + Initialize 
+        #region  Construktor 
 
-        public RowFormulaPadItem()
-        { }
+        public RowFormulaPadItem() : this(null, string.Empty) { }
 
-        public RowFormulaPadItem(RowItem cRow)
+        public RowFormulaPadItem(RowItem row) : this(row, string.Empty) { }
+
+        public RowFormulaPadItem(RowItem row, string layoutID) : base(string.Empty)
         {
-            _Row = cRow;
-        }
-
-        public RowFormulaPadItem(RowItem cRow, string LayoutID)
-        {
-            _Row = cRow;
-            _LayoutID = LayoutID;
-
-        }
-
-
-
-        protected override void Initialize()
-        {
-            base.Initialize();
+            _Row = row;
+            _LayoutID = layoutID;
             p_LO = new PointDF(this, "LO", 0, 0, false, true, true);
             p_RO = new PointDF(this, "RO", 0, 0);
             p_RU = new PointDF(this, "RU", 0, 0);
@@ -95,9 +83,11 @@ namespace BlueControls.ItemCollection
             p_R = new PointDF(this, "R", 0, 0);
             p_o = new PointDF(this, "O", 0, 0);
             p_u = new PointDF(this, "U", 0, 0);
-            _Row = null;
             _tmpBMP = null;
         }
+
+
+
 
 
         #endregion
@@ -402,7 +392,7 @@ namespace BlueControls.ItemCollection
             var mb = _pad.MaxBounds(null);
 
             var zoomv = _pad.ZoomFitValue(mb, false, _tmpBMP.Size);
-            var centerpos = _pad.CenterPos(mb ,false, _tmpBMP.Size, zoomv);
+            var centerpos = _pad.CenterPos(mb, false, _tmpBMP.Size, zoomv);
             var slidervalues = _pad.SliderValues(mb, zoomv, centerpos);
 
             _pad.ShowInPrintMode = true;

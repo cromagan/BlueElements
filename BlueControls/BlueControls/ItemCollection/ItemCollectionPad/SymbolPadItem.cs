@@ -35,22 +35,28 @@ namespace BlueControls.ItemCollection
             // Keine Variablen zum Reseten, ein Invalidate reicht
         }
 
+
+        public SymbolPadItem() : base(string.Empty)
+        {
+            Symbol = enSymbol.Pfeil;
+            BackColor = Color.White;
+            BorderColor = Color.Black;
+            BorderWidth = 1;
+        }
+
         protected override string ClassId()
         {
             return "Symbol";
         }
 
         public enSymbol Symbol = enSymbol.Pfeil;
-        public bool Gefuellt = true;
-        public bool WhiteBack = true;
+
+        public Color BackColor;
+        public Color BorderColor;
+        public decimal BorderWidth;
 
 
-        protected override void Initialize()
-        {
-            base.Initialize();
-            Symbol = enSymbol.Pfeil;
-            WhiteBack = true;
-        }
+
 
 
         protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
@@ -89,27 +95,11 @@ namespace BlueControls.ItemCollection
 
             }
 
-
-            if (WhiteBack) { GR.FillPath(Brushes.White, p); }
-
-
-            if (p != null && Style != PadStyles.Undefiniert)
+            if (p != null)
             {
-
-
-                var f = Skin.GetBlueFont(Style, Parent.SheetStyle);
-
-                if (Gefuellt)
-                {
-                    GR.FillPath(f.Brush_Color_Main, p);
-                }
-                else
-                {
-
-                    GR.DrawPath(f.Pen(cZoom * Parent.SheetStyleScale), p);
-                }
+                GR.FillPath(new SolidBrush(BackColor), p);
+                GR.DrawPath(new Pen(BorderColor, (float)(BorderWidth * cZoom * Parent.SheetStyleScale)), p);
             }
-
 
 
             GR.TranslateTransform(-trp.X, -trp.Y);
@@ -140,10 +130,11 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl("Farbe", ((int)Style).ToString(), x));
 
 
-            l.Add(new FlexiControl("Gefüllt", Gefuellt));
-            l.Add(new FlexiControl("Hintergrund weiß füllen", WhiteBack));
+            l.Add(new FlexiControl("Randdicke", BorderWidth.ToString(), enDataFormat.Gleitkommazahl, 1));
+            l.Add(new FlexiControl("Randfarbe", BorderColor.ToHTMLCode(), enDataFormat.Farbcode, 1));
+            l.Add(new FlexiControl("Hintergrundfarbe", BackColor.ToHTMLCode(), enDataFormat.Farbcode, 1));
 
-            l.AddRange(base.GetStyleOptions(sender, e));
+            //  l.AddRange(base.GetStyleOptions(sender, e));
 
             return l;
 
@@ -151,10 +142,14 @@ namespace BlueControls.ItemCollection
         public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         {
             base.DoStyleCommands(sender, Tags, ref CloseMenu);
-            Gefuellt = Tags.TagGet("Gefüllt").FromPlusMinus();
+
+
+            BackColor = Tags.TagGet("Hintergrundfarbe").FromHTMLCode();
+            BorderColor = Tags.TagGet("Randfarbe").FromHTMLCode();
+            decimal.TryParse(Tags.TagGet("Randdicke"), out BorderWidth);
             Symbol = (enSymbol)int.Parse(Tags.TagGet("Symbol"));
             Style = (PadStyles)int.Parse(Tags.TagGet("Farbe"));
-            WhiteBack = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
+
         }
 
 
@@ -163,8 +158,9 @@ namespace BlueControls.ItemCollection
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             t = t + "Symbol=" + (int)Symbol + ", ";
-            t = t + "Fill=" + Gefuellt.ToPlusMinus() + ", ";
-            t = t + "WhiteBack=" + WhiteBack.ToPlusMinus() + ", ";
+            t = t + "Backcolor=" + BorderColor.ToHTMLCode() + ", ";
+            t = t + "BorderColor=" + BackColor.ToHTMLCode() + ", ";
+            t = t + "BorderWidth=" + BorderWidth.ToString().ToNonCritical() + ", ";
 
             return t.Trim(", ") + "}";
         }
@@ -177,11 +173,14 @@ namespace BlueControls.ItemCollection
                 case "symbol":
                     Symbol = (enSymbol)int.Parse(pair.Value);
                     return true;
-                case "fill":
-                    Gefuellt = pair.Value.FromPlusMinus();
+                case "backcolor":
+                    BackColor = pair.Value.FromHTMLCode();
                     return true;
-                case "whiteback":
-                    WhiteBack = pair.Value.FromPlusMinus();
+                case "bordercolor":
+                    BorderColor = pair.Value.FromHTMLCode();
+                    return true;
+                case "borderwidth":
+                    decimal.TryParse(pair.Value.FromNonCritical(), out BorderWidth);
                     return true;
                 default:
                     return base.ParseExplicit(pair);

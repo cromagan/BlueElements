@@ -187,7 +187,6 @@ namespace BlueBasics
         {
             lock (_SyncLockObject)
             {
-
                 if (_IsTraceLogging) { return; }
                 _IsTraceLogging = true;
 

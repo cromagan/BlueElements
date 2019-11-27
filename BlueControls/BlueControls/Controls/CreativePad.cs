@@ -68,7 +68,7 @@ namespace BlueControls.Controls
 
         private IMouseAndKeyHandle _GivesMouseComandsTo;
 
-        public readonly int DPI = 300;
+        public static readonly int DPI = 300;
 
         private PointDF P_rLO;
         private PointDF P_rLU;
@@ -1841,7 +1841,7 @@ namespace BlueControls.Controls
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
         {
 
-             HotItem = this.HotItem(e);
+            HotItem = this.HotItem(e);
 
 
             if (HotItem != null)

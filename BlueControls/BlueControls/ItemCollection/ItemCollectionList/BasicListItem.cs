@@ -28,184 +28,157 @@ using System.Drawing;
 namespace BlueControls.ItemCollection
 {
     public abstract class BasicListItem : BasicItem, ICompareKey, IComparable, ICloneable
+    {
+        public abstract SizeF SizeUntouchedForListBox();
+
+        public abstract bool IsClickable();
+
+        public abstract void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth);
+
+        public abstract SizeF QuickAndDirtySize(int PreferedHeigth);
+
+
+        protected abstract string GetCompareKey();
+
+        protected abstract void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate);
+
+
+        public ItemCollectionList Parent { get; private set; }
+
+
+
+
+        /// <summary>
+        /// Ist das Item markiert/selektiert?
+        /// </summary>
+        /// <remarks></remarks>
+        private bool _Checked;
+
+        public Rectangle Pos;
+        private string _UserDefCompareKey = "";
+
+
+        /// <summary>
+        /// Ist das Item enabled?
+        /// </summary>
+        /// <remarks></remarks>
+        protected bool _Enabled = true;
+
+
+        protected BasicListItem(string internalname) : base(internalname)
         {
-            public abstract SizeF SizeUntouchedForListBox();
-
-            public abstract bool IsClickable();
-
-            public abstract void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth);
-
-            public abstract SizeF QuickAndDirtySize(int PreferedHeigth);
+            _Checked = false;
+            Pos = new Rectangle(0, 0, 0, 0);
+            _UserDefCompareKey = string.Empty;
+        }
 
 
-            protected abstract string GetCompareKey();
-
-            protected abstract void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate);
 
 
-            protected abstract bool FilterMatchLVL2(string FilterText);
 
-            public ItemCollectionList Parent;
-
-
-            protected abstract BasicListItem CloneLVL2();
-
-            /// <summary>
-            /// Ist das Item markiert/selektiert?
-            /// </summary>
-            /// <remarks></remarks>
-            private bool _Checked;
-
-            public Rectangle Pos;
-            private string _UserDefCompareKey = "";
+        public bool Contains(int x, int y)
+        {
+            return Pos.Contains(x, y);
+        }
 
 
-            /// <summary>
-            /// Ist das Item enabled?
-            /// </summary>
-            /// <remarks></remarks>
-            protected bool _Enabled = true;
 
 
-            protected BasicListItem()
+
+        public void SetCoordinates(Rectangle r)
+        {
+            Pos = r;
+            Parent?.OnNeedRefresh();
+        }
+
+
+        public bool Enabled
+        {
+            get
             {
-                Initialize();
+                return _Enabled;
+            }
+            set
+            {
+                if (_Enabled == value) { return; }
+
+                _Enabled = value;
+                Parent?.OnNeedRefresh();
+            }
+        }
+
+
+        public string CompareKey()
+        {
+
+            if (!string.IsNullOrEmpty(_UserDefCompareKey))
+            {
+                if (Convert.ToChar(_UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + _UserDefCompareKey); }
+                return _UserDefCompareKey + Constants.FirstSortChar + Parent.IndexOf(this).ToString(Constants.Format_Integer6);
             }
 
+            return GetCompareKey();
+        }
 
-            protected override void Initialize()
+
+        public string UserDefCompareKey
+        {
+            get
             {
-                base.Initialize();
-
-                _Checked = false;
-                Pos = new Rectangle(0, 0, 0, 0);
-                _UserDefCompareKey = string.Empty;
+                return _UserDefCompareKey;
             }
-
-
-            public bool Contains(int x, int Y)
+            set
             {
-                return Pos.Contains(x, Y);
+                if (value == _UserDefCompareKey) { return; }
+                _UserDefCompareKey = value;
+
+                OnChanged();
             }
+        }
 
 
-
-
-
-            public void SetCoordinates(Rectangle r)
+        public bool Checked
+        {
+            get
             {
-
-                Pos = r;
+                return _Checked;
             }
-
-
-            public bool Enabled
+            set
             {
-                get
-                {
-                    return _Enabled;
-                }
-                set
-                {
-                    _Enabled = value;
-                }
+                Parent.SetNewCheckState(this, value, ref _Checked);
+                OnChanged();
             }
-
-
-            public string CompareKey()
-            {
-
-                if (!string.IsNullOrEmpty(_UserDefCompareKey))
-                {
-                    if (Convert.ToChar(_UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + _UserDefCompareKey); }
-                    return _UserDefCompareKey + Constants.FirstSortChar + Parent.IndexOf(this).ToString(Constants.Format_Integer6);
-                }
-
-                return GetCompareKey();
-            }
-
-
-            public string UserDefCompareKey
-            {
-                get
-                {
-                    return _UserDefCompareKey;
-                }
-                set
-                {
-                    if (value == _UserDefCompareKey) { return; }
-                    _UserDefCompareKey = value;
-
-                    OnChanged();
-                }
-            }
-
-
-            public bool Checked
-            {
-                get
-                {
-                    return _Checked;
-                }
-                set
-                {
-                    Parent.SetNewCheckState(this, value, ref _Checked);
-                    OnChanged();
-                }
-            }
-
-
-        //protected enStates ModifyState(enStates vState)
-        //{
-        //    enStates ItemState = 0;
-
-
-        //    if (Convert.ToBoolean(vState & enStates.Standard_Disabled) || !_Enabled)
-        //    {
-        //        ItemState = enStates.Standard_Disabled;
-        //    }
-        //    else
-        //    {
-        //        ItemState = enStates.Standard;
-        //        if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { ItemState |= enStates.Standard_MouseOver; }
-        //    }
-
-
-        //    if (_Checked) { ItemState |= enStates.Checked; }
-
-
-        //    return ItemState;
-        //}
+        }
 
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Argumente von öffentlichen Methoden validieren", MessageId = "0")]
         public void Draw(Graphics GR, int xModifier, int YModifier, enStates vState, bool DrawBorderAndBack, string FilterText, bool Translate)
+        {
+
+
+            if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
+            if (Parent.ItemDesign == enDesign.Undefiniert) { return; }
+
+
+            var PositionModified = new Rectangle(Pos.X - xModifier, Pos.Y - YModifier, Pos.Width, Pos.Height);
+
+
+
+
+            DrawExplicit(GR, PositionModified, vState, DrawBorderAndBack, Translate);
+
+
+            if (DrawBorderAndBack)
             {
-
-
-                if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
-                if (Parent.ItemDesign == enDesign.Undefiniert) { return; }
-
-
-                var PositionModified = new Rectangle(Pos.X - xModifier, Pos.Y - YModifier, Pos.Width, Pos.Height);
-
-
-
-
-                DrawExplicit(GR, PositionModified, vState, DrawBorderAndBack, Translate);
-
-
-                if (DrawBorderAndBack)
+                if (!string.IsNullOrEmpty(FilterText) && !FilterMatch(FilterText))
                 {
-                    if (!string.IsNullOrEmpty(FilterText) && !FilterMatch(FilterText))
-                    {
-                        var c1 = Skin.Color_Back(Parent.ControlDesign, enStates.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
-                        c1 = c1.SetAlpha(160);
-                        GR.FillRectangle(new SolidBrush(c1), PositionModified);
-                    }
+                    var c1 = Skin.Color_Back(Parent.ControlDesign, enStates.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
+                    c1 = c1.SetAlpha(160);
+                    GR.FillRectangle(new SolidBrush(c1), PositionModified);
                 }
-
             }
+
+        }
 
         public int CompareTo(object obj)
         {
@@ -221,27 +194,42 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public object Clone()
+        public virtual object Clone()
+        {
+            Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+            return null;
+        }
+
+        public BasicListItem GetCloneData(BasicListItem x)
+        {
+
+            if (x.Internal != Internal)
             {
-                var x = CloneLVL2();
-                x._Checked = _Checked;
-                x._Enabled = _Enabled;
-                x._Internal = _Internal;
-                x._Tags.AddRange(_Tags);
-                x._UserDefCompareKey = _UserDefCompareKey;
-                return x;
+                Develop.DebugPrint(enFehlerArt.Fehler, "Clone fehlgeschlagen, Internal untershiedlich");
             }
 
-
-            public bool FilterMatch(string FilterText)
-            {
-                if (_Internal.ToUpper().Contains(FilterText.ToUpper())) { return true; }
-                return FilterMatchLVL2(FilterText);
-            }
-
+            x.Checked = Checked;
+            x.Enabled = Enabled;
+            x.Tags.AddRange(_Tags);
+            x.UserDefCompareKey = UserDefCompareKey;
+            return x;
         }
 
 
 
+        public virtual bool FilterMatch(string FilterText)
+        {
+            if (Internal.ToUpper().Contains(FilterText.ToUpper())) { return true; }
+            return false;
+        }
 
+        internal void SetParent(ItemCollectionList itemCollectionList)
+        {
+            Parent = itemCollectionList;
+        }
     }
+
+
+
+
+}

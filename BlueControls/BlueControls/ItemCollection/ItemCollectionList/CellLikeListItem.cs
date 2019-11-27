@@ -18,7 +18,6 @@
 #endregion
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
@@ -57,12 +56,10 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-        //public CellLikeListItem() : base() { }
 
 
-        public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled)
+        public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled) : base(internalAndReadableText)
         {
-            _Internal = internalAndReadableText;
             _StyleLikeThis = columnStyle;
             _style = style;
 
@@ -79,14 +76,6 @@ namespace BlueControls.ItemCollection
 
         #endregion
 
-        public override string Internal
-        {
-            get
-            {
-                return _Internal;
-            }
-        }
-
 
 
         public override void DesignOrStyleChanged()
@@ -98,7 +87,7 @@ namespace BlueControls.ItemCollection
 
         public override SizeF SizeUntouchedForListBox()
         {
-            return Table.FormatedText_NeededSize(_StyleLikeThis, _Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16);
+            return Table.FormatedText_NeededSize(_StyleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16);
         }
 
 
@@ -110,7 +99,7 @@ namespace BlueControls.ItemCollection
                 Skin.Draw_Back(GR, Parent.ItemDesign, vState, PositionModified, null, false);
             }
 
-            Table.Draw_FormatedText(_StyleLikeThis, _Internal, GR, PositionModified, false, _style, Parent.ItemDesign, vState);
+            Table.Draw_FormatedText(_StyleLikeThis, Internal, GR, PositionModified, false, _style, Parent.ItemDesign, vState);
 
             if (DrawBorderAndBack)
             {
@@ -122,10 +111,9 @@ namespace BlueControls.ItemCollection
         protected override string GetCompareKey()
         {
             // Die hauptklasse frägt nach diesem Kompare-Key
-            var txt = CellItem.ValueReadable(_StyleLikeThis, _Internal, enShortenStyle.HTML);
-            return DataFormat.CompareKey(txt, _StyleLikeThis.Format) + "|" + _Internal;
+            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML);
+            return DataFormat.CompareKey(txt, _StyleLikeThis.Format) + "|" + Internal;
         }
-
 
         public override bool IsClickable()
         {
@@ -142,14 +130,15 @@ namespace BlueControls.ItemCollection
             return SizeUntouchedForListBox();
         }
 
-        protected override BasicListItem CloneLVL2()
+        public override object Clone()
         {
-            return new CellLikeListItem(_Internal, _StyleLikeThis, _style, _Enabled);
+            return GetCloneData(new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled));
         }
 
-        protected override bool FilterMatchLVL2(string FilterText)
+        public override bool FilterMatch(string FilterText)
         {
-            var txt = CellItem.ValueReadable(_StyleLikeThis, _Internal, enShortenStyle.Both);
+            if (base.FilterMatch(FilterText)) { return true; }
+            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both);
             return txt.ToUpper().Contains(FilterText.ToUpper());
         }
 

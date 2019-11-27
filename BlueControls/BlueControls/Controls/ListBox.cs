@@ -242,7 +242,7 @@ namespace BlueControls.Controls
 
             Down.Visible = _MoveAllowed;
             Up.Visible = _MoveAllowed;
-            Plus.Visible = (_AddAlloweds != enAddType.None);
+            Plus.Visible = _AddAlloweds != enAddType.None;
             Minus.Visible = _RemoveAllowed;
             FilterTxt.Visible = _FilterAllowed;
             FilterCap.Visible = _FilterAllowed;
@@ -459,7 +459,7 @@ namespace BlueControls.Controls
                     if (!ThisItem.Enabled) { vStateItem = enStates.Standard_Disabled; }
                     if (ThisItem.Checked) { vStateItem |= enStates.Checked; }
 
-                    ThisItem.Draw(gr, 0, (int)(SliderY.Value), vStateItem, true, FilterTxt.Text, Translate);
+                    ThisItem.Draw(gr, 0, (int)SliderY.Value, vStateItem, true, FilterTxt.Text, Translate);
                 }
 
             }

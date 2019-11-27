@@ -445,10 +445,10 @@ namespace BlueControls.Forms
             var DruckB = PrintPad.DruckbereichRect();
 
 
-            var tempVar = Math.Max(1,(int)(Math.Floor(DruckB.Width / (double)OneItem.Width + 0.01)));
+            var tempVar = Math.Max(1,(int)Math.Floor(DruckB.Width / (double)OneItem.Width + 0.01));
             for (var x = 0 ; x < tempVar ; x++)
             {
-                var tempVar2 = Math.Max(1, (int)(Math.Floor(DruckB.Height / (double)OneItem.Height +0.01)));
+                var tempVar2 = Math.Max(1, (int)Math.Floor(DruckB.Height / (double)OneItem.Height +0.01));
                 for (var y = 0 ; y < tempVar2 ; y++)
                 {
 

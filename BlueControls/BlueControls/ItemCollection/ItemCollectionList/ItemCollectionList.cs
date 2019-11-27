@@ -116,7 +116,7 @@ namespace BlueControls.ItemCollection
 
         #endregion
 
-        #region  Construktor + Initialize 
+        #region  Construktor 
 
 
 
@@ -274,9 +274,22 @@ namespace BlueControls.ItemCollection
             ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
-        private void OnNeedRefresh()
+        public void OnNeedRefresh()
         {
             NeedRefresh?.Invoke(this, System.EventArgs.Empty);
+        }
+
+
+        protected override void OnItemAdded(BasicListItem item)
+        {
+            item.SetParent(this);
+            base.OnItemAdded(item);
+        }
+
+        protected override void OnItemRemoving(BasicListItem item)
+        {
+            item.SetParent(null);
+            base.OnItemRemoving(item);
         }
 
         protected override void OnListOrItemChanged()
@@ -1013,7 +1026,6 @@ namespace BlueControls.ItemCollection
 
         public new void Add(BasicListItem cItem)
         {
-            cItem.Parent = this;
             base.Add(cItem);
             OnNeedRefresh();
         }

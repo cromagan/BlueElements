@@ -81,7 +81,7 @@ namespace BlueDatabase
             var CellKey = KeyOfCell(Column.Key, RowKey);
             if (!_cells.ContainsKey(CellKey)) { return; }
 
-            var Inhalt = _cells[CellKey].Value;
+ //           var Inhalt = _cells[CellKey].Value;
             _cells.Remove(CellKey);
           //  DoSpecialFormats(Column, RowKey, Inhalt, false, false, true);
         }

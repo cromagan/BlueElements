@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using BlueBasics;
 using BlueControls.Enums;
 using System.Drawing;
 
@@ -30,33 +29,34 @@ namespace BlueControls.ItemCollection
 
 
     public class LineListItem : BasicListItem
+    {
+        public override void DesignOrStyleChanged()
         {
-            public override void DesignOrStyleChanged()
-            {
-                // Keine Variablen zum Reseten, ein Invalidate reicht
-            }
+            // Keine Variablen zum Reseten, ein Invalidate reicht
+        }
 
 
-            #region  Variablen-Deklarationen 
+        #region  Variablen-Deklarationen 
 
-            #endregion
-
-
-            #region  Event-Deklarationen + Delegaten 
-
-            #endregion
+        #endregion
 
 
-            #region  Construktor + Initialize 
+        #region  Event-Deklarationen + Delegaten 
 
-            public LineListItem(string cUserDefCompareKey)
-            {
-                UserDefCompareKey = cUserDefCompareKey;
-            }
+        #endregion
 
 
-            public LineListItem()
-            { }
+        #region  Construktor + Initialize 
+
+        public LineListItem(string internalname, string cUserDefCompareKey) : base(internalname)
+        {
+            UserDefCompareKey = cUserDefCompareKey;
+        }
+
+        public LineListItem(string cUserDefCompareKey) : this(string.Empty, cUserDefCompareKey) { }
+
+
+        public LineListItem() : this(string.Empty, string.Empty) { }
 
 
 
@@ -69,72 +69,58 @@ namespace BlueControls.ItemCollection
 
         #endregion
 
-        public override string Internal
-        {
-            get
-            {
-                return _Internal;
-            }
-        }
+
 
 
         public override SizeF SizeUntouchedForListBox()
-            {
-
-                if (Pos.X == 0 && Pos.X == 0 && Pos.Width == 0 && Pos.Height == 0)
-                {
-
-                    return new SizeF(4, 4);
-
-
-                }
-
-                //  DebugPrint_NichtImplementiert()
-                return Pos.Size;
-            }
-
-            protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate)
         {
-
-                GR.DrawLine(Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard).Pen(1f), PositionModified.Left, (int)(PositionModified.Top + PositionModified.Height / 2.0), PositionModified.Right, (int)(PositionModified.Top + PositionModified.Height / 2.0));
-            }
-
-
-
-            public override bool IsClickable()
+            if (Pos.X == 0 && Pos.X == 0 && Pos.Width == 0 && Pos.Height == 0)
             {
-                return false;
+
+                return new SizeF(4, 4);
             }
 
+            return Pos.Size;
+        }
 
-            public override void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth)
-            {
-                SetCoordinates(new Rectangle((int)(X), (int)(Y) + 2, (int)(MultiX - SliderWidth), 4));
-            }
-
-            public override SizeF QuickAndDirtySize(int PreferedHeigth)
-            {
-                return SizeUntouchedForListBox();
-            }
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate)
+        {
+            GR.DrawLine(Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard).Pen(1f), PositionModified.Left, (int)(PositionModified.Top + PositionModified.Height / 2.0), PositionModified.Right, (int)(PositionModified.Top + PositionModified.Height / 2.0));
+        }
 
 
-            protected override string GetCompareKey()
-            {
-                return Pos.ToString();
-            }
+
+        public override bool IsClickable()
+        {
+            return false;
+        }
 
 
-            protected override BasicListItem CloneLVL2()
-            {
-                return new LineListItem();
-            }
+        public override void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth)
+        {
+            SetCoordinates(new Rectangle((int)X, (int)Y + 2, (int)(MultiX - SliderWidth), 4));
+        }
+
+        public override SizeF QuickAndDirtySize(int PreferedHeigth)
+        {
+            return SizeUntouchedForListBox();
+        }
 
 
-            protected override bool FilterMatchLVL2(string FilterText)
-            {
-                Develop.DebugPrint_NichtImplementiert();
-                return false;
-            }
+        protected override string GetCompareKey()
+        {
+            return Pos.ToString();
+        }
+
+
+        public override object Clone()
+        {
+            return GetCloneData(new LineListItem(Internal, UserDefCompareKey));
+
+
 
         }
+
+
     }
+}

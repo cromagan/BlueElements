@@ -26,7 +26,6 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 
@@ -97,16 +96,14 @@ namespace BlueControls.ItemCollection
 
 
 
-        #region  Construktor + Initialize 
+        #region  Construktor  
 
-
-
-        protected override void Initialize()
+        public ChildPadItem() : base(string.Empty)
         {
-            base.Initialize();
             PadInternal = null; // new CreativePad();
             _tmpBMP = null;
         }
+
 
 
         #endregion

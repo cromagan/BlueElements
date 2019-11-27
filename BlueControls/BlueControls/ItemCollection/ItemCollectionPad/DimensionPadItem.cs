@@ -71,66 +71,31 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
-        public DimensionPadItem()
-        { }
+        public DimensionPadItem() : this(string.Empty, null, null, 0) { }
 
 
-        public DimensionPadItem(string cInternal, PointDF cPoint1, PointDF cPoint2, int AbstandinMM, int InitialDPI) : this(cPoint1, cPoint2, AbstandinMM, InitialDPI)
+        public DimensionPadItem(PointDF cPoint1, PointDF cPoint2, int AbstandinMM) : this(string.Empty, cPoint1, cPoint2, AbstandinMM) { }
+
+
+
+
+        public DimensionPadItem(string internalname, PointDF cPoint1, PointDF cPoint2, int AbstandinMM) : base(internalname)
         {
-            _Internal = cInternal;
-
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
 
 
-        public DimensionPadItem(PointDF cPoint1, PointDF cPoint2, int AbstandinMM, int InitialDPI) : base()
-        {
             Point1.SetTo(cPoint1.X, cPoint1.Y);
             Point2.SetTo(cPoint2.X, cPoint2.Y);
 
             ComputeData();
 
-            var a = GeometryDF.PolarToCartesian(modConverter.mmToPixel(AbstandinMM, InitialDPI), Convert.ToDouble(_Winkel - 90));
+            var a = GeometryDF.PolarToCartesian(modConverter.mmToPixel(AbstandinMM, CreativePad.DPI), Convert.ToDouble(_Winkel - 90));
 
             TextPointx.SetTo(Point1, _Länge / 2, _Winkel);
             TextPointx.X += a.X;
             TextPointx.Y += a.Y;
 
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        }
+            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
 
-
-        public DimensionPadItem(PointF cPoint1, PointF cPoint2, int AbstandInMM, int InitialDPI) : this(new PointDF(cPoint1), new PointDF(cPoint2), AbstandInMM, InitialDPI)
-        {
-            //Point1.SetTo(cPoint1.X, cPoint1.Y);
-            //Point2.SetTo(cPoint2.X, cPoint2.Y);
-
-            //ComputeData();
-
-
-            //var a = GeometryDF.PolarToCartesian(modConverter.mmToPixel(AbstandInMM, InitialDPI), Convert.ToDouble(_Winkel - 90));
-
-            //TextPointx.SetTo(Point1, _Länge / 2, _Winkel);
-            //TextPointx.X += a.X;
-            //TextPointx.Y += a.Y;
-
-
-            //if (string.IsNullOrEmpty(_Internal))
-            //{
-            //    Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            //}
-        }
-
-
-
-
-
-        protected override void Initialize()
-        {
-            base.Initialize();
             Text1 = string.Empty;
             Text2 = string.Empty;
             NachKomma = 1;
@@ -146,6 +111,9 @@ namespace BlueControls.ItemCollection
             _Bezugslinie2.Parent = this;
 
         }
+
+
+        public DimensionPadItem(PointF cPoint1, PointF cPoint2, int AbstandInMM) : this(new PointDF(cPoint1), new PointDF(cPoint2), AbstandInMM) { }
 
 
         #endregion

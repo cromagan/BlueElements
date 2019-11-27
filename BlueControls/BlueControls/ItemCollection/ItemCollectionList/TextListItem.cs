@@ -97,18 +97,14 @@ namespace BlueControls.ItemCollection
             //if (_Symbol != null) { _SymbolDisabled = QuickImage.Get(_Symbol, Skin.AdditionalState(enStates.Standard_Disabled)); }
         }
 
-        public TextListItem(string internalname, string readableText, QuickImage symbol, bool isCaption, bool enabled, enDataFormat format, string userDefCompareKey) : base()
+        public TextListItem(string internalname, string readableText, QuickImage symbol, bool isCaption, bool enabled, enDataFormat format, string userDefCompareKey) : base(internalname)
         {
             _IsCaption = isCaption;
-            _Internal = internalname;
             _ReadableText = readableText;
             _Symbol = symbol;
-            //if (_Symbol != null) { _SymbolDisabled = QuickImage.Get(_Symbol, Skin.AdditionalState(enStates.Standard_Disabled)); }
-
             _Enabled = enabled;
             _Format = format;
             UserDefCompareKey = userDefCompareKey;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
         }
 
 
@@ -153,13 +149,6 @@ namespace BlueControls.ItemCollection
 
         #endregion
 
-        public override string Internal
-        {
-            get
-            {
-                return _Internal;
-            }
-        }
 
 
         private enDesign tempDesign()
@@ -207,7 +196,7 @@ namespace BlueControls.ItemCollection
 
         protected override string GetCompareKey()
         {
-            return DataFormat.CompareKey(_Internal, _Format);
+            return DataFormat.CompareKey(Internal, _Format);
         }
 
 
@@ -219,7 +208,7 @@ namespace BlueControls.ItemCollection
 
         public override void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth)
         {
-            SetCoordinates(new Rectangle((int)(X), (int)(Y), (int)(MultiX - SliderWidth), (int)SizeUntouchedForListBox().Height));
+            SetCoordinates(new Rectangle((int)X, (int)Y, (int)(MultiX - SliderWidth), (int)SizeUntouchedForListBox().Height));
         }
 
 
@@ -233,24 +222,15 @@ namespace BlueControls.ItemCollection
 
         }
 
-        protected override BasicListItem CloneLVL2()
+        public override object Clone()
         {
-
-            //Develop.DebugPrint_NichtImplementiert();
-            ////var x = new TextListItem(_Internal, _ReadableText, _Format, true);
-            ////x._Symbolx = _Symbolx;
-            ////x._IsCaption = _IsCaption;
-            //return null;
-
-            return new TextListItem(_Internal, _ReadableText, _Symbol, _IsCaption, _Enabled, _Format, UserDefCompareKey);
-
+            return GetCloneData(new TextListItem(Internal, _ReadableText, _Symbol, _IsCaption, _Enabled, _Format, UserDefCompareKey));
         }
 
-        protected override bool FilterMatchLVL2(string FilterText)
+        public override bool FilterMatch(string FilterText)
         {
+            if (base.FilterMatch(FilterText)) { return true; }
             return _ReadableText.ToUpper().Contains(FilterText.ToUpper());
         }
-
-
     }
 }

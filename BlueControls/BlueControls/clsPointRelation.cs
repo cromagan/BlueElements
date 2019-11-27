@@ -108,7 +108,7 @@ namespace BlueControls
             if (obj is clsPointRelation PRL)
             {
                 // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
-                return CompareKey().CompareTo((PRL).CompareKey());
+                return CompareKey().CompareTo(PRL.CompareKey());
             }
             else
             {
@@ -184,7 +184,7 @@ namespace BlueControls
         public override string ToString()
         {
 
-            var t = "{Type=" + (int)(_relationtype) +
+            var t = "{Type=" + (int)_relationtype +
                        ", Value=" + _Richtmaß;
 
 

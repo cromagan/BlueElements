@@ -18,8 +18,6 @@
 #endregion
 
 
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -169,7 +167,7 @@ namespace BlueControls.Forms
 
         private void btnAddDimension_Click(object sender, System.EventArgs e)
         {
-            var b = new DimensionPadItem(new PointF(300, 300), new PointF(400, 300), 30, Pad.DPI);
+            var b = new DimensionPadItem(new PointF(300, 300), new PointF(400, 300), 30);
             Pad.Item.Add(b);
         }
 

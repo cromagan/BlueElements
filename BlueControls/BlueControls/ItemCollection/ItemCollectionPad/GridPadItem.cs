@@ -66,25 +66,22 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-        public GridPadItem()
-        { }
+        public GridPadItem() : this(PadStyles.Style_Standard, new Point(0, 0)) { }
 
 
-        public GridPadItem(PadStyles vFormat, Point cNP)
+        public GridPadItem(PadStyles vFormat, Point cNP) : base(string.Empty)
         {
+            NP = new PointDF(this, "Nullpunkt", 0, 0, true, false, true);
             NP.SetTo(cNP);
             Style = vFormat;
-        }
 
-
-        protected override void Initialize()
-        {
-            base.Initialize();
-            NP = new PointDF(this, "Nullpunkt", 0, 0, true, false, true);
-            //NP = new PointDF(this, "Nullpunkt", 0, 0);
             Style = PadStyles.Style_Überschrift_Haupt;
             GridShow = 10M;
+
         }
+
+
+
 
 
         #endregion

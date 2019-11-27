@@ -46,35 +46,17 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-        //public RowFormulaListItem()
-        //{ }
-        public RowFormulaListItem(RowItem cRow)
-        {
-            _Row = cRow;
-        }
+
+        public RowFormulaListItem(RowItem row) : this(row, string.Empty, string.Empty) { }
+
+        public RowFormulaListItem(RowItem row, string userDefCompareKey) : this(row, string.Empty, userDefCompareKey) { }
 
 
-        public RowFormulaListItem(RowItem row, string userDefCompareKey)
-        {
-            _Row = row;
-            UserDefCompareKey = userDefCompareKey;
-        }
-
-
-        public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey)
+        public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey) : base(string.Empty)
         {
             _Row = row;
             _LayoutID = layoutID;
             UserDefCompareKey = userDefCompareKey;
-        }
-
-
-
-        protected override void Initialize()
-        {
-            base.Initialize();
-            _Row = null;
-            _tmpBMP = null;
         }
 
 
@@ -131,14 +113,6 @@ namespace BlueControls.ItemCollection
             {
                 _tmpBMP.Dispose();
                 _tmpBMP = null;
-            }
-        }
-
-        public override string Internal
-        {
-            get
-            {
-                return _Internal;
             }
         }
 
@@ -238,11 +212,11 @@ namespace BlueControls.ItemCollection
 
             if (IsIn == enBlueListBoxAppearance.Gallery || IsIn == enBlueListBoxAppearance.FileSystem)
             {
-                SetCoordinates(new Rectangle((int)(X), (int)(Y), (int)(MultiX), (int)(MultiX * 0.8)));
+                SetCoordinates(new Rectangle((int)X, (int)Y, (int)MultiX, (int)(MultiX * 0.8)));
             }
             else
             {
-                SetCoordinates(new Rectangle((int)(X), (int)(Y), (int)(MultiX - SliderWidth), (int)(MaxWidth * 0.8)));
+                SetCoordinates(new Rectangle((int)X, (int)Y, (int)(MultiX - SliderWidth), (int)(MaxWidth * 0.8)));
             }
 
         }
@@ -266,16 +240,6 @@ namespace BlueControls.ItemCollection
             return _Row.CellFirstString();
         }
 
-        protected override BasicListItem CloneLVL2()
-        {
-            Develop.DebugPrint_NichtImplementiert();
-            return null;
-        }
 
-        protected override bool FilterMatchLVL2(string FilterText)
-        {
-            Develop.DebugPrint_NichtImplementiert();
-            return false;
-        }
     }
 }

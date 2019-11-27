@@ -57,11 +57,9 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
-        public ObjectListItem(IObjectWithDialog cobject)
+        public ObjectListItem(IObjectWithDialog cobject) : base(string.Empty)
         {
-
             Obj = cobject;
-
         }
 
 
@@ -74,11 +72,6 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        protected override void Initialize()
-        {
-            base.Initialize();
-            Obj = null;
-        }
 
 
         #endregion
@@ -87,27 +80,8 @@ namespace BlueControls.ItemCollection
         #region  Properties 
 
 
-        //public IReadableText ObjectReadable
-        //{
-        //    get
-        //    {
-        //        return Obj;
-        //    }
-        //}
 
 
-        //public IParseable ObjectParseable
-        //{
-        //    get
-        //    {
-        //        if (!(Obj is IParseable))
-        //        {
-        //            Develop.DebugPrint(enFehlerArt.Fehler, "Zugriffsverletzung, nicht Parseable");
-        //        }
-
-        //        return (IParseable)Obj;
-        //    }
-        //}
 
         #endregion
 
@@ -145,7 +119,7 @@ namespace BlueControls.ItemCollection
         protected override string GetCompareKey()
         {
             if (Obj is ICompareKey key) { return key.CompareKey(); }
-            return DataFormat.CompareKey(_Internal, enDataFormat.Text);
+            return DataFormat.CompareKey(Internal, enDataFormat.Text);
         }
 
 
@@ -158,7 +132,7 @@ namespace BlueControls.ItemCollection
 
         public override void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth)
         {
-            SetCoordinates(new Rectangle((int)(X), (int)(Y), (int)(MultiX - SliderWidth), (int)SizeUntouchedForListBox().Height));
+            SetCoordinates(new Rectangle((int)X, (int)Y, (int)(MultiX - SliderWidth), (int)SizeUntouchedForListBox().Height));
         }
 
         public override SizeF QuickAndDirtySize(int PreferedHeigth)
@@ -175,13 +149,14 @@ namespace BlueControls.ItemCollection
             OnChanged();
         }
 
-        protected override BasicListItem CloneLVL2()
+        public override object Clone()
         {
-            return new ObjectListItem(Obj);
+            return GetCloneData(new ObjectListItem(Obj));
         }
 
-        protected override bool FilterMatchLVL2(string FilterText)
+        public override bool FilterMatch(string FilterText)
         {
+            if (base.FilterMatch(FilterText)) { return true; }
             return Obj.ReadableText().ToUpper().Contains(FilterText.ToUpper());
         }
 

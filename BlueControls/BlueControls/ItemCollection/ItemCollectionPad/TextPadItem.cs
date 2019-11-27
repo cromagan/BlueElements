@@ -62,58 +62,47 @@ namespace BlueControls.ItemCollection
 
 
         #region  Construktor + Initialize 
-        public TextPadItem()
+        public TextPadItem() : this(string.Empty, string.Empty) { }
+        //public TextPadItem(string vInternalAndReadableText)
+        //{
+        //    if (vInternalAndReadableText.StartsWith("{")) { Develop.DebugPrint(enFehlerArt.Fehler, "Code zum Parsen übergeben!"); }
+
+        //    _Internal = vInternalAndReadableText;
+        //    _ReadableText = vInternalAndReadableText;
+        //    _VariableText = _ReadableText;
+        //    if (string.IsNullOrEmpty(_Internal))
+        //    {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
+        //    }
+        //}
+
+
+        //public TextPadItem(string vInternalAndReadableText, enDataFormat cFormat)
+        //{
+        //    _Internal = vInternalAndReadableText;
+        //    _ReadableText = vInternalAndReadableText;
+        //    _VariableText = _ReadableText;
+        //    _Format = cFormat;
+        //    if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
+        //}
+
+
+
+
+        public TextPadItem(string internalname, string vReadableText) : base(internalname)
         {
-
-        }
-        public TextPadItem(string vInternalAndReadableText)
-        {
-            if (vInternalAndReadableText.StartsWith("{")) { Develop.DebugPrint(enFehlerArt.Fehler, "Code zum Parsen übergeben!"); }
-
-            _Internal = vInternalAndReadableText;
-            _ReadableText = vInternalAndReadableText;
-            _VariableText = _ReadableText;
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
-
-
-        public TextPadItem(string vInternalAndReadableText, enDataFormat cFormat)
-        {
-            _Internal = vInternalAndReadableText;
-            _ReadableText = vInternalAndReadableText;
-            _VariableText = _ReadableText;
-            _Format = cFormat;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        }
-
-
-
-
-        public TextPadItem(string vInternal, string vReadableText)
-        {
-            _Internal = vInternal;
             _ReadableText = vReadableText;
             _VariableText = _ReadableText;
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        }
-
-
-        protected override void Initialize()
-        {
-            base.Initialize();
-
-
-            _ReadableText = string.Empty;
-            _VariableText = string.Empty;
 
             Style = PadStyles.Undefiniert;
 
             etxt = null;
             _Align = enAlignment.Top_Left;
+
         }
+
+
+
 
 
         #endregion
@@ -191,7 +180,7 @@ namespace BlueControls.ItemCollection
                     AdditionalScale = decimal.Parse(pair.Value.FromNonCritical());
                     return true;
                 default:
-                    return base.ParseExplicit(pair);               
+                    return base.ParseExplicit(pair);
             }
         }
 

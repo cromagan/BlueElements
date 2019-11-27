@@ -107,25 +107,14 @@ namespace BlueControls.ItemCollection
 
 
 
-        public ComicCompPadItem()
-        { }
+        public ComicCompPadItem() : this(string.Empty, null) { }
 
-        public ComicCompPadItem(string Internal, Bitmap cBitmap)
+        public ComicCompPadItem(string internalname, Bitmap cBitmap) : base(internalname)
         {
 
-            _Internal = Internal;
             _Bitmap = cBitmap;
             ImageChanged();
-            if (string.IsNullOrEmpty(_Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-            }
-        }
 
-
-        protected override void Initialize()
-        {
-            base.Initialize();
             P1 = new PointDF(this, "Punkt1", 0, 0, false, true, true);
             P2 = new PointDF(this, "Punkt2", 0, 0);
             _Bitmap = null;
@@ -139,7 +128,12 @@ namespace BlueControls.ItemCollection
             _L2 = 0M;
 
             AdditionalPoints.Clear();
+
+
         }
+
+
+
 
 
         #endregion
@@ -407,11 +401,11 @@ namespace BlueControls.ItemCollection
 
             foreach (var ThisPoint in x)
             {
-                x1 = (int)(Math.Min(ThisPoint.X, x1));
-                y1 = (int)(Math.Min(ThisPoint.Y, y1));
+                x1 = (int)Math.Min(ThisPoint.X, x1);
+                y1 = (int)Math.Min(ThisPoint.Y, y1);
 
-                x2 = (int)(Math.Max(ThisPoint.X, x2));
-                y2 = (int)(Math.Max(ThisPoint.Y, y2));
+                x2 = (int)Math.Max(ThisPoint.X, x2);
+                y2 = (int)Math.Max(ThisPoint.Y, y2);
             }
 
             return new RectangleDF(x1, y1, x2 - x1, y2 - y1);

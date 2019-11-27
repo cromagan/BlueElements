@@ -12,11 +12,7 @@ namespace BlueControls.ItemCollection.Basics
 
 
 
-        /// <summary>
-        /// Welcher Wert wirklich hinter der Anzeige steckt
-        /// </summary>
-        /// <remarks></remarks>
-        protected string _Internal = "";
+
 
         /// <summary>
         /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
@@ -37,20 +33,28 @@ namespace BlueControls.ItemCollection.Basics
         #endregion
 
 
-        #region  Construktor + Initialize 
+        #region  Construktor  
 
 
         public event EventHandler Changed;
 
-        protected BasicItem()
+        protected BasicItem(string internalname)
         {
-            Initialize();
-        }
 
-        protected virtual void Initialize()
-        {
-            _Internal = UniqueInternal();
+            if (string.IsNullOrEmpty(internalname))
+            {
+                Internal = UniqueInternal();
+            }
+            else
+            {
+                Internal = internalname;
+            }
+
+
             _Tags = new List<string>();
+
+            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
+
         }
 
 
@@ -78,7 +82,10 @@ namespace BlueControls.ItemCollection.Basics
 
 
 
-        public abstract string Internal { get; }
+        public virtual string Internal { get; private set; }
+
+
+
 
 
         public bool IsNullOrEmpty()

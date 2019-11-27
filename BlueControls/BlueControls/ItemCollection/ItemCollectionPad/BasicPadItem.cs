@@ -30,7 +30,7 @@ namespace BlueControls.ItemCollection
 {
     public abstract class BasicPadItem : BasicItem, IParseable
     {
-        protected abstract bool ParseExplicit(KeyValuePair<string, string> pair);
+       // protected abstract bool ParseExplicit(KeyValuePair<string, string> pair);
 
 
         /// <summary>
@@ -136,22 +136,52 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected BasicPadItem()
-        {
-        }
+        protected BasicPadItem(string internalname) : base(internalname) { }
 
 
-        protected BasicPadItem(string CodeToParse)
+        public virtual bool ParseThis(string tag, string value)
         {
-            Parse(CodeToParse);
-        }
-
-        public override string Internal
-        {
-            get
+            switch (tag)
             {
-                return _Internal;
+                case "classid":
+                case "type":
+                case "enabled":
+                case "checked":
+                    return true;
+
+                case "tag":
+                    _Tags.Add(value.FromNonCritical());
+                    return true;
+
+                case "print":
+                    _PrintMe = value.FromPlusMinus();
+                    return true;
+
+                case "point":
+                    foreach (var ThisPoint in PointList())
+                    {
+                        if (value.Contains("Name=" + ThisPoint.Name + ","))
+                        {
+                            ThisPoint.Parse(value);
+                            ThisPoint.Parent = this;
+                        }
+                    }
+                    return true;
+
+                // case "format": // = Textformat!!!
+                case "design":
+                case "style":
+                    _Style = (PadStyles)int.Parse(value);
+                    return true;
+
+                case "removetoo":
+                    RemoveToo.AddRange(value.FromNonCritical().SplitByCR());
+                    return true;
+
+                default:
+                    return false;
             }
+
         }
 
 
@@ -164,51 +194,13 @@ namespace BlueControls.ItemCollection
 
             foreach (var pair in ToParse.GetAllTags())
             {
-                switch (pair.Key)
+
+                if (!ParseThis(pair.Key, pair.Value))
                 {
-                    case "classid":
-                    case "type":
-                    case "enabled":
-                    case "checked":
-                        break;
-
-                    case "internalname":
-                        _Internal = pair.Value.FromNonCritical();
-                        break;
-
-                    case "tag":
-                        _Tags.Add(pair.Value.FromNonCritical());
-                        break;
-
-                    case "print":
-                        _PrintMe = pair.Value.FromPlusMinus();
-                        break;
-
-                    case "point":
-                        foreach (var ThisPoint in PointList())
-                        {
-                            if (pair.Value.Contains("Name=" + ThisPoint.Name + ","))
-                            {
-                                ThisPoint.Parse(pair.Value);
-                                ThisPoint.Parent = this;
-                            }
-                        }
-                        break;
-
-                    // case "format": // = Textformat!!!
-                    case "design":
-                    case "style":
-                        _Style = (PadStyles)int.Parse(pair.Value);
-                        break;
-
-                    case "removetoo":
-                        RemoveToo.AddRange(pair.Value.FromNonCritical().SplitByCR());
-                        break;
-
-                    default:
-                        if (!ParseExplicit(pair)) { Develop.DebugPrint(enFehlerArt.Warnung, "Tag unbekannt: " + pair.Key); }
-                        break;
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + ToParse);
                 }
+     
+
             }
             IsParsing = false;
         }
@@ -220,7 +212,7 @@ namespace BlueControls.ItemCollection
             var t = "{";
 
             t = t + "ClassID=" + ClassId() + ", ";
-            t = t + "InternalName=" + _Internal.ToNonCritical() + ", ";
+            t = t + "InternalName=" + Internal.ToNonCritical() + ", ";
 
             if (_Tags.Count > 0)
             {

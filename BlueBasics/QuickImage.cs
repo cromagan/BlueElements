@@ -453,7 +453,7 @@ namespace BlueBasics
             C = C + "|";
             if (Height > 0 && Width != Height) { C = C + Height; }
             C = C + "|";
-            if (Effekt != enImageCodeEffect.Ohne) { C = C + (int)(Effekt); }
+            if (Effekt != enImageCodeEffect.Ohne) { C = C + (int)Effekt; }
             C = C + "|";
             C = C + Färbung;
             C = C + "|";
@@ -595,7 +595,7 @@ namespace BlueBasics
 
                 if (!string.IsNullOrEmpty(_Zweitsymbol))
                 {
-                    var x = ((int)bmpOri.Width / 2);
+                    var x = (int)(bmpOri.Width / 2);
                     bmpSecond = Get(_Zweitsymbol + "|" + x).BMP;
                 }
 
