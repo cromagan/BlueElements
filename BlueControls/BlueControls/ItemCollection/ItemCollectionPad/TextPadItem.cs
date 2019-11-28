@@ -159,29 +159,31 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
+        public override bool ParseThis(string tag, string value)
         {
-            switch (pair.Key)
+            if (base.ParseThis(tag, value)) { return true; }
+
+            switch (tag)
             {
                 case "readabletext":
-                    _ReadableText = pair.Value.FromNonCritical();
+                    _ReadableText = value.FromNonCritical();
                     _VariableText = _ReadableText;
                     return true;
 
                 case "alignment":
-                    _Align = (enAlignment)byte.Parse(pair.Value);
+                    _Align = (enAlignment)byte.Parse(value);
                     return true;
 
                 case "format":
-                    _Format = (enDataFormat)int.Parse(pair.Value);
+                    _Format = (enDataFormat)int.Parse(value);
                     return true;
 
                 case "additionalscale":
-                    AdditionalScale = decimal.Parse(pair.Value.FromNonCritical());
+                    AdditionalScale = decimal.Parse(value.FromNonCritical());
                     return true;
-                default:
-                    return base.ParseExplicit(pair);
             }
+
+            return false;
         }
 
 
@@ -316,7 +318,7 @@ namespace BlueControls.ItemCollection
 
                     if (Parent == null)
                     {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Parent is Nothing, wurde das Obct zu einer Collectin hinzugefügt?");
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Parent is Nothing, wurde das Objekt zu einer Collection hinzugefügt?");
                     }
                     else
                     {

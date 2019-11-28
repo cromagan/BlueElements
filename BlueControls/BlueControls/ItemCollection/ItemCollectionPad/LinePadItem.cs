@@ -64,20 +64,20 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
         public LinePadItem() : this(PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
-        public LinePadItem(PadStyles vFormat, Point cPoint1, Point cPoint2) : base(string.Empty)
-        {
+        public LinePadItem(PadStyles format, Point point1, Point point2) : this(string.Empty, PadStyles.Style_Standard, point1, point2) { }
 
+        public LinePadItem(string internalname, PadStyles format, Point point1, Point point2) : base(internalname)
+        {
             Point1 = new PointDF(this, "Punkt 1", 0, 0);
             Point2 = new PointDF(this, "Punkt 2", 0, 0);
 
-            Point1.SetTo(cPoint1);
-            Point2.SetTo(cPoint2);
-            Style = vFormat;
+            Point1.SetTo(point1);
+            Point2.SetTo(point2);
+            Style = format;
 
             _TempPoints = new List<PointDF>();
             Style = PadStyles.Style_Standard;
             Art = enConectorStyle.Direct;
-
         }
 
 
@@ -204,24 +204,18 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
+        public override bool ParseThis(string tag, string value)
         {
+            if (base.ParseThis(tag, value)) { return true; }
 
-            _LastRecalc = DateTime.Now.AddHours(-1);
-
-            switch (pair.Key)
+            switch (tag)
             {
-                case "checked":
-                    return true;
                 case "connection":
-                    Art = (enConectorStyle)int.Parse(pair.Value);
+                    Art = (enConectorStyle)int.Parse(value);
                     return true;
 
             }
-
             return false;
-
-
         }
 
         public override string ToString()
@@ -344,7 +338,7 @@ namespace BlueControls.ItemCollection
         private bool IsVerdeckt(decimal X, decimal Y)
         {
 
-            foreach (var ThisItemBasic in Parent)
+            foreach (var ThisItemBasic in (ItemCollectionPad)Parent)
             {
                 if (ThisItemBasic != null)
                 {
@@ -374,7 +368,7 @@ namespace BlueControls.ItemCollection
             var p1 = new PointDF(X1, Y1);
             var p2 = new PointDF(X2, Y2);
 
-            foreach (var ThisItemBasic in Parent)
+            foreach (var ThisItemBasic in (ItemCollectionPad)Parent)
             {
                 if (SchneidetDas(ThisItemBasic, p1, p2))
                 {
@@ -501,7 +495,7 @@ namespace BlueControls.ItemCollection
             if (P1 >= _TempPoints.Count - 1) { return false; }
             //   If _TempPoints.Count > 4 Then Return False
 
-            foreach (var ThisItemBasic in Parent)
+            foreach (var ThisItemBasic in (ItemCollectionPad)Parent)
             {
                 if (ThisItemBasic != null)
                 {

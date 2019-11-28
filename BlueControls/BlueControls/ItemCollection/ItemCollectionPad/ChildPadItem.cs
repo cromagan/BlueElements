@@ -98,7 +98,10 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor  
 
-        public ChildPadItem() : base(string.Empty)
+
+        public ChildPadItem() : this(string.Empty) { }
+
+        public ChildPadItem(string internalname) : base(internalname)
         {
             PadInternal = null; // new CreativePad();
             _tmpBMP = null;
@@ -118,8 +121,8 @@ namespace BlueControls.ItemCollection
             }
 
 
-            PadInternal.SheetStyle = Parent.SheetStyle.CellFirstString();
-            PadInternal.SheetStyleScale = Parent.SheetStyleScale;
+            PadInternal.SheetStyle = ((ItemCollectionPad)Parent).SheetStyle.CellFirstString();
+            PadInternal.SheetStyleScale = ((ItemCollectionPad)Parent).SheetStyleScale;
         }
 
 
@@ -139,8 +142,8 @@ namespace BlueControls.ItemCollection
             if (PadInternal != null)
             {
 
-                PadInternal.SheetStyle = Parent.SheetStyle.CellFirstString();
-                PadInternal.SheetStyleScale = Parent.SheetStyleScale;
+                PadInternal.SheetStyle = ((ItemCollectionPad)Parent).SheetStyle.CellFirstString();
+                PadInternal.SheetStyleScale = ((ItemCollectionPad)Parent).SheetStyleScale;
 
                 //var r = UsedArea();
 
@@ -203,26 +206,26 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
+        public override bool ParseThis(string tag, string value)
         {
-            switch (pair.Key)
+            if (base.ParseThis(tag, value)) { return true; }
+
+            switch (tag)
             {
                 case "fixsize":
-                    FixSize = pair.Value.FromPlusMinus();
+                    FixSize = value.FromPlusMinus();
                     return true;
                 case "name":
-                    _Name = pair.Value.FromNonCritical();
+                    _Name = value.FromNonCritical();
                     return true;
                 case "data":
                     PadInternal = new CreativePad();
-                    PadInternal.ParseData(pair.Value, false, string.Empty);
+                    PadInternal.ParseData(value, false, string.Empty);
                     return true;
                 case "checked":
                     return true;
-                default:
-                    return base.ParseExplicit(pair);
-
             }
+            return false;
         }
 
 

@@ -67,11 +67,13 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor 
 
-        public RowFormulaPadItem() : this(null, string.Empty) { }
+        public RowFormulaPadItem(string internalname) : this(internalname, null, string.Empty) { }
 
-        public RowFormulaPadItem(RowItem row) : this(row, string.Empty) { }
+        public RowFormulaPadItem(RowItem row) : this(string.Empty, row, string.Empty) { }
 
-        public RowFormulaPadItem(RowItem row, string layoutID) : base(string.Empty)
+        public RowFormulaPadItem(RowItem row, string layoutID) : this(string.Empty, row, layoutID) { }
+
+        public RowFormulaPadItem(string internalname, RowItem row, string layoutID) : base(internalname)
         {
             _Row = row;
             _LayoutID = layoutID;
@@ -217,35 +219,34 @@ namespace BlueControls.ItemCollection
             return new RectangleDF(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
         }
 
-        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
+        public override bool ParseThis(string tag, string value)
         {
+            if (base.ParseThis(tag, value)) { return true; }
 
-            switch (pair.Key)
+            switch (tag)
             {
-                case "checked":
-                    return true;
 
                 case "layoutid":
-                    _LayoutID = pair.Value.FromNonCritical();
+                    _LayoutID = value.FromNonCritical();
                     return true;
 
                 case "database":
-                    ParseExplicit_TMPDatabase = Database.GetByFilename(pair.Value, false);
+                    ParseExplicit_TMPDatabase = Database.GetByFilename(value, false);
                     if (ParseExplicit_TMPDatabase == null)
                     {
                         ParseExplicit_TMPDatabase = new Database(false);
-                        ParseExplicit_TMPDatabase.Load(pair.Value);
+                        ParseExplicit_TMPDatabase.Load(value);
                     }
                     return true;
 
                 case "rowid": // TODO: alt
                 case "rowkey":
-                    _Row = ParseExplicit_TMPDatabase.Row.SearchByKey(int.Parse(pair.Value));
+                    _Row = ParseExplicit_TMPDatabase.Row.SearchByKey(int.Parse(value));
                     if (_Row != null) { ParseExplicit_TMPDatabase = null; }
                     return true;
 
                 case "firstvalue":
-                    var n = pair.Value.FromNonCritical();
+                    var n = value.FromNonCritical();
 
                     if (_Row != null)
                     {

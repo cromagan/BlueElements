@@ -131,17 +131,19 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
+        public override bool ParseThis(string tag, string value)
         {
-            switch (pair.Key)
+            if (base.ParseThis(tag, value)) { return true; }
+
+            switch (tag)
             {
                 case "text": // TODO: Alt 06.09.2019
                 case "text1":
-                    Text1 = pair.Value.FromNonCritical();
+                    Text1 = value.FromNonCritical();
                     return true;
 
                 case "text2":
-                    Text2 = pair.Value.FromNonCritical();
+                    Text2 = value.FromNonCritical();
                     return true;
 
                 case "color": // TODO: Alt 06.09.2019
@@ -154,22 +156,22 @@ namespace BlueControls.ItemCollection
                     return true;
 
                 case "decimal":
-                    NachKomma = int.Parse(pair.Value);
+                    NachKomma = int.Parse(value);
                     return true;
 
                 case "checked": // TODO: Alt 06.09.2019
                     return true;
 
                 case "prefix": // TODO: Alt 06.09.2019
-                    Prefix = pair.Value.FromNonCritical();
+                    Prefix = value.FromNonCritical();
                     return true;
 
                 case "suffix":
-                    Suffix = pair.Value.FromNonCritical();
+                    Suffix = value.FromNonCritical();
                     return true;
 
                 case "additionalscale":
-                    AdditionalScale = decimal.Parse(pair.Value.FromNonCritical());
+                    AdditionalScale = decimal.Parse(value.FromNonCritical());
                     return true;
 
             }

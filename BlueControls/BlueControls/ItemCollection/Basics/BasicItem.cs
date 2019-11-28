@@ -24,6 +24,8 @@ namespace BlueControls.ItemCollection.Basics
         private static string UniqueInternal_LastTime = "InitialDummy";
         private static int UniqueInternal_Count;
 
+        protected object _parent = null;
+
         #endregion
 
 
@@ -72,9 +74,14 @@ namespace BlueControls.ItemCollection.Basics
             }
         }
 
+        //public object Parent { get; private set; }
+
         #endregion
 
-
+        internal void SetParent(object collection) 
+        {
+            _parent = collection;
+        }
 
 
 

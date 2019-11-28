@@ -143,7 +143,7 @@ namespace BlueControls.Forms
 
         private void btnAddDistance_Click(object sender, System.EventArgs e)
         {
-            var b = new SpacerPadItem(Pad.Item);
+            var b = new SpacerPadItem();
             Pad.Item.Add(b);
             b.SetCoordinates(new RectangleDF(10, 10, 20, 20));
         }

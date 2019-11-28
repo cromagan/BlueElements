@@ -197,12 +197,12 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate)
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate)
         {
 
             if (DrawBorderAndBack)
             {
-                Skin.Draw_Back(GR, Parent.ItemDesign, vState, PositionModified, null, false);
+                Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
             }
             var DCoordinates = PositionModified;
             DCoordinates.Inflate(-_padding, -_padding);
@@ -279,7 +279,7 @@ namespace BlueControls.ItemCollection
 
             if (DrawBorderAndBack)
             {
-                Skin.Draw_Border(GR, Parent.ItemDesign, vState, PositionModified);
+                Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
             }
 
         }

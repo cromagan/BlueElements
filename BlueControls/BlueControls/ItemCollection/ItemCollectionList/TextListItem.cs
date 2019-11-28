@@ -151,11 +151,11 @@ namespace BlueControls.ItemCollection
 
 
 
-        private enDesign tempDesign()
+        private enDesign tempDesign(enDesign itemdesign)
         {
             if (_IsCaption)
             {
-                switch (Parent.ItemDesign)
+                switch (itemdesign)
                 {
                     case enDesign.Item_KontextMenu:
                         return enDesign.Item_KontextMenu_Caption;
@@ -165,19 +165,19 @@ namespace BlueControls.ItemCollection
             }
 
 
-            return Parent.ItemDesign;
+            return itemdesign;
         }
 
 
         public override SizeF SizeUntouchedForListBox()
         {
-            return Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(), enStates.Standard), 16);
+            return Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(((ItemCollectionList)Parent).ItemDesign), enStates.Standard), 16);
         }
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate)
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign design, enStates vState, bool DrawBorderAndBack, bool Translate)
         {
 
-            var tmpd = tempDesign();
+            var tmpd = tempDesign(design);
 
             if (DrawBorderAndBack)
             {

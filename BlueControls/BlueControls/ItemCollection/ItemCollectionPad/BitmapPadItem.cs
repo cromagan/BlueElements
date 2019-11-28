@@ -211,30 +211,32 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
+        public override bool ParseThis(string tag, string value)
         {
-            switch (pair.Key)
+            if (base.ParseThis(tag, value)) { return true; }
+
+            switch (tag)
             {
                 case "stretchallowed": // ALT
                     return true;
                 case "modus":
-                    BildModus = (enSizeModes)int.Parse(pair.Value);
+                    BildModus = (enSizeModes)int.Parse(value);
                     return true;
                 case "whiteback":
-                    WhiteBack = pair.Value.FromPlusMinus();
+                    WhiteBack = value.FromPlusMinus();
                     return true;
                 case "padding":
-                    Padding = int.Parse(pair.Value);
+                    Padding = int.Parse(value);
                     return true;
                 case "image":
-                    Bitmap = modConverter.Base64ToBitmap(pair.Value);
+                    Bitmap = modConverter.Base64ToBitmap(value);
                     return true;
                 case "placeholder":
-                    _PlaceHolderString = pair.Value.FromNonCritical();
+                    _PlaceHolderString = value.FromNonCritical();
                     return true;
-                default:
-                    return base.ParseExplicit(pair);
             }
+
+            return false;
         }
 
 

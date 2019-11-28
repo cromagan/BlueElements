@@ -106,13 +106,14 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-
         public ComicCompPadItem() : this(string.Empty, null) { }
 
-        public ComicCompPadItem(string internalname, Bitmap cBitmap) : base(internalname)
+        public ComicCompPadItem(string internalname) : this(internalname, null) { }
+
+        public ComicCompPadItem(string internalname, Bitmap bitmap) : base(internalname)
         {
 
-            _Bitmap = cBitmap;
+            _Bitmap = bitmap;
             ImageChanged();
 
             P1 = new PointDF(this, "Punkt1", 0, 0, false, true, true);
@@ -417,13 +418,15 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
+        public override bool ParseThis(string tag, string value)
         {
-            switch (pair.Key)
+            if (base.ParseThis(tag, value)) { return true; }
+
+            switch (tag)
             {
                 case "additionalpoints":
                     AdditionalPoints.Clear();
-                    for (var z = 1; z <= int.Parse(pair.Value); z++)
+                    for (var z = 1; z <= int.Parse(value); z++)
                     {
                         var p = new PointDF(this, "Zusatz" + z, 0, 0, false, true);
                         AdditionalPoints.Add(p);
@@ -431,33 +434,33 @@ namespace BlueControls.ItemCollection
                     return true;
 
                 case "angle1":
-                    _W1 = decimal.Parse(pair.Value);
+                    _W1 = decimal.Parse(value);
                     return true;
 
                 case "angle2":
-                    _W2 = decimal.Parse(pair.Value);
+                    _W2 = decimal.Parse(value);
                     return true;
 
                 case "angle3":
-                    _Winkel = Convert.ToDouble(decimal.Parse(pair.Value));
+                    _Winkel = Convert.ToDouble(decimal.Parse(value));
                     return true;
 
                 case "length1":
-                    _L1 = decimal.Parse(pair.Value);
+                    _L1 = decimal.Parse(value);
                     return true;
 
                 case "length2":
-                    _L2 = decimal.Parse(pair.Value);
+                    _L2 = decimal.Parse(value);
                     return true;
 
                 case "image":
                 case "bitmap":
                     // TODO: image entfernen 06.09.2019
-                    _Bitmap = modConverter.Base64ToBitmap(pair.Value);
+                    _Bitmap = modConverter.Base64ToBitmap(value);
                     return true;
 
                 case "fixlenght":
-                    _Length = decimal.Parse(pair.Value);
+                    _Length = decimal.Parse(value);
                     return true;
             }
 

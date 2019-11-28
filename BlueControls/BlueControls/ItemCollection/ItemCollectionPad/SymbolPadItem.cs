@@ -35,8 +35,10 @@ namespace BlueControls.ItemCollection
             // Keine Variablen zum Reseten, ein Invalidate reicht
         }
 
+        public SymbolPadItem() : this(string.Empty) { }
 
-        public SymbolPadItem() : base(string.Empty)
+
+        public SymbolPadItem(string internalname) : base(internalname)
         {
             Symbol = enSymbol.Pfeil;
             BackColor = Color.White;
@@ -131,8 +133,8 @@ namespace BlueControls.ItemCollection
 
 
             l.Add(new FlexiControl("Randdicke", BorderWidth.ToString(), enDataFormat.Gleitkommazahl, 1));
-            l.Add(new FlexiControl("Randfarbe", BorderColor.ToHTMLCode(), enDataFormat.Farbcode, 1));
-            l.Add(new FlexiControl("Hintergrundfarbe", BackColor.ToHTMLCode(), enDataFormat.Farbcode, 1));
+            l.Add(new FlexiControl("Randfarbe", BorderColor.ToHTMLCode(), enDataFormat.Text, 1));
+            l.Add(new FlexiControl("Hintergrundfarbe", BackColor.ToHTMLCode(), enDataFormat.Text, 1));
 
             //  l.AddRange(base.GetStyleOptions(sender, e));
 
@@ -166,28 +168,29 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
+        public override bool ParseThis(string tag, string value)
         {
-            switch (pair.Key)
+            if (base.ParseThis(tag, value)) { return true; }
+
+            switch (tag)
             {
                 case "symbol":
-                    Symbol = (enSymbol)int.Parse(pair.Value);
+                    Symbol = (enSymbol)int.Parse(value);
                     return true;
                 case "backcolor":
-                    BackColor = pair.Value.FromHTMLCode();
+                    BackColor = value.FromHTMLCode();
                     return true;
                 case "bordercolor":
-                    BorderColor = pair.Value.FromHTMLCode();
+                    BorderColor = value.FromHTMLCode();
                     return true;
                 case "borderwidth":
-                    decimal.TryParse(pair.Value.FromNonCritical(), out BorderWidth);
+                    decimal.TryParse(value.FromNonCritical(), out BorderWidth);
                     return true;
-                default:
-                    return base.ParseExplicit(pair);
+                case "fill": // alt: 28.11.2019
+                case "whiteback": // alt: 28.11.2019
+                    return true;
             }
+            return false;
         }
-
-
-
     }
 }

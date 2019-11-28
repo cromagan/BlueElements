@@ -30,7 +30,7 @@ namespace BlueControls.ItemCollection
 {
     public abstract class BasicPadItem : BasicItem, IParseable
     {
-       // protected abstract bool ParseExplicit(KeyValuePair<string, string> pair);
+        // protected abstract bool ParseExplicit(KeyValuePair<string, string> pair);
 
 
         /// <summary>
@@ -68,8 +68,6 @@ namespace BlueControls.ItemCollection
         /// <remarks></remarks>
         public abstract bool Contains(PointF value, decimal zoomfactor);
 
-        public ItemCollectionPad Parent;
-
 
         /// <summary>
         /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
@@ -105,6 +103,15 @@ namespace BlueControls.ItemCollection
 
         public List<string> RemoveToo = new List<string>();
 
+
+        public ItemCollectionPad Parent
+        {
+            get
+            {
+                return (ItemCollectionPad)_parent;
+            }
+
+        }
 
         public bool PrintMe
         {
@@ -178,6 +185,14 @@ namespace BlueControls.ItemCollection
                     RemoveToo.AddRange(value.FromNonCritical().SplitByCR());
                     return true;
 
+
+                case "internalname":
+                    if (value != Internal)
+                    {
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Namen unterschiedlich: " + value + " / " + Internal);
+                    }
+                    return true;
+
                 default:
                     return false;
             }
@@ -188,18 +203,18 @@ namespace BlueControls.ItemCollection
         public bool IsParsing { get; private set; }
 
 
-        public void Parse(string ToParse)
+        public void Parse(List<KeyValuePair<string, string>> ToParse)
         {
             IsParsing = true;
 
-            foreach (var pair in ToParse.GetAllTags())
+            foreach (var pair in ToParse)
             {
 
                 if (!ParseThis(pair.Key, pair.Value))
                 {
                     Develop.DebugPrint(enFehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + ToParse);
                 }
-     
+
 
             }
             IsParsing = false;
@@ -241,12 +256,12 @@ namespace BlueControls.ItemCollection
 
         public void InDenVordergrund()
         {
-            Parent?.InDenVordergrund(this);
+            ((ItemCollectionPad)Parent)?.InDenVordergrund(this);
         }
 
         public void InDenHintergrund()
         {
-            Parent?.InDenHintergrund(this);
+            ((ItemCollectionPad)Parent)?.InDenHintergrund(this);
         }
 
         public void EineEbeneNachVorne()
@@ -257,7 +272,7 @@ namespace BlueControls.ItemCollection
             if (i2 != null)
             {
                 var tempVar = this;
-                Parent.Swap(tempVar, i2);
+                ((ItemCollectionPad)Parent).Swap(tempVar, i2);
             }
         }
 
@@ -268,7 +283,7 @@ namespace BlueControls.ItemCollection
             if (i2 != null)
             {
                 var tempVar = this;
-                Parent.Swap(tempVar, i2);
+                ((ItemCollectionPad)Parent).Swap(tempVar, i2);
             }
         }
 
@@ -386,6 +401,9 @@ namespace BlueControls.ItemCollection
             return DrawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, SizeOfParentControl));
         }
 
-
+        public void Parse(string ToParse)
+        {
+            Parse(ToParse.GetAllTags());
+        }
     }
 }

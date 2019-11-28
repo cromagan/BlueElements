@@ -51,7 +51,7 @@ namespace BlueControls.Controls
             Item = new ItemCollectionList();
             Item.ListOrItemChanged += _Item_ListOrItemChanged;
             Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
-            Item.ItemAdded += _Item_Item_Added;
+            Item.ItemAdded += _Item_ItemAdded;
             Item.ItemRemoved += _Item_ItemRemoved;
             Item.ItemRemoving += _Item_ItemRemoving;
             _Appearance = enBlueListBoxAppearance.Listbox;
@@ -459,7 +459,7 @@ namespace BlueControls.Controls
                     if (!ThisItem.Enabled) { vStateItem = enStates.Standard_Disabled; }
                     if (ThisItem.Checked) { vStateItem |= enStates.Checked; }
 
-                    ThisItem.Draw(gr, 0, (int)SliderY.Value, vStateItem, true, FilterTxt.Text, Translate);
+                    ThisItem.Draw(gr, 0, (int)SliderY.Value, Item.ControlDesign, Item.ItemDesign, vStateItem, true, FilterTxt.Text, Translate);
                 }
 
             }
@@ -533,11 +533,11 @@ namespace BlueControls.Controls
             ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
-        private void SwapItems(BasicListItem Nr1, BasicListItem Nr2)
-        {
-            Item.Swap(ref Nr1, ref Nr2);
-            CheckButtons();
-        }
+        //private void SwapItems(BasicListItem Nr1, BasicListItem Nr2)
+        //{
+        //    Item.Swap(ref Nr1, ref Nr2);
+        //    CheckButtons();
+        //}
 
 
         private void Up_Click(object sender, System.EventArgs e)
@@ -552,7 +552,8 @@ namespace BlueControls.Controls
                     if (thisItem.Checked)
                     {
                         if (LN == null) { return; }// Befehl verwerfen...
-                        SwapItems(LN, thisItem);
+                        Item.Swap(Item.IndexOf(LN), Item.IndexOf(thisItem));
+                        CheckButtons();
                         return;
                     }
 
@@ -577,7 +578,8 @@ namespace BlueControls.Controls
                     if (Item[z].Checked)
                     {
                         if (LN < 0) { return; }// Befehl verwerfen...
-                        SwapItems(Item[LN], Item[z]);
+                        Item.Swap(LN, z);
+                        CheckButtons();
                         return;
                     }
 
@@ -744,7 +746,7 @@ namespace BlueControls.Controls
             return false;
         }
 
-        private void _Item_Item_Added(object sender, ListEventArgs e)
+        private void _Item_ItemAdded(object sender, ListEventArgs e)
         {
             if (IsDisposed) { return; }
 

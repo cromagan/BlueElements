@@ -77,9 +77,8 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public BasicPadItemTwoPoints(ItemCollectionPad vparent) : base(string.Empty)
+        public BasicPadItemTwoPoints() : base(string.Empty)
         {
-            Parent = vparent;
             p_ML = new PointDF(this, "ML", 0, 0);
             p_MR = new PointDF(this, "MR", 1000, 0);
            }

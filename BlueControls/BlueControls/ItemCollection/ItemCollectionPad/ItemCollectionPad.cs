@@ -24,10 +24,11 @@ using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueBasics.Enums;
+using BlueControls.ItemCollection.Basics;
 
 namespace BlueControls.ItemCollection
 {
-    public class ItemCollectionPad : ListExt<BasicPadItem>, IParseable
+    public class ItemCollectionPad : BasicItemCollection<BasicPadItem>, IParseable
     {
         #region  Variablen-Deklarationen 
 
@@ -45,10 +46,7 @@ namespace BlueControls.ItemCollection
 
             set
             {
-                if (_sheetStyle == value)
-                {
-                    return;
-                }
+                if (_sheetStyle == value) { return; }
 
                 _sheetStyle = value;
                 OnChanged();
@@ -61,10 +59,7 @@ namespace BlueControls.ItemCollection
 
             set
             {
-                if (_sheetStyleScale == value)
-                {
-                    return;
-                }
+                if (_sheetStyleScale == value) { return; }
 
                 _sheetStyleScale = value;
                 OnChanged();
@@ -74,15 +69,6 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
-        public ItemCollectionPad()
-        {
-            Initialize();
-        }
-
-        private void Initialize()
-        {
-            Clear();
-        }
 
         #endregion
 
@@ -91,17 +77,14 @@ namespace BlueControls.ItemCollection
 
         public event EventHandler ItemsZOrderChanged;
 
-        public event EventHandler Changed;
+
 
         #endregion
 
 
         internal void InDenVordergrund(BasicPadItem ThisItem)
         {
-            if (IndexOf(ThisItem) == Count - 1)
-            {
-                return;
-            }
+            if (IndexOf(ThisItem) == Count - 1) { return; }
 
             Remove(ThisItem);
             Add(ThisItem);
@@ -111,10 +94,7 @@ namespace BlueControls.ItemCollection
 
         internal void InDenHintergrund(BasicPadItem ThisItem)
         {
-            if (IndexOf(ThisItem) == 0)
-            {
-                return;
-            }
+            if (IndexOf(ThisItem) == 0) { return; }
 
             Remove(ThisItem);
             Insert(0, ThisItem);
@@ -200,7 +180,7 @@ namespace BlueControls.ItemCollection
             IsParsing = true;
             ThrowEvents = false;
 
-            Initialize();
+            Clear();
             foreach (var pair in ToParse.GetAllTags())
             {
                 switch (pair.Key)
@@ -244,120 +224,110 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private void AddByCode(string Code)
+        private void AddByCode(string code)
         {
-            //TODO: Abspecken
-
             BasicPadItem i = null;
+            var x = code.GetAllTags();
 
-            if (Code.ToLower().StartsWith("{type=blueelements.clsitemtext,"))
+            var ding = string.Empty;
+            var name = string.Empty;
+
+
+            foreach (var thisIt in x)
             {
-                i = new TextPadItem();
+                switch (thisIt.Key)
+                {
+                    case "type":
+                    case "classid":
+                        ding = thisIt.Value;
+                        break;
+                    case "internalname":
+                        name = thisIt.Value;
+                        break;
+                }
             }
-            else if (Code.ToLower().StartsWith("{type=blueelements.textitem,"))
+
+
+            if (string.IsNullOrEmpty(ding) )
             {
-                i = new TextPadItem();
+                Develop.DebugPrint(enFehlerArt.Fehler, "Itemtyp unbekannt: " + code);
             }
-            else if (Code.ToLower().StartsWith("{classid=text,"))
+
+            if (string.IsNullOrEmpty(name))
             {
-                i = new TextPadItem();
+                Develop.DebugPrint(enFehlerArt.Fehler, "Itemname unbekannt: " + code);
             }
-            else if (Code.ToLower().StartsWith("{type=blueelements.clsitemdistanz,"))
+
+
+            switch (ding.ToLower())
             {
-                i = new SpacerPadItem(this);
+                case "blueelements.clsitemtext":
+                case "blueelements.textitem":
+                case "text":
+                    i = new TextPadItem(name, string.Empty);
+                    break;
+
+                case "blueelements.clsitemdistanz":
+                case "blueelements.distanzitem":
+                case "spacer":
+                    i = new SpacerPadItem(name);
+                    break;
+
+                case "blueelements.clsitemimage":
+                case "blueelements.imageitem":
+                case "image":
+                    i = new BitmapPadItem(name, string.Empty);
+                    break;
+
+                case "blueelements.clsdimensionitem":
+                case "blueelements.dimensionitem":
+                case "dimension":
+                    i = new DimensionPadItem(name, null, null, 0);
+                    break;
+
+                case "blueelements.clsitemline":
+                case "blueelements.itemline":
+                case "line":
+                    i = new LinePadItem(name, Enums.PadStyles.Style_Standard, Point.Empty, Point.Empty);
+                    break;
+
+                case "blueelements.clsitempad":
+                case "blueelements.itempad":
+                case "childpad":
+                    i = new ChildPadItem(name);
+                    break;
+
+
+                case "blueelements.clsitemgrid":
+                case "blueelements.itemgrid":
+                case "grid":
+                    i = new GridPadItem(name);
+                    break;
+
+                case "blueelements.rowformulaitem":
+                case "row":
+                    i = new RowFormulaPadItem(name);
+                    break;
+
+                case "blueelements.clsitemcomiccomp":
+                case "comic":
+                    i = new ComicCompPadItem(name);
+                    break;
+
+                case "symbol":
+                    i = new SymbolPadItem(name);
+                    break;
+                default:
+                    Develop.DebugPrint(enFehlerArt.Fehler, "Unbekanntes Item: " + code);
+                    break;
+
             }
-            else if (Code.ToLower().StartsWith("{type=blueelements.distanzitem,"))
-            {
-                i = new SpacerPadItem(this);
-            }
-            else if (Code.ToLower().StartsWith("{classid=spacer,"))
-            {
-                i = new SpacerPadItem(this);
-            }
-            else if (Code.ToLower().StartsWith("{type=blueelements.clsitemimage,"))
-            {
-                i = new BitmapPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{type=blueelements.imageitem,"))
-            {
-                i = new BitmapPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{classid=image,"))
-            {
-                i = new BitmapPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{type=blueelements.dimensionitem,"))
-            {
-                i = new DimensionPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{classid=dimension,"))
-            {
-                i = new DimensionPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{type=blueelements.clsitemline,"))
-            {
-                i = new LinePadItem();
-            }
-            else if (Code.ToLower().StartsWith("{type=blueelements.lineitem,"))
-            {
-                i = new LinePadItem();
-            }
-            else if (Code.ToLower().StartsWith("{classid=line,"))
-            {
-                i = new LinePadItem();
-            }
-            else if (Code.ToLower().StartsWith("{type=blueelements.clsitempad,"))
-            {
-                i = new ChildPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{type=blueelements.childPaditem,"))
-            {
-                i = new ChildPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{classid=childpad,"))
-            {
-                i = new ChildPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{type=blueelements.clsitemgrid,"))
-            {
-                i = new GridPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{type=blueelements.griditem,"))
-            {
-                i = new GridPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{classid=grid,"))
-            {
-                i = new GridPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{type=blueelements.rowformulaitem,"))
-            {
-                i = new RowFormulaPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{classid=row,"))
-            {
-                i = new RowFormulaPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{type=blueelements.clsitemcomiccomp,"))
-            {
-                i = new ComicCompPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{classid=comic,"))
-            {
-                i = new ComicCompPadItem();
-            }
-            else if (Code.ToLower().StartsWith("{classid=symbol,"))
-            {
-                i = new SymbolPadItem();
-            }
-            else
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Unbekanntes Item: " + Code);
-            }
+
+
 
             if (i != null)
             {
-                i.Parse(Code);
+                i.Parse(x);
                 Add(i);
             }
         }
@@ -366,8 +336,6 @@ namespace BlueControls.ItemCollection
         public new string ToString()
         {
             var t = "{";
-
-
             t = t + "DPI=" + DPI + ", ";
             t = t + "SheetStyle=" + SheetStyle.CellFirstString().ToNonCritical() + ", ";
             t = t + "SheetStyleScale=" + _sheetStyleScale + ", ";
@@ -379,29 +347,16 @@ namespace BlueControls.ItemCollection
                     t = t + "Item=" + Thisitem + ", ";
                 }
             }
-
-
             return t.TrimEnd(", ") + "}";
         }
 
-        public new void Add(BasicPadItem cItem)
+
+        protected override void OnItemAdded(BasicPadItem item)
         {
-            if (string.IsNullOrEmpty(cItem.Internal))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + cItem.Internal);
-            }
-
-            if (this[cItem.Internal] != null)
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches aber schon vorhanden ist: " + cItem.Internal);
-            }
-
-            cItem.Parent = this;
-
-
-            base.Add(cItem);
+            base.OnItemAdded(item);
             RecomputePointAndRelations();
         }
+
 
 
         public void DesignOrStyleChanged()
@@ -420,10 +375,7 @@ namespace BlueControls.ItemCollection
 
         public new void Remove(BasicPadItem cItem)
         {
-            if (cItem == null)
-            {
-                return;
-            }
+            if (cItem == null) { return; }
 
             base.Remove(cItem);
 
@@ -461,29 +413,13 @@ namespace BlueControls.ItemCollection
             }
 
 
-            if (!Done)
-            {
-                return new RectangleDF();
-            }
+            if (!Done) { return new RectangleDF(); }
 
             return new RectangleDF(x1, y1, x2 - x1, y2 - y1);
         }
 
-        protected override void OnListOrItemChanged()
-        {
-            base.OnListOrItemChanged();
-            OnChanged();
-        }
 
-        public void OnChanged()
-        {
-            if (IsParsing)
-            {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!");
-                return;
-            }
 
-            Changed?.Invoke(this, System.EventArgs.Empty);
-        }
+
     }
 }

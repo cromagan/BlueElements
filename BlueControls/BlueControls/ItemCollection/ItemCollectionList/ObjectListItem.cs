@@ -88,29 +88,29 @@ namespace BlueControls.ItemCollection
 
         public override SizeF SizeUntouchedForListBox()
         {
-            return Skin.FormatedText_NeededSize(Obj.ReadableText(), Obj.SymbolForReadableText(), Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), 16);
+            return Skin.FormatedText_NeededSize(Obj.ReadableText(), Obj.SymbolForReadableText(), Skin.GetBlueFont(((ItemCollectionList)Parent).ItemDesign, enStates.Standard), 16);
         }
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate)
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate)
         {
 
             if (DrawBorderAndBack)
             {
-                Skin.Draw_Back(GR, Parent.ItemDesign, vState, PositionModified, null, false);
+                Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
             }
 
             if (Obj == null)
             {
-                Skin.Draw_FormatedText(GR, "Objekt nicht vorhanden", Parent.ItemDesign, vState, QuickImage.Get(enImageCode.Kritisch, 16), enAlignment.VerticalCenter_Left, PositionModified, null, false, Translate);
+                Skin.Draw_FormatedText(GR, "Objekt nicht vorhanden", itemdesign, vState, QuickImage.Get(enImageCode.Kritisch, 16), enAlignment.VerticalCenter_Left, PositionModified, null, false, Translate);
             }
             else
             {
-                Skin.Draw_FormatedText(GR, Obj.ReadableText(), Parent.ItemDesign, vState, Obj.SymbolForReadableText(), enAlignment.VerticalCenter_Left, PositionModified, null, false, false);
+                Skin.Draw_FormatedText(GR, Obj.ReadableText(), itemdesign, vState, Obj.SymbolForReadableText(), enAlignment.VerticalCenter_Left, PositionModified, null, false, false);
             }
 
             if (DrawBorderAndBack)
             {
-                Skin.Draw_Border(GR, Parent.ItemDesign, vState, PositionModified);
+                Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
             }
         }
 

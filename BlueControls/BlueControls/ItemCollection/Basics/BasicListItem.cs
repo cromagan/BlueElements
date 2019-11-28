@@ -40,11 +40,7 @@ namespace BlueControls.ItemCollection
 
         protected abstract string GetCompareKey();
 
-        protected abstract void DrawExplicit(Graphics GR, Rectangle PositionModified, enStates vState, bool DrawBorderAndBack, bool Translate);
-
-
-        public ItemCollectionList Parent { get; private set; }
-
+        protected abstract void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates state, bool drawBorderAndBack, bool translate);
 
 
 
@@ -103,7 +99,7 @@ namespace BlueControls.ItemCollection
                 if (_Enabled == value) { return; }
 
                 _Enabled = value;
-                Parent?.OnNeedRefresh();
+                ((ItemCollectionList)Parent)?.OnNeedRefresh();
             }
         }
 
@@ -114,7 +110,7 @@ namespace BlueControls.ItemCollection
             if (!string.IsNullOrEmpty(_UserDefCompareKey))
             {
                 if (Convert.ToChar(_UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + _UserDefCompareKey); }
-                return _UserDefCompareKey + Constants.FirstSortChar + Parent.IndexOf(this).ToString(Constants.Format_Integer6);
+                return _UserDefCompareKey + Constants.FirstSortChar + ((ItemCollectionList)Parent).IndexOf(this).ToString(Constants.Format_Integer6);
             }
 
             return GetCompareKey();
@@ -145,19 +141,24 @@ namespace BlueControls.ItemCollection
             }
             set
             {
-                Parent.SetNewCheckState(this, value, ref _Checked);
+                Parent?.SetNewCheckState(this, value, ref _Checked);
                 OnChanged();
             }
         }
 
+        public ItemCollectionList Parent
+        {
+            get
+            { return (ItemCollectionList)_parent; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Argumente von öffentlichen Methoden validieren", MessageId = "0")]
-        public void Draw(Graphics GR, int xModifier, int YModifier, enStates vState, bool DrawBorderAndBack, string FilterText, bool Translate)
+        }
+
+        public void Draw(Graphics GR, int xModifier, int YModifier, enDesign controldesign, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, string FilterText, bool Translate)
         {
 
 
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
-            if (Parent.ItemDesign == enDesign.Undefiniert) { return; }
+            if (itemdesign == enDesign.Undefiniert) { return; }
 
 
             var PositionModified = new Rectangle(Pos.X - xModifier, Pos.Y - YModifier, Pos.Width, Pos.Height);
@@ -165,14 +166,14 @@ namespace BlueControls.ItemCollection
 
 
 
-            DrawExplicit(GR, PositionModified, vState, DrawBorderAndBack, Translate);
+            DrawExplicit(GR, PositionModified, itemdesign, vState, DrawBorderAndBack, Translate);
 
 
             if (DrawBorderAndBack)
             {
                 if (!string.IsNullOrEmpty(FilterText) && !FilterMatch(FilterText))
                 {
-                    var c1 = Skin.Color_Back(Parent.ControlDesign, enStates.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
+                    var c1 = Skin.Color_Back(controldesign, enStates.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
                     c1 = c1.SetAlpha(160);
                     GR.FillRectangle(new SolidBrush(c1), PositionModified);
                 }
@@ -223,10 +224,7 @@ namespace BlueControls.ItemCollection
             return false;
         }
 
-        internal void SetParent(ItemCollectionList itemCollectionList)
-        {
-            Parent = itemCollectionList;
-        }
+
     }
 
 

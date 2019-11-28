@@ -55,13 +55,11 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
+        public SpacerPadItem() : this(string.Empty) { }
 
 
-        public SpacerPadItem(ItemCollectionPad vparent) : base(string.Empty)
+        public SpacerPadItem(string internalname) : base(internalname)
         {
-            Parent = vparent;
-
-
             mm125x = Math.Round(modConverter.mmToPixel(1.25M, ItemCollectionPad.DPI), 1);
 
             _Size = mm125x * 2; // 19,68 = 2,5 mm
@@ -138,12 +136,15 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
+
+        public override bool ParseThis(string tag, string value)
         {
-            switch (pair.Key)
+            if (base.ParseThis(tag, value)) { return true; }
+
+            switch (tag)
             {
                 case "size":
-                    _Size = decimal.Parse(pair.Value);
+                    _Size = decimal.Parse(value);
                     return true;
                 case "checked":
                     return true;

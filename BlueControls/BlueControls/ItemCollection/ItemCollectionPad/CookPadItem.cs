@@ -57,7 +57,7 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-        public CookPadItem(): base(string.Empty)
+        public CookPadItem() : base(string.Empty)
         {
             Childs = new List<CookPadItem>();
             Middlex = new PointDF(this, "Middle", 0, 0);
@@ -85,8 +85,6 @@ namespace BlueControls.ItemCollection
 
             GR.DrawEllipse(CreativePad.PenGray, DCoordinates);
 
-
-
             var f = new Font("Arial", (float)(5 * cZoom));
             var l = GR.MeasureString(Anzeige, f);
 
@@ -96,31 +94,19 @@ namespace BlueControls.ItemCollection
             GR.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), new Rectangle((int)(p.X - l.Width / 2.0), (int)(p.Y - l.Height * 2), (int)l.Width, (int)l.Height));
 
             GR.DrawString(Anzeige, f, Brushes.Black, new PointF((float)(p.X - l.Width / 2.0), p.Y - l.Height * 2));
-
-
         }
 
-        public override void GenerateInternalRelation(List<clsPointRelation> relations)
-        {
-
-        }
+        public override void GenerateInternalRelation(List<clsPointRelation> relations) { }
 
         public override void SetCoordinates(RectangleDF r)
         {
             Middlex.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));
         }
 
-        public override void DesignOrStyleChanged()
-        {
-
-        }
+        public override void DesignOrStyleChanged() { }
 
 
-
-        protected override void KeepInternalLogic()
-        {
-
-        }
+        protected override void KeepInternalLogic() { }
 
         protected override string ClassId()
         {
@@ -148,10 +134,6 @@ namespace BlueControls.ItemCollection
             return new RectangleDF(Middlex.X - 30, Middlex.Y - 30, 60, 60);
         }
 
-        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
-        {
-            return false;
-        }
 
 
 

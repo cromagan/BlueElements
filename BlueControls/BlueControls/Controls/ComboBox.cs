@@ -244,23 +244,11 @@ namespace BlueControls.Controls
             if (!FloatingInputBoxListBoxStyle.IsShowing(this))
             {
                 // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
-
-
                 var r = i.Pos;
-                var l = i.Parent.Appearance;
-
-                i.Parent.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
-
                 var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox().Height) / 2.0);
                 i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, (int)i.SizeUntouchedForListBox().Height));
-
-
-                i.Draw(TMPGR, 0, 0, state, false, string.Empty, Translate);
-
-                i.Parent.Appearance = l;
+                i.Draw(TMPGR, 0, 0, enDesign.ComboBox_Textbox, enDesign.ComboBox_Textbox, state, false, string.Empty, Translate);
                 i.SetCoordinates(r);
-
-
             }
 
 

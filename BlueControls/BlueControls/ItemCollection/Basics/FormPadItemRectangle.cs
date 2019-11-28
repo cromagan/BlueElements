@@ -78,7 +78,10 @@ namespace BlueControls.ItemCollection
 
         public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         {
-            Rotation = int.Parse(Tags.TagGet("Drehwinkel"));
+
+            var r = Tags.TagGet("Drehwinkel");
+            int.TryParse(r, out Rotation);
+
             var nFixSize = Tags.TagGet("Größe fixiert").FromPlusMinus();
             if (nFixSize != FixSize)
             {
@@ -169,16 +172,18 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
+        public override bool ParseThis(string tag, string value)
         {
-            switch (pair.Key)
+            if (base.ParseThis(tag, value)) { return true; }
+
+            switch (tag)
             {
                 case "fixsize":
-                    FixSize = pair.Value.FromPlusMinus();
+                    FixSize = value.FromPlusMinus();
                     return true;
 
                 case "rotation":
-                    Rotation = int.Parse(pair.Value);
+                    Rotation = int.Parse(value);
                     return true;
             }
             return false;

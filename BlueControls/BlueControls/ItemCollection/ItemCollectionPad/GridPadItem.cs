@@ -66,14 +66,15 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-        public GridPadItem() : this(PadStyles.Style_Standard, new Point(0, 0)) { }
+        public GridPadItem(string internalname) : this(internalname, PadStyles.Style_Standard, new Point(0, 0)) { }
 
+        public GridPadItem(PadStyles style, Point nullpunkt) : this(string.Empty, style, nullpunkt) { }
 
-        public GridPadItem(PadStyles vFormat, Point cNP) : base(string.Empty)
+        public GridPadItem(string internalname, PadStyles style, Point nullpunkt) : base(internalname)
         {
             NP = new PointDF(this, "Nullpunkt", 0, 0, true, false, true);
-            NP.SetTo(cNP);
-            Style = vFormat;
+            NP.SetTo(nullpunkt);
+            Style = style;
 
             Style = PadStyles.Style_Überschrift_Haupt;
             GridShow = 10M;
@@ -178,21 +179,16 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override bool ParseExplicit(KeyValuePair<string, string> pair)
+        public override bool ParseThis(string tag, string value)
         {
+            if (base.ParseThis(tag, value)) { return true; }
 
-            switch (pair.Key)
+            switch (tag)
             {
                 case "grid":
-                    GridShow = int.Parse(pair.Value);
+                    GridShow = int.Parse(value);
                     return true;
-
-
-                case "checked":
-                    return true;
-
             }
-
             return false;
         }
 

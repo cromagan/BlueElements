@@ -32,7 +32,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection
 {
-    public class ItemCollectionList : ListExt<BasicListItem>, ICloneable
+    public class ItemCollectionList : BasicItemCollection<BasicListItem>, ICloneable
     {
 
         #region  Variablen-Deklarationen 
@@ -120,33 +120,25 @@ namespace BlueControls.ItemCollection
 
 
 
-        public ItemCollectionList()
-        {
-            Initialize();
-        }
+        public ItemCollectionList() : this(enBlueListBoxAppearance.Listbox) { }
 
-        public ItemCollectionList(enBlueListBoxAppearance Design)
-        {
-            Initialize();
-            _Appearance = Design;
-            GetDesigns();
-        }
-
-
-        private void Initialize()
+        public ItemCollectionList(enBlueListBoxAppearance design) : base()
         {
             _CellposCorrect = true;
             _Appearance = enBlueListBoxAppearance.Listbox;
             _ItemDesign = enDesign.Undefiniert;
             _ControlDesign = enDesign.Undefiniert;
             _CheckBehavior = enCheckBehavior.SingleSelection;
+            _Appearance = design;
+            GetDesigns();
         }
+
+
 
         #endregion
 
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler ItemCheckedChanged;
-        public event EventHandler NeedRefresh;
         #endregion
 
         private void GetDesigns()
@@ -274,29 +266,14 @@ namespace BlueControls.ItemCollection
             ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public void OnNeedRefresh()
-        {
-            NeedRefresh?.Invoke(this, System.EventArgs.Empty);
-        }
 
 
-        protected override void OnItemAdded(BasicListItem item)
-        {
-            item.SetParent(this);
-            base.OnItemAdded(item);
-        }
 
-        protected override void OnItemRemoving(BasicListItem item)
-        {
-            item.SetParent(null);
-            base.OnItemRemoving(item);
-        }
 
         protected override void OnListOrItemChanged()
         {
-            base.OnListOrItemChanged();
             _CellposCorrect = false;
-            OnNeedRefresh();
+            base.OnListOrItemChanged();
         }
 
         public List<BasicListItem> Checked()
@@ -375,7 +352,7 @@ namespace BlueControls.ItemCollection
             }
             if (_CellposCorrect) { return; }
 
-  
+
 
 
             var InControlWidth = int.MaxValue;
@@ -928,12 +905,6 @@ namespace BlueControls.ItemCollection
         }
 
 
-        //private void InvalidateView()
-        //{
-        //    _CellposCorrect = false;
-        //    OnListOrItemChanged();
-        //}
-
 
 
 
@@ -959,12 +930,14 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        public void Swap(ref BasicListItem Nr1, ref BasicListItem Nr2)
-        {
-            // Der Swap geht so, und nicht anders! Es müssen die Items im Original-Array geswapt werden!
-            Swap(IndexOf(Nr1), IndexOf(Nr2));
-            _CellposCorrect = false;
-        }
+
+
+        //public void Swap(ref BasicListItem Nr1, ref BasicListItem Nr2)
+        //{
+        //    // Der Swap geht so, und nicht anders! Es müssen die Items im Original-Array geswapt werden!
+        //    Swap(IndexOf(Nr1), IndexOf(Nr2));
+        //    _CellposCorrect = false;
+        //}
 
 
         public void Add(ColumnItem Column)
@@ -1024,11 +997,7 @@ namespace BlueControls.ItemCollection
 
         }
 
-        public new void Add(BasicListItem cItem)
-        {
-            base.Add(cItem);
-            OnNeedRefresh();
-        }
+
 
 
         public void DesignOrStyleChanged()
@@ -1042,16 +1011,16 @@ namespace BlueControls.ItemCollection
 
 
 
-        public void Remove(List<string> Internals)
-        {
+        //public void Remove(List<string> Internals)
+        //{
 
-            if (Internals == null || Internals.Count == 0) { return; }
+        //    if (Internals == null || Internals.Count == 0) { return; }
 
-            foreach (var thisstring in Internals)
-            {
-                Remove(this[thisstring]);
-            }
-        }
+        //    foreach (var thisstring in Internals)
+        //    {
+        //        Remove(this[thisstring]);
+        //    }
+        //}
 
 
 
@@ -1060,22 +1029,22 @@ namespace BlueControls.ItemCollection
             Remove(this[Internal]);
         }
 
-        public new void Remove(BasicListItem cItem)
-        {
-            if (cItem == null) { return; }
-            base.Remove(cItem);
-            _CellposCorrect = false;
-            OnNeedRefresh();
-        }
+        //public new void Remove(BasicListItem cItem)
+        //{
+        //    if (cItem == null) { return; }
+        //    base.Remove(cItem);
+        //    _CellposCorrect = false;
+        //    OnNeedRefresh();
+        //}
 
 
-        public new void Clear()
-        {
-            if (Count == 0) { return; }
-            base.Clear();
-            _CellposCorrect = false;
-            OnNeedRefresh();
-        }
+        //public new void Clear()
+        //{
+        //    if (Count == 0) { return; }
+        //    base.Clear();
+        //    _CellposCorrect = false;
+        //    OnNeedRefresh();
+        //}
 
 
         public Rectangle MaximumBounds()
