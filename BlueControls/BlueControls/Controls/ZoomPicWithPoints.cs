@@ -165,7 +165,7 @@ namespace BlueControls.Controls
             var FilenamePNG = T.TagGet("ImageFile");
             var i = new BitmapListItem(FilenamePNG, FilenamePNG.FileNameWithoutSuffix(), FilenamePNG, string.Empty);
             i.Padding = 10;
-            i.Tags.AddRange(T);
+            i.Tags = T;
             i.Bitmap = B;
             return i;
         }
@@ -264,7 +264,7 @@ namespace BlueControls.Controls
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            Invalidate();           
+            Invalidate();
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -287,7 +287,7 @@ namespace BlueControls.Controls
 
             return PathOfPicture.FilePath() + PathOfPicture.FileNameWithoutSuffix() + ".txt";
 
-//            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
+            //            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
         }
 
 
@@ -381,7 +381,7 @@ namespace BlueControls.Controls
                 TMPGR.DrawLine(Pen_RotTransp, e.X, 0, e.X, OverlayBMP.Height);
             }
 
-    
+
 
             if (_Helper.HasFlag(enHelpers.SymetricalHorizontal))
             {
@@ -400,7 +400,7 @@ namespace BlueControls.Controls
                 if (!MouseDownPos_1_1.IsEmpty)
                 {
                     TMPGR.DrawEllipse(Pen_RotTransp, new Rectangle(MouseDownPos_1_1.X - 3, MouseDownPos_1_1.Y - 3, 6, 6));
-                    TMPGR.DrawLine(Pen_RotTransp, new Point(e.X,e.Y), MouseDownPos_1_1);
+                    TMPGR.DrawLine(Pen_RotTransp, new Point(e.X, e.Y), MouseDownPos_1_1);
                 }
 
                 //var h = (int)(BMP.Width / 2);
@@ -431,7 +431,7 @@ namespace BlueControls.Controls
         public void PointRemove(string name)
         {
             var p = GetPoint(name);
-            if (p== null) { return; }
+            if (p == null) { return; }
             points.Remove(p);
             WritePointsInTags();
             Invalidate();

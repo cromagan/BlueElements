@@ -390,7 +390,7 @@ namespace BlueDatabase
         {
             if (obj is RuleItem RLI)
             {
-                return CompareKey().CompareTo((RLI).CompareKey());
+                return CompareKey().CompareTo(RLI.CompareKey());
             }
             else
             {

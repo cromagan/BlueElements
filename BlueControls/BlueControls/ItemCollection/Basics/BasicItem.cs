@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 
 namespace BlueControls.ItemCollection.Basics
 {
-    public abstract class BasicItem : ICanBeEmpty, IChangedFeedback
+    public abstract class BasicItem : IChangedFeedback
     {
         #region  Variablen-Deklarationen 
 
@@ -14,11 +13,6 @@ namespace BlueControls.ItemCollection.Basics
 
 
 
-        /// <summary>
-        /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
-        /// </summary>
-        /// <remarks></remarks>
-        protected List<string> _Tags;
 
 
         private static string UniqueInternal_LastTime = "InitialDummy";
@@ -52,9 +46,6 @@ namespace BlueControls.ItemCollection.Basics
                 Internal = internalname;
             }
 
-
-            _Tags = new List<string>();
-
             if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
 
         }
@@ -66,15 +57,6 @@ namespace BlueControls.ItemCollection.Basics
         #region  Properties 
 
 
-        public List<string> Tags
-        {
-            get
-            {
-                return _Tags;
-            }
-        }
-
-        //public object Parent { get; private set; }
 
         #endregion
 
@@ -83,27 +65,9 @@ namespace BlueControls.ItemCollection.Basics
             _parent = collection;
         }
 
-
-
         public abstract void DesignOrStyleChanged();
 
-
-
-        public virtual string Internal { get; private set; }
-
-
-
-
-
-        public bool IsNullOrEmpty()
-        {
-            // Nicht das interne Abfragen, sondern das der Items!
-            if (string.IsNullOrEmpty(Internal)) { return true; }
-
-            return false;
-        }
-
-
+        public string Internal { get; private set; }
 
         public static string UniqueInternal()
         {

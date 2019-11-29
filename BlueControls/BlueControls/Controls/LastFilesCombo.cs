@@ -182,14 +182,19 @@ namespace BlueControls.Controls
                             }
 
                             var it = new TextListItem(x[0], show, false, NR.ToString(Constants.Format_Integer3));
+
+                            var t = new List<string>();
+
                             if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]))
                             {
-                                it.Tags.Add(x[1]);
+                                t.Add(x[1]);
                             }
                             else
                             {
-                                it.Tags.Add(string.Empty);
+                                t.Add(string.Empty);
                             }
+                            it.Tags = t;
+
                             Item.Add(it);
                         }
 
@@ -282,7 +287,10 @@ namespace BlueControls.Controls
             }
 
             base.OnItemClicked(e);
-            AddFileName(e.Item.Internal, e.Item.Tags[0]);
+
+            var t = (List<string>)e.Item.Tags;
+
+            AddFileName(e.Item.Internal, t[0]);
         }
 
 

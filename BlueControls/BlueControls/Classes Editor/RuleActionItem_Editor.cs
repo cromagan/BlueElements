@@ -59,7 +59,7 @@ namespace BlueControls.Classes_Editor
 
 
             Rule_Aktion.Item.Add(new TextListItem("0+", "Wenn...", false));
-            for (var z = 0 ; z <= 5000 ; z++)
+            for (var z = 0; z <= 5000; z++)
             {
 
                 if (z == 1000)
@@ -72,10 +72,10 @@ namespace BlueControls.Classes_Editor
 
                 if (Ac.ToString() != z.ToString())
                 {
-                        var t = string.Empty;
-                        QuickImage s = null;
-                        RuleActionItem.MaximalText(tmp.Rule.Database, Ac, ref t, ref s);
-                        Rule_Aktion.Item.Add(new TextListItem(z.ToString(), t, s));
+                    var t = string.Empty;
+                    QuickImage s = null;
+                    RuleActionItem.MaximalText(tmp.Rule.Database, Ac, ref t, ref s);
+                    Rule_Aktion.Item.Add(new TextListItem(z.ToString(), t, s));
                 }
             }
 
@@ -185,19 +185,16 @@ namespace BlueControls.Classes_Editor
         private void WriteBack()
         {
 
-            if (IsFilling())
-            {
-                return;
-            }
+            if (IsFilling()) { return; }
 
             tmp.Action = (enAction)int.Parse(Rule_Aktion.Text);
 
-            var l = Rule_Aktion_Columns.Item.Checked().ToListOfString();
+            var l = Rule_Aktion_Columns.Item.Checked();
             tmp.Columns.Clear(); // = New List(Of ColumnItem)
 
             foreach (var t1 in l)
             {
-                tmp.Columns.Add(tmp.Rule.Database.Column[t1]);
+                tmp.Columns.Add((ColumnItem)((TextListItem)t1).Tags);
             }
 
             tmp.Text = Rule_Action_Text.Text;

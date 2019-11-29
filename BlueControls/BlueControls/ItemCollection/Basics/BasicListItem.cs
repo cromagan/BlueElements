@@ -42,6 +42,11 @@ namespace BlueControls.ItemCollection
 
         protected abstract void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates state, bool drawBorderAndBack, bool translate);
 
+        /// <summary>
+        /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
+        /// </summary>
+        /// <remarks></remarks>
+        public object Tags;
 
 
         /// <summary>
@@ -99,7 +104,7 @@ namespace BlueControls.ItemCollection
                 if (_Enabled == value) { return; }
 
                 _Enabled = value;
-                ((ItemCollectionList)Parent)?.OnNeedRefresh();
+                Parent?.OnNeedRefresh();
             }
         }
 
@@ -110,7 +115,7 @@ namespace BlueControls.ItemCollection
             if (!string.IsNullOrEmpty(_UserDefCompareKey))
             {
                 if (Convert.ToChar(_UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + _UserDefCompareKey); }
-                return _UserDefCompareKey + Constants.FirstSortChar + ((ItemCollectionList)Parent).IndexOf(this).ToString(Constants.Format_Integer6);
+                return _UserDefCompareKey + Constants.FirstSortChar + Parent.IndexOf(this).ToString(Constants.Format_Integer6);
             }
 
             return GetCompareKey();
@@ -211,12 +216,10 @@ namespace BlueControls.ItemCollection
 
             x.Checked = Checked;
             x.Enabled = Enabled;
-            x.Tags.AddRange(_Tags);
+            x.Tags = Tags;
             x.UserDefCompareKey = UserDefCompareKey;
             return x;
         }
-
-
 
         public virtual bool FilterMatch(string FilterText)
         {
@@ -224,10 +227,5 @@ namespace BlueControls.ItemCollection
             return false;
         }
 
-
     }
-
-
-
-
 }

@@ -831,7 +831,7 @@ namespace BlueControls.ItemCollection
                         case TextListItem TI: Add(TI); break;
                         case BitmapListItem BI: Add(BI); break;
                         case LineListItem LI: Add(LI); break;
-                        case ObjectListItem OI: Add(OI); break;
+                        // case ObjectListItem OI: Add(OI); break;
                         case CellLikeListItem CI: Add(CI); break;
                         default:
                             Develop.DebugPrint_NichtImplementiert();
@@ -942,7 +942,7 @@ namespace BlueControls.ItemCollection
 
         public void Add(ColumnItem Column)
         {
-            Add(new ObjectListItem(Column));
+            Add(new TextListItem(Column.Name, Column));
         }
 
         public void Add(enContextMenuComands Comand, bool vEnabled = true)

@@ -337,11 +337,8 @@ namespace BlueControls.Controls
             }
             set
             {
-
                 if (_enabled == value) { return; }
-
                 _enabled = value;
-
 
                 foreach (System.Windows.Forms.Control ThisControl in Controls)
                 {
@@ -364,33 +361,15 @@ namespace BlueControls.Controls
             get
             {
                 if (_Value == null) { return string.Empty; }
-
                 return _Value;
             }
             set
             {
                 if (value == null) { value = string.Empty; }
-
                 if (_Value == value) { return; }
-
-
-
-                //  if (!_allinitialized) { CreateSubControls(); }
-
                 if (_IsFilling) { return; }
-
-
-                //if (_Value != null && _Value.StartsWith("HAUPT201909") && string.IsNullOrEmpty(value))
-                //{
-                //    _Value = value;
-
-                //}
-
-
                 _Value = value;
-
                 UpdateValueToControl();
-
                 OnValueChanged();
             }
         }
@@ -411,10 +390,7 @@ namespace BlueControls.Controls
 
                 if (_Suffix == value) { return; }
                 _Suffix = value;
-
-
                 UpdateControls();
-
             }
         }
 
@@ -734,7 +710,6 @@ namespace BlueControls.Controls
                     Develop.DebugPrint(Typ(e.Control));
                     break;
             }
-
             UpdateControls();
         }
 
@@ -1300,9 +1275,8 @@ namespace BlueControls.Controls
                     if (!_Ist.Contains(ThisString))
                     {
 
-                        if (BlueBasics.FileOperations.FileExists(ThisString))
+                        if (FileOperations.FileExists(ThisString))
                         {
-
                             if (ThisString.FileType() == enFileFormat.Image)
                             {
                                 Main.Item.Add(new BitmapListItem(ThisString, ThisString.FileNameWithoutSuffix(), ThisString, FileEncryptionKey));
@@ -1311,31 +1285,17 @@ namespace BlueControls.Controls
                             {
                                 Main.Item.Add(new TextListItem(ThisString, ThisString.FileNameWithSuffix(), QuickImage.Get(ThisString.FileType(), 48)));
                             }
-
-
                         }
                         else
                         {
                             Main.Item.Add(ThisString);
                         }
-
-
                     }
                 }
             }
-
         }
 
-
-
-
-
         #endregion
-
-
-
-
-
 
         #region  Button 
 
@@ -1759,6 +1719,11 @@ namespace BlueControls.Controls
                 if (Control != _InfoCaption)
                 {
                     if (Control is IQuickInfo QI) { QI.QuickInfo = _QuickInfo; }
+                    Control.Enabled = _enabled;
+                }
+                else
+                {
+                    Control.Enabled = true;
                 }
 
 

@@ -316,7 +316,7 @@ namespace BlueDatabase
 
         #region  Variablen-Deklarationen 
 
-        private IContainer components;
+        //private IContainer components;
         private BackgroundWorker Backup;
 
 

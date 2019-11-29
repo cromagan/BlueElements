@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using System.Drawing;
 
@@ -44,7 +45,14 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
-
+        public TextListItem(IReadableText obj) : this(string.Empty, obj.ReadableText(), obj.SymbolForReadableText())
+        {
+            Tags = obj;
+        }
+        public TextListItem(string internalname, IReadableText obj) : this(internalname, obj.ReadableText(), obj.SymbolForReadableText())
+        {
+            Tags = obj;
+        }
 
         public TextListItem(string internalname, string readableText, bool isCaption, string userDefCompareKey) : this(internalname, readableText, null, isCaption, true, enDataFormat.Text, userDefCompareKey) { }
 

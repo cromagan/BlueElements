@@ -95,7 +95,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
 
-            if (FileExists(Layout1.Text))
+            if (Layout1.Text.FileSuffix().ToUpper() != "BCR" && FileExists(Layout1.Text))
             {
                 _LoadedLayout = string.Empty;
                 LayBearb.Enabled = true;
@@ -215,15 +215,27 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (!fileOrLayoutID.StartsWith("#"))
             {
-                _LoadedLayout = string.Empty;
-                Pad.Item.Clear();
-                Pad.SheetSizeInMM = SizeF.Empty;
-                var x = new TextPadItem("x", "Layout aus Dateisystem");
-                Pad.Item.Add(x);
-                x.Style = Enums.PadStyles.Style_Überschrift_Haupt;
-                x.SetCoordinates(new RectangleDF(0, 0, 1000, 400));
 
-                Pad.Enabled = false;
+                if (fileOrLayoutID.FileSuffix().ToUpper() == "BCR")
+                {
+                    Pad.Enabled = true;
+                    _LoadedLayout = fileOrLayoutID;
+                    var l = modAllgemein.LoadFromDisk(fileOrLayoutID);
+                    Pad.ParseData(l, true, string.Empty);
+
+                }
+                else
+                {
+                    _LoadedLayout = string.Empty;
+                    Pad.Item.Clear();
+                    Pad.SheetSizeInMM = SizeF.Empty;
+                    var x = new TextPadItem("x", "Nicht edititerbares Layout aus dem Dateisystem");
+                    Pad.Item.Add(x);
+                    x.Style = Enums.PadStyles.Style_Überschrift_Haupt;
+                    x.SetCoordinates(new RectangleDF(0, 0, 1000, 400));
+
+                    Pad.Enabled = false;
+                }
             }
             else
             {
@@ -245,11 +257,19 @@ namespace BlueControls.BlueDatabaseDialogs
 
             var newl = Pad.DataToString();
 
-            var ind = Database.LayoutIDToIndex(_LoadedLayout);
 
-            if (Database.Layouts[ind] == newl) { return; }
+            if (_LoadedLayout.StartsWith("#"))
+            {
+                var ind = Database.LayoutIDToIndex(_LoadedLayout);
+                if (Database.Layouts[ind] == newl) { return; }
+                Database.Layouts[ind] = newl;
+            }
+            else if (_LoadedLayout.FileSuffix().ToUpper() == "BCR")
+            {
+                modAllgemein.SaveToDisk(_LoadedLayout, newl, false);
+            }
 
-            Database.Layouts[ind] = newl;
+
             Pad.ZoomFit();
         }
 

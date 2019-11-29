@@ -75,7 +75,7 @@ namespace BlueControls.BlueDatabaseDialogs
             var NewRules = new ListExt<RuleItem>();
             foreach (var ThisItem in lbxRuleSelector.Item)
             {
-                var Rule = (RuleItem)((ObjectListItem)ThisItem).Obj;
+                var Rule = (RuleItem)((TextListItem)ThisItem).Tags;
                 NewRules.Add((RuleItem)Rule.Clone());
             }
 
@@ -179,7 +179,7 @@ namespace BlueControls.BlueDatabaseDialogs
             var NewExports = new List<ExportDefinition>();
             foreach (var ThisItem in ExportSets.Item)
             {
-                NewExports.Add((ExportDefinition)((ObjectListItem)ThisItem).Obj);
+                NewExports.Add((ExportDefinition)((TextListItem)ThisItem).Tags);
             }
 
             if (NewExports.IsDifferentTo(_Database.Export))
@@ -247,15 +247,10 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (ThisRule != null)
                 {
-                    var obj = new ObjectListItem(ThisRule);
-                    //obj.Enabled = string.IsNullOrEmpty(ThisRule.SystemKey);
+                    var obj = new TextListItem(ThisRule);
                     lbxRuleSelector.Item.Add(obj);
                 }
             }
-
-            //  Enable_Rule_Controls()
-
-
 
 
             // Exports ----------------
@@ -265,7 +260,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (ThisSet != null)
                 {
-                    ExportSets.Item.Add(new ObjectListItem(ThisSet));
+                    ExportSets.Item.Add(new TextListItem(ThisSet));
                 }
             }
             ExportSets.Item.Sort();
@@ -329,7 +324,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void ExportSets_AddClicked(object sender, System.EventArgs e)
         {
-            var NewExportItem = new ObjectListItem(new ExportDefinition(_Database));
+            var NewExportItem = new TextListItem(new ExportDefinition(_Database));
             ExportSets.Item.Add(NewExportItem);
             NewExportItem.Checked = true;
         }
@@ -347,7 +342,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 ExportEditor.ObjectWithDialog = null;
                 return;
             }
-            var SelectedExport = (ExportDefinition)((ObjectListItem)ExportSets.Item.Checked()[0]).Obj;
+            var SelectedExport = (ExportDefinition)((TextListItem)ExportSets.Item.Checked()[0]).Tags;
 
             ExportEditor.ObjectWithDialog = SelectedExport;
         }
@@ -364,10 +359,9 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void lbxRuleSelector_AddClicked(object sender, System.EventArgs e)
         {
-            var NewRuleItem = new ObjectListItem(new RuleItem(_Database));
+            var NewRuleItem = new TextListItem(new RuleItem(_Database));
             lbxRuleSelector.Item.Add(NewRuleItem);
             NewRuleItem.Checked = true;
-
         }
 
         private void lbxRuleSelector_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
@@ -381,8 +375,8 @@ namespace BlueControls.BlueDatabaseDialogs
             switch (e.ClickedComand)
             {
                 case "Kopieren":
-                    var ClickedRule = (RuleItem)((ObjectListItem)e.HotItem).Obj;
-                    var NewRuleItem = new ObjectListItem((RuleItem)ClickedRule.Clone());
+                    var ClickedRule = (RuleItem)((TextListItem)e.HotItem).Tags;
+                    var NewRuleItem = new TextListItem((RuleItem)ClickedRule.Clone());
                     lbxRuleSelector.Item.Add(NewRuleItem);
                     NewRuleItem.Checked = true;
                     break;
@@ -397,7 +391,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private void lbxRuleSelector_ItemCheckedChanged(object sender, System.EventArgs e)
         {
             if (lbxRuleSelector.Item.Checked().Count != 1) { return; }
-            var SelectedRule = (RuleItem)((ObjectListItem)lbxRuleSelector.Item.Checked()[0]).Obj;
+            var SelectedRule = (RuleItem)((TextListItem)lbxRuleSelector.Item.Checked()[0]).Tags;
             RuleItemEditor.ObjectWithDialog = SelectedRule;
         }
 
@@ -433,7 +427,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (thisitem is ItemCollection.Basics.BasicItem ThisItemBasic)
                 {
-                    var tempVar = (ExportDefinition)((ObjectListItem)ThisItemBasic).Obj;
+                    var tempVar = (ExportDefinition)((TextListItem)ThisItemBasic).Tags;
                     tempVar.DeleteAllBackups();
                 }
             }
@@ -803,8 +797,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void lbxRuleSelector_ItemRemoving(object sender, ListEventArgs e)
         {
-
-            if (RuleItemEditor.ObjectWithDialog == ((ObjectListItem)e.Item).Obj)
+            if (RuleItemEditor.ObjectWithDialog == ((TextListItem)e.Item).Tags)
             {
                 RuleItemEditor.ObjectWithDialog = null;
             }

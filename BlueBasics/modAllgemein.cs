@@ -666,8 +666,7 @@ namespace BlueBasics
 
         public static GraphicsPath Poly_Arrow(Rectangle rect)
         {
-            GraphicsPath p = null;
-            p = new GraphicsPath();
+            var p = new GraphicsPath();
 
 
 

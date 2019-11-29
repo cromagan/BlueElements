@@ -61,7 +61,7 @@ namespace BlueControls.Classes_Editor
             {
                 if (ThisAction != null)
                 {
-                    ActionSelector.Item.Add(new ObjectListItem(ThisAction));
+                    ActionSelector.Item.Add(new TextListItem(ThisAction));
                 }
             }
             ActionSelector.Item.Sort();
@@ -90,7 +90,7 @@ namespace BlueControls.Classes_Editor
             var NewAction = new RuleActionItem(tmp, 0, string.Empty, null);
             tmp.Actions.Add(NewAction);
 
-            var NewActionItem = new ObjectListItem(NewAction);
+            var NewActionItem = new TextListItem(NewAction);
 
             ActionSelector.Item.Add(NewActionItem);
 
@@ -106,7 +106,7 @@ namespace BlueControls.Classes_Editor
                 return;
             }
 
-            var SelectedAction = (RuleActionItem)((ObjectListItem)ActionSelector.Item.Checked()[0]).Obj;
+            var SelectedAction = (RuleActionItem)((TextListItem)ActionSelector.Item.Checked()[0]).Tags;
             RuleActionEditor.ObjectWithDialog = SelectedAction;
         }
 
@@ -121,11 +121,8 @@ namespace BlueControls.Classes_Editor
 
         private void ActionSelector_ItemRemoving(object sender, ListEventArgs e)
         {
-
             if (tmp == null) { return; }
-
-            tmp.Actions.Remove((BlueDatabase.RuleActionItem)((ObjectListItem)(e.Item)).Obj);
-
+            tmp.Actions.Remove((RuleActionItem)((TextListItem)e.Item).Tags);
             OnChanged(tmp);
         }
 
@@ -139,7 +136,5 @@ namespace BlueControls.Classes_Editor
             ActionSelector.Item.Clear();
             RuleActionEditor.ObjectWithDialog = null;
         }
-
-
     }
 }

@@ -91,6 +91,13 @@ namespace BlueControls.ItemCollection
         public abstract RectangleDF UsedArea();
 
 
+
+        /// <summary>
+        /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
+        /// </summary>
+        /// <remarks></remarks>
+        protected List<string> _Tags;
+
         /// <summary>
         /// Soll es gedruckt werden?
         /// </summary>
@@ -143,8 +150,19 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected BasicPadItem(string internalname) : base(internalname) { }
+        protected BasicPadItem(string internalname) : base(internalname)
+        {
+            _Tags = new List<string>();
+        }
 
+
+        public List<string> Tags
+        {
+            get
+            {
+                return _Tags;
+            }
+        }
 
         public virtual bool ParseThis(string tag, string value)
         {
@@ -175,7 +193,7 @@ namespace BlueControls.ItemCollection
                     }
                     return true;
 
-                // case "format": // = Textformat!!!
+                case "format": // = Textformat!!!
                 case "design":
                 case "style":
                     _Style = (PadStyles)int.Parse(value);

@@ -688,12 +688,8 @@ namespace BlueControls.Controls
 
                     if (lbxColumns.Item[ItC].IsClickable())
                     {
-
-
-                        var ThisItem = (ObjectListItem)lbxColumns.Item[ItC];
-
-
-                        var co = _Database.Column[ThisItem.Internal];
+                        var ThisItem = (TextListItem)lbxColumns.Item[ItC];
+                        var co = (ColumnItem)ThisItem.Tags; //  _Database.Column[ThisItem.Internal];
 
                         if (co == null)
                         {

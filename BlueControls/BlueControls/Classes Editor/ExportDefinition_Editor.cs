@@ -96,7 +96,7 @@ namespace BlueControls.Classes_Editor
             {
                 if (thisFilter != null)
                 {
-                    ExportFilter.Item.Add(new ObjectListItem(thisFilter));
+                    ExportFilter.Item.Add(new TextListItem(thisFilter));
                 }
             }
 
@@ -280,7 +280,7 @@ namespace BlueControls.Classes_Editor
             tmp.ExportSpaltenAnsicht = int.Parse(ExportSpaltenAnsicht.Text);
 
             tmp.Filter.Clear();
-            foreach (ObjectListItem thisFilter in ExportFilter.Item)
+            foreach (TextListItem thisFilter in ExportFilter.Item)
             {
                 tmp.Filter.Add(new FilterItem(tmp.Database, thisFilter.Internal));
             }
