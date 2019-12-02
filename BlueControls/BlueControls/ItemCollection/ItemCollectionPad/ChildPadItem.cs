@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace BlueControls.ItemCollection
 {
@@ -72,6 +73,13 @@ namespace BlueControls.ItemCollection
         public List<BasicPadItem> VisibleItems = null;
         public List<BasicPadItem> ZoomItems = null;
 
+
+        public enAlignment TextLage = (enAlignment)(-1);
+        public Color Farbe = Color.Transparent;
+        public List<string> AnsichtenVonMir = new List<string>();
+
+
+
         #endregion
 
 
@@ -94,7 +102,19 @@ namespace BlueControls.ItemCollection
             }
         }
 
-
+        //public string Text
+        //{
+        //    get
+        //    {
+        //        return _ReadableText;
+        //    }
+        //    set
+        //    {
+        //        if (value == _ReadableText) { return; }
+        //        _ReadableText = value;
+        //        OnChanged();
+        //    }
+        //}
 
         #region  Construktor  
 
@@ -105,6 +125,16 @@ namespace BlueControls.ItemCollection
         {
             PadInternal = null; // new CreativePad();
             _tmpBMP = null;
+
+            VisibleItems = null;
+            ZoomItems = null;
+
+            _Name = string.Empty;
+            TextLage = (enAlignment)(-1);
+            Farbe = Color.Transparent;
+            //_ReadableText = string.Empty;
+            //_VariableText = string.Empty;
+            AnsichtenVonMir = new List<string>();
         }
 
 
@@ -145,13 +175,6 @@ namespace BlueControls.ItemCollection
                 PadInternal.SheetStyle = ((ItemCollectionPad)Parent).SheetStyle.CellFirstString();
                 PadInternal.SheetStyleScale = ((ItemCollectionPad)Parent).SheetStyleScale;
 
-                //var r = UsedArea();
-
-                //while (r.Width * cZoom > 8000 || r.Height * cZoom > 8000)
-                //{
-                //    cZoom = cZoom * 0.8m; // Kann ruhig verändert werden, tut nix zur Sache, DKoordinates reichen
-                //}
-
 
                 if (_tmpBMP != null)
                 {
@@ -178,32 +201,80 @@ namespace BlueControls.ItemCollection
                 if (ForPrinting) { PadInternal.Unselect(); }
 
                 PadInternal.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y, VisibleItems);
+
+
+
+                if (_tmpBMP != null)
+                {
+
+                    foreach (var thisA in AnsichtenVonMir)
+                    {
+                        ChildPadItem Pad = null;
+                        foreach (var It in Parent)
+                        {
+                            if (It is ChildPadItem CP)
+                            {
+                                if (CP.Name.ToUpper() == thisA.ToUpper())
+                                {
+                                    Pad = CP;
+                                    break;
+                                }
+                            }
+                        }
+
+
+                        if (Pad != null)
+                        {
+
+                            var mb2 = Pad.PadInternal.MaxBounds(Pad.ZoomItems);
+                            var tmpG = Graphics.FromImage(_tmpBMP);
+                            var p = new Pen(Pad.Farbe, 3);
+                            var p2 = new Pen(Color.White, 7);
+                            p.DashPattern = new float[] { 5, 1, 1, 1 };
+                            var DC2 = mb2.ZoomAndMoveRect(zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y);
+                            tmpG.DrawRectangle(p2, DC2);
+                            tmpG.DrawRectangle(p, DC2);
+
+
+
+                            if (Pad.TextLage != (enAlignment)(-1))
+                            {
+                                var font = new Font("Arial", 10);
+                                var s = tmpG.MeasureString(Pad.Name, font);
+                                tmpG.DrawString(Pad.Name, font, new SolidBrush(Pad.Farbe), (float)DC2.Left, (float)(DC2.Top - s.Height - 3));
+                            }
+                        }
+                    }
+
+
+                    GR.DrawImage(_tmpBMP, new Rectangle(-DCoordinates.Width / 2, -DCoordinates.Height / 2, DCoordinates.Width, DCoordinates.Height));
+                }
             }
-
-            //If ForPrinting AndAlso _Pad IsNot Nothing Then
-            //    _tmpImage = CType(_Pad.ToImage(2), Bitmap)
-            //End If
-
-
-            if (_tmpBMP != null)
-            {
-                //var scale = (float)Math.Min(DCoordinates.Width / (double)_tmpBitmap.Width, DCoordinates.Height / (double)_tmpBitmap.Height);
-                //var r2 = new RectangleF((DCoordinates.Width - _tmpBitmap.Width * scale) / 2 + DCoordinates.Left, (DCoordinates.Height - _tmpBitmap.Height * scale) / 2 + DCoordinates.Top, _tmpBitmap.Width * scale, _tmpBitmap.Height * scale);
-
-                //GR.DrawImage(_tmpBitmap, r2, new RectangleF(0, 0, _tmpBitmap.Width, _tmpBitmap.Height), GraphicsUnit.Pixel);
-                GR.DrawImage(_tmpBMP, new Rectangle(-DCoordinates.Width / 2, -DCoordinates.Height / 2, DCoordinates.Width, DCoordinates.Height));
-            }
-
             GR.TranslateTransform(-trp.X, -trp.Y);
             GR.ResetTransform();
+
+
+
 
             if (!ForPrinting)
             {
                 GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
             }
+
+            if (TextLage != (enAlignment)(-1))
+            {
+                var p = new Pen(Farbe, 3);
+                p.DashPattern = new float[] { 10, 2, 1, 2 };
+                GR.DrawRectangle(p, DCoordinates);
+
+                var font = new Font("Arial", 10);
+                var s = GR.MeasureString(Name, font);
+                GR.DrawString(Name, font, new SolidBrush(Farbe), (float)DCoordinates.Left, (float)(DCoordinates.Top - s.Height - 3));
+
+            }
+
+
         }
-
-
 
 
         public override bool ParseThis(string tag, string value)
@@ -212,6 +283,11 @@ namespace BlueControls.ItemCollection
 
             switch (tag)
             {
+                //case "readabletext":
+                //    _ReadableText = value.FromNonCritical();
+                //    _VariableText = _ReadableText;
+                //    return true;
+
                 case "fixsize":
                     FixSize = value.FromPlusMinus();
                     return true;
@@ -224,6 +300,16 @@ namespace BlueControls.ItemCollection
                     return true;
                 case "checked":
                     return true;
+                case "embedded":
+                    AnsichtenVonMir = value.FromNonCritical().SplitByCRToList();
+                    return true;
+                case "color":
+                    Farbe = value.FromHTMLCode();
+                    return true;
+                case "pos":
+                    TextLage = (enAlignment)int.Parse(value);
+                    return true;
+
             }
             return false;
         }
@@ -235,10 +321,15 @@ namespace BlueControls.ItemCollection
             t = t.Substring(0, t.Length - 1) + ", ";
 
 
-            if (!string.IsNullOrEmpty(_Name))
-            {
-                t = t + "Name=" + _Name.ToNonCritical() + ", ";
-            }
+            if (!string.IsNullOrEmpty(_Name)) { t = t + "Name=" + _Name.ToNonCritical() + ", "; }
+
+            //if (!string.IsNullOrEmpty(_ReadableText)) { t = t + "ReadableText=" + _ReadableText.ToNonCritical() + ", "; }
+
+            if (TextLage != (enAlignment)(-1)) { t = t + "Pos=" + (int)TextLage + ", "; }
+
+            if (AnsichtenVonMir.Count > 0) { t = t + "Embedded=" + AnsichtenVonMir.JoinWithCr().ToNonCritical() + ", "; }
+
+            t = t + "Color=" + Farbe.ToHTMLCode() + ", ";
 
 
             if (PadInternal != null)
@@ -425,6 +516,22 @@ namespace BlueControls.ItemCollection
             var l = new List<FlexiControl>();
 
             l.Add(new FlexiControl("Name", _Name, enDataFormat.Text, 1));
+            //l.Add(new FlexiControl("Text", _VariableText, enDataFormat.Text, 5));
+
+            l.Add(new FlexiControl("Randfarbe", Farbe.ToHTMLCode(), enDataFormat.Text, 1));
+
+
+            var Lage = new ItemCollectionList();
+            Lage.Add(new TextListItem("-1", "ohne"));
+            Lage.Add(new TextListItem(((int)enAlignment.Top_Left).ToString(), "Links oben"));
+            //Lage.Add(new TextListItem(((int)enAlignment.Bottom_Left).ToString(), "Links unten"));
+            l.Add(new FlexiControl("Textlage", ((int)TextLage).ToString(), Lage));
+
+
+            l.Add(new FlexiControl("Eingebettete Ansichten", AnsichtenVonMir.JoinWithCr(), enDataFormat.Text, 5));
+
+
+
 
             l.AddRange(base.GetStyleOptions(sender, e));
             return l;
@@ -433,6 +540,14 @@ namespace BlueControls.ItemCollection
         public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         {
             _Name = Tags.TagGet("name").FromNonCritical();
+
+            TextLage = (enAlignment)int.Parse(Tags.TagGet("Textlage"));
+
+            AnsichtenVonMir = Tags.TagGet("Eingebettete Ansichten").FromNonCritical().SplitByCRToList();
+
+
+
+            Farbe = Tags.TagGet("Randfarbe").FromHTMLCode();
 
             base.DoStyleCommands(sender, Tags, ref CloseMenu);
 

@@ -128,8 +128,8 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl(true));
             l.Add(new FlexiControl("Symbol", ((int)Symbol).ToString(), Comms));
 
-            var x = Skin.GetRahmenArt(Parent.SheetStyle, true);
-            l.Add(new FlexiControl("Farbe", ((int)Style).ToString(), x));
+            //var x = Skin.GetRahmenArt(Parent.SheetStyle, true);
+            //l.Add(new FlexiControl("Farbe", ((int)Style).ToString(), x));
 
 
             l.Add(new FlexiControl("Randdicke", BorderWidth.ToString(), enDataFormat.Gleitkommazahl, 1));
@@ -150,7 +150,7 @@ namespace BlueControls.ItemCollection
             BorderColor = Tags.TagGet("Randfarbe").FromHTMLCode();
             decimal.TryParse(Tags.TagGet("Randdicke"), out BorderWidth);
             Symbol = (enSymbol)int.Parse(Tags.TagGet("Symbol"));
-            Style = (PadStyles)int.Parse(Tags.TagGet("Farbe"));
+            //Style = (PadStyles)int.Parse(Tags.TagGet("Farbe"));
 
         }
 

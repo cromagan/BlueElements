@@ -223,10 +223,7 @@ namespace BlueControls.ItemCollection
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
-            if (Art != enConectorStyle.Direct)
-            {
-                t = t + "Connection=" + (int)Art + ", ";
-            }
+            if (Art != enConectorStyle.Direct) { t = t + "Connection=" + (int)Art + ", "; }
             return t + "}";
         }
 

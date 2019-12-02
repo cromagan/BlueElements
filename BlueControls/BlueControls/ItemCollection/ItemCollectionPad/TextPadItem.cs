@@ -63,28 +63,7 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
         public TextPadItem() : this(string.Empty, string.Empty) { }
-        //public TextPadItem(string vInternalAndReadableText)
-        //{
-        //    if (vInternalAndReadableText.StartsWith("{")) { Develop.DebugPrint(enFehlerArt.Fehler, "Code zum Parsen übergeben!"); }
 
-        //    _Internal = vInternalAndReadableText;
-        //    _ReadableText = vInternalAndReadableText;
-        //    _VariableText = _ReadableText;
-        //    if (string.IsNullOrEmpty(_Internal))
-        //    {
-        //        Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-        //    }
-        //}
-
-
-        //public TextPadItem(string vInternalAndReadableText, enDataFormat cFormat)
-        //{
-        //    _Internal = vInternalAndReadableText;
-        //    _ReadableText = vInternalAndReadableText;
-        //    _VariableText = _ReadableText;
-        //    _Format = cFormat;
-        //    if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        //}
 
 
 
@@ -364,10 +343,7 @@ namespace BlueControls.ItemCollection
             var ot = _ReadableText;
             _ReadableText = Export.ParseVariable(_ReadableText, VariableName, Value, ValueType, enValueType.Text);
 
-            if (ot == _ReadableText)
-            {
-                return false;
-            }
+            if (ot == _ReadableText) { return false; }
 
             etxt = null;
 
