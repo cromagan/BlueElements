@@ -35,37 +35,39 @@ namespace BlueControls.Classes_Editor
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.Help = new  Button();
-            this.Rule_Aktion = new  ComboBox();
-            this.BlueLine1 = new  Line();
-            this.Rule_Action_Text = new  TextBox();
-            this.Rule_Aktion_Columns = new  ListBox();
-            this.Caption12 = new  Caption();
-            this.Caption16 = new  Caption();
-            this.Caption15 = new  Caption();
+            this.btnHelp = new Button();
+            this.cbxRuleAktion = new ComboBox();
+            this.BlueLine1 = new Line();
+            this.txbRuleActionText = new TextBox();
+            this.lstRuleAktionColumns = new ListBox();
+            this.capColumns = new Caption();
+            this.capText = new Caption();
+            this.capAktion = new Caption();
             this.SuspendLayout();
             //
             //Help
             //
-            this.Help.Anchor = (System.Windows.Forms.AnchorStyles)(System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right);
-            this.Help.ImageCode = "Information|20";
-            this.Help.Location = new Point(478, 15);
-            this.Help.Name = "Help";
-            this.Help.Size = new Size(40, 22);
-            this.Help.TabIndex = 13;
-            this.Help.Click += new EventHandler(Help_Click);
+            this.btnHelp.Anchor = (System.Windows.Forms.AnchorStyles)(System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right);
+            this.btnHelp.ImageCode = "Information|20";
+            this.btnHelp.Location = new Point(478, 15);
+            this.btnHelp.Name = "Help";
+            this.btnHelp.Size = new Size(40, 22);
+            this.btnHelp.TabIndex = 13;
+            this.btnHelp.Click += new EventHandler(btnHelp_Click);
             //
-            //Rule_Aktion
+            //cbxRuleAktion
             //
-            this.Rule_Aktion.Anchor = (System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right);
-            this.Rule_Aktion.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.Rule_Aktion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Rule_Aktion.Enabled = false;
-            this.Rule_Aktion.Format = enDataFormat.Text;
-            this.Rule_Aktion.Location = new Point(63, 15);
-            this.Rule_Aktion.Name = "Rule_Aktion";
-            this.Rule_Aktion.Size = new Size(415, 22);
-            this.Rule_Aktion.TabIndex = 12;
+            this.cbxRuleAktion.Anchor = (System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right);
+            this.cbxRuleAktion.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxRuleAktion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxRuleAktion.Enabled = false;
+            this.cbxRuleAktion.Format = enDataFormat.Text;
+            this.cbxRuleAktion.Location = new Point(63, 15);
+            this.cbxRuleAktion.Name = "cbxRuleAktion";
+            this.cbxRuleAktion.Size = new Size(415, 22);
+            this.cbxRuleAktion.TabIndex = 12;
+            this.cbxRuleAktion.ItemClicked += new EventHandler<BasicListItemEventArgs>(cbxRuleAktion_ItemClicked);
+            this.cbxRuleAktion.TextChanged += new EventHandler(cbxRuleAktion_TextChanged);
             //
             //BlueLine1
             //
@@ -76,82 +78,80 @@ namespace BlueControls.Classes_Editor
             this.BlueLine1.Size = new Size(512, 2);
             this.BlueLine1.Text = "BlueLine1";
             //
-            //Rule_Action_Text
+            //txbRuleActionText
             //
-            this.Rule_Action_Text.Anchor = (System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right);
-            this.Rule_Action_Text.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.Rule_Action_Text.Enabled = false;
-            this.Rule_Action_Text.Location = new Point(231, 79);
-            this.Rule_Action_Text.MultiLine = true;
-            this.Rule_Action_Text.Name = "Rule_Action_Text";
-            this.Rule_Action_Text.Size = new Size(287, 129);
-            this.Rule_Action_Text.TabIndex = 15;
-            this.Rule_Action_Text.Verhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            this.Rule_Action_Text.TextChanged += new EventHandler(Rule_Action_Text_TextChanged);
+            this.txbRuleActionText.Anchor = (System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right);
+            this.txbRuleActionText.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbRuleActionText.Enabled = false;
+            this.txbRuleActionText.Location = new Point(231, 79);
+            this.txbRuleActionText.MultiLine = true;
+            this.txbRuleActionText.Name = "txbRuleActionText";
+            this.txbRuleActionText.Size = new Size(287, 129);
+            this.txbRuleActionText.TabIndex = 15;
+            this.txbRuleActionText.Verhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.txbRuleActionText.TextChanged += new EventHandler(txbRuleActionText_TextChanged);
             //
-            //Rule_Aktion_Columns
+            //lstRuleAktionColumns
             //
-            this.Rule_Aktion_Columns.AddAllowed = enAddType.OnlySuggests;
-            this.Rule_Aktion_Columns.Anchor = (System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left);
-            this.Rule_Aktion_Columns.CheckBehavior = enCheckBehavior.MultiSelection;
-            this.Rule_Aktion_Columns.Enabled = false;
-            this.Rule_Aktion_Columns.FilterAllowed = true;
-            this.Rule_Aktion_Columns.Location = new Point(7, 79);
-            this.Rule_Aktion_Columns.Name = "Rule_Aktion_Columns";
-            this.Rule_Aktion_Columns.QuickInfo = "";
-            this.Rule_Aktion_Columns.Size = new Size(216, 129);
-            this.Rule_Aktion_Columns.TabIndex = 14;
-            this.Rule_Aktion_Columns.ItemClicked += new EventHandler<BasicListItemEventArgs>(Rule_Aktion_Columns_ItemClicked);
-            this.Rule_Aktion.ItemClicked += new EventHandler<BasicListItemEventArgs>(Rule_Aktion_ItemClicked);
-            this.Rule_Aktion.TextChanged += new EventHandler(Rule_Aktion_TextChanged);
+            this.lstRuleAktionColumns.AddAllowed = enAddType.OnlySuggests;
+            this.lstRuleAktionColumns.Anchor = (System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left);
+            this.lstRuleAktionColumns.CheckBehavior = enCheckBehavior.MultiSelection;
+            this.lstRuleAktionColumns.Enabled = false;
+            this.lstRuleAktionColumns.FilterAllowed = true;
+            this.lstRuleAktionColumns.Location = new Point(7, 79);
+            this.lstRuleAktionColumns.Name = "lstRuleAktionColumns";
+            this.lstRuleAktionColumns.QuickInfo = "";
+            this.lstRuleAktionColumns.Size = new Size(216, 129);
+            this.lstRuleAktionColumns.TabIndex = 14;
+            this.lstRuleAktionColumns.ItemClicked += new EventHandler<BasicListItemEventArgs>(lstRuleAktionColumns_ItemClicked);
             //
-            //Caption12
+            //capColumns
             //
-            this.Caption12.CausesValidation = false;
-            this.Caption12.Location = new Point(7, 59);
-            this.Caption12.Name = "Caption12";
-            this.Caption12.Size = new Size(112, 20);
-            this.Caption12.Text = "Betrifft Spalte(n):";
+            this.capColumns.CausesValidation = false;
+            this.capColumns.Location = new Point(7, 59);
+            this.capColumns.Name = "capColumns";
+            this.capColumns.Size = new Size(112, 20);
+            this.capColumns.Text = "Betrifft Spalte(n):";
             //
-            //Caption16
+            //capText
             //
-            this.Caption16.CausesValidation = false;
-            this.Caption16.Location = new Point(231, 59);
-            this.Caption16.Name = "Caption16";
-            this.Caption16.Size = new Size(88, 20);
-            this.Caption16.Text = "Items / Text:";
+            this.capText.CausesValidation = false;
+            this.capText.Location = new Point(231, 59);
+            this.capText.Name = "capText";
+            this.capText.Size = new Size(88, 20);
+            this.capText.Text = "Items / Text:";
             //
-            //Caption15
+            //capAktion
             //
-            this.Caption15.CausesValidation = false;
-            this.Caption15.Location = new Point(7, 15);
-            this.Caption15.Name = "Caption15";
-            this.Caption15.Size = new Size(56, 16);
-            this.Caption15.Text = "Aktion:";
+            this.capAktion.CausesValidation = false;
+            this.capAktion.Location = new Point(7, 15);
+            this.capAktion.Name = "Caption15";
+            this.capAktion.Size = new Size(56, 16);
+            this.capAktion.Text = "Aktion:";
             //
             //RuleActionItem_Editor
             //
-            this.Controls.Add(this.Help);
-            this.Controls.Add(this.Rule_Aktion);
+            this.Controls.Add(this.btnHelp);
+            this.Controls.Add(this.cbxRuleAktion);
             this.Controls.Add(this.BlueLine1);
-            this.Controls.Add(this.Rule_Action_Text);
-            this.Controls.Add(this.Rule_Aktion_Columns);
-            this.Controls.Add(this.Caption12);
-            this.Controls.Add(this.Caption16);
-            this.Controls.Add(this.Caption15);
+            this.Controls.Add(this.txbRuleActionText);
+            this.Controls.Add(this.lstRuleAktionColumns);
+            this.Controls.Add(this.capColumns);
+            this.Controls.Add(this.capText);
+            this.Controls.Add(this.capAktion);
             this.Name = "RuleActionItem_Editor";
             this.Size = new Size(527, 220);
             this.ResumeLayout(false);
 
         }
 
-        private Button Help;
-        private ComboBox Rule_Aktion;
+        private Button btnHelp;
+        private ComboBox cbxRuleAktion;
         private Line BlueLine1;
-        private TextBox Rule_Action_Text;
-        private ListBox Rule_Aktion_Columns;
-        private Caption Caption12;
-        private Caption Caption16;
-        private Caption Caption15;
+        private TextBox txbRuleActionText;
+        private ListBox lstRuleAktionColumns;
+        private Caption capColumns;
+        private Caption capText;
+        private Caption capAktion;
     }
 }

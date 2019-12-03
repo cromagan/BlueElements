@@ -50,6 +50,7 @@ namespace BlueBasics.Enums
         Excel,
         Farben,
         Farbrad,
+        Feder,
         Fernglas,
         Filmrolle,
         Formel,

@@ -114,7 +114,7 @@ namespace BlueControls.ItemCollection
         {
 
             _Bitmap = bitmap;
-            ImageChanged();
+
 
             P1 = new PointDF(this, "Punkt1", 0, 0, false, true, true);
             P2 = new PointDF(this, "Punkt2", 0, 0);
@@ -129,7 +129,7 @@ namespace BlueControls.ItemCollection
             _L2 = 0M;
 
             AdditionalPoints.Clear();
-
+            ImageChanged();
 
         }
 

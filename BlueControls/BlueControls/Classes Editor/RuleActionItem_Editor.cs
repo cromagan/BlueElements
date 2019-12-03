@@ -55,16 +55,16 @@ namespace BlueControls.Classes_Editor
 
 
 
-            Rule_Aktion.Item.Clear();
+            cbxRuleAktion.Item.Clear();
 
 
-            Rule_Aktion.Item.Add(new TextListItem("0+", "Wenn...", false));
+            cbxRuleAktion.Item.Add(new TextListItem("0+", "Wenn...", false));
             for (var z = 0; z <= 5000; z++)
             {
 
                 if (z == 1000)
                 {
-                    Rule_Aktion.Item.Add(new TextListItem("1000+", "Dann...", false));
+                    cbxRuleAktion.Item.Add(new TextListItem("1000+", "Dann...", false));
                 }
 
 
@@ -75,14 +75,14 @@ namespace BlueControls.Classes_Editor
                     var t = string.Empty;
                     QuickImage s = null;
                     RuleActionItem.MaximalText(tmp.Rule.Database, Ac, ref t, ref s);
-                    Rule_Aktion.Item.Add(new TextListItem(z.ToString(), t, s));
+                    cbxRuleAktion.Item.Add(new TextListItem(z.ToString(), t, s));
                 }
             }
 
 
-            Rule_Aktion_Columns.Item.Clear();
-            Rule_Aktion_Columns.Item.AddRange(tmp.Rule.Database.Column, false, false);
-            Rule_Aktion_Columns.Item.Sort();
+            lstRuleAktionColumns.Item.Clear();
+            lstRuleAktionColumns.Item.AddRange(tmp.Rule.Database.Column, false, false);
+            lstRuleAktionColumns.Item.Sort();
         }
 
         private void Enable_Action_Controls(bool CanDeleteAllData)
@@ -92,38 +92,38 @@ namespace BlueControls.Classes_Editor
             if (tmp != null)
             {
 
-                Help.Enabled = true;
-                Rule_Aktion.Enabled = true;
+                btnHelp.Enabled = true;
+                cbxRuleAktion.Enabled = true;
 
-                switch (RuleActionItem.NeededColumns(Rule_Aktion.Text))
+                switch (RuleActionItem.NeededColumns(cbxRuleAktion.Text))
                 {
                     case enNeededColumns.None:
-                        Rule_Aktion_Columns.Enabled = false;
+                        lstRuleAktionColumns.Enabled = false;
                         break;
                     case enNeededColumns.OnlyOne:
-                        Rule_Aktion_Columns.Enabled = true;
-                        Rule_Aktion_Columns.Item.CheckBehavior = enCheckBehavior.SingleSelection;
+                        lstRuleAktionColumns.Enabled = true;
+                        lstRuleAktionColumns.Item.CheckBehavior = enCheckBehavior.SingleSelection;
                         break;
                     default:
-                        Rule_Aktion_Columns.Enabled = true;
-                        Rule_Aktion_Columns.Item.CheckBehavior = enCheckBehavior.MultiSelection;
+                        lstRuleAktionColumns.Enabled = true;
+                        lstRuleAktionColumns.Item.CheckBehavior = enCheckBehavior.MultiSelection;
                         break;
                 }
 
 
 
-                switch (RuleActionItem.NeededText(Rule_Aktion.Text))
+                switch (RuleActionItem.NeededText(cbxRuleAktion.Text))
                 {
                     case enNeededText.None:
-                        Rule_Action_Text.Enabled = false;
+                        txbRuleActionText.Enabled = false;
                         break;
                     //case enNeededText.OnlyOneLine:
                     //    Rule_Action_Text.Enabled = true;
                     //    Rule_Action_Text.MultiLine = false;
                     //    break;
                     default:
-                        Rule_Action_Text.Enabled = true;
-                        Rule_Action_Text.MultiLine = true;
+                        txbRuleActionText.Enabled = true;
+                        txbRuleActionText.MultiLine = true;
 
                         break;
                 }
@@ -132,47 +132,47 @@ namespace BlueControls.Classes_Editor
             else
             {
 
-                Help.Enabled = false;
-                Rule_Aktion.Enabled = false;
-                Rule_Aktion_Columns.Enabled = false;
-                Rule_Action_Text.Enabled = false;
+                btnHelp.Enabled = false;
+                cbxRuleAktion.Enabled = false;
+                lstRuleAktionColumns.Enabled = false;
+                txbRuleActionText.Enabled = false;
 
             }
 
-            if (!Rule_Aktion.Enabled)
+            if (!cbxRuleAktion.Enabled)
             {
                 if (CanDeleteAllData)
                 {
-                    Rule_Aktion.Text = string.Empty;
+                    cbxRuleAktion.Text = string.Empty;
                 }
             }
 
-            if (!Rule_Action_Text.Enabled)
+            if (!txbRuleActionText.Enabled)
             {
                 if (CanDeleteAllData)
                 {
-                    Rule_Action_Text.Text = string.Empty;
+                    txbRuleActionText.Text = string.Empty;
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(Rule_Action_Text.Text))
+                    if (!string.IsNullOrEmpty(txbRuleActionText.Text))
                     {
-                        Rule_Action_Text.Enabled = true;
+                        txbRuleActionText.Enabled = true;
                     }
                 }
             }
 
-            if (!Rule_Aktion_Columns.Enabled)
+            if (!lstRuleAktionColumns.Enabled)
             {
                 if (CanDeleteAllData)
                 {
-                    Rule_Aktion_Columns.Item.UncheckAll();
+                    lstRuleAktionColumns.Item.UncheckAll();
                 }
                 else
                 {
-                    if (Rule_Aktion_Columns.Item.Checked().Count > 0)
+                    if (lstRuleAktionColumns.Item.Checked().Count > 0)
                     {
-                        Rule_Aktion_Columns.Enabled = true;
+                        lstRuleAktionColumns.Enabled = true;
                     }
                 }
             }
@@ -187,9 +187,9 @@ namespace BlueControls.Classes_Editor
 
             if (IsFilling()) { return; }
 
-            tmp.Action = (enAction)int.Parse(Rule_Aktion.Text);
+            tmp.Action = (enAction)int.Parse(cbxRuleAktion.Text);
 
-            var l = Rule_Aktion_Columns.Item.Checked();
+            var l = lstRuleAktionColumns.Item.Checked();
             tmp.Columns.Clear(); // = New List(Of ColumnItem)
 
             foreach (var t1 in l)
@@ -197,7 +197,7 @@ namespace BlueControls.Classes_Editor
                 tmp.Columns.Add((ColumnItem)((TextListItem)t1).Tags);
             }
 
-            tmp.Text = Rule_Action_Text.Text;
+            tmp.Text = txbRuleActionText.Text;
 
 
 
@@ -205,12 +205,12 @@ namespace BlueControls.Classes_Editor
             OnChanged(tmp);
         }
 
-        private void Rule_Aktion_Columns_ItemClicked(object sender, BasicListItemEventArgs e)
+        private void lstRuleAktionColumns_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             WriteBack();
         }
 
-        private void Rule_Aktion_ItemClicked(object sender, BasicListItemEventArgs e)
+        private void cbxRuleAktion_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             WriteBack();
         }
@@ -219,35 +219,35 @@ namespace BlueControls.Classes_Editor
         {
             Enabled = true;
 
-            Rule_Aktion.Text = ((int)tmp.Action).ToString();
+            cbxRuleAktion.Text = ((int)tmp.Action).ToString();
 
-            if (Rule_Aktion.Text == "0")
+            if (cbxRuleAktion.Text == "0")
             {
-                Rule_Aktion.Text = "0+";
+                cbxRuleAktion.Text = "0+";
             }
 
-            Rule_Aktion_Columns.Item.UncheckAll();
+            lstRuleAktionColumns.Item.UncheckAll();
             foreach (var t in tmp.Columns)
             {
-                if (t != null && Rule_Aktion_Columns.Item[t.Name] != null) { Rule_Aktion_Columns.Item[t.Name].Checked = true; }
+                if (t != null && lstRuleAktionColumns.Item[t.Name] != null) { lstRuleAktionColumns.Item[t.Name].Checked = true; }
             }
-            Rule_Action_Text.Text = tmp.Text;
+            txbRuleActionText.Text = tmp.Text;
 
 
 
             Enable_Action_Controls(false);
         }
 
-        private void Rule_Aktion_TextChanged(object sender, System.EventArgs e)
+        private void cbxRuleAktion_TextChanged(object sender, System.EventArgs e)
         {
             WriteBack();
         }
 
-        private void Help_Click(object sender, System.EventArgs e)
+        private void btnHelp_Click(object sender, System.EventArgs e)
         {
-            if (string.IsNullOrEmpty(Rule_Aktion.Text)) { return; }
+            if (string.IsNullOrEmpty(cbxRuleAktion.Text)) { return; }
 
-            var x = (enAction)int.Parse(Rule_Aktion.Text);
+            var x = (enAction)int.Parse(cbxRuleAktion.Text);
             if (x.ToString() == ((int)x).ToString()) { return; }
 
             MessageBox.Show(RuleActionItem.HelpTextinHTML(tmp.Rule.Database, x), enImageCode.Information, "OK");
@@ -255,7 +255,7 @@ namespace BlueControls.Classes_Editor
         }
 
 
-        private void Rule_Action_Text_TextChanged(object sender, System.EventArgs e)
+        private void txbRuleActionText_TextChanged(object sender, System.EventArgs e)
         {
             WriteBack();
         }

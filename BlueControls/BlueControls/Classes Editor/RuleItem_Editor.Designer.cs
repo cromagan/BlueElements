@@ -34,7 +34,7 @@ namespace BlueControls.Classes_Editor
         private void InitializeComponent()
         {
             this.RuleActionEditor = new RuleActionItem_Editor();
-            this.ActionSelector = new ListBox();
+            this.lstActionSelector = new ListBox();
             this.SuspendLayout();
             //
             //RuleActionEditor
@@ -48,33 +48,33 @@ namespace BlueControls.Classes_Editor
             this.RuleActionEditor.Text = "Aktion-Editor";
             this.RuleActionEditor.Changed += new EventHandler(RuleActionEditor_Changed);
             //
-            //ActionSelector
+            //lstActionSelector
             //
-            this.ActionSelector.AddAllowed = enAddType.UserDef;
-            this.ActionSelector.Anchor = (System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left);
-            this.ActionSelector.CheckBehavior = enCheckBehavior.AlwaysSingleSelection;
-            this.ActionSelector.FilterAllowed = true;
-            this.ActionSelector.Location = new Point(7, 16);
-            this.ActionSelector.Name = "ActionSelector";
-            this.ActionSelector.QuickInfo = "";
-            this.ActionSelector.RemoveAllowed = true;
-            this.ActionSelector.Size = new Size(472, 216);
-            this.ActionSelector.TabIndex = 5;
-            this.ActionSelector.AddClicked += new EventHandler(ActionSelector_AddClicked);
-            this.ActionSelector.ItemCheckedChanged += new EventHandler(ActionSelector_Item_CheckedChanged);
-            this.ActionSelector.ItemRemoving += ActionSelector_ItemRemoving;
+            this.lstActionSelector.AddAllowed = enAddType.UserDef;
+            this.lstActionSelector.Anchor = (System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left);
+            this.lstActionSelector.CheckBehavior = enCheckBehavior.AlwaysSingleSelection;
+            this.lstActionSelector.FilterAllowed = true;
+            this.lstActionSelector.Location = new Point(7, 16);
+            this.lstActionSelector.Name = "lstActionSelector";
+            this.lstActionSelector.QuickInfo = "";
+            this.lstActionSelector.RemoveAllowed = true;
+            this.lstActionSelector.Size = new Size(472, 216);
+            this.lstActionSelector.TabIndex = 5;
+            this.lstActionSelector.AddClicked += new EventHandler(ActionSelector_AddClicked);
+            this.lstActionSelector.ItemCheckedChanged += new EventHandler(lstActionSelector_ItemCheckedChanged);
+            this.lstActionSelector.ItemRemoving += lstActionSelector_ItemRemoving;
             //
             //RuleItem_Editor
             //
             this.Controls.Add(this.RuleActionEditor);
-            this.Controls.Add(this.ActionSelector);
+            this.Controls.Add(this.lstActionSelector);
             this.Name = "RuleItem_Editor";
             this.Size = new Size(1023, 243);
             this.ResumeLayout(false);
         }
 
         internal RuleActionItem_Editor RuleActionEditor;
-        private ListBox ActionSelector;
+        private ListBox lstActionSelector;
     }
 }
 

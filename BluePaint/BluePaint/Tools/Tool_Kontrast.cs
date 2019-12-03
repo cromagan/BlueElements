@@ -23,7 +23,7 @@ using static BlueBasics.Extensions;
 
 namespace BluePaint
 {
-    public partial class Tool_Kontrast : GenericTool
+    public partial class Tool_Kontrast : GenericTool // System.Windows.Forms.UserControl // 
     {
 
         public Tool_Kontrast()
@@ -34,16 +34,16 @@ namespace BluePaint
 
         private void btnKontrastErhoehen_Click(object sender, System.EventArgs e)
         {
-            if (_Pic == null ) { return; }
+            if (_Pic == null) { return; }
 
             OnForceUndoSaving();
 
             var ca = new Color();
             var cn = new Color();
 
-            for (var x = 0 ; x < _Pic.Width ; x++)
+            for (var x = 0; x < _Pic.Width; x++)
             {
-                for (var y = 0 ; y < _Pic.Height ; y++)
+                for (var y = 0; y < _Pic.Height; y++)
                 {
                     ca = _Pic.GetPixel(x, y);
                     if (ca.ToArgb() != Color.White.ToArgb())
@@ -74,9 +74,9 @@ namespace BluePaint
 
             var ca = new Color();
 
-            for (var x = 0 ; x < _Pic.Width ; x++)
+            for (var x = 0; x < _Pic.Width; x++)
             {
-                for (var y = 0 ; y < _Pic.Height ; y++)
+                for (var y = 0; y < _Pic.Height; y++)
                 {
                     ca = _Pic.GetPixel(x, y);
                     if (ca.ToArgb() != Color.White.ToArgb())
@@ -94,9 +94,9 @@ namespace BluePaint
             if (_Pic == null) { return; }
             OnForceUndoSaving();
 
-            for (var x = 0 ; x < _Pic.Width - 1 ; x++)
+            for (var x = 0; x < _Pic.Width - 1; x++)
             {
-                for (var y = 0 ; y < _Pic.Height - 1 ; y++)
+                for (var y = 0; y < _Pic.Height - 1; y++)
                 {
                     if (!_Pic.GetPixel(x + 1, y + 1).IsNearWhite(0.9)) { _Pic.SetPixel(x, y, Color.Black); }
                     if (!_Pic.GetPixel(x + 1, y).IsNearWhite(0.9)) { _Pic.SetPixel(x, y, Color.Black); }
@@ -105,6 +105,86 @@ namespace BluePaint
             }
 
             OnPicChangedByTool();
+
+        }
+
+        private void btnAusdünnen_Click(object sender, System.EventArgs e)
+        {
+
+            if (_Pic == null) { return; }
+            OnForceUndoSaving();
+
+            var again = false;
+
+
+            do
+            {
+                again = false;
+                for (var x = 0; x < _Pic.Width - 4; x++)
+                {
+                    for (var y = 0; y < _Pic.Height - 1; y++)
+                    {
+                        // .##. -> .#..
+                        if (_Pic.GetPixel(x + 0, y).IsNearWhite(0.9) &&
+                            !_Pic.GetPixel(x + 1, y).IsNearWhite(0.9) &&
+                            !_Pic.GetPixel(x + 2, y).IsNearWhite(0.9) &&
+                             _Pic.GetPixel(x + 3, y).IsNearWhite(0.9))
+                        {
+                            _Pic.SetPixel(x + 2, y, Color.White);
+                            again = true;
+                        }
+
+                        // .###. -> .##..
+                        if (_Pic.GetPixel(x + 0, y).IsNearWhite(0.9) &&
+                            !_Pic.GetPixel(x + 1, y).IsNearWhite(0.9) &&
+                             !_Pic.GetPixel(x + 2, y).IsNearWhite(0.9) &&
+                              !_Pic.GetPixel(x + 3, y).IsNearWhite(0.9) &&
+                          _Pic.GetPixel(x + 4, y).IsNearWhite(0.9))
+                        {
+                            _Pic.SetPixel(x + 3, y, Color.White);
+                            again = true;
+                        }
+                    }
+                }
+            } while (again);
+
+
+
+            do
+            {
+                again = false;
+                for (var x = 0; x < _Pic.Width -1; x++)
+                {
+                    for (var y = 0; y < _Pic.Height - 4; y++)
+                    {
+                        // .##. -> .#..
+                        if (_Pic.GetPixel(x , y+0).IsNearWhite(0.9) &&
+                            !_Pic.GetPixel(x , y+1).IsNearWhite(0.9) &&
+                            !_Pic.GetPixel(x , y+2).IsNearWhite(0.9) &&
+                             _Pic.GetPixel(x , y+3).IsNearWhite(0.9))
+                        {
+                            _Pic.SetPixel(x , y+2, Color.White);
+                            again = true;
+                        }
+
+                        // .###. -> .##..
+                        if (_Pic.GetPixel(x , y+0).IsNearWhite(0.9) &&
+                            !_Pic.GetPixel(x , y+1).IsNearWhite(0.9) &&
+                             !_Pic.GetPixel(x , y+2).IsNearWhite(0.9) &&
+                              !_Pic.GetPixel(x , y+3).IsNearWhite(0.9) &&
+                          _Pic.GetPixel(x , y+4).IsNearWhite(0.9))
+                        {
+                            _Pic.SetPixel(x , y+3, Color.White);
+                            again = true;
+                        }
+                    }
+                }
+            } while (again);
+
+
+            OnPicChangedByTool();
+
+
 
         }
     }

@@ -46,11 +46,12 @@ namespace BluePaint
             this.btnKontrastErhoehen = new BlueControls.Controls.Button();
             this.btnGraustufen = new BlueControls.Controls.Button();
             this.btnPixelHinzu = new BlueControls.Controls.Button();
+            this.btnAusdünnen = new BlueControls.Controls.Button();
             this.SuspendLayout();
             // 
             // btnAlleFarbenSchwarz
             // 
-            this.btnAlleFarbenSchwarz.ImageCode = "HoherKontrast";
+            this.btnAlleFarbenSchwarz.ImageCode = "Kontrast";
             this.btnAlleFarbenSchwarz.Location = new System.Drawing.Point(16, 120);
             this.btnAlleFarbenSchwarz.Name = "btnAlleFarbenSchwarz";
             this.btnAlleFarbenSchwarz.Size = new System.Drawing.Size(324, 48);
@@ -60,7 +61,7 @@ namespace BluePaint
             // 
             // btnKontrastErhoehen
             // 
-            this.btnKontrastErhoehen.ImageCode = "KontrastErhöhen";
+            this.btnKontrastErhoehen.ImageCode = "Kontrast||||||||||Pfeil_Oben";
             this.btnKontrastErhoehen.Location = new System.Drawing.Point(16, 8);
             this.btnKontrastErhoehen.Name = "btnKontrastErhoehen";
             this.btnKontrastErhoehen.Size = new System.Drawing.Size(324, 48);
@@ -88,8 +89,19 @@ namespace BluePaint
             this.btnPixelHinzu.Text = "Schwarze Pixel hinzufügen";
             this.btnPixelHinzu.Click += new System.EventHandler(this.btnPixelHinzu_Click);
             // 
+            // btnAusdünnen
+            // 
+            this.btnAusdünnen.ImageCode = "Feder|30";
+            this.btnAusdünnen.Location = new System.Drawing.Point(16, 232);
+            this.btnAusdünnen.Name = "btnAusdünnen";
+            this.btnAusdünnen.Size = new System.Drawing.Size(324, 48);
+            this.btnAusdünnen.TabIndex = 10;
+            this.btnAusdünnen.Text = "Schwarze Pixel entfernen";
+            this.btnAusdünnen.Click += new System.EventHandler(this.btnAusdünnen_Click);
+            // 
             // Tool_Kontrast
             // 
+            this.Controls.Add(this.btnAusdünnen);
             this.Controls.Add(this.btnPixelHinzu);
             this.Controls.Add(this.btnAlleFarbenSchwarz);
             this.Controls.Add(this.btnKontrastErhoehen);
@@ -104,6 +116,7 @@ namespace BluePaint
         internal Button btnKontrastErhoehen;
         internal Button btnGraustufen;
         internal Button btnPixelHinzu;
+        internal Button btnAusdünnen;
     }
 
 }

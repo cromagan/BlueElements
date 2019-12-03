@@ -177,7 +177,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             // Export ------------
             var NewExports = new List<ExportDefinition>();
-            foreach (var ThisItem in ExportSets.Item)
+            foreach (var ThisItem in lbxExportSets.Item)
             {
                 NewExports.Add((ExportDefinition)((TextListItem)ThisItem).Tags);
             }
@@ -254,16 +254,16 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             // Exports ----------------
-            ExportSets.Item.Clear();
+            lbxExportSets.Item.Clear();
 
             foreach (var ThisSet in _Database.Export)
             {
                 if (ThisSet != null)
                 {
-                    ExportSets.Item.Add(new TextListItem(ThisSet));
+                    lbxExportSets.Item.Add(new TextListItem(ThisSet));
                 }
             }
-            ExportSets.Item.Sort();
+            lbxExportSets.Item.Sort();
 
             // -----------------------------
 
@@ -325,13 +325,13 @@ namespace BlueControls.BlueDatabaseDialogs
         private void ExportSets_AddClicked(object sender, System.EventArgs e)
         {
             var NewExportItem = new TextListItem(new ExportDefinition(_Database));
-            ExportSets.Item.Add(NewExportItem);
+            lbxExportSets.Item.Add(NewExportItem);
             NewExportItem.Checked = true;
         }
 
-        private void ExportSets_Item_CheckedChanged(object sender, System.EventArgs e)
+        private void lbxExportSets_ItemCheckedChanged(object sender, System.EventArgs e)
         {
-            if (ExportSets.Item.Checked().Count != 1)
+            if (lbxExportSets.Item.Checked().Count != 1)
             {
                 ExportEditor.ObjectWithDialog = null;
                 return;
@@ -342,7 +342,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 ExportEditor.ObjectWithDialog = null;
                 return;
             }
-            var SelectedExport = (ExportDefinition)((TextListItem)ExportSets.Item.Checked()[0]).Tags;
+            var SelectedExport = (ExportDefinition)((TextListItem)lbxExportSets.Item.Checked()[0]).Tags;
 
             ExportEditor.ObjectWithDialog = SelectedExport;
         }
@@ -421,7 +421,7 @@ namespace BlueControls.BlueDatabaseDialogs
         #endregion
 
 
-        private void ExportSets_RemoveClicked(object sender, ListOfBasicListItemEventArgs e)
+        private void lbxExportSets_RemoveClicked(object sender, ListOfBasicListItemEventArgs e)
         {
             foreach (var thisitem in e.Items)
             {
@@ -533,7 +533,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         }
 
-        private void FremdImport_Click(object sender, System.EventArgs e)
+        private void btnFremdImport_Click(object sender, System.EventArgs e)
         {
             if (_Database.ReadOnly) { return; }
 
@@ -800,6 +800,36 @@ namespace BlueControls.BlueDatabaseDialogs
             if (RuleItemEditor.ObjectWithDialog == ((TextListItem)e.Item).Tags)
             {
                 RuleItemEditor.ObjectWithDialog = null;
+            }
+        }
+
+        private void RuleItemEditor_Changed(object sender, System.EventArgs e)
+        {
+            foreach (var thisitem in lbxRuleSelector.Item)
+            {
+                if (thisitem is TextListItem tli)
+                {
+                    if (tli.Tags == RuleItemEditor.ObjectWithDialog)
+                    {
+                        tli.Text = RuleItemEditor.ObjectWithDialog.ReadableText();
+                        tli.Symbol = RuleItemEditor.ObjectWithDialog.SymbolForReadableText();
+                    }
+                }
+            }
+        }
+
+        private void ExportEditor_Changed(object sender, System.EventArgs e)
+        {
+            foreach (var thisitem in lbxExportSets.Item)
+            {
+                if (thisitem is TextListItem tli)
+                {
+                    if (tli.Tags == ExportEditor.ObjectWithDialog)
+                    {
+                        tli.Text = ExportEditor.ObjectWithDialog.ReadableText();
+                        tli.Symbol = ExportEditor.ObjectWithDialog.SymbolForReadableText();
+                    }
+                }
             }
         }
     }

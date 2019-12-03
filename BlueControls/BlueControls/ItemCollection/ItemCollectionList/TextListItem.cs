@@ -146,12 +146,12 @@ namespace BlueControls.ItemCollection
             {
                 return _Symbol;
             }
-            //set
-            //{
-            //    if (value == _Symbolx) { return; }
-            //    _Symbolx = value;
-            //    OnChanged();
-            //}
+            set
+            {
+                if (value == _Symbol) { return; }
+                _Symbol = value;
+                OnChanged();
+            }
         }
 
 
