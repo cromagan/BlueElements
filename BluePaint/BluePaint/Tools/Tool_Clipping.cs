@@ -70,7 +70,7 @@ namespace BluePaint
             gr.DrawLine(Pen_Blau, e.TrimmedX, 0, e.TrimmedX, _Pic.Height);
             gr.DrawLine(Pen_Blau, 0, e.TrimmedY, _Pic.Width, e.TrimmedY);
 
-            if (e.Button == System.Windows.Forms. MouseButtons.Left)
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
                 gr.DrawLine(Pen_Blau, _MouseDown.X, 0, _MouseDown.X, _Pic.Height);
                 gr.DrawLine(Pen_Blau, 0, _MouseDown.Y, _Pic.Width, _MouseDown.Y);
@@ -83,7 +83,7 @@ namespace BluePaint
         {
             if (_Pic == null || _PicPreview == null) { return; }
             _AutoCropping = true;
-         //   var NP = PointInsidePic(e);
+            //   var NP = PointInsidePic(e);
 
             Links.Value = Math.Min(e.TrimmedX, _MouseDown.X) + 1;
             Recht.Value = -(_Pic.Width - Math.Max(e.TrimmedX, _MouseDown.X));
@@ -141,7 +141,7 @@ namespace BluePaint
 
         private void ZuschnittOK_Click(object sender, System.EventArgs e)
         {
-            var _BMP2 = Crop(_Pic, (int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
+            var _BMP2 = _Pic.Crop((int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
 
             OnOverridePic(new BitmapEventArgs(_BMP2));
             Links.Value = 0;
@@ -161,19 +161,19 @@ namespace BluePaint
             _AutoCropping = true;
             OnZoomFit();
 
-            modAllgemein.GetAutoValuesForCrop(_Pic, out var Left, out var Right, out var Top, out var Bottom, 0.9);
+            var pa = _Pic.GetAutoValuesForCrop(0.9);
 
-            Links.Value = Left;
-            Recht.Value = Right;
-            Oben.Value = Top;
-            Unten.Value = Bottom;
+            Links.Value = pa.Left;
+            Recht.Value = pa.Right;
+            Oben.Value = pa.Top;
+            Unten.Value = pa.Bottom;
 
             _AutoCropping = false;
 
             ValueChanged(this, System.EventArgs.Empty);
         }
 
-              public void Set(int Left, int Top, int Right, int Bottom)
+        public void Set(int Left, int Top, int Right, int Bottom)
         {
 
             if (Left < 0 || Top < 0 || Right > 0 || Bottom > 0)

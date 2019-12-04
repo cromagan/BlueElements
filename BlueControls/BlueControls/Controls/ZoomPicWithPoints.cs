@@ -180,17 +180,12 @@ namespace BlueControls.Controls
 
         private void WritePointsInTags()
         {
-
             var Old = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
 
             foreach (var thisO in Old)
             {
                 Tags.TagSet(thisO, string.Empty);
-                //Tags.TagSet(thisO + "-X", string.Empty);
-                //Tags.TagSet(thisO + "-Y", string.Empty);
             }
-
-
 
             var s = string.Empty;
 
@@ -198,13 +193,9 @@ namespace BlueControls.Controls
             {
                 s = s + ThisP.Name + "|";
                 Tags.TagSet(ThisP.Name, ThisP.ToString());
-                //Tags.TagSet(ThisP.Name + "-X", ThisP.X.ToString());
-                //Tags.TagSet(ThisP.Name + "-Y", ThisP.Y.ToString());
             }
 
-
             Tags.TagSet("AllPointNames", s.TrimEnd("|").ToNonCritical());
-
         }
 
         public PointDF GetPoint(string name)
@@ -494,8 +485,37 @@ namespace BlueControls.Controls
                 Tags.TagSet("Datum", DateTime.Now.ToString());
                 Tags.Save(pathtxt, false);
             }
+        }
 
 
+        public static Tuple<Bitmap, List<string>> ResizeData(Bitmap pic, List<string> tags, int width, int height)
+        {
+
+            var zoomx = (decimal)width / pic.Width;
+            var zoomy = (decimal)height / pic.Height;
+
+
+            var pic2 = pic.Resize(width, height, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
+
+            var tags2 = new List<string>(tags);
+
+
+            var Names = tags2.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
+
+
+
+            foreach (var thisO in Names)
+            {
+                var s = tags2.TagGet(thisO);
+                var ThisP = new PointDF(null, s);
+
+                ThisP.X = ThisP.X * zoomx;
+                ThisP.Y = ThisP.Y * zoomy;
+                tags2.TagSet(ThisP.Name, ThisP.ToString());
+            }
+
+
+            return new Tuple<Bitmap, List<string>>(pic2, tags2);
 
         }
     }

@@ -1,14 +1,11 @@
-using System;
-using System.Diagnostics;
-using System.Drawing;
 using BlueControls.Controls;
-using BlueControls.Enums;
+using System.Diagnostics;
 
 namespace BlueControls.BlueDatabaseDialogs
-    {
+{
 
 
-        internal sealed partial class SearchAndReplace
+    internal sealed partial class SearchAndReplace
         {
 			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
 			[DebuggerNonUserCode()]

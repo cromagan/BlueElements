@@ -49,9 +49,9 @@ namespace BlueBrain
             var Letters = AllLetters.Select((t, z) => AllLetters.Substring(z, 1)).ToList();
 
 
-            for (var x = 0 ; x < 10 ; x++)
+            for (var x = 0; x < 10; x++)
             {
-                for (var y = 0 ; y < 10 ; y++)
+                for (var y = 0; y < 10; y++)
                 {
                     Koords.Add(x + "|" + y);
                 }
@@ -75,9 +75,9 @@ namespace BlueBrain
             if (BMP.Width != 10 || BMP.Height != 10) { BMP = BMP.Resize(10, 10, enSizeModes.EmptySpace, InterpolationMode.HighQualityBicubic, true); }
 
 
-            for (var x = 0 ; x < BMP.Width ; x++)
+            for (var x = 0; x < BMP.Width; x++)
             {
-                for (var y = 0 ; y < BMP.Height ; y++)
+                for (var y = 0; y < BMP.Height; y++)
                 {
                     Brain.InputLayer.SetValue(x + "|" + y, BMP.GetPixel(x, y).R / 127.5 - 1);
                 }
@@ -93,7 +93,7 @@ namespace BlueBrain
             var Count = 0;
             Error = Brain.BackPropagationGradiant(TrainTo, 0.001, true);
             var v = Brain.OutputLayer.SoftMaxValue(TrainTo);
-            var nv = Brain.OutputLayer.SoftMaxValue(TrainTo); 
+            var nv = Brain.OutputLayer.SoftMaxValue(TrainTo);
 
             do
             {
@@ -164,7 +164,7 @@ namespace BlueBrain
             var Again = false;
             var PixAnz = BMP.Width * BMP.Height;
 
-            BMP = modAllgemein.Grayscale(BMP);
+            BMP = BMP.Grayscale();
 
             do
             {
@@ -174,9 +174,9 @@ namespace BlueBrain
                 var NearBlack = 0;
                 var NearWhite = 0;
 
-                for (var y = 0 ; y < BMP.Height ; y++)
+                for (var y = 0; y < BMP.Height; y++)
                 {
-                    for (var x = 0 ; x < BMP.Width ; x++)
+                    for (var x = 0; x < BMP.Width; x++)
                     {
                         var c = BMP.GetPixel(x, y);
                         var h = c.GetBrightness();
@@ -196,7 +196,7 @@ namespace BlueBrain
                 if (Dark > Light * 5)
                 {
                     Again = true;
-                    BMP = modAllgemein.Invert(BMP);
+                    BMP = BMP.Invert();
                     modAllgemein.Swap(ref NearBlack, ref NearWhite);
                 }
 
@@ -205,7 +205,7 @@ namespace BlueBrain
 
                 if (NearBlack < PixAnz / 50 && NearWhite < PixAnz / 5)
                 {
-                    BMP = modAllgemein.SetBrightnessContrastGamma(BMP, 0, 0.2f, 1.1f);
+                    BMP = BMP.SetBrightnessContrastGamma(0, 0.2f, 1.1f);
                     //BlueBasics.Forms.PictureView x2 = new Forms.PictureView(BMP);
                     //x2.ShowDialog();
                     Again = true;
@@ -213,7 +213,7 @@ namespace BlueBrain
                 }
                 else if (NearBlack < PixAnz / 50 && NearWhite > PixAnz / 5)
                 {
-                    BMP = modAllgemein.SetBrightnessContrastGamma(BMP, -0.2f, 0.1f, 1.1f);
+                    BMP = BMP.SetBrightnessContrastGamma(-0.2f, 0.1f, 1.1f);
                     Again = true;
                     //BlueBasics.Forms.PictureView x3 = new Forms.PictureView(BMP);
                     //x3.ShowDialog();
@@ -221,7 +221,7 @@ namespace BlueBrain
                 }
                 else if (NearBlack > PixAnz / 50 && NearWhite < PixAnz / 5)
                 {
-                    BMP = modAllgemein.SetBrightnessContrastGamma(BMP, 0.05f, 0.1f, 1);
+                    BMP = BMP.SetBrightnessContrastGamma(0.05f, 0.1f, 1);
                     //BlueBasics.Forms.PictureView x4 = new Forms.PictureView(BMP);
                     //x4.ShowDialog();
                     Again = true;
@@ -239,12 +239,12 @@ namespace BlueBrain
             var Anfang = -1;
 
 
-            for (var y = 0 ; y < BMP.Height ; y++)
+            for (var y = 0; y < BMP.Height; y++)
             {
                 var Dark = 0;
                 var Light = 0;
 
-                for (var x = 0 ; x < BMP.Width ; x++)
+                for (var x = 0; x < BMP.Width; x++)
                 {
                     var h = BMP.GetPixel(x, y).GetBrightness();
                     if (h < 0.4)
@@ -271,7 +271,7 @@ namespace BlueBrain
 
                 if (Anfang != -1 && Ende != -1)
                 {
-                    tx = tx + AnalyseBMPAreaY(modAllgemein.Crop(BMP, 0, 0, Anfang, -(BMP.Height - Ende) + 1)) + "\r\n";
+                    tx = tx + AnalyseBMPAreaY(BMP.Crop(0, 0, Anfang, -(BMP.Height - Ende) + 1)) + "\r\n";
                     Anfang = -1;
                     Ende = -1;
                 }
@@ -296,11 +296,11 @@ namespace BlueBrain
 
 
 
-            for (var x = 0 ; x < BMP.Width ; x++)
+            for (var x = 0; x < BMP.Width; x++)
             {
                 var Dark = 0;
 
-                for (var y = 0 ; y < BMP.Height ; y++)
+                for (var y = 0; y < BMP.Height; y++)
                 {
                     var h = BMP.GetPixel(x, y).GetBrightness();
                     if (h < 0.4)
@@ -322,7 +322,7 @@ namespace BlueBrain
 
                 if (Anfang != -1 && Ende != -1)
                 {
-                    var c = AnalyseBMPAreaXY(modAllgemein.Crop(BMP, Anfang, -(BMP.Width - Ende) + 1, 0, 0));
+                    var c = AnalyseBMPAreaXY(BMP.Crop(Anfang, -(BMP.Width - Ende) + 1, 0, 0));
                     if (string.IsNullOrEmpty(c)) { c = "?"; }
                     tx = tx + c;
                     Anfang = -1;
@@ -336,7 +336,7 @@ namespace BlueBrain
 
         private static string AnalyseBMPAreaXY(Bitmap BMP)
         {
-            BMP = modAllgemein.AutoCrop(BMP,0.7);
+            BMP = BMP.AutoCrop(0.7);
             //BlueBasics.Forms.PictureView x2 = new Forms.PictureView(BMP);
             //x2.ShowDialog();
             return AnalyseChar(BMP, string.Empty, out _);

@@ -218,6 +218,9 @@ namespace BlueControls.Controls
         #region  SelectedIndexChanging event Implementation 
         protected override void WndProc(ref System.Windows.Forms.Message m)
         {
+
+            try
+            {
             if (m.Msg == (int)enWndProc.WM_REFLECT + (int)enWndProc.WM_NOTIFY)
             {
                 var hdr = (NMHDR)Marshal.PtrToStructure(m.LParam, typeof(NMHDR));
@@ -240,6 +243,14 @@ namespace BlueControls.Controls
             if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
 
             base.WndProc(ref m);
+            }
+
+            catch
+            {
+
+            }
+
+
         }
 
         private void OnSelectedIndexChanging(TabControlEventArgs e)

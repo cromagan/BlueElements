@@ -28,7 +28,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 
 namespace BlueControls.ItemCollection
 {
@@ -236,8 +235,8 @@ namespace BlueControls.ItemCollection
                                 var mb2 = Pad.PadInternal.MaxBounds(Pad.ZoomItems);
                                 mb2.Inflate(-1, -1);
                                 var tmpG = Graphics.FromImage(_tmpBMP);
-                                var p = new Pen(Pad.Farbe, (float)(9 * cZoom));
-                                var p2 = new Pen(Color.White, (float)(9 * cZoom) + 2f);
+                                var p = new Pen(Pad.Farbe, (float)(8.7m * cZoom));
+                                var p2 = new Pen(Color.White, (float)(8.7m * cZoom) + 2f);
                                 p.DashPattern = new float[] { 5, 1, 1, 1 };
                                 var DC2 = mb2.ZoomAndMoveRect(zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y);
                                 tmpG.DrawRectangle(p2, DC2);
@@ -270,7 +269,7 @@ namespace BlueControls.ItemCollection
 
                 if (TextLage != (enAlignment)(-1))
                 {
-                    var p = new Pen(Farbe, (float)(9 * cZoom));
+                    var p = new Pen(Farbe, (float)(8.7m * cZoom));
                     p.DashPattern = new float[] { 10, 2, 1, 2 };
                     GR.DrawRectangle(p, DCoordinates);
 

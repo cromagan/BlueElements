@@ -41,10 +41,10 @@ namespace BlueControls.Forms
         {
             try
             {
-                if (disposing && components != null)
-                {
-                    components.Dispose();
-                }
+                //if (disposing && components != null)
+                //{
+                //    components.Dispose();
+                //}
             }
             finally
             {
@@ -53,7 +53,7 @@ namespace BlueControls.Forms
         }
 
         //Wird vom Windows Form-Designer benötigt.
-        private IContainer components;
+       // private IContainer components;
 
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  

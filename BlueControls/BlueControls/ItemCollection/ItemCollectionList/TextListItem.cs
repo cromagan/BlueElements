@@ -32,7 +32,7 @@ namespace BlueControls.ItemCollection
         private string _ReadableText;
         private QuickImage _Symbol;
         private readonly enDataFormat _Format = enDataFormat.Text;
-        private bool _IsCaption;
+        readonly private bool _IsCaption;
 
 
         #endregion

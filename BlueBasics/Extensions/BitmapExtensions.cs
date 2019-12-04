@@ -47,6 +47,108 @@ namespace BlueBasics
 
         }
 
+        public static void AllePixelZuSchwarz(this Bitmap _Pic, double nearWhiteSchwelle)
+        {
+            for (var x = 0; x < _Pic.Width; x++)
+            {
+                for (var y = 0; y < _Pic.Height; y++)
+                {
+                    var ca = _Pic.GetPixel(x, y);
+                    if (!ca.IsNearWhite(nearWhiteSchwelle))
+                    {
+                        _Pic.SetPixel(x, y, Color.FromArgb(ca.A, 0, 0, 0));
+                    }
+                }
+            }
+        }
+
+        public static void AllePixelZuWeiß(this Bitmap _Pic, double nearBlackSchwelle)
+        {
+            for (var x = 0; x < _Pic.Width; x++)
+            {
+                for (var y = 0; y < _Pic.Height; y++)
+                {
+                    var ca = _Pic.GetPixel(x, y);
+                    if (!ca.IsNearBlack(nearBlackSchwelle))
+                    {
+                        _Pic.SetPixel(x, y, Color.FromArgb(ca.A, 255, 255, 255));
+                    }
+                }
+            }
+        }
+
+
+        public static void Ausdünnen(this Bitmap pic, int staerke)
+        {
+
+
+
+            for (var x = 0; x < pic.Width - 1; x++)
+            {
+                for (var y = 0; y < pic.Height - 1; y++)
+                {
+                    if (!IsWhite(x, y))
+                    {
+                        for (var wi = staerke; wi > 0; wi--)
+                        {
+
+                            var ma1 = (int)Math.Floor((float)wi / 2);
+                            var ma2 = wi - ma1;
+
+                            // X                        
+                            if (IsWhite(x - ma1 - 1, y) && IsWhite(x + ma2 + 1, y))
+                            {
+                                var allblack = true;
+
+                                for (var ch = -ma1; ch <= ma2; ch++)
+                                {
+                                    if (IsWhite(x + ch, y)) { allblack = false; break; }
+                                }
+
+                                if (allblack)
+                                {
+                                    for (var ch = -ma1; ch <= ma2; ch++)
+                                    {
+                                        if (ch != 0) { pic.SetPixel(x + ch, y, Color.White); }
+                                    }
+                                }
+                            }
+
+                            // Y                        
+                            if (IsWhite(x, y - ma1 - 1) && IsWhite(x, y + ma2 + 1))
+                            {
+                                var allblack = true;
+
+                                for (var ch = -ma1; ch <= ma2; ch++)
+                                {
+                                    if (IsWhite(x, y + ch)) { allblack = false; break; }
+                                }
+
+                                if (allblack)
+                                {
+                                    for (var ch = -ma1; ch <= ma2; ch++)
+                                    {
+                                        if (ch != 0) { pic.SetPixel(x, y + ch, Color.White); }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            bool IsWhite(int x, int y)
+            {
+                if (x < 0 || y < 0) { return true; }
+                if (x >= pic.Width || y >= pic.Height) { return true; }
+                return pic.GetPixel(x, y).IsNearWhite(0.9);
+            }
+
+
+        }
+
+
 
         public static Bitmap Image_Clone(this Bitmap SourceBMP)
         {
@@ -163,6 +265,265 @@ namespace BlueBasics
                 return null;
             }
         }
+
+        public static Bitmap Invert(this Bitmap source)
+        {
+            //create a blank bitmap the same size as original
+            var newBitmap = new Bitmap(source.Width, source.Height);
+
+            //get a graphics object from the new image
+            var g = Graphics.FromImage(newBitmap);
+
+            // create the negative color matrix
+            var colorMatrix = new ColorMatrix(new[]
+            {
+                new float[] {-1, 0, 0, 0, 0},
+                new float[] {0, -1, 0, 0, 0},
+                new float[] {0, 0, -1, 0, 0},
+                new float[] {0, 0, 0, 1, 0},
+                new float[] {1, 1, 1, 0, 1}
+            });
+
+            // create some image attributes
+            var attributes = new ImageAttributes();
+
+            attributes.SetColorMatrix(colorMatrix);
+
+            g.DrawImage(source, new Rectangle(0, 0, source.Width, source.Height),
+                        0, 0, source.Width, source.Height, GraphicsUnit.Pixel, attributes);
+
+            //dispose the Graphics object
+            g.Dispose();
+
+            return newBitmap;
+        }
+
+        public static Bitmap Crop(this Bitmap _Pic, Rectangle R)
+        {
+            return _Pic.Crop(R.Left, -(_Pic.Width - R.Right), R.Top, -(_Pic.Height - R.Bottom));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_Pic"></param>
+        /// <param name="Left">Positiver Wert schneidet diese Anzahl von Pixel vom linken Rand weg.</param>
+        /// <param name="Right">Negativer Wert schneidet diese Anzahl von Pixel vom rechten Rand weg.</param>
+        /// <param name="Top">Positiver Wert schneidet diese Anzahl von Pixel vom oberen Rand weg.</param>
+        /// <param name="Bottom">Negativer Wert schneidet diese Anzahl von Pixel vom unteren Rand weg.</param>
+        /// <returns></returns>
+        public static Bitmap Crop(this Bitmap _Pic, int Left, int Right, int Top, int Bottom)
+        {
+            if (Left == 0 && Right == 0 && Top == 0 && Bottom == 0) { return _Pic; }
+
+            if (_Pic == null) { return null; }
+
+            modAllgemein.CollectGarbage();
+
+            var w = Math.Max((int)(_Pic.Width - Left + Right), 1);
+            var h = Math.Max((int)(_Pic.Height - Top + Bottom), 1);
+
+            var _BMP2 = new Bitmap(w, h);
+            using (var GR = Graphics.FromImage(_BMP2))
+            {
+                GR.DrawImage(_Pic, new Point(-Left, -Top));
+            }
+
+            modAllgemein.CollectGarbage();
+
+            return _BMP2;
+
+        }
+
+
+        public static Bitmap AutoCrop(this Bitmap _Pic, double MinBrightness)
+        {
+            var pa = _Pic.GetAutoValuesForCrop(MinBrightness);
+            return Crop(_Pic, pa.Left, pa.Right, pa.Top, pa.Bottom);
+        }
+
+        public static System.Windows.Forms.Padding GetAutoValuesForCrop(this Bitmap _Pic, double MinBrightness)
+        {
+            var pa = new System.Windows.Forms.Padding(0, 0, 0, 0);
+            if (_Pic == null) { return pa; }
+
+            var x = 0;
+            var Y = 0;
+            var ExitNow = false;
+
+            do
+            {
+                for (Y = 0; Y < _Pic.Height; Y++)
+                {
+                    if (!_Pic.GetPixel(x, Y).IsNearWhite(MinBrightness))
+                    {
+                        ExitNow = true;
+                        break;
+                    }
+                }
+                if (ExitNow) { break; }
+
+                x += 1;
+                if (x > _Pic.Width * 0.9) { break; }
+            } while (true);
+
+            pa.Left = x;
+
+            // -------------
+            x = _Pic.Width - 1;
+
+            ExitNow = false;
+            do
+            {
+                for (Y = 0; Y < _Pic.Height; Y++)
+                {
+                    if (!_Pic.GetPixel(x, Y).IsNearWhite(MinBrightness))
+                    {
+                        ExitNow = true;
+                        break;
+                    }
+                }
+                if (ExitNow) { break; }
+                x -= 1;
+                if (x < _Pic.Width * 0.1) { break; }
+            } while (true);
+
+            pa.Right = x - _Pic.Width + 1;
+
+
+            // -------------
+            Y = 0;
+            ExitNow = false;
+            do
+            {
+                for (x = 0; x < _Pic.Width; x++)
+                {
+                    if (!_Pic.GetPixel(x, Y).IsNearWhite(MinBrightness))
+                    {
+                        ExitNow = true;
+                        break;
+                    }
+                }
+                if (ExitNow) { break; }
+                Y += 1;
+                if (Y > _Pic.Height * 0.9) { break; }
+            } while (true);
+
+            pa.Top = Y;
+
+
+            // -------------
+            Y = _Pic.Height - 1;
+            ExitNow = false;
+            do
+            {
+                for (x = 0; x < _Pic.Width; x++)
+                {
+                    if (!_Pic.GetPixel(x, Y).IsNearWhite(MinBrightness))
+                    {
+                        ExitNow = true;
+                        break;
+                    }
+                }
+                if (ExitNow) { break; }
+                Y -= 1;
+                if (Y < _Pic.Height * 0.1) { break; }
+            } while (true);
+            pa.Bottom = Y - _Pic.Height + 1;
+
+            return pa;
+        }
+
+
+
+
+        public static Bitmap Grayscale(this Bitmap original)
+        {
+            var newBitmap = new Bitmap(original.Width, original.Height);
+            var g = Graphics.FromImage(newBitmap);
+
+            var colorMatrix = new ColorMatrix(
+               new[]
+               {
+                   new[] {.3f, .3f, .3f, 0, 0},
+                   new[] {.59f, .59f, .59f, 0, 0},
+                   new[] {.11f, .11f, .11f, 0, 0},
+                   new float[] {0, 0, 0, 1, 0},
+                   new float[] {0, 0, 0, 0, 1}
+               });
+
+            var attributes = new ImageAttributes();
+            attributes.SetColorMatrix(colorMatrix);
+
+            g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height), 0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
+            g.Dispose();
+            return newBitmap;
+        }
+
+
+        /// <summary>
+        /// Helligkeit, Kontrast und Gammawert eines Bitmaps ändern
+        /// </summary>
+        /// <param name="InBitmap">Bitmap-Objekt</param>
+        /// <param name="Brightness">Heligkeit (-1 bis 1) 0 = Normal</param>
+        /// <param name="Contrast">Kontrast (-1 bis 1) 0 = Normal</param>
+        /// <param name="Gamma">Gammawert (0 bis 2) 1 = Normal</param>
+        /// <returns>Bitmap-Objekt</returns>
+        public static Bitmap SetBrightnessContrastGamma(this Bitmap InBitmap, float Brightness, float Contrast, float Gamma)
+        {
+
+            // Min/Max
+            if (Brightness > 1) { Brightness = 1; }
+            if (Brightness < -1) { Brightness = -1; }
+            if (Contrast > 1) { Contrast = 1; }
+            if (Contrast < -1) { Contrast = -1; }
+
+            // Gammawert darf nicht = 0 sein (Bug in GDI+)
+            if (Gamma == 0) { Gamma = Convert.ToSingle(Gamma + 1.0E-45); }
+
+            // Zur korrekten Darstellung:
+            var Diff = Brightness / 2 - Contrast / 2;
+
+            // ColorMatrix erstellen
+            var Matrix = new ColorMatrix(new[]
+            {
+                new[] {1 + Contrast, 0, 0, 0, 0},
+                new[] {0, 1 + Contrast, 0, 0, 0},
+                new[] {0, 0, 1 + Contrast, 0, 0},
+                new float[] {0, 0, 0, 1, 0},
+                new[] {Brightness + Diff, Brightness + Diff, Brightness + Diff, 0, 1}
+            });
+
+
+            // Neue Bitmap erstellen
+            var NewBmp = new Bitmap(InBitmap.Width, InBitmap.Height, PixelFormat.Format24bppRgb);
+
+            // ImageAttribute-Objekt erstellen
+            using (var ImageAttr = new ImageAttributes())
+            {
+
+                // ColorMatrix für das ImageAttribute-Objekt setzen
+                ImageAttr.SetColorMatrix(Matrix);
+
+                // Gamma für das ImageAttribute-Objekt setzen
+                ImageAttr.SetGamma(Gamma);
+
+                // Graphics-Objekt von NewBmp erstellen
+                using (var NewBmpGra = Graphics.FromImage(NewBmp))
+                {
+
+                    // InBitmap in das Graphics-Objekt zeichnen
+                    NewBmpGra.DrawImage(InBitmap, new Rectangle(0, 0, InBitmap.Width, InBitmap.Height), 0, 0, InBitmap.Width, InBitmap.Height, GraphicsUnit.Pixel, ImageAttr);
+
+                    //Graphics-Objekt löschen
+                }
+
+                // ImageAttribute-Objekt löschen
+            }
+
+            return NewBmp;
+        }
+
 
 
     }

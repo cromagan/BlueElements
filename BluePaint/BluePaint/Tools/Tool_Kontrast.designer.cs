@@ -1,14 +1,4 @@
-﻿using BlueBasics;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
-using System.Diagnostics;
-using BlueControls.Controls;
-using System.Linq;
-using System.Xml.Linq;
-using System.Threading.Tasks;
+﻿using BlueControls.Controls;
 
 namespace BluePaint
 {
