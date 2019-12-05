@@ -247,6 +247,8 @@ namespace BlueControls.ItemCollection
                                 if (Pad.TextLage != (enAlignment)(-1))
                                 {
                                     var s = tmpG.MeasureString(Pad.Name, font);
+
+                                    tmpG.FillRectangle(Brushes.White, new RectangleF((float)DC2.Left, (float)(DC2.Top - s.Height - 9f * (float)cZoom), s.Width, s.Height));
                                     tmpG.DrawString(Pad.Name, font, new SolidBrush(Pad.Farbe), (float)DC2.Left, (float)(DC2.Top - s.Height - 9f * (float)cZoom));
                                 }
                             }

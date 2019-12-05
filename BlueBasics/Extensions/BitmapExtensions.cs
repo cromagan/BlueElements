@@ -82,6 +82,8 @@ namespace BlueBasics
         {
 
 
+            if (pic == null) { return; }
+
 
             for (var x = 0; x < pic.Width - 1; x++)
             {
