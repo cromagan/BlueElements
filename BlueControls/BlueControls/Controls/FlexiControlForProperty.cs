@@ -24,6 +24,7 @@ namespace BlueControls.Controls
         Timer Checker = new Timer();
 
 
+        new bool _enabled = true;
 
         public FlexiControlForProperty() : base()
         {
@@ -63,6 +64,24 @@ namespace BlueControls.Controls
 
             }
         }
+
+
+        [DefaultValue(true)]
+        public new bool Enabled
+        {
+            get
+            {
+                return _enabled;
+            }
+            set
+            {
+                if (_enabled == value) { return; }
+                _enabled = value;
+                CheckEnabledState();
+                GenFehlerText();
+            }
+        }
+
 
         [DefaultValue(true)]
         public bool FehlerWennLeer
@@ -150,8 +169,6 @@ namespace BlueControls.Controls
             }
         }
 
-
-
         [DefaultValue(null)]
         public object PropertyObject
         {
@@ -167,10 +184,8 @@ namespace BlueControls.Controls
                 UpdateControlData();
                 SetValueFromProperty();
                 CheckEnabledState();
-
             }
         }
-
 
         private void GetTmpVariables()
         {
@@ -180,7 +195,6 @@ namespace BlueControls.Controls
                 propInfo = null;
                 return;
             }
-
 
             _propertynamecpl = _propertyName;
 
@@ -223,7 +237,7 @@ namespace BlueControls.Controls
             if (_IsFilling) { return; }
             if (!_allinitialized) { return; }
 
-            if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
+            if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
             if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null) { return; }
 
@@ -235,15 +249,16 @@ namespace BlueControls.Controls
 
         }
 
-        internal void CheckEnabledState()
+        internal bool CheckEnabledState()
         {
-            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null)
+            if (!_enabled ||  _propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null)
             {
-                Enabled = false;
-                return;
+                base.Enabled = false;
+                return false;
             }
 
-            Enabled = true;
+            base.Enabled = true;
+            return true;
         }
 
 
@@ -321,13 +336,11 @@ namespace BlueControls.Controls
 
         private void GenFehlerText()
         {
-
             if (_FehlerWennLeer && string.IsNullOrEmpty(Value))
             {
                 InfoText = "Dieses Feld darf nicht leer sein.";
                 return;
             }
-
 
             if (string.IsNullOrEmpty(Value))
             {

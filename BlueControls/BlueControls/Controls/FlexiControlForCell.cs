@@ -182,6 +182,7 @@ namespace BlueControls.Controls
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Size = new Size(300, 300);
+            ShowInfoWhenDisabled = true;
             CaptionPosition = captionPosition;
             Database = database;
             ColumnKey = columnKey;

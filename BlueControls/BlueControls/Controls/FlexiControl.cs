@@ -61,6 +61,7 @@ namespace BlueControls.Controls
         private Caption _CaptionObject;
         private Caption _InfoCaption;
         private string _InfoText = string.Empty;
+        bool _ShowInfoWhenDisabled = false;
 
 
         private string _Suffix = string.Empty;
@@ -310,6 +311,19 @@ namespace BlueControls.Controls
 
         #region  Properties 
 
+        [DefaultValue(false)]
+        public bool ShowInfoWhenDisabled
+        {
+            get { return _ShowInfoWhenDisabled; }
+            set
+            {
+                if (_ShowInfoWhenDisabled == value) { return; }
+                _ShowInfoWhenDisabled = value;
+                DoInfoTextCaption();
+            }
+        }
+
+
         [DefaultValue(typeof(Color), "Transparent")]
         public Color Color
         {
@@ -340,6 +354,12 @@ namespace BlueControls.Controls
                 if (_enabled == value) { return; }
                 _enabled = value;
 
+
+                if (!_ShowInfoWhenDisabled)
+                {
+                    DoInfoTextCaption();
+                }
+
                 foreach (System.Windows.Forms.Control ThisControl in Controls)
                 {
                     if (ThisControl.Name == "Info")
@@ -351,6 +371,9 @@ namespace BlueControls.Controls
                         ThisControl.Enabled = value;
                     }
                 }
+
+                Invalidate();
+
             }
         }
 
@@ -554,12 +577,24 @@ namespace BlueControls.Controls
             Skin.Draw_Back_Transparent(TMPGR, ClientRectangle, this);
 
 
-            if (_Color.A != 0 && state != enStates.Standard_Disabled)
-            {
-                var lgb = new LinearGradientBrush(ClientRectangle, _Color, Color.Transparent, LinearGradientMode.Horizontal);
-                TMPGR.FillRectangle(lgb, ClientRectangle);
-            }
 
+
+            if (_Color.A != 0)
+            {
+                if (Enabled)
+                {
+                    var lgb = new LinearGradientBrush(ClientRectangle, _Color, Color.Transparent, LinearGradientMode.Horizontal);
+                    TMPGR.FillRectangle(lgb, ClientRectangle);
+                }
+                else
+                {
+                    var br = (byte)(_Color.GetBrightness()* 254);
+                    
+
+                    var lgb = new LinearGradientBrush(ClientRectangle, Color.FromArgb(br,br,br), Color.Transparent, LinearGradientMode.Horizontal);
+                    TMPGR.FillRectangle(lgb, ClientRectangle);
+                }
+            }
 
             if (!_allinitialized) { CreateSubControls(); }
 
@@ -1589,14 +1624,24 @@ namespace BlueControls.Controls
 
         private void DoInfoTextCaption()
         {
-            if (!string.IsNullOrEmpty(_InfoText) && _InfoCaption != null)
+            var tmp = _InfoText;
+
+            if (!_ShowInfoWhenDisabled && !Enabled)
             {
-                _InfoCaption.QuickInfo = _InfoText;
+                tmp = string.Empty;
+            }
+
+
+
+
+            if (!string.IsNullOrEmpty(tmp) && _InfoCaption != null)
+            {
+                _InfoCaption.QuickInfo = tmp;
                 return;
             }
-            if (string.IsNullOrEmpty(_InfoText) && _InfoCaption == null) { return; }
+            if (string.IsNullOrEmpty(tmp) && _InfoCaption == null) { return; }
 
-            if (string.IsNullOrEmpty(_InfoText))
+            if (string.IsNullOrEmpty(tmp))
             {
                 Controls.Remove(_InfoCaption);
                 _InfoCaption.Dispose();
@@ -1607,7 +1652,7 @@ namespace BlueControls.Controls
                 _InfoCaption = new Caption
                 {
                     Name = "Info",
-                    QuickInfo = _InfoText,
+                    QuickInfo = tmp,
                     Text = "<ImageCode=Warnung|16>",
                     Width = 18,
                     Height = 18,
