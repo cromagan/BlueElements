@@ -25,6 +25,7 @@ namespace BlueControls
 
         public T obj = default(T);
 
+        public event EventHandler MultipleUserDetected;
 
 
         public clsSerializeableMultiUserFile() : base(false)
@@ -305,10 +306,16 @@ namespace BlueControls
                 if (_OtherUser != obj.LastSavedBy)
                 {
                     _OtherUser = obj.LastSavedBy;
+                    OnMultipleUserDetected();
                     Forms.MessageBox.Show("<b><u>Achtung:</u></b><br>Sie und '<b>" + obj.LastSavedBy + "</b>' bearbeiten<br>gerade gleichzeitig '<b>" + obj.Beschreibung +
                        "</b>'.<br><br>Bitte koordinieren sie die Bearbeitung - <br>Daten werden <u>nicht</u> automatisch zusammengefügt.", BlueBasics.Enums.enImageCode.Warnung, "OK");
                 }
             }
+        }
+
+        private void OnMultipleUserDetected()
+        {
+            MultipleUserDetected?.Invoke(this, System.EventArgs.Empty);
         }
     }
 }
