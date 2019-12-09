@@ -329,7 +329,7 @@ namespace BlueControls.Controls
                 return;
             }
 
-            Enabled = CellCollection.UserEditPossible(_tmpColumn, _tmpRow, false); // Rechteverwaltung einfliesen lassen
+            Enabled = CellCollection.UserEditPossible(_tmpColumn, _tmpRow); // Rechteverwaltung einfliesen lassen
         }
 
 

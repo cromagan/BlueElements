@@ -86,7 +86,7 @@ namespace BlueBasics.MultiUserFile
         public event EventHandler<DatabaseStoppedEventArgs> ConnectedControlsStopAllWorking;
 
         /// <summary>
-        /// Wird ausgegeben, sobals isparsed false ist, noch vor den automatischen reperaturen.
+        /// Wird ausgegeben, sobald isParsed false ist, noch vor den automatischen Reperaturen.
         /// Diese Event kann verwendet werden, um die Datenbank zu reparieren, bevor sich automatische Dialoge öffnen.
         /// </summary>
         public event EventHandler Parsed;
@@ -465,33 +465,22 @@ namespace BlueBasics.MultiUserFile
                 return "Dateizugriffsfehler.";
             }
 
-
-
             if (!CanWrite(Filename, 0.5))
             {
                 SavebleErrorReason_WindowsOnly_lastChecked = DateTime.Now.AddSeconds(5);
                 return "Windows blockiert die Datenbank-Datei.";
             }
-
-
-
             return string.Empty;
-
         }
 
         protected abstract void DoWorkInParallelBinSaverThread();
 
         public bool ReloadNeeded()
         {
-
             //        Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
-
-
             if (string.IsNullOrEmpty(Filename)) { return false; }
 
             if (_CheckedAndReloadNeed) { return true; }
-
-
 
             if (GetFileInfo(false) != _LastSaveCode)
             {
@@ -499,16 +488,13 @@ namespace BlueBasics.MultiUserFile
                 return true;
             }
 
-
             return false;
         }
 
         private void BinSaver_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-
             switch ((string)e.UserState)
             {
-
                 case "ResetProcess":
                     break;
 
@@ -534,18 +520,12 @@ namespace BlueBasics.MultiUserFile
                     OnSavedToDisk();
                     break;
 
-
                 default:
                     Develop.DebugPrint_NichtImplementiert();
                     break;
-
             }
 
-
             Writer_ProcessDone = (string)e.UserState;
-
-
-
         }
 
         protected abstract List<byte> ToListOfByte(bool willSave);
@@ -894,5 +874,27 @@ namespace BlueBasics.MultiUserFile
         protected abstract bool IsBackgroundWorkerBusy();
         protected abstract void CancelBackGroundWorker();
         protected abstract bool IsThereBackgroundWorkToDo(bool mustSave);
+
+
+
+        public string UserEditErrorReason()
+        {
+
+            if (ReadOnly) { return "Die Datei wurde schreibgeschützt geöffnet."; }
+
+
+            if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
+
+            // Wichtig: Am Ende der Laderoutine wird das Dateidatum geholt. Sind da andere Speicherroutinen anderer 
+            // PCs am Werk, kann schon mal im Millisecundenbereich ein Eintrag verchluckt werden.
+            if (BinReLoader.IsBusy) { return "Aktuell werden im Hintergrund Daten geladen."; }
+
+            // Siehe Reloader, sicherheitshalber
+            if (BinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
+
+            if (ReloadNeeded()) { return "Die Datei muss neu eingelesen werden."; }
+
+            return string.Empty;
+        }
     }
 }

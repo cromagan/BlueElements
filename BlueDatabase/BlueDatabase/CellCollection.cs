@@ -81,9 +81,9 @@ namespace BlueDatabase
             var CellKey = KeyOfCell(Column.Key, RowKey);
             if (!_cells.ContainsKey(CellKey)) { return; }
 
- //           var Inhalt = _cells[CellKey].Value;
+            //           var Inhalt = _cells[CellKey].Value;
             _cells.Remove(CellKey);
-          //  DoSpecialFormats(Column, RowKey, Inhalt, false, false, true);
+            //  DoSpecialFormats(Column, RowKey, Inhalt, false, false, true);
         }
 
         internal void Load_310(ColumnItem _Column, RowItem _Row, string Value, int Width, int Height)
@@ -736,6 +736,15 @@ namespace BlueDatabase
 
             if (Value == OldValue) { return; }
 
+
+            var f = Database.UserEditErrorReason();
+            if (!string.IsNullOrEmpty(f))
+            {
+                Develop.DebugPrint(enFehlerArt.Warnung, "Fehler: "  +f + "<br>" + Database.Filename);
+                return;
+            }
+
+
             Database.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, Column.Key, Row.Key, OldValue, Value, true, FreezeMode);
 
             Column._UcaseNamesSortedByLenght = null;
@@ -1052,16 +1061,16 @@ namespace BlueDatabase
         /// <param name="Row"></param>
         /// <param name="DateiRechtePrüfen"></param>
         /// <returns></returns>
-        public static bool UserEditPossible(ColumnItem Column, RowItem Row, bool DateiRechtePrüfen)
+        public static bool UserEditPossible(ColumnItem Column, RowItem Row)
         {
-            if (Column.Format == enDataFormat.LinkedCell)
-            {
-                var LinkedData = LinkedCellData(Column, Row, false, true, false);
-                if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return UserEditPossible(LinkedData.Item1, LinkedData.Item2, DateiRechtePrüfen); }
-                return false;
-            }
+            //if (Column.Format == enDataFormat.LinkedCell)
+            //{
+            //    var LinkedData = LinkedCellData(Column, Row, false, true, false);
+            //    if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return UserEditPossible(LinkedData.Item1, LinkedData.Item2, DateiRechtePrüfen); }
+            //    return false;
+            //}
 
-            return string.IsNullOrEmpty(UserEditErrorReason(Column, Row, DateiRechtePrüfen));
+            return string.IsNullOrEmpty(UserEditErrorReason(Column, Row));
         }
 
         /// <summary>
@@ -1072,11 +1081,14 @@ namespace BlueDatabase
         /// <param name="DateiRechtePrüfen"></param>
         /// <param name="Column"></param>
         /// <returns></returns>
-        public static string UserEditErrorReason(ColumnItem Column, RowItem Row, bool DateiRechtePrüfen)
+        public static string UserEditErrorReason(ColumnItem Column, RowItem Row)
         {
             if (Column == null) { return LanguageTool.DoTranslate("Es ist keine Spalte ausgewählt.", true); }
-            if (Column.Database.ReadOnly) { return LanguageTool.DoTranslate("Datenbank wurde schreibgeschützt geöffnet", true); }
+   
 
+            var tmpf = Column.Database.UserEditErrorReason();
+
+            if (!string.IsNullOrEmpty(tmpf)) { return LanguageTool.DoTranslate(tmpf, true); }
 
 
             if (!Column.SaveContent) { return LanguageTool.DoTranslate("Der Spalteninhalt wird nicht gespeichert.", true); }
@@ -1086,7 +1098,7 @@ namespace BlueDatabase
                 var LinkedData = LinkedCellData(Column, Row, false, true, false);
                 if (LinkedData.Item1 != null && LinkedData.Item2 != null)
                 {
-                    var tmp = UserEditErrorReason(LinkedData.Item1, LinkedData.Item2, DateiRechtePrüfen);
+                    var tmp = UserEditErrorReason(LinkedData.Item1, LinkedData.Item2);
                     if (!string.IsNullOrEmpty(tmp)) { return LanguageTool.DoTranslate("Die verlinkte Zelle kann nicht bearbeitet werden: ", true) + tmp; }
                     return string.Empty;
                 }

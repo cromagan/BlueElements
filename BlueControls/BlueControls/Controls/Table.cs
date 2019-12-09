@@ -1410,6 +1410,11 @@ namespace BlueControls.Controls
 
             if (Database.ReloadNeeded()) { Database.Load_Reload(); }
 
+
+            var f = Database.UserEditErrorReason();
+            if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
+
+
             if (CellInThisDatabaseColumn == null)
             {
                 //NotEditableInfo("Interner Zellenfehler");
@@ -1450,9 +1455,9 @@ namespace BlueControls.Controls
                 NotEditableInfo("Diese Spalte kann generell nicht bearbeitet werden.");
                 return;
             }
-            if (!CellCollection.UserEditPossible(ContentHolderCellColumn, ContentHolderCellRow, false))
+            if (!CellCollection.UserEditPossible(ContentHolderCellColumn, ContentHolderCellRow))
             {
-                NotEditableInfo(CellCollection.UserEditErrorReason(ContentHolderCellColumn, ContentHolderCellRow, false));
+                NotEditableInfo(CellCollection.UserEditErrorReason(ContentHolderCellColumn, ContentHolderCellRow));
                 return;
             }
 
@@ -1800,6 +1805,9 @@ namespace BlueControls.Controls
 
             if (string.IsNullOrEmpty(CancelReason))
             {
+                var f = column.Database.UserEditErrorReason();
+                if (!string.IsNullOrEmpty(f)) { table.NotEditableInfo(f); return; }
+
                 if (row == null)
                 {
                     row = column.Database.Row.Add(newValue);
@@ -2529,7 +2537,7 @@ namespace BlueControls.Controls
                                 return;
                             }
 
-                            var l2 = CellCollection.UserEditErrorReason(_CursorPosColumn, _CursorPosRow, false);
+                            var l2 = CellCollection.UserEditErrorReason(_CursorPosColumn, _CursorPosRow);
 
                             if (string.IsNullOrEmpty(l2))
                             {
@@ -2551,7 +2559,7 @@ namespace BlueControls.Controls
                             return;
                         }
 
-                        var l = CellCollection.UserEditErrorReason(_CursorPosColumn, _CursorPosRow, false);
+                        var l = CellCollection.UserEditErrorReason(_CursorPosColumn, _CursorPosRow);
 
                         if (string.IsNullOrEmpty(l))
                         {
@@ -2659,7 +2667,7 @@ namespace BlueControls.Controls
                                 }
 
 
-                                var l2 = CellCollection.UserEditErrorReason(_CursorPosColumn, _CursorPosRow, false);
+                                var l2 = CellCollection.UserEditErrorReason(_CursorPosColumn, _CursorPosRow);
 
                                 if (string.IsNullOrEmpty(l2))
                                 {
@@ -3893,14 +3901,9 @@ namespace BlueControls.Controls
             if (_Database.ColumnArrangements[_ArrangementNr][_Database.Column[0]] == null) { return false; }
             if (!_Database.PermissionCheck(_Database.PermissionGroups_NewRow, null)) { return false; }
 
-            if (!CellCollection.UserEditPossible(_Database.Column[0], null, false)) { return false; }
+            if (!CellCollection.UserEditPossible(_Database.Column[0], null)) { return false; }
             return true;
         }
-
-
-
-
-
 
 
         private void _Database_RowCountChanged(object sender, System.EventArgs e)
