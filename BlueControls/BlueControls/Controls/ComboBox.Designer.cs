@@ -51,7 +51,7 @@ namespace BlueControls.Controls
             this.btnDropDown.Name = "btnDropDown";
             this.btnDropDown.Size = new Size(24, 150);
             this.btnDropDown.TabIndex = 1;
-            this.btnDropDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnDropDown_MouseUp);
+            this.btnDropDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ShowMenu);
             this.btnDropDown.LostFocus += new EventHandler(this.btnDropDown_LostFocus);
             // 
             // ComboBox

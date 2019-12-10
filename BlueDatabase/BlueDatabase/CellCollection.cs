@@ -737,12 +737,15 @@ namespace BlueDatabase
             if (Value == OldValue) { return; }
 
 
-            var f = Database.UserEditErrorReason();
-            if (!string.IsNullOrEmpty(f))
-            {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Fehler: "  +f + "<br>" + Database.Filename);
-                return;
-            }
+            Database.WaitEditable(false);
+
+            // Nur anzeige-Datenbanken sind immer Schreibgeschützt
+            //var f = Database.UserEditErrorReason(false);
+            //if (!string.IsNullOrEmpty(f))
+            //{
+            //    Develop.DebugPrint(enFehlerArt.Warnung, "Fehler: " + f + "<br>" + Database.Filename);
+            //    return;
+            //}
 
 
             Database.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, Column.Key, Row.Key, OldValue, Value, true, FreezeMode);
@@ -1086,7 +1089,7 @@ namespace BlueDatabase
             if (Column == null) { return LanguageTool.DoTranslate("Es ist keine Spalte ausgewählt.", true); }
    
 
-            var tmpf = Column.Database.UserEditErrorReason();
+            var tmpf = Column.Database.UserEditErrorReason(true);
 
             if (!string.IsNullOrEmpty(tmpf)) { return LanguageTool.DoTranslate(tmpf, true); }
 

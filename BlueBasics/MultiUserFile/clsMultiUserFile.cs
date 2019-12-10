@@ -877,24 +877,32 @@ namespace BlueBasics.MultiUserFile
 
 
 
-        public string UserEditErrorReason()
+        public string UserEditErrorReason(bool StrongMode)
         {
-
             if (ReadOnly) { return "Die Datei wurde schreibgeschützt geöffnet."; }
-
-
-            if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
-
-            // Wichtig: Am Ende der Laderoutine wird das Dateidatum geholt. Sind da andere Speicherroutinen anderer 
-            // PCs am Werk, kann schon mal im Millisecundenbereich ein Eintrag verchluckt werden.
-            if (BinReLoader.IsBusy) { return "Aktuell werden im Hintergrund Daten geladen."; }
-
-            // Siehe Reloader, sicherheitshalber
+                                 
+            // Wird gespeichert, werden am Ende Penings zu Undos. Diese werden evtl nicht mitgespeichert.
             if (BinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
 
-            if (ReloadNeeded()) { return "Die Datei muss neu eingelesen werden."; }
+            if (StrongMode)
+            {
+                if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
 
+                if (BinReLoader.IsBusy) { return "Aktuell werden im Hintergrund Daten geladen."; }
+                if (ReloadNeeded()) { return "Die Datei muss neu eingelesen werden."; }
+            }
             return string.Empty;
+        }
+
+
+        public void WaitEditable(bool StrongMode)
+        {
+            if (ReadOnly) { return; }
+
+            while ( !string.IsNullOrEmpty(UserEditErrorReason(StrongMode)))
+            {
+                Pause(0.2, true);
+            }
         }
     }
 }

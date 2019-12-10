@@ -368,6 +368,9 @@ namespace BlueControls.Controls
 
             if (OldVal == NewValue) { return; }
 
+
+            _tmpRow.Database.WaitEditable(false);
+
             _tmpRow.CellSet(_tmpColumn, NewValue);
             if (OldVal != _tmpRow.CellGetString(_tmpColumn)) { _tmpRow.DoAutomatic(false, false); }
         }

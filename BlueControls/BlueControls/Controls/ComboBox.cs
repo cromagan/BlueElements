@@ -279,7 +279,7 @@ namespace BlueControls.Controls
 
 
 
-        private void btnDropDown_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        public void ShowMenu(object sender, System.Windows.Forms.MouseEventArgs ex)
         {
 
             if (_btnDropDownIsIn) { return; }
@@ -348,7 +348,7 @@ namespace BlueControls.Controls
                 // nicht bei rechts, ansonsten gibt's evtl. Kontextmenü (von der Textbox aus gesteuert) UND den Auswahldialog
                 if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList)
                 {
-                    btnDropDown_MouseUp(this, e);
+                    ShowMenu(this, e);
                 }
                 else
                 {

@@ -319,7 +319,7 @@ namespace BlueControls.Controls
             {
                 if (_ShowInfoWhenDisabled == value) { return; }
                 _ShowInfoWhenDisabled = value;
-                DoInfoTextCaption();
+                Invalidate();
             }
         }
 
@@ -355,11 +355,6 @@ namespace BlueControls.Controls
                 _enabled = value;
 
 
-                if (!_ShowInfoWhenDisabled)
-                {
-                    DoInfoTextCaption();
-                }
-
                 foreach (System.Windows.Forms.Control ThisControl in Controls)
                 {
                     if (ThisControl.Name == "Info")
@@ -373,7 +368,6 @@ namespace BlueControls.Controls
                 }
 
                 Invalidate();
-
             }
         }
 
@@ -519,7 +513,7 @@ namespace BlueControls.Controls
             {
                 if (_InfoText == value) { return; }
                 _InfoText = value;
-                DoInfoTextCaption();
+                Invalidate();
             }
         }
 
@@ -572,6 +566,11 @@ namespace BlueControls.Controls
         {
             if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
 
+
+            // Enabled wurde verdeckt!
+            if (!Enabled) { state = enStates.Standard_Disabled; }
+
+
             var TMPGR = Graphics.FromImage(_BitmapOfControl);
 
             Skin.Draw_Back_Transparent(TMPGR, ClientRectangle, this);
@@ -581,17 +580,15 @@ namespace BlueControls.Controls
 
             if (_Color.A != 0)
             {
-                if (Enabled)
+                if (state.HasFlag(enStates.Standard_Disabled))
                 {
-                    var lgb = new LinearGradientBrush(ClientRectangle, _Color, Color.Transparent, LinearGradientMode.Horizontal);
+                    var br = (byte)(_Color.GetBrightness() * 254);
+                    var lgb = new LinearGradientBrush(ClientRectangle, Color.FromArgb(br, br, br), Color.Transparent, LinearGradientMode.Horizontal);
                     TMPGR.FillRectangle(lgb, ClientRectangle);
                 }
                 else
                 {
-                    var br = (byte)(_Color.GetBrightness()* 254);
-                    
-
-                    var lgb = new LinearGradientBrush(ClientRectangle, Color.FromArgb(br,br,br), Color.Transparent, LinearGradientMode.Horizontal);
+                    var lgb = new LinearGradientBrush(ClientRectangle, _Color, Color.Transparent, LinearGradientMode.Horizontal);
                     TMPGR.FillRectangle(lgb, ClientRectangle);
                 }
             }
@@ -622,6 +619,8 @@ namespace BlueControls.Controls
 
             gr.DrawImage(_BitmapOfControl, 0, 0);
             TMPGR.Dispose();
+
+            DoInfoTextCaption(!state.HasFlag(enStates.Standard_Disabled));
         }
 
         protected override void InitializeSkin()
@@ -1581,7 +1580,9 @@ namespace BlueControls.Controls
 
             Controls.Add(Control);
 
-            DoInfoTextCaption();
+            Invalidate();
+
+            //DoInfoTextCaption();
 
         }
 
@@ -1622,14 +1623,11 @@ namespace BlueControls.Controls
 
 
 
-        private void DoInfoTextCaption()
+        private void DoInfoTextCaption(bool tmpenabled)
         {
             var tmp = _InfoText;
 
-            if (!_ShowInfoWhenDisabled && !Enabled)
-            {
-                tmp = string.Empty;
-            }
+            if (!_ShowInfoWhenDisabled && !tmpenabled) { tmp = string.Empty; }
 
 
 
@@ -1644,6 +1642,7 @@ namespace BlueControls.Controls
             if (string.IsNullOrEmpty(tmp))
             {
                 Controls.Remove(_InfoCaption);
+                _InfoCaption.Click -= _InfoCaption_Click;
                 _InfoCaption.Dispose();
                 _InfoCaption = null;
             }
@@ -1653,15 +1652,34 @@ namespace BlueControls.Controls
                 {
                     Name = "Info",
                     QuickInfo = tmp,
+                    Enabled = true,
                     Text = "<ImageCode=Warnung|16>",
                     Width = 18,
                     Height = 18,
                     Left = Width - 18,
                     Top = 0,
-                    Anchor = System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Top
+                    Anchor = System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Top,
+                    Visible = true
                 };
                 Controls.Add(_InfoCaption);
                 _InfoCaption.BringToFront();
+                _InfoCaption.Click += _InfoCaption_Click;
+            }
+
+
+        }
+
+        private void _InfoCaption_Click(object sender, System.EventArgs e)
+        {
+
+            foreach (var thisc in Controls)
+            {
+                if (thisc is ComboBox cbx)
+                {
+                    cbx.Focus();
+                    cbx.ShowMenu(null, null);
+                    return;
+                }
             }
 
 

@@ -1411,7 +1411,7 @@ namespace BlueControls.Controls
             if (Database.ReloadNeeded()) { Database.Load_Reload(); }
 
 
-            var f = Database.UserEditErrorReason();
+            var f = Database.UserEditErrorReason(true);
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
 
 
@@ -1805,7 +1805,7 @@ namespace BlueControls.Controls
 
             if (string.IsNullOrEmpty(CancelReason))
             {
-                var f = column.Database.UserEditErrorReason();
+                var f = column.Database.UserEditErrorReason(true);
                 if (!string.IsNullOrEmpty(f)) { table.NotEditableInfo(f); return; }
 
                 if (row == null)
