@@ -1411,7 +1411,7 @@ namespace BlueControls.Controls
             if (Database.ReloadNeeded()) { Database.Load_Reload(); }
 
 
-            var f = Database.UserEditErrorReason(true);
+            var f = Database.ErrorReason(enErrorReason.EditGeneral);
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
 
 
@@ -1455,9 +1455,9 @@ namespace BlueControls.Controls
                 NotEditableInfo("Diese Spalte kann generell nicht bearbeitet werden.");
                 return;
             }
-            if (!CellCollection.UserEditPossible(ContentHolderCellColumn, ContentHolderCellRow))
+            if (!CellCollection.UserEditPossible(ContentHolderCellColumn, ContentHolderCellRow, enErrorReason.EditGeneral))
             {
-                NotEditableInfo(CellCollection.UserEditErrorReason(ContentHolderCellColumn, ContentHolderCellRow));
+                NotEditableInfo(CellCollection.ErrorReason(ContentHolderCellColumn, ContentHolderCellRow, enErrorReason.EditGeneral));
                 return;
             }
 
@@ -1759,11 +1759,6 @@ namespace BlueControls.Controls
                 return;
             }
 
-
-
-
-
-
             if (row == null && column != column.Database.Column[0])
             {
 
@@ -1805,15 +1800,19 @@ namespace BlueControls.Controls
 
             if (string.IsNullOrEmpty(CancelReason))
             {
-                var f = column.Database.UserEditErrorReason(true);
-                if (!string.IsNullOrEmpty(f)) { table.NotEditableInfo(f); return; }
-
+                //var f = column.Database.ErrorReason(enErrorReason.EditGeneral);
+                //if (!string.IsNullOrEmpty(f)) { table.NotEditableInfo(f); return; }
+                //d
                 if (row == null)
                 {
+                    var f = CellCollection.ErrorReason(column.Database.Column[0], null, enErrorReason.EditGeneral);
+                    if (!string.IsNullOrEmpty(f)) { table.NotEditableInfo(f); return; }
                     row = column.Database.Row.Add(newValue);
                 }
                 else
                 {
+                    var f = CellCollection.ErrorReason(column, row, enErrorReason.EditGeneral);
+                    if (!string.IsNullOrEmpty(f)) { table.NotEditableInfo(f); return; }
                     row.CellSet(column, newValue);
                 }
 
@@ -2537,7 +2536,7 @@ namespace BlueControls.Controls
                                 return;
                             }
 
-                            var l2 = CellCollection.UserEditErrorReason(_CursorPosColumn, _CursorPosRow);
+                            var l2 = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow, enErrorReason.EditGeneral);
 
                             if (string.IsNullOrEmpty(l2))
                             {
@@ -2559,7 +2558,7 @@ namespace BlueControls.Controls
                             return;
                         }
 
-                        var l = CellCollection.UserEditErrorReason(_CursorPosColumn, _CursorPosRow);
+                        var l = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow, enErrorReason.EditGeneral);
 
                         if (string.IsNullOrEmpty(l))
                         {
@@ -2667,7 +2666,7 @@ namespace BlueControls.Controls
                                 }
 
 
-                                var l2 = CellCollection.UserEditErrorReason(_CursorPosColumn, _CursorPosRow);
+                                var l2 = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow, enErrorReason.EditGeneral);
 
                                 if (string.IsNullOrEmpty(l2))
                                 {
@@ -3582,7 +3581,7 @@ namespace BlueControls.Controls
                 _SortedRowsBefore.Clear();
                 if (_SortedRows != null) { _SortedRowsBefore.AddRange(_SortedRows); }
                 EnsureVisible(_CursorPosColumn, _CursorPosRow);
-      //          CursorPos_Set(null, null, true);
+                //          CursorPos_Set(null, null, true);
                 OnRowsSorted();
             }
 
@@ -3888,10 +3887,10 @@ namespace BlueControls.Controls
         private bool UserEdit_NewRowAllowed()
         {
 
-            if (Thread.CurrentThread.IsBackground) { return false; }
+            //if (Thread.CurrentThread.IsBackground) { return false; }
 
             if (_Database == null) { return false; }
-            if (!Enabled) { return false; }
+            //if (!Enabled) { return false; }
 
             if (_Database.Column[0] == null) { return false; }
 
@@ -3901,7 +3900,7 @@ namespace BlueControls.Controls
             if (_Database.ColumnArrangements[_ArrangementNr][_Database.Column[0]] == null) { return false; }
             if (!_Database.PermissionCheck(_Database.PermissionGroups_NewRow, null)) { return false; }
 
-            if (!CellCollection.UserEditPossible(_Database.Column[0], null)) { return false; }
+            if (!CellCollection.UserEditPossible(_Database.Column[0], null, enErrorReason.EditNormaly)) { return false; }
             return true;
         }
 

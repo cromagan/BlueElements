@@ -329,7 +329,7 @@ namespace BlueControls.Controls
                 return;
             }
 
-            Enabled = CellCollection.UserEditPossible(_tmpColumn, _tmpRow); // Rechteverwaltung einfliesen lassen
+            Enabled = CellCollection.UserEditPossible(_tmpColumn, _tmpRow, enErrorReason.EditNormaly); // Rechteverwaltung einfliesen lassen.
         }
 
 
@@ -369,7 +369,7 @@ namespace BlueControls.Controls
             if (OldVal == NewValue) { return; }
 
 
-            _tmpRow.Database.WaitEditable(false);
+            _tmpRow.Database.WaitEditable();
 
             _tmpRow.CellSet(_tmpColumn, NewValue);
             if (OldVal != _tmpRow.CellGetString(_tmpColumn)) { _tmpRow.DoAutomatic(false, false); }

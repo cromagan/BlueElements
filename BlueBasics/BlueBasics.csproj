@@ -79,6 +79,7 @@
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Enums\enErrorReason.cs" />
     <Compile Include="Interfaces\ILastSavedBy.cs" />
     <Compile Include="MultiUserFile\clsMultiUserFile.cs">
       <SubType>Component</SubType>

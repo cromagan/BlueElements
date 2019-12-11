@@ -737,15 +737,7 @@ namespace BlueDatabase
             if (Value == OldValue) { return; }
 
 
-            Database.WaitEditable(false);
-
-            // Nur anzeige-Datenbanken sind immer Schreibgeschützt
-            //var f = Database.UserEditErrorReason(false);
-            //if (!string.IsNullOrEmpty(f))
-            //{
-            //    Develop.DebugPrint(enFehlerArt.Warnung, "Fehler: " + f + "<br>" + Database.Filename);
-            //    return;
-            //}
+            Database.WaitEditable();
 
 
             Database.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, Column.Key, Row.Key, OldValue, Value, true, FreezeMode);
@@ -1064,7 +1056,7 @@ namespace BlueDatabase
         /// <param name="Row"></param>
         /// <param name="DateiRechtePrüfen"></param>
         /// <returns></returns>
-        public static bool UserEditPossible(ColumnItem Column, RowItem Row)
+        public static bool UserEditPossible(ColumnItem Column, RowItem Row, enErrorReason mode)
         {
             //if (Column.Format == enDataFormat.LinkedCell)
             //{
@@ -1073,7 +1065,7 @@ namespace BlueDatabase
             //    return false;
             //}
 
-            return string.IsNullOrEmpty(UserEditErrorReason(Column, Row));
+            return string.IsNullOrEmpty(ErrorReason(Column, Row, mode));
         }
 
         /// <summary>
@@ -1084,15 +1076,15 @@ namespace BlueDatabase
         /// <param name="DateiRechtePrüfen"></param>
         /// <param name="Column"></param>
         /// <returns></returns>
-        public static string UserEditErrorReason(ColumnItem Column, RowItem Row)
+        public static string ErrorReason(ColumnItem Column, RowItem Row, enErrorReason mode)
         {
+
+            if (mode == enErrorReason.OnlyRead) { return string.Empty; }
+
             if (Column == null) { return LanguageTool.DoTranslate("Es ist keine Spalte ausgewählt.", true); }
-   
 
-            var tmpf = Column.Database.UserEditErrorReason(true);
-
+            var tmpf = Column.Database.ErrorReason(mode);
             if (!string.IsNullOrEmpty(tmpf)) { return LanguageTool.DoTranslate(tmpf, true); }
-
 
             if (!Column.SaveContent) { return LanguageTool.DoTranslate("Der Spalteninhalt wird nicht gespeichert.", true); }
 
@@ -1101,7 +1093,7 @@ namespace BlueDatabase
                 var LinkedData = LinkedCellData(Column, Row, false, true, false);
                 if (LinkedData.Item1 != null && LinkedData.Item2 != null)
                 {
-                    var tmp = UserEditErrorReason(LinkedData.Item1, LinkedData.Item2);
+                    var tmp = ErrorReason(LinkedData.Item1, LinkedData.Item2, mode);
                     if (!string.IsNullOrEmpty(tmp)) { return LanguageTool.DoTranslate("Die verlinkte Zelle kann nicht bearbeitet werden: ", true) + tmp; }
                     return string.Empty;
                 }

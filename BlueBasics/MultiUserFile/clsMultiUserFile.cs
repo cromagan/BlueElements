@@ -75,7 +75,11 @@ namespace BlueBasics.MultiUserFile
         /// </summary>
         private string Writer_ProcessDone = string.Empty;
 
-        private DateTime SavebleErrorReason_WindowsOnly_lastChecked = DateTime.Now.AddSeconds(-30);
+        private DateTime _CanWriteNextCheck = DateTime.Now.AddSeconds(-30);
+        private string _CanWriteError = string.Empty;
+
+        private DateTime _EditNormalyNextCheck = DateTime.Now.AddSeconds(-30);
+        private string _EditNormalyError = string.Empty;
 
         #region  Event-Deklarationen 
 
@@ -316,7 +320,7 @@ namespace BlueBasics.MultiUserFile
         {
             if (ReadOnly) { return; }
 
-            var f = SavebleErrorReason();
+            var f = ErrorReason(enErrorReason.Save);
 
             if (!string.IsNullOrEmpty(f))
             {
@@ -437,41 +441,7 @@ namespace BlueBasics.MultiUserFile
 
         protected abstract void ThisIsOnDisk(List<byte> binaryData);
 
-        protected virtual string SavebleErrorReason()
-        {
-            if (ReadOnly) { return "Datenbank wurde schreibgeschützt geöffnet"; }
-            if (BlockDateiVorhanden()) { return "Beim letzten Versuch, die Datei zu speichern, ist der Speichervorgang nicht korrekt beendet worden. Speichern ist solange deaktiviert, bis ein Administrator die Freigabe zum Speichern erteilt."; }
 
-
-            if (BinReLoader.IsBusy) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
-
-
-            if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
-            if (!FileExists(Filename)) { return string.Empty; }
-
-
-            if (!CanWriteInDirectory(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datenbank keine Schreibrechte."; }
-
-            if (DateTime.Now.Subtract(SavebleErrorReason_WindowsOnly_lastChecked).TotalSeconds < 0) { return "Windows blockiert die Datenbank-Datei."; }
-
-
-            try
-            {
-                var f = new FileInfo(Filename);
-                if (DateTime.Now.Subtract(f.LastWriteTime).TotalSeconds < 2) { return "Anderer Speichervorgang noch nicht abgeschlossen."; }
-            }
-            catch
-            {
-                return "Dateizugriffsfehler.";
-            }
-
-            if (!CanWrite(Filename, 0.5))
-            {
-                SavebleErrorReason_WindowsOnly_lastChecked = DateTime.Now.AddSeconds(5);
-                return "Windows blockiert die Datenbank-Datei.";
-            }
-            return string.Empty;
-        }
 
         protected abstract void DoWorkInParallelBinSaverThread();
 
@@ -711,30 +681,16 @@ namespace BlueBasics.MultiUserFile
         public void UnlockHard()
         {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            if (IsSaveAble() && !BlockDateiVorhanden()) { return; }
-            Load_Reload();
-            if (BlockDateiVorhanden()) { DeleteFile(Blockdateiname(), true); }
-            Release(true, 180);
-        }
-
-        /// <summary>
-        /// Prüft ob gerade eben Speicherzugriff auf die Datei möglich ist.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsSaveAble()
-        {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-
-            var w = SavebleErrorReason();
-            if (!string.IsNullOrEmpty(w))
+            try
             {
-                //if (ShowErrorMessage) { Notification.Show("<b><u>Datenbank speichern nicht möglich:</b></u><br><br>" + w + "<br><br><i>Datei: " + _FileName.FileNameWithSuffix(), enImageCode.Kritisch); }
-                return false;
+                Load_Reload();
+                if (BlockDateiVorhanden()) { DeleteFile(Blockdateiname(), true); }
+                Release(true, 180);
             }
-
-            return true;
+            catch
+            {
+            }
         }
-
 
         private string Blockdateiname()
         {
@@ -837,7 +793,7 @@ namespace BlueBasics.MultiUserFile
 
 
 
-            if (_MustBackup && !_MustReload && Checker_Tick_count < Count_Save && Checker_Tick_count >= Count_BackUp && IsSaveAble())
+            if (_MustBackup && !_MustReload && Checker_Tick_count < Count_Save && Checker_Tick_count >= Count_BackUp && string.IsNullOrEmpty(ErrorReason(enErrorReason.EditAcut)))
             {
                 StartBackgroundWorker();
                 return;
@@ -877,30 +833,121 @@ namespace BlueBasics.MultiUserFile
 
 
 
-        public string UserEditErrorReason(bool StrongMode)
+        public virtual string ErrorReason(enErrorReason mode)
         {
-            if (ReadOnly) { return "Die Datei wurde schreibgeschützt geöffnet."; }
-                                 
-            // Wird gespeichert, werden am Ende Penings zu Undos. Diese werden evtl nicht mitgespeichert.
-            if (BinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
+            if (mode == enErrorReason.OnlyRead) { return string.Empty; }
 
-            if (StrongMode)
+            //----------Alle Edits und Save ------------------------------------------------------------------------
+            //  Generelle Prüfung, die eigentlich immer benötigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell ändern
+            //  und eine Prüfung, die nicht auf die Sekunde genau wichtig ist.
+            if (ReadOnly) { return "Die Datei wurde schreibgeschützt geöffnet."; }
+
+            if (CheckForLastError(ref _EditNormalyNextCheck, ref _EditNormalyError)) { return _EditNormalyError; }
+
+
+            if (!string.IsNullOrEmpty(Filename))
+            {
+                if (!CanWriteInDirectory(Filename.FilePath()))
+                {
+                    _EditNormalyError = "Sie haben im Verzeichnis der Datei keine Schreibrechte.";
+                    return _EditNormalyError;
+                }
+                if (BlockDateiVorhanden())
+                {
+                    var f = new FileInfo(Blockdateiname());
+                    if (DateTime.Now.Subtract(f.LastWriteTime).TotalSeconds > 60)
+                    {
+                        _EditNormalyError = "Eine Blockdatei ist anscheinend dauerhaft vorhanden. Administrator verständigen.";
+                        return _EditNormalyError;
+                    }
+                }
+            }
+
+            //----------EditAcut, EditGeneral ---------------------------------------------------------------------- 
+            if (mode.HasFlag(enErrorReason.EditAcut) || mode.HasFlag(enErrorReason.EditGeneral))
+            {
+                // Wird gespeichert, werden am Ende Penings zu Undos. Diese werden evtl nicht mitgespeichert.
+                if (BinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
+            }
+
+            //----------EditGeneral------------------------------------------------------------------------------------------
+            if (mode.HasFlag(enErrorReason.EditGeneral))
             {
                 if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
-
                 if (BinReLoader.IsBusy) { return "Aktuell werden im Hintergrund Daten geladen."; }
                 if (ReloadNeeded()) { return "Die Datei muss neu eingelesen werden."; }
             }
+
+
+            //---------- Save ------------------------------------------------------------------------------------------
+
+            if (mode.HasFlag(enErrorReason.Save))
+            {
+                if (BinReLoader.IsBusy) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
+
+                if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
+                if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------
+
+                if (CheckForLastError(ref _CanWriteNextCheck, ref _CanWriteError))
+                {
+                    if (!string.IsNullOrEmpty(_CanWriteError)) { return _CanWriteError; }
+                }
+
+
+                if (BlockDateiVorhanden())
+                {
+                    _CanWriteError = "Beim letzten Versuch, die Datei zu speichern, ist der Speichervorgang nicht korrekt beendet worden. Speichern ist solange deaktiviert, bis ein Administrator die Freigabe zum Speichern erteilt.";
+                    return _CanWriteError;
+                }
+
+
+                try
+                {
+                    var f2 = new FileInfo(Filename);
+                    if (DateTime.Now.Subtract(f2.LastWriteTime).TotalSeconds < 2)
+                    {
+                        _CanWriteError = "Anderer Speichervorgang noch nicht abgeschlossen.";
+                        return _CanWriteError;
+                    }
+                }
+                catch
+                {
+                    _CanWriteError = "Dateizugriffsfehler.";
+                    return _CanWriteError;
+                }
+
+                if (!CanWrite(Filename, 0.5))
+                {
+                    _CanWriteError = "Windows blockiert die Datenbank-Datei.";
+                    return _CanWriteError;
+                }
+
+
+            }
+
             return string.Empty;
+
+
+            // Gibt true zurück, wenn die letzte Prüfung noch gülig ist
+            bool CheckForLastError(ref DateTime nextCheck, ref string lastMessage)
+            {
+                if (DateTime.Now.Subtract(nextCheck).TotalSeconds < 0) { return true; }
+                lastMessage = string.Empty;
+                nextCheck = DateTime.Now.AddSeconds(5);
+                return false;
+            }
+
         }
 
 
-        public void WaitEditable(bool StrongMode)
-        {
-            if (ReadOnly) { return; }
 
-            while ( !string.IsNullOrEmpty(UserEditErrorReason(StrongMode)))
+
+        public void WaitEditable()
+        {
+
+            while (!string.IsNullOrEmpty(ErrorReason(enErrorReason.EditAcut)))
             {
+                if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.EditNormaly))) { return; }// Nur anzeige-Datenbanken sind immer Schreibgeschützt
                 Pause(0.2, true);
             }
         }

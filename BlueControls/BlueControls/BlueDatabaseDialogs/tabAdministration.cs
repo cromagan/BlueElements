@@ -548,9 +548,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         public static void OpenLayoutEditor(Database DB, string AdditionalLayoutPath, string LayoutToOpen)
         {
-
-
-            if (!DB.IsSaveAble()) { return; }
+            if (!string.IsNullOrEmpty(DB.ErrorReason(enErrorReason.EditNormaly))) { return; }
 
             DB.AbortBackup();
 

@@ -64,7 +64,7 @@ namespace BlueControls.BlueDatabaseDialogs
                     {
                         if (ThisColumn.DropdownBearbeitungErlaubt)
                         {
-                            if (CellCollection.UserEditPossible(ThisColumn, Row))
+                            if (CellCollection.UserEditPossible(ThisColumn, Row, BlueBasics.Enums.enErrorReason.OnlyRead))
                             {
                                 var ThisView = Formula.SearchColumnView(ThisColumn);
                                 if (ThisView != null)

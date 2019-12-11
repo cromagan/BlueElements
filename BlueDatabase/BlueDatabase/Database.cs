@@ -1600,30 +1600,20 @@ namespace BlueDatabase
 
 
 
-        /// <summary>
-        /// Gibt einen Fehlergrund zurück, wenn gerade eben kein Speicherzugriff auf die Datei möglich ist.
-        /// </summary>
-        /// <returns></returns>
-        protected override string SavebleErrorReason()
+
+        public override string ErrorReason(enErrorReason mode)
         {
-
-            var f = base.SavebleErrorReason();
-
+            if (mode == enErrorReason.OnlyRead) { return string.Empty; }
+            if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."; }
+            var f = base.ErrorReason(mode);
             if (!string.IsNullOrEmpty(f)) { return f; }
 
-            if (Cell.Freezed) { return "Datenbank gerade eingefroren."; }
-
-
-            if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."; }
-
-            if (Backup.IsBusy) { return "Speichern aktuell nicht möglich, da gerade Sicherheitskopien erstellt werden."; }
-
-
+            if (mode.HasFlag(enErrorReason.Save))
+            {
+                if (Cell.Freezed) { return "Datenbank gerade eingefroren."; }
+            }
             return string.Empty;
         }
-
-
-
 
         public override bool HasPendingChanges()
         {
