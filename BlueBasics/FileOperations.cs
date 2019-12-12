@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.IO;
 using static BlueBasics.modAllgemein;
 using BlueBasics.Enums;
+using System.Security.Cryptography;
 
 namespace BlueBasics
 {
@@ -370,5 +371,19 @@ namespace BlueBasics
 
             return filename;
         }
+
+
+        public static string CalculateMD5(string filename)
+        {
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = File.OpenRead(filename))
+                {
+                    var hash = md5.ComputeHash(stream);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                }
+            }
+        }
+
     }
 }

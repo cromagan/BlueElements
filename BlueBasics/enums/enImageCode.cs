@@ -158,6 +158,7 @@ namespace BlueBasics.Enums
         Word,
         XML,
         ZA,
+        Zahnrad,
         Zeile,
         Zeilenumbruch,
         Zentrieren,

@@ -223,12 +223,6 @@
     <Compile Include="ItemCollection\Basics\FormPadItemRectangle.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />
     <Compile Include="SystemInputHook.cs" />
-    <Compile Include="Controls\BrainDrawer.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\BrainDrawer.Designer.cs">
-      <DependentUpon>BrainDrawer.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controls\Button.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -712,10 +706,6 @@
     <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj">
       <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
       <Name>BlueBasics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\BlueBrain\BlueBrain\BlueBrain.csproj">
-      <Project>{fc28245c-8f58-412d-85ce-8f5327618fa8}</Project>
-      <Name>BlueBrain</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\BlueDatabase\BlueDatabase\BlueDatabase.csproj">
       <Project>{ce8be078-ddae-47f5-aaa9-685564b898c9}</Project>

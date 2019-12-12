@@ -23,6 +23,11 @@ namespace BlueBasics.MultiUserFile
 
         private string _LastSaveCode;
         public bool ReadOnly { get; private set; }
+
+
+        /// <summary>
+        /// Load benutzen
+        /// </summary>
         public string Filename { get; private set; }
 
         protected int _ReloadDelaySecond = 10;
@@ -101,6 +106,7 @@ namespace BlueBasics.MultiUserFile
 
         public clsMultiUserFile(bool readOnly)
         {
+            CreateControl();
             InitializeComponent();
 
 
@@ -536,30 +542,49 @@ namespace BlueBasics.MultiUserFile
 
         protected abstract bool isSomethingDiscOperatingsBlocking();
 
-        public void Load(string fileName)
+
+        public void Load(string fileNameToLoad, bool CreateWhenNotExisting)
         {
 
-            if (fileName.ToUpper() == Filename.ToUpper()) { return; }
+            if (fileNameToLoad.ToUpper() == Filename.ToUpper()) { return; }
 
             if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(enFehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
 
-            if (string.IsNullOrEmpty(fileName)) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname nicht angegeben!"); }
-            fileName = modConverter.SerialNr2Path(fileName);
+            if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname nicht angegeben!"); }
+            fileNameToLoad = modConverter.SerialNr2Path(fileNameToLoad);
 
-            if (!FileExists(fileName))
+
+            if (!CanWriteInDirectory(fileNameToLoad.FilePath())) { ReadOnly = true; }
+
+
+            if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
+
+
+
+            if (!FileExists(fileNameToLoad))
             {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Datenbank existiert nicht: " + fileName);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
-                ReadOnly = true;
-                return;
+
+                if (CreateWhenNotExisting)
+                {
+                    SaveAsAndChangeTo(fileNameToLoad);
+                }
+                else
+                {
+
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
+                    ReadOnly = true;
+                    return;
+                }
             }
 
-            if (!CanWriteInDirectory(fileName.FilePath())) { ReadOnly = true; }
 
 
-            if (!IsFileAllowedToLoad(fileName)) { return; }
 
 
-            Filename = fileName;
+
+
+
+            Filename = fileNameToLoad;
 
 
             // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
@@ -951,5 +976,13 @@ namespace BlueBasics.MultiUserFile
                 Pause(0.2, true);
             }
         }
+
+
+        protected override void OnHandleDestroyed(System.EventArgs e)
+        {
+            Release(false, 60);
+            base.OnHandleDestroyed(e);
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BlueBasics;
+using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows.Forms;
@@ -204,7 +205,8 @@ namespace BlueControls.Controls
             }
 
 
-            _propertynamecpl = _propertynamecpl.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + "/\\ _");
+            _propertynamecpl = _propertynamecpl.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + "-/\\ _");
+            _propertynamecpl = _propertynamecpl.Replace("-", "_");
             _propertynamecpl = _propertynamecpl.Replace(" ", "_");
             _propertynamecpl = _propertynamecpl.Replace("/", "_");
             _propertynamecpl = _propertynamecpl.Replace("\\", "_");
@@ -318,6 +320,14 @@ namespace BlueControls.Controls
                 {
                     if (rekursiv) { SetAllFlexControls(gr, _to, rekursiv); }
                 }
+                if (thisc is TabControl tb)
+                {
+                    if (rekursiv) { SetAllFlexControls(tb, _to, rekursiv); }
+                }
+                if (thisc is TabPage tabp)
+                {
+                    if (rekursiv) { SetAllFlexControls(tabp, _to, rekursiv); }
+                }
                 else if (thisc is FlexiControlForProperty flx)
                 {
                     flx.PropertyObject = _to;
@@ -370,6 +380,13 @@ namespace BlueControls.Controls
             }
             return null;
         }
+
+        protected override void OnHandleDestroyed(System.EventArgs e)
+        {
+            FillPropertyNow();
+            base.OnHandleDestroyed(e);
+        }
+
     }
 }
 

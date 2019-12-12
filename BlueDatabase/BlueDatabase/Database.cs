@@ -133,7 +133,7 @@ namespace BlueDatabase
                         var tmp = Database.GetByFilename(pf, false);
                         if (tmp != null) { return tmp; }
                         tmp = new Database(false);
-                        tmp.Load(pf);
+                        tmp.Load(pf, false);
                         return tmp;
                     }
 
@@ -427,7 +427,7 @@ namespace BlueDatabase
             CultureInfo.DefaultThreadCurrentUICulture = culture;
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
 
-            CreateControl();
+
             InitializeComponent();
 
             Cell = new CellCollection(this);
