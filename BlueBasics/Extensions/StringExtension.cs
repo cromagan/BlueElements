@@ -839,6 +839,12 @@ namespace BlueBasics
 
         }
 
+        public static bool ContainsWord(this string input, string value, RegexOptions options)
+        {
+            return (input.IndexOfWord(value, 0, options) >= 0);
+        }
+
+
         public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options)
         {
             //pattern = pattern.Replace("(", "\\(");

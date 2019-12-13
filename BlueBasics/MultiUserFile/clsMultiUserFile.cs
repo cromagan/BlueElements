@@ -699,7 +699,12 @@ namespace BlueBasics.MultiUserFile
                 Develop.DoEvents();
                 if (DateTime.Now.Subtract(D).TotalSeconds > MaxWaitSeconds)
                 {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Datei nicht freigegeben...." + Filename);
+                    if (MUSTRelease)
+                    {
+                        Develop.DebugPrint(enFehlerArt.Warnung, "Datei nicht freigegeben...." + Filename);
+                    }
+
+
                     return false;
                 } // KAcke, Da liegt ein größerer Fehler vor...
                 if (!MUSTRelease && DateTime.Now.Subtract(D).TotalSeconds > 20 && !BlockDateiVorhanden()) { return false; } // Wenn der Saver hängt.... kommt auch vor :-(
