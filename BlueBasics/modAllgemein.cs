@@ -627,7 +627,7 @@ namespace BlueBasics
 
         public static bool DateTimeTryParse(string Value, out DateTime DT)
         {
-
+            // https://docs.microsoft.com/de-de/dotnet/standard/base-types/standard-date-and-time-format-strings?view=netframework-4.8
             if (DateTime.TryParseExact(Value, Constants.Format_Date5, CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
             if (DateTime.TryParseExact(Value, Constants.Format_Date6, CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
             if (DateTime.TryParseExact(Value, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
@@ -635,6 +635,8 @@ namespace BlueBasics
             if (DateTime.TryParseExact(Value, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
             if (DateTime.TryParseExact(Value, "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
             if (DateTime.TryParseExact(Value, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
+            if (DateTime.TryParseExact(Value, "dd.MM.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
+            if (DateTime.TryParseExact(Value, "d.M.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DT)) { return true; }
 
             return false;
 
