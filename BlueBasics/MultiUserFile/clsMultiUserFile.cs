@@ -30,6 +30,8 @@ namespace BlueBasics.MultiUserFile
         /// </summary>
         public string Filename { get; private set; }
 
+        public bool AutoDeleteBAK { get; set; }
+
         protected int _ReloadDelaySecond = 10;
         private void InitializeComponent()
         {
@@ -115,6 +117,7 @@ namespace BlueBasics.MultiUserFile
             _CheckedAndReloadNeed = true;
             _LastSaveCode = string.Empty;
             ReadOnly = readOnly;
+            AutoDeleteBAK = false;
             UserEditedAktion = new DateTime(1900, 1, 1);
 
             Checker.Enabled = false;
@@ -256,7 +259,7 @@ namespace BlueBasics.MultiUserFile
         internal void ParseInternal(List<byte> bLoaded)
         {
             if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Doppelter Parse!"); }
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
             _isParsing = true;
             ParseExternal(bLoaded);
@@ -428,7 +431,11 @@ namespace BlueBasics.MultiUserFile
             CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
             DeleteFile(BlockDatei, true);
 
-
+            // Evtl. das BAK löschen
+            if (AutoDeleteBAK && FileExists(tBackup))
+            {
+                DeleteFile(tBackup, false);
+            }
 
 
             BinaryWriter_ReportProgressAndWait(15, "GetFileState");
@@ -692,7 +699,7 @@ namespace BlueBasics.MultiUserFile
                 Develop.DoEvents();
                 if (DateTime.Now.Subtract(D).TotalSeconds > MaxWaitSeconds)
                 {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Datenank nicht freigegeben...." + Filename);
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Datei nicht freigegeben...." + Filename);
                     return false;
                 } // KAcke, Da liegt ein größerer Fehler vor...
                 if (!MUSTRelease && DateTime.Now.Subtract(D).TotalSeconds > 20 && !BlockDateiVorhanden()) { return false; } // Wenn der Saver hängt.... kommt auch vor :-(

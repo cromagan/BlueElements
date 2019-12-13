@@ -64,6 +64,7 @@ namespace BlueControls.Controls
         bool _ShowInfoWhenDisabled = false;
 
 
+        private bool _MultiLine = false;
         private string _Suffix = string.Empty;
         private enDataFormat _Format = enDataFormat.Text;
 
@@ -201,20 +202,20 @@ namespace BlueControls.Controls
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _EditType = enEditTypeFormula.Textfeld;
 
-            var TMPMultiLine = false;
+            _MultiLine = false;
 
 
             if (TextLines >= 2)
             {
                 _CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
                 Size = new Size(200, 16 + 24 * TextLines);
-                TMPMultiLine = true;
+                _MultiLine = true;
             }
             else
             {
                 _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
                 Size = new Size(200, 24);
-                TMPMultiLine = false;
+                _MultiLine = false;
             }
 
 
@@ -225,7 +226,7 @@ namespace BlueControls.Controls
 
             var c = CreateSubControls();
 
-            StyleTextBox((TextBox)c, TMPMultiLine, string.Empty, false);
+            StyleTextBox((TextBox)c, string.Empty, false);
 
             Value = InitialValue;
         }
@@ -410,6 +411,26 @@ namespace BlueControls.Controls
                 UpdateControls();
             }
         }
+
+        /// <summary>
+        /// Falls das Steuerelement Multiline unterstützt, wird dieser angezeigt
+        /// </summary>
+        [DefaultValue(false)]
+        public bool MultiLine
+        {
+            get
+            {
+                return _MultiLine;
+            }
+            set
+            {
+
+                if (_MultiLine == value) { return; }
+                _MultiLine = value;
+                UpdateControls();
+            }
+        }
+
 
 
         /// <summary>
@@ -1472,7 +1493,7 @@ namespace BlueControls.Controls
         {
             var Control = new TextBox();
             _InstantChangedEvent = true;
-            StyleTextBox(Control, false, string.Empty, false);
+            StyleTextBox(Control, string.Empty, false);
             UpdateValueToControl();
             StandardBehandlung(Control);
             return Control;
@@ -1481,17 +1502,17 @@ namespace BlueControls.Controls
 
 
 
-        protected void StyleTextBox(TextBox Control, bool Multiline, string AllowedChars, bool SpellChecking)
+        protected void StyleTextBox(TextBox Control, string AllowedChars, bool SpellChecking)
         {
             Control.Enabled = _enabled;
             Control.Format = _Format;
             Control.Suffix = _Suffix;
             Control.AllowedChars = AllowedChars;
-            Control.MultiLine = Multiline;
+            Control.MultiLine = _MultiLine;
             Control.SpellChecking = SpellChecking;
             Control.InstantChangedEvent = _InstantChangedEvent;
 
-            if (Multiline || Height > 20)
+            if (_MultiLine || Height > 20)
             {
                 Control.Verhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             }

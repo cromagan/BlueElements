@@ -407,6 +407,7 @@ namespace BlueControls.Controls
             Suffix = column1.Suffix;
             Format = column1.Format;
             InstantChangedEvent = false;
+            MultiLine = column1.MultiLine;
 
             switch (e.Control)
             {
@@ -432,7 +433,7 @@ namespace BlueControls.Controls
                     break;
 
                 case TextBox textBox:
-                    StyleTextBox(textBox, column1.MultiLine, column1.AllowedChars, column1.SpellCheckingEnabled);
+                    StyleTextBox(textBox, column1.AllowedChars, column1.SpellCheckingEnabled);
                     textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus += GotFocus_TextBox;
                     textBox.TextChanged += TextBox_TextChanged;

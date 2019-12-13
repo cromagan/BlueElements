@@ -1,8 +1,10 @@
 ﻿using BlueBasics;
-using System;
+using BlueBasics.Enums;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows.Forms;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.Controls
 {
@@ -229,7 +231,20 @@ namespace BlueControls.Controls
             }
 
 
-            Value = (string)propInfo.GetValue(_propertyObject, null);
+           var  x = propInfo.GetValue(_propertyObject, null);
+
+            if (x is string s)
+            {
+                Value = s;
+            }else if (x is List<string> ls)
+            {
+                Value = ls.JoinWithCr();
+            }
+            else
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
+            }
+
 
 
         }
@@ -244,10 +259,29 @@ namespace BlueControls.Controls
             if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null) { return; }
 
 
-            var OldVal = (string)propInfo.GetValue(_propertyObject, null);
+            var OldVal = string.Empty;
+            var x = propInfo.GetValue(_propertyObject, null);
+            object toSet = null;
+
+            if (x is string s)
+            {
+                OldVal = s;
+                toSet = Value;
+            }
+            else if (x is List<string> ls)
+            {
+                OldVal = ls.JoinWithCr();
+                toSet = Value.SplitByCRToList();
+            }
+            else
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
+            }
+
+
             if (OldVal == Value) { return; }
 
-            propInfo.SetValue(_propertyObject, Value, null);
+            propInfo.SetValue(_propertyObject, toSet, null);
 
         }
 
