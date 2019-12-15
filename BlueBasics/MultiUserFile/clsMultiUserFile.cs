@@ -24,6 +24,7 @@ namespace BlueBasics.MultiUserFile
         private string _LastSaveCode;
         public bool ReadOnly { get; private set; }
 
+        public bool EasyMode { get; private set; }
 
         /// <summary>
         /// Load benutzen
@@ -106,7 +107,7 @@ namespace BlueBasics.MultiUserFile
 
 
 
-        public clsMultiUserFile(bool readOnly)
+        public clsMultiUserFile(bool readOnly, bool easyMode)
         {
             CreateControl();
             InitializeComponent();
@@ -117,6 +118,7 @@ namespace BlueBasics.MultiUserFile
             _CheckedAndReloadNeed = true;
             _LastSaveCode = string.Empty;
             ReadOnly = readOnly;
+            EasyMode = easyMode;
             AutoDeleteBAK = false;
             UserEditedAktion = new DateTime(1900, 1, 1);
 
@@ -328,12 +330,13 @@ namespace BlueBasics.MultiUserFile
         private void BinSaver_DoWork(object sender, DoWorkEventArgs e)
         {
             if (ReadOnly) { return; }
+            if (EasyMode) { Develop.DebugPrint(enFehlerArt.Fehler, "Dürfte nicht passieren."); }
 
             var f = ErrorReason(enErrorReason.Save);
 
             if (!string.IsNullOrEmpty(f))
             {
-                Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datenbank abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + f);
+                Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + f);
                 OnSaveAborded();
                 return;
             }
@@ -407,7 +410,7 @@ namespace BlueBasics.MultiUserFile
                     count += 1;
                     if (count > 30)
                     {
-                        Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datenbank abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + ex.Message);
+                        Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + ex.Message);
                         DeleteFile(BlockDatei, true);
                         DeleteFile(TMP, true);
                         return;
@@ -458,9 +461,13 @@ namespace BlueBasics.MultiUserFile
 
         protected abstract void DoWorkInParallelBinSaverThread();
 
+        /// <summary>
+        /// EasyMode gibt immer false zurück
+        /// </summary>
+        /// <returns></returns>
         public bool ReloadNeeded()
         {
-            //        Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+            if (EasyMode) { return false; }
             if (string.IsNullOrEmpty(Filename)) { return false; }
 
             if (_CheckedAndReloadNeed) { return true; }
@@ -530,7 +537,9 @@ namespace BlueBasics.MultiUserFile
                 return;
             }
 
-            if (!ReloadNeeded()) { return; }
+
+            //WIchtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
+            if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded()) { return; }
 
             if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, da gerade geparst wird"); }
 
@@ -700,7 +709,7 @@ namespace BlueBasics.MultiUserFile
             while (HasPendingChanges())
             {
 
-                if (!BinSaver.IsBusy) { BinSaver.RunWorkerAsync(); }
+                if (!BinSaver.IsBusy) { SaveProcess(); }
                 Develop.DoEvents();
                 if (DateTime.Now.Subtract(D).TotalSeconds > MaxWaitSeconds)
                 {
@@ -716,6 +725,121 @@ namespace BlueBasics.MultiUserFile
                 if (DateTime.Now.Subtract(D).TotalSeconds > 30 && !BinSaver.IsBusy && HasPendingChanges() && BlockDateiVorhanden()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank aufgrund der Blockdatei nicht freigegeben: " + Filename); }
             }
             return true;
+        }
+
+        private void SaveProcess()
+        {
+            if (ReadOnly) { return; }
+
+            if (!EasyMode)
+            {
+                if (!BinSaver.IsBusy) { BinSaver.RunWorkerAsync(); }
+                return;
+            }
+
+
+            if (IsThereBackgroundWorkToDo(true))
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Easymode unterstützt keine Backgroundworker");
+            }
+
+
+
+
+
+            var f = ErrorReason(enErrorReason.Save);
+
+            if (!string.IsNullOrEmpty(f))
+            {
+                Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + f);
+                OnSaveAborded();
+                return;
+            }
+
+            if (string.IsNullOrEmpty(Filename)) { return; }
+
+            var tBackup = Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
+
+
+            if (FileExists(tBackup)) { DeleteFile(tBackup, true); }
+
+
+            if (FileExists(Filename))
+            {
+                var done = false;
+                try
+                {
+                    done = RenameFile(Filename, tBackup, false);
+                }
+                catch (Exception ex)
+                {
+                    Develop.DebugPrint(enFehlerArt.Warnung, ex);
+                    return;
+                }
+                if (!done)
+                {
+                    Develop.DebugPrint(enFehlerArt.Info, "Befehl anscheinend abgebrochen:\r\n" + Filename);
+                    return;
+                }
+            }
+
+
+
+            Writer_BinaryData = ToListOfByte(true);
+
+
+
+
+
+            // Und hier wird nun die neue Datei als TMP erzeugt erzeugt.
+            var count = 0;
+
+            do
+            {
+                try
+                {
+                    using (var x = new FileStream(Filename, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        x.Write(Writer_BinaryData.ToArray(), 0, Writer_BinaryData.ToArray().Length);
+                        x.Flush();
+                        x.Close();
+                    }
+                    SetFileDate();
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    count += 1;
+                    if (count > 30)
+                    {
+                        Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + ex.Message);
+                        return;
+                    }
+                    Develop.DoEvents();
+                }
+            } while (true);
+
+
+
+            // ---- Steuerelemente Sagen, was gespeichert wurde
+            ThisIsOnDisk(Writer_BinaryData);
+
+
+
+            // Evtl. das BAK löschen
+            if (AutoDeleteBAK && FileExists(tBackup))
+            {
+                DeleteFile(tBackup, false);
+            }
+
+            _LastSaveCode = GetFileInfo(true);
+            _CheckedAndReloadNeed = false;
+
+            DoWorkInSerialSavingThread();
+
+            DoWorkInParallelBinSaverThread(); // OK, gemogelt, aber sonst wirds ja gar nicht gemacht
+
+            OnSavedToDisk();
         }
 
         public abstract bool HasPendingChanges();
@@ -853,7 +977,7 @@ namespace BlueBasics.MultiUserFile
 
             if (_MustSave && Checker_Tick_count > Count_Save)
             {
-                BinSaver.RunWorkerAsync();
+                SaveProcess();
                 Checker_Tick_count = 0;
                 return;
             }

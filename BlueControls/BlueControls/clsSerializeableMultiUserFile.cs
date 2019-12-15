@@ -29,15 +29,11 @@ namespace BlueControls
         public event EventHandler MultipleUserDetected;
 
 
-        public clsSerializeableMultiUserFile() : base(false)
+        public clsSerializeableMultiUserFile(bool readOnly, bool easymode) : base(readOnly, easymode)
         {
             obj = (T)Activator.CreateInstance(typeof(T));
         }
 
-        public clsSerializeableMultiUserFile(bool readOnly) : base(readOnly)
-        {
-            obj = (T)Activator.CreateInstance(typeof(T));
-        }
 
         protected override bool isSomethingDiscOperatingsBlocking()
         {

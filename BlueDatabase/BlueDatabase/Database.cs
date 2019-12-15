@@ -417,7 +417,7 @@ namespace BlueDatabase
         #region  Construktor + Initialize 
 
 
-        public Database(bool readOnly) : base(readOnly)
+        public Database(bool readOnly) : base(readOnly, false)
         {
             AllDatabases.Add(this);
             OnDatabaseAdded(this);
