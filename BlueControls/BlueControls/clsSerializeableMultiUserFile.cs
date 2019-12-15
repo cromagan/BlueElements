@@ -34,6 +34,11 @@ namespace BlueControls
             obj = (T)Activator.CreateInstance(typeof(T));
         }
 
+        public clsSerializeableMultiUserFile(bool readOnly) : base(readOnly)
+        {
+            obj = (T)Activator.CreateInstance(typeof(T));
+        }
+
         protected override bool isSomethingDiscOperatingsBlocking()
         {
             return false;

@@ -573,6 +573,11 @@ namespace BlueBasics.MultiUserFile
 
                 if (CreateWhenNotExisting)
                 {
+                    if (ReadOnly)
+                    {
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Readonly kann keine Datei erzeugen");
+                        return;
+                    }
                     SaveAsAndChangeTo(fileNameToLoad);
                 }
                 else
