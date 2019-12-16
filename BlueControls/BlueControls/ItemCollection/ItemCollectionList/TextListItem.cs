@@ -32,7 +32,6 @@ namespace BlueControls.ItemCollection
         private string _ReadableText;
         private QuickImage _Symbol;
         private readonly enDataFormat _Format = enDataFormat.Text;
-        readonly private bool _IsCaption;
 
 
         #endregion
@@ -107,7 +106,7 @@ namespace BlueControls.ItemCollection
 
         public TextListItem(string internalname, string readableText, QuickImage symbol, bool isCaption, bool enabled, enDataFormat format, string userDefCompareKey) : base(internalname)
         {
-            _IsCaption = isCaption;
+            IsCaption = isCaption;
             _ReadableText = readableText;
             _Symbol = symbol;
             _Enabled = enabled;
@@ -161,7 +160,7 @@ namespace BlueControls.ItemCollection
 
         private enDesign tempDesign(enDesign itemdesign)
         {
-            if (_IsCaption)
+            if (IsCaption)
             {
                 switch (itemdesign)
                 {
@@ -177,7 +176,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override SizeF SizeUntouchedForListBox()
+        public override Size SizeUntouchedForListBox()
         {
             return Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(((ItemCollectionList)Parent).ItemDesign), enStates.Standard), 16);
         }
@@ -208,22 +207,13 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override bool IsClickable()
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth)
         {
-            return !_IsCaption;
+            return (int)SizeUntouchedForListBox().Height;
         }
 
 
-        public override void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth)
-        {
-            SetCoordinates(new Rectangle((int)X, (int)Y, (int)(MultiX - SliderWidth), (int)SizeUntouchedForListBox().Height));
-        }
 
-
-        public override SizeF QuickAndDirtySize(int PreferedHeigth)
-        {
-            return SizeUntouchedForListBox();
-        }
 
         public override void DesignOrStyleChanged()
         {
@@ -232,7 +222,7 @@ namespace BlueControls.ItemCollection
 
         public override object Clone()
         {
-            return GetCloneData(new TextListItem(Internal, _ReadableText, _Symbol, _IsCaption, _Enabled, _Format, UserDefCompareKey));
+            return GetCloneData(new TextListItem(Internal, _ReadableText, _Symbol, IsCaption, _Enabled, _Format, UserDefCompareKey));
         }
 
         public override bool FilterMatch(string FilterText)

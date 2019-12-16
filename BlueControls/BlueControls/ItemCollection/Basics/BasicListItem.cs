@@ -29,13 +29,11 @@ namespace BlueControls.ItemCollection
 {
     public abstract class BasicListItem : BasicItem, ICompareKey, IComparable, ICloneable
     {
-        public abstract SizeF SizeUntouchedForListBox();
+        public abstract Size SizeUntouchedForListBox();
 
-        public abstract bool IsClickable();
 
-        public abstract void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth);
 
-        public abstract SizeF QuickAndDirtySize(int PreferedHeigth);
+        public abstract int HeightForListBox(enBlueListBoxAppearance style, int columnWidth);
 
 
         protected abstract string GetCompareKey();
@@ -58,6 +56,7 @@ namespace BlueControls.ItemCollection
         public Rectangle Pos;
         private string _UserDefCompareKey = "";
 
+        public bool IsCaption { get; protected set; }
 
         /// <summary>
         /// Ist das Item enabled?
@@ -74,6 +73,10 @@ namespace BlueControls.ItemCollection
         }
 
 
+        public virtual bool IsClickable()
+        {
+            return !IsCaption;
+        }
 
 
 

@@ -96,8 +96,8 @@ namespace BlueControls.BlueDatabaseDialogs
                 nochOk = false;
             }
 
-            FiltItems.Item.ComputeAllItemPositions(new Size(10, 10), true, false, enBlueListBoxAppearance.Autofilter, null, null);
-            var PrefSize = FiltItems.Item.MaximumBounds();
+
+            var PrefSize = FiltItems.Item.CalculateColumnAndSize();
             FiltItems.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Top;
             FiltItems.Width = Math.Min(Table.tmpColumnContentWidth(Column, F, 16), Width - Skin.PaddingSmal * 2);
 

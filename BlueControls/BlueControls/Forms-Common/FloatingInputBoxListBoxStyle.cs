@@ -95,9 +95,9 @@ namespace BlueControls.Forms
 
             var itemsClone = (ItemCollectionList)ItemsOri.Clone();
 
-
-            var He = (int)(itemsClone.HeigthOfAllItemsAdded(int.MaxValue));
-            var Wi = (int)(itemsClone.WidthOfBiggestItem(int.MaxValue));
+            var data = itemsClone.ItemData(); // BiggestItem, HeightOf One, HeightAdded, SenkrechtAllowed
+            var Wi = data.Item1;
+            var He = data.Item3;
 
             if (AddNewAllowed != enAddType.None) { He += 24; }
 
@@ -105,11 +105,7 @@ namespace BlueControls.Forms
             lstbx.Appearance = (enBlueListBoxAppearance)itemsClone.ControlDesign;
             lstbx.Translate = Translate;
 
-
-
-            if (lstbx.Appearance == enBlueListBoxAppearance.Listbox ||
-                lstbx.Appearance == enBlueListBoxAppearance.Gallery ||
-                lstbx.Appearance == enBlueListBoxAppearance.FileSystem)
+            if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
             {
                 He += Skin.PaddingSmal * 2;
                 He = Math.Max(He, 5 * 16 + Skin.PaddingSmal * 2 + 24);

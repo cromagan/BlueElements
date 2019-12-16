@@ -1169,7 +1169,10 @@ namespace BlueDatabase
 
             if (!_cells.ContainsKey(CellKey)) { return string.Empty; }
 
-            return _cells[CellKey].Value;
+            var s = _cells[CellKey].Value;
+
+            if (s !=null) { return s; }
+            return string.Empty;
         }
 
         public void Set(string columnName, RowItem row, string value)

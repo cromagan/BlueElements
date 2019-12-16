@@ -175,9 +175,17 @@ namespace BlueBasics.MultiUserFile
                     tmpLastSaveCode = GetFileInfo(true);
 
 
-                    Pause(0.5, false);
 
-                    if (new FileInfo(Filename).Length == _tmp.Length) { break; }
+                    if (EasyMode)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Pause(0.5, false);
+                        if (new FileInfo(Filename).Length == _tmp.Length) { break; }
+                    }
+
                 }
                 catch (Exception ex)
                 {

@@ -133,6 +133,7 @@ namespace BlueControls.Controls
             {
                 if (_Appearance == value) { return; }
                 _Appearance = value;
+                Item.Appearance = value;
             }
         }
 
@@ -425,7 +426,7 @@ namespace BlueControls.Controls
 
             if (ButtonsVisible()) { PaintModYx = Plus.Height; }
 
-            Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - PaintModYx), false, _MoveAllowed, _Appearance, this, SliderY);
+            Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - PaintModYx), this, SliderY);
 
 
             if (SliderY.Visible) { PaintModXx = SliderY.Width; }

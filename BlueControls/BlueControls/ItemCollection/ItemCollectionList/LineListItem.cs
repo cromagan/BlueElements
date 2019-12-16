@@ -72,12 +72,12 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override SizeF SizeUntouchedForListBox()
+        public override Size SizeUntouchedForListBox()
         {
             if (Pos.X == 0 && Pos.X == 0 && Pos.Width == 0 && Pos.Height == 0)
             {
 
-                return new SizeF(4, 4);
+                return new Size(4, 4);
             }
 
             return Pos.Size;
@@ -96,31 +96,19 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth)
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth)
         {
-            SetCoordinates(new Rectangle((int)X, (int)Y + 2, (int)(MultiX - SliderWidth), 4));
+            return 4;
         }
-
-        public override SizeF QuickAndDirtySize(int PreferedHeigth)
-        {
-            return SizeUntouchedForListBox();
-        }
-
 
         protected override string GetCompareKey()
         {
             return Pos.ToString();
         }
 
-
         public override object Clone()
         {
             return GetCloneData(new LineListItem(Internal, UserDefCompareKey));
-
-
-
         }
-
-
     }
 }

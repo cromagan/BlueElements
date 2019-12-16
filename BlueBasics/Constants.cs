@@ -94,6 +94,7 @@ namespace BlueBasics
         public const string Format_Integer4 = "0000";
         public const string Format_Integer3 = "000";
         public const string Format_Integer2 = "00";
+        public const string Format_Integer1 = "0"; // Bei Floats ohne Komma
 
         public const string Format_Float1 = "0.#"; // 1 Nachkomma
         public const string Format_Float2 = "0.##"; // 2 Nachkomma

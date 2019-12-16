@@ -255,8 +255,15 @@ namespace BlueControls.Controls
 
             list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
             var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
-            var x = Math.Max((int)(list.WidthOfBiggestItem(500) + 20 + s.Width), 200);
-            var y = Math.Max((int)(list.HeightOfBiggestItem(100) + Skin.PaddingSmal * 2), 24);
+
+
+            var data = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+            var Wi = data.Item1;
+            var He = data.Item2;
+
+
+            var x = Math.Max((int)(data.Item1 + 20 + s.Width), 200);
+            var y = Math.Max((int)(data.Item2 + Skin.PaddingSmal * 2), 24);
 
             Size = new Size(x, y);
 

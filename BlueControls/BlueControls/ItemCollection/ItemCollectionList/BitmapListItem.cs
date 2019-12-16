@@ -286,12 +286,9 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override SizeF SizeUntouchedForListBox()
+        public override Size SizeUntouchedForListBox()
         {
-            if (_Bitmap == null) { Debugger.Break(); }
-            GetImage();
-            if (_Bitmap == null) { return SizeF.Empty; }
-            return _Bitmap.Size;
+            return new Size(300, 300);
         }
 
         private void GetImage()
@@ -329,61 +326,23 @@ namespace BlueControls.ItemCollection
             return _Bitmap != null;
         }
 
-
-
-
-
-        public override bool IsClickable()
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth)
         {
-            return true;
-        }
-
-        public override void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth)
-        {
-
-            MaxWidth = Math.Min(MaxWidth, 800);
-
-
-            switch (IsIn)
+            switch (style)
             {
-                case enBlueListBoxAppearance.Gallery:
-                    SetCoordinates(new Rectangle((int)X, (int)Y, (int)MultiX, (int)(MultiX * 0.8)));
-                    break;
-
                 case enBlueListBoxAppearance.FileSystem:
-                    SetCoordinates(new Rectangle((int)X, (int)Y, 110, 110 + _captionlines * ConstMY));
-                    break;
-
+                    return (110 + _captionlines * ConstMY);
                 default:
-                    SetCoordinates(new Rectangle((int)X, (int)Y, (int)(MultiX - SliderWidth), (int)(MaxWidth * 0.8)));
-                    break;
-
+                    return (int)(columnWidth * 0.8);
             }
-
-
-
-
         }
 
-        public override SizeF QuickAndDirtySize(int PreferedHeigth)
-        {
-
-
-            if (ImageLoaded())
-            {
-                return SizeUntouchedForListBox();
-            }
-
-            return new SizeF(400, PreferedHeigth);
-        }
 
 
         protected override string GetCompareKey()
         {
             return Internal;
         }
-
-
 
         public override bool FilterMatch(string FilterText)
         {
@@ -392,7 +351,5 @@ namespace BlueControls.ItemCollection
             if (_ImageFilename.ToUpper().Contains(FilterText.ToUpper())) { return true; }
             return false;
         }
-
-
     }
 }

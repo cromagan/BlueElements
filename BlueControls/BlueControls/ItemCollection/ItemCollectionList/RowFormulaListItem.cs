@@ -191,47 +191,16 @@ namespace BlueControls.ItemCollection
 
         }
 
-        public override SizeF SizeUntouchedForListBox()
+        public override Size SizeUntouchedForListBox()
         {
-
-            if (_tmpBMP == null) { GeneratePic(); }
-            if (_tmpBMP == null) { return SizeF.Empty; }
-            return _tmpBMP.Size;
-
-        }
-
-        public override bool IsClickable()
-        {
-            return true;
-        }
-
-        public override void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth)
-        {
-
-            MaxWidth = Math.Min(MaxWidth, 800);
-
-            if (IsIn == enBlueListBoxAppearance.Gallery || IsIn == enBlueListBoxAppearance.FileSystem)
-            {
-                SetCoordinates(new Rectangle((int)X, (int)Y, (int)MultiX, (int)(MultiX * 0.8)));
-            }
-            else
-            {
-                SetCoordinates(new Rectangle((int)X, (int)Y, (int)(MultiX - SliderWidth), (int)(MaxWidth * 0.8)));
-            }
+            return new Size(300, 300);
 
         }
 
 
-        public override SizeF QuickAndDirtySize(int PreferedHeigth)
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth)
         {
-
-            if (_tmpBMP != null)
-            {
-                return SizeUntouchedForListBox();
-            }
-
-            return new SizeF(400, PreferedHeigth);
-
+            return (int)(columnWidth * 0.8);
         }
 
 
@@ -239,7 +208,5 @@ namespace BlueControls.ItemCollection
         {
             return _Row.CellFirstString();
         }
-
-
     }
 }

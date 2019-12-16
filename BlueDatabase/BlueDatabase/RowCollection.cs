@@ -309,6 +309,13 @@ namespace BlueDatabase
 
         public void Remove(RowItem Row)
         {
+
+            if (Database.InvokeRequired)
+            {
+                Database.Invoke(new Action(() => Database.Row.Remove(Row)));
+                return;
+            }
+
             if (Row == null) { return; }
             Remove(Row.Key);
         }

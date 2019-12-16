@@ -3574,6 +3574,9 @@ namespace BlueControls.Controls
         public List<RowItem> SortedRows()
         {
             if (AreRowsSorted()) { return _SortedRows; }
+
+            if (Database == null) { return new List<RowItem>(); }
+
             _SortedRows = Database.Row.CalculateSortedRows(Filter, SortUsed());
 
             if (!_SortedRows.SequenceEqual(_SortedRowsBefore))

@@ -85,7 +85,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override SizeF SizeUntouchedForListBox()
+        public override Size SizeUntouchedForListBox()
         {
             return Table.FormatedText_NeededSize(_StyleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16);
         }
@@ -115,19 +115,10 @@ namespace BlueControls.ItemCollection
             return DataFormat.CompareKey(txt, _StyleLikeThis.Format) + "|" + Internal;
         }
 
-        public override bool IsClickable()
-        {
-            return true;
-        }
 
-        public override void ComputePositionForListBox(enBlueListBoxAppearance IsIn, float X, float Y, float MultiX, int SliderWidth, int MaxWidth)
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth)
         {
-            SetCoordinates(new Rectangle((int)X, (int)Y, (int)(MultiX - SliderWidth), (int)SizeUntouchedForListBox().Height));
-        }
-
-        public override SizeF QuickAndDirtySize(int PreferedHeigth)
-        {
-            return SizeUntouchedForListBox();
+            return (int)SizeUntouchedForListBox().Height;
         }
 
         public override object Clone()
