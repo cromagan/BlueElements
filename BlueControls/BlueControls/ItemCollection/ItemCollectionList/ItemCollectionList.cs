@@ -437,7 +437,7 @@ namespace BlueControls.ItemCollection
 
                     if (ori == enOrientation.Waagerecht)
                     {
-                        if ((colCount == 1 || ThisItem.IsCaption)) { wi = ControlDrawingArea.Width - SliderWidth; }
+                        if (ThisItem.IsCaption) { wi = ControlDrawingArea.Width - SliderWidth; }
                         he = ThisItem.HeightForListBox(_Appearance, wi);
                     }
                     else
@@ -541,7 +541,7 @@ namespace BlueControls.ItemCollection
                 Develop.DebugPrint(enFehlerArt.Fehler, "Nur 'senkrecht' erlaubt mehrere Spalten");
             }
 
-            if(Count <12) { return -1; }  // <10 ergibt dividieb by zere, weil es da 0 einträge währen bei 10 Spalten
+            if (Count < 12) { return -1; }  // <10 ergibt dividieb by zere, weil es da 0 einträge währen bei 10 Spalten
 
             var colCount = 0;
             var dithemh = (int)(AllItemsHeight / Count);
@@ -575,7 +575,7 @@ namespace BlueControls.ItemCollection
             }
 
             return -1;
-       }
+        }
 
         /// <summary>
         /// Füllt die Ersetzungen mittels eines Übergebenen Enums aus.

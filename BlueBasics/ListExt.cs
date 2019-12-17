@@ -124,7 +124,11 @@ namespace BlueBasics
         public new void RemoveRange(int index, int count) { Develop.DebugPrint_NichtImplementiert(); }
 
         public new void Reverse(int index, int count) { Develop.DebugPrint_NichtImplementiert(); }
-        public new void Reverse() { Develop.DebugPrint_NichtImplementiert(); }
+        public new void Reverse()
+        {
+            base.Reverse();
+            OnListOrItemChanged();
+        }
 
         public new void Sort(int index, int count, IComparer<T> comparer) { Develop.DebugPrint_NichtImplementiert(); }
 
