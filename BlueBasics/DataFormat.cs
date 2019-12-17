@@ -422,9 +422,9 @@ namespace BlueBasics
                 case enDataFormat.Ganzzahl:
                     if (string.IsNullOrEmpty(IsValue)) { return CompareKey_S_NOK + "0000000000"; }
 
-                    if (IsValue.IsNumeral())
+                    if (int.TryParse(IsValue, out var w))
                     {
-                        return CompareKey_S_OK + IsValue.Nummer(10);
+                        return CompareKey_S_OK + w.ToString(Constants.Format_Integer10);
                     }
                     else
                     {
@@ -477,11 +477,16 @@ namespace BlueBasics
                     return Constants.SecondSortChar + IsValue;
 
                 case enDataFormat.Gleitkommazahl:
-                    if (string.IsNullOrEmpty(IsValue)) { return "0000000000,0"; }
+                    if (string.IsNullOrEmpty(IsValue)) { return "0000000000,000"; }
 
-                    if (IsValue.IsDouble())
+                    if (double.TryParse(IsValue, out var dw))
                     {
-                        return CompareKey_S_OK + double.Parse(IsValue).ToString(Constants.Format_Float10_1);
+                        var t = dw.ToString(Constants.Format_Float10_3);
+                        if (!t.Contains(",")) { t = t + ",000"; };
+                        while (t.Length < 14) { t += "0"; }
+
+                        return CompareKey_S_OK + t;
+
                     }
                     else
                     {

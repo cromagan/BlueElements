@@ -100,6 +100,8 @@ namespace BlueBasics
         public const string Format_Float2 = "0.##"; // 2 Nachkomma
         public const string Format_Float3 = "0.###"; // 3 Nachkomma
         public const string Format_Float4 = "0.####"; // 4 Nachkomma
-        public const string Format_Float10_1 = "0000000000.#"; 
+        public const string Format_Float10_1 = "0000000000.#";
+        public const string Format_Float10_2 = "0000000000.##";
+        public const string Format_Float10_3 = "0000000000.###";
     }
 }

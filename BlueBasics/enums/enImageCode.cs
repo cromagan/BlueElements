@@ -95,7 +95,7 @@ namespace BlueBasics.Enums
         MinusZeichen,
         Note,
         Ordner,
-        Passwort,
+        Papierkorb,
         Pause,
         PDF,
         Person,

@@ -341,7 +341,7 @@ namespace BlueControls.ItemCollection
 
             BreakAfterItems = CalculateColumnCount(data.Item1, data.Item3, data.Item4);
 
-            return ComputeAllItemPositions(new Size(300, 300), null, null);
+            return ComputeAllItemPositions(new Size(30, 30), null, null);
 
 
 

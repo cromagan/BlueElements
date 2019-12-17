@@ -375,6 +375,9 @@ namespace BlueBasics
 
         public static string CalculateMD5(string filename)
         {
+
+            if (!FileExists(filename)) { return string.Empty; }
+
             using (var md5 = MD5.Create())
             {
                 using (var stream = File.OpenRead(filename))

@@ -105,19 +105,19 @@ namespace BlueControls.Forms
             lstbx.Appearance = (enBlueListBoxAppearance)itemsClone.ControlDesign;
             lstbx.Translate = Translate;
 
-            if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
-            {
-                He += Skin.PaddingSmal * 2;
-                He = Math.Max(He, 5 * 16 + Skin.PaddingSmal * 2 + 24);
-                Wi = Math.Max(Wi, 250);
-            }
-            else
-            {
+            //if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
+            //{
+            //    He += Skin.PaddingSmal * 2;
+            //    He = Math.Max(He, 5 * 16 + Skin.PaddingSmal * 2 + 24);
+            //    Wi = Math.Max(Wi, 250);
+            //}
+            //else
+            //{
                 //Wi = CInt(Wi * 1.05) 'Weil die Breite nur circa berechnet wird
                 He += 1; // Um ja den Slider zu vermeiden!
                 He = Math.Max(He, 16);
                 Wi = Math.Max(Wi, 16);
-            }
+            //}
 
             Wi = Math.Max(Wi, MinWidth);
 
