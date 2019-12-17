@@ -81,9 +81,7 @@
   <ItemGroup>
     <Compile Include="Enums\enErrorReason.cs" />
     <Compile Include="Interfaces\ILastSavedBy.cs" />
-    <Compile Include="MultiUserFile\clsMultiUserFile.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="MultiUserFile\clsMultiUserFile.cs" />
     <Compile Include="Enums\enAlignmentHorizontal.cs" />
     <Compile Include="Enums\enSW.cs" />
     <Compile Include="Enums\enDataFormat.cs" />

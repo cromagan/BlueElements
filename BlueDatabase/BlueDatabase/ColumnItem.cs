@@ -1378,7 +1378,7 @@ namespace BlueDatabase
                     _TMP_LinkedDatabase.RowKeyChanged += _TMP_LinkedDatabase_RowKeyChanged;
                     _TMP_LinkedDatabase.ColumnKeyChanged += _TMP_LinkedDatabase_ColumnKeyChanged;
                     _TMP_LinkedDatabase.ConnectedControlsStopAllWorking += _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
-                    _TMP_LinkedDatabase.Disposed += _TMP_LinkedDatabase_Disposed;
+                    //_TMP_LinkedDatabase.Disposed += _TMP_LinkedDatabase_Disposed;
                     _TMP_LinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
                 }
 
@@ -1452,10 +1452,10 @@ namespace BlueDatabase
             }
         }
 
-        private void _TMP_LinkedDatabase_Disposed(object sender, System.EventArgs e)
-        {
-            Invalidate_TmpVariables();
-        }
+        //private void _TMP_LinkedDatabase_Disposed(object sender, System.EventArgs e)
+        //{
+        //    Invalidate_TmpVariables();
+        //}
 
         private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, DatabaseStoppedEventArgs e)
         {
@@ -1921,7 +1921,7 @@ namespace BlueDatabase
                 _TMP_LinkedDatabase.RowKeyChanged -= _TMP_LinkedDatabase_RowKeyChanged;
                 _TMP_LinkedDatabase.ColumnKeyChanged -= _TMP_LinkedDatabase_ColumnKeyChanged;
                 _TMP_LinkedDatabase.ConnectedControlsStopAllWorking -= _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
-                _TMP_LinkedDatabase.Disposed -= _TMP_LinkedDatabase_Disposed;
+                //_TMP_LinkedDatabase.Disposed -= _TMP_LinkedDatabase_Disposed;
                 _TMP_LinkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
                 _TMP_LinkedDatabase = null;
             }

@@ -425,7 +425,7 @@ namespace BlueDatabase
             var culture = new System.Globalization.CultureInfo("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
 
 
             InitializeComponent();
@@ -772,7 +772,7 @@ namespace BlueDatabase
         private void Column_ItemAdded(object sender, ListEventArgs e)
         {
             AddPending(enDatabaseDataType.dummyComand_AddColumn, ((ColumnItem)e.Item).Key, -1, "", ((ColumnItem)e.Item).Key.ToString(), false);
-            AddPending(enDatabaseDataType.co_Name, ((ColumnItem)e.Item).Key, -1, "", Name, false);
+            AddPending(enDatabaseDataType.co_Name, ((ColumnItem)e.Item).Key, -1, "", ((ColumnItem)e.Item).Name, false);
         }
 
         public void AbortBackup()
@@ -1160,7 +1160,7 @@ namespace BlueDatabase
         public override void RepairAfterParse()
         {
 
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             // System-Spalten checken und alte Formate auf neuen Stand bringen
             Column.Repair();
 
@@ -1638,7 +1638,7 @@ namespace BlueDatabase
         /// <returns></returns>
         public string Export_CSV(enFirstRow FirstRow)
         {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             return Export_CSV(FirstRow, (List<ColumnItem>)null, null);
         }
 
@@ -1750,7 +1750,7 @@ namespace BlueDatabase
         /// <returns></returns>
         public string Export_CSV(enFirstRow FirstRow, ColumnViewCollection Arr, List<RowItem> SortedRows)
         {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
             return Export_CSV(FirstRow, Arr.ListOfUsedColumn(), SortedRows);
         }
@@ -1773,7 +1773,7 @@ namespace BlueDatabase
         /// <returns></returns>
         public void Export_HTML(string vFilename)
         {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             Export_HTML(vFilename, (List<ColumnItem>)null, null, false);
         }
 
@@ -1784,7 +1784,7 @@ namespace BlueDatabase
         /// <returns></returns>
         public void Export_HTML(string vFilename, int ArrNr, FilterCollection Filter)
         {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             Export_HTML(vFilename, ColumnArrangements[ArrNr].ListOfUsedColumn(), Row.CalculateSortedRows(Filter, SortDefinition), false);
         }
 
@@ -1794,7 +1794,7 @@ namespace BlueDatabase
         /// <returns></returns>
         public void Export_HTML(bool Execute)
         {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             Export_HTML(string.Empty, (List<ColumnItem>)null, null, Execute);
         }
 
@@ -1981,10 +1981,10 @@ namespace BlueDatabase
 
             try
             {
-                if (InvokeRequired)
-                {
-                    return (bool)Invoke(new Func<bool>(() => PermissionCheck(allowed, row)));
-                }
+                //if (InvokeRequired)
+                //{
+                //    return (bool)Invoke(new Func<bool>(() => PermissionCheck(allowed, row)));
+                //}
 
 
                 if (IsAdministrator()) { return true; }
@@ -2074,7 +2074,7 @@ namespace BlueDatabase
 
         public new string ToString()
         {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             return ToListOfByte(false).ToArray().ToStringConvert();
         }
 
@@ -2326,7 +2326,7 @@ namespace BlueDatabase
 
         public string DefaultLayoutPath()
         {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
 
             return Filename.FilePath() + "Layouts\\";
@@ -2338,7 +2338,7 @@ namespace BlueDatabase
         private void InitializeComponent()
         {
             this.Backup = new System.ComponentModel.BackgroundWorker();
-            this.SuspendLayout();
+            //this.SuspendLayout();
             // 
             // Backup
             // 
@@ -2346,7 +2346,7 @@ namespace BlueDatabase
             this.Backup.WorkerSupportsCancellation = true;
             this.Backup.DoWork += new System.ComponentModel.DoWorkEventHandler(this.Backup_DoWork);
             this.Backup.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.Backup_ProgressChanged);
-            this.ResumeLayout(false);
+            //this.ResumeLayout(false);
 
         }
 
@@ -2381,11 +2381,11 @@ namespace BlueDatabase
 
         internal void AddPending(enDatabaseDataType Comand, int ColumnKey, int RowKey, string PreviousValue, string ChangedTo, bool ExecuteNow, bool FreezedMode)
         {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => AddPending(Comand, ColumnKey, RowKey, PreviousValue, ChangedTo, ExecuteNow, FreezedMode)));
-                return;
-            }
+            //if (InvokeRequired)
+            //{
+            //    Invoke(new Action(() => AddPending(Comand, ColumnKey, RowKey, PreviousValue, ChangedTo, ExecuteNow, FreezedMode)));
+            //    return;
+            //}
 
 
             if (Cell.Freezed != FreezedMode)

@@ -11,11 +11,11 @@ using static BlueBasics.modAllgemein;
 
 namespace BlueBasics.MultiUserFile
 {
-    public abstract class clsMultiUserFile : System.Windows.Forms.Control
+    public abstract class clsMultiUserFile
     {
         private System.ComponentModel.BackgroundWorker BinReLoader;
         private System.ComponentModel.BackgroundWorker BinSaver;
-        private System.Windows.Forms.Timer Checker;
+        private Timer Checker;
         private System.ComponentModel.IContainer components;
 
         private bool _CheckedAndReloadNeed;
@@ -34,33 +34,6 @@ namespace BlueBasics.MultiUserFile
         public bool AutoDeleteBAK { get; set; }
 
         protected int _ReloadDelaySecond = 10;
-        private void InitializeComponent()
-        {
-            this.components = new System.ComponentModel.Container();
-            this.BinReLoader = new System.ComponentModel.BackgroundWorker();
-            this.BinSaver = new System.ComponentModel.BackgroundWorker();
-            this.Checker = new System.Windows.Forms.Timer(this.components);
-            this.SuspendLayout();
-            // 
-            // BinReLoader
-            // 
-            this.BinReLoader.WorkerReportsProgress = true;
-            this.BinReLoader.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BinReLoader_DoWork);
-            this.BinReLoader.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BinReLoader_ProgressChanged);
-            // 
-            // BinSaver
-            // 
-            this.BinSaver.WorkerReportsProgress = true;
-            this.BinSaver.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BinSaver_DoWork);
-            this.BinSaver.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BinSaver_ProgressChanged);
-            // 
-            // Checker
-            // 
-            this.Checker.Interval = 1000;
-            this.Checker.Tick += new System.EventHandler(this.Checker_Tick);
-            this.ResumeLayout(false);
-
-        }
 
         private bool _isParsing;
         private int _ParsedAndRepairedCount = 0;
@@ -109,8 +82,32 @@ namespace BlueBasics.MultiUserFile
 
         public clsMultiUserFile(bool readOnly, bool easyMode)
         {
-            CreateControl();
-            InitializeComponent();
+            //CreateControl();
+            //  InitializeComponent();
+            this.components = new System.ComponentModel.Container();
+            this.BinReLoader = new System.ComponentModel.BackgroundWorker();
+            this.BinSaver = new System.ComponentModel.BackgroundWorker();
+            this.Checker = new Timer(Checker_Tick);
+            //this.SuspendLayout();
+            // 
+            // BinReLoader
+            // 
+            this.BinReLoader.WorkerReportsProgress = true;
+            this.BinReLoader.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BinReLoader_DoWork);
+            this.BinReLoader.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BinReLoader_ProgressChanged);
+            // 
+            // BinSaver
+            // 
+            this.BinSaver.WorkerReportsProgress = true;
+            this.BinSaver.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BinSaver_DoWork);
+            this.BinSaver.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BinSaver_ProgressChanged);
+            // 
+            // Checker
+            // 
+            //this.Checker.Interval = 1000;
+            //this.Checker.Tick += new System.EventHandler(this.Checker_Tick);
+            //this.ResumeLayout(false);
+            // ---------------------------------
 
 
             Filename = string.Empty;
@@ -122,7 +119,9 @@ namespace BlueBasics.MultiUserFile
             AutoDeleteBAK = false;
             UserEditedAktion = new DateTime(1900, 1, 1);
 
-            Checker.Enabled = false;
+            Develop.DebugPrint_NichtImplementiert();
+            Checker.Change(1000, 1000);
+//            Checker.Enabled = false;
 
         }
 
@@ -539,11 +538,11 @@ namespace BlueBasics.MultiUserFile
         /// </summary>
         public void Load_Reload()
         {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => Load_Reload()));
-                return;
-            }
+            //if (InvokeRequired)
+            //{
+            //    Invoke(new Action(() => Load_Reload()));
+            //    return;
+            //}
 
 
             //WIchtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
@@ -561,7 +560,7 @@ namespace BlueBasics.MultiUserFile
 
             BinReLoader_DoWork(null, null);
 
-            Checker.Enabled = true;
+            //Checker.Enabled = true;
         }
 
         protected abstract bool isSomethingDiscOperatingsBlocking();
@@ -626,7 +625,7 @@ namespace BlueBasics.MultiUserFile
 
         public void SaveAsAndChangeTo(string NewFileName)
         {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
 
             if (NewFileName.ToUpper() == Filename.ToUpper()) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
 
@@ -854,7 +853,7 @@ namespace BlueBasics.MultiUserFile
 
         public void UnlockHard()
         {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             try
             {
                 Load_Reload();
@@ -928,9 +927,9 @@ namespace BlueBasics.MultiUserFile
 
         private int Checker_Tick_count = -5;
 
-        private void Checker_Tick(object sender, System.EventArgs e)
+        private void Checker_Tick(object state)
         {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
             if (BinReLoader.IsBusy) { return; }
             if (BinSaver.IsBusy) { return; }
             if (string.IsNullOrEmpty(Filename)) { return; }
@@ -1127,11 +1126,11 @@ namespace BlueBasics.MultiUserFile
         }
 
 
-        protected override void OnHandleDestroyed(System.EventArgs e)
-        {
-            Release(false, 60);
-            base.OnHandleDestroyed(e);
-        }
+        //protected override void OnHandleDestroyed(System.EventArgs e)
+        //{
+        //    Release(false, 60);
+        //    base.OnHandleDestroyed(e);
+        //}
 
     }
 }
