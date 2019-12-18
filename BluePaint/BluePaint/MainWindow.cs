@@ -40,7 +40,7 @@ namespace BluePaint
 
         public MainWindow() : this(false)
         {
-            //InitializeComponent();
+
         }
 
         public MainWindow(bool LoadSaveEnabled) : base()
@@ -54,10 +54,7 @@ namespace BluePaint
 
         public MainWindow(string filename, bool LoadSaveEnabled) : this(LoadSaveEnabled)
         {
-            //InitializeComponent();
-
             LoadFromDisk(filename);
-
         }
 
         private void LoadFromDisk(string filename)
@@ -99,9 +96,6 @@ namespace BluePaint
 
         public void SetTool(GenericTool NewTool, bool DoInitalizingAction)
         {
-
-
-
             if (P.OverlayBMP != null)
             {
                 var gr = Graphics.FromImage(P.OverlayBMP);
@@ -218,12 +212,6 @@ namespace BluePaint
             SetTool(new Tool_Bruchlinie(), true);
         }
 
-
-        //private void P_SizeChanged(object sender, System.EventArgs e)
-        //{
-        //    P.Refresh();
-        //}
-
         private void Spiegeln_Click(object sender, System.EventArgs e)
         {
             SetTool(new Tool_Spiegeln(), true);
@@ -277,23 +265,15 @@ namespace BluePaint
 
         private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e)
         {
-
-
-            if (CurrentTool != null)
-            {
-                CurrentTool.MouseDown(e);
-            }
+            CurrentTool?.MouseDown(e);
         }
 
 
         private void P_ImageMouseMove(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e)
         {
 
+            CurrentTool?.MouseMove(e);
 
-            if (CurrentTool != null)
-            {
-                CurrentTool.MouseMove(e);
-            }
 
             if (e.IsInPic)
             {
@@ -302,22 +282,18 @@ namespace BluePaint
                 InfoText.Text = "X: " + e.TrimmedX +
                                "<br>Y: " + e.TrimmedY +
                                "<br>Farbe: " + c.ToHTMLCode().ToUpper();
-
             }
             else
             {
                 InfoText.Text = "";
 
             }
-            // ShowLupe(e);
+
         }
 
         private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e)
         {
-            if (CurrentTool != null)
-            {
-                CurrentTool.MouseUp(e);
-            }
+            CurrentTool?.MouseUp(e);
         }
 
 
@@ -339,54 +315,9 @@ namespace BluePaint
 
         private void P_MouseLeave(object sender, System.EventArgs e)
         {
-            //ShowLupe(null);
-
             InfoText.Text = "";
-
         }
 
-        //public void ShowLupe(System.Windows.Forms.MouseEventArgs e)
-        //{
-
-        //    if (Lupe.Image == null || Lupe.Image.Width != Lupe.Width || Lupe.Image.Height != Lupe.Height)
-        //    {
-        //        Lupe.Image = new Bitmap(Lupe.Width, Lupe.Height);
-        //    }
-
-
-        //    var gr = Graphics.FromImage(Lupe.Image);
-        //    gr.Clear(Color.White);
-        //    if (e == null) { return; }
-
-
-        //    var r = new Rectangle(0, 0, Lupe.Width, Lupe.Height);
-
-
-        //    gr.InterpolationMode = InterpolationMode.NearestNeighbor;
-        //    gr.PixelOffsetMode = PixelOffsetMode.Half;
-
-        //    gr.DrawImage(P.BMP, r, new Rectangle(e.X - 7, e.Y - 7, 15, 15), GraphicsUnit.Pixel);
-
-        //    if (P.OverlayBMP != null)
-        //    {
-        //        gr.DrawImage(P.OverlayBMP, r, new Rectangle(e.X - 7, e.Y - 7, 15, 15), GraphicsUnit.Pixel);
-        //    }
-
-
-        //    var Mitte = r.PointOf(enAlignment.Horizontal_Vertical_Center);
-        //    gr.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X, Mitte.Y - 7, Mitte.X, Mitte.Y + 6);
-        //    gr.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X - 7, Mitte.Y, Mitte.X + 6, Mitte.Y);
-
-        //    gr.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), Mitte.X, r.Top, Mitte.X, r.Bottom);
-        //    gr.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), r.Left, Mitte.Y, r.Right, Mitte.Y);
-
-        //    gr.DrawLine(Pens.Red, Mitte.X, Mitte.Y - 6, Mitte.X, Mitte.Y + 5);
-        //    gr.DrawLine(Pens.Red, Mitte.X - 6, Mitte.Y, Mitte.X + 5, Mitte.Y);
-
-
-        //    Lupe.Refresh();
-
-        //}
 
         private void Dummy_Click(object sender, System.EventArgs e)
         {
@@ -421,9 +352,9 @@ namespace BluePaint
             if (!PathExists(SaveTab.FileName.FilePath())) { return; }
             if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-          if (FileExists(SaveTab.FileName))
+            if (FileExists(SaveTab.FileName))
             {
-                if (BlueControls.Forms.MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", BlueBasics.Enums.enImageCode.Frage,"Ja","Nein" ) !=0) { return; }
+                if (BlueControls.Forms.MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", BlueBasics.Enums.enImageCode.Frage, "Ja", "Nein") != 0) { return; }
             }
 
             _filename = SaveTab.FileName;
@@ -527,7 +458,10 @@ namespace BluePaint
             base.OnFormClosing(e);
         }
 
-
+        private void P_DoAdditionalDrawing(object sender, BlueControls.EventArgs.AdditionalDrawing e)
+        {
+            CurrentTool.DoAdditionalDrawing(e);
+        }
     }
 
 }

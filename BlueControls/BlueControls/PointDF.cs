@@ -23,6 +23,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
@@ -133,6 +134,14 @@ namespace BlueControls
             Name = "Dummy Point von PointF";
             _x = (decimal)PF.X;
             _y = (decimal)PF.Y;
+        }
+
+        public PointDF(int cx, int cy)
+        {
+            Initialize();
+            Name = "Dummy Point von IntX und IntY";
+            _x = (decimal)cx;
+            _y = (decimal)cy;
         }
 
         public PointDF(double cx, double cY)
@@ -508,9 +517,14 @@ namespace BlueControls
             }
         }
 
+        public PointF ZoomAndMove(AdditionalDrawing e)
+        {
+            return ZoomAndMove(e.Zoom, e.MoveX, e.MoveY);
+        }
+
         public PointF ZoomAndMove(decimal Zoom, decimal MoveX, decimal MoveY)
         {
-            return new PointF((float)(_x * Zoom - MoveX + Zoom/2), (float)(_y * Zoom - MoveY + Zoom / 2));
+            return new PointF((float)(_x * Zoom - MoveX + Zoom / 2), (float)(_y * Zoom - MoveY + Zoom / 2));
         }
 
 

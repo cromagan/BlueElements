@@ -35,12 +35,7 @@ namespace BlueControls.Controls
     {
 
         public Bitmap BMP = null;
-        public Bitmap OverlayBMP = null;
-
-
-
-
-
+        //public Bitmap OverlayBMP = null;
 
         [DefaultValue(true)]
         public bool AlwaysSmooth
@@ -55,16 +50,11 @@ namespace BlueControls.Controls
             }
         }
 
-
-        //public event EventHandler<MouseEventArgs1_1> ImageMouseEnter;
         public event EventHandler<MouseEventArgs1_1> ImageMouseDown;
         public event EventHandler<MouseEventArgs1_1> ImageMouseMove;
         public event EventHandler<MouseEventArgs1_1> ImageMouseUp;
         public event EventHandler<AdditionalDrawing> DoAdditionalDrawing;
         public event EventHandler<PositionEventArgs> OverwriteMouseImageData;
-        //public event EventHandler ImageMouseLeave;
-
-        //private bool _IsInPic = false;
 
         private bool _AlwaysSmooth = false;
 
@@ -85,7 +75,6 @@ namespace BlueControls.Controls
         protected override RectangleDF MaxBounds()
         {
             if (BMP != null) { return new RectangleDF(0, 0, BMP.Width, BMP.Height); }
-
             return new RectangleDF(0, 0, 0, 0);
         }
 
@@ -127,10 +116,10 @@ namespace BlueControls.Controls
                 TMPGR.DrawImage(BMP, r);
 
 
-                if (OverlayBMP != null)
-                {
-                    TMPGR.DrawImage(OverlayBMP, r);
-                }
+                //if (OverlayBMP != null)
+                //{
+                //    TMPGR.DrawImage(OverlayBMP, r);
+                //}
 
 
             }
@@ -214,57 +203,10 @@ namespace BlueControls.Controls
             base.OnMouseUp(e);
         }
 
-
-        //protected override void OnMouseLeave(System.EventArgs e)
-        //{
-        //    base.OnMouseLeave(e);
-        //    ChangeIsInPic(false, null);
-        //}
-
-        //private void ChangeIsInPic(bool NewState, MouseEventArgs e)
-        //{
-
-        //    if (!NewState && _IsInPic)
-        //    {
-        //        _IsInPic = false;
-        //        OnImageMouseLeave();
-        //    }
-
-        //    if (NewState && !_IsInPic)
-        //    {
-        //        _IsInPic = true;
-        //        OnImageMouseEnter(e);
-        //    }
-
-        //}
-
-        //protected void OnImageMouseEnter(MouseEventArgs e)
-        //{
-        //    ImageMouseEnter?.Invoke(this, e);
-        //}
-
-        //protected void OnImageMouseLeave()
-        //{
-        //    ImageMouseLeave?.Invoke(this, System.EventArgs.Empty);
-        //}
-
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-
-
-            //if (!IsInBitmap())
-            //{
-            //    ChangeIsInPic(false, null);
-            //    return;
-            //}
-
-            //var mc = new MouseEventArgs1_1((int)MousePos_1_1.X, (int)MousePos_1_1.Y, IsInBitmap);
-
-
             OnImageMouseMove(GenerateNewMouseEventArgs(e));
-
-
         }
 
         protected virtual void OnImageMouseMove(MouseEventArgs1_1 e)
@@ -274,47 +216,10 @@ namespace BlueControls.Controls
 
 
 
-        ///// <summary>
-        ///// Berechnet Maus Koordinaten auf dem Großen Bild
-        ///// in in Koordinaten um, als ob auf dem Bild direkt gewählt werden würde.
-        ///// Falls die Maus-Koordinaten ausserhalb des tatsächlichen Bildes sind
-        ///// </summary>
-        ///// <remarks>
-        ///// </remarks>
-        //protected MouseEventArgs MouseToPixelKoordsOnImage(System.Windows.Forms.MouseEventArgs e)
-        //{
-
-        //    if (_Zoom < 0.01m ) { return null; }
-
-        //    //var r = MaxBounds().ZoomAndMoveRect(_Zoom, (decimal)SliderX.Value, (decimal)SliderY.Value);
-
-
-        //    //var x1 = Convert.ToInt32(Math.Floor((e.X - r.Left) / _Zoom));
-        //    //var y1 = Convert.ToInt32(Math.Floor((e.Y - r.Top) / _Zoom));
-
-        //    //if (TrimIntoPic)
-        //    //{
-        //    //    x1 = Math.Max(0, x1);
-        //    //    y1 = Math.Max(0, y1);
-
-        //    //    x1 = Math.Min(BMP.Width, x1);
-        //    //    y1 = Math.Min(BMP.Height, y1);
-
-        //    //}
-
-
-        //    return new MouseEventArgs(e.Button, e.Clicks, x1, y1, e.Delta);
-
-        //    //            return new Point(x1, y1);
-
-        //}
-
         public Point PointInsidePic(int x, int y)
         {
 
             if (BMP == null) { return Point.Empty; }
-
-
 
             x = Math.Max(0, x);
             y = Math.Max(0, y);
@@ -323,10 +228,6 @@ namespace BlueControls.Controls
             y = Math.Min(BMP.Height - 1, y);
 
             return new Point(x, y);
-
         }
-
-
-
     }
 }

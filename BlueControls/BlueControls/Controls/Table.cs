@@ -1879,7 +1879,7 @@ namespace BlueControls.Controls
 
         private bool ComputeAllCellPositions()
         {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
 
             if (Database.IsParsing()) { return false; }
@@ -3500,7 +3500,7 @@ namespace BlueControls.Controls
         private int Column_DrawWidth(ColumnViewItem ViewItem, Rectangle DisplayRectangleWOSlider)
         {
             // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
             if (ViewItem._TMP_DrawWidth != null) { return (int)ViewItem._TMP_DrawWidth; }
 

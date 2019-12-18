@@ -31,7 +31,6 @@ namespace BlueControls.Controls
         public event EventHandler PointSetByUser;
 
         public List<string> Tags = new List<string>();
-        // private enSelectModus _SelectModus = enSelectModus.Ohne;
         public string Feedback = string.Empty;
 
         private bool _PointAdding = false;
@@ -74,13 +73,10 @@ namespace BlueControls.Controls
             }
             set
             {
-
-
                 if (_Helper == value) { return; }
                 _Helper = value;
                 Invalidate();
             }
-
         }
 
 
@@ -101,29 +97,26 @@ namespace BlueControls.Controls
 
         }
 
-        protected override void DrawControl(Graphics gr, enStates state)
-        {
-            PrepareOverlay();
-            base.DrawControl(gr, state);
-        }
+        //protected override void DrawControl(Graphics gr, enStates state)
+        //{
+        //    PrepareOverlay();
+        //    base.DrawControl(gr, state);
+        //}
 
 
         protected override void OnDoAdditionalDrawing(AdditionalDrawing e)
         {
             base.OnDoAdditionalDrawing(e);
 
+            DrawMittelLinien(e);
+
+
             /// Punkte
             foreach (var ThisPoint in points)
             {
                 ThisPoint.Draw(e.G, e.Zoom, e.MoveX, e.MoveY, enDesign.Button_EckpunktSchieber, enStates.Standard);
             }
-
-
-
-
         }
-
-
 
 
         public void LoadData(string PathOfPicture)
@@ -311,9 +304,8 @@ namespace BlueControls.Controls
 
         }
 
-        private void PrepareOverlay()
+        private void DrawMittelLinien(AdditionalDrawing eg)
         {
-            //OverlayBMP = (BMP.Clone();
 
             if (BMP == null) { return; }
 
@@ -322,40 +314,38 @@ namespace BlueControls.Controls
             OnOverwriteMouseImageData(e);
 
 
+            ///// Punkte
+            //foreach (var ThisPoint in points)
+            //{
+            //    ThisPoint.Draw(e.G, e.Zoom, e.MoveX, e.MoveY, enDesign.Button_EckpunktSchieber, enStates.Standard);
+            //}
+            //if (OverlayBMP == null || OverlayBMP.Width != BMP.Width || OverlayBMP.Height != BMP.Height)
+            //{
+            //    OverlayBMP = new Bitmap(BMP.Width, BMP.Height);
+            //}
 
-            if (OverlayBMP == null || OverlayBMP.Width != BMP.Width || OverlayBMP.Height != BMP.Height)
-            {
-                OverlayBMP = new Bitmap(BMP.Width, BMP.Height);
-            }
 
+            //var TMPGR = Graphics.FromImage(BMP);
 
-            var TMPGR = Graphics.FromImage(OverlayBMP);
-
-            TMPGR.Clear(Color.Transparent);
+            //TMPGR.Clear(Color.Transparent);
 
             // Mittellinie
             var PicturePos = base.MaxBounds();
 
             if (_MittelLinie.HasFlag(enOrientation.Waagerecht))
             {
-                var p1 = PicturePos.PointOf(enAlignment.VerticalCenter_Left).ToPointF();
-                var p2 = PicturePos.PointOf(enAlignment.VerticalCenter_Right).ToPointF();
-
-                //var p1 = new Point(0, (int)(OverlayBMP.Height / 2));
-                //var p2 = new Point(OverlayBMP.Width, (int)(OverlayBMP.Height / 2));
-
-                TMPGR.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
-                TMPGR.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
+                var p1 = PicturePos.PointOf(enAlignment.VerticalCenter_Left).ZoomAndMove(eg);
+                var p2 = PicturePos.PointOf(enAlignment.VerticalCenter_Right).ZoomAndMove(eg);
+                eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
+                eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
             }
 
             if (_MittelLinie.HasFlag(enOrientation.Senkrecht))
             {
-                var p1 = PicturePos.PointOf(enAlignment.Top_HorizontalCenter).ToPointF();
-                var p2 = PicturePos.PointOf(enAlignment.Bottom_HorizontalCenter).ToPointF();
-                //var p1 = new Point((int)(OverlayBMP.Width / 2),0);
-                //var p2 = new Point((int)(OverlayBMP.Width / 2), OverlayBMP.Height);
-                TMPGR.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
-                TMPGR.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
+                var p1 = PicturePos.PointOf(enAlignment.Top_HorizontalCenter).ZoomAndMove(eg);
+                var p2 = PicturePos.PointOf(enAlignment.Bottom_HorizontalCenter).ZoomAndMove(eg);
+                eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
+                eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
             }
 
 
@@ -364,12 +354,16 @@ namespace BlueControls.Controls
 
             if (_Helper.HasFlag(enHelpers.HorizontalLine))
             {
-                TMPGR.DrawLine(Pen_RotTransp, 0, e.Y, OverlayBMP.Width, e.Y);
-
+                var p1 = new PointDF(0, e.Y).ZoomAndMove(eg);
+                var p2 = new PointDF(BMP.Width, e.Y).ZoomAndMove(eg);
+                eg.G.DrawLine(Pen_RotTransp, p1, p2);
             }
+
             if (_Helper.HasFlag(enHelpers.VerticalLine))
             {
-                TMPGR.DrawLine(Pen_RotTransp, e.X, 0, e.X, OverlayBMP.Height);
+                var p1 = new PointDF(e.X, 0).ZoomAndMove(eg);
+                var p2 = new PointDF(e.X, BMP.Height).ZoomAndMove(eg);
+                eg.G.DrawLine(Pen_RotTransp, p1, p2);
             }
 
 
@@ -379,25 +373,28 @@ namespace BlueControls.Controls
                 var h = (int)(BMP.Width / 2);
                 var x = Math.Abs(h - e.X);
 
-                TMPGR.DrawLine(Pen_RotTransp, h - x, e.Y, h + x, e.Y);
+                var p1 = new PointDF(h - x, e.Y).ZoomAndMove(eg);
+                var p2 = new PointDF(h + x, e.Y).ZoomAndMove(eg);
+                eg.G.DrawLine(Pen_RotTransp, p1, p2);
 
             }
 
             if (_Helper.HasFlag(enHelpers.MouseDownPoint))
             {
 
-                TMPGR.DrawEllipse(Pen_RotTransp, new Rectangle(e.X - 3, e.Y - 3, 6, 6));
+                var m1 = new PointDF(e.X, e.X).ZoomAndMove(eg);
+
+                eg.G.DrawEllipse(Pen_RotTransp, new RectangleF(m1.X - 3, m1.Y - 3, 6, 6));
 
                 if (!MouseDownPos_1_1.IsEmpty)
                 {
-                    TMPGR.DrawEllipse(Pen_RotTransp, new Rectangle(MouseDownPos_1_1.X - 3, MouseDownPos_1_1.Y - 3, 6, 6));
-                    TMPGR.DrawLine(Pen_RotTransp, new Point(e.X, e.Y), MouseDownPos_1_1);
+
+                    var md1 = new PointDF(MouseDownPos_1_1).ZoomAndMove(eg);
+                    var mc1 = new PointDF(e.X, e.Y).ZoomAndMove(eg);
+
+                    eg.G.DrawEllipse(Pen_RotTransp, new RectangleF(md1.X - 3, md1.Y - 3, 6, 6));
+                    eg.G.DrawLine(Pen_RotTransp, mc1, md1);
                 }
-
-                //var h = (int)(BMP.Width / 2);
-                //var x = Math.Abs(h - e.X);
-
-                //TMPGR.DrawLine(Pen_RotTransp, h - x, e.Y, h + x, e.Y);
 
             }
 
@@ -407,14 +404,12 @@ namespace BlueControls.Controls
             {
                 if (!MouseDownPos_1_1.IsEmpty)
                 {
-
-                    var r = new Rectangle(Math.Min(MouseDownPos_1_1.X, e.X), Math.Min(MouseDownPos_1_1.Y, e.Y), Math.Abs(MouseDownPos_1_1.X - e.X) + 1, Math.Abs(MouseDownPos_1_1.Y - e.Y) + 1);
-                    //var r = new Rectangle((int)Math.Min(MouseDownPos_1_1.X, e.X), (int)Math.Min(MouseDownPos_1_1.Y, e.Y), (int)Math.Abs(MouseDownPos_1_1.X - e.X) + 1, (int)Math.Abs(MouseDownPos_1_1.Y - MousePos_1_1.Y) + 1);
-                    TMPGR.FillRectangle(Brush_RotTransp, r);
+                    var md1 = new PointDF(MouseDownPos_1_1).ZoomAndMove(eg);
+                    var mc1 = new PointDF(e.X, e.Y).ZoomAndMove(eg);
+                    var r = new RectangleF(Math.Min(md1.X, e.X), Math.Min(md1.Y, e.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
+                    eg.G.FillRectangle(Brush_RotTransp, r);
                 }
             }
-
-            //TMPGR.DrawString(e.ToString(), new Font("Arial", 10), Brushes.Red, new Point(0, 0));
 
 
         }

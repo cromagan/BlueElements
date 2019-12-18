@@ -23,7 +23,7 @@ using static BlueBasics.Extensions;
 
 namespace BluePaint
 {
-    public partial class Tool_Kontrast : GenericTool // System.Windows.Forms.UserControl // 
+    public partial class Tool_Kontrast : GenericTool //  System.Windows.Forms.UserControl //
     {
 
         public Tool_Kontrast()
@@ -37,7 +37,9 @@ namespace BluePaint
             if (_Pic == null) { return; }
 
 
-            OnOverridePic(_Pic.AdjustContrast(1.1f));
+            OnOverridePic(_Pic.AdjustContrast((float)sldKontrast.Value));
+
+            sldKontrast.Value = 1f;
 
             //OnForceUndoSaving();
 
@@ -65,7 +67,9 @@ namespace BluePaint
         private void btnGraustufen_Click(object sender, System.EventArgs e)
         {
             if (_Pic == null) { return; }
+
             OnOverridePic(_Pic.Grayscale());
+            sldKontrast.Value = 1f;
         }
 
         private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e)
@@ -74,6 +78,8 @@ namespace BluePaint
             OnForceUndoSaving();
 
             _Pic.AllePixelZuSchwarz(1f);
+
+            sldKontrast.Value = 1f;
 
             OnPicChangedByTool();
         }
@@ -93,6 +99,8 @@ namespace BluePaint
                 }
             }
 
+            sldKontrast.Value = 1f;
+
             OnPicChangedByTool();
 
         }
@@ -105,8 +113,32 @@ namespace BluePaint
 
             _Pic.Ausdünnen(4);
 
+            sldKontrast.Value = 1f;
+
+            ClearPreviewPic();
+
             OnPicChangedByTool();
             return;
+        }
+
+        private void sldKontrast_ValueChanged(object sender, System.EventArgs e)
+        {
+            capKontrast.Text = sldKontrast.Value.ToString();
+
+
+            if (sldKontrast.Value == 1)
+            {
+                ClearPreviewPic();
+            }
+
+            else
+            {
+                _PicPreview = _Pic.AdjustContrast((float)sldKontrast.Value);
+
+            }
+
+
+            OnPicChangedByTool();
         }
     }
 

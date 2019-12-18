@@ -47,8 +47,8 @@ namespace BluePaint
         public event System.EventHandler<BitmapEventArgs> OverridePic;
 
 
-        protected Bitmap _Pic;
-        protected Bitmap _PicPreview;
+        //protected Bitmap _Pic;
+        //protected Bitmap _PicPreview;
 
         public void SetPics(Bitmap Pic, Bitmap PicPreview)
         {
@@ -80,7 +80,7 @@ namespace BluePaint
         public virtual new void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1 e) { }
 
 
-        public virtual void PicChangedFromMain() { }
+        //public virtual void PicChangedFromMain() { }
 
 
 
@@ -130,15 +130,6 @@ namespace BluePaint
 
             ForceUndoSaving?.Invoke(this, System.EventArgs.Empty);
         }
-
-
-        //public bool IsInsidePic(System.Windows.Forms.MouseEventArgs e)
-        //{
-
-        //    if (e.X >= 0 && e.Y >= 0 && e.X < _Pic.Width && e.Y < _Pic.Height) { return true; }
-        //    return false;
-
-        //}
 
         public void ClearPreviewPic()
         {

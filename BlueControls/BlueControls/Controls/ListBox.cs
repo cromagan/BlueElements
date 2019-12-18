@@ -751,7 +751,7 @@ namespace BlueControls.Controls
         {
             if (IsDisposed) { return; }
 
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
             Invalidate();
 
