@@ -11,7 +11,7 @@ using static BlueBasics.modAllgemein;
 
 namespace BlueBasics.MultiUserFile
 {
-    public abstract class clsMultiUserFile
+    public abstract class clsMultiUserFile : IDisposable
     {
         private System.ComponentModel.BackgroundWorker BinReLoader;
         private System.ComponentModel.BackgroundWorker BinSaver;
@@ -119,9 +119,8 @@ namespace BlueBasics.MultiUserFile
             AutoDeleteBAK = false;
             UserEditedAktion = new DateTime(1900, 1, 1);
 
-            Develop.DebugPrint_NichtImplementiert();
             Checker.Change(1000, 1000);
-//            Checker.Enabled = false;
+            //            Checker.Enabled = false;
 
         }
 
@@ -930,6 +929,9 @@ namespace BlueBasics.MultiUserFile
         private void Checker_Tick(object state)
         {
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+
+            if (EasyMode && ReadOnly) { return; }
+
             if (BinReLoader.IsBusy) { return; }
             if (BinSaver.IsBusy) { return; }
             if (string.IsNullOrEmpty(Filename)) { return; }
@@ -1124,6 +1126,54 @@ namespace BlueBasics.MultiUserFile
                 Pause(0.2, true);
             }
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // Dient zur Erkennung redundanter Aufrufe.
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
+                }
+
+                // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
+                // TODO: große Felder auf Null setzen.
+
+                Release(false, 1);
+                while (BinSaver.IsBusy) { Pause(0.1, true); }
+
+
+                //  https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
+
+                BinReLoader.Dispose();
+                BinSaver.Dispose();
+                Checker.Dispose();
+
+                Checker.Dispose();
+
+                disposedValue = true;
+            }
+        }
+
+        //TODO: Finalizer nur überschreiben, wenn Dispose(bool disposing) weiter oben Code für die Freigabe nicht verwalteter Ressourcen enthält.
+        ~clsMultiUserFile()
+        {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
+            Dispose(false);
+        }
+
+        // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
+        public void Dispose()
+        {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
+            Dispose(true);
+            // TODO: Auskommentierung der folgenden Zeile aufheben, wenn der Finalizer weiter oben überschrieben wird.
+            GC.SuppressFinalize(this);
+        }
+        #endregion
 
 
         //protected override void OnHandleDestroyed(System.EventArgs e)

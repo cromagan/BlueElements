@@ -19,6 +19,7 @@
 
 using BluePaint.EventArgs;
 using BlueControls;
+using System.Drawing;
 
 namespace BluePaint
 {
@@ -45,7 +46,7 @@ namespace BluePaint
 
             var _Pic = ScreenShot.GrabArea(null, 0, 0).Pic;
 
-            if (_Pic != null) { OnOverridePic(new BitmapEventArgs(_Pic)); }
+            if (_Pic != null) { OnOverridePic(_Pic); }
             OnShowMainWindow();
         }
 

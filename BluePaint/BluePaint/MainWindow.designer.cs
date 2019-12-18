@@ -2,7 +2,7 @@
 
 namespace BluePaint
 {
-    partial class Form1 : BlueControls.Forms.Form
+    partial class MainWindow : BlueControls.Forms.Form
     {
         /// <summary>
         /// Required designer variable.
@@ -30,9 +30,14 @@ namespace BluePaint
         /// </summary>
         private void InitializeComponent()
         {
-            this.TabControl1 = new BlueControls.Controls.TabControl();
+            this.tabRibbonbar = new BlueControls.Controls.TabControl();
             this.Tab_Start = new BlueControls.Controls.TabPage();
             this.grpDatei = new BlueControls.Controls.GroupBox();
+            this.btnSave = new BlueControls.Controls.Button();
+            this.btnLetzteDateien = new BlueControls.Controls.LastFilesCombo();
+            this.btnOeffnen = new BlueControls.Controls.Button();
+            this.btnSaveAs = new BlueControls.Controls.Button();
+            this.btnNeu = new BlueControls.Controls.Button();
             this.Tab_Werkzeug = new BlueControls.Controls.TabPage();
             this.btnOK = new BlueControls.Controls.Button();
             this.grpNeu = new BlueControls.Controls.GroupBox();
@@ -53,8 +58,11 @@ namespace BluePaint
             this.Split = new System.Windows.Forms.SplitContainer();
             this.BLupe = new BlueControls.Controls.GroupBox();
             this.InfoText = new BlueControls.Controls.Caption();
-            this.TabControl1.SuspendLayout();
+            this.LoadTab = new System.Windows.Forms.OpenFileDialog();
+            this.SaveTab = new System.Windows.Forms.SaveFileDialog();
+            this.tabRibbonbar.SuspendLayout();
             this.Tab_Start.SuspendLayout();
+            this.grpDatei.SuspendLayout();
             this.Tab_Werkzeug.SuspendLayout();
             this.grpNeu.SuspendLayout();
             this.grpSonstiges.SuspendLayout();
@@ -67,18 +75,18 @@ namespace BluePaint
             this.BLupe.SuspendLayout();
             this.SuspendLayout();
             // 
-            // TabControl1
+            // tabRibbonbar
             // 
-            this.TabControl1.Controls.Add(this.Tab_Start);
-            this.TabControl1.Controls.Add(this.Tab_Werkzeug);
-            this.TabControl1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.TabControl1.HotTrack = true;
-            this.TabControl1.IsRibbonBar = true;
-            this.TabControl1.Location = new System.Drawing.Point(0, 0);
-            this.TabControl1.Name = "TabControl1";
-            this.TabControl1.SelectedIndex = 1;
-            this.TabControl1.Size = new System.Drawing.Size(1007, 110);
-            this.TabControl1.TabIndex = 0;
+            this.tabRibbonbar.Controls.Add(this.Tab_Start);
+            this.tabRibbonbar.Controls.Add(this.Tab_Werkzeug);
+            this.tabRibbonbar.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tabRibbonbar.HotTrack = true;
+            this.tabRibbonbar.IsRibbonBar = true;
+            this.tabRibbonbar.Location = new System.Drawing.Point(0, 0);
+            this.tabRibbonbar.Name = "tabRibbonbar";
+            this.tabRibbonbar.SelectedIndex = 1;
+            this.tabRibbonbar.Size = new System.Drawing.Size(1007, 110);
+            this.tabRibbonbar.TabIndex = 0;
             // 
             // Tab_Start
             // 
@@ -92,11 +100,70 @@ namespace BluePaint
             // grpDatei
             // 
             this.grpDatei.CausesValidation = false;
+            this.grpDatei.Controls.Add(this.btnSave);
+            this.grpDatei.Controls.Add(this.btnLetzteDateien);
+            this.grpDatei.Controls.Add(this.btnOeffnen);
+            this.grpDatei.Controls.Add(this.btnSaveAs);
+            this.grpDatei.Controls.Add(this.btnNeu);
             this.grpDatei.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpDatei.Location = new System.Drawing.Point(0, 0);
             this.grpDatei.Name = "grpDatei";
-            this.grpDatei.Size = new System.Drawing.Size(288, 81);
-            this.grpDatei.Text = "Dateisystem";
+            this.grpDatei.Size = new System.Drawing.Size(416, 81);
+            this.grpDatei.Text = "Datei";
+            // 
+            // btnSave
+            // 
+            this.btnSave.ImageCode = "Diskette";
+            this.btnSave.Location = new System.Drawing.Point(240, 2);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(64, 66);
+            this.btnSave.TabIndex = 5;
+            this.btnSave.Text = "Speichern";
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // btnLetzteDateien
+            // 
+            this.btnLetzteDateien.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.btnLetzteDateien.DrawStyle = BlueControls.Enums.enComboboxStyle.RibbonBar;
+            this.btnLetzteDateien.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.btnLetzteDateien.Enabled = false;
+            this.btnLetzteDateien.ImageCode = "Ordner";
+            this.btnLetzteDateien.Location = new System.Drawing.Point(128, 2);
+            this.btnLetzteDateien.Name = "btnLetzteDateien";
+            this.btnLetzteDateien.Size = new System.Drawing.Size(104, 66);
+            this.btnLetzteDateien.TabIndex = 1;
+            this.btnLetzteDateien.Text = "zuletzt geöffnete Dateien";
+            this.btnLetzteDateien.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.btnLetzteDateien_ItemClicked);
+            // 
+            // btnOeffnen
+            // 
+            this.btnOeffnen.ImageCode = "Ordner";
+            this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
+            this.btnOeffnen.Name = "btnOeffnen";
+            this.btnOeffnen.Size = new System.Drawing.Size(56, 66);
+            this.btnOeffnen.TabIndex = 1;
+            this.btnOeffnen.Text = "Öffnen";
+            this.btnOeffnen.Click += new System.EventHandler(this.btnOeffnen_Click);
+            // 
+            // btnSaveAs
+            // 
+            this.btnSaveAs.ImageCode = "Diskette";
+            this.btnSaveAs.Location = new System.Drawing.Point(304, 2);
+            this.btnSaveAs.Name = "btnSaveAs";
+            this.btnSaveAs.Size = new System.Drawing.Size(64, 66);
+            this.btnSaveAs.TabIndex = 4;
+            this.btnSaveAs.Text = "Speichern unter";
+            this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
+            // 
+            // btnNeu
+            // 
+            this.btnNeu.ImageCode = "Datei";
+            this.btnNeu.Location = new System.Drawing.Point(8, 2);
+            this.btnNeu.Name = "btnNeu";
+            this.btnNeu.Size = new System.Drawing.Size(56, 66);
+            this.btnNeu.TabIndex = 0;
+            this.btnNeu.Text = "Neu";
+            this.btnNeu.Click += new System.EventHandler(this.btnNeu_Click);
             // 
             // Tab_Werkzeug
             // 
@@ -316,24 +383,35 @@ namespace BluePaint
             this.InfoText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.InfoText.CausesValidation = false;
             this.InfoText.Location = new System.Drawing.Point(8, 16);
             this.InfoText.Name = "InfoText";
             this.InfoText.Size = new System.Drawing.Size(256, 144);
             this.InfoText.Translate = false;
             // 
-            // Form1
+            // LoadTab
+            // 
+            this.LoadTab.Filter = "PNG-Dateien|*.PNG|BMP-Dateien|*.BMP|JPG-Dateien|*.JPG";
+            this.LoadTab.Title = "Bild laden";
+            this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
+            // 
+            // SaveTab
+            // 
+            this.SaveTab.Filter = "PNG-Dateien|*.PNG|BMP-Dateien|*.BMP|JPG-Dateien|*.JPG";
+            this.SaveTab.Title = "Bitte neuen Dateinamen wählen.";
+            // 
+            // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1007, 450);
             this.Controls.Add(this.Split);
-            this.Controls.Add(this.TabControl1);
-            this.Name = "Form1";
+            this.Controls.Add(this.tabRibbonbar);
+            this.Name = "MainWindow";
             this.Text = "BluePaint";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.TabControl1.ResumeLayout(false);
+            this.tabRibbonbar.ResumeLayout(false);
             this.Tab_Start.ResumeLayout(false);
+            this.grpDatei.ResumeLayout(false);
             this.Tab_Werkzeug.ResumeLayout(false);
             this.grpNeu.ResumeLayout(false);
             this.grpSonstiges.ResumeLayout(false);
@@ -348,7 +426,7 @@ namespace BluePaint
 
         }
 
-        internal TabControl TabControl1;
+        internal TabControl tabRibbonbar;
         internal TabPage Tab_Start;
         internal TabPage Tab_Werkzeug;
         internal ZoomPic P;
@@ -370,8 +448,14 @@ namespace BluePaint
         internal Caption InfoText;
         internal Button btnDummy;
         #endregion
-
-        private GroupBox grpDatei;
         private Button btnZoomFit;
+        private GroupBox grpDatei;
+        internal LastFilesCombo btnLetzteDateien;
+        private Button btnOeffnen;
+        private Button btnSaveAs;
+        private Button btnNeu;
+        private System.Windows.Forms.OpenFileDialog LoadTab;
+        private System.Windows.Forms.SaveFileDialog SaveTab;
+        private Button btnSave;
     }
 }

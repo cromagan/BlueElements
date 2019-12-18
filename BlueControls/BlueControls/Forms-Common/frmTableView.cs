@@ -706,7 +706,7 @@ namespace BlueControls.Forms
         }
 
 
-        private void NeuDBSaveAs_Click(object sender, System.EventArgs e)
+        private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e)
         {
 
             var bu = (Button)sender;
@@ -769,7 +769,7 @@ namespace BlueControls.Forms
             var DatenbankDa = Convert.ToBoolean(_Database != null);
 
 
-            NeuDB.Enabled = true;
+            btnNeuDB.Enabled = true;
 
             btnOeffnen.Enabled = true;
 
@@ -1014,7 +1014,7 @@ namespace BlueControls.Forms
         }
 
 
-        private void Öffne_Click(object sender, System.EventArgs e)
+        private void btnOeffnen_Click(object sender, System.EventArgs e)
         {
             LoadTab.ShowDialog();
         }

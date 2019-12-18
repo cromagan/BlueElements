@@ -104,14 +104,21 @@ namespace BluePaint
             ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
         }
 
-
-        protected virtual void OnOverridePic(BitmapEventArgs e)
+        /// <summary>
+        /// OnForceUndoSaving wird automatisch in der MainForm ausgelöst.
+        /// Wird benutzt, wenn ein neues Bild erstellt wurde und dieses in den Speicher soll.
+        /// </summary>
+        /// <param name="BMP"></param>
+        protected virtual void OnOverridePic(Bitmap BMP)
         {
 
-            OverridePic?.Invoke(this, e);
+            OverridePic?.Invoke(this, new BitmapEventArgs(BMP));
         }
 
-
+        /// <summary>
+        /// Wird benutzt, wenn in das vorhandene Bild etwas gemalt wurde.
+        /// Wird das ganze Bild geändert, muss OnOverridePic benutzt werden.
+        /// </summary>
         protected virtual void OnPicChangedByTool()
         {
 

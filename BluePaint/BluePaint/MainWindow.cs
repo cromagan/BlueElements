@@ -23,21 +23,59 @@ using BluePaint.EventArgs;
 using System;
 using System.Drawing;
 using static BlueBasics.Extensions;
-
-
+using static BlueBasics.FileOperations;
+using BlueControls.Forms;
 
 namespace BluePaint
 {
-    public partial class Form1
+    public partial class MainWindow
     {
-
-        public Form1()
-        {
-            InitializeComponent();
-        }
-
+        private string _filename = string.Empty;
         private GenericTool CurrentTool;
         private Bitmap _PicUndo = null;
+
+        private bool _isSaved = true;
+
+
+
+        public MainWindow() : this(false)
+        {
+            //InitializeComponent();
+        }
+
+        public MainWindow(bool LoadSaveEnabled) : base()
+        {
+            InitializeComponent();
+
+            Tab_Start.Enabled = LoadSaveEnabled;
+            btnOK.Visible = !LoadSaveEnabled;
+        }
+
+
+        public MainWindow(string filename, bool LoadSaveEnabled) : this(LoadSaveEnabled)
+        {
+            //InitializeComponent();
+
+            LoadFromDisk(filename);
+
+        }
+
+        private void LoadFromDisk(string filename)
+        {
+
+            if (!IsSaved()) { return; }
+
+            if (FileExists(filename))
+            {
+                SetPic((Bitmap)modAllgemein.Image_FromFile(filename));
+                _filename = filename;
+                _isSaved = true;
+
+                btnLetzteDateien.AddFileName(filename, string.Empty);
+            }
+
+
+        }
 
         private void Screenshot_Click(object sender, System.EventArgs e)
         {
@@ -49,10 +87,14 @@ namespace BluePaint
             SetTool(new Tool_Clipping(), true);
         }
 
-
+        /// <summary>
+        /// Filename wird entfernt!
+        /// </summary>
+        /// <param name="bmp"></param>
         public void SetPic(Bitmap bmp)
         {
             CurrentTool_OverridePic(this, new BitmapEventArgs(bmp));
+            _filename = string.Empty;
         }
 
         public void SetTool(GenericTool NewTool, bool DoInitalizingAction)
@@ -150,6 +192,7 @@ namespace BluePaint
         private void CurrentTool_ForceUndoSaving(object sender, System.EventArgs e)
         {
 
+            _isSaved = false;
 
             if (_PicUndo != null)
             {
@@ -169,64 +212,6 @@ namespace BluePaint
             btnRückgänig.Enabled = true;
 
         }
-
-
-        //public void Redraw()
-        //{
-
-        //    if (P.Image == null || P.Image.Width != P.Width || P.Image.Height != P.Height)
-        //    {
-        //        P.Image = new Bitmap(P.Width, P.Height);
-        //    }
-
-        //    var gr = Graphics.FromImage(P.Image);
-
-        //    gr.Clear(Color.FromArgb(201, 211, 226));
-
-
-        //    if (P.BMP != null)
-        //    {
-
-        //        _Zoom = (float)Math.Min(P.Width / (double)(P.BMP.Width + 20), P.Height / (double)(P.BMP.Height + 20));
-
-        //        var DW = Convert.ToInt32(Convert.ToSingle(Math.Floor(P.BMP.Width * _Zoom)));
-        //        var DH = Convert.ToInt32(Convert.ToSingle(Math.Floor(P.BMP.Height * _Zoom)));
-        //        var RückX = Convert.ToInt32(Math.Floor((P.Width - DW) / 2.0));
-        //        var RückY = Convert.ToInt32(Math.Floor((P.Height - DH) / 2.0));
-
-        //        _DrawArea = new Rectangle(RückX, RückY, DW, DH);
-        //    }
-        //    else
-        //    {
-        //        _DrawArea = new Rectangle();
-        //        _Zoom = 1.0F;
-        //    }
-
-
-        //    if (_Zoom >= 1)
-        //    {
-        //        gr.InterpolationMode = InterpolationMode.NearestNeighbor;
-        //    }
-        //    else
-        //    {
-        //        gr.InterpolationMode = InterpolationMode.Bicubic;
-        //    }
-
-
-        //    gr.PixelOffsetMode = PixelOffsetMode.Half;
-
-        //    if (P.BMP != null)
-        //    {
-        //        gr.DrawImage(P.BMP, _DrawArea);
-        //    }
-
-        //    if (P.OverlayBMP != null)
-        //    {
-        //        gr.DrawImage(P.OverlayBMP, _DrawArea);
-        //    }
-
-        //    P.Refresh();
-        //}
 
         private void Bruchlinie_Click(object sender, System.EventArgs e)
         {
@@ -264,6 +249,7 @@ namespace BluePaint
 
             if (_PicUndo == null) { return; }
             btnRückgänig.Enabled = false;
+            _isSaved = false;
 
 
             BlueBasics.modAllgemein.Swap(ref P.BMP, ref _PicUndo);
@@ -410,6 +396,135 @@ namespace BluePaint
         private void btnZoomFit_Click(object sender, System.EventArgs e)
         {
             P.ZoomFit();
+        }
+
+        private void btnNeu_Click(object sender, System.EventArgs e)
+        {
+            if (!IsSaved()) { return; }
+
+            SetPic(new Bitmap(100, 100));
+            _filename = "*";
+
+        }
+
+        private void btnOeffnen_Click(object sender, System.EventArgs e)
+        {
+            if (!IsSaved()) { return; }
+            LoadTab.ShowDialog();
+        }
+
+        private void btnSaveAs_Click(object sender, System.EventArgs e)
+        {
+
+            SaveTab.ShowDialog();
+
+            if (!PathExists(SaveTab.FileName.FilePath())) { return; }
+            if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
+
+          if (FileExists(SaveTab.FileName))
+            {
+                if (BlueControls.Forms.MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", BlueBasics.Enums.enImageCode.Frage,"Ja","Nein" ) !=0) { return; }
+            }
+
+            _filename = SaveTab.FileName;
+            _isSaved = false;
+
+            Speichern();
+        }
+
+        private void btnLetzteDateien_ItemClicked(object sender, BlueControls.EventArgs.BasicListItemEventArgs e)
+        {
+            if (!IsSaved()) { return; }
+            LoadFromDisk(e.Item.Internal);
+
+        }
+
+        private bool IsSaved()
+        {
+            if (_isSaved) { return true; }
+
+            if (string.IsNullOrEmpty(_filename)) { return true; }
+
+
+            switch (MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", BlueBasics.Enums.enImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen"))
+            {
+
+
+                case 0:
+                    Speichern();
+                    break;
+
+                case 1:
+                    return true;
+
+                case 2:
+                    return false;
+            }
+
+            return IsSaved();
+        }
+
+        private void btnSave_Click(object sender, System.EventArgs e)
+        {
+            Speichern();
+
+        }
+
+        private void Speichern()
+        {
+            if (_filename == "*")
+            {
+                btnSaveAs_Click(null, System.EventArgs.Empty);
+                return;
+            }
+
+
+            try
+            {
+
+                switch (_filename.FileSuffix().ToUpper())
+                {
+                    case "JPG":
+
+                        P.BMP.Save(_filename, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        _isSaved = true;
+                        break;
+
+                    case "BMP":
+
+                        P.BMP.Save(_filename, System.Drawing.Imaging.ImageFormat.Bmp);
+                        _isSaved = true;
+                        break;
+
+                    case "PNG":
+
+                        P.BMP.Save(_filename, System.Drawing.Imaging.ImageFormat.Png);
+                        _isSaved = true;
+                        break;
+
+                }
+
+                P.BMP.Save(_filename);
+                _isSaved = true;
+            }
+            catch
+            {
+                _isSaved = false;
+            }
+
+        }
+
+        private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            LoadFromDisk(LoadTab.FileName);
+        }
+
+
+        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
+        {
+            if (!IsSaved()) { e.Cancel = true; }
+
+            base.OnFormClosing(e);
         }
 
 

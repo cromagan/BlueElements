@@ -44,27 +44,27 @@ namespace BluePaint
             var W = modErgebnis.Ergebnis(X.Text);
             var H = modErgebnis.Ergebnis(Y.Text);
 
-            if (W == null || W < 2)
+            if (W == null || (int)W < 2)
             {
                 Notification.Show("Bitte Breite eingeben.", enImageCode.Information);
                 return;
             }
 
 
-            if (H == null || H < 2)
+            if (H == null || (int)H < 2)
             {
                 Notification.Show("Bitte Höhe eingeben.", enImageCode.Information);
                 return;
             }
 
 
-            var _Pic = new Bitmap(Convert.ToInt32(W), Convert.ToInt32(H));
+            var newPic = new Bitmap((int)W, (int)H);
 
 
-            var gr = Graphics.FromImage(_Pic);
+            var gr = Graphics.FromImage(newPic);
 
             gr.Clear(Color.White);
-            gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, _Pic.Width - 2, _Pic.Height - 2);
+            gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, newPic.Width - 2, newPic.Height - 2);
 
             if (!string.IsNullOrEmpty(TXT.Text))
             {
@@ -73,7 +73,7 @@ namespace BluePaint
 
                 var fs = gr.MeasureString(TXT.Text, f);
 
-                gr.TranslateTransform((float)(_Pic.Width / 2.0), (float)(_Pic.Height / 2.0));
+                gr.TranslateTransform((float)(newPic.Width / 2.0), (float)(newPic.Height / 2.0));
 
                 gr.RotateTransform(-90);
 
@@ -82,7 +82,7 @@ namespace BluePaint
 
             }
 
-            OnOverridePic(new BitmapEventArgs(_Pic));
+            OnOverridePic(newPic);
         }
     }
 }

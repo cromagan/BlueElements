@@ -260,10 +260,23 @@ namespace BlueControls.Forms
                             W = 4;
                             break;
 
+                        case "verwerfen":
                         case "löschen":
                             B.ImageCode = "Papierkorb|16";
                             W = 4;
                             break;
+
+                        case "speichern":
+                        case "sichern":
+                            B.ImageCode = "Diskette|16";
+                            W = 4;
+                            break;
+
+                        case "laden":
+                            B.ImageCode = "Ordner|16";
+                            W = 4;
+                            break;
+
 
                         default:
                             B.ImageCode = string.Empty;

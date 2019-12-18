@@ -401,7 +401,7 @@ namespace BlueControls.ItemCollection
                 default:
                     if (BreakAfterItems < 1)
                     {
-                        colWidth = ControlDrawingArea.Width;
+                        colWidth = ControlDrawingArea.Width - SliderWidth;
                     }
                     else
                     {

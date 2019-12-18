@@ -143,7 +143,7 @@ namespace BluePaint
         {
             var _BMP2 = _Pic.Crop((int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
 
-            OnOverridePic(new BitmapEventArgs(_BMP2));
+            OnOverridePic(_BMP2);
             Links.Value = 0;
             Recht.Value = 0;
             Oben.Value = 0;

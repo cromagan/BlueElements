@@ -52,7 +52,6 @@ namespace BluePaint
             // 
             // Caption1
             // 
-            this.Caption1.CausesValidation = false;
             this.Caption1.Location = new System.Drawing.Point(40, 56);
             this.Caption1.Name = "Caption1";
             this.Caption1.Size = new System.Drawing.Size(40, 24);
@@ -60,7 +59,6 @@ namespace BluePaint
             // 
             // Caption2
             // 
-            this.Caption2.CausesValidation = false;
             this.Caption2.Location = new System.Drawing.Point(40, 88);
             this.Caption2.Name = "Caption2";
             this.Caption2.Size = new System.Drawing.Size(40, 24);
@@ -86,7 +84,6 @@ namespace BluePaint
             // 
             // Caption3
             // 
-            this.Caption3.CausesValidation = false;
             this.Caption3.Location = new System.Drawing.Point(40, 128);
             this.Caption3.Name = "Caption3";
             this.Caption3.Size = new System.Drawing.Size(40, 24);

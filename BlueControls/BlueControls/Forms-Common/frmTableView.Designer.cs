@@ -79,7 +79,7 @@ namespace BlueControls.Forms
             this.btnLetzteDateien = new BlueControls.Controls.LastFilesCombo();
             this.btnOeffnen = new BlueControls.Controls.Button();
             this.btnSaveAs = new BlueControls.Controls.Button();
-            this.NeuDB = new BlueControls.Controls.Button();
+            this.btnNeuDB = new BlueControls.Controls.Button();
             this.tabStart = new BlueControls.Controls.TabPage();
             this.grpAnsicht = new BlueControls.Controls.GroupBox();
             this.SpaltAnsichtCap = new BlueControls.Controls.Caption();
@@ -170,7 +170,6 @@ namespace BlueControls.Forms
             // 
             // Zei
             // 
-            this.Zei.CausesValidation = false;
             this.Zei.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.Zei.Location = new System.Drawing.Point(0, 714);
             this.Zei.Name = "Zei";
@@ -215,7 +214,6 @@ namespace BlueControls.Forms
             // 
             // Copyright
             // 
-            this.Copyright.CausesValidation = false;
             this.Copyright.Location = new System.Drawing.Point(96, 2);
             this.Copyright.Name = "Copyright";
             this.Copyright.Size = new System.Drawing.Size(176, 22);
@@ -272,7 +270,7 @@ namespace BlueControls.Forms
             this.grpDatei.Controls.Add(this.btnLetzteDateien);
             this.grpDatei.Controls.Add(this.btnOeffnen);
             this.grpDatei.Controls.Add(this.btnSaveAs);
-            this.grpDatei.Controls.Add(this.NeuDB);
+            this.grpDatei.Controls.Add(this.btnNeuDB);
             this.grpDatei.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpDatei.Location = new System.Drawing.Point(0, 0);
             this.grpDatei.Name = "grpDatei";
@@ -301,7 +299,7 @@ namespace BlueControls.Forms
             this.btnOeffnen.Size = new System.Drawing.Size(56, 66);
             this.btnOeffnen.TabIndex = 1;
             this.btnOeffnen.Text = "Öffnen";
-            this.btnOeffnen.Click += new System.EventHandler(this.Öffne_Click);
+            this.btnOeffnen.Click += new System.EventHandler(this.btnOeffnen_Click);
             // 
             // btnSaveAs
             // 
@@ -311,17 +309,17 @@ namespace BlueControls.Forms
             this.btnSaveAs.Size = new System.Drawing.Size(64, 66);
             this.btnSaveAs.TabIndex = 4;
             this.btnSaveAs.Text = "Speichern unter";
-            this.btnSaveAs.Click += new System.EventHandler(this.NeuDBSaveAs_Click);
+            this.btnSaveAs.Click += new System.EventHandler(this.btnNeuDB_SaveAs_Click);
             // 
-            // NeuDB
+            // btnNeuDB
             // 
-            this.NeuDB.ImageCode = "Datei";
-            this.NeuDB.Location = new System.Drawing.Point(8, 2);
-            this.NeuDB.Name = "NeuDB";
-            this.NeuDB.Size = new System.Drawing.Size(56, 66);
-            this.NeuDB.TabIndex = 0;
-            this.NeuDB.Text = "Neu";
-            this.NeuDB.Click += new System.EventHandler(this.NeuDBSaveAs_Click);
+            this.btnNeuDB.ImageCode = "Datei";
+            this.btnNeuDB.Location = new System.Drawing.Point(8, 2);
+            this.btnNeuDB.Name = "btnNeuDB";
+            this.btnNeuDB.Size = new System.Drawing.Size(56, 66);
+            this.btnNeuDB.TabIndex = 0;
+            this.btnNeuDB.Text = "Neu";
+            this.btnNeuDB.Click += new System.EventHandler(this.btnNeuDB_SaveAs_Click);
             // 
             // tabStart
             // 
@@ -353,7 +351,6 @@ namespace BlueControls.Forms
             // 
             // SpaltAnsichtCap
             // 
-            this.SpaltAnsichtCap.CausesValidation = false;
             this.SpaltAnsichtCap.Location = new System.Drawing.Point(8, 46);
             this.SpaltAnsichtCap.Name = "SpaltAnsichtCap";
             this.SpaltAnsichtCap.Size = new System.Drawing.Size(98, 22);
@@ -686,7 +683,7 @@ namespace BlueControls.Forms
         private Formula Formula;
         private Button btnOeffnen;
         private OpenFileDialog LoadTab;
-        private Button NeuDB;
+        private Button btnNeuDB;
         private SaveFileDialog SaveTab;
         private Caption SpaltAnsichtCap;
         private ComboBox cbxColumnArr;

@@ -36,34 +36,36 @@ namespace BluePaint
         {
             if (_Pic == null) { return; }
 
-            OnForceUndoSaving();
 
-            var ca = new Color();
-            var cn = new Color();
+            OnOverridePic(_Pic.AdjustContrast(1.1f));
 
-            for (var x = 0; x < _Pic.Width; x++)
-            {
-                for (var y = 0; y < _Pic.Height; y++)
-                {
-                    ca = _Pic.GetPixel(x, y);
-                    if (ca.ToArgb() != Color.White.ToArgb())
-                    {
-                        cn = FromHSB(ca.GetHue(), (float)(ca.GetSaturation() * 1.2), (float)(ca.GetBrightness() * 0.9), ca.A);
-                        _Pic.SetPixel(x, y, cn);
-                    }
+            //OnForceUndoSaving();
 
-                }
-            }
+            //var ca = new Color();
+            //var cn = new Color();
 
-            OnPicChangedByTool();
+            //for (var x = 0; x < _Pic.Width; x++)
+            //{
+            //    for (var y = 0; y < _Pic.Height; y++)
+            //    {
+            //        ca = _Pic.GetPixel(x, y);
+            //        if (ca.ToArgb() != Color.White.ToArgb())
+            //        {
+            //            cn = FromHSB(ca.GetHue(), (float)(ca.GetSaturation() * 1.2), (float)(ca.GetBrightness() * 0.9), ca.A);
+            //            _Pic.SetPixel(x, y, cn);
+            //        }
+
+            //    }
+            //}
+
+            //q
+            //OnPicChangedByTool();
         }
 
         private void btnGraustufen_Click(object sender, System.EventArgs e)
         {
             if (_Pic == null) { return; }
-            OnForceUndoSaving();
-            _Pic = _Pic.Grayscale();
-            OnPicChangedByTool();
+            OnOverridePic(_Pic.Grayscale());
         }
 
         private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e)

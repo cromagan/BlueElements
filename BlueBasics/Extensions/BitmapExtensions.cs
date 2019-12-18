@@ -437,7 +437,57 @@ namespace BlueBasics
         }
 
 
+        public static Bitmap AdjustContrast(this Bitmap Image, float Value)
+        {
+            Value = (100.0f + Value) / 100.0f;
+            Value *= Value;
+            var NewBitmap = Image_Clone(Image);
+            var data = NewBitmap.LockBits(new Rectangle(0, 0, NewBitmap.Width, NewBitmap.Height), ImageLockMode.ReadWrite, NewBitmap.PixelFormat);
+            var Height = NewBitmap.Height;
+            var Width = NewBitmap.Width;
 
+            unsafe
+            {
+                for (var y = 0; y < Height; ++y)
+                {
+                    byte* row = (byte*)data.Scan0 + (y * data.Stride);
+                    var columnOffset = 0;
+                    for (var x = 0; x < Width; ++x)
+                    {
+                        var B = row[columnOffset];
+                        var G = row[columnOffset + 1];
+                        var R = row[columnOffset + 2];
+
+                        var Red = R / 255.0f;
+                        var Green = G / 255.0f;
+                        var Blue = B / 255.0f;
+                        Red = (((Red - 0.5f) * Value) + 0.5f) * 255.0f;
+                        Green = (((Green - 0.5f) * Value) + 0.5f) * 255.0f;
+                        Blue = (((Blue - 0.5f) * Value) + 0.5f) * 255.0f;
+
+                        var iR = (int)Red;
+                        iR = iR > 255 ? 255 : iR;
+                        iR = iR < 0 ? 0 : iR;
+                        var iG = (int)Green;
+                        iG = iG > 255 ? 255 : iG;
+                        iG = iG < 0 ? 0 : iG;
+                        var iB = (int)Blue;
+                        iB = iB > 255 ? 255 : iB;
+                        iB = iB < 0 ? 0 : iB;
+
+                        row[columnOffset] = (byte)iB;
+                        row[columnOffset + 1] = (byte)iG;
+                        row[columnOffset + 2] = (byte)iR;
+
+                        columnOffset += 4;
+                    }
+                }
+            }
+
+            NewBitmap.UnlockBits(data);
+
+            return NewBitmap;
+        }
 
         public static Bitmap Grayscale(this Bitmap original)
         {

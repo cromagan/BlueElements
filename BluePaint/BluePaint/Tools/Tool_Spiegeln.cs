@@ -44,7 +44,7 @@ namespace BluePaint
             gr.DrawImage(_Pic.Image_Clone(), 0, ni.Height, ni.Width, -ni.Height);
             gr.Dispose();
 
-            OnOverridePic(new BitmapEventArgs(ni));
+            OnOverridePic(ni);
         }
 
         private void SpiegelnV_Click(object sender, System.EventArgs e)
@@ -57,7 +57,7 @@ namespace BluePaint
             gr.DrawImage(_Pic.Image_Clone(), ni.Width, 0, -ni.Width, ni.Height);
             gr.Dispose();
 
-            OnOverridePic(new BitmapEventArgs(ni));
+            OnOverridePic(ni);
         }
     }
 
