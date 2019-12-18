@@ -26,48 +26,28 @@ namespace BluePaint
 {
     public partial class Tool_Eraser : GenericTool
     {
-        private Point _MouseDown;
-
         public Tool_Eraser()
         {
             InitializeComponent();
         }
 
-        public override void PicChangedFromMain()
-        {
 
+
+        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic)
+        {
+            MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
 
-        public override void ToolFirstShown()
-        {
-
-        }
-
-        public override void MouseDown(MouseEventArgs1_1 e)
-        {
-            OnForceUndoSaving();
-
-            ClearPreviewPic();
-            _MouseDown = new Point(e.TrimmedX, e.TrimmedY);
-
-
-            if (Razi.Checked)
-            {
-                MouseMove(e);
-            }
-
-        }
-
-        public override void MouseMove(MouseEventArgs1_1 e)
+        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
             var Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
             var Pen_RotTransp = new Pen(Color.FromArgb(50, 255, 0, 0));
 
-            if (_Pic == null || _PicPreview== null) { return; }
 
 
 
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+
+            if (e.Current.Button == System.Windows.Forms.MouseButtons.Left)
             {
 
                 if (Razi.Checked)
@@ -115,7 +95,7 @@ namespace BluePaint
             OnPicChangedByTool();
         }
 
-        public override void MouseUp(MouseEventArgs1_1 e)
+        public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
 
             if (_Pic == null || _PicPreview == null) { return; }

@@ -18,11 +18,13 @@
 #endregion
 
 
+using BlueBasics;
+using System;
 using System.Drawing;
 
 namespace BlueControls.EventArgs
 {
-  public  class AdditionalDrawing : System.EventArgs
+    public class AdditionalDrawing : System.EventArgs
     {
         public AdditionalDrawing(Graphics gr, decimal zoom, decimal movex, decimal movey)
         {
@@ -32,11 +34,33 @@ namespace BlueControls.EventArgs
             this.MoveY = movey;
 
         }
-        
-        public Graphics G { get;  }
+
+        public Graphics G { get; }
         public decimal Zoom { get; }
         public decimal MoveX { get; }
         public decimal MoveY { get; }
 
+        public void FillRectangle(Brush brush, Rectangle rectangle)
+        {
+
+            var p1 = new PointDF(rectangle.PointOf(BlueBasics.Enums.enAlignment.Top_Left)).ZoomAndMove(this);
+            p1.X -= (float)(Zoom / 2);
+            p1.Y -= (float)(Zoom / 2);
+
+            var p2 = new PointDF(rectangle.PointOf(BlueBasics.Enums.enAlignment.Bottom_Right)).ZoomAndMove(this);
+            p2.X += (float)(Zoom / 2);
+            p2.Y += (float)(Zoom / 2);
+
+            G.FillRectangle(brush, p1.X, p1.Y, p2.X - p1.X, p2.Y - p1.Y);
+
+
+        }
+
+        public void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
+        {
+            var p1 = new PointDF(x1, y1).ZoomAndMove(this);
+            var p2 = new PointDF(x2, y2).ZoomAndMove(this);
+            G.DrawLine(pen, p1, p2);
+        }
     }
 }

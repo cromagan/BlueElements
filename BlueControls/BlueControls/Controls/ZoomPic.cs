@@ -27,13 +27,14 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using BlueControls.EventArgs;
 using BlueControls.Designer_Support;
+using BlueBasics;
 
 namespace BlueControls.Controls
 {
     [Designer(typeof(BasicDesigner))]
     public partial class ZoomPic : ZoomPad
     {
-
+        private MouseEventArgs1_1 _MouseDown = null;
         public Bitmap BMP = null;
         //public Bitmap OverlayBMP = null;
 
@@ -51,8 +52,8 @@ namespace BlueControls.Controls
         }
 
         public event EventHandler<MouseEventArgs1_1> ImageMouseDown;
-        public event EventHandler<MouseEventArgs1_1> ImageMouseMove;
-        public event EventHandler<MouseEventArgs1_1> ImageMouseUp;
+        public event EventHandler<MouseEventArgs1_1DownAndCurrent> ImageMouseMove;
+        public event EventHandler<MouseEventArgs1_1DownAndCurrent> ImageMouseUp;
         public event EventHandler<AdditionalDrawing> DoAdditionalDrawing;
         public event EventHandler<PositionEventArgs> OverwriteMouseImageData;
 
@@ -95,7 +96,7 @@ namespace BlueControls.Controls
             if (BMP != null)
             {
 
-                var r =  new RectangleDF(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(_Zoom, _MoveX, _MoveY);
+                var r = new RectangleDF(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(_Zoom, _MoveX, _MoveY);
 
 
                 if (_Zoom < 1 || _AlwaysSmooth)
@@ -165,6 +166,7 @@ namespace BlueControls.Controls
 
         protected virtual void OnImageMouseDown(MouseEventArgs1_1 e)
         {
+            _MouseDown = e;
             ImageMouseDown?.Invoke(this, e);
         }
 
@@ -174,7 +176,8 @@ namespace BlueControls.Controls
         /// <param name="e"></param>
         protected virtual void OnImageMouseUp(MouseEventArgs1_1 e)
         {
-            ImageMouseUp?.Invoke(this, e);
+            ImageMouseUp?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
+            _MouseDown = null;
         }
 
 
@@ -211,7 +214,7 @@ namespace BlueControls.Controls
 
         protected virtual void OnImageMouseMove(MouseEventArgs1_1 e)
         {
-            ImageMouseMove?.Invoke(this, e);
+            ImageMouseMove?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
         }
 
 

@@ -31,14 +31,14 @@ namespace BluePaint
         }
 
 
-        public override void MouseDown(MouseEventArgs1_1 e)
+        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic)
         {
             OnForceUndoSaving();
             ClearPreviewPic();
             MouseMove(e);
         }
 
-        public override void MouseMove(MouseEventArgs1_1 e)
+        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
             var Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
 

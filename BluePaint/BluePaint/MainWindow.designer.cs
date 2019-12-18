@@ -346,8 +346,8 @@ namespace BluePaint
             this.P.TabStop = false;
             this.P.Translate = false;
             this.P.ImageMouseDown += new System.EventHandler<BlueControls.EventArgs.MouseEventArgs1_1>(this.P_ImageMouseDown);
-            this.P.ImageMouseMove += new System.EventHandler<BlueControls.EventArgs.MouseEventArgs1_1>(this.P_ImageMouseMove);
-            this.P.ImageMouseUp += new System.EventHandler<BlueControls.EventArgs.MouseEventArgs1_1>(this.P_ImageMouseUp);
+            this.P.ImageMouseMove += new System.EventHandler<BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent>(this.P_ImageMouseMove);
+            this.P.ImageMouseUp += new System.EventHandler<BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent>(this.P_ImageMouseUp);
             this.P.DoAdditionalDrawing += new System.EventHandler<BlueControls.EventArgs.AdditionalDrawing>(this.P_DoAdditionalDrawing);
             this.P.MouseLeave += new System.EventHandler(this.P_MouseLeave);
             // 

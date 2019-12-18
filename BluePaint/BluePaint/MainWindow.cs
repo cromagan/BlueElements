@@ -96,12 +96,12 @@ namespace BluePaint
 
         public void SetTool(GenericTool NewTool, bool DoInitalizingAction)
         {
-            if (P.OverlayBMP != null)
-            {
-                var gr = Graphics.FromImage(P.OverlayBMP);
-                gr.Clear(Color.Transparent);
-                P.Invalidate();
-            }
+            //if (P.OverlayBMP != null)
+            //{
+            //    var gr = Graphics.FromImage(P.OverlayBMP);
+            //    gr.Clear(Color.Transparent);
+            //    P.Invalidate();
+            //}
 
 
             if (CurrentTool != null)
@@ -112,9 +112,13 @@ namespace BluePaint
                 CurrentTool.ZoomFit -= CurrentTool_ZoomFit;
                 CurrentTool.HideMainWindow -= CurrentTool_HideMainWindow;
                 CurrentTool.ShowMainWindow -= CurrentTool_ShowMainWindow;
-                CurrentTool.PicChangedByTool -= CurrentTool_PicChangedByTool;
-                CurrentTool.OverridePic -= CurrentTool_OverridePic;
+
                 CurrentTool.ForceUndoSaving -= CurrentTool_ForceUndoSaving;
+
+                //CurrentTool.PicChangedByTool -= CurrentTool_PicChangedByTool;
+                CurrentTool.OverridePic -= CurrentTool_OverridePic;
+                CurrentTool.DoInvalidate -= CurrentTool_DoInvalidate;
+                CurrentTool.NeedCurrentPic -= CurrentTool_NeedCurrentPic;
                 CurrentTool = null;
             }
 
@@ -128,14 +132,15 @@ namespace BluePaint
                 NewTool.Dock = System.Windows.Forms.DockStyle.Fill;
 
 
-                CurrentTool.SetPics(P.BMP, P.OverlayBMP);
+                //CurrentTool.SetPics(P.BMP, P.OverlayBMP);
                 CurrentTool.ZoomFit += CurrentTool_ZoomFit;
                 CurrentTool.HideMainWindow += CurrentTool_HideMainWindow;
                 CurrentTool.ShowMainWindow += CurrentTool_ShowMainWindow;
-                CurrentTool.PicChangedByTool += CurrentTool_PicChangedByTool;
+                //CurrentTool.PicChangedByTool += CurrentTool_PicChangedByTool;
                 CurrentTool.OverridePic += CurrentTool_OverridePic;
                 CurrentTool.ForceUndoSaving += CurrentTool_ForceUndoSaving;
-
+                CurrentTool.DoInvalidate += CurrentTool_DoInvalidate;
+                CurrentTool.NeedCurrentPic += CurrentTool_NeedCurrentPic;
 
                 if (DoInitalizingAction)
                 {
@@ -145,6 +150,16 @@ namespace BluePaint
             }
 
 
+        }
+
+        private void CurrentTool_NeedCurrentPic(object sender, BitmapEventArgs e)
+        {
+            e.BMP = P.BMP;
+        }
+
+        private void CurrentTool_DoInvalidate(object sender, System.EventArgs e)
+        {
+            P.Invalidate();
         }
 
         private void CurrentTool_ZoomFit(object sender, System.EventArgs e)
@@ -172,15 +187,15 @@ namespace BluePaint
             CurrentTool_ForceUndoSaving(this, System.EventArgs.Empty);
             P.BMP = e.BMP;
 
-            if (P.BMP != null)
-            {
-                P.OverlayBMP = new Bitmap(P.BMP.Width, P.BMP.Height);
-            }
+            //if (P.BMP != null)
+            //{
+            //    P.OverlayBMP = new Bitmap(P.BMP.Width, P.BMP.Height);
+            //}
 
-            P.Refresh();
+            P.Invalidate();
 
 
-            if (CurrentTool != null) { CurrentTool.SetPics(P.BMP, P.OverlayBMP); }
+            //if (CurrentTool != null) { CurrentTool.SetPics(P.BMP, P.OverlayBMP); }
         }
 
         private void CurrentTool_ForceUndoSaving(object sender, System.EventArgs e)
@@ -241,7 +256,7 @@ namespace BluePaint
 
 
             BlueBasics.modAllgemein.Swap(ref P.BMP, ref _PicUndo);
-            P.OverlayBMP = new Bitmap(P.BMP.Width, P.BMP.Height);
+            //P.OverlayBMP = new Bitmap(P.BMP.Width, P.BMP.Height);
 
             if (P.BMP.Width != _PicUndo.Width || P.BMP.Height != _PicUndo.Height)
             {
@@ -250,10 +265,10 @@ namespace BluePaint
             else
             {
 
-                P.Refresh();
+                P.Invalidate();
             }
 
-            if (CurrentTool != null) { CurrentTool.SetPics(P.BMP, P.OverlayBMP); }
+            //if (CurrentTool != null) { CurrentTool.SetPics(P.BMP, P.OverlayBMP); }
 
 
 
@@ -265,22 +280,24 @@ namespace BluePaint
 
         private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e)
         {
-            CurrentTool?.MouseDown(e);
+
+           CurrentTool?.MouseDown(e, P.BMP);
         }
 
 
-        private void P_ImageMouseMove(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e)
+        private void P_ImageMouseMove(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e)
         {
 
-            CurrentTool?.MouseMove(e);
+
+            CurrentTool?.MouseMove(e, P.BMP);
 
 
-            if (e.IsInPic)
+            if (e.Current.IsInPic)
             {
-                var c = P.BMP.GetPixel(e.TrimmedX, e.TrimmedY);
+                var c = P.BMP.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
 
-                InfoText.Text = "X: " + e.TrimmedX +
-                               "<br>Y: " + e.TrimmedY +
+                InfoText.Text = "X: " + e.Current.TrimmedX +
+                               "<br>Y: " + e.Current.TrimmedY +
                                "<br>Farbe: " + c.ToHTMLCode().ToUpper();
             }
             else
@@ -291,9 +308,9 @@ namespace BluePaint
 
         }
 
-        private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e)
+        private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e)
         {
-            CurrentTool?.MouseUp(e);
+            CurrentTool?.MouseUp(e, P.BMP);
         }
 
 
@@ -460,8 +477,10 @@ namespace BluePaint
 
         private void P_DoAdditionalDrawing(object sender, BlueControls.EventArgs.AdditionalDrawing e)
         {
-            CurrentTool.DoAdditionalDrawing(e);
+            CurrentTool?.DoAdditionalDrawing(e, P.BMP);
         }
+
+
     }
 
 }

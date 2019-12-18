@@ -17,31 +17,26 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Windows.Forms;
-
 namespace BlueControls.EventArgs
 {
-    public sealed class MouseEventArgs1_1 : MouseEventArgs
+    public sealed class MouseEventArgs1_1DownAndCurrent : System.EventArgs
     {
+        MouseEventArgs1_1 down = null;
+        MouseEventArgs1_1 current = null;
 
-
-        public MouseEventArgs1_1(MouseButtons button, int clicks, int x, int y, int delta, int trimmedX, int trimmedy, bool isinPic) : base(button, clicks, x, y, delta)
+        public MouseEventArgs1_1DownAndCurrent(MouseEventArgs1_1 down, MouseEventArgs1_1 current) : base()
         {
-            this.IsInPic = isinPic;
-
-            this.TrimmedX = trimmedX;
-            this.TrimmedY = trimmedy;
-
+            MouseDown = down;
+            Current = current;
         }
 
 
 
 
-        public int TrimmedX { get; }
+        public MouseEventArgs1_1 MouseDown { get; }
 
-        public int TrimmedY { get; }
+        public MouseEventArgs1_1 Current { get; }
 
-        public bool IsInPic { get; }
 
 
 

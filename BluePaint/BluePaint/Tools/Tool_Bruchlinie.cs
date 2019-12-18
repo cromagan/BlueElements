@@ -20,7 +20,6 @@
 
 using System;
 using System.Drawing;
-using static BlueBasics.Develop;
 using BlueControls.Controls;
 
 
@@ -39,7 +38,9 @@ namespace BluePaint
 
         private void Bruch_Click(object sender, System.EventArgs e)
         {
-            if (_Pic == null ) { return; }
+            var _Pic = OnNeedCurrentPic();
+
+            if (_Pic == null) { return; }
 
             var von = new Point();
             var Nach = new Point();
@@ -95,7 +96,7 @@ namespace BluePaint
             var gr = Graphics.FromImage(_Pic);
 
 
-            for (var z = 0 ; z <= 10 ; z++)
+            for (var z = 0; z <= 10; z++)
             {
                 von = Nach;
 
@@ -103,9 +104,9 @@ namespace BluePaint
                 Nach.Y += YRI;
 
 
-                for (var x1 = -1 ; x1 <= 1 ; x1++)
+                for (var x1 = -1; x1 <= 1; x1++)
                 {
-                    for (var y1 = -1 ; y1 <= 1 ; y1++)
+                    for (var y1 = -1; y1 <= 1; y1++)
                     {
                         gr.DrawLine(new Pen(Color.FromArgb(255, 255, 255), 8), von.X + ModX + x1, von.Y + ModY + y1, Nach.X + ModX + x1, Nach.Y + ModY + y1);
                     }
@@ -119,7 +120,7 @@ namespace BluePaint
                 if (ChangeY) { YRI = YRI * -1; }
             }
 
-            OnPicChangedByTool();
+            OnDoInvalidate();
         }
     }
 }

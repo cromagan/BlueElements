@@ -34,30 +34,13 @@ namespace BluePaint
             InitializeComponent();
         }
 
+        public event System.EventHandler DoInvalidate;
         public event System.EventHandler ZoomFit;
-
         public event System.EventHandler HideMainWindow;
-
         public event System.EventHandler ShowMainWindow;
-
         public event System.EventHandler ForceUndoSaving;
-
-        public event System.EventHandler PicChangedByTool;
-
         public event System.EventHandler<BitmapEventArgs> OverridePic;
-
-
-        //protected Bitmap _Pic;
-        //protected Bitmap _PicPreview;
-
-        public void SetPics(Bitmap Pic, Bitmap PicPreview)
-        {
-            _Pic = Pic;
-            _PicPreview = PicPreview;
-            PicChangedFromMain();
-        }
-
-
+        public event System.EventHandler<BitmapEventArgs> NeedCurrentPic;
 
 
         public virtual void ToolFirstShown() { }
@@ -67,20 +50,24 @@ namespace BluePaint
         /// 
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual new void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e) { }
+        public virtual new void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) { }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual new void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1 e) { }
+        public virtual new void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual new void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1 e) { }
+        public virtual new void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
+        public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent mouse, Bitmap OriginalPic) { }
 
-        //public virtual void PicChangedFromMain() { }
 
 
 
@@ -104,6 +91,14 @@ namespace BluePaint
             ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
         }
 
+
+        protected virtual Bitmap OnNeedCurrentPic()
+        {
+            var e = new BitmapEventArgs(null);
+            NeedCurrentPic?.Invoke(this, e);
+            return e.BMP;
+        }
+
         /// <summary>
         /// OnForceUndoSaving wird automatisch in der MainForm ausgelöst.
         /// Wird benutzt, wenn ein neues Bild erstellt wurde und dieses in den Speicher soll.
@@ -115,15 +110,15 @@ namespace BluePaint
             OverridePic?.Invoke(this, new BitmapEventArgs(BMP));
         }
 
-        /// <summary>
-        /// Wird benutzt, wenn in das vorhandene Bild etwas gemalt wurde.
-        /// Wird das ganze Bild geändert, muss OnOverridePic benutzt werden.
-        /// </summary>
-        protected virtual void OnPicChangedByTool()
-        {
+        ///// <summary>
+        ///// Wird benutzt, wenn in das vorhandene Bild etwas gemalt wurde.
+        ///// Wird das ganze Bild geändert, muss OnOverridePic benutzt werden.
+        ///// </summary>
+        //protected virtual void OnPicChangedByTool()
+        //{
 
-            PicChangedByTool?.Invoke(this, System.EventArgs.Empty);
-        }
+        //    PicChangedByTool?.Invoke(this, System.EventArgs.Empty);
+        //}
 
         protected virtual void OnForceUndoSaving()
         {
@@ -131,16 +126,22 @@ namespace BluePaint
             ForceUndoSaving?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public void ClearPreviewPic()
+        protected virtual void OnDoInvalidate()
         {
 
-            if (_PicPreview == null) { return; }
-
-            var gr = Graphics.FromImage(_PicPreview);
-            gr.Clear(Color.Transparent);
-            gr.Dispose();
-
+            DoInvalidate?.Invoke(this, System.EventArgs.Empty);
         }
+
+        //public void ClearPreviewPic()
+        //{
+
+        //    if (_PicPreview == null) { return; }
+
+        //    var gr = Graphics.FromImage(_PicPreview);
+        //    gr.Clear(Color.Transparent);
+        //    gr.Dispose();
+
+        //}
 
 
 
