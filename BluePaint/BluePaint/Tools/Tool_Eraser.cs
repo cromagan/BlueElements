@@ -35,15 +35,9 @@ namespace BluePaint
 
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
         {
-            var c = Color.FromArgb(50, 255, 0, 0);
-            var Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
-            var Pen_RotTransp = new Pen(c);
-            //e.G.DrawString("OK" + DateTime.Now.Millisecond.ToString() , new Font("Arial", 20), new SolidBrush(Color.Red), new Point(0, 0));
-            //var Pen_RotTransp2 = new Pen(Color.FromArgb(50, 0, 255, 0));
-
             if (Razi.Checked)
             {
-                e.FillCircle(c, e.Current.TrimmedX, e.Current.TrimmedY, 3);
+                e.FillCircle(ColorRedTransp, e.Current.TrimmedX, e.Current.TrimmedY, 3);
             }
 
 
@@ -51,22 +45,17 @@ namespace BluePaint
             {
                 var _Pic = OnNeedCurrentPic();
 
-                e.DrawLine(Pen_RotTransp, 0, e.Current.TrimmedY, _Pic.Width, e.Current.TrimmedY);
-                e.DrawLine(Pen_RotTransp, e.Current.TrimmedX, 0, e.Current.TrimmedX, _Pic.Height);
+                e.DrawLine(Pen_RedTransp, 0, e.Current.TrimmedY, _Pic.Width, e.Current.TrimmedY);
+                e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, 0, e.Current.TrimmedX, _Pic.Height);
 
                 if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null)
                 {
-                    e.DrawLine(Pen_RotTransp, 0, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
-                    e.DrawLine(Pen_RotTransp, e.MouseDown.TrimmedX, 0, e.MouseDown.TrimmedX, _Pic.Height);
-                    e.FillRectangle(Brush_RotTransp, e.TrimmedRectangle());
+                    e.DrawLine(Pen_RedTransp, 0, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
+                    e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, 0, e.MouseDown.TrimmedX, _Pic.Height);
+                    e.FillRectangle(Brush_RedTransp, e.TrimmedRectangle());
                 }
             }
-
-
         }
-
-
-
 
         public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic)
         {
@@ -76,7 +65,6 @@ namespace BluePaint
 
         public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
-
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left)
             {
 
@@ -87,7 +75,6 @@ namespace BluePaint
                 }
             }
                 OnDoInvalidate();
-
         }
 
         public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)

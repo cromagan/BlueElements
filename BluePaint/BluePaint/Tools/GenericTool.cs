@@ -29,6 +29,11 @@ namespace BluePaint
     public partial class GenericTool : GroupBox
     {
 
+        protected static Color ColorRedTransp = Color.FromArgb(50, 255, 0, 0);
+        protected static SolidBrush Brush_RedTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
+        protected static Pen Pen_RedTransp = new Pen(ColorRedTransp);
+        protected static Pen Pen_LightWhite = new Pen(Color.FromArgb(150, 255, 255, 255), 3);
+
         public GenericTool()
         {
             InitializeComponent();
