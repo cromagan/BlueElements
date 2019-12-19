@@ -120,7 +120,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
             if (Style == PadStyles.Undefiniert) { return; }
 
@@ -128,12 +128,12 @@ namespace BlueControls.ItemCollection
 
 
             var p = new Pen(Color.FromArgb(30, c.R, c.G, c.B), 1);
-            decimal ex = 0;
+            float ex = 0;
 
             var po = DCoordinates.PointOf(enAlignment.HorizontalCenter);
 
 
-            var mo = modConverter.mmToPixel(GridShow, ItemCollectionPad.DPI) * cZoom;
+            var mo = (float)(modConverter.mmToPixel(GridShow, ItemCollectionPad.DPI) * cZoom);
 
             var count = 0;
             do
@@ -168,7 +168,7 @@ namespace BlueControls.ItemCollection
             if (!ForPrinting)
             {
 
-                GR.DrawImage(NPEMF, new Rectangle(po.X - 7, po.Y - 7, 15, 15));
+                GR.DrawImage(NPEMF, new RectangleF(po.X - 7, po.Y - 7, 15, 15));
             }
         }
 

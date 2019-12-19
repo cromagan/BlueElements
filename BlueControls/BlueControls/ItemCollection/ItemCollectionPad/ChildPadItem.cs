@@ -161,7 +161,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
 
             try
@@ -194,7 +194,7 @@ namespace BlueControls.ItemCollection
 
                     if (_tmpBMP == null)
                     {
-                        _tmpBMP = new Bitmap(Math.Abs(DCoordinates.Width), Math.Abs(DCoordinates.Height));
+                        _tmpBMP = new Bitmap((int)Math.Abs(DCoordinates.Width), (int)Math.Abs(DCoordinates.Height));
                     }
 
                     var mb = PadInternal.MaxBounds(ZoomItems);
@@ -255,7 +255,7 @@ namespace BlueControls.ItemCollection
                         }
 
 
-                        GR.DrawImage(_tmpBMP, new Rectangle(-DCoordinates.Width / 2, -DCoordinates.Height / 2, DCoordinates.Width, DCoordinates.Height));
+                        GR.DrawImage(_tmpBMP, new Rectangle((int)-DCoordinates.Width / 2, (int)-DCoordinates.Height / 2, (int)DCoordinates.Width, (int)DCoordinates.Height));
                     }
                 }
                 GR.TranslateTransform(-trp.X, -trp.Y);
@@ -372,20 +372,20 @@ namespace BlueControls.ItemCollection
 
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
 
-            var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
+            var tZo = Math.Min((decimal)l1.Width / l2.Width, (decimal)l1.Height / l2.Height);
             PadInternal.SetZoom(1);
 
             // Coordinaten auf Maßstab 1/1 scalieren
-            var x = (e.X - l1.X) / tZo;
-            var y = (e.Y - l1.Y) / tZo;
+            var x = (e.X - (decimal)l1.X) / tZo;
+            var y = (e.Y - (decimal)l1.Y) / tZo;
 
             // Nullpunkt verschiebung laut Maxbounds
             x = x + l2.X;
             y = y + l2.Y;
 
             // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
-            x = x + (l2.Width - l1.Width / tZo) / 2;
-            y = y + (l2.Height - l1.Height / tZo) / 2;
+            x = x + (l2.Width - (decimal)l1.Width / tZo) / 2;
+            y = y + (l2.Height - (decimal)l1.Height / tZo) / 2;
 
             x = Math.Min(x, int.MaxValue / 2.0m);
             y = Math.Min(y, int.MaxValue / 2.0m);
@@ -411,22 +411,22 @@ namespace BlueControls.ItemCollection
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
 
             decimal tZo = 1;
-            if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
+            if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min((decimal)l1.Width / l2.Width, (decimal)l1.Height / l2.Height); }
 
 
             PadInternal.SetZoom(1);
 
             // Coordinaten auf Maßstab 1/1 scalieren
-            var x = (e.X - l1.X) / tZo;
-            var y = (e.Y - l1.Y) / tZo;
+            var x = (e.X - (decimal)l1.X) / tZo;
+            var y = (e.Y - (decimal)l1.Y) / tZo;
 
             // Nullpunkt verschiebung laut Maxbounds
             x = x + l2.X;
             y = y + l2.Y;
 
             // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
-            x = x + (l2.Width - l1.Width / tZo) / 2;
-            y = y + (l2.Height - l1.Height / tZo) / 2;
+            x = x + (l2.Width - (decimal)l1.Width / tZo) / 2;
+            y = y + (l2.Height - (decimal)l1.Height / tZo) / 2;
 
             x = Math.Min(x, int.MaxValue / 2.0m);
             y = Math.Min(y, int.MaxValue / 2.0m);
@@ -452,20 +452,20 @@ namespace BlueControls.ItemCollection
 
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
 
-            var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
+            var tZo = Math.Min((decimal)l1.Width / l2.Width, (decimal)l1.Height / l2.Height);
             PadInternal.SetZoom(1);
 
             // Coordinaten auf Maßstab 1/1 scalieren
-            var x = (e.X - l1.X) / tZo;
-            var y = (e.Y - l1.Y) / tZo;
+            var x = (e.X - (decimal)l1.X) / tZo;
+            var y = (e.Y - (decimal)l1.Y) / tZo;
 
             // Nullpunkt verschiebung laut Maxbounds
             x = x + l2.X;
             y = y + l2.Y;
 
             // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
-            x = x + (l2.Width - l1.Width / tZo) / 2;
-            y = y + (l2.Height - l1.Height / tZo) / 2;
+            x = x + (l2.Width - (decimal)l1.Width / tZo) / 2;
+            y = y + (l2.Height - (decimal)l1.Height / tZo) / 2;
 
             x = Math.Min(x, int.MaxValue / 2.0m);
             y = Math.Min(y, int.MaxValue / 2.0m);

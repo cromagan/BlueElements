@@ -108,13 +108,13 @@ namespace BluePaint
             // sldKontrast
             // 
             this.sldKontrast.Location = new System.Drawing.Point(16, 24);
-            this.sldKontrast.MouseChange = 0.01D;
-            this.sldKontrast.Maximum = 2D;
-            this.sldKontrast.Minimum = 0.5D;
+            this.sldKontrast.MouseChange = 1D;
+            this.sldKontrast.Maximum = 100D;
+            this.sldKontrast.Minimum = -100D;
             this.sldKontrast.Name = "sldKontrast";
             this.sldKontrast.Size = new System.Drawing.Size(248, 24);
-            this.sldKontrast.SmallChange = 0.01D;
-            this.sldKontrast.Value = 1D;
+            this.sldKontrast.SmallChange = 1D;
+            this.sldKontrast.Value = 0D;
             this.sldKontrast.ValueChanged += new System.EventHandler(this.sldKontrast_ValueChanged);
             // 
             // capKontrast

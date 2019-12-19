@@ -104,11 +104,11 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
             DCoordinates.Inflate(-Padding, -Padding);
 
-            var r1 = new Rectangle(DCoordinates.Left + Padding, DCoordinates.Top + Padding, DCoordinates.Width - Padding * 2, DCoordinates.Height - Padding * 2);
+            var r1 = new RectangleF(DCoordinates.Left + Padding, DCoordinates.Top + Padding, DCoordinates.Width - Padding * 2, DCoordinates.Height - Padding * 2);
             var r2 = new RectangleF();
             var r3 = new RectangleF();
 
@@ -154,7 +154,7 @@ namespace BlueControls.ItemCollection
             GR.RotateTransform(-Rotation);
 
 
-            r1 = new Rectangle(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);
+            r1 = new RectangleF(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);
             r2 = new RectangleF(r2.Left - trp.X, r2.Top - trp.Y, r2.Width, r2.Height);
 
 

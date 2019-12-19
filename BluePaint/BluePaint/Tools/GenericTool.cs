@@ -66,7 +66,7 @@ namespace BluePaint
         /// 
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent mouse, Bitmap OriginalPic) { }
+        public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, Bitmap OriginalPic) { }
 
 
 

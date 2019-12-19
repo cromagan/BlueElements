@@ -79,7 +79,7 @@ namespace BlueControls.ItemCollection
 
         public abstract void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu);
 
-        protected abstract void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting);
+        protected abstract void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting);
 
         protected abstract string ClassId();
 
@@ -368,7 +368,7 @@ namespace BlueControls.ItemCollection
 
                 if (IsInDrawingArea(DCoordinates, SizeOfParentControl))
                 {
-                    GR.DrawImage(QuickImage.Get("Drucker|16||1").BMP, DCoordinates.PointOf(enAlignment.Top_Left));
+                    GR.DrawImage(QuickImage.Get("Drucker|16||1").BMP, DCoordinates.X , DCoordinates.Y);
                 }
             }
         }
@@ -413,7 +413,7 @@ namespace BlueControls.ItemCollection
             GR.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY));
         }
 
-        protected bool IsInDrawingArea(Rectangle DrawingKoordinates, Size SizeOfParentControl)
+        protected bool IsInDrawingArea(RectangleF DrawingKoordinates, Size SizeOfParentControl)
         {
             if (SizeOfParentControl.IsEmpty || SizeOfParentControl.Width == 0 || SizeOfParentControl.Height == 0) { return true; }
             return DrawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, SizeOfParentControl));

@@ -27,7 +27,6 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using BlueControls.EventArgs;
 using BlueControls.Designer_Support;
-using BlueBasics;
 
 namespace BlueControls.Controls
 {
@@ -35,6 +34,8 @@ namespace BlueControls.Controls
     public partial class ZoomPic : ZoomPad
     {
         private MouseEventArgs1_1 _MouseDown = null;
+        private MouseEventArgs1_1 _MouseCurrent = null;
+
         public Bitmap BMP = null;
         //public Bitmap OverlayBMP = null;
 
@@ -127,7 +128,7 @@ namespace BlueControls.Controls
 
 
 
-            OnDoAdditionalDrawing(new AdditionalDrawing(TMPGR, _Zoom, _MoveX, _MoveY));
+            OnDoAdditionalDrawing(new AdditionalDrawing(TMPGR, _Zoom, _MoveX, _MoveY, _MouseDown, _MouseCurrent));
 
 
             Skin.Draw_Border(TMPGR, enDesign.Table_And_Pad, state, new Rectangle(1, 1, Size.Width - SliderY.Width, Size.Height - SliderX.Height));
@@ -144,7 +145,9 @@ namespace BlueControls.Controls
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            OnImageMouseDown(GenerateNewMouseEventArgs(e));
+            _MouseCurrent = GenerateNewMouseEventArgs(e);
+            _MouseDown = _MouseCurrent;
+            OnImageMouseDown(_MouseDown);
         }
 
 
@@ -164,9 +167,8 @@ namespace BlueControls.Controls
             OverwriteMouseImageData?.Invoke(this, e);
         }
 
-        protected virtual void OnImageMouseDown(MouseEventArgs1_1 e)
+        private void OnImageMouseDown(MouseEventArgs1_1 e)
         {
-            _MouseDown = e;
             ImageMouseDown?.Invoke(this, e);
         }
 
@@ -177,7 +179,6 @@ namespace BlueControls.Controls
         protected virtual void OnImageMouseUp(MouseEventArgs1_1 e)
         {
             ImageMouseUp?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
-            _MouseDown = null;
         }
 
 
@@ -202,17 +203,22 @@ namespace BlueControls.Controls
         /// <param name="e"></param>
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            OnImageMouseUp(GenerateNewMouseEventArgs(e));
+            _MouseCurrent = GenerateNewMouseEventArgs(e);
+            OnImageMouseUp(_MouseCurrent);
             base.OnMouseUp(e);
+            _MouseDown = null;
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            OnImageMouseMove(GenerateNewMouseEventArgs(e));
+
+            _MouseCurrent = GenerateNewMouseEventArgs(e);
+
+            OnImageMouseMove(_MouseCurrent);
         }
 
-        protected virtual void OnImageMouseMove(MouseEventArgs1_1 e)
+        private void OnImageMouseMove(MouseEventArgs1_1 e)
         {
             ImageMouseMove?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
         }

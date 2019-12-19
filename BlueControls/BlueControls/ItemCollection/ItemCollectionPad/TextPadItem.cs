@@ -185,7 +185,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
 
             if (Style == PadStyles.Undefiniert) { return; }
@@ -197,7 +197,7 @@ namespace BlueControls.ItemCollection
             GR.RotateTransform(-Rotation);
 
 
-            etxt.DrawingPos = new Point(DCoordinates.Left - trp.X, DCoordinates.Top - trp.Y);
+            etxt.DrawingPos = new Point((int)(DCoordinates.Left - trp.X), (int)(DCoordinates.Top - trp.Y));
             etxt.DrawingArea = Rectangle.Empty; // new Rectangle(DCoordinates.Left, DCoordinates.Top, DCoordinates.Width, DCoordinates.Height);
 
             if (!string.IsNullOrEmpty(_ReadableText) || !ForPrinting)

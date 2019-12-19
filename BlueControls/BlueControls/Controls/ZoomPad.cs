@@ -20,6 +20,7 @@
 
 using BlueBasics;
 using BlueControls.Designer_Support;
+using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using System;
 using System.ComponentModel;
@@ -66,8 +67,6 @@ namespace BlueControls.Controls
         /// </summary>
         public Point MousePos_1_1;
 
-
-        //  protected RectangleDF MaxBounds { get; set; }
 
 
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e)
@@ -363,10 +362,7 @@ namespace BlueControls.Controls
             if (SliderX.Visible) { he -= SliderX.Height; }
 
             return new Rectangle(0, 0, wi, he);
-
         }
-
-
 
     }
 }

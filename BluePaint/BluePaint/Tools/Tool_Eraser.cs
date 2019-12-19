@@ -21,6 +21,7 @@ using System;
 using System.Drawing;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
+using static BlueBasics.Extensions;
 
 namespace BluePaint
 {
@@ -32,86 +33,79 @@ namespace BluePaint
         }
 
 
+        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
+        {
+            var c = Color.FromArgb(50, 255, 0, 0);
+            var Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
+            var Pen_RotTransp = new Pen(c);
+            //e.G.DrawString("OK" + DateTime.Now.Millisecond.ToString() , new Font("Arial", 20), new SolidBrush(Color.Red), new Point(0, 0));
+            //var Pen_RotTransp2 = new Pen(Color.FromArgb(50, 0, 255, 0));
+
+            if (Razi.Checked)
+            {
+                e.FillCircle(c, e.Current.TrimmedX, e.Current.TrimmedY, 3);
+            }
+
+
+            if (DrawBox.Checked)
+            {
+                var _Pic = OnNeedCurrentPic();
+
+                e.DrawLine(Pen_RotTransp, 0, e.Current.TrimmedY, _Pic.Width, e.Current.TrimmedY);
+                e.DrawLine(Pen_RotTransp, e.Current.TrimmedX, 0, e.Current.TrimmedX, _Pic.Height);
+
+                if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null)
+                {
+                    e.DrawLine(Pen_RotTransp, 0, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
+                    e.DrawLine(Pen_RotTransp, e.MouseDown.TrimmedX, 0, e.MouseDown.TrimmedX, _Pic.Height);
+                    e.FillRectangle(Brush_RotTransp, e.TrimmedRectangle());
+                }
+            }
+
+
+        }
+
+
+
 
         public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic)
         {
+            OnForceUndoSaving();
             MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
 
         public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
-            var Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
-            var Pen_RotTransp = new Pen(Color.FromArgb(50, 255, 0, 0));
-
-
-
-
 
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left)
             {
 
                 if (Razi.Checked)
                 {
-                    var gr = Graphics.FromImage(_Pic);
-                    var r = new Rectangle(e.TrimmedX - 4, e.TrimmedY - 4, 9, 9);
-                    gr.FillEllipse(Brushes.White, r);
+                    var _Pic = OnNeedCurrentPic();
+                    _Pic.FillCircle(Color.White, e.Current.TrimmedX, e.Current.TrimmedY, 3);
                 }
-
-                if (DrawBox.Checked)
-                {
-                    ClearPreviewPic();
-                    var gr = Graphics.FromImage(_PicPreview);
-                    var r = new Rectangle(Math.Min(_MouseDown.X, e.TrimmedX), Math.Min(_MouseDown.Y, e.TrimmedY), Math.Abs(_MouseDown.X - e.TrimmedX) + 1, Math.Abs(_MouseDown.Y - e.TrimmedY) + 1);
-                    gr.FillRectangle(Brush_RotTransp, r);
-                }
-
             }
+                OnDoInvalidate();
 
-            if (Razi.Checked)
-            {
-                ClearPreviewPic();
-                var gr = Graphics.FromImage(_PicPreview);
-                var r = new Rectangle(e.TrimmedX - 4, e.TrimmedY - 4, 9, 9);
-                gr.FillEllipse(Brush_RotTransp, r);
-            }
-
-
-            if (DrawBox.Checked && e.Button == System.Windows.Forms.MouseButtons.None)
-            {
-
-                ClearPreviewPic();
-
-
-                if (_PicPreview != null)
-                {
-                    var gr = Graphics.FromImage(_PicPreview);
-
-                    gr.DrawLine(Pen_RotTransp, e.TrimmedX, 0, e.TrimmedX, _Pic.Height);
-                    gr.DrawLine(Pen_RotTransp, 0, e.TrimmedY, _Pic.Width, e.TrimmedY);
-                }
-
-            }
-
-            OnPicChangedByTool();
         }
 
         public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
 
-            if (_Pic == null || _PicPreview == null) { return; }
+            if (Razi.Checked) { return; }
+
+            var _Pic = OnNeedCurrentPic();
 
 
             if (Eleminate.Checked)
             {
 
-                if (e.IsInPic)
+                if (e.Current.IsInPic)
                 {
-                    var cc = _Pic.GetPixel(e.X, e.Y).ToArgb();
+                    var cc = _Pic.GetPixel(e.Current.X, e.Current.Y).ToArgb();
 
-                    if (cc == -1)
-                    {
-                        return;
-                    }
+                    if (cc == -1) { return; }
 
                     for (var x = 0; x < _Pic.Width; x++)
                     {
@@ -124,38 +118,23 @@ namespace BluePaint
                         }
                     }
 
-                    OnPicChangedByTool();
-
+                    OnDoInvalidate();
+                    return;
                 }
-
-
             }
 
 
             if (DrawBox.Checked)
             {
-                ClearPreviewPic();
-                using (var gr = Graphics.FromImage(_Pic))
-                {
-
-                    var r = new Rectangle(Math.Min(_MouseDown.X, e.TrimmedX), Math.Min(_MouseDown.Y, e.TrimmedY), Math.Abs(_MouseDown.X - e.TrimmedX) + 1, Math.Abs(_MouseDown.Y - e.TrimmedY) + 1);
-                    gr.FillRectangle(Brushes.White, r);
-                }
-
-                OnPicChangedByTool();
+                var g = Graphics.FromImage(_Pic);
+                g.FillRectangle(Brushes.White, e.TrimmedRectangle());
+                OnDoInvalidate();
             }
         }
 
         private void DrawBox_CheckedChanged(object sender, System.EventArgs e)
         {
-
-            if (((Button)sender).Checked)
-            {
-                ClearPreviewPic();
-                OnPicChangedByTool();
-            }
-
-
+            OnDoInvalidate();
         }
     }
 

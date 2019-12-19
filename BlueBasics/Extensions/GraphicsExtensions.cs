@@ -37,5 +37,12 @@ namespace BlueBasics
         {
             DrawImageInRectAspectRatio(GR, bmp, R.Left, R.Top, R.Width, R.Height);
         }
+
+
+        public static void DrawRectangle(this Graphics GR,Pen pen, RectangleF R)
+        {
+            GR.DrawRectangle(pen, R.X, R.Y, R.Width, R.Height);
+        }
+
     }
 }

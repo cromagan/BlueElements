@@ -576,6 +576,29 @@ namespace BlueBasics
             return NewBmp;
         }
 
+        public static void FillCircle(this Bitmap BMP, Color C, int X, int Y, int R)
+        {
+
+            for (var adx = -R; adx <= R; adx++)
+            {
+                for (var ady = -R; ady <= R; ady++)
+                {
+
+                    var d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady))-0.5;
+
+                    var px = X + adx;
+                    var py = Y + ady;
+                    if (px >= 0 && py >= 0 && px < BMP.Width && py < BMP.Height)
+                    {
+                        if (d <= R) { BMP.SetPixel(px, py, C); }
+                    }
+
+
+
+                }
+            }
+        }
+
 
 
     }

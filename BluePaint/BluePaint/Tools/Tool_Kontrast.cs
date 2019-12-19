@@ -18,6 +18,7 @@
 #endregion
 
 using BlueBasics;
+using BlueControls.EventArgs;
 using System.Drawing;
 using static BlueBasics.Extensions;
 
@@ -31,15 +32,29 @@ namespace BluePaint
             InitializeComponent();
         }
 
+        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
+        {
+            if (sldKontrast.Value == 0 || OriginalPic == null) { return; }
+
+            var _PicPreview = OriginalPic.AdjustContrast((float)sldKontrast.Value);
+
+            //var t = Graphics.FromImage(_PicPreview);
+            //t.Clear(Color.Red);
+
+            e.DrawImage(_PicPreview);
+        }
+
 
         private void btnKontrastErhoehen_Click(object sender, System.EventArgs e)
         {
+            var _Pic = OnNeedCurrentPic();
+
             if (_Pic == null) { return; }
 
 
             OnOverridePic(_Pic.AdjustContrast((float)sldKontrast.Value));
 
-            sldKontrast.Value = 1f;
+            sldKontrast.Value = 0f;
 
             //OnForceUndoSaving();
 
@@ -66,26 +81,29 @@ namespace BluePaint
 
         private void btnGraustufen_Click(object sender, System.EventArgs e)
         {
+            var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
 
             OnOverridePic(_Pic.Grayscale());
-            sldKontrast.Value = 1f;
+            sldKontrast.Value = 0f;
         }
 
         private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e)
         {
+            var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnForceUndoSaving();
 
             _Pic.AllePixelZuSchwarz(1f);
 
-            sldKontrast.Value = 1f;
+            sldKontrast.Value = 0f;
 
-            OnPicChangedByTool();
+            OnDoInvalidate();
         }
 
         private void btnPixelHinzu_Click(object sender, System.EventArgs e)
         {
+            var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnForceUndoSaving();
 
@@ -99,46 +117,30 @@ namespace BluePaint
                 }
             }
 
-            sldKontrast.Value = 1f;
+            sldKontrast.Value = 0f;
 
-            OnPicChangedByTool();
+            OnDoInvalidate();
 
         }
 
         private void btnAusdünnen_Click(object sender, System.EventArgs e)
         {
-
+            var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnForceUndoSaving();
 
             _Pic.Ausdünnen(4);
 
-            sldKontrast.Value = 1f;
+            sldKontrast.Value = 0f;
 
-            ClearPreviewPic();
-
-            OnPicChangedByTool();
+            OnDoInvalidate();
             return;
         }
 
         private void sldKontrast_ValueChanged(object sender, System.EventArgs e)
         {
             capKontrast.Text = sldKontrast.Value.ToString();
-
-
-            if (sldKontrast.Value == 1)
-            {
-                ClearPreviewPic();
-            }
-
-            else
-            {
-                _PicPreview = _Pic.AdjustContrast((float)sldKontrast.Value);
-
-            }
-
-
-            OnPicChangedByTool();
+            OnDoInvalidate();
         }
     }
 

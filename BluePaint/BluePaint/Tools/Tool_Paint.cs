@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
 using BlueControls.EventArgs;
 using System.Drawing;
 
@@ -34,40 +35,41 @@ namespace BluePaint
         public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic)
         {
             OnForceUndoSaving();
-            ClearPreviewPic();
-            MouseMove(e);
+            MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
 
         public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
-            var Brush_RotTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
 
-            if (e.Button == System.Windows.Forms. MouseButtons.Left)
+            if (e.Current.Button == System.Windows.Forms.MouseButtons.Left)
             {
-
-                if (e.IsInPic)
-                {
-                    var gr = Graphics.FromImage(_Pic);
-                    var r = new Rectangle(e.X - 1, e.Y - 1, 3, 3);
-                    gr.FillEllipse(Brushes.Black, r);
-                    OnPicChangedByTool();
-                }
-
+                var _Pic = OnNeedCurrentPic();
+                _Pic.FillCircle(Color.Black, e.Current.TrimmedX, e.Current.TrimmedY, 2);
+                OnDoInvalidate();
             }
             else
             {
-
-                if (e.IsInPic)
-                {
-                    ClearPreviewPic();
-                    var gr = Graphics.FromImage(_PicPreview);
-                    var r = new Rectangle(e.X - 1, e.Y - 1, 3, 3);
-                    gr.FillEllipse(Brush_RotTransp, r);
-                }
-
-                OnPicChangedByTool();
+                OnDoInvalidate();
             }
 
+
         }
+
+        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
+        {
+            var c = Color.FromArgb(50, 255, 0, 0);
+
+
+            e.FillCircle(c, e.Current.TrimmedX, e.Current.TrimmedY, 2);
+
+
+
+
+        }
+
+
+
+
+
     }
 }

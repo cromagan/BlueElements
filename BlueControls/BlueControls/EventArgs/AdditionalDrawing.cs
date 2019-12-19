@@ -24,15 +24,14 @@ using System.Drawing;
 
 namespace BlueControls.EventArgs
 {
-    public class AdditionalDrawing : System.EventArgs
+    public class AdditionalDrawing : MouseEventArgs1_1DownAndCurrent
     {
-        public AdditionalDrawing(Graphics gr, decimal zoom, decimal movex, decimal movey)
+        public AdditionalDrawing(Graphics gr, decimal zoom, decimal movex, decimal movey, MouseEventArgs1_1 mouseDown, MouseEventArgs1_1 current) : base(mouseDown, current)
         {
             this.G = gr;
             this.Zoom = zoom;
             this.MoveX = movex;
             this.MoveY = movey;
-
         }
 
         public Graphics G { get; }
@@ -42,18 +41,39 @@ namespace BlueControls.EventArgs
 
         public void FillRectangle(Brush brush, Rectangle rectangle)
         {
+            var x = new RectangleDF(rectangle).ZoomAndMoveRect(Zoom, MoveX, MoveY);
+            G.FillRectangle(brush, x);
+        }
 
-            var p1 = new PointDF(rectangle.PointOf(BlueBasics.Enums.enAlignment.Top_Left)).ZoomAndMove(this);
-            p1.X -= (float)(Zoom / 2);
-            p1.Y -= (float)(Zoom / 2);
+        public void DrawImage(Bitmap BMP)
+        {
+            var r = new RectangleDF(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(Zoom, MoveX, MoveY);
 
-            var p2 = new PointDF(rectangle.PointOf(BlueBasics.Enums.enAlignment.Bottom_Right)).ZoomAndMove(this);
-            p2.X += (float)(Zoom / 2);
-            p2.Y += (float)(Zoom / 2);
-
-            G.FillRectangle(brush, p1.X, p1.Y, p2.X - p1.X, p2.Y - p1.Y);
+            G.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
 
 
+
+            G.DrawImage(BMP, r);
+
+//            G.DrawImage(BMP, p1.X, p1.Y, p2.X - p1.X, p2.Y - p1.Y);
+
+        }
+
+
+        public void FillCircle(Color C, int X, int Y, int R)
+        {
+            var B = new SolidBrush(C);
+            for (var adx = -R; adx <= R; adx++)
+            {
+                for (var ady = -R; ady <= R; ady++)
+                {
+
+                    var d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady))-0.5;
+
+                    if (d <= R) { FillRectangle(B, new Rectangle(X + adx, Y + ady, 1, 1)); }
+
+                }
+            }
         }
 
         public void DrawLine(Pen pen, int x1, int y1, int x2, int y2)

@@ -66,7 +66,7 @@ namespace BluePaint
             ValueChanged(this, System.EventArgs.Empty);
 
         }
-        public override void DoAdditionalDrawing(AdditionalDrawing e, MouseEventArgs1_1DownAndCurrent mouse, Bitmap OriginalPic)
+        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
         {
             if (OriginalPic == null ) { return; }
 
@@ -75,13 +75,13 @@ namespace BluePaint
 
             DrawZusatz(e, OriginalPic);
 
-            e.DrawLine(Pen_Blau, mouse.Current.TrimmedX, 0, mouse.Current.TrimmedX, OriginalPic.Height);
-            e.DrawLine(Pen_Blau, 0, mouse.Current.TrimmedY, OriginalPic.Width, mouse.Current.TrimmedY);
+            e.DrawLine(Pen_Blau, e.Current.TrimmedX, 0, e.Current.TrimmedX, OriginalPic.Height);
+            e.DrawLine(Pen_Blau, 0, e.Current.TrimmedY, OriginalPic.Width, e.Current.TrimmedY);
 
-            if (mouse.Current.Button == System.Windows.Forms.MouseButtons.Left)
+            if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null)
             {
-                e.DrawLine(Pen_Blau, mouse.MouseDown.X, 0, mouse.MouseDown.X, OriginalPic.Height);
-                e.DrawLine(Pen_Blau, 0, mouse.MouseDown.Y, OriginalPic.Width, mouse.MouseDown.Y);
+                e.DrawLine(Pen_Blau, e.MouseDown.X, 0, e.MouseDown.X, OriginalPic.Height);
+                e.DrawLine(Pen_Blau, 0, e.MouseDown.Y, OriginalPic.Width, e.MouseDown.Y);
             }
 
         }

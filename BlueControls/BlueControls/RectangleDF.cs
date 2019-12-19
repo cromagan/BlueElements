@@ -49,26 +49,32 @@ namespace BlueControls
             Height = height;
         }
 
+        public RectangleDF(Rectangle r)
+        {
+            X = r.X;
+            Y = r.Y;
+            Width = r.Width;
+            Height = r.Height;
+        }
+
+
+
         public decimal Left
         {
-            get
-            { return X; }
+            get { return X; }
         }
 
         public decimal Top
         {
-            get
-            { return Y; }
+            get { return Y; }
         }
         public decimal Right
         {
-            get
-            { return X + Width; }
+            get { return X + Width; }
         }
         public decimal Bottom
         {
-            get
-            { return Y + Height; }
+            get { return Y + Height; }
         }
 
         public void Inflate(int XVal, int YVal)
@@ -154,9 +160,9 @@ namespace BlueControls
         }
 
 
-        public Rectangle ZoomAndMoveRect(decimal cZoom, decimal MoveX, decimal MoveY)
+        public RectangleF ZoomAndMoveRect(decimal cZoom, decimal MoveX, decimal MoveY)
         {
-            return new Rectangle((int)(X * cZoom - MoveX), (int)(Y * cZoom - MoveY), (int)(Width * cZoom), (int)(Height * cZoom));
+            return new RectangleF((int)(X * cZoom - MoveX), (int)(Y * cZoom - MoveY), (int)(Width * cZoom), (int)(Height * cZoom));
         }
 
     }

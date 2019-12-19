@@ -61,7 +61,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override void DrawExplicit(Graphics GR, Rectangle DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
 
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
@@ -84,11 +84,11 @@ namespace BlueControls.ItemCollection
                     break;
 
                 case enSymbol.Pfeil:
-                    p = modAllgemein.Poly_Arrow(d2);
+                    p = modAllgemein.Poly_Arrow(d2.ToRect());
                     break;
 
                 case enSymbol.Bruchlinie:
-                    p = modAllgemein.Poly_Bruchlinie(d2);
+                    p = modAllgemein.Poly_Bruchlinie(d2.ToRect());
                     break;
 
                 default:
