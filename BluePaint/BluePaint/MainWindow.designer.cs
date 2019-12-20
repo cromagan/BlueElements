@@ -245,11 +245,11 @@ namespace BluePaint
             // btnSpiegeln
             // 
             this.btnSpiegeln.ImageCode = "SpiegelnVertikal";
-            this.btnSpiegeln.Location = new System.Drawing.Point(8, 2);
+            this.btnSpiegeln.Location = new System.Drawing.Point(0, 2);
             this.btnSpiegeln.Name = "btnSpiegeln";
-            this.btnSpiegeln.Size = new System.Drawing.Size(56, 66);
+            this.btnSpiegeln.Size = new System.Drawing.Size(64, 66);
             this.btnSpiegeln.TabIndex = 3;
-            this.btnSpiegeln.Text = "Spiegeln";
+            this.btnSpiegeln.Text = "Drehen & Spiegeln";
             this.btnSpiegeln.Click += new System.EventHandler(this.Spiegeln_Click);
             // 
             // btnBruchlinie

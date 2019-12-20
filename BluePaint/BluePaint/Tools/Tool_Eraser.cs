@@ -45,13 +45,13 @@ namespace BluePaint
             {
                 var _Pic = OnNeedCurrentPic();
 
-                e.DrawLine(Pen_RedTransp, 0, e.Current.TrimmedY, _Pic.Width, e.Current.TrimmedY);
-                e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, 0, e.Current.TrimmedX, _Pic.Height);
+                e.DrawLine(Pen_RedTransp, -1, e.Current.TrimmedY, _Pic.Width, e.Current.TrimmedY);
+                e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, _Pic.Height);
 
                 if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null)
                 {
-                    e.DrawLine(Pen_RedTransp, 0, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
-                    e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, 0, e.MouseDown.TrimmedX, _Pic.Height);
+                    e.DrawLine(Pen_RedTransp, -1, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
+                    e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, -1, e.MouseDown.TrimmedX, _Pic.Height);
                     e.FillRectangle(Brush_RedTransp, e.TrimmedRectangle());
                 }
             }

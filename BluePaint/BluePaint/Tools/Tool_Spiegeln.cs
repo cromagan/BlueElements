@@ -25,6 +25,7 @@ using static BlueBasics.Extensions;
 using BlueControls.EventArgs;
 using BlueControls;
 using BlueBasics;
+using System;
 
 namespace BluePaint
 {
@@ -98,13 +99,13 @@ namespace BluePaint
 
             var _Pic = OnNeedCurrentPic();
 
-            e.DrawLine(Pen_RedTransp, 0, e.Current.TrimmedY, _Pic.Width, e.Current.TrimmedY);
-            e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, 0, e.Current.TrimmedX, _Pic.Height);
+            e.DrawLine(Pen_RedTransp, -1, e.Current.TrimmedY, _Pic.Width, e.Current.TrimmedY);
+            e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, _Pic.Height);
 
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null)
             {
-                e.DrawLine(Pen_RedTransp, 0, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
-                e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, 0, e.MouseDown.TrimmedX, _Pic.Height);
+                e.DrawLine(Pen_RedTransp, -1, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
+                e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, -1, e.MouseDown.TrimmedX, _Pic.Height);
 
                 e.DrawLine(Pen_LightWhite, e.Current.TrimmedX, e.Current.TrimmedY, e.MouseDown.TrimmedX, e.MouseDown.TrimmedY);
                 e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, e.Current.TrimmedY, e.MouseDown.TrimmedX, e.MouseDown.TrimmedY);
@@ -131,65 +132,50 @@ namespace BluePaint
             if (!_ausricht) { return; }
 
             _ausricht = false;
+            CollectGarbage();
 
             var _Pic = OnNeedCurrentPic();
 
             var _middle = new PointDF(_Pic.Width / 2, _Pic.Height / 2);
-            var Dist = GeometryDF.Winkel(new PointDF(e.Current.X, e.Current.Y), new PointDF(e.MouseDown.X, e.MouseDown.Y));
+            var Wink = (float)GeometryDF.Winkel(new PointDF(e.MouseDown.X, e.MouseDown.Y), new PointDF(e.Current.X, e.Current.Y));
 
 
             var Lang = GeometryDF.Länge(_middle, new PointDF(0, 0)); // Länge vom Eck zur Mitte;
-            var Wink_LO = GeometryDF.Länge(_middle, new PointDF(0, 0)); // Winkel: Mitte bis LO
-            var Wink_RO = GeometryDF.Länge(_middle, new PointDF(_Pic.Width, 0)); // Winkel: Mitte bis RO
-            var Wink_LU = GeometryDF.Länge(_middle, new PointDF(0, _Pic.Height)); // Winkel: Mitte bis LU
-            var Wink_RU = GeometryDF.Länge(_middle, new PointDF(_Pic.Width, _Pic.Height)); // Winkel: Mitte bis RU
+            var Wink_LO = GeometryDF.Winkel(_middle, new PointDF(0, 0)); // Winkel: Mitte bis LO
+            var Wink_RO = GeometryDF.Winkel(_middle, new PointDF(_Pic.Width, 0)); // Winkel: Mitte bis RO
+            var Wink_LU = GeometryDF.Winkel(_middle, new PointDF(0, _Pic.Height)); // Winkel: Mitte bis LU
+            var Wink_RU = GeometryDF.Winkel(_middle, new PointDF(_Pic.Width, _Pic.Height)); // Winkel: Mitte bis RU
 
-            var P_LO = new PointDF(_middle, Lang, Wink_LO + Dist);
-            var P_RO = new PointDF(_middle, Lang, Wink_RO + Dist);
-            var P_RU = new PointDF(_middle, Lang, Wink_RU + Dist);
-            var P_LU = new PointDF(_middle, Lang, Wink_LU + Dist);
-
-
-            var maxX = int.MinValue;
-            var maxY = int.MinValue;
-            var minX = int.MaxValue;
-            var minY = int.MaxValue;
-
-            Develop.DebugPrint_NichtImplementiert();
-            OnDoInvalidate();
-
-            //if (Eleminate.Checked)
-            //{
-
-            //    if (e.Current.IsInPic)
-            //    {
-            //        var cc = _Pic.GetPixel(e.Current.X, e.Current.Y).ToArgb();
-
-            //        if (cc == -1) { return; }
-
-            //        for (var x = 0; x < _Pic.Width; x++)
-            //        {
-            //            for (var y = 0; y < _Pic.Height; y++)
-            //            {
-            //                if (_Pic.GetPixel(x, y).ToArgb() == cc)
-            //                {
-            //                    _Pic.SetPixel(x, y, Color.White);
-            //                }
-            //            }
-            //        }
-
-            //        OnDoInvalidate();
-            //        return;
-            //    }
-            //}
+            var P_LO = new PointDF(_middle, Lang, Wink_LO + (decimal)Wink);
+            var P_RO = new PointDF(_middle, Lang, Wink_RO + (decimal)Wink);
+            var P_RU = new PointDF(_middle, Lang, Wink_RU + (decimal)Wink);
+            var P_LU = new PointDF(_middle, Lang, Wink_LU + (decimal)Wink);
 
 
-            //if (DrawBox.Checked)
-            //{
-            //    var g = Graphics.FromImage(_Pic);
-            //    g.FillRectangle(Brushes.White, e.TrimmedRectangle());
-            //    OnDoInvalidate();
-            //}
+
+
+
+            var MinX = Math.Min(Math.Min(P_LO.X, P_RO.X), Math.Min(P_LU.X, P_RU.X));
+            var MinY = Math.Min(Math.Min(P_LO.Y, P_RO.Y), Math.Min(P_LU.Y, P_RU.Y));
+            var MaxX = Math.Max(Math.Max(P_LO.X, P_RO.X), Math.Max(P_LU.X, P_RU.X));
+            var MaxY = Math.Max(Math.Max(P_LO.Y, P_RO.Y), Math.Max(P_LU.Y, P_RU.Y));
+
+            var W = (int)(MaxX - MinX);
+            var H = (int)(MaxY - MinY);
+
+            var nBMP = new Bitmap(W, H);
+            var g = Graphics.FromImage(nBMP);
+            g.Clear(Color.Magenta);
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+
+            g.TranslateTransform(W / 2, H / 2);
+            g.RotateTransform(Wink);
+
+            g.DrawImage(_Pic, -W / 2, -H / 2, _Pic.Width, _Pic.Height); // Mit  Width und Height, manche Bilder schlagen sonst fehl
+
+            OnOverridePic(nBMP);
+
+
         }
     }
 }

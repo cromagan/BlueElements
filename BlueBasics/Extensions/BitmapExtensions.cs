@@ -328,7 +328,7 @@ namespace BlueBasics
             var _BMP2 = new Bitmap(w, h);
             using (var GR = Graphics.FromImage(_BMP2))
             {
-                GR.DrawImage(_Pic, new Point(-Left, -Top));
+                GR.DrawImage(_Pic, -Left, -Top, _Pic.Width, _Pic.Height); // Width und Height MUSS angegeben werden. Manche Bilder (Falsches Format?) schlagen fehl, wenn es fehlt.
             }
 
             modAllgemein.CollectGarbage();
@@ -436,6 +436,74 @@ namespace BlueBasics
             return pa;
         }
 
+        public static Bitmap AdjustGamma(this Bitmap image, float gamma)
+        {
+            //http://csharphelper.com/blog/2016/12/provide-gamma-correction-for-an-image-in-c/
+            // Set the ImageAttributes object's gamma value.
+            var attributes = new ImageAttributes();
+            attributes.SetGamma(Math.Max(gamma, 0.001f));
+
+            // Draw the image onto the new bitmap
+            // while applying the new gamma value.
+            Point[] points =
+            {
+        new Point(0, 0),
+        new Point(image.Width, 0),
+        new Point(0, image.Height),
+    };
+            var rect =
+                new Rectangle(0, 0, image.Width, image.Height);
+
+            // Make the result bitmap.
+            var bm = new Bitmap(image.Width, image.Height);
+            using (var gr = Graphics.FromImage(bm))
+            {
+                gr.DrawImage(image, points, rect,
+                    GraphicsUnit.Pixel, attributes);
+            }
+
+            // Return the result.
+            return bm;
+        }
+
+
+        public static Bitmap AdjustBrightness(this Bitmap image, float brightness)
+        {
+            // http://csharphelper.com/blog/2014/10/use-an-imageattributes-object-to-adjust-an-images-brightness-in-c/
+            // Make the ColorMatrix.
+            var b = Math.Max(brightness, 0.001f);
+            var cm = new ColorMatrix(new float[][]
+                {
+            new float[] {b, 0, 0, 0, 0},
+            new float[] {0, b, 0, 0, 0},
+            new float[] {0, 0, b, 0, 0},
+            new float[] {0, 0, 0, 1, 0},
+            new float[] {0, 0, 0, 0, 1},
+                });
+            var attributes = new ImageAttributes();
+            attributes.SetColorMatrix(cm);
+
+            // Draw the image onto the new bitmap while applying
+            // the new ColorMatrix.
+            Point[] points =
+            {
+        new Point(0, 0),
+        new Point(image.Width, 0),
+        new Point(0, image.Height),
+    };
+            var rect = new Rectangle(0, 0, image.Width, image.Height);
+
+            // Make the result bitmap.
+            var bm = new Bitmap(image.Width, image.Height);
+            using (var gr = Graphics.FromImage(bm))
+            {
+                gr.DrawImage(image, points, rect,
+                    GraphicsUnit.Pixel, attributes);
+            }
+
+            // Return the result.
+            return bm;
+        }
 
         public static Bitmap AdjustContrast(this Bitmap Image, float Value)
         {
@@ -584,7 +652,7 @@ namespace BlueBasics
                 for (var ady = -R; ady <= R; ady++)
                 {
 
-                    var d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady))-0.5;
+                    var d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady)) - 0.5;
 
                     var px = X + adx;
                     var py = Y + ady;

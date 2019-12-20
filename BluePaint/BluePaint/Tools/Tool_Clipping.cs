@@ -75,13 +75,16 @@ namespace BluePaint
 
             DrawZusatz(e, OriginalPic);
 
-            e.DrawLine(Pen_Blau, e.Current.TrimmedX, 0, e.Current.TrimmedX, OriginalPic.Height);
-            e.DrawLine(Pen_Blau, 0, e.Current.TrimmedY, OriginalPic.Width, e.Current.TrimmedY);
+
+            if (e.Current == null) { return; }
+
+            e.DrawLine(Pen_Blau, e.Current.TrimmedX, -1, e.Current.TrimmedX, OriginalPic.Height);
+            e.DrawLine(Pen_Blau, -1, e.Current.TrimmedY, OriginalPic.Width, e.Current.TrimmedY);
 
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null)
             {
-                e.DrawLine(Pen_Blau, e.MouseDown.X, 0, e.MouseDown.X, OriginalPic.Height);
-                e.DrawLine(Pen_Blau, 0, e.MouseDown.Y, OriginalPic.Width, e.MouseDown.Y);
+                e.DrawLine(Pen_Blau, e.MouseDown.X, -1, e.MouseDown.X, OriginalPic.Height);
+                e.DrawLine(Pen_Blau, -1, e.MouseDown.Y, OriginalPic.Width, e.MouseDown.Y);
             }
 
         }
@@ -125,6 +128,7 @@ namespace BluePaint
             var _Pic = OnNeedCurrentPic();
 
             var _BMP2 = _Pic.Crop((int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
+
 
             OnOverridePic(_BMP2);
             Links.Value = 0;

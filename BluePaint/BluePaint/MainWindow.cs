@@ -96,14 +96,6 @@ namespace BluePaint
 
         public void SetTool(GenericTool NewTool, bool DoInitalizingAction)
         {
-            //if (P.OverlayBMP != null)
-            //{
-            //    var gr = Graphics.FromImage(P.OverlayBMP);
-            //    gr.Clear(Color.Transparent);
-            //    P.Invalidate();
-            //}
-
-
             if (CurrentTool != null)
             {
                 CurrentTool.Dispose();
@@ -123,7 +115,7 @@ namespace BluePaint
             }
 
 
-
+            P.Invalidate();
 
             if (NewTool != null)
             {

@@ -24,7 +24,7 @@ using static BlueBasics.Extensions;
 
 namespace BluePaint
 {
-    public partial class Tool_Kontrast : GenericTool //  System.Windows.Forms.UserControl //
+    public partial class Tool_Kontrast :   GenericTool //System.Windows.Forms.UserControl //
     {
 
         public Tool_Kontrast()
@@ -34,49 +34,41 @@ namespace BluePaint
 
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
         {
-            if (sldKontrast.Value == 0 || OriginalPic == null) { return; }
 
-            var _PicPreview = OriginalPic.AdjustContrast((float)sldKontrast.Value);
+           if( OriginalPic == null) { return; }
 
-            //var t = Graphics.FromImage(_PicPreview);
-            //t.Clear(Color.Red);
+            if (sldKontrast.Value != 0)
+            {
+                var _PicPreview = OriginalPic.AdjustContrast((float)sldKontrast.Value);
+                e.DrawImage(_PicPreview);
+                return;
+            }
 
-            e.DrawImage(_PicPreview);
+            if (sldGamma.Value != 1)
+            {
+                var _PicPreview = OriginalPic.AdjustGamma((float)sldGamma.Value);
+                e.DrawImage(_PicPreview);
+                return;
+            }
+
+            if (sldHelligkeit.Value != 1)
+            {
+                var _PicPreview = OriginalPic.AdjustBrightness((float)sldHelligkeit.Value);
+                e.DrawImage(_PicPreview);
+                return;
+            }
+
         }
 
 
         private void btnKontrastErhoehen_Click(object sender, System.EventArgs e)
         {
             var _Pic = OnNeedCurrentPic();
-
             if (_Pic == null) { return; }
-
-
             OnOverridePic(_Pic.AdjustContrast((float)sldKontrast.Value));
-
+            sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
-
-            //OnForceUndoSaving();
-
-            //var ca = new Color();
-            //var cn = new Color();
-
-            //for (var x = 0; x < _Pic.Width; x++)
-            //{
-            //    for (var y = 0; y < _Pic.Height; y++)
-            //    {
-            //        ca = _Pic.GetPixel(x, y);
-            //        if (ca.ToArgb() != Color.White.ToArgb())
-            //        {
-            //            cn = FromHSB(ca.GetHue(), (float)(ca.GetSaturation() * 1.2), (float)(ca.GetBrightness() * 0.9), ca.A);
-            //            _Pic.SetPixel(x, y, cn);
-            //        }
-
-            //    }
-            //}
-
-            //q
-            //OnPicChangedByTool();
+            sldHelligkeit.Value = 1f;
         }
 
         private void btnGraustufen_Click(object sender, System.EventArgs e)
@@ -85,7 +77,9 @@ namespace BluePaint
             if (_Pic == null) { return; }
 
             OnOverridePic(_Pic.Grayscale());
+            sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
+            sldHelligkeit.Value = 1f;
         }
 
         private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e)
@@ -96,7 +90,9 @@ namespace BluePaint
 
             _Pic.AllePixelZuSchwarz(1f);
 
+            sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
+            sldHelligkeit.Value = 1f;
 
             OnDoInvalidate();
         }
@@ -117,7 +113,9 @@ namespace BluePaint
                 }
             }
 
+            sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
+            sldHelligkeit.Value = 1f;
 
             OnDoInvalidate();
 
@@ -131,17 +129,71 @@ namespace BluePaint
 
             _Pic.Ausdünnen(4);
 
+            sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
+            sldHelligkeit.Value = 1f;
 
             OnDoInvalidate();
             return;
         }
 
+
+
+
+
+        private void btnHelligkeit_Click(object sender, System.EventArgs e)
+        {
+            var _Pic = OnNeedCurrentPic();
+            if (_Pic == null) { return; }
+            OnOverridePic(_Pic.AdjustBrightness((float)sldHelligkeit.Value));
+            sldGamma.Value = 1f;
+            sldKontrast.Value = 0f;
+            sldHelligkeit.Value = 1f;
+        }
+
+        private void btnGamma_Click(object sender, System.EventArgs e)
+        {
+            var _Pic = OnNeedCurrentPic();
+            if (_Pic == null) { return; }
+            OnOverridePic(_Pic.AdjustGamma((float)sldGamma.Value));
+            sldGamma.Value = 1f;
+            sldKontrast.Value = 0f;
+            sldHelligkeit.Value = 1f;
+
+        }
+
+        private void sldHelligkeit_ValueChanged(object sender, System.EventArgs e)
+        {
+            sldGamma.Value = 1f;
+            sldKontrast.Value = 0f;
+            //sldHelligkeit.Value = 0f;
+
+            capHelligkeit.Text = sldHelligkeit.Value.ToString();
+            OnDoInvalidate();
+
+        }
+
+
         private void sldKontrast_ValueChanged(object sender, System.EventArgs e)
         {
+            sldGamma.Value = 1f;
+            //sldKontrast.Value = 0f;
+            sldHelligkeit.Value = 1f;
+
             capKontrast.Text = sldKontrast.Value.ToString();
             OnDoInvalidate();
         }
+
+        private void sldGamma_ValueChanged(object sender, System.EventArgs e)
+        {
+            //sldGamma.Value = 1f;
+            sldKontrast.Value = 0f;
+            sldHelligkeit.Value = 1f;
+
+            capGamma.Text = sldGamma.Value.ToString();
+            OnDoInvalidate();
+        }
+
     }
 
 }
