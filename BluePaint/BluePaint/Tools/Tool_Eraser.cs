@@ -74,7 +74,7 @@ namespace BluePaint
                     _Pic.FillCircle(Color.White, e.Current.TrimmedX, e.Current.TrimmedY, 3);
                 }
             }
-                OnDoInvalidate();
+            OnDoInvalidate();
         }
 
         public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
@@ -90,24 +90,14 @@ namespace BluePaint
 
                 if (e.Current.IsInPic)
                 {
-                    var cc = _Pic.GetPixel(e.Current.X, e.Current.Y).ToArgb();
+                    var cc = _Pic.GetPixel(e.Current.X, e.Current.Y);
 
-                    if (cc == -1) { return; }
+                    if (cc.ToArgb() == -1) { return; }
 
-                    for (var x = 0; x < _Pic.Width; x++)
-                    {
-                        for (var y = 0; y < _Pic.Height; y++)
-                        {
-                            if (_Pic.GetPixel(x, y).ToArgb() == cc)
-                            {
-                                _Pic.SetPixel(x, y, Color.White);
-                            }
-                        }
-                    }
-
-                    OnDoInvalidate();
+                    OnOverridePic(OriginalPic.ReplaceColor(cc, Color.White));
                     return;
                 }
+
             }
 
 

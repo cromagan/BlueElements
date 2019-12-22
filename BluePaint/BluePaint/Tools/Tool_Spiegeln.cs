@@ -136,45 +136,46 @@ namespace BluePaint
 
             var _Pic = OnNeedCurrentPic();
 
-            var _middle = new PointDF(_Pic.Width / 2, _Pic.Height / 2);
             var Wink = (float)GeometryDF.Winkel(new PointDF(e.MouseDown.X, e.MouseDown.Y), new PointDF(e.Current.X, e.Current.Y));
 
 
-            var Lang = GeometryDF.Länge(_middle, new PointDF(0, 0)); // Länge vom Eck zur Mitte;
-            var Wink_LO = GeometryDF.Winkel(_middle, new PointDF(0, 0)); // Winkel: Mitte bis LO
-            var Wink_RO = GeometryDF.Winkel(_middle, new PointDF(_Pic.Width, 0)); // Winkel: Mitte bis RO
-            var Wink_LU = GeometryDF.Winkel(_middle, new PointDF(0, _Pic.Height)); // Winkel: Mitte bis LU
-            var Wink_RU = GeometryDF.Winkel(_middle, new PointDF(_Pic.Width, _Pic.Height)); // Winkel: Mitte bis RU
 
-            var P_LO = new PointDF(_middle, Lang, Wink_LO + (decimal)Wink);
-            var P_RO = new PointDF(_middle, Lang, Wink_RO + (decimal)Wink);
-            var P_RU = new PointDF(_middle, Lang, Wink_RU + (decimal)Wink);
-            var P_LU = new PointDF(_middle, Lang, Wink_LU + (decimal)Wink);
+            // Make a Matrix to represent rotation by this angle.
+            var rotate_at_origin = new Matrix();
+            rotate_at_origin.Rotate(Wink);
+
+            // Rotate the image's corners to see how big it will be after rotation.
+            PointF[] p = { new PointF(0, 0), new PointF(_Pic.Width, 0), new PointF(_Pic.Width, _Pic.Height), new PointF(0, _Pic.Height), };
+            rotate_at_origin.TransformPoints(p);
 
 
+            var MinX = Math.Min(Math.Min(p[0].X, p[1].X), Math.Min(p[2].X, p[3].X));
+            var MinY = Math.Min(Math.Min(p[0].Y, p[1].Y), Math.Min(p[2].Y, p[3].Y));
+            var MaxX = Math.Max(Math.Max(p[0].X, p[1].X), Math.Max(p[2].X, p[3].X));
+            var MaxY = Math.Max(Math.Max(p[0].Y, p[1].Y), Math.Max(p[2].Y, p[3].Y));
+
+            var B = (int)Math.Round(MaxX - MinX);
+            var H = (int)Math.Round(MaxY - MinY);
+            var nBMP = new Bitmap(B, H);
+
+            // Create the real rotation transformation.
+            var rotate_at_center = new Matrix();
+            rotate_at_center.RotateAt(Wink, new PointF(B / 2f, H / 2f));
 
 
+            // Draw the image onto the new bitmap rotated.
+            using (var gr = Graphics.FromImage(nBMP))
+            {
+                gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                gr.Clear(Color.Magenta);
+                gr.Transform = rotate_at_center;
 
-            var MinX = Math.Min(Math.Min(P_LO.X, P_RO.X), Math.Min(P_LU.X, P_RU.X));
-            var MinY = Math.Min(Math.Min(P_LO.Y, P_RO.Y), Math.Min(P_LU.Y, P_RU.Y));
-            var MaxX = Math.Max(Math.Max(P_LO.X, P_RO.X), Math.Max(P_LU.X, P_RU.X));
-            var MaxY = Math.Max(Math.Max(P_LO.Y, P_RO.Y), Math.Max(P_LU.Y, P_RU.Y));
-
-            var W = (int)(MaxX - MinX);
-            var H = (int)(MaxY - MinY);
-
-            var nBMP = new Bitmap(W, H);
-            var g = Graphics.FromImage(nBMP);
-            g.Clear(Color.Magenta);
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-
-            g.TranslateTransform(W / 2, H / 2);
-            g.RotateTransform(Wink);
-
-            g.DrawImage(_Pic, -W / 2, -H / 2, _Pic.Width, _Pic.Height); // Mit  Width und Height, manche Bilder schlagen sonst fehl
-
+                // Draw the image centered on the bitmap.
+                var x = (B - _Pic.Width) / 2;
+                var y = (H - _Pic.Height) / 2;
+                gr.DrawImage(_Pic, x, y, _Pic.Width, _Pic.Height);
+            }
             OnOverridePic(nBMP);
-
 
         }
     }

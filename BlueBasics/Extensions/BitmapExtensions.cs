@@ -557,6 +557,56 @@ namespace BlueBasics
             return NewBitmap;
         }
 
+        public static unsafe Bitmap ReplaceColor(this Bitmap source, Color toReplace, Color replacement)
+        {
+            // https://stackoverflow.com/questions/17208254/how-to-change-pixel-color-of-an-image-in-c-net
+            const int pixelSize = 4; // 32 bits per pixel
+
+            var target = new Bitmap(source.Width, source.Height, PixelFormat.Format32bppArgb);
+            BitmapData sourceData = null, targetData = null;
+
+            try
+            {
+                sourceData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+                targetData = target.LockBits(new Rectangle(0, 0, target.Width, target.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+                for (var y = 0; y < source.Height; ++y)
+                {
+                    var sourceRow = (byte*)sourceData.Scan0 + (y * sourceData.Stride);
+                    var targetRow = (byte*)targetData.Scan0 + (y * targetData.Stride);
+
+                    for (var x = 0; x < source.Width; ++x)
+                    {
+                        var b = sourceRow[x * pixelSize + 0];
+                        var g = sourceRow[x * pixelSize + 1];
+                        var r = sourceRow[x * pixelSize + 2];
+                        var a = sourceRow[x * pixelSize + 3];
+
+                        if (toReplace.R == r && toReplace.G == g && toReplace.B == b)
+                        {
+                            r = replacement.R;
+                            g = replacement.G;
+                            b = replacement.B;
+                        }
+
+                        targetRow[x * pixelSize + 0] = b;
+                        targetRow[x * pixelSize + 1] = g;
+                        targetRow[x * pixelSize + 2] = r;
+                        targetRow[x * pixelSize + 3] = a;
+                    }
+                }
+            }
+            finally
+            {
+                if (sourceData != null) { source.UnlockBits(sourceData); }
+                if (targetData != null) { target.UnlockBits(targetData); }
+            }
+
+            return target;
+        }
+
+
         public static Bitmap Grayscale(this Bitmap original)
         {
             var newBitmap = new Bitmap(original.Width, original.Height);
