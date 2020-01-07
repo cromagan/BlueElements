@@ -642,6 +642,30 @@ namespace BlueBasics
 
         }
 
+        public static string ChecksumFileName(string name)
+        {
+
+            name = name.Replace("\\", "}");
+            name = name.Replace("/", "}");
+            name = name.Replace(":", "}");
+            name = name.Replace("?", "}");
+
+            name = name.Replace("\r", "");
+
+            if (name.Length < 100) { return name; }
+
+            var nn = "";
+
+            for (var z = 0; z <= name.Length - 21; z++)
+            {
+                nn = nn + name.Substring(z, 1);
+            }
+            nn = nn + name.Substring(name.Length - 20);
+
+
+            return nn;
+        }
+
 
         public static string LastMouseButton()
         {

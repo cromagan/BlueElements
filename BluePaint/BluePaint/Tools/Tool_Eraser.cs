@@ -41,7 +41,7 @@ namespace BluePaint
             }
 
 
-            if (DrawBox.Checked)
+            if (DrawBox.Checked && e.Current != null)
             {
                 var _Pic = OnNeedCurrentPic();
 

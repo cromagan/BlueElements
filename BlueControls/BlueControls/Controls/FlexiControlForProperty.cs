@@ -231,12 +231,18 @@ namespace BlueControls.Controls
             }
 
 
-           var  x = propInfo.GetValue(_propertyObject, null);
+            var x = propInfo.GetValue(_propertyObject, null);
 
-            if (x is string s)
+
+            if (x is null)
+            {
+                Value = string.Empty;
+            }
+            else if (x is string s)
             {
                 Value = s;
-            }else if (x is List<string> ls)
+            }
+            else if (x is List<string> ls)
             {
                 Value = ls.JoinWithCr();
             }
@@ -263,7 +269,13 @@ namespace BlueControls.Controls
             var x = propInfo.GetValue(_propertyObject, null);
             object toSet = null;
 
-            if (x is string s)
+
+            if (x is null)
+            {
+                OldVal = string.Empty;
+                toSet = Value; // Wissen wir leider nicht, welcher Typ....
+            }
+            else if (x is string s)
             {
                 OldVal = s;
                 toSet = Value;
@@ -287,7 +299,7 @@ namespace BlueControls.Controls
 
         internal bool CheckEnabledState()
         {
-            if (!_enabled ||  _propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null)
+            if (!_enabled || _propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null)
             {
                 base.Enabled = false;
                 return false;

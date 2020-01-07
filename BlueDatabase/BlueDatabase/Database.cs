@@ -63,6 +63,13 @@ namespace BlueDatabase
         }
 
 
+        //new public void Load(string fileNameToLoad)
+        //{
+        //    base.Load(fileNameToLoad, false);
+
+
+        //}
+
         private static Database Load(Stream Stream)
         {
             if (Stream == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname nicht angegeben!"); }
@@ -252,6 +259,13 @@ namespace BlueDatabase
 
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="checkOnlyFilenameToo">Prüft, ob die Datenbank ohne Dateipfad - also nur Dateiname und Suffix - existiert und gibt diese zurück.</param>
+        /// <returns></returns>
         public static Database GetByFilename(string filePath, bool checkOnlyFilenameToo)
         {
             filePath = modConverter.SerialNr2Path(filePath);
@@ -269,11 +283,7 @@ namespace BlueDatabase
                     if (ThisDatabase != null && ThisDatabase.Filename.ToLower().FileNameWithSuffix() == filePath.ToLower().FileNameWithSuffix()) { return ThisDatabase; }
                 }
             }
-
-
-
             return null;
-
         }
 
 
@@ -1617,13 +1627,23 @@ namespace BlueDatabase
 
         public override bool HasPendingChanges()
         {
-            if (ReadOnly) { return false; }
 
-            foreach (var ThisWork in Works)
+            try
+
             {
-                if (ThisWork.State == enItemState.Pending) { return true; }
+                if (ReadOnly) { return false; }
+
+                foreach (var ThisWork in Works)
+                {
+                    if (ThisWork.State == enItemState.Pending) { return true; }
+                }
+                return false;
             }
-            return false;
+            catch
+            {
+                return HasPendingChanges();
+            }
+
         }
 
 

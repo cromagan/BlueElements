@@ -382,7 +382,7 @@ namespace BlueControls.Controls
             if (_Helper.HasFlag(enHelpers.MouseDownPoint))
             {
 
-                var m1 = new PointDF(e.X, e.X).ZoomAndMove(eg);
+                var m1 = new PointDF(e.X, e.Y).ZoomAndMove(eg);
 
                 eg.G.DrawEllipse(Pen_RotTransp, new RectangleF(m1.X - 3, m1.Y - 3, 6, 6));
 
