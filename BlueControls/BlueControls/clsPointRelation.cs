@@ -37,7 +37,10 @@ namespace BlueControls
 
         private string _Richtmaß;
 
-        private readonly List<PointDF> _AllP;  // Wird für Parse gebraucht!
+        /// <summary>
+        /// Wird für parsing gebraucht
+        /// </summary>
+        private List<PointDF> tmpAllPoints;
 
         internal bool Computed;
         internal int Order;
@@ -54,17 +57,24 @@ namespace BlueControls
             Points.Add(Point1);
             Points.Add(Point2);
 
-            InitRelationData(false);
+            OverrideSavedRichtmaß(false);
+
+
+            if (!IsOk())
+            {
+                Develop.DebugPrint(enFehlerArt.Warnung, "Beziehung falsch initialisiert: " + ErrorReason());
+            }
+
         }
 
 
-        public clsPointRelation(string Code, List<PointDF> allp)
+        public clsPointRelation(string Code, List<PointDF> allPoints)
         {
             Initialize();
-            _AllP = allp;
+            tmpAllPoints = allPoints;
             Parse(Code);
 
-            InitRelationData(true);
+            OverrideSavedRichtmaß(true);
         }
 
 
@@ -154,7 +164,7 @@ namespace BlueControls
                     case "point":
                         var added = false;
                         var m = pair.Value.IndexOf(", X=") + 4;
-                        foreach (var ThisPoint in _AllP)
+                        foreach (var ThisPoint in tmpAllPoints)
                         {
                             var nv = ThisPoint.ToString();
 
@@ -185,17 +195,13 @@ namespace BlueControls
         {
 
             var t = "{Type=" + (int)_relationtype +
-                       ", Value=" + _Richtmaß;
+                   ", Value=" + _Richtmaß;
 
 
             foreach (var thispoint in Points)
             {
-
                 t = t + ", Point=" + thispoint;
-
-
             }
-
 
             return t + "}";
         }
@@ -220,7 +226,7 @@ namespace BlueControls
             var c = Color.FromArgb(50, 255, 0, 0);
             var p = new Pen(c);
 
- 
+
             foreach (var thispoint in Points)
             {
                 thispoint.Draw(GR, cZoom, MoveX, MoveY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
@@ -389,7 +395,7 @@ namespace BlueControls
         }
 
 
-        public void InitRelationData(bool Parsing)
+        public void OverrideSavedRichtmaß(bool Parsing)
         {
             if (!IsOk()) { return; }
 
@@ -429,21 +435,16 @@ namespace BlueControls
 
         private string GetRichtmaß()
         {
-            var tmp = 0M;
-
             switch (_relationtype)
             {
                 case enRelationType.None:
                     Develop.DebugPrint(enFehlerArt.Fehler, "Der Type None ist nicht erlaubt");
                     break;
+
                 case enRelationType.WaagerechtSenkrecht:
+                    if (Math.Abs(Points[0].X) > 9999999 || Math.Abs(Points[0].Y) > 9999999) { return "-1"; }
 
-                    if (Math.Abs(Points[0].X) > 9999999 || Math.Abs(Points[0].Y) > 9999999)
-                    {
-                        return "-1";
-                    }
-
-                    tmp = Math.Round(Geometry.Winkel(Math.Round(Points[0].X, 2), Math.Round(Points[0].Y, 2), Math.Round(Points[1].X, 2), Math.Round(Points[1].Y, 2)), 2);
+                    var tmp = Math.Round(Geometry.Winkel(Math.Round(Points[0].X, 2), Math.Round(Points[0].Y, 2), Math.Round(Points[1].X, 2), Math.Round(Points[1].Y, 2)), 2);
                     switch (tmp)
                     {
                         case 0M:
@@ -457,52 +458,30 @@ namespace BlueControls
                             return tmp.ToString();
                     }
 
-                //break; case Is = enRelationType.WinkelZueinander
-                //    Return Winkel(Points(0).X, Points(0).Y, Points(1).X, Points(1).Y)
-
-                //break; case Is = enRelationType.AbstandZueinander
-                //    Return Länge(Points(0), Points(1))
-
                 case enRelationType.PositionZueinander:
-                    //'Mehr geht nicht, weil der Double-Zahlenwert die Nachkommastellen verwirft....
-
-                    //If Math.Abs(Points(0).X - Points(1).X) > 9999 OrElse Math.Abs(Points(0).Y - Points(1).Y) > 9999 Then Return 0
-
-                    //Return 900000090000 + Math.Round(Points(0).X - Points(1).X, 1) * 10000000 + Math.Round(Points(0).Y - Points(1).Y, 1)
                     return Math.Round(Points[0].X - Points[1].X, 1) + ";" + Math.Round(Points[0].Y - Points[1].Y, 1);
 
                 case enRelationType.YPositionZueinander:
                     return Math.Round(Points[0].Y - Points[1].Y, 1).ToString();
 
 
-                //  Case Is = enRelationType.Mittig : Return String.Empty
-                //break; case Is = enRelationType.WinkelÜberMittelpunkt
-                //    tmp = Math.Round(Winkelx(Points(0), Points(1)) - Winkelx(Points(0), Points(2)), 1)
-
-                //    If tmp = 90 Then Return "90"
-                //    If tmp = -90 OrElse tmp = 270 Then Return "-90"
-
-                //    If tmp < 0 Then tmp += 360
-                //    Return tmp.ToString
-
                 case enRelationType.Dummy:
                     return string.Empty;
 
                 case enRelationType.AbstandZueinander:
-
                     tmp = Math.Round(GeometryDF.Länge(Points[0], Points[1]), 5);
                     return tmp.ToString();
 
                 default:
                     Develop.DebugPrint(_relationtype);
-
                     break;
             }
+
             return string.Empty;
         }
 
 
-        public bool Repair(int OrderNr, bool AllowBigChanges)
+        public bool MakePointKonsistent(int OrderNr, bool AllowBigChanges)
         {
 
             var OK = false;
@@ -586,7 +565,7 @@ namespace BlueControls
             var DidSomething = false;
 
 
-            for (var z = 0 ; z < Points.Count ; z++)
+            for (var z = 0; z < Points.Count; z++)
             {
 
                 // ACHTUNG: Position-Fix und Fixpoints sind unterschiedlich!
@@ -748,7 +727,7 @@ namespace BlueControls
         public bool IsInternal()
         {
 
-            for (var z = 0 ; z <= Points.Count - 2 ; z++)
+            for (var z = 0; z <= Points.Count - 2; z++)
             {
                 if (Points[z].Parent != Points[z + 1].Parent) { return false; }
             }

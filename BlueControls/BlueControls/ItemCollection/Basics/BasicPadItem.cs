@@ -330,7 +330,7 @@ namespace BlueControls.ItemCollection
             {
                 foreach (var ThisRelation in _InternalRelations)
                 {
-                    ThisRelation.InitRelationData(false);
+                    ThisRelation.OverrideSavedRichtmaß(false);
                 }
             }
         }

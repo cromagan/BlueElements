@@ -505,6 +505,17 @@ namespace BlueControls.Controls
             {
                 P.AddIfNotExists(ThisRelation.Points);
             }
+
+
+            //foreach (var ThisPoint in P)
+            //{
+            //    if (ThisPoint.Parent == null)
+            //    {
+            //        Develop.DebugPrint(enFehlerArt.Warnung, "Öffentliche Punkte brauchen ein Parent");
+            //        // sonst werden sie nicht gespeichert, und Beziehungen gehen verloren
+            //    }
+            //}
+
             return P;
 
         }
@@ -1267,7 +1278,7 @@ namespace BlueControls.Controls
                 {
                     if (!ThisRelation.Computed)
                     {
-                        ThisRelation.Repair(LowestOrder(ThisRelation.Points), AllowBigChanges);
+                        ThisRelation.MakePointKonsistent(LowestOrder(ThisRelation.Points), AllowBigChanges);
                     }
                 }
 
@@ -2860,7 +2871,7 @@ namespace BlueControls.Controls
                             if (Cb.Contains(ThisRelation.Points[0]) && Cb.Contains(ThisRelation.Points[1]))
                             {
                                 ThisRelation.RelationType = enRelationType.PositionZueinander;
-                                ThisRelation.InitRelationData(false);
+                                ThisRelation.OverrideSavedRichtmaß(false);
                                 InvalidateOrder();
                                 Relations_Optimizex();
                                 return;
@@ -2947,7 +2958,7 @@ namespace BlueControls.Controls
                                     case enRelationType.WaagerechtSenkrecht when r2.RelationType == enRelationType.WaagerechtSenkrecht && r1.Richtmaß() != r2.Richtmaß():
                                         // Beziehungen mit gleichen punkten, aber spearat mix X und Y -> PositionZueinander konvertieren 
                                         r1.RelationType = enRelationType.PositionZueinander;
-                                        r1.InitRelationData(false);
+                                        r1.OverrideSavedRichtmaß(false);
                                         Relations.Remove(r2);
                                         InvalidateOrder();
                                         Relations_Optimizex();

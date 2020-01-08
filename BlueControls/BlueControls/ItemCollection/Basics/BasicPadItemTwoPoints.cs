@@ -26,9 +26,6 @@ namespace BlueControls.ItemCollection
 {
     public abstract class BasicPadItemTwoPoints : BasicPadItem
     {
-        //protected PointDF p_ML;
-        //protected PointDF p_MR;
-        protected decimal winkel;
         private decimal _laengePix;
         private decimal _breitePix;
 
@@ -44,7 +41,20 @@ namespace BlueControls.ItemCollection
 
 
 
-        public decimal laengePix
+
+
+        public BasicPadItemTwoPoints() : base(string.Empty)
+        {
+            p_ML = new PointDF(this, "ML", 0, 0);
+            p_MR = new PointDF(this, "MR", 1000, 0);
+            p_OL = new PointDF();
+            p_OR = new PointDF();
+            p_UL = new PointDF();
+            p_UR = new PointDF();
+
+        }
+
+        public decimal LaengePix
         {
             get
             {
@@ -62,7 +72,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public decimal breitePix
+        public decimal BreitePix
         {
             get
             { return _breitePix; }
@@ -77,30 +87,31 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public BasicPadItemTwoPoints() : base(string.Empty)
+
+
+
+
+        public decimal WinkelMLtoMR()
         {
-            p_ML = new PointDF(this, "ML", 0, 0);
-            p_MR = new PointDF(this, "MR", 1000, 0);
-           }
+
+            return GeometryDF.Winkel(p_ML, p_MR);
+        }
 
         protected override void KeepInternalLogic()
         {
 
-            if (p_OL == null)
-            {
-                p_OL = new PointDF();
-                p_OR = new PointDF();
-                p_UL = new PointDF();
-                p_UR = new PointDF();
-            }
+            var winkel = WinkelMLtoMR();
 
-            p_UL.SetTo(p_ML, breitePix / 2, winkel - 90);
-            p_OL.SetTo(p_ML, breitePix / 2, winkel + 90);
-            p_UR.SetTo(p_MR, breitePix / 2, winkel - 90);
-            p_OR.SetTo(p_MR, breitePix / 2, winkel + 90);
+            p_UL.SetTo(p_ML, BreitePix / 2, winkel - 90);
+            p_OL.SetTo(p_ML, BreitePix / 2, winkel + 90);
+            p_UR.SetTo(p_MR, BreitePix / 2, winkel - 90);
+            p_OR.SetTo(p_MR, BreitePix / 2, winkel + 90);
 
-            winkel = GeometryDF.Winkel(p_ML, p_MR);
         }
+
+
+
+
 
         public override void GenerateInternalRelation(List<clsPointRelation> relations)
         {

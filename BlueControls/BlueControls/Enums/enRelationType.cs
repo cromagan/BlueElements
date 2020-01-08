@@ -14,9 +14,7 @@
 
         AbstandZueinander = 30,
 
-        //   Mittig = 40
 
-        // WinkelÜberMittelpunkt = 60
 
 
         Dummy = 1000
