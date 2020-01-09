@@ -83,6 +83,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Enums\enErrorReason.cs" />
+    <Compile Include="EventArgs\OldBlockFileEventArgs.cs" />
     <Compile Include="Extensions\RectangleFExtension.cs" />
     <Compile Include="Interfaces\ILastSavedBy.cs" />
     <Compile Include="MultiUserFile\clsMultiUserFile.cs" />

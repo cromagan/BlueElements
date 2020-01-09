@@ -67,12 +67,12 @@ namespace BlueBasics.MultiUserFile
         public event EventHandler<LoadedEventArgs> Loaded;
         public event EventHandler<LoadingEventArgs> Loading;
         public event EventHandler SavedToDisk;
-        public event EventHandler SaveAborded;
+        public event EventHandler<OldBlockFileEventArgs> FileOldBlockFileExists;
         public event EventHandler<DatabaseStoppedEventArgs> ConnectedControlsStopAllWorking;
 
         /// <summary>
         /// Wird ausgegeben, sobald isParsed false ist, noch vor den automatischen Reperaturen.
-        /// Diese Event kann verwendet werden, um die Datenbank zu reparieren, bevor sich automatische Dialoge öffnen.
+        /// Diese Event kann verwendet werden, um die Datei automatisch zu reparieren, bevor sich automatische Dialoge öffnen.
         /// </summary>
         public event EventHandler Parsed;
 
@@ -226,6 +226,7 @@ namespace BlueBasics.MultiUserFile
 
 
             OnLoaded(new LoadedEventArgs(OnlyReload));
+            TryOnFileOldBlockFileExists();
         }
 
         /// <summary>
@@ -261,6 +262,7 @@ namespace BlueBasics.MultiUserFile
 
 
             OnLoaded(new LoadedEventArgs(false));
+            TryOnFileOldBlockFileExists();
         }
 
 
@@ -343,7 +345,7 @@ namespace BlueBasics.MultiUserFile
             if (!string.IsNullOrEmpty(f))
             {
                 Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + f);
-                OnSaveAborded();
+                TryOnFileOldBlockFileExists();
                 return;
             }
 
@@ -677,9 +679,19 @@ namespace BlueBasics.MultiUserFile
         {
             SavedToDisk?.Invoke(this, System.EventArgs.Empty);
         }
-        private void OnSaveAborded()
+        public void TryOnFileOldBlockFileExists()
         {
-            SaveAborded?.Invoke(this, System.EventArgs.Empty);
+            double sec = 0;
+
+            if (BlockDateiVorhanden())
+            {
+                var f = new FileInfo(Blockdateiname());
+                sec = DateTime.Now.Subtract(f.CreationTime).TotalSeconds;
+            }
+
+            if (sec < 180) { return; }
+
+            FileOldBlockFileExists?.Invoke(this, new OldBlockFileEventArgs(sec));
         }
 
         private void OnParsed()
@@ -694,11 +706,11 @@ namespace BlueBasics.MultiUserFile
         /// </summary>
         public bool Release(bool MUSTRelease, int MaxWaitSeconds)
         {
-            if (ReadOnly) { return false; }
+            if (ReadOnly) { TryOnFileOldBlockFileExists(); return false; }
 
             if (isSomethingDiscOperatingsBlocking())
             {
-                if (!MUSTRelease) { return false; }
+                if (!MUSTRelease) { TryOnFileOldBlockFileExists(); return false; }
                 Develop.DebugPrint(enFehlerArt.Fehler, "Release unmöglich, Datenbankstatus eingefroren");
             }
             OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
@@ -710,7 +722,7 @@ namespace BlueBasics.MultiUserFile
             var D = DateTime.Now; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
 
 
-            if (!MUSTRelease && BlockDateiVorhanden()) { return false; }
+            if (!MUSTRelease && BlockDateiVorhanden()) { TryOnFileOldBlockFileExists(); return false; }
 
             while (HasPendingChanges())
             {
@@ -725,9 +737,9 @@ namespace BlueBasics.MultiUserFile
                     }
 
 
-                    return false;
+                    TryOnFileOldBlockFileExists(); return false;
                 } // KAcke, Da liegt ein größerer Fehler vor...
-                if (!MUSTRelease && DateTime.Now.Subtract(D).TotalSeconds > 20 && !BlockDateiVorhanden()) { return false; } // Wenn der Saver hängt.... kommt auch vor :-(
+                if (!MUSTRelease && DateTime.Now.Subtract(D).TotalSeconds > 20 && !BlockDateiVorhanden()) { TryOnFileOldBlockFileExists(); return false; } // Wenn der Saver hängt.... kommt auch vor :-(
                 if (DateTime.Now.Subtract(D).TotalSeconds > 30 && !BinSaver.IsBusy && HasPendingChanges() && BlockDateiVorhanden()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank aufgrund der Blockdatei nicht freigegeben: " + Filename); }
             }
             return true;
@@ -758,7 +770,7 @@ namespace BlueBasics.MultiUserFile
             if (!string.IsNullOrEmpty(f))
             {
                 Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + f);
-                OnSaveAborded();
+                TryOnFileOldBlockFileExists();
                 return;
             }
 

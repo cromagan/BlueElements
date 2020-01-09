@@ -120,7 +120,7 @@ namespace BlueBasics
                 }
 
             }
-            catch 
+            catch
             {
 
 
@@ -343,23 +343,30 @@ namespace BlueBasics
 
             tempPoly_RoundRec.AddLine(x + radius, y, x + width - radius, y);
 
-            Poly_AddRad90(tempPoly_RoundRec, x + width - radius, y, radius, 270); // OK
+            AddRad90(x + width - radius, y, radius, 270); // OK
 
             tempPoly_RoundRec.AddLine(x + width, y + radius, x + width, y + height - radius);
 
-            Poly_AddRad90(tempPoly_RoundRec, x + width - radius, y + height - radius, radius, 0);
+            AddRad90(x + width - radius, y + height - radius, radius, 0);
 
             tempPoly_RoundRec.AddLine(x + width - radius, y + height, x + radius, y + height);
 
-            Poly_AddRad90(tempPoly_RoundRec, x, y + height - radius, radius, 90);
+            AddRad90(x, y + height - radius, radius, 90);
 
             tempPoly_RoundRec.AddLine(x, y + height - radius, x, y + radius);
 
-            Poly_AddRad90(tempPoly_RoundRec, x, y, radius, 180); // OK
+            AddRad90(x, y, radius, 180); // OK
 
             tempPoly_RoundRec.CloseFigure();
 
             return tempPoly_RoundRec;
+
+
+            void AddRad90(int MxX, int MxY, int Radius, int GradStart)
+            {
+                tempPoly_RoundRec.AddArc(MxX, MxY, Radius, Radius, GradStart, 90);
+            }
+
         }
 
 
@@ -426,12 +433,24 @@ namespace BlueBasics
 
             p.CloseFigure();
             return p;
+
+
+
+
         }
 
-        private static void Poly_AddRad90(GraphicsPath GP, int MxX, int MxY, int Radius, int GradStart)
+
+
+
+        public static void AddRad(this GraphicsPath GP, PointF middle, PointF Start, float winkel)
         {
-            GP.AddArc(MxX, MxY, Radius, Radius, GradStart, 90);
+
+            var radius = (float)Math.Abs(Geometry.Länge(middle, Start));
+            var startw = (float)Geometry.Winkel(middle, Start);
+
+            GP.AddArc(middle.X - radius, middle.Y - radius, radius * 2, radius * 2, startw, winkel);
         }
+
 
 
         #endregion
