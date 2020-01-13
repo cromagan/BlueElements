@@ -177,7 +177,7 @@ namespace BlueControls.Forms
         {
             try
             {
-                modFernsteuerung.ShowWindow(Handle, (int)modFernsteuerung.enSW.ShowNoActivate);
+                modFernsteuerung.ShowWindow(Handle, (int)enSW.ShowNoActivate);
             }
             catch (ObjectDisposedException)
             {
