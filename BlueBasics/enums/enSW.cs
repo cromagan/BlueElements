@@ -17,12 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
-namespace BlueBasics
+namespace BlueBasics.Enums
 {
-
-
-
     public static partial class modFernsteuerung
     {
         public enum enSW
