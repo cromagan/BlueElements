@@ -57,7 +57,15 @@ namespace BlueControls
             Height = r.Height;
         }
 
+        public RectangleDF(PointDF p1, PointDF p2)
+        {
 
+            X = Math.Min(p1.X, p2.X);
+            Y = Math.Min(p1.Y, p2.Y);
+            Width = Math.Abs(p1.X - p2.X);
+            Height = Math.Abs(p1.Y - p2.Y);
+
+        }
 
         public decimal Left
         {
@@ -77,6 +85,11 @@ namespace BlueControls
             get { return Y + Height; }
         }
 
+        /// <summary>
+        /// Positive Werte verkleinern das Rechteck, negative vergrößern es.
+        /// </summary>
+        /// <param name="XVal"></param>
+        /// <param name="YVal"></param>
         public void Inflate(int XVal, int YVal)
         {
             X += XVal;
@@ -165,5 +178,53 @@ namespace BlueControls
             return new RectangleF((int)(X * cZoom - MoveX), (int)(Y * cZoom - MoveY), (int)(Width * cZoom), (int)(Height * cZoom));
         }
 
+        /// <summary>
+        /// Erweitert das Rechteck, dass ein Kreis mit den angegebenen Parametern ebenfalls umschlossen wird.
+        /// </summary>
+        /// <param name="P"></param>
+        /// <param name="maxrad"></param>
+        public void ExpandTo(PointDF middle, decimal radius)
+        {
+            ExpandTo(new PointDF(middle.X, middle.Y + radius));
+            ExpandTo(new PointDF(middle.X, middle.Y - radius));
+            ExpandTo(new PointDF(middle.X + radius, middle.Y));
+            ExpandTo(new PointDF(middle.X - radius, middle.Y));
+        }
+
+
+
+
+        /// <summary>
+        /// Erweitert das Rechteck, dass der Angegebene Punkt ebenfalls umschlossen wird.
+        /// </summary>
+        /// <param name="P"></param>
+        public void ExpandTo(PointDF P)
+        {
+            if (P.X < X)
+            {
+                Width = Right - P.X;
+                X = P.X;
+            }
+
+            if (P.Y < Y)
+            {
+                Height = Bottom - P.Y;
+                Y = P.Y;
+            }
+
+
+            if (P.X > Right)
+            {
+                Width = P.X - X;
+            }
+
+            if (P.Y > Bottom)
+            {
+                Height = P.Y - Y;
+            }
+
+
+
+        }
     }
 }

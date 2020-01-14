@@ -151,13 +151,7 @@ namespace BlueControls.ItemCollection
 
         public override RectangleDF UsedArea()
         {
-            var minX = Math.Min(Math.Min(p_OL.X, p_UL.X), Math.Min(p_OR.X, p_UR.X));
-            var maxX = Math.Max(Math.Max(p_OL.X, p_UL.X), Math.Max(p_OR.X, p_UR.X));
-            var minY = Math.Min(Math.Min(p_OL.Y, p_UL.Y), Math.Min(p_OR.Y, p_UR.Y));
-            var maxY = Math.Max(Math.Max(p_OL.Y, p_UL.Y), Math.Max(p_OR.Y, p_UR.Y));
-
-            return new RectangleDF(minX, minY, maxX - minX, maxY - minY);
-            //return new RectangleDF(p_m.X - trLaenge/2, p_m.Y - trBreite/2, trLaenge, trBreite);
+           return new RectangleDF(p_OL, p_UR);
         }
 
 

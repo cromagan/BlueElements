@@ -330,41 +330,22 @@ namespace BlueControls.ItemCollection
             var maxrad = (decimal)(Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height)) / 2 + 10);
 
 
-            var P1_x = decimal.MaxValue;
-            var P1_y = decimal.MaxValue;
-            var P2_x = decimal.MinValue;
-            var P2_y = decimal.MinValue;
+            var X = new RectangleDF(Point1, Point2);
+            X.ExpandTo(_Bezugslinie1);
+            X.ExpandTo(_Bezugslinie2);
+
+            X.ExpandTo(TextPointx, maxrad);
 
 
-            P1_x = Math.Min(P1_x, Point1.X);
-            P1_x = Math.Min(P1_x, _Bezugslinie1.X);
-            P1_x = Math.Min(P1_x, Point2.X);
-            P1_x = Math.Min(P1_x, _Bezugslinie2.X);
-            P1_x = Math.Min(P1_x, TextPointx.X - maxrad);
-            //P1_x = Math.Min(P1_x, TextPointx.X - (decimal)sz2.Width / 2m - 10);
 
-            P1_y = Math.Min(P1_y, Point1.Y);
-            P1_y = Math.Min(P1_y, _Bezugslinie1.Y);
-            P1_y = Math.Min(P1_y, Point2.Y);
-            P1_y = Math.Min(P1_y, _Bezugslinie2.Y);
-            P1_y = Math.Min(P1_y, TextPointx.Y - maxrad);
-            // P1_y = Math.Min(P1_y, TextPointx.Y - (decimal)sz2.Height / 2m - 10);
 
-            P2_x = Math.Max(P2_x, Point1.X);
-            P2_x = Math.Max(P2_x, _Bezugslinie1.X);
-            P2_x = Math.Max(P2_x, Point2.X);
-            P2_x = Math.Max(P2_x, _Bezugslinie2.X);
-            P2_x = Math.Max(P2_x, TextPointx.X + maxrad);
-            // P2_x = Math.Max(P2_x, TextPointx.X + (decimal)sz2.Width / 2m + 10);
 
-            P2_y = Math.Max(P2_y, Point1.Y);
-            P2_y = Math.Max(P2_y, _Bezugslinie1.Y);
-            P2_y = Math.Max(P2_y, Point2.Y);
-            P2_y = Math.Max(P2_y, _Bezugslinie2.Y);
-            P2_y = Math.Max(P2_y, TextPointx.Y + maxrad);
-            // P2_y = Math.Max(P2_y, TextPointx.Y + (decimal)sz2.Height / 2m + 10);
+            //return new RectangleDF(P1_x - 2, P1_y - 2, P2_x - P1_x + 4, P2_y - P1_y + 4); 
 
-            return new RectangleDF(P1_x - 2, P1_y - 2, P2_x - P1_x + 4, P2_y - P1_y + 4); // die Sicherheits koordinaten damit nicht linien abgeschnitten werden
+            X.Inflate(-2, -2); // die Sicherheits koordinaten damit nicht linien abgeschnitten werden
+
+            return X;
+
         }
 
 

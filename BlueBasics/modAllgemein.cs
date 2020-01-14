@@ -442,22 +442,15 @@ namespace BlueBasics
 
 
 
-        public static void AddRad(this GraphicsPath GP, PointF middle, PointF startP, PointF endP, bool reverse)
+        public static void AddRad(this GraphicsPath GP, PointF middle, PointF startP, float Wink)
         {
 
             var radius = (float)Math.Abs(Geometry.Länge(middle, startP));
             var startw = (float)Geometry.Winkel(middle, startP);
-            var endW = (float)Geometry.Winkel(middle, endP);
 
 
-            if (reverse)
-            {
-                GP.AddArc(middle.X - radius, middle.Y - radius, radius * 2, radius * 2, endW, endW - startw);
-            }
-            else
-            {
-                GP.AddArc(middle.X - radius, middle.Y - radius, radius * 2, radius * 2,  - endW , endW - startw);
-            }
+            GP.AddArc(middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -Wink);
+
 
 
         }
