@@ -39,10 +39,26 @@ namespace BlueBasics
         }
 
 
-        public static void DrawRectangle(this Graphics GR,Pen pen, RectangleF R)
+        public static void DrawRectangle(this Graphics GR, Pen pen, RectangleF R)
         {
             GR.DrawRectangle(pen, R.X, R.Y, R.Width, R.Height);
         }
+
+
+
+        public static void DrawRad(this Graphics GR, Pen pen, PointF middle, PointF startP, float Wink)
+        {
+
+            var radius = (float)Math.Abs(Geometry.Länge(middle, startP));
+            var startw = (float)Geometry.Winkel(middle, startP);
+
+
+            GR.DrawArc(pen, middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -Wink);
+
+
+
+        }
+
 
     }
 }
