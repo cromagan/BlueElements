@@ -1105,7 +1105,7 @@ namespace BlueControls
 
 
 
-        internal static BlueFont GetBlueFont(PadStyles vFormat, RowItem RowOfStyle)
+        public static BlueFont GetBlueFont(PadStyles vFormat, RowItem RowOfStyle)
         {
             if (StyleDB == null) { InitStyles(); }
             if (StyleDB == null || RowOfStyle == null) { return BlueFont.Get(ErrorFont); }
