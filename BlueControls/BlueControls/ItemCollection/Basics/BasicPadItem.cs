@@ -84,6 +84,9 @@ namespace BlueControls.ItemCollection
         protected abstract string ClassId();
 
 
+        public abstract void Move(decimal x, decimal y);
+
+
         /// <summary>
         /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
         /// </summary>
@@ -103,6 +106,8 @@ namespace BlueControls.ItemCollection
         /// </summary>
         /// <remarks></remarks>
         protected bool _PrintMe = true;
+
+        protected int _ZoomPadding = 0;
 
         private readonly List<clsPointRelation> _InternalRelations = new List<clsPointRelation>();
 
@@ -133,6 +138,21 @@ namespace BlueControls.ItemCollection
                 OnChanged();
             }
         }
+
+        public int ZoomPadding
+        {
+            get
+            {
+                return _ZoomPadding;
+            }
+            set
+            {
+                if (_ZoomPadding == value) { return; }
+                _ZoomPadding = value;
+                OnChanged();
+            }
+        }
+
 
         public PadStyles Style
         {
@@ -211,6 +231,10 @@ namespace BlueControls.ItemCollection
                     }
                     return true;
 
+                case "zoompadding":
+                    _ZoomPadding = int.Parse(value);
+                    return true;
+
                 default:
                     return false;
             }
@@ -258,6 +282,13 @@ namespace BlueControls.ItemCollection
 
             t = t + "Style=" + (int)_Style + ", ";
             t = t + "Print=" + _PrintMe.ToPlusMinus() + ", ";
+
+
+            if (_ZoomPadding !=0)
+            {
+            t = t + "ZoomPadding=" + _ZoomPadding + ", ";
+            }
+
 
             foreach (var ThisPoint in PointList())
             {
@@ -423,5 +454,27 @@ namespace BlueControls.ItemCollection
         {
             Parse(ToParse.GetAllTags());
         }
+
+
+
+        /// <summary>
+        /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.
+        /// </summary>
+        /// <remarks></remarks>
+        public RectangleDF ZoomToArea()
+        {
+            var x = UsedArea();
+
+            if (_ZoomPadding == 0) { return x; }
+
+
+            x.Inflate(-ZoomPadding, -ZoomPadding);
+
+            return x;
+
+
+        }
+
+
     }
 }

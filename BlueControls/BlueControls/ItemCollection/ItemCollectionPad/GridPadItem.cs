@@ -171,6 +171,13 @@ namespace BlueControls.ItemCollection
                 GR.DrawImage(NPEMF, new RectangleF(po.X - 7, po.Y - 7, 15, 15));
             }
         }
+        public override void Move(decimal x, decimal y)
+        {
+            NP.SetTo(NP.X + x, NP.Y + y);
+            RecomputePointAndRelations();
+        }
+
+
 
         public override void SetCoordinates(RectangleDF r)
         {

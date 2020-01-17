@@ -191,6 +191,15 @@ namespace BlueControls.ItemCollection
 
         }
 
+        public override void Move(decimal x, decimal y)
+        {
+            _LastRecalc = DateTime.Now.AddHours(-1);
+            Point1.SetTo(Point1.X + x, Point1.Y + y);
+            Point2.SetTo(Point2.X + x, Point2.Y + y);
+            RecomputePointAndRelations();
+        }
+
+
         public override void SetCoordinates(RectangleDF r)
         {
             _LastRecalc = DateTime.Now.AddHours(-1);

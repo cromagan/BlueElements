@@ -61,7 +61,12 @@ namespace BlueControls.ItemCollection
 
 
 
-
+        public override void Move(decimal x, decimal y)
+        {
+            p_LO.SetTo(p_LO.X + x, p_LO.Y + y);
+            p_RU.SetTo(p_RU.X + x, p_RU.Y + y);
+            RecomputePointAndRelations();
+        }
 
 
 

@@ -101,7 +101,19 @@ namespace BlueControls.ItemCollection
         public override void SetCoordinates(RectangleDF r)
         {
             Middlex.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));
+            RecomputePointAndRelations();
         }
+
+
+        public override void Move(decimal x, decimal y)
+        {
+            Middlex.SetTo(Middlex.X + x, Middlex.Y + y);
+            Middlex.SetTo(Middlex.X + x, Middlex.Y + y);
+
+            RecomputePointAndRelations();
+        }
+
+
 
         public override void DesignOrStyleChanged() { }
 

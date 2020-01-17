@@ -477,7 +477,7 @@ namespace BlueControls.Controls
             if (Tags != null)
             {
                 Tags.TagSet("Erstellt", modAllgemein.UserName());
-                Tags.TagSet("Datum", DateTime.Now.ToString());
+                Tags.TagSet("Datum", DateTime.Now.ToString(Constants.Format_Date5));
                 Tags.Save(pathtxt, false);
             }
         }

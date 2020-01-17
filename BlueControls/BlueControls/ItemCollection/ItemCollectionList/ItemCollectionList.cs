@@ -331,24 +331,22 @@ namespace BlueControls.ItemCollection
 
         public Size CalculateColumnAndSize()
         {
-
-
             var data = ItemData(); /// BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
 
-            if (data.Item4 == enOrientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, null); }
+            if (data.Item4 == enOrientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, null, data); }
 
 
 
             BreakAfterItems = CalculateColumnCount(data.Item1, data.Item3, data.Item4);
 
-            return ComputeAllItemPositions(new Size(30, 30), null, null);
+            return ComputeAllItemPositions(new Size(1, 30), null, null, data);
 
 
 
 
         }
 
-        internal Size ComputeAllItemPositions(Size ControlDrawingArea, System.Windows.Forms.Control InControl, Slider SliderY)
+        internal Size ComputeAllItemPositions(Size ControlDrawingArea, System.Windows.Forms.Control InControl, Slider SliderY, Tuple<int, int, int, enOrientation> data)
         {
 
 
@@ -368,7 +366,7 @@ namespace BlueControls.ItemCollection
 
             if (_ItemDesign == enDesign.Undefiniert) { GetDesigns(); }
 
-            var data = ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+            // var data = ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
 
 
             var ori = data.Item4;
@@ -398,7 +396,9 @@ namespace BlueControls.ItemCollection
                 case enBlueListBoxAppearance.FileSystem:
                     colWidth = 110;
                     break;
+
                 default:
+                    // u.a. Autofilter
                     if (BreakAfterItems < 1)
                     {
                         colWidth = ControlDrawingArea.Width - SliderWidth;
@@ -408,7 +408,17 @@ namespace BlueControls.ItemCollection
                         colCount = Count / BreakAfterItems;
                         var r = Count % colCount;
                         if (r != 0) { colCount++; }
-                        colWidth = (ControlDrawingArea.Width - SliderWidth) / colCount;
+
+                        if (ControlDrawingArea.Width < 5)
+                        {
+                            colWidth =  data.Item1;
+                        }
+                        else
+                        {
+                            colWidth = (ControlDrawingArea.Width - SliderWidth) / colCount;
+                        }
+
+
                     }
                     break;
             }
@@ -424,7 +434,7 @@ namespace BlueControls.ItemCollection
             BasicListItem previtem = null;
             foreach (var ThisItem in this)
             {
-                // PaintmodX kann immer angezogen werden, da es eh nur bei einspaltigen Listboxen verändert wird!
+                // PaintmodX kann immer abgezogen werden, da es eh nur bei einspaltigen Listboxen verändert wird!
                 if (ThisItem != null)
                 {
                     var cx = 0;
@@ -543,7 +553,7 @@ namespace BlueControls.ItemCollection
 
             if (Count < 12) { return -1; }  // <10 ergibt dividieb by zere, weil es da 0 einträge währen bei 10 Spalten
 
-            var colCount = 0;
+
             var dithemh = (int)(AllItemsHeight / Count);
 
 
@@ -565,6 +575,9 @@ namespace BlueControls.ItemCollection
                 if (colc * dithemh > 600) { ok = false; }
                 if (colc * dithemh < 150) { ok = false; }
                 if (TestSP * BiggestItemWidth > 600) { ok = false; }
+
+                if (((float)colc * (float)dithemh) / ((float)TestSP * (float)BiggestItemWidth ) < 0.5) { ok = false; }
+
 
                 if (ok)
                 {

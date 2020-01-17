@@ -301,7 +301,7 @@ namespace BlueControls.Forms
             switch (_Database.Column[0].Format)
             {
                 case enDataFormat.Datum_und_Uhrzeit:
-                    vRow = _Database.Row.Add(NameRepair(DateTime.Now.ToString(), null));
+                    vRow = _Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null));
                     break;
                 default:
                     vRow = _Database.Row.Add(NameRepair("Neuer Eintrag", null));

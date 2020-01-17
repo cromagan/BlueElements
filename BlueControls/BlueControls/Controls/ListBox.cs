@@ -426,7 +426,7 @@ namespace BlueControls.Controls
 
             if (ButtonsVisible()) { PaintModYx = Plus.Height; }
 
-            Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - PaintModYx), this, SliderY);
+            Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - PaintModYx), this, SliderY, Item.ItemData());
 
 
             if (SliderY.Visible) { PaintModXx = SliderY.Width; }

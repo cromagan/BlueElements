@@ -123,6 +123,14 @@ namespace BlueControls.ItemCollection
             return l;
         }
 
+
+        public override void Move(decimal x, decimal y)
+        {
+            p_m.SetTo(p_m.X + x, p_m.Y + y);
+            RecomputePointAndRelations();
+        }
+
+
         public override void SetCoordinates(RectangleDF r)
         {
             p_m.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));

@@ -402,11 +402,14 @@ namespace BlueControls.ItemCollection
                 {
                     if (ZoomItems == null || ZoomItems.Contains(ThisItem))
                     {
-                        x1 = Math.Min(x1, ThisItem.UsedArea().Left);
-                        y1 = Math.Min(y1, ThisItem.UsedArea().Top);
 
-                        x2 = Math.Max(x2, ThisItem.UsedArea().Right);
-                        y2 = Math.Max(y2, ThisItem.UsedArea().Bottom);
+                        var UA = ThisItem.ZoomToArea();
+       
+                        x1 = Math.Min(x1, UA.Left);
+                        y1 = Math.Min(y1, UA.Top);
+
+                        x2 = Math.Max(x2, UA.Right);
+                        y2 = Math.Max(y2, UA.Bottom);
                         Done = true;
                     }
                 }

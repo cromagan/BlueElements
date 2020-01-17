@@ -550,7 +550,7 @@ namespace BlueDatabase
 
             if (CellIsNullOrEmpty(Database.Column.SysRowChangeDate))
             {
-                Database.Cell.SystemSet(Database.Column.SysRowChangeDate, this, DateTime.Now.ToString(), false);
+                Database.Cell.SystemSet(Database.Column.SysRowChangeDate, this, DateTime.Now.ToString(Constants.Format_Date5), false);
             }
         }
 

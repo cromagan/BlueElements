@@ -499,20 +499,14 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public void Move(decimal x, decimal y)
+
+        public override void Move(decimal x, decimal y)
         {
-            P1.X += x;
-            P2.X += x;
-            P1.Y += y;
-            P2.Y += y;
+            P1.SetTo(P1.X + x, P1.Y + y);
+            P2.SetTo(P2.X + x, P2.Y + y);
 
             RecomputePointAndRelations();
             CalculateCorners();
-        }
-
-        public void Move(PointDF P)
-        {
-            Move(P.X, P.Y);
         }
 
 
@@ -842,5 +836,7 @@ namespace BlueControls.ItemCollection
 
 
         }
+
+
     }
 }

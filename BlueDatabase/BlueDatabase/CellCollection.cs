@@ -748,7 +748,7 @@ namespace BlueDatabase
 
 
             SystemSet(Database.Column.SysRowChanger, Row, Database.UserName, FreezeMode);
-            SystemSet(Database.Column.SysRowChangeDate, Row, DateTime.Now.ToString(), FreezeMode);
+            SystemSet(Database.Column.SysRowChangeDate, Row, DateTime.Now.ToString(Constants.Format_Date5), FreezeMode);
 
 
             Invalidate_CellContentSize(Column, Row);

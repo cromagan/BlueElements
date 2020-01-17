@@ -139,6 +139,16 @@ namespace BlueControls.ItemCollection
             return true;
         }
 
+
+        public override void Move(decimal x, decimal y)
+        {
+            p_ML.SetTo(p_ML.X + x, p_ML.Y + y);
+            p_MR.SetTo(p_MR.X + x, p_MR.Y + y);
+
+            RecomputePointAndRelations();
+        }
+
+
         public override void SetCoordinates(RectangleDF r)
         {
 
