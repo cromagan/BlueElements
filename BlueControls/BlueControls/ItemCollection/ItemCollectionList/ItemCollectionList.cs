@@ -35,7 +35,6 @@ namespace BlueControls.ItemCollection
     public class ItemCollectionList : BasicItemCollection<BasicListItem>, ICloneable
     {
 
-        //test
 
         #region  Variablen-Deklarationen 
 
