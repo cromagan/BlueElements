@@ -328,7 +328,7 @@ namespace BlueDatabase
             {
                 if (ThisRowItem != null)
                 {
-                    ThisRowItem.Repair();
+                    //ThisRowItem.Repair();
                     _LastRowKey = Math.Max(_LastRowKey, ThisRowItem.Key); // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
                 }
 

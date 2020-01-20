@@ -525,34 +525,34 @@ namespace BlueDatabase
 
 
 
-        /// <summary>
-        /// Überprüft auf ungültige Werte in einer Zelle und korrigiert diese. Es werden keine Regeln ausgelöst.
-        /// </summary>
-        internal void Repair()
-        {
-            if (Database.Column.SysCorrect == null) { Database.Column.GetSystems(); }
+        ///// <summary>
+        ///// Überprüft auf ungültige Werte in einer Zelle und korrigiert diese. Es werden keine Regeln ausgelöst.
+        ///// </summary>
+        //internal void Repair()
+        //{
+        //    if (Database.Column.SysCorrect == null) { Database.Column.GetSystems(); }
 
-            if (Key < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Key < 0"); }
+        //    if (Key < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Key < 0"); }
 
-            if (Database.ReadOnly) { return; }
+        //    if (Database.ReadOnly) { return; }
 
-            if (CellIsNullOrEmpty(Database.Column.SysLocked))
-            {
-                Database.Cell.SystemSet(Database.Column.SysLocked, this, false.ToPlusMinus(), false);
-            }
-
-
-            if (CellIsNullOrEmpty(Database.Column.SysCorrect))
-            {
-                Database.Cell.SystemSet(Database.Column.SysCorrect, this, true.ToPlusMinus(), false);
-            }
+        //    if (CellIsNullOrEmpty(Database.Column.SysLocked))
+        //    {
+        //        Database.Cell.SystemSet(Database.Column.SysLocked, this, false.ToPlusMinus(), false);
+        //    }
 
 
-            if (CellIsNullOrEmpty(Database.Column.SysRowChangeDate))
-            {
-                Database.Cell.SystemSet(Database.Column.SysRowChangeDate, this, DateTime.Now.ToString(Constants.Format_Date5), false);
-            }
-        }
+        //    if (CellIsNullOrEmpty(Database.Column.SysCorrect))
+        //    {
+        //        Database.Cell.SystemSet(Database.Column.SysCorrect, this, true.ToPlusMinus(), false);
+        //    }
+
+
+        //    if (CellIsNullOrEmpty(Database.Column.SysRowChangeDate))
+        //    {
+        //        Database.Cell.SystemSet(Database.Column.SysRowChangeDate, this, DateTime.Now.ToString(Constants.Format_Date5), false);
+        //    }
+        //}
 
         public bool MatchesTo(FilterItem Filter)
         {
