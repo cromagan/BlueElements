@@ -3013,7 +3013,7 @@ namespace BlueDatabase
             {
                 if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == fileName.ToLower())
                 {
-                    ThisDatabase.Release(true, 180);
+                    ThisDatabase.Release(true, 240);
                     Develop.DebugPrint(enFehlerArt.Fehler, "Doppletes Laden von " + fileName);
                     return false;
                 }

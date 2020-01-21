@@ -693,7 +693,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
 
-            for (var n = 0 ; n < _Database.Works.Count ; n++)
+            for (var n = 0; n < _Database.Works.Count; n++)
             {
 
 
@@ -719,10 +719,16 @@ namespace BlueControls.BlueDatabaseDialogs
                     }
 
 
-                    if (Col != null && Row != null)
+                    if (Row != null)
                     {
                         r.CellSet("RowFirst", Row.CellFirstString());
                     }
+                    else if (cd[1] != "-1")
+                    {
+                        r.CellSet("RowFirst", "[gelöscht]");
+                    }
+
+
 
                     r.CellSet("Aenderer", _Database.Works[n].User);
                     r.CellSet("AenderZeit", _Database.Works[n].CompareKey());

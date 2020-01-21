@@ -548,7 +548,9 @@ namespace BlueBasics.MultiUserFile
             //}
 
 
-            //WIchtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
+            if (string.IsNullOrEmpty(Filename)) { return; }
+
+            //Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
             if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded()) { return; }
 
             if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, da gerade geparst wird"); }
@@ -632,7 +634,7 @@ namespace BlueBasics.MultiUserFile
 
             if (NewFileName.ToUpper() == Filename.ToUpper()) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
 
-            Release(true, 180); // Original-Datenbank speichern, die ist ja dann weg.
+            Release(true, 240); // Original-Datenbank speichern, die ist ja dann weg.
 
             Filename = NewFileName;
             var l = ToListOfByte(true);
@@ -872,7 +874,7 @@ namespace BlueBasics.MultiUserFile
             {
                 Load_Reload();
                 if (BlockDateiVorhanden()) { DeleteFile(Blockdateiname(), true); }
-                Release(true, 180);
+                Release(true, 240);
             }
             catch
             {
