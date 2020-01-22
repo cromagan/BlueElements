@@ -266,7 +266,9 @@ namespace BlueBasics
         public static bool Text_LängeCheck(string TXT, enDataFormat format)
         {
             var ml = Text_MaximaleLänge(format);
-            var il = TXT.Length;
+            var il = 0;
+            if (TXT != null) { il = TXT.Length; }
+
             if (ml > -1 && il > ml) { return false; }
 
             switch (format)
