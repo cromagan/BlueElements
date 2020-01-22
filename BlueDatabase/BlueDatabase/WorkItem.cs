@@ -114,8 +114,6 @@ namespace BlueDatabase
 
         public string User { get; private set; }
 
-        // public string Group { get; private set; }
-
         public string PreviousValue { get; private set; }
 
         public string ChangedTo
@@ -131,7 +129,6 @@ namespace BlueDatabase
                 _changedTo = value;
                 OnChanged();
             }
-
         }
 
         public bool HistorischRelevant
@@ -166,9 +163,8 @@ namespace BlueDatabase
             this.PreviousValue = PreviousValue;
             _changedTo = ChangedTo;
             this.User = User;
-            //  this.Group = Group;
 
-            Date = DateTime.Now;
+            Date = DateTime.UtcNow;
         }
 
 

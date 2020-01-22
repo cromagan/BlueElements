@@ -4189,11 +4189,11 @@ namespace BlueControls.Controls
                     LasNr = z;
                     if (isfirst)
                     {
-                        Las = new TextListItem("Cancel", "Aktueller Text - ab " + _Database.Works[z].Date + ", geändert von " + _Database.Works[z].User);
+                        Las = new TextListItem("Cancel", "Aktueller Text - ab " + _Database.Works[z].Date + " UTC, geändert von " + _Database.Works[z].User);
                     }
                     else
                     {
-                        Las = new TextListItem(co.ToString(Constants.Format_Integer5) + _Database.Works[z].ChangedTo, "ab " + _Database.Works[z].Date + ", geändert von " + _Database.Works[z].User);
+                        Las = new TextListItem(co.ToString(Constants.Format_Integer5) + _Database.Works[z].ChangedTo, "ab " + _Database.Works[z].Date + " UTC, geändert von " + _Database.Works[z].User);
                     }
 
                     isfirst = false;
@@ -4205,7 +4205,7 @@ namespace BlueControls.Controls
             if (Las != null)
             {
                 co += 1;
-                i.Add(new TextListItem(co.ToString(Constants.Format_Integer5) + _Database.Works[LasNr].PreviousValue, "vor " + _Database.Works[LasNr].Date));
+                i.Add(new TextListItem(co.ToString(Constants.Format_Integer5) + _Database.Works[LasNr].PreviousValue, "vor " + _Database.Works[LasNr].Date + " UTC"));
             }
 
 
