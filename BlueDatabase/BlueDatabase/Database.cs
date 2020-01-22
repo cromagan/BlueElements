@@ -2456,7 +2456,7 @@ namespace BlueDatabase
 
             // Keine Doppelten Rausfiltern, ansonstn stimmen die Undo nicht mehr
 
-            UserEditedAktion = DateTime.Now;
+            UserEditedAktionUTC = DateTime.UtcNow;
 
             if (RowKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
             if (ColumnKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }

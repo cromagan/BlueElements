@@ -220,9 +220,9 @@ namespace BlueControls.ItemCollection
 
         }
 
-        public override object Clone()
+        public override BasicListItem CloneToNewCollection(ItemCollectionList newParent)
         {
-            return GetCloneData(new TextListItem(Internal, _ReadableText, _Symbol, IsCaption, _Enabled, _Format, UserDefCompareKey));
+            return CloneToNewCollection(newParent, new TextListItem(Internal, _ReadableText, _Symbol, IsCaption, _Enabled, _Format, UserDefCompareKey));
         }
 
         public override bool FilterMatch(string FilterText)

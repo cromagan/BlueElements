@@ -27,7 +27,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection
 {
-    public abstract class BasicListItem : BasicItem, ICompareKey, IComparable, ICloneable
+    public abstract class BasicListItem : BasicItem, ICompareKey, IComparable
     {
         public abstract Size SizeUntouchedForListBox();
 
@@ -149,6 +149,8 @@ namespace BlueControls.ItemCollection
             }
             set
             {
+                if (Parent == null) { Develop.DebugPrint(enFehlerArt.Warnung, "Parent == null!"); }
+
                 Parent?.SetNewCheckState(this, value, ref _Checked);
                 OnChanged();
             }
@@ -203,25 +205,27 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public virtual object Clone()
+        public virtual BasicListItem CloneToNewCollection(ItemCollectionList newParent)
         {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
             return null;
         }
 
-        public BasicListItem GetCloneData(BasicListItem x)
+        public BasicListItem CloneToNewCollection(ItemCollectionList newParent, BasicListItem newItem)
         {
-
-            if (x.Internal != Internal)
+            if (newItem.Internal != Internal)
             {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Clone fehlgeschlagen, Internal untershiedlich");
+                Develop.DebugPrint(enFehlerArt.Fehler, "Clone fehlgeschlagen, Internal unterschiedlich");
             }
 
-            x.Checked = Checked;
-            x.Enabled = Enabled;
-            x.Tags = Tags;
-            x.UserDefCompareKey = UserDefCompareKey;
-            return x;
+            newParent.Add(newItem);
+
+            newItem.Checked = Checked; // Parent muss gesetz sein!
+            newItem.Enabled = Enabled;
+            newItem.Tags = Tags;
+            newItem.UserDefCompareKey = UserDefCompareKey;
+
+            return newItem;
         }
 
         public virtual bool FilterMatch(string FilterText)

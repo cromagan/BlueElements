@@ -1084,7 +1084,7 @@ namespace BlueControls.ItemCollection
 
             foreach (var ThisItem in this)
             {
-                x.Add((BasicListItem)ThisItem.Clone());
+                ThisItem.CloneToNewCollection(x);
             }
             return x;
         }

@@ -21,7 +21,7 @@ namespace BlueBasics.MultiUserFile
         private bool _CheckedAndReloadNeed;
 
 
-        public DateTime _LastMessage = DateTime.Now.AddMinutes(-10);
+        private DateTime _LastMessageUTC = DateTime.UtcNow.AddMinutes(-10);
 
         private string _LastSaveCode;
         public bool ReadOnly { get; private set; }
@@ -40,7 +40,7 @@ namespace BlueBasics.MultiUserFile
         private bool _isParsing;
         private int _ParsedAndRepairedCount = 0;
 
-        public DateTime UserEditedAktion;
+        public DateTime UserEditedAktionUTC;
 
 
         /// <summary>
@@ -58,10 +58,10 @@ namespace BlueBasics.MultiUserFile
         /// </summary>
         private string Writer_ProcessDone = string.Empty;
 
-        private DateTime _CanWriteNextCheck = DateTime.Now.AddSeconds(-30);
+        private DateTime _CanWriteNextCheckUTC = DateTime.UtcNow.AddSeconds(-30);
         private string _CanWriteError = string.Empty;
 
-        private DateTime _EditNormalyNextCheck = DateTime.Now.AddSeconds(-30);
+        private DateTime _EditNormalyNextCheckUTC = DateTime.UtcNow.AddSeconds(-30);
         private string _EditNormalyError = string.Empty;
 
         #region  Event-Deklarationen 
@@ -119,7 +119,7 @@ namespace BlueBasics.MultiUserFile
             ReadOnly = readOnly;
             EasyMode = easyMode;
             AutoDeleteBAK = false;
-            UserEditedAktion = new DateTime(1900, 1, 1);
+            UserEditedAktionUTC = new DateTime(1900, 1, 1);
 
             Checker.Change(1000, 1000);
             //            Checker.Enabled = false;
@@ -160,7 +160,7 @@ namespace BlueBasics.MultiUserFile
             string tmpLastSaveCode;
             byte[] _tmp = null;
 
-            var StartTime = DateTime.Now;
+            var StartTime = DateTime.UtcNow;
             do
             {
                 try
@@ -190,7 +190,7 @@ namespace BlueBasics.MultiUserFile
                 catch (Exception ex)
                 {
                     // Home Office kann lange blokieren....
-                    if (DateTime.Now.Subtract(StartTime).TotalSeconds > 300)
+                    if (DateTime.UtcNow.Subtract(StartTime).TotalSeconds > 300)
                     {
                         Develop.DebugPrint(enFehlerArt.Fehler, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
                     }
@@ -362,10 +362,12 @@ namespace BlueBasics.MultiUserFile
             {
                 if (FileExists(tBackup))
                 {
+                    System.IO.File.SetCreationTimeUtc(tBackup, DateTime.UtcNow);
                     done = RenameFile(tBackup, BlockDatei, false);
                 }
                 else
                 {
+                    System.IO.File.SetCreationTimeUtc(Filename, DateTime.UtcNow);
                     done = CopyFile(Filename, BlockDatei, false);
                 }
             }
@@ -669,7 +671,7 @@ namespace BlueBasics.MultiUserFile
             try
             {
                 var f = new FileInfo(Filename);
-                return f.LastWriteTime.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
+                return f.LastWriteTimeUtc.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
             }
             catch
             {
@@ -686,14 +688,14 @@ namespace BlueBasics.MultiUserFile
         public void TryOnOldBlockFileExists()
         {
 
-            if (DateTime.Now.Subtract(_LastMessage).TotalMinutes < 1) { return; }
+            if (DateTime.UtcNow.Subtract(_LastMessageUTC).TotalMinutes < 1) { return; }
 
 
             if (BlockDateiVorhanden())
             {
-                _LastMessage = DateTime.Now;
+                _LastMessageUTC = DateTime.UtcNow;
                 var f = new FileInfo(Blockdateiname());
-                var sec = DateTime.Now.Subtract(f.CreationTime).TotalSeconds;
+                var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
                 OldBlockFileExists?.Invoke(this, new OldBlockFileEventArgs(sec));
             }
 
@@ -724,7 +726,7 @@ namespace BlueBasics.MultiUserFile
             if (string.IsNullOrEmpty(Filename)) { return false; }
 
             MaxWaitSeconds = Math.Min(MaxWaitSeconds, 40);
-            var D = DateTime.Now; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
+            var D = DateTime.UtcNow; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
 
 
             if (!MUSTRelease && BlockDateiVorhanden()) { TryOnOldBlockFileExists(); return false; }
@@ -734,7 +736,7 @@ namespace BlueBasics.MultiUserFile
 
                 if (!BinSaver.IsBusy) { SaveProcess(); }
                 Develop.DoEvents();
-                if (DateTime.Now.Subtract(D).TotalSeconds > MaxWaitSeconds)
+                if (DateTime.UtcNow.Subtract(D).TotalSeconds > MaxWaitSeconds)
                 {
                     if (MUSTRelease)
                     {
@@ -744,8 +746,8 @@ namespace BlueBasics.MultiUserFile
 
                     TryOnOldBlockFileExists(); return false;
                 } // KAcke, Da liegt ein größerer Fehler vor...
-                if (!MUSTRelease && DateTime.Now.Subtract(D).TotalSeconds > 20 && !BlockDateiVorhanden()) { TryOnOldBlockFileExists(); return false; } // Wenn der Saver hängt.... kommt auch vor :-(
-                if (DateTime.Now.Subtract(D).TotalSeconds > 30 && !BinSaver.IsBusy && HasPendingChanges() && BlockDateiVorhanden()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank aufgrund der Blockdatei nicht freigegeben: " + Filename); }
+                if (!MUSTRelease && DateTime.UtcNow.Subtract(D).TotalSeconds > 20 && !BlockDateiVorhanden()) { TryOnOldBlockFileExists(); return false; } // Wenn der Saver hängt.... kommt auch vor :-(
+                if (DateTime.UtcNow.Subtract(D).TotalSeconds > 30 && !BinSaver.IsBusy && HasPendingChanges() && BlockDateiVorhanden()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank aufgrund der Blockdatei nicht freigegeben: " + Filename); }
             }
             return true;
         }
@@ -895,17 +897,17 @@ namespace BlueBasics.MultiUserFile
 
         private void SetFileDate()
         {
-            var starttime = DateTime.Now;
+            var starttime = DateTime.UtcNow;
             do
             {
                 try
                 {
-                    File.SetLastAccessTime(Filename, DateTime.Now);
+                    File.SetLastAccessTime(Filename, DateTime.UtcNow);
                     break;
                 }
                 catch
                 {
-                    if (DateTime.Now.Subtract(starttime).TotalSeconds > 60)
+                    if (DateTime.UtcNow.Subtract(starttime).TotalSeconds > 60)
                     {
                         Develop.DebugPrint(enFehlerArt.Fehler, "Wartezeit überschritten, ich konnte dem System nicht mitteilen, dass die Datenbank aktualisiert wurde.<br>" + Filename);
                     }
@@ -979,7 +981,7 @@ namespace BlueBasics.MultiUserFile
 
 
 
-            if (DateTime.Now.Subtract(UserEditedAktion).TotalSeconds < Count_UserWork) { return; } // Benutzer arbeiten lassen
+            if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < Count_UserWork) { return; } // Benutzer arbeiten lassen
             if (Checker_Tick_count > Count_Save && _MustSave) { CancelBackGroundWorker(); }
             if (Checker_Tick_count > _ReloadDelaySecond && _MustReload) { CancelBackGroundWorker(); }
             if (IsBackgroundWorkerBusy()) { return; }
@@ -1035,7 +1037,7 @@ namespace BlueBasics.MultiUserFile
             //  und eine Prüfung, die nicht auf die Sekunde genau wichtig ist.
             if (ReadOnly) { return "Die Datei wurde schreibgeschützt geöffnet."; }
 
-            if (CheckForLastError(ref _EditNormalyNextCheck, ref _EditNormalyError)) { return _EditNormalyError; }
+            if (CheckForLastError(ref _EditNormalyNextCheckUTC, ref _EditNormalyError)) { return _EditNormalyError; }
 
 
             if (!string.IsNullOrEmpty(Filename))
@@ -1048,7 +1050,7 @@ namespace BlueBasics.MultiUserFile
                 if (BlockDateiVorhanden())
                 {
                     var f = new FileInfo(Blockdateiname());
-                    if (DateTime.Now.Subtract(f.LastWriteTime).TotalSeconds > 60)
+                    if (DateTime.UtcNow.Subtract(f.LastWriteTime).TotalSeconds > 60)
                     {
                         _EditNormalyError = "Eine Blockdatei ist anscheinend dauerhaft vorhanden. Administrator verständigen.";
                         return _EditNormalyError;
@@ -1081,7 +1083,7 @@ namespace BlueBasics.MultiUserFile
                 if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
                 if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------
 
-                if (CheckForLastError(ref _CanWriteNextCheck, ref _CanWriteError))
+                if (CheckForLastError(ref _CanWriteNextCheckUTC, ref _CanWriteError))
                 {
                     if (!string.IsNullOrEmpty(_CanWriteError)) { return _CanWriteError; }
                 }
@@ -1097,7 +1099,7 @@ namespace BlueBasics.MultiUserFile
                 try
                 {
                     var f2 = new FileInfo(Filename);
-                    if (DateTime.Now.Subtract(f2.LastWriteTime).TotalSeconds < 2)
+                    if (DateTime.UtcNow.Subtract(f2.LastWriteTime).TotalSeconds < 2)
                     {
                         _CanWriteError = "Anderer Speichervorgang noch nicht abgeschlossen.";
                         return _CanWriteError;
@@ -1122,11 +1124,11 @@ namespace BlueBasics.MultiUserFile
 
 
             // Gibt true zurück, wenn die letzte Prüfung noch gülig ist
-            bool CheckForLastError(ref DateTime nextCheck, ref string lastMessage)
+            bool CheckForLastError(ref DateTime nextCheckUTC, ref string lastMessage)
             {
-                if (DateTime.Now.Subtract(nextCheck).TotalSeconds < 0) { return true; }
+                if (DateTime.UtcNow.Subtract(nextCheckUTC).TotalSeconds < 0) { return true; }
                 lastMessage = string.Empty;
-                nextCheck = DateTime.Now.AddSeconds(5);
+                nextCheckUTC = DateTime.UtcNow.AddSeconds(5);
                 return false;
             }
 

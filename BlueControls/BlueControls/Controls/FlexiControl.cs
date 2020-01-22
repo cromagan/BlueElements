@@ -1071,8 +1071,10 @@ namespace BlueControls.Controls
 
             if (SourceItem != null && TargetItem == null)
             {
-                TargetItem = (BasicListItem)SourceItem.Clone();
-                Target.Item.Add(TargetItem);
+
+                TargetItem = (BasicListItem)SourceItem.CloneToNewCollection(Target.Item);
+                //TargetItem = (BasicListItem)SourceItem.Clone();
+                //Target.Item.Add(TargetItem);
             }
             else if (SourceItem == null && TargetItem == null)
             {

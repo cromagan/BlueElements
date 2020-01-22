@@ -121,9 +121,10 @@ namespace BlueControls.ItemCollection
             return (int)SizeUntouchedForListBox().Height;
         }
 
-        public override object Clone()
+
+        public override BasicListItem CloneToNewCollection(ItemCollectionList newParent)
         {
-            return GetCloneData(new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled));
+            return CloneToNewCollection(newParent, new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled));
         }
 
         public override bool FilterMatch(string FilterText)

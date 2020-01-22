@@ -106,9 +106,9 @@ namespace BlueControls.ItemCollection
             return Pos.ToString();
         }
 
-        public override object Clone()
+        public override BasicListItem CloneToNewCollection(ItemCollectionList newParent)
         {
-            return GetCloneData(new LineListItem(Internal, UserDefCompareKey));
+            return CloneToNewCollection(newParent, new LineListItem(Internal, UserDefCompareKey));
         }
     }
 }
