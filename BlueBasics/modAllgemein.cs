@@ -560,15 +560,15 @@ namespace BlueBasics
         #region  Datum und Zeit 
 
 
-        public static void Pause(double Sekunden, bool DoEvents)
+        public static void Pause(double sekunden, bool doEvents)
         {
 
-            if (Sekunden <= 0) { return; }
+            if (sekunden <= 0) { return; }
 
 
-            if (!DoEvents)
+            if (!doEvents)
             {
-                Thread.Sleep((int)(Sekunden * 1000));
+                Thread.Sleep((int)(sekunden * 1000));
                 return;
             }
 
@@ -579,7 +579,7 @@ namespace BlueBasics
             {
                 Develop.DoEvents();
                 AkTimer = DateTime.Now.Subtract(FirstTimer);
-            } while (!(AkTimer.TotalSeconds >= Sekunden));
+            } while (!(AkTimer.TotalSeconds >= sekunden));
         }
 
 

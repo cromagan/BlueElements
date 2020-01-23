@@ -330,7 +330,7 @@ namespace BlueControls.ItemCollection
                 foreach (var thispoint in AdditionalPoints)
                 {
                     GR.DrawLine(CreativePad.PenGray, Mitte.ZoomAndMove(cZoom, MoveX, MoveY), thispoint.ZoomAndMove(cZoom, MoveX, MoveY));
-                    thispoint.Draw(GR, cZoom, MoveX, MoveY, enDesign.Button_EckpunktSchieber, enStates.Standard);
+                    thispoint.Draw(GR, cZoom, MoveX, MoveY, enDesign.Button_EckpunktSchieber, enStates.Standard, false);
                 }
             }
 
@@ -341,7 +341,7 @@ namespace BlueControls.ItemCollection
 
                 foreach (var thispoint in AdditionalPoints)
                 {
-                    thispoint.Draw(GR, cZoom, MoveX, MoveY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                    thispoint.Draw(GR, cZoom, MoveX, MoveY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
                 }
 
                 //  GR.DrawImage(GetTransformedImage, New Rectangle(0, 0, 300, 300))

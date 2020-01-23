@@ -51,6 +51,9 @@ namespace BlueControls
         private decimal _StoreX;
         private decimal _StoreY;
 
+
+        public static Font SimpleArial = new Font("Arial", 8);
+
         #endregion
 
 
@@ -497,7 +500,7 @@ namespace BlueControls
         }
 
 
-        public void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, enDesign Type, enStates State)
+        public void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, enDesign Type, enStates State, bool DrawName)
         {
             var tx = _x * cZoom - MoveX + cZoom / 2;
             var ty = _y * cZoom - MoveY + cZoom / 2;
@@ -512,9 +515,24 @@ namespace BlueControls
             {
                 if (_order >= 0)
                 {
-                    GR.DrawString(_order.ToString(), new Font("Arial", 6), Brushes.Magenta, r.PointOf(enAlignment.Top_Right).X + Constants.GlobalRND.Next(-20, 10), r.PointOf(enAlignment.Top_Right).Y + Constants.GlobalRND.Next(-20, 10));
+                    GR.DrawString(_order.ToString(), SimpleArial, Brushes.Magenta, r.PointOf(enAlignment.Top_Right).X + Constants.GlobalRND.Next(-20, 10), r.PointOf(enAlignment.Top_Right).Y + Constants.GlobalRND.Next(-20, 10));
                 }
             }
+
+
+            if (DrawName)
+            {
+                for (var x = -1; x < 2; x++)
+                {
+                    for (var y = -1; y < 2; y++)
+                    {
+                        GR.DrawString(Name, SimpleArial, Brushes.White, (float)tx + x, (float)ty + y - 16);
+                    }
+
+                }
+                GR.DrawString(Name, SimpleArial, Brushes.Black, (float)tx, (float)ty - 16);
+            }
+
         }
 
         public PointF ZoomAndMove(AdditionalDrawing e)

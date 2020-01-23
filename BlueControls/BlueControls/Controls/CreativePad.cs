@@ -995,7 +995,7 @@ namespace BlueControls.Controls
                     // Alle Punkte mit Order anzeigen
                     foreach (var ThisPoint in _Points)
                     {
-                        ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                        ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
                     }
                 }
 
@@ -1008,11 +1008,11 @@ namespace BlueControls.Controls
                 {
                     if (ThisPoint.CanMove(Relations))
                     {
-                        ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard);
+                        ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard, false);
                     }
                     else
                     {
-                        ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                        ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
                     }
                 }
 

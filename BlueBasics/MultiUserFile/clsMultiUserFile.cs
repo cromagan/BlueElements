@@ -13,10 +13,10 @@ namespace BlueBasics.MultiUserFile
 {
     public abstract class clsMultiUserFile : IDisposable
     {
-        private System.ComponentModel.BackgroundWorker BinReLoader;
+
         private System.ComponentModel.BackgroundWorker BinSaver;
         private Timer Checker;
-        private System.ComponentModel.IContainer components;
+
 
         private bool _CheckedAndReloadNeed;
 
@@ -38,7 +38,8 @@ namespace BlueBasics.MultiUserFile
         protected int _ReloadDelaySecond = 10;
 
         private bool _isParsing;
-        private int _ParsedAndRepairedCount = 0;
+
+        private bool _IsLoading = false;
 
         public DateTime UserEditedAktionUTC;
 
@@ -84,36 +85,16 @@ namespace BlueBasics.MultiUserFile
 
         public clsMultiUserFile(bool readOnly, bool easyMode)
         {
-            //CreateControl();
-            //  InitializeComponent();
-            this.components = new System.ComponentModel.Container();
-            this.BinReLoader = new System.ComponentModel.BackgroundWorker();
-            this.BinSaver = new System.ComponentModel.BackgroundWorker();
-            this.Checker = new Timer(Checker_Tick);
-            //this.SuspendLayout();
-            // 
-            // BinReLoader
-            // 
-            this.BinReLoader.WorkerReportsProgress = true;
-            this.BinReLoader.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BinReLoader_DoWork);
-            this.BinReLoader.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BinReLoader_ProgressChanged);
-            // 
-            // BinSaver
-            // 
-            this.BinSaver.WorkerReportsProgress = true;
-            this.BinSaver.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BinSaver_DoWork);
-            this.BinSaver.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BinSaver_ProgressChanged);
-            // 
-            // Checker
-            // 
-            //this.Checker.Interval = 1000;
-            //this.Checker.Tick += new System.EventHandler(this.Checker_Tick);
-            //this.ResumeLayout(false);
-            // ---------------------------------
+
+            BinSaver = new System.ComponentModel.BackgroundWorker();
+            BinSaver.WorkerReportsProgress = true;
+            BinSaver.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BinSaver_DoWork);
+            BinSaver.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BinSaver_ProgressChanged);
+
+            Checker = new Timer(Checker_Tick);
 
 
-            Filename = string.Empty;
-            //Filename = filename; // KEIN Filename. Ansonsten wird davon ausgegnagen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
+            Filename = string.Empty;// KEIN Filename. Ansonsten wird davon ausgegnagen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
             _CheckedAndReloadNeed = true;
             _LastSaveCode = string.Empty;
             ReadOnly = readOnly;
@@ -122,8 +103,6 @@ namespace BlueBasics.MultiUserFile
             UserEditedAktionUTC = new DateTime(1900, 1, 1);
 
             Checker.Change(1000, 1000);
-            //            Checker.Enabled = false;
-
         }
 
         public void SetReadOnly()
@@ -137,25 +116,32 @@ namespace BlueBasics.MultiUserFile
             ReadOnly = true;
         }
 
-
         /// <summary>
-        /// Diese Routine ist ein Paraleller Process.
-        /// Er prüft, ob Daten Reloaded werden müssen. Falls KEINE Daten da sind, werden sie geladen.
+        /// Führt - falls nötig - einen Reload der Datenbank aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void BinReLoader_DoWork(object sender, DoWorkEventArgs e)
+        public bool Load_Reload()
         {
+            while (_IsLoading) { Develop.DoEvents(); }
+
+            _IsLoading = true;
+
+            if (string.IsNullOrEmpty(Filename)) { _IsLoading = false; return false; }
+
+            //Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
+            if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded()) { _IsLoading = false; return false; }
+
+            if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, da gerade geparst wird"); }
+
+            if (isSomethingDiscOperatingsBlocking()) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, vererbte Klasse gab Fehler zurück"); }
 
             var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
 
-
-            if (OnlyReload && !ReloadNeeded()) { return; }
+            if (OnlyReload && !ReloadNeeded()) { _IsLoading = false; return false; }
 
             var ec = new LoadingEventArgs(OnlyReload);
             OnLoading(ec);
 
-            if (OnlyReload && ReadOnly && ec.Cancel) { return; }
+            if (OnlyReload && ReadOnly && ec.Cancel) { _IsLoading = false; return false; }
 
             string tmpLastSaveCode;
             byte[] _tmp = null;
@@ -167,24 +153,17 @@ namespace BlueBasics.MultiUserFile
                 {
                     if (string.IsNullOrEmpty(Filename))
                     {
-                        Develop.DebugPrint(enFehlerArt.Warnung, "Dateiname ist leer: " + Filename);
-                        return;
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname ist leer: " + Filename); // sollte vorher abgefangn sein.
+                        _IsLoading = false; return false;
                     }
 
                     _tmp = File.ReadAllBytes(Filename);
                     tmpLastSaveCode = GetFileInfo(true);
 
+                    if (EasyMode) { break; }
 
-
-                    if (EasyMode)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        Pause(0.5, false);
-                        if (new FileInfo(Filename).Length == _tmp.Length) { break; }
-                    }
+                    Pause(0.5, false);
+                    if (new FileInfo(Filename).Length == _tmp.Length) { break; }
 
                 }
                 catch (Exception ex)
@@ -193,6 +172,7 @@ namespace BlueBasics.MultiUserFile
                     if (DateTime.UtcNow.Subtract(StartTime).TotalSeconds > 300)
                     {
                         Develop.DebugPrint(enFehlerArt.Fehler, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
+                        _IsLoading = false; return false;
                     }
                 }
             } while (true);
@@ -207,21 +187,9 @@ namespace BlueBasics.MultiUserFile
 
 
 
-
-            if (sender is BackgroundWorker w)
-            {
-                while (_isParsing) { Develop.DoEvents(); }
-                var tmpParsCount = _ParsedAndRepairedCount;
-                w.ReportProgress(1, _BLoaded);
-                while (tmpParsCount == _ParsedAndRepairedCount || _isParsing) { Develop.DoEvents(); }
-                w.ReportProgress(0, tmpLastSaveCode);
-
-            }
-            else
-            {
-                BinReLoader_ProgressChanged(null, new ProgressChangedEventArgs(1, _BLoaded));
-                BinReLoader_ProgressChanged(null, new ProgressChangedEventArgs(0, tmpLastSaveCode));
-            }
+            ParseInternal(_BLoaded);
+            _LastSaveCode = tmpLastSaveCode; // initialize setzt zurück
+            _CheckedAndReloadNeed = false;
 
 
             CheckDataAfterReload();
@@ -229,6 +197,8 @@ namespace BlueBasics.MultiUserFile
 
             OnLoaded(new LoadedEventArgs(OnlyReload));
             TryOnOldBlockFileExists();
+
+            _IsLoading = false; return true;
         }
 
         /// <summary>
@@ -240,7 +210,7 @@ namespace BlueBasics.MultiUserFile
 
 
         /// <summary>
-        /// Gibt die Möglichkeit, vor einem Reload Daten zu speichern. Diese kann nach dem Reload mit CheckDataAfterReload zu prüfen, ob alles geklappt hat.
+        /// Gibt die Möglichkeit, vor einem Reload Daten in Variablen zu speichern. Diese kann nach dem Reload mit CheckDataAfterReload zu prüfen, ob alles geklappt hat.
         /// </summary>
         protected abstract void PrepeareDataForCheckingBeforeLoad();
 
@@ -285,33 +255,12 @@ namespace BlueBasics.MultiUserFile
 
             RepairAfterParse();
 
-            _ParsedAndRepairedCount++;
 
         }
 
         public abstract void RepairAfterParse();
         protected abstract void ParseExternal(List<byte> bLoaded);
 
-        private void BinReLoader_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            switch (e.ProgressPercentage)
-            {
-                case 1:
-                    ParseInternal((List<byte>)e.UserState);
-                    break;
-
-                case 0:
-                    _CheckedAndReloadNeed = false;
-                    _LastSaveCode = (string)e.UserState; // initialize setzt zurück
-                    break;
-
-                default:
-                    Develop.DebugPrint_NichtImplementiert();
-                    break;
-
-            }
-
-        }
 
         private void BinaryWriter_ReportProgressAndWait(int percentProcess, string UserState)
         {
@@ -501,8 +450,7 @@ namespace BlueBasics.MultiUserFile
                     break;
 
                 case "Reload":
-                    if (BinReLoader.IsBusy) { Develop.DoEvents(); }
-                    BinReLoader_DoWork(null, null);
+                    Load_Reload();
                     break;
 
                 case "GetBinData":
@@ -538,37 +486,9 @@ namespace BlueBasics.MultiUserFile
         /// </summary>
         protected abstract void DoWorkInSerialSavingThread();
 
-        /// <summary>
-        /// Führt - falls nötig - einen Reload der Datenbank aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
-        /// </summary>
-        public void Load_Reload()
-        {
-            //if (InvokeRequired)
-            //{
-            //    Invoke(new Action(() => Load_Reload()));
-            //    return;
-            //}
-
-
-            if (string.IsNullOrEmpty(Filename)) { return; }
-
-            //Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
-            if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded()) { return; }
-
-            if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, da gerade geparst wird"); }
-
-            if (isSomethingDiscOperatingsBlocking()) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, vererbte Klasse gab Fehler zurück"); }
 
 
 
-            //Der View-Code muss vom Table Selbst verwaltet werden. Jede Table/Formula kann ja eine eigene Ansicht haben!
-            // Stelle sicher, dass der Prozess nicht läuft- Nur Sicherheitshalber, sollte eigentlich eh nicht sein.
-            while (BinReLoader.IsBusy) { Develop.DoEvents(); }
-
-            BinReLoader_DoWork(null, null);
-
-            //Checker.Enabled = true;
-        }
 
         protected abstract bool isSomethingDiscOperatingsBlocking();
 
@@ -951,7 +871,7 @@ namespace BlueBasics.MultiUserFile
 
             if (EasyMode && ReadOnly) { return; }
 
-            if (BinReLoader.IsBusy) { return; }
+            if (_IsLoading) { return; }
             if (BinSaver.IsBusy) { return; }
             if (string.IsNullOrEmpty(Filename)) { return; }
 
@@ -998,7 +918,7 @@ namespace BlueBasics.MultiUserFile
             if (_MustReload && _MustSave)
             {
                 // Checker_Tick_count nicht auf 0 setzen, dass der Saver noch stimmt.
-                BinReLoader.RunWorkerAsync();
+                Load_Reload();
                 return;
             }
 
@@ -1015,7 +935,7 @@ namespace BlueBasics.MultiUserFile
             // Überhaupt nix besonderes. Ab und zu mal Reloaden
             if (_MustReload && Checker_Tick_count > _ReloadDelaySecond)
             {
-                BinReLoader.RunWorkerAsync();
+                Load_Reload();
                 Checker_Tick_count = 0;
             }
 
@@ -1069,7 +989,7 @@ namespace BlueBasics.MultiUserFile
             if (mode.HasFlag(enErrorReason.EditGeneral))
             {
                 if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
-                if (BinReLoader.IsBusy) { return "Aktuell werden im Hintergrund Daten geladen."; }
+                if (_IsLoading) { return "Aktuell werden im Hintergrund Daten geladen."; }
                 if (ReloadNeeded()) { return "Die Datei muss neu eingelesen werden."; }
             }
 
@@ -1078,7 +998,7 @@ namespace BlueBasics.MultiUserFile
 
             if (mode.HasFlag(enErrorReason.Save))
             {
-                if (BinReLoader.IsBusy) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
+                if (_IsLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
 
                 if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
                 if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------
@@ -1168,7 +1088,6 @@ namespace BlueBasics.MultiUserFile
 
                 //  https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
 
-                BinReLoader.Dispose();
                 BinSaver.Dispose();
                 Checker.Dispose();
 

@@ -34,9 +34,8 @@ namespace BlueControls.Enums
         VerticalLine = 32,
         DrawToPoint = 64,
         FilledRectancle = 128,
+        PointNames = 256,
 
         HorizontalVerticalLine = HorizontalLine | VerticalLine
-
-
     }
 }

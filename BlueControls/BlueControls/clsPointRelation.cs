@@ -229,7 +229,7 @@ namespace BlueControls
 
             foreach (var thispoint in Points)
             {
-                thispoint.Draw(GR, cZoom, MoveX, MoveY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                thispoint.Draw(GR, cZoom, MoveX, MoveY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
 
 
                 if (thispoint.Parent is BasicPadItem tempVar)
