@@ -28,7 +28,7 @@ namespace BlueBasics.EventArgs
             //this.OnlyReloaded = OnlyReloaded;
         }
 
-        public bool Cancel { get; set; }
+        public bool TryCancel { get; set; }
 
     }
 }

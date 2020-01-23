@@ -50,12 +50,8 @@ namespace BlueControls
             return true;
         }
 
-        protected override void DoWorkInParallelBinSaverThread()
-        {
 
-        }
-
-        protected override void DoWorkInSerialSavingThread()
+        protected override void DoWorkAfterSaving()
         {
 
         }
@@ -169,9 +165,9 @@ namespace BlueControls
             return false;
         }
 
-        protected override void ThisIsOnDisk(List<byte> binaryData)
+        protected override void ThisIsOnDisk(string data)
         {
-            _dataOnDisk = binaryData.ToStringConvert();
+            _dataOnDisk = data;
         }
 
 

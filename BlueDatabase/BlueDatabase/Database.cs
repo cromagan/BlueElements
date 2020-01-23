@@ -392,11 +392,6 @@ namespace BlueDatabase
         string _LastWorkItem = string.Empty;
 
 
-        /// <summary>
-        /// Variable wird einzig und allein vom BinWriter verändert.
-        /// Kein Reset oder Initalize verändert den Inhalt.
-        /// </summary>
-        private List<string> Writer_FilesToDeleteLCase;
 
         private string WVorher = string.Empty;
 
@@ -2092,11 +2087,7 @@ namespace BlueDatabase
         }
 
 
-        public new string ToString()
-        {
-            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            return ToListOfByte(false).ToArray().ToStringConvert();
-        }
+
 
 
         protected override List<byte> ToListOfByte(bool willSave)
@@ -2970,15 +2961,9 @@ namespace BlueDatabase
         }
 
 
-        protected override void DoWorkInParallelBinSaverThread()
-        {
-            if (Writer_FilesToDeleteLCase.Count > 0)
-            {
-                if (_VerwaisteDaten == enVerwaisteDaten.Löschen) { DeleteFile(Writer_FilesToDeleteLCase); }
-            }
-        }
 
-        protected override void DoWorkInSerialSavingThread()
+
+        protected override void DoWorkAfterSaving()
         {
 
             ChangeWorkItems(enItemState.Pending, enItemState.Undo);
@@ -2989,11 +2974,18 @@ namespace BlueDatabase
             FilesAfterLoadingLCase.Remove(FilesNewLCase);
 
             // Hier erst reintun, dass der Worker nicht zu früh reagiert!
-            Writer_FilesToDeleteLCase = new List<string>();
-            Writer_FilesToDeleteLCase.AddRange(FilesAfterLoadingLCase);
+            var Writer_FilesToDeleteLCase = new List<string>();
+
+            if (_VerwaisteDaten == enVerwaisteDaten.Löschen) { Writer_FilesToDeleteLCase.AddRange(FilesAfterLoadingLCase); }
+
+
 
             FilesAfterLoadingLCase.Clear();
             FilesAfterLoadingLCase.AddRange(FilesNewLCase);
+
+
+            if (Writer_FilesToDeleteLCase.Count > 0) { DeleteFile(Writer_FilesToDeleteLCase); }
+
 
         }
 
@@ -3055,7 +3047,7 @@ namespace BlueDatabase
             if (!Backup.IsBusy) { Backup.RunWorkerAsync(); }
         }
 
-        protected override void ThisIsOnDisk(List<byte> binaryData)
+        protected override void ThisIsOnDisk(string data)
         {
             //Uninterresant
         }
