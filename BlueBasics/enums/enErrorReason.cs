@@ -43,7 +43,9 @@ namespace BlueBasics.Enums
         EditGeneral = 8,
 
 
-        Save = 16
+        Save = 16,
+
+        Load = 32
 
 
     }

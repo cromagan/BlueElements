@@ -141,29 +141,32 @@ namespace BlueBasics.MultiUserFile
         /// <summary>
         /// Führt - falls nötig - einen Reload der Datenbank aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
         /// </summary>
-        public bool Load_Reload()
+        public void Load_Reload()
         {
             while (_IsLoading) { Develop.DoEvents(); }
 
+            if (string.IsNullOrEmpty(Filename)) { _IsLoading = false; return; }
+
+
             _IsLoading = true;
 
-            if (string.IsNullOrEmpty(Filename)) { _IsLoading = false; return false; }
+
 
             //Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
-            if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded()) { _IsLoading = false; return false; }
+            if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded()) { _IsLoading = false; return; }
 
-            if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, da gerade geparst wird"); }
+            //if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, da gerade geparst wird"); }
 
-            if (isSomethingDiscOperatingsBlocking()) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, vererbte Klasse gab Fehler zurück"); }
+            //if (isSomethingDiscOperatingsBlocking()) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, vererbte Klasse gab Fehler zurück"); }
 
             var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
 
-            if (OnlyReload && !ReloadNeeded()) { _IsLoading = false; return false; }
+            if (OnlyReload && !ReloadNeeded()) { _IsLoading = false; return; } // Wird in der Schleife auch geprüft
 
             var ec = new LoadingEventArgs(OnlyReload);
             OnLoading(ec);
 
-            if (OnlyReload && ReadOnly && ec.TryCancel) { _IsLoading = false; return false; }
+            if (OnlyReload && ReadOnly && ec.TryCancel) { _IsLoading = false; return; }
 
             string tmpLastSaveCode;
             byte[] _tmp = null;
@@ -173,19 +176,25 @@ namespace BlueBasics.MultiUserFile
             {
                 try
                 {
-                    if (string.IsNullOrEmpty(Filename))
+
+                    if (OnlyReload && !ReloadNeeded()) { _IsLoading = false; return; } // PRoblem hat sich aufgelöst
+
+                    var f = ErrorReason(enErrorReason.Load);
+
+                    if (string.IsNullOrEmpty(f))
                     {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname ist leer: " + Filename); // sollte vorher abgefangn sein.
-                        _IsLoading = false; return false;
+                        _tmp = File.ReadAllBytes(Filename);
+                        tmpLastSaveCode = GetFileInfo(true);
+                        break;
                     }
 
-                    _tmp = File.ReadAllBytes(Filename);
-                    tmpLastSaveCode = GetFileInfo(true);
-
-                    if (EasyMode) { break; }
-
+                    Develop.DebugPrint(enFehlerArt.Info, f);
                     Pause(0.5, false);
-                    if (new FileInfo(Filename).Length == _tmp.Length) { break; }
+
+                    //if (EasyMode) { break; }
+
+                    //Pause(0.5, false);
+                    //if (new FileInfo(Filename).Length == _tmp.Length) { break; }
 
                 }
                 catch (Exception ex)
@@ -194,7 +203,7 @@ namespace BlueBasics.MultiUserFile
                     if (DateTime.UtcNow.Subtract(StartTime).TotalSeconds > 300)
                     {
                         Develop.DebugPrint(enFehlerArt.Fehler, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
-                        _IsLoading = false; return false;
+                        _IsLoading = false; return;
                     }
                 }
             } while (true);
@@ -220,7 +229,7 @@ namespace BlueBasics.MultiUserFile
             OnLoaded(new LoadedEventArgs(OnlyReload));
             TryOnOldBlockFileExists();
 
-            _IsLoading = false; return true;
+            _IsLoading = false;
         }
 
         /// <summary>
@@ -346,17 +355,17 @@ namespace BlueBasics.MultiUserFile
                 }
             }
 
-            //OK, nun gehts rund: Haupt-Datei wird zum Backup kopiert.
-            RenameFile(Filename, Backupdateiname(), true);
+            //OK, nun gehts rund: Zuerst das Backup löschen
+            if (FileExists(Backupdateiname())) { DeleteFile(Backupdateiname(), true); }
 
+            //Haupt-Datei wird zum Backup umbenannt
+            RenameFile(Filename, Backupdateiname(), true);
 
             // --- TmpFile wird zum Haupt ---
             RenameFile(SavedFileName, Filename, true);
 
-
             // ---- Steuerelemente Sagen, was gespeichert wurde
             ThisIsOnDisk(SavedData);
-
 
             if (!EasyMode)
             {
@@ -387,23 +396,33 @@ namespace BlueBasics.MultiUserFile
         private bool CreateBlockDatei()
         {
 
-            var tBackup = Backupdateiname();
-            var BlockDatei = Blockdateiname();
+            //var tBackup = Backupdateiname();
+            //var BlockDatei = Blockdateiname();
 
             // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
             var done = false;
             try
             {
-                if (FileExists(tBackup))
+
+
+                using (var x = new FileStream(Blockdateiname(), FileMode.Create, FileAccess.Write, FileShare.None))
                 {
-                    System.IO.File.SetCreationTimeUtc(tBackup, DateTime.UtcNow);
-                    done = RenameFile(tBackup, BlockDatei, false);
+                    var tw = (UserName() + "\r\n" + DateTime.UtcNow.ToString(Constants.Format_Date5)).ToByte();
+                    x.Write(tw, 0, tw.Length);
+                    x.Flush();
+                    x.Close();
                 }
-                else
-                {
-                    System.IO.File.SetCreationTimeUtc(Filename, DateTime.UtcNow);
-                    done = CopyFile(Filename, BlockDatei, false);
-                }
+                done = true;
+                //if (FileExists(tBackup))
+                //{
+                //    System.IO.File.SetCreationTimeUtc(tBackup, DateTime.UtcNow);
+                //    done = RenameFile(tBackup, BlockDatei, false);
+                //}
+                //else
+                //{
+                //    System.IO.File.SetCreationTimeUtc(Filename, DateTime.UtcNow);
+                //    done = CopyFile(Filename, BlockDatei, false);
+                //}
             }
             catch (Exception ex)
             {
@@ -420,7 +439,8 @@ namespace BlueBasics.MultiUserFile
             }
 
 
-            if (!BlockDateiVorhanden())
+
+            if (AgeOfBlockDatei() < 0)
             {
                 Develop.DebugPrint("Block-Datei Konflikt 1\r\n" + Filename);
                 return false;
@@ -591,11 +611,10 @@ namespace BlueBasics.MultiUserFile
             if (DateTime.UtcNow.Subtract(_LastMessageUTC).TotalMinutes < 1) { return; }
 
 
-            if (BlockDateiVorhanden())
+            var sec = AgeOfBlockDatei();
+
+            if (sec >= 0)
             {
-                _LastMessageUTC = DateTime.UtcNow;
-                var f = new FileInfo(Blockdateiname());
-                var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
                 OldBlockFileExists?.Invoke(this, new OldBlockFileEventArgs(sec));
             }
 
@@ -634,7 +653,7 @@ namespace BlueBasics.MultiUserFile
             var D = DateTime.UtcNow; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
 
 
-            if (!MUSTRelease && BlockDateiVorhanden()) { TryOnOldBlockFileExists(); return false; }
+            if (!MUSTRelease && AgeOfBlockDatei() >= 0) { TryOnOldBlockFileExists(); return false; }
 
             while (HasPendingChanges())
             {
@@ -647,12 +666,12 @@ namespace BlueBasics.MultiUserFile
                     TryOnOldBlockFileExists(); return false;
                 }
 
-                if (!MUSTRelease && DateTime.UtcNow.Subtract(D).TotalSeconds > 20 && !BlockDateiVorhanden())
+                if (!MUSTRelease && DateTime.UtcNow.Subtract(D).TotalSeconds > 20 && AgeOfBlockDatei() < 0)
                 {
                     Develop.DebugPrint(enFehlerArt.Warnung, "Saver hängt bei " + Filename + " " + f);
                     return false;
                 }
-                if (DateTime.UtcNow.Subtract(D).TotalSeconds > 30 && HasPendingChanges() && BlockDateiVorhanden())
+                if (DateTime.UtcNow.Subtract(D).TotalSeconds > 30 && HasPendingChanges() && AgeOfBlockDatei() >= 0)
                 {
                     Develop.DebugPrint(enFehlerArt.Warnung, "Datenbank aufgrund der Blockdatei nicht freigegeben: " + Filename + " " + f);
                     return false;
@@ -689,30 +708,33 @@ namespace BlueBasics.MultiUserFile
         private Tuple<string, string, string> WriteTempFileToDisk()
         {
 
-            var f = ErrorReason(enErrorReason.Save);
-            if (!string.IsNullOrEmpty(f)) { return null; }
-
-
-            var fi = GetFileInfo(true);
-            var Writer_BinaryData = ToListOfByte(true);
+            var fi = string.Empty;
+            var TMP = string.Empty;
+            byte[] Writer_BinaryData;
 
             var count = 0;
-            var TMP = string.Empty;
 
             do
             {
+                var f = ErrorReason(enErrorReason.Save);
+                if (!string.IsNullOrEmpty(f)) { return null; }
+
+                fi = GetFileInfo(true);
+                Writer_BinaryData = ToListOfByte(true).ToArray();
+
                 TMP = TempFile(Filename + "-" + modAllgemein.UserName().ToUpper());
+
                 try
                 {
                     using (var x = new FileStream(TMP, FileMode.Create, FileAccess.Write, FileShare.None))
                     {
-                        x.Write(Writer_BinaryData.ToArray(), 0, Writer_BinaryData.ToArray().Length);
+                        x.Write(Writer_BinaryData, 0, Writer_BinaryData.Length);
                         x.Flush();
                         x.Close();
                     }
 
 
-                    File.SetLastWriteTimeUtc(TMP, DateTime.UtcNow);
+                    //File.SetLastWriteTimeUtc(TMP, DateTime.UtcNow);
                     //SetFileDate();
                     break;
                 }
@@ -726,10 +748,11 @@ namespace BlueBasics.MultiUserFile
                         Develop.DebugPrint(enFehlerArt.Warnung, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + ex.Message);
                         return null;
                     }
+                    Pause(0.5, true);
                 }
             } while (true);
 
-            return new Tuple<string, string, string>(TMP, fi, Writer_BinaryData.ToArray().ToStringConvert());
+            return new Tuple<string, string, string>(TMP, fi, Writer_BinaryData.ToStringConvert());
 
         }
 
@@ -741,7 +764,7 @@ namespace BlueBasics.MultiUserFile
             try
             {
                 Load_Reload();
-                if (BlockDateiVorhanden()) { DeleteFile(Blockdateiname(), true); }
+                if (AgeOfBlockDatei() >= 0) { DeleteFile(Blockdateiname(), true); }
                 Release(true, 240);
             }
             catch
@@ -762,11 +785,25 @@ namespace BlueBasics.MultiUserFile
             return Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
         }
 
-        public bool BlockDateiVorhanden()
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>-1 wenn keine vorhanden ist, ansonsten das Alter in Sekunden</returns>
+        public double AgeOfBlockDatei()
         {
-            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            return FileExists(Blockdateiname());
+            if (!FileExists(Blockdateiname())) { return -1; }
+
+
+            _LastMessageUTC = DateTime.UtcNow;
+            var f = new FileInfo(Blockdateiname());
+
+            var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
+
+
+            return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil vonSecunden in der Zukunft erzeugt.
         }
+
 
         public bool IsParsing()
         {
@@ -885,6 +922,23 @@ namespace BlueBasics.MultiUserFile
         {
             if (mode == enErrorReason.OnlyRead) { return string.Empty; }
 
+            //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
+            if (mode == enErrorReason.Load)
+            {
+                if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
+
+                if (PureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
+                if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
+                if (_isParsing) { return "Es werden aktuell Daten geparsed."; }
+
+                var sec = -1d;
+                if (!EasyMode) { sec = AgeOfBlockDatei(); }
+                if (sec >= 0 && sec < 10) { return "Eine anderer Computer speichert gerade Daten ab."; }
+                if (isSomethingDiscOperatingsBlocking()) { return "Reload unmöglich, vererbte Klasse gab Fehler zurück"; }
+                return string.Empty;
+            }
+
+
             //----------Alle Edits und Save ------------------------------------------------------------------------
             //  Generelle Prüfung, die eigentlich immer benötigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell ändern
             //  und eine Prüfung, die nicht auf die Sekunde genau wichtig ist.
@@ -900,14 +954,13 @@ namespace BlueBasics.MultiUserFile
                     _EditNormalyError = "Sie haben im Verzeichnis der Datei keine Schreibrechte.";
                     return _EditNormalyError;
                 }
-                if (BlockDateiVorhanden())
+
+                var sec = AgeOfBlockDatei();
+
+                if (sec > 60)
                 {
-                    var f = new FileInfo(Blockdateiname());
-                    if (DateTime.UtcNow.Subtract(f.LastWriteTimeUtc).TotalSeconds > 60)
-                    {
-                        _EditNormalyError = "Eine Blockdatei ist anscheinend dauerhaft vorhanden. Administrator verständigen.";
-                        return _EditNormalyError;
-                    }
+                    _EditNormalyError = "Eine Blockdatei ist anscheinend dauerhaft vorhanden. Administrator verständigen.";
+                    return _EditNormalyError;
                 }
             }
 
@@ -943,7 +996,7 @@ namespace BlueBasics.MultiUserFile
                 }
 
 
-                if (BlockDateiVorhanden())
+                if (AgeOfBlockDatei() >= 0)
                 {
                     _CanWriteError = "Beim letzten Versuch, die Datei zu speichern, ist der Speichervorgang nicht korrekt beendet worden. Speichern ist solange deaktiviert, bis ein Administrator die Freigabe zum Speichern erteilt.";
                     return _CanWriteError;
