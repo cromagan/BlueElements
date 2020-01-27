@@ -38,7 +38,7 @@ namespace BluePaint
 
 
 
-        public MainWindow() : this(false)
+        public MainWindow() : this(true)
         {
 
         }
@@ -472,7 +472,10 @@ namespace BluePaint
             CurrentTool?.DoAdditionalDrawing(e, P.BMP);
         }
 
-
+        private void btnBrain_Click(object sender, System.EventArgs e)
+        {
+            SetTool(new Tool_Brain(), true);
+        }
     }
 
 }

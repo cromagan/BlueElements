@@ -54,6 +54,9 @@ namespace BluePaint
             this.grpSteuerung = new BlueControls.Controls.GroupBox();
             this.btnZoomFit = new BlueControls.Controls.Button();
             this.btnRückgänig = new BlueControls.Controls.Button();
+            this.tabExperimentell = new BlueControls.Controls.TabPage();
+            this.groupBox1 = new BlueControls.Controls.GroupBox();
+            this.btnBrain = new BlueControls.Controls.Button();
             this.P = new BlueControls.Controls.ZoomPic();
             this.Split = new System.Windows.Forms.SplitContainer();
             this.BLupe = new BlueControls.Controls.GroupBox();
@@ -68,6 +71,8 @@ namespace BluePaint
             this.grpSonstiges.SuspendLayout();
             this.grpZeichnen.SuspendLayout();
             this.grpSteuerung.SuspendLayout();
+            this.tabExperimentell.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Split)).BeginInit();
             this.Split.Panel1.SuspendLayout();
             this.Split.Panel2.SuspendLayout();
@@ -79,12 +84,12 @@ namespace BluePaint
             // 
             this.tabRibbonbar.Controls.Add(this.Tab_Start);
             this.tabRibbonbar.Controls.Add(this.Tab_Werkzeug);
+            this.tabRibbonbar.Controls.Add(this.tabExperimentell);
             this.tabRibbonbar.Dock = System.Windows.Forms.DockStyle.Top;
             this.tabRibbonbar.HotTrack = true;
             this.tabRibbonbar.IsRibbonBar = true;
             this.tabRibbonbar.Location = new System.Drawing.Point(0, 0);
             this.tabRibbonbar.Name = "tabRibbonbar";
-            this.tabRibbonbar.SelectedIndex = 1;
             this.tabRibbonbar.Size = new System.Drawing.Size(1007, 110);
             this.tabRibbonbar.TabIndex = 0;
             // 
@@ -335,6 +340,35 @@ namespace BluePaint
             this.btnRückgänig.Text = "Rückgängig";
             this.btnRückgänig.Click += new System.EventHandler(this.Rückg_Click);
             // 
+            // tabExperimentell
+            // 
+            this.tabExperimentell.Controls.Add(this.groupBox1);
+            this.tabExperimentell.Location = new System.Drawing.Point(4, 25);
+            this.tabExperimentell.Name = "tabExperimentell";
+            this.tabExperimentell.Size = new System.Drawing.Size(999, 81);
+            this.tabExperimentell.TabIndex = 2;
+            this.tabExperimentell.Text = "Experimentell";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.CausesValidation = false;
+            this.groupBox1.Controls.Add(this.btnBrain);
+            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.groupBox1.Location = new System.Drawing.Point(0, 0);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(136, 81);
+            this.groupBox1.Text = "Experimentel";
+            // 
+            // btnBrain
+            // 
+            this.btnBrain.ImageCode = "Feder";
+            this.btnBrain.Location = new System.Drawing.Point(8, 2);
+            this.btnBrain.Name = "btnBrain";
+            this.btnBrain.Size = new System.Drawing.Size(80, 66);
+            this.btnBrain.TabIndex = 6;
+            this.btnBrain.Text = "Neuronales Netzwerk";
+            this.btnBrain.Click += new System.EventHandler(this.btnBrain_Click);
+            // 
             // P
             // 
             this.P.AlwaysSmooth = false;
@@ -407,6 +441,7 @@ namespace BluePaint
             this.ClientSize = new System.Drawing.Size(1007, 450);
             this.Controls.Add(this.Split);
             this.Controls.Add(this.tabRibbonbar);
+            this.Design = BlueControls.Enums.enDesign.Form_Standard;
             this.Name = "MainWindow";
             this.Text = "BluePaint";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -418,6 +453,8 @@ namespace BluePaint
             this.grpSonstiges.ResumeLayout(false);
             this.grpZeichnen.ResumeLayout(false);
             this.grpSteuerung.ResumeLayout(false);
+            this.tabExperimentell.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
             this.Split.Panel1.ResumeLayout(false);
             this.Split.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Split)).EndInit();
@@ -458,5 +495,8 @@ namespace BluePaint
         private System.Windows.Forms.OpenFileDialog LoadTab;
         private System.Windows.Forms.SaveFileDialog SaveTab;
         private Button btnSave;
+        private TabPage tabExperimentell;
+        internal GroupBox groupBox1;
+        internal Button btnBrain;
     }
 }

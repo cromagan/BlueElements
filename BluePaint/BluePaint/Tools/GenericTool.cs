@@ -26,7 +26,7 @@ namespace BluePaint
 {
 
 
-    public partial class GenericTool : GroupBox
+    public partial class GenericTool : GroupBox // System.Windows.Forms.UserControl //
     {
 
         protected static Color ColorRedTransp = Color.FromArgb(50, 255, 0, 0);
@@ -105,7 +105,7 @@ namespace BluePaint
         }
 
         /// <summary>
-        /// OnForceUndoSaving wird automatisch in der MainForm ausgelöst.
+        /// Es wird automatisch OnForceUndoSaving in der MainForm ausgelöst.
         /// Wird benutzt, wenn ein neues Bild erstellt wurde und dieses in den Speicher soll.
         /// </summary>
         /// <param name="BMP"></param>

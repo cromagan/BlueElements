@@ -140,6 +140,12 @@
     <Compile Include="Tools\Tool_Paint.designer.cs">
       <DependentUpon>Tool_Paint.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tools\Tool_Brain.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_Brain.designer.cs">
+      <DependentUpon>Tool_Brain.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tools\Tool_Screenshot.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -186,6 +192,9 @@
     <EmbeddedResource Include="Tools\Tool_Paint.resx">
       <DependentUpon>Tool_Paint.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_Brain.resx">
+      <DependentUpon>Tool_Brain.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Tools\Tool_Screenshot.resx">
       <DependentUpon>Tool_Screenshot.cs</DependentUpon>
     </EmbeddedResource>
@@ -221,6 +230,10 @@
     <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj">
       <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
       <Name>BlueBasics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BlueBrain\BlueBrain\BlueBrain.csproj">
+      <Project>{fc28245c-8f58-412d-85ce-8f5327618fa8}</Project>
+      <Name>BlueBrain</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\BlueControls\BlueControls\BlueControls.csproj">
       <Project>{6a9cfa8b-ddf5-4fa2-a110-c87a0ce34347}</Project>
