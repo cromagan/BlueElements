@@ -160,6 +160,7 @@ namespace BlueBrain
             {
                 var sum = ChildLayer.Neurones.Select((t, j) => t.Error * Neurones[i].Weight[j]).Sum();
                 Neurones[i].Error = sum * Neurones[i].Value * (1.0 - Neurones[i].Value);
+                if (double.IsNaN(Neurones[i].Error)) { DebugPrint(enFehlerArt.Fehler, "NaN entdeckt"); }
             }
         }
 

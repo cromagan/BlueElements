@@ -73,63 +73,80 @@ namespace BluePaint
 
             var All = Directory.GetFiles(txtPath.Text, "*.png", SearchOption.TopDirectoryOnly);
 
-            var ziel = 0;
-
 
             foreach (var thisf in All)
             {
-                var P = (Bitmap)Image_FromFile(thisf);
-                OnOverridePic(P);
 
-                for (var x = 0; x < P.Width; x++)
+
+                if (!thisf.ToLower().Contains("ready"))
                 {
-                    for (var y = 0; y < P.Height; y++)
+
+
+                    var P = (Bitmap)Image_FromFile(thisf);
+                    var PR = (Bitmap)Image_FromFile(thisf.Trim(".png") + "-ready.png");
+                    OnOverridePic(P);
+
+                    for (var x = 0; x < P.Width; x++)
                     {
-                        ziel = FillNetwork(P, x, y);
-                        Br.BackPropagationGradiant(ziel.ToString(), 1, true);
+                        for (var y = 0; y < P.Height; y++)
+                        {
+                            FillNetwork(P, x, y);
+
+                            var c = PR.GetPixel(x, y);
+
+
+                            var z = "0";
+                            if (c.R == 0 && c.A > 200) { z = "1"; }
+                            if (c.R == 255) { z = "2"; }
+
+
+                            Br.Compute();
+
+                            //if (Br.OutputLayer.SoftMax() != z)
+                            //{
+                                Br.BackPropagationGradiant(z, 1, false);
+                            //}
+
+
+                        }
                     }
+
+                    Br.Save(f);
                 }
 
-                Br.Save(f);
             }
         }
 
-        private int FillNetwork(Bitmap p, int x, int y)
+        private void FillNetwork(Bitmap p, int x, int y)
         {
-            var Ziel = 0;
             for (var px = -2; px <= 2; px++)
             {
                 for (var py = -2; py <= 2; py++)
                 {
                     var C = GetPixel(p, x + px, y + py);
 
-                    if (px == 0 && py == 0)
-                    {
-                        Ziel = C;
-                    }
-                    else
+                    if (px != 0 || py != 0)
                     {
                         var s = px.ToString() + "," + py.ToString();
                         Br.InputLayer.SetValue(s, C);
                     }
                 }
             }
-            return Ziel;
         }
 
-        private int GetPixel(Bitmap p, int x, int y)
+        private float GetPixel(Bitmap p, int x, int y)
         {
 
             if (x < 0 || y < 0 || x >= p.Width || y >= p.Height) { return 0; }
 
             var c = p.GetPixel(x, y);
 
-            if (c.A < 128) { return 0; }
+            var br = c.GetBrightness() * 255;
+            var st = c.GetSaturation() * 255;  // Weiße Flächen haben keine Sättigung....
 
-            if (c.GetBrightness() < 0.1) { return 1; }
+            if (br < 40 && st < 40 ) {return ((float)c.A/255); }
 
-            return 2;
-
+            return -1;
 
         }
 
