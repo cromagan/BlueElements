@@ -2100,37 +2100,6 @@ namespace BlueControls.Controls
 
 
 
-        private void GetUniques(ColumnItem Column, List<string> Einzigartig, List<string> NichtEinzigartig)
-        {
-            //  Dim List_FilterString As List(Of String) = Column.Autofilter_ItemList(_Filter)
-            foreach (var ThisRow in SortedRows())
-            {
-                List<string> TMP = null;
-                if (Column.MultiLine)
-                {
-                    TMP = ThisRow.CellGetList(Column);
-                }
-                else
-                {
-                    TMP = new List<string> { ThisRow.CellGetString(Column) };
-                }
-
-                foreach (var ThisString in TMP)
-                {
-                    if (Einzigartig.Contains(ThisString))
-                    {
-                        NichtEinzigartig.AddIfNotExists(ThisString);
-                    }
-                    else
-                    {
-                        Einzigartig.AddIfNotExists(ThisString);
-                    }
-                }
-            }
-
-            Einzigartig.RemoveString(NichtEinzigartig, false);
-
-        }
 
 
         private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e)
@@ -2151,9 +2120,7 @@ namespace BlueControls.Controls
 
                 case "doeinzigartig":
                     Filter.Delete(e.Column);
-                    var Einzigartig = new List<string>();
-                    var NichtEinzigartig = new List<string>();
-                    GetUniques(e.Column, Einzigartig, NichtEinzigartig);
+                    e.Column.GetUniques(SortedRows(), out var Einzigartig, out var NichtEinzigartig);
 
                     if (Einzigartig.Count > 0)
                     {
@@ -2168,9 +2135,7 @@ namespace BlueControls.Controls
 
                 case "donichteinzigartig":
                     Filter.Delete(e.Column);
-                    var xEinzigartig = new List<string>();
-                    var xNichtEinzigartig = new List<string>();
-                    GetUniques(e.Column, xEinzigartig, xNichtEinzigartig);
+                    e.Column.GetUniques(SortedRows(), out var xEinzigartig, out var xNichtEinzigartig);
 
                     if (xNichtEinzigartig.Count > 0)
                     {

@@ -2855,6 +2855,45 @@ namespace BlueDatabase
         }
 
 
+        public void GetUniques(List<RowItem> rows, out List<string> Einzigartig, out List<string> NichtEinzigartig)
+        {
+
+
+            Einzigartig = new List<string>();
+            NichtEinzigartig = new List<string>();
+
+            foreach (var ThisRow in rows)
+            {
+                List<string> TMP = null;
+                if (MultiLine)
+                {
+                    TMP = ThisRow.CellGetList(this);
+                }
+                else
+                {
+                    TMP = new List<string> { ThisRow.CellGetString(this) };
+                }
+
+                foreach (var ThisString in TMP)
+                {
+                    if (Einzigartig.Contains(ThisString))
+                    {
+                        NichtEinzigartig.AddIfNotExists(ThisString);
+                    }
+                    else
+                    {
+                        Einzigartig.AddIfNotExists(ThisString);
+                    }
+                }
+            }
+
+            Einzigartig.RemoveString(NichtEinzigartig, false);
+
+        }
+
+
+
+
         /// <summary>
         /// Füllt die Ersetzungen mittels eines übergebenen Enums aus.
         /// </summary>

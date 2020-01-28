@@ -543,9 +543,16 @@ namespace BlueBasics.MultiUserFile
 
 
             // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
-            Load_Reload();
 
-            if (ReloadNeeded()) { Develop.DebugPrint(enFehlerArt.Fehler, "Datei nicht korrekt geladen (nicht mehr aktuell)"); }
+            var count = 0;
+            do
+            {
+                Load_Reload();
+                count++;
+                if (count > 10) { Develop.DebugPrint(enFehlerArt.Fehler, "Datei nicht korrekt geladen (nicht mehr aktuell)"); }
+            } while (ReloadNeeded());
+
+
         }
 
         protected abstract bool IsFileAllowedToLoad(string fileName);
