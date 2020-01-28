@@ -85,39 +85,36 @@ namespace BluePaint
                 {
                     for (var y = 0; y < P.Height; y++)
                     {
-                        ziel = GetPixel(P, x, y);
-                        FillNetwork(P, x, y);
+                        ziel = FillNetwork(P, x, y);
                         Br.BackPropagationGradiant(ziel.ToString(), 1, true);
-
                     }
                 }
 
-
-
-
-
-
-
+                Br.Save(f);
             }
-
         }
 
-        private void FillNetwork(Bitmap p, int x, int y)
+        private int FillNetwork(Bitmap p, int x, int y)
         {
-
+            var Ziel = 0;
             for (var px = -2; px <= 2; px++)
             {
                 for (var py = -2; py <= 2; py++)
                 {
-                    if (px != 0 || py != 0)
+                    var C = GetPixel(p, x + px, y + py);
+
+                    if (px == 0 && py == 0)
+                    {
+                        Ziel = C;
+                    }
+                    else
                     {
                         var s = px.ToString() + "," + py.ToString();
-                        var C = GetPixel(p, x + px, y + py);
                         Br.InputLayer.SetValue(s, C);
-
                     }
                 }
             }
+            return Ziel;
         }
 
         private int GetPixel(Bitmap p, int x, int y)
@@ -138,7 +135,51 @@ namespace BluePaint
 
         private void btnAnwenden_Click(object sender, System.EventArgs e)
         {
-            OnForceUndoSaving();
+            //OnForceUndoSaving();
+
+            var P = OnNeedCurrentPic();
+
+            var NP = new Bitmap(P.Width, P.Height);
+
+
+
+
+            for (var x = 0; x < P.Width; x++)
+            {
+                for (var y = 0; y < P.Height; y++)
+                {
+                    FillNetwork(P, x, y);
+                    Br.Compute();
+
+
+                    switch (Br.OutputLayer.SoftMax())
+                    {
+                        case "0":
+                            NP.SetPixel(x, y, Color.Transparent);
+                            break;
+
+                        case "1":
+                            NP.SetPixel(x, y, Color.Black);
+                            break;
+
+                        case "2":
+                            NP.SetPixel(x, y, Color.Red);
+                            break;
+
+                    }
+
+
+
+
+
+                }
+            }
+
+            OnOverridePic(NP);
+
+
+
         }
+
     }
 }

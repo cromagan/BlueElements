@@ -583,11 +583,12 @@ namespace BlueBasics
                         var r = sourceRow[x * pixelSize + 2];
                         var a = sourceRow[x * pixelSize + 3];
 
-                        if (toReplace.R == r && toReplace.G == g && toReplace.B == b)
+                        if (toReplace.R == r && toReplace.G == g && toReplace.B == b && toReplace.A == a)
                         {
                             r = replacement.R;
                             g = replacement.G;
                             b = replacement.B;
+                            a = replacement.A;
                         }
 
                         targetRow[x * pixelSize + 0] = b;

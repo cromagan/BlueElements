@@ -92,9 +92,9 @@ namespace BluePaint
                 {
                     var cc = _Pic.GetPixel(e.Current.X, e.Current.Y);
 
-                    if (cc.ToArgb() == -1) { return; }
+                    if (cc.ToArgb() == 0) { return; }
 
-                    OnOverridePic(OriginalPic.ReplaceColor(cc, Color.White));
+                    OnOverridePic(OriginalPic.ReplaceColor(cc, Color.Transparent));
                     return;
                 }
 
