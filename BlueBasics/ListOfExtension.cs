@@ -300,6 +300,40 @@ namespace BlueBasics
 
 
 
+        public static List<string> TagGetAll(this ICollection<string> _String, string TagName)
+        {
+            var l = new List<string>();
+
+            if (_String == null) { return l; }
+
+            var uTagName = TagName.ToUpper();
+
+            foreach (var ThisString in _String)
+            {
+                if (ThisString.ToUpper().StartsWith(uTagName))
+                {
+                    if (ThisString.ToUpper().StartsWith(uTagName + ": "))
+                    {
+                        l.Add(ThisString.Substring(uTagName.Length + 2));
+                    }
+                    else
+                    {
+                        if (ThisString.ToUpper().StartsWith(uTagName + ":")) { l.Add(ThisString.Substring(uTagName.Length + 1)); }
+                    }
+
+                    if (ThisString.ToUpper().StartsWith(uTagName + " = "))
+                    {
+                        l.Add(ThisString.Substring(uTagName.Length + 3));
+                    }
+                    else
+                    {
+                        if (ThisString.ToUpper().StartsWith(uTagName + "=")) { l.Add(ThisString.Substring(uTagName.Length + 1)); }
+                    }
+                }
+            }
+            return l;
+        }
+
         public static string TagGet(this ICollection<string> _String, string TagName)
         {
 

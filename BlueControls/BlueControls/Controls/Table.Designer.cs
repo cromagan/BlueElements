@@ -70,7 +70,6 @@ namespace BlueControls.Controls
             // 
             // SliderX
             // 
-            this.SliderX.CausesValidation = false;
             this.SliderX.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.SliderX.Enabled = false;
             this.SliderX.Location = new Point(0, 414);
@@ -81,7 +80,6 @@ namespace BlueControls.Controls
             // 
             // SliderY
             // 
-            this.SliderY.CausesValidation = false;
             this.SliderY.Dock = System.Windows.Forms.DockStyle.Right;
             this.SliderY.Enabled = false;
             this.SliderY.Location = new Point(1107, 0);

@@ -493,7 +493,6 @@ namespace BlueControls.Controls
                 if (ViewItem != null && ViewItem.Column != null)
                 {
 
-                    lfdno += 1;
 
                     if (IsOnScreen(ViewItem, DisplayRectangleWOSlider))
                     {
@@ -501,6 +500,7 @@ namespace BlueControls.Controls
                         if ((col == enTableDrawColumn.NonPermament && ViewItem.ViewType != enViewType.PermanentColumn && (int)ViewItem.OrderTMP_Spalte_X1 + (int)ViewItem._TMP_DrawWidth > PermaX) ||
                             (col == enTableDrawColumn.Permament && ViewItem.ViewType == enViewType.PermanentColumn))
                         {
+                            lfdno += 1;
                             switch (type)
                             {
                                 case enTableDrawType.ColumnBackBody:
@@ -570,33 +570,35 @@ namespace BlueControls.Controls
                             }
                         }
 
+                        // Zeilenlinie Zeichnen
                         GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, y);
+                        // Zelleninhalt Zeichnen
                         Draw_CellTransparent(GR, ViewItem, CurrentRow, y, DisplayRectangleWOSlider, _Cell_Font);
                         Drawn = ToDraw;
                     }
                 }
                 else
                 {
+                    // Zeilenlinie Zeichnen
                     GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, y);
+                    // Zelleninhalt Zeichnen
                     Draw_CellTransparent(GR, ViewItem, CurrentRow, y, DisplayRectangleWOSlider, _Cell_Font);
                 }
 
 
                 if (lfdno == 1)
                 {
-                    // Zeilenlinien und Überschriften zeichnen
+                    // Überschrift zeichnen
                     if (!string.IsNullOrEmpty(CurrentRow.TMP_Chapter))
                     {
+                        var si = GR.MeasureString(CurrentRow.TMP_Chapter, _Chapter_Font.Font());
+                        GR.FillRectangle(new SolidBrush(Skin.Color_Back(enDesign.Table_And_Pad, enStates.Standard).SetAlpha(50)), 1, (int)CurrentRow.TMP_Y - RowCaptionSizeY, DisplayRectangleWOSlider.Width-2, RowCaptionSizeY);
+
+                        GR.FillRectangle(new SolidBrush(Skin.Color_Back(enDesign.Table_And_Pad, enStates.Standard).SetAlpha(200)), 1, (int)CurrentRow.TMP_Y - RowCaptionFontY, si.Width, si.Height);
                         GR.DrawString(CurrentRow.TMP_Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, (int)CurrentRow.TMP_Y - RowCaptionFontY);
+                        GR.DrawLine(Skin.Pen_LinieDick, 0, (int)CurrentRow.TMP_Y, DisplayRectangleWOSlider.Width, (int)CurrentRow.TMP_Y);
+
                     }
-
-
-                    //if (CurrentRow == View_RowLast())
-                    //{
-                    //    var y = (int)(CurrentRow.TMP_Y + CurrentRow.TMP_DrawHeight);
-                    //    GR.SmoothingMode = SmoothingMode.None;
-                    //    GR.DrawLine(Skin.Pen_LinieDünn, 0, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 1, y);
-                    //}
                 }
             }
 
@@ -783,7 +785,7 @@ namespace BlueControls.Controls
 
             if (OnlyCursorLines)
             {
-                var pen = new Pen(Skin.Color_Border(enDesign.Table_Cursor, stat).SetAlpha(80));
+                var pen = new Pen(Skin.Color_Border(enDesign.Table_Cursor, stat).SetAlpha(180));
                 GR.DrawRectangle(pen, new Rectangle(-1, tmpCursorRect.Top - 1, DisplayRectangleWOSlider.Width + 2, tmpCursorRect.Height + 1));
             }
             else
@@ -1965,11 +1967,11 @@ namespace BlueControls.Controls
 
                         if (string.IsNullOrEmpty(LastCap))
                         {
-                            ThisRow.TMP_Chapter = "*";
+                            ThisRow.TMP_Chapter = "- ohne " + _Database.Column.SysChapter.Caption + " -" ;
                         }
                         else
                         {
-                            ThisRow.TMP_Chapter = LastCap.Replace("\r\n", ", ");
+                            ThisRow.TMP_Chapter = LastCap.Replace("\r", ", ");
                         }
 
                     }

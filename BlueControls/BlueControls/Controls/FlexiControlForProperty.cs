@@ -1,5 +1,6 @@
 ﻿using BlueBasics;
 using BlueBasics.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
@@ -14,6 +15,8 @@ namespace BlueControls.Controls
 
     public class FlexiControlForProperty : FlexiControl
     {
+
+        object _LastParent = null;
 
         private PropertyInfo propInfo;
         private object _propertyObject;
@@ -433,6 +436,31 @@ namespace BlueControls.Controls
             base.OnHandleDestroyed(e);
         }
 
+
+
+
+        protected override void OnParentChanged(System.EventArgs e)
+        {
+            FillPropertyNow();
+            if (_LastParent is GroupBox gp) { gp.TextChanged -= Gp_TextChanged; }
+
+
+            base.OnParentChanged(e);
+
+            _LastParent = Parent;
+
+            if (_LastParent is GroupBox gp2) { gp2.TextChanged += Gp_TextChanged; }
+
+
+        }
+
+        private void Gp_TextChanged(object sender, System.EventArgs e)
+        {
+            GetTmpVariables();
+            UpdateControlData();
+            SetValueFromProperty();
+            CheckEnabledState();
+        }
     }
 }
 

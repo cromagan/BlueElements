@@ -188,7 +188,7 @@ namespace BlueBasics.MultiUserFile
                         break;
                     }
 
-                    Develop.DebugPrint(enFehlerArt.Info, f);
+                    Develop.DebugPrint(enFehlerArt.Info, f + "\r\n" + Filename);
                     Pause(0.5, false);
 
                     //if (EasyMode) { break; }
@@ -664,7 +664,7 @@ namespace BlueBasics.MultiUserFile
 
             while (HasPendingChanges())
             {
-                var f = Save(true);
+                var f = Save();
 
                 if (DateTime.UtcNow.Subtract(D).TotalSeconds > MaxWaitSeconds)
                 {
@@ -687,25 +687,36 @@ namespace BlueBasics.MultiUserFile
             return true;
         }
 
-        private string Save(bool instantan)
+        /// <summary>
+        /// Speichert die Daten - wenn möglich - sofort ab.
+        /// </summary>
+        /// <returns></returns>
+        private string Save()
         {
             if (ReadOnly) { return "Datei ist schreibgeschützt"; }
             Load_Reload();
 
-            if (instantan)
-            {
-                var Data = WriteTempFileToDisk(); // Dateiname, Stand der Originaldatei, was gespeichert wurde
 
-                if (Data == null) { return "Datenpaket konnte nicht erstellt werden."; }
-
-                return SaveRoutine(Data.Item1, Data.Item2, Data.Item3);
-            }
-            else
+            while (PureBinSaver.IsBusy)
             {
-                if (!PureBinSaver.IsBusy) { PureBinSaver.RunWorkerAsync(); }
+                Develop.DoEvents();
+                Develop.DebugPrint(enFehlerArt.Warnung, "Informatioszwecke. Bei Datei: " + Filename);
+                if (!HasPendingChanges()) { return "Speichern nicht mehr nötig."; }
             }
 
-            return "Speicherprozess nur angestoßen.";
+            //if (instantan)
+            //{
+            var Data = WriteTempFileToDisk(); // Dateiname, Stand der Originaldatei, was gespeichert wurde
+
+            if (Data == null) { return "Datenpaket konnte nicht erstellt werden."; }
+            return SaveRoutine(Data.Item1, Data.Item2, Data.Item3);
+            //}
+            //else
+            //{
+            //    if (!PureBinSaver.IsBusy) { PureBinSaver.RunWorkerAsync(); }
+            //}
+
+            //return "Speicherprozess nur angestoßen.";
         }
 
         /// <summary>
@@ -752,7 +763,7 @@ namespace BlueBasics.MultiUserFile
                     count += 1;
                     if (count > 30)
                     {
-                        Develop.DebugPrint(enFehlerArt.Warnung, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + ex.Message);
+                        Develop.DebugPrint(enFehlerArt.Warnung, "Speichern der TMP-Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + ex.Message);
                         return null;
                     }
                     Pause(0.5, true);
