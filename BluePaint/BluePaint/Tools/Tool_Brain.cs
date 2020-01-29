@@ -33,6 +33,7 @@ namespace BluePaint
     {
 
         int Schwelle = 120;
+        int r = 6;
 
         BlueBrain.FullyConnectedNetwork Br = null;
 
@@ -53,20 +54,40 @@ namespace BluePaint
             else
             {
 
-                var inp = new ListExt<string> {  "-2,-2", "-1,-2", "0,-2", "1,-2", "2,-2",
-                                        "-2,-1", "-1,-1", "0,-1", "1,-1", "2,-1",
-                                        "-2,0", "-1,0",  "1,0", "2,0",
-                                        "-2,1", "-1,1", "0,1", "1,1", "2,1",
-                                        "-2,2", "-1,2", "0,2", "1,2", "2,2"};
-                var outp = new ListExt<string> { "0", "1", "2" }; // Transparent, Black, Color
+                var inp = new ListExt<string>();
+                var oup = new ListExt<string>();
+                for (var px = -r; px <= r; px++)
+                {
+                    for (var py = -r; py <= r; py++)
+                    {
 
-                Br = new BlueBrain.FullyConnectedNetwork(inp, outp, 25);
+                        if (InRange(px, py))
+                        {
+                            inp.Add(px.ToString() + ";" + py.ToString());
+                            oup.Add(px.ToString() + ";" + py.ToString());
+                        }
+
+                    }
+                }
+
+                oup.Add("black");
+                oup.Add("transparent");
+                //oup.Add("original");
+
+                Br = new BlueBrain.FullyConnectedNetwork(inp, oup, r * r * 4);
                 Br.Save(f);
             }
 
 
 
 
+        }
+
+
+        private bool InRange(int x, int y)
+        {
+            var isr = Math.Sqrt(x * x + y * y);
+            return (isr <= r);
         }
 
         private void Learn()
@@ -92,24 +113,42 @@ namespace BluePaint
                     {
                         for (var y = 0; y < P.Height; y++)
                         {
-                            FillNetwork(P, x, y);
+                            var OnlyColored = FillNetwork(P, x, y);
 
                             var c = PR.GetPixel(x, y);
 
 
-                            var z = "0";
-                            if (c.R == 0 && c.A > 200) { z = "1"; }
-                            if (c.R == 255) { z = "2"; }
-
-
-                            Br.Compute();
-
-                            //if (Br.OutputLayer.SoftMax() != z)
-                            //{
-                            Br.BackPropagationGradiant(z, 1, false);
-                            //}
-
-
+                            if (OnlyColored)
+                            {
+                                Br.BackPropagationGradiant("0;0", 0.1, true); // = Original-Farbe
+                            }
+                            else if (c.R == 0 && c.A > 200)
+                            {
+                                Br.BackPropagationGradiant("black", 0.1, true);
+                            }
+                            else if (c.A < 20)
+                            {
+                                Br.BackPropagationGradiant("transparent", 0.1, true);
+                            }
+                            else
+                            {
+                                for (var px = -r; px <= r; px++)
+                                {
+                                    for (var py = -r; py <= r; py++)
+                                    {
+                                        if (InRange(px, py))
+                                        {
+                                            var CV = GetPixelColor(P, x + px, y + py);
+                                            var CO = GetPixelColor(PR, x + px, y + py);
+                                            if (CV.ToArgb() == CO.ToArgb())
+                                            {
+                                                var s = px.ToString() + ";" + py.ToString();
+                                                Br.BackPropagationGradiant(s, 0.1, true);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -130,21 +169,25 @@ namespace BluePaint
             }
         }
 
-        private void FillNetwork(Bitmap p, int x, int y)
+        private bool FillNetwork(Bitmap p, int x, int y)
         {
-            for (var px = -2; px <= 2; px++)
-            {
-                for (var py = -2; py <= 2; py++)
-                {
-                    var C = GetPixel(p, x + px, y + py);
+            var OnlyColoredArea = true;
 
-                    if (px != 0 || py != 0)
+            for (var px = -r; px <= r; px++)
+            {
+                for (var py = -r; py <= r; py++)
+                {
+                    if (InRange(px, py))
                     {
-                        var s = px.ToString() + "," + py.ToString();
+                        var C = GetPixel(p, x + px, y + py);
+                        var s = px.ToString() + ";" + py.ToString();
                         Br.InputLayer.SetValue(s, C);
+                        if (C >= 0) { OnlyColoredArea = false; }
                     }
                 }
             }
+
+            return OnlyColoredArea;
         }
 
         private float GetPixel(Bitmap p, int x, int y)
@@ -184,19 +227,21 @@ namespace BluePaint
 
                     switch (Br.OutputLayer.SoftMax())
                     {
-                        case "0":
+                        case "transparent":
                             NP.SetPixel(x, y, Color.Transparent);
                             break;
 
-                        case "1":
+                        case "black":
                             NP.SetPixel(x, y, Color.Black);
                             break;
 
-                        case "2":
-                            var c = GetBestColor(P, x, y, true);
+                        default:
+                            var l = Br.OutputLayer.SoftMax().SplitBy(";");
+
+                            var c = GetPixelColor(P, x + int.Parse(l[0]), y + int.Parse(l[1]));
 
 
-                            NP.SetPixel(x, y, c);
+                            NP.SetPixel(x, y, Color.Red);
                             break;
 
                     }
@@ -220,64 +265,14 @@ namespace BluePaint
 
             if (x < 0 || y < 0 || x >= p.Width || y >= p.Height) { return Color.Transparent; }
 
-           return p.GetPixel(x, y);
+            return p.GetPixel(x, y);
 
 
 
         }
 
 
-        private Color GetBestColor(Bitmap p, int x, int y, bool weiter)
-        {
 
-            //var c = p.GetPixel(x, y);
-
-
-            //for (var px = -5; px <= 5; px++)
-            //{
-            //    for (var py = -5; py <= 5; py++)
-            //    {
-            //        var cn = GetPixelColor(p, x + px, y + py);
-            //        if (cn.GetSaturation() > c.GetSaturation()) { c = cn; }
-            //    }
-            //}
-
-            return Color.White;
-
-
-            //var c = p.GetPixel(x, y);
-
-            //var br = c.GetBrightness() * 255;
-            ////var st = c.GetSaturation() * 255;  // Weiße Flächen haben keine Sättigung....
-
-
-            //if (br > 50 && c.A > 230) { return c; }
-
-            //if (weiter)
-            //{
-
-            //    var c2 = GetBestColor(p, x, y - 1, false);
-            //    if (c2.ToArgb() != 0) { return c2; }
-
-            //    var c3 = GetBestColor(p, x, y + 1, false);
-            //    if (c3.ToArgb() != 0) { return c3; }
-
-
-            //    var c4 = GetBestColor(p, x + 1, y, false);
-            //    if (c4.ToArgb() != 0) { return c4; }
-
-
-            //    var c5 = GetBestColor(p, x + 1, y, false);
-            //    if (c5.ToArgb() != 0) { return c5; }
-
-
-            //    return Color.Magenta;
-            //}
-
-
-
-            return Color.FromArgb(0, 0, 0, 0);
-        }
 
         private void btnLernmaske_Click(object sender, System.EventArgs e)
         {
