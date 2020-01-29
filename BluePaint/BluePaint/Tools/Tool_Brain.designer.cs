@@ -5,7 +5,7 @@ namespace BluePaint
 {
 
 
-    public partial class Tool_Brain : GenericTool
+    public partial class Tool_Brain 
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [System.Diagnostics.DebuggerNonUserCode()]
@@ -35,6 +35,7 @@ namespace BluePaint
             this.btnLernen = new BlueControls.Controls.Button();
             this.btnAnwenden = new BlueControls.Controls.Button();
             this.txtPath = new BlueControls.Controls.TextBox();
+            this.btnLernmaske = new BlueControls.Controls.Button();
             this.SuspendLayout();
             // 
             // btnLernen
@@ -48,7 +49,7 @@ namespace BluePaint
             // 
             // btnAnwenden
             // 
-            this.btnAnwenden.Location = new System.Drawing.Point(32, 144);
+            this.btnAnwenden.Location = new System.Drawing.Point(24, 136);
             this.btnAnwenden.Name = "btnAnwenden";
             this.btnAnwenden.Size = new System.Drawing.Size(216, 40);
             this.btnAnwenden.TabIndex = 1;
@@ -58,14 +59,24 @@ namespace BluePaint
             // txtPath
             // 
             this.txtPath.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtPath.Location = new System.Drawing.Point(16, 232);
+            this.txtPath.Location = new System.Drawing.Point(24, 56);
             this.txtPath.Name = "txtPath";
             this.txtPath.Size = new System.Drawing.Size(352, 24);
             this.txtPath.TabIndex = 2;
             this.txtPath.Text = "C:\\Users\\cp33\\OneDrive\\Desktop\\Learn\\";
             // 
+            // btnLernmaske
+            // 
+            this.btnLernmaske.Location = new System.Drawing.Point(24, 224);
+            this.btnLernmaske.Name = "btnLernmaske";
+            this.btnLernmaske.Size = new System.Drawing.Size(216, 40);
+            this.btnLernmaske.TabIndex = 3;
+            this.btnLernmaske.Text = "Lernmaske anzeigen";
+            this.btnLernmaske.Click += new System.EventHandler(this.btnLernmaske_Click);
+            // 
             // Tool_Brain
             // 
+            this.Controls.Add(this.btnLernmaske);
             this.Controls.Add(this.txtPath);
             this.Controls.Add(this.btnAnwenden);
             this.Controls.Add(this.btnLernen);
@@ -78,6 +89,7 @@ namespace BluePaint
         private Button btnLernen;
         private Button btnAnwenden;
         private TextBox txtPath;
+        private Button btnLernmaske;
     }
 
 }

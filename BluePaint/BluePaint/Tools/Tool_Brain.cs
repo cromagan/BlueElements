@@ -29,8 +29,10 @@ using System;
 
 namespace BluePaint
 {
-    public partial class Tool_Brain
+    public partial class Tool_Brain : GenericTool //  System.Windows.Forms.UserControl //  
     {
+
+        int Schwelle = 120;
 
         BlueBrain.FullyConnectedNetwork Br = null;
 
@@ -67,7 +69,7 @@ namespace BluePaint
 
         }
 
-        private void btnLernen_Click(object sender, System.EventArgs e)
+        private void Learn()
         {
             OnForceUndoSaving();
 
@@ -104,7 +106,7 @@ namespace BluePaint
 
                             //if (Br.OutputLayer.SoftMax() != z)
                             //{
-                                Br.BackPropagationGradiant(z, 1, false);
+                            Br.BackPropagationGradiant(z, 1, false);
                             //}
 
 
@@ -114,6 +116,17 @@ namespace BluePaint
                     Br.Save(f);
                 }
 
+            }
+        }
+
+        private void btnLernen_Click(object sender, System.EventArgs e)
+        {
+            for (var z = 0; z < 100; z++)
+            {
+
+                Learn();
+                btnAnwenden_Click(null, null);
+                Develop.DoEvents();
             }
         }
 
@@ -144,7 +157,7 @@ namespace BluePaint
             var br = c.GetBrightness() * 255;
             var st = c.GetSaturation() * 255;  // Weiße Flächen haben keine Sättigung....
 
-            if (br < 40 && st < 40 ) {return ((float)c.A/255); }
+            if (br < Schwelle && st < Schwelle) { return ((float)c.A / 255); }
 
             return -1;
 
@@ -180,7 +193,10 @@ namespace BluePaint
                             break;
 
                         case "2":
-                            NP.SetPixel(x, y, Color.Red);
+                            var c = GetBestColor(P, x, y, true);
+
+
+                            NP.SetPixel(x, y, c);
                             break;
 
                     }
@@ -198,5 +214,108 @@ namespace BluePaint
 
         }
 
+
+        private Color GetPixelColor(Bitmap p, int x, int y)
+        {
+
+            if (x < 0 || y < 0 || x >= p.Width || y >= p.Height) { return Color.Transparent; }
+
+           return p.GetPixel(x, y);
+
+
+
+        }
+
+
+        private Color GetBestColor(Bitmap p, int x, int y, bool weiter)
+        {
+
+            //var c = p.GetPixel(x, y);
+
+
+            //for (var px = -5; px <= 5; px++)
+            //{
+            //    for (var py = -5; py <= 5; py++)
+            //    {
+            //        var cn = GetPixelColor(p, x + px, y + py);
+            //        if (cn.GetSaturation() > c.GetSaturation()) { c = cn; }
+            //    }
+            //}
+
+            return Color.White;
+
+
+            //var c = p.GetPixel(x, y);
+
+            //var br = c.GetBrightness() * 255;
+            ////var st = c.GetSaturation() * 255;  // Weiße Flächen haben keine Sättigung....
+
+
+            //if (br > 50 && c.A > 230) { return c; }
+
+            //if (weiter)
+            //{
+
+            //    var c2 = GetBestColor(p, x, y - 1, false);
+            //    if (c2.ToArgb() != 0) { return c2; }
+
+            //    var c3 = GetBestColor(p, x, y + 1, false);
+            //    if (c3.ToArgb() != 0) { return c3; }
+
+
+            //    var c4 = GetBestColor(p, x + 1, y, false);
+            //    if (c4.ToArgb() != 0) { return c4; }
+
+
+            //    var c5 = GetBestColor(p, x + 1, y, false);
+            //    if (c5.ToArgb() != 0) { return c5; }
+
+
+            //    return Color.Magenta;
+            //}
+
+
+
+            return Color.FromArgb(0, 0, 0, 0);
+        }
+
+        private void btnLernmaske_Click(object sender, System.EventArgs e)
+        {
+
+
+
+            //OnForceUndoSaving();
+
+            var P = OnNeedCurrentPic();
+
+            var NP = new Bitmap(P.Width, P.Height);
+
+
+
+
+            for (var x = 0; x < P.Width; x++)
+            {
+                for (var y = 0; y < P.Height; y++)
+                {
+                    var p = GetPixel(P, x, y);
+
+                    if (p < 0)
+                    {
+                        NP.SetPixel(x, y, Color.Red);
+                    }
+                    else
+                    {
+                        var b = 255 - (int)(p * 255f);
+                        NP.SetPixel(x, y, Color.FromArgb(b, b, b));
+                    }
+
+
+
+                }
+            }
+
+            OnOverridePic(NP);
+
+        }
     }
 }
