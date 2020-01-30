@@ -33,7 +33,8 @@ namespace BluePaint
     {
 
         int Schwelle = 120;
-        int r = 6;
+        int r = 7;
+        int rk = 1;
 
         BlueBrain.FullyConnectedNetwork Br = null;
 
@@ -61,20 +62,23 @@ namespace BluePaint
                     for (var py = -r; py <= r; py++)
                     {
 
-                        if (InRange(px, py))
-                        {
-                            inp.Add(px.ToString() + ";" + py.ToString());
-                            oup.Add(px.ToString() + ";" + py.ToString());
-                        }
-
+                        if (InRange(r, px, py)) { inp.Add(px.ToString() + ";" + py.ToString()); }
+                        if (InRange(rk, px, py)) { oup.Add(px.ToString() + ";" + py.ToString()); }
                     }
                 }
+
+
+
+
+
+
+
 
                 oup.Add("black");
                 oup.Add("transparent");
                 //oup.Add("original");
 
-                Br = new BlueBrain.FullyConnectedNetwork(inp, oup, r * r * 4);
+                Br = new BlueBrain.FullyConnectedNetwork(inp, oup, (int)(inp.Count * 1.2));
                 Br.Save(f);
             }
 
@@ -84,10 +88,10 @@ namespace BluePaint
         }
 
 
-        private bool InRange(int x, int y)
+        private bool InRange(int rad, int x, int y)
         {
             var isr = Math.Sqrt(x * x + y * y);
-            return (isr <= r);
+            return (isr <= rad);
         }
 
         private void Learn()
@@ -108,6 +112,7 @@ namespace BluePaint
                     var P = (Bitmap)Image_FromFile(thisf);
                     var PR = (Bitmap)Image_FromFile(thisf.Trim(".png") + "-ready.png");
                     OnOverridePic(P);
+                    Develop.DoEvents();
 
                     for (var x = 0; x < P.Width; x++)
                     {
@@ -117,34 +122,39 @@ namespace BluePaint
 
                             var c = PR.GetPixel(x, y);
 
+                            Br.Compute();
+
 
                             if (OnlyColored)
                             {
-                                Br.BackPropagationGradiant("0;0", 0.1, true); // = Original-Farbe
+                                if (Br.OutputLayer.SoftMax() != "0;0") { Br.BackPropagationGradiant("0;0", 0.5, true); } // = Original-Farbe
                             }
                             else if (c.R == 0 && c.A > 200)
                             {
-                                Br.BackPropagationGradiant("black", 0.1, true);
+                                if (Br.OutputLayer.SoftMax() != "black") { Br.BackPropagationGradiant("black", 0.5, true); }
                             }
                             else if (c.A < 20)
                             {
-                                Br.BackPropagationGradiant("transparent", 0.1, true);
+                                if (Br.OutputLayer.SoftMax() != "transparent") { Br.BackPropagationGradiant("transparent", 0.5, true); }
                             }
                             else
                             {
-                                for (var px = -r; px <= r; px++)
+                                var rad = 1000d;
+                                var cod = string.Empty;
+
+                                for (var px = -rk; px <= rk; px++)
                                 {
-                                    for (var py = -r; py <= r; py++)
+                                    for (var py = -rk; py <= rk; py++)
                                     {
-                                        if (InRange(px, py))
+                                        var isr = Math.Sqrt(x * x + y * y);
+                                        if (isr < rk && isr < rad && isr >=1)
                                         {
-                                            var CV = GetPixelColor(P, x + px, y + py);
-                                            var CO = GetPixelColor(PR, x + px, y + py);
-                                            if (CV.ToArgb() == CO.ToArgb())
-                                            {
-                                                var s = px.ToString() + ";" + py.ToString();
-                                                Br.BackPropagationGradiant(s, 0.1, true);
-                                            }
+                                            rad = isr;
+                                            cod = px.ToString() + ";" + py.ToString();
+                                        }
+                                        if (!string.IsNullOrEmpty(cod))
+                                        {
+                                            if (Br.OutputLayer.SoftMax() != cod) { Br.BackPropagationGradiant(cod, 0.5, true); }
                                         }
                                     }
                                 }
@@ -160,13 +170,13 @@ namespace BluePaint
 
         private void btnLernen_Click(object sender, System.EventArgs e)
         {
-            for (var z = 0; z < 100; z++)
-            {
+            //for (var z = 0; z < 100; z++)
+            //{
 
                 Learn();
-                btnAnwenden_Click(null, null);
-                Develop.DoEvents();
-            }
+            //    btnAnwenden_Click(null, null);
+            //    Develop.DoEvents();
+            //}
         }
 
         private bool FillNetwork(Bitmap p, int x, int y)
@@ -177,7 +187,7 @@ namespace BluePaint
             {
                 for (var py = -r; py <= r; py++)
                 {
-                    if (InRange(px, py))
+                    if (InRange(r, px, py))
                     {
                         var C = GetPixel(p, x + px, y + py);
                         var s = px.ToString() + ";" + py.ToString();
@@ -199,6 +209,8 @@ namespace BluePaint
 
             var br = c.GetBrightness() * 255;
             var st = c.GetSaturation() * 255;  // Weiße Flächen haben keine Sättigung....
+
+            if (c.R < 20 && c.G < 20 && c.B < 20) { st = 0; }
 
             if (br < Schwelle && st < Schwelle) { return ((float)c.A / 255); }
 
@@ -241,7 +253,7 @@ namespace BluePaint
                             var c = GetPixelColor(P, x + int.Parse(l[0]), y + int.Parse(l[1]));
 
 
-                            NP.SetPixel(x, y, Color.Red);
+                            NP.SetPixel(x, y, c);
                             break;
 
                     }
