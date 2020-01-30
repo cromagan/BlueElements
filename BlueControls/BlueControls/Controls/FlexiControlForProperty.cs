@@ -460,6 +460,8 @@ namespace BlueControls.Controls
             UpdateControlData();
             SetValueFromProperty();
             CheckEnabledState();
+
+            OnValueChanged(); // Wichig, dass Fehler-Dreiecke angezeigt werden können
         }
     }
 }
