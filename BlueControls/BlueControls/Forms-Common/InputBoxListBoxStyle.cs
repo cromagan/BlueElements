@@ -30,16 +30,16 @@ namespace BlueControls.Forms
 
         List<string> GiveBack = null;
 
-        private InputBoxListBoxStyle()
+        #region Konstruktor
+
+
+        private InputBoxListBoxStyle() : base()
         {
             InitializeComponent();
         }
 
-        private InputBoxListBoxStyle(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl)
+        private InputBoxListBoxStyle(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl) : this()
         {
-            InitializeComponent();
-
-
             if (ItemsOriginal.Appearance != enBlueListBoxAppearance.Listbox)
             {
                 Develop.DebugPrint("Design nicht Listbox");
@@ -62,6 +62,8 @@ namespace BlueControls.Forms
 
         }
 
+        #endregion
+
         public static string Show(string TXT, List<string> Items)
         {
 
@@ -76,7 +78,7 @@ namespace BlueControls.Forms
             x.AddRange(Items);
             x.Sort();
 
-            var erg = Show(TXT, x , enAddType.None, true);
+            var erg = Show(TXT, x, enAddType.None, true);
 
 
             if (erg is null || erg.Count != 1) { return string.Empty; }
@@ -86,8 +88,7 @@ namespace BlueControls.Forms
 
         public static List<string> Show(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl)
         {
-
-           var MB = new InputBoxListBoxStyle(TXT, ItemsOriginal, AddNewAllowed, CancelErl);
+            var MB = new InputBoxListBoxStyle(TXT, ItemsOriginal, AddNewAllowed, CancelErl);
             MB.ShowDialog();
 
             return MB.GiveBack;
@@ -102,15 +103,15 @@ namespace BlueControls.Forms
             txbText.Focus();
         }
 
-        protected override void SetValue()
+        protected override void SetValue(bool canceled)
         {
-            if (CancelPressed)
+            if (canceled)
             {
                 GiveBack = null;
             }
             else
             {
-                GiveBack = txbText.Item.Checked().ToListOfString(); 
+                GiveBack = txbText.Item.Checked().ToListOfString();
             }
         }
     }

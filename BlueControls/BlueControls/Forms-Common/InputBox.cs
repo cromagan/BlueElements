@@ -7,14 +7,15 @@ namespace BlueControls.Forms
 
         string GiveBack = string.Empty;
 
-        private InputBox()
+        #region Konstruktor
+
+        private InputBox() : base()
         {
             InitializeComponent();
         }
 
-        private InputBox(string TXT, string VorschlagsText, enDataFormat Textformat, bool BigMultiLineBox)
+        private InputBox(string TXT, string VorschlagsText, enDataFormat Textformat, bool BigMultiLineBox) :this()
         {
-            InitializeComponent();
 
             txbText.Text = VorschlagsText;
             txbText.Format = Textformat;
@@ -25,6 +26,9 @@ namespace BlueControls.Forms
 
             GiveBack = VorschlagsText;
         }
+
+
+        #endregion
 
         public static string Show(string TXT)
         {
@@ -61,9 +65,9 @@ namespace BlueControls.Forms
             txbText.Focus();
         }
 
-        protected override void SetValue()
+        protected override void SetValue(bool canceled)
         {
-            if (CancelPressed)
+            if (canceled)
             {
                 GiveBack = string.Empty;
             }

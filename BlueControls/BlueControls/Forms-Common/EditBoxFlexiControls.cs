@@ -8,7 +8,11 @@ namespace BlueControls.Forms
     public partial class EditBoxFlexiControl : Forms.DialogWithOkAndCancel
     {
 
-        private EditBoxFlexiControl()
+        List<string> GiveBack = null;
+
+
+        #region Konstruktor
+        private EditBoxFlexiControl() : base()
         {
             InitializeComponent();
         }
@@ -43,44 +47,40 @@ namespace BlueControls.Forms
             Setup(we, top, true, false);
         }
 
+        #endregion
+
+
 
         public static List<string> Show(List<FlexiControl> Flexis)
         {
             var MB = new EditBoxFlexiControl(Flexis);
             MB.ShowDialog();
-
-
-            var l = new List<string>();
-
-
-            if (!MB.CancelPressed)
-            {
-                foreach (var ThisFlexi in Flexis)
-                {
-                    if (!string.IsNullOrEmpty(ThisFlexi.ValueId))
-                    {
-                        l.TagSet(ThisFlexi.ValueId, ThisFlexi.Value.ToNonCritical());
-                    }
-                }
-
-            }
-
-            return l;
-
-
-
-
-
+            return MB.GiveBack;
         }
 
 
 
 
 
-        protected override void SetValue()
+        protected override void SetValue(bool canceled)
         {
-            // Ausnahme: Wird in Show-Dialog abgehandelt
+            GiveBack = new List<string>();
 
+            if (!canceled)
+            {
+                foreach (var thisObj in Controls)
+                {
+
+                    if (thisObj is FlexiControl ThisFlexi)
+                    {
+
+                        if (!string.IsNullOrEmpty(ThisFlexi.ValueId))
+                        {
+                            GiveBack.TagSet(ThisFlexi.ValueId, ThisFlexi.Value.ToNonCritical());
+                        }
+                    }
+                }
+            }
         }
 
         private void FlexiButtonClick(object sender, System.EventArgs e)

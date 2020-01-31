@@ -89,7 +89,7 @@ namespace BlueControls.Forms
 
 
         #endregion
-        protected Controls.Button butOK;
+        private Controls.Button butOK;
         private Controls.Button butAbbrechen;
         private Controls.Caption capText;
     }

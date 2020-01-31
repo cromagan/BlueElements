@@ -5,16 +5,16 @@ using static BlueBasics.Develop;
 
 namespace BlueControls.Forms
 {
-    public partial class DialogWithOkAndCancel : Forms.Form
+    public partial class DialogWithOkAndCancel : BlueControls.Forms.Form
     {
 
 
 
 
-        protected bool CancelPressed = false;
+        #region Konstruktor
 
 
-        public DialogWithOkAndCancel()
+        public DialogWithOkAndCancel() : base()
         {
             InitializeComponent();
             SetTopLevel(true);
@@ -27,6 +27,7 @@ namespace BlueControls.Forms
 
         }
 
+        #endregion
 
         public void Setup(int MinWidth, int BottomOfLowestControl, bool CancelPossible, bool Sizeable)
         {
@@ -100,22 +101,23 @@ namespace BlueControls.Forms
         }
 
 
-        protected virtual void SetValue()
+        /// <summary>
+        /// Diese Routine wird aufgerufen, nachdem OK oder Cancel gedrückt wurde.
+        /// </summary>
+        protected virtual void SetValue(bool canceled)
         {
             DebugPrint_RoutineMussUeberschriebenWerden();
         }
 
         protected void Ok()
         {
-            CancelPressed = false;
-            SetValue();
+            SetValue(false);
             Close();
         }
 
         protected void Cancel()
         {
-            CancelPressed = true;
-            SetValue();
+            SetValue(true);
             Close();
         }
 
@@ -123,7 +125,17 @@ namespace BlueControls.Forms
         {
             Cancel();
         }
-
+        protected bool OK_Enabled
+        {
+            get
+            {
+                return butOK.Enabled;
+            }
+            set
+            {
+                butOK.Enabled = value;
+            }
+        }
         private void butOK_Click(object sender, System.EventArgs e)
         {
             Ok();

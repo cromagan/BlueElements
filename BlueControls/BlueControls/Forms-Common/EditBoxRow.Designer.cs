@@ -33,11 +33,6 @@ namespace BlueControls.Forms
             this.formToEdit = new BlueControls.Controls.Formula();
             this.SuspendLayout();
             // 
-            // butOK
-            // 
-            this.butOK.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
-            this.butOK.Location = new System.Drawing.Point(72, 213);
-            // 
             // formToEdit
             // 
             this.formToEdit.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -53,7 +48,6 @@ namespace BlueControls.Forms
             this.ClientSize = new System.Drawing.Size(612, 663);
             this.Controls.Add(this.formToEdit);
             this.Name = "EditBoxRow";
-            this.Controls.SetChildIndex(this.butOK, 0);
             this.Controls.SetChildIndex(this.formToEdit, 0);
             this.ResumeLayout(false);
 

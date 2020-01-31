@@ -34,10 +34,6 @@ namespace BlueControls.Forms
             this.txbText = new BlueControls.Controls.ListBox();
             this.SuspendLayout();
             // 
-            // butOK
-            // 
-            this.butOK.Location = new System.Drawing.Point(72, 211);
-            // 
             // txbText
             // 
             this.txbText.AddAllowed = enAddType.Text;
@@ -56,7 +52,6 @@ namespace BlueControls.Forms
             this.Controls.Add(this.txbText);
             this.Name = "InputBoxListBoxStyle";
             this.Shown += new System.EventHandler(this.InputBox_Shown);
-            this.Controls.SetChildIndex(this.butOK, 0);
             this.Controls.SetChildIndex(this.txbText, 0);
             this.ResumeLayout(false);
 

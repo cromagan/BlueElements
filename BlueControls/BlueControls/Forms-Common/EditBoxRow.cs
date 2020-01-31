@@ -5,21 +5,20 @@ namespace BlueControls.Forms
     public partial class EditBoxRow : Forms.DialogWithOkAndCancel
     {
 
-
-        private EditBoxRow()
+        #region Konstruktor
+        private EditBoxRow() : base()
         {
             InitializeComponent();
         }
 
-        private EditBoxRow(string TXT, RowItem row)
+        private EditBoxRow(string TXT, RowItem row) : this()
         {
-            InitializeComponent();
             formToEdit.Database = row.Database;
-
             formToEdit.ShowingRowKey = row.Key;
             Setup(TXT, formToEdit, formToEdit.MinimumSize.Width + 50, false, true);
         }
 
+        #endregion
 
         public static void Show(string TXT, RowItem row, bool IsDialog)
         {
@@ -39,7 +38,7 @@ namespace BlueControls.Forms
 
 
 
-        protected override void SetValue()
+        protected override void SetValue(bool canceled)
         {
             // Nix zu tun
         }

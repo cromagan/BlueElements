@@ -28,15 +28,17 @@ namespace BlueControls.Forms
 
         string GiveBack = string.Empty;
 
-        private InputBoxComboStyle()
+
+        #region Konstruktor
+
+
+        private InputBoxComboStyle() : base()
         {
             InitializeComponent();
         }
 
-        private InputBoxComboStyle(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt)
+        private InputBoxComboStyle(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt) : this()
         {
-            InitializeComponent();
-
             cbxText.Text = VorschlagsText;
 
             var SuggestClone = (ItemCollectionList)SuggestOriginal.Clone();
@@ -60,6 +62,8 @@ namespace BlueControls.Forms
             GiveBack = VorschlagsText;
         }
 
+
+        #endregion
 
         public static string Show(string TXT, ItemCollectionList Suggest,bool TexteingabeErlaubt)
         {
@@ -106,9 +110,9 @@ namespace BlueControls.Forms
             cbxText.Focus();
         }
 
-        protected override void SetValue()
+        protected override void SetValue(bool canceled)
         {
-            if (CancelPressed)
+            if (canceled)
             {
                 GiveBack = string.Empty;
             }

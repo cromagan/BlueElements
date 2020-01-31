@@ -38,7 +38,7 @@ namespace BluePaint
 
 
 
-        public MainWindow() : this(true)
+        private MainWindow() : this(true)
         {
 
         }
@@ -49,6 +49,8 @@ namespace BluePaint
 
             Tab_Start.Enabled = LoadSaveEnabled;
             btnOK.Visible = !LoadSaveEnabled;
+            tabRibbonbar.SelectedIndex = 1;
+
         }
 
 
