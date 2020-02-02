@@ -17,23 +17,18 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using BluePaint.EventArgs;
-using BlueControls;
-using System.Drawing;
 using BlueBasics;
-using static BlueBasics.modAllgemein;
-using static BlueBasics.FileOperations;
-using System.IO;
-using System;
-using System.Windows.Forms;
 using Encog.Engine.Network.Activation;
+using Encog.ML.Data.Basic;
 using Encog.Neural.Networks;
 using Encog.Neural.Networks.Layers;
-using Encog.Neural.Networks.Training;
 using Encog.Neural.Networks.Training.Propagation.Back;
-using Encog.ML.Data;
-using Encog.ML.Data.Basic;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using static BlueBasics.FileOperations;
+using static BlueBasics.modAllgemein;
 
 namespace BluePaint
 {
@@ -49,7 +44,7 @@ namespace BluePaint
     {
 
         int Schwelle = 120;
-        int r = 8;
+        int r = 3;
         //int rk = 1;
 
         Bitmap testI = null;
@@ -123,6 +118,8 @@ namespace BluePaint
             var All = Directory.GetFiles(txtPath.Text, "*.png", SearchOption.TopDirectoryOnly);
 
             var allreadyUsed = new List<string>();
+            var allreadyUsedInputs = new List<string>();
+
 
 
             foreach (var thisf in All)
@@ -142,20 +139,25 @@ namespace BluePaint
                     {
                         for (var y = 0; y < P.Height; y++)
                         {
+
+
                             var colorsinput = OneSet(P, x, y);
                             var colorsoutput = GetOutPixel(PR, x, y);
-                            var colorsstring = ToString(colorsinput) + "X" + ToString(colorsoutput); //Beide, wegen 50/50
-                            if (!allreadyUsed.Contains(colorsstring))
+                            var colorsInputstring = ToString(colorsinput);
+                            if (!allreadyUsedInputs.Contains(colorsInputstring))
                             {
-                                allreadyUsed.Add(colorsstring);
+                                allreadyUsedInputs.Add(colorsInputstring);
+                                allreadyUsed.Add(ToString(colorsinput) + "X" + ToString(colorsoutput));
+
                             }
 
                         }
                     }
-
+                    //break;
                 }
             }
 
+            allreadyUsed.Shuffle();
 
             var inputs = new double[allreadyUsed.Count][];
             var outputs = new double[allreadyUsed.Count][];
@@ -178,19 +180,26 @@ namespace BluePaint
 
 
             var leaerner = new Backpropagation(network, dataset);
-            leaerner.LearningRate = 0.4;
+            leaerner.LearningRate = 0.01;
+
 
             for (var i = 0; i < 300000; i++)
             {
                 leaerner.Iteration();
 
-                if (i % 20 == 0)
+
+                if (i % 50 == 0)
+                {
+                    btnAnwenden.Text = "Error: " + leaerner.Error;
+                    Develop.DoEvents();
+                }
+
+                if (i % 500 == 0)
                 {
                     SaveNetWork(f);
                     btnAnwenden_Click(null, null);
                 }
 
-                Develop.DoEvents();
                 //Console.WriteLine("error: " + leaerner.Error);
 
             }
@@ -234,11 +243,11 @@ namespace BluePaint
             var br = c.GetBrightness() * 255;
             var st = c.GetSaturation() * 255;  // Weiße Flächen haben keine Sättigung....
 
-            if (c.R < 20 && c.G < 20 && c.B < 20) { st = 0; }
+            if (c.R < 20 && c.G < 20 && c.B < 20) { st = -0.3f; }
 
             if (br < Schwelle && st < Schwelle) { return ((float)c.A / 255); }
 
-            return -1;
+            return -1.0f;
 
         }
 
