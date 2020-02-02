@@ -76,6 +76,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="encog-core-cs, Version=3.3.0.0, Culture=neutral, PublicKeyToken=3e882172b12155d4, processorArchitecture=MSIL">
+      <HintPath>..\packages\encog-dotnet-core.3.4.0\lib\encog-core-cs.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -231,10 +234,6 @@
     <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj">
       <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
       <Name>BlueBasics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\BlueBrain\BlueBrain\BlueBrain.csproj">
-      <Project>{fc28245c-8f58-412d-85ce-8f5327618fa8}</Project>
-      <Name>BlueBrain</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\BlueControls\BlueControls\BlueControls.csproj">
       <Project>{6a9cfa8b-ddf5-4fa2-a110-c87a0ce34347}</Project>
