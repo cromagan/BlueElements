@@ -40,14 +40,14 @@ namespace BluePaint
         Color = 2
     }
 
-    public partial class Tool_Brain : GenericTool //  System.Windows.Forms.UserControl //  
+    public partial class Tool_Brain : GenericTool  //  System.Windows.Forms.Form //
     {
 
         int Schwelle = 120;
         int r = 3;
         //int rk = 1;
 
-        Bitmap testI = null;
+        bool stopping = false;
 
 
 
@@ -61,7 +61,7 @@ namespace BluePaint
             InitializeComponent();
 
 
-            f = System.Windows.Forms.Application.StartupPath + "\\SingleLine.brn";
+            f = System.Windows.Forms.Application.StartupPath + "\\..\\..\\Ressourcen\\ComicSharpOutline.eg";
 
             if (FileExists(f))
             {
@@ -88,7 +88,7 @@ namespace BluePaint
 
                 #region Network
                 network = new BasicNetwork();
-                network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, inp.Count));
+                network.AddLayer(new BasicLayer(new ActivationLinear(), true, inp.Count));
                 network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)((inp.Count + oup.Count) * 1.5)));
                 network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, oup.Count));
                 network.Structure.FinalizeStructure();
@@ -107,7 +107,7 @@ namespace BluePaint
 
         private bool InRange(int rad, int x, int y)
         {
-            var isr = Math.Sqrt(x * x + y * y);
+            var isr = Math.Sqrt(x * x + y * y) - 0.2;
             return (isr <= rad);
         }
 
@@ -115,12 +115,18 @@ namespace BluePaint
 
         private void btnLernen_Click(object sender, System.EventArgs e)
         {
+            btnLernen.Enabled = false;
+            btnStop.Enabled = true;
+
+
+            stopping = false;
+
             var All = Directory.GetFiles(txtPath.Text, "*.png", SearchOption.TopDirectoryOnly);
 
             var allreadyUsed = new List<string>();
             var allreadyUsedInputs = new List<string>();
 
-
+            Bitmap testI = null;
 
             foreach (var thisf in All)
             {
@@ -133,6 +139,7 @@ namespace BluePaint
                     if (testI == null)
                     {
                         testI = (Bitmap)Image_FromFile(thisf);
+                        OnOverridePic(testI);
                     }
 
                     for (var x = 0; x < P.Width; x++)
@@ -153,7 +160,15 @@ namespace BluePaint
 
                         }
                     }
-                    //break;
+
+                    Develop.DoEvents();
+                    if (stopping)
+                    {
+                        btnLernen.Enabled = true;
+                        return;
+                    }
+
+
                 }
             }
 
@@ -179,30 +194,42 @@ namespace BluePaint
             var dataset = new BasicMLDataSet(inputs, outputs);
 
 
-            var leaerner = new Backpropagation(network, dataset);
-            leaerner.LearningRate = 0.01;
+            var leaerner1 = new Encog.Neural.Networks.Training.Propagation.Back.Backpropagation(network, dataset);
+            leaerner1.LearningRate = 0.01;
 
 
-            for (var i = 0; i < 300000; i++)
+            var lastime = DateTime.Now;
+            var lastimeerr = DateTime.Now;
+
+            do
             {
-                leaerner.Iteration();
+                leaerner1.Iteration();
 
 
-                if (i % 50 == 0)
+                if (DateTime.Now.Subtract(lastimeerr).TotalSeconds > 1)
                 {
-                    btnAnwenden.Text = "Error: " + leaerner.Error;
+                    capFehlerrate.Text = "Error: " + leaerner1.Error;
                     Develop.DoEvents();
+                    lastimeerr = DateTime.Now;
                 }
 
-                if (i % 500 == 0)
+                if (stopping)
                 {
-                    SaveNetWork(f);
-                    btnAnwenden_Click(null, null);
+                    Encog.Persist.EncogDirectoryPersistence.SaveObject(new FileInfo(f), network);
+                    btnLernen.Enabled = true;
+                    return;
                 }
 
-                //Console.WriteLine("error: " + leaerner.Error);
+                if (DateTime.Now.Subtract(lastime).TotalSeconds > 30)
+                {
+                    Encog.Persist.EncogDirectoryPersistence.SaveObject(new FileInfo(f), network);
+                    OnOverridePic(testI);
+                    btnAnwenden_Click(null, null);
+                    lastime = DateTime.Now;
+                }
 
-            }
+
+            } while (true);
 
 
 
@@ -253,20 +280,7 @@ namespace BluePaint
 
         private void btnAnwenden_Click(object sender, System.EventArgs e)
         {
-            OnForceUndoSaving();
-
-            Bitmap P = null;
-
-            if (testI != null)
-            {
-                P = (Bitmap)testI.Clone();
-            }
-            else
-            {
-                P = OnNeedCurrentPic();
-            }
-
-
+            var P = OnNeedCurrentPic();
             if (P == null) { return; }
 
             var NP = new Bitmap(P.Width, P.Height);
@@ -344,17 +358,8 @@ namespace BluePaint
 
         private void btnLernmaske_Click(object sender, System.EventArgs e)
         {
-
-
-
-            //OnForceUndoSaving();
-
             var P = OnNeedCurrentPic();
-
             var NP = new Bitmap(P.Width, P.Height);
-
-
-
 
             for (var x = 0; x < P.Width; x++)
             {
@@ -376,17 +381,8 @@ namespace BluePaint
 
                 }
             }
-
             OnOverridePic(NP);
-
         }
-
-        public void SaveNetWork(string f)
-        {
-            var networkFile = new FileInfo(f);
-            Encog.Persist.EncogDirectoryPersistence.SaveObject(networkFile, network);
-        }
-
 
         private double[] GetOutPixel(Bitmap pr, int x, int y)
         {
@@ -445,5 +441,13 @@ namespace BluePaint
 
         }
 
+
+
+        private void btnStop_Click(object sender, System.EventArgs e)
+        {
+            btnStop.Enabled = false;
+            stopping = true;
+
+        }
     }
 }

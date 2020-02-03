@@ -680,7 +680,7 @@ namespace BlueBasics.MultiUserFile
                 }
                 if (DateTime.UtcNow.Subtract(D).TotalSeconds > 30 && HasPendingChanges() && AgeOfBlockDatei() >= 0)
                 {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Datenbank aufgrund der Blockdatei nicht freigegeben: " + Filename + " " + f);
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Datei aufgrund der Blockdatei nicht freigegeben: " + Filename + " " + f);
                     return false;
                 }
             }

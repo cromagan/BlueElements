@@ -90,6 +90,7 @@ namespace BluePaint
             this.tabRibbonbar.IsRibbonBar = true;
             this.tabRibbonbar.Location = new System.Drawing.Point(0, 0);
             this.tabRibbonbar.Name = "tabRibbonbar";
+            this.tabRibbonbar.SelectedIndex = 1;
             this.tabRibbonbar.Size = new System.Drawing.Size(1007, 110);
             this.tabRibbonbar.TabIndex = 0;
             // 
@@ -441,7 +442,6 @@ namespace BluePaint
             this.ClientSize = new System.Drawing.Size(1007, 450);
             this.Controls.Add(this.Split);
             this.Controls.Add(this.tabRibbonbar);
-            this.Design = BlueControls.Enums.enDesign.Form_Standard;
             this.Name = "MainWindow";
             this.Text = "BluePaint";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
