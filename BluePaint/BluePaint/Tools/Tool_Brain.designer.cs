@@ -71,7 +71,7 @@ namespace BluePaint
             this.txtPath.Name = "txtPath";
             this.txtPath.Size = new System.Drawing.Size(336, 24);
             this.txtPath.TabIndex = 2;
-            this.txtPath.Text = "C:\\Users\\cp33\\OneDrive\\Desktop\\Learn\\";
+            this.txtPath.Text = "D:\\01_Data\\Dokumente\\Desktop\\Learn";
             // 
             // btnLernmaske
             // 
