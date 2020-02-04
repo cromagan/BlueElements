@@ -61,20 +61,26 @@ namespace BlueBasics
 
         public static void TraceLogging_End()
         {
-            if (!string.IsNullOrEmpty(_CurrentTraceLogFile))
+            try
             {
-                // Trace-Log soll umgeleitet werden
-                Trace.WriteLine("    </table>");
-                Trace.WriteLine("  </body>");
-                Trace.WriteLine(" </html>");
-                Trace.Listeners.Remove(_TraceListener);
-                _TraceListener.Flush();
-                _TraceListener.Close();
-                _TraceListener.Dispose();
-                _TraceListener = null;
-                if (_DeleteTraceLog && FileExists(_CurrentTraceLogFile)) { File.Delete(_CurrentTraceLogFile); }
+                if (!string.IsNullOrEmpty(_CurrentTraceLogFile))
+                {
+                    // Trace-Log soll umgeleitet werden
+                    Trace.WriteLine("    </table>");
+                    Trace.WriteLine("  </body>");
+                    Trace.WriteLine(" </html>");
+                    Trace.Listeners.Remove(_TraceListener);
+                    _TraceListener.Flush();
+                    _TraceListener.Close();
+                    _TraceListener.Dispose();
+                    _TraceListener = null;
+                    if (_DeleteTraceLog && FileExists(_CurrentTraceLogFile)) { File.Delete(_CurrentTraceLogFile); }
+                }
             }
+            catch
+            {
 
+            }
             _CurrentTraceLogFile = "";
             _DeleteTraceLog = true;
         }
@@ -89,16 +95,21 @@ namespace BlueBasics
             _CurrentTraceLogFile = TempFile(TraceFileName);
             _TraceListener = new TextWriterTraceListener(_CurrentTraceLogFile);
             Trace.Listeners.Add(_TraceListener);
-            Trace.AutoFlush = true;
-            Trace.WriteLine("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
-            Trace.WriteLine("\"http://www.w3.org/TR/html4/strict.dtd\">");
-            Trace.WriteLine("<html>");
-            Trace.WriteLine("  <head>");
-            Trace.WriteLine("    <title>Tracelog</title>");
-            Trace.WriteLine("  </head>");
-            Trace.WriteLine("<body>");
-            Trace.WriteLine("  <Font face=\"Arial\" Size=\"2\">");
-            Trace.WriteLine("  <table border=\"1\" cellspacing=\"1\" cellpadding=\"1\" align=\"left\">");
+            try
+            {
+                Trace.AutoFlush = true;
+                Trace.WriteLine("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
+                Trace.WriteLine("\"http://www.w3.org/TR/html4/strict.dtd\">");
+                Trace.WriteLine("<html>");
+                Trace.WriteLine("  <head>");
+                Trace.WriteLine("    <title>Tracelog</title>");
+                Trace.WriteLine("  </head>");
+                Trace.WriteLine("<body>");
+                Trace.WriteLine("  <Font face=\"Arial\" Size=\"2\">");
+                Trace.WriteLine("  <table border=\"1\" cellspacing=\"1\" cellpadding=\"1\" align=\"left\">");
+            }
+            catch { }
+
         }
 
         public static void AbortExe()
@@ -187,124 +198,128 @@ namespace BlueBasics
         {
             lock (_SyncLockObject)
             {
-                if (_IsTraceLogging) { return; }
-                _IsTraceLogging = true;
-
-
-
-                if (Art == enFehlerArt.Fehler) { _LastDebugMessage = string.Empty; }
-
-                if (DateTime.Now.Subtract(_LastDebugTime).TotalSeconds > 5) { _LastDebugMessage = string.Empty; }
-
-                var net = Art + (";" + Meldung);
-                if (net == _LastDebugMessage)
+                try
                 {
-                    _IsTraceLogging = false;
-                    return;
-                }
+                    if (_IsTraceLogging) { return; }
+                    _IsTraceLogging = true;
 
-                _LastDebugMessage = net;
-                _LastDebugTime = DateTime.Now;
-                var First = true;
-                var tmp = _CurrentTraceLogFile;
-                var strace = new StackTrace(true);
-                var Nr = 100;
-                List<string> l = null;
-                Trace.WriteLine("<tr>");
 
-                switch (Art)
-                {
-                    case enFehlerArt.DevelopInfo:
-                        if (!IsDevelopment())
+
+                    if (Art == enFehlerArt.Fehler) { _LastDebugMessage = string.Empty; }
+
+                    if (DateTime.Now.Subtract(_LastDebugTime).TotalSeconds > 5) { _LastDebugMessage = string.Empty; }
+
+                    var net = Art + (";" + Meldung);
+                    if (net == _LastDebugMessage)
+                    {
+                        _IsTraceLogging = false;
+                        return;
+                    }
+
+                    _LastDebugMessage = net;
+                    _LastDebugTime = DateTime.Now;
+                    var First = true;
+                    var tmp = _CurrentTraceLogFile;
+                    var strace = new StackTrace(true);
+                    var Nr = 100;
+                    List<string> l = null;
+                    Trace.WriteLine("<tr>");
+
+                    switch (Art)
+                    {
+                        case enFehlerArt.DevelopInfo:
+                            if (!IsDevelopment())
+                            {
+                                _IsTraceLogging = false;
+                                return;
+                            }
+
+                            Trace.WriteLine("<th><font size = 3>Runtime-Info");
+                            Nr = 5;
+                            break;
+
+                        case enFehlerArt.Info:
+                            Trace.WriteLine("<th><font size = 3>Info");
+                            Nr = 5;
+                            break;
+
+                        case enFehlerArt.Warnung:
+                            if (IsDevelopment()) { Debugger.Break(); }
+
+                            Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
+                            _DeleteTraceLog = false;
+                            break;
+
+                        case enFehlerArt.Fehler:
+                            if (IsDevelopment()) { Debugger.Break(); }
+
+                            if (!FileExists(tmp)) { l = new List<string>(); }
+
+                            Trace.WriteLine("<th><font color =FF0000>Fehler<font color =000000>");
+                            _DeleteTraceLog = false;
+                            break;
+
+                        default:
+                            Trace.WriteLine("<th>?");
+                            _DeleteTraceLog = false;
+                            break;
+                    }
+
+                    Trace.WriteLine("<br>" + DateTime.Now.ToString(Constants.Format_Date) + "<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
+                    Trace.WriteLine("<th ALIGN=LEFT>");
+                    for (var z = 0; z <= Math.Min(Nr + 2, strace.FrameCount - 2); z++)
+                    {
+                        if (!strace.GetFrame(z).GetMethod().Name.Contains("DebugPrint"))
                         {
-                            _IsTraceLogging = false;
-                            return;
+                            if (First) { Trace.WriteLine("<font color =0000FF>"); }
+                            Trace.WriteLine("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
+
+                            l?.Add("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
+
+                            if (First) { Trace.WriteLine("<font color =000000>"); }
+                            First = false;
                         }
 
-                        Trace.WriteLine("<th><font size = 3>Runtime-Info");
-                        Nr = 5;
-                        break;
-
-                    case enFehlerArt.Info:
-                        Trace.WriteLine("<th><font size = 3>Info");
-                        Nr = 5;
-                        break;
-
-                    case enFehlerArt.Warnung:
-                        if (IsDevelopment()) { Debugger.Break(); }
-
-                        Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
-                        _DeleteTraceLog = false;
-                        break;
-
-                    case enFehlerArt.Fehler:
-                        if (IsDevelopment()) { Debugger.Break(); }
-
-                        if (!FileExists(tmp)) { l = new List<string>(); }
-
-                        Trace.WriteLine("<th><font color =FF0000>Fehler<font color =000000>");
-                        _DeleteTraceLog = false;
-                        break;
-
-                    default:
-                        Trace.WriteLine("<th>?");
-                        _DeleteTraceLog = false;
-                        break;
-                }
-
-                Trace.WriteLine("<br>" + DateTime.Now.ToString(Constants.Format_Date) + "<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
-                Trace.WriteLine("<th ALIGN=LEFT>");
-                for (var z = 0; z <= Math.Min(Nr + 2, strace.FrameCount - 2); z++)
-                {
-                    if (!strace.GetFrame(z).GetMethod().Name.Contains("DebugPrint"))
-                    {
-                        if (First) { Trace.WriteLine("<font color =0000FF>"); }
-                        Trace.WriteLine("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
-
-                        l?.Add("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
-
-                        if (First) { Trace.WriteLine("<font color =000000>"); }
-                        First = false;
                     }
 
-                }
+                    Meldung = Meldung.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes();
+                    Trace.WriteLine("</th><th ALIGN=LEFT><font size = 3>" + Meldung + "</th>");
 
-                Meldung = Meldung.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes();
-                Trace.WriteLine("</th><th ALIGN=LEFT><font size = 3>" + Meldung + "</th>");
-
-                Trace.WriteLine("</tr>");
-                if (Art == enFehlerArt.Fehler)
-                {
-                    TraceLogging_End();
-                    var endl = new List<string>();
-                    HTML_AddHead(endl, "Beenden...");
-                    endl.Add("<center>");
-                    endl.Add("<font size = 10>");
-                    endl.Add("Entschuldigen Sie bitte...<br><font size =5><br>");
-                    endl.Add("Das Programm <b>" + AppName() + "</b> musste beendet werden.<br>");
-                    endl.Add("<br>");
-                    endl.Add("<u><b>Grund:</u></b><br>");
-                    endl.Add(Meldung);
-                    endl.Add("<br>");
-                    endl.Add("<font size = 1>");
-                    endl.Add("Datum: " + DateTime.Now);
-                    if (FileExists(tmp))
+                    Trace.WriteLine("</tr>");
+                    if (Art == enFehlerArt.Fehler)
                     {
+                        TraceLogging_End();
+                        var endl = new List<string>();
+                        HTML_AddHead(endl, "Beenden...");
+                        endl.Add("<center>");
+                        endl.Add("<font size = 10>");
+                        endl.Add("Entschuldigen Sie bitte...<br><font size =5><br>");
+                        endl.Add("Das Programm <b>" + AppName() + "</b> musste beendet werden.<br>");
                         endl.Add("<br>");
-                        endl.Add("<a href=\"file://" + tmp + "\">Tracelog öffnen</a>");
-                    }
-                    else
-                    {
-                        endl.AddRange(l);
+                        endl.Add("<u><b>Grund:</u></b><br>");
+                        endl.Add(Meldung);
+                        endl.Add("<br>");
+                        endl.Add("<font size = 1>");
+                        endl.Add("Datum: " + DateTime.Now);
+                        if (FileExists(tmp))
+                        {
+                            endl.Add("<br>");
+                            endl.Add("<a href=\"file://" + tmp + "\">Tracelog öffnen</a>");
+                        }
+                        else
+                        {
+                            endl.AddRange(l);
+                        }
+
+                        HTML_AddFoot(endl);
+                        endl.Save(TempFile("", "Endmeldung", "html"), true);
+                        AbortExe();
+                        return;
                     }
 
-                    HTML_AddFoot(endl);
-                    endl.Save(TempFile("", "Endmeldung", "html"), true);
-                    AbortExe();
-                    return;
+                    _IsTraceLogging = false;
                 }
-
-                _IsTraceLogging = false;
+                catch { }
             }
         }
 

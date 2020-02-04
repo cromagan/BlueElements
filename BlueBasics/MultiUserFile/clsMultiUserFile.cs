@@ -675,7 +675,7 @@ namespace BlueBasics.MultiUserFile
 
                 if (!MUSTRelease && DateTime.UtcNow.Subtract(D).TotalSeconds > 20 && AgeOfBlockDatei() < 0)
                 {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Saver hängt bei " + Filename + " " + f);
+                    Develop.DebugPrint(enFehlerArt.Info, "Saver hängt bei " + Filename + " " + f);
                     return false;
                 }
                 if (DateTime.UtcNow.Subtract(D).TotalSeconds > 30 && HasPendingChanges() && AgeOfBlockDatei() >= 0)

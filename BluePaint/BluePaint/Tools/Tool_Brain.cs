@@ -43,8 +43,8 @@ namespace BluePaint
     public partial class Tool_Brain : GenericTool  //  System.Windows.Forms.Form //
     {
 
-        int Schwelle = 120;
-        int r = 3;
+        //int Schwelle = 120;
+        int r = 2;
         //int rk = 1;
 
         bool stopping = false;
@@ -77,7 +77,12 @@ namespace BluePaint
                     for (var py = -r; py <= r; py++)
                     {
 
-                        if (InRange(r, px, py)) { inp.Add(px.ToString() + ";" + py.ToString()); }
+                        if (InRange(r, px, py))
+                        {
+                            inp.Add(px.ToString() + ";" + py.ToString()+ ";Bright");
+                            inp.Add(px.ToString() + ";" + py.ToString() + ";Satur");
+                            inp.Add(px.ToString() + ";" + py.ToString() + ";Alpha");
+                        }
                         //if (InRange(rk, px, py)) { oup.Add(px.ToString() + ";" + py.ToString()); }
                     }
                 }
@@ -121,7 +126,7 @@ namespace BluePaint
 
             stopping = false;
 
-            var All = Directory.GetFiles(txtPath.Text, "*.png", SearchOption.TopDirectoryOnly);
+            var All = Directory.GetFiles(txtPath.Text, "*.png", SearchOption.AllDirectories);
 
             var allreadyUsed = new List<string>();
             var allreadyUsedInputs = new List<string>();
@@ -194,8 +199,10 @@ namespace BluePaint
             var dataset = new BasicMLDataSet(inputs, outputs);
 
 
-            var leaerner1 = new Encog.Neural.Networks.Training.Propagation.Back.Backpropagation(network, dataset);
-            leaerner1.LearningRate = 0.01;
+            //var learner1 = new Encog.Neural.Networks.Training.Propagation.SCG.ScaledConjugateGradient(network, dataset);
+            //var learner1 = new Encog.Neural.Networks.Training.Propagation.Quick.QuickPropagation(network, dataset);
+            var learner1 = new Encog.Neural.Networks.Training.Propagation.Back.Backpropagation(network, dataset);
+            learner1.LearningRate = 0.01;
 
 
             var lastime = DateTime.Now;
@@ -203,12 +210,12 @@ namespace BluePaint
 
             do
             {
-                leaerner1.Iteration();
+                learner1.Iteration();
 
 
                 if (DateTime.Now.Subtract(lastimeerr).TotalSeconds > 1)
                 {
-                    capFehlerrate.Text = "Error: " + leaerner1.Error;
+                    capFehlerrate.Text = "Error: " + learner1.Error;
                     Develop.DoEvents();
                     lastimeerr = DateTime.Now;
                 }
@@ -251,8 +258,18 @@ namespace BluePaint
                 {
                     if (InRange(r, px, py))
                     {
+
+
+                        var c = GetPixelColor(p, x + px, y + py);
                         pos++;
-                        l[pos] = GetInputPixel(p, x + px, y + py);
+                        l[pos] = c.GetBrightness()*2-1;
+                        pos++;
+                        l[pos] = c.GetSaturation()*2-1;
+                        pos++;
+                        l[pos] = (c.A / 128)-1;
+
+
+                        //                        l[pos] = GetInputPixel(p, x + px, y + py);
                     }
                 }
             }
@@ -260,23 +277,23 @@ namespace BluePaint
             return l;
         }
 
-        private double GetInputPixel(Bitmap p, int x, int y)
-        {
+        //private double GetInputPixel(Bitmap p, int x, int y)
+        //{
 
-            if (x < 0 || y < 0 || x >= p.Width || y >= p.Height) { return 0; }
+        //    if (x < 0 || y < 0 || x >= p.Width || y >= p.Height) { return 0; }
 
-            var c = p.GetPixel(x, y);
+        //    var c = p.GetPixel(x, y);
 
-            var br = c.GetBrightness() * 255;
-            var st = c.GetSaturation() * 255;  // Weiße Flächen haben keine Sättigung....
+        //    var br = c.GetBrightness() * 255;
+        //    var st = c.GetSaturation() * 255;  // Weiße Flächen haben keine Sättigung....
 
-            if (c.R < 20 && c.G < 20 && c.B < 20) { st = -0.3f; }
+        //    if (c.R < 20 && c.G < 20 && c.B < 20) { st = -0.3f; }
 
-            if (br < Schwelle && st < Schwelle) { return ((float)c.A / 255); }
+        //    if (br < Schwelle && st < Schwelle) { return ((float)c.A / 255); }
 
-            return -1.0f;
+        //    return -1.0f;
 
-        }
+        //}
 
         private void btnAnwenden_Click(object sender, System.EventArgs e)
         {
@@ -358,30 +375,30 @@ namespace BluePaint
 
         private void btnLernmaske_Click(object sender, System.EventArgs e)
         {
-            var P = OnNeedCurrentPic();
-            var NP = new Bitmap(P.Width, P.Height);
+            //var P = OnNeedCurrentPic();
+            //var NP = new Bitmap(P.Width, P.Height);
 
-            for (var x = 0; x < P.Width; x++)
-            {
-                for (var y = 0; y < P.Height; y++)
-                {
-                    var p = GetInputPixel(P, x, y);
+            //for (var x = 0; x < P.Width; x++)
+            //{
+            //    for (var y = 0; y < P.Height; y++)
+            //    {
+            //        var p = GetInputPixel(P, x, y);
 
-                    if (p < 0)
-                    {
-                        NP.SetPixel(x, y, Color.Red);
-                    }
-                    else
-                    {
-                        var b = 255 - (int)(p * 255f);
-                        NP.SetPixel(x, y, Color.FromArgb(b, b, b));
-                    }
+            //        if (p < 0)
+            //        {
+            //            NP.SetPixel(x, y, Color.Red);
+            //        }
+            //        else
+            //        {
+            //            var b = 255 - (int)(p * 255f);
+            //            NP.SetPixel(x, y, Color.FromArgb(b, b, b));
+            //        }
 
 
 
-                }
-            }
-            OnOverridePic(NP);
+            //    }
+            //}
+            //OnOverridePic(NP);
         }
 
         private double[] GetOutPixel(Bitmap pr, int x, int y)

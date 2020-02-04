@@ -3171,7 +3171,7 @@ namespace BlueControls.Controls
         private void _Database_StoreView(object sender, System.EventArgs e)
         {
 
-            if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
+            //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
 
             _StoredView = ViewToString();
 
