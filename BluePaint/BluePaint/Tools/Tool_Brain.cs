@@ -40,11 +40,11 @@ namespace BluePaint
     //    Color = 1
     //}
 
-    public partial class Tool_Brain : GenericTool  //  System.Windows.Forms.Form //
+    public partial class Tool_Brain : GenericTool  //  BlueControls.Forms.Form //
     {
 
         //int Schwelle = 120;
-        int r = 3;
+        int r = 4;
         //int rk = 1;
 
         bool stopping = false;
@@ -80,16 +80,11 @@ namespace BluePaint
                         if (InRange(r, px, py))
                         {
                             inp.Add(px.ToString() + ";" + py.ToString() + ";Bright");
-                            //inp.Add(px.ToString() + ";" + py.ToString() + ";Satur");
-                            //inp.Add(px.ToString() + ";" + py.ToString() + ";Alpha");
                         }
-                        //if (InRange(rk, px, py)) { oup.Add(px.ToString() + ";" + py.ToString()); }
                     }
                 }
 
                 oup.Add("black");
-                //oup.Add("transparent");
-                //oup.Add("original");
 
                 #region Network
                 network = new BasicNetwork();
@@ -99,8 +94,6 @@ namespace BluePaint
                 network.Structure.FinalizeStructure();
                 network.Reset();
                 #endregion
-
-
 
             }
 
@@ -138,8 +131,7 @@ namespace BluePaint
                 if (!thisf.ToLower().Contains("ready"))
                 {
 
-                    var P = ((Bitmap)Image_FromFile(thisf)).AdjustContrast(100f);
-                    var PR = (Bitmap)Image_FromFile(thisf.Trim(".png") + "-ready.png");
+
 
 
 
@@ -150,31 +142,49 @@ namespace BluePaint
                         OnOverridePic(testI);
                     }
 
-                    for (var x = 0; x < P.Width; x++)
+
+                    var count = 1;
+                    if (btnDrehen.Checked) { count = 8; }
+
+                    do
                     {
-                        for (var y = 0; y < P.Height; y++)
+
+                        count--;
+                        var was = ((RotateFlipType)count);
+
+                        var P = ((Bitmap)Image_FromFile(thisf)).AdjustContrast(100f);
+                        var PR = (Bitmap)Image_FromFile(thisf.Trim(".png") + "-ready.png");
+                        P.RotateFlip(was);
+                        PR.RotateFlip(was);
+
+
+                        for (var x = 0; x < P.Width; x++)
                         {
-
-
-                            var colorsinput = OneSet(P, x, y);
-                            var colorsoutput = GetOutPixel(PR, x, y);
-                            var colorsInputstring = ToString(colorsinput);
-                            if (!allreadyUsedInputs.Contains(colorsInputstring))
+                            for (var y = 0; y < P.Height; y++)
                             {
-                                allreadyUsedInputs.Add(colorsInputstring);
-                                allreadyUsed.Add(ToString(colorsinput) + "X" + ToString(colorsoutput));
+
+
+                                var colorsinput = OneSet(P, x, y);
+                                var colorsoutput = GetOutPixel(PR, x, y);
+                                var colorsInputstring = ToString(colorsinput);
+                                if (!allreadyUsedInputs.Contains(colorsInputstring))
+                                {
+                                    allreadyUsedInputs.Add(colorsInputstring);
+                                    allreadyUsed.Add(ToString(colorsinput) + "X" + ToString(colorsoutput));
+
+                                }
 
                             }
-
                         }
-                    }
 
-                    Develop.DoEvents();
-                    if (stopping)
-                    {
-                        btnLernen.Enabled = true;
-                        return;
-                    }
+                        Develop.DoEvents();
+                        if (stopping)
+                        {
+                            btnLernen.Enabled = true;
+                            return;
+                        }
+
+                    } while (count > 0);
 
 
                 }
@@ -320,7 +330,7 @@ namespace BluePaint
 
                     var b = (int)(result[0] * 255);
 
-                    NP.SetPixel(x, y, Color.FromArgb(b, b, b));
+                    NP.SetPixel(x, y, Color.FromArgb(b, 255 - b, b));
 
 
 

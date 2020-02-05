@@ -39,8 +39,9 @@ namespace BluePaint
             this.tabControl1 = new BlueControls.Controls.TabControl();
             this.tabAnwenden = new BlueControls.Controls.TabPage();
             this.tabLernen = new BlueControls.Controls.TabPage();
-            this.btnStop = new BlueControls.Controls.Button();
             this.capFehlerrate = new BlueControls.Controls.Caption();
+            this.btnStop = new BlueControls.Controls.Button();
+            this.btnDrehen = new BlueControls.Controls.Button();
             this.tabControl1.SuspendLayout();
             this.tabAnwenden.SuspendLayout();
             this.tabLernen.SuspendLayout();
@@ -48,7 +49,7 @@ namespace BluePaint
             // 
             // btnLernen
             // 
-            this.btnLernen.Location = new System.Drawing.Point(8, 0);
+            this.btnLernen.Location = new System.Drawing.Point(8, 16);
             this.btnLernen.Name = "btnLernen";
             this.btnLernen.Size = new System.Drawing.Size(232, 24);
             this.btnLernen.TabIndex = 0;
@@ -67,7 +68,7 @@ namespace BluePaint
             // txtPath
             // 
             this.txtPath.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtPath.Location = new System.Drawing.Point(8, 24);
+            this.txtPath.Location = new System.Drawing.Point(8, 40);
             this.txtPath.Name = "txtPath";
             this.txtPath.Size = new System.Drawing.Size(336, 24);
             this.txtPath.TabIndex = 2;
@@ -75,7 +76,7 @@ namespace BluePaint
             // 
             // btnLernmaske
             // 
-            this.btnLernmaske.Location = new System.Drawing.Point(16, 152);
+            this.btnLernmaske.Location = new System.Drawing.Point(24, 256);
             this.btnLernmaske.Name = "btnLernmaske";
             this.btnLernmaske.Size = new System.Drawing.Size(216, 40);
             this.btnLernmaske.TabIndex = 3;
@@ -90,7 +91,7 @@ namespace BluePaint
             this.tabControl1.HotTrack = true;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
-            this.tabControl1.Size = new System.Drawing.Size(361, 273);
+            this.tabControl1.Size = new System.Drawing.Size(361, 384);
             this.tabControl1.TabIndex = 4;
             // 
             // tabAnwenden
@@ -98,12 +99,13 @@ namespace BluePaint
             this.tabAnwenden.Controls.Add(this.btnAnwenden);
             this.tabAnwenden.Location = new System.Drawing.Point(4, 25);
             this.tabAnwenden.Name = "tabAnwenden";
-            this.tabAnwenden.Size = new System.Drawing.Size(353, 244);
+            this.tabAnwenden.Size = new System.Drawing.Size(353, 355);
             this.tabAnwenden.TabIndex = 0;
             this.tabAnwenden.Text = "Anwenden";
             // 
             // tabLernen
             // 
+            this.tabLernen.Controls.Add(this.btnDrehen);
             this.tabLernen.Controls.Add(this.capFehlerrate);
             this.tabLernen.Controls.Add(this.btnStop);
             this.tabLernen.Controls.Add(this.btnLernmaske);
@@ -111,29 +113,39 @@ namespace BluePaint
             this.tabLernen.Controls.Add(this.txtPath);
             this.tabLernen.Location = new System.Drawing.Point(4, 25);
             this.tabLernen.Name = "tabLernen";
-            this.tabLernen.Size = new System.Drawing.Size(353, 244);
+            this.tabLernen.Size = new System.Drawing.Size(353, 355);
             this.tabLernen.TabIndex = 1;
             this.tabLernen.Text = "Lernen";
             // 
+            // capFehlerrate
+            // 
+            this.capFehlerrate.Location = new System.Drawing.Point(120, 144);
+            this.capFehlerrate.Name = "capFehlerrate";
+            this.capFehlerrate.Size = new System.Drawing.Size(216, 48);
+            this.capFehlerrate.Text = "-";
+            // 
             // btnStop
             // 
-            this.btnStop.Location = new System.Drawing.Point(8, 64);
+            this.btnStop.Location = new System.Drawing.Point(8, 144);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(112, 40);
             this.btnStop.TabIndex = 4;
             this.btnStop.Text = "Stop";
             this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
-            // capFehlerrate
+            // btnDrehen
             // 
-            this.capFehlerrate.Location = new System.Drawing.Point(128, 56);
-            this.capFehlerrate.Name = "capFehlerrate";
-            this.capFehlerrate.Size = new System.Drawing.Size(216, 48);
-            this.capFehlerrate.Text = "-";
+            this.btnDrehen.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnDrehen.Checked = true;
+            this.btnDrehen.Location = new System.Drawing.Point(40, 64);
+            this.btnDrehen.Name = "btnDrehen";
+            this.btnDrehen.Size = new System.Drawing.Size(152, 24);
+            this.btnDrehen.TabIndex = 5;
+            this.btnDrehen.Text = "Bilder auch drehen";
             // 
             // Tool_Brain
             // 
-            this.ClientSize = new System.Drawing.Size(361, 273);
+            this.ClientSize = new System.Drawing.Size(361, 384);
             this.Controls.Add(this.tabControl1);
             this.Name = "Tool_Brain";
             this.tabControl1.ResumeLayout(false);
@@ -152,6 +164,7 @@ namespace BluePaint
         private TabPage tabLernen;
         private Button btnStop;
         private Caption capFehlerrate;
+        private Button btnDrehen;
     }
 
 }
