@@ -38,10 +38,10 @@ namespace BluePaint
         private bool _isSaved = true;
 
 
-        private List<string> _macro = null;
+        private static List<string> _macro = null;
 
         // Merkt sich im Falle einer Aufnahme die benutzen Tools. So können sie ganz einfach wieder aufgerufen werden
-        private List<GenericTool> _merker = null;
+        private static List<GenericTool> _merker = null;
         private bool _aufnahme = false;
 
 
@@ -85,12 +85,12 @@ namespace BluePaint
 
         private void Screenshot_Click(object sender, System.EventArgs e)
         {
-            SetTool(new Tool_Screenshot(), true);
+            SetTool(new Tool_Screenshot(), !_aufnahme);
         }
 
         private void Clipping_Click(object sender, System.EventArgs e)
         {
-            SetTool(new Tool_Clipping(), true);
+            SetTool(new Tool_Clipping(_aufnahme), !_aufnahme);
         }
 
         /// <summary>
@@ -130,6 +130,17 @@ namespace BluePaint
             if (NewTool != null)
             {
                 CurrentTool = NewTool;
+
+                if (_aufnahme)
+                {
+                    if (string.IsNullOrEmpty(NewTool.MacroKennung()))
+                    {
+                        MessageBox.Show("Während einer Aufnahme<br>nicht möglich.", BlueBasics.Enums.enImageCode.Information, "OK");
+                        return;
+                    }
+                    _merker.Add(NewTool);
+                }
+
                 Split.Panel1.Controls.Add(NewTool);
                 NewTool.Dock = System.Windows.Forms.DockStyle.Fill;
 
@@ -163,7 +174,10 @@ namespace BluePaint
 
         private void CurrentTool_CommandForMacro(object sender, CommandForMacroArgs e)
         {
-            throw new NotImplementedException();
+            if (!_aufnahme) { return; }
+
+            _macro.Add(CurrentTool.MacroKennung().ToNonCritical() + ";" + e.Command.ToNonCritical());
+
         }
 
         private void CurrentTool_NeedCurrentPic(object sender, BitmapEventArgs e)
@@ -238,27 +252,27 @@ namespace BluePaint
 
         private void Bruchlinie_Click(object sender, System.EventArgs e)
         {
-            SetTool(new Tool_Bruchlinie(), true);
+            SetTool(new Tool_Bruchlinie(), !_aufnahme);
         }
 
         private void Spiegeln_Click(object sender, System.EventArgs e)
         {
-            SetTool(new Tool_Spiegeln(), true);
+            SetTool(new Tool_Spiegeln(), !_aufnahme);
         }
 
         private void Zeichnen_Click(object sender, System.EventArgs e)
         {
-            SetTool(new Tool_Paint(), true);
+            SetTool(new Tool_Paint(), !_aufnahme);
         }
 
         private void Radiergummi_Click(object sender, System.EventArgs e)
         {
-            SetTool(new Tool_Eraser(), true);
+            SetTool(new Tool_Eraser(_aufnahme), !_aufnahme);
         }
 
         private void Kontrast_Click(object sender, System.EventArgs e)
         {
-            SetTool(new Tool_Kontrast(), true);
+            SetTool(new Tool_Kontrast(), !_aufnahme);
         }
 
         private void Rückg_Click(object sender, System.EventArgs e)
@@ -270,7 +284,7 @@ namespace BluePaint
 
 
             BlueBasics.modAllgemein.Swap(ref P.BMP, ref _PicUndo);
-            //P.OverlayBMP = new Bitmap(P.BMP.Width, P.BMP.Height);
+
 
             if (P.BMP.Width != _PicUndo.Width || P.BMP.Height != _PicUndo.Height)
             {
@@ -278,16 +292,13 @@ namespace BluePaint
             }
             else
             {
-
                 P.Invalidate();
             }
 
-            //if (CurrentTool != null) { CurrentTool.SetPics(P.BMP, P.OverlayBMP); }
-
-
-
-
-
+            if (_aufnahme)
+            {
+                _macro.RemoveAt(_macro.Count - 1);
+            }
         }
 
 
@@ -352,7 +363,7 @@ namespace BluePaint
 
         private void Dummy_Click(object sender, System.EventArgs e)
         {
-            SetTool(new Tool_DummyGenerator(), true);
+            SetTool(new Tool_DummyGenerator(), !_aufnahme);
         }
 
         private void btnZoomFit_Click(object sender, System.EventArgs e)
@@ -496,32 +507,53 @@ namespace BluePaint
 
         private void btnBrain_Click(object sender, System.EventArgs e)
         {
-            SetTool(new Tool_Brain(), true);
+            SetTool(new Tool_Brain(), !_aufnahme);
         }
 
         private void btnAufnahme_Click(object sender, System.EventArgs e)
         {
+
+            if (P.BMP == null)
+            {
+                MessageBox.Show("Kein Bild vorhanden.");
+                return;
+            }
+
+            SetTool(null, false);
+
+
             _macro = new List<string>();
             _merker = new List<GenericTool>();
             _aufnahme = true;
+            _PicUndo = null;
+            btnRückgänig.Enabled = false;
 
 
             btnAufnahme.Enabled = false;
             btnStop.Enabled = true;
             btnAbspielen.Enabled = false;
+            grpDatei.Enabled = false;
+            MessageBox.Show("Aufnahme gestartet.", BlueBasics.Enums.enImageCode.Aufnahme, "Ok");
+
         }
 
         private void btnStop_Click(object sender, System.EventArgs e)
         {
+            SetTool(null, false);
             _aufnahme = false;
             btnAufnahme.Enabled = true;
             btnStop.Enabled = false;
+            grpDatei.Enabled = true;
             btnAbspielen.Enabled = _macro.Count > 0;
+
+            MessageBox.Show("Aufnahme beendet.", BlueBasics.Enums.enImageCode.Stop, "Ok");
 
         }
 
         private void btnAbspielen_Click(object sender, System.EventArgs e)
         {
+            if (!IsSaved()) { return; }
+            SetTool(new Tool_Abspielen(_macro, _merker), false);
 
         }
     }

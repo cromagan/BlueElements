@@ -56,7 +56,7 @@ namespace BluePaint
 
         string f = string.Empty;
 
-        public Tool_Brain()
+        public Tool_Brain() : base()
         {
             InitializeComponent();
 
@@ -331,9 +331,9 @@ namespace BluePaint
 
 
 
-                    var b = (int)(result[0] * 128);
+                    var b = (int)(result[0] * 255);
 
-                    if (b < 80)
+                    if (b < 200)
                     {
 
                         NP.SetPixel(x, y, Color.FromArgb(b, b, b));
@@ -461,6 +461,20 @@ namespace BluePaint
         public override string MacroKennung()
         {
             return "NormalizeOutline";
+        }
+
+        public override void ExcuteCommand(string command)
+        {
+            var c = command.SplitBy(";");
+
+            if (c[0] == "Anwenden")
+            {
+                btnAnwenden_Click(null, System.EventArgs.Empty);
+            }
+            else
+            {
+                Develop.DebugPrint_NichtImplementiert();
+            }
         }
 
     }

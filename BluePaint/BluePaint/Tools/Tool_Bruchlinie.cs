@@ -30,7 +30,7 @@ namespace BluePaint
 
 
 
-        public Tool_Bruchlinie()
+        public Tool_Bruchlinie() : base()
         {
             InitializeComponent();
         }
@@ -59,8 +59,6 @@ namespace BluePaint
             switch (((Button)sender).Name.ToLower())
             {
                 case "bruch_oben":
-                    OnCommandForMacro("bruch_oben");
-
                     Nach = new Point(0, 5);
                     YRI = -5;
                     ModY = -5;
@@ -68,7 +66,6 @@ namespace BluePaint
                     break;
 
                 case "bruch_unten":
-                    OnCommandForMacro("bruch_unten");
                     Nach = new Point(0, _Pic.Height - 6);
                     YRI = 5;
                     ModY = 5;
@@ -76,7 +73,6 @@ namespace BluePaint
                     break;
 
                 case "bruch_links":
-                    OnCommandForMacro("bruch_links");
                     Nach = new Point(5, 0);
                     XRi = -5;
                     ModX = -5;
@@ -84,7 +80,6 @@ namespace BluePaint
                     break;
 
                 case "bruch_rechts":
-                    OnCommandForMacro("bruch_rechts");
                     Nach = new Point(_Pic.Width - 6, 0);
                     XRi = 5;
                     ModX = 5;
@@ -129,10 +124,6 @@ namespace BluePaint
         }
 
 
-        public override string MacroKennung()
-        {
-            return "Bruchlinie";
-        }
 
     }
 }

@@ -29,7 +29,7 @@ namespace BluePaint
     public partial class Tool_DummyGenerator
     {
 
-        public Tool_DummyGenerator()
+        public Tool_DummyGenerator() : base()
         {
             InitializeComponent();
         }
@@ -57,7 +57,7 @@ namespace BluePaint
                 return;
             }
 
-
+     
             var newPic = new Bitmap((int)W, (int)H);
 
 
@@ -83,11 +83,6 @@ namespace BluePaint
             }
 
             OnOverridePic(newPic);
-        }
-
-        public override string MacroKennung()
-        {
-            return "DummyGenerator";
         }
 
     }

@@ -19,6 +19,7 @@
 
 using System;
 using System.Drawing;
+using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using static BlueBasics.Extensions;
@@ -27,9 +28,19 @@ namespace BluePaint
 {
     public partial class Tool_Eraser : GenericTool
     {
-        public Tool_Eraser()
+        public Tool_Eraser(bool Aufnahme) : base()
         {
             InitializeComponent();
+
+
+            DrawBox.Enabled = !Aufnahme;
+            Razi.Enabled = !Aufnahme;
+
+            if (Aufnahme)
+            {
+                Eleminate.Checked = true;
+            }
+
         }
 
 
@@ -94,6 +105,8 @@ namespace BluePaint
 
                     if (cc.ToArgb() == 0) { return; }
 
+                    OnCommandForMacro("Replace;" + cc.ToArgb());
+
                     OnOverridePic(OriginalPic.ReplaceColor(cc, Color.Transparent));
                     return;
                 }
@@ -118,6 +131,22 @@ namespace BluePaint
         public override string MacroKennung()
         {
             return "Eraser";
+        }
+
+        public override void ExcuteCommand(string command)
+        {
+            var c = command.SplitBy(";");
+
+            if (c[0] == "Replace")
+            {
+                var OriginalPic = OnNeedCurrentPic();
+                var cc = Color.FromArgb(int.Parse(c[1]));
+                OnOverridePic(OriginalPic.ReplaceColor(cc, Color.Transparent));
+            }
+            else
+            {
+                Develop.DebugPrint_NichtImplementiert();
+            }
         }
 
     }

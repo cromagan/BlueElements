@@ -149,6 +149,12 @@
     <Compile Include="Tools\Tool_Brain.designer.cs">
       <DependentUpon>Tool_Brain.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tools\Tool_Abspielen.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_Abspielen.designer.cs">
+      <DependentUpon>Tool_Abspielen.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tools\Tool_Screenshot.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -197,6 +203,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Tools\Tool_Brain.resx">
       <DependentUpon>Tool_Brain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_Abspielen.resx">
+      <DependentUpon>Tool_Abspielen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tools\Tool_Screenshot.resx">
       <DependentUpon>Tool_Screenshot.cs</DependentUpon>

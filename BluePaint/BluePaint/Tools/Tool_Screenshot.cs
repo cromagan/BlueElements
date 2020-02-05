@@ -26,7 +26,7 @@ namespace BluePaint
     public partial class Tool_Screenshot
     {
 
-        public Tool_Screenshot()
+        public Tool_Screenshot() : base()
         {
             InitializeComponent();
         }
@@ -56,11 +56,6 @@ namespace BluePaint
             OnZoomFit();
         }
 
-
-        public override string MacroKennung()
-        {
-            return "Screenshot";
-        }
 
     }
 }

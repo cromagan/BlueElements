@@ -26,14 +26,27 @@ using BluePaint.EventArgs;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Controls;
+using BlueControls.Forms;
 
 namespace BluePaint
 {
+
     public partial class Tool_Clipping
     {
-        public Tool_Clipping()
+        public Tool_Clipping(bool aufnahme)
         {
             InitializeComponent();
+
+            if (aufnahme)
+            {
+                CheckMinMax();
+                AutoZ_Click(null, null);
+                ZuschnittOK_Click(null, null);
+                this.Enabled = false;
+                MessageBox.Show("Automatisch zugeschnitten.");
+                OnCommandForMacro("AutoZuschnitt");
+            }
+
         }
 
         public override void ToolFirstShown()
@@ -56,7 +69,7 @@ namespace BluePaint
 
         public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
-            if (OriginalPic == null ) { return; }
+            if (OriginalPic == null) { return; }
 
             Links.Value = Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX) + 1;
             Recht.Value = -(OriginalPic.Width - Math.Max(e.Current.TrimmedX, e.MouseDown.TrimmedX));
@@ -68,7 +81,7 @@ namespace BluePaint
         }
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
         {
-            if (OriginalPic == null ) { return; }
+            if (OriginalPic == null) { return; }
 
             var Pen_Blau = new Pen(Color.FromArgb(150, 0, 0, 255));
 
@@ -92,8 +105,6 @@ namespace BluePaint
 
         private void ValueChangedByClicking(object sender, System.EventArgs e)
         {
-            OnCommandForMacro("NewValues");
-
             OnDoInvalidate();
         }
 
@@ -114,11 +125,11 @@ namespace BluePaint
 
             if (Oben.Value != 0)
             {
-                e.FillRectangle( Brush_Blau, new Rectangle(0, 0, OriginalPic.Width, Convert.ToInt32(Oben.Value)));
+                e.FillRectangle(Brush_Blau, new Rectangle(0, 0, OriginalPic.Width, Convert.ToInt32(Oben.Value)));
             }
             if (Unten.Value != 0)
             {
-                e.FillRectangle( Brush_Blau, new Rectangle(0, OriginalPic.Height + Convert.ToInt32(Unten.Value), OriginalPic.Width, (int)-Unten.Value));
+                e.FillRectangle(Brush_Blau, new Rectangle(0, OriginalPic.Height + Convert.ToInt32(Unten.Value), OriginalPic.Width, (int)-Unten.Value));
             }
 
 
@@ -158,11 +169,8 @@ namespace BluePaint
             Oben.Value = pa.Top;
             Unten.Value = pa.Bottom;
 
-
             OnDoInvalidate();
-       //     ValueChangedByClicking(this, System.EventArgs.Empty);
 
-            OnCommandForMacro("Autozoom");
         }
 
         public void Set(int Left, int Top, int Right, int Bottom)
@@ -195,6 +203,22 @@ namespace BluePaint
         public override string MacroKennung()
         {
             return "Clipping";
+        }
+
+        public override void ExcuteCommand(string command)
+        {
+            var c = command.SplitBy(";");
+
+            if (c[0] == "AutoZuschnitt")
+            {
+                CheckMinMax();
+                AutoZ_Click(null, null);
+                ZuschnittOK_Click(null, null);
+            }
+            else
+            {
+                Develop.DebugPrint_NichtImplementiert();
+            }
         }
 
     }

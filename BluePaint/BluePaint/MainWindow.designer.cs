@@ -32,6 +32,10 @@ namespace BluePaint
         {
             this.tabRibbonbar = new BlueControls.Controls.TabControl();
             this.Tab_Start = new BlueControls.Controls.TabPage();
+            this.grpBearbteitung = new BlueControls.Controls.GroupBox();
+            this.btnAbspielen = new BlueControls.Controls.Button();
+            this.btnStop = new BlueControls.Controls.Button();
+            this.btnAufnahme = new BlueControls.Controls.Button();
             this.grpDatei = new BlueControls.Controls.GroupBox();
             this.btnSave = new BlueControls.Controls.Button();
             this.btnLetzteDateien = new BlueControls.Controls.LastFilesCombo();
@@ -63,12 +67,9 @@ namespace BluePaint
             this.InfoText = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.grpBearbteitung = new BlueControls.Controls.GroupBox();
-            this.btnAufnahme = new BlueControls.Controls.Button();
-            this.btnStop = new BlueControls.Controls.Button();
-            this.btnAbspielen = new BlueControls.Controls.Button();
             this.tabRibbonbar.SuspendLayout();
             this.Tab_Start.SuspendLayout();
+            this.grpBearbteitung.SuspendLayout();
             this.grpDatei.SuspendLayout();
             this.Tab_Werkzeug.SuspendLayout();
             this.grpNeu.SuspendLayout();
@@ -82,7 +83,6 @@ namespace BluePaint
             this.Split.Panel2.SuspendLayout();
             this.Split.SuspendLayout();
             this.BLupe.SuspendLayout();
-            this.grpBearbteitung.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabRibbonbar
@@ -95,6 +95,7 @@ namespace BluePaint
             this.tabRibbonbar.IsRibbonBar = true;
             this.tabRibbonbar.Location = new System.Drawing.Point(0, 0);
             this.tabRibbonbar.Name = "tabRibbonbar";
+            this.tabRibbonbar.SelectedIndex = 1;
             this.tabRibbonbar.Size = new System.Drawing.Size(1007, 110);
             this.tabRibbonbar.TabIndex = 0;
             // 
@@ -107,6 +108,50 @@ namespace BluePaint
             this.Tab_Start.Size = new System.Drawing.Size(999, 81);
             this.Tab_Start.TabIndex = 0;
             this.Tab_Start.Text = "Start";
+            // 
+            // grpBearbteitung
+            // 
+            this.grpBearbteitung.CausesValidation = false;
+            this.grpBearbteitung.Controls.Add(this.btnAbspielen);
+            this.grpBearbteitung.Controls.Add(this.btnStop);
+            this.grpBearbteitung.Controls.Add(this.btnAufnahme);
+            this.grpBearbteitung.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpBearbteitung.Location = new System.Drawing.Point(384, 0);
+            this.grpBearbteitung.Name = "grpBearbteitung";
+            this.grpBearbteitung.Size = new System.Drawing.Size(248, 81);
+            this.grpBearbteitung.Text = "Serienbearbeitung";
+            // 
+            // btnAbspielen
+            // 
+            this.btnAbspielen.Enabled = false;
+            this.btnAbspielen.ImageCode = "Abspielen";
+            this.btnAbspielen.Location = new System.Drawing.Point(168, 2);
+            this.btnAbspielen.Name = "btnAbspielen";
+            this.btnAbspielen.Size = new System.Drawing.Size(72, 66);
+            this.btnAbspielen.TabIndex = 2;
+            this.btnAbspielen.Text = "Abspielen";
+            this.btnAbspielen.Click += new System.EventHandler(this.btnAbspielen_Click);
+            // 
+            // btnStop
+            // 
+            this.btnStop.Enabled = false;
+            this.btnStop.ImageCode = "Stop";
+            this.btnStop.Location = new System.Drawing.Point(88, 2);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(72, 66);
+            this.btnStop.TabIndex = 1;
+            this.btnStop.Text = "Stop";
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            // 
+            // btnAufnahme
+            // 
+            this.btnAufnahme.ImageCode = "Aufnahme";
+            this.btnAufnahme.Location = new System.Drawing.Point(8, 2);
+            this.btnAufnahme.Name = "btnAufnahme";
+            this.btnAufnahme.Size = new System.Drawing.Size(72, 66);
+            this.btnAufnahme.TabIndex = 0;
+            this.btnAufnahme.Text = "Aufnahme";
+            this.btnAufnahme.Click += new System.EventHandler(this.btnAufnahme_Click);
             // 
             // grpDatei
             // 
@@ -440,50 +485,6 @@ namespace BluePaint
             this.SaveTab.Filter = "PNG-Dateien|*.PNG|BMP-Dateien|*.BMP|JPG-Dateien|*.JPG";
             this.SaveTab.Title = "Bitte neuen Dateinamen wählen.";
             // 
-            // grpBearbteitung
-            // 
-            this.grpBearbteitung.CausesValidation = false;
-            this.grpBearbteitung.Controls.Add(this.btnAbspielen);
-            this.grpBearbteitung.Controls.Add(this.btnStop);
-            this.grpBearbteitung.Controls.Add(this.btnAufnahme);
-            this.grpBearbteitung.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpBearbteitung.Location = new System.Drawing.Point(384, 0);
-            this.grpBearbteitung.Name = "grpBearbteitung";
-            this.grpBearbteitung.Size = new System.Drawing.Size(248, 81);
-            this.grpBearbteitung.Text = "Serienbearbeitung";
-            // 
-            // btnAufnahme
-            // 
-            this.btnAufnahme.ImageCode = "Aufnahme";
-            this.btnAufnahme.Location = new System.Drawing.Point(8, 2);
-            this.btnAufnahme.Name = "btnAufnahme";
-            this.btnAufnahme.Size = new System.Drawing.Size(72, 66);
-            this.btnAufnahme.TabIndex = 0;
-            this.btnAufnahme.Text = "Aufnahme";
-            this.btnAufnahme.Click += new System.EventHandler(this.btnAufnahme_Click);
-            // 
-            // btnStop
-            // 
-            this.btnStop.Enabled = false;
-            this.btnStop.ImageCode = "Stop";
-            this.btnStop.Location = new System.Drawing.Point(88, 2);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(72, 66);
-            this.btnStop.TabIndex = 1;
-            this.btnStop.Text = "Stop";
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
-            // 
-            // btnAbspielen
-            // 
-            this.btnAbspielen.Enabled = false;
-            this.btnAbspielen.ImageCode = "Abspielen";
-            this.btnAbspielen.Location = new System.Drawing.Point(168, 2);
-            this.btnAbspielen.Name = "btnAbspielen";
-            this.btnAbspielen.Size = new System.Drawing.Size(72, 66);
-            this.btnAbspielen.TabIndex = 2;
-            this.btnAbspielen.Text = "Abspielen";
-            this.btnAbspielen.Click += new System.EventHandler(this.btnAbspielen_Click);
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -496,6 +497,7 @@ namespace BluePaint
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.tabRibbonbar.ResumeLayout(false);
             this.Tab_Start.ResumeLayout(false);
+            this.grpBearbteitung.ResumeLayout(false);
             this.grpDatei.ResumeLayout(false);
             this.Tab_Werkzeug.ResumeLayout(false);
             this.grpNeu.ResumeLayout(false);
@@ -509,7 +511,6 @@ namespace BluePaint
             ((System.ComponentModel.ISupportInitialize)(this.Split)).EndInit();
             this.Split.ResumeLayout(false);
             this.BLupe.ResumeLayout(false);
-            this.grpBearbteitung.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

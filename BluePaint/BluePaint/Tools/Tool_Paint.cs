@@ -26,7 +26,7 @@ namespace BluePaint
     public partial class Tool_Paint
     {
 
-        public Tool_Paint()
+        public Tool_Paint() : base()
         {
             InitializeComponent();
         }
@@ -40,7 +40,6 @@ namespace BluePaint
 
         public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
-
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left)
             {
                 var _Pic = OnNeedCurrentPic();
@@ -51,30 +50,13 @@ namespace BluePaint
             {
                 OnDoInvalidate();
             }
-
-
         }
 
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
         {
             var c = Color.FromArgb(50, 255, 0, 0);
-
-
             e.FillCircle(c, e.Current.TrimmedX, e.Current.TrimmedY, 2);
-
-
-
-
         }
-
-
-
-        public override string MacroKennung()
-        {
-            return "Paint";
-        }
-
-
 
     }
 }

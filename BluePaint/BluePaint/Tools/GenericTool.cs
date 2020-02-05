@@ -34,7 +34,7 @@ namespace BluePaint
         protected static Pen Pen_RedTransp = new Pen(ColorRedTransp);
         protected static Pen Pen_LightWhite = new Pen(Color.FromArgb(150, 255, 255, 255), 3);
 
-        public GenericTool()
+        public GenericTool() : base()
         {
             InitializeComponent();
         }
@@ -74,8 +74,16 @@ namespace BluePaint
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
         public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, Bitmap OriginalPic) { }
 
+        /// <summary>
+        /// Falls es während einer Makro aufzeichnung benutzt werden kann, gibt es eine eindeutige kennug zurück.
+        /// Wenn keine BEnutzung möglich ist, wird string.empty zurückgegebenm
+        /// </summary>
+        /// <returns></returns>
+        public virtual string MacroKennung()
+        {
+            return string.Empty;
+        }
 
-        public abstract string MacroKennung();
 
 
         protected virtual void OnHideMainWindow()
@@ -97,6 +105,11 @@ namespace BluePaint
             ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
         }
 
+        public virtual void ExcuteCommand(string command)
+        {
+
+            BlueBasics.Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+        }
 
         protected virtual Bitmap OnNeedCurrentPic()
         {

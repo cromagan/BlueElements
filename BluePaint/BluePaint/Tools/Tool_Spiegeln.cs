@@ -34,7 +34,7 @@ namespace BluePaint
 
         private bool _ausricht = false;
 
-        public Tool_Spiegeln()
+        public Tool_Spiegeln() : base()
         {
             InitializeComponent();
         }
@@ -180,10 +180,6 @@ namespace BluePaint
         }
 
 
-        public override string MacroKennung()
-        {
-            return "Mirror";
-        }
 
     }
 }

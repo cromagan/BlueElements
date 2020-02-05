@@ -27,7 +27,7 @@ namespace BluePaint
     public partial class Tool_Kontrast :   GenericTool //System.Windows.Forms.UserControl //
     {
 
-        public Tool_Kontrast()
+        public Tool_Kontrast() : base()
         {
             InitializeComponent();
         }
@@ -66,6 +66,8 @@ namespace BluePaint
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnOverridePic(_Pic.AdjustContrast((float)sldKontrast.Value));
+            OnCommandForMacro("Kontrast;" + (float)sldKontrast.Value);
+
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
@@ -80,6 +82,8 @@ namespace BluePaint
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
+
+            OnCommandForMacro("Graustufen");
         }
 
         private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e)
@@ -93,6 +97,8 @@ namespace BluePaint
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
+
+            OnCommandForMacro("AlleFarbenSchwarz");
 
             OnDoInvalidate();
         }
@@ -116,7 +122,7 @@ namespace BluePaint
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
-
+            OnCommandForMacro("PixelHinzu");
             OnDoInvalidate();
 
         }
@@ -126,6 +132,8 @@ namespace BluePaint
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnForceUndoSaving();
+
+            OnCommandForMacro("Ausdünnen");
 
             _Pic.Ausdünnen(4);
 
@@ -146,6 +154,7 @@ namespace BluePaint
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnOverridePic(_Pic.AdjustBrightness((float)sldHelligkeit.Value));
+            OnCommandForMacro("Helligkeit;" + (float)sldHelligkeit.Value);
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
@@ -156,6 +165,9 @@ namespace BluePaint
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnOverridePic(_Pic.AdjustGamma((float)sldGamma.Value));
+
+            OnCommandForMacro("Gamma;" + (float)sldGamma.Value);
+
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
@@ -197,6 +209,54 @@ namespace BluePaint
         public override string MacroKennung()
         {
             return "Kontrast";
+        }
+
+        public override void ExcuteCommand(string command)
+        {
+            var c = command.SplitBy(";");
+
+            switch (c[0])
+            {
+                case "Kontrast":
+                    sldKontrast.Value = double.Parse(c[1]);
+                    btnKontrastErhoehen_Click (null, System.EventArgs.Empty);
+                    break;
+                case "Graustufen":
+                    btnGraustufen_Click(null, System.EventArgs.Empty);
+                    break;
+                case "AlleFarbenSchwarz":
+                    btnAlleFarbenSchwarz_Click(null, System.EventArgs.Empty);
+                    break;
+                case "PixelHinzu":
+                    btnPixelHinzu_Click(null, System.EventArgs.Empty);
+                    break;
+                case "Ausdünnen":
+                    btnAusdünnen_Click(null, System.EventArgs.Empty);
+                    break;
+                case "Gamma":
+                    sldGamma.Value = double.Parse(c[1]);
+                    btnGamma_Click(null, System.EventArgs.Empty);
+                    break;
+                case "Helligkeit":
+                    sldHelligkeit.Value = double.Parse(c[1]);
+                    btnHelligkeit_Click(null, System.EventArgs.Empty);
+                    break;
+                default:
+                    Develop.DebugPrint_NichtImplementiert();
+                    break;
+            }
+
+
+            //if (c[0] == "Replace")
+            //{
+            //    var OriginalPic = OnNeedCurrentPic();
+            //    var cc = Color.FromArgb(int.Parse(c[1]));
+            //    OnOverridePic(OriginalPic.ReplaceColor(cc, Color.Transparent));
+            //}
+            //else
+            //{
+            //    Develop.DebugPrint_NichtImplementiert();
+            //}
         }
 
 
