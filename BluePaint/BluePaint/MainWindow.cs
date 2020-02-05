@@ -25,6 +25,7 @@ using System.Drawing;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 using BlueControls.Forms;
+using System.Collections.Generic;
 
 namespace BluePaint
 {
@@ -36,6 +37,12 @@ namespace BluePaint
 
         private bool _isSaved = true;
 
+
+        private List<string> _macro = null;
+
+        // Merkt sich im Falle einer Aufnahme die benutzen Tools. So können sie ganz einfach wieder aufgerufen werden
+        private List<GenericTool> _merker = null;
+        private bool _aufnahme = false;
 
 
         private MainWindow() : this(true)
@@ -113,6 +120,7 @@ namespace BluePaint
                 CurrentTool.OverridePic -= CurrentTool_OverridePic;
                 CurrentTool.DoInvalidate -= CurrentTool_DoInvalidate;
                 CurrentTool.NeedCurrentPic -= CurrentTool_NeedCurrentPic;
+                CurrentTool.CommandForMacro -= CurrentTool_CommandForMacro;
                 CurrentTool = null;
             }
 
@@ -135,15 +143,27 @@ namespace BluePaint
                 CurrentTool.ForceUndoSaving += CurrentTool_ForceUndoSaving;
                 CurrentTool.DoInvalidate += CurrentTool_DoInvalidate;
                 CurrentTool.NeedCurrentPic += CurrentTool_NeedCurrentPic;
+                CurrentTool.CommandForMacro += CurrentTool_CommandForMacro;
 
                 if (DoInitalizingAction)
                 {
                     NewTool.ToolFirstShown();
                 }
 
+
+                if (_aufnahme && _merker.Contains(NewTool))
+                {
+                    _merker.Add(NewTool);
+                }
+
             }
 
 
+        }
+
+        private void CurrentTool_CommandForMacro(object sender, CommandForMacroArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void CurrentTool_NeedCurrentPic(object sender, BitmapEventArgs e)
@@ -275,7 +295,7 @@ namespace BluePaint
         private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e)
         {
 
-           CurrentTool?.MouseDown(e, P.BMP);
+            CurrentTool?.MouseDown(e, P.BMP);
         }
 
 
@@ -477,6 +497,32 @@ namespace BluePaint
         private void btnBrain_Click(object sender, System.EventArgs e)
         {
             SetTool(new Tool_Brain(), true);
+        }
+
+        private void btnAufnahme_Click(object sender, System.EventArgs e)
+        {
+            _macro = new List<string>();
+            _merker = new List<GenericTool>();
+            _aufnahme = true;
+
+
+            btnAufnahme.Enabled = false;
+            btnStop.Enabled = true;
+            btnAbspielen.Enabled = false;
+        }
+
+        private void btnStop_Click(object sender, System.EventArgs e)
+        {
+            _aufnahme = false;
+            btnAufnahme.Enabled = true;
+            btnStop.Enabled = false;
+            btnAbspielen.Enabled = _macro.Count > 0;
+
+        }
+
+        private void btnAbspielen_Click(object sender, System.EventArgs e)
+        {
+
         }
     }
 

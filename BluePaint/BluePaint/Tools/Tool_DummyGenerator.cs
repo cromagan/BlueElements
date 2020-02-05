@@ -84,5 +84,11 @@ namespace BluePaint
 
             OnOverridePic(newPic);
         }
+
+        public override string MacroKennung()
+        {
+            return "DummyGenerator";
+        }
+
     }
 }

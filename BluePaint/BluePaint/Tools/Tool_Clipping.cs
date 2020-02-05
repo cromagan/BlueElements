@@ -63,7 +63,7 @@ namespace BluePaint
             Oben.Value = Math.Min(e.Current.TrimmedY, e.MouseDown.TrimmedY) + 1;
             Unten.Value = -(OriginalPic.Height - Math.Max(e.Current.TrimmedY, e.MouseDown.TrimmedY));
 
-            ValueChanged(this, System.EventArgs.Empty);
+            ValueChangedByClicking(this, System.EventArgs.Empty);
 
         }
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
@@ -90,8 +90,10 @@ namespace BluePaint
         }
 
 
-        private void ValueChanged(object sender, System.EventArgs e)
+        private void ValueChangedByClicking(object sender, System.EventArgs e)
         {
+            OnCommandForMacro("NewValues");
+
             OnDoInvalidate();
         }
 
@@ -156,7 +158,11 @@ namespace BluePaint
             Oben.Value = pa.Top;
             Unten.Value = pa.Bottom;
 
-            ValueChanged(this, System.EventArgs.Empty);
+
+            OnDoInvalidate();
+       //     ValueChangedByClicking(this, System.EventArgs.Empty);
+
+            OnCommandForMacro("Autozoom");
         }
 
         public void Set(int Left, int Top, int Right, int Bottom)
@@ -184,6 +190,11 @@ namespace BluePaint
             Recht.Minimum = -_Pic.Width + 1;
             Oben.Maximum = _Pic.Height - 1;
             Unten.Minimum = -_Pic.Height - 1;
+        }
+
+        public override string MacroKennung()
+        {
+            return "Clipping";
         }
 
     }

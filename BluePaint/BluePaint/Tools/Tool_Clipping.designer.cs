@@ -63,7 +63,7 @@ namespace BluePaint
             this.Unten.Orientation = enOrientation.Senkrecht;
             this.Unten.Size = new System.Drawing.Size(144, 36);
             this.Unten.Text = "Slider1";
-            this.Unten.ValueChanged += new System.EventHandler(this.ValueChanged);
+            this.Unten.ValueChanged += new System.EventHandler(this.ValueChangedByClicking);
             // 
             // Oben
             // 
@@ -75,7 +75,7 @@ namespace BluePaint
             this.Oben.Orientation = enOrientation.Senkrecht;
             this.Oben.Size = new System.Drawing.Size(144, 36);
             this.Oben.Text = "Slider1";
-            this.Oben.ValueChanged += new System.EventHandler(this.ValueChanged);
+            this.Oben.ValueChanged += new System.EventHandler(this.ValueChangedByClicking);
             // 
             // Recht
             // 
@@ -87,7 +87,7 @@ namespace BluePaint
             this.Recht.Name = "Recht";
             this.Recht.Size = new System.Drawing.Size(36, 144);
             this.Recht.Text = "Slider2";
-            this.Recht.ValueChanged += new System.EventHandler(this.ValueChanged);
+            this.Recht.ValueChanged += new System.EventHandler(this.ValueChangedByClicking);
             // 
             // PictureBox2
             // 
@@ -109,7 +109,7 @@ namespace BluePaint
             this.Links.Name = "Links";
             this.Links.Size = new System.Drawing.Size(36, 144);
             this.Links.Text = "Slider1";
-            this.Links.ValueChanged += new System.EventHandler(this.ValueChanged);
+            this.Links.ValueChanged += new System.EventHandler(this.ValueChangedByClicking);
             // 
             // AutoZ
             // 

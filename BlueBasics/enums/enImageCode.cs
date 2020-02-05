@@ -22,7 +22,7 @@ namespace BlueBasics.Enums
     public enum enImageCode
     {
         None,
-
+        Abspielen,
         Anwendung,
         Aufnahme,
         AZ,

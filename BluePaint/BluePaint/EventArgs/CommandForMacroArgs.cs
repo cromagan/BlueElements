@@ -22,19 +22,17 @@ using System.Drawing;
 
 namespace BluePaint.EventArgs
 {
-    public class SetHelperEventArgs : System.EventArgs
+    public class CommandForMacroArgs : System.EventArgs
     {
 
 
-        public SetHelperEventArgs(enOrientation mittellinie, enHelpers helper)
+        public CommandForMacroArgs(string Command)
         {
-            this.Mittellinie = mittellinie;
-            this.Helper = helper;
+            this.Command = Command;
         }
 
-        public enOrientation Mittellinie { get; set; }
+        public string Command { get; set; }
 
-        public enHelpers Helper { get; set; }
 
     }
 }

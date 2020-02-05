@@ -26,7 +26,7 @@ namespace BluePaint
 {
 
 
-    public partial class GenericTool : GroupBox // System.Windows.Forms.UserControl //
+    public abstract partial  class GenericTool : GroupBox // System.Windows.Forms.UserControl //
     {
 
         protected static Color ColorRedTransp = Color.FromArgb(50, 255, 0, 0);
@@ -46,6 +46,7 @@ namespace BluePaint
         public event System.EventHandler ForceUndoSaving;
         public event System.EventHandler<BitmapEventArgs> OverridePic;
         public event System.EventHandler<BitmapEventArgs> NeedCurrentPic;
+        public event System.EventHandler<CommandForMacroArgs> CommandForMacro;
 
 
         public virtual void ToolFirstShown() { }
@@ -74,6 +75,7 @@ namespace BluePaint
         public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, Bitmap OriginalPic) { }
 
 
+        public abstract string MacroKennung();
 
 
         protected virtual void OnHideMainWindow()
@@ -85,7 +87,6 @@ namespace BluePaint
 
         protected virtual void OnZoomFit()
         {
-
             ZoomFit?.Invoke(this, System.EventArgs.Empty);
         }
 
@@ -111,42 +112,26 @@ namespace BluePaint
         /// <param name="BMP"></param>
         protected virtual void OnOverridePic(Bitmap BMP)
         {
-
             OverridePic?.Invoke(this, new BitmapEventArgs(BMP));
         }
 
-        ///// <summary>
-        ///// Wird benutzt, wenn in das vorhandene Bild etwas gemalt wurde.
-        ///// Wird das ganze Bild geändert, muss OnOverridePic benutzt werden.
-        ///// </summary>
-        //protected virtual void OnPicChangedByTool()
-        //{
-
-        //    PicChangedByTool?.Invoke(this, System.EventArgs.Empty);
-        //}
-
         protected virtual void OnForceUndoSaving()
         {
-
             ForceUndoSaving?.Invoke(this, System.EventArgs.Empty);
         }
 
         protected virtual void OnDoInvalidate()
         {
-
             DoInvalidate?.Invoke(this, System.EventArgs.Empty);
         }
 
-        //public void ClearPreviewPic()
-        //{
 
-        //    if (_PicPreview == null) { return; }
 
-        //    var gr = Graphics.FromImage(_PicPreview);
-        //    gr.Clear(Color.Transparent);
-        //    gr.Dispose();
+        protected virtual void OnCommandForMacro(string command)
+        {
+            CommandForMacro?.Invoke(this, new CommandForMacroArgs(command));
+        }
 
-        //}
 
 
 

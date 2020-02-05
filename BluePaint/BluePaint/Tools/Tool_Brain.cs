@@ -297,6 +297,9 @@ namespace BluePaint
 
         private void btnAnwenden_Click(object sender, System.EventArgs e)
         {
+
+            OnCommandForMacro("Anwenden");
+
             var P = OnNeedCurrentPic();
             if (P == null) { return; }
 
@@ -328,11 +331,14 @@ namespace BluePaint
 
 
 
-                    var b = (int)(result[0] * 255);
+                    var b = (int)(result[0] * 128);
 
-                    NP.SetPixel(x, y, Color.FromArgb(b, 255 - b, b));
+                    if (b < 80)
+                    {
 
+                        NP.SetPixel(x, y, Color.FromArgb(b, b, b));
 
+                    }
 
 
                 }
@@ -450,5 +456,12 @@ namespace BluePaint
             stopping = true;
 
         }
+
+
+        public override string MacroKennung()
+        {
+            return "NormalizeOutline";
+        }
+
     }
 }

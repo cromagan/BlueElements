@@ -194,6 +194,12 @@ namespace BluePaint
             OnDoInvalidate();
         }
 
+        public override string MacroKennung()
+        {
+            return "Kontrast";
+        }
+
+
     }
 
 }

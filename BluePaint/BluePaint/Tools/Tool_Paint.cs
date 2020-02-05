@@ -69,6 +69,11 @@ namespace BluePaint
 
 
 
+        public override string MacroKennung()
+        {
+            return "Paint";
+        }
+
 
 
     }

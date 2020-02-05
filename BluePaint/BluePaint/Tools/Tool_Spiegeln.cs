@@ -178,5 +178,12 @@ namespace BluePaint
             OnOverridePic(nBMP);
 
         }
+
+
+        public override string MacroKennung()
+        {
+            return "Mirror";
+        }
+
     }
 }

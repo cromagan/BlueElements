@@ -55,5 +55,12 @@ namespace BluePaint
             DoScreenShot();
             OnZoomFit();
         }
+
+
+        public override string MacroKennung()
+        {
+            return "Screenshot";
+        }
+
     }
 }
