@@ -37,7 +37,6 @@ namespace BluePaint
 
         private bool _isSaved = true;
 
-
         private static List<string> _macro = null;
 
         // Merkt sich im Falle einer Aufnahme die benutzen Tools. So können sie ganz einfach wieder aufgerufen werden
@@ -80,6 +79,7 @@ namespace BluePaint
                 btnLetzteDateien.AddFileName(filename, string.Empty);
             }
 
+            P.ZoomFit();
 
         }
 
@@ -103,8 +103,35 @@ namespace BluePaint
             _filename = string.Empty;
         }
 
+
+        private bool AreSame(object a, object b)
+        {
+
+            if (a == null || b == null) { return false; }
+            var t = a.GetType();
+            var u = b.GetType();
+
+            if (t.IsAssignableFrom(u) || u.IsAssignableFrom(t))
+            {
+                // x.IsAssignableFrom(y) returns true if:
+                //   (1) x and y are the same type
+                //   (2) x and y are in the same inheritance hierarchy
+                //   (3) y is implemented by x
+                //   (4) y is a generic type parameter and one of its constraints is x
+                return true;
+            }
+            return false;
+        }
+
         public void SetTool(GenericTool NewTool, bool DoInitalizingAction)
         {
+
+            if (AreSame(NewTool, CurrentTool))
+            {
+                MessageBox.Show("Das Werkzeug ist aktuell schon gewählt.", BlueBasics.Enums.enImageCode.Information, "OK");
+                return;
+            }
+
             if (CurrentTool != null)
             {
                 CurrentTool.Dispose();
@@ -299,6 +326,12 @@ namespace BluePaint
             {
                 _macro.RemoveAt(_macro.Count - 1);
             }
+
+
+            if (CurrentTool != null)
+            {
+                CurrentTool.PictureChangedByMainWindow();
+            }
         }
 
 
@@ -428,10 +461,12 @@ namespace BluePaint
                     break;
 
                 case 1:
+                    _isSaved = true;
                     return true;
 
                 case 2:
                     return false;
+
             }
 
             return IsSaved();
@@ -531,7 +566,6 @@ namespace BluePaint
 
             btnAufnahme.Enabled = false;
             btnStop.Enabled = true;
-            btnAbspielen.Enabled = false;
             grpDatei.Enabled = false;
             MessageBox.Show("Aufnahme gestartet.", BlueBasics.Enums.enImageCode.Aufnahme, "Ok");
 
@@ -544,17 +578,28 @@ namespace BluePaint
             btnAufnahme.Enabled = true;
             btnStop.Enabled = false;
             grpDatei.Enabled = true;
-            btnAbspielen.Enabled = _macro.Count > 0;
-
             MessageBox.Show("Aufnahme beendet.", BlueBasics.Enums.enImageCode.Stop, "Ok");
+
+            if (_macro.Count > 0)
+            {
+
+                _isSaved = true;
+
+                SetTool(new Tool_Abspielen(_macro, _merker), false);
+            }
+
 
         }
 
-        private void btnAbspielen_Click(object sender, System.EventArgs e)
-        {
-            if (!IsSaved()) { return; }
-            SetTool(new Tool_Abspielen(_macro, _merker), false);
 
+        private void btnGrößeÄndern_Click(object sender, System.EventArgs e)
+        {
+            SetTool(new Tool_Resize(), !_aufnahme);
+        }
+
+        private void btn100_Click(object sender, System.EventArgs e)
+        {
+            P.Zoom100();
         }
     }
 

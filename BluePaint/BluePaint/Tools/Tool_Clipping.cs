@@ -33,7 +33,7 @@ namespace BluePaint
 
     public partial class Tool_Clipping
     {
-        public Tool_Clipping(bool aufnahme)
+        public Tool_Clipping(bool aufnahme) : base()
         {
             InitializeComponent();
 

@@ -54,7 +54,6 @@ namespace BluePaint
             // 
             // Unten
             // 
-            this.Unten.CausesValidation = false;
             this.Unten.LargeChange = 1D;
             this.Unten.Location = new System.Drawing.Point(64, 256);
             this.Unten.Maximum = 0D;
@@ -67,7 +66,6 @@ namespace BluePaint
             // 
             // Oben
             // 
-            this.Oben.CausesValidation = false;
             this.Oben.LargeChange = 1D;
             this.Oben.Location = new System.Drawing.Point(64, 56);
             this.Oben.Maximum = 500D;
@@ -79,7 +77,6 @@ namespace BluePaint
             // 
             // Recht
             // 
-            this.Recht.CausesValidation = false;
             this.Recht.LargeChange = 1D;
             this.Recht.Location = new System.Drawing.Point(216, 104);
             this.Recht.Maximum = 0D;
@@ -102,7 +99,6 @@ namespace BluePaint
             // 
             // Links
             // 
-            this.Links.CausesValidation = false;
             this.Links.LargeChange = 1D;
             this.Links.Location = new System.Drawing.Point(16, 104);
             this.Links.Maximum = 500D;

@@ -84,6 +84,14 @@ namespace BluePaint
             return string.Empty;
         }
 
+        /// <summary>
+        /// Z.B: bei Undo
+        /// </summary>
+        /// <returns></returns>
+        public virtual void PictureChangedByMainWindow()
+        {
+
+        }
 
 
         protected virtual void OnHideMainWindow()

@@ -43,6 +43,7 @@ namespace BluePaint
     public partial class Tool_Brain : GenericTool  //  BlueControls.Forms.Form //
     {
 
+        int AlphaSchwelle = 200;
         //int Schwelle = 120;
         int r = 4;
         //int rk = 1;
@@ -62,6 +63,12 @@ namespace BluePaint
 
 
             f = System.Windows.Forms.Application.StartupPath + "\\..\\..\\Ressourcen\\ComicSharpOutline.eg";
+
+            if (!FileExists(f))
+            {
+                f = System.Windows.Forms.Application.StartupPath + "\\ComicSharpOutline.eg";
+            }
+
 
             if (FileExists(f))
             {
@@ -138,7 +145,7 @@ namespace BluePaint
 
                     if (testI == null)
                     {
-                        testI = ((Bitmap)Image_FromFile(thisf)).AdjustContrast(100f);
+                        testI = ((Bitmap)Image_FromFile(thisf));//.AdjustContrast(100f);
                         OnOverridePic(testI);
                     }
 
@@ -152,7 +159,7 @@ namespace BluePaint
                         count--;
                         var was = ((RotateFlipType)count);
 
-                        var P = ((Bitmap)Image_FromFile(thisf)).AdjustContrast(100f);
+                        var P = ((Bitmap)Image_FromFile(thisf));//.AdjustContrast(100f);
                         var PR = (Bitmap)Image_FromFile(thisf.Trim(".png") + "-ready.png");
                         P.RotateFlip(was);
                         PR.RotateFlip(was);
@@ -289,9 +296,53 @@ namespace BluePaint
 
             if (c.A < 20) { return 1f; }
 
-            var br = 1 - c.GetBrightness();
 
-            return 1 - (br * br * br * br * br);// * c.GetSaturation();
+
+            return BrightenExpo(c);
+
+        }
+
+
+        private List<Color> UsedColors(Bitmap P)
+        {
+
+            var c = new List<Color>();
+
+
+            for (var x = 0; x < P.Width - 1; x++)
+            {
+                for (var y = 0; y < P.Height - 1; y++)
+                {
+
+                    var col = P.GetPixel(x, y);
+
+                    //if (!c.Contains(col))
+                    //{
+                    //    if (BrightenExpo(col) > 0.99) { c.Add(col); }
+                    //}
+
+                    if (!c.Contains(col))
+                    {
+                        if (P.GetPixel(x + 1, y + 1).ToArgb() == col.ToArgb() && P.GetPixel(x + 1, y).ToArgb() == col.ToArgb() && P.GetPixel(x, y + 1).ToArgb() == col.ToArgb())
+                        {
+                            if (BrightenExpo(col) > 0.3) { c.Add(col); }
+                        }
+                    }
+
+
+
+
+                }
+            }
+            return c;
+        }
+
+
+        private float BrightenExpo(Color col)
+        {
+            var br = 1 - col.GetBrightness();
+
+            return 1 - (br * br * br * br * br * br);
 
         }
 
@@ -306,6 +357,10 @@ namespace BluePaint
             var NP = new Bitmap(P.Width, P.Height);
 
 
+            var cols = UsedColors(P);
+
+
+            //var Phell = P.AdjustContrast(100f);
 
 
             for (var x = 0; x < P.Width; x++)
@@ -316,37 +371,21 @@ namespace BluePaint
                     var colorsinput = OneSet(P, x, y);
                     var result = network.Compute(new BasicMLData(colorsinput, false));
 
-
-
-                    //var res = enColor.Color;
-
-                    //if (result[0] > 0.5)
-                    //{
-                    //    res = enColor.Black;
-                    //}
-                    //else if (result[1] > result[0] && result[1] > result[2])
-                    //{
-                    //    res = enColor.Transparent;
-                    //}
-
-
-
                     var b = (int)(result[0] * 255);
 
-                    if (b < 200)
+                    if (b < 230)
                     {
 
-                        NP.SetPixel(x, y, Color.FromArgb(b, b, b));
+                        NP.SetPixel(x, y, Color.FromArgb(0, 0, 0));
 
                     }
+                    else
+                    {
+                        var nc = GetNearestColor(cols, P, x, y);
+                        NP.SetPixel(x, y, nc);
 
-
+                    }
                 }
-
-
-
-
-
             }
 
             OnOverridePic(NP);
@@ -356,6 +395,214 @@ namespace BluePaint
 
         }
 
+        private Color GetNearestColor(List<Color> allcolors, Bitmap p, int x, int y)
+        {
+            var checkcol = p.GetPixel(x, y);
+
+            var Col = GetNearestColor(allcolors, GetPixelColor(p, x, y));
+            if (!Col.IsMagenta()) { return Col; }
+
+
+            var left = false;
+            var right = false;
+            var up = false;
+            var down = false;
+
+
+            var upleft = false;
+            var upright = false;
+            var downleft = false;
+            var downright = false;
+
+            for (var ters = 1; ters <= 15; ters++)
+            {
+
+
+                if (!down)
+                {
+                    var c = GetPixelColor(p, x, y + ters);
+                    if (c.A < AlphaSchwelle) { return Color.Transparent; }
+                    if (BrightenExpo(c) < 0.5)
+                    {
+                        down = true;
+                    }
+                    else
+                    {
+                        Col = GetNearestColor(allcolors, c);
+                        if (!Col.IsMagenta()) { return Col; }
+                    }
+                }
+
+                if (!up)
+                {
+                    var c = GetPixelColor(p, x, y - ters);
+                    if (c.A < AlphaSchwelle) { return Color.Transparent; }
+                    if (BrightenExpo(c) < 0.5)
+                    {
+                        up = true;
+                    }
+                    else
+                    {
+                        Col = GetNearestColor(allcolors, c);
+                        if (!Col.IsMagenta()) { return Col; }
+                    }
+
+
+                }
+
+                if (!left)
+                {
+                    var c = GetPixelColor(p, x - ters, y);
+                    if (c.A < AlphaSchwelle) { return Color.Transparent; }
+                    if (BrightenExpo(c) < 0.5)
+                    {
+                        left = true;
+                    }
+                    else
+                    {
+                        Col = GetNearestColor(allcolors, c);
+                        if (!Col.IsMagenta()) { return Col; }
+                    }
+
+                }
+
+                if (!right)
+                {
+                    var c = GetPixelColor(p, x + ters, y);
+                    if (c.A < AlphaSchwelle) { return Color.Transparent; }
+                    if (BrightenExpo(c) < 0.5)
+                    {
+                        right = true;
+                    }
+                    else
+                    {
+                        Col = GetNearestColor(allcolors, c);
+                        if (!Col.IsMagenta()) { return Col; }
+                    }
+
+                }
+
+                if (!upleft)
+                {
+                    var c = GetPixelColor(p, x - ters, y - ters);
+                    if (c.A < AlphaSchwelle) { return Color.Transparent; }
+                    if (BrightenExpo(c) < 0.5)
+                    {
+                        upleft = true;
+                    }
+                    else
+                    {
+                        Col = GetNearestColor(allcolors, c);
+                        if (!Col.IsMagenta()) { return Col; }
+                    }
+
+                }
+
+                if (!upright)
+                {
+                    var c = GetPixelColor(p, x + ters, y - ters);
+                    if (c.A < AlphaSchwelle) { return Color.Transparent; }
+                    if (BrightenExpo(c) < 0.5)
+                    {
+                        upright = true;
+                    }
+                    else
+                    {
+                        Col = GetNearestColor(allcolors, c);
+                        if (!Col.IsMagenta()) { return Col; }
+                    }
+
+                }
+
+
+                if (!downleft)
+                {
+                    var c = GetPixelColor(p, x - ters, y + ters);
+                    if (c.A < AlphaSchwelle) { return Color.Transparent; }
+                    if (BrightenExpo(c) < 0.5)
+                    {
+                        downleft = true;
+                    }
+                    else
+                    {
+                        Col = GetNearestColor(allcolors, c);
+                        if (!Col.IsMagenta()) { return Col; }
+                    }
+
+                }
+
+                if (!downright)
+                {
+                    var c = GetPixelColor(p, x + ters, y + ters);
+                    if (c.A < AlphaSchwelle) { return Color.Transparent; }
+                    if (BrightenExpo(c) < 0.5)
+                    {
+                        downright = true;
+                    }
+                    else
+                    {
+                        Col = GetNearestColor(allcolors, c);
+                        if (!Col.IsMagenta()) { return Col; }
+                    }
+
+                }
+
+
+                if (up && down && left && right && downleft && downright && upleft && upright)
+                {
+                    up = false;
+                    down = false;
+                    left = false;
+                    right = false;
+
+                    upleft = false;
+                    upright = false;
+                    downleft = false;
+                    downright = false;
+                }
+
+
+            }
+
+            return Color.Magenta;
+        }
+
+        private Color GetNearestColor(List<Color> allcolors, Color checkcol)
+        {
+
+            if (checkcol.A < AlphaSchwelle) { return Color.Transparent; }
+
+
+            if (BrightenExpo(checkcol) < 0.4) { return Color.Magenta; }
+
+            return checkcol.ClosestHSVColor(allcolors, 0.5f, 1f);
+
+
+            //var diff =100d;
+            //var giveback = Color.Magenta;
+
+            //var dbl_input_red = Convert.ToDouble(checkcol.R);
+            //var dbl_input_green = Convert.ToDouble(checkcol.G);
+            //var dbl_input_blue = Convert.ToDouble(checkcol.B);
+
+
+            //foreach (var o in allcolors)
+            //{
+            //    var dbl_test_red = Math.Pow(Convert.ToDouble(((Color)o).R) - dbl_input_red, 2.0);
+            //    var dbl_test_green = Math.Pow(Convert.ToDouble(((Color)o).G) - dbl_input_green, 2.0);
+            //    var dbl_test_blue = Math.Pow(Convert.ToDouble(((Color)o).B) - dbl_input_blue, 2.0);
+
+            //    var nd = Math.Sqrt(dbl_test_blue + dbl_test_green + dbl_test_red);
+            //    if (nd < diff)
+            //    {
+            //        diff = nd;
+            //        giveback = o;
+            //    }
+            //}
+
+
+            //return giveback;
+        }
 
         private Color GetPixelColor(Bitmap p, int x, int y)
         {

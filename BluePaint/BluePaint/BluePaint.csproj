@@ -113,6 +113,12 @@
     <Compile Include="Tools\Tool_Bruchlinie.designer.cs">
       <DependentUpon>Tool_Bruchlinie.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tools\Tool_Resize.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_Resize.designer.cs">
+      <DependentUpon>Tool_Resize.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tools\Tool_Clipping.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -185,6 +191,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Tools\Tool_Bruchlinie.resx">
       <DependentUpon>Tool_Bruchlinie.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_Resize.resx">
+      <DependentUpon>Tool_Resize.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tools\Tool_Clipping.resx">
       <DependentUpon>Tool_Clipping.cs</DependentUpon>

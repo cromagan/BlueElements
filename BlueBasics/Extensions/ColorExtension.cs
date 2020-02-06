@@ -18,8 +18,10 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 
 namespace BlueBasics
 {
@@ -54,7 +56,7 @@ namespace BlueBasics
                 double[] t3 = { Hue + 1.0 / 3.0, Hue, Hue - 1.0 / 3.0 };
                 double[] clr = { 0, 0, 0 };
 
-                for (var i = 0 ; i <= 2 ; i++)
+                for (var i = 0; i <= 2; i++)
                 {
                     if (t3[i] < 0) { t3[i] += 1.0; }
                     if (t3[i] > 1) { t3[i] -= 1.0; }
@@ -227,6 +229,11 @@ namespace BlueBasics
         }
 
         public static bool IsMagenta(this Color Col)
+        {
+            return (Col.ToArgb() == -65281);
+        }
+
+        public static bool IsMagentaOrTransparent(this Color Col)
         {
             if (Col.ToArgb() == -65281) { return true; }
             if (Col.A == 0) { return true; }
@@ -413,6 +420,63 @@ namespace BlueBasics
         public static Color Darken(this Color color, double Value)
         {
             return FromHSB(color.GetHue(), color.GetSaturation(), (float)(color.GetBrightness() * (1 - Value)), color.A);
+        }
+
+
+        public static Color ClosestHueColor(this Color target, List<Color> colors)
+        {
+            //https://stackoverflow.com/questions/27374550/how-to-compare-color-object-and-get-closest-color-in-an-color/27375621
+            var hue1 = target.GetHue();
+            var diffs = colors.Select(n => getHueDistance(n.GetHue(), hue1));
+            var diffMin = diffs.Min(n => n);
+            return colors[diffs.ToList().FindIndex(n => n == diffMin)];
+        }
+
+
+        public static Color ClosestRGBColor(this Color target, List<Color> colors)
+        {
+            //https://stackoverflow.com/questions/27374550/how-to-compare-color-object-and-get-closest-color-in-an-color/27375621
+            var colorDiffs = colors.Select(n => ColorDiff(n, target)).Min(n => n);
+            return colors[colors.FindIndex(n => ColorDiff(n, target) == colorDiffs)];
+        }
+
+        // weighed distance using hue, saturation and brightness
+        public static Color ClosestHSVColor(this Color target, List<Color> colors, float factorSat, float factorBri)
+        {
+            //https://stackoverflow.com/questions/27374550/how-to-compare-color-object-and-get-closest-color-in-an-color/27375621
+            var hue1 = target.GetHue();
+            var num1 = ColorNum(target, factorSat, factorBri);
+            var diffs = colors.Select(n => Math.Abs(ColorNum(n, factorSat, factorBri) - num1) + getHueDistance(n.GetHue(), hue1));
+            var diffMin = diffs.Min(x => x);
+            return colors[diffs.ToList().FindIndex(n => n == diffMin)];
+        }
+
+
+        // color brightness as perceived:
+        public static float getBrightness(Color c)
+        {
+            return (c.R * 0.299f + c.G * 0.587f + c.B * 0.114f) / 256f;
+        }
+
+        // distance between two hues:
+        public static float getHueDistance(float hue1, float hue2)
+        {
+            var d = Math.Abs(hue1 - hue2);
+            return d > 180 ? 360 - d : d;
+        }
+
+        //  weighed only by saturation and brightness (from my trackbars)
+        public static float ColorNum(Color c, float factorSat, float factorBri)
+        {
+            return c.GetSaturation() * factorSat + getBrightness(c) * factorBri;
+        }
+
+        // distance in RGB space
+        public static int ColorDiff(Color c1, Color c2)
+        {
+            return (int)Math.Sqrt((c1.R - c2.R) * (c1.R - c2.R)
+                                   + (c1.G - c2.G) * (c1.G - c2.G)
+                                   + (c1.B - c2.B) * (c1.B - c2.B));
         }
     }
 }

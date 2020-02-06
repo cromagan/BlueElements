@@ -613,12 +613,12 @@ namespace BlueBasics
                         if (bmpSecond != null && X > bmpOri.Width - bmpSecond.Width && Y > bmpOri.Height - bmpSecond.Height)
                         {
                             var c2 = bmpSecond.GetPixel(X - (bmpOri.Width - bmpSecond.Width), Y - (bmpOri.Height - bmpSecond.Height));
-                            if (!c2.IsMagenta()) { c = c2; }
+                            if (!c2.IsMagentaOrTransparent()) { c = c2; }
                             //c = Color.Black;
                         }
 
 
-                        if (c.IsMagenta())
+                        if (c.IsMagentaOrTransparent())
                         {
                             c = Color.FromArgb(0, 0, 0, 0);
                         }
@@ -641,7 +641,7 @@ namespace BlueBasics
 
                         if (_effekt.HasFlag(enImageCodeEffect.Durchgestrichen))
                         {
-                            if (c.IsMagenta())
+                            if (c.IsMagentaOrTransparent())
                             {
                                 c = bmpKreuz.GetPixel(X, Y);
                             }
@@ -651,7 +651,7 @@ namespace BlueBasics
                             }
                         }
 
-                        if (!c.IsMagenta())
+                        if (!c.IsMagentaOrTransparent())
                         {
                             if (_transparenz > 0 && _transparenz < 100) { c = Color.FromArgb((int)(c.A * (100 - _transparenz) / 100.0), c.R, c.G, c.B); }
                         }
@@ -659,20 +659,20 @@ namespace BlueBasics
                         if (_effekt.HasFlag(enImageCodeEffect.WindowsMEDisabled))
                         {
                             c1 = Color.FromArgb(0, 0, 0, 0);
-                            if (!c.IsMagenta())
+                            if (!c.IsMagentaOrTransparent())
                             {
                                 var RandPixel = false;
-                                if (X > 0 && bmpOri.GetPixel(X - 1, Y).IsMagenta()) { RandPixel = true; }
-                                if (Y > 0 && bmpOri.GetPixel(X, Y - 1).IsMagenta()) { RandPixel = true; }
-                                if (X < bmpOri.Width - 1 && bmpOri.GetPixel(X + 1, Y).IsMagenta()) { RandPixel = true; }
-                                if (Y < bmpOri.Height - 1 && bmpOri.GetPixel(X, Y + 1).IsMagenta()) { RandPixel = true; }
+                                if (X > 0 && bmpOri.GetPixel(X - 1, Y).IsMagentaOrTransparent()) { RandPixel = true; }
+                                if (Y > 0 && bmpOri.GetPixel(X, Y - 1).IsMagentaOrTransparent()) { RandPixel = true; }
+                                if (X < bmpOri.Width - 1 && bmpOri.GetPixel(X + 1, Y).IsMagentaOrTransparent()) { RandPixel = true; }
+                                if (Y < bmpOri.Height - 1 && bmpOri.GetPixel(X, Y + 1).IsMagentaOrTransparent()) { RandPixel = true; }
 
                                 if (c.B < 128 || RandPixel)
                                 {
                                     c1 = SystemColors.ControlDark;
                                     if (X < bmpOri.Width - 1 && Y < bmpOri.Height - 1)
                                     {
-                                        if (bmpOri.GetPixel(X + 1, Y + 1).IsMagenta()) { c1 = SystemColors.ControlLightLight; }
+                                        if (bmpOri.GetPixel(X + 1, Y + 1).IsMagentaOrTransparent()) { c1 = SystemColors.ControlLightLight; }
                                     }
                                 }
                             }

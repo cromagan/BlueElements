@@ -33,7 +33,6 @@ namespace BluePaint
             this.tabRibbonbar = new BlueControls.Controls.TabControl();
             this.Tab_Start = new BlueControls.Controls.TabPage();
             this.grpBearbteitung = new BlueControls.Controls.GroupBox();
-            this.btnAbspielen = new BlueControls.Controls.Button();
             this.btnStop = new BlueControls.Controls.Button();
             this.btnAufnahme = new BlueControls.Controls.Button();
             this.grpDatei = new BlueControls.Controls.GroupBox();
@@ -48,6 +47,7 @@ namespace BluePaint
             this.btnDummy = new BlueControls.Controls.Button();
             this.btnScreenshot = new BlueControls.Controls.Button();
             this.grpSonstiges = new BlueControls.Controls.GroupBox();
+            this.btnGrößeÄndern = new BlueControls.Controls.Button();
             this.btnKontrast = new BlueControls.Controls.Button();
             this.btnSpiegeln = new BlueControls.Controls.Button();
             this.btnBruchlinie = new BlueControls.Controls.Button();
@@ -67,6 +67,7 @@ namespace BluePaint
             this.InfoText = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
+            this.btn100 = new BlueControls.Controls.Button();
             this.tabRibbonbar.SuspendLayout();
             this.Tab_Start.SuspendLayout();
             this.grpBearbteitung.SuspendLayout();
@@ -112,7 +113,6 @@ namespace BluePaint
             // grpBearbteitung
             // 
             this.grpBearbteitung.CausesValidation = false;
-            this.grpBearbteitung.Controls.Add(this.btnAbspielen);
             this.grpBearbteitung.Controls.Add(this.btnStop);
             this.grpBearbteitung.Controls.Add(this.btnAufnahme);
             this.grpBearbteitung.Dock = System.Windows.Forms.DockStyle.Left;
@@ -120,17 +120,6 @@ namespace BluePaint
             this.grpBearbteitung.Name = "grpBearbteitung";
             this.grpBearbteitung.Size = new System.Drawing.Size(248, 81);
             this.grpBearbteitung.Text = "Serienbearbeitung";
-            // 
-            // btnAbspielen
-            // 
-            this.btnAbspielen.Enabled = false;
-            this.btnAbspielen.ImageCode = "Abspielen";
-            this.btnAbspielen.Location = new System.Drawing.Point(168, 2);
-            this.btnAbspielen.Name = "btnAbspielen";
-            this.btnAbspielen.Size = new System.Drawing.Size(72, 66);
-            this.btnAbspielen.TabIndex = 2;
-            this.btnAbspielen.Text = "Abspielen";
-            this.btnAbspielen.Click += new System.EventHandler(this.btnAbspielen_Click);
             // 
             // btnStop
             // 
@@ -237,7 +226,7 @@ namespace BluePaint
             // btnOK
             // 
             this.btnOK.ImageCode = "Häkchen";
-            this.btnOK.Location = new System.Drawing.Point(680, 0);
+            this.btnOK.Location = new System.Drawing.Point(720, 0);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(56, 72);
             this.btnOK.TabIndex = 1;
@@ -250,9 +239,9 @@ namespace BluePaint
             this.grpNeu.Controls.Add(this.btnDummy);
             this.grpNeu.Controls.Add(this.btnScreenshot);
             this.grpNeu.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpNeu.Location = new System.Drawing.Point(520, 0);
+            this.grpNeu.Location = new System.Drawing.Point(632, 0);
             this.grpNeu.Name = "grpNeu";
-            this.grpNeu.Size = new System.Drawing.Size(152, 81);
+            this.grpNeu.Size = new System.Drawing.Size(120, 81);
             this.grpNeu.Text = "Neu";
             // 
             // btnDummy
@@ -278,20 +267,31 @@ namespace BluePaint
             // grpSonstiges
             // 
             this.grpSonstiges.CausesValidation = false;
+            this.grpSonstiges.Controls.Add(this.btnGrößeÄndern);
             this.grpSonstiges.Controls.Add(this.btnKontrast);
             this.grpSonstiges.Controls.Add(this.btnSpiegeln);
             this.grpSonstiges.Controls.Add(this.btnBruchlinie);
             this.grpSonstiges.Controls.Add(this.btnClipping);
             this.grpSonstiges.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpSonstiges.Location = new System.Drawing.Point(280, 0);
+            this.grpSonstiges.Location = new System.Drawing.Point(328, 0);
             this.grpSonstiges.Name = "grpSonstiges";
-            this.grpSonstiges.Size = new System.Drawing.Size(240, 81);
+            this.grpSonstiges.Size = new System.Drawing.Size(304, 81);
             this.grpSonstiges.Text = "Sonstiges";
+            // 
+            // btnGrößeÄndern
+            // 
+            this.btnGrößeÄndern.ImageCode = "Bild||||||||||ZoomFit";
+            this.btnGrößeÄndern.Location = new System.Drawing.Point(8, 2);
+            this.btnGrößeÄndern.Name = "btnGrößeÄndern";
+            this.btnGrößeÄndern.Size = new System.Drawing.Size(56, 66);
+            this.btnGrößeÄndern.TabIndex = 6;
+            this.btnGrößeÄndern.Text = "Größe ändern";
+            this.btnGrößeÄndern.Click += new System.EventHandler(this.btnGrößeÄndern_Click);
             // 
             // btnKontrast
             // 
             this.btnKontrast.ImageCode = "Kontrast";
-            this.btnKontrast.Location = new System.Drawing.Point(176, 2);
+            this.btnKontrast.Location = new System.Drawing.Point(240, 2);
             this.btnKontrast.Name = "btnKontrast";
             this.btnKontrast.Size = new System.Drawing.Size(56, 66);
             this.btnKontrast.TabIndex = 5;
@@ -301,7 +301,7 @@ namespace BluePaint
             // btnSpiegeln
             // 
             this.btnSpiegeln.ImageCode = "SpiegelnVertikal";
-            this.btnSpiegeln.Location = new System.Drawing.Point(0, 2);
+            this.btnSpiegeln.Location = new System.Drawing.Point(64, 2);
             this.btnSpiegeln.Name = "btnSpiegeln";
             this.btnSpiegeln.Size = new System.Drawing.Size(64, 66);
             this.btnSpiegeln.TabIndex = 3;
@@ -311,7 +311,7 @@ namespace BluePaint
             // btnBruchlinie
             // 
             this.btnBruchlinie.ImageCode = "Bruchlinie";
-            this.btnBruchlinie.Location = new System.Drawing.Point(120, 2);
+            this.btnBruchlinie.Location = new System.Drawing.Point(184, 2);
             this.btnBruchlinie.Name = "btnBruchlinie";
             this.btnBruchlinie.Size = new System.Drawing.Size(56, 66);
             this.btnBruchlinie.TabIndex = 2;
@@ -321,7 +321,7 @@ namespace BluePaint
             // btnClipping
             // 
             this.btnClipping.ImageCode = "Zuschneiden";
-            this.btnClipping.Location = new System.Drawing.Point(64, 2);
+            this.btnClipping.Location = new System.Drawing.Point(128, 2);
             this.btnClipping.Name = "btnClipping";
             this.btnClipping.Size = new System.Drawing.Size(56, 66);
             this.btnClipping.TabIndex = 1;
@@ -334,7 +334,7 @@ namespace BluePaint
             this.grpZeichnen.Controls.Add(this.btnZeichnen);
             this.grpZeichnen.Controls.Add(this.btnRadiergummi);
             this.grpZeichnen.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpZeichnen.Location = new System.Drawing.Point(144, 0);
+            this.grpZeichnen.Location = new System.Drawing.Point(192, 0);
             this.grpZeichnen.Name = "grpZeichnen";
             this.grpZeichnen.Size = new System.Drawing.Size(136, 81);
             this.grpZeichnen.Text = "Zeichnen";
@@ -362,12 +362,13 @@ namespace BluePaint
             // grpSteuerung
             // 
             this.grpSteuerung.CausesValidation = false;
+            this.grpSteuerung.Controls.Add(this.btn100);
             this.grpSteuerung.Controls.Add(this.btnZoomFit);
             this.grpSteuerung.Controls.Add(this.btnRückgänig);
             this.grpSteuerung.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpSteuerung.Location = new System.Drawing.Point(0, 0);
             this.grpSteuerung.Name = "grpSteuerung";
-            this.grpSteuerung.Size = new System.Drawing.Size(144, 81);
+            this.grpSteuerung.Size = new System.Drawing.Size(192, 81);
             this.grpSteuerung.Text = "Steuerung";
             // 
             // btnZoomFit
@@ -485,6 +486,16 @@ namespace BluePaint
             this.SaveTab.Filter = "PNG-Dateien|*.PNG|BMP-Dateien|*.BMP|JPG-Dateien|*.JPG";
             this.SaveTab.Title = "Bitte neuen Dateinamen wählen.";
             // 
+            // btn100
+            // 
+            this.btn100.ImageCode = "Pinnadel";
+            this.btn100.Location = new System.Drawing.Point(136, 2);
+            this.btn100.Name = "btn100";
+            this.btn100.Size = new System.Drawing.Size(48, 66);
+            this.btn100.TabIndex = 9;
+            this.btn100.Text = "100%";
+            this.btn100.Click += new System.EventHandler(this.btn100_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -550,8 +561,9 @@ namespace BluePaint
         internal GroupBox groupBox1;
         internal Button btnBrain;
         private GroupBox grpBearbteitung;
-        private Button btnAbspielen;
         private Button btnStop;
         private Button btnAufnahme;
+        internal Button btnGrößeÄndern;
+        private Button btn100;
     }
 }

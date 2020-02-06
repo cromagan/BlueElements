@@ -111,7 +111,7 @@ namespace BluePaint
 
 
             var f = System.IO.Directory.GetFiles(txbQuelle.Text, "*.PNG", System.IO.SearchOption.TopDirectoryOnly);
-            if (f == null || f.GetUpperBound(0) == 0)
+            if (f == null || f.GetUpperBound(0) < 0)
             {
                 MessageBox.Show("Keine Dateien im Quellverzeichniss gefunden.");
                 return;
@@ -159,6 +159,7 @@ namespace BluePaint
                     ThisTool.ExcuteCommand(t[1].FromNonCritical());
                     ThisTool.OverridePic -= ThisTool_OverridePic;
                     ThisTool.NeedCurrentPic -= ThisTool_NeedCurrentPic;
+                    return; // keine weiteren kennungen reagieren lassen
                 }
             }
         }
