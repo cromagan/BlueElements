@@ -18,6 +18,7 @@
 #endregion
 
 using BlueBasics;
+using BlueControls.EventArgs;
 using Encog.Engine.Network.Activation;
 using Encog.ML.Data.Basic;
 using Encog.Neural.Networks;
@@ -27,18 +28,12 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Windows.Forms;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modAllgemein;
 
 namespace BluePaint
 {
-
-    //enum enColor : int
-    //{
-    //    Black = 0,
-    //    //Transparent = 1,
-    //    Color = 1
-    //}
 
     public partial class Tool_Brain : GenericTool  //  BlueControls.Forms.Form //
     {
@@ -48,9 +43,12 @@ namespace BluePaint
         int r = 4;
         //int rk = 1;
 
+        float isBlack = 0.2f;
+
         bool stopping = false;
 
-
+        Bitmap _VisibleLernImageSource = null;
+        Bitmap _VisibleLernImageTarget = null;
 
         BasicNetwork network = null;
 
@@ -96,7 +94,9 @@ namespace BluePaint
                 #region Network
                 network = new BasicNetwork();
                 network.AddLayer(new BasicLayer(new ActivationLinear(), true, inp.Count));
-                network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)((inp.Count + oup.Count) * 1.5)));
+                network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)((inp.Count + oup.Count) * 2)));
+                network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)((inp.Count + oup.Count) * 2)));
+                network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)((inp.Count + oup.Count) * 2)));
                 network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, oup.Count));
                 network.Structure.FinalizeStructure();
                 network.Reset();
@@ -123,15 +123,18 @@ namespace BluePaint
             btnLernen.Enabled = false;
             btnStop.Enabled = true;
 
+            _VisibleLernImageSource = null;
+            _VisibleLernImageTarget = null;
+
 
             stopping = false;
 
             var All = Directory.GetFiles(txtPath.Text, "*.png", SearchOption.AllDirectories);
 
-            var allreadyUsed = new List<string>();
+            var toLearn = new List<string>();
             var allreadyUsedInputs = new List<string>();
 
-            Bitmap testI = null;
+
 
             foreach (var thisf in All)
             {
@@ -143,10 +146,11 @@ namespace BluePaint
 
 
 
-                    if (testI == null)
+                    if (_VisibleLernImageSource == null)
                     {
-                        testI = ((Bitmap)Image_FromFile(thisf));//.AdjustContrast(100f);
-                        OnOverridePic(testI);
+                        _VisibleLernImageSource = ((Bitmap)Image_FromFile(thisf));//.AdjustContrast(100f);
+                        _VisibleLernImageTarget = (Bitmap)Image_FromFile(thisf.Trim(".png") + "-ready.png");
+                        OnOverridePic(_VisibleLernImageSource);
                     }
 
 
@@ -159,32 +163,14 @@ namespace BluePaint
                         count--;
                         var was = ((RotateFlipType)count);
 
-                        var P = ((Bitmap)Image_FromFile(thisf));//.AdjustContrast(100f);
+                        var P = ((Bitmap)Image_FromFile(thisf));
                         var PR = (Bitmap)Image_FromFile(thisf.Trim(".png") + "-ready.png");
                         P.RotateFlip(was);
                         PR.RotateFlip(was);
 
-
-                        for (var x = 0; x < P.Width; x++)
-                        {
-                            for (var y = 0; y < P.Height; y++)
-                            {
-
-
-                                var colorsinput = OneSet(P, x, y);
-                                var colorsoutput = GetOutPixel(PR, x, y);
-                                var colorsInputstring = ToString(colorsinput);
-                                if (!allreadyUsedInputs.Contains(colorsInputstring))
-                                {
-                                    allreadyUsedInputs.Add(colorsInputstring);
-                                    allreadyUsed.Add(ToString(colorsinput) + "X" + ToString(colorsoutput));
-
-                                }
-
-                            }
-                        }
-
+                        GetInputLearnPixel(P, PR, 0, 0, P.Width, P.Height, allreadyUsedInputs, toLearn);
                         Develop.DoEvents();
+
                         if (stopping)
                         {
                             btnLernen.Enabled = true;
@@ -197,13 +183,23 @@ namespace BluePaint
                 }
             }
 
-            allreadyUsed.Shuffle();
+            Learn(toLearn, -1);
 
-            var inputs = new double[allreadyUsed.Count][];
-            var outputs = new double[allreadyUsed.Count][];
+
+
+        }
+
+        private void Learn(List<string> toLearn, int Count)
+        {
+            if (toLearn.Count == 0) { return; }
+
+            toLearn.Shuffle();
+
+            var inputs = new double[toLearn.Count][];
+            var outputs = new double[toLearn.Count][];
             var pos = -1;
 
-            foreach (var thisx in allreadyUsed)
+            foreach (var thisx in toLearn)
             {
                 var t = thisx.SplitBy("X");
                 pos++;
@@ -228,8 +224,11 @@ namespace BluePaint
             var lastime = new DateTime(1900, 1, 1);
             var lastimeerr = DateTime.Now;
 
+            var current = 0;
+
             do
             {
+                current++;
                 learner1.Iteration();
 
 
@@ -249,21 +248,44 @@ namespace BluePaint
 
                 if (DateTime.Now.Subtract(lastime).TotalSeconds > 10)
                 {
-                    Encog.Persist.EncogDirectoryPersistence.SaveObject(new FileInfo(f), network);
-                    OnOverridePic(testI);
-                    btnAnwenden_Click(null, null);
+                    if (Count < 0)
+                    {
+                        Encog.Persist.EncogDirectoryPersistence.SaveObject(new FileInfo(f), network);
+                    }
+
+                    OnOverridePic(_VisibleLernImageSource);
+                    DoModus(0);
                     lastime = DateTime.Now;
+                    if (Count > 0 && current > Count) { break; }
                 }
 
 
+
+
             } while (true);
-
-
-
         }
 
+        private void GetInputLearnPixel(Bitmap sourceBMP, Bitmap targetBMP, int xs, int ys, int width, int height, List<string> allreadyUsedInputs, List<string> toLearn)
+        {
+            for (var x = Math.Max(xs, 0); x < Math.Min(xs + width, sourceBMP.Width); x++)
+            {
+                for (var y = Math.Max(ys, 0); y < Math.Min(ys + height, sourceBMP.Height); y++)
+                {
 
 
+                    var colorsinput = OneSet(sourceBMP, x, y);
+                    var colorsoutput = GetOutPixel(targetBMP, x, y);
+                    var colorsInputstring = ToString(colorsinput);
+                    if (!allreadyUsedInputs.Contains(colorsInputstring))
+                    {
+                        allreadyUsedInputs.Add(colorsInputstring);
+                        toLearn.Add(ToString(colorsinput) + "X" + ToString(colorsoutput));
+
+                    }
+
+                }
+            }
+        }
 
         private double[] OneSet(Bitmap p, int x, int y)
         {
@@ -294,7 +316,7 @@ namespace BluePaint
 
             var c = p.GetPixel(x, y);
 
-            if (c.A < 20) { return 1f; }
+            //if (c.A < 20) { return 1f; }
 
 
 
@@ -342,57 +364,40 @@ namespace BluePaint
         {
             var br = 1 - col.GetBrightness();
 
-            return 1 - (br * br * br * br * br * br);
+            return 1 - ((br * br * br) * (Math.Min((int)(col.A * 1.2), 255) / 255));
 
         }
 
-        private void btnAnwenden_Click(object sender, System.EventArgs e)
+
+
+        public int BlackValue(Bitmap P, int x, int y)
+        {
+            var colorsinput = OneSet(P, x, y);
+            var result = network.Compute(new BasicMLData(colorsinput, false));
+
+            return (int)(result[0] * 255);
+
+
+        }
+
+
+        public bool Black(Bitmap P, int x, int y)
         {
 
-            OnCommandForMacro("Anwenden");
 
-            var P = OnNeedCurrentPic();
-            if (P == null) { return; }
-
-            var NP = new Bitmap(P.Width, P.Height);
+            return (BlackValue(P, x, y) < 180);
+        }
 
 
-            var cols = UsedColors(P);
-
-
-            //var Phell = P.AdjustContrast(100f);
-
-
-            for (var x = 0; x < P.Width; x++)
-            {
-                for (var y = 0; y < P.Height; y++)
-                {
-
-                    var colorsinput = OneSet(P, x, y);
-                    var result = network.Compute(new BasicMLData(colorsinput, false));
-
-                    var b = (int)(result[0] * 255);
-
-                    if (b < 180)
-                    {
-
-                        NP.SetPixel(x, y, Color.FromArgb(0, 0, 0));
-
-                    }
-                    else
-                    {
-                        var nc = GetNearestColor(cols, P, x, y);
-                        NP.SetPixel(x, y, nc);
-
-                    }
-                }
-            }
-
-            OnOverridePic(NP);
-            Develop.DoEvents();
-
-
-
+        private void btnAnwendenFarbe_Click(object sender, System.EventArgs e)
+        {
+            OnCommandForMacro("AnwendenFarbe");
+            DoModus(1);
+        }
+        private void btnAnwendenSW_Click(object sender, System.EventArgs e)
+        {
+            OnCommandForMacro("AnwendenBW");
+            DoModus(0);
         }
 
         private Color GetNearestColor(List<Color> allcolors, Bitmap p, int x, int y)
@@ -577,31 +582,6 @@ namespace BluePaint
 
             return checkcol.ClosestHSVColor(allcolors, 0.5f, 1f);
 
-
-            //var diff =100d;
-            //var giveback = Color.Magenta;
-
-            //var dbl_input_red = Convert.ToDouble(checkcol.R);
-            //var dbl_input_green = Convert.ToDouble(checkcol.G);
-            //var dbl_input_blue = Convert.ToDouble(checkcol.B);
-
-
-            //foreach (var o in allcolors)
-            //{
-            //    var dbl_test_red = Math.Pow(Convert.ToDouble(((Color)o).R) - dbl_input_red, 2.0);
-            //    var dbl_test_green = Math.Pow(Convert.ToDouble(((Color)o).G) - dbl_input_green, 2.0);
-            //    var dbl_test_blue = Math.Pow(Convert.ToDouble(((Color)o).B) - dbl_input_blue, 2.0);
-
-            //    var nd = Math.Sqrt(dbl_test_blue + dbl_test_green + dbl_test_red);
-            //    if (nd < diff)
-            //    {
-            //        diff = nd;
-            //        giveback = o;
-            //    }
-            //}
-
-
-            //return giveback;
         }
 
         private Color GetPixelColor(Bitmap p, int x, int y)
@@ -623,13 +603,7 @@ namespace BluePaint
                 for (var y = 0; y < P.Height; y++)
                 {
                     var p = (int)(GetInputPixel(P, x, y) * 255);
-
-
                     NP.SetPixel(x, y, Color.FromArgb(p, p, p));
-
-
-
-
                 }
             }
             OnOverridePic(NP);
@@ -638,27 +612,9 @@ namespace BluePaint
         private double[] GetOutPixel(Bitmap pr, int x, int y)
         {
             var b = new double[] { 1 };
-
             var c = pr.GetPixel(x, y);
-
-            if (c.GetBrightness() < 0.2) { b[0] = 0; }
-
+            if (c.GetBrightness() < isBlack) { b[0] = 0; }
             return b;
-            //if (c.ToArgb() == -16777216)
-            //{
-            //    b[(int)enColor.Black] = 1;
-            //}
-            ////else if (c.A < 20)
-            ////{
-            ////    b[(int)enColor.Transparent] = 1;
-            ////}
-            //else
-            //{
-            //    b[(int)enColor.Color] = 1;
-            //}
-
-            //return b;
-
         }
 
         private string ToString(double[] v)
@@ -714,15 +670,108 @@ namespace BluePaint
         {
             var c = command.SplitBy(";");
 
-            if (c[0] == "Anwenden")
+            switch (c[0])
             {
-                btnAnwenden_Click(null, System.EventArgs.Empty);
-            }
-            else
-            {
-                Develop.DebugPrint_NichtImplementiert();
+
+                case "AnwendenBW":
+                    DoModus(0);
+                    break;
+
+                case "AnwendenFarbe":
+                    DoModus(1);
+                    break;
+                default:
+
+                    Develop.DebugPrint_NichtImplementiert();
+                    break;
             }
         }
 
+        public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
+        {
+            base.MouseUp(e, OriginalPic);
+
+
+            if (!e.Current.IsInPic) { return; }
+
+            var toLearn = new List<string>();
+            var allreadyUsedInputs = new List<string>();
+
+            var x = e.Current.X;
+            var y = e.Current.Y;
+
+            GetInputLearnPixel(_VisibleLernImageSource, _VisibleLernImageTarget, x - 5, y - 5, 10, 10, allreadyUsedInputs, toLearn);
+            stopping = false;
+
+            btnStop.Enabled = true;
+            {
+
+                Learn(toLearn, 1000);
+                Develop.DoEvents();
+
+
+
+                if (Black(_VisibleLernImageSource, x, y))
+                {
+                    if (GetOutPixel(_VisibleLernImageTarget, x, y)[0] < isBlack)
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    if (GetOutPixel(_VisibleLernImageTarget, x, y)[0] >= isBlack)
+                    {
+                        return;
+                    }
+
+                }
+
+
+            }
+
+        }
+
+
+
+        private void DoModus(int modus)
+        {
+            var P = OnNeedCurrentPic();
+            if (P == null) { return; }
+
+            var NP = new Bitmap(P.Width, P.Height);
+
+            var cols = UsedColors(P);
+
+            for (var x = 0; x < P.Width; x++)
+            {
+                for (var y = 0; y < P.Height; y++)
+                {
+
+                    if (Black(P, x, y))
+                    {
+                        var V = BlackValue(P, x, y);
+                        NP.SetPixel(x, y, Color.FromArgb(V, V, V));
+                    }
+                    else
+                    {
+                        if (modus == 1)
+                        {
+                            var nc = GetNearestColor(cols, P, x, y);
+                            NP.SetPixel(x, y, nc);
+                        }
+                        else
+                        {
+                            NP.SetPixel(x, y, Color.Transparent);
+                        }
+
+
+                    }
+                }
+            }
+
+            OnOverridePic(NP);
+            Develop.DoEvents();
+        }
     }
 }

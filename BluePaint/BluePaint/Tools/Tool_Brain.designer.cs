@@ -33,15 +33,16 @@ namespace BluePaint
         private void InitializeComponent()
         {
             this.btnLernen = new BlueControls.Controls.Button();
-            this.btnAnwenden = new BlueControls.Controls.Button();
+            this.btnAnwendenFarbe = new BlueControls.Controls.Button();
             this.txtPath = new BlueControls.Controls.TextBox();
             this.btnLernmaske = new BlueControls.Controls.Button();
             this.tabControl1 = new BlueControls.Controls.TabControl();
             this.tabAnwenden = new BlueControls.Controls.TabPage();
             this.tabLernen = new BlueControls.Controls.TabPage();
+            this.btnDrehen = new BlueControls.Controls.Button();
             this.capFehlerrate = new BlueControls.Controls.Caption();
             this.btnStop = new BlueControls.Controls.Button();
-            this.btnDrehen = new BlueControls.Controls.Button();
+            this.btnAnwendenSW = new BlueControls.Controls.Button();
             this.tabControl1.SuspendLayout();
             this.tabAnwenden.SuspendLayout();
             this.tabLernen.SuspendLayout();
@@ -56,14 +57,14 @@ namespace BluePaint
             this.btnLernen.Text = "Lernen";
             this.btnLernen.Click += new System.EventHandler(this.btnLernen_Click);
             // 
-            // btnAnwenden
+            // btnAnwendenFarbe
             // 
-            this.btnAnwenden.Location = new System.Drawing.Point(8, 16);
-            this.btnAnwenden.Name = "btnAnwenden";
-            this.btnAnwenden.Size = new System.Drawing.Size(296, 48);
-            this.btnAnwenden.TabIndex = 1;
-            this.btnAnwenden.Text = "Anwenden";
-            this.btnAnwenden.Click += new System.EventHandler(this.btnAnwenden_Click);
+            this.btnAnwendenFarbe.Location = new System.Drawing.Point(8, 16);
+            this.btnAnwendenFarbe.Name = "btnAnwendenFarbe";
+            this.btnAnwendenFarbe.Size = new System.Drawing.Size(296, 48);
+            this.btnAnwendenFarbe.TabIndex = 1;
+            this.btnAnwendenFarbe.Text = "Anwenden (Farbe)";
+            this.btnAnwendenFarbe.Click += new System.EventHandler(this.btnAnwendenFarbe_Click);
             // 
             // txtPath
             // 
@@ -96,7 +97,8 @@ namespace BluePaint
             // 
             // tabAnwenden
             // 
-            this.tabAnwenden.Controls.Add(this.btnAnwenden);
+            this.tabAnwenden.Controls.Add(this.btnAnwendenSW);
+            this.tabAnwenden.Controls.Add(this.btnAnwendenFarbe);
             this.tabAnwenden.Location = new System.Drawing.Point(4, 25);
             this.tabAnwenden.Name = "tabAnwenden";
             this.tabAnwenden.Size = new System.Drawing.Size(353, 355);
@@ -117,6 +119,16 @@ namespace BluePaint
             this.tabLernen.TabIndex = 1;
             this.tabLernen.Text = "Lernen";
             // 
+            // btnDrehen
+            // 
+            this.btnDrehen.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnDrehen.Checked = true;
+            this.btnDrehen.Location = new System.Drawing.Point(40, 64);
+            this.btnDrehen.Name = "btnDrehen";
+            this.btnDrehen.Size = new System.Drawing.Size(152, 24);
+            this.btnDrehen.TabIndex = 5;
+            this.btnDrehen.Text = "Bilder auch drehen";
+            // 
             // capFehlerrate
             // 
             this.capFehlerrate.Location = new System.Drawing.Point(120, 144);
@@ -133,15 +145,14 @@ namespace BluePaint
             this.btnStop.Text = "Stop";
             this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
-            // btnDrehen
+            // btnAnwendenSW
             // 
-            this.btnDrehen.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnDrehen.Checked = true;
-            this.btnDrehen.Location = new System.Drawing.Point(40, 64);
-            this.btnDrehen.Name = "btnDrehen";
-            this.btnDrehen.Size = new System.Drawing.Size(152, 24);
-            this.btnDrehen.TabIndex = 5;
-            this.btnDrehen.Text = "Bilder auch drehen";
+            this.btnAnwendenSW.Location = new System.Drawing.Point(8, 88);
+            this.btnAnwendenSW.Name = "btnAnwendenSW";
+            this.btnAnwendenSW.Size = new System.Drawing.Size(296, 48);
+            this.btnAnwendenSW.TabIndex = 2;
+            this.btnAnwendenSW.Text = "Anwenden (SW)";
+            this.btnAnwendenSW.Click += new System.EventHandler(this.btnAnwendenSW_Click);
             // 
             // Tool_Brain
             // 
@@ -156,7 +167,7 @@ namespace BluePaint
         }
 
         private Button btnLernen;
-        private Button btnAnwenden;
+        private Button btnAnwendenFarbe;
         private TextBox txtPath;
         private Button btnLernmaske;
         private TabControl tabControl1;
@@ -165,6 +176,7 @@ namespace BluePaint
         private Button btnStop;
         private Caption capFehlerrate;
         private Button btnDrehen;
+        private Button btnAnwendenSW;
     }
 
 }
