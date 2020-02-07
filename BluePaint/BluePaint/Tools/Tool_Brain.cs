@@ -373,7 +373,7 @@ namespace BluePaint
 
                     var b = (int)(result[0] * 255);
 
-                    if (b < 230)
+                    if (b < 180)
                     {
 
                         NP.SetPixel(x, y, Color.FromArgb(0, 0, 0));
