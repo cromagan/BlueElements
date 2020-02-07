@@ -1,5 +1,6 @@
 ﻿using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,6 +32,13 @@ namespace BlueControls.Controls
 
 
         new bool _enabled = true;
+
+
+        /// <summary>
+        /// Die Hauptklasse wird zwar beibehalten, aber unterklassen müssen evtl. neu definiert werden.
+        /// </summary>
+       public event System.EventHandler LoadedFromDisk;
+
 
         public FlexiControlForProperty() : base()
         {
@@ -185,12 +193,37 @@ namespace BlueControls.Controls
 
                 FillPropertyNow();
 
+                if (_propertyObject is IReloadable LS)
+                {
+                    LS.LoadedFromDisk -= OnLoadedFromDisk;
+                }
+
+
                 _propertyObject = value;
                 GetTmpVariables();
                 UpdateControlData();
                 SetValueFromProperty();
                 CheckEnabledState();
+
+
+                if (_propertyObject is IReloadable LSn)
+                {
+                    LSn.LoadedFromDisk += OnLoadedFromDisk;
+                }
+
             }
+        }
+
+        private void OnLoadedFromDisk(object sender, System.EventArgs e)
+        {
+            FillPropertyNow();
+            _propertyObject = null;  //Das Objekt ist tot und irgendwo im Nirvana verschwunden
+            GetTmpVariables();
+            UpdateControlData();
+            SetValueFromProperty();
+            CheckEnabledState();
+
+            LoadedFromDisk?.Invoke(this, System.EventArgs.Empty);
         }
 
         private void GetTmpVariables()

@@ -19,11 +19,9 @@
 
 namespace BlueBasics.Interfaces
 {
-    public interface ILastSavedBy
+    public interface ILastSavedBy : IReloadable
     {
         string LastSavedBy { get; set; }
-
         string Beschreibung { get; }
-
     }
 }

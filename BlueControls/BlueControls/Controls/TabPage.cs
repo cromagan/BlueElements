@@ -188,6 +188,14 @@ namespace BlueControls.Controls
 
         protected override void OnEnabledChanged(System.EventArgs e)
         {
+
+            if (InvokeRequired)
+            {
+                Invoke(new System.Action(() => OnEnabledChanged(e)));
+                return;
+            }
+
+
             base.OnEnabledChanged(e);                   
             Invalidate();
             Parent?.Invalidate();

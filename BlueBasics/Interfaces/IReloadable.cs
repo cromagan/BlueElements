@@ -17,36 +17,12 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueBasics.Enums
+namespace BlueBasics.Interfaces
 {
-    public enum enErrorReason
+    public interface IReloadable
     {
-        /// <summary>
-        /// Ob der Wert gelesen werden kann. Ein Speichern/Bearbeiten ist nicht geplant.
-        /// </summary>
-        OnlyRead = 1,
+        void OnLoadedFromDisk(); // Wird benötigt, dass clsSerializableMultiUserFile mitteilen kann, dass was geändert wurde.
 
-
-        ///// <summary>
-        ///// Ob das Feld im allgemeinen bearbeitet werden kann, wenn keine Prozesse dazwischenpfuschen
-        ///// </summary>
-        EditNormaly = 2,
-
-        /// <summary>
-        /// Wenn die Daten eigentlich geschrieben werden müssen
-        /// </summary>
-        EditAcut = 4,
-
-        /// <summary>
-        /// Es ist noch Zeit, der Benutzer kann ausgesperrt werden
-        /// </summary>
-        EditGeneral = 8,
-
-
-        Save = 16,
-
-        Load = 32
-
-
+        event System.EventHandler LoadedFromDisk; // wird benötigt, dass die Klasse selbst sich mitteilen kann, das was geändert wurde.
     }
 }

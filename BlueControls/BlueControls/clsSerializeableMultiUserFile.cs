@@ -182,7 +182,10 @@ namespace BlueControls
 
         protected override void OnLoaded(LoadedEventArgs e)
         {
-            base.OnLoaded(e);
+
+            obj?.OnLoadedFromDisk(); // Zuerst verknüpften Objekten Sagem dass sie nicht mehgr gültig sind
+
+            base.OnLoaded(e); // Dann das Ereignis auslösen, so dass sie repariert werden können
 
             if (_FirstLoad)
             {

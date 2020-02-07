@@ -441,7 +441,18 @@ namespace BlueControls.Controls
             Invalidate();
         }
 
+        public void SetTextIfItemExists(string text)
+        {
+            foreach (var thisItem in Item)
+            {
+                if (thisItem.Internal == text)
+                {
+                    Text = text;
+                    return;
+                }
 
+            }
 
+        }
     }
 }

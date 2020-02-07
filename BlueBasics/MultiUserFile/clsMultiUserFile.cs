@@ -138,6 +138,50 @@ namespace BlueBasics.MultiUserFile
             ReadOnly = true;
         }
 
+
+
+        private Tuple<List<byte>, string> LoadBytesFromDisk(bool OnlyReload)
+        {
+            byte[] _tmp = null;
+            var tmpLastSaveCode = string.Empty;
+
+            var StartTime = DateTime.UtcNow;
+            do
+            {
+                try
+                {
+
+                    if (OnlyReload && !ReloadNeeded()) { return null; } // PRoblem hat sich aufgelöst
+
+                    var f = ErrorReason(enErrorReason.Load);
+
+                    if (string.IsNullOrEmpty(f))
+                    {
+                        _tmp = File.ReadAllBytes(Filename);
+                        tmpLastSaveCode = GetFileInfo(true);
+                        break;
+                    }
+
+                    Develop.DebugPrint(enFehlerArt.Info, f + "\r\n" + Filename);
+                    Pause(0.5, false);
+                }
+                catch (Exception ex)
+                {
+                    // Home Office kann lange blokieren....
+                    if (DateTime.UtcNow.Subtract(StartTime).TotalSeconds > 300)
+                    {
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
+                        return null;
+                    }
+                }
+            } while (true);
+
+            var _BLoaded = new List<byte>();
+            _BLoaded.AddRange(_tmp);
+
+            return new Tuple<List<byte>, string>(_BLoaded, tmpLastSaveCode);
+        }
+
         /// <summary>
         /// Führt - falls nötig - einen Reload der Datenbank aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
         /// </summary>
@@ -168,55 +212,14 @@ namespace BlueBasics.MultiUserFile
 
             if (OnlyReload && ReadOnly && ec.TryCancel) { _IsLoading = false; return; }
 
-            string tmpLastSaveCode;
-            byte[] _tmp = null;
+            var Data = LoadBytesFromDisk(OnlyReload);
+            if (Data == null) { _IsLoading = false; return; }
 
-            var StartTime = DateTime.UtcNow;
-            do
-            {
-                try
-                {
-
-                    if (OnlyReload && !ReloadNeeded()) { _IsLoading = false; return; } // PRoblem hat sich aufgelöst
-
-                    var f = ErrorReason(enErrorReason.Load);
-
-                    if (string.IsNullOrEmpty(f))
-                    {
-                        _tmp = File.ReadAllBytes(Filename);
-                        tmpLastSaveCode = GetFileInfo(true);
-                        break;
-                    }
-
-                    Develop.DebugPrint(enFehlerArt.Info, f + "\r\n" + Filename);
-                    Pause(0.5, false);
-
-                    //if (EasyMode) { break; }
-
-                    //Pause(0.5, false);
-                    //if (new FileInfo(Filename).Length == _tmp.Length) { break; }
-
-                }
-                catch (Exception ex)
-                {
-                    // Home Office kann lange blokieren....
-                    if (DateTime.UtcNow.Subtract(StartTime).TotalSeconds > 300)
-                    {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
-                        _IsLoading = false; return;
-                    }
-                }
-            } while (true);
-
-
-            var _BLoaded = new List<byte>();
-            _BLoaded.AddRange(_tmp);
+            var tmpLastSaveCode = Data.Item2;
+            var _BLoaded = Data.Item1;
             ThisIsOnDisk(_BLoaded.ToStringConvert());
 
-
             PrepeareDataForCheckingBeforeLoad();
-
-
 
             ParseInternal(_BLoaded);
             _LastSaveCode = tmpLastSaveCode; // initialize setzt zurück
@@ -293,30 +296,6 @@ namespace BlueBasics.MultiUserFile
         protected abstract void ParseExternal(List<byte> bLoaded);
 
 
-        //private void BinaryWriter_ReportProgressAndWait(int percentProcess, string UserState)
-        //{
-
-        //    if (UserState == Writer_ProcessDone)
-        //    {
-        //        BinSaver.ReportProgress(0, "ResetProcess");
-        //        do
-        //        {
-        //            Develop.DoEvents();
-        //        } while (Writer_ProcessDone == "ResetProcess");
-        //    }
-
-
-        //    BinSaver.ReportProgress(percentProcess, UserState);
-
-        //    do
-        //    {
-        //        Develop.DoEvents();
-        //    } while (Writer_ProcessDone != UserState);
-
-
-        //}
-
-
         private string SaveRoutine(string SavedFileName, string StateOfOriginalFile, string SavedData)
         {
             if (ReadOnly) { return "Datei ist Readonly"; }
@@ -382,7 +361,25 @@ namespace BlueBasics.MultiUserFile
             }
 
 
-            _LastSaveCode = GetFileInfo(true);
+            if (!EasyMode)
+            {
+                // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
+                var Data = LoadBytesFromDisk(false);
+                if (SavedData != Data.Item1.ToArray().ToStringConvert())
+                {
+                    _CheckedAndReloadNeed = true;
+                    _LastSaveCode = "Fehler";
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!!" + Filename);
+                    return "Speichervorgang fehlgeschlagen.";
+                }
+                _LastSaveCode = Data.Item2;
+            }
+            else
+            {
+                _LastSaveCode = GetFileInfo(true);
+            }
+
+
             _CheckedAndReloadNeed = false;
 
             DoWorkAfterSaving();
@@ -994,7 +991,6 @@ namespace BlueBasics.MultiUserFile
             if (mode.HasFlag(enErrorReason.EditGeneral))
             {
                 if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
-                if (_IsLoading) { return "Aktuell werden Daten geladen."; }
                 if (ReloadNeeded()) { return "Die Datei muss neu eingelesen werden."; }
             }
 
@@ -1064,7 +1060,6 @@ namespace BlueBasics.MultiUserFile
 
         public void WaitEditable()
         {
-
             while (!string.IsNullOrEmpty(ErrorReason(enErrorReason.EditAcut)))
             {
                 if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.EditNormaly))) { return; }// Nur anzeige-Datenbanken sind immer Schreibgeschützt
