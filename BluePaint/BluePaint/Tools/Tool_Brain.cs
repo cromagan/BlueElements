@@ -31,11 +31,11 @@ using System.IO;
 using System.Windows.Forms;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modAllgemein;
-
+using static BlueBasics.Extensions;
 namespace BluePaint
 {
 
-    public partial class Tool_Brain : GenericTool  //  BlueControls.Forms.Form //
+    public partial class Tool_Brain : GenericTool  // BlueControls.Forms.Form //
     {
 
         int AlphaSchwelle = 200;
@@ -370,33 +370,43 @@ namespace BluePaint
 
 
 
-        public int BlackValue(Bitmap P, int x, int y)
+        public int BlackValue(Bitmap P, int x, int y, int modus)
         {
             var colorsinput = OneSet(P, x, y);
             var result = network.Compute(new BasicMLData(colorsinput, false));
 
-            return (int)(result[0] * 255);
+
+            if (modus == 1)
+            {
+                if (result[0] < 0.7) { return 255; }
+                return 0;
+
+            }
+
+
+
+            return 255 - (int)(result[0] * 255);
 
 
         }
 
 
-        public bool Black(Bitmap P, int x, int y)
-        {
+        //public bool Black(Bitmap P, int x, int y)
+        //{
 
 
-            return (BlackValue(P, x, y) < 180);
-        }
+        //    return (BlackValue(P, x, y) < 180);
+        //}
 
 
         private void btnAnwendenFarbe_Click(object sender, System.EventArgs e)
         {
-            OnCommandForMacro("AnwendenFarbe");
+            OnCommandForMacro("Anwenden;1");
             DoModus(1);
         }
         private void btnAnwendenSW_Click(object sender, System.EventArgs e)
         {
-            OnCommandForMacro("AnwendenBW");
+            OnCommandForMacro("Anwenden;0");
             DoModus(0);
         }
 
@@ -673,13 +683,11 @@ namespace BluePaint
             switch (c[0])
             {
 
-                case "AnwendenBW":
-                    DoModus(0);
+                case "Anwenden":
+                    DoModus(int.Parse(c[1]));
                     break;
 
-                case "AnwendenFarbe":
-                    DoModus(1);
-                    break;
+
                 default:
 
                     Develop.DebugPrint_NichtImplementiert();
@@ -687,91 +695,163 @@ namespace BluePaint
             }
         }
 
-        public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
-        {
-            base.MouseUp(e, OriginalPic);
+        //public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
+        //{
+        //    base.MouseUp(e, OriginalPic);
 
 
-            if (!e.Current.IsInPic) { return; }
+        //    if (!e.Current.IsInPic) { return; }
 
-            var toLearn = new List<string>();
-            var allreadyUsedInputs = new List<string>();
+        //    var toLearn = new List<string>();
+        //    var allreadyUsedInputs = new List<string>();
 
-            var x = e.Current.X;
-            var y = e.Current.Y;
+        //    var x = e.Current.X;
+        //    var y = e.Current.Y;
 
-            GetInputLearnPixel(_VisibleLernImageSource, _VisibleLernImageTarget, x - 5, y - 5, 10, 10, allreadyUsedInputs, toLearn);
-            stopping = false;
+        //    GetInputLearnPixel(_VisibleLernImageSource, _VisibleLernImageTarget, x - 5, y - 5, 10, 10, allreadyUsedInputs, toLearn);
+        //    stopping = false;
 
-            btnStop.Enabled = true;
-            {
+        //    btnStop.Enabled = true;
+        //    {
 
-                Learn(toLearn, 1000);
-                Develop.DoEvents();
-
-
-
-                if (Black(_VisibleLernImageSource, x, y))
-                {
-                    if (GetOutPixel(_VisibleLernImageTarget, x, y)[0] < isBlack)
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    if (GetOutPixel(_VisibleLernImageTarget, x, y)[0] >= isBlack)
-                    {
-                        return;
-                    }
-
-                }
+        //        Learn(toLearn, 1000);
+        //        Develop.DoEvents();
 
 
-            }
 
-        }
+        //        if (Black(_VisibleLernImageSource, x, y))
+        //        {
+        //            if (GetOutPixel(_VisibleLernImageTarget, x, y)[0] < isBlack)
+        //            {
+        //                return;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (GetOutPixel(_VisibleLernImageTarget, x, y)[0] >= isBlack)
+        //            {
+        //                return;
+        //            }
+
+        //        }
+
+
+        //    }
+
+        //}
 
 
 
         private void DoModus(int modus)
         {
-            var P = OnNeedCurrentPic();
-            if (P == null) { return; }
+            var sourceBMP = OnNeedCurrentPic();
+            if (sourceBMP == null) { return; }
 
-            var NP = new Bitmap(P.Width, P.Height);
+            var newBMP = new Bitmap(sourceBMP.Width, sourceBMP.Height);
 
-            var cols = UsedColors(P);
+            var cols = UsedColors(sourceBMP);
 
-            for (var x = 0; x < P.Width; x++)
+            // -------------------- Only Color --------------------------------
+            #region Generate Color Image
+
+            var onlyColorBMP = new Bitmap(sourceBMP.Width, sourceBMP.Height);
+            for (var x = 0; x < onlyColorBMP.Width; x++)
             {
-                for (var y = 0; y < P.Height; y++)
+                for (var y = 0; y < onlyColorBMP.Height; y++)
                 {
 
-                    if (Black(P, x, y))
+                    switch (modus)
                     {
-                        var V = BlackValue(P, x, y);
-                        NP.SetPixel(x, y, Color.FromArgb(V, V, V));
-                    }
-                    else
-                    {
-                        if (modus == 1)
-                        {
-                            var nc = GetNearestColor(cols, P, x, y);
-                            NP.SetPixel(x, y, nc);
-                        }
-                        else
-                        {
-                            NP.SetPixel(x, y, Color.Transparent);
-                        }
+                        case 0: // BW
+                            onlyColorBMP.SetPixel(x, y, Color.Transparent);
+                            break;
 
+                        case 1: // Farbe
+                        case 2: // BlurFarbe
+                            var nc = GetNearestColor(cols, sourceBMP, x, y);
+                            onlyColorBMP.SetPixel(x, y, nc);
+                            break;
 
+                        default:
+                            Develop.DebugPrint("Modus nicht definiert");
+                            return;
                     }
                 }
             }
 
-            OnOverridePic(NP);
+            if (modus == 2)
+            {
+                onlyColorBMP = onlyColorBMP.ImageBlurFilter(BlueBasics.Enums.BlurType.GaussianBlur3x3);
+            }
+
+            #endregion
+            // ----------------------- Brain --------------------------------------
+
+
+
+
+
+
+
+            var g = Graphics.FromImage(newBMP);
+            g.Clear(Color.Transparent);
+
+
+
+            for (var x = 0; x < sourceBMP.Width; x++)
+            {
+                for (var y = 0; y < sourceBMP.Height; y++)
+                {
+
+                    var backc = onlyColorBMP.GetPixel(x, y);
+                    var overcolor = Color.FromArgb(BlackValue(sourceBMP, x, y, modus), 0, 0, 0);
+
+                    //newBMP.SetPixel(x, y, BlueBasics.Extensions.Blend(overcolor, backc, backc.A / 255));
+
+                    g.FillRectangle(new SolidBrush(backc), x, y, 1, 1);
+                    g.FillRectangle(new SolidBrush(overcolor), x, y, 1, 1);
+
+                    //newBMP.SetPixel(x, y, MixAlphaColor(onlyColorBMP.GetPixel(x, y), Color.FromArgb(BlackValue(sourceBMP, x, y, modus), 0, 0, 0)));
+
+                    //var col =;
+                    //var a1 = BlackValue(sourceBMP, x, y, modus);
+
+                    //var r = 
+
+
+                    //newBMP.SetPixel(x, y,);
+                    //newBMP.SetPixel(x, y, Color.FromArgb(BlackValue(sourceBMP, x, y, modus), 0, 0, 0));
+
+                    //if (Black(sourceBMP, x, y))
+                    //{
+                    //    var V = BlackValue(sourceBMP, x, y);
+                    //    newBMP.SetPixel(x, y, Color.FromArgb(V, V, V));
+                    //}
+                    //else
+                    //{
+                    //    if (modus == 1)
+                    //    {
+                    //        newBMP.SetPixel(x, y, onlyColorBMP.GetPixel(x,y));
+                    //    }
+                    //    else
+                    //    {
+                    //        newBMP.SetPixel(x, y, Color.Transparent);
+                    //    }
+
+
+                    //}
+                }
+            }
+
+            OnOverridePic(newBMP);
             Develop.DoEvents();
+        }
+
+        private void btnAnwendenBlurSW_Click(object sender, System.EventArgs e)
+        {
+            OnCommandForMacro("Anwenden;2");
+            DoModus(2);
+
         }
     }
 }

@@ -38,11 +38,12 @@ namespace BluePaint
             this.btnLernmaske = new BlueControls.Controls.Button();
             this.tabControl1 = new BlueControls.Controls.TabControl();
             this.tabAnwenden = new BlueControls.Controls.TabPage();
+            this.btnAnwendenSW = new BlueControls.Controls.Button();
             this.tabLernen = new BlueControls.Controls.TabPage();
             this.btnDrehen = new BlueControls.Controls.Button();
             this.capFehlerrate = new BlueControls.Controls.Caption();
             this.btnStop = new BlueControls.Controls.Button();
-            this.btnAnwendenSW = new BlueControls.Controls.Button();
+            this.btnAnwendenBlurSW = new BlueControls.Controls.Button();
             this.tabControl1.SuspendLayout();
             this.tabAnwenden.SuspendLayout();
             this.tabLernen.SuspendLayout();
@@ -97,6 +98,7 @@ namespace BluePaint
             // 
             // tabAnwenden
             // 
+            this.tabAnwenden.Controls.Add(this.btnAnwendenBlurSW);
             this.tabAnwenden.Controls.Add(this.btnAnwendenSW);
             this.tabAnwenden.Controls.Add(this.btnAnwendenFarbe);
             this.tabAnwenden.Location = new System.Drawing.Point(4, 25);
@@ -104,6 +106,15 @@ namespace BluePaint
             this.tabAnwenden.Size = new System.Drawing.Size(353, 355);
             this.tabAnwenden.TabIndex = 0;
             this.tabAnwenden.Text = "Anwenden";
+            // 
+            // btnAnwendenSW
+            // 
+            this.btnAnwendenSW.Location = new System.Drawing.Point(8, 88);
+            this.btnAnwendenSW.Name = "btnAnwendenSW";
+            this.btnAnwendenSW.Size = new System.Drawing.Size(296, 48);
+            this.btnAnwendenSW.TabIndex = 2;
+            this.btnAnwendenSW.Text = "Anwenden (SW)";
+            this.btnAnwendenSW.Click += new System.EventHandler(this.btnAnwendenSW_Click);
             // 
             // tabLernen
             // 
@@ -145,14 +156,14 @@ namespace BluePaint
             this.btnStop.Text = "Stop";
             this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
-            // btnAnwendenSW
+            // btnAnwendenBlurSW
             // 
-            this.btnAnwendenSW.Location = new System.Drawing.Point(8, 88);
-            this.btnAnwendenSW.Name = "btnAnwendenSW";
-            this.btnAnwendenSW.Size = new System.Drawing.Size(296, 48);
-            this.btnAnwendenSW.TabIndex = 2;
-            this.btnAnwendenSW.Text = "Anwenden (SW)";
-            this.btnAnwendenSW.Click += new System.EventHandler(this.btnAnwendenSW_Click);
+            this.btnAnwendenBlurSW.Location = new System.Drawing.Point(8, 160);
+            this.btnAnwendenBlurSW.Name = "btnAnwendenBlurSW";
+            this.btnAnwendenBlurSW.Size = new System.Drawing.Size(296, 48);
+            this.btnAnwendenBlurSW.TabIndex = 3;
+            this.btnAnwendenBlurSW.Text = "Anwenden (Blur+SW)";
+            this.btnAnwendenBlurSW.Click += new System.EventHandler(this.btnAnwendenBlurSW_Click);
             // 
             // Tool_Brain
             // 
@@ -177,6 +188,7 @@ namespace BluePaint
         private Caption capFehlerrate;
         private Button btnDrehen;
         private Button btnAnwendenSW;
+        private Button btnAnwendenBlurSW;
     }
 
 }
