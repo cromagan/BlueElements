@@ -38,6 +38,15 @@ namespace BluePaint
     public partial class Tool_Brain : GenericTool  // BlueControls.Forms.Form //
     {
 
+        public enum colmode
+        {
+            BW = 0,
+            Color = 1,
+            ColorBlur = 2,
+            BWNoPostProcessing = 3
+        }
+
+
         int AlphaSchwelle = 200;
         //int Schwelle = 120;
         int r = 4;
@@ -138,7 +147,9 @@ namespace BluePaint
 
             foreach (var thisf in All)
             {
-                if (!thisf.ToLower().Contains("ready"))
+                var secondf = thisf.Trim(".png") + "-v99.png";
+
+                if (!thisf.ToLower().Contains("v99") && FileExists(secondf))
                 {
 
 
@@ -149,7 +160,7 @@ namespace BluePaint
                     if (_VisibleLernImageSource == null)
                     {
                         _VisibleLernImageSource = ((Bitmap)Image_FromFile(thisf));//.AdjustContrast(100f);
-                        _VisibleLernImageTarget = (Bitmap)Image_FromFile(thisf.Trim(".png") + "-ready.png");
+                        _VisibleLernImageTarget = (Bitmap)Image_FromFile(secondf);
                         OnOverridePic(_VisibleLernImageSource);
                     }
 
@@ -164,7 +175,7 @@ namespace BluePaint
                         var was = ((RotateFlipType)count);
 
                         var P = ((Bitmap)Image_FromFile(thisf));
-                        var PR = (Bitmap)Image_FromFile(thisf.Trim(".png") + "-ready.png");
+                        var PR = (Bitmap)Image_FromFile(secondf);
                         P.RotateFlip(was);
                         PR.RotateFlip(was);
 
@@ -254,7 +265,7 @@ namespace BluePaint
                     }
 
                     OnOverridePic(_VisibleLernImageSource);
-                    DoModus(0);
+                    DoModus(colmode.BWNoPostProcessing);
                     lastime = DateTime.Now;
                     if (Count > 0 && current > Count) { break; }
                 }
@@ -370,13 +381,13 @@ namespace BluePaint
 
 
 
-        public int BlackValue(Bitmap P, int x, int y, int modus)
+        public int BlackValue(Bitmap P, int x, int y, colmode modus)
         {
             var colorsinput = OneSet(P, x, y);
             var result = network.Compute(new BasicMLData(colorsinput, false));
 
 
-            if (modus == 1)
+            if (modus == colmode.Color)
             {
                 if (result[0] < 0.7) { return 255; }
                 return 0;
@@ -402,12 +413,12 @@ namespace BluePaint
         private void btnAnwendenFarbe_Click(object sender, System.EventArgs e)
         {
             OnCommandForMacro("Anwenden;1");
-            DoModus(1);
+            DoModus(colmode.Color);
         }
         private void btnAnwendenSW_Click(object sender, System.EventArgs e)
         {
             OnCommandForMacro("Anwenden;0");
-            DoModus(0);
+            DoModus(colmode.BW);
         }
 
         private Color GetNearestColor(List<Color> allcolors, Bitmap p, int x, int y)
@@ -684,7 +695,7 @@ namespace BluePaint
             {
 
                 case "Anwenden":
-                    DoModus(int.Parse(c[1]));
+                    DoModus((colmode)int.Parse(c[1]));
                     break;
 
 
@@ -742,7 +753,7 @@ namespace BluePaint
 
 
 
-        private void DoModus(int modus)
+        private void DoModus(colmode modus)
         {
             var sourceBMP = OnNeedCurrentPic();
             if (sourceBMP == null) { return; }
@@ -762,12 +773,13 @@ namespace BluePaint
 
                     switch (modus)
                     {
-                        case 0: // BW
-                            onlyColorBMP.SetPixel(x, y, Color.Transparent);
+                        case colmode.BWNoPostProcessing:
+                        case colmode.BW: // BW
+                            onlyColorBMP.SetPixel(x, y, Color.White);
                             break;
 
-                        case 1: // Farbe
-                        case 2: // BlurFarbe
+                        case colmode.Color: // Farbe
+                        case colmode.ColorBlur: // BlurFarbe
                             var nc = GetNearestColor(cols, sourceBMP, x, y);
                             onlyColorBMP.SetPixel(x, y, nc);
                             break;
@@ -779,17 +791,14 @@ namespace BluePaint
                 }
             }
 
-            if (modus == 2)
+            if (modus == colmode.ColorBlur)
             {
-                onlyColorBMP = onlyColorBMP.ImageBlurFilter(BlueBasics.Enums.BlurType.GaussianBlur3x3);
+                onlyColorBMP = onlyColorBMP.ImageBlurFilter(BlueBasics.Enums.BlurType.Mean3x3);
             }
 
             #endregion
             // ----------------------- Brain --------------------------------------
-
-
-
-
+            #region Brain
 
 
 
@@ -804,44 +813,95 @@ namespace BluePaint
                 {
 
                     var backc = onlyColorBMP.GetPixel(x, y);
-                    var overcolor = Color.FromArgb(BlackValue(sourceBMP, x, y, modus), 0, 0, 0);
-
-                    //newBMP.SetPixel(x, y, BlueBasics.Extensions.Blend(overcolor, backc, backc.A / 255));
-
-                    g.FillRectangle(new SolidBrush(backc), x, y, 1, 1);
-                    g.FillRectangle(new SolidBrush(overcolor), x, y, 1, 1);
-
-                    //newBMP.SetPixel(x, y, MixAlphaColor(onlyColorBMP.GetPixel(x, y), Color.FromArgb(BlackValue(sourceBMP, x, y, modus), 0, 0, 0)));
-
-                    //var col =;
-                    //var a1 = BlackValue(sourceBMP, x, y, modus);
-
-                    //var r = 
 
 
-                    //newBMP.SetPixel(x, y,);
-                    //newBMP.SetPixel(x, y, Color.FromArgb(BlackValue(sourceBMP, x, y, modus), 0, 0, 0));
-
-                    //if (Black(sourceBMP, x, y))
-                    //{
-                    //    var V = BlackValue(sourceBMP, x, y);
-                    //    newBMP.SetPixel(x, y, Color.FromArgb(V, V, V));
-                    //}
-                    //else
-                    //{
-                    //    if (modus == 1)
-                    //    {
-                    //        newBMP.SetPixel(x, y, onlyColorBMP.GetPixel(x,y));
-                    //    }
-                    //    else
-                    //    {
-                    //        newBMP.SetPixel(x, y, Color.Transparent);
-                    //    }
 
 
-                    //}
+
+
+
+                    switch (modus)
+                    {
+                        case colmode.Color:
+                        case colmode.BW:
+                        case colmode.BWNoPostProcessing:
+                            {
+                                g.FillRectangle(new SolidBrush(backc), x, y, 1, 1);
+                                var overcolor = Color.FromArgb(BlackValue(sourceBMP, x, y, modus), 0, 0, 0);
+                                g.FillRectangle(new SolidBrush(overcolor), x, y, 1, 1);
+                                break;
+                            }
+                        case colmode.ColorBlur:
+                            {
+
+                                if (sourceBMP.GetPixel(x, y).A > 200)
+                                {
+                                    g.FillRectangle(new SolidBrush(backc), x, y, 1, 1);
+                                }
+
+
+                                var b = BlackValue(sourceBMP, x, y, modus);
+                                if (b > 100)
+                                {
+                                    var overcolor = Color.FromArgb(b, 0, 0, 0);
+                                    g.FillRectangle(new SolidBrush(overcolor), x, y, 1, 1);
+
+                                }
+                                break;
+                            }
+
+
+                        default:
+                            {
+                                Develop.DebugPrint("Modus nicht definiert");
+                                return;
+                            }
+                    }
+
+
+
                 }
             }
+
+            #endregion
+
+            // ----------------------- Nachbearbeitung --------------------------------------
+            #region BW Nachbearbeitung
+
+            if (modus == colmode.BW)
+            {
+
+                for (var x = 0; x < sourceBMP.Width - 1; x++)
+                {
+                    for (var y = 0; y < sourceBMP.Height - 1; y++)
+                    {
+                        var pix = new List<string>();
+                        for (var px = 0; px < 2; px++)
+                        {
+                            for (var py = 0; py < 2; py++)
+                            {
+
+                                pix.Add(newBMP.GetPixel(x + px, y + py).R.ToString(Constants.Format_Integer3) + ";" + (x + px) + ";" + (y + py));
+
+                            }
+                        }
+
+                        pix.Sort();
+
+
+                        for (var z = 2; z < 4; z++)
+                        {
+                            var t = pix[z].SplitBy(";");
+                            newBMP.SetPixel(int.Parse(t[1]), int.Parse(t[2]), Color.White);
+                        }
+
+
+                    }
+                }
+
+            }
+            #endregion
+
 
             OnOverridePic(newBMP);
             Develop.DoEvents();
@@ -850,7 +910,7 @@ namespace BluePaint
         private void btnAnwendenBlurSW_Click(object sender, System.EventArgs e)
         {
             OnCommandForMacro("Anwenden;2");
-            DoModus(2);
+            DoModus(colmode.ColorBlur);
 
         }
     }
