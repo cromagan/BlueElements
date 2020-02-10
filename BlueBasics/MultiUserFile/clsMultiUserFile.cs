@@ -367,27 +367,28 @@ namespace BlueBasics.MultiUserFile
                 var Data = LoadBytesFromDisk(false);
                 if (SavedData != Data.Item1.ToArray().ToStringConvert())
                 {
+                    // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichter und ungeladen.
                     _CheckedAndReloadNeed = true;
                     _LastSaveCode = "Fehler";
                     Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!!" + Filename);
                     return "Speichervorgang fehlgeschlagen.";
                 }
-                _LastSaveCode = Data.Item2;
+                else
+                {
+                    _CheckedAndReloadNeed = false;
+                    _LastSaveCode = Data.Item2;
+                }
             }
             else
             {
+                _CheckedAndReloadNeed = false;
                 _LastSaveCode = GetFileInfo(true);
             }
 
-
-            _CheckedAndReloadNeed = false;
-
             DoWorkAfterSaving();
-
 
             OnSavedToDisk();
             return string.Empty;
-
         }
 
         private bool CreateBlockDatei()
