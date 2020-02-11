@@ -164,7 +164,7 @@ namespace BlueBasics
         public static void DebugPrint(enFehlerArt Art, Exception ex)
         {
             if (Art != enFehlerArt.Info && Art != enFehlerArt.DevelopInfo && IsDevelopment()) { Debugger.Break(); }
-            DebugPrint(Art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message);
+            DebugPrint(Art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace.ToString());
         }
 
         public static void DebugPrint(Exception Warnung)

@@ -104,7 +104,7 @@ namespace BlueBasics
         {
 
             // Open a Stream and decode a TIFF image
-            var imageStreamSource = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            var imageStreamSource = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
             var l = new List<Bitmap>();
             var frames = 1;
 
@@ -211,7 +211,7 @@ namespace BlueBasics
 
             try
             {
-                var fs = new FileStream(DateiName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                var fs = new FileStream(DateiName, FileMode.Open, FileAccess.Read, FileShare.Read);
                 var IM = Image.FromStream(fs);
                 fs.Close();
                 fs.Dispose();

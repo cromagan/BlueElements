@@ -290,7 +290,7 @@ namespace BlueBasics
                     try
                     {
                         // Versuch, Datei EXKLUSIV zu öffnen
-                        using (var obFi = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.None))
+                        using (var obFi = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read))
                         {
                             obFi.Close();
                         }

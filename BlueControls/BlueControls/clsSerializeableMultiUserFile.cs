@@ -72,7 +72,7 @@ namespace BlueControls
             var XmlContent = bLoaded.ToStringConvert(); // NICHT von UTF8 konvertieren, das macht der XML-Deserializer von alleine
 
             var _byteOrderMarkUtf8 = System.Text.Encoding.UTF8.GetString(System.Text.Encoding.UTF8.GetPreamble());
-            if (XmlContent.StartsWith(_byteOrderMarkUtf8))
+            if (XmlContent.StartsWith(_byteOrderMarkUtf8, StringComparison.Ordinal))
             {
                 var lastIndexOfUtf8 = _byteOrderMarkUtf8.Length - 1;
                 XmlContent = XmlContent.Remove(0, lastIndexOfUtf8);
@@ -80,14 +80,14 @@ namespace BlueControls
 
 
 
-            while (!XmlContent.StartsWith("<"))
+            while (!XmlContent.StartsWith("<", StringComparison.Ordinal))
             {
                 XmlContent = XmlContent.Substring(1);
             }
 
 
-            // Bei Assistent für verwaltetes Debuggen "BindingFailure" :Fehler deaktiviren unw weiterlaufen lassen 
-            // nn aufgrund der Sicherheitsebene ... Auf Pubilc setzern
+            // Bei Assistent für verwaltetes Debuggen "BindingFailure": Fehler deaktivieren und weiterlaufen lassen 
+            // nn aufgrund der Sicherheitsebene ... Auf Public setzern
             var Serializer = new XmlSerializer(typeof(T));
             var StringReader = new StringReader(XmlContent);
 
@@ -130,7 +130,17 @@ namespace BlueControls
 
             Serializer.Serialize(TextWriter, obj);
 
-            var Result = System.Text.Encoding.UTF8.GetString(MemoryStream.ToArray()).ToByteList(); // NICHT nach UTF8 konvertieren, das machte der XML-Serializer bereits von alleine
+
+            var Result = System.Text.Encoding.UTF8.GetString(MemoryStream.ToArray());  // NICHT nach UTF8 konvertieren, das machte der XML-Serializer bereits von alleine
+
+
+            //while (!Result.StartsWith("<", StringComparison.Ordinal))
+            //{
+            //    Result = Result.Substring(1);
+            //}
+            Result = Result.Substring(1); // Erstes Zeichen cutten, das ist iorgendein sonderzeichen
+
+            //var Result = System.Text.Encoding.UTF8.GetString(MemoryStream.ToArray()).ToByteList();
 
 
 
@@ -141,7 +151,7 @@ namespace BlueControls
 
             //ParseExternal(Result);
 
-            return Result;
+            return Result.ToByteList();
 
         }
 

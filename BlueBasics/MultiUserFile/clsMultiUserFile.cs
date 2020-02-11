@@ -40,6 +40,7 @@ namespace BlueBasics.MultiUserFile
         private bool _isParsing;
 
         private bool _IsLoading = false;
+        private bool _IsSaving = false;
 
         public DateTime UserEditedAktionUTC;
 
@@ -187,7 +188,20 @@ namespace BlueBasics.MultiUserFile
         /// </summary>
         public void Load_Reload()
         {
-            while (_IsLoading) { Develop.DoEvents(); }
+
+            var x = DateTime.Now;
+
+
+            while (_IsLoading)
+            {
+                Develop.DoEvents();
+                if (DateTime.Now.Subtract(x).TotalMinutes > 2)
+                {
+                    Develop.DebugPrint(enFehlerArt.Fehler, "Load_Reload hängt");
+                    return;
+                }
+
+            }
 
             if (string.IsNullOrEmpty(Filename)) { _IsLoading = false; return; }
 
@@ -310,10 +324,18 @@ namespace BlueBasics.MultiUserFile
 
             if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben"; }
 
+
+            if (_IsSaving)
+            {
+                Develop.DebugPrint("Doppelter Speichervorgang");
+            }
+
+            _IsSaving = true;
+
             if (!EasyMode)
             {
                 var erfolg = CreateBlockDatei();
-                if (!erfolg) { return "Blockdatei konnte nicht erzeugt werden."; }
+                if (!erfolg) { _IsSaving = false; return "Blockdatei konnte nicht erzeugt werden."; }
 
 
                 // Blockdatei da, wir sind save. Andere Computer lassen die Datei ab jetzt in Ruhe!
@@ -322,6 +344,7 @@ namespace BlueBasics.MultiUserFile
                 {
                     DeleteFile(Blockdateiname(), true);
                     DeleteFile(SavedFileName, false);
+                    _IsSaving = false;
                     return "Datei wurde inzwischen verändert.";
                 }
 
@@ -330,6 +353,7 @@ namespace BlueBasics.MultiUserFile
                 {
                     DeleteFile(Blockdateiname(), true);
                     DeleteFile(SavedFileName, false);
+                    _IsSaving = false;
                     return "Daten wurden inzwischen verändert.";
                 }
             }
@@ -371,7 +395,7 @@ namespace BlueBasics.MultiUserFile
                     _CheckedAndReloadNeed = true;
                     _LastSaveCode = "Fehler";
                     Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!!" + Filename);
-                    return "Speichervorgang fehlgeschlagen.";
+                    _IsSaving = false; return "Speichervorgang fehlgeschlagen.";
                 }
                 else
                 {
@@ -388,6 +412,7 @@ namespace BlueBasics.MultiUserFile
             DoWorkAfterSaving();
 
             OnSavedToDisk();
+            _IsSaving = false;
             return string.Empty;
         }
 
@@ -464,6 +489,8 @@ namespace BlueBasics.MultiUserFile
             if (string.IsNullOrEmpty(Filename)) { return false; }
 
             if (_CheckedAndReloadNeed) { return true; }
+
+            if (_IsSaving || _IsLoading) { return false; }
 
             if (GetFileInfo(false) != _LastSaveCode)
             {
@@ -858,7 +885,7 @@ namespace BlueBasics.MultiUserFile
             if (EasyMode && ReadOnly) { return; }
 
             if (_IsLoading) { return; }
-            if (PureBinSaver.IsBusy) { return; }
+            if (PureBinSaver.IsBusy || _IsSaving) { return; }
             if (string.IsNullOrEmpty(Filename)) { return; }
 
 
@@ -912,7 +939,8 @@ namespace BlueBasics.MultiUserFile
 
             if (_MustSave && Checker_Tick_count > Count_Save)
             {
-                PureBinSaver.RunWorkerAsync();
+                // Eigentlich sollte die folgende Abfrage überflüssig sein. Ist sie aber nicht
+                if (!PureBinSaver.IsBusy) { PureBinSaver.RunWorkerAsync(); }
                 Checker_Tick_count = 0;
                 return;
             }
@@ -949,7 +977,7 @@ namespace BlueBasics.MultiUserFile
 
                 var sec = -1d;
                 if (!EasyMode) { sec = AgeOfBlockDatei(); }
-                if (sec >= 0 && sec < 10) { return "Eine anderer Computer speichert gerade Daten ab."; }
+                if (sec >= 0 && sec < 10) { return "Ein anderer Computer speichert gerade Daten ab."; }
                 if (isSomethingDiscOperatingsBlocking()) { return "Reload unmöglich, vererbte Klasse gab Fehler zurück"; }
                 return string.Empty;
             }
