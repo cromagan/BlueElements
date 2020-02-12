@@ -18,12 +18,14 @@
 #endregion
 
 
-namespace BlueDatabase.EventArgs
+using BlueBasics.MultiUserFile;
+
+namespace BlueBasics.EventArgs
 {
    public class DatabaseGiveBackEventArgs : System.EventArgs
     {
         
-        public Database Database { get; set; }
+        public clsMultiUserFile Database { get; set; }
 
     }
 }

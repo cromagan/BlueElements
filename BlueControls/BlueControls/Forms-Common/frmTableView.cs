@@ -412,7 +412,7 @@ namespace BlueControls.Forms
             LoadTab.FileName = Datei;
 
 
-            var tmpDatabase = Database.GetByFilename(Datei, false);
+            var tmpDatabase = (Database)Database.GetByFilename(Datei, false);
 
             if (tmpDatabase == null)
             {

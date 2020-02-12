@@ -14,6 +14,71 @@ namespace BlueBasics.MultiUserFile
     public abstract class clsMultiUserFile : IDisposable
     {
 
+
+
+
+        #region Shareds
+        public static List<clsMultiUserFile> AllDatabases = new List<clsMultiUserFile>();
+
+
+        public static void ReleaseAll(bool MUSTRelease, int MaxWaitSeconds)
+        {
+
+            if (MUSTRelease)
+            {
+                ReleaseAll(false, MaxWaitSeconds); // Beenden, was geht, dann erst der muss
+            }
+
+
+            var x = AllDatabases.Count;
+
+            foreach (var ThisDatabase in AllDatabases)
+            {
+                ThisDatabase?.Release(MUSTRelease, MaxWaitSeconds);
+
+                if (x != AllDatabases.Count)
+                {
+                    // Die Auflistung wurde verändert! Selten, aber kann passieren!
+                    ReleaseAll(MUSTRelease, MaxWaitSeconds);
+                    return;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="checkOnlyFilenameToo">Prüft, ob die Datenbank ohne Dateipfad - also nur Dateiname und Suffix - existiert und gibt diese zurück.</param>
+        /// <returns></returns>
+        public static clsMultiUserFile GetByFilename(string filePath, bool checkOnlyFilenameToo)
+        {
+            filePath = modConverter.SerialNr2Path(filePath);
+
+            foreach (var ThisDatabase in AllDatabases)
+            {
+                if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == filePath.ToLower()) { return ThisDatabase; }
+            }
+
+
+            if (checkOnlyFilenameToo)
+            {
+                foreach (var ThisDatabase in AllDatabases)
+                {
+                    if (ThisDatabase != null && ThisDatabase.Filename.ToLower().FileNameWithSuffix() == filePath.ToLower().FileNameWithSuffix()) { return ThisDatabase; }
+                }
+            }
+            return null;
+        }
+
+
+        #endregion
+
+        #region Variablen und Properties
+
+
+
         private System.ComponentModel.BackgroundWorker PureBinSaver;
         private Timer Checker;
 
@@ -29,7 +94,7 @@ namespace BlueBasics.MultiUserFile
         public bool EasyMode { get; private set; }
 
         /// <summary>
-        /// Load benutzen
+        /// Load oder SaveAsAndChangeTo benutzen
         /// </summary>
         public string Filename { get; private set; }
 
@@ -45,26 +110,14 @@ namespace BlueBasics.MultiUserFile
         public DateTime UserEditedAktionUTC;
 
 
-        ///// <summary>
-        ///// Variable wird einzig und allein vom BinWriter verändert.
-        ///// Kein Reset oder Initalize verändert den Inhalt.
-        ///// </summary>
-        //private List<byte> Writer_BinaryData;
-
-
-
-        ///// <summary>
-        ///// Feedback-Variable, ob der Process abgeschlossen wurde. Erhällt immer den reporteden UserState, wenn Fertig.
-        ///// Variable wird einzig und allein vom BinWriter verändert.
-        ///// Kein Reset oder Initalize verändert den Inhalt.
-        ///// </summary>
-        //private string Writer_ProcessDone = string.Empty;
-
         private DateTime _CanWriteNextCheckUTC = DateTime.UtcNow.AddSeconds(-30);
         private string _CanWriteError = string.Empty;
 
         private DateTime _EditNormalyNextCheckUTC = DateTime.UtcNow.AddSeconds(-30);
         private string _EditNormalyError = string.Empty;
+
+        #endregion
+
 
         #region  Event-Deklarationen 
 
@@ -73,6 +126,7 @@ namespace BlueBasics.MultiUserFile
         public event EventHandler SavedToDisk;
         public event EventHandler<OldBlockFileEventArgs> OldBlockFileExists;
         public event EventHandler<DatabaseStoppedEventArgs> ConnectedControlsStopAllWorking;
+        public static event EventHandler<DatabaseGiveBackEventArgs> DatabaseAdded;
 
         /// <summary>
         /// Wird ausgegeben, sobald isParsed false ist, noch vor den automatischen Reperaturen.
@@ -84,8 +138,13 @@ namespace BlueBasics.MultiUserFile
 
 
 
-        public clsMultiUserFile(bool readOnly, bool easyMode)
+        protected clsMultiUserFile(bool readOnly, bool easyMode)
         {
+
+
+
+            AllDatabases.Add(this);
+            OnDatabaseAdded(this);
 
             PureBinSaver = new System.ComponentModel.BackgroundWorker();
             PureBinSaver.WorkerReportsProgress = true;
@@ -203,7 +262,7 @@ namespace BlueBasics.MultiUserFile
 
             }
 
-            if (string.IsNullOrEmpty(Filename)) { _IsLoading = false; return; }
+            if (string.IsNullOrEmpty(Filename)) { return; }
 
 
             _IsLoading = true;
@@ -572,6 +631,8 @@ namespace BlueBasics.MultiUserFile
             var count = 0;
             do
             {
+
+                if (count>0) { Pause(1, false); }
                 Load_Reload();
                 count++;
                 if (count > 10) { Develop.DebugPrint(enFehlerArt.Fehler, "Datei nicht korrekt geladen (nicht mehr aktuell)"); }
@@ -580,7 +641,7 @@ namespace BlueBasics.MultiUserFile
 
         }
 
-        protected abstract bool IsFileAllowedToLoad(string fileName);
+
 
         public void SaveAsAndChangeTo(string NewFileName)
         {
@@ -1147,6 +1208,30 @@ namespace BlueBasics.MultiUserFile
         {
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             return ToListOfByte(false).ToArray().ToStringConvert();
+        }
+
+
+        protected static void OnDatabaseAdded(clsMultiUserFile database)
+        {
+            var e = new DatabaseGiveBackEventArgs();
+            e.Database = database;
+            DatabaseAdded?.Invoke(null, e);
+        }
+
+
+        protected bool IsFileAllowedToLoad(string fileName)
+        {
+            foreach (var ThisDatabase in AllDatabases)
+            {
+                if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == fileName.ToLower())
+                {
+                    ThisDatabase.Release(true, 240);
+                    Develop.DebugPrint(enFehlerArt.Fehler, "Doppletes Laden von " + fileName);
+                    return false;
+                }
+            }
+
+            return true;
         }
 
     }

@@ -35,6 +35,8 @@ using static BlueBasics.FileOperations;
 using static BlueBasics.Extensions;
 using BlueControls.Designer_Support;
 using System.Collections.Generic;
+using BlueBasics.EventArgs;
+using BlueDatabase;
 
 namespace BlueControls.Controls
 {
@@ -371,7 +373,7 @@ namespace BlueControls.Controls
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
         {
 
-  
+
 
             switch (e.ClickedComand)
             {
@@ -479,28 +481,29 @@ namespace BlueControls.Controls
             var ed = new DatabaseGiveBackEventArgs();
             ed.Database = null;
             OnConnectedDatabase(ed);
-            if (ed.Database == null) { return; }
-
-            if (_Bitmap != null)
+            if (ed.Database is Database DB)
             {
-                if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+                if (_Bitmap != null)
+                {
+                    if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+                }
+
+
+                string n;
+
+                var lLCase = DB.AllConnectedFilesLCase();
+
+
+                using (var x = new ItemSelect())
+                {
+                    n = x.SelectOne_OfDataSystem(lLCase, DB.FileEncryptionKey);
+                }
+
+                if (string.IsNullOrEmpty(n)) { return; }
+
+                FromFile(n);
+                OnImageChanged();
             }
-
-
-            string n;
-
-            var lLCase = ed.Database.AllConnectedFilesLCase();
-
-
-            using (var x = new ItemSelect())
-            {
-                n = x.SelectOne_OfDataSystem(lLCase, ed.Database.FileEncryptionKey);
-            }
-
-            if (string.IsNullOrEmpty(n)) { return; }
-
-            FromFile(n);
-            OnImageChanged();
 
         }
 

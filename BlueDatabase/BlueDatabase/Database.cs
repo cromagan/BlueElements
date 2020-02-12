@@ -42,7 +42,7 @@ namespace BlueDatabase
         #region  Shareds 
 
         public static readonly string DatabaseVersion = "3.31";
-        public static List<Database> AllDatabases = new List<Database>();
+
 
 
 
@@ -53,22 +53,15 @@ namespace BlueDatabase
             var l = new List<Database>();
             foreach (var ThisDatabase in AllDatabases)
             {
-                if (ThisDatabase != null)
+                if (ThisDatabase is Database DB)
                 {
-                    if (ThisDatabase.Caption.ToUpper() == Caption.ToUpper()) { l.Add(ThisDatabase); }
+                    if (DB.Caption.ToUpper() == Caption.ToUpper()) { l.Add(DB); }
                 }
             }
 
             return l;
         }
 
-
-        //new public void Load(string fileNameToLoad)
-        //{
-        //    base.Load(fileNameToLoad, false);
-
-
-        //}
 
         private static Database Load(Stream Stream)
         {
@@ -137,11 +130,11 @@ namespace BlueDatabase
 
                     if (FileExists(pf))
                     {
-                        var tmp = Database.GetByFilename(pf, false);
-                        if (tmp != null) { return tmp; }
+                        var tmp = GetByFilename(pf, false);
+                        if (tmp != null) { return (Database)tmp; }
                         tmp = new Database(false);
                         tmp.Load(pf, false);
-                        return tmp;
+                        return (Database)tmp;
                     }
 
                 } while (pf != string.Empty);
@@ -156,170 +149,8 @@ namespace BlueDatabase
             return null;
         }
 
-        public string DoImportScript(string TextToImport, RowItem row, bool MeldeFehlgeschlageneZeilen)
-        {
-            if (string.IsNullOrEmpty(_ImportScript)) { return "Kein Import-Skript vorhanden."; }
-            if (string.IsNullOrEmpty(TextToImport)) { return "Kein Text zum Importieren angegeben."; }
 
 
-            var cmds = _ImportScript.FromNonCritical().SplitByCRToList();
-
-            //if (row == null)
-            //{
-            //    row = Row.Add(DateTime.Now.ToString(Constants.Format_Date));
-            //}
-            //else
-            //{
-            if (row != null && row.CellGetBoolean(row.Database.Column.SysLocked)) { return "Die Zeile ist gesperrt (abgeschlossen)."; }
-            //}
-
-
-
-            foreach (var thiscmd in cmds)
-            {
-                var feh = DoImportScript(TextToImport, thiscmd.Replace(";cr;", "\r").Replace(";tab;", "\t").SplitBy("|"), row);
-
-                if (feh.Item3 == null) { return "Es konnte keine neue Zeile erzeugt werden."; }
-
-                if (row == null)
-                {
-                    row = feh.Item3;
-                }
-                else
-                {
-                    if (row != feh.Item3) { return "Zeilen-Inkonsistenz festgestellt."; }
-                }
-
-                if (!string.IsNullOrEmpty(feh.Item1))
-                {
-                    if (feh.Item2) { return feh.Item1 + "<br><br>Zeile:<br>" + thiscmd; }
-                    if (MeldeFehlgeschlageneZeilen) { return feh.Item1 + "<br><br>Zeile:<br>" + thiscmd; }
-                }
-            }
-            return string.Empty;
-        }
-
-
-        internal void OnProgressbarInfo(ProgressbarEventArgs e)
-        {
-            ProgressbarInfo?.Invoke(this, e);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="textToImport"></param>
-        /// <param name="cmd"></param>
-        /// <returns>Wenn Erfolgreich wird nichts zurückgegeben. Schwere Fehler beginnen mit einem !</returns>
-        private Tuple<string, bool, RowItem> DoImportScript(string textToImport, string[] cmd, RowItem row)
-        {
-
-            if (cmd == null) { return Tuple.Create("Kein Befehl übergeben", true, row); }
-            if (cmd.GetUpperBound(0) != 3) { return Tuple.Create("Format muss 4 | haben.", true, row); }
-
-            var c = Column[cmd[1]];
-            if (c == null) { return Tuple.Create("Spalte nicht in der Datenbank gefunden.", true, row); }
-
-            if (string.IsNullOrEmpty(cmd[2])) { return Tuple.Create("Suchtext 'vorher' ist nicht angegeben", true, row); }
-            if (string.IsNullOrEmpty(cmd[3])) { return Tuple.Create("Suchtext 'nachher' ist nicht angegeben", true, row); }
-
-            var vh = textToImport.IndexOf(cmd[2]);
-            if (vh < 0) { return Tuple.Create("Suchtext 'vorher' im Text nicht vorhanden.", false, row); }
-
-            var nh = textToImport.IndexOf(cmd[3], vh + cmd[2].Length);
-            if (nh < 0) { return Tuple.Create("Suchtext 'nachher' im Text nicht vorhanden.", false, row); }
-
-            var txt = textToImport.Substring(vh + cmd[2].Length, nh - vh - cmd[2].Length);
-
-            switch (cmd[0].ToUpper())
-            {
-                case "IMPORT1":
-                    if (c.IsFirst() && row == null)
-                    {
-                        row = Row.Add(txt);
-                    }
-                    else
-                    {
-                        if (row == null) { return Tuple.Create("Keine Zeile angegeben.", true, row); }
-                        row.CellSet(c, txt);
-                    }
-                    return Tuple.Create(string.Empty, false, row);
-
-                case "IMPORT2":
-                    if (row == null) { return Tuple.Create("Keine Zeile angegeben.", true, row); }
-                    var l = row.CellGetList(c);
-                    l.Add(txt);
-                    row.CellSet(c, l);
-                    return Tuple.Create(string.Empty, false, row);
-
-                default:
-                    return Tuple.Create("Befehl nicht erkannt.", true, row);
-            }
-
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="checkOnlyFilenameToo">Prüft, ob die Datenbank ohne Dateipfad - also nur Dateiname und Suffix - existiert und gibt diese zurück.</param>
-        /// <returns></returns>
-        public static Database GetByFilename(string filePath, bool checkOnlyFilenameToo)
-        {
-            filePath = modConverter.SerialNr2Path(filePath);
-
-            foreach (var ThisDatabase in AllDatabases)
-            {
-                if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == filePath.ToLower()) { return ThisDatabase; }
-            }
-
-
-            if (checkOnlyFilenameToo)
-            {
-                foreach (var ThisDatabase in AllDatabases)
-                {
-                    if (ThisDatabase != null && ThisDatabase.Filename.ToLower().FileNameWithSuffix() == filePath.ToLower().FileNameWithSuffix()) { return ThisDatabase; }
-                }
-            }
-            return null;
-        }
-
-
-
-
-
-        private static void OnDatabaseAdded(Database database)
-        {
-            var e = new DatabaseGiveBackEventArgs();
-            e.Database = database;
-            DatabaseAdded?.Invoke(null, e);
-        }
-
-        public static void ReleaseAll(bool MUSTRelease, int MaxWaitSeconds)
-        {
-
-            if (MUSTRelease)
-            {
-                ReleaseAll(false, MaxWaitSeconds); // Beenden, was geht, dann erst der muss
-            }
-
-
-            var x = AllDatabases.Count;
-
-            foreach (var ThisDatabase in AllDatabases)
-            {
-                ThisDatabase?.Release(MUSTRelease, MaxWaitSeconds);
-
-                if (x != AllDatabases.Count)
-                {
-                    // Die Auflistung wurde verändert! Selten, aber kann passieren!
-                    ReleaseAll(MUSTRelease, MaxWaitSeconds);
-                    return;
-                }
-            }
-        }
 
         #endregion
 
@@ -414,7 +245,7 @@ namespace BlueDatabase
         public event EventHandler<RenameColumnInLayoutEventArgs> RenameColumnInLayout;
         public event EventHandler<GenerateLayoutInternalEventargs> GenerateLayoutInternal;
 
-        public static event EventHandler<DatabaseGiveBackEventArgs> DatabaseAdded;
+
 
         #endregion
 
@@ -424,14 +255,10 @@ namespace BlueDatabase
 
         public Database(bool readOnly) : base(readOnly, false)
         {
-            AllDatabases.Add(this);
-            OnDatabaseAdded(this);
 
             var culture = new System.Globalization.CultureInfo("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
-            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-
 
             InitializeComponent();
 
@@ -476,17 +303,6 @@ namespace BlueDatabase
             UserGroup = "#Administrator";
 
 
-        }
-
-        public int LayoutIDToIndex(string exportFormularID)
-        {
-
-            for (var z = 0; z < Layouts.Count; z++)
-            {
-                if (Layouts[z].Contains("ID=" + exportFormularID + ",")) { return z; }
-            }
-
-            return -1;
         }
 
         private void Initialize()
@@ -758,6 +574,129 @@ namespace BlueDatabase
 
 
         #endregion
+
+
+        public int LayoutIDToIndex(string exportFormularID)
+        {
+
+            for (var z = 0; z < Layouts.Count; z++)
+            {
+                if (Layouts[z].Contains("ID=" + exportFormularID + ",")) { return z; }
+            }
+
+            return -1;
+        }
+
+        public string DoImportScript(string TextToImport, RowItem row, bool MeldeFehlgeschlageneZeilen)
+        {
+            if (string.IsNullOrEmpty(_ImportScript)) { return "Kein Import-Skript vorhanden."; }
+            if (string.IsNullOrEmpty(TextToImport)) { return "Kein Text zum Importieren angegeben."; }
+
+
+            var cmds = _ImportScript.FromNonCritical().SplitByCRToList();
+
+            //if (row == null)
+            //{
+            //    row = Row.Add(DateTime.Now.ToString(Constants.Format_Date));
+            //}
+            //else
+            //{
+            if (row != null && row.CellGetBoolean(row.Database.Column.SysLocked)) { return "Die Zeile ist gesperrt (abgeschlossen)."; }
+            //}
+
+
+
+            foreach (var thiscmd in cmds)
+            {
+                var feh = DoImportScript(TextToImport, thiscmd.Replace(";cr;", "\r").Replace(";tab;", "\t").SplitBy("|"), row);
+
+                if (feh.Item3 == null) { return "Es konnte keine neue Zeile erzeugt werden."; }
+
+                if (row == null)
+                {
+                    row = feh.Item3;
+                }
+                else
+                {
+                    if (row != feh.Item3) { return "Zeilen-Inkonsistenz festgestellt."; }
+                }
+
+                if (!string.IsNullOrEmpty(feh.Item1))
+                {
+                    if (feh.Item2) { return feh.Item1 + "<br><br>Zeile:<br>" + thiscmd; }
+                    if (MeldeFehlgeschlageneZeilen) { return feh.Item1 + "<br><br>Zeile:<br>" + thiscmd; }
+                }
+            }
+            return string.Empty;
+        }
+
+
+        internal void OnProgressbarInfo(ProgressbarEventArgs e)
+        {
+            ProgressbarInfo?.Invoke(this, e);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="textToImport"></param>
+        /// <param name="cmd"></param>
+        /// <returns>Wenn Erfolgreich wird nichts zurückgegeben. Schwere Fehler beginnen mit einem !</returns>
+        private Tuple<string, bool, RowItem> DoImportScript(string textToImport, string[] cmd, RowItem row)
+        {
+
+            if (cmd == null) { return Tuple.Create("Kein Befehl übergeben", true, row); }
+            if (cmd.GetUpperBound(0) != 3) { return Tuple.Create("Format muss 4 | haben.", true, row); }
+
+            var c = Column[cmd[1]];
+            if (c == null) { return Tuple.Create("Spalte nicht in der Datenbank gefunden.", true, row); }
+
+            if (string.IsNullOrEmpty(cmd[2])) { return Tuple.Create("Suchtext 'vorher' ist nicht angegeben", true, row); }
+            if (string.IsNullOrEmpty(cmd[3])) { return Tuple.Create("Suchtext 'nachher' ist nicht angegeben", true, row); }
+
+            var vh = textToImport.IndexOf(cmd[2]);
+            if (vh < 0) { return Tuple.Create("Suchtext 'vorher' im Text nicht vorhanden.", false, row); }
+
+            var nh = textToImport.IndexOf(cmd[3], vh + cmd[2].Length);
+            if (nh < 0) { return Tuple.Create("Suchtext 'nachher' im Text nicht vorhanden.", false, row); }
+
+            var txt = textToImport.Substring(vh + cmd[2].Length, nh - vh - cmd[2].Length);
+
+            switch (cmd[0].ToUpper())
+            {
+                case "IMPORT1":
+                    if (c.IsFirst() && row == null)
+                    {
+                        row = Row.Add(txt);
+                    }
+                    else
+                    {
+                        if (row == null) { return Tuple.Create("Keine Zeile angegeben.", true, row); }
+                        row.CellSet(c, txt);
+                    }
+                    return Tuple.Create(string.Empty, false, row);
+
+                case "IMPORT2":
+                    if (row == null) { return Tuple.Create("Keine Zeile angegeben.", true, row); }
+                    var l = row.CellGetList(c);
+                    l.Add(txt);
+                    row.CellSet(c, l);
+                    return Tuple.Create(string.Empty, false, row);
+
+                default:
+                    return Tuple.Create("Befehl nicht erkannt.", true, row);
+            }
+
+        }
+
+
+
+
+
+
+
+
 
 
         private void Column_ItemRemoved(object sender, System.EventArgs e)
@@ -2999,20 +2938,7 @@ namespace BlueDatabase
             return false;
         }
 
-        protected override bool IsFileAllowedToLoad(string fileName)
-        {
-            foreach (var ThisDatabase in AllDatabases)
-            {
-                if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == fileName.ToLower())
-                {
-                    ThisDatabase.Release(true, 240);
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Doppletes Laden von " + fileName);
-                    return false;
-                }
-            }
 
-            return true;
-        }
 
         protected override bool IsThereBackgroundWorkToDo(bool mustSave)
         {

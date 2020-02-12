@@ -169,16 +169,14 @@ namespace BlueControls.Controls
         private static void Database_DatabaseAdded(object sender, DatabaseGiveBackEventArgs e)
         {
 
-            e.Database.NeedPassword += Database_NeedPassword;
-            e.Database.GenerateLayoutInternal += CreativePad.GenerateLayoutFromRow;
-            e.Database.RenameColumnInLayout += CreativePad.RenameColumnInLayout;
-            e.Database.Loaded += tabAdministration.CheckDatabase;
-
-
-
+            if (e.Database is Database DB)
+            {
+                DB.NeedPassword += Database_NeedPassword;
+                DB.GenerateLayoutInternal += CreativePad.GenerateLayoutFromRow;
+                DB.RenameColumnInLayout += CreativePad.RenameColumnInLayout;
+                DB.Loaded += tabAdministration.CheckDatabase;
+            }
         }
-
-
 
         public event EventHandler RowsSorted;
 
@@ -592,7 +590,7 @@ namespace BlueControls.Controls
                     if (!string.IsNullOrEmpty(CurrentRow.TMP_Chapter))
                     {
                         var si = GR.MeasureString(CurrentRow.TMP_Chapter, _Chapter_Font.Font());
-                        GR.FillRectangle(new SolidBrush(Skin.Color_Back(enDesign.Table_And_Pad, enStates.Standard).SetAlpha(50)), 1, (int)CurrentRow.TMP_Y - RowCaptionSizeY, DisplayRectangleWOSlider.Width-2, RowCaptionSizeY);
+                        GR.FillRectangle(new SolidBrush(Skin.Color_Back(enDesign.Table_And_Pad, enStates.Standard).SetAlpha(50)), 1, (int)CurrentRow.TMP_Y - RowCaptionSizeY, DisplayRectangleWOSlider.Width - 2, RowCaptionSizeY);
 
                         GR.FillRectangle(new SolidBrush(Skin.Color_Back(enDesign.Table_And_Pad, enStates.Standard).SetAlpha(200)), 1, (int)CurrentRow.TMP_Y - RowCaptionFontY, si.Width, si.Height);
                         GR.DrawString(CurrentRow.TMP_Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, (int)CurrentRow.TMP_Y - RowCaptionFontY);
@@ -1967,7 +1965,7 @@ namespace BlueControls.Controls
 
                         if (string.IsNullOrEmpty(LastCap))
                         {
-                            ThisRow.TMP_Chapter = "- ohne " + _Database.Column.SysChapter.Caption + " -" ;
+                            ThisRow.TMP_Chapter = "- ohne " + _Database.Column.SysChapter.Caption + " -";
                         }
                         else
                         {

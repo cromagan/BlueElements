@@ -45,11 +45,6 @@ namespace BlueControls
 
         }
 
-        protected override bool IsFileAllowedToLoad(string fileName)
-        {
-            return true;
-        }
-
 
         protected override void DoWorkAfterSaving()
         {

@@ -31,6 +31,7 @@ using static BlueBasics.FileOperations;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 using BlueBasics.EventArgs;
+using BlueBasics.MultiUserFile;
 
 namespace BlueDatabase
 {
@@ -1452,11 +1453,6 @@ namespace BlueDatabase
             }
         }
 
-        //private void _TMP_LinkedDatabase_Disposed(object sender, System.EventArgs e)
-        //{
-        //    Invalidate_TmpVariables();
-        //}
-
         private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, DatabaseStoppedEventArgs e)
         {
             Database.OnConnectedControlsStopAllWorking(e);
@@ -1481,7 +1477,7 @@ namespace BlueDatabase
 
             }
 
-            TMP_LinkedDatabase = Database.GetByFilename(el.Filenname, true);
+            TMP_LinkedDatabase = (Database)clsMultiUserFile.GetByFilename(el.Filenname, true);
             if (_TMP_LinkedDatabase == null)
             {
                 Database.OnLoadingLinkedDatabase(el);
@@ -1489,7 +1485,7 @@ namespace BlueDatabase
 
 
 
-            TMP_LinkedDatabase = Database.GetByFilename(el.Filenname, true); // Event wird ausgelöst, Multitasking pfuscht rein, nochmal prüfen!!!!
+            TMP_LinkedDatabase = (Database)clsMultiUserFile.GetByFilename(el.Filenname, true); // Event wird ausgelöst, Multitasking pfuscht rein, nochmal prüfen!!!!
 
 
             if (_TMP_LinkedDatabase == null)

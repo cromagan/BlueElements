@@ -31,6 +31,8 @@ using BlueControls.ItemCollection;
 using BlueDatabase.EventArgs;
 using BlueControls.Enums;
 using BlueControls.Designer_Support;
+using BlueBasics.EventArgs;
+using BlueDatabase;
 
 namespace BlueControls.Controls
 {
@@ -1785,9 +1787,9 @@ namespace BlueControls.Controls
             var i = new ItemCollectionList(enBlueListBoxAppearance.Listbox);
 
 
-            if (e.Database != null && e.Database.Bins.Count > 0)
+            if (e.Database is Database DB && DB.Bins.Count > 0)
             {
-                foreach (var bmp in e.Database.Bins)
+                foreach (var bmp in DB.Bins)
                 {
 
                     if (bmp.Picture != null)
