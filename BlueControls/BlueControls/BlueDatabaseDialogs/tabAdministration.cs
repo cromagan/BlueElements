@@ -527,7 +527,7 @@ namespace BlueControls.BlueDatabaseDialogs
         /// <param name="DB"></param>
         public static void OpenDatabaseHeadEditor(Database DB)
         {
-            DB.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+            DB.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             DB.Load_Reload();
             using (var w = new DatabaseHeadEditor(DB))
             {

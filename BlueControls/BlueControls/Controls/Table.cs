@@ -162,14 +162,14 @@ namespace BlueControls.Controls
             ServiceStarted = true;
 
 
-            Database.DatabaseAdded += Database_DatabaseAdded;
+            Database.MultiUserFileAdded += Database_DatabaseAdded;
 
         }
 
-        private static void Database_DatabaseAdded(object sender, DatabaseGiveBackEventArgs e)
+        private static void Database_DatabaseAdded(object sender, MultiUserFileGiveBackEventArgs e)
         {
 
-            if (e.Database is Database DB)
+            if (e.File is Database DB)
             {
                 DB.NeedPassword += Database_NeedPassword;
                 DB.GenerateLayoutInternal += CreativePad.GenerateLayoutFromRow;
@@ -1308,7 +1308,7 @@ namespace BlueControls.Controls
                 if (ISIN_MouseDown) { return; }
                 ISIN_MouseDown = true;
 
-                _Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+                _Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
                 CellOnCoordinate(e.X, e.Y, out _MouseOverColumn, out _MouseOverRow);
 
@@ -1402,7 +1402,7 @@ namespace BlueControls.Controls
 
         private void Cell_Edit(ColumnItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, bool WithDropDown)
         {
-            Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+            Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
             ColumnItem ContentHolderCellColumn;
             RowItem ContentHolderCellRow;
@@ -2070,7 +2070,7 @@ namespace BlueControls.Controls
 
             if (!columnviewitem.Column.AutoFilter_möglich()) { return; }
 
-            Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+            Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             //OnBeforeAutoFilterShow(new ColumnEventArgs(columnviewitem.Column));
 
             _AutoFilter = new AutoFilter(columnviewitem.Column, Filter);
@@ -2204,7 +2204,7 @@ namespace BlueControls.Controls
 
             lock (Lock_UserAction)
             {
-                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
                 Invalidate();
             }
 
@@ -2216,7 +2216,7 @@ namespace BlueControls.Controls
 
             lock (Lock_UserAction)
             {
-                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
                 Invalidate();
             }
         }
@@ -2279,7 +2279,7 @@ namespace BlueControls.Controls
         }
 
 
-        private void _Database_StopAllWorking(object sender, DatabaseStoppedEventArgs e)
+        private void _Database_StopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e)
         {
             CloseAllComponents();
         }
@@ -2422,7 +2422,7 @@ namespace BlueControls.Controls
             {
                 if (ISIN_MouseWheel) { return; }
                 ISIN_MouseWheel = true;
-                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
                 if (!SliderY.Visible)
                 {
                     ISIN_MouseWheel = false;
@@ -2448,7 +2448,7 @@ namespace BlueControls.Controls
                 if (ISIN_Click) { return; }
                 ISIN_Click = true;
 
-                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
                 CellOnCoordinate(MousePos().X, MousePos().Y, out _MouseOverColumn, out _MouseOverRow);
 
 
@@ -2467,7 +2467,7 @@ namespace BlueControls.Controls
             {
                 if (ISIN_SizeChanged) { return; }
                 ISIN_SizeChanged = true;
-                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
                 Invalidate_AllDraw(false);
 
@@ -2486,7 +2486,7 @@ namespace BlueControls.Controls
                 if (ISIN_KeyDown) { return; }
                 ISIN_KeyDown = true;
 
-                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
                 switch (e.KeyCode)
                 {
@@ -2674,7 +2674,7 @@ namespace BlueControls.Controls
 
                 if (e.Button != System.Windows.Forms.MouseButtons.None)
                 {
-                    _Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+                    _Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
                 }
                 else
                 {
@@ -2869,7 +2869,7 @@ namespace BlueControls.Controls
 
                 if (Mouse_IsInHead())
                 {
-                    Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+                    Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
                     DoubleClick?.Invoke(this, ea);
                     ISIN_DoubleClick = false;
@@ -3017,7 +3017,7 @@ namespace BlueControls.Controls
             {
                 if (ISIN_Resize) { return; }
                 ISIN_Resize = true;
-                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
                 Invalidate_AllDraw(false);
                 ISIN_Resize = false;
@@ -3900,7 +3900,7 @@ namespace BlueControls.Controls
             {
                 if (ISIN_VisibleChanged) { return; }
                 ISIN_VisibleChanged = true;
-                Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
                 ISIN_VisibleChanged = false;
             }
 

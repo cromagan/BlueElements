@@ -376,9 +376,9 @@ namespace BlueControls.Controls
         }
 
 
-        private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, DatabaseGiveBackEventArgs e)
+        private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e)
         {
-            e.Database = _Database;
+            e.File = _Database;
         }
 
 
@@ -587,9 +587,9 @@ namespace BlueControls.Controls
         }
 
 
-        private void EasyPicConnectedDatabase(object sender, DatabaseGiveBackEventArgs e)
+        private void EasyPicConnectedDatabase(object sender, MultiUserFileGiveBackEventArgs e)
         {
-            e.Database = _Database;
+            e.File = _Database;
         }
 
         private void GotFocus_ComboBox(object sender, System.EventArgs e)

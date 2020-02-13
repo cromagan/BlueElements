@@ -18,7 +18,7 @@ namespace BlueBasics.MultiUserFile
 
 
         #region Shareds
-        public static List<clsMultiUserFile> AllDatabases = new List<clsMultiUserFile>();
+        public static List<clsMultiUserFile> AllFiles = new List<clsMultiUserFile>();
 
 
         public static void ReleaseAll(bool MUSTRelease, int MaxWaitSeconds)
@@ -30,13 +30,13 @@ namespace BlueBasics.MultiUserFile
             }
 
 
-            var x = AllDatabases.Count;
+            var x = AllFiles.Count;
 
-            foreach (var ThisDatabase in AllDatabases)
+            foreach (var ThisDatabase in AllFiles)
             {
                 ThisDatabase?.Release(MUSTRelease, MaxWaitSeconds);
 
-                if (x != AllDatabases.Count)
+                if (x != AllFiles.Count)
                 {
                     // Die Auflistung wurde verändert! Selten, aber kann passieren!
                     ReleaseAll(MUSTRelease, MaxWaitSeconds);
@@ -56,7 +56,7 @@ namespace BlueBasics.MultiUserFile
         {
             filePath = modConverter.SerialNr2Path(filePath);
 
-            foreach (var ThisDatabase in AllDatabases)
+            foreach (var ThisDatabase in AllFiles)
             {
                 if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == filePath.ToLower()) { return ThisDatabase; }
             }
@@ -64,7 +64,7 @@ namespace BlueBasics.MultiUserFile
 
             if (checkOnlyFilenameToo)
             {
-                foreach (var ThisDatabase in AllDatabases)
+                foreach (var ThisDatabase in AllFiles)
                 {
                     if (ThisDatabase != null && ThisDatabase.Filename.ToLower().FileNameWithSuffix() == filePath.ToLower().FileNameWithSuffix()) { return ThisDatabase; }
                 }
@@ -125,8 +125,8 @@ namespace BlueBasics.MultiUserFile
         public event EventHandler<LoadingEventArgs> Loading;
         public event EventHandler SavedToDisk;
         public event EventHandler<OldBlockFileEventArgs> OldBlockFileExists;
-        public event EventHandler<DatabaseStoppedEventArgs> ConnectedControlsStopAllWorking;
-        public static event EventHandler<DatabaseGiveBackEventArgs> DatabaseAdded;
+        public event EventHandler<MultiUserFileStopWorkingEventArgs> ConnectedControlsStopAllWorking;
+        public static event EventHandler<MultiUserFileGiveBackEventArgs> MultiUserFileAdded;
 
         /// <summary>
         /// Wird ausgegeben, sobald isParsed false ist, noch vor den automatischen Reperaturen.
@@ -143,7 +143,7 @@ namespace BlueBasics.MultiUserFile
 
 
 
-            AllDatabases.Add(this);
+            AllFiles.Add(this);
             OnDatabaseAdded(this);
 
             PureBinSaver = new System.ComponentModel.BackgroundWorker();
@@ -737,7 +737,7 @@ namespace BlueBasics.MultiUserFile
 
             if (string.IsNullOrEmpty(Filename)) { return false; }
 
-            OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
+            OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
 
 
 
@@ -914,7 +914,7 @@ namespace BlueBasics.MultiUserFile
             return _isParsing;
         }
 
-        public void OnConnectedControlsStopAllWorking(DatabaseStoppedEventArgs e)
+        public void OnConnectedControlsStopAllWorking(MultiUserFileStopWorkingEventArgs e)
         {
             if (e.AllreadyStopped.Contains(Filename.ToLower())) { return; }
             e.AllreadyStopped.Add(Filename.ToLower());
@@ -1213,15 +1213,15 @@ namespace BlueBasics.MultiUserFile
 
         protected static void OnDatabaseAdded(clsMultiUserFile database)
         {
-            var e = new DatabaseGiveBackEventArgs();
-            e.Database = database;
-            DatabaseAdded?.Invoke(null, e);
+            var e = new MultiUserFileGiveBackEventArgs();
+            e.File = database;
+            MultiUserFileAdded?.Invoke(null, e);
         }
 
 
         protected bool IsFileAllowedToLoad(string fileName)
         {
-            foreach (var ThisDatabase in AllDatabases)
+            foreach (var ThisDatabase in AllFiles)
             {
                 if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == fileName.ToLower())
                 {

@@ -17,15 +17,20 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
-using BlueBasics.MultiUserFile;
+using System.Collections.Generic;
 
 namespace BlueBasics.EventArgs
 {
-   public class DatabaseGiveBackEventArgs : System.EventArgs
+    public class MultiUserFileStopWorkingEventArgs : System.EventArgs
     {
-        
-        public clsMultiUserFile Database { get; set; }
+
+
+        public MultiUserFileStopWorkingEventArgs()
+        {
+            AllreadyStopped = new List<string>();
+        }
+
+        public List<string> AllreadyStopped { get; }
 
     }
 }

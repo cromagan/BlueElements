@@ -441,9 +441,8 @@ namespace BlueDatabase
 
         public void GenerateOverView()
         {
-            var da = new List<string>();
-            modAllgemein.HTML_AddHead(da, Database.Filename.FileNameWithoutSuffix());
-            da.Add("  <Font face=\"Arial\" Size=\"7\">Spaltenliste von: " + Database.Caption + "</h1><br>");
+           var da = new HTML( Database.Filename.FileNameWithoutSuffix());
+            da.AddCaption("Spaltenliste von: " + Database.Caption);
             da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.Filename + "</h1><br>");
 
             da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
@@ -458,7 +457,7 @@ namespace BlueDatabase
             da.Add("              <th align=left>Admin-Info</th>");
             da.Add("              <th align=left>Tags</th>");
             da.Add("              <th align=left>Änderungs-Rechte</th>");
-            da.Add("      </tr>");
+            da.RowEnd();
 
 
             var lfdn = 0;
@@ -479,12 +478,12 @@ namespace BlueDatabase
                     da.Add("              <th align=left>" + ThisColumnItem.AdminInfo.Replace("\r", "<br>") + "</th>");
                     da.Add("              <th align=left>" + ThisColumnItem.Tags.JoinWith("<br>") + "</th>");
                     da.Add("              <th align=left>" + ThisColumnItem.PermissionGroups_ChangeCell.JoinWith("<br>") + "</th>");
-                    da.Add("      </tr>");
+                    da.RowEnd();
                 }
             }
 
             da.Add("    </table>");
-            modAllgemein.HTML_AddFoot(da);
+            da.AddFoot();
 
             da.Save(TempFile("", "Spaltenliste.html"), true);
         }

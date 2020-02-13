@@ -596,7 +596,7 @@ namespace BlueControls.Controls
             _Database.Load_Reload();
 
 
-            _Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+            _Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
             if (!_Inited) { View_Init(); }
 

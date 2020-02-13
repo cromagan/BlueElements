@@ -85,9 +85,10 @@
     <Compile Include="clsImageMatrix.cs" />
     <Compile Include="Enums\enBlurType.cs" />
     <Compile Include="Enums\enErrorReason.cs" />
-    <Compile Include="EventArgs\DatabaseGiveBackEventArgs.cs" />
+    <Compile Include="EventArgs\MultiUserFileGiveBackEventArgs.cs" />
     <Compile Include="EventArgs\OldBlockFileEventArgs.cs" />
     <Compile Include="Extensions\RectangleFExtension.cs" />
+    <Compile Include="HTML.cs" />
     <Compile Include="Interfaces\IReloadable.cs" />
     <Compile Include="Interfaces\ILastSavedBy.cs" />
     <Compile Include="MultiUserFile\clsMultiUserFile.cs" />
@@ -95,7 +96,7 @@
     <Compile Include="Enums\enSW.cs" />
     <Compile Include="Enums\enDataFormat.cs" />
     <Compile Include="Enums\enFehlerArt.cs" />
-    <Compile Include="EventArgs\DatabaseStoppedEventArgs.cs" />
+    <Compile Include="EventArgs\MultiUserFileStopWorkingEventArgs.cs" />
     <Compile Include="EventArgs\LoadedEventArgs.cs" />
     <Compile Include="EventArgs\LoadingEventArgs.cs" />
     <Compile Include="Extensions\GraphicsExtensions.cs" />

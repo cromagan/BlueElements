@@ -923,25 +923,6 @@ namespace BlueBasics
 
 
 
-        public static void HTML_AddHead(List<string> l, string Title)
-        {
-            // DebugPrint_Disposed(disposedValue)
-            l.Add("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
-            l.Add("\"http://www.w3.org/TR/html4/strict.dtd\">");
-            l.Add("<html>");
-            l.Add("  <head>");
-            l.Add("    <title>" + Title + "</title>");
-            l.Add("  </head>");
-            l.Add("<body>");
-        }
-
-
-        public static void HTML_AddFoot(List<string> l)
-        {
-            l.Add("  </body>");
-            l.Add("</html>");
-        }
-
 
         public static Stream GetEmmbedResource(Assembly assembly, string Name)
         {

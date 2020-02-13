@@ -1453,7 +1453,7 @@ namespace BlueDatabase
             }
         }
 
-        private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, DatabaseStoppedEventArgs e)
+        private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e)
         {
             Database.OnConnectedControlsStopAllWorking(e);
         }

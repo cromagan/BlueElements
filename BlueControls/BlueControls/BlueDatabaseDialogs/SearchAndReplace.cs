@@ -75,7 +75,7 @@ namespace BlueControls.BlueDatabaseDialogs
             var SuchText = Alt.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
             var ErsetzText = Neu.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
 
-            _BlueTable.Database.OnConnectedControlsStopAllWorking(new DatabaseStoppedEventArgs());
+            _BlueTable.Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
 
             var sp = new List<ColumnItem>();

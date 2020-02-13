@@ -51,7 +51,7 @@ namespace BlueDatabase
         public static List<Database> GetByCaption(string Caption)
         {
             var l = new List<Database>();
-            foreach (var ThisDatabase in AllDatabases)
+            foreach (var ThisDatabase in AllFiles)
             {
                 if (ThisDatabase is Database DB)
                 {
@@ -1788,11 +1788,10 @@ namespace BlueDatabase
             }
 
 
-            var da = new List<string>();
-            modAllgemein.HTML_AddHead(da, Filename.FileNameWithoutSuffix());
-            da.Add("  <Font face=\"Arial\" Size=\"7\">" + _Caption + "</h1><br>");
+            var da = new HTML(Filename.FileNameWithoutSuffix());
+            da.AddCaption(_Caption);
             da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
-            da.Add("      <tr>");
+            da.RowBeginn();
 
 
             foreach (var ThisColumn in ColList)
@@ -1802,14 +1801,14 @@ namespace BlueDatabase
                     da.Add("        <th BORDERCOLOR=\"#aaaaaa\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\"><b>" + ThisColumn.ReadableText().Replace(";", "<br>") + "</b></th>");
                 }
             }
-            da.Add("      </tr>");
+            da.RowEnd();
 
 
             foreach (var ThisRow in SortedRows)
             {
                 if (ThisRow != null)
                 {
-                    da.Add("      <tr>");
+                    da.RowBeginn();
                     foreach (var ThisColumn in ColList)
                     {
                         if (ThisColumn != null)
@@ -1837,13 +1836,13 @@ namespace BlueDatabase
 
                         }
                     }
-                    da.Add("      </tr>");
+                    da.RowEnd();
                 }
             }
 
 
             // Summe----
-            da.Add("      <tr>");
+            da.RowBeginn();
             foreach (var ThisColumn in ColList)
             {
                 if (ThisColumn != null)
@@ -1859,12 +1858,12 @@ namespace BlueDatabase
                     }
                 }
             }
-            da.Add("      </tr>");
+            da.RowEnd();
 
             // ----------------------
 
             da.Add("    </table>");
-            modAllgemein.HTML_AddFoot(da);
+            da.AddFoot();
             da.Save(vFilename, Execute);
         }
 

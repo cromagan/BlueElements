@@ -68,7 +68,7 @@ namespace BlueControls.Controls
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
         public event EventHandler ImageChanged;
-        public event EventHandler<DatabaseGiveBackEventArgs> ConnectedDatabase;
+        public event EventHandler<MultiUserFileGiveBackEventArgs> ConnectedDatabase;
 
 
         [DefaultValue(-1)]
@@ -325,12 +325,12 @@ namespace BlueControls.Controls
         {
             base.OnMouseEnter(e);
 
-            var ed = new DatabaseGiveBackEventArgs();
-            ed.Database = null;
+            var ed = new MultiUserFileGiveBackEventArgs();
+            ed.File = null;
             OnConnectedDatabase(ed);
 
 
-            AusDatenbank.Enabled = ed.Database != null;
+            AusDatenbank.Enabled = ed.File != null;
 
             _Richt = 1;
             _PanelMover.Enabled = true;
@@ -349,7 +349,7 @@ namespace BlueControls.Controls
             if (ThrowEvent) { OnImageChanged(); }
         }
 
-        private void OnConnectedDatabase(DatabaseGiveBackEventArgs e)
+        private void OnConnectedDatabase(MultiUserFileGiveBackEventArgs e)
         {
             ConnectedDatabase?.Invoke(this, e);
         }
@@ -478,10 +478,10 @@ namespace BlueControls.Controls
         private void AusDatenbank_Click(object sender, System.EventArgs e)
         {
 
-            var ed = new DatabaseGiveBackEventArgs();
-            ed.Database = null;
+            var ed = new MultiUserFileGiveBackEventArgs();
+            ed.File = null;
             OnConnectedDatabase(ed);
-            if (ed.Database is Database DB)
+            if (ed.File is Database DB)
             {
                 if (_Bitmap != null)
                 {

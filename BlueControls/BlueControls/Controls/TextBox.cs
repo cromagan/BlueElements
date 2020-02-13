@@ -354,7 +354,7 @@ namespace BlueControls.Controls
         public event EventHandler TAB;
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
-        public event EventHandler<DatabaseGiveBackEventArgs> NeedDatabaseOfAdditinalSpecialChars;
+        public event EventHandler<MultiUserFileGiveBackEventArgs> NeedDatabaseOfAdditinalSpecialChars;
 
         #endregion
 
@@ -1780,14 +1780,14 @@ namespace BlueControls.Controls
 
             var x = _Cursor_CharPos;
 
-            var e = new DatabaseGiveBackEventArgs();
+            var e = new MultiUserFileGiveBackEventArgs();
             OnNeedDatabaseOfAdditinalSpecialChars(e);
 
 
             var i = new ItemCollectionList(enBlueListBoxAppearance.Listbox);
 
 
-            if (e.Database is Database DB && DB.Bins.Count > 0)
+            if (e.File is Database DB && DB.Bins.Count > 0)
             {
                 foreach (var bmp in DB.Bins)
                 {
@@ -1824,7 +1824,7 @@ namespace BlueControls.Controls
             if (_eTxt.InsertImage(r[0], _Cursor_CharPos)) { _Cursor_CharPos += 1; }
         }
 
-        private void OnNeedDatabaseOfAdditinalSpecialChars(DatabaseGiveBackEventArgs e)
+        private void OnNeedDatabaseOfAdditinalSpecialChars(MultiUserFileGiveBackEventArgs e)
         {
             NeedDatabaseOfAdditinalSpecialChars?.Invoke(this, e);
         }
