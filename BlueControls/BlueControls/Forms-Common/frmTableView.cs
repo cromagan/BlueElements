@@ -95,7 +95,7 @@ namespace BlueControls.Forms
 
             if (_Database != null)
             {
-                _Database.Release(false, 180);
+                _Database.Save(false);
                 _Database = null;
             }
         }
@@ -1088,7 +1088,7 @@ namespace BlueControls.Forms
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
         {
             SetDatabasetoNothing();
-            Database.ReleaseAll(true, 180);
+            Database.SaveAll(true);
             base.OnFormClosing(e);
         }
 

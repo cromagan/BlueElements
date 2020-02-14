@@ -21,25 +21,22 @@ namespace BlueBasics.MultiUserFile
         public static List<clsMultiUserFile> AllFiles = new List<clsMultiUserFile>();
 
 
-        public static void ReleaseAll(bool MUSTRelease, int MaxWaitSeconds)
+        public static void SaveAll(bool mustSave)
         {
 
-            if (MUSTRelease)
-            {
-                ReleaseAll(false, MaxWaitSeconds); // Beenden, was geht, dann erst der muss
-            }
+            if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
 
 
             var x = AllFiles.Count;
 
-            foreach (var ThisDatabase in AllFiles)
+            foreach (var thisFile in AllFiles)
             {
-                ThisDatabase?.Release(MUSTRelease, MaxWaitSeconds);
+                thisFile?.Save(mustSave);
 
                 if (x != AllFiles.Count)
                 {
                     // Die Auflistung wurde verändert! Selten, aber kann passieren!
-                    ReleaseAll(MUSTRelease, MaxWaitSeconds);
+                    SaveAll(mustSave);
                     return;
                 }
             }
@@ -181,10 +178,8 @@ namespace BlueBasics.MultiUserFile
 
         private void PureBinSaver_DoWork(object sender, DoWorkEventArgs e)
         {
-
-            var Data = WriteTempFileToDisk();
+            var Data = WriteTempFileToDisk(true);
             PureBinSaver.ReportProgress(100, Data);
-
         }
 
         public void SetReadOnly()
@@ -242,12 +237,10 @@ namespace BlueBasics.MultiUserFile
             return new Tuple<List<byte>, string>(_BLoaded, tmpLastSaveCode);
         }
 
-        /// <summary>
-        /// Führt - falls nötig - einen Reload der Datenbank aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
-        /// </summary>
-        public void Load_Reload()
-        {
 
+
+        private void WaitLoaded()
+        {
             var x = DateTime.Now;
 
 
@@ -256,11 +249,38 @@ namespace BlueBasics.MultiUserFile
                 Develop.DoEvents();
                 if (DateTime.Now.Subtract(x).TotalMinutes > 2)
                 {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Load_Reload hängt");
+                    Develop.DebugPrint(enFehlerArt.Fehler, "WaitLoaded hängt");
                     return;
                 }
 
             }
+        }
+
+
+        //private void WaitSaved()
+        //{
+        //    var x = DateTime.Now;
+
+
+        //    while (_IsSaving)
+        //    {
+        //        Develop.DoEvents();
+        //        if (DateTime.Now.Subtract(x).TotalMinutes > 2)
+        //        {
+        //            Develop.DebugPrint(enFehlerArt.Fehler, "WaitSaved hängt");
+        //            return;
+        //        }
+
+        //    }
+        //}
+
+        /// <summary>
+        /// Führt - falls nötig - einen Reload der Datenbank aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
+        /// </summary>
+        public void Load_Reload()
+        {
+
+            WaitLoaded();
 
             if (string.IsNullOrEmpty(Filename)) { return; }
 
@@ -373,6 +393,17 @@ namespace BlueBasics.MultiUserFile
         {
             if (ReadOnly) { return "Datei ist Readonly"; }
 
+
+            if (SavedFileName == null ||
+                StateOfOriginalFile == null ||
+                SavedData == null ||
+                string.IsNullOrEmpty(SavedFileName) ||
+                string.IsNullOrEmpty(StateOfOriginalFile) ||
+                string.IsNullOrEmpty(SavedData)) { return "Keine Daten angekommen."; }
+
+
+            if (PureBinSaver.IsBusy) { return "Interner Binärer Speichervorgang noch nicht abgeschlossen."; }
+
             var f = ErrorReason(enErrorReason.Save);
             if (!string.IsNullOrEmpty(f))
             {
@@ -387,6 +418,9 @@ namespace BlueBasics.MultiUserFile
             if (_IsSaving)
             {
                 Develop.DebugPrint("Doppelter Speichervorgang");
+                DeleteFile(SavedFileName, false);
+                _IsSaving = false;
+                return "Speichervorgang von verschiedenen Routinen aufgerufen.";
             }
 
             _IsSaving = true;
@@ -632,7 +666,7 @@ namespace BlueBasics.MultiUserFile
             do
             {
 
-                if (count>0) { Pause(1, false); }
+                if (count > 0) { Pause(1, false); }
                 Load_Reload();
                 count++;
                 if (count > 10) { Develop.DebugPrint(enFehlerArt.Fehler, "Datei nicht korrekt geladen (nicht mehr aktuell)"); }
@@ -649,7 +683,7 @@ namespace BlueBasics.MultiUserFile
 
             if (NewFileName.ToUpper() == Filename.ToUpper()) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
 
-            Release(true, 240); // Original-Datenbank speichern, die ist ja dann weg.
+            Save(true); // Original-Datenbank speichern, die ist ja dann weg.
 
             Filename = NewFileName;
             var l = ToListOfByte(true);
@@ -723,14 +757,14 @@ namespace BlueBasics.MultiUserFile
         /// Ist die Datei in Bearbeitung wird diese freigegeben. Zu guter letzt werden PendingChanges fest gespeichert.
         /// Dadurch ist evtl. ein Reload nötig. Ein Reload wird nur bei Pending Changes ausgelöst!
         /// </summary>
-        public bool Release(bool MUSTRelease, int MaxWaitSeconds)
+        public bool Save(bool mustSave)
         {
 
             if (ReadOnly) { TryOnOldBlockFileExists(); return false; }
 
             if (isSomethingDiscOperatingsBlocking())
             {
-                if (!MUSTRelease) { TryOnOldBlockFileExists(); return false; }
+                if (!mustSave) { TryOnOldBlockFileExists(); return false; }
                 Develop.DebugPrint(enFehlerArt.Warnung, "Release unmöglich, Datenbankstatus eingefroren");
                 return false;
             }
@@ -742,74 +776,44 @@ namespace BlueBasics.MultiUserFile
 
 
 
-            MaxWaitSeconds = Math.Min(MaxWaitSeconds, 40);
             var D = DateTime.UtcNow; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
 
 
-            if (!MUSTRelease && AgeOfBlockDatei() >= 0) { TryOnOldBlockFileExists(); return false; }
+            if (!mustSave && AgeOfBlockDatei() >= 0) { TryOnOldBlockFileExists(); return false; }
 
             while (HasPendingChanges())
             {
-                var f = Save();
 
-                if (DateTime.UtcNow.Subtract(D).TotalSeconds > MaxWaitSeconds)
-                {
-                    // Da liegt ein größerer Fehler vor...
-                    if (MUSTRelease) { Develop.DebugPrint(enFehlerArt.Warnung, "Datei nicht freigegeben...." + Filename + " " + f); }
-                    TryOnOldBlockFileExists(); return false;
-                }
+                Load_Reload();
+                var Data = WriteTempFileToDisk(false); // Dateiname, Stand der Originaldatei, was gespeichert wurde
+                var f = SaveRoutine(Data?.Item1, Data?.Item2, Data?.Item3);
 
-                if (!MUSTRelease && DateTime.UtcNow.Subtract(D).TotalSeconds > 20 && AgeOfBlockDatei() < 0)
+                if (!string.IsNullOrEmpty(f))
                 {
-                    Develop.DebugPrint(enFehlerArt.Info, "Saver hängt bei " + Filename + " " + f);
-                    return false;
-                }
-                if (DateTime.UtcNow.Subtract(D).TotalSeconds > 30 && HasPendingChanges() && AgeOfBlockDatei() >= 0)
-                {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Datei aufgrund der Blockdatei nicht freigegeben: " + Filename + " " + f);
-                    return false;
+
+                    if (DateTime.UtcNow.Subtract(D).TotalSeconds > 40)
+                    {
+                        // Da liegt ein größerer Fehler vor...
+                        if (mustSave) { Develop.DebugPrint(enFehlerArt.Warnung, "Datei nicht gespeichert: " + Filename + " " + f); }
+                        TryOnOldBlockFileExists(); return false;
+                    }
+
+                    if (!mustSave && DateTime.UtcNow.Subtract(D).TotalSeconds > 5 && AgeOfBlockDatei() < 0)
+                    {
+                        Develop.DebugPrint(enFehlerArt.Info, "Optionales Speichern nach 5 Sekunden abgebrochen bei " + Filename + " " + f);
+                        return false;
+                    }
                 }
             }
             return true;
         }
 
-        /// <summary>
-        /// Speichert die Daten - wenn möglich - sofort ab.
-        /// </summary>
-        /// <returns></returns>
-        private string Save()
-        {
-            if (ReadOnly) { return "Datei ist schreibgeschützt"; }
-            Load_Reload();
-
-
-            while (PureBinSaver.IsBusy)
-            {
-                Develop.DoEvents();
-                Develop.DebugPrint(enFehlerArt.Warnung, "Informatioszwecke. Bei Datei: " + Filename);
-                if (!HasPendingChanges()) { return "Speichern nicht mehr nötig."; }
-            }
-
-            //if (instantan)
-            //{
-            var Data = WriteTempFileToDisk(); // Dateiname, Stand der Originaldatei, was gespeichert wurde
-
-            if (Data == null) { return "Datenpaket konnte nicht erstellt werden."; }
-            return SaveRoutine(Data.Item1, Data.Item2, Data.Item3);
-            //}
-            //else
-            //{
-            //    if (!PureBinSaver.IsBusy) { PureBinSaver.RunWorkerAsync(); }
-            //}
-
-            //return "Speicherprozess nur angestoßen.";
-        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns>Dateiname, Stand der Originaldatei, was gespeichert wurde</returns>
-        private Tuple<string, string, string> WriteTempFileToDisk()
+        private Tuple<string, string, string> WriteTempFileToDisk(bool iAmThePureBinSaver)
         {
 
             var fi = string.Empty;
@@ -817,6 +821,9 @@ namespace BlueBasics.MultiUserFile
             byte[] Writer_BinaryData;
 
             var count = 0;
+
+
+            if (!iAmThePureBinSaver && PureBinSaver.IsBusy) { return null; }
 
             do
             {
@@ -869,7 +876,7 @@ namespace BlueBasics.MultiUserFile
             {
                 Load_Reload();
                 if (AgeOfBlockDatei() >= 0) { DeleteFile(Blockdateiname(), true); }
-                Release(true, 240);
+                Save(true);
             }
             catch
             {
@@ -1172,8 +1179,8 @@ namespace BlueBasics.MultiUserFile
                 // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
                 // TODO: große Felder auf Null setzen.
 
-                Release(false, 1);
-                while (PureBinSaver.IsBusy) { Pause(0.1, true); }
+                Save(false);
+                while (PureBinSaver.IsBusy) { Pause(0.5, true); }
 
 
                 //  https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
@@ -1225,7 +1232,7 @@ namespace BlueBasics.MultiUserFile
             {
                 if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == fileName.ToLower())
                 {
-                    ThisDatabase.Release(true, 240);
+                    ThisDatabase.Save(true);
                     Develop.DebugPrint(enFehlerArt.Fehler, "Doppletes Laden von " + fileName);
                     return false;
                 }

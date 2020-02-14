@@ -441,22 +441,22 @@ namespace BlueDatabase
 
         public void GenerateOverView()
         {
-           var da = new HTML( Database.Filename.FileNameWithoutSuffix());
+            var da = new HTML(Database.Filename.FileNameWithoutSuffix());
             da.AddCaption("Spaltenliste von: " + Database.Caption);
             da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.Filename + "</h1><br>");
 
-            da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
+            da.TableBeginn();
+            da.RowBeginn();
+            da.CellAdd("#");
+            da.CellAdd("Name");
+            da.CellAdd("Beschriftung");
+            da.CellAdd("Überschriften");
+            da.CellAdd("Datenformat");
+            da.CellAdd("Quickinfo");
+            da.CellAdd("Admin-Info");
+            da.CellAdd("Tags");
+            da.CellAdd("Änderungs-Rechte");
 
-            da.Add("       <tr bgcolor=\"#dddddd\"BORDERCOLOR=\"#cccccc\" > ");
-            da.Add("              <th align=left>#</th>");
-            da.Add("              <th align=left width =\"1%\">Name</th>");
-            da.Add("              <th align=left>Beschriftung</th>");
-            da.Add("              <th align=left>Überschriften</th>");
-            da.Add("              <th align=left>Datenformat</th>");
-            da.Add("              <th align=left>Quickinfo</th>");
-            da.Add("              <th align=left>Admin-Info</th>");
-            da.Add("              <th align=left>Tags</th>");
-            da.Add("              <th align=left>Änderungs-Rechte</th>");
             da.RowEnd();
 
 
@@ -467,22 +467,21 @@ namespace BlueDatabase
                 if (ThisColumnItem != null)
                 {
                     lfdn += 1;
-
-                    da.Add("       <tr BORDERCOLOR=\"#cccccc\">");
-                    da.Add("              <th align=left>" + lfdn.ToString() + "</th>");
-                    da.Add("              <th align=left>" + ThisColumnItem.Name + "</th>");
-                    da.Add("              <th align=left>" + ThisColumnItem.Caption.Replace("\r", "<br>") + "</th>");
-                    da.Add("              <th align=left>" + (ThisColumnItem.Ueberschrift1 + "/" +ThisColumnItem.Ueberschrift2 + "/" + ThisColumnItem.Ueberschrift3 + "/").TrimEnd("/")  + " </th>");
-                    da.Add("              <th align=left>" + ThisColumnItem.Format + "</th>");
-                    da.Add("              <th align=left>" + ThisColumnItem.Quickinfo.Replace("\r", "<br>") + "</th>");
-                    da.Add("              <th align=left>" + ThisColumnItem.AdminInfo.Replace("\r", "<br>") + "</th>");
-                    da.Add("              <th align=left>" + ThisColumnItem.Tags.JoinWith("<br>") + "</th>");
-                    da.Add("              <th align=left>" + ThisColumnItem.PermissionGroups_ChangeCell.JoinWith("<br>") + "</th>");
+                    da.RowBeginn();
+                    da.CellAdd(lfdn.ToString());
+                    da.CellAdd(ThisColumnItem.Name);
+                    da.CellAdd(ThisColumnItem.Caption.Replace("\r", "<br>"));
+                    da.CellAdd((ThisColumnItem.Ueberschrift1 + "/" + ThisColumnItem.Ueberschrift2 + "/" + ThisColumnItem.Ueberschrift3 + "/").TrimEnd("/"));
+                    da.CellAdd(ThisColumnItem.Format.ToString());
+                    da.CellAdd(ThisColumnItem.Quickinfo.Replace("\r", "<br>"));
+                    da.CellAdd(ThisColumnItem.AdminInfo.Replace("\r", "<br>"));
+                    da.CellAdd(ThisColumnItem.Tags.JoinWith("<br>"));
+                    da.CellAdd(ThisColumnItem.PermissionGroups_ChangeCell.JoinWith("<br>"));
                     da.RowEnd();
                 }
             }
 
-            da.Add("    </table>");
+            da.TableEnd();
             da.AddFoot();
 
             da.Save(TempFile("", "Spaltenliste.html"), true);

@@ -1790,7 +1790,8 @@ namespace BlueDatabase
 
             var da = new HTML(Filename.FileNameWithoutSuffix());
             da.AddCaption(_Caption);
-            da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
+
+            da.TableBeginn();
             da.RowBeginn();
 
 
@@ -1798,7 +1799,8 @@ namespace BlueDatabase
             {
                 if (ThisColumn != null)
                 {
-                    da.Add("        <th BORDERCOLOR=\"#aaaaaa\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\"><b>" + ThisColumn.ReadableText().Replace(";", "<br>") + "</b></th>");
+                    da.CellAdd(ThisColumn.ReadableText().Replace(";", "<br>"), ThisColumn.BackColor);
+                    //da.Add("        <th bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\"><b>" + ThisColumn.ReadableText().Replace(";", "<br>") + "</b></th>");
                 }
             }
             da.RowEnd();
@@ -1825,11 +1827,11 @@ namespace BlueDatabase
 
                             if (LCrow != null && LCColumn != null)
                             {
-                                da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">" + LCrow.CellGetValuesReadable(LCColumn, enShortenStyle.HTML).JoinWith("<br>") + "</th>");
+                                da.CellAdd(LCrow.CellGetValuesReadable(LCColumn, enShortenStyle.HTML).JoinWith("<br>"), ThisColumn.BackColor);
                             }
                             else
                             {
-                                da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\"> </th>");
+                                da.CellAdd(" ", ThisColumn.BackColor);
 
                             }
 
@@ -1850,19 +1852,22 @@ namespace BlueDatabase
                     var s = ThisColumn.Summe(SortedRows);
                     if (s == null)
                     {
-                        da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">-</th>");
+                        da.CellAdd("-", ThisColumn.BackColor);
+
+                        //da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">-</th>");
                     }
                     else
                     {
-                        da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">&sum; " + s + "</th>");
+                        da.CellAdd("&sum; " + s, ThisColumn.BackColor);
+                        //da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">&sum; " + s + "</th>");
                     }
                 }
             }
             da.RowEnd();
 
             // ----------------------
+            da.TableEnd();
 
-            da.Add("    </table>");
             da.AddFoot();
             da.Save(vFilename, Execute);
         }

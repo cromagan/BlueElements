@@ -236,7 +236,7 @@ namespace BlueControls.Controls
                     _Database.ColumnArrangements.ItemInternalChanged -= ColumnArrangements_ItemInternalChanged;
                     _Database.ProgressbarInfo -= _Database_ProgressbarInfo;
 
-                    _Database.Release(false, 180);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
+                    _Database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
 
                 }
                 _Database = value;
