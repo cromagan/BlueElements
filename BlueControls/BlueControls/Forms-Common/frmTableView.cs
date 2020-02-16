@@ -713,7 +713,7 @@ namespace BlueControls.Forms
 
             switch (bu.Name)
             {
-                case "SaveAs":
+                case "btnSaveAs":
                     if (_Database == null) { return; }
                     break;
                 case "NeuDB":
