@@ -172,7 +172,7 @@ namespace BlueBasics.MultiUserFile
 
 
 
-            SaveRoutine(Data.Item1, Data.Item2, Data.Item3);
+            SaveRoutine(true, Data.Item1, Data.Item2, Data.Item3);
 
         }
 
@@ -389,46 +389,35 @@ namespace BlueBasics.MultiUserFile
         protected abstract void ParseExternal(List<byte> bLoaded);
 
 
-        private string SaveRoutine(string SavedFileName, string StateOfOriginalFile, string SavedData)
+        private string SaveRoutine(bool FromParallelProzess, string SavedFileName, string StateOfOriginalFile, string SavedData)
         {
-            if (ReadOnly) { return "Datei ist Readonly"; }
 
+            if (ReadOnly) { return Feedback("Datei ist Readonly"); }
 
-            if (SavedFileName == null ||
-                StateOfOriginalFile == null ||
-                SavedData == null ||
-                string.IsNullOrEmpty(SavedFileName) ||
-                string.IsNullOrEmpty(StateOfOriginalFile) ||
-                string.IsNullOrEmpty(SavedData)) { return "Keine Daten angekommen."; }
+            if (SavedFileName == null || string.IsNullOrEmpty(SavedFileName) ||
+                StateOfOriginalFile == null || string.IsNullOrEmpty(StateOfOriginalFile) ||
+                SavedData == null || string.IsNullOrEmpty(SavedData)) { return Feedback("Keine Daten angekommen."); }
 
-
-            if (PureBinSaver.IsBusy) { return "Interner Binärer Speichervorgang noch nicht abgeschlossen."; }
+            if (!FromParallelProzess && PureBinSaver.IsBusy) { return Feedback("Anderer interner binärer Speichervorgang noch nicht abgeschlossen."); }
 
             var f = ErrorReason(enErrorReason.Save);
-            if (!string.IsNullOrEmpty(f))
-            {
-                Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + f);
-                TryOnOldBlockFileExists();
-                return "Fehler: " + f;
-            }
+            if (!string.IsNullOrEmpty(f)) { return Feedback("Fehler: " + f); }
 
-            if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben"; }
+            if (string.IsNullOrEmpty(Filename)) { return Feedback("Kein Dateiname angegeben"); }
 
 
-            if (_IsSaving)
-            {
-                Develop.DebugPrint("Doppelter Speichervorgang");
-                DeleteFile(SavedFileName, false);
-                _IsSaving = false;
-                return "Speichervorgang von verschiedenen Routinen aufgerufen.";
-            }
+            if (_IsSaving) { return Feedback("Speichervorgang von verschiedenen Routinen aufgerufen."); }
 
             _IsSaving = true;
 
             if (!EasyMode)
             {
                 var erfolg = CreateBlockDatei();
-                if (!erfolg) { _IsSaving = false; return "Blockdatei konnte nicht erzeugt werden."; }
+                if (!erfolg)
+                {
+                    _IsSaving = false;
+                    return Feedback("Blockdatei konnte nicht erzeugt werden.");
+                }
 
 
                 // Blockdatei da, wir sind save. Andere Computer lassen die Datei ab jetzt in Ruhe!
@@ -436,18 +425,16 @@ namespace BlueBasics.MultiUserFile
                 if (GetFileInfo(true) != StateOfOriginalFile)
                 {
                     DeleteFile(Blockdateiname(), true);
-                    DeleteFile(SavedFileName, false);
                     _IsSaving = false;
-                    return "Datei wurde inzwischen verändert.";
+                    return Feedback("Datei wurde inzwischen verändert.");
                 }
 
 
                 if (SavedData != ToString())
                 {
                     DeleteFile(Blockdateiname(), true);
-                    DeleteFile(SavedFileName, false);
                     _IsSaving = false;
-                    return "Daten wurden inzwischen verändert.";
+                    return Feedback("Daten wurden inzwischen verändert.");
                 }
             }
 
@@ -488,7 +475,8 @@ namespace BlueBasics.MultiUserFile
                     _CheckedAndReloadNeed = true;
                     _LastSaveCode = "Fehler";
                     Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!!" + Filename);
-                    _IsSaving = false; return "Speichervorgang fehlgeschlagen.";
+                    _IsSaving = false;
+                    return Feedback("Speichervorgang fehlgeschlagen.");
                 }
                 else
                 {
@@ -507,6 +495,17 @@ namespace BlueBasics.MultiUserFile
             OnSavedToDisk();
             _IsSaving = false;
             return string.Empty;
+
+
+            string Feedback(string txt)
+            {
+                if (SavedFileName == null || string.IsNullOrEmpty(SavedFileName)) { DeleteFile(SavedFileName, false); }
+                Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + txt);
+                TryOnOldBlockFileExists();
+                return txt;
+            }
+
+
         }
 
         private bool CreateBlockDatei()
@@ -786,7 +785,7 @@ namespace BlueBasics.MultiUserFile
 
                 Load_Reload();
                 var Data = WriteTempFileToDisk(false); // Dateiname, Stand der Originaldatei, was gespeichert wurde
-                var f = SaveRoutine(Data?.Item1, Data?.Item2, Data?.Item3);
+                var f = SaveRoutine(false, Data?.Item1, Data?.Item2, Data?.Item3);
 
                 if (!string.IsNullOrEmpty(f))
                 {
