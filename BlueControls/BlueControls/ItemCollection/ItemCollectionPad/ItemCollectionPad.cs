@@ -189,7 +189,7 @@ namespace BlueControls.ItemCollection
                         break;
 
                     case "item":
-                        AddByCode(pair.Value);
+                        Add(BasicPadItem.NewByParsing(pair.Value));
                         break;
 
                     case "dpi":
@@ -224,113 +224,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private void AddByCode(string code)
-        {
-            BasicPadItem i = null;
-            var x = code.GetAllTags();
 
-            var ding = string.Empty;
-            var name = string.Empty;
-
-
-            foreach (var thisIt in x)
-            {
-                switch (thisIt.Key)
-                {
-                    case "type":
-                    case "classid":
-                        ding = thisIt.Value;
-                        break;
-                    case "internalname":
-                        name = thisIt.Value;
-                        break;
-                }
-            }
-
-
-            if (string.IsNullOrEmpty(ding) )
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Itemtyp unbekannt: " + code);
-            }
-
-            if (string.IsNullOrEmpty(name))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Itemname unbekannt: " + code);
-            }
-
-
-            switch (ding.ToLower())
-            {
-                case "blueelements.clsitemtext":
-                case "blueelements.textitem":
-                case "text":
-                    i = new TextPadItem(name, string.Empty);
-                    break;
-
-                case "blueelements.clsitemdistanz":
-                case "blueelements.distanzitem":
-                case "spacer":
-                    i = new SpacerPadItem(name);
-                    break;
-
-                case "blueelements.clsitemimage":
-                case "blueelements.imageitem":
-                case "image":
-                    i = new BitmapPadItem(name, string.Empty);
-                    break;
-
-                case "blueelements.clsdimensionitem":
-                case "blueelements.dimensionitem":
-                case "dimension":
-                    i = new DimensionPadItem(name, null, null, 0);
-                    break;
-
-                case "blueelements.clsitemline":
-                case "blueelements.itemline":
-                case "line":
-                    i = new LinePadItem(name, Enums.PadStyles.Style_Standard, Point.Empty, Point.Empty);
-                    break;
-
-                case "blueelements.clsitempad":
-                case "blueelements.itempad":
-                case "childpad":
-                    i = new ChildPadItem(name);
-                    break;
-
-
-                case "blueelements.clsitemgrid":
-                case "blueelements.itemgrid":
-                case "grid":
-                    i = new GridPadItem(name);
-                    break;
-
-                case "blueelements.rowformulaitem":
-                case "row":
-                    i = new RowFormulaPadItem(name);
-                    break;
-
-                case "blueelements.clsitemcomiccomp":
-                case "comic":
-                    i = new ComicCompPadItem(name);
-                    break;
-
-                case "symbol":
-                    i = new SymbolPadItem(name);
-                    break;
-                default:
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Unbekanntes Item: " + code);
-                    break;
-
-            }
-
-
-
-            if (i != null)
-            {
-                i.Parse(x);
-                Add(i);
-            }
-        }
 
 
         public new string ToString()

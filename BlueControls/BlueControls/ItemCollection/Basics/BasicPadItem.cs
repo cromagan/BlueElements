@@ -28,9 +28,121 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection
 {
-    public abstract class BasicPadItem : BasicItem, IParseable
+    public abstract class BasicPadItem : BasicItem, IParseable, System.ICloneable
     {
-        // protected abstract bool ParseExplicit(KeyValuePair<string, string> pair);
+
+
+
+
+
+
+        public static BasicPadItem NewByParsing(string code)
+        {
+            BasicPadItem i = null;
+            var x = code.GetAllTags();
+
+            var ding = string.Empty;
+            var name = string.Empty;
+
+
+            foreach (var thisIt in x)
+            {
+                switch (thisIt.Key)
+                {
+                    case "type":
+                    case "classid":
+                        ding = thisIt.Value;
+                        break;
+                    case "internalname":
+                        name = thisIt.Value;
+                        break;
+                }
+            }
+
+
+            if (string.IsNullOrEmpty(ding))
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Itemtyp unbekannt: " + code);
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(name))
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Itemname unbekannt: " + code);
+                return null;
+            }
+
+
+            switch (ding.ToLower())
+            {
+                case "blueelements.clsitemtext":
+                case "blueelements.textitem":
+                case "text":
+                    i = new TextPadItem(name, string.Empty);
+                    break;
+
+                case "blueelements.clsitemdistanz":
+                case "blueelements.distanzitem":
+                case "spacer":
+                    i = new SpacerPadItem(name);
+                    break;
+
+                case "blueelements.clsitemimage":
+                case "blueelements.imageitem":
+                case "image":
+                    i = new BitmapPadItem(name, string.Empty);
+                    break;
+
+                case "blueelements.clsdimensionitem":
+                case "blueelements.dimensionitem":
+                case "dimension":
+                    i = new DimensionPadItem(name, null, null, 0);
+                    break;
+
+                case "blueelements.clsitemline":
+                case "blueelements.itemline":
+                case "line":
+                    i = new LinePadItem(name, Enums.PadStyles.Style_Standard, Point.Empty, Point.Empty);
+                    break;
+
+                case "blueelements.clsitempad":
+                case "blueelements.itempad":
+                case "childpad":
+                    i = new ChildPadItem(name);
+                    break;
+
+
+                case "blueelements.clsitemgrid":
+                case "blueelements.itemgrid":
+                case "grid":
+                    i = new GridPadItem(name);
+                    break;
+
+                case "blueelements.rowformulaitem":
+                case "row":
+                    i = new RowFormulaPadItem(name);
+                    break;
+
+                case "blueelements.clsitemcomiccomp":
+                case "comic":
+                    i = new ComicCompPadItem(name);
+                    break;
+
+                case "symbol":
+                    i = new SymbolPadItem(name);
+                    break;
+                default:
+                    Develop.DebugPrint(enFehlerArt.Fehler, "Unbekanntes Item: " + code);
+                    break;
+
+            }
+
+
+
+            if (i != null) { i.Parse(x); }
+
+            return i;
+        }
 
 
         /// <summary>
@@ -284,9 +396,9 @@ namespace BlueControls.ItemCollection
             t = t + "Print=" + _PrintMe.ToPlusMinus() + ", ";
 
 
-            if (_ZoomPadding !=0)
+            if (_ZoomPadding != 0)
             {
-            t = t + "ZoomPadding=" + _ZoomPadding + ", ";
+                t = t + "ZoomPadding=" + _ZoomPadding + ", ";
             }
 
 
@@ -399,7 +511,7 @@ namespace BlueControls.ItemCollection
 
                 if (IsInDrawingArea(DCoordinates, SizeOfParentControl))
                 {
-                    GR.DrawImage(QuickImage.Get("Drucker|16||1").BMP, DCoordinates.X , DCoordinates.Y);
+                    GR.DrawImage(QuickImage.Get("Drucker|16||1").BMP, DCoordinates.X, DCoordinates.Y);
                 }
             }
         }
@@ -475,6 +587,12 @@ namespace BlueControls.ItemCollection
 
         }
 
+        public object Clone()
+        {
 
+            var t = ToString();
+            return NewByParsing(t);
+
+        }
     }
 }

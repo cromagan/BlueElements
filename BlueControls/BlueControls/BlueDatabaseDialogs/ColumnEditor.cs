@@ -316,7 +316,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void SetKeyTo(Database database, ComboBox combobox, int columnKey)
         {
-            if (columnKey < 0)
+            if (database is null || columnKey < 0)
             {
                 combobox.Text = "#Ohne";
             }

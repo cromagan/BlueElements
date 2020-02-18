@@ -192,6 +192,9 @@ namespace BlueControls.ItemCollection
                         }
                     }
 
+
+                    if(DCoordinates.Width <1 || DCoordinates.Height <1 || DCoordinates.Width > 20000 ||  DCoordinates.Height > 20000) { return; }
+
                     if (_tmpBMP == null)
                     {
                         _tmpBMP = new Bitmap((int)Math.Abs(DCoordinates.Width), (int)Math.Abs(DCoordinates.Height));
@@ -563,5 +566,7 @@ namespace BlueControls.ItemCollection
             base.DoStyleCommands(sender, Tags, ref CloseMenu);
 
         }
+
+
     }
 }
