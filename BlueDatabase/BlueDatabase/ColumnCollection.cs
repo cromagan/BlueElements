@@ -204,7 +204,7 @@ namespace BlueDatabase
                 if (ThisColumn != null && ThisColumn.Identifier.ToUpper() == Kennung.ToUpper()) { return; }
             }
 
-            var c = new ColumnItem(Database, true);
+            var c = Database.Column.Add();
             c.Load(enDatabaseDataType.co_Identifier, Kennung);
             c.StandardWerteNachKennung(true);
 
@@ -421,6 +421,101 @@ namespace BlueDatabase
 
         }
 
+        public ColumnItem AddACloneFrom(ColumnItem Source)
+        {
+
+            var c = Add(string.Empty);
+
+            c.Caption = Source.Caption;
+            c.CaptionBitmap = Source.CaptionBitmap;
+
+            c.Format = Source.Format;
+            c.LineLeft = Source.LineLeft;
+            c.LineRight = Source.LineRight;
+            c.MultiLine = Source.MultiLine;
+            c.Quickinfo = Source.Quickinfo;
+            c.ForeColor = Source.ForeColor;
+            c.BackColor = Source.BackColor;
+
+            c.EditTrotzSperreErlaubt = Source.EditTrotzSperreErlaubt;
+
+
+            c.EditType = Source.EditType;
+            c.Identifier = Source.Identifier;
+
+            c.PermissionGroups_ChangeCell.Clear();
+            c.PermissionGroups_ChangeCell.AddRange(Source.PermissionGroups_ChangeCell);
+
+            c.Tags.Clear();
+            c.Tags.AddRange(Source.Tags);
+
+
+            c.AllowedChars = Source.AllowedChars;
+            c.AdminInfo = Source.AdminInfo;
+            c.AutoFilterErlaubt = Source.AutoFilterErlaubt;
+            c.AutofilterTextFilterErlaubt = Source.AutofilterTextFilterErlaubt;
+            c.AutoFilterErweitertErlaubt = Source.AutoFilterErweitertErlaubt;
+            c.IgnoreAtRowFilter = Source.IgnoreAtRowFilter;
+            c.DropdownBearbeitungErlaubt = Source.DropdownBearbeitungErlaubt;
+            c.DropdownAllesAbwählenErlaubt = Source.DropdownAllesAbwählenErlaubt;
+            c.TextBearbeitungErlaubt = Source.TextBearbeitungErlaubt;
+            c.SpellCheckingEnabled = Source.SpellCheckingEnabled;
+            c.DropdownWerteAndererZellenAnzeigen = Source.DropdownWerteAndererZellenAnzeigen;
+            c.AfterEdit_QuickSortRemoveDouble = Source.AfterEdit_QuickSortRemoveDouble;
+
+            c.AfterEdit_Runden = Source.AfterEdit_Runden;
+            c.AfterEdit_DoUCase = Source.AfterEdit_DoUCase;
+            c.AfterEdit_AutoCorrect = Source.AfterEdit_AutoCorrect;
+            c.AutoRemove = Source.AutoRemove;
+            c.SaveContent = Source.SaveContent;
+            c.CellInitValue = Source.CellInitValue;
+            c.AutoFilterJoker = Source.AutoFilterJoker;
+            c.KeyColumnKey = Source.KeyColumnKey;
+            c.LinkedCell_RowKey = Source.LinkedCell_RowKey;
+            c.LinkedCell_ColumnKey = Source.LinkedCell_ColumnKey;
+            c.LinkedCell_ColumnValueFoundIn = Source.LinkedCell_ColumnValueFoundIn;
+            c.LinkedCell_ColumnValueAdd = Source.LinkedCell_ColumnValueAdd;
+            c.ZellenZusammenfassen = Source.ZellenZusammenfassen;
+            c.DropdownKey = Source.DropdownKey;
+            c.VorschlagsColumn = Source.VorschlagsColumn;
+            c.Align = Source.Align;
+            c.SortMask = Source.SortMask;
+
+
+            c.DropDownItems.Clear();
+            c.DropDownItems.AddRange(Source.DropDownItems);
+
+            c.Replacer.Clear();
+            c.Replacer.AddRange(Source.Replacer);
+
+            c.Regex.Clear();
+            c.Regex.AddRange(Source.Regex);
+
+
+            c.CompactView = Source.CompactView;
+            c.ShowUndo = Source.ShowUndo;
+            c.ShowMultiLineInOneLine = Source.ShowMultiLineInOneLine;
+
+            c.Ueberschrift1 = Source.Ueberschrift1;
+            c.Ueberschrift2 = Source.Ueberschrift2;
+            c.Ueberschrift3 = Source.Ueberschrift3;
+
+            c.Suffix = Source.Suffix;
+
+            c.LinkedKeyKennung = Source.LinkedKeyKennung;
+            c.LinkedDatabaseFile = Source.LinkedDatabaseFile;
+            c.BildCode_ImageNotFound = Source.BildCode_ImageNotFound;
+            c.BildCode_ConstantHeight = Source.BildCode_ConstantHeight;
+            c.BestFile_StandardSuffix = Source.BestFile_StandardSuffix;
+            c.BestFile_StandardFolder = Source.BestFile_StandardFolder;
+
+            c.Prefix = Source.Prefix;
+
+            return c;
+
+
+        }
+
         //internal string ChangeKeysToNames(string OriginalString)
         //{
 
@@ -511,5 +606,96 @@ namespace BlueDatabase
 
             return TestName;
         }
+
+        [Obsolete]
+        public new ColumnItem Add(ColumnItem column)
+        {
+
+            Develop.DebugPrint(enFehlerArt.Fehler, "Direkter Aufruf nicht erlaubt!");
+            return null;
+        }
+
+
+        /// <summary>
+        /// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
+        /// </summary>
+        /// <param name="comand">AddColumn muss benutzt werden. Ein Sicherheitsfaktor, um zu zeigen, dass das AddPending bereits erledigt wurde.</param>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        public ColumnItem Add(enDatabaseDataType comand, ColumnItem column)
+        {
+
+            if (comand != enDatabaseDataType.AddColumn)
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!");
+            }
+
+            if (column.Database != Database)
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!");
+            }
+
+            if (base.Contains(column))
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Spalte bereits vorhanden!");
+            }
+
+
+
+            base.Add(column);
+
+            return column;
+        }
+
+
+        /// <summary>
+        /// Diese Routine sollte nur bei einem Load oder Reload benutzt werden.
+        /// </summary>
+        /// <param name="colKey">Ein bereits bekannter einmaliger Schlüssel mit einer Wert >= 0</param>
+        /// <returns></returns>
+        internal ColumnItem Add(int colKey)
+        {
+            Database.AddPending(enDatabaseDataType.AddColumn, colKey, -1, "", colKey.ToString(), true);
+            return SearchByKey(colKey);
+        }
+
+
+        public ColumnItem Add()
+        {
+            return Add(Database.Column.NextColumnKey());
+        }
+
+
+
+        public ColumnItem Add(string internalName, string caption, enDataFormat format)
+        {
+            var c = Add();
+            c.Name = internalName;
+
+            c.Caption = caption;
+            c.Format = format;
+
+            return c;
+
+
+        }
+
+        public ColumnItem Add(string internalName, string caption, string suffix, enDataFormat format)
+        {
+            var c = Add();
+            c.Name = internalName;
+            c.Caption = caption;
+            c.Format = format;
+            c.Suffix = suffix;
+            return c;
+        }
+
+        public ColumnItem Add(string internalName)
+        {
+            var c = Add();
+            c.Name = internalName;
+            return c;
+        }
+
     }
 }

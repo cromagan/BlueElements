@@ -290,7 +290,7 @@ namespace BlueDatabase
             Row.RowRemoving += Row_BeforeRemoveRow;
             Row.RowAdded += Row_RowAdded;
 
-            Column.ItemAdded += Column_ItemAdded;
+            //Column.ItemAdded += Column_ItemAdded;
             Column.ItemRemoving += Column_ItemRemoving;
             Column.ItemRemoved += Column_ItemRemoved;
 
@@ -713,11 +713,11 @@ namespace BlueDatabase
         }
 
 
-        private void Column_ItemAdded(object sender, ListEventArgs e)
-        {
-            AddPending(enDatabaseDataType.dummyComand_AddColumn, ((ColumnItem)e.Item).Key, -1, "", ((ColumnItem)e.Item).Key.ToString(), false);
-            AddPending(enDatabaseDataType.co_Name, ((ColumnItem)e.Item).Key, -1, "", ((ColumnItem)e.Item).Name, false);
-        }
+        //private void Column_ItemAdded(object sender, ListEventArgs e)
+        //{
+        //    AddPending(enDatabaseDataType.dummyComand_AddColumn, ((ColumnItem)e.Item).Key, -1, "", ((ColumnItem)e.Item).Key.ToString(), false);
+        //    AddPending(enDatabaseDataType.co_Name, ((ColumnItem)e.Item).Key, -1, "", ((ColumnItem)e.Item).Name, false);
+        //}
 
         public void AbortBackup()
         {
@@ -1024,13 +1024,13 @@ namespace BlueDatabase
                             if (_Column != null)
                             {
                                 // Prima, gefunden! Noch die Collections korrigieren
-                                Column.Add(_Column);
+                                Column.Add(enDatabaseDataType.AddColumn, _Column);
                                 ColumnsOld.Remove(_Column);
                             }
                             else
                             {
                                 // Nicht gefunden, als neu machen
-                                _Column = new ColumnItem(this, ColKey, "", true);
+                                _Column = Column.Add(ColKey);
                             }
                         }
                     }
@@ -1331,10 +1331,10 @@ namespace BlueDatabase
                     }
                     break;
 
-                case enDatabaseDataType.dummyComand_AddColumn:
+                case enDatabaseDataType.AddColumn:
                     var tKey = int.Parse(Inhalt);
                     _Column = Column.SearchByKey(tKey);
-                    if (_Column == null) { _Column = new ColumnItem(this, tKey, "", true); }
+                    if (_Column == null) { _Column = Column.Add(enDatabaseDataType.AddColumn, new ColumnItem(this, tKey)); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveRow:
@@ -2365,10 +2365,6 @@ namespace BlueDatabase
             }
 
 
-
-
-
-
             if (ExecuteNow)
             {
                 ParseThis(Comand, ChangedTo, Column.SearchByKey(ColumnKey), Row.SearchByKey(RowKey), -1, -1);
@@ -2420,7 +2416,7 @@ namespace BlueDatabase
                         dummy -= 1;
                         ChangeRowKeyInPending(ThisPending.RowKey, dummy);
                     }
-                    if (ThisPending.Comand == enDatabaseDataType.dummyComand_AddColumn)
+                    if (ThisPending.Comand == enDatabaseDataType.AddColumn)
                     {
                         dummy -= 1;
                         ChangeColumnKeyInPending(ThisPending.ColKey, dummy);
@@ -2455,7 +2451,7 @@ namespace BlueDatabase
                         case enDatabaseDataType.dummyComand_AddRow:
                             ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
                             break;
-                        case enDatabaseDataType.dummyComand_AddColumn:
+                        case enDatabaseDataType.AddColumn:
                             ChangeColumnKeyInPending(ThisPending.ColKey, Column.NextColumnKey());
                             break;
                     }
@@ -2507,7 +2503,7 @@ namespace BlueDatabase
                     _Col = Column.SearchByKey(ThisPendingItem.ColKey);
                     if (_Col == null)
                     {
-                        if (ThisPendingItem.Comand != enDatabaseDataType.dummyComand_AddColumn)
+                        if (ThisPendingItem.Comand != enDatabaseDataType.AddColumn)
                         {
                             Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + Filename + "<br>" + ThisPendingItem.ToString());
                             return;
@@ -2617,7 +2613,7 @@ namespace BlueDatabase
 
                         switch (ThisPending.Comand)
                         {
-                            case enDatabaseDataType.dummyComand_AddColumn:
+                            case enDatabaseDataType.AddColumn:
                             case enDatabaseDataType.dummyComand_RemoveColumn:
                                 ThisPending.ChangedTo = NewKey.ToString();
                                 break;

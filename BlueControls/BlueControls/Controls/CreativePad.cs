@@ -1784,7 +1784,7 @@ namespace BlueControls.Controls
                         break;
                     case "#duplicate":
                         Done = true;
-                        Item.Add((BasicPadItem)thisItem.Clone());
+                        Item.Add((BasicPadItem)((ICloneable)thisItem).Clone());
                         break;
                 }
 

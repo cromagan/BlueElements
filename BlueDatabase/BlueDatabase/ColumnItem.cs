@@ -35,7 +35,7 @@ using BlueBasics.MultiUserFile;
 
 namespace BlueDatabase
 {
-    public sealed class ColumnItem : IObjectWithDialog, IReadableText, ICompareKey, ICheckable
+    public sealed class ColumnItem : IReadableText, IParseable, ICompareKey, ICheckable
     {
         #region  Variablen-Deklarationen 
 
@@ -154,9 +154,20 @@ namespace BlueDatabase
         #region  Construktor + Initialize 
 
 
-        private void Initialize()
+        public ColumnItem(Database database, int columnkey)
         {
-            _Name = string.Empty;
+            Database = database;
+            if (columnkey < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "ColumnKey <0"); }
+
+            var ex = Database.Column.SearchByKey(columnkey);
+            if (ex != null){ Develop.DebugPrint(enFehlerArt.Fehler, "Key existiert bereits"); }
+
+            this.Key = columnkey;
+
+
+            #region Standard-Werte
+
+            _Name = Database.Column.Freename(string.Empty);
             _Caption = string.Empty;
             _CaptionBitmap = null;
 
@@ -229,100 +240,32 @@ namespace BlueDatabase
             _BestFile_StandardFolder = string.Empty;
             _UcaseNamesSortedByLenght = null;
 
+            #endregion
+
+
+            DropDownItems.ListOrItemChanged += DropDownItems_ListOrItemChanged;
+            Replacer.ListOrItemChanged += Replacer_ListOrItemChanged;
+            Regex.ListOrItemChanged += Regex_ListOrItemChanged;
+            PermissionGroups_ChangeCell.ListOrItemChanged += PermissionGroups_ChangeCell_ListOrItemChanged;
+            Tags.ListOrItemChanged += Tags_ListOrItemChanged;
+
+
+
+
             Invalidate_TmpVariables();
         }
+        #endregion
 
 
 
-        public ColumnItem(ColumnItem Source, bool addtodatabase) : this(Source.Database, -1, Source._Name, addtodatabase)
-        {
-            Caption = Source.Caption;
-            CaptionBitmap = Source.CaptionBitmap;
 
-            Format = Source.Format;
-            LineLeft = Source.LineLeft;
-            LineRight = Source.LineRight;
-            MultiLine = Source.MultiLine;
-            Quickinfo = Source.Quickinfo;
-            ForeColor = Source.ForeColor;
-            BackColor = Source.BackColor;
-
-            EditTrotzSperreErlaubt = Source.EditTrotzSperreErlaubt;
+        #region  Properties 
 
 
-            EditType = Source.EditType;
-            Identifier = Source.Identifier;
 
-            PermissionGroups_ChangeCell.Clear();
-            PermissionGroups_ChangeCell.AddRange(Source.PermissionGroups_ChangeCell);
+        public int Key { get; }
 
-            Tags.Clear();
-            Tags.AddRange(Source.Tags);
-
-
-            AllowedChars = Source.AllowedChars;
-            AdminInfo = Source.AdminInfo;
-            AutoFilterErlaubt = Source.AutoFilterErlaubt;
-            AutofilterTextFilterErlaubt = Source.AutofilterTextFilterErlaubt;
-            AutoFilterErweitertErlaubt = Source.AutoFilterErweitertErlaubt;
-            IgnoreAtRowFilter = Source.IgnoreAtRowFilter;
-            DropdownBearbeitungErlaubt = Source.DropdownBearbeitungErlaubt;
-            DropdownAllesAbwählenErlaubt = Source.DropdownAllesAbwählenErlaubt;
-            TextBearbeitungErlaubt = Source.TextBearbeitungErlaubt;
-            SpellCheckingEnabled = Source.SpellCheckingEnabled;
-            DropdownWerteAndererZellenAnzeigen = Source.DropdownWerteAndererZellenAnzeigen;
-            AfterEdit_QuickSortRemoveDouble = Source.AfterEdit_QuickSortRemoveDouble;
-
-            AfterEdit_Runden = Source.AfterEdit_Runden;
-            AfterEdit_DoUCase = Source.AfterEdit_DoUCase;
-            AfterEdit_AutoCorrect = Source.AfterEdit_AutoCorrect;
-            AutoRemove = Source.AutoRemove;
-            SaveContent = Source.SaveContent;
-            CellInitValue = Source.CellInitValue;
-            AutoFilterJoker = Source.AutoFilterJoker;
-            KeyColumnKey = Source.KeyColumnKey;
-            LinkedCell_RowKey = Source.LinkedCell_RowKey;
-            LinkedCell_ColumnKey = Source.LinkedCell_ColumnKey;
-            LinkedCell_ColumnValueFoundIn = Source.LinkedCell_ColumnValueFoundIn;
-            LinkedCell_ColumnValueAdd = Source.LinkedCell_ColumnValueAdd;
-            ZellenZusammenfassen = Source.ZellenZusammenfassen;
-            DropdownKey = Source.DropdownKey;
-            VorschlagsColumn = Source.VorschlagsColumn;
-            Align = Source.Align;
-            SortMask = Source.SortMask;
-
-
-            DropDownItems.Clear();
-            DropDownItems.AddRange(Source.DropDownItems);
-
-            Replacer.Clear();
-            Replacer.AddRange(Source.Replacer);
-
-            Regex.Clear();
-            Regex.AddRange(Source.Regex);
-
-
-            CompactView = Source.CompactView;
-            ShowUndo = Source.ShowUndo;
-            ShowMultiLineInOneLine = Source.ShowMultiLineInOneLine;
-
-            Ueberschrift1 = Source.Ueberschrift1;
-            Ueberschrift2 = Source.Ueberschrift2;
-            Ueberschrift3 = Source.Ueberschrift3;
-
-            Suffix = Source.Suffix;
-
-            LinkedKeyKennung = Source.LinkedKeyKennung;
-            LinkedDatabaseFile = Source.LinkedDatabaseFile;
-            BildCode_ImageNotFound = Source.BildCode_ImageNotFound;
-            BildCode_ConstantHeight = Source.BildCode_ConstantHeight;
-            BestFile_StandardSuffix = Source.BestFile_StandardSuffix;
-            BestFile_StandardFolder = Source.BestFile_StandardFolder;
-
-            Prefix = Source.Prefix;
-
-        }
-
+        public string I_Am_A_Key_For_Other_Column { get; private set; }
 
 
         internal void CheckIfIAmAKeyColumn()
@@ -341,73 +284,7 @@ namespace BlueDatabase
             if (_Format == enDataFormat.Columns_für_LinkedCellDropdown) { I_Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
         }
 
-        public ColumnItem(Database database, bool addtodatabase) : this(database, -1, string.Empty, addtodatabase) { }
 
-        public ColumnItem(Database database, string columninternalname, bool addtodatabase) : this(database, -1, columninternalname, addtodatabase) { }
-
-
-        public ColumnItem(Database database, string columninternalname, string caption, string suffix, enDataFormat format, bool addtodatabase) : this(database, -1, columninternalname, addtodatabase)
-        {
-            Caption = caption;
-            Suffix = suffix;
-            Format = format;
-
-            MultiLine = false;
-            TextBearbeitungErlaubt = true;
-        }
-
-        public ColumnItem(Database database, int columnkey, string columninternalname, bool addtodatabase)
-        {
-
-
-            if (!addtodatabase)
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Neue Spalte MUSS zur Datenbank hinzugefügt werden.");
-                // Grund: Undos müssen geloggt werden
-            }
-
-            Database = database;
-
-
-
-            if (columnkey == -1)
-            {
-                this.Key = Database.Column.NextColumnKey();
-            }
-            else
-            {
-                this.Key = columnkey;
-            }
-
-
-            DropDownItems.ListOrItemChanged += DropDownItems_ListOrItemChanged;
-            Replacer.ListOrItemChanged += Replacer_ListOrItemChanged;
-            Regex.ListOrItemChanged += Regex_ListOrItemChanged;
-            PermissionGroups_ChangeCell.ListOrItemChanged += PermissionGroups_ChangeCell_ListOrItemChanged;
-
-            Tags.ListOrItemChanged += Tags_ListOrItemChanged;
-
-            Initialize();
-            Name = Database.Column.Freename(columninternalname);
-
-
-            if (addtodatabase) { database.Column.Add(this); }
-
-        }
-
-
-        #endregion
-
-
-
-
-        #region  Properties 
-
-
-
-        public int Key { get; }
-
-        public string I_Am_A_Key_For_Other_Column { get; private set; }
 
         public string Caption
         {
@@ -455,10 +332,12 @@ namespace BlueDatabase
                 if (Database.Column[value] != null) { return; }
                 if (string.IsNullOrEmpty(value)) { return; }
 
-                Database.AddPending(enDatabaseDataType.co_Name, this, _Name, value, false);
-
                 var old = _Name;
-                _Name = value;
+
+                Database.AddPending(enDatabaseDataType.co_Name, this, _Name, value, true);
+
+
+                //_Name = value;
                 Database.Column_NameChanged(old, this);
                 OnChanged();
             }
@@ -1735,13 +1614,13 @@ namespace BlueDatabase
                 case "System: Chapter":
                     _Name = "SYS_Chapter";
                     _Format = enDataFormat.Text;
-                    if (_MultiLine) { _ShowMultiLineInOneLine = true; }
                     if (SetAll)
                     {
                         Caption = "Kapitel";
                         ForeColor = Color.FromArgb(0, 0, 0);
                         BackColor = Color.FromArgb(255, 255, 150);
                         LineLeft = enColumnLineStyle.Dick;
+                        if (_MultiLine) { _ShowMultiLineInOneLine = true; }
                     }
                     break;
 
@@ -2698,7 +2577,7 @@ namespace BlueDatabase
             if (string.IsNullOrEmpty(filename))
             {
                 if (!mustBeFree) { return string.Empty; }
-                filename = (_Name.Substring(0,1) + DateTime.Now.ToString("mm.fff")).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
+                filename = (_Name.Substring(0, 1) + DateTime.Now.ToString("mm.fff")).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
             }
 
             if (filename.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
@@ -2840,15 +2719,15 @@ namespace BlueDatabase
             Develop.DebugPrint(enFehlerArt.Fehler, "Kann nur über die Datenbank geparsed werden.");
         }
 
-        public object Clone()
-        {
-            if (!IsOk())
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Quell-Spalte fehlerhaft:\r\nQuelle: " + Name + "\r\nFehler: " + ErrorReason());
-            }
+        //public object Clone()
+        //{
+        //    if (!IsOk())
+        //    {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Quell-Spalte fehlerhaft:\r\nQuelle: " + Name + "\r\nFehler: " + ErrorReason());
+        //    }
 
-            return new ColumnItem(this, false);
-        }
+        //    return new ColumnItem(this, false);
+        //}
 
 
         public void GetUniques(List<RowItem> rows, out List<string> Einzigartig, out List<string> NichtEinzigartig)

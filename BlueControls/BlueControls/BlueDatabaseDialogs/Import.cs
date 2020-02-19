@@ -155,7 +155,7 @@ namespace BlueControls.BlueDatabaseDialogs
                     var Col = _Database.Column[Zeil[0][SpaltNo]];
                     if (Col == null)
                     {
-                        Col = new ColumnItem(_Database, Zeil[0][SpaltNo], true);
+                        Col = _Database.Column.Add(Zeil[0][SpaltNo]);
                         Col.Caption = Zeil[0][SpaltNo];
                         Col.Format = enDataFormat.Text;
                     }
@@ -172,7 +172,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
                 while (columns.Count < Zeil[0].GetUpperBound(0) + 1)
                 {
-                    var newc = new ColumnItem(_Database, true);
+                    var newc = _Database.Column.Add(string.Empty);
                     newc.Caption = newc.Name;
                     newc.Format = enDataFormat.Text;
                     newc.MultiLine = true;

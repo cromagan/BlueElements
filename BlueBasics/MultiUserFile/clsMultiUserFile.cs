@@ -284,17 +284,10 @@ namespace BlueBasics.MultiUserFile
 
             if (string.IsNullOrEmpty(Filename)) { return; }
 
-
             _IsLoading = true;
-
-
 
             //Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
             if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded()) { _IsLoading = false; return; }
-
-            //if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, da gerade geparst wird"); }
-
-            //if (isSomethingDiscOperatingsBlocking()) { Develop.DebugPrint(enFehlerArt.Fehler, "Reload unmöglich, vererbte Klasse gab Fehler zurück"); }
 
             var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
 
@@ -313,7 +306,6 @@ namespace BlueBasics.MultiUserFile
             ThisIsOnDisk(_BLoaded.ToStringConvert());
 
             PrepeareDataForCheckingBeforeLoad();
-
             ParseInternal(_BLoaded);
             _LastSaveCode = tmpLastSaveCode; // initialize setzt zurück
             _CheckedAndReloadNeed = false;
@@ -1014,7 +1006,7 @@ namespace BlueBasics.MultiUserFile
 
 
             // Überhaupt nix besonderes. Ab und zu mal Reloaden
-            if (_MustReload && Checker_Tick_count > _ReloadDelaySecond)
+            if (_MustReload && Checker_Tick_count > _ReloadDelaySecond && string.IsNullOrEmpty(ErrorReason(enErrorReason.Load)))
             {
                 Load_Reload();
                 Checker_Tick_count = 0;
@@ -1037,6 +1029,8 @@ namespace BlueBasics.MultiUserFile
             if (mode == enErrorReason.Load)
             {
                 if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
+
+                if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 1) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen 
 
                 if (PureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
                 if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
@@ -1096,6 +1090,9 @@ namespace BlueBasics.MultiUserFile
             if (mode.HasFlag(enErrorReason.Save))
             {
                 if (_IsLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
+
+                if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 1) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen 
+
 
                 if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
                 if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------

@@ -198,7 +198,7 @@ namespace BlueDatabase.Enums
         dummyComand_AddRow = 221,
         //	dummyComand_AddUndo = 222,
         dummyComand_RemoveColumn = 223,
-        dummyComand_AddColumn = 224,
+        AddColumn = 224,
 
         UndoCount = 249,
         //PendingsInOne = 250,

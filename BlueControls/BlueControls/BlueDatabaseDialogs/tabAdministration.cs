@@ -363,13 +363,13 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (Vorlage != null)
             {
-                newc = new ColumnItem(Vorlage, true);
+                newc = _TableView.Database.Column.AddACloneFrom(Vorlage);
+
             }
             else
             {
-                newc = new ColumnItem(_TableView.Database, true);
+                newc = _TableView.Database.Column.Add();
             }
-
 
 
             using (var w = new ColumnEditor(newc))
@@ -495,7 +495,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 if (_TableView.PermanentPossible(ViewItem) && _TableView.NonPermanentPossible(ViewItem))
                 {
                     btnPermanent.Enabled = true;
-                    btnPermanent.Checked = (ViewItem.ViewType == enViewType.PermanentColumn);
+                    btnPermanent.Checked = ViewItem.ViewType == enViewType.PermanentColumn;
                 }
                 else if (_TableView.PermanentPossible(ViewItem))
                 {

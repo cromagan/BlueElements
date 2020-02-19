@@ -622,57 +622,18 @@ namespace BlueControls.BlueDatabaseDialogs
         {
 
             var x = new Database(true);
-            ColumnItem c;
-
-            c = new ColumnItem(x, "Index", true);
-            c.Caption = "Index";
-            c.Format = enDataFormat.Ganzzahl;
-
-            c = new ColumnItem(x, "ColumnKey", true);
-            c.Caption = "Spalten-<br>Schlüssel";
-            c.Format = enDataFormat.Ganzzahl;
-
-            c = new ColumnItem(x, "ColumnName", true);
-            c.Caption = "Spalten-<br>Name";
-            c.Format = enDataFormat.Text;
-
-            c = new ColumnItem(x, "ColumnCaption", true);
-            c.Caption = "Spaten-<br>Beschriftung";
-            c.Format = enDataFormat.Text;
-
-            c = new ColumnItem(x, "RowKey", true);
-            c.Caption = "Zeilen-<br>Schlüssel";
-            c.Format = enDataFormat.Ganzzahl;
-
-            c = new ColumnItem(x, "RowFirst", true);
-            c.Caption = "Zeile, Wert der<br>1. Spalte";
-            c.Format = enDataFormat.Text;
-
-            c = new ColumnItem(x, "Aenderzeit", true);
-            c.Caption = "Änder-<br>Zeit";
-            c.Format = enDataFormat.Text;
-
-            c = new ColumnItem(x, "Aenderer", true);
-            c.Caption = "Änderer";
-            c.Format = enDataFormat.Text;
-
-            c = new ColumnItem(x, "Symbol", true);
-            c.Caption = "Symbol";
-            c.Format = enDataFormat.BildCode;
-
-            c = new ColumnItem(x, "Aenderung", true);
-            c.Caption = "Änderung";
-            c.Format = enDataFormat.Text;
-
-            c = new ColumnItem(x, "WertAlt", true);
-            c.Caption = "Wert alt";
-            c.Format = enDataFormat.Text;
-
-            c = new ColumnItem(x, "WertNeu", true);
-            c.Caption = "Wert neu";
-            c.Format = enDataFormat.Text;
-
-
+            x.Column.Add("Index", "Index", enDataFormat.Ganzzahl);
+            x.Column.Add("ColumnKey", "Spalten-<br>Schlüssel", enDataFormat.Ganzzahl);
+            x.Column.Add("ColumnName", "Spalten-<br>Name", enDataFormat.Text);
+            x.Column.Add("ColumnCaption","Spaten-<br>Beschriftung", enDataFormat.Text);
+            x.Column.Add("RowKey", "Zeilen-<br>Schlüssel", enDataFormat.Ganzzahl);
+            x.Column.Add("RowFirst", "Zeile, Wert der<br>1. Spalte", enDataFormat.Text);
+            x.Column.Add("Aenderzeit","Änder-<br>Zeit", enDataFormat.Text);
+            x.Column.Add("Aenderer", "Änderer", enDataFormat.Text);
+            x.Column.Add("Symbol", "Symbol", enDataFormat.BildCode);
+            x.Column.Add("Aenderung","Änderung", enDataFormat.Text);
+            x.Column.Add("WertAlt", "Wert alt", enDataFormat.Text);
+            x.Column.Add("WertNeu", "Wert neu", enDataFormat.Text);
 
             foreach (var ThisColumn in x.Column)
             {

@@ -18,17 +18,14 @@
 #endregion
 
 using BlueBasics;
-using BlueControls.EventArgs;
 using Encog.Engine.Network.Activation;
 using Encog.ML.Data.Basic;
 using Encog.Neural.Networks;
 using Encog.Neural.Networks.Layers;
-using Encog.Neural.Networks.Training.Propagation.Back;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
@@ -57,7 +54,7 @@ namespace BluePaint
         bool stopping = false;
 
         Bitmap _VisibleLernImageSource = null;
-        Bitmap _VisibleLernImageTarget = null;
+        //Bitmap _VisibleLernImageTarget = null;
 
         BasicNetwork network = null;
 
@@ -79,7 +76,7 @@ namespace BluePaint
 
             if (FileExists(f))
             {
-                network = (BasicNetwork)(Encog.Persist.EncogDirectoryPersistence.LoadObject(new FileInfo(f)));
+                network = (BasicNetwork)Encog.Persist.EncogDirectoryPersistence.LoadObject(new FileInfo(f));
             }
             else
             {
@@ -122,7 +119,7 @@ namespace BluePaint
         private bool InRange(int rad, int x, int y)
         {
             var isr = Math.Sqrt(x * x + y * y) - 0.2;
-            return (isr <= rad);
+            return isr <= rad;
         }
 
 
@@ -133,7 +130,7 @@ namespace BluePaint
             btnStop.Enabled = true;
 
             _VisibleLernImageSource = null;
-            _VisibleLernImageTarget = null;
+            //_VisibleLernImageTarget = null;
 
 
             stopping = false;
@@ -159,8 +156,8 @@ namespace BluePaint
 
                     if (_VisibleLernImageSource == null)
                     {
-                        _VisibleLernImageSource = ((Bitmap)Image_FromFile(thisf));//.AdjustContrast(100f);
-                        _VisibleLernImageTarget = (Bitmap)Image_FromFile(secondf);
+                        _VisibleLernImageSource = (Bitmap)Image_FromFile(thisf);
+                        //_VisibleLernImageTarget = (Bitmap)Image_FromFile(secondf);
                         OnOverridePic(_VisibleLernImageSource);
                     }
 
@@ -172,9 +169,9 @@ namespace BluePaint
                     {
 
                         count--;
-                        var was = ((RotateFlipType)count);
+                        var was = (RotateFlipType)count;
 
-                        var P = ((Bitmap)Image_FromFile(thisf));
+                        var P = (Bitmap)Image_FromFile(thisf);
                         var PR = (Bitmap)Image_FromFile(secondf);
                         P.RotateFlip(was);
                         PR.RotateFlip(was);
@@ -375,7 +372,7 @@ namespace BluePaint
         {
             var br = 1 - col.GetBrightness();
 
-            return 1 - ((br * br * br) * (Math.Min((int)(col.A * 1.2), 255) / 255));
+            return 1 - (br * br * br * (Math.Min((int)(col.A * 1.2), 255) / 255));
 
         }
 
@@ -423,7 +420,7 @@ namespace BluePaint
 
         private Color GetNearestColor(List<Color> allcolors, Bitmap p, int x, int y)
         {
-            var checkcol = p.GetPixel(x, y);
+            //var checkcol = p.GetPixel(x, y);
 
             var Col = GetNearestColor(allcolors, GetPixelColor(p, x, y));
             if (!Col.IsMagenta()) { return Col; }

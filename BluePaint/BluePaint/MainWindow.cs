@@ -222,10 +222,10 @@ namespace BluePaint
             P.ZoomFit();
         }
 
-        private void CurrentTool_PicChangedByTool(object sender, System.EventArgs e)
-        {
-            P.Invalidate();
-        }
+        //private void CurrentTool_PicChangedByTool(object sender, System.EventArgs e)
+        //{
+        //    P.Invalidate();
+        //}
 
         private void CurrentTool_HideMainWindow(object sender, System.EventArgs e)
         {

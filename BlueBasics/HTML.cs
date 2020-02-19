@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueBasics
 {
@@ -19,53 +15,44 @@ namespace BlueBasics
 
         public HTML(string Title)
         {
-            Code = new List<string>();
+            Code = new List<string>
+            {
+                "<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"",
+                "\"http://www.w3.org/TR/html4/strict.dtd\">",
+                "<html>",
+                "  <head>",
+                "    <title>" + Title + "</title>",
+                "    <style type=\"text/css\">",
 
-            // DebugPrint_Disposed(disposedValue)
-            Code.Add("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
-            Code.Add("\"http://www.w3.org/TR/html4/strict.dtd\">");
-            Code.Add("<html>");
-            Code.Add("  <head>");
-            Code.Add("    <title>" + Title + "</title>");
+                "      table {",
+                //Code.Add("              border-spacing: 5px;");// If the table has collapsed borders, border-spacing has no effect.
+                "              border: 1px solid gray;",
+                "              border-collapse: collapse;",
+                "            }",
 
-            Code.Add("    <style type=\"text/css\">");
+                "      td {",
+                "          padding: 3px;",
+                "          border: 1px solid black;",
+                "          border-collapse: collapse;",
+                "          }",
 
-            Code.Add("      table {");
-            //Code.Add("              border-spacing: 5px;");// If the table has collapsed borders, border-spacing has no effect.
-            Code.Add("              border: 1px solid gray;");
-            Code.Add("              border-collapse: collapse;");
-            Code.Add("            }");
-
-            Code.Add("      td {");
-            Code.Add("          padding: 3px;");
-            Code.Add("          border: 1px solid black;");
-            Code.Add("          border-collapse: collapse;");
-            Code.Add("          }");
-
-            Code.Add("      th {");
-            Code.Add("          padding: 3px;");
-            Code.Add("          border: 1px solid black;");
-            Code.Add("          border-collapse: collapse;");
-            Code.Add("          text-align: left;");
-            Code.Add("          text-valign: middle;");
-            Code.Add("          font-family: Arial, Helvetica, sans-serif;");
-            Code.Add("          font-size: 12px;");
-            Code.Add("          }");
-
-
-            Code.Add("      p {");
-            Code.Add("          font-family: Arial, Helvetica, sans-serif;");
-            Code.Add("          font-size: 12px;");
-            Code.Add("          }");
-
-            Code.Add("    </style>");
-
-            Code.Add("  </head>");
-
-
-
-
-            Code.Add("<body>");
+                "      th {",
+                "          padding: 3px;",
+                "          border: 1px solid black;",
+                "          border-collapse: collapse;",
+                "          text-align: left;",
+                "          text-valign: middle;",
+                "          font-family: Arial, Helvetica, sans-serif;",
+                "          font-size: 12px;",
+                "          }",
+                "      p {",
+                "          font-family: Arial, Helvetica, sans-serif;",
+                "          font-size: 12px;",
+                "          }",
+                "    </style>",
+                "  </head>",
+                "<body>"
+            };
 
         }
 

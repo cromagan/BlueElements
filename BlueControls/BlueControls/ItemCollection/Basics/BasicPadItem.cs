@@ -28,7 +28,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection
 {
-    public abstract class BasicPadItem : BasicItem, IParseable, System.ICloneable
+    public abstract class BasicPadItem : BasicItem, IParseable //, System.ICloneable
     {
 
 
@@ -587,12 +587,12 @@ namespace BlueControls.ItemCollection
 
         }
 
-        public object Clone()
-        {
+        //public object Clone()
+        //{
 
-            var t = ToString();
-            return NewByParsing(t);
+        //    var t = ToString();
+        //    return NewByParsing(t);
 
-        }
+        //}
     }
 }

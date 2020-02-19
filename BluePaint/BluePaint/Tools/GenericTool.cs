@@ -19,7 +19,6 @@
 
 using BlueControls.Controls;
 using BluePaint.EventArgs;
-using System;
 using System.Drawing;
 
 namespace BluePaint

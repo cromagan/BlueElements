@@ -888,21 +888,21 @@ namespace BlueControls.Controls
 
             if (!ContentHolderCellColumn.MultiLine || !toDraw.Contains("\r"))
             {
-                Draw_CellTransparentDirect_OneLine(GR, toDraw, CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY, ContentHolderCellColumn, true, DisplayRectangleWOSlider, vfont);
+                Draw_CellTransparentDirect_OneLine(GR, toDraw, CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY, 0, ContentHolderCellColumn, true, DisplayRectangleWOSlider, vfont);
             }
             else
             {
                 var MEI = toDraw.SplitByCR();
                 if (ContentHolderCellColumn.ShowMultiLineInOneLine)
                 {
-                    Draw_CellTransparentDirect_OneLine(GR, MEI.JoinWith("; "), CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY, ContentHolderCellColumn, true, DisplayRectangleWOSlider, vfont);
+                    Draw_CellTransparentDirect_OneLine(GR, MEI.JoinWith("; "), CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY, 0, ContentHolderCellColumn, true, DisplayRectangleWOSlider, vfont);
                 }
                 else
                 {
                     var y = 0;
                     for (var z = 0; z <= MEI.GetUpperBound(0); z++)
                     {
-                        Draw_CellTransparentDirect_OneLine(GR, MEI[z], CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY + y, ContentHolderCellColumn, Convert.ToBoolean(z == MEI.GetUpperBound(0)), DisplayRectangleWOSlider, vfont);
+                        Draw_CellTransparentDirect_OneLine(GR, MEI[z], CellInThisDatabaseColumn, CellInThisDatabaseRow, RowY, y, ContentHolderCellColumn, Convert.ToBoolean(z == MEI.GetUpperBound(0)), DisplayRectangleWOSlider, vfont);
                         y += FormatedText_NeededSize(CellInThisDatabaseColumn.Column, MEI[z], vfont, enShortenStyle.Replaced, Pix16 - 1).Height;
                     }
                 }
@@ -1199,18 +1199,18 @@ namespace BlueControls.Controls
         }
 
         /// Zeichnet die eine Zeile der Zelle ohne Hintergrund und prüft noch, ob der verlinkte Inhalt gezeichnet werden soll.
-        private void Draw_CellTransparentDirect_OneLine(Graphics GR, string DrawString, ColumnViewItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, int Y, ColumnItem ContentHolderColumnStyle, bool IsLastRow, Rectangle DisplayRectangleWOSlider, BlueFont vfont)
+        private void Draw_CellTransparentDirect_OneLine(Graphics GR, string DrawString, ColumnViewItem CellInThisDatabaseColumn, RowItem CellInThisDatabaseRow, int RowY, int TxtY, ColumnItem ContentHolderColumnStyle, bool IsLastRow, Rectangle DisplayRectangleWOSlider, BlueFont vfont)
         {
 
 
             var r = new Rectangle((int)CellInThisDatabaseColumn.OrderTMP_Spalte_X1,
-                                   Y,
+                                   RowY + TxtY,
                                   Column_DrawWidth(CellInThisDatabaseColumn, DisplayRectangleWOSlider),
                                   Pix16);
 
-            if (r.Bottom > Y + Row_DrawHeight(CellInThisDatabaseRow, DisplayRectangleWOSlider) - Pix16)
+            if (r.Bottom > RowY + Row_DrawHeight(CellInThisDatabaseRow, DisplayRectangleWOSlider) - Pix16)
             {
-                if (r.Bottom > Y + Row_DrawHeight(CellInThisDatabaseRow, DisplayRectangleWOSlider)) { return; }
+                if (r.Bottom > RowY + Row_DrawHeight(CellInThisDatabaseRow, DisplayRectangleWOSlider)) { return; }
                 if (!IsLastRow) { DrawString = "..."; }// Die Letzte Zeile noch ganz hinschreiben
             }
 
