@@ -270,6 +270,8 @@ namespace BlueControls.ItemCollection
                 if (!ForPrinting)
                 {
                     GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
+                    GR.DrawString(Name, font, Brushes.Gray, (float)DCoordinates.Left, (float)DCoordinates.Top);
+
                 }
 
                 if (TextLage != (enAlignment)(-1))
@@ -367,7 +369,7 @@ namespace BlueControls.ItemCollection
 
         public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY)
         {
-            if (PadInternal.Item.Count == 0) { return false; }
+            if (PadInternal  == null || PadInternal.Item.Count == 0) { return false; }
 
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
             var l2 = PadInternal.MaxBounds(ZoomItems);
@@ -406,7 +408,7 @@ namespace BlueControls.ItemCollection
 
         public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY)
         {
-            if (PadInternal.Item.Count == 0) { return false; }
+            if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
 
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
             var l2 = PadInternal.MaxBounds(ZoomItems);
@@ -566,7 +568,5 @@ namespace BlueControls.ItemCollection
             base.DoStyleCommands(sender, Tags, ref CloseMenu);
 
         }
-
-
     }
 }

@@ -60,10 +60,10 @@ namespace BlueControls
             OverrideSavedRichtmaß(false);
 
 
-            if (!IsOk())
-            {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Beziehung falsch initialisiert: " + ErrorReason());
-            }
+            //if (!IsOk())
+            //{
+            //    Develop.DebugPrint(enFehlerArt.Warnung, "Beziehung falsch initialisiert: " + ErrorReason());
+            //}
 
         }
 
@@ -784,13 +784,38 @@ namespace BlueControls
                     {
                         return "Der Punkt hat kein Parent.";
                     }
-                    //else
-                    //{
-                    //    if (Thispoint.Parent is BasicPadItem item)
-                    //    {
-                    //        if (!Item.Contains(item)) { RemoveMe = true; }
-                    //    }
-                    //}
+                    else
+                    {
+                        if (Thispoint.Parent is BasicPadItem item)
+                        {
+                            if (item.Parent is ItemCollectionPad pad)
+                            {
+                                if (!pad.Contains(item))
+                                {
+                                    return "Das enthaltende Parent iwird nicht mehr angezeigt.";
+                                }
+
+                            }
+                            else
+                            {
+                                return "Das enthaltende Parent ist keiner Pad-Collection zugeordnet.";
+                            }
+
+                        }
+                        else if (Thispoint.Parent is CreativePad pad)
+                        {
+
+                            if (!pad.AllPoints().Contains(Thispoint))
+                            {
+                                return "Der Punkt ist im Pad nicht mehr enthalten.";
+                            }
+
+                        }
+                        else
+                        {
+                            return "Point-Parent ist unbekannt.";
+                        }
+                    }
                 }
             }
             return string.Empty;

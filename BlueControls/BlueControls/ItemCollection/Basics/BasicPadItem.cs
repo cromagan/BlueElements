@@ -28,7 +28,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection
 {
-    public abstract class BasicPadItem : BasicItem, IParseable //, System.ICloneable
+    public abstract class BasicPadItem : BasicItem, IParseable , System.ICloneable
     {
 
 
@@ -234,7 +234,6 @@ namespace BlueControls.ItemCollection
             {
                 return (ItemCollectionPad)_parent;
             }
-
         }
 
         public bool PrintMe
@@ -583,16 +582,12 @@ namespace BlueControls.ItemCollection
             x.Inflate(-ZoomPadding, -ZoomPadding);
 
             return x;
-
-
         }
 
-        //public object Clone()
-        //{
-
-        //    var t = ToString();
-        //    return NewByParsing(t);
-
-        //}
+        public object Clone()
+        {
+            var t = ToString();
+            return NewByParsing(t);
+        }
     }
 }

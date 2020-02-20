@@ -301,12 +301,13 @@ namespace BlueControls.Controls
                     {
                         if (thisItem is ChildPadItem cpi)
                         {
-                            cpi.PadInternal.AutoRelation = value;
+                            if (cpi.PadInternal != null)
+                            {
+                                cpi.PadInternal.AutoRelation = value;
+                            }
                         }
                     }
                 }
-
-
             }
         }
 
@@ -2164,7 +2165,13 @@ namespace BlueControls.Controls
 
             foreach (var ThisRelation in _ExternalRelations)
             {
-                if (ThisRelation != null) { t = t + "Relation=" + ThisRelation + ", "; }
+                if (ThisRelation != null)
+                {
+                    if (ThisRelation.IsOk())
+                    {
+                        t = t + "Relation=" + ThisRelation + ", ";
+                    }
+                }
             }
 
 
