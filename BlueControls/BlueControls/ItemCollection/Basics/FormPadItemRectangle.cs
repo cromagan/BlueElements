@@ -53,6 +53,13 @@ namespace BlueControls.ItemCollection
             p_RO = new PointDF(this, "RO", 0, 0);
             p_RU = new PointDF(this, "RU", 0, 0);
             p_LU = new PointDF(this, "LU", 0, 0);
+
+
+            Points.Add(p_LO);
+            Points.Add(p_RO);
+            Points.Add(p_LU);
+            Points.Add(p_RU);
+
             Rotation = 0;
         }
 
@@ -91,13 +98,13 @@ namespace BlueControls.ItemCollection
             if (nFixSize != FixSize)
             {
                 FixSize = nFixSize;
-                ClearInternalRelations();
+                GenerateInternalRelation();
             }
         }
 
-        public override void GenerateInternalRelation(List<clsPointRelation> relations)
+        public override void GenerateInternalRelation()
         {
-
+            Relations.Clear();
 
             p_LU.X = p_LO.X;
             p_RO.Y = p_LO.Y;
@@ -106,20 +113,23 @@ namespace BlueControls.ItemCollection
 
             if (FixSize)
             {
-                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
-                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
-                relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
+                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
+                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
+                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
             }
             else
             {
                 //relations.Add(new clsPointRelation(enRelationType.YPositionZueinander, p_LO, p_RU));
 
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
+                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
+                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
 
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
-                relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
+                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
+                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
             }
+
+
+            OnPointOrRelationsChanged();
         }
 
         public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
@@ -129,7 +139,7 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl(true));
             l.Add(new FlexiControl("Drehwinkel", Rotation.ToString(), enDataFormat.Ganzzahl, 1));
 
-            var Relations = ((CreativePad)sender).AllRelations();
+            var Relations = ((CreativePad)sender).Item.AllRelations;
 
             if (!FixSize && !p_LO.CanMove(Relations) && !p_RU.CanMove(Relations))
             {
@@ -145,15 +155,6 @@ namespace BlueControls.ItemCollection
             return l;
         }
 
-        public override List<PointDF> PointList()
-        {
-            var l = new List<PointDF>();
-            l.Add(p_LO);
-            l.Add(p_RU);
-            l.Add(p_LU);
-            l.Add(p_RO);
-            return l;
-        }
 
         public override void SetCoordinates(RectangleDF r)
         {
@@ -167,8 +168,6 @@ namespace BlueControls.ItemCollection
             if (p_LO == null || p_RU == null) { return new RectangleDF(); }
             return new RectangleDF(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
         }
-
-
 
         protected override void KeepInternalLogic()
         {
@@ -201,8 +200,5 @@ namespace BlueControls.ItemCollection
             t = t + "Fixsize=" + FixSize.ToPlusMinus() + ", ";
             return t.Trim(", ") + "}";
         }
-
-
-
     }
 }

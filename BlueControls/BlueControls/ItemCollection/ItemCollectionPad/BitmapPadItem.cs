@@ -35,7 +35,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection
 {
-    public class BitmapPadItem : FormPadItemRectangle, ICloneable, ICanHaveColumnVariables
+    public class BitmapPadItem : FormPadItemRectangle, ICanHaveColumnVariables
     {
 
 
@@ -272,18 +272,18 @@ namespace BlueControls.ItemCollection
 
 
 
-        public object Clone()
-        {
-            ClearInternalRelations(); // Damit nix geclont wird
-            var i = (BitmapPadItem)MemberwiseClone();
+        //public object Clone()
+        //{
+        //    ClearInternalRelations(); // Damit nix geclont wird
+        //    var i = (BitmapPadItem)MemberwiseClone();
 
-            i.p_LO = new PointDF(i, p_LO);
-            i.p_LU = new PointDF(i, p_LU);
-            i.p_RU = new PointDF(i, p_RU);
-            i.p_RO = new PointDF(i, p_RO);
+        //    i.p_LO = new PointDF(i, p_LO);
+        //    i.p_LU = new PointDF(i, p_LU);
+        //    i.p_RU = new PointDF(i, p_RU);
+        //    i.p_RO = new PointDF(i, p_RO);
 
-            return i;
-        }
+        //    return i;
+        //}
 
 
 

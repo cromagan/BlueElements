@@ -31,7 +31,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection
 {
-    public class ComicCompPadItem : BasicPadItem, ICloneable
+    public class ComicCompPadItem : BasicPadItem
     {
 
 
@@ -118,6 +118,11 @@ namespace BlueControls.ItemCollection
 
             P1 = new PointDF(this, "Punkt1", 0, 0, false, true, true);
             P2 = new PointDF(this, "Punkt2", 0, 0);
+
+
+            Points.Add(P1);
+            Points.Add(P2);
+
             _Bitmap = null;
             _Length = 0M;
             _EinpassModus = false;
@@ -131,17 +136,13 @@ namespace BlueControls.ItemCollection
             AdditionalPoints.Clear();
             ImageChanged();
 
+
+
         }
-
-
-
-
 
         #endregion
 
-
         #region  Properties 
-
 
         public Bitmap Bitmap
         {
@@ -179,7 +180,7 @@ namespace BlueControls.ItemCollection
 
             GetProportionsAndResetAngle();
 
-            ClearInternalRelations();
+            GenerateInternalRelation();
         }
 
         public void GetProportionsAndResetAngle()
@@ -219,7 +220,7 @@ namespace BlueControls.ItemCollection
 
             if (value.DistanzZuStrecke(P1, P2) < ne) { return true; }
 
-            foreach (var Thispoint in PointList())
+            foreach (var Thispoint in Points)
             {
                 if (Geometry.Länge(value, Thispoint.ToPointF()) < ne) { return true; }
             }
@@ -355,18 +356,6 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override List<PointDF> PointList()
-        {
-            var l = new List<PointDF>();
-
-            l.Add(P1);
-            l.Add(P2);
-
-
-            l.AddRange(AdditionalPoints);
-
-            return l;
-        }
 
 
 
@@ -391,7 +380,7 @@ namespace BlueControls.ItemCollection
                 x.Add(BerLU);
             }
 
-            x.AddRange(PointList());
+            x.AddRange(Points);
 
 
             var x1 = int.MaxValue;
@@ -553,31 +542,31 @@ namespace BlueControls.ItemCollection
 
 
 
-        public object Clone()
-        {
-            ClearInternalRelations(); // Damit nix geclont wird
+        //public object Clone()
+        //{
+        //    ClearInternalRelations(); // Damit nix geclont wird
 
-            var i = (ComicCompPadItem)MemberwiseClone();
-
-
-            i.P1 = new PointDF(i, P1);
-            i.P2 = new PointDF(i, P2);
+        //    var i = (ComicCompPadItem)MemberwiseClone();
 
 
-            i.AdditionalPoints.Clear();
+        //    i.P1 = new PointDF(i, P1);
+        //    i.P2 = new PointDF(i, P2);
 
-            foreach (var thispoint in AdditionalPoints)
-            {
-                i.AdditionalPoints.Add(new PointDF(i, thispoint));
-            }
 
-            i.BerLO = new PointDF(i, BerLO);
-            i.BerRO = new PointDF(i, BerRO);
-            i.BerRU = new PointDF(i, BerRU);
-            i.BerLU = new PointDF(i, BerLU);
-            i._EinpassModus = false;
-            return i;
-        }
+        //    i.AdditionalPoints.Clear();
+
+        //    foreach (var thispoint in AdditionalPoints)
+        //    {
+        //        i.AdditionalPoints.Add(new PointDF(i, thispoint));
+        //    }
+
+        //    i.BerLO = new PointDF(i, BerLO);
+        //    i.BerRO = new PointDF(i, BerRO);
+        //    i.BerRU = new PointDF(i, BerRU);
+        //    i.BerLU = new PointDF(i, BerLU);
+        //    i._EinpassModus = false;
+        //    return i;
+        //}
 
 
         protected override void KeepInternalLogic()
@@ -610,13 +599,15 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> relations)
+        public override void GenerateInternalRelation()
         {
+            Relations.Clear();
+
             if (!_EinpassModus)
             {
                 if (_Length > 0M)
                 {
-                    relations.Add(new clsPointRelation(enRelationType.AbstandZueinander, P1, P2));
+                    Relations.Add(new clsPointRelation(enRelationType.AbstandZueinander, P1, P2));
                 }
 
 
@@ -624,14 +615,16 @@ namespace BlueControls.ItemCollection
                 {
                     if (GeometryDF.Länge(Thispoint, P1) < GeometryDF.Länge(Thispoint, P2))
                     {
-                        relations.Add(new clsPointRelation(enRelationType.PositionZueinander, P1, Thispoint));
+                        Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, P1, Thispoint));
                     }
                     else
                     {
-                        relations.Add(new clsPointRelation(enRelationType.PositionZueinander, P2, Thispoint));
+                        Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, P2, Thispoint));
                     }
                 }
             }
+
+            OnPointOrRelationsChanged();
         }
 
 
@@ -639,11 +632,10 @@ namespace BlueControls.ItemCollection
 
         public void AddPointCartesian(string Name, double LenghtToMiddle, double AngleToMiddle)
         {
-            ClearInternalRelations();
             var p = new PointDF(this, Name, 0, 0, false, true);
             p.Tag = LenghtToMiddle + ";" + AngleToMiddle;
             AdditionalPoints.Add(p);
-
+            GenerateInternalRelation(); // Stößt Änderung an
         }
 
         public void AddPointCartesian(double LenghtToMiddle, double AngleToMiddle)
@@ -735,8 +727,8 @@ namespace BlueControls.ItemCollection
                 l.Add(new FlexiControl("Einen Punkt hinzufügen", enImageCode.PlusZeichen));
                 l.Add(new FlexiControl("Letzten Punkt entfernen", enImageCode.MinusZeichen));
                 l.Add(new FlexiControl());
-                var Relations = ((CreativePad)sender).AllRelations();
 
+                var Relations = ((CreativePad)sender).Item.AllRelations;
 
                 if (!(_Length > 0M) && P1.CanMove(Relations) && P2.CanMove(Relations))
                 {
@@ -815,9 +807,8 @@ namespace BlueControls.ItemCollection
                 CloseMenu = false;
                 if (AdditionalPoints.Count > 0)
                 {
-                    //AdditionalPoints[AdditionalPoints.Count - 1].Dispose();
                     AdditionalPoints.RemoveAt(AdditionalPoints.Count - 1);
-                    ClearInternalRelations();
+                    GenerateInternalRelation(); // Stößt Änderung an
                 }
                 return;
             }
@@ -831,7 +822,7 @@ namespace BlueControls.ItemCollection
             else
             {
                 _Length = 0M;
-                ClearInternalRelations();
+                GenerateInternalRelation(); // Stößt Änderung an
             }
 
 

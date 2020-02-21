@@ -24,6 +24,7 @@ using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueBasics.Enums;
+using System.ComponentModel;
 
 namespace BlueControls.ItemCollection
 {
@@ -32,38 +33,84 @@ namespace BlueControls.ItemCollection
         #region  Variablen-Deklarationen 
 
         public static readonly int DPI = 300;
-        private RowItem _sheetStyle;
-        private decimal _sheetStyleScale;
+        private RowItem _SheetStyle;
+        private decimal _SheetStyleScale;
+        private SizeF _SheetSizeInMM = SizeF.Empty;
+        private System.Windows.Forms.Padding _RandinMM = System.Windows.Forms.Padding.Empty;
+
+
+        public PointDF P_rLO;
+        public PointDF P_rLU;
+        public PointDF P_rRU;
+        public PointDF P_rRO;
+
+
+        public readonly List<PointDF> AllPoints = new List<PointDF>();
+        public readonly List<clsPointRelation> AllRelations = new List<clsPointRelation>();
+
 
         #endregion
 
         public bool IsParsing { get; private set; }
 
+        [DefaultValue(true)]
+        public bool IsSaved { get; set; }
+
         public RowItem SheetStyle
         {
-            get { return _sheetStyle; }
+            get { return _SheetStyle; }
 
             set
             {
-                if (_sheetStyle == value) { return; }
+                if (_SheetStyle == value) { return; }
 
-                _sheetStyle = value;
+                _SheetStyle = value;
                 OnChanged();
             }
         }
 
         public decimal SheetStyleScale
         {
-            get { return _sheetStyleScale; }
+            get { return _SheetStyleScale; }
 
             set
             {
-                if (_sheetStyleScale == value) { return; }
+                if (_SheetStyleScale == value) { return; }
 
-                _sheetStyleScale = value;
+                _SheetStyleScale = value;
                 OnChanged();
             }
         }
+
+
+
+        public SizeF SheetSizeInMM
+        {
+            get
+            {
+                return _SheetSizeInMM;
+            }
+            set
+            {
+                if (value == _SheetSizeInMM) { return; }
+                _SheetSizeInMM = new SizeF(value.Width, value.Height);
+                GenPoints();
+            }
+        }
+
+        public System.Windows.Forms.Padding RandinMM
+        {
+            get
+            {
+                return _RandinMM;
+            }
+            set
+            {
+                _RandinMM = new System.Windows.Forms.Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
+                GenPoints();
+            }
+        }
+
 
 
         #region  Construktor + Initialize 
@@ -74,9 +121,8 @@ namespace BlueControls.ItemCollection
 
         #region  Event-Deklarationen + Delegaten 
 
-        public event EventHandler ItemsZOrderChanged;
 
-
+        public event EventHandler DoInvalidate;
 
         #endregion
 
@@ -88,7 +134,7 @@ namespace BlueControls.ItemCollection
             Remove(ThisItem);
             Add(ThisItem);
 
-            OnItemsZOrderChanged();
+            OnDoInvalidate();
         }
 
         internal void InDenHintergrund(BasicPadItem ThisItem)
@@ -98,7 +144,7 @@ namespace BlueControls.ItemCollection
             Remove(ThisItem);
             Insert(0, ThisItem);
 
-            OnItemsZOrderChanged();
+            OnDoInvalidate();
         }
 
 
@@ -169,10 +215,10 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        internal void OnItemsZOrderChanged()
-        {
-            ItemsZOrderChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+        //internal void OnItemsZOrderChanged()
+        //{
+        //    ItemsZOrderChanged?.Invoke(this, System.EventArgs.Empty);
+        //}
 
         public void Parse(string ToParse)
         {
@@ -205,11 +251,11 @@ namespace BlueControls.ItemCollection
                             Skin.InitStyles();
                         }
 
-                        _sheetStyle = Skin.StyleDB.Row[pair.Value];
+                        _SheetStyle = Skin.StyleDB.Row[pair.Value];
                         break;
 
                     case "sheetstylescale":
-                        _sheetStyleScale = decimal.Parse(pair.Value);
+                        _SheetStyleScale = decimal.Parse(pair.Value);
                         break;
 
                     default:
@@ -231,7 +277,7 @@ namespace BlueControls.ItemCollection
             var t = "{";
             t = t + "DPI=" + DPI + ", ";
             t = t + "SheetStyle=" + SheetStyle.CellFirstString().ToNonCritical() + ", ";
-            t = t + "SheetStyleScale=" + _sheetStyleScale + ", ";
+            t = t + "SheetStyleScale=" + _SheetStyleScale + ", ";
 
             foreach (var Thisitem in this)
             {
@@ -247,10 +293,38 @@ namespace BlueControls.ItemCollection
         protected override void OnItemAdded(BasicPadItem item)
         {
             base.OnItemAdded(item);
+            AllPoints.AddIfNotExists(item.Points);
+            AllRelations.AddIfNotExists(item.Relations);
+
+            IsSaved = false;
+
+
+            item.Changed += Item_Changed;
+            item.PointOrRelationsChanged += Item_PointOrRelationsChanged;
+ 
             RecomputePointAndRelations();
         }
 
+        private void Item_PointOrRelationsChanged(object sender, System.EventArgs e)
+        {
 
+            var ni = (BasicPadItem)sender;
+
+
+            AllPoints.AddIfNotExists(ni.Points);
+            AllRelations.AddIfNotExists(ni.Relations);
+
+            dddd // Punkte Löschen 
+
+
+        }
+
+        private void Item_Changed(object sender, System.EventArgs e)
+        {
+            IsSaved = false;
+            OnDoInvalidate();
+
+        }
 
         public void DesignOrStyleChanged()
         {
@@ -258,6 +332,7 @@ namespace BlueControls.ItemCollection
             {
                 thisItem?.DesignOrStyleChanged();
             }
+            OnDoInvalidate();
         }
 
 
@@ -314,6 +389,91 @@ namespace BlueControls.ItemCollection
             return new RectangleDF(x1, y1, x2 - x1, y2 - y1);
         }
 
+
+
+
+        public void GenPoints()
+        {
+
+            if (Math.Abs(_SheetSizeInMM.Width) < 0.001 || Math.Abs(_SheetSizeInMM.Height) < 0.001)
+            {
+                if (P_rLO != null)
+                {
+                    P_rLO.Parent = null;
+                    AllPoints.Remove(P_rLO);
+                    P_rLO = null;
+
+                    P_rRO.Parent = null;
+                    AllPoints.Remove(P_rRO);
+                    P_rRO = null;
+
+                    P_rRU.Parent = null;
+                    AllPoints.Remove(P_rRU);
+                    P_rRU = null;
+
+                    P_rLU.Parent = null;
+                    AllPoints.Remove(P_rLU);
+                    P_rLU = null;
+                }
+
+                return;
+            }
+
+
+            if (P_rLO == null)
+            {
+
+                P_rLO = new PointDF(this, "Druckbereich LO", 0, 0, true);
+                AllPoints.AddIfNotExists(P_rLO);
+
+                P_rRO = new PointDF(this, "Druckbereich RO", 0, 0, true);
+                AllPoints.AddIfNotExists(P_rLU);
+
+                P_rRU = new PointDF(this, "Druckbereich RU", 0, 0, true);
+                AllPoints.AddIfNotExists(P_rRU);
+
+                P_rLU = new PointDF(this, "Druckbereich LU", 0, 0, true);
+                AllPoints.AddIfNotExists(P_rRO);
+            }
+
+            var SSW = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI), 1);
+            var SSH = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Height, DPI), 1);
+            var rr = Math.Round(modConverter.mmToPixel(_RandinMM.Right, DPI), 1);
+            var rl = Math.Round(modConverter.mmToPixel(_RandinMM.Left, DPI), 1);
+            var ro = Math.Round(modConverter.mmToPixel(_RandinMM.Top, DPI), 1);
+            var ru = Math.Round(modConverter.mmToPixel(_RandinMM.Bottom, DPI), 1);
+
+            P_rLO.SetTo(rl, ro);
+            P_rRO.SetTo(SSW - rr, ro);
+            P_rRU.SetTo(SSW - rr, SSH - ru);
+            P_rLU.SetTo(rl, SSH - ru);
+            OnDoInvalidate();
+        }
+
+
+        protected override void OnItemRemoving(BasicPadItem item)
+        {
+            item.Changed -= Item_Changed;
+            item.PointOrRelationsChanged -= Item_PointOrRelationsChanged;
+
+
+            base.OnItemRemoving(item);
+            AllPoints.RemoveRange(item.Points);
+            AllRelations.RemoveRange(item.Relations);
+        }
+
+
+        protected override void OnListOrItemChanged()
+        {
+            base.OnListOrItemChanged();
+            IsSaved = false;
+            OnDoInvalidate();
+        }
+
+        public void OnDoInvalidate()
+        {
+            DoInvalidate?.Invoke(this, System.EventArgs.Empty); // Invalidate-Befehl weitergeben an untergeordnete Steuerelemente
+        }
 
 
 

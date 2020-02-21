@@ -56,14 +56,14 @@ namespace BlueControls.ItemCollection
             {
                 if (_PadInternal != null)
                 {
-                    _PadInternal.NeedRefresh -= _Pad_NeedRefresh;
+                    _PadInternal.DoInvalidate -= _Pad_DoInvalidate;
                 }
 
                 _PadInternal = value;
 
                 if (value != null)
                 {
-                    _PadInternal.NeedRefresh += _Pad_NeedRefresh;
+                    _PadInternal.DoInvalidate += _Pad_DoInvalidate;
                 }
             }
         }
@@ -361,7 +361,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        private void _Pad_NeedRefresh(object sender, System.EventArgs e)
+        private void _Pad_DoInvalidate(object sender, System.EventArgs e)
         {
             if (IsParsing) { return; }
             OnChanged();

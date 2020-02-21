@@ -726,12 +726,10 @@ namespace BlueControls
 
         public bool IsInternal()
         {
-
             for (var z = 0; z <= Points.Count - 2; z++)
             {
                 if (Points[z].Parent != Points[z + 1].Parent) { return false; }
             }
-
             return true;
         }
 
@@ -786,13 +784,14 @@ namespace BlueControls
                     }
                     else
                     {
+                        ss
                         if (Thispoint.Parent is BasicPadItem item)
                         {
                             if (item.Parent is ItemCollectionPad pad)
                             {
                                 if (!pad.Contains(item))
                                 {
-                                    return "Das enthaltende Parent iwird nicht mehr angezeigt.";
+                                    return "Das enthaltende Parent wird nicht mehr angezeigt.";
                                 }
 
                             }
@@ -805,7 +804,7 @@ namespace BlueControls
                         else if (Thispoint.Parent is CreativePad pad)
                         {
 
-                            if (!pad.AllPoints().Contains(Thispoint))
+                            if (!pad.Item.AllPoints.Contains(Thispoint))
                             {
                                 return "Der Punkt ist im Pad nicht mehr enthalten.";
                             }

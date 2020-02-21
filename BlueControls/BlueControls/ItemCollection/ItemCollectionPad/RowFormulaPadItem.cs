@@ -86,6 +86,16 @@ namespace BlueControls.ItemCollection
             p_o = new PointDF(this, "O", 0, 0);
             p_u = new PointDF(this, "U", 0, 0);
             _tmpBMP = null;
+
+            Points.Add(p_LO);
+            Points.Add(p_RU);
+            Points.Add(p_LU);
+            Points.Add(p_RO);
+
+            Points.Add(p_L);
+            Points.Add(p_R);
+            Points.Add(p_u);
+            Points.Add(p_o);
         }
 
 
@@ -195,22 +205,6 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public override List<PointDF> PointList()
-        {
-            var l = new List<PointDF>();
-            l.Add(p_LO);
-            l.Add(p_RU);
-            l.Add(p_LU);
-            l.Add(p_RO);
-
-            l.Add(p_L);
-            l.Add(p_R);
-            l.Add(p_u);
-            l.Add(p_o);
-
-
-            return l;
-        }
 
 
         public override RectangleDF UsedArea()
@@ -322,11 +316,7 @@ namespace BlueControls.ItemCollection
 
             p_o.SetTo(p_LO.X + (p_RO.X - p_LO.X) / 2, p_LO.Y);
             p_u.SetTo(p_o.X, p_LU.Y);
-        }
 
-
-        public override void GenerateInternalRelation(List<clsPointRelation> relations)
-        {
             p_LU.X = p_LO.X;
             p_RO.Y = p_LO.Y;
             p_RU.X = p_RO.X;
@@ -339,15 +329,25 @@ namespace BlueControls.ItemCollection
             p_L.X = p_LO.X;
             p_R.X = p_RO.X;
 
+        }
 
-            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
-            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
-            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
 
-            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_R));
-            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_L));
-            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_u));
-            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_o));
+        public override void GenerateInternalRelation()
+        {
+
+            Relations.Clear();
+
+            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
+            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
+            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
+
+            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_R));
+            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_L));
+            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_u));
+            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_o));
+
+            OnPointOrRelationsChanged();
+
         }
 
 

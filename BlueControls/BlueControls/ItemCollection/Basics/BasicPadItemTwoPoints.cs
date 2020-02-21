@@ -52,6 +52,11 @@ namespace BlueControls.ItemCollection
             p_UL = new PointDF();
             p_UR = new PointDF();
 
+
+            Points.Add(p_ML);
+            Points.Add(p_MR);
+
+
         }
 
         public decimal LaengePix
@@ -113,19 +118,14 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> relations)
+        public override void GenerateInternalRelation()
         {
-            relations.Add(new clsPointRelation(enRelationType.AbstandZueinander, p_ML, p_MR));
+            Relations.Clear();
+            Relations.Add(new clsPointRelation(enRelationType.AbstandZueinander, p_ML, p_MR));
+            OnPointOrRelationsChanged();
         }
 
-        public override List<PointDF> PointList()
-        {
-            var l = new List<PointDF>();
-            l.Add(p_ML);
-            l.Add(p_MR);
 
-            return l;
-        }
 
         public override bool Contains(PointF value, decimal zoomfactor)
         {

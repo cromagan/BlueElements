@@ -498,10 +498,10 @@ namespace BlueControls.Forms
             //End Sub
 
 
-            protected override void OnShown(System.EventArgs e)
-            {
-                base.OnShown(e);
-                Pad.Changed = false;
-            }
+            //protected override void OnShown(System.EventArgs e)
+            //{
+            //    base.OnShown(e);
+            //    Pad.Changed = false;
+            //}
         }
     }

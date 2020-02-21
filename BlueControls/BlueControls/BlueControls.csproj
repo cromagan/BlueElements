@@ -441,7 +441,6 @@
     <Compile Include="ItemCollection\ItemCollectionPad\BitmapPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\ChildPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\ComicCompPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\CookPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\DimensionPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\GridPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\ItemCollectionPad.cs" />

@@ -22,17 +22,21 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using BlueControls.ItemCollection.Basics;
 using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection
 {
-    public abstract class BasicPadItem : BasicItem, IParseable , System.ICloneable
+    public abstract class BasicPadItem : BasicItem, IParseable, System.ICloneable
     {
 
 
 
+        #region  Event-Deklarationen + Delegaten 
+        public event System.EventHandler PointOrRelationsChanged;
+        #endregion
 
 
 
@@ -145,6 +149,8 @@ namespace BlueControls.ItemCollection
         }
 
 
+        protected BasicPadItem(string internalname) : base(internalname) { }
+
         /// <summary>
         ///  Falls das Element über Kordinaten gesetzt werden kann, ist diese mit dieser Routine möglich.
         ///  Dabei werden Beziehungen komplett ignoriert!
@@ -156,18 +162,10 @@ namespace BlueControls.ItemCollection
 
 
         /// <summary>
-        ///  Gibt die Punkte zurück, die ein Modifizieren des Objektes erlauben.
-        /// </summary>
-        /// <remarks></remarks>
-        public abstract List<PointDF> PointList();
-
-
-
-        /// <summary>
         /// Erstellt alle Internen Beziehungen
         /// </summary>
         /// <remarks></remarks>
-        public abstract void GenerateInternalRelation(List<clsPointRelation> relations);
+        public abstract void GenerateInternalRelation();
 
 
         protected abstract void KeepInternalLogic();
@@ -211,7 +209,7 @@ namespace BlueControls.ItemCollection
         /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
         /// </summary>
         /// <remarks></remarks>
-        protected List<string> _Tags;
+        protected List<string> _Tags = new List<string>();
 
         /// <summary>
         /// Soll es gedruckt werden?
@@ -221,7 +219,8 @@ namespace BlueControls.ItemCollection
 
         protected int _ZoomPadding = 0;
 
-        private readonly List<clsPointRelation> _InternalRelations = new List<clsPointRelation>();
+        public readonly List<clsPointRelation> Relations = new List<clsPointRelation>();
+        public readonly List<PointDF> Points = new List<PointDF>();
 
         private PadStyles _Style = PadStyles.Undefiniert;
 
@@ -280,13 +279,6 @@ namespace BlueControls.ItemCollection
 
         }
 
-
-        protected BasicPadItem(string internalname) : base(internalname)
-        {
-            _Tags = new List<string>();
-        }
-
-
         public List<string> Tags
         {
             get
@@ -314,12 +306,12 @@ namespace BlueControls.ItemCollection
                     return true;
 
                 case "point":
-                    foreach (var ThisPoint in PointList())
+                    foreach (var ThisPoint in Points)
                     {
                         if (value.Contains("Name=" + ThisPoint.Name + ","))
                         {
                             ThisPoint.Parse(value);
-                            ThisPoint.Parent = this;
+                            ThisPoint.Parent = this;  qqq // Punkte dem Parent hinzufügen
                         }
                     }
                     return true;
@@ -401,7 +393,7 @@ namespace BlueControls.ItemCollection
             }
 
 
-            foreach (var ThisPoint in PointList())
+            foreach (var ThisPoint in Points)
             {
                 t = t + "Point=" + ThisPoint + ", ";
             }
@@ -447,46 +439,22 @@ namespace BlueControls.ItemCollection
             }
         }
 
-
-        public List<clsPointRelation> RelationList()
-        {
-            if (_InternalRelations == null || _InternalRelations.Count == 0)
-            {
-                KeepInternalLogic();
-                GenerateInternalRelation(_InternalRelations);
-            }
-
-            return _InternalRelations;
-        }
-
-
         public void RecomputePointAndRelations()
         {
             KeepInternalLogic();
 
-            if (_InternalRelations == null || _InternalRelations.Count == 0)
+            if (Relations == null || Relations.Count == 0)
             {
-                GenerateInternalRelation(_InternalRelations);
+                GenerateInternalRelation();
             }
             else
             {
-                foreach (var ThisRelation in _InternalRelations)
+                foreach (var ThisRelation in Relations)
                 {
                     ThisRelation.OverrideSavedRichtmaß(false);
                 }
             }
         }
-
-
-        public void ClearInternalRelations()
-        {
-            //foreach (clsPointRelation thisrelation in _InternalRelations)
-            //{
-            //    if (!thisrelation.IsDisposed()) { thisrelation.Dispose(); }
-            //}
-            _InternalRelations.Clear();
-        }
-
 
 
         public void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
@@ -514,7 +482,6 @@ namespace BlueControls.ItemCollection
                 }
             }
         }
-
 
         internal BasicPadItem Previous()
         {
@@ -545,9 +512,6 @@ namespace BlueControls.ItemCollection
             } while (true);
 
         }
-
-
-
 
 
         public void DrawOutline(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, Color c)
@@ -588,6 +552,11 @@ namespace BlueControls.ItemCollection
         {
             var t = ToString();
             return NewByParsing(t);
+        }
+
+        protected void OnPointOrRelationsChanged()
+        {
+            PointOrRelationsChanged?.Invoke(this, System.EventArgs.Empty);
         }
     }
 }

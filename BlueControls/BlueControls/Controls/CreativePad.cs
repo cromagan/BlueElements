@@ -54,8 +54,6 @@ namespace BlueControls.Controls
         private bool _isParsing;
 
 
-        private SizeF _SheetSizeInMM = SizeF.Empty;
-        private System.Windows.Forms.Padding _RandinMM = System.Windows.Forms.Padding.Empty;
 
         public string Caption = "";
 
@@ -70,18 +68,10 @@ namespace BlueControls.Controls
 
         public static readonly int DPI = 300;
 
-        private PointDF P_rLO;
-        private PointDF P_rLU;
-        private PointDF P_rRU;
-        private PointDF P_rRO;
 
         private enAutoRelationMode _AutoRelation = enAutoRelationMode.Alle_Erhalten;
         private bool _ShowInPrintMode;
 
-        /// <summary>
-        /// Objektübergreifende Beziehungen
-        /// </summary>
-        private readonly List<clsPointRelation> _ExternalRelations = new List<clsPointRelation>();
 
         /// <summary>
         /// Die Auto-Beziehungen, die hinzukommen (würden)
@@ -104,11 +94,6 @@ namespace BlueControls.Controls
 
 
 
-        private RowItem _SheetStyle;
-        private decimal _SheetStyleScale = 1.0m;
-
-
-
         private bool _Grid;
         private float _GridShow = 10;
         private float _Gridsnap = 1;
@@ -127,7 +112,7 @@ namespace BlueControls.Controls
 
         public event EventHandler Parsed;
 
-        public event EventHandler NeedRefresh;
+        public event EventHandler DoInvalidate;
 
         public event PrintPageEventHandler PrintPage;
 
@@ -144,20 +129,17 @@ namespace BlueControls.Controls
         {
             get
             {
-                return _SheetStyleScale;
+                return Item.SheetStyleScale;
             }
             set
             {
 
                 if (value < 0.1m) { value = 0.1m; }
 
-                if (!_isParsing && _SheetStyleScale == value) { return; }
+                if (!_isParsing && Item.SheetStyleScale == value) { return; }
 
-                _SheetStyleScale = value;
+                Item.SheetStyleScale = value;
 
-
-                Item.SheetStyle = _SheetStyle;
-                Item.SheetStyleScale = _SheetStyleScale;
                 if (_isParsing) { return; }
 
 
@@ -184,50 +166,6 @@ namespace BlueControls.Controls
                 Invalidate();
             }
         }
-
-
-        //[DefaultValue(true)]
-        //public bool KeyboardEditEnabled
-        //{
-        //    get
-        //    {
-        //        return _KeyboardEditEnabled;
-        //    }
-        //    set
-        //    {
-        //        _KeyboardEditEnabled = value;
-        //        EigenschaftenDurchschleifen();
-        //    }
-        //}
-
-        //[DefaultValue(true)]
-        //public bool MouseEditEnabled
-        //{
-        //    get
-        //    {
-        //        return _MouseEditEnabled;
-        //    }
-        //    set
-        //    {
-        //        _MouseEditEnabled = value;
-        //        EigenschaftenDurchschleifen();
-        //    }
-        //}
-        //[DefaultValue(true)]
-        //public bool KontextMenuEnabled
-        //{
-        //    get
-        //    {
-        //        return _KontextMenuEnabled;
-        //    }
-        //    set
-        //    {
-        //        _KontextMenuEnabled = value;
-        //        EigenschaftenDurchschleifen();
-        //    }
-        //}
-
-
 
 
 
@@ -292,8 +230,6 @@ namespace BlueControls.Controls
             set
             {
                 _AutoRelation = value;
-                //  _AutoSnap = value
-
 
                 if (Item != null)
                 {
@@ -311,58 +247,17 @@ namespace BlueControls.Controls
             }
         }
 
-        [DefaultValue(false)]
-        public bool Changed { get; set; }
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ItemCollectionPad Item { get; }
 
-        public SizeF SheetSizeInMM
-        {
-            get
-            {
-                return _SheetSizeInMM;
-            }
-            set
-            {
-                if (value == _SheetSizeInMM) { return; }
-
-                _SheetSizeInMM = new SizeF(value.Width, value.Height);
-
-                GenPoints();
-
-
-            }
-        }
-
-        public System.Windows.Forms.Padding RandinMM
-        {
-            get
-            {
-                return _RandinMM;
-            }
-            set
-            {
-                _RandinMM = new System.Windows.Forms.Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
-                GenPoints();
-            }
-        }
-
-
-
-
-
-
-
-
 
         private PointDF Getbetterpoint(double X, double Y, PointDF notPoint, bool MustUsableForAutoRelation)
         {
-            var _Points = AllPoints();
 
-            foreach (var thispoint in _Points)
+            foreach (var thispoint in Item.AllPoints)
             {
 
                 if (thispoint != null)
@@ -373,7 +268,7 @@ namespace BlueControls.Controls
 
                         if (thispoint != notPoint)
                         {
-                            if (Math.Abs((double)thispoint.X - X) < 0.01 && Math.Abs((double)thispoint.Y - Y) < 0.01) { return GetPointWithLowerIndex(_Points, notPoint, thispoint, true); }
+                            if (Math.Abs((double)thispoint.X - X) < 0.01 && Math.Abs((double)thispoint.Y - Y) < 0.01) { return GetPointWithLowerIndex(notPoint, thispoint, true); }
                         }
 
                     }
@@ -391,35 +286,23 @@ namespace BlueControls.Controls
             {
                 if (Skin.StyleDB == null) { Skin.InitStyles(); }
                 if (Skin.StyleDB == null) { return string.Empty; }
-                if (_SheetStyle == null) { return string.Empty; }
-
-                return _SheetStyle.CellFirstString();
-
-
+                if (Item.SheetStyle == null) { return string.Empty; }
+                return Item.SheetStyle.CellFirstString();
             }
             set
             {
-
                 if (!_isParsing && value == SheetStyle) { return; }
-
                 if (Skin.StyleDB == null) { Skin.InitStyles(); }
 
-
-                _SheetStyle = Skin.StyleDB.Row[value];
-                if (_SheetStyle == null) { _SheetStyle = Skin.StyleDB.Row.First(); }// Einfach die Erste nehmen
-
-
-                Item.SheetStyle = _SheetStyle;
-                Item.SheetStyleScale = _SheetStyleScale;
+                Item.SheetStyle = Skin.StyleDB.Row[value];
+                if (Item.SheetStyle == null) { Item.SheetStyle = Skin.StyleDB.Row.First(); }// Einfach die Erste nehmen
 
                 if (_isParsing) { return; }
-
 
                 Item.DesignOrStyleChanged();
 
                 RepairAll(0, false);
                 Invalidate();
-
             }
         }
 
@@ -438,22 +321,26 @@ namespace BlueControls.Controls
 
 
             Item = new ItemCollectionPad();
-
-            Item.Changed += _Item_Changed;
+            Item.ListOrItemChanged += Item_ListOrItemChanged;
             Item.ItemRemoved += _Item_ItemRemoved;
             Item.ItemAdded += _Item_ItemAdded;
+            Item.DoInvalidate += Item_DoInvalidate;
 
             SetDoubleBuffering();
             Initialize();
             _MouseHighlight = false;
-            GenPoints();
+            Item.GenPoints();
 
 
         }
 
-        private void _Item_Changed(object sender, System.EventArgs e)
+        private void Item_DoInvalidate(object sender, System.EventArgs e)
         {
-            Changed = true;
+            Invalidate();
+        }
+
+        private void Item_ListOrItemChanged(object sender, System.EventArgs e)
+        {
             Invalidate();
         }
 
@@ -464,69 +351,29 @@ namespace BlueControls.Controls
 
 
 
-        public List<clsPointRelation> AllRelations()
-        {
+        //public List<clsPointRelation> AllRelations()
+        //{
 
-            var R = new List<clsPointRelation>();
-            foreach (var thisItem in Item)
-            {
-                if (thisItem != null)
-                {
-                    R.AddRange(thisItem.RelationList());
-                }
-            }
-            R.AddIfNotExists(_ExternalRelations);
-            return R;
-        }
-
-        public List<PointDF> AllPoints()
-        {
-
-            var P = new List<PointDF>();
-
-            if (P_rLO != null)
-            {
-                P.AddIfNotExists(P_rLO);
-                P.AddIfNotExists(P_rLU);
-                P.AddIfNotExists(P_rRU);
-                P.AddIfNotExists(P_rRO);
-            }
+        //    var R = new List<clsPointRelation>();
+        //    foreach (var thisItem in Item)
+        //    {
+        //        if (thisItem != null)
+        //        {
+        //            R.AddRange(thisItem.RelationList());
+        //        }
+        //    }
+        //    R.AddIfNotExists(_ExternalRelations);
+        //    return R;
+        //}
 
 
-
-            foreach (var thisItem in Item)
-            {
-                if (thisItem != null)
-                {
-                    P.AddRange(thisItem.PointList());
-                }
-            }
-
-            foreach (var ThisRelation in _ExternalRelations)
-            {
-                P.AddIfNotExists(ThisRelation.Points);
-            }
-
-
-            //foreach (var ThisPoint in P)
-            //{
-            //    if (ThisPoint.Parent == null)
-            //    {
-            //        Develop.DebugPrint(enFehlerArt.Warnung, "Öffentliche Punkte brauchen ein Parent");
-            //        // sonst werden sie nicht gespeichert, und Beziehungen gehen verloren
-            //    }
-            //}
-
-            return P;
-
-        }
 
 
 
         internal Rectangle DruckbereichRect()
         {
-            if (P_rLO == null) { return new Rectangle(0, 0, 0, 0); }
-            return new Rectangle((int)P_rLO.X, (int)P_rLO.Y, (int)(P_rRU.X - P_rLO.X), (int)(P_rRU.Y - P_rLO.Y));
+            if (Item.P_rLO == null) { return new Rectangle(0, 0, 0, 0); }
+            return new Rectangle((int)Item.P_rLO.X, (int)Item.P_rLO.Y, (int)(Item.P_rRU.X - Item.P_rLO.X), (int)(Item.P_rRU.Y - Item.P_rLO.Y));
         }
 
         protected override RectangleDF MaxBounds()
@@ -553,15 +400,15 @@ namespace BlueControls.Controls
 
 
 
-            if (_SheetSizeInMM.Width > 0 && _SheetSizeInMM.Height > 0)
+            if (Item.SheetSizeInMM.Width > 0 && Item.SheetSizeInMM.Height > 0)
             {
 
                 var X1 = Math.Min(r.Left, 0);
                 var y1 = Math.Min(r.Top, 0);
 
 
-                var x2 = Math.Max(r.Right, modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI));
-                var y2 = Math.Max(r.Bottom, modConverter.mmToPixel((decimal)_SheetSizeInMM.Height, DPI));
+                var x2 = Math.Max(r.Right, modConverter.mmToPixel((decimal)Item.SheetSizeInMM.Width, DPI));
+                var y2 = Math.Max(r.Bottom, modConverter.mmToPixel((decimal)Item.SheetSizeInMM.Height, DPI));
 
                 return new RectangleDF(X1, y1, x2 - X1, y2 - y1);
             }
@@ -620,14 +467,6 @@ namespace BlueControls.Controls
             return I;
         }
 
-
-
-
-
-
-
-
-
         protected override bool IsInputKey(System.Windows.Forms.Keys keyData)
         {
             // Ganz wichtig diese Routine!
@@ -646,8 +485,6 @@ namespace BlueControls.Controls
             return false;
 
         }
-
-
 
         protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => DoKeyUp(e, true); // Kann nicht public gemacht werden, deswegen Umleitung
         public void DoKeyUp(System.Windows.Forms.KeyEventArgs e, bool hasbase)
@@ -741,8 +578,8 @@ namespace BlueControls.Controls
 
                     if (GeometryDF.Länge(thisPoint, new PointDF(p)) < 5m / _Zoom)
                     {
-                        var Relations = AllRelations();
-                        if (!thisPoint.CanMove(Relations))
+
+                        if (!thisPoint.CanMove(Item.AllRelations))
                         {
                             Invalidate();
                             Forms.QuickInfo.Show("Dieser Punkt ist fest definiert<br>und kann nicht verschoben werden.");
@@ -771,7 +608,7 @@ namespace BlueControls.Controls
 
                 if (Ho != null)
                 {
-                    Sel_P.AddIfNotExists(Ho.PointList());
+                    Sel_P.AddIfNotExists(Ho.Points);
                     _OrdersValid = false;
                     ComputeMovingData();
                     Invalidate();
@@ -856,7 +693,7 @@ namespace BlueControls.Controls
                 {
                     if (Thispoint.Parent is BasicPadItem item)
                     {
-                        Sel_P.AddIfNotExists(item.PointList());
+                        Sel_P.AddIfNotExists(item.Points);
                         _OrdersValid = false;
                         Invalidate();
                         break;
@@ -865,7 +702,7 @@ namespace BlueControls.Controls
 
                 if (Convert.ToBoolean(_AutoRelation | enAutoRelationMode.NurBeziehungenErhalten) && _NewAutoRelations.Count > 0)
                 {
-                    _ExternalRelations.AddRange(_NewAutoRelations);
+                    Item.AllRelations.AddRange(_NewAutoRelations);
                     InvalidateOrder();
                     RepairAll(0, false);
                 }
@@ -882,12 +719,8 @@ namespace BlueControls.Controls
                 FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
 
             }
-
-
             ComputeMovingData();
-
             Invalidate(); // Damit auch snap-Punkte wieder gelöscht werden
-
         }
 
 
@@ -903,7 +736,7 @@ namespace BlueControls.Controls
 
             try
             {
-                if (_SheetStyle == null || _SheetStyleScale < 0.1m) { return true; }
+                if (Item.SheetStyle == null || Item.SheetStyleScale < 0.1m) { return true; }
 
                 ComputeOrders();
 
@@ -942,13 +775,11 @@ namespace BlueControls.Controls
 
                 var TMPGR = Graphics.FromImage(BMP);
 
-
-
-                if (_SheetSizeInMM.Width > 0 && _SheetSizeInMM.Height > 0)
+                if (Item.SheetSizeInMM.Width > 0 && Item.SheetSizeInMM.Height > 0)
                 {
                     Skin.Draw_Back(TMPGR, enDesign.Table_And_Pad, vState, DisplayRectangle, this, true);
-                    var SSW = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI), 1);
-                    var SSH = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Height, DPI), 1);
+                    var SSW = Math.Round(modConverter.mmToPixel((decimal)Item.SheetSizeInMM.Width, DPI), 1);
+                    var SSH = Math.Round(modConverter.mmToPixel((decimal)Item.SheetSizeInMM.Height, DPI), 1);
                     var LO = new PointDF(0m, 0m).ZoomAndMove(zoomf, X, Y);
                     var RU = new PointDF(SSW, SSH).ZoomAndMove(zoomf, X, Y);
 
@@ -956,10 +787,10 @@ namespace BlueControls.Controls
                     TMPGR.FillRectangle(Brushes.White, R);
                     TMPGR.DrawRectangle(PenGray, R);
 
-                    var rtx = (int)(P_rLO.X * zoomf - X);
-                    var rty = (int)(P_rLO.Y * zoomf - Y);
-                    var rtx2 = (int)(P_rRU.X * zoomf - X);
-                    var rty2 = (int)(P_rRU.Y * zoomf - Y);
+                    var rtx = (int)(Item.P_rLO.X * zoomf - X);
+                    var rty = (int)(Item.P_rLO.Y * zoomf - Y);
+                    var rtx2 = (int)(Item.P_rRU.X * zoomf - X);
+                    var rty2 = (int)(Item.P_rRU.Y * zoomf - Y);
                     var Rr = new Rectangle(rtx, rty, rtx2 - rtx, rty2 - rty);
                     if (!_ShowInPrintMode)
                     {
@@ -981,20 +812,18 @@ namespace BlueControls.Controls
                 }
 
 
-                var Relations = AllRelations();
-
                 // Erst Beziehungen, weil die die Grauen Punkte zeichnet
-                foreach (var ThisRelation in Relations)
+                foreach (var ThisRelation in Item.AllRelations)
                 {
-                    ThisRelation.Draw(TMPGR, zoomf, X, Y, Relations.IndexOf(ThisRelation));
+                    ThisRelation.Draw(TMPGR, zoomf, X, Y, Item.AllRelations.IndexOf(ThisRelation));
                 }
 
 
                 if (Debug_ShowPointOrder)
                 {
-                    var _Points = AllPoints();
+
                     // Alle Punkte mit Order anzeigen
-                    foreach (var ThisPoint in _Points)
+                    foreach (var ThisPoint in Item.AllPoints)
                     {
                         ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
                     }
@@ -1007,7 +836,7 @@ namespace BlueControls.Controls
 
                 foreach (var ThisPoint in Sel_P)
                 {
-                    if (ThisPoint.CanMove(Relations))
+                    if (ThisPoint.CanMove(Item.AllRelations))
                     {
                         ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard, false);
                     }
@@ -1075,15 +904,12 @@ namespace BlueControls.Controls
         {
             Unselect();
             InvalidateOrder();
-            Changed = true;
             ZoomFit();
             Invalidate();
         }
 
         private void _Item_ItemAdded(object sender, ListEventArgs e)
         {
-            //EigenschaftenDurchschleifen();
-            Changed = true;
             InvalidateOrder();
         }
 
@@ -1094,18 +920,12 @@ namespace BlueControls.Controls
         private bool MoveSelectedPoints(decimal X, decimal Y)
         {
             Item.RecomputePointAndRelations();
-            var Relations = AllRelations();
-            var _Points = AllPoints();
 
 
-            var f = NotPerformingx(Relations, false);
 
-            foreach (var thispoint in _Points)
-            {
-                thispoint?.Store();
-            }
+            var f = NotPerforming(false);
 
-            foreach (var thispoint in _Points)
+            foreach (var thispoint in Item.AllPoints)
             {
                 thispoint?.Store();
             }
@@ -1136,11 +956,11 @@ namespace BlueControls.Controls
 
 
 
-            var f2 = NotPerformingx(Relations, false);
+            var f2 = NotPerforming(false);
 
             if (f2 > f)
             {
-                foreach (var thispoint in _Points)
+                foreach (var thispoint in Item.AllPoints)
                 {
                     thispoint?.ReStore();
                 }
@@ -1155,13 +975,7 @@ namespace BlueControls.Controls
 
 
             Invalidate();
-
-
             return Convert.ToBoolean(f2 == 0);
-
-
-
-
         }
 
 
@@ -1177,17 +991,15 @@ namespace BlueControls.Controls
             var CanMove_X = true;
             var CanMove_Y = true;
 
-            var Relations = AllRelations();
-
             foreach (var thispoint in Sel_P)
             {
-                Move_X.AddIfNotExists(ConnectsWith(thispoint, Relations, true, false));
-                Move_Y.AddIfNotExists(ConnectsWith(thispoint, Relations, false, false));
+                Move_X.AddIfNotExists(ConnectsWith(thispoint, true, false));
+                Move_Y.AddIfNotExists(ConnectsWith(thispoint, false, false));
             }
 
             foreach (var thispoint in Move_X)
             {
-                if (!thispoint.CanMoveX(Relations))
+                if (!thispoint.CanMoveX(Item.AllRelations))
                 {
                     CanMove_X = false;
                     break;
@@ -1201,7 +1013,7 @@ namespace BlueControls.Controls
 
             foreach (var thispoint in Move_Y)
             {
-                if (!thispoint.CanMoveY(Relations))
+                if (!thispoint.CanMoveY(Item.AllRelations))
                 {
                     CanMove_Y = false;
                     break;
@@ -1228,10 +1040,6 @@ namespace BlueControls.Controls
         public bool PerformAll(ItemCollectionPad ThisItemCol, int Level, bool AllowBigChanges)
         {
 
-            var ThisRelations = AllRelations();
-            //var ThisPoints = AllPoints();
-
-
             var L = new List<string>();
             var Methode = 0;
             ComputeOrders();
@@ -1240,7 +1048,7 @@ namespace BlueControls.Controls
             {
                 var tmp = "";
 
-                foreach (var ThisRelation in ThisRelations)
+                foreach (var ThisRelation in Item.AllRelations)
                 {
 
                     if (ThisRelation.Performs(true))
@@ -1265,7 +1073,7 @@ namespace BlueControls.Controls
                     if (Methode == 2) { return false; }
 
                     Methode += 1;
-                    Relations_Optimizex();
+                    Relations_Optimize();
                     ThisItemCol.RecomputePointAndRelations();
                     ComputeOrders();
                     L.Clear();
@@ -1275,7 +1083,7 @@ namespace BlueControls.Controls
                     L.Add(tmp);
                 }
 
-                foreach (var ThisRelation in ThisRelations)
+                foreach (var ThisRelation in Item.AllRelations)
                 {
                     if (!ThisRelation.Computed)
                     {
@@ -1287,21 +1095,18 @@ namespace BlueControls.Controls
 
         }
 
-
-
         private void ComputeOrders()
         {
-
             if (_OrdersValid) { return; }
 
             if (ComputeOrders_isin) { return; }
             ComputeOrders_isin = true;
 
-            //Points_DeleteInvalid();
+
             Relations_DeleteInvalid();
 
             ComputePointOrder();
-            ComputeRelationOrderx();
+            ComputeRelationOrder();
 
             _OrdersValid = true;
 
@@ -1315,12 +1120,8 @@ namespace BlueControls.Controls
             var Count = 1;
 
 
-            var _Points = AllPoints();
-
-            var Relations = AllRelations();
-
-
-
+            var _Points = new List<PointDF>();
+            _Points.AddRange(Item.AllPoints);
 
 
             foreach (var Thispoint in _Points)
@@ -1336,7 +1137,7 @@ namespace BlueControls.Controls
             var RelationXY = new List<clsPointRelation>();
 
 
-            foreach (var thisRelation in Relations)
+            foreach (var thisRelation in Item.AllRelations)
             {
                 if (thisRelation.Connects(true))
                 {
@@ -1559,8 +1360,7 @@ namespace BlueControls.Controls
             if (MoveSelectedPoints(MoveX, MoveY))
             {
                 // Wenn Strongmode true ist es für den Anwender unerklärlich, warum er denn nix macht,obwohl kein Fehler da ist...
-                var Relations = AllRelations();
-                if (NotPerformingx(Relations, false) == 0)
+                   if (NotPerforming(false) == 0)
                 {
                     AddAllAutoRelations(PMoveX, PSnapToX, PMoveY, PSnapToY);
                 }
@@ -1573,15 +1373,12 @@ namespace BlueControls.Controls
             MouseDownPos_1_1 = new Point((int)(MouseDownPos_1_1.X + MoveX), (int)(MouseDownPos_1_1.Y + MoveY));
         }
 
-
-
         private decimal SnapToGrid(bool DoX, List<PointDF> Movep, decimal MouseMovedTo)
         {
 
             if (!_Grid || Math.Abs(_Gridsnap) < 0.001) { return MouseMovedTo; }
 
             if (Movep == null || Movep.Count == 0) { return 0M; }
-
 
             PointDF MasterPoint = null;
             var LowOrderPoint = Movep[0];
@@ -1661,19 +1458,13 @@ namespace BlueControls.Controls
 
             if (PointToTest == null) { return; }
 
-
-            //var sX = (decimal)SliderX.Value;
-            //var sY = (decimal)SliderY.Value;
-
-
             var dr = AviablePaintArea();
 
 
             var WillMoveTo = new PointDF(PointToTest.X + MouseMovedTo.X - MouseDownPos_1_1.X, PointToTest.Y + MouseMovedTo.Y - MouseDownPos_1_1.Y);
 
-            var _Points = AllPoints();
 
-            foreach (var ThisPoint in _Points)
+            foreach (var ThisPoint in Item.AllPoints)
             {
                 if (ThisPoint != null && ThisPoint.CanUsedForAutoRelation && ThisPoint.IsOnScreen(_Zoom, _MoveX, _MoveY, dr))
                 {
@@ -1735,8 +1526,6 @@ namespace BlueControls.Controls
             BasicPadItem thisItem = null;
 
             if (e.HotItem is BasicPadItem item) { thisItem = item; }
-
-            Changed = true;
 
             var Done = false;
 
@@ -1889,8 +1678,7 @@ namespace BlueControls.Controls
             }
 
 
-            var _Points = AllPoints();
-            foreach (var Thispoint in _Points)
+            foreach (var Thispoint in Item.AllPoints)
             {
                 Thispoint?.Store();
             }
@@ -1902,45 +1690,6 @@ namespace BlueControls.Controls
             ContextMenuInit?.Invoke(this, e);
         }
 
-        public void GenPoints()
-        {
-
-            if (Math.Abs(_SheetSizeInMM.Width) < 0.001 || Math.Abs(_SheetSizeInMM.Height) < 0.001)
-            {
-                if (P_rLO != null)
-                {
-                    P_rLO = null;
-                    P_rRO = null;
-                    P_rRU = null;
-                    P_rLU = null;
-                }
-
-                return;
-            }
-
-
-            if (P_rLO == null)
-            {
-
-                P_rLO = new PointDF(this, "Druckbereich LO", 0, 0, true);
-                P_rRO = new PointDF(this, "Druckbereich RO", 0, 0, true);
-                P_rRU = new PointDF(this, "Druckbereich RU", 0, 0, true);
-                P_rLU = new PointDF(this, "Druckbereich LU", 0, 0, true);
-
-            }
-
-            var SSW = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI), 1);
-            var SSH = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Height, DPI), 1);
-            var rr = Math.Round(modConverter.mmToPixel(_RandinMM.Right, DPI), 1);
-            var rl = Math.Round(modConverter.mmToPixel(_RandinMM.Left, DPI), 1);
-            var ro = Math.Round(modConverter.mmToPixel(_RandinMM.Top, DPI), 1);
-            var ru = Math.Round(modConverter.mmToPixel(_RandinMM.Bottom, DPI), 1);
-
-            P_rLO.SetTo(rl, ro);
-            P_rRO.SetTo(SSW - rr, ro);
-            P_rRU.SetTo(SSW - rr, SSH - ru);
-            P_rLU.SetTo(rl, SSH - ru);
-        }
 
         private clsPointRelation AddOneAutoRelation(enRelationType rel, PointDF Snap1, PointDF SnaP2)
         {
@@ -1961,9 +1710,9 @@ namespace BlueControls.Controls
 
 
             var r = new clsPointRelation(rel, Snap1, SnaP2);
-            var Relations = AllRelations();
 
-            foreach (var thisRelation in Relations)
+
+            foreach (var thisRelation in Item.AllRelations)
             {
                 if (thisRelation != null)
                 {
@@ -1985,9 +1734,8 @@ namespace BlueControls.Controls
         {
 
             if (l == null) { l = new List<clsPointRelation>(); }
-            var Relations = AllRelations();
 
-            foreach (var thisRelation in Relations)
+            foreach (var thisRelation in Item.AllRelations)
             {
                 if (thisRelation != null && !l.Contains(thisRelation) && thisRelation.Connects(CheckX))
                 {
@@ -2092,7 +1840,7 @@ namespace BlueControls.Controls
 
         public void Relation_Add(enRelationType enRelationType, PointDF Point1, PointDF Point2)
         {
-            _ExternalRelations.Add(new clsPointRelation(enRelationType, Point1, Point2));
+            Item.AllRelations.Add(new clsPointRelation(enRelationType, Point1, Point2));
             InvalidateOrder();
         }
 
@@ -2101,28 +1849,29 @@ namespace BlueControls.Controls
         private void RelationDeleteExternal(BasicPadItem ThisItem)
         {
 
-            foreach (var ThisRelation in _ExternalRelations)
+            foreach (var ThisRelation in Item.AllRelations)
             {
                 if (ThisRelation != null)
                 {
 
-                    foreach (var Thispoint in ThisRelation.Points)
+                    if (!ThisRelation.IsInternal())
                     {
-
-                        if (Thispoint.Parent is BasicPadItem tItem)
+                        foreach (var Thispoint in ThisRelation.Points)
                         {
-                            if (tItem == ThisItem)
+
+                            if (Thispoint.Parent is BasicPadItem tItem)
                             {
-                                _ExternalRelations.Remove(ThisRelation);
-                                RelationDeleteExternal(ThisItem); // 'Rekursiv
-                                return;
+                                if (tItem == ThisItem)
+                                {
+                                    Item.AllRelations.Remove(ThisRelation);
+                                    RelationDeleteExternal(ThisItem); // 'Rekursiv
+                                    return;
+                                }
                             }
                         }
                     }
                 }
-
             }
-
             InvalidateOrder();
         }
 
@@ -2141,16 +1890,16 @@ namespace BlueControls.Controls
 
             if (!string.IsNullOrEmpty(Caption)) { t = t + "Caption=" + Caption.ToNonCritical() + ", "; }
 
-            if (_SheetStyle != null) { t = t + "Style=" + _SheetStyle.CellFirstString().ToNonCritical() + ", "; }
+            if (Item.SheetStyle != null) { t = t + "Style=" + Item.SheetStyle.CellFirstString().ToNonCritical() + ", "; }
 
-            if (_SheetStyleScale < 0.1m) { _SheetStyleScale = 1.0m; }
+            if (Item.SheetStyleScale < 0.1m) { Item.SheetStyleScale = 1.0m; }
 
-            if (Math.Abs(_SheetStyleScale - 1) > 0.001m) { t = t + "FontScale=" + _SheetStyleScale + ", "; }
+            if (Math.Abs(Item.SheetStyleScale - 1) > 0.001m) { t = t + "FontScale=" + Item.SheetStyleScale + ", "; }
 
-            if (_SheetSizeInMM.Width > 0 && _SheetSizeInMM.Height > 0)
+            if (Item.SheetSizeInMM.Width > 0 && Item.SheetSizeInMM.Height > 0)
             {
-                t = t + "SheetSize=" + _SheetSizeInMM + ", ";
-                t = t + "PrintArea=" + _RandinMM + ", ";
+                t = t + "SheetSize=" + Item.SheetSizeInMM + ", ";
+                t = t + "PrintArea=" + Item.RandinMM + ", ";
             }
 
             //  _AutoSort = False
@@ -2163,11 +1912,11 @@ namespace BlueControls.Controls
 
             //Dim One As Boolean
 
-            foreach (var ThisRelation in _ExternalRelations)
+            foreach (var ThisRelation in Item.AllRelations)
             {
                 if (ThisRelation != null)
                 {
-                    if (ThisRelation.IsOk())
+                    if (!ThisRelation.IsInternal() && ThisRelation.IsOk())
                     {
                         t = t + "Relation=" + ThisRelation + ", ";
                     }
@@ -2209,13 +1958,13 @@ namespace BlueControls.Controls
                 switch (T)
                 {
                     case "sheetsize":
-                        _SheetSizeInMM = Extensions.SizeFParse(pvalue);
-                        GenPoints();
+                        Item.SheetSizeInMM = Extensions.SizeFParse(pvalue);
+                        Item.GenPoints();
                         break;
 
                     case "printarea":
-                        _RandinMM = Extensions.PaddingParse(pvalue);
-                        GenPoints();
+                        Item.RandinMM = Extensions.PaddingParse(pvalue);
+                        Item.GenPoints();
                         break;
 
                     case "items":
@@ -2223,7 +1972,7 @@ namespace BlueControls.Controls
                         break;
 
                     case "relation":
-                        _ExternalRelations.Add(new clsPointRelation(pvalue, AllPoints()));
+                        Item.AllRelations.Add(new clsPointRelation(pvalue, Item.AllPoints));
                         InvalidateOrder();
                         break;
 
@@ -2277,10 +2026,6 @@ namespace BlueControls.Controls
             if (needPrinterData) { RepairPrinterData(); }
 
             OnParsed();
-
-
-
-
         }
 
         private void OnParsed()
@@ -2315,9 +2060,8 @@ namespace BlueControls.Controls
 
         private void Initialize()
         {
-
-            _SheetSizeInMM = Size.Empty;
-            _RandinMM = System.Windows.Forms.Padding.Empty;
+            Item.SheetSizeInMM = Size.Empty;
+            Item.RandinMM = System.Windows.Forms.Padding.Empty;
 
 
             Caption = "";
@@ -2328,17 +2072,15 @@ namespace BlueControls.Controls
 
 
             _NewAutoRelations.Clear();
-            _ExternalRelations.Clear();
+            Item.AllRelations.Clear();
+            Item.AllPoints.Clear();
 
 
             if (Skin.StyleDB == null) { Skin.InitStyles(); }
-            _SheetStyle = null;
-            _SheetStyleScale = 1.0m;
+            Item.SheetStyle = null;
+            Item.SheetStyleScale = 1.0m;
 
-            if (Skin.StyleDB != null) { _SheetStyle = Skin.StyleDB.Row.First(); }
-
-            Item.SheetStyle = _SheetStyle;
-            Item.SheetStyleScale = _SheetStyleScale;
+            if (Skin.StyleDB != null) { Item.SheetStyle = Skin.StyleDB.Row.First(); }
 
 
             Sel_P.Clear();
@@ -2375,16 +2117,6 @@ namespace BlueControls.Controls
                 Item.RecomputePointAndRelations();
                 InvalidateOrder();
             }
-
-
-            //if (Itemc != RepairAll_OldItemc)
-            //{
-            //    DrawCreativePadToBitmap(DummyGraphics(), enStates.Standard);
-            //    modAllgemein.CollectGarbage();
-            //}
-
-            //RepairAll_OldItemc = Itemc;
-
 
             return PerformAll(Item, Level, AllowBigChanges);
         }
@@ -2443,29 +2175,20 @@ namespace BlueControls.Controls
 
             if (DruckerDokument.DefaultPageSettings.Landscape)
             {
-                SheetSizeInMM = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
-
-                RandinMM = new System.Windows.Forms.Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+                Item.SheetSizeInMM = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
+                Item.RandinMM = new System.Windows.Forms.Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
 
 
             }
             else
             {
                 // Hochformat
-                SheetSizeInMM = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
-
-                RandinMM = new System.Windows.Forms.Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
-
-
-
+                Item.SheetSizeInMM = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
+                Item.RandinMM = new System.Windows.Forms.Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
             }
 
 
-
-
-            GenPoints();
-
-
+            Item.GenPoints();
         }
 
 
@@ -2476,11 +2199,11 @@ namespace BlueControls.Controls
 
 
             OriD.DefaultPageSettings.Landscape = false;
-            OriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(SheetSizeInMM.Width / 25.4 * 100), (int)(SheetSizeInMM.Height / 25.4 * 100));
-            OriD.DefaultPageSettings.Margins.Top = (int)(RandinMM.Top / 25.4 * 100);
-            OriD.DefaultPageSettings.Margins.Bottom = (int)(RandinMM.Bottom / 25.4 * 100);
-            OriD.DefaultPageSettings.Margins.Left = (int)(RandinMM.Left / 25.4 * 100);
-            OriD.DefaultPageSettings.Margins.Right = (int)(RandinMM.Right / 25.4 * 100);
+            OriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(Item.SheetSizeInMM.Width / 25.4 * 100), (int)(Item.SheetSizeInMM.Height / 25.4 * 100));
+            OriD.DefaultPageSettings.Margins.Top = (int)(Item.RandinMM.Top / 25.4 * 100);
+            OriD.DefaultPageSettings.Margins.Bottom = (int)(Item.RandinMM.Bottom / 25.4 * 100);
+            OriD.DefaultPageSettings.Margins.Left = (int)(Item.RandinMM.Left / 25.4 * 100);
+            OriD.DefaultPageSettings.Margins.Right = (int)(Item.RandinMM.Right / 25.4 * 100);
 
 
 
@@ -2492,11 +2215,9 @@ namespace BlueControls.Controls
             }
 
 
-            SheetSizeInMM = new SizeF((int)(OriD.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(OriD.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
-
-            RandinMM = new System.Windows.Forms.Padding((int)(OriD.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
-
-            GenPoints();
+            Item.SheetSizeInMM = new SizeF((int)(OriD.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(OriD.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
+            Item.RandinMM = new System.Windows.Forms.Padding((int)(OriD.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+            Item.GenPoints();
         }
 
 
@@ -2513,7 +2234,7 @@ namespace BlueControls.Controls
             var done = false;
             foreach (PaperSize ps in DruckerDokument.PrinterSettings.PaperSizes)
             {
-                if (ps.Width == (int)(SheetSizeInMM.Width / 25.4 * 100) && ps.Height == (int)(SheetSizeInMM.Height / 25.4 * 100))
+                if (ps.Width == (int)(Item.SheetSizeInMM.Width / 25.4 * 100) && ps.Height == (int)(Item.SheetSizeInMM.Height / 25.4 * 100))
                 {
                     done = true;
                     DruckerDokument.DefaultPageSettings.PaperSize = ps;
@@ -2523,11 +2244,11 @@ namespace BlueControls.Controls
 
             if (!done)
             {
-                DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)(SheetSizeInMM.Width / 25.4 * 100), (int)(SheetSizeInMM.Height / 25.4 * 100));
+                DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)(Item.SheetSizeInMM.Width / 25.4 * 100), (int)(Item.SheetSizeInMM.Height / 25.4 * 100));
             }
             DruckerDokument.DefaultPageSettings.PrinterResolution = DruckerDokument.DefaultPageSettings.PrinterSettings.PrinterResolutions[0];
             DruckerDokument.OriginAtMargins = true;
-            DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(RandinMM.Left / 25.4 * 100), (int)(RandinMM.Right / 25.4 * 100), (int)(RandinMM.Top / 25.4 * 100), (int)(RandinMM.Bottom / 25.4 * 100));
+            DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(Item.RandinMM.Left / 25.4 * 100), (int)(Item.RandinMM.Right / 25.4 * 100), (int)(Item.RandinMM.Top / 25.4 * 100), (int)(Item.RandinMM.Bottom / 25.4 * 100));
         }
 
         public void SaveAsBitmap(string Title, string OptionalFileName)
@@ -2580,9 +2301,6 @@ namespace BlueControls.Controls
             }
         }
 
-
-
-
         private void PicsSave_FileOk(object sender, CancelEventArgs e)
         {
             if (e.Cancel) { return; }
@@ -2592,17 +2310,14 @@ namespace BlueControls.Controls
         public new void Invalidate()
         {
             base.Invalidate();
-            OnNeedRefresh();
+            OnDoInvalidate();
 
         }
 
-
-        private void OnNeedRefresh()
+        public void OnDoInvalidate()
         {
-            NeedRefresh?.Invoke(this, System.EventArgs.Empty); // Invalidate-Befehl weitergeben an untergeordnete Steuerelemente
+            DoInvalidate?.Invoke(this, System.EventArgs.Empty); // Invalidate-Befehl weitergeben an untergeordnete Steuerelemente
         }
-
-
 
         public bool ParseVariable(string VariableName, enValueType ValueType, string Value)
         {
@@ -2622,8 +2337,6 @@ namespace BlueControls.Controls
             }
 
             if (did) { Invalidate(); }
-
-
             return did;
         }
 
@@ -2637,7 +2350,6 @@ namespace BlueControls.Controls
                     ParseVariable(thiscolumnitem.Name, thiscolumnitem, row);
                 }
             }
-
 
             ParseSpecialCodes();
         }
@@ -2798,13 +2510,12 @@ namespace BlueControls.Controls
 
             if (_Gridsnap < 0.0001F) { _Gridsnap = 0; }
         }
-        public void ComputeRelationOrderx()
+        public void ComputeRelationOrder()
         {
             var Count = 0;
 
             // Zurücksetzen ---- 
-            var Relations = AllRelations();
-            foreach (var ThisRelation in Relations)
+            foreach (var ThisRelation in Item.AllRelations)
             {
                 ThisRelation.Order = -1;
             }
@@ -2818,7 +2529,7 @@ namespace BlueControls.Controls
                     clsPointRelation NextRel = null;
                     var RelPO = int.MaxValue;
 
-                    foreach (var ThisRelation in Relations)
+                    foreach (var ThisRelation in Item.AllRelations)
                     {
                         if (ThisRelation.Order < 0)
                         {
@@ -2841,24 +2552,22 @@ namespace BlueControls.Controls
 
             }
 
-            Relations.Sort();
+            Item.AllRelations.Sort();
         }
 
-        public void Relations_Optimizex()
+        public void Relations_Optimize()
         {
-            var Relations = AllRelations();
-            if (NotPerformingx(Relations, true) > 0) { return; }
+            if (NotPerforming(true) > 0) { return; }
 
 
             var Cb = new List<PointDF>();
             var DobR = new List<clsPointRelation>();
 
-            var _Points = AllPoints();
 
-            foreach (var thisPoint in _Points)
+            foreach (var thisPoint in Item.AllPoints)
             {
-                var CX = ConnectsWith(thisPoint, Relations, true, true);
-                var CY = ConnectsWith(thisPoint, Relations, false, true);
+                var CX = ConnectsWith(thisPoint,  true, true);
+                var CY = ConnectsWith(thisPoint,  false, true);
 
                 // Ermitteln, die auf X und Y miteinander verbunden sind
                 Cb.Clear();
@@ -2872,7 +2581,7 @@ namespace BlueControls.Controls
                 {
 
                     DobR.Clear();
-                    foreach (var ThisRelation in Relations)
+                    foreach (var ThisRelation in Item.AllRelations)
                     {
 
 
@@ -2884,7 +2593,7 @@ namespace BlueControls.Controls
                                 ThisRelation.RelationType = enRelationType.PositionZueinander;
                                 ThisRelation.OverrideSavedRichtmaß(false);
                                 InvalidateOrder();
-                                Relations_Optimizex();
+                                Relations_Optimize();
                                 return;
                             }
                         }
@@ -2915,17 +2624,17 @@ namespace BlueControls.Controls
 
                                         if (R1.Points[0].Parent == R2.Points[0].Parent && R1.Points[1].Parent == R2.Points[1].Parent)
                                         {
-                                            Relations.Remove(R1);
+                                            Item.AllRelations.Remove(R1);
                                             InvalidateOrder();
-                                            Relations_Optimizex();
+                                            Relations_Optimize();
                                             return;
                                         }
 
                                         if (R1.Points[0].Parent == R2.Points[1].Parent && R1.Points[1].Parent == R2.Points[0].Parent)
                                         {
-                                            Relations.Remove(R1);
+                                            Item.AllRelations.Remove(R1);
                                             InvalidateOrder();
-                                            Relations_Optimizex();
+                                            Relations_Optimize();
                                             return;
                                         }
                                     }
@@ -2939,19 +2648,19 @@ namespace BlueControls.Controls
 
 
             // und nun direct nach doppelten suchen
-            foreach (var r1 in Relations)
+            foreach (var r1 in Item.AllRelations)
             {
                 if (!r1.IsInternal())
                 {
-                    foreach (var r2 in Relations)
+                    foreach (var r2 in Item.AllRelations)
                     {
                         if (!r1.SinngemäßIdenitisch(r2) && !r2.IsInternal())
                         {
                             if (r1.SinngemäßIdenitisch(r2))
                             {
-                                Relations.Remove(r2);
+                                Item.AllRelations.Remove(r2);
                                 InvalidateOrder();
-                                Relations_Optimizex();
+                                Relations_Optimize();
                                 return;
 
                             }
@@ -2962,17 +2671,17 @@ namespace BlueControls.Controls
                                 {
                                     case enRelationType.PositionZueinander:
                                         // Beziehungen mit gleichen punkten, aber einer mächtigen PositionZueinander -> andere löschen
-                                        Relations.Remove(r2);
+                                        Item.AllRelations.Remove(r2);
                                         InvalidateOrder();
-                                        Relations_Optimizex();
+                                        Relations_Optimize();
                                         return;
                                     case enRelationType.WaagerechtSenkrecht when r2.RelationType == enRelationType.WaagerechtSenkrecht && r1.Richtmaß() != r2.Richtmaß():
-                                        // Beziehungen mit gleichen punkten, aber spearat mix X und Y -> PositionZueinander konvertieren 
+                                        // Beziehungen mit gleichen punkten, aber spearat mit X und Y -> PositionZueinander konvertieren 
                                         r1.RelationType = enRelationType.PositionZueinander;
                                         r1.OverrideSavedRichtmaß(false);
-                                        Relations.Remove(r2);
+                                        Item.AllRelations.Remove(r2);
                                         InvalidateOrder();
-                                        Relations_Optimizex();
+                                        Relations_Optimize();
                                         return;
                                 }
                             }
@@ -2985,10 +2694,6 @@ namespace BlueControls.Controls
 
 
 
-        /// <summary>
-        /// Es wird davon ausgegangen, dass alle Punkte gültig sind.
-        /// </summary>
-        /// <returns></returns>
         public bool Relations_DeleteInvalid()
         {
             var z = -1;
@@ -2998,11 +2703,11 @@ namespace BlueControls.Controls
             do
             {
                 z += 1;
-                if (z > _ExternalRelations.Count - 1) { break; }
+                if (z > Item.AllRelations.Count - 1) { break; }
 
-                if (!_ExternalRelations[z].IsOk())
+                if (!Item.AllRelations[z].IsOk())
                 {
-                    _ExternalRelations.Remove(_ExternalRelations[z]);
+                    Item.AllRelations.Remove(Item.AllRelations[z]);
                     z = -1;
                     SomethingChanged = true;
                 }
@@ -3011,12 +2716,17 @@ namespace BlueControls.Controls
             return SomethingChanged;
         }
 
-        public int NotPerformingx(List<clsPointRelation> ThisRelations, bool Strongmode)
+        /// <summary>
+        /// Ermittelt die anzahl der Beziehungen, die nicht korrekt sind.
+        /// </summary>
+        /// <param name="Strongmode"></param>
+        /// <returns></returns>
+        public int NotPerforming(bool Strongmode)
         {
 
             var f = 0;
 
-            foreach (var ThisRelation in ThisRelations)
+            foreach (var ThisRelation in Item.AllRelations)
             {
                 if (!ThisRelation.Performs(Strongmode)) { f += 1; }
             }
@@ -3040,7 +2750,7 @@ namespace BlueControls.Controls
 
 
 
-        public List<PointDF> ConnectsWith(PointDF Point, List<clsPointRelation> ThisRelations, bool CheckX, bool IgnoreInternals)
+        public List<PointDF> ConnectsWith(PointDF Point, bool CheckX, bool IgnoreInternals)
         {
 
             var Points = new List<PointDF>();
@@ -3056,7 +2766,7 @@ namespace BlueControls.Controls
                 if (Ist >= Points.Count) { break; }
 
 
-                foreach (var ThisRelation in ThisRelations)
+                foreach (var ThisRelation in Item.AllRelations)
                 {
                     if (ThisRelation != null && ThisRelation.Points.Contains(Points[Ist]) && ThisRelation.Performs(false) && ThisRelation.Connects(CheckX))
                     {
@@ -3077,13 +2787,13 @@ namespace BlueControls.Controls
 
 
 
-        public PointDF GetPointWithLowerIndex(List<PointDF> ThisPoints, PointDF NotPoint, PointDF ErsatzFür, bool MustUsableForAutoRelation)
+        public PointDF GetPointWithLowerIndex(PointDF NotPoint, PointDF ErsatzFür, bool MustUsableForAutoRelation)
         {
             if (NotPoint != null && NotPoint.Parent == ErsatzFür.Parent) { return ErsatzFür; }
 
             var p = ErsatzFür;
 
-            foreach (var thispoint in ThisPoints)
+            foreach (var thispoint in Item.AllPoints)
             {
                 if (thispoint != null)
                 {
@@ -3135,21 +2845,6 @@ namespace BlueControls.Controls
 
         }
 
-        //public void EigenschaftenDurchschleifen()
-        //{
-
-        //    foreach (var ThisItem in Item)
-        //    {
-
-        //        if (ThisItem is ChildPadItem tempVar)
-        //        {
-
-        //            tempVar.PadInternal.KeyboardEditEnabled = _KeyboardEditEnabled;
-        //            tempVar.PadInternal.MouseEditEnabled = _MouseEditEnabled;
-        //            tempVar.PadInternal.KontextMenuEnabled = _KontextMenuEnabled;
-        //        }
-        //    }
-        //}
 
         public static void GenerateLayoutFromRow(object sender, GenerateLayoutInternalEventargs e)
         {
@@ -3207,8 +2902,6 @@ namespace BlueControls.Controls
             OnEndPrint(e);
         }
 
-
-
         private void OnBeginnPrint(PrintEventArgs e)
         {
             BeginnPrint?.Invoke(this, e);
@@ -3218,8 +2911,5 @@ namespace BlueControls.Controls
         {
             EndPrint?.Invoke(this, e);
         }
-
-
-
     }
 }

@@ -79,6 +79,8 @@ namespace BlueControls.ItemCollection
             Style = PadStyles.Style_Überschrift_Haupt;
             GridShow = 10M;
 
+            Points.Add(NP);
+
         }
 
 
@@ -104,14 +106,6 @@ namespace BlueControls.ItemCollection
             return false;
         }
 
-
-        public override List<PointDF> PointList()
-        {
-            var l = new List<PointDF>();
-            l.Add(NP);
-
-            return l;
-        }
 
 
         public override RectangleDF UsedArea()
@@ -212,7 +206,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> relations)
+        public override void GenerateInternalRelation()
         {
             // Nix zu Tun
         }

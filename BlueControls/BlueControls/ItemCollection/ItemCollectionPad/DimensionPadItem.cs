@@ -110,6 +110,12 @@ namespace BlueControls.ItemCollection
             _Bezugslinie1.Parent = this;
             _Bezugslinie2.Parent = this;
 
+
+            Points.Add(Point1);
+            Points.Add(Point2);
+            Points.Add(TextPointx);
+
+
         }
 
 
@@ -307,15 +313,6 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override List<PointDF> PointList()
-        {
-            var l = new List<PointDF>();
-            l.Add(Point1);
-            l.Add(Point2);
-            l.Add(TextPointx);
-            return l;
-        }
-
 
         public override RectangleDF UsedArea()
         {
@@ -400,7 +397,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> relations)
+        public override void GenerateInternalRelation()
         {
             // Nix zu tun
         }

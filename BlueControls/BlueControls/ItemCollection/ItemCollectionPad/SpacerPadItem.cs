@@ -69,6 +69,13 @@ namespace BlueControls.ItemCollection
             p_r = new PointDF(this, "R", 0, 0);
             p_m = new PointDF(this, "M", 0, 0, false, true, true);
 
+
+            Points.Add(p_m);
+            Points.Add(p_o);
+            Points.Add(p_u);
+            Points.Add(p_l);
+            Points.Add(p_r);
+
         }
 
 
@@ -107,20 +114,6 @@ namespace BlueControls.ItemCollection
         {
             if (ForPrinting) { return; }
             GR.DrawEllipse(CreativePad.PenGray, DCoordinates);
-        }
-
-
-        public override List<PointDF> PointList()
-        {
-
-            var l = new List<PointDF>();
-            l.Add(p_m);
-            l.Add(p_o);
-            l.Add(p_u);
-            l.Add(p_l);
-            l.Add(p_r);
-
-            return l;
         }
 
 
@@ -182,12 +175,14 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> relations)
+        public override void GenerateInternalRelation()
         {
-            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_u));
-            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_o));
-            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_r));
-            relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_l));
+            Relations.Clear();
+            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_u));
+            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_o));
+            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_r));
+            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_l));
+            OnPointOrRelationsChanged();
         }
 
         public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)

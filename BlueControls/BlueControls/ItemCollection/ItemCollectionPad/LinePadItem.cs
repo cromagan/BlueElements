@@ -73,6 +73,11 @@ namespace BlueControls.ItemCollection
 
             Point1.SetTo(point1);
             Point2.SetTo(point2);
+
+            Points.Add(Point1);
+            Points.Add(Point2);
+
+
             Style = format;
 
             _TempPoints = new List<PointDF>();
@@ -131,13 +136,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override List<PointDF> PointList()
-        {
-            var l = new List<PointDF>();
-            l.Add(Point1);
-            l.Add(Point2);
-            return l;
-        }
+
 
 
         public override RectangleDF UsedArea()
@@ -237,7 +236,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void GenerateInternalRelation(List<clsPointRelation> relations)
+        public override void GenerateInternalRelation()
         {
             // nix zu Tun
         }
