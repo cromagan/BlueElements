@@ -67,13 +67,13 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor 
 
-        public RowFormulaPadItem(string internalname) : this(internalname, null, string.Empty) { }
+        public RowFormulaPadItem(ItemCollectionPad parent, string internalname) : this(parent, internalname, null, string.Empty) { }
 
-        public RowFormulaPadItem(RowItem row) : this(string.Empty, row, string.Empty) { }
+        public RowFormulaPadItem(ItemCollectionPad parent, RowItem row) : this(parent, string.Empty, row, string.Empty) { }
 
-        public RowFormulaPadItem(RowItem row, string layoutID) : this(string.Empty, row, layoutID) { }
+        public RowFormulaPadItem(ItemCollectionPad parent, RowItem row, string layoutID) : this(parent, string.Empty, row, layoutID) { }
 
-        public RowFormulaPadItem(string internalname, RowItem row, string layoutID) : base(internalname)
+        public RowFormulaPadItem(ItemCollectionPad parent, string internalname, RowItem row, string layoutID) : base(parent, internalname)
         {
             _Row = row;
             _LayoutID = layoutID;
@@ -337,14 +337,14 @@ namespace BlueControls.ItemCollection
 
             Relations.Clear();
 
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
+            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_RO));
+            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_RU));
+            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_LU));
 
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_R));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_L));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_u));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_o));
+            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_R));
+            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_L));
+            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_u));
+            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_o));
 
             OnPointOrRelationsChanged();
 
@@ -380,11 +380,11 @@ namespace BlueControls.ItemCollection
             }
 
 
-            var _pad = new CreativePad();
+            var _pad = new CreativePad(new ItemCollectionPad(_LayoutID, _Row));
 
-            _pad.GenerateFromRow(_LayoutID, _Row, false);
 
-            var re = _pad.MaxBounds(null);
+
+            var re = _pad.Item.MaxBounds(null);
 
             if (_tmpBMP != null)
             {
@@ -397,7 +397,7 @@ namespace BlueControls.ItemCollection
 
             if (_tmpBMP == null) { _tmpBMP = new Bitmap((int)re.Width, (int)re.Height); }
 
-            var mb = _pad.MaxBounds(null);
+            var mb = _pad.Item.MaxBounds(null);
 
             var zoomv = _pad.ZoomFitValue(mb, false, _tmpBMP.Size);
             var centerpos = _pad.CenterPos(mb, false, _tmpBMP.Size, zoomv);
@@ -407,7 +407,7 @@ namespace BlueControls.ItemCollection
             _pad.Unselect();
 
 
-            if (Parent.SheetStyle != null) { _pad.SheetStyle = Parent.SheetStyle.CellFirstString(); }
+            if (Parent.SheetStyle != null) { _pad.Item.SheetStyle = Parent.SheetStyle; }
 
 
             _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y, null);
@@ -467,11 +467,8 @@ namespace BlueControls.ItemCollection
             var Layouts = new ItemCollectionList();
             for (var z = 0; z < Row.Database.Layouts.Count; z++)
             {
-                using (var p = new CreativePad())
-                {
-                    p.ParseData(Row.Database.Layouts[z], false, string.Empty);
-                    Layouts.Add(new TextListItem(z.ToString(), p.Caption, enImageCode.Stern));
-                }
+                var p = new ItemCollectionPad(Row.Database.Layouts[z], string.Empty);
+                Layouts.Add(new TextListItem(z.ToString(), p.Caption, enImageCode.Stern));
             }
 
             l.Add(new FlexiControl("LayoutId", _LayoutID, Layouts));

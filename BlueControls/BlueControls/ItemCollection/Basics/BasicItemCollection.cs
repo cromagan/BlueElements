@@ -28,17 +28,17 @@ namespace BlueControls.ItemCollection
 
 
         #region  Event-Deklarationen + Delegaten 
-        public event EventHandler Changed;
-        public event EventHandler NeedRefresh;
+        //public event EventHandler Changed;
+        public event EventHandler DoInvalidate;
         #endregion
 
 
 
 
 
-        public void OnNeedRefresh()
+        public void OnDoInvalidate()
         {
-            NeedRefresh?.Invoke(this, System.EventArgs.Empty);
+            DoInvalidate?.Invoke(this, System.EventArgs.Empty);
         }
 
 
@@ -49,34 +49,27 @@ namespace BlueControls.ItemCollection
                 Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
             }
 
-            item.SetParent(this);
             base.OnItemAdded(item);
-            OnNeedRefresh();
+            OnDoInvalidate();
         }
 
-        protected override void OnItemRemoving(t item)
-        {
-            item.SetParent(null);
-            base.OnItemRemoving(item);
-        }
 
-        public void OnChanged()
-        {
-            //if (IsParsing)
-            //{
-            //    Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!");
-            //    return;
-            //}
-
-            Changed?.Invoke(this, System.EventArgs.Empty);
-        }
+        //public void OnChanged()
+        //{
+        //    //if (IsParsing)
+        //    //{
+        //    //    Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!");
+        //    //    return;
+        //    //}
+        //    q
+        //    Changed?.Invoke(this, System.EventArgs.Empty);
+        //}
 
 
         protected override void OnListOrItemChanged()
         {
             base.OnListOrItemChanged();
-            OnNeedRefresh();
-            OnChanged();
+            OnDoInvalidate();
         }
 
     }

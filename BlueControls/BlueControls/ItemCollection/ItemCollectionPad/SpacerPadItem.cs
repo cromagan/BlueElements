@@ -55,10 +55,10 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-        public SpacerPadItem() : this(string.Empty) { }
+        public SpacerPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
 
 
-        public SpacerPadItem(string internalname) : base(internalname)
+        public SpacerPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname)
         {
             mm125x = Math.Round(modConverter.mmToPixel(1.25M, ItemCollectionPad.DPI), 1);
 
@@ -178,10 +178,10 @@ namespace BlueControls.ItemCollection
         public override void GenerateInternalRelation()
         {
             Relations.Clear();
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_u));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_o));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_r));
-            Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_m, p_l));
+            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_m, p_u));
+            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_m, p_o));
+            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_m, p_r));
+            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_m, p_l));
             OnPointOrRelationsChanged();
         }
 

@@ -34,8 +34,12 @@ namespace BlueControls.ItemCollection.Basics
 
         public event EventHandler Changed;
 
-        protected BasicItem(string internalname)
+
+
+        protected BasicItem(object parent, string internalname)
         {
+            _parent = parent;
+
 
             if (string.IsNullOrEmpty(internalname))
             {
@@ -60,10 +64,6 @@ namespace BlueControls.ItemCollection.Basics
 
         #endregion
 
-        internal void SetParent(object collection) 
-        {
-            _parent = collection;
-        }
 
         public abstract void DesignOrStyleChanged();
 

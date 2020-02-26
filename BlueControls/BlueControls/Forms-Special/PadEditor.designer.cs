@@ -105,23 +105,13 @@ namespace BlueControls.Forms
             // 
             // Pad
             // 
-            this.Pad.Changed = true;
             this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Pad.GridShow = 10F;
             this.Pad.GridSnap = 1F;
             this.Pad.Location = new System.Drawing.Point(0, 110);
             this.Pad.Name = "Pad";
-            this.Pad.RandinMM = new System.Windows.Forms.Padding(0);
-            this.Pad.SheetSizeInMM = new System.Drawing.SizeF(0F, 0F);
-            this.Pad.SheetStyle = "Lysithea";
-            this.Pad.SheetStyleScale = new decimal(new int[] {
-            10,
-            0,
-            0,
-            65536});
             this.Pad.Size = new System.Drawing.Size(1334, 571);
             this.Pad.TabIndex = 0;
-            this.Pad.Parsed += new System.EventHandler(this.Pad_Parsed);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon

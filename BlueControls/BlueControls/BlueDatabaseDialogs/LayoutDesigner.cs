@@ -145,8 +145,8 @@ namespace BlueControls.BlueDatabaseDialogs
             if (string.IsNullOrEmpty(ex)) { return; }
             var c = new CreativePad();
 
-            c.Caption = ex;
-            Database.Layouts.Add(c.DataToString());
+            c.Item.Caption = ex;
+            Database.Layouts.Add(c.ToString());
 
 
             befülleLayoutDropdown();
@@ -154,7 +154,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             _LoadedLayout = string.Empty;
 
-            LoadLayout(c.ID);
+            LoadLayout(c.Item.ID);
 
             CheckButtons();
         }
@@ -167,7 +167,7 @@ namespace BlueControls.BlueDatabaseDialogs
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
 
 
-            if (MessageBox.Show("Layout <b>'" + Pad.Caption + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (MessageBox.Show("Layout <b>'" + Pad.Item.Caption + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
 
             Pad.Item.Clear();
             var ind = Database.LayoutIDToIndex(_LoadedLayout);
@@ -189,9 +189,9 @@ namespace BlueControls.BlueDatabaseDialogs
             SaveCurrentLayout();
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
 
-            var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Caption, enDataFormat.Text);
+            var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, enDataFormat.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
-            Pad.Caption = ex;
+            Pad.Item.Caption = ex;
 
             SaveCurrentLayout();
             befülleLayoutDropdown();
@@ -221,19 +221,20 @@ namespace BlueControls.BlueDatabaseDialogs
                     Pad.Enabled = true;
                     _LoadedLayout = fileOrLayoutID;
                     var l = modAllgemein.LoadFromDisk(fileOrLayoutID);
-                    Pad.ParseData(l, true, string.Empty);
+                    Pad.Item = new ItemCollectionPad(l, string.Empty);
+                    ItemChanged();
 
                 }
                 else
                 {
                     _LoadedLayout = string.Empty;
                     Pad.Item.Clear();
-                    Pad.SheetSizeInMM = SizeF.Empty;
-                    var x = new TextPadItem("x", "Nicht edititerbares Layout aus dem Dateisystem");
+                    Pad.Item.SheetSizeInMM = SizeF.Empty;
+                    var x = new TextPadItem(Pad.Item, "x", "Nicht editierbares Layout aus dem Dateisystem");
                     Pad.Item.Add(x);
                     x.Style = Enums.PadStyles.Style_Überschrift_Haupt;
                     x.SetCoordinates(new RectangleDF(0, 0, 1000, 400));
-
+                    ItemChanged();
                     Pad.Enabled = false;
                 }
             }
@@ -242,20 +243,30 @@ namespace BlueControls.BlueDatabaseDialogs
                 Pad.Enabled = true;
                 _LoadedLayout = fileOrLayoutID;
                 var ind = Database.LayoutIDToIndex(_LoadedLayout);
-                Pad.ParseData(Database.Layouts[ind], true, string.Empty);
+                Pad.Item = new ItemCollectionPad(Database.Layouts[ind], string.Empty);
+                ItemChanged();
             }
 
-            Pad.ZoomFit();
+
+        }
+
+
+        public override void ItemChanged()
+        {
+            base.ItemChanged();
+
             CheckButtons();
             GenerateText();
+
         }
+
 
         private void SaveCurrentLayout()
         {
             if (Database == null) { return; }
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
 
-            var newl = Pad.DataToString();
+            var newl = Pad.Item.ToString();
 
 
             if (_LoadedLayout.StartsWith("#"))
@@ -567,7 +578,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private void SaveTab_FileOk(object sender, CancelEventArgs e)
         {
 
-            var t = Pad.DataToString();
+            var t = Pad.Item.ToString();
             modAllgemein.SaveToDisk(SaveTab.FileName, t, false);
 
         }
@@ -599,14 +610,12 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void LoadFile(string fileName)
         {
-
-
             Pad.Item.Clear();
             var t = modAllgemein.LoadFromDisk(fileName);
 
-            Pad.ParseData(t, true, _LoadedLayout);
-            Pad.ZoomFit();
-            Ribbon.SelectedIndex = 1;
+            Pad.Item = new ItemCollectionPad(t, _LoadedLayout);
+            ItemChanged();
+
         }
     }
 }

@@ -47,7 +47,7 @@ namespace BlueDatabase
             foreach (var ThisRow in Row)
             {
                 var FN = TempFile(Path, ThisRow.CellFirstString(), "PNG");
-                ThisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(ThisRow, LayoutID, false, true, FN));
+                ThisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(ThisRow, LayoutID, FN));
                 l.Add(FN);
             }
 
@@ -56,9 +56,9 @@ namespace BlueDatabase
 
 
 
-        public static void SaveAsBitmap(RowItem Row, string LayoutID, string optionalFilename)
+        public static void SaveAsBitmap(RowItem Row, string LayoutID, string Filename)
         {
-            Row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(Row, LayoutID, false, true, optionalFilename));
+            Row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(Row, LayoutID, Filename));
         }
 
 

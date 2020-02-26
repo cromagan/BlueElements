@@ -65,7 +65,7 @@ namespace BlueControls.ItemCollection
         protected bool _Enabled = true;
 
 
-        protected BasicListItem(string internalname) : base(internalname)
+        protected BasicListItem(string internalname) : base(null, internalname)
         {
             _Checked = false;
             Pos = new Rectangle(0, 0, 0, 0);
@@ -92,7 +92,7 @@ namespace BlueControls.ItemCollection
         public void SetCoordinates(Rectangle r)
         {
             Pos = r;
-            Parent?.OnNeedRefresh();
+            Parent?.OnDoInvalidate();
         }
 
 
@@ -107,7 +107,7 @@ namespace BlueControls.ItemCollection
                 if (_Enabled == value) { return; }
 
                 _Enabled = value;
-                Parent?.OnNeedRefresh();
+                Parent?.OnDoInvalidate();
             }
         }
 
@@ -209,6 +209,11 @@ namespace BlueControls.ItemCollection
         {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
             return null;
+        }
+
+        internal void SetParent(object list)
+        {
+            _parent = list;
         }
 
         public BasicListItem CloneToNewCollection(ItemCollectionList newParent, BasicListItem newItem)

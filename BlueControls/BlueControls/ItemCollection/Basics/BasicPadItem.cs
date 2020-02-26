@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.EventArgs;
 using BlueControls.ItemCollection.Basics;
 using System.Collections.Generic;
 using System.Drawing;
@@ -40,7 +39,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public static BasicPadItem NewByParsing(string code)
+        public static BasicPadItem NewByParsing(ItemCollectionPad parent, string code)
         {
             BasicPadItem i = null;
             var x = code.GetAllTags();
@@ -82,58 +81,58 @@ namespace BlueControls.ItemCollection
                 case "blueelements.clsitemtext":
                 case "blueelements.textitem":
                 case "text":
-                    i = new TextPadItem(name, string.Empty);
+                    i = new TextPadItem(parent, name, string.Empty);
                     break;
 
                 case "blueelements.clsitemdistanz":
                 case "blueelements.distanzitem":
                 case "spacer":
-                    i = new SpacerPadItem(name);
+                    i = new SpacerPadItem(parent, name);
                     break;
 
                 case "blueelements.clsitemimage":
                 case "blueelements.imageitem":
                 case "image":
-                    i = new BitmapPadItem(name, string.Empty);
+                    i = new BitmapPadItem(parent, name, string.Empty);
                     break;
 
                 case "blueelements.clsdimensionitem":
                 case "blueelements.dimensionitem":
                 case "dimension":
-                    i = new DimensionPadItem(name, null, null, 0);
+                    i = new DimensionPadItem(parent, name, null, null, 0);
                     break;
 
                 case "blueelements.clsitemline":
                 case "blueelements.itemline":
                 case "line":
-                    i = new LinePadItem(name, Enums.PadStyles.Style_Standard, Point.Empty, Point.Empty);
+                    i = new LinePadItem(parent, name, Enums.PadStyles.Style_Standard, Point.Empty, Point.Empty);
                     break;
 
                 case "blueelements.clsitempad":
                 case "blueelements.itempad":
                 case "childpad":
-                    i = new ChildPadItem(name);
+                    i = new ChildPadItem(parent, name);
                     break;
 
 
                 case "blueelements.clsitemgrid":
                 case "blueelements.itemgrid":
                 case "grid":
-                    i = new GridPadItem(name);
+                    i = new GridPadItem(parent, name);
                     break;
 
                 case "blueelements.rowformulaitem":
                 case "row":
-                    i = new RowFormulaPadItem(name);
+                    i = new RowFormulaPadItem(parent, name);
                     break;
 
                 case "blueelements.clsitemcomiccomp":
                 case "comic":
-                    i = new ComicCompPadItem(name);
+                    i = new ComicCompPadItem(parent, name);
                     break;
 
                 case "symbol":
-                    i = new SymbolPadItem(name);
+                    i = new SymbolPadItem(parent, name);
                     break;
                 default:
                     Develop.DebugPrint(enFehlerArt.Fehler, "Unbekanntes Item: " + code);
@@ -149,7 +148,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected BasicPadItem(string internalname) : base(internalname) { }
+        protected BasicPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) { }
 
         /// <summary>
         ///  Falls das Element über Kordinaten gesetzt werden kann, ist diese mit dieser Routine möglich.
@@ -311,7 +310,7 @@ namespace BlueControls.ItemCollection
                         if (value.Contains("Name=" + ThisPoint.Name + ","))
                         {
                             ThisPoint.Parse(value);
-                            ThisPoint.Parent = this;  qqq // Punkte dem Parent hinzufügen
+                            ThisPoint.Parent = this;  
                         }
                     }
                     return true;
@@ -451,7 +450,7 @@ namespace BlueControls.ItemCollection
             {
                 foreach (var ThisRelation in Relations)
                 {
-                    ThisRelation.OverrideSavedRichtmaß(false);
+                    ThisRelation.OverrideSavedRichtmaß(false, false);
                 }
             }
         }
@@ -551,12 +550,42 @@ namespace BlueControls.ItemCollection
         public object Clone()
         {
             var t = ToString();
-            return NewByParsing(t);
+            return NewByParsing(Parent, t);
         }
 
         protected void OnPointOrRelationsChanged()
         {
             PointOrRelationsChanged?.Invoke(this, System.EventArgs.Empty);
         }
+
+        public void RelationDeleteExternal()
+        {
+         
+            foreach (var ThisRelation in Parent.AllRelations)
+            {
+                if (ThisRelation != null)
+                {
+
+                    if (!ThisRelation.IsInternal())
+                    {
+                        foreach (var Thispoint in ThisRelation.Points)
+                        {
+
+                            if (Thispoint.Parent is BasicPadItem tItem)
+                            {
+                                if (tItem == this)
+                                {
+                                    Parent.AllRelations.Remove(ThisRelation);
+                                    RelationDeleteExternal(); // 'Rekursiv
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
     }
 }

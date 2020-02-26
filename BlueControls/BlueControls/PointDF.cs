@@ -455,6 +455,9 @@ namespace BlueControls
                     case CreativePad _:
                         t = t + "ParentType=Main, ";
                         break;
+                    case ItemCollectionPad _:
+                        t = t + "ParentType=Main, ";
+                        break;
                     default:
                         t = t + "ParentType=" + Parent.GetType().FullName + ", ";
                         break;

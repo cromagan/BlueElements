@@ -47,7 +47,7 @@ namespace BlueControls.ItemCollection
         #region  Construktor 
 
 
-        public FormPadItemRectangle(string internalname) : base(internalname)
+        public FormPadItemRectangle(ItemCollectionPad parent, string internalname) : base(parent, internalname)
         {
             p_LO = new PointDF(this, "LO", 0, 0, false, true, true);
             p_RO = new PointDF(this, "RO", 0, 0);
@@ -113,19 +113,19 @@ namespace BlueControls.ItemCollection
 
             if (FixSize)
             {
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RO));
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_RU));
-                Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, p_LO, p_LU));
+                Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_RO));
+                Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_RU));
+                Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_LU));
             }
             else
             {
                 //relations.Add(new clsPointRelation(enRelationType.YPositionZueinander, p_LO, p_RU));
 
-                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
-                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
+                Relations.Add(new clsPointRelation(Parent, enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
+                Relations.Add(new clsPointRelation(Parent, enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
 
-                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
-                Relations.Add(new clsPointRelation(enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
+                Relations.Add(new clsPointRelation(Parent, enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
+                Relations.Add(new clsPointRelation(Parent, enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
             }
 
 

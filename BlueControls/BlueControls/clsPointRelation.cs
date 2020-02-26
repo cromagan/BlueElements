@@ -29,18 +29,16 @@ using System.Drawing;
 
 namespace BlueControls
 {
-    public sealed class clsPointRelation : IComparable, ICompareKey, IParseable, ICheckable
+    public sealed class clsPointRelation : IComparable, ICompareKey
     {
 
         private enRelationType _relationtype;
         public readonly ListExt<PointDF> Points = new ListExt<PointDF>();
 
+        public readonly ItemCollectionPad ParentCollection;
+
         private string _Richtmaß;
 
-        /// <summary>
-        /// Wird für parsing gebraucht
-        /// </summary>
-        private List<PointDF> tmpAllPoints;
 
         internal bool Computed;
         internal int Order;
@@ -48,38 +46,10 @@ namespace BlueControls
 
         public event EventHandler Changed;
 
-
-        public clsPointRelation(enRelationType enRelationType, PointDF Point1, PointDF Point2)
+        public clsPointRelation(ItemCollectionPad parentCollection)
         {
-            Initialize();
-            _relationtype = enRelationType;
 
-            Points.Add(Point1);
-            Points.Add(Point2);
-
-            OverrideSavedRichtmaß(false);
-
-
-            //if (!IsOk())
-            //{
-            //    Develop.DebugPrint(enFehlerArt.Warnung, "Beziehung falsch initialisiert: " + ErrorReason());
-            //}
-
-        }
-
-
-        public clsPointRelation(string Code, List<PointDF> allPoints)
-        {
-            Initialize();
-            tmpAllPoints = allPoints;
-            Parse(Code);
-
-            OverrideSavedRichtmaß(true);
-        }
-
-
-        public void Initialize()
-        {
+            ParentCollection = parentCollection;
             _relationtype = enRelationType.None;
 
             Points.Clear();
@@ -88,11 +58,93 @@ namespace BlueControls
             _Richtmaß = string.Empty;
             Computed = false;
             Order = -1;
+
+
+        }
+
+
+        public clsPointRelation(ItemCollectionPad parentCollection, enRelationType enRelationType, PointDF Point1, PointDF Point2) : this(parentCollection)
+        {
+
+            _relationtype = enRelationType;
+            Points.ThrowEvents = false;
+
+            Points.Add(Point1);
+            Points.Add(Point2);
+
+            Points.ThrowEvents = true;
+
+            OverrideSavedRichtmaß(false, true);
+        }
+
+
+        public clsPointRelation(ItemCollectionPad parentCollection, string ToParse) : this(parentCollection)
+        {
+
+            Points.ThrowEvents = false;
+
+            if (ToParse.Contains("ParentType=BlueBasics.CreativePad,"))
+            {
+                ToParse = ToParse.Replace("ParentType=BlueBasics.CreativePad,", "ParentType=Main,");
+            }
+            if (ToParse.Contains("ParentType=BlueBasics.BlueCreativePad,"))
+            {
+                ToParse = ToParse.Replace("ParentType=BlueBasics.BlueCreativePad,", "ParentType=Main,");
+            }
+            if (ToParse.Contains("ParentType=BlueControls.ItemCollection.ItemCollectionPad,"))
+            {
+                ToParse = ToParse.Replace("ParentType=BlueControls.ItemCollection.ItemCollectionPad,", "ParentType=Main,");
+            }
+
+
+
+            foreach (var pair in ToParse.GetAllTags())
+            {
+                switch (pair.Key)
+                {
+                    case "type":
+                        _relationtype = (enRelationType)int.Parse(pair.Value);
+                        break;
+                    case "value":
+                        _Richtmaß = pair.Value;
+                        break;
+                    case "point":
+                        var added = false;
+                        var m = pair.Value.IndexOf(", X=") + 4;
+                        foreach (var ThisPoint in ParentCollection.AllPoints)
+                        {
+                            if (ThisPoint != null)
+                            {
+
+                                var nv = ThisPoint.ToString();
+
+                                if (!string.IsNullOrEmpty(nv) && nv.Length >= m && nv.Substring(0, m) == pair.Value.Substring(0, m))
+                                {
+                                    added = true;
+                                    Points.Add(ThisPoint);
+                                    break;
+                                }
+                            }
+                        }
+                        if (!added)
+                        {
+                            Develop.DebugPrint(enFehlerArt.Warnung, "Punkt nicht gefunden: " + pair.Value);
+                        }
+
+                        break;
+                    default:
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        break;
+                }
+            }
+
+            Points.ThrowEvents = true;
+
+            OverrideSavedRichtmaß(true, true);
         }
 
 
 
-        public bool IsParsing { get; private set; }
 
         public enRelationType RelationType
         {
@@ -133,69 +185,12 @@ namespace BlueControls
         }
 
 
-        public void Parse(string ToParse)
-        {
-            IsParsing = true;
-            Initialize();
-            Points.ThrowEvents = false;
-
-            if (ToParse.Contains("ParentType=BlueBasics.CreativePad,"))
-            {
-                ToParse = ToParse.Replace("ParentType=BlueBasics.CreativePad,", "ParentType=Main,");
-            }
-            if (ToParse.Contains("ParentType=BlueBasics.BlueCreativePad,"))
-            {
-                ToParse = ToParse.Replace("ParentType=BlueBasics.BlueCreativePad,", "ParentType=Main,");
-            }
-
-
-
-
-            foreach (var pair in ToParse.GetAllTags())
-            {
-                switch (pair.Key)
-                {
-                    case "type":
-                        _relationtype = (enRelationType)int.Parse(pair.Value);
-                        break;
-                    case "value":
-                        _Richtmaß = pair.Value;
-                        break;
-                    case "point":
-                        var added = false;
-                        var m = pair.Value.IndexOf(", X=") + 4;
-                        foreach (var ThisPoint in tmpAllPoints)
-                        {
-                            var nv = ThisPoint.ToString();
-
-                            if (!string.IsNullOrEmpty(nv) && nv.Length >= m && nv.Substring(0, m) == pair.Value.Substring(0, m))
-                            {
-                                added = true;
-                                Points.Add(ThisPoint);
-                                break;
-                            }
-                        }
-                        if (!added)
-                        {
-                            Develop.DebugPrint(enFehlerArt.Warnung, "Punkt nicht gefunden: " + pair.Value);
-                        }
-
-                        break;
-                    default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                        break;
-                }
-            }
-
-            Points.ThrowEvents = true;
-            IsParsing = false;
-        }
 
         public override string ToString()
         {
 
             var t = "{Type=" + (int)_relationtype +
-                   ", Value=" + _Richtmaß;
+                     ", Value=" + _Richtmaß;
 
 
             foreach (var thispoint in Points)
@@ -351,7 +346,7 @@ namespace BlueControls
             var Multi = 10;
             if (!StrongMode) { Multi = 300; }
 
-            if (!IsOk()) { return false; }
+            if (!IsOk(false)) { return false; }
 
 
             switch (_relationtype)
@@ -395,9 +390,9 @@ namespace BlueControls
         }
 
 
-        public void OverrideSavedRichtmaß(bool Parsing)
+        public void OverrideSavedRichtmaß(bool Parsing, bool IsCreating)
         {
-            if (!IsOk()) { return; }
+            if (!IsOk(IsCreating)) { return; }
 
             if (!Parsing || string.IsNullOrEmpty(_Richtmaß)) { _Richtmaß = GetRichtmaß(); }
 
@@ -735,7 +730,6 @@ namespace BlueControls
 
         public void OnChanged()
         {
-            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
@@ -753,9 +747,9 @@ namespace BlueControls
         /// Um zu prüfen, ob die Punkte zueinander stimmen, muss Performs benutzt werden.
         /// </summary>
         /// <returns></returns>
-        public bool IsOk()
+        public bool IsOk(bool IsCreating)
         {
-            return string.IsNullOrEmpty(ErrorReason());
+            return string.IsNullOrEmpty(ErrorReason(IsCreating));
         }
 
         /// <summary>
@@ -763,61 +757,33 @@ namespace BlueControls
         /// Um zu prüfen, ob die Punkte zueinander stimmen, muss Performs benutzt werden.
         /// </summary>
         /// <returns></returns>
-        public string ErrorReason()
+        public string ErrorReason(bool IsCreating)
         {
+
+
             if (Points == null) { return "Keine Punkte definiert."; }
             if (Points.Count < 2) { return "Zu wenige Punkte definiert."; }
             if (Points[0] == Points[1]) { return "Die Punkte verweisen auf sich selbst."; }
             if (_relationtype == enRelationType.None) { return "Der Type None ist nicht erlaubt"; }
 
-            foreach (var Thispoint in Points)
+            if (!IsCreating)
             {
-                if (Thispoint == null)
+                if (!ParentCollection.AllRelations.Contains(this)) { return "Beziehung nicht mehr vorhanden."; }
+
+                foreach (var Thispoint in Points)
                 {
-                    return "Einer der Punkte ist null.";
-                }
-                else
-                {
-                    if (Thispoint.Parent == null)
-                    {
-                        return "Der Punkt hat kein Parent.";
-                    }
-                    else
-                    {
-                        ss
-                        if (Thispoint.Parent is BasicPadItem item)
-                        {
-                            if (item.Parent is ItemCollectionPad pad)
-                            {
-                                if (!pad.Contains(item))
-                                {
-                                    return "Das enthaltende Parent wird nicht mehr angezeigt.";
-                                }
-
-                            }
-                            else
-                            {
-                                return "Das enthaltende Parent ist keiner Pad-Collection zugeordnet.";
-                            }
-
-                        }
-                        else if (Thispoint.Parent is CreativePad pad)
-                        {
-
-                            if (!pad.Item.AllPoints.Contains(Thispoint))
-                            {
-                                return "Der Punkt ist im Pad nicht mehr enthalten.";
-                            }
-
-                        }
-                        else
-                        {
-                            return "Point-Parent ist unbekannt.";
-                        }
-                    }
+                    if (Thispoint == null) { return "Einer der Punkte ist null."; }
+                    if (!ParentCollection.AllPoints.Contains(Thispoint)) { return "Punkt nicht mehr vorhanden."; }
                 }
             }
+
+
+
+
+
             return string.Empty;
         }
+
+
     }
 }

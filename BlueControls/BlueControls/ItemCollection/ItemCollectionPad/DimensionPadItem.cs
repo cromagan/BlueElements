@@ -71,15 +71,15 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
-        public DimensionPadItem() : this(string.Empty, null, null, 0) { }
+        public DimensionPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, null, 0) { }
 
 
-        public DimensionPadItem(PointDF cPoint1, PointDF cPoint2, int AbstandinMM) : this(string.Empty, cPoint1, cPoint2, AbstandinMM) { }
+        public DimensionPadItem(ItemCollectionPad parent, PointDF cPoint1, PointDF cPoint2, int AbstandinMM) : this(parent, string.Empty, cPoint1, cPoint2, AbstandinMM) { }
 
 
 
 
-        public DimensionPadItem(string internalname, PointDF cPoint1, PointDF cPoint2, int AbstandinMM) : base(internalname)
+        public DimensionPadItem(ItemCollectionPad parent, string internalname, PointDF cPoint1, PointDF cPoint2, int AbstandinMM) : base(parent, internalname)
         {
 
 
@@ -88,7 +88,7 @@ namespace BlueControls.ItemCollection
 
             ComputeData();
 
-            var a = GeometryDF.PolarToCartesian(modConverter.mmToPixel(AbstandinMM, CreativePad.DPI), Convert.ToDouble(_Winkel - 90));
+            var a = GeometryDF.PolarToCartesian(modConverter.mmToPixel(AbstandinMM, ItemCollectionPad.DPI), Convert.ToDouble(_Winkel - 90));
 
             TextPointx.SetTo(Point1, _Länge / 2, _Winkel);
             TextPointx.X += a.X;
@@ -119,7 +119,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public DimensionPadItem(PointF cPoint1, PointF cPoint2, int AbstandInMM) : this(new PointDF(cPoint1), new PointDF(cPoint2), AbstandInMM) { }
+        public DimensionPadItem(ItemCollectionPad parent, PointF cPoint1, PointF cPoint2, int AbstandInMM) : this(parent, new PointDF(cPoint1), new PointDF(cPoint2), AbstandInMM) { }
 
 
         #endregion

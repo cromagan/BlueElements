@@ -43,7 +43,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public BasicPadItemTwoPoints() : base(string.Empty)
+        public BasicPadItemTwoPoints(ItemCollectionPad parent) : base(parent, string.Empty)
         {
             p_ML = new PointDF(this, "ML", 0, 0);
             p_MR = new PointDF(this, "MR", 1000, 0);
@@ -121,7 +121,7 @@ namespace BlueControls.ItemCollection
         public override void GenerateInternalRelation()
         {
             Relations.Clear();
-            Relations.Add(new clsPointRelation(enRelationType.AbstandZueinander, p_ML, p_MR));
+            Relations.Add(new clsPointRelation(Parent, enRelationType.AbstandZueinander, p_ML, p_MR));
             OnPointOrRelationsChanged();
         }
 

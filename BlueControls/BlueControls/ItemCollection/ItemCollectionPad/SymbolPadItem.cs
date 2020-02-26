@@ -35,10 +35,10 @@ namespace BlueControls.ItemCollection
             // Keine Variablen zum Reseten, ein Invalidate reicht
         }
 
-        public SymbolPadItem() : this(string.Empty) { }
+        public SymbolPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
 
 
-        public SymbolPadItem(string internalname) : base(internalname)
+        public SymbolPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname)
         {
             Symbol = enSymbol.Pfeil;
             BackColor = Color.White;

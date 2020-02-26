@@ -106,11 +106,11 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-        public ComicCompPadItem() : this(string.Empty, null) { }
+        public ComicCompPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null) { }
 
-        public ComicCompPadItem(string internalname) : this(internalname, null) { }
+        public ComicCompPadItem(ItemCollectionPad parent, string internalname) : this(parent, internalname, null) { }
 
-        public ComicCompPadItem(string internalname, Bitmap bitmap) : base(internalname)
+        public ComicCompPadItem(ItemCollectionPad parent, string internalname, Bitmap bitmap) : base(parent, internalname)
         {
 
             _Bitmap = bitmap;
@@ -607,7 +607,7 @@ namespace BlueControls.ItemCollection
             {
                 if (_Length > 0M)
                 {
-                    Relations.Add(new clsPointRelation(enRelationType.AbstandZueinander, P1, P2));
+                    Relations.Add(new clsPointRelation(Parent, enRelationType.AbstandZueinander, P1, P2));
                 }
 
 
@@ -615,11 +615,11 @@ namespace BlueControls.ItemCollection
                 {
                     if (GeometryDF.Länge(Thispoint, P1) < GeometryDF.Länge(Thispoint, P2))
                     {
-                        Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, P1, Thispoint));
+                        Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, P1, Thispoint));
                     }
                     else
                     {
-                        Relations.Add(new clsPointRelation(enRelationType.PositionZueinander, P2, Thispoint));
+                        Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, P2, Thispoint));
                     }
                 }
             }

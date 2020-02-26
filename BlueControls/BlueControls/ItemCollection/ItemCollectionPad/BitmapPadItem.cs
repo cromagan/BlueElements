@@ -59,17 +59,17 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-        public BitmapPadItem() : this(string.Empty, null, Size.Empty) { }
+        public BitmapPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, Size.Empty) { }
 
-        public BitmapPadItem(string internalname, string FileToLoad) : this(internalname, (Bitmap)modAllgemein.Image_FromFile(FileToLoad), Size.Empty) { }
+        public BitmapPadItem(ItemCollectionPad parent, string internalname, string FileToLoad) : this(parent, internalname, (Bitmap)modAllgemein.Image_FromFile(FileToLoad), Size.Empty) { }
 
-        public BitmapPadItem(string internalname, Bitmap bmp) : this(internalname, bmp, Size.Empty) { }
+        public BitmapPadItem(ItemCollectionPad parent, string internalname, Bitmap bmp) : this(parent, internalname, bmp, Size.Empty) { }
 
-        public BitmapPadItem(Bitmap bmp, Size size) : this(string.Empty, bmp, size) { }
+        public BitmapPadItem(ItemCollectionPad parent, Bitmap bmp, Size size) : this(parent, string.Empty, bmp, size) { }
 
-        public BitmapPadItem(Bitmap bmp) : this(string.Empty, bmp, Size.Empty) { }
+        public BitmapPadItem(ItemCollectionPad parent, Bitmap bmp) : this(parent, string.Empty, bmp, Size.Empty) { }
 
-        public BitmapPadItem(string internalname, Bitmap bmp, Size size) : base(internalname)
+        public BitmapPadItem(ItemCollectionPad parent, string internalname, Bitmap bmp, Size size) : base(parent, internalname)
         {
 
 

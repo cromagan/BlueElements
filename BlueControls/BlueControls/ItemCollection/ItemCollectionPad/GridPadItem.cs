@@ -66,11 +66,11 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-        public GridPadItem(string internalname) : this(internalname, PadStyles.Style_Standard, new Point(0, 0)) { }
+        public GridPadItem(ItemCollectionPad parent, string internalname) : this(parent, internalname, PadStyles.Style_Standard, new Point(0, 0)) { }
 
-        public GridPadItem(PadStyles style, Point nullpunkt) : this(string.Empty, style, nullpunkt) { }
+        public GridPadItem(ItemCollectionPad parent, PadStyles style, Point nullpunkt) : this(parent, string.Empty, style, nullpunkt) { }
 
-        public GridPadItem(string internalname, PadStyles style, Point nullpunkt) : base(internalname)
+        public GridPadItem(ItemCollectionPad parent, string internalname, PadStyles style, Point nullpunkt) : base(parent, internalname)
         {
             NP = new PointDF(this, "Nullpunkt", 0, 0, true, false, true);
             NP.SetTo(nullpunkt);

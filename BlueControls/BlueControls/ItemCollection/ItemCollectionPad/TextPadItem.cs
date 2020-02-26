@@ -62,13 +62,13 @@ namespace BlueControls.ItemCollection
 
 
         #region  Construktor + Initialize 
-        public TextPadItem() : this(string.Empty, string.Empty) { }
+        public TextPadItem(ItemCollectionPad parent) : this(parent, string.Empty, string.Empty) { }
 
 
 
 
 
-        public TextPadItem(string internalname, string vReadableText) : base(internalname)
+        public TextPadItem(ItemCollectionPad parent, string internalname, string vReadableText) : base(parent, internalname)
         {
             _ReadableText = vReadableText;
             _VariableText = _ReadableText;

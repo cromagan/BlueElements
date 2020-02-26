@@ -52,7 +52,7 @@ namespace BlueControls.Forms
 
         private void InitWindow(bool FitWindowToBest, string WindowCaption, int OpenOnScreen, string DesignName)
         {
- 
+
             if (FitWindowToBest)
             {
                 if (System.Windows.Forms.Screen.AllScreens.Length == 1 || OpenOnScreen < 0)
@@ -95,7 +95,7 @@ namespace BlueControls.Forms
                 PadDesign.Text = DesignName;
             }
 
-            Pad.SheetStyle = PadDesign.Text;
+            Pad.Item.SheetStyle = Skin.StyleDB.Row[PadDesign.Text];
 
             SchriftGröße.Item.Add(new TextListItem("050", "50%"));
             SchriftGröße.Item.Add(new TextListItem("060", "60%"));
@@ -137,27 +137,27 @@ namespace BlueControls.Forms
 
         private void btnAddLine_Click(object sender, System.EventArgs e)
         {
-            var b = new LinePadItem(PadStyles.Style_Standard, new Point(300, 300), new Point(400, 300));
+            var b = new LinePadItem(Pad.Item, PadStyles.Style_Standard, new Point(300, 300), new Point(400, 300));
             Pad.Item.Add(b);
         }
 
         private void btnAddDistance_Click(object sender, System.EventArgs e)
         {
-            var b = new SpacerPadItem();
+            var b = new SpacerPadItem(Pad.Item);
             Pad.Item.Add(b);
             b.SetCoordinates(new RectangleDF(10, 10, 20, 20));
         }
 
         private void btnAddImage_Click(object sender, System.EventArgs e)
         {
-            var b = new BitmapPadItem(QuickImage.Get(enImageCode.Fragezeichen).BMP, new Size(1000, 1000));
+            var b = new BitmapPadItem(Pad.Item, QuickImage.Get(enImageCode.Fragezeichen).BMP, new Size(1000, 1000));
             Pad.Item.Add(b);
         }
 
 
         private void AddText_Click(object sender, System.EventArgs e)
         {
-            var b = new TextPadItem();
+            var b = new TextPadItem(Pad.Item);
             b.Text = "";
             b.Style = PadStyles.Style_Standard;
             Pad.Item.Add(b);
@@ -167,7 +167,7 @@ namespace BlueControls.Forms
 
         private void btnAddDimension_Click(object sender, System.EventArgs e)
         {
-            var b = new DimensionPadItem(new PointF(300, 300), new PointF(400, 300), 30);
+            var b = new DimensionPadItem(Pad.Item, new PointF(300, 300), new PointF(400, 300), 30);
             Pad.Item.Add(b);
         }
 
@@ -190,17 +190,6 @@ namespace BlueControls.Forms
             Pad.ShowPrinterPageSetup();
         }
 
-        private void Pad_Parsed(object sender, System.EventArgs e)
-        {
-
-
-            PadDesign.Text = Pad.SheetStyle;
-
-            SchriftGröße.Text = ((int)(Pad.SheetStyleScale * 100)).ToString(Constants.Format_Integer3);
-
-
-            //     Nur70.Checked = CBool(Pad.SheetStyleScale = 0.7F)
-        }
 
         private void Drucken_Click(object sender, System.EventArgs e)
         {
@@ -214,7 +203,7 @@ namespace BlueControls.Forms
 
         private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e)
         {
-            Pad.SheetStyle = e.Item.Internal;
+            Pad.Item.SheetStyle = Skin.StyleDB.Row[e.Item.Internal];
         }
 
 
@@ -271,7 +260,7 @@ namespace BlueControls.Forms
 
         private void SchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e)
         {
-            Pad.SheetStyleScale = decimal.Parse(SchriftGröße.Text) / 100m;
+            Pad.Item.SheetStyleScale = decimal.Parse(SchriftGröße.Text) / 100m;
         }
 
         private void ArbeitsbreichSetup_Click(object sender, System.EventArgs e)
@@ -281,16 +270,31 @@ namespace BlueControls.Forms
 
         private void btnAddUnterStufe_Click(object sender, System.EventArgs e)
         {
-            var b = new ChildPadItem();
+            var b = new ChildPadItem(Pad.Item);
             b.SetCoordinates(new RectangleDF(100, 100, 300, 300));
             Pad.Item.Add(b);
         }
 
         private void btnAddSymbol_Click(object sender, System.EventArgs e)
         {
-            var b = new SymbolPadItem();
+            var b = new SymbolPadItem(Pad.Item);
             b.SetCoordinates(new RectangleDF(100, 100, 300, 300));
             Pad.Item.Add(b);
         }
+
+        public virtual void ItemChanged()
+        {
+
+            Pad.ZoomFit();
+            Ribbon.SelectedIndex = 1;
+            PadDesign.Text = Pad.Item.SheetStyle.CellFirstString();
+
+            SchriftGröße.Text = ((int)(Pad.Item.SheetStyleScale * 100)).ToString(Constants.Format_Integer3);
+
+
+
+
+        }
+
     }
 }

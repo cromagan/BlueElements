@@ -22,13 +22,11 @@ namespace BlueDatabase.EventArgs
 {
     public class GenerateLayoutInternalEventargs : System.EventArgs
     {
-        public GenerateLayoutInternalEventargs(RowItem row, string layoutID, bool directPrint, bool directSave, string optionalFilename)
+        public GenerateLayoutInternalEventargs(RowItem row, string layoutID, string SaveTo)
         {
             Row = row;
             LayoutID = layoutID;
-            DirectPrint = directPrint;
-            DirectSave = directSave;
-            OptionalFilename = optionalFilename;
+            Filename = SaveTo;
             Handled = false;
         }
 
@@ -36,8 +34,8 @@ namespace BlueDatabase.EventArgs
         public bool Handled { get; set; }
         public RowItem Row { get; set; }
         public string LayoutID { get; set; }
-        public bool DirectPrint { get; set; }
-        public bool DirectSave { get; set; }
-        public string OptionalFilename { get; set; }
+        //public bool DirectPrint { get; set; }
+        //public bool DirectSave { get; set; }
+        public string Filename { get; set; }
     }
 }

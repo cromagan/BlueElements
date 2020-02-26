@@ -169,7 +169,8 @@ namespace BlueControls.Forms
             {
 
                 TmpPad.ShowInPrintMode = true;
-                TmpPad.GenerateFromRow(FrmDrucken_Layout1.Text, Liste[0], false);
+                TmpPad.Item = new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[0]);
+
                 TmpPad.ZoomFit();
             }
 
@@ -430,19 +431,19 @@ namespace BlueControls.Forms
 
 
 
-            var tmp = new CreativePad();
+            var tmp = new CreativePad(new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[0]));
 
-            tmp.GenerateFromRow(FrmDrucken_Layout1.Text, Liste[0], false);
 
-            var OneItem = tmp.MaxBounds(null);
 
-            PrintPad.SheetStyle = tmp.SheetStyle;
-            PrintPad.SheetStyleScale = tmp.SheetStyleScale;
+            var OneItem = tmp.Item.MaxBounds(null);
+
+            PrintPad.Item.SheetStyle = tmp.Item.SheetStyle;
+            PrintPad.Item.SheetStyleScale = tmp.Item.SheetStyleScale;
 
             tmp.Dispose();
 
 
-            var DruckB = PrintPad.DruckbereichRect();
+            var DruckB = PrintPad.Item.DruckbereichRect();
 
 
             var tempVar = Math.Max(1,(int)Math.Floor(DruckB.Width / (double)OneItem.Width + 0.01));
@@ -453,8 +454,8 @@ namespace BlueControls.Forms
                 {
 
 
-                    var It = new ChildPadItem();
-                    It.PadInternal.GenerateFromRow(FrmDrucken_Layout1.Text, Liste[StartNr], false);
+                    var It = new ChildPadItem(PrintPad.Item);
+                    It.PadInternal = new CreativePad(new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[StartNr]));
 
                     //Dim it As New RowFormulaPadItem(Liste(StartNr), Integer.Parse(FrmDrucken_Layout1.Text))
                     PrintPad.Item.Add(It);

@@ -113,7 +113,7 @@ namespace BlueControls.ItemCollection
                 GetDesigns();
 
                 DesignOrStyleChanged();
-                OnNeedRefresh();
+                OnDoInvalidate();
             }
         }
 
@@ -259,7 +259,7 @@ namespace BlueControls.ItemCollection
             ValidateCheckStates(This);
 
             OnItemCheckedChanged();
-            OnNeedRefresh();
+            OnDoInvalidate();
         }
 
 
@@ -273,6 +273,13 @@ namespace BlueControls.ItemCollection
         {
             _CellposCorrect = Size.Empty;
             base.OnListOrItemChanged();
+        }
+
+
+        protected override void OnItemAdded(BasicListItem item)
+        {
+            item.SetParent(this);
+            base.OnItemAdded(item);
         }
 
         public List<BasicListItem> Checked()
@@ -412,7 +419,7 @@ namespace BlueControls.ItemCollection
 
                         if (ControlDrawingArea.Width < 5)
                         {
-                            colWidth =  data.Item1;
+                            colWidth = data.Item1;
                         }
                         else
                         {
@@ -577,7 +584,7 @@ namespace BlueControls.ItemCollection
                 if (colc * dithemh < 150) { ok = false; }
                 if (TestSP * BiggestItemWidth > 600) { ok = false; }
 
-                if (((float)colc * (float)dithemh) / ((float)TestSP * (float)BiggestItemWidth ) < 0.5) { ok = false; }
+                if (((float)colc * (float)dithemh) / ((float)TestSP * (float)BiggestItemWidth) < 0.5) { ok = false; }
 
 
                 if (ok)
@@ -800,11 +807,8 @@ namespace BlueControls.ItemCollection
 
             for (var z = 0; z < vLayoutDatabase.Layouts.Count; z++)
             {
-                using (var p = new CreativePad())
-                {
-                    p.ParseData(vLayoutDatabase.Layouts[z], false, string.Empty);
-                    Add(new TextListItem(p.ID, p.Caption, enImageCode.Stern));
-                }
+                var p = new ItemCollectionPad(vLayoutDatabase.Layouts[z], string.Empty);
+                Add(new TextListItem(p.ID, p.Caption, enImageCode.Stern));
             }
 
             if (!vDoDiscLayouts) { return; }
@@ -1072,7 +1076,7 @@ namespace BlueControls.ItemCollection
 
             _Validating = false;
 
-            if (SomethingDonex) { OnNeedRefresh(); }
+            if (SomethingDonex) { OnDoInvalidate(); }
         }
 
         public object Clone()

@@ -160,11 +160,9 @@ namespace BlueControls.ItemCollection
             }
 
 
-            var _pad = new CreativePad();
+            var _pad = new CreativePad(new ItemCollectionPad(_LayoutID, _Row));
 
-            _pad.GenerateFromRow(_LayoutID, _Row, false);
-
-            var mb = _pad.MaxBounds(null);
+            var mb = _pad.Item.MaxBounds(null);
 
             if (_tmpBMP != null)
             {

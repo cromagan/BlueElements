@@ -43,7 +43,7 @@ namespace BlueControls.ItemCollection
 
         private Bitmap _tmpBMP;
 
-        [AccessedThroughProperty(nameof(PadInternal))]
+
         private CreativePad _PadInternal;
         public CreativePad PadInternal
         {
@@ -51,19 +51,18 @@ namespace BlueControls.ItemCollection
             {
                 return _PadInternal;
             }
-            [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
                 if (_PadInternal != null)
                 {
-                    _PadInternal.DoInvalidate -= _Pad_DoInvalidate;
+                    _PadInternal.Item.DoInvalidate -= _Pad_DoInvalidate;
                 }
 
                 _PadInternal = value;
 
                 if (value != null)
                 {
-                    _PadInternal.DoInvalidate += _Pad_DoInvalidate;
+                    _PadInternal.Item.DoInvalidate += _Pad_DoInvalidate;
                 }
             }
         }
@@ -118,9 +117,9 @@ namespace BlueControls.ItemCollection
         #region  Construktor  
 
 
-        public ChildPadItem() : this(string.Empty) { }
+        public ChildPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
 
-        public ChildPadItem(string internalname) : base(internalname)
+        public ChildPadItem(ItemCollectionPad parent,  string internalname) : base(parent, internalname)
         {
             PadInternal = null; // new CreativePad();
             _tmpBMP = null;
@@ -150,8 +149,8 @@ namespace BlueControls.ItemCollection
             }
 
 
-            PadInternal.SheetStyle = ((ItemCollectionPad)Parent).SheetStyle.CellFirstString();
-            PadInternal.SheetStyleScale = ((ItemCollectionPad)Parent).SheetStyleScale;
+            PadInternal.Item.SheetStyle = Parent.SheetStyle;
+            PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
         }
 
 
@@ -178,8 +177,8 @@ namespace BlueControls.ItemCollection
                 if (PadInternal != null)
                 {
 
-                    PadInternal.SheetStyle = ((ItemCollectionPad)Parent).SheetStyle.CellFirstString();
-                    PadInternal.SheetStyleScale = ((ItemCollectionPad)Parent).SheetStyleScale;
+                    PadInternal.Item.SheetStyle = Parent.SheetStyle;
+                    PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
 
 
                     if (_tmpBMP != null)
@@ -193,14 +192,14 @@ namespace BlueControls.ItemCollection
                     }
 
 
-                    if(DCoordinates.Width <1 || DCoordinates.Height <1 || DCoordinates.Width > 20000 ||  DCoordinates.Height > 20000) { return; }
+                    if (DCoordinates.Width < 1 || DCoordinates.Height < 1 || DCoordinates.Width > 20000 || DCoordinates.Height > 20000) { return; }
 
                     if (_tmpBMP == null)
                     {
                         _tmpBMP = new Bitmap((int)Math.Abs(DCoordinates.Width), (int)Math.Abs(DCoordinates.Height));
                     }
 
-                    var mb = PadInternal.MaxBounds(ZoomItems);
+                    var mb = PadInternal.Item.MaxBounds(ZoomItems);
 
                     var zoomv = PadInternal.ZoomFitValue(mb, false, _tmpBMP.Size);
                     var centerpos = PadInternal.CenterPos(mb, false, _tmpBMP.Size, zoomv);
@@ -235,7 +234,7 @@ namespace BlueControls.ItemCollection
                             if (Pad != null)
                             {
 
-                                var mb2 = Pad.PadInternal.MaxBounds(Pad.ZoomItems);
+                                var mb2 = Pad.PadInternal.Item.MaxBounds(Pad.ZoomItems);
                                 mb2.Inflate(-1, -1);
                                 var tmpG = Graphics.FromImage(_tmpBMP);
                                 var p = new Pen(Pad.Farbe, (float)(8.7m * cZoom));
@@ -311,8 +310,7 @@ namespace BlueControls.ItemCollection
                     _Name = value.FromNonCritical();
                     return true;
                 case "data":
-                    PadInternal = new CreativePad();
-                    PadInternal.ParseData(value, false, string.Empty);
+                    PadInternal = new CreativePad(new ItemCollectionPad(value, string.Empty));
                     return true;
                 case "checked":
                     return true;
@@ -350,7 +348,7 @@ namespace BlueControls.ItemCollection
 
             if (PadInternal != null)
             {
-                t = t + "Data=" + PadInternal.DataToString() + ", ";
+                t = t + "Data=" + PadInternal.Item.ToString() + ", ";
             }
 
             return t.Trim(", ") + "}";
@@ -369,10 +367,10 @@ namespace BlueControls.ItemCollection
 
         public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY)
         {
-            if (PadInternal  == null || PadInternal.Item.Count == 0) { return false; }
+            if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
 
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
-            var l2 = PadInternal.MaxBounds(ZoomItems);
+            var l2 = PadInternal.Item.MaxBounds(ZoomItems);
 
 
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
@@ -411,7 +409,7 @@ namespace BlueControls.ItemCollection
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
 
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
-            var l2 = PadInternal.MaxBounds(ZoomItems);
+            var l2 = PadInternal.Item.MaxBounds(ZoomItems);
 
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
 
@@ -453,7 +451,7 @@ namespace BlueControls.ItemCollection
             if (PadInternal.Item.Count == 0) { return false; }
 
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
-            var l2 = PadInternal.MaxBounds(ZoomItems);
+            var l2 = PadInternal.Item.MaxBounds(ZoomItems);
 
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
 
@@ -489,7 +487,7 @@ namespace BlueControls.ItemCollection
         public bool ParseVariable(string VariableName, enValueType ValueType, string Value)
         {
             if (PadInternal == null) { return false; }
-            return PadInternal.ParseVariable(VariableName, ValueType, Value);
+            return PadInternal.Item.ParseVariable(VariableName, ValueType, Value);
         }
 
 
@@ -497,7 +495,7 @@ namespace BlueControls.ItemCollection
         public bool ParseSpecialCodes()
         {
             if (PadInternal == null) { return false; }
-            return PadInternal.ParseSpecialCodes();
+            return PadInternal.Item.ParseSpecialCodes();
         }
 
 
@@ -513,7 +511,7 @@ namespace BlueControls.ItemCollection
         public bool ResetVariables()
         {
             if (PadInternal == null) { return false; }
-            return PadInternal.ResetVariables();
+            return PadInternal.Item.ResetVariables();
         }
 
 
@@ -521,7 +519,7 @@ namespace BlueControls.ItemCollection
         public bool RenameColumn(string oldName, ColumnItem cColumnItem)
         {
             if (PadInternal == null) { return false; }
-            return PadInternal.RenameColumn(oldName, cColumnItem);
+            return PadInternal.Item.RenameColumn(oldName, cColumnItem);
         }
 
 
