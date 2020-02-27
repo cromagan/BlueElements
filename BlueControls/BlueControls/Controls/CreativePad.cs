@@ -148,7 +148,7 @@ namespace BlueControls.Controls
             }
         }
 
-        [DefaultValue(1.0)]
+        [DefaultValue(10.0)]
         public float GridSnap
         {
             get
@@ -248,7 +248,8 @@ namespace BlueControls.Controls
 
 
             Sel_P = new ListExt<PointDF>();
-            Sel_P.ListOrItemChanged += Sel_P_ListOrItemChanged;
+            Sel_P.ItemAdded += Sel_P_ItemAdded;
+            Sel_P.ItemRemoved += Sel_P_ItemRemoved;
 
             Move_X.Clear();
             Move_Y.Clear();
@@ -261,7 +262,12 @@ namespace BlueControls.Controls
         public CreativePad() : this(new ItemCollectionPad()) { }
 
 
-        private void Sel_P_ListOrItemChanged(object sender, System.EventArgs e)
+        private void Sel_P_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e)
+        {
+            _Item.InvalidateOrder();
+        }
+
+        private void Sel_P_ItemRemoved(object sender, System.EventArgs e)
         {
             _Item.InvalidateOrder();
         }

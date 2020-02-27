@@ -56,6 +56,7 @@ namespace BluePaint
             this.btnZeichnen = new BlueControls.Controls.Button();
             this.btnRadiergummi = new BlueControls.Controls.Button();
             this.grpSteuerung = new BlueControls.Controls.GroupBox();
+            this.btn100 = new BlueControls.Controls.Button();
             this.btnZoomFit = new BlueControls.Controls.Button();
             this.btnRückgänig = new BlueControls.Controls.Button();
             this.tabExperimentell = new BlueControls.Controls.TabPage();
@@ -67,7 +68,6 @@ namespace BluePaint
             this.InfoText = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.btn100 = new BlueControls.Controls.Button();
             this.tabRibbonbar.SuspendLayout();
             this.Tab_Start.SuspendLayout();
             this.grpBearbteitung.SuspendLayout();
@@ -226,7 +226,7 @@ namespace BluePaint
             // btnOK
             // 
             this.btnOK.ImageCode = "Häkchen";
-            this.btnOK.Location = new System.Drawing.Point(720, 0);
+            this.btnOK.Location = new System.Drawing.Point(760, 0);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(56, 72);
             this.btnOK.TabIndex = 1;
@@ -371,6 +371,16 @@ namespace BluePaint
             this.grpSteuerung.Size = new System.Drawing.Size(192, 81);
             this.grpSteuerung.Text = "Steuerung";
             // 
+            // btn100
+            // 
+            this.btn100.ImageCode = "Pinnadel";
+            this.btn100.Location = new System.Drawing.Point(136, 2);
+            this.btn100.Name = "btn100";
+            this.btn100.Size = new System.Drawing.Size(48, 66);
+            this.btn100.TabIndex = 9;
+            this.btn100.Text = "100%";
+            this.btn100.Click += new System.EventHandler(this.btn100_Click);
+            // 
             // btnZoomFit
             // 
             this.btnZoomFit.ImageCode = "ZoomFit";
@@ -485,16 +495,6 @@ namespace BluePaint
             // 
             this.SaveTab.Filter = "PNG-Dateien|*.PNG|BMP-Dateien|*.BMP|JPG-Dateien|*.JPG";
             this.SaveTab.Title = "Bitte neuen Dateinamen wählen.";
-            // 
-            // btn100
-            // 
-            this.btn100.ImageCode = "Pinnadel";
-            this.btn100.Location = new System.Drawing.Point(136, 2);
-            this.btn100.Name = "btn100";
-            this.btn100.Size = new System.Drawing.Size(48, 66);
-            this.btn100.TabIndex = 9;
-            this.btn100.Text = "100%";
-            this.btn100.Click += new System.EventHandler(this.btn100_Click);
             // 
             // MainWindow
             // 

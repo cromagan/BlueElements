@@ -156,10 +156,12 @@ namespace BlueControls.ItemCollection
             if (Skin.StyleDB != null) { _SheetStyle = Skin.StyleDB.Row.First(); }
 
             AllRelations = new ListExt<clsPointRelation>();
-            AllRelations.ListOrItemChanged += AllRelations_ListOrItemChanged;
+            AllRelations.ItemAdded += PointOrRelation_ItemAdded;
+            AllRelations.ItemRemoved += PointOrRelation_ItemRemoved; 
 
             AllPoints = new ListExt<PointDF>();
-            AllPoints.ListOrItemChanged += AllPoints_ListOrItemChanged;
+            AllPoints.ItemAdded += PointOrRelation_ItemAdded;
+            AllPoints.ItemRemoved += PointOrRelation_ItemRemoved;
 
         }
 
@@ -898,7 +900,7 @@ namespace BlueControls.ItemCollection
                 t = t + "PrintArea=" + RandinMM + ", ";
             }
 
-            t = t + "DPI=" + DPI + ", ";
+            //t = t + "DPI=" + DPI + ", "; // TODO: Nach Update wieder aktivieren
 
             t = t + "Items={";
 
@@ -1204,7 +1206,7 @@ namespace BlueControls.ItemCollection
 
         public bool RepairAll(int Level, bool AllowBigChanges)
         {
-            InvalidateOrder();
+            //InvalidateOrder();
 
             if (Level == 0)
             {
@@ -1231,7 +1233,7 @@ namespace BlueControls.ItemCollection
             var L = new List<string>();
             var Methode = 0;
 
-            InvalidateOrder();
+            //InvalidateOrder();
             ComputeOrders(null);
 
             do
@@ -1442,12 +1444,12 @@ namespace BlueControls.ItemCollection
             _OrdersValid = false;
         }
 
-        private void AllPoints_ListOrItemChanged(object sender, System.EventArgs e)
+        private void PointOrRelation_ItemRemoved(object sender, System.EventArgs e)
         {
             InvalidateOrder();
         }
 
-        private void AllRelations_ListOrItemChanged(object sender, System.EventArgs e)
+        private void PointOrRelation_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e)
         {
             InvalidateOrder();
         }

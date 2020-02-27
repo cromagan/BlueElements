@@ -110,7 +110,11 @@ namespace BlueControls.ItemCollection
 
         public override RectangleDF UsedArea()
         {
-            return new RectangleDF(NP.X - 1, NP.Y - 1, 2, 2);
+            
+
+            var r = new RectangleDF(Parent.DruckbereichRect()); // muss der gesamte druckbereich sein, ansonsten wirds ja nicht angezeigt, wenn der NP ausserhalb dem Bild ist
+            r.ExpandTo(NP);
+            return r;
         }
 
 
@@ -124,7 +128,7 @@ namespace BlueControls.ItemCollection
             var p = new Pen(Color.FromArgb(30, c.R, c.G, c.B), 1);
             float ex = 0;
 
-            var po = DCoordinates.PointOf(enAlignment.HorizontalCenter);
+            var po = NP.ZoomAndMove(cZoom, MoveX, MoveY);
 
 
             var mo = (float)(modConverter.mmToPixel(GridShow, ItemCollectionPad.DPI) * cZoom);
