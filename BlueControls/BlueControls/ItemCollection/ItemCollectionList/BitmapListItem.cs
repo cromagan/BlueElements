@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using static BlueBasics.FileOperations;
 
@@ -92,7 +91,7 @@ namespace BlueControls.ItemCollection
             _padding = 0;
 
             _overlays.Clear();
-            _overlays.ListOrItemChanged += _overlays_ListOrItemChanged;
+            //_overlays.ListOrItemChanged += _overlays_ListOrItemChanged;
         }
 
 
@@ -100,12 +99,6 @@ namespace BlueControls.ItemCollection
 
 
         public BitmapListItem(string internalname, string caption, QuickImage QI) : this(internalname, caption, string.Empty, QI.BMP, string.Empty) { }
-
-
-        private void _overlays_ListOrItemChanged(object sender, System.EventArgs e)
-        {
-            OnChanged();
-        }
 
 
         #endregion
@@ -125,7 +118,7 @@ namespace BlueControls.ItemCollection
             {
                 _ImageFilename = string.Empty;
                 _Bitmap = value;
-                OnChanged();
+                //OnChanged();
             }
         }
 
@@ -141,7 +134,7 @@ namespace BlueControls.ItemCollection
                 if (_caption == value) { return; }
                 _caption = value;
                 _captiontmp.Clear();
-                OnChanged();
+                //OnChanged();
             }
         }
 
@@ -158,7 +151,7 @@ namespace BlueControls.ItemCollection
                 if (_captionlines == value) { return; }
                 _captionlines = value;
                 _captiontmp.Clear();
-                OnChanged();
+                //OnChanged();
             }
         }
 
@@ -173,7 +166,7 @@ namespace BlueControls.ItemCollection
             {
                 if (_padding == value) { return; }
                 _padding = value;
-                OnChanged();
+                //OnChanged();
             }
         }
 
@@ -190,11 +183,6 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-
-        public override void DesignOrStyleChanged()
-        {
-            // Keine Variablen zum Reseten, ein Invalidate reicht
-        }
 
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate)

@@ -22,22 +22,26 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.ItemCollection.Basics;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection
 {
-    public abstract class BasicPadItem : BasicItem, IParseable, System.ICloneable
+    public abstract class BasicPadItem : IParseable, System.ICloneable, IChangedFeedback
     {
 
+        private static string UniqueInternal_LastTime = "InitialDummy";
+        private static int UniqueInternal_Count;
+        public readonly ItemCollectionPad Parent = null;
 
 
         #region  Event-Deklarationen + Delegaten 
         public event System.EventHandler PointOrRelationsChanged;
+        public event EventHandler Changed;
         #endregion
 
-
+        public string Internal { get; private set; }
 
         public static BasicPadItem NewByParsing(ItemCollectionPad parent, string code)
         {
@@ -148,7 +152,25 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected BasicPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) { }
+        public abstract void DesignOrStyleChanged();
+
+        protected BasicPadItem(ItemCollectionPad parent, string internalname)
+        {
+            Parent = parent;
+
+
+            if (string.IsNullOrEmpty(internalname))
+            {
+                Internal = UniqueInternal();
+            }
+            else
+            {
+                Internal = internalname;
+            }
+
+            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
+
+        }
 
         /// <summary>
         ///  Falls das Element über Kordinaten gesetzt werden kann, ist diese mit dieser Routine möglich.
@@ -157,7 +179,24 @@ namespace BlueControls.ItemCollection
         /// <remarks></remarks>
         public abstract void SetCoordinates(RectangleDF r);
 
+        public static string UniqueInternal()
+        {
 
+            var NeueZeit = DateTime.Now + " " + DateTime.Now.Millisecond;
+
+            if (NeueZeit == UniqueInternal_LastTime)
+            {
+                UniqueInternal_Count += 1;
+            }
+            else
+            {
+                UniqueInternal_Count = 0;
+                UniqueInternal_LastTime = NeueZeit;
+            }
+
+
+            return "Auto " + NeueZeit + " IDX" + UniqueInternal_Count;
+        }
 
 
         /// <summary>
@@ -226,13 +265,7 @@ namespace BlueControls.ItemCollection
         public List<string> RemoveToo = new List<string>();
 
 
-        public ItemCollectionPad Parent
-        {
-            get
-            {
-                return (ItemCollectionPad)_parent;
-            }
-        }
+
 
         public bool PrintMe
         {
@@ -551,6 +584,13 @@ namespace BlueControls.ItemCollection
         {
             var t = ToString();
             return NewByParsing(Parent, t);
+        }
+
+
+        public void OnChanged()
+        {
+            if (this is IParseable O && O.IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
+            Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
         protected void OnPointOrRelationsChanged()

@@ -175,7 +175,7 @@ namespace BlueControls.Classes_Editor
             foreach (var thisItem in e.Items)
             {
 
-                if (thisItem is ItemCollection.Basics.BasicItem ThisItemBasic)
+                if (thisItem is BasicListItem ThisItemBasic)
                 {
                     string fil = null;
                     if (ThisItemBasic.Internal.Contains("|"))

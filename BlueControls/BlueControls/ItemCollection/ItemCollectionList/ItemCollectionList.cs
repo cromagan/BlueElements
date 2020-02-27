@@ -32,7 +32,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection
 {
-    public class ItemCollectionList : BasicItemCollection<BasicListItem>, ICloneable
+    public class ItemCollectionList : ListExt<BasicListItem>, ICloneable
     {
 
 
@@ -112,7 +112,7 @@ namespace BlueControls.ItemCollection
 
                 GetDesigns();
 
-                DesignOrStyleChanged();
+                //DesignOrStyleChanged();
                 OnDoInvalidate();
             }
         }
@@ -142,6 +142,7 @@ namespace BlueControls.ItemCollection
 
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler ItemCheckedChanged;
+        public event EventHandler DoInvalidate;
         #endregion
 
         private void GetDesigns()
@@ -269,17 +270,29 @@ namespace BlueControls.ItemCollection
             ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
+        public void OnDoInvalidate()
+        {
+            DoInvalidate?.Invoke(this, System.EventArgs.Empty);
+        }
+
         protected override void OnListOrItemChanged()
         {
             _CellposCorrect = Size.Empty;
             base.OnListOrItemChanged();
+            OnDoInvalidate();
         }
 
 
         protected override void OnItemAdded(BasicListItem item)
         {
+            if (string.IsNullOrEmpty(item.Internal))
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
+            }
+
             item.SetParent(this);
             base.OnItemAdded(item);
+            OnDoInvalidate();
         }
 
         public List<BasicListItem> Checked()
@@ -958,14 +971,14 @@ namespace BlueControls.ItemCollection
 
 
 
-        public void DesignOrStyleChanged()
-        {
+        //public void DesignOrStyleChanged()
+        //{
 
-            foreach (var thisItem in this)
-            {
-                thisItem?.DesignOrStyleChanged();
-            }
-        }
+        //    foreach (var thisItem in this)
+        //    {
+        //        thisItem?.DesignOrStyleChanged();
+        //    }
+        //}
 
 
 

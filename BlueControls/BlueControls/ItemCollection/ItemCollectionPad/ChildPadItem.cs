@@ -27,7 +27,6 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Runtime.CompilerServices;
 
 namespace BlueControls.ItemCollection
 {

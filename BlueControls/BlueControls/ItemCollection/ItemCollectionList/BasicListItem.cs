@@ -21,16 +21,17 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
-using BlueControls.ItemCollection.Basics;
 using System;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection
 {
-    public abstract class BasicListItem : BasicItem, ICompareKey, IComparable
+    public abstract class BasicListItem : ICompareKey, IComparable
     {
         public abstract Size SizeUntouchedForListBox();
 
+        public ItemCollectionList Parent { get; private set; }
+        public string Internal { get; private set; }
 
 
         public abstract int HeightForListBox(enBlueListBoxAppearance style, int columnWidth);
@@ -65,8 +66,21 @@ namespace BlueControls.ItemCollection
         protected bool _Enabled = true;
 
 
-        protected BasicListItem(string internalname) : base(null, internalname)
+        protected BasicListItem(string internalname) 
         {
+
+
+            if (string.IsNullOrEmpty(internalname))
+            {
+                Internal = BasicPadItem.UniqueInternal(); // Wiederverwenden ;-)
+            }
+            else
+            {
+                Internal = internalname;
+            }
+
+            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
+
             _Checked = false;
             Pos = new Rectangle(0, 0, 0, 0);
             _UserDefCompareKey = string.Empty;
@@ -136,7 +150,7 @@ namespace BlueControls.ItemCollection
                 if (value == _UserDefCompareKey) { return; }
                 _UserDefCompareKey = value;
 
-                OnChanged();
+                //OnChanged();
             }
         }
 
@@ -152,16 +166,10 @@ namespace BlueControls.ItemCollection
                 if (Parent == null) { Develop.DebugPrint(enFehlerArt.Warnung, "Parent == null!"); }
 
                 Parent?.SetNewCheckState(this, value, ref _Checked);
-                OnChanged();
+                //OnChanged();
             }
         }
 
-        public ItemCollectionList Parent
-        {
-            get
-            { return (ItemCollectionList)_parent; }
-
-        }
 
         public void Draw(Graphics GR, int xModifier, int YModifier, enDesign controldesign, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, string FilterText, bool Translate)
         {
@@ -211,9 +219,9 @@ namespace BlueControls.ItemCollection
             return null;
         }
 
-        internal void SetParent(object list)
+        internal void SetParent(ItemCollectionList list)
         {
-            _parent = list;
+            Parent = list;
         }
 
         public BasicListItem CloneToNewCollection(ItemCollectionList newParent, BasicListItem newItem)

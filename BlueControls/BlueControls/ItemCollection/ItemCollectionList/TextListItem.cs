@@ -134,7 +134,7 @@ namespace BlueControls.ItemCollection
             {
                 if (value == _ReadableText) { return; }
                 _ReadableText = value;
-                OnChanged();
+                //OnChanged();
             }
         }
 
@@ -149,7 +149,7 @@ namespace BlueControls.ItemCollection
             {
                 if (value == _Symbol) { return; }
                 _Symbol = value;
-                OnChanged();
+                //OnChanged();
             }
         }
 
@@ -213,12 +213,6 @@ namespace BlueControls.ItemCollection
         }
 
 
-
-
-        public override void DesignOrStyleChanged()
-        {
-
-        }
 
         public override BasicListItem CloneToNewCollection(ItemCollectionList newParent)
         {

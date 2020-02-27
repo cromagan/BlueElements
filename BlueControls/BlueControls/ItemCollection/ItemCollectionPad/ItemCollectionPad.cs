@@ -32,7 +32,7 @@ using BlueControls.Forms;
 
 namespace BlueControls.ItemCollection
 {
-    public class ItemCollectionPad : BasicItemCollection<BasicPadItem>
+    public class ItemCollectionPad : ListExt<BasicPadItem>
     {
         #region  Variablen-Deklarationen 
 
@@ -391,7 +391,7 @@ namespace BlueControls.ItemCollection
 
         #region  Event-Deklarationen + Delegaten 
 
-
+        public event EventHandler DoInvalidate;
         #endregion
 
 
@@ -542,10 +542,21 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
+        public void OnDoInvalidate()
+        {
+            DoInvalidate?.Invoke(this, System.EventArgs.Empty);
+        }
+
+
 
 
         protected override void OnItemAdded(BasicPadItem item)
         {
+            if (string.IsNullOrEmpty(item.Internal))
+            {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
+            }
+
             base.OnItemAdded(item);
             AllPoints.AddIfNotExists(item.Points);
             AllRelations.AddIfNotExists(item.Relations);
@@ -563,7 +574,7 @@ namespace BlueControls.ItemCollection
                 Develop.DebugPrint(enFehlerArt.Fehler, "Parent ungleich!");
 
             }
-
+            OnDoInvalidate();
 
         }
 

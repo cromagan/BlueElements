@@ -425,7 +425,7 @@ namespace BlueControls.BlueDatabaseDialogs
         {
             foreach (var thisitem in e.Items)
             {
-                if (thisitem is ItemCollection.Basics.BasicItem ThisItemBasic)
+                if (thisitem is BasicListItem ThisItemBasic)
                 {
                     var tempVar = (ExportDefinition)((TextListItem)ThisItemBasic).Tags;
                     tempVar.DeleteAllBackups();

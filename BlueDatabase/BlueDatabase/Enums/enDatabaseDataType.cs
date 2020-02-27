@@ -18,7 +18,6 @@
 #endregion
 namespace BlueDatabase.Enums
 {
-
     public enum enDatabaseDataType : byte
     {
         // Fehler = 0

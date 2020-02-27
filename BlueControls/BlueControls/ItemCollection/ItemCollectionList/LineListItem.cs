@@ -30,10 +30,6 @@ namespace BlueControls.ItemCollection
 
     public class LineListItem : BasicListItem
     {
-        public override void DesignOrStyleChanged()
-        {
-            // Keine Variablen zum Reseten, ein Invalidate reicht
-        }
 
 
         #region  Variablen-Deklarationen 

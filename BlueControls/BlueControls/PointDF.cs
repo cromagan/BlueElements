@@ -658,7 +658,7 @@ namespace BlueControls
             if (obj is PointDF tobj)
             {
                 // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
-                return CompareKey().CompareTo((tobj).CompareKey());
+                return CompareKey().CompareTo(tobj.CompareKey());
             }
             else
             {

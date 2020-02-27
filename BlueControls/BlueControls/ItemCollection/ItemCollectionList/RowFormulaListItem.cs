@@ -82,7 +82,7 @@ namespace BlueControls.ItemCollection
                     _tmpBMP.Dispose();
                     _tmpBMP = null;
                 }
-                OnChanged();
+                //OnChanged();
             }
         }
 
@@ -102,7 +102,7 @@ namespace BlueControls.ItemCollection
 
                 removePic();
 
-                OnChanged();
+                //OnChanged();
             }
         }
 
@@ -114,11 +114,6 @@ namespace BlueControls.ItemCollection
                 _tmpBMP.Dispose();
                 _tmpBMP = null;
             }
-        }
-
-        public override void DesignOrStyleChanged()
-        {
-            removePic();
         }
 
 
