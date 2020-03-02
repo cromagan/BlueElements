@@ -699,20 +699,27 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public void Remove(string Internal)
+        public void Remove(string internalname)
         {
-            Remove(this[Internal]);
+            Remove(this[internalname]);
         }
 
-        public new void Remove(BasicPadItem cItem)
+        public new void Remove(BasicPadItem item)
         {
-            if (cItem == null) { return; }
+            if (item == null || !Contains(item)) { return; }
 
-            base.Remove(cItem);
+            base.Remove(item);
 
-            foreach (var ThisToo in cItem.RemoveToo)
+            if (string.IsNullOrEmpty(item.Gruppenzugehörigkeit)) { return; }
+
+
+            foreach (var ThisToo in this)
             {
-                Remove(ThisToo);
+                if (item.Gruppenzugehörigkeit.ToLower()  == ThisToo.Gruppenzugehörigkeit.ToLower())
+                {
+                    Remove(ThisToo);
+                    return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
+                }
             }
         }
 

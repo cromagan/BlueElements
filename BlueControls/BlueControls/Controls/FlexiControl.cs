@@ -231,49 +231,46 @@ namespace BlueControls.Controls
             Value = InitialValue;
         }
 
-        /// <summary>
-        /// Erstellt eine Combobox
-        /// </summary>
-        /// <param name="CaptionText"></param>
-        /// <param name="InitialValue"></param>
-        /// <param name="list"></param>
-        public FlexiControl(string CaptionText, string InitialValue, ItemCollectionList list)
-        {
+        ///// <summary>
+        ///// Erstellt eine Combobox
+        ///// </summary>
+        ///// <param name="CaptionText"></param>
+        ///// <param name="InitialValue"></param>
+        ///// <param name="list"></param>
+        //public FlexiControl(string CaptionText, string InitialValue, ItemCollectionList list)
+        //{
 
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
+        //    // Dieser Aufruf ist für den Designer erforderlich.
+        //    InitializeComponent();
 
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
-            _Caption = CaptionText + ":";
-            ValueId = CaptionText;
-            _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-            //_Values = list;
-            //_Value = cValue;
+        //    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        //    _EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
+        //    _Caption = CaptionText + ":";
+        //    ValueId = CaptionText;
+        //    _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
 
 
-
-            list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
-            var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
-
-
-            var data = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-            var Wi = data.Item1;
-            var He = data.Item2;
+        //    list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
+        //    var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
 
 
-            var x = Math.Max((int)(data.Item1 + 20 + s.Width), 200);
-            var y = Math.Max((int)(data.Item2 + Skin.PaddingSmal * 2), 24);
+        //    var data = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+        //    var Wi = data.Item1;
+        //    var He = data.Item2;
 
-            Size = new Size(x, y);
+
+        //    var x = Math.Max((int)(data.Item1 + 20 + s.Width), 200);
+        //    var y = Math.Max((int)(data.Item2 + Skin.PaddingSmal * 2), 24);
+
+        //    Size = new Size(x, y);
 
 
-            var c = CreateSubControls();
+        //    var c = CreateSubControls();
 
-            StyleComboBox((ComboBox)c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
+        //    StyleComboBox((ComboBox)c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
 
-            Value = InitialValue;
-        }
+        //    Value = InitialValue;
+        //}
 
 
 

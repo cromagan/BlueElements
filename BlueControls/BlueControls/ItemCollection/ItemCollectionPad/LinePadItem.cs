@@ -78,10 +78,10 @@ namespace BlueControls.ItemCollection
             Points.Add(Point2);
 
 
-            Style = format;
+            Stil = format;
 
             _TempPoints = new List<PointDF>();
-            Style = PadStyles.Style_Standard;
+            Stil = PadStyles.Style_Standard;
             Art = enConectorStyle.Direct;
         }
 
@@ -170,7 +170,7 @@ namespace BlueControls.ItemCollection
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
-            if (Style == PadStyles.Undefiniert)
+            if (Stil == PadStyles.Undefiniert)
             {
                 return;
             }
@@ -185,7 +185,7 @@ namespace BlueControls.ItemCollection
 
             for (var z = 0; z <= _TempPoints.Count - 2; z++)
             {
-                GR.DrawLine(Skin.GetBlueFont(Style, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(cZoom, MoveX, MoveY), _TempPoints[z + 1].ZoomAndMove(cZoom, MoveX, MoveY));
+                GR.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(cZoom, MoveX, MoveY), _TempPoints[z + 1].ZoomAndMove(cZoom, MoveX, MoveY));
             }
 
         }
@@ -782,9 +782,11 @@ namespace BlueControls.ItemCollection
         {
             CalcTempPoints();
         }
-        public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
+
+        public override List<FlexiControl> GetStyleOptionsx()
         {
             var l = new List<FlexiControl>();
+
 
 
             var Verhalt = new ItemCollectionList();
@@ -794,14 +796,15 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl("Linien-Verhalten", ((int)Art).ToString(), Verhalt));
 
 
+            l.Add(new FlexiControl("Stil", ((int)Stil).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, false)));
 
-            l.Add(new FlexiControl("Stil", ((int)Style).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, false)));
+            l.AddRange(base.GetStyleOptionsx());
             return l;
         }
 
         public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         {
-            Style = (PadStyles)int.Parse(Tags.TagGet("Stil"));
+            Stil = (PadStyles)int.Parse(Tags.TagGet("Stil"));
 
             _TempPoints = null;
             Art = (enConectorStyle)int.Parse(Tags.TagGet("Linien-Verhalten"));

@@ -67,7 +67,7 @@ namespace BlueControls.ItemCollection
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
 
             GR.TranslateTransform(trp.X, trp.Y);
-            GR.RotateTransform(-Rotation);
+            GR.RotateTransform(-Drehwinkel);
 
 
             GraphicsPath p = null;
@@ -114,10 +114,11 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
-        {
 
+        public override List<FlexiControl> GetStyleOptionsx()
+        {
             var l = new List<FlexiControl>();
+
 
             l.Add(new FlexiControl(true));
 
@@ -137,10 +138,10 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl("Hintergrundfarbe", BackColor.ToHTMLCode(), enDataFormat.Text, 1));
 
             //  l.AddRange(base.GetStyleOptions(sender, e));
-
+            l.AddRange(base.GetStyleOptionsx());
             return l;
-
         }
+
         public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         {
             base.DoStyleCommands(sender, Tags, ref CloseMenu);

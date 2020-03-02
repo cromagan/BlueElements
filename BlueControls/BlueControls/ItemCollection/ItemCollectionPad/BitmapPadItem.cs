@@ -42,12 +42,12 @@ namespace BlueControls.ItemCollection
         #region  Variablen-Deklarationen 
 
 
-        public bool WhiteBack;
+        public bool Hintergrund_weiß_füllen;
         public int Padding;
         public List<QuickImage> Overlays;
-        public enSizeModes BildModus;
+        public enSizeModes Bild_Modus;
 
-        private string _PlaceHolderString;
+        private string Platzhalter_für_Layout;
         #endregion
 
 
@@ -77,10 +77,10 @@ namespace BlueControls.ItemCollection
             SetCoordinates(new RectangleDF(0, 0, size.Width, size.Height));
 
             Overlays = new List<QuickImage>();
-            WhiteBack = true;
+            Hintergrund_weiß_füllen = true;
             Padding = 0;
-            BildModus = enSizeModes.EmptySpace;
-            Style = PadStyles.Undefiniert; // Kein Rahmen
+            Bild_Modus = enSizeModes.EmptySpace;
+            Stil = PadStyles.Undefiniert; // Kein Rahmen
         }
 
 
@@ -117,7 +117,7 @@ namespace BlueControls.ItemCollection
                 r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
 
 
-                switch (BildModus)
+                switch (Bild_Modus)
                 {
                     case enSizeModes.Verzerren:
                         {
@@ -151,14 +151,14 @@ namespace BlueControls.ItemCollection
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
 
             GR.TranslateTransform(trp.X, trp.Y);
-            GR.RotateTransform(-Rotation);
+            GR.RotateTransform(-Drehwinkel);
 
 
             r1 = new RectangleF(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);
             r2 = new RectangleF(r2.Left - trp.X, r2.Top - trp.Y, r2.Width, r2.Height);
 
 
-            if (WhiteBack)
+            if (Hintergrund_weiß_füllen)
             {
                 GR.FillRectangle(Brushes.White, r1);
             }
@@ -178,11 +178,11 @@ namespace BlueControls.ItemCollection
             }
 
 
-            if (Style != PadStyles.Undefiniert)
+            if (Stil != PadStyles.Undefiniert)
             {
                 if (Parent.SheetStyleScale > 0 && Parent.SheetStyle != null)
                 {
-                    GR.DrawRectangle(Skin.GetBlueFont(Style, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), r1);
+                    GR.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), r1);
                 }
             }
 
@@ -201,10 +201,10 @@ namespace BlueControls.ItemCollection
                 GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
 
 
-                if (!string.IsNullOrEmpty(_PlaceHolderString))
+                if (!string.IsNullOrEmpty(Platzhalter_für_Layout))
                 {
                     var f = new Font("Arial", 8);
-                    GR.DrawString(_PlaceHolderString, f, Brushes.Black, DCoordinates.Left, DCoordinates.Top);
+                    GR.DrawString(Platzhalter_für_Layout, f, Brushes.Black, DCoordinates.Left, DCoordinates.Top);
                 }
 
             }
@@ -220,10 +220,10 @@ namespace BlueControls.ItemCollection
                 case "stretchallowed": // ALT
                     return true;
                 case "modus":
-                    BildModus = (enSizeModes)int.Parse(value);
+                    Bild_Modus = (enSizeModes)int.Parse(value);
                     return true;
                 case "whiteback":
-                    WhiteBack = value.FromPlusMinus();
+                    Hintergrund_weiß_füllen = value.FromPlusMinus();
                     return true;
                 case "padding":
                     Padding = int.Parse(value);
@@ -232,7 +232,7 @@ namespace BlueControls.ItemCollection
                     Bitmap = modConverter.Base64ToBitmap(value);
                     return true;
                 case "placeholder":
-                    _PlaceHolderString = value.FromNonCritical();
+                    Platzhalter_für_Layout = value.FromNonCritical();
                     return true;
             }
 
@@ -246,13 +246,13 @@ namespace BlueControls.ItemCollection
         {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-            t = t + "Modus=" + (int)BildModus + ", ";
-            if (!string.IsNullOrEmpty(_PlaceHolderString))
+            t = t + "Modus=" + (int)Bild_Modus + ", ";
+            if (!string.IsNullOrEmpty(Platzhalter_für_Layout))
             {
-                t = t + "Placeholder=" + _PlaceHolderString.ToNonCritical() + ", ";
+                t = t + "Placeholder=" + Platzhalter_für_Layout.ToNonCritical() + ", ";
             }
 
-            t = t + "WhiteBack=" + WhiteBack.ToPlusMinus() + ", ";
+            t = t + "WhiteBack=" + Hintergrund_weiß_füllen.ToPlusMinus() + ", ";
 
             foreach (var thisQI in Overlays)
             {
@@ -293,14 +293,14 @@ namespace BlueControls.ItemCollection
         public bool ParseVariable(string VariableName, enValueType ValueType, string Value)
         {
 
-            if (string.IsNullOrEmpty(_PlaceHolderString))
+            if (string.IsNullOrEmpty(Platzhalter_für_Layout))
             {
                 return false;
             }
 
-            var ot = Export.ParseVariable(_PlaceHolderString, VariableName, Value, ValueType, enValueType.BinaryImage);
+            var ot = Export.ParseVariable(Platzhalter_für_Layout, VariableName, Value, ValueType, enValueType.BinaryImage);
 
-            if (ot == _PlaceHolderString)
+            if (ot == Platzhalter_für_Layout)
             {
                 return false;
             }
@@ -320,7 +320,7 @@ namespace BlueControls.ItemCollection
         public bool ResetVariables()
         {
 
-            if (!string.IsNullOrEmpty(_PlaceHolderString) && Bitmap != null)
+            if (!string.IsNullOrEmpty(Platzhalter_für_Layout) && Bitmap != null)
             {
                 Bitmap.Dispose();
                 Bitmap = null;
@@ -334,19 +334,19 @@ namespace BlueControls.ItemCollection
 
         public bool RenameColumn(string oldName, ColumnItem cColumnItem)
         {
-            var ot = _PlaceHolderString;
+            var ot = Platzhalter_für_Layout;
 
-            _PlaceHolderString = _PlaceHolderString.Replace("//TS/000" + oldName + "/", "//TS/000" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
-            _PlaceHolderString = _PlaceHolderString.Replace("//TS/001" + oldName + "/", "//TS/001" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
-            _PlaceHolderString = _PlaceHolderString.Replace("//TS/002" + oldName + "/", "//TS/002" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
-            _PlaceHolderString = _PlaceHolderString.Replace("//TS/003" + oldName + "/", "//TS/003" + cColumnItem.Name + "/", RegexOptions.IgnoreCase); // Spaltenname für Bedingungen
-            _PlaceHolderString = _PlaceHolderString.Replace("//TS/302" + oldName + "/", "//TS/302" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
-            return ot != _PlaceHolderString;
+            Platzhalter_für_Layout = Platzhalter_für_Layout.Replace("//TS/000" + oldName + "/", "//TS/000" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
+            Platzhalter_für_Layout = Platzhalter_für_Layout.Replace("//TS/001" + oldName + "/", "//TS/001" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
+            Platzhalter_für_Layout = Platzhalter_für_Layout.Replace("//TS/002" + oldName + "/", "//TS/002" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
+            Platzhalter_für_Layout = Platzhalter_für_Layout.Replace("//TS/003" + oldName + "/", "//TS/003" + cColumnItem.Name + "/", RegexOptions.IgnoreCase); // Spaltenname für Bedingungen
+            Platzhalter_für_Layout = Platzhalter_für_Layout.Replace("//TS/302" + oldName + "/", "//TS/302" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
+            return ot != Platzhalter_für_Layout;
         }
 
 
 
-        public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
+        public override List<FlexiControl> GetStyleOptionsx()
         {
 
             var l = new List<FlexiControl>();
@@ -354,7 +354,7 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl("Bildschirmbereich wählen", enImageCode.Bild));
             l.Add(new FlexiControl("Datei laden", enImageCode.Ordner));
             l.Add(new FlexiControl(true));
-            l.Add(new FlexiControl("Platzhalter für Layout", _PlaceHolderString, enDataFormat.Text, 2));
+            l.Add(new FlexiControl("Platzhalter für Layout", Platzhalter_für_Layout, enDataFormat.Text, 2));
 
 
             l.Add(new FlexiControl(true));
@@ -364,21 +364,20 @@ namespace BlueControls.ItemCollection
             Comms.Add(new TextListItem(((int)enSizeModes.Verzerren).ToString(), "Verzerren", QuickImage.Get("BildmodusVerzerren|32")));
             Comms.Add(new TextListItem(((int)enSizeModes.EmptySpace).ToString(), "Einpassen", QuickImage.Get("BildmodusEinpassen|32")));
 
-            l.Add(new FlexiControl("Bild-Modus", ((int)BildModus).ToString(), Comms));
+            l.Add(new FlexiControlForProperty(this, "Bild-Modus", Comms));
 
 
             l.Add(new FlexiControl(true));
 
+            AddLineStyleOption();
+    
 
-            l.Add(new FlexiControl("Umrandung", ((int)Style).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, true)));
+            k
 
+            l.Add(new FlexiControlForProperty(this, "Hintergrund_weiß_füllen"));
 
-            l.Add(new FlexiControl("Hintergrund weiß füllen", WhiteBack));
-
-            l.AddRange(base.GetStyleOptions(sender, e));
-
+            l.AddRange(base.GetStyleOptionsx());
             return l;
-
         }
 
 
@@ -452,10 +451,10 @@ namespace BlueControls.ItemCollection
 
 
 
-            WhiteBack = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
-            BildModus = (enSizeModes)int.Parse(Tags.TagGet("Bild-Modus"));
-            Style = (PadStyles)int.Parse(Tags.TagGet("Umrandung"));
-            _PlaceHolderString = Tags.TagGet("Platzhalter für Layout").FromNonCritical();
+            Hintergrund_weiß_füllen = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
+            Bild_Modus = (enSizeModes)int.Parse(Tags.TagGet("Bild-Modus"));
+            Stil = (PadStyles)int.Parse(Tags.TagGet("Umrandung"));
+            Platzhalter_für_Layout = Tags.TagGet("Platzhalter für Layout").FromNonCritical();
 
         }
     }

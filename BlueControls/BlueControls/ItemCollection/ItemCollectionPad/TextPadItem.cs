@@ -73,7 +73,7 @@ namespace BlueControls.ItemCollection
             _ReadableText = vReadableText;
             _VariableText = _ReadableText;
 
-            Style = PadStyles.Undefiniert;
+            Stil = PadStyles.Undefiniert;
 
             etxt = null;
             _Align = enAlignment.Top_Left;
@@ -188,13 +188,13 @@ namespace BlueControls.ItemCollection
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
 
-            if (Style == PadStyles.Undefiniert) { return; }
+            if (Stil == PadStyles.Undefiniert) { return; }
 
 
 
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
             GR.TranslateTransform(trp.X, trp.Y);
-            GR.RotateTransform(-Rotation);
+            GR.RotateTransform(-Drehwinkel);
 
 
             etxt.DrawingPos = new Point((int)(DCoordinates.Left - trp.X), (int)(DCoordinates.Top - trp.Y));
@@ -289,7 +289,7 @@ namespace BlueControls.ItemCollection
         protected override void KeepInternalLogic()
         {
 
-            if (Style != PadStyles.Undefiniert)
+            if (Stil != PadStyles.Undefiniert)
             {
 
                 if (etxt == null)
@@ -301,7 +301,7 @@ namespace BlueControls.ItemCollection
                     }
                     else
                     {
-                        etxt = new ExtText(Style, Parent.SheetStyle);
+                        etxt = new ExtText(Stil, Parent.SheetStyle);
                     }
 
 
@@ -398,14 +398,14 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
+        public override List<FlexiControl> GetStyleOptionsx()
         {
             var l = new List<FlexiControl>();
 
             l.Add(new FlexiControl("Text", _VariableText, enDataFormat.Text, 5));
 
 
-            l.Add(new FlexiControl("Stil", ((int)Style).ToString(), Skin.GetFonts(Parent.SheetStyle)));
+            l.Add(new FlexiControl("Stil", ((int)Stil).ToString(), Skin.GetFonts(Parent.SheetStyle)));
 
 
 
@@ -419,8 +419,7 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControl("Skalierung", AdditionalScale.ToString(), enDataFormat.Gleitkommazahl, 1));
 
 
-            l.AddRange(base.GetStyleOptions(sender, e));
-
+            l.AddRange(base.GetStyleOptionsx());
             return l;
         }
 
@@ -442,9 +441,9 @@ namespace BlueControls.ItemCollection
 
             var tmps = (PadStyles)int.Parse(Tags.TagGet("Stil"));
 
-            if (tmps != Style)
+            if (tmps != Stil)
             {
-                Style = tmps;
+                Stil = tmps;
                 etxt = null;
             }
 

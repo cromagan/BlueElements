@@ -222,6 +222,7 @@
     <Compile Include="ItemCollection\ItemCollectionPad\BasicPadItemTwoPoints.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FormPadItemRectangle.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />
+    <Compile Include="PropertyAttributes.cs" />
     <Compile Include="SystemInputHook.cs" />
     <Compile Include="Controls\Button.cs">
       <SubType>Component</SubType>
@@ -438,7 +439,6 @@
     <Compile Include="ItemCollection\ItemCollectionPad\BasicPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\BitmapPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\ChildPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\ComicCompPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\DimensionPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\GridPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\ItemCollectionPad.cs" />

@@ -44,20 +44,32 @@ namespace BlueControls.ItemCollection
 
         private decimal _Winkel;
         private decimal _Länge;
+        private string _text_oben = string.Empty;
 
-        public int NachKomma;
+        public int Nachkommastellen { get; set; } = 1;
 
-        public string Text1;
-        public string Text2;
+        public string Text_oben
+        {
+            get
+            {
+                return _text_oben;
+            }
+            set
+            {
+               if = _text_oben ==  Länge_in_MM.ToString() {  value = string.empty}
+                _text_oben = value;
+            }
+        }
+        public string Text_unten { get; set; } = string.Empty;
 
 
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
-        public decimal AdditionalScale = 3.07m;
+        public decimal Skalierung { get; set; } = 3.07m;
 
 
-        public string Prefix = "";
-        public string Suffix = "";
+        public string Präfix { get; set; } = string.Empty;
+        public string Suffix { get; set; } = string.Empty;
 
 
 
@@ -96,11 +108,11 @@ namespace BlueControls.ItemCollection
 
             if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
 
-            Text1 = string.Empty;
-            Text2 = string.Empty;
-            NachKomma = 1;
+            Text_oben = string.Empty;
+            Text_unten = string.Empty;
+            Nachkommastellen = 1;
 
-            Style = PadStyles.Style_StandardAlternativ;
+            Stil = PadStyles.Style_StandardAlternativ;
 
             Point1.Parent = this;
             Point2.Parent = this;
@@ -145,11 +157,11 @@ namespace BlueControls.ItemCollection
             {
                 case "text": // TODO: Alt 06.09.2019
                 case "text1":
-                    Text1 = value.FromNonCritical();
+                    Text_oben = value.FromNonCritical();
                     return true;
 
                 case "text2":
-                    Text2 = value.FromNonCritical();
+                    Text_unten = value.FromNonCritical();
                     return true;
 
                 case "color": // TODO: Alt 06.09.2019
@@ -162,14 +174,14 @@ namespace BlueControls.ItemCollection
                     return true;
 
                 case "decimal":
-                    NachKomma = int.Parse(value);
+                    Nachkommastellen = int.Parse(value);
                     return true;
 
                 case "checked": // TODO: Alt 06.09.2019
                     return true;
 
                 case "prefix": // TODO: Alt 06.09.2019
-                    Prefix = value.FromNonCritical();
+                    Präfix = value.FromNonCritical();
                     return true;
 
                 case "suffix":
@@ -177,7 +189,7 @@ namespace BlueControls.ItemCollection
                     return true;
 
                 case "additionalscale":
-                    AdditionalScale = decimal.Parse(value.FromNonCritical());
+                    Skalierung = decimal.Parse(value.FromNonCritical());
                     return true;
 
             }
@@ -192,31 +204,34 @@ namespace BlueControls.ItemCollection
             t = t.Substring(0, t.Length - 1) + ", ";
 
             return t +
-                   ", Text1=" + Text1.ToNonCritical() +
-                   ", Text2=" + Text2.ToNonCritical() +
-                   ", Decimal=" + NachKomma +
-                   ", Prefix=" + Prefix.ToNonCritical() +
+                   ", Text1=" + Text_oben.ToNonCritical() +
+                   ", Text2=" + Text_unten.ToNonCritical() +
+                   ", Decimal=" + Nachkommastellen +
+                   ", Prefix=" + Präfix.ToNonCritical() +
                    ", Suffix=" + Suffix.ToNonCritical() +
-                   ", AdditionalScale=" + AdditionalScale.ToString().ToNonCritical() + "}";
+                   ", AdditionalScale=" + Skalierung.ToString().ToNonCritical() + "}";
         }
 
 
         public string AngezeigterText1()
         {
-            if (!string.IsNullOrEmpty(Text1)) { return Text1; }
-            var s = LängeInMM().ToString();
+            if (!string.IsNullOrEmpty(Text_oben)) { return Text_oben; }
+            var s = Länge_in_MM().ToString();
 
             s = s.TrimEnd("0");
             s = s.TrimEnd(",");
             s = s.TrimEnd(".");
 
-            return Prefix + s + Suffix;
+            return Präfix + s + Suffix;
         }
 
 
-        public decimal LängeInMM()
+        public decimal Länge_in_MM
         {
-            return Math.Round(modConverter.PixelToMM(_Länge, ItemCollectionPad.DPI), NachKomma);
+            get
+            {
+                return Math.Round(modConverter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
+            }
         }
 
 
@@ -243,15 +258,15 @@ namespace BlueControls.ItemCollection
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
 
-            if (Style == PadStyles.Undefiniert) { return; }
+            if (Stil == PadStyles.Undefiniert) { return; }
 
 
 
 
-            var geszoom = Parent.SheetStyleScale * AdditionalScale * cZoom;
+            var geszoom = Parent.SheetStyleScale * Skalierung * cZoom;
 
 
-            var f = Skin.GetBlueFont(Style, Parent.SheetStyle);
+            var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
 
             var PfeilG = (decimal)f.Font(geszoom).Size * 0.8m;
             var pen2 = f.Pen(cZoom);
@@ -263,7 +278,7 @@ namespace BlueControls.ItemCollection
 
 
             var sz1 = GR.MeasureString(AngezeigterText1(), f.Font(geszoom));
-            var sz2 = GR.MeasureString(Text2, f.Font(geszoom));
+            var sz2 = GR.MeasureString(Text_unten, f.Font(geszoom));
             var P1 = _SchnittPunkt1.ZoomAndMove(cZoom, MoveX, MoveY);
             var P2 = _SchnittPunkt2.ZoomAndMove(cZoom, MoveX, MoveY);
 
@@ -308,7 +323,7 @@ namespace BlueControls.ItemCollection
             GR.TranslateTransform((float)Mitte2.X, (float)Mitte2.Y);
             GR.RotateTransform(-TextWinkel);
             GR.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz2.Width * 0.9 / 2), (int)(-sz2.Height * 0.8 / 2), (int)(sz2.Width * 0.9), (int)(sz2.Height * 0.8)));
-            GR.DrawString(Text2, f.Font(geszoom), f.Brush_Color_Main, new PointF((float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0)));
+            GR.DrawString(Text_unten, f.Font(geszoom), f.Brush_Color_Main, new PointF((float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0)));
             GR.Restore(x);
         }
 
@@ -316,13 +331,13 @@ namespace BlueControls.ItemCollection
 
         public override RectangleDF UsedArea()
         {
-            if (Style == PadStyles.Undefiniert) { return new RectangleDF(0, 0, 0, 0); }
-            var geszoom = Parent.SheetStyleScale * AdditionalScale;
+            if (Stil == PadStyles.Undefiniert) { return new RectangleDF(0, 0, 0, 0); }
+            var geszoom = Parent.SheetStyleScale * Skalierung;
 
-            var f = Skin.GetBlueFont(Style, Parent.SheetStyle);
+            var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
 
             var sz1 = BlueFont.MeasureString(AngezeigterText1(), f.Font(geszoom));
-            var sz2 = BlueFont.MeasureString(Text2, f.Font(geszoom));
+            var sz2 = BlueFont.MeasureString(Text_unten, f.Font(geszoom));
 
             var maxrad = (decimal)(Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height)) / 2 + 10);
 
@@ -376,7 +391,7 @@ namespace BlueControls.ItemCollection
 
             var MaßL = 0M;
             var tmppW = -90;
-            var MHLAb = modConverter.mmToPixel(1.5M * AdditionalScale / 3.07m, ItemCollectionPad.DPI); // Den Abstand der Maßhilsfline, in echten MM
+            var MHLAb = modConverter.mmToPixel(1.5M * Skalierung / 3.07m, ItemCollectionPad.DPI); // Den Abstand der Maßhilsfline, in echten MM
             ComputeData();
 
             MaßL = TextPointx.DistanzZuLinie(Point1, Point2);
@@ -402,37 +417,40 @@ namespace BlueControls.ItemCollection
             // Nix zu tun
         }
 
-        public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
+
+        public override List<FlexiControl> GetStyleOptions()
         {
             var l = new List<FlexiControl>();
 
+            l.Add(new FlexiControlForProperty(this, "Länge_in_MM"));
 
-            l.Add(new FlexiControl("Tatsächliche Länge: " + LängeInMM() + " mm"));
-
-            l.Add(new FlexiControl("Text (oben)", Text1, enDataFormat.Text, 1));
-            l.Add(new FlexiControl("Präfix", Prefix, enDataFormat.Text, 1));
-            l.Add(new FlexiControl("Suffix", Suffix, enDataFormat.Text, 1));
-            l.Add(new FlexiControl("Text (unten)", Text2, enDataFormat.Text, 1));
-
+            l.Add(new FlexiControlForProperty(this, "Text oben"));
+            l.Add(new FlexiControlForProperty(this, "Suffix"));
+            l.Add(new FlexiControlForProperty(this, "Text unten"));
+            l.Add(new FlexiControlForProperty(this, "Präfix"));
 
 
-            l.Add(new FlexiControl("Stil", ((int)Style).ToString(), Skin.GetFonts(Parent.SheetStyle)));
+            AddStyleOption();
 
-            l.Add(new FlexiControl("Skalierung", AdditionalScale.ToString(), enDataFormat.Gleitkommazahl, 1));
+
+            l.Add(new FlexiControlForProperty(this, "Skalierung"));
+
+
+            l.AddRange(base.GetStyleOptions);
             return l;
         }
 
         public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         {
-            Text1 = Tags.TagGet("Text (oben)").FromNonCritical();
-            if (Text1 == LängeInMM().ToString()) { Text1 = ""; }
-            Text2 = Tags.TagGet("Text (unten)").FromNonCritical();
+            Text_oben = Tags.TagGet("Text (oben)").FromNonCritical();
+            if (Text_oben == Länge_in_MM.ToString()) { Text_oben = ""; }
+            Text_unten = Tags.TagGet("Text (unten)").FromNonCritical();
 
             Suffix = Tags.TagGet("Suffix").FromNonCritical();
-            Prefix = Tags.TagGet("Präfix").FromNonCritical();
-            AdditionalScale = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
+            Präfix = Tags.TagGet("Präfix").FromNonCritical();
+            Skalierung = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
 
-            Style = (PadStyles)int.Parse(Tags.TagGet("Stil"));
+            Stil = (PadStyles)int.Parse(Tags.TagGet("Stil"));
         }
 
 

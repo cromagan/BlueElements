@@ -1,8 +1,13 @@
 ﻿using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Enums;
+using BlueControls.ItemCollection;
+using BlueDatabase.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 using static BlueBasics.Extensions;
@@ -23,8 +28,6 @@ namespace BlueControls.Controls
         private string _propertyName;
         private bool _addGroupboxText;
         private string _propertynamecpl;
-        bool _AutoQuickInfo = true;
-        bool _AutoCaption = true;
         bool _FehlerWennLeer = true;
         bool _FehlerFormatCheck = true;
         Timer Checker = new Timer();
@@ -34,22 +37,53 @@ namespace BlueControls.Controls
 
 
         /// <summary>
-        /// Die Hauptklasse wird zwar beibehalten, aber unterklassen müssen evtl. neu definiert werden.
+        /// Die Hauptklasse wird zwar beibehalten, aber Unterklassen müssen evtl. neu definiert werden.
         /// </summary>
-       public event System.EventHandler LoadedFromDisk;
+        public event System.EventHandler LoadedFromDisk;
 
 
         public FlexiControlForProperty() : base()
         {
-
             GenFehlerText();
-
-
             Checker.Tick += Checker_Tick;
-
             Checker.Interval = 1000;
             Checker.Enabled = true;
 
+            CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+            EditType = enEditTypeFormula.Textfeld;
+            Size = new Size(200, 24);
+        }
+
+
+        public FlexiControlForProperty(object propertyObject, string propertyName) : this()
+        {
+            _propertyObject = propertyObject;
+            _propertyName = propertyName;
+            UpdateControlData();
+            CheckEnabledState();
+        }
+
+        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList list) : this(propertyObject, propertyName)
+        {
+
+            list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
+            var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+
+
+            var data = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+            var Wi = data.Item1;
+            var He = data.Item2;
+
+
+            var x = Math.Max((int)(data.Item1 + 20 + s.Width), 200);
+            var y = Math.Max((int)(data.Item2 + Skin.PaddingSmal * 2), 24);
+
+            Size = new Size(x, y);
+
+
+            var c = CreateSubControls();
+
+           StyleComboBox((ComboBox)c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
 
         }
 
@@ -70,9 +104,7 @@ namespace BlueControls.Controls
                 FillPropertyNow();
 
                 _propertyName = value;
-                GetTmpVariables();
                 UpdateControlData();
-                SetValueFromProperty();
                 CheckEnabledState();
 
             }
@@ -96,31 +128,31 @@ namespace BlueControls.Controls
         }
 
 
-        [DefaultValue(true)]
-        public bool FehlerWennLeer
-        {
-            get { return _FehlerWennLeer; }
-            set
-            {
-                if (_FehlerWennLeer == value) { return; }
-                _FehlerWennLeer = value;
-                GenFehlerText();
-            }
-        }
+        //[DefaultValue(true)]
+        //public bool FehlerWennLeer
+        //{
+        //    get { return _FehlerWennLeer; }
+        //    set
+        //    {
+        //        if (_FehlerWennLeer == value) { return; }
+        //        _FehlerWennLeer = value;
+        //        GenFehlerText();
+        //    }
+        //}
 
 
 
-        [DefaultValue(true)]
-        public bool FehlerFormatCheck
-        {
-            get { return _FehlerFormatCheck; }
-            set
-            {
-                if (_FehlerFormatCheck == value) { return; }
-                _FehlerFormatCheck = value;
-                GenFehlerText();
-            }
-        }
+        //[DefaultValue(true)]
+        //public bool FehlerFormatCheck
+        //{
+        //    get { return _FehlerFormatCheck; }
+        //    set
+        //    {
+        //        if (_FehlerFormatCheck == value) { return; }
+        //        _FehlerFormatCheck = value;
+        //        GenFehlerText();
+        //    }
+        //}
 
 
         [DefaultValue(false)]
@@ -134,9 +166,7 @@ namespace BlueControls.Controls
                 FillPropertyNow();
 
                 _addGroupboxText = value;
-                GetTmpVariables();
                 UpdateControlData();
-                SetValueFromProperty();
                 CheckEnabledState();
 
             }
@@ -144,43 +174,22 @@ namespace BlueControls.Controls
 
 
 
-        [DefaultValue(true)]
-        public bool AutoCaption
-        {
-            get { return _AutoCaption; }
-            set
-            {
-                if (_AutoCaption == value) { return; }
+        //[DefaultValue(true)]
+        //public bool AutoQuickInfo
+        //{
+        //    get { return _AutoQuickInfo; }
+        //    set
+        //    {
+        //        if (_AutoQuickInfo == value) { return; }
 
-                FillPropertyNow();
+        //        FillPropertyNow();
 
-                _AutoCaption = value;
-                GetTmpVariables();
-                UpdateControlData();
-                SetValueFromProperty();
-                CheckEnabledState();
+        //        _AutoQuickInfo = value;
+        //        UpdateControlData();
+        //        CheckEnabledState();
 
-            }
-        }
-
-        [DefaultValue(true)]
-        public bool AutoQuickInfo
-        {
-            get { return _AutoQuickInfo; }
-            set
-            {
-                if (_AutoQuickInfo == value) { return; }
-
-                FillPropertyNow();
-
-                _AutoQuickInfo = value;
-                GetTmpVariables();
-                UpdateControlData();
-                SetValueFromProperty();
-                CheckEnabledState();
-
-            }
-        }
+        //    }
+        //}
 
         [DefaultValue(null)]
         public object PropertyObject
@@ -199,9 +208,7 @@ namespace BlueControls.Controls
 
 
                 _propertyObject = value;
-                GetTmpVariables();
                 UpdateControlData();
-                SetValueFromProperty();
                 CheckEnabledState();
 
 
@@ -217,40 +224,12 @@ namespace BlueControls.Controls
         {
             FillPropertyNow();
             _propertyObject = null;  //Das Objekt ist tot und irgendwo im Nirvana verschwunden
-            GetTmpVariables();
             UpdateControlData();
-            SetValueFromProperty();
             CheckEnabledState();
 
             LoadedFromDisk?.Invoke(this, System.EventArgs.Empty);
         }
 
-        private void GetTmpVariables()
-        {
-
-            if (string.IsNullOrEmpty(_propertyName) || _propertyObject == null)
-            {
-                propInfo = null;
-                return;
-            }
-
-            _propertynamecpl = _propertyName;
-
-            if (_addGroupboxText && Parent is GroupBox grp)
-            {
-                _propertynamecpl = _propertynamecpl + "_" + grp.Text;
-            }
-
-
-            _propertynamecpl = _propertynamecpl.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + "-/\\ _");
-            _propertynamecpl = _propertynamecpl.Replace("-", "_");
-            _propertynamecpl = _propertynamecpl.Replace(" ", "_");
-            _propertynamecpl = _propertynamecpl.Replace("/", "_");
-            _propertynamecpl = _propertynamecpl.Replace("\\", "_");
-            _propertynamecpl = _propertynamecpl.Replace("__", "_");
-
-            propInfo = _propertyObject.GetType().GetProperty(_propertynamecpl);
-        }
 
 
 
@@ -280,6 +259,10 @@ namespace BlueControls.Controls
             else if (x is List<string> ls)
             {
                 Value = ls.JoinWithCr();
+            }
+            else if (x is bool bo)
+            {
+                Value = bo.ToPlusMinus();
             }
             else
             {
@@ -320,6 +303,11 @@ namespace BlueControls.Controls
                 OldVal = ls.JoinWithCr();
                 toSet = Value.SplitByCRToList();
             }
+            else if (x is bool bo)
+            {
+                OldVal = bo.ToPlusMinus();
+                toSet = Value.FromPlusMinus();
+            }
             else
             {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
@@ -340,6 +328,14 @@ namespace BlueControls.Controls
                 return false;
             }
 
+            if (!propInfo.CanWrite)
+            {
+                base.Enabled = false;
+                return false;
+
+            }
+
+
             base.Enabled = true;
             return true;
         }
@@ -356,36 +352,125 @@ namespace BlueControls.Controls
         private void UpdateControlData()
         {
 
+            #region propInfo & _propertynamecpl befüllen
 
-            if (!string.IsNullOrEmpty(_propertyName))
+
+            if (string.IsNullOrEmpty(_propertyName) || _propertyObject == null)
             {
-
-
-
-                var x = _propertyName.SplitBy("__");
-                if (_AutoCaption) { Caption = x[0].Replace("_", " ") + ":"; }
-
-
-                var qi = _propertyName.Replace("_", " ");
-
+                propInfo = null;
+                _propertynamecpl = string.Empty;
+            }
+            else
+            {
+                _propertynamecpl = _propertyName;
 
                 if (_addGroupboxText && Parent is GroupBox grp)
                 {
-                    qi = qi + " " + grp.Text.TrimEnd(":");
+                    _propertynamecpl = _propertynamecpl + "_" + grp.Text;
                 }
 
 
-                if (_AutoQuickInfo) { QuickInfo = qi.Replace("  ", " "); };
+                _propertynamecpl = _propertynamecpl.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + "-/\\ _");
+                _propertynamecpl = _propertynamecpl.Replace("-", "_");
+                _propertynamecpl = _propertynamecpl.Replace(" ", "_");
+                _propertynamecpl = _propertynamecpl.Replace("/", "_");
+                _propertynamecpl = _propertynamecpl.Replace("\\", "_");
+                _propertynamecpl = _propertynamecpl.Replace("__", "_");
+
+                propInfo = _propertyObject.GetType().GetProperty(_propertynamecpl);
+
+            }
+
+            #endregion
+
+            #region Art des Steuerelements bestimmen
+
+            switch (propInfo.PropertyType.FullName.ToLower())
+            {
+                case "system.string":
+                    MultiLine = false;
+                    break;
+                case "system.boolean":
+                    EditType = enEditTypeFormula.Ja_Nein_Knopf;
+                    var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+                    Size = new Size((int)s.Width + 30, 22);
+                    break;
+
+                default:
+                    Develop.DebugPrint("propertyType unbekannt: " + propInfo.PropertyType.FullName);
+                    break;
+            }
+
+
+            #endregion
+
+            #region Caption setzen
+            if (!string.IsNullOrEmpty(_propertyName))
+            {
+
+                var x = _propertyName.SplitBy("__");
+                Caption = x[0].Replace("_", " ") + ":";
                 FileEncryptionKey = string.Empty;
             }
 
             else
             {
-                if (_AutoCaption) { Caption = "[unbekannt]"; }
-                if (_AutoQuickInfo) { QuickInfo = string.Empty; }
+                Caption = "[unbekannt]";
             }
+            #endregion
 
 
+
+            #region QuickInfo setzen
+            // https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
+            _FehlerWennLeer = true;
+
+            if (propInfo == null)
+            {
+                QuickInfo = string.Empty;
+            }
+            else
+            {
+
+                var done = false;
+
+
+                var ca = propInfo.GetCustomAttributes();
+                if (ca != null)
+
+                {
+
+                    foreach (var thisas in ca)
+                    {
+
+                        if (thisas is PropertyAttributes pa)
+                        {
+                            QuickInfo = pa.Description;
+                            _FehlerWennLeer = pa.FehlerWennLeer;
+                            done = true;
+                        }
+                        else if (thisas is DescriptionAttribute da)
+                        {
+                            QuickInfo = da.Description;
+                            done = true;
+                        }
+
+
+
+                    }
+                }
+
+                if (!done)
+                {
+                    QuickInfo = string.Empty;
+                }
+
+
+            }
+            #endregion
+
+            SetValueFromProperty();
+            GenFehlerText();
         }
 
 
@@ -474,23 +559,21 @@ namespace BlueControls.Controls
         protected override void OnParentChanged(System.EventArgs e)
         {
             FillPropertyNow();
-            if (_LastParent is GroupBox gp) { gp.TextChanged -= Gp_TextChanged; }
+            if (_LastParent is GroupBox gp) { gp.TextChanged -= GroupBox_TextChanged; }
 
 
             base.OnParentChanged(e);
 
             _LastParent = Parent;
 
-            if (_LastParent is GroupBox gp2) { gp2.TextChanged += Gp_TextChanged; }
+            if (_LastParent is GroupBox gp2) { gp2.TextChanged += GroupBox_TextChanged; }
 
 
         }
 
-        private void Gp_TextChanged(object sender, System.EventArgs e)
+        private void GroupBox_TextChanged(object sender, System.EventArgs e)
         {
-            GetTmpVariables();
             UpdateControlData();
-            SetValueFromProperty();
             CheckEnabledState();
 
             OnValueChanged(); // Wichig, dass Fehler-Dreiecke angezeigt werden können

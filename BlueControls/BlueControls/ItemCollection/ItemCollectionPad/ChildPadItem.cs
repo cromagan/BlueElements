@@ -169,7 +169,7 @@ namespace BlueControls.ItemCollection
 
                 var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
                 GR.TranslateTransform(trp.X, trp.Y);
-                GR.RotateTransform(-Rotation);
+                GR.RotateTransform(-Drehwinkel);
                 var font = new Font("Arial", (float)(30 * cZoom));
 
 
@@ -303,7 +303,7 @@ namespace BlueControls.ItemCollection
                 //    return true;
 
                 case "fixsize":
-                    FixSize = value.FromPlusMinus();
+                    Größe_fixiert = value.FromPlusMinus();
                     return true;
                 case "name":
                     _Name = value.FromNonCritical();
@@ -523,9 +523,8 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
+        public override List<FlexiControl> GetStyleOptionsx()
         {
-
             var l = new List<FlexiControl>();
 
             l.Add(new FlexiControl("Name", _Name, enDataFormat.Text, 1));
@@ -543,10 +542,7 @@ namespace BlueControls.ItemCollection
 
             l.Add(new FlexiControl("Eingebettete Ansichten", AnsichtenVonMir.JoinWithCr(), enDataFormat.Text, 5));
 
-
-
-
-            l.AddRange(base.GetStyleOptions(sender, e));
+            l.AddRange(base.GetStyleOptionsx());
             return l;
         }
 

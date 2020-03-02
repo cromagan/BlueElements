@@ -35,8 +35,8 @@ namespace BlueControls.ItemCollection
         internal PointDF p_RO;
         internal PointDF p_RU;
         internal PointDF p_LU;
-        public int Rotation;
-        public bool FixSize;
+        public int Drehwinkel { get; set; } = 0;
+        public bool Größe_fixiert { get; set; } = false;
         #endregion
 
         #region  Event-Deklarationen + Delegaten 
@@ -60,7 +60,7 @@ namespace BlueControls.ItemCollection
             Points.Add(p_LU);
             Points.Add(p_RU);
 
-            Rotation = 0;
+            Drehwinkel = 0;
         }
 
 
@@ -88,19 +88,6 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        {
-
-            var r = Tags.TagGet("Drehwinkel");
-            int.TryParse(r, out Rotation);
-
-            var nFixSize = Tags.TagGet("Größe fixiert").FromPlusMinus();
-            if (nFixSize != FixSize)
-            {
-                FixSize = nFixSize;
-                GenerateInternalRelation();
-            }
-        }
 
         public override void GenerateInternalRelation()
         {
@@ -111,7 +98,7 @@ namespace BlueControls.ItemCollection
             p_RU.X = p_RO.X;
             p_RU.Y = p_LU.Y;
 
-            if (FixSize)
+            if (Größe_fixiert)
             {
                 Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_RO));
                 Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_RU));
@@ -132,26 +119,27 @@ namespace BlueControls.ItemCollection
             OnPointOrRelationsChanged();
         }
 
-        public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
+
+        public override List<FlexiControl> GetStyleOptions()
         {
             var l = new List<FlexiControl>();
 
             l.Add(new FlexiControl(true));
-            l.Add(new FlexiControl("Drehwinkel", Rotation.ToString(), enDataFormat.Ganzzahl, 1));
+            l.Add(new FlexiControlForProperty(this, "Drehwinkel"));
 
-            var Relations = ((CreativePad)sender).Item.AllRelations;
 
-            if (!FixSize && !p_LO.CanMove(Relations) && !p_RU.CanMove(Relations))
+
+            if (!Größe_fixiert && !p_LO.CanMove(Parent.AllRelations) && !p_RU.CanMove(Parent.AllRelations))
             {
                 l.Add(new FlexiControl(true));
                 l.Add(new FlexiControl("Objekt fest definiert,<br>Größe kann nicht fixiert werden"));
             }
             else
             {
-                l.Add(new FlexiControl("Größe fixiert", FixSize));
+                l.Add(new FlexiControlForProperty(this, "Größe_fixiert"));
             }
 
-
+            l.AddRange(base.GetStyleOptions());
             return l;
         }
 
@@ -183,11 +171,11 @@ namespace BlueControls.ItemCollection
             switch (tag)
             {
                 case "fixsize":
-                    FixSize = value.FromPlusMinus();
+                    Größe_fixiert = value.FromPlusMinus();
                     return true;
 
                 case "rotation":
-                    Rotation = int.Parse(value);
+                    Drehwinkel = int.Parse(value);
                     return true;
             }
             return false;
@@ -196,8 +184,8 @@ namespace BlueControls.ItemCollection
         {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-            if (Rotation != 0) { t = t + "Rotation=" + Rotation + ", "; }
-            t = t + "Fixsize=" + FixSize.ToPlusMinus() + ", ";
+            if (Drehwinkel != 0) { t = t + "Rotation=" + Drehwinkel + ", "; }
+            t = t + "Fixsize=" + Größe_fixiert.ToPlusMinus() + ", ";
             return t.Trim(", ") + "}";
         }
     }

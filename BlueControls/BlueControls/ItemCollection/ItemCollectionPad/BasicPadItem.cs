@@ -24,6 +24,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection
@@ -217,13 +218,6 @@ namespace BlueControls.ItemCollection
         public abstract bool Contains(PointF value, decimal zoomfactor);
 
 
-        /// <summary>
-        /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        public abstract List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e);
 
         public abstract void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu);
 
@@ -262,12 +256,17 @@ namespace BlueControls.ItemCollection
 
         private PadStyles _Style = PadStyles.Undefiniert;
 
-        public List<string> RemoveToo = new List<string>();
+        //public List<string> RemoveToo = new List<string>();
 
 
+        /// <summary>
+        /// Wird ein Element gelöscht, das diese Feld befüllt hat, werden automatisch alle andern Elemente mit der selben Gruppe gelöscht.
+        /// </summary>
+        [PropertyAttributes("Alle Elemente, die der selben Gruppe angehören, werden beim Löschen eines Elements ebenfalls gelöscht.", false)]
+        public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
-
-        public bool PrintMe
+        [PropertyAttributes("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.", false)]
+        public bool Bei_Export_sichtbar
         {
             get
             {
@@ -296,7 +295,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public PadStyles Style
+        public PadStyles Stil
         {
             get
             {
@@ -321,7 +320,7 @@ namespace BlueControls.ItemCollection
 
         public virtual bool ParseThis(string tag, string value)
         {
-            switch (tag)
+            switch (tag.ToLower())
             {
                 case "classid":
                 case "type":
@@ -343,7 +342,7 @@ namespace BlueControls.ItemCollection
                         if (value.Contains("Name=" + ThisPoint.Name + ","))
                         {
                             ThisPoint.Parse(value);
-                            ThisPoint.Parent = this;  
+                            ThisPoint.Parent = this;
                         }
                     }
                     return true;
@@ -354,8 +353,12 @@ namespace BlueControls.ItemCollection
                     _Style = (PadStyles)int.Parse(value);
                     return true;
 
-                case "removetoo":
-                    RemoveToo.AddRange(value.FromNonCritical().SplitByCR());
+                case "removetoo": // TODO: Alt, löschen, 02.03.2020
+                    //RemoveToo.AddRange(value.FromNonCritical().SplitByCR());
+                    return true;
+
+                case "removetoogroup":
+                    Gruppenzugehörigkeit = value.FromNonCritical();
                     return true;
 
 
@@ -397,6 +400,26 @@ namespace BlueControls.ItemCollection
             IsParsing = false;
         }
 
+        /// <summary>
+        /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
+        /// </summary>
+        /// <returns></returns>
+        public virtual List<FlexiControl> GetStyleOptions()
+        {
+
+            var l = new List<FlexiControl>();
+
+
+            l.Add(new FlexiControlForProperty(this, "Gruppenzugehörigkeit"));
+            l.Add(new FlexiControlForProperty(this, "Bei_Export_sichtbar"));
+
+            return l;
+
+        }
+
+
+
+
 
         public override string ToString()
         {
@@ -431,8 +454,10 @@ namespace BlueControls.ItemCollection
             }
 
 
-            if (RemoveToo.Count > 0) { t = t + "RemoveToo=" + RemoveToo.JoinWithCr().ToNonCritical() + ", "; }
-
+            if (!string.IsNullOrEmpty(Gruppenzugehörigkeit))
+            {
+                t = t + "RemoveTooGroup=" + Gruppenzugehörigkeit.ToNonCritical() + ", ";
+            }
 
             return t.Trim(", ") + "}";
         }
@@ -459,6 +484,19 @@ namespace BlueControls.ItemCollection
                 ((ItemCollectionPad)Parent).Swap(tempVar, i2);
             }
         }
+
+        internal void AddStyleOption(List<FlexiControl> l)
+        {
+            l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetFonts(Parent.SheetStyle)));
+            //l.Add(new FlexiControl("Stil", ((int)Stil).ToString()));
+        }
+        internal void AddLineStyleOption(List<FlexiControl> l)
+        {
+            l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetRahmenArt(Parent.SheetStyle, true)));
+            //l.Add(new FlexiControlForProperty("Umrandung", ((int)Stil).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, true)));
+
+        }
+
 
         public void EineEbeneNachHinten()
         {
@@ -600,7 +638,7 @@ namespace BlueControls.ItemCollection
 
         public void RelationDeleteExternal()
         {
-         
+
             foreach (var ThisRelation in Parent.AllRelations)
             {
                 if (ThisRelation != null)

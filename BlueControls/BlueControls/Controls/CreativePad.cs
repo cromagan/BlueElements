@@ -1075,15 +1075,6 @@ namespace BlueControls.Controls
                         thisItem.EineEbeneNachHinten();
                         break;
 
-                    case "#printme":
-                        Done = true;
-                        thisItem.PrintMe = true;
-                        break;
-
-                    case "#printmenot":
-                        Done = true;
-                        thisItem.PrintMe = false;
-                        break;
                     case "#duplicate":
                         Done = true;
                         _Item.Add((BasicPadItem)((ICloneable)thisItem).Clone());
@@ -1169,14 +1160,14 @@ namespace BlueControls.Controls
 
 
                 Items.Add(new TextListItem("#ExterneBeziehungen", "Objektübergreifende Punkt-Beziehungen aufheben", enImageCode.Kreuz));
-                if (((BasicPadItem)HotItem).PrintMe)
-                {
-                    Items.Add(new TextListItem("#PrintMeNot", "Objekt nicht drucken", QuickImage.Get("Drucker|16||1")));
-                }
-                else
-                {
-                    Items.Add(new TextListItem("#PrintMe", "Objekt drucken", enImageCode.Drucker));
-                }
+                //if (((BasicPadItem)HotItem).Bei_Export_sichtbar)
+                //{
+                //    Items.Add(new TextListItem("#PrintMeNot", "Objekt nicht drucken", QuickImage.Get("Drucker|16||1")));
+                //}
+                //else
+                //{
+                //    Items.Add(new TextListItem("#PrintMe", "Objekt drucken", enImageCode.Drucker));
+                //}
 
 
                 Items.Add(new TextListItem("#Duplicate", "Objekt duplizieren", enImageCode.Kopieren, HotItem is ICloneable));
@@ -1586,7 +1577,7 @@ namespace BlueControls.Controls
 
         public void ShowErweitertMenü(BasicPadItem Item)
         {
-            var l = Item.GetStyleOptions(this, System.EventArgs.Empty);
+            var l = Item.GetStyleOptionsx();
 
             if (l.Count == 0)
             {

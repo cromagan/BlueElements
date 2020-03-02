@@ -185,9 +185,11 @@ namespace BlueControls.ItemCollection
             OnPointOrRelationsChanged();
         }
 
-        public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
+
+        public override List<FlexiControl> GetStyleOptionsx()
         {
             var l = new List<FlexiControl>();
+
 
             var Size = new ItemCollectionList();
             Size.Add(new TextListItem((mm125x * 1m).ToString(Constants.Format_Float4), "Klein (1,25 mm)", enImageCode.GrößeÄndern));
@@ -197,7 +199,7 @@ namespace BlueControls.ItemCollection
 
             l.Add(new FlexiControl("Größe Distanzhalter", _Size.ToString(Constants.Format_Float4), Size));
 
-
+            l.AddRange(base.GetStyleOptionsx());
             return l;
         }
 

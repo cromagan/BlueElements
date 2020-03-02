@@ -159,7 +159,7 @@ namespace BlueControls.Forms
         {
             var b = new TextPadItem(Pad.Item);
             b.Text = "";
-            b.Style = PadStyles.Style_Standard;
+            b.Stil = PadStyles.Style_Standard;
             Pad.Item.Add(b);
             b.SetCoordinates(new RectangleDF(10, 10, 200, 200));
         }

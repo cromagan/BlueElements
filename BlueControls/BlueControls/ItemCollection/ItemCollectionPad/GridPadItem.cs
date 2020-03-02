@@ -74,9 +74,9 @@ namespace BlueControls.ItemCollection
         {
             NP = new PointDF(this, "Nullpunkt", 0, 0, true, false, true);
             NP.SetTo(nullpunkt);
-            Style = style;
+            Stil = style;
 
-            Style = PadStyles.Style_Überschrift_Haupt;
+            Stil = PadStyles.Style_Überschrift_Haupt;
             GridShow = 10M;
 
             Points.Add(NP);
@@ -120,9 +120,9 @@ namespace BlueControls.ItemCollection
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
-            if (Style == PadStyles.Undefiniert) { return; }
+            if (Stil == PadStyles.Undefiniert) { return; }
 
-            var c = Skin.GetBlueFont(Style, Parent.SheetStyle).Color_Main;
+            var c = Skin.GetBlueFont(Stil, Parent.SheetStyle).Color_Main;
 
 
             var p = new Pen(Color.FromArgb(30, c.R, c.G, c.B), 1);
@@ -215,16 +215,21 @@ namespace BlueControls.ItemCollection
             // Nix zu Tun
         }
 
-        public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
+
+        public override List<FlexiControl> GetStyleOptionsx()
         {
             var l = new List<FlexiControl>();
-            l.Add(new FlexiControl("Stil", ((int)Style).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, false)));
+
+
+            l.Add(new FlexiControl("Stil", ((int)Stil).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, false)));
+
+            l.AddRange(base.GetStyleOptionsx());
             return l;
         }
 
         public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         {
-            Style = (PadStyles)int.Parse(Tags.TagGet("Format"));
+            Stil = (PadStyles)int.Parse(Tags.TagGet("Format"));
         }
     }
 }

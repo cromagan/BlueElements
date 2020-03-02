@@ -455,7 +455,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override List<FlexiControl> GetStyleOptions(object sender, System.EventArgs e)
+        public override List<FlexiControl> GetStyleOptionsx()
         {
             var l = new List<FlexiControl>();
 
@@ -473,6 +473,7 @@ namespace BlueControls.ItemCollection
 
             l.Add(new FlexiControl("LayoutId", _LayoutID, Layouts));
 
+            l.AddRange(base.GetStyleOptionsx());
             return l;
         }
 
