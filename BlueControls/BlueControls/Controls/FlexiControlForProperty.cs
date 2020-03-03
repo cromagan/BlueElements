@@ -59,7 +59,7 @@ namespace BlueControls.Controls
         {
             _propertyObject = propertyObject;
             _propertyName = propertyName;
-            UpdateControlData(rowCount, list, image);
+            UpdateControlData(true, rowCount, list, image);
             CheckEnabledState();
         }
 
@@ -89,7 +89,7 @@ namespace BlueControls.Controls
                 FillPropertyNow();
 
                 _propertyName = value;
-                UpdateControlData(1, null, enImageCode.None);
+                UpdateControlData(false, 1, null, enImageCode.None);
                 CheckEnabledState();
 
             }
@@ -151,7 +151,7 @@ namespace BlueControls.Controls
                 FillPropertyNow();
 
                 _addGroupboxText = value;
-                UpdateControlData(1, null, enImageCode.None);
+                UpdateControlData(false, 1, null, enImageCode.None);
                 CheckEnabledState();
 
             }
@@ -193,7 +193,7 @@ namespace BlueControls.Controls
 
 
                 _propertyObject = value;
-                UpdateControlData(1, null, enImageCode.None);
+                UpdateControlData(false, 1, null, enImageCode.None);
                 CheckEnabledState();
 
 
@@ -209,7 +209,7 @@ namespace BlueControls.Controls
         {
             FillPropertyNow();
             _propertyObject = null;  //Das Objekt ist tot und irgendwo im Nirvana verschwunden
-            UpdateControlData(1, null, enImageCode.None);
+            UpdateControlData(false, 1, null, enImageCode.None);
             CheckEnabledState();
 
             LoadedFromDisk?.Invoke(this, System.EventArgs.Empty);
@@ -397,7 +397,7 @@ namespace BlueControls.Controls
         }
 
 
-        private void UpdateControlData(int TextLines, ItemCollectionList list, enImageCode image)
+        private void UpdateControlData(bool withCreate, int TextLines, ItemCollectionList list, enImageCode image)
         {
 
             #region propInfo & _propertynamecpl befüllen
@@ -449,7 +449,7 @@ namespace BlueControls.Controls
 
             #region Art des Steuerelements bestimmen
 
-            if (propInfo != null)
+            if (withCreate && propInfo != null)
             {
 
                 switch (propInfo.PropertyType.FullName.ToLower())
@@ -543,10 +543,10 @@ namespace BlueControls.Controls
 
                 }
             }
-            else
-            {
-                Develop.DebugPrint(_propertyName + " hat keine Zuordnung");
-            }
+            //else
+            //{
+            //    Develop.DebugPrint(_propertyName + " hat keine Zuordnung");
+            //}
 
             #endregion
 
@@ -706,7 +706,7 @@ namespace BlueControls.Controls
 
         private void GroupBox_TextChanged(object sender, System.EventArgs e)
         {
-            UpdateControlData(1, null, enImageCode.None);
+            UpdateControlData(false, 1, null, enImageCode.None);
             CheckEnabledState();
 
             OnValueChanged(); // Wichig, dass Fehler-Dreiecke angezeigt werden können

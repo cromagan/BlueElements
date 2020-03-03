@@ -1113,6 +1113,8 @@ namespace BlueControls.Controls
         public List<BasicPadItem> HotItems(System.Windows.Forms.MouseEventArgs e)
         {
 
+            if (e == null) { return new List<BasicPadItem>(); }
+
 
             var P = new Point((int)((decimal)(e.X + _MoveX) / _Zoom), (int)((decimal)(e.Y + _MoveY) / _Zoom));
 
