@@ -287,12 +287,12 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
 
-        private void LeerLösch_Click(object sender, System.EventArgs e)
+        private void CodeGeneratorChanges_Click(object sender, System.EventArgs e)
         {
             GenerateText();
         }
 
-        private void Leer_TextChanged(object sender, System.EventArgs e)
+        private void CodeGeneratorChanges_TextChanged(object sender, System.EventArgs e)
         {
             GenerateText();
         }
@@ -617,5 +617,32 @@ namespace BlueControls.BlueDatabaseDialogs
             ItemChanged();
 
         }
+
+        private void Pad_HotItemChanged(object sender, System.EventArgs e)
+        {
+
+            tabElementEigenschaften.Controls.Clear();
+            if (Pad.HotItem == null) { return; }
+
+            var Flexis = Pad.HotItem.GetStyleOptions();
+            if (Flexis.Count == 0) { return; }
+
+
+            var top = Skin.Padding;
+            foreach (var ThisFlexi in Flexis)
+            {
+                tabElementEigenschaften.Controls.Add(ThisFlexi);
+                ThisFlexi.Enabled = true;
+                ThisFlexi.Left = Skin.Padding;
+                ThisFlexi.Top = top;
+                ThisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+                top = top + Skin.Padding + ThisFlexi.Height;
+
+                ThisFlexi.Width = tabElementEigenschaften.Width - Skin.Padding * 4;
+                //ThisFlexi.ButtonClicked += FlexiButtonClick;
+            }
+
+        }
+
     }
 }

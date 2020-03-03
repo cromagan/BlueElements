@@ -455,11 +455,11 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override List<FlexiControl> GetStyleOptionsx()
+        public override List<FlexiControl> GetStyleOptions()
         {
             var l = new List<FlexiControl>();
 
-            l.Add(new FlexiControl("Datensatz bearbeiten", enImageCode.Stift));
+            l.Add(new FlexiControlForProperty(this, "Datensatz bearbeiten", enImageCode.Stift));
 
             l.Add(new FlexiControl());
 
@@ -471,40 +471,40 @@ namespace BlueControls.ItemCollection
                 Layouts.Add(new TextListItem(z.ToString(), p.Caption, enImageCode.Stern));
             }
 
-            l.Add(new FlexiControl("LayoutId", _LayoutID, Layouts));
+            l.Add(new FlexiControlForProperty(this, "LayoutId", Layouts));
 
-            l.AddRange(base.GetStyleOptionsx());
+            l.AddRange(base.GetStyleOptions());
             return l;
         }
 
-        public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        {
+        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
+        //{
 
-            if (Tags.TagGet("Datensatz bearbeiten").FromPlusMinus())
-            {
-                CloseMenu = false;
-                EditBoxRow.Show("Datensatz bearbeiten:", _Row, true);
-                GeneratePic(true);
-                return;
-            }
-
-
-            var newl = Tags.TagGet("LayoutId");
-
-            if (newl != _LayoutID)
-            {
-                _LayoutID = newl;
-                GeneratePic(true);
-                if (_tmpBMP != null)
-                {
-                    KeepInternalLogic();
-                }
-                KeepInternalLogic();
-            }
+        //    if (Tags.TagGet("Datensatz bearbeiten").FromPlusMinus())
+        //    {
+        //        CloseMenu = false;
+        //        EditBoxRow.Show("Datensatz bearbeiten:", _Row, true);
+        //        GeneratePic(true);
+        //        return;
+        //    }
 
 
+        //    var newl = Tags.TagGet("LayoutId");
+
+        //    if (newl != _LayoutID)
+        //    {
+        //        _LayoutID = newl;
+        //        GeneratePic(true);
+        //        if (_tmpBMP != null)
+        //        {
+        //            KeepInternalLogic();
+        //        }
+        //        KeepInternalLogic();
+        //    }
 
 
-        }
+
+
+        //}
     }
 }

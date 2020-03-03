@@ -42,7 +42,7 @@ namespace BlueControls.ItemCollection
 
         readonly private decimal mm125x; //Math.Round(mmToPixel(1.25D, _DPIx), 1)
 
-        private decimal _Size;
+        public string Größe_Distanzhalter { get; set; }
 
         #endregion
 
@@ -62,7 +62,7 @@ namespace BlueControls.ItemCollection
         {
             mm125x = Math.Round(modConverter.mmToPixel(1.25M, ItemCollectionPad.DPI), 1);
 
-            _Size = mm125x * 2; // 19,68 = 2,5 mm
+            Größe_Distanzhalter = (mm125x * 2).ToString(Constants.Format_Float10); // 19,68 = 2,5 mm
             p_o = new PointDF(this, "O", 0, 0);
             p_u = new PointDF(this, "U", 0, 0);
             p_l = new PointDF(this, "L", 0, 0);
@@ -105,7 +105,7 @@ namespace BlueControls.ItemCollection
         public override bool Contains(PointF value, decimal zoomfactor)
         {
             var mp = UsedArea().PointOf(enAlignment.Horizontal_Vertical_Center);
-            return GeometryDF.Länge(value.ToPointDF(), mp) < _Size / 2;
+            return GeometryDF.Länge(value.ToPointDF(), mp) < decimal.Parse(Größe_Distanzhalter) / 2;
         }
 
 
@@ -133,7 +133,8 @@ namespace BlueControls.ItemCollection
 
         public override RectangleDF UsedArea()
         {
-            return new RectangleDF(p_l.X, p_o.Y, _Size * Parent.SheetStyleScale, _Size * Parent.SheetStyleScale);
+            var t = decimal.Parse(Größe_Distanzhalter) * Parent.SheetStyleScale;
+            return new RectangleDF(p_l.X, p_o.Y, t, t);
         }
 
 
@@ -145,7 +146,7 @@ namespace BlueControls.ItemCollection
             switch (tag)
             {
                 case "size":
-                    _Size = decimal.Parse(value);
+                    Größe_Distanzhalter = value.FromNonCritical();
                     return true;
                 case "checked":
                     return true;
@@ -162,16 +163,17 @@ namespace BlueControls.ItemCollection
         {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-            return t + "Size=" + _Size + "}";
+            return t + "Size=" + Größe_Distanzhalter.ToNonCritical() + "}";
         }
 
 
         protected override void KeepInternalLogic()
         {
-            p_o.SetTo(p_m.X, p_m.Y - _Size * Parent.SheetStyleScale / 2);
-            p_u.SetTo(p_m.X, p_m.Y + _Size * Parent.SheetStyleScale / 2);
-            p_l.SetTo(p_m.X - _Size * Parent.SheetStyleScale / 2, p_m.Y);
-            p_r.SetTo(p_m.X + _Size * Parent.SheetStyleScale / 2, p_m.Y);
+            var t = decimal.Parse(Größe_Distanzhalter) * Parent.SheetStyleScale / 2;
+            p_o.SetTo(p_m.X, p_m.Y - t);
+            p_u.SetTo(p_m.X, p_m.Y + t);
+            p_l.SetTo(p_m.X - t, p_m.Y);
+            p_r.SetTo(p_m.X + t, p_m.Y);
         }
 
 
@@ -186,29 +188,31 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override List<FlexiControl> GetStyleOptionsx()
+        public override List<FlexiControl> GetStyleOptions()
         {
             var l = new List<FlexiControl>();
 
 
-            var Size = new ItemCollectionList();
-            Size.Add(new TextListItem((mm125x * 1m).ToString(Constants.Format_Float4), "Klein (1,25 mm)", enImageCode.GrößeÄndern));
-            Size.Add(new TextListItem((mm125x * 2m).ToString(Constants.Format_Float4), "Normal (2,5 mm)", enImageCode.GrößeÄndern));
-            Size.Add(new TextListItem((mm125x * 4m).ToString(Constants.Format_Float4), "Groß (5,0 mm)", enImageCode.GrößeÄndern));
-            Size.Add(new TextListItem((mm125x * 5m).ToString(Constants.Format_Float4), "Sehr groß (10,0 mm)", enImageCode.GrößeÄndern));
+            var Size = new ItemCollectionList
+            {
+                new TextListItem((mm125x * 1m).ToString(Constants.Format_Float4), "Klein (1,25 mm)", enImageCode.GrößeÄndern),
+                new TextListItem((mm125x * 2m).ToString(Constants.Format_Float4), "Normal (2,5 mm)", enImageCode.GrößeÄndern),
+                new TextListItem((mm125x * 4m).ToString(Constants.Format_Float4), "Groß (5,0 mm)", enImageCode.GrößeÄndern),
+                new TextListItem((mm125x * 5m).ToString(Constants.Format_Float4), "Sehr groß (10,0 mm)", enImageCode.GrößeÄndern)
+            };
 
-            l.Add(new FlexiControl("Größe Distanzhalter", _Size.ToString(Constants.Format_Float4), Size));
+            l.Add(new FlexiControlForProperty(this, "Größe Distanzhalter", Size));
 
-            l.AddRange(base.GetStyleOptionsx());
+            l.AddRange(base.GetStyleOptions());
             return l;
         }
 
-        public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        {
+        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
+        //{
 
-            _Size = decimal.Parse(Tags.TagGet("Größe Distanzhalter").FromNonCritical());
-            SetCoordinates(new RectangleDF(p_m.X - 5, p_m.Y - 5, 10, 10));
+        //    _Size = decimal.Parse(Tags.TagGet("Größe Distanzhalter").FromNonCritical());
+        //    SetCoordinates(new RectangleDF(p_m.X - 5, p_m.Y - 5, 10, 10));
 
-        }
+        //}
     }
 }

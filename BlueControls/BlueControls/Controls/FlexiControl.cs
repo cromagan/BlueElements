@@ -64,7 +64,7 @@ namespace BlueControls.Controls
         bool _ShowInfoWhenDisabled = false;
 
 
-        private bool _MultiLine = false;
+        protected bool _MultiLine = false;
         private string _Suffix = string.Empty;
         private enDataFormat _Format = enDataFormat.Text;
 
@@ -89,51 +89,55 @@ namespace BlueControls.Controls
             InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        }
-
-
-
-        /// <summary>
-        /// Erstellt ein einfaches Linien-Element.
-        /// </summary>
-        /// <param name="vType"></param>
-        public FlexiControl(bool Horizontal)
-        {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
-
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _EditType = enEditTypeFormula.Line;
             Size = new Size(200, 8);
 
-            if (!Horizontal) { Develop.DebugPrint_NichtImplementiert(); }
         }
 
-        /// <summary>
-        /// Erstellt einen Ja/Nein-Knopf.
-        /// </summary>
-        /// <param name="caption"></param>
-        /// <param name="value"></param>
-        public FlexiControl(string caption, bool value)
-        {
 
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
 
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _EditType = enEditTypeFormula.Ja_Nein_Knopf;
-            _Caption = caption + ":";
-            ValueId = caption;
-            _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+        ///// <summary>
+        ///// Erstellt ein einfaches Linien-Element.
+        ///// </summary>
+        ///// <param name="vType"></param>
+        //public FlexiControl(bool Horizontal)
+        //{
+        //    // Dieser Aufruf ist für den Designer erforderlich.
+        //    InitializeComponent();
 
-            var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+        //    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        //    _EditType = enEditTypeFormula.Line;
+        //    Size = new Size(200, 8);
 
-            Size = new Size((int)s.Width + 30, 22);
+        //    if (!Horizontal) { Develop.DebugPrint_NichtImplementiert(); }
+        //}
 
-            CreateSubControls();
-            this.Value = value.ToPlusMinus();
+        ///// <summary>
+        ///// Erstellt einen Ja/Nein-Knopf.
+        ///// </summary>
+        ///// <param name="caption"></param>
+        ///// <param name="value"></param>
+        //public FlexiControl(string caption, bool value)
+        //{
 
-        }
+        //    // Dieser Aufruf ist für den Designer erforderlich.
+        //    InitializeComponent();
+
+        //    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        //    _EditType = enEditTypeFormula.Ja_Nein_Knopf;
+        //    _Caption = caption + ":";
+        //    ValueId = caption;
+        //    _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+
+        //    var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+
+        //    Size = new Size((int)s.Width + 30, 22);
+
+        //    CreateSubControls();
+        //    this.Value = value.ToPlusMinus();
+
+        //}
 
 
         /// <summary>
@@ -158,78 +162,78 @@ namespace BlueControls.Controls
 
         }
 
-        /// <summary>
-        /// Initialisiert das FlexControl als einfachen Button zum klicken
-        /// </summary>
-        /// <param name="CaptionText"></param>
-        /// <param name="Pic"></param>
-        public FlexiControl(string CaptionText, enImageCode Pic)
-        {
+        ///// <summary>
+        ///// Initialisiert das FlexControl als einfachen Button zum klicken
+        ///// </summary>
+        ///// <param name="CaptionText"></param>
+        ///// <param name="Pic"></param>
+        //public FlexiControl(string CaptionText, enImageCode Pic)
+        //{
 
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
+        //    // Dieser Aufruf ist für den Designer erforderlich.
+        //    InitializeComponent();
 
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _EditType = enEditTypeFormula.Button;
-            _Caption = CaptionText;
-            ValueId = CaptionText;
-            _CaptionPosition = enÜberschriftAnordnung.ohne;
-            _Value = string.Empty;
-
-
-            var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
-            Size = new Size((int)s.Width + 50, 30);
-
-            var c = CreateSubControls();
-
-            ((Button)c).ImageCode = QuickImage.Get(Pic).ToString();
-
-        }
-
-        /// <summary>
-        /// Initialisiert das FlexControl als Textbox
-        /// </summary>
-        /// <param name="CaptionText"></param>
-        /// <param name="InitialValue"></param>
-        /// <param name="Format"></param>
-        /// <param name="TextLines"></param>
-        public FlexiControl(string CaptionText, string InitialValue, enDataFormat Format, int TextLines)
-        {
-
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
-
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _EditType = enEditTypeFormula.Textfeld;
-
-            _MultiLine = false;
+        //    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        //    _EditType = enEditTypeFormula.Button;
+        //    _Caption = CaptionText;
+        //    ValueId = CaptionText;
+        //    _CaptionPosition = enÜberschriftAnordnung.ohne;
+        //    _Value = string.Empty;
 
 
-            if (TextLines >= 2)
-            {
-                _CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
-                Size = new Size(200, 16 + 24 * TextLines);
-                _MultiLine = true;
-            }
-            else
-            {
-                _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-                Size = new Size(200, 24);
-                _MultiLine = false;
-            }
+        //    var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+        //    Size = new Size((int)s.Width + 50, 30);
+
+        //    var c = CreateSubControls();
+
+        //    ((Button)c).ImageCode = QuickImage.Get(Pic).ToString();
+
+        //}
+
+        ///// <summary>
+        ///// Initialisiert das FlexControl als Textbox
+        ///// </summary>
+        ///// <param name="CaptionText"></param>
+        ///// <param name="InitialValue"></param>
+        ///// <param name="Format"></param>
+        ///// <param name="TextLines"></param>
+        //public FlexiControl(string CaptionText, string InitialValue, enDataFormat Format, int TextLines)
+        //{
+
+        //    // Dieser Aufruf ist für den Designer erforderlich.
+        //    InitializeComponent();
+
+        //    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        //    _EditType = enEditTypeFormula.Textfeld;
+
+        //    _MultiLine = false;
 
 
-            _Caption = CaptionText + ":";
-            ValueId = CaptionText;
-            _Format = Format;
-            _InstantChangedEvent = true;
+        //    if (TextLines >= 2)
+        //    {
+        //        _CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
+        //        Size = new Size(200, 16 + 24 * TextLines);
+        //        _MultiLine = true;
+        //    }
+        //    else
+        //    {
+        //        _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+        //        Size = new Size(200, 24);
+        //        _MultiLine = false;
+        //    }
 
-            var c = CreateSubControls();
 
-            StyleTextBox((TextBox)c, string.Empty, false);
+        //    _Caption = CaptionText + ":";
+        //    ValueId = CaptionText;
+        //    _Format = Format;
+        //    _InstantChangedEvent = true;
 
-            Value = InitialValue;
-        }
+        //    var c = CreateSubControls();
+
+        //    StyleTextBox((TextBox)c, string.Empty, false);
+
+        //    Value = InitialValue;
+        //}
 
         ///// <summary>
         ///// Erstellt eine Combobox

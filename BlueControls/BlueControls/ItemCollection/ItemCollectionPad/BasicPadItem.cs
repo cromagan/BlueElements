@@ -131,14 +131,10 @@ namespace BlueControls.ItemCollection
                     i = new RowFormulaPadItem(parent, name);
                     break;
 
-                case "blueelements.clsitemcomiccomp":
-                case "comic":
-                    i = new ComicCompPadItem(parent, name);
-                    break;
-
                 case "symbol":
                     i = new SymbolPadItem(parent, name);
                     break;
+
                 default:
                     Develop.DebugPrint(enFehlerArt.Fehler, "Unbekanntes Item: " + code);
                     break;
@@ -219,7 +215,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public abstract void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu);
+        //public abstract void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu);
 
         protected abstract void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting);
 

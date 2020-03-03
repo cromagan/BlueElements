@@ -39,10 +39,12 @@ namespace BlueControls.ItemCollection
 
 
         #region  Variablen-Deklarationen 
-        private string _VariableText;
+
+        [PropertyAttributes("Text der angezeigt werden soll.<br>Kann Variablen aus dem Code-Generator enthalten.", true)]
+        public string Interner_Text { get; set; }
         private string _ReadableText;
-        private enAlignment _Align;
-        private enDataFormat _Format = enDataFormat.Text;
+        public enAlignment Ausrichtung { get; set; }
+        private enDataFormat Format { get; set; } = enDataFormat.Text;
 
         private ExtText etxt;
 
@@ -50,7 +52,7 @@ namespace BlueControls.ItemCollection
 
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
-        public decimal AdditionalScale = 3.07m;
+        public decimal Skalierung { get; set; } = 3.07m;
 
 
         #endregion
@@ -71,12 +73,12 @@ namespace BlueControls.ItemCollection
         public TextPadItem(ItemCollectionPad parent, string internalname, string vReadableText) : base(parent, internalname)
         {
             _ReadableText = vReadableText;
-            _VariableText = _ReadableText;
+            Interner_Text = _ReadableText;
 
             Stil = PadStyles.Undefiniert;
 
             etxt = null;
-            _Align = enAlignment.Top_Left;
+            Ausrichtung = enAlignment.Top_Left;
 
         }
 
@@ -114,12 +116,12 @@ namespace BlueControls.ItemCollection
         {
             get
             {
-                return _Align;
+                return Ausrichtung;
             }
             set
             {
-                if (value == _Align) { return; }
-                _Align = value;
+                if (value == Ausrichtung) { return; }
+                Ausrichtung = value;
                 etxt = null;
                 //OnNeedRefresh();
                 OnChanged();
@@ -132,8 +134,6 @@ namespace BlueControls.ItemCollection
 
         public override void DesignOrStyleChanged()
         {
-
-
             etxt = null;
         }
 
@@ -146,19 +146,19 @@ namespace BlueControls.ItemCollection
             {
                 case "readabletext":
                     _ReadableText = value.FromNonCritical();
-                    _VariableText = _ReadableText;
+                    Interner_Text = _ReadableText;
                     return true;
 
                 case "alignment":
-                    _Align = (enAlignment)byte.Parse(value);
+                    Ausrichtung = (enAlignment)byte.Parse(value);
                     return true;
 
                 case "format":
-                    _Format = (enDataFormat)int.Parse(value);
+                    Format = (enDataFormat)int.Parse(value);
                     return true;
 
                 case "additionalscale":
-                    AdditionalScale = decimal.Parse(value.FromNonCritical());
+                    Skalierung = decimal.Parse(value.FromNonCritical());
                     return true;
             }
 
@@ -171,9 +171,9 @@ namespace BlueControls.ItemCollection
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             if (!string.IsNullOrEmpty(_ReadableText)) { t = t + "ReadableText=" + _ReadableText.ToNonCritical() + ", "; }
-            if (_Format != enDataFormat.Text) { t = t + "Format=" + (int)_Format + ", "; }
-            if (_Align != enAlignment.Top_Left) { t = t + "Alignment=" + (int)_Align + ", "; }
-            t = t + "AdditionalScale=" + AdditionalScale.ToString().ToNonCritical() + ", ";
+            if (Format != enDataFormat.Text) { t = t + "Format=" + (int)Format + ", "; }
+            if (Ausrichtung != enAlignment.Top_Left) { t = t + "Alignment=" + (int)Ausrichtung + ", "; }
+            t = t + "AdditionalScale=" + Skalierung.ToString().ToNonCritical() + ", ";
             return t.Trim(", ") + "}";
         }
 
@@ -202,7 +202,7 @@ namespace BlueControls.ItemCollection
 
             if (!string.IsNullOrEmpty(_ReadableText) || !ForPrinting)
             {
-                etxt.Draw(GR, (float)(cZoom * AdditionalScale * Parent.SheetStyleScale));
+                etxt.Draw(GR, (float)(cZoom * Skalierung * Parent.SheetStyleScale));
             }
 
 
@@ -322,11 +322,11 @@ namespace BlueControls.ItemCollection
 
                 //etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / Parent.SheetStyleScale), -1);
                 //etxt.LineBreakWidth = etxt.DrawingArea.Width;
-                etxt.TextDimensions = new Size((int)(UsedArea().Width / AdditionalScale / Parent.SheetStyleScale), -1);
-                etxt.Ausrichtung = _Align;
+                etxt.TextDimensions = new Size((int)(UsedArea().Width / Skalierung / Parent.SheetStyleScale), -1);
+                etxt.Ausrichtung = Ausrichtung;
 
-                p_RU.Y = Math.Max(p_LO.Y + etxt.Height() * AdditionalScale * Parent.SheetStyleScale, p_LO.Y + 10);
-                p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * AdditionalScale * Parent.SheetStyleScale);
+                p_RU.Y = Math.Max(p_LO.Y + etxt.Height() * Skalierung * Parent.SheetStyleScale, p_LO.Y + 10);
+                p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * Skalierung * Parent.SheetStyleScale);
             }
 
 
@@ -354,9 +354,9 @@ namespace BlueControls.ItemCollection
         public bool ResetVariables()
         {
 
-            if (_VariableText == _ReadableText) { return false; }
+            if (Interner_Text == _ReadableText) { return false; }
 
-            _ReadableText = _VariableText;
+            _ReadableText = Interner_Text;
 
             etxt = null;
 
@@ -379,7 +379,7 @@ namespace BlueControls.ItemCollection
 
         public bool RenameColumn(string oldName, ColumnItem cColumnItem)
         {
-            _ReadableText = _VariableText;
+            _ReadableText = Interner_Text;
 
             var ot = _ReadableText;
 
@@ -388,7 +388,7 @@ namespace BlueControls.ItemCollection
 
             if (ot == _ReadableText) { return false; }
 
-            _VariableText = _ReadableText;
+            Interner_Text = _ReadableText;
 
             etxt = null;
             return true;
@@ -398,69 +398,69 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override List<FlexiControl> GetStyleOptionsx()
+        public override List<FlexiControl> GetStyleOptions()
         {
             var l = new List<FlexiControl>();
 
-            l.Add(new FlexiControl("Text", _VariableText, enDataFormat.Text, 5));
+            l.Add(new FlexiControlForProperty(this, "Interner-Text", 5));
 
 
-            l.Add(new FlexiControl("Stil", ((int)Stil).ToString(), Skin.GetFonts(Parent.SheetStyle)));
-
-
-
-
-            var Aursicht = new ItemCollectionList();
-            Aursicht.Add(new TextListItem(((int)enAlignment.Top_Left).ToString(), "Linksbündig ausrichten", enImageCode.Linksbündig));
-            Aursicht.Add(new TextListItem(((int)enAlignment.Top_HorizontalCenter).ToString(), "Zentrieren", enImageCode.Zentrieren));
-            Aursicht.Add(new TextListItem(((int)enAlignment.Top_Right).ToString(), "Rechtsbündig ausrichten", enImageCode.Rechtsbündig));
+            var Aursicht = new ItemCollectionList
+            {
+                new TextListItem(((int)enAlignment.Top_Left).ToString(), "Linksbündig ausrichten", enImageCode.Linksbündig),
+                new TextListItem(((int)enAlignment.Top_HorizontalCenter).ToString(), "Zentrieren", enImageCode.Zentrieren),
+                new TextListItem(((int)enAlignment.Top_Right).ToString(), "Rechtsbündig ausrichten", enImageCode.Rechtsbündig)
+            };
             Aursicht.Sort();
-            l.Add(new FlexiControl("Ausrichtung", ((int)_Align).ToString(), Aursicht));
-            l.Add(new FlexiControl("Skalierung", AdditionalScale.ToString(), enDataFormat.Gleitkommazahl, 1));
+            l.Add(new FlexiControlForProperty(this, "Ausrichtung", Aursicht));
+            l.Add(new FlexiControlForProperty(this, "Skalierung"));
 
 
-            l.AddRange(base.GetStyleOptionsx());
+            AddStyleOption(l);
+
+            l.AddRange(base.GetStyleOptions());
+
             return l;
         }
 
-        public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        {
+        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
+        //{
 
-            base.DoStyleCommands(sender, Tags, ref CloseMenu);
+        //    base.DoStyleCommands(sender, Tags, ref CloseMenu);
 
-            var txt = Tags.TagGet("text").FromNonCritical();
+        //    var txt = Tags.TagGet("text").FromNonCritical();
 
-            if (txt != _VariableText)
-            {
-                _ReadableText = txt; //DirectCast(sender, TextBox).Text
-                _VariableText = txt; //_ReadableText
-                etxt = null;
-                RecomputePointAndRelations();
-            }
-
-
-            var tmps = (PadStyles)int.Parse(Tags.TagGet("Stil"));
-
-            if (tmps != Stil)
-            {
-                Stil = tmps;
-                etxt = null;
-            }
+        //    if (txt != _VariableText)
+        //    {
+        //        _ReadableText = txt; //DirectCast(sender, TextBox).Text
+        //        _VariableText = txt; //_ReadableText
+        //        etxt = null;
+        //        RecomputePointAndRelations();
+        //    }
 
 
-            var tmpa = (enAlignment)int.Parse(Tags.TagGet("Ausrichtung"));
+        //    var tmps = (PadStyles)int.Parse(Tags.TagGet("Stil"));
 
-            if (tmpa != _Align)
-            {
-                _Align = tmpa;
-                etxt = null;
-            }
-
-
-            AdditionalScale = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
+        //    if (tmps != Stil)
+        //    {
+        //        Stil = tmps;
+        //        etxt = null;
+        //    }
 
 
-        }
+        //    var tmpa = (enAlignment)int.Parse(Tags.TagGet("Ausrichtung"));
+
+        //    if (tmpa != _Align)
+        //    {
+        //        _Align = tmpa;
+        //        etxt = null;
+        //    }
+
+
+        //    AdditionalScale = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
+
+
+        //}
 
 
 

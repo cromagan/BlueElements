@@ -77,6 +77,9 @@ namespace BlueControls.Controls
         private float _GridShow = 10;
         private float _Gridsnap = 1;
 
+        public BasicPadItem HotItem { get; private set; } = null;
+
+
 
         private bool RepairPrinterData_Prepaired;
         private ItemCollectionPad _Item;
@@ -90,6 +93,9 @@ namespace BlueControls.Controls
 
         public event PrintEventHandler BeginnPrint;
         public event PrintEventHandler EndPrint;
+
+
+        public event EventHandler HotItemChanged;
         #endregion
 
 
@@ -221,13 +227,13 @@ namespace BlueControls.Controls
                     _Item.OnDoInvalidate();
                 }
 
-                
+
 
 
 
             }
         }
-        
+
 
 
 
@@ -384,9 +390,9 @@ namespace BlueControls.Controls
             base.OnMouseDown(e);
 
 
-            var Ho = HotItem(e);
+            CheckHotItem(e);
 
-            if (Ho is IMouseAndKeyHandle ho2)
+            if (HotItem is IMouseAndKeyHandle ho2)
             {
                 if (ho2.MouseDown(this, e, _Zoom, _MoveX, _MoveY))
                 {
@@ -426,14 +432,14 @@ namespace BlueControls.Controls
                 {
                     Unselect();
 
-                    if (HotItem(e) == null) { ComputeMovingData(); }
+                    if (HotItem == null) { ComputeMovingData(); }
                     Invalidate();
 
                 }
 
-                if (Ho != null)
+                if (HotItem != null)
                 {
-                    Sel_P.AddIfNotExists(Ho.Points);
+                    Sel_P.AddIfNotExists(HotItem.Points);
                     ComputeMovingData();
                     Invalidate();
                 }
@@ -445,10 +451,10 @@ namespace BlueControls.Controls
         internal void DoMouseMove(System.Windows.Forms.MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            var ho = HotItem(e);
+
             if (_GivesMouseComandsTo != null)
             {
-                if (e.Button == System.Windows.Forms.MouseButtons.None && ho != _GivesMouseComandsTo)
+                if (e.Button == System.Windows.Forms.MouseButtons.None && HotItem != _GivesMouseComandsTo)
                 {
                     _GivesMouseComandsTo = null;
                     Invalidate();
@@ -468,7 +474,7 @@ namespace BlueControls.Controls
             }
             else
             {
-                if (ho is IMouseAndKeyHandle Ho2)
+                if (HotItem is IMouseAndKeyHandle Ho2)
                 {
                     if (Ho2.MouseMove(this, e, _Zoom, _MoveX, _MoveY))
                     {
@@ -695,6 +701,7 @@ namespace BlueControls.Controls
 
         private void _Item_ItemRemoved(object sender, System.EventArgs e)
         {
+            CheckHotItem(null);
             Unselect();
             ZoomFit();
             Invalidate();
@@ -1122,37 +1129,45 @@ namespace BlueControls.Controls
         }
 
 
-        private BasicPadItem HotItem(System.Windows.Forms.MouseEventArgs e)
+        private void CheckHotItem(System.Windows.Forms.MouseEventArgs e)
         {
-            var l = HotItems(e); // _Item.Search(CInt((e.X + SliderX.Value) / _Zoom), CInt((e.Y + SliderY.Value) / _Zoom), _Zoom)
+            var OldHot = HotItem;
+
+            var l = HotItems(e);
 
             var Mina = long.MaxValue;
-            BasicPadItem _HotItem = null;
 
+            HotItem = null;
 
-            foreach (var ThisItem in l)
+            if (e != null)
             {
-                var a = (long)Math.Abs(ThisItem.UsedArea().Width) * (long)Math.Abs(ThisItem.UsedArea().Height);
-                if (a <= Mina)
+
+                foreach (var ThisItem in l)
                 {
-                    // Gleich deswegen, dass neuere, IDENTISCHE Items dass oberste gewählt wird.
-                    Mina = a;
-                    _HotItem = ThisItem;
+                    var a = (long)Math.Abs(ThisItem.UsedArea().Width) * (long)Math.Abs(ThisItem.UsedArea().Height);
+                    if (a <= Mina)
+                    {
+                        // Gleich deswegen, dass neuere, IDENTISCHE Items dass oberste gewählt wird.
+                        Mina = a;
+                        HotItem = ThisItem;
+                    }
                 }
             }
 
-            return _HotItem;
+
+            if (HotItem != OldHot) { OnHotItemChanged(); }
 
         }
 
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object selectedHotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
         {
 
-            HotItem = this.HotItem(e);
+            CheckHotItem(e);
+            selectedHotItem = HotItem;
 
 
-            if (HotItem != null)
+            if (selectedHotItem != null)
             {
                 Items.Add(new TextListItem("Allgemeine Element-Aktionen", true));
                 Items.Add(new TextListItem("#Erweitert", "Objekt bearbeiten", enImageCode.Stift));
@@ -1170,7 +1185,7 @@ namespace BlueControls.Controls
                 //}
 
 
-                Items.Add(new TextListItem("#Duplicate", "Objekt duplizieren", enImageCode.Kopieren, HotItem is ICloneable));
+                Items.Add(new TextListItem("#Duplicate", "Objekt duplizieren", enImageCode.Kopieren, selectedHotItem is ICloneable));
 
 
                 Items.Add(new LineListItem());
@@ -1577,7 +1592,7 @@ namespace BlueControls.Controls
 
         public void ShowErweitertMenü(BasicPadItem Item)
         {
-            var l = Item.GetStyleOptionsx();
+            var l = Item.GetStyleOptions();
 
             if (l.Count == 0)
             {
@@ -1593,7 +1608,7 @@ namespace BlueControls.Controls
 
             var ClosMe = true;
 
-            Item.DoStyleCommands(this, tg, ref ClosMe);
+            //Item.DoStyleCommands(this, tg, ref ClosMe);
 
 
 
@@ -1616,6 +1631,11 @@ namespace BlueControls.Controls
         private void DruckerDokument_EndPrint(object sender, PrintEventArgs e)
         {
             OnEndPrint(e);
+        }
+
+        private void OnHotItemChanged()
+        {
+            HotItemChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
         private void OnBeginnPrint(PrintEventArgs e)

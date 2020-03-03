@@ -42,12 +42,13 @@ namespace BlueControls.ItemCollection
         #region  Variablen-Deklarationen 
 
 
-        public bool Hintergrund_weiß_füllen;
+        public bool Hintergrund_weiß_füllen { get; set; }
         public int Padding;
         public List<QuickImage> Overlays;
-        public enSizeModes Bild_Modus;
+        public enSizeModes Bild_Modus { get; set; }
 
-        private string Platzhalter_für_Layout;
+        [PropertyAttributes("Hier kann ein Platzhalter, der mit dem Code-Generator erzeugt wurde, eingefügt werden.", false)]
+        public string Platzhalter_für_Layout { get; set; }
         #endregion
 
 
@@ -89,6 +90,44 @@ namespace BlueControls.ItemCollection
 
         #region  Properties 
         public Bitmap Bitmap { get; set; }
+
+
+
+        public string Bildschirmbereich_wählen
+        {
+            set
+            {
+                if (Bitmap != null)
+                {
+                    if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+                }
+
+                Bitmap = ScreenShot.GrabArea(null, 2000, 2000).Pic;
+            }
+        }
+
+        public string Datei_laden
+        {
+            set
+            {
+                if (Bitmap != null)
+                {
+                    if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+                }
+
+                var e = new System.Windows.Forms.OpenFileDialog();
+                e.CheckFileExists = true;
+                e.Multiselect = false;
+                e.Title = "Bild wählen:";
+                e.Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|BMP Windows Bitmap|*.bmp";
+
+                e.ShowDialog();
+
+                if (!FileExists(e.FileName)) { return; }
+
+                Bitmap = (Bitmap)modAllgemein.Image_FromFile(e.FileName);
+            }
+        }
 
         #endregion
 
@@ -293,17 +332,11 @@ namespace BlueControls.ItemCollection
         public bool ParseVariable(string VariableName, enValueType ValueType, string Value)
         {
 
-            if (string.IsNullOrEmpty(Platzhalter_für_Layout))
-            {
-                return false;
-            }
+            if (string.IsNullOrEmpty(Platzhalter_für_Layout)) { return false; }
 
             var ot = Export.ParseVariable(Platzhalter_für_Layout, VariableName, Value, ValueType, enValueType.BinaryImage);
 
-            if (ot == Platzhalter_für_Layout)
-            {
-                return false;
-            }
+            if (ot == Platzhalter_für_Layout) { return false; }
 
             Bitmap = modConverter.StringToBitmap(ot);
 
@@ -346,116 +379,116 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override List<FlexiControl> GetStyleOptionsx()
+        public override List<FlexiControl> GetStyleOptions()
         {
 
             var l = new List<FlexiControl>();
 
-            l.Add(new FlexiControl("Bildschirmbereich wählen", enImageCode.Bild));
-            l.Add(new FlexiControl("Datei laden", enImageCode.Ordner));
-            l.Add(new FlexiControl(true));
-            l.Add(new FlexiControl("Platzhalter für Layout", Platzhalter_für_Layout, enDataFormat.Text, 2));
+            l.Add(new FlexiControlForProperty(this, "Bildschirmbereich_wählen", enImageCode.Bild));
+            l.Add(new FlexiControlForProperty(this, "Datei_laden", enImageCode.Ordner));
+            l.Add(new FlexiControl());
+            l.Add(new FlexiControlForProperty(this, "Platzhalter_für_Layout", 2));
 
 
-            l.Add(new FlexiControl(true));
+            l.Add(new FlexiControl());
 
-            var Comms = new ItemCollectionList();
-            Comms.Add(new TextListItem(((int)enSizeModes.BildAbschneiden).ToString(), "Abschneiden", QuickImage.Get("BildmodusAbschneiden|32")));
-            Comms.Add(new TextListItem(((int)enSizeModes.Verzerren).ToString(), "Verzerren", QuickImage.Get("BildmodusVerzerren|32")));
-            Comms.Add(new TextListItem(((int)enSizeModes.EmptySpace).ToString(), "Einpassen", QuickImage.Get("BildmodusEinpassen|32")));
+            var Comms = new ItemCollectionList
+            {
+                new TextListItem(((int)enSizeModes.BildAbschneiden).ToString(), "Abschneiden", QuickImage.Get("BildmodusAbschneiden|32")),
+                new TextListItem(((int)enSizeModes.Verzerren).ToString(), "Verzerren", QuickImage.Get("BildmodusVerzerren|32")),
+                new TextListItem(((int)enSizeModes.EmptySpace).ToString(), "Einpassen", QuickImage.Get("BildmodusEinpassen|32"))
+            };
 
             l.Add(new FlexiControlForProperty(this, "Bild-Modus", Comms));
 
 
-            l.Add(new FlexiControl(true));
+            l.Add(new FlexiControl());
 
-            AddLineStyleOption();
-    
+            AddLineStyleOption(l);
 
-            k
 
             l.Add(new FlexiControlForProperty(this, "Hintergrund_weiß_füllen"));
 
-            l.AddRange(base.GetStyleOptionsx());
+            l.AddRange(base.GetStyleOptions());
             return l;
         }
 
 
 
 
-        public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        {
+        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
+        //{
 
-            base.DoStyleCommands(sender, Tags, ref CloseMenu);
+        //    base.DoStyleCommands(sender, Tags, ref CloseMenu);
 
-            if (Tags.TagGet("Bildschirmbereich wählen").FromPlusMinus())
-            {
-                CloseMenu = false;
-                if (Bitmap != null)
-                {
-                    if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-                }
+        //    if (Tags.TagGet("Bildschirmbereich wählen").FromPlusMinus())
+        //    {
+        //        CloseMenu = false;
+        //        if (Bitmap != null)
+        //        {
+        //            if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+        //        }
 
-                Bitmap = ScreenShot.GrabArea(null, 2000, 2000).Pic;
-                return;
-            }
+        //        Bitmap = ScreenShot.GrabArea(null, 2000, 2000).Pic;
+        //        return;
+        //    }
 
-            if (Tags.TagGet("Datei laden").FromPlusMinus())
-            {
-                CloseMenu = false;
-                if (Bitmap != null)
-                {
-                    if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-                }
+        //    if (Tags.TagGet("Datei laden").FromPlusMinus())
+        //    {
+        //        CloseMenu = false;
+        //        if (Bitmap != null)
+        //        {
+        //            if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+        //        }
 
-                var e = new System.Windows.Forms.OpenFileDialog();
-                e.CheckFileExists = true;
-                e.Multiselect = false;
-                e.Title = "Bild wählen:";
-                e.Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|BMP Windows Bitmap|*.bmp";
+        //        var e = new System.Windows.Forms.OpenFileDialog();
+        //        e.CheckFileExists = true;
+        //        e.Multiselect = false;
+        //        e.Title = "Bild wählen:";
+        //        e.Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|BMP Windows Bitmap|*.bmp";
 
-                e.ShowDialog();
+        //        e.ShowDialog();
 
-                if (!FileExists(e.FileName))
-                {
-                    return;
-                }
+        //        if (!FileExists(e.FileName))
+        //        {
+        //            return;
+        //        }
 
-                Bitmap = (Bitmap)modAllgemein.Image_FromFile(e.FileName);
-                return;
-            }
-
-
-            if (Tags.TagGet("Skalieren").FromPlusMinus())
-            {
-                CloseMenu = false;
-                var t = InputBox.Show("Skalierfaktor oder Formel eingeben:", "1", enDataFormat.Text);
-
-                var sc = modErgebnis.Ergebnis(t);
-                if (sc == null || sc == 1)
-                {
-                    Notification.Show("Keine Änderung vorgenommen.");
-                    return;
-                }
-
-                var x = p_RU.X - p_LO.X;
-                var y = p_RU.Y - p_LO.Y;
+        //        Bitmap = (Bitmap)modAllgemein.Image_FromFile(e.FileName);
+        //        return;
+        //    }
 
 
-                p_RU.X = (decimal)((double)p_LO.X + (double)x * sc);
-                p_RU.Y = (decimal)((double)p_LO.Y + (double)y * sc);
+        //    if (Tags.TagGet("Skalieren").FromPlusMinus())
+        //    {
+        //        CloseMenu = false;
+        //        var t = InputBox.Show("Skalierfaktor oder Formel eingeben:", "1", enDataFormat.Text);
 
-                KeepInternalLogic();
-                return;
-            }
+        //        var sc = modErgebnis.Ergebnis(t);
+        //        if (sc == null || sc == 1)
+        //        {
+        //            Notification.Show("Keine Änderung vorgenommen.");
+        //            return;
+        //        }
+
+        //        var x = p_RU.X - p_LO.X;
+        //        var y = p_RU.Y - p_LO.Y;
+
+
+        //        p_RU.X = (decimal)((double)p_LO.X + (double)x * sc);
+        //        p_RU.Y = (decimal)((double)p_LO.Y + (double)y * sc);
+
+        //        KeepInternalLogic();
+        //        return;
+        //    }
 
 
 
-            Hintergrund_weiß_füllen = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
-            Bild_Modus = (enSizeModes)int.Parse(Tags.TagGet("Bild-Modus"));
-            Stil = (PadStyles)int.Parse(Tags.TagGet("Umrandung"));
-            Platzhalter_für_Layout = Tags.TagGet("Platzhalter für Layout").FromNonCritical();
+        //    Hintergrund_weiß_füllen = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
+        //    Bild_Modus = (enSizeModes)int.Parse(Tags.TagGet("Bild-Modus"));
+        //    Stil = (PadStyles)int.Parse(Tags.TagGet("Umrandung"));
+        //    Platzhalter_für_Layout = Tags.TagGet("Platzhalter für Layout").FromNonCritical();
 
-        }
+        //}
     }
 }

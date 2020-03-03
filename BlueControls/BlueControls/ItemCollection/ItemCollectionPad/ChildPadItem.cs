@@ -71,9 +71,11 @@ namespace BlueControls.ItemCollection
         public List<BasicPadItem> ZoomItems = null;
 
 
-        public enAlignment TextLage = (enAlignment)(-1);
-        public Color Farbe = Color.Transparent;
-        public List<string> AnsichtenVonMir = new List<string>();
+        public enAlignment Textlage { get; set; } = (enAlignment)(-1);
+        public Color Randfarbe { get; set; } = Color.Transparent;
+
+        [PropertyAttributes("Soll eine Umrandung einer anderen Ansicht hier angezeigt werden,<br>muss dessen Name hier eingegeben werden.", false)]
+        public List<string> Eingebettete_Ansichten { get; set; } = new List<string>();
 
 
 
@@ -84,7 +86,7 @@ namespace BlueControls.ItemCollection
 
         #endregion
 
-
+        [PropertyAttributes("Name und gleichzeitig eventuelle Beschriftung dieser Ansicht.", false)]
         public string Name
         {
             get
@@ -127,11 +129,11 @@ namespace BlueControls.ItemCollection
             ZoomItems = null;
 
             _Name = string.Empty;
-            TextLage = (enAlignment)(-1);
-            Farbe = Color.Transparent;
+            Textlage = (enAlignment)(-1);
+            Randfarbe = Color.Transparent;
             //_ReadableText = string.Empty;
             //_VariableText = string.Empty;
-            AnsichtenVonMir = new List<string>();
+            Eingebettete_Ansichten = new List<string>();
         }
 
 
@@ -214,7 +216,7 @@ namespace BlueControls.ItemCollection
                     if (_tmpBMP != null)
                     {
 
-                        foreach (var thisA in AnsichtenVonMir)
+                        foreach (var thisA in Eingebettete_Ansichten)
                         {
                             ChildPadItem Pad = null;
                             foreach (var It in Parent)
@@ -236,7 +238,7 @@ namespace BlueControls.ItemCollection
                                 var mb2 = Pad.PadInternal.Item.MaxBounds(Pad.ZoomItems);
                                 mb2.Inflate(-1, -1);
                                 var tmpG = Graphics.FromImage(_tmpBMP);
-                                var p = new Pen(Pad.Farbe, (float)(8.7m * cZoom));
+                                var p = new Pen(Pad.Randfarbe, (float)(8.7m * cZoom));
                                 var p2 = new Pen(Color.White, (float)(8.7m * cZoom) + 2f);
                                 p.DashPattern = new float[] { 5, 1, 1, 1 };
                                 var DC2 = mb2.ZoomAndMoveRect(zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y);
@@ -245,12 +247,12 @@ namespace BlueControls.ItemCollection
 
 
 
-                                if (Pad.TextLage != (enAlignment)(-1))
+                                if (Pad.Textlage != (enAlignment)(-1))
                                 {
                                     var s = tmpG.MeasureString(Pad.Name, font);
 
                                     tmpG.FillRectangle(Brushes.White, new RectangleF((float)DC2.Left, (float)(DC2.Top - s.Height - 9f * (float)cZoom), s.Width, s.Height));
-                                    tmpG.DrawString(Pad.Name, font, new SolidBrush(Pad.Farbe), (float)DC2.Left, (float)(DC2.Top - s.Height - 9f * (float)cZoom));
+                                    tmpG.DrawString(Pad.Name, font, new SolidBrush(Pad.Randfarbe), (float)DC2.Left, (float)(DC2.Top - s.Height - 9f * (float)cZoom));
                                 }
                             }
                         }
@@ -272,14 +274,14 @@ namespace BlueControls.ItemCollection
 
                 }
 
-                if (TextLage != (enAlignment)(-1))
+                if (Textlage != (enAlignment)(-1))
                 {
-                    var p = new Pen(Farbe, (float)(8.7m * cZoom));
+                    var p = new Pen(Randfarbe, (float)(8.7m * cZoom));
                     p.DashPattern = new float[] { 10, 2, 1, 2 };
                     GR.DrawRectangle(p, DCoordinates);
 
                     var s = GR.MeasureString(Name, font);
-                    GR.DrawString(Name, font, new SolidBrush(Farbe), (float)DCoordinates.Left, (float)(DCoordinates.Top - s.Height - 9f * (float)cZoom));
+                    GR.DrawString(Name, font, new SolidBrush(Randfarbe), (float)DCoordinates.Left, (float)(DCoordinates.Top - s.Height - 9f * (float)cZoom));
                 }
 
 
@@ -314,13 +316,13 @@ namespace BlueControls.ItemCollection
                 case "checked":
                     return true;
                 case "embedded":
-                    AnsichtenVonMir = value.FromNonCritical().SplitByCRToList();
+                    Eingebettete_Ansichten = value.FromNonCritical().SplitByCRToList();
                     return true;
                 case "color":
-                    Farbe = value.FromHTMLCode();
+                    Randfarbe = value.FromHTMLCode();
                     return true;
                 case "pos":
-                    TextLage = (enAlignment)int.Parse(value);
+                    Textlage = (enAlignment)int.Parse(value);
                     return true;
 
             }
@@ -338,11 +340,11 @@ namespace BlueControls.ItemCollection
 
             //if (!string.IsNullOrEmpty(_ReadableText)) { t = t + "ReadableText=" + _ReadableText.ToNonCritical() + ", "; }
 
-            if (TextLage != (enAlignment)(-1)) { t = t + "Pos=" + (int)TextLage + ", "; }
+            if (Textlage != (enAlignment)(-1)) { t = t + "Pos=" + (int)Textlage + ", "; }
 
-            if (AnsichtenVonMir.Count > 0) { t = t + "Embedded=" + AnsichtenVonMir.JoinWithCr().ToNonCritical() + ", "; }
+            if (Eingebettete_Ansichten.Count > 0) { t = t + "Embedded=" + Eingebettete_Ansichten.JoinWithCr().ToNonCritical() + ", "; }
 
-            t = t + "Color=" + Farbe.ToHTMLCode() + ", ";
+            t = t + "Color=" + Randfarbe.ToHTMLCode() + ", ";
 
 
             if (PadInternal != null)
@@ -523,43 +525,46 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override List<FlexiControl> GetStyleOptionsx()
+        public override List<FlexiControl> GetStyleOptions()
         {
             var l = new List<FlexiControl>();
 
-            l.Add(new FlexiControl("Name", _Name, enDataFormat.Text, 1));
-            //l.Add(new FlexiControl("Text", _VariableText, enDataFormat.Text, 5));
-
-            l.Add(new FlexiControl("Randfarbe", Farbe.ToHTMLCode(), enDataFormat.Text, 1));
+            l.Add(new FlexiControlForProperty(this, "Name"));
 
 
-            var Lage = new ItemCollectionList();
-            Lage.Add(new TextListItem("-1", "ohne"));
-            Lage.Add(new TextListItem(((int)enAlignment.Top_Left).ToString(), "Links oben"));
-            //Lage.Add(new TextListItem(((int)enAlignment.Bottom_Left).ToString(), "Links unten"));
-            l.Add(new FlexiControl("Textlage", ((int)TextLage).ToString(), Lage));
+            l.Add(new FlexiControlForProperty(this, "Randfarbe"));
 
 
-            l.Add(new FlexiControl("Eingebettete Ansichten", AnsichtenVonMir.JoinWithCr(), enDataFormat.Text, 5));
+            var Lage = new ItemCollectionList
+            {
+                new TextListItem("-1", "ohne"),
+                new TextListItem(((int)enAlignment.Top_Left).ToString(), "Links oben")
+            };
 
-            l.AddRange(base.GetStyleOptionsx());
+            l.Add(new FlexiControlForProperty(this, "Textlage",  Lage));
+
+
+            l.Add(new FlexiControlForProperty(this, "Eingebettete Ansichten", 5));
+
+
+            l.AddRange(base.GetStyleOptions());
             return l;
         }
 
-        public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        {
-            _Name = Tags.TagGet("name").FromNonCritical();
+        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
+        //{
+        //    _Name = Tags.TagGet("name").FromNonCritical();
 
-            TextLage = (enAlignment)int.Parse(Tags.TagGet("Textlage"));
+        //    TextLage = (enAlignment)int.Parse(Tags.TagGet("Textlage"));
 
-            AnsichtenVonMir = Tags.TagGet("Eingebettete Ansichten").FromNonCritical().SplitByCRToList();
+        //    AnsichtenVonMir = Tags.TagGet("Eingebettete Ansichten").FromNonCritical().SplitByCRToList();
 
 
 
-            Farbe = Tags.TagGet("Randfarbe").FromHTMLCode();
+        //    Randfarbe = Tags.TagGet("Randfarbe").FromHTMLCode();
 
-            base.DoStyleCommands(sender, Tags, ref CloseMenu);
+        //    base.DoStyleCommands(sender, Tags, ref CloseMenu);
 
-        }
+        //}
     }
 }

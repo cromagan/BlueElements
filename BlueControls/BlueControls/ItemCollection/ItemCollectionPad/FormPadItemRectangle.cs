@@ -124,14 +124,14 @@ namespace BlueControls.ItemCollection
         {
             var l = new List<FlexiControl>();
 
-            l.Add(new FlexiControl(true));
+            l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty(this, "Drehwinkel"));
 
 
 
             if (!Größe_fixiert && !p_LO.CanMove(Parent.AllRelations) && !p_RU.CanMove(Parent.AllRelations))
             {
-                l.Add(new FlexiControl(true));
+                l.Add(new FlexiControl());
                 l.Add(new FlexiControl("Objekt fest definiert,<br>Größe kann nicht fixiert werden"));
             }
             else

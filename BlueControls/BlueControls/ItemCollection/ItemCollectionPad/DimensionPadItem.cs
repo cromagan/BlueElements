@@ -56,8 +56,9 @@ namespace BlueControls.ItemCollection
             }
             set
             {
-               if = _text_oben ==  Länge_in_MM.ToString() {  value = string.empty}
+               if (_text_oben ==  Länge_in_MM.ToString()) { value = string.Empty; }
                 _text_oben = value;
+                OnChanged();
             }
         }
         public string Text_unten { get; set; } = string.Empty;
@@ -216,8 +217,7 @@ namespace BlueControls.ItemCollection
         public string AngezeigterText1()
         {
             if (!string.IsNullOrEmpty(Text_oben)) { return Text_oben; }
-            var s = Länge_in_MM().ToString();
-
+            var s = Länge_in_MM.ToString(Constants.Format_Float10); 
             s = s.TrimEnd("0");
             s = s.TrimEnd(",");
             s = s.TrimEnd(".");
@@ -430,28 +430,28 @@ namespace BlueControls.ItemCollection
             l.Add(new FlexiControlForProperty(this, "Präfix"));
 
 
-            AddStyleOption();
+            AddStyleOption(l);
 
 
             l.Add(new FlexiControlForProperty(this, "Skalierung"));
 
 
-            l.AddRange(base.GetStyleOptions);
+            l.AddRange(base.GetStyleOptions());
             return l;
         }
 
-        public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        {
-            Text_oben = Tags.TagGet("Text (oben)").FromNonCritical();
-            if (Text_oben == Länge_in_MM.ToString()) { Text_oben = ""; }
-            Text_unten = Tags.TagGet("Text (unten)").FromNonCritical();
+        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
+        //{
+        //    Text_oben = Tags.TagGet("Text (oben)").FromNonCritical();
+        //    if (Text_oben == Länge_in_MM.ToString()) { Text_oben = ""; }
+        //    Text_unten = Tags.TagGet("Text (unten)").FromNonCritical();
 
-            Suffix = Tags.TagGet("Suffix").FromNonCritical();
-            Präfix = Tags.TagGet("Präfix").FromNonCritical();
-            Skalierung = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
+        //    Suffix = Tags.TagGet("Suffix").FromNonCritical();
+        //    Präfix = Tags.TagGet("Präfix").FromNonCritical();
+        //    Skalierung = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
 
-            Stil = (PadStyles)int.Parse(Tags.TagGet("Stil"));
-        }
+        //    Stil = (PadStyles)int.Parse(Tags.TagGet("Stil"));
+        //}
 
 
 

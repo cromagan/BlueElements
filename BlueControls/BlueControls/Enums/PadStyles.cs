@@ -1,6 +1,6 @@
 ﻿namespace BlueControls.Enums
 {
-    public enum PadStyles
+    public enum PadStyles : int
     {
         Undefiniert = -1, // Braucht man
 

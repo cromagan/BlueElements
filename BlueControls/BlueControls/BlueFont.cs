@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -698,7 +699,10 @@ namespace BlueControls
             }
         }
 
-
+        public static SizeF MeasureStringOfCaption(string s)
+        {
+           return BlueFont.MeasureString(s, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+        }
 
 
     }

@@ -43,7 +43,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption4 = new BlueControls.Controls.Caption();
             this.Code = new BlueControls.Controls.TextBox();
             this.Clip = new BlueControls.Controls.Button();
-            this.BlueFrame2 = new BlueControls.Controls.GroupBox();
+            this.groupBoxX = new BlueControls.Controls.GroupBox();
             this.Caption11 = new BlueControls.Controls.Caption();
             this.FomAx = new BlueControls.Controls.TabControl();
             this.txt = new BlueControls.Controls.TabPage();
@@ -83,13 +83,16 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSpeichern = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
+            this.tabRightSide = new BlueControls.Controls.TabControl();
+            this.tabElementEigenschaften = new BlueControls.Controls.TabPage();
+            this.tabCodeGenerator = new BlueControls.Controls.TabPage();
             this.Ribbon.SuspendLayout();
             this.Page_Control.SuspendLayout();
             this.Page_Start.SuspendLayout();
             this.Area_Drucken.SuspendLayout();
             this.Area_Design.SuspendLayout();
             this.DatenbankVER.SuspendLayout();
-            this.BlueFrame2.SuspendLayout();
+            this.groupBoxX.SuspendLayout();
             this.FomAx.SuspendLayout();
             this.txt.SuspendLayout();
             this.Pic.SuspendLayout();
@@ -97,12 +100,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ex2.SuspendLayout();
             this.BlueFrame1.SuspendLayout();
             this.grpDateiSystem.SuspendLayout();
+            this.tabRightSide.SuspendLayout();
+            this.tabCodeGenerator.SuspendLayout();
             this.SuspendLayout();
             // 
             // Pad
             // 
             this.Pad.AutoRelation = ((BlueControls.Enums.enAutoRelationMode)((BlueControls.Enums.enAutoRelationMode.DirektVerbindungen | BlueControls.Enums.enAutoRelationMode.NurBeziehungenErhalten)));
-            this.Pad.Size = new System.Drawing.Size(837, 433);
+            this.Pad.Size = new System.Drawing.Size(816, 502);
+            this.Pad.HotItemChanged += new System.EventHandler(this.Pad_HotItemChanged);
             // 
             // Ribbon
             // 
@@ -175,7 +181,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Captionxx1
             // 
-            this.Captionxx1.CausesValidation = false;
             this.Captionxx1.Location = new System.Drawing.Point(8, 2);
             this.Captionxx1.Name = "Captionxx1";
             this.Captionxx1.Size = new System.Drawing.Size(82, 22);
@@ -204,7 +209,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption4
             // 
-            this.Caption4.CausesValidation = false;
             this.Caption4.Location = new System.Drawing.Point(16, 24);
             this.Caption4.Name = "Caption4";
             this.Caption4.Size = new System.Drawing.Size(104, 24);
@@ -231,24 +235,23 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Clip.Text = "Clipboard";
             this.Clip.Click += new System.EventHandler(this.Clip_Click);
             // 
-            // BlueFrame2
+            // groupBoxX
             // 
-            this.BlueFrame2.CausesValidation = false;
-            this.BlueFrame2.Controls.Add(this.Caption4);
-            this.BlueFrame2.Controls.Add(this.Spaltx);
-            this.BlueFrame2.Controls.Add(this.Code);
-            this.BlueFrame2.Controls.Add(this.Caption11);
-            this.BlueFrame2.Controls.Add(this.Clip);
-            this.BlueFrame2.Controls.Add(this.FomAx);
-            this.BlueFrame2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.BlueFrame2.Location = new System.Drawing.Point(837, 110);
-            this.BlueFrame2.Name = "BlueFrame2";
-            this.BlueFrame2.Size = new System.Drawing.Size(503, 433);
-            this.BlueFrame2.Text = "Feld-Codes";
+            this.groupBoxX.CausesValidation = false;
+            this.groupBoxX.Controls.Add(this.Caption4);
+            this.groupBoxX.Controls.Add(this.Spaltx);
+            this.groupBoxX.Controls.Add(this.Code);
+            this.groupBoxX.Controls.Add(this.Caption11);
+            this.groupBoxX.Controls.Add(this.Clip);
+            this.groupBoxX.Controls.Add(this.FomAx);
+            this.groupBoxX.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBoxX.Location = new System.Drawing.Point(0, 0);
+            this.groupBoxX.Name = "groupBoxX";
+            this.groupBoxX.Size = new System.Drawing.Size(516, 473);
+            this.groupBoxX.Text = "Feld-Codes";
             // 
             // Caption11
             // 
-            this.Caption11.CausesValidation = false;
             this.Caption11.Location = new System.Drawing.Point(8, 352);
             this.Caption11.Name = "Caption11";
             this.Caption11.Size = new System.Drawing.Size(48, 18);
@@ -296,7 +299,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Abkürz.Size = new System.Drawing.Size(448, 16);
             this.Abkürz.TabIndex = 109;
             this.Abkürz.Text = "Benutze Abkürzungen <i>(z.B. Minute -<>> Min.)";
-            this.Abkürz.Click += new System.EventHandler(this.LeerLösch_Click);
+            this.Abkürz.Click += new System.EventHandler(this.CodeGeneratorChanges_Click);
             // 
             // ÜberschriftS
             // 
@@ -306,7 +309,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ÜberschriftS.Size = new System.Drawing.Size(448, 16);
             this.ÜberschriftS.TabIndex = 108;
             this.ÜberschriftS.Text = "Überschriften noch stärker darstellen";
-            this.ÜberschriftS.Click += new System.EventHandler(this.LeerLösch_Click);
+            this.ÜberschriftS.Click += new System.EventHandler(this.CodeGeneratorChanges_Click);
             // 
             // Leer
             // 
@@ -315,7 +318,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Leer.Name = "Leer";
             this.Leer.Size = new System.Drawing.Size(273, 24);
             this.Leer.TabIndex = 98;
-            this.Leer.TextChanged += new System.EventHandler(this.Leer_TextChanged);
+            this.Leer.TextChanged += new System.EventHandler(this.CodeGeneratorChanges_TextChanged);
             // 
             // Nachtext
             // 
@@ -324,7 +327,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Nachtext.Name = "Nachtext";
             this.Nachtext.Size = new System.Drawing.Size(224, 24);
             this.Nachtext.TabIndex = 101;
-            this.Nachtext.TextChanged += new System.EventHandler(this.Leer_TextChanged);
+            this.Nachtext.TextChanged += new System.EventHandler(this.CodeGeneratorChanges_TextChanged);
             // 
             // ZeilUmbruch
             // 
@@ -333,7 +336,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ZeilUmbruch.Name = "ZeilUmbruch";
             this.ZeilUmbruch.Size = new System.Drawing.Size(273, 24);
             this.ZeilUmbruch.TabIndex = 99;
-            this.ZeilUmbruch.TextChanged += new System.EventHandler(this.Leer_TextChanged);
+            this.ZeilUmbruch.TextChanged += new System.EventHandler(this.CodeGeneratorChanges_TextChanged);
             // 
             // Vortext
             // 
@@ -342,7 +345,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Vortext.Name = "Vortext";
             this.Vortext.Size = new System.Drawing.Size(224, 24);
             this.Vortext.TabIndex = 100;
-            this.Vortext.TextChanged += new System.EventHandler(this.Leer_TextChanged);
+            this.Vortext.TextChanged += new System.EventHandler(this.CodeGeneratorChanges_TextChanged);
             // 
             // HtmlSonderzeichen
             // 
@@ -352,7 +355,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.HtmlSonderzeichen.Size = new System.Drawing.Size(448, 16);
             this.HtmlSonderzeichen.TabIndex = 107;
             this.HtmlSonderzeichen.Text = "Ersetze \'&amp;\', \'<<>\' und \'<>>\' für XML-Formate";
-            this.HtmlSonderzeichen.Click += new System.EventHandler(this.LeerLösch_Click);
+            this.HtmlSonderzeichen.Click += new System.EventHandler(this.CodeGeneratorChanges_Click);
             // 
             // LeerLösch
             // 
@@ -362,7 +365,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.LeerLösch.Size = new System.Drawing.Size(208, 16);
             this.LeerLösch.TabIndex = 92;
             this.LeerLösch.Text = "Wenn Leer, komplett löschen";
-            this.LeerLösch.Click += new System.EventHandler(this.LeerLösch_Click);
+            this.LeerLösch.Click += new System.EventHandler(this.CodeGeneratorChanges_Click);
             // 
             // Spezialvormat
             // 
@@ -372,11 +375,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Spezialvormat.Size = new System.Drawing.Size(448, 16);
             this.Spezialvormat.TabIndex = 106;
             this.Spezialvormat.Text = "Bereinige das Format (z.B.: Spezielle Felder wie Telefonnummer)";
-            this.Spezialvormat.Click += new System.EventHandler(this.LeerLösch_Click);
+            this.Spezialvormat.Click += new System.EventHandler(this.CodeGeneratorChanges_Click);
             // 
             // ZeilCap
             // 
-            this.ZeilCap.CausesValidation = false;
             this.ZeilCap.Location = new System.Drawing.Point(4, 63);
             this.ZeilCap.Name = "ZeilCap";
             this.ZeilCap.Size = new System.Drawing.Size(172, 18);
@@ -384,7 +386,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption10
             // 
-            this.Caption10.CausesValidation = false;
             this.Caption10.Location = new System.Drawing.Point(236, 95);
             this.Caption10.Name = "Caption10";
             this.Caption10.Size = new System.Drawing.Size(76, 18);
@@ -392,7 +393,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption9
             // 
-            this.Caption9.CausesValidation = false;
             this.Caption9.Location = new System.Drawing.Point(4, 95);
             this.Caption9.Name = "Caption9";
             this.Caption9.Size = new System.Drawing.Size(68, 18);
@@ -400,7 +400,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption7
             // 
-            this.Caption7.CausesValidation = false;
             this.Caption7.Location = new System.Drawing.Point(4, 39);
             this.Caption7.Name = "Caption7";
             this.Caption7.Size = new System.Drawing.Size(134, 18);
@@ -427,7 +426,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Base64.Size = new System.Drawing.Size(135, 16);
             this.Base64.TabIndex = 10;
             this.Base64.Text = "Base64-Format";
-            this.Base64.Click += new System.EventHandler(this.LeerLösch_Click);
+            this.Base64.Click += new System.EventHandler(this.CodeGeneratorChanges_Click);
             // 
             // Abma
             // 
@@ -456,11 +455,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GroMi.Size = new System.Drawing.Size(80, 64);
             this.GroMi.TabIndex = 10;
             this.GroMi.Text = "abschneiden";
-            this.GroMi.Click += new System.EventHandler(this.LeerLösch_Click);
+            this.GroMi.Click += new System.EventHandler(this.CodeGeneratorChanges_Click);
             // 
             // Caption6
             // 
-            this.Caption6.CausesValidation = false;
             this.Caption6.Location = new System.Drawing.Point(8, 16);
             this.Caption6.Name = "Caption6";
             this.Caption6.Size = new System.Drawing.Size(39, 18);
@@ -468,7 +466,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption5
             // 
-            this.Caption5.CausesValidation = false;
             this.Caption5.Location = new System.Drawing.Point(112, 16);
             this.Caption5.Name = "Caption5";
             this.Caption5.Size = new System.Drawing.Size(34, 18);
@@ -485,7 +482,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ExactMi.Size = new System.Drawing.Size(80, 64);
             this.ExactMi.TabIndex = 8;
             this.ExactMi.Text = "einpassen";
-            this.ExactMi.Click += new System.EventHandler(this.LeerLösch_Click);
+            this.ExactMi.Click += new System.EventHandler(this.CodeGeneratorChanges_Click);
             // 
             // Mxx
             // 
@@ -497,7 +494,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Mxx.Size = new System.Drawing.Size(80, 64);
             this.Mxx.TabIndex = 9;
             this.Mxx.Text = "verzerren";
-            this.Mxx.Click += new System.EventHandler(this.LeerLösch_Click);
+            this.Mxx.Click += new System.EventHandler(this.CodeGeneratorChanges_Click);
             // 
             // Wi
             // 
@@ -508,7 +505,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Wi.Size = new System.Drawing.Size(40, 24);
             this.Wi.TabIndex = 4;
             this.Wi.Text = "800";
-            this.Wi.TextChanged += new System.EventHandler(this.Leer_TextChanged);
+            this.Wi.TextChanged += new System.EventHandler(this.CodeGeneratorChanges_TextChanged);
             // 
             // He
             // 
@@ -519,7 +516,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.He.Size = new System.Drawing.Size(40, 24);
             this.He.TabIndex = 5;
             this.He.Text = "600";
-            this.He.TextChanged += new System.EventHandler(this.Leer_TextChanged);
+            this.He.TextChanged += new System.EventHandler(this.CodeGeneratorChanges_TextChanged);
             // 
             // ex2
             // 
@@ -658,17 +655,45 @@ namespace BlueControls.BlueDatabaseDialogs
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datei wählen.";
             this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.SaveTab_FileOk);
             // 
+            // tabRightSide
+            // 
+            this.tabRightSide.Controls.Add(this.tabElementEigenschaften);
+            this.tabRightSide.Controls.Add(this.tabCodeGenerator);
+            this.tabRightSide.Dock = System.Windows.Forms.DockStyle.Right;
+            this.tabRightSide.HotTrack = true;
+            this.tabRightSide.Location = new System.Drawing.Point(816, 110);
+            this.tabRightSide.Name = "tabRightSide";
+            this.tabRightSide.Size = new System.Drawing.Size(524, 502);
+            this.tabRightSide.TabIndex = 3;
+            // 
+            // tabElementEigenschaften
+            // 
+            this.tabElementEigenschaften.Location = new System.Drawing.Point(4, 25);
+            this.tabElementEigenschaften.Name = "tabElementEigenschaften";
+            this.tabElementEigenschaften.Size = new System.Drawing.Size(516, 473);
+            this.tabElementEigenschaften.TabIndex = 0;
+            this.tabElementEigenschaften.Text = "Element-Eigenschaften";
+            // 
+            // tabCodeGenerator
+            // 
+            this.tabCodeGenerator.Controls.Add(this.groupBoxX);
+            this.tabCodeGenerator.Location = new System.Drawing.Point(4, 25);
+            this.tabCodeGenerator.Name = "tabCodeGenerator";
+            this.tabCodeGenerator.Size = new System.Drawing.Size(516, 473);
+            this.tabCodeGenerator.TabIndex = 1;
+            this.tabCodeGenerator.Text = "Code-Generator";
+            // 
             // LayoutDesigner
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(1340, 543);
-            this.Controls.Add(this.BlueFrame2);
+            this.ClientSize = new System.Drawing.Size(1340, 612);
+            this.Controls.Add(this.tabRightSide);
             this.Name = "LayoutDesigner";
             this.Text = "Druck-Layout";
             this.TopMost = false;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Controls.SetChildIndex(this.Ribbon, 0);
-            this.Controls.SetChildIndex(this.BlueFrame2, 0);
+            this.Controls.SetChildIndex(this.tabRightSide, 0);
             this.Controls.SetChildIndex(this.Pad, 0);
             this.Ribbon.ResumeLayout(false);
             this.Page_Control.ResumeLayout(false);
@@ -676,7 +701,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Area_Drucken.ResumeLayout(false);
             this.Area_Design.ResumeLayout(false);
             this.DatenbankVER.ResumeLayout(false);
-            this.BlueFrame2.ResumeLayout(false);
+            this.groupBoxX.ResumeLayout(false);
             this.FomAx.ResumeLayout(false);
             this.txt.ResumeLayout(false);
             this.Pic.ResumeLayout(false);
@@ -684,6 +709,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ex2.ResumeLayout(false);
             this.BlueFrame1.ResumeLayout(false);
             this.grpDateiSystem.ResumeLayout(false);
+            this.tabRightSide.ResumeLayout(false);
+            this.tabCodeGenerator.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -697,7 +724,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox Code;
         private Caption Caption4;
         private ComboBox Spaltx;
-        private GroupBox BlueFrame2;
+        private GroupBox groupBoxX;
         private Caption Caption11;
         private TabControl FomAx;
         private TabPage txt;
@@ -737,5 +764,8 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnSpeichern;
         private System.Windows.Forms.OpenFileDialog LoadTab;
         private System.Windows.Forms.SaveFileDialog SaveTab;
+        private TabControl tabRightSide;
+        private TabPage tabElementEigenschaften;
+        private TabPage tabCodeGenerator;
     }
 }

@@ -47,10 +47,12 @@ namespace BlueControls.ItemCollection
         internal PointDF Point2;
         //   Dim _Design As enDesign
 
-        internal enConectorStyle Art;
+
         private List<PointDF> _TempPoints;
 
         private DateTime _LastRecalc = DateTime.Now.AddHours(-1);
+
+        public enConectorStyle Linien_Verhalten { get; set; }
 
 
         #endregion
@@ -82,7 +84,7 @@ namespace BlueControls.ItemCollection
 
             _TempPoints = new List<PointDF>();
             Stil = PadStyles.Style_Standard;
-            Art = enConectorStyle.Direct;
+            Linien_Verhalten = enConectorStyle.Direct;
         }
 
 
@@ -219,7 +221,7 @@ namespace BlueControls.ItemCollection
             switch (tag)
             {
                 case "connection":
-                    Art = (enConectorStyle)int.Parse(value);
+                    Linien_Verhalten = (enConectorStyle)int.Parse(value);
                     return true;
 
             }
@@ -231,7 +233,7 @@ namespace BlueControls.ItemCollection
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
-            if (Art != enConectorStyle.Direct) { t = t + "Connection=" + (int)Art + ", "; }
+            if (Linien_Verhalten != enConectorStyle.Direct) { t = t + "Connection=" + (int)Linien_Verhalten + ", "; }
             return t + "}";
         }
 
@@ -253,7 +255,7 @@ namespace BlueControls.ItemCollection
             }
 
 
-            if (Art != enConectorStyle.Direct && _TempPoints != null)
+            if (Linien_Verhalten != enConectorStyle.Direct && _TempPoints != null)
             {
                 if (DateTime.Now.Subtract(_LastRecalc).TotalSeconds > 5)
                 {
@@ -280,7 +282,7 @@ namespace BlueControls.ItemCollection
             _TempPoints.Add(Point1);
             _TempPoints.Add(Point2);
 
-            if (Art == enConectorStyle.Direct)
+            if (Linien_Verhalten == enConectorStyle.Direct)
             {
                 return;
             }
@@ -304,14 +306,14 @@ namespace BlueControls.ItemCollection
                         break;
                     }
 
-                    if (Art == enConectorStyle.AusweichenUndGerade && Begradige(z))
+                    if (Linien_Verhalten == enConectorStyle.AusweichenUndGerade && Begradige(z))
                     {
                         again = true;
                         break;
                     }
 
 
-                    if (Art == enConectorStyle.AusweichenUndGerade || Art == enConectorStyle.Ausweichenx)
+                    if (Linien_Verhalten == enConectorStyle.AusweichenUndGerade || Linien_Verhalten == enConectorStyle.Ausweichenx)
                     {
                         if (WeicheAus(z))
                         {
@@ -419,7 +421,7 @@ namespace BlueControls.ItemCollection
         private bool Vereinfache(int P1)
         {
 
-            if (Art != enConectorStyle.AusweichenUndGerade)
+            if (Linien_Verhalten != enConectorStyle.AusweichenUndGerade)
             {
                 if (P1 > 0 && P1 < _TempPoints.Count - 1)
                 {
@@ -783,32 +785,34 @@ namespace BlueControls.ItemCollection
             CalcTempPoints();
         }
 
-        public override List<FlexiControl> GetStyleOptionsx()
+        public override List<FlexiControl> GetStyleOptions()
         {
             var l = new List<FlexiControl>();
 
 
 
-            var Verhalt = new ItemCollectionList();
-            Verhalt.Add(new TextListItem(((int)enConectorStyle.Direct).ToString(), "Linie direkt zwischen zwei Punkten", QuickImage.Get(enImageCode.Linie)));
-            Verhalt.Add(new TextListItem(((int)enConectorStyle.Ausweichenx).ToString(), "Linie soll Objekten ausweichen", QuickImage.Get(enImageCode.Linie)));
-            Verhalt.Add(new TextListItem(((int)enConectorStyle.AusweichenUndGerade).ToString(), "Linie soll Objekten ausweichen und rechtwinklig sein", QuickImage.Get(enImageCode.Linie)));
-            l.Add(new FlexiControl("Linien-Verhalten", ((int)Art).ToString(), Verhalt));
+            var Verhalt = new ItemCollectionList
+            {
+                new TextListItem(((int)enConectorStyle.Direct).ToString(), "Linie direkt zwischen zwei Punkten", QuickImage.Get(enImageCode.Linie)),
+                new TextListItem(((int)enConectorStyle.Ausweichenx).ToString(), "Linie soll Objekten ausweichen", QuickImage.Get(enImageCode.Linie)),
+                new TextListItem(((int)enConectorStyle.AusweichenUndGerade).ToString(), "Linie soll Objekten ausweichen und rechtwinklig sein", QuickImage.Get(enImageCode.Linie))
+            };
+            l.Add(new FlexiControlForProperty(this, "Linien-Verhalten", Verhalt));
 
 
-            l.Add(new FlexiControl("Stil", ((int)Stil).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, false)));
+            AddLineStyleOption(l);
 
-            l.AddRange(base.GetStyleOptionsx());
+            l.AddRange(base.GetStyleOptions());
             return l;
         }
 
-        public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        {
-            Stil = (PadStyles)int.Parse(Tags.TagGet("Stil"));
+        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
+        //{
+        //    Stil = (PadStyles)int.Parse(Tags.TagGet("Stil"));
 
-            _TempPoints = null;
-            Art = (enConectorStyle)int.Parse(Tags.TagGet("Linien-Verhalten"));
-        }
+        //    _TempPoints = null;
+        //    Linien_Verhalten = (enConectorStyle)int.Parse(Tags.TagGet("Linien-Verhalten"));
+        //}
 
     }
 }

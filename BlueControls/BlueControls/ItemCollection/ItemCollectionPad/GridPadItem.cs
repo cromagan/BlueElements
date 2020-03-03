@@ -216,20 +216,21 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override List<FlexiControl> GetStyleOptionsx()
+        public override List<FlexiControl> GetStyleOptions()
         {
             var l = new List<FlexiControl>();
 
+            AddLineStyleOption(l);
 
-            l.Add(new FlexiControl("Stil", ((int)Stil).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, false)));
 
-            l.AddRange(base.GetStyleOptionsx());
+
+            l.AddRange(base.GetStyleOptions());
             return l;
         }
 
-        public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        {
-            Stil = (PadStyles)int.Parse(Tags.TagGet("Format"));
-        }
+        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
+        //{
+        //    Stil = (PadStyles)int.Parse(Tags.TagGet("Format"));
+        //}
     }
 }

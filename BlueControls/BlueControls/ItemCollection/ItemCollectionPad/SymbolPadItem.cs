@@ -41,9 +41,9 @@ namespace BlueControls.ItemCollection
         public SymbolPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname)
         {
             Symbol = enSymbol.Pfeil;
-            BackColor = Color.White;
-            BorderColor = Color.Black;
-            BorderWidth = 1;
+            Hintergrundfarbe = Color.White;
+            Randfarbe = Color.Black;
+            Randdicke = 1;
         }
 
         protected override string ClassId()
@@ -53,9 +53,9 @@ namespace BlueControls.ItemCollection
 
         public enSymbol Symbol = enSymbol.Pfeil;
 
-        public Color BackColor;
-        public Color BorderColor;
-        public decimal BorderWidth;
+        public Color Hintergrundfarbe;
+        public Color Randfarbe;
+        public decimal Randdicke;
 
 
 
@@ -99,8 +99,8 @@ namespace BlueControls.ItemCollection
 
             if (p != null)
             {
-                GR.FillPath(new SolidBrush(BackColor), p);
-                GR.DrawPath(new Pen(BorderColor, (float)(BorderWidth * cZoom * Parent.SheetStyleScale)), p);
+                GR.FillPath(new SolidBrush(Hintergrundfarbe), p);
+                GR.DrawPath(new Pen(Randfarbe, (float)(Randdicke * cZoom * Parent.SheetStyleScale)), p);
             }
 
 
@@ -115,45 +115,46 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override List<FlexiControl> GetStyleOptionsx()
+        public override List<FlexiControl> GetStyleOptions()
         {
             var l = new List<FlexiControl>();
 
 
-            l.Add(new FlexiControl(true));
+            l.Add(new FlexiControl());
 
-            var Comms = new ItemCollectionList();
-            Comms.Add(new TextListItem(((int)enSymbol.Ohne).ToString(), "Ohne", QuickImage.Get("Datei|32")));
-            Comms.Add(new TextListItem(((int)enSymbol.Pfeil).ToString(), "Pfeil", QuickImage.Get("Pfeil_Rechts|32")));
-            Comms.Add(new TextListItem(((int)enSymbol.Bruchlinie).ToString(), "Bruchlinie"));
-            l.Add(new FlexiControl(true));
-            l.Add(new FlexiControl("Symbol", ((int)Symbol).ToString(), Comms));
+            var Comms = new ItemCollectionList
+            {
+                new TextListItem(((int)enSymbol.Ohne).ToString(), "Ohne", QuickImage.Get("Datei|32")),
+                new TextListItem(((int)enSymbol.Pfeil).ToString(), "Pfeil", QuickImage.Get("Pfeil_Rechts|32")),
+                new TextListItem(((int)enSymbol.Bruchlinie).ToString(), "Bruchlinie")
+            };
+            l.Add(new FlexiControl());
+            l.Add(new FlexiControlForProperty(this, "Symbol", Comms));
 
-            //var x = Skin.GetRahmenArt(Parent.SheetStyle, true);
-            //l.Add(new FlexiControl("Farbe", ((int)Style).ToString(), x));
 
 
-            l.Add(new FlexiControl("Randdicke", BorderWidth.ToString(), enDataFormat.Gleitkommazahl, 1));
-            l.Add(new FlexiControl("Randfarbe", BorderColor.ToHTMLCode(), enDataFormat.Text, 1));
-            l.Add(new FlexiControl("Hintergrundfarbe", BackColor.ToHTMLCode(), enDataFormat.Text, 1));
 
-            //  l.AddRange(base.GetStyleOptions(sender, e));
-            l.AddRange(base.GetStyleOptionsx());
+            l.Add(new FlexiControlForProperty(this, "Randdicke"));
+            l.Add(new FlexiControlForProperty(this, "Randfarbe"));
+            l.Add(new FlexiControlForProperty(this, "Hintergrundfarbe"));
+
+
+            l.AddRange(base.GetStyleOptions());
             return l;
         }
 
-        public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        {
-            base.DoStyleCommands(sender, Tags, ref CloseMenu);
+        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
+        //{
+        //    base.DoStyleCommands(sender, Tags, ref CloseMenu);
 
 
-            BackColor = Tags.TagGet("Hintergrundfarbe").FromHTMLCode();
-            BorderColor = Tags.TagGet("Randfarbe").FromHTMLCode();
-            decimal.TryParse(Tags.TagGet("Randdicke"), out BorderWidth);
-            Symbol = (enSymbol)int.Parse(Tags.TagGet("Symbol"));
-            //Style = (PadStyles)int.Parse(Tags.TagGet("Farbe"));
+        //    BackColor = Tags.TagGet("Hintergrundfarbe").FromHTMLCode();
+        //    BorderColor = Tags.TagGet("Randfarbe").FromHTMLCode();
+        //    decimal.TryParse(Tags.TagGet("Randdicke"), out BorderWidth);
+        //    Symbol = (enSymbol)int.Parse(Tags.TagGet("Symbol"));
+        //    //Style = (PadStyles)int.Parse(Tags.TagGet("Farbe"));
 
-        }
+        //}
 
 
         public override string ToString()
@@ -161,9 +162,9 @@ namespace BlueControls.ItemCollection
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             t = t + "Symbol=" + (int)Symbol + ", ";
-            t = t + "Backcolor=" + BorderColor.ToHTMLCode() + ", ";
-            t = t + "BorderColor=" + BackColor.ToHTMLCode() + ", ";
-            t = t + "BorderWidth=" + BorderWidth.ToString().ToNonCritical() + ", ";
+            t = t + "Backcolor=" + Randfarbe.ToHTMLCode() + ", ";
+            t = t + "BorderColor=" + Hintergrundfarbe.ToHTMLCode() + ", ";
+            t = t + "BorderWidth=" + Randdicke.ToString().ToNonCritical() + ", ";
 
             return t.Trim(", ") + "}";
         }
@@ -179,13 +180,13 @@ namespace BlueControls.ItemCollection
                     Symbol = (enSymbol)int.Parse(value);
                     return true;
                 case "backcolor":
-                    BackColor = value.FromHTMLCode();
+                    Hintergrundfarbe = value.FromHTMLCode();
                     return true;
                 case "bordercolor":
-                    BorderColor = value.FromHTMLCode();
+                    Randfarbe = value.FromHTMLCode();
                     return true;
                 case "borderwidth":
-                    decimal.TryParse(value.FromNonCritical(), out BorderWidth);
+                    decimal.TryParse(value.FromNonCritical(), out Randdicke);
                     return true;
                 case "fill": // alt: 28.11.2019
                 case "whiteback": // alt: 28.11.2019

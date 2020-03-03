@@ -55,37 +55,22 @@ namespace BlueControls.Controls
         }
 
 
-        public FlexiControlForProperty(object propertyObject, string propertyName) : this()
+        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount, ItemCollectionList list, enImageCode image) : this()
         {
             _propertyObject = propertyObject;
             _propertyName = propertyName;
-            UpdateControlData();
+            UpdateControlData(rowCount, list, image);
             CheckEnabledState();
         }
 
-        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList list) : this(propertyObject, propertyName)
-        {
+        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList list) : this(propertyObject, propertyName, 1, list, enImageCode.None) { }
 
-            list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
-            var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount) : this(propertyObject, propertyName, rowCount, null, enImageCode.None) { }
 
+        public FlexiControlForProperty(object propertyObject, string propertyName, enImageCode image) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
 
-            var data = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-            var Wi = data.Item1;
-            var He = data.Item2;
+        public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
 
-
-            var x = Math.Max((int)(data.Item1 + 20 + s.Width), 200);
-            var y = Math.Max((int)(data.Item2 + Skin.PaddingSmal * 2), 24);
-
-            Size = new Size(x, y);
-
-
-            var c = CreateSubControls();
-
-           StyleComboBox((ComboBox)c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
-
-        }
 
         private void Checker_Tick(object sender, System.EventArgs e)
         {
@@ -104,7 +89,7 @@ namespace BlueControls.Controls
                 FillPropertyNow();
 
                 _propertyName = value;
-                UpdateControlData();
+                UpdateControlData(1, null, enImageCode.None);
                 CheckEnabledState();
 
             }
@@ -166,7 +151,7 @@ namespace BlueControls.Controls
                 FillPropertyNow();
 
                 _addGroupboxText = value;
-                UpdateControlData();
+                UpdateControlData(1, null, enImageCode.None);
                 CheckEnabledState();
 
             }
@@ -208,7 +193,7 @@ namespace BlueControls.Controls
 
 
                 _propertyObject = value;
-                UpdateControlData();
+                UpdateControlData(1, null, enImageCode.None);
                 CheckEnabledState();
 
 
@@ -224,7 +209,7 @@ namespace BlueControls.Controls
         {
             FillPropertyNow();
             _propertyObject = null;  //Das Objekt ist tot und irgendwo im Nirvana verschwunden
-            UpdateControlData();
+            UpdateControlData(1, null, enImageCode.None);
             CheckEnabledState();
 
             LoadedFromDisk?.Invoke(this, System.EventArgs.Empty);
@@ -237,7 +222,7 @@ namespace BlueControls.Controls
         {
 
 
-            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null)
+            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null || !propInfo.CanRead)
             {
                 Value = string.Empty;
                 InfoText = string.Empty;
@@ -264,6 +249,22 @@ namespace BlueControls.Controls
             {
                 Value = bo.ToPlusMinus();
             }
+            else if (x is int iv)
+            {
+                Value = iv.ToString();
+            }
+            else if (x is Enum en)
+            {
+                Value = ((int)x).ToString();
+            }
+            else if (x is decimal dc)
+            {
+                Value = dc.ToString(Constants.Format_Float2);
+            }
+            else if (x is Color co)
+            {
+                Value = co.ToHTMLCode();
+            }
             else
             {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
@@ -280,7 +281,7 @@ namespace BlueControls.Controls
 
             if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
-            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null) { return; }
+            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null || !propInfo.CanRead) { return; }
 
 
             var OldVal = string.Empty;
@@ -307,6 +308,53 @@ namespace BlueControls.Controls
             {
                 OldVal = bo.ToPlusMinus();
                 toSet = Value.FromPlusMinus();
+            }
+            else if (x is Color co)
+            {
+                OldVal = co.ToHTMLCode();
+                toSet = Value.FromHTMLCode();
+            }
+            else if (x is int iv)
+            {
+                OldVal = iv.ToString();
+
+                if (int.TryParse(Value, out var tmp))
+                {
+                    toSet = tmp;
+                }
+                else
+                {
+                    toSet = 0;
+                }
+
+            }
+            else if (x is Enum en)
+            {
+                OldVal = ((int)x).ToString();
+
+                if (int.TryParse(Value, out var tmp))
+                {
+                    toSet = tmp;
+                }
+                else
+                {
+                    toSet = 0;
+                }
+
+            }
+            else if (x is decimal dc)
+            {
+                OldVal = dc.ToString(Constants.Format_Float2);
+
+                if (decimal.TryParse(Value, out var tmp))
+                {
+                    toSet = tmp;
+                }
+                else
+                {
+                    toSet = 0;
+                }
+
             }
             else
             {
@@ -349,7 +397,7 @@ namespace BlueControls.Controls
         }
 
 
-        private void UpdateControlData()
+        private void UpdateControlData(int TextLines, ItemCollectionList list, enImageCode image)
         {
 
             #region propInfo & _propertynamecpl befüllen
@@ -383,26 +431,6 @@ namespace BlueControls.Controls
 
             #endregion
 
-            #region Art des Steuerelements bestimmen
-
-            switch (propInfo.PropertyType.FullName.ToLower())
-            {
-                case "system.string":
-                    MultiLine = false;
-                    break;
-                case "system.boolean":
-                    EditType = enEditTypeFormula.Ja_Nein_Knopf;
-                    var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
-                    Size = new Size((int)s.Width + 30, 22);
-                    break;
-
-                default:
-                    Develop.DebugPrint("propertyType unbekannt: " + propInfo.PropertyType.FullName);
-                    break;
-            }
-
-
-            #endregion
 
             #region Caption setzen
             if (!string.IsNullOrEmpty(_propertyName))
@@ -418,6 +446,111 @@ namespace BlueControls.Controls
                 Caption = "[unbekannt]";
             }
             #endregion
+
+            #region Art des Steuerelements bestimmen
+
+            if (propInfo != null)
+            {
+
+                switch (propInfo.PropertyType.FullName.ToLower())
+                {
+                    //case "system.string":
+                    //case "system.int32":
+                    //case "system.decimal":
+
+
+
+                    case "system.boolean":
+                        {
+                            EditType = enEditTypeFormula.Ja_Nein_Knopf;
+                            var s = BlueFont.MeasureStringOfCaption(_Caption);
+                            Size = new Size((int)s.Width + 30, 22);
+                            break;
+                        }
+
+                    default: // Alle enums sind ein eigener Typ.... deswegen alles in die TExtbox
+                        {
+
+                            if (list != null)
+                            {
+                                EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
+                                list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
+                                var s = BlueFont.MeasureStringOfCaption(_Caption);
+
+                                var data = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+                                var Wi = data.Item1;
+                                var He = data.Item2;
+
+                                var x = Math.Max((int)(data.Item1 + 20 + s.Width), 200);
+                                var y = Math.Max((int)(data.Item2 + Skin.PaddingSmal * 2), 24);
+                                Size = new Size(x, y);
+                                var c = (ComboBox)CreateSubControls();
+                                StyleComboBox(c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
+
+                            }
+                            else if (image != enImageCode.None)
+                            {
+                                EditType = enEditTypeFormula.Button;
+                                CaptionPosition = enÜberschriftAnordnung.ohne;
+                                Size = new Size((int)BlueFont.MeasureStringOfCaption(_Caption).Width + 50, 30);
+                                var c = (Button)CreateSubControls();
+                                c.ImageCode = QuickImage.Get(image).ToString();
+
+                            }
+                            else
+                            {
+                                _EditType = enEditTypeFormula.Textfeld;
+
+                                var tmpName = propInfo.PropertyType.FullName.ToLower();
+
+
+                                if (TextLines >= 2)
+                                {
+                                    _CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
+                                    Size = new Size(200, 16 + 24 * TextLines);
+                                    _MultiLine = true;
+                                    tmpName = "system.string";
+                                }
+                                else
+                                {
+                                    _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+                                    Size = new Size(200, 24);
+                                    _MultiLine = false;
+                                }
+
+
+                                switch (tmpName)
+                                {
+                                    case "system.string": Format = enDataFormat.Text; break;
+                                    case "system.int32": Format = enDataFormat.Ganzzahl; break;
+                                    case "system.decimal": Format = enDataFormat.Gleitkommazahl; break;
+                                    case "system.drawing.color": Format = enDataFormat.Farbcode; break;
+                                    default: Format = enDataFormat.Text; break;
+                                }
+
+
+
+                                _InstantChangedEvent = true;
+
+                                var c = CreateSubControls();
+
+                                StyleTextBox((TextBox)c, string.Empty, false);
+                            }
+
+
+                            break;
+                        }
+
+                }
+            }
+            else
+            {
+                Develop.DebugPrint(_propertyName + " hat keine Zuordnung");
+            }
+
+            #endregion
+
+
 
 
 
@@ -573,7 +706,7 @@ namespace BlueControls.Controls
 
         private void GroupBox_TextChanged(object sender, System.EventArgs e)
         {
-            UpdateControlData();
+            UpdateControlData(1, null, enImageCode.None);
             CheckEnabledState();
 
             OnValueChanged(); // Wichig, dass Fehler-Dreiecke angezeigt werden können
