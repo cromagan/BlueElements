@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics;
 using BlueControls.Controls;
-using BlueControls.Forms;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
 
 
-    internal partial class LayoutDesigner : PadEditor
-    {
+    internal partial class LayoutDesigner
+    { 
         //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing)

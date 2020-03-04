@@ -56,9 +56,9 @@ namespace BlueControls.ItemCollection
             }
             set
             {
-               if (_text_oben ==  Länge_in_MM.ToString()) { value = string.Empty; }
+                if (_text_oben == Länge_in_MM.ToString()) { value = string.Empty; }
                 _text_oben = value;
-                OnChanged();
+                OnChanged(false);
             }
         }
         public string Text_unten { get; set; } = string.Empty;
@@ -192,12 +192,15 @@ namespace BlueControls.ItemCollection
                 case "additionalscale":
                     Skalierung = decimal.Parse(value.FromNonCritical());
                     return true;
-
             }
 
             return false;
         }
 
+        protected override void ParseFinished() { }
+
+
+        protected override void GenerateInternalRelationExplicit() { }
 
         public override string ToString()
         {
@@ -217,7 +220,7 @@ namespace BlueControls.ItemCollection
         public string AngezeigterText1()
         {
             if (!string.IsNullOrEmpty(Text_oben)) { return Text_oben; }
-            var s = Länge_in_MM.ToString(Constants.Format_Float10); 
+            var s = Länge_in_MM.ToString(Constants.Format_Float10);
             s = s.TrimEnd("0");
             s = s.TrimEnd(",");
             s = s.TrimEnd(".");
@@ -361,21 +364,6 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void Move(decimal x, decimal y)
-        {
-            // Ignorieren, kann man nicht verschieben
-            //p_LO.SetTo(p_LO.X + x, p_LO.Y + y);
-            //p_RU.SetTo(p_RU.X + x, p_RU.Y + y);
-            RecomputePointAndRelations();
-        }
-
-
-
-        public override void SetCoordinates(RectangleDF r)
-        {
-            // Ignorieren, kann man nicht verschieben
-            RecomputePointAndRelations();
-        }
 
 
         private void ComputeData()
@@ -384,7 +372,7 @@ namespace BlueControls.ItemCollection
             _Winkel = GeometryDF.Winkel(Point1, Point2);
         }
 
-        protected override void KeepInternalLogic()
+        public override void CaluclatePointsWORelations()
         {
             //Gegeben sind:
             // Point1, Point2 und Textpoint
@@ -409,13 +397,10 @@ namespace BlueControls.ItemCollection
 
             _Bezugslinie1.SetTo(_SchnittPunkt1, MHLAb, _Winkel + tmppW);
             _Bezugslinie2.SetTo(_SchnittPunkt2, MHLAb, _Winkel + tmppW);
+
+            base.CaluclatePointsWORelations();
         }
 
-
-        public override void GenerateInternalRelation()
-        {
-            // Nix zu tun
-        }
 
 
         public override List<FlexiControl> GetStyleOptions()

@@ -24,7 +24,6 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection
@@ -174,7 +173,10 @@ namespace BlueControls.ItemCollection
         ///  Dabei werden Beziehungen komplett ignoriert!
         /// </summary>
         /// <remarks></remarks>
-        public abstract void SetCoordinates(RectangleDF r);
+        public virtual void SetCoordinates(RectangleDF r)
+        {
+            OnChanged(true);
+        }
 
         public static string UniqueInternal()
         {
@@ -197,13 +199,13 @@ namespace BlueControls.ItemCollection
 
 
         /// <summary>
-        /// Erstellt alle Internen Beziehungen
+        /// Erstellt alle internen Beziehungen. Punkte müssen stimmen und Relations muss leer sein.
         /// </summary>
         /// <remarks></remarks>
-        public abstract void GenerateInternalRelation();
+        protected abstract void GenerateInternalRelationExplicit();
 
 
-        protected abstract void KeepInternalLogic();
+        public virtual void CaluclatePointsWORelations() { }
 
 
         /// <summary>
@@ -222,7 +224,10 @@ namespace BlueControls.ItemCollection
         protected abstract string ClassId();
 
 
-        public abstract void Move(decimal x, decimal y);
+        public virtual void Move(decimal x, decimal y)
+        {
+            OnChanged(true);
+        }
 
 
         /// <summary>
@@ -272,7 +277,7 @@ namespace BlueControls.ItemCollection
             {
                 if (_PrintMe == value) { return; }
                 _PrintMe = value;
-                OnChanged();
+                OnChanged(false);
             }
         }
 
@@ -286,7 +291,7 @@ namespace BlueControls.ItemCollection
             {
                 if (_ZoomPadding == value) { return; }
                 _ZoomPadding = value;
-                OnChanged();
+                OnChanged(false);
             }
         }
 
@@ -301,7 +306,8 @@ namespace BlueControls.ItemCollection
             {
                 if (_Style == value) { return; }
                 _Style = value;
-                OnChanged();
+                DesignOrStyleChanged();
+                OnChanged(true);
             }
 
         }
@@ -390,12 +396,14 @@ namespace BlueControls.ItemCollection
                 {
                     Develop.DebugPrint(enFehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + ToParse);
                 }
-
-
             }
+
+            ParseFinished();
+
             IsParsing = false;
         }
 
+        protected abstract void ParseFinished();
         /// <summary>
         /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
         /// </summary>
@@ -505,15 +513,10 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public void RecomputePointAndRelations()
-        {
-            KeepInternalLogic();
 
+        protected void OverrideSavedRichtmaßOfAllRelations()
+        {
             if (Relations == null || Relations.Count == 0)
-            {
-                GenerateInternalRelation();
-            }
-            else
             {
                 foreach (var ThisRelation in Relations)
                 {
@@ -618,6 +621,24 @@ namespace BlueControls.ItemCollection
         {
             var t = ToString();
             return NewByParsing(Parent, t);
+        }
+
+
+        public void OnChanged(bool checkLogic)
+        {
+            if (checkLogic) { GenerateInternalRelation(); }
+
+            OnChanged();
+        }
+
+        public void GenerateInternalRelation()
+        {
+            Relations.Clear();
+            CaluclatePointsWORelations();
+            GenerateInternalRelationExplicit();
+            OverrideSavedRichtmaßOfAllRelations();
+            OnPointOrRelationsChanged();
+            OnChanged(false); // False, sonst endlosschleife
         }
 
 

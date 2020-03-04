@@ -32,9 +32,6 @@ namespace BlueControls.ItemCollection
     public class LinePadItem : BasicPadItem
     {
 
-        private string CalcTempPoints_Code = string.Empty;
-
-
         public override void DesignOrStyleChanged()
         {
             // Keine Variablen zum Reseten, ein Invalidate reicht
@@ -45,8 +42,8 @@ namespace BlueControls.ItemCollection
 
         internal PointDF Point1;
         internal PointDF Point2;
-        //   Dim _Design As enDesign
 
+        private string CalcTempPoints_Code = string.Empty;
 
         private List<PointDF> _TempPoints;
 
@@ -138,9 +135,6 @@ namespace BlueControls.ItemCollection
         }
 
 
-
-
-
         public override RectangleDF UsedArea()
         {
             if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M) { return new RectangleDF(); }
@@ -197,7 +191,7 @@ namespace BlueControls.ItemCollection
             _LastRecalc = DateTime.Now.AddHours(-1);
             Point1.SetTo(Point1.X + x, Point1.Y + y);
             Point2.SetTo(Point2.X + x, Point2.Y + y);
-            RecomputePointAndRelations();
+            base.Move(x, y);
         }
 
 
@@ -210,7 +204,7 @@ namespace BlueControls.ItemCollection
             Point2.SetTo(r.PointOf(enAlignment.Bottom_Right));
 
 
-            RecomputePointAndRelations();
+            base.SetCoordinates(r);
         }
 
 
@@ -223,10 +217,11 @@ namespace BlueControls.ItemCollection
                 case "connection":
                     Linien_Verhalten = (enConectorStyle)int.Parse(value);
                     return true;
-
             }
             return false;
         }
+
+        protected override void ParseFinished() { }
 
         public override string ToString()
         {
@@ -237,12 +232,7 @@ namespace BlueControls.ItemCollection
             return t + "}";
         }
 
-
-        public override void GenerateInternalRelation()
-        {
-            // nix zu Tun
-        }
-
+        protected override void GenerateInternalRelationExplicit() { }
 
         private void CalcTempPoints()
         {
@@ -269,11 +259,7 @@ namespace BlueControls.ItemCollection
             }
 
 
-            if (_TempPoints != null && _TempPoints.Count > 1)
-            {
-                return;
-            }
-
+            if (_TempPoints != null && _TempPoints.Count > 1) { return; }
 
             _LastRecalc = DateTime.Now;
             CalcTempPoints_Code = NewCode;
@@ -282,10 +268,7 @@ namespace BlueControls.ItemCollection
             _TempPoints.Add(Point1);
             _TempPoints.Add(Point2);
 
-            if (Linien_Verhalten == enConectorStyle.Direct)
-            {
-                return;
-            }
+            if (Linien_Verhalten == enConectorStyle.Direct) { return; }
 
             var count = 0;
 
@@ -329,14 +312,8 @@ namespace BlueControls.ItemCollection
                     }
                 }
 
-                if (!again)
-                {
-                    break;
-                }
-                if (count > 50)
-                {
-                    break;
-                }
+                if (!again) { break; }
+                if (count > 50) { break; }
 
             } while (true);
         }
@@ -377,10 +354,7 @@ namespace BlueControls.ItemCollection
 
             foreach (var ThisItemBasic in (ItemCollectionPad)Parent)
             {
-                if (SchneidetDas(ThisItemBasic, p1, p2))
-                {
-                    return true;
-                }
+                if (SchneidetDas(ThisItemBasic, p1, p2)) { return true; }
             }
 
             return false;
@@ -780,9 +754,10 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void KeepInternalLogic()
+        public override void CaluclatePointsWORelations()
         {
             CalcTempPoints();
+            base.CaluclatePointsWORelations();
         }
 
         public override List<FlexiControl> GetStyleOptions()

@@ -49,7 +49,7 @@ namespace BlueBasics.Enums
         // Link_To_BlueDataSystem = 42
        // Telefonnummer = 43, // Spezielle Formate
 
-        Farbcode = 45, // Color
+        FarbeInteger = 45, // Color
         //Email = 46, // Spezielle Formate
         //InternetAdresse = 47, // Spezielle Formate
 

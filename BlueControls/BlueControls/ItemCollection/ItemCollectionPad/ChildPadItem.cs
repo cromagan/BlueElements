@@ -97,30 +97,17 @@ namespace BlueControls.ItemCollection
             {
                 if (value == _Name) { return; }
                 _Name = value;
-                OnChanged();
+                OnChanged(false);
             }
         }
 
-        //public string Text
-        //{
-        //    get
-        //    {
-        //        return _ReadableText;
-        //    }
-        //    set
-        //    {
-        //        if (value == _ReadableText) { return; }
-        //        _ReadableText = value;
-        //        OnChanged();
-        //    }
-        //}
 
         #region  Construktor  
 
 
         public ChildPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
 
-        public ChildPadItem(ItemCollectionPad parent,  string internalname) : base(parent, internalname)
+        public ChildPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname)
         {
             PadInternal = null; // new CreativePad();
             _tmpBMP = null;
@@ -163,11 +150,8 @@ namespace BlueControls.ItemCollection
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
-
             try
             {
-
-
 
                 var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
                 GR.TranslateTransform(trp.X, trp.Y);
@@ -266,13 +250,12 @@ namespace BlueControls.ItemCollection
 
 
 
-
                 if (!ForPrinting)
                 {
-                    GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
                     GR.DrawString(Name, font, Brushes.Gray, (float)DCoordinates.Left, (float)DCoordinates.Top);
 
                 }
+
 
                 if (Textlage != (enAlignment)(-1))
                 {
@@ -289,6 +272,9 @@ namespace BlueControls.ItemCollection
             catch
             {
             }
+
+            base.DrawExplicit(GR, DCoordinates, cZoom, MoveX, MoveY, vState, SizeOfParentControl, ForPrinting);
+
 
         }
 
@@ -324,11 +310,12 @@ namespace BlueControls.ItemCollection
                 case "pos":
                     Textlage = (enAlignment)int.Parse(value);
                     return true;
-
             }
             return false;
         }
 
+
+        protected override void ParseFinished() { }
 
         public override string ToString()
         {
@@ -363,7 +350,7 @@ namespace BlueControls.ItemCollection
         private void _Pad_DoInvalidate(object sender, System.EventArgs e)
         {
             if (IsParsing) { return; }
-            OnChanged();
+            OnChanged(false);
         }
 
         public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY)
@@ -485,18 +472,25 @@ namespace BlueControls.ItemCollection
             return true;
         }
 
-        public bool ParseVariable(string VariableName, enValueType ValueType, string Value)
+        public bool ReplaceVariable(string VariableName, enValueType ValueType, string Value)
         {
             if (PadInternal == null) { return false; }
-            return PadInternal.Item.ParseVariable(VariableName, ValueType, Value);
+            var b = PadInternal.Item.ParseVariable(VariableName, ValueType, Value);
+
+            if (b) { OnChanged(true); }
+            return b;
+
         }
 
 
 
-        public bool ParseSpecialCodes()
+        public bool DoSpecialCodes()
         {
             if (PadInternal == null) { return false; }
-            return PadInternal.Item.ParseSpecialCodes();
+            var b = PadInternal.Item.ParseSpecialCodes();
+
+            if (b) { OnChanged(true); }
+            return b;
         }
 
 
@@ -512,7 +506,9 @@ namespace BlueControls.ItemCollection
         public bool ResetVariables()
         {
             if (PadInternal == null) { return false; }
-            return PadInternal.Item.ResetVariables();
+            var b = PadInternal.Item.ResetVariables();
+            if (b) { OnChanged(true); }
+            return b;
         }
 
 
@@ -541,7 +537,7 @@ namespace BlueControls.ItemCollection
                 new TextListItem(((int)enAlignment.Top_Left).ToString(), "Links oben")
             };
 
-            l.Add(new FlexiControlForProperty(this, "Textlage",  Lage));
+            l.Add(new FlexiControlForProperty(this, "Textlage", Lage));
 
 
             l.Add(new FlexiControlForProperty(this, "Eingebettete Ansichten", 5));

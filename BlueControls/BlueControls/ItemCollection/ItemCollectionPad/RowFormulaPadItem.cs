@@ -96,11 +96,7 @@ namespace BlueControls.ItemCollection
             Points.Add(p_R);
             Points.Add(p_u);
             Points.Add(p_o);
-        }
-
-
-
-
+         }
 
         #endregion
 
@@ -206,7 +202,6 @@ namespace BlueControls.ItemCollection
         }
 
 
-
         public override RectangleDF UsedArea()
         {
             if (p_LO == null || p_RU == null) { return new RectangleDF(); }
@@ -263,14 +258,12 @@ namespace BlueControls.ItemCollection
                         MessageBox.Show("<b><u>Eintrag neu gefunden:</b></u><br>" + n, enImageCode.Warnung, "OK");
                     }
 
-
                     return true; // Alles beim Alten
 
             }
 
             return false;
         }
-
 
         public override string ToString()
         {
@@ -294,18 +287,18 @@ namespace BlueControls.ItemCollection
         {
             p_LO.SetTo(p_LO.X + x, p_LO.Y + y);
             p_RU.SetTo(p_RU.X + x, p_RU.Y + y);
-            RecomputePointAndRelations();
+            base.Move(x, y);
         }
 
         public override void SetCoordinates(RectangleDF r)
         {
             p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
             p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
-            RecomputePointAndRelations();
+            base.SetCoordinates(r);
         }
 
 
-        protected override void KeepInternalLogic()
+        public override void CaluclatePointsWORelations()
         {
             p_RO.SetTo(p_RU.X, p_LO.Y);
             p_LU.SetTo(p_LO.X, p_RU.Y);
@@ -329,25 +322,21 @@ namespace BlueControls.ItemCollection
             p_L.X = p_LO.X;
             p_R.X = p_RO.X;
 
+            base.CaluclatePointsWORelations();
+
         }
 
 
-        public override void GenerateInternalRelation()
+        protected override void GenerateInternalRelationExplicit() 
         {
+            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RO));
+            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RU));
+            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_LU));
 
-            Relations.Clear();
-
-            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_RO));
-            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_RU));
-            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_LU));
-
-            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_R));
-            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_L));
-            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_u));
-            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_o));
-
-            OnPointOrRelationsChanged();
-
+            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_R));
+            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_L));
+            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_u));
+            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_o));
         }
 
 
@@ -375,7 +364,7 @@ namespace BlueControls.ItemCollection
             if (Row == null || string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#"))
             {
                 _tmpBMP = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
-                KeepInternalLogic();
+                OnChanged(true);
                 return;
             }
 
@@ -415,7 +404,7 @@ namespace BlueControls.ItemCollection
 
             if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + _tmpBMP.Width, p_LO.Y + _tmpBMP.Height); }
 
-            RecomputePointAndRelations();
+            OnChanged(true);
         }
 
 
@@ -453,7 +442,7 @@ namespace BlueControls.ItemCollection
         //    Return False
         //End Function
 
-
+        protected override void ParseFinished() { }
 
         public override List<FlexiControl> GetStyleOptions()
         {

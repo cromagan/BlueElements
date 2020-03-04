@@ -53,8 +53,6 @@ namespace BlueControls.ItemCollection
 
             Points.Add(p_ML);
             Points.Add(p_MR);
-
-
         }
 
         public decimal LaengePix
@@ -67,10 +65,8 @@ namespace BlueControls.ItemCollection
 
             {
                 if (value == _laengePix) { return; }
-
                 _laengePix = value;
-                KeepInternalLogic();
-
+                OnChanged(true);
             }
         }
 
@@ -83,10 +79,8 @@ namespace BlueControls.ItemCollection
 
             {
                 if (value == _breitePix) { return; }
-
                 _breitePix = value;
-                KeepInternalLogic();
-
+                OnChanged(true);
             }
         }
 
@@ -96,31 +90,24 @@ namespace BlueControls.ItemCollection
 
         public decimal WinkelMLtoMR()
         {
-
             return GeometryDF.Winkel(p_ML, p_MR);
         }
 
-        protected override void KeepInternalLogic()
+        public override void CaluclatePointsWORelations()
         {
-
             var winkel = WinkelMLtoMR();
-
             p_UL.SetTo(p_ML, BreitePix / 2, winkel - 90);
             p_OL.SetTo(p_ML, BreitePix / 2, winkel + 90);
             p_UR.SetTo(p_MR, BreitePix / 2, winkel - 90);
             p_OR.SetTo(p_MR, BreitePix / 2, winkel + 90);
 
+            base.CaluclatePointsWORelations();
         }
 
 
-
-
-
-        public override void GenerateInternalRelation()
+        protected override void GenerateInternalRelationExplicit()
         {
-            Relations.Clear();
-            Relations.Add(new clsPointRelation(Parent, enRelationType.AbstandZueinander, p_ML, p_MR));
-            OnPointOrRelationsChanged();
+            Relations.Add(new clsPointRelation(Parent, this, enRelationType.AbstandZueinander, p_ML, p_MR));
         }
 
 
@@ -142,24 +129,20 @@ namespace BlueControls.ItemCollection
         {
             p_ML.SetTo(p_ML.X + x, p_ML.Y + y);
             p_MR.SetTo(p_MR.X + x, p_MR.Y + y);
-
-            RecomputePointAndRelations();
+            base.Move(x, y);
         }
 
 
         public override void SetCoordinates(RectangleDF r)
         {
-
             p_ML.SetTo(r.PointOf(enAlignment.VerticalCenter_Left));
             p_MR.SetTo(r.PointOf(enAlignment.VerticalCenter_Right));
-
-
-            RecomputePointAndRelations();
+            base.SetCoordinates(r);
         }
 
         public override RectangleDF UsedArea()
         {
-           return new RectangleDF(p_OL, p_UR);
+            return new RectangleDF(p_OL, p_UR);
         }
 
 

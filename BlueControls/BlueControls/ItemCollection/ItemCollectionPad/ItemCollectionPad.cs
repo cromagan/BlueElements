@@ -157,7 +157,7 @@ namespace BlueControls.ItemCollection
 
             AllRelations = new ListExt<clsPointRelation>();
             AllRelations.ItemAdded += PointOrRelation_ItemAdded;
-            AllRelations.ItemRemoved += PointOrRelation_ItemRemoved; 
+            AllRelations.ItemRemoved += PointOrRelation_ItemRemoved;
 
             AllPoints = new ListExt<PointDF>();
             AllPoints.ItemAdded += PointOrRelation_ItemAdded;
@@ -422,7 +422,7 @@ namespace BlueControls.ItemCollection
         {
             foreach (var thisItem in this)
             {
-                thisItem?.RecomputePointAndRelations();
+                thisItem?.GenerateInternalRelation();
             }
         }
 
@@ -521,11 +521,7 @@ namespace BlueControls.ItemCollection
             {
                 if (thisItem is ICanHaveColumnVariables variables)
                 {
-                    if (variables.RenameColumn(oldName, cColumnItem))
-                    {
-                        thisItem.RecomputePointAndRelations();
-                        did = true;
-                    }
+                    if (variables.RenameColumn(oldName, cColumnItem)) { did = true; }
                 }
             }
 
@@ -560,8 +556,10 @@ namespace BlueControls.ItemCollection
             }
 
             base.OnItemAdded(item);
+            item.GenerateInternalRelation();
+
             AllPoints.AddIfNotExists(item.Points);
-            AllRelations.AddIfNotExists(item.Relations);
+            AllRelations.AddIfNotExists(item.Relations); // Eigentlich überflüssig
 
             IsSaved = false;
             InvalidateOrder();
@@ -569,7 +567,7 @@ namespace BlueControls.ItemCollection
             item.Changed += Item_Changed;
             item.PointOrRelationsChanged += Item_PointOrRelationsChanged;
 
-            RecomputePointAndRelations();
+            //RecomputePointAndRelations();
 
             if (item.Parent != this)
             {
@@ -715,7 +713,7 @@ namespace BlueControls.ItemCollection
 
             foreach (var ThisToo in this)
             {
-                if (item.Gruppenzugehörigkeit.ToLower()  == ThisToo.Gruppenzugehörigkeit.ToLower())
+                if (item.Gruppenzugehörigkeit.ToLower() == ThisToo.Gruppenzugehörigkeit.ToLower())
                 {
                     Remove(ThisToo);
                     return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
@@ -1074,15 +1072,11 @@ namespace BlueControls.ItemCollection
             {
                 if (thisItem is ICanHaveColumnVariables variables)
                 {
-                    if (variables.ParseVariable(VariableName, ValueType, Value))
-                    {
-                        thisItem.RecomputePointAndRelations();
-                        did = true;
-                    }
+                    if (variables.ReplaceVariable(VariableName, ValueType, Value)) { did = true; }
                 }
             }
 
-            if (did) { OnDoInvalidate(); }
+            if (did) { RepairAll(1, false); }
             return did;
         }
 
@@ -1157,11 +1151,7 @@ namespace BlueControls.ItemCollection
             {
                 if (thisItem is ICanHaveColumnVariables variables)
                 {
-                    if (variables.ParseSpecialCodes())
-                    {
-                        thisItem.RecomputePointAndRelations();
-                        did = true;
-                    }
+                    if (variables.DoSpecialCodes()) { did = true; }
                 }
             }
 
@@ -1178,11 +1168,7 @@ namespace BlueControls.ItemCollection
             {
                 if (thisItem is ICanHaveColumnVariables variables)
                 {
-                    if (variables.ResetVariables())
-                    {
-                        thisItem.RecomputePointAndRelations();
-                        did = true;
-                    }
+                    if (variables.ResetVariables()) { did = true; }
                 }
             }
 

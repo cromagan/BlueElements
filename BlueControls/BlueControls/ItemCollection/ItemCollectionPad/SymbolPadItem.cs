@@ -106,10 +106,8 @@ namespace BlueControls.ItemCollection
 
             GR.TranslateTransform(-trp.X, -trp.Y);
             GR.ResetTransform();
-            if (!ForPrinting)
-            {
-                GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
-            }
+
+            base.DrawExplicit(GR, DCoordinates, cZoom, MoveX, MoveY, vState, SizeOfParentControl, ForPrinting);
         }
 
 
@@ -194,5 +192,7 @@ namespace BlueControls.ItemCollection
             }
             return false;
         }
+        protected override void ParseFinished() { }
+
     }
 }

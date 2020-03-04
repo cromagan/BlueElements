@@ -172,15 +172,15 @@ namespace BlueControls.ItemCollection
         public override void Move(decimal x, decimal y)
         {
             NP.SetTo(NP.X + x, NP.Y + y);
-            RecomputePointAndRelations();
+            base.Move(x, y);
         }
 
-
+        protected override void GenerateInternalRelationExplicit() { }
 
         public override void SetCoordinates(RectangleDF r)
         {
             NP.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));
-            RecomputePointAndRelations();
+            base.SetCoordinates(r);
         }
 
 
@@ -197,6 +197,9 @@ namespace BlueControls.ItemCollection
             return false;
         }
 
+
+        protected override void ParseFinished() { }
+
         public override string ToString()
         {
             var t = base.ToString();
@@ -204,16 +207,7 @@ namespace BlueControls.ItemCollection
             return t + "Grid=" + GridShow + "}";
         }
 
-        protected override void KeepInternalLogic()
-        {
-            //Nix
-        }
 
-
-        public override void GenerateInternalRelation()
-        {
-            // Nix zu Tun
-        }
 
 
         public override List<FlexiControl> GetStyleOptions()

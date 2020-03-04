@@ -183,10 +183,10 @@ namespace BlueDatabase
                     break;
 
 
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                     if (Style == enShortenStyle.HTML) { break; }
                     if (column.CompactView) { return string.Empty; }
-                    if (!string.IsNullOrEmpty(Txt) && Txt.IsFormat(enDataFormat.Farbcode))
+                    if (!string.IsNullOrEmpty(Txt) && Txt.IsFormat(enDataFormat.FarbeInteger))
                     {
                         var col = Color.FromArgb(int.Parse(Txt));
                         Txt = col.ColorName();
@@ -301,9 +301,9 @@ namespace BlueDatabase
                         return QuickImage.Get("Fragezeichen||||||200|||80");
                     }
 
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
 
-                    if (!string.IsNullOrEmpty(Txt) && Txt.IsFormat(enDataFormat.Farbcode))
+                    if (!string.IsNullOrEmpty(Txt) && Txt.IsFormat(enDataFormat.FarbeInteger))
                     {
                         var col = Color.FromArgb(int.Parse(Txt));
                         return QuickImage.Get(enImageCode.Kreis, 16, "", col.ToHTMLCode());

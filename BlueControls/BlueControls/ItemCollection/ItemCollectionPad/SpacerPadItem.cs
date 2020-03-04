@@ -120,14 +120,14 @@ namespace BlueControls.ItemCollection
         public override void Move(decimal x, decimal y)
         {
             p_m.SetTo(p_m.X + x, p_m.Y + y);
-            RecomputePointAndRelations();
+            base.Move(x, y);
         }
 
 
         public override void SetCoordinates(RectangleDF r)
         {
             p_m.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));
-            RecomputePointAndRelations();
+            base.SetCoordinates(r);
         }
 
 
@@ -167,24 +167,24 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void KeepInternalLogic()
+        public override void CaluclatePointsWORelations()
         {
             var t = decimal.Parse(Größe_Distanzhalter) * Parent.SheetStyleScale / 2;
             p_o.SetTo(p_m.X, p_m.Y - t);
             p_u.SetTo(p_m.X, p_m.Y + t);
             p_l.SetTo(p_m.X - t, p_m.Y);
             p_r.SetTo(p_m.X + t, p_m.Y);
+
+            base.CaluclatePointsWORelations();
         }
 
 
-        public override void GenerateInternalRelation()
+        protected override void GenerateInternalRelationExplicit()
         {
-            Relations.Clear();
-            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_m, p_u));
-            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_m, p_o));
-            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_m, p_r));
-            Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_m, p_l));
-            OnPointOrRelationsChanged();
+            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_m, p_u));
+            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_m, p_o));
+            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_m, p_r));
+            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_m, p_l));
         }
 
 
@@ -206,6 +206,8 @@ namespace BlueControls.ItemCollection
             l.AddRange(base.GetStyleOptions());
             return l;
         }
+
+        protected override void ParseFinished() { }
 
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         //{

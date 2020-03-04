@@ -23,6 +23,7 @@ using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
+using BlueControls.Enums;
 
 namespace BlueControls.ItemCollection
 {
@@ -72,7 +73,7 @@ namespace BlueControls.ItemCollection
         {
             p_LO.SetTo(p_LO.X + x, p_LO.Y + y);
             p_RU.SetTo(p_RU.X + x, p_RU.Y + y);
-            RecomputePointAndRelations();
+            base.Move(x, y);
         }
 
 
@@ -89,34 +90,25 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override void GenerateInternalRelation()
+        protected override void GenerateInternalRelationExplicit()
         {
-            Relations.Clear();
-
-            p_LU.X = p_LO.X;
-            p_RO.Y = p_LO.Y;
-            p_RU.X = p_RO.X;
-            p_RU.Y = p_LU.Y;
-
             if (Größe_fixiert)
             {
-                Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_RO));
-                Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_RU));
-                Relations.Add(new clsPointRelation(Parent, enRelationType.PositionZueinander, p_LO, p_LU));
+                Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RO));
+                Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RU));
+                Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_LU));
             }
             else
             {
                 //relations.Add(new clsPointRelation(enRelationType.YPositionZueinander, p_LO, p_RU));
 
-                Relations.Add(new clsPointRelation(Parent, enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
-                Relations.Add(new clsPointRelation(Parent, enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
+                Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
+                Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
 
-                Relations.Add(new clsPointRelation(Parent, enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
-                Relations.Add(new clsPointRelation(Parent, enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
+                Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
+                Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
             }
 
-
-            OnPointOrRelationsChanged();
         }
 
 
@@ -148,7 +140,7 @@ namespace BlueControls.ItemCollection
         {
             p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
             p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
-            RecomputePointAndRelations();
+            base.SetCoordinates(r);
         }
 
         public override RectangleDF UsedArea()
@@ -157,10 +149,12 @@ namespace BlueControls.ItemCollection
             return new RectangleDF(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
         }
 
-        protected override void KeepInternalLogic()
+        public override void CaluclatePointsWORelations()
         {
             p_RO.SetTo(p_RU.X, p_LO.Y);
             p_LU.SetTo(p_LO.X, p_RU.Y);
+
+            base.CaluclatePointsWORelations();
         }
 
 
@@ -187,6 +181,19 @@ namespace BlueControls.ItemCollection
             if (Drehwinkel != 0) { t = t + "Rotation=" + Drehwinkel + ", "; }
             t = t + "Fixsize=" + Größe_fixiert.ToPlusMinus() + ", ";
             return t.Trim(", ") + "}";
+        }
+
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+        {
+            try
+            {
+
+                if (!ForPrinting)
+                {
+                    GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
+                }
+            }
+            catch { }
         }
     }
 }

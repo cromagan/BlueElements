@@ -158,7 +158,7 @@ namespace BlueControls.Forms
         private void AddText_Click(object sender, System.EventArgs e)
         {
             var b = new TextPadItem(Pad.Item);
-            b.Text = "";
+            b.Interner_Text = string.Empty;
             b.Stil = PadStyles.Style_Standard;
             Pad.Item.Add(b);
             b.SetCoordinates(new RectangleDF(10, 10, 200, 200));
@@ -207,24 +207,24 @@ namespace BlueControls.Forms
         }
 
 
-        private void Raster_CheckedChanged(object sender, System.EventArgs e)
+        private void ckbRaster_CheckedChanged(object sender, System.EventArgs e)
         {
-            Pad.Grid = Raster.Checked;
+            Pad.Grid = ckbRaster.Checked;
         }
 
-        private void RasterAnzeige_TextChanged(object sender, System.EventArgs e)
+        private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e)
         {
 
-            if (!RasterAnzeige.Text.IsNumeral()) { return; }
+            if (!txbRasterAnzeige.Text.IsNumeral()) { return; }
 
-            Pad.GridShow = float.Parse(RasterAnzeige.Text);
+            Pad.GridShow = float.Parse(txbRasterAnzeige.Text);
         }
 
         private void RasterFangen_TextChanged(object sender, System.EventArgs e)
         {
-            if (!RasterFangen.Text.IsNumeral()) { return; }
+            if (!txbRasterFangen.Text.IsNumeral()) { return; }
 
-            Pad.GridSnap = float.Parse(RasterFangen.Text);
+            Pad.GridSnap = float.Parse(txbRasterFangen.Text);
         }
 
 

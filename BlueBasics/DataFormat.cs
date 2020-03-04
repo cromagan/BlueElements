@@ -56,7 +56,7 @@ namespace BlueBasics
             {
                 case enDataFormat.Bit:
                 case enDataFormat.BildCode:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                 case enDataFormat.Schrift:
                     return true;
                 default:
@@ -76,7 +76,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
@@ -178,7 +178,7 @@ namespace BlueBasics
                     return "+-";
 
                 case enDataFormat.Ganzzahl:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                     return Constants.Char_Numerals + "-";
 
                 case enDataFormat.Gleitkommazahl:
@@ -239,7 +239,7 @@ namespace BlueBasics
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.RelationText:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
@@ -291,7 +291,7 @@ namespace BlueBasics
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                 case enDataFormat.BildCode:
                     return Convert.ToBoolean(il > 0);
 
@@ -333,7 +333,7 @@ namespace BlueBasics
 
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.Ganzzahl:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                     return true; // Macht Alls der Text_SchabloneCheck
 
                 case enDataFormat.LinkedCell:
@@ -383,7 +383,7 @@ namespace BlueBasics
 
 
                 case enDataFormat.Ganzzahl:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                     if (TXT == "0") { return true; }
                     if (TXT == "-") { return false; }
                     if (!string.IsNullOrEmpty(TXT) && TXT.Substring(0, 1) == "0") { return false; }
@@ -434,7 +434,7 @@ namespace BlueBasics
                     }
 
                 case enDataFormat.Bit:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                 case enDataFormat.Schrift:
                     return Constants.SecondSortChar + IsValue;
 
@@ -536,7 +536,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Link_To_Filesystem:
@@ -604,7 +604,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.LinkedCell:
@@ -637,7 +637,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
@@ -682,7 +682,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
@@ -704,7 +704,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:

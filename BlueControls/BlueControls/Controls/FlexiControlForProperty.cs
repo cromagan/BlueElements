@@ -524,7 +524,7 @@ namespace BlueControls.Controls
                                     case "system.string": Format = enDataFormat.Text; break;
                                     case "system.int32": Format = enDataFormat.Ganzzahl; break;
                                     case "system.decimal": Format = enDataFormat.Gleitkommazahl; break;
-                                    case "system.drawing.color": Format = enDataFormat.Farbcode; break;
+                                    case "system.drawing.color": Format = enDataFormat.Text; break; // HTML-Farbcode noch nicht programmiert
                                     default: Format = enDataFormat.Text; break;
                                 }
 

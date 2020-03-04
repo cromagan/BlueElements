@@ -50,11 +50,11 @@ namespace BlueControls.Forms
             this.Area_Assistent = new BlueControls.Controls.GroupBox();
             this.Bez_None = new BlueControls.Controls.Button();
             this.Bez_Direkt = new BlueControls.Controls.Button();
-            this.RasterFangenCap = new BlueControls.Controls.Caption();
-            this.cappi1 = new BlueControls.Controls.Caption();
-            this.RasterFangen = new BlueControls.Controls.TextBox();
-            this.RasterAnzeige = new BlueControls.Controls.TextBox();
-            this.Raster = new BlueControls.Controls.Button();
+            this.capRasterFangen = new BlueControls.Controls.Caption();
+            this.capRasterAnzeige = new BlueControls.Controls.Caption();
+            this.txbRasterFangen = new BlueControls.Controls.TextBox();
+            this.txbRasterAnzeige = new BlueControls.Controls.TextBox();
+            this.ckbRaster = new BlueControls.Controls.Button();
             this.Bez_All = new BlueControls.Controls.Button();
             this.Area_Design = new BlueControls.Controls.GroupBox();
             this.ArbeitsbreichSetup = new BlueControls.Controls.Button();
@@ -124,7 +124,7 @@ namespace BlueControls.Forms
             this.Ribbon.IsRibbonBar = true;
             this.Ribbon.Location = new System.Drawing.Point(0, 0);
             this.Ribbon.Name = "Ribbon";
-            this.Ribbon.SelectedIndex = 1;
+            this.Ribbon.SelectedIndex = 2;
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
             this.Ribbon.TabIndex = 2;
             // 
@@ -326,11 +326,11 @@ namespace BlueControls.Forms
             this.Area_Assistent.CausesValidation = false;
             this.Area_Assistent.Controls.Add(this.Bez_None);
             this.Area_Assistent.Controls.Add(this.Bez_Direkt);
-            this.Area_Assistent.Controls.Add(this.RasterFangenCap);
-            this.Area_Assistent.Controls.Add(this.cappi1);
-            this.Area_Assistent.Controls.Add(this.RasterFangen);
-            this.Area_Assistent.Controls.Add(this.RasterAnzeige);
-            this.Area_Assistent.Controls.Add(this.Raster);
+            this.Area_Assistent.Controls.Add(this.capRasterFangen);
+            this.Area_Assistent.Controls.Add(this.capRasterAnzeige);
+            this.Area_Assistent.Controls.Add(this.txbRasterFangen);
+            this.Area_Assistent.Controls.Add(this.txbRasterAnzeige);
+            this.Area_Assistent.Controls.Add(this.ckbRaster);
             this.Area_Assistent.Controls.Add(this.Bez_All);
             this.Area_Assistent.Dock = System.Windows.Forms.DockStyle.Left;
             this.Area_Assistent.Location = new System.Drawing.Point(288, 0);
@@ -359,56 +359,54 @@ namespace BlueControls.Forms
             this.Bez_Direkt.Text = "Nur Direktverbindungen erstellen";
             this.Bez_Direkt.CheckedChanged += new System.EventHandler(this.BezMode_CheckedChanged);
             // 
-            // RasterFangenCap
+            // capRasterFangen
             // 
-            this.RasterFangenCap.CausesValidation = false;
-            this.RasterFangenCap.Location = new System.Drawing.Point(8, 46);
-            this.RasterFangenCap.Name = "RasterFangenCap";
-            this.RasterFangenCap.Size = new System.Drawing.Size(56, 22);
-            this.RasterFangenCap.Text = "Fangen:";
+            this.capRasterFangen.Location = new System.Drawing.Point(8, 46);
+            this.capRasterFangen.Name = "capRasterFangen";
+            this.capRasterFangen.Size = new System.Drawing.Size(56, 22);
+            this.capRasterFangen.Text = "Fangen:";
             // 
-            // cappi1
+            // capRasterAnzeige
             // 
-            this.cappi1.CausesValidation = false;
-            this.cappi1.Location = new System.Drawing.Point(8, 24);
-            this.cappi1.Name = "cappi1";
-            this.cappi1.Size = new System.Drawing.Size(56, 22);
-            this.cappi1.Text = "Anzeige:";
+            this.capRasterAnzeige.Location = new System.Drawing.Point(8, 24);
+            this.capRasterAnzeige.Name = "capRasterAnzeige";
+            this.capRasterAnzeige.Size = new System.Drawing.Size(56, 22);
+            this.capRasterAnzeige.Text = "Anzeige:";
             // 
-            // RasterFangen
+            // txbRasterFangen
             // 
-            this.RasterFangen.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.RasterFangen.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
-            this.RasterFangen.Location = new System.Drawing.Point(72, 46);
-            this.RasterFangen.Name = "RasterFangen";
-            this.RasterFangen.Size = new System.Drawing.Size(64, 22);
-            this.RasterFangen.Suffix = "mm";
-            this.RasterFangen.TabIndex = 6;
-            this.RasterFangen.Text = "10";
-            this.RasterFangen.TextChanged += new System.EventHandler(this.RasterFangen_TextChanged);
+            this.txbRasterFangen.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbRasterFangen.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
+            this.txbRasterFangen.Location = new System.Drawing.Point(72, 46);
+            this.txbRasterFangen.Name = "txbRasterFangen";
+            this.txbRasterFangen.Size = new System.Drawing.Size(64, 22);
+            this.txbRasterFangen.Suffix = "mm";
+            this.txbRasterFangen.TabIndex = 6;
+            this.txbRasterFangen.Text = "10";
+            this.txbRasterFangen.TextChanged += new System.EventHandler(this.RasterFangen_TextChanged);
             // 
-            // RasterAnzeige
+            // txbRasterAnzeige
             // 
-            this.RasterAnzeige.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.RasterAnzeige.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
-            this.RasterAnzeige.Location = new System.Drawing.Point(72, 24);
-            this.RasterAnzeige.Name = "RasterAnzeige";
-            this.RasterAnzeige.Size = new System.Drawing.Size(64, 22);
-            this.RasterAnzeige.Suffix = "mm";
-            this.RasterAnzeige.TabIndex = 5;
-            this.RasterAnzeige.Text = "10";
-            this.RasterAnzeige.TextChanged += new System.EventHandler(this.RasterAnzeige_TextChanged);
+            this.txbRasterAnzeige.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbRasterAnzeige.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
+            this.txbRasterAnzeige.Location = new System.Drawing.Point(72, 24);
+            this.txbRasterAnzeige.Name = "txbRasterAnzeige";
+            this.txbRasterAnzeige.Size = new System.Drawing.Size(64, 22);
+            this.txbRasterAnzeige.Suffix = "mm";
+            this.txbRasterAnzeige.TabIndex = 5;
+            this.txbRasterAnzeige.Text = "10";
+            this.txbRasterAnzeige.TextChanged += new System.EventHandler(this.txbRasterAnzeige_TextChanged);
             // 
-            // Raster
+            // ckbRaster
             // 
-            this.Raster.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox;
-            this.Raster.ImageCode = "Raster|18";
-            this.Raster.Location = new System.Drawing.Point(8, 2);
-            this.Raster.Name = "Raster";
-            this.Raster.Size = new System.Drawing.Size(112, 22);
-            this.Raster.TabIndex = 4;
-            this.Raster.Text = "Raster";
-            this.Raster.CheckedChanged += new System.EventHandler(this.Raster_CheckedChanged);
+            this.ckbRaster.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox;
+            this.ckbRaster.ImageCode = "Raster|18";
+            this.ckbRaster.Location = new System.Drawing.Point(8, 2);
+            this.ckbRaster.Name = "ckbRaster";
+            this.ckbRaster.Size = new System.Drawing.Size(112, 22);
+            this.ckbRaster.TabIndex = 4;
+            this.ckbRaster.Text = "Raster";
+            this.ckbRaster.CheckedChanged += new System.EventHandler(this.ckbRaster_CheckedChanged);
             // 
             // Bez_All
             // 
@@ -456,7 +454,6 @@ namespace BlueControls.Forms
             // 
             // sscchrifthgöße
             // 
-            this.sscchrifthgöße.CausesValidation = false;
             this.sscchrifthgöße.Location = new System.Drawing.Point(112, 46);
             this.sscchrifthgöße.Name = "sscchrifthgöße";
             this.sscchrifthgöße.Size = new System.Drawing.Size(88, 22);
@@ -474,7 +471,6 @@ namespace BlueControls.Forms
             // 
             // ssss
             // 
-            this.ssss.CausesValidation = false;
             this.ssss.Location = new System.Drawing.Point(112, 2);
             this.ssss.Name = "ssss";
             this.ssss.Size = new System.Drawing.Size(77, 22);
@@ -526,11 +522,11 @@ namespace BlueControls.Forms
 			private Button Vorschau;
 			private ComboBox PadDesign;
 			private Button Bez_All;
-			private Button Raster;
-			private Caption RasterFangenCap;
-			private Caption cappi1;
-			private TextBox RasterFangen;
-			private TextBox RasterAnzeige;
+			protected Button ckbRaster;
+			private Caption capRasterFangen;
+			private Caption capRasterAnzeige;
+			private TextBox txbRasterFangen;
+			private TextBox txbRasterAnzeige;
 			private Button Bez_None;
 			private Button Bez_Direkt;
 			internal ComboBox SchriftGröße;

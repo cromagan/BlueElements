@@ -5,8 +5,8 @@ namespace BlueControls.Interfaces
 {
     public interface ICanHaveColumnVariables
     {
-        bool ParseVariable(string VariableName, enValueType ValueType, string Value);
-        bool ParseSpecialCodes();
+        bool ReplaceVariable(string VariableName, enValueType ValueType, string Value);
+        bool DoSpecialCodes();
         bool ResetVariables();
         bool RenameColumn(string oldName, ColumnItem cColumnItem);
     }

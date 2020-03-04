@@ -237,9 +237,6 @@ namespace BlueControls.ItemCollection
             GR.ResetTransform();
             if (!ForPrinting)
             {
-                GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
-
-
                 if (!string.IsNullOrEmpty(Platzhalter_für_Layout))
                 {
                     var f = new Font("Arial", 8);
@@ -247,6 +244,9 @@ namespace BlueControls.ItemCollection
                 }
 
             }
+
+            base.DrawExplicit(GR, DCoordinates, cZoom, MoveX, MoveY, vState, SizeOfParentControl, ForPrinting);
+
         }
 
 
@@ -274,12 +274,12 @@ namespace BlueControls.ItemCollection
                     Platzhalter_für_Layout = value.FromNonCritical();
                     return true;
             }
-
             return false;
         }
 
 
 
+        protected override void ParseFinished() { }
 
         public override string ToString()
         {
@@ -329,7 +329,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public bool ParseVariable(string VariableName, enValueType ValueType, string Value)
+        public bool ReplaceVariable(string VariableName, enValueType ValueType, string Value)
         {
 
             if (string.IsNullOrEmpty(Platzhalter_für_Layout)) { return false; }
@@ -340,11 +340,13 @@ namespace BlueControls.ItemCollection
 
             Bitmap = modConverter.StringToBitmap(ot);
 
+            OnChanged(true);
+
             return true;
         }
 
 
-        public bool ParseSpecialCodes()
+        public bool DoSpecialCodes()
         {
             return false;
         }
@@ -357,6 +359,7 @@ namespace BlueControls.ItemCollection
             {
                 Bitmap.Dispose();
                 Bitmap = null;
+                OnChanged(true);
                 return true;
             }
 

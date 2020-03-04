@@ -36,6 +36,7 @@ namespace BlueControls
         public readonly ListExt<PointDF> Points = new ListExt<PointDF>();
 
         public readonly ItemCollectionPad ParentCollection;
+        public readonly object Parent;
 
         private string _Richtmaß;
 
@@ -46,7 +47,7 @@ namespace BlueControls
 
         public event EventHandler Changed;
 
-        public clsPointRelation(ItemCollectionPad parentCollection)
+        public clsPointRelation(ItemCollectionPad parentCollection, object parent)
         {
 
             ParentCollection = parentCollection;
@@ -58,12 +59,11 @@ namespace BlueControls
             _Richtmaß = string.Empty;
             Computed = false;
             Order = -1;
-
-
+            Parent = parent;
         }
 
 
-        public clsPointRelation(ItemCollectionPad parentCollection, enRelationType enRelationType, PointDF Point1, PointDF Point2) : this(parentCollection)
+        public clsPointRelation(ItemCollectionPad parentCollection, object parent, enRelationType enRelationType, PointDF Point1, PointDF Point2) : this(parentCollection, parent)
         {
 
             _relationtype = enRelationType;
@@ -78,7 +78,7 @@ namespace BlueControls
         }
 
 
-        public clsPointRelation(ItemCollectionPad parentCollection, string ToParse) : this(parentCollection)
+        public clsPointRelation(ItemCollectionPad parentCollection, object parent, string ToParse) : this(parentCollection, parent)
         {
 
             Points.ThrowEvents = false;
@@ -770,17 +770,19 @@ namespace BlueControls
             {
                 if (!ParentCollection.AllRelations.Contains(this)) { return "Beziehung nicht mehr vorhanden."; }
 
+
+                if (Parent is BasicPadItem ba)
+                {
+                    if (!ParentCollection.Contains(ba)) { return "Objekt nicht mehr vorhanden"; }
+                    if (!ba.Relations.Contains(this)) { return "Beziehung nicht mehr vorhanden."; }
+                }
+
                 foreach (var Thispoint in Points)
                 {
                     if (Thispoint == null) { return "Einer der Punkte ist null."; }
                     if (!ParentCollection.AllPoints.Contains(Thispoint)) { return "Punkt nicht mehr vorhanden."; }
                 }
             }
-
-
-
-
-
             return string.Empty;
         }
 

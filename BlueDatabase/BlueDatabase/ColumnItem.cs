@@ -1912,7 +1912,7 @@ namespace BlueDatabase
                 case enDataFormat.RelationText: return QuickImage.Get(enImageCode.Herz, 16);
                 case enDataFormat.Datum_und_Uhrzeit: return QuickImage.Get(enImageCode.Uhr, 16);
                 case enDataFormat.Bit: return QuickImage.Get(enImageCode.Häkchen, 16);
-                case enDataFormat.Farbcode: return QuickImage.Get(enImageCode.Pinsel, 16);
+                case enDataFormat.FarbeInteger: return QuickImage.Get(enImageCode.Pinsel, 16);
                 case enDataFormat.Ganzzahl: return QuickImage.Get(enImageCode.Ganzzahl, 16);
                 case enDataFormat.Gleitkommazahl: return QuickImage.Get(enImageCode.Gleitkommazahl, 16);
                 case enDataFormat.BildCode: return QuickImage.Get(enImageCode.Smiley, 16);
@@ -2049,7 +2049,7 @@ namespace BlueDatabase
                 //            return false;
                 //    }
 
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                     if (EditType_To_Check == enEditTypeFormula.Farb_Auswahl_Dialog) { return true; }
                     return false;
 
@@ -2689,7 +2689,7 @@ namespace BlueDatabase
                 case enDataFormat.Link_To_Filesystem:
                     return enEditTypeTable.FileHandling_InDateiSystem;
 
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                     if (DoDropDown) { return enEditTypeTable.Dropdown_Single; }
                     return enEditTypeTable.Farb_Auswahl_Dialog;
 

@@ -80,7 +80,7 @@ namespace BlueDatabase
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Farbcode:
+                case enDataFormat.FarbeInteger:
                 case enDataFormat.Schrift:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Link_To_Filesystem:

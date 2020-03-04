@@ -59,7 +59,7 @@ namespace BlueControls.Controls
 
 
         /// <summary>
-        /// Die Punkte, die zum Schieben Markiert sind.
+        /// Die Punkte, die zum Schieben markiert sind.
         /// </summary>
         private readonly ListExt<PointDF> Sel_P;
         /// <summary>
@@ -226,11 +226,6 @@ namespace BlueControls.Controls
                     _Item.DoInvalidate += Item_DoInvalidate;
                     _Item.OnDoInvalidate();
                 }
-
-
-
-
-
             }
         }
 
@@ -712,11 +707,7 @@ namespace BlueControls.Controls
 
         private bool MoveSelectedPoints(decimal X, decimal Y)
         {
-            _Item.RecomputePointAndRelations();
-
-
-
-            var f = _Item.NotPerforming(false);
+            var errorsBefore = _Item.NotPerforming(false);
 
             foreach (var thispoint in _Item.AllPoints)
             {
@@ -733,8 +724,9 @@ namespace BlueControls.Controls
                 thispoint.SetTo(thispoint.X, thispoint.Y + Y);
             }
 
+            CaluclateOtherPointsOf(Sel_P);
 
-            if (f == 0)
+            if (errorsBefore == 0)
             {
                 _Item.RepairAll(1, true);
             }
@@ -745,39 +737,50 @@ namespace BlueControls.Controls
                 // und sicherheitshalber große Änderungen verbieten, um nicht noch mehr kaputt zu machen...
             }
 
-            _Item.RecomputePointAndRelations();
+            var errorsAfter = _Item.NotPerforming(false);
 
-
-
-            var f2 = _Item.NotPerforming(false);
-
-            if (f2 > f)
+            if (errorsAfter > errorsBefore)
             {
                 foreach (var thispoint in _Item.AllPoints)
                 {
                     thispoint?.ReStore();
                 }
-                _Item.RecomputePointAndRelations();
+                CaluclateOtherPointsOf(Sel_P);
 
             }
-            else if (f2 < f)
+            else if (errorsAfter < errorsBefore)
             {
-                ComputeMovingData();
+                ComputeMovingData(); // Evtl. greifen nun vorher invalide Beziehungen.
             }
 
 
 
             Invalidate();
-            return Convert.ToBoolean(f2 == 0);
+            return Convert.ToBoolean(errorsAfter == 0);
         }
 
+        private void CaluclateOtherPointsOf(ListExt<PointDF> sel_P)
+        {
+            var x = new List<BasicPadItem>();
+
+
+            foreach (var thispoint in Sel_P)
+            {
+                if (thispoint.Parent is BasicPadItem BP)
+                {
+                    if (!x.Contains(BP))
+                    {
+                        BP.CaluclatePointsWORelations();
+                        x.Add(BP);
+                    }
+
+                }
+            }
+        }
 
         private void ComputeMovingData()
         {
-
             _Item.ComputeOrders(Sel_P);
-
-
 
             Move_X.Clear();
             Move_Y.Clear();
@@ -1229,7 +1232,7 @@ namespace BlueControls.Controls
             }
 
 
-            var r = new clsPointRelation(_Item, rel, Snap1, SnaP2);
+            var r = new clsPointRelation(_Item, null, rel, Snap1, SnaP2);
 
 
             foreach (var thisRelation in _Item.AllRelations)
@@ -1538,7 +1541,7 @@ namespace BlueControls.Controls
         }
 
 
-        private void CheckGrid()
+        public void CheckGrid()
         {
             GridPadItem Found = null;
 
@@ -1603,21 +1606,21 @@ namespace BlueControls.Controls
             }
 
 
-            var tg = EditBoxFlexiControl.Show(l);
+            EditBoxFlexiControl.Show(l);
 
 
-            if (tg.Count == 0) { return; }
+            //if (tg.Count == 0) { return; }
 
-            var ClosMe = true;
+            //var ClosMe = true;
 
-            //Item.DoStyleCommands(this, tg, ref ClosMe);
-
-
-
-            Item.RecomputePointAndRelations();
+            ////Item.DoStyleCommands(this, tg, ref ClosMe);
 
 
-            if (!ClosMe) { ShowErweitertMenü(Item); }
+
+            //Item.RecomputePointAndRelationsx();
+
+
+            //if (!ClosMe) { ShowErweitertMenü(Item); }
 
 
 

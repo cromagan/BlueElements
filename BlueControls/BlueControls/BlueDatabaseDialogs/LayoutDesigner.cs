@@ -31,7 +31,7 @@ using System.ComponentModel;
 namespace BlueControls.BlueDatabaseDialogs
 {
 
-    internal partial class LayoutDesigner
+    internal partial class LayoutDesigner : BlueControls.Forms.PadEditor
     {
         public readonly Database Database;
 
@@ -39,7 +39,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private string _AdditionalLayoutPath = "";
 
 
-        public LayoutDesigner(Database cDatabase, string cvAdditionalLayoutPath)
+        public LayoutDesigner(Database cDatabase, string cvAdditionalLayoutPath) : base()
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -146,8 +146,9 @@ namespace BlueControls.BlueDatabaseDialogs
             var c = new CreativePad();
 
             c.Item.Caption = ex;
+            Pad.Grid = false;
             Database.Layouts.Add(c.ToString());
-
+            Pad.Grid = ckbRaster.Checked;
 
             befülleLayoutDropdown();
 
@@ -266,8 +267,9 @@ namespace BlueControls.BlueDatabaseDialogs
             if (Database == null) { return; }
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
 
+            Pad.Grid = false;
             var newl = Pad.Item.ToString();
-
+            Pad.Grid = ckbRaster.Checked;
 
             if (_LoadedLayout.StartsWith("#"))
             {
@@ -577,8 +579,10 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void SaveTab_FileOk(object sender, CancelEventArgs e)
         {
-
+            Pad.Grid = false;
             var t = Pad.Item.ToString();
+            Pad.Grid = ckbRaster.Checked;
+
             modAllgemein.SaveToDisk(SaveTab.FileName, t, false);
 
         }
