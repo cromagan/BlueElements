@@ -80,7 +80,6 @@ namespace BlueControls.ItemCollection
             Stil = format;
 
             _TempPoints = new List<PointDF>();
-            Stil = PadStyles.Style_Standard;
             Linien_Verhalten = enConectorStyle.Direct;
         }
 

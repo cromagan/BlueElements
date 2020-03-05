@@ -626,8 +626,8 @@ namespace BlueControls.ItemCollection
 
         public void OnChanged(bool checkLogic)
         {
+            if (!Parent.Contains(this)) { return; } // Wir sind nich im Konstruktor, also ignorieren
             if (checkLogic) { GenerateInternalRelation(); }
-
             OnChanged();
         }
 

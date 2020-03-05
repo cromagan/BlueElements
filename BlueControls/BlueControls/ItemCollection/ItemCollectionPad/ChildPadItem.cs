@@ -70,7 +70,6 @@ namespace BlueControls.ItemCollection
         public List<BasicPadItem> VisibleItems = null;
         public List<BasicPadItem> ZoomItems = null;
 
-
         public enAlignment Textlage { get; set; } = (enAlignment)(-1);
         public Color Randfarbe { get; set; } = Color.Transparent;
 
@@ -185,7 +184,6 @@ namespace BlueControls.ItemCollection
                     }
 
                     var mb = PadInternal.Item.MaxBounds(ZoomItems);
-
                     var zoomv = PadInternal.ZoomFitValue(mb, false, _tmpBMP.Size);
                     var centerpos = PadInternal.CenterPos(mb, false, _tmpBMP.Size, zoomv);
                     var slidervalues = PadInternal.SliderValues(mb, zoomv, centerpos);
@@ -277,7 +275,6 @@ namespace BlueControls.ItemCollection
 
 
         }
-
 
         public override bool ParseThis(string tag, string value)
         {
@@ -527,9 +524,7 @@ namespace BlueControls.ItemCollection
 
             l.Add(new FlexiControlForProperty(this, "Name"));
 
-
             l.Add(new FlexiControlForProperty(this, "Randfarbe"));
-
 
             var Lage = new ItemCollectionList
             {
@@ -539,10 +534,7 @@ namespace BlueControls.ItemCollection
 
             l.Add(new FlexiControlForProperty(this, "Textlage", Lage));
 
-
             l.Add(new FlexiControlForProperty(this, "Eingebettete Ansichten", 5));
-
-
             l.AddRange(base.GetStyleOptions());
             return l;
         }

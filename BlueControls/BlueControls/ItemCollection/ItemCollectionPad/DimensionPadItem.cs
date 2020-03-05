@@ -221,13 +221,15 @@ namespace BlueControls.ItemCollection
         {
             if (!string.IsNullOrEmpty(Text_oben)) { return Text_oben; }
             var s = Länge_in_MM.ToString(Constants.Format_Float10);
-            s = s.TrimEnd("0");
-            s = s.TrimEnd(",");
-            s = s.TrimEnd(".");
+            s = s.Replace(".", ",");
 
+            if ( s.Contains(","))
+            {
+                s = s.TrimEnd("0");
+                s = s.TrimEnd(",");
+            }
             return Präfix + s + Suffix;
         }
-
 
         public decimal Länge_in_MM
         {
@@ -236,9 +238,6 @@ namespace BlueControls.ItemCollection
                 return Math.Round(modConverter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
             }
         }
-
-
-
 
         protected override string ClassId()
         {

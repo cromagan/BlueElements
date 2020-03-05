@@ -43,10 +43,7 @@ namespace BlueControls.ItemCollection
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
-
-
         #region  Construktor 
-
 
         public FormPadItemRectangle(ItemCollectionPad parent, string internalname) : base(parent, internalname)
         {
@@ -64,10 +61,7 @@ namespace BlueControls.ItemCollection
             Drehwinkel = 0;
         }
 
-
         #endregion
-
-
 
         public override void Move(decimal x, decimal y)
         {
@@ -76,10 +70,6 @@ namespace BlueControls.ItemCollection
             base.Move(x, y);
         }
 
-
-
-
-
         public override bool Contains(PointF value, decimal zoomfactor)
         {
             var tmp = UsedArea();
@@ -87,7 +77,6 @@ namespace BlueControls.ItemCollection
             tmp.Inflate(-ne, -ne);
             return tmp.Contains(value.ToPointDF());
         }
-
 
 
         protected override void GenerateInternalRelationExplicit()
@@ -108,9 +97,7 @@ namespace BlueControls.ItemCollection
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
             }
-
         }
-
 
         public override List<FlexiControl> GetStyleOptions()
         {
@@ -118,8 +105,6 @@ namespace BlueControls.ItemCollection
 
             l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty(this, "Drehwinkel"));
-
-
 
             if (!Größe_fixiert && !p_LO.CanMove(Parent.AllRelations) && !p_RU.CanMove(Parent.AllRelations))
             {

@@ -18,6 +18,7 @@
 #endregion
 
 using BlueBasics.Enums;
+using System;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection
@@ -41,18 +42,29 @@ namespace BlueControls.ItemCollection
 
 
 
-        public BasicPadItemTwoPoints(ItemCollectionPad parent) : base(parent, string.Empty)
+        public BasicPadItemTwoPoints(ItemCollectionPad parent, decimal winkel, decimal laengePix, decimal breitePix) : base(parent, string.Empty)
         {
+            _laengePix = laengePix;
+            _breitePix = breitePix;
+
             p_ML = new PointDF(this, "ML", 0, 0);
-            p_MR = new PointDF(this, "MR", 1000, 0);
+            p_MR = new PointDF(this, "MR", p_ML, laengePix, winkel);
             p_OL = new PointDF();
             p_OR = new PointDF();
             p_UL = new PointDF();
             p_UR = new PointDF();
 
-
             Points.Add(p_ML);
             Points.Add(p_MR);
+        }
+
+
+        public PointDF Middle
+        {
+            get
+            {
+                return new PointDF((p_ML.X + p_MR.X) / 2, (p_ML.Y + p_MR.Y) / 2);
+            }
         }
 
         public decimal LaengePix
@@ -66,7 +78,9 @@ namespace BlueControls.ItemCollection
             {
                 if (value == _laengePix) { return; }
                 _laengePix = value;
-                OnChanged(true);
+
+                SetMiddleAndAngle(Middle, WinkelMLtoMR());
+
             }
         }
 
@@ -142,9 +156,19 @@ namespace BlueControls.ItemCollection
 
         public override RectangleDF UsedArea()
         {
-            return new RectangleDF(p_OL, p_UR);
+            var r = new RectangleDF(p_OL, p_UR);
+            r.ExpandTo(p_ML);
+            r.ExpandTo(p_MR);
+            r.ExpandTo(p_OR);
+            r.ExpandTo(p_UL);
+            return r;
         }
 
-
+        public void SetMiddleAndAngle(PointDF newMiddle, decimal alpha)
+        {
+            p_ML.SetTo(newMiddle, -_laengePix / 2, alpha);
+            p_MR.SetTo(newMiddle, _laengePix / 2, alpha);
+            OnChanged(true);
+        }
     }
 }

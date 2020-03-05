@@ -124,7 +124,7 @@ namespace BlueControls.Forms
             this.Ribbon.IsRibbonBar = true;
             this.Ribbon.Location = new System.Drawing.Point(0, 0);
             this.Ribbon.Name = "Ribbon";
-            this.Ribbon.SelectedIndex = 2;
+            this.Ribbon.SelectedIndex = 1;
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
             this.Ribbon.TabIndex = 2;
             // 

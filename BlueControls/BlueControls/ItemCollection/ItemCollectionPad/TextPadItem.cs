@@ -34,10 +34,6 @@ namespace BlueControls.ItemCollection
 {
     public class TextPadItem : FormPadItemRectangle, ICanHaveColumnVariables
     {
-
-
-
-
         #region  Variablen-Deklarationen 
 
         [PropertyAttributes("Text der angezeigt werden soll.<br>Kann Variablen aus dem Code-Generator enthalten.", true)]
@@ -58,10 +54,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-
         private string _ReadableText;
-
-
 
         private enDataFormat Format { get; set; } = enDataFormat.Text;
 
@@ -87,10 +80,6 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
         public TextPadItem(ItemCollectionPad parent) : this(parent, string.Empty, string.Empty) { }
 
-
-
-
-
         public TextPadItem(ItemCollectionPad parent, string internalname, string readableText) : base(parent, internalname)
         {
             _ReadableText = readableText;
@@ -103,15 +92,10 @@ namespace BlueControls.ItemCollection
 
         }
 
-
-
-
-
         #endregion
 
 
         #region  Properties 
-
 
         public string Text
         {
@@ -127,10 +111,6 @@ namespace BlueControls.ItemCollection
             //    OnChanged();
             //}
         }
-
-
-
-
 
         public enAlignment Ausrichtung
         {

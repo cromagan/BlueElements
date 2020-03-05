@@ -178,7 +178,7 @@ namespace BlueControls.ItemCollection
             do
             {
                 Count += 1;
-                RepairAll(1, false);
+                PerformAll(1, false);
                 if (NotPerforming(false) == 0) { break; }
                 if (Count > 20) { break; }
             } while (true);
@@ -293,7 +293,7 @@ namespace BlueControls.ItemCollection
 
             //CheckGrid();
 
-            RepairAll(0, true);
+            PerformAll(0, true);
 
             //if (needPrinterData) { RepairPrinterData(); }
         }
@@ -401,9 +401,13 @@ namespace BlueControls.ItemCollection
         {
             if (IndexOf(ThisItem) == Count - 1) { return; }
 
+            var g1 = ThisItem.Gruppenzugehörigkeit;
+            ThisItem.Gruppenzugehörigkeit = string.Empty;
+
             Remove(ThisItem);
             Add(ThisItem);
 
+            ThisItem.Gruppenzugehörigkeit = g1;
             OnDoInvalidate();
         }
 
@@ -411,25 +415,39 @@ namespace BlueControls.ItemCollection
         {
             if (IndexOf(ThisItem) == 0) { return; }
 
+            var g1 = ThisItem.Gruppenzugehörigkeit;
+            ThisItem.Gruppenzugehörigkeit = string.Empty;
+
             Remove(ThisItem);
             Insert(0, ThisItem);
 
+            ThisItem.Gruppenzugehörigkeit = g1;
             OnDoInvalidate();
         }
 
 
-        public void RecomputePointAndRelations()
-        {
-            foreach (var thisItem in this)
-            {
-                thisItem?.GenerateInternalRelation();
-            }
-        }
+        //public void RecomputePointAndRelations()
+        //{
+        //    foreach (var thisItem in this)
+        //    {
+        //        thisItem?.GenerateInternalRelation();
+        //    }
+        //}
 
 
         public void Swap(BasicPadItem Nr1, BasicPadItem Nr2)
         {
+            var g1 = Nr1.Gruppenzugehörigkeit;
+            Nr1.Gruppenzugehörigkeit = string.Empty;
+
+            var g2 = Nr2.Gruppenzugehörigkeit;
+            Nr2.Gruppenzugehörigkeit = string.Empty;
+
             Swap(IndexOf(Nr1), IndexOf(Nr2));
+
+            Nr1.Gruppenzugehörigkeit = g1;
+            Nr2.Gruppenzugehörigkeit = g2;
+            OnDoInvalidate();
         }
 
 
@@ -506,7 +524,7 @@ namespace BlueControls.ItemCollection
 
                 DesignOrStyleChanged();
 
-                RepairAll(0, true);
+                PerformAll(0, true);
                 OnDoInvalidate();
             }
         }
@@ -528,8 +546,8 @@ namespace BlueControls.ItemCollection
             if (!did) { return false; }
 
 
-            RepairAll(0, true);
-            RepairAll(1, true);
+            PerformAll(0, true);
+            PerformAll(1, true);
 
             return true;
         }
@@ -713,7 +731,7 @@ namespace BlueControls.ItemCollection
 
             foreach (var ThisToo in this)
             {
-                if (item.Gruppenzugehörigkeit.ToLower() == ThisToo.Gruppenzugehörigkeit.ToLower())
+                if (item.Gruppenzugehörigkeit.ToLower() == ThisToo.Gruppenzugehörigkeit?.ToLower())
                 {
                     Remove(ThisToo);
                     return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
@@ -884,7 +902,7 @@ namespace BlueControls.ItemCollection
         public new string ToString()
         {
 
-            RepairAll(2, false);
+            PerformAll(2, false);
 
             var t = "{";
 
@@ -954,6 +972,7 @@ namespace BlueControls.ItemCollection
             var r = MaxBounds(null);
             if (r.Width == 0) { return null; }
 
+            modAllgemein.CollectGarbage();
 
             do
             {
@@ -973,8 +992,6 @@ namespace BlueControls.ItemCollection
                 {
                     break;
                 }
-
-                modAllgemein.CollectGarbage();
             } while (true);
 
 
@@ -1076,7 +1093,7 @@ namespace BlueControls.ItemCollection
                 }
             }
 
-            if (did) { RepairAll(1, false); }
+            if (did) { PerformAll(1, false); }
             return did;
         }
 
@@ -1188,27 +1205,27 @@ namespace BlueControls.ItemCollection
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Level">Level 0 = Hart / Reparier alles mit Gewalt; 
-        /// Level 1 = Normal / Reparier nur die neuen Sachen;
-        ///  Level 2 = Leicht / Reparier nur die neuen Sachen mit schnelleren Abbruchbedingungen</param>
-        /// <param name="AllowBigChanges"></param>
-        /// <returns></returns>
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="Level">Level 0 = Hart / Reparier alles mit Gewalt; 
+        ///// Level 1 = Normal / Reparier nur die neuen Sachen;
+        /////  Level 2 = Leicht / Reparier nur die neuen Sachen mit schnelleren Abbruchbedingungen</param>
+        ///// <param name="AllowBigChanges"></param>
+        ///// <returns></returns>
 
-        public bool RepairAll(int Level, bool AllowBigChanges)
-        {
-            //InvalidateOrder();
+        //public bool RepairAll(int Level, bool AllowBigChanges)
+        //{
+        //    //InvalidateOrder();
 
-            if (Level == 0)
-            {
-                //RepairAll_OldItemc = Itemc + 1; // Löst eine Kettenreaktion aus
-                RecomputePointAndRelations();
-            }
+        //    //if (Level == 0)
+        //    //{
+        //    //    //RepairAll_OldItemc = Itemc + 1; // Löst eine Kettenreaktion aus
+        //    //    RecomputePointAndRelations();
+        //    //}
 
-            return PerformAll(Level, AllowBigChanges);
-        }
+        //    return PerformAll(Level, AllowBigChanges);
+        //}
 
 
         /// <summary>
@@ -1259,7 +1276,7 @@ namespace BlueControls.ItemCollection
 
                     Methode += 1;
                     Relations_Optimize();
-                    RecomputePointAndRelations();
+                    //RecomputePointAndRelations();
                     ComputeOrders(null);
                     L.Clear();
                 }

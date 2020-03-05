@@ -527,14 +527,14 @@ namespace BlueControls.Controls
                 if (Convert.ToBoolean(_AutoRelation | enAutoRelationMode.NurBeziehungenErhalten) && _NewAutoRelations.Count > 0)
                 {
                     _Item.AllRelations.AddRange(_NewAutoRelations);
-                    _Item.RepairAll(0, false);
+                    _Item.PerformAll(0, false);
                 }
 
             }
 
             _NewAutoRelations.Clear();
 
-            _Item.RepairAll(1, false);
+            _Item.PerformAll(1, false);
 
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
@@ -545,15 +545,6 @@ namespace BlueControls.Controls
             ComputeMovingData();
             Invalidate(); // Damit auch snap-Punkte wieder gelöscht werden
         }
-
-
-
-
-
-
-
-
-
 
         protected override void InitializeSkin()
         {
@@ -596,8 +587,6 @@ namespace BlueControls.Controls
                 {
                     TMPGR.Clear(Color.White);
                 }
-
-
 
                 if (!_Item.Draw(TMPGR, zoomf, X, Y, BMP.Size, _ShowInPrintMode, VisibleItems))
                 {
@@ -728,11 +717,11 @@ namespace BlueControls.Controls
 
             if (errorsBefore == 0)
             {
-                _Item.RepairAll(1, true);
+                _Item.PerformAll(1, true);
             }
             else
             {
-                _Item.RepairAll(2, false);
+                _Item.PerformAll(2, false);
                 // Sind eh schon fehler drinne, also schneller abbrechen, um nicht allzusehr verzögen
                 // und sicherheitshalber große Änderungen verbieten, um nicht noch mehr kaputt zu machen...
             }
@@ -1101,7 +1090,7 @@ namespace BlueControls.Controls
 
 
 
-            _Item.RepairAll(0, false); // Da könnte sich ja alles geändert haben...
+            _Item.PerformAll(0, false); // Da könnte sich ja alles geändert haben...
             Invalidate();
 
             return Done;
