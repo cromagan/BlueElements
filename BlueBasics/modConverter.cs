@@ -17,9 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics.Enums;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Management;
 using System.Text;
@@ -343,6 +345,100 @@ namespace BlueBasics
             SerialNr2Path_LastSearch = "";
             return Pfad;
         }
+
+
+
+
+
+        /// <summary>
+        /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static int IntParse(string s)
+        {
+            if (int.TryParse(s, out var result)) { return result; }
+            Develop.DebugPrint(enFehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
+            return 0;
+        }
+
+
+
+        /// <summary>
+        /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static long LongParse(string s)
+        {
+            if (long.TryParse(s, out var result)) { return result; }
+            Develop.DebugPrint(enFehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
+            return 0;
+        }
+
+        /// <summary>
+        /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static decimal DecimalParse(string s)
+        {
+            if (decimal.TryParse(s, out var result)) { return result; }
+            Develop.DebugPrint(enFehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
+            return 0;
+        }
+
+
+        /// <summary>
+        /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static double DoubleParse(string s)
+        {
+            if (double.TryParse(s, out var result)) { return result; }
+            Develop.DebugPrint(enFehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
+            return 0;
+        }
+
+
+
+
+        /// <summary>
+        /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird DateTime.Now zurückgegeben.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static DateTime DateTimeParse(string s)
+        {
+            if (DateTimeTryParse(s, out var result)) { return result; }
+            Develop.DebugPrint(enFehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
+            return DateTime.Now;
+        }
+
+        public static bool DateTimeTryParse(string s, out DateTime result)
+        {
+            // https://docs.microsoft.com/de-de/dotnet/standard/base-types/standard-date-and-time-format-strings?view=netframework-4.8
+            if (DateTime.TryParseExact(s, Constants.Format_Date5, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
+            if (DateTime.TryParseExact(s, Constants.Format_Date6, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
+            if (DateTime.TryParseExact(s, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
+            if (DateTime.TryParseExact(s, "dd.MM.yyyy H:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
+            if (DateTime.TryParseExact(s, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
+            if (DateTime.TryParseExact(s, "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
+            if (DateTime.TryParseExact(s, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
+            if (DateTime.TryParseExact(s, "dd.MM.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
+            if (DateTime.TryParseExact(s, "d.M.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
+
+            return false;
+
+        }
+
+
+
+
+
+
+
     }
 
 }

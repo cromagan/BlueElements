@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using static BlueBasics.modConverter;
 
 namespace BlueBasics
 {
@@ -333,6 +334,25 @@ namespace BlueBasics
             }
             return l;
         }
+
+        public static int TagGetInt(this ICollection<string> _String, string TagName)
+        {
+
+           return IntParse( TagGet(_String, TagName));
+        }
+
+        public static decimal TagGetDecimal(this ICollection<string> _String, string TagName)
+        {
+
+            return DecimalParse(TagGet(_String, TagName));
+        }
+
+        public static double TagGetDouble(this ICollection<string> _String, string TagName)
+        {
+
+            return DoubleParse(TagGet(_String, TagName));
+        }
+
 
         public static string TagGet(this ICollection<string> _String, string TagName)
         {

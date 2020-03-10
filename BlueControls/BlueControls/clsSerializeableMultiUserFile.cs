@@ -15,7 +15,7 @@ namespace BlueControls
     //https://social.msdn.microsoft.com/Forums/de-DE/68cdcd22-745e-49e8-8cad-dc7c3c7b8839/c-xml-datei-elemente-lesen-schreiben-ndern-erweitern
     ////https://www.jerriepelser.com/blog/deserialize-different-json-object-same-class/
 
-    public sealed class clsSerializeableMultiUserFile<T> : clsMultiUserFile where T : ILastSavedBy
+    public sealed class clsSerializeableMultiUserFile<T> : clsMultiUserFile where T : ILastSavedBy, IReloadable
     {
 
 
@@ -188,7 +188,7 @@ namespace BlueControls
         protected override void OnLoaded(LoadedEventArgs e)
         {
 
-            obj?.OnLoadedFromDisk(); // Zuerst verknüpften Objekten Sagem dass sie nicht mehgr gültig sind
+            obj?.OnLoadedFromDisk(this); // Zuerst verknüpften Objekten Sagem dass sie nicht mehgr gültig sind
 
             base.OnLoaded(e); // Dann das Ereignis auslösen, so dass sie repariert werden können
 

@@ -21,7 +21,7 @@ namespace BlueBasics.Interfaces
 {
     public interface IReloadable
     {
-        void OnLoadedFromDisk(); // Wird benötigt, dass clsSerializableMultiUserFile mitteilen kann, dass was geändert wurde.
+        void OnLoadedFromDisk(object parent); // Wird benötigt, dass clsSerializableMultiUserFile mitteilen kann, dass was geändert wurde.
 
         event System.EventHandler LoadedFromDisk; // wird benötigt, dass die Klasse selbst sich mitteilen kann, das was geändert wurde.
     }
