@@ -188,7 +188,7 @@ namespace BlueControls
         protected override void OnLoaded(LoadedEventArgs e)
         {
 
-            obj?.OnLoadedFromDisk(this); // Zuerst verknüpften Objekten Sagem dass sie nicht mehgr gültig sind
+            obj?.OnLoadedFromDisk(this); // Zuerst verknüpften Objekten mitteilen, dass sie nicht mehr gültig sind
 
             base.OnLoaded(e); // Dann das Ereignis auslösen, so dass sie repariert werden können
 

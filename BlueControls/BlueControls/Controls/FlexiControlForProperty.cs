@@ -11,6 +11,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 using static BlueBasics.Extensions;
+using static BlueBasics.modConverter;
 
 namespace BlueControls.Controls
 {
@@ -26,7 +27,7 @@ namespace BlueControls.Controls
         private PropertyInfo propInfo;
         private object _propertyObject;
         private string _propertyName;
-        private bool _addGroupboxText;
+        //private bool _addGroupboxText;
         private string _propertynamecpl;
         bool _FehlerWennLeer = true;
         bool _FehlerFormatCheck = true;
@@ -140,22 +141,22 @@ namespace BlueControls.Controls
         //}
 
 
-        [DefaultValue(false)]
-        public bool AddGroupboxText
-        {
-            get { return _addGroupboxText; }
-            set
-            {
-                if (_addGroupboxText == value) { return; }
+        //[DefaultValue(false)]
+        //public bool AddGroupboxText
+        //{
+        //    get { return _addGroupboxText; }
+        //    set
+        //    {
+        //        if (_addGroupboxText == value) { return; }
 
-                FillPropertyNow();
+        //        FillPropertyNow();
 
-                _addGroupboxText = value;
-                UpdateControlData(false, 1, null, enImageCode.None);
-                CheckEnabledState();
+        //        _addGroupboxText = value;
+        //        UpdateControlData(false, 1, null, enImageCode.None);
+        //        CheckEnabledState();
 
-            }
-        }
+        //    }
+        //}
 
 
 
@@ -261,6 +262,10 @@ namespace BlueControls.Controls
             {
                 Value = dc.ToString(Constants.Format_Float2);
             }
+            else if (x is double db)
+            {
+                Value = db.ToString(Constants.Format_Float2);
+            }
             else if (x is Color co)
             {
                 Value = co.ToHTMLCode();
@@ -317,44 +322,22 @@ namespace BlueControls.Controls
             else if (x is int iv)
             {
                 OldVal = iv.ToString();
-
-                if (int.TryParse(Value, out var tmp))
-                {
-                    toSet = tmp;
-                }
-                else
-                {
-                    toSet = 0;
-                }
-
+                toSet = IntParse(Value);
             }
             else if (x is Enum en)
             {
                 OldVal = ((int)x).ToString();
-
-                if (int.TryParse(Value, out var tmp))
-                {
-                    toSet = tmp;
-                }
-                else
-                {
-                    toSet = 0;
-                }
-
+                toSet = IntParse(Value);
             }
             else if (x is decimal dc)
             {
                 OldVal = dc.ToString(Constants.Format_Float2);
-
-                if (decimal.TryParse(Value, out var tmp))
-                {
-                    toSet = tmp;
-                }
-                else
-                {
-                    toSet = 0;
-                }
-
+                toSet = DecimalParse(Value);
+            }
+            else if (x is double db)
+            {
+                OldVal = db.ToString(Constants.Format_Float2);
+                toSet = DoubleParse(Value);
             }
             else
             {
@@ -412,10 +395,10 @@ namespace BlueControls.Controls
             {
                 _propertynamecpl = _propertyName;
 
-                if (_addGroupboxText && Parent is GroupBox grp)
-                {
-                    _propertynamecpl = _propertynamecpl + "_" + grp.Text;
-                }
+                //if (_addGroupboxText && Parent is GroupBox grp)
+                //{
+                //    _propertynamecpl = _propertynamecpl + "_" + grp.Text;
+                //}
 
 
                 _propertynamecpl = _propertynamecpl.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + "-/\\ _");
@@ -607,7 +590,7 @@ namespace BlueControls.Controls
         }
 
 
-        public static void SetAllFlexControls(System.Windows.Forms.Control _in, object _to, bool rekursiv)
+        public static void SetAllFlexControls(System.Windows.Forms.Control _in, object _to)
         {
 
             if (_in == null || _in.IsDisposed) { return; }
@@ -615,19 +598,19 @@ namespace BlueControls.Controls
             foreach (var thisc in _in.Controls)
             {
 
-                if (thisc is GroupBox gr)
-                {
-                    if (rekursiv) { SetAllFlexControls(gr, _to, rekursiv); }
-                }
-                if (thisc is TabControl tb)
-                {
-                    if (rekursiv) { SetAllFlexControls(tb, _to, rekursiv); }
-                }
-                if (thisc is TabPage tabp)
-                {
-                    if (rekursiv) { SetAllFlexControls(tabp, _to, rekursiv); }
-                }
-                else if (thisc is FlexiControlForProperty flx)
+                //if (thisc is GroupBox gr)
+                //{
+                //    if (rekursiv) { SetAllFlexControls(gr, _to, rekursiv); }
+                //}
+                //if (thisc is TabControl tb)
+                //{
+                //    if (rekursiv) { SetAllFlexControls(tb, _to, rekursiv); }
+                //}
+                //if (thisc is TabPage tabp)
+                //{
+                //    if (rekursiv) { SetAllFlexControls(tabp, _to, rekursiv); }
+                //}
+                if (thisc is FlexiControlForProperty flx)
                 {
                     flx.PropertyObject = _to;
                 }
@@ -645,6 +628,13 @@ namespace BlueControls.Controls
 
         private void GenFehlerText()
         {
+
+            if (propInfo == null)
+            {
+                InfoText = string.Empty;
+                return;
+            }
+
             if (_FehlerWennLeer && string.IsNullOrEmpty(Value))
             {
                 InfoText = "Dieses Feld darf nicht leer sein.";
@@ -689,28 +679,28 @@ namespace BlueControls.Controls
 
 
 
-        protected override void OnParentChanged(System.EventArgs e)
-        {
-            FillPropertyNow();
-            if (_LastParent is GroupBox gp) { gp.TextChanged -= GroupBox_TextChanged; }
+        //protected override void OnParentChanged(System.EventArgs e)
+        //{
+        //    FillPropertyNow();
+        //    if (_LastParent is GroupBox gp) { gp.TextChanged -= GroupBox_TextChanged; }
 
 
-            base.OnParentChanged(e);
+        //    base.OnParentChanged(e);
 
-            _LastParent = Parent;
+        //    _LastParent = Parent;
 
-            if (_LastParent is GroupBox gp2) { gp2.TextChanged += GroupBox_TextChanged; }
+        //    if (_LastParent is GroupBox gp2) { gp2.TextChanged += GroupBox_TextChanged; }
 
 
-        }
+        //}
 
-        private void GroupBox_TextChanged(object sender, System.EventArgs e)
-        {
-            UpdateControlData(false, 1, null, enImageCode.None);
-            CheckEnabledState();
+        //private void GroupBox_TextChanged(object sender, System.EventArgs e)
+        //{
+        //    UpdateControlData(false, 1, null, enImageCode.None);
+        //    CheckEnabledState();
 
-            OnValueChanged(); // Wichig, dass Fehler-Dreiecke angezeigt werden können
-        }
+        //    OnValueChanged(); // Wichig, dass Fehler-Dreiecke angezeigt werden können
+        //}
     }
 }
 

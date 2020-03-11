@@ -357,8 +357,9 @@ namespace BlueBasics
         /// <returns></returns>
         public static int IntParse(string s)
         {
+            if (string.IsNullOrEmpty(s)) { return 0; }
             if (int.TryParse(s, out var result)) { return result; }
-            Develop.DebugPrint(enFehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
+            Develop.DebugPrint(enFehlerArt.Warnung, "Int kann nicht geparsed werden: " + s);
             return 0;
         }
 
@@ -371,8 +372,9 @@ namespace BlueBasics
         /// <returns></returns>
         public static long LongParse(string s)
         {
+            if (string.IsNullOrEmpty(s)) { return 0; }
             if (long.TryParse(s, out var result)) { return result; }
-            Develop.DebugPrint(enFehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
+            Develop.DebugPrint(enFehlerArt.Warnung, "Long kann nicht geparsed werden: " + s);
             return 0;
         }
 
@@ -383,8 +385,9 @@ namespace BlueBasics
         /// <returns></returns>
         public static decimal DecimalParse(string s)
         {
+            if (string.IsNullOrEmpty(s)) { return 0; }
             if (decimal.TryParse(s, out var result)) { return result; }
-            Develop.DebugPrint(enFehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
+            Develop.DebugPrint(enFehlerArt.Warnung, "Decimal kann nicht geparsed werden: " + s);
             return 0;
         }
 
@@ -396,8 +399,9 @@ namespace BlueBasics
         /// <returns></returns>
         public static double DoubleParse(string s)
         {
+            if (string.IsNullOrEmpty(s)) { return 0; }
             if (double.TryParse(s, out var result)) { return result; }
-            Develop.DebugPrint(enFehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
+            Develop.DebugPrint(enFehlerArt.Warnung, "Double kann nicht geparsed werden: " + s);
             return 0;
         }
 

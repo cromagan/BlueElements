@@ -21,7 +21,7 @@ using System;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
-using static BlueBasics.modAllgemein;
+using static BlueBasics.modConverter;
 using BlueBasics.Enums;
 
 namespace BlueDatabase

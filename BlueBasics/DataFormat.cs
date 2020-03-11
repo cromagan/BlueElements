@@ -21,7 +21,7 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BlueBasics.Enums;
-using static BlueBasics.modAllgemein;
+using static BlueBasics.modConverter;
 
 namespace BlueBasics
 {

@@ -26,6 +26,7 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
+using static BlueBasics.modConverter;
 using System.Text.RegularExpressions;
 
 namespace BlueDatabase

@@ -51,7 +51,7 @@ namespace BlueControls.Controls
 
 
         #region  Events 
-        public new event EventHandler TextChanged;
+        //public new event EventHandler TextChanged;
          #endregion
 
 
@@ -102,7 +102,7 @@ namespace BlueControls.Controls
                 if (_Text == value) { return; }
                 _Text = value;
                 Invalidate();
-                OnTextChanged();
+                //OnTextChanged();
             }
         }
 
@@ -229,10 +229,10 @@ namespace BlueControls.Controls
             base.OnSizeChanged(e);
         }
 
-        protected virtual void OnTextChanged()
-        {
-            TextChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+        //protected virtual void OnTextChanged()
+        //{
+        //    TextChanged?.Invoke(this, System.EventArgs.Empty);
+        //}
 
 
     }

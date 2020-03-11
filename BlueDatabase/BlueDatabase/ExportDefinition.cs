@@ -28,7 +28,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using static BlueBasics.FileOperations;
-using static BlueBasics.modAllgemein;
+using static BlueBasics.modConverter;
 
 namespace BlueDatabase
 {
