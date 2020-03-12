@@ -22,12 +22,10 @@ namespace BlueControls.Controls
     public class FlexiControlForProperty : FlexiControl
     {
 
-        object _LastParent = null;
 
         private PropertyInfo propInfo;
         private object _propertyObject;
         private string _propertyName;
-        //private bool _addGroupboxText;
         private string _propertynamecpl;
         bool _FehlerWennLeer = true;
         bool _FehlerFormatCheck = true;
@@ -414,7 +412,6 @@ namespace BlueControls.Controls
 
             #endregion
 
-
             #region Caption setzen
             if (!string.IsNullOrEmpty(_propertyName))
             {
@@ -451,7 +448,7 @@ namespace BlueControls.Controls
                             break;
                         }
 
-                    default: // Alle enums sind ein eigener Typ.... deswegen alles in die TExtbox
+                    default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
                         {
 
                             if (list != null)
@@ -532,10 +529,6 @@ namespace BlueControls.Controls
             //}
 
             #endregion
-
-
-
-
 
             #region QuickInfo setzen
             // https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
