@@ -458,7 +458,7 @@ namespace BlueControls.Controls
 
 
                 default:
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Control unbekannt");
+                    Develop.DebugPrint("Control unbekannt");
                     break;
             }
         }
@@ -512,7 +512,7 @@ namespace BlueControls.Controls
                     break;
 
                 default:
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Control unbekannt");
+                    Develop.DebugPrint("Control unbekannt");
                     break;
 
 
