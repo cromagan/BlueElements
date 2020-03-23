@@ -23,12 +23,12 @@ namespace BlueBasics.EventArgs
     {
 
 
-        public LoadedEventArgs(bool OnlyReloaded)
+        public LoadedEventArgs(bool onlyReload)
         {
-            this.OnlyReloaded = OnlyReloaded;
+            this.OnlyReload = onlyReload;
         }
 
-        public bool OnlyReloaded { get; set; }
+        public bool OnlyReload { get; private set; }
 
     }
 }

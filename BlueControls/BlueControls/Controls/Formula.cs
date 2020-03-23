@@ -1370,8 +1370,6 @@ namespace BlueControls.Controls
             }
 
 
-
-
             Items.Add(new TextListItem("#Schnelleingabe", "Allgemeine Schnelleingabe öffnen", QuickImage.Get(enImageCode.Lupe), _Database != null && ShowingRow != null));
 
 
@@ -1380,20 +1378,11 @@ namespace BlueControls.Controls
                 Items.Add(new LineListItem());
                 Items.Add(new TextListItem("#Ansicht", "Formular bearbeiten", QuickImage.Get(enImageCode.Textfeld), _Database != null));
 
-
-
-
-
             }
         }
 
-
-
-
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
         {
-
-
             if (_Database == null) { return true; }
 
             switch (e.ClickedComand.ToLower())
@@ -1408,8 +1397,6 @@ namespace BlueControls.Controls
                 case "#ansicht":
                     ShowViewEditor();
                     return true;
-
-
 
             }
 
@@ -1428,11 +1415,9 @@ namespace BlueControls.Controls
         }
         private void _Database_StoreView(object sender, LoadingEventArgs e)
         {
-            if (e.OnlyReloaded) { return; }
+            if (e.OnlyReload) { return; }
             SavedRowKey = ShowingRowKey;
         }
-
-
         private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e)
         {
             // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
@@ -1440,9 +1425,6 @@ namespace BlueControls.Controls
             if (e.KeyOld == SavedRowKey) { SavedRowKey = e.KeyNew; }
 
         }
-
-
-
 
         #endregion
     }

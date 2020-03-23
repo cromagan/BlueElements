@@ -47,23 +47,23 @@ namespace BlueBasics.MultiUserFile
         /// 
         /// </summary>
         /// <param name="filePath"></param>
-        /// <param name="checkOnlyFilenameToo">Prüft, ob die Datenbank ohne Dateipfad - also nur Dateiname und Suffix - existiert und gibt diese zurück.</param>
+        /// <param name="checkOnlyFilenameToo">Prüft, ob die Datei ohne Dateipfad - also nur Dateiname und Suffix - existiert und gibt diese zurück.</param>
         /// <returns></returns>
         public static clsMultiUserFile GetByFilename(string filePath, bool checkOnlyFilenameToo)
         {
             filePath = modConverter.SerialNr2Path(filePath);
 
-            foreach (var ThisDatabase in AllFiles)
+            foreach (var ThisFile in AllFiles)
             {
-                if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == filePath.ToLower()) { return ThisDatabase; }
+                if (ThisFile != null && ThisFile.Filename.ToLower() == filePath.ToLower()) { return ThisFile; }
             }
 
 
             if (checkOnlyFilenameToo)
             {
-                foreach (var ThisDatabase in AllFiles)
+                foreach (var ThisFile in AllFiles)
                 {
-                    if (ThisDatabase != null && ThisDatabase.Filename.ToLower().FileNameWithSuffix() == filePath.ToLower().FileNameWithSuffix()) { return ThisDatabase; }
+                    if (ThisFile != null && ThisFile.Filename.ToLower().FileNameWithSuffix() == filePath.ToLower().FileNameWithSuffix()) { return ThisFile; }
                 }
             }
             return null;
@@ -141,7 +141,7 @@ namespace BlueBasics.MultiUserFile
 
 
             AllFiles.Add(this);
-            OnDatabaseAdded(this);
+            OnMultiUserFileAdded(this);
 
             PureBinSaver = new System.ComponentModel.BackgroundWorker();
             PureBinSaver.WorkerReportsProgress = true;
@@ -164,16 +164,11 @@ namespace BlueBasics.MultiUserFile
 
         private void PureBinSaver_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-
-            //            var Data = WriteFileToDisk();
             if (e.UserState == null) { return; }
 
             var Data = (Tuple<string, string, string>)e.UserState;
 
-
-
             SaveRoutine(true, Data.Item1, Data.Item2, Data.Item3);
-
         }
 
         private void PureBinSaver_DoWork(object sender, DoWorkEventArgs e)
@@ -275,7 +270,7 @@ namespace BlueBasics.MultiUserFile
         //}
 
         /// <summary>
-        /// Führt - falls nötig - einen Reload der Datenbank aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
+        /// Führt - falls nötig - einen Reload der Datei aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
         /// </summary>
         public void Load_Reload()
         {
@@ -380,13 +375,20 @@ namespace BlueBasics.MultiUserFile
         public abstract void RepairAfterParse();
         protected abstract void ParseExternal(List<byte> bLoaded);
 
-
-        private string SaveRoutine(bool FromParallelProzess, string SavedFileName, string StateOfOriginalFile, string SavedData)
+        /// <summary>
+        /// Entfernt im regelfall die Temporäre Datei
+        /// </summary>
+        /// <param name="FromParallelProzess"></param>
+        /// <param name="SavedFileName"></param>
+        /// <param name="StateOfOriginalFile"></param>
+        /// <param name="SavedData"></param>
+        /// <returns></returns>
+        private string SaveRoutine(bool FromParallelProzess, string savedFileName, string StateOfOriginalFile, string SavedData)
         {
 
             if (ReadOnly) { return Feedback("Datei ist Readonly"); }
 
-            if (SavedFileName == null || string.IsNullOrEmpty(SavedFileName) ||
+            if (savedFileName == null || string.IsNullOrEmpty(savedFileName) ||
                 StateOfOriginalFile == null || string.IsNullOrEmpty(StateOfOriginalFile) ||
                 SavedData == null || string.IsNullOrEmpty(SavedData)) { return Feedback("Keine Daten angekommen."); }
 
@@ -437,7 +439,7 @@ namespace BlueBasics.MultiUserFile
             RenameFile(Filename, Backupdateiname(), true);
 
             // --- TmpFile wird zum Haupt ---
-            RenameFile(SavedFileName, Filename, true);
+            RenameFile(savedFileName, Filename, true);
 
             // ---- Steuerelemente Sagen, was gespeichert wurde
             ThisIsOnDisk(SavedData);
@@ -491,7 +493,7 @@ namespace BlueBasics.MultiUserFile
 
             string Feedback(string txt)
             {
-                if (SavedFileName == null || string.IsNullOrEmpty(SavedFileName)) { DeleteFile(SavedFileName, false); }
+                DeleteFile(savedFileName, false);
                 Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + txt);
                 TryOnOldBlockFileExists();
                 return txt;
@@ -674,7 +676,7 @@ namespace BlueBasics.MultiUserFile
 
             if (NewFileName.ToUpper() == Filename.ToUpper()) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
 
-            Save(true); // Original-Datenbank speichern, die ist ja dann weg.
+            Save(true); // Original-Datei speichern, die ist ja dann weg.
 
             Filename = NewFileName;
             var l = ToListOfByte(true);
@@ -756,7 +758,7 @@ namespace BlueBasics.MultiUserFile
             if (isSomethingDiscOperatingsBlocking())
             {
                 if (!mustSave) { TryOnOldBlockFileExists(); return false; }
-                Develop.DebugPrint(enFehlerArt.Warnung, "Release unmöglich, Datenbankstatus eingefroren");
+                Develop.DebugPrint(enFehlerArt.Warnung, "Release unmöglich, Dateistatus geblockt");
                 return false;
             }
 
@@ -781,12 +783,12 @@ namespace BlueBasics.MultiUserFile
 
                 if (!string.IsNullOrEmpty(f))
                 {
-
                     if (DateTime.UtcNow.Subtract(D).TotalSeconds > 40)
                     {
                         // Da liegt ein größerer Fehler vor...
                         if (mustSave) { Develop.DebugPrint(enFehlerArt.Warnung, "Datei nicht gespeichert: " + Filename + " " + f); }
-                        TryOnOldBlockFileExists(); return false;
+                        TryOnOldBlockFileExists();
+                        return false;
                     }
 
                     if (!mustSave && DateTime.UtcNow.Subtract(D).TotalSeconds > 5 && AgeOfBlockDatei() < 0)
@@ -795,6 +797,7 @@ namespace BlueBasics.MultiUserFile
                         return false;
                     }
                 }
+
             }
             return true;
         }
@@ -824,7 +827,7 @@ namespace BlueBasics.MultiUserFile
                 fi = GetFileInfo(true);
                 Writer_BinaryData = ToListOfByte(true).ToArray();
 
-                TMP = TempFile(Filename + "-" + modAllgemein.UserName().ToUpper());
+                TMP = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + modAllgemein.UserName().ToUpper());
 
                 try
                 {
@@ -1127,7 +1130,7 @@ namespace BlueBasics.MultiUserFile
 
                 if (!CanWrite(Filename, 0.5))
                 {
-                    _CanWriteError = "Windows blockiert die Datenbank-Datei.";
+                    _CanWriteError = "Windows blockiert die Datei.";
                     return _CanWriteError;
                 }
 
@@ -1155,7 +1158,7 @@ namespace BlueBasics.MultiUserFile
         {
             while (!string.IsNullOrEmpty(ErrorReason(enErrorReason.EditAcut)))
             {
-                if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.EditNormaly))) { return; }// Nur anzeige-Datenbanken sind immer Schreibgeschützt
+                if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.EditNormaly))) { return; }// Nur anzeige-Dateien sind immer Schreibgeschützt
                 Pause(0.2, true);
             }
         }
@@ -1214,21 +1217,21 @@ namespace BlueBasics.MultiUserFile
         }
 
 
-        protected static void OnDatabaseAdded(clsMultiUserFile database)
+        protected static void OnMultiUserFileAdded(clsMultiUserFile file)
         {
             var e = new MultiUserFileGiveBackEventArgs();
-            e.File = database;
+            e.File = file;
             MultiUserFileAdded?.Invoke(null, e);
         }
 
 
         protected bool IsFileAllowedToLoad(string fileName)
         {
-            foreach (var ThisDatabase in AllFiles)
+            foreach (var ThisFile in AllFiles)
             {
-                if (ThisDatabase != null && ThisDatabase.Filename.ToLower() == fileName.ToLower())
+                if (ThisFile != null && ThisFile.Filename.ToLower() == fileName.ToLower())
                 {
-                    ThisDatabase.Save(true);
+                    ThisFile.Save(true);
                     Develop.DebugPrint(enFehlerArt.Fehler, "Doppletes Laden von " + fileName);
                     return false;
                 }

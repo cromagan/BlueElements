@@ -192,6 +192,7 @@ namespace BlueBasics
 
         public static bool FileExists(string file)
         {
+            if (file == null) { return false; }
             if (string.IsNullOrEmpty(file)) { return false; }
             if (file.ContainsChars(Constants.Char_PfadSonderZeichen)) { return false; }
             return File.Exists(file);

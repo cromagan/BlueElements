@@ -296,74 +296,82 @@ namespace BlueControls.Controls
 
         protected override void DrawControl(Graphics gr, enStates state)
         {
-            if (_design == enDesign.Undefiniert)
+            try
             {
-                GetDesign();
-                if (_design == enDesign.Undefiniert) { return; }
-            }
-
-            if (state != enStates.Standard && state != enStates.Standard_Disabled)
-            {
-                Develop.DebugPrint(state);
-                return;
-            }
-
-
-            if (tmpSkinRow == null) { tmpSkinRow = Skin.SkinRow(_design, state); }
-
-
-
-            if (!string.IsNullOrEmpty(_Text))
-            {
-                if (QuickModePossible())
+                if (_design == enDesign.Undefiniert)
                 {
-                    if (gr == null) { return; }
-                    Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+                    GetDesign();
+                    if (_design == enDesign.Undefiniert) { return; }
+                }
 
-                    Skin.Draw_FormatedText(gr, _Text, null, tmpSkinRow, state, enAlignment.Top_Left, new Rectangle(), null, false, Translate);
+                if (state != enStates.Standard && state != enStates.Standard_Disabled)
+                {
+                    Develop.DebugPrint(state);
                     return;
                 }
 
 
-                if (eText == null)
+                if (tmpSkinRow == null) { tmpSkinRow = Skin.SkinRow(_design, state); }
+
+
+
+                if (!string.IsNullOrEmpty(_Text))
                 {
-                    eText = new ExtText(_design, state, tmpSkinRow);
+                    if (QuickModePossible())
+                    {
+                        if (gr == null) { return; }
+                        Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+
+                        Skin.Draw_FormatedText(gr, _Text, null, tmpSkinRow, state, enAlignment.Top_Left, new Rectangle(), null, false, Translate);
+                        return;
+                    }
 
 
-                    eText.HtmlText = BlueDatabase.LanguageTool.DoTranslate(_Text, Translate);
-                    //eText.Zeilenabstand = _Zeilenabstand;
+                    if (eText == null)
+                    {
+                        eText = new ExtText(_design, state, tmpSkinRow);
+
+
+                        eText.HtmlText = BlueDatabase.LanguageTool.DoTranslate(_Text, Translate);
+                        //eText.Zeilenabstand = _Zeilenabstand;
+                    }
+                    eText.State = state;
+                    eText.Multiline = true;
+
+                    switch (_TextAnzeigeverhalten)
+                    {
+
+                        case enSteuerelementVerhalten.Steuerelement_Anpassen:
+                            eText.TextDimensions = Size.Empty;
+                            Size = eText.LastSize();
+                            break;
+
+                        case enSteuerelementVerhalten.Text_Abschneiden:
+                            eText.TextDimensions = Size.Empty;
+                            break;
+
+                        case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
+                            eText.TextDimensions = new Size(base.Size.Width, -1);
+                            break;
+
+                        case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
+                            eText.TextDimensions = Size.Empty;
+                            break;
+                    }
+                    eText.DrawingArea = base.ClientRectangle;
                 }
-                eText.State = state;
-                eText.Multiline = true;
 
-                switch (_TextAnzeigeverhalten)
-                {
+                if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird
 
-                    case enSteuerelementVerhalten.Steuerelement_Anpassen:
-                        eText.TextDimensions = Size.Empty;
-                        Size = eText.LastSize();
-                        break;
+                Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
-                    case enSteuerelementVerhalten.Text_Abschneiden:
-                        eText.TextDimensions = Size.Empty;
-                        break;
+                if (!string.IsNullOrEmpty(_Text)) { eText.Draw(gr, 1); }
 
-                    case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
-                        eText.TextDimensions = new Size(base.Size.Width, -1);
-                        break;
-
-                    case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
-                        eText.TextDimensions = Size.Empty;
-                        break;
-                }
-                eText.DrawingArea = base.ClientRectangle;
+            }
+            catch
+            {
             }
 
-            if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird
-
-            Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-
-            if (!string.IsNullOrEmpty(_Text)) { eText.Draw(gr, 1); }
         }
 
         private bool QuickModePossible()

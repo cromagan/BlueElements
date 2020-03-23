@@ -2335,7 +2335,7 @@ namespace BlueControls.Controls
 
             if (Filter != null)
             {
-                if (e.OnlyReloaded) { f = Filter.ToString(); }
+                if (e.OnlyReload) { f = Filter.ToString(); }
                 Filter.Changed -= FilterChanged;
                 Filter = null;
             }
@@ -2349,7 +2349,7 @@ namespace BlueControls.Controls
                 Filter = new FilterCollection(_Database, f);
                 Filter.Changed += FilterChanged;
 
-                if (e.OnlyReloaded)
+                if (e.OnlyReload)
                 {
                     if (_ArrangementNr != 1)
                     {
@@ -2403,7 +2403,7 @@ namespace BlueControls.Controls
             Invalidate();
 
 
-            if (e.OnlyReloaded)
+            if (e.OnlyReload)
             {
                 if (string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View Empty!"); }
 
@@ -2412,10 +2412,6 @@ namespace BlueControls.Controls
             }
 
         }
-
-
-
-
 
         private void CloseAllComponents()
         {

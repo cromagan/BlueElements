@@ -23,10 +23,7 @@ namespace BlueBasics.EventArgs
     {
 
 
-        public LoadingEventArgs(bool OnlyReloaded) : base(OnlyReloaded)
-        {
-            //this.OnlyReloaded = OnlyReloaded;
-        }
+        public LoadingEventArgs(bool onlyReload) : base(onlyReload) { }
 
         public bool TryCancel { get; set; }
 

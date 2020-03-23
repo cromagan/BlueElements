@@ -516,114 +516,121 @@ namespace BlueControls.Controls
         protected override void DrawControl(Graphics gr, enStates state)
         {
 
-            var PicHeight44 = false;
-            var Par = ParentType();
-            var DesignToolbar = false;
-            var DesignText = false;
-
-            if (_ButtonStyle != enButtonStyle.Button && _ButtonStyle != enButtonStyle.Button_RibbonBar && _ButtonStyle != enButtonStyle.SliderButton)
+            try
             {
-                if (_Checked || MousePressing()) { state |= enStates.Checked; }
+                var PicHeight44 = false;
+                var Par = ParentType();
+                var DesignToolbar = false;
+                var DesignText = false;
+
+                if (_ButtonStyle != enButtonStyle.Button && _ButtonStyle != enButtonStyle.Button_RibbonBar && _ButtonStyle != enButtonStyle.SliderButton)
+                {
+                    if (_Checked || MousePressing()) { state |= enStates.Checked; }
+                }
+
+
+                // Groß machen?
+                if (Par == enPartentType.RibbonPage || Par == enPartentType.RibbonGroupBox)
+                {
+                    DesignToolbar = true;
+                    PicHeight44 = true;
+                }
+
+
+                if ((int)_ButtonStyle > 1000 && (int)_ButtonStyle < 2000) { PicHeight44 = true; }
+                if ((int)_ButtonStyle > 2000)
+                {
+                    DesignText = true;
+                    DesignToolbar = false;
+                    PicHeight44 = false;
+                }
+
+
+                switch ((enButtonStyle)((int)_ButtonStyle % 1000))
+                {
+                    case enButtonStyle.Button:
+                    case enButtonStyle.SliderButton:
+                        switch (Par)
+                        {
+                            case enPartentType.RibbonPage:
+                            case enPartentType.RibbonGroupBox:
+                                DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                                break;
+                            case enPartentType.Slider:
+                                DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_SliderDesign, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                                break;
+                            case enPartentType.ComboBox:
+                                DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_ComboBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                                break;
+                            case enPartentType.RibbonBarCombobox:
+                                DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_Combobox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                                break;
+                            default:
+                                DrawButton(this, gr, ref tmpSkinRow, enDesign.Button, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                                break;
+                        }
+
+                        break;
+                    case enButtonStyle.Optionbox:
+                        if (DesignToolbar)
+                        {
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_OptionButton, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                        }
+                        else if (DesignText)
+                        {
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.OptionButton_TextStyle, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                        }
+                        else
+                        {
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_OptionButton, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                        }
+                        break;
+
+                    case enButtonStyle.Checkbox:
+                        if (DesignToolbar)
+                        {
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                        }
+                        else if (DesignText)
+                        {
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.CheckBox_TextStyle, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                        }
+                        else
+                        {
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                        }
+                        break;
+
+                    case enButtonStyle.Yes_or_No:
+                        if (DesignToolbar)
+                        {
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                        }
+                        else
+                        {
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                        }
+                        break;
+
+                    case enButtonStyle.Pic1_or_Pic2:
+                        if (DesignToolbar)
+                        {
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                        }
+                        else
+                        {
+                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
+                        }
+                        break;
+
+                    default:
+                        Develop.DebugPrint("Button-Design nicht definiert!");
+                        break;
+                }
+
             }
-
-
-            // Groß machen?
-            if (Par == enPartentType.RibbonPage || Par == enPartentType.RibbonGroupBox)
+            catch
             {
-                DesignToolbar = true;
-                PicHeight44 = true;
-            }
-
-
-            if ((int)_ButtonStyle > 1000 && (int)_ButtonStyle < 2000) { PicHeight44 = true; }
-            if ((int)_ButtonStyle > 2000)
-            {
-                DesignText = true;
-                DesignToolbar = false;
-                PicHeight44 = false;
-            }
-
-
-            switch ((enButtonStyle)((int)_ButtonStyle % 1000))
-            {
-                case enButtonStyle.Button:
-                case enButtonStyle.SliderButton:
-                    switch (Par)
-                    {
-                        case enPartentType.RibbonPage:
-                        case enPartentType.RibbonGroupBox:
-                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                            break;
-                        case enPartentType.Slider:
-                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_SliderDesign, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                            break;
-                        case enPartentType.ComboBox:
-                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_ComboBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                            break;
-                        case enPartentType.RibbonBarCombobox:
-                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_Combobox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                            break;
-                        default:
-                            DrawButton(this, gr, ref tmpSkinRow, enDesign.Button, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                            break;
-                    }
-
-                    break;
-                case enButtonStyle.Optionbox:
-                    if (DesignToolbar)
-                    {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_OptionButton, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                    }
-                    else if (DesignText)
-                    {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.OptionButton_TextStyle, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                    }
-                    else
-                    {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_OptionButton, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                    }
-                    break;
-
-                case enButtonStyle.Checkbox:
-                    if (DesignToolbar)
-                    {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                    }
-                    else if (DesignText)
-                    {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.CheckBox_TextStyle, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                    }
-                    else
-                    {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                    }
-                    break;
-
-                case enButtonStyle.Yes_or_No:
-                    if (DesignToolbar)
-                    {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                    }
-                    else
-                    {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                    }
-                    break;
-
-                case enButtonStyle.Pic1_or_Pic2:
-                    if (DesignToolbar)
-                    {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                    }
-                    else
-                    {
-                        DrawButton(this, gr, ref tmpSkinRow, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
-                    }
-                    break;
-
-                default:
-                    Develop.DebugPrint("Button-Design nicht definiert!");
-                    break;
             }
 
 
