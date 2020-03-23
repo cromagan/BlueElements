@@ -79,17 +79,24 @@ namespace BlueDatabase
 
 
 
-        public ColumnItem SearchByKey(int Key)
+        public ColumnItem SearchByKey(int key)
         {
-            if (Database == null) { return null; }
-            if (Key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
-
-            foreach (var ThisColumn in this)
+            try
             {
-                if (ThisColumn != null && ThisColumn.Key == Key) { return ThisColumn; }
-            }
+                if (Database == null) { return null; }
+                if (key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
 
-            return null;
+                foreach (var ThisColumn in this)
+                {
+                    if (ThisColumn != null && ThisColumn.Key == key) { return ThisColumn; }
+                }
+
+                return null;
+            }
+            catch
+            {
+                return SearchByKey(key); // Sammlung wurde verändert
+            }
         }
 
 
