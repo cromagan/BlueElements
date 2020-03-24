@@ -387,7 +387,7 @@ namespace BlueBasics
         {
             if (string.IsNullOrEmpty(s)) { return 0; }
             if (decimal.TryParse(s, out var result)) { return result; }
-            Develop.DebugPrint(enFehlerArt.Warnung, "Decimal kann nicht geparsed werden: " + s);
+            //Develop.DebugPrint(enFehlerArt.Warnung, "Decimal kann nicht geparsed werden: " + s);
             return 0;
         }
 

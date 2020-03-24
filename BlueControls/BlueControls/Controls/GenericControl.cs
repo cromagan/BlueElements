@@ -155,10 +155,13 @@ namespace BlueControls.Controls
 
         protected override void WndProc(ref System.Windows.Forms.Message m)
         {
-            //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
-            if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
-
-            base.WndProc(ref m);
+            try
+            {
+                //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
+                if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
+                base.WndProc(ref m);
+            }
+            catch { }
         }
 
 
