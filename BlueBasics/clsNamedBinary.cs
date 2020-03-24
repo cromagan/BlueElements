@@ -129,8 +129,6 @@ namespace BlueBasics
 
         public void LoadFromFile(string FileName)
         {
-
-
             if (!FileExists(FileName))
             {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Datei Existiert nicht");
@@ -143,26 +141,20 @@ namespace BlueBasics
             if (FileName.FileType() == enFileFormat.Image)
             {
                 _picture = (Bitmap)modAllgemein.Image_FromFile(FileName);
-
             }
             else
             {
-
                 _binary = modConverter.FileToString(FileName);
-
             }
 
             _name = FileName.FileNameWithSuffix();
         }
-
-
 
         public bool IsNullOrEmpty()
         {
             if (_picture == null && string.IsNullOrEmpty(_binary)) { return true; }
             return false;
         }
-
 
         public void Parse(string ToParse)
         {
@@ -174,14 +166,6 @@ namespace BlueBasics
                 IsParsing = false;
                 return;
             }
-
-            //if (!ToParse.StartsWith("{"))
-            //{
-            //    ParseOldFormat(ToParse);
-            //    IsParsing = false;
-            //    return;
-            //}
-
 
             foreach (var pair in ToParse.GetAllTags())
             {
@@ -204,44 +188,9 @@ namespace BlueBasics
             IsParsing = false;
         }
 
-        //private void ParseOldFormat(string Value)
-        //{
-
-        //    Develop.DebugPrint_NichtImplementiert();   // Todo: Diese Routine löschen
-        //    if (Value.Substring(1, 3) == "PNG")
-        //    {
-        //        _picture = modConverter.StringToBitmap(Value);
-        //        return;
-        //    }
-
-        //    switch (Value.Substring(0, 9))
-        //    {
-        //        case "NamedPNG#":
-        //        {
-        //            var x = Value.IndexOf("\r");
-        //            _name = Value.Substring(9, x - 9);
-        //            _picture = modConverter.StringToBitmap(Value.Substring(x + 1));
-        //            return;
-        //        }
-        //        case "NamedBIN#":
-        //        {
-        //            var x = Value.IndexOf("\r");
-        //            _name = Value.Substring(9, x - 9);
-        //            _binary = Value.Substring(x + 1);
-        //            return;
-        //        }
-        //        default:
-        //            Develop.DebugPrint(enFehlerArt.Fehler, "Kann nicht geparsed werden: " + Value.Substring(0, 20));
-        //            break;
-        //    }
-        //}
-
-
         public override string ToString()
         {
-
             var t = "{Name=" + _name.ToNonCritical() + ", ";
-
 
             if (_picture != null)
             {
@@ -256,13 +205,10 @@ namespace BlueBasics
             return t.TrimEnd(", ") + "}";
         }
 
-
         public void OnChanged()
         {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
-
     }
-
 }
