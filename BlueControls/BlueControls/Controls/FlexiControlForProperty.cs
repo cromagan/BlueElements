@@ -29,7 +29,6 @@ namespace BlueControls.Controls
         private string _propertynamecpl;
         bool _FehlerWennLeer = true;
         bool _FehlerFormatCheck = true;
-        Timer Checker = new Timer();
 
 
         new bool _enabled = true;
@@ -44,9 +43,16 @@ namespace BlueControls.Controls
         public FlexiControlForProperty() : base()
         {
             GenFehlerText();
-            Checker.Tick += Checker_Tick;
-            Checker.Interval = 1000;
-            Checker.Enabled = true;
+
+            //if (propChecker == null)
+            //{
+            //    propChecker = new Timer();
+            //    propChecker.Interval = 1000;
+            //    propChecker.Enabled = true;
+            //}
+
+            _IdleTimer.Tick += Checker_Tick;
+
 
             CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
             EditType = enEditTypeFormula.Textfeld;
@@ -75,6 +81,9 @@ namespace BlueControls.Controls
         {
             if (_IsFilling) { return; }
             if (!_allinitialized) { return; }
+
+            if (_LastTextChange != null) { return; } // Noch am bearbeiten
+
             SetValueFromProperty();
         }
 
@@ -90,7 +99,6 @@ namespace BlueControls.Controls
                 _propertyName = value;
                 UpdateControlData(false, 1, null, enImageCode.None);
                 CheckEnabledState();
-
             }
         }
 
@@ -112,69 +120,6 @@ namespace BlueControls.Controls
         }
 
 
-        //[DefaultValue(true)]
-        //public bool FehlerWennLeer
-        //{
-        //    get { return _FehlerWennLeer; }
-        //    set
-        //    {
-        //        if (_FehlerWennLeer == value) { return; }
-        //        _FehlerWennLeer = value;
-        //        GenFehlerText();
-        //    }
-        //}
-
-
-
-        //[DefaultValue(true)]
-        //public bool FehlerFormatCheck
-        //{
-        //    get { return _FehlerFormatCheck; }
-        //    set
-        //    {
-        //        if (_FehlerFormatCheck == value) { return; }
-        //        _FehlerFormatCheck = value;
-        //        GenFehlerText();
-        //    }
-        //}
-
-
-        //[DefaultValue(false)]
-        //public bool AddGroupboxText
-        //{
-        //    get { return _addGroupboxText; }
-        //    set
-        //    {
-        //        if (_addGroupboxText == value) { return; }
-
-        //        FillPropertyNow();
-
-        //        _addGroupboxText = value;
-        //        UpdateControlData(false, 1, null, enImageCode.None);
-        //        CheckEnabledState();
-
-        //    }
-        //}
-
-
-
-        //[DefaultValue(true)]
-        //public bool AutoQuickInfo
-        //{
-        //    get { return _AutoQuickInfo; }
-        //    set
-        //    {
-        //        if (_AutoQuickInfo == value) { return; }
-
-        //        FillPropertyNow();
-
-        //        _AutoQuickInfo = value;
-        //        UpdateControlData();
-        //        CheckEnabledState();
-
-        //    }
-        //}
-
         [DefaultValue(null)]
         public object PropertyObject
         {
@@ -189,7 +134,6 @@ namespace BlueControls.Controls
                 {
                     LS.LoadedFromDisk -= OnLoadedFromDisk;
                 }
-
 
                 _propertyObject = value;
                 UpdateControlData(false, 1, null, enImageCode.None);
@@ -273,8 +217,6 @@ namespace BlueControls.Controls
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
             }
 
-
-
         }
 
         private void FillPropertyNow()
@@ -346,7 +288,6 @@ namespace BlueControls.Controls
             if (OldVal == Value) { return; }
 
             propInfo.SetValue(_propertyObject, toSet, null);
-
         }
 
         internal bool CheckEnabledState()
@@ -361,9 +302,7 @@ namespace BlueControls.Controls
             {
                 base.Enabled = false;
                 return false;
-
             }
-
 
             base.Enabled = true;
             return true;
@@ -508,16 +447,9 @@ namespace BlueControls.Controls
                                     default: Format = enDataFormat.Text; break;
                                 }
 
-
-
-                                _InstantChangedEvent = true;
-
                                 var c = CreateSubControls();
-
                                 StyleTextBox((TextBox)c, string.Empty, false);
                             }
-
-
                             break;
                         }
 
@@ -671,29 +603,14 @@ namespace BlueControls.Controls
 
 
 
+        protected override void Dispose(bool disposing)
+        {
+            _IdleTimer.Tick -= Checker_Tick;
+            if (_propertyObject is IReloadable LS) { LS.LoadedFromDisk -= OnLoadedFromDisk; }
 
-        //protected override void OnParentChanged(System.EventArgs e)
-        //{
-        //    FillPropertyNow();
-        //    if (_LastParent is GroupBox gp) { gp.TextChanged -= GroupBox_TextChanged; }
+            base.Dispose(disposing);
+        }
 
-
-        //    base.OnParentChanged(e);
-
-        //    _LastParent = Parent;
-
-        //    if (_LastParent is GroupBox gp2) { gp2.TextChanged += GroupBox_TextChanged; }
-
-
-        //}
-
-        //private void GroupBox_TextChanged(object sender, System.EventArgs e)
-        //{
-        //    UpdateControlData(false, 1, null, enImageCode.None);
-        //    CheckEnabledState();
-
-        //    OnValueChanged(); // Wichig, dass Fehler-Dreiecke angezeigt werden können
-        //}
     }
 }
 

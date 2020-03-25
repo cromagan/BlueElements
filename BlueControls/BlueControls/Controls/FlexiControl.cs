@@ -70,7 +70,17 @@ namespace BlueControls.Controls
 
         protected bool _allinitialized = false;
         protected bool _enabled = false;
-        protected bool _InstantChangedEvent = true;
+
+
+        protected System.Windows.Forms.Timer _IdleTimer;
+
+        /// <summary>
+        /// Speichert, wann die letzte Text-Änderung vorgenommen wurden.
+        /// Wenn NULL, dann wurde bereits ein Event ausgelöst.
+        /// </summary>
+        protected DateTime? _LastTextChange;
+
+
         public event EventHandler RemovingAll;
 
         public event EventHandler NeedRefresh;
@@ -78,10 +88,11 @@ namespace BlueControls.Controls
         public event EventHandler ValueChanged;
 
 
+
+
+
+
         #region  Constructor 
-
-
-
 
         public FlexiControl()
         {
@@ -93,61 +104,25 @@ namespace BlueControls.Controls
             _EditType = enEditTypeFormula.Line;
             Size = new Size(200, 8);
 
+            if (_IdleTimer == null)
+            {
+                _IdleTimer = new Timer();
+                _IdleTimer.Interval = 1000;
+                _IdleTimer.Enabled = true;
+            }
+
+            _IdleTimer.Tick += _IdleTimer_Tick;
+
         }
 
-
-
-        ///// <summary>
-        ///// Erstellt ein einfaches Linien-Element.
-        ///// </summary>
-        ///// <param name="vType"></param>
-        //public FlexiControl(bool Horizontal)
-        //{
-        //    // Dieser Aufruf ist für den Designer erforderlich.
-        //    InitializeComponent();
-
-        //    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        //    _EditType = enEditTypeFormula.Line;
-        //    Size = new Size(200, 8);
-
-        //    if (!Horizontal) { Develop.DebugPrint_NichtImplementiert(); }
-        //}
-
-        ///// <summary>
-        ///// Erstellt einen Ja/Nein-Knopf.
-        ///// </summary>
-        ///// <param name="caption"></param>
-        ///// <param name="value"></param>
-        //public FlexiControl(string caption, bool value)
-        //{
-
-        //    // Dieser Aufruf ist für den Designer erforderlich.
-        //    InitializeComponent();
-
-        //    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        //    _EditType = enEditTypeFormula.Ja_Nein_Knopf;
-        //    _Caption = caption + ":";
-        //    ValueId = caption;
-        //    _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-
-        //    var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
-
-        //    Size = new Size((int)s.Width + 30, 22);
-
-        //    CreateSubControls();
-        //    this.Value = value.ToPlusMinus();
-
-        //}
 
 
         /// <summary>
         /// Einfacher Info Text. Wird nirgends mehr zurück gegeben.
         /// </summary>
         /// <param name="CaptionText"></param>
-        public FlexiControl(string CaptionText)
+        public FlexiControl(string CaptionText) : base()
         {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _EditType = enEditTypeFormula.None;
@@ -162,125 +137,8 @@ namespace BlueControls.Controls
 
         }
 
-        ///// <summary>
-        ///// Initialisiert das FlexControl als einfachen Button zum klicken
-        ///// </summary>
-        ///// <param name="CaptionText"></param>
-        ///// <param name="Pic"></param>
-        //public FlexiControl(string CaptionText, enImageCode Pic)
-        //{
 
-        //    // Dieser Aufruf ist für den Designer erforderlich.
-        //    InitializeComponent();
-
-        //    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        //    _EditType = enEditTypeFormula.Button;
-        //    _Caption = CaptionText;
-        //    ValueId = CaptionText;
-        //    _CaptionPosition = enÜberschriftAnordnung.ohne;
-        //    _Value = string.Empty;
-
-
-        //    var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
-        //    Size = new Size((int)s.Width + 50, 30);
-
-        //    var c = CreateSubControls();
-
-        //    ((Button)c).ImageCode = QuickImage.Get(Pic).ToString();
-
-        //}
-
-        ///// <summary>
-        ///// Initialisiert das FlexControl als Textbox
-        ///// </summary>
-        ///// <param name="CaptionText"></param>
-        ///// <param name="InitialValue"></param>
-        ///// <param name="Format"></param>
-        ///// <param name="TextLines"></param>
-        //public FlexiControl(string CaptionText, string InitialValue, enDataFormat Format, int TextLines)
-        //{
-
-        //    // Dieser Aufruf ist für den Designer erforderlich.
-        //    InitializeComponent();
-
-        //    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        //    _EditType = enEditTypeFormula.Textfeld;
-
-        //    _MultiLine = false;
-
-
-        //    if (TextLines >= 2)
-        //    {
-        //        _CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
-        //        Size = new Size(200, 16 + 24 * TextLines);
-        //        _MultiLine = true;
-        //    }
-        //    else
-        //    {
-        //        _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-        //        Size = new Size(200, 24);
-        //        _MultiLine = false;
-        //    }
-
-
-        //    _Caption = CaptionText + ":";
-        //    ValueId = CaptionText;
-        //    _Format = Format;
-        //    _InstantChangedEvent = true;
-
-        //    var c = CreateSubControls();
-
-        //    StyleTextBox((TextBox)c, string.Empty, false);
-
-        //    Value = InitialValue;
-        //}
-
-        ///// <summary>
-        ///// Erstellt eine Combobox
-        ///// </summary>
-        ///// <param name="CaptionText"></param>
-        ///// <param name="InitialValue"></param>
-        ///// <param name="list"></param>
-        //public FlexiControl(string CaptionText, string InitialValue, ItemCollectionList list)
-        //{
-
-        //    // Dieser Aufruf ist für den Designer erforderlich.
-        //    InitializeComponent();
-
-        //    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        //    _EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
-        //    _Caption = CaptionText + ":";
-        //    ValueId = CaptionText;
-        //    _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-
-
-        //    list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
-        //    var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
-
-
-        //    var data = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-        //    var Wi = data.Item1;
-        //    var He = data.Item2;
-
-
-        //    var x = Math.Max((int)(data.Item1 + 20 + s.Width), 200);
-        //    var y = Math.Max((int)(data.Item2 + Skin.PaddingSmal * 2), 24);
-
-        //    Size = new Size(x, y);
-
-
-        //    var c = CreateSubControls();
-
-        //    StyleComboBox((ComboBox)c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
-
-        //    Value = InitialValue;
-        //}
-
-
-
-
-
-
+        #endregion
 
         #region  QuickInfo 
         // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
@@ -305,17 +163,6 @@ namespace BlueControls.Controls
             }
         }
         #endregion
-
-
-
-
-
-
-
-
-        #endregion
-
-
 
 
         #region  Properties 
@@ -392,11 +239,13 @@ namespace BlueControls.Controls
             set
             {
                 if (value == null) { value = string.Empty; }
+                if (_Value == null && string.IsNullOrEmpty(value)) { return; }
                 if (_Value == value) { return; }
                 if (_IsFilling) { return; }
+                _LastTextChange = DateTime.UtcNow;
                 _Value = value;
                 UpdateValueToControl();
-                OnValueChanged();
+                //OnValueChanged();
             }
         }
 
@@ -441,27 +290,27 @@ namespace BlueControls.Controls
 
 
 
-        /// <summary>
-        /// Falls das Steuerelement eine InstantChangeEvent unterstützt, wird dieses umgesetzt
-        /// </summary>
-        [DefaultValue(true)]
-        public bool InstantChangedEvent
-        {
-            get
-            {
-                return _InstantChangedEvent;
-            }
-            set
-            {
+        ///// <summary>
+        ///// Falls das Steuerelement eine InstantChangeEvent unterstützt, wird dieses umgesetzt
+        ///// </summary>
+        //[DefaultValue(true)]
+        //public bool InstantChangedEvent
+        //{
+        //    get
+        //    {
+        //        return _InstantChangedEvent;
+        //    }
+        //    set
+        //    {
 
-                if (_InstantChangedEvent == value) { return; }
-                _InstantChangedEvent = value;
+        //        if (_InstantChangedEvent == value) { return; }
+        //        _InstantChangedEvent = value;
 
 
-                UpdateControls();
+        //        UpdateControls();
 
-            }
-        }
+        //    }
+        //}
 
 
         /// <summary>
@@ -476,24 +325,11 @@ namespace BlueControls.Controls
             }
             set
             {
-
                 if (_Format == value) { return; }
                 _Format = value;
-
-
                 UpdateControls();
-
             }
         }
-
-
-
-
-
-
-
-
-
 
         [DefaultValue(enEditTypeFormula.None)]
         public enEditTypeFormula EditType
@@ -545,8 +381,6 @@ namespace BlueControls.Controls
                 Invalidate();
             }
         }
-
-
 
 
         [DefaultValue(enÜberschriftAnordnung.ohne)]
@@ -727,10 +561,12 @@ namespace BlueControls.Controls
                 case ComboBox ComboBox:
                     //ComboBox.ItemClicked += ComboBoxItemClicked;
                     ComboBox.TextChanged += ValueChanged_ComboBox;
+                    ComboBox.LostFocus += TextEditControl_LostFocus;
                     break;
 
                 case TextBox TextBox:
                     TextBox.TextChanged += ValueChanged_TextBox;
+                    TextBox.LostFocus += TextEditControl_LostFocus;
                     break;
 
                 case Caption _:
@@ -776,6 +612,10 @@ namespace BlueControls.Controls
             UpdateControls();
         }
 
+        private void TextEditControl_LostFocus(object sender, System.EventArgs e)
+        {
+            CheckIfChanged();
+        }
 
         protected override void OnControlRemoved(System.Windows.Forms.ControlEventArgs e)
         {
@@ -786,10 +626,12 @@ namespace BlueControls.Controls
                 case ComboBox ComboBox:
                     //ComboBox.ItemClicked -= ComboBoxItemClicked;
                     ComboBox.TextChanged -= ValueChanged_ComboBox;
+                    ComboBox.LostFocus -= TextEditControl_LostFocus;
                     break;
 
                 case TextBox TextBox:
                     TextBox.TextChanged -= ValueChanged_TextBox;
+                    TextBox.LostFocus -= TextEditControl_LostFocus;
                     break;
 
                 case Caption _:
@@ -917,7 +759,7 @@ namespace BlueControls.Controls
         /// </summary>
         private void UpdateValueTo_Caption()
         {
-            if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
+            //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             //if (Column == null) { return; } // nur mögloch bei verbundenen Datenbanken
 
             if (_EditType != enEditTypeFormula.nur_als_Text_anzeigen) { return; } // und auch dann nur als reine Text anzeige
@@ -977,7 +819,7 @@ namespace BlueControls.Controls
         /// </summary>
         private void UpdateValueTo_EasyPic(EasyPic Control)
         {
-            if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
+            //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             Control.FromFile(_Value);
         }
 
@@ -1023,7 +865,7 @@ namespace BlueControls.Controls
         /// </summary>
         private void UpdateValueTo_Combobox(ComboBox Control)
         {
-            if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
+            //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             Control.Text = _Value;
         }
 
@@ -1031,16 +873,15 @@ namespace BlueControls.Controls
         {
             //if (_IsCreating || _IsFilling) { return; }
             Value = ((ComboBox)sender).Text;
+
+            if (((ComboBox)sender).DropDownStyle == ComboBoxStyle.DropDownList)
+            {
+                CheckIfChanged();
+            }
         }
 
 
-
-
-
-
-
-
-        #endregion
+       #endregion
 
 
         #region  ListBox 
@@ -1095,6 +936,7 @@ namespace BlueControls.Controls
             ListBoxen(out var Main, out var Suggest);
             if (sender == Suggest) { return; }
             Value = Main.Item.ToListOfString().JoinWithCr();
+            CheckIfChanged();
         }
 
         private void ListBox_ItemAdded(object sender, ListEventArgs e)
@@ -1111,6 +953,7 @@ namespace BlueControls.Controls
                 return;
             }
             Value = Main.Item.ToListOfString().JoinWithCr();
+            CheckIfChanged();
         }
 
 
@@ -1300,7 +1143,7 @@ namespace BlueControls.Controls
         /// </summary>
         private void UpdateValueTo_ListBox()
         {
-            if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
+            //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             // Das muss OnChanged von FlexiControlForCell übernehmen.
 
             ListBoxen(out var Main, out var Suggest);
@@ -1370,7 +1213,7 @@ namespace BlueControls.Controls
         {
             if (_EditType != enEditTypeFormula.Button) { return; }
             Value = "+"; // Geklickt, wurde hiermit vermerkt
-
+            CheckIfChanged();
             OnButtonClicked();
         }
 
@@ -1393,6 +1236,7 @@ namespace BlueControls.Controls
         private void YesNoButton_CheckedChanged(object sender, System.EventArgs e)
         {
             Value = ((Button)sender).Checked.ToPlusMinus();
+            CheckIfChanged();
         }
 
         /// <summary>
@@ -1462,7 +1306,7 @@ namespace BlueControls.Controls
         private void UpdateValueTo_Button(Button Control)
         {
 
-            if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling und Creating False!"); }
+            //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling und Creating False!"); }
 
             switch (_EditType)
             {
@@ -1502,7 +1346,6 @@ namespace BlueControls.Controls
         private TextBox Control_Create_TextBox()
         {
             var Control = new TextBox();
-            _InstantChangedEvent = true;
             StyleTextBox(Control, string.Empty, false);
             UpdateValueToControl();
             StandardBehandlung(Control);
@@ -1520,7 +1363,6 @@ namespace BlueControls.Controls
             Control.AllowedChars = AllowedChars;
             Control.MultiLine = _MultiLine;
             Control.SpellChecking = SpellChecking;
-            Control.InstantChangedEvent = _InstantChangedEvent;
 
             if (_MultiLine || Height > 20)
             {
@@ -1538,12 +1380,9 @@ namespace BlueControls.Controls
         /// </summary>
         private void UpdateValueTo_TextBox(TextBox Control)
         {
-            if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
+            //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
 
-
-            Control.InstantChangedEvent = true;
             Control.Text = _Value;
-            Control.InstantChangedEvent = _InstantChangedEvent;
         }
 
 
@@ -1615,6 +1454,13 @@ namespace BlueControls.Controls
 
             //DoInfoTextCaption();
 
+        }
+
+        private void CheckIfChanged()
+        {
+            if (_LastTextChange == null) { return; }
+            _LastTextChange = null;
+            OnValueChanged();
         }
 
 
@@ -1799,6 +1645,12 @@ namespace BlueControls.Controls
         }
 
 
+        private void _IdleTimer_Tick(object sender, System.EventArgs e)
+        {
+            if (_LastTextChange == null) { return; }
+            if (DateTime.Now.Subtract((DateTime)_LastTextChange).TotalSeconds < 5) { return; }
+            CheckIfChanged();
+        }
 
 
 
@@ -1827,14 +1679,11 @@ namespace BlueControls.Controls
                     case ComboBox ComboBox:
                         ComboBox.Suffix = _Suffix;
                         ComboBox.Format = _Format;
-                        ComboBox.InstantChangedEvent = _InstantChangedEvent;
-
                         break;
 
                     case TextBox TextBox:
                         TextBox.Suffix = _Suffix;
                         TextBox.Format = _Format;
-                        TextBox.InstantChangedEvent = _InstantChangedEvent;
                         break;
 
                     case EasyPic _:
@@ -1861,5 +1710,6 @@ namespace BlueControls.Controls
                 }
             }
         }
+
     }
 }

@@ -13,11 +13,13 @@ namespace BlueControls.Controls
             {
                 if (disposing && components != null)
                 {
+                    _IdleTimer.Tick -= _IdleTimer_Tick;
                     _InfoText = string.Empty;
                     if (_BitmapOfControl != null) { _BitmapOfControl.Dispose(); }
                     //DoInfoTextButton(); // Events entfernen!
                     RemoveAll(); // Events entfernen!
-                    components.Dispose();
+
+                   components.Dispose();
                 }
             }
             finally

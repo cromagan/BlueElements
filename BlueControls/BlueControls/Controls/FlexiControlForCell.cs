@@ -406,7 +406,6 @@ namespace BlueControls.Controls
 
             Suffix = column1.Suffix;
             Format = column1.Format;
-            InstantChangedEvent = false;
             MultiLine = column1.MultiLine;
 
             switch (e.Control)

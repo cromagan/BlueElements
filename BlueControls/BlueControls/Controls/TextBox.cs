@@ -77,15 +77,15 @@ namespace BlueControls.Controls
 
         private DateTime _LastUserActionForSpellChecking = DateTime.Now;
 
-        private bool _InstantChangedEvent = true;
-        private System.Windows.Forms.Timer _InstantChangeTimer;
+        //private bool _InstantChangedEvent = true;
+        //private System.Windows.Forms.Timer _InstantChangeTimer;
 
 
-        /// <summary>
-        /// Speichert, wann die letzte Text-Änderung vorgenommen wurden.
-        /// Wenn NULL, dann wurde bereits ein Event ausgelöst.
-        /// </summary>
-        private DateTime? _LastTextChange;
+        ///// <summary>
+        ///// Speichert, wann die letzte Text-Änderung vorgenommen wurden.
+        ///// Wenn NULL, dann wurde bereits ein Event ausgelöst.
+        ///// </summary>
+        //private DateTime? _LastTextChange;
 
         private string _LastCheckedText = string.Empty;
 
@@ -298,50 +298,50 @@ namespace BlueControls.Controls
             }
         }
 
-        [DefaultValue(true)]
-        public bool InstantChangedEvent
-        {
-            get
-            {
-                return _InstantChangedEvent;
-            }
-            set
-            {
-                if (value == _InstantChangedEvent) { return; }
+        //[DefaultValue(true)]
+        //public bool InstantChangedEvent
+        //{
+        //    get
+        //    {
+        //        return _InstantChangedEvent;
+        //    }
+        //    set
+        //    {
+        //        if (value == _InstantChangedEvent) { return; }
 
 
-                if (!_InstantChangedEvent)
-                {
-                    _InstantChangeTimer.Tick -= _InstantChangeTimer_Tick;
-                    _InstantChangeTimer.Enabled = true;
-                    _InstantChangeTimer.Dispose();
+        //        if (!_InstantChangedEvent)
+        //        {
+        //            _InstantChangeTimer.Tick -= _InstantChangeTimer_Tick;
+        //            _InstantChangeTimer.Enabled = true;
+        //            _InstantChangeTimer.Dispose();
 
-                }
+        //        }
 
-                if (_LastTextChange != null) { OnTextChanged(); }
-                _InstantChangedEvent = value;
+        //        if (_LastTextChange != null) { OnTextChanged(); }
+        //        _InstantChangedEvent = value;
 
-                if (!_InstantChangedEvent)
-                {
-                    _LastTextChange = null;
-                    _InstantChangeTimer = new System.Windows.Forms.Timer();
-                    _InstantChangeTimer.Interval = 1000;
-                    _InstantChangeTimer.Enabled = true;
-                    _InstantChangeTimer.Tick += _InstantChangeTimer_Tick;
-                }
+        //        if (!_InstantChangedEvent)
+        //        {
+        //            _LastTextChange = null;
+        //            _InstantChangeTimer = new System.Windows.Forms.Timer();
+        //            _InstantChangeTimer.Interval = 1000;
+        //            _InstantChangeTimer.Enabled = true;
+        //            _InstantChangeTimer.Tick += _InstantChangeTimer_Tick;
+        //        }
 
 
 
-            }
-        }
+        //    }
+        //}
 
-        private void _InstantChangeTimer_Tick(object sender, System.EventArgs e)
-        {
-            if (_LastTextChange == null) { return; }
-            if (DateTime.Now.Subtract((DateTime)_LastTextChange).TotalSeconds < 5) { return; }
-            _InstantChangeTimer.Enabled = false;
-            OnTextChanged();
-        }
+        //private void _InstantChangeTimer_Tick(object sender, System.EventArgs e)
+        //{
+        //    if (_LastTextChange == null) { return; }
+        //    if (DateTime.Now.Subtract((DateTime)_LastTextChange).TotalSeconds < 5) { return; }
+        //    _InstantChangeTimer.Enabled = false;
+        //    OnTextChanged();
+        //}
 
 
         #endregion
@@ -395,7 +395,7 @@ namespace BlueControls.Controls
             base.OnLostFocus(e);
 
 
-            if (_LastTextChange != null) { OnTextChanged(); }
+            //if (_LastTextChange != null) { OnTextChanged(); }
 
 
             _LastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
@@ -892,15 +892,8 @@ namespace BlueControls.Controls
 
             if (Dictionary.DictionaryRunning(true)) { _MustCheck = true; }
 
-            if (_InstantChangedEvent)
-            {
-                OnTextChanged();
-                return;
-            }
-
-
-            _LastTextChange = DateTime.Now;
-            _InstantChangeTimer.Enabled = true;
+            OnTextChanged();
+            return;
         }
 
 
@@ -910,7 +903,6 @@ namespace BlueControls.Controls
         /// </summary>
         protected virtual void OnTextChanged()
         {
-            _LastTextChange = null;
             TextChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
