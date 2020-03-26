@@ -42,10 +42,10 @@ namespace BlueControls.Controls
     {
 
 
-        /// <summary>
-        /// Wenn True, wird ValueChanged NICHT ausgelöst
-        /// </summary>
-        protected bool _IsFilling;
+        ///// <summary>
+        ///// Wenn True, wird ValueChanged NICHT ausgelöst
+        ///// </summary>
+        //protected bool _IsFilling;
 
         public readonly string ValueId;
         private string _Value = string.Empty;
@@ -241,10 +241,11 @@ namespace BlueControls.Controls
                 if (value == null) { value = string.Empty; }
                 if (_Value == null && string.IsNullOrEmpty(value)) { return; }
                 if (_Value == value) { return; }
-                if (_IsFilling) { return; }
                 _LastTextChange = DateTime.UtcNow;
                 _Value = value;
                 UpdateValueToControl();
+
+                if (!Focused) { CheckIfChanged(); }
                 //OnValueChanged();
             }
         }
@@ -499,7 +500,7 @@ namespace BlueControls.Controls
         {
             if (!_allinitialized) { CreateSubControls(); }
 
-            _IsFilling = true;
+            //_IsFilling = true;
 
             foreach (System.Windows.Forms.Control Control in Controls)
             {
@@ -543,7 +544,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            _IsFilling = false;
+            //_IsFilling = false;
 
         }
 
@@ -881,7 +882,7 @@ namespace BlueControls.Controls
         }
 
 
-       #endregion
+        #endregion
 
 
         #region  ListBox 
@@ -1456,6 +1457,22 @@ namespace BlueControls.Controls
 
         }
 
+
+
+
+        public override bool Focused
+        {
+            get
+            {
+                foreach (System.Windows.Forms.Control ThisControl in Controls)
+                {
+                    if (ThisControl.Focused) { return true; }
+                }
+
+                return base.Focused;
+            }
+        }
+
         private void CheckIfChanged()
         {
             if (_LastTextChange == null) { return; }
@@ -1648,7 +1665,7 @@ namespace BlueControls.Controls
         private void _IdleTimer_Tick(object sender, System.EventArgs e)
         {
             if (_LastTextChange == null) { return; }
-            if (DateTime.Now.Subtract((DateTime)_LastTextChange).TotalSeconds < 5) { return; }
+            if (DateTime.UtcNow.Subtract((DateTime)_LastTextChange).TotalSeconds < 5) { return; }
             CheckIfChanged();
         }
 

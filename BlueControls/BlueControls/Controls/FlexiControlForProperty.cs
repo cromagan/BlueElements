@@ -79,7 +79,7 @@ namespace BlueControls.Controls
 
         private void Checker_Tick(object sender, System.EventArgs e)
         {
-            if (_IsFilling) { return; }
+            //if (_IsFilling) { return; }
             if (!_allinitialized) { return; }
 
             if (_LastTextChange != null) { return; } // Noch am bearbeiten
@@ -221,7 +221,7 @@ namespace BlueControls.Controls
 
         private void FillPropertyNow()
         {
-            if (_IsFilling) { return; }
+            //if (_IsFilling) { return; }
             if (!_allinitialized) { return; }
 
             if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
