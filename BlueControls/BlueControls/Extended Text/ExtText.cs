@@ -821,25 +821,33 @@ namespace BlueControls
 
         internal string ConvertCharToPlainText(int Von, int Bis)
         {
-            var T = "";
-            var cZ = Von;
-
-
-            Bis = Math.Min(Bis, Chars.Count - 1);
-
-            while (cZ <= Bis && Chars[cZ].Char > 0)
+            try
             {
+                var T = string.Empty;
+                var cZ = Von;
 
-                if (Chars[cZ].Char < ExtChar.ImagesStart)
+                Bis = Math.Min(Bis, Chars.Count - 1);
+
+                while (cZ <= Bis && Chars[cZ].Char > 0)
                 {
-                    T += Convert.ToChar(Chars[cZ].Char).ToString();
+
+                    if (Chars[cZ].Char < ExtChar.ImagesStart)
+                    {
+                        T += Convert.ToChar(Chars[cZ].Char).ToString();
+                    }
+                    cZ += 1;
                 }
-                cZ += 1;
+
+                T = T.Replace("\n", "");
+
+                return T;
+            }
+            catch
+            {
+                // Wenn Chars geändter wird (und dann der Count nimmer stimmt)
+                return ConvertCharToPlainText(Von, Bis);
             }
 
-            T = T.Replace("\n", "");
-
-            return T;
         }
 
         private void DoSpecialEntities(string xHTMLTextx, ref int xStartPosx, ref int xPosition, ref BlueFont f, ref int Stufe, ref enMarkState MarkState)

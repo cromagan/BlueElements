@@ -45,7 +45,7 @@ namespace BlueControls.Controls
         ///// <summary>
         ///// Wenn True, wird ValueChanged NICHT ausgelöst
         ///// </summary>
-        //protected bool _IsFilling;
+        protected bool _IsFilling;
 
         public readonly string ValueId;
         private string _Value = string.Empty;
@@ -500,7 +500,7 @@ namespace BlueControls.Controls
         {
             if (!_allinitialized) { CreateSubControls(); }
 
-            //_IsFilling = true;
+            _IsFilling = true;
 
             foreach (System.Windows.Forms.Control Control in Controls)
             {
@@ -544,7 +544,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            //_IsFilling = false;
+            _IsFilling = false;
 
         }
 
@@ -872,7 +872,7 @@ namespace BlueControls.Controls
 
         private void ValueChanged_ComboBox(object sender, System.EventArgs e)
         {
-            //if (_IsCreating || _IsFilling) { return; }
+            if (_IsFilling) { return; }
             Value = ((ComboBox)sender).Text;
 
             if (((ComboBox)sender).DropDownStyle == ComboBoxStyle.DropDownList)
@@ -934,6 +934,7 @@ namespace BlueControls.Controls
 
         private void ListBox_ItemRemoved(object sender, System.EventArgs e)
         {
+            if (_IsFilling) { return; }
             ListBoxen(out var Main, out var Suggest);
             if (sender == Suggest) { return; }
             Value = Main.Item.ToListOfString().JoinWithCr();
@@ -953,6 +954,8 @@ namespace BlueControls.Controls
                 ListBox_ItemClicked(Suggest, new BasicListItemEventArgs((BasicListItem)e.Item)); // Gleich nach oben schieben
                 return;
             }
+            if (_IsFilling) { return; }
+
             Value = Main.Item.ToListOfString().JoinWithCr();
             CheckIfChanged();
         }
