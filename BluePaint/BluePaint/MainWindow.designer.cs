@@ -36,6 +36,8 @@ namespace BluePaint
             this.btnStop = new BlueControls.Controls.Button();
             this.btnAufnahme = new BlueControls.Controls.Button();
             this.grpDatei = new BlueControls.Controls.GroupBox();
+            this.btnEinfügen = new BlueControls.Controls.Button();
+            this.btnCopy = new BlueControls.Controls.Button();
             this.btnSave = new BlueControls.Controls.Button();
             this.btnLetzteDateien = new BlueControls.Controls.LastFilesCombo();
             this.btnOeffnen = new BlueControls.Controls.Button();
@@ -116,7 +118,7 @@ namespace BluePaint
             this.grpBearbteitung.Controls.Add(this.btnStop);
             this.grpBearbteitung.Controls.Add(this.btnAufnahme);
             this.grpBearbteitung.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpBearbteitung.Location = new System.Drawing.Point(384, 0);
+            this.grpBearbteitung.Location = new System.Drawing.Point(544, 0);
             this.grpBearbteitung.Name = "grpBearbteitung";
             this.grpBearbteitung.Size = new System.Drawing.Size(248, 81);
             this.grpBearbteitung.Text = "Serienbearbeitung";
@@ -145,6 +147,8 @@ namespace BluePaint
             // grpDatei
             // 
             this.grpDatei.CausesValidation = false;
+            this.grpDatei.Controls.Add(this.btnEinfügen);
+            this.grpDatei.Controls.Add(this.btnCopy);
             this.grpDatei.Controls.Add(this.btnSave);
             this.grpDatei.Controls.Add(this.btnLetzteDateien);
             this.grpDatei.Controls.Add(this.btnOeffnen);
@@ -153,8 +157,28 @@ namespace BluePaint
             this.grpDatei.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpDatei.Location = new System.Drawing.Point(0, 0);
             this.grpDatei.Name = "grpDatei";
-            this.grpDatei.Size = new System.Drawing.Size(384, 81);
+            this.grpDatei.Size = new System.Drawing.Size(544, 81);
             this.grpDatei.Text = "Datei";
+            // 
+            // btnEinfügen
+            // 
+            this.btnEinfügen.ImageCode = "Clipboard";
+            this.btnEinfügen.Location = new System.Drawing.Point(440, 2);
+            this.btnEinfügen.Name = "btnEinfügen";
+            this.btnEinfügen.Size = new System.Drawing.Size(64, 66);
+            this.btnEinfügen.TabIndex = 7;
+            this.btnEinfügen.Text = "Einfügen";
+            this.btnEinfügen.Click += new System.EventHandler(this.btnEinfügen_Click);
+            // 
+            // btnCopy
+            // 
+            this.btnCopy.ImageCode = "Kopieren";
+            this.btnCopy.Location = new System.Drawing.Point(376, 2);
+            this.btnCopy.Name = "btnCopy";
+            this.btnCopy.Size = new System.Drawing.Size(64, 66);
+            this.btnCopy.TabIndex = 6;
+            this.btnCopy.Text = "Kopieren";
+            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
             // 
             // btnSave
             // 
@@ -565,5 +589,7 @@ namespace BluePaint
         private Button btnAufnahme;
         internal Button btnGrößeÄndern;
         private Button btn100;
+        private Button btnEinfügen;
+        private Button btnCopy;
     }
 }

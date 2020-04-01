@@ -26,6 +26,7 @@ using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 using BlueControls.Forms;
 using System.Collections.Generic;
+using BlueBasics.Enums;
 
 namespace BluePaint
 {
@@ -601,6 +602,33 @@ namespace BluePaint
         {
             P.Zoom100();
         }
-    }
 
+        private void btnCopy_Click(object sender, System.EventArgs e)
+        {
+            if (P.BMP == null)
+            {
+                MessageBox.Show("Kein Bild vorhanden.");
+                return;
+            }
+            System.Windows.Forms.Clipboard.SetDataObject(P.BMP, false);
+
+            Notification.Show("Das Bild ist nun<br>in der Zwischenablage.", enImageCode.Clipboard);
+        }
+
+        private void btnEinfügen_Click(object sender, System.EventArgs e)
+        {
+            if (!IsSaved()) { return; }
+
+            if (!System.Windows.Forms.Clipboard.ContainsImage())
+            {
+                Notification.Show("Abbruch,<br>kein Bild im Zwischenspeicher!", enImageCode.Information);
+                return;
+            }
+
+            SetPic((Bitmap)System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Bitmap));
+            _isSaved = false;
+            _filename = "*";
+            P.ZoomFit();
+        }
+    }
 }

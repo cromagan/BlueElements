@@ -865,7 +865,7 @@ namespace BlueControls.Controls
 
             if (!System.Windows.Forms.Clipboard.ContainsText())
             {
-                Notification.Show("Abbruch,<br>kein Text im Clipboard!", enImageCode.Information);
+                Notification.Show("Abbruch,<br>kein Text im Zwischenspeicher!", enImageCode.Information);
                 return;
             }
 

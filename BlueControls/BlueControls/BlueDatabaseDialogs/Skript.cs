@@ -212,7 +212,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (!System.Windows.Forms.Clipboard.ContainsText())
             {
-                MessageBox.Show("Kein Text im Clipboard, abbruch.", enImageCode.Information, "OK");
+                MessageBox.Show("Kein Text im Zwischenspeicher, abbruch.", enImageCode.Information, "OK");
                 return;
             }
 
@@ -222,7 +222,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (string.IsNullOrEmpty(nt))
             {
-                MessageBox.Show("Nur leerer Text im Clipboard, abbruch.", enImageCode.Information, "OK");
+                MessageBox.Show("Nur leerer Text im Zwischenspeicher, abbruch.", enImageCode.Information, "OK");
                 return;
             }
 
