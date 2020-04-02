@@ -1156,24 +1156,32 @@ namespace BlueDatabase
         }
         public string GetString(ColumnItem column, RowItem row) // Main Method
         {
-            if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
-            if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!<br>" + Database.Filename); }
-
-            if (column.Format == enDataFormat.LinkedCell)
+            try
             {
-                var LinkedData = LinkedCellData(column, row, false, false, false);
-                if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return LinkedData.Item2.Database.Cell.GetString(LinkedData.Item1, LinkedData.Item2); }
+                if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
+                if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!<br>" + Database.Filename); }
+
+                if (column.Format == enDataFormat.LinkedCell)
+                {
+                    var LinkedData = LinkedCellData(column, row, false, false, false);
+                    if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return LinkedData.Item2.Database.Cell.GetString(LinkedData.Item1, LinkedData.Item2); }
+                    return string.Empty;
+                }
+
+                var CellKey = KeyOfCell(column, row);
+
+                if (!_cells.ContainsKey(CellKey)) { return string.Empty; }
+
+                var s = _cells[CellKey].Value;
+
+                if (s != null) { return s; }
                 return string.Empty;
             }
-
-            var CellKey = KeyOfCell(column, row);
-
-            if (!_cells.ContainsKey(CellKey)) { return string.Empty; }
-
-            var s = _cells[CellKey].Value;
-
-            if (s !=null) { return s; }
-            return string.Empty;
+            catch
+            {
+                // Manchmal verscwhindwet der vorhandene Key?!?
+                return GetString(column, row);
+            }
         }
 
         public void Set(string columnName, RowItem row, string value)
