@@ -132,8 +132,6 @@ namespace BlueControls.Controls
 
         #region  Events 
 
-
-
         public event EventHandler<RowEventArgs> RowAdded;
 
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
@@ -156,32 +154,7 @@ namespace BlueControls.Controls
 
         public event EventHandler ViewChanged;
 
-        internal static void StartDatabaseService()
-        {
-            if (ServiceStarted) { return; }
-            ServiceStarted = true;
-
-
-            Database.MultiUserFileAdded += Database_DatabaseAdded;
-
-        }
-
-        private static void Database_DatabaseAdded(object sender, MultiUserFileGiveBackEventArgs e)
-        {
-
-            if (e.File is Database DB)
-            {
-                DB.NeedPassword += Database_NeedPassword;
-                DB.GenerateLayoutInternal += DB_GenerateLayoutInternal;
-                DB.RenameColumnInLayout += DB_RenameColumnInLayout;
-                DB.Loaded += tabAdministration.CheckDatabase;
-            }
-        }
-
-
-
-
-
+        public event EventHandler FilterChanged;
 
         public event EventHandler RowsSorted;
 
@@ -1228,7 +1201,27 @@ namespace BlueControls.Controls
 
         #endregion
 
+        internal static void StartDatabaseService()
+        {
+            if (ServiceStarted) { return; }
+            ServiceStarted = true;
 
+
+            Database.MultiUserFileAdded += Database_DatabaseAdded;
+
+        }
+
+        private static void Database_DatabaseAdded(object sender, MultiUserFileGiveBackEventArgs e)
+        {
+
+            if (e.File is Database DB)
+            {
+                DB.NeedPassword += Database_NeedPassword;
+                DB.GenerateLayoutInternal += DB_GenerateLayoutInternal;
+                DB.RenameColumnInLayout += DB_RenameColumnInLayout;
+                DB.Loaded += tabAdministration.CheckDatabase;
+            }
+        }
         public static void Database_NeedPassword(object sender, PasswordEventArgs e)
         {
             if (e.Handled) { return; }
@@ -2336,7 +2329,7 @@ namespace BlueControls.Controls
             if (Filter != null)
             {
                 if (e.OnlyReload) { f = Filter.ToString(); }
-                Filter.Changed -= FilterChanged;
+                Filter.Changed -= Filter_Changed;
                 Filter = null;
             }
 
@@ -2347,7 +2340,7 @@ namespace BlueControls.Controls
 
 
                 Filter = new FilterCollection(_Database, f);
-                Filter.Changed += FilterChanged;
+                Filter.Changed += Filter_Changed;
 
                 if (e.OnlyReload)
                 {
@@ -3836,10 +3829,16 @@ namespace BlueControls.Controls
             Invalidate();
         }
 
-        internal void FilterChanged(object sender, System.EventArgs e)
+        internal void Filter_Changed(object sender, System.EventArgs e)
         {
             Invalidate_RowSort();
             Invalidate();
+            OnFilterChanged();
+        }
+
+        private void OnFilterChanged()
+        {
+            FilterChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
         public bool Mouse_IsInHead()

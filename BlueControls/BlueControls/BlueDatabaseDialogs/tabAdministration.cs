@@ -52,7 +52,7 @@ namespace BlueControls.BlueDatabaseDialogs
             Check_OrderButtons();
         }
 
-        [DefaultValue((ComboBox)null)]
+        [DefaultValue((Table)null)]
         public Table Table
         {
 

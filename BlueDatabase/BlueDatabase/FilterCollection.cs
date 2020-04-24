@@ -27,11 +27,11 @@ using BlueDatabase.Enums;
 
 namespace BlueDatabase
 {
-    public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable
+    public sealed class FilterCollection : ListExt<FilterItem>, IParseable
     {
         #region  Variablen-Deklarationen 
 
-        private readonly ListExt<FilterItem> _Internal = new ListExt<FilterItem>();
+        //private readonly ListExt<FilterItem> _Internal = new ListExt<FilterItem>();
         public readonly Database Database;
 
         #endregion
@@ -47,32 +47,27 @@ namespace BlueDatabase
         #region  Construktor + Initialize 
 
 
-        private void Initialize()
+
+
+
+        protected override void OnListOrItemChanged()
         {
-            _Internal.Clear();
-            _Internal.ListOrItemChanged += _Internal_ListOrItemChanged;
-        }
-
-
-
-
-        private void _Internal_ListOrItemChanged(object sender, System.EventArgs e)
-        {
+            base.OnListOrItemChanged();
             OnChanged();
         }
 
-        public FilterCollection(Database cDatabase)
+
+
+        public FilterCollection(Database database)
         {
-            Database = cDatabase;
-            Initialize();
+            Database = database;
         }
 
-        public FilterCollection(Database cDatabase, string FilterCodes)
+        public FilterCollection(Database database, string filterCodes)
         {
-            Database = cDatabase;
-            Initialize();
+            Database = database;
 
-            Parse(FilterCodes);
+            Parse(filterCodes);
         }
 
         #endregion
@@ -84,33 +79,33 @@ namespace BlueDatabase
 
 
 
-        public void Clear()
-        {
-            if (_Internal.Count > 0) { _Internal.Clear(); }
+        //public void Clear()
+        //{
+        //    if (_Internal.Count > 0) { _Internal.Clear(); }
 
-        }
-
-
-
-        public bool Activ()
-        {
-            foreach (var ThisFilterItem in _Internal)
-            {
-                if (ThisFilterItem != null && ThisFilterItem.FilterType != enFilterType.KeinFilter) { return true; }
-            }
-
-            return false;
-        }
-
-        public int Count()
-        {
-            return _Internal.Count;
-        }
+        //}
 
 
 
+        //public bool Activ()
+        //{
+        //    foreach (var ThisFilterItem in _Internal)
+        //    {
+        //        if (ThisFilterItem != null && ThisFilterItem.FilterType != enFilterType.KeinFilter) { return true; }
+        //    }
 
-        public void Delete(ColumnItem vColumn)
+        //    return false;
+        //}
+
+        //public int Count()
+        //{
+        //    return _Internal.Count;
+        //}
+
+
+
+
+        public void Delete(ColumnItem column)
         {
 
             var Again = true;
@@ -120,13 +115,13 @@ namespace BlueDatabase
                 Again = false;
 
 
-                foreach (var ThisFilterItem in _Internal)
+                foreach (var ThisFilterItem in this)
                 {
                     if (ThisFilterItem != null)
                     {
-                        if (ThisFilterItem.Column == vColumn)
+                        if (ThisFilterItem.Column == column)
                         {
-                            _Internal.Remove(ThisFilterItem);
+                            Remove(ThisFilterItem);
                             Again = true;
                             break;
                         }
@@ -294,11 +289,11 @@ namespace BlueDatabase
 
             if (Column == null)
             {
-                _Internal.Add(new FilterItem(Database, FilterType, FilterValue));
+                base.Add(new FilterItem(Database, FilterType, FilterValue));
             }
             else
             {
-                _Internal.Add(new FilterItem(Column, FilterType, FilterValue));
+                base.Add(new FilterItem(Column, FilterType, FilterValue));
             }
         }
 
@@ -366,8 +361,8 @@ namespace BlueDatabase
         {
 
             IsParsing = true;
-            _Internal.ThrowEvents = false;
-            Initialize();
+            ThrowEvents = false;
+           // Initialize();
 
             foreach (var pair in ToParse.GetAllTags())
             {
@@ -382,7 +377,7 @@ namespace BlueDatabase
                 }
             }
 
-            _Internal.ThrowEvents = true;
+            ThrowEvents = true;
             IsParsing = false;
 
         }
@@ -402,15 +397,15 @@ namespace BlueDatabase
             return w.TrimEnd(", ") + "}";
         }
 
-        public IEnumerator<FilterItem> GetEnumerator()
-        {
-            return _Internal.GetEnumerator();
-        }
+        //public IEnumerator<FilterItem> GetEnumerator()
+        //{
+        //    return _Internal.GetEnumerator();
+        //}
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _Internal.GetEnumerator();
-        }
+        //IEnumerator IEnumerable.GetEnumerator()
+        //{
+        //    return _Internal.GetEnumerator();
+        //}
 
         public void OnChanged()
         {

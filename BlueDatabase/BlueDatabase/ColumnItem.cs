@@ -2657,7 +2657,7 @@ namespace BlueDatabase
 
         public List<string> Autofilter_ItemList(FilterCollection vFilter)
         {
-            if (vFilter == null || vFilter.Count() < 0) { return Contents(null); }
+            if (vFilter == null || vFilter.Count < 0) { return Contents(null); }
 
             var tfilter = new FilterCollection(Database);
 

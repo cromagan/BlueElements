@@ -587,7 +587,7 @@ namespace BlueDatabase
         {
             if (Database == null) { return false; }
 
-            if (filter == null || filter.Count() == 0) { return true; }
+            if (filter == null || filter.Count == 0) { return true; }
 
             foreach (var ThisFilter in filter)
             {

@@ -409,7 +409,7 @@ namespace BlueDatabase
             }
 
 
-            if (Filter.Count() > 0)
+            if (Filter.Count > 0)
             {
                 t = t + " Nur bestimmte Einträge.";
             }
@@ -515,7 +515,7 @@ namespace BlueDatabase
                 Result = Result + "exid=" + _ExportFormularID.ToNonCritical() + ", ";
             }
 
-            if (Filter.Count() > 0)
+            if (Filter.Count > 0)
             {
                 Result = Result + "flt=" + Filter + ", ";
             }
@@ -692,7 +692,7 @@ namespace BlueDatabase
                     if (Thisrow != null)
                     {
 
-                        if (Filter != null && Filter.Count() > 0 && !Thisrow.MatchesTo(Filter))
+                        if (Filter != null && Filter.Count > 0 && !Thisrow.MatchesTo(Filter))
                         {
                             var tmp = DeleteId(Thisrow.Key, worker);
                             if (tmp) { Did = true; }
@@ -894,7 +894,7 @@ namespace BlueDatabase
                         {
                             if (Thisrow != null)
                             {
-                                if (Filter == null || Filter.Count() < 1 || Thisrow.MatchesTo(Filter))
+                                if (Filter == null || Filter.Count < 1 || Thisrow.MatchesTo(Filter))
                                 {
 
                                     var Id = Thisrow.Key.ToString();

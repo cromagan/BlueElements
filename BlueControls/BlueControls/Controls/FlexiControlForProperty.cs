@@ -87,6 +87,10 @@ namespace BlueControls.Controls
             SetValueFromProperty();
         }
 
+
+        /// <summary>
+        /// Der Getter/Setter des UserControls. Dabei werden Sonderzeichen in _ umgewandelt. Punkte gelöscht. Zwei __ werden zu einem geändert, und die Anzegige nach den beiden _ wird optisch abgeschnitten.
+        /// </summary>
         public string PropertyName
         {
             get { return _propertyName; }

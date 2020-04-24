@@ -84,6 +84,12 @@
     <Compile Include="BlueDatabaseDialogs\Skript.Designer.cs">
       <DependentUpon>Skript.cs</DependentUpon>
     </Compile>
+    <Compile Include="BlueDatabaseDialogs\Filterleiste.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BlueDatabaseDialogs\Filterleiste.Designer.cs">
+      <DependentUpon>Filterleiste.cs</DependentUpon>
+    </Compile>
     <Compile Include="BlueFont.cs" />
     <Compile Include="clsSerializeableMultiUserFile.cs" />
     <Compile Include="Controls\ZoomPic.cs">
@@ -516,6 +522,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\Skript.resx">
       <DependentUpon>Skript.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BlueDatabaseDialogs\Filterleiste.resx">
+      <DependentUpon>Filterleiste.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\Caption.resx">
       <DependentUpon>Caption.cs</DependentUpon>
