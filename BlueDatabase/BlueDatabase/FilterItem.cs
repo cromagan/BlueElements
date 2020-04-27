@@ -38,7 +38,7 @@ namespace BlueDatabase
         public readonly Database Database;
 
         private ColumnItem _Column;
-        private enFilterType _FilterType;
+        private enFilterType _FilterType = enFilterType.KeinFilter;
 
         #endregion
 
@@ -51,51 +51,38 @@ namespace BlueDatabase
         #region  Construktor + Initialize 
 
 
-        private void Initialize()
+
+
+        public FilterItem(Database database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string>() { searchValue }) { }
+
+        public FilterItem(Database database, enFilterType filterType, List<string> searchValue)
         {
+            Database = database;
             SearchValue = new List<string>();
-            _FilterType = enFilterType.KeinFilter;
+            _FilterType = filterType;
+            if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
         }
 
 
-        public FilterItem(Database cDatabase, enFilterType FilterType, string SearchValue)
+        public FilterItem(Database database, string FilterCode)
         {
-
-            Database = cDatabase;
-            Initialize();
-            _FilterType = FilterType;
-            this.SearchValue.Add(SearchValue);
-        }
-
-        public FilterItem(Database cDatabase, string FilterCode)
-        {
-            Database = cDatabase;
+            Database = database;
             Parse(FilterCode);
         }
 
-        public FilterItem(ColumnItem Column, enFilterType FilterType, string SearchValue)
+        public FilterItem(ColumnItem column, enFilterType filterType, string searchValue) : this(column, filterType, new List<string>() { searchValue }) { }
+
+
+        public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue)
         {
 
-            if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Columm == null;" + FilterType.ToString() + ";" + SearchValue); }
+            if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte nicht vorhanden."); }
 
-            Database = Column.Database;
-            Initialize();
-            _Column = Column;
-            _FilterType = FilterType;
-            this.SearchValue.Add(SearchValue);
-        }
+            Database = column.Database;
+            _Column = column;
+            _FilterType = filterType;
 
-        public FilterItem(ColumnItem Column, enFilterType FilterType, List<string> SearchValue)
-        {
-
-            Database = Column.Database;
-            Initialize();
-            _Column = Column;
-            _FilterType = FilterType;
-            if (SearchValue != null && SearchValue.Count > 0)
-            {
-                this.SearchValue.AddRange(SearchValue);
-            }
+            if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
         }
 
 
@@ -120,7 +107,7 @@ namespace BlueDatabase
         }
 
 
-        public List<string> SearchValue { get; private set; }
+        public List<string> SearchValue { get; private set; } = new List<string>();
 
         public enFilterType FilterType
         {
@@ -169,7 +156,6 @@ namespace BlueDatabase
         public void Parse(string ToParse)
         {
             IsParsing = true;
-            Initialize();
             foreach (var pair in ToParse.GetAllTags())
             {
                 switch (pair.Key)

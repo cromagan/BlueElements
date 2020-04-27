@@ -47,17 +47,6 @@ namespace BlueDatabase
         #region  Construktor + Initialize 
 
 
-
-
-
-        protected override void OnListOrItemChanged()
-        {
-            base.OnListOrItemChanged();
-            OnChanged();
-        }
-
-
-
         public FilterCollection(Database database)
         {
             Database = database;
@@ -74,33 +63,14 @@ namespace BlueDatabase
 
 
 
+        protected override void OnListOrItemChanged()
+        {
+            base.OnListOrItemChanged();
+            OnChanged();
+        }
 
 
 
-
-
-        //public void Clear()
-        //{
-        //    if (_Internal.Count > 0) { _Internal.Clear(); }
-
-        //}
-
-
-
-        //public bool Activ()
-        //{
-        //    foreach (var ThisFilterItem in _Internal)
-        //    {
-        //        if (ThisFilterItem != null && ThisFilterItem.FilterType != enFilterType.KeinFilter) { return true; }
-        //    }
-
-        //    return false;
-        //}
-
-        //public int Count()
-        //{
-        //    return _Internal.Count;
-        //}
 
 
 
@@ -141,160 +111,156 @@ namespace BlueDatabase
             Delete(tmp);
         }
 
-
         public void Delete_RowFilter()
         {
             Delete((ColumnItem)null);
         }
 
 
-        public void Add(enFilterType FilterType, int FilterBy)
+
+        public void Add(enFilterType filterType, string filterBy)
         {
-            Add((ColumnItem)null, FilterType, FilterBy.ToString());
+            Add(new FilterItem(Database, filterType, filterBy));
         }
 
-        public void Add(enFilterType FilterType, string FilterBy)
+        public void Add(enFilterType filterType, List<string> filterBy)
         {
-            Add((ColumnItem)null, FilterType, FilterBy);
-        }
-
-        public void Add(int ColumnIndex, enFilterType FilterType, string FilterBy)
-        {
-
-            var tmp = Database.Column[ColumnIndex];
-            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spaltenindex '" + ColumnIndex + "' nicht vorhanden."); }
-
-            Add(tmp, FilterType, FilterBy);
-        }
-
-        public void Add(string ColumnName, enFilterType FilterType, int FilterBy)
-        {
-
-            var tmp = Database.Column[ColumnName];
-            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + ColumnName + "' nicht vorhanden."); }
-
-            Add(tmp, FilterType, FilterBy.ToString());
-        }
-
-        public void Add(string ColumnName, enFilterType FilterType, string FilterBy)
-        {
-
-            var tmp = Database.Column[ColumnName];
-            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + ColumnName + "' nicht vorhanden."); }
-
-            Add(tmp, FilterType, FilterBy);
-        }
-
-        public void Add(enFilterType FilterType, List<string> FilterBy)
-        {
-            foreach (var t in FilterBy)
-            {
-                Add(FilterType, t);
-            }
-        }
-
-        public void Add(int ColumnIndex, enFilterType FilterType, List<string> FilterBy)
-        {
-            var tmp = Database.Column[ColumnIndex];
-            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spaltenindex '" + ColumnIndex + "' nicht vorhanden."); }
-
-            Add(tmp, FilterType, FilterBy);
-        }
-
-        public void Add(string ColumnName, enFilterType FilterType, List<string> FilterBy)
-        {
-
-            var tmp = Database.Column[ColumnName];
-            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + ColumnName + "' nicht vorhanden."); }
-
-            Add(tmp, FilterType, FilterBy);
-        }
-
-        public void Add(ColumnItem Column, enFilterType FilterType, List<string> FilterBy)
-        {
-            foreach (var t in FilterBy)
-            {
-                Add(Column, FilterType, t);
-            }
+            Add(new FilterItem(Database, filterType, filterBy));
         }
 
 
-        public void Add(ColumnItem Column, enFilterType FilterType, string FilterValue)
+
+        public void Add(string columnName, enFilterType filterType, string filterBy)
         {
-            if (FilterType == enFilterType.KeinFilter)
+            Add(Database.Column[columnName], filterType, filterBy);
+        }
+
+        public void Add(string columnName, enFilterType filterType, List<string> filterBy)
+        {
+
+            Add(Database.Column[columnName], filterType, filterBy);
+        }
+
+        public void Add(ColumnItem column, enFilterType filterType, List<string> filterBy)
+        {
+            Add(new FilterItem(column, filterType, filterBy));
+        }
+
+
+        public void Add(ColumnItem column, enFilterType filterType, string filterBy)
+        {
+            Add(new FilterItem(column, filterType, filterBy));
+        }
+
+
+        protected override void OnItemAdded(FilterItem item)
+        {
+            base.OnItemAdded(item);
+
+            if (item.FilterType == enFilterType.KeinFilter)
             {
                 Develop.DebugPrint("Kein Filter!");
                 return;
             }
 
-            var Oder1 = false;
-            var Und1 = false;
-            var TMPFilter1 = FilterType;
-
-            var Oder2 = false;
-            var Und2 = false;
-
-            if (Convert.ToBoolean(TMPFilter1 & enFilterType.UND))
-            {
-                Und1 = true;
-                TMPFilter1 = TMPFilter1 ^ enFilterType.UND;
-            }
-            if (Convert.ToBoolean(TMPFilter1 & enFilterType.ODER))
-            {
-                Oder1 = true;
-                TMPFilter1 = TMPFilter1 ^ enFilterType.ODER;
-            }
 
 
             foreach (var ThisFilterItem in this)
             {
-                if (ThisFilterItem != null)
+                if (ThisFilterItem.Column == item.Column && item != ThisFilterItem)
                 {
-
-
-                    if (ThisFilterItem.Column == Column)
-                    {
-                        var TMPFilter2 = ThisFilterItem.FilterType;
-                        if (Convert.ToBoolean(TMPFilter2 & enFilterType.UND))
-                        {
-                            Und2 = true;
-                            TMPFilter2 = TMPFilter2 ^ enFilterType.UND;
-                        }
-                        if (Convert.ToBoolean(TMPFilter2 & enFilterType.ODER))
-                        {
-                            Oder2 = true;
-                            TMPFilter2 = TMPFilter2 ^ enFilterType.ODER;
-                        }
-
-                        if (TMPFilter1 == TMPFilter2)
-                        {
-                            if (ThisFilterItem.SearchValue.Contains(FilterValue) && Und1 == Und2 && Oder1 == Oder2) { return; }// Filter genau so schon im gebrauch
-
-                            if (Und1 == false && Und2 == false && Oder1 == false && Oder2 == false) { Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Vergleichmethode!"); }
-                            if (Und1 != Und2) { Und1 = true; }
-                            if (Oder1 != Oder2) { Oder1 = true; }
-                            if (Und1 == Oder1) { Develop.DebugPrint(enFehlerArt.Fehler, "Doppelte Vergleichmethode!"); }
-
-                            if (Und1) { ThisFilterItem.FilterType = TMPFilter1 | enFilterType.UND; }
-                            if (Oder1) { ThisFilterItem.FilterType = TMPFilter1 | enFilterType.ODER; }
-                            ThisFilterItem.SearchValue.Add(FilterValue); // KEIN Cutend, es kann ja sein, daß nach LEEREN auch gesucht wird!
-
-                            return;
-                        }
-                    }
-
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Doppelter Filter!");
                 }
             }
 
 
-            if (Column == null)
+            if (item.SearchValue != null && item.SearchValue.Count >1)
             {
-                base.Add(new FilterItem(Database, FilterType, FilterValue));
+                if (!item.FilterType.HasFlag(enFilterType.UND ) && !item.FilterType.HasFlag(enFilterType.ODER))
+                {
+                    Develop.DebugPrint(enFehlerArt.Warnung, "UND/ODER fehlt");
+                }
             }
-            else
+
+            if (item.FilterType.HasFlag(enFilterType.UND) && item.FilterType.HasFlag(enFilterType.ODER))
             {
-                base.Add(new FilterItem(Column, FilterType, FilterValue));
+                Develop.DebugPrint(enFehlerArt.Warnung, "UND/ODER zu viel");
             }
+
+
+            //var Oder1 = false;
+            //var Und1 = false;
+            //var TMPFilter1 = filterType;
+
+                //var Oder2 = false;
+                //var Und2 = false;
+
+                //if (Convert.ToBoolean(TMPFilter1 & enFilterType.UND))
+                //{
+                //    Und1 = true;
+                //    TMPFilter1 = TMPFilter1 ^ enFilterType.UND;
+                //}
+                //if (Convert.ToBoolean(TMPFilter1 & enFilterType.ODER))
+                //{
+                //    Oder1 = true;
+                //    TMPFilter1 = TMPFilter1 ^ enFilterType.ODER;
+                //}
+
+
+                //foreach (var ThisFilterItem in this)
+                //{
+                //    if (ThisFilterItem != null)
+                //    {
+
+
+                //        if (ThisFilterItem.Column == Column)
+                //        {
+                //            var TMPFilter2 = ThisFilterItem.filterType;
+                //            if (Convert.ToBoolean(TMPFilter2 & enFilterType.UND))
+                //            {
+                //                Und2 = true;
+                //                TMPFilter2 = TMPFilter2 ^ enFilterType.UND;
+                //            }
+                //            if (Convert.ToBoolean(TMPFilter2 & enFilterType.ODER))
+                //            {
+                //                Oder2 = true;
+                //                TMPFilter2 = TMPFilter2 ^ enFilterType.ODER;
+                //            }
+
+                //            if (TMPFilter1 == TMPFilter2)
+                //            {
+                //                if (ThisFilterItem.SearchValue.Contains(FilterValue) && Und1 == Und2 && Oder1 == Oder2) { return; }// Filter genau so schon im gebrauch
+
+                //                if (Und1 == false && Und2 == false && Oder1 == false && Oder2 == false) { Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Vergleichmethode!"); }
+                //                if (Und1 != Und2) { Und1 = true; }
+                //                if (Oder1 != Oder2) { Oder1 = true; }
+                //                if (Und1 == Oder1) { Develop.DebugPrint(enFehlerArt.Fehler, "Doppelte Vergleichmethode!"); }
+
+                //                if (Und1) { ThisFilterItem.filterType = TMPFilter1 | enFilterType.UND; }
+                //                if (Oder1) { ThisFilterItem.filterType = TMPFilter1 | enFilterType.ODER; }
+                //                ThisFilterItem.SearchValue.Add(FilterValue); // KEIN Cutend, es kann ja sein, daß nach LEEREN auch gesucht wird!
+
+                //                return;
+                //            }
+                //        }
+
+                //    }
+                //}
+
+
+                //if (Column == null)
+                //{
+                //    base.Add(new FilterItem(Database, filterType, FilterValue));
+                //}
+                //else
+                //{
+                //    base.Add(new FilterItem(Column, filterType, FilterValue));
+                //}
+
+
+
+
+
         }
 
 
@@ -325,15 +291,6 @@ namespace BlueDatabase
 
 
 
-        public void Add(FilterItem Filter)
-        {
-
-            if (Filter.SearchValue.Count == 0) { Develop.DebugPrint("Filter hat keine Werte!"); }
-
-
-            Add(Filter.Column, Filter.FilterType, Filter.SearchValue);
-        }
-
         public bool Uses(ColumnItem Column)
         {
 
@@ -362,7 +319,7 @@ namespace BlueDatabase
 
             IsParsing = true;
             ThrowEvents = false;
-           // Initialize();
+            // Initialize();
 
             foreach (var pair in ToParse.GetAllTags())
             {
@@ -413,5 +370,58 @@ namespace BlueDatabase
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
+        public void DeleteOtherAndAddIfNotExists(string columName, enFilterType filterType, string filterBy)
+        {
+
+            var tmp = Database.Column[columName];
+            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
+
+
+            DeleteOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy));
+        }
+
+        public void DeleteOtherAndAddIfNotExists(FilterItem filterItem)
+        {
+
+            if (Exists(filterItem)) { return; }
+
+            Delete(filterItem.Column);
+
+            if (Exists(filterItem)) { return; } // Falls ein Event ausgelöst wurde, und es nun doch schon das ist
+
+            Add(filterItem);
+
+        }
+
+        public bool Exists(FilterItem filterItem)
+        {
+            foreach (var thisFilter in this)
+            {
+                if (thisFilter.FilterType == filterItem.FilterType)
+                {
+                    if (thisFilter.Column == filterItem.Column)
+                    {
+
+                        if (thisFilter.SearchValue.JoinWithCr() == filterItem.SearchValue.JoinWithCr())
+                        {
+                            return true;
+                        }
+
+                    }
+
+                }
+            }
+
+            return false;
+        }
+
+        public void DeleteOtherAndAddIfNotExists(string columName, enFilterType filterType, List<string> filterBy)
+        {
+
+            var tmp = Database.Column[columName];
+            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
+
+            DeleteOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy));
+        }
     }
 }

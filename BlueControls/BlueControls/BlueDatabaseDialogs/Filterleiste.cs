@@ -8,7 +8,7 @@ using System;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
-    public partial class Filterleiste : System.Windows.Forms.UserControl
+    public partial class Filterleiste : GroupBox // System.Windows.Forms.UserControl
     {
 
         private Table _TableView;

@@ -85,7 +85,7 @@
       <DependentUpon>Skript.cs</DependentUpon>
     </Compile>
     <Compile Include="BlueDatabaseDialogs\Filterleiste.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="BlueDatabaseDialogs\Filterleiste.Designer.cs">
       <DependentUpon>Filterleiste.cs</DependentUpon>
@@ -104,6 +104,7 @@
     <Compile Include="Controls\ZoomPicWithPoints.Designer.cs">
       <DependentUpon>ZoomPicWithPoints.cs</DependentUpon>
     </Compile>
+    <Compile Include="Enums\enGroupBoxStyle.cs" />
     <Compile Include="Enums\enPartentType.cs" />
     <Compile Include="Enums\enHelpers.cs" />
     <Compile Include="Enums\enSymbol.cs" />

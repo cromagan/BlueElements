@@ -36,7 +36,7 @@
             // btnTextLöschen
             // 
             this.btnTextLöschen.ImageCode = "Kreuz|16";
-            this.btnTextLöschen.Location = new System.Drawing.Point(144, 16);
+            this.btnTextLöschen.Location = new System.Drawing.Point(144, 8);
             this.btnTextLöschen.Name = "btnTextLöschen";
             this.btnTextLöschen.Size = new System.Drawing.Size(24, 22);
             this.btnTextLöschen.TabIndex = 13;
@@ -45,9 +45,9 @@
             // txbZeilenFilter
             // 
             this.txbZeilenFilter.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbZeilenFilter.Location = new System.Drawing.Point(8, 16);
+            this.txbZeilenFilter.Location = new System.Drawing.Point(8, 8);
             this.txbZeilenFilter.Margin = new System.Windows.Forms.Padding(4);
-            this.txbZeilenFilter.Name = "ZeilenFilter_TextFeld";
+            this.txbZeilenFilter.Name = "txbZeilenFilter";
             this.txbZeilenFilter.QuickInfo = "Texte können mit <b>+</b> kombiniert werden.<br><i>Kein Leerzeichen beim +-Zeiche" +
     "n benutzen.";
             this.txbZeilenFilter.Size = new System.Drawing.Size(136, 22);
@@ -58,23 +58,22 @@
             // btnAlleFilterAus
             // 
             this.btnAlleFilterAus.ImageCode = "Trichter|16|||||||||Kreuz";
-            this.btnAlleFilterAus.Location = new System.Drawing.Point(176, 16);
+            this.btnAlleFilterAus.Location = new System.Drawing.Point(176, 8);
             this.btnAlleFilterAus.Margin = new System.Windows.Forms.Padding(4);
-            this.btnAlleFilterAus.Name = "AlleFilterAus";
+            this.btnAlleFilterAus.Name = "btnAlleFilterAus";
             this.btnAlleFilterAus.Size = new System.Drawing.Size(128, 24);
             this.btnAlleFilterAus.TabIndex = 12;
             this.btnAlleFilterAus.Text = "alle Filter aus";
             this.btnAlleFilterAus.Click += new System.EventHandler(this.btnAlleFilterAus_Click);
             // 
-            // Suchleiste
+            // Filterleiste
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.btnTextLöschen);
             this.Controls.Add(this.txbZeilenFilter);
             this.Controls.Add(this.btnAlleFilterAus);
-            this.Name = "Suchleiste";
+            this.Name = "Filterleiste";
             this.Size = new System.Drawing.Size(951, 53);
+            this.GroupBoxStyle = Enums.enGroupBoxStyle.Nothing;
             this.ResumeLayout(false);
 
         }
