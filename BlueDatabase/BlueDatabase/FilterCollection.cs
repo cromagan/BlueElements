@@ -120,12 +120,12 @@ namespace BlueDatabase
 
         public void Add(enFilterType filterType, string filterBy)
         {
-            Add(new FilterItem(Database, filterType, filterBy));
+            AddIfNotExists(new FilterItem(Database, filterType, filterBy));
         }
 
         public void Add(enFilterType filterType, List<string> filterBy)
         {
-            Add(new FilterItem(Database, filterType, filterBy));
+            AddIfNotExists(new FilterItem(Database, filterType, filterBy));
         }
 
 
@@ -143,15 +143,20 @@ namespace BlueDatabase
 
         public void Add(ColumnItem column, enFilterType filterType, List<string> filterBy)
         {
-            Add(new FilterItem(column, filterType, filterBy));
+            AddIfNotExists(new FilterItem(column, filterType, filterBy));
         }
 
 
         public void Add(ColumnItem column, enFilterType filterType, string filterBy)
         {
-            Add(new FilterItem(column, filterType, filterBy));
+            AddIfNotExists(new FilterItem(column, filterType, filterBy));
         }
 
+        private void AddIfNotExists(FilterItem filterItem)
+        {
+            if (Exists(filterItem)) { return; }
+            Add(filterItem);
+        }
 
         protected override void OnItemAdded(FilterItem item)
         {
@@ -174,9 +179,9 @@ namespace BlueDatabase
             }
 
 
-            if (item.SearchValue != null && item.SearchValue.Count >1)
+            if (item.SearchValue != null && item.SearchValue.Count > 1)
             {
-                if (!item.FilterType.HasFlag(enFilterType.UND ) && !item.FilterType.HasFlag(enFilterType.ODER))
+                if (!item.FilterType.HasFlag(enFilterType.UND) && !item.FilterType.HasFlag(enFilterType.ODER))
                 {
                     Develop.DebugPrint(enFehlerArt.Warnung, "UND/ODER fehlt");
                 }
@@ -192,70 +197,70 @@ namespace BlueDatabase
             //var Und1 = false;
             //var TMPFilter1 = filterType;
 
-                //var Oder2 = false;
-                //var Und2 = false;
+            //var Oder2 = false;
+            //var Und2 = false;
 
-                //if (Convert.ToBoolean(TMPFilter1 & enFilterType.UND))
-                //{
-                //    Und1 = true;
-                //    TMPFilter1 = TMPFilter1 ^ enFilterType.UND;
-                //}
-                //if (Convert.ToBoolean(TMPFilter1 & enFilterType.ODER))
-                //{
-                //    Oder1 = true;
-                //    TMPFilter1 = TMPFilter1 ^ enFilterType.ODER;
-                //}
-
-
-                //foreach (var ThisFilterItem in this)
-                //{
-                //    if (ThisFilterItem != null)
-                //    {
+            //if (Convert.ToBoolean(TMPFilter1 & enFilterType.UND))
+            //{
+            //    Und1 = true;
+            //    TMPFilter1 = TMPFilter1 ^ enFilterType.UND;
+            //}
+            //if (Convert.ToBoolean(TMPFilter1 & enFilterType.ODER))
+            //{
+            //    Oder1 = true;
+            //    TMPFilter1 = TMPFilter1 ^ enFilterType.ODER;
+            //}
 
 
-                //        if (ThisFilterItem.Column == Column)
-                //        {
-                //            var TMPFilter2 = ThisFilterItem.filterType;
-                //            if (Convert.ToBoolean(TMPFilter2 & enFilterType.UND))
-                //            {
-                //                Und2 = true;
-                //                TMPFilter2 = TMPFilter2 ^ enFilterType.UND;
-                //            }
-                //            if (Convert.ToBoolean(TMPFilter2 & enFilterType.ODER))
-                //            {
-                //                Oder2 = true;
-                //                TMPFilter2 = TMPFilter2 ^ enFilterType.ODER;
-                //            }
-
-                //            if (TMPFilter1 == TMPFilter2)
-                //            {
-                //                if (ThisFilterItem.SearchValue.Contains(FilterValue) && Und1 == Und2 && Oder1 == Oder2) { return; }// Filter genau so schon im gebrauch
-
-                //                if (Und1 == false && Und2 == false && Oder1 == false && Oder2 == false) { Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Vergleichmethode!"); }
-                //                if (Und1 != Und2) { Und1 = true; }
-                //                if (Oder1 != Oder2) { Oder1 = true; }
-                //                if (Und1 == Oder1) { Develop.DebugPrint(enFehlerArt.Fehler, "Doppelte Vergleichmethode!"); }
-
-                //                if (Und1) { ThisFilterItem.filterType = TMPFilter1 | enFilterType.UND; }
-                //                if (Oder1) { ThisFilterItem.filterType = TMPFilter1 | enFilterType.ODER; }
-                //                ThisFilterItem.SearchValue.Add(FilterValue); // KEIN Cutend, es kann ja sein, daﬂ nach LEEREN auch gesucht wird!
-
-                //                return;
-                //            }
-                //        }
-
-                //    }
-                //}
+            //foreach (var ThisFilterItem in this)
+            //{
+            //    if (ThisFilterItem != null)
+            //    {
 
 
-                //if (Column == null)
-                //{
-                //    base.Add(new FilterItem(Database, filterType, FilterValue));
-                //}
-                //else
-                //{
-                //    base.Add(new FilterItem(Column, filterType, FilterValue));
-                //}
+            //        if (ThisFilterItem.Column == Column)
+            //        {
+            //            var TMPFilter2 = ThisFilterItem.filterType;
+            //            if (Convert.ToBoolean(TMPFilter2 & enFilterType.UND))
+            //            {
+            //                Und2 = true;
+            //                TMPFilter2 = TMPFilter2 ^ enFilterType.UND;
+            //            }
+            //            if (Convert.ToBoolean(TMPFilter2 & enFilterType.ODER))
+            //            {
+            //                Oder2 = true;
+            //                TMPFilter2 = TMPFilter2 ^ enFilterType.ODER;
+            //            }
+
+            //            if (TMPFilter1 == TMPFilter2)
+            //            {
+            //                if (ThisFilterItem.SearchValue.Contains(FilterValue) && Und1 == Und2 && Oder1 == Oder2) { return; }// Filter genau so schon im gebrauch
+
+            //                if (Und1 == false && Und2 == false && Oder1 == false && Oder2 == false) { Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Vergleichmethode!"); }
+            //                if (Und1 != Und2) { Und1 = true; }
+            //                if (Oder1 != Oder2) { Oder1 = true; }
+            //                if (Und1 == Oder1) { Develop.DebugPrint(enFehlerArt.Fehler, "Doppelte Vergleichmethode!"); }
+
+            //                if (Und1) { ThisFilterItem.filterType = TMPFilter1 | enFilterType.UND; }
+            //                if (Oder1) { ThisFilterItem.filterType = TMPFilter1 | enFilterType.ODER; }
+            //                ThisFilterItem.SearchValue.Add(FilterValue); // KEIN Cutend, es kann ja sein, daﬂ nach LEEREN auch gesucht wird!
+
+            //                return;
+            //            }
+            //        }
+
+            //    }
+            //}
+
+
+            //if (Column == null)
+            //{
+            //    base.Add(new FilterItem(Database, filterType, FilterValue));
+            //}
+            //else
+            //{
+            //    base.Add(new FilterItem(Column, filterType, FilterValue));
+            //}
 
 
 
@@ -326,7 +331,7 @@ namespace BlueDatabase
                 switch (pair.Key)
                 {
                     case "filter":
-                        Add(new FilterItem(Database, pair.Value));
+                        AddIfNotExists(new FilterItem(Database, pair.Value));
                         break;
                     default:
                         Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);

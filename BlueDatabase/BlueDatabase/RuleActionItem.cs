@@ -363,7 +363,7 @@ namespace BlueDatabase
 
                     foreach (var t in Columns)
                     {
-                        var erg2 = StringErgebnis(_Text, Row);
+                        var erg2 = Row.ReplaceVariables(_Text);
                         if (erg2 == _Text)
                         {
                             return "Der Text der Spalte '#Spalte:" + t.Name + "' konnte nicht erstellt werden.";
@@ -557,47 +557,12 @@ namespace BlueDatabase
         {
             if (!Text.ToUpper().Contains(oldName.ToUpper())) { return; }
             _Text = _Text.Replace("&" + oldName + ";", "&" + cColumnItem.Name + ";", RegexOptions.IgnoreCase);
+            _Text = _Text.Replace("&" + oldName + "(", "&" + cColumnItem.Name + "(", RegexOptions.IgnoreCase);
             OnChanged();
         }
 
 
-        private string StringErgebnis(string formel, RowItem Row)
-        {
-
-            var erg = formel;
-
-            // Variablen ersetzen
-            foreach (var thisColumnItem in Row.Database.Column)
-            {
-                if (thisColumnItem != null)
-                {
-                    var w = Row.CellGetString(thisColumnItem);
-                    erg = erg.Replace("&" + thisColumnItem.Name.ToUpper() + ";", w, RegexOptions.IgnoreCase);
-
-
-                    while (erg.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + "("))
-                    {
-                        var x = erg.ToUpper().IndexOf("&" + thisColumnItem.Name.ToUpper() + "(");
-
-                        var x2 = erg.IndexOf(")", x);
-                        if (x2 < x) { return erg; }
-
-                        var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
-                        ww = ww.Replace(" ", string.Empty).ToUpper();
-                        var vals = ww.SplitBy(",");
-                        if (vals.Length != 2) { return formel; }
-                        if (vals[0] != "L") { return formel; }
-                        if (!int.TryParse(vals[1], out var Stellen)) { return formel; }
-
-                        var newW = w.Substring(0, Math.Min(Stellen, w.Length));
-                        erg = erg.Replace(erg.Substring(x, x2 - x + 1), newW);
-                    }
-                }
-            }
-
-
-            return erg;
-        }
+ 
 
         private static double? MatheErgebnis(string Formel, RowItem Row)
         {
@@ -606,18 +571,7 @@ namespace BlueDatabase
             Formel = Formel.ToUpper();
             Formel = Formel.RemoveChars(" \r\n");
 
-            // Variablen ersetzen
-            foreach (var thisColumnItem in Row.Database.Column)
-            {
-                if (thisColumnItem != null)
-                {
-                    var w = "0";
-                    if (!Row.CellIsNullOrEmpty(thisColumnItem)) { w = Row.CellGetString(thisColumnItem); }
-                    Formel = Formel.Replace("&" + thisColumnItem.Name.ToUpper() + ";", w);
-                }
-
-            }
-
+            Formel = Row.ReplaceVariablesForMath(Formel);
 
             Formel = Formel.ToUpper();
             Formel = Formel.RemoveChars(" \r\n");

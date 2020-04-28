@@ -679,6 +679,75 @@ namespace BlueDatabase
 
 
         /// <summary>
+        /// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; Leere ZEllen werden mit 0 ersetzt.
+        /// </summary>
+        /// <param name="formel"></param>
+        /// <returns></returns>
+        public string ReplaceVariablesForMath(string formel)
+        {
+    
+            // Variablen ersetzen
+            foreach (var thisColumnItem in Database.Column)
+            {
+                if (thisColumnItem != null)
+                {
+                    var w = "0";
+                    if (!CellIsNullOrEmpty(thisColumnItem)) { w = CellGetString(thisColumnItem); }
+                    formel = formel.Replace("&" + thisColumnItem.Name.ToUpper() + ";", w);
+                }
+
+            }
+
+            return formel;
+        }
+
+        /// <summary>
+        /// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; oder &Spaltenname(L,8);
+        /// </summary>
+        /// <param name="formel"></param>
+        /// <returns></returns>
+        public string ReplaceVariables(string formel)
+        {
+
+            var erg = formel;
+
+            // Variablen ersetzen
+            foreach (var thisColumnItem in Database.Column)
+            {
+                if (thisColumnItem != null)
+                {
+                    var w = CellGetString(thisColumnItem);
+                    erg = erg.Replace("&" + thisColumnItem.Name.ToUpper() + ";", w, RegexOptions.IgnoreCase);
+
+
+                    while (erg.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + "("))
+                    {
+                        var x = erg.ToUpper().IndexOf("&" + thisColumnItem.Name.ToUpper() + "(");
+
+                        var x2 = erg.IndexOf(")", x);
+                        if (x2 < x) { return erg; }
+
+                        var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
+                        ww = ww.Replace(" ", string.Empty).ToUpper();
+                        var vals = ww.SplitBy(",");
+                        if (vals.Length != 2) { return formel; }
+                        if (vals[0] != "L") { return formel; }
+                        if (!int.TryParse(vals[1], out var Stellen)) { return formel; }
+
+                        var newW = w.Substring(0, Math.Min(Stellen, w.Length));
+                        erg = erg.Replace(erg.Substring(x, x2 - x + 1), newW);
+                    }
+                }
+            }
+
+
+            return erg;
+        }
+
+
+
+
+        /// <summary>
         /// Erstellt einen Sortierfähigen String eine Zeile
         /// </summary>
         /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
