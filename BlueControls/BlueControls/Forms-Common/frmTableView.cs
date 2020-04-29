@@ -507,7 +507,7 @@ namespace BlueControls.Forms
 
         private void Filter_ZeilenFilterSetzen()
         {
-            if (TableView.Database != null) { TableView.Filter.Delete_RowFilter(); }
+            if (TableView.Database != null) { TableView.Filter.Remove_RowFilter(); }
 
             if (TableView.Database != null && !string.IsNullOrEmpty(ZeilenFilter_TextFeld.Text))
             {

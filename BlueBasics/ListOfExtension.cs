@@ -360,7 +360,7 @@ namespace BlueBasics
 
             if (_String == null) { return string.Empty; }
 
-            var uTagName = TagName.ToUpper();
+            var uTagName = TagName.ToUpper().Trim();
 
             foreach (var ThisString in _String)
             {

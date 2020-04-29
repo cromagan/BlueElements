@@ -123,7 +123,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void Filter_ZeilenFilterSetzen()
         {
-            if (_TableView.Database != null) { _TableView.Filter.Delete_RowFilter(); }
+            if (_TableView.Database != null) { _TableView.Filter.Remove_RowFilter(); }
 
             if (_TableView.Database != null && !string.IsNullOrEmpty(txbZeilenFilter.Text))
             {

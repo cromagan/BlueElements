@@ -75,45 +75,61 @@ namespace BlueDatabase
 
 
 
-        public void Delete(ColumnItem column)
+        public void Remove(ColumnItem column)
         {
 
-            var Again = true;
+            var toDel = new List<FilterItem>();
 
-            while (Again)
+            foreach (var thisFilter in this)
             {
-                Again = false;
-
-
-                foreach (var ThisFilterItem in this)
+                if (thisFilter.Column == column)
                 {
-                    if (ThisFilterItem != null)
-                    {
-                        if (ThisFilterItem.Column == column)
-                        {
-                            Remove(ThisFilterItem);
-                            Again = true;
-                            break;
-                        }
-                    }
+
+                    toDel.Add(thisFilter);
                 }
 
             }
 
+            if (toDel.Count ==0) { return; }
+
+            RemoveRange(toDel);
+
+            //var Again = true;
+
+            //while (Again)
+            //{
+            //    Again = false;
+
+
+            //    foreach (var ThisFilterItem in this)
+            //    {
+            //        if (ThisFilterItem != null)
+            //        {
+            //            if (ThisFilterItem.Column == column)
+            //            {
+            //                Remove(ThisFilterItem);
+            //                Again = true;
+            //                break;
+            //            }
+            //        }
+            //    }
+
+            //}
+
         }
 
-        public void Delete(string ColumnName)
+        public void Remove(string columnName)
         {
 
-            var tmp = Database.Column[ColumnName];
-            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + ColumnName + "' nicht vorhanden."); }
+            var tmp = Database.Column[columnName];
+            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
 
-            Delete(tmp);
+            Remove(tmp);
         }
 
-        public void Delete_RowFilter()
+        public void Remove_RowFilter()
         {
-            Delete((ColumnItem)null);
+            Remove((ColumnItem)null);
         }
 
 
@@ -375,22 +391,22 @@ namespace BlueDatabase
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public void DeleteOtherAndAddIfNotExists(string columName, enFilterType filterType, string filterBy)
+        public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, string filterBy)
         {
 
             var tmp = Database.Column[columName];
             if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
 
 
-            DeleteOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy));
+            RemoveOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy));
         }
 
-        public void DeleteOtherAndAddIfNotExists(FilterItem filterItem)
+        public void RemoveOtherAndAddIfNotExists(FilterItem filterItem)
         {
 
             if (Exists(filterItem)) { return; }
 
-            Delete(filterItem.Column);
+            Remove(filterItem.Column);
 
             if (Exists(filterItem)) { return; } // Falls ein Event ausgelöst wurde, und es nun doch schon das ist
 
@@ -420,13 +436,13 @@ namespace BlueDatabase
             return false;
         }
 
-        public void DeleteOtherAndAddIfNotExists(string columName, enFilterType filterType, List<string> filterBy)
+        public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, List<string> filterBy)
         {
 
             var tmp = Database.Column[columName];
             if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
 
-            DeleteOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy));
+            RemoveOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy));
         }
     }
 }

@@ -2132,16 +2132,16 @@ namespace BlueControls.Controls
                     break;
 
                 case "filter":
-                    Filter.Delete(e.Column);
+                    Filter.Remove(e.Column);
                     Filter.Add(e.Filter);
                     break;
 
                 case "filterdelete":
-                    Filter.Delete(e.Column);
+                    Filter.Remove(e.Column);
                     break;
 
                 case "doeinzigartig":
-                    Filter.Delete(e.Column);
+                    Filter.Remove(e.Column);
                     e.Column.GetUniques(SortedRows(), out var Einzigartig, out var NichtEinzigartig);
 
                     if (Einzigartig.Count > 0)
@@ -2156,7 +2156,7 @@ namespace BlueControls.Controls
                     break;
 
                 case "donichteinzigartig":
-                    Filter.Delete(e.Column);
+                    Filter.Remove(e.Column);
                     e.Column.GetUniques(SortedRows(), out var xEinzigartig, out var xNichtEinzigartig);
 
                     if (xNichtEinzigartig.Count > 0)

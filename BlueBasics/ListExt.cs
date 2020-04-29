@@ -102,6 +102,17 @@ namespace BlueBasics
 
         }
 
+
+        public void RemoveRange(IEnumerable<T> collection)
+        {
+ 
+            foreach (var item in collection)
+            {
+                Remove(item);
+            }
+        }
+
+
         public new void Insert(int index, T item)
         {
             if (index > Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch!"); }
