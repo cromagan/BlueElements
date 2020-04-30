@@ -86,7 +86,6 @@ namespace BlueControls.Controls
             // 
             // Caption2
             // 
-            this.Caption2.CausesValidation = false;
             this.Caption2.Location = new System.Drawing.Point(8, 272);
             this.Caption2.Name = "Caption2";
             this.Caption2.Size = new System.Drawing.Size(130, 16);
@@ -130,7 +129,6 @@ namespace BlueControls.Controls
             // 
             // capUeberschrift
             // 
-            this.capUeberschrift.CausesValidation = false;
             this.capUeberschrift.Location = new System.Drawing.Point(8, 224);
             this.capUeberschrift.Name = "Caption1";
             this.capUeberschrift.Size = new System.Drawing.Size(64, 16);
@@ -138,7 +136,6 @@ namespace BlueControls.Controls
             // 
             // BlueLine2
             // 
-            this.BlueLine2.CausesValidation = false;
             this.BlueLine2.Location = new System.Drawing.Point(8, 320);
             this.BlueLine2.Name = "BlueLine2";
             this.BlueLine2.Size = new System.Drawing.Size(160, 2);
@@ -170,7 +167,6 @@ namespace BlueControls.Controls
             // 
             // BlueLine1
             // 
-            this.BlueLine1.CausesValidation = false;
             this.BlueLine1.Location = new System.Drawing.Point(8, 88);
             this.BlueLine1.Name = "BlueLine1";
             this.BlueLine1.Size = new System.Drawing.Size(160, 2);

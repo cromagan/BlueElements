@@ -1192,9 +1192,7 @@ namespace BlueControls.Controls
                 if (!IsLastRow) { DrawString = "..."; }// Die Letzte Zeile noch ganz hinschreiben
             }
 
-            var tmpImageCode = CellItem.StandardImage(ContentHolderColumnStyle, DrawString);
-
-            Draw_FormatedText(GR, ContentHolderColumnStyle, DrawString, tmpImageCode, r, false, vfont, enShortenStyle.Replaced);
+            Draw_FormatedText(GR, ContentHolderColumnStyle, DrawString, r, false, vfont, enShortenStyle.Replaced, enStates.Standard);
         }
 
 
@@ -4360,29 +4358,46 @@ namespace BlueControls.Controls
 
 
         /// <summary>
-        /// Zeichnet den Text und das Bild ohne weitere Modifikation
+        /// Der Status des Bildes wird geändert, Texte werden gekürzt
         /// </summary>
-        /// <param name="GR"></param>
+        /// <param name="gr"></param>
         /// <param name="column"></param>
-        /// <param name="Txt"></param>
-        /// <param name="ImageCode"></param>
-        /// <param name="vAlign"></param>
-        /// <param name="FitInRect"></param>
+        /// <param name="originalText"></param>
+        /// <param name="fitInRect"></param>
         /// <param name="Child"></param>
-        /// <param name="DeleteBack"></param>
-        /// <param name="F"></param>
-        private static void Draw_FormatedText(Graphics GR, ColumnItem column, string Txt, QuickImage ImageCode, Rectangle FitInRect, bool DeleteBack, BlueFont F, enShortenStyle Style)
+        /// <param name="deleteBack"></param>
+        /// <param name="font"></param>
+        private static void Draw_FormatedText(Graphics gr, ColumnItem column, string originalText, Rectangle fitInRect, bool deleteBack, BlueFont font, enShortenStyle style, enStates state)
         {
 
-            var tmpText = CellItem.ValueReadable(column, Txt, Style);
+            var tmpText = CellItem.ValueReadable(column, originalText, style);
             var tmpAlign = CellItem.StandardAlignment(column);
+            QuickImage tmpImageCode = null;
 
-            Skin.Draw_FormatedText(GR, tmpText, ImageCode, tmpAlign, FitInRect, null, DeleteBack, F, false);
+            if (style == enShortenStyle.Replaced)
+            {
+                tmpImageCode = CellItem.StandardImage(column, tmpText);
+            }
+            else
+            {
+                var tmpText2 = CellItem.ValueReadable(column, originalText, enShortenStyle.Replaced);
+                tmpImageCode = CellItem.StandardImage(column, tmpText2);
+            }
+
+            hhh
+
+            if (tmpImageCode != null)
+            {
+                tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state));
+            }
+
+            Skin.Draw_FormatedText(gr, tmpText, tmpImageCode, tmpAlign, fitInRect, null, deleteBack, font, false);
         }
 
 
         /// <summary>
-        /// Status des Bildes (Disabled) wird geändert
+        /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werdern.
+        /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
         /// </summary>
         public static void Draw_FormatedText(ColumnItem column, string Txt, Graphics GR, Rectangle FitInRect, bool DeleteBack, enShortenStyle Style, enDesign vDesign, enStates vState)
         {
@@ -4395,24 +4410,27 @@ namespace BlueControls.Controls
             BlueFont f = null;
             if (!string.IsNullOrEmpty(Txt)) { f = Skin.GetBlueFont(SkinRow); }
 
-
-
-            var tmpImage = CellItem.StandardImage(column, Txt);
-
-
-            if (tmpImage != null)
-            {
-                tmpImage = QuickImage.Get(tmpImage, Skin.AdditionalState(vState));
-            }
-
-
-            Draw_FormatedText(GR, column, Txt, tmpImage, FitInRect, DeleteBack, f, Style);
+            Draw_FormatedText(GR, column, Txt, FitInRect, DeleteBack, f, Style, vState);
         }
 
         public static Size FormatedText_NeededSize(ColumnItem Column, string txt, BlueFont F, enShortenStyle Style, int MinSize)
         {
             var tmpText = CellItem.ValueReadable(Column, txt, Style);
-            var tmpImageCode = CellItem.StandardImage(Column, txt);
+            QuickImage tmpImageCode = null;
+
+            hhh
+
+            if (Style == enShortenStyle.Replaced)
+            {
+                tmpImageCode = CellItem.StandardImage(Column, tmpText);
+            }
+            else
+            {
+                var tmpText2 = CellItem.ValueReadable(Column, txt, enShortenStyle.Replaced);
+                tmpImageCode = CellItem.StandardImage(Column, tmpText2);
+            }
+
+
 
 
             return Skin.FormatedText_NeededSize(tmpText, tmpImageCode, F, MinSize);
