@@ -100,19 +100,19 @@ namespace BlueDatabase
 
             if (!column.MultiLine)
             {
-                ret.Add(ValueReadable(column, Row.CellGetString(column), Style));
+                ret.Add(ValueReadable(column, Row.CellGetString(column), Style, column.CompactView));
                 return ret;
             }
 
             var x = Row.CellGetList(column);
             foreach (var thisstring in x)
             {
-                ret.Add(ValueReadable(column, thisstring, Style));
+                ret.Add(ValueReadable(column, thisstring, Style, column.CompactView));
             }
 
             if (x.Count == 0)
             {
-                var tmp = ValueReadable(column, string.Empty, Style);
+                var tmp = ValueReadable(column, string.Empty, Style, column.CompactView);
                 if (!string.IsNullOrEmpty(tmp)) { ret.Add(tmp); }
             }
 
@@ -129,7 +129,7 @@ namespace BlueDatabase
         /// <param name="Txt"></param>
         /// <param name="Style"></param>
         /// <returns></returns>
-        public static string ValueReadable(ColumnItem column, string Txt, enShortenStyle Style)
+        public static string ValueReadable(ColumnItem column, string Txt, enShortenStyle Style, bool CompactView)
         {
 
             switch (column.Format)
@@ -151,13 +151,13 @@ namespace BlueDatabase
 
 
                 case enDataFormat.BildCode:
-                    if (column.CompactView && Style != enShortenStyle.HTML) { return string.Empty; }
+                    if (CompactView && Style != enShortenStyle.HTML) { return string.Empty; }
                     Txt = LanguageTool.ColumnReplace(Txt, column, Style);
                     break;
 
 
                 case enDataFormat.Bit:
-                    if (column.CompactView && Style != enShortenStyle.HTML) { return string.Empty; }
+                    if (CompactView && Style != enShortenStyle.HTML) { return string.Empty; }
                     if (Txt == true.ToPlusMinus())
                     {
                         Txt = "Ja";
@@ -185,7 +185,7 @@ namespace BlueDatabase
 
                 case enDataFormat.FarbeInteger:
                     if (Style == enShortenStyle.HTML) { break; }
-                    if (column.CompactView) { return string.Empty; }
+                    if (CompactView) { return string.Empty; }
                     if (!string.IsNullOrEmpty(Txt) && Txt.IsFormat(enDataFormat.FarbeInteger))
                     {
                         var col = Color.FromArgb(int.Parse(Txt));
@@ -200,7 +200,7 @@ namespace BlueDatabase
                     //    Develop.DebugPrint_NichtImplementiert();
                     //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return Txt; }
 
-                    //if (Column.CompactView) { return string.Empty; }
+                    //if (CompactView) { return string.Empty; }
                     //return BlueFont.Get(Txt).ReadableText();
                     return Txt;
 

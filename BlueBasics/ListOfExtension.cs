@@ -116,27 +116,36 @@ namespace BlueBasics
 
         }
 
-
-        public static bool IsDifferentTo<T>(this List<T> List1, List<T> List2) where T : IParseable
+        public static bool IsDifferentTo<T>(this List<T> List1, List<T> List2) 
         {
-            if (List1.Count != List2.Count) { return true; }
-
-            return List1.Where((t, Count) => t.ToString() != List2[Count].ToString()).Any();
+            //https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
+            if (List1 == List2) { return false; }
+            if (List1 is null || List2 is null) { return true; }
+            return !List1.SequenceEqual(List2);
         }
 
 
-        public static bool IsDifferentTo(this List<string> List1, List<string> List2)
-        {
-            if (List1.Count != List2.Count) { return true; }
 
-            return List1.Where((t, Count) => t != List2[Count]).Any();
-        }
-        public static bool IsDifferentTo(this List<string> List1, BindingList<string> List2)
-        {
-            if (List1.Count != List2.Count) { return true; }
+        //public static bool IsDifferentTo<T>(this List<T> List1, List<T> List2) where T : IParseable
+        //{
+        //    if (List1.Count != List2.Count) { return true; }
 
-            return List1.Where((t, Count) => t != List2[Count]).Any();
-        }
+        //    return List1.Where((t, Count) => t.ToString() != List2[Count].ToString()).Any();
+        //}
+
+
+        //public static bool IsDifferentTo(this List<string> List1, List<string> List2)
+        //{
+        //    if (List1.Count != List2.Count) { return true; }
+
+        //    return List1.Where((t, Count) => t != List2[Count]).Any();
+        //}
+        //public static bool IsDifferentTo(this List<string> List1, BindingList<string> List2)
+        //{
+        //    if (List1.Count != List2.Count) { return true; }
+
+        //    return List1.Where((t, Count) => t != List2[Count]).Any();
+        //}
 
 
 
@@ -159,21 +168,20 @@ namespace BlueBasics
         }
 
 
-        /// <summary>
-        /// Falls der Dateityp String ist, WIRD zwischen Gross und Kleinschreibung unterschieden!
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="L"></param>
-        /// <param name="Value"></param>
-        public static void Remove<T>(this List<T> L, List<T> Value) where T : IComparable
-        {
-            foreach (var Item in Value)
-            {
-                L.Remove(Item);
-            }
-        }
-
-
+        ///// <summary>
+        ///// Falls der Dateityp String ist, WIRD zwischen Gross und Kleinschreibung unterschieden!
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="L"></param>
+        ///// <param name="Value"></param>
+        //public static void Remove<T>(this List<T> L, List<T> Value) where T : IComparable
+        //{
+        //    foreach (var Item in Value)
+        //    {
+        //        L.Remove(Item);
+        //    }
+        //}
+  
         public static void RemoveNullOrEmpty(this List<string> L)
         {
             var z = 0;

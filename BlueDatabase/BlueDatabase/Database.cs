@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using BlueBasics;
@@ -2907,25 +2908,19 @@ namespace BlueDatabase
 
             ChangeWorkItems(enItemState.Pending, enItemState.Undo);
 
-
-
             var FilesNewLCase = AllConnectedFilesLCase();
-            FilesAfterLoadingLCase.Remove(FilesNewLCase);
 
-            // Hier erst reintun, dass der Worker nicht zu früh reagiert!
             var Writer_FilesToDeleteLCase = new List<string>();
 
-            if (_VerwaisteDaten == enVerwaisteDaten.Löschen) { Writer_FilesToDeleteLCase.AddRange(FilesAfterLoadingLCase); }
-
-
+            if (_VerwaisteDaten == enVerwaisteDaten.Löschen)
+            {
+                Writer_FilesToDeleteLCase = FilesAfterLoadingLCase.Except(FilesNewLCase).ToList();
+            }
 
             FilesAfterLoadingLCase.Clear();
             FilesAfterLoadingLCase.AddRange(FilesNewLCase);
 
-
             if (Writer_FilesToDeleteLCase.Count > 0) { DeleteFile(Writer_FilesToDeleteLCase); }
-
-
         }
 
         protected override bool isSomethingDiscOperatingsBlocking()

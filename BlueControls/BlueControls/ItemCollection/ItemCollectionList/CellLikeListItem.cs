@@ -104,7 +104,7 @@ namespace BlueControls.ItemCollection
         protected override string GetCompareKey()
         {
             // Die hauptklasse frägt nach diesem Kompare-Key
-            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML);
+            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, _StyleLikeThis.CompactView);
             return DataFormat.CompareKey(txt, _StyleLikeThis.Format) + "|" + Internal;
         }
 
@@ -123,7 +123,7 @@ namespace BlueControls.ItemCollection
         public override bool FilterMatch(string FilterText)
         {
             if (base.FilterMatch(FilterText)) { return true; }
-            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both);
+            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, false);
             return txt.ToUpper().Contains(FilterText.ToUpper());
         }
 

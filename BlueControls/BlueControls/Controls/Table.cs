@@ -4370,21 +4370,30 @@ namespace BlueControls.Controls
         private static void Draw_FormatedText(Graphics gr, ColumnItem column, string originalText, Rectangle fitInRect, bool deleteBack, BlueFont font, enShortenStyle style, enStates state)
         {
 
-            var tmpText = CellItem.ValueReadable(column, originalText, style);
+            var tmpText = CellItem.ValueReadable(column, originalText, style, column.CompactView);
             var tmpAlign = CellItem.StandardAlignment(column);
             QuickImage tmpImageCode = null;
 
-            if (style == enShortenStyle.Replaced)
+
+
+            if (column.Format == enDataFormat.BildCode)
             {
-                tmpImageCode = CellItem.StandardImage(column, tmpText);
+                if (style == enShortenStyle.Replaced && !column.CompactView)
+                {
+                    tmpImageCode = CellItem.StandardImage(column, tmpText);
+                }
+                else
+                {
+                    var tmpText2 = CellItem.ValueReadable(column, originalText, enShortenStyle.Replaced, false);
+                    tmpImageCode = CellItem.StandardImage(column, tmpText2);
+                }
             }
             else
             {
-                var tmpText2 = CellItem.ValueReadable(column, originalText, enShortenStyle.Replaced);
-                tmpImageCode = CellItem.StandardImage(column, tmpText2);
+                tmpImageCode = CellItem.StandardImage(column, originalText);
             }
 
-            hhh
+
 
             if (tmpImageCode != null)
             {
@@ -4413,27 +4422,35 @@ namespace BlueControls.Controls
             Draw_FormatedText(GR, column, Txt, FitInRect, DeleteBack, f, Style, vState);
         }
 
-        public static Size FormatedText_NeededSize(ColumnItem Column, string txt, BlueFont F, enShortenStyle Style, int MinSize)
+        public static Size FormatedText_NeededSize(ColumnItem column, string originalText, BlueFont font, enShortenStyle style, int minSize)
         {
-            var tmpText = CellItem.ValueReadable(Column, txt, Style);
+            var tmpText = CellItem.ValueReadable(column, originalText, style, column.CompactView);
             QuickImage tmpImageCode = null;
 
-            hhh
 
-            if (Style == enShortenStyle.Replaced)
+
+            if (column.Format == enDataFormat.BildCode)
             {
-                tmpImageCode = CellItem.StandardImage(Column, tmpText);
+                if (style == enShortenStyle.Replaced && !column.CompactView)
+                {
+                    tmpImageCode = CellItem.StandardImage(column, tmpText);
+                }
+                else
+                {
+                    var tmpText2 = CellItem.ValueReadable(column, originalText, enShortenStyle.Replaced, false);
+                    tmpImageCode = CellItem.StandardImage(column, tmpText2);
+                }
             }
             else
             {
-                var tmpText2 = CellItem.ValueReadable(Column, txt, enShortenStyle.Replaced);
-                tmpImageCode = CellItem.StandardImage(Column, tmpText2);
+                tmpImageCode = CellItem.StandardImage(column, originalText);
             }
 
 
 
 
-            return Skin.FormatedText_NeededSize(tmpText, tmpImageCode, F, MinSize);
+
+            return Skin.FormatedText_NeededSize(tmpText, tmpImageCode, font, minSize);
         }
     }
 }

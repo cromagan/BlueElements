@@ -33,6 +33,7 @@ using BlueDatabase.Enums;
 using BlueControls.Enums;
 using System.Windows.Forms;
 using BlueControls.Designer_Support;
+using System.Linq;
 
 namespace BlueControls.Controls
 {
@@ -1154,7 +1155,7 @@ namespace BlueControls.Controls
 
             var _Soll = _Value.SplitByCRToList();
             var _Ist = Main.Item.ToListOfString();
-            _Ist.Remove(_Soll);
+            _Ist = _Ist.Except(_Soll).ToList();
 
 
             if (Suggest != null)

@@ -24,6 +24,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Reflection;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 
 namespace BlueBasics
@@ -67,6 +68,7 @@ namespace BlueBasics
 
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Changed;
+        public static event EventHandler<NeedImageEventArgs> NeedImage;
         #endregion
 
 
@@ -432,7 +434,7 @@ namespace BlueBasics
 
             if (_SearchedCode == Code) { return _FoundInde; }
 
-            for (var z = 0 ; z < PC.Count ; z++)
+            for (var z = 0; z < PC.Count; z++)
             {
                 if (Code == PC[z].ToString())
                 {
@@ -522,6 +524,19 @@ namespace BlueBasics
             var i = GetIndex(TMPName);
             if (i >= 0 && PC[i] != this) { return PC[i].BMP; }
 
+
+            var e = new NeedImageEventArgs(TMPName);
+
+            OnNeedImage(e);
+
+            if (e.BMP != null) { return e.BMP; }
+
+
+            // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen
+            var i2 = GetIndex(TMPName);
+            if (i2 >= 0 && PC[i2] != this) { return PC[i2].BMP; }
+
+
             return null;
         }
 
@@ -603,10 +618,10 @@ namespace BlueBasics
 
                 var c = new Color();
                 var c1 = new Color();
-                for (var X = 0 ; X < bmpOri.Width ; X++)
+                for (var X = 0; X < bmpOri.Width; X++)
                 {
 
-                    for (var Y = 0 ; Y < bmpOri.Height ; Y++)
+                    for (var Y = 0; Y < bmpOri.Height; Y++)
                     {
                         c = bmpOri.GetPixel(X, Y);
 
@@ -828,6 +843,12 @@ namespace BlueBasics
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
+
+        public void OnNeedImage(NeedImageEventArgs e)
+        {
+            NeedImage?.Invoke(this, e);
+        }
+
     }
 }
 
