@@ -373,52 +373,59 @@ namespace BlueBasics
             return null;
         }
 
-        public static QuickImage Get(enFileFormat File, int Size)
+
+        public static enImageCode FileTypeImage(enFileFormat File)
         {
+
             switch (File)
             {
                 case enFileFormat.WordKind:
-                    return Get(enImageCode.Word, Size);
+                    return enImageCode.Word;
                 case enFileFormat.ExcelKind:
-                    return Get(enImageCode.Excel, Size);
+                    return enImageCode.Excel;
                 case enFileFormat.PowerPointKind:
-                    return Get(enImageCode.PowerPoint, Size);
+                    return enImageCode.PowerPoint;
                 case enFileFormat.Textdocument:
-                    return Get(enImageCode.Textdatei, Size);
+                    return enImageCode.Textdatei;
                 case enFileFormat.EMail:
-                    return Get(enImageCode.Brief, Size);
+                    return enImageCode.Brief;
                 case enFileFormat.Pdf:
-                    return Get(enImageCode.PDF, Size);
+                    return enImageCode.PDF;
                 case enFileFormat.HTML:
-                    return Get(enImageCode.Globus, Size);
+                    return enImageCode.Globus;
                 case enFileFormat.Image:
-                    return Get(enImageCode.Bild, Size);
+                    return enImageCode.Bild;
                 case enFileFormat.CompressedArchive:
-                    return Get(enImageCode.Karton, Size);
+                    return enImageCode.Karton;
                 case enFileFormat.Movie:
-                    return Get(enImageCode.Filmrolle, Size);
+                    return enImageCode.Filmrolle;
                 case enFileFormat.Executable:
-                    return Get(enImageCode.Anwendung, Size);
+                    return enImageCode.Anwendung;
                 case enFileFormat.HelpFile:
-                    return Get(enImageCode.Frage, Size);
+                    return enImageCode.Frage;
                 case enFileFormat.Database:
-                    return Get(enImageCode.Skript, Size);
+                    return enImageCode.Datenbank;
                 case enFileFormat.XMLFile:
-                    return Get(enImageCode.XML, Size);
+                    return enImageCode.XML;
                 case enFileFormat.Visitenkarte:
-                    return Get(enImageCode.Visitenkarte, Size);
+                    return enImageCode.Visitenkarte;
                 case enFileFormat.Sound:
-                    return Get(enImageCode.Note, Size);
+                    return enImageCode.Note;
                 case enFileFormat.Unknown:
-                    return Get(enImageCode.Datei, Size);
+                    return enImageCode.Datei;
                 case enFileFormat.ProgrammingCode:
-                    return Get(enImageCode.Summe, Size);
+                    return enImageCode.Skript;
                 case enFileFormat.Link:
-                    return Get(enImageCode.Undo, Size);
+                    return enImageCode.Undo;
                 default:
                     Develop.DebugPrint(File);
-                    return Get(enImageCode.Datei, Size);
+                    return enImageCode.Datei;
             }
+        }
+
+        public static QuickImage Get(enFileFormat File, int Size)
+        {
+            return Get(FileTypeImage(File), Size);
         }
 
 

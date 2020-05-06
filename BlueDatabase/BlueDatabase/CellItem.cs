@@ -281,25 +281,36 @@ namespace BlueDatabase
 
 
                 case enDataFormat.BildCode:
-                    if ( column == null) { return null; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
+                    if (column == null) { return null; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
                     if (string.IsNullOrEmpty(Txt)) { return null; }
 
                     var code = column.Prefix + Txt + column.Suffix;
                     if (column.BildCode_ConstantHeight > 0) { code = code + "|" + column.BildCode_ConstantHeight; }
-                   var defaultImage = QuickImage.Get(code);
+                    var defaultImage = QuickImage.Get(code);
 
                     if (defaultImage != null && !defaultImage.IsError) { return defaultImage; }
 
-                    if (column.BildCode_ImageNotFound != enImageNotFound.ShowErrorPic) { return null; }
 
-                    if (column.BildCode_ConstantHeight > 0)
+
+                    var gr = 16;
+
+                    if (column.BildCode_ConstantHeight > 0) { gr = column.BildCode_ConstantHeight; }
+                    switch (column.BildCode_ImageNotFound)
                     {
-                        return QuickImage.Get("Fragezeichen|" + column.BildCode_ConstantHeight + "|||||200|||80");
+                        case enImageNotFound.Show_Error_QuestionMark:
+                            return QuickImage.Get("Fragezeichen|" + gr + "|||||200|||80");
+                        case enImageNotFound.Show_Yellow_Circle:
+                            return QuickImage.Get("Kreis2|" + gr);
+                        case enImageNotFound.Show_Red_Cross:
+                            return QuickImage.Get("Kreuz|" + gr);
+                        case enImageNotFound.Show_Green_Checkmark:
+                            return QuickImage.Get("Häkchen|" + gr);
+                        default:
+                            return null;
                     }
-                    else
-                    {
-                        return QuickImage.Get("Fragezeichen||||||200|||80");
-                    }
+
+
+
 
                 case enDataFormat.FarbeInteger:
 

@@ -5,6 +5,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueBasics;
 using System;
+using BlueBasics.Enums;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
@@ -13,10 +14,35 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private Table _TableView;
 
+        private enOrientation _orientation;
+
         public Filterleiste()
         {
             InitializeComponent();
             FillFilters();
+            SteuerelementeAnordnen();
+        }
+
+        private void SteuerelementeAnordnen()
+        {
+            throw new NotImplementedException();
+        }
+
+        [DefaultValue(enOrientation.Waagerecht)]
+        public enOrientation Orientation
+        {
+            get
+            {
+                return _orientation;
+            }
+            set
+            {
+                if (_orientation == value) { return; }
+                _orientation = value;
+                SteuerelementeAnordnen();
+
+            }
+
         }
 
         [DefaultValue((Table)null)]
@@ -57,23 +83,60 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void FillFilters()
         {
-            if (_TableView != null && _TableView.Database != null)
+
+            #region ZeilenFilter
+            if (_TableView != null && _TableView.Database != null && _TableView.Filter.IsRowFilterActiv())
             {
-                if (_TableView.Filter.IsRowFilterActiv())
-                {
-                    txbZeilenFilter.Text = _TableView.Filter.RowFilterText();
-                }
-                else
-                {
-                    txbZeilenFilter.Text = "";
-                }
+                txbZeilenFilter.Text = _TableView.Filter.RowFilterText();
             }
             else
             {
-                txbZeilenFilter.Text = "";
+                txbZeilenFilter.Text = string.Empty;
+            }
+            #endregion
+
+            // Vorhandene Flexis ermitteln
+            var flexvorhanden = new List<FlexiControlForFilter>();
+            foreach (var ThisControl in Controls)
+            {
+                if (ThisControl is FlexiControlForFilter flx) { flexvorhanden.Add(flx); }
             }
 
 
+            foreach (var thisFilter in _TableView.Filter)
+            {
+
+                if (thisFilter.Column is ColumnItem co)
+                {
+
+                    var flx = FlexiItemOf(co);
+                    flexvorhanden.Remove(flx);
+                    TupleExtensions richtig stellen
+
+                }
+
+            }
+
+
+        }
+
+
+        private FlexiControlForFilter FlexiItemOf(ColumnItem column)
+        {
+
+            foreach (var ThisControl in Controls)
+            {
+                if (ThisControl is FlexiControlForFilter flx)
+                {
+
+                    if (flx.ColumnKey == column.KeyColumnKey && flx.Database == column.Database)
+                    {
+                        return flx;
+                    }
+                }
+            }
+
+            return null;
 
         }
 
@@ -150,7 +213,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         public bool Textbox_hasFocus()
         {
-           return txbZeilenFilter.Focused();
+            return txbZeilenFilter.Focused();
         }
     }
 }

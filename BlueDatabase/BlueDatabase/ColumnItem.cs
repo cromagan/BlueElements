@@ -233,7 +233,7 @@ namespace BlueDatabase
 
             _LinkedKeyKennung = string.Empty;
             _LinkedDatabaseFile = string.Empty;
-            _BildCode_ImageNotFound = enImageNotFound.ShowErrorPic;
+            _BildCode_ImageNotFound = enImageNotFound.Show_Error_QuestionMark;
             _BildCode_ConstantHeight = 0;
             _Prefix = string.Empty;
             _BestFile_StandardSuffix = string.Empty;
