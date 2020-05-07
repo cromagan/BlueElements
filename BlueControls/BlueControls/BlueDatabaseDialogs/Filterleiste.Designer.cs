@@ -48,8 +48,6 @@
             this.txbZeilenFilter.Location = new System.Drawing.Point(8, 8);
             this.txbZeilenFilter.Margin = new System.Windows.Forms.Padding(4);
             this.txbZeilenFilter.Name = "txbZeilenFilter";
-            this.txbZeilenFilter.QuickInfo = "Texte können mit <b>+</b> kombiniert werden.<br><i>Kein Leerzeichen beim +-Zeiche" +
-    "n benutzen.";
             this.txbZeilenFilter.Size = new System.Drawing.Size(136, 22);
             this.txbZeilenFilter.TabIndex = 11;
             this.txbZeilenFilter.TextChanged += new System.EventHandler(this.txbZeilenFilter_TextChanged);

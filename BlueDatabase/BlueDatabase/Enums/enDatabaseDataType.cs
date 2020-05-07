@@ -183,6 +183,7 @@ namespace BlueDatabase.Enums
         co_ZellenZusammenfassen = 189,
         co_AutoRemove = 190,
         co_SaveContent = 191,
+        co_AutoFilter_Dauerfilter = 192,
 
 
 

@@ -3827,7 +3827,7 @@ namespace BlueControls.Controls
             Invalidate();
         }
 
-        internal void Filter_Changed(object sender, System.EventArgs e)
+        private void Filter_Changed(object sender, System.EventArgs e)
         {
             Invalidate_RowSort();
             Invalidate();

@@ -296,15 +296,35 @@ namespace BlueDatabase
             return false;
         }
 
-        public string RowFilterText()
+        public string RowFilterText
         {
 
-            foreach (var ThisFilterItem in this)
+            get
             {
-                if (ThisFilterItem != null && ThisFilterItem.Column == null) { return ThisFilterItem.SearchValue[0]; }
+                foreach (var ThisFilterItem in this)
+                {
+                    if (ThisFilterItem != null && ThisFilterItem.Column == null) { return ThisFilterItem.SearchValue[0]; }
+                }
+
+                return string.Empty;
+            }
+            set
+            {
+                foreach (var ThisFilterItem in this)
+                {
+                    if (ThisFilterItem != null && ThisFilterItem.Column == null)
+                    {
+                        if (ThisFilterItem.SearchValue[0].ToLower() == value.ToLower()) { return; }
+                        ThisFilterItem.SearchValue[0] = value;
+                        OnChanged();
+                        return;
+                    }
+                }
+
+                Add(new FilterItem(Database, enFilterType.Instr_UND_GroﬂKleinEgal, value));
+
             }
 
-            return string.Empty;
         }
 
 

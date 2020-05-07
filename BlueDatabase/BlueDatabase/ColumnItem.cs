@@ -132,6 +132,7 @@ namespace BlueDatabase
 
         private string _AutoRemove;
         private bool _SaveContent;
+        private bool _AutoFilter_Dauerfilter;
 
         private int _KeyColumnKey;
 
@@ -221,6 +222,7 @@ namespace BlueDatabase
             _AutoRemove = string.Empty;
             _AutoFilterJoker = string.Empty;
             _SaveContent = true;
+            _AutoFilter_Dauerfilter = false;
 
             _SpellCheckingEnabled = false;
 
@@ -944,6 +946,21 @@ namespace BlueDatabase
             }
         }
 
+        public bool AutoFilter_Dauerfilter
+        {
+            get
+            {
+                return _AutoFilter_Dauerfilter;
+            }
+            set
+            {
+                if (_AutoFilter_Dauerfilter == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_AutoFilter_Dauerfilter, this, _AutoFilter_Dauerfilter.ToPlusMinus(), value.ToPlusMinus(), true);
+                OnChanged();
+            }
+        }
+
+
 
         public int DropdownKey
         {
@@ -1522,6 +1539,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_AfterEdit_DoUcase: _AfterEdit_DoUCase = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_AfterEdit_AutoCorrect: _AfterEdit_AutoCorrect = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_SaveContent: _SaveContent = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_AutoFilter_Dauerfilter: _AutoFilter_Dauerfilter = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_AutoRemove: _AutoRemove = Wert; break;
                 case enDatabaseDataType.co_AdminInfo: _AdminInfo = Wert; break;
                 case enDatabaseDataType.co_Suffix: _Suffix = Wert; break;
@@ -1820,6 +1838,12 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_Runden, _AfterEdit_Runden.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoRemove, _AutoRemove, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_SaveContent, _SaveContent.ToPlusMinus(), Key);
+
+            if (_AutoFilter_Dauerfilter)
+            {
+                Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilter_Dauerfilter, _AutoFilter_Dauerfilter.ToPlusMinus(), Key);
+            }
+
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErlaubt, _AutofilterErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterTextFilterErlaubt, _AutofilterTextFilterErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErweitertErlaubt, _AutoFilterErweitertErlaubt.ToPlusMinus(), Key);

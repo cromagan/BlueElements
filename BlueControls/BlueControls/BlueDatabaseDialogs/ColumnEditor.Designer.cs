@@ -147,6 +147,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnTargetColumn = new BlueControls.Controls.Button();
             this.btnColumnKeyInColumn = new BlueControls.Controls.Button();
             this.capRowKeyInColumn = new BlueControls.Controls.Caption();
+            this.btnDauerFilter = new BlueControls.Controls.Button();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -252,7 +253,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capAlign
             // 
-            this.capAlign.CausesValidation = false;
             this.capAlign.Location = new System.Drawing.Point(384, 120);
             this.capAlign.Name = "capAlign";
             this.capAlign.Size = new System.Drawing.Size(104, 16);
@@ -268,7 +268,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // caption7
             // 
-            this.caption7.CausesValidation = false;
             this.caption7.Location = new System.Drawing.Point(8, 96);
             this.caption7.Name = "caption7";
             this.caption7.Size = new System.Drawing.Size(48, 16);
@@ -276,7 +275,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capUeberschrift3
             // 
-            this.capUeberschrift3.CausesValidation = false;
             this.capUeberschrift3.Location = new System.Drawing.Point(528, 56);
             this.capUeberschrift3.Name = "capUeberschrift3";
             this.capUeberschrift3.Size = new System.Drawing.Size(88, 16);
@@ -285,7 +283,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capUeberschrift2
             // 
-            this.capUeberschrift2.CausesValidation = false;
             this.capUeberschrift2.Location = new System.Drawing.Point(528, 32);
             this.capUeberschrift2.Name = "capUeberschrift2";
             this.capUeberschrift2.Size = new System.Drawing.Size(88, 16);
@@ -294,7 +291,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capUeberschrift1
             // 
-            this.capUeberschrift1.CausesValidation = false;
             this.capUeberschrift1.Location = new System.Drawing.Point(528, 8);
             this.capUeberschrift1.Name = "capUeberschrift1";
             this.capUeberschrift1.Size = new System.Drawing.Size(88, 16);
@@ -327,7 +323,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capReplacer
             // 
-            this.capReplacer.CausesValidation = false;
             this.capReplacer.Location = new System.Drawing.Point(8, 248);
             this.capReplacer.Name = "capReplacer";
             this.capReplacer.Size = new System.Drawing.Size(144, 24);
@@ -344,7 +339,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capEinheit
             // 
-            this.capEinheit.CausesValidation = false;
             this.capEinheit.Location = new System.Drawing.Point(8, 56);
             this.capEinheit.Name = "capEinheit";
             this.capEinheit.Size = new System.Drawing.Size(48, 32);
@@ -362,7 +356,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.picCaptionImage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.picCaptionImage.CausesValidation = false;
             this.picCaptionImage.Location = new System.Drawing.Point(528, 96);
             this.picCaptionImage.MaxSize = 300;
             this.picCaptionImage.Name = "picCaptionImage";
@@ -370,7 +363,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption6
             // 
-            this.Caption6.CausesValidation = false;
             this.Caption6.Location = new System.Drawing.Point(528, 80);
             this.Caption6.Name = "Caption6";
             this.Caption6.Size = new System.Drawing.Size(152, 24);
@@ -398,7 +390,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption16
             // 
-            this.Caption16.CausesValidation = false;
             this.Caption16.Location = new System.Drawing.Point(8, 8);
             this.Caption16.Name = "Caption16";
             this.Caption16.Size = new System.Drawing.Size(136, 16);
@@ -443,7 +434,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption1
             // 
-            this.Caption1.CausesValidation = false;
             this.Caption1.Location = new System.Drawing.Point(248, 72);
             this.Caption1.Name = "Caption1";
             this.Caption1.Size = new System.Drawing.Size(80, 16);
@@ -452,7 +442,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption4
             // 
-            this.Caption4.CausesValidation = false;
             this.Caption4.Location = new System.Drawing.Point(384, 72);
             this.Caption4.Name = "Caption4";
             this.Caption4.Size = new System.Drawing.Size(88, 16);
@@ -491,7 +480,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capBildCodeImageNotfound
             // 
-            this.capBildCodeImageNotfound.CausesValidation = false;
             this.capBildCodeImageNotfound.Location = new System.Drawing.Point(8, 40);
             this.capBildCodeImageNotfound.Name = "capBildCodeImageNotfound";
             this.capBildCodeImageNotfound.Size = new System.Drawing.Size(184, 16);
@@ -499,7 +487,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capBildCodeConstHeight
             // 
-            this.capBildCodeConstHeight.CausesValidation = false;
             this.capBildCodeConstHeight.Location = new System.Drawing.Point(8, 16);
             this.capBildCodeConstHeight.Name = "capBildCodeConstHeight";
             this.capBildCodeConstHeight.Size = new System.Drawing.Size(184, 16);
@@ -573,7 +560,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption15
             // 
-            this.Caption15.CausesValidation = false;
             this.Caption15.Location = new System.Drawing.Point(8, 48);
             this.Caption15.Name = "Caption15";
             this.Caption15.Size = new System.Drawing.Size(216, 16);
@@ -604,7 +590,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // capDropDownKey
             // 
             this.capDropDownKey.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.capDropDownKey.CausesValidation = false;
             this.capDropDownKey.Location = new System.Drawing.Point(24, 336);
             this.capDropDownKey.Name = "capDropDownKey";
             this.capDropDownKey.Size = new System.Drawing.Size(208, 40);
@@ -645,7 +630,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption9
             // 
-            this.Caption9.CausesValidation = false;
             this.Caption9.Location = new System.Drawing.Point(576, 16);
             this.Caption9.Name = "Caption9";
             this.Caption9.Size = new System.Drawing.Size(328, 32);
@@ -694,7 +678,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capAutoRemove
             // 
-            this.capAutoRemove.CausesValidation = false;
             this.capAutoRemove.Location = new System.Drawing.Point(8, 360);
             this.capAutoRemove.Name = "capAutoRemove";
             this.capAutoRemove.Size = new System.Drawing.Size(568, 16);
@@ -723,7 +706,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption12
             // 
-            this.Caption12.CausesValidation = false;
             this.Caption12.Location = new System.Drawing.Point(8, 16);
             this.Caption12.Name = "Caption12";
             this.Caption12.Size = new System.Drawing.Size(568, 16);
@@ -731,7 +713,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capSchlüsselspalte
             // 
-            this.capSchlüsselspalte.CausesValidation = false;
             this.capSchlüsselspalte.Location = new System.Drawing.Point(8, 304);
             this.capSchlüsselspalte.Name = "capSchlüsselspalte";
             this.capSchlüsselspalte.Size = new System.Drawing.Size(392, 40);
@@ -778,7 +759,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capVorschlag
             // 
-            this.capVorschlag.CausesValidation = false;
             this.capVorschlag.Location = new System.Drawing.Point(8, 256);
             this.capVorschlag.Name = "capVorschlag";
             this.capVorschlag.Size = new System.Drawing.Size(392, 40);
@@ -788,7 +768,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption11
             // 
-            this.Caption11.CausesValidation = false;
             this.Caption11.Location = new System.Drawing.Point(8, 128);
             this.Caption11.Name = "Caption11";
             this.Caption11.Size = new System.Drawing.Size(328, 16);
@@ -805,6 +784,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabFilter
             // 
+            this.tabFilter.Controls.Add(this.btnDauerFilter);
             this.tabFilter.Controls.Add(this.Caption10);
             this.tabFilter.Controls.Add(this.tbxJoker);
             this.tabFilter.Controls.Add(this.ZeilenFilter);
@@ -821,7 +801,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption10
             // 
-            this.Caption10.CausesValidation = false;
             this.Caption10.Location = new System.Drawing.Point(8, 104);
             this.Caption10.Name = "Caption10";
             this.Caption10.Size = new System.Drawing.Size(312, 56);
@@ -918,7 +897,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // Caption18
             // 
             this.Caption18.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Caption18.CausesValidation = false;
             this.Caption18.Location = new System.Drawing.Point(560, 8);
             this.Caption18.Name = "Caption18";
             this.Caption18.Size = new System.Drawing.Size(188, 15);
@@ -927,7 +905,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption17
             // 
-            this.Caption17.CausesValidation = false;
             this.Caption17.Location = new System.Drawing.Point(8, 8);
             this.Caption17.Name = "Caption17";
             this.Caption17.Size = new System.Drawing.Size(168, 16);
@@ -1010,7 +987,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capSortiermaske
             // 
-            this.capSortiermaske.CausesValidation = false;
             this.capSortiermaske.Location = new System.Drawing.Point(512, 288);
             this.capSortiermaske.Name = "capSortiermaske";
             this.capSortiermaske.Size = new System.Drawing.Size(152, 24);
@@ -1028,7 +1004,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capRegex
             // 
-            this.capRegex.CausesValidation = false;
             this.capRegex.Location = new System.Drawing.Point(512, 104);
             this.capRegex.Name = "capRegex";
             this.capRegex.Size = new System.Drawing.Size(388, 17);
@@ -1047,7 +1022,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // Caption13
             // 
             this.Caption13.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Caption13.CausesValidation = false;
             this.Caption13.Location = new System.Drawing.Point(513, 24);
             this.Caption13.Name = "Caption13";
             this.Caption13.Size = new System.Drawing.Size(392, 24);
@@ -1069,7 +1043,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption8
             // 
-            this.Caption8.CausesValidation = false;
             this.Caption8.Location = new System.Drawing.Point(4, 15);
             this.Caption8.Name = "Caption8";
             this.Caption8.Size = new System.Drawing.Size(144, 16);
@@ -1086,7 +1059,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capLinkedKeyKennung
             // 
-            this.capLinkedKeyKennung.CausesValidation = false;
             this.capLinkedKeyKennung.Location = new System.Drawing.Point(8, 24);
             this.capLinkedKeyKennung.Name = "capLinkedKeyKennung";
             this.capLinkedKeyKennung.Size = new System.Drawing.Size(224, 16);
@@ -1103,7 +1075,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capLinkedDatabase
             // 
-            this.capLinkedDatabase.CausesValidation = false;
             this.capLinkedDatabase.Location = new System.Drawing.Point(12, 25);
             this.capLinkedDatabase.Name = "capLinkedDatabase";
             this.capLinkedDatabase.Size = new System.Drawing.Size(152, 16);
@@ -1111,7 +1082,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capBestFileStandardSuffix
             // 
-            this.capBestFileStandardSuffix.CausesValidation = false;
             this.capBestFileStandardSuffix.Location = new System.Drawing.Point(8, 72);
             this.capBestFileStandardSuffix.Name = "capBestFileStandardSuffix";
             this.capBestFileStandardSuffix.Size = new System.Drawing.Size(264, 16);
@@ -1127,7 +1097,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capBestFileStandardFolder
             // 
-            this.capBestFileStandardFolder.CausesValidation = false;
             this.capBestFileStandardFolder.Location = new System.Drawing.Point(8, 24);
             this.capBestFileStandardFolder.Name = "capBestFileStandardFolder";
             this.capBestFileStandardFolder.Size = new System.Drawing.Size(320, 16);
@@ -1159,7 +1128,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capInfo
             // 
-            this.capInfo.CausesValidation = false;
             this.capInfo.Location = new System.Drawing.Point(8, 16);
             this.capInfo.Name = "capInfo";
             this.capInfo.Size = new System.Drawing.Size(280, 19);
@@ -1168,7 +1136,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption3
             // 
-            this.Caption3.CausesValidation = false;
             this.Caption3.Location = new System.Drawing.Point(8, 40);
             this.Caption3.Name = "Caption3";
             this.Caption3.Size = new System.Drawing.Size(136, 16);
@@ -1186,7 +1153,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption2
             // 
-            this.Caption2.CausesValidation = false;
             this.Caption2.Location = new System.Drawing.Point(312, 16);
             this.Caption2.Name = "Caption2";
             this.Caption2.Size = new System.Drawing.Size(144, 16);
@@ -1341,7 +1307,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.line1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.line1.CausesValidation = false;
             this.line1.Location = new System.Drawing.Point(8, 56);
             this.line1.Name = "line1";
             this.line1.Size = new System.Drawing.Size(856, 2);
@@ -1401,11 +1366,19 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capRowKeyInColumn
             // 
-            this.capRowKeyInColumn.CausesValidation = false;
             this.capRowKeyInColumn.Location = new System.Drawing.Point(8, 24);
             this.capRowKeyInColumn.Name = "capRowKeyInColumn";
             this.capRowKeyInColumn.Size = new System.Drawing.Size(320, 16);
             this.capRowKeyInColumn.Text = "Die zu suchende Zeile ist in dieser Spalte zu finden:";
+            // 
+            // btnDauerFilter
+            // 
+            this.btnDauerFilter.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnDauerFilter.Location = new System.Drawing.Point(8, 248);
+            this.btnDauerFilter.Name = "btnDauerFilter";
+            this.btnDauerFilter.Size = new System.Drawing.Size(304, 16);
+            this.btnDauerFilter.TabIndex = 8;
+            this.btnDauerFilter.Text = "Standardmäßig als Dauerfilter anzeigen";
             // 
             // ColumnEditor
             // 
@@ -1488,18 +1461,18 @@ namespace BlueControls.BlueDatabaseDialogs
 			private Button btnIgnoreLock;
 			private Button btnLogUndo;
 			private Button btnSpellChecking;
-			internal EasyPic picCaptionImage;
+			private EasyPic picCaptionImage;
 			private Caption Caption6;
-			internal Caption capEinheit;
-			internal ComboBox cbxEinheit;
-			internal TextBox tbxJoker;
-			internal Caption Caption10;
-			internal TextBox tbxInitValue;
-			internal Caption Caption12;
+			private Caption capEinheit;
+			private ComboBox cbxEinheit;
+			private TextBox tbxJoker;
+			private Caption Caption10;
+			private TextBox tbxInitValue;
+			private Caption Caption12;
 			private Button btnAutoEditKleineFehler;
 			private Button btnAutoEditToUpper;
-			internal TextBox tbxRunden;
-			internal Caption Caption11;
+			private TextBox tbxRunden;
+			private Caption Caption11;
 			private Button btnAutoEditAutoSort;
             private ComboBox cbxBildCodeImageNotfound;
             private Caption capBildCodeImageNotfound;
@@ -1507,7 +1480,7 @@ namespace BlueControls.BlueDatabaseDialogs
             private TextBox txbBildCodeConstHeight;
             private TextBox txbLinkedKeyKennung;
             private Caption capLinkedKeyKennung;
-            internal ComboBox cbxLinkedDatabase;
+            private ComboBox cbxLinkedDatabase;
             private Caption capLinkedDatabase;
             private Caption capBestFileStandardSuffix;
             private TextBox txbBestFileStandardSuffix;
@@ -1525,37 +1498,38 @@ namespace BlueControls.BlueDatabaseDialogs
             private TextBox txbZeichenkette;
             private TextBox txbReplacer;
             private Caption capReplacer;
-        private Caption capUeberschrift3;
-        private Caption capUeberschrift2;
-        private Caption capUeberschrift1;
-        private TextBox txbUeberschift3;
-        private TextBox txbUeberschift2;
-        private TextBox txbUeberschift1;
-        private GroupBox grpBildCode;
-        private TextBox txbPrefix;
-        private Caption caption7;
-        private Button btnStandard;
-        private Button btnKompakteAnzeige;
-        private TabPage tabSpezial;
-        private GroupBox grpLinkToFileSystem;
-        private GroupBox grpLinkedDatabase;
-        private ComboBox cbxSchlüsselspalte;
-        private Caption capSchlüsselspalte;
-        private GroupBox grpColumnsForLinkedDatabase;
-        private TextBox txbSortMask;
-        private Caption capSortiermaske;
-        private TextBox txbRegex;
-        private Caption capRegex;
-        private ComboBox cbxAlign;
-        private Caption capAlign;
-        private ComboBox cbxVorschlagSpalte;
-        private Caption capVorschlag;
-        private ComboBox cbxDropDownKey;
-        private Caption capDropDownKey;
-        private Button butZusammenfassen;
-        private GroupBox grpAuswahlmenuOptionen;
-        internal TextBox txbAutoRemove;
-        internal Caption capAutoRemove;
-        private Button butSaveContent;
+            private Caption capUeberschrift3;
+            private Caption capUeberschrift2;
+            private Caption capUeberschrift1;
+            private TextBox txbUeberschift3;
+            private TextBox txbUeberschift2;
+            private TextBox txbUeberschift1;
+            private GroupBox grpBildCode;
+            private TextBox txbPrefix;
+            private Caption caption7;
+            private Button btnStandard;
+            private Button btnKompakteAnzeige;
+            private TabPage tabSpezial;
+            private GroupBox grpLinkToFileSystem;
+            private GroupBox grpLinkedDatabase;
+            private ComboBox cbxSchlüsselspalte;
+            private Caption capSchlüsselspalte;
+            private GroupBox grpColumnsForLinkedDatabase;
+            private TextBox txbSortMask;
+            private Caption capSortiermaske;
+            private TextBox txbRegex;
+            private Caption capRegex;
+            private ComboBox cbxAlign;
+            private Caption capAlign;
+            private ComboBox cbxVorschlagSpalte;
+            private Caption capVorschlag;
+            private ComboBox cbxDropDownKey;
+            private Caption capDropDownKey;
+            private Button butZusammenfassen;
+            private GroupBox grpAuswahlmenuOptionen;
+            private TextBox txbAutoRemove;
+            private Caption capAutoRemove;
+            private Button butSaveContent;
+        private Button btnDauerFilter;
     }
 	}

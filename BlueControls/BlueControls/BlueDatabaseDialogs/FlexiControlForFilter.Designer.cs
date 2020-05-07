@@ -31,15 +31,7 @@ namespace BlueControls.Controls
         /// </summary>
         private void InitializeComponent()
         {
-            this.Marker = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
-            // 
-            // Marker
-            // 
-            this.Marker.WorkerReportsProgress = true;
-            this.Marker.WorkerSupportsCancellation = true;
-            this.Marker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.Marker_DoWork);
-            this.Marker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.Marker_ProgressChanged);
             // 
             // FlexiControlForCell
             // 
@@ -49,7 +41,5 @@ namespace BlueControls.Controls
         }
 
         #endregion
-
-        private BackgroundWorker Marker;
     }
 }

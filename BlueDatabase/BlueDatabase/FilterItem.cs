@@ -204,13 +204,33 @@ namespace BlueDatabase
         {
 
 
-            if (_Column == null) { return "Spezial-Zeilen-Filter"; }
-            if (SearchValue == null || SearchValue.Count != 1) { return "Special-Wert-Filter"; }
+            if (_Column == null) { return "Zeilen-Filter"; }
 
-            if (_Column == Database.Column.SysCorrect)
+            var nam = _Column.ReadableText();
+
+            if (SearchValue == null || SearchValue.Count < 1) { return "#### Filter-Fehler ####"; }
+
+            if (SearchValue.Count > 1)
             {
-                if (Convert.ToBoolean(FilterType & enFilterType.Istgleich) && SearchValue[0].FromPlusMinus()) { return "Muss fehlerfrei sein"; }
-                if (Convert.ToBoolean(FilterType & enFilterType.Istgleich) && !SearchValue[0].FromPlusMinus()) { return "Muss Fehler haben"; }
+                switch (_FilterType)
+                {
+                    case enFilterType.IstGleich_ODER:
+                        return nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'";
+                    default:
+
+
+                        return nam + ": Spezial-Filter";
+                }
+
+            }
+
+
+
+
+            if (_Column == Database.Column.SysCorrect && _FilterType.HasFlag(enFilterType.Istgleich))
+            {
+                if (SearchValue[0].FromPlusMinus()) { return "Fehlerfrei"; }
+                if (!SearchValue[0].FromPlusMinus()) { return "Fehlerhaft"; }
             }
 
 
@@ -219,27 +239,27 @@ namespace BlueDatabase
                 case enFilterType.Istgleich:
                 case enFilterType.Istgleich_GroﬂKleinEgal:
                 case enFilterType.Istgleich_ODER_GroﬂKleinEgal:
-                    return "'" + _Column.ReadableText() + "' = " + SearchValue[0];
+                    return nam + " = " + SearchValue[0];
 
                 case enFilterType.Ungleich_MultiRowIgnorieren:
                 case enFilterType.Ungleich_MultiRowIgnorieren_UND_GroﬂKleinEgal:
                 case enFilterType.Ungleich_MultiRowIgnorieren_GroﬂKleinEgal:
-                    if (string.IsNullOrEmpty(SearchValue[0])) { return "'" + _Column.ReadableText() + "' muss bef¸llt sein"; }
-                    return "'" + _Column.ReadableText() + "' <> " + SearchValue[0];
+                    if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss bef¸llt sein"; }
+                    return nam + " <> " + SearchValue[0];
 
 
                 case enFilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren:
                 case enFilterType.Istgleich_MultiRowIgnorieren:
-                    if (SearchValue.Count == 1 && string.IsNullOrEmpty(SearchValue[0])) { return "'" + _Column.ReadableText() + "' muss leer sein"; }
+                    if (SearchValue.Count == 1 && string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
                     return "Spezial-Filter";
 
 
                 case enFilterType.Instr:
                 case enFilterType.Instr_GroﬂKleinEgal:
-                    return "'" + _Column.ReadableText() + "' beinhaltet den Text '" + SearchValue[0] + "'";
+                    return nam + " beinhaltet den Text '" + SearchValue[0] + "'";
 
                 default:
-                    return "Spezial-Filter";
+                    return nam + "Spezial-Filter";
 
             }
         }

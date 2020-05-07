@@ -221,6 +221,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             txbAutoRemove.Text = _Column.AutoRemove;
             butSaveContent.Checked = _Column.SaveContent;
+            btnDauerFilter.Checked = _Column.AutoFilter_Dauerfilter;
 
 
             cbxSchlüsselspalte.Item.Clear();
@@ -555,6 +556,7 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.SortMask = txbSortMask.Text;
             _Column.AutoRemove = txbAutoRemove.Text;
             _Column.SaveContent = butSaveContent.Checked;
+            _Column.AutoFilter_Dauerfilter = btnDauerFilter.Checked;
 
             //// Regel: Wenn Leer, gib Fehler aus
             //var tmpR = _Column.Database.Rules_Has(_Column, "Leer-Fehler");

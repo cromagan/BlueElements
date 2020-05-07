@@ -45,7 +45,7 @@ namespace BlueBasics
 
         public static string JoinWith(this ICollection<string> IC, string JoinChar)
         {
-            return string.Join(JoinChar, IC.ToArray()).TrimEnd(JoinChar);
+            return string.Join(JoinChar, IC.ToArray()); // .TrimEnd(JoinChar);
         }
 
 
