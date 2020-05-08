@@ -58,9 +58,9 @@ namespace BlueDatabase
         public FilterItem(Database database, enFilterType filterType, List<string> searchValue)
         {
             Database = database;
-            SearchValue = new List<string>();
             _FilterType = filterType;
             if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
+            SearchValue.ListOrItemChanged += SearchValue_ListOrItemChanged;
         }
 
 
@@ -68,6 +68,7 @@ namespace BlueDatabase
         {
             Database = database;
             Parse(FilterCode);
+            SearchValue.ListOrItemChanged += SearchValue_ListOrItemChanged;
         }
 
         public FilterItem(ColumnItem column, enFilterType filterType, string searchValue) : this(column, filterType, new List<string>() { searchValue }) { }
@@ -83,8 +84,8 @@ namespace BlueDatabase
             _FilterType = filterType;
 
             if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
+            SearchValue.ListOrItemChanged += SearchValue_ListOrItemChanged;
         }
-
 
         #endregion
 
@@ -107,7 +108,7 @@ namespace BlueDatabase
         }
 
 
-        public List<string> SearchValue { get; private set; } = new List<string>();
+        public ListExt<string> SearchValue { get; private set; } = new ListExt<string>();
 
         public enFilterType FilterType
         {
@@ -214,7 +215,9 @@ namespace BlueDatabase
             {
                 switch (_FilterType)
                 {
-                    case enFilterType.IstGleich_ODER:
+                    case enFilterType.Istgleich:
+                    case enFilterType.Istgleich_GroﬂKleinEgal:
+                    case enFilterType.Istgleich_ODER_GroﬂKleinEgal:
                         return nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'";
                     default:
 
@@ -239,6 +242,7 @@ namespace BlueDatabase
                 case enFilterType.Istgleich:
                 case enFilterType.Istgleich_GroﬂKleinEgal:
                 case enFilterType.Istgleich_ODER_GroﬂKleinEgal:
+                case enFilterType.Istgleich_UND_GroﬂKleinEgal:
                     return nam + " = " + SearchValue[0];
 
                 case enFilterType.Ungleich_MultiRowIgnorieren:
@@ -256,10 +260,12 @@ namespace BlueDatabase
 
                 case enFilterType.Instr:
                 case enFilterType.Instr_GroﬂKleinEgal:
+                    if (SearchValue.Count == 0 || string.IsNullOrEmpty(SearchValue[0])) { return "Filter aktuell ohne Funktion"; }
+
                     return nam + " beinhaltet den Text '" + SearchValue[0] + "'";
 
                 default:
-                    return nam + "Spezial-Filter";
+                    return nam + ": Spezial-Filter";
 
             }
         }
@@ -293,6 +299,20 @@ namespace BlueDatabase
             return string.Empty;
         }
 
+        private void SearchValue_ListOrItemChanged(object sender, System.EventArgs e)
+        {
+            OnChanged();
+        }
 
+        public void Changeto(enFilterType type, string searchvalue)
+        {
+            SearchValue.ThrowEvents = false;
+
+            SearchValue.Clear();
+            SearchValue.Add(searchvalue);
+            _FilterType = type;
+            SearchValue.ThrowEvents = true;
+            OnChanged();
+        }
     }
 }

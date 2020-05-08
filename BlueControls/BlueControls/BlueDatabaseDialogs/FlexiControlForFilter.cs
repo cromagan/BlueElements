@@ -18,24 +18,12 @@
 #endregion
 
 using System.Drawing;
-using System.Drawing.Imaging;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using BlueDatabase.EventArgs;
 using BlueDatabase.Enums;
-using static BlueBasics.FileOperations;
-using System.Collections.Generic;
-using BlueControls.Enums;
-using System;
 using BlueControls.Designer_Support;
 using System.ComponentModel;
-using BlueControls.EventArgs;
-using System.Windows.Forms;
-using BlueControls.BlueDatabaseDialogs;
+using System.Collections.Generic;
 
 namespace BlueControls.Controls
 {
@@ -44,130 +32,14 @@ namespace BlueControls.Controls
     {
 
 
-
+        /// <summary>
+        /// ACHTUNG: Das Control wird niemals den Filter selbst ändern.
+        /// Der Filter wird nur zur einfacheren Identifizierung der nachfolgenden Steuerelemente behalten.
+        /// </summary>
         public readonly FilterItem Filter = null;
-        // Für automatisches Datenbank-Management
-        //private int _ColKey = -1;
-        //private int _RowKey = -1;
-        //private Database _Database = null;
 
+        List<string> AllItems = null;
 
-        //private ColumnItem _tmpColumn = null;
-        //private RowItem _tmpRow = null;
-
-        //public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
-        //public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
-
-        //public int RowKey
-        //{
-        //    get
-        //    {
-        //        return _RowKey;
-        //    }
-        //    set
-        //    {
-        //        if (value == _RowKey) { return; }
-        //        FillCellNow();
-
-        //        _RowKey = value;
-        //        GetTmpVariables();
-        //        SetValueFromCell();
-        //        CheckEnabledState();
-        //    }
-        //}
-
-        //public int ColumnKey
-        //{
-        //    get
-        //    {
-        //        return _ColKey;
-        //    }
-        //    set
-        //    {
-        //        if (value == _ColKey) { return; }
-        //        FillCellNow();
-
-        //        _ColKey = value;
-        //        GetTmpVariables();
-        //        UpdateColumnData();
-        //        SetValueFromCell();
-
-        //    }
-        //}
-
-        //public Database Database
-        //{
-        //    get
-        //    {
-        //        return _Database;
-        //    }
-        //    set
-        //    {
-        //        if (value == _Database) { return; }
-
-        //        FillCellNow();
-
-        //        if (_Database != null)
-        //        {
-        //            _Database.Cell.CellValueChanged -= Database_CellValueChanged;
-        //            _Database.Row.RowRemoved -= Database_RowRemoved;
-        //            _Database.Column.ItemInternalChanged -= Column_ItemInternalChanged;
-        //            _Database.ConnectedControlsStopAllWorking -= Database_ConnectedControlsStopAllWorking;
-        //            _Database.Row.RowChecked -= Database_RowChecked;
-        //            _Database.RowKeyChanged -= _Database_RowKeyChanged;
-        //            _Database.Loaded -= _Database_Loaded;
-        //        }
-
-        //        _Database = value;
-        //        GetTmpVariables();
-        //        UpdateColumnData();
-
-        //        if (_Database != null)
-        //        {
-        //            _Database.Cell.CellValueChanged += Database_CellValueChanged;
-        //            _Database.Row.RowRemoved += Database_RowRemoved;
-        //            _Database.Column.ItemInternalChanged += Column_ItemInternalChanged;
-        //            _Database.ConnectedControlsStopAllWorking += Database_ConnectedControlsStopAllWorking;
-        //            _Database.Row.RowChecked += Database_RowChecked;
-        //            _Database.RowKeyChanged += _Database_RowKeyChanged;
-        //            _Database.Loaded += _Database_Loaded;
-        //            //V.Column.Database.ColumnKeyChanged += _Database_ColumnKeyChanged; // Columns sind als Objektverweis vermerkt
-
-        //        }
-
-        //        CheckEnabledState();
-        //    }
-        //}
-
-        //private void _Database_Loaded(object sender, LoadedEventArgs e)
-        //{
-        //    if (InvokeRequired)
-        //    {
-        //        Invoke(new Action(() => _Database_Loaded(sender, e)));
-        //        return;
-        //    }
-
-        //    UpdateColumnData();
-        //    SetValueFromCell();
-        //}
-
-        //private void GetTmpVariables()
-        //{
-
-
-
-        //    if (_Database != null)
-        //    {
-        //        _tmpColumn = _Database.Column.SearchByKey(_ColKey);
-        //        _tmpRow = _Database.Row.SearchByKey(_RowKey);
-        //    }
-        //    else
-        //    {
-        //        _tmpColumn = null;
-        //        _tmpRow = null;
-        //    }
-
-        //}
 
         public FlexiControlForFilter() : this(null, enÜberschriftAnordnung.Links_neben_Dem_Feld)
         {
@@ -185,20 +57,9 @@ namespace BlueControls.Controls
             Filter = filter;
             UpdateFilterData();
 
+            InstantChangedEvent = true;
+
             Filter.Changed += Filter_Changed;
-            //if (Filter.Column != null)
-            //{
-            //    Caption = Filter.Column.Caption.Replace("\r", " ").Replace("\n", " ").Replace("  ", " ").TrimEnd(":") + ":";
-            //    //EditType = _tmpColumn.EditType;
-            //    QuickInfo = Filter.Column.QickInfoText(string.Empty);
-            //    //FileEncryptionKey = _Database.FileEncryptionKey;
-
-            //}
-
-            //ShowInfoWhenDisabled = true;
-            //CaptionPosition = captionPosition;
-            //Database = database;
-            //ColumnKey = columnKey;
         }
 
         private void Filter_Changed(object sender, System.EventArgs e)
@@ -220,9 +81,19 @@ namespace BlueControls.Controls
             else
             {
                 Enabled = true;
-                Caption = Filter.Column.Caption.Replace("\r", " ").Replace("\n", " ").Replace("  ", " ").TrimEnd(":") + ":";
-                //EditType = _tmpColumn.EditType;
-                QuickInfo = Filter.Column.QickInfoText(string.Empty);
+                Caption = Filter.Column.ReadableText() + ":";
+
+                var qi = Filter.Column.QickInfoText(string.Empty);
+
+                if (string.IsNullOrEmpty(qi))
+                {
+                    QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText();
+                }
+                else
+                {
+                    QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText() + "<br><br><b>Info:</b><br>" + qi;
+                }
+
 
 
                 if (!Filter.Column.AutoFilterErlaubt)
@@ -232,211 +103,23 @@ namespace BlueControls.Controls
                 else
                 {
 
-                    if (Filter.FilterType == enFilterType.Instr_GroßKleinEgal && Filter.SearchValue.Count <2)
+                    if (Filter.FilterType == enFilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1)
                     {
                         CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
                         EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
+
+                        Value = Filter.SearchValue[0];
                     }
                     else
                     {
                         CaptionPosition = enÜberschriftAnordnung.ohne;
                         EditType = enEditTypeFormula.Button;
                     }
-
-
-
-                    //GStyleCom
-
-                    ////if (Filter.Column.AutofilterTextFilterErlaubt)
-                    ////{
-
-                    ////}
-                    ////else
-                    ////{
-
-                    ////}
-
-
                 }
 
-                //FileEncryptionKey = _Database.FileEncryptionKey;
             }
         }
 
-        //private void Database_RowChecked(object sender, RowCheckedEventArgs e)
-        //{
-        //    if (e.Row != _tmpRow) { return; }
-
-        //    var NewT = string.Empty;
-
-        //    foreach (var ThisString in e.ColumnsWithErrors)
-        //    {
-
-        //        var X = ThisString.SplitBy("|");
-        //        if (_tmpColumn != null && X[0].ToUpper() == _tmpColumn.Name.ToUpper())
-        //        {
-        //            if (!string.IsNullOrEmpty(InfoText)) { InfoText = InfoText + "<br><hr><br>"; }
-        //            NewT = NewT + X[1];
-        //        }
-
-        //    }
-        //    InfoText = NewT;
-        //}
-        //private void Database_RowRemoved(object sender, System.EventArgs e)
-        //{
-        //    GetTmpVariables();
-        //    RowKey = -1;
-        //}
-
-        //private void Database_CellValueChanged(object sender, CellEventArgs e)
-        //{
-        //    if (e.Row != _tmpRow) { return; }
-
-
-        //    if (e.Column == _tmpColumn)
-        //    {
-        //        SetValueFromCell();
-        //        CheckEnabledState();
-        //    }
-
-
-        //    if (e.Column == e.Column.Database.Column.SysLocked)
-        //    {
-        //        CheckEnabledState();
-        //    }
-
-        //}
-
-        //private void SetValueFromCell()
-        //{
-
-
-        //    if (_tmpColumn == null || _tmpRow == null)
-        //    {
-        //        Value = string.Empty;
-        //        InfoText = string.Empty;
-        //        return;
-        //    }
-
-
-
-        //    switch (_tmpColumn.Format)
-        //    {
-        //        case enDataFormat.Link_To_Filesystem:
-        //            var tmp = _tmpRow.CellGetList(_tmpColumn);
-        //            var tmp2 = new List<string>();
-        //            foreach (var file in tmp)
-        //            {
-        //                var tmpF = _tmpColumn.BestFile(file, false);
-        //                if (FileExists(tmpF))
-        //                {
-        //                    tmp2.Add(tmpF);
-        //                }
-        //                else
-        //                {
-        //                    tmp2.Add(file);
-        //                }
-        //            }
-
-        //            Value = tmp2.JoinWithCr();
-
-        //            if (Value.ToUpper() != tmp2.JoinWithCr().ToUpper())
-        //            {
-        //                Develop.DebugPrint(enFehlerArt.Warnung, "Werte ungleich: " + Value + " - " + tmp2.JoinWithCr());
-        //            }
-        //            break;
-
-        //        default:
-        //            Value = _tmpRow.CellGetString(_tmpColumn);
-        //            break;
-
-
-        //    }
-
-
-
-        //}
-
-        //private void Database_ConnectedControlsStopAllWorking(object sender, System.EventArgs e)
-        //{
-        //    FillCellNow();
-        //}
-
-        //private void Column_ItemInternalChanged(object sender, ListEventArgs e)
-        //{
-        //    if ((ColumnItem)e.Item == _tmpColumn)
-        //    {
-        //        UpdateColumnData();
-        //        CheckEnabledState();
-        //        OnNeedRefresh();
-        //    }
-        //}
-
-
-
-
-
-        //internal void CheckEnabledState()
-        //{
-
-
-        //    if (Parent == null || !Parent.Enabled || _tmpColumn == null || _tmpRow == null)
-        //    {
-        //        Enabled = false;
-        //        return;
-        //    }
-
-        //    Enabled = CellCollection.UserEditPossible(_tmpColumn, _tmpRow, enErrorReason.EditNormaly); // Rechteverwaltung einfliesen lassen.
-        //}
-
-
-        //private void FillCellNow()
-        //{
-        //    if (_IsFilling) { return; }
-
-        //    if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
-        //    GetTmpVariables(); // Falls der Key inzwischen nicht mehr in der Collection ist, deswegen neu prüfen. RowREmoved greift zwar, kann aber durchaus erst nach RowSortesd/CursorposChanges auftreten.
-
-
-        //    if (_tmpColumn == null || _tmpRow == null) { return; }
-
-        //    var OldVal = _tmpRow.CellGetString(_tmpColumn);
-        //    var NewValue = string.Empty;
-
-        //    switch (_tmpColumn.Format)
-        //    {
-        //        case enDataFormat.Link_To_Filesystem:
-        //            var tmp = Value.SplitByCRToList();
-        //            var tmp2 = new List<string>();
-
-        //            foreach (var file in tmp)
-        //            {
-        //                tmp2.Add(_tmpColumn.SimplyFile(file));
-        //            }
-        //            NewValue = tmp2.JoinWithCr();
-        //            break;
-
-        //        default:
-        //            NewValue = Value;
-        //            break;
-
-
-        //    }
-
-        //    if (OldVal == NewValue) { return; }
-
-
-        //    _tmpRow.Database.WaitEditable();
-
-        //    _tmpRow.CellSet(_tmpColumn, NewValue);
-        //    if (OldVal != _tmpRow.CellGetString(_tmpColumn)) { _tmpRow.DoAutomatic(false, false); }
-        //}
-
-
-        //private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e)
-        //{
-        //    e.File = _Database;
-        //}
 
 
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)
@@ -448,15 +131,7 @@ namespace BlueControls.Controls
             {
                 var Item2 = new ItemCollectionList();
                 ItemCollectionList.GetItemCollection(Item2, Filter.Column, null, enShortenStyle.Unreplaced, 10000);
-
-                //if (column1.TextBearbeitungErlaubt)
-                //{
                 StyleComboBox(cbx, Item2, System.Windows.Forms.ComboBoxStyle.DropDown);
-                //}
-                //else
-                //{
-                //    StyleComboBox(comboBox, Item2, System.Windows.Forms.ComboBoxStyle.DropDownList);
-                //}
             }
 
 
@@ -466,504 +141,36 @@ namespace BlueControls.Controls
                 btn.Text = Filter.ReadableText();
             }
 
-            //base.OnControlAdded(e);
-            //var column1 = _tmpColumn;
-            //if (column1.Format == enDataFormat.LinkedCell)
-            //{
-            //    column1 = null;
-
-            //    if (_tmpColumn.LinkedDatabase() != null && _tmpColumn.LinkedCell_ColumnKey > -1)
-            //    {
-            //        column1 = _tmpColumn.LinkedDatabase().Column.SearchByKey(_tmpColumn.LinkedCell_ColumnKey);
-            //    }
-
-            //    if (column1 == null)
-            //    {
-            //        Develop.DebugPrint("Column nicht gefunden");
-            //        return;
-            //    }
-
-            //}
-
-
-            //Suffix = column1.Suffix;
-            //Format = column1.Format;
-            //MultiLine = column1.MultiLine;
-
-            //switch (e.Control)
-            //{
-            //    case ComboBox comboBox:
-            //        var Item2 = new ItemCollectionList();
-            //        ItemCollectionList.GetItemCollection(Item2, column1, null, enShortenStyle.Both, 10000);
-
-            //        if (column1.TextBearbeitungErlaubt)
-            //        {
-            //            StyleComboBox(comboBox, Item2, System.Windows.Forms.ComboBoxStyle.DropDown);
-            //        }
-            //        else
-            //        {
-            //            StyleComboBox(comboBox, Item2, System.Windows.Forms.ComboBoxStyle.DropDownList);
-            //        }
-
-            //        comboBox.GotFocus += GotFocus_ComboBox;
-            //        break;
-
-            //    case EasyPic easyPic:
-            //        easyPic.ConnectedDatabase += EasyPicConnectedDatabase;
-            //        easyPic.ImageChanged += EasyPicImageChanged;
-            //        break;
-
-            //    case TextBox textBox:
-            //        StyleTextBox(textBox, column1.AllowedChars, column1.SpellCheckingEnabled);
-            //        textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
-            //        textBox.GotFocus += GotFocus_TextBox;
-            //        textBox.TextChanged += TextBox_TextChanged;
-
-            //        break;
-
-            //    case ListBox listBox:
-            //        if (listBox.Name == "Main")
-            //        {
-            //            StyleListBox(listBox, column1);
-            //        }
-            //        listBox.AddClicked += ListBox_AddClicked;
-            //        //listBox.NeedRow += ListBox_NeedRow;
-            //        break;
-
-
-            //    case Button _:
-            //        break;
-
-            //    case Caption _:
-            //        break;
-
-
-            //    default:
-            //        Develop.DebugPrint("Control unbekannt");
-            //        break;
-            //}
         }
 
 
-        //private void TextBox_TextChanged(object sender, System.EventArgs e)
-        //{
-        //    while (Marker.IsBusy)
-        //    {
-        //        if (!Marker.CancellationPending) { Marker.CancelAsync(); }
-        //        Develop.DoEvents();
-        //    }
 
-        //    if (_tmpColumn == null) { return; }
+        public bool IsThisItemBetterForIS()
+        {
+            var cbx = GetComboBox();
+            if (cbx == null) { return true; }
 
-        //    if (_tmpColumn.Format != enDataFormat.RelationText) { return; }
+            return cbx.Item[Value] != null;
+        }
 
-        //    Marker.RunWorkerAsync();
-        //}
 
-        //protected override void OnControlRemoved(System.Windows.Forms.ControlEventArgs e)
-        //{
-        //    base.OnControlRemoved(e);
+        private ComboBox GetComboBox()
+        {
 
-        //    switch (e.Control)
-        //    {
-        //        case ComboBox comboBox:
-        //            comboBox.GotFocus -= GotFocus_ComboBox;
-        //            break;
+            foreach (var thisc in Controls)
+            {
+                if (thisc is ComboBox cbx)
+                {
 
-        //        case EasyPic easyPic:
-        //            easyPic.ConnectedDatabase -= EasyPicConnectedDatabase;
-        //            easyPic.ImageChanged -= EasyPicImageChanged;
-        //            break;
+                    return cbx;
+                }
+            }
+            return null;
 
-        //        case TextBox textBox:
-        //            textBox.NeedDatabaseOfAdditinalSpecialChars -= textBox_NeedDatabaseOfAdditinalSpecialChars;
-        //            textBox.GotFocus -= GotFocus_TextBox;
-        //            textBox.TextChanged -= TextBox_TextChanged;
-        //            break;
+        }
 
-        //        case ListBox listBox:
-        //            listBox.AddClicked -= ListBox_AddClicked;
-        //            //listBox.NeedRow -= ListBox_NeedRow;
-        //            break;
 
-        //        case Caption _:
-        //            break;
 
-        //        case Button _:
-        //            break;
 
-        //        default:
-        //            Develop.DebugPrint("Control unbekannt");
-        //            break;
-
-
-        //    }
-        //}
-
-
-
-        //private void EasyPicImageChanged(object sender, System.EventArgs e)
-        //{
-
-        //    foreach (System.Windows.Forms.Control ThisControl in Controls)
-        //    {
-
-        //        if (ThisControl is EasyPic Control)
-        //        {
-        //            if (_tmpColumn == null && _tmpRow == null) { Develop.DebugPrint_NichtImplementiert(); }
-        //            if (_tmpColumn.Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
-
-
-
-        //            switch (Control.SorceType)
-        //            {
-        //                case enSorceType.ScreenShot:
-        //                    var fil = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
-        //                    Control.Bitmap.Save(fil, ImageFormat.Png);
-        //                    Control.ChangeSource(fil, enSorceType.LoadedFromDisk, false);
-        //                    Value = fil;   // Ruft rekursiv DoEasyPicValueChanged und springt zu LoadedFromDisk
-        //                    return;
-
-        //                case enSorceType.Nichts:
-        //                    Value = string.Empty;   // TODO: SetValue(FromCell) benutzen
-        //                    FillCellNow();
-        //                    return;
-
-        //                case enSorceType.LoadedFromDisk:
-        //                    if (Control.SorceName != _tmpColumn.SimplyFile(Control.SorceName))
-        //                    {
-        //                        // DEr name kann nur vereifacht werden, wenn es bereits im richtigen Verzeichniss ist. Name wird vereinfacht (ungleich) - bereits im richtigen verzeichniss!
-        //                        Value = Control.SorceName;
-        //                        FillCellNow();
-        //                        return;
-        //                    }
-
-
-
-        //                    var fil2 = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
-
-        //                    if (fil2.FilePath().ToUpper() != Control.SorceName.FilePath().ToUpper())
-        //                    {
-        //                        Control.Bitmap.Save(fil2, ImageFormat.Png);
-        //                    }
-        //                    else
-        //                    {
-        //                        fil2 = Control.SorceName;
-        //                    }
-        //                    Control.ChangeSource(fil2, enSorceType.LoadedFromDisk, false);
-        //                    Value = fil2;    // Ruft rekursiv DoEasyPicValueChanged und springt zu LoadedFromDisk
-        //                    return;
-
-        //                case enSorceType.EntryWithoutPic:
-        //                    Value = Control.SorceName;   // TODO: SetValue(FromCell) benutzen
-        //                    // Entweder ein Dummy eintrag (Bildzeichen-Liste, wo Haupt das Bild sein sollte, aber eben nur bei den 3 Seitensichten eines da ist
-        //                    // Oder datenbank wird von einem andern PC aus gestartet
-        //                    return;
-
-
-        //            }
-        //        }
-        //    }
-        //    Develop.DebugPrint_NichtImplementiert();
-        //}
-
-
-        //private void EasyPicConnectedDatabase(object sender, MultiUserFileGiveBackEventArgs e)
-        //{
-        //    e.File = _Database;
-        //}
-
-        //private void GotFocus_ComboBox(object sender, System.EventArgs e)
-        //{
-        //    if (_tmpColumn == null || _tmpRow == null) { return; }
-        //    if (!string.IsNullOrEmpty(((ComboBox)sender).Text)) { return; }
-        //    Value = CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow);   // TODO: SetValue(FromCell) benutzen
-        //}
-
-
-
-        //private void GotFocus_TextBox(object sender, System.EventArgs e)
-        //{
-        //    if (_tmpColumn == null || _tmpRow == null) { return; }
-        //    if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
-
-
-        //    Value = CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow);   // TODO: SetValue(FromCell) benutzen
-        //}
-
-
-
-
-        //protected override void OnValueChanged()
-        //{
-        //    base.OnValueChanged();
-        //    FillCellNow();
-        //}
-
-
-        //private void ListBox_AddClicked(object sender, System.EventArgs e)
-        //{
-
-        //    var Dia = ColumnItem.UserEditDialogTypeInTable(_tmpColumn, false);
-
-        //    var lbx = (ListBox)sender;
-
-        //    switch (Dia)
-        //    {
-        //        case enEditTypeTable.None:
-        //            return;
-
-        //        case enEditTypeTable.FileHandling_InDateiSystem:
-        //            // korrektheit der Zelle bereits geprüft
-        //            if (_tmpColumn != null && string.IsNullOrEmpty(lbx.LastFilePath)) { lbx.LastFilePath = _Database.Filename.FilePath(); }
-        //            var DelList = new List<string>();
-        //            using (var f = new System.Windows.Forms.OpenFileDialog())
-        //            {
-        //                f.CheckFileExists = true;
-        //                f.CheckPathExists = true;
-        //                f.Multiselect = true;
-        //                f.InitialDirectory = lbx.LastFilePath;
-        //                f.Title = "Datei(en) hinzufügen:";
-        //                f.ShowDialog();
-
-        //                if (f.FileNames == null || f.FileNames.Length == 0) { return; }
-
-
-        //                for (var z = 0; z <= f.FileNames.GetUpperBound(0); z++)
-        //                {
-        //                    var b = modConverter.FileToByte(f.FileNames[z]);
-
-        //                    if (!string.IsNullOrEmpty(_Database.FileEncryptionKey)) { b = modAllgemein.SimpleCrypt(b, _Database.FileEncryptionKey, 1); }
-
-        //                    var neu = f.FileNames[z].FileNameWithSuffix();
-        //                    neu = _tmpColumn.BestFile(neu.FileNameWithSuffix(), true);
-        //                    lbx.LastFilePath = f.FileNames[z].FilePath();
-
-        //                    modConverter.ByteToFile(neu, b);
-        //                    lbx.Item.Add(neu.FileNameWithSuffix(), _tmpColumn, enShortenStyle.Replaced);
-
-        //                    DelList.Add(f.FileNames[z]);
-        //                }
-        //            }
-
-        //            Forms.FileDialogs.DeleteFile(DelList, true);
-        //            return;
-
-        //        case enEditTypeTable.Textfeld:
-        //            lbx.Add_Text();
-        //            return;
-
-        //        case enEditTypeTable.Listbox:
-        //            lbx.Add_TextBySuggestion();
-        //            return;
-
-
-        //        default:
-        //            Develop.DebugPrint(Dia);
-        //            return;
-        //    }
-
-
-        //}
-
-
-
-        //private void Marker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
-        //{
-        //    TextBox TXB = null;
-
-        //    foreach (var Control in Controls)
-        //    {
-        //        if (Control is TextBox t) { TXB = t; }
-        //    }
-
-        //    if (Marker.CancellationPending) { return; }
-        //    if (TXB == null) { return; }
-
-
-
-        //    if (_tmpRow == null) { return; }
-
-        //    if (Marker.CancellationPending) { return; }
-        //    var Names = new List<string>();
-        //    Names.AddRange(_Database.Column[0].GetUcaseNamesSortedByLenght());
-        //    if (Marker.CancellationPending) { return; }
-
-        //    var myname = _tmpRow.CellFirstString().ToUpper();
-
-        //    var InitT = TXB.Text;
-
-        //    bool Ok;
-        //    do
-        //    {
-        //        Ok = true;
-
-        //        Marker.ReportProgress(0, new List<object> { TXB, "Unmark1" });
-        //        Develop.DoEvents();
-        //        if (Marker.CancellationPending || InitT != TXB.Text) { return; }
-
-        //        Marker.ReportProgress(0, new List<object> { TXB, "Unmark2" });
-        //        Develop.DoEvents();
-        //        if (Marker.CancellationPending || InitT != TXB.Text) { return; }
-
-        //        try
-        //        {
-        //            foreach (var ThisWord in Names)
-        //            {
-        //                var cap = 0;
-        //                do
-        //                {
-        //                    Develop.DoEvents();
-        //                    if (Marker.CancellationPending || InitT != TXB.Text) { return; }
-        //                    var fo = InitT.IndexOfWord(ThisWord, cap, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
-        //                    if (fo < 0) { break; }
-
-        //                    if (ThisWord == myname)
-        //                    {
-        //                        Marker.ReportProgress(0, new List<object> { TXB, "Mark1", fo, fo + ThisWord.Length - 1 });
-        //                    }
-        //                    else
-        //                    {
-        //                        Marker.ReportProgress(0, new List<object> { TXB, "Mark2", fo, fo + ThisWord.Length - 1 });
-        //                    }
-        //                    cap = fo + ThisWord.Length;
-
-        //                } while (true);
-        //            }
-
-
-        //        }
-        //        catch
-        //        {
-        //            Ok = false;
-        //        }
-
-        //    } while (!Ok);
-
-
-        //}
-
-        //private void Marker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
-        //{
-        //    //Ja, Multithreading ist kompliziert...
-        //    if (Marker.CancellationPending) { return; }
-
-        //    var x = (List<object>)e.UserState;
-        //    var TXB = (TextBox)x[0];
-
-        //    switch ((string)x[1])
-        //    {
-        //        case "Unmark1":
-        //            TXB.Unmark(enMarkState.MyOwn);
-        //            TXB.Invalidate();
-        //            break;
-
-        //        case "Unmark2":
-        //            TXB.Unmark(enMarkState.Other);
-        //            TXB.Invalidate();
-        //            break;
-
-        //        case "Mark1":
-        //            TXB.Mark(enMarkState.MyOwn, (int)x[2], (int)x[3]);
-        //            TXB.Invalidate();
-        //            break;
-
-        //        case "Mark2":
-        //            TXB.Mark(enMarkState.Other, (int)x[2], (int)x[3]);
-        //            TXB.Invalidate();
-        //            break;
-
-
-
-        //        default:
-        //            Develop.DebugPrint((string)x[1]);
-        //            break;
-        //    }
-
-        //}
-
-        //private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e)
-        //{
-        //    if (e.KeyOld != _RowKey) { return; }
-        //    _RowKey = e.KeyNew;
-        //}
-
-
-
-        //protected override void OnRemovingAll()
-        //{
-        //    FillCellNow();
-        //    base.OnRemovingAll();
-        //}
-
-        //public void GetContextMenuItems(MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
-        //{
-
-        //    GetTmpVariables();
-
-        //    if (_tmpColumn != null && _tmpColumn.Database.IsAdministrator())
-        //    {
-        //        Items.Add(new TextListItem("#ColumnEdit", "Spalte bearbeiten", QuickImage.Get(enImageCode.Spalte), _tmpColumn != null));
-        //    }
-
-
-        //    if (Parent is Formula f)
-        //    {
-
-        //        var x = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
-
-        //        f.GetContextMenuItems(null, x, out var _, Tags, ref Cancel, ref Translate);
-
-        //        if (x.Count > 0)
-        //        {
-        //            if (Items.Count > 0)
-        //            {
-        //                Items.Add(new LineListItem());
-        //            }
-
-        //            Items.AddRange(x);
-        //        }
-        //    }
-
-        //    HotItem = _tmpColumn;
-        //}
-
-        //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
-        //{
-
-        //    switch (e.ClickedComand)
-        //    {
-        //        case "#columnedit":
-        //            if (e.HotItem is ColumnItem col)
-        //            {
-        //                tabAdministration.OpenColumnEditor(col);
-        //            }
-
-        //            return true;
-
-        //        default:
-
-        //            if (Parent is Formula f)
-        //            {
-        //                return f.ContextMenuItemClickedInternalProcessig(sender, e);
-        //            }
-        //            break;
-        //    }
-
-        //    return false;
-
-
-        //}
-
-        //public void OnContextMenuInit(ContextMenuInitEventArgs e)
-        //{
-        //    ContextMenuInit?.Invoke(this, e);
-        //}
-
-        //public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
-        //{
-        //    ContextMenuItemClicked?.Invoke(this, e);
-        //}
     }
 }

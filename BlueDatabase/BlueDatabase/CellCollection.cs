@@ -780,7 +780,7 @@ namespace BlueDatabase
             F.Add(new FilterItem(cc, enFilterType.Istgleich_GroﬂKleinEgal, row.CellGetString(cc)));
             F.Add(new FilterItem(column, enFilterType.Ungleich_MultiRowIgnorieren, string.Empty));
 
-            var rows = column.Database.Row.CalculateSortedRows(F, null);
+            var rows = column.Database.Row.CalculateSortedRows(F, null, null);
             rows.Remove(row);
             if (rows.Count == 0) { return string.Empty; }
             return rows[0].CellGetString(column);

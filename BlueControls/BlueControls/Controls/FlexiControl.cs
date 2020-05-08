@@ -72,6 +72,7 @@ namespace BlueControls.Controls
         protected bool _allinitialized = false;
         protected bool _enabled = false;
 
+        private bool _InstantChangedEvent = false;
 
         protected System.Windows.Forms.Timer _IdleTimer;
 
@@ -246,7 +247,7 @@ namespace BlueControls.Controls
                 _Value = value;
                 UpdateValueToControl();
 
-                if (!Focused) { CheckIfChanged(); }
+                if (!Focused || _InstantChangedEvent) { CheckIfChanged(); }
                 //OnValueChanged();
             }
         }
@@ -292,27 +293,27 @@ namespace BlueControls.Controls
 
 
 
-        ///// <summary>
-        ///// Falls das Steuerelement eine InstantChangeEvent unterstützt, wird dieses umgesetzt
-        ///// </summary>
-        //[DefaultValue(true)]
-        //public bool InstantChangedEvent
-        //{
-        //    get
-        //    {
-        //        return _InstantChangedEvent;
-        //    }
-        //    set
-        //    {
+        /// <summary>
+        /// Falls das Steuerelement eine InstantChangeEvent unterstützt, wird dieses umgesetzt
+        /// </summary>
+        [DefaultValue(false)]
+        public bool InstantChangedEvent
+        {
+            get
+            {
+                return _InstantChangedEvent;
+            }
+            set
+            {
 
-        //        if (_InstantChangedEvent == value) { return; }
-        //        _InstantChangedEvent = value;
+                if (_InstantChangedEvent == value) { return; }
+                _InstantChangedEvent = value;
+
+                CheckIfChanged();
 
 
-        //        UpdateControls();
-
-        //    }
-        //}
+            }
+        }
 
 
         /// <summary>
@@ -1582,6 +1583,7 @@ namespace BlueControls.Controls
 
 
         }
+
 
 
         /// <summary>

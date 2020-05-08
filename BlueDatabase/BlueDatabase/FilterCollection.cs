@@ -62,6 +62,28 @@ namespace BlueDatabase
         #endregion
 
 
+        #region Properties
+
+
+        public FilterItem this[ColumnItem column]
+        {
+            get
+            {
+                foreach (var ThisFilterItem in this)
+                {
+                    if (ThisFilterItem != null && ThisFilterItem.FilterType != enFilterType.KeinFilter)
+                    {
+                        if (ThisFilterItem.Column == column) { return ThisFilterItem; }
+                    }
+                }
+
+                return null;
+            }
+        }
+
+
+        #endregion
+
 
         protected override void OnListOrItemChanged()
         {
@@ -82,40 +104,12 @@ namespace BlueDatabase
 
             foreach (var thisFilter in this)
             {
-                if (thisFilter.Column == column)
-                {
-
-                    toDel.Add(thisFilter);
-                }
+                if (thisFilter.Column == column) { toDel.Add(thisFilter); }
 
             }
 
-            if (toDel.Count ==0) { return; }
-
+            if (toDel.Count == 0) { return; }
             RemoveRange(toDel);
-
-            //var Again = true;
-
-            //while (Again)
-            //{
-            //    Again = false;
-
-
-            //    foreach (var ThisFilterItem in this)
-            //    {
-            //        if (ThisFilterItem != null)
-            //        {
-            //            if (ThisFilterItem.Column == column)
-            //            {
-            //                Remove(ThisFilterItem);
-            //                Again = true;
-            //                break;
-            //            }
-            //        }
-            //    }
-
-            //}
-
         }
 
         public void Remove(string columnName)
@@ -186,13 +180,13 @@ namespace BlueDatabase
 
 
 
-            foreach (var ThisFilterItem in this)
+
+            var f = this[item.Column];
+            if (f != null && item != f)
             {
-                if (ThisFilterItem.Column == item.Column && item != ThisFilterItem)
-                {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Doppelter Filter!");
-                }
+                Develop.DebugPrint(enFehlerArt.Warnung, "Doppelter Filter!");
             }
+
 
 
             if (item.SearchValue != null && item.SearchValue.Count > 1)
@@ -287,13 +281,7 @@ namespace BlueDatabase
 
         public bool IsRowFilterActiv()
         {
-
-            foreach (var ThisFilterItem in this)
-            {
-                if (ThisFilterItem != null && ThisFilterItem.Column == null && ThisFilterItem.FilterType != enFilterType.KeinFilter) { return true; }
-            }
-
-            return false;
+            return this[(ColumnItem)null] != null;
         }
 
         public string RowFilterText
@@ -301,24 +289,23 @@ namespace BlueDatabase
 
             get
             {
-                foreach (var ThisFilterItem in this)
-                {
-                    if (ThisFilterItem != null && ThisFilterItem.Column == null) { return ThisFilterItem.SearchValue[0]; }
-                }
+
+                var f = this[(ColumnItem)null];
+                if (f != null) { return f.SearchValue[0]; }
 
                 return string.Empty;
             }
             set
             {
-                foreach (var ThisFilterItem in this)
+
+                var f = this[(ColumnItem)null];
+
+                if (f != null)
                 {
-                    if (ThisFilterItem != null && ThisFilterItem.Column == null)
-                    {
-                        if (ThisFilterItem.SearchValue[0].ToLower() == value.ToLower()) { return; }
-                        ThisFilterItem.SearchValue[0] = value;
-                        OnChanged();
-                        return;
-                    }
+                    if (f.SearchValue[0].ToLower() == value.ToLower()) { return; }
+                    f.SearchValue[0] = value;
+                    //OnChanged();
+                    return;
                 }
 
                 Add(new FilterItem(Database, enFilterType.Instr_UND_GroﬂKleinEgal, value));
@@ -332,19 +319,7 @@ namespace BlueDatabase
 
 
 
-        public bool Uses(ColumnItem Column)
-        {
 
-            foreach (var ThisFilterItem in this)
-            {
-                if (ThisFilterItem != null && ThisFilterItem.FilterType != enFilterType.KeinFilter)
-                {
-                    if (ThisFilterItem.Column == Column) { return true; }
-                }
-            }
-
-            return false;
-        }
 
 
         public bool MayHasRowFilter(ColumnItem Column)

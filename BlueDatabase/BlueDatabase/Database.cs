@@ -1714,11 +1714,11 @@ namespace BlueDatabase
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
         /// </summary>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow FirstRow, int ArrNr, FilterCollection Filter)
+        public string Export_CSV(enFirstRow firstRow, int arrangementNo, FilterCollection filter, List<RowItem> pinned)
         {
             //    Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
-            return Export_CSV(FirstRow, ColumnArrangements[ArrNr].ListOfUsedColumn(), Row.CalculateSortedRows(Filter, SortDefinition));
+            return Export_CSV(firstRow, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned));
         }
 
 
@@ -1737,10 +1737,10 @@ namespace BlueDatabase
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
         /// </summary>
         /// <returns></returns>
-        public void Export_HTML(string vFilename, int ArrNr, FilterCollection Filter)
+        public void Export_HTML(string filename, int arrangementNo, FilterCollection filter, List<RowItem> pinned)
         {
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            Export_HTML(vFilename, ColumnArrangements[ArrNr].ListOfUsedColumn(), Row.CalculateSortedRows(Filter, SortDefinition), false);
+            Export_HTML(filename, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned), false);
         }
 
         /// <summary>

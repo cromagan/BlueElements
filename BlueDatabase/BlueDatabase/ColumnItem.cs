@@ -161,7 +161,7 @@ namespace BlueDatabase
             if (columnkey < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "ColumnKey <0"); }
 
             var ex = Database.Column.SearchByKey(columnkey);
-            if (ex != null){ Develop.DebugPrint(enFehlerArt.Fehler, "Key existiert bereits"); }
+            if (ex != null) { Develop.DebugPrint(enFehlerArt.Fehler, "Key existiert bereits"); }
 
             this.Key = columnkey;
 
@@ -1958,17 +1958,20 @@ namespace BlueDatabase
 
         public string ReadableText()
         {
+            var ret = _Caption;
+
             foreach (var ThisColumnItem in Database.Column)
             {
                 if (ThisColumnItem != null)
                 {
                     if (ThisColumnItem != this && ThisColumnItem.Caption.ToUpper() == _Caption.ToUpper())
                     {
-                        return _Caption.Replace("\r", "; ") + " (" + _Name + ")";
+                        ret = _Caption + " (" + _Name + ")";
+                        break;
                     }
                 }
             }
-            return _Caption.Replace("\r", "; ");
+            return ret.Replace("\r", " ").Replace("\n", " ").Replace("  ", " ").TrimEnd(":");
         }
 
         public string CompareKey()

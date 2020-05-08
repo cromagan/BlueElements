@@ -89,6 +89,7 @@ namespace BlueControls.Controls
         private enBlueTableAppearance _Design = enBlueTableAppearance.Standard;
         private List<RowItem> _SortedRows; // Die Sortierung der Zeile
         private List<RowItem> _SortedRowsBefore = new List<RowItem>(); // Die Sortierung der Zeile
+        private List<RowItem> _PinnedRows = new List<RowItem>();
 
         private readonly object Lock_UserAction = new object();
         private BlueFont _Column_Font;
@@ -188,6 +189,7 @@ namespace BlueControls.Controls
 
                 CloseAllComponents();
 
+                _PinnedRows.Clear();
                 _MouseOverColumn = null;
                 _MouseOverRow = null;
                 _CursorPosColumn = null;
@@ -380,6 +382,22 @@ namespace BlueControls.Controls
                 Pix18 = 18;
             }
 
+        }
+
+        internal void Pin(List<RowItem> rows)
+        {
+
+            if (rows == null) { rows = new List<RowItem>(); }
+
+            rows = rows.Distinct().ToList();
+
+            if (!rows.IsDifferentTo(_PinnedRows)) { return; }
+
+            _PinnedRows.Clear();
+            _PinnedRows.AddRange(rows);
+
+            Invalidate_RowSort();
+            Invalidate();
         }
 
         private static int GetPix(int Pix, BlueFont F, double Scale)
@@ -636,6 +654,9 @@ namespace BlueControls.Controls
                 Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
                 Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.Cells, PermaX, DisplayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
 
+                // PinnedRowsMarkieren
+                Draw_Pinned(GR, DisplayRectangleWOSlider);
+
                 // Den CursorLines zeichnen
                 Draw_Cursor(GR, DisplayRectangleWOSlider, true);
 
@@ -671,7 +692,25 @@ namespace BlueControls.Controls
 
         }
 
+        private void Draw_Pinned(Graphics gR, Rectangle displayRectangleWOSlider)
+        {
 
+            if (_PinnedRows == null || _PinnedRows.Count == 0) { return; }
+            var b = new SolidBrush(Color.FromArgb(50, 255, 255, 0));
+
+
+            foreach (var ThisRowItem in _PinnedRows)
+            {
+                if (ThisRowItem.TMP_Y is int y)
+                {
+                    if (y > 1 && y < displayRectangleWOSlider.Height)
+                    {
+
+                        gR.FillRectangle(b, 0, y, displayRectangleWOSlider.Width, Row_DrawHeight(ThisRowItem, DisplayRectangleWithoutSlider()));
+                    }
+                }
+            }
+        }
 
         private void Draw_Column_Head_Captions(Graphics GR)
         {
@@ -1032,9 +1071,11 @@ namespace BlueControls.Controls
             var tstate = enStates.Undefiniert;
             ViewItem._TMP_AutoFilterLocation = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 18, HeadSize() - 18, 18, 18);
 
+            var filtIt = Filter[ViewItem.Column];
             if (ViewItem.Column.AutoFilter_möglich())
             {
-                if (Filter.Uses(ViewItem.Column))
+
+                if (filtIt != null)
                 {
                     tstate = enStates.Checked;
                 }
@@ -1048,7 +1089,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            if (Filter.Uses(ViewItem.Column))
+            if (filtIt != null)
             {
                 i = QuickImage.Get("Trichter|14|||FF0000");
             }
@@ -1587,6 +1628,21 @@ namespace BlueControls.Controls
             }
 
         }
+
+        public void PinRemove(RowItem row)
+        {
+            _PinnedRows.Remove(row);
+            Invalidate_RowSort();
+            Invalidate();
+        }
+
+        public void PinAdd(RowItem row)
+        {
+            _PinnedRows.Add(row);
+            Invalidate_RowSort();
+            Invalidate();
+        }
+
 
         private void OnEditBeforeNewRow(RowCancelEventArgs e)
         {
@@ -2257,7 +2313,7 @@ namespace BlueControls.Controls
 
             if (AreRowsSorted())
             {
-                if (Filter.Uses(e.Column) || SortUsed() == null || SortUsed().UsedForRowSort(e.Column) || Filter.MayHasRowFilter(e.Column))
+                if (Filter[e.Column] != null || SortUsed() == null || SortUsed().UsedForRowSort(e.Column) || Filter.MayHasRowFilter(e.Column))
                 {
                     Invalidate_RowSort();
                 }
@@ -3113,6 +3169,19 @@ namespace BlueControls.Controls
             x = x + ", SliderY=" + SliderY.Value;
 
 
+            if (_PinnedRows != null && _PinnedRows.Count > 0)
+            {
+                foreach (var thisRow in _PinnedRows)
+                {
+                    x = x + ", Pin=" + thisRow.Key.ToString();
+                }
+            }
+
+
+            foreach (var thiscol in _Database.ColumnArrangements[_ArrangementNr])
+            {
+                if (thiscol._TMP_Reduced) { x = x + ", Reduced=" + thiscol.Column.Key.ToString(); }
+            }
 
             if (_sortDefinitionTemporary?.Columns != null)
             {
@@ -3171,11 +3240,23 @@ namespace BlueControls.Controls
                         _sortDefinitionTemporary = new RowSortDefinition(_Database, pairValue);
                         break;
 
+                    case "pin":
+                        _PinnedRows.Add(_Database.Row.SearchByKey(int.Parse(pairValue)));
+                        break;
+
+                    case "reduced":
+                        var c = _Database.Column.SearchByKey(int.Parse(pairValue));
+                        var cv = _Database.ColumnArrangements[_ArrangementNr][c];
+                        if (cv != null) { cv._TMP_Reduced = true; }
+                        break;
+
                     default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + T);
+                        Develop.DebugPrint(enFehlerArt.Warnung, "Tag unbekannt: " + T);
                         break;
                 }
             } while (true);
+
+            Filter.OnChanged();
 
             Invalidate_RowSort(); // beim Parsen wirft der Filter kein Event ab
 
@@ -3337,11 +3418,6 @@ namespace BlueControls.Controls
                 if (value != _ArrangementNr)
                 {
                     _ArrangementNr = value;
-                    //if (_ColumnArrangementSelector != null)
-                    //{
-                    //    _ColumnArrangementSelector.Text = _ArrangementNr.ToString();
-                    //}
-                    //InternalColumnArrangementSelector.Text = _ArrangementNr.ToString();
                     Invalidate_HeadSize();
                     Invalidate_AllDraw(false);
                     Invalidate();
@@ -3549,7 +3625,13 @@ namespace BlueControls.Controls
             return null;
         }
 
-
+        public List<RowItem> PinnedRows
+        {
+            get
+            {
+                return _PinnedRows;
+            }
+        }
 
 
         public List<RowItem> SortedRows()
@@ -3558,9 +3640,9 @@ namespace BlueControls.Controls
 
             if (Database == null) { return new List<RowItem>(); }
 
-            _SortedRows = Database.Row.CalculateSortedRows(Filter, SortUsed());
+            _SortedRows = Database.Row.CalculateSortedRows(Filter, SortUsed(), _PinnedRows);
 
-            if (!_SortedRows.SequenceEqual(_SortedRowsBefore))
+            if (!_SortedRows.IsDifferentTo(_SortedRowsBefore))
             {
                 _SortedRowsBefore.Clear();
                 if (_SortedRows != null) { _SortedRowsBefore.AddRange(_SortedRows); }

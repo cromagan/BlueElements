@@ -284,9 +284,9 @@ namespace BlueDatabase
         }
 
 
-        public void DoAutomatic(FilterCollection Filter, bool FullCheck)
+        public void DoAutomatic(FilterCollection filter, bool fullCheck, List<RowItem> pinned)
         {
-            var x = CalculateSortedRows(Filter, null);
+            var x = CalculateSortedRows(filter, null, pinned);
 
 
             if (x.Count() == 0) { return; }
@@ -298,7 +298,7 @@ namespace BlueDatabase
             {
                 c++;
                 Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", c, x.Count(), false, false));
-                ThisRowItem.DoAutomatic(true, FullCheck);
+                ThisRowItem.DoAutomatic(true, fullCheck);
             }
 
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", x.Count(), x.Count(), false, true));
@@ -446,17 +446,18 @@ namespace BlueDatabase
         }
 
 
-        public List<RowItem> CalculateSortedRows(FilterCollection Filter, RowSortDefinition rowSortDefinition)
+        public List<RowItem> CalculateSortedRows(FilterCollection Filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows)
         {
             var TMP = new List<string>();
             var _tmpSortedRows = new List<RowItem>();
 
+            if (pinnedRows == null) { pinnedRows = new List<RowItem>(); }
 
             foreach (var ThisRowItem in Database.Row)
             {
                 if (ThisRowItem != null)
                 {
-                    if (ThisRowItem.MatchesTo(Filter))
+                    if (ThisRowItem.MatchesTo(Filter) && !pinnedRows.Contains(ThisRowItem))
                     {
                         if (rowSortDefinition == null)
                         {
@@ -498,6 +499,8 @@ namespace BlueDatabase
                 }
 
             }
+
+            _tmpSortedRows.InsertRange(0, pinnedRows);
             return _tmpSortedRows;
         }
 

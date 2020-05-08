@@ -121,7 +121,7 @@ namespace BlueControls.BlueDatabaseDialogs
             sFilter.Item.Clear();
             if (vFilter != null)
             {
-                sFilter.Item.Add(new TextListItem("filterlöschen", "Filter löschen", QuickImage.Get("Trichter|16||1"), vFilter.Uses(Column), Constants.FirstSortChar + "01"));
+                sFilter.Item.Add(new TextListItem("filterlöschen", "Filter löschen", QuickImage.Get("Trichter|16||1"), vFilter[Column] != null, Constants.FirstSortChar + "01"));
             }
             else
             {

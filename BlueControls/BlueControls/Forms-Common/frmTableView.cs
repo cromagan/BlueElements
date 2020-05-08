@@ -1064,7 +1064,7 @@ namespace BlueControls.Forms
 
         private void Datenüberprüfung_Click(object sender, System.EventArgs e)
         {
-            TableView.Database.Row.DoAutomatic(TableView.Filter, true);
+            TableView.Database.Row.DoAutomatic(TableView.Filter, true, TableView.PinnedRows);
         }
 
 

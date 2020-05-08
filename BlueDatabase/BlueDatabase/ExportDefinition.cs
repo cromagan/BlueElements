@@ -878,14 +878,14 @@ namespace BlueDatabase
                     case enExportTyp.DatenbankCSVFormat:
                         if (_Intervall > (float)DateTime.Now.Subtract(_LastExportTime).TotalDays) { return false; }
                         SingleFileExport = TempFile(SingleFileExport + ".CSV");
-                        if (!FileExists(SingleFileExport)) { modAllgemein.SaveToDisk(SingleFileExport, Database.Export_CSV(enFirstRow.ColumnInternalName, _ExportSpaltenAnsicht, Filter), false); }
+                        if (!FileExists(SingleFileExport)) { modAllgemein.SaveToDisk(SingleFileExport, Database.Export_CSV(enFirstRow.ColumnInternalName, _ExportSpaltenAnsicht, Filter, null), false); }
                         Added.Add(SingleFileExport + "|" + tim);
                         break;
 
                     case enExportTyp.DatenbankHTMLFormat:
                         if (_Intervall > (float)DateTime.Now.Subtract(_LastExportTime).TotalDays) { return false; }
                         SingleFileExport = TempFile(SingleFileExport + ".HTML");
-                        if (!FileExists(SingleFileExport)) { Database.Export_HTML(SingleFileExport, _ExportSpaltenAnsicht, Filter); }
+                        if (!FileExists(SingleFileExport)) { Database.Export_HTML(SingleFileExport, _ExportSpaltenAnsicht, Filter, null); }
                         Added.Add(SingleFileExport + "|" + tim);
                         break;
 

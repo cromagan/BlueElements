@@ -4,12 +4,11 @@ using BlueControls.Controls;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueBasics;
-using System;
 using BlueBasics.Enums;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
-    public partial class Filterleiste : GroupBox // System.Windows.Forms.UserControl
+    public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserControl // 
     {
 
         private Table _TableView;
@@ -91,6 +90,8 @@ namespace BlueControls.BlueDatabaseDialogs
         private void FillFilters()
         {
 
+            if (_isFilling) { return; }
+
             _isFilling = true;
 
             #region ZeilenFilter
@@ -115,7 +116,7 @@ namespace BlueControls.BlueDatabaseDialogs
             if (_orientation == enOrientation.Waagerecht)
             {
                 toppos = btnAlleFilterAus.Top;
-                leftpos = btnAlleFilterAus.Right + Skin.PaddingSmal;
+                leftpos = btnPinZurück.Right + Skin.Padding;
                 constwi = (int)(txbZeilenFilter.Width * 1.5);
                 right = constwi + Skin.PaddingSmal;
                 anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
@@ -142,13 +143,23 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (_TableView != null && _TableView.Filter != null)
             {
-                /// Flexis erstellen und hinrutschen
-                foreach (var thisFilter in _TableView.Filter)
-                {
-                    if (thisFilter.Column is ColumnItem co)
-                    {
-                        var flx = FlexiItemOf(thisFilter);
+                var colara = _TableView.Database.ColumnArrangements[_TableView.Arrangement];
 
+                foreach (var thisclsVitem in colara)
+                {
+
+                    var f = _TableView.Filter[thisclsVitem.Column];
+
+                    if (f == null && thisclsVitem.Column.AutoFilter_Dauerfilter)
+                    {
+                        // Dummy-Filter, nicht in der Collection
+                        f = new FilterItem(thisclsVitem.Column, enFilterType.Instr_GroßKleinEgal, string.Empty);
+                    }
+
+
+                    if (f != null)
+                    {
+                        var flx = FlexiItemOf(f);
                         if (flx != null)
                         {
                             // Sehr Gut, Flex vorhanden, wird später nicht mehr gelöscht
@@ -157,7 +168,7 @@ namespace BlueControls.BlueDatabaseDialogs
                         else
                         {
                             // Na gut, eben neuen Flex erstellen
-                            flx = new FlexiControlForFilter(thisFilter, enÜberschriftAnordnung.Links_neben_Dem_Feld);
+                            flx = new FlexiControlForFilter(f, enÜberschriftAnordnung.Links_neben_Dem_Feld);
                             flx.ValueChanged += Flx_ValueChanged;
                             flx.ButtonClicked += Flx_ButtonClicked;
                             Controls.Add(flx);
@@ -198,14 +209,40 @@ namespace BlueControls.BlueDatabaseDialogs
         {
             if (_isFilling) { return; }
 
-
             if (sender is FlexiControlForFilter flx)
             {
                 if (flx.EditType == enEditTypeFormula.Button) { return; }
 
+                if (_TableView == null) { return; }
+
+                var ISFilter = flx.IsThisItemBetterForIS();
+
+                if (_TableView.Filter == null || _TableView.Filter.Count == 0 || !_TableView.Filter.Contains(flx.Filter))
+                {
+                    if (ISFilter) { flx.Filter.FilterType = enFilterType.Istgleich_ODER_GroßKleinEgal; } // Filter noch nicht in der Collection, kann ganz einfach geändert werdern
+                    flx.Filter.SearchValue[0] = flx.Value;
+                    _TableView.Filter.Add(flx.Filter);
+                    return;
+                }
+
+                if (flx.Filter.SearchValue.Count != 1)
+                {
+                    Develop.DebugPrint_NichtImplementiert();
+                    return;
+                }
+
+                if (ISFilter)
+                {
+                    flx.Filter.Changeto(enFilterType.Istgleich_ODER_GroßKleinEgal, flx.Value);
+                }
+                else
+                {
+                    flx.Filter.Changeto(enFilterType.Instr_GroßKleinEgal, flx.Value);
+                    // flx.Filter.SearchValue[0] = flx.Value;
+                }
+
             }
 
-            throw new NotImplementedException();
         }
 
         private FlexiControlForFilter FlexiItemOf(FilterItem filter)
@@ -292,16 +329,6 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             _TableView.Filter.RowFilterText = newF;
-            //foreach (var ThisFilterItem in _TableView.Filter)
-            //{
-            //    if (ThisFilterItem != null && ThisFilterItem.Column == null)
-            //    {
-            //        ThisFilterItem.SearchValue[0] = newF;
-            //    }
-            //}
-
-
-
 
         }
 
@@ -310,7 +337,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private void btnAlleFilterAus_Click(object sender, System.EventArgs e)
         {
             if (_TableView.Database != null) { _TableView.Filter.Clear(); }
-            //txbZeilenFilter.Text = string.Empty;
         }
 
 
@@ -322,6 +348,19 @@ namespace BlueControls.BlueDatabaseDialogs
         public bool Textbox_hasFocus()
         {
             return txbZeilenFilter.Focused();
+        }
+
+        private void btnPinZurück_Click(object sender, System.EventArgs e)
+        {
+            if (_TableView == null) { return; }
+            _TableView.Pin(null);
+        }
+
+        private void btnPin_Click(object sender, System.EventArgs e)
+        {
+            if (_TableView == null) { return; }
+            _TableView.Pin(_TableView.SortedRows());
+
         }
     }
 }
