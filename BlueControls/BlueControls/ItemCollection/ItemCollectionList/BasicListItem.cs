@@ -31,7 +31,7 @@ namespace BlueControls.ItemCollection
         public abstract Size SizeUntouchedForListBox();
 
         public ItemCollectionList Parent { get; private set; }
-        public string Internal { get; private set; }
+        public string Internal { get; set; }
 
 
         public abstract int HeightForListBox(enBlueListBoxAppearance style, int columnWidth);

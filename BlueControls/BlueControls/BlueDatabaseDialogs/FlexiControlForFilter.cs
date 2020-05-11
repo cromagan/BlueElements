@@ -130,7 +130,14 @@ namespace BlueControls.Controls
             if (e.Control is ComboBox cbx)
             {
                 var Item2 = new ItemCollectionList();
-                ItemCollectionList.GetItemCollection(Item2, Filter.Column, null, enShortenStyle.Unreplaced, 10000);
+
+                var c = Filter.Column.Contents(null);
+
+                foreach (var thiss in c)
+                {
+                    Item2.Add(new TextListItem("|" + thiss, thiss));
+                }
+
                 StyleComboBox(cbx, Item2, System.Windows.Forms.ComboBoxStyle.DropDown);
             }
 
@@ -140,19 +147,7 @@ namespace BlueControls.Controls
                 btn.ImageCode = "Kreuz|16";
                 btn.Text = Filter.ReadableText();
             }
-
         }
-
-
-
-        public bool IsThisItemBetterForIS()
-        {
-            var cbx = GetComboBox();
-            if (cbx == null) { return true; }
-
-            return cbx.Item[Value] != null;
-        }
-
 
         private ComboBox GetComboBox()
         {
@@ -168,9 +163,6 @@ namespace BlueControls.Controls
             return null;
 
         }
-
-
-
 
     }
 }

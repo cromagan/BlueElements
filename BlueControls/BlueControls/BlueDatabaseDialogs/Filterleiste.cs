@@ -215,12 +215,14 @@ namespace BlueControls.BlueDatabaseDialogs
 
                 if (_TableView == null) { return; }
 
-                var ISFilter = flx.IsThisItemBetterForIS();
+                var ISFilter = flx.Value.StartsWith("|");
+
+                var v = flx.Value.Trim("|");
 
                 if (_TableView.Filter == null || _TableView.Filter.Count == 0 || !_TableView.Filter.Contains(flx.Filter))
                 {
                     if (ISFilter) { flx.Filter.FilterType = enFilterType.Istgleich_ODER_GroßKleinEgal; } // Filter noch nicht in der Collection, kann ganz einfach geändert werdern
-                    flx.Filter.SearchValue[0] = flx.Value;
+                    flx.Filter.SearchValue[0] = v;
                     _TableView.Filter.Add(flx.Filter);
                     return;
                 }
@@ -233,12 +235,20 @@ namespace BlueControls.BlueDatabaseDialogs
 
                 if (ISFilter)
                 {
-                    flx.Filter.Changeto(enFilterType.Istgleich_ODER_GroßKleinEgal, flx.Value);
+                        flx.Filter.Changeto(enFilterType.Istgleich_ODER_GroßKleinEgal, v);
                 }
                 else
                 {
-                    flx.Filter.Changeto(enFilterType.Instr_GroßKleinEgal, flx.Value);
-                    // flx.Filter.SearchValue[0] = flx.Value;
+
+                    if (string.IsNullOrEmpty(v))
+                    {
+                        _TableView.Filter.Remove(flx.Filter);
+                    }
+                    else
+                    {
+                        flx.Filter.Changeto(enFilterType.Instr_GroßKleinEgal, v);
+                        // flx.Filter.SearchValue[0] =v;
+                    }
                 }
 
             }
@@ -282,9 +292,9 @@ namespace BlueControls.BlueDatabaseDialogs
             var NeuerT = txbZeilenFilter.Text.TrimStart();
 
 
-            NeuerT = NeuerT.TrimStart('+');
-            NeuerT = NeuerT.Replace("++", "+");
-            if (NeuerT == "+") { NeuerT = string.Empty; }
+            //NeuerT = NeuerT.TrimStart('+');
+            //NeuerT = NeuerT.Replace("++", "+");
+            //if (NeuerT == "+") { NeuerT = string.Empty; }
 
 
 

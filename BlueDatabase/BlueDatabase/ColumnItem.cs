@@ -1838,12 +1838,7 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_Runden, _AfterEdit_Runden.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoRemove, _AutoRemove, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_SaveContent, _SaveContent.ToPlusMinus(), Key);
-
-            if (_AutoFilter_Dauerfilter)
-            {
-                Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilter_Dauerfilter, _AutoFilter_Dauerfilter.ToPlusMinus(), Key);
-            }
-
+            Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilter_Dauerfilter, _AutoFilter_Dauerfilter.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErlaubt, _AutofilterErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterTextFilterErlaubt, _AutofilterTextFilterErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErweitertErlaubt, _AutoFilterErweitertErlaubt.ToPlusMinus(), Key);

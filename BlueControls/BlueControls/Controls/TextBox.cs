@@ -716,6 +716,8 @@ namespace BlueControls.Controls
 
             Invalidate();
 
+            if (IsDisposed) { return; }
+
             CheckIfTextIsChanded(_eTxt.PlainText);
         }
 

@@ -1896,6 +1896,9 @@ namespace BlueControls.Controls
 
                 row.DoAutomatic(true, false);
 
+
+                if (table.Database == column.Database) { table.PinAdd(row); }
+
                 // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
                 // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
 
@@ -3642,7 +3645,7 @@ namespace BlueControls.Controls
 
             _SortedRows = Database.Row.CalculateSortedRows(Filter, SortUsed(), _PinnedRows);
 
-            if (!_SortedRows.IsDifferentTo(_SortedRowsBefore))
+            if (_SortedRows.IsDifferentTo(_SortedRowsBefore))
             {
                 _SortedRowsBefore.Clear();
                 if (_SortedRows != null) { _SortedRowsBefore.AddRange(_SortedRows); }

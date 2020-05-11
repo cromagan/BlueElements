@@ -216,6 +216,7 @@ namespace BlueDatabase
                 switch (_FilterType)
                 {
                     case enFilterType.Istgleich:
+                    case enFilterType.IstGleich_ODER:
                     case enFilterType.Istgleich_GroﬂKleinEgal:
                     case enFilterType.Istgleich_ODER_GroﬂKleinEgal:
                         return nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'";
