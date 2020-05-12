@@ -1884,6 +1884,7 @@ namespace BlueControls.Controls
                     var f = CellCollection.ErrorReason(column.Database.Column[0], null, enErrorReason.EditGeneral);
                     if (!string.IsNullOrEmpty(f)) { table.NotEditableInfo(f); return; }
                     row = column.Database.Row.Add(newValue);
+                    if (table.Database == column.Database) { table.PinAdd(row); }
                 }
                 else
                 {
@@ -1895,9 +1896,6 @@ namespace BlueControls.Controls
                 if (table.Database == column.Database) { table.CursorPos_Set(column, row, false); }
 
                 row.DoAutomatic(true, false);
-
-
-                if (table.Database == column.Database) { table.PinAdd(row); }
 
                 // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
                 // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)

@@ -353,7 +353,7 @@ namespace BlueDatabase
             }
             catch
             {
-               // Develop.DebugPrint(ex);
+                // Develop.DebugPrint(ex);
                 return SearchByKey(Key);
             }
 
@@ -500,7 +500,18 @@ namespace BlueDatabase
 
             }
 
-            _tmpSortedRows.InsertRange(0, pinnedRows);
+            var newPinned = new List<RowItem>();
+
+            foreach (var thisPinned in pinnedRows)
+            {
+                if (Database.Row.Contains(thisPinned))
+                {
+                    newPinned.Add(thisPinned);
+                }
+            }
+
+
+            _tmpSortedRows.InsertRange(0, newPinned);
             return _tmpSortedRows;
         }
 
