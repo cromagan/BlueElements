@@ -49,19 +49,19 @@ namespace BlueDatabase
 
 
 
-        public static List<Database> GetByCaption(string Caption)
-        {
-            var l = new List<Database>();
-            foreach (var ThisDatabase in AllFiles)
-            {
-                if (ThisDatabase is Database DB)
-                {
-                    if (DB.Caption.ToUpper() == Caption.ToUpper()) { l.Add(DB); }
-                }
-            }
+        //public static List<Database> GetByCaption(string Caption)
+        //{
+        //    var l = new List<Database>();
+        //    foreach (var ThisDatabase in AllFiles)
+        //    {
+        //        if (ThisDatabase is Database DB)
+        //        {
+        //            if (DB.Caption.ToUpper() == Caption.ToUpper()) { l.Add(DB); }
+        //        }
+        //    }
 
-            return l;
-        }
+        //    return l;
+        //}
 
 
         private static Database Load(Stream Stream)

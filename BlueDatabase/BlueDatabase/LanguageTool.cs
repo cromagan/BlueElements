@@ -91,6 +91,13 @@ namespace BlueDatabase
 
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <param name="mustTranslate">TRUE erstellt einen Eintrag in der Englisch-Datenbank, falls nicht vorhanden.</param>
+        /// <returns></returns>
         public static string DoTranslate(string txt, bool mustTranslate)
         {
             if (Translation == null) { return txt; }

@@ -5,6 +5,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueBasics;
 using BlueBasics.Enums;
+using System;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
@@ -89,6 +90,13 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void FillFilters()
         {
+
+
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => FillFilters()));
+                return;
+            }
 
             if (_isFilling) { return; }
 
