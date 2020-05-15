@@ -110,6 +110,7 @@
     <Compile Include="Controls\ZoomPicWithPoints.Designer.cs">
       <DependentUpon>ZoomPicWithPoints.cs</DependentUpon>
     </Compile>
+    <Compile Include="Enums\enFilterTypesToShow.cs" />
     <Compile Include="Enums\enGroupBoxStyle.cs" />
     <Compile Include="Enums\enPartentType.cs" />
     <Compile Include="Enums\enHelpers.cs" />

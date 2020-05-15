@@ -6,6 +6,7 @@ using BlueDatabase.Enums;
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
+using BlueControls.Enums;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
@@ -16,19 +17,16 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private enOrientation _orientation = enOrientation.Waagerecht;
 
+        private enFilterTypesToShow _Filtertypes = enFilterTypesToShow.SichtbareSpalten_DauerFilter_und_Aktive;
+
         private bool _isFilling = false;
 
         public Filterleiste()
         {
             InitializeComponent();
             FillFilters();
-            SteuerelementeAnordnen();
         }
 
-        private void SteuerelementeAnordnen()
-        {
-            //         throw new NotImplementedException();
-        }
 
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation
@@ -41,11 +39,23 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (_orientation == value) { return; }
                 _orientation = value;
-                SteuerelementeAnordnen();
-
             }
-
         }
+
+        [DefaultValue(enOrientation.Waagerecht)]
+        public enFilterTypesToShow Filtertypes
+        {
+            get
+            {
+                return _Filtertypes;
+            }
+            set
+            {
+                if (_Filtertypes == value) { return; }
+                _Filtertypes = value;
+            }
+        }
+
 
         [DefaultValue((Table)null)]
         public Table Table
@@ -124,7 +134,7 @@ namespace BlueControls.BlueDatabaseDialogs
             if (_orientation == enOrientation.Waagerecht)
             {
                 toppos = btnAlleFilterAus.Top;
-                leftpos = btnPinZurück.Right + Skin.Padding;
+                leftpos = btnPinZurück.Right + Skin.Padding * 3;
                 constwi = (int)(txbZeilenFilter.Width * 1.5);
                 right = constwi + Skin.PaddingSmal;
                 anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
@@ -141,6 +151,9 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
 
+
+
+
             // Vorhandene Flexis ermitteln
             var flexsToDelete = new List<FlexiControlForFilter>();
             foreach (var ThisControl in Controls)
@@ -153,19 +166,26 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 var colara = _TableView.Database.ColumnArrangements[_TableView.Arrangement];
 
+
+
                 foreach (var thisclsVitem in colara)
                 {
 
-                    var f = _TableView.Filter[thisclsVitem.Column];
+                    var ShowMe = false;
 
-                    if (f == null && thisclsVitem.Column.AutoFilter_Dauerfilter)
+                    if (_Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_Alle)) { ShowMe = true; }
+                    if (_Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_DauerFilter) && thisclsVitem.Column.AutoFilter_Dauerfilter) { ShowMe = true; }
+                    var f = _TableView.Filter[thisclsVitem.Column];
+                    if (f != null && _Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_AktiveFilter)) { ShowMe = true; }
+
+                    if (f == null && ShowMe)
                     {
                         // Dummy-Filter, nicht in der Collection
                         f = new FilterItem(thisclsVitem.Column, enFilterType.Instr_GroßKleinEgal, string.Empty);
                     }
 
 
-                    if (f != null)
+                    if (f != null && ShowMe)
                     {
                         var flx = FlexiItemOf(f);
                         if (flx != null)
@@ -243,7 +263,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
                 if (ISFilter)
                 {
-                        flx.Filter.Changeto(enFilterType.Istgleich_ODER_GroßKleinEgal, v);
+                    flx.Filter.Changeto(enFilterType.Istgleich_ODER_GroßKleinEgal, v);
                 }
                 else
                 {
