@@ -196,7 +196,7 @@ namespace BlueControls.BlueDatabaseDialogs
                         else
                         {
                             // Na gut, eben neuen Flex erstellen
-                            flx = new FlexiControlForFilter(f, enÜberschriftAnordnung.Links_neben_Dem_Feld);
+                            flx = new FlexiControlForFilter(_TableView, f, enÜberschriftAnordnung.Links_neben_Dem_Feld);
                             flx.ValueChanged += Flx_ValueChanged;
                             flx.ButtonClicked += Flx_ButtonClicked;
                             Controls.Add(flx);
@@ -243,9 +243,9 @@ namespace BlueControls.BlueDatabaseDialogs
 
                 if (_TableView == null) { return; }
 
-                var ISFilter = flx.Value.StartsWith("|");
+                var ISFilter = flx.WasThisValueClicked(); //  flx.Value.StartsWith("|");
 
-                var v = flx.Value.Trim("|");
+                var v = flx.Value; //.Trim("|");
 
                 if (_TableView.Filter == null || _TableView.Filter.Count == 0 || !_TableView.Filter.Contains(flx.Filter))
                 {

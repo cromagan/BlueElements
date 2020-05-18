@@ -207,6 +207,11 @@ namespace BlueDatabase
 
             if (_Column == null) { return "Zeilen-Filter"; }
 
+
+
+
+
+
             var nam = _Column.ReadableText();
 
             if (SearchValue == null || SearchValue.Count < 1) { return "#### Filter-Fehler ####"; }
@@ -244,13 +249,13 @@ namespace BlueDatabase
                 case enFilterType.Istgleich_GroﬂKleinEgal:
                 case enFilterType.Istgleich_ODER_GroﬂKleinEgal:
                 case enFilterType.Istgleich_UND_GroﬂKleinEgal:
-                    return nam + " = " + SearchValue[0];
+                    return nam + " = " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced);
 
                 case enFilterType.Ungleich_MultiRowIgnorieren:
                 case enFilterType.Ungleich_MultiRowIgnorieren_UND_GroﬂKleinEgal:
                 case enFilterType.Ungleich_MultiRowIgnorieren_GroﬂKleinEgal:
                     if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss bef¸llt sein"; }
-                    return nam + " <> " + SearchValue[0];
+                    return nam + " <> " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced);
 
 
                 case enFilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren:

@@ -24,6 +24,9 @@ using BlueDatabase.Enums;
 using BlueControls.Designer_Support;
 using System.ComponentModel;
 using System.Collections.Generic;
+using BlueControls.Enums;
+using BlueBasics.Enums;
+using System;
 
 namespace BlueControls.Controls
 {
@@ -38,22 +41,23 @@ namespace BlueControls.Controls
         /// </summary>
         public readonly FilterItem Filter = null;
 
-        List<string> AllItems = null;
+        public readonly Table TableView = null;
 
 
-        public FlexiControlForFilter() : this(null, enÜberschriftAnordnung.Links_neben_Dem_Feld)
+        public FlexiControlForFilter() : this(null, null, enÜberschriftAnordnung.Links_neben_Dem_Feld)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
             // InitializeComponent();
         }
 
-        public FlexiControlForFilter(FilterItem filter, enÜberschriftAnordnung captionPosition)
+        public FlexiControlForFilter(Table tableView, FilterItem filter, enÜberschriftAnordnung captionPosition)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Size = new Size(300, 300);
+            TableView = tableView;
             Filter = filter;
             UpdateFilterData();
 
@@ -130,15 +134,17 @@ namespace BlueControls.Controls
             if (e.Control is ComboBox cbx)
             {
                 var Item2 = new ItemCollectionList();
+                Item2.Add(new TextListItem("|~", "Keine weiteren Einträge vorhanden"));
 
-                var c = Filter.Column.Contents(null);
+                //var c = Filter.Column.Contents(null);
 
-                foreach (var thiss in c)
-                {
-                    Item2.Add(new TextListItem("|" + thiss, thiss));
-                }
+                //foreach (var thiss in c)
+                //{
+                //    Item2.Add(new TextListItem("|" + thiss, thiss));
+                //}
 
                 StyleComboBox(cbx, Item2, System.Windows.Forms.ComboBoxStyle.DropDown);
+                cbx.DropDownShowing += Cbx_DropDownShowing;
             }
 
 
@@ -147,6 +153,55 @@ namespace BlueControls.Controls
                 btn.ImageCode = "Kreuz|16";
                 btn.Text = Filter.ReadableText();
             }
+        }
+
+
+        private void Cbx_DropDownShowing(object sender, System.EventArgs e)
+        {
+            var cbx = (ComboBox)sender;
+
+
+
+
+
+
+
+
+            //var List_FilterString = Column.Autofilter_ItemList(vFilter);
+
+
+            //var F = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
+
+            //Width = Math.Max(TXTBox.Width + Skin.Padding * 2, Table.tmpColumnContentWidth(Column, F, 16));
+
+            cbx.Item.Clear();
+            cbx.Item.CheckBehavior = enCheckBehavior.MultiSelection;
+
+
+            if (TableView == null)
+            {
+                cbx.Item.Add(new TextListItem("|~", "Anzeigefehler", enImageCode.Kreuz, false));
+                return;
+            }
+
+            var List_FilterString = Filter.Column.Autofilter_ItemList(TableView.Filter);
+
+            if (List_FilterString.Count == 0)
+            {
+
+                cbx.Item.Add(new TextListItem("|~", "Keine weiteren Einträge vorhanden", enImageCode.Kreuz, false));
+            }
+
+            else if (List_FilterString.Count < 400)
+            {
+                cbx.Item.AddRange(List_FilterString, Filter.Column, enShortenStyle.Replaced);
+                cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
+            }
+            else
+            {
+                cbx.Item.Add(new TextListItem("|~", "Zu viele Einträge", enImageCode.Kreuz, false));
+            }
+
         }
 
         private ComboBox GetComboBox()
@@ -164,5 +219,11 @@ namespace BlueControls.Controls
 
         }
 
+        internal bool WasThisValueClicked()
+        {
+            var cb = GetComboBox();
+            if (cb == null) { return false; }
+            return cb.WasThisValueClicked();
+        }
     }
 }

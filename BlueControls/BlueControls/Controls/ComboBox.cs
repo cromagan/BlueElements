@@ -65,7 +65,7 @@ namespace BlueControls.Controls
         private System.Windows.Forms.ComboBoxStyle _DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
         private enComboboxStyle _DrawStyle = enComboboxStyle.TextBox;
         private string _ImageCode = string.Empty;
-
+        private string _LastClickedText = "####~~~~|||||";
 
         #endregion
 
@@ -140,6 +140,7 @@ namespace BlueControls.Controls
 
         #region  Events 
         public event EventHandler<BasicListItemEventArgs> ItemClicked;
+        public event EventHandler DropDownShowing;
         #endregion
 
 
@@ -160,6 +161,7 @@ namespace BlueControls.Controls
 
             if (!string.IsNullOrEmpty(e.ClickedComand))
             {
+                _LastClickedText = e.ClickedComand;
                 Text = e.ClickedComand;
                 OnItemClicked(new BasicListItemEventArgs(Item[e.ClickedComand]));
 
@@ -266,6 +268,10 @@ namespace BlueControls.Controls
             }
         }
 
+        internal bool WasThisValueClicked()
+        {
+            return (Text == _LastClickedText);
+        }
 
         protected override void OnEnabledChanged(System.EventArgs e)
         {
@@ -285,9 +291,14 @@ namespace BlueControls.Controls
             if (_btnDropDownIsIn) { return; }
             if (IsDisposed) { return; }
             if (!Enabled) { return; }
-            if (Item.Count == 0) { return; }
 
             _btnDropDownIsIn = true;
+
+            OnDropDownShowing();
+
+            if (Item.Count == 0) { _btnDropDownIsIn = false; return; }
+
+
 
             int X, Y;
 
@@ -316,7 +327,10 @@ namespace BlueControls.Controls
             _btnDropDownIsIn = false;
         }
 
-
+        private void OnDropDownShowing()
+        {
+            DropDownShowing?.Invoke(this, System.EventArgs.Empty);
+        }
 
         protected override void OnGotFocus(System.EventArgs e)
         {
@@ -387,6 +401,7 @@ namespace BlueControls.Controls
         private void _Item_ItemAdded(object sender, ListEventArgs e)
         {
             if (IsDisposed) { return; }
+            if (_btnDropDownIsIn) { return; }
 
             FloatingInputBoxListBoxStyle.Close(this);
             Invalidate();
@@ -396,6 +411,7 @@ namespace BlueControls.Controls
         {
 
             if (IsDisposed) { return; }
+            if (_btnDropDownIsIn) { return; }
 
             FloatingInputBoxListBoxStyle.Close(this);
             Invalidate();
@@ -437,6 +453,7 @@ namespace BlueControls.Controls
         private void _Item_ItemRemoved(object sender, System.EventArgs e)
         {
             if (IsDisposed) { return; }
+            if (_btnDropDownIsIn) { return; }
             FloatingInputBoxListBoxStyle.Close(this);
             Invalidate();
         }
