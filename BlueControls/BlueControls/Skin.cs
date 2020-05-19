@@ -955,10 +955,10 @@ namespace BlueControls
                 if (QI != null) { GR.DrawImage(QI.BMP, (int)(FitInRect.X + XP), (int)(FitInRect.Y + YP1)); }
                 if (!string.IsNullOrEmpty(TXT)) { GR.DrawString(TXT, F.Font(), F.Brush_Color_Main, FitInRect.X + pSize.Width + XP, FitInRect.Y + YP2); }
             }
-            catch (Exception ex)
+            catch (Exception _)
             {
                 // es kommt selten vor, dass das Graphics-Objekt an anderer Stelle verwendet wird. Was immer das auch heiﬂen mag...
-                Develop.DebugPrint(ex);
+                //Develop.DebugPrint(ex);
             }
         }
 

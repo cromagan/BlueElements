@@ -3196,66 +3196,57 @@ namespace BlueControls.Controls
             return x + "}";
         }
 
-        public void ParseView(string Value)
+        public void ParseView(string ToParse)
         {
 
-            if (string.IsNullOrEmpty(Value)) { return; }
+            if (string.IsNullOrEmpty(ToParse)) { return; }
 
-
-
-            var Beg = 0;
-
-            do
+            foreach (var pair in ToParse.GetAllTags())
             {
-                Beg += 1;
-                if (Beg > Value.Length) { break; }
-                var T = Value.ParseTag(Beg);
-                var pairValue = Value.ParseValue(T, Beg);
-                Beg = Beg + T.Length + pairValue.Length + 2;
-                switch (T)
+                switch (pair.Key)
                 {
                     case "arrangementnr":
-                        Arrangement = int.Parse(pairValue);
+                        Arrangement = int.Parse(pair.Value);
                         break;
 
                     case "filters":
-                        Filter.Parse(pairValue);
+                        Filter.Parse(pair.Value);
                         break;
 
                     case "sliderx":
-                        SliderX.Maximum = Math.Max(SliderX.Maximum, int.Parse(pairValue));
-                        SliderX.Value = int.Parse(pairValue);
+                        SliderX.Maximum = Math.Max(SliderX.Maximum, int.Parse(pair.Value));
+                        SliderX.Value = int.Parse(pair.Value);
                         break;
 
                     case "slidery":
-                        SliderY.Maximum = Math.Max(SliderY.Maximum, int.Parse(pairValue));
-                        SliderY.Value = int.Parse(pairValue);
+                        SliderY.Maximum = Math.Max(SliderY.Maximum, int.Parse(pair.Value));
+                        SliderY.Value = int.Parse(pair.Value);
                         break;
 
                     case "cursorpos":
-                        Database.Cell.DataOfCellKey(pairValue, out var column, out var row);
+                        Database.Cell.DataOfCellKey(pair.Value, out var column, out var row);
                         CursorPos_Set(column, row, false);
                         break;
 
                     case "tempsort":
-                        _sortDefinitionTemporary = new RowSortDefinition(_Database, pairValue);
+                        _sortDefinitionTemporary = new RowSortDefinition(_Database, pair.Value);
                         break;
 
                     case "pin":
-                        _PinnedRows.Add(_Database.Row.SearchByKey(int.Parse(pairValue)));
+                        _PinnedRows.Add(_Database.Row.SearchByKey(int.Parse(pair.Value)));
                         break;
 
                     case "reduced":
-                        var c = _Database.Column.SearchByKey(int.Parse(pairValue));
+                        var c = _Database.Column.SearchByKey(int.Parse(pair.Value));
                         var cv = _Database.ColumnArrangements[_ArrangementNr][c];
                         if (cv != null) { cv._TMP_Reduced = true; }
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Warnung, "Tag unbekannt: " + T);
+                        Develop.DebugPrint(enFehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
                         break;
                 }
-            } while (true);
+            } 
 
             Filter.OnChanged();
 

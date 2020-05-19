@@ -110,11 +110,13 @@ namespace BlueControls.Controls
                 if (_Database != null)
                 {
                     _Database.Cell.CellValueChanged -= Database_CellValueChanged;
-                    _Database.Row.RowRemoved -= Database_RowRemoved;
+                    //_Database.Row.RowRemoved -= Database_RowRemoved;
+                    _Database.Row.RowRemoving -= Row_RowRemoving;
                     _Database.Column.ItemInternalChanged -= Column_ItemInternalChanged;
                     _Database.ConnectedControlsStopAllWorking -= Database_ConnectedControlsStopAllWorking;
                     _Database.Row.RowChecked -= Database_RowChecked;
                     _Database.RowKeyChanged -= _Database_RowKeyChanged;
+                    _Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
                     _Database.Loaded -= _Database_Loaded;
                 }
 
@@ -125,19 +127,31 @@ namespace BlueControls.Controls
                 if (_Database != null)
                 {
                     _Database.Cell.CellValueChanged += Database_CellValueChanged;
-                    _Database.Row.RowRemoved += Database_RowRemoved;
+                    //_Database.Row.RowRemoved += Database_RowRemoved;
+                    _Database.Row.RowRemoving += Row_RowRemoving;
                     _Database.Column.ItemInternalChanged += Column_ItemInternalChanged;
                     _Database.ConnectedControlsStopAllWorking += Database_ConnectedControlsStopAllWorking;
                     _Database.Row.RowChecked += Database_RowChecked;
                     _Database.RowKeyChanged += _Database_RowKeyChanged;
                     _Database.Loaded += _Database_Loaded;
-                    //V.Column.Database.ColumnKeyChanged += _Database_ColumnKeyChanged; // Columns sind als Objektverweis vermerkt
+                    _Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
 
                 }
 
                 CheckEnabledState();
             }
         }
+
+        private void Row_RowRemoving(object sender, RowEventArgs e)
+        {
+            if (e.Row.Key  == _RowKey)
+            {
+                _RowKey = -1;
+                GetTmpVariables();
+            }
+
+        }
+
 
         private void _Database_Loaded(object sender, LoadedEventArgs e)
         {
@@ -154,8 +168,6 @@ namespace BlueControls.Controls
         private void GetTmpVariables()
         {
 
-
-
             if (_Database != null)
             {
                 _tmpColumn = _Database.Column.SearchByKey(_ColKey);
@@ -169,11 +181,7 @@ namespace BlueControls.Controls
 
         }
 
-        public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld)
-        {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            // InitializeComponent();
-        }
+        public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
 
         public FlexiControlForCell(Database database, int columnKey, enÜberschriftAnordnung captionPosition)
         {
@@ -224,11 +232,6 @@ namespace BlueControls.Controls
 
             }
             InfoText = NewT;
-        }
-        private void Database_RowRemoved(object sender, System.EventArgs e)
-        {
-            GetTmpVariables();
-            RowKey = -1;
         }
 
         private void Database_CellValueChanged(object sender, CellEventArgs e)
@@ -805,8 +808,17 @@ namespace BlueControls.Controls
         {
             if (e.KeyOld != _RowKey) { return; }
             _RowKey = e.KeyNew;
+            GetTmpVariables();
+            SetValueFromCell();
         }
 
+        private void _Database_ColumnKeyChanged(object sender, KeyChangedEventArgs e)
+        {
+            if (e.KeyOld != _ColKey) { return; }
+            _ColKey = e.KeyNew;
+            GetTmpVariables();
+            SetValueFromCell();
+        }
 
 
         protected override void OnRemovingAll()
