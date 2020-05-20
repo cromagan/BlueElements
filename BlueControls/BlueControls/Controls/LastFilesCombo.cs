@@ -40,11 +40,11 @@ namespace BlueControls.Controls
         public string _filename = string.Empty;
         public bool _mustExists = true;
         public int _maxCount = 20;
-        public string _specialcommand = string.Empty;
+        //public string _specialcommand = string.Empty;
 
 
         #region  Events 
-        public event System.EventHandler SpecialCommandClicked;
+        //public event System.EventHandler SpecialCommandClicked;
         #endregion
 
 
@@ -68,24 +68,24 @@ namespace BlueControls.Controls
             }
         }
 
-        /// <summary>
-        /// Wenn an erster Stelle ein besonderer Befehl stehen soll. Das Event SpecialCommandClicked wird anstelle ItemClicked ausgelöst.
-        /// </summary>
-        /// 
-        [DefaultValue("")]
-        public string SpecialCommand
-        {
-            get
-            {
-                return _specialcommand;
-            }
-            set
-            {
-                if (_specialcommand == value) { return; }
-                _specialcommand = value;
-                GenerateMenu();
-            }
-        }
+        ///// <summary>
+        ///// Wenn an erster Stelle ein besonderer Befehl stehen soll. Das Event SpecialCommandClicked wird anstelle ItemClicked ausgelöst.
+        ///// </summary>
+        ///// 
+        //[DefaultValue("")]
+        //public string SpecialCommand
+        //{
+        //    get
+        //    {
+        //        return _specialcommand;
+        //    }
+        //    set
+        //    {
+        //        if (_specialcommand == value) { return; }
+        //        _specialcommand = value;
+        //        GenerateMenu();
+        //    }
+        //}
 
 
         [DefaultValue(true)]
@@ -141,10 +141,10 @@ namespace BlueControls.Controls
             Item.Clear();
 
 
-            if (!string.IsNullOrEmpty(_specialcommand))
-            {
-                Item.Add(new TextListItem("#SPECIAL#", _specialcommand, QuickImage.Get(ImageCode), true, "!"));
-            }
+            //if (!string.IsNullOrEmpty(_specialcommand))
+            //{
+            //    Item.Add(new TextListItem("#SPECIAL#", _specialcommand, QuickImage.Get(ImageCode), true, "!"));
+            //}
 
 
 
@@ -280,11 +280,11 @@ namespace BlueControls.Controls
         protected override void OnItemClicked(BasicListItemEventArgs e)
         {
 
-            if (!string.IsNullOrEmpty(_specialcommand) && e.Item.Internal == "#SPECIAL#")
-            {
-                OnSpecialCommandClicked();
-                return;
-            }
+            //if (!string.IsNullOrEmpty(_specialcommand) && e.Item.Internal == "#SPECIAL#")
+            //{
+            //    OnSpecialCommandClicked();
+            //    return;
+            //}
 
             base.OnItemClicked(e);
 
@@ -294,10 +294,10 @@ namespace BlueControls.Controls
         }
 
 
-        private void OnSpecialCommandClicked()
-        {
-            SpecialCommandClicked?.Invoke(this, System.EventArgs.Empty);
-        }
+        //private void OnSpecialCommandClicked()
+        //{
+        //    SpecialCommandClicked?.Invoke(this, System.EventArgs.Empty);
+        //}
 
 
     }

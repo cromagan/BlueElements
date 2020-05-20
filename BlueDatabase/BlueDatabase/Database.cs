@@ -1553,7 +1553,7 @@ namespace BlueDatabase
             var f = base.ErrorReason(mode);
             if (!string.IsNullOrEmpty(f)) { return f; }
 
-            if (mode.HasFlag(enErrorReason.Save))
+            if (mode.HasFlag(enErrorReason.Save) || mode.HasFlag(enErrorReason.Load)|| mode.HasFlag(enErrorReason.EditGeneral))
             {
                 if (Cell.Freezed) { return "Datenbank gerade eingefroren."; }
             }

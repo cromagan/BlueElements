@@ -446,10 +446,18 @@ namespace BlueDatabase
         /// </summary>
         /// <param name="IsNewRow"></param>
         /// <param name="doFemdZelleInvalidate"></param>
-        public string DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck)
+        public Tuple<bool, string> DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck)
         {
 
-            if (Database.ReadOnly) { return "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"; }
+            if (Database.ReadOnly) { return new Tuple<bool, string>(false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"); }
+
+            var feh = Database.ErrorReason(enErrorReason.EditAcut);
+
+            if (!string.IsNullOrEmpty(feh))
+            {
+                Develop.DebugPrint(enFehlerArt.Warnung, "Automatik nicht möglich: " + feh);
+                return new Tuple<bool, string>(false, feh);
+            }
 
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
             var cols = DoRules();
@@ -522,7 +530,7 @@ namespace BlueDatabase
 
             //MessageBox.Show(_InfoTXT, enImageCode.Information, "OK");
 
-            return _InfoTXT;
+            return new Tuple<bool, string>(true, _InfoTXT); ;
 
         }
 
@@ -685,7 +693,7 @@ namespace BlueDatabase
         /// <returns></returns>
         public string ReplaceVariablesForMath(string formel)
         {
-    
+
             // Variablen ersetzen
             foreach (var thisColumnItem in Database.Column)
             {

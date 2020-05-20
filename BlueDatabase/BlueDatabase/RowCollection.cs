@@ -286,20 +286,33 @@ namespace BlueDatabase
 
         public void DoAutomatic(FilterCollection filter, bool fullCheck, List<RowItem> pinned)
         {
+            if (Database.ReadOnly) { return; }
+
             var x = CalculateSortedRows(filter, null, pinned);
 
 
             if (x.Count() == 0) { return; }
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", 0, x.Count(), true, false));
 
-            var c = 0;
+            var all = x.Count;
 
-            foreach (var ThisRowItem in x)
+            while (x.Count > 0)
             {
-                c++;
-                Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", c, x.Count(), false, false));
-                ThisRowItem.DoAutomatic(true, fullCheck);
+
+                Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", (all - x.Count()), all, false, false));
+                if (x[0].DoAutomatic(true, fullCheck).Item1)
+                {
+                    x.RemoveAt(0);
+                }
+
             }
+
+            //foreach (var ThisRowItem in x)
+            //{
+            //    c++;
+            //    Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", c, x.Count(), false, false));
+            //    ThisRowItem.DoAutomatic(true, fullCheck);
+            //}
 
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", x.Count(), x.Count(), false, true));
         }

@@ -1033,7 +1033,7 @@ namespace BlueBasics.MultiUserFile
             {
                 if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
 
-                if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 1) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen 
+                if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 6) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen 
 
                 if (PureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
                 if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
@@ -1094,7 +1094,7 @@ namespace BlueBasics.MultiUserFile
             {
                 if (_IsLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
 
-                if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 1) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen 
+                if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 6) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
 
 
                 if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
