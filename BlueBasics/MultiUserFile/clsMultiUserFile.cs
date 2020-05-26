@@ -992,6 +992,9 @@ namespace BlueBasics.MultiUserFile
 
             if (_MustReload && _MustSave)
             {
+                var f = ErrorReason(enErrorReason.Load);
+                if (!string.IsNullOrEmpty(f)) { return; }
+
                 // Checker_Tick_count nicht auf 0 setzen, dass der Saver noch stimmt.
                 Load_Reload();
                 return;
@@ -1001,6 +1004,10 @@ namespace BlueBasics.MultiUserFile
 
             if (_MustSave && Checker_Tick_count > Count_Save)
             {
+                var f = ErrorReason(enErrorReason.Save);
+                if (!string.IsNullOrEmpty(f)) { return; }
+
+
                 // Eigentlich sollte die folgende Abfrage überflüssig sein. Ist sie aber nicht
                 if (!PureBinSaver.IsBusy) { PureBinSaver.RunWorkerAsync(); }
                 Checker_Tick_count = 0;
@@ -1011,6 +1018,8 @@ namespace BlueBasics.MultiUserFile
             // Überhaupt nix besonderes. Ab und zu mal Reloaden
             if (_MustReload && Checker_Tick_count > _ReloadDelaySecond && string.IsNullOrEmpty(ErrorReason(enErrorReason.Load)))
             {
+                var f = ErrorReason(enErrorReason.Load);
+                if (!string.IsNullOrEmpty(f)) { return; }
                 Load_Reload();
                 Checker_Tick_count = 0;
             }

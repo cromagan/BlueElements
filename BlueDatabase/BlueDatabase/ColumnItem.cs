@@ -47,6 +47,7 @@ namespace BlueDatabase
         private string _Caption;
         private Bitmap _CaptionBitmap;
         private string _QuickInfo;
+        private string _Intelligenter_Multifilter;
         private string _Ueberschrift1;
         private string _Ueberschrift2;
         private string _Ueberschrift3;
@@ -132,7 +133,7 @@ namespace BlueDatabase
 
         private string _AutoRemove;
         private bool _SaveContent;
-        private bool _AutoFilter_Dauerfilter;
+        private enDauerfilter _AutoFilter_Dauerfilter;
 
         private int _KeyColumnKey;
 
@@ -180,6 +181,7 @@ namespace BlueDatabase
             _Ueberschrift1 = string.Empty;
             _Ueberschrift2 = string.Empty;
             _Ueberschrift3 = string.Empty;
+            _Intelligenter_Multifilter = string.Empty;
             _ForeColor = Color.Black;
             _BackColor = Color.White;
             _CellInitValue = string.Empty;
@@ -222,7 +224,7 @@ namespace BlueDatabase
             _AutoRemove = string.Empty;
             _AutoFilterJoker = string.Empty;
             _SaveContent = true;
-            _AutoFilter_Dauerfilter = false;
+            _AutoFilter_Dauerfilter = enDauerfilter.ohne;
 
             _SpellCheckingEnabled = false;
 
@@ -437,6 +439,19 @@ namespace BlueDatabase
             {
                 if (_QuickInfo == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_QuickInfo, this, _QuickInfo, value, true);
+                OnChanged();
+            }
+        }
+        public string Intelligenter_Multifilter
+        {
+            get
+            {
+                return _Intelligenter_Multifilter;
+            }
+            set
+            {
+                if (_Intelligenter_Multifilter == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_Intelligenter_Multifilter, this, _Intelligenter_Multifilter, value, true);
                 OnChanged();
             }
         }
@@ -946,7 +961,7 @@ namespace BlueDatabase
             }
         }
 
-        public bool AutoFilter_Dauerfilter
+        public enDauerfilter AutoFilter_Dauerfilter
         {
             get
             {
@@ -955,7 +970,7 @@ namespace BlueDatabase
             set
             {
                 if (_AutoFilter_Dauerfilter == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AutoFilter_Dauerfilter, this, _AutoFilter_Dauerfilter.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database.AddPending(enDatabaseDataType.co_AutoFilter_Dauerfilter, this, ((int)_AutoFilter_Dauerfilter).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -1344,7 +1359,7 @@ namespace BlueDatabase
                     CellCollection.Invalidate_CellContentSize(this, ThisRow);
                     Invalidate_TmpColumnContentWidth();
                     Database.Cell.OnCellValueChanged(new CellEventArgs(this, ThisRow));
-                    ThisRow.DoAutomatic(true, false);
+                    ThisRow.DoAutomatic(true, false, 5);
                 }
             }
         }
@@ -1504,6 +1519,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_LineLeft: _LineLeft = (enColumnLineStyle)int.Parse(Wert); break;
                 case enDatabaseDataType.co_LinieRight: _LineRight = (enColumnLineStyle)int.Parse(Wert); break;
                 case enDatabaseDataType.co_QuickInfo: _QuickInfo = Wert; break;
+                case enDatabaseDataType.co_Intelligenter_Multifilter: _Intelligenter_Multifilter = Wert; break;
                 case enDatabaseDataType.co_Ueberschrift1: _Ueberschrift1 = Wert; break;
                 case enDatabaseDataType.co_Ueberschrift2: _Ueberschrift2 = Wert; break;
                 case enDatabaseDataType.co_Ueberschrift3: _Ueberschrift3 = Wert; break;
@@ -1539,7 +1555,22 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_AfterEdit_DoUcase: _AfterEdit_DoUCase = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_AfterEdit_AutoCorrect: _AfterEdit_AutoCorrect = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_SaveContent: _SaveContent = Wert.FromPlusMinus(); break;
-                case enDatabaseDataType.co_AutoFilter_Dauerfilter: _AutoFilter_Dauerfilter = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_AutoFilter_Dauerfilter:
+
+                    if (Wert == "-")
+                    {
+                        _AutoFilter_Dauerfilter = enDauerfilter.ohne;
+                    }
+                    else if (Wert == "+")
+                    {
+                        _AutoFilter_Dauerfilter = enDauerfilter.beide;
+                    }
+                    else
+                    {
+                        _AutoFilter_Dauerfilter = (enDauerfilter)int.Parse(Wert);
+                    }
+
+                    break;
                 case enDatabaseDataType.co_AutoRemove: _AutoRemove = Wert; break;
                 case enDatabaseDataType.co_AdminInfo: _AdminInfo = Wert; break;
                 case enDatabaseDataType.co_Suffix: _Suffix = Wert; break;
@@ -1838,7 +1869,7 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_Runden, _AfterEdit_Runden.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoRemove, _AutoRemove, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_SaveContent, _SaveContent.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilter_Dauerfilter, _AutoFilter_Dauerfilter.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilter_Dauerfilter, ((int)_AutoFilter_Dauerfilter).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErlaubt, _AutofilterErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterTextFilterErlaubt, _AutofilterTextFilterErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErweitertErlaubt, _AutoFilterErweitertErlaubt.ToPlusMinus(), Key);
@@ -1886,7 +1917,7 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_VorschlagColumn, _VorschlagsColumn.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Align, ((int)_Align).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_SortMask, _SortMask, Key);
-
+            Database.SaveToByteList(l, enDatabaseDataType.co_Intelligenter_Multifilter, _Intelligenter_Multifilter, Key);
 
             //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
             Database.SaveToByteList(l, enDatabaseDataType.co_Identifier, _Identifier, Key);

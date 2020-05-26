@@ -62,6 +62,7 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxRandRechts.Item.AddRange(typeof(enColumnLineStyle));
             cbxBildCodeImageNotfound.Item.AddRange(typeof(enImageNotFound));
             cbxAlign.Item.AddRange(typeof(enAlignmentHorizontal));
+            cbxDauerFilter.Item.AddRange(typeof(enDauerfilter));
 
 
             //if (cbxAlign.Item.Count == 0)
@@ -171,7 +172,7 @@ namespace BlueControls.BlueDatabaseDialogs
             txbUeberschift2.Text = _Column.Ueberschrift2;
             txbUeberschift3.Text = _Column.Ueberschrift3;
 
-
+            txbIntelligenter_Multifilter.Text = _Column.Intelligenter_Multifilter;
 
             txbPrefix.Text = _Column.Prefix;
 
@@ -221,8 +222,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             txbAutoRemove.Text = _Column.AutoRemove;
             butSaveContent.Checked = _Column.SaveContent;
-            btnDauerFilter.Checked = _Column.AutoFilter_Dauerfilter;
-
+            cbxDauerFilter.Text = ((int)_Column.AutoFilter_Dauerfilter).ToString();
 
             cbxSchlüsselspalte.Item.Clear();
             cbxSchlüsselspalte.Item.Add("#Ohne");
@@ -486,7 +486,7 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.Ueberschrift3 = txbUeberschift3.Text;
 
             _Column.Prefix = txbPrefix.Text;
-
+            _Column.Intelligenter_Multifilter = txbIntelligenter_Multifilter.Text;
 
             var NewTags = tbxTags.Text.SplitByCRToList();
             if (NewTags.IsDifferentTo(_Column.Tags))
@@ -556,7 +556,7 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.SortMask = txbSortMask.Text;
             _Column.AutoRemove = txbAutoRemove.Text;
             _Column.SaveContent = butSaveContent.Checked;
-            _Column.AutoFilter_Dauerfilter = btnDauerFilter.Checked;
+            _Column.AutoFilter_Dauerfilter = (enDauerfilter)int.Parse(cbxDauerFilter.Text);
 
             //// Regel: Wenn Leer, gib Fehler aus
             //var tmpR = _Column.Database.Rules_Has(_Column, "Leer-Fehler");

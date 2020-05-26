@@ -277,7 +277,7 @@ namespace BlueDatabase
                 if (ThisColum != null && !string.IsNullOrEmpty(ThisColum.CellInitValue)) { Row.CellSet(ThisColum, ThisColum.CellInitValue); }
             }
 
-            Row.DoAutomatic(false, false);
+            Row.DoAutomatic(false, false, 1);
 
 
             return Row;
@@ -299,7 +299,7 @@ namespace BlueDatabase
             while (x.Count > 0)
             {
 
-                Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", (all - x.Count()), all, false, false));
+                Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - x.Count(), all, false, false));
                 if (x[0].DoAutomatic(true, fullCheck).Item1)
                 {
                     x.RemoveAt(0);

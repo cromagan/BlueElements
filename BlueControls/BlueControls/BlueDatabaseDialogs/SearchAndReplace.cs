@@ -171,7 +171,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
                 }
 
-                if (RowChanged) { ThisRow.DoAutomatic(true, false); }
+                if (RowChanged) { ThisRow.DoAutomatic(true, false, 10); }
             }
 
             P?.Close();

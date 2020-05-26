@@ -174,7 +174,13 @@ namespace BlueControls.BlueDatabaseDialogs
                     var ShowMe = false;
 
                     if (_Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_Alle)) { ShowMe = true; }
-                    if (_Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_DauerFilter) && thisclsVitem.Column.AutoFilter_Dauerfilter) { ShowMe = true; }
+                    if (_Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_DauerFilter))
+                    {
+                        if (thisclsVitem.Column.AutoFilter_Dauerfilter.HasFlag(enDauerfilter.waagerecht) && _orientation == enOrientation.Waagerecht) { ShowMe = true; }
+                        if (thisclsVitem.Column.AutoFilter_Dauerfilter.HasFlag(enDauerfilter.senkrecht) && _orientation == enOrientation.Senkrecht) { ShowMe = true; }
+                    }
+
+
                     var f = _TableView.Filter[thisclsVitem.Column];
                     if (f != null && _Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_AktiveFilter)) { ShowMe = true; }
 

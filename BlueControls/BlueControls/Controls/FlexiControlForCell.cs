@@ -144,7 +144,7 @@ namespace BlueControls.Controls
 
         private void Row_RowRemoving(object sender, RowEventArgs e)
         {
-            if (e.Row.Key  == _RowKey)
+            if (e.Row.Key == _RowKey)
             {
                 _RowKey = -1;
                 GetTmpVariables();
@@ -375,7 +375,7 @@ namespace BlueControls.Controls
             _tmpRow.Database.WaitEditable();
 
             _tmpRow.CellSet(_tmpColumn, NewValue);
-            if (OldVal != _tmpRow.CellGetString(_tmpColumn)) { _tmpRow.DoAutomatic(false, false); }
+            if (OldVal != _tmpRow.CellGetString(_tmpColumn)) { _tmpRow.DoAutomatic(false, false, 1); }
         }
 
 

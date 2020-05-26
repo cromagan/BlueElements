@@ -184,6 +184,7 @@ namespace BlueDatabase.Enums
         co_AutoRemove = 190,
         co_SaveContent = 191,
         co_AutoFilter_Dauerfilter = 192,
+        co_Intelligenter_Multifilter = 193,
 
 
 

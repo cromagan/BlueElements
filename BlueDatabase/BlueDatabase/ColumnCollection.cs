@@ -508,6 +508,7 @@ namespace BlueDatabase
             c.Ueberschrift3 = Source.Ueberschrift3;
 
             c.Suffix = Source.Suffix;
+            c.Intelligenter_Multifilter = Source.Intelligenter_Multifilter;
 
             c.LinkedKeyKennung = Source.LinkedKeyKennung;
             c.LinkedDatabaseFile = Source.LinkedDatabaseFile;

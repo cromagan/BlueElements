@@ -16,14 +16,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
+using System;
+
 namespace BlueDatabase.Enums
 {
-    public enum enViewType
+    [Flags]
+    public enum enDauerfilter
     {
-        None = 0,
-        Column = 1,
-        PermanentColumn = 2
-
-        //Separator = 100
+        ohne = 0,
+        senkrecht = 1,
+        waagerecht = 2,
+        beide = senkrecht | waagerecht
     }
 }

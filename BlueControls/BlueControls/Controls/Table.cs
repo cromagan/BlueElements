@@ -1895,7 +1895,7 @@ namespace BlueControls.Controls
 
                 if (table.Database == column.Database) { table.CursorPos_Set(column, row, false); }
 
-                row.DoAutomatic(true, false);
+                row.DoAutomatic(true, false, 5);
 
                 // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
                 // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
@@ -4218,7 +4218,7 @@ namespace BlueControls.Controls
 
 
             Database.Cell.Set(Column, Row, v[0].Substring(5), false);
-            Row.DoAutomatic(true, true);
+            Row.DoAutomatic(true, true, 5);
         }
 
 

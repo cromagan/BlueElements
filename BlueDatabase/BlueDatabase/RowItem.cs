@@ -444,8 +444,32 @@ namespace BlueDatabase
         /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
         /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
         /// </summary>
-        /// <param name="IsNewRow"></param>
-        /// <param name="doFemdZelleInvalidate"></param>
+        /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
+        /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
+        /// <param name="tryforsceonds"></param>
+        /// <returns></returns>
+        public Tuple<bool, string> DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds)
+        {
+
+            if (Database.ReadOnly) { return new Tuple<bool, string>(false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"); }
+
+
+            var t = DateTime.Now;
+            do
+            {
+                var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck);
+                if (erg.Item1) { return erg; }
+
+                if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
+            } while (true);
+        }
+
+        /// <summary>
+        /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
+        /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
+        /// </summary>
+        /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
+        /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
         public Tuple<bool, string> DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck)
         {
 
@@ -455,7 +479,7 @@ namespace BlueDatabase
 
             if (!string.IsNullOrEmpty(feh))
             {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Automatik nicht möglich: " + feh);
+                //Develop.DebugPrint(enFehlerArt.Warnung, "Automatik nicht möglich: " + feh);
                 return new Tuple<bool, string>(false, feh);
             }
 

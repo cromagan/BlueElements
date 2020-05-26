@@ -50,8 +50,8 @@ namespace BlueBasics
 
         public static bool IsDevelopment()
         {
-            if (IsHostRunning()) { return true; }
-            return System.Windows.Forms.Application.StartupPath.ToLower().Contains("\\bin\\") && modAllgemein.UserName().ToLower() == "k0012794";
+            return IsHostRunning(); // { return true; }
+         //   return System.Windows.Forms.Application.StartupPath.ToLower().Contains("\\bin\\") && IsPeterChr();
         }
 
         public static bool IsHostRunning()
