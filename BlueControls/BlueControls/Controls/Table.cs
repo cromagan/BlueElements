@@ -50,16 +50,19 @@ namespace BlueControls.Controls
     public partial class Table : GenericControl, IContextMenu, IBackgroundNone
     {
 
-        public Table()
+        #region Constructor
+        public Table() : base(true)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            SetDoubleBuffering();
             _MouseHighlight = false;
         }
+        #endregion
+
+
 
 
         /// <summary>
@@ -3246,7 +3249,7 @@ namespace BlueControls.Controls
                         Develop.DebugPrint(enFehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
                         break;
                 }
-            } 
+            }
 
             Filter.OnChanged();
 

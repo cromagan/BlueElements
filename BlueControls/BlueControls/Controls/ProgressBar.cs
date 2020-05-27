@@ -30,6 +30,11 @@ namespace BlueControls.Controls
     {
         private int wProzent = 100;
 
+
+        #region Constructor
+        public ProgressBar() : base(false) {}
+
+        #endregion
         [DefaultValue(100)]
         public int Prozent
         {

@@ -41,9 +41,10 @@ namespace BlueControls.Controls
     public partial class TextBox : GenericControl, IBackgroundBitmap, IContextMenu, IQuickInfo
     {
 
+        #region Constructor
 
 
-        public TextBox()
+        public TextBox(): base(true)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -59,7 +60,7 @@ namespace BlueControls.Controls
                 _MouseHighlight = false;
             }
         }
-
+        #endregion
 
 
         #region  Variablen 

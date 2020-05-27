@@ -42,6 +42,13 @@ namespace BlueControls.Controls
         public int _maxCount = 20;
         //public string _specialcommand = string.Empty;
 
+        #region Constructor
+        public LastFilesCombo(): base()
+        {
+            SetLastFilesStyle();
+        }
+
+        #endregion
 
         #region  Events 
         //public event System.EventHandler SpecialCommandClicked;
@@ -119,13 +126,6 @@ namespace BlueControls.Controls
 
             }
         }
-
-
-        public LastFilesCombo()
-        {
-            SetLastFilesStyle();
-        }
-
 
 
 

@@ -23,10 +23,11 @@ using System.Drawing;
 using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 
 namespace BlueControls.Forms
 {
-    public partial class Form : System.Windows.Forms.Form, BlueControls.Interfaces.IDesignAble
+    public partial class Form : System.Windows.Forms.Form, IDesignAble, ISupportsBeginnEdit
     {
         public Form(): base()
         {
@@ -152,7 +153,67 @@ namespace BlueControls.Forms
         #endregion
 
 
+        #region ISupportsEdit
 
+        public int BeginnEditCounter { get; set; } = 0;
+
+
+        public new void SuspendLayout()
+        {
+            BeginnEdit();
+        }
+        public new void ResumeLayout(bool dummy)
+        {
+            EndEdit();
+        }
+
+        public void BeginnEdit()
+        {
+            if (BeginnEditCounter == 0)
+            {
+                base.SuspendLayout();
+                foreach (var ThisControl in Controls)
+                {
+                    if (ThisControl is ISupportsBeginnEdit e)
+                    {
+                        e.BeginnEdit();
+                    }
+                }
+            }
+            BeginnEditCounter++;
+        }
+        public void EndEdit()
+        {
+            BeginnEditCounter--;
+
+            if (BeginnEditCounter == 0)
+            {
+
+                base.ResumeLayout();
+                Invalidate();
+
+                foreach (var ThisControl in Controls)
+                {
+                    if (ThisControl is ISupportsBeginnEdit e)
+                    {
+                        e.EndEdit();
+                    }
+                }
+
+                PerformLayout();
+            }
+        }
+
+        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)
+        {
+            if (e.Control is ISupportsBeginnEdit nc)
+            {
+                nc.BeginnEditCounter = BeginnEditCounter;
+            }
+            base.OnControlAdded(e);
+        }
+
+        #endregion
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
         {
             //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.form.closed?view=netframework-4.8
@@ -213,9 +274,7 @@ namespace BlueControls.Forms
         private void SkinChanged(object sender, System.EventArgs e)
         {
             BackColor = Skin.Color_Back(_design, enStates.Standard);
-            SuspendLayout();
             Invalidate();
-            ResumeLayout();
         }
 
 

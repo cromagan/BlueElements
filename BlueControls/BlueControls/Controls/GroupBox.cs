@@ -31,17 +31,18 @@ namespace BlueControls.Controls
     [Designer("System.Windows.Forms.Design.ParentControlDesigner,System.Design", typeof(IDesigner))]
     public partial class GroupBox : GenericControl, IBackgroundBitmap
     {
-        public GroupBox()
+
+        #region Constructor
+        public GroupBox() : base(false)
         {
 
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             SetNotFocusable();
             _MouseHighlight = false;
         }
 
+        #endregion
 
         #region  Variablen 
         private Bitmap _BitmapOfControl;
@@ -127,10 +128,7 @@ namespace BlueControls.Controls
         #endregion
         protected override void InitializeSkin()
         {
-            SuspendLayout();
             Invalidate();
-            Refresh();
-            ResumeLayout();
         }
 
 

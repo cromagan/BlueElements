@@ -44,15 +44,8 @@ namespace BlueControls.Controls
     public sealed partial class EasyPic : IContextMenu, IBackgroundNone
     {
 
-
-
-        private Bitmap _Bitmap = null;
-        private int _MaxSize = -1;
-
-
-        private int _Richt;
-
-        public EasyPic()
+        #region Constructor
+        public EasyPic(): base(false)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -61,6 +54,15 @@ namespace BlueControls.Controls
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             SetNotFocusable();
         }
+
+        #endregion
+
+        private Bitmap _Bitmap = null;
+        private int _MaxSize = -1;
+
+
+        private int _Richt;
+
 
 
 

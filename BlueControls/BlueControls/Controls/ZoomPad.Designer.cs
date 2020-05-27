@@ -34,7 +34,6 @@
             // 
             // SliderX
             // 
-            this.SliderX.CausesValidation = false;
             this.SliderX.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.SliderX.Location = new System.Drawing.Point(0, 221);
             this.SliderX.Name = "SliderX";
@@ -43,7 +42,6 @@
             // 
             // SliderY
             // 
-            this.SliderY.CausesValidation = false;
             this.SliderY.Dock = System.Windows.Forms.DockStyle.Right;
             this.SliderY.Location = new System.Drawing.Point(365, 0);
             this.SliderY.Name = "SliderY";

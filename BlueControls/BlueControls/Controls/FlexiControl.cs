@@ -70,7 +70,8 @@ namespace BlueControls.Controls
         private enDataFormat _Format = enDataFormat.Text;
 
         protected bool _allinitialized = false;
-        protected bool _enabled = false;
+        //  protected bool _enabled = false;
+        protected string _disabledReason = string.Empty;
 
         private bool _InstantChangedEvent = false;
 
@@ -96,7 +97,7 @@ namespace BlueControls.Controls
 
         #region  Constructor 
 
-        public FlexiControl()
+        public FlexiControl(): base(false)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -123,7 +124,7 @@ namespace BlueControls.Controls
         /// Einfacher Info Text. Wird nirgends mehr zurück gegeben.
         /// </summary>
         /// <param name="CaptionText"></param>
-        public FlexiControl(string CaptionText) : base()
+        public FlexiControl(string CaptionText) : base(false)
         {
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -201,33 +202,76 @@ namespace BlueControls.Controls
 
 
         [DefaultValue(true)]
+        [Obsolete]
         public new bool Enabled
         {
             get
             {
-                return _enabled;
+                return string.IsNullOrEmpty(_disabledReason);
+            }
+            // set
+            // {
+            //     if (Enabled == value) { return; }
+            ////     _enabled = value;
+
+            //     if (
+
+
+            //     //foreach (System.Windows.Forms.Control ThisControl in Controls)
+            //     //{
+            //     //    if (ThisControl.Name == "Info")
+            //     //    {
+            //     //        ThisControl.Enabled = true;
+            //     //    }
+            //     //    else
+            //     //    {
+            //     //        ThisControl.Enabled = value;
+            //     //    }
+            //     //}
+
+            //     //Invalidate();
+            // }
+        }
+
+
+        [DefaultValue("")]
+        public string DisabledReason
+        {
+            get
+            {
+                if (_disabledReason == null) { return string.Empty; }
+                return _disabledReason;
             }
             set
             {
-                if (_enabled == value) { return; }
-                _enabled = value;
+                if (value == null) { value = string.Empty; }
+                if (_disabledReason == null && string.IsNullOrEmpty(value)) { return; }
+                if (_disabledReason == value) { return; }
+
+                _disabledReason = value;
+
+
 
 
                 foreach (System.Windows.Forms.Control ThisControl in Controls)
                 {
-                    if (ThisControl.Name == "Info")
+                    if (ThisControl != _InfoCaption)
                     {
-                        ThisControl.Enabled = true;
+                        ThisControl.Enabled = Enabled;
                     }
                     else
                     {
-                        ThisControl.Enabled = value;
+                        ThisControl.Enabled = true;
                     }
                 }
 
+                DoInfoTextCaption(_disabledReason);
                 Invalidate();
+
+
             }
         }
+
 
 
         [DefaultValue("")]
@@ -486,7 +530,23 @@ namespace BlueControls.Controls
             gr.DrawImage(_BitmapOfControl, 0, 0);
             TMPGR.Dispose();
 
-            DoInfoTextCaption(!state.HasFlag(enStates.Standard_Disabled));
+
+
+            if (!string.IsNullOrEmpty(_disabledReason))
+            {
+                DoInfoTextCaption(_disabledReason);
+            }
+            else
+            {
+                if (state.HasFlag(enStates.Standard_Disabled))
+                {
+                    DoInfoTextCaption("Übergeordnetes Steuerlement ist deaktiviert.");
+                }
+                else
+                {
+                    DoInfoTextCaption(string.Empty);
+                }
+            }
         }
 
         protected override void InitializeSkin()
@@ -725,7 +785,7 @@ namespace BlueControls.Controls
             if (_CaptionPosition == enÜberschriftAnordnung.ohne) { return; }
 
             _CaptionObject = new Caption();
-            _CaptionObject.Enabled = _enabled;
+            _CaptionObject.Enabled = Enabled;
 
             Controls.Add(_CaptionObject);
 
@@ -788,7 +848,7 @@ namespace BlueControls.Controls
         {
             var Control = new Line
             {
-                Enabled = _enabled,
+                Enabled = this.Enabled,
                 Orientation = enOrientation.Waagerecht
             };
             StandardBehandlung(Control);
@@ -809,7 +869,7 @@ namespace BlueControls.Controls
         private EasyPic Control_Create_EasyPic()
         {
             var Control = new EasyPic();
-            Control.Enabled = _enabled;
+            Control.Enabled = Enabled;
 
             StandardBehandlung(Control);
             UpdateValueToControl();
@@ -854,7 +914,7 @@ namespace BlueControls.Controls
 
         protected void StyleComboBox(ComboBox Control, ItemCollectionList list, System.Windows.Forms.ComboBoxStyle Style)
         {
-            Control.Enabled = _enabled;
+            Control.Enabled = Enabled;
             Control.Format = _Format;
             Control.Suffix = _Suffix;
             Control.DropDownStyle = Style;
@@ -1004,7 +1064,7 @@ namespace BlueControls.Controls
         private ListBox Control_Create_SuggestListBox(ListBox MainBox, ItemCollectionList List)
         {
             var Control = new ListBox();
-            Control.Enabled = _enabled;
+            Control.Enabled = Enabled;
             Control.Item.Clear();
             Control.Item.AddRange(List);
             Control.Item.CheckBehavior = enCheckBehavior.NoSelection;
@@ -1042,7 +1102,7 @@ namespace BlueControls.Controls
         private ListBox Control_Create_MainListBox()
         {
             var Control = new ListBox();
-            Control.Enabled = _enabled;
+            Control.Enabled = Enabled;
             Control.Name = "Main";
 
             StyleListBox(Control, null);
@@ -1055,7 +1115,7 @@ namespace BlueControls.Controls
 
         protected void StyleListBox(ListBox Control, ColumnItem Column)
         {
-            Control.Enabled = _enabled;
+            Control.Enabled = Enabled;
 
             Control.Item.Clear();
             Control.Item.CheckBehavior = enCheckBehavior.MultiSelection;
@@ -1252,7 +1312,7 @@ namespace BlueControls.Controls
         {
             var Control = new Button
             {
-                Enabled = _enabled,
+                Enabled = this.Enabled,
                 Name = "ComandButton",
                 Checked = false,
                 ButtonStyle = enButtonStyle.Button,
@@ -1272,7 +1332,7 @@ namespace BlueControls.Controls
         {
             var Control = new Button
             {
-                Enabled = _enabled,
+                Enabled = Enabled,
                 Name = "ColorButton",
                 Checked = false,
                 ButtonStyle = enButtonStyle.Button,
@@ -1293,7 +1353,7 @@ namespace BlueControls.Controls
         {
             var Control = new Button
             {
-                Enabled = _enabled,
+                Enabled = this.Enabled,
                 Name = "YesNoButton",
                 ButtonStyle = enButtonStyle.Yes_or_No,
                 Text = "",
@@ -1363,7 +1423,7 @@ namespace BlueControls.Controls
 
         protected void StyleTextBox(TextBox Control, string AllowedChars, bool SpellChecking)
         {
-            Control.Enabled = _enabled;
+            Control.Enabled = Enabled;
             Control.Format = _Format;
             Control.Suffix = _Suffix;
             Control.AllowedChars = AllowedChars;
@@ -1522,37 +1582,64 @@ namespace BlueControls.Controls
 
 
 
-        private void DoInfoTextCaption(bool tmpenabled)
+        private void DoInfoTextCaption(string disabledReason)
         {
-            var tmp = _InfoText;
-
-            if (!_ShowInfoWhenDisabled && !tmpenabled) { tmp = string.Empty; }
-
-
-
-
-            if (!string.IsNullOrEmpty(tmp) && _InfoCaption != null)
+            var txt = string.Empty;
+            var symbol = string.Empty;
+            if (string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText))
             {
-                _InfoCaption.QuickInfo = tmp;
+                txt = string.Empty;
+                symbol = string.Empty;
+            }
+            else if (!string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText))
+            {
+                symbol = "<ImageCode=Kreuz|16>";
+                txt = disabledReason;
+            }
+            else if (string.IsNullOrEmpty(disabledReason) && !string.IsNullOrEmpty(_InfoText))
+            {
+                symbol = "<ImageCode=Warnung|16>";
+                txt = _InfoText;
+            }
+            else 
+            {
+                symbol = "<ImageCode=Information|16>";
+                txt = "<b>Der Wert kann nicht bearbeitet werden:</b><br>" + disabledReason + "<br><br><b>Enthält aber einen Fehler:</b><br>" + _InfoText ;
+            }
+
+
+
+
+            if (!_ShowInfoWhenDisabled && !string.IsNullOrEmpty(disabledReason)) { txt = string.Empty; }
+
+
+
+
+            if (!string.IsNullOrEmpty(txt) && _InfoCaption != null)
+            {
+                _InfoCaption.Visible = true;
+                _InfoCaption.QuickInfo = txt;
+                _InfoCaption.Text = symbol;
                 return;
             }
-            if (string.IsNullOrEmpty(tmp) && _InfoCaption == null) { return; }
+            if (string.IsNullOrEmpty(txt) && _InfoCaption == null) { return; }
 
-            if (string.IsNullOrEmpty(tmp))
+            if (string.IsNullOrEmpty(txt))
             {
-                Controls.Remove(_InfoCaption);
-                _InfoCaption.Click -= _InfoCaption_Click;
-                _InfoCaption.Dispose();
-                _InfoCaption = null;
+                //Controls.Remove(_InfoCaption);
+                //_InfoCaption.Click -= _InfoCaption_Click;
+                //_InfoCaption.Dispose();
+                //_InfoCaption = null;
+                _InfoCaption.Visible = false;
             }
             else
             {
                 _InfoCaption = new Caption
                 {
                     Name = "Info",
-                    QuickInfo = tmp,
+                    QuickInfo = txt,
                     Enabled = true,
-                    Text = "<ImageCode=Warnung|16>",
+                    Text = symbol,
                     Width = 18,
                     Height = 18,
                     Left = Width - 18,
@@ -1688,7 +1775,7 @@ namespace BlueControls.Controls
                 if (Control != _InfoCaption)
                 {
                     if (Control is IQuickInfo QI) { QI.QuickInfo = _QuickInfo; }
-                    Control.Enabled = _enabled;
+                    Control.Enabled = Enabled;
                 }
                 else
                 {

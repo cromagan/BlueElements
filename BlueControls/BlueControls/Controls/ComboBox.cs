@@ -40,8 +40,8 @@ namespace BlueControls.Controls
     public partial class ComboBox : TextBox
     {
 
-
-        public ComboBox()
+        #region Constructor
+        public ComboBox() : base()
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -54,8 +54,9 @@ namespace BlueControls.Controls
             Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
             Item.ItemRemoved += _Item_ItemRemoved;
 
-            SetDoubleBuffering();
         }
+
+        #endregion
 
 
         #region  Variablen 

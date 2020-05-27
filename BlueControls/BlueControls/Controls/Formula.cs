@@ -40,17 +40,21 @@ namespace BlueControls.Controls
     [Designer(typeof(BasicDesigner))]
     public partial class Formula : GenericControl, IBackgroundNone, IContextMenu
     {
-
-        public Formula()
+        #region Constructor
+        public Formula() : base(false)
         {
             InitializeComponent();
         }
 
+        #endregion
+
+
         private Database _Database;
 
+
+        private RowItem _tmpShowingRow = null;
         private int _ShowingRowKey = -1;
         private bool _Inited;
-        private int Suspendcounter;
 
 
         public event EventHandler<RowEventArgs> ShowingRowChanged;
@@ -60,7 +64,7 @@ namespace BlueControls.Controls
         private List<FlexiControlForCell> _Control;
 
 
-        private int SavedRowKey = int.MinValue;
+        private int _savedRowKey = int.MinValue;
 
         private long TabGeneratorCount;
 
@@ -70,7 +74,8 @@ namespace BlueControls.Controls
             {
                 if (disposing)
                 {
-                    _ShowingRowKey = 0;
+                    _ShowingRowKey = -1;
+                    _tmpShowingRow = null;
                     Database = null; // Wichtig,  (nicht _Database) um events zu lösen.
                     //components?.Dispose();
 
@@ -161,23 +166,26 @@ namespace BlueControls.Controls
                 }
 
 
-                SuspendAllLayout();
+                BeginnEdit();
 
 
                 _ShowingRowKey = value;
+                _tmpShowingRow = _Database?.Row.SearchByKey(_ShowingRowKey);
 
                 foreach (var thisFlex in _Control)
                 {
-                    if (thisFlex != null && !thisFlex.IsDisposed) { thisFlex.RowKey = _ShowingRowKey; }
+                    if (thisFlex != null && !thisFlex.IsDisposed)
+                    {
+                        thisFlex.RowKey = _ShowingRowKey;
+                        thisFlex.CheckEnabledState();
+                    }
                 }
-
-
-                Controls_SetCorrectEnabledState_All();
 
                 OnShowingRowChanged(new RowEventArgs(ShowingRow));
 
                 ShowingRow?.DoAutomatic(false, false);
-                ResumeAllLayout();
+
+                EndEdit();
             }
         }
 
@@ -200,39 +208,11 @@ namespace BlueControls.Controls
             get
             {
                 Develop.DebugPrint_Disposed(IsDisposed);
-                var r = _Database?.Row.SearchByKey(_ShowingRowKey);
-                return r;
+                return _tmpShowingRow;
             }
         }
 
 
-        private void SuspendAllLayout()
-        {
-            Suspendcounter += 1;
-            if (Suspendcounter > 1) { return; }
-
-            SuspendLayout();
-            Tabs.SuspendLayout();
-
-            foreach (System.Windows.Forms.TabPage tp in Tabs.TabPages)
-            {
-                tp.SuspendLayout();
-            }
-
-        }
-
-        private void ResumeAllLayout()
-        {
-            Suspendcounter -= 1;
-            if (Suspendcounter > 0) { return; }
-            foreach (System.Windows.Forms.TabPage tp in Tabs.TabPages)
-            {
-                tp.ResumeLayout();
-            }
-            Tabs.ResumeLayout();
-
-            ResumeLayout();
-        }
 
 
         private void View_Init()
@@ -240,7 +220,7 @@ namespace BlueControls.Controls
             if (_Database == null) { return; }
             if (Parent == null) { return; } // Irgend ein Formular reagiert nioch?!?
 
-            SuspendAllLayout();
+            BeginnEdit();
             _Inited = false;
 
             Control_Remove_All();
@@ -266,7 +246,7 @@ namespace BlueControls.Controls
 
             if (Tabs.TabPages.Count >= 0) { Tabs.SelectedIndex = 0; }
 
-            ResumeAllLayout();
+            EndEdit();
 
         }
 
@@ -281,7 +261,7 @@ namespace BlueControls.Controls
             if (IsDisposed) { return; }
             _Inited = false;
             _Database?.LoadPicsIntoImageChache();
-            ShowingRowKey = SavedRowKey;
+            ShowingRowKey = _savedRowKey;
         }
 
 
@@ -373,7 +353,7 @@ namespace BlueControls.Controls
         private void Control_RepairSize_All()
         {
             var Count = -1;
-            SuspendAllLayout();
+            BeginnEdit();
 
             foreach (var ThisView in _Database.Views)
             {
@@ -464,7 +444,7 @@ namespace BlueControls.Controls
                 if (ViewN == 0) { SetButtonsToPosition(_BelegterBereichTop[0] + 3); }
             }
 
-            ResumeAllLayout();
+            EndEdit();
         }
 
 
@@ -533,7 +513,7 @@ namespace BlueControls.Controls
         {
             var Count = -1;
 
-            SuspendAllLayout();
+            BeginnEdit();
 
             _Control = new List<FlexiControlForCell>();
 
@@ -561,19 +541,19 @@ namespace BlueControls.Controls
                 }
             }
 
-            ResumeAllLayout();
+            EndEdit();
         }
 
         private void Controls_SetCorrectEnabledState_All()
         {
             Develop.DebugPrint_Disposed(IsDisposed);
 
-            SuspendAllLayout();
+            BeginnEdit();
             foreach (var ThisControl in _Control)
             {
                 if (ThisControl != null && !ThisControl.IsDisposed) { ThisControl.CheckEnabledState(); }
             }
-            ResumeAllLayout();
+            EndEdit();
         }
 
 
@@ -726,7 +706,7 @@ namespace BlueControls.Controls
         private void Generate_Tabs()
         {
             if (_Database.Views.Count < 1) { return; }
-            SuspendAllLayout();
+            BeginnEdit();
 
 
 
@@ -749,7 +729,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            ResumeAllLayout();
+            EndEdit();
 
         }
 
@@ -781,12 +761,8 @@ namespace BlueControls.Controls
 
             if (_Database != null && _Inited)
             {
-                SuspendAllLayout();
                 Control_RepairSize_All();
-                ResumeAllLayout();
             }
-
-            PerformLayout();
 
             Editor.Left = Width - Editor.Width;
             Editor.Height = Height;
@@ -1199,7 +1175,7 @@ namespace BlueControls.Controls
 
 
             var R = false;
-            SuspendAllLayout();
+            BeginnEdit();
 
             do
             {
@@ -1231,7 +1207,7 @@ namespace BlueControls.Controls
 
 
             _Control?.Clear();
-            ResumeAllLayout();
+            EndEdit();
 
         }
 
@@ -1416,13 +1392,13 @@ namespace BlueControls.Controls
         private void _Database_StoreView(object sender, LoadingEventArgs e)
         {
             if (e.OnlyReload) { return; }
-            SavedRowKey = ShowingRowKey;
+            _savedRowKey = ShowingRowKey;
         }
         private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e)
         {
             // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
             // Jedes FlexControl beachtet für sich die Änderung
-            if (e.KeyOld == SavedRowKey) { SavedRowKey = e.KeyNew; }
+            if (e.KeyOld == _savedRowKey) { _savedRowKey = e.KeyNew; }
 
         }
 

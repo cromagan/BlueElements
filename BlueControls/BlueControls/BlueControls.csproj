@@ -225,6 +225,7 @@
       <DependentUpon>PictureView.cs</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Interfaces\ISupportsBeginnEdit.cs" />
     <Compile Include="Interfaces\IDesignAble.cs" />
     <Compile Include="Forms-Common\Notification.cs">
       <SubType>Form</SubType>
@@ -300,7 +301,7 @@
       <DependentUpon>CreativePad.cs</DependentUpon>
     </Compile>
     <Compile Include="EventArgs\TabControlEventArgs.cs" />
-    <Compile Include="Controls\TabPageCollectionEditor.cs" />
+    <Compile Include="Classes Editor\TabPageCollectionEditor.cs" />
     <Compile Include="Designer Support\BasicDesigner.cs" />
     <Compile Include="Designer Support\ButtonActionList.cs" />
     <Compile Include="Designer Support\ButtonDesigner.cs" />

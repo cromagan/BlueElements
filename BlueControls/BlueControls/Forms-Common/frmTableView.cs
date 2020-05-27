@@ -437,7 +437,7 @@ namespace BlueControls.Forms
             StandardTabx();
 
 
-            SuspendLayout();
+            BeginnEdit();
 
             if (_Database == null)
             {
@@ -469,7 +469,7 @@ namespace BlueControls.Forms
                 TableView.CursorPos_Set(TableView.Database.Column[0], TableView.View_RowFirst(), false);
             }
 
-            ResumeLayout();
+            EndEdit();
         }
 
 

@@ -26,7 +26,7 @@ namespace BlueControls.Forms
             foreach (var ThisFlexi in Flexis)
             {
                 Controls.Add(ThisFlexi);
-                ThisFlexi.Enabled = true;
+                ThisFlexi.DisabledReason = string.Empty;
                 ThisFlexi.Left = Skin.Padding;
                 ThisFlexi.Top = top;
                 ThisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;

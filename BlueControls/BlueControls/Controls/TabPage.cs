@@ -31,10 +31,11 @@ namespace BlueControls.Controls
     {
 
         private Bitmap _BitmapOfControl;
+        #region Constructor
 
 
 
-        public TabPage()
+        public TabPage() : base()
         {
 
             //This call is required by the Windows Form Designer.
@@ -56,6 +57,7 @@ namespace BlueControls.Controls
 
         }
 
+        #endregion
 
 
         //UserControl1 overrides dispose to clean up the component list.
@@ -135,12 +137,7 @@ namespace BlueControls.Controls
 
         private void SkinChanged(object sender, System.EventArgs e)
         {
-
-
-            SuspendLayout();
             Invalidate();
-            Refresh();
-            ResumeLayout();
         }
 
 
@@ -196,7 +193,7 @@ namespace BlueControls.Controls
             }
 
 
-            base.OnEnabledChanged(e);                   
+            base.OnEnabledChanged(e);
             Invalidate();
             Parent?.Invalidate();
         }

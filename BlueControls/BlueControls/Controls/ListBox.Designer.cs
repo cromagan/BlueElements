@@ -43,7 +43,6 @@ namespace BlueControls.Controls
             // 
             this.SliderY.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                                                    | System.Windows.Forms.AnchorStyles.Right)));
-            this.SliderY.CausesValidation = false;
             this.SliderY.Location = new Point(159, 0);
             this.SliderY.Name = "SliderY";
             this.SliderY.Orientation = enOrientation.Senkrecht;

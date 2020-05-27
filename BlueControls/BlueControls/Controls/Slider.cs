@@ -31,9 +31,9 @@ namespace BlueControls.Controls
     public partial class Slider : IBackgroundNone
     {
 
+        #region Constructor
 
-
-        public Slider()
+        public Slider(): base(false)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -44,7 +44,7 @@ namespace BlueControls.Controls
             SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
         }
 
-
+        #endregion
 
         #region  Variablen 
 

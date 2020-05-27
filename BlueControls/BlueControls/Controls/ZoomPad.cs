@@ -32,11 +32,13 @@ namespace BlueControls.Controls
     [Designer(typeof(BasicDesigner))]
     public partial class ZoomPad : GenericControl, IBackgroundBitmap
     {
-        public ZoomPad()
+
+        #region Constructor
+        public ZoomPad() : base(true)
         {
             InitializeComponent();
         }
-
+        #endregion
 
 
 

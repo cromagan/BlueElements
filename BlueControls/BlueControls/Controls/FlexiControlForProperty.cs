@@ -31,7 +31,7 @@ namespace BlueControls.Controls
         bool _FehlerFormatCheck = true;
 
 
-        new bool _enabled = true;
+        bool _enabled = true;
 
 
         /// <summary>
@@ -39,6 +39,26 @@ namespace BlueControls.Controls
         /// </summary>
         public event System.EventHandler LoadedFromDisk;
 
+        #region Constructor
+
+        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount, ItemCollectionList list, enImageCode image) : this()
+        {
+            _propertyObject = propertyObject;
+            _propertyName = propertyName;
+            UpdateControlData(true, rowCount, list, image);
+            CheckEnabledState();
+        }
+
+        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList list) : this(propertyObject, propertyName, 1, list, enImageCode.None) { }
+
+        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount) : this(propertyObject, propertyName, rowCount, null, enImageCode.None) { }
+
+        public FlexiControlForProperty(object propertyObject, string propertyName, enImageCode image) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
+
+        public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
+
+
+        #endregion
 
         public FlexiControlForProperty() : base()
         {
@@ -58,23 +78,6 @@ namespace BlueControls.Controls
             EditType = enEditTypeFormula.Textfeld;
             Size = new Size(200, 24);
         }
-
-
-        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount, ItemCollectionList list, enImageCode image) : this()
-        {
-            _propertyObject = propertyObject;
-            _propertyName = propertyName;
-            UpdateControlData(true, rowCount, list, image);
-            CheckEnabledState();
-        }
-
-        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList list) : this(propertyObject, propertyName, 1, list, enImageCode.None) { }
-
-        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount) : this(propertyObject, propertyName, rowCount, null, enImageCode.None) { }
-
-        public FlexiControlForProperty(object propertyObject, string propertyName, enImageCode image) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
-
-        public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
 
 
         private void Checker_Tick(object sender, System.EventArgs e)
@@ -296,19 +299,35 @@ namespace BlueControls.Controls
 
         internal bool CheckEnabledState()
         {
-            if (!_enabled || _propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null)
+            if ( _propertyObject == null )
             {
-                base.Enabled = false;
+                base.DisabledReason = "Kein zugehöriges Objekt definiert.";
                 return false;
             }
+            if ( string.IsNullOrEmpty(_propertyName))
+            {
+                base.DisabledReason = "Kein Feld-Name angegeben.";
+                return false;
+            }
+            if (propInfo == null)
+            {
+                base.DisabledReason = "Feld existiert im zugehörigen Objekt nicht.";
+                return false;
+            }
+            if (!_enabled)
+            {
+                base.DisabledReason = "Das Feld ist deaktiviert.";
+                return false;
+            }
+
 
             if (!propInfo.CanWrite)
             {
-                base.Enabled = false;
+                base.DisabledReason = "Feld ist schreibgeschützt.";
                 return false;
             }
 
-            base.Enabled = true;
+            base.DisabledReason = string.Empty;
             return true;
         }
 

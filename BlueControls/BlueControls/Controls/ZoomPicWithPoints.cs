@@ -18,10 +18,13 @@ namespace BlueControls.Controls
     [Designer(typeof(BasicDesigner))]
     public partial class ZoomPicWithPoints : ZoomPic
     {
-        public ZoomPicWithPoints()
+
+        #region Constructor
+        public ZoomPicWithPoints() : base()
         {
             InitializeComponent();
         }
+        #endregion
 
 
         List<PointDF> points = new List<PointDF>();

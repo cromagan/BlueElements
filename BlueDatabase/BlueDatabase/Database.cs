@@ -2293,7 +2293,7 @@ namespace BlueDatabase
         private void InitializeComponent()
         {
             this.Backup = new System.ComponentModel.BackgroundWorker();
-            //this.SuspendLayout();
+
             // 
             // Backup
             // 
@@ -2301,7 +2301,7 @@ namespace BlueDatabase
             this.Backup.WorkerSupportsCancellation = true;
             this.Backup.DoWork += new System.ComponentModel.DoWorkEventHandler(this.Backup_DoWork);
             this.Backup.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.Backup_ProgressChanged);
-            //this.ResumeLayout(false);
+
 
         }
 

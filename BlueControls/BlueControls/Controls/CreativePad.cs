@@ -41,7 +41,37 @@ namespace BlueControls.Controls
     public sealed partial class CreativePad : ZoomPad, IContextMenu
     {
 
+        #region Constructor
 
+        public CreativePad(ItemCollectionPad itemCollectionPad) : base()
+        {
+            // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+            InitializeComponent();
+
+
+            // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
+
+            Item = itemCollectionPad;
+
+
+            _NewAutoRelations.Clear();
+
+
+            Sel_P = new ListExt<PointDF>();
+            Sel_P.ItemAdded += Sel_P_ItemAdded;
+            Sel_P.ItemRemoved += Sel_P_ItemRemoved;
+
+            Move_X.Clear();
+            Move_Y.Clear();
+
+            _MouseHighlight = false;
+        }
+
+
+
+        public CreativePad() : this(new ItemCollectionPad()) { }
+
+        #endregion
 
         public static bool Debug_ShowPointOrder = false;
         public static bool Debug_ShowRelationOrder = false;
@@ -231,36 +261,6 @@ namespace BlueControls.Controls
 
 
 
-
-        public CreativePad(ItemCollectionPad itemCollectionPad) : base()
-        {
-            // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
-            InitializeComponent();
-
-
-            // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
-
-            Item = itemCollectionPad;
-
-
-            SetDoubleBuffering();
-
-            _NewAutoRelations.Clear();
-
-
-            Sel_P = new ListExt<PointDF>();
-            Sel_P.ItemAdded += Sel_P_ItemAdded;
-            Sel_P.ItemRemoved += Sel_P_ItemRemoved;
-
-            Move_X.Clear();
-            Move_Y.Clear();
-
-            _MouseHighlight = false;
-        }
-
-
-
-        public CreativePad() : this(new ItemCollectionPad()) { }
 
 
         private void Sel_P_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e)

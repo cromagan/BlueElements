@@ -52,6 +52,14 @@ namespace BlueControls.Controls
             }
         }
 
+        #region Constructor
+        public ZoomPic() : base()
+        {
+            InitializeComponent();
+            _MouseHighlight = false;
+        }
+
+        #endregion
         public event EventHandler<MouseEventArgs1_1> ImageMouseDown;
         public event EventHandler<MouseEventArgs1_1DownAndCurrent> ImageMouseMove;
         public event EventHandler<MouseEventArgs1_1DownAndCurrent> ImageMouseUp;
@@ -60,13 +68,6 @@ namespace BlueControls.Controls
 
         private bool _AlwaysSmooth = false;
 
-
-
-        public ZoomPic()
-        {
-            InitializeComponent();
-            _MouseHighlight = false;
-        }
 
 
         protected override void InitializeSkin()

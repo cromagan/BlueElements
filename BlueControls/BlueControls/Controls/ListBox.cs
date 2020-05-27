@@ -40,8 +40,8 @@ namespace BlueControls.Controls
     public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IQuickInfo
     {
 
-
-        public ListBox()
+        #region Constructor
+        public ListBox() : base(true)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -55,8 +55,9 @@ namespace BlueControls.Controls
             Item.ItemRemoved += _Item_ItemRemoved;
             Item.ItemRemoving += _Item_ItemRemoving;
             _Appearance = enBlueListBoxAppearance.Listbox;
-            SetDoubleBuffering();
         }
+
+        #endregion
 
         private enBlueListBoxAppearance _Appearance; //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
         private BasicListItem _MouseOverItem;

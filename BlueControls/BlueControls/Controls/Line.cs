@@ -30,7 +30,10 @@ namespace BlueControls.Controls
     [Designer(typeof(BasicDesigner))]
     public class Line : GenericControl, IBackgroundNone
     {
-        public Line()
+
+
+        #region Constructor
+        public Line() : base(false)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -40,6 +43,9 @@ namespace BlueControls.Controls
             SetNotFocusable();
             _MouseHighlight = false;
         }
+        #endregion
+
+
 
 
         private enOrientation _Orientation = enOrientation.Waagerecht;

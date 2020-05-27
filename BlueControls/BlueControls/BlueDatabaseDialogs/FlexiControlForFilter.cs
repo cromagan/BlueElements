@@ -75,7 +75,7 @@ namespace BlueControls.Controls
         {
             if (Filter == null || Filter.Column == null)
             {
-                Enabled = false;
+                DisabledReason = "Bezug zum Filter verloren.";
                 Caption = string.Empty;
                 EditType = enEditTypeFormula.None;
                 QuickInfo = string.Empty;
@@ -84,7 +84,7 @@ namespace BlueControls.Controls
             }
             else
             {
-                Enabled = true;
+                DisabledReason = string.Empty;
                 Caption = Filter.Column.ReadableText() + ":";
 
                 var qi = Filter.Column.QickInfoText(string.Empty);

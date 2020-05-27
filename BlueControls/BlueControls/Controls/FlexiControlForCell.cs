@@ -45,6 +45,23 @@ namespace BlueControls.Controls
 
 
 
+        #region Constructor
+        public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
+
+        public FlexiControlForCell(Database database, int columnKey, enÜberschriftAnordnung captionPosition) : base()
+        {
+            // Dieser Aufruf ist für den Designer erforderlich.
+            InitializeComponent();
+
+            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+            Size = new Size(300, 300);
+            ShowInfoWhenDisabled = true;
+            CaptionPosition = captionPosition;
+            Database = database;
+            ColumnKey = columnKey;
+        }
+
+        #endregion
 
         // Für automatisches Datenbank-Management
         private int _ColKey = -1;
@@ -181,20 +198,7 @@ namespace BlueControls.Controls
 
         }
 
-        public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
 
-        public FlexiControlForCell(Database database, int columnKey, enÜberschriftAnordnung captionPosition)
-        {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
-
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            Size = new Size(300, 300);
-            ShowInfoWhenDisabled = true;
-            CaptionPosition = captionPosition;
-            Database = database;
-            ColumnKey = columnKey;
-        }
 
         private void UpdateColumnData()
         {
@@ -242,11 +246,10 @@ namespace BlueControls.Controls
             if (e.Column == _tmpColumn)
             {
                 SetValueFromCell();
-                CheckEnabledState();
             }
 
 
-            if (e.Column == e.Column.Database.Column.SysLocked)
+            if (e.Column == _tmpColumn || e.Column == e.Column.Database.Column.SysLocked)
             {
                 CheckEnabledState();
             }
@@ -328,11 +331,11 @@ namespace BlueControls.Controls
 
             if (Parent == null || !Parent.Enabled || _tmpColumn == null || _tmpRow == null)
             {
-                Enabled = false;
+                DisabledReason = "Bezug zur Zelle verloren.";
                 return;
             }
 
-            Enabled = CellCollection.UserEditPossible(_tmpColumn, _tmpRow, enErrorReason.EditNormaly); // Rechteverwaltung einfliesen lassen.
+            DisabledReason = CellCollection.ErrorReason(_tmpColumn, _tmpRow, enErrorReason.EditNormaly); // Rechteverwaltung einfliesen lassen.
         }
 
 
@@ -388,6 +391,10 @@ namespace BlueControls.Controls
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)
         {
             base.OnControlAdded(e);
+
+            if (e.Control is Caption) { return; } // z.B. Info Caption
+
+
             var column1 = _tmpColumn;
             if (column1.Format == enDataFormat.LinkedCell)
             {
@@ -455,8 +462,8 @@ namespace BlueControls.Controls
                 case Button _:
                     break;
 
-                case Caption _:
-                    break;
+                //case Caption _:
+                //    break;
 
 
                 default:

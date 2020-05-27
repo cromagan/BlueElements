@@ -36,7 +36,7 @@ namespace BlueControls.Controls
 {
     [ToolboxBitmap(typeof(System.Windows.Forms.TabControl))]
     [Designer(typeof(TabControlDesigner))]
-    public sealed class TabControl : System.Windows.Forms.TabControl, IContextMenu, IBackgroundNone
+    public sealed class TabControl : System.Windows.Forms.TabControl, IContextMenu, IBackgroundNone, ISupportsBeginnEdit
     {
 
         public event System.EventHandler<TabControlEventArgs> SelectedIndexChanging;
@@ -45,8 +45,8 @@ namespace BlueControls.Controls
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
 
-
-        public TabControl()
+        #region Constructor
+        public TabControl() : base()
         {
 
 
@@ -69,6 +69,7 @@ namespace BlueControls.Controls
             Skin.SkinChanged += SkinChanged;
 
         }
+        #endregion
 
         //UserControl1 overrides dispose to clean up the component list.
         protected override void Dispose(bool NowDisposing)
@@ -221,28 +222,28 @@ namespace BlueControls.Controls
 
             try
             {
-            if (m.Msg == (int)enWndProc.WM_REFLECT + (int)enWndProc.WM_NOTIFY)
-            {
-                var hdr = (NMHDR)Marshal.PtrToStructure(m.LParam, typeof(NMHDR));
-                if (hdr.code == TCN_SELCHANGING)
+                if (m.Msg == (int)enWndProc.WM_REFLECT + (int)enWndProc.WM_NOTIFY)
                 {
-                    if (_HotTab != null)
+                    var hdr = (NMHDR)Marshal.PtrToStructure(m.LParam, typeof(NMHDR));
+                    if (hdr.code == TCN_SELCHANGING)
                     {
-                        var e = new TabControlEventArgs(_HotTab, Controls.IndexOf(_HotTab));
-                        OnSelectedIndexChanging(e);
-
-                        if (e.Cancel || _HotTab.Enabled == false)
+                        if (_HotTab != null)
                         {
-                            m.Result = new IntPtr(1);
-                            return;
+                            var e = new TabControlEventArgs(_HotTab, Controls.IndexOf(_HotTab));
+                            OnSelectedIndexChanging(e);
+
+                            if (e.Cancel || _HotTab.Enabled == false)
+                            {
+                                m.Result = new IntPtr(1);
+                                return;
+                            }
                         }
                     }
                 }
-            }
 
-            if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
+                if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
 
-            base.WndProc(ref m);
+                base.WndProc(ref m);
             }
 
             catch
@@ -350,7 +351,7 @@ namespace BlueControls.Controls
 
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
         {
-
+            if (BeginnEditCounter > 0) { return; }
             if (Skin.SkinDB == null) { return; }
 
 
@@ -502,15 +503,73 @@ namespace BlueControls.Controls
 
         private void SkinChanged(object sender, System.EventArgs e)
         {
-            SuspendLayout();
             Invalidate();
-            ResumeLayout();
-
         }
+        #region ISupportsEdit
+
+        public int BeginnEditCounter { get; set; } = 0;
+
+
+        public new void SuspendLayout()
+        {
+            BeginnEdit();
+        }
+        public new void ResumeLayout(bool dummy)
+        {
+            EndEdit();
+        }
+
+        public void BeginnEdit()
+        {
+            if (BeginnEditCounter == 0)
+            {
+                base.SuspendLayout();
+                foreach (var ThisControl in Controls)
+                {
+                    if (ThisControl is ISupportsBeginnEdit e)
+                    {
+                        e.BeginnEdit();
+                    }
+                }
+            }
+            BeginnEditCounter++;
+        }
+        public void EndEdit()
+        {
+            BeginnEditCounter--;
+
+            if (BeginnEditCounter == 0)
+            {
+
+                base.ResumeLayout();
+                Invalidate();
+
+                foreach (var ThisControl in Controls)
+                {
+                    if (ThisControl is ISupportsBeginnEdit e)
+                    {
+                        e.EndEdit();
+                    }
+                }
+
+                PerformLayout();
+            }
+        }
+
+        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)
+        {
+            if (e.Control is ISupportsBeginnEdit nc)
+            {
+                nc.BeginnEditCounter = BeginnEditCounter;
+            }
+            base.OnControlAdded(e);
+        }
+
+        #endregion
+
+
     }
 
 
-    #region  SelectedIndexChanging EventArgs Class/Delegate 
 
-    #endregion
 }

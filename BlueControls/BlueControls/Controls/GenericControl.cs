@@ -34,21 +34,14 @@ using System.Drawing;
 //Inherits ScrollableControl - > keine Tastatur/Mouseabfragen
 
 
-
-
-
-
 namespace BlueControls.Controls
 {
-    public class GenericControl : System.Windows.Forms.Control
+    public class GenericControl : System.Windows.Forms.Control, ISupportsBeginnEdit
     {
-        //protected static readonly Skin Skin = Skin.Instance;
-        protected RowItem tmpSkinRow;
 
 
-        private enPartentType _MyParentType = enPartentType.Unbekannt;
-
-        protected GenericControl()
+        #region Constructor
+        protected GenericControl(bool DoubleBuffer) : base()
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -65,11 +58,36 @@ namespace BlueControls.Controls
 
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
 
+            if (DoubleBuffer)
+            {
+                SetDoubleBuffering();
+            }
+
+
             Translate = true;
 
             InitializeSkin();
             Skin.SkinChanged += SkinChanged;
 
+        }
+        #endregion
+
+
+        #region  Standard-Variablen 
+        private bool _MousePressing;
+        protected bool _MouseHighlight = true;
+        protected RowItem tmpSkinRow;
+        private enPartentType _MyParentType = enPartentType.Unbekannt;
+
+        #endregion
+
+
+
+
+        protected void SetDoubleBuffering()
+        {
+            SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
+            SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
         }
 
         private void SkinChanged(object sender, System.EventArgs e)
@@ -77,18 +95,6 @@ namespace BlueControls.Controls
             InitializeSkin();
         }
 
-        public void SetDoubleBuffering()
-        {
-            SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
-            SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
-        }
-
-
-        #region  Standard-Variablen 
-        private bool _MousePressing;
-        protected bool _MouseHighlight = true;
-
-        #endregion
 
         protected virtual void DrawControl(Graphics gr, enStates state)
         {
@@ -147,6 +153,8 @@ namespace BlueControls.Controls
             }
         }
 
+
+
         protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified)
         {
             return bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
@@ -171,10 +179,67 @@ namespace BlueControls.Controls
             DoDraw(e.Graphics, false);
         }
 
+        #region ISupportsEdit
+
+        public int BeginnEditCounter { get; set; } = 0;
 
 
+        public new void SuspendLayout()
+        {
+            BeginnEdit();
+        }
+        public new void ResumeLayout(bool dummy)
+        {
+            EndEdit();
+        }
 
+        public void BeginnEdit()
+        {
+            if (BeginnEditCounter == 0)
+            {
+                base.SuspendLayout();
+                foreach (var ThisControl in Controls)
+                {
+                    if (ThisControl is ISupportsBeginnEdit e)
+                    {
+                        e.BeginnEdit();
+                    }
+                }
+            }
+            BeginnEditCounter++;
+        }
+        public void EndEdit()
+        {
+            BeginnEditCounter--;
 
+            if (BeginnEditCounter == 0)
+            {
+
+                base.ResumeLayout();
+                Invalidate();
+
+                foreach (var ThisControl in Controls)
+                {
+                    if (ThisControl is ISupportsBeginnEdit e)
+                    {
+                        e.EndEdit();
+                    }
+                }
+
+                PerformLayout();
+            }
+        }
+
+        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)
+        {
+            if (e.Control is ISupportsBeginnEdit nc)
+            {
+                nc.BeginnEditCounter = BeginnEditCounter;
+            }
+            base.OnControlAdded(e);
+        }
+
+        #endregion
 
         /// <summary>
         /// Veranlaßt, das das Control neu gezeichnet wird.
@@ -213,7 +278,7 @@ namespace BlueControls.Controls
 
         private void DoDraw(Graphics GR, bool IgnoreVisible)
         {
-            if (Develop.Exited || IsDisposed || !Visible) { return; }
+            if (Develop.Exited || IsDisposed || !Visible || BeginnEditCounter > 0) { return; }
 
             lock (this)
             {
@@ -591,6 +656,7 @@ namespace BlueControls.Controls
             } while (true);
 
         }
+
 
     }
 }

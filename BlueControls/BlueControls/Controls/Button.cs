@@ -35,10 +35,10 @@ namespace BlueControls.Controls
     public sealed class Button : GenericControl, IQuickInfo, IBackgroundNone
     {
 
-        public Button()
-        {
-            SetDoubleBuffering();
-        }
+        #region Constructor
+        public Button() : base(true) { }
+        #endregion
+
 
 
 

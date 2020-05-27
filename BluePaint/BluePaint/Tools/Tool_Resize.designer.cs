@@ -53,7 +53,6 @@ namespace BluePaint
             this.flxProzent.Caption = "Skalieren auf:";
             this.flxProzent.CaptionPosition = BlueDatabase.Enums.enÜberschriftAnordnung.Links_neben_Dem_Feld;
             this.flxProzent.EditType = BlueDatabase.Enums.enEditTypeFormula.Textfeld;
-            this.flxProzent.Enabled = true;
             this.flxProzent.FileEncryptionKey = null;
             this.flxProzent.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.flxProzent.Location = new System.Drawing.Point(8, 8);

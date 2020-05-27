@@ -37,7 +37,9 @@ namespace BlueControls.Controls
     [DefaultEvent("Click")]
     public partial class Caption : GenericControl, IContextMenu, IQuickInfo, IBackgroundNone
     {
-        public Caption()
+
+        #region Constructor
+        public Caption(): base(false)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -46,6 +48,8 @@ namespace BlueControls.Controls
             SetNotFocusable();
             _MouseHighlight = false;
         }
+        #endregion
+
 
         #region  Variablen 
 
