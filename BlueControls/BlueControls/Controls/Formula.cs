@@ -449,7 +449,6 @@ namespace BlueControls.Controls
 
 
 
-
         private void Control_Create(ColumnViewItem cd, System.Windows.Forms.Control vParent)
         {
             if (cd?.Column == null) { return; }
@@ -706,9 +705,9 @@ namespace BlueControls.Controls
         private void Generate_Tabs()
         {
             if (_Database.Views.Count < 1) { return; }
+
+
             BeginnEdit();
-
-
 
             foreach (var ThisView in _Database.Views)
             {
@@ -904,7 +903,8 @@ namespace BlueControls.Controls
         {
             var i = Tabs.SelectedIndex;
 
-            SuspendLayout();
+
+            BeginnEdit();
             _Inited = false;
             View_Init();
 
@@ -916,7 +916,7 @@ namespace BlueControls.Controls
 
             if (i >= 0) { Tabs.SelectedIndex = i; }
 
-            ResumeLayout();
+            EndEdit();
         }
 
 
@@ -1216,24 +1216,22 @@ namespace BlueControls.Controls
         {
             if (vObject == null || vObject.IsDisposed) { return; }
 
+            BeginnEdit();
+
             switch (vObject)
             {
                 case TabControl _:
-                    vObject.SuspendLayout();
                     foreach (System.Windows.Forms.Control o in vObject.Controls)
                     {
                         RemoveControl(o);
                     }
-                    vObject.ResumeLayout();
                     return;
 
                 case TabPage _:
-                    vObject.SuspendLayout();
                     foreach (System.Windows.Forms.Control o in vObject.Controls)
                     {
                         RemoveControl(o);
                     }
-                    vObject.ResumeLayout();
                     break;
 
                 default:
@@ -1244,6 +1242,8 @@ namespace BlueControls.Controls
 
             vObject.Parent.Controls.Remove(vObject);
             vObject.Dispose();
+
+            EndEdit();
         }
 
         private void Li_Click(object sender, System.EventArgs e)

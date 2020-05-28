@@ -53,6 +53,9 @@ namespace BlueControls.Controls
             Item.ItemAdded += _Item_ItemAdded;
             Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
             Item.ItemRemoved += _Item_ItemRemoved;
+            btnDropDown.Left = Width - btnDropDown.Width;
+            btnDropDown.Top = 0;
+            btnDropDown.Height = this.Height;
 
         }
 

@@ -977,7 +977,6 @@ namespace BlueControls.Forms
                     break;
 
                 case "ContentPaste":
-                    //     bt.Database.BeginnEdit()
                     Row.CellSet(Column, Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text)));
                     break;
 

@@ -55,6 +55,9 @@ namespace BlueControls.Controls
             Item.ItemRemoved += _Item_ItemRemoved;
             Item.ItemRemoving += _Item_ItemRemoving;
             _Appearance = enBlueListBoxAppearance.Listbox;
+
+            SliderY.Top = 0;
+            SliderY.Left = Width - SliderY.Width;
         }
 
         #endregion
@@ -226,7 +229,6 @@ namespace BlueControls.Controls
             }
         }
         #endregion
-
 
         protected override void OnVisibleChanged(System.EventArgs e)
         {

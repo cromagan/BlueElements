@@ -155,6 +155,10 @@ namespace BlueControls.Forms
 
         #region ISupportsEdit
 
+        [DefaultValue(0)]
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int BeginnEditCounter { get; set; } = 0;
 
 
@@ -163,6 +167,11 @@ namespace BlueControls.Forms
             BeginnEdit();
         }
         public new void ResumeLayout(bool dummy)
+        {
+            EndEdit();
+        }
+
+        public new void ResumeLayout()
         {
             EndEdit();
         }
@@ -208,7 +217,7 @@ namespace BlueControls.Forms
         {
             if (e.Control is ISupportsBeginnEdit nc)
             {
-                nc.BeginnEditCounter = BeginnEditCounter;
+                if (BeginnEditCounter > 0) { nc.BeginnEditCounter = 1; } // Nur auf 1 setzen, da nur bei einem 0er das Parent auflöst
             }
             base.OnControlAdded(e);
         }
