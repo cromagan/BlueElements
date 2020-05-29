@@ -100,7 +100,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 _LoadedLayout = string.Empty;
                 LayBearb.Enabled = true;
                 LayOpen.Enabled = true;
-                Page_Control.Enabled = false;
+                tabPageControl.Enabled = false;
                 Abma.Enabled = true;
                 Base64.Enabled = true;
                 Area_Drucken.Enabled = false;
@@ -115,7 +115,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (!string.IsNullOrEmpty(_LoadedLayout))
             {
-                Page_Control.Enabled = true;
+                tabPageControl.Enabled = true;
 
                 grpDateiSystem.Enabled = true;
 
@@ -127,7 +127,7 @@ namespace BlueControls.BlueDatabaseDialogs
             else
             {
                 Area_Drucken.Enabled = false;
-                Page_Control.Enabled = false;
+                tabPageControl.Enabled = false;
 
                 grpDateiSystem.Enabled = false;
 

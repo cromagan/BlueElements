@@ -86,8 +86,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabElementEigenschaften = new BlueControls.Controls.TabPage();
             this.tabCodeGenerator = new BlueControls.Controls.TabPage();
             this.Ribbon.SuspendLayout();
-            this.Page_Control.SuspendLayout();
-            this.Page_Start.SuspendLayout();
+            this.tabPageControl.SuspendLayout();
+            this.tabPageStart.SuspendLayout();
             this.Area_Drucken.SuspendLayout();
             this.Area_Design.SuspendLayout();
             this.DatenbankVER.SuspendLayout();
@@ -114,16 +114,16 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Ribbon.SelectedIndex = 0;
             this.Ribbon.Size = new System.Drawing.Size(1340, 110);
             // 
-            // Page_Start
+            // tabPageStart
             // 
-            this.Page_Start.Controls.Add(this.BlueFrame1);
-            this.Page_Start.Controls.Add(this.DatenbankVER);
-            this.Page_Start.Controls.Add(this.grpDateiSystem);
-            this.Page_Start.Size = new System.Drawing.Size(1332, 81);
-            this.Page_Start.Controls.SetChildIndex(this.grpDateiSystem, 0);
-            this.Page_Start.Controls.SetChildIndex(this.Area_Drucken, 0);
-            this.Page_Start.Controls.SetChildIndex(this.DatenbankVER, 0);
-            this.Page_Start.Controls.SetChildIndex(this.BlueFrame1, 0);
+            this.tabPageStart.Controls.Add(this.BlueFrame1);
+            this.tabPageStart.Controls.Add(this.DatenbankVER);
+            this.tabPageStart.Controls.Add(this.grpDateiSystem);
+            this.tabPageStart.Size = new System.Drawing.Size(1332, 81);
+            this.tabPageStart.Controls.SetChildIndex(this.grpDateiSystem, 0);
+            this.tabPageStart.Controls.SetChildIndex(this.Area_Drucken, 0);
+            this.tabPageStart.Controls.SetChildIndex(this.DatenbankVER, 0);
+            this.tabPageStart.Controls.SetChildIndex(this.BlueFrame1, 0);
             // 
             // Area_Drucken
             // 
@@ -695,8 +695,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Controls.SetChildIndex(this.tabRightSide, 0);
             this.Controls.SetChildIndex(this.Pad, 0);
             this.Ribbon.ResumeLayout(false);
-            this.Page_Control.ResumeLayout(false);
-            this.Page_Start.ResumeLayout(false);
+            this.tabPageControl.ResumeLayout(false);
+            this.tabPageStart.ResumeLayout(false);
             this.Area_Drucken.ResumeLayout(false);
             this.Area_Design.ResumeLayout(false);
             this.DatenbankVER.ResumeLayout(false);

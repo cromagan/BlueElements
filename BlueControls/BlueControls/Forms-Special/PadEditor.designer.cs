@@ -29,13 +29,13 @@ namespace BlueControls.Forms
             this.btnZoomFit = new BlueControls.Controls.Button();
             this.Pad = new BlueControls.Controls.CreativePad();
             this.Ribbon = new BlueControls.Controls.TabControl();
-            this.Page_Start = new BlueControls.Controls.TabPage();
+            this.tabPageStart = new BlueControls.Controls.TabPage();
             this.Area_Drucken = new BlueControls.Controls.GroupBox();
             this.Vorschau = new BlueControls.Controls.Button();
             this.Button_PageSetup = new BlueControls.Controls.Button();
             this.Bild = new BlueControls.Controls.Button();
             this.Drucken = new BlueControls.Controls.Button();
-            this.Page_Control = new BlueControls.Controls.TabPage();
+            this.tabPageControl = new BlueControls.Controls.TabPage();
             this.grpKomponenteHinzufügen = new BlueControls.Controls.GroupBox();
             this.btnAddSymbol = new BlueControls.Controls.Button();
             this.btnAddUnterStufe = new BlueControls.Controls.Button();
@@ -63,9 +63,9 @@ namespace BlueControls.Forms
             this.PadDesign = new BlueControls.Controls.ComboBox();
             this.ssss = new BlueControls.Controls.Caption();
             this.Ribbon.SuspendLayout();
-            this.Page_Start.SuspendLayout();
+            this.tabPageStart.SuspendLayout();
             this.Area_Drucken.SuspendLayout();
-            this.Page_Control.SuspendLayout();
+            this.tabPageControl.SuspendLayout();
             this.grpKomponenteHinzufügen.SuspendLayout();
             this.grpWerkzeuge.SuspendLayout();
             this.Page_Settings.SuspendLayout();
@@ -116,8 +116,8 @@ namespace BlueControls.Forms
             // 
             // Ribbon
             // 
-            this.Ribbon.Controls.Add(this.Page_Start);
-            this.Ribbon.Controls.Add(this.Page_Control);
+            this.Ribbon.Controls.Add(this.tabPageStart);
+            this.Ribbon.Controls.Add(this.tabPageControl);
             this.Ribbon.Controls.Add(this.Page_Settings);
             this.Ribbon.Dock = System.Windows.Forms.DockStyle.Top;
             this.Ribbon.HotTrack = true;
@@ -128,14 +128,14 @@ namespace BlueControls.Forms
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
             this.Ribbon.TabIndex = 2;
             // 
-            // Page_Start
+            // tabPageStart
             // 
-            this.Page_Start.Controls.Add(this.Area_Drucken);
-            this.Page_Start.Location = new System.Drawing.Point(4, 25);
-            this.Page_Start.Name = "Page_Start";
-            this.Page_Start.Size = new System.Drawing.Size(1326, 81);
-            this.Page_Start.TabIndex = 1;
-            this.Page_Start.Text = "Start";
+            this.tabPageStart.Controls.Add(this.Area_Drucken);
+            this.tabPageStart.Location = new System.Drawing.Point(4, 25);
+            this.tabPageStart.Name = "tabPageStart";
+            this.tabPageStart.Size = new System.Drawing.Size(1326, 81);
+            this.tabPageStart.TabIndex = 1;
+            this.tabPageStart.Text = "Start";
             // 
             // Area_Drucken
             // 
@@ -191,15 +191,15 @@ namespace BlueControls.Forms
             this.Drucken.Text = "Drucken";
             this.Drucken.Click += new System.EventHandler(this.Drucken_Click);
             // 
-            // Page_Control
+            // tabPageControl
             // 
-            this.Page_Control.Controls.Add(this.grpKomponenteHinzufügen);
-            this.Page_Control.Controls.Add(this.grpWerkzeuge);
-            this.Page_Control.Location = new System.Drawing.Point(4, 25);
-            this.Page_Control.Name = "Page_Control";
-            this.Page_Control.Size = new System.Drawing.Size(1326, 81);
-            this.Page_Control.TabIndex = 0;
-            this.Page_Control.Text = "Steuerung";
+            this.tabPageControl.Controls.Add(this.grpKomponenteHinzufügen);
+            this.tabPageControl.Controls.Add(this.grpWerkzeuge);
+            this.tabPageControl.Location = new System.Drawing.Point(4, 25);
+            this.tabPageControl.Name = "tabPageControl";
+            this.tabPageControl.Size = new System.Drawing.Size(1326, 81);
+            this.tabPageControl.TabIndex = 0;
+            this.tabPageControl.Text = "Steuerung";
             // 
             // grpKomponenteHinzufügen
             // 
@@ -487,9 +487,9 @@ namespace BlueControls.Forms
             this.Text = "(c) Christian Peter";
             this.TopMost = true;
             this.Ribbon.ResumeLayout(false);
-            this.Page_Start.ResumeLayout(false);
+            this.tabPageStart.ResumeLayout(false);
             this.Area_Drucken.ResumeLayout(false);
-            this.Page_Control.ResumeLayout(false);
+            this.tabPageControl.ResumeLayout(false);
             this.grpKomponenteHinzufügen.ResumeLayout(false);
             this.grpWerkzeuge.ResumeLayout(false);
             this.Page_Settings.ResumeLayout(false);
@@ -507,8 +507,8 @@ namespace BlueControls.Forms
 			private Button btnAddLine;
 			public CreativePad Pad;
 			protected TabControl Ribbon;
-			protected TabPage Page_Control;
-			protected TabPage Page_Start;
+			protected TabPage tabPageControl;
+			protected TabPage tabPageStart;
 			protected GroupBox grpWerkzeuge;
 			protected GroupBox grpKomponenteHinzufügen;
 			protected GroupBox Area_Drucken;

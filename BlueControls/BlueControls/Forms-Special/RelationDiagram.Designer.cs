@@ -37,8 +37,8 @@ namespace BlueControls.Forms
 			{
             this.Hinzu = new Button();
             this.Ribbon.SuspendLayout();
-            this.Page_Control.SuspendLayout();
-            this.Page_Start.SuspendLayout();
+            this.tabPageControl.SuspendLayout();
+            this.tabPageStart.SuspendLayout();
             this.grpKomponenteHinzufügen.SuspendLayout();
             this.Area_Drucken.SuspendLayout();
             this.Area_Design.SuspendLayout();
@@ -56,9 +56,9 @@ namespace BlueControls.Forms
             this.Ribbon.SelectedIndex = 1;
             this.Ribbon.Size = new Size(1290, 110);
             // 
-            // Page_Control
+            // tabPageControl
             // 
-            this.Page_Control.Size = new Size(1282, 81);
+            this.tabPageControl.Size = new Size(1282, 81);
             // 
             // Area_KomponenteHinzufügen
             // 
@@ -96,8 +96,8 @@ namespace BlueControls.Forms
             this.Text = "Beziehungs-Editor";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Ribbon.ResumeLayout(false);
-            this.Page_Control.ResumeLayout(false);
-            this.Page_Start.ResumeLayout(false);
+            this.tabPageControl.ResumeLayout(false);
+            this.tabPageStart.ResumeLayout(false);
             this.grpKomponenteHinzufügen.ResumeLayout(false);
             this.Area_Drucken.ResumeLayout(false);
             this.Area_Design.ResumeLayout(false);

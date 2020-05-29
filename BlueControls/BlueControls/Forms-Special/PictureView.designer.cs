@@ -32,12 +32,12 @@ namespace BlueControls.Forms
             this.ZoomFitBut = new BlueControls.Controls.Button();
             this.Pad = new BlueControls.Controls.ZoomPic();
             this.Ribbon = new BlueControls.Controls.TabControl();
-            this.Page_Control = new BlueControls.Controls.TabPage();
+            this.tabPageControl = new BlueControls.Controls.TabPage();
             this.grpWerkzeuge = new BlueControls.Controls.GroupBox();
             this.Auswahl = new BlueControls.Controls.Button();
             this.grpSeiten.SuspendLayout();
             this.Ribbon.SuspendLayout();
-            this.Page_Control.SuspendLayout();
+            this.tabPageControl.SuspendLayout();
             this.grpWerkzeuge.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -116,7 +116,7 @@ namespace BlueControls.Forms
             // 
             // Ribbon
             // 
-            this.Ribbon.Controls.Add(this.Page_Control);
+            this.Ribbon.Controls.Add(this.tabPageControl);
             this.Ribbon.Dock = System.Windows.Forms.DockStyle.Top;
             this.Ribbon.HotTrack = true;
             this.Ribbon.IsRibbonBar = true;
@@ -125,15 +125,15 @@ namespace BlueControls.Forms
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
             this.Ribbon.TabIndex = 2;
             // 
-            // Page_Control
+            // tabPageControl
             // 
-            this.Page_Control.Controls.Add(this.grpWerkzeuge);
-            this.Page_Control.Controls.Add(this.grpSeiten);
-            this.Page_Control.Location = new System.Drawing.Point(4, 25);
-            this.Page_Control.Name = "Page_Control";
-            this.Page_Control.Size = new System.Drawing.Size(1326, 81);
-            this.Page_Control.TabIndex = 0;
-            this.Page_Control.Text = "Steuerung";
+            this.tabPageControl.Controls.Add(this.grpWerkzeuge);
+            this.tabPageControl.Controls.Add(this.grpSeiten);
+            this.tabPageControl.Location = new System.Drawing.Point(4, 25);
+            this.tabPageControl.Name = "tabPageControl";
+            this.tabPageControl.Size = new System.Drawing.Size(1326, 81);
+            this.tabPageControl.TabIndex = 0;
+            this.tabPageControl.Text = "Steuerung";
             // 
             // grpWerkzeuge
             // 
@@ -170,7 +170,7 @@ namespace BlueControls.Forms
             this.TopMost = true;
             this.grpSeiten.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
-            this.Page_Control.ResumeLayout(false);
+            this.tabPageControl.ResumeLayout(false);
             this.grpWerkzeuge.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -181,7 +181,7 @@ namespace BlueControls.Forms
 			private Button Auswahl;
 			public ZoomPic Pad;
 			protected TabControl Ribbon;
-			protected TabPage Page_Control;
+			protected TabPage tabPageControl;
 			protected GroupBox grpSeiten;
 			protected GroupBox grpWerkzeuge;
 			private Button ZoomFitBut;
