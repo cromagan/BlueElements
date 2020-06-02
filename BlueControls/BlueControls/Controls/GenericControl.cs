@@ -26,6 +26,7 @@ using BlueDatabase;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using BlueBasics.Enums;
 
 
 //Inherits UserControl ' -> Gibt Focus an Child!
@@ -192,60 +193,60 @@ namespace BlueControls.Controls
         {
             BeginnEdit();
         }
-        public new void ResumeLayout(bool dummy)
+        public new void ResumeLayout(bool performLayout)
         {
-            EndEdit();
+            EndEdit(performLayout);
         }
 
         public new void ResumeLayout()
         {
-            EndEdit();
-        }
-
-        public void BeginnEdit()
-        {
-            if (BeginnEditCounter == 0)
-            {
-                base.SuspendLayout();
-                foreach (var ThisControl in Controls)
-                {
-                    if (ThisControl is ISupportsBeginnEdit e)
-                    {
-                        e.BeginnEdit();
-                    }
-                }
-            }
-            BeginnEditCounter++;
+            EndEdit(true);
         }
 
         public void EndEdit()
         {
+            EndEdit(true);
+        }
+
+        public void BeginnEdit()
+        {
+            BeginnEdit(1);
+        }
+
+        public void BeginnEdit(int count)
+        {
+            if (DesignMode) { return; }
+            if (BeginnEditCounter == 0) { base.SuspendLayout(); }
+
+            foreach (var ThisControl in Controls)
+            {
+                if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
+            }
+
+            BeginnEditCounter += count;
+        }
+
+        public void EndEdit(bool performLayout)
+        {
+            if (DesignMode) { return; }
+            if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
             BeginnEditCounter--;
 
-            if (BeginnEditCounter == 0)
+            foreach (var ThisControl in Controls)
             {
-
-                base.ResumeLayout();
-                Invalidate();
-
-                foreach (var ThisControl in Controls)
-                {
-                    if (ThisControl is ISupportsBeginnEdit e)
-                    {
-                        e.EndEdit();
-                    }
-                }
-
-                PerformLayout();
+                if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(performLayout); }
             }
+
+
+            if (BeginnEditCounter == 0) { base.ResumeLayout(performLayout); }
+
+            Invalidate();
         }
 
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)
         {
-            if (e.Control is ISupportsBeginnEdit nc)
-            {
-                if (BeginnEditCounter > 0) { nc.BeginnEditCounter = 1; } // Nur auf 1 setzen, da nur bei einem 0er das Parent auflöst
-            }
+            if (DesignMode) { return; }
+            if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
             base.OnControlAdded(e);
         }
 

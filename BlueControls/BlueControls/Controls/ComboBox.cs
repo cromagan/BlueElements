@@ -48,6 +48,10 @@ namespace BlueControls.Controls
             InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+            _MouseHighlight = true;
+
+            SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
+
             Item = new ItemCollectionList(enBlueListBoxAppearance.DropdownSelectbox);
 
             Item.ItemAdded += _Item_ItemAdded;
@@ -180,6 +184,13 @@ namespace BlueControls.Controls
             ItemClicked?.Invoke(this, e);
         }
 
+
+
+        protected override enDesign GetDesign()
+        {
+            if (ParentType() == enPartentType.RibbonGroupBox || ParentType() == enPartentType.RibbonPage) { return enDesign.Ribbon_ComboBox_Textbox; }
+            return enDesign.ComboBox_Textbox;
+        }
 
 
         protected override void DrawControl(Graphics gr, enStates state)

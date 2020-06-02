@@ -101,6 +101,7 @@ namespace BlueControls.Controls
             set
             {
                 if (_Database == value) { return; }
+                BeginnEdit();
 
                 if (Editor.Visible) { Editor.Visible = false; }
                 ShowingRowKey = -1; // Wichtig, dass ordenlich Showing-Row to Nothing gesetzt wird, weil dann alle Fokuse durch Enabled elemeniert werden und nachträglich nix mehr ausgelöst wird.
@@ -135,6 +136,8 @@ namespace BlueControls.Controls
                 }
 
                 _Inited = false;
+
+                EndEdit();
             }
         }
 
@@ -1225,7 +1228,8 @@ namespace BlueControls.Controls
                     {
                         RemoveControl(o);
                     }
-                    return;
+                    EndEdit();
+                    return; // Raus hier
 
                 case TabPage _:
                     foreach (System.Windows.Forms.Control o in vObject.Controls)

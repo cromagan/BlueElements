@@ -23,7 +23,11 @@ namespace BlueControls.Interfaces
     public interface ISupportsBeginnEdit
     {
         void BeginnEdit();
+
+        void BeginnEdit(int count);
+
         void EndEdit();
+        void EndEdit(bool performLayout);
 
         int BeginnEditCounter { get; set; }
     }

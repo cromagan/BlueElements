@@ -2927,7 +2927,7 @@ namespace BlueDatabase
         {
             if (Cell.Freezed)
             {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Reload unmöglich, Datenbankstatus eingefroren");
+      //          Develop.DebugPrint(enFehlerArt.Warnung, "Reload unmöglich, Datenbankstatus eingefroren");
                 return true;
             }
             return false;

@@ -50,15 +50,9 @@ namespace BlueControls.Controls
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
+
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            if (this is ComboBox)
-            {
-                SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
-            }
-            else
-            {
-                _MouseHighlight = false;
-            }
+            _MouseHighlight = false;
         }
         #endregion
 
@@ -1153,14 +1147,8 @@ namespace BlueControls.Controls
 
 
 
-        private enDesign GetDesign()
+        protected virtual enDesign GetDesign()
         {
-            if (this is ComboBox)
-            {
-                if (ParentType() == enPartentType.RibbonGroupBox || ParentType() == enPartentType.RibbonPage) { return enDesign.Ribbon_ComboBox_Textbox; }
-                return enDesign.ComboBox_Textbox;
-            }
-
             return enDesign.TextBox;
         }
 
