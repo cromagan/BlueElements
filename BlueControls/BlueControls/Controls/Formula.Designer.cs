@@ -329,7 +329,6 @@ namespace BlueControls.Controls
             this.MinimumSize = new System.Drawing.Size(320, 350);
             this.Name = "Formula";
             this.Size = new System.Drawing.Size(320, 350);
-            this.SizeChanged += new System.EventHandler(this.BlueFormula_SizeChanged);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Tabs_MouseUp);
             this.Editor.ResumeLayout(false);
             this.x2.ResumeLayout(false);

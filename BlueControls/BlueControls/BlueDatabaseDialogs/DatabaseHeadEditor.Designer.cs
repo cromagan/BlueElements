@@ -66,6 +66,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxBevorzugtesSkin = new BlueControls.Controls.ComboBox();
             this.capAnsicht = new BlueControls.Controls.Caption();
             this.capBevorzugtesSkin = new BlueControls.Controls.Caption();
+            this.Tab_Backup = new BlueControls.Controls.TabPage();
+            this.ExportEditor = new BlueControls.Classes_Editor.ExportDefinition_Editor();
+            this.grpExport = new BlueControls.Controls.GroupBox();
+            this.lbxExportSets = new BlueControls.Controls.ListBox();
             this.Tab_Regeln = new BlueControls.Controls.TabPage();
             this.Tab_Rechte = new BlueControls.Controls.TabPage();
             this.grpDateiVerschluesselung = new BlueControls.Controls.GroupBox();
@@ -73,10 +77,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnDateiSchluessel = new BlueControls.Controls.Button();
             this.Tab_Binaer = new BlueControls.Controls.TabPage();
             this.lstBinary = new BlueControls.Controls.ListBox();
-            this.Tab_Backup = new BlueControls.Controls.TabPage();
-            this.ExportEditor = new BlueControls.Classes_Editor.ExportDefinition_Editor();
-            this.grpExport = new BlueControls.Controls.GroupBox();
-            this.lbxExportSets = new BlueControls.Controls.ListBox();
             this.Tab_Sortierung = new BlueControls.Controls.TabPage();
             this.Tab_Undo = new BlueControls.Controls.TabPage();
             this.tbxUndoAnzahl = new BlueControls.Controls.TextBox();
@@ -89,12 +89,12 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.Tab_Allgemein.SuspendLayout();
+            this.Tab_Backup.SuspendLayout();
+            this.grpExport.SuspendLayout();
             this.Tab_Regeln.SuspendLayout();
             this.Tab_Rechte.SuspendLayout();
             this.grpDateiVerschluesselung.SuspendLayout();
             this.Tab_Binaer.SuspendLayout();
-            this.Tab_Backup.SuspendLayout();
-            this.grpExport.SuspendLayout();
             this.Tab_Sortierung.SuspendLayout();
             this.Tab_Undo.SuspendLayout();
             this.Tab_Expermimentell.SuspendLayout();
@@ -125,7 +125,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.PermissionGroups_NewRow.Name = "PermissionGroups_NewRow";
             this.PermissionGroups_NewRow.QuickInfo = "";
             this.PermissionGroups_NewRow.RemoveAllowed = true;
-            this.PermissionGroups_NewRow.Size = new System.Drawing.Size(176, 360);
+            this.PermissionGroups_NewRow.Size = new System.Drawing.Size(176, 848);
             this.PermissionGroups_NewRow.TabIndex = 4;
             // 
             // capNeueZeilenInfo
@@ -157,7 +157,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.DatenbankAdmin.Name = "DatenbankAdmin";
             this.DatenbankAdmin.QuickInfo = "";
             this.DatenbankAdmin.RemoveAllowed = true;
-            this.DatenbankAdmin.Size = new System.Drawing.Size(176, 434);
+            this.DatenbankAdmin.Size = new System.Drawing.Size(176, 922);
             this.DatenbankAdmin.TabIndex = 4;
             // 
             // capNeueZeilen
@@ -271,7 +271,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capCaption
             // 
-            this.capCaption.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.capCaption.Location = new System.Drawing.Point(8, 8);
             this.capCaption.Name = "capCaption";
             this.capCaption.Size = new System.Drawing.Size(137, 16);
@@ -403,7 +402,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbGlobalScale
             // 
-            this.txbGlobalScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.txbGlobalScale.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbGlobalScale.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.txbGlobalScale.Location = new System.Drawing.Point(168, 512);
@@ -450,7 +448,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tbxReloadVerzoegerung
             // 
-            this.tbxReloadVerzoegerung.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxReloadVerzoegerung.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxReloadVerzoegerung.Format = BlueBasics.Enums.enDataFormat.Ganzzahl;
             this.tbxReloadVerzoegerung.Location = new System.Drawing.Point(168, 488);
@@ -520,6 +517,62 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capBevorzugtesSkin.Name = "capBevorzugtesSkin";
             this.capBevorzugtesSkin.Size = new System.Drawing.Size(112, 18);
             this.capBevorzugtesSkin.Text = "Bevorzugtes Skin:";
+            // 
+            // Tab_Backup
+            // 
+            this.Tab_Backup.Controls.Add(this.ExportEditor);
+            this.Tab_Backup.Controls.Add(this.grpExport);
+            this.Tab_Backup.Location = new System.Drawing.Point(4, 25);
+            this.Tab_Backup.Name = "Tab_Backup";
+            this.Tab_Backup.Padding = new System.Windows.Forms.Padding(3);
+            this.Tab_Backup.Size = new System.Drawing.Size(1039, 616);
+            this.Tab_Backup.TabIndex = 5;
+            this.Tab_Backup.Text = "Backup & Export";
+            this.Tab_Backup.UseVisualStyleBackColor = true;
+            // 
+            // ExportEditor
+            // 
+            this.ExportEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ExportEditor.CausesValidation = false;
+            this.ExportEditor.Enabled = false;
+            this.ExportEditor.IsDialog = false;
+            this.ExportEditor.Location = new System.Drawing.Point(8, 176);
+            this.ExportEditor.Name = "ExportEditor";
+            this.ExportEditor.Size = new System.Drawing.Size(1031, 437);
+            this.ExportEditor.Text = "Export-Editor:";
+            this.ExportEditor.Changed += new System.EventHandler(this.ExportEditor_Changed);
+            // 
+            // grpExport
+            // 
+            this.grpExport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpExport.CausesValidation = false;
+            this.grpExport.Controls.Add(this.lbxExportSets);
+            this.grpExport.Location = new System.Drawing.Point(8, 8);
+            this.grpExport.Name = "grpExport";
+            this.grpExport.Size = new System.Drawing.Size(1031, 168);
+            this.grpExport.Text = "Alle Export-Aufgaben:";
+            // 
+            // lbxExportSets
+            // 
+            this.lbxExportSets.AddAllowed = BlueControls.Enums.enAddType.UserDef;
+            this.lbxExportSets.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbxExportSets.FilterAllowed = true;
+            this.lbxExportSets.LastFilePath = null;
+            this.lbxExportSets.Location = new System.Drawing.Point(8, 24);
+            this.lbxExportSets.Name = "lbxExportSets";
+            this.lbxExportSets.QuickInfo = "";
+            this.lbxExportSets.RemoveAllowed = true;
+            this.lbxExportSets.Size = new System.Drawing.Size(2046, 304);
+            this.lbxExportSets.TabIndex = 0;
+            this.lbxExportSets.Text = "ExportAufgaben";
+            this.lbxExportSets.ItemCheckedChanged += new System.EventHandler(this.lbxExportSets_ItemCheckedChanged);
+            this.lbxExportSets.AddClicked += new System.EventHandler(this.ExportSets_AddClicked);
+            this.lbxExportSets.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.lbxExportSets_RemoveClicked);
             // 
             // Tab_Regeln
             // 
@@ -599,62 +652,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lstBinary.TabIndex = 0;
             this.lstBinary.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.Bilder_ContextMenuInit);
             this.lstBinary.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.Bilder_ContextMenuItemClicked);
-            // 
-            // Tab_Backup
-            // 
-            this.Tab_Backup.Controls.Add(this.ExportEditor);
-            this.Tab_Backup.Controls.Add(this.grpExport);
-            this.Tab_Backup.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Backup.Name = "Tab_Backup";
-            this.Tab_Backup.Padding = new System.Windows.Forms.Padding(3);
-            this.Tab_Backup.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Backup.TabIndex = 5;
-            this.Tab_Backup.Text = "Backup & Export";
-            this.Tab_Backup.UseVisualStyleBackColor = true;
-            // 
-            // ExportEditor
-            // 
-            this.ExportEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ExportEditor.CausesValidation = false;
-            this.ExportEditor.Enabled = false;
-            this.ExportEditor.IsDialog = false;
-            this.ExportEditor.Location = new System.Drawing.Point(8, 176);
-            this.ExportEditor.Name = "ExportEditor";
-            this.ExportEditor.Size = new System.Drawing.Size(1031, 437);
-            this.ExportEditor.Text = "Export-Editor:";
-            this.ExportEditor.Changed += new System.EventHandler(this.ExportEditor_Changed);
-            // 
-            // grpExport
-            // 
-            this.grpExport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.grpExport.CausesValidation = false;
-            this.grpExport.Controls.Add(this.lbxExportSets);
-            this.grpExport.Location = new System.Drawing.Point(8, 8);
-            this.grpExport.Name = "grpExport";
-            this.grpExport.Size = new System.Drawing.Size(1031, 168);
-            this.grpExport.Text = "Alle Export-Aufgaben:";
-            // 
-            // lbxExportSets
-            // 
-            this.lbxExportSets.AddAllowed = BlueControls.Enums.enAddType.UserDef;
-            this.lbxExportSets.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbxExportSets.FilterAllowed = true;
-            this.lbxExportSets.LastFilePath = null;
-            this.lbxExportSets.Location = new System.Drawing.Point(8, 24);
-            this.lbxExportSets.Name = "lbxExportSets";
-            this.lbxExportSets.QuickInfo = "";
-            this.lbxExportSets.RemoveAllowed = true;
-            this.lbxExportSets.Size = new System.Drawing.Size(1015, 136);
-            this.lbxExportSets.TabIndex = 0;
-            this.lbxExportSets.Text = "ExportAufgaben";
-            this.lbxExportSets.ItemCheckedChanged += new System.EventHandler(this.lbxExportSets_ItemCheckedChanged);
-            this.lbxExportSets.AddClicked += new System.EventHandler(this.ExportSets_AddClicked);
-            this.lbxExportSets.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.lbxExportSets_RemoveClicked);
             // 
             // Tab_Sortierung
             // 
@@ -747,12 +744,12 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpKennwort.ResumeLayout(false);
             this.GlobalTab.ResumeLayout(false);
             this.Tab_Allgemein.ResumeLayout(false);
+            this.Tab_Backup.ResumeLayout(false);
+            this.grpExport.ResumeLayout(false);
             this.Tab_Regeln.ResumeLayout(false);
             this.Tab_Rechte.ResumeLayout(false);
             this.grpDateiVerschluesselung.ResumeLayout(false);
             this.Tab_Binaer.ResumeLayout(false);
-            this.Tab_Backup.ResumeLayout(false);
-            this.grpExport.ResumeLayout(false);
             this.Tab_Sortierung.ResumeLayout(false);
             this.Tab_Undo.ResumeLayout(false);
             this.Tab_Expermimentell.ResumeLayout(false);

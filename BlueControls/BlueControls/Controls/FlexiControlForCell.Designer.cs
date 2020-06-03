@@ -40,10 +40,6 @@ namespace BlueControls.Controls
             this.Marker.WorkerSupportsCancellation = true;
             this.Marker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.Marker_DoWork);
             this.Marker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.Marker_ProgressChanged);
-            // 
-            // FlexiControlForCell
-            // 
-            this.Name = "FlexiControlForCell";
             this.ResumeLayout(false);
 
         }

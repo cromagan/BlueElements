@@ -149,12 +149,6 @@
     <Compile Include="Tools\Tool_Paint.designer.cs">
       <DependentUpon>Tool_Paint.cs</DependentUpon>
     </Compile>
-    <Compile Include="Tools\Tool_Brain.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Tools\Tool_Brain.designer.cs">
-      <DependentUpon>Tool_Brain.cs</DependentUpon>
-    </Compile>
     <Compile Include="Tools\Tool_Abspielen.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -210,9 +204,6 @@
     <EmbeddedResource Include="Tools\Tool_Paint.resx">
       <DependentUpon>Tool_Paint.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Tools\Tool_Brain.resx">
-      <DependentUpon>Tool_Brain.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Tools\Tool_Abspielen.resx">
       <DependentUpon>Tool_Abspielen.cs</DependentUpon>
     </EmbeddedResource>
@@ -232,7 +223,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Ressourcen\ComicSharpOutline.eg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

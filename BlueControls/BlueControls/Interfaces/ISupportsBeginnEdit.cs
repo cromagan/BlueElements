@@ -27,7 +27,7 @@ namespace BlueControls.Interfaces
         void BeginnEdit(int count);
 
         void EndEdit();
-        void EndEdit(bool performLayout);
+
 
         int BeginnEditCounter { get; set; }
     }

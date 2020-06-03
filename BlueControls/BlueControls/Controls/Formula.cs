@@ -755,11 +755,10 @@ namespace BlueControls.Controls
         }
 
 
-
-        private void BlueFormula_SizeChanged(object sender, System.EventArgs e)
+        protected override void OnSizeChanged(System.EventArgs e)
         {
             if (IsDisposed) { return; }
-
+            base.OnSizeChanged(e);
 
             if (_Database != null && _Inited)
             {

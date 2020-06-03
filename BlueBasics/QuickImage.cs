@@ -520,13 +520,8 @@ namespace BlueBasics
         public Bitmap GetBitmap(string TMPName)
         {
             Bitmap vbmp = null;
-            //vbmp = modAllgemein.GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), TMPName + ".ico");
-            //if (vbmp != null) { return vbmp; }
             vbmp = modAllgemein.GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), TMPName + ".png");
             if (vbmp != null) { return vbmp; }
-            //vbmp = modAllgemein.GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), TMPName + ".bmp");
-            //if (vbmp != null) { return vbmp; }
-
 
             var i = GetIndex(TMPName);
             if (i >= 0 && PC[i] != this) { return PC[i].BMP; }
@@ -557,6 +552,8 @@ namespace BlueBasics
             Bitmap bmpSecond = null;
             Color? colgreen = null;
             Color? colfärb = null;
+
+
 
             // Fehlerhaftes Bild
             if (bmpOri == null)
@@ -636,7 +633,6 @@ namespace BlueBasics
                         {
                             var c2 = bmpSecond.GetPixel(X - (bmpOri.Width - bmpSecond.Width), Y - (bmpOri.Height - bmpSecond.Height));
                             if (!c2.IsMagentaOrTransparent()) { c = c2; }
-                            //c = Color.Black;
                         }
 
 
@@ -711,26 +707,28 @@ namespace BlueBasics
             {
                 if (_height > 0)
                 {
-                    _Bitmap = new Bitmap(_width, _height, PixelFormat.Format32bppPArgb);
+                    _Bitmap = bmpTMP.Resize(_width, _height, enSizeModes.EmptySpace, InterpolationMode.High, false);
                 }
                 else
                 {
-                    _Bitmap = new Bitmap(_width, _width, PixelFormat.Format32bppPArgb);
+                    _Bitmap = bmpTMP.Resize(_width, _width, enSizeModes.EmptySpace, InterpolationMode.High, false);
                 }
             }
             else
             {
-                _Bitmap = new Bitmap(bmpTMP.Width, bmpTMP.Height, PixelFormat.Format32bppPArgb);
+                _Bitmap = bmpTMP;
             }
 
 
-            using (var GR = Graphics.FromImage(_Bitmap))
-            {
-                GR.Clear(Color.FromArgb(0, 0, 0, 0));
-                GR.InterpolationMode = InterpolationMode.High;
-                bmpTMP = bmpTMP.Resize(_Bitmap.Width, _Bitmap.Height, enSizeModes.EmptySpace, InterpolationMode.High, false);
-                GR.DrawImage(bmpTMP, 0, 0, _Bitmap.Width, _Bitmap.Height);
-            }
+            //_Bitmap = bmpTMP.Bitmap.Resize(_Bitmap.Width, _Bitmap.Height, enSizeModes.EmptySpace, InterpolationMode.High, false);
+
+            //using (var GR = Graphics.FromImage(_Bitmap))
+            //{
+            //    GR.Clear(Color.FromArgb(0, 0, 0, 0));
+            //    GR.InterpolationMode = InterpolationMode.High;
+            //    bmpTMP = bmpTMP.Resize(_Bitmap.Width, _Bitmap.Height, enSizeModes.EmptySpace, InterpolationMode.High, false);
+            //    GR.DrawImage(bmpTMP, 0, 0, _Bitmap.Width, _Bitmap.Height);
+            //}
         }
 
 

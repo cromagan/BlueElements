@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;

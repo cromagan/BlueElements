@@ -75,7 +75,6 @@ namespace BlueControls.Controls
 
         private bool _InstantChangedEvent = false;
 
-        protected System.Windows.Forms.Timer _IdleTimer;
 
         /// <summary>
         /// Speichert, wann die letzte Text-Änderung vorgenommen wurden.
@@ -107,14 +106,7 @@ namespace BlueControls.Controls
             _EditType = enEditTypeFormula.Line;
             Size = new Size(200, 8);
 
-            if (_IdleTimer == null)
-            {
-                _IdleTimer = new Timer();
-                _IdleTimer.Interval = 1000;
-                _IdleTimer.Enabled = true;
-            }
 
-            _IdleTimer.Tick += _IdleTimer_Tick;
 
         }
 
@@ -202,7 +194,6 @@ namespace BlueControls.Controls
 
 
         [DefaultValue(true)]
-        [Obsolete]
         public new bool Enabled
         {
             get
@@ -1631,6 +1622,7 @@ namespace BlueControls.Controls
                 //_InfoCaption.Dispose();
                 //_InfoCaption = null;
                 _InfoCaption.Visible = false;
+                _InfoCaption.BringToFront();
             }
             else
             {
@@ -1650,6 +1642,7 @@ namespace BlueControls.Controls
                 Controls.Add(_InfoCaption);
                 _InfoCaption.BringToFront();
                 _InfoCaption.Click += _InfoCaption_Click;
+                _InfoCaption.BringToFront();
             }
 
 

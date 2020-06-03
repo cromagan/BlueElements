@@ -42,6 +42,10 @@ namespace BlueControls.Controls
 
 
         #region Constructor
+
+        protected GenericControl() : this(false)  { }
+
+
         protected GenericControl(bool DoubleBuffer) : base()
         {
 
@@ -192,21 +196,20 @@ namespace BlueControls.Controls
         public new void SuspendLayout()
         {
             BeginnEdit();
+            base.SuspendLayout();
         }
         public new void ResumeLayout(bool performLayout)
         {
-            EndEdit(performLayout);
+            base.ResumeLayout(performLayout);
+            EndEdit();
         }
 
         public new void ResumeLayout()
         {
-            EndEdit(true);
+            base.ResumeLayout();
+            EndEdit();
         }
 
-        public void EndEdit()
-        {
-            EndEdit(true);
-        }
 
         public void BeginnEdit()
         {
@@ -216,7 +219,6 @@ namespace BlueControls.Controls
         public void BeginnEdit(int count)
         {
             if (DesignMode) { return; }
-            if (BeginnEditCounter == 0) { base.SuspendLayout(); }
 
             foreach (var ThisControl in Controls)
             {
@@ -226,21 +228,18 @@ namespace BlueControls.Controls
             BeginnEditCounter += count;
         }
 
-        public void EndEdit(bool performLayout)
+        public void EndEdit()
         {
             if (DesignMode) { return; }
             if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
             BeginnEditCounter--;
 
+            if (BeginnEditCounter == 0) { Invalidate(); }
+
             foreach (var ThisControl in Controls)
             {
-                if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(performLayout); }
+                if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
             }
-
-
-            if (BeginnEditCounter == 0) { base.ResumeLayout(performLayout); }
-
-            Invalidate();
         }
 
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)

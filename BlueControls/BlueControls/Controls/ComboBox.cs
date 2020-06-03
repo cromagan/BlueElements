@@ -285,7 +285,7 @@ namespace BlueControls.Controls
 
         internal bool WasThisValueClicked()
         {
-            return (Text == _LastClickedText);
+            return Text == _LastClickedText;
         }
 
         protected override void OnEnabledChanged(System.EventArgs e)

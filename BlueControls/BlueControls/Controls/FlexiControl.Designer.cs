@@ -37,8 +37,24 @@ namespace BlueControls.Controls
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            components = new Container();
+            this.components = new System.ComponentModel.Container();
+            this._IdleTimer = new System.Windows.Forms.Timer(this.components);
+            this.SuspendLayout();
+            // 
+            // _IdleTimer
+            // 
+            this._IdleTimer.Enbled = true;
+            this._IdleTimer.Interval = 1000;
+            this._IdleTimer.Tick += new System.EventHandler(this._IdleTimer_Tick);
+            // 
+            // FlexiControl
+            // 
+            this.Name = "FlexiControl";
+            this.Size = new System.Drawing.Size(100, 100);
+            this.ResumeLayout(false);
+
         }
 
+        protected System.Windows.Forms.Timer _IdleTimer;
     }
 }

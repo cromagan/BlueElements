@@ -23,10 +23,8 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueControls.Designer_Support;
 using System.ComponentModel;
-using System.Collections.Generic;
 using BlueControls.Enums;
 using BlueBasics.Enums;
-using System;
 
 namespace BlueControls.Controls
 {

@@ -18,7 +18,6 @@
 #endregion
 
 
-using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
 namespace BlueControls.EventArgs

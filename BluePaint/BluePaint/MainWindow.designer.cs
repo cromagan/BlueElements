@@ -63,7 +63,6 @@ namespace BluePaint
             this.btnRückgänig = new BlueControls.Controls.Button();
             this.tabExperimentell = new BlueControls.Controls.TabPage();
             this.groupBox1 = new BlueControls.Controls.GroupBox();
-            this.btnBrain = new BlueControls.Controls.Button();
             this.P = new BlueControls.Controls.ZoomPic();
             this.Split = new System.Windows.Forms.SplitContainer();
             this.BLupe = new BlueControls.Controls.GroupBox();
@@ -438,22 +437,11 @@ namespace BluePaint
             // groupBox1
             // 
             this.groupBox1.CausesValidation = false;
-            this.groupBox1.Controls.Add(this.btnBrain);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(136, 81);
             this.groupBox1.Text = "Experimentel";
-            // 
-            // btnBrain
-            // 
-            this.btnBrain.ImageCode = "Feder";
-            this.btnBrain.Location = new System.Drawing.Point(8, 2);
-            this.btnBrain.Name = "btnBrain";
-            this.btnBrain.Size = new System.Drawing.Size(80, 66);
-            this.btnBrain.TabIndex = 6;
-            this.btnBrain.Text = "Neuronales Netzwerk";
-            this.btnBrain.Click += new System.EventHandler(this.btnBrain_Click);
             // 
             // P
             // 
@@ -583,7 +571,6 @@ namespace BluePaint
         private Button btnSave;
         private TabPage tabExperimentell;
         internal GroupBox groupBox1;
-        internal Button btnBrain;
         private GroupBox grpBearbteitung;
         private Button btnStop;
         private Button btnAufnahme;

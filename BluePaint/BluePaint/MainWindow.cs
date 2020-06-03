@@ -541,10 +541,7 @@ namespace BluePaint
             CurrentTool?.DoAdditionalDrawing(e, P.BMP);
         }
 
-        private void btnBrain_Click(object sender, System.EventArgs e)
-        {
-            SetTool(new Tool_Brain(), !_aufnahme);
-        }
+
 
         private void btnAufnahme_Click(object sender, System.EventArgs e)
         {
