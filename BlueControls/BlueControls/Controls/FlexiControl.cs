@@ -727,6 +727,11 @@ namespace BlueControls.Controls
                     break;
             }
 
+
+
+            if (e.Control == _InfoCaption) { _InfoCaption = null; }
+            if (e.Control == _CaptionObject) { _CaptionObject = null; }
+
         }
 
 
@@ -1584,7 +1589,7 @@ namespace BlueControls.Controls
             }
             else if (!string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText))
             {
-                symbol = "<ImageCode=Kreuz|16>";
+                symbol = "  <ImageCode=Schloss|10|||||150||20>";
                 txt = disabledReason;
             }
             else if (string.IsNullOrEmpty(disabledReason) && !string.IsNullOrEmpty(_InfoText))
@@ -1608,9 +1613,13 @@ namespace BlueControls.Controls
 
             if (!string.IsNullOrEmpty(txt) && _InfoCaption != null)
             {
-                _InfoCaption.Visible = true;
+                _InfoCaption.Left = this.Width - 18;
+                _InfoCaption.Top = 0;
                 _InfoCaption.QuickInfo = txt;
                 _InfoCaption.Text = symbol;
+                _InfoCaption.Visible = true;
+                _InfoCaption.BringToFront();
+
                 return;
             }
             if (string.IsNullOrEmpty(txt) && _InfoCaption == null) { return; }
@@ -1622,7 +1631,6 @@ namespace BlueControls.Controls
                 //_InfoCaption.Dispose();
                 //_InfoCaption = null;
                 _InfoCaption.Visible = false;
-                _InfoCaption.BringToFront();
             }
             else
             {

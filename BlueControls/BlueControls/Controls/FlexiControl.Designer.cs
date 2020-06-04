@@ -43,7 +43,7 @@ namespace BlueControls.Controls
             // 
             // _IdleTimer
             // 
-            this._IdleTimer.Enbled = true;
+            this._IdleTimer.Enabled = true;
             this._IdleTimer.Interval = 1000;
             this._IdleTimer.Tick += new System.EventHandler(this._IdleTimer_Tick);
             // 
