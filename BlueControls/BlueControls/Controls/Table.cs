@@ -489,7 +489,7 @@ namespace BlueControls.Controls
 
                 if (ViewItem != null && ViewItem.Column != null)
                 {
-
+                    lfdno += 1;
 
                     if (IsOnScreen(ViewItem, DisplayRectangleWOSlider))
                     {
@@ -497,7 +497,7 @@ namespace BlueControls.Controls
                         if ((col == enTableDrawColumn.NonPermament && ViewItem.ViewType != enViewType.PermanentColumn && (int)ViewItem.OrderTMP_Spalte_X1 + (int)ViewItem._TMP_DrawWidth > PermaX) ||
                             (col == enTableDrawColumn.Permament && ViewItem.ViewType == enViewType.PermanentColumn))
                         {
-                            lfdno += 1;
+
                             switch (type)
                             {
                                 case enTableDrawType.ColumnBackBody:
