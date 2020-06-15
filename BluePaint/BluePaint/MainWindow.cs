@@ -73,7 +73,7 @@ namespace BluePaint
 
             if (FileExists(filename))
             {
-                SetPic((Bitmap)modAllgemein.Image_FromFile(filename));
+                SetPic((Bitmap)BitmapExt.Image_FromFile(filename));
                 _filename = filename;
                 _isSaved = true;
 

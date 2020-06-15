@@ -138,7 +138,7 @@ namespace BlueControls.Forms
             {
                 try
                 {
-                    Pad.BMP = (Bitmap)modAllgemein.Image_FromFile(_FileList[Nr]);
+                    Pad.BMP = (Bitmap)BitmapExt.Image_FromFile(_FileList[Nr]);
                 } 
                 catch (Exception ex)
                 {

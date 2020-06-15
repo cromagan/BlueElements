@@ -27,6 +27,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using BlueBasics.Enums;
+using System.Drawing.Imaging;
 
 
 //Inherits UserControl ' -> Gibt Focus an Child!
@@ -43,10 +44,10 @@ namespace BlueControls.Controls
 
         #region Constructor
 
-        protected GenericControl() : this(false)  { }
+        protected GenericControl() : this(false, false)  { }
 
 
-        protected GenericControl(bool DoubleBuffer) : base()
+        protected GenericControl(bool DoubleBuffer, bool UseBackgroundBitmap) : base()
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -57,11 +58,12 @@ namespace BlueControls.Controls
             SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
 
             SetStyle(System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
-            SetStyle(System.Windows.Forms.ControlStyles.Opaque, false);
+            SetStyle(System.Windows.Forms.ControlStyles.Opaque, true);
 
             //The next 3 styles are allefor double buffering
 
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
+            SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
 
             if (DoubleBuffer)
             {
@@ -69,6 +71,7 @@ namespace BlueControls.Controls
             }
 
 
+            _UseBackBitmap = UseBackgroundBitmap;
             Translate = true;
 
             InitializeSkin();
@@ -84,15 +87,27 @@ namespace BlueControls.Controls
         protected RowItem tmpSkinRow;
         private enPartentType _MyParentType = enPartentType.Unbekannt;
 
+        private readonly bool _UseBackBitmap = false;
+        private Bitmap _BitmapOfControl;
+        private bool _GeneratingBitmapOfControl;
+
         #endregion
 
 
-
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            if (disposing)
+            {
+                _BitmapOfControl?.Dispose();
+                _BitmapOfControl = null;
+            }
+        }
 
         protected void SetDoubleBuffering()
         {
             SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
-            SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
+
         }
 
         private void SkinChanged(object sender, System.EventArgs e)
@@ -103,6 +118,7 @@ namespace BlueControls.Controls
 
         protected virtual void DrawControl(Graphics gr, enStates state)
         {
+
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
         }
         protected virtual void InitializeSkin()
@@ -308,7 +324,19 @@ namespace BlueControls.Controls
 
                 if (Width < 1 || Height < 1) { return; }
 
-                DrawControl(GR, IsStatus());
+                if (_UseBackBitmap)
+                {
+                    if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
+                    var TMPGR = Graphics.FromImage(_BitmapOfControl);
+                    DrawControl(TMPGR, IsStatus());
+                    GR.DrawImage(_BitmapOfControl, 0, 0);
+                    TMPGR.Dispose();
+                }
+                else
+                {
+                    DrawControl(GR, IsStatus());
+                }
+
 
 
                 // UmRandung für DesignMode ------------
@@ -320,10 +348,10 @@ namespace BlueControls.Controls
                     }
                 }
 
-                foreach (System.Windows.Forms.Control c in Controls)
-                {
-                    c.Invalidate();
-                }
+                //foreach (System.Windows.Forms.Control c in Controls)
+                //{
+                //    c.Invalidate();
+                //}
 
             }
         }
@@ -536,9 +564,36 @@ namespace BlueControls.Controls
         {
             if (IsDisposed) { return; }
             Invalidate();
+
+
+            if (_BitmapOfControl != null)
+            {
+                if (_BitmapOfControl.Width < Width || _BitmapOfControl.Height < Height)
+                {
+                    _BitmapOfControl.Dispose();
+                    _BitmapOfControl = null;
+                }
+            }
+
+
+
             base.OnSizeChanged(e);
         }
         #endregion
+
+
+
+        public Bitmap BitmapOfControl()
+        {
+            if (!_UseBackBitmap || _GeneratingBitmapOfControl) { return null; }
+
+            _GeneratingBitmapOfControl = true;
+
+            if (_BitmapOfControl == null) { Refresh(); }
+            _GeneratingBitmapOfControl = false;
+            return _BitmapOfControl;
+        }
+
 
 
         private void ShowQuickInfo()

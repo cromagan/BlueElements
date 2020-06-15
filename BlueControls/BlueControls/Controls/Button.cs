@@ -36,7 +36,7 @@ namespace BlueControls.Controls
     {
 
         #region Constructor
-        public Button() : base(true) { }
+        public Button() : base(true, false) { }
         #endregion
 
 

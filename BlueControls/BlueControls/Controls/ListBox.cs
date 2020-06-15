@@ -41,7 +41,7 @@ namespace BlueControls.Controls
     {
 
         #region Constructor
-        public ListBox() : base(true)
+        public ListBox() : base(true, false)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.

@@ -551,14 +551,11 @@ namespace BlueControls.Controls
 
         }
 
-
-        internal void DrawCreativePadToBitmap(Bitmap BMP, enStates vState, decimal zoomf, decimal X, decimal Y, List<BasicPadItem> VisibleItems)
+        internal void DrawCreativePadTo(Graphics TMPGR, Size maxs, enStates vState, decimal zoomf, decimal X, decimal Y, List<BasicPadItem> VisibleItems)
         {
-
             try
             {
 
-                var TMPGR = Graphics.FromImage(BMP);
 
                 if (_Item.SheetSizeInMM.Width > 0 && _Item.SheetSizeInMM.Height > 0)
                 {
@@ -588,9 +585,9 @@ namespace BlueControls.Controls
                     TMPGR.Clear(Color.White);
                 }
 
-                if (!_Item.Draw(TMPGR, zoomf, X, Y, BMP.Size, _ShowInPrintMode, VisibleItems))
+                if (!_Item.Draw(TMPGR, zoomf, X, Y, maxs, _ShowInPrintMode, VisibleItems))
                 {
-                    DrawCreativePadToBitmap(BMP, vState, zoomf, X, Y, VisibleItems);
+                    DrawCreativePadTo(TMPGR, maxs, vState, zoomf, X, Y, VisibleItems);
                     return;
                 }
 
@@ -663,21 +660,28 @@ namespace BlueControls.Controls
             }
             catch
             {
-                DrawCreativePadToBitmap(BMP, vState, zoomf, X, Y, VisibleItems);
+                DrawCreativePadTo(TMPGR, maxs, vState, zoomf, X, Y, VisibleItems);
             }
+        }
+
+
+
+
+        internal void DrawCreativePadToBitmap(Bitmap BMP, enStates vState, decimal zoomf, decimal X, decimal Y, List<BasicPadItem> VisibleItems)
+        {
+
+            var TMPGR = Graphics.FromImage(BMP);
+            DrawCreativePadTo(TMPGR, BMP.Size, vState, zoomf, X, Y, VisibleItems);
+            TMPGR.Dispose();
         }
 
 
 
         protected override void DrawControl(Graphics gr, enStates state)
         {
-            if (_BitmapOfControl == null)
-            {
-                _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
-            }
 
-            DrawCreativePadToBitmap(_BitmapOfControl, state, _Zoom, _MoveX, _MoveY, null);
-            gr.DrawImage(_BitmapOfControl, 0, 0);
+            DrawCreativePadTo(gr, Size, state, _Zoom, _MoveX, _MoveY, null);
+
             Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, DisplayRectangle);
         }
 

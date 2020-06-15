@@ -62,7 +62,7 @@ namespace BlueControls.ItemCollection
 
         public BitmapPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, Size.Empty) { }
 
-        public BitmapPadItem(ItemCollectionPad parent, string internalname, string FileToLoad) : this(parent, internalname, (Bitmap)modAllgemein.Image_FromFile(FileToLoad), Size.Empty) { }
+        public BitmapPadItem(ItemCollectionPad parent, string internalname, string FileToLoad) : this(parent, internalname, (Bitmap)BitmapExt.Image_FromFile(FileToLoad), Size.Empty) { }
 
         public BitmapPadItem(ItemCollectionPad parent, string internalname, Bitmap bmp) : this(parent, internalname, bmp, Size.Empty) { }
 
@@ -125,7 +125,7 @@ namespace BlueControls.ItemCollection
 
                 if (!FileExists(e.FileName)) { return; }
 
-                Bitmap = (Bitmap)modAllgemein.Image_FromFile(e.FileName);
+                Bitmap = (Bitmap)BitmapExt.Image_FromFile(e.FileName);
             }
         }
 

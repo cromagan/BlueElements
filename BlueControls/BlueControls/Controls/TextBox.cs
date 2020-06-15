@@ -38,13 +38,13 @@ namespace BlueControls.Controls
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("TextChanged")]
-    public partial class TextBox : GenericControl, IBackgroundBitmap, IContextMenu, IQuickInfo
+    public partial class TextBox : GenericControl, IContextMenu, IQuickInfo
     {
 
         #region Constructor
 
 
-        public TextBox(): base(true)
+        public TextBox(): base(true, true)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.

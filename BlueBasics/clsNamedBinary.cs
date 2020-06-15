@@ -140,7 +140,7 @@ namespace BlueBasics
 
             if (FileName.FileType() == enFileFormat.Image)
             {
-                _picture = (Bitmap)modAllgemein.Image_FromFile(FileName);
+                _picture = (Bitmap)BitmapExt.Image_FromFile(FileName);
             }
             else
             {

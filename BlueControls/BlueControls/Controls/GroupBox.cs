@@ -29,11 +29,11 @@ using BlueControls.Interfaces;
 namespace BlueControls.Controls
 {
     [Designer("System.Windows.Forms.Design.ParentControlDesigner,System.Design", typeof(IDesigner))]
-    public partial class GroupBox : GenericControl, IBackgroundBitmap
+    public partial class GroupBox : GenericControl
     {
 
         #region Constructor
-        public GroupBox() : base(false)
+        public GroupBox() : base(false, true)
         {
 
 
@@ -45,9 +45,7 @@ namespace BlueControls.Controls
         #endregion
 
         #region  Variablen 
-        private Bitmap _BitmapOfControl;
-        private bool _GeneratingBitmapOfControl;
-        private string _Text = "";
+        private string _Text = string.Empty;
         private enGroupBoxStyle _GroupBoxStyle = enGroupBoxStyle.Normal;
         #endregion
 
@@ -134,9 +132,9 @@ namespace BlueControls.Controls
 
         protected override void DrawControl(Graphics gr, enStates state)
         {
-            if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
+            //if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
 
-            var TMPGR = Graphics.FromImage(_BitmapOfControl);
+            //var TMPGR = Graphics.FromImage(_BitmapOfControl);
 
             if (ParentType() == enPartentType.RibbonPage) { _GroupBoxStyle = enGroupBoxStyle.RibbonBar; }
 
@@ -148,9 +146,9 @@ namespace BlueControls.Controls
                     if (!Parent.Enabled) { state = enStates.Standard_Disabled; } // TabPage
                     if (!Parent.Parent.Enabled) { state = enStates.Standard_Disabled; }// RibbonBar
                                                                                        //  vState = enStates.Standard_Disabled
-                    Skin.Draw_Back(TMPGR, enDesign.RibbonBar_Frame, state, DisplayRectangle, this, true);
-                    Skin.Draw_Border(TMPGR, enDesign.RibbonBar_Frame, state, DisplayRectangle);
-                    Skin.Draw_FormatedText(TMPGR, _Text, enDesign.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width, DisplayRectangle.Height + 2), this, false, Translate);
+                    Skin.Draw_Back(gr, enDesign.RibbonBar_Frame, state, DisplayRectangle, this, true);
+                    Skin.Draw_Border(gr, enDesign.RibbonBar_Frame, state, DisplayRectangle);
+                    Skin.Draw_FormatedText(gr, _Text, enDesign.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width, DisplayRectangle.Height + 2), this, false, Translate);
 
                     if (Dock != System.Windows.Forms.DockStyle.Left)
                     {
@@ -162,22 +160,22 @@ namespace BlueControls.Controls
                     break;
                 case enGroupBoxStyle.Normal:
                     var r = new Rectangle(DisplayRectangle.Left + Skin.Padding, DisplayRectangle.Top, DisplayRectangle.Width, DisplayRectangle.Height);
-                    Skin.Draw_Back(TMPGR, enDesign.Frame, state, DisplayRectangle, this, true);
+                    Skin.Draw_Back(gr, enDesign.Frame, state, DisplayRectangle, this, true);
 
                     if (Height > 33)
                     {
-                        Skin.Draw_Border(TMPGR, enDesign.Frame, state, DisplayRectangle);
-                        Skin.Draw_FormatedText(TMPGR, _Text, enDesign.Frame, state, null, enAlignment.Top_Left, r, this, true, Translate);
+                        Skin.Draw_Border(gr, enDesign.Frame, state, DisplayRectangle);
+                        Skin.Draw_FormatedText(gr, _Text, enDesign.Frame, state, null, enAlignment.Top_Left, r, this, true, Translate);
                     }
                     break;
 
                 default:
-                    Skin.Draw_Back_Transparent(TMPGR, DisplayRectangle, this);
+                    Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
                     break;
             }
 
-            gr.DrawImage(_BitmapOfControl, 0, 0);
-            TMPGR.Dispose();
+            //gr.DrawImage(_BitmapOfControl, 0, 0);
+            //TMPGR.Dispose();
         }
 
         private void ChildControls_RibbonBar()
@@ -214,32 +212,6 @@ namespace BlueControls.Controls
                         break;
                 }
             }
-        }
-
-
-
-        public Bitmap BitmapOfControl()
-        {
-            if (_GeneratingBitmapOfControl) { return null; }
-            _GeneratingBitmapOfControl = true;
-            if (_BitmapOfControl == null) { Refresh(); }
-            _GeneratingBitmapOfControl = false;
-            return _BitmapOfControl;
-        }
-
-        protected override void OnSizeChanged(System.EventArgs e)
-        {
-            if (_BitmapOfControl != null)
-            {
-                if (_BitmapOfControl.Width < Width || _BitmapOfControl.Height < Height)
-                {
-                    _BitmapOfControl.Dispose();
-                    _BitmapOfControl = null;
-                }
-            }
-
-            Invalidate();
-            base.OnSizeChanged(e);
         }
     }
 }

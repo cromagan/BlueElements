@@ -84,16 +84,16 @@ namespace BlueControls.Controls
 
         protected override void DrawControl(Graphics gr, enStates state)
         {
-            if (_BitmapOfControl == null)
-            {
-                _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
-            }
+            //if (_BitmapOfControl == null)
+            //{
+            //    _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
+            //}
 
-            var TMPGR = Graphics.FromImage(_BitmapOfControl);
+            //var TMPGR = Graphics.FromImage(_BitmapOfControl);
 
             var lgb = new LinearGradientBrush(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
 
-            TMPGR.FillRectangle(lgb, ClientRectangle);
+            gr.FillRectangle(lgb, ClientRectangle);
 
             if (BMP != null)
             {
@@ -103,20 +103,20 @@ namespace BlueControls.Controls
 
                 if (_Zoom < 1 || _AlwaysSmooth)
                 {
-                    TMPGR.SmoothingMode = SmoothingMode.AntiAlias;
-                    TMPGR.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    gr.SmoothingMode = SmoothingMode.AntiAlias;
+                    gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 }
                 else
                 {
-                    TMPGR.SmoothingMode = SmoothingMode.HighSpeed;
-                    TMPGR.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    gr.SmoothingMode = SmoothingMode.HighSpeed;
+                    gr.InterpolationMode = InterpolationMode.NearestNeighbor;
                 }
 
-                TMPGR.PixelOffsetMode = PixelOffsetMode.Half;
+                gr.PixelOffsetMode = PixelOffsetMode.Half;
 
 
 
-                TMPGR.DrawImage(BMP, r);
+                gr.DrawImage(BMP, r);
 
 
                 //if (OverlayBMP != null)
@@ -129,11 +129,11 @@ namespace BlueControls.Controls
 
 
 
-            OnDoAdditionalDrawing(new AdditionalDrawing(TMPGR, _Zoom, _MoveX, _MoveY, _MouseDown, _MouseCurrent));
+            OnDoAdditionalDrawing(new AdditionalDrawing(gr, _Zoom, _MoveX, _MoveY, _MouseDown, _MouseCurrent));
 
 
-            Skin.Draw_Border(TMPGR, enDesign.Table_And_Pad, state, new Rectangle(1, 1, Size.Width - SliderY.Width, Size.Height - SliderX.Height));
-            gr.DrawImage(_BitmapOfControl, 0, 0);
+            Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, new Rectangle(1, 1, Size.Width - SliderY.Width, Size.Height - SliderX.Height));
+            //gr.DrawImage(_BitmapOfControl, 0, 0);
         }
 
 

@@ -31,6 +31,7 @@ using BlueDatabase;
 using BlueControls.Enums;
 using BlueDatabase.Enums;
 using BlueControls.ItemCollection;
+using BlueControls.Controls;
 
 namespace BlueControls
 {
@@ -399,14 +400,16 @@ namespace BlueControls
 
             switch (vControl.Parent)
             {
-                case IBackgroundBitmap TRB:
+                case IBackgroundNone _:
+                    Draw_Back_Transparent(GR, r, vControl.Parent);
+                    break;
+
+                case GenericControl TRB:
                     if (TRB.BitmapOfControl() == null) { return; }
                     GR.DrawImage(TRB.BitmapOfControl(), r, new Rectangle(vControl.Left + r.Left, vControl.Top + r.Top, r.Width, r.Height), GraphicsUnit.Pixel);
                     break;
 
-                case IBackgroundNone _:
-                    Draw_Back_Transparent(GR, r, vControl.Parent);
-                    break;
+
 
                 case System.Windows.Forms.Form frm:
 

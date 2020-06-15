@@ -30,11 +30,11 @@ using System.Windows.Forms;
 namespace BlueControls.Controls
 {
     [Designer(typeof(BasicDesigner))]
-    public partial class ZoomPad : GenericControl, IBackgroundBitmap
+    public partial class ZoomPad : GenericControl
     {
 
         #region Constructor
-        public ZoomPad() : base(true)
+        public ZoomPad() : base(true, true)
         {
             InitializeComponent();
         }
@@ -46,8 +46,7 @@ namespace BlueControls.Controls
         public static readonly Pen PenGrayLarge = new Pen(Color.FromArgb(40, 0, 0, 0), 5);
 
 
-        protected Bitmap _BitmapOfControl;
-        protected bool _GeneratingBitmapOfControl;
+
 
         protected decimal _Zoom = 1;
         protected decimal _ZoomFit = 1;
@@ -178,15 +177,6 @@ namespace BlueControls.Controls
 
 
 
-        public Bitmap BitmapOfControl()
-        {
-            if (_GeneratingBitmapOfControl) { return null; }
-            _GeneratingBitmapOfControl = true;
-            if (_BitmapOfControl == null) { Refresh(); }
-            _GeneratingBitmapOfControl = false;
-            return _BitmapOfControl;
-        }
-
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e)
         {
             base.OnMouseWheel(e);
@@ -238,15 +228,6 @@ namespace BlueControls.Controls
 
         protected override void OnSizeChanged(System.EventArgs e)
         {
-            if (_BitmapOfControl != null)
-            {
-                if (_BitmapOfControl.Width < Width || _BitmapOfControl.Height < Height)
-                {
-                    _BitmapOfControl.Dispose();
-                    _BitmapOfControl = null;
-                }
-            }
-
             ZoomFit();
             base.OnSizeChanged(e);
         }

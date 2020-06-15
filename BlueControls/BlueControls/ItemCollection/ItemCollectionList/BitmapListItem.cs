@@ -297,7 +297,7 @@ namespace BlueControls.ItemCollection
                     }
                     else
                     {
-                        _Bitmap = (Bitmap)modAllgemein.Image_FromFile(_ImageFilename);
+                        _Bitmap = (Bitmap)BitmapExt.Image_FromFile(_ImageFilename);
                     }
 
                 }

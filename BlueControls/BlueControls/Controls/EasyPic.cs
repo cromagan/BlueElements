@@ -45,7 +45,7 @@ namespace BlueControls.Controls
     {
 
         #region Constructor
-        public EasyPic(): base(false)
+        public EasyPic(): base(false, false)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -237,7 +237,7 @@ namespace BlueControls.Controls
                 return;
             }
 
-            var ix = (Bitmap)modAllgemein.Image_FromFile(Filename);
+            var ix = (Bitmap)BitmapExt.Image_FromFile(Filename);
 
             var i = ix.Image_Clone();
 

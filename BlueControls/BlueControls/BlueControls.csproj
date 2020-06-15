@@ -438,7 +438,6 @@
     <Compile Include="Controls\GroupBox.Designer.cs">
       <DependentUpon>GroupBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interfaces\IBackgroundBitmap.cs" />
     <Compile Include="Interfaces\IBackgroundNone.cs" />
     <Compile Include="Interfaces\ICanHaveColumnVariables.cs" />
     <Compile Include="Interfaces\IContextMenu.cs" />

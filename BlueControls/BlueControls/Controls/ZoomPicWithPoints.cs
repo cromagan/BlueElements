@@ -289,7 +289,7 @@ namespace BlueControls.Controls
 
             if (FileExists(PathOfPicture))
             {
-                B = (Bitmap)Image_FromFile(PathOfPicture);
+                B = (Bitmap)BitmapExt.Image_FromFile(PathOfPicture);
             }
 
             var ftxt = FilenameTXT(PathOfPicture);

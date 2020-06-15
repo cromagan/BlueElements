@@ -120,7 +120,7 @@ namespace BluePaint
 
             foreach (var thisf in f)
             {
-                OnOverridePic((Bitmap)modAllgemein.Image_FromFile(thisf));
+                OnOverridePic((Bitmap)BitmapExt.Image_FromFile(thisf));
                 OnZoomFit();
                 Develop.DoEvents();
 

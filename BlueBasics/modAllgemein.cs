@@ -129,7 +129,7 @@ namespace BlueBasics
                     l.Clear();
                     CollectGarbage();
 
-                    var x = (Bitmap)Image_FromFile(fileName);
+                    var x = (Bitmap)BitmapExt.Image_FromFile(fileName);
                     l.Add(x.Resize(MaxSize, MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
 
 
@@ -198,32 +198,6 @@ namespace BlueBasics
         }
 
 
-        /// <summary>
-        /// Diese Routine ist genau so schnell wie Image.fromFile, setzt aber KEINEN Datei-Lock.
-        /// </summary>
-        /// <param name="DateiName"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public static Image Image_FromFile(string DateiName)
-        {
-            if (string.IsNullOrEmpty(DateiName)) { return null; }
-            if (!FileExists(DateiName)) { return null; }
-
-            try
-            {
-                var fs = new FileStream(DateiName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                var IM = Image.FromStream(fs);
-                fs.Close();
-                fs.Dispose();
-                return IM;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
-
-        }
 
 
 

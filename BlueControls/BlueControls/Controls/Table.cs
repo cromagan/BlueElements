@@ -51,7 +51,7 @@ namespace BlueControls.Controls
     {
 
         #region Constructor
-        public Table() : base(true)
+        public Table() : base(true, false)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.

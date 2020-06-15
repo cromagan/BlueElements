@@ -39,7 +39,7 @@ namespace BlueControls.Controls
 {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
-    public partial class FlexiControl : GenericControl, IQuickInfo, IBackgroundBitmap
+    public partial class FlexiControl : GenericControl, IQuickInfo
     {
 
 
@@ -53,9 +53,6 @@ namespace BlueControls.Controls
         protected enEditTypeFormula _EditType = enEditTypeFormula.None; // None ist -1 und muss gesetzt sein!
         protected enÜberschriftAnordnung _CaptionPosition = enÜberschriftAnordnung.ohne;
         protected string _Caption;
-
-        private Bitmap _BitmapOfControl;
-        private bool _GeneratingBitmapOfControl;
 
         private int _ControlX = -1;
         private Color _Color = Color.Transparent;
@@ -96,7 +93,7 @@ namespace BlueControls.Controls
 
         #region  Constructor 
 
-        public FlexiControl(): base(false)
+        public FlexiControl(): base(false, true)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -116,7 +113,7 @@ namespace BlueControls.Controls
         /// Einfacher Info Text. Wird nirgends mehr zurück gegeben.
         /// </summary>
         /// <param name="CaptionText"></param>
-        public FlexiControl(string CaptionText) : base(false)
+        public FlexiControl(string CaptionText) : base(false, true)
         {
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -465,16 +462,13 @@ namespace BlueControls.Controls
 
         protected override void DrawControl(Graphics gr, enStates state)
         {
-            if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
-
 
             // Enabled wurde verdeckt!
             if (!Enabled) { state = enStates.Standard_Disabled; }
 
 
-            var TMPGR = Graphics.FromImage(_BitmapOfControl);
 
-            Skin.Draw_Back_Transparent(TMPGR, ClientRectangle, this);
+            Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
 
 
 
@@ -485,12 +479,12 @@ namespace BlueControls.Controls
                 {
                     var br = (byte)(_Color.GetBrightness() * 254);
                     var lgb = new LinearGradientBrush(ClientRectangle, Color.FromArgb(br, br, br), Color.Transparent, LinearGradientMode.Horizontal);
-                    TMPGR.FillRectangle(lgb, ClientRectangle);
+                    gr.FillRectangle(lgb, ClientRectangle);
                 }
                 else
                 {
                     var lgb = new LinearGradientBrush(ClientRectangle, _Color, Color.Transparent, LinearGradientMode.Horizontal);
-                    TMPGR.FillRectangle(lgb, ClientRectangle);
+                    gr.FillRectangle(lgb, ClientRectangle);
                 }
             }
 
@@ -514,12 +508,11 @@ namespace BlueControls.Controls
                         Height = Height - Main.Top - 1
                     };
 
-                    Skin.Draw_Border(TMPGR, enDesign.ListBox, tmpstate, R);
+                    Skin.Draw_Border(gr, enDesign.ListBox, tmpstate, R);
                 }
             }
 
-            gr.DrawImage(_BitmapOfControl, 0, 0);
-            TMPGR.Dispose();
+
 
 
 
@@ -1546,36 +1539,6 @@ namespace BlueControls.Controls
         {
             ValueChanged?.Invoke(this, System.EventArgs.Empty);
         }
-
-
-
-        public Bitmap BitmapOfControl()
-        {
-            if (_GeneratingBitmapOfControl) { return null; }
-
-            _GeneratingBitmapOfControl = true;
-
-            if (_BitmapOfControl == null) { Refresh(); }
-            _GeneratingBitmapOfControl = false;
-            return _BitmapOfControl;
-        }
-
-
-        protected override void OnSizeChanged(System.EventArgs e)
-        {
-            if (_BitmapOfControl != null)
-            {
-                if (_BitmapOfControl.Width < Width || _BitmapOfControl.Height < Height)
-                {
-                    _BitmapOfControl.Dispose();
-                    _BitmapOfControl = null;
-                }
-            }
-
-            Invalidate();
-            base.OnSizeChanged(e);
-        }
-
 
 
         private void DoInfoTextCaption(string disabledReason)

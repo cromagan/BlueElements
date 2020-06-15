@@ -41,7 +41,7 @@ namespace BlueControls.Controls
     public partial class Formula : GenericControl, IBackgroundNone, IContextMenu
     {
         #region Constructor
-        public Formula() : base(false)
+        public Formula() : base(false, false)
         {
             InitializeComponent();
         }

@@ -39,7 +39,7 @@ namespace BlueControls.Controls
     {
 
         #region Constructor
-        public Caption(): base(false)
+        public Caption(): base(false, false)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();

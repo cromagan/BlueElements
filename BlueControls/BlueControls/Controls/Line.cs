@@ -33,7 +33,7 @@ namespace BlueControls.Controls
 
 
         #region Constructor
-        public Line() : base(false)
+        public Line() : base(false, false)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.

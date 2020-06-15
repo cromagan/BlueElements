@@ -210,7 +210,7 @@ namespace BlueDatabase
 
                             //    break;
                             case enDataFormat.Link_To_Filesystem:
-                                I = (Bitmap)modAllgemein.Image_FromFile(column.BestFile(row.CellGetString(column), false));
+                                I = (Bitmap)BitmapExt.Image_FromFile(column.BestFile(row.CellGetString(column), false));
 
 
                                 break;

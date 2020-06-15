@@ -27,10 +27,9 @@ using System.Windows.Forms.Design;
 namespace BlueControls.Controls
 {
     [Designer(typeof(ScrollableControlDesigner))]
-    public class TabPage : System.Windows.Forms.TabPage, IBackgroundBitmap
+    public class TabPage : System.Windows.Forms.TabPage, IBackgroundNone
     {
 
-        private Bitmap _BitmapOfControl;
         #region Constructor
 
 
@@ -65,9 +64,6 @@ namespace BlueControls.Controls
         {
             if (disposing)
             {
-                _BitmapOfControl?.Dispose();
-                _BitmapOfControl = null;
-
                 //If components IsNot Nothing Then
                 //    components.Dispose()
                 //End If
@@ -155,29 +151,29 @@ namespace BlueControls.Controls
 
             if (Width < 1 || Height < 1) { return; }
 
-            if (_BitmapOfControl == null)
-            {
-                _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
-            }
+            //if (_BitmapOfControl == null)
+            //{
+            //    _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
+            //}
 
-            var TMPGR = Graphics.FromImage(_BitmapOfControl);
+            //var TMPGR = Graphics.FromImage(_BitmapOfControl);
 
             if (Parent != null)
             {
                 if (((TabControl)Parent).IsRibbonBar)
                 {
-                    TMPGR.Clear(Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard));
-                    Skin.Draw_Back(TMPGR, enDesign.RibbonBar_Body, enStates.Standard, ClientRectangle, this, true);
+                    GR.Clear(Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard));
+                    Skin.Draw_Back(GR, enDesign.RibbonBar_Body, enStates.Standard, ClientRectangle, this, true);
                 }
                 else
                 {
-                    TMPGR.Clear(Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard));
-                    Skin.Draw_Back(TMPGR, enDesign.TabStrip_Body, enStates.Standard, ClientRectangle, this, true);
+                    GR.Clear(Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard));
+                    Skin.Draw_Back(GR, enDesign.TabStrip_Body, enStates.Standard, ClientRectangle, this, true);
                 }
             }
 
-            GR.DrawImage(_BitmapOfControl, 0, 0);
-            TMPGR.Dispose();
+            //GR.DrawImage(_BitmapOfControl, 0, 0);
+            //TMPGR.Dispose();
 
 
         }
@@ -204,12 +200,6 @@ namespace BlueControls.Controls
         }
 
 
-        public Bitmap BitmapOfControl()
-        {
-            if (_BitmapOfControl == null) { Refresh(); }
-            return _BitmapOfControl;
-        }
-
 
         /// <summary>
         /// Veranlaßt, das das Control neu gezeichnet wird.
@@ -226,22 +216,6 @@ namespace BlueControls.Controls
         {
             if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
             base.WndProc(ref m);
-        }
-
-
-        protected override void OnSizeChanged(System.EventArgs e)
-        {
-            if (_BitmapOfControl != null)
-            {
-                if (_BitmapOfControl.Width < Width || _BitmapOfControl.Height < Height)
-                {
-                    _BitmapOfControl.Dispose();
-                    _BitmapOfControl = null;
-                }
-            }
-
-            Invalidate();
-            base.OnSizeChanged(e);
         }
 
         protected override void OnEnter(System.EventArgs e)
