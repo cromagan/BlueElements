@@ -58,17 +58,11 @@ namespace BlueControls
         public static readonly int PaddingSmal = 3; // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
         public static readonly int Padding = 9;
 
-        private static enSkin _Skin = enSkin.Windows_10;
 
         private static enStates SkinRow_LastState = enStates.Undefiniert;
         private static enDesign SkinRow_LastType = enDesign.Undefiniert;
         private static RowItem SkinRow_LastRow;
 
-
-        //public static readonly Skin Instance = new Skin();
-
-
-        public static event EventHandler SkinChanged;
 
 
         private static ColumnItem ColX1 = null;
@@ -91,44 +85,15 @@ namespace BlueControls
         private static ColumnItem col_Font = null;
         private static ColumnItem col_StandardPic = null;
 
-        //private Skin()
-        //{
-        //    _Skin = enSkin.Windows_10;
-        //    LoadSkin(); // SkinChanged wird NICHT ausgelöst
-        //}
-
-
-        public static enSkin SkinDesign
-        {
-            get
-            {
-                return _Skin;
-            }
-            set
-            {
-                if (value == _Skin) { return; }
-                _Skin = value;
-                LoadSkin();
-            }
-        }
 
 
 
         public static void LoadSkin()
         {
-            _SkinString = _Skin.ToString();
-            _SkinString = _SkinString.Replace("_", "");
-            _SkinString = _SkinString.Replace(" ", "");
+            _SkinString = "Windows10";
 
-            SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", Convert.ToBoolean(_Skin == enSkin.Windows_10), Convert.ToBoolean(Develop.AppName() == "SkinDesigner"));
-            if (SkinDB == null)
-            {
-                Develop.DebugPrint("Skin '" + _SkinString + "' konnte nicht geladen werden!");
-                _Skin = enSkin.Windows_10;
-                LoadSkin();
-                return;
-            }
 
+            SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", true, Convert.ToBoolean(Develop.AppName() == "SkinDesigner"));
 
 
 
@@ -159,14 +124,8 @@ namespace BlueControls
             Pen_LinieKräftig = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard));
             Pen_LinieDick = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard), 3);
 
-
-            OnSkinChanged();
         }
 
-        private static void OnSkinChanged()
-        {
-            SkinChanged?.Invoke(null, System.EventArgs.Empty);
-        }
 
 
 
@@ -413,15 +372,19 @@ namespace BlueControls
 
                 case System.Windows.Forms.Form frm:
 
-                    if (frm.BackgroundImage != null)
-                    {
-                        // Wichtig, für Farbverläufe in MSGBoxen
-                        GR.DrawImage(frm.BackgroundImage, r, new Rectangle(vControl.Left + r.Left, vControl.Top + r.Top, r.Width, r.Height), GraphicsUnit.Pixel);
-                    }
-                    else
-                    {
+                    //if (frm.BackgroundImage != null)
+                    //{
+                    //    // Wichtig, für Farbverläufe in MSGBoxen
+                    //    GR.DrawImage(frm.BackgroundImage, r, new Rectangle(vControl.Left + r.Left, vControl.Top + r.Top, r.Width, r.Height), GraphicsUnit.Pixel);
+                    //}
+                    //else
+                    //{
                         GR.FillRectangle(new SolidBrush(frm.BackColor), r);
-                    }
+                    //}
+                    break;
+
+                case TabPage tab:
+                    GR.FillRectangle(new SolidBrush(tab.BackColor), r);
                     break;
 
                 case System.Windows.Forms.SplitContainer _:

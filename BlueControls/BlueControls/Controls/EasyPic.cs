@@ -243,7 +243,7 @@ namespace BlueControls.Controls
 
             if (_MaxSize > 0)
             {
-                _Bitmap = i.Resize(_MaxSize, _MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
+                _Bitmap = BitmapExt.Resize(i, _MaxSize, _MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
                 SorceType = enSorceType.LoadedFromDiskAndResized;
                 SorceName = Filename;
             }
@@ -282,11 +282,6 @@ namespace BlueControls.Controls
         }
         #endregion
 
-
-        protected override void InitializeSkin()
-        {
-
-        }
 
         protected override void DrawControl(Graphics GR, enStates vState)
         {

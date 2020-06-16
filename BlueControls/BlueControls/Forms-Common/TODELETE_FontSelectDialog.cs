@@ -146,7 +146,7 @@ namespace BlueControls.Forms
         {
             if (Adding) { return; }
 
-            Sample.Image = Font.SampleText();
+            Sample.Image = Font.SampleText().Bitmap;
         }
 
 

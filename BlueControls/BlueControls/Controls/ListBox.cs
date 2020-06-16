@@ -395,14 +395,6 @@ namespace BlueControls.Controls
         }
 
 
-
-        protected override void InitializeSkin()
-        {
-
-        }
-
-
-
         protected override void DrawControl(Graphics gr, enStates state)
         {
             if (Item != null) { Item.Appearance = _Appearance; }

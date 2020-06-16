@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -191,7 +192,6 @@ namespace BlueDatabase
         private enVerwaisteDaten _VerwaisteDaten;
         private string _ImportScript;
         private enAnsicht _Ansicht;
-        private int _Skin;
         private double _GlobalScale;
 
 
@@ -253,7 +253,10 @@ namespace BlueDatabase
 
         #region  Construktor + Initialize 
 
-
+        /// <summary>
+        /// Nachher  Load benutzen.
+        /// </summary>
+        /// <param name="readOnly"></param>
         public Database(bool readOnly) : base(readOnly, false)
         {
 
@@ -350,7 +353,6 @@ namespace BlueDatabase
             _ImportScript = string.Empty;
 
             _GlobalScale = 1f;
-            _Skin = -1; //enSkin.Unverändert;
             _Ansicht = enAnsicht.Unverändert;
 
 
@@ -382,19 +384,6 @@ namespace BlueDatabase
         }
 
 
-        [Browsable(false)]
-        public int Skin
-        {
-            get
-            {
-                return _Skin;
-            }
-            set
-            {
-                if (_Skin == value) { return; }
-                AddPending(enDatabaseDataType.Skin, -1, -1, _Skin.ToString(), value.ToString(), true);
-            }
-        }
 
         [Browsable(false)]
         public double GlobalScale
@@ -1204,9 +1193,6 @@ namespace BlueDatabase
                 case enDatabaseDataType.Caption:
                     _Caption = Inhalt;
                     break;
-                case enDatabaseDataType.Skin:
-                    _Skin = int.Parse(Inhalt);
-                    break;
                 case enDatabaseDataType.GlobalScale:
                     _GlobalScale = double.Parse(Inhalt);
                     break;
@@ -1279,6 +1265,10 @@ namespace BlueDatabase
 
                 case (enDatabaseDataType)30:
                     // TODO: Entferne GlobalInfo
+                    break;
+
+                case (enDatabaseDataType)52:
+                    // TODO: Entferne Skin
                     break;
 
                 case enDatabaseDataType.JoinTyp:
@@ -1374,7 +1364,7 @@ namespace BlueDatabase
                 {
                     if (!string.IsNullOrEmpty(bmp.Name))
                     {
-                        QuickImage.Add("DB_" + bmp.Name, bmp.Picture);
+                        QuickImage.Add("DB_" + bmp.Name, new BitmapExt((Bitmap)bmp.Picture.Clone()));
                     }
                 }
 
@@ -2071,7 +2061,6 @@ namespace BlueDatabase
                 SaveToByteList(l, enDatabaseDataType.Tags, Tags.JoinWithCr());
                 SaveToByteList(l, enDatabaseDataType.PermissionGroups_NewRow, PermissionGroups_NewRow.JoinWithCr());
                 SaveToByteList(l, enDatabaseDataType.DatenbankAdmin, DatenbankAdmin.JoinWithCr());
-                SaveToByteList(l, enDatabaseDataType.Skin, _Skin.ToString());
                 SaveToByteList(l, enDatabaseDataType.GlobalScale, _GlobalScale.ToString());
                 SaveToByteList(l, enDatabaseDataType.Ansicht, ((int)_Ansicht).ToString());
                 SaveToByteList(l, enDatabaseDataType.ReloadDelaySecond, _ReloadDelaySecond.ToString());

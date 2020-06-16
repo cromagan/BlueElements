@@ -29,7 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Drawing.Printing;
 using BlueControls.Designer_Support;
 
@@ -546,10 +545,6 @@ namespace BlueControls.Controls
             Invalidate(); // Damit auch snap-Punkte wieder gelöscht werden
         }
 
-        protected override void InitializeSkin()
-        {
-
-        }
 
         internal void DrawCreativePadTo(Graphics TMPGR, Size maxs, enStates vState, decimal zoomf, decimal X, decimal Y, List<BasicPadItem> VisibleItems)
         {

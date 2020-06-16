@@ -493,7 +493,7 @@ namespace BlueControls.Controls
             var zoomy = (decimal)height / pic.Height;
 
 
-            var pic2 = pic.Resize(width, height, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
+            var pic2 = BitmapExt.Resize(pic, width, height, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
 
             var tags2 = new List<string>(tags);
 

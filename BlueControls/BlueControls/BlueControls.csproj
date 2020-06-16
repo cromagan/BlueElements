@@ -132,7 +132,6 @@
     <Compile Include="Enums\enMarkState.cs" />
     <Compile Include="Enums\enRahmenArt.cs" />
     <Compile Include="Enums\enRelationType.cs" />
-    <Compile Include="Enums\enSkin.cs" />
     <Compile Include="Enums\enDesign.cs" />
     <Compile Include="Enums\enStates.cs" />
     <Compile Include="Enums\enWndProc.cs" />
@@ -226,7 +225,6 @@
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Interfaces\ISupportsBeginnEdit.cs" />
-    <Compile Include="Interfaces\IDesignAble.cs" />
     <Compile Include="Forms-Common\Notification.cs">
       <SubType>Form</SubType>
     </Compile>

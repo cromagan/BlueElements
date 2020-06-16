@@ -702,9 +702,6 @@ Partial Class frmTest
         Me.BlueCreativePad2.GridSnap = 1.0!
         Me.BlueCreativePad2.Location = New System.Drawing.Point(240, 40)
         Me.BlueCreativePad2.Name = "BlueCreativePad2"
-        Me.BlueCreativePad2.RandinMM = New System.Windows.Forms.Padding(0)
-        Me.BlueCreativePad2.SheetSizeInMM = New System.Drawing.SizeF(0!, 0!)
-        Me.BlueCreativePad2.SheetStyle = "Lysithea"
         Me.BlueCreativePad2.Size = New System.Drawing.Size(176, 104)
         Me.BlueCreativePad2.TabIndex = 50
         Me.BlueCreativePad2.Text = "BlueCreativePad2"
@@ -715,9 +712,6 @@ Partial Class frmTest
         Me.BlueCreativePad1.GridSnap = 1.0!
         Me.BlueCreativePad1.Location = New System.Drawing.Point(432, 40)
         Me.BlueCreativePad1.Name = "BlueCreativePad1"
-        Me.BlueCreativePad1.RandinMM = New System.Windows.Forms.Padding(0)
-        Me.BlueCreativePad1.SheetSizeInMM = New System.Drawing.SizeF(0!, 0!)
-        Me.BlueCreativePad1.SheetStyle = "Lysithea"
         Me.BlueCreativePad1.Size = New System.Drawing.Size(464, 256)
         Me.BlueCreativePad1.TabIndex = 49
         Me.BlueCreativePad1.Text = "BlueCreativePad1"

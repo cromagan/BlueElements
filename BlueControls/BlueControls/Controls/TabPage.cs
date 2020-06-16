@@ -19,15 +19,15 @@
 
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Windows.Forms.Design;
 
 namespace BlueControls.Controls
 {
     [Designer(typeof(ScrollableControlDesigner))]
-    public class TabPage : System.Windows.Forms.TabPage, IBackgroundNone
+    public class TabPage : System.Windows.Forms.TabPage
     {
 
         #region Constructor
@@ -41,36 +41,25 @@ namespace BlueControls.Controls
             //InitializeComponent()
 
             //Add any initialization after the InitializeComponent() call
-            SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
+            //SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
 
-            SetStyle(System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
-            SetStyle(System.Windows.Forms.ControlStyles.Opaque, false);
+            //SetStyle(System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
+            //SetStyle(System.Windows.Forms.ControlStyles.Opaque, true);
 
-            //The next 3 styles are allefor double buffering
-            SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
-            // Me.SetStyle(System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer, True)
-            SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
-            SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
+            ////The next 3 styles are allefor double buffering
+            //SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
+            //// Me.SetStyle(System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer, True)
+            //SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
+            //SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
 
-            Skin.SkinChanged += SkinChanged;
+            SetBackColor();
+
 
         }
 
         #endregion
 
 
-        //UserControl1 overrides dispose to clean up the component list.
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                //If components IsNot Nothing Then
-                //    components.Dispose()
-                //End If
-            }
-            Skin.SkinChanged -= SkinChanged;
-            base.Dispose(disposing);
-        }
 
 
 
@@ -129,104 +118,120 @@ namespace BlueControls.Controls
         #endregion
 
 
-
-
-        private void SkinChanged(object sender, System.EventArgs e)
+        protected override void OnParentChanged(System.EventArgs e)
         {
-            Invalidate();
+            base.OnParentChanged(e);
+            SetBackColor();
         }
 
-
-
-
-        protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent)
+        private void SetBackColor()
         {
-
-        }
-
-        private void DoDraw(Graphics GR)
-        {
-            if (Skin.SkinDB == null) { return; }
-            if (IsDisposed) { return; }
-
-            if (Width < 1 || Height < 1) { return; }
-
-            //if (_BitmapOfControl == null)
-            //{
-            //    _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
-            //}
-
-            //var TMPGR = Graphics.FromImage(_BitmapOfControl);
-
             if (Parent != null)
             {
                 if (((TabControl)Parent).IsRibbonBar)
                 {
-                    GR.Clear(Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard));
-                    Skin.Draw_Back(GR, enDesign.RibbonBar_Body, enStates.Standard, ClientRectangle, this, true);
+                    BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
                 }
                 else
                 {
-                    GR.Clear(Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard));
-                    Skin.Draw_Back(GR, enDesign.TabStrip_Body, enStates.Standard, ClientRectangle, this, true);
+                    BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
                 }
             }
-
-            //GR.DrawImage(_BitmapOfControl, 0, 0);
-            //TMPGR.Dispose();
-
-
-        }
-
-
-        protected override void OnEnabledChanged(System.EventArgs e)
-        {
-
-            if (InvokeRequired)
+            else
             {
-                Invoke(new System.Action(() => OnEnabledChanged(e)));
-                return;
+                BackColor = Color.Red;
             }
-
-
-            base.OnEnabledChanged(e);
-            Invalidate();
-            Parent?.Invalidate();
-        }
-
-        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
-        {
-            DoDraw(e.Graphics);
         }
 
 
+        //protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent)
+        //{
 
-        /// <summary>
-        /// Veranlaßt, das das Control neu gezeichnet wird.
-        /// </summary>
-        /// <remarks></remarks>
-        public override void Refresh()
-        {
-            if (IsDisposed) { return; }
-            DoDraw(CreateGraphics());
-        }
+        //}
+
+        //private void DoDraw(Graphics GR)
+        //{
+        //    if (Skin.SkinDB == null) { return; }
+        //    if (IsDisposed) { return; }
+
+        //    if (Width < 1 || Height < 1) { return; }
+
+        //    //if (_BitmapOfControl == null)
+        //    //{
+        //    //    _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
+        //    //}
+
+        //    //var TMPGR = Graphics.FromImage(_BitmapOfControl);
+
+        //    if (Parent != null)
+        //    {
+        //        if (((TabControl)Parent).IsRibbonBar)
+        //        {
+        //            GR.Clear(Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard));
+        //            Skin.Draw_Back(GR, enDesign.RibbonBar_Body, enStates.Standard, ClientRectangle, this, true);
+        //        }
+        //        else
+        //        {
+        //            GR.Clear(Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard));
+        //            Skin.Draw_Back(GR, enDesign.TabStrip_Body, enStates.Standard, ClientRectangle, this, true);
+        //        }
+        //    }
+
+        //    //GR.DrawImage(_BitmapOfControl, 0, 0);
+        //    //TMPGR.Dispose();
 
 
-        protected override void WndProc(ref System.Windows.Forms.Message m)
-        {
-            if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
-            base.WndProc(ref m);
-        }
+        //}
 
-        protected override void OnEnter(System.EventArgs e)
-        {
-            //   MyBase.OnEnter(e)
-        }
 
-        protected override void OnLeave(System.EventArgs e)
-        {
-            //MyBase.OnLeave(e)
-        }
+        //protected override void OnEnabledChanged(System.EventArgs e)
+        //{
+
+        //    if (InvokeRequired)
+        //    {
+        //        Invoke(new System.Action(() => OnEnabledChanged(e)));
+        //        return;
+        //    }
+
+
+        //    base.OnEnabledChanged(e);
+        //    Invalidate();
+        //    Parent?.Invalidate();
+        //}
+
+        //protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
+        //{
+        //    DoDraw(e.Graphics);
+        //}
+
+
+
+        ///// <summary>
+        ///// Veranlaßt, das das Control neu gezeichnet wird.
+        ///// </summary>
+        ///// <remarks></remarks>
+        //public override void Refresh()
+        //{
+        //    if (IsDisposed) { return; }
+        //    DoDraw(CreateGraphics());
+        //}
+
+
+        //protected override void WndProc(ref System.Windows.Forms.Message m)
+        //{
+        //    if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
+        //    base.WndProc(ref m);
+        //}
+
+        //protected override void OnEnter(System.EventArgs e)
+        //{
+        //    //   MyBase.OnEnter(e)
+        //}
+
+        //protected override void OnLeave(System.EventArgs e)
+        //{
+        //    //MyBase.OnLeave(e)
+        //}
 
 
 

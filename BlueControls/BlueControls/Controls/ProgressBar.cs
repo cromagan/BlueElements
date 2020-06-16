@@ -65,10 +65,6 @@ namespace BlueControls.Controls
         //Friend Overrides Sub PrepareForShowing()
         //    'Stop
         //End Sub
-        protected override void InitializeSkin()
-        {
-
-        }
 
         // Private Sub EventDrawControl(GR as graphics, vState As enStates) Handles MyBase.DrawControl
         protected override void DrawControl(Graphics gr, enStates state)

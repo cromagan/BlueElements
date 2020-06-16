@@ -70,7 +70,7 @@ namespace BlueDatabase.Enums
         //  BackUpDir_ALT = 49
         // AdminPass = 50
         // CriticalChangePass = 51
-        Skin = 52,
+        // Skin = 52,
         Ansicht = 53,
         Layouts = 54,
         //BinaryData = 55,

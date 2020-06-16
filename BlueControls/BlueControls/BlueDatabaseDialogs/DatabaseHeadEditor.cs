@@ -158,7 +158,6 @@ namespace BlueControls.BlueDatabaseDialogs
 
             _Database.JoinTyp = (enJoinTyp)int.Parse(cbxJoinTyp.Text);
             _Database.VerwaisteDaten = (enVerwaisteDaten)int.Parse(cbxVerwaisteDaten.Text);
-            _Database.Skin = int.Parse(cbxBevorzugtesSkin.Text);
             _Database.Ansicht = (enAnsicht)int.Parse(cbxAnsicht.Text);
 
             _Database.SortDefinition = new RowSortDefinition(_Database, lbxSortierSpalten.Item.ToListOfString().ToArray(), btnSortRichtung.Checked);
@@ -203,9 +202,6 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxVerwaisteDaten.Item.AddRange(typeof(enVerwaisteDaten));
             cbxVerwaisteDaten.Text = ((int)_Database.VerwaisteDaten).ToString();
 
-            cbxBevorzugtesSkin.Item.Clear();
-            cbxBevorzugtesSkin.Item.AddRange(typeof(enSkin));
-            cbxBevorzugtesSkin.Text = _Database.Skin.ToString();
 
             cbxAnsicht.Item.Clear();
             cbxAnsicht.Item.AddRange(typeof(enAnsicht));

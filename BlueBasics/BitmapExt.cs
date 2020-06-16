@@ -18,15 +18,13 @@
 #endregion
 
 
+using BlueBasics.Enums;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using static BlueBasics.FileOperations;
 
 namespace BlueBasics
@@ -34,7 +32,12 @@ namespace BlueBasics
 
     //https://stackoverflow.com/questions/24701703/c-sharp-faster-alternatives-to-setpixel-and-getpixel-for-bitmaps-for-windows-f
 
-  public  class BitmapExt
+    // Todo: Obselete Routinen:
+    // Image_FromFile
+    // Resize
+
+
+    public class BitmapExt
     {
         public Bitmap Bitmap { get; private set; }
         public int[] Bits { get; private set; } // Int32 = int
@@ -45,23 +48,7 @@ namespace BlueBasics
         protected GCHandle BitsHandle { get; private set; }
 
 
-        public BitmapExt(string filename)
-        {
-            var orig = Image_FromFile(filename);
-
-            Width = orig.Width;
-            Height = orig.Height;
-            Bits = new int[Width * Height];
-            BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-            Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, BitsHandle.AddrOfPinnedObject());
-
-            using (var gr = Graphics.FromImage(Bitmap))
-            {
-                gr.DrawImage(orig, new Rectangle(0, 0, Width, Height));
-            }
-
-            orig.Dispose();
-        }
+        public BitmapExt(string filename) : this((Bitmap)Image_FromFile(filename)) { }
 
         public BitmapExt(int width, int height)
         {
@@ -70,6 +57,46 @@ namespace BlueBasics
             Bits = new int[Width * Height];
             BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
             Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, BitsHandle.AddrOfPinnedObject());
+        }
+
+        /// <summary>
+        /// Achtung, das eingehende Bild wird zerstört!
+        /// </summary>
+        /// <param name="bmp"></param>
+        public BitmapExt(Bitmap bmp)
+        {
+            if (bmp == null)
+            {
+                Width = -1;
+                Height = -1;
+                return;
+            }
+
+
+            try
+            {
+
+                Width = bmp.Width;
+                Height = bmp.Height;
+                Bits = new int[Width * Height];
+                BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+                Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, BitsHandle.AddrOfPinnedObject());
+
+                using (var gr = Graphics.FromImage(Bitmap))
+                {
+                    gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
+                }
+
+                bmp.Dispose(); // Sichherheithalber, da es ja nun ein neues Bild ist.
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
+                Width = -1;
+                Height = -1;
+                Bitmap = null;
+            }
+
         }
 
         public void SetPixel(int x, int y, Color colour)
@@ -118,6 +145,224 @@ namespace BlueBasics
             }
 
 
+        }
+
+        public static Bitmap Resize(Bitmap bmp, int width, int height, enSizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage)
+        {
+            if (bmp == null) { return null; }
+            if (width < 1 && height < 1) { return null; }
+
+            if (collectGarbage) { modAllgemein.CollectGarbage(); }
+
+
+            if (width < 1) { width = 1; }
+            if (height < 1) { height = 1; }
+
+            var Scale = Math.Min(width / (double)bmp.Width, height / (double)bmp.Height);
+
+            switch (sizeMode)
+            {
+                case enSizeModes.EmptySpace:
+                    break;
+
+                case enSizeModes.BildAbschneiden:
+                    break;
+
+                case enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
+                    // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
+                    width = (int)(Scale * bmp.Width);
+                    height = (int)(Scale * bmp.Height);
+                    break;
+
+                case enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
+                    // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
+                    if (Scale >= 1) { return bmp; }
+                    width = (int)(Scale * bmp.Width);
+                    height = (int)(Scale * bmp.Height);
+                    break;
+
+                case enSizeModes.Verzerren:
+                    Scale = 1; // Dummy setzen
+                    break;
+
+                default:
+                    Develop.DebugPrint(sizeMode);
+                    return null;
+            }
+
+            var nw = (int)(bmp.Width * Scale);
+            var nh = (int)(bmp.Height * Scale);
+
+            if (sizeMode == enSizeModes.Verzerren)
+            {
+                nw = width;
+                nh = height;
+            }
+
+
+
+            try
+            {
+
+                var ImageResize = new Bitmap(width, height); // Kein Format32bppPArgb --> Fehler
+                using (var GR = Graphics.FromImage(ImageResize))
+                {
+                    GR.InterpolationMode = interpolationMode;
+                    GR.PixelOffsetMode = PixelOffsetMode.Half;
+
+
+                    // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
+                    if (bmp.Width > 20000 && nw < 4000)
+                    {
+                        var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 4.0), (int)(bmp.Height / 4.0), null, IntPtr.Zero);
+                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                    }
+                    else if (bmp.Width > 15000 && nw < 4000)
+                    {
+                        var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
+                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                    }
+                    else if (bmp.Width > 10000 && nw < 2500)
+                    {
+                        var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
+                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                    }
+                    else if (bmp.Width > 8000 && nw < 2000)
+                    {
+                        var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 2.5), (int)(bmp.Height / 2.5), null, IntPtr.Zero);
+                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                    }
+                    else
+                    {
+                        GR.DrawImage(bmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                    }
+
+                }
+                return ImageResize;
+
+            }
+            catch
+            {
+                if (!collectGarbage) { modAllgemein.CollectGarbage(); }
+                if (sizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern)
+                {
+                    return (Bitmap)bmp.GetThumbnailImage(nw, nh, null, IntPtr.Zero);
+                }
+                return null;
+            }
+        }
+
+
+        public void Resize(int width, int height, enSizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage)
+        {
+            if (Bitmap == null) { return; }
+
+            if (collectGarbage) { modAllgemein.CollectGarbage(); }
+
+
+            if (width < 1) { width = 1; }
+            if (height < 1) { height = 1; }
+
+            var Scale = Math.Min(width / (double)Width, height / (double)Height);
+
+            switch (sizeMode)
+            {
+                case enSizeModes.EmptySpace:
+                    break;
+
+                case enSizeModes.BildAbschneiden:
+                    break;
+
+                case enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
+                    // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
+                    width = (int)(Scale * Width);
+                    height = (int)(Scale * Height);
+                    break;
+
+                case enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
+                    // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
+                    if (Scale >= 1) { return; }
+                    width = (int)(Scale * Width);
+                    height = (int)(Scale * Height);
+                    break;
+
+                case enSizeModes.Verzerren:
+                    Scale = 1; // Dummy setzen
+                    break;
+
+                default:
+                    Develop.DebugPrint(sizeMode);
+                    return;
+            }
+
+            var nw = (int)(Width * Scale);
+            var nh = (int)(Height * Scale);
+
+            if (sizeMode == enSizeModes.Verzerren)
+            {
+                nw = width;
+                nh = height;
+            }
+
+
+
+
+            try
+            {
+                var oldBMP = Bitmap;
+                Width = width;
+                Height = height;
+                Bits = new int[Width * Height];
+                BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+                Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, BitsHandle.AddrOfPinnedObject());
+
+
+                using (var GR = Graphics.FromImage(Bitmap))
+                {
+                    GR.InterpolationMode = interpolationMode;
+                    GR.PixelOffsetMode = PixelOffsetMode.Half;
+
+
+                    // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
+                    if (Width > 20000 && nw < 4000)
+                    {
+                        var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 4.0), (int)(oldBMP.Height / 4.0), null, IntPtr.Zero);
+                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                    }
+                    else if (oldBMP.Width > 15000 && nw < 4000)
+                    {
+                        var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 3.0), (int)(oldBMP.Height / 3.0), null, IntPtr.Zero);
+                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                    }
+                    else if (oldBMP.Width > 10000 && nw < 2500)
+                    {
+                        var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 3.0), (int)(oldBMP.Height / 3.0), null, IntPtr.Zero);
+                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                    }
+                    else if (oldBMP.Width > 8000 && nw < 2000)
+                    {
+                        var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 2.5), (int)(oldBMP.Height / 2.5), null, IntPtr.Zero);
+                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                    }
+                    else
+                    {
+                        GR.DrawImage(oldBMP, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
+
+                //if (!collectGarbage) { modAllgemein.CollectGarbage(); }
+                //if (sizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern)
+                //{
+                //    return (Bitmap)bmp.GetThumbnailImage(nw, nh, null, IntPtr.Zero);
+                //}
+                //return null;
+            }
         }
 
 

@@ -66,18 +66,8 @@ namespace BlueControls.Controls
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
 
 
-            Skin.SkinChanged += SkinChanged;
-
         }
         #endregion
-
-        //UserControl1 overrides dispose to clean up the component list.
-        protected override void Dispose(bool NowDisposing)
-        {
-
-            Skin.SkinChanged -= SkinChanged;
-            base.Dispose(NowDisposing);
-        }
 
 
 
@@ -501,10 +491,6 @@ namespace BlueControls.Controls
             ContextMenuInit?.Invoke(this, e);
         }
 
-        private void SkinChanged(object sender, System.EventArgs e)
-        {
-            Invalidate();
-        }
 
 
 

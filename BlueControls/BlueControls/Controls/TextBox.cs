@@ -1134,17 +1134,6 @@ namespace BlueControls.Controls
 
 
 
-        protected override void InitializeSkin()
-        {
-            if (_eTxt != null)
-            {
-                var s = Text;
-                _eTxt = null;
-                Text = s;
-            }
-
-        }
-
 
 
         protected virtual enDesign GetDesign()

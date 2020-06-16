@@ -70,11 +70,6 @@ namespace BlueControls.Controls
 
 
 
-        protected override void InitializeSkin()
-        {
-
-        }
-
         protected override RectangleDF MaxBounds()
         {
             if (BMP != null) { return new RectangleDF(0, 0, BMP.Width, BMP.Height); }

@@ -330,20 +330,20 @@ namespace BlueDatabase
                 case "210": // Maximale Größe
                     Wi = Math.Max(4, Wi);
                     He = Math.Max(4, He);
-                    I = I.Resize(Wi, He, enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern, InterpolationMode.HighQualityBicubic, true);
+                    I = BitmapExt.Resize(I, Wi, He, enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern, InterpolationMode.HighQualityBicubic, true);
 
                     break;
 
                 case "211": // Exacte Größe, Weißer Rand
                     Wi = Math.Max(4, Wi);
                     He = Math.Max(4, He);
-                    I = I.Resize(Wi, He, enSizeModes.EmptySpace, InterpolationMode.HighQualityBicubic, true);
+                    I = BitmapExt.Resize(I, Wi, He, enSizeModes.EmptySpace, InterpolationMode.HighQualityBicubic, true);
                     break;
 
                 case "212":// Exacte Größe, Auffüllen
                     Wi = Math.Max(4, Wi);
                     He = Math.Max(4, He);
-                    I = I.Resize(Wi, He, enSizeModes.BildAbschneiden, InterpolationMode.HighQualityBicubic, true);
+                    I = BitmapExt.Resize(I, Wi, He, enSizeModes.BildAbschneiden, InterpolationMode.HighQualityBicubic, true);
 
                     break;
 

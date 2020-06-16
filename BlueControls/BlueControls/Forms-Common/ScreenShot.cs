@@ -361,7 +361,7 @@ namespace BlueControls
                 if (MaxW > 0 && MaxH > 0)
                 {
                     // Auch hier NEW Bitmap, da evtl. das Original-Bild zurück gegeben wird.
-                    FeedBack.Pic = new Bitmap(ClipedArea.Resize(MaxW, MaxH, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
+                    FeedBack.Pic = new Bitmap(BitmapExt.Resize(ClipedArea, MaxW, MaxH, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
 
                     FeedBack.IsResized = true;
                 }

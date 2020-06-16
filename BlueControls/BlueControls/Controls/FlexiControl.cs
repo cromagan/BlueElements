@@ -533,10 +533,6 @@ namespace BlueControls.Controls
             }
         }
 
-        protected override void InitializeSkin()
-        {
-
-        }
 
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Die Filling-Variable wird währenddessen umgesetzt.

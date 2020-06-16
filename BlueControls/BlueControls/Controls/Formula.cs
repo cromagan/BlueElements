@@ -736,19 +736,6 @@ namespace BlueControls.Controls
         }
 
 
-        protected override void InitializeSkin()
-        {
-            if (_Database == null) { return; }
-
-            var r = _ShowingRowKey;
-            ShowingRowKey = -1;
-
-            _Database.LoadPicsIntoImageChache();
-            RedoView();
-            ShowingRowKey = r;
-        }
-
-
         protected override void DrawControl(Graphics gr, enStates state)
         {
             Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);

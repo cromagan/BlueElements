@@ -130,7 +130,7 @@ namespace BlueBasics
                     CollectGarbage();
 
                     var x = (Bitmap)BitmapExt.Image_FromFile(fileName);
-                    l.Add(x.Resize(MaxSize, MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
+                    l.Add(BitmapExt.Resize(x, MaxSize, MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
 
 
                     if (frames > 1)
@@ -191,7 +191,7 @@ namespace BlueBasics
 
             if (MaxSize > 0)
             {
-                return bitmap.Resize(MaxSize, MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
+                bitmap = BitmapExt.Resize(bitmap, MaxSize, MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
             }
 
             return bitmap;
@@ -879,7 +879,7 @@ namespace BlueBasics
             return (from ThisString in assembly.GetManifestResourceNames() where ThisString.EndsWith("." + Name) select assembly.GetManifestResourceStream(ThisString)).FirstOrDefault();
         }
 
-        public static Bitmap GetEmmbedBitmap(Assembly assembly, string Name)
+        public static BitmapExt GetEmmbedBitmap(Assembly assembly, string Name)
         {
 
             if (Name.Contains("|")) { return null; }
@@ -892,10 +892,10 @@ namespace BlueBasics
                 switch (Name.FileType())
                 {
                     case enFileFormat.Image:
-                        return new Bitmap(d);
+                        return new BitmapExt(new Bitmap(d));
 
                     case enFileFormat.Icon:
-                        return new Icon(d).ToBitmap();
+                        return new BitmapExt(new Icon(d).ToBitmap());
 
                     default:
                         Develop.DebugPrint(GetEmmbedResource(assembly, Name));

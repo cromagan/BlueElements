@@ -55,26 +55,26 @@ Public Class frmTest
 
 
 
-        Dim x As New DimensionPadItem("Test", New PointDF(10, 200), New PointDF(20, 200), 10, 200)
+        'Dim x As New DimensionPadItem("Test", New PointDF(10, 200), New PointDF(20, 200), 10, 200)
         'x.Point2 = New clsNamedPoint(x, 20, 10)
         'x.Distance(10)
         ' x.Text = "10"
 
-        BlueCreativePad1.Item.Add(x)
+        'BlueCreativePad1.Item.Add(x)
 
 
-        Dim x2 As New DimensionPadItem("Test", New PointDF(10, 200), New PointDF(20, 200), 10, 200)
+        'Dim x2 As New DimensionPadItem("Test", New PointDF(10, 200), New PointDF(20, 200), 10, 200)
 
-        BlueCreativePad2.Item.Add(x2)
+        'BlueCreativePad2.Item.Add(x2)
 
 
     End Sub
 
-    Private Sub BlueButton2_Click(ByVal Sender As System.Object, ByVal e As EventArgs) Handles BlueButton2.Click
+    'Private Sub BlueButton2_Click(ByVal Sender As System.Object, ByVal e As EventArgs) Handles BlueButton2.Click
 
-        BlueCaption8.ContextMenu_Show(Sender, New MouseEventArgs(MouseButtons.None, 0, 0, 0, 0))
+    '    BlueCaption8.ContextMenu_Show(Sender, New MouseEventArgs(MouseButtons.None, 0, 0, 0, 0))
 
-    End Sub
+    'End Sub
 
     Private Sub BlueCaption8_ContextMenu_Init(sender As Object, e As ContextMenuInitEventArgs) Handles BlueCaption8.ContextMenuInit
         e.UserMenu.Add(New TextListItem("Disabled", True))

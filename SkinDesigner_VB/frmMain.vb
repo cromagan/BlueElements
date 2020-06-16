@@ -18,7 +18,7 @@ Class frmMain
     Dim Version As String = "0.0001"
 
 
-    Dim DB() As Database
+    Dim DB As Database
 
     Dim copyrow As RowItem = Nothing
 
@@ -38,7 +38,7 @@ Class frmMain
         '        .Release()
         '    End With
         'Next
-        BlueDatabase.Database.ReleaseAll(True, 60)
+        MultiUserFile.clsMultiUserFile.SaveAll(True)
     End Sub
 
     'Public Sub ToEnum(ByVal Col As ColumnItem, ByRef t As System.Type)
@@ -61,116 +61,109 @@ Class frmMain
         Dim pf As String = System.Reflection.Assembly.GetEntryAssembly.Location.FilePath
         pf = pf.PathParent(3) & "BlueControls\BlueControls\Ressourcen\Skin\"
 
-        ReDim DB(2)
-        DB(0) = New Database(False) ' MUSS IMMER  Windows10 BLEIBEN! VORLAGE!
-        DB(0).Load(pf & "Windows10.skn")
 
-        DB(2) = New Database(False)
-        DB(2).Load(pf & "XP.skn")
-
-        DB(1) = New Database(False)
-        DB(1).Load(pf & "GlossyCyan.skn")
+        DB = New Database(False) ' MUSS IMMER  Windows10 BLEIBEN! VORLAGE!
+        DB.Load(pf & "Windows10.skn", False)
 
 
-        For z As Integer = 0 To DB.GetUpperBound(0)
-            With DB(z)
-                .UnlockHard()
-                .Column("Control").GetValuesFromEnum(GetType(enDesign), 0, 9999)
-                .Column("Status").GetValuesFromEnum(GetType(enStates), 0, 9999)
-                .Column("Border_Style").GetValuesFromEnum(GetType(enRahmenArt), 0, 9999)
-                .Column("Draw_Back").GetValuesFromEnum(GetType(enHintergrundArt), 0, 9999)
-                .Column("Kontur").GetValuesFromEnum(GetType(enKontur), 0, 9999)
-            End With
-        Next
+
+        With DB
+            .UnlockHard()
+            .Column("Control").GetValuesFromEnum(GetType(enDesign), 0, 9999)
+            .Column("Status").GetValuesFromEnum(GetType(enStates), 0, 9999)
+            .Column("Border_Style").GetValuesFromEnum(GetType(enRahmenArt), 0, 9999)
+            .Column("Draw_Back").GetValuesFromEnum(GetType(enHintergrundArt), 0, 9999)
+            .Column("Kontur").GetValuesFromEnum(GetType(enKontur), 0, 9999)
+        End With
 
 
 
 
 
 
-        TabView.Database = DB(0)
 
-        DB(0).Column(0).DropdownBearbeitungErlaubt = True
-        DB(0).Column(1).DropdownBearbeitungErlaubt = True
+        TabView.Database = DB
 
-
-
-
-
-        For z As Integer = DB.GetUpperBound(0) To 1 Step -1 ' Rückwärts, um dir richtigen Fehlermeldungen zu bekommen
-            ' DB(z).CopyLayout(DB(0), False)
-
-
-            Dim r As RowItem
-
-            ' Werte der Stamm-Datenbank in die zweite Datenbank übernehmen
-            For Each ThisRowItem As RowItem In DB(0).Row
-                If ThisRowItem IsNot Nothing Then
-
-                    r = DB(z).Row(New FilterItem(DB(z).Column(0), enFilterType.Istgleich, ThisRowItem.CellGetString(ThisRowItem.Database.Column(0))),
-                                 New FilterItem(DB(z).Column(1), enFilterType.Istgleich, ThisRowItem.CellGetString(ThisRowItem.Database.Column(1))))
-
-                    If r Is Nothing Then
-                        r = DB(z).Row.Add(ThisRowItem.CellGetString(ThisRowItem.Database.Column(0)))
-                        r.CellSet(r.Database.Column(0), ThisRowItem.CellGetString(ThisRowItem.Database.Column(1)))
-                    End If
-
-                    If ThisRowItem.CellIsNullOrEmpty("Font") Then
-                        r.CellSet("Font", String.Empty)
-                    Else
-                        If r.CellIsNullOrEmpty("Font") Then
-                            Notification.Show(DB(z).Filename.FileNameWithoutSuffix & "<br>" & ThisRowItem.CellGetString(ThisRowItem.Database.Column(0)) & "<br>" & ThisRowItem.CellGetString(ThisRowItem.Database.Column(1)) & "<br>Schrift prüfen", enImageCode.Warnung)
-                        End If
-                    End If
+        DB.Column(0).DropdownBearbeitungErlaubt = True
+        DB.Column(1).DropdownBearbeitungErlaubt = True
 
 
 
 
 
-                End If
-            Next
-
-            ' Alte Werte der zweit datenbank löschen
-            Dim Again As Boolean
-
-            '  DB(z).Editablexx("")
-            Do
-                Again = False
-
-                For Each thisRow As RowItem In DB(z).Row
+        'For z As Integer = DB.GetUpperBound(0) To 1 Step -1 ' Rückwärts, um dir richtigen Fehlermeldungen zu bekommen
+        '    ' DB(z).CopyLayout(DB(0), False)
 
 
-                    If thisRow IsNot Nothing Then
-                        If DB(0).Row(New FilterItem(DB(0).Column(0), enFilterType.Istgleich, thisRow.CellGetString(thisRow.Database.Column(0))),
-                                     New FilterItem(DB(0).Column(1), enFilterType.Istgleich, thisRow.CellGetString(thisRow.Database.Column(1)))) Is Nothing Then
-                            DB(z).Row.Remove(thisRow)
-                            Again = True
-                            Exit For
-                        End If
-                    End If
-                Next
+        '    Dim r As RowItem
 
-                If Not Again Then Exit Do
+        '    ' Werte der Stamm-Datenbank in die zweite Datenbank übernehmen
+        '    For Each ThisRowItem As RowItem In DB(0).Row
+        '        If ThisRowItem IsNot Nothing Then
 
-            Loop
+        '            r = DB(z).Row(New FilterItem(DB(z).Column(0), enFilterType.Istgleich, ThisRowItem.CellGetString(ThisRowItem.Database.Column(0))),
+        '                         New FilterItem(DB(z).Column(1), enFilterType.Istgleich, ThisRowItem.CellGetString(ThisRowItem.Database.Column(1))))
+
+        '            If r Is Nothing Then
+        '                r = DB(z).Row.Add(ThisRowItem.CellGetString(ThisRowItem.Database.Column(0)))
+        '                r.CellSet(r.Database.Column(0), ThisRowItem.CellGetString(ThisRowItem.Database.Column(1)))
+        '            End If
+
+        '            If ThisRowItem.CellIsNullOrEmpty("Font") Then
+        '                r.CellSet("Font", String.Empty)
+        '            Else
+        '                If r.CellIsNullOrEmpty("Font") Then
+        '                    Notification.Show(DB(z).Filename.FileNameWithoutSuffix & "<br>" & ThisRowItem.CellGetString(ThisRowItem.Database.Column(0)) & "<br>" & ThisRowItem.CellGetString(ThisRowItem.Database.Column(1)) & "<br>Schrift prüfen", enImageCode.Warnung)
+        '                End If
+        '            End If
 
 
-        Next z
+
+
+
+        '        End If
+        '    Next
+
+        '    ' Alte Werte der zweit datenbank löschen
+        '    Dim Again As Boolean
+
+        '    '  DB(z).Editablexx("")
+        '    Do
+        '        Again = False
+
+        '        For Each thisRow As RowItem In DB(z).Row
+
+
+        '            If thisRow IsNot Nothing Then
+        '                If DB(0).Row(New FilterItem(DB(0).Column(0), enFilterType.Istgleich, thisRow.CellGetString(thisRow.Database.Column(0))),
+        '                             New FilterItem(DB(0).Column(1), enFilterType.Istgleich, thisRow.CellGetString(thisRow.Database.Column(1)))) Is Nothing Then
+        '                    DB(z).Row.Remove(thisRow)
+        '                    Again = True
+        '                    Exit For
+        '                End If
+        '            End If
+        '        Next
+
+        '        If Not Again Then Exit Do
+
+        '    Loop
+
+
+        'Next z
 
 
         TabView.Arrangement = 1
 
 
 
-        Dis0.Text = DB(0).Tags(0)
+        Dis0.Text = DB.Tags(0)
         Dis0.Item.AddRange(GetType(enImageCodeEffect))
 
 
-        Dis1.Text = DB(1).Tags(0)
-        Dis1.Item.AddRange(GetType(enImageCodeEffect))
+        'Dis1.Text = DB(1).Tags(0)
+        'Dis1.Item.AddRange(GetType(enImageCodeEffect))
 
-        F0.Database = DB(0)
-        F1.Database = DB(1)
+        F0.Database = DB
 
     End Sub
 
@@ -178,7 +171,7 @@ Class frmMain
 
 
     Private Sub SK_ContextMenu_Init(sender As Object, e As ContextMenuInitEventArgs) Handles TabView.ContextMenuInit
-        Dim CellKey As String = CStr(e.Tag)
+        Dim CellKey As String = e.Tags.TagGet("CellKey")
         If (String.IsNullOrEmpty(CellKey)) Then Exit Sub
         Dim Column As ColumnItem = Nothing
         Dim Row As RowItem = Nothing
@@ -219,14 +212,14 @@ Class frmMain
     End Sub
 
     Private Sub SK_ContextMenu_ItemClicked(sender As Object, e As ContextMenuItemClickedEventArgs) Handles TabView.ContextMenuItemClicked
-        Dim CellKey As String = CStr(e.Tag)
+        Dim CellKey As String = e.Tags.TagGet("CellKey")
         If (String.IsNullOrEmpty(CellKey)) Then Exit Sub
         Dim Column As ColumnItem = Nothing
         Dim Row As RowItem = Nothing
         TabView.Database.Cell.DataOfCellKey(CellKey, Column, Row)
 
 
-        Select Case e.ClickedComand.Internal
+        Select Case e.ClickedComand
             Case Is = "ZeileLöschen"
                 If Row IsNot Nothing Then
                     If MessageBox.Show("Zeile löschen?", enImageCode.Frage, "Ja", "Nein") = 0 Then
@@ -293,22 +286,22 @@ Class frmMain
         If e.Row Is Nothing Then Exit Sub
 
 
-        Dim r1 As RowItem = DB(0).Row(New FilterItem(DB(0).Column(0), enFilterType.Istgleich_GroßKleinEgal, e.Row.CellGetString(e.Row.Database.Column(0))),
-                                      New FilterItem(DB(0).Column(1), enFilterType.Istgleich_GroßKleinEgal, e.Row.CellGetString(e.Row.Database.Column(1))))
+        Dim r1 As RowItem = DB.Row(New FilterItem(DB.Column(0), enFilterType.Istgleich_GroßKleinEgal, e.Row.CellGetString(e.Row.Database.Column(0))),
+                                   New FilterItem(DB.Column(1), enFilterType.Istgleich_GroßKleinEgal, e.Row.CellGetString(e.Row.Database.Column(1))))
 
         F0.ShowingRowKey = r1.Key
 
 
-        Dim r2 As RowItem = DB(1).Row(New FilterItem(DB(1).Column(0), enFilterType.Istgleich_GroßKleinEgal, e.Row.CellGetString(e.Row.Database.Column(0))),
-                                      New FilterItem(DB(1).Column(1), enFilterType.Istgleich_GroßKleinEgal, e.Row.CellGetString(e.Row.Database.Column(1))))
+        'Dim r2 As RowItem = DB(1).Row(New FilterItem(DB(1).Column(0), enFilterType.Istgleich_GroßKleinEgal, e.Row.CellGetString(e.Row.Database.Column(0))),
+        '                              New FilterItem(DB(1).Column(1), enFilterType.Istgleich_GroßKleinEgal, e.Row.CellGetString(e.Row.Database.Column(1))))
 
 
 
-        If r2 IsNot Nothing Then
-            F1.ShowingRowKey = r2.Key
-        Else
-            F1.ShowingRowKey = -1
-        End If
+        'If r2 IsNot Nothing Then
+        '    F1.ShowingRowKey = r2.Key
+        'Else
+        '    F1.ShowingRowKey = -1
+        'End If
 
 
 
@@ -377,8 +370,7 @@ Class frmMain
 
 
     Private Sub Dis_Zone_Click(ByVal Sender As Object, E As BasicListItemEventArgs) Handles Dis0.ItemClicked, Dis1.ItemClicked
-        DB(0).Tags(0) = Dis0.Text
-        DB(1).Tags(0) = Dis1.Text
+        DB.Tags(0) = Dis0.Text
     End Sub
 
 
@@ -419,7 +411,7 @@ Class frmMain
 
 
     Private Sub Kopf1_Click(sender As Object, e As EventArgs) Handles Kopf1.Click
-        BlueControls.BlueDatabaseDialogs.tabAdministration.OpenDatabaseHeadEditor(DB(0))
+        BlueControls.BlueDatabaseDialogs.tabAdministration.OpenDatabaseHeadEditor(DB)
 
     End Sub
 
@@ -427,7 +419,7 @@ Class frmMain
 
         MessageBox.Show("Diese Datenbank wird mit den Kopfeigenschaften von Windows 10 Skin überschrieben.<br>Nur die Binärdaten können hier abgeändert werden.", enImageCode.Information, "OK")
 
-        BlueControls.BlueDatabaseDialogs.tabAdministration.OpenDatabaseHeadEditor(DB(0))
+        BlueControls.BlueDatabaseDialogs.tabAdministration.OpenDatabaseHeadEditor(DB)
     End Sub
 
 End Class

@@ -367,7 +367,7 @@ namespace BlueControls.Controls
 
 
 
-        protected override void InitializeSkin()
+        protected void InitializeSkin()
         {
             _Cell_Font = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard).Scale(FontScale);
             _Column_Font = Skin.GetBlueFont(enDesign.Table_Column, enStates.Standard).Scale(FontScale);

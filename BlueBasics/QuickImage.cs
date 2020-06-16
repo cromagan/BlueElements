@@ -55,7 +55,7 @@ namespace BlueBasics
         private int _drehWinkel;
 
 
-        private Bitmap _Bitmap;
+        private BitmapExt _Bitmap;
 
 
         private string TMPCode = "";
@@ -104,6 +104,15 @@ namespace BlueBasics
         #region  Properties 
 
         public Bitmap BMP
+        {
+            get
+            {
+                if (_Bitmap == null) { Generate(); }
+                return _Bitmap.Bitmap;
+            }
+        }
+
+        public BitmapExt BMPExt
         {
             get
             {
@@ -481,7 +490,7 @@ namespace BlueBasics
         }
 
 
-        public static void Add(string Name, Bitmap BMP)
+        public static void Add(string Name, BitmapExt BMP)
         {
 
             if (string.IsNullOrEmpty(Name)) { return; }
@@ -517,14 +526,13 @@ namespace BlueBasics
         }
 
 
-        public Bitmap GetBitmap(string TMPName)
+        public BitmapExt GetBitmap(string TMPName)
         {
-            Bitmap vbmp = null;
-            vbmp = modAllgemein.GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), TMPName + ".png");
+            var vbmp = modAllgemein.GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), TMPName + ".png");
             if (vbmp != null) { return vbmp; }
 
             var i = GetIndex(TMPName);
-            if (i >= 0 && PC[i] != this) { return PC[i].BMP; }
+            if (i >= 0 && PC[i] != this) { return PC[i].BMPExt; }
 
 
             var e = new NeedImageEventArgs(TMPName);
@@ -536,7 +544,7 @@ namespace BlueBasics
 
             // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen
             var i2 = GetIndex(TMPName);
-            if (i2 >= 0 && PC[i2] != this) { return PC[i2].BMP; }
+            if (i2 >= 0 && PC[i2] != this) { return PC[i2].BMPExt; }
 
 
             return null;
@@ -547,7 +555,7 @@ namespace BlueBasics
         {
 
             var bmpOri = GetBitmap(_name);
-            Bitmap bmpTMP = null;
+            BitmapExt bmpTMP = null;
             Bitmap bmpKreuz = null;
             Bitmap bmpSecond = null;
             Color? colgreen = null;
@@ -559,8 +567,8 @@ namespace BlueBasics
             if (bmpOri == null)
             {
                 _IsError = true;
-                _Bitmap = new Bitmap(16, 16, PixelFormat.Format32bppPArgb);
-                using (var GR = Graphics.FromImage(_Bitmap))
+                _Bitmap = new BitmapExt(16, 16);
+                using (var GR = Graphics.FromImage(_Bitmap.Bitmap))
                 {
                     GR.Clear(Color.Black);
                     GR.DrawLine(new Pen(Color.Red, 3), 0, 0, _Bitmap.Width - 1, _Bitmap.Height - 1);
@@ -578,17 +586,16 @@ namespace BlueBasics
                 {
                     if (_height > 0)
                     {
-                        _Bitmap = bmpOri.Resize(_width, _height, enSizeModes.EmptySpace, InterpolationMode.High, false);
+                        bmpOri.Resize(_width, _height, enSizeModes.EmptySpace, InterpolationMode.High, false);
                     }
                     else
                     {
-                        _Bitmap = bmpOri.Resize(_width, _width, enSizeModes.EmptySpace, InterpolationMode.High, false);
+                        bmpOri.Resize(_width, _width, enSizeModes.EmptySpace, InterpolationMode.High, false);
                     }
                 }
-                else
-                {
-                    _Bitmap = bmpOri;
-                }
+
+
+                _Bitmap = bmpOri;
                 return;
             }
 
@@ -601,7 +608,7 @@ namespace BlueBasics
             if (bmpOri != null)
             {
 
-                bmpTMP = new Bitmap(bmpOri.Width, bmpOri.Height, PixelFormat.Format32bppPArgb);
+                bmpTMP = new BitmapExt(bmpOri.Width, bmpOri.Height);
                 if (_effekt.HasFlag(enImageCodeEffect.Durchgestrichen))
                 {
                     var tmpEx = _effekt ^ enImageCodeEffect.Durchgestrichen;
@@ -707,28 +714,18 @@ namespace BlueBasics
             {
                 if (_height > 0)
                 {
-                    _Bitmap = bmpTMP.Resize(_width, _height, enSizeModes.EmptySpace, InterpolationMode.High, false);
+                    bmpTMP.Resize(_width, _height, enSizeModes.EmptySpace, InterpolationMode.High, false);
                 }
                 else
                 {
-                    _Bitmap = bmpTMP.Resize(_width, _width, enSizeModes.EmptySpace, InterpolationMode.High, false);
+                    bmpTMP.Resize(_width, _width, enSizeModes.EmptySpace, InterpolationMode.High, false);
                 }
+                _Bitmap = bmpTMP;
             }
             else
             {
                 _Bitmap = bmpTMP;
             }
-
-
-            //_Bitmap = bmpTMP.Bitmap.Resize(_Bitmap.Width, _Bitmap.Height, enSizeModes.EmptySpace, InterpolationMode.High, false);
-
-            //using (var GR = Graphics.FromImage(_Bitmap))
-            //{
-            //    GR.Clear(Color.FromArgb(0, 0, 0, 0));
-            //    GR.InterpolationMode = InterpolationMode.High;
-            //    bmpTMP = bmpTMP.Resize(_Bitmap.Width, _Bitmap.Height, enSizeModes.EmptySpace, InterpolationMode.High, false);
-            //    GR.DrawImage(bmpTMP, 0, 0, _Bitmap.Width, _Bitmap.Height);
-            //}
         }
 
 

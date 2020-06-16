@@ -394,12 +394,6 @@ namespace BlueControls.Controls
             if (e.Delta < 0) { But2_Click(But2, e); }
         }
 
-
-
-        protected override void InitializeSkin()
-        {
-
-        }
         protected override void DrawControl(Graphics gr, enStates state)
         {
             var vState_Back = state;

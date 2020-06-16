@@ -243,7 +243,7 @@ namespace BlueControls.Controls
             _design = enDesign.Undefiniert;
             if (Parent == null) { return; }
 
-            if (Parent is IDesignAble D) { _design = D.Design; }
+            if (Parent is Form fm) { _design = fm.Design; }
 
             switch (_design)
             {
@@ -287,13 +287,6 @@ namespace BlueControls.Controls
             eText = null;
             if (!QuickModePossible()) { SetDoubleBuffering(); }
             Invalidate();
-        }
-
-
-        protected override void InitializeSkin()
-        {
-            eText = null;
-            GetDesign();
         }
 
 

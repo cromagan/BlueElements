@@ -99,10 +99,6 @@ namespace BlueControls.Controls
         }
 
 
-        protected override void InitializeSkin()
-        {
-
-        }
 
         public void CheckSize()
         {

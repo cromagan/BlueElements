@@ -26,7 +26,7 @@ using System.Drawing.Text;
 
 namespace BlueControls
 {
-    public class ExtChar : IDesignAble
+    public class ExtChar 
     {
         #region  Variablen-Deklarationen 
 

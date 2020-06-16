@@ -407,12 +407,6 @@ namespace BlueControls.Controls
         }
 
 
-        protected override void InitializeSkin()
-        {
-
-        }
-
-
         internal static void DrawButton(System.Windows.Forms.Control con, Graphics GR, ref RowItem _SkinRow, enDesign vButtonTypex, enStates vStatex, QuickImage p, enAlignment Align, bool PicHeight44, ExtText etxt, string vtext, Rectangle DisplayRectangle, bool Translate)
         {
 

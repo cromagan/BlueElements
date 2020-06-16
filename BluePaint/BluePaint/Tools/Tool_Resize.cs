@@ -92,7 +92,7 @@ namespace BluePaint
 
             if (pr == 1 || pr < 0.01 || pr > 1000 || wi < 1 || he < 1) { return; }
 
-            var _BMP2 = p.Resize(wi, he, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
+            var _BMP2 = BitmapExt.Resize(p, wi, he, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
 
             OnOverridePic(_BMP2);
 

@@ -28,12 +28,13 @@ using BlueControls.Interfaces;
 
 namespace BlueControls.Forms
 {
-    public partial class Form : System.Windows.Forms.Form, IDesignAble, ISupportsBeginnEdit
+    public partial class Form : System.Windows.Forms.Form, ISupportsBeginnEdit
     {
         public Form(): base()
         {
 
             if (Skin.SkinDB == null) { Skin.LoadSkin(); }
+            SkinChanged();
             InitializeComponent();
         }
 
@@ -125,7 +126,7 @@ namespace BlueControls.Forms
 
                 if (Skin.SkinDB == null) { Skin.LoadSkin(); }
 
-                SkinChanged(this, System.EventArgs.Empty);
+                SkinChanged();
 
 
 
@@ -230,7 +231,6 @@ namespace BlueControls.Forms
             if (!e.Cancel)
             {
                 IsClosed = true;
-                Skin.SkinChanged -= SkinChanged;
             }
         }
 
@@ -260,7 +260,6 @@ namespace BlueControls.Forms
         {
             BackColor = Skin.Color_Back(_design, enStates.Standard);
             base.OnLoad(e);
-            Skin.SkinChanged += SkinChanged;
         }
 
 
@@ -279,13 +278,11 @@ namespace BlueControls.Forms
             if (!IsClosed) { base.OnInvalidated(e); }
         }
 
-        private void SkinChanged(object sender, System.EventArgs e)
+        private void SkinChanged()
         {
             BackColor = Skin.Color_Back(_design, enStates.Standard);
             Invalidate();
         }
-
-
 
 
 

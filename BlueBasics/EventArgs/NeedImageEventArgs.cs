@@ -24,7 +24,7 @@ namespace BlueBasics.EventArgs
     public class NeedImageEventArgs : System.EventArgs
     {
         public string Name { get; }
-        public Bitmap BMP { get;  set; }
+        public BitmapExt BMP { get;  set; }
 
         public NeedImageEventArgs(string name)
         {

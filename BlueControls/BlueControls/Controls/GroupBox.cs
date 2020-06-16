@@ -124,10 +124,7 @@ namespace BlueControls.Controls
 
 
         #endregion
-        protected override void InitializeSkin()
-        {
-            Invalidate();
-        }
+
 
 
         protected override void DrawControl(Graphics gr, enStates state)

@@ -206,7 +206,7 @@ namespace BlueControls.Forms
 
                     if (ConnectedControl == null || ConnectedControl == ThisForm._ConnectedControl)
                     {
-                        if (Design == enDesign.Undefiniert || ((IDesignAble)ThisForm).Design == Design)
+                        if (Design == enDesign.Undefiniert || ThisForm.Design == Design)
                         {
                             try
                             {

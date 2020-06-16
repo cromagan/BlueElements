@@ -5,8 +5,7 @@ using System.ComponentModel.Design;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.Design;
-using TabControl = BlueControls.Controls.TabControl;
-using TabPage = BlueControls.Controls.TabPage;
+using BlueControls.Controls;
 
 namespace BlueControls.Designer_Support
 {

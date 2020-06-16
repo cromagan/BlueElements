@@ -53,7 +53,7 @@ using System.Drawing;
 
 namespace BlueControls
 {
-    public sealed class ExtText : IDesignAble
+    public sealed class ExtText 
     {
         #region  Variablen-Deklarationen 
 

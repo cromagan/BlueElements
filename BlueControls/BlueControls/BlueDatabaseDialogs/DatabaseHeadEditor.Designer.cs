@@ -63,9 +63,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capReloadVerzoegerung = new BlueControls.Controls.Caption();
             this.cbxAnsicht = new BlueControls.Controls.ComboBox();
             this.cbxJoinTyp = new BlueControls.Controls.ComboBox();
-            this.cbxBevorzugtesSkin = new BlueControls.Controls.ComboBox();
             this.capAnsicht = new BlueControls.Controls.Caption();
-            this.capBevorzugtesSkin = new BlueControls.Controls.Caption();
             this.Tab_Backup = new BlueControls.Controls.TabPage();
             this.ExportEditor = new BlueControls.Classes_Editor.ExportDefinition_Editor();
             this.grpExport = new BlueControls.Controls.GroupBox();
@@ -384,9 +382,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.Controls.Add(this.capReloadVerzoegerung);
             this.Tab_Allgemein.Controls.Add(this.cbxAnsicht);
             this.Tab_Allgemein.Controls.Add(this.cbxJoinTyp);
-            this.Tab_Allgemein.Controls.Add(this.cbxBevorzugtesSkin);
             this.Tab_Allgemein.Controls.Add(this.capAnsicht);
-            this.Tab_Allgemein.Controls.Add(this.capBevorzugtesSkin);
             this.Tab_Allgemein.Controls.Add(this.capInfo);
             this.Tab_Allgemein.Controls.Add(this.capTags);
             this.Tab_Allgemein.Controls.Add(this.txbCaption);
@@ -492,16 +488,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxJoinTyp.Size = new System.Drawing.Size(160, 24);
             this.cbxJoinTyp.TabIndex = 31;
             // 
-            // cbxBevorzugtesSkin
-            // 
-            this.cbxBevorzugtesSkin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cbxBevorzugtesSkin.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxBevorzugtesSkin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxBevorzugtesSkin.Location = new System.Drawing.Point(168, 534);
-            this.cbxBevorzugtesSkin.Name = "cbxBevorzugtesSkin";
-            this.cbxBevorzugtesSkin.Size = new System.Drawing.Size(160, 24);
-            this.cbxBevorzugtesSkin.TabIndex = 31;
-            // 
             // capAnsicht
             // 
             this.capAnsicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -509,14 +495,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capAnsicht.Name = "capAnsicht";
             this.capAnsicht.Size = new System.Drawing.Size(120, 18);
             this.capAnsicht.Text = "Bevorzugte Ansicht:";
-            // 
-            // capBevorzugtesSkin
-            // 
-            this.capBevorzugtesSkin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.capBevorzugtesSkin.Location = new System.Drawing.Point(8, 536);
-            this.capBevorzugtesSkin.Name = "capBevorzugtesSkin";
-            this.capBevorzugtesSkin.Size = new System.Drawing.Size(112, 18);
-            this.capBevorzugtesSkin.Text = "Bevorzugtes Skin:";
             // 
             // Tab_Backup
             // 
@@ -782,9 +760,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private TabPage Tab_Rechte;
         private TabPage Tab_Backup;
         private ComboBox cbxAnsicht;
-        private ComboBox cbxBevorzugtesSkin;
         private Caption capAnsicht;
-        private Caption capBevorzugtesSkin;
         private GroupBox grpKennwort;
         private RuleItem_Editor RuleItemEditor;
         private GroupBox grpBenutzergruppen;

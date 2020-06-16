@@ -44,7 +44,7 @@ namespace BlueControls.Controls
 
         #region Constructor
 
-        protected GenericControl() : this(false, false)  { }
+        protected GenericControl() : this(false, false) { }
 
 
         protected GenericControl(bool DoubleBuffer, bool UseBackgroundBitmap) : base()
@@ -73,9 +73,6 @@ namespace BlueControls.Controls
 
             _UseBackBitmap = UseBackgroundBitmap;
             Translate = true;
-
-            InitializeSkin();
-            Skin.SkinChanged += SkinChanged;
 
         }
         #endregion
@@ -110,19 +107,12 @@ namespace BlueControls.Controls
 
         }
 
-        private void SkinChanged(object sender, System.EventArgs e)
-        {
-            InitializeSkin();
-        }
+
 
 
         protected virtual void DrawControl(Graphics gr, enStates state)
         {
 
-            Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-        }
-        protected virtual void InitializeSkin()
-        {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
         }
 
@@ -313,7 +303,7 @@ namespace BlueControls.Controls
                 {
                     if (DesignMode)
                     {
-                        Skin.SkinDesign = enSkin.Windows_10;
+                        Skin.LoadSkin();
                     }
                     else
                     {
@@ -324,18 +314,27 @@ namespace BlueControls.Controls
 
                 if (Width < 1 || Height < 1) { return; }
 
-                if (_UseBackBitmap)
+                try
                 {
-                    if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
-                    var TMPGR = Graphics.FromImage(_BitmapOfControl);
-                    DrawControl(TMPGR, IsStatus());
-                    GR.DrawImage(_BitmapOfControl, 0, 0);
-                    TMPGR.Dispose();
+                    if (_UseBackBitmap)
+                    {
+                        if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
+                        var TMPGR = Graphics.FromImage(_BitmapOfControl);
+                        DrawControl(TMPGR, IsStatus());
+                        GR.DrawImage(_BitmapOfControl, 0, 0);
+                        TMPGR.Dispose();
+                    }
+                    else
+                    {
+                        DrawControl(GR, IsStatus());
+                    }
+
                 }
-                else
+                catch
                 {
-                    DrawControl(GR, IsStatus());
+                    return;
                 }
+
 
 
 

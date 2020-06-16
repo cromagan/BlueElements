@@ -35,7 +35,6 @@ Partial Class frmMain
         Me.BlueButton3 = New Button()
         Me.TabView = New Table()
         Me.F0 = New Formula()
-        Me.F1 = New Formula()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.Panel3 = New System.Windows.Forms.Panel()
         Me.Button1 = New Button()
@@ -158,15 +157,6 @@ Partial Class frmMain
         Me.F0.Size = New System.Drawing.Size(485, 73)
         Me.F0.TabIndex = 14
         '
-        'F1
-        '
-        Me.F1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.F1.Location = New System.Drawing.Point(494, 3)
-        Me.F1.MinimumSize = New System.Drawing.Size(320, 50)
-        Me.F1.Name = "F1"
-        Me.F1.Size = New System.Drawing.Size(486, 73)
-        Me.F1.TabIndex = 15
-        '
         'TableLayoutPanel1
         '
         Me.TableLayoutPanel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -176,7 +166,6 @@ Partial Class frmMain
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.Panel3, 1, 1)
-        Me.TableLayoutPanel1.Controls.Add(Me.F1, 1, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.F0, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Panel1, 0, 1)
         Me.TableLayoutPanel1.Location = New System.Drawing.Point(0, 8)
@@ -423,7 +412,6 @@ Partial Class frmMain
     Friend WithEvents Dis0 As ComboBox
     Friend WithEvents FilterAus As Button
     Friend WithEvents F0 As Formula
-    Friend WithEvents F1 As Formula
     Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
     Friend WithEvents Panel1 As System.Windows.Forms.Panel
     Friend WithEvents Panel2 As System.Windows.Forms.Panel
