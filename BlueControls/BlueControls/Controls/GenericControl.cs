@@ -605,22 +605,40 @@ namespace BlueControls.Controls
             }
         }
 
+        internal static bool AllEnabled(System.Windows.Forms.Control control)
+        {
+            Develop.DebugPrint_Disposed(control.IsDisposed);
 
-        public static enPartentType Typ(System.Windows.Forms.Control cControl)
+
+
+
+            do
+            {
+                if (control == null) { return true; }
+                if (control.IsDisposed) { return false; }
+                if (!control.Enabled) { return false; }
+                control = control.Parent;
+
+            } while (true);
+
+        }
+
+
+        public static enPartentType Typ(System.Windows.Forms.Control control)
         {
 
-            switch (cControl)
+            switch (control)
             {
                 case null:
                     return enPartentType.Nothing;
                 case GroupBox _:
                     {
-                        if (cControl.Parent is TabPage TP)
+                        if (control.Parent is TabPage TP)
                         {
 
                             if (TP.Parent == null) { return enPartentType.Unbekannt; }
 
-                            if (((TabControl)TP.Parent).IsRibbonBar)
+                            if (((AbstractTabControl)TP.Parent).IsRibbonBar)
                             {
                                 return enPartentType.RibbonGroupBox;
                             }
@@ -630,17 +648,17 @@ namespace BlueControls.Controls
                 case LastFilesCombo _:
                     return enPartentType.LastFilesCombo;
                 //Is = "BlueBasics.ComboBox"
-                case ComboBox _ when ((ComboBox)cControl).ParentType() == enPartentType.RibbonPage:
+                case ComboBox _ when ((ComboBox)control).ParentType() == enPartentType.RibbonPage:
                     return enPartentType.RibbonBarCombobox;
                 case ComboBox _:
                     return enPartentType.ComboBox;
                 // Is = "BlueBasics.TabControl"
-                case TabControl _ when ((TabControl)cControl).IsRibbonBar:
+                case Ribbonbar _:
                     return enPartentType.RibbonControl;
                 case TabControl _:
                     return enPartentType.TabControl;
                 // Is = "BlueBasics.TabPage"
-                case TabPage _ when cControl.Parent != null && ((TabControl)cControl.Parent).IsRibbonBar:
+                case TabPage _ when control.Parent != null && ((AbstractTabControl)control.Parent).IsRibbonBar:
                     return enPartentType.RibbonPage;
                 case TabPage _:
                     return enPartentType.TabPage;
@@ -700,10 +718,15 @@ namespace BlueControls.Controls
             //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
         }
 
-        protected Form ParentForm()
+        protected System.Windows.Forms.Form ParentForm()
         {
-            Develop.DebugPrint_Disposed(IsDisposed);
-            var o = Parent;
+            return ParentForm(Parent);
+        }
+
+        public static System.Windows.Forms.Form ParentForm(System.Windows.Forms.Control o)
+        {
+            Develop.DebugPrint_Disposed(o.IsDisposed);
+
 
             do
             {

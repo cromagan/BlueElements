@@ -753,7 +753,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Caption Caption13;
         private Caption Caption22;
         private ListBox DatenbankAdmin;
-        private TabControl GlobalTab;
+        private AbstractTabControl GlobalTab;
         private TabPage Tab_Allgemein;
         private TabPage Tab_Sortierung;
         private TabPage Tab_Regeln;

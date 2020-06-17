@@ -359,6 +359,10 @@ namespace BlueControls
 
             switch (vControl.Parent)
             {
+                case IUseMyBackColor BC:
+                    GR.FillRectangle(new SolidBrush(vControl.Parent.BackColor), r);
+                    return;
+
                 case IBackgroundNone _:
                     Draw_Back_Transparent(GR, r, vControl.Parent);
                     break;
@@ -383,9 +387,9 @@ namespace BlueControls
                     //}
                     break;
 
-                case TabPage tab:
-                    GR.FillRectangle(new SolidBrush(tab.BackColor), r);
-                    break;
+                //case TabPage tab:
+                //    GR.FillRectangle(new SolidBrush(tab.BackColor), r);
+                //    break;
 
                 case System.Windows.Forms.SplitContainer _:
                     Draw_Back_Transparent(GR, r, vControl.Parent);

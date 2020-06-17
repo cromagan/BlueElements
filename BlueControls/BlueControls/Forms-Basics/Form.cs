@@ -28,7 +28,7 @@ using BlueControls.Interfaces;
 
 namespace BlueControls.Forms
 {
-    public partial class Form : System.Windows.Forms.Form, ISupportsBeginnEdit
+    public partial class Form : System.Windows.Forms.Form, ISupportsBeginnEdit, IUseMyBackColor
     {
         public Form(): base()
         {

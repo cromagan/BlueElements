@@ -31,7 +31,7 @@ namespace BlueControls.Forms
             this.ZoomIn = new BlueControls.Controls.Button();
             this.ZoomFitBut = new BlueControls.Controls.Button();
             this.Pad = new BlueControls.Controls.ZoomPic();
-            this.Ribbon = new BlueControls.Controls.TabControl();
+            this.Ribbon = new BlueControls.Controls.RibbonBar();
             this.tabPageControl = new BlueControls.Controls.TabPage();
             this.grpWerkzeuge = new BlueControls.Controls.GroupBox();
             this.Auswahl = new BlueControls.Controls.Button();
@@ -119,7 +119,6 @@ namespace BlueControls.Forms
             this.Ribbon.Controls.Add(this.tabPageControl);
             this.Ribbon.Dock = System.Windows.Forms.DockStyle.Top;
             this.Ribbon.HotTrack = true;
-            this.Ribbon.IsRibbonBar = true;
             this.Ribbon.Location = new System.Drawing.Point(0, 0);
             this.Ribbon.Name = "Ribbon";
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
@@ -180,7 +179,7 @@ namespace BlueControls.Forms
 			private Button ZoomOut;
 			private Button Auswahl;
 			public ZoomPic Pad;
-			protected TabControl Ribbon;
+			protected RibbonBar Ribbon;
 			protected TabPage tabPageControl;
 			protected GroupBox grpSeiten;
 			protected GroupBox grpWerkzeuge;

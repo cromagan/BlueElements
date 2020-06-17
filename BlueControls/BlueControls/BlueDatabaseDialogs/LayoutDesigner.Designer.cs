@@ -763,7 +763,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnSpeichern;
         private System.Windows.Forms.OpenFileDialog LoadTab;
         private System.Windows.Forms.SaveFileDialog SaveTab;
-        private TabControl tabRightSide;
+        private AbstractTabControl tabRightSide;
         private TabPage tabElementEigenschaften;
         private TabPage tabCodeGenerator;
     }

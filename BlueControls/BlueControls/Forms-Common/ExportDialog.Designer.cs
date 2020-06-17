@@ -465,7 +465,7 @@ namespace BlueControls.Forms
 			internal Button FrmDrucken_ExportVerzeichniss;
 			internal Caption Captionxx1;
 			internal CreativePad TmpPad;
-			internal TabControl Tabs;
+			internal AbstractTabControl Tabs;
 			internal TabPage TabEinträge;
 			internal TabPage TabLayout;
 			private Caption Caption1;

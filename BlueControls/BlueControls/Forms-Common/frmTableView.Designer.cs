@@ -26,7 +26,7 @@ using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
-using TabControl = BlueControls.Controls.TabControl;
+using AbstractTabControl = BlueControls.Controls.AbstractTabControl;
 using TabPage = BlueControls.Controls.TabPage;
 using TextBox = BlueControls.Controls.TextBox;
 
@@ -67,7 +67,7 @@ namespace BlueControls.Forms
             this.TableView = new BlueControls.Controls.Table();
             this.cbxColumnArr = new BlueControls.Controls.ComboBox();
             this.Zei = new BlueControls.Controls.Caption();
-            this.MainRibbon = new BlueControls.Controls.TabControl();
+            this.MainRibbon = new BlueControls.Controls.RibbonBar();
             this.tabDatei = new BlueControls.Controls.TabPage();
             this.grpInformation = new BlueControls.Controls.GroupBox();
             this.Copyright = new BlueControls.Controls.Caption();
@@ -184,7 +184,6 @@ namespace BlueControls.Forms
             this.MainRibbon.Controls.Add(this.tabAdmin);
             this.MainRibbon.Dock = System.Windows.Forms.DockStyle.Top;
             this.MainRibbon.HotTrack = true;
-            this.MainRibbon.IsRibbonBar = true;
             this.MainRibbon.Location = new System.Drawing.Point(0, 0);
             this.MainRibbon.Name = "MainRibbon";
             this.MainRibbon.Size = new System.Drawing.Size(1212, 110);
@@ -713,7 +712,7 @@ namespace BlueControls.Forms
         private GroupBox grpBearbeitung;
         private GroupBox grpOrdner;
         private GroupBox grpDatei;
-        private TabControl MainRibbon;
+        private RibbonBar MainRibbon;
         private tabAdministration tabAdmin;
         private Button btnTextLöschen;
     }

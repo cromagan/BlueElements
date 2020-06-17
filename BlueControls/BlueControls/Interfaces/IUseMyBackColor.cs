@@ -17,13 +17,13 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueControls.Controls
+namespace BlueControls.Interfaces
 {
-   public class TabControl : AbstractTabControl
+    /// <summary>
+    /// Wird verwendet, das Steuerelement im Regelfall diese Farbe hat.
+    /// </summary>
+    public interface IUseMyBackColor
     {
-
-
-        public TabControl() : base(false) { }
 
     }
 }

@@ -1178,7 +1178,7 @@ namespace BlueControls.Controls
 
                             break;
                         case "Tabs":
-                            if (((TabControl)o).TabCount > 0)
+                            if (((AbstractTabControl)o).TabCount > 0)
                             {
                                 RemoveControl(o);
                                 R = true;
@@ -1209,7 +1209,7 @@ namespace BlueControls.Controls
 
             switch (vObject)
             {
-                case TabControl _:
+                case AbstractTabControl _:
                     foreach (System.Windows.Forms.Control o in vObject.Controls)
                     {
                         RemoveControl(o);

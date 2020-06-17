@@ -17,6 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System;
@@ -26,36 +28,37 @@ using System.Windows.Forms.Design;
 
 namespace BlueControls.Controls
 {
+    [ToolboxBitmap(typeof(System.Windows.Forms.TabPage))]
     [Designer(typeof(ScrollableControlDesigner))]
-    public class TabPage : System.Windows.Forms.TabPage
+    public class TabPage : System.Windows.Forms.TabPage, IUseMyBackColor, ISupportsBeginnEdit
     {
 
         #region Constructor
 
 
 
-        public TabPage() : base()
-        {
+        //public TabPage() : base()
+        //{
 
-            //This call is required by the Windows Form Designer.
-            //InitializeComponent()
+        //    //This call is required by the Windows Form Designer.
+        //    //InitializeComponent()
 
-            //Add any initialization after the InitializeComponent() call
-            //SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
+        //    //Add any initialization after the InitializeComponent() call
+        //    //SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
 
-            //SetStyle(System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
-            //SetStyle(System.Windows.Forms.ControlStyles.Opaque, true);
+        //    //SetStyle(System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
+        //    //SetStyle(System.Windows.Forms.ControlStyles.Opaque, true);
 
-            ////The next 3 styles are allefor double buffering
-            //SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
-            //// Me.SetStyle(System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer, True)
-            //SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
-            //SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
+        //    ////The next 3 styles are allefor double buffering
+        //    //SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
+        //    //// Me.SetStyle(System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer, True)
+        //    //SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
+        //    //SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
 
-            SetBackColor();
+        //    //SetBackColor();
 
 
-        }
+        //}
 
         #endregion
 
@@ -65,57 +68,57 @@ namespace BlueControls.Controls
 
 
 
-        #region  AutoScale deaktivieren 
-        // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
+        //#region  AutoScale deaktivieren 
+        //// https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
 
 
 
-        public void PerformAutoScale()
-        {
-            // NIX TUN!!!!
-        }
+        //public void PerformAutoScale()
+        //{
+        //    // NIX TUN!!!!
+        //}
 
-        public void Scale()
-        {
-            // NIX TUN!!!!
-        }
-
-
-
-        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified)
-        {
-            factor = new SizeF(1, 1);
-            base.ScaleControl(factor, specified);
+        //public void Scale()
+        //{
+        //    // NIX TUN!!!!
+        //}
 
 
-        }
 
-        protected override bool ScaleChildren
-        {
-            get
-            {
-                return false; //MyBase.ScaleChildren
-            }
-        }
+        //protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified)
+        //{
+        //    factor = new SizeF(1, 1);
+        //    base.ScaleControl(factor, specified);
 
-        [DefaultValue(false)]
-        public override bool AutoSize
-        {
-            get
-            {
-                return false; //MyBase.AutoSize
-            }
-            set
-            {
-                base.AutoSize = false;
-            }
-        }
 
-        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified)
-        {
-            return bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
-        }
-        #endregion
+        //}
+
+        //protected override bool ScaleChildren
+        //{
+        //    get
+        //    {
+        //        return false; //MyBase.ScaleChildren
+        //    }
+        //}
+
+        //[DefaultValue(false)]
+        //public override bool AutoSize
+        //{
+        //    get
+        //    {
+        //        return false; //MyBase.AutoSize
+        //    }
+        //    set
+        //    {
+        //        base.AutoSize = false;
+        //    }
+        //}
+
+        //protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified)
+        //{
+        //    return bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
+        //}
+        //#endregion
 
 
         protected override void OnParentChanged(System.EventArgs e)
@@ -124,11 +127,11 @@ namespace BlueControls.Controls
             SetBackColor();
         }
 
-        private void SetBackColor()
+        public void SetBackColor()
         {
             if (Parent != null)
             {
-                if (((TabControl)Parent).IsRibbonBar)
+                if (((AbstractTabControl)Parent).IsRibbonBar)
                 {
                     BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
                 }
@@ -144,10 +147,10 @@ namespace BlueControls.Controls
         }
 
 
-        //protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent)
-        //{
+        protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent)
+        {
 
-        //}
+        }
 
         //private void DoDraw(Graphics GR)
         //{
@@ -199,10 +202,9 @@ namespace BlueControls.Controls
         //    Parent?.Invalidate();
         //}
 
-        //protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
-        //{
-        //    DoDraw(e.Graphics);
-        //}
+
+
+
 
 
 
@@ -233,7 +235,72 @@ namespace BlueControls.Controls
         //    //MyBase.OnLeave(e)
         //}
 
+        #region ISupportsEdit
 
+        [DefaultValue(0)]
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int BeginnEditCounter { get; set; } = 0;
+
+
+        public new void SuspendLayout()
+        {
+            BeginnEdit();
+            base.SuspendLayout();
+        }
+        public new void ResumeLayout(bool performLayout)
+        {
+            base.ResumeLayout(performLayout);
+            EndEdit();
+        }
+
+        public new void ResumeLayout()
+        {
+            base.ResumeLayout();
+            EndEdit();
+        }
+
+
+        public void BeginnEdit()
+        {
+            BeginnEdit(1);
+        }
+
+        public void BeginnEdit(int count)
+        {
+            if (DesignMode) { return; }
+
+            foreach (var ThisControl in Controls)
+            {
+                if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
+            }
+
+            BeginnEditCounter += count;
+        }
+
+        public void EndEdit()
+        {
+            if (DesignMode) { return; }
+            if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
+            BeginnEditCounter--;
+
+            if (BeginnEditCounter == 0) { Invalidate(); }
+
+            foreach (var ThisControl in Controls)
+            {
+                if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
+            }
+        }
+
+        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)
+        {
+            if (DesignMode) { return; }
+            if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
+            base.OnControlAdded(e);
+        }
+
+        #endregion
 
     }
 }

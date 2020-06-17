@@ -28,7 +28,7 @@ namespace BlueControls.Forms
             this.btnZoomIn = new BlueControls.Controls.Button();
             this.btnZoomFit = new BlueControls.Controls.Button();
             this.Pad = new BlueControls.Controls.CreativePad();
-            this.Ribbon = new BlueControls.Controls.TabControl();
+            this.Ribbon = new BlueControls.Controls.RibbonBar();
             this.tabPageStart = new BlueControls.Controls.TabPage();
             this.Area_Drucken = new BlueControls.Controls.GroupBox();
             this.Vorschau = new BlueControls.Controls.Button();
@@ -121,7 +121,6 @@ namespace BlueControls.Forms
             this.Ribbon.Controls.Add(this.Page_Settings);
             this.Ribbon.Dock = System.Windows.Forms.DockStyle.Top;
             this.Ribbon.HotTrack = true;
-            this.Ribbon.IsRibbonBar = true;
             this.Ribbon.Location = new System.Drawing.Point(0, 0);
             this.Ribbon.Name = "Ribbon";
             this.Ribbon.SelectedIndex = 1;
@@ -506,7 +505,7 @@ namespace BlueControls.Forms
 			private Button btnAddDimension;
 			private Button btnAddLine;
 			public CreativePad Pad;
-			protected TabControl Ribbon;
+			protected RibbonBar Ribbon;
 			protected TabPage tabPageControl;
 			protected TabPage tabPageStart;
 			protected GroupBox grpWerkzeuge;

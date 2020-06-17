@@ -30,7 +30,7 @@ namespace BluePaint
         /// </summary>
         private void InitializeComponent()
         {
-            this.tabRibbonbar = new BlueControls.Controls.TabControl();
+            this.tabRibbonbar = new BlueControls.Controls.RibbonBar();
             this.Tab_Start = new BlueControls.Controls.TabPage();
             this.grpBearbteitung = new BlueControls.Controls.GroupBox();
             this.btnStop = new BlueControls.Controls.Button();
@@ -94,7 +94,6 @@ namespace BluePaint
             this.tabRibbonbar.Controls.Add(this.tabExperimentell);
             this.tabRibbonbar.Dock = System.Windows.Forms.DockStyle.Top;
             this.tabRibbonbar.HotTrack = true;
-            this.tabRibbonbar.IsRibbonBar = true;
             this.tabRibbonbar.Location = new System.Drawing.Point(0, 0);
             this.tabRibbonbar.Name = "tabRibbonbar";
             this.tabRibbonbar.SelectedIndex = 1;
@@ -538,7 +537,7 @@ namespace BluePaint
 
         }
 
-        internal TabControl tabRibbonbar;
+        internal RibbonBar tabRibbonbar;
         internal TabPage Tab_Start;
         internal TabPage Tab_Werkzeug;
         internal ZoomPic P;

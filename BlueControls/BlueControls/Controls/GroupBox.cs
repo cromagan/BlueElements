@@ -22,30 +22,33 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Windows.Forms;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 
 namespace BlueControls.Controls
 {
-    [Designer("System.Windows.Forms.Design.ParentControlDesigner,System.Design", typeof(IDesigner))]
-    public partial class GroupBox : GenericControl
+    //[Designer("System.Windows.Forms.Design.ParentControlDesigner,System.Design", typeof(IDesigner))]
+    [ToolboxBitmap(typeof(System.Windows.Forms.GroupBox))]
+    public partial class GroupBox : System.Windows.Forms.GroupBox, IUseMyBackColor
     {
 
         #region Constructor
-        public GroupBox() : base(false, true)
+        public GroupBox() : base()
         {
 
 
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            SetNotFocusable();
-            _MouseHighlight = false;
+            //// Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+            //SetNotFocusable();
+            //_MouseHighlight = false;
+            SetStandardValues();
         }
 
         #endregion
 
         #region  Variablen 
-        private string _Text = string.Empty;
+        //private string _Text = string.Empty;
         private enGroupBoxStyle _GroupBoxStyle = enGroupBoxStyle.Normal;
         #endregion
 
@@ -69,116 +72,176 @@ namespace BlueControls.Controls
             {
                 if (_GroupBoxStyle == value) { return; }
                 _GroupBoxStyle = value;
+                SetStandardValues();
                 Invalidate();
             }
         }
 
 
-        [DefaultValue(0)]
-        public new int TabIndex
-        {
-            get
-            {
-                return 0;
-            }
+        //[DefaultValue(0)]
+        //public new int TabIndex
+        //{
+        //    get
+        //    {
+        //        return 0;
+        //    }
 
-            set
-            {
+        //    set
+        //    {
 
-                base.TabIndex = 0;
-            }
-        }
+        //        base.TabIndex = 0;
+        //    }
+        //}
 
-        [DefaultValue(false)]
-        public new bool TabStop
-        {
-            get
-            {
-                return false;
-            }
+        //[DefaultValue(false)]
+        //public new bool TabStop
+        //{
+        //    get
+        //    {
+        //        return false;
+        //    }
 
-            set
-            {
-                base.TabStop = false;
+        //    set
+        //    {
+        //        base.TabStop = false;
 
-            }
-        }
+        //    }
+        //}
 
 
-        [DefaultValue("")]
-        public new string Text
-        {
-            get
-            {
-                return _Text;
-            }
+        //[DefaultValue("")]
+        //public new string Text
+        //{
+        //    get
+        //    {
+        //        return _Text;
+        //    }
 
-            set
-            {
-                if (_Text == value) { return; }
-                _Text = value;
-                Invalidate();
-                //OnTextChanged();
-            }
-        }
+        //    set
+        //    {
+        //        if (_Text == value) { return; }
+        //        _Text = value;
+        //        Invalidate();
+        //        //OnTextChanged();
+        //    }
+        //}
 
 
         #endregion
 
 
-
-        protected override void DrawControl(Graphics gr, enStates state)
+        protected override void OnParentChanged(System.EventArgs e)
         {
-            //if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
+            base.OnParentChanged(e);
+            SetStandardValues();
+            ChildControls_RibbonBar();
+        }
 
-            //var TMPGR = Graphics.FromImage(_BitmapOfControl);
+        protected override void OnControlAdded(ControlEventArgs e)
+        {
+            base.OnControlAdded(e);
+            SetStandardValues();
+            ChildControls_RibbonBar();
+        }
 
-            if (ParentType() == enPartentType.RibbonPage) { _GroupBoxStyle = enGroupBoxStyle.RibbonBar; }
 
+        protected override void OnControlRemoved(ControlEventArgs e)
+        {
+            base.OnControlRemoved(e);
+            SetStandardValues();
+            ChildControls_RibbonBar();
+        }
+
+        protected override void OnDockChanged(System.EventArgs e)
+        {
+            base.OnDockChanged(e);
+            SetStandardValues();
+            ChildControls_RibbonBar();
+        }
+
+        private void SetStandardValues()
+        {
+            var l = GenericControl.Typ(Parent);
+
+            if (_GroupBoxStyle == enGroupBoxStyle.RibbonBar) { l = enPartentType.RibbonPage; }
+
+
+            switch (l)
+            {
+                case enPartentType.RibbonPage:
+                    GroupBoxStyle = enGroupBoxStyle.RibbonBar;
+                    BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
+                    break;
+                case enPartentType.TabPage:
+                    BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
+                    break;
+
+                case enPartentType.Form:
+                    BackColor = Skin.Color_Back(enDesign.Form_Standard, enStates.Standard);
+                    break;
+
+            }
+
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs pevent)
+        {
+            // base.OnPaintBackground(pevent);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            //      base.OnPaint(e);
+
+            var state = enStates.Standard;
+
+            if (!GenericControl.AllEnabled(Parent)) { state = enStates.Standard_Disabled; }
+
+            var r = new Rectangle(0, 0, Width, Height);
+
+            e.Graphics.Clear(BackColor);
 
             switch (_GroupBoxStyle)
             {
                 case enGroupBoxStyle.RibbonBar:
+                    Skin.Draw_Border(e.Graphics, enDesign.RibbonBar_Frame, state, r);
 
-                    if (!Parent.Enabled) { state = enStates.Standard_Disabled; } // TabPage
-                    if (!Parent.Parent.Enabled) { state = enStates.Standard_Disabled; }// RibbonBar
-                                                                                       //  vState = enStates.Standard_Disabled
-                    Skin.Draw_Back(gr, enDesign.RibbonBar_Frame, state, DisplayRectangle, this, true);
-                    Skin.Draw_Border(gr, enDesign.RibbonBar_Frame, state, DisplayRectangle);
-                    Skin.Draw_FormatedText(gr, _Text, enDesign.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width, DisplayRectangle.Height + 2), this, false, Translate);
-
-                    if (Dock != System.Windows.Forms.DockStyle.Left)
+                    if (!string.IsNullOrEmpty(Text))
                     {
-                        Dock = System.Windows.Forms.DockStyle.Left;
-                        return;
+                        var bottomTXT = new Rectangle(0, 0, Width, Height + 2);
+                        Skin.Draw_FormatedText(e.Graphics, Text, enDesign.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, bottomTXT, this, false, true);
                     }
 
-                    ChildControls_RibbonBar();
                     break;
-                case enGroupBoxStyle.Normal:
-                    var r = new Rectangle(DisplayRectangle.Left + Skin.Padding, DisplayRectangle.Top, DisplayRectangle.Width, DisplayRectangle.Height);
-                    Skin.Draw_Back(gr, enDesign.Frame, state, DisplayRectangle, this, true);
 
+                case enGroupBoxStyle.Normal:
                     if (Height > 33)
                     {
-                        Skin.Draw_Border(gr, enDesign.Frame, state, DisplayRectangle);
-                        Skin.Draw_FormatedText(gr, _Text, enDesign.Frame, state, null, enAlignment.Top_Left, r, this, true, Translate);
+                        Skin.Draw_Border(e.Graphics, enDesign.Frame, state, r);
+                        if (!string.IsNullOrEmpty(Text))
+                        {
+                            var topTXT = new Rectangle(Skin.Padding, 0, Width, Height);
+                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.Frame, state, null, enAlignment.Top_Left, topTXT, this, true, true);
+                        }
                     }
                     break;
 
                 default:
-                    Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+                    Skin.Draw_Back_Transparent(e.Graphics, DisplayRectangle, this);
                     break;
             }
 
-            //gr.DrawImage(_BitmapOfControl, 0, 0);
-            //TMPGR.Dispose();
+
+            if (DesignMode) { ChildControls_RibbonBar(); }
+
         }
 
         private void ChildControls_RibbonBar()
         {
 
-            if (Parent == null) { return; }
+            if (_GroupBoxStyle != enGroupBoxStyle.RibbonBar) { return; }
+
+            //if (Parent == null) { return; }
             if (Width < 10 || Height < 10) { return; }
             if (Controls.Count == 0) { return; }
 

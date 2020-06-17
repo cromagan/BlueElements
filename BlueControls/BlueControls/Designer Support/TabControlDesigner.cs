@@ -36,7 +36,7 @@ namespace BlueControls.Designer_Support
             {
                 if (m_verbs.Count == 3)
                 {
-                    var MyControl = (TabControl)Control;
+                    var MyControl = (AbstractTabControl)Control;
                     if (MyControl.TabCount > 0)
                     {
                         m_verbs[1].Enabled = true;
@@ -81,7 +81,7 @@ namespace BlueControls.Designer_Support
         public void OnAddPage(object sender, System.EventArgs e)
         {
 
-            var ParentControl = (TabControl)Control;
+            var ParentControl = (AbstractTabControl)Control;
             var oldTabs = ParentControl.Controls;
 
             RaiseComponentChanging(TypeDescriptor.GetProperties(ParentControl)["TabPages"]);
@@ -105,7 +105,7 @@ namespace BlueControls.Designer_Support
         public void OnInsertPage(object sender, System.EventArgs e)
         {
 
-            var ParentControl = (TabControl)Control;
+            var ParentControl = (AbstractTabControl)Control;
             var oldTabs = ParentControl.Controls;
             var Index = ParentControl.SelectedIndex;
 
@@ -138,7 +138,7 @@ namespace BlueControls.Designer_Support
         public void OnRemovePage(object sender, System.EventArgs e)
         {
 
-            var ParentControl = (TabControl)Control;
+            var ParentControl = (AbstractTabControl)Control;
             var oldTabs = ParentControl.Controls;
 
             if (ParentControl.SelectedIndex < 0) { return; }
@@ -157,7 +157,7 @@ namespace BlueControls.Designer_Support
         private void SetVerbs()
         {
 
-            var ParentControl = (TabControl)Control;
+            var ParentControl = (AbstractTabControl)Control;
 
             switch (ParentControl.TabPages.Count)
             {

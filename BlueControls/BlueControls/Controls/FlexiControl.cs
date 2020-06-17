@@ -39,7 +39,7 @@ namespace BlueControls.Controls
 {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
-    public partial class FlexiControl : GenericControl, IQuickInfo
+    public partial class FlexiControl : GenericControl, IQuickInfo, IUseMyBackColor
     {
 
 
@@ -93,7 +93,7 @@ namespace BlueControls.Controls
 
         #region  Constructor 
 
-        public FlexiControl(): base(false, true)
+        public FlexiControl(): base(false, false)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -113,7 +113,7 @@ namespace BlueControls.Controls
         /// Einfacher Info Text. Wird nirgends mehr zurück gegeben.
         /// </summary>
         /// <param name="CaptionText"></param>
-        public FlexiControl(string CaptionText) : base(false, true)
+        public FlexiControl(string CaptionText) : base(false, false)
         {
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

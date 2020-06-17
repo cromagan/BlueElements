@@ -98,6 +98,9 @@
     </Compile>
     <Compile Include="BlueFont.cs" />
     <Compile Include="clsSerializeableMultiUserFile.cs" />
+    <Compile Include="Controls\TabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\ZoomPic.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -224,6 +227,7 @@
       <DependentUpon>PictureView.cs</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Interfaces\IUseMyBackColor.cs" />
     <Compile Include="Interfaces\ISupportsBeginnEdit.cs" />
     <Compile Include="Forms-Common\Notification.cs">
       <SubType>Form</SubType>
@@ -236,6 +240,9 @@
     <Compile Include="ItemCollection\ItemCollectionPad\FormPadItemRectangle.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />
     <Compile Include="PropertyAttributes.cs" />
+    <Compile Include="Controls\RibbonBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="SystemInputHook.cs" />
     <Compile Include="Controls\Button.cs">
       <SubType>Component</SubType>
@@ -495,7 +502,7 @@
     <Compile Include="Controls\Slider.Designer.cs">
       <DependentUpon>Slider.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\TabControl.cs">
+    <Compile Include="Controls\AbstractTabControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\Table.cs">

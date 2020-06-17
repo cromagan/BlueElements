@@ -46,7 +46,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Database _originalDB;
 
 
-        public tabAdministration()
+        public tabAdministration() : base()
         {
             InitializeComponent();
             Check_OrderButtons();
@@ -480,11 +480,11 @@ namespace BlueControls.BlueDatabaseDialogs
             if (column == null || ViewItem == null)
             {
                 enAktuelleSpalte = false;
-                grpAktuelleSpalte.Text = "Spalte: -";
+                //grpAktuelleSpalte.Text = "Spalte: -";
             }
             else
             {
-                grpAktuelleSpalte.Text = "Spalte: " + column.ReadableText();
+               // grpAktuelleSpalte.Text = "Spalte: " + column.ReadableText();
                 btnSpalteNachLinks.Enabled = Convert.ToBoolean(IndexOfViewItem > 0);
                 btnSpalteNachRechts.Enabled = Convert.ToBoolean(IndexOfViewItem >= 0) && Convert.ToBoolean(IndexOfViewItem < _TableView.Database.ColumnArrangements[_TableView.Arrangement].Count() - 1);
 
