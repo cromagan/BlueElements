@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using static BlueBasics.modAllgemein;
 using static BlueBasics.FileOperations;
 using BlueControls.ItemCollection;
 using static BlueBasics.Extensions;

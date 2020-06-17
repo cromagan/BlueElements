@@ -28,6 +28,7 @@ using System.ComponentModel;
 using System.Drawing;
 using BlueBasics.Enums;
 using System.Drawing.Imaging;
+using BlueControls.BlueDatabaseDialogs;
 
 
 //Inherits UserControl ' -> Gibt Focus an Child!
@@ -653,11 +654,12 @@ namespace BlueControls.Controls
                 case ComboBox _:
                     return enPartentType.ComboBox;
                 // Is = "BlueBasics.TabControl"
-                case Ribbonbar _:
+                case RibbonBar _:
                     return enPartentType.RibbonControl;
                 case TabControl _:
                     return enPartentType.TabControl;
                 // Is = "BlueBasics.TabPage"
+                case tabAdministration _:
                 case TabPage _ when control.Parent != null && ((AbstractTabControl)control.Parent).IsRibbonBar:
                     return enPartentType.RibbonPage;
                 case TabPage _:

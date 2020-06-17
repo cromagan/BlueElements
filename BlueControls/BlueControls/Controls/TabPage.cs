@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms.Design;
@@ -144,13 +143,14 @@ namespace BlueControls.Controls
             {
                 BackColor = Color.Red;
             }
+            Invalidate();
         }
 
 
-        protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent)
-        {
+        //protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent)
+        //{
 
-        }
+        //}
 
         //private void DoDraw(Graphics GR)
         //{

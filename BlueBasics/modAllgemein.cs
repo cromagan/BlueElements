@@ -35,7 +35,6 @@ using System.Threading;
 using BlueBasics.Enums;
 using Microsoft.Win32;
 using static BlueBasics.FileOperations;
-using System.Globalization;
 using System.Windows.Media.Imaging;
 
 namespace BlueBasics

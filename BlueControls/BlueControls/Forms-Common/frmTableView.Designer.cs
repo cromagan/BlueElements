@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.ComponentModel;
 using System.Diagnostics;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
@@ -26,7 +25,6 @@ using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
-using AbstractTabControl = BlueControls.Controls.AbstractTabControl;
 using TabPage = BlueControls.Controls.TabPage;
 using TextBox = BlueControls.Controls.TextBox;
 
@@ -96,10 +94,6 @@ namespace BlueControls.Forms
             this.such = new BlueControls.Controls.TextBox();
             this.Vorwärts = new BlueControls.Controls.Button();
             this.zurück = new BlueControls.Controls.Button();
-            this.grpFilter = new BlueControls.Controls.GroupBox();
-            this.btnTextLöschen = new BlueControls.Controls.Button();
-            this.AlleFilterAus = new BlueControls.Controls.Button();
-            this.ZeilenFilter_TextFeld = new BlueControls.Controls.TextBox();
             this.grpAllgemein = new BlueControls.Controls.GroupBox();
             this.btnNeu = new BlueControls.Controls.Button();
             this.btnDrucken = new BlueControls.Controls.ComboBox();
@@ -109,6 +103,7 @@ namespace BlueControls.Forms
             this.AllgemeinerEditor = new BlueControls.Controls.Button();
             this.BeziehungsEditor = new BlueControls.Controls.Button();
             this.tabAdmin = new BlueControls.BlueDatabaseDialogs.tabAdministration();
+            this.Filter = new BlueControls.BlueDatabaseDialogs.Filterleiste();
             this.MainRibbon.SuspendLayout();
             this.tabDatei.SuspendLayout();
             this.grpInformation.SuspendLayout();
@@ -118,7 +113,6 @@ namespace BlueControls.Forms
             this.grpAnsicht.SuspendLayout();
             this.grpBearbeitung.SuspendLayout();
             this.grpFormularSteuerung.SuspendLayout();
-            this.grpFilter.SuspendLayout();
             this.grpAllgemein.SuspendLayout();
             this.tabExtras.SuspendLayout();
             this.grpEditor.SuspendLayout();
@@ -137,7 +131,7 @@ namespace BlueControls.Forms
             // 
             // Formula
             // 
-            this.Formula.Location = new System.Drawing.Point(200, 144);
+            this.Formula.Location = new System.Drawing.Point(216, 184);
             this.Formula.MinimumSize = new System.Drawing.Size(320, 350);
             this.Formula.Name = "Formula";
             this.Formula.Size = new System.Drawing.Size(856, 352);
@@ -146,9 +140,9 @@ namespace BlueControls.Forms
             // TableView
             // 
             this.TableView.Dock = System.Windows.Forms.DockStyle.Left;
-            this.TableView.Location = new System.Drawing.Point(0, 110);
+            this.TableView.Location = new System.Drawing.Point(0, 152);
             this.TableView.Name = "TableView";
-            this.TableView.Size = new System.Drawing.Size(192, 604);
+            this.TableView.Size = new System.Drawing.Size(192, 562);
             this.TableView.TabIndex = 73;
             this.TableView.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.TableView_ContextMenu_Init);
             this.TableView.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.TableView_ContextMenuItemClicked);
@@ -186,11 +180,13 @@ namespace BlueControls.Forms
             this.MainRibbon.HotTrack = true;
             this.MainRibbon.Location = new System.Drawing.Point(0, 0);
             this.MainRibbon.Name = "MainRibbon";
+            this.MainRibbon.SelectedIndex = 0;
             this.MainRibbon.Size = new System.Drawing.Size(1212, 110);
             this.MainRibbon.TabIndex = 92;
             // 
             // tabDatei
             // 
+            this.tabDatei.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabDatei.Controls.Add(this.grpInformation);
             this.tabDatei.Controls.Add(this.grpOrdner);
             this.tabDatei.Controls.Add(this.grpDatei);
@@ -202,6 +198,7 @@ namespace BlueControls.Forms
             // 
             // grpInformation
             // 
+            this.grpInformation.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpInformation.CausesValidation = false;
             this.grpInformation.Controls.Add(this.Copyright);
             this.grpInformation.Controls.Add(this.btnInformation);
@@ -209,6 +206,8 @@ namespace BlueControls.Forms
             this.grpInformation.Location = new System.Drawing.Point(488, 0);
             this.grpInformation.Name = "grpInformation";
             this.grpInformation.Size = new System.Drawing.Size(280, 81);
+            this.grpInformation.TabIndex = 0;
+            this.grpInformation.TabStop = false;
             this.grpInformation.Text = "Information";
             // 
             // Copyright
@@ -232,6 +231,7 @@ namespace BlueControls.Forms
             // 
             // grpOrdner
             // 
+            this.grpOrdner.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpOrdner.CausesValidation = false;
             this.grpOrdner.Controls.Add(this.btnDatenbanken);
             this.grpOrdner.Controls.Add(this.btnTemporärenSpeicherortÖffnen);
@@ -239,6 +239,8 @@ namespace BlueControls.Forms
             this.grpOrdner.Location = new System.Drawing.Point(304, 0);
             this.grpOrdner.Name = "grpOrdner";
             this.grpOrdner.Size = new System.Drawing.Size(184, 81);
+            this.grpOrdner.TabIndex = 1;
+            this.grpOrdner.TabStop = false;
             this.grpOrdner.Text = "Ordner";
             // 
             // btnDatenbanken
@@ -265,6 +267,7 @@ namespace BlueControls.Forms
             // 
             // grpDatei
             // 
+            this.grpDatei.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpDatei.CausesValidation = false;
             this.grpDatei.Controls.Add(this.btnLetzteDateien);
             this.grpDatei.Controls.Add(this.btnOeffnen);
@@ -274,6 +277,8 @@ namespace BlueControls.Forms
             this.grpDatei.Location = new System.Drawing.Point(0, 0);
             this.grpDatei.Name = "grpDatei";
             this.grpDatei.Size = new System.Drawing.Size(304, 81);
+            this.grpDatei.TabIndex = 2;
+            this.grpDatei.TabStop = false;
             this.grpDatei.Text = "Datei";
             // 
             // btnLetzteDateien
@@ -322,10 +327,10 @@ namespace BlueControls.Forms
             // 
             // tabStart
             // 
+            this.tabStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabStart.Controls.Add(this.grpAnsicht);
             this.tabStart.Controls.Add(this.grpBearbeitung);
             this.tabStart.Controls.Add(this.grpFormularSteuerung);
-            this.tabStart.Controls.Add(this.grpFilter);
             this.tabStart.Controls.Add(this.grpAllgemein);
             this.tabStart.Location = new System.Drawing.Point(4, 25);
             this.tabStart.Name = "tabStart";
@@ -335,6 +340,7 @@ namespace BlueControls.Forms
             // 
             // grpAnsicht
             // 
+            this.grpAnsicht.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpAnsicht.CausesValidation = false;
             this.grpAnsicht.Controls.Add(this.cbxColumnArr);
             this.grpAnsicht.Controls.Add(this.SpaltAnsichtCap);
@@ -343,9 +349,11 @@ namespace BlueControls.Forms
             this.grpAnsicht.Controls.Add(this.Ansicht1);
             this.grpAnsicht.Controls.Add(this.Ansicht0);
             this.grpAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAnsicht.Location = new System.Drawing.Point(936, 0);
+            this.grpAnsicht.Location = new System.Drawing.Point(696, 0);
             this.grpAnsicht.Name = "grpAnsicht";
             this.grpAnsicht.Size = new System.Drawing.Size(464, 81);
+            this.grpAnsicht.TabIndex = 0;
+            this.grpAnsicht.TabStop = false;
             this.grpAnsicht.Text = "Ansichten-Auswahl";
             // 
             // SpaltAnsichtCap
@@ -398,14 +406,17 @@ namespace BlueControls.Forms
             // 
             // grpBearbeitung
             // 
+            this.grpBearbeitung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpBearbeitung.CausesValidation = false;
             this.grpBearbeitung.Controls.Add(this.Datenüberprüfung);
             this.grpBearbeitung.Controls.Add(this.AngezeigteZeilenLöschen);
             this.grpBearbeitung.Controls.Add(this.SuchenUndErsetzen);
             this.grpBearbeitung.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpBearbeitung.Location = new System.Drawing.Point(688, 0);
+            this.grpBearbeitung.Location = new System.Drawing.Point(448, 0);
             this.grpBearbeitung.Name = "grpBearbeitung";
             this.grpBearbeitung.Size = new System.Drawing.Size(248, 81);
+            this.grpBearbeitung.TabIndex = 1;
+            this.grpBearbeitung.TabStop = false;
             this.grpBearbeitung.Text = "Bearbeitung";
             // 
             // Datenüberprüfung
@@ -442,16 +453,18 @@ namespace BlueControls.Forms
             // 
             // grpFormularSteuerung
             // 
-            this.grpFormularSteuerung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(233)))), ((int)(((byte)(216)))));
+            this.grpFormularSteuerung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpFormularSteuerung.CausesValidation = false;
             this.grpFormularSteuerung.Controls.Add(this.SuchB);
             this.grpFormularSteuerung.Controls.Add(this.such);
             this.grpFormularSteuerung.Controls.Add(this.Vorwärts);
             this.grpFormularSteuerung.Controls.Add(this.zurück);
             this.grpFormularSteuerung.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpFormularSteuerung.Location = new System.Drawing.Point(448, 0);
+            this.grpFormularSteuerung.Location = new System.Drawing.Point(208, 0);
             this.grpFormularSteuerung.Name = "grpFormularSteuerung";
             this.grpFormularSteuerung.Size = new System.Drawing.Size(240, 81);
+            this.grpFormularSteuerung.TabIndex = 2;
+            this.grpFormularSteuerung.TabStop = false;
             this.grpFormularSteuerung.Text = "Formular-Ansicht-Steuerung";
             // 
             // SuchB
@@ -500,52 +513,9 @@ namespace BlueControls.Forms
             this.zurück.Text = "zurück";
             this.zurück.Click += new System.EventHandler(this.zurück_Click);
             // 
-            // grpFilter
-            // 
-            this.grpFilter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(233)))), ((int)(((byte)(216)))));
-            this.grpFilter.CausesValidation = false;
-            this.grpFilter.Controls.Add(this.btnTextLöschen);
-            this.grpFilter.Controls.Add(this.AlleFilterAus);
-            this.grpFilter.Controls.Add(this.ZeilenFilter_TextFeld);
-            this.grpFilter.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpFilter.Location = new System.Drawing.Point(208, 0);
-            this.grpFilter.Name = "grpFilter";
-            this.grpFilter.Size = new System.Drawing.Size(240, 81);
-            this.grpFilter.Text = "Filter";
-            // 
-            // btnTextLöschen
-            // 
-            this.btnTextLöschen.ImageCode = "Kreuz|16";
-            this.btnTextLöschen.Location = new System.Drawing.Point(144, 2);
-            this.btnTextLöschen.Name = "btnTextLöschen";
-            this.btnTextLöschen.Size = new System.Drawing.Size(24, 22);
-            this.btnTextLöschen.TabIndex = 11;
-            this.btnTextLöschen.Click += new System.EventHandler(this.btnTextLöschen_Click);
-            // 
-            // AlleFilterAus
-            // 
-            this.AlleFilterAus.ImageCode = "Trichter||||||||||Kreuz";
-            this.AlleFilterAus.Location = new System.Drawing.Point(176, 2);
-            this.AlleFilterAus.Name = "AlleFilterAus";
-            this.AlleFilterAus.Size = new System.Drawing.Size(56, 66);
-            this.AlleFilterAus.TabIndex = 9;
-            this.AlleFilterAus.Text = "alle Filter aus";
-            this.AlleFilterAus.Click += new System.EventHandler(this.AlleFilterAus_Click);
-            // 
-            // ZeilenFilter_TextFeld
-            // 
-            this.ZeilenFilter_TextFeld.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.ZeilenFilter_TextFeld.Location = new System.Drawing.Point(8, 2);
-            this.ZeilenFilter_TextFeld.Name = "ZeilenFilter_TextFeld";
-            this.ZeilenFilter_TextFeld.QuickInfo = "Texte können mit <b>+</b> kombiniert werden.<br><i>Kein Leerzeichen beim +-Zeiche" +
-    "n benutzen.";
-            this.ZeilenFilter_TextFeld.Size = new System.Drawing.Size(136, 22);
-            this.ZeilenFilter_TextFeld.TabIndex = 6;
-            this.ZeilenFilter_TextFeld.TextChanged += new System.EventHandler(this.ZeilenFilter_TextFeld_TextChanged);
-            this.ZeilenFilter_TextFeld.Enter += new System.EventHandler(this.ZeilenFilter_TextFeld_Enter);
-            // 
             // grpAllgemein
             // 
+            this.grpAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpAllgemein.CausesValidation = false;
             this.grpAllgemein.Controls.Add(this.btnNeu);
             this.grpAllgemein.Controls.Add(this.btnDrucken);
@@ -554,6 +524,8 @@ namespace BlueControls.Forms
             this.grpAllgemein.Location = new System.Drawing.Point(0, 0);
             this.grpAllgemein.Name = "grpAllgemein";
             this.grpAllgemein.Size = new System.Drawing.Size(208, 81);
+            this.grpAllgemein.TabIndex = 4;
+            this.grpAllgemein.TabStop = false;
             this.grpAllgemein.Text = "Allgemein";
             // 
             // btnNeu
@@ -591,6 +563,7 @@ namespace BlueControls.Forms
             // 
             // tabExtras
             // 
+            this.tabExtras.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabExtras.Controls.Add(this.grpEditor);
             this.tabExtras.Location = new System.Drawing.Point(4, 25);
             this.tabExtras.Name = "tabExtras";
@@ -600,6 +573,7 @@ namespace BlueControls.Forms
             // 
             // grpEditor
             // 
+            this.grpEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpEditor.CausesValidation = false;
             this.grpEditor.Controls.Add(this.AllgemeinerEditor);
             this.grpEditor.Controls.Add(this.BeziehungsEditor);
@@ -607,6 +581,8 @@ namespace BlueControls.Forms
             this.grpEditor.Location = new System.Drawing.Point(0, 0);
             this.grpEditor.Name = "grpEditor";
             this.grpEditor.Size = new System.Drawing.Size(152, 81);
+            this.grpEditor.TabIndex = 0;
+            this.grpEditor.TabStop = false;
             this.grpEditor.Text = "Editoren";
             // 
             // AllgemeinerEditor
@@ -631,6 +607,7 @@ namespace BlueControls.Forms
             // 
             // tabAdmin
             // 
+            this.tabAdmin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabAdmin.Enabled = false;
             this.tabAdmin.Location = new System.Drawing.Point(4, 25);
             this.tabAdmin.Name = "tabAdmin";
@@ -638,12 +615,26 @@ namespace BlueControls.Forms
             this.tabAdmin.TabIndex = 5;
             this.tabAdmin.Text = "Administration";
             // 
+            // Filter
+            // 
+            this.Filter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.Filter.Dock = System.Windows.Forms.DockStyle.Top;
+            this.Filter.Filtertypes = ((BlueControls.Enums.enFilterTypesToShow)((BlueControls.Enums.enFilterTypesToShow.SichtbareSpalten_DauerFilter | BlueControls.Enums.enFilterTypesToShow.SichtbareSpalten_AktiveFilter)));
+            this.Filter.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.Nothing;
+            this.Filter.Location = new System.Drawing.Point(0, 110);
+            this.Filter.Name = "Filter";
+            this.Filter.Size = new System.Drawing.Size(1212, 42);
+            this.Filter.TabIndex = 93;
+            this.Filter.TabStop = false;
+            this.Filter.Text = "Filter";
+            // 
             // frmTableView
             // 
             this.ClientSize = new System.Drawing.Size(1212, 730);
             this.Controls.Add(this.Formula);
             this.Controls.Add(this.TableView);
             this.Controls.Add(this.Zei);
+            this.Controls.Add(this.Filter);
             this.Controls.Add(this.MainRibbon);
             this.MinimumSize = new System.Drawing.Size(1024, 768);
             this.Name = "frmTableView";
@@ -657,7 +648,6 @@ namespace BlueControls.Forms
             this.grpAnsicht.ResumeLayout(false);
             this.grpBearbeitung.ResumeLayout(false);
             this.grpFormularSteuerung.ResumeLayout(false);
-            this.grpFilter.ResumeLayout(false);
             this.grpAllgemein.ResumeLayout(false);
             this.tabExtras.ResumeLayout(false);
             this.grpEditor.ResumeLayout(false);
@@ -675,9 +665,6 @@ namespace BlueControls.Forms
         private Button zurück;
         private Button btnLoeschen;
         private Button btnNeu;
-        private TextBox ZeilenFilter_TextFeld;
-        private Button AlleFilterAus;
-        private GroupBox grpFilter;
         private ComboBox btnDrucken;
         private Formula Formula;
         private Button btnOeffnen;
@@ -714,7 +701,7 @@ namespace BlueControls.Forms
         private GroupBox grpDatei;
         private RibbonBar MainRibbon;
         private tabAdministration tabAdmin;
-        private Button btnTextLöschen;
+        private Filterleiste Filter;
     }
 
 }

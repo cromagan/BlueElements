@@ -30,7 +30,6 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
-using System.Drawing.Imaging;
 
 namespace BlueControls.Controls
 {
@@ -196,17 +195,12 @@ namespace BlueControls.Controls
         protected override void DrawControl(Graphics gr, enStates state)
         {
 
-            if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(Width, Height, PixelFormat.Format32bppPArgb); }
-            var TMPGR = Graphics.FromImage(_BitmapOfControl);
-
-
-
 
             if (_DrawStyle != enComboboxStyle.TextBox)
             {
                 if (string.IsNullOrEmpty(_Initialtext) && !string.IsNullOrEmpty(Text)) { _Initialtext = Text; }
                 RowItem tempVar = null;
-                Button.DrawButton(this, TMPGR, ref tempVar, (enDesign)_DrawStyle, state, QuickImage.Get(_ImageCode), enAlignment.Horizontal_Vertical_Center, true, null, _Initialtext, DisplayRectangle, Translate);
+                Button.DrawButton(this, gr, ref tempVar, (enDesign)_DrawStyle, state, QuickImage.Get(_ImageCode), enAlignment.Horizontal_Vertical_Center, true, null, _Initialtext, DisplayRectangle, Translate);
                 DoReturn();
                 return;
             }
@@ -225,7 +219,7 @@ namespace BlueControls.Controls
             var i = Item[Text];
             if (i == null)
             {
-                base.DrawControl(TMPGR, state);
+                base.DrawControl(gr, state);
                 DoReturn();
                 return;
             }
@@ -236,7 +230,7 @@ namespace BlueControls.Controls
             if (Focused() && _DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown)
             {
                 // Focused = Bearbeitung erwünscht, Cursor anzeigen und KEINE Items zeichnen
-                base.DrawControl(TMPGR, state);
+                base.DrawControl(gr, state);
                 DoReturn();
                 return;
             }
@@ -248,7 +242,7 @@ namespace BlueControls.Controls
                 {
                     if (tempVar2.Symbol == null && tempVar2.IsClickable())
                     {
-                        base.DrawControl(TMPGR, state);
+                        base.DrawControl(gr, state);
                         DoReturn();
                         return;
                     }
@@ -256,7 +250,7 @@ namespace BlueControls.Controls
             }
 
 
-            Skin.Draw_Back(TMPGR, vType, state, DisplayRectangle, this, true);
+            Skin.Draw_Back(gr, vType, state, DisplayRectangle, this, true);
 
             if (!FloatingInputBoxListBoxStyle.IsShowing(this))
             {
@@ -264,21 +258,21 @@ namespace BlueControls.Controls
                 var r = i.Pos;
                 var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox().Height) / 2.0);
                 i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, (int)i.SizeUntouchedForListBox().Height));
-                i.Draw(TMPGR, 0, 0, enDesign.ComboBox_Textbox, enDesign.ComboBox_Textbox, state, false, string.Empty, Translate);
+                i.Draw(gr, 0, 0, enDesign.ComboBox_Textbox, enDesign.ComboBox_Textbox, state, false, string.Empty, Translate);
                 i.SetCoordinates(r);
             }
 
 
 
 
-            Skin.Draw_Border(TMPGR, vType, state, DisplayRectangle);
+            Skin.Draw_Border(gr, vType, state, DisplayRectangle);
 
             DoReturn();
 
             void DoReturn()
             {
-                gr.DrawImage(_BitmapOfControl, 0, 0);
-                TMPGR.Dispose();
+                //gr.DrawImage(_BitmapOfControl, 0, 0);
+                //TMPGR.Dispose();
                 btnDropDown.Invalidate();
             }
         }

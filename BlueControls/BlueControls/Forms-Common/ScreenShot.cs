@@ -26,7 +26,6 @@ using System.Drawing.Imaging;
 using System.Runtime.CompilerServices;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.Enums;
 using BlueControls.Forms;
 
 namespace BlueControls

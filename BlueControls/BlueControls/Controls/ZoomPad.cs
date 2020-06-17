@@ -20,8 +20,6 @@
 
 using BlueBasics;
 using BlueControls.Designer_Support;
-using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Drawing;

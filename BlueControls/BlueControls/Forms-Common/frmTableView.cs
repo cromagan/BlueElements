@@ -432,6 +432,7 @@ namespace BlueControls.Forms
             _Database = cDatabase;
             TableView.Database = cDatabase;
             Formula.Database = cDatabase;
+            Filter.Table = TableView;
 
 
             StandardTabx();
@@ -470,55 +471,55 @@ namespace BlueControls.Forms
 
 
 
-        private void ZeilenFilter_TextFeld_TextChanged(object sender, System.EventArgs e)
-        {
-            if (grpFilter.Visible == false) { return; }
+        //private void ZeilenFilter_TextFeld_TextChanged(object sender, System.EventArgs e)
+        //{
+        //    if (grpFilter.Visible == false) { return; }
 
-            var NeuerT = ZeilenFilter_TextFeld.Text.TrimStart();
-
-
-            NeuerT = NeuerT.TrimStart('+');
-            NeuerT = NeuerT.Replace("++", "+");
-            if (NeuerT == "+") { NeuerT = string.Empty; }
+        //    var NeuerT = ZeilenFilter_TextFeld.Text.TrimStart();
 
 
-
-            if (NeuerT != ZeilenFilter_TextFeld.Text)
-            {
-                ZeilenFilter_TextFeld.Text = NeuerT;
-                return;
-            }
+        //    NeuerT = NeuerT.TrimStart('+');
+        //    NeuerT = NeuerT.Replace("++", "+");
+        //    if (NeuerT == "+") { NeuerT = string.Empty; }
 
 
-            Filter_ZeilenFilterSetzen();
-        }
 
-        private void ZeilenFilter_TextFeld_Enter(object sender, System.EventArgs e)
-        {
-            Filter_ZeilenFilterSetzen();
-        }
+        //    if (NeuerT != ZeilenFilter_TextFeld.Text)
+        //    {
+        //        ZeilenFilter_TextFeld.Text = NeuerT;
+        //        return;
+        //    }
 
 
-        private void Filter_ZeilenFilterSetzen()
-        {
-            if (TableView.Database != null) { TableView.Filter.Remove_RowFilter(); }
+        //    Filter_ZeilenFilterSetzen();
+        //}
 
-            if (TableView.Database != null && !string.IsNullOrEmpty(ZeilenFilter_TextFeld.Text))
-            {
-                TableView.Filter.Add(enFilterType.Instr_UND_GroßKleinEgal, new List<string>(ZeilenFilter_TextFeld.Text.SplitBy("+")));
-            }
+        //private void ZeilenFilter_TextFeld_Enter(object sender, System.EventArgs e)
+        //{
+        //    Filter_ZeilenFilterSetzen();
+        //}
 
-        }
 
-        private void AlleFilterAus_Click(object sender, System.EventArgs e)
-        {
-            ZeilenFilter_TextFeld.Text = string.Empty;
+        //private void Filter_ZeilenFilterSetzen()
+        //{
+        //    if (TableView.Database != null) { TableView.Filter.Remove_RowFilter(); }
 
-            if (TableView.Filter != null)
-            {
-                TableView.Filter.Clear();
-            }
-        }
+        //    if (TableView.Database != null && !string.IsNullOrEmpty(ZeilenFilter_TextFeld.Text))
+        //    {
+        //        TableView.Filter.Add(enFilterType.Instr_UND_GroßKleinEgal, new List<string>(ZeilenFilter_TextFeld.Text.SplitBy("+")));
+        //    }
+
+        //}
+
+        //private void AlleFilterAus_Click(object sender, System.EventArgs e)
+        //{
+        //    ZeilenFilter_TextFeld.Text = string.Empty;
+
+        //    if (TableView.Filter != null)
+        //    {
+        //        TableView.Filter.Clear();
+        //    }
+        //}
 
 
 
@@ -604,23 +605,21 @@ namespace BlueControls.Forms
             Ansicht2.Checked = _Ansicht == enAnsicht.Tabelle_und_Formular_nebeneinander;
             Ansicht3.Checked = _Ansicht == enAnsicht.Tabelle_und_Formular_übereinander;
 
-            AlleFilterAus_Click(null, null);
+
+            TableView?.Filter?.Clear();
 
 
             switch (_Ansicht)
             {
                 case enAnsicht.Nur_Tabelle:
                     grpFormularSteuerung.Visible = false;
-                    grpFilter.Visible = true;
 
                     Formula.Visible = false;
 
                     Formula.Dock = System.Windows.Forms.DockStyle.None;
                     TableView.Dock = System.Windows.Forms.DockStyle.None;
 
-
                     TableView.Design = enBlueTableAppearance.Standard;
-
 
                     Formula.Dock = System.Windows.Forms.DockStyle.None;
                     TableView.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -628,7 +627,6 @@ namespace BlueControls.Forms
 
                 case enAnsicht.Überschriften_und_Formular:
                     grpFormularSteuerung.Visible = true;
-                    grpFilter.Visible = false;
                     TableView.Design = enBlueTableAppearance.OnlyMainColumnWithoutHead;
                     Formula.Visible = true;
 
@@ -641,7 +639,6 @@ namespace BlueControls.Forms
 
                 case enAnsicht.Tabelle_und_Formular_nebeneinander:
                     grpFormularSteuerung.Visible = false;
-                    grpFilter.Visible = true;
                     TableView.Design = enBlueTableAppearance.Standard;
                     Formula.Visible = true;
 
@@ -656,7 +653,6 @@ namespace BlueControls.Forms
 
                 case enAnsicht.Tabelle_und_Formular_übereinander:
                     grpFormularSteuerung.Visible = false;
-                    grpFilter.Visible = true;
                     TableView.Design = enBlueTableAppearance.Standard;
                     Formula.Visible = true;
 
@@ -820,17 +816,8 @@ namespace BlueControls.Forms
             Vorwärts.Enabled = DatenbankDa;
             zurück.Enabled = DatenbankDa;
             such.Enabled = DatenbankDa;
-            ZeilenFilter_TextFeld.Enabled = DatenbankDa;
-            btnTextLöschen.Enabled = DatenbankDa;
-            AlleFilterAus.Enabled = DatenbankDa;
 
-
-            if (LanguageTool.Translation != null)
-            {
-                ZeilenFilter_TextFeld.Enabled = false;
-            }
-
-
+            Filter.Enabled = DatenbankDa && TableView.Design != enBlueTableAppearance.OnlyMainColumnWithoutHead;
         }
 
 
@@ -1121,10 +1108,10 @@ namespace BlueControls.Forms
             TableView.WriteColumnArrangementsInto(cbxColumnArr);
         }
 
-        private void btnTextLöschen_Click(object sender, System.EventArgs e)
-        {
-            ZeilenFilter_TextFeld.Text = string.Empty;
-        }
+        //private void btnTextLöschen_Click(object sender, System.EventArgs e)
+        //{
+        //    ZeilenFilter_TextFeld.Text = string.Empty;
+        //}
 
 
 

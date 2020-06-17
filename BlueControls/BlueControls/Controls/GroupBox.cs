@@ -19,9 +19,7 @@
 
 using System;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Windows.Forms;
 using BlueBasics.Enums;
 using BlueControls.Enums;

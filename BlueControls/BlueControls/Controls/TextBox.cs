@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Imaging;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Forms;
@@ -58,8 +57,6 @@ namespace BlueControls.Controls
 
 
         #region  Variablen 
-        private bool _GeneratingBitmapOfControl;
-        protected Bitmap _BitmapOfControl;
         private enDataFormat _Format = enDataFormat.Text;
         private enSteuerelementVerhalten _Verhalten = enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
         private ExtText _eTxt;
@@ -1291,20 +1288,14 @@ namespace BlueControls.Controls
 
 
 
-            // ERST HIER! Manche Routinen ändern die Größe des Textfeldes.
-            if (_BitmapOfControl == null)
-            {
-                _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
-            }
 
 
-            var TMPGR = Graphics.FromImage(_BitmapOfControl);
 
-            Skin.Draw_Back(TMPGR, _eTxt.Design, state, DisplayRectangle, this, true);
-            Cursor_Show(TMPGR);
-            MarkAndGenerateZone(TMPGR);
+            Skin.Draw_Back(gr, _eTxt.Design, state, DisplayRectangle, this, true);
+            Cursor_Show(gr);
+            MarkAndGenerateZone(gr);
 
-            _eTxt.Draw(TMPGR, 1);
+            _eTxt.Draw(gr, 1);
 
 
             if (!string.IsNullOrEmpty(_Suffix))
@@ -1314,22 +1305,19 @@ namespace BlueControls.Controls
                 if (_eTxt.Chars.Count > 0)
                 {
                     r.X += 2;
-                    Skin.Draw_FormatedText(TMPGR, _Suffix, _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, false);
+                    Skin.Draw_FormatedText(gr, _Suffix, _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, false);
                 }
                 else
                 {
-                    Skin.Draw_FormatedText(TMPGR, "[in " + _Suffix + "]", _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, Translate);
+                    Skin.Draw_FormatedText(gr, "[in " + _Suffix + "]", _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, Translate);
                 }
             }
 
-            Skin.Draw_Border(TMPGR, _eTxt.Design, state, DisplayRectangle);
+            Skin.Draw_Border(gr, _eTxt.Design, state, DisplayRectangle);
 
 
 
 
-            gr.DrawImage(_BitmapOfControl, 0, 0);
-
-            TMPGR.Dispose();
 
             if (_MustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(true) && !SpellChecker.CancellationPending && !SpellChecker.IsBusy) { SpellChecker.RunWorkerAsync(); }
         }
@@ -1360,31 +1348,10 @@ namespace BlueControls.Controls
         }
 
 
-        public Bitmap BitmapOfControl()
-        {
-            if (_GeneratingBitmapOfControl) { return null; }
-            _GeneratingBitmapOfControl = true;
-            if (_BitmapOfControl == null) { Refresh(); }
-            _GeneratingBitmapOfControl = false;
-            return _BitmapOfControl;
-        }
 
 
 
-        protected override void OnSizeChanged(System.EventArgs e)
-        {
-            if (_BitmapOfControl != null)
-            {
-                if (_BitmapOfControl.Width < Width || _BitmapOfControl.Height < Height)
-                {
-                    _BitmapOfControl.Dispose();
-                    _BitmapOfControl = null;
-                }
-            }
 
-            Invalidate();
-            base.OnSizeChanged(e);
-        }
 
 
 

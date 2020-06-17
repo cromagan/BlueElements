@@ -319,7 +319,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capAktuellAngezeigteAnsicht
             // 
-            this.capAktuellAngezeigteAnsicht.CausesValidation = false;
             this.capAktuellAngezeigteAnsicht.Location = new System.Drawing.Point(16, 2);
             this.capAktuellAngezeigteAnsicht.Name = "capAktuellAngezeigteAnsicht";
             this.capAktuellAngezeigteAnsicht.Size = new System.Drawing.Size(112, 44);
