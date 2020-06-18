@@ -546,7 +546,7 @@ namespace BlueControls.Controls
         }
 
 
-        internal void DrawCreativePadTo(Graphics TMPGR, Size maxs, enStates vState, decimal zoomf, decimal X, decimal Y, List<BasicPadItem> VisibleItems)
+        internal void DrawCreativePadTo(Graphics gr, Size maxs, enStates vState, decimal zoomf, decimal X, decimal Y, List<BasicPadItem> visibleItems)
         {
             try
             {
@@ -554,15 +554,15 @@ namespace BlueControls.Controls
 
                 if (_Item.SheetSizeInMM.Width > 0 && _Item.SheetSizeInMM.Height > 0)
                 {
-                    Skin.Draw_Back(TMPGR, enDesign.Table_And_Pad, vState, DisplayRectangle, this, true);
+                    Skin.Draw_Back(gr, enDesign.Table_And_Pad, vState, DisplayRectangle, this, true);
                     var SSW = Math.Round(modConverter.mmToPixel((decimal)_Item.SheetSizeInMM.Width, ItemCollectionPad.DPI), 1);
                     var SSH = Math.Round(modConverter.mmToPixel((decimal)_Item.SheetSizeInMM.Height, ItemCollectionPad.DPI), 1);
                     var LO = new PointDF(0m, 0m).ZoomAndMove(zoomf, X, Y);
                     var RU = new PointDF(SSW, SSH).ZoomAndMove(zoomf, X, Y);
 
                     var R = new Rectangle((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
-                    TMPGR.FillRectangle(Brushes.White, R);
-                    TMPGR.DrawRectangle(PenGray, R);
+                    gr.FillRectangle(Brushes.White, R);
+                    gr.DrawRectangle(PenGray, R);
 
                     var rtx = (int)(_Item.P_rLO.X * zoomf - X);
                     var rty = (int)(_Item.P_rLO.Y * zoomf - Y);
@@ -571,18 +571,18 @@ namespace BlueControls.Controls
                     var Rr = new Rectangle(rtx, rty, rtx2 - rtx, rty2 - rty);
                     if (!_ShowInPrintMode)
                     {
-                        TMPGR.DrawRectangle(PenGray, Rr);
+                        gr.DrawRectangle(PenGray, Rr);
                     }
 
                 }
                 else
                 {
-                    TMPGR.Clear(Color.White);
+                    gr.Clear(Color.White);
                 }
 
-                if (!_Item.Draw(TMPGR, zoomf, X, Y, maxs, _ShowInPrintMode, VisibleItems))
+                if (!_Item.Draw(gr, zoomf, X, Y, maxs, _ShowInPrintMode, visibleItems))
                 {
-                    DrawCreativePadTo(TMPGR, maxs, vState, zoomf, X, Y, VisibleItems);
+                    DrawCreativePadTo(gr, maxs, vState, zoomf, X, Y, visibleItems);
                     return;
                 }
 
@@ -590,7 +590,7 @@ namespace BlueControls.Controls
                 // Erst Beziehungen, weil die die Grauen Punkte zeichnet
                 foreach (var ThisRelation in _Item.AllRelations)
                 {
-                    ThisRelation.Draw(TMPGR, zoomf, X, Y, _Item.AllRelations.IndexOf(ThisRelation));
+                    ThisRelation.Draw(gr, zoomf, X, Y, _Item.AllRelations.IndexOf(ThisRelation));
                 }
 
 
@@ -600,7 +600,7 @@ namespace BlueControls.Controls
                     // Alle Punkte mit Order anzeigen
                     foreach (var ThisPoint in _Item.AllPoints)
                     {
-                        ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
+                        ThisPoint.Draw(gr, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
                     }
                 }
 
@@ -613,11 +613,11 @@ namespace BlueControls.Controls
                 {
                     if (ThisPoint.CanMove(_Item.AllRelations))
                     {
-                        ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard, false);
+                        ThisPoint.Draw(gr, zoomf, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard, false);
                     }
                     else
                     {
-                        ThisPoint.Draw(TMPGR, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
+                        ThisPoint.Draw(gr, zoomf, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
                     }
                 }
 
@@ -631,14 +631,14 @@ namespace BlueControls.Controls
 
                     if (ThisRelation.RelationType == enRelationType.WaagerechtSenkrecht)
                     {
-                        TMPGR.DrawEllipse(new Pen(Color.Green, 3), P1.X - 4, P1.Y - 3, 7, 7);
-                        TMPGR.DrawEllipse(new Pen(Color.Green, 3), P2.X - 4, P2.Y - 3, 7, 7);
-                        TMPGR.DrawLine(new Pen(Color.Green, 1), P1, P2);
+                        gr.DrawEllipse(new Pen(Color.Green, 3), P1.X - 4, P1.Y - 3, 7, 7);
+                        gr.DrawEllipse(new Pen(Color.Green, 3), P2.X - 4, P2.Y - 3, 7, 7);
+                        gr.DrawLine(new Pen(Color.Green, 1), P1, P2);
                     }
                     else
                     {
-                        TMPGR.DrawEllipse(new Pen(Color.Green, 3), P1.X - 4, P1.Y - 4, 7, 7);
-                        TMPGR.DrawEllipse(new Pen(Color.Green, 3), P1.X - 8, P1.Y - 8, 15, 15);
+                        gr.DrawEllipse(new Pen(Color.Green, 3), P1.X - 4, P1.Y - 4, 7, 7);
+                        gr.DrawEllipse(new Pen(Color.Green, 3), P1.X - 8, P1.Y - 8, 15, 15);
                     }
                 }
 
@@ -648,26 +648,26 @@ namespace BlueControls.Controls
                 {
                     var DCoordinates = PA.UsedArea().ZoomAndMoveRect(zoomf, X, Y);
 
-                    TMPGR.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
+                    gr.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
                 }
 
-                TMPGR.Dispose();
+             //   TMPGR.Dispose();
             }
             catch
             {
-                DrawCreativePadTo(TMPGR, maxs, vState, zoomf, X, Y, VisibleItems);
+                DrawCreativePadTo(gr, maxs, vState, zoomf, X, Y, visibleItems);
             }
         }
 
 
 
 
-        internal void DrawCreativePadToBitmap(Bitmap BMP, enStates vState, decimal zoomf, decimal X, decimal Y, List<BasicPadItem> VisibleItems)
+        internal void DrawCreativePadToBitmap(Bitmap BMP, enStates vState, decimal zoomf, decimal X, decimal Y, List<BasicPadItem> visibleItems)
         {
 
-            var TMPGR = Graphics.FromImage(BMP);
-            DrawCreativePadTo(TMPGR, BMP.Size, vState, zoomf, X, Y, VisibleItems);
-            TMPGR.Dispose();
+            var gr = Graphics.FromImage(BMP);
+            DrawCreativePadTo(gr, BMP.Size, vState, zoomf, X, Y, visibleItems);
+            gr.Dispose();
         }
 
 

@@ -47,6 +47,8 @@ namespace BlueBasics
 
         protected GCHandle BitsHandle { get; private set; }
 
+       public PixelFormat _pixelformat = PixelFormat.Format32bppArgb;
+      //  public PixelFormat _pixelformat = PixelFormat.Format32bppPArgb;
 
         public BitmapExt(string filename) : this((Bitmap)Image_FromFile(filename)) { }
 
@@ -56,7 +58,7 @@ namespace BlueBasics
             Height = height;
             Bits = new int[Width * Height];
             BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-            Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppArgb, BitsHandle.AddrOfPinnedObject());
+            Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
         }
 
         /// <summary>
@@ -80,7 +82,7 @@ namespace BlueBasics
                 Height = bmp.Height;
                 Bits = new int[Width * Height];
                 BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-                Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppArgb, BitsHandle.AddrOfPinnedObject());
+                Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
 
                 using (var gr = Graphics.FromImage(Bitmap))
                 {
@@ -314,7 +316,7 @@ namespace BlueBasics
                 Height = height;
                 Bits = new int[Width * Height];
                 BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-                Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppArgb, BitsHandle.AddrOfPinnedObject());
+                Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
 
 
                 using (var GR = Graphics.FromImage(Bitmap))
