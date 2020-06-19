@@ -1790,7 +1790,7 @@ namespace BlueControls.Controls
 
             if (ContentHolderCellColumn.TextBearbeitungErlaubt)
             {
-                if (t.Count == 1)
+                if (t.Count == 1 && CellInThisDatabaseRow.CellIsNullOrEmpty(CellInThisDatabaseColumn))
                 {
                     // Bei nur einem Wert, wenn Texteingabe erlaubt, Dropdown öffnen
                     Cell_Edit(CellInThisDatabaseColumn, CellInThisDatabaseRow, false);

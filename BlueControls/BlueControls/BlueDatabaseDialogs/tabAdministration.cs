@@ -435,6 +435,12 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void Check_OrderButtons()
         {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => Check_OrderButtons()));
+                return;
+            }
+
             var enTabAllgemein = true;
             var enTabellenAnsicht = true;
             var enAnsichtsVerwaltung = true;

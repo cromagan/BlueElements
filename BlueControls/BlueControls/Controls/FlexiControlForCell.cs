@@ -396,6 +396,14 @@ namespace BlueControls.Controls
 
 
             var column1 = _tmpColumn;
+
+            if (column1 == null)
+            {
+                Develop.DebugPrint("Column nicht gefunden");
+                return;
+            }
+
+
             if (column1.Format == enDataFormat.LinkedCell)
             {
                 column1 = null;
