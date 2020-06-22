@@ -10,7 +10,7 @@ using BlueControls.Enums;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
-    public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserControl // 
+    public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserControl //  
     {
 
         private Table _TableView;
@@ -111,6 +111,9 @@ namespace BlueControls.BlueDatabaseDialogs
             if (_isFilling) { return; }
 
             _isFilling = true;
+
+
+            btnAdmin.Visible = _TableView != null && _TableView.Database != null && _TableView.Database.IsAdministrator();
 
             #region ZeilenFilter
             if (_TableView != null && _TableView.Database != null && _TableView.Filter.IsRowFilterActiv())
@@ -404,6 +407,17 @@ namespace BlueControls.BlueDatabaseDialogs
         {
             if (_TableView == null) { return; }
             _TableView.Pin(_TableView.SortedRows());
+
+        }
+
+        private void btnAdmin_Click(object sender, System.EventArgs e)
+        {
+            Database.SaveAll(false);
+            var x = new BlueControls.Forms.frmTableView(_TableView.Database,false, true);
+            x.ShowDialog();
+            x.Dispose();
+            Database.SaveAll(false);
+
 
         }
     }

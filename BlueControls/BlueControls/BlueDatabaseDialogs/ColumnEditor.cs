@@ -26,6 +26,7 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using static BlueBasics.Extensions;
 
 
 namespace BlueControls.BlueDatabaseDialogs
@@ -173,6 +174,8 @@ namespace BlueControls.BlueDatabaseDialogs
             txbUeberschift3.Text = _Column.Ueberschrift3;
 
             txbIntelligenter_Multifilter.Text = _Column.Intelligenter_Multifilter;
+
+            txbDauerFilterPos.Text = _Column.DauerFilterPos.ToString();
 
             txbPrefix.Text = _Column.Prefix;
 
@@ -487,6 +490,9 @@ namespace BlueControls.BlueDatabaseDialogs
 
             _Column.Prefix = txbPrefix.Text;
             _Column.Intelligenter_Multifilter = txbIntelligenter_Multifilter.Text;
+
+
+            _Column.DauerFilterPos = PointParse(txbDauerFilterPos.Text);
 
             var NewTags = tbxTags.Text.SplitByCRToList();
             if (NewTags.IsDifferentTo(_Column.Tags))

@@ -151,6 +151,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnTargetColumn = new BlueControls.Controls.Button();
             this.btnColumnKeyInColumn = new BlueControls.Controls.Button();
             this.capRowKeyInColumn = new BlueControls.Controls.Caption();
+            this.txbDauerFilterPos = new BlueControls.Controls.TextBox();
+            this.capDauerfilterPos = new BlueControls.Controls.Caption();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -175,6 +177,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabDesign
             // 
+            this.tabDesign.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabDesign.Controls.Add(this.butZusammenfassen);
             this.tabDesign.Controls.Add(this.cbxAlign);
             this.tabDesign.Controls.Add(this.txbReplacer);
@@ -210,7 +213,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabDesign.Size = new System.Drawing.Size(912, 487);
             this.tabDesign.TabIndex = 0;
             this.tabDesign.Text = "Design";
-            this.tabDesign.UseVisualStyleBackColor = true;
             // 
             // butZusammenfassen
             // 
@@ -462,6 +464,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // grpBildCode
             // 
+            this.grpBildCode.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpBildCode.CausesValidation = false;
             this.grpBildCode.Controls.Add(this.cbxBildCodeImageNotfound);
             this.grpBildCode.Controls.Add(this.capBildCodeImageNotfound);
@@ -470,6 +473,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpBildCode.Location = new System.Drawing.Point(456, 8);
             this.grpBildCode.Name = "grpBildCode";
             this.grpBildCode.Size = new System.Drawing.Size(440, 104);
+            this.grpBildCode.TabIndex = 2;
+            this.grpBildCode.TabStop = false;
             this.grpBildCode.Text = "Fomat: BildCode";
             // 
             // cbxBildCodeImageNotfound
@@ -508,6 +513,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabRechte
             // 
+            this.tabRechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabRechte.Controls.Add(this.grpAuswahlmenuOptionen);
             this.tabRechte.Controls.Add(this.btnIgnoreLock);
             this.tabRechte.Controls.Add(this.lbxCellEditor);
@@ -520,10 +526,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabRechte.Size = new System.Drawing.Size(912, 487);
             this.tabRechte.TabIndex = 1;
             this.tabRechte.Text = "Rechte";
-            this.tabRechte.UseVisualStyleBackColor = true;
             // 
             // grpAuswahlmenuOptionen
             // 
+            this.grpAuswahlmenuOptionen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpAuswahlmenuOptionen.CausesValidation = false;
             this.grpAuswahlmenuOptionen.Controls.Add(this.btnOtherValuesToo);
             this.grpAuswahlmenuOptionen.Controls.Add(this.tbxAuswaehlbareWerte);
@@ -534,6 +540,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpAuswahlmenuOptionen.Location = new System.Drawing.Point(32, 80);
             this.grpAuswahlmenuOptionen.Name = "grpAuswahlmenuOptionen";
             this.grpAuswahlmenuOptionen.Size = new System.Drawing.Size(536, 392);
+            this.grpAuswahlmenuOptionen.TabIndex = 0;
+            this.grpAuswahlmenuOptionen.TabStop = false;
             this.grpAuswahlmenuOptionen.Text = "Auswahlmenü-Optionen:";
             // 
             // btnOtherValuesToo
@@ -650,6 +658,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabAutoBearbeitung
             // 
+            this.tabAutoBearbeitung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabAutoBearbeitung.Controls.Add(this.txbAutoRemove);
             this.tabAutoBearbeitung.Controls.Add(this.capAutoRemove);
             this.tabAutoBearbeitung.Controls.Add(this.cbxSchlüsselspalte);
@@ -787,6 +796,9 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabFilter
             // 
+            this.tabFilter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabFilter.Controls.Add(this.capDauerfilterPos);
+            this.tabFilter.Controls.Add(this.txbDauerFilterPos);
             this.tabFilter.Controls.Add(this.cap_Intelligenter_Multifilter);
             this.tabFilter.Controls.Add(this.capDauerFilter);
             this.tabFilter.Controls.Add(this.cbxDauerFilter);
@@ -803,7 +815,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabFilter.Size = new System.Drawing.Size(912, 487);
             this.tabFilter.TabIndex = 2;
             this.tabFilter.Text = "Filter";
-            this.tabFilter.UseVisualStyleBackColor = true;
             // 
             // cap_Intelligenter_Multifilter
             // 
@@ -825,7 +836,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxDauerFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxDauerFilter.Location = new System.Drawing.Point(160, 264);
             this.cbxDauerFilter.Name = "cbxDauerFilter";
-            this.cbxDauerFilter.Size = new System.Drawing.Size(192, 24);
+            this.cbxDauerFilter.Size = new System.Drawing.Size(384, 24);
             this.cbxDauerFilter.TabIndex = 32;
             // 
             // Caption10
@@ -891,6 +902,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabQuickInfo
             // 
+            this.tabQuickInfo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabQuickInfo.Controls.Add(this.tbxAdminInfo);
             this.tabQuickInfo.Controls.Add(this.tbxQuickinfo);
             this.tabQuickInfo.Controls.Add(this.Caption18);
@@ -902,7 +914,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabQuickInfo.Size = new System.Drawing.Size(912, 487);
             this.tabQuickInfo.TabIndex = 3;
             this.tabQuickInfo.Text = "Quickinfo";
-            this.tabQuickInfo.UseVisualStyleBackColor = true;
             // 
             // tbxAdminInfo
             // 
@@ -960,6 +971,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabSonstiges
             // 
+            this.tabSonstiges.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabSonstiges.Controls.Add(this.butSaveContent);
             this.tabSonstiges.Controls.Add(this.txbSortMask);
             this.tabSonstiges.Controls.Add(this.btnSpellChecking);
@@ -977,7 +989,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabSonstiges.Size = new System.Drawing.Size(912, 487);
             this.tabSonstiges.TabIndex = 4;
             this.tabSonstiges.Text = "Sonstiges allgemein";
-            this.tabSonstiges.UseVisualStyleBackColor = true;
             // 
             // butSaveContent
             // 
@@ -1151,7 +1162,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.BlueFrame1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.BlueFrame1.BackColor = System.Drawing.SystemColors.Control;
+            this.BlueFrame1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.BlueFrame1.CausesValidation = false;
             this.BlueFrame1.Controls.Add(this.capInfo);
             this.BlueFrame1.Controls.Add(this.Caption3);
@@ -1161,6 +1172,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BlueFrame1.Location = new System.Drawing.Point(8, 8);
             this.BlueFrame1.Name = "BlueFrame1";
             this.BlueFrame1.Size = new System.Drawing.Size(916, 104);
+            this.BlueFrame1.TabIndex = 16;
+            this.BlueFrame1.TabStop = false;
             this.BlueFrame1.Text = "Allgemein";
             // 
             // capInfo
@@ -1252,11 +1265,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabControl.HotTrack = true;
             this.tabControl.Location = new System.Drawing.Point(0, 120);
             this.tabControl.Name = "tabControl";
+            this.tabControl.SelectedIndex = 3;
             this.tabControl.Size = new System.Drawing.Size(920, 516);
             this.tabControl.TabIndex = 15;
             // 
             // tabSpezial
             // 
+            this.tabSpezial.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabSpezial.Controls.Add(this.grpLinkToFileSystem);
             this.tabSpezial.Controls.Add(this.grpLinkedDatabase);
             this.tabSpezial.Controls.Add(this.grpBildCode);
@@ -1268,6 +1283,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // grpLinkToFileSystem
             // 
+            this.grpLinkToFileSystem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpLinkToFileSystem.CausesValidation = false;
             this.grpLinkToFileSystem.Controls.Add(this.capBestFileStandardFolder);
             this.grpLinkToFileSystem.Controls.Add(this.txbBestFileStandardFolder);
@@ -1276,10 +1292,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpLinkToFileSystem.Location = new System.Drawing.Point(8, 8);
             this.grpLinkToFileSystem.Name = "grpLinkToFileSystem";
             this.grpLinkToFileSystem.Size = new System.Drawing.Size(440, 104);
+            this.grpLinkToFileSystem.TabIndex = 0;
+            this.grpLinkToFileSystem.TabStop = false;
             this.grpLinkToFileSystem.Text = "Format: Link To Filesystem";
             // 
             // grpLinkedDatabase
             // 
+            this.grpLinkedDatabase.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpLinkedDatabase.CausesValidation = false;
             this.grpLinkedDatabase.Controls.Add(this.grpColumnsForLinkedDatabase);
             this.grpLinkedDatabase.Controls.Add(this.grpVerlinkteZellen);
@@ -1288,6 +1307,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpLinkedDatabase.Location = new System.Drawing.Point(8, 120);
             this.grpLinkedDatabase.Name = "grpLinkedDatabase";
             this.grpLinkedDatabase.Size = new System.Drawing.Size(888, 360);
+            this.grpLinkedDatabase.TabIndex = 1;
+            this.grpLinkedDatabase.TabStop = false;
             this.grpLinkedDatabase.Text = "Format: LinkedCell (und dessen Columns / Values)";
             // 
             // grpColumnsForLinkedDatabase
@@ -1298,6 +1319,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpColumnsForLinkedDatabase.Location = new System.Drawing.Point(8, 64);
             this.grpColumnsForLinkedDatabase.Name = "grpColumnsForLinkedDatabase";
             this.grpColumnsForLinkedDatabase.Size = new System.Drawing.Size(872, 56);
+            this.grpColumnsForLinkedDatabase.TabIndex = 0;
+            this.grpColumnsForLinkedDatabase.TabStop = false;
             this.grpColumnsForLinkedDatabase.Text = "Format: Columns_für_LinkedCellDropdown";
             // 
             // grpVerlinkteZellen
@@ -1317,6 +1340,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpVerlinkteZellen.Location = new System.Drawing.Point(8, 128);
             this.grpVerlinkteZellen.Name = "grpVerlinkteZellen";
             this.grpVerlinkteZellen.Size = new System.Drawing.Size(872, 224);
+            this.grpVerlinkteZellen.TabIndex = 1;
+            this.grpVerlinkteZellen.TabStop = false;
             this.grpVerlinkteZellen.Text = "Format: Verlinkte Zellen";
             // 
             // txbZeichenkette
@@ -1407,6 +1432,21 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capRowKeyInColumn.Name = "capRowKeyInColumn";
             this.capRowKeyInColumn.Size = new System.Drawing.Size(320, 16);
             this.capRowKeyInColumn.Text = "Die zu suchende Zeile ist in dieser Spalte zu finden:";
+            // 
+            // txbDauerFilterPos
+            // 
+            this.txbDauerFilterPos.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbDauerFilterPos.Location = new System.Drawing.Point(160, 296);
+            this.txbDauerFilterPos.Name = "txbDauerFilterPos";
+            this.txbDauerFilterPos.Size = new System.Drawing.Size(384, 24);
+            this.txbDauerFilterPos.TabIndex = 33;
+            // 
+            // capDauerfilterPos
+            // 
+            this.capDauerfilterPos.Location = new System.Drawing.Point(8, 296);
+            this.capDauerfilterPos.Name = "capDauerfilterPos";
+            this.capDauerfilterPos.Size = new System.Drawing.Size(144, 24);
+            this.capDauerfilterPos.Text = "Dauerfilter-Pos.:";
             // 
             // ColumnEditor
             // 
@@ -1562,5 +1602,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private ComboBox cbxDauerFilter;
         private Caption cap_Intelligenter_Multifilter;
         private TextBox txbIntelligenter_Multifilter;
+        private Caption capDauerfilterPos;
+        private TextBox txbDauerFilterPos;
     }
 	}

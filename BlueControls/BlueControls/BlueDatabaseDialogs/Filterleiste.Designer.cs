@@ -33,6 +33,7 @@
             this.btnAlleFilterAus = new BlueControls.Controls.Button();
             this.btnPin = new BlueControls.Controls.Button();
             this.btnPinZurück = new BlueControls.Controls.Button();
+            this.btnAdmin = new BlueControls.Controls.Button();
             this.SuspendLayout();
             // 
             // btnTextLöschen
@@ -86,8 +87,20 @@
             this.btnPinZurück.TabIndex = 15;
             this.btnPinZurück.Click += new System.EventHandler(this.btnPinZurück_Click);
             // 
+            // btnAdmin
+            // 
+            this.btnAdmin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAdmin.ImageCode = "Zahnrad|16|||FF0000";
+            this.btnAdmin.Location = new System.Drawing.Point(928, 0);
+            this.btnAdmin.Name = "btnAdmin";
+            this.btnAdmin.Size = new System.Drawing.Size(24, 24);
+            this.btnAdmin.TabIndex = 16;
+            this.btnAdmin.Visible = false;
+            this.btnAdmin.Click += new System.EventHandler(this.btnAdmin_Click);
+            // 
             // Filterleiste
             // 
+            this.Controls.Add(this.btnAdmin);
             this.Controls.Add(this.btnPinZurück);
             this.Controls.Add(this.btnPin);
             this.Controls.Add(this.btnTextLöschen);
@@ -95,7 +108,6 @@
             this.Controls.Add(this.btnAlleFilterAus);
             this.Name = "Filterleiste";
             this.Size = new System.Drawing.Size(951, 53);
-            this.GroupBoxStyle = Enums.enGroupBoxStyle.Nothing;
             this.ResumeLayout(false);
 
         }
@@ -107,5 +119,6 @@
         private Controls.Button btnAlleFilterAus;
         private Controls.Button btnPin;
         private Controls.Button btnPinZurück;
+        private Controls.Button btnAdmin;
     }
 }

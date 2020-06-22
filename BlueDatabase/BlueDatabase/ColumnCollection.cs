@@ -23,6 +23,7 @@ using BlueBasics;
 using BlueDatabase.Enums;
 using static BlueBasics.FileOperations;
 using BlueBasics.Enums;
+using System.Drawing;
 
 namespace BlueDatabase
 {
@@ -509,6 +510,8 @@ namespace BlueDatabase
 
             c.Suffix = Source.Suffix;
             c.Intelligenter_Multifilter = Source.Intelligenter_Multifilter;
+
+            c.DauerFilterPos = new Point(Source.DauerFilterPos.X, Source.DauerFilterPos.Y);
 
             c.LinkedKeyKennung = Source.LinkedKeyKennung;
             c.LinkedDatabaseFile = Source.LinkedDatabaseFile;

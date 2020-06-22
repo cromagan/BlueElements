@@ -83,6 +83,7 @@ namespace BlueDatabase.Enums
         VerwaisteDaten = 62,
         ImportScript = 63,
         GlobalScale = 64,
+        FilterImagePfad = 65,
 
 
         Info_ColumDataSart = 100,
@@ -185,6 +186,7 @@ namespace BlueDatabase.Enums
         co_SaveContent = 191,
         co_AutoFilter_Dauerfilter = 192,
         co_Intelligenter_Multifilter = 193,
+        co_DauerFilterPos = 194,
 
 
 

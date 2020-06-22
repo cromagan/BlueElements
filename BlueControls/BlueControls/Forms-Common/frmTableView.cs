@@ -39,12 +39,11 @@ namespace BlueControls.Forms
 {
     public partial class frmTableView
     {
-        public frmTableView() : this(null, true, true, false) { }
-        public frmTableView(Database Database) : this(Database, false, false, false) { }
+        public frmTableView() : this(null, true, true) { }
+        public frmTableView(Database Database) : this(Database, false, false) { }
 
-        public frmTableView(Database database, bool loadTabVisible, bool adminTabVisible, bool changeSkin)
+        public frmTableView(Database database, bool loadTabVisible, bool adminTabVisible)
         {
-            ChangeSkin = changeSkin;
             InitializeComponent();
 
 
@@ -82,7 +81,6 @@ namespace BlueControls.Forms
             DatabaseSet(database);
         }
 
-        private bool ChangeSkin = false;
         private Database _Database;
         private enAnsicht _Ansicht = enAnsicht.Nur_Tabelle;
         private const string _Version = "1.0001";

@@ -193,7 +193,7 @@ namespace BlueDatabase
         private string _ImportScript;
         private enAnsicht _Ansicht;
         private double _GlobalScale;
-
+        private string _FilterImagePfad;
 
         public readonly ListExt<RuleItem> Rules = new ListExt<RuleItem>();
         public readonly ListExt<ColumnViewCollection> ColumnArrangements = new ListExt<ColumnViewCollection>();
@@ -354,7 +354,7 @@ namespace BlueDatabase
 
             _GlobalScale = 1f;
             _Ansicht = enAnsicht.Unverändert;
-
+            FilterImagePfad = string.Empty;
 
             _sortDefinition = null;
 
@@ -396,6 +396,24 @@ namespace BlueDatabase
             {
                 if (_GlobalScale == value) { return; }
                 AddPending(enDatabaseDataType.GlobalScale, -1, -1, _GlobalScale.ToString(), value.ToString(), true);
+                Cell.InvalidateAllSizes();
+            }
+        }
+
+
+
+
+        [Browsable(false)]
+        public string FilterImagePfad
+        {
+            get
+            {
+                return _FilterImagePfad;
+            }
+            set
+            {
+                if (_FilterImagePfad == value) { return; }
+                AddPending(enDatabaseDataType.FilterImagePfad, -1, -1, _FilterImagePfad, value, true);
                 Cell.InvalidateAllSizes();
             }
         }
@@ -1196,6 +1214,9 @@ namespace BlueDatabase
                 case enDatabaseDataType.GlobalScale:
                     _GlobalScale = double.Parse(Inhalt);
                     break;
+                case enDatabaseDataType.FilterImagePfad:
+                    _FilterImagePfad = Inhalt;
+                    break;
                 case enDatabaseDataType.Ansicht:
                     _Ansicht = (enAnsicht)int.Parse(Inhalt);
                     break;
@@ -1543,7 +1564,7 @@ namespace BlueDatabase
             var f = base.ErrorReason(mode);
             if (!string.IsNullOrEmpty(f)) { return f; }
 
-            if (mode.HasFlag(enErrorReason.Save) || mode.HasFlag(enErrorReason.Load)|| mode.HasFlag(enErrorReason.EditGeneral))
+            if (mode.HasFlag(enErrorReason.Save) || mode.HasFlag(enErrorReason.Load) || mode.HasFlag(enErrorReason.EditGeneral))
             {
                 if (Cell.Freezed) { return "Datenbank gerade eingefroren."; }
             }
@@ -2067,6 +2088,8 @@ namespace BlueDatabase
                 SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
 
                 SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
+
+                SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _FilterImagePfad);
 
 
                 Column.SaveToByteList(l);
@@ -2916,7 +2939,7 @@ namespace BlueDatabase
         {
             if (Cell.Freezed)
             {
-      //          Develop.DebugPrint(enFehlerArt.Warnung, "Reload unmöglich, Datenbankstatus eingefroren");
+                //          Develop.DebugPrint(enFehlerArt.Warnung, "Reload unmöglich, Datenbankstatus eingefroren");
                 return true;
             }
             return false;

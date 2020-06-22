@@ -126,6 +126,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 _Database.ReloadDelaySecond = 1;
             }
 
+            _Database.FilterImagePfad = txbFilterImagePath.Text;
 
             if (tbxTags.Text != _Database.Tags.JoinWithCr())
             {
@@ -266,6 +267,8 @@ namespace BlueControls.BlueDatabaseDialogs
             txbCaption.Text = _Database.Caption;
             tbxReloadVerzoegerung.Text = _Database.ReloadDelaySecond.ToString();
             txbGlobalScale.Text = _Database.GlobalScale.ToString();
+
+            txbFilterImagePath.Text = _Database.FilterImagePfad;
 
             tbxUndoAnzahl.Text = _Database.UndoCount.ToString();
 

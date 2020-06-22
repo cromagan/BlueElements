@@ -32,6 +32,7 @@ using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 using BlueBasics.EventArgs;
 using BlueBasics.MultiUserFile;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase
 {
@@ -48,6 +49,7 @@ namespace BlueDatabase
         private Bitmap _CaptionBitmap;
         private string _QuickInfo;
         private string _Intelligenter_Multifilter;
+        private Point _DauerFilterPos;
         private string _Ueberschrift1;
         private string _Ueberschrift2;
         private string _Ueberschrift3;
@@ -243,6 +245,8 @@ namespace BlueDatabase
             _BestFile_StandardSuffix = string.Empty;
             _BestFile_StandardFolder = string.Empty;
             _UcaseNamesSortedByLenght = null;
+            _Intelligenter_Multifilter = string.Empty;
+            _DauerFilterPos = Point.Empty;
 
             #endregion
 
@@ -455,7 +459,19 @@ namespace BlueDatabase
                 OnChanged();
             }
         }
-
+        public Point DauerFilterPos
+        {
+            get
+            {
+                return _DauerFilterPos;
+            }
+            set
+            {
+                if (_DauerFilterPos.ToString() == value.ToString()) { return; }
+                Database.AddPending(enDatabaseDataType.co_DauerFilterPos, this, _DauerFilterPos.ToString(), value.ToString(), true);
+                OnChanged();
+            }
+        }
         public string Ueberschrift1
         {
             get
@@ -1520,6 +1536,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_LinieRight: _LineRight = (enColumnLineStyle)int.Parse(Wert); break;
                 case enDatabaseDataType.co_QuickInfo: _QuickInfo = Wert; break;
                 case enDatabaseDataType.co_Intelligenter_Multifilter: _Intelligenter_Multifilter = Wert; break;
+                case enDatabaseDataType.co_DauerFilterPos: _DauerFilterPos = PointParse(Wert); break;
                 case enDatabaseDataType.co_Ueberschrift1: _Ueberschrift1 = Wert; break;
                 case enDatabaseDataType.co_Ueberschrift2: _Ueberschrift2 = Wert; break;
                 case enDatabaseDataType.co_Ueberschrift3: _Ueberschrift3 = Wert; break;
@@ -1918,6 +1935,9 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_Align, ((int)_Align).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_SortMask, _SortMask, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Intelligenter_Multifilter, _Intelligenter_Multifilter, Key);
+
+            Database.SaveToByteList(l, enDatabaseDataType.co_DauerFilterPos, _DauerFilterPos.ToString(), Key);
+
 
             //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
             Database.SaveToByteList(l, enDatabaseDataType.co_Identifier, _Identifier, Key);
