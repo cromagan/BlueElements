@@ -173,8 +173,17 @@ namespace BlueBasics.MultiUserFile
 
         private void PureBinSaver_DoWork(object sender, DoWorkEventArgs e)
         {
-            var Data = WriteTempFileToDisk(true);
-            PureBinSaver.ReportProgress(100, Data);
+
+            try
+            {
+                var Data = WriteTempFileToDisk(true);
+                PureBinSaver.ReportProgress(100, Data);
+            }
+            catch
+            {
+                // OPeration completed bereits aufgerufen
+            }
+
         }
 
         public void SetReadOnly()

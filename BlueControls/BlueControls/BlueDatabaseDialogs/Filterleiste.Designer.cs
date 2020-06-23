@@ -34,6 +34,8 @@
             this.btnPin = new BlueControls.Controls.Button();
             this.btnPinZurück = new BlueControls.Controls.Button();
             this.btnAdmin = new BlueControls.Controls.Button();
+            this.pic = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pic)).BeginInit();
             this.SuspendLayout();
             // 
             // btnTextLöschen
@@ -98,8 +100,23 @@
             this.btnAdmin.Visible = false;
             this.btnAdmin.Click += new System.EventHandler(this.btnAdmin_Click);
             // 
+            // pic
+            // 
+            this.pic.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pic.BackColor = System.Drawing.Color.White;
+            this.pic.Location = new System.Drawing.Point(8, 40);
+            this.pic.Name = "pic";
+            this.pic.Size = new System.Drawing.Size(936, 104);
+            this.pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pic.TabIndex = 17;
+            this.pic.TabStop = false;
+            this.pic.Visible = false;
+            // 
             // Filterleiste
             // 
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.Controls.Add(this.pic);
             this.Controls.Add(this.btnAdmin);
             this.Controls.Add(this.btnPinZurück);
             this.Controls.Add(this.btnPin);
@@ -108,6 +125,8 @@
             this.Controls.Add(this.btnAlleFilterAus);
             this.Name = "Filterleiste";
             this.Size = new System.Drawing.Size(951, 53);
+            this.SizeChanged += new System.EventHandler(this.Filterleiste_SizeChanged);
+            ((System.ComponentModel.ISupportInitialize)(this.pic)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -120,5 +139,6 @@
         private Controls.Button btnPin;
         private Controls.Button btnPinZurück;
         private Controls.Button btnAdmin;
+        private System.Windows.Forms.PictureBox pic;
     }
 }

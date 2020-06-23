@@ -278,7 +278,7 @@ namespace BlueControls.Controls
                 _Value = value;
                 UpdateValueToControl();
 
-                if (!Focused || _InstantChangedEvent) { CheckIfChanged(); }
+                if (InvokeRequired || !Focused || _InstantChangedEvent) { CheckIfChanged(); }
                 //OnValueChanged();
             }
         }

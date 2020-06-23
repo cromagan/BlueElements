@@ -41,17 +41,18 @@ namespace BlueBasics
         private static TextWriterTraceListener _TraceListener;
         private static bool _DeleteTraceLog = true;
         private static bool _IsTraceLogging;
-        private static bool _ServiceStarted;
         private readonly static DateTime _ProgrammStarted = DateTime.Now;
 
         [DefaultValue(false)]
-        public static bool Exited { get; private set; }
+        public static bool Exited { get; private set; } = false;
 
+        [DefaultValue(false)]
+        public static bool ServiceStarted { get; private set; } = false;
 
         public static bool IsDevelopment()
         {
             return IsHostRunning(); // { return true; }
-         //   return System.Windows.Forms.Application.StartupPath.ToLower().Contains("\\bin\\") && IsPeterChr();
+                                    //   return System.Windows.Forms.Application.StartupPath.ToLower().Contains("\\bin\\") && IsPeterChr();
         }
 
         public static bool IsHostRunning()
@@ -74,7 +75,7 @@ namespace BlueBasics
                     _TraceListener.Close();
                     _TraceListener.Dispose();
                     _TraceListener = null;
-                    if (_DeleteTraceLog && FileExists(_CurrentTraceLogFile)) { File.Delete(_CurrentTraceLogFile); }
+                    if (_DeleteTraceLog && FileExists(_CurrentTraceLogFile)) { BlueBasics.FileOperations.DeleteFile(_CurrentTraceLogFile, false); }
                 }
             }
             catch
@@ -377,22 +378,24 @@ namespace BlueBasics
 
         public static void StartService()
         {
-            if (_ServiceStarted) { return; }
+            if (ServiceStarted) { return; }
 
-            _ServiceStarted = true;
+            ServiceStarted = true;
             var ci = new CultureInfo("de-DE");
-            ci.NumberFormat.CurrencyGroupSeparator = "";
-            ci.NumberFormat.NumberGroupSeparator = "";
-            ci.NumberFormat.PercentGroupSeparator = "";
+            ci.NumberFormat.CurrencyGroupSeparator = string.Empty;
+            ci.NumberFormat.NumberGroupSeparator = string.Empty;
+            ci.NumberFormat.PercentGroupSeparator = string.Empty;
             ci.NumberFormat.NumberDecimalSeparator = ",";
             System.Windows.Forms.Application.CurrentCulture = ci;
+            CultureInfo.DefaultThreadCurrentCulture = ci;
+            CultureInfo.DefaultThreadCurrentUICulture = ci;
             TraceLogging_Start(TempFile("", AppName() + "-Trace.html"));
 
             var Check = new System.Windows.Forms.Timer();
             Check.Tick += CloseAfter12Hours;
             Check.Interval = 60000;
             Check.Enabled = true;
-        }
+       }
 
         private static void CloseAfter12Hours(object sender, System.EventArgs e)
         {

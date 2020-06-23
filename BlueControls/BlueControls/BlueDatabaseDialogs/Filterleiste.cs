@@ -10,7 +10,7 @@ using BlueControls.Enums;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
-    public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserControl //  
+    public partial class Filterleiste : GroupBox // System.Windows.Forms.UserControl //  
     {
 
         private Table _TableView;
@@ -132,6 +132,7 @@ namespace BlueControls.BlueDatabaseDialogs
             var down = 0;
             var right = 0;
             System.Windows.Forms.AnchorStyles anchor;
+            var showPic = false;
 
 
             if (_orientation == enOrientation.Waagerecht)
@@ -151,6 +152,36 @@ namespace BlueControls.BlueDatabaseDialogs
                 right = 0;
                 anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
                 down = txbZeilenFilter.Height + Skin.Padding;
+
+                showPic = _TableView != null && _TableView.Database != null && !string.IsNullOrEmpty(_TableView.Database.FilterImagePfad);
+
+            }
+
+
+            if (showPic)
+            {
+                pic.Height = (int)(pic.Width * 0.7);
+                var filename = _TableView.Database.FilterImagePfad;
+                if (pic.Tag is string tx)
+                {
+                    if (tx != filename) { pic.Tag = null; }
+                }
+
+                if (pic.Tag == null)
+                {
+                    if (FileOperations.FileExists(filename))
+                    {
+                        pic.Image = BitmapExt.Image_FromFile(filename);
+                    }
+                }
+                pic.Tag = filename;
+                pic.Top = down;
+                pic.Visible = true;
+                down = pic.Bottom + Skin.Padding;
+            }
+            else
+            {
+                pic.Visible = false;
             }
 
 
@@ -413,11 +444,22 @@ namespace BlueControls.BlueDatabaseDialogs
         private void btnAdmin_Click(object sender, System.EventArgs e)
         {
             Database.SaveAll(false);
-            var x = new BlueControls.Forms.frmTableView(_TableView.Database,false, true);
+            var x = new BlueControls.Forms.frmTableView(_TableView.Database, false, true);
             x.ShowDialog();
             x.Dispose();
             Database.SaveAll(false);
 
+
+        }
+
+        private void Filterleiste_SizeChanged(object sender, System.EventArgs e)
+        {
+
+
+           if (pic.Visible)
+            {
+                FillFilters();
+            }
 
         }
     }

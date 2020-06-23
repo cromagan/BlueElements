@@ -91,6 +91,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption11 = new BlueControls.Controls.Caption();
             this.btnAutoEditAutoSort = new BlueControls.Controls.Button();
             this.tabFilter = new BlueControls.Controls.TabPage();
+            this.capDauerfilterPos = new BlueControls.Controls.Caption();
+            this.txbDauerFilterPos = new BlueControls.Controls.TextBox();
             this.cap_Intelligenter_Multifilter = new BlueControls.Controls.Caption();
             this.capDauerFilter = new BlueControls.Controls.Caption();
             this.cbxDauerFilter = new BlueControls.Controls.ComboBox();
@@ -151,8 +153,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnTargetColumn = new BlueControls.Controls.Button();
             this.btnColumnKeyInColumn = new BlueControls.Controls.Button();
             this.capRowKeyInColumn = new BlueControls.Controls.Caption();
-            this.txbDauerFilterPos = new BlueControls.Controls.TextBox();
-            this.capDauerfilterPos = new BlueControls.Controls.Caption();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -816,6 +816,21 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabFilter.TabIndex = 2;
             this.tabFilter.Text = "Filter";
             // 
+            // capDauerfilterPos
+            // 
+            this.capDauerfilterPos.Location = new System.Drawing.Point(8, 296);
+            this.capDauerfilterPos.Name = "capDauerfilterPos";
+            this.capDauerfilterPos.Size = new System.Drawing.Size(144, 24);
+            this.capDauerfilterPos.Text = "Dauerfilter-Pos.:";
+            // 
+            // txbDauerFilterPos
+            // 
+            this.txbDauerFilterPos.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbDauerFilterPos.Location = new System.Drawing.Point(160, 296);
+            this.txbDauerFilterPos.Name = "txbDauerFilterPos";
+            this.txbDauerFilterPos.Size = new System.Drawing.Size(384, 24);
+            this.txbDauerFilterPos.TabIndex = 33;
+            // 
             // cap_Intelligenter_Multifilter
             // 
             this.cap_Intelligenter_Multifilter.Location = new System.Drawing.Point(8, 216);
@@ -1265,7 +1280,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabControl.HotTrack = true;
             this.tabControl.Location = new System.Drawing.Point(0, 120);
             this.tabControl.Name = "tabControl";
-            this.tabControl.SelectedIndex = 3;
+            this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(920, 516);
             this.tabControl.TabIndex = 15;
             // 
@@ -1432,21 +1447,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capRowKeyInColumn.Name = "capRowKeyInColumn";
             this.capRowKeyInColumn.Size = new System.Drawing.Size(320, 16);
             this.capRowKeyInColumn.Text = "Die zu suchende Zeile ist in dieser Spalte zu finden:";
-            // 
-            // txbDauerFilterPos
-            // 
-            this.txbDauerFilterPos.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbDauerFilterPos.Location = new System.Drawing.Point(160, 296);
-            this.txbDauerFilterPos.Name = "txbDauerFilterPos";
-            this.txbDauerFilterPos.Size = new System.Drawing.Size(384, 24);
-            this.txbDauerFilterPos.TabIndex = 33;
-            // 
-            // capDauerfilterPos
-            // 
-            this.capDauerfilterPos.Location = new System.Drawing.Point(8, 296);
-            this.capDauerfilterPos.Name = "capDauerfilterPos";
-            this.capDauerfilterPos.Size = new System.Drawing.Size(144, 24);
-            this.capDauerfilterPos.Text = "Dauerfilter-Pos.:";
             // 
             // ColumnEditor
             // 
