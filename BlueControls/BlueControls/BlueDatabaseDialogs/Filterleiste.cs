@@ -98,7 +98,7 @@ namespace BlueControls.BlueDatabaseDialogs
             FillFilters();
         }
 
-        private void FillFilters()
+        internal void FillFilters()
         {
 
 
@@ -160,7 +160,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (showPic)
             {
-                pic.Height = (int)(pic.Width * 0.7);
+                pic.Height = (int)Math.Min(pic.Width * 0.7, Height * 0.6);
                 var filename = _TableView.Database.FilterImagePfad;
                 if (pic.Tag is string tx)
                 {
@@ -177,7 +177,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 pic.Tag = filename;
                 pic.Top = down;
                 pic.Visible = true;
-                down = pic.Bottom + Skin.Padding;
+                toppos = pic.Bottom + Skin.Padding;
             }
             else
             {
@@ -236,19 +236,62 @@ namespace BlueControls.BlueDatabaseDialogs
                         else
                         {
                             // Na gut, eben neuen Flex erstellen
-                            flx = new FlexiControlForFilter(_TableView, f, enÜberschriftAnordnung.Links_neben_Dem_Feld);
+                            flx = new FlexiControlForFilter(_TableView, f, enÜberschriftAnordnung.Links_neben_Dem_Feld, this);
                             flx.ValueChanged += Flx_ValueChanged;
                             flx.ButtonClicked += Flx_ButtonClicked;
                             Controls.Add(flx);
                         }
 
-                        flx.Top = toppos;
-                        flx.Left = leftpos;
-                        flx.Width = constwi;
-                        flx.Height = btnAlleFilterAus.Height;
-                        flx.Anchor = anchor;
-                        toppos += down;
-                        leftpos += right;
+
+                        if (showPic && !f.Column.DauerFilterPos.IsEmpty)
+                        {
+                            flx.Height = btnAlleFilterAus.Height * 2;
+
+
+                            if (flx.GetComboBox() is ComboBox cbx)
+                            {
+                                var data = cbx.Item.ItemData();  // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+                                var wi = Math.Min(data.Item1 + Skin.Padding + 16, 100);
+
+                                flx.Width = wi;
+                            }
+                            else
+                            {
+                                flx.Width = 100;
+                            }
+
+
+                            var sc = Math.Min(pic.Width / (float)pic.Image.Width, pic.Height / (float)pic.Image.Height);
+
+                            var xr = (int)(pic.Image.Width * sc); // x REal angezeigte breite
+                            var xab = (pic.Width - xr) / 2; // x Abstand
+                            var xm = (int)(f.Column.DauerFilterPos.X / 10000f * xr) + xab; // Filter X mitte
+                            flx.Left = xm - flx.Width / 2 + pic.Left;
+
+                            var yr = (int)(pic.Image.Height * sc); // Y REal angezeigte breite
+                            var yab = (pic.Height - yr) / 2; // Y Abstand
+                            var ym = (int)(f.Column.DauerFilterPos.Y / 10000f * yr) + yab; ; // Filter X mitte
+                            flx.Top = ym - flx.Height / 2 + pic.Top;
+
+
+
+                            flx.BringToFront();
+
+
+
+                        }
+                        else
+                        {
+
+                            flx.Top = toppos;
+                            flx.Left = leftpos;
+                            flx.Width = constwi;
+                            flx.Height = btnAlleFilterAus.Height;
+                            flx.Anchor = anchor;
+                            toppos += down;
+                            leftpos += right;
+                        }
+
                     }
                 }
             }
@@ -456,7 +499,7 @@ namespace BlueControls.BlueDatabaseDialogs
         {
 
 
-           if (pic.Visible)
+            if (pic.Visible)
             {
                 FillFilters();
             }

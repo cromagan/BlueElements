@@ -139,6 +139,6 @@
         private Controls.Button btnPin;
         private Controls.Button btnPinZurück;
         private Controls.Button btnAdmin;
-        private System.Windows.Forms.PictureBox pic;
+        internal System.Windows.Forms.PictureBox pic;
     }
 }

@@ -877,7 +877,7 @@ namespace BlueControls.Controls
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
         {
 
-            switch (e.ClickedComand)
+            switch (e.ClickedComand.ToLower())
             {
                 case "#columnedit":
                     if (e.HotItem is ColumnItem col)

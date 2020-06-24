@@ -307,7 +307,10 @@ namespace BlueControls.ItemCollection
             return p;
         }
 
-
+        /// <summary>
+        ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+        /// </summary>
+        /// <returns></returns>
         internal Tuple<int, int, int, enOrientation> ItemData() // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
         {
             var w = 16;

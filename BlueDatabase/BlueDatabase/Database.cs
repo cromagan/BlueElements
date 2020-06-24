@@ -354,7 +354,7 @@ namespace BlueDatabase
 
             _GlobalScale = 1f;
             _Ansicht = enAnsicht.Unverändert;
-            FilterImagePfad = string.Empty;
+            _FilterImagePfad = string.Empty;
 
             _sortDefinition = null;
 
