@@ -385,14 +385,20 @@ namespace BlueDatabase
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
+        public void RemoveOtherAndAddIfNotExists(ColumnItem column, enFilterType filterType, string filterBy)
+        {
+
+            RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy));
+        }
+
         public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, string filterBy)
         {
 
-            var tmp = Database.Column[columName];
-            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
+            var column = Database.Column[columName];
+            if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
 
 
-            RemoveOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy));
+            RemoveOtherAndAddIfNotExists(column, filterType, filterBy);
         }
 
         public void RemoveOtherAndAddIfNotExists(FilterItem filterItem)
