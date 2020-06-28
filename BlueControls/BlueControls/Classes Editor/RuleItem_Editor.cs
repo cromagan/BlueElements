@@ -18,7 +18,6 @@
 #endregion
 
 using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 
@@ -30,13 +29,6 @@ namespace BlueControls.Classes_Editor
         public RuleItem_Editor()
         {
             InitializeComponent();
-        }
-
-        private RuleItem tmp;
-
-        protected override void ConvertObject(IObjectWithDialog ThisObject)
-        {
-            tmp = (RuleItem)ThisObject;
         }
 
         protected override void PrepaireFormula()
@@ -57,7 +49,7 @@ namespace BlueControls.Classes_Editor
             lstActionSelector.Item.Clear();
 
 
-            foreach (var ThisAction in tmp.Actions)
+            foreach (var ThisAction in Item.Actions)
             {
                 if (ThisAction != null)
                 {
@@ -72,7 +64,7 @@ namespace BlueControls.Classes_Editor
             }
             else
             {
-                RuleActionEditor.ObjectWithDialog = null;
+                RuleActionEditor.Item = null;
             }
         }
 
@@ -80,64 +72,64 @@ namespace BlueControls.Classes_Editor
 
         private void ActionSelector_AddClicked(object sender, System.EventArgs e)
         {
-            if (tmp== null)
+            if (Item== null)
             {
                 Forms.Notification.Show("Bitte vorher eine Regel auswählen.");
                 return;
             }
 
 
-            var NewAction = new RuleActionItem(tmp, 0, string.Empty, null);
-            tmp.Actions.Add(NewAction);
+            var NewAction = new RuleActionItem(Item, 0, string.Empty, null);
+            Item.Actions.Add(NewAction);
 
             var NewActionItem = new TextListItem(NewAction);
 
             lstActionSelector.Item.Add(NewActionItem);
 
             NewActionItem.Checked = true;
-            OnChanged(tmp);
+            OnChanged(Item);
         }
 
         private void lstActionSelector_ItemCheckedChanged(object sender, System.EventArgs e)
         {
             if (lstActionSelector.Item.Checked().Count != 1)
             {
-                RuleActionEditor.ObjectWithDialog = null;
+                RuleActionEditor.Item = null;
                 return;
             }
 
             var SelectedAction = (RuleActionItem)((TextListItem)lstActionSelector.Item.Checked()[0]).Tags;
-            RuleActionEditor.ObjectWithDialog = SelectedAction;
+            RuleActionEditor.Item = SelectedAction;
         }
 
         private void RuleActionEditor_Changed(object sender, System.EventArgs e)
         {
 
-            if (IsFilling()) { return; }
+            if (IsFilling) { return; }
 
 
             foreach (var thisitem in lstActionSelector.Item)
             {
                 if (thisitem is TextListItem tli)
                 {
-                    if (tli.Tags == RuleActionEditor.ObjectWithDialog)
+                    if (tli.Tags == RuleActionEditor.Item)
                     {
-                        tli.Text = RuleActionEditor.ObjectWithDialog.ReadableText();
-                        tli.Symbol = RuleActionEditor.ObjectWithDialog.SymbolForReadableText();
+                        tli.Text = RuleActionEditor.Item.ReadableText();
+                        tli.Symbol = RuleActionEditor.Item.SymbolForReadableText();
                     }
                 }
             }
 
 
-            OnChanged(tmp);
+            OnChanged(Item);
         }
 
 
         private void lstActionSelector_ItemRemoving(object sender, ListEventArgs e)
         {
-            if (tmp == null) { return; }
-            tmp.Actions.Remove((RuleActionItem)((TextListItem)e.Item).Tags);
-            OnChanged(tmp);
+            if (Item == null) { return; }
+            Item.Actions.Remove((RuleActionItem)((TextListItem)e.Item).Tags);
+            OnChanged(Item);
         }
 
 
@@ -148,7 +140,7 @@ namespace BlueControls.Classes_Editor
             RuleActionEditor.Enabled = false;
 
             lstActionSelector.Item.Clear();
-            RuleActionEditor.ObjectWithDialog = null;
+            RuleActionEditor.Item = null;
         }
     }
 }

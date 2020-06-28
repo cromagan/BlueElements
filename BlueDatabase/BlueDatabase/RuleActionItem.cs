@@ -28,7 +28,7 @@ using System.Text.RegularExpressions;
 
 namespace BlueDatabase
 {
-    public sealed class RuleActionItem : IObjectWithDialog, IParseable, IReadableText, IComparable, ICompareKey, ICloneable, ICheckable, ICanBeEmpty
+    public sealed class RuleActionItem : IParseable, IReadableText, IComparable, ICompareKey, ICloneable, ICheckable, ICanBeEmpty
     {
         #region  Variablen-Deklarationen 
 

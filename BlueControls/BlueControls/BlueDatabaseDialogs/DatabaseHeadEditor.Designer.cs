@@ -310,7 +310,6 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Right)));
             this.RuleItemEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.RuleItemEditor.CausesValidation = false;
-            this.RuleItemEditor.IsDialog = false;
             this.RuleItemEditor.Location = new System.Drawing.Point(8, 384);
             this.RuleItemEditor.Name = "RuleItemEditor";
             this.RuleItemEditor.Size = new System.Drawing.Size(1023, 221);
@@ -549,7 +548,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ExportEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.ExportEditor.CausesValidation = false;
             this.ExportEditor.Enabled = false;
-            this.ExportEditor.IsDialog = false;
             this.ExportEditor.Location = new System.Drawing.Point(8, 176);
             this.ExportEditor.Name = "ExportEditor";
             this.ExportEditor.Size = new System.Drawing.Size(1031, 437);

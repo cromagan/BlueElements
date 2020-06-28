@@ -3,10 +3,11 @@ using System.Diagnostics;
 using System.Drawing;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueDatabase;
 
 namespace BlueControls.Classes_Editor
 {
-    internal partial class RuleItem_Editor : AbstractClassEditor
+    internal partial class RuleItem_Editor : AbstractClassEditor<RuleItem>
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
@@ -43,7 +44,7 @@ namespace BlueControls.Classes_Editor
             this.RuleActionEditor.CausesValidation = false;
             this.RuleActionEditor.Location = new Point(487, 16);
             this.RuleActionEditor.Name = "RuleActionEditor";
-            this.RuleActionEditor.ObjectWithDialog = null;
+            this.RuleActionEditor.Item = null;
             this.RuleActionEditor.Size = new Size(528, 216);
             this.RuleActionEditor.Text = "Aktion-Editor";
             this.RuleActionEditor.Changed += new EventHandler(RuleActionEditor_Changed);

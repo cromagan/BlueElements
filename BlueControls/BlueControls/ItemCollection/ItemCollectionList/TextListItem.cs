@@ -44,10 +44,21 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
+
+        /// <summary>
+        /// Fügt das übergebende Object den Tags hinzu.
+        /// </summary>
+        /// <param name="obj"></param>
         public TextListItem(IReadableText obj) : this(string.Empty, obj.ReadableText(), obj.SymbolForReadableText())
         {
             Tags = obj;
         }
+
+        /// <summary>
+        /// Fügt das übergebende Object den Tags hinzu.
+        /// </summary>
+        /// <param name="internalname"></param>
+        /// <param name="obj"></param>
         public TextListItem(string internalname, IReadableText obj) : this(internalname, obj.ReadableText(), obj.SymbolForReadableText())
         {
             Tags = obj;

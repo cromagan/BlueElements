@@ -5,10 +5,11 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueDatabase;
 
 namespace BlueControls.Classes_Editor
 {
-    internal partial class RuleActionItem_Editor : AbstractClassEditor
+    internal partial class RuleActionItem_Editor : AbstractClassEditor<RuleActionItem>
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

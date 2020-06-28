@@ -17,13 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Forms;
-using BlueControls.Enums;
-using BlueDatabase;
-using BlueDatabase.EventArgs;
 
 namespace BlueControls.BlueDatabaseDialogs
 {

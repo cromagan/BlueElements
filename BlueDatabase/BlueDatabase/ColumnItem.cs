@@ -32,7 +32,6 @@ using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 using BlueBasics.EventArgs;
 using BlueBasics.MultiUserFile;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase
 {

@@ -26,7 +26,7 @@ using BlueDatabase.Enums;
 
 namespace BlueDatabase
 {
-    public sealed class FilterItem : IObjectWithDialog, IParseable, ICompareKey, IReadableText, ICanBeEmpty
+    public sealed class FilterItem : IParseable, ICompareKey, IReadableText, ICanBeEmpty
     {
 
         #region  Variablen-Deklarationen 
@@ -203,6 +203,9 @@ namespace BlueDatabase
 
         public string ReadableText()
         {
+
+
+            if (_FilterType == enFilterType.KeinFilter) { return "Filter ohne Funktion"; }
 
 
             if (_Column == null) { return "Zeilen-Filter"; }

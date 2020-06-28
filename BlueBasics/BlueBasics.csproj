@@ -102,7 +102,6 @@
     <Compile Include="EventArgs\LoadedEventArgs.cs" />
     <Compile Include="EventArgs\LoadingEventArgs.cs" />
     <Compile Include="Extensions\GraphicsExtensions.cs" />
-    <Compile Include="Interfaces\IObjectWithDialog.cs" />
     <Compile Include="ListExt.cs" />
     <Compile Include="strProcess.cs" />
     <Compile Include="Enums\enMouseEvent.cs" />

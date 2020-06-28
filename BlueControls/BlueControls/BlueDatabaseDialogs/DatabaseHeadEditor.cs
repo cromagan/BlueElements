@@ -332,18 +332,18 @@ namespace BlueControls.BlueDatabaseDialogs
         {
             if (lbxExportSets.Item.Checked().Count != 1)
             {
-                ExportEditor.ObjectWithDialog = null;
+                ExportEditor.Item = null;
                 return;
             }
 
             if (_Database.ReadOnly)
             {
-                ExportEditor.ObjectWithDialog = null;
+                ExportEditor.Item = null;
                 return;
             }
             var SelectedExport = (ExportDefinition)((TextListItem)lbxExportSets.Item.Checked()[0]).Tags;
 
-            ExportEditor.ObjectWithDialog = SelectedExport;
+            ExportEditor.Item = SelectedExport;
         }
 
 
@@ -391,7 +391,7 @@ namespace BlueControls.BlueDatabaseDialogs
         {
             if (lbxRuleSelector.Item.Checked().Count != 1) { return; }
             var SelectedRule = (RuleItem)((TextListItem)lbxRuleSelector.Item.Checked()[0]).Tags;
-            RuleItemEditor.ObjectWithDialog = SelectedRule;
+            RuleItemEditor.Item = SelectedRule;
         }
 
 
@@ -763,9 +763,9 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void lbxRuleSelector_ItemRemoving(object sender, ListEventArgs e)
         {
-            if (RuleItemEditor.ObjectWithDialog == ((TextListItem)e.Item).Tags)
+            if (RuleItemEditor.Item == ((TextListItem)e.Item).Tags)
             {
-                RuleItemEditor.ObjectWithDialog = null;
+                RuleItemEditor.Item = null;
             }
         }
 
@@ -775,10 +775,10 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (thisitem is TextListItem tli)
                 {
-                    if (tli.Tags == RuleItemEditor.ObjectWithDialog)
+                    if (tli.Tags == RuleItemEditor.Item)
                     {
-                        tli.Text = RuleItemEditor.ObjectWithDialog.ReadableText();
-                        tli.Symbol = RuleItemEditor.ObjectWithDialog.SymbolForReadableText();
+                        tli.Text = RuleItemEditor.Item.ReadableText();
+                        tli.Symbol = RuleItemEditor.Item.SymbolForReadableText();
                     }
                 }
             }
@@ -790,10 +790,10 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (thisitem is TextListItem tli)
                 {
-                    if (tli.Tags == ExportEditor.ObjectWithDialog)
+                    if (tli.Tags == ExportEditor.Item)
                     {
-                        tli.Text = ExportEditor.ObjectWithDialog.ReadableText();
-                        tli.Symbol = ExportEditor.ObjectWithDialog.SymbolForReadableText();
+                        tli.Text = ExportEditor.Item.ReadableText();
+                        tli.Symbol = ExportEditor.Item.SymbolForReadableText();
                     }
                 }
             }

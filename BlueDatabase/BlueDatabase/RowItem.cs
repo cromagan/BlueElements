@@ -594,6 +594,9 @@ namespace BlueDatabase
             if (Filter != null)
             {
 
+
+                if (Filter.FilterType == enFilterType.KeinFilter || Filter.FilterType == enFilterType.GroﬂKleinEgal) { return true; } // Filter ohne Funktion
+
                 if (Filter.Column == null)
                 {
                     if (!Convert.ToBoolean(Filter.FilterType & enFilterType.GroﬂKleinEgal)) { Filter.FilterType |= enFilterType.GroﬂKleinEgal; }

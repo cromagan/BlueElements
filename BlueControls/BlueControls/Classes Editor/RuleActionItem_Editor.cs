@@ -25,25 +25,17 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueControls.Enums;
-using BlueBasics.Interfaces;
 
 namespace BlueControls.Classes_Editor
 {
     internal sealed partial class RuleActionItem_Editor
     {
 
-        public RuleActionItem_Editor()
+        public RuleActionItem_Editor() : base()
         {
             InitializeComponent();
         }
 
-        private RuleActionItem tmp;
-
-
-        protected override void ConvertObject(IObjectWithDialog ThisObject)
-        {
-            tmp = (RuleActionItem)ThisObject;
-        }
 
 
 
@@ -74,14 +66,14 @@ namespace BlueControls.Classes_Editor
                 {
                     var t = string.Empty;
                     QuickImage s = null;
-                    RuleActionItem.MaximalText(tmp.Rule.Database, Ac, ref t, ref s);
+                    RuleActionItem.MaximalText(Item.Rule.Database, Ac, ref t, ref s);
                     cbxRuleAktion.Item.Add(new TextListItem(z.ToString(), t, s));
                 }
             }
 
 
             lstRuleAktionColumns.Item.Clear();
-            lstRuleAktionColumns.Item.AddRange(tmp.Rule.Database.Column, false, false);
+            lstRuleAktionColumns.Item.AddRange(Item.Rule.Database.Column, false, false);
             lstRuleAktionColumns.Item.Sort();
         }
 
@@ -89,7 +81,7 @@ namespace BlueControls.Classes_Editor
         {
 
 
-            if (tmp != null)
+            if (Item != null)
             {
 
                 btnHelp.Enabled = true;
@@ -185,24 +177,24 @@ namespace BlueControls.Classes_Editor
         private void WriteBack()
         {
 
-            if (IsFilling()) { return; }
+            if (IsFilling) { return; }
 
-            tmp.Action = (enAction)int.Parse(cbxRuleAktion.Text);
+            Item.Action = (enAction)int.Parse(cbxRuleAktion.Text);
 
             var l = lstRuleAktionColumns.Item.Checked();
-            tmp.Columns.Clear(); // = New List(Of ColumnItem)
+            Item.Columns.Clear(); // = New List(Of ColumnItem)
 
             foreach (var t1 in l)
             {
-                tmp.Columns.Add((ColumnItem)((TextListItem)t1).Tags);
+                Item.Columns.Add((ColumnItem)((TextListItem)t1).Tags);
             }
 
-            tmp.Text = txbRuleActionText.Text;
+            Item.Text = txbRuleActionText.Text;
 
 
 
             Enable_Action_Controls(false); // Um nicht mehr erlaubte Felder aus und einzuschalten
-            OnChanged(tmp);
+            OnChanged(Item);
         }
 
         private void lstRuleAktionColumns_ItemClicked(object sender, BasicListItemEventArgs e)
@@ -219,7 +211,7 @@ namespace BlueControls.Classes_Editor
         {
             Enabled = true;
 
-            cbxRuleAktion.Text = ((int)tmp.Action).ToString();
+            cbxRuleAktion.Text = ((int)Item.Action).ToString();
 
             if (cbxRuleAktion.Text == "0")
             {
@@ -227,11 +219,11 @@ namespace BlueControls.Classes_Editor
             }
 
             lstRuleAktionColumns.Item.UncheckAll();
-            foreach (var t in tmp.Columns)
+            foreach (var t in Item.Columns)
             {
                 if (t != null && lstRuleAktionColumns.Item[t.Name] != null) { lstRuleAktionColumns.Item[t.Name].Checked = true; }
             }
-            txbRuleActionText.Text = tmp.Text;
+            txbRuleActionText.Text = Item.Text;
 
 
 
@@ -250,7 +242,7 @@ namespace BlueControls.Classes_Editor
             var x = (enAction)int.Parse(cbxRuleAktion.Text);
             if (x.ToString() == ((int)x).ToString()) { return; }
 
-            MessageBox.Show(RuleActionItem.HelpTextinHTML(tmp.Rule.Database, x), enImageCode.Information, "OK");
+            MessageBox.Show(RuleActionItem.HelpTextinHTML(Item.Rule.Database, x), enImageCode.Information, "OK");
 
         }
 
