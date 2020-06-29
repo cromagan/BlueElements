@@ -36,17 +36,18 @@ namespace BlueControls.BlueDatabaseDialogs
     internal sealed partial class ColumnEditor
     {
         private ColumnItem _Column;
+        private Table _Table;
 
 
 
 
-
-        public ColumnEditor(ColumnItem vColumn)
+        public ColumnEditor(ColumnItem column, Table table) : base()
         {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
 
-            Column_DatenAuslesen(vColumn);
+            _Table = table;
+            Column_DatenAuslesen(column);
 
         }
 
@@ -65,13 +66,6 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxAlign.Item.AddRange(typeof(enAlignmentHorizontal));
             cbxDauerFilter.Item.AddRange(typeof(enDauerfilter));
 
-
-            //if (cbxAlign.Item.Count == 0)
-            //{
-            //    cbxAlign.Item.Add(new TextListItem(((int)enAlignment.Left).ToString(), "links"));
-            //    cbxAlign.Item.Add(new TextListItem(((int)enAlignment.VerticalCenter).ToString(), "mittig"));
-            //    cbxAlign.Item.Add(new TextListItem(((int)enAlignment.Left).ToString(), "rechts"));
-            //}
 
             cbxLinkedDatabase.Item.Clear();
             if (!string.IsNullOrEmpty(_Column.Database.Filename))
@@ -111,8 +105,17 @@ namespace BlueControls.BlueDatabaseDialogs
             btnZurueck.Enabled = _Column.Previous() != null;
             btnVor.Enabled = _Column.Next() != null;
 
+            if (_Table != null)
+            {
+                butAktuellVor.Enabled = _Table.CurrentArrangement[_Column].PreviewsVisible(_Table.CurrentArrangement) != null;
+                butAktuellZurueck.Enabled = _Table.CurrentArrangement[_Column].NextVisible(_Table.CurrentArrangement) != null; 
+            }
+            else
+            {
+                butAktuellVor.Enabled = false;
+                butAktuellZurueck.Enabled = false;
 
-
+            }
 
 
 
@@ -672,11 +675,11 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (!AllOk()) { return; }
 
-            if (_Column.Previous() == null)
-            {
-                MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
-                return;
-            }
+            //if (_Column.Previous() == null)
+            //{
+            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
+            //    return;
+            //}
 
             Column_DatenAuslesen(_Column.Previous());
         }
@@ -685,11 +688,11 @@ namespace BlueControls.BlueDatabaseDialogs
         {
             if (!AllOk()) { return; }
 
-            if (_Column.Next() == null)
-            {
-                MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
-                return;
-            }
+            //if (_Column.Next() == null)
+            //{
+            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
+            //    return;
+            //}
 
             Column_DatenAuslesen(_Column.Next());
         }
@@ -803,6 +806,36 @@ namespace BlueControls.BlueDatabaseDialogs
                 cbxTargetColumn.Text = string.Empty;
                 btnTargetColumn.Checked = false;
             }
+        }
+
+        private void butAktuellZurueck_Click(object sender, System.EventArgs e)
+        {
+
+            if (!AllOk()) { return; }
+
+            //if (_Column.Previous() == null)
+            //{
+            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
+            //    return;
+            //}
+
+            Column_DatenAuslesen(_Table.CurrentArrangement[_Column].PreviewsVisible(_Table.CurrentArrangement).Column);
+
+
+        }
+
+        private void butAktuellVor_Click(object sender, System.EventArgs e)
+        {
+
+            if (!AllOk()) { return; }
+
+            //if (_Column.Previous() == null)
+            //{
+            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
+            //    return;
+            //}
+
+            Column_DatenAuslesen(_Table.CurrentArrangement[_Column].NextVisible(_Table.CurrentArrangement).Column);
         }
     }
 }

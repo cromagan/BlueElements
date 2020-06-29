@@ -882,7 +882,7 @@ namespace BlueControls.Controls
                 case "#columnedit":
                     if (e.HotItem is ColumnItem col)
                     {
-                        tabAdministration.OpenColumnEditor(col);
+                        tabAdministration.OpenColumnEditor(col, null);
                     }
 
                     return true;

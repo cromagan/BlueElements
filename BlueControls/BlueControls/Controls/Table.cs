@@ -3423,7 +3423,17 @@ namespace BlueControls.Controls
             }
         }
 
+        public ColumnViewCollection CurrentArrangement
+        {
+            get
+            {
+                if (_Database == null) { return null; }
 
+                return _Database.ColumnArrangements[_ArrangementNr];
+
+
+            }
+        }
 
 
         private void CellOnCoordinate(int Xpos, int Ypos, out ColumnItem Column, out RowItem Row)

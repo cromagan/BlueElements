@@ -83,7 +83,7 @@ namespace BlueControls.BlueDatabaseDialogs
             if (string.IsNullOrEmpty(searchT)) { return; }
 
             var found = _col;
-            var ca = _BlueTable.Database.ColumnArrangements[_BlueTable.Arrangement];
+            var ca = _BlueTable?.CurrentArrangement;
             if (found == null) { found = _BlueTable.Database.Column.SysLocked; }
             var columnStarted = _col;
 

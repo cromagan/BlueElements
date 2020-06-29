@@ -177,7 +177,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private void OrderDelete_Click(object sender, System.EventArgs e)
         {
             if (_TableView.Arrangement < 2 || _TableView.Arrangement >= _TableView.Database.ColumnArrangements.Count) { return; }
-            if (MessageBox.Show("Anordung <b>'" + _TableView.Database.ColumnArrangements[_TableView.Arrangement].Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (MessageBox.Show("Anordung <b>'" + _TableView.CurrentArrangement.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             _TableView.Database.ColumnArrangements.RemoveAt(_TableView.Arrangement);
 
             _TableView.Arrangement = 1;
@@ -185,7 +185,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void Rename_Click(object sender, System.EventArgs e)
         {
-            var n = InputBox.Show("Umbenennen:", _TableView.Database.ColumnArrangements[_TableView.Arrangement].Name, enDataFormat.Text);
+            var n = InputBox.Show("Umbenennen:", _TableView.CurrentArrangement.Name, enDataFormat.Text);
             if (!string.IsNullOrEmpty(n)) { _TableView.Database.ColumnArrangements[_TableView.Arrangement].Name = n; }
         }
 
@@ -195,16 +195,16 @@ namespace BlueControls.BlueDatabaseDialogs
             aa.AddRange(_TableView.Database.Permission_AllUsed(true));
             aa.Sort();
             aa.CheckBehavior = enCheckBehavior.MultiSelection;
-            aa.Check(_TableView.Database.ColumnArrangements[_TableView.Arrangement].PermissionGroups_Show, true);
+            aa.Check(_TableView.CurrentArrangement.PermissionGroups_Show, true);
 
 
             var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
             if (b == null) { return; }
 
-            _TableView.Database.ColumnArrangements[_TableView.Arrangement].PermissionGroups_Show.Clear();
-            _TableView.Database.ColumnArrangements[_TableView.Arrangement].PermissionGroups_Show.AddRange(b.ToArray());
+            _TableView.CurrentArrangement.PermissionGroups_Show.Clear();
+            _TableView.CurrentArrangement.PermissionGroups_Show.AddRange(b.ToArray());
 
-            if (_TableView.Arrangement == 1) { _TableView.Database.ColumnArrangements[_TableView.Arrangement].PermissionGroups_Show.Add("#Everybody"); }
+            if (_TableView.Arrangement == 1) { _TableView.CurrentArrangement.PermissionGroups_Show.Add("#Everybody"); }
 
         }
 
@@ -214,7 +214,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             foreach (var ThisColumnItem in _TableView.Database.Column)
             {
-                if (ThisColumnItem != null && _TableView.Database.ColumnArrangements[_TableView.Arrangement][ThisColumnItem] == null) { ic.Add(ThisColumnItem); }
+                if (ThisColumnItem != null && _TableView.CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem); }
 
             }
 
@@ -229,7 +229,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, enAddType.None, true);
             if (r == null || r.Count == 0) { return; }
-            _TableView.Database.ColumnArrangements[_TableView.Arrangement].Add(_TableView.Database.Column[r[0]], false);
+            _TableView.CurrentArrangement.Add(_TableView.Database.Column[r[0]], false);
 
             _TableView.Invalidate_HeadSize();
 
@@ -239,31 +239,31 @@ namespace BlueControls.BlueDatabaseDialogs
         private void OrderReset_Click(object sender, System.EventArgs e)
         {
             if (MessageBox.Show("Alle Spalten anzeigen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            _TableView.Database.ColumnArrangements[_TableView.Arrangement].ShowAllColumns(_TableView.Database);
+            _TableView.CurrentArrangement.ShowAllColumns(_TableView.Database);
         }
 
         private void btnSpalteAusblenden_Click(object sender, System.EventArgs e)
         {
             ColumnViewItem ViewItem = null;
-            if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.Database.ColumnArrangements[_TableView.Arrangement][_TableView.CursorPosColumn()]; }
+            if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.CurrentArrangement[_TableView.CursorPosColumn()]; }
 
-            _TableView.Database.ColumnArrangements[_TableView.Arrangement].Remove(ViewItem);
+            _TableView.CurrentArrangement.Remove(ViewItem);
         }
 
         private void btnSpalteBearbeiten_Click(object sender, System.EventArgs e)
         {
-            OpenColumnEditor(_TableView.CursorPosColumn(), _TableView.CursorPosRow());
+            OpenColumnEditor(_TableView.CursorPosColumn(), _TableView.CursorPosRow(), _TableView);
         }
 
 
 
-        public static void OpenColumnEditor(ColumnItem column, RowItem Row)
+        public static void OpenColumnEditor(ColumnItem column, RowItem Row, Table tableview)
         {
             if (column == null) { return; }
 
             if (Row == null)
             {
-                OpenColumnEditor(column);
+                OpenColumnEditor(column, tableview);
                 return;
             }
 
@@ -306,7 +306,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
 
-            OpenColumnEditor(column);
+            OpenColumnEditor(column, tableview);
 
 
 
@@ -315,10 +315,10 @@ namespace BlueControls.BlueDatabaseDialogs
 
         }
 
-        public static void OpenColumnEditor(ColumnItem column)
+        public static void OpenColumnEditor(ColumnItem column, Table tableview)
         {
 
-            using (var w = new ColumnEditor(column))
+            using (var w = new ColumnEditor(column, tableview))
             {
                 w.ShowDialog();
                 column.Invalidate_ColumAndContent();
@@ -372,7 +372,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
 
-            using (var w = new ColumnEditor(newc))
+            using (var w = new ColumnEditor(newc, _TableView))
             {
                 w.ShowDialog();
                 newc.Invalidate_ColumAndContent();
@@ -381,7 +381,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             _TableView.Database.Column.Repair();
 
-            if (_TableView.Arrangement > 0) { _TableView.Database.ColumnArrangements[_TableView.Arrangement].Add(newc, false); }
+            if (_TableView.Arrangement > 0) { _TableView.CurrentArrangement.Add(newc, false); }
 
             _TableView.Invalidate_HeadSize();
 
@@ -389,7 +389,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void Systemspalten_Click(object sender, System.EventArgs e)
         {
-            _TableView.Database.ColumnArrangements[_TableView.Arrangement].HideSystemColumns();
+            _TableView.CurrentArrangement.HideSystemColumns();
         }
 
         private void btnSpalteNachLinks_Click(object sender, System.EventArgs e)
@@ -398,8 +398,8 @@ namespace BlueControls.BlueDatabaseDialogs
             if (_TableView.Arrangement > 0)
             {
                 ColumnViewItem ViewItem = null;
-                if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.Database.ColumnArrangements[_TableView.Arrangement][_TableView.CursorPosColumn()]; }
-                _TableView.Database.ColumnArrangements[_TableView.Arrangement].Swap(ViewItem, ViewItem.PreviewsVisible(_TableView.Database.ColumnArrangements[_TableView.Arrangement]));
+                if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.CurrentArrangement[_TableView.CursorPosColumn()]; }
+                _TableView.CurrentArrangement.Swap(ViewItem, ViewItem.PreviewsVisible(_TableView.CurrentArrangement));
             }
             else
             {
@@ -415,8 +415,8 @@ namespace BlueControls.BlueDatabaseDialogs
             if (_TableView.Arrangement > 0)
             {
                 ColumnViewItem ViewItem = null;
-                if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.Database.ColumnArrangements[_TableView.Arrangement][_TableView.CursorPosColumn()]; }
-                _TableView.Database.ColumnArrangements[_TableView.Arrangement].Swap(ViewItem, ViewItem.NextVisible(_TableView.Database.ColumnArrangements[_TableView.Arrangement]));
+                if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.CurrentArrangement[_TableView.CursorPosColumn()]; }
+                _TableView.CurrentArrangement.Swap(ViewItem, ViewItem.NextVisible(_TableView.CurrentArrangement));
             }
             else
             {
@@ -465,9 +465,9 @@ namespace BlueControls.BlueDatabaseDialogs
             ColumnViewItem ViewItem = null;
             var column = _TableView.CursorPosColumn();
 
-            if (column != null) { ViewItem = _TableView.Database.ColumnArrangements[_TableView.Arrangement][column]; }
+            if (column != null) { ViewItem = _TableView.CurrentArrangement[column]; }
             var IndexOfViewItem = -1;
-            if (_TableView.Arrangement <= _TableView.Database.ColumnArrangements.Count) { IndexOfViewItem = _TableView.Database.ColumnArrangements[_TableView.Arrangement].IndexOf(ViewItem); }
+            if (_TableView.Arrangement <= _TableView.Database.ColumnArrangements.Count) { IndexOfViewItem = _TableView.CurrentArrangement.IndexOf(ViewItem); }
 
 
             var enLayoutEditable = Convert.ToBoolean(_TableView.Arrangement > 0); // Hauptansicht (0) kann nicht bearbeitet werden
@@ -492,7 +492,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                // grpAktuelleSpalte.Text = "Spalte: " + column.ReadableText();
                 btnSpalteNachLinks.Enabled = Convert.ToBoolean(IndexOfViewItem > 0);
-                btnSpalteNachRechts.Enabled = Convert.ToBoolean(IndexOfViewItem >= 0) && Convert.ToBoolean(IndexOfViewItem < _TableView.Database.ColumnArrangements[_TableView.Arrangement].Count() - 1);
+                btnSpalteNachRechts.Enabled = Convert.ToBoolean(IndexOfViewItem >= 0) && Convert.ToBoolean(IndexOfViewItem < _TableView.CurrentArrangement.Count() - 1);
 
 
 
@@ -661,7 +661,7 @@ namespace BlueControls.BlueDatabaseDialogs
         {
 
             ColumnViewItem ViewItem = null;
-            if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.Database.ColumnArrangements[_TableView.Arrangement][_TableView.CursorPosColumn()]; }
+            if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.CurrentArrangement[_TableView.CursorPosColumn()]; }
 
             if (ViewItem == null) { return; }
 
@@ -699,15 +699,15 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (index < 1) { return; }
                 index--;
-                var ViewItem = _TableView.Database.ColumnArrangements[_TableView.Arrangement][c];
+                var ViewItem = _TableView.CurrentArrangement[c];
 
                 if (ViewItem != null)
                 {
-                    _TableView.Database.ColumnArrangements[_TableView.Arrangement].Remove(ViewItem);
+                    _TableView.CurrentArrangement.Remove(ViewItem);
                 }
 
-                if (index >= _TableView.Database.ColumnArrangements[_TableView.Arrangement].Count()) { index = _TableView.Database.ColumnArrangements[_TableView.Arrangement].Count(); }
-                _TableView.Database.ColumnArrangements[_TableView.Arrangement].InsertAt(index, c);
+                if (index >= _TableView.CurrentArrangement.Count()) { index = _TableView.CurrentArrangement.Count(); }
+                _TableView.CurrentArrangement.InsertAt(index, c);
                 _TableView.CursorPos_Set(c, _TableView.CursorPosRow(), true);
                 Check_OrderButtons();
             }

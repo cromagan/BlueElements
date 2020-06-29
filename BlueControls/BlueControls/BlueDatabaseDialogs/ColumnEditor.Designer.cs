@@ -153,6 +153,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnTargetColumn = new BlueControls.Controls.Button();
             this.btnColumnKeyInColumn = new BlueControls.Controls.Button();
             this.capRowKeyInColumn = new BlueControls.Controls.Caption();
+            this.capIntern = new BlueControls.Controls.Caption();
+            this.caption5 = new BlueControls.Controls.Caption();
+            this.butAktuellVor = new BlueControls.Controls.Button();
+            this.butAktuellZurueck = new BlueControls.Controls.Button();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -1238,27 +1242,28 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnVor
             // 
             this.btnVor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnVor.Location = new System.Drawing.Point(696, 643);
+            this.btnVor.ImageCode = "Pfeil_Rechts|16|||FF0000";
+            this.btnVor.Location = new System.Drawing.Point(304, 640);
             this.btnVor.Name = "btnVor";
             this.btnVor.Size = new System.Drawing.Size(72, 24);
             this.btnVor.TabIndex = 5;
-            this.btnVor.Text = ">>>";
             this.btnVor.Click += new System.EventHandler(this.btnVor_Click);
             // 
             // btnZurueck
             // 
             this.btnZurueck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnZurueck.Location = new System.Drawing.Point(592, 643);
+            this.btnZurueck.ImageCode = "Pfeil_Links|16|||FF0000";
+            this.btnZurueck.Location = new System.Drawing.Point(224, 640);
             this.btnZurueck.Name = "btnZurueck";
             this.btnZurueck.Size = new System.Drawing.Size(72, 24);
             this.btnZurueck.TabIndex = 4;
-            this.btnZurueck.Text = "<<<";
             this.btnZurueck.Click += new System.EventHandler(this.btnZurueck_Click);
             // 
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(848, 643);
+            this.btnOk.ImageCode = "Häkchen|16";
+            this.btnOk.Location = new System.Drawing.Point(840, 640);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(72, 24);
             this.btnOk.TabIndex = 6;
@@ -1448,9 +1453,47 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capRowKeyInColumn.Size = new System.Drawing.Size(320, 16);
             this.capRowKeyInColumn.Text = "Die zu suchende Zeile ist in dieser Spalte zu finden:";
             // 
+            // capIntern
+            // 
+            this.capIntern.Location = new System.Drawing.Point(112, 640);
+            this.capIntern.Name = "capIntern";
+            this.capIntern.Size = new System.Drawing.Size(104, 24);
+            this.capIntern.Text = "Interne Ansicht:";
+            // 
+            // caption5
+            // 
+            this.caption5.Location = new System.Drawing.Point(460, 641);
+            this.caption5.Name = "caption5";
+            this.caption5.Size = new System.Drawing.Size(104, 24);
+            this.caption5.Text = "Aktuelle Ansicht:";
+            // 
+            // butAktuellVor
+            // 
+            this.butAktuellVor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.butAktuellVor.ImageCode = "Pfeil_Rechts|16|||0000FF";
+            this.butAktuellVor.Location = new System.Drawing.Point(652, 641);
+            this.butAktuellVor.Name = "butAktuellVor";
+            this.butAktuellVor.Size = new System.Drawing.Size(72, 24);
+            this.butAktuellVor.TabIndex = 19;
+            this.butAktuellVor.Click += new System.EventHandler(this.butAktuellVor_Click);
+            // 
+            // butAktuellZurueck
+            // 
+            this.butAktuellZurueck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.butAktuellZurueck.ImageCode = "Pfeil_Links|16|||0000FF";
+            this.butAktuellZurueck.Location = new System.Drawing.Point(572, 641);
+            this.butAktuellZurueck.Name = "butAktuellZurueck";
+            this.butAktuellZurueck.Size = new System.Drawing.Size(72, 24);
+            this.butAktuellZurueck.TabIndex = 18;
+            this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
+            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(926, 671);
+            this.Controls.Add(this.caption5);
+            this.Controls.Add(this.butAktuellVor);
+            this.Controls.Add(this.butAktuellZurueck);
+            this.Controls.Add(this.capIntern);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.BlueFrame1);
             this.Controls.Add(this.btnVor);
@@ -1604,5 +1647,9 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbIntelligenter_Multifilter;
         private Caption capDauerfilterPos;
         private TextBox txbDauerFilterPos;
+        private Caption capIntern;
+        private Caption caption5;
+        private Button butAktuellVor;
+        private Button butAktuellZurueck;
     }
 	}

@@ -923,7 +923,7 @@ namespace BlueControls.Forms
                     break;
 
                 case "SpaltenEigenschaftenBearbeiten":
-                    tabAdministration.OpenColumnEditor(Column);
+                    tabAdministration.OpenColumnEditor(Column, TableView);
                     CheckButtons();
                     break;
 

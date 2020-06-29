@@ -1579,7 +1579,7 @@ namespace BlueDatabase
                     }
                     else if (Wert == "+")
                     {
-                        _AutoFilter_Dauerfilter = enDauerfilter.beide;
+                        _AutoFilter_Dauerfilter = enDauerfilter.waagerecht_senkrecht;
                     }
                     else
                     {

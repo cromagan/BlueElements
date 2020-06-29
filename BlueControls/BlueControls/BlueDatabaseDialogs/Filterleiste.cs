@@ -115,7 +115,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             btnAdmin.Visible = _TableView != null && _TableView.Database != null && _TableView.Database.IsAdministrator();
 
-            #region ZeilenFilter
+            #region ZeilenFilter befüllen
             if (_TableView != null && _TableView.Database != null && _TableView.Filter.IsRowFilterActiv())
             {
                 txbZeilenFilter.Text = _TableView.Filter.RowFilterText;
@@ -131,10 +131,11 @@ namespace BlueControls.BlueDatabaseDialogs
             var constwi = 0;
             var down = 0;
             var right = 0;
-            System.Windows.Forms.AnchorStyles anchor;
+            var anchor = System.Windows.Forms.AnchorStyles.None;
             var showPic = false;
 
 
+            #region Variablen für Waagerecht / Senkrecht bestimmen
             if (_orientation == enOrientation.Waagerecht)
             {
                 toppos = btnAlleFilterAus.Top;
@@ -154,10 +155,10 @@ namespace BlueControls.BlueDatabaseDialogs
                 down = txbZeilenFilter.Height + Skin.Padding;
 
                 showPic = _TableView != null && _TableView.Database != null && !string.IsNullOrEmpty(_TableView.Database.FilterImagePfad);
-
             }
+            #endregion
 
-
+            #region  Bild bei Bedarf laden und Visble richtig setze
             if (showPic)
             {
                 pic.Height = (int)Math.Min(pic.Width * 0.7, Height * 0.6);
@@ -184,50 +185,74 @@ namespace BlueControls.BlueDatabaseDialogs
                 pic.Visible = false;
             }
 
+            #endregion
 
-
-
-
-            // Vorhandene Flexis ermitteln
             var flexsToDelete = new List<FlexiControlForFilter>();
+            #region Vorhandene Flexis ermitteln
+
             foreach (var ThisControl in Controls)
             {
                 if (ThisControl is FlexiControlForFilter flx) { flexsToDelete.Add(flx); }
             }
 
+            #endregion
 
-            if (_TableView != null && _TableView.Filter != null)
+            #region Neue Flexis erstellen / updaten
+            if (_TableView != null && _TableView.Database != null && _TableView.Filter != null)
             {
-                var colara = _TableView.Database.ColumnArrangements[_TableView.Arrangement];
 
+                var columSort = new List<ColumnItem>();
+                var colArrngmt = _TableView?.CurrentArrangement;
 
-
-                foreach (var thisclsVitem in colara)
+                #region Reihenfolge der Spalten bestimmen
+                foreach (var thisclsVitem in colArrngmt)
                 {
+                    columSort.AddIfNotExists(thisclsVitem.Column);
+                }
 
+                foreach (var thisColumn in _TableView.Database.Column)
+                {
+                    columSort.AddIfNotExists(thisColumn);
+                }
+                #endregion
+
+
+                foreach (var thisColumn in columSort)
+                {
                     var ShowMe = false;
+                    var ViewItem = colArrngmt[thisColumn];
+                    var FilterItem = _TableView.Filter[thisColumn];
 
-                    if (_Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_Alle)) { ShowMe = true; }
-                    if (_Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_DauerFilter))
+                    #region Sichtbarkeit des Filterelemts bestimmen
+
+                    if (ViewItem != null)
                     {
-                        if (thisclsVitem.Column.AutoFilter_Dauerfilter.HasFlag(enDauerfilter.waagerecht) && _orientation == enOrientation.Waagerecht) { ShowMe = true; }
-                        if (thisclsVitem.Column.AutoFilter_Dauerfilter.HasFlag(enDauerfilter.senkrecht) && _orientation == enOrientation.Senkrecht) { ShowMe = true; }
+                        if (_Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_Alle)) { ShowMe = true; }
+                        if (_Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_DauerFilter))
+                        {
+                            if (thisColumn.AutoFilter_Dauerfilter.HasFlag(enDauerfilter.waagerecht) && _orientation == enOrientation.Waagerecht) { ShowMe = true; }
+                            if (thisColumn.AutoFilter_Dauerfilter.HasFlag(enDauerfilter.senkrecht) && _orientation == enOrientation.Senkrecht) { ShowMe = true; }
+                        }
+
+
+                        if (FilterItem != null && _Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_AktiveFilter)) { ShowMe = true; }
                     }
 
+                    if (thisColumn.AutoFilter_Dauerfilter.HasFlag(enDauerfilter.senkrechtAuchUnsichtbar) && _orientation == enOrientation.Senkrecht) { ShowMe = true; }
 
-                    var f = _TableView.Filter[thisclsVitem.Column];
-                    if (f != null && _Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_AktiveFilter)) { ShowMe = true; }
+                    #endregion
 
-                    if (f == null && ShowMe)
+
+                    if (FilterItem == null && ShowMe)
                     {
                         // Dummy-Filter, nicht in der Collection
-                        f = new FilterItem(thisclsVitem.Column, enFilterType.Instr_GroßKleinEgal, string.Empty);
+                        FilterItem = new FilterItem(thisColumn, enFilterType.Instr_GroßKleinEgal, string.Empty);
                     }
 
 
-                    if (f != null && ShowMe)
+                    if (FilterItem != null && ShowMe)
                     {
-                        var flx = FlexiItemOf(f);
+                        var flx = FlexiItemOf(FilterItem);
                         if (flx != null)
                         {
                             // Sehr Gut, Flex vorhanden, wird später nicht mehr gelöscht
@@ -236,14 +261,14 @@ namespace BlueControls.BlueDatabaseDialogs
                         else
                         {
                             // Na gut, eben neuen Flex erstellen
-                            flx = new FlexiControlForFilter(_TableView, f, enÜberschriftAnordnung.Links_neben_Dem_Feld, this);
+                            flx = new FlexiControlForFilter(_TableView, FilterItem, enÜberschriftAnordnung.Links_neben_Dem_Feld, this);
                             flx.ValueChanged += Flx_ValueChanged;
                             flx.ButtonClicked += Flx_ButtonClicked;
                             Controls.Add(flx);
                         }
 
 
-                        if (showPic && !f.Column.DauerFilterPos.IsEmpty)
+                        if (showPic && !FilterItem.Column.DauerFilterPos.IsEmpty)
                         {
                             flx.Height = btnAlleFilterAus.Height * 2;
 
@@ -265,12 +290,12 @@ namespace BlueControls.BlueDatabaseDialogs
 
                             var xr = (int)(pic.Image.Width * sc); // x REal angezeigte breite
                             var xab = (pic.Width - xr) / 2; // x Abstand
-                            var xm = (int)(f.Column.DauerFilterPos.X / 10000f * xr) + xab; // Filter X mitte
+                            var xm = (int)(FilterItem.Column.DauerFilterPos.X / 10000f * xr) + xab; // Filter X mitte
                             flx.Left = xm - flx.Width / 2 + pic.Left;
 
                             var yr = (int)(pic.Image.Height * sc); // Y REal angezeigte breite
                             var yab = (pic.Height - yr) / 2; // Y Abstand
-                            var ym = (int)(f.Column.DauerFilterPos.Y / 10000f * yr) + yab; ; // Filter X mitte
+                            var ym = (int)(FilterItem.Column.DauerFilterPos.Y / 10000f * yr) + yab; ; // Filter X mitte
                             flx.Top = ym - flx.Height / 2 + pic.Top;
 
 
@@ -295,8 +320,9 @@ namespace BlueControls.BlueDatabaseDialogs
                     }
                 }
             }
+            #endregion
 
-            // Unnötige Flexis löschen
+            #region  Unnötige Flexis löschen
 
             foreach (var thisFlexi in flexsToDelete)
             {
@@ -307,6 +333,8 @@ namespace BlueControls.BlueDatabaseDialogs
                 Controls.Remove(thisFlexi);
                 thisFlexi.Dispose();
             }
+
+            #endregion
 
             _isFilling = false;
         }
