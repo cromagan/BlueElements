@@ -662,17 +662,36 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public void AddRange(ColumnCollection Columns, bool OnlyExportableTextformatForLayout, bool NoCritical)
+        public void AddRange(ColumnCollection Columns, bool OnlyExportableTextformatForLayout, bool NoCritical, bool DoCaptionSort)
         {
+
             foreach (var ThisColumnItem in Columns)
             {
                 if (ThisColumnItem != null)
                 {
                     var addx = true;
-                    if (OnlyExportableTextformatForLayout && !ThisColumnItem.ExportableTextformatForLayout()) { addx = false; }
-                    if (NoCritical && !ThisColumnItem.Format.CanBeCheckedByRules()) { addx = false; }
+                    if (addx && OnlyExportableTextformatForLayout && !ThisColumnItem.ExportableTextformatForLayout()) { addx = false; }
+                    if (addx && NoCritical && !ThisColumnItem.Format.CanBeCheckedByRules()) { addx = false; }
+                    if (addx && this[ThisColumnItem.Name] != null) { addx = false; }
 
-                    if (addx) { if (this[ThisColumnItem.Name] == null) { Add(ThisColumnItem); } }
+                    if (addx)
+                    {
+                        Add(ThisColumnItem, DoCaptionSort);
+
+                        if (DoCaptionSort)
+                        {
+                            var capt = ThisColumnItem.Ueberschriften;
+
+
+                            if (this[capt] == null)
+                            {
+                                Add(new TextListItem(capt, capt, null, true, true, enDataFormat.Text, capt + Constants.FirstSortChar));
+                            }
+
+
+                        }
+
+                    }
 
                 }
 
@@ -914,9 +933,17 @@ namespace BlueControls.ItemCollection
         //}
 
 
-        public void Add(ColumnItem Column)
+        public void Add(ColumnItem column, bool doCaptionSort)
         {
-            Add(new TextListItem(Column.Name, Column));
+            if (doCaptionSort)
+            {
+                Add(new TextListItem(column.Name, column, column.Ueberschriften + Constants.SecondSortChar + column.Name));
+            }
+            else
+            {
+                Add(new TextListItem(column.Name, column, string.Empty));
+            }
+
         }
 
         public void Add(enContextMenuComands Comand, bool vEnabled = true)

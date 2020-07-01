@@ -62,7 +62,13 @@ namespace BlueControls.ItemCollection
 
         #region  Properties 
 
-
+        public override string QuickInfo
+        {
+            get
+            {
+                return string.Empty;
+            }
+        }
         #endregion
 
 

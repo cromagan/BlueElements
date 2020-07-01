@@ -230,7 +230,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 {
                     foreach (var ThisColumn in _Database.SortDefinition.Columns)
                     {
-                        if (ThisColumn != null) { lbxSortierSpalten.Item.Add(ThisColumn); }
+                        if (ThisColumn != null) { lbxSortierSpalten.Item.Add(ThisColumn, false); }
                     }
                 }
             }
@@ -284,10 +284,12 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             lbxSortierSpalten.Suggestions.Clear();
-            foreach (var ThisColumnItem in _Database.Column)
-            {
-                if (ThisColumnItem != null) { lbxSortierSpalten.Suggestions.Add(ThisColumnItem); }
-            }
+            lbxSortierSpalten.Suggestions.AddRange(_Database.Column, false, false, false);
+
+            //foreach (var ThisColumnItem in _Database.Column)
+            //{
+            //    if (ThisColumnItem != null) { lbxSortierSpalten.Suggestions.Add(ThisColumnItem); }
+            //}
 
 
 
@@ -624,13 +626,13 @@ namespace BlueControls.BlueDatabaseDialogs
             x.Column.Add("Index", "Index", enDataFormat.Ganzzahl);
             x.Column.Add("ColumnKey", "Spalten-<br>Schlüssel", enDataFormat.Ganzzahl);
             x.Column.Add("ColumnName", "Spalten-<br>Name", enDataFormat.Text);
-            x.Column.Add("ColumnCaption","Spaten-<br>Beschriftung", enDataFormat.Text);
+            x.Column.Add("ColumnCaption", "Spalten-<br>Beschriftung", enDataFormat.Text);
             x.Column.Add("RowKey", "Zeilen-<br>Schlüssel", enDataFormat.Ganzzahl);
             x.Column.Add("RowFirst", "Zeile, Wert der<br>1. Spalte", enDataFormat.Text);
-            x.Column.Add("Aenderzeit","Änder-<br>Zeit", enDataFormat.Text);
+            x.Column.Add("Aenderzeit", "Änder-<br>Zeit", enDataFormat.Text);
             x.Column.Add("Aenderer", "Änderer", enDataFormat.Text);
             x.Column.Add("Symbol", "Symbol", enDataFormat.BildCode);
-            x.Column.Add("Aenderung","Änderung", enDataFormat.Text);
+            x.Column.Add("Aenderung", "Änderung", enDataFormat.Text);
             x.Column.Add("WertAlt", "Wert alt", enDataFormat.Text);
             x.Column.Add("WertNeu", "Wert neu", enDataFormat.Text);
 

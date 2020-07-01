@@ -49,7 +49,7 @@ namespace BlueControls.ItemCollection
         /// Fügt das übergebende Object den Tags hinzu.
         /// </summary>
         /// <param name="obj"></param>
-        public TextListItem(IReadableText obj) : this(string.Empty, obj.ReadableText(), obj.SymbolForReadableText())
+        public TextListItem(IReadableText obj) : this(string.Empty, obj, string.Empty)
         {
             Tags = obj;
         }
@@ -59,10 +59,21 @@ namespace BlueControls.ItemCollection
         /// </summary>
         /// <param name="internalname"></param>
         /// <param name="obj"></param>
-        public TextListItem(string internalname, IReadableText obj) : this(internalname, obj.ReadableText(), obj.SymbolForReadableText())
+        public TextListItem(string internalname, IReadableText obj) : this(internalname, obj, string.Empty)
         {
             Tags = obj;
         }
+
+        /// <summary>
+        /// Fügt das übergebende Object den Tags hinzu.
+        /// </summary>
+        /// <param name="internalname"></param>
+        /// <param name="obj"></param>
+        public TextListItem(string internalname, IReadableText obj, string userDefCompareKey) : this(internalname, obj.ReadableText(), obj.SymbolForReadableText(), true, userDefCompareKey)
+        {
+            Tags = obj;
+        }
+
 
         public TextListItem(string internalname, string readableText, bool isCaption, string userDefCompareKey) : this(internalname, readableText, null, isCaption, true, enDataFormat.Text, userDefCompareKey) { }
 
@@ -134,6 +145,13 @@ namespace BlueControls.ItemCollection
 
         #region  Properties 
 
+        public override string QuickInfo
+        {
+            get
+            {
+                return _ReadableText.ToHTMLText();
+            }
+        }
 
         public string Text
         {

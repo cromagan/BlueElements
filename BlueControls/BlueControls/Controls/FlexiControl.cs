@@ -38,7 +38,7 @@ namespace BlueControls.Controls
 {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
-    public partial class FlexiControl : GenericControl, IQuickInfo, IUseMyBackColor
+    public partial class FlexiControl : GenericControl, IUseMyBackColor
     {
 
 
@@ -129,30 +129,6 @@ namespace BlueControls.Controls
         }
 
 
-        #endregion
-
-        #region  QuickInfo 
-        // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
-        private string _QuickInfo = "";
-        [Category("Darstellung")]
-        [DefaultValue("")]
-        [Description("QuickInfo des Steuerelementes - im extTXT-Format")]
-        public string QuickInfo
-        {
-            get
-            {
-                return _QuickInfo;
-            }
-            set
-            {
-                if (_QuickInfo != value)
-                {
-                    Forms.QuickInfo.Close();
-                    _QuickInfo = value;
-                    UpdateControls();
-                }
-            }
-        }
         #endregion
 
 
@@ -1722,6 +1698,12 @@ namespace BlueControls.Controls
         }
 
 
+        protected override void OnQuickInfoChanged()
+        {
+            base.OnQuickInfoChanged();
+            UpdateControls();
+        }
+
 
         private void UpdateControls()
         {
@@ -1733,7 +1715,7 @@ namespace BlueControls.Controls
 
                 if (Control != _InfoCaption)
                 {
-                    if (Control is IQuickInfo QI) { QI.QuickInfo = _QuickInfo; }
+                    if (Control is GenericControl QI) { QI.QuickInfo = QuickInfo; }
                     Control.Enabled = Enabled;
                 }
                 else

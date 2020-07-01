@@ -37,7 +37,7 @@ namespace BlueControls.Controls
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("TextChanged")]
-    public partial class TextBox : GenericControl, IContextMenu, IQuickInfo
+    public partial class TextBox : GenericControl, IContextMenu
     {
 
         #region Constructor

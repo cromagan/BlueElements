@@ -73,7 +73,7 @@ namespace BlueControls.Classes_Editor
 
 
             lstRuleAktionColumns.Item.Clear();
-            lstRuleAktionColumns.Item.AddRange(Item.Rule.Database.Column, false, false);
+            lstRuleAktionColumns.Item.AddRange(Item.Rule.Database.Column, false, false, true);
             lstRuleAktionColumns.Item.Sort();
         }
 

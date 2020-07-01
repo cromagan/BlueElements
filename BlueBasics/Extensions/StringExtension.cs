@@ -476,7 +476,26 @@ namespace BlueBasics
         }
 
 
+        public static string ToHTMLText(this string txt)
+        {
+            txt = txt.Replace("&", "&amp;");
+            txt = txt.Replace("<", "&lt;");
+            txt = txt.Replace(">", "&gt;");
+            //s
+            //txt = txt.Replace("~~&lt;", "<<>");
+            //txt = txt.Replace("~~&gt;", "<>>");
+            txt = txt.Replace("\r\n", "<br>");
+            txt = txt.Replace("\r", "<br>");
+            return txt;
+        }
 
+        public static string ConvertFromHtmlToRich(this string txt)
+        {
+            txt = txt.Replace("\r\n", "<br>");
+            txt = txt.Replace("<<>", "&lt;");
+            txt = txt.Replace("<>>", "&gt;");
+            return txt;
+        }
 
 
 

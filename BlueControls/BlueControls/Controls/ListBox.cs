@@ -37,7 +37,7 @@ namespace BlueControls.Controls
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ItemClicked")]
-    public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IQuickInfo
+    public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone
     {
 
         #region Constructor
@@ -205,27 +205,6 @@ namespace BlueControls.Controls
 
         #endregion
 
-        #region  QuickInfo 
-        // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
-        private string _QuickInfo = "";
-        [Category("Darstellung")]
-        [Description("QuickInfo des Steuerelementes - im extTXT-Format")]
-        public string QuickInfo
-        {
-            get
-            {
-                return _QuickInfo;
-            }
-            set
-            {
-                if (_QuickInfo != value)
-                {
-                    Forms.QuickInfo.Close();
-                    _QuickInfo = value;
-                }
-            }
-        }
-        #endregion
 
         protected override void OnVisibleChanged(System.EventArgs e)
         {
@@ -492,6 +471,7 @@ namespace BlueControls.Controls
             {
                 _MouseOverItem = ND;
                 Invalidate();
+                DoQuickInfo();
             }
         }
 
@@ -507,7 +487,31 @@ namespace BlueControls.Controls
 
 
 
+        public override string QuickInfoText
+        {
+            get
+            {
+                var t1 = base.QuickInfoText;
+                var t2 = string.Empty;
 
+                if (_MouseOverItem != null) { t2 = _MouseOverItem.QuickInfo; }
+
+
+                if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2))
+                {
+                    return string.Empty;
+                }
+                else if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2))
+                {
+                    return t1 + "<br><hr><br>" + t2;
+                }
+                else
+                {
+                    return t1 + t2; // Eins davon ist leer
+                }
+
+            }
+        }
 
 
 

@@ -191,6 +191,37 @@ namespace BlueControls.Controls
             DoDraw(e.Graphics, false);
         }
 
+
+
+        #region  QuickInfo 
+        // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
+        private string _QuickInfo = "";
+        [Category("Darstellung")]
+        [DefaultValue("")]
+        [Description("QuickInfo des Steuerelementes - im extTXT-Format")]
+        public string QuickInfo
+        {
+            get
+            {
+                return _QuickInfo;
+            }
+            set
+            {
+                if (_QuickInfo != value)
+                {
+                    Forms.QuickInfo.Close();
+                    _QuickInfo = value;
+                    OnQuickInfoChanged();
+                }
+            }
+        }
+
+        protected virtual void OnQuickInfoChanged()
+        {
+            // Dummy, dass die angeleeiteten Controls reagieren können.
+        }
+        #endregion
+
         #region ISupportsEdit
 
         [DefaultValue(0)]
@@ -198,7 +229,13 @@ namespace BlueControls.Controls
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int BeginnEditCounter { get; set; } = 0;
-
+        public virtual string QuickInfoText
+        {
+            get
+            {
+                return _QuickInfo;
+            }
+        }
 
         public new void SuspendLayout()
         {
@@ -494,14 +531,28 @@ namespace BlueControls.Controls
             if (Enabled) { tmpSkinRow = null; }
             base.OnMouseLeave(e);
 
+            DoQuickInfo();
+         }
 
-            if (this is IQuickInfo tempVar)
+
+        public void DoQuickInfo()
+        {
+            if (string.IsNullOrEmpty(_QuickInfo) && string.IsNullOrEmpty(QuickInfoText))
             {
-                if (!string.IsNullOrEmpty(tempVar.QuickInfo)) { Forms.QuickInfo.Close(); }
+                Forms.QuickInfo.Close();
             }
-
+            else
+            {
+                if (ContainsMouse())
+                {
+                    Forms.QuickInfo.Show(QuickInfoText);
+                }
+                else
+                {
+                    Forms.QuickInfo.Close();
+                }
+            }
         }
-
 
 
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e)
@@ -509,23 +560,9 @@ namespace BlueControls.Controls
 
             lock (this)
             {
-
-
                 if (IsDisposed) { return; }
-
-                if (this is IQuickInfo tempVar)
-                {
-                    if (!ContainsMouse())
-                    {
-                        if (!string.IsNullOrEmpty(tempVar.QuickInfo)) { Forms.QuickInfo.Close(); }
-                    }
-                    else
-                    {
-                        ShowQuickInfo();
-                    }
-                }
-
                 base.OnMouseMove(e);
+                DoQuickInfo();
 
             }
         }
@@ -556,7 +593,7 @@ namespace BlueControls.Controls
 
             if (Enabled) { tmpSkinRow = null; }
             base.OnMouseEnter(e);
-            ShowQuickInfo();
+            if (!string.IsNullOrEmpty(_QuickInfo) || !string.IsNullOrEmpty(QuickInfoText)) { Forms.QuickInfo.Show(QuickInfoText); }
         }
 
 
@@ -596,15 +633,7 @@ namespace BlueControls.Controls
 
 
 
-        private void ShowQuickInfo()
-        {
-            if (IsDisposed) { return; }
-            if (this is IQuickInfo tempVar)
-            {
-                if (string.IsNullOrEmpty(tempVar.QuickInfo)) { return; }
-                Forms.QuickInfo.Show(tempVar.QuickInfo);
-            }
-        }
+
 
         internal static bool AllEnabled(System.Windows.Forms.Control control)
         {

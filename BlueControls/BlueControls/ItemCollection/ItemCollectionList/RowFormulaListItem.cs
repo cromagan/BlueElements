@@ -63,6 +63,15 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
+        public override string QuickInfo
+        {
+            get
+            {
+                if (_Row == null) { return string.Empty; }
+                return _Row.CellFirstString().ToHTMLText();
+            }
+        }
+
         public string LayoutID
         {
             get

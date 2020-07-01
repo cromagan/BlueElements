@@ -732,10 +732,12 @@ namespace BlueDatabase
 
             if (tmpa.IsOk())
             {
-                rtext = "..." + tmpa.ReadableText().Replace("'" + IrgendeineDatebank.Column[0].ReadableText() + "'", "'SPALTE'");
-                rtext = "..." + tmpa.ReadableText().Replace("'" + IrgendeineDatebank.Column[1].ReadableText() + "'", "'SPALTE'");
-                rtext = rtext.Replace(" 2 Kom", " ?? Kom");
-                rtext = rtext.Replace(" 2 Stu", " ?? Stu");
+                rtext = "..." + tmpa.ReadableText();
+
+                rtext = rtext.Replace("'" + IrgendeineDatebank.Column[0].ReadableText() + "'", "'SPALTE'");
+                rtext = rtext.Replace("'" + IrgendeineDatebank.Column[1].ReadableText() + "'", "'SPALTE'");
+                //rtext = rtext.Replace(" 2 Kom", " ?? Kom");
+                //rtext = rtext.Replace(" 2 Stu", " ?? Stu");
                 rSym = tmpa.SymbolForReadableText();
 
             }

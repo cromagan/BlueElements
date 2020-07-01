@@ -96,7 +96,7 @@ namespace BlueControls.Controls
                 DisabledReason = string.Empty;
                 var captmp = Filter.Column.ReadableText() + ":";
 
-                var qi = Filter.Column.QickInfoText(string.Empty);
+                var qi = Filter.Column.QuickInfoText(string.Empty);
 
                 if (string.IsNullOrEmpty(qi))
                 {

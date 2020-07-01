@@ -32,7 +32,7 @@ namespace BlueControls.Controls
 {
     [Designer(typeof(ButtonDesigner))]
     [DefaultEvent("Click")]
-    public sealed class Button : GenericControl, IQuickInfo, IBackgroundNone
+    public sealed class Button : GenericControl, IBackgroundNone
     {
 
         #region Constructor
@@ -73,29 +73,6 @@ namespace BlueControls.Controls
         #region  Properties 
 
 
-
-        #region  QuickInfo 
-        // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
-        private string _QuickInfo = "";
-        [Category("Darstellung")]
-        [DefaultValue("")]
-        [Description("QuickInfo des Steuerelementes - im extTXT-Format")]
-        public string QuickInfo
-        {
-            get
-            {
-                return _QuickInfo;
-            }
-            set
-            {
-                if (_QuickInfo != value)
-                {
-                    Forms.QuickInfo.Close();
-                    _QuickInfo = value;
-                }
-            }
-        }
-        #endregion
 
 
 

@@ -716,9 +716,7 @@ namespace BlueControls
             {
                 if (IsRich)
                 {
-                    cactext = cactext.Replace("\r\n", "<br>");
-                    cactext = cactext.Replace("<<>", "&lt;");
-                    cactext = cactext.Replace("<>>", "&gt;");
+                    cactext = cactext.ConvertFromHtmlToRich();
                 }
                 else
                 {

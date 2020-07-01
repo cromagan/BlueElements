@@ -453,7 +453,6 @@
     <Compile Include="Interfaces\ICanHaveColumnVariables.cs" />
     <Compile Include="Interfaces\IContextMenu.cs" />
     <Compile Include="Interfaces\IMouseAndKeyHandle.cs" />
-    <Compile Include="Interfaces\IQuickInfo.cs" />
     <Compile Include="ItemCollection\ItemCollectionList\BasicListItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionList\BitmapListItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionList\CellLikeListItem.cs" />

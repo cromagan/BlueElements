@@ -2479,7 +2479,7 @@ namespace BlueControls.Controls
             TXTBox_Close(BCB);
             FloatingInputBoxListBoxStyle.Close(this);
             AutoFilter_Close();
-            QuickInfo.Close();
+            Forms.QuickInfo.Close();
 
 
         }
@@ -2758,7 +2758,7 @@ namespace BlueControls.Controls
                     var T = "";
                     if (_MouseOverColumn != null && e.Y < HeadSize())
                     {
-                        T = _MouseOverColumn.QickInfoText(string.Empty);
+                        T = _MouseOverColumn.QuickInfoText(string.Empty);
                     }
                     else if (_MouseOverColumn != null && _MouseOverRow != null)
                     {
@@ -2774,14 +2774,14 @@ namespace BlueControls.Controls
                                         if (int.TryParse(Txt, out var ColKey))
                                         {
                                             var C = _MouseOverColumn.LinkedDatabase().Column.SearchByKey(ColKey);
-                                            if (C != null) { T = C.QickInfoText(_MouseOverColumn.Caption + ": " + C.Caption); }
+                                            if (C != null) { T = C.QuickInfoText(_MouseOverColumn.Caption + ": " + C.Caption); }
                                         }
                                         break;
 
                                     case enDataFormat.LinkedCell:
                                     case enDataFormat.Values_für_LinkedCellDropdown:
                                         var LinkedData = CellCollection.LinkedCellData(_MouseOverColumn, _MouseOverRow, false, false, false);
-                                        if (LinkedData.Item1 != null) { T = LinkedData.Item1.QickInfoText(_MouseOverColumn.ReadableText() + " bei " + LinkedData.Item1.ReadableText() + ":"); }
+                                        if (LinkedData.Item1 != null) { T = LinkedData.Item1.QuickInfoText(_MouseOverColumn.ReadableText() + " bei " + LinkedData.Item1.ReadableText() + ":"); }
                                         break;
 
                                     default:
@@ -3057,7 +3057,7 @@ namespace BlueControls.Controls
             {
                 if (ISIN_MouseLeave) { return; }
                 ISIN_MouseLeave = true;
-                QuickInfo.Close();
+                Forms.QuickInfo.Close();
 
 
                 ISIN_MouseLeave = false;
@@ -3075,7 +3075,7 @@ namespace BlueControls.Controls
             {
                 if (ISIN_MouseEnter) { return; }
                 ISIN_MouseEnter = true;
-                QuickInfo.Close();
+                Forms.QuickInfo.Close();
 
                 ISIN_MouseEnter = false;
             }

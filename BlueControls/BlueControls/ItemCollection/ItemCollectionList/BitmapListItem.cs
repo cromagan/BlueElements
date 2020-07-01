@@ -179,6 +179,14 @@ namespace BlueControls.ItemCollection
 
         }
 
+        public override string QuickInfo
+        {
+            get
+            {
+                return string.Empty;
+            }
+        }
+
 
         #endregion
 

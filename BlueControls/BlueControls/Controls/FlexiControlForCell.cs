@@ -213,7 +213,7 @@ namespace BlueControls.Controls
             {
                 Caption = _tmpColumn.ReadableText() + ":";
                 EditType = _tmpColumn.EditType;
-                QuickInfo = _tmpColumn.QickInfoText(string.Empty);
+                QuickInfo = _tmpColumn.QuickInfoText(string.Empty);
                 FileEncryptionKey = _Database.FileEncryptionKey;
             }
         }

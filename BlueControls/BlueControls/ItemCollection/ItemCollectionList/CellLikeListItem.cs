@@ -45,6 +45,14 @@ namespace BlueControls.ItemCollection
 
         private readonly enShortenStyle _style;
 
+        public override string QuickInfo
+        {
+            get
+            {
+                return Internal.ToHTMLText(); // unveränderter Text
+            }
+        }
+
         #endregion
 
 

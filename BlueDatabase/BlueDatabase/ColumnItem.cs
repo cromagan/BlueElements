@@ -412,7 +412,7 @@ namespace BlueDatabase
         }
 
 
-        public string QickInfoText(string AdditionalText)
+        public string QuickInfoText(string AdditionalText)
         {
             var T = string.Empty;
             if (!string.IsNullOrEmpty(_QuickInfo)) { T = T + _QuickInfo; }
@@ -689,6 +689,18 @@ namespace BlueDatabase
                 Database.AddPending(enDatabaseDataType.co_BildCode_ConstantHeight, this, _BildCode_ConstantHeight.ToString(), value.ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
+            }
+        }
+
+
+        public string Ueberschriften
+        {
+            get
+            {
+                var txt = _Ueberschrift1 + "/" + _Ueberschrift2 + "/" + _Ueberschrift3;
+                if (txt == "//") { return "###"; }
+                return txt.TrimEnd("/");
+
             }
         }
 

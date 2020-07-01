@@ -500,7 +500,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (Database != null)
             {
-                Spaltx.Item.AddRange(Database.Column, true, true);
+                Spaltx.Item.AddRange(Database.Column, true, true, false);
                 Spaltx.Item.Sort();
             }
 

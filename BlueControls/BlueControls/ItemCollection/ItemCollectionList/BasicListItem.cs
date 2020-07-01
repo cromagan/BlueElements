@@ -66,7 +66,7 @@ namespace BlueControls.ItemCollection
         protected bool _Enabled = true;
 
 
-        protected BasicListItem(string internalname) 
+        protected BasicListItem(string internalname)
         {
 
 
@@ -170,6 +170,7 @@ namespace BlueControls.ItemCollection
             }
         }
 
+        public abstract string QuickInfo { get; }
 
         public void Draw(Graphics GR, int xModifier, int YModifier, enDesign controldesign, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, string FilterText, bool Translate)
         {

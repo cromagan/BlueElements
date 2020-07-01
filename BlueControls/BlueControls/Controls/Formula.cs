@@ -587,7 +587,7 @@ namespace BlueControls.Controls
 
 
             lbxColumns.Item.Clear();
-            lbxColumns.Item.AddRange(_Database.Column, false, false);
+            lbxColumns.Item.AddRange(_Database.Column, false, false, false);
             lbxColumns.Item.Sort();
 
             cbxCaptionPosition.Item.AddRange(typeof(en‹berschriftAnordnung));

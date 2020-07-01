@@ -214,7 +214,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             foreach (var ThisColumnItem in _TableView.Database.Column)
             {
-                if (ThisColumnItem != null && _TableView.CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem); }
+                if (ThisColumnItem != null && _TableView.CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem, false); }
 
             }
 
@@ -490,7 +490,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
             else
             {
-               // grpAktuelleSpalte.Text = "Spalte: " + column.ReadableText();
+                // grpAktuelleSpalte.Text = "Spalte: " + column.ReadableText();
                 btnSpalteNachLinks.Enabled = Convert.ToBoolean(IndexOfViewItem > 0);
                 btnSpalteNachRechts.Enabled = Convert.ToBoolean(IndexOfViewItem >= 0) && Convert.ToBoolean(IndexOfViewItem < _TableView.CurrentArrangement.Count() - 1);
 

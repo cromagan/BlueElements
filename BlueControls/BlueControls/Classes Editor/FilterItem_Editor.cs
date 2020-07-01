@@ -20,7 +20,7 @@ namespace BlueControls.Classes_Editor
 
         protected override void PrepaireFormula()
         {
-            Col.Item.AddRange(Item.Database.Column, false, false);
+            Col.Item.AddRange(Item.Database.Column, false, false,true);
         }
 
         protected override void EnabledAndFillFormula()

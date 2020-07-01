@@ -107,8 +107,8 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (_Table != null)
             {
-                butAktuellVor.Enabled = _Table.CurrentArrangement[_Column].PreviewsVisible(_Table.CurrentArrangement) != null;
-                butAktuellZurueck.Enabled = _Table.CurrentArrangement[_Column].NextVisible(_Table.CurrentArrangement) != null; 
+                butAktuellZurueck.Enabled = _Table.CurrentArrangement[_Column]?.PreviewsVisible(_Table.CurrentArrangement) != null;
+                butAktuellVor.Enabled = _Table.CurrentArrangement[_Column]?.NextVisible(_Table.CurrentArrangement) != null; 
             }
             else
             {
@@ -243,15 +243,15 @@ namespace BlueControls.BlueDatabaseDialogs
 
             foreach (var ThisColumn in _Column.Database.Column)
             {
-                if ((ThisColumn.Format == enDataFormat.RelationText || !ThisColumn.MultiLine) && ThisColumn.Format.CanBeCheckedByRules()) { cbxSchlüsselspalte.Item.Add(ThisColumn); }
+                if ((ThisColumn.Format == enDataFormat.RelationText || !ThisColumn.MultiLine) && ThisColumn.Format.CanBeCheckedByRules()) { cbxSchlüsselspalte.Item.Add(ThisColumn, false); }
                 if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase())
                 {
-                    cbxRowKeyInColumn.Item.Add(ThisColumn);
-                    cbxDropDownKey.Item.Add(ThisColumn);
-                    cbxVorschlagSpalte.Item.Add(ThisColumn);
+                    cbxRowKeyInColumn.Item.Add(ThisColumn, false);
+                    cbxDropDownKey.Item.Add(ThisColumn, false);
+                    cbxVorschlagSpalte.Item.Add(ThisColumn, false);
                 }
-                if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxRowKeyInColumn.Item.Add(ThisColumn); }
-                if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxColumnKeyInColumn.Item.Add(ThisColumn); }
+                if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxRowKeyInColumn.Item.Add(ThisColumn, false); }
+                if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) { cbxColumnKeyInColumn.Item.Add(ThisColumn, false); }
             }
 
             cbxSchlüsselspalte.Item.Sort();
@@ -792,7 +792,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 foreach (var ThisLinkedColumn in _Column.LinkedDatabase().Column)
                 {
-                    if (!ThisLinkedColumn.IsFirst() && ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) { cbxTargetColumn.Item.Add(ThisLinkedColumn); }
+                    if (!ThisLinkedColumn.IsFirst() && ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) { cbxTargetColumn.Item.Add(ThisLinkedColumn, false); }
 
                 }
                 cbxTargetColumn.Item.Sort();
