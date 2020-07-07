@@ -37,7 +37,7 @@ namespace BlueControls.Forms
         //    }
         //}
 
-        private MessageBox(string TXT, enImageCode Pic, params string[] Buttons)
+        private MessageBox(string TXT, enImageCode Pic, params string[] Buttons) : base(Enums.enDesign.Form_MsgBox)
         {
             InitializeComponent();
 

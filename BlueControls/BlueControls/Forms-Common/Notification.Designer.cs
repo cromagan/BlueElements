@@ -56,7 +56,6 @@ namespace BlueControls.Forms
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(86, 65);
             this.Controls.Add(this.capTXT);
-            this.Design = BlueControls.Enums.enDesign.Form_DesktopBenachrichtigung;
             this.Name = "Notification";
             this.ResumeLayout(false);
 

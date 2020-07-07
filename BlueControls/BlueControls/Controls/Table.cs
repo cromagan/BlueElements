@@ -80,12 +80,12 @@ namespace BlueControls.Controls
         private ColumnItem _MouseOverColumn;
         private RowItem _MouseOverRow;
 
-
+        private string _MouseOverText;
         private AutoFilter _AutoFilter;
         private SearchAndReplace _searchAndReplace;
 
         private int? _HeadSize = null;
-        private int WiederHolungsSpaltenWidth;
+        private int _WiederHolungsSpaltenWidth;
         private int _ArrangementNr = 1;
         private RowSortDefinition _sortDefinitionTemporary;
 
@@ -197,6 +197,7 @@ namespace BlueControls.Controls
                 _MouseOverRow = null;
                 _CursorPosColumn = null;
                 _CursorPosRow = null;
+                _MouseOverText = string.Empty;
 
                 if (_Database != null)
                 {
@@ -1997,7 +1998,8 @@ namespace BlueControls.Controls
 
 
 
-                WiederHolungsSpaltenWidth = 0;
+                _WiederHolungsSpaltenWidth = 0;
+                _MouseOverText = string.Empty;
 
                 var wdh = true;
 
@@ -2012,7 +2014,7 @@ namespace BlueControls.Controls
                         {
                             ThisViewItem.OrderTMP_Spalte_X1 = MaxX;
                             MaxX += Column_DrawWidth(ThisViewItem, DisplayR);
-                            WiederHolungsSpaltenWidth = Math.Max(WiederHolungsSpaltenWidth, MaxX);
+                            _WiederHolungsSpaltenWidth = Math.Max(_WiederHolungsSpaltenWidth, MaxX);
                         }
                         else
                         {
@@ -2382,6 +2384,7 @@ namespace BlueControls.Controls
             Invalidate_HeadSize();
 
             var f = string.Empty;
+            _MouseOverText = string.Empty; 
 
 
             if (Filter != null)
@@ -2734,16 +2737,12 @@ namespace BlueControls.Controls
         {
             base.OnMouseMove(e);
 
-            if (_Database == null)
-            {
-                Forms.QuickInfo.Close();
-                return;
-            }
 
             lock (Lock_UserAction)
             {
                 if (ISIN_MouseMove) { return; }
                 ISIN_MouseMove = true;
+                _MouseOverText = string.Empty;
 
 
                 CellOnCoordinate(e.X, e.Y, out _MouseOverColumn, out _MouseOverRow);
@@ -2755,10 +2754,9 @@ namespace BlueControls.Controls
                 else
                 {
 
-                    var T = "";
                     if (_MouseOverColumn != null && e.Y < HeadSize())
                     {
-                        T = _MouseOverColumn.QuickInfoText(string.Empty);
+                        _MouseOverText = _MouseOverColumn.QuickInfoText(string.Empty);
                     }
                     else if (_MouseOverColumn != null && _MouseOverRow != null)
                     {
@@ -2774,14 +2772,14 @@ namespace BlueControls.Controls
                                         if (int.TryParse(Txt, out var ColKey))
                                         {
                                             var C = _MouseOverColumn.LinkedDatabase().Column.SearchByKey(ColKey);
-                                            if (C != null) { T = C.QuickInfoText(_MouseOverColumn.Caption + ": " + C.Caption); }
+                                            if (C != null) { _MouseOverText = C.QuickInfoText(_MouseOverColumn.Caption + ": " + C.Caption); }
                                         }
                                         break;
 
                                     case enDataFormat.LinkedCell:
                                     case enDataFormat.Values_für_LinkedCellDropdown:
                                         var LinkedData = CellCollection.LinkedCellData(_MouseOverColumn, _MouseOverRow, false, false, false);
-                                        if (LinkedData.Item1 != null) { T = LinkedData.Item1.QuickInfoText(_MouseOverColumn.ReadableText() + " bei " + LinkedData.Item1.ReadableText() + ":"); }
+                                        if (LinkedData.Item1 != null) { _MouseOverText = LinkedData.Item1.QuickInfoText(_MouseOverColumn.ReadableText() + " bei " + LinkedData.Item1.ReadableText() + ":"); }
                                         break;
 
                                     default:
@@ -2795,29 +2793,29 @@ namespace BlueControls.Controls
                             }
                             else
                             {
-                                T = "Verknüpfung zur Ziel-Datenbank fehlerhaft.";
+                                _MouseOverText = "Verknüpfung zur Ziel-Datenbank fehlerhaft.";
                             }
                         }
 
                         else if (_Database.IsAdministrator())
                         {
-                            T = Database.UndoText(_MouseOverColumn, _MouseOverRow);
+                            _MouseOverText = Database.UndoText(_MouseOverColumn, _MouseOverRow);
                         }
                     }
 
 
-                    T = T.Trim();
-                    T = T.Trim("<br>");
-                    T = T.Trim();
+                    _MouseOverText = _MouseOverText.Trim();
+                    _MouseOverText = _MouseOverText.Trim("<br>");
+                    _MouseOverText = _MouseOverText.Trim();
 
-                    if (!string.IsNullOrEmpty(T))
-                    {
-                        Forms.QuickInfo.Show(T);
-                    }
-                    else
-                    {
-                        Forms.QuickInfo.Close();
-                    }
+                    //if (string.IsNullOrEmpty(T))
+                    //{
+                    //    Forms.QuickInfo.Close();
+                    //}
+                    //else
+                    //{
+                    //    Forms.QuickInfo.Show(T);
+                    //}
 
 
 
@@ -3031,6 +3029,7 @@ namespace BlueControls.Controls
 
             if (_CursorPosColumn == column && _CursorPosRow == row) { return; }
 
+            _MouseOverText = string.Empty;
             _CursorPosColumn = column;
             _CursorPosRow = row;
 
@@ -3388,9 +3387,9 @@ namespace BlueControls.Controls
             }
 
 
-            if (ViewItem.OrderTMP_Spalte_X1 < WiederHolungsSpaltenWidth)
+            if (ViewItem.OrderTMP_Spalte_X1 < _WiederHolungsSpaltenWidth)
             {
-                SliderX.Value = SliderX.Value + (int)ViewItem.OrderTMP_Spalte_X1 - WiederHolungsSpaltenWidth;
+                SliderX.Value = SliderX.Value + (int)ViewItem.OrderTMP_Spalte_X1 - _WiederHolungsSpaltenWidth;
             }
             else if (ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, r) > r.Width)
             {
@@ -4539,5 +4538,34 @@ namespace BlueControls.Controls
 
             return Skin.FormatedText_NeededSize(tmpText, tmpImageCode, font, minSize);
         }
+
+        public override string QuickInfoText
+        {
+            get
+            {
+                var t1 = base.QuickInfoText;
+                var t2 = _MouseOverText;
+
+                //if (_MouseOverItem != null) { t2 = _MouseOverItem.QuickInfo; }
+
+
+                if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2))
+                {
+                    return string.Empty;
+                }
+                else if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2))
+                {
+                    return t1 + "<br><hr><br>" + t2;
+                }
+                else
+                {
+                    return t1 + t2; // Eins davon ist leer
+                }
+
+            }
+        }
+
+
+
     }
 }

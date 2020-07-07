@@ -119,7 +119,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Controls.Add(this.FiltItems);
             this.Controls.Add(this.BlueLine1);
             this.Controls.Add(this.TXTBox);
-            this.Design = enDesign.Form_AutoFilter;
             this.Name = "AutoFilter";
             this.Text = "AutoFilter";
             this.TopMost = true;

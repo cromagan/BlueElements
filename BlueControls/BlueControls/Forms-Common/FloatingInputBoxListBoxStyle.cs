@@ -34,17 +34,17 @@ namespace BlueControls.Forms
     /// </summary>
     public partial class FloatingInputBoxListBoxStyle : BlueControls.Forms.FloatingForm
     {
-        private FloatingInputBoxListBoxStyle()
+        private FloatingInputBoxListBoxStyle(): base(enDesign.Form_QuickInfo)
         {
             InitializeComponent();
         }
 
-        private FloatingInputBoxListBoxStyle(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) : base(ConnectedControl)
+        private FloatingInputBoxListBoxStyle(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) : base(ConnectedControl, Items.ControlDesign)
 
         {
             InitializeComponent();
             this.Tag = Tag;
-            Design = Items.ControlDesign;
+           // Design = Items.ControlDesign;
 
             Xpos -= Skin.PaddingSmal;
             Ypos -= Skin.PaddingSmal;

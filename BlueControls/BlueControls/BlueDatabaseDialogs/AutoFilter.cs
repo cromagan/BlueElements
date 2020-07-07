@@ -37,7 +37,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
 
-        public AutoFilter(ColumnItem vColumn, FilterCollection vFilter) : base(null)
+        public AutoFilter(ColumnItem vColumn, FilterCollection vFilter) : base(enDesign.Form_AutoFilter)
         {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();

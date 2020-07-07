@@ -15,31 +15,12 @@ namespace BlueControls.Forms
         private readonly System.Windows.Forms.Control _ConnectedControl = null;
 
 
-        protected FloatingForm()
+        protected FloatingForm(enDesign design) : base(design)
         {
 
 
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
-            SetStyles();
-            AllBoxes.Add(this);
-
-        }
-
-        protected FloatingForm(System.Windows.Forms.Control ConnectedControl)
-        {
-
-
-            // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
-            InitializeComponent();
-            _ConnectedControl = ConnectedControl;
-            SetStyles();
-            AllBoxes.Add(this);
-        }
-
-
-        private void SetStyles()
-        {
 
             SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
             SetStyle(System.Windows.Forms.ControlStyles.StandardClick, false);
@@ -58,10 +39,24 @@ namespace BlueControls.Forms
             SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
 
-
             //BackColor = Color.FromArgb(255, 0, 255);
             //TransparencyKey = Color.FromArgb(255, 0, 255);
+
+
+            AllBoxes.Add(this);
+
         }
+
+        protected FloatingForm(System.Windows.Forms.Control connectedControl, enDesign design) : this(design)
+        {
+            // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+            //InitializeComponent();
+            _ConnectedControl = connectedControl;
+            //SetStyles();
+            //AllBoxes.Add(this);
+        }
+
+
 
 
 

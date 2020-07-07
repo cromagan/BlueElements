@@ -36,14 +36,14 @@ namespace BlueControls.Forms
         internal int FloatInAndOutMilliSek = -999;
 
 
-        private Notification()
+        private Notification() : base(Enums.enDesign.Form_DesktopBenachrichtigung)
         {
             InitializeComponent();
         }
 
-        private Notification(string Text)
+        private Notification(string Text) : this()
         {
-            InitializeComponent();
+            //InitializeComponent();
 
 
             capTXT.Text = Text;

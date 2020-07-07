@@ -30,9 +30,16 @@ namespace BlueControls.Forms
 {
     public partial class Form : System.Windows.Forms.Form, ISupportsBeginnEdit, IUseMyBackColor
     {
-        public Form(): base()
+        public Form(): this(enDesign.Form_Standard)
         {
+            //if (Skin.SkinDB == null) { Skin.LoadSkin(); }
+            //SkinChanged();
+            //InitializeComponent();
+        }
 
+        public Form(enDesign design) : base()
+        {
+            _design = design;
             if (Skin.SkinDB == null) { Skin.LoadSkin(); }
             SkinChanged();
             InitializeComponent();
@@ -119,18 +126,18 @@ namespace BlueControls.Forms
             {
                 return _design;
             }
-            set
-            {
-                if (value == _design) { return; }
-                _design = value;
+            //set
+            //{
+            //    if (value == _design) { return; }
+            //    _design = value;
 
-                if (Skin.SkinDB == null) { Skin.LoadSkin(); }
+            //    if (Skin.SkinDB == null) { Skin.LoadSkin(); }
 
-                SkinChanged();
+            //    SkinChanged();
 
 
 
-            }
+            //}
         }
 
         [DefaultValue(true)]

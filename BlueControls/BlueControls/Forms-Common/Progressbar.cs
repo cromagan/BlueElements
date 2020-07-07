@@ -35,14 +35,14 @@ namespace BlueControls.Forms
         private int _count = 0;
         private string _baseText = string.Empty;
 
-        private Progressbar()
+        private Progressbar() : base(Enums.enDesign.Form_BitteWarten)
         {
             InitializeComponent();
         }
 
-        private Progressbar(string Text)
+        private Progressbar(string Text) : this()
         {
-            InitializeComponent();
+           // InitializeComponent();
             capTXT.Text = Text;
             var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));

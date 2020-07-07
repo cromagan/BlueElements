@@ -76,7 +76,6 @@ namespace BlueControls.Forms
             this.Controls.Add(this.capText);
             this.Controls.Add(this.butAbbrechen);
             this.Controls.Add(this.butOK);
-            this.Design = enDesign.Form_MsgBox;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "DialogWithOkAndCancel";
             this.ShowIcon = false;

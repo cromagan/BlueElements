@@ -1,5 +1,6 @@
 ﻿using BlueBasics;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using System;
 using static BlueBasics.Develop;
 
@@ -12,9 +13,13 @@ namespace BlueControls.Forms
 
 
         #region Konstruktor
+        public DialogWithOkAndCancel() : this(Enums.enDesign.Form_MsgBox)
+        {
+
+        }
 
 
-        public DialogWithOkAndCancel() : base()
+        public DialogWithOkAndCancel(enDesign design) : base(design)
         {
             InitializeComponent();
             SetTopLevel(true);

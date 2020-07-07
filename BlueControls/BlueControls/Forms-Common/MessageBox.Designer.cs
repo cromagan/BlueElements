@@ -50,7 +50,6 @@ namespace BlueControls.Forms
             this.ClientSize = new System.Drawing.Size(104, 98);
             this.CloseButtonEnabled = false;
             this.Controls.Add(this.capText);
-            this.Design = BlueControls.Enums.enDesign.Form_MsgBox;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "MessageBox";
             this.ShowIcon = false;

@@ -48,7 +48,6 @@ namespace BlueControls.Forms
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(86, 65);
             this.Controls.Add(this.capTXT);
-            this.Design = enDesign.Form_BitteWarten;
             this.Name = "Progressbar";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.ResumeLayout(false);

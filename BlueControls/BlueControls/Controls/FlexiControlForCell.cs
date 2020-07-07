@@ -399,7 +399,8 @@ namespace BlueControls.Controls
 
             if (column1 == null)
             {
-                Develop.DebugPrint("Column nicht gefunden");
+    //            Develop.DebugPrint("Column nicht gefunden"); 
+    // Bei Steuerelementen, die manuell hinzugefügt werden
                 return;
             }
 
@@ -526,6 +527,9 @@ namespace BlueControls.Controls
                     break;
 
                 case Button _:
+                    break;
+
+                case Line _:
                     break;
 
                 default:

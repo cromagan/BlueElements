@@ -35,14 +35,14 @@ namespace BlueControls.Forms
 
         private int Counter = 0;
 
-        private QuickInfo()
+        private QuickInfo(): base( Enums.enDesign.Form_QuickInfo)
         {
             InitializeComponent();
         }
 
-        private QuickInfo(string Text)
+        private QuickInfo(string Text) : this()
         {
-            InitializeComponent();
+            //InitializeComponent();
 
 
             capTXT.Text = Text;

@@ -114,7 +114,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Controls.Add(this.caption1);
             this.Controls.Add(this.grpSonderzeichen);
             this.Controls.Add(this.btnSuchInCell);
-            this.Design = BlueControls.Enums.enDesign.Form_Standard;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "Search";
             this.ShowInTaskbar = false;
