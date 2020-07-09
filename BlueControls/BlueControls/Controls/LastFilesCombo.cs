@@ -43,7 +43,7 @@ namespace BlueControls.Controls
         //public string _specialcommand = string.Empty;
 
         #region Constructor
-        public LastFilesCombo(): base()
+        public LastFilesCombo() : base()
         {
             SetLastFilesStyle();
         }

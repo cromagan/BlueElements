@@ -17,18 +17,18 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.ComponentModel;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.Forms;
+using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
-using BlueControls.Designer_Support;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 
 namespace BlueControls.Controls
 {
@@ -39,7 +39,7 @@ namespace BlueControls.Controls
     {
 
         #region Constructor
-        public Caption(): base(false, false)
+        public Caption() : base(false, false)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -305,10 +305,10 @@ namespace BlueControls.Controls
 
                     if (eText == null)
                     {
-                        eText = new ExtText(_design, state, tmpSkinRow);
-
-
-                        eText.HtmlText = BlueDatabase.LanguageTool.DoTranslate(_Text, Translate);
+                        eText = new ExtText(_design, state, tmpSkinRow)
+                        {
+                            HtmlText = BlueDatabase.LanguageTool.DoTranslate(_Text, Translate)
+                        };
                         //eText.Zeilenabstand = _Zeilenabstand;
                     }
                     eText.State = state;

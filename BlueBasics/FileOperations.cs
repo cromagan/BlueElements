@@ -17,12 +17,12 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using static BlueBasics.modAllgemein;
-using BlueBasics.Enums;
 using System.Security.Cryptography;
+using static BlueBasics.modAllgemein;
 
 namespace BlueBasics
 {

@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -25,6 +24,7 @@ using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
+using System;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
@@ -35,7 +35,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Database _Database;
         private RowItem _row = null;
 
-        private string _DidImport = string.Empty;
+        private readonly string _DidImport = string.Empty;
 
         public Skript(Table table)
         {

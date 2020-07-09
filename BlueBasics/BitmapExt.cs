@@ -47,8 +47,8 @@ namespace BlueBasics
 
         protected GCHandle BitsHandle { get; private set; }
 
-       public PixelFormat _pixelformat = PixelFormat.Format32bppArgb;
-      //  public PixelFormat _pixelformat = PixelFormat.Format32bppPArgb;
+        public PixelFormat _pixelformat = PixelFormat.Format32bppArgb;
+        //  public PixelFormat _pixelformat = PixelFormat.Format32bppPArgb;
 
         public BitmapExt(string filename) : this((Bitmap)Image_FromFile(filename)) { }
 

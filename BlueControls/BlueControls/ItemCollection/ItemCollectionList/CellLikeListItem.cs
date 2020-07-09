@@ -41,7 +41,7 @@ namespace BlueControls.ItemCollection
         /// Nach welche Spalte sich der Stil richten muss.
         /// Wichtig, dass es ein Spalten-item ist, da bei neuen Datenbanken zwar die Spalte vorhnden ist, aber wenn keine Zeile Vorhanden ist, logischgerweise auch keine Zelle da ist.
         /// </summary>
-        private ColumnItem _StyleLikeThis;
+        private readonly ColumnItem _StyleLikeThis;
 
         private readonly enShortenStyle _style;
 
@@ -119,7 +119,7 @@ namespace BlueControls.ItemCollection
 
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth)
         {
-            return (int)SizeUntouchedForListBox().Height;
+            return SizeUntouchedForListBox().Height;
         }
 
 

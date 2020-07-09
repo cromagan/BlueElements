@@ -41,7 +41,7 @@ namespace BlueBasics
         private static TextWriterTraceListener _TraceListener;
         private static bool _DeleteTraceLog = true;
         private static bool _IsTraceLogging;
-        private readonly static DateTime _ProgrammStarted = DateTime.Now;
+        private static readonly DateTime _ProgrammStarted = DateTime.Now;
 
         [DefaultValue(false)]
         public static bool Exited { get; private set; } = false;
@@ -395,7 +395,7 @@ namespace BlueBasics
             Check.Tick += CloseAfter12Hours;
             Check.Interval = 60000;
             Check.Enabled = true;
-       }
+        }
 
         private static void CloseAfter12Hours(object sender, System.EventArgs e)
         {

@@ -263,9 +263,11 @@ namespace BlueControls.ItemCollection
             _LastRecalc = DateTime.Now;
             CalcTempPoints_Code = NewCode;
 
-            _TempPoints = new List<PointDF>();
-            _TempPoints.Add(Point1);
-            _TempPoints.Add(Point2);
+            _TempPoints = new List<PointDF>
+            {
+                Point1,
+                Point2
+            };
 
             if (Linien_Verhalten == enConectorStyle.Direct) { return; }
 
@@ -321,7 +323,7 @@ namespace BlueControls.ItemCollection
         private bool IsVerdeckt(decimal X, decimal Y)
         {
 
-            foreach (var ThisItemBasic in (ItemCollectionPad)Parent)
+            foreach (var ThisItemBasic in Parent)
             {
                 if (ThisItemBasic != null)
                 {
@@ -351,7 +353,7 @@ namespace BlueControls.ItemCollection
             var p1 = new PointDF(X1, Y1);
             var p2 = new PointDF(X2, Y2);
 
-            foreach (var ThisItemBasic in (ItemCollectionPad)Parent)
+            foreach (var ThisItemBasic in Parent)
             {
                 if (SchneidetDas(ThisItemBasic, p1, p2)) { return true; }
             }
@@ -475,7 +477,7 @@ namespace BlueControls.ItemCollection
             if (P1 >= _TempPoints.Count - 1) { return false; }
             //   If _TempPoints.Count > 4 Then Return False
 
-            foreach (var ThisItemBasic in (ItemCollectionPad)Parent)
+            foreach (var ThisItemBasic in Parent)
             {
                 if (ThisItemBasic != null)
                 {

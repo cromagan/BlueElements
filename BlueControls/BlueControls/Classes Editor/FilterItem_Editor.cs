@@ -1,14 +1,14 @@
-﻿using System.Drawing;
-using BlueBasics;
+﻿using BlueBasics;
 using BlueControls.BlueDatabaseDialogs;
-using BlueControls.Forms;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System.Drawing;
 
 namespace BlueControls.Classes_Editor
 {
-    internal sealed partial class FilterItem_Editor :  AbstractClassEditor<FilterItem> //System.Windows.Forms.UserControl // :
+    internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem> //System.Windows.Forms.UserControl // :
     {
         public FilterItem_Editor() : base()
         {
@@ -20,7 +20,7 @@ namespace BlueControls.Classes_Editor
 
         protected override void PrepaireFormula()
         {
-            Col.Item.AddRange(Item.Database.Column, false, false,true);
+            Col.Item.AddRange(Item.Database.Column, false, false, true);
         }
 
         protected override void EnabledAndFillFormula()

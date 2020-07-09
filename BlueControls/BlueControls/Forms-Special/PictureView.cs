@@ -18,10 +18,10 @@
 #endregion
 
 
+using BlueBasics;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using BlueBasics;
 
 
 
@@ -139,7 +139,7 @@ namespace BlueControls.Forms
                 try
                 {
                     Pad.BMP = (Bitmap)BitmapExt.Image_FromFile(_FileList[Nr]);
-                } 
+                }
                 catch (Exception ex)
                 {
                     Pad.BMP = null;

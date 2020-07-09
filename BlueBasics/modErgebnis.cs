@@ -71,7 +71,7 @@ namespace BlueBasics
                     var Att = Formel.Substring(a + 1, e - a - 1).SplitBy(",");
                     var Att2 = new double?[Att.Length];
 
-                    for (TMP = 0 ; TMP < Att.Length ; TMP++)
+                    for (TMP = 0; TMP < Att.Length; TMP++)
                     {
                         var qq = ErgebnisCore(Att[TMP]);
                         if (qq == null) { return null; }
@@ -83,14 +83,14 @@ namespace BlueBasics
                     switch (Formel.Substring(a - 3, 4))
                     {
                         case "MIN(":
-                            for (TMP = 1 ; TMP < Att2.Length ; TMP++)
+                            for (TMP = 1; TMP < Att2.Length; TMP++)
                             {
                                 if (Att2[TMP] < Replacer) { Replacer = Att2[TMP]; }
                             }
 
                             break;
                         case "MAX(":
-                            for (TMP = 1 ; TMP < Att2.Length ; TMP++)
+                            for (TMP = 1; TMP < Att2.Length; TMP++)
                             {
                                 if (Att2[TMP] > Replacer) { Replacer = Att2[TMP]; }
                             }

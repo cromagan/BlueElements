@@ -1,3 +1,4 @@
+using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
 using System.ComponentModel;
@@ -5,7 +6,6 @@ using System.ComponentModel.Design;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.Design;
-using BlueControls.Controls;
 
 namespace BlueControls.Designer_Support
 {
@@ -116,7 +116,7 @@ namespace BlueControls.Designer_Support
 
             var tpc = new System.Windows.Forms.TabPage[ParentControl.TabCount + 1];
             //Starting at our Insert Position, store and remove all the tabpages.
-            for (var i = Index ; i < ParentControl.TabCount ; i++)
+            for (var i = Index; i < ParentControl.TabCount; i++)
             {
                 tpc[i] = ParentControl.TabPages[Index];
                 ParentControl.TabPages.Remove(ParentControl.TabPages[Index]);
@@ -124,7 +124,7 @@ namespace BlueControls.Designer_Support
             //add the tabpage to be inserted.
             ParentControl.TabPages.Add(P);
             //then re-add the original tabpages.
-            for (var i = Index ; i < tpc.GetUpperBound(0) ; i++)
+            for (var i = Index; i < tpc.GetUpperBound(0); i++)
             {
                 ParentControl.TabPages.Add(tpc[i]);
             }
@@ -210,13 +210,16 @@ namespace BlueControls.Designer_Support
 
             if ((System.Windows.Forms.Control)SelectionService.PrimarySelection == Control)
             {
-                var hti = new TCHITTESTINFO();
+                var hti = new TCHITTESTINFO
+                {
+                    pt = Control.PointToClient(point)
+                };
 
-                hti.pt = Control.PointToClient(point);
-
-                var m = new System.Windows.Forms.Message();
-                m.HWnd = Control.Handle;
-                m.Msg = TCM_HITTEST;
+                var m = new System.Windows.Forms.Message
+                {
+                    HWnd = Control.Handle,
+                    Msg = TCM_HITTEST
+                };
 
                 var lparam = Marshal.AllocHGlobal(Marshal.SizeOf(hti));
                 Marshal.StructureToPtr(hti, lparam, false);

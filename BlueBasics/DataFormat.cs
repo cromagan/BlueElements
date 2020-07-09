@@ -17,10 +17,10 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics.Enums;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using BlueBasics.Enums;
 using static BlueBasics.modConverter;
 
 namespace BlueBasics

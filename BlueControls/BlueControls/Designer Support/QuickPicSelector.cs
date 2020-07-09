@@ -17,11 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms.Design;
-using BlueBasics;
 
 namespace BlueControls.Designer_Support
 {

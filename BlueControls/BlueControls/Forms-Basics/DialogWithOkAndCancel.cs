@@ -39,7 +39,7 @@ namespace BlueControls.Forms
 
             Text = Develop.AppName();
 
-            MinWidth = Math.Max(this.Width, MinWidth);
+            MinWidth = Math.Max(Width, MinWidth);
 
 
             Size = new System.Drawing.Size(MinWidth, BottomOfLowestControl + butOK.Height + BorderHeight + Skin.Padding);
@@ -64,7 +64,7 @@ namespace BlueControls.Forms
             butAbbrechen.Top = BottomOfLowestControl;
             if (Sizeable)
             {
-                this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+                FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             }
 
 

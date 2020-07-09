@@ -22,9 +22,10 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueControls.BlueDatabaseDialogs;
-using BlueControls.Forms;
+using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
@@ -39,7 +40,6 @@ using System.Drawing.Text;
 using System.Linq;
 using System.Threading;
 using static BlueBasics.FileOperations;
-using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
@@ -91,8 +91,8 @@ namespace BlueControls.Controls
 
         private enBlueTableAppearance _Design = enBlueTableAppearance.Standard;
         private List<RowItem> _SortedRows; // Die Sortierung der Zeile
-        private List<RowItem> _SortedRowsBefore = new List<RowItem>(); // Die Sortierung der Zeile
-        private List<RowItem> _PinnedRows = new List<RowItem>();
+        private readonly List<RowItem> _SortedRowsBefore = new List<RowItem>(); // Die Sortierung der Zeile
+        private readonly List<RowItem> _PinnedRows = new List<RowItem>();
 
         private readonly object Lock_UserAction = new object();
         private BlueFont _Column_Font;
@@ -104,7 +104,7 @@ namespace BlueControls.Controls
 
         private Rectangle tmpCursorRect = Rectangle.Empty;
 
-        private FontSelectDialog _FDia = null;
+        private readonly FontSelectDialog _FDia = null;
 
         private bool _ShowNumber = false;
 
@@ -1158,7 +1158,7 @@ namespace BlueControls.Controls
             if (ViewItem.Column.CaptionBitmap != null && ViewItem.Column.CaptionBitmap.Width > 10)
             {
                 var pos = new Point((int)ViewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - FS.Width) / 2.0), 3 + Down);
-                GR.DrawImageInRectAspectRatio(ViewItem.Column.CaptionBitmap, (int)ViewItem.OrderTMP_Spalte_X1 + 2, (int)(pos.Y + FS.Height), (int)Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 4, HeadSize() - (int)(pos.Y + FS.Height) - 6 - 18);
+                GR.DrawImageInRectAspectRatio(ViewItem.Column.CaptionBitmap, (int)ViewItem.OrderTMP_Spalte_X1 + 2, (int)(pos.Y + FS.Height), Column_DrawWidth(ViewItem, DisplayRectangleWOSlider) - 4, HeadSize() - (int)(pos.Y + FS.Height) - 6 - 18);
 
                 // Dann der Text
                 GR.TranslateTransform(pos.X, pos.Y);
@@ -1777,8 +1777,10 @@ namespace BlueControls.Controls
                 }
             }
 
-            var t = new ItemCollectionList();
-            t.Appearance = enBlueListBoxAppearance.DropdownSelectbox;
+            var t = new ItemCollectionList
+            {
+                Appearance = enBlueListBoxAppearance.DropdownSelectbox
+            };
             ItemCollectionList.GetItemCollection(t, ContentHolderCellColumn, ContentHolderCellRow, enShortenStyle.Both, 1000);
 
             if (t.Count == 0)
@@ -2384,7 +2386,7 @@ namespace BlueControls.Controls
             Invalidate_HeadSize();
 
             var f = string.Empty;
-            _MouseOverText = string.Empty; 
+            _MouseOverText = string.Empty;
 
 
             if (Filter != null)
@@ -4400,8 +4402,10 @@ namespace BlueControls.Controls
 
                 if (ContentHolderCellColumn.Format == enDataFormat.Text_mit_Formatierung)
                 {
-                    var l = new ExtText(enDesign.TextBox, enStates.Standard);
-                    l.HtmlText = _Ist1;
+                    var l = new ExtText(enDesign.TextBox, enStates.Standard)
+                    {
+                        HtmlText = _Ist1
+                    };
                     _Ist1 = l.PlainText;
                 }
 

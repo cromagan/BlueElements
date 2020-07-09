@@ -116,7 +116,7 @@ namespace BlueBasics
 
         }
 
-        public static bool IsDifferentTo<T>(this List<T> List1, List<T> List2) 
+        public static bool IsDifferentTo<T>(this List<T> List1, List<T> List2)
         {
             //https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
             if (List1 == List2) { return false; }
@@ -181,7 +181,7 @@ namespace BlueBasics
         //        L.Remove(Item);
         //    }
         //}
-  
+
         public static void RemoveNullOrEmpty(this List<string> L)
         {
             var z = 0;
@@ -346,7 +346,7 @@ namespace BlueBasics
         public static int TagGetInt(this ICollection<string> _String, string TagName)
         {
 
-           return IntParse( TagGet(_String, TagName));
+            return IntParse(TagGet(_String, TagName));
         }
 
         public static decimal TagGetDecimal(this ICollection<string> _String, string TagName)

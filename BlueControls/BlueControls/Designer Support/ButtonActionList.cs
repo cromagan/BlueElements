@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.Design;
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
 using BlueControls.Enums;
+using System.ComponentModel;
+using System.ComponentModel.Design;
 
 namespace BlueControls.Designer_Support
 {
@@ -63,11 +63,13 @@ namespace BlueControls.Designer_Support
 
         public override DesignerActionItemCollection GetSortedActionItems()
         {
-            var items = new DesignerActionItemCollection();
-            items.Add(new DesignerActionHeaderItem("Allgemein"));
+            var items = new DesignerActionItemCollection
+            {
+                new DesignerActionHeaderItem("Allgemein"),
 
 
-            items.Add(new DesignerActionPropertyItem("ButtonStyle", "ButtonStyle", "Allgemein", "Das Verhalten des Buttons."));
+                new DesignerActionPropertyItem("ButtonStyle", "ButtonStyle", "Allgemein", "Das Verhalten des Buttons.")
+            };
 
             if ((int)ReverenceControl.ButtonStyle % 1000 == (int)enButtonStyle.Checkbox || (int)ReverenceControl.ButtonStyle % 1000 == (int)enButtonStyle.Yes_or_No || (int)ReverenceControl.ButtonStyle % 1000 == (int)enButtonStyle.Pic1_or_Pic2 || (int)ReverenceControl.ButtonStyle % 1000 == (int)enButtonStyle.Optionbox)
             {

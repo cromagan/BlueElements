@@ -17,23 +17,23 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueControls.BlueDatabaseDialogs;
-using BlueControls.Forms;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using BlueDatabase.EventArgs;
 using BlueDatabase.Enums;
-using BlueControls.Enums;
-using BlueControls.Designer_Support;
+using BlueDatabase.EventArgs;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 
 namespace BlueControls.Controls
 {
@@ -394,12 +394,13 @@ namespace BlueControls.Controls
                     if (ThisViewItem?.Column != null)
                     {
 
-                        var ObjPX = new Rectangle(); // Die Koordinaten in Pixel des Steuerelements
+                        var ObjPX = new Rectangle
+                        {
+                            Width = ThisViewItem.Width * WidthInPixelOfColumn + (ThisViewItem.Width - 1) * Skin.PaddingSmal,
+                            X = ThisViewItem.Spalte_X1 * WidthInPixelOfColumn + ThisViewItem.Spalte_X1 * Skin.PaddingSmal + MoveIn,
 
-                        ObjPX.Width = ThisViewItem.Width * WidthInPixelOfColumn + (ThisViewItem.Width - 1) * Skin.PaddingSmal;
-                        ObjPX.X = ThisViewItem.Spalte_X1 * WidthInPixelOfColumn + ThisViewItem.Spalte_X1 * Skin.PaddingSmal + MoveIn;
-
-                        ObjPX.Y = MoveIn;
+                            Y = MoveIn
+                        }; // Die Koordinaten in Pixel des Steuerelements
                         for (var z = ThisViewItem.Spalte_X1; z < ThisViewItem.Spalte_X1 + ThisViewItem.Width; z++) // Spalte_X2
                         {
                             ObjPX.Y = Math.Max(_BelegterBereichTop[z], ObjPX.Y);
@@ -457,9 +458,11 @@ namespace BlueControls.Controls
             if (cd?.Column == null) { return; }
 
             Develop.Debugprint_BackgroundThread();
-            var btb = new FlexiControlForCell(cd.Column.Database, cd.Column.Key, cd.ÜberschriftAnordnung);
-            btb.TabIndex = TabIndex + 10000;
-            btb.Tag = cd;
+            var btb = new FlexiControlForCell(cd.Column.Database, cd.Column.Key, cd.ÜberschriftAnordnung)
+            {
+                TabIndex = TabIndex + 10000,
+                Tag = cd
+            };
             btb.NeedRefresh += Btb_IAmInvalid;
 
             vParent.Controls.Add(btb);
@@ -719,8 +722,10 @@ namespace BlueControls.Controls
                 if (ThisView != null && ThisView != _Database.Views[0])
                 {
                     TabGeneratorCount += 1;
-                    var tempPage = new TabPage();
-                    tempPage.Text = "Seite #" + TabGeneratorCount;
+                    var tempPage = new TabPage
+                    {
+                        Text = "Seite #" + TabGeneratorCount
+                    };
 
                     tempPage.Text = ThisView.Name;
                     tempPage.Enabled = _Database.PermissionCheck(ThisView.PermissionGroups_Show, null);

@@ -24,6 +24,6 @@ namespace BlueControls.Enums
     {
         Ohne = 0,
         Pfeil = 1,
-        Bruchlinie =2
+        Bruchlinie = 2
     }
 }

@@ -7,8 +7,7 @@ namespace BlueControls.Forms
 {
     public partial class EditBoxFlexiControl : Forms.DialogWithOkAndCancel
     {
-
-        List<string> GiveBack = null;
+        private List<string> GiveBack = null;
 
 
         #region Konstruktor

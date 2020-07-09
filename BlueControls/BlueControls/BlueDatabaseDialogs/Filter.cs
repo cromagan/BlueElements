@@ -25,7 +25,7 @@ namespace BlueControls.BlueDatabaseDialogs
     public sealed partial class Filter : BlueControls.Forms.Form
     {
 
-  
+
 
 
 

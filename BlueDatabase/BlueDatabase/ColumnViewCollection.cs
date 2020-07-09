@@ -17,13 +17,13 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueDatabase.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using BlueBasics;
-using BlueBasics.Interfaces;
-using BlueBasics.Enums;
-using BlueDatabase.Enums;
 
 namespace BlueDatabase
 {
@@ -56,12 +56,12 @@ namespace BlueDatabase
 
 
             _Internal.Clear();
-            _Internal.ListOrItemChanged += _Internal_ListOrItemChanged;
+            _Internal.ListOrItemChanged += Internal_ListOrItemChanged;
 
 
         }
 
-        private void _Internal_ListOrItemChanged(object sender, System.EventArgs e)
+        private void Internal_ListOrItemChanged(object sender, System.EventArgs e)
         {
             OnChanged();
         }

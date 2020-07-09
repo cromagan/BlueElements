@@ -18,14 +18,14 @@
 #endregion
 
 
+using BlueControls.Designer_Support;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using BlueControls.EventArgs;
-using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
@@ -39,17 +39,7 @@ namespace BlueControls.Controls
         //public Bitmap OverlayBMP = null;
 
         [DefaultValue(true)]
-        public bool AlwaysSmooth
-        {
-            get
-            {
-                return _AlwaysSmooth;
-            }
-            set
-            {
-                _AlwaysSmooth = value;
-            }
-        }
+        public bool AlwaysSmooth { get; set; } = false;
 
         #region Constructor
         public ZoomPic() : base()
@@ -64,10 +54,6 @@ namespace BlueControls.Controls
         public event EventHandler<MouseEventArgs1_1DownAndCurrent> ImageMouseUp;
         public event EventHandler<AdditionalDrawing> DoAdditionalDrawing;
         public event EventHandler<PositionEventArgs> OverwriteMouseImageData;
-
-        private bool _AlwaysSmooth = false;
-
-
 
         protected override RectangleDF MaxBounds()
         {
@@ -95,7 +81,7 @@ namespace BlueControls.Controls
                 var r = new RectangleDF(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(_Zoom, _MoveX, _MoveY);
 
 
-                if (_Zoom < 1 || _AlwaysSmooth)
+                if (_Zoom < 1 || AlwaysSmooth)
                 {
                     gr.SmoothingMode = SmoothingMode.AntiAlias;
                     gr.InterpolationMode = InterpolationMode.HighQualityBicubic;

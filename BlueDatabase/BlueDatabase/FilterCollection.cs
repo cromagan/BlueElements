@@ -17,12 +17,12 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace BlueDatabase
 {
@@ -280,7 +280,7 @@ namespace BlueDatabase
 
         public bool IsRowFilterActiv()
         {
-            return this[(ColumnItem)null] != null;
+            return this[null] != null;
         }
 
         public string RowFilterText
@@ -289,7 +289,7 @@ namespace BlueDatabase
             get
             {
 
-                var f = this[(ColumnItem)null];
+                var f = this[null];
                 if (f != null) { return f.SearchValue[0]; }
 
                 return string.Empty;
@@ -297,7 +297,7 @@ namespace BlueDatabase
             set
             {
 
-                var f = this[(ColumnItem)null];
+                var f = this[null];
 
                 if (f != null)
                 {

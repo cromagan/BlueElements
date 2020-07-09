@@ -25,12 +25,11 @@ using System.Drawing.Text;
 
 namespace BlueControls
 {
-    public class ExtChar 
+    public class ExtChar
     {
         #region  Variablen-Deklarationen 
 
         public PointF Pos = PointF.Empty;
-        private BlueFont _Font = null;
         private readonly char _Char;
 
         private enDesign _Design = enDesign.Undefiniert;
@@ -61,7 +60,7 @@ namespace BlueControls
         {
             _Design = cDesign;
             _Char = charcode;
-            _Font = cFont;
+            Font = cFont;
             _Stufe = Stufe;
             _State = cState;
             Marking = cMarkState;
@@ -72,20 +71,14 @@ namespace BlueControls
 
         #region  Properties 
 
-        internal BlueFont Font
-        {
-            get
-            {
-                return _Font;
-            }
-        }
+        internal BlueFont Font { get; private set; } = null;
 
 
         public int Char
         {
             get
             {
-                return (int)_Char;
+                return _Char;
             }
         }
 
@@ -104,11 +97,11 @@ namespace BlueControls
                 }
                 else if (_Char < 0)
                 {
-                    _Size = _Font.CharSize(0f);
+                    _Size = Font.CharSize(0f);
                 }
                 else
                 {
-                    _Size = _Font.CharSize(_Char);
+                    _Size = Font.CharSize(_Char);
 
                 }
 
@@ -197,11 +190,11 @@ namespace BlueControls
 
             if (vDesign == enDesign.Undefiniert || vState == enStates.Undefiniert)
             {
-                _Font = null;
+                Font = null;
             }
             else
             {
-                _Font = Skin.GetBlueFont(vDesign, vState, vStufe);
+                Font = Skin.GetBlueFont(vDesign, vState, vStufe);
             }
         }
 
@@ -254,8 +247,8 @@ namespace BlueControls
 
             Font f = null;
 
-            if (_Font != null) { f = _Font.FontWithoutLines(czoom); }
-            if (_Font == null) { return; }
+            if (Font != null) { f = Font.FontWithoutLines(czoom); }
+            if (Font == null) { return; }
 
             var IsCap = false;
 
@@ -266,23 +259,23 @@ namespace BlueControls
 
 
                 var c = _Char;
-                if (_Font.Kapitälchen && c != char.ToUpper(c))
+                if (Font.Kapitälchen && c != char.ToUpper(c))
                 {
                     IsCap = true;
-                    f = _Font.FontWithoutLinesForCapitals(czoom);
+                    f = Font.FontWithoutLinesForCapitals(czoom);
                     c = char.ToUpper(c);
                 }
-                else if (_Font.OnlyUpper)
+                else if (Font.OnlyUpper)
                 {
                     c = char.ToUpper(c);
                 }
-                else if (_Font.OnlyLower)
+                else if (Font.OnlyLower)
                 {
                     c = char.ToLower(c);
                 }
-                if (_Font.Underline)
+                if (Font.Underline)
                 {
-                    GR.DrawLine(_Font.Pen(czoom), DrawX, (int)(DrawY + _Font.Oberlänge(czoom) + (_Font.Pen(1f).Width + 1) * czoom + 0.5), DrawX + (1 + Size.Width) * czoom, (int)(DrawY + _Font.Oberlänge(czoom) + (_Font.Pen(1f).Width + 1) * czoom + 0.5));
+                    GR.DrawLine(Font.Pen(czoom), DrawX, (int)(DrawY + Font.Oberlänge(czoom) + (Font.Pen(1f).Width + 1) * czoom + 0.5), DrawX + (1 + Size.Width) * czoom, (int)(DrawY + Font.Oberlänge(czoom) + (Font.Pen(1f).Width + 1) * czoom + 0.5));
                 }
 
                 if (IsCap)
@@ -293,13 +286,13 @@ namespace BlueControls
 
                 try
                 {
-                    if (_Font.Outline)
+                    if (Font.Outline)
                     {
                         for (var PX = -1; PX <= 1; PX++)
                         {
                             for (var PY = -1; PY <= 1; PY++)
                             {
-                                GR.DrawString(c.ToString(), f, _Font.Brush_Color_Outline, DrawX + PX, DrawY + PY, StringFormat.GenericTypographic);
+                                GR.DrawString(c.ToString(), f, Font.Brush_Color_Outline, DrawX + PX, DrawY + PY, StringFormat.GenericTypographic);
                             }
                         }
                     }
@@ -307,15 +300,15 @@ namespace BlueControls
 
                     if (IsCap)
                     {
-                        GR.DrawString(c.ToString(), f, _Font.Brush_Color_Main, DrawX + 0.3F * czoom, DrawY, StringFormat.GenericTypographic);
+                        GR.DrawString(c.ToString(), f, Font.Brush_Color_Main, DrawX + 0.3F * czoom, DrawY, StringFormat.GenericTypographic);
                     }
 
-                    GR.DrawString(c.ToString(), f, _Font.Brush_Color_Main, DrawX, DrawY, StringFormat.GenericTypographic);
+                    GR.DrawString(c.ToString(), f, Font.Brush_Color_Main, DrawX, DrawY, StringFormat.GenericTypographic);
 
 
-                    if (_Font.StrikeOut)
+                    if (Font.StrikeOut)
                     {
-                        GR.DrawLine(_Font.Pen(czoom), DrawX - 1, (int)(DrawY + Size.Height * 0.55), (int)(DrawX + 1 + Size.Width), (int)(DrawY + Size.Height * 0.55));
+                        GR.DrawLine(Font.Pen(czoom), DrawX - 1, (int)(DrawY + Size.Height * 0.55), (int)(DrawX + 1 + Size.Width), (int)(DrawY + Size.Height * 0.55));
                     }
 
 
@@ -341,13 +334,13 @@ namespace BlueControls
 
                 if (Math.Abs(czoom - 1) < 0.001)
                 {
-                    var BNR = QuickImage.Get((int)_Char - ImagesStart);
+                    var BNR = QuickImage.Get(_Char - ImagesStart);
                     if (BNR == null) { return; }
                     GR.DrawImage(BNR.BMP, (int)DrawX, (int)DrawY);
                 }
                 else
                 {
-                    var l = QuickImage.Get((int)_Char - ImagesStart);
+                    var l = QuickImage.Get(_Char - ImagesStart);
 
                     if (l == null || l.Width == 0) { l = QuickImage.Get("Warnung|16"); }
 

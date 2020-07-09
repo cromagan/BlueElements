@@ -24,24 +24,15 @@ namespace BlueDatabase.EventArgs
     {
 
 
-        public DatabaseSettingsEventHandler(ColumnItem ExecutingColumn, string Filenname, bool ReadOnly)
+        public DatabaseSettingsEventHandler(ColumnItem executingColumn, string filenname, bool readOnly)
         {
-            this.ExecutingColumn = ExecutingColumn;
-            this.Filenname = Filenname;
-            this.ReadOnly = ReadOnly;
-            //this.PasswordSub = PasswordSub;
-            //this.GenenerateLayout = GenLayout;
-            //this.RenameColumnInLayout = RenameColumn;
+            ExecutingColumn = executingColumn;
+            Filenname = filenname;
+            ReadOnly = readOnly;
         }
 
-        public ColumnItem ExecutingColumn { get;  }
+        public ColumnItem ExecutingColumn { get; }
         public string Filenname { get; }
-
         public bool ReadOnly { get; set; }
-
-        //public GetPassword PasswordSub { get; set; }
-        //public GenerateLayout_Internal GenenerateLayout { get; set; }
-
-        //public RenameColumnInLayout RenameColumnInLayout { get; set; }
     }
 }

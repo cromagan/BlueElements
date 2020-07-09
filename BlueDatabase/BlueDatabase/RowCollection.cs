@@ -18,15 +18,15 @@
 #endregion
 
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
 
 namespace BlueDatabase
 {
@@ -93,8 +93,10 @@ namespace BlueDatabase
         {
             get
             {
-                var d = new FilterCollection(filter.Database);
-                d.Add(filter);
+                var d = new FilterCollection(filter.Database)
+                {
+                    filter
+                };
                 return this[d];
             }
         }
@@ -104,9 +106,11 @@ namespace BlueDatabase
         {
             get
             {
-                var d = new FilterCollection(filter1.Database);
-                d.Add(filter1);
-                d.Add(filter2);
+                var d = new FilterCollection(filter1.Database)
+                {
+                    filter1,
+                    filter2
+                };
                 return this[d];
             }
         }
@@ -165,8 +169,10 @@ namespace BlueDatabase
 
         public bool Remove(FilterItem Filter)
         {
-            var NF = new FilterCollection(Database);
-            NF.Add(Filter);
+            var NF = new FilterCollection(Database)
+            {
+                Filter
+            };
             return Remove(NF);
         }
 

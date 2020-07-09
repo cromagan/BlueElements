@@ -17,13 +17,13 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueControls.ItemCollection
 {
@@ -101,10 +101,11 @@ namespace BlueControls.ItemCollection
 
         public override List<FlexiControl> GetStyleOptions()
         {
-            var l = new List<FlexiControl>();
-
-            l.Add(new FlexiControl());
-            l.Add(new FlexiControlForProperty(this, "Drehwinkel"));
+            var l = new List<FlexiControl>
+            {
+                new FlexiControl(),
+                new FlexiControlForProperty(this, "Drehwinkel")
+            };
 
             if (!Größe_fixiert && !p_LO.CanMove(Parent.AllRelations) && !p_RU.CanMove(Parent.AllRelations))
             {

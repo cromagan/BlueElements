@@ -37,8 +37,6 @@ namespace BlueControls
 
         private Font _Font;
         private Font _FontOL;
-
-        private Color _Color_Main;
         private Pen _Pen;
 
 
@@ -93,7 +91,7 @@ namespace BlueControls
             OnlyLower = false;
             OnlyUpper = false;
 
-            _Color_Main = Color.Black;
+            Color_Main = Color.Black;
             Color_Outline = Color.Magenta;
             _Pen = null;
             Brush_Color_Main = null;
@@ -206,13 +204,7 @@ namespace BlueControls
 
         public Brush Brush_Color_Outline { get; private set; }
 
-        public Color Color_Main
-        {
-            get
-            {
-                return _Color_Main;
-            }
-        }
+        public Color Color_Main { get; private set; }
 
         public Color Color_Outline { get; private set; }
 
@@ -296,7 +288,7 @@ namespace BlueControls
             if (vChar >= 0 && vChar <= 31) { return new SizeF(0, _Zeilenabstand); }
             if (vChar >= ExtChar.ImagesStart)
             {
-                var BNR = QuickImage.Get((int)vChar - (int)ExtChar.ImagesStart);
+                var BNR = QuickImage.Get(vChar - ExtChar.ImagesStart);
                 if (BNR == null) { return new SizeF(0, 0); }
                 return new SizeF(BNR.BMP.Width + 1, BNR.BMP.Height + 1);
             }
@@ -353,7 +345,7 @@ namespace BlueControls
                         break;
 
                     case "color":
-                        _Color_Main = pair.Value.FromHTMLCode();
+                        Color_Main = pair.Value.FromHTMLCode();
                         break;
 
                     case "italic":
@@ -461,11 +453,11 @@ namespace BlueControls
             _Zeilenabstand = _FontOL.Height;
 
             _Pen = GeneratePen(1.0F);
-            Brush_Color_Main = new SolidBrush(_Color_Main);
+            Brush_Color_Main = new SolidBrush(Color_Main);
             Brush_Color_Outline = new SolidBrush(Color_Outline);
 
 
-            _Code = ToString(FontName, FontSize, Bold, Italic, Underline, StrikeOut, Outline, _Color_Main.ToHTMLCode(), Color_Outline.ToHTMLCode(), Kapitälchen, OnlyUpper, OnlyLower);
+            _Code = ToString(FontName, FontSize, Bold, Italic, Underline, StrikeOut, Outline, Color_Main.ToHTMLCode(), Color_Outline.ToHTMLCode(), Kapitälchen, OnlyUpper, OnlyLower);
         }
 
         internal BlueFont Scale(double fontScale)
@@ -481,7 +473,7 @@ namespace BlueControls
 
             if (Bold) { linDi = linDi * 1.5F; }
 
-            return new Pen(_Color_Main, linDi);
+            return new Pen(Color_Main, linDi);
         }
 
 
@@ -582,7 +574,7 @@ namespace BlueControls
                 {
                     gr.Clear(Color.FromArgb(180, 180, 180));
                 }
-                else if (_Color_Main.GetBrightness() > 0.9F)
+                else if (Color_Main.GetBrightness() > 0.9F)
                 {
                     gr.Clear(Color.FromArgb(200, 200, 200));
                 }
@@ -659,7 +651,7 @@ namespace BlueControls
             using (var gr = Graphics.FromImage(bmp.Bitmap))
             {
 
-                if (_Color_Main.GetBrightness() > 0.9F)
+                if (Color_Main.GetBrightness() > 0.9F)
                 {
                     gr.Clear(Color.FromArgb(200, 200, 200));
                 }

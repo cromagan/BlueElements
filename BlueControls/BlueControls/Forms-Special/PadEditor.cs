@@ -18,12 +18,12 @@
 #endregion
 
 
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
+using System.Drawing;
 
 
 
@@ -157,9 +157,11 @@ namespace BlueControls.Forms
 
         private void AddText_Click(object sender, System.EventArgs e)
         {
-            var b = new TextPadItem(Pad.Item);
-            b.Interner_Text = string.Empty;
-            b.Stil = PadStyles.Style_Standard;
+            var b = new TextPadItem(Pad.Item)
+            {
+                Interner_Text = string.Empty,
+                Stil = PadStyles.Style_Standard
+            };
             Pad.Item.Add(b);
             b.SetCoordinates(new RectangleDF(10, 10, 200, 200));
         }

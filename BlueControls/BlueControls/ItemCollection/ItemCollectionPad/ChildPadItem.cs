@@ -257,8 +257,10 @@ namespace BlueControls.ItemCollection
 
                 if (Textlage != (enAlignment)(-1))
                 {
-                    var p = new Pen(Randfarbe, (float)(8.7m * cZoom));
-                    p.DashPattern = new float[] { 10, 2, 1, 2 };
+                    var p = new Pen(Randfarbe, (float)(8.7m * cZoom))
+                    {
+                        DashPattern = new float[] { 10, 2, 1, 2 }
+                    };
                     GR.DrawRectangle(p, DCoordinates);
 
                     var s = GR.MeasureString(Name, font);
@@ -520,11 +522,12 @@ namespace BlueControls.ItemCollection
 
         public override List<FlexiControl> GetStyleOptions()
         {
-            var l = new List<FlexiControl>();
+            var l = new List<FlexiControl>
+            {
+                new FlexiControlForProperty(this, "Name"),
 
-            l.Add(new FlexiControlForProperty(this, "Name"));
-
-            l.Add(new FlexiControlForProperty(this, "Randfarbe"));
+                new FlexiControlForProperty(this, "Randfarbe")
+            };
 
             var Lage = new ItemCollectionList
             {

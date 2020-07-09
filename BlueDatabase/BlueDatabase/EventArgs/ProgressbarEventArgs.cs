@@ -24,19 +24,19 @@ namespace BlueDatabase.EventArgs
     {
         public ProgressbarEventArgs(string name, int current, int count, bool beginns, bool ends)
         {
-            this.Name = name;
-            this.Current = current;
-            this.Count = count;
-            this.Beginns = beginns;
-            this.Ends = ends;
+            Name = name;
+            Current = current;
+            Count = count;
+            Beginns = beginns;
+            Ends = ends;
         }
 
-        public int Count { get; private set; }
-        public int Current { get; private set; }
+        public int Count { get; }
+        public int Current { get; }
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
-        public bool Beginns { get; private set; }
-        public bool Ends { get; private set; }
+        public bool Beginns { get; }
+        public bool Ends { get; }
     }
 }

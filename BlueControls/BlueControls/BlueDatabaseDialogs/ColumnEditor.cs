@@ -17,8 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.IO;
-using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -26,6 +24,8 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System.IO;
+using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 
 
@@ -36,7 +36,7 @@ namespace BlueControls.BlueDatabaseDialogs
     internal sealed partial class ColumnEditor
     {
         private ColumnItem _Column;
-        private Table _Table;
+        private readonly Table _Table;
 
 
 
@@ -108,7 +108,7 @@ namespace BlueControls.BlueDatabaseDialogs
             if (_Table != null)
             {
                 butAktuellZurueck.Enabled = _Table.CurrentArrangement[_Column]?.PreviewsVisible(_Table.CurrentArrangement) != null;
-                butAktuellVor.Enabled = _Table.CurrentArrangement[_Column]?.NextVisible(_Table.CurrentArrangement) != null; 
+                butAktuellVor.Enabled = _Table.CurrentArrangement[_Column]?.NextVisible(_Table.CurrentArrangement) != null;
             }
             else
             {

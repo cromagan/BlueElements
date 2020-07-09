@@ -40,14 +40,14 @@ namespace BlueBasics.Enums
         //Binärdaten_Bild = 19,
 
         //Passwort = 20, // String
-      //  Text_Ohne_Kritische_Zeichen = 21,
+        //  Text_Ohne_Kritische_Zeichen = 21,
 
 
-       // Binärdaten = 39,
+        // Binärdaten = 39,
 
 
         // Link_To_BlueDataSystem = 42
-       // Telefonnummer = 43, // Spezielle Formate
+        // Telefonnummer = 43, // Spezielle Formate
 
         FarbeInteger = 45, // Color
         //Email = 46, // Spezielle Formate

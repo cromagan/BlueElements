@@ -111,7 +111,7 @@ namespace BlueBasics
                 }
 
             }
-            catch 
+            catch
             {
                 return null;
             }
@@ -199,7 +199,7 @@ namespace BlueBasics
                 var fs = new MemoryStream(value, 0, value.Length, false);
                 return (Bitmap)Image.FromStream(fs);
             }
-            catch 
+            catch
             {
                 Develop.DebugPrint("Fehler bei der Umwandlung!");
                 return null;
@@ -220,7 +220,7 @@ namespace BlueBasics
                 var b = FileToByte(Dateiname);
                 return b.ToStringConvert();
             }
-            catch 
+            catch
             {
                 return string.Empty;
             }
@@ -329,7 +329,7 @@ namespace BlueBasics
             var odrive = DriveInfo.GetDrives();
 
 
-            for (z = 0 ; z <= odrive.GetUpperBound(0) ; z++)
+            for (z = 0; z <= odrive.GetUpperBound(0); z++)
             {
                 if (odrive[z].IsReady)
                 {

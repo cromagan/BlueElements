@@ -17,12 +17,12 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
+using System.Collections.Generic;
 
 
 namespace BlueControls.Forms
@@ -68,29 +68,31 @@ namespace BlueControls.Forms
         }
 
 
-        public RowItem SelectOne_OfRow(List<RowItem> Rows, string TextOfNewRow, string LayoutID, bool AllowClose)
+        public RowItem SelectOne_OfRow(List<RowItem> rows, string textOfNewRow, string layoutID, bool allowClose)
         {
 
             List.Item.Clear();
 
-            foreach (var ThisRow in Rows)
+            foreach (var ThisRow in rows)
             {
-                var x = new RowFormulaListItem(ThisRow);
-                x.LayoutID = LayoutID;
+                var x = new RowFormulaListItem(ThisRow)
+                {
+                    LayoutID = layoutID
+                };
                 List.Item.Add(x);
             }
 
 
-            if (!string.IsNullOrEmpty(TextOfNewRow))
+            if (!string.IsNullOrEmpty(textOfNewRow))
             {
-                List.Item.Add(new BitmapListItem(QuickImage.Get("Kreuz|128").BMP, TextOfNewRow));
+                List.Item.Add(new BitmapListItem(QuickImage.Get("Kreuz|128").BMP, textOfNewRow));
             }
 
             do
             {
                 ShowDialog();
                 if (ClickedItem != null) { break; }
-                if (AllowClose) { break; }
+                if (allowClose) { break; }
 
             } while (true);
 

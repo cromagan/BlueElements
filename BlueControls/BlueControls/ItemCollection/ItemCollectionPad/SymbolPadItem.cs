@@ -18,13 +18,13 @@
 #endregion
 
 
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace BlueControls.ItemCollection
 {
@@ -115,10 +115,10 @@ namespace BlueControls.ItemCollection
 
         public override List<FlexiControl> GetStyleOptions()
         {
-            var l = new List<FlexiControl>();
-
-
-            l.Add(new FlexiControl());
+            var l = new List<FlexiControl>
+            {
+                new FlexiControl()
+            };
 
             var Comms = new ItemCollectionList
             {

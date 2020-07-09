@@ -18,13 +18,13 @@
 #endregion
 
 
-using System.Runtime.InteropServices;
 using BlueBasics.Enums;
+using System.Runtime.InteropServices;
 
 namespace BlueBasics
 
 
-    //TODO: Enums erzeugen
+//TODO: Enums erzeugen
 {
     internal static class modTastaturSimulation
     {

@@ -1,16 +1,16 @@
-﻿using System;
+﻿using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.ItemCollection;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueBasics.Enums;
-using BlueControls.Enums;
-using static BlueBasics.FileOperations;
-using BlueControls.ItemCollection;
 using static BlueBasics.Extensions;
-using BlueBasics;
-using BlueControls.EventArgs;
-using BlueControls.Designer_Support;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls
 {
@@ -26,7 +26,7 @@ namespace BlueControls.Controls
         #endregion
 
 
-        List<PointDF> points = new List<PointDF>();
+        private readonly List<PointDF> points = new List<PointDF>();
 
 
 
@@ -36,11 +36,8 @@ namespace BlueControls.Controls
         public string Feedback = string.Empty;
 
         private bool _PointAdding = false;
-
-
-
-        static Pen Pen_RotTransp = new Pen(Color.FromArgb(200, 255, 0, 0));
-        static Brush Brush_RotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
+        private static readonly Pen Pen_RotTransp = new Pen(Color.FromArgb(200, 255, 0, 0));
+        private static readonly Brush Brush_RotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
 
         private enOrientation _MittelLinie = enOrientation.Ohne;
 
@@ -158,10 +155,12 @@ namespace BlueControls.Controls
         public static BitmapListItem GenerateBitmapListItem(Bitmap B, List<string> T)
         {
             var FilenamePNG = T.TagGet("ImageFile");
-            var i = new BitmapListItem(FilenamePNG, FilenamePNG.FileNameWithoutSuffix(), FilenamePNG, string.Empty);
-            i.Padding = 10;
-            i.Tags = T;
-            i.Bitmap = B;
+            var i = new BitmapListItem(FilenamePNG, FilenamePNG.FileNameWithoutSuffix(), FilenamePNG, string.Empty)
+            {
+                Padding = 10,
+                Tags = T,
+                Bitmap = B
+            };
             return i;
         }
 
@@ -212,7 +211,7 @@ namespace BlueControls.Controls
 
         public void PointSet(string name, int x, int y)
         {
-            PointSet(name, (decimal)x, (decimal)y);
+            PointSet(name, x, (decimal)y);
         }
 
         public void PointSet(string name, double x, double y)
@@ -372,7 +371,7 @@ namespace BlueControls.Controls
 
             if (_Helper.HasFlag(enHelpers.SymetricalHorizontal))
             {
-                var h = (int)(BMP.Width / 2);
+                var h = BMP.Width / 2;
                 var x = Math.Abs(h - e.X);
 
                 var p1 = new PointDF(h - x, e.Y).ZoomAndMove(eg);

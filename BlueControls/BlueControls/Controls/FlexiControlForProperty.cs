@@ -23,15 +23,13 @@ namespace BlueControls.Controls
     {
 
 
-        private PropertyInfo propInfo;
+        private PropertyInfo _propInfo;
         private object _propertyObject;
         private string _propertyName;
         private string _propertynamecpl;
-        bool _FehlerWennLeer = true;
-        bool _FehlerFormatCheck = true;
-
-
-        bool _enabled = true;
+        private bool _FehlerWennLeer = true;
+        private readonly bool _FehlerFormatCheck = true;
+        private bool _enabled = true;
 
 
         /// <summary>
@@ -172,7 +170,7 @@ namespace BlueControls.Controls
         {
 
 
-            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null || !propInfo.CanRead)
+            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead)
             {
                 Value = string.Empty;
                 InfoText = string.Empty;
@@ -180,7 +178,7 @@ namespace BlueControls.Controls
             }
 
 
-            var x = propInfo.GetValue(_propertyObject, null);
+            var x = _propInfo.GetValue(_propertyObject, null);
 
 
             if (x is null)
@@ -233,11 +231,11 @@ namespace BlueControls.Controls
 
             if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
-            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || propInfo == null || !propInfo.CanRead) { return; }
+            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead) { return; }
 
 
             var OldVal = string.Empty;
-            var x = propInfo.GetValue(_propertyObject, null);
+            var x = _propInfo.GetValue(_propertyObject, null);
             object toSet = null;
 
 
@@ -294,22 +292,22 @@ namespace BlueControls.Controls
 
             if (OldVal == Value) { return; }
 
-            propInfo.SetValue(_propertyObject, toSet, null);
+            _propInfo.SetValue(_propertyObject, toSet, null);
         }
 
         internal bool CheckEnabledState()
         {
-            if ( _propertyObject == null )
+            if (_propertyObject == null)
             {
                 base.DisabledReason = "Kein zugehöriges Objekt definiert.";
                 return false;
             }
-            if ( string.IsNullOrEmpty(_propertyName))
+            if (string.IsNullOrEmpty(_propertyName))
             {
                 base.DisabledReason = "Kein Feld-Name angegeben.";
                 return false;
             }
-            if (propInfo == null)
+            if (_propInfo == null)
             {
                 base.DisabledReason = "Feld existiert im zugehörigen Objekt nicht.";
                 return false;
@@ -321,7 +319,7 @@ namespace BlueControls.Controls
             }
 
 
-            if (!propInfo.CanWrite)
+            if (!_propInfo.CanWrite)
             {
                 base.DisabledReason = "Feld ist schreibgeschützt.";
                 return false;
@@ -348,7 +346,7 @@ namespace BlueControls.Controls
 
             if (string.IsNullOrEmpty(_propertyName) || _propertyObject == null)
             {
-                propInfo = null;
+                _propInfo = null;
                 _propertynamecpl = string.Empty;
             }
             else
@@ -368,7 +366,7 @@ namespace BlueControls.Controls
                 _propertynamecpl = _propertynamecpl.Replace("\\", "_");
                 _propertynamecpl = _propertynamecpl.Replace("__", "_");
 
-                propInfo = _propertyObject.GetType().GetProperty(_propertynamecpl);
+                _propInfo = _propertyObject.GetType().GetProperty(_propertynamecpl);
 
             }
 
@@ -391,10 +389,10 @@ namespace BlueControls.Controls
 
             #region Art des Steuerelements bestimmen
 
-            if (withCreate && propInfo != null)
+            if (withCreate && _propInfo != null)
             {
 
-                switch (propInfo.PropertyType.FullName.ToLower())
+                switch (_propInfo.PropertyType.FullName.ToLower())
                 {
                     //case "system.string":
                     //case "system.int32":
@@ -424,7 +422,7 @@ namespace BlueControls.Controls
                                 var He = data.Item2;
 
                                 var x = Math.Max((int)(data.Item1 + 20 + s.Width), 200);
-                                var y = Math.Max((int)(data.Item2 + Skin.PaddingSmal * 2), 24);
+                                var y = Math.Max(data.Item2 + Skin.PaddingSmal * 2, 24);
                                 Size = new Size(x, y);
                                 var c = (ComboBox)CreateSubControls();
                                 StyleComboBox(c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
@@ -443,7 +441,7 @@ namespace BlueControls.Controls
                             {
                                 _EditType = enEditTypeFormula.Textfeld;
 
-                                var tmpName = propInfo.PropertyType.FullName.ToLower();
+                                var tmpName = _propInfo.PropertyType.FullName.ToLower();
 
 
                                 if (TextLines >= 2)
@@ -489,7 +487,7 @@ namespace BlueControls.Controls
             // https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
             _FehlerWennLeer = true;
 
-            if (propInfo == null)
+            if (_propInfo == null)
             {
                 QuickInfo = string.Empty;
             }
@@ -499,7 +497,7 @@ namespace BlueControls.Controls
                 var done = false;
 
 
-                var ca = propInfo.GetCustomAttributes();
+                var ca = _propInfo.GetCustomAttributes();
                 if (ca != null)
 
                 {
@@ -577,7 +575,7 @@ namespace BlueControls.Controls
         private void GenFehlerText()
         {
 
-            if (propInfo == null)
+            if (_propInfo == null)
             {
                 InfoText = string.Empty;
                 return;
@@ -611,7 +609,7 @@ namespace BlueControls.Controls
             if (!_allinitialized) { return null; }
 
 
-            foreach (var thiscon in this.Controls)
+            foreach (var thiscon in Controls)
             {
                 if (thiscon is ComboBox cbx) { return cbx; }
             }

@@ -17,19 +17,19 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
+using BlueControls.ItemCollection;
+using BlueDatabase;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueControls.Forms;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.ItemCollection;
-using BlueDatabase;
-using BlueDatabase.Enums;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
@@ -548,9 +548,11 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             string GetFromFile;
-            var openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            openFileDialog1.CheckFileExists = true;
-            openFileDialog1.Filter = "Datenbanken|*.mdb";
+            var openFileDialog1 = new System.Windows.Forms.OpenFileDialog
+            {
+                CheckFileExists = true,
+                Filter = "Datenbanken|*.mdb"
+            };
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 GetFromFile = openFileDialog1.FileName;
@@ -560,18 +562,18 @@ namespace BlueControls.BlueDatabaseDialogs
                 return;
             }
 
-            var I = new ItemCollectionList();
-
-
-            I.Add(new TextListItem(((int)enDatabaseDataType.ColumnArrangement).ToString(), "Anordnungen der Spaltenansichten"));
-            I.Add(new TextListItem(((int)enDatabaseDataType.Views).ToString(), "Formulare"));
-            I.Add(new TextListItem(((int)enDatabaseDataType.Rules).ToString(), "Regeln"));
-            I.Add(new TextListItem(((int)enDatabaseDataType.UndoInOne).ToString(), "Undo-Speicher"));
-            I.Add(new TextListItem(((int)enDatabaseDataType.AutoExport).ToString(), "Auto-Export"));
-            I.Add(new TextListItem(((int)enDatabaseDataType.BinaryDataInOne).ToString(), "Binäre Daten im Kopf der Datenbank"));
-            I.Add(new TextListItem(((int)enDatabaseDataType.Layouts).ToString(), "Eingebettete Layouts"));
-            I.Add(new TextListItem(((int)enDatabaseDataType.Tags).ToString(), "Tags des Datenbankkopfes"));
-            I.Add(new TextListItem(((int)enDatabaseDataType.SortDefinition).ToString(), "Standard-Sortierung"));
+            var I = new ItemCollectionList
+            {
+                new TextListItem(((int)enDatabaseDataType.ColumnArrangement).ToString(), "Anordnungen der Spaltenansichten"),
+                new TextListItem(((int)enDatabaseDataType.Views).ToString(), "Formulare"),
+                new TextListItem(((int)enDatabaseDataType.Rules).ToString(), "Regeln"),
+                new TextListItem(((int)enDatabaseDataType.UndoInOne).ToString(), "Undo-Speicher"),
+                new TextListItem(((int)enDatabaseDataType.AutoExport).ToString(), "Auto-Export"),
+                new TextListItem(((int)enDatabaseDataType.BinaryDataInOne).ToString(), "Binäre Daten im Kopf der Datenbank"),
+                new TextListItem(((int)enDatabaseDataType.Layouts).ToString(), "Eingebettete Layouts"),
+                new TextListItem(((int)enDatabaseDataType.Tags).ToString(), "Tags des Datenbankkopfes"),
+                new TextListItem(((int)enDatabaseDataType.SortDefinition).ToString(), "Standard-Sortierung")
+            };
 
             I.Sort();
 

@@ -34,7 +34,7 @@ namespace BlueControls.Forms
     /// </summary>
     public partial class FloatingInputBoxListBoxStyle : BlueControls.Forms.FloatingForm
     {
-        private FloatingInputBoxListBoxStyle(): base(enDesign.Form_QuickInfo)
+        private FloatingInputBoxListBoxStyle() : base(enDesign.Form_QuickInfo)
         {
             InitializeComponent();
         }
@@ -44,7 +44,7 @@ namespace BlueControls.Forms
         {
             InitializeComponent();
             this.Tag = Tag;
-           // Design = Items.ControlDesign;
+            // Design = Items.ControlDesign;
 
             Xpos -= Skin.PaddingSmal;
             Ypos -= Skin.PaddingSmal;
@@ -113,10 +113,10 @@ namespace BlueControls.Forms
             //}
             //else
             //{
-                //Wi = CInt(Wi * 1.05) 'Weil die Breite nur circa berechnet wird
-                He += 1; // Um ja den Slider zu vermeiden!
-                He = Math.Max(He, 16);
-                Wi = Math.Max(Wi, 16);
+            //Wi = CInt(Wi * 1.05) 'Weil die Breite nur circa berechnet wird
+            He += 1; // Um ja den Slider zu vermeiden!
+            He = Math.Max(He, 16);
+            Wi = Math.Max(Wi, 16);
             //}
 
             Wi = Math.Max(Wi, MinWidth);
@@ -138,7 +138,7 @@ namespace BlueControls.Forms
             }
 
 
-            this.Size = new Size(Wi + lstbx.Left * 2, He + lstbx.Top * 2);
+            Size = new Size(Wi + lstbx.Left * 2, He + lstbx.Top * 2);
 
 
 
@@ -167,7 +167,7 @@ namespace BlueControls.Forms
 
                 if (lstbx.Appearance != enBlueListBoxAppearance.Listbox && lstbx.Appearance != enBlueListBoxAppearance.Gallery && lstbx.Appearance != enBlueListBoxAppearance.FileSystem)
                 {
-                    OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.Internal, this.Tag, null)); // Das Tag hier ist eigentlich das HotItem
+                    OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.Internal, Tag, null)); // Das Tag hier ist eigentlich das HotItem
                     if (!IsDisposed) { Close(); }
                     return;
                 }
@@ -196,7 +196,7 @@ namespace BlueControls.Forms
 
             var MouseIsDown = !string.IsNullOrEmpty(modAllgemein.LastMouseButton());
 
-            if (MouseIsDown && !_MouseWasDown && !this.IsMouseInForm())
+            if (MouseIsDown && !_MouseWasDown && !IsMouseInForm())
             {
                 // erster Klick ausserhalb des Forms
                 Close();
@@ -204,7 +204,7 @@ namespace BlueControls.Forms
                 return;
             }
 
-            if (_MouseWasDown && !MouseIsDown && this.IsMouseInForm())
+            if (_MouseWasDown && !MouseIsDown && IsMouseInForm())
             {
                 // Maus ausserhalb der Form ausgelassen
                 _MouseWasDown = false;
@@ -257,11 +257,13 @@ namespace BlueControls.Forms
                 ThisContextMenu.Add(new LineListItem());
                 ThisContextMenu.Add(enContextMenuComands.Abbruch);
 
-                var Infos = new List<object>();
-                Infos.Add(UserMenu);
-                Infos.Add(HotItem);
-                Infos.Add(tags);
-                Infos.Add(Control);
+                var Infos = new List<object>
+                {
+                    UserMenu,
+                    HotItem,
+                    tags,
+                    Control
+                };
 
                 var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, Infos, (System.Windows.Forms.Control)Control, Translate);
                 _ContextMenu.ItemClicked += _ContextMenu_ItemClicked;

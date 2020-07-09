@@ -223,7 +223,7 @@ namespace BlueControls.ItemCollection
             var s = Länge_in_MM.ToString(Constants.Format_Float10);
             s = s.Replace(".", ",");
 
-            if ( s.Contains(","))
+            if (s.Contains(","))
             {
                 s = s.TrimEnd("0");
                 s = s.TrimEnd(",");
@@ -404,14 +404,15 @@ namespace BlueControls.ItemCollection
 
         public override List<FlexiControl> GetStyleOptions()
         {
-            var l = new List<FlexiControl>();
+            var l = new List<FlexiControl>
+            {
+                new FlexiControlForProperty(this, "Länge_in_MM"),
 
-            l.Add(new FlexiControlForProperty(this, "Länge_in_MM"));
-
-            l.Add(new FlexiControlForProperty(this, "Text oben"));
-            l.Add(new FlexiControlForProperty(this, "Suffix"));
-            l.Add(new FlexiControlForProperty(this, "Text unten"));
-            l.Add(new FlexiControlForProperty(this, "Präfix"));
+                new FlexiControlForProperty(this, "Text oben"),
+                new FlexiControlForProperty(this, "Suffix"),
+                new FlexiControlForProperty(this, "Text unten"),
+                new FlexiControlForProperty(this, "Präfix")
+            };
 
 
             AddStyleOption(l);

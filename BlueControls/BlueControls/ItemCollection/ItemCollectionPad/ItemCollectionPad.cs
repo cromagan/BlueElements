@@ -17,18 +17,18 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Forms;
+using BlueControls.Interfaces;
+using BlueDatabase;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using BlueBasics;
-using static BlueBasics.FileOperations;
-using BlueDatabase;
-using BlueBasics.Enums;
 using System.ComponentModel;
-using BlueControls.Interfaces;
-using BlueDatabase.Enums;
+using System.Drawing;
 using System.Drawing.Imaging;
-using BlueControls.Forms;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection
 {
@@ -63,7 +63,7 @@ namespace BlueControls.ItemCollection
         /// <summary>
         /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter
         /// </summary>
-        int IDCount = 0;
+        private readonly int IDCount = 0;
 
 
         public readonly ListExt<PointDF> AllPoints;
@@ -861,8 +861,10 @@ namespace BlueControls.ItemCollection
         public List<PointDF> ConnectsWith(PointDF Point, bool CheckX, bool IgnoreInternals)
         {
 
-            var Points = new List<PointDF>();
-            Points.Add(Point);
+            var Points = new List<PointDF>
+            {
+                Point
+            };
 
             var Ist = -1;
 

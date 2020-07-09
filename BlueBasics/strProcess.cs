@@ -23,14 +23,14 @@ namespace BlueBasics
 {
 
 
-        public struct strProcess
-        {
-            public IntPtr MainWindowHandle;
-            public int prid;
-            public string MainWindowTitle;
-            public string Klasse;
-            public string ExeName;
-        }
+    public struct strProcess
+    {
+        public IntPtr MainWindowHandle;
+        public int prid;
+        public string MainWindowTitle;
+        public string Klasse;
+        public string ExeName;
+    }
 
 
 }

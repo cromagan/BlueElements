@@ -17,11 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
+using System;
+using System.Collections.Generic;
 
 namespace BlueBasics
 {
@@ -105,7 +105,7 @@ namespace BlueBasics
 
         public void RemoveRange(IEnumerable<T> collection)
         {
- 
+
             foreach (var item in collection)
             {
                 Remove(item);

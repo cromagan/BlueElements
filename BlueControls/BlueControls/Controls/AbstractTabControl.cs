@@ -20,9 +20,9 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
-using BlueControls.Forms;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using System;
@@ -582,7 +582,7 @@ namespace BlueControls.Controls
 
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)
         {
-            if (e.Control is TabPage tb) { tb.SetBackColor(); }  
+            if (e.Control is TabPage tb) { tb.SetBackColor(); }
 
             if (DesignMode) { return; }
             if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }

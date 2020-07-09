@@ -35,7 +35,7 @@ namespace BlueControls.Forms
 
         private int Counter = 0;
 
-        private QuickInfo(): base( Enums.enDesign.Form_QuickInfo)
+        private QuickInfo() : base(Enums.enDesign.Form_QuickInfo)
         {
             InitializeComponent();
         }
@@ -52,9 +52,9 @@ namespace BlueControls.Forms
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
 
 
-            this.Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
+            Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
 
-            this.Visible = false;
+            Visible = false;
 
             timQI.Enabled = true;
 
@@ -79,7 +79,7 @@ namespace BlueControls.Forms
         }
 
 
-        public new static void Close()
+        public static new void Close()
         {
             Close(false);
         }

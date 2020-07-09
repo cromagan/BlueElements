@@ -40,7 +40,7 @@ namespace BlueControls.ItemCollection
 
         private string _ImageFilename;
 
-        private string _EncryptionKey;
+        private readonly string _EncryptionKey;
 
         private int _captionlines = 2;
 
@@ -252,7 +252,7 @@ namespace BlueControls.ItemCollection
                 {
                     c--;
                     var s = Skin.FormatedText_NeededSize(ThisCap, null, Skin.GetBlueFont(enDesign.Item_Listbox, vState), 16);
-                    var r = new Rectangle((int)(DCoordinates.Left + (DCoordinates.Width - s.Width) / 2.0), (int)(DCoordinates.Bottom - s.Height) - 3, (int)s.Width, (int)s.Height);
+                    var r = new Rectangle((int)(DCoordinates.Left + (DCoordinates.Width - s.Width) / 2.0), DCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
 
                     r.X = r.X - trp.X;
                     r.Y = r.Y - trp.Y;

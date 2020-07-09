@@ -20,8 +20,8 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Forms;
 using BlueControls.Enums;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -115,11 +115,13 @@ namespace BlueControls.ItemCollection
                     if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
                 }
 
-                var e = new System.Windows.Forms.OpenFileDialog();
-                e.CheckFileExists = true;
-                e.Multiselect = false;
-                e.Title = "Bild wählen:";
-                e.Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|BMP Windows Bitmap|*.bmp";
+                var e = new System.Windows.Forms.OpenFileDialog
+                {
+                    CheckFileExists = true,
+                    Multiselect = false,
+                    Title = "Bild wählen:",
+                    Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|BMP Windows Bitmap|*.bmp"
+                };
 
                 e.ShowDialog();
 
@@ -385,15 +387,16 @@ namespace BlueControls.ItemCollection
         public override List<FlexiControl> GetStyleOptions()
         {
 
-            var l = new List<FlexiControl>();
+            var l = new List<FlexiControl>
+            {
+                new FlexiControlForProperty(this, "Bildschirmbereich_wählen", enImageCode.Bild),
+                new FlexiControlForProperty(this, "Datei_laden", enImageCode.Ordner),
+                new FlexiControl(),
+                new FlexiControlForProperty(this, "Platzhalter_für_Layout", 2),
 
-            l.Add(new FlexiControlForProperty(this, "Bildschirmbereich_wählen", enImageCode.Bild));
-            l.Add(new FlexiControlForProperty(this, "Datei_laden", enImageCode.Ordner));
-            l.Add(new FlexiControl());
-            l.Add(new FlexiControlForProperty(this, "Platzhalter_für_Layout", 2));
 
-
-            l.Add(new FlexiControl());
+                new FlexiControl()
+            };
 
             var Comms = new ItemCollectionList
             {

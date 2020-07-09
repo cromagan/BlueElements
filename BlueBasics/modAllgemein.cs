@@ -18,6 +18,8 @@
 #endregion
 
 
+using BlueBasics.Enums;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,10 +34,8 @@ using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using BlueBasics.Enums;
-using Microsoft.Win32;
-using static BlueBasics.FileOperations;
 using System.Windows.Media.Imaging;
+using static BlueBasics.FileOperations;
 
 namespace BlueBasics
 {

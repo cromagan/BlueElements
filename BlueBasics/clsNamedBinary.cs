@@ -18,11 +18,11 @@
 #endregion
 
 
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using static BlueBasics.FileOperations;
 
 namespace BlueBasics

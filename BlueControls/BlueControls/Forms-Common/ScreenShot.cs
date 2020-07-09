@@ -17,6 +17,9 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Forms;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,9 +27,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.CompilerServices;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Forms;
 
 namespace BlueControls
 {
@@ -232,11 +232,12 @@ namespace BlueControls
                     {
                         Rahm.Visible = false;
 
-                        var l = new strScreenData();
-
-                        l.Pic = GrabArea(AllS[0].GrabedArea());
-                        l.HookP1 = HookStartPoint;
-                        l.HookP2 = HookEndPoint;
+                        var l = new strScreenData
+                        {
+                            Pic = GrabArea(AllS[0].GrabedArea()),
+                            HookP1 = HookStartPoint,
+                            HookP2 = HookEndPoint
+                        };
 
 
                         AllS.Add(l);

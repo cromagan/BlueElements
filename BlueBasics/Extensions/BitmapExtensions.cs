@@ -17,12 +17,12 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using BlueBasics.Enums;
 
 namespace BlueBasics
 {
@@ -219,8 +219,8 @@ namespace BlueBasics
 
             modAllgemein.CollectGarbage();
 
-            var w = Math.Max((int)(_Pic.Width - Left + Right), 1);
-            var h = Math.Max((int)(_Pic.Height - Top + Bottom), 1);
+            var w = Math.Max(_Pic.Width - Left + Right, 1);
+            var h = Math.Max(_Pic.Height - Top + Bottom, 1);
 
             var _BMP2 = new Bitmap(w, h);
             using (var GR = Graphics.FromImage(_BMP2))
@@ -415,7 +415,7 @@ namespace BlueBasics
             {
                 for (var y = 0; y < Height; ++y)
                 {
-                    byte* row = (byte*)data.Scan0 + (y * data.Stride);
+                    var row = (byte*)data.Scan0 + (y * data.Stride);
                     var columnOffset = 0;
                     for (var x = 0; x < Width; ++x)
                     {
@@ -866,12 +866,12 @@ namespace BlueBasics
                             calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
 
 
-                            blue += (double)pixelBuffer[calcOffset] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
+                            blue += pixelBuffer[calcOffset] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
 
 
-                            green += (double)pixelBuffer[calcOffset + 1] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
+                            green += pixelBuffer[calcOffset + 1] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
 
-                            red += (double)pixelBuffer[calcOffset + 2] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
+                            red += pixelBuffer[calcOffset + 2] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
                         }
                     }
 

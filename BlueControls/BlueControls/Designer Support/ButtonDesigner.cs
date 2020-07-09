@@ -14,8 +14,10 @@ namespace BlueControls.Designer_Support
             {
                 if (aList == null)
                 {
-                    aList = new DesignerActionListCollection();
-                    aList.Add(new ButtonActionList(Component));
+                    aList = new DesignerActionListCollection
+                    {
+                        new ButtonActionList(Component)
+                    };
                 }
                 return aList;
             }

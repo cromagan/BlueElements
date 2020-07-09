@@ -19,7 +19,7 @@
 
 namespace BlueControls.Controls
 {
-   public class TabControl : AbstractTabControl
+    public class TabControl : AbstractTabControl
     {
 
 

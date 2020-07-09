@@ -33,7 +33,7 @@ namespace BlueControls.Controls
 
         #region Constructor
 
-        public Slider(): base(false, false)
+        public Slider() : base(false, false)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.

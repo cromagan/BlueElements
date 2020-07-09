@@ -7,14 +7,14 @@ namespace BlueControls.EventArgs
     {
         // string Comand, ColumnItem ThisColumn, FilterItem NewFilter
 
-        public FilterComandEventArgs(string Comand, ColumnItem Column, FilterItem NewFilter) : base(NewFilter)
+        public FilterComandEventArgs(string comand, ColumnItem column, FilterItem newFilter) : base(newFilter)
         {
-            this.Comand = Comand;
-            this.Column = Column;
+            Comand = comand;
+            Column = column;
         }
 
-        public string Comand { get; set; }
-     public ColumnItem Column { get; set; }
+        public string Comand { get; }
+        public ColumnItem Column { get; }
 
     }
 }

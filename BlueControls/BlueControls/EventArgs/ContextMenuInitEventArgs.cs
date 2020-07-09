@@ -27,13 +27,13 @@ namespace BlueControls.EventArgs
     {
 
 
-        public ContextMenuInitEventArgs(object HotItem, List<string> Tags, ItemCollectionList UserMenu)
+        public ContextMenuInitEventArgs(object hotItem, List<string> tags, ItemCollectionList userMenu)
         {
-            this.UserMenu = UserMenu;
-            this.HotItem = HotItem;
-            this.Tags = Tags;
-            this.Translate = true;
-            this.Cancel = false;
+            UserMenu = userMenu;
+            HotItem = hotItem;
+            Tags = tags;
+            Translate = true;
+            Cancel = false;
 
 
         }

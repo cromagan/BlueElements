@@ -207,7 +207,7 @@ namespace BlueControls.ItemCollection
 
         public override Size SizeUntouchedForListBox()
         {
-            return Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(((ItemCollectionList)Parent).ItemDesign), enStates.Standard), 16);
+            return Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(Parent.ItemDesign), enStates.Standard), 16);
         }
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign design, enStates vState, bool DrawBorderAndBack, bool Translate)
@@ -238,7 +238,7 @@ namespace BlueControls.ItemCollection
 
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth)
         {
-            return (int)SizeUntouchedForListBox().Height;
+            return SizeUntouchedForListBox().Height;
         }
 
 

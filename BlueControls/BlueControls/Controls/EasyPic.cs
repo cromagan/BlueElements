@@ -20,22 +20,22 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.Forms;
+using BlueBasics.EventArgs;
+using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using BlueDatabase;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using static BlueBasics.FileOperations;
 using static BlueBasics.Extensions;
-using BlueControls.Designer_Support;
-using System.Collections.Generic;
-using BlueBasics.EventArgs;
-using BlueDatabase;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls
 {
@@ -45,7 +45,7 @@ namespace BlueControls.Controls
     {
 
         #region Constructor
-        public EasyPic(): base(false, false)
+        public EasyPic() : base(false, false)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -321,8 +321,10 @@ namespace BlueControls.Controls
         {
             base.OnMouseEnter(e);
 
-            var ed = new MultiUserFileGiveBackEventArgs();
-            ed.File = null;
+            var ed = new MultiUserFileGiveBackEventArgs
+            {
+                File = null
+            };
             OnConnectedDatabase(ed);
 
 
@@ -474,8 +476,10 @@ namespace BlueControls.Controls
         private void AusDatenbank_Click(object sender, System.EventArgs e)
         {
 
-            var ed = new MultiUserFileGiveBackEventArgs();
-            ed.File = null;
+            var ed = new MultiUserFileGiveBackEventArgs
+            {
+                File = null
+            };
             OnConnectedDatabase(ed);
             if (ed.File is Database DB)
             {

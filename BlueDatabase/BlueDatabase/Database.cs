@@ -18,6 +18,11 @@
 #endregion
 
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,11 +32,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
 using static BlueBasics.FileOperations;
 
 
@@ -221,7 +221,7 @@ namespace BlueDatabase
         /// <summary>
         /// Variable nur temporär für den BinReloader, um mögliche Datenverluste zu entdecken.
         /// </summary>
-        string _LastWorkItem = string.Empty;
+        private string _LastWorkItem = string.Empty;
 
 
 
@@ -1326,8 +1326,10 @@ namespace BlueDatabase
                     var UIO = Inhalt.SplitByCR();
                     for (var z = 0; z <= UIO.GetUpperBound(0); z++)
                     {
-                        var tmpWork = new WorkItem(UIO[z]);
-                        tmpWork.State = enItemState.Undo; // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Deswegen die alten "Pendings" zu Undos ändern.
+                        var tmpWork = new WorkItem(UIO[z])
+                        {
+                            State = enItemState.Undo // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Deswegen die alten "Pendings" zu Undos ändern.
+                        };
                         Works.Add(tmpWork);
                     }
                     break;
@@ -2304,15 +2306,17 @@ namespace BlueDatabase
 
         private void InitializeComponent()
         {
-            this.Backup = new System.ComponentModel.BackgroundWorker();
+            Backup = new System.ComponentModel.BackgroundWorker
+            {
 
-            // 
-            // Backup
-            // 
-            this.Backup.WorkerReportsProgress = true;
-            this.Backup.WorkerSupportsCancellation = true;
-            this.Backup.DoWork += new System.ComponentModel.DoWorkEventHandler(this.Backup_DoWork);
-            this.Backup.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.Backup_ProgressChanged);
+                // 
+                // Backup
+                // 
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true
+            };
+            Backup.DoWork += new System.ComponentModel.DoWorkEventHandler(Backup_DoWork);
+            Backup.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(Backup_ProgressChanged);
 
 
         }

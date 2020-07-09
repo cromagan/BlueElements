@@ -21,8 +21,8 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Forms;
 using BlueControls.Enums;
+using BlueControls.Forms;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
@@ -96,7 +96,7 @@ namespace BlueControls.ItemCollection
             Points.Add(p_R);
             Points.Add(p_u);
             Points.Add(p_o);
-         }
+        }
 
         #endregion
 
@@ -327,7 +327,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void GenerateInternalRelationExplicit() 
+        protected override void GenerateInternalRelationExplicit()
         {
             Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RO));
             Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RU));
@@ -446,11 +446,12 @@ namespace BlueControls.ItemCollection
 
         public override List<FlexiControl> GetStyleOptions()
         {
-            var l = new List<FlexiControl>();
+            var l = new List<FlexiControl>
+            {
+                new FlexiControlForProperty(this, "Datensatz bearbeiten", enImageCode.Stift),
 
-            l.Add(new FlexiControlForProperty(this, "Datensatz bearbeiten", enImageCode.Stift));
-
-            l.Add(new FlexiControl());
+                new FlexiControl()
+            };
 
 
             var Layouts = new ItemCollectionList();

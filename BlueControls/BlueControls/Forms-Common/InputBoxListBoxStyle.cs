@@ -27,8 +27,7 @@ namespace BlueControls.Forms
 {
     public partial class InputBoxListBoxStyle : Forms.DialogWithOkAndCancel
     {
-
-        List<string> GiveBack = null;
+        private List<string> GiveBack = null;
 
         #region Konstruktor
 
@@ -73,8 +72,10 @@ namespace BlueControls.Forms
             }
 
 
-            var x = new ItemCollectionList(enBlueListBoxAppearance.Listbox);
-            x.CheckBehavior = enCheckBehavior.AlwaysSingleSelection;
+            var x = new ItemCollectionList(enBlueListBoxAppearance.Listbox)
+            {
+                CheckBehavior = enCheckBehavior.AlwaysSingleSelection
+            };
             x.AddRange(Items);
             x.Sort();
 

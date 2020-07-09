@@ -17,11 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using BlueBasics.Enums;
 
 namespace BlueBasics
 {
@@ -188,8 +188,10 @@ namespace BlueBasics
                 hh = GetWindow(hh, 2);
                 if (hh.ToInt32() != 0)
                 {
-                    var l = new strProcess();
-                    l.MainWindowHandle = hh;
+                    var l = new strProcess
+                    {
+                        MainWindowHandle = hh
+                    };
                     GetWindowInfo(ref l);
                     wDescr.Add(l);
                 }

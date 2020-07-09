@@ -17,9 +17,9 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics.Enums;
 using System;
 using System.Drawing;
-using BlueBasics.Enums;
 
 namespace BlueBasics
 {
@@ -77,7 +77,7 @@ namespace BlueBasics
             if (Erg == llo) { return LO; }
             if (Erg == lro) { return rO; }
             if (Erg == llu) { return lu; }
-            if (Erg == lru) { return ru; } 
+            if (Erg == lru) { return ru; }
             return Point.Empty;
 
         }

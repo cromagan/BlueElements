@@ -19,12 +19,12 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.Forms;
+using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueControls.Enums;
 
 namespace BlueControls.Classes_Editor
 {

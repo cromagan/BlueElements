@@ -17,20 +17,20 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Drawing;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
 
 namespace BlueControls.Classes_Editor
 {
-    internal sealed partial class ExportDefinition_Editor :AbstractClassEditor<ExportDefinition> //  System.Windows.Forms.UserControl// 
+    internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<ExportDefinition> //  System.Windows.Forms.UserControl// 
     {
 
 

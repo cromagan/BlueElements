@@ -17,12 +17,12 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace BlueDatabase
 {
@@ -94,7 +94,7 @@ namespace BlueDatabase
 
             var Result = "";
 
-         //   if (!string.IsNullOrEmpty(_SystemKey)) { Result = Result + "SK=" + _SystemKey.ToNonCritical() + ", "; }
+            //   if (!string.IsNullOrEmpty(_SystemKey)) { Result = Result + "SK=" + _SystemKey.ToNonCritical() + ", "; }
 
 
             foreach (var ThisAction in Actions)
@@ -122,7 +122,7 @@ namespace BlueDatabase
                 switch (pair.Key)
                 {
                     case "sk": // TODO: alt 28.03.2019 , löschen
-                      //  _SystemKey = pair.Value.FromNonCritical();
+                               //  _SystemKey = pair.Value.FromNonCritical();
                         break;
 
                     case "aktion":
@@ -145,7 +145,7 @@ namespace BlueDatabase
         {
             //var VorschlagsRegel = false;
 
-         //   if (!string.IsNullOrEmpty(_SystemKey)) { return string.Empty; }
+            //   if (!string.IsNullOrEmpty(_SystemKey)) { return string.Empty; }
 
             var Dann = AnzahlDanns();
 
@@ -273,7 +273,7 @@ namespace BlueDatabase
             var GiveB = new string[2];
 
 
-            for (var z = 0 ; z <= 1 ; z++)
+            for (var z = 0; z <= 1; z++)
             {
                 switch (Txts[z].Count)
                 {
@@ -287,7 +287,7 @@ namespace BlueDatabase
                         {
                             GiveB[z] = Txts[z][0];
                             var tempVar = Txts[z].Count - 2;
-                            for (var z1 = 1 ; z1 <= tempVar ; z1++)
+                            for (var z1 = 1; z1 <= tempVar; z1++)
                             {
                                 GiveB[z] = GiveB[z] + ", " + Txts[z][z1];
                             }
@@ -369,7 +369,7 @@ namespace BlueDatabase
             }
 
 
-            for (var z = 0 ; z < e.Count ; z++)
+            for (var z = 0; z < e.Count; z++)
             {
                 if (z == 0)
                 {
@@ -524,7 +524,7 @@ namespace BlueDatabase
                 {
                     //if (ThisAction.Action != enAction.KopiereAndereSpalten)
                     //{
-                        if (ThisAction.Columns.Contains(Column)) { return true; }
+                    if (ThisAction.Columns.Contains(Column)) { return true; }
                     //}
                 }
             }

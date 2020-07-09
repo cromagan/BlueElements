@@ -17,20 +17,20 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollection;
+using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Forms;
-using BlueControls.EventArgs;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
-using BlueControls.Enums;
-using BlueControls.Designer_Support;
-using BlueBasics.EventArgs;
-using BlueDatabase;
 
 namespace BlueControls.Controls
 {
@@ -43,7 +43,7 @@ namespace BlueControls.Controls
         #region Constructor
 
 
-        public TextBox(): base(true, true)
+        public TextBox() : base(true, true)
         {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -102,28 +102,28 @@ namespace BlueControls.Controls
         #region  Properties 
 
 
-        #region  QuickInfo 
-        // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
-        private string _QuickInfo = "";
-        [Category("Darstellung")]
-        [DefaultValue("")]
-        [Description("QuickInfo des Steuerelementes - im extTXT-Format")]
-        public string QuickInfo
-        {
-            get
-            {
-                return _QuickInfo;
-            }
-            set
-            {
-                if (_QuickInfo != value)
-                {
-                    Forms.QuickInfo.Close();
-                    _QuickInfo = value;
-                }
-            }
-        }
-        #endregion
+        //#region  QuickInfo 
+        //// Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
+        //private string _QuickInfo = "";
+        //[Category("Darstellung")]
+        //[DefaultValue("")]
+        //[Description("QuickInfo des Steuerelementes - im extTXT-Format")]
+        //public string QuickInfo
+        //{
+        //    get
+        //    {
+        //        return _QuickInfo;
+        //    }
+        //    set
+        //    {
+        //        if (_QuickInfo != value)
+        //        {
+        //            Forms.QuickInfo.Close();
+        //            _QuickInfo = value;
+        //        }
+        //    }
+        //}
+        //#endregion
 
         [DefaultValue(false)]
         public bool SpellChecking
@@ -1866,22 +1866,23 @@ namespace BlueControls.Controls
 
             if (_SliderY != null) { return _SliderY; }
 
-            _SliderY = new Slider();
-
-            _SliderY.Dock = System.Windows.Forms.DockStyle.Right;
-            _SliderY.LargeChange = 10.0D;
-            _SliderY.Location = new Point(Width - 18, 0);
-            _SliderY.Maximum = 100.0D;
-            _SliderY.Minimum = 0.0D;
-            _SliderY.MouseChange = 1.0D;
-            _SliderY.Name = "SliderY";
-            _SliderY.Orientation = enOrientation.Senkrecht;
-            _SliderY.Size = new Size(18, Height);
-            _SliderY.SmallChange = 48.0D;
-            _SliderY.TabIndex = 0;
-            _SliderY.TabStop = false;
-            _SliderY.Value = 0.0D;
-            _SliderY.Visible = true;
+            _SliderY = new Slider
+            {
+                Dock = System.Windows.Forms.DockStyle.Right,
+                LargeChange = 10.0D,
+                Location = new Point(Width - 18, 0),
+                Maximum = 100.0D,
+                Minimum = 0.0D,
+                MouseChange = 1.0D,
+                Name = "SliderY",
+                Orientation = enOrientation.Senkrecht,
+                Size = new Size(18, Height),
+                SmallChange = 48.0D,
+                TabIndex = 0,
+                TabStop = false,
+                Value = 0.0D,
+                Visible = true
+            };
             _SliderY.ValueChanged += new EventHandler(SliderY_ValueChange);
             Controls.Add(_SliderY);
 

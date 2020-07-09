@@ -31,7 +31,7 @@ namespace BlueControls.Enums
         /// <summary>
         /// Felder im Creativepad
         /// </summary>
-        Field= 2,
+        Field = 2,
         /// <summary>
         /// Verknüpfungen, der eigene Name
         /// </summary>

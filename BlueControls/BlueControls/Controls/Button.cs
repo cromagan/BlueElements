@@ -17,16 +17,16 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Design;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Design;
 
 namespace BlueControls.Controls
 {
@@ -155,8 +155,10 @@ namespace BlueControls.Controls
                 if (value == enButtonStyle.SliderButton)
                 {
                     if (_ClickFirerer != null) { return; }
-                    _ClickFirerer = new System.Windows.Forms.Timer();
-                    _ClickFirerer.Enabled = false;
+                    _ClickFirerer = new System.Windows.Forms.Timer
+                    {
+                        Enabled = false
+                    };
                     _ClickFirerer.Tick += _ClickFirerer_Tick;
                 }
 

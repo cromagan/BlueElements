@@ -17,18 +17,18 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.Forms;
+using BlueDatabase;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.Forms;
-using BlueDatabase;
-using BlueControls.Enums;
 using static BlueBasics.FileOperations;
-using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection
 {
@@ -578,7 +578,7 @@ namespace BlueControls.ItemCollection
             if (Count < 12) { return -1; }  // <10 ergibt dividieb by zere, weil es da 0 einträge währen bei 10 Spalten
 
 
-            var dithemh = (int)(AllItemsHeight / Count);
+            var dithemh = AllItemsHeight / Count;
 
 
             //    Size f;
@@ -600,7 +600,7 @@ namespace BlueControls.ItemCollection
                 if (colc * dithemh < 150) { ok = false; }
                 if (TestSP * BiggestItemWidth > 600) { ok = false; }
 
-                if (((float)colc * (float)dithemh) / ((float)TestSP * (float)BiggestItemWidth) < 0.5) { ok = false; }
+                if ((colc * (float)dithemh) / (TestSP * (float)BiggestItemWidth) < 0.5) { ok = false; }
 
 
                 if (ok)
@@ -707,7 +707,7 @@ namespace BlueControls.ItemCollection
                 if (this[z1.ToString()] == null) { Add(new TextListItem(z1.ToString(), Enum.GetName(type, z1).Replace("_", " "))); }
             }
 
-            this.Sort();
+            Sort();
 
         }
 
@@ -1125,8 +1125,10 @@ namespace BlueControls.ItemCollection
         public object Clone()
         {
 
-            var x = new ItemCollectionList(_Appearance);
-            x.CheckBehavior = _CheckBehavior;
+            var x = new ItemCollectionList(_Appearance)
+            {
+                CheckBehavior = _CheckBehavior
+            };
 
 
             foreach (var ThisItem in this)
@@ -1155,8 +1157,10 @@ namespace BlueControls.ItemCollection
                 if (column.DropdownKey >= 0 && checkedItemsAtRow != null)
                 {
                     var cc = column.Database.Column.SearchByKey(column.DropdownKey);
-                    var F = new FilterCollection(column.Database);
-                    F.Add(new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc)));
+                    var F = new FilterCollection(column.Database)
+                    {
+                        new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc))
+                    };
                     l.AddRange(column.Contents(F));
                 }
                 else

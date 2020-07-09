@@ -47,14 +47,11 @@ namespace BlueControls.ItemCollection
             {
                 if (value == _VariableText) { return; }
                 _VariableText = value;
-                _ReadableText = value;
+                Text = value;
                 MakeNewETxt();
                 OnChanged(true);
             }
         }
-
-
-        private string _ReadableText;
 
         private enDataFormat Format { get; set; } = enDataFormat.Text;
 
@@ -82,7 +79,7 @@ namespace BlueControls.ItemCollection
 
         public TextPadItem(ItemCollectionPad parent, string internalname, string readableText) : base(parent, internalname)
         {
-            _ReadableText = readableText;
+            Text = readableText;
             _VariableText = readableText;
 
             Stil = PadStyles.Undefiniert;
@@ -99,10 +96,7 @@ namespace BlueControls.ItemCollection
 
         public string Text
         {
-            get
-            {
-                return _ReadableText;
-            }
+            get; private set;
             //set
             //{
             //    if (value == _ReadableText) { return; }
@@ -144,8 +138,8 @@ namespace BlueControls.ItemCollection
             switch (tag)
             {
                 case "readabletext":
-                    _ReadableText = value.FromNonCritical();
-                    _VariableText = _ReadableText;
+                    Text = value.FromNonCritical();
+                    _VariableText = Text;
                     return true;
 
                 case "alignment":
@@ -169,7 +163,7 @@ namespace BlueControls.ItemCollection
         {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-            if (!string.IsNullOrEmpty(_ReadableText)) { t = t + "ReadableText=" + _ReadableText.ToNonCritical() + ", "; }
+            if (!string.IsNullOrEmpty(Text)) { t = t + "ReadableText=" + Text.ToNonCritical() + ", "; }
             if (Format != enDataFormat.Text) { t = t + "Format=" + (int)Format + ", "; }
             if (_ausrichtung != enAlignment.Top_Left) { t = t + "Alignment=" + (int)_ausrichtung + ", "; }
             t = t + "AdditionalScale=" + Skalierung.ToString().ToNonCritical() + ", ";
@@ -201,7 +195,7 @@ namespace BlueControls.ItemCollection
                 etxt.DrawingPos = new Point((int)(DCoordinates.Left - trp.X), (int)(DCoordinates.Top - trp.Y));
                 etxt.DrawingArea = Rectangle.Empty; // new Rectangle(DCoordinates.Left, DCoordinates.Top, DCoordinates.Width, DCoordinates.Height);
 
-                if (!string.IsNullOrEmpty(_ReadableText) || !ForPrinting)
+                if (!string.IsNullOrEmpty(Text) || !ForPrinting)
                 {
                     etxt.Draw(GR, (float)(cZoom * Skalierung * Parent.SheetStyleScale));
                 }
@@ -299,9 +293,9 @@ namespace BlueControls.ItemCollection
                 }
 
 
-                if (!string.IsNullOrEmpty(_ReadableText))
+                if (!string.IsNullOrEmpty(Text))
                 {
-                    etxt.HtmlText = ChangeText(_ReadableText);
+                    etxt.HtmlText = ChangeText(Text);
                 }
                 else
                 {
@@ -343,10 +337,10 @@ namespace BlueControls.ItemCollection
         public bool ReplaceVariable(string VariableName, enValueType ValueType, string Value)
         {
 
-            var ot = _ReadableText;
-            _ReadableText = Export.ParseVariable(_ReadableText, VariableName, Value, ValueType, enValueType.Text);
+            var ot = Text;
+            Text = Export.ParseVariable(Text, VariableName, Value, ValueType, enValueType.Text);
 
-            if (ot == _ReadableText) { return false; }
+            if (ot == Text) { return false; }
 
             MakeNewETxt();
             OnChanged(true);
@@ -357,8 +351,8 @@ namespace BlueControls.ItemCollection
 
         public bool ResetVariables()
         {
-            if (_VariableText == _ReadableText) { return false; }
-            _ReadableText = _VariableText;
+            if (_VariableText == Text) { return false; }
+            Text = _VariableText;
             MakeNewETxt();
             OnChanged(true);
 
@@ -368,10 +362,10 @@ namespace BlueControls.ItemCollection
 
         public bool DoSpecialCodes()
         {
-            var ot = _ReadableText;
-            _ReadableText = Export.DoLayoutCode("XS", _ReadableText, null, "XE", false);
+            var ot = Text;
+            Text = Export.DoLayoutCode("XS", Text, null, "XE", false);
 
-            if (ot == _ReadableText) { return false; }
+            if (ot == Text) { return false; }
             MakeNewETxt();
             OnChanged(true);
 
@@ -386,7 +380,7 @@ namespace BlueControls.ItemCollection
 
             if (ot == _VariableText) { return false; }
 
-            _ReadableText = _VariableText;
+            Text = _VariableText;
             MakeNewETxt();
             OnChanged(true);
             return true;
@@ -395,9 +389,10 @@ namespace BlueControls.ItemCollection
 
         public override List<FlexiControl> GetStyleOptions()
         {
-            var l = new List<FlexiControl>();
-
-            l.Add(new FlexiControlForProperty(this, "Interner-Text", 5));
+            var l = new List<FlexiControl>
+            {
+                new FlexiControlForProperty(this, "Interner-Text", 5)
+            };
 
 
             var Aursicht = new ItemCollectionList
@@ -420,7 +415,7 @@ namespace BlueControls.ItemCollection
 
         protected override void ParseFinished()
         {
-              MakeNewETxt();
+            MakeNewETxt();
         }
 
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)

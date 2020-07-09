@@ -17,25 +17,25 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Drawing;
-using System.Drawing.Imaging;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
+using BlueControls.BlueDatabaseDialogs;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using BlueDatabase.EventArgs;
 using BlueDatabase.Enums;
-using static BlueBasics.FileOperations;
-using System.Collections.Generic;
-using BlueControls.Enums;
+using BlueDatabase.EventArgs;
 using System;
-using BlueControls.Designer_Support;
+using System.Collections.Generic;
 using System.ComponentModel;
-using BlueControls.EventArgs;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
-using BlueControls.BlueDatabaseDialogs;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls
 {
@@ -399,8 +399,8 @@ namespace BlueControls.Controls
 
             if (column1 == null)
             {
-    //            Develop.DebugPrint("Column nicht gefunden"); 
-    // Bei Steuerelementen, die manuell hinzugefügt werden
+                //            Develop.DebugPrint("Column nicht gefunden"); 
+                // Bei Steuerelementen, die manuell hinzugefügt werden
                 return;
             }
 

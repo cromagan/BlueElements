@@ -17,21 +17,21 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Drawing;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.BlueDatabaseDialogs;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueControls.Designer_Support;
-using System.ComponentModel;
-using BlueControls.Enums;
-using BlueBasics.Enums;
-using BlueControls.Interfaces;
-using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
-using BlueBasics;
-using BlueControls.BlueDatabaseDialogs;
-using BlueControls.Forms;
+using System.ComponentModel;
+using System.Drawing;
 
 namespace BlueControls.Controls
 {
@@ -153,8 +153,10 @@ namespace BlueControls.Controls
 
             if (e.Control is ComboBox cbx)
             {
-                var Item2 = new ItemCollectionList();
-                Item2.Add(new TextListItem("|~", "Keine weiteren Einträge vorhanden"));
+                var Item2 = new ItemCollectionList
+                {
+                    new TextListItem("|~", "Keine weiteren Einträge vorhanden")
+                };
 
                 //var c = Filter.Column.Contents(null);
 

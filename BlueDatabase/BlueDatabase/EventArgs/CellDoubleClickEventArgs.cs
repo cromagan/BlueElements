@@ -23,9 +23,9 @@ namespace BlueDatabase.EventArgs
     {
 
 
-        public CellDoubleClickEventArgs(ColumnItem Column, RowItem Row, bool StartEdit)  : base(Column,Row)
+        public CellDoubleClickEventArgs(ColumnItem column, RowItem row, bool startEdit) : base(column, row)
         {
-            this.StartEdit = StartEdit;
+            StartEdit = startEdit;
 
         }
 

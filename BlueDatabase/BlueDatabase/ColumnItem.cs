@@ -18,20 +18,20 @@
 #endregion
 
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
+using BlueBasics.MultiUserFile;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using static BlueBasics.FileOperations;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
-using BlueBasics.EventArgs;
-using BlueBasics.MultiUserFile;
+using static BlueBasics.FileOperations;
 
 namespace BlueDatabase
 {
@@ -165,7 +165,7 @@ namespace BlueDatabase
             var ex = Database.Column.SearchByKey(columnkey);
             if (ex != null) { Develop.DebugPrint(enFehlerArt.Fehler, "Key existiert bereits"); }
 
-            this.Key = columnkey;
+            Key = columnkey;
 
 
             #region Standard-Werte
@@ -2214,7 +2214,7 @@ namespace BlueDatabase
                 case enDataFormat.RelationText:
                     if (!_MultiLine) { return "Bei diesem Format muss mehrzeilig ausgewählt werden."; }
                     if (_KeyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
-                    if (this.IsFirst()) { return "Diese Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
+                    if (IsFirst()) { return "Diese Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
                     if (!string.IsNullOrEmpty(_CellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
                     if (_VorschlagsColumn > 0) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
 
@@ -2223,7 +2223,7 @@ namespace BlueDatabase
                 case enDataFormat.LinkedCell:
                     if (!string.IsNullOrEmpty(_CellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
                     if (_KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
-                    if (this.IsFirst()) { return "Dieses Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
+                    if (IsFirst()) { return "Dieses Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
                     if (_LinkedCell_RowKey < 0) { return "Die Angabe der Spalte, aus der der Schlüsselwert geholt wird, fehlt."; }
                     if (_LinkedCell_ColumnValueFoundIn < 0 && _LinkedCell_ColumnKey < 0) { return "Information fehlt, welche Spalte der Zieldatenbank verwendet werden soll."; }
                     if (_LinkedCell_ColumnValueFoundIn > -1 && _LinkedCell_ColumnKey > -1) { return "Doppelte Informationen, welche Spalte der Zieldatenbank verwendet werden soll."; }
@@ -2314,7 +2314,7 @@ namespace BlueDatabase
 
             if (!string.IsNullOrEmpty(_CellInitValue))
             {
-                if (this.IsFirst()) { return "Die erste Spalte darf keinen InitialWert haben."; }
+                if (IsFirst()) { return "Die erste Spalte darf keinen InitialWert haben."; }
                 if (_VorschlagsColumn > -1) { return "InitialWert und Vorschlagspalten-Initial-Text gemeinsam nicht möglich"; }
             }
 
@@ -2396,7 +2396,7 @@ namespace BlueDatabase
             }
 
 
-            if (this.IsFirst())
+            if (IsFirst())
             {
                 if (_KeyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
 

@@ -25,7 +25,7 @@ namespace BlueBasics.EventArgs
 
         public OldBlockFileEventArgs(double blockDateiExistsinSeconds)
         {
-            this.BlockDateiExistsInSeconds = blockDateiExistsinSeconds;
+            BlockDateiExistsInSeconds = blockDateiExistsinSeconds;
         }
 
         public double BlockDateiExistsInSeconds { get; }

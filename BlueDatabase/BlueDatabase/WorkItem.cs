@@ -17,12 +17,12 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
+using System;
 using static BlueBasics.modConverter;
-using BlueBasics.Enums;
 
 namespace BlueDatabase
 {

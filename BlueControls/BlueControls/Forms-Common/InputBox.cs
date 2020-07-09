@@ -4,8 +4,7 @@ namespace BlueControls.Forms
 {
     public partial class InputBox : Forms.DialogWithOkAndCancel
     {
-
-        string GiveBack = string.Empty;
+        private string GiveBack = string.Empty;
 
         #region Konstruktor
 
@@ -14,7 +13,7 @@ namespace BlueControls.Forms
             InitializeComponent();
         }
 
-        private InputBox(string TXT, string VorschlagsText, enDataFormat Textformat, bool BigMultiLineBox) :this()
+        private InputBox(string TXT, string VorschlagsText, enDataFormat Textformat, bool BigMultiLineBox) : this()
         {
 
             txbText.Text = VorschlagsText;

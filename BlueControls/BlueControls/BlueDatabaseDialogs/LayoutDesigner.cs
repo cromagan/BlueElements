@@ -17,16 +17,16 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Forms;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using static BlueBasics.FileOperations;
 using System.ComponentModel;
+using System.Drawing;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs
 {

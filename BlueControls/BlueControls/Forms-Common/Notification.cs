@@ -53,9 +53,9 @@ namespace BlueControls.Forms
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
 
 
-            this.Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
+            Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
 
-            this.Location = new Point(-Width - 10, Height - 10);
+            Location = new Point(-Width - 10, Height - 10);
             FloatInAndOutMilliSek = Math.Max(3200, Text.Length * 110);
 
             timNote.Enabled = true;
@@ -92,7 +92,7 @@ namespace BlueControls.Forms
 
             foreach (var ThisForm in AllBoxes)
             {
-                if (!ThisForm.IsDisposed && ThisForm is Notification )
+                if (!ThisForm.IsDisposed && ThisForm is Notification)
                 {
                     try
                     {

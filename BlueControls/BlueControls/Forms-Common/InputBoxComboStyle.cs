@@ -25,8 +25,7 @@ namespace BlueControls.Forms
 {
     public partial class InputBoxComboStyle : Forms.DialogWithOkAndCancel
     {
-
-        string GiveBack = string.Empty;
+        private string GiveBack = string.Empty;
 
 
         #region Konstruktor
@@ -65,7 +64,7 @@ namespace BlueControls.Forms
 
         #endregion
 
-        public static string Show(string TXT, ItemCollectionList Suggest,bool TexteingabeErlaubt)
+        public static string Show(string TXT, ItemCollectionList Suggest, bool TexteingabeErlaubt)
         {
             return Show(TXT, string.Empty, Suggest, TexteingabeErlaubt);
         }

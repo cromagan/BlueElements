@@ -17,10 +17,10 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace BlueBasics
 {

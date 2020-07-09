@@ -42,27 +42,31 @@ namespace BlueControls.Forms
 
         private Progressbar(string Text) : this()
         {
-           // InitializeComponent();
+            // InitializeComponent();
             capTXT.Text = Text;
             var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
-            this.Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
+            Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
         }
 
 
         public static Progressbar Show(string Text)
         {
-            var P = new Progressbar(Text);
-            P._baseText = Text;
+            var P = new Progressbar(Text)
+            {
+                _baseText = Text
+            };
             P.Show();
             return P;
         }
 
         public static Progressbar Show(string Text, int Count)
         {
-            var P = new Progressbar(Text);
-            P._baseText = Text;
-            P._count = Count;
+            var P = new Progressbar(Text)
+            {
+                _baseText = Text,
+                _count = Count
+            };
             P.Update(0);
             P.Show();
             P.BringToFront();
@@ -152,11 +156,11 @@ namespace BlueControls.Forms
             }
             else if (eProgressbar_LastCalulatedSeconds > 94)
             {
-                T = "<br>" + PRT + " % - Geschätzte Restzeit:   " + (int)(eProgressbar_LastCalulatedSeconds / 60) + " Minuten<tab>";
+                T = "<br>" + PRT + " % - Geschätzte Restzeit:   " + eProgressbar_LastCalulatedSeconds / 60 + " Minuten<tab>";
             }
             else if (eProgressbar_LastCalulatedSeconds > 10)
             {
-                T = "<br>" + PRT + " % - Geschätzte Restzeit: " + (int)(eProgressbar_LastCalulatedSeconds / 5) * 5 + " Sekunden<tab>";
+                T = "<br>" + PRT + " % - Geschätzte Restzeit: " + eProgressbar_LastCalulatedSeconds / 5 * 5 + " Sekunden<tab>";
             }
             else if (eProgressbar_LastCalulatedSeconds > 0)
             {

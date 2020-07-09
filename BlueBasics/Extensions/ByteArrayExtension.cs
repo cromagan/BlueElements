@@ -28,7 +28,7 @@ namespace BlueBasics
             return Encoding.Default.GetString(b);
         }
 
-        public static string ToStringConvertUTF8(this List<byte> b )
+        public static string ToStringConvertUTF8(this List<byte> b)
         {
             return Encoding.UTF8.GetString(b.ToArray());
         }

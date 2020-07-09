@@ -20,9 +20,10 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.Forms;
+using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using System;
@@ -30,7 +31,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Printing;
-using BlueControls.Designer_Support;
 
 namespace BlueControls.Controls
 {
@@ -324,7 +324,7 @@ namespace BlueControls.Controls
 
             if (_GivesMouseComandsTo != null)
             {
-                if (((IMouseAndKeyHandle)_GivesMouseComandsTo).KeyUp(this, e, _Zoom, _MoveX, _MoveY)) { return; }
+                if (_GivesMouseComandsTo.KeyUp(this, e, _Zoom, _MoveX, _MoveY)) { return; }
             }
 
 
@@ -455,7 +455,7 @@ namespace BlueControls.Controls
                 }
                 else
                 {
-                    if (!((IMouseAndKeyHandle)_GivesMouseComandsTo).MouseMove(this, e, _Zoom, _MoveX, _MoveY))
+                    if (!_GivesMouseComandsTo.MouseMove(this, e, _Zoom, _MoveX, _MoveY))
                     {
                         _GivesMouseComandsTo = null;
                         Invalidate();
@@ -495,7 +495,7 @@ namespace BlueControls.Controls
 
             if (_GivesMouseComandsTo != null)
             {
-                if (!((IMouseAndKeyHandle)_GivesMouseComandsTo).MouseUp(this, e, _Zoom, _MoveX, _MoveY))
+                if (!_GivesMouseComandsTo.MouseUp(this, e, _Zoom, _MoveX, _MoveY))
                 {
                     _GivesMouseComandsTo = null;
                 }
@@ -651,7 +651,7 @@ namespace BlueControls.Controls
                     gr.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
                 }
 
-             //   TMPGR.Dispose();
+                //   TMPGR.Dispose();
             }
             catch
             {
@@ -1107,7 +1107,7 @@ namespace BlueControls.Controls
             if (e == null) { return new List<BasicPadItem>(); }
 
 
-            var P = new Point((int)((decimal)(e.X + _MoveX) / _Zoom), (int)((decimal)(e.Y + _MoveY) / _Zoom));
+            var P = new Point((int)((e.X + _MoveX) / _Zoom), (int)((e.Y + _MoveY) / _Zoom));
 
             var l = new List<BasicPadItem>();
 

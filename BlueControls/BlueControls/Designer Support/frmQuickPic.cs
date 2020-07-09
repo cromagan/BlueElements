@@ -18,11 +18,11 @@
 #endregion
 
 
+using BlueBasics;
+using BlueBasics.Enums;
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
 
 namespace BlueControls.Designer_Support
 {
@@ -88,386 +88,386 @@ namespace BlueControls.Designer_Support
         [DebuggerStepThrough]
         private void InitializeComponent()
         {
-            this.LB = new System.Windows.Forms.ListBox();
-            this.ButOK = new System.Windows.Forms.Button();
-            this.PicName = new System.Windows.Forms.TextBox();
-            this.GroupBox1 = new System.Windows.Forms.GroupBox();
-            this.GroupBox2 = new System.Windows.Forms.GroupBox();
-            this.GrY = new System.Windows.Forms.TextBox();
-            this.GrX = new System.Windows.Forms.TextBox();
-            this.Label1 = new System.Windows.Forms.Label();
-            this.chkbDurchgestrichen = new System.Windows.Forms.CheckBox();
-            this.chkbGrauStufen = new System.Windows.Forms.CheckBox();
-            this.chkbMEDisabled = new System.Windows.Forms.CheckBox();
-            this.chkbXPDisabled = new System.Windows.Forms.CheckBox();
-            this.GroupBox4 = new System.Windows.Forms.GroupBox();
-            this.Preview = new System.Windows.Forms.PictureBox();
-            this.SAT = new System.Windows.Forms.TrackBar();
-            this.Label2 = new System.Windows.Forms.Label();
-            this.SATL = new System.Windows.Forms.Label();
-            this.Hell = new System.Windows.Forms.TrackBar();
-            this.Label4 = new System.Windows.Forms.Label();
-            this.Transp = new System.Windows.Forms.TrackBar();
-            this.Helll = new System.Windows.Forms.Label();
-            this.Label6 = new System.Windows.Forms.Label();
-            this.Transpl = new System.Windows.Forms.Label();
-            this.Label3 = new System.Windows.Forms.Label();
-            this.Label5 = new System.Windows.Forms.Label();
-            this.Färb = new System.Windows.Forms.TextBox();
-            this.grün = new System.Windows.Forms.TextBox();
-            this.GroupBox3 = new System.Windows.Forms.GroupBox();
-            this.ZweitSymbol = new System.Windows.Forms.GroupBox();
-            this.txbZweitsymbol = new System.Windows.Forms.TextBox();
-            this.GroupBox1.SuspendLayout();
-            this.GroupBox2.SuspendLayout();
-            this.GroupBox4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Preview)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SAT)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Hell)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Transp)).BeginInit();
-            this.GroupBox3.SuspendLayout();
-            this.ZweitSymbol.SuspendLayout();
-            this.SuspendLayout();
+            LB = new System.Windows.Forms.ListBox();
+            ButOK = new System.Windows.Forms.Button();
+            PicName = new System.Windows.Forms.TextBox();
+            GroupBox1 = new System.Windows.Forms.GroupBox();
+            GroupBox2 = new System.Windows.Forms.GroupBox();
+            GrY = new System.Windows.Forms.TextBox();
+            GrX = new System.Windows.Forms.TextBox();
+            Label1 = new System.Windows.Forms.Label();
+            chkbDurchgestrichen = new System.Windows.Forms.CheckBox();
+            chkbGrauStufen = new System.Windows.Forms.CheckBox();
+            chkbMEDisabled = new System.Windows.Forms.CheckBox();
+            chkbXPDisabled = new System.Windows.Forms.CheckBox();
+            GroupBox4 = new System.Windows.Forms.GroupBox();
+            Preview = new System.Windows.Forms.PictureBox();
+            SAT = new System.Windows.Forms.TrackBar();
+            Label2 = new System.Windows.Forms.Label();
+            SATL = new System.Windows.Forms.Label();
+            Hell = new System.Windows.Forms.TrackBar();
+            Label4 = new System.Windows.Forms.Label();
+            Transp = new System.Windows.Forms.TrackBar();
+            Helll = new System.Windows.Forms.Label();
+            Label6 = new System.Windows.Forms.Label();
+            Transpl = new System.Windows.Forms.Label();
+            Label3 = new System.Windows.Forms.Label();
+            Label5 = new System.Windows.Forms.Label();
+            Färb = new System.Windows.Forms.TextBox();
+            grün = new System.Windows.Forms.TextBox();
+            GroupBox3 = new System.Windows.Forms.GroupBox();
+            ZweitSymbol = new System.Windows.Forms.GroupBox();
+            txbZweitsymbol = new System.Windows.Forms.TextBox();
+            GroupBox1.SuspendLayout();
+            GroupBox2.SuspendLayout();
+            GroupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(Preview)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(SAT)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(Hell)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(Transp)).BeginInit();
+            GroupBox3.SuspendLayout();
+            ZweitSymbol.SuspendLayout();
+            SuspendLayout();
             // 
             // LB
             // 
-            this.LB.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            LB.Anchor = (((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.LB.Location = new System.Drawing.Point(8, 16);
-            this.LB.Name = "LB";
-            this.LB.Size = new System.Drawing.Size(192, 303);
-            this.LB.TabIndex = 0;
-            this.LB.DoubleClick += new System.EventHandler(this.LB_DoubleClick);
+            | System.Windows.Forms.AnchorStyles.Right);
+            LB.Location = new System.Drawing.Point(8, 16);
+            LB.Name = "LB";
+            LB.Size = new System.Drawing.Size(192, 303);
+            LB.TabIndex = 0;
+            LB.DoubleClick += new System.EventHandler(LB_DoubleClick);
             // 
             // ButOK
             // 
-            this.ButOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButOK.Location = new System.Drawing.Point(519, 331);
-            this.ButOK.Name = "ButOK";
-            this.ButOK.Size = new System.Drawing.Size(64, 24);
-            this.ButOK.TabIndex = 1;
-            this.ButOK.Text = "OK";
+            ButOK.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
+            ButOK.Location = new System.Drawing.Point(519, 331);
+            ButOK.Name = "ButOK";
+            ButOK.Size = new System.Drawing.Size(64, 24);
+            ButOK.TabIndex = 1;
+            ButOK.Text = "OK";
             // 
             // PicName
             // 
-            this.PicName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.PicName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.PicName.Location = new System.Drawing.Point(8, 334);
-            this.PicName.Name = "PicName";
-            this.PicName.Size = new System.Drawing.Size(192, 20);
-            this.PicName.TabIndex = 2;
-            this.PicName.Text = "PicNam";
-            this.PicName.TextChanged += new System.EventHandler(this.SomethingChanged);
+            PicName.Anchor = ((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right);
+            PicName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            PicName.Location = new System.Drawing.Point(8, 334);
+            PicName.Name = "PicName";
+            PicName.Size = new System.Drawing.Size(192, 20);
+            PicName.TabIndex = 2;
+            PicName.Text = "PicNam";
+            PicName.TextChanged += new System.EventHandler(SomethingChanged);
             // 
             // GroupBox1
             // 
-            this.GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.GroupBox1.Controls.Add(this.LB);
-            this.GroupBox1.Controls.Add(this.PicName);
-            this.GroupBox1.Location = new System.Drawing.Point(0, 0);
-            this.GroupBox1.Name = "GroupBox1";
-            this.GroupBox1.Size = new System.Drawing.Size(208, 358);
-            this.GroupBox1.TabIndex = 3;
-            this.GroupBox1.TabStop = false;
-            this.GroupBox1.Text = "Name";
+            GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left);
+            GroupBox1.Controls.Add(LB);
+            GroupBox1.Controls.Add(PicName);
+            GroupBox1.Location = new System.Drawing.Point(0, 0);
+            GroupBox1.Name = "GroupBox1";
+            GroupBox1.Size = new System.Drawing.Size(208, 358);
+            GroupBox1.TabIndex = 3;
+            GroupBox1.TabStop = false;
+            GroupBox1.Text = "Name";
             // 
             // GroupBox2
             // 
-            this.GroupBox2.Controls.Add(this.GrY);
-            this.GroupBox2.Controls.Add(this.GrX);
-            this.GroupBox2.Controls.Add(this.Label1);
-            this.GroupBox2.Location = new System.Drawing.Point(304, 8);
-            this.GroupBox2.Name = "GroupBox2";
-            this.GroupBox2.Size = new System.Drawing.Size(160, 48);
-            this.GroupBox2.TabIndex = 4;
-            this.GroupBox2.TabStop = false;
-            this.GroupBox2.Text = "Abmessung";
+            GroupBox2.Controls.Add(GrY);
+            GroupBox2.Controls.Add(GrX);
+            GroupBox2.Controls.Add(Label1);
+            GroupBox2.Location = new System.Drawing.Point(304, 8);
+            GroupBox2.Name = "GroupBox2";
+            GroupBox2.Size = new System.Drawing.Size(160, 48);
+            GroupBox2.TabIndex = 4;
+            GroupBox2.TabStop = false;
+            GroupBox2.Text = "Abmessung";
             // 
             // GrY
             // 
-            this.GrY.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.GrY.Location = new System.Drawing.Point(88, 16);
-            this.GrY.Name = "GrY";
-            this.GrY.Size = new System.Drawing.Size(24, 20);
-            this.GrY.TabIndex = 2;
-            this.GrY.Text = "16";
-            this.GrY.TextChanged += new System.EventHandler(this.SomethingChanged);
+            GrY.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            GrY.Location = new System.Drawing.Point(88, 16);
+            GrY.Name = "GrY";
+            GrY.Size = new System.Drawing.Size(24, 20);
+            GrY.TabIndex = 2;
+            GrY.Text = "16";
+            GrY.TextChanged += new System.EventHandler(SomethingChanged);
             // 
             // GrX
             // 
-            this.GrX.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.GrX.Location = new System.Drawing.Point(48, 16);
-            this.GrX.Name = "GrX";
-            this.GrX.Size = new System.Drawing.Size(24, 20);
-            this.GrX.TabIndex = 0;
-            this.GrX.Text = "16";
-            this.GrX.TextChanged += new System.EventHandler(this.SomethingChanged);
+            GrX.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            GrX.Location = new System.Drawing.Point(48, 16);
+            GrX.Name = "GrX";
+            GrX.Size = new System.Drawing.Size(24, 20);
+            GrX.TabIndex = 0;
+            GrX.Text = "16";
+            GrX.TextChanged += new System.EventHandler(SomethingChanged);
             // 
             // Label1
             // 
-            this.Label1.Location = new System.Drawing.Point(8, 16);
-            this.Label1.Name = "Label1";
-            this.Label1.Size = new System.Drawing.Size(144, 16);
-            this.Label1.TabIndex = 1;
-            this.Label1.Text = "Größe            x            Pixel";
+            Label1.Location = new System.Drawing.Point(8, 16);
+            Label1.Name = "Label1";
+            Label1.Size = new System.Drawing.Size(144, 16);
+            Label1.TabIndex = 1;
+            Label1.Text = "Größe            x            Pixel";
             // 
             // chkbDurchgestrichen
             // 
-            this.chkbDurchgestrichen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.chkbDurchgestrichen.Location = new System.Drawing.Point(8, 16);
-            this.chkbDurchgestrichen.Name = "chkbDurchgestrichen";
-            this.chkbDurchgestrichen.Size = new System.Drawing.Size(120, 16);
-            this.chkbDurchgestrichen.TabIndex = 0;
-            this.chkbDurchgestrichen.Text = "Durchgestrichen";
-            this.chkbDurchgestrichen.CheckedChanged += new System.EventHandler(this.SomethingCheckedChanged);
+            chkbDurchgestrichen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            chkbDurchgestrichen.Location = new System.Drawing.Point(8, 16);
+            chkbDurchgestrichen.Name = "chkbDurchgestrichen";
+            chkbDurchgestrichen.Size = new System.Drawing.Size(120, 16);
+            chkbDurchgestrichen.TabIndex = 0;
+            chkbDurchgestrichen.Text = "Durchgestrichen";
+            chkbDurchgestrichen.CheckedChanged += new System.EventHandler(SomethingCheckedChanged);
             // 
             // chkbGrauStufen
             // 
-            this.chkbGrauStufen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.chkbGrauStufen.Location = new System.Drawing.Point(8, 64);
-            this.chkbGrauStufen.Name = "chkbGrauStufen";
-            this.chkbGrauStufen.Size = new System.Drawing.Size(152, 16);
-            this.chkbGrauStufen.TabIndex = 15;
-            this.chkbGrauStufen.Text = "Bild in Graustufen anzeigen";
-            this.chkbGrauStufen.CheckedChanged += new System.EventHandler(this.SomethingCheckedChanged);
+            chkbGrauStufen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            chkbGrauStufen.Location = new System.Drawing.Point(8, 64);
+            chkbGrauStufen.Name = "chkbGrauStufen";
+            chkbGrauStufen.Size = new System.Drawing.Size(152, 16);
+            chkbGrauStufen.TabIndex = 15;
+            chkbGrauStufen.Text = "Bild in Graustufen anzeigen";
+            chkbGrauStufen.CheckedChanged += new System.EventHandler(SomethingCheckedChanged);
             // 
             // chkbMEDisabled
             // 
-            this.chkbMEDisabled.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.chkbMEDisabled.Location = new System.Drawing.Point(8, 32);
-            this.chkbMEDisabled.Name = "chkbMEDisabled";
-            this.chkbMEDisabled.Size = new System.Drawing.Size(136, 16);
-            this.chkbMEDisabled.TabIndex = 1;
-            this.chkbMEDisabled.Text = "Windows ME disabled";
-            this.chkbMEDisabled.CheckedChanged += new System.EventHandler(this.SomethingCheckedChanged);
+            chkbMEDisabled.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            chkbMEDisabled.Location = new System.Drawing.Point(8, 32);
+            chkbMEDisabled.Name = "chkbMEDisabled";
+            chkbMEDisabled.Size = new System.Drawing.Size(136, 16);
+            chkbMEDisabled.TabIndex = 1;
+            chkbMEDisabled.Text = "Windows ME disabled";
+            chkbMEDisabled.CheckedChanged += new System.EventHandler(SomethingCheckedChanged);
             // 
             // chkbXPDisabled
             // 
-            this.chkbXPDisabled.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.chkbXPDisabled.Location = new System.Drawing.Point(8, 48);
-            this.chkbXPDisabled.Name = "chkbXPDisabled";
-            this.chkbXPDisabled.Size = new System.Drawing.Size(136, 16);
-            this.chkbXPDisabled.TabIndex = 2;
-            this.chkbXPDisabled.Text = "Windows XP disabled";
-            this.chkbXPDisabled.CheckedChanged += new System.EventHandler(this.SomethingCheckedChanged);
+            chkbXPDisabled.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            chkbXPDisabled.Location = new System.Drawing.Point(8, 48);
+            chkbXPDisabled.Name = "chkbXPDisabled";
+            chkbXPDisabled.Size = new System.Drawing.Size(136, 16);
+            chkbXPDisabled.TabIndex = 2;
+            chkbXPDisabled.Text = "Windows XP disabled";
+            chkbXPDisabled.CheckedChanged += new System.EventHandler(SomethingCheckedChanged);
             // 
             // GroupBox4
             // 
-            this.GroupBox4.Controls.Add(this.chkbXPDisabled);
-            this.GroupBox4.Controls.Add(this.chkbMEDisabled);
-            this.GroupBox4.Controls.Add(this.chkbGrauStufen);
-            this.GroupBox4.Controls.Add(this.chkbDurchgestrichen);
-            this.GroupBox4.Location = new System.Drawing.Point(216, 88);
-            this.GroupBox4.Name = "GroupBox4";
-            this.GroupBox4.Size = new System.Drawing.Size(160, 88);
-            this.GroupBox4.TabIndex = 7;
-            this.GroupBox4.TabStop = false;
-            this.GroupBox4.Text = "Effekt";
+            GroupBox4.Controls.Add(chkbXPDisabled);
+            GroupBox4.Controls.Add(chkbMEDisabled);
+            GroupBox4.Controls.Add(chkbGrauStufen);
+            GroupBox4.Controls.Add(chkbDurchgestrichen);
+            GroupBox4.Location = new System.Drawing.Point(216, 88);
+            GroupBox4.Name = "GroupBox4";
+            GroupBox4.Size = new System.Drawing.Size(160, 88);
+            GroupBox4.TabIndex = 7;
+            GroupBox4.TabStop = false;
+            GroupBox4.Text = "Effekt";
             // 
             // Preview
             // 
-            this.Preview.Location = new System.Drawing.Point(216, 8);
-            this.Preview.Name = "Preview";
-            this.Preview.Size = new System.Drawing.Size(80, 72);
-            this.Preview.TabIndex = 8;
-            this.Preview.TabStop = false;
+            Preview.Location = new System.Drawing.Point(216, 8);
+            Preview.Name = "Preview";
+            Preview.Size = new System.Drawing.Size(80, 72);
+            Preview.TabIndex = 8;
+            Preview.TabStop = false;
             // 
             // SAT
             // 
-            this.SAT.AutoSize = false;
-            this.SAT.LargeChange = 1;
-            this.SAT.Location = new System.Drawing.Point(80, 8);
-            this.SAT.Maximum = 200;
-            this.SAT.Name = "SAT";
-            this.SAT.Size = new System.Drawing.Size(240, 32);
-            this.SAT.TabIndex = 5;
-            this.SAT.TickFrequency = 10;
-            this.SAT.Value = 100;
-            this.SAT.ValueChanged += new System.EventHandler(this.SomethingChanged);
+            SAT.AutoSize = false;
+            SAT.LargeChange = 1;
+            SAT.Location = new System.Drawing.Point(80, 8);
+            SAT.Maximum = 200;
+            SAT.Name = "SAT";
+            SAT.Size = new System.Drawing.Size(240, 32);
+            SAT.TabIndex = 5;
+            SAT.TickFrequency = 10;
+            SAT.Value = 100;
+            SAT.ValueChanged += new System.EventHandler(SomethingChanged);
             // 
             // Label2
             // 
-            this.Label2.Location = new System.Drawing.Point(8, 16);
-            this.Label2.Name = "Label2";
-            this.Label2.Size = new System.Drawing.Size(56, 16);
-            this.Label2.TabIndex = 6;
-            this.Label2.Text = "Sättigung:";
+            Label2.Location = new System.Drawing.Point(8, 16);
+            Label2.Name = "Label2";
+            Label2.Size = new System.Drawing.Size(56, 16);
+            Label2.TabIndex = 6;
+            Label2.Text = "Sättigung:";
             // 
             // SATL
             // 
-            this.SATL.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SATL.Location = new System.Drawing.Point(320, 16);
-            this.SATL.Name = "SATL";
-            this.SATL.Size = new System.Drawing.Size(40, 16);
-            this.SATL.TabIndex = 7;
-            this.SATL.Text = "100%";
+            SATL.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            SATL.Location = new System.Drawing.Point(320, 16);
+            SATL.Name = "SATL";
+            SATL.Size = new System.Drawing.Size(40, 16);
+            SATL.TabIndex = 7;
+            SATL.Text = "100%";
             // 
             // Hell
             // 
-            this.Hell.AutoSize = false;
-            this.Hell.LargeChange = 1;
-            this.Hell.Location = new System.Drawing.Point(80, 40);
-            this.Hell.Maximum = 200;
-            this.Hell.Name = "Hell";
-            this.Hell.Size = new System.Drawing.Size(240, 32);
-            this.Hell.TabIndex = 8;
-            this.Hell.TickFrequency = 10;
-            this.Hell.Value = 100;
-            this.Hell.ValueChanged += new System.EventHandler(this.SomethingChanged);
+            Hell.AutoSize = false;
+            Hell.LargeChange = 1;
+            Hell.Location = new System.Drawing.Point(80, 40);
+            Hell.Maximum = 200;
+            Hell.Name = "Hell";
+            Hell.Size = new System.Drawing.Size(240, 32);
+            Hell.TabIndex = 8;
+            Hell.TickFrequency = 10;
+            Hell.Value = 100;
+            Hell.ValueChanged += new System.EventHandler(SomethingChanged);
             // 
             // Label4
             // 
-            this.Label4.Location = new System.Drawing.Point(8, 40);
-            this.Label4.Name = "Label4";
-            this.Label4.Size = new System.Drawing.Size(56, 16);
-            this.Label4.TabIndex = 9;
-            this.Label4.Text = "Helligkeit:";
+            Label4.Location = new System.Drawing.Point(8, 40);
+            Label4.Name = "Label4";
+            Label4.Size = new System.Drawing.Size(56, 16);
+            Label4.TabIndex = 9;
+            Label4.Text = "Helligkeit:";
             // 
             // Transp
             // 
-            this.Transp.AutoSize = false;
-            this.Transp.LargeChange = 1;
-            this.Transp.Location = new System.Drawing.Point(80, 72);
-            this.Transp.Maximum = 99;
-            this.Transp.Name = "Transp";
-            this.Transp.Size = new System.Drawing.Size(240, 32);
-            this.Transp.TabIndex = 8;
-            this.Transp.TickFrequency = 10;
-            this.Transp.ValueChanged += new System.EventHandler(this.SomethingChanged);
+            Transp.AutoSize = false;
+            Transp.LargeChange = 1;
+            Transp.Location = new System.Drawing.Point(80, 72);
+            Transp.Maximum = 99;
+            Transp.Name = "Transp";
+            Transp.Size = new System.Drawing.Size(240, 32);
+            Transp.TabIndex = 8;
+            Transp.TickFrequency = 10;
+            Transp.ValueChanged += new System.EventHandler(SomethingChanged);
             // 
             // Helll
             // 
-            this.Helll.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Helll.Location = new System.Drawing.Point(320, 40);
-            this.Helll.Name = "Helll";
-            this.Helll.Size = new System.Drawing.Size(40, 16);
-            this.Helll.TabIndex = 10;
-            this.Helll.Text = "100%";
+            Helll.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            Helll.Location = new System.Drawing.Point(320, 40);
+            Helll.Name = "Helll";
+            Helll.Size = new System.Drawing.Size(40, 16);
+            Helll.TabIndex = 10;
+            Helll.Text = "100%";
             // 
             // Label6
             // 
-            this.Label6.Location = new System.Drawing.Point(8, 72);
-            this.Label6.Name = "Label6";
-            this.Label6.Size = new System.Drawing.Size(72, 16);
-            this.Label6.TabIndex = 9;
-            this.Label6.Text = "Transparenz:";
+            Label6.Location = new System.Drawing.Point(8, 72);
+            Label6.Name = "Label6";
+            Label6.Size = new System.Drawing.Size(72, 16);
+            Label6.TabIndex = 9;
+            Label6.Text = "Transparenz:";
             // 
             // Transpl
             // 
-            this.Transpl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Transpl.Location = new System.Drawing.Point(320, 72);
-            this.Transpl.Name = "Transpl";
-            this.Transpl.Size = new System.Drawing.Size(40, 16);
-            this.Transpl.TabIndex = 10;
-            this.Transpl.Text = "0%";
+            Transpl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            Transpl.Location = new System.Drawing.Point(320, 72);
+            Transpl.Name = "Transpl";
+            Transpl.Size = new System.Drawing.Size(40, 16);
+            Transpl.TabIndex = 10;
+            Transpl.Text = "0%";
             // 
             // Label3
             // 
-            this.Label3.Location = new System.Drawing.Point(8, 112);
-            this.Label3.Name = "Label3";
-            this.Label3.Size = new System.Drawing.Size(56, 16);
-            this.Label3.TabIndex = 11;
-            this.Label3.Text = "Färbung:";
+            Label3.Location = new System.Drawing.Point(8, 112);
+            Label3.Name = "Label3";
+            Label3.Size = new System.Drawing.Size(56, 16);
+            Label3.TabIndex = 11;
+            Label3.Text = "Färbung:";
             // 
             // Label5
             // 
-            this.Label5.Location = new System.Drawing.Point(128, 112);
-            this.Label5.Name = "Label5";
-            this.Label5.Size = new System.Drawing.Size(72, 16);
-            this.Label5.TabIndex = 13;
-            this.Label5.Text = "Grün wird zu:";
+            Label5.Location = new System.Drawing.Point(128, 112);
+            Label5.Name = "Label5";
+            Label5.Size = new System.Drawing.Size(72, 16);
+            Label5.TabIndex = 13;
+            Label5.Text = "Grün wird zu:";
             // 
             // Färb
             // 
-            this.Färb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.Färb.Location = new System.Drawing.Point(64, 112);
-            this.Färb.Name = "Färb";
-            this.Färb.Size = new System.Drawing.Size(48, 20);
-            this.Färb.TabIndex = 16;
-            this.Färb.TextChanged += new System.EventHandler(this.SomethingChanged);
+            Färb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            Färb.Location = new System.Drawing.Point(64, 112);
+            Färb.Name = "Färb";
+            Färb.Size = new System.Drawing.Size(48, 20);
+            Färb.TabIndex = 16;
+            Färb.TextChanged += new System.EventHandler(SomethingChanged);
             // 
             // grün
             // 
-            this.grün.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.grün.Location = new System.Drawing.Point(200, 112);
-            this.grün.Name = "grün";
-            this.grün.Size = new System.Drawing.Size(48, 20);
-            this.grün.TabIndex = 17;
-            this.grün.TextChanged += new System.EventHandler(this.SomethingChanged);
+            grün.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            grün.Location = new System.Drawing.Point(200, 112);
+            grün.Name = "grün";
+            grün.Size = new System.Drawing.Size(48, 20);
+            grün.TabIndex = 17;
+            grün.TextChanged += new System.EventHandler(SomethingChanged);
             // 
             // GroupBox3
             // 
-            this.GroupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.GroupBox3.Controls.Add(this.grün);
-            this.GroupBox3.Controls.Add(this.Färb);
-            this.GroupBox3.Controls.Add(this.Label5);
-            this.GroupBox3.Controls.Add(this.Label3);
-            this.GroupBox3.Controls.Add(this.Transpl);
-            this.GroupBox3.Controls.Add(this.Label6);
-            this.GroupBox3.Controls.Add(this.Helll);
-            this.GroupBox3.Controls.Add(this.Transp);
-            this.GroupBox3.Controls.Add(this.Label4);
-            this.GroupBox3.Controls.Add(this.Hell);
-            this.GroupBox3.Controls.Add(this.SATL);
-            this.GroupBox3.Controls.Add(this.Label2);
-            this.GroupBox3.Controls.Add(this.SAT);
-            this.GroupBox3.Location = new System.Drawing.Point(216, 184);
-            this.GroupBox3.Name = "GroupBox3";
-            this.GroupBox3.Size = new System.Drawing.Size(368, 144);
-            this.GroupBox3.TabIndex = 6;
-            this.GroupBox3.TabStop = false;
-            this.GroupBox3.Text = "Color";
+            GroupBox3.Anchor = ((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right);
+            GroupBox3.Controls.Add(grün);
+            GroupBox3.Controls.Add(Färb);
+            GroupBox3.Controls.Add(Label5);
+            GroupBox3.Controls.Add(Label3);
+            GroupBox3.Controls.Add(Transpl);
+            GroupBox3.Controls.Add(Label6);
+            GroupBox3.Controls.Add(Helll);
+            GroupBox3.Controls.Add(Transp);
+            GroupBox3.Controls.Add(Label4);
+            GroupBox3.Controls.Add(Hell);
+            GroupBox3.Controls.Add(SATL);
+            GroupBox3.Controls.Add(Label2);
+            GroupBox3.Controls.Add(SAT);
+            GroupBox3.Location = new System.Drawing.Point(216, 184);
+            GroupBox3.Name = "GroupBox3";
+            GroupBox3.Size = new System.Drawing.Size(368, 144);
+            GroupBox3.TabIndex = 6;
+            GroupBox3.TabStop = false;
+            GroupBox3.Text = "Color";
             // 
             // ZweitSymbol
             // 
-            this.ZweitSymbol.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ZweitSymbol.Controls.Add(this.txbZweitsymbol);
-            this.ZweitSymbol.Location = new System.Drawing.Point(384, 88);
-            this.ZweitSymbol.Name = "ZweitSymbol";
-            this.ZweitSymbol.Size = new System.Drawing.Size(200, 88);
-            this.ZweitSymbol.TabIndex = 9;
-            this.ZweitSymbol.TabStop = false;
-            this.ZweitSymbol.Text = "Zweitsymbol";
+            ZweitSymbol.Anchor = ((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right);
+            ZweitSymbol.Controls.Add(txbZweitsymbol);
+            ZweitSymbol.Location = new System.Drawing.Point(384, 88);
+            ZweitSymbol.Name = "ZweitSymbol";
+            ZweitSymbol.Size = new System.Drawing.Size(200, 88);
+            ZweitSymbol.TabIndex = 9;
+            ZweitSymbol.TabStop = false;
+            ZweitSymbol.Text = "Zweitsymbol";
             // 
             // txbZweitsymbol
             // 
-            this.txbZweitsymbol.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txbZweitsymbol.Location = new System.Drawing.Point(8, 24);
-            this.txbZweitsymbol.Name = "txbZweitsymbol";
-            this.txbZweitsymbol.Size = new System.Drawing.Size(184, 20);
-            this.txbZweitsymbol.TabIndex = 17;
-            this.txbZweitsymbol.TextChanged += new System.EventHandler(this.SomethingChanged);
+            txbZweitsymbol.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            txbZweitsymbol.Location = new System.Drawing.Point(8, 24);
+            txbZweitsymbol.Name = "txbZweitsymbol";
+            txbZweitsymbol.Size = new System.Drawing.Size(184, 20);
+            txbZweitsymbol.TabIndex = 17;
+            txbZweitsymbol.TextChanged += new System.EventHandler(SomethingChanged);
             // 
             // frmQuickPic
             // 
-            this.Controls.Add(this.ZweitSymbol);
-            this.Controls.Add(this.Preview);
-            this.Controls.Add(this.GroupBox4);
-            this.Controls.Add(this.GroupBox3);
-            this.Controls.Add(this.GroupBox2);
-            this.Controls.Add(this.GroupBox1);
-            this.Controls.Add(this.ButOK);
-            this.Name = "frmQuickPic";
-            this.Size = new System.Drawing.Size(591, 362);
-            this.GroupBox1.ResumeLayout(false);
-            this.GroupBox1.PerformLayout();
-            this.GroupBox2.ResumeLayout(false);
-            this.GroupBox2.PerformLayout();
-            this.GroupBox4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.Preview)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SAT)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Hell)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Transp)).EndInit();
-            this.GroupBox3.ResumeLayout(false);
-            this.GroupBox3.PerformLayout();
-            this.ZweitSymbol.ResumeLayout(false);
-            this.ZweitSymbol.PerformLayout();
-            this.ResumeLayout(false);
+            Controls.Add(ZweitSymbol);
+            Controls.Add(Preview);
+            Controls.Add(GroupBox4);
+            Controls.Add(GroupBox3);
+            Controls.Add(GroupBox2);
+            Controls.Add(GroupBox1);
+            Controls.Add(ButOK);
+            Name = "frmQuickPic";
+            Size = new System.Drawing.Size(591, 362);
+            GroupBox1.ResumeLayout(false);
+            GroupBox1.PerformLayout();
+            GroupBox2.ResumeLayout(false);
+            GroupBox2.PerformLayout();
+            GroupBox4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(Preview)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(SAT)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(Hell)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(Transp)).EndInit();
+            GroupBox3.ResumeLayout(false);
+            GroupBox3.PerformLayout();
+            ZweitSymbol.ResumeLayout(false);
+            ZweitSymbol.PerformLayout();
+            ResumeLayout(false);
 
         }
 
@@ -479,7 +479,7 @@ namespace BlueControls.Designer_Support
             LB.Items.Clear();
 
             const enImageCode tempVar = (enImageCode)9999;
-            for (enImageCode z = 0 ; z <= tempVar ; z++)
+            for (enImageCode z = 0; z <= tempVar; z++)
             {
                 var w = Enum.GetName(z.GetType(), z);
                 if (!string.IsNullOrEmpty(w)) { LB.Items.Add(w); }

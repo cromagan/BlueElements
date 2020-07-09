@@ -17,14 +17,14 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
-using static BlueBasics.FileOperations;
+using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using static BlueBasics.FileOperations;
 
 namespace BlueDatabase
 {
@@ -199,7 +199,7 @@ namespace BlueDatabase
                 case enAction.Substring: Co = 260; break;
                 //case enAction.LinkedCell: Co = 270; break;
                 //case enAction.SortiereIntelligent: Co = 290; break;
-              //  case enAction.KopiereAndereSpalten: Co = 295; break;
+                //  case enAction.KopiereAndereSpalten: Co = 295; break;
 
                 // Finaler Abschluss
                 case enAction.Sperre_die_Zelle: Co = 300; break;
@@ -292,7 +292,7 @@ namespace BlueDatabase
             switch (_Action)
             {
                 case enAction.Setze_Fehlerhaft:
-                     if (string.IsNullOrEmpty(_Text)) { return "*"; }
+                    if (string.IsNullOrEmpty(_Text)) { return "*"; }
                     return _Text;
 
                 case enAction.Wert_Setzen:
@@ -373,9 +373,11 @@ namespace BlueDatabase
                     return string.Empty;
 
                 case enAction.Skript:
-                    var sc = new BlueScript.Script();
-                    sc.ScriptText = _Text;
-                   // sc.Execute();
+                    var sc = new BlueScript.Script
+                    {
+                        ScriptText = _Text
+                    };
+                    // sc.Execute();
 
 
                     return string.Empty;
@@ -562,7 +564,7 @@ namespace BlueDatabase
         }
 
 
- 
+
 
         private static double? MatheErgebnis(string Formel, RowItem Row)
         {
@@ -1172,7 +1174,7 @@ namespace BlueDatabase
                 }
             }
 
-            if ((int)_Action == 0) { return "Keine Aktion gewählt"; }
+            if (_Action == 0) { return "Keine Aktion gewählt"; }
 
             switch (NeededColumns(_Action))
             {
@@ -1617,8 +1619,8 @@ namespace BlueDatabase
                         case enAction.Enthält_NICHT_Zeichenkette:
                             return "beim Wert in '#Spalte:" + Column.Name + "' fehlt eine Zeichenkette";
 
-                        //case enAction.Ist_der_Nutzer:
-                        //    return "sie gehören zu einer bestimmten Benutzergruppe";
+                            //case enAction.Ist_der_Nutzer:
+                            //    return "sie gehören zu einer bestimmten Benutzergruppe";
 
                             //case enAction.Ist_Jünger_Als:
                             //    return "die Zeile ist zu jung";
@@ -1650,7 +1652,7 @@ namespace BlueDatabase
             var l = new List<ColumnItem>();
 
 
-            if ((int)_Action == 0) { return l; }
+            if (_Action == 0) { return l; }
 
             l.AddRange(Columns);
 
@@ -1675,10 +1677,10 @@ namespace BlueDatabase
                 case enAction.Wert_Setzen:
                 case enAction.Sperre_die_Zelle:
                 case enAction.Formatfehler_des_Zelleninhaltes:
-                //case enAction.Ist_der_Nutzer:
-                //case enAction.Ist_Jünger_Als:
-                //case enAction.SortiereIntelligent:
-                //case enAction.KopiereAndereSpalten:
+                    //case enAction.Ist_der_Nutzer:
+                    //case enAction.Ist_Jünger_Als:
+                    //case enAction.SortiereIntelligent:
+                    //case enAction.KopiereAndereSpalten:
                     break;
 
                 case enAction.Berechne:
@@ -1700,7 +1702,7 @@ namespace BlueDatabase
                     break;
 
                 case enAction.Substring:
-                    if (!string.IsNullOrEmpty(_Text) && Columns.Count > 0 )
+                    if (!string.IsNullOrEmpty(_Text) && Columns.Count > 0)
                     {
                         foreach (var thisColumnItem in Rule.Database.Column)
                         {

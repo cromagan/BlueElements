@@ -171,13 +171,13 @@ namespace BlueDatabase.Enums
         co_Ueberschrift3 = 176,
         co_Prefix = 177,
         co_KeyColumnKey = 178,
-        co_LinkedCell_RowKey=179,
-        co_LinkedCell_ColumnKey=180,
-        co_LinkedCell_ColumnValueFoundIn=181,
-        co_LinkedCell_ColumnValueAdd=182,
+        co_LinkedCell_RowKey = 179,
+        co_LinkedCell_ColumnKey = 180,
+        co_LinkedCell_ColumnValueFoundIn = 181,
+        co_LinkedCell_ColumnValueAdd = 182,
         //co_LinkedCell_Behaviour = 183,
-        co_DropDownKey =184,
-        co_VorschlagColumn=185,
+        co_DropDownKey = 184,
+        co_VorschlagColumn = 185,
         co_Align = 186,
         co_Regex = 187,
         co_SortMask = 188,
@@ -207,7 +207,7 @@ namespace BlueDatabase.Enums
         //PendingsInOne = 250,
         UndoInOne = 251,
         //   StatisticInOneOld = 252
- 
+
 
 
         //StatisticOld = 253

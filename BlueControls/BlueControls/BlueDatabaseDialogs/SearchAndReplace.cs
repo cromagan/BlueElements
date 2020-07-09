@@ -17,8 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -26,6 +24,8 @@ using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
+using System;
+using System.Collections.Generic;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
@@ -154,8 +154,10 @@ namespace BlueControls.BlueDatabaseDialogs
                         }
                         else if (FügeHinzu.Checked)
                         {
-                            var tmp = new List<string>(OriginalText.SplitByCR());
-                            tmp.Add(ErsetzText);
+                            var tmp = new List<string>(OriginalText.SplitByCR())
+                            {
+                                ErsetzText
+                            };
                             GeändeterText = tmp.SortedDistinctList().JoinWithCr();
                         }
 

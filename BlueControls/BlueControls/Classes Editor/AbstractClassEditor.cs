@@ -17,10 +17,10 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.Interfaces;
+using System;
+using System.ComponentModel;
 
 namespace BlueControls.Classes_Editor
 {

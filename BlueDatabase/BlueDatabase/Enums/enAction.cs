@@ -38,7 +38,7 @@ namespace BlueDatabase.Enums
         Auf_eine_existierende_Datei_verweist = 20,
         Auf_einen_existierenden_Pfad_verweist = 21,
 
-       // Erhält_den_Focus = 22,
+        // Erhält_den_Focus = 22,
 
         Unsichtbare_Zeichen_am_Ende_Enthält = 23,
 

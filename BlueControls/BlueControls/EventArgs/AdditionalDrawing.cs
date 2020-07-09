@@ -27,10 +27,10 @@ namespace BlueControls.EventArgs
     {
         public AdditionalDrawing(Graphics gr, decimal zoom, decimal movex, decimal movey, MouseEventArgs1_1 mouseDown, MouseEventArgs1_1 current) : base(mouseDown, current)
         {
-            this.G = gr;
-            this.Zoom = zoom;
-            this.MoveX = movex;
-            this.MoveY = movey;
+            G = gr;
+            Zoom = zoom;
+            MoveX = movex;
+            MoveY = movey;
         }
 
         public Graphics G { get; }
@@ -54,7 +54,7 @@ namespace BlueControls.EventArgs
 
             G.DrawImage(BMP, r);
 
-//            G.DrawImage(BMP, p1.X, p1.Y, p2.X - p1.X, p2.Y - p1.Y);
+            //            G.DrawImage(BMP, p1.X, p1.Y, p2.X - p1.X, p2.Y - p1.Y);
 
         }
 
@@ -67,7 +67,7 @@ namespace BlueControls.EventArgs
                 for (var ady = -R; ady <= R; ady++)
                 {
 
-                    var d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady))-0.5;
+                    var d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady)) - 0.5;
 
                     if (d <= R) { FillRectangle(B, new Rectangle(X + adx, Y + ady, 1, 1)); }
 

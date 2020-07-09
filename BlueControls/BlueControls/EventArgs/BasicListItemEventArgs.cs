@@ -22,16 +22,14 @@ using BlueControls.ItemCollection;
 
 namespace BlueControls.EventArgs
 {
-  public  class BasicListItemEventArgs : System.EventArgs
+    public class BasicListItemEventArgs : System.EventArgs
     {
-        public BasicListItemEventArgs(BasicListItem Item)
+        public BasicListItemEventArgs(BasicListItem item)
         {
-            this.Item = Item;
-
-
+            Item = item;
         }
 
-        public BasicListItem Item { get; set; }
+        public BasicListItem Item { get; }
 
 
     }

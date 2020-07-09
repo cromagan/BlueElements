@@ -18,20 +18,20 @@
 #endregion
 
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollection;
+using BlueDatabase;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Reflection;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Interfaces;
-using BlueDatabase;
-using BlueControls.Enums;
-using BlueDatabase.Enums;
-using BlueControls.ItemCollection;
-using BlueControls.Controls;
 
 namespace BlueControls
 {
@@ -312,9 +312,11 @@ namespace BlueControls
                         var cx3 = Color.FromArgb(Value(cRow, col_Color_Back_3, 0));
                         var PR = Value(cRow, col_Verlauf_Mitte, 0.7f);
                         var lgb2 = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Bottom), cx1, cx3);
-                        var cb = new ColorBlend();
-                        cb.Colors = new[] { cx1, cx2, cx3 };
-                        cb.Positions = new[] { 0.0F, PR, 1.0F };
+                        var cb = new ColorBlend
+                        {
+                            Colors = new[] { cx1, cx2, cx3 },
+                            Positions = new[] { 0.0F, PR, 1.0F }
+                        };
 
                         lgb2.InterpolationColors = cb;
                         lgb2.GammaCorrection = true;
@@ -383,7 +385,7 @@ namespace BlueControls
                     //}
                     //else
                     //{
-                        GR.FillRectangle(new SolidBrush(frm.BackColor), r);
+                    GR.FillRectangle(new SolidBrush(frm.BackColor), r);
                     //}
                     break;
 
@@ -492,15 +494,19 @@ namespace BlueControls
 
             cb.Colors = new[] { c1, c2, c3, c4, c5 };
             cb.Positions = new[] { 0.0F, 0.25F, 0.5F, 0.75F, 1 };
-            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5);
-            lgb.InterpolationColors = cb;
+            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5)
+            {
+                InterpolationColors = cb
+            };
             Draw_Back_Glossy_TMP(lgb, r, GR, 20);
 
             c2 = Color.White;
             cb.Colors = new[] { c2, c3, c4, c5 };
             cb.Positions = new[] { 0.0F, 0.5F, 0.75F, 1.0F };
-            lgb = new LinearGradientBrush(new Point(r.Left + 1, r.Top), new Point(r.Left + 1, r.Top + r.Height - 1), c2, c5);
-            lgb.InterpolationColors = cb;
+            lgb = new LinearGradientBrush(new Point(r.Left + 1, r.Top), new Point(r.Left + 1, r.Top + r.Height - 1), c2, c5)
+            {
+                InterpolationColors = cb
+            };
 
             r.Inflate(-4, -4);
             GR.SmoothingMode = SmoothingMode.HighQuality;
@@ -525,15 +531,19 @@ namespace BlueControls
 
             cb.Colors = new[] { c1, c2, c3, c4, c5 };
             cb.Positions = new[] { 0.0F, 0.25F, 0.5F, 0.75F, 1 };
-            lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5);
-            lgb.InterpolationColors = cb;
+            lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5)
+            {
+                InterpolationColors = cb
+            };
             Draw_Back_Glossy_TMP(lgb, r, GR, 20);
 
             c2 = Color.White;
             cb.Colors = new[] { c2, c3, c4, c5 };
             cb.Positions = new[] { 0.0F, 0.5F, 0.75F, 1.0F };
-            lgb = new LinearGradientBrush(new Point(r.Left + 1, r.Top), new Point(r.Left + 1, r.Top + r.Height - 1), c2, c5);
-            lgb.InterpolationColors = cb;
+            lgb = new LinearGradientBrush(new Point(r.Left + 1, r.Top), new Point(r.Left + 1, r.Top + r.Height - 1), c2, c5)
+            {
+                InterpolationColors = cb
+            };
 
 
             r.Inflate(-4, -4);
@@ -668,14 +678,18 @@ namespace BlueControls
                         r.Inflate(-3, -3);
 
                         PathX = Kontur(Kon, r);
-                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_3, 0)));
-                        PenX.DashStyle = DashStyle.Dot;
+                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_3, 0)))
+                        {
+                            DashStyle = DashStyle.Dot
+                        };
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
 
                     case enRahmenArt.FocusDotLine:
-                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_3, 0)));
-                        PenX.DashStyle = DashStyle.Dot;
+                        PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_3, 0)))
+                        {
+                            DashStyle = DashStyle.Dot
+                        };
                         r.Inflate(-3, -3);
                         PathX = Kontur(Kon, r);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
@@ -749,8 +763,10 @@ namespace BlueControls
             var c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
             var c2 = Color.FromArgb(Value(Row, col_Color_Border_3, 0));
 
-            lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Height), c1, c2);
-            lgb.GammaCorrection = true;
+            lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Height), c1, c2)
+            {
+                GammaCorrection = true
+            };
 
             var x = GR.SmoothingMode;
 
@@ -845,15 +861,17 @@ namespace BlueControls
         public static ItemCollectionList GetFonts(RowItem SheetStyle)
         {
 
-            var Rahms = new ItemCollectionList();
-            //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Standard).ToString(), "Standard", GetBlueFont(PadStyles.Style_Standard, SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GetBlueFont(PadStyles.Style_StandardFett, SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GetBlueFont(PadStyles.Style_StandardAlternativ, SheetStyle).SymbolForReadableText()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolForReadableText()));
+            var Rahms = new ItemCollectionList
+            {
+                //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
+                new TextListItem(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolForReadableText()),
+                new TextListItem(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolForReadableText()),
+                new TextListItem(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolForReadableText()),
+                new TextListItem(((int)PadStyles.Style_Standard).ToString(), "Standard", GetBlueFont(PadStyles.Style_Standard, SheetStyle).SymbolForReadableText()),
+                new TextListItem(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GetBlueFont(PadStyles.Style_StandardFett, SheetStyle).SymbolForReadableText()),
+                new TextListItem(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GetBlueFont(PadStyles.Style_StandardAlternativ, SheetStyle).SymbolForReadableText()),
+                new TextListItem(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolForReadableText())
+            };
             Rahms.Sort();
 
             return Rahms;

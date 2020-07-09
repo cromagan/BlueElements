@@ -26,17 +26,17 @@ namespace BlueControls.EventArgs
     {
 
 
-        public ContextMenuItemClickedEventArgs(string ClickedComand, object HotItem, List<string> Tags)
+        public ContextMenuItemClickedEventArgs(string clickedComand, object hotItem, List<string> tags)
         {
-            this.HotItem = HotItem;
-            this.Tags = Tags;
-            this.ClickedComand = ClickedComand;
+            HotItem = hotItem;
+            Tags = tags;
+            ClickedComand = clickedComand;
         }
 
 
 
-        public string ClickedComand { get;  }
-        public object HotItem { get;  }
+        public string ClickedComand { get; }
+        public object HotItem { get; }
         public List<string> Tags { get; }
 
 

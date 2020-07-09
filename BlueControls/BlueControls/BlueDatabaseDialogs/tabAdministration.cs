@@ -17,24 +17,24 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
+using BlueControls.ItemCollection;
+using BlueDatabase;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.Forms;
-using BlueControls.EventArgs;
-using BlueControls.ItemCollection;
-using BlueDatabase;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Enums;
-using BlueControls.Enums;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
-using BlueBasics.EventArgs;
 
 namespace BlueControls.BlueDatabaseDialogs
 {

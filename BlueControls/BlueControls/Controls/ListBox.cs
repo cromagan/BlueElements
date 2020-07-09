@@ -21,16 +21,16 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
-using BlueControls.Forms;
+using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using BlueControls.Designer_Support;
-using System.Collections.Generic;
 
 namespace BlueControls.Controls
 {

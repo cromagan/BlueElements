@@ -18,16 +18,16 @@
 #endregion
 
 
-using System;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.IO;
 using BlueBasics;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
+using System;
+using System.Collections.Generic;
+using System.Drawing.Printing;
+using System.IO;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Forms
@@ -446,16 +446,18 @@ namespace BlueControls.Forms
             var DruckB = PrintPad.Item.DruckbereichRect();
 
 
-            var tempVar = Math.Max(1,(int)Math.Floor(DruckB.Width / (double)OneItem.Width + 0.01));
-            for (var x = 0 ; x < tempVar ; x++)
+            var tempVar = Math.Max(1, (int)Math.Floor(DruckB.Width / (double)OneItem.Width + 0.01));
+            for (var x = 0; x < tempVar; x++)
             {
-                var tempVar2 = Math.Max(1, (int)Math.Floor(DruckB.Height / (double)OneItem.Height +0.01));
-                for (var y = 0 ; y < tempVar2 ; y++)
+                var tempVar2 = Math.Max(1, (int)Math.Floor(DruckB.Height / (double)OneItem.Height + 0.01));
+                for (var y = 0; y < tempVar2; y++)
                 {
 
 
-                    var It = new ChildPadItem(PrintPad.Item);
-                    It.PadInternal = new CreativePad(new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[StartNr]));
+                    var It = new ChildPadItem(PrintPad.Item)
+                    {
+                        PadInternal = new CreativePad(new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[StartNr]))
+                    };
 
                     //Dim it As New RowFormulaPadItem(Liste(StartNr), Integer.Parse(FrmDrucken_Layout1.Text))
                     PrintPad.Item.Add(It);

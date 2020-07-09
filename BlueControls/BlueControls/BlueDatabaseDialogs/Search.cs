@@ -20,8 +20,8 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Forms;
 using BlueControls.Enums;
+using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 

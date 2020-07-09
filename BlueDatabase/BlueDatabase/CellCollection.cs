@@ -17,17 +17,17 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
-using static BlueBasics.modAllgemein;
-using static BlueBasics.Extensions;
-using static BlueBasics.modConverter;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Text.RegularExpressions;
+using static BlueBasics.Extensions;
+using static BlueBasics.modAllgemein;
+using static BlueBasics.modConverter;
 
 namespace BlueDatabase
 {
@@ -38,7 +38,7 @@ namespace BlueDatabase
         #region  Variablen-Deklarationen 
 
         private readonly Database Database;
-        private Dictionary<string, CellItem> _cells = new Dictionary<string, CellItem>();
+        private readonly Dictionary<string, CellItem> _cells = new Dictionary<string, CellItem>();
 
 
         private Dictionary<string, string> _freezed = null;
@@ -776,9 +776,11 @@ namespace BlueDatabase
             var cc = column.Database.Column.SearchByKey(column.VorschlagsColumn);
             if (cc == null) { return string.Empty; }
 
-            var F = new FilterCollection(column.Database);
-            F.Add(new FilterItem(cc, enFilterType.Istgleich_GroﬂKleinEgal, row.CellGetString(cc)));
-            F.Add(new FilterItem(column, enFilterType.Ungleich_MultiRowIgnorieren, string.Empty));
+            var F = new FilterCollection(column.Database)
+            {
+                new FilterItem(cc, enFilterType.Istgleich_GroﬂKleinEgal, row.CellGetString(cc)),
+                new FilterItem(column, enFilterType.Ungleich_MultiRowIgnorieren, string.Empty)
+            };
 
             var rows = column.Database.Row.CalculateSortedRows(F, null, null);
             rows.Remove(row);
@@ -1250,9 +1252,9 @@ namespace BlueDatabase
         public DateTime GetDateTime(ColumnItem column, RowItem row) // Main Method
         {
             var _String = GetString(column, row);
-            if (string.IsNullOrEmpty(_String)) { return default(DateTime); }
+            if (string.IsNullOrEmpty(_String)) { return default; }
             if (DateTimeTryParse(_String, out var d)) { return d; }
-            return default(DateTime);
+            return default;
         }
 
         public void Set(string columnName, RowItem row, DateTime value)

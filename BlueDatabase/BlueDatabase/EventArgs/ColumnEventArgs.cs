@@ -20,7 +20,7 @@
 
 namespace BlueDatabase.EventArgs
 {
-   public class ColumnEventArgs : System.EventArgs
+    public class ColumnEventArgs : System.EventArgs
     {
 
         public ColumnEventArgs(ColumnItem column)
@@ -28,6 +28,6 @@ namespace BlueDatabase.EventArgs
             Column = column;
         }
 
-       public ColumnItem Column { get; set; }
+        public ColumnItem Column { get; }
     }
 }

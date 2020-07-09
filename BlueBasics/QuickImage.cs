@@ -17,14 +17,14 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
 
 namespace BlueBasics
 {
@@ -620,7 +620,7 @@ namespace BlueBasics
 
                 if (!string.IsNullOrEmpty(_Zweitsymbol))
                 {
-                    var x = (int)(bmpOri.Width / 2);
+                    var x = bmpOri.Width / 2;
                     bmpSecond = Get(_Zweitsymbol + "|" + x).BMP;
                 }
 

@@ -18,7 +18,7 @@
 #endregion
 namespace BlueControls.Controls
 {
-   public class RibbonBar : AbstractTabControl
+    public class RibbonBar : AbstractTabControl
     {
 
 

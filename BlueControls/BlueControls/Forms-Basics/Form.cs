@@ -17,20 +17,20 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 
 namespace BlueControls.Forms
 {
     public partial class Form : System.Windows.Forms.Form, ISupportsBeginnEdit, IUseMyBackColor
     {
-        public Form(): this(enDesign.Form_Standard)
+        public Form() : this(enDesign.Form_Standard)
         {
             //if (Skin.SkinDB == null) { Skin.LoadSkin(); }
             //SkinChanged();
@@ -39,7 +39,7 @@ namespace BlueControls.Forms
 
         public Form(enDesign design) : base()
         {
-            _design = design;
+            Design = design;
             if (Skin.SkinDB == null) { Skin.LoadSkin(); }
             SkinChanged();
             InitializeComponent();
@@ -88,10 +88,6 @@ namespace BlueControls.Forms
             // NIX TUN!!!!
         }
 
-        private enDesign _design = enDesign.Form_Standard;
-
-        private bool _CloseButtonEnabled = true;
-
         protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified)
         {
             factor = new SizeF(1, 1);
@@ -122,10 +118,7 @@ namespace BlueControls.Forms
         [DefaultValue(enDesign.Form_Standard)]
         public enDesign Design
         {
-            get
-            {
-                return _design;
-            }
+            get;
             //set
             //{
             //    if (value == _design) { return; }
@@ -138,21 +131,10 @@ namespace BlueControls.Forms
 
 
             //}
-        }
+        } = enDesign.Form_Standard;
 
         [DefaultValue(true)]
-        public bool CloseButtonEnabled
-        {
-            get
-            {
-                return _CloseButtonEnabled;
-            }
-            set
-            {
-
-                _CloseButtonEnabled = value;
-            }
-        }
+        public bool CloseButtonEnabled { get; set; } = true;
 
 
         protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified)
@@ -265,7 +247,7 @@ namespace BlueControls.Forms
 
         protected override void OnLoad(System.EventArgs e)
         {
-            BackColor = Skin.Color_Back(_design, enStates.Standard);
+            BackColor = Skin.Color_Back(Design, enStates.Standard);
             base.OnLoad(e);
         }
 
@@ -287,7 +269,7 @@ namespace BlueControls.Forms
 
         private void SkinChanged()
         {
-            BackColor = Skin.Color_Back(_design, enStates.Standard);
+            BackColor = Skin.Color_Back(Design, enStates.Standard);
             Invalidate();
         }
 
@@ -299,7 +281,7 @@ namespace BlueControls.Forms
 
         public List<Button> Generate_Buttons(string[] Names)
         {
-            var MyX = this.Width - Skin.Padding - BorderWidth;
+            var MyX = Width - Skin.Padding - BorderWidth;
             var erT = new ExtText(enDesign.Button, enStates.Standard);
             var Buts = new List<Button>();
 
@@ -311,9 +293,11 @@ namespace BlueControls.Forms
 
                     erT.TextDimensions = Size.Empty;
                     erT.PlainText = Names[Z];
-                    B = new Button();
-                    B.Name = Z.ToString();
-                    B.Text = Names[Z];
+                    B = new Button
+                    {
+                        Name = Z.ToString(),
+                        Text = Names[Z]
+                    };
                     var W = 2;
 
                     switch (B.Text.ToLower())
@@ -355,7 +339,7 @@ namespace BlueControls.Forms
                     }
 
                     B.Size = new Size(erT.Width() + Skin.Padding * W, erT.Height() + Skin.Padding * 2);
-                    B.Location = new Point(MyX - B.Width, this.Height - BorderHeight - Skin.Padding - B.Height);
+                    B.Location = new Point(MyX - B.Width, Height - BorderHeight - Skin.Padding - B.Height);
                     MyX = B.Location.X - Skin.Padding;
 
                     B.ButtonStyle = enButtonStyle.Button;
@@ -380,7 +364,7 @@ namespace BlueControls.Forms
             get
             {
                 var oParam = base.CreateParams;
-                if (!_CloseButtonEnabled)
+                if (!CloseButtonEnabled)
                 {
                     oParam.ClassStyle |= (int)enCS.NOCLOSE;
                 }

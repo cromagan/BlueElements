@@ -17,11 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollection;
+using System;
+using System.Drawing;
 
 namespace BlueControls.Forms
 {
@@ -70,23 +70,25 @@ namespace BlueControls.Forms
                 }
                 FNList.Sort();
 
-                FSList = new ItemCollectionList();
-                FSList.Add(new TextListItem("8", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("9", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("10", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("11", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("12", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("14", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("16", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("18", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("20", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("22", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("24", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("26", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("28", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("36", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("48", enDataFormat.Gleitkommazahl));
-                FSList.Add(new TextListItem("72", enDataFormat.Gleitkommazahl));
+                FSList = new ItemCollectionList
+                {
+                    new TextListItem("8", enDataFormat.Gleitkommazahl),
+                    new TextListItem("9", enDataFormat.Gleitkommazahl),
+                    new TextListItem("10", enDataFormat.Gleitkommazahl),
+                    new TextListItem("11", enDataFormat.Gleitkommazahl),
+                    new TextListItem("12", enDataFormat.Gleitkommazahl),
+                    new TextListItem("14", enDataFormat.Gleitkommazahl),
+                    new TextListItem("16", enDataFormat.Gleitkommazahl),
+                    new TextListItem("18", enDataFormat.Gleitkommazahl),
+                    new TextListItem("20", enDataFormat.Gleitkommazahl),
+                    new TextListItem("22", enDataFormat.Gleitkommazahl),
+                    new TextListItem("24", enDataFormat.Gleitkommazahl),
+                    new TextListItem("26", enDataFormat.Gleitkommazahl),
+                    new TextListItem("28", enDataFormat.Gleitkommazahl),
+                    new TextListItem("36", enDataFormat.Gleitkommazahl),
+                    new TextListItem("48", enDataFormat.Gleitkommazahl),
+                    new TextListItem("72", enDataFormat.Gleitkommazahl)
+                };
                 FSList.Sort();
             }
 

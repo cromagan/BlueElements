@@ -30,13 +30,13 @@ namespace BlueBasics
 
             var w = Code.Split(',');
 
-            var P = new System.Windows.Forms.Padding();
-
-
-            P.Left = int.Parse(w[0]);
-            P.Top = int.Parse(w[1]);
-            P.Right = int.Parse(w[2]);
-            P.Bottom = int.Parse(w[3]);
+            var P = new System.Windows.Forms.Padding
+            {
+                Left = int.Parse(w[0]),
+                Top = int.Parse(w[1]),
+                Right = int.Parse(w[2]),
+                Bottom = int.Parse(w[3])
+            };
 
             return P;
         }

@@ -110,7 +110,7 @@ namespace BlueControls.ItemCollection
 
         public override RectangleDF UsedArea()
         {
-            
+
 
             var r = new RectangleDF(Parent.DruckbereichRect()); // muss der gesamte druckbereich sein, ansonsten wirds ja nicht angezeigt, wenn der NP ausserhalb dem Bild ist
             r.ExpandTo(NP);

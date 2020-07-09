@@ -72,7 +72,7 @@ namespace BlueControls.Classes_Editor
 
         private void ActionSelector_AddClicked(object sender, System.EventArgs e)
         {
-            if (Item== null)
+            if (Item == null)
             {
                 Forms.Notification.Show("Bitte vorher eine Regel auswählen.");
                 return;

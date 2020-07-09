@@ -52,7 +52,7 @@ using System.Drawing;
 
 namespace BlueControls
 {
-    public sealed class ExtText 
+    public sealed class ExtText
     {
         #region  Variablen-Deklarationen 
 
@@ -349,7 +349,7 @@ namespace BlueControls
                     break;
                 }
 
-                switch ((int)Chars[Akt].Char)
+                switch (Chars[Akt].Char)
                 {
                     //case 9:
                     //    Chars[Akt].Width = (float)((Math.Truncate(IsX / 100) + 1) * 100 - IsX);
@@ -803,7 +803,7 @@ namespace BlueControls
                 }
                 else
                 {
-                    var index = (int)Chars[cZ].Char - ExtChar.ImagesStart;
+                    var index = Chars[cZ].Char - ExtChar.ImagesStart;
                     var x = QuickImage.Get(index);
                     if (x != null) { T += "<ImageCode=" + x.Name + ">"; }
 
@@ -1164,7 +1164,7 @@ namespace BlueControls
 
             while (_Width == null) { ReBreak(); }
 
-            if ((int)_Width < 5 || (int)_Height < 5) { return new Size(32, 16); }
+            if (_Width < 5 || _Height < 5) { return new Size(32, 16); }
 
             return new Size((int)_Width, (int)_Height);
         }

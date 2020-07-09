@@ -24,8 +24,7 @@ namespace BlueControls.Forms
 {
     public partial class MessageBox : Forms.Form
     {
-
-        Button Pressed = null;
+        private Button Pressed = null;
 
         //private MessageBox()
         //{
@@ -66,7 +65,7 @@ namespace BlueControls.Forms
 
                 if (ThisButton.Left < BorderWidth)
                 {
-                    this.Width = (this.Width - ThisButton.Left) + BorderWidth;
+                    Width = (Width - ThisButton.Left) + BorderWidth;
                 }
             }
             Pressed = null;

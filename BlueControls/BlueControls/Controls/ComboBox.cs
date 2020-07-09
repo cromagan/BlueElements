@@ -21,9 +21,9 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
-using BlueControls.Forms;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using System;
@@ -58,7 +58,7 @@ namespace BlueControls.Controls
             Item.ItemRemoved += _Item_ItemRemoved;
             btnDropDown.Left = Width - btnDropDown.Width;
             btnDropDown.Top = 0;
-            btnDropDown.Height = this.Height;
+            btnDropDown.Height = Height;
 
         }
 
@@ -257,7 +257,7 @@ namespace BlueControls.Controls
                 // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
                 var r = i.Pos;
                 var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox().Height) / 2.0);
-                i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, (int)i.SizeUntouchedForListBox().Height));
+                i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox().Height));
                 i.Draw(gr, 0, 0, enDesign.ComboBox_Textbox, enDesign.ComboBox_Textbox, state, false, string.Empty, Translate);
                 i.SetCoordinates(r);
             }

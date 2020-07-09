@@ -24,10 +24,10 @@ namespace BlueDatabase.EventArgs
 
     public class RowCancelEventArgs : RowEventArgs
     {
-        
-        public RowCancelEventArgs(RowItem Row, string CancelReason) : base(Row)
+
+        public RowCancelEventArgs(RowItem row, string cancelReason) : base(row)
         {
-            this.CancelReason = CancelReason;
+            CancelReason = cancelReason;
         }
 
         public string CancelReason { get; set; }

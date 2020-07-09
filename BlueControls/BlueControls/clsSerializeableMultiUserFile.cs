@@ -1,13 +1,13 @@
-﻿using System;
+﻿using BlueBasics;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
+using BlueBasics.MultiUserFile;
+using System;
 using System.Collections.Generic;
-using System.Xml;
-using System.Xml.Serialization;
 using System.IO;
 using System.Runtime.Serialization;
-using BlueBasics.Interfaces;
-using BlueBasics.EventArgs;
-using BlueBasics.MultiUserFile;
-using BlueBasics;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace BlueControls
 {
@@ -24,7 +24,7 @@ namespace BlueControls
         private string _OtherUser = string.Empty;
 
 
-        public T obj = default(T);
+        public T obj = default;
 
         public event EventHandler MultipleUserDetected;
 
@@ -118,10 +118,12 @@ namespace BlueControls
             // nn aufgrund der Sicherheitsebene ... Auf Pubilc setzern
             var Serializer = new XmlSerializer(typeof(T), string.Empty);
             var MemoryStream = new MemoryStream();
-            var TextWriter = new XmlTextWriter(MemoryStream, System.Text.Encoding.UTF8);
-            TextWriter.Indentation = 4;
-            TextWriter.IndentChar = ' ';
-            TextWriter.Formatting = Formatting.Indented;
+            var TextWriter = new XmlTextWriter(MemoryStream, System.Text.Encoding.UTF8)
+            {
+                Indentation = 4,
+                IndentChar = ' ',
+                Formatting = Formatting.Indented
+            };
 
             Serializer.Serialize(TextWriter, obj);
 
@@ -181,7 +183,7 @@ namespace BlueControls
 
 
 
- 
+
 
 
 

@@ -29,6 +29,6 @@ namespace BlueDatabase.Enums
         senkrechtAuchUnsichtbar = 4,
         waagerecht_senkrecht = senkrecht | waagerecht,
         waagerecht_senkrechtAuchUnsichtbar = senkrechtAuchUnsichtbar | waagerecht
-   //     beide = senkrecht | waagerecht
+        //     beide = senkrecht | waagerecht
     }
 }

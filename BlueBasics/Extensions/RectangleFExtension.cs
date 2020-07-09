@@ -17,9 +17,9 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics.Enums;
 using System;
 using System.Drawing;
-using BlueBasics.Enums;
 
 namespace BlueBasics
 {

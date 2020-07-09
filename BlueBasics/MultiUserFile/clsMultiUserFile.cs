@@ -76,8 +76,8 @@ namespace BlueBasics.MultiUserFile
 
 
 
-        private System.ComponentModel.BackgroundWorker PureBinSaver;
-        private Timer Checker;
+        private readonly System.ComponentModel.BackgroundWorker PureBinSaver;
+        private readonly Timer Checker;
 
 
         private bool _CheckedAndReloadNeed;
@@ -143,10 +143,12 @@ namespace BlueBasics.MultiUserFile
             AllFiles.Add(this);
             OnMultiUserFileAdded(this);
 
-            PureBinSaver = new System.ComponentModel.BackgroundWorker();
-            PureBinSaver.WorkerReportsProgress = true;
-            PureBinSaver.DoWork += new System.ComponentModel.DoWorkEventHandler(this.PureBinSaver_DoWork);
-            PureBinSaver.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.PureBinSaver_ProgressChanged);
+            PureBinSaver = new System.ComponentModel.BackgroundWorker
+            {
+                WorkerReportsProgress = true
+            };
+            PureBinSaver.DoWork += new System.ComponentModel.DoWorkEventHandler(PureBinSaver_DoWork);
+            PureBinSaver.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(PureBinSaver_ProgressChanged);
 
             Checker = new Timer(Checker_Tick);
 
@@ -1237,8 +1239,10 @@ namespace BlueBasics.MultiUserFile
 
         protected static void OnMultiUserFileAdded(clsMultiUserFile file)
         {
-            var e = new MultiUserFileGiveBackEventArgs();
-            e.File = file;
+            var e = new MultiUserFileGiveBackEventArgs
+            {
+                File = file
+            };
             MultiUserFileAdded?.Invoke(null, e);
         }
 

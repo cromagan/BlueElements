@@ -60,8 +60,8 @@ namespace BlueControls.Forms
 
             if (!adminTabVisible)
             {
-                this.MainRibbon.Controls.Remove(tabAdmin);
-                this.MainRibbon.Controls.Remove(tabExtras);
+                MainRibbon.Controls.Remove(tabAdmin);
+                MainRibbon.Controls.Remove(tabExtras);
                 grpAllgemein.Visible = false;
                 grpBearbeitung.Visible = false;
             }
@@ -74,7 +74,7 @@ namespace BlueControls.Forms
 
             if (!loadTabVisible)
             {
-                this.MainRibbon.Controls.Remove(tabDatei);
+                MainRibbon.Controls.Remove(tabDatei);
             }
 
 

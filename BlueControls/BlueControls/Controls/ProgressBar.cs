@@ -32,7 +32,7 @@ namespace BlueControls.Controls
 
 
         #region Constructor
-        public ProgressBar() : base(false, false) {}
+        public ProgressBar() : base(false, false) { }
 
         #endregion
         [DefaultValue(100)]

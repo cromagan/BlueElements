@@ -143,8 +143,8 @@ namespace BlueControls
         {
             Initialize();
             Name = "Dummy Point von IntX und IntY";
-            _x = (decimal)cx;
-            _y = (decimal)cy;
+            _x = cx;
+            _y = cy;
         }
 
         public PointDF(double cx, double cY)

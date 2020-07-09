@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueBasics;
-using BlueBasics.Enums;
 using System;
-using BlueControls.Enums;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace BlueControls.BlueDatabaseDialogs
 {

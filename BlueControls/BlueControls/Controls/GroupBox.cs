@@ -17,13 +17,13 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics.Enums;
+using BlueControls.Enums;
+using BlueControls.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueBasics.Enums;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
 
 namespace BlueControls.Controls
 {

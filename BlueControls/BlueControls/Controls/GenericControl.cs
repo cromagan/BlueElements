@@ -19,16 +19,16 @@
 
 
 using BlueBasics;
-using BlueControls.Forms;
+using BlueBasics.Enums;
+using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Enums;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using System;
 using System.ComponentModel;
 using System.Drawing;
-using BlueBasics.Enums;
 using System.Drawing.Imaging;
-using BlueControls.BlueDatabaseDialogs;
 
 
 //Inherits UserControl ' -> Gibt Focus an Child!
@@ -532,7 +532,7 @@ namespace BlueControls.Controls
             base.OnMouseLeave(e);
 
             DoQuickInfo();
-         }
+        }
 
 
         public void DoQuickInfo()

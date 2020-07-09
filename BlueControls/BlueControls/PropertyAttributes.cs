@@ -8,8 +8,8 @@ namespace BlueControls
     {
         public PropertyAttributes(string description, bool fehlerWennLeer)
         {
-            this.Description = description;
-            this.FehlerWennLeer = fehlerWennLeer;
+            Description = description;
+            FehlerWennLeer = fehlerWennLeer;
         }
 
         public override string Description { get; }

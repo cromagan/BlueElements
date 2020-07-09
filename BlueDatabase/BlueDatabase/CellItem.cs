@@ -32,7 +32,7 @@ namespace BlueDatabase
     /// </summary>
     public class CellItem
     {
-        string _value = string.Empty;
+        private string _value = string.Empty;
 
 
         #region Konstruktor

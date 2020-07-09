@@ -18,14 +18,14 @@
 #endregion
 
 
-using System;
-using System.Collections.Generic;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
+using System;
+using System.Collections.Generic;
 
 namespace BlueControls.Interfaces
 {
-    public interface IContextMenu 
+    public interface IContextMenu
     {
 
         event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;

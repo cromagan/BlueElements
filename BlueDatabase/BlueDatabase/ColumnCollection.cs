@@ -17,13 +17,13 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using BlueBasics;
-using BlueDatabase.Enums;
-using static BlueBasics.FileOperations;
-using BlueBasics.Enums;
 using System.Drawing;
+using static BlueBasics.FileOperations;
 
 namespace BlueDatabase
 {

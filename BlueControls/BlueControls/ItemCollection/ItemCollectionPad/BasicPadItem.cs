@@ -411,11 +411,11 @@ namespace BlueControls.ItemCollection
         public virtual List<FlexiControl> GetStyleOptions()
         {
 
-            var l = new List<FlexiControl>();
-
-
-            l.Add(new FlexiControlForProperty(this, "Gruppenzugehörigkeit"));
-            l.Add(new FlexiControlForProperty(this, "Bei_Export_sichtbar"));
+            var l = new List<FlexiControl>
+            {
+                new FlexiControlForProperty(this, "Gruppenzugehörigkeit"),
+                new FlexiControlForProperty(this, "Bei_Export_sichtbar")
+            };
 
             return l;
 
@@ -469,12 +469,12 @@ namespace BlueControls.ItemCollection
 
         public void InDenVordergrund()
         {
-            ((ItemCollectionPad)Parent)?.InDenVordergrund(this);
+            Parent?.InDenVordergrund(this);
         }
 
         public void InDenHintergrund()
         {
-            ((ItemCollectionPad)Parent)?.InDenHintergrund(this);
+            Parent?.InDenHintergrund(this);
         }
 
         public void EineEbeneNachVorne()
@@ -485,7 +485,7 @@ namespace BlueControls.ItemCollection
             if (i2 != null)
             {
                 var tempVar = this;
-                ((ItemCollectionPad)Parent).Swap(tempVar, i2);
+                Parent.Swap(tempVar, i2);
             }
         }
 
@@ -509,7 +509,7 @@ namespace BlueControls.ItemCollection
             if (i2 != null)
             {
                 var tempVar = this;
-                ((ItemCollectionPad)Parent).Swap(tempVar, i2);
+                Parent.Swap(tempVar, i2);
             }
         }
 

@@ -1,7 +1,7 @@
-using System;
-using System.Drawing;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using System;
+using System.Drawing;
 
 namespace BlueControls
 {
@@ -30,7 +30,7 @@ namespace BlueControls
 
             var Radius = 10;
 
-            Width = Radius * 2; 
+            Width = Radius * 2;
             Height = Radius * 2;
 
             Left = -Radius * 3;

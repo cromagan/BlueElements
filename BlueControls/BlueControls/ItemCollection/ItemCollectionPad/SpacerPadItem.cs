@@ -40,7 +40,7 @@ namespace BlueControls.ItemCollection
         internal PointDF p_m;
 
 
-        readonly private decimal mm125x; //Math.Round(mmToPixel(1.25D, _DPIx), 1)
+        private readonly decimal mm125x; //Math.Round(mmToPixel(1.25D, _DPIx), 1)
 
         public string Größe_Distanzhalter { get; set; }
 

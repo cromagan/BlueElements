@@ -18,17 +18,17 @@
 #endregion
 
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using BlueBasics;
-using BlueBasics.Enums;
-using static BlueBasics.FileOperations;
 using System.Text.RegularExpressions;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
+using static BlueBasics.FileOperations;
 
 namespace BlueDatabase
 {
@@ -121,12 +121,12 @@ namespace BlueDatabase
 
                     c[z] = c[z].FromNonCritical().FromNonCritical().GenerateSlash();
 
-    
+
                     var tempVar2 = 0;
                     var tempVar3 = 0;
                     Bitmap tempVar4 = null;
                     string tempVar5 = null;
-                    DoSingleCode(c[z], ref TX, null, ref Col,  ref tempVar2, ref tempVar3, ref tempVar4, ref tempVar5, Ges, ref Ended);
+                    DoSingleCode(c[z], ref TX, null, ref Col, ref tempVar2, ref tempVar3, ref tempVar4, ref tempVar5, Ges, ref Ended);
 
 
                 } while (!Ended);
@@ -259,7 +259,7 @@ namespace BlueDatabase
 
                 case "103": // Vortext
                     var ts = tx.SplitByCR();
-                    for (var tz = 0 ; tz <= ts.GetUpperBound(0) ; tz++)
+                    for (var tz = 0; tz <= ts.GetUpperBound(0); tz++)
                     {
                         ts[tz] = CodeNr.Substring(3) + ts[tz];
                     }
@@ -268,7 +268,7 @@ namespace BlueDatabase
 
                 case "104": // Nachtext
                     var ts2 = tx.SplitByCR();
-                    for (var tz = 0 ; tz <= ts2.GetUpperBound(0) ; tz++)
+                    for (var tz = 0; tz <= ts2.GetUpperBound(0); tz++)
                     {
                         ts2[tz] = ts2[tz] + CodeNr.Substring(3);
                     }
@@ -373,7 +373,7 @@ namespace BlueDatabase
                 case "107":
 
                     var ts3 = tx.SplitByCR();
-                    for (var tz = 0 ; tz <= ts3.GetUpperBound(0) ; tz++)
+                    for (var tz = 0; tz <= ts3.GetUpperBound(0); tz++)
                     {
                         ts3[tz] = CellItem.ValueReadable(column, ts3[tz], enShortenStyle.HTML, column.CompactView);
                     }
@@ -440,7 +440,7 @@ namespace BlueDatabase
                         tx = tx.Replace("zwei TL", "2 TL", RegexOptions.IgnoreCase);
 
 
-                        for (var t = 0 ; t <= A.GetUpperBound(0) ; t++)
+                        for (var t = 0; t <= A.GetUpperBound(0); t++)
                         {
                             tx = tx.Replace("gerieben" + A[t], "ger.");
                             //tx = tx.Replace("groß" + A[t], "gr.");
@@ -579,7 +579,7 @@ namespace BlueDatabase
 
 
             //http://de.selfhtml.org/html/referenz/zeichen.htm#benannte_iso8859_1
-            ColumnItem Col= null;
+            ColumnItem Col = null;
             do
             {
                 z += 1;
@@ -608,8 +608,10 @@ namespace BlueDatabase
         public static List<string> SaveAs(RowItem Row, string Layout, string DestinationFile)
         {
 
-            var l = new List<RowItem>();
-            l.Add(Row);
+            var l = new List<RowItem>
+            {
+                Row
+            };
 
             return GenerateLayout_FileSystem(l, Layout, DestinationFile, false, string.Empty);
         }
@@ -716,8 +718,10 @@ namespace BlueDatabase
             }
 
 
-            var TMPList = new List<RowItem>();
-            TMPList.Add(Row);
+            var TMPList = new List<RowItem>
+            {
+                Row
+            };
             return InternalCreateLayout(TMPList, LoadedFile, string.Empty, ToNonCriticalText);
         }
 
@@ -726,8 +730,10 @@ namespace BlueDatabase
         {
             if (!FileExists(LoadFile)) { return; }
 
-            var TMPList = new List<RowItem>();
-            TMPList.Add(Row);
+            var TMPList = new List<RowItem>
+            {
+                Row
+            };
             InternalCreateLayout(TMPList, modAllgemein.LoadFromDisk(LoadFile), SaveFile, false);
         }
 

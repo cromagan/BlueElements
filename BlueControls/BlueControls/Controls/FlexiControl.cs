@@ -17,22 +17,22 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueControls.Enums;
-using System.Windows.Forms;
-using BlueControls.Designer_Support;
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls
 {
@@ -58,7 +58,7 @@ namespace BlueControls.Controls
         private Caption _CaptionObject;
         private Caption _InfoCaption;
         private string _InfoText = string.Empty;
-        bool _ShowInfoWhenDisabled = false;
+        private bool _ShowInfoWhenDisabled = false;
 
 
         protected bool _MultiLine = false;
@@ -92,7 +92,7 @@ namespace BlueControls.Controls
 
         #region  Constructor 
 
-        public FlexiControl(): base(false, false)
+        public FlexiControl() : base(false, false)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -744,8 +744,10 @@ namespace BlueControls.Controls
         {
             if (_CaptionPosition == enÜberschriftAnordnung.ohne) { return; }
 
-            _CaptionObject = new Caption();
-            _CaptionObject.Enabled = Enabled;
+            _CaptionObject = new Caption
+            {
+                Enabled = Enabled
+            };
 
             Controls.Add(_CaptionObject);
 
@@ -808,7 +810,7 @@ namespace BlueControls.Controls
         {
             var Control = new Line
             {
-                Enabled = this.Enabled,
+                Enabled = Enabled,
                 Orientation = enOrientation.Waagerecht
             };
             StandardBehandlung(Control);
@@ -828,8 +830,10 @@ namespace BlueControls.Controls
         /// </summary>
         private EasyPic Control_Create_EasyPic()
         {
-            var Control = new EasyPic();
-            Control.Enabled = Enabled;
+            var Control = new EasyPic
+            {
+                Enabled = Enabled
+            };
 
             StandardBehandlung(Control);
             UpdateValueToControl();
@@ -937,7 +941,7 @@ namespace BlueControls.Controls
             if (SourceItem != null && TargetItem == null)
             {
 
-                TargetItem = (BasicListItem)SourceItem.CloneToNewCollection(Target.Item);
+                TargetItem = SourceItem.CloneToNewCollection(Target.Item);
                 //TargetItem = (BasicListItem)SourceItem.Clone();
                 //Target.Item.Add(TargetItem);
             }
@@ -1023,8 +1027,10 @@ namespace BlueControls.Controls
         /// <returns></returns>
         private ListBox Control_Create_SuggestListBox(ListBox MainBox, ItemCollectionList List)
         {
-            var Control = new ListBox();
-            Control.Enabled = Enabled;
+            var Control = new ListBox
+            {
+                Enabled = Enabled
+            };
             Control.Item.Clear();
             Control.Item.AddRange(List);
             Control.Item.CheckBehavior = enCheckBehavior.NoSelection;
@@ -1061,9 +1067,11 @@ namespace BlueControls.Controls
         /// </summary>
         private ListBox Control_Create_MainListBox()
         {
-            var Control = new ListBox();
-            Control.Enabled = Enabled;
-            Control.Name = "Main";
+            var Control = new ListBox
+            {
+                Enabled = Enabled,
+                Name = "Main"
+            };
 
             StyleListBox(Control, null);
             UpdateValueToControl();
@@ -1272,7 +1280,7 @@ namespace BlueControls.Controls
         {
             var Control = new Button
             {
-                Enabled = this.Enabled,
+                Enabled = Enabled,
                 Name = "ComandButton",
                 Checked = false,
                 ButtonStyle = enButtonStyle.Button,
@@ -1313,7 +1321,7 @@ namespace BlueControls.Controls
         {
             var Control = new Button
             {
-                Enabled = this.Enabled,
+                Enabled = Enabled,
                 Name = "YesNoButton",
                 ButtonStyle = enButtonStyle.Yes_or_No,
                 Text = "",
@@ -1531,10 +1539,10 @@ namespace BlueControls.Controls
                 symbol = "<ImageCode=Warnung|16>";
                 txt = _InfoText;
             }
-            else 
+            else
             {
                 symbol = "<ImageCode=Information|16>";
-                txt = "<b>Der Wert kann nicht bearbeitet werden:</b><br>" + disabledReason + "<br><br><b>Enthält aber einen Fehler:</b><br>" + _InfoText ;
+                txt = "<b>Der Wert kann nicht bearbeitet werden:</b><br>" + disabledReason + "<br><br><b>Enthält aber einen Fehler:</b><br>" + _InfoText;
             }
 
 
@@ -1547,7 +1555,7 @@ namespace BlueControls.Controls
 
             if (!string.IsNullOrEmpty(txt) && _InfoCaption != null)
             {
-                _InfoCaption.Left = this.Width - 18;
+                _InfoCaption.Left = Width - 18;
                 _InfoCaption.Top = 0;
                 _InfoCaption.QuickInfo = txt;
                 _InfoCaption.Text = symbol;
