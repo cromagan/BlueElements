@@ -462,6 +462,8 @@ namespace BlueControls.Controls
                     if (listBox.Name == "Main")
                     {
                         StyleListBox(listBox, column1);
+                        listBox.ContextMenuInit += ListBox_ContextMenuInit;
+                        listBox.ContextMenuItemClicked += ListBox_ContextMenuItemClicked;
                     }
                     listBox.AddClicked += ListBox_AddClicked;
                     //listBox.NeedRow += ListBox_NeedRow;
@@ -519,6 +521,11 @@ namespace BlueControls.Controls
                     break;
 
                 case ListBox listBox:
+                    if (listBox.Name == "Main")
+                    {
+                        listBox.ContextMenuInit -= ListBox_ContextMenuInit;
+                        listBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
+                    }
                     listBox.AddClicked -= ListBox_AddClicked;
                     //listBox.NeedRow -= ListBox_NeedRow;
                     break;
@@ -638,6 +645,90 @@ namespace BlueControls.Controls
         {
             base.OnValueChanged();
             FillCellNow();
+        }
+
+
+        private void ListBox_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
+        {
+
+            switch (e.ClickedComand.ToLower())
+            {
+                case "dateiöffnen":
+                    if (e.HotItem is TextListItem t)
+                    {
+                        if (FileExists(t.Internal))
+                        {
+                            var b = modConverter.FileToByte(t.Internal);
+                            b = modAllgemein.SimpleCrypt(b, FileEncryptionKey, -1);
+                            var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
+                            modConverter.ByteToFile(tmp, b);
+                            modAllgemein.ExecuteFile(tmp, null, true, false);
+                            MessageBox.Show("Warte...");
+                            DeleteFile(tmp, true);
+                        }
+                    }
+                    break;
+
+                case "bild öffnen":
+                    if (e.HotItem is BitmapListItem bi)
+                    {
+                        if (bi.ImageLoaded())
+                        {
+                            var x = new BlueControls.Forms.PictureView(bi.Bitmap);
+                            x.Show();
+
+                            //var b = modConverter.FileToByte(t.Internal);
+                            //b = modAllgemein.SimpleCrypt(b, FileEncryptionKey, -1);
+                            //var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
+                            //modConverter.ByteToFile(tmp, b);
+                            //modAllgemein.ExecuteFile(tmp, null, true, false);
+                            //MessageBox.Show("Warte...");
+                            //DeleteFile(tmp, true);
+                        }
+                    }
+                    break;
+
+                    //if (FileExists(_ImageFilename))
+                    //{
+                    //    if (!string.IsNullOrEmpty(_EncryptionKey))
+                    //    {
+                    //        var b = modConverter.FileToByte(_ImageFilename);
+                    //        b = modAllgemein.SimpleCrypt(b, _EncryptionKey, -1);
+                    //        _Bitmap = modConverter.ByteToBitmap(b);
+                    //    }
+                    //    else
+                    //    {
+                    //        _Bitmap = (Bitmap)BitmapExt.Image_FromFile(_ImageFilename);
+                    //    }
+
+                    //}
+
+
+            }
+
+
+        }
+
+        private void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
+        {
+
+            if (e.HotItem is TextListItem t)
+            {
+                if (FileExists(t.Internal))
+                {
+                    e.UserMenu.Add(enContextMenuComands.DateiÖffnen);
+                }
+            }
+
+            if (e.HotItem is BitmapListItem b)
+            {
+                //if (FileExists(t.Internal))
+                //{
+                    e.UserMenu.Add(new TextListItem("Bild öffnen"));
+                //}
+            }
+
+
         }
 
 

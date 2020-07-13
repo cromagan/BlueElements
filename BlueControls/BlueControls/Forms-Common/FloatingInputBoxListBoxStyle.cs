@@ -251,9 +251,20 @@ namespace BlueControls.Forms
             if (UserMenu.Count > 0) { ThisContextMenu.AddRange(UserMenu); }
 
 
+            var par = Control.ParentControlWithCommands();
+
+
 
             if (ThisContextMenu.Count > 0)
             {
+
+
+                if (par != null)
+                {
+                    ThisContextMenu.Add(new LineListItem());
+                    ThisContextMenu.Add(enContextMenuComands.WeitereBefehle);
+                }
+
                 ThisContextMenu.Add(new LineListItem());
                 ThisContextMenu.Add(enContextMenuComands.Abbruch);
 
@@ -268,7 +279,14 @@ namespace BlueControls.Forms
                 var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, Infos, (System.Windows.Forms.Control)Control, Translate);
                 _ContextMenu.ItemClicked += _ContextMenu_ItemClicked;
             }
+            else
+            {
+                if (par != null)
+                {
+                    ContextMenuShow(par, e);
+                }
 
+            }
         }
 
         private static void _ContextMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e)
@@ -281,6 +299,19 @@ namespace BlueControls.Forms
 
             FloatingInputBoxListBoxStyle.Close(enBlueListBoxAppearance.KontextMenu);
             FloatingInputBoxListBoxStyle.Close(ob);
+
+            if (e.ClickedComand.ToLower() == "weiterebefehle") 
+            {
+                var par = ob.ParentControlWithCommands();
+
+                if (par != null)
+                {
+                    ContextMenuShow(par, null);
+
+                }
+                    return;
+
+            }
 
 
             if (e.ClickedComand.ToLower() == "abbruch") { return; }

@@ -20,6 +20,8 @@
 
 using BlueBasics;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
@@ -30,7 +32,62 @@ namespace BlueControls
     public static class Allgemein
     {
 
+        public static IContextMenu ParentControlWithCommands(this object o)
+        {
+            var par = o.ParentControl<IContextMenu>();
 
+            if (par == null) { return null; }
+
+
+            var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+            var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+            var tags = new List<string>();
+            var Cancel = false;
+            var Translate = true;
+
+            par.GetContextMenuItems(null, ThisContextMenu, out var HotItem, tags, ref Cancel, ref Translate);
+
+            if (Cancel) { return null; }
+
+
+
+            var ec = new ContextMenuInitEventArgs(HotItem, tags, UserMenu);
+            par.OnContextMenuInit(ec);
+            if (ec.Cancel) { return null; }
+
+            if (ThisContextMenu != null && ThisContextMenu.Count > 0) { return par; }
+            if (UserMenu.Count > 0) { return par; }
+
+            return null;
+        }
+
+        public static t ParentControl<t>(this object o)
+        {
+
+            if (o is System.Windows.Forms.Control co)
+            {
+
+
+
+                do
+                {
+                co = co.Parent;
+                    switch (co)
+                    {
+                        case null:
+                            return default;
+                        case t ctr:
+                            return ctr;
+                        default:
+                            break;
+                    }
+                } while (true);
+
+            }
+
+            return default;
+
+        }
         public static List<string> SplitByWidth(this string Text, float MaxWidth, int MaxLines, enDesign design, enStates state)
         {
 

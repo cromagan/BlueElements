@@ -38,6 +38,8 @@
         Einfügen = 19,
         VorherigenInhaltWiederherstellen = 23,
 
+        WeitereBefehle = 24,
+
         Abbruch = 999
     }
 }

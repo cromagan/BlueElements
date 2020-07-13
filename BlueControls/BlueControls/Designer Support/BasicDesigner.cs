@@ -15,7 +15,7 @@ namespace BlueControls.Designer_Support
             properties.Remove("UseWaitCursor");
             properties.Remove("RightToLeft");
             // properties.Remove("Cursor");
-            properties.Remove("CausesValidation");
+            //properties.Remove("CausesValidation");
             properties.Remove("AccessibleDescription");
             properties.Remove("AccessibleName");
             properties.Remove("AccessibleRole");

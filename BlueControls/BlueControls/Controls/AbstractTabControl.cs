@@ -507,11 +507,21 @@ namespace BlueControls.Controls
 
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
         {
-            HotItem = (TabPage)TestTab(new Point(e.X, e.Y));
-            if (_HotTab != null)
+
+            if (e != null)
             {
-                Tags.TagSet("Page", TabPages.IndexOf(_HotTab).ToString());
+
+                HotItem = (TabPage)TestTab(new Point(e.X, e.Y));
+                if (_HotTab != null)
+                {
+                    Tags.TagSet("Page", TabPages.IndexOf(_HotTab).ToString());
+                }
             }
+            else
+            {
+                HotItem = null;
+            }
+
         }
 
         public void OnContextMenuInit(ContextMenuInitEventArgs e)

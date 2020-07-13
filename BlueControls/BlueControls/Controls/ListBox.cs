@@ -710,7 +710,7 @@ namespace BlueControls.Controls
 
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
         {
-            var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+            //var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
 
 
 
