@@ -226,7 +226,6 @@ namespace BlueControls.Controls
 
             switch (_design)
             {
-                case enDesign.Form_MsgBox:
                 case enDesign.Form_QuickInfo:
                 case enDesign.Form_DesktopBenachrichtigung:
                 case enDesign.Form_BitteWarten:

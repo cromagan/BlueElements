@@ -327,7 +327,6 @@ Partial Class frmMain
         Me.BlueTabControl1.Controls.Add(Me.BlueTabPage1)
         Me.BlueTabControl1.Dock = System.Windows.Forms.DockStyle.Top
         Me.BlueTabControl1.HotTrack = True
-        Me.BlueTabControl1.IsRibbonBar = True
         Me.BlueTabControl1.Location = New System.Drawing.Point(0, 0)
         Me.BlueTabControl1.Name = "BlueTabControl1"
         Me.BlueTabControl1.Size = New System.Drawing.Size(983, 110)

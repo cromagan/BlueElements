@@ -262,7 +262,7 @@ Class frmMain
                 Row.CellSet(Column, String.Empty)
 
             Case "SpaltenEigenschaftenBearbeiten"
-                BlueControls.BlueDatabaseDialogs.tabAdministration.OpenColumnEditor(Column)
+                BlueControls.BlueDatabaseDialogs.tabAdministration.OpenColumnEditor(Column, TabView)
 
 
             Case Else
