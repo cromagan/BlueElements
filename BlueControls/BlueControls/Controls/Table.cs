@@ -2751,7 +2751,7 @@ namespace BlueControls.Controls
 
                 if (e.Button != System.Windows.Forms.MouseButtons.None)
                 {
-                    _Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                    _Database?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
                 }
                 else
                 {
