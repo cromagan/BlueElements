@@ -127,7 +127,7 @@ namespace BlueBasics.MultiUserFile
 
         /// <summary>
         /// Wird ausgegeben, sobald isParsed false ist, noch vor den automatischen Reperaturen.
-        /// Diese Event kann verwendet werden, um die Datei automatisch zu reparieren, bevor sich automatische Dialoge öffnen.
+        /// Dieses Event kann verwendet werden, um die Datei automatisch zu reparieren, bevor sich automatische Dialoge öffnen.
         /// </summary>
         public event EventHandler Parsed;
 
@@ -204,7 +204,7 @@ namespace BlueBasics.MultiUserFile
         private Tuple<List<byte>, string> LoadBytesFromDisk(bool OnlyReload)
         {
             byte[] _tmp = null;
-            var tmpLastSaveCode = string.Empty;
+            var tmpLastSaveCode2 = string.Empty;
 
             var StartTime = DateTime.UtcNow;
             do
@@ -218,9 +218,14 @@ namespace BlueBasics.MultiUserFile
 
                     if (string.IsNullOrEmpty(f))
                     {
+                        var tmpLastSaveCode1 = GetFileInfo(true);
                         _tmp = File.ReadAllBytes(Filename);
-                        tmpLastSaveCode = GetFileInfo(true);
-                        break;
+                        tmpLastSaveCode2 = GetFileInfo(true);
+
+                        if (tmpLastSaveCode1 == tmpLastSaveCode2) { break; }
+
+                        f = "Datei wurde während des Ladens verändert.";
+
                     }
 
                     Develop.DebugPrint(enFehlerArt.Info, f + "\r\n" + Filename);
@@ -240,7 +245,7 @@ namespace BlueBasics.MultiUserFile
             var _BLoaded = new List<byte>();
             _BLoaded.AddRange(_tmp);
 
-            return new Tuple<List<byte>, string>(_BLoaded, tmpLastSaveCode);
+            return new Tuple<List<byte>, string>(_BLoaded, tmpLastSaveCode2);
         }
 
 

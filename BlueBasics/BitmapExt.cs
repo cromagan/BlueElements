@@ -52,14 +52,9 @@ namespace BlueBasics
 
         public BitmapExt(string filename) : this((Bitmap)Image_FromFile(filename)) { }
 
-        public BitmapExt(int width, int height)
-        {
-            Width = width;
-            Height = height;
-            Bits = new int[Width * Height];
-            BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-            Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
-        }
+        public BitmapExt(int width, int height) => EmptyBitmap(width, height);
+
+        public BitmapExt(Icon icon) : this(icon.ToBitmap()) { }
 
         /// <summary>
         /// Achtung, das eingehende Bild wird zerstört!
@@ -255,6 +250,24 @@ namespace BlueBasics
         }
 
 
+        public BitmapExt Crop(Rectangle re)
+        {
+
+            var newBMP = new BitmapExt(re.Width, re.Height);
+
+
+            using (var GR = Graphics.FromImage(newBMP.Bitmap))
+            {
+                GR.Clear(Color.Transparent);
+                GR.PixelOffsetMode = PixelOffsetMode.Half;
+                GR.DrawImage(Bitmap, new Rectangle(0, 0, re.Width, re.Height), re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel);
+            }
+
+            return newBMP;
+
+        }
+
+
         public void Resize(int width, int height, enSizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage)
         {
             if (Bitmap == null) { return; }
@@ -312,12 +325,8 @@ namespace BlueBasics
             try
             {
                 var oldBMP = Bitmap;
-                Width = width;
-                Height = height;
-                Bits = new int[Width * Height];
-                BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-                Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
 
+                EmptyBitmap(width, height);
 
                 using (var GR = Graphics.FromImage(Bitmap))
                 {
@@ -366,6 +375,26 @@ namespace BlueBasics
                 //return null;
             }
         }
+
+        private void EmptyBitmap(int width, int height)
+        {
+            Width = width;
+            Height = height;
+            Bits = new int[Width * Height];
+            BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+            Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
+        }
+
+        public void MakeTransparent(Color color)
+        {
+            Bitmap.MakeTransparent(color);
+        }
+
+        public void Save(string name, ImageFormat imageFormat)
+        {
+            Bitmap.Save(name, imageFormat);
+        }
+
 
 
     }

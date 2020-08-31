@@ -894,7 +894,7 @@ namespace BlueBasics
                         return new BitmapExt(new Bitmap(d));
 
                     case enFileFormat.Icon:
-                        return new BitmapExt(new Icon(d).ToBitmap());
+                        return new BitmapExt(new Icon(d));
 
                     default:
                         Develop.DebugPrint(GetEmmbedResource(assembly, Name));
