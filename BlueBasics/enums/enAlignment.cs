@@ -19,8 +19,6 @@
 
 using System;
 
-// Test 3
-
 namespace BlueBasics.Enums
 {
     [Flags]

@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-// Test
 using BlueControls.Controls;
 using BluePaint.EventArgs;
 using System.Drawing;
