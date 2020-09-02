@@ -46,7 +46,7 @@ namespace BlueControls.Controls
 
 
         #region Constructor
-        public AbstractTabControl(bool isRibbon) : base()
+        public AbstractTabControl() : base()
         {
 
 
@@ -64,10 +64,6 @@ namespace BlueControls.Controls
             // Me.SetStyle(System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer, True)
             SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
-
-
-            IsRibbonBar = isRibbon;
-            SetData();
 
         }
         #endregion
@@ -153,11 +149,6 @@ namespace BlueControls.Controls
 
 
 
-
-
-
-        public readonly bool IsRibbonBar;
-
         #region  Properties 
 
         [Editor(typeof(TabPageCollectionEditor), typeof(UITypeEditor))]
@@ -169,39 +160,8 @@ namespace BlueControls.Controls
             }
         }
 
-        //[DefaultValue(false)]
-        //public bool IsRibbonBar
-        //{
-        //    get
-        //    {
-        //        return _IsRibbonBar;
-        //    }
-        //    set
-        //    {
-        //        if (_IsRibbonBar == value) { return; }
-        //        _IsRibbonBar = value;
 
 
-        //        SetData();
-
-        //        Invalidate();
-        //    }
-        //}
-
-
-        //[DefaultValue(0)]
-        //public new int SelectedIndex
-        //{
-        //    get
-        //    {
-        //        Develop.DebugPrint_InvokeRequired(this.InvokeRequired, false);
-        //        return base.SelectedIndex;
-        //    }
-        //    set
-        //    {
-        //        base.SelectedIndex = value;
-        //    }
-        //}
 
         #endregion
 
@@ -329,33 +289,6 @@ namespace BlueControls.Controls
 
         #endregion
 
-        //protected override void OnParentChanged(System.EventArgs e)
-        //{
-        //    base.OnParentChanged(e);
-        //    SetData();
-        //}
-
-        private void SetData()
-        {
-            if (IsRibbonBar)
-            {
-                Height = 110;
-                SendToBack();
-                Dock = System.Windows.Forms.DockStyle.Top;
-                BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
-            }
-            else
-            {
-                BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
-            }
-
-
-            foreach (var thisTab in TabPages)
-            {
-                if (thisTab is TabPage TB) { TB.SetBackColor(); }
-
-            }
-        }
 
         protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent)
         {
@@ -373,12 +306,8 @@ namespace BlueControls.Controls
 
 
 
-            if (IsRibbonBar)
+            if (this is RibbonBar)
             {
-                //Height = 110;
-                //SendToBack();
-                //Dock = System.Windows.Forms.DockStyle.Top;
-
                 Skin.Draw_Back(e.Graphics, enDesign.RibbonBar_Back, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
             }
             else
@@ -437,7 +366,7 @@ namespace BlueControls.Controls
                 r.Y -= 2;
                 r.X += 1;
 
-                if (IsRibbonBar)
+                if (this is RibbonBar)
                 {
                     Skin.Draw_Back(graphics, enDesign.RibbonBar_Head, tmpState, r, this, true);
                     Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.RibbonBar_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
@@ -469,7 +398,7 @@ namespace BlueControls.Controls
 
             if (r.Width < 2 || r.Height < 2) { return; }
 
-            if (IsRibbonBar)
+            if (this is RibbonBar)
             {
                 Skin.Draw_Back(graphics, enDesign.RibbonBar_Body, w, r, this, true);
                 Skin.Draw_Border(graphics, enDesign.RibbonBar_Body, w, r);

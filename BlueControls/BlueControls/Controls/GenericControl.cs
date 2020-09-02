@@ -668,10 +668,7 @@ namespace BlueControls.Controls
 
                             if (TP.Parent == null) { return enPartentType.Unbekannt; }
 
-                            if (((AbstractTabControl)TP.Parent).IsRibbonBar)
-                            {
-                                return enPartentType.RibbonGroupBox;
-                            }
+                            if (TP.Parent is RibbonBar) { return enPartentType.RibbonGroupBox; }
                         }
                         return enPartentType.GroupBox;
                     }
@@ -689,7 +686,7 @@ namespace BlueControls.Controls
                     return enPartentType.TabControl;
                 // Is = "BlueBasics.TabPage"
                 case tabAdministration _:
-                case TabPage _ when control.Parent != null && ((AbstractTabControl)control.Parent).IsRibbonBar:
+                case TabPage _ when control.Parent is RibbonBar:
                     return enPartentType.RibbonPage;
                 case TabPage _:
                     return enPartentType.TabPage;

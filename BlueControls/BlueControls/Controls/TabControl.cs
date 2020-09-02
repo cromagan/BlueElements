@@ -17,13 +17,18 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueControls.Enums;
+
 namespace BlueControls.Controls
 {
     public class TabControl : AbstractTabControl
     {
 
 
-        public TabControl() : base(false) { }
+        public TabControl() : base()
+        {
+            BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
+        }
 
     }
 }

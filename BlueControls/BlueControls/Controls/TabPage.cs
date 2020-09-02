@@ -128,16 +128,14 @@ namespace BlueControls.Controls
 
         public void SetBackColor()
         {
-            if (Parent != null)
+
+            if (Parent is RibbonBar)
             {
-                if (((AbstractTabControl)Parent).IsRibbonBar)
-                {
-                    BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
-                }
-                else
-                {
-                    BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
-                }
+                BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
+            }
+            else if (Parent is TabControl)
+            {
+                BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
             }
             else
             {
