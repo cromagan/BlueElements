@@ -2080,8 +2080,8 @@ namespace BlueDatabase
 
                 case enDataFormat.LinkedCell:
                     if (EditType_To_Check == enEditTypeFormula.None) { return true; }
-                    if (EditType_To_Check != enEditTypeFormula.Textfeld &&
-                        EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
+                    //if (EditType_To_Check != enEditTypeFormula.Textfeld &&
+                    //    EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
                     if (Database.IsParsing()) { return true; }
 
                     if (LinkedDatabase() == null) { return false; }
@@ -2090,7 +2090,7 @@ namespace BlueDatabase
                     var col = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
                     if (col == null) { return false; }
 
-                    return col.UserEditDialogTypeInFormula(enEditTypeFormula.Textfeld);
+                    return col.UserEditDialogTypeInFormula(EditType_To_Check);
 
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
