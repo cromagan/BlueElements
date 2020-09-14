@@ -125,7 +125,7 @@ namespace BlueControls.Controls
                         else
                         {
                             CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
-                            captmp = captmp = Filter.Column.Caption + ":";
+                            captmp = Filter.Column.Caption + ":";
 
                         }
                         Caption = captmp;

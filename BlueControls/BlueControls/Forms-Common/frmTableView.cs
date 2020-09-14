@@ -200,9 +200,7 @@ namespace BlueControls.Forms
                 return;
             }
 
-
-
-            Table.SearchNextText(SuchtT, TableView, null, Formula.ShowingRow, out var found, out var GefRow, true);
+            Table.SearchNextText(SuchtT, TableView, null, Formula.ShowingRow, out _, out var GefRow, true);
 
 
             //var CheckRow = BlueFormulax.ShowingRow;

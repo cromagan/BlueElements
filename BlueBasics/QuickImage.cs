@@ -624,16 +624,12 @@ namespace BlueBasics
                     bmpSecond = Get(_Zweitsymbol + "|" + x).BMP;
                 }
 
-
-
-                var c = new Color();
-                var c1 = new Color();
-                for (var X = 0; X < bmpOri.Width; X++)
+               for (var X = 0; X < bmpOri.Width; X++)
                 {
 
                     for (var Y = 0; Y < bmpOri.Height; Y++)
                     {
-                        c = bmpOri.GetPixel(X, Y);
+                        var c = bmpOri.GetPixel(X, Y);
 
                         if (bmpSecond != null && X > bmpOri.Width - bmpSecond.Width && Y > bmpOri.Height - bmpSecond.Height)
                         {
@@ -682,7 +678,7 @@ namespace BlueBasics
 
                         if (_effekt.HasFlag(enImageCodeEffect.WindowsMEDisabled))
                         {
-                            c1 = Color.FromArgb(0, 0, 0, 0);
+                            var c1 = Color.FromArgb(0, 0, 0, 0);
                             if (!c.IsMagentaOrTransparent())
                             {
                                 var RandPixel = false;

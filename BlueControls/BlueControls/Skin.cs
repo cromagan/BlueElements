@@ -361,7 +361,7 @@ namespace BlueControls
 
             switch (vControl.Parent)
             {
-                case IUseMyBackColor BC:
+                case IUseMyBackColor _:
                     GR.FillRectangle(new SolidBrush(vControl.Parent.BackColor), r);
                     return;
 

@@ -835,7 +835,7 @@ namespace BlueBasics
 
 
             var filterWidth = filterMatrix.GetLength(1);
-            var filterHeight = filterMatrix.GetLength(0);
+            //var filterHeight = filterMatrix.GetLength(0);
 
 
             var filterOffset = (filterWidth - 1) / 2;

@@ -720,7 +720,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            if (e.HotItem is BitmapListItem b)
+            if (e.HotItem is BitmapListItem)
             {
                 //if (FileExists(t.Internal))
                 //{

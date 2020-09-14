@@ -179,8 +179,6 @@ namespace BlueControls.Controls
 
 
             var x = _propInfo.GetValue(_propertyObject, null);
-
-
             if (x is null)
             {
                 Value = string.Empty;
@@ -201,7 +199,7 @@ namespace BlueControls.Controls
             {
                 Value = iv.ToString();
             }
-            else if (x is Enum en)
+            else if (x is Enum)
             {
                 Value = ((int)x).ToString();
             }
@@ -237,8 +235,6 @@ namespace BlueControls.Controls
             var OldVal = string.Empty;
             var x = _propInfo.GetValue(_propertyObject, null);
             object toSet = null;
-
-
             if (x is null)
             {
                 OldVal = string.Empty;
@@ -269,7 +265,7 @@ namespace BlueControls.Controls
                 OldVal = iv.ToString();
                 toSet = IntParse(Value);
             }
-            else if (x is Enum en)
+            else if (x is Enum)
             {
                 OldVal = ((int)x).ToString();
                 toSet = IntParse(Value);
@@ -418,8 +414,8 @@ namespace BlueControls.Controls
                                 var s = BlueFont.MeasureStringOfCaption(_Caption);
 
                                 var data = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-                                var Wi = data.Item1;
-                                var He = data.Item2;
+                                //var Wi = data.Item1;
+                                //var He = data.Item2;
 
                                 var x = Math.Max((int)(data.Item1 + 20 + s.Width), 200);
                                 var y = Math.Max(data.Item2 + Skin.PaddingSmal * 2, 24);

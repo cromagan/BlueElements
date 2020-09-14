@@ -1000,46 +1000,40 @@ namespace BlueDatabase
 
                 if (RowKey > -1)
                 {
-                    if (_Row == null || _Row.Key != RowKey)
+                    _Row = Row.SearchByKey(RowKey);
+                    if (_Row == null)
                     {
-                        _Row = Row.SearchByKey(RowKey);
-                        if (_Row == null)
-                        {
-                            _Row = new RowItem(this, RowKey);
-                            Row.Add(_Row);
-                        }
+                        _Row = new RowItem(this, RowKey);
+                        Row.Add(_Row);
                     }
                 }
 
                 if (ColKey > -1)
                 {
-                    if (_Column == null || _Column.Key != ColKey)
+                    // Zuerst schauen, ob die Column schon (wieder) in der richtigen Collection ist
+                    _Column = Column.SearchByKey(ColKey);
+
+                    if (_Column == null)
                     {
-                        // Zuerst schauen, ob die Column schon (wieder) in der richtigen Collection ist
-                        _Column = Column.SearchByKey(ColKey);
-
-                        if (_Column == null)
+                        // Column noch nicht gefunden. Schauen, ob sie vor dem Reload vorhanden war und gg. hinzufügen
+                        foreach (var ThisColumn in ColumnsOld)
                         {
-                            // Column noch nicht gefunden. Schauen, ob sie vor dem Reload vorhanden war und gg. hinzufügen
-                            foreach (var ThisColumn in ColumnsOld)
+                            if (ThisColumn != null && ThisColumn.Key == ColKey)
                             {
-                                if (ThisColumn != null && ThisColumn.Key == ColKey)
-                                {
-                                    _Column = ThisColumn;
-                                }
+                                _Column = ThisColumn;
                             }
+                        }
 
-                            if (_Column != null)
-                            {
-                                // Prima, gefunden! Noch die Collections korrigieren
-                                Column.Add(enDatabaseDataType.AddColumn, _Column);
-                                ColumnsOld.Remove(_Column);
-                            }
-                            else
-                            {
-                                // Nicht gefunden, als neu machen
-                                _Column = Column.Add(ColKey);
-                            }
+                        if (_Column != null)
+                        {
+                            // Prima, gefunden! Noch die Collections korrigieren
+                            Column.Add(enDatabaseDataType.AddColumn, _Column);
+                            ColumnsOld.Remove(_Column);
+                        }
+                        else
+                        {
+                            // Nicht gefunden, als neu machen
+                            _Column = Column.Add(ColKey);
                         }
                     }
                 }
@@ -1155,13 +1149,13 @@ namespace BlueDatabase
 
 
 
-        private string ParseThis(enDatabaseDataType Art, string Inhalt, ColumnItem _Column, RowItem _Row, int X, int Y)
+        private string ParseThis(enDatabaseDataType Art, string content, ColumnItem column, RowItem row, int width, int height)
         {
 
 
             if (Art >= enDatabaseDataType.Info_ColumDataSart && Art <= enDatabaseDataType.Info_ColumnDataEnd)
             {
-                return _Column.Load(Art, Inhalt);
+                return column.Load(Art, content);
             }
 
 
@@ -1173,11 +1167,11 @@ namespace BlueDatabase
                 case enDatabaseDataType.Formatkennung:
                     break;
                 case enDatabaseDataType.Version:
-                    LoadedVersion = Inhalt.Trim();
+                    LoadedVersion = content.Trim();
                     if (LoadedVersion != DatabaseVersion)
                     {
                         Initialize();
-                        LoadedVersion = Inhalt.Trim();
+                        LoadedVersion = content.Trim();
                     }
                     else
                     {
@@ -1194,49 +1188,49 @@ namespace BlueDatabase
                 case enDatabaseDataType.CryptionTest:
                     break;
                 case enDatabaseDataType.Creator:
-                    _Creator = Inhalt;
+                    _Creator = content;
                     break;
                 case enDatabaseDataType.CreateDate:
-                    _CreateDate = Inhalt;
+                    _CreateDate = content;
                     break;
                 case enDatabaseDataType.ReloadDelaySecond:
-                    _ReloadDelaySecond = int.Parse(Inhalt);
+                    _ReloadDelaySecond = int.Parse(content);
                     break;
                 case enDatabaseDataType.DatenbankAdmin:
-                    DatenbankAdmin.SplitByCR_QuickSortAndRemoveDouble(Inhalt);
+                    DatenbankAdmin.SplitByCR_QuickSortAndRemoveDouble(content);
                     break;
                 case enDatabaseDataType.SortDefinition:
-                    _sortDefinition = new RowSortDefinition(this, Inhalt);
+                    _sortDefinition = new RowSortDefinition(this, content);
                     break;
                 case enDatabaseDataType.Caption:
-                    _Caption = Inhalt;
+                    _Caption = content;
                     break;
                 case enDatabaseDataType.GlobalScale:
-                    _GlobalScale = double.Parse(Inhalt);
+                    _GlobalScale = double.Parse(content);
                     break;
                 case enDatabaseDataType.FilterImagePfad:
-                    _FilterImagePfad = Inhalt;
+                    _FilterImagePfad = content;
                     break;
                 case enDatabaseDataType.Ansicht:
-                    _Ansicht = (enAnsicht)int.Parse(Inhalt);
+                    _Ansicht = (enAnsicht)int.Parse(content);
                     break;
                 case enDatabaseDataType.Tags:
-                    Tags.SplitByCR(Inhalt);
+                    Tags.SplitByCR(content);
                     break;
                 case enDatabaseDataType.BinaryDataInOne:
                     Bins.Clear();
-                    var l = new List<string>(Inhalt.SplitByCR());
+                    var l = new List<string>(content.SplitByCR());
                     foreach (var t in l)
                     {
                         Bins.Add(new clsNamedBinary(t));
                     }
                     break;
                 case enDatabaseDataType.Layouts:
-                    Layouts.SplitByCR_QuickSortAndRemoveDouble(Inhalt);
+                    Layouts.SplitByCR_QuickSortAndRemoveDouble(content);
                     break;
                 case enDatabaseDataType.AutoExport:
                     Export.Clear();
-                    var AE = new List<string>(Inhalt.SplitByCR());
+                    var AE = new List<string>(content.SplitByCR());
                     foreach (var t in AE)
                     {
                         Export.Add(new ExportDefinition(this, t));
@@ -1245,7 +1239,7 @@ namespace BlueDatabase
 
                 case enDatabaseDataType.Rules:
                     Rules.Clear();
-                    var RU = Inhalt.SplitByCR();
+                    var RU = content.SplitByCR();
                     for (var z = 0; z <= RU.GetUpperBound(0); z++)
                     {
                         Rules.Add(new RuleItem(this, RU[z]));
@@ -1254,7 +1248,7 @@ namespace BlueDatabase
 
                 case enDatabaseDataType.ColumnArrangement:
                     ColumnArrangements.Clear();
-                    var CA = new List<string>(Inhalt.SplitByCR());
+                    var CA = new List<string>(content.SplitByCR());
                     foreach (var t in CA)
                     {
                         ColumnArrangements.Add(new ColumnViewCollection(this, t));
@@ -1263,7 +1257,7 @@ namespace BlueDatabase
 
                 case enDatabaseDataType.Views:
                     Views.Clear();
-                    var VI = new List<string>(Inhalt.SplitByCR());
+                    var VI = new List<string>(content.SplitByCR());
                     foreach (var t in VI)
                     {
                         Views.Add(new ColumnViewCollection(this, t));
@@ -1271,17 +1265,17 @@ namespace BlueDatabase
                     break;
 
                 case enDatabaseDataType.PermissionGroups_NewRow:
-                    PermissionGroups_NewRow.SplitByCR_QuickSortAndRemoveDouble(Inhalt);
+                    PermissionGroups_NewRow.SplitByCR_QuickSortAndRemoveDouble(content);
                     break;
 
                 case enDatabaseDataType.LastRowKey:
-                    return Row.Load_310(Art, Inhalt);
+                    return Row.Load_310(Art, content);
 
                 case enDatabaseDataType.LastColumnKey:
-                    return Column.Load_310(Art, Inhalt);
+                    return Column.Load_310(Art, content);
 
                 case enDatabaseDataType.GlobalShowPass:
-                    _GlobalShowPass = Inhalt;
+                    _GlobalShowPass = content;
                     break;
 
                 case (enDatabaseDataType)30:
@@ -1293,37 +1287,37 @@ namespace BlueDatabase
                     break;
 
                 case enDatabaseDataType.JoinTyp:
-                    _JoinTyp = (enJoinTyp)int.Parse(Inhalt);
+                    _JoinTyp = (enJoinTyp)int.Parse(content);
                     break;
 
                 case enDatabaseDataType.VerwaisteDaten:
-                    _VerwaisteDaten = (enVerwaisteDaten)int.Parse(Inhalt);
+                    _VerwaisteDaten = (enVerwaisteDaten)int.Parse(content);
                     break;
 
                 case enDatabaseDataType.ImportScript:
-                    _ImportScript = Inhalt;
+                    _ImportScript = content;
                     break;
 
                 case enDatabaseDataType.FileEncryptionKey:
-                    _FileEncryptionKey = Inhalt;
+                    _FileEncryptionKey = content;
                     break;
 
 
                 case enDatabaseDataType.ce_Value_withSizeData:
                 case enDatabaseDataType.ce_UTF8Value_withSizeData:
                 case enDatabaseDataType.ce_Value_withoutSizeData:
-                    if (Art == enDatabaseDataType.ce_UTF8Value_withSizeData) { Inhalt = modConverter.UTF8toString(Inhalt); }
-                    Cell.Load_310(_Column, _Row, Inhalt, X, Y);
+                    if (Art == enDatabaseDataType.ce_UTF8Value_withSizeData) { content = modConverter.UTF8toString(content); }
+                    Cell.Load_310(column, row, content, width, height);
                     break;
 
                 case enDatabaseDataType.UndoCount:
-                    _UndoCount = int.Parse(Inhalt);
+                    _UndoCount = int.Parse(content);
                     break;
 
 
                 case enDatabaseDataType.UndoInOne:
                     Works.Clear();
-                    var UIO = Inhalt.SplitByCR();
+                    var UIO = content.SplitByCR();
                     for (var z = 0; z <= UIO.GetUpperBound(0); z++)
                     {
                         var tmpWork = new WorkItem(UIO[z])
@@ -1336,31 +1330,23 @@ namespace BlueDatabase
 
 
                 case enDatabaseDataType.dummyComand_AddRow:
-                    var Key = int.Parse(Inhalt);
-                    _Row = Row.SearchByKey(Key);
-                    if (_Row == null)
-                    {
-                        _Row = new RowItem(this, Key);
-                        Row.Add(_Row);
-                    }
+                    var addRowKey = int.Parse(content);
+                    if (Row.SearchByKey(addRowKey) == null) { Row.Add(new RowItem(this, addRowKey)); }
                     break;
 
                 case enDatabaseDataType.AddColumn:
-                    var tKey = int.Parse(Inhalt);
-                    _Column = Column.SearchByKey(tKey);
-                    if (_Column == null) { _Column = Column.Add(enDatabaseDataType.AddColumn, new ColumnItem(this, tKey)); }
+                    var addColumnKey = int.Parse(content);
+                    if (Column.SearchByKey(addColumnKey) == null) { Column.Add(enDatabaseDataType.AddColumn, new ColumnItem(this, addColumnKey)); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveRow:
-                    var trKey = int.Parse(Inhalt);
-                    _Row = Row.SearchByKey(trKey);
-                    if (_Row != null) { Row.Remove(trKey); }
+                    var removeRowKey = int.Parse(content);
+                    if (Row.SearchByKey(removeRowKey) is RowItem) { Row.Remove(removeRowKey); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveColumn:
-                    var rvKey = int.Parse(Inhalt);
-                    _Column = Column.SearchByKey(rvKey);
-                    if (_Column != null) { Column.Remove(_Column); }
+                    var removeColumnKey = int.Parse(content);
+                    if (Column.SearchByKey(removeColumnKey) is ColumnItem col) { Column.Remove(col); }
                     break;
 
                 case enDatabaseDataType.EOF:
@@ -1370,7 +1356,7 @@ namespace BlueDatabase
                     LoadedVersion = "9.99";
                     if (!ReadOnly)
                     {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Laden von Datentyp \'" + Art + "\' nicht definiert.<br>Wert: " + Inhalt + "<br>Datei: " + Filename);
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Laden von Datentyp \'" + Art + "\' nicht definiert.<br>Wert: " + content + "<br>Datei: " + Filename);
                     }
                     break;
             }

@@ -156,7 +156,7 @@ namespace BlueDatabase
                     Database.Cell.Delete(ThisColumnItem, Key);
                 }
             }
-            if (!_Internal.TryRemove(Key, out e)) { Develop.DebugPrint(enFehlerArt.Fehler, "Remove Failed"); }
+            if (!_Internal.TryRemove(Key, out _)) { Develop.DebugPrint(enFehlerArt.Fehler, "Remove Failed"); }
             OnRowRemoved();
         }
 

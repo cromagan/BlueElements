@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="Regeln für BlueBasics" Description="Codeanalyseregeln für BlueBasics.csproj." ToolsVersion="15.0">
+<RuleSet Name="Regeln für BlueBasics" Description="Codeanalyseregeln für BlueBasics.csproj." ToolsVersion="16.0">
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1000" Action="Warning" />
     <Rule Id="CA1003" Action="Warning" />
@@ -607,8 +607,9 @@
     <Rule Id="IDE0047WithoutSuggestion" Action="Warning" />
     <Rule Id="IDE0048WithoutSuggestion" Action="Warning" />
     <Rule Id="IDE0049WithoutSuggestion" Action="Error" />
+    <Rule Id="IDE0058" Action="None" />
     <Rule Id="IDE1005WithoutSuggestion" Action="Warning" />
-    <Rule Id="IDE1006" Action="Info" />
-    <Rule Id="IDE1006WithoutSuggestion" Action="Info" />
+    <Rule Id="IDE1006" Action="None" />
+    <Rule Id="IDE1006WithoutSuggestion" Action="None" />
   </Rules>
 </RuleSet>

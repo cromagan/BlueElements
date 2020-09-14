@@ -289,11 +289,10 @@ namespace BlueControls.Forms
             {
                 if (!string.IsNullOrEmpty(Names[Z]))
                 {
-                    var B = new Button();
 
                     erT.TextDimensions = Size.Empty;
                     erT.PlainText = Names[Z];
-                    B = new Button
+                    var B = new Button
                     {
                         Name = Z.ToString(),
                         Text = Names[Z]

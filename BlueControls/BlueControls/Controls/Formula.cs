@@ -327,7 +327,7 @@ namespace BlueControls.Controls
 
             if (nr < int.MaxValue)
             {
-                p = e.ColumnsWithErrors[nr].Split('|');
+                _ = e.ColumnsWithErrors[nr].Split('|');
             }
 
         }
@@ -847,8 +847,7 @@ namespace BlueControls.Controls
             //if (_Database.Views.Count == 0) { _Database.Views.Add(new ColumnViewCollection(_Database, "")); }
 
             var Column = _Database.Column[((BasicListItem)e.HotItem).Internal];
-
-            var View = SearchColumnView(Column);
+            _ = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
 
             var CurrView = CurrentView();
@@ -1014,7 +1013,7 @@ namespace BlueControls.Controls
         {
 
             var Column = _Database.Column[EditorSelectedColumn()];
-            var View = SearchColumnView(Column);
+            _ = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
 
 
@@ -1028,7 +1027,7 @@ namespace BlueControls.Controls
         private void cbxControlType_ItemClicked(object sender, BasicListItemEventArgs e)
         {
             var Column = _Database.Column[EditorSelectedColumn()];
-            var View = SearchColumnView(Column);
+            _ = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
 
             if (ViewItem != null) { ViewItem.Column.EditType = (enEditTypeFormula)int.Parse(cbxControlType.Text); }
@@ -1041,7 +1040,7 @@ namespace BlueControls.Controls
         private void SLinks_Click(object sender, System.EventArgs e)
         {
             var Column = _Database.Column[EditorSelectedColumn()];
-            var View = SearchColumnView(Column);
+            _ = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
 
             ViewItem?.KoordÄndern(-1, 0, 0);
@@ -1053,7 +1052,7 @@ namespace BlueControls.Controls
         private void SRechts_Click(object sender, System.EventArgs e)
         {
             var Column = _Database.Column[EditorSelectedColumn()];
-            var View = SearchColumnView(Column);
+            _ = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
 
             ViewItem?.KoordÄndern(1, 0, 0);
@@ -1092,7 +1091,7 @@ namespace BlueControls.Controls
         private void EOben_Click(object sender, System.EventArgs e)
         {
             var Column = _Database.Column[EditorSelectedColumn()];
-            var View = SearchColumnView(Column);
+            _ = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
 
             ViewItem?.KoordÄndern(0, 0, -1);
@@ -1108,7 +1107,7 @@ namespace BlueControls.Controls
         {
 
             var Column = _Database.Column[EditorSelectedColumn()];
-            var View = SearchColumnView(Column);
+            _ = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
 
             ViewItem?.KoordÄndern(0, 0, 1);
@@ -1124,7 +1123,7 @@ namespace BlueControls.Controls
         private void ELinks_Click(object sender, System.EventArgs e)
         {
             var Column = _Database.Column[EditorSelectedColumn()];
-            var View = SearchColumnView(Column);
+            _ = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
 
             ViewItem?.KoordÄndern(0, -1, 0);
@@ -1140,7 +1139,7 @@ namespace BlueControls.Controls
         private void ERechts_Click(object sender, System.EventArgs e)
         {
             var Column = _Database.Column[EditorSelectedColumn()];
-            var View = SearchColumnView(Column);
+            _ = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
 
             ViewItem?.KoordÄndern(0, 1, 0);

@@ -286,9 +286,7 @@ namespace BlueControls.Forms
 
 
                 ShowSpeichernEnde();
-
-                var l = new List<string>();
-
+                List<string> l;
                 if (FrmDrucken_Layout1.Text.IsLong())
                 {
                     l = Export.SaveAsBitmap(Liste, FrmDrucken_Layout1.Text, ZielPfad);

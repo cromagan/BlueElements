@@ -42,8 +42,6 @@ namespace BluePaint
 
             if (_Pic == null) { return; }
 
-            var von = new Point();
-            var Nach = new Point();
 
             var XRi = Convert.ToInt32(_Pic.Width / 10.0);
             var YRI = Convert.ToInt32(_Pic.Height / 10.0);
@@ -55,7 +53,7 @@ namespace BluePaint
 
 
             OnForceUndoSaving();
-
+            Point Nach;
             switch (((Button)sender).Name.ToLower())
             {
                 case "bruch_oben":
@@ -98,7 +96,7 @@ namespace BluePaint
 
             for (var z = 0; z <= 10; z++)
             {
-                von = Nach;
+                var von = Nach;
 
                 Nach.X += XRi;
                 Nach.Y += YRI;
@@ -122,8 +120,5 @@ namespace BluePaint
 
             OnDoInvalidate();
         }
-
-
-
     }
 }

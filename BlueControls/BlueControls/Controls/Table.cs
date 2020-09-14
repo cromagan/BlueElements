@@ -825,9 +825,6 @@ namespace BlueControls.Controls
             Skin.Draw_Back(GR, enDesign.ListBox, vState, DisplayRectangle, this, true);
 
             var Col = Database.Column[0];
-
-
-            var r = new Rectangle();
             // Zeilen Zeichnen (Alle Zellen)
             for (var Zeiv = vFirstVisibleRow; Zeiv <= vLastVisibleRow; Zeiv++)
             {
@@ -835,7 +832,7 @@ namespace BlueControls.Controls
 
                 var ViewItem = _Database.ColumnArrangements[0][Col];
 
-                r = new Rectangle(0, (int)Row.TMP_Y, DisplayRectangleWithoutSlider().Width, Row_DrawHeight(Row, DisplayRectangleWOSlider));
+                var r = new Rectangle(0, (int)Row.TMP_Y, DisplayRectangleWithoutSlider().Width, Row_DrawHeight(Row, DisplayRectangleWOSlider));
 
 
                 if (_CursorPosColumn != null && _CursorPosRow == Row)
@@ -2204,7 +2201,7 @@ namespace BlueControls.Controls
 
                 case "doeinzigartig":
                     Filter.Remove(e.Column);
-                    e.Column.GetUniques(SortedRows(), out var Einzigartig, out var NichtEinzigartig);
+                    e.Column.GetUniques(SortedRows(), out var Einzigartig, out _);
 
                     if (Einzigartig.Count > 0)
                     {
@@ -2219,7 +2216,7 @@ namespace BlueControls.Controls
 
                 case "donichteinzigartig":
                     Filter.Remove(e.Column);
-                    e.Column.GetUniques(SortedRows(), out var xEinzigartig, out var xNichtEinzigartig);
+                    e.Column.GetUniques(SortedRows(), out _, out var xNichtEinzigartig);
 
                     if (xNichtEinzigartig.Count > 0)
                     {
