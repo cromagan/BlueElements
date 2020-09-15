@@ -384,9 +384,9 @@ namespace BlueControls.Controls
             var PaintModYx = 0;
             var vStateBox = state;
 
-            if (Convert.ToBoolean(vStateBox & enStates.Standard_MouseOver)) { vStateBox = vStateBox ^ enStates.Standard_MouseOver; }
-            if (Convert.ToBoolean(vStateBox & enStates.Standard_MousePressed)) { vStateBox = vStateBox ^ enStates.Standard_MousePressed; }
-            if (Convert.ToBoolean(vStateBox & enStates.Standard_HasFocus)) { vStateBox = vStateBox ^ enStates.Standard_HasFocus; }
+            if (Convert.ToBoolean(vStateBox & enStates.Standard_MouseOver)) { vStateBox ^= enStates.Standard_MouseOver; }
+            if (Convert.ToBoolean(vStateBox & enStates.Standard_MousePressed)) { vStateBox ^= enStates.Standard_MousePressed; }
+            if (Convert.ToBoolean(vStateBox & enStates.Standard_HasFocus)) { vStateBox ^= enStates.Standard_HasFocus; }
 
             if (Item.Count == 0)
             {

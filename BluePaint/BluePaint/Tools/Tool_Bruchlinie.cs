@@ -114,8 +114,8 @@ namespace BluePaint
                 gr.DrawLine(new Pen(Color.FromArgb(128, 128, 128)), von, Nach);
 
 
-                if (ChangeX) { XRi = XRi * -1; }
-                if (ChangeY) { YRI = YRI * -1; }
+                if (ChangeX) { XRi *= -1; }
+                if (ChangeY) { YRI *= -1; }
             }
 
             OnDoInvalidate();

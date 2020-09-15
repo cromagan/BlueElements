@@ -415,7 +415,7 @@ namespace BlueDatabase
         public string QuickInfoText(string AdditionalText)
         {
             var T = string.Empty;
-            if (!string.IsNullOrEmpty(_QuickInfo)) { T = T + _QuickInfo; }
+            if (!string.IsNullOrEmpty(_QuickInfo)) { T += _QuickInfo; }
             if (Database.IsAdministrator() && !string.IsNullOrEmpty(_AdminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + _AdminInfo; }
 
 
@@ -2703,7 +2703,7 @@ namespace BlueDatabase
             {
                 nr++;
                 var tmpname = cleanfilename;
-                if (nr > 0) { tmpname = tmpname + nr.ToString(Constants.Format_Integer2); }
+                if (nr > 0) { tmpname += nr.ToString(Constants.Format_Integer2); }
                 ok = true;
 
                 foreach (var columnitem in Database.Column)

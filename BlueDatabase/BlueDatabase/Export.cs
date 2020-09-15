@@ -776,7 +776,7 @@ namespace BlueDatabase
                         tmpBody = DoLayoutCode("AS", tmpBody, ThisRow, "AE", ToNonCriticalText); // Anfangsbedingungen
                         tmpBody = DoLayoutCode("TS", tmpBody, ThisRow, "E", ToNonCriticalText); // Textbedingungen (Endcode NUR e, weil Pics sonst den zweiten Buchstaben IMMER löschen!
                         tmpBody = DoLayoutCode("XS", tmpBody, ThisRow, "XE", ToNonCriticalText); // Endbedingungen
-                        tmpSave = tmpSave + tmpBody;
+                        tmpSave += tmpBody;
                     }
                 }
 
@@ -789,7 +789,7 @@ namespace BlueDatabase
             }
 
 
-            tmpSave = tmpSave + Foot;
+            tmpSave += Foot;
             if (!string.IsNullOrEmpty(SaveFile)) // Dateien ohne SUfiix-Angabe könenn nicht gespeichert werden
             {
                 modAllgemein.SaveToDisk(SaveFile, tmpSave, false);

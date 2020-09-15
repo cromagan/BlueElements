@@ -630,9 +630,9 @@ namespace BlueBasics
 
             for (var z = 0; z <= name.Length - 21; z++)
             {
-                nn = nn + name.Substring(z, 1);
+                nn += name.Substring(z, 1);
             }
-            nn = nn + name.Substring(name.Length - 20);
+            nn += name.Substring(name.Length - 20);
 
 
             return nn;

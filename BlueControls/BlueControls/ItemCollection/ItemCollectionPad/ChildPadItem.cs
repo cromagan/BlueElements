@@ -370,12 +370,12 @@ namespace BlueControls.ItemCollection
             var y = (e.Y - (decimal)l1.Y) / tZo;
 
             // Nullpunkt verschiebung laut Maxbounds
-            x = x + l2.X;
-            y = y + l2.Y;
+            x += l2.X;
+            y += l2.Y;
 
             // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
-            x = x + (l2.Width - (decimal)l1.Width / tZo) / 2;
-            y = y + (l2.Height - (decimal)l1.Height / tZo) / 2;
+            x += (l2.Width - (decimal)l1.Width / tZo) / 2;
+            y += (l2.Height - (decimal)l1.Height / tZo) / 2;
 
             x = Math.Min(x, int.MaxValue / 2.0m);
             y = Math.Min(y, int.MaxValue / 2.0m);
@@ -411,12 +411,12 @@ namespace BlueControls.ItemCollection
             var y = (e.Y - (decimal)l1.Y) / tZo;
 
             // Nullpunkt verschiebung laut Maxbounds
-            x = x + l2.X;
-            y = y + l2.Y;
+            x += l2.X;
+            y += l2.Y;
 
             // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
-            x = x + (l2.Width - (decimal)l1.Width / tZo) / 2;
-            y = y + (l2.Height - (decimal)l1.Height / tZo) / 2;
+            x += (l2.Width - (decimal)l1.Width / tZo) / 2;
+            y += (l2.Height - (decimal)l1.Height / tZo) / 2;
 
             x = Math.Min(x, int.MaxValue / 2.0m);
             y = Math.Min(y, int.MaxValue / 2.0m);
@@ -450,8 +450,8 @@ namespace BlueControls.ItemCollection
             var y = (e.Y - (decimal)l1.Y) / tZo;
 
             // Nullpunkt verschiebung laut Maxbounds
-            x = x + l2.X;
-            y = y + l2.Y;
+            x += l2.X;
+            y += l2.Y;
 
             // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
             x = x + (l2.Width - (decimal)l1.Width / tZo) / 2;

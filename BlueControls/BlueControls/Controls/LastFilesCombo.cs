@@ -169,11 +169,11 @@ namespace BlueControls.Controls
 
                             if (_mustExists)
                             {
-                                show = show + x[0].FileNameWithSuffix();
+                                show += x[0].FileNameWithSuffix();
                             }
                             else
                             {
-                                show = show + x[0];
+                                show += x[0];
                             }
 
                             if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]))

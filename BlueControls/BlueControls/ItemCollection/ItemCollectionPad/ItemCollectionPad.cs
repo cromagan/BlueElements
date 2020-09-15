@@ -927,7 +927,7 @@ namespace BlueControls.ItemCollection
 
             //t = t + "DPI=" + DPI + ", "; // TODO: Nach Update wieder aktivieren
 
-            t = t + "Items={";
+            t += "Items={";
 
 
             foreach (var Thisitem in this)
@@ -980,15 +980,15 @@ namespace BlueControls.ItemCollection
             {
                 if ((int)(r.Width * Scale) > 15000)
                 {
-                    Scale = Scale * 0.8m;
+                    Scale *= 0.8m;
                 }
                 else if ((int)(r.Height * Scale) > 15000)
                 {
-                    Scale = Scale * 0.8m;
+                    Scale *= 0.8m;
                 }
                 else if ((int)(r.Height * Scale) * (int)(r.Height * Scale) > 90000000)
                 {
-                    Scale = Scale * 0.8m;
+                    Scale *= 0.8m;
                 }
                 else
                 {

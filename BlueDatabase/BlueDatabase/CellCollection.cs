@@ -851,10 +851,10 @@ namespace BlueDatabase
 
                 // Oder-Flag ermitteln --------------------------------------------
                 var Oder = Typ.HasFlag(enFilterType.ODER);
-                if (Oder) { Typ = Typ ^ enFilterType.ODER; }
+                if (Oder) { Typ ^= enFilterType.ODER; }
                 // Und-Flag Ermitteln --------------------------------------------
                 var Und = Typ.HasFlag(enFilterType.UND);
-                if (Und) { Typ = Typ ^ enFilterType.UND; }
+                if (Und) { Typ ^= enFilterType.UND; }
 
                 if (filter.SearchValue.Count < 2)
                 {
@@ -906,7 +906,7 @@ namespace BlueDatabase
                 if (Typ.HasFlag(enFilterType.MultiRowIgnorieren))
                 {
                     TMPMultiLine = false;
-                    Typ = Typ ^ enFilterType.MultiRowIgnorieren;
+                    Typ ^= enFilterType.MultiRowIgnorieren;
                 }
                 if (TMPMultiLine && !_String.Contains("\r")) { TMPMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multinline behandel werden.
 
@@ -991,7 +991,7 @@ namespace BlueDatabase
             {
                 IstValue = IstValue.ToUpper();
                 FilterValue = FilterValue.ToUpper();
-                Typ = Typ ^ enFilterType.GroßKleinEgal;
+                Typ ^= enFilterType.GroßKleinEgal;
             }
 
 

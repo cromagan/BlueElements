@@ -1061,9 +1061,9 @@ namespace BlueControls.Controls
             Control.Height = Height - Control.Top - 1;
 
 
-            Control.Height = Control.Height - 2;
+            Control.Height -= 2;
             Control.Left = 2;
-            Control.Width = Control.Width - 4;
+            Control.Width -= 4;
 
             Control.BringToFront();
 
@@ -1170,7 +1170,7 @@ namespace BlueControls.Controls
 
 
             Control.Left = 2;
-            Control.Width = Control.Width - 4;
+            Control.Width -= 4;
 
             if (!FullSize)
             {

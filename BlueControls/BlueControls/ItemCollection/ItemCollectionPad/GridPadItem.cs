@@ -138,7 +138,7 @@ namespace BlueControls.ItemCollection
             {
                 count += 1;
                 if (count > 20) { break; }
-                if (mo < 5) { mo = mo * 2; }
+                if (mo < 5) { mo *= 2; }
             } while (true);
 
             if (mo >= 5)
@@ -154,7 +154,7 @@ namespace BlueControls.ItemCollection
                         GR.DrawLine(p, 0, po.Y - (int)ex, SizeOfParentControl.Width, po.Y - (int)ex);
                     }
 
-                    ex = ex + mo;
+                    ex += mo;
                     if (po.X - ex < 0 && po.Y - ex < 0 && po.X + ex > SizeOfParentControl.Width && po.Y + ex > SizeOfParentControl.Height)
                     {
                         break;

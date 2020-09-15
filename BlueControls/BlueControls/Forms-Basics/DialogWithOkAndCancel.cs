@@ -81,8 +81,8 @@ namespace BlueControls.Forms
                 capText.Translate = false;
                 capText.Text = TXT;
                 capText.Refresh();
-                wi = wi + capText.Width;
-                he = he + capText.Height;
+                wi += capText.Width;
+                he += capText.Height;
             }
 
 

@@ -100,11 +100,11 @@ namespace BlueDatabase
 
             if (Reverse)
             {
-                Result = Result + "Direction=Z-A";
+                Result += "Direction=Z-A";
             }
             else
             {
-                Result = Result + "Direction=A-Z";
+                Result += "Direction=A-Z";
             }
 
             if (_Columns != null)

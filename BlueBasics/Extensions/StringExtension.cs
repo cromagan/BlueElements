@@ -743,7 +743,7 @@ namespace BlueBasics
             if (Pfad.Length > 6 && Pfad.Substring(0, 7).ToLower() == "http://") { return Pfad; }
             if (Pfad.Length > 7 && Pfad.Substring(0, 8).ToLower() == "https://") { return Pfad; }
             if (Pfad.Contains("/")) { Pfad = Pfad.Replace("/", "\\"); }
-            if (Pfad.Substring(Pfad.Length - 1) != "\\") { Pfad = Pfad + "\\"; }
+            if (Pfad.Substring(Pfad.Length - 1) != "\\") { Pfad += "\\"; }
 
             if (Pfad.IndexOf("\\\\", 1) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + Pfad); }
 
@@ -893,7 +893,7 @@ namespace BlueBasics
                     {
                         return startIndex - 1; // -1, weil ein Leereichen hinzugefügt wurde.
                     }
-                    startIndex = startIndex + value.Length;
+                    startIndex += value.Length;
 
                 }
             }

@@ -136,7 +136,7 @@ namespace BlueBasics
                             return null;
                     }
 
-                    a = a - 3;
+                    a -= 3;
                 }
                 else // Es ist KEINE Funktion, also den Inhalt der Klammer normal berechnen
                 {

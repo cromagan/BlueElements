@@ -430,11 +430,11 @@ namespace BlueControls.Controls
             {
                 if (_SliderContainsMouse)
                 {
-                    vState_Back = vState_Back ^ enStates.Standard_MouseOver;
+                    vState_Back ^= enStates.Standard_MouseOver;
                 }
                 else
                 {
-                    vState_Slider = vState_Slider ^ enStates.Standard_MouseOver;
+                    vState_Slider ^= enStates.Standard_MouseOver;
                 }
             }
 
@@ -442,11 +442,11 @@ namespace BlueControls.Controls
             {
                 if (_SliderContainsMouse)
                 {
-                    vState_Back = vState_Back ^ enStates.Standard_MousePressed;
+                    vState_Back ^= enStates.Standard_MousePressed;
                 }
                 else
                 {
-                    vState_Slider = vState_Slider ^ enStates.Standard_MousePressed;
+                    vState_Slider ^= enStates.Standard_MousePressed;
                 }
             }
 

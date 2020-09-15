@@ -471,7 +471,7 @@ namespace BlueControls
 
             var linDi = _Zeilenabstand / 10 * cZoom;
 
-            if (Bold) { linDi = linDi * 1.5F; }
+            if (Bold) { linDi *= 1.5F; }
 
             return new Pen(Color_Main, linDi);
         }
@@ -486,13 +486,13 @@ namespace BlueControls
         private static string ToString(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, string Color_Main, string Color_Outline, bool vKapitälchen, bool vonlyuppe, bool vonlylower)
         {
             var c = "{Name=" + FontName + ", Size=" + FontSize.ToString().ToNonCritical();
-            if (Bold) { c = c + ", Bold=True"; }
-            if (Italic) { c = c + ", Italic=True"; }
-            if (Underline) { c = c + ", Underline=True"; }
-            if (Strikeout) { c = c + ", Strikeout=True"; }
-            if (vKapitälchen) { c = c + ", Capitals=True"; }
-            if (vonlyuppe) { c = c + ", OnlyUpper=True"; }
-            if (vonlylower) { c = c + ", OnlyLower=True"; }
+            if (Bold) { c += ", Bold=True"; }
+            if (Italic) { c += ", Italic=True"; }
+            if (Underline) { c += ", Underline=True"; }
+            if (Strikeout) { c += ", Strikeout=True"; }
+            if (vKapitälchen) { c += ", Capitals=True"; }
+            if (vonlyuppe) { c += ", OnlyUpper=True"; }
+            if (vonlylower) { c += ", OnlyLower=True"; }
             if (OutLine) { c = c + ", Outline=True, OutlineColor=" + Color_Outline; }
 
             if (Color_Main != "000000") { c = c + ", Color=" + Color_Main; }
@@ -549,14 +549,14 @@ namespace BlueControls
             var t = FontName + ", " + FontSize + " pt, ";
 
 
-            if (Bold) { t = t + "B"; }
-            if (Italic) { t = t + "I"; }
-            if (Underline) { t = t + "U"; }
-            if (StrikeOut) { t = t + "S"; }
-            if (Kapitälchen) { t = t + "C"; }
-            if (Outline) { t = t + "O"; }
-            if (OnlyLower) { t = t + "L"; }
-            if (OnlyUpper) { t = t + "U"; }
+            if (Bold) { t += "B"; }
+            if (Italic) { t += "I"; }
+            if (Underline) { t += "U"; }
+            if (StrikeOut) { t += "S"; }
+            if (Kapitälchen) { t += "C"; }
+            if (Outline) { t += "O"; }
+            if (OnlyLower) { t += "L"; }
+            if (OnlyUpper) { t += "U"; }
             return t.TrimEnd(", ");
         }
 

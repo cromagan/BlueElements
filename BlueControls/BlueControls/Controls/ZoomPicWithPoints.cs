@@ -505,8 +505,8 @@ namespace BlueControls.Controls
                 var s = tags2.TagGet(thisO);
                 var ThisP = new PointDF(null, s);
 
-                ThisP.X = ThisP.X * zoomx;
-                ThisP.Y = ThisP.Y * zoomy;
+                ThisP.X *= zoomx;
+                ThisP.Y *= zoomy;
                 tags2.TagSet(ThisP.Name, ThisP.ToString());
             }
 

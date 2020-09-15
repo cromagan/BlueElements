@@ -230,8 +230,8 @@ namespace BlueControls.Controls
                 var X = ThisString.SplitBy("|");
                 if (_tmpColumn != null && X[0].ToUpper() == _tmpColumn.Name.ToUpper())
                 {
-                    if (!string.IsNullOrEmpty(InfoText)) { InfoText = InfoText + "<br><hr><br>"; }
-                    NewT = NewT + X[1];
+                    if (!string.IsNullOrEmpty(InfoText)) { InfoText += "<br><hr><br>"; }
+                    NewT += X[1];
                 }
 
             }

@@ -285,8 +285,8 @@ namespace BlueControls.Controls
 
         protected override void DrawControl(Graphics GR, enStates vState)
         {
-            if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState = vState ^ enStates.Standard_MouseOver; }
-            if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState = vState ^ enStates.Standard_MousePressed; }
+            if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
+            if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }
 
 
             Skin.Draw_Back(GR, enDesign.EasyPic, vState, DisplayRectangle, this, true);

@@ -1402,7 +1402,7 @@ namespace BlueControls
             {
                 if (t.Marking.HasFlag(markstate))
                 {
-                    t.Marking = t.Marking ^ markstate;
+                    t.Marking ^= markstate;
                 }
             }
         }

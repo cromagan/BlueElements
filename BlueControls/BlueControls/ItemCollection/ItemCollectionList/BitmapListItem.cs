@@ -254,8 +254,8 @@ namespace BlueControls.ItemCollection
                     var s = Skin.FormatedText_NeededSize(ThisCap, null, Skin.GetBlueFont(enDesign.Item_Listbox, vState), 16);
                     var r = new Rectangle((int)(DCoordinates.Left + (DCoordinates.Width - s.Width) / 2.0), DCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
 
-                    r.X = r.X - trp.X;
-                    r.Y = r.Y - trp.Y;
+                    r.X -= trp.X;
+                    r.Y -= trp.Y;
 
                     r.Y = r.Y - ConstMY * c + Ausgl;
 

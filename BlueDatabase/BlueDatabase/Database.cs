@@ -86,7 +86,7 @@ namespace BlueDatabase
             {
 
                 var x = -1;
-                var pf = string.Empty;
+                string pf;
 
                 do
                 {
@@ -883,7 +883,7 @@ namespace BlueDatabase
         public void Parse(List<byte> _BLoaded, ref int Pointer, ref enDatabaseDataType Art, ref int ColNR, ref int RowNR, ref string Wert, ref int X, ref int Y)
         {
 
-            var Les = 0;
+            int Les;
 
             switch ((enRoutinen)_BLoaded[Pointer])
             {
@@ -2483,9 +2483,8 @@ namespace BlueDatabase
             if (ThisPendingItem.State == enItemState.Pending)
             {
 
-                ColumnItem _Col = null;
-                RowItem _Row = null;
 
+                RowItem _Row = null;
                 if (ThisPendingItem.RowKey > -1)
                 {
                     _Row = Row.SearchByKey(ThisPendingItem.RowKey);
@@ -2500,7 +2499,7 @@ namespace BlueDatabase
                     }
                 }
 
-                _Col = null;
+                ColumnItem _Col = null;
                 if (ThisPendingItem.ColKey > -1)
                 {
                     _Col = Column.SearchByKey(ThisPendingItem.ColKey);

@@ -453,10 +453,10 @@ namespace BlueControls
                         t = t + "ParentName=" + ((BasicPadItem)_parent).Internal.ToNonCritical() + ", ";
                         break;
                     case CreativePad _:
-                        t = t + "ParentType=Main, ";
+                        t += "ParentType=Main, ";
                         break;
                     case ItemCollectionPad _:
-                        t = t + "ParentType=Main, ";
+                        t += "ParentType=Main, ";
                         break;
                     default:
                         t = t + "ParentType=" + Parent.GetType().FullName + ", ";

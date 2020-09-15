@@ -138,7 +138,7 @@ namespace BlueControls
         {
             // http://de.wikipedia.org/wiki/Polarkoordinaten
 
-            Winkel = Winkel % 360;
+            Winkel %= 360;
 
             switch (Winkel)
             {

@@ -545,11 +545,11 @@ namespace BlueDatabase
 
             if (cols.Count == 0)
             {
-                _InfoTXT = _InfoTXT + "Diese Zeile ist fehlerfrei.";
+                _InfoTXT += "Diese Zeile ist fehlerfrei.";
             }
             else
             {
-                _InfoTXT = _InfoTXT + _Info.JoinWith("<br><hr><br>");
+                _InfoTXT += _Info.JoinWith("<br><hr><br>");
             }
 
             //MessageBox.Show(_InfoTXT, enImageCode.Information, "OK");

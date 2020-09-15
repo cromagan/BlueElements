@@ -484,7 +484,7 @@ namespace BlueBasics
                     if (double.TryParse(IsValue, out var dw))
                     {
                         var t = dw.ToString(Constants.Format_Float10_3);
-                        if (!t.Contains(",")) { t = t + ",000"; };
+                        if (!t.Contains(",")) { t += ",000"; };
                         while (t.Length < 14) { t += "0"; }
 
                         return CompareKey_S_OK + t;

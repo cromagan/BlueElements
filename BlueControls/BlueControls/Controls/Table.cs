@@ -420,7 +420,7 @@ namespace BlueControls.Controls
             // Listboxen bekommen keinen Focus, also Tabellen auch nicht. Basta.
             if (Convert.ToBoolean(state & enStates.Standard_HasFocus))
             {
-                state = state ^ enStates.Standard_HasFocus;
+                state ^= enStates.Standard_HasFocus;
             }
 
             if (_Database == null || DesignMode)
@@ -843,7 +843,7 @@ namespace BlueControls.Controls
                 {
                     if (Convert.ToBoolean(ItStat & enStates.Checked))
                     {
-                        ItStat = ItStat ^ enStates.Checked;
+                        ItStat ^= enStates.Checked;
                     }
                 }
 
@@ -974,8 +974,8 @@ namespace BlueControls.Controls
 
             for (z = 0; z <= 1; z++)
             {
-                var xPos = 0;
-                enColumnLineStyle Lin = 0;
+                int xPos;
+                enColumnLineStyle Lin;
                 if (z == 0)
                 {
                     xPos = (int)vcolumn.OrderTMP_Spalte_X1;
@@ -4100,8 +4100,8 @@ namespace BlueControls.Controls
 
         private SizeF ColumnHead_Size(ColumnItem column)
         {
-            float wi = 0;
-            float he = 0;
+            float wi;
+            float he;
 
             if (column.CaptionBitmap != null && column.CaptionBitmap.Width > 10)
             {

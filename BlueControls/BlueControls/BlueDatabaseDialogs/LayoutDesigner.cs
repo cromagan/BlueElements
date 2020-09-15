@@ -329,17 +329,17 @@ namespace BlueControls.BlueDatabaseDialogs
                 T = "//TS/000" + Nam;
 
                 // Auf die Reihenfolge kommt es an!
-                if (LeerLösch.Checked) { T = T + "/100"; }
-                if (Spezialvormat.Checked) { T = T + "/107"; }
-                if (Abkürz.Checked) { T = T + "/110"; }
-                if (HtmlSonderzeichen.Checked) { T = T + "/108"; }
+                if (LeerLösch.Checked) { T += "/100"; }
+                if (Spezialvormat.Checked) { T += "/107"; }
+                if (Abkürz.Checked) { T += "/110"; }
+                if (HtmlSonderzeichen.Checked) { T += "/108"; }
                 if (!string.IsNullOrEmpty(Leer.Text)) { T = T + "/101" + Leer.Text.EleminateSlash().ToNonCritical(); }
                 if (!string.IsNullOrEmpty(Vortext.Text)) { T = T + "/103" + Vortext.Text.EleminateSlash().ToNonCritical(); }
                 if (!string.IsNullOrEmpty(Nachtext.Text)) { T = T + "/104" + Nachtext.Text.EleminateSlash().ToNonCritical(); }
                 if (ZeilUmbruch.Enabled && !string.IsNullOrEmpty(ZeilUmbruch.Text)) { T = T + "/102" + ZeilUmbruch.Text.EleminateSlash().ToNonCritical(); }
-                if (ÜberschriftS.Checked) { T = T + "/109"; }
+                if (ÜberschriftS.Checked) { T += "/109"; }
 
-                T = T + "/E";
+                T += "/E";
                 Code.Text = T;
 
             }
@@ -350,10 +350,10 @@ namespace BlueControls.BlueDatabaseDialogs
                     T = "//TS/001" + Nam;
                     if (int.Parse(Wi.Text) > 5) { T = T + "/200" + int.Parse(Wi.Text); }
                     if (int.Parse(He.Text) > 5) { T = T + "/201" + int.Parse(He.Text); }
-                    if (Mxx.Checked) { T = T + "/210"; }
-                    if (ExactMi.Checked) { T = T + "/211"; }
-                    if (GroMi.Checked) { T = T + "/212"; }
-                    if (Base64.Checked) { T = T + "/220"; }
+                    if (Mxx.Checked) { T += "/210"; }
+                    if (ExactMi.Checked) { T += "/211"; }
+                    if (GroMi.Checked) { T += "/212"; }
+                    if (Base64.Checked) { T += "/220"; }
                 }
                 else
                 {
@@ -361,7 +361,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 }
 
 
-                T = T + "/E";
+                T += "/E";
                 Code.Text = T;
 
             }

@@ -943,15 +943,15 @@ namespace BlueDatabase
             if ((int)Action < 1000)
             {
                 r = r + "<b>Bedingung:<br>Wenn </b>" + t.Trim('.') + "<b>, dann </b>...<br>";
-                r = r + "<i> - Bedingungen können nicht alleine stehen, sie benötigen immer eine auszuführende Aktion<br> - Bedingungen prüfen nur und ändern nichts</i><br>";
+                r += "<i> - Bedingungen können nicht alleine stehen, sie benötigen immer eine auszuführende Aktion<br> - Bedingungen prüfen nur und ändern nichts</i><br>";
             }
             else
             {
                 r = r + "<b>Aktion:<br>Wenn </b>..., <b> dann </b>" + t.Trim('.') + ".<br>";
-                r = r + "<i> - Aktion können alleine stehen, evtl. ist dadurch eine manuelle Zellenbearbeitung nicht mehr möglich<br> - Aktionen haben immer Auswirkungen auf eine oder mehrere Zellen</i><br>";
+                r += "<i> - Aktion können alleine stehen, evtl. ist dadurch eine manuelle Zellenbearbeitung nicht mehr möglich<br> - Aktionen haben immer Auswirkungen auf eine oder mehrere Zellen</i><br>";
             }
 
-            r = r + "<br><br><b>Beschreibung:</b><br>";
+            r += "<br><br><b>Beschreibung:</b><br>";
 
 
             var MehrereTexteReichtEiner = false;
@@ -964,7 +964,7 @@ namespace BlueDatabase
             switch (Action)
             {
                 case enAction.Anmerkung:
-                    r = r + "Anmerkung ist ohne Funktion und nur für Notizen gedacht.";
+                    r += "Anmerkung ist ohne Funktion und nur für Notizen gedacht.";
                     break;
 
                 case enAction.Ist:
@@ -980,18 +980,18 @@ namespace BlueDatabase
                     break;
 
                 case enAction.Enthält:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so <b>in einer Zeile der Zelle</b> steht.";
+                    r += "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so <b>in einer Zeile der Zelle</b> steht.";
                     MehrereTexteReichtEiner = true;
                     EineSpalteWahrUmWahrzusein = true;
                     break;
 
                 case enAction.Enthält_Zeichenkette:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so <b>irgendwo in der Zelle</b> steht.<br>Gross/Kleinschreibung wird ignoriert.";
+                    r += "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so <b>irgendwo in der Zelle</b> steht.<br>Gross/Kleinschreibung wird ignoriert.";
                     EineSpalteWahrUmWahrzusein = true;
                     break;
 
                 case enAction.Enthält_NICHT_Zeichenkette:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so  <b>nicht in der Zelle</b> steht.<br>Gross/Kleinschreibung wird ignoriert.";
+                    r += "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so  <b>nicht in der Zelle</b> steht.<br>Gross/Kleinschreibung wird ignoriert.";
                     MehrereTexteReichtEiner = true;
                     break;
 
@@ -1015,7 +1015,7 @@ namespace BlueDatabase
                     break;
 
                 case enAction.Auf_eine_existierende_Datei_verweist:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der <b>Inhalt der Zelle</b> auf eine existierende Datei im Windows-Dateisystem verweist.";
+                    r += "Diese Bedingung ist <i>WAHR</i>, wenn der <b>Inhalt der Zelle</b> auf eine existierende Datei im Windows-Dateisystem verweist.";
                     break;
 
                 case enAction.Auf_einen_existierenden_Pfad_verweist:
@@ -1048,19 +1048,19 @@ namespace BlueDatabase
 
 
                 case enAction.Wert_Dazu:
-                    r = r + "Diese Aktion fügt neue Werte hinzu, ohne die alten zu löschen. Anschließende wird sortiert und eventuell doppelt Werte entfernt.";
+                    r += "Diese Aktion fügt neue Werte hinzu, ohne die alten zu löschen. Anschließende wird sortiert und eventuell doppelt Werte entfernt.";
                     MehrTexteAllegeamacht = true;
                     MehrSpaltenAllegeamacht = true;
                     break;
 
                 case enAction.Wert_Weg:
-                    r = r + "Diese Aktion entfernt die hier angegeben Werte hinzu, ohne die alten zu löschen. Anschließende wird sortiert und eventuell doppelte Werte entfernt.";
+                    r += "Diese Aktion entfernt die hier angegeben Werte hinzu, ohne die alten zu löschen. Anschließende wird sortiert und eventuell doppelte Werte entfernt.";
                     MehrTexteAllegeamacht = true;
                     MehrSpaltenAllegeamacht = true;
                     break;
 
                 case enAction.Wert_Setzen:
-                    r = r + "Diese Aktion überschreibt den Text in der Zelle mit dem hier angegeben Text.";
+                    r += "Diese Aktion überschreibt den Text in der Zelle mit dem hier angegeben Text.";
                     MehrSpaltenAllegeamacht = true;
                     break;
 
@@ -1105,12 +1105,12 @@ namespace BlueDatabase
                     break;
 
                 case enAction.Sperre_die_Zelle:
-                    r = r + "Diese Aktion sperrt die <b>manuelle</b> Bearbeitung für dieser Zelle.";
+                    r += "Diese Aktion sperrt die <b>manuelle</b> Bearbeitung für dieser Zelle.";
                     MehrSpaltenAllegeamacht = true;
                     break;
 
                 case enAction.Skript:
-                    r = r + " ";
+                    r += " ";
                     //MehrSpaltenAllegeamacht = true;
                     break;
 
@@ -1134,22 +1134,22 @@ namespace BlueDatabase
 
             if (MehrereTexteReichtEiner)
             {
-                r = r + "<br>Werden hier mehrere Textzeilen eingegeben, wird jede Textzeile für sich geprüft. Um <i>WAHR</i> zu sein, reicht es, wenn <b>eine</b> Textzeile zutrifft.";
+                r += "<br>Werden hier mehrere Textzeilen eingegeben, wird jede Textzeile für sich geprüft. Um <i>WAHR</i> zu sein, reicht es, wenn <b>eine</b> Textzeile zutrifft.";
             }
 
             if (EineSpalteWahrUmWahrzusein)
             {
-                r = r + "<br>Werden hier mehrere Spalten ausgewählt, reicht es wenn <b>eine</b> der Spalten <i>WAHR</i> zurückgibt, um <i>WAHR</i> zu sein.";
+                r += "<br>Werden hier mehrere Spalten ausgewählt, reicht es wenn <b>eine</b> der Spalten <i>WAHR</i> zurückgibt, um <i>WAHR</i> zu sein.";
             }
 
             if (MehrTexteAllegeamacht)
             {
-                r = r + "<br>Werden hier mehrere Textzeilen eingegeben, wird jede Textzeile für sich abgearbeitet.";
+                r += "<br>Werden hier mehrere Textzeilen eingegeben, wird jede Textzeile für sich abgearbeitet.";
             }
 
             if (MehrSpaltenAllegeamacht)
             {
-                r = r + "<br>Werden hier mehrere Spalten ausgewählt, werden alle abgearbeitet.";
+                r += "<br>Werden hier mehrere Spalten ausgewählt, werden alle abgearbeitet.";
             }
 
             return r;
@@ -1404,7 +1404,7 @@ namespace BlueDatabase
             {
                 foreach (var t1 in Columns)
                 {
-                    t = t + TrifftZuText(vRow, t1, w);
+                    t += TrifftZuText(vRow, t1, w);
                     if (!string.IsNullOrEmpty(t)) { break; }
                 }
             }
@@ -1430,11 +1430,11 @@ namespace BlueDatabase
             if (!IsBedingung()) { return true; }
 
 
-            string[] w = null;
+            string[] w;
             if (string.IsNullOrEmpty(_Text))
             {
                 w = new string[1]; //MUSS mindestens eines haben, daß auf Leere geprüft werden kann
-                w[0] = "";
+                w[0] = string.Empty;
             }
             else
             {
@@ -1534,7 +1534,7 @@ namespace BlueDatabase
                         }
                         if (Column.MultiLine)
                         {
-                            tmp = tmp + "\r";
+                            tmp += "\r";
                         }
                         return !Column.Database.Cell.GetString(Column, Row).ContainsOnlyChars(tmp);
                     }

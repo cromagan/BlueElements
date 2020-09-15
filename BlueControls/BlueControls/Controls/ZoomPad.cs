@@ -185,11 +185,11 @@ namespace BlueControls.Controls
 
             if (e.Delta > 0)
             {
-                _Zoom = _Zoom * 1.5m;
+                _Zoom *= 1.5m;
             }
             else
             {
-                _Zoom = _Zoom * (1m / 1.5m);
+                _Zoom *= (1m / 1.5m);
             }
 
 

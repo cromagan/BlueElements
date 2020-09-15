@@ -61,7 +61,7 @@ namespace BluePaint
                 return;
             }
 
-            pr = pr / 100;
+            pr /= 100;
 
             var wi = (int)(p.Width * pr);
             var he = (int)(p.Height * pr);
@@ -85,7 +85,7 @@ namespace BluePaint
             var p = OnNeedCurrentPic();
             if (p == null) { return; }
             if (!double.TryParse(flxProzent.Value, out var pr)) { return; }
-            pr = pr / 100;
+            pr /= 100;
 
             var wi = (int)(p.Width * pr);
             var he = (int)(p.Height * pr);

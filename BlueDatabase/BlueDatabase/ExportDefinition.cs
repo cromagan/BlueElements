@@ -388,7 +388,7 @@ namespace BlueDatabase
             }
             else
             {
-                t = t + ", wenn sich was geändert hat";
+                t += ", wenn sich was geändert hat";
             }
 
 
@@ -396,14 +396,14 @@ namespace BlueDatabase
             {
                 if (!string.IsNullOrEmpty(_ExportFormularID))
                 {
-                    t = t + " mit einem gewählten Formular. Einträge werden immer aktualisiert und gelöschte Einträge auch gelöscht.";
+                    t += " mit einem gewählten Formular. Einträge werden immer aktualisiert und gelöschte Einträge auch gelöscht.";
                 }
             }
             else
             {
                 if (_ExportSpaltenAnsicht > 0)
                 {
-                    t = t + " nur bestimmte Spalten.";
+                    t += " nur bestimmte Spalten.";
                 }
 
             }
@@ -411,13 +411,13 @@ namespace BlueDatabase
 
             if (Filter.Count > 0)
             {
-                t = t + " Nur bestimmte Einträge.";
+                t += " Nur bestimmte Einträge.";
             }
 
 
             if (_AutomatischLöschen > 0)
             {
-                t = t + " Automatische Bereinigung.";
+                t += " Automatische Bereinigung.";
             }
 
             return t;
@@ -522,7 +522,7 @@ namespace BlueDatabase
 
             if (_BereitsExportiert.Count > 0)
             {
-                Result = Result + "exp=";
+                Result += "exp=";
                 foreach (var thise in _BereitsExportiert)
                 {
                     if (!string.IsNullOrEmpty(shortener) && thise.StartsWith(shortener))

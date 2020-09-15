@@ -466,25 +466,25 @@ namespace BlueBasics
         {
 
             var C = Name + "|";
-            if (Width > 0) { C = C + Width; }
-            C = C + "|";
-            if (Height > 0 && Width != Height) { C = C + Height; }
-            C = C + "|";
-            if (Effekt != enImageCodeEffect.Ohne) { C = C + (int)Effekt; }
-            C = C + "|";
-            C = C + Färbung;
-            C = C + "|";
-            C = C + ChangeGreenTo;
-            C = C + "|";
-            if (Helligkeit != 100) { C = C + Helligkeit; }
-            C = C + "|";
-            if (Sättigung != 100) { C = C + Sättigung; }
-            C = C + "|";
-            if (Drehwinkel > 0) { C = C + Drehwinkel; }
-            C = C + "|";
-            if (Transparenz > 0) { C = C + Transparenz; }
-            C = C + "|";
-            if (!string.IsNullOrEmpty(Zweitsymbol)) { C = C + Zweitsymbol; }
+            if (Width > 0) { C += Width; }
+            C += "|";
+            if (Height > 0 && Width != Height) { C += Height; }
+            C += "|";
+            if (Effekt != enImageCodeEffect.Ohne) { C += (int)Effekt; }
+            C += "|";
+            C += Färbung;
+            C += "|";
+            C += ChangeGreenTo;
+            C += "|";
+            if (Helligkeit != 100) { C += Helligkeit; }
+            C += "|";
+            if (Sättigung != 100) { C += Sättigung; }
+            C += "|";
+            if (Drehwinkel > 0) { C += Drehwinkel; }
+            C += "|";
+            if (Transparenz > 0) { C += Transparenz; }
+            C += "|";
+            if (!string.IsNullOrEmpty(Zweitsymbol)) { C += Zweitsymbol; }
             return C.TrimEnd('|');
         }
 
