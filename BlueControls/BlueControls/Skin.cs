@@ -81,7 +81,7 @@ namespace BlueControls
         private static ColumnItem col_Verlauf_Mitte = null;
         private static ColumnItem col_Border_Style = null;
 
-        private static ColumnItem col_Status = null;
+        //private static ColumnItem col_Status = null;
         private static ColumnItem col_Font = null;
         private static ColumnItem col_StandardPic = null;
 
@@ -114,7 +114,7 @@ namespace BlueControls
             col_Verlauf_Mitte = SkinDB.Column["Verlauf_Mitte"];
             col_Border_Style = SkinDB.Column["Border_Style"];
 
-            col_Status = SkinDB.Column["Status"];
+            //col_Status = SkinDB.Column["Status"];
             col_Font = SkinDB.Column["Font"];
             col_StandardPic = SkinDB.Column["StandardPic"];
 
@@ -419,7 +419,7 @@ namespace BlueControls
 
         private static void Draw_Back_Verlauf_Vertical_Glanzpunkt(Graphics GR, RowItem Row, Rectangle r)
         {
-            LinearGradientBrush lgb = null;
+
             var cb = new ColorBlend();
 
             var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
@@ -430,7 +430,7 @@ namespace BlueControls
             if (PR < 0.06F) { PR = 0.06F; }
             if (PR > 0.94F) { PR = 0.94F; }
 
-            lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c1);
+            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c1);
 
 
             cb.Colors = new[] { c1, c2, c1, c1, c1.Darken(0.3), c1 };
@@ -457,7 +457,7 @@ namespace BlueControls
 
         private static void Draw_Back_Verlauf_Horizontal_3(Graphics GR, RowItem Row, Rectangle r)
         {
-            LinearGradientBrush lgb = null;
+
             var cb = new ColorBlend();
 
             var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
@@ -466,7 +466,7 @@ namespace BlueControls
             var PR = Value(Row, col_Verlauf_Mitte, 0.5f);
 
 
-            lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Top), c1, c3);
+            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Top), c1, c3);
 
             cb.Colors = new[] { c1, c2, c3 };
             cb.Positions = new[] { 0.0F, PR, 1.0F };
@@ -519,7 +519,7 @@ namespace BlueControls
 
             var col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
 
-            LinearGradientBrush lgb = null;
+
             var cb = new ColorBlend();
 
             var c5 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.Black, 1), 0.4);
@@ -531,7 +531,7 @@ namespace BlueControls
 
             cb.Colors = new[] { c1, c2, c3, c4, c5 };
             cb.Positions = new[] { 0.0F, 0.25F, 0.5F, 0.75F, 1 };
-            lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5)
+            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5)
             {
                 InterpolationColors = cb
             };
@@ -619,13 +619,13 @@ namespace BlueControls
 
 
 
-        private static System.Windows.Forms.Padding Paddings(RowItem Row)
-        {
+        //private static System.Windows.Forms.Padding Paddings(RowItem Row)
+        //{
 
-            return new System.Windows.Forms.Padding(Value(Row, ColX1, 0), Value(Row, ColY1, 0), Value(Row, ColX2, 0), Value(Row, ColY2, 0));
+        //    return new System.Windows.Forms.Padding(Value(Row, ColX1, 0), Value(Row, ColY1, 0), Value(Row, ColX2, 0), Value(Row, ColY2, 0));
 
 
-        }
+        //}
 
         public static void Draw_Border(Graphics GR, RowItem Row, Rectangle r)
         {
@@ -657,8 +657,8 @@ namespace BlueControls
 
 
             // PathX kann durch die ganzen Expand mal zu klein werden, dann wird nothing zurückgegeben
-            GraphicsPath PathX = null;
-            Pen PenX = null;
+            GraphicsPath PathX;
+            Pen PenX;
             try
             {
 
@@ -758,12 +758,11 @@ namespace BlueControls
         private static void Draw_Border_DuoColor(Graphics GR, RowItem Row, Rectangle r, bool NurOben)
         {
 
-            LinearGradientBrush lgb = null;
-            // Dim cb As New ColorBlend
+
             var c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
             var c2 = Color.FromArgb(Value(Row, col_Color_Border_3, 0));
 
-            lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Height), c1, c2)
+            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Height), c1, c2)
             {
                 GammaCorrection = true
             };
@@ -1133,14 +1132,14 @@ namespace BlueControls
 
         private static void Draw_Back_Verlauf_Vertical_3(Graphics GR, RowItem Row, Rectangle r)
         {
-            LinearGradientBrush lgb = null;
+
             var cb = new ColorBlend();
 
             var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
             var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
             var c3 = Color.FromArgb(Value(Row, col_Color_Back_3, 0));
             var PR = Value(Row, col_Verlauf_Mitte, 0.5f);
-            lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c3);
+            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c3);
 
             cb.Colors = new[] { c1, c2, c3 };
             cb.Positions = new[] { 0.0F, PR, 1.0F };

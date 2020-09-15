@@ -188,7 +188,7 @@ namespace BlueControls.Controls
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
         {
             // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
-            DoDraw(e.Graphics, false);
+            DoDraw(e.Graphics);
         }
 
 
@@ -302,7 +302,7 @@ namespace BlueControls.Controls
         public override void Refresh()
         {
             if (IsDisposed) { return; }
-            DoDraw(CreateGraphics(), true);
+            DoDraw(CreateGraphics());
         }
 
 
@@ -330,7 +330,7 @@ namespace BlueControls.Controls
 
 
 
-        private void DoDraw(Graphics GR, bool IgnoreVisible)
+        private void DoDraw(Graphics gr)
         {
             if (Develop.Exited || IsDisposed || !Visible || BeginnEditCounter > 0) { return; }
 
@@ -359,12 +359,12 @@ namespace BlueControls.Controls
                         if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
                         var TMPGR = Graphics.FromImage(_BitmapOfControl);
                         DrawControl(TMPGR, IsStatus());
-                        GR.DrawImage(_BitmapOfControl, 0, 0);
+                        gr.DrawImage(_BitmapOfControl, 0, 0);
                         TMPGR.Dispose();
                     }
                     else
                     {
-                        DrawControl(GR, IsStatus());
+                        DrawControl(gr, IsStatus());
                     }
 
                 }
@@ -381,7 +381,7 @@ namespace BlueControls.Controls
                 {
                     using (var P = new Pen(Color.FromArgb(128, 255, 0, 0)))
                     {
-                        GR.DrawRectangle(P, 0, 0, Width - 1, Height - 1);
+                        gr.DrawRectangle(P, 0, 0, Width - 1, Height - 1);
                     }
                 }
 
