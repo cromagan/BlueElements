@@ -194,6 +194,8 @@ namespace BlueBasics
                     Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
                     return string.Empty;
 
+                case enDataFormat.Button:
+                    return string.Empty;
 
                 default:
                     Develop.DebugPrint(format);
@@ -254,6 +256,9 @@ namespace BlueBasics
                 case enDataFormat.Datum_und_Uhrzeit:
                     return 19;
 
+                case enDataFormat.Button:
+                    return 0;
+
                 default:
                     Develop.DebugPrint(format);
                     return -1;
@@ -279,6 +284,7 @@ namespace BlueBasics
                 case enDataFormat.RelationText:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
+                case enDataFormat.Button:
                     return true;
 
                 case enDataFormat.Datum_und_Uhrzeit:
@@ -326,6 +332,7 @@ namespace BlueBasics
                 case enDataFormat.Bit:
                 case enDataFormat.RelationText:
                 case enDataFormat.Link_To_Filesystem:
+                case enDataFormat.Button:
                     return true;
 
                 case enDataFormat.Datum_und_Uhrzeit:
@@ -366,6 +373,7 @@ namespace BlueBasics
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
                 case enDataFormat.Link_To_Filesystem:
+                case enDataFormat.Button:
                     return true;
 
 

@@ -76,8 +76,11 @@ namespace BlueBasics.Enums
         Columns_für_LinkedCellDropdown = 75,
         Values_für_LinkedCellDropdown = 76,
 
-        RelationText = 77
+        RelationText = 77,
         //KeyForSame = 78
+
+
+        Button = 79
 
         // bis 999 wird geprüft
 

@@ -96,6 +96,7 @@
     <Compile Include="Enums\enViewType.cs" />
     <Compile Include="Enums\enÜberschriftAnordnung.cs" />
     <Compile Include="EventArgs\BeforeNewValueEventArgs.cs" />
+    <Compile Include="EventArgs\ButtonCellEventArgs.cs" />
     <Compile Include="EventArgs\CellCancelEventArgs.cs" />
     <Compile Include="EventArgs\CellDoubleClickEventArgs.cs" />
     <Compile Include="EventArgs\GenerateLayoutInternalEventargs.cs" />

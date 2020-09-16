@@ -149,12 +149,11 @@ namespace BlueDatabase
                     Txt = Txt.Replace("\r", " ");
                     break;
 
-
                 case enDataFormat.BildCode:
+                case enDataFormat.Button:
                     if (CompactView && Style != enShortenStyle.HTML) { return string.Empty; }
                     Txt = LanguageTool.ColumnReplace(Txt, column, Style);
                     break;
-
 
                 case enDataFormat.Bit:
                     if (CompactView && Style != enShortenStyle.HTML) { return string.Empty; }
@@ -278,6 +277,11 @@ namespace BlueDatabase
                     {
                         return QuickImage.Get(enImageCode.Kritisch, 16);
                     }
+
+                case enDataFormat.Button:
+                    if (column == null) { return null; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
+                    if (string.IsNullOrEmpty(Txt)) { return null; }
+                    return  QuickImage.Get("Stern|16");
 
 
                 case enDataFormat.BildCode:

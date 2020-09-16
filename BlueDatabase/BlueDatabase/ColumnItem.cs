@@ -2000,6 +2000,7 @@ namespace BlueDatabase
                 case enDataFormat.LinkedCell: return QuickImage.Get(enImageCode.Fernglas, 16);
                 case enDataFormat.Columns_für_LinkedCellDropdown: return QuickImage.Get(enImageCode.Fernglas, 16, "FF0000", "");
                 case enDataFormat.Values_für_LinkedCellDropdown: return QuickImage.Get(enImageCode.Fernglas, 16, "00FF00", "");
+                case enDataFormat.Button: return QuickImage.Get(enImageCode.Kugel, 16);
             }
 
 
@@ -2141,6 +2142,10 @@ namespace BlueDatabase
 
                 case enDataFormat.Schrift:
                     if (EditType_To_Check == enEditTypeFormula.Font_AuswahlDialog) { return true; }
+                    return false;
+
+                case enDataFormat.Button:
+                    //if (EditType_To_Check == enEditTypeFormula.Button) { return true; }
                     return false;
 
                 default:
@@ -2780,6 +2785,9 @@ namespace BlueDatabase
                 case enDataFormat.Schrift:
                     if (DoDropDown) { return enEditTypeTable.Dropdown_Single; }
                     return enEditTypeTable.Font_AuswahlDialog;
+
+                case enDataFormat.Button:
+                    return enEditTypeTable.None;
 
                 default:
                     if (Format.TextboxEditPossible())

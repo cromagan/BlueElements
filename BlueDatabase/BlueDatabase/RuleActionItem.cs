@@ -1386,7 +1386,7 @@ namespace BlueDatabase
         public string TrifftZuText(RowItem vRow)
         {
 
-            string[] w = null;
+            string[] w;
             if (string.IsNullOrEmpty(_Text))
             {
                 w = new string[1]; //MUSS mindestens eines haben, daß auf Leere geprüft werden kann

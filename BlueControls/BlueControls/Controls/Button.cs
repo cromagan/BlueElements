@@ -625,5 +625,13 @@ namespace BlueControls.Controls
             if (DesignMode) { DisableOtherOptionButtons(); }
         }
 
+        internal static Size StandardSize(string text, QuickImage image)
+        {
+            var s = Skin.FormatedText_NeededSize(text, image, Skin.GetBlueFont(enDesign.Button_CheckBox, enStates.Standard), 16);
+
+            s.Width += 10;
+            s.Height += 4;
+            return s;
+        }
     }
 }

@@ -79,7 +79,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             var F = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
 
-            Width = Math.Max(TXTBox.Width + Skin.Padding * 2, Table.tmpColumnContentWidth(Column, F, 16));
+            Width = Math.Max(TXTBox.Width + Skin.Padding * 2, Table.tmpColumnContentWidth(null, Column, F, 16));
 
             FiltItems.Item.Clear();
             FiltItems.CheckBehavior = enCheckBehavior.MultiSelection;
@@ -98,7 +98,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             var PrefSize = FiltItems.Item.CalculateColumnAndSize();
             FiltItems.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Top;
-            FiltItems.Width = Math.Min(Table.tmpColumnContentWidth(Column, F, 16), Width - Skin.PaddingSmal * 2);
+            FiltItems.Width = Math.Min(Table.tmpColumnContentWidth(null, Column, F, 16), Width - Skin.PaddingSmal * 2);
 
             FiltItems.Width = Math.Max(FiltItems.Width, PrefSize.Width);
             FiltItems.Height = Math.Max(FiltItems.Height, PrefSize.Height);

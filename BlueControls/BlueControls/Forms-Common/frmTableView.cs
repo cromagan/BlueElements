@@ -291,7 +291,7 @@ namespace BlueControls.Forms
 
         private void Neu_Click(object sender, System.EventArgs e)
         {
-            RowItem vRow = null;
+            RowItem vRow;
 
 
             switch (_Database.Column[0].Format)

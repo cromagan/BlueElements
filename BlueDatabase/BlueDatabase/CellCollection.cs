@@ -407,7 +407,7 @@ namespace BlueDatabase
             var keyc = Database.Column.SearchByKey(column.KeyColumnKey); // Schlüsselspalte für diese Spalte bestimmen
             if (keyc is null) { return; }
 
-            List<RowItem> Rows = null;
+            List<RowItem> Rows;
             var ownRow = Database.Row.SearchByKey(rowKey);
             if (keyc.Format == enDataFormat.RelationText)
             {
