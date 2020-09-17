@@ -364,8 +364,6 @@ namespace BlueBasics
 
         public static string TagGet(this ICollection<string> _String, string TagName)
         {
-
-
             if (_String == null) { return string.Empty; }
 
             var uTagName = TagName.ToUpper().Trim();

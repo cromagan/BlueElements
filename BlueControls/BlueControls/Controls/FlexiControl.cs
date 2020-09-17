@@ -935,30 +935,30 @@ namespace BlueControls.Controls
 
         protected void MoveItemBetweenList(ListBox Source, ListBox Target, string Internal)
         {
-            //var SourceItem = Source.Item[Internal];
-            //var TargetItem = Target.Item[Internal];
-
-            //if (SourceItem != null && TargetItem == null)
-            //{
-
-            //    TargetItem_ = SourceItem.CloneToNewCollection(Target.Item);
-            //    //TargetItem = (BasicListItem)SourceItem.Clone();
-            //    //Target.Item.Add(TargetItem);
-            //}
-            //else if (SourceItem == null && TargetItem == null)
-            //{
-            //    TargetItem = new TextListItem(Internal);
-            //    Target.Item.Add(TargetItem);
-            //}
-
             var SourceItem = Source.Item[Internal];
             var TargetItem = Target.Item[Internal];
 
-            if (SourceItem == null && TargetItem == null)
+            if (SourceItem != null && TargetItem == null)
+            {
+
+                SourceItem.CloneToNewCollection(Target.Item);
+                //TargetItem = (BasicListItem)SourceItem.Clone();
+                //Target.Item.Add(TargetItem);
+            }
+            else if (SourceItem == null && TargetItem == null)
             {
                 TargetItem = new TextListItem(Internal);
                 Target.Item.Add(TargetItem);
             }
+
+            //var SourceItem = Source.Item[Internal];
+            //var TargetItem = Target.Item[Internal];
+
+            //if (SourceItem == null && TargetItem == null)
+            //{
+            //    TargetItem = new TextListItem(Internal);
+            //    Target.Item.Add(TargetItem);
+            //}
 
 
 
