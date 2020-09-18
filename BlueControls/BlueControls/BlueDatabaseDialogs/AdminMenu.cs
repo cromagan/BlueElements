@@ -167,7 +167,32 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void OrderAdd_Click(object sender, System.EventArgs e)
         {
-            _TableView.Arrangement_Add();
+            string newname = null;
+
+            var MitVorlage = false;
+
+            if (_TableView.Arrangement > 0)
+            {
+                MitVorlage = Convert.ToBoolean(Forms.MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
+            }
+
+            if (_TableView.Database.ColumnArrangements.Count < 1)
+            {
+                _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, "", ""));
+            }
+
+            if (MitVorlage)
+            {
+                newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
+                if (string.IsNullOrEmpty(newname)) { return; }
+                _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, _TableView.CurrentArrangement.ToString(), newname));
+            }
+            else
+            {
+                newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
+                if (string.IsNullOrEmpty(newname)) { return; }
+                _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, "", newname));
+            }
         }
 
         private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e)
@@ -182,7 +207,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e)
         {
             var n = InputBox.Show("Umbenennen:", _TableView.CurrentArrangement.Name, enDataFormat.Text);
-            if (!string.IsNullOrEmpty(n)) { _TableView.Database.ColumnArrangements[_TableView.Arrangement].Name = n; }
+            if (!string.IsNullOrEmpty(n)) { _TableView.CurrentArrangement.Name = n; }
         }
 
         private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, BasicListItemEventArgs e)

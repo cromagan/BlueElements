@@ -619,7 +619,7 @@ namespace BlueControls.Forms
             // 
             this.Filter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.Filter.Dock = System.Windows.Forms.DockStyle.Top;
-            this.Filter.Filtertypes = ((BlueControls.Enums.enFilterTypesToShow)((BlueControls.Enums.enFilterTypesToShow.SichtbareSpalten_DauerFilter | BlueControls.Enums.enFilterTypesToShow.SichtbareSpalten_AktiveFilter)));
+            this.Filter.Filtertypes = ((BlueControls.Enums.enFilterTypesToShow)((BlueControls.Enums.enFilterTypesToShow.NachDefinierterAnsicht | BlueControls.Enums.enFilterTypesToShow.AktuelleAnsicht_AktiveFilter)));
             this.Filter.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.Nothing;
             this.Filter.Location = new System.Drawing.Point(0, 110);
             this.Filter.Name = "Filter";

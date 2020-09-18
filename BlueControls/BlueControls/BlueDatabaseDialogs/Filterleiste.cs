@@ -6,6 +6,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace BlueControls.BlueDatabaseDialogs
@@ -17,9 +18,11 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private enOrientation _orientation = enOrientation.Waagerecht;
 
-        private enFilterTypesToShow _Filtertypes = enFilterTypesToShow.SichtbareSpalten_DauerFilter_und_Aktive;
+        private enFilterTypesToShow _Filtertypes = enFilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
 
         private bool _isFilling = false;
+
+        private string _AnsichtName = string.Empty;
 
         public Filterleiste()
         {
@@ -42,7 +45,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
         }
 
-        [DefaultValue(enOrientation.Waagerecht)]
+        [DefaultValue(enFilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
         public enFilterTypesToShow Filtertypes
         {
             get
@@ -55,6 +58,21 @@ namespace BlueControls.BlueDatabaseDialogs
                 _Filtertypes = value;
             }
         }
+
+        [DefaultValue("")]
+        public string AnsichtName
+        {
+            get
+            {
+                return _AnsichtName;
+            }
+            set
+            {
+                if (_AnsichtName == value) { return; }
+                _AnsichtName = value;
+            }
+        }
+
 
 
         [DefaultValue((Table)null)]
@@ -75,6 +93,7 @@ namespace BlueControls.BlueDatabaseDialogs
                     _TableView.DatabaseChanged -= _TableView_DatabaseChanged;
                     _TableView.FilterChanged -= _TableView_FilterChanged;
                     _TableView.EnabledChanged -= _TableView_EnabledChanged;
+                    _TableView.ViewChanged -= _TableView_ViewChanged;
                     //ChangeDatabase(null);
                 }
                 _TableView = value;
@@ -89,8 +108,14 @@ namespace BlueControls.BlueDatabaseDialogs
                     //_TableView.ViewChanged += _TableView_ViewChanged;
                     _TableView.FilterChanged += _TableView_FilterChanged;
                     _TableView.EnabledChanged += _TableView_EnabledChanged;
+                    _TableView.ViewChanged += _TableView_ViewChanged;
                 }
             }
+        }
+
+        private void _TableView_ViewChanged(object sender, System.EventArgs e)
+        {
+            FillFilters();
         }
 
         private void _TableView_FilterChanged(object sender, System.EventArgs e)
@@ -202,10 +227,28 @@ namespace BlueControls.BlueDatabaseDialogs
             {
 
                 var columSort = new List<ColumnItem>();
-                var colArrngmt = _TableView?.CurrentArrangement;
+
+                ColumnViewCollection orderArrangement = null;
+
+                foreach (var thisArr in _TableView.Database.ColumnArrangements)
+                {
+                    if (thisArr.Name.ToUpper() == _AnsichtName.ToUpper())
+                    {
+                        orderArrangement = thisArr;
+                    }
+                }
+
+
+                if (orderArrangement is null) { orderArrangement = _TableView?.CurrentArrangement; }
 
                 #region Reihenfolge der Spalten bestimmen
-                foreach (var thisclsVitem in colArrngmt)
+
+                foreach (var thisclsVitem in orderArrangement)
+                {
+                    columSort.AddIfNotExists(thisclsVitem.Column);
+                }
+
+                foreach (var thisclsVitem in _TableView?.CurrentArrangement)
                 {
                     columSort.AddIfNotExists(thisclsVitem.Column);
                 }
@@ -220,25 +263,14 @@ namespace BlueControls.BlueDatabaseDialogs
                 foreach (var thisColumn in columSort)
                 {
                     var ShowMe = false;
-                    var ViewItem = colArrngmt[thisColumn];
+                    var ViewItemOrder = orderArrangement[thisColumn];
+                    var ViewItemCurrent = _TableView.CurrentArrangement[thisColumn];
                     var FilterItem = _TableView.Filter[thisColumn];
 
                     #region Sichtbarkeit des Filterelemts bestimmen
 
-                    if (ViewItem != null)
-                    {
-                        if (_Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_Alle)) { ShowMe = true; }
-                        if (_Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_DauerFilter))
-                        {
-                            if (thisColumn.AutoFilter_Dauerfilter.HasFlag(enDauerfilter.waagerecht) && _orientation == enOrientation.Waagerecht) { ShowMe = true; }
-                            if (thisColumn.AutoFilter_Dauerfilter.HasFlag(enDauerfilter.senkrecht) && _orientation == enOrientation.Senkrecht) { ShowMe = true; }
-                        }
-
-
-                        if (FilterItem != null && _Filtertypes.HasFlag(enFilterTypesToShow.SichtbareSpalten_AktiveFilter)) { ShowMe = true; }
-                    }
-
-                    if (thisColumn.AutoFilter_Dauerfilter.HasFlag(enDauerfilter.senkrechtAuchUnsichtbar) && _orientation == enOrientation.Senkrecht) { ShowMe = true; }
+                    if (ViewItemOrder != null && _Filtertypes.HasFlag(enFilterTypesToShow.NachDefinierterAnsicht)) { ShowMe = true; }
+                    if (ViewItemCurrent != null && _Filtertypes.HasFlag(enFilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { ShowMe = true; }
 
                     #endregion
 

@@ -28,13 +28,14 @@ namespace BlueControls.Enums
 
 
         None = 0,
-        SichtbareSpalten_DauerFilter = 1,
-        SichtbareSpalten_AktiveFilter = 2,
-        SichtbareSpalten_Alle = 8,
+        NachDefinierterAnsicht = 1,
+        AktuelleAnsicht_AktiveFilter = 2,
+        NachDefinierterAnsichtStepByStep = 4,
 
 
 
-        SichtbareSpalten_DauerFilter_und_Aktive = SichtbareSpalten_DauerFilter | SichtbareSpalten_AktiveFilter
+
+        DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter = NachDefinierterAnsicht | AktuelleAnsicht_AktiveFilter
 
     }
 }

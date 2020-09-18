@@ -77,7 +77,6 @@
     <Compile Include="Enums\enItemState.cs" />
     <Compile Include="Enums\enAction.cs" />
     <Compile Include="Enums\enFilterType.cs" />
-    <Compile Include="Enums\enDauerfilter.cs" />
     <Compile Include="Enums\enShortenStyle.cs" />
     <Compile Include="Enums\enValueType.cs" />
     <Compile Include="Enums\enVerwaisteDaten.cs" />

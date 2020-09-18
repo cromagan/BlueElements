@@ -487,7 +487,7 @@ namespace BlueControls.Controls
 
             var lfdno = 0;
 
-            foreach (var ViewItem in _Database.ColumnArrangements[_ArrangementNr])
+            foreach (var ViewItem in CurrentArrangement)
             {
 
 
@@ -540,7 +540,7 @@ namespace BlueControls.Controls
 
 
             //  Neue Zeile 
-            if (UserEdit_NewRowAllowed() && ViewItem == _Database.ColumnArrangements[_ArrangementNr][Database.Column[0]])
+            if (UserEdit_NewRowAllowed() && ViewItem == CurrentArrangement[Database.Column[0]])
             {
                 Skin.Draw_FormatedText(GR, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, Pix16), enAlignment.Left, new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)ViewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font, Translate);
             }
@@ -637,7 +637,7 @@ namespace BlueControls.Controls
 
                 /// Maximale Rechten Pixel der Permanenten Columns ermitteln
                 var PermaX = 0;
-                foreach (var ViewItem in _Database.ColumnArrangements[_ArrangementNr])
+                foreach (var ViewItem in CurrentArrangement)
                 {
                     if (ViewItem != null && ViewItem.Column != null && ViewItem.ViewType == enViewType.PermanentColumn)
                     {
@@ -728,11 +728,13 @@ namespace BlueControls.Controls
 
             var PermaX = 0;
 
-            for (var X = 0; X < _Database.ColumnArrangements[_ArrangementNr].Count() + 1; X++)
+            var ca = CurrentArrangement;
+
+            for (var X = 0; X < ca.Count() + 1; X++)
             {
-                if (X < _Database.ColumnArrangements[_ArrangementNr].Count())
+                if (X < ca.Count())
                 {
-                    ViewItem = _Database.ColumnArrangements[_ArrangementNr][X];
+                    ViewItem = ca[X];
                 }
                 else
                 {
@@ -1382,14 +1384,14 @@ namespace BlueControls.Controls
 
             if (string.IsNullOrEmpty(Filename)) { Filename = TempFile("", "", "html"); }
 
-            _Database.Export_HTML(Filename, _Database.ColumnArrangements[_ArrangementNr], SortedRows(), Execute);
+            _Database.Export_HTML(Filename, CurrentArrangement, SortedRows(), Execute);
         }
 
 
         public string Export_CSV(enFirstRow FirstRow)
         {
             if (_Database == null) { return string.Empty; }
-            return _Database.Export_CSV(FirstRow, _Database.ColumnArrangements[_ArrangementNr], SortedRows());
+            return _Database.Export_CSV(FirstRow, CurrentArrangement, SortedRows());
         }
 
 
@@ -1530,7 +1532,7 @@ namespace BlueControls.Controls
                 return; // Klick ins Leere
             }
 
-            var ViewItem = _Database.ColumnArrangements[_ArrangementNr][cellInThisDatabaseColumn];
+            var ViewItem = CurrentArrangement[cellInThisDatabaseColumn];
 
 
             if (ViewItem == null)
@@ -1749,7 +1751,7 @@ namespace BlueControls.Controls
             }
 
 
-            var ViewItemx = _Database.ColumnArrangements[_ArrangementNr][cellInThisDatabaseColumn];
+            var ViewItemx = CurrentArrangement[cellInThisDatabaseColumn];
 
             if (ContentHolderCellRow != null)
             {
@@ -2029,7 +2031,7 @@ namespace BlueControls.Controls
 
 
 
-                foreach (var ThisViewItem in _Database.ColumnArrangements[_ArrangementNr])
+                foreach (var ThisViewItem in CurrentArrangement)
                 {
                     if (ThisViewItem != null)
                     {
@@ -2050,7 +2052,7 @@ namespace BlueControls.Controls
                 var wdh = true;
 
                 // Spalten berechnen
-                foreach (var ThisViewItem in _Database.ColumnArrangements[_ArrangementNr])
+                foreach (var ThisViewItem in CurrentArrangement)
                 {
                     if (ThisViewItem?.Column != null)
                     {
@@ -2134,7 +2136,7 @@ namespace BlueControls.Controls
             }
 
 
-            var prev = ThisViewItem.PreviewsVisible(_Database.ColumnArrangements[_ArrangementNr]);
+            var prev = ThisViewItem.PreviewsVisible(CurrentArrangement);
 
             if (prev == null) { return true; }
             return Convert.ToBoolean(prev.ViewType == enViewType.PermanentColumn);
@@ -2151,7 +2153,7 @@ namespace BlueControls.Controls
             }
 
 
-            var NX = ThisViewItem.NextVisible(_Database.ColumnArrangements[_ArrangementNr]);
+            var NX = ThisViewItem.NextVisible(CurrentArrangement);
 
             if (NX == null) { return true; }
             return Convert.ToBoolean(NX.ViewType != enViewType.PermanentColumn);
@@ -2453,7 +2455,7 @@ namespace BlueControls.Controls
                 {
                     if (_ArrangementNr != 1)
                     {
-                        if (_Database.ColumnArrangements == null || _ArrangementNr >= _Database.ColumnArrangements.Count || _Database.ColumnArrangements[_ArrangementNr] == null || !_Database.PermissionCheck(_Database.ColumnArrangements[_ArrangementNr].PermissionGroups_Show, null))
+                        if (_Database.ColumnArrangements == null || _ArrangementNr >= _Database.ColumnArrangements.Count || CurrentArrangement == null || !_Database.PermissionCheck(CurrentArrangement.PermissionGroups_Show, null))
                         {
                             _ArrangementNr = 1;
                         }
@@ -2930,7 +2932,7 @@ namespace BlueControls.Controls
 
                 if (_MouseOverColumn != null)
                 {
-                    ViewItem = _Database.ColumnArrangements[_ArrangementNr][_MouseOverColumn];
+                    ViewItem = CurrentArrangement[_MouseOverColumn];
                 }
 
 
@@ -3073,7 +3075,7 @@ namespace BlueControls.Controls
             if (column != null) { column = Database.Column.SearchByKey(column.Key); }
             if (row != null) { row = Database.Row.SearchByKey(row.Key); }
 
-            if (_Database.ColumnArrangements.Count == 0 || _Database.ColumnArrangements[_ArrangementNr][column] == null || !SortedRows().Contains(row))
+            if (_Database.ColumnArrangements.Count == 0 || CurrentArrangement[column] == null || !SortedRows().Contains(row))
             {
                 column = null;
                 row = null;
@@ -3233,7 +3235,7 @@ namespace BlueControls.Controls
             }
 
 
-            foreach (var thiscol in _Database.ColumnArrangements[_ArrangementNr])
+            foreach (var thiscol in CurrentArrangement)
             {
                 if (thiscol._TMP_Reduced) { x = x + ", Reduced=" + thiscol.Column.Key.ToString(); }
             }
@@ -3292,7 +3294,7 @@ namespace BlueControls.Controls
 
                     case "reduced":
                         var c = _Database.Column.SearchByKey(int.Parse(pair.Value));
-                        var cv = _Database.ColumnArrangements[_ArrangementNr][c];
+                        var cv = CurrentArrangement[c];
                         if (cv != null) { cv._TMP_Reduced = true; }
                         break;
 
@@ -3337,52 +3339,6 @@ namespace BlueControls.Controls
         #endregion
 
 
-
-        #region  Arrangement Only 
-
-
-
-
-
-
-
-
-
-
-        public void Arrangement_Add()
-        {
-            string e = null;
-
-            var MitVorlage = false;
-
-            if (_ArrangementNr > 0)
-            {
-                MitVorlage = Convert.ToBoolean(Forms.MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
-            }
-
-            if (_Database.ColumnArrangements.Count < 1)
-            {
-                _Database.ColumnArrangements.Add(new ColumnViewCollection(_Database, "", ""));
-            }
-
-            if (MitVorlage)
-            {
-                e = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
-                if (string.IsNullOrEmpty(e)) { return; }
-                _Database.ColumnArrangements.Add(new ColumnViewCollection(_Database, _Database.ColumnArrangements[_ArrangementNr].ToString(), e));
-            }
-            else
-            {
-                e = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
-                if (string.IsNullOrEmpty(e)) { return; }
-                _Database.ColumnArrangements.Add(new ColumnViewCollection(_Database, "", e));
-            }
-
-            //Invalidatex_ExternalContols();
-        }
-
-        #endregion
-
         public bool EnsureVisible(string CellKey)
         {
             Database.Cell.DataOfCellKey(CellKey, out var column, out var row);
@@ -3391,7 +3347,7 @@ namespace BlueControls.Controls
 
         public bool EnsureVisible(ColumnItem Column, RowItem Row)
         {
-            var ok1 = EnsureVisible(_Database.ColumnArrangements[_ArrangementNr][Column]);
+            var ok1 = EnsureVisible(CurrentArrangement[Column]);
             var ok2 = EnsureVisible(Row);
             return ok1 && ok2;
         }
@@ -3479,10 +3435,7 @@ namespace BlueControls.Controls
             get
             {
                 if (_Database == null) { return null; }
-
                 return _Database.ColumnArrangements[_ArrangementNr];
-
-
             }
         }
 
@@ -3497,7 +3450,7 @@ namespace BlueControls.Controls
         {
             if (_Database == null || _Database.ColumnArrangements.Count - 1 < _ArrangementNr) { return null; }
 
-            foreach (var ThisViewItem in _Database.ColumnArrangements[_ArrangementNr])
+            foreach (var ThisViewItem in CurrentArrangement)
             {
 
                 if (ThisViewItem?.Column != null)
@@ -3526,7 +3479,7 @@ namespace BlueControls.Controls
             }
 
 
-            if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead || _Database.ColumnArrangements[_ArrangementNr].Count() - 1 < 0)
+            if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead || CurrentArrangement.Count() - 1 < 0)
             {
                 _HeadSize = 0;
                 return 0;
@@ -3535,7 +3488,7 @@ namespace BlueControls.Controls
 
             _HeadSize = 16;
 
-            foreach (var ThisViewItem in _Database.ColumnArrangements[_ArrangementNr])
+            foreach (var ThisViewItem in CurrentArrangement)
             {
                 if (ThisViewItem?.Column != null)
                 {
@@ -3573,7 +3526,7 @@ namespace BlueControls.Controls
 
         private bool IsOnScreen(ColumnItem Column, RowItem Row, Rectangle displayRectangleWOSlider)
         {
-            if (!IsOnScreen(_Database.ColumnArrangements[_ArrangementNr][Column], displayRectangleWOSlider)) { return false; }
+            if (!IsOnScreen(CurrentArrangement[Column], displayRectangleWOSlider)) { return false; }
             if (!IsOnScreen(Row, displayRectangleWOSlider)) { return false; }
             return true;
         }
@@ -3666,7 +3619,7 @@ namespace BlueControls.Controls
             if (vrow.TMP_DrawHeight != null) { return (int)vrow.TMP_DrawHeight; }
             var tmp = Pix18;
 
-            foreach (var ThisViewItem in _Database.ColumnArrangements[_ArrangementNr])
+            foreach (var ThisViewItem in CurrentArrangement)
             {
                 if (ThisViewItem?.Column != null)
                 {
@@ -3855,26 +3808,20 @@ namespace BlueControls.Controls
             }
             else
             {
-
                 if (_ArrangementNr < _Database.ColumnArrangements.Count - 1)
                 {
-
-                    foreach (var ThisViewItem in _Database.ColumnArrangements[_ArrangementNr])
+                    foreach (var ThisViewItem in CurrentArrangement)
                     {
                         Invalidate_DrawWidth(ThisViewItem);
                     }
-
                 }
-
             }
-
-
         }
 
 
         private void Invalidatex_DrawWidth(ColumnItem vcolumn)
         {
-            Invalidate_DrawWidth(_Database.ColumnArrangements[_ArrangementNr][vcolumn]);
+            Invalidate_DrawWidth(CurrentArrangement[vcolumn]);
         }
         private void Invalidate_DrawWidth(ColumnViewItem ViewItem)
         {
@@ -3954,17 +3901,17 @@ namespace BlueControls.Controls
             {
                 if (Convert.ToBoolean(Direction & enDirection.Links))
                 {
-                    if (_Database.ColumnArrangements[_ArrangementNr].PreviousVisible(NewColumn) != null)
+                    if (CurrentArrangement.PreviousVisible(NewColumn) != null)
                     {
-                        NewColumn = _Database.ColumnArrangements[_ArrangementNr].PreviousVisible(NewColumn);
+                        NewColumn = CurrentArrangement.PreviousVisible(NewColumn);
                     }
                 }
 
                 if (Convert.ToBoolean(Direction & enDirection.Rechts))
                 {
-                    if (_Database.ColumnArrangements[_ArrangementNr].NextVisible(NewColumn) != null)
+                    if (CurrentArrangement.NextVisible(NewColumn) != null)
                     {
-                        NewColumn = _Database.ColumnArrangements[_ArrangementNr].NextVisible(NewColumn);
+                        NewColumn = CurrentArrangement.NextVisible(NewColumn);
                     }
                 }
             }
@@ -4052,7 +3999,7 @@ namespace BlueControls.Controls
             if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) { return false; }
             if (_Database.ColumnArrangements.Count == 0) { return false; }
 
-            if (_Database.ColumnArrangements[_ArrangementNr][_Database.Column[0]] == null) { return false; }
+            if (CurrentArrangement[_Database.Column[0]] == null) { return false; }
             if (!_Database.PermissionCheck(_Database.PermissionGroups_NewRow, null)) { return false; }
 
             if (!CellCollection.UserEditPossible(_Database.Column[0], null, enErrorReason.EditNormaly)) { return false; }
@@ -4416,7 +4363,7 @@ namespace BlueControls.Controls
         {
             searchTXT = searchTXT.Trim();
 
-            var ca = TableView.Database.ColumnArrangements[TableView.Arrangement];
+            var ca = TableView.CurrentArrangement;
 
 
             if (TableView.Design == enBlueTableAppearance.OnlyMainColumnWithoutHead)

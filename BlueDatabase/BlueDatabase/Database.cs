@@ -783,16 +783,11 @@ namespace BlueDatabase
                 if (Views.Count > 1 && !Views[1].PermissionGroups_Show.Contains("#Everybody")) { Views[1].PermissionGroups_Show.Add("#Everybody"); }
             }
 
-
-
             for (var z = 0; z < Layouts.Count; z++)
             {
-
                 if (!Layouts[z].StartsWith("{ID=#"))
                 {
-
                     Layouts[z] = "{ID=#Converted" + z.ToString() + ", " + Layouts[z].Substring(1);
-
                 }
             }
         }
@@ -1106,15 +1101,11 @@ namespace BlueDatabase
         public override void RepairAfterParse()
         {
 
-            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             // System-Spalten checken und alte Formate auf neuen Stand bringen
             Column.Repair();
 
             // Evtl. Defekte Rows reparieren
             Row.Repair();
-
-            //// Regeln prüfen lassen
-            //CheckRules();
 
             //Defekte Ansichten reparieren - Teil 1
             for (var z = 0; z <= 1; z++)
@@ -1124,23 +1115,44 @@ namespace BlueDatabase
                     ColumnArrangements.Add(new ColumnViewCollection(this, ""));
                 }
 
-                if (z == 0 || ColumnArrangements[z].Count() < 1)
-                {
-                    ColumnArrangements[z].ShowAllColumns(this);
-                }
+
+
                 if (string.IsNullOrEmpty(ColumnArrangements[z].Name))
                 {
                     switch (z)
                     {
                         case 0:
                             ColumnArrangements[z].Name = "Alle Spalten";
+                            if (ColumnArrangements[z].Count() < 1) { ColumnArrangements[z].ShowAllColumns(this); }
                             break;
                         case 1:
                             ColumnArrangements[z].Name = "Standard";
+                            if (!ColumnArrangements[z].PermissionGroups_Show.Contains("#Everybody")) { ColumnArrangements[z].PermissionGroups_Show.Add("#Everybody"); }
                             break;
+
+                        //case 2:
+                        //    if (ColumnArrangements[z].Name != "Filter waagerecht" && !string.IsNullOrEmpty(ColumnArrangements[z].Name))
+                        //    {
+                        //        ColumnArrangements.Add(new ColumnViewCollection(this, ""));
+                        //        ColumnArrangements.Swap(z, ColumnArrangements.Count - 1);
+                        //    }
+
+                        //    ColumnArrangements[z].Name = "Filter waagerecht";
+                        //    break;
+
+                        //case 3:
+                        //    if (ColumnArrangements[z].Name != "Filter senkrecht" && !string.IsNullOrEmpty(ColumnArrangements[z].Name))
+                        //    {
+                        //        ColumnArrangements.Add(new ColumnViewCollection(this, ""));
+                        //        ColumnArrangements.Swap(z, ColumnArrangements.Count - 1);
+                        //    }
+
+                        //    ColumnArrangements[z].Name = "Filter senkrecht";
+                        //    break;
+
                     }
                 }
-                if (z == 1 && !ColumnArrangements[z].PermissionGroups_Show.Contains("#Everybody")) { ColumnArrangements[z].PermissionGroups_Show.Add("#Everybody"); }
+
                 ColumnArrangements[z].PermissionGroups_Show.RemoveString("#Administrator", false);
             }
 

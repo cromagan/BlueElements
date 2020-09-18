@@ -93,11 +93,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabFilter = new BlueControls.Controls.TabPage();
             this.capDauerfilterPos = new BlueControls.Controls.Caption();
             this.txbDauerFilterPos = new BlueControls.Controls.TextBox();
-            this.cap_Intelligenter_Multifilter = new BlueControls.Controls.Caption();
-            this.capDauerFilter = new BlueControls.Controls.Caption();
-            this.cbxDauerFilter = new BlueControls.Controls.ComboBox();
             this.Caption10 = new BlueControls.Controls.Caption();
-            this.txbIntelligenter_Multifilter = new BlueControls.Controls.TextBox();
             this.tbxJoker = new BlueControls.Controls.TextBox();
             this.ZeilenFilter = new BlueControls.Controls.Button();
             this.AutoFilterMöglich = new BlueControls.Controls.Button();
@@ -803,11 +799,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabFilter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabFilter.Controls.Add(this.capDauerfilterPos);
             this.tabFilter.Controls.Add(this.txbDauerFilterPos);
-            this.tabFilter.Controls.Add(this.cap_Intelligenter_Multifilter);
-            this.tabFilter.Controls.Add(this.capDauerFilter);
-            this.tabFilter.Controls.Add(this.cbxDauerFilter);
             this.tabFilter.Controls.Add(this.Caption10);
-            this.tabFilter.Controls.Add(this.txbIntelligenter_Multifilter);
             this.tabFilter.Controls.Add(this.tbxJoker);
             this.tabFilter.Controls.Add(this.ZeilenFilter);
             this.tabFilter.Controls.Add(this.AutoFilterMöglich);
@@ -835,29 +827,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbDauerFilterPos.Size = new System.Drawing.Size(384, 24);
             this.txbDauerFilterPos.TabIndex = 33;
             // 
-            // cap_Intelligenter_Multifilter
-            // 
-            this.cap_Intelligenter_Multifilter.Location = new System.Drawing.Point(8, 216);
-            this.cap_Intelligenter_Multifilter.Name = "cap_Intelligenter_Multifilter";
-            this.cap_Intelligenter_Multifilter.Size = new System.Drawing.Size(144, 24);
-            this.cap_Intelligenter_Multifilter.Text = "Inteligenter Multifilter:";
-            // 
-            // capDauerFilter
-            // 
-            this.capDauerFilter.Location = new System.Drawing.Point(8, 264);
-            this.capDauerFilter.Name = "capDauerFilter";
-            this.capDauerFilter.Size = new System.Drawing.Size(144, 24);
-            this.capDauerFilter.Text = "Dauerfilter-Anzeige:";
-            // 
-            // cbxDauerFilter
-            // 
-            this.cbxDauerFilter.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxDauerFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxDauerFilter.Location = new System.Drawing.Point(160, 264);
-            this.cbxDauerFilter.Name = "cbxDauerFilter";
-            this.cbxDauerFilter.Size = new System.Drawing.Size(384, 24);
-            this.cbxDauerFilter.TabIndex = 32;
-            // 
             // Caption10
             // 
             this.Caption10.Location = new System.Drawing.Point(8, 104);
@@ -866,14 +835,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption10.Text = "Bei Autofilter-Aktionen, Zellen mit folgenden Inhalt <b>immer</b> anzeigen, wenn " +
     "ein Wert gewählt wurde:<br>(Joker)";
             this.Caption10.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // txbIntelligenter_Multifilter
-            // 
-            this.txbIntelligenter_Multifilter.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbIntelligenter_Multifilter.Location = new System.Drawing.Point(160, 216);
-            this.txbIntelligenter_Multifilter.Name = "txbIntelligenter_Multifilter";
-            this.txbIntelligenter_Multifilter.Size = new System.Drawing.Size(384, 24);
-            this.txbIntelligenter_Multifilter.TabIndex = 7;
             // 
             // tbxJoker
             // 
@@ -1641,10 +1602,6 @@ namespace BlueControls.BlueDatabaseDialogs
             private TextBox txbAutoRemove;
             private Caption capAutoRemove;
             private Button butSaveContent;
-        private Caption capDauerFilter;
-        private ComboBox cbxDauerFilter;
-        private Caption cap_Intelligenter_Multifilter;
-        private TextBox txbIntelligenter_Multifilter;
         private Caption capDauerfilterPos;
         private TextBox txbDauerFilterPos;
         private Caption capIntern;

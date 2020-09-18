@@ -509,7 +509,7 @@ namespace BlueDatabase
             c.Ueberschrift3 = Source.Ueberschrift3;
 
             c.Suffix = Source.Suffix;
-            c.Intelligenter_Multifilter = Source.Intelligenter_Multifilter;
+            //c.Intelligenter_Multifilter = Source.Intelligenter_Multifilter;
 
             c.DauerFilterPos = new Point(Source.DauerFilterPos.X, Source.DauerFilterPos.Y);
 
