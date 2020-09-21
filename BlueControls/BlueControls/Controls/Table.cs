@@ -563,7 +563,7 @@ namespace BlueControls.Controls
                     if (Drawn != ToDraw)
                     {
 
-                        if (y - 2 < HeadSize() && Zei < SortedRows().Count)
+                        if (y - 2 < HeadSize() && Zei < (SortedRows().Count-1))
                         {
                             if (Database.Cell.GetStringBehindLinkedValue(ViewItem.Column, SortedRows()[Zei + 1]) == ToDraw)
                             {

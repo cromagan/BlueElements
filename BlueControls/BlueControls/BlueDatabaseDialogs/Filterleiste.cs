@@ -6,7 +6,6 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace BlueControls.BlueDatabaseDialogs
@@ -154,21 +153,31 @@ namespace BlueControls.BlueDatabaseDialogs
             var toppos = 0;
             var leftpos = 0;
             var constwi = 0;
+            var consthe = btnAlleFilterAus.Height;
             var down = 0;
             var right = 0;
             var anchor = System.Windows.Forms.AnchorStyles.None;
             var showPic = false;
 
 
+            var breakafter = -1;
+            var beginnx = -1;
+            var afterBreakAddY = -1;
+
+
             #region Variablen für Waagerecht / Senkrecht bestimmen
             if (_orientation == enOrientation.Waagerecht)
             {
+
                 toppos = btnAlleFilterAus.Top;
-                leftpos = btnPinZurück.Right + Skin.Padding * 3;
+                beginnx = btnPinZurück.Right + Skin.Padding * 3;
+                leftpos = beginnx;
                 constwi = (int)(txbZeilenFilter.Width * 1.5);
                 right = constwi + Skin.PaddingSmal;
                 anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
                 down = 0;
+                breakafter = btnAdmin.Left;
+                afterBreakAddY = txbZeilenFilter.Height + Skin.Padding;
             }
             else
             {
@@ -270,7 +279,7 @@ namespace BlueControls.BlueDatabaseDialogs
                     #region Sichtbarkeit des Filterelemts bestimmen
 
                     if (ViewItemOrder != null && _Filtertypes.HasFlag(enFilterTypesToShow.NachDefinierterAnsicht)) { ShowMe = true; }
-                    if (ViewItemCurrent != null && _Filtertypes.HasFlag(enFilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { ShowMe = true; }
+                    if (ViewItemCurrent != null && FilterItem != null && _Filtertypes.HasFlag(enFilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { ShowMe = true; }
 
                     #endregion
 
@@ -302,7 +311,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
                         if (showPic && !FilterItem.Column.DauerFilterPos.IsEmpty)
                         {
-                            flx.Height = btnAlleFilterAus.Height * 2;
+                            flx.Height = consthe * 2;
 
 
                             if (flx.GetComboBox() is ComboBox cbx)
@@ -339,11 +348,16 @@ namespace BlueControls.BlueDatabaseDialogs
                         }
                         else
                         {
+                            if (breakafter > 0 && leftpos + constwi > breakafter)
+                            {
+                                leftpos = beginnx;
+                                toppos += afterBreakAddY;
+                            }
 
                             flx.Top = toppos;
                             flx.Left = leftpos;
                             flx.Width = constwi;
-                            flx.Height = btnAlleFilterAus.Height;
+                            flx.Height = consthe;
                             flx.Anchor = anchor;
                             toppos += down;
                             leftpos += right;
@@ -507,19 +521,13 @@ namespace BlueControls.BlueDatabaseDialogs
                 return;
             }
 
-
-
             _TableView.Filter.RowFilterText = newF;
-
         }
-
-
 
         private void btnAlleFilterAus_Click(object sender, System.EventArgs e)
         {
             if (_TableView.Database != null) { _TableView.Filter.Clear(); }
         }
-
 
         private void btnTextLöschen_Click(object sender, System.EventArgs e)
         {
@@ -541,7 +549,6 @@ namespace BlueControls.BlueDatabaseDialogs
         {
             if (_TableView == null) { return; }
             _TableView.Pin(_TableView.SortedRows());
-
         }
 
         private void btnAdmin_Click(object sender, System.EventArgs e)
@@ -551,19 +558,11 @@ namespace BlueControls.BlueDatabaseDialogs
             x.ShowDialog();
             x.Dispose();
             Database.SaveAll(false);
-
-
         }
 
         private void Filterleiste_SizeChanged(object sender, System.EventArgs e)
         {
-
-
-            if (pic.Visible)
-            {
-                FillFilters();
-            }
-
+            if (pic.Visible || _orientation == enOrientation.Waagerecht) { FillFilters(); }
         }
     }
 }

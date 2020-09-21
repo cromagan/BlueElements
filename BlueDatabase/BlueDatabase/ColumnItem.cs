@@ -2026,7 +2026,30 @@ namespace BlueDatabase
                 {
                     if (ThisColumnItem != this && ThisColumnItem.Caption.ToUpper() == _Caption.ToUpper())
                     {
-                        ret = _Caption + " (" + _Name + ")";
+                        var done = false;
+                        if (!string.IsNullOrEmpty(_Ueberschrift3))
+                        {
+                            ret = _Ueberschrift3 + "/" + ret;
+                            done = true;
+                        }
+                        if (!string.IsNullOrEmpty(_Ueberschrift2))
+                        {
+                            ret = _Ueberschrift2 + "/" + ret;
+                            done = true;
+                        }
+
+                        if (!string.IsNullOrEmpty(_Ueberschrift1))
+                        {
+                            ret = _Ueberschrift1 + "/" + ret;
+                            done = true;
+                        }
+
+                        if (!done)
+                        {
+                            ret = _Name; //_Caption + " (" + _Name + ")";
+                        }
+
+
                         break;
                     }
                 }
