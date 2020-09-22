@@ -221,7 +221,6 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             txbZeichenkette.Text = _Column.LinkedCell_ColumnValueAdd;
-            butZusammenfassen.Checked = _Column.ZellenZusammenfassen;
             txbSortMask.Text = _Column.SortMask;
 
             txbAutoRemove.Text = _Column.AutoRemove;
@@ -554,7 +553,6 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             _Column.LinkedCell_ColumnValueAdd = txbZeichenkette.Text;
-            _Column.ZellenZusammenfassen = butZusammenfassen.Checked;
             _Column.DropdownKey = ColumKeyFrom(_Column.Database, cbxDropDownKey.Text);
             _Column.VorschlagsColumn = ColumKeyFrom(_Column.Database, cbxVorschlagSpalte.Text);
             _Column.Align = (enAlignmentHorizontal)int.Parse(cbxAlign.Text);

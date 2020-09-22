@@ -268,7 +268,7 @@ namespace BlueDatabase
 
         public void Repair()
         {
-            var ColN = 0;
+
             var w = new List<string>
             {
                 "System: Chapter",
@@ -334,7 +334,7 @@ namespace BlueDatabase
 
 
             // Reihengolge reparieren
-            ColN = -1;
+            var ColN = -1;
             do
             {
                 ColN += 1;
@@ -483,7 +483,7 @@ namespace BlueDatabase
             c.LinkedCell_ColumnKey = Source.LinkedCell_ColumnKey;
             c.LinkedCell_ColumnValueFoundIn = Source.LinkedCell_ColumnValueFoundIn;
             c.LinkedCell_ColumnValueAdd = Source.LinkedCell_ColumnValueAdd;
-            c.ZellenZusammenfassen = Source.ZellenZusammenfassen;
+            //c.ZellenZusammenfassen = Source.ZellenZusammenfassen;
             c.DropdownKey = Source.DropdownKey;
             c.VorschlagsColumn = Source.VorschlagsColumn;
             c.Align = Source.Align;

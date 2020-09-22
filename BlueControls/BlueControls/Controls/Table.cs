@@ -556,35 +556,35 @@ namespace BlueControls.Controls
                 var y = (int)CurrentRow.TMP_Y;
                 GR.SmoothingMode = SmoothingMode.None;
 
-                if (ViewItem.Column.ZellenZusammenfassen)
-                {
-                    var ToDraw = Database.Cell.GetStringBehindLinkedValue(ViewItem.Column, CurrentRow);
+                //if (ViewItem.Column.ZellenZusammenfassen)
+                //{
+                //    var ToDraw = Database.Cell.GetStringBehindLinkedValue(ViewItem.Column, CurrentRow);
 
-                    if (Drawn != ToDraw)
-                    {
+                //    if (Drawn != ToDraw)
+                //    {
 
-                        if (y - 2 < HeadSize() && Zei < (SortedRows().Count-1))
-                        {
-                            if (Database.Cell.GetStringBehindLinkedValue(ViewItem.Column, SortedRows()[Zei + 1]) == ToDraw)
-                            {
-                                y = HeadSize();
-                            }
-                        }
+                //        if (y - 2 < HeadSize() && Zei < (SortedRows().Count - 1))
+                //        {
+                //            if (Database.Cell.GetStringBehindLinkedValue(ViewItem.Column, SortedRows()[Zei + 1]) == ToDraw)
+                //            {
+                //                y = HeadSize();
+                //            }
+                //        }
 
-                        // Zeilenlinie Zeichnen
-                        GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 1, y);
-                        // Zelleninhalt Zeichnen
-                        Draw_CellTransparent(GR, ViewItem, CurrentRow, y, displayRectangleWOSlider, _Cell_Font);
-                        Drawn = ToDraw;
-                    }
-                }
-                else
-                {
-                    // Zeilenlinie Zeichnen
-                    GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 1, y);
-                    // Zelleninhalt Zeichnen
-                    Draw_CellTransparent(GR, ViewItem, CurrentRow, y, displayRectangleWOSlider, _Cell_Font);
-                }
+                //        // Zeilenlinie Zeichnen
+                //        GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 1, y);
+                //        // Zelleninhalt Zeichnen
+                //        Draw_CellTransparent(GR, ViewItem, CurrentRow, y, displayRectangleWOSlider, _Cell_Font);
+                //        Drawn = ToDraw;
+                //    }
+                //}
+                //else
+                //{
+                // Zeilenlinie Zeichnen
+                GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 1, y);
+                // Zelleninhalt Zeichnen
+                Draw_CellTransparent(GR, ViewItem, CurrentRow, y, displayRectangleWOSlider, _Cell_Font);
+                //}
 
 
                 if (lfdno == 1)
@@ -964,7 +964,7 @@ namespace BlueControls.Controls
 
             var r = new Rectangle((int)cellInThisDatabaseColumn.OrderTMP_Spalte_X1,
                        rowY,
-                      drawColumnWidth, 
+                      drawColumnWidth,
                       Math.Min(drawRowHeight, 24));
 
 
@@ -3210,13 +3210,12 @@ namespace BlueControls.Controls
         #region  Store and Restore View 
         public string ViewToString()
         {
-            string tmp = null;
 
             var x = "{";
             //   x = x & "<Filename>" & _Database.Filename
             x = x + "ArrangementNr=" + _ArrangementNr;
 
-            tmp = Filter.ToString();
+            var tmp = Filter.ToString();
 
             if (tmp.Length > 2)
             {
@@ -4210,10 +4209,9 @@ namespace BlueControls.Controls
                 else
                 {
 
-                    var TMPSize = Size.Empty;
                     foreach (var ThisString in TMP)
                     {
-                        TMPSize = FormatedText_NeededSize(Column, ThisString, CellFont, enShortenStyle.Replaced, Pix16);
+                        var TMPSize = FormatedText_NeededSize(Column, ThisString, CellFont, enShortenStyle.Replaced, Pix16);
                         _ContentSize.Width = Math.Max(TMPSize.Width, _ContentSize.Width);
                         _ContentSize.Height += Math.Max(TMPSize.Height, Pix16);
 
@@ -4503,7 +4501,7 @@ namespace BlueControls.Controls
 
             var tmpText = CellItem.ValueReadable(column, originalText, style, column.CompactView);
             var tmpAlign = CellItem.StandardAlignment(column);
-            QuickImage tmpImageCode = null;
+            QuickImage tmpImageCode;
 
 
 

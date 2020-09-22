@@ -120,7 +120,7 @@ namespace BlueDatabase
         /// </summary>
         private string _LinkedCell_ColumnValueAdd;
 
-        private bool _ZellenZusammenfassen;
+        //private bool _ZellenZusammenfassen;
 
         private int _DropDownKey;
 
@@ -192,7 +192,7 @@ namespace BlueDatabase
             _LinkedCell_ColumnValueAdd = string.Empty;
 
             _SortMask = string.Empty;
-            _ZellenZusammenfassen = false;
+            //_ZellenZusammenfassen = false;
             _DropDownKey = -1;
             _VorschlagsColumn = -1;
             _Align = enAlignmentHorizontal.Keine_Präferenz;
@@ -397,19 +397,19 @@ namespace BlueDatabase
         }
 
 
-        public bool ZellenZusammenfassen
-        {
-            get
-            {
-                return _ZellenZusammenfassen;
-            }
-            set
-            {
-                if (_ZellenZusammenfassen == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_ZellenZusammenfassen, this, _ZellenZusammenfassen.ToPlusMinus(), value.ToPlusMinus(), true);
-                OnChanged();
-            }
-        }
+        //public bool ZellenZusammenfassen
+        //{
+        //    get
+        //    {
+        //        return _ZellenZusammenfassen;
+        //    }
+        //    set
+        //    {
+        //        if (_ZellenZusammenfassen == value) { return; }
+        //        Database.AddPending(enDatabaseDataType.co_ZellenZusammenfassen, this, _ZellenZusammenfassen.ToPlusMinus(), value.ToPlusMinus(), true);
+        //        OnChanged();
+        //    }
+        //}
 
 
         public string QuickInfoText(string AdditionalText)
@@ -1617,12 +1617,13 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn: _LinkedCell_ColumnValueFoundIn = int.Parse(Wert); break;
                 case enDatabaseDataType.co_LinkedCell_ColumnValueAdd: _LinkedCell_ColumnValueAdd = Wert; break;
                 case enDatabaseDataType.co_SortMask: _SortMask = Wert; break;
-                case enDatabaseDataType.co_ZellenZusammenfassen: _ZellenZusammenfassen = Wert.FromPlusMinus(); break;
+                //case enDatabaseDataType.co_ZellenZusammenfassen: _ZellenZusammenfassen = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_DropDownKey: _DropDownKey = int.Parse(Wert); break;
                 case enDatabaseDataType.co_VorschlagColumn: _VorschlagsColumn = int.Parse(Wert); break;
                 case enDatabaseDataType.co_Align: _Align = (enAlignmentHorizontal)int.Parse(Wert); break;
-                case (enDatabaseDataType)192: break;
-                case (enDatabaseDataType)193: break;
+                //case (enDatabaseDataType)189: break;
+                //case (enDatabaseDataType)192: break;
+                //case (enDatabaseDataType)193: break;
 
                 default:
                     if (Art.ToString() == ((int)Art).ToString())
@@ -1942,7 +1943,7 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnKey, _LinkedCell_ColumnKey.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, _LinkedCell_ColumnValueFoundIn.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueAdd, _LinkedCell_ColumnValueAdd, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_ZellenZusammenfassen, _ZellenZusammenfassen.ToPlusMinus(), Key);
+            //Database.SaveToByteList(l, enDatabaseDataType.co_ZellenZusammenfassen, _ZellenZusammenfassen.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropDownKey, _DropDownKey.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_VorschlagColumn, _VorschlagsColumn.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Align, ((int)_Align).ToString(), Key);
@@ -2059,7 +2060,7 @@ namespace BlueDatabase
 
         public string CompareKey()
         {
-            string tmp = null;
+            string tmp;
 
             if (string.IsNullOrEmpty(_Caption))
             {
@@ -2192,7 +2193,6 @@ namespace BlueDatabase
 
         public string ErrorReason()
         {
-            enEditTypeTable TMP_EditDialog = 0;
 
             if (Key < 0) { return "Interner Fehler: ID nicht definiert"; }
 
@@ -2220,9 +2220,6 @@ namespace BlueDatabase
 
 
             if (((int)_Format).ToString() == _Format.ToString()) { return "Format fehlerhaft."; }
-
-
-            TMP_EditDialog = UserEditDialogTypeInTable(_Format, false, true, _MultiLine);
 
             if (_Format.NeedTargetDatabase())
             {
@@ -2319,6 +2316,9 @@ namespace BlueDatabase
             if (_EditTrotzSperreErlaubt && !_TextBearbeitungErlaubt && !_DropdownBearbeitungErlaubt) { return "Wenn die Zeilensperre ignoriert werden soll, muss eine Bearbeitungsmethode definiert sein."; }
 
 
+
+
+            var TMP_EditDialog = UserEditDialogTypeInTable(_Format, false, true, _MultiLine);
             if (_TextBearbeitungErlaubt)
             {
                 if (TMP_EditDialog == enEditTypeTable.Dropdown_Single) { return "Format unterstützt nur Dropdown-Menü."; }
@@ -2544,7 +2544,7 @@ namespace BlueDatabase
         {
             if (string.IsNullOrEmpty(TXT)) { return string.Empty; }
 
-            string oTXT = null;
+
 
             const char h4 = (char)1004; // H4 = Normaler Text, nach links rutschen
             const char h3 = (char)1003; // überschrift
@@ -2553,6 +2553,8 @@ namespace BlueDatabase
             const char h7 = (char)1007; // bold
 
             if (_Format == enDataFormat.Text_mit_Formatierung) { TXT = TXT.HTMLSpecialToNormalChar(); }
+
+            string oTXT;
 
             do
             {
@@ -2726,7 +2728,6 @@ namespace BlueDatabase
             }
 
 
-            var ok = false;
             var nr = -1;
 
             do
@@ -2734,7 +2735,7 @@ namespace BlueDatabase
                 nr++;
                 var tmpname = cleanfilename;
                 if (nr > 0) { tmpname += nr.ToString(Constants.Format_Integer2); }
-                ok = true;
+                var ok = true;
 
                 foreach (var columnitem in Database.Column)
                 {

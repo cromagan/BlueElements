@@ -1523,7 +1523,7 @@ namespace BlueDatabase
 
                     if (!Row.CellIsNullOrEmpty(Column))
                     {
-                        string tmp = null;
+                        string tmp;
                         if (!string.IsNullOrEmpty(Column.AllowedChars))
                         {
                             tmp = Column.AllowedChars;

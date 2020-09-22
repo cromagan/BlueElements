@@ -29,7 +29,6 @@ namespace BlueControls.BlueDatabaseDialogs
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColumnEditor));
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabDesign = new BlueControls.Controls.TabPage();
-            this.butZusammenfassen = new BlueControls.Controls.Button();
             this.cbxAlign = new BlueControls.Controls.ComboBox();
             this.txbReplacer = new BlueControls.Controls.TextBox();
             this.btnStandard = new BlueControls.Controls.Button();
@@ -178,7 +177,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // tabDesign
             // 
             this.tabDesign.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabDesign.Controls.Add(this.butZusammenfassen);
             this.tabDesign.Controls.Add(this.cbxAlign);
             this.tabDesign.Controls.Add(this.txbReplacer);
             this.tabDesign.Controls.Add(this.btnStandard);
@@ -213,15 +211,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabDesign.Size = new System.Drawing.Size(912, 487);
             this.tabDesign.TabIndex = 0;
             this.tabDesign.Text = "Design";
-            // 
-            // butZusammenfassen
-            // 
-            this.butZusammenfassen.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.butZusammenfassen.Location = new System.Drawing.Point(8, 200);
-            this.butZusammenfassen.Name = "butZusammenfassen";
-            this.butZusammenfassen.Size = new System.Drawing.Size(360, 16);
-            this.butZusammenfassen.TabIndex = 12;
-            this.butZusammenfassen.Text = "Zeilen optisch zusammenfassen bei gleichen Werten";
             // 
             // cbxAlign
             // 
@@ -1597,7 +1586,6 @@ namespace BlueControls.BlueDatabaseDialogs
             private Caption capVorschlag;
             private ComboBox cbxDropDownKey;
             private Caption capDropDownKey;
-            private Button butZusammenfassen;
             private GroupBox grpAuswahlmenuOptionen;
             private TextBox txbAutoRemove;
             private Caption capAutoRemove;
