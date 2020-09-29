@@ -462,7 +462,7 @@ namespace BlueControls.Forms
                     It.SetCoordinates(new RectangleDF(DruckB.Left + x * OneItem.Width, DruckB.Top + y * OneItem.Height, OneItem.Width, OneItem.Height));
 
 
-                    StartNr += 1;
+                    StartNr++;
 
                     if (FrmDrucken_Einzeln.Checked || StartNr >= Liste.Count) { break; }
                 }

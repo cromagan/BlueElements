@@ -195,7 +195,7 @@ namespace BlueDatabase
 
             foreach (var ThisAction in Actions)
             {
-                if (ThisAction != null && ThisAction.IsOk() && ThisAction.IsBedingung()) { W += 1; }
+                if (ThisAction != null && ThisAction.IsOk() && ThisAction.IsBedingung()) { W++; }
             }
 
             return W;
@@ -208,7 +208,7 @@ namespace BlueDatabase
 
             foreach (var ThisAction in Actions)
             {
-                if (ThisAction != null && ThisAction.IsOk() && !ThisAction.IsBedingung()) { W += 1; }
+                if (ThisAction != null && ThisAction.IsOk() && !ThisAction.IsBedingung()) { W++; }
             }
 
 

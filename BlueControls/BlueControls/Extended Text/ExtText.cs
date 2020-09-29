@@ -265,7 +265,7 @@ namespace BlueControls
 
             do
             {
-                Pos -= 1;
+                Pos--;
                 if (Pos < 0) { return 0; }
                 if (Chars[Pos].isWordSeperator()) { return Pos + 1; }
             } while (true);
@@ -281,7 +281,7 @@ namespace BlueControls
 
             do
             {
-                Pos += 1;
+                Pos++;
                 if (Pos >= Chars.Count) { return Chars.Count; }
                 if (Chars[Pos].isWordSeperator()) { return Pos; }
             } while (true);
@@ -342,7 +342,7 @@ namespace BlueControls
 
             do
             {
-                Akt += 1;
+                Akt++;
                 if (Akt > Chars.Count - 1)
                 {
                     RI.Add(ZB_Char + ";" + (Akt - 1));
@@ -513,7 +513,7 @@ namespace BlueControls
             {
                 if (Chars[AugZeichen].isPossibleLineBreak())
                 {
-                    AugZeichen -= 1;
+                    AugZeichen--;
                 }
                 else
                 {
@@ -528,7 +528,7 @@ namespace BlueControls
             {
                 if (Chars[AugZeichen].isPossibleLineBreak()) { return AugZeichen + 1; }
 
-                AugZeichen -= 1;
+                AugZeichen--;
 
                 if (AugZeichen <= MinZeichen) { return Started; }
             } while (true);
@@ -742,10 +742,10 @@ namespace BlueControls
                                     var OP = 1;
                                     do
                                     {
-                                        Pos += 1;
+                                        Pos++;
                                         if (Pos > Lang) { break; }
-                                        if (cactext[Pos] == '>') { OP -= 1; }
-                                        if (cactext[Pos] == '<') { OP += 1; }
+                                        if (cactext[Pos] == '>') { OP--; }
+                                        if (cactext[Pos] == '<') { OP++; }
                                         if (OP == 0) { break; }
 
                                     } while (true);
@@ -757,7 +757,7 @@ namespace BlueControls
                                 break;
                             default:
                                 // Normales Zeichen
-                                Zeichen += 1;
+                                Zeichen++;
                                 Chars.Add(new ExtChar(CH, _Design, _State, BF, Stufe, Markstate));
                                 break;
                         }
@@ -765,12 +765,12 @@ namespace BlueControls
                     else
                     {
                         // Normales Zeichen
-                        Zeichen += 1;
+                        Zeichen++;
                         Chars.Add(new ExtChar(CH, _Design, _State, BF, Stufe, Markstate));
                     }
 
 
-                    Pos += 1;
+                    Pos++;
                 } while (true);
             }
 
@@ -808,7 +808,7 @@ namespace BlueControls
                     if (x != null) { T += "<ImageCode=" + x.Name + ">"; }
 
                 }
-                cZ += 1;
+                cZ++;
             }
 
 
@@ -832,7 +832,7 @@ namespace BlueControls
                     {
                         T += Convert.ToChar(Chars[cZ].Char).ToString();
                     }
-                    cZ += 1;
+                    cZ++;
                 }
 
                 T = T.Replace("\n", "");
@@ -850,7 +850,7 @@ namespace BlueControls
         private void DoSpecialEntities(string xHTMLTextx, ref int xStartPosx, ref int xPosition, ref BlueFont f, ref int Stufe, ref enMarkState MarkState)
         {
             var Endpos = xHTMLTextx.IndexOf(';', xStartPosx + 1);
-            xPosition += 1;
+            xPosition++;
             if (Endpos <= xStartPosx || Endpos > xStartPosx + 10)
             {
                 // Ein nicht konvertiertes &, einfach so übernehmen.
@@ -1015,49 +1015,49 @@ namespace BlueControls
                     break;
 
                 case "BR":
-                    Position += 1;
+                    Position++;
                     Chars.Add(new ExtChar((char)13, _Design, _State, PF, Stufe, enMarkState.None));
                     break;
 
                 //case "HR":
-                //    Position += 1;
+                //    Position++;
                 //    Chars.Add(new ExtChar(13, _Design, _State, PF, Stufe, MarkState));
-                //    Position += 1;
+                //    Position++;
                 //    Chars.Add(new ExtChar((int)enEtxtCodes.HorizontalLine, _Design, _State, PF, Stufe, MarkState));
                 //    break;
 
                 case "TAB":
-                    Position += 1;
+                    Position++;
                     Chars.Add(new ExtChar((char)9, _Design, _State, PF, Stufe, enMarkState.None));
                     break;
 
                 case "ZBX_STORE":
-                    Position += 1;
+                    Position++;
                     Chars.Add(new ExtChar(ExtChar.StoreX, _Design, _State, PF, Stufe, enMarkState.None));
                     break;
 
                 //case "ZBX_RESET":
-                //    Position += 1;
+                //    Position++;
                 //    Chars.Add(new ExtChar((int)enEtxtCodes.ZBX_RESET, _Design, _State, PF, Stufe, MarkState));
                 //    break;
 
                 case "TOP":
-                    Position += 1;
+                    Position++;
                     Chars.Add(new ExtChar(ExtChar.Top, _Design, _State, PF, Stufe, enMarkState.None));
                     break;
 
                 //case "ZBY_STORE":
-                //    Position += 1;
+                //    Position++;
                 //    Chars.Add(new ExtChar((int)enEtxtCodes.ZBY_STORE, _Design, _State, PF, Stufe, MarkState));
                 //    break;
 
                 //case "ZBY_RESET":
-                //    Position += 1;
+                //    Position++;
                 //    Chars.Add(new ExtChar((int)enEtxtCodes.ZBY_RESET, _Design, _State, PF, Stufe, MarkState));
                 //    break;
 
                 //case "LEFT":
-                //    Position += 1;
+                //    Position++;
                 //    Chars.Add(new ExtChar((int)enEtxtCodes.Left, _Design, _State, PF, Stufe, MarkState));
                 //    break;
 
@@ -1072,13 +1072,13 @@ namespace BlueControls
                         x = QuickImage.Get(Attribut);
                     }
 
-                    Position += 1;
+                    Position++;
 
                     Chars.Add(new ExtChar((char)(QuickImage.GetIndex(x) + ExtChar.ImagesStart), _Design, _State, PF, Stufe, enMarkState.None));
                     break;
 
                 //case "PROGRESSBAR":
-                //    Position += 1;
+                //    Position++;
                 //    Chars.Add(new ExtChar((int)((int)enEtxtCodes.ProgressBar0 + int.Parse(Attribut)), _Design, _State, PF, Stufe, MarkState));
                 //    break;
 
@@ -1192,7 +1192,7 @@ namespace BlueControls
 
             do
             {
-                cZ += 1;
+                cZ++;
                 if (cZ > Chars.Count - 1) // Das Ende des Textes
                 {
                     break;
@@ -1237,7 +1237,7 @@ namespace BlueControls
 
             //   Dim RN As Integer = cZ
 
-            cZ -= 1;
+            cZ--;
 
             if (XNr >= 0)
             {

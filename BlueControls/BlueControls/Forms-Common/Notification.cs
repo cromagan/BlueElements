@@ -135,7 +135,7 @@ namespace BlueControls.Forms
         private void timNote_Tick(object sender, System.EventArgs e)
         {
             var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
-            _Timer_Tick_count += 1;
+            _Timer_Tick_count++;
 
             if (Tag is System.Windows.Forms.Control tempVar)
             {
@@ -217,7 +217,7 @@ namespace BlueControls.Forms
         //{
         //    var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
         //    var Going = false;
-        //    _Timer_Tick_count += 1;
+        //    _Timer_Tick_count++;
 
         //    if (Tag is System.Windows.Forms.Control tempVar)
         //    {

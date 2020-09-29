@@ -360,7 +360,7 @@ namespace BlueControls.Controls
 
             foreach (var ThisView in _Database.Views)
             {
-                Count += 1;
+                Count++;
 
                 var View_Spalten = View_AnzahlSpalten(ThisView);
                 var _BelegterBereichTop = new int[View_Spalten + 1];
@@ -527,7 +527,7 @@ namespace BlueControls.Controls
                 if (ThisView != null)
                 {
                     var Index = _Database.Views.IndexOf(ThisView);
-                    Count += 1;
+                    Count++;
 
                     foreach (var ThisViewItem in ThisView)
                     {
@@ -664,7 +664,7 @@ namespace BlueControls.Controls
             {
                 if (lbxColumns.Item.RemoveNull()) { ItC = -1; }
 
-                ItC += 1;
+                ItC++;
                 if (ItC > lbxColumns.Item.Count - 1) { break; }
 
 
@@ -721,7 +721,7 @@ namespace BlueControls.Controls
 
                 if (ThisView != null && ThisView != _Database.Views[0])
                 {
-                    TabGeneratorCount += 1;
+                    TabGeneratorCount++;
                     var tempPage = new TabPage
                     {
                         Text = "Seite #" + TabGeneratorCount

@@ -337,7 +337,7 @@ namespace BlueDatabase
             var ColN = -1;
             do
             {
-                ColN += 1;
+                ColN++;
 
                 if (ColN + 2 > Count) { break; }
 
@@ -376,7 +376,7 @@ namespace BlueDatabase
             do
             {
                 if (_LastColumnKey == int.MaxValue) { _LastColumnKey = 0; }
-                _LastColumnKey += 1;
+                _LastColumnKey++;
                 if (SearchByKey(_LastColumnKey) == null) { return _LastColumnKey; }
             } while (true);
         }
@@ -572,7 +572,7 @@ namespace BlueDatabase
 
                 if (ThisColumnItem != null)
                 {
-                    lfdn += 1;
+                    lfdn++;
                     da.RowBeginn();
                     da.CellAdd(lfdn.ToString());
                     da.CellAdd(ThisColumnItem.Name);
@@ -611,7 +611,7 @@ namespace BlueDatabase
 
             do
             {
-                nr += 1;
+                nr++;
                 TestName = Wunschname + "_" + nr;
             } while (this[TestName] != null);
 

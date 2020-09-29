@@ -18,8 +18,6 @@ namespace BlueControls
     public sealed class clsSerializeableMultiUserFile<T> : clsMultiUserFile where T : ILastSavedBy, IReloadable
     {
 
-
-        private string _dataOnDisk = string.Empty;
         private bool _FirstLoad = true;
         private string _OtherUser = string.Empty;
 
@@ -54,7 +52,6 @@ namespace BlueControls
         public override bool HasPendingChanges()
         {
             return _dataOnDisk != ToListOfByte(false).ToStringConvert();
-
         }
 
         protected override void ParseExternal(List<byte> bLoaded)
@@ -171,19 +168,6 @@ namespace BlueControls
         {
             return false;
         }
-
-        protected override void ThisIsOnDisk(string data)
-        {
-            _dataOnDisk = data;
-        }
-
-
-
-
-
-
-
-
 
 
 

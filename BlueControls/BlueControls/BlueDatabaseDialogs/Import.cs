@@ -208,7 +208,7 @@ namespace BlueControls.BlueDatabaseDialogs
                         if (row == null && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo]))
                         {
                             row = _Database.Row.Add(Zeil[ZeilNo][SpaltNo]);
-                            neuZ += 1;
+                            neuZ++;
                         }
                     }
                     else

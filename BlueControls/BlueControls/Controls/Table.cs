@@ -493,7 +493,7 @@ namespace BlueControls.Controls
 
                 if (ViewItem != null && ViewItem.Column != null)
                 {
-                    lfdno += 1;
+                    lfdno++;
 
                     if (IsOnScreen(ViewItem, displayRectangleWOSlider))
                     {
@@ -4299,7 +4299,7 @@ namespace BlueControls.Controls
 
                 if (_Database.Works[z].CellKey == CellKey && _Database.Works[z].HistorischRelevant)
                 {
-                    co += 1;
+                    co++;
                     LasNr = z;
                     if (isfirst)
                     {
@@ -4318,7 +4318,7 @@ namespace BlueControls.Controls
 
             if (Las != null)
             {
-                co += 1;
+                co++;
                 i.Add(new TextListItem(co.ToString(Constants.Format_Integer5) + _Database.Works[LasNr].PreviousValue, "vor " + _Database.Works[LasNr].Date + " UTC"));
             }
 

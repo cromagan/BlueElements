@@ -867,7 +867,7 @@ namespace BlueControls.ItemCollection
 
                 if (vLayoutDatabase == null) { break; }
 
-                du += 1;
+                du++;
                 if (du >= 2) { break; }
                 vAdditionalLayoutPath = vLayoutDatabase.DefaultLayoutPath();
 

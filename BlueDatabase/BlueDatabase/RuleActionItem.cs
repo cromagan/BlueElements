@@ -526,7 +526,7 @@ namespace BlueDatabase
                 //        var Curr = 0;
                 //        foreach (var ThisSerach in Calc[zx])
                 //        {
-                //            if (ThisSerach.ToLower() == ThisString.ToLower()) { Curr += 1; }
+                //            if (ThisSerach.ToLower() == ThisString.ToLower()) { Curr++; }
                 //        }
                 //        if (Curr > Max)
                 //        {

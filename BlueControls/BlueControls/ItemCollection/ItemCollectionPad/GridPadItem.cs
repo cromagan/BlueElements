@@ -136,7 +136,7 @@ namespace BlueControls.ItemCollection
             var count = 0;
             do
             {
-                count += 1;
+                count++;
                 if (count > 20) { break; }
                 if (mo < 5) { mo *= 2; }
             } while (true);

@@ -287,7 +287,7 @@ namespace BlueDatabase
             var z = _Internal.Count;
             do
             {
-                z -= 1;
+                z--;
                 if (z < 0) { return null; }
 
                 if (_Internal[z] != null && _Internal[z].Column != null) { return _Internal[z]; }
@@ -310,7 +310,7 @@ namespace BlueDatabase
                     if (_Internal[ViewItemNo].Column == OfColumn) { Found = true; }
                 }
 
-                ViewItemNo -= 1;
+                ViewItemNo--;
             } while (true);
         }
 
@@ -329,7 +329,7 @@ namespace BlueDatabase
                     if (_Internal[ViewItemNo].Column == OfColumn) { Found = true; }
                 }
 
-                ViewItemNo += 1;
+                ViewItemNo++;
             } while (true);
 
         }
@@ -340,7 +340,7 @@ namespace BlueDatabase
 
             do
             {
-                ViewItemNo -= 1;
+                ViewItemNo--;
                 if (ViewItemNo < 0) { return null; }
 
                 if (_Internal[ViewItemNo] != null && _Internal[ViewItemNo].Column != null) { return _Internal[ViewItemNo]; }
@@ -359,7 +359,7 @@ namespace BlueDatabase
 
             do
             {
-                ViewItemNo += 1;
+                ViewItemNo++;
                 if (ViewItemNo >= _Internal.Count) { return null; }
 
                 if (_Internal[ViewItemNo] != null && _Internal[ViewItemNo].Column != null) { return _Internal[ViewItemNo]; }

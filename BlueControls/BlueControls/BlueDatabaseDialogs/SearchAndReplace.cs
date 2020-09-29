@@ -116,7 +116,7 @@ namespace BlueControls.BlueDatabaseDialogs
             foreach (var ThisRow in ro)
             {
                 var RowChanged = false;
-                co += 1;
+                co++;
                 P.Update(co);
 
 
@@ -165,7 +165,7 @@ namespace BlueControls.BlueDatabaseDialogs
                         if (GeändeterText != OriginalText)
                         {
                             RowChanged = true;
-                            count += 1;
+                            count++;
                             ThisRow.CellSet(Thiscolumn, GeändeterText);
                         }
                     }

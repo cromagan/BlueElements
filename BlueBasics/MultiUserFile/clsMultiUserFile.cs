@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Text;
 using System.Threading;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modAllgemein;
@@ -82,10 +83,12 @@ namespace BlueBasics.MultiUserFile
 
         private bool _CheckedAndReloadNeed;
 
-
         private DateTime _LastMessageUTC = DateTime.UtcNow.AddMinutes(-10);
 
         private string _LastSaveCode;
+
+        protected string _dataOnDisk;
+
         public bool ReadOnly { get; private set; }
 
         public bool EasyMode { get; private set; }
@@ -156,12 +159,13 @@ namespace BlueBasics.MultiUserFile
             Filename = string.Empty;// KEIN Filename. Ansonsten wird davon ausgegnagen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
             _CheckedAndReloadNeed = true;
             _LastSaveCode = string.Empty;
+            _dataOnDisk = string.Empty;
             ReadOnly = readOnly;
             EasyMode = easyMode;
             AutoDeleteBAK = false;
             UserEditedAktionUTC = new DateTime(1900, 1, 1);
 
-            Checker.Change(1000, 1000);
+            Checker.Change(2000, 2000);
         }
 
         private void PureBinSaver_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -314,7 +318,7 @@ namespace BlueBasics.MultiUserFile
 
             var tmpLastSaveCode = Data.Item2;
             var _BLoaded = Data.Item1;
-            ThisIsOnDisk(_BLoaded.ToStringConvert());
+            _dataOnDisk = _BLoaded.ToStringConvert();
 
             PrepeareDataForCheckingBeforeLoad();
             ParseInternal(_BLoaded);
@@ -458,7 +462,7 @@ namespace BlueBasics.MultiUserFile
             RenameFile(savedFileName, Filename, true);
 
             // ---- Steuerelemente Sagen, was gespeichert wurde
-            ThisIsOnDisk(SavedData);
+            _dataOnDisk = SavedData;
 
             if (!EasyMode)
             {
@@ -574,11 +578,6 @@ namespace BlueBasics.MultiUserFile
             return true;
 
         }
-
-        protected abstract void ThisIsOnDisk(string data);
-
-
-
 
 
         /// <summary>
@@ -704,7 +703,7 @@ namespace BlueBasics.MultiUserFile
                 x.Close();
             }
 
-            ThisIsOnDisk(l.ToStringConvert());
+            _dataOnDisk = l.ToStringConvert();
 
 
             _LastSaveCode = GetFileInfo(true);
@@ -863,7 +862,7 @@ namespace BlueBasics.MultiUserFile
                 {
                     DeleteFile(TMP, false);
 
-                    count += 1;
+                    count++;
                     if (count > 30)
                     {
                         Develop.DebugPrint(enFehlerArt.Warnung, "Speichern der TMP-Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + ex.Message);
@@ -969,11 +968,11 @@ namespace BlueBasics.MultiUserFile
 
             // Ausstehende Arbeiten ermittelen
             var _MustReload = ReloadNeeded();
-            var _MustSave = HasPendingChanges();
-            var _MustBackup = IsThereBackgroundWorkToDo(_MustSave);
+            var _MustSave = !ReadOnly && HasPendingChanges();
+            var _MustBackup = !ReadOnly &&  IsThereBackgroundWorkToDo(_MustSave);
 
 
-            Checker_Tick_count += 1;
+            Checker_Tick_count++;
 
             if (Checker_Tick_count < 0) { return; }
 

@@ -111,7 +111,7 @@ namespace BlueDatabase
                 var Ended = false;
                 do
                 {
-                    z += 1;
+                    z++;
                     if (z > c.GetUpperBound(0) || c[z].Length < 3)
                     {
                         TX = "/FehlerTS/";
@@ -582,7 +582,7 @@ namespace BlueDatabase
             ColumnItem Col = null;
             do
             {
-                z += 1;
+                z++;
                 if (z > c.GetUpperBound(0) || c[z].Length < 3) { return "/FehlerTS/"; }
 
 

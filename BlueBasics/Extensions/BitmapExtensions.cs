@@ -262,7 +262,7 @@ namespace BlueBasics
                 }
                 if (ExitNow) { break; }
 
-                x += 1;
+                x++;
                 if (x > _Pic.Width * 0.9) { break; }
             } while (true);
 
@@ -283,7 +283,7 @@ namespace BlueBasics
                     }
                 }
                 if (ExitNow) { break; }
-                x -= 1;
+                x--;
                 if (x < _Pic.Width * 0.1) { break; }
             } while (true);
 
@@ -304,7 +304,7 @@ namespace BlueBasics
                     }
                 }
                 if (ExitNow) { break; }
-                Y += 1;
+                Y++;
                 if (Y > _Pic.Height * 0.9) { break; }
             } while (true);
 
@@ -325,7 +325,7 @@ namespace BlueBasics
                     }
                 }
                 if (ExitNow) { break; }
-                Y -= 1;
+                Y--;
                 if (Y < _Pic.Height * 0.1) { break; }
             } while (true);
             pa.Bottom = Y - _Pic.Height + 1;

@@ -364,7 +364,7 @@ namespace BlueControls.Controls
                 var r = GetTabRect(id);
 
                 r.Y -= 2;
-                r.X += 1;
+                r.X++;
 
                 if (this is RibbonBar)
                 {

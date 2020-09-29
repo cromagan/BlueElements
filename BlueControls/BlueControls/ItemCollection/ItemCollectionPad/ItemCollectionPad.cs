@@ -177,7 +177,7 @@ namespace BlueControls.ItemCollection
             var Count = 0;
             do
             {
-                Count += 1;
+                Count++;
                 PerformAll(1, false);
                 if (NotPerforming(false) == 0) { break; }
                 if (Count > 20) { break; }
@@ -665,7 +665,7 @@ namespace BlueControls.ItemCollection
 
             do
             {
-                z += 1;
+                z++;
                 if (z > AllRelations.Count - 1) { break; }
 
                 if (!AllRelations[z].IsOk(false))
@@ -691,7 +691,7 @@ namespace BlueControls.ItemCollection
 
             foreach (var ThisRelation in AllRelations)
             {
-                if (!ThisRelation.Performs(Strongmode)) { f += 1; }
+                if (!ThisRelation.Performs(Strongmode)) { f++; }
             }
 
             return f;
@@ -872,7 +872,7 @@ namespace BlueControls.ItemCollection
 
             do
             {
-                Ist += 1;
+                Ist++;
                 if (Ist >= Points.Count) { break; }
 
 
@@ -1276,7 +1276,7 @@ namespace BlueControls.ItemCollection
                     if (Level == 2) { return false; }
                     if (Methode == 2) { return false; }
 
-                    Methode += 1;
+                    Methode++;
                     Relations_Optimize();
                     //RecomputePointAndRelations();
                     ComputeOrders(null);
@@ -1677,17 +1677,17 @@ namespace BlueControls.ItemCollection
                 if (DidPoint != null)
                 {
                     _Points.Remove(DidPoint);
-                    Count += 1;
+                    Count++;
                     if (Modus > 1) { Modus = 1; }
                 }
                 else
                 {
-                    Modus += 1;
+                    Modus++;
                 }
 
                 if (Modus == 5)
                 {
-                    if (Sel_P == null || Sel_P.Count == 0) { Modus += 1; }
+                    if (Sel_P == null || Sel_P.Count == 0) { Modus++; }
                 }
 
                 if (_Points.Count == 0) { return; }
@@ -1742,7 +1742,7 @@ namespace BlueControls.ItemCollection
 
                     if (NextRel == null) { break; }
 
-                    Count += 1;
+                    Count++;
                     NextRel.Order = Count;
                 } while (true);
 

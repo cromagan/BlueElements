@@ -108,7 +108,7 @@ namespace BlueBasics
                 }
                 else
                 {
-                    z += 1;
+                    z++;
                 }
             }
 
@@ -195,7 +195,7 @@ namespace BlueBasics
                 }
                 else
                 {
-                    z += 1;
+                    z++;
                 }
             }
 
@@ -220,7 +220,7 @@ namespace BlueBasics
                 }
                 else
                 {
-                    z += 1;
+                    z++;
                 }
             }
 
@@ -280,7 +280,7 @@ namespace BlueBasics
                 }
                 else
                 {
-                    z += 1;
+                    z++;
                 }
 
             }

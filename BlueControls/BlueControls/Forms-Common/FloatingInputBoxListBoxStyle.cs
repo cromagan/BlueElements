@@ -114,7 +114,7 @@ namespace BlueControls.Forms
             //else
             //{
             //Wi = CInt(Wi * 1.05) 'Weil die Breite nur circa berechnet wird
-            He += 1; // Um ja den Slider zu vermeiden!
+            He++; // Um ja den Slider zu vermeiden!
             He = Math.Max(He, 16);
             Wi = Math.Max(Wi, 16);
             //}

@@ -1507,7 +1507,7 @@ namespace BlueDatabase
 
             do
             {
-                ColumnCount -= 1;
+                ColumnCount--;
                 if (ColumnCount < 0) { return null; }
                 if (Database.Column[ColumnCount] != null) { return Database.Column[ColumnCount]; }
             } while (true);
@@ -1521,7 +1521,7 @@ namespace BlueDatabase
 
             do
             {
-                ColumnCount += 1;
+                ColumnCount++;
                 if (ColumnCount >= Database.Column.Count) { return null; }
                 if (Database.Column[ColumnCount] != null) { return Database.Column[ColumnCount]; }
 

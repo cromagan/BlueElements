@@ -83,7 +83,7 @@ namespace BlueBasics
 
         public static bool isWordSeperator(this char value)
         {
-            const string TR = "°~|=<>+`´\r\n\t";
+            const string TR = "~|=<>+`´\r\n\t";
 
             if (char.IsPunctuation(value)) { return true; }
             if (char.IsSeparator(value)) { return true; }
@@ -103,7 +103,7 @@ namespace BlueBasics
 
             do
             {
-                Pos += 1;
+                Pos++;
                 var InsterPos = Pos + AfterTXT.Length;
                 if (InsterPos > TXT.Length) { break; }
 
@@ -183,7 +183,7 @@ namespace BlueBasics
 
             do
             {
-                Beg += 1;
+                Beg++;
                 if (Beg > Value.Length) { break; }
                 var T = Value.ParseTag(Beg);
                 var V = Value.ParseValue(T, Beg);
@@ -210,7 +210,7 @@ namespace BlueBasics
             {
                 if (BG < 1) { break; }
                 if (" ,{".Contains(TXT.Substring(BG, 1))) { break; }
-                BG -= 1;
+                BG--;
             } while (true);
 
             return TXT.Substring(BG + 1, IG - BG - 1).ToLower();
@@ -230,7 +230,7 @@ namespace BlueBasics
 
             //while (TXT.Substring(FirstCharAfterEquals, 1) == " ")
             //{
-            //    FirstCharAfterEquals += 1;
+            //    FirstCharAfterEquals++;
             //}
 
             var OpenBraketCount = 0;
@@ -241,7 +241,7 @@ namespace BlueBasics
             while (!ExitDo && CurrentChar < TXT.Length - 1)
             {
 
-                CurrentChar += 1;
+                CurrentChar++;
 
                 switch (TXT.Substring(CurrentChar, 1))
                 {
@@ -254,18 +254,18 @@ namespace BlueBasics
                         break;
 
                     case "{":
-                        OpenBraketCount += 1;
+                        OpenBraketCount++;
                         break;
 
                     case "}":
                         if (OpenBraketCount == 0)
                         {
-                            CurrentChar -= 1;
+                            CurrentChar--;
                             ExitDo = true;
                         }
                         else
                         {
-                            OpenBraketCount -= 1;
+                            OpenBraketCount--;
                         }
                         break;
                 }
@@ -333,7 +333,7 @@ namespace BlueBasics
                 }
                 else
                 {
-                    p += 1;
+                    p++;
                 }
             }
             return TXT;
@@ -699,7 +699,7 @@ namespace BlueBasics
 
             do
             {
-                z -= 1;
+                z--;
                 if (z <= 1) { return string.Empty; }
                 if (Pfad.Substring(z - 1, 1) == "\\") { return Pfad.Substring(0, z); }
             } while (true);
@@ -726,7 +726,7 @@ namespace BlueBasics
 
             do
             {
-                z -= 1;
+                z--;
                 if (Pathx.Substring(z, 1) == "\\") { return Pathx.Substring(z + 1); }
                 if (z < 1) { return string.Empty; }
             } while (true);
@@ -864,19 +864,44 @@ namespace BlueBasics
         }
 
 
+        public static List<string> AllWords(this string input)
+        {
+
+            input = " " + input + " ";
+            var position = 0;
+            var LastSeperator = 0;
+            var l = new List<string>();
+
+            do
+            {
+
+                position++;
+
+                if (position >= input.Length) { return l; }
+
+                if (input[position].isWordSeperator())
+                {
+                    if (position > LastSeperator + 1)
+                    {
+                        l.Add(input.Substring(LastSeperator+1, position - LastSeperator-1));
+                    }
+                    LastSeperator = position;
+
+                }
+
+
+            } while (true);
+
+
+        }
+
         public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options)
         {
-            //pattern = pattern.Replace("(", "\\(");
-            //pattern = pattern.Replace(")", "\\)");
-            //pattern = pattern.Replace("|", "\\|");
-
-            //return (Regex.Match(input, "\\b" + pattern + "\\b", options).Success);
             if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(enFehlerArt.Fehler, "Regex option nicht erlaubt."); }
-
 
             value = value.ToUpper();
             input = " " + input.ToUpper() + " ";
-            startIndex += 1;
+            startIndex++;
 
 
             do
@@ -1006,7 +1031,7 @@ namespace BlueBasics
             var Anz = 0;
             for (var z = 0; z <= Text.Length - value.Length; z++)
             {
-                if (Text.Substring(z, value.Length) == value) { Anz += 1; }
+                if (Text.Substring(z, value.Length) == value) { Anz++; }
             }
             return Anz;
         }

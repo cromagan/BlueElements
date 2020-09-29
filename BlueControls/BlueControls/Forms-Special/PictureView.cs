@@ -117,7 +117,7 @@ namespace BlueControls.Forms
 
         //    do
         //    {
-        //        Count += 1;
+        //        Count++;
         //        if (Pad.RepairAll(0, true)) { break; }
         //        if (Count > 10) { break; }
         //    } while (true);
@@ -215,7 +215,7 @@ namespace BlueControls.Forms
         private void Links_Click(object sender, System.EventArgs e)
         {
 
-            _NR -= 1;
+            _NR--;
             if (_NR <= 0) { _NR = 0; }
 
             LoadPic(_NR);
@@ -223,7 +223,7 @@ namespace BlueControls.Forms
 
         private void Rechts_Click(object sender, System.EventArgs e)
         {
-            _NR += 1;
+            _NR++;
             if (_NR >= _FileList.Count - 1) { _NR = _FileList.Count - 1; }
 
             LoadPic(_NR);

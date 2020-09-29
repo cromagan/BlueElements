@@ -200,7 +200,7 @@ namespace BlueControls.Forms
 
             //    {
 
-            //        Plus += 1;
+            //        Plus++;
             //        var Rel = new clsRelation(Col, I.Row, thisR);
             //        switch (Rel.Status)
             //        {
@@ -254,7 +254,7 @@ namespace BlueControls.Forms
             //    }
             //    else
             //    {
-            //        z += 1;
+            //        z++;
             //    }
             //} while (true);
 

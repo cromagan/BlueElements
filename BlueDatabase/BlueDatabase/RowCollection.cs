@@ -133,7 +133,7 @@ namespace BlueDatabase
             do
             {
                 if (_LastRowKey == int.MaxValue) { _LastRowKey = 0; }
-                _LastRowKey += 1;
+                _LastRowKey++;
             } while (SearchByKey(_LastRowKey) != null);
 
             return _LastRowKey;

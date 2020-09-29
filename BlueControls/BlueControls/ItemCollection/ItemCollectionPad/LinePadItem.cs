@@ -275,7 +275,7 @@ namespace BlueControls.ItemCollection
 
             do
             {
-                count += 1;
+                count++;
                 var again = false;
                 if (_TempPoints.Count > 100)
                 {

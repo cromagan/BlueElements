@@ -160,7 +160,7 @@ namespace BlueControls.Controls
                 {
                     if (!_mustExists || FileExists(x[0]))
                     {
-                        NR += 1;
+                        NR++;
 
                         if (NR < MaxCount)
                         {

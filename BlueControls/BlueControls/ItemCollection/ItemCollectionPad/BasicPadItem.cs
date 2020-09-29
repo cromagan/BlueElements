@@ -185,7 +185,7 @@ namespace BlueControls.ItemCollection
 
             if (NeueZeit == UniqueInternal_LastTime)
             {
-                UniqueInternal_Count += 1;
+                UniqueInternal_Count++;
             }
             else
             {
@@ -559,7 +559,7 @@ namespace BlueControls.ItemCollection
 
             do
             {
-                ItemCount -= 1;
+                ItemCount--;
                 if (ItemCount < 0) { return null; }
                 if (Parent[ItemCount] != null) { return Parent[ItemCount]; }
             } while (true);
@@ -575,7 +575,7 @@ namespace BlueControls.ItemCollection
 
             do
             {
-                ItemCount += 1;
+                ItemCount++;
                 if (ItemCount >= Parent.Count) { return null; }
                 if (Parent[ItemCount] != null) { return Parent[ItemCount]; }
             } while (true);

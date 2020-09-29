@@ -90,7 +90,7 @@ namespace BlueDatabase
 
                 do
                 {
-                    x += 1;
+                    x++;
                     pf = string.Empty;
                     switch (x)
                     {
@@ -2428,12 +2428,12 @@ namespace BlueDatabase
                 {
                     if (ThisPending.Comand == enDatabaseDataType.dummyComand_AddRow)
                     {
-                        dummy -= 1;
+                        dummy--;
                         ChangeRowKeyInPending(ThisPending.RowKey, dummy);
                     }
                     if (ThisPending.Comand == enDatabaseDataType.AddColumn)
                     {
-                        dummy -= 1;
+                        dummy--;
                         ChangeColumnKeyInPending(ThisPending.ColKey, dummy);
                     }
                 }
@@ -2861,7 +2861,7 @@ namespace BlueDatabase
                 var c = 0;
                 do
                 {
-                    c += 1;
+                    c++;
                     if (c > 20 || Works.Count - c < 20) { break; }
                     var wn = Works.Count - c;
                     if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { _LastWorkItem = Works[wn].ToString(); }
@@ -2979,11 +2979,6 @@ namespace BlueDatabase
         protected override void StartBackgroundWorker()
         {
             if (!Backup.IsBusy) { Backup.RunWorkerAsync(); }
-        }
-
-        protected override void ThisIsOnDisk(string data)
-        {
-            //Uninterresant
         }
 
 

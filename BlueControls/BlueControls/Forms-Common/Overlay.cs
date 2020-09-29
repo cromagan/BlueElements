@@ -134,7 +134,7 @@ namespace BlueControls
             }
 
 
-            Count += 1;
+            Count++;
 
             if (Count > 4)
             {

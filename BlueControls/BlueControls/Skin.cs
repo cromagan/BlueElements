@@ -642,7 +642,7 @@ namespace BlueControls
             if (Kon == enKontur.Unbekannt)
             {
                 Kon = enKontur.Rechteck;
-                r.Width -= 1;
+                r.Width--;
                 r.Height = -1;
             }
             else
@@ -724,16 +724,16 @@ namespace BlueControls
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
 
 
-                        r.Width -= 1;
-                        r.Height -= 1;
+                        r.Width--;
+                        r.Height--;
 
                         PathX = Kontur(Kon, r);
                         PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_2, 0)), 1);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
 
 
-                        r.Width -= 1;
-                        r.Height -= 1;
+                        r.Width--;
+                        r.Height--;
                         PathX = Kontur(Kon, r);
                         PenX = new Pen(Color.FromArgb(Value(Row, col_Color_Border_1, 0)), 1);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }

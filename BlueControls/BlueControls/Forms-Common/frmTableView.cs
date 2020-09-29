@@ -220,7 +220,7 @@ namespace BlueControls.Forms
             //    if (Count > TableView.Database.Row.Count() + 1) { break; }
             //    if (GefRow != null && GefRow != BlueFormulax.ShowingRow) { break; }
 
-            //    Count += 1;
+            //    Count++;
             //    CheckRow = TableView.View_NextRow(CheckRow);
             //    if (CheckRow == null) { CheckRow = TableView.View_RowFirst(); }
 
@@ -323,7 +323,7 @@ namespace BlueControls.Forms
                     {
                         if (ThisRow.CellFirstString().ToUpper() == NewName.ToUpper())
                         {
-                            IstZ += 1;
+                            IstZ++;
                             NewName = IstName + " (" + IstZ + ")";
                             Changed = true;
                             break;

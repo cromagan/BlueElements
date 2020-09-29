@@ -465,8 +465,8 @@ namespace BlueControls.Controls
             {
                 if (_Cursor_CharPos > -1)
                 {
-                    if (X == -1 && _Cursor_CharPos > 0) { _Cursor_CharPos -= 1; }
-                    if (X == 1 && _Cursor_CharPos < _eTxt.Chars.Count) { _Cursor_CharPos += 1; }
+                    if (X == -1 && _Cursor_CharPos > 0) { _Cursor_CharPos--; }
+                    if (X == 1 && _Cursor_CharPos < _eTxt.Chars.Count) { _Cursor_CharPos++; }
                 }
                 else if (_MarkStart > -1 && _MarkEnd > -1)
                 {
@@ -557,7 +557,7 @@ namespace BlueControls.Controls
                             Char_DelBereich(-1, -1);
                             if (_eTxt.InsertChar(KeyAscii, _Cursor_CharPos))
                             {
-                                _Cursor_CharPos += 1;
+                                _Cursor_CharPos++;
                             }
                         }
 
@@ -570,7 +570,7 @@ namespace BlueControls.Controls
                             Char_DelBereich(-1, -1);
                             if (_eTxt.InsertChar(KeyAscii, _Cursor_CharPos))
                             {
-                                _Cursor_CharPos += 1;
+                                _Cursor_CharPos++;
                             }
 
 
@@ -644,7 +644,7 @@ namespace BlueControls.Controls
                 var a = (enASCIIKey)t;
                 if (_eTxt.InsertChar(a, _Cursor_CharPos))
                 {
-                    _Cursor_CharPos += 1;
+                    _Cursor_CharPos++;
                 }
             }
 
@@ -1759,7 +1759,7 @@ namespace BlueControls.Controls
 
 
             Char_DelBereich(-1, -1);
-            if (_eTxt.InsertImage(r[0], _Cursor_CharPos)) { _Cursor_CharPos += 1; }
+            if (_eTxt.InsertImage(r[0], _Cursor_CharPos)) { _Cursor_CharPos++; }
         }
 
         private void OnNeedDatabaseOfAdditinalSpecialChars(MultiUserFileGiveBackEventArgs e)

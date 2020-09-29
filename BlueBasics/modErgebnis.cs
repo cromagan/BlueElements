@@ -170,7 +170,7 @@ namespace BlueBasics
                 if (TMP < 1 || TMP > Formel.Length - 2) { return null; }
 
                 var sep2 = Formel.Substring(TMP - 1, 1);
-                if (sep2 == "<" || sep2 == ">" || sep2 == "=") { TMP -= 1; }
+                if (sep2 == "<" || sep2 == ">" || sep2 == "=") { TMP--; }
                 sep2 = Formel.Substring(TMP + 1, 1);
                 if (sep2 == "<" || sep2 == ">" || sep2 == "=") { Seperator = Formel.Substring(TMP, 2); }
             }
@@ -238,7 +238,7 @@ namespace BlueBasics
 
                 var VorZ = Formel.Substring(LastMin - 1, 1);
                 if (VorZ.IsNumeral()) { OkMin = LastMin; }
-                LastMin += 1;
+                LastMin++;
             }
             return OkMin;
         }
