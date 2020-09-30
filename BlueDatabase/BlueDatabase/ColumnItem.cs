@@ -65,7 +65,8 @@ namespace BlueDatabase
         public readonly ListExt<string> DropDownItems = new ListExt<string>();
         public readonly ListExt<string> Tags = new ListExt<string>();
         public readonly ListExt<string> PermissionGroups_ChangeCell = new ListExt<string>();
-        public readonly ListExt<string> Replacer = new ListExt<string>();
+        public readonly ListExt<string> OpticalReplace = new ListExt<string>();
+        public readonly ListExt<string> AfterEdit_AutoReplace = new ListExt<string>();
 
         private string _AllowedChars;
         private string _AdminInfo;
@@ -251,7 +252,8 @@ namespace BlueDatabase
 
 
             DropDownItems.ListOrItemChanged += DropDownItems_ListOrItemChanged;
-            Replacer.ListOrItemChanged += Replacer_ListOrItemChanged;
+            OpticalReplace.ListOrItemChanged += OpticalReplacer_ListOrItemChanged;
+            AfterEdit_AutoReplace.ListOrItemChanged += AfterEdit_AutoReplace_ListOrItemChanged;
             Regex.ListOrItemChanged += Regex_ListOrItemChanged;
             PermissionGroups_ChangeCell.ListOrItemChanged += PermissionGroups_ChangeCell_ListOrItemChanged;
             Tags.ListOrItemChanged += Tags_ListOrItemChanged;
@@ -1560,7 +1562,8 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_EditType: _EditType = (enEditTypeFormula)int.Parse(Wert); break;
                 case enDatabaseDataType.co_MultiLine: _MultiLine = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_DropDownItems: DropDownItems.SplitByCR_QuickSortAndRemoveDouble(Wert); break;
-                case enDatabaseDataType.co_Replacer: Replacer.SplitByCR(Wert); break;
+                case enDatabaseDataType.co_OpticalReplace: OpticalReplace.SplitByCR(Wert); break;
+                case enDatabaseDataType.co_AfterEdit_AutoReplace: AfterEdit_AutoReplace.SplitByCR(Wert); break;
                 case enDatabaseDataType.co_Regex: Regex.SplitByCR(Wert); break;
                 case enDatabaseDataType.co_Tags: Tags.SplitByCR(Wert); break;
                 case enDatabaseDataType.co_AutoFilterJoker: _AutoFilterJoker = Wert; break;
@@ -1917,7 +1920,8 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_LinieRight, ((int)_LineRight).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropdownBearbeitungErlaubt, _DropdownBearbeitungErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropDownItems, DropDownItems.JoinWithCr(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Replacer, Replacer.JoinWithCr(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_OpticalReplace, OpticalReplace.JoinWithCr(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_AutoReplace, AfterEdit_AutoReplace.JoinWithCr(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Regex, Regex.JoinWithCr(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropdownAllesAbwählenErlaubt, _DropdownAllesAbwählenErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, _DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), Key);
@@ -2287,6 +2291,7 @@ namespace BlueDatabase
                     if (_AfterEdit_AutoCorrect) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
                     if (_AfterEdit_DoUCase) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
                     if (_AfterEdit_Runden != -1) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
+                    if (AfterEdit_AutoReplace.Count > 0) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
                     break;
 
 
@@ -2405,7 +2410,7 @@ namespace BlueDatabase
             if (string.IsNullOrEmpty(_LinkedKeyKennung) && _Format.NeedLinkedKeyKennung()) { return "Spaltenkennung für verlinkte Datenbanken fehlt."; }
 
 
-            if (Replacer.Count > 0)
+            if (OpticalReplace.Count > 0)
             {
                 if (_Format != enDataFormat.Text &&
                     _Format != enDataFormat.Columns_für_LinkedCellDropdown &&
@@ -2468,10 +2473,16 @@ namespace BlueDatabase
             OnChanged();
         }
 
-        private void Replacer_ListOrItemChanged(object sender, System.EventArgs e)
+        private void OpticalReplacer_ListOrItemChanged(object sender, System.EventArgs e)
         {
-            Database.AddPending(enDatabaseDataType.co_Replacer, Key, Replacer.JoinWithCr(), false);
+            Database.AddPending(enDatabaseDataType.co_OpticalReplace, Key, OpticalReplace.JoinWithCr(), false);
             Invalidate_ColumAndContent();
+            OnChanged();
+        }
+
+        private void AfterEdit_AutoReplace_ListOrItemChanged(object sender, System.EventArgs e)
+        {
+            Database.AddPending(enDatabaseDataType.co_AfterEdit_AutoReplace, Key, AfterEdit_AutoReplace.JoinWithCr(), false);
             OnChanged();
         }
 
@@ -2502,27 +2513,37 @@ namespace BlueDatabase
                     l2.Add(SimplyFile(thisFile));
                 }
 
-
-
                 Value = l2.SortedDistinctList().JoinWithCr();
             }
 
 
-            if (_AfterEdit_DoUCase)
+            if (_AfterEdit_DoUCase) { Value = Value.ToUpper(); }
+
+            if (!string.IsNullOrEmpty(_AutoRemove)) { Value = Value.RemoveChars(_AutoRemove); }
+
+
+
+            if (AfterEdit_AutoReplace.Count > 0)
             {
-                Value = Value.ToUpper();
+                var l = new List<string>(Value.SplitByCR());
+
+                foreach (var thisar in AfterEdit_AutoReplace)
+                {
+                    var rep = (thisar + "| ").SplitBy("|");
+
+                    for (var z = 0; z < l.Count; z++)
+                    {
+                        if (l[z] == rep[0]) { l[z] = rep[1].Replace(";cr;", "\r"); }
+                    }
+
+                }
+
+                Value = l.SortedDistinctList().JoinWithCr();
             }
 
-            if (_AfterEdit_QuickSortRemoveDouble)
-            {
-                var l = new List<string>(Value.SplitByCR()).SortedDistinctList();
-                Value = l.JoinWithCr();
-            }
 
-            if (_AfterEdit_AutoCorrect)
-            {
-                Value = KleineFehlerCorrect(Value);
-            }
+
+            if (_AfterEdit_AutoCorrect) { Value = KleineFehlerCorrect(Value); }
 
             if (_AfterEdit_Runden > -1 && double.TryParse(Value, out var erg))
             {
@@ -2531,10 +2552,12 @@ namespace BlueDatabase
             }
 
 
-            if (!string.IsNullOrEmpty(_AutoRemove))
+            if (_AfterEdit_QuickSortRemoveDouble)
             {
-                Value = Value.RemoveChars(_AutoRemove);
+                var l = new List<string>(Value.SplitByCR()).SortedDistinctList();
+                Value = l.JoinWithCr();
             }
+
 
             return Value;
         }
@@ -2917,10 +2940,10 @@ namespace BlueDatabase
 
             NewReplacer.Reverse();
 
-            if (Replacer.IsDifferentTo(NewReplacer))
+            if (OpticalReplace.IsDifferentTo(NewReplacer))
             {
-                Replacer.Clear();
-                Replacer.AddRange(NewReplacer);
+                OpticalReplace.Clear();
+                OpticalReplace.AddRange(NewReplacer);
             }
 
 

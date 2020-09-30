@@ -48,11 +48,11 @@ namespace BlueDatabase
 
             if (Translation != null) { return ColumnReplaceTranslated(newTXT, Column); }
 
-            if (Style == enShortenStyle.Unreplaced || Column.Replacer.Count == 0) { return newTXT; }
+            if (Style == enShortenStyle.Unreplaced || Column.OpticalReplace.Count == 0) { return newTXT; }
 
             var OT = newTXT;
 
-            foreach (var ThisString in Column.Replacer)
+            foreach (var ThisString in Column.OpticalReplace)
             {
                 var x = ThisString.SplitBy("|");
                 if (x.Length == 2)

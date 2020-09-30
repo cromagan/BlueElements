@@ -187,7 +187,8 @@ namespace BlueControls.BlueDatabaseDialogs
 
             tbxAuswaehlbareWerte.Text = _Column.DropDownItems.JoinWithCr();
 
-            txbReplacer.Text = _Column.Replacer.JoinWithCr();
+            txbReplacer.Text = _Column.OpticalReplace.JoinWithCr();
+            txbAutoReplace.Text = _Column.AfterEdit_AutoReplace.JoinWithCr();
             txbRegex.Text = _Column.Regex.JoinWithCr();
 
             tbxTags.Text = _Column.Tags.JoinWithCr();
@@ -474,11 +475,17 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             var NewRep = txbReplacer.Text.SplitByCRToList();
-            //NewRep.QuickSortAndRemoveDouble();
-            if (NewRep.IsDifferentTo(_Column.Replacer))
+            if (NewRep.IsDifferentTo(_Column.OpticalReplace))
             {
-                _Column.Replacer.Clear();
-                _Column.Replacer.AddRange(NewRep);
+                _Column.OpticalReplace.Clear();
+                _Column.OpticalReplace.AddRange(NewRep);
+            }
+
+            var NewRep2 = txbAutoReplace.Text.SplitByCRToList();
+            if (NewRep2.IsDifferentTo(_Column.AfterEdit_AutoReplace))
+            {
+                _Column.AfterEdit_AutoReplace.Clear();
+                _Column.AfterEdit_AutoReplace.AddRange(NewRep2);
             }
 
             _Column.AutoFilterJoker = tbxJoker.Text;

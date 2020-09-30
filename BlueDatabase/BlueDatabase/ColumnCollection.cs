@@ -493,8 +493,11 @@ namespace BlueDatabase
             c.DropDownItems.Clear();
             c.DropDownItems.AddRange(Source.DropDownItems);
 
-            c.Replacer.Clear();
-            c.Replacer.AddRange(Source.Replacer);
+            c.OpticalReplace.Clear();
+            c.OpticalReplace.AddRange(Source.OpticalReplace);
+
+            c.AfterEdit_AutoReplace.Clear();
+            c.AfterEdit_AutoReplace.AddRange(Source.OpticalReplace);
 
             c.Regex.Clear();
             c.Regex.AddRange(Source.Regex);

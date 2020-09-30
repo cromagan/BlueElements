@@ -165,7 +165,7 @@ namespace BlueDatabase.Enums
         co_BildCode_ConstantHeight = 170,
         co_BildCode_ImageNotFound = 171,
         //co_FontScale = 172,
-        co_Replacer = 173,
+        co_OpticalReplace = 173,
         co_Ueberschrift1 = 174,
         co_Ueberschrift2 = 175,
         co_Ueberschrift3 = 176,
@@ -187,6 +187,7 @@ namespace BlueDatabase.Enums
         //co_AutoFilter_Dauerfilter = 192,
         //co_Intelligenter_Multifilter = 193,
         co_DauerFilterPos = 194,
+        co_AfterEdit_AutoReplace = 195,
 
 
 
