@@ -698,7 +698,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbAutoReplace.Name = "txbAutoReplace";
             this.txbAutoReplace.QuickInfo = "Texte in der Spalte werden als ganze Zeilen mit diesen Angaben <b>permanent</b> e" +
     "rsetzt.<br>;cr; kann als Zeilenumbruch benutzt werdern.<br><i><u>Beispiel:</i></" +
-    "u>gruen|hellgrün;cr;grün";
+    "u>gruen|hellgrün;cr;grün|casesensitive<br>casesensitive ist optional";
             this.txbAutoReplace.Size = new System.Drawing.Size(904, 192);
             this.txbAutoReplace.SpellChecking = true;
             this.txbAutoReplace.TabIndex = 39;

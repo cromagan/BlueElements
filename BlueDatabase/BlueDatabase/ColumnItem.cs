@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
@@ -2529,16 +2530,32 @@ namespace BlueDatabase
 
                 foreach (var thisar in AfterEdit_AutoReplace)
                 {
-                    var rep = (thisar + "| ").SplitBy("|");
+                    var rep = thisar.SplitBy("|");
 
                     for (var z = 0; z < l.Count; z++)
                     {
-                        if (l[z] == rep[0]) { l[z] = rep[1].Replace(";cr;", "\r"); }
+
+                        var r = string.Empty;
+                        if (rep.Count() > 1) { r = rep[1].Replace(";cr;", "\r"); }
+                        var op = string.Empty;
+                        if (rep.Count() > 2) { op = rep[2].ToLower(); }
+
+
+                        if (op == "casesensitive")
+                        {
+                            if (l[z] == rep[0]) { l[z] = r; }
+                        }
+                        else
+                        {
+                            if (l[z].ToLower() == rep[0].ToLower()) { l[z] = r; }
+                        }
+
+
                     }
 
                 }
 
-                Value = l.SortedDistinctList().JoinWithCr();
+                Value = l.JoinWithCr();
             }
 
 

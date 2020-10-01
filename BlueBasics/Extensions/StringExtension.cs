@@ -980,7 +980,12 @@ namespace BlueBasics
             return TXT;
         }
 
-
+        /// <summary>
+        /// Trennt den Text mittels dem Trennzeichen. Sind ein oder mehrere Trennzeichen am Ende, werden Leeren Felder diese nicht zurückgegeben.
+        /// </summary>
+        /// <param name="TextToSplit"></param>
+        /// <param name="Trennzeichen"></param>
+        /// <returns></returns>
         public static string[] SplitBy(this string TextToSplit, string Trennzeichen)
         {
             var w = new string[0];
