@@ -54,7 +54,7 @@ namespace BlueControls.Classes_Editor
             var c = Item.Database.Column[Col.Text];
 
 
-            if (c == null || !c.AutoFilter_möglich()) { return; }
+            if (c == null || !c.AutoFilterSymbolPossible()) { return; }
 
             var tmpfc = new FilterCollection(Item.Database);
             if (Item.FilterType != enFilterType.KeinFilter) { tmpfc.Add(Item); }
@@ -99,7 +99,7 @@ namespace BlueControls.Classes_Editor
             var c = Item.Database.Column[Col.Text];
 
 
-            if (c == null || c.AutoFilter_möglich())
+            if (c == null || c.AutoFilterSymbolPossible())
             {
                 FiltWahl.Enabled = true;
             }

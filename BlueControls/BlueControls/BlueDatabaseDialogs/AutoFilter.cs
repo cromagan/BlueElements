@@ -108,8 +108,8 @@ namespace BlueControls.BlueDatabaseDialogs
             FiltItems.Height = Math.Min(FiltItems.Height, 560);
 
 
-            TXTBox.Enabled = Column.AutofilterTextFilterErlaubt;
-            Was.Enabled = Column.AutofilterTextFilterErlaubt;
+            TXTBox.Enabled = Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
+            Was.Enabled = Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
 
             if (Column.Format.IsZahl())
             {
@@ -147,12 +147,12 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
 
-            sFilter.Item.Add(new TextListItem("clipboard", "aus der Zwischenablage", QuickImage.Get(enImageCode.Clipboard, 17), Column.AutoFilterErweitertErlaubt, Constants.FirstSortChar + "05"));
-            sFilter.Item.Add(new TextListItem("ModusMultiUnd", "mehrfache UND-Auswahl aktivieren", QuickImage.Get(enImageCode.PlusZeichen, 17, "0000FF", ""), Column.MultiLine && Column.AutoFilterErweitertErlaubt && nochOk, Constants.FirstSortChar + "06"));
-            sFilter.Item.Add(new TextListItem("ModusMultiOder", "mehrfache ODER-Auswahl aktivieren", QuickImage.Get(enImageCode.PlusZeichen, 17), Column.AutoFilterErweitertErlaubt && nochOk, Constants.FirstSortChar + "07"));
-            sFilter.Item.Add(new TextListItem("ModusNegativ", "negativ Auswahl aktivieren", QuickImage.Get(enImageCode.MinusZeichen, 17), !Column.MultiLine && Column.AutoFilterErweitertErlaubt && nochOk, Constants.FirstSortChar + "08"));
-            sFilter.Item.Add(new TextListItem("Einzigartig", "Einzigartige Einträge", QuickImage.Get(enImageCode.Eins, 17), Column.AutoFilterErweitertErlaubt, Constants.FirstSortChar + "09"));
-            sFilter.Item.Add(new TextListItem("NichtEinzigartig", "Nicht Einzigartige Einträge", QuickImage.Get("Eins|17||1"), Column.AutoFilterErweitertErlaubt, Constants.FirstSortChar + "10"));
+            sFilter.Item.Add(new TextListItem("clipboard", "aus der Zwischenablage", QuickImage.Get(enImageCode.Clipboard, 17), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "05"));
+            sFilter.Item.Add(new TextListItem("ModusMultiUnd", "mehrfache UND-Auswahl aktivieren", QuickImage.Get(enImageCode.PlusZeichen, 17, "0000FF", ""), Column.MultiLine && Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "06"));
+            sFilter.Item.Add(new TextListItem("ModusMultiOder", "mehrfache ODER-Auswahl aktivieren", QuickImage.Get(enImageCode.PlusZeichen, 17), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "07"));
+            sFilter.Item.Add(new TextListItem("ModusNegativ", "negativ Auswahl aktivieren", QuickImage.Get(enImageCode.MinusZeichen, 17), !Column.MultiLine && Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "08"));
+            sFilter.Item.Add(new TextListItem("Einzigartig", "Einzigartige Einträge", QuickImage.Get(enImageCode.Eins, 17), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "09"));
+            sFilter.Item.Add(new TextListItem("NichtEinzigartig", "Nicht Einzigartige Einträge", QuickImage.Get("Eins|17||1"), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "10"));
 
 
 
@@ -414,7 +414,7 @@ namespace BlueControls.BlueDatabaseDialogs
                         TXTBox.Enabled = false;
 
                         sFilter.Item.Remove("ModusMultiUnd");
-                        sFilter.Item.Add(new TextListItem("ModusMultiUndFertig", "Und-Mehrfachauswahl fertig!", QuickImage.Get(enImageCode.Häkchen, 17), Column.AutoFilterErweitertErlaubt, Constants.FirstSortChar + "6"));
+                        sFilter.Item.Add(new TextListItem("ModusMultiUndFertig", "Und-Mehrfachauswahl fertig!", QuickImage.Get(enImageCode.Häkchen, 17), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "6"));
 
                         sFilter.Item["Clipboard"].Enabled = false;
                         sFilter.Item["ModusNegativ"].Enabled = false;
@@ -430,7 +430,7 @@ namespace BlueControls.BlueDatabaseDialogs
                         TXTBox.Text = "";
                         TXTBox.Enabled = false;
                         sFilter.Item.Remove("ModusMultiOder");
-                        sFilter.Item.Add(new TextListItem("ModusMultiOderFertig", "Oder-Mehrfachauswahl fertig!", QuickImage.Get(enImageCode.Häkchen, 17), Column.AutoFilterErweitertErlaubt, Constants.FirstSortChar + "7"));
+                        sFilter.Item.Add(new TextListItem("ModusMultiOderFertig", "Oder-Mehrfachauswahl fertig!", QuickImage.Get(enImageCode.Häkchen, 17), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "7"));
 
                         sFilter.Item["Clipboard"].Enabled = false;
                         sFilter.Item["ModusNegativ"].Enabled = false;

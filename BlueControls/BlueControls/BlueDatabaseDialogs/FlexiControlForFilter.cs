@@ -109,7 +109,7 @@ namespace BlueControls.Controls
 
 
 
-                if (!Filter.Column.AutoFilterErlaubt)
+                if (!Filter.Column.AutoFilterSymbolPossible())
                 {
                     EditType = enEditTypeFormula.None;
                 }

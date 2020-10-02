@@ -43,7 +43,7 @@ namespace BlueDatabase
     {
         #region  Shareds 
 
-        public static readonly string DatabaseVersion = "3.31";
+        public static readonly string DatabaseVersion = "3.40";
 
 
 
@@ -257,7 +257,7 @@ namespace BlueDatabase
         /// Nachher  Load benutzen.
         /// </summary>
         /// <param name="readOnly"></param>
-        public Database(bool readOnly) : base(readOnly, false)
+        public Database(bool readOnly) : base(readOnly, false, true)
         {
 
             var culture = new System.Globalization.CultureInfo("de-DE");

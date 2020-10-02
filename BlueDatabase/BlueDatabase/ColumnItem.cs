@@ -71,9 +71,10 @@ namespace BlueDatabase
 
         private string _AllowedChars;
         private string _AdminInfo;
-        private bool _AutofilterErlaubt;
-        private bool _AutofilterTextFilterErlaubt;
-        private bool _AutoFilterErweitertErlaubt;
+        private enFilterOptions _FilterOptions;
+        //private bool _AutofilterErlaubt;
+        //private bool _AutofilterTextFilterErlaubt;
+        //private bool _AutoFilterErweitertErlaubt;
         private bool _IgnoreAtRowFilter;
         private bool _CompactView;
         private bool _ShowMultiLineInOneLine;
@@ -212,9 +213,10 @@ namespace BlueDatabase
 
             _AllowedChars = string.Empty;
             _AdminInfo = string.Empty;
-            _AutofilterErlaubt = true;
-            _AutofilterTextFilterErlaubt = true;
-            _AutoFilterErweitertErlaubt = true;
+            _FilterOptions = enFilterOptions.Enabled | enFilterOptions.TextFilterEnabled | enFilterOptions.ExtendedFilterEnabled;
+            //_AutofilterErlaubt = true;
+            //_AutofilterTextFilterErlaubt = true;
+            //_AutoFilterErweitertErlaubt = true;
             _IgnoreAtRowFilter = false;
             _DropdownBearbeitungErlaubt = false;
             _DropdownAllesAbwählenErlaubt = false;
@@ -755,53 +757,66 @@ namespace BlueDatabase
             }
         }
 
-
-        public bool AutoFilterErlaubt
+        public enFilterOptions FilterOptions
         {
             get
             {
-                if (!_Format.Autofilter_möglich()) { return false; }
-                return _AutofilterErlaubt;
+                return _FilterOptions;
             }
             set
             {
-                if (_AutofilterErlaubt == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AutoFilterErlaubt, this, _AutofilterErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+                if (_FilterOptions == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_co_FilterOptions, this, ((int)_FilterOptions).ToString(), ((int)value).ToString(), true);
                 Invalidate_TmpVariables();
                 OnChanged();
             }
         }
+        //public bool AutoFilterErlaubt
+        //{
+        //    get
+        //    {
+        //        if (!_Format.Autofilter_möglich()) { return false; }
+        //        return _AutofilterErlaubt;
+        //    }
+        //    set
+        //    {
+        //        if (_AutofilterErlaubt == value) { return; }
+        //        Database.AddPending(enDatabaseDataType.co_AutoFilterErlaubt, this, _AutofilterErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+        //        Invalidate_TmpVariables();
+        //        OnChanged();
+        //    }
+        //}
 
-        public bool AutoFilterErweitertErlaubt
-        {
-            get
-            {
-                if (!AutoFilterErlaubt) { return false; }
-                return _AutoFilterErweitertErlaubt;
-            }
-            set
-            {
-                if (_AutoFilterErweitertErlaubt == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AutoFilterErweitertErlaubt, this, _AutoFilterErweitertErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
-                OnChanged();
-            }
-        }
+        //public bool AutoFilterErweitertErlaubt
+        //{
+        //    get
+        //    {
+        //        if (!AutoFilterErlaubt) { return false; }
+        //        return _AutoFilterErweitertErlaubt;
+        //    }
+        //    set
+        //    {
+        //        if (_AutoFilterErweitertErlaubt == value) { return; }
+        //        Database.AddPending(enDatabaseDataType.co_AutoFilterErweitertErlaubt, this, _AutoFilterErweitertErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+        //        OnChanged();
+        //    }
+        //}
 
-        public bool AutofilterTextFilterErlaubt
-        {
-            get
-            {
-                if (!AutoFilterErlaubt) { return false; }
-                if (!_Format.TextboxEditPossible()) { return false; }
-                return _AutofilterTextFilterErlaubt;
-            }
-            set
-            {
-                if (_AutofilterTextFilterErlaubt == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AutoFilterTextFilterErlaubt, this, _AutofilterTextFilterErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
-                OnChanged();
-            }
-        }
+        //public bool AutofilterTextFilterErlaubt
+        //{
+        //    get
+        //    {
+        //        if (!AutoFilterErlaubt) { return false; }
+        //        if (!_Format.TextboxEditPossible()) { return false; }
+        //        return _AutofilterTextFilterErlaubt;
+        //    }
+        //    set
+        //    {
+        //        if (_AutofilterTextFilterErlaubt == value) { return; }
+        //        Database.AddPending(enDatabaseDataType.co_AutoFilterTextFilterErlaubt, this, _AutofilterTextFilterErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+        //        OnChanged();
+        //    }
+        //}
 
 
         public bool IgnoreAtRowFilter
@@ -1570,9 +1585,17 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_AutoFilterJoker: _AutoFilterJoker = Wert; break;
                 case enDatabaseDataType.co_PermissionGroups_ChangeCell: PermissionGroups_ChangeCell.SplitByCR_QuickSortAndRemoveDouble(Wert); break;
                 case enDatabaseDataType.co_AllowedChars: _AllowedChars = Wert; break;
-                case enDatabaseDataType.co_AutoFilterErlaubt: _AutofilterErlaubt = Wert.FromPlusMinus(); break;
-                case enDatabaseDataType.co_AutoFilterTextFilterErlaubt: _AutofilterTextFilterErlaubt = Wert.FromPlusMinus(); break;
-                case enDatabaseDataType.co_AutoFilterErweitertErlaubt: _AutoFilterErweitertErlaubt = Wert.FromPlusMinus(); break;
+                case enDatabaseDataType.co_co_FilterOptions: _FilterOptions = (enFilterOptions)int.Parse(Wert); break;
+                case enDatabaseDataType.co_AutoFilterErlaubt_alt:
+                    _FilterOptions = enFilterOptions.None;
+                    if (Wert.FromPlusMinus()) { _FilterOptions |= enFilterOptions.Enabled; }
+                    break;
+                case enDatabaseDataType.co_AutoFilterTextFilterErlaubt_alt:
+                    if (Wert.FromPlusMinus()) { _FilterOptions |= enFilterOptions.TextFilterEnabled; }
+                    break;
+                case enDatabaseDataType.co_AutoFilterErweitertErlaubt_alt:
+                    if (Wert.FromPlusMinus()) { _FilterOptions |= enFilterOptions.ExtendedFilterEnabled; }
+                    break;
                 case enDatabaseDataType.co_BeiZeilenfilterIgnorieren: _IgnoreAtRowFilter = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_CompactView: _CompactView = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_ShowUndo: _ShowUndo = Wert.FromPlusMinus(); break;
@@ -1744,10 +1767,11 @@ namespace BlueDatabase
                     _Caption = "Fehlerfrei";
                     _SpellCheckingEnabled = false;
                     _Format = enDataFormat.Bit;
-                    _AutoFilterErweitertErlaubt = false;
+                    //_AutoFilterErweitertErlaubt = false;
                     _AutoFilterJoker = string.Empty;
-                    _AutofilterTextFilterErlaubt = false;
+                    //_AutofilterTextFilterErlaubt = false;
                     _IgnoreAtRowFilter = true;
+                    _FilterOptions = enFilterOptions.Enabled;
                     if (SetAll)
                     {
                         ForeColor = Color.FromArgb(128, 0, 0);
@@ -1760,9 +1784,10 @@ namespace BlueDatabase
                     _Name = "SYS_Locked";
                     _SpellCheckingEnabled = false;
                     _Format = enDataFormat.Bit;
-                    _AutoFilterErweitertErlaubt = false;
+                    _FilterOptions = enFilterOptions.Enabled;
+                    //_AutoFilterErweitertErlaubt = false;
                     _AutoFilterJoker = string.Empty;
-                    _AutofilterTextFilterErlaubt = false;
+                    //_AutofilterTextFilterErlaubt = false;
                     _IgnoreAtRowFilter = true;
                     if (_TextBearbeitungErlaubt || _DropdownBearbeitungErlaubt)
                     {
@@ -1904,10 +1929,11 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_Runden, _AfterEdit_Runden.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoRemove, _AutoRemove, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_SaveContent, _SaveContent.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_co_FilterOptions, ((int)_FilterOptions).ToString(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilter_Dauerfilter, ((int)_AutoFilter_Dauerfilter).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErlaubt, _AutofilterErlaubt.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterTextFilterErlaubt, _AutofilterTextFilterErlaubt.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErweitertErlaubt, _AutoFilterErweitertErlaubt.ToPlusMinus(), Key);
+            //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErlaubt, _AutofilterErlaubt.ToPlusMinus(), Key);
+            //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterTextFilterErlaubt, _AutofilterTextFilterErlaubt.ToPlusMinus(), Key);
+            //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErweitertErlaubt, _AutoFilterErweitertErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterJoker, _AutoFilterJoker, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BeiZeilenfilterIgnorieren, _IgnoreAtRowFilter.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_TextBearbeitungErlaubt, _TextBearbeitungErlaubt.ToPlusMinus(), Key);
@@ -2233,12 +2259,16 @@ namespace BlueDatabase
             }
 
 
+            if (!_Format.Autofilter_möglich() && _FilterOptions != enFilterOptions.None ){ return "Bei diesem Format keine Filterung erlaubt."; }
+
+            if (_FilterOptions != enFilterOptions.None && !_FilterOptions.HasFlag( enFilterOptions.Enabled)) { return "Filter Kombination nicht möglich."; }
+
             switch (_Format)
             {
 
                 case enDataFormat.Bit:
-                    if (_AutoFilterErweitertErlaubt) { return "Format unterstützt keinen 'erweiternden Autofilter'"; }
-                    if (_AutofilterTextFilterErlaubt) { return "Format unterstützt keine 'Texteingabe bei Autofilter'"; }
+                    if (_FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled)) { return "Format unterstützt keinen 'erweiternden Autofilter'"; }
+                    if (_FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled)) { return "Format unterstützt keine 'Texteingabe bei Autofilter'"; }
                     if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Format unterstützt keinen 'Autofilter Joker'"; }
                     if (!_IgnoreAtRowFilter) { return "Format muss bei Zeilenfilter ignoriert werden.'"; }
                     break;
@@ -2399,7 +2429,7 @@ namespace BlueDatabase
             if (_AfterEdit_Runden > 6) { return "Beim Runden maximal 6 Nachkommastellen möglich"; }
 
 
-            if (!_AutofilterErlaubt)
+            if (_FilterOptions == enFilterOptions.None)
             {
                 if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen"; }
             }
@@ -2419,7 +2449,7 @@ namespace BlueDatabase
                     _Format != enDataFormat.Ganzzahl &&
                     _Format != enDataFormat.Gleitkommazahl) { return "Format unterstützt keine Ersetzungen."; }
 
-                if (_AutoFilterErweitertErlaubt) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
+                if (_FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled)) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
                 if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Entweder 'Ersetzungen' oder 'Autofilter Joker'"; }
             }
 
@@ -2803,9 +2833,9 @@ namespace BlueDatabase
         }
 
 
-        public bool AutoFilter_möglich()
+        public bool AutoFilterSymbolPossible()
         {
-            if (!AutoFilterErlaubt) { return false; }
+            if (!FilterOptions.HasFlag(enFilterOptions.Enabled)) { return false; }
             return Format.Autofilter_möglich();
         }
 

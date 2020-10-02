@@ -460,9 +460,10 @@ namespace BlueDatabase
 
             c.AllowedChars = Source.AllowedChars;
             c.AdminInfo = Source.AdminInfo;
-            c.AutoFilterErlaubt = Source.AutoFilterErlaubt;
-            c.AutofilterTextFilterErlaubt = Source.AutofilterTextFilterErlaubt;
-            c.AutoFilterErweitertErlaubt = Source.AutoFilterErweitertErlaubt;
+            c.FilterOptions = Source.FilterOptions;
+            //c.AutoFilterErlaubt = Source.AutoFilterErlaubt;
+            //c.AutofilterTextFilterErlaubt = Source.AutofilterTextFilterErlaubt;
+            //c.AutoFilterErweitertErlaubt = Source.AutoFilterErweitertErlaubt;
             c.IgnoreAtRowFilter = Source.IgnoreAtRowFilter;
             c.DropdownBearbeitungErlaubt = Source.DropdownBearbeitungErlaubt;
             c.DropdownAllesAbwählenErlaubt = Source.DropdownAllesAbwählenErlaubt;

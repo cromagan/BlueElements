@@ -1122,7 +1122,7 @@ namespace BlueControls.Controls
             ViewItem._TMP_AutoFilterLocation = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 18, HeadSize() - 18, 18, 18);
 
             var filtIt = Filter[ViewItem.Column];
-            if (ViewItem.Column.AutoFilter_möglich())
+            if (ViewItem.Column.AutoFilterSymbolPossible())
             {
 
                 if (filtIt != null)
@@ -1149,7 +1149,7 @@ namespace BlueControls.Controls
 
 
             }
-            else if (ViewItem.Column.AutoFilter_möglich())
+            else if (ViewItem.Column.AutoFilterSymbolPossible())
             {
 
                 if (Autofilter_Sinnvoll(ViewItem))
@@ -2198,7 +2198,7 @@ namespace BlueControls.Controls
 
             if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) { return; }
 
-            if (!columnviewitem.Column.AutoFilter_möglich()) { return; }
+            if (!columnviewitem.Column.AutoFilterSymbolPossible()) { return; }
 
             Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             //OnBeforeAutoFilterShow(new ColumnEventArgs(columnviewitem.Column));
@@ -3959,7 +3959,7 @@ namespace BlueControls.Controls
         {
             if (ViewItem == null) { return false; }
             if (ViewItem._TMP_AutoFilterLocation.Width == 0) { return false; }
-            if (!ViewItem.Column.AutoFilter_möglich()) { return false; }
+            if (!ViewItem.Column.AutoFilterSymbolPossible()) { return false; }
             return ViewItem._TMP_AutoFilterLocation.Contains(e.X, e.Y);
         }
 

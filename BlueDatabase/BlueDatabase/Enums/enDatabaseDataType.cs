@@ -127,9 +127,9 @@ namespace BlueDatabase.Enums
         co_AllowedChars = 135,
 
         co_AdminInfo = 137,
-        co_AutoFilterErlaubt = 138,
-        co_AutoFilterTextFilterErlaubt = 139,
-        co_AutoFilterErweitertErlaubt = 140,
+        co_AutoFilterErlaubt_alt = 138,
+        co_AutoFilterTextFilterErlaubt_alt = 139,
+        co_AutoFilterErweitertErlaubt_alt = 140,
         co_TextBearbeitungErlaubt = 141,
         co_DropdownBearbeitungErlaubt = 142,
         co_DropdownAllesAbwählenErlaubt = 143,
@@ -188,6 +188,7 @@ namespace BlueDatabase.Enums
         //co_Intelligenter_Multifilter = 193,
         co_DauerFilterPos = 194,
         co_AfterEdit_AutoReplace = 195,
+        co_co_FilterOptions = 196,
 
 
 

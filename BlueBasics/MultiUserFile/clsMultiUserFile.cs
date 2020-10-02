@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Threading;
 using static BlueBasics.FileOperations;
@@ -81,6 +82,8 @@ namespace BlueBasics.MultiUserFile
         private readonly Timer Checker;
 
 
+        private readonly bool _zipped;
+
         private bool _CheckedAndReloadNeed;
 
         private DateTime _LastMessageUTC = DateTime.UtcNow.AddMinutes(-10);
@@ -138,9 +141,10 @@ namespace BlueBasics.MultiUserFile
 
 
 
-        protected clsMultiUserFile(bool readOnly, bool easyMode)
+        protected clsMultiUserFile(bool readOnly, bool easyMode, bool zipped)
         {
 
+            _zipped = zipped;
 
 
             AllFiles.Add(this);
@@ -247,7 +251,16 @@ namespace BlueBasics.MultiUserFile
             } while (true);
 
             var _BLoaded = new List<byte>();
-            _BLoaded.AddRange(_tmp);
+
+            if (_tmp.Length > 4 && BitConverter.ToInt32(_tmp, 0) == 67324752)
+            {
+                // Gezipte Daten-Kennung gefunden
+                _BLoaded.AddRange(UnzipIt(_tmp));
+            }
+            else
+            {
+                _BLoaded.AddRange(_tmp);
+            }
 
             return new Tuple<List<byte>, string>(_BLoaded, tmpLastSaveCode2);
         }
@@ -375,7 +388,6 @@ namespace BlueBasics.MultiUserFile
         internal void ParseInternal(List<byte> bLoaded)
         {
             if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Doppelter Parse!"); }
-            //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
             _isParsing = true;
             ParseExternal(bLoaded);
@@ -388,8 +400,6 @@ namespace BlueBasics.MultiUserFile
 
 
             RepairAfterParse();
-
-
         }
 
         public abstract void RepairAfterParse();
@@ -818,6 +828,59 @@ namespace BlueBasics.MultiUserFile
         }
 
 
+        private byte[] UnzipIt(byte[] data)
+        {
+            using (var originalFileStream = new MemoryStream(data))
+            {
+
+                using (var zipArchive = new ZipArchive(originalFileStream))
+                {
+
+                    var entry = zipArchive.GetEntry("Main.bin");
+
+                    using (var stream = entry.Open())
+                    {
+                        using (var ms = new MemoryStream())
+                        {
+                            stream.CopyTo(ms);
+                            return ms.ToArray();
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private byte[] ZipIt(byte[] data)
+        {
+            // https://stackoverflow.com/questions/17217077/create-zip-file-from-byte
+
+            using (var compressedFileStream = new MemoryStream())
+            {
+                //Create an archive and store the stream in memory.
+                using (var zipArchive = new ZipArchive(compressedFileStream, ZipArchiveMode.Create, false))
+                {
+
+                    //Create a zip entry for each attachment
+                    var zipEntry = zipArchive.CreateEntry("Main.bin");
+
+                    //Get the stream of the attachment
+                    using (var originalFileStream = new MemoryStream(data))
+                    {
+                        using (var zipEntryStream = zipEntry.Open())
+                        {
+                            //Copy the attachment stream to the zip entry stream
+                            originalFileStream.CopyTo(zipEntryStream);
+                        }
+                    }
+
+                }
+
+                return compressedFileStream.ToArray();
+            }
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -825,8 +888,10 @@ namespace BlueBasics.MultiUserFile
         private Tuple<string, string, string> WriteTempFileToDisk(bool iAmThePureBinSaver)
         {
 
-            var fi = string.Empty;
-            var TMP = string.Empty;
+            string FileInfoBeforeSaving;
+            string TMPFileName;
+            string DataUncompressed;
+
             byte[] Writer_BinaryData;
 
             var count = 0;
@@ -839,14 +904,28 @@ namespace BlueBasics.MultiUserFile
                 var f = ErrorReason(enErrorReason.Save);
                 if (!string.IsNullOrEmpty(f)) { return null; }
 
-                fi = GetFileInfo(true);
-                Writer_BinaryData = ToListOfByte(true).ToArray();
+                FileInfoBeforeSaving = GetFileInfo(true);
 
-                TMP = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + modAllgemein.UserName().ToUpper());
+
+
+                if (_zipped)
+                {
+                    var bytes = ToListOfByte(true).ToArray();
+                    DataUncompressed = bytes.ToStringConvert();
+                    Writer_BinaryData = ZipIt(bytes);
+                }
+                else
+                {
+                    Writer_BinaryData = ToListOfByte(true).ToArray();
+                    DataUncompressed = Writer_BinaryData.ToStringConvert();
+                }
+
+
+                TMPFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + modAllgemein.UserName().ToUpper());
 
                 try
                 {
-                    using (var x = new FileStream(TMP, FileMode.Create, FileAccess.Write, FileShare.None))
+                    using (var x = new FileStream(TMPFileName, FileMode.Create, FileAccess.Write, FileShare.None))
                     {
                         x.Write(Writer_BinaryData, 0, Writer_BinaryData.Length);
                         x.Flush();
@@ -860,7 +939,7 @@ namespace BlueBasics.MultiUserFile
                 }
                 catch (Exception ex)
                 {
-                    DeleteFile(TMP, false);
+                    DeleteFile(TMPFileName, false);
 
                     count++;
                     if (count > 30)
@@ -872,7 +951,7 @@ namespace BlueBasics.MultiUserFile
                 }
             } while (true);
 
-            return new Tuple<string, string, string>(TMP, fi, Writer_BinaryData.ToStringConvert());
+            return new Tuple<string, string, string>(TMPFileName, FileInfoBeforeSaving, DataUncompressed);
 
         }
 
@@ -969,7 +1048,7 @@ namespace BlueBasics.MultiUserFile
             // Ausstehende Arbeiten ermittelen
             var _MustReload = ReloadNeeded();
             var _MustSave = !ReadOnly && HasPendingChanges();
-            var _MustBackup = !ReadOnly &&  IsThereBackgroundWorkToDo(_MustSave);
+            var _MustBackup = !ReadOnly && IsThereBackgroundWorkToDo(_MustSave);
 
 
             Checker_Tick_count++;

@@ -149,9 +149,9 @@ namespace BlueControls.BlueDatabaseDialogs
 
             cbxAlign.Text = ((int)_Column.Align).ToString();
 
-            AutoFilterMöglich.Checked = _Column.AutoFilterErlaubt;
-            AutoFilterTXT.Checked = _Column.AutofilterTextFilterErlaubt;
-            AutoFilterErw.Checked = _Column.AutoFilterErweitertErlaubt;
+            AutoFilterMöglich.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.Enabled);
+            AutoFilterTXT.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
+            AutoFilterErw.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled);
             ZeilenFilter.Checked = _Column.IgnoreAtRowFilter;
             btnEditableStandard.Checked = _Column.TextBearbeitungErlaubt;
             btnEditableDropdown.Checked = _Column.DropdownBearbeitungErlaubt;
@@ -451,9 +451,15 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.ShowUndo = btnLogUndo.Checked;
             _Column.SpellCheckingEnabled = btnSpellChecking.Checked;
 
-            _Column.AutoFilterErlaubt = AutoFilterMöglich.Checked;
-            _Column.AutofilterTextFilterErlaubt = AutoFilterTXT.Checked;
-            _Column.AutoFilterErweitertErlaubt = AutoFilterErw.Checked;
+
+            var tmpf = enFilterOptions.None;
+            if (AutoFilterMöglich.Checked) { tmpf |= enFilterOptions.Enabled; }
+            if (AutoFilterTXT.Checked) { tmpf |= enFilterOptions.TextFilterEnabled; }
+            if (AutoFilterErw.Checked) { tmpf |= enFilterOptions.ExtendedFilterEnabled; }
+            //_Column.AutoFilterErlaubt = AutoFilterMöglich.Checked;
+            //_Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled) = AutoFilterTXT.Checked;
+            //_Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) = AutoFilterErw.Checked;
+            _Column.FilterOptions = tmpf;
 
             _Column.IgnoreAtRowFilter = ZeilenFilter.Checked;
 

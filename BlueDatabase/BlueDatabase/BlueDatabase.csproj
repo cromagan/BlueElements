@@ -74,6 +74,7 @@
     <Compile Include="ColumnViewCollection.cs" />
     <Compile Include="ColumnViewItem.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="Enums\enFilterOptions.cs" />
     <Compile Include="Enums\enItemState.cs" />
     <Compile Include="Enums\enAction.cs" />
     <Compile Include="Enums\enFilterType.cs" />
