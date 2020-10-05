@@ -4339,17 +4339,17 @@ namespace BlueControls.Controls
                     c = c.Replace("\r", "\r\n");
 
                     System.Windows.Forms.Clipboard.SetDataObject(c, true);
-                    if (Meldung) { Notification.Show("<b>" + c + LanguageTool.DoTranslate("</b><br>ist nun in der Zwischenablage.", true), enImageCode.Kopieren); }
+                    if (Meldung) { Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), enImageCode.Kopieren); }
                 }
                 else
                 {
-                    if (Meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Spalte nicht möglich.", true), enImageCode.Warnung); }
+                    if (Meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Spalte nicht möglich."), enImageCode.Warnung); }
                 }
 
             }
             catch
             {
-                if (Meldung) { Notification.Show(LanguageTool.DoTranslate("Unerwarteter Fehler beim Kopieren.", true), enImageCode.Warnung); }
+                if (Meldung) { Notification.Show(LanguageTool.DoTranslate("Unerwarteter Fehler beim Kopieren."), enImageCode.Warnung); }
             }
 
 

@@ -94,7 +94,6 @@ namespace BlueControls.Controls
             else
             {
                 DisabledReason = string.Empty;
-                var captmp = Filter.Column.ReadableText() + ":";
 
                 var qi = Filter.Column.QuickInfoText(string.Empty);
 
@@ -116,8 +115,11 @@ namespace BlueControls.Controls
                 else
                 {
 
+                    var ShowDelFilterButton = true;
+
                     if (Filter.FilterType == enFilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1)
                     {
+
                         if (myParent == null || myParent.Orientation == enOrientation.Waagerecht || Filter.Column.DauerFilterPos.IsEmpty)
                         {
                             CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
@@ -125,14 +127,25 @@ namespace BlueControls.Controls
                         else
                         {
                             CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
-                            captmp = Filter.Column.Caption + ":";
 
                         }
-                        Caption = captmp;
+                        ShowDelFilterButton = false;
+                        Caption = Filter.Column.ReadableText() + ":";
                         EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
                         Value = Filter.SearchValue[0];
                     }
-                    else
+
+
+                    if (Filter.Column.FilterOptions == enFilterOptions.Enabled_OnlyAndAllowed || Filter.Column.FilterOptions == enFilterOptions.Enabled_OnlyOrAllowed)
+                    {
+                        ShowDelFilterButton = false;
+                        CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+                        Caption = Filter.Column.ReadableText() + ":";
+                        EditType = enEditTypeFormula.Button;
+                    }
+
+
+                    if (ShowDelFilterButton)
                     {
                         CaptionPosition = enÜberschriftAnordnung.ohne;
                         EditType = enEditTypeFormula.Button;
@@ -172,8 +185,27 @@ namespace BlueControls.Controls
 
             if (e.Control is Button btn)
             {
-                btn.ImageCode = "Kreuz|16";
-                btn.Text = Filter.ReadableText();
+
+                if (CaptionPosition == enÜberschriftAnordnung.ohne)
+                {
+                    btn.ImageCode = "Trichter|16||1";
+                    btn.Text = Filter.ReadableText();
+                }
+                else
+                {
+                    if (Filter != null && Filter.SearchValue != null && Filter.SearchValue.Count >0 && !string.IsNullOrEmpty(Filter.SearchValue[0]))
+                    {
+                        btn.ImageCode = "Trichter|16";
+                        btn.Text = "wählen (" + Filter.SearchValue.Count.ToString()  + ")";
+                    }
+                    else
+                    {
+                        btn.ImageCode = "Trichter|16";
+                        btn.Text = "wählen";
+                    }
+                }
+
+
             }
         }
 

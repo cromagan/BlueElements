@@ -2259,9 +2259,21 @@ namespace BlueDatabase
             }
 
 
-            if (!_Format.Autofilter_möglich() && _FilterOptions != enFilterOptions.None ){ return "Bei diesem Format keine Filterung erlaubt."; }
+            if (!_Format.Autofilter_möglich() && _FilterOptions != enFilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
 
-            if (_FilterOptions != enFilterOptions.None && !_FilterOptions.HasFlag( enFilterOptions.Enabled)) { return "Filter Kombination nicht möglich."; }
+            if (_FilterOptions != enFilterOptions.None && !_FilterOptions.HasFlag(enFilterOptions.Enabled)) { return "Filter Kombination nicht möglich."; }
+
+            if (_FilterOptions != enFilterOptions.Enabled_OnlyAndAllowed && _FilterOptions.HasFlag(enFilterOptions.OnlyAndAllowed)) { return "Filter Kombination nicht möglich."; }
+            if (_FilterOptions != enFilterOptions.Enabled_OnlyOrAllowed && _FilterOptions.HasFlag(enFilterOptions.OnlyOrAllowed)) { return "Filter Kombination nicht möglich."; }
+
+            if (_FilterOptions.HasFlag(enFilterOptions.OnlyAndAllowed) || _FilterOptions.HasFlag(enFilterOptions.OnlyOrAllowed))
+            {
+                if (!_MultiLine)
+                {
+                    return "Dieser Filter kann nur bei Mehrzeiligen Spalten benutzt werden.";
+                }
+            }
+
 
             switch (_Format)
             {

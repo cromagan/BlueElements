@@ -152,6 +152,11 @@ namespace BlueControls.BlueDatabaseDialogs
             AutoFilterMöglich.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.Enabled);
             AutoFilterTXT.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
             AutoFilterErw.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled);
+            chkFilterOnlyOr.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.OnlyOrAllowed);
+            chkFilterOnlyAND.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.OnlyAndAllowed);
+
+
+
             ZeilenFilter.Checked = _Column.IgnoreAtRowFilter;
             btnEditableStandard.Checked = _Column.TextBearbeitungErlaubt;
             btnEditableDropdown.Checked = _Column.DropdownBearbeitungErlaubt;
@@ -456,6 +461,8 @@ namespace BlueControls.BlueDatabaseDialogs
             if (AutoFilterMöglich.Checked) { tmpf |= enFilterOptions.Enabled; }
             if (AutoFilterTXT.Checked) { tmpf |= enFilterOptions.TextFilterEnabled; }
             if (AutoFilterErw.Checked) { tmpf |= enFilterOptions.ExtendedFilterEnabled; }
+            if (chkFilterOnlyOr.Checked) { tmpf |= enFilterOptions.OnlyOrAllowed; }
+            if (chkFilterOnlyAND.Checked) { tmpf |= enFilterOptions.OnlyAndAllowed; }
             //_Column.AutoFilterErlaubt = AutoFilterMöglich.Checked;
             //_Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled) = AutoFilterTXT.Checked;
             //_Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) = AutoFilterErw.Checked;
@@ -843,5 +850,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             Column_DatenAuslesen(_Table.CurrentArrangement[_Column].NextVisible(_Table.CurrentArrangement).Column);
         }
+
+
     }
 }

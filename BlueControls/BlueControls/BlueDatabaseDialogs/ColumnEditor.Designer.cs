@@ -92,6 +92,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption11 = new BlueControls.Controls.Caption();
             this.btnAutoEditAutoSort = new BlueControls.Controls.Button();
             this.tabFilter = new BlueControls.Controls.TabPage();
+            this.chkFilterOnlyAND = new BlueControls.Controls.Button();
             this.capDauerfilterPos = new BlueControls.Controls.Caption();
             this.txbDauerFilterPos = new BlueControls.Controls.TextBox();
             this.Caption10 = new BlueControls.Controls.Caption();
@@ -154,6 +155,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
+            this.chkFilterOnlyOr = new BlueControls.Controls.Button();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -696,9 +698,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbAutoReplace.Location = new System.Drawing.Point(8, 288);
             this.txbAutoReplace.MultiLine = true;
             this.txbAutoReplace.Name = "txbAutoReplace";
-            this.txbAutoReplace.QuickInfo = "Texte in der Spalte werden als ganze Zeilen mit diesen Angaben <b>permanent</b> e" +
-    "rsetzt.<br>;cr; kann als Zeilenumbruch benutzt werdern.<br><i><u>Beispiel:</i></" +
-    "u>gruen|hellgrün;cr;grün|casesensitive<br>casesensitive ist optional";
+            this.txbAutoReplace.QuickInfo = resources.GetString("txbAutoReplace.QuickInfo");
             this.txbAutoReplace.Size = new System.Drawing.Size(904, 192);
             this.txbAutoReplace.SpellChecking = true;
             this.txbAutoReplace.TabIndex = 39;
@@ -835,6 +835,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // tabFilter
             // 
             this.tabFilter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabFilter.Controls.Add(this.chkFilterOnlyOr);
+            this.tabFilter.Controls.Add(this.chkFilterOnlyAND);
             this.tabFilter.Controls.Add(this.capDauerfilterPos);
             this.tabFilter.Controls.Add(this.txbDauerFilterPos);
             this.tabFilter.Controls.Add(this.Caption10);
@@ -850,10 +852,19 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabFilter.TabIndex = 2;
             this.tabFilter.Text = "Filter";
             // 
+            // chkFilterOnlyAND
+            // 
+            this.chkFilterOnlyAND.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.chkFilterOnlyAND.Location = new System.Drawing.Point(32, 72);
+            this.chkFilterOnlyAND.Name = "chkFilterOnlyAND";
+            this.chkFilterOnlyAND.Size = new System.Drawing.Size(192, 16);
+            this.chkFilterOnlyAND.TabIndex = 34;
+            this.chkFilterOnlyAND.Text = "nur <b>UND</b>-Filterung erlauben";
+            // 
             // capDauerfilterPos
             // 
             this.capDauerfilterPos.CausesValidation = false;
-            this.capDauerfilterPos.Location = new System.Drawing.Point(8, 296);
+            this.capDauerfilterPos.Location = new System.Drawing.Point(4, 369);
             this.capDauerfilterPos.Name = "capDauerfilterPos";
             this.capDauerfilterPos.Size = new System.Drawing.Size(144, 24);
             this.capDauerfilterPos.Text = "Dauerfilter-Pos.:";
@@ -861,7 +872,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // txbDauerFilterPos
             // 
             this.txbDauerFilterPos.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbDauerFilterPos.Location = new System.Drawing.Point(160, 296);
+            this.txbDauerFilterPos.Location = new System.Drawing.Point(156, 369);
             this.txbDauerFilterPos.Name = "txbDauerFilterPos";
             this.txbDauerFilterPos.Size = new System.Drawing.Size(384, 24);
             this.txbDauerFilterPos.TabIndex = 33;
@@ -869,7 +880,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // Caption10
             // 
             this.Caption10.CausesValidation = false;
-            this.Caption10.Location = new System.Drawing.Point(8, 104);
+            this.Caption10.Location = new System.Drawing.Point(4, 177);
             this.Caption10.Name = "Caption10";
             this.Caption10.Size = new System.Drawing.Size(312, 56);
             this.Caption10.Text = "Bei Autofilter-Aktionen, Zellen mit folgenden Inhalt <b>immer</b> anzeigen, wenn " +
@@ -879,7 +890,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // tbxJoker
             // 
             this.tbxJoker.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbxJoker.Location = new System.Drawing.Point(8, 160);
+            this.tbxJoker.Location = new System.Drawing.Point(4, 233);
             this.tbxJoker.Name = "tbxJoker";
             this.tbxJoker.Size = new System.Drawing.Size(312, 24);
             this.tbxJoker.TabIndex = 7;
@@ -887,7 +898,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // ZeilenFilter
             // 
             this.ZeilenFilter.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.ZeilenFilter.Location = new System.Drawing.Point(12, 71);
+            this.ZeilenFilter.Location = new System.Drawing.Point(8, 144);
             this.ZeilenFilter.Name = "ZeilenFilter";
             this.ZeilenFilter.Size = new System.Drawing.Size(304, 16);
             this.ZeilenFilter.TabIndex = 6;
@@ -905,7 +916,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // AutoFilterTXT
             // 
             this.AutoFilterTXT.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.AutoFilterTXT.Location = new System.Drawing.Point(28, 31);
+            this.AutoFilterTXT.Location = new System.Drawing.Point(32, 32);
             this.AutoFilterTXT.Name = "AutoFilterTXT";
             this.AutoFilterTXT.Size = new System.Drawing.Size(208, 16);
             this.AutoFilterTXT.TabIndex = 4;
@@ -914,7 +925,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // AutoFilterErw
             // 
             this.AutoFilterErw.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.AutoFilterErw.Location = new System.Drawing.Point(28, 47);
+            this.AutoFilterErw.Location = new System.Drawing.Point(32, 48);
             this.AutoFilterErw.Name = "AutoFilterErw";
             this.AutoFilterErw.Size = new System.Drawing.Size(192, 16);
             this.AutoFilterErw.TabIndex = 5;
@@ -1505,6 +1516,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
             // 
+            // chkFilterOnlyOr
+            // 
+            this.chkFilterOnlyOr.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.chkFilterOnlyOr.Location = new System.Drawing.Point(32, 88);
+            this.chkFilterOnlyOr.Name = "chkFilterOnlyOr";
+            this.chkFilterOnlyOr.Size = new System.Drawing.Size(192, 16);
+            this.chkFilterOnlyOr.TabIndex = 35;
+            this.chkFilterOnlyOr.Text = "nur <b>ODER</b>-Filterung erlauben";
+            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(926, 671);
@@ -1666,5 +1686,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button butAktuellZurueck;
         private TextBox txbAutoReplace;
         private Caption capAutoReplace;
+        private Button chkFilterOnlyAND;
+        private Button chkFilterOnlyOr;
     }
 	}

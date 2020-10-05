@@ -309,6 +309,14 @@ namespace BlueDatabase
                             return QuickImage.Get("Kreuz|" + gr);
                         case enImageNotFound.Show_Green_Checkmark:
                             return QuickImage.Get("Häkchen|" + gr);
+
+                        case enImageNotFound.Show_Info_Sign:
+                            return QuickImage.Get("Information|" + gr);
+                        case enImageNotFound.Show_Warning_Sign:
+                            return QuickImage.Get("Warnung|" + gr);
+                        case enImageNotFound.Show_Critical_Sign:
+                            return QuickImage.Get("Kritisch|" + gr);
+
                         default:
                             return null;
                     }

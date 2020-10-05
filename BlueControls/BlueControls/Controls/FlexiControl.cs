@@ -164,7 +164,9 @@ namespace BlueControls.Controls
             }
         }
 
-
+        /// <summary>
+        /// DisabledReason befüllen, um das Steuerelement zu disablen
+        /// </summary>
         [DefaultValue(true)]
         public new bool Enabled
         {

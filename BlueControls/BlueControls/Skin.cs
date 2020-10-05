@@ -915,15 +915,15 @@ namespace BlueControls
             }
 
 
-            if (Convert.ToBoolean(vAlign & enAlignment.Right)) { XP = FitInRect.Width - pSize.Width - tSize.Width; }
-            if (Convert.ToBoolean(vAlign & enAlignment.HorizontalCenter)) { XP = (float)((FitInRect.Width - pSize.Width - tSize.Width) / 2.0); }
+            if (vAlign.HasFlag(enAlignment.Right)) { XP = FitInRect.Width - pSize.Width - tSize.Width; }
+            if (vAlign.HasFlag(enAlignment.HorizontalCenter)) { XP = (float)((FitInRect.Width - pSize.Width - tSize.Width) / 2.0); }
 
-            if (Convert.ToBoolean(vAlign & enAlignment.VerticalCenter))
+            if (vAlign.HasFlag(enAlignment.VerticalCenter))
             {
                 YP1 = (float)((FitInRect.Height - pSize.Height) / 2.0);
                 YP2 = (float)((FitInRect.Height - tSize.Height) / 2.0);
             }
-            if (Convert.ToBoolean(vAlign & enAlignment.Bottom))
+            if (vAlign.HasFlag(enAlignment.Bottom))
             {
                 YP1 = FitInRect.Height - pSize.Height;
                 YP2 = FitInRect.Height - tSize.Height;

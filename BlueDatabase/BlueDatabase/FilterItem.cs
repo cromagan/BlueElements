@@ -228,6 +228,11 @@ namespace BlueDatabase
                     case enFilterType.Istgleich_GroﬂKleinEgal:
                     case enFilterType.Istgleich_ODER_GroﬂKleinEgal:
                         return nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'";
+
+                    case enFilterType.IstGleich_UND:
+                    case enFilterType.Istgleich_UND_GroﬂKleinEgal:
+                        return nam + " - alle: '" + SearchValue.JoinWith("', '") + "'";
+
                     default:
 
 

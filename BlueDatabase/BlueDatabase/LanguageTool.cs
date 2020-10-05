@@ -30,6 +30,8 @@ namespace BlueDatabase
         private static string German = string.Empty;
         private static string English = string.Empty;
 
+        private static readonly object[] EmptyArgs = new object[0];
+
 
         /// <summary>
         /// Fügt Präfix und Suffix hinzu und ersteztt den Text nach dem geünschten Stil.
@@ -92,23 +94,28 @@ namespace BlueDatabase
         }
 
 
+
+
+        public static string DoTranslate(string txt) => DoTranslate(txt, true, EmptyArgs);
+
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="txt"></param>
         /// <param name="mustTranslate">TRUE erstellt einen Eintrag in der Englisch-Datenbank, falls nicht vorhanden.</param>
         /// <returns></returns>
-        public static string DoTranslate(string txt, bool mustTranslate)
+        public static string DoTranslate(string txt, bool mustTranslate, params object[] args)
         {
-            if (Translation == null) { return txt; }
+            if (Translation == null) { return string.Format(txt, args); }
             if (string.IsNullOrEmpty(txt)) { return string.Empty; }
 
-            if (German == txt) { return English; }
+            if (German == txt) { return string.Format(English, args); }
 
             German = txt;
 
-            if (txt.ContainsChars(Constants.Char_Numerals)) { English = German; return German; }
-            if (txt.ToLower().Contains("imagecode")) { English = German; return German; }
+            //if (txt.ContainsChars(Constants.Char_Numerals)) { English = German; return string.Format(English, args); }
+            //if (txt.ToLower().Contains("imagecode")) { English = German; return string.Format(English, args); }
 
             var addend = string.Empty;
 
@@ -123,17 +130,17 @@ namespace BlueDatabase
             var r = Translation.Row[txt];
             if (r == null)
             {
-                if (Translation.ReadOnly) { English = German; return German; }
-                if (!mustTranslate) { English = German; return German; }
+                if (Translation.ReadOnly) { English = German; return string.Format(English, args); }
+                if (!mustTranslate) { English = German; return string.Format(English, args); }
                 r = Translation.Row.Add(txt);
             }
 
 
             var t = r.CellGetString("Translation");
-            if (string.IsNullOrEmpty(t)) { English = German; return German; }
+            if (string.IsNullOrEmpty(t)) { English = German; return string.Format(English, args); }
             English = t + addend;
 
-            return English;
+            return string.Format(English, args);
         }
 
     }

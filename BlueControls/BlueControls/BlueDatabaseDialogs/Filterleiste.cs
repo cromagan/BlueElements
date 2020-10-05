@@ -2,11 +2,13 @@
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
@@ -287,7 +289,20 @@ namespace BlueControls.BlueDatabaseDialogs
                     if (FilterItem == null && ShowMe)
                     {
                         // Dummy-Filter, nicht in der Collection
-                        FilterItem = new FilterItem(thisColumn, enFilterType.Instr_GroßKleinEgal, string.Empty);
+
+                        if (thisColumn.FilterOptions == enFilterOptions.Enabled_OnlyAndAllowed)
+                        {
+                            FilterItem = new FilterItem(thisColumn, enFilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
+                        }
+                        else if (thisColumn.FilterOptions == enFilterOptions.Enabled_OnlyAndAllowed)
+                        {
+                            FilterItem = new FilterItem(thisColumn, enFilterType.Istgleich_ODER_GroßKleinEgal, string.Empty);
+                        }
+                        else
+                        {
+                            FilterItem = new FilterItem(thisColumn, enFilterType.Instr_GroßKleinEgal, string.Empty);
+                        }
+
                     }
 
 
@@ -387,7 +402,40 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void Flx_ButtonClicked(object sender, System.EventArgs e)
         {
-            _TableView.Filter.Remove(((FlexiControlForFilter)sender).Filter);
+
+            var f = (FlexiControlForFilter)sender;
+
+
+            if (f.CaptionPosition == enÜberschriftAnordnung.ohne)
+            {
+                // ein Großer Knopf ohne Überschrift, da wird der evl. Filter gelöscht
+                _TableView.Filter.Remove(((FlexiControlForFilter)sender).Filter);
+                return;
+            }
+
+            //f.Enabled = false;
+
+            var autofilter = new AutoFilter(f.Filter.Column, _TableView.Filter);
+            var p = f.PointToScreen(Point.Empty);
+
+            autofilter.Position_LocateToPosition(new Point(p.X, p.Y + f.Height));
+
+            autofilter.Show();
+
+            autofilter.FilterComand += AutoFilter_FilterComand;
+            Develop.Debugprint_BackgroundThread();
+
+
+        }
+
+        private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e)
+        {
+
+            _TableView.Filter.Remove(e.Column);
+
+            if (e.Comand != "Filter") { return; }
+            _TableView.Filter.Add(e.Filter);
+
         }
 
         private void Flx_ValueChanged(object sender, System.EventArgs e)
