@@ -743,7 +743,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public void AddRange(List<string> Values, ColumnItem ColumnStyle, enShortenStyle Style)
+        public void AddRange(List<string> Values, ColumnItem ColumnStyle, enShortenStyle Style, bool compact)
         {
 
             if (Values == null) { return; }
@@ -758,12 +758,12 @@ namespace BlueControls.ItemCollection
 
             foreach (var thisstring in Values)
             {
-                Add(thisstring, ColumnStyle, Style); // If Item(thisstring) Is Nothing Then Add(New CellLikeItem(thisstring, ColumnStyle))
+                Add(thisstring, ColumnStyle, Style, compact); // If Item(thisstring) Is Nothing Then Add(New CellLikeItem(thisstring, ColumnStyle))
             }
 
         }
 
-        public void Add(string Value, ColumnItem ColumnStyle, enShortenStyle Style)
+        public void Add(string Value, ColumnItem ColumnStyle, enShortenStyle Style, bool compact)
         {
 
 
@@ -775,7 +775,7 @@ namespace BlueControls.ItemCollection
                 }
                 else
                 {
-                    Add(new CellLikeListItem(Value, ColumnStyle, Style, true));
+                    Add(new CellLikeListItem(Value, ColumnStyle, Style, true, compact));
 
                 }
             }
@@ -1142,7 +1142,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem checkedItemsAtRow, enShortenStyle style, int maxItems)
+        public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem checkedItemsAtRow, enShortenStyle style, int maxItems, bool compact)
         {
 
             var Marked = new List<string>();
@@ -1233,7 +1233,7 @@ namespace BlueControls.ItemCollection
 
             if (maxItems > 0 && l.Count > maxItems) { return; }
 
-            e.AddRange(l, column, style);
+            e.AddRange(l, column, style, compact);
 
 
             if (checkedItemsAtRow != null)

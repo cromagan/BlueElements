@@ -86,7 +86,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (List_FilterString.Count < 400)
             {
-                lsbFilterItems.Item.AddRange(List_FilterString, Column, enShortenStyle.Both);
+                lsbFilterItems.Item.AddRange(List_FilterString, Column, enShortenStyle.Replaced, false);
                 lsbFilterItems.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
             }
             else
@@ -107,9 +107,8 @@ namespace BlueControls.BlueDatabaseDialogs
 
             lsbFilterItems.Height = Math.Min(lsbFilterItems.Height, 560);
 
-            if (nochOk && Column.FilterOptions != enFilterOptions.Enabled_OnlyAndAllowed && Column.FilterOptions != enFilterOptions.Enabled_OnlyOrAllowed)
+            if (Column.FilterOptions != enFilterOptions.Enabled_OnlyAndAllowed && Column.FilterOptions != enFilterOptions.Enabled_OnlyOrAllowed)
             {
-                // Nur bei den richtigen Filterungen auch anzeigen. Bei den anderen rentiert es sich nicht...
 
                 txbEingabe.Enabled = Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
                 capWas.Enabled = Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);

@@ -115,7 +115,7 @@ namespace BlueBasics
 
         public new void Insert(int index, T item)
         {
-            if (index > Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch!"); }
+            if (index > Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch: " + index); }
             base.Insert(index, item);
             OnItemAdded(item);
         }
@@ -160,7 +160,7 @@ namespace BlueBasics
         {
             get
             {
-                if (index >= Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch!"); }
+                if (index >= Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch: " + index); }
                 return base[index];
             }
             set
