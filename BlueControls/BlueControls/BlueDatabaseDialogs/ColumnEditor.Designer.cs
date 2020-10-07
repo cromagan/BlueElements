@@ -92,6 +92,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption11 = new BlueControls.Controls.Caption();
             this.btnAutoEditAutoSort = new BlueControls.Controls.Button();
             this.tabFilter = new BlueControls.Controls.TabPage();
+            this.chkFilterOnlyOr = new BlueControls.Controls.Button();
             this.chkFilterOnlyAND = new BlueControls.Controls.Button();
             this.capDauerfilterPos = new BlueControls.Controls.Caption();
             this.txbDauerFilterPos = new BlueControls.Controls.TextBox();
@@ -155,7 +156,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
-            this.chkFilterOnlyOr = new BlueControls.Controls.Button();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -852,6 +852,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabFilter.TabIndex = 2;
             this.tabFilter.Text = "Filter";
             // 
+            // chkFilterOnlyOr
+            // 
+            this.chkFilterOnlyOr.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.chkFilterOnlyOr.Location = new System.Drawing.Point(32, 88);
+            this.chkFilterOnlyOr.Name = "chkFilterOnlyOr";
+            this.chkFilterOnlyOr.Size = new System.Drawing.Size(192, 16);
+            this.chkFilterOnlyOr.TabIndex = 35;
+            this.chkFilterOnlyOr.Text = "nur <b>ODER</b>-Filterung erlauben";
+            // 
             // chkFilterOnlyAND
             // 
             this.chkFilterOnlyAND.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
@@ -1482,6 +1491,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capIntern
             // 
+            this.capIntern.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.capIntern.CausesValidation = false;
             this.capIntern.Location = new System.Drawing.Point(112, 640);
             this.capIntern.Name = "capIntern";
@@ -1490,6 +1500,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // caption5
             // 
+            this.caption5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.caption5.CausesValidation = false;
             this.caption5.Location = new System.Drawing.Point(460, 641);
             this.caption5.Name = "caption5";
@@ -1515,15 +1526,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.butAktuellZurueck.Size = new System.Drawing.Size(72, 24);
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
-            // 
-            // chkFilterOnlyOr
-            // 
-            this.chkFilterOnlyOr.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.chkFilterOnlyOr.Location = new System.Drawing.Point(32, 88);
-            this.chkFilterOnlyOr.Name = "chkFilterOnlyOr";
-            this.chkFilterOnlyOr.Size = new System.Drawing.Size(192, 16);
-            this.chkFilterOnlyOr.TabIndex = 35;
-            this.chkFilterOnlyOr.Text = "nur <b>ODER</b>-Filterung erlauben";
             // 
             // ColumnEditor
             // 

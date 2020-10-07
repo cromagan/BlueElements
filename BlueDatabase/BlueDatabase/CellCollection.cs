@@ -892,7 +892,7 @@ namespace BlueDatabase
 
                 }
                 if (_String is null) { _String = string.Empty; }
-                if (Typ.HasFlag(enFilterType.Instr)) { _String = LanguageTool.ColumnReplace(_String, fColumn, enShortenStyle.Both); }
+                if (Typ.HasFlag(enFilterType.Instr)) { _String = LanguageTool.ColumnReplace(_String, fColumn, enShortenStyle.Both, false); }
 
 
 
@@ -1009,7 +1009,7 @@ namespace BlueDatabase
                 case enFilterType.Berechne:
                     if (string.IsNullOrEmpty(IstValue)) { return false; }
                     if (!FilterValue.ToUpper().Contains("VALUE")) { return false; }
-                    var d = modErgebnis.Ergebnis(FilterValue.Replace("VALUE", IstValue, RegexOptions.IgnoreCase));
+                    var d = modErgebnis.Ergebnis(FilterValue.Replace("VALUE", IstValue.Replace(",", "."), RegexOptions.IgnoreCase));
                     if (d == null) { return false; }
                     return Convert.ToBoolean(d == -1);
 

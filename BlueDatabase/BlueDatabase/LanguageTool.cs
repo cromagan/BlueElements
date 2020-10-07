@@ -40,9 +40,9 @@ namespace BlueDatabase
         /// <param name="Column"></param>
         /// <param name="Style"></param>
         /// <returns></returns>
-        public static string ColumnReplace(string newTXT, ColumnItem Column, enShortenStyle Style)
+        public static string ColumnReplace(string newTXT, ColumnItem Column, enShortenStyle Style, bool compactView)
         {
-            if (!string.IsNullOrEmpty(newTXT))
+            if (!compactView && !string.IsNullOrEmpty(newTXT))
             {
                 if (!string.IsNullOrEmpty(Column.Prefix)) { newTXT = DoTranslate(Column.Prefix, true) + " " + newTXT; }
                 if (!string.IsNullOrEmpty(Column.Suffix)) { newTXT = newTXT + " " + DoTranslate(Column.Suffix, true); }

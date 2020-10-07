@@ -241,7 +241,9 @@ namespace BlueControls.BlueDatabaseDialogs
         public static void OpenDatabaseHeadEditor(Database DB)
         {
             DB.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
-            DB.Load_Reload();
+
+
+    //        DB.Load_Reload(); Auf keinen Fall, die Routine wird evtl. in der Laderoutine aufgerufen. z.B. bei Fehlerhaften Regeln
             using (var w = new DatabaseHeadEditor(DB))
             {
                 w.ShowDialog();

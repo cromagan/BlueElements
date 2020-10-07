@@ -368,7 +368,7 @@ namespace BlueControls.BlueDatabaseDialogs
                             {
                                 modAllgemein.Swap(ref Zd1, ref Zd2);
                             }
-                            CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Berechne | enFilterType.UND, "BTW(VALUE, " + Zd1 + "," + Zd2 + ")"));
+                            CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Berechne | enFilterType.UND, "BTW(VALUE, " + Zd1.ToString().Replace(",",".") + "," + Zd2.ToString().Replace(",", ".") + ")"));
                             return;
                         }
                     }

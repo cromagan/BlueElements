@@ -144,7 +144,7 @@ namespace BlueDatabase
                 case enDataFormat.RelationText:
                 case enDataFormat.LinkedCell:  // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
                     //if (Txt == null || string.IsNullOrEmpty(Txt)) { return string.Empty; }
-                    Txt = LanguageTool.ColumnReplace(Txt, column, Style);
+                    Txt = LanguageTool.ColumnReplace(Txt, column, Style, CompactView);
                     Txt = Txt.Replace("\r\n", " ");
                     Txt = Txt.Replace("\r", " ");
                     break;
@@ -152,7 +152,7 @@ namespace BlueDatabase
                 case enDataFormat.BildCode:
                 case enDataFormat.Button:
                     if (CompactView && Style != enShortenStyle.HTML) { return string.Empty; }
-                    Txt = LanguageTool.ColumnReplace(Txt, column, Style);
+                    Txt = LanguageTool.ColumnReplace(Txt, column, Style, CompactView);
                     break;
 
                 case enDataFormat.Bit:
@@ -178,7 +178,7 @@ namespace BlueDatabase
                     {
                         Txt = "Unbekannt";
                     }
-                    Txt = LanguageTool.ColumnReplace(Txt, column, Style);
+                    Txt = LanguageTool.ColumnReplace(Txt, column, Style, CompactView);
                     break;
 
 
@@ -190,7 +190,7 @@ namespace BlueDatabase
                         var col = Color.FromArgb(int.Parse(Txt));
                         Txt = col.ColorName();
                     }
-                    Txt = LanguageTool.ColumnReplace(Txt, column, Style);
+                    Txt = LanguageTool.ColumnReplace(Txt, column, Style, CompactView);
                     break;
 
 
@@ -212,7 +212,7 @@ namespace BlueDatabase
                     var C = LinkedDatabase.Column.SearchByKey(ColKey);
                     if (C == null) { return "Columnkey nicht gefunden"; }
 
-                    Txt = LanguageTool.ColumnReplace(C.ReadableText(), column, Style);
+                    Txt = LanguageTool.ColumnReplace(C.ReadableText(), column, Style, CompactView);
                     break;
 
                 default:

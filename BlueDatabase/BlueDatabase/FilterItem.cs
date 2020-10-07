@@ -257,13 +257,13 @@ namespace BlueDatabase
                 case enFilterType.Istgleich_GroﬂKleinEgal:
                 case enFilterType.Istgleich_ODER_GroﬂKleinEgal:
                 case enFilterType.Istgleich_UND_GroﬂKleinEgal:
-                    return nam + " = " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced);
+                    return nam + " = " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced, false);
 
                 case enFilterType.Ungleich_MultiRowIgnorieren:
                 case enFilterType.Ungleich_MultiRowIgnorieren_UND_GroﬂKleinEgal:
                 case enFilterType.Ungleich_MultiRowIgnorieren_GroﬂKleinEgal:
                     if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss bef¸llt sein"; }
-                    return nam + " <> " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced);
+                    return nam + " <> " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced, false);
 
 
                 case enFilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren:
@@ -277,6 +277,21 @@ namespace BlueDatabase
                     if (SearchValue.Count == 0 || string.IsNullOrEmpty(SearchValue[0])) { return "Filter aktuell ohne Funktion"; }
 
                     return nam + " beinhaltet den Text '" + SearchValue[0] + "'";
+
+
+                case (enFilterType.Berechne | enFilterType.UND):
+
+                    if (SearchValue[0].ToUpper().StartsWith("BTW(VALUE, "))
+                    {
+                        var l = SearchValue[0].ToUpper().TrimStart("BTW(VALUE, ");
+                        l = l.TrimEnd(")");
+                        l = "von " + l.Replace(",", " bis ");
+
+                        return nam + ": " + l;
+                    }
+
+
+                    return nam + ": Spezial-Filter";
 
                 default:
                     return nam + ": Spezial-Filter";

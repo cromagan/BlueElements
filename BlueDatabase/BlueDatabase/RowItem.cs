@@ -649,7 +649,7 @@ namespace BlueDatabase
                     if (!ThisColumnItem.IgnoreAtRowFilter)
                     {
                         var _String = CellGetString(ThisColumnItem);
-                        _String = LanguageTool.ColumnReplace(_String, ThisColumnItem, enShortenStyle.Both);
+                        _String = LanguageTool.ColumnReplace(_String, ThisColumnItem, enShortenStyle.Both, false);
                         if (!string.IsNullOrEmpty(_String) && _String.ToUpper().Contains(searchText)) { return true; }
                     }
                 }
