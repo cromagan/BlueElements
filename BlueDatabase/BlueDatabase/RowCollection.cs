@@ -465,7 +465,7 @@ namespace BlueDatabase
         }
 
 
-        public List<RowItem> CalculateSortedRows(FilterCollection Filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows)
+        public List<RowItem> CalculateSortedRows(List<FilterItem> Filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows)
         {
             var TMP = new List<string>();
             var _tmpSortedRows = new List<RowItem>();

@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
+using static BlueBasics.modConverter;
 
 namespace BlueBasics
 {
@@ -737,14 +738,13 @@ namespace BlueBasics
 
 
 
-
             if (string.IsNullOrEmpty(w[1]))
             {
                 _width = -1;
             }
             else
             {
-                _width = int.Parse(w[1]);
+                _width = IntParse(w[1]);
             }
 
             if (string.IsNullOrEmpty(w[2]))
@@ -753,12 +753,12 @@ namespace BlueBasics
             }
             else
             {
-                _height = int.Parse(w[2]);
+                _height = IntParse(w[2]);
             }
 
             if (!string.IsNullOrEmpty(w[3]))
             {
-                _effekt = (enImageCodeEffect)int.Parse(w[3]);
+                _effekt = (enImageCodeEffect)IntParse(w[3]);
             }
 
 

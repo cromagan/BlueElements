@@ -618,7 +618,7 @@ namespace BlueDatabase
             return true;
         }
 
-        public bool MatchesTo(FilterCollection filter)
+        public bool MatchesTo(List<FilterItem> filter)
         {
             if (Database == null) { return false; }
 

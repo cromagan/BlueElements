@@ -1033,6 +1033,16 @@ namespace BlueControls.ItemCollection
 
 
 
+        public void RemoveRange(List<string> Internal)
+        {
+            foreach (var item in Internal)
+            {
+                Remove(item);
+            }
+        }
+
+
+
         public BasicListItem this[string Internal]
         {
             get

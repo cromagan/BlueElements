@@ -2587,6 +2587,12 @@ namespace BlueDatabase
                         {
                             if (l[z] == rep[0]) { l[z] = r; }
                         }
+                        else if (op == "instr")
+                        {
+                            l[z] = l[z].Replace(rep[0], r, RegexOptions.IgnoreCase);
+
+                            //if (l[z].ToLower() == rep[0].ToLower()) { l[z] = r; }
+                        }
                         else
                         {
                             if (l[z].ToLower() == rep[0].ToLower()) { l[z] = r; }
