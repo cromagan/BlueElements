@@ -246,8 +246,8 @@ namespace BlueDatabase
 
             if (_Column == Database.Column.SysCorrect && _FilterType.HasFlag(enFilterType.Istgleich))
             {
-                if (SearchValue[0].FromPlusMinus()) { return "Fehlerfrei"; }
-                if (!SearchValue[0].FromPlusMinus()) { return "Fehlerhaft"; }
+                if (SearchValue[0].FromPlusMinus()) { return "Fehlerfreie Zeilen"; }
+                if (!SearchValue[0].FromPlusMinus()) { return "Fehlerhafte Zeilen"; }
             }
 
 
@@ -279,6 +279,7 @@ namespace BlueDatabase
                     return nam + " beinhaltet den Text '" + SearchValue[0] + "'";
 
 
+                case enFilterType.Berechne:
                 case (enFilterType.Berechne | enFilterType.UND):
 
                     if (SearchValue[0].ToUpper().StartsWith("BTW(VALUE, "))

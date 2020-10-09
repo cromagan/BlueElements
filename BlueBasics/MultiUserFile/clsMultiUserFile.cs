@@ -1018,6 +1018,8 @@ namespace BlueBasics.MultiUserFile
 
         /// <summary>
         /// Darf nur von einem Background-Thread aufgerufen werden.
+        /// Nach einer Minute wird der trotzdem diese Routine verlassen, vermutlich liegt dann ein Fehler vor,
+        /// da der Parse unabhängig vom Netzwerk ist 
         /// </summary>
         public void WaitParsed()
         {
@@ -1026,9 +1028,12 @@ namespace BlueBasics.MultiUserFile
                 Develop.DebugPrint(enFehlerArt.Fehler, "Darf nur von einem BackgroundThread aufgerufen werden!");
             }
 
+            var x = DateTime.Now;
+
             while (_isParsing)
             {
                 Develop.DoEvents();
+                if (DateTime.Now.Subtract(x).TotalSeconds > 60) { return; }
             }
         }
 
