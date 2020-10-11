@@ -254,14 +254,22 @@ namespace BlueControls.BlueDatabaseDialogs
 
                 #region Reihenfolge der Spalten bestimmen
 
-                foreach (var thisclsVitem in orderArrangement)
+
+                if (orderArrangement != null)
                 {
-                    columSort.AddIfNotExists(thisclsVitem.Column);
+                    foreach (var thisclsVitem in orderArrangement)
+                    {
+                        columSort.AddIfNotExists(thisclsVitem.Column);
+                    }
                 }
 
-                foreach (var thisclsVitem in _TableView?.CurrentArrangement)
+
+                if (_TableView?.CurrentArrangement != null)
                 {
-                    columSort.AddIfNotExists(thisclsVitem.Column);
+                    foreach (var thisclsVitem in _TableView?.CurrentArrangement)
+                    {
+                        columSort.AddIfNotExists(thisclsVitem.Column);
+                    }
                 }
 
                 foreach (var thisColumn in _TableView.Database.Column)

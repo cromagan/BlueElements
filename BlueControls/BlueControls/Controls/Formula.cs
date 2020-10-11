@@ -864,6 +864,12 @@ namespace BlueControls.Controls
                     break;
 
                 case "#AddColumnToHead":
+
+                    if (_Database.Views.Count ==0)
+                    {
+                        _Database.Views.Add(new ColumnViewCollection(_Database, string.Empty, "##Head###"));
+                    }
+
                     _Database.Views[0].Add(Column, false);
                     break;
 

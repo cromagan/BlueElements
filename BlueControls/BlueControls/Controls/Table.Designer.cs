@@ -67,6 +67,7 @@ namespace BlueControls.Controls
             this.BTB.ESC += new EventHandler(this.BB_ESC);
             this.BTB.TAB += new EventHandler(this.BB_TAB);
             this.BTB.LostFocus += new EventHandler(this.BB_LostFocus);
+            this.BTB.NeedDatabaseOfAdditinalSpecialChars += BTB_NeedDatabaseOfAdditinalSpecialChars;
             // 
             // SliderX
             // 
@@ -100,6 +101,9 @@ namespace BlueControls.Controls
             this.ResumeLayout(false);
 
         }
+
+
+
         private ComboBox BCB;
         private TextBox BTB;
         private Slider SliderX;

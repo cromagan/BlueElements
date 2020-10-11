@@ -702,7 +702,7 @@ namespace BlueControls.Forms
                 case "btnSaveAs":
                     if (_Database == null) { return; }
                     break;
-                case "NeuDB":
+                case "btnNeuDB":
                     if (_Database != null) { SetDatabasetoNothing(); }
                     break;
                 default:
@@ -718,7 +718,7 @@ namespace BlueControls.Forms
 
             StandardTabx();
 
-            if (bu.Name == "NeuDB")
+            if (bu.Name == "btnNeuDB")
             {
                 DatabaseSet(new Database(false)); // Ab jetzt in der Variable _Database zu finden
             }

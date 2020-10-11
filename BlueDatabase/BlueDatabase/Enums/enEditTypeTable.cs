@@ -31,6 +31,7 @@ namespace BlueDatabase.Enums
         //RelationEditor_InTable = 6,
         Dropdown_Single = 7,
         Font_AuswahlDialog = 8,
-        Textfeld_mit_Auswahlknopf = 9
+        Textfeld_mit_Auswahlknopf = 9,
+        WarnungNurFormular = 10
     }
 }

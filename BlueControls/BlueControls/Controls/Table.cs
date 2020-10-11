@@ -1670,6 +1670,10 @@ namespace BlueControls.Controls
                     //Cell_Edit_Font(cellInThisDatabaseColumn, cellInThisDatabaseRow);
                     break;
 
+                case enEditTypeTable.WarnungNurFormular:
+                    NotEditableInfo("Dieser Zelltyp kann nur in einem Formular-Fenster bearbeitet werden");
+                    break;
+
                 default:
 
                     Develop.DebugPrint(dia);
@@ -3048,7 +3052,10 @@ namespace BlueControls.Controls
             CloseAllComponents();
         }
 
-
+        private void BTB_NeedDatabaseOfAdditinalSpecialChars(object sender, BlueBasics.EventArgs.MultiUserFileGiveBackEventArgs e)
+        {
+            e.File = Database;
+        }
 
         private void BB_TAB(object sender, System.EventArgs e)
         {
@@ -3433,7 +3440,7 @@ namespace BlueControls.Controls
         {
             get
             {
-                if (_Database == null) { return null; }
+                if (_Database == null || _Database.ColumnArrangements == null || _Database.ColumnArrangements.Count <= _ArrangementNr ) { return null; }
                 return _Database.ColumnArrangements[_ArrangementNr];
             }
         }
@@ -3998,7 +4005,7 @@ namespace BlueControls.Controls
             if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) { return false; }
             if (_Database.ColumnArrangements.Count == 0) { return false; }
 
-            if (CurrentArrangement[_Database.Column[0]] == null) { return false; }
+            if (CurrentArrangement != null && CurrentArrangement[_Database.Column[0]] == null) { return false; }
             if (!_Database.PermissionCheck(_Database.PermissionGroups_NewRow, null)) { return false; }
 
             if (!CellCollection.UserEditPossible(_Database.Column[0], null, enErrorReason.EditNormaly)) { return false; }
@@ -4092,7 +4099,11 @@ namespace BlueControls.Controls
             Database?.Load_Reload();
 
 
-
+            if ( e == null)
+            {
+                Cancel = true;
+                return;
+            }
 
             CellOnCoordinate(e.X, e.Y, out _MouseOverColumn, out _MouseOverRow);
 

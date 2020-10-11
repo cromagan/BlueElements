@@ -205,7 +205,7 @@ namespace BlueControls
         {
             get
             {
-                if (string.IsNullOrEmpty(_TMPHtmlText))
+                if (string.IsNullOrEmpty(_TMPPlainText))
                 {
                     _TMPPlainText = ConvertCharToPlainText(0, Chars.Count - 1);
                 }

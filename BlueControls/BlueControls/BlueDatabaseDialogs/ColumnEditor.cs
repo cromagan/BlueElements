@@ -104,7 +104,7 @@ namespace BlueControls.BlueDatabaseDialogs
             btnZurueck.Enabled = _Column.Previous() != null;
             btnVor.Enabled = _Column.Next() != null;
 
-            if (_Table != null)
+            if (_Table != null && _Table.CurrentArrangement != null)
             {
                 butAktuellZurueck.Enabled = _Table.CurrentArrangement[_Column]?.PreviewsVisible(_Table.CurrentArrangement) != null;
                 butAktuellVor.Enabled = _Table.CurrentArrangement[_Column]?.NextVisible(_Table.CurrentArrangement) != null;

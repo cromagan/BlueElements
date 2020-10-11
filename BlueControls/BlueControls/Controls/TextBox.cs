@@ -444,7 +444,7 @@ namespace BlueControls.Controls
                     break;
                 case System.Windows.Forms.Keys.Delete:
                     KeyPress(enASCIIKey.DEL);
-                    CheckIfTextIsChanded(_eTxt.PlainText);
+                    CheckIfTextIsChanded(_eTxt.HtmlText);
                     break;
             }
 
@@ -608,7 +608,7 @@ namespace BlueControls.Controls
                     }
             }
 
-            CheckIfTextIsChanded(_eTxt.PlainText);
+            CheckIfTextIsChanded(_eTxt.HtmlText);
         }
 
 
@@ -648,7 +648,7 @@ namespace BlueControls.Controls
                 }
             }
 
-            CheckIfTextIsChanded(_eTxt.PlainText);
+            CheckIfTextIsChanded(_eTxt.HtmlText);
         }
 
         private void Clipboard_Copy()
@@ -710,7 +710,7 @@ namespace BlueControls.Controls
 
             if (IsDisposed) { return; }
 
-            CheckIfTextIsChanded(_eTxt.PlainText);
+            CheckIfTextIsChanded(_eTxt.HtmlText);
         }
 
         internal bool WordStarts(string word, int position)
@@ -1760,6 +1760,8 @@ namespace BlueControls.Controls
 
             Char_DelBereich(-1, -1);
             if (_eTxt.InsertImage(r[0], _Cursor_CharPos)) { _Cursor_CharPos++; }
+
+            CheckIfTextIsChanded(_eTxt.HtmlText);
         }
 
         private void OnNeedDatabaseOfAdditinalSpecialChars(MultiUserFileGiveBackEventArgs e)

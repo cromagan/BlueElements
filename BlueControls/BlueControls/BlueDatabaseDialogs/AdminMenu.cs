@@ -159,7 +159,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             _TableView.Database.Column.Repair();
 
-            if (_TableView.Arrangement > 0) { _TableView.CurrentArrangement.Add(newc, false); }
+            if (_TableView.Arrangement > 0 && _TableView.CurrentArrangement != null) { _TableView.CurrentArrangement.Add(newc, false); }
 
             _TableView.Invalidate_HeadSize();
 
@@ -171,7 +171,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             var MitVorlage = false;
 
-            if (_TableView.Arrangement > 0)
+            if (_TableView.Arrangement > 0 && _TableView.CurrentArrangement != null)
             {
                 MitVorlage = Convert.ToBoolean(Forms.MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
             }

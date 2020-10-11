@@ -2903,6 +2903,9 @@ namespace BlueDatabase
                 case enDataFormat.Button:
                     return enEditTypeTable.None;
 
+                case enDataFormat.Text_mit_Formatierung:
+                    return enEditTypeTable.WarnungNurFormular; // Wegen dem Sonderzeichen
+
                 default:
                     if (Format.TextboxEditPossible())
                     {
