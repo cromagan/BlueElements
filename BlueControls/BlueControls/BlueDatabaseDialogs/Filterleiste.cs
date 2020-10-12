@@ -5,6 +5,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,6 +15,7 @@ namespace BlueControls.BlueDatabaseDialogs
 {
     public partial class Filterleiste : GroupBox // System.Windows.Forms.UserControl //  
     {
+        #region Variablen
 
         private Table _TableView;
 
@@ -25,12 +27,18 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private string _AnsichtName = string.Empty;
 
+        #endregion
+
+        #region Konstruktor
         public Filterleiste()
         {
             InitializeComponent();
             FillFilters();
         }
 
+        #endregion
+
+        #region Properties
 
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation
@@ -118,6 +126,10 @@ namespace BlueControls.BlueDatabaseDialogs
         {
             FillFilters();
         }
+
+        #endregion
+
+
 
         private void _TableView_FilterChanged(object sender, System.EventArgs e)
         {
@@ -438,10 +450,10 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e)
         {
-
             _TableView.Filter.Remove(e.Column);
 
             if (e.Comand != "Filter") { return; }
+            e.Filter.Tag = "Filterleiste";
             _TableView.Filter.Add(e.Filter);
 
         }
@@ -457,6 +469,8 @@ namespace BlueControls.BlueDatabaseDialogs
                 if (_TableView == null) { return; }
 
                 var ISFilter = flx.WasThisValueClicked(); //  flx.Value.StartsWith("|");
+
+                flx.Filter.Tag = "Filterleiste";
 
                 var v = flx.Value; //.Trim("|");
 

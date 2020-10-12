@@ -1130,25 +1130,25 @@ namespace BlueDatabase
                             if (!ColumnArrangements[z].PermissionGroups_Show.Contains("#Everybody")) { ColumnArrangements[z].PermissionGroups_Show.Add("#Everybody"); }
                             break;
 
-                        //case 2:
-                        //    if (ColumnArrangements[z].Name != "Filter waagerecht" && !string.IsNullOrEmpty(ColumnArrangements[z].Name))
-                        //    {
-                        //        ColumnArrangements.Add(new ColumnViewCollection(this, ""));
-                        //        ColumnArrangements.Swap(z, ColumnArrangements.Count - 1);
-                        //    }
+                            //case 2:
+                            //    if (ColumnArrangements[z].Name != "Filter waagerecht" && !string.IsNullOrEmpty(ColumnArrangements[z].Name))
+                            //    {
+                            //        ColumnArrangements.Add(new ColumnViewCollection(this, ""));
+                            //        ColumnArrangements.Swap(z, ColumnArrangements.Count - 1);
+                            //    }
 
-                        //    ColumnArrangements[z].Name = "Filter waagerecht";
-                        //    break;
+                            //    ColumnArrangements[z].Name = "Filter waagerecht";
+                            //    break;
 
-                        //case 3:
-                        //    if (ColumnArrangements[z].Name != "Filter senkrecht" && !string.IsNullOrEmpty(ColumnArrangements[z].Name))
-                        //    {
-                        //        ColumnArrangements.Add(new ColumnViewCollection(this, ""));
-                        //        ColumnArrangements.Swap(z, ColumnArrangements.Count - 1);
-                        //    }
+                            //case 3:
+                            //    if (ColumnArrangements[z].Name != "Filter senkrecht" && !string.IsNullOrEmpty(ColumnArrangements[z].Name))
+                            //    {
+                            //        ColumnArrangements.Add(new ColumnViewCollection(this, ""));
+                            //        ColumnArrangements.Swap(z, ColumnArrangements.Count - 1);
+                            //    }
 
-                        //    ColumnArrangements[z].Name = "Filter senkrecht";
-                        //    break;
+                            //    ColumnArrangements[z].Name = "Filter senkrecht";
+                            //    break;
 
                     }
                 }
@@ -2900,7 +2900,7 @@ namespace BlueDatabase
 
                     if (!ok && string.IsNullOrEmpty(ok2))
                     {
-                        if (!Filename.Contains("AutoVue") && !Filename.Contains("Plandaten") && !Filename.Contains("Ketten."))
+                        if (!Filename.Contains("AutoVue") && !Filename.Contains("Plandaten") && !Filename.Contains("Ketten.") && !Filename.Contains("Kettenräder."))
                         {
                             Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br><br>Vorher:<br>" + WVorher + "<br><br>Nachher:<br>" + Works.ToString());
                         }

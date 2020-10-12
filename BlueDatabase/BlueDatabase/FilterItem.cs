@@ -40,6 +40,8 @@ namespace BlueDatabase
         private ColumnItem _Column;
         private enFilterType _FilterType = enFilterType.KeinFilter;
 
+        public string Tag = string.Empty;
+
         #endregion
 
 
@@ -50,11 +52,7 @@ namespace BlueDatabase
 
         #region  Construktor + Initialize 
 
-
-
-
         public FilterItem(Database database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string>() { searchValue }) { }
-
         public FilterItem(Database database, enFilterType filterType, List<string> searchValue)
         {
             Database = database;
@@ -63,7 +61,6 @@ namespace BlueDatabase
             SearchValue.ListOrItemChanged += SearchValue_ListOrItemChanged;
         }
 
-
         public FilterItem(Database database, string FilterCode)
         {
             Database = database;
@@ -71,10 +68,15 @@ namespace BlueDatabase
             SearchValue.ListOrItemChanged += SearchValue_ListOrItemChanged;
         }
 
-        public FilterItem(ColumnItem column, enFilterType filterType, string searchValue) : this(column, filterType, new List<string>() { searchValue }) { }
+        public FilterItem(ColumnItem column, enFilterType filterType, string searchValue) : this(column, filterType, new List<string>() { searchValue }, string.Empty) { }
+
+        public FilterItem(ColumnItem column, enFilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string>() { searchValue }, tag) { }
 
 
-        public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue)
+        public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
+
+
+        public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue, string tag)
         {
 
             if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte nicht vorhanden."); }
@@ -82,6 +84,7 @@ namespace BlueDatabase
             Database = column.Database;
             _Column = column;
             _FilterType = filterType;
+            Tag = tag;
 
             if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
             SearchValue.ListOrItemChanged += SearchValue_ListOrItemChanged;
@@ -150,6 +153,8 @@ namespace BlueDatabase
                 Result = Result + ", Value=" + t.ToNonCritical();
             }
 
+            if (!string.IsNullOrEmpty(Tag)) { Result = Result + ", Tag=" + Tag.ToNonCritical(); }
+
             return Result + "}";
         }
 
@@ -178,6 +183,9 @@ namespace BlueDatabase
                         break;
                     case "value":
                         SearchValue.Add(pair.Value.FromNonCritical());
+                        break;
+                    case "tag":
+                        Tag = pair.Value.FromNonCritical();
                         break;
                     default:
                         Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);

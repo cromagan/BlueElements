@@ -306,9 +306,9 @@ namespace BlueDatabase
                     //OnChanged();
                     return;
                 }
-
-                Add(new FilterItem(Database, enFilterType.Instr_UND_GroﬂKleinEgal, value));
-
+                var fi = new FilterItem(Database, enFilterType.Instr_UND_GroﬂKleinEgal, value);
+                fi.Tag = "RowFilter";
+                Add(fi);
             }
 
         }
