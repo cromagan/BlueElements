@@ -93,6 +93,9 @@ namespace BlueBasics
 
         public new void AddRange(IEnumerable<T> collection)
         {
+
+            if (collection is null) { return; }
+
             base.AddRange(collection);
 
             foreach (var item in collection)

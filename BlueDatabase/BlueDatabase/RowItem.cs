@@ -749,6 +749,8 @@ namespace BlueDatabase
             // Variablen ersetzen
             foreach (var thisColumnItem in Database.Column)
             {
+                if (!erg.Contains("&")) { return erg; }
+
                 if (thisColumnItem != null)
                 {
                     var w = CellGetString(thisColumnItem);

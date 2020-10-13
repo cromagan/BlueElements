@@ -741,6 +741,7 @@ namespace BlueBasics.MultiUserFile
             catch
             {
                 if (!MustDo) { return string.Empty; }
+                Develop.CheckStackForOverflow();
                 Pause(0.5, false);
                 return GetFileInfo(MustDo);
             }
