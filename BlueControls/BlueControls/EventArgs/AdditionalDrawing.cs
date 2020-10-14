@@ -77,8 +77,8 @@ namespace BlueControls.EventArgs
 
         public void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
         {
-            var p1 = new PointDF(x1, y1).ZoomAndMove(this);
-            var p2 = new PointDF(x2, y2).ZoomAndMove(this);
+            var p1 = new PointM(x1, y1).ZoomAndMove(this);
+            var p2 = new PointM(x2, y2).ZoomAndMove(this);
             G.DrawLine(pen, p1, p2);
         }
     }

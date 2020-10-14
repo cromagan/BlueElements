@@ -31,14 +31,14 @@ using System.Drawing;
 
 namespace BlueControls
 {
-    public sealed class PointDF : IParseable, IComparable
+    public sealed class PointM : IParseable, IComparable
     {
         #region  Variablen-Deklarationen 
 
         private object _parent;
         private decimal _x;
         private decimal _y;
-        private bool _positionFix;
+        private enXY _moveable;
         private bool _canUsedForAutoRelation;
 
         private int _order;
@@ -67,177 +67,61 @@ namespace BlueControls
         #region  Construktor + Initialize 
 
 
-        public PointDF()
+        // Polar - Construktor
+        public PointM(object parent, string name, decimal startX, decimal startY, decimal laenge, decimal alpha)
         {
             Initialize();
-            Name = "Dummy Point ohne Angaben";
+            _parent = parent;
+            Name = name;
+            var tempVar = GeometryDF.PolarToCartesian(laenge, Convert.ToDouble(alpha));
+            _x = startX + tempVar.X;
+            _y = startY + tempVar.Y;
+        }
+        public PointM(PointM startPoint, decimal laenge, decimal alpha) : this(null, "Dummy Point von PointM mit Polarverschiebung", startPoint.X, startPoint.Y, laenge, alpha) { }
+        public PointM(PointF startPoint, decimal laenge, decimal alpha) : this(null, "Dummy Point von PointF mit Polarverschiebung", (decimal)startPoint.X, (decimal)startPoint.Y, laenge, alpha) { }
+
+        // Parsen
+        public PointM(object parent, string codeToParse)
+        {
+            Parse(codeToParse);
+            _parent = parent;
         }
 
 
 
-        public PointDF(object cParent, string cName, PointDF StartPoint, decimal Länge, decimal Alpha)
+
+        public PointM(object parent, string name, decimal x, decimal y, enXY moveable, bool canUsedForAutoRelation, bool primaryGridSnapPoint, string tag)
         {
             Initialize();
-            _parent = cParent;
-            Name = cName;
-            var tempVar = GeometryDF.PolarToCartesian(Länge, Convert.ToDouble(Alpha));
-            _x = StartPoint.X + tempVar.X;
-            _y = StartPoint.Y + tempVar.Y;
+            _parent = parent;
+            _x = x;
+            _y = y;
+            Name = name;
+            _moveable = moveable;
+            _canUsedForAutoRelation = canUsedForAutoRelation;
+            _primaryGridSnapPoint = primaryGridSnapPoint;
+            _tag = tag;
         }
+        public PointM() : this(null, "Dummy Point ohne Angaben", 0m, 0m, enXY.XY, true, false, string.Empty) { }
+        public PointM(string name, decimal x, decimal y) : this(null, name, x, y, enXY.XY, true, false, string.Empty) { }
+        public PointM(object parent, string name, int x, int y, enXY moveable, bool canUsedForAutoRelation, bool primaryGridSnapPoint) : this(parent, name, (decimal)x, (decimal)y, moveable, canUsedForAutoRelation, primaryGridSnapPoint, string.Empty) { }
+        public PointM(object parent, string name, decimal x, decimal y) : this(parent, name, x, y, enXY.XY, true, false, string.Empty) { }
+        public PointM(PointF point) : this(null, "Dummy Point von PointF", (decimal)point.X, (decimal)point.Y, enXY.XY, true, false, string.Empty) { }
+        public PointM(int x, int y) : this(null, "Dummy Point von IntX und IntY", (decimal)x, (decimal)y, enXY.XY, true, false, string.Empty) { }
+        public PointM(double x, double y) : this(null, "Dummy Point von DoubleX und DoubleY", (decimal)x, (decimal)y, enXY.XY, true, false, string.Empty) { }
+        public PointM(decimal x, decimal y) : this(null, "Dummy Point von DecimalX und DecimalY", x, y, enXY.XY, true, false, string.Empty) { }
+        public PointM(PointM point) : this(null, "Dummy Point von PointM", point.X, point.Y, enXY.XY, true, false, string.Empty) { }
+        public PointM(object parent, string name, int x, int y, enXY moveable) : this(parent, name, (decimal)x, (decimal)y, moveable, true, false, string.Empty) { }
+
+        public PointM(object parent, string name, int x, int y, enXY moveable, bool canUsedForAutoRelation) : this(parent, name, (decimal)x, (decimal)y, moveable, canUsedForAutoRelation, false, string.Empty) { }
+
+        public PointM(object parent, string name, decimal x, decimal y, enXY moveable, bool canUsedForAutoRelation) : this(parent, name, x, y, moveable, canUsedForAutoRelation, false, string.Empty) { }
 
 
-        public PointDF(PointDF StartPoint, decimal Länge, decimal Alpha)
-        {
-            Initialize();
-            Name = "Dummy Point von PointDF mit Polarverschiebung";
-            var tempVar = GeometryDF.PolarToCartesian(Länge, Convert.ToDouble(Alpha));
-            _x = StartPoint.X + tempVar.X;
-            _y = StartPoint.Y + tempVar.Y;
-        }
+        public PointM(object parent, PointM template) : this(parent, template.Name, template.X, template.Y, template.Moveable, template.CanUsedForAutoRelation, template.PrimaryGridSnapPoint, template.Tag) { }
 
 
 
-        public PointDF(PointF StartPoint, decimal Länge, decimal Alpha)
-        {
-            Initialize();
-            Name = "Dummy Point von PointF mit Polarverschiebung";
-            var tempVar = GeometryDF.PolarToCartesian(Länge, Convert.ToDouble(Alpha));
-            _x = (decimal)(StartPoint.X + (float)tempVar.X);
-            _y = (decimal)(StartPoint.Y + (float)tempVar.Y);
-        }
-
-        public PointDF(object cParent, string Code)
-        {
-            Parse(Code);
-            _parent = cParent;
-        }
-
-
-        public PointDF(object cParent, string cName, int cX, int cY)
-        {
-            Initialize();
-            _parent = cParent;
-            _x = cX;
-            _y = cY;
-            Name = cName;
-        }
-
-        public PointDF(string cName, decimal cX, decimal cY)
-        {
-            Initialize();
-            _x = cX;
-            _y = cY;
-            Name = cName;
-        }
-
-
-        public PointDF(PointF PF)
-        {
-            Initialize();
-            Name = "Dummy Point von PointF";
-            _x = (decimal)PF.X;
-            _y = (decimal)PF.Y;
-        }
-
-        public PointDF(int cx, int cy)
-        {
-            Initialize();
-            Name = "Dummy Point von IntX und IntY";
-            _x = cx;
-            _y = cy;
-        }
-
-        public PointDF(double cx, double cY)
-        {
-            Initialize();
-            Name = "Dummy Point von DoubleX und DoubleY";
-            _x = (decimal)cx;
-            _y = (decimal)cY;
-        }
-
-        public PointDF(decimal cx, decimal cY)
-        {
-            Initialize();
-            Name = "Dummy Point von DecimalX und DecimalY";
-            _x = cx;
-            _y = cY;
-        }
-
-
-        public PointDF(PointDF PointDF)
-        {
-            Initialize();
-            Name = "Dummy Point von PointDF";
-            _x = PointDF.X;
-            _y = PointDF.Y;
-        }
-
-
-        public PointDF(object cParent, string cName, int cX, int cY, bool IsFix)
-        {
-            Initialize();
-            _parent = cParent;
-            _x = cX;
-            _y = cY;
-            Name = cName;
-            _positionFix = IsFix;
-        }
-
-        public PointDF(object cParent, string cName, int cX, int cY, bool IsFix, bool vCanUsedForAutoRelation)
-        {
-            Initialize();
-            _parent = cParent;
-            _x = cX;
-            _y = cY;
-            Name = cName;
-            _positionFix = IsFix;
-            _canUsedForAutoRelation = vCanUsedForAutoRelation;
-        }
-
-        public PointDF(object cParent, string cName, int cX, int cY, bool IsFix, bool vCanUsedForAutoRelation, bool vPrimaryGridSnapPoint)
-        {
-            Initialize();
-            _parent = cParent;
-            _x = cX;
-            _y = cY;
-            Name = cName;
-            _positionFix = IsFix;
-            _canUsedForAutoRelation = vCanUsedForAutoRelation;
-            _primaryGridSnapPoint = vPrimaryGridSnapPoint;
-        }
-
-
-        public PointDF(object cParent, PointDF Vorlage)
-        {
-            Initialize();
-            // Order und Parent weichen ab!
-
-            _parent = cParent;
-
-            Name = Vorlage.Name;
-            _x = Vorlage.X;
-            _y = Vorlage.Y;
-            _StoreX = Vorlage._StoreX;
-            _StoreY = Vorlage._StoreY;
-
-            _canUsedForAutoRelation = Vorlage.CanUsedForAutoRelation;
-            _positionFix = Vorlage.PositionFix;
-
-            _primaryGridSnapPoint = Vorlage.PrimaryGridSnapPoint;
-            _tag = Vorlage.Tag;
-        }
-
-
-        public PointDF(object cParent, string cName, decimal cX, decimal cY, bool IsFix, bool vCanUsedForAutoRelation)
-        {
-            Initialize();
-            _parent = cParent;
-            _x = cX;
-            _y = cY;
-            Name = cName;
-            _positionFix = IsFix;
-            _canUsedForAutoRelation = vCanUsedForAutoRelation;
-        }
 
         public void Initialize()
         {
@@ -245,7 +129,7 @@ namespace BlueControls
             _parent = null;
             _x = 0;
             _y = 0;
-            _positionFix = false;
+            _moveable = enXY.XY;
             _canUsedForAutoRelation = true;
             _primaryGridSnapPoint = false;
             _tag = string.Empty;
@@ -306,17 +190,17 @@ namespace BlueControls
             }
         }
 
-        public bool PositionFix
+        public enXY Moveable
         {
             get
             {
-                return _positionFix;
+                return _moveable;
             }
 
             set
             {
-                if (_positionFix == value) { return; }
-                _positionFix = value;
+                if (_moveable == value) { return; }
+                _moveable = value;
                 OnChanged();
             }
         }
@@ -407,7 +291,16 @@ namespace BlueControls
                         _y = decimal.Parse(pair.Value);
                         break;
                     case "fix":
-                        _positionFix = pair.Value.FromPlusMinus();
+
+                        if (pair.Value.FromPlusMinus())
+                        {
+                            _moveable = enXY.none;
+                        }
+                        else
+                        {
+                            _moveable = enXY.XY;
+                        }
+
                         break;
                     case "getsnapped":
                         _canUsedForAutoRelation = pair.Value.FromPlusMinus();
@@ -433,9 +326,9 @@ namespace BlueControls
             return new Point((int)_x, (int)_y);
         }
 
-        public static PointDF Empty()
+        public static PointM Empty()
         {
-            return new PointDF(0m, 0m);
+            return new PointM(0m, 0m);
         }
 
 
@@ -472,10 +365,13 @@ namespace BlueControls
             {
                 t = t + "Tag=" + _tag.ToNonCritical() + ", ";
             }
-            if (_positionFix)
-            {
-                t = t + "Fix=" + _positionFix + ", ";
-            }
+            //if (_moveable)
+            //{
+            //    t = t + "Fix=" + _moveable + ", ";
+            //}
+
+            t = t + "Moveable=" + ((int)_moveable).ToString() + ", ";
+
             if (!_canUsedForAutoRelation)
             {
                 t = t + "GetSnapped=" + _canUsedForAutoRelation + ", ";
@@ -561,14 +457,14 @@ namespace BlueControls
             _y = (decimal)cy;
         }
 
-        public void SetTo(PointDF StartPoint, decimal Länge, decimal Alpha)
+        public void SetTo(PointM StartPoint, decimal Länge, decimal Alpha)
         {
             var tempVar = GeometryDF.PolarToCartesian(Länge, Convert.ToDouble(Alpha));
             _x = StartPoint.X + tempVar.X;
             _y = StartPoint.Y + tempVar.Y;
         }
 
-        public void SetTo(PointDF Point)
+        public void SetTo(PointM Point)
         {
             _x = Point.X;
             _y = Point.Y;
@@ -589,9 +485,9 @@ namespace BlueControls
         }
 
 
-        private bool CanMove(bool CheckX, List<clsPointRelation> Rel, List<clsPointRelation> Alredychecked)
+        private bool CanMove(enXY toCheck, List<clsPointRelation> Rel, List<clsPointRelation> Alredychecked)
         {
-            if (_positionFix) { return false; }
+            if (_moveable == enXY.none) { return false; }
 
 
             foreach (var ThisRelation in Rel)
@@ -600,12 +496,12 @@ namespace BlueControls
                 {
                     Alredychecked.Add(ThisRelation);
 
-                    if (ThisRelation.Connects(CheckX))
+                    if (ThisRelation.Connects(toCheck))
                     {
                         var Move = true;
                         foreach (var thispoint in ThisRelation.Points)
                         {
-                            if (thispoint != this) { Move = thispoint.CanMove(CheckX, Rel, Alredychecked); }
+                            if (thispoint != this) { Move = thispoint.CanMove(toCheck, Rel, Alredychecked); }
                             if (!Move) { return false; }
                         }
                     }
@@ -620,14 +516,14 @@ namespace BlueControls
         {
             var Alredychecked = new List<clsPointRelation>();
 
-            return CanMove(true, Rel, Alredychecked);
+            return CanMove(enXY.X, Rel, Alredychecked);
         }
 
         public bool CanMoveY(List<clsPointRelation> Rel)
         {
             var Alredychecked = new List<clsPointRelation>();
 
-            return CanMove(false, Rel, Alredychecked);
+            return CanMove(enXY.Y, Rel, Alredychecked);
         }
 
         public bool CanMove(List<clsPointRelation> Rel)
@@ -655,7 +551,7 @@ namespace BlueControls
 
         public int CompareTo(object obj)
         {
-            if (obj is PointDF tobj)
+            if (obj is PointM tobj)
             {
                 // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
                 return CompareKey().CompareTo(tobj.CompareKey());
@@ -675,7 +571,7 @@ namespace BlueControls
         }
 
 
-        public decimal DistanzZuLinie(PointDF P1, PointDF P2)
+        public decimal DistanzZuLinie(PointM P1, PointM P2)
         {
             return DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
         }

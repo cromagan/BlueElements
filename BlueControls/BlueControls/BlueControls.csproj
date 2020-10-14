@@ -125,6 +125,7 @@
     <Compile Include="Controls\ZoomPicWithPoints.Designer.cs">
       <DependentUpon>ZoomPicWithPoints.cs</DependentUpon>
     </Compile>
+    <Compile Include="Enums\enXY.cs" />
     <Compile Include="Enums\enFilterTypesToShow.cs" />
     <Compile Include="Enums\enGroupBoxStyle.cs" />
     <Compile Include="Enums\enPartentType.cs" />
@@ -248,7 +249,6 @@
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\ILastSavedBy.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\BasicPadItemTwoPoints.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FormPadItemRectangle.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />
     <Compile Include="PropertyAttributes.cs" />
@@ -495,7 +495,7 @@
     <Compile Include="Forms-Common\Overlay.Designer.cs">
       <DependentUpon>Overlay.cs</DependentUpon>
     </Compile>
-    <Compile Include="PointDF.cs" />
+    <Compile Include="PointM.cs" />
     <Compile Include="Controls\ProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>

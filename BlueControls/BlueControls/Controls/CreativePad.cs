@@ -56,7 +56,7 @@ namespace BlueControls.Controls
             _NewAutoRelations.Clear();
 
 
-            Sel_P = new ListExt<PointDF>();
+            Sel_P = new ListExt<PointM>();
             Sel_P.ItemAdded += Sel_P_ItemAdded;
             Sel_P.ItemRemoved += Sel_P_ItemRemoved;
 
@@ -90,15 +90,15 @@ namespace BlueControls.Controls
         /// <summary>
         /// Die Punkte, die zum Schieben markiert sind.
         /// </summary>
-        private readonly ListExt<PointDF> Sel_P;
+        private readonly ListExt<PointM> Sel_P;
         /// <summary>
         /// Diese Punkte bewegen sich in der X-Richtung mit
         /// </summary>
-        private readonly List<PointDF> Move_X = new List<PointDF>();
+        private readonly List<PointM> Move_X = new List<PointM>();
         /// <summary>
         /// Diese Punkte bewegen sich in der Y-Richtung mit
         /// </summary>
-        private readonly List<PointDF> Move_Y = new List<PointDF>();
+        private readonly List<PointM> Move_Y = new List<PointM>();
 
 
 
@@ -402,7 +402,7 @@ namespace BlueControls.Controls
                 foreach (var thisPoint in Sel_P)
                 {
 
-                    if (GeometryDF.Länge(thisPoint, new PointDF(p)) < 5m / _Zoom)
+                    if (GeometryDF.Länge(thisPoint, new PointM(p)) < 5m / _Zoom)
                     {
 
                         if (!thisPoint.CanMove(_Item.AllRelations))
@@ -557,8 +557,8 @@ namespace BlueControls.Controls
                     Skin.Draw_Back(gr, enDesign.Table_And_Pad, vState, DisplayRectangle, this, true);
                     var SSW = Math.Round(modConverter.mmToPixel((decimal)_Item.SheetSizeInMM.Width, ItemCollectionPad.DPI), 1);
                     var SSH = Math.Round(modConverter.mmToPixel((decimal)_Item.SheetSizeInMM.Height, ItemCollectionPad.DPI), 1);
-                    var LO = new PointDF(0m, 0m).ZoomAndMove(zoomf, X, Y);
-                    var RU = new PointDF(SSW, SSH).ZoomAndMove(zoomf, X, Y);
+                    var LO = new PointM(0m, 0m).ZoomAndMove(zoomf, X, Y);
+                    var RU = new PointM(SSW, SSH).ZoomAndMove(zoomf, X, Y);
 
                     var R = new Rectangle((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
                     gr.FillRectangle(Brushes.White, R);
@@ -747,7 +747,7 @@ namespace BlueControls.Controls
             return Convert.ToBoolean(errorsAfter == 0);
         }
 
-        private void CaluclateOtherPointsOf(ListExt<PointDF> sel_P)
+        private void CaluclateOtherPointsOf(ListExt<PointM> sel_P)
         {
             var x = new List<BasicPadItem>();
 
@@ -822,17 +822,17 @@ namespace BlueControls.Controls
         {
             if (MouseDownPos_1_1 == null) { return; }
 
-            PointDF PMoveX = null;
-            PointDF PMoveY = null;
-            PointDF PSnapToX = null;
-            PointDF PSnapToY = null;
+            PointM PMoveX = null;
+            PointM PMoveY = null;
+            PointM PSnapToX = null;
+            PointM PSnapToY = null;
 
             _NewAutoRelations.Clear();
 
             var MoveX = (decimal)(MousePos_1_1.X - MouseDownPos_1_1.X);
             var MoveY = (decimal)(MousePos_1_1.Y - MouseDownPos_1_1.Y);
 
-            var MouseMovedTo = new PointDF(MousePos_1_1);
+            var MouseMovedTo = new PointM(MousePos_1_1);
 
 
             if (Move_X.Count > 0)
@@ -841,7 +841,7 @@ namespace BlueControls.Controls
 
                 if (_Grid == false || Math.Abs(_Gridsnap) < 0.001 || MoveX == 0M)
                 {
-                    if (_AutoRelation != enAutoRelationMode.None) { SnapToPoint(true, Sel_P, MouseMovedTo, ref PMoveX, ref PSnapToX); }
+                    if (_AutoRelation != enAutoRelationMode.None) { SnapToPoint(enXY.X, Sel_P, MouseMovedTo, ref PMoveX, ref PSnapToX); }
                     if (PMoveX != null) { MoveX = PSnapToX.X - PMoveX.X; }
                 }
             }
@@ -856,7 +856,7 @@ namespace BlueControls.Controls
 
                 if (_Grid == false || Math.Abs(_Gridsnap) < 0.001 || MoveY == 0M)
                 {
-                    if (_AutoRelation != enAutoRelationMode.None) { SnapToPoint(false, Sel_P, MouseMovedTo, ref PMoveY, ref PSnapToY); }
+                    if (_AutoRelation != enAutoRelationMode.None) { SnapToPoint(enXY.Y, Sel_P, MouseMovedTo, ref PMoveY, ref PSnapToY); }
                     if (PMoveY != null) { MoveY = PSnapToY.Y - PMoveY.Y; }
                 }
             }
@@ -883,14 +883,14 @@ namespace BlueControls.Controls
             MouseDownPos_1_1 = new Point((int)(MouseDownPos_1_1.X + MoveX), (int)(MouseDownPos_1_1.Y + MoveY));
         }
 
-        private decimal SnapToGrid(bool DoX, List<PointDF> Movep, decimal MouseMovedTo)
+        private decimal SnapToGrid(bool DoX, List<PointM> Movep, decimal MouseMovedTo)
         {
 
             if (!_Grid || Math.Abs(_Gridsnap) < 0.001) { return MouseMovedTo; }
 
             if (Movep == null || Movep.Count == 0) { return 0M; }
 
-            PointDF MasterPoint = null;
+            PointM MasterPoint = null;
             var LowOrderPoint = Movep[0];
 
             foreach (var thisPoint in Movep)
@@ -927,7 +927,7 @@ namespace BlueControls.Controls
         }
 
 
-        private void SnapToPoint(bool DoX, List<PointDF> Movep, PointDF MouseMovedTo, ref PointDF PMove, ref PointDF PSnapTo)
+        private void SnapToPoint(enXY DoX, List<PointM> Movep, PointM MouseMovedTo, ref PointM PMove, ref PointM PSnapTo)
         {
             decimal ShortestDist = 10;
             var Nearest = decimal.MaxValue;
@@ -940,8 +940,8 @@ namespace BlueControls.Controls
 
             if (!Convert.ToBoolean(_AutoRelation & enAutoRelationMode.DirektVerbindungen))
             {
-                if (DoX && !Convert.ToBoolean(_AutoRelation & enAutoRelationMode.Senkrecht)) { return; }
-                if (!DoX && !Convert.ToBoolean(_AutoRelation & enAutoRelationMode.Waagerecht)) { return; }
+                if (DoX.HasFlag(enXY.X) && !Convert.ToBoolean(_AutoRelation & enAutoRelationMode.Senkrecht)) { return; }
+                if (DoX.HasFlag(enXY.Y) && !Convert.ToBoolean(_AutoRelation & enAutoRelationMode.Waagerecht)) { return; }
 
             }
             else
@@ -963,7 +963,7 @@ namespace BlueControls.Controls
 
         }
 
-        private void SnapToPoint(bool DoX, ref PointDF PointToTest, PointDF MouseMovedTo, ref decimal ShortestDist, ref PointDF PMove, ref PointDF PSnapTo, ref decimal Nearest)
+        private void SnapToPoint(enXY DoX, ref PointM PointToTest, PointM MouseMovedTo, ref decimal ShortestDist, ref PointM PMove, ref PointM PSnapTo, ref decimal Nearest)
         {
 
             if (PointToTest == null) { return; }
@@ -971,7 +971,7 @@ namespace BlueControls.Controls
             var dr = AviablePaintArea();
 
 
-            var WillMoveTo = new PointDF(PointToTest.X + MouseMovedTo.X - MouseDownPos_1_1.X, PointToTest.Y + MouseMovedTo.Y - MouseDownPos_1_1.Y);
+            var WillMoveTo = new PointM(PointToTest.X + MouseMovedTo.X - MouseDownPos_1_1.X, PointToTest.Y + MouseMovedTo.Y - MouseDownPos_1_1.Y);
 
 
             foreach (var ThisPoint in _Item.AllPoints)
@@ -986,11 +986,11 @@ namespace BlueControls.Controls
                         if (Distanz < 1000 * _Zoom)
                         {
                             decimal SnapDist = 0;
-                            if (DoX)
+                            if (DoX.HasFlag(enXY.X))
                             {
                                 SnapDist = Math.Abs(WillMoveTo.X - ThisPoint.X) * _Zoom;
                             }
-                            else
+                            if (DoX.HasFlag(enXY.Y))
                             {
                                 SnapDist = Math.Abs(WillMoveTo.Y - ThisPoint.Y) * _Zoom;
                             }
@@ -1202,7 +1202,7 @@ namespace BlueControls.Controls
         }
 
 
-        private clsPointRelation AddOneAutoRelation(enRelationType rel, PointDF Snap1, PointDF SnaP2)
+        private clsPointRelation AddOneAutoRelation(enRelationType rel, PointM Snap1, PointM SnaP2)
         {
 
             // Wegen den beziehungen kann ein Snap-Point sich verschieben, sicherheitshalber
@@ -1241,7 +1241,7 @@ namespace BlueControls.Controls
 
         }
 
-        private bool HängenZusammen(bool CheckX, PointDF Point1, PointDF Point2, List<clsPointRelation> l)
+        private bool HängenZusammen(enXY CheckX, PointM Point1, PointM Point2, List<clsPointRelation> l)
         {
 
             if (l == null) { l = new List<clsPointRelation>(); }
@@ -1269,7 +1269,7 @@ namespace BlueControls.Controls
             return false;
         }
 
-        private void AddAllAutoRelations(PointDF PMoveX, PointDF PSnapToX, PointDF PMoveY, PointDF PSnapToY)
+        private void AddAllAutoRelations(PointM PMoveX, PointM PSnapToX, PointM PMoveY, PointM PSnapToY)
         {
             clsPointRelation tmpRl = null;
 
@@ -1299,8 +1299,8 @@ namespace BlueControls.Controls
 
             if (PMoveX != null && PMoveY != null)
             {
-                PointDF BP1 = null;
-                PointDF BP2 = null;
+                PointM BP1 = null;
+                PointM BP2 = null;
                 if (PMoveX == PMoveY)
                 {
                     BP1 = PMoveX; // kann NichtSnapable sein
@@ -1349,7 +1349,7 @@ namespace BlueControls.Controls
 
         }
 
-        //public void Relation_Add(enRelationType enRelationType, PointDF Point1, PointDF Point2)
+        //public void Relation_Add(enRelationType enRelationType, PointM Point1, PointM Point2)
         //{
         //    Item.AllRelations.Add(new clsPointRelation(enRelationType, Point1, Point2));
         //}

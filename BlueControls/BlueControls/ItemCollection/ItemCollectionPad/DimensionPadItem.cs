@@ -31,15 +31,15 @@ namespace BlueControls.ItemCollection
     {
         #region  Variablen-Deklarationen 
 
-        private readonly PointDF Point1 = new PointDF(null, "Punkt 1", 0, 0, false, false);
-        private readonly PointDF Point2 = new PointDF(null, "Punkt 2", 0, 0, false, false);
-        private readonly PointDF TextPointx = new PointDF(null, "Mitte Text", 0, 0, false, false);
+        private readonly PointM Point1 = new PointM(null, "Punkt 1", 0, 0, enXY.XY, false);
+        private readonly PointM Point2 = new PointM(null, "Punkt 2", 0, 0, enXY.XY, false);
+        private readonly PointM TextPointx = new PointM(null, "Mitte Text", 0, 0, enXY.XY, false);
 
-        private readonly PointDF _SchnittPunkt1 = new PointDF(null, "Schnittpunkt 1, Zeigt der Pfeil hin", 0, 0);
-        private readonly PointDF _SchnittPunkt2 = new PointDF(null, "Schnittpunkt 2, Zeigt der Pfeil hin", 0, 0);
+        private readonly PointM _SchnittPunkt1 = new PointM(null, "Schnittpunkt 1, Zeigt der Pfeil hin", 0, 0);
+        private readonly PointM _SchnittPunkt2 = new PointM(null, "Schnittpunkt 2, Zeigt der Pfeil hin", 0, 0);
 
-        private readonly PointDF _Bezugslinie1 = new PointDF(null, "Bezugslinie 1, Ende der Hilfslinie", 0, 0);
-        private readonly PointDF _Bezugslinie2 = new PointDF(null, "Bezugslinie 2, Ende der Hilfslinien", 0, 0);
+        private readonly PointM _Bezugslinie1 = new PointM(null, "Bezugslinie 1, Ende der Hilfslinie", 0, 0);
+        private readonly PointM _Bezugslinie2 = new PointM(null, "Bezugslinie 2, Ende der Hilfslinien", 0, 0);
 
 
         private decimal _Winkel;
@@ -87,12 +87,12 @@ namespace BlueControls.ItemCollection
         public DimensionPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, null, 0) { }
 
 
-        public DimensionPadItem(ItemCollectionPad parent, PointDF cPoint1, PointDF cPoint2, int AbstandinMM) : this(parent, string.Empty, cPoint1, cPoint2, AbstandinMM) { }
+        public DimensionPadItem(ItemCollectionPad parent, PointM cPoint1, PointM cPoint2, int AbstandinMM) : this(parent, string.Empty, cPoint1, cPoint2, AbstandinMM) { }
 
 
 
 
-        public DimensionPadItem(ItemCollectionPad parent, string internalname, PointDF cPoint1, PointDF cPoint2, int AbstandinMM) : base(parent, internalname)
+        public DimensionPadItem(ItemCollectionPad parent, string internalname, PointM cPoint1, PointM cPoint2, int AbstandinMM) : base(parent, internalname)
         {
 
 
@@ -132,7 +132,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public DimensionPadItem(ItemCollectionPad parent, PointF cPoint1, PointF cPoint2, int AbstandInMM) : this(parent, new PointDF(cPoint1), new PointDF(cPoint2), AbstandInMM) { }
+        public DimensionPadItem(ItemCollectionPad parent, PointF cPoint1, PointF cPoint2, int AbstandInMM) : this(parent, new PointM(cPoint1), new PointM(cPoint2), AbstandInMM) { }
 
 
         #endregion
@@ -252,7 +252,7 @@ namespace BlueControls.ItemCollection
             if (value.DistanzZuStrecke(Point2, _Bezugslinie2) < ne) { return true; }
             if (value.DistanzZuStrecke(_SchnittPunkt1, _SchnittPunkt2) < ne) { return true; }
             if (value.DistanzZuStrecke(_SchnittPunkt1, TextPointx) < ne) { return true; }
-            if (GeometryDF.Länge(new PointDF(value), TextPointx) < ne * 10) { return true; }
+            if (GeometryDF.Länge(new PointM(value), TextPointx) < ne * 10) { return true; }
 
             return false;
         }
@@ -312,7 +312,7 @@ namespace BlueControls.ItemCollection
             if (geszoom < 0.15m) { return; } // Schrift zu klein, würde abstürzen
 
 
-            var Mitte1 = new PointDF(Mitte, (decimal)(sz1.Height / 2.1), (decimal)(TextWinkel + 90));
+            var Mitte1 = new PointM(Mitte, (decimal)(sz1.Height / 2.1), (decimal)(TextWinkel + 90));
             var x = GR.Save();
             GR.TranslateTransform((float)Mitte1.X, (float)Mitte1.Y);
             GR.RotateTransform(-TextWinkel);
@@ -320,7 +320,7 @@ namespace BlueControls.ItemCollection
             GR.DrawString(AngezeigterText1(), f.Font(geszoom), f.Brush_Color_Main, new PointF((float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0)));
             GR.Restore(x);
 
-            var Mitte2 = new PointDF(Mitte, (decimal)(sz2.Height / 2.1), (decimal)(TextWinkel - 90));
+            var Mitte2 = new PointM(Mitte, (decimal)(sz2.Height / 2.1), (decimal)(TextWinkel - 90));
             x = GR.Save();
             GR.TranslateTransform((float)Mitte2.X, (float)Mitte2.Y);
             GR.RotateTransform(-TextWinkel);

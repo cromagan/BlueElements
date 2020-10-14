@@ -33,7 +33,7 @@ namespace BlueControls
     {
 
         private enRelationType _relationtype;
-        public readonly ListExt<PointDF> Points = new ListExt<PointDF>();
+        public readonly ListExt<PointM> Points = new ListExt<PointM>();
 
         public readonly ItemCollectionPad ParentCollection;
         public readonly object Parent;
@@ -63,7 +63,7 @@ namespace BlueControls
         }
 
 
-        public clsPointRelation(ItemCollectionPad parentCollection, object parent, enRelationType enRelationType, PointDF Point1, PointDF Point2) : this(parentCollection, parent)
+        public clsPointRelation(ItemCollectionPad parentCollection, object parent, enRelationType enRelationType, PointM Point1, PointM Point2) : this(parentCollection, parent)
         {
 
             _relationtype = enRelationType;
@@ -486,14 +486,14 @@ namespace BlueControls
             }
             if (!OK) { return false; }
 
-            var StartPx = new List<PointDF>();
+            var StartPx = new List<PointM>();
             foreach (var t in Points)
             {
-                StartPx.Add(new PointDF(t));
+                StartPx.Add(new PointM(t));
             }
 
 
-            PointDF Fix, Flex;
+            PointM Fix, Flex;
 
 
             if (Points[1].Order > Points[0].Order)
@@ -566,7 +566,7 @@ namespace BlueControls
                 // ACHTUNG: Position-Fix und Fixpoints sind unterschiedlich!
                 // Position-Fix: Der Punkt DARF nicht bewegt werden
                 // FixPoints: Über Beziehungen kann er eigentlich nicht bewegt werden. Aber über des kontextmenü kann es ja sein, dass die Beziehungen ungültig geworden sind.
-                if (Points[z].PositionFix)
+                if (Points[z].Moveable != enXY.none)
                 {
                     // Erst auf Änderungen prüfen, damit ein neuer Durchgang angestoßen wird.
                     // Und dann die Fixen dinegns zurück setzen
@@ -598,28 +598,15 @@ namespace BlueControls
             return _Richtmaß;
         }
 
-        public bool Connects(bool CheckX)
+        public bool Connects(enXY toCheck)
         {
             switch (_relationtype)
             {
                 case enRelationType.WaagerechtSenkrecht:
-                    if (CheckX)
-                    {
-                        if (_Richtmaß != "90")
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        //CheckY
-                        if (_Richtmaß != "0")
-                        {
-                            return false;
-                        }
-                    }
-
+                    if (toCheck.HasFlag(enXY.X) && _Richtmaß != "90") { return false; }
+                    if (toCheck.HasFlag(enXY.Y) && _Richtmaß != "0") { return false; }
                     break;
+
                 case enRelationType.PositionZueinander:
 
                     //break; case Is = enRelationType.Mittig
@@ -630,7 +617,7 @@ namespace BlueControls
 
                     break;
                 case enRelationType.YPositionZueinander:
-                    return !CheckX;
+                    return toCheck.HasFlag(enXY.Y);
 
                 case enRelationType.Dummy:
                     return true;
@@ -705,7 +692,7 @@ namespace BlueControls
             return true;
         }
 
-        public bool NeedCount(PointDF PointToCheck)
+        public bool NeedCount(PointM PointToCheck)
         {
 
             if (PointToCheck.Order < int.MaxValue) { return false; }

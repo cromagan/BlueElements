@@ -313,8 +313,8 @@ namespace BlueControls.Forms
             //}
 
 
-            //PointDF P1 = null;
-            //PointDF P2 = null;
+            //PointM P1 = null;
+            //PointM P2 = null;
 
 
             //switch (NachRelation.Status)

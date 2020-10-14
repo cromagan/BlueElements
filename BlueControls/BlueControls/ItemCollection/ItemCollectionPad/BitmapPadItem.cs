@@ -318,10 +318,10 @@ namespace BlueControls.ItemCollection
         //    ClearInternalRelations(); // Damit nix geclont wird
         //    var i = (BitmapPadItem)MemberwiseClone();
 
-        //    i.p_LO = new PointDF(i, p_LO);
-        //    i.p_LU = new PointDF(i, p_LU);
-        //    i.p_RU = new PointDF(i, p_RU);
-        //    i.p_RO = new PointDF(i, p_RO);
+        //    i.p_LO = new PointM(i, p_LO);
+        //    i.p_LU = new PointM(i, p_LU);
+        //    i.p_RU = new PointM(i, p_RU);
+        //    i.p_RO = new PointM(i, p_RO);
 
         //    return i;
         //}

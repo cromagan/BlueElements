@@ -168,15 +168,7 @@ namespace BlueControls.ItemCollection
 
         }
 
-        /// <summary>
-        ///  Falls das Element über Kordinaten gesetzt werden kann, ist diese mit dieser Routine möglich.
-        ///  Dabei werden Beziehungen komplett ignoriert!
-        /// </summary>
-        /// <remarks></remarks>
-        public virtual void SetCoordinates(RectangleDF r)
-        {
-            OnChanged(true);
-        }
+
 
         public static string UniqueInternal()
         {
@@ -215,10 +207,6 @@ namespace BlueControls.ItemCollection
         /// <remarks></remarks>
         public abstract bool Contains(PointF value, decimal zoomfactor);
 
-
-
-        //public abstract void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu);
-
         protected abstract void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting);
 
         protected abstract string ClassId();
@@ -242,22 +230,21 @@ namespace BlueControls.ItemCollection
         /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
         /// </summary>
         /// <remarks></remarks>
-        protected List<string> _Tags = new List<string>();
+        private readonly List<string> _Tags = new List<string>();
 
         /// <summary>
         /// Soll es gedruckt werden?
         /// </summary>
         /// <remarks></remarks>
-        protected bool _PrintMe = true;
+        private bool _Bei_Export_sichtbar = true;
 
         protected int _ZoomPadding = 0;
 
         public readonly List<clsPointRelation> Relations = new List<clsPointRelation>();
-        public readonly List<PointDF> Points = new List<PointDF>();
+        public readonly List<PointM> Points = new List<PointM>();
 
         private PadStyles _Style = PadStyles.Undefiniert;
 
-        //public List<string> RemoveToo = new List<string>();
 
 
         /// <summary>
@@ -271,12 +258,12 @@ namespace BlueControls.ItemCollection
         {
             get
             {
-                return _PrintMe;
+                return _Bei_Export_sichtbar;
             }
             set
             {
-                if (_PrintMe == value) { return; }
-                _PrintMe = value;
+                if (_Bei_Export_sichtbar == value) { return; }
+                _Bei_Export_sichtbar = value;
                 OnChanged(false);
             }
         }
@@ -335,7 +322,7 @@ namespace BlueControls.ItemCollection
                     return true;
 
                 case "print":
-                    _PrintMe = value.FromPlusMinus();
+                    _Bei_Export_sichtbar = value.FromPlusMinus();
                     return true;
 
                 case "point":
@@ -443,7 +430,7 @@ namespace BlueControls.ItemCollection
 
 
             t = t + "Style=" + (int)_Style + ", ";
-            t = t + "Print=" + _PrintMe.ToPlusMinus() + ", ";
+            t = t + "Print=" + _Bei_Export_sichtbar.ToPlusMinus() + ", ";
 
 
             if (_ZoomPadding != 0)
@@ -530,7 +517,7 @@ namespace BlueControls.ItemCollection
         {
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
 
-            if (ForPrinting && !_PrintMe) { return; }
+            if (ForPrinting && !_Bei_Export_sichtbar) { return; }
 
             var DCoordinates = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
 
@@ -542,7 +529,7 @@ namespace BlueControls.ItemCollection
             DrawExplicit(GR, DCoordinates, cZoom, MoveX, MoveY, vState, SizeOfParentControl, ForPrinting);
 
 
-            if (!_PrintMe)
+            if (!_Bei_Export_sichtbar)
             {
 
                 if (IsInDrawingArea(DCoordinates, SizeOfParentControl))

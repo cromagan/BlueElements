@@ -40,12 +40,12 @@ namespace BlueControls.ItemCollection
 
         #region  Variablen-Deklarationen 
 
-        internal PointDF Point1;
-        internal PointDF Point2;
+        internal PointM Point1;
+        internal PointM Point2;
 
         private string CalcTempPoints_Code = string.Empty;
 
-        private List<PointDF> _TempPoints;
+        private List<PointM> _TempPoints;
 
         private DateTime _LastRecalc = DateTime.Now.AddHours(-1);
 
@@ -67,8 +67,8 @@ namespace BlueControls.ItemCollection
 
         public LinePadItem(ItemCollectionPad parent, string internalname, PadStyles format, Point point1, Point point2) : base(parent, internalname)
         {
-            Point1 = new PointDF(this, "Punkt 1", 0, 0);
-            Point2 = new PointDF(this, "Punkt 2", 0, 0);
+            Point1 = new PointM(this, "Punkt 1", 0, 0);
+            Point2 = new PointM(this, "Punkt 2", 0, 0);
 
             Point1.SetTo(point1);
             Point2.SetTo(point2);
@@ -79,12 +79,12 @@ namespace BlueControls.ItemCollection
 
             Stil = format;
 
-            _TempPoints = new List<PointDF>();
+            _TempPoints = new List<PointM>();
             Linien_Verhalten = enConectorStyle.Direct;
         }
 
 
-        //public LinePadItem(string vInternal, PadStyles vFormat, enConectorStyle vArt, PointDF cPoint1, PointDF cPoint2)
+        //public LinePadItem(string vInternal, PadStyles vFormat, enConectorStyle vArt, PointM cPoint1, PointM cPoint2)
         //{
         //    _Internal = vInternal;
         //    Point1.SetTo(cPoint1);
@@ -194,17 +194,17 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void SetCoordinates(RectangleDF r)
-        {
-            _LastRecalc = DateTime.Now.AddHours(-1);
+        //public override void SetCoordinates(RectangleDF r)
+        //{
+        //    _LastRecalc = DateTime.Now.AddHours(-1);
 
 
-            Point1.SetTo(r.PointOf(enAlignment.Top_Left));
-            Point2.SetTo(r.PointOf(enAlignment.Bottom_Right));
+        //    Point1.SetTo(r.PointOf(enAlignment.Top_Left));
+        //    Point2.SetTo(r.PointOf(enAlignment.Bottom_Right));
 
 
-            base.SetCoordinates(r);
-        }
+        //    base.SetCoordinates(r);
+        //}
 
 
         public override bool ParseThis(string tag, string value)
@@ -263,7 +263,7 @@ namespace BlueControls.ItemCollection
             _LastRecalc = DateTime.Now;
             CalcTempPoints_Code = NewCode;
 
-            _TempPoints = new List<PointDF>
+            _TempPoints = new List<PointM>
             {
                 Point1,
                 Point2
@@ -350,8 +350,8 @@ namespace BlueControls.ItemCollection
         private bool SchneidetWas(decimal X1, decimal Y1, decimal X2, decimal Y2)
         {
 
-            var p1 = new PointDF(X1, Y1);
-            var p2 = new PointDF(X2, Y2);
+            var p1 = new PointM(X1, Y1);
+            var p2 = new PointM(X2, Y2);
 
             foreach (var ThisItemBasic in Parent)
             {
@@ -362,7 +362,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private bool SchneidetDas(BasicPadItem ThisBasicItem, PointDF P1, PointDF P2)
+        private bool SchneidetDas(BasicPadItem ThisBasicItem, PointM P1, PointM P2)
         {
 
 
@@ -703,15 +703,15 @@ namespace BlueControls.ItemCollection
 
             if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X || (int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y) { return false; }
 
-            PointDF NP1;
-            PointDF NP2;
+            PointM NP1;
+            PointM NP2;
 
             if ((int)(_TempPoints[P1].X - _TempPoints[P1 + 1].X) > (int)(_TempPoints[P1].Y - _TempPoints[P1 + 1].Y))
             {
 
 
-                NP1 = new PointDF(_TempPoints[P1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
-                NP2 = new PointDF(_TempPoints[P1 + 1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
+                NP1 = new PointM(_TempPoints[P1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
+                NP2 = new PointM(_TempPoints[P1 + 1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
                 _TempPoints.Insert(P1 + 1, NP1);
                 _TempPoints.Insert(P1 + 2, NP2);
 
@@ -720,8 +720,8 @@ namespace BlueControls.ItemCollection
             else
             {
 
-                NP1 = new PointDF((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1].Y);
-                NP2 = new PointDF((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1 + 1].Y);
+                NP1 = new PointM((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1].Y);
+                NP2 = new PointM((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1 + 1].Y);
 
                 _TempPoints.Insert(P1 + 1, NP1);
                 _TempPoints.Insert(P1 + 2, NP2);
@@ -789,6 +789,17 @@ namespace BlueControls.ItemCollection
         //    _TempPoints = null;
         //    Linien_Verhalten = (enConectorStyle)int.Parse(Tags.TagGet("Linien-Verhalten"));
         //}
+
+
+        public void SetCoordinates(decimal px1, decimal py1, decimal px2, decimal py2)
+        {
+            Point1.SetTo(px1, py1);
+            Point2.SetTo(px2, py2);
+
+            //p_ML.SetTo(r.PointOf(enAlignment.VerticalCenter_Left));
+            //p_MR.SetTo(r.PointOf(enAlignment.VerticalCenter_Right));
+            //base.SetCoordinates(r);
+        }
 
     }
 }

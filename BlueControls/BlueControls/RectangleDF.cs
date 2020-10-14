@@ -57,7 +57,7 @@ namespace BlueControls
             Height = r.Height;
         }
 
-        public RectangleDF(PointDF p1, PointDF p2)
+        public RectangleDF(PointM p1, PointM p2)
         {
 
             X = Math.Min(p1.X, p2.X);
@@ -99,38 +99,38 @@ namespace BlueControls
 
         }
 
-        public PointDF PointOf(enAlignment P)
+        public PointM PointOf(enAlignment P)
         {
             switch (P)
             {
                 case enAlignment.Bottom_Left:
-                    return new PointDF(Left, Bottom);
+                    return new PointM(Left, Bottom);
                 case enAlignment.Bottom_Right:
-                    return new PointDF(Right, Bottom);
+                    return new PointM(Right, Bottom);
                 case enAlignment.Top_Left:
-                    return new PointDF(Left, Top);
+                    return new PointM(Left, Top);
                 case enAlignment.Top_Right:
-                    return new PointDF(Right, Top);
+                    return new PointM(Right, Top);
                 case enAlignment.Bottom_HorizontalCenter:
-                    return new PointDF(Left + Width / 2m, Bottom);
+                    return new PointM(Left + Width / 2m, Bottom);
                 case enAlignment.Top_HorizontalCenter:
-                    return new PointDF(Left + Width / 2m, Top);
+                    return new PointM(Left + Width / 2m, Top);
                 case enAlignment.VerticalCenter_Left:
-                    return new PointDF(Left, Top + Height / 2m);
+                    return new PointM(Left, Top + Height / 2m);
                 case enAlignment.VerticalCenter_Right:
-                    return new PointDF(Right, Top + Height / 2m);
+                    return new PointM(Right, Top + Height / 2m);
                 case enAlignment.Horizontal_Vertical_Center:
-                    return new PointDF(Left + Width / 2m, Top + Height / 2m);
+                    return new PointM(Left + Width / 2m, Top + Height / 2m);
                 default:
                     Develop.DebugPrint(P);
-                    return new PointDF();
+                    return new PointM();
 
             }
         }
 
 
 
-        public PointDF NearestCornerOF(PointDF P)
+        public PointM NearestCornerOF(PointM P)
         {
 
             var LO = PointOf(enAlignment.Top_Left);
@@ -156,7 +156,7 @@ namespace BlueControls
         }
 
 
-        public bool Contains(PointDF P)
+        public bool Contains(PointM P)
         {
             return Contains(P.X, P.Y);
         }
@@ -183,12 +183,12 @@ namespace BlueControls
         /// </summary>
         /// <param name="P"></param>
         /// <param name="maxrad"></param>
-        public void ExpandTo(PointDF middle, decimal radius)
+        public void ExpandTo(PointM middle, decimal radius)
         {
-            ExpandTo(new PointDF(middle.X, middle.Y + radius));
-            ExpandTo(new PointDF(middle.X, middle.Y - radius));
-            ExpandTo(new PointDF(middle.X + radius, middle.Y));
-            ExpandTo(new PointDF(middle.X - radius, middle.Y));
+            ExpandTo(new PointM(middle.X, middle.Y + radius));
+            ExpandTo(new PointM(middle.X, middle.Y - radius));
+            ExpandTo(new PointM(middle.X + radius, middle.Y));
+            ExpandTo(new PointM(middle.X - radius, middle.Y));
         }
 
 
@@ -198,7 +198,7 @@ namespace BlueControls
         /// Erweitert das Rechteck, dass der Angegebene Punkt ebenfalls umschlossen wird.
         /// </summary>
         /// <param name="P"></param>
-        public void ExpandTo(PointDF P)
+        public void ExpandTo(PointM P)
         {
             if (P.X < X)
             {

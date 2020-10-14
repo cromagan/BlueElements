@@ -32,10 +32,19 @@ namespace BlueControls.ItemCollection
 
         #region  Variablen-Deklarationen 
 
-        internal PointDF p_LO;
-        internal PointDF p_RO;
-        internal PointDF p_RU;
-        internal PointDF p_LU;
+        internal PointM p_LO;
+        internal PointM p_RO;
+        internal PointM p_RU;
+        internal PointM p_LU;
+
+        internal PointM p_O;
+        internal PointM p_U;
+        internal PointM p_L;
+        internal PointM p_R;
+
+
+
+
         public int Drehwinkel { get; set; } = 0;
         public bool Größe_fixiert { get; set; } = false;
         #endregion
@@ -47,16 +56,29 @@ namespace BlueControls.ItemCollection
 
         public FormPadItemRectangle(ItemCollectionPad parent, string internalname) : base(parent, internalname)
         {
-            p_LO = new PointDF(this, "LO", 0, 0, false, true, true);
-            p_RO = new PointDF(this, "RO", 0, 0);
-            p_RU = new PointDF(this, "RU", 0, 0);
-            p_LU = new PointDF(this, "LU", 0, 0);
+            p_LO = new PointM(this, "LO", 0, 0, enXY.XY, true, true);
+            p_RO = new PointM(this, "RO", 0, 0);
+            p_RU = new PointM(this, "RU", 0, 0);
+            p_LU = new PointM(this, "LU", 0, 0);
+
+
+            p_L = new PointM(this, "L", 0, 0);
+            p_R = new PointM(this, "R", 0, 0);
+            p_O = new PointM(this, "O", 0, 0);
+            p_U = new PointM(this, "U", 0, 0);
+
+
+
 
 
             Points.Add(p_LO);
             Points.Add(p_RO);
             Points.Add(p_LU);
             Points.Add(p_RU);
+            Points.Add(p_L);
+            Points.Add(p_R);
+            Points.Add(p_U);
+            Points.Add(p_O);
 
             Drehwinkel = 0;
         }
@@ -75,7 +97,7 @@ namespace BlueControls.ItemCollection
             var tmp = UsedArea();
             var ne = (int)(5 / zoomfactor);
             tmp.Inflate(-ne, -ne);
-            return tmp.Contains(value.ToPointDF());
+            return tmp.Contains(value.ToPointM());
         }
 
 
@@ -86,6 +108,9 @@ namespace BlueControls.ItemCollection
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RO));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RU));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_LU));
+
+
+
             }
             else
             {
@@ -122,12 +147,15 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void SetCoordinates(RectangleDF r)
+        public void SetCoordinates(RectangleDF r)
         {
             p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
             p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
-            base.SetCoordinates(r);
+            OnChanged(true);
         }
+
+
+
 
         public override RectangleDF UsedArea()
         {
@@ -139,6 +167,24 @@ namespace BlueControls.ItemCollection
         {
             p_RO.SetTo(p_RU.X, p_LO.Y);
             p_LU.SetTo(p_LO.X, p_RU.Y);
+
+
+
+            p_L.SetTo(p_LO.X, p_LO.Y + (p_LU.Y - p_LO.Y) / 2);
+            p_R.SetTo(p_RO.X, p_L.Y);
+
+            p_O.SetTo(p_LO.X + (p_RO.X - p_LO.X) / 2, p_LO.Y);
+            p_U.SetTo(p_O.X, p_LU.Y);
+
+
+            p_O.Y = p_LO.Y;
+            p_U.Y = p_LU.Y;
+
+            p_L.X = p_LO.X;
+            p_R.X = p_RO.X;
+
+
+
 
             base.CaluclatePointsWORelations();
         }
@@ -181,5 +227,25 @@ namespace BlueControls.ItemCollection
             }
             catch { }
         }
+
+
+
+
+        //internal PointM PointOf(enAlignment P)
+        //{
+
+        //    switch (P)
+        //    {
+        //        case enAlignment.Bottom_Left: return p_LU;
+        //        case enAlignment.Bottom_Right: return p_RU;
+        //        case enAlignment.Top_Left: return p_LO;
+        //        case enAlignment.Top_Right: return p_RO;
+        //        case enAlignment.Bottom_HorizontalCenter: return p_U;
+        //        case enAlignment.Top_HorizontalCenter: return p_O;
+        //        case enAlignment.VerticalCenter_Left: return p_L;
+        //        case enAlignment.VerticalCenter_Right: return p_R;
+        //        default: return null;
+        //    }
+        //}
     }
 }

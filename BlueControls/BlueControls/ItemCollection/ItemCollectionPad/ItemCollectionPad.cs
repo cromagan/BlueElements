@@ -43,10 +43,10 @@ namespace BlueControls.ItemCollection
         private System.Windows.Forms.Padding _RandinMM = System.Windows.Forms.Padding.Empty;
 
 
-        public PointDF P_rLO;
-        public PointDF P_rLU;
-        public PointDF P_rRU;
-        public PointDF P_rRO;
+        public PointM P_rLO;
+        public PointM P_rLU;
+        public PointM P_rRU;
+        public PointM P_rRO;
 
 
 
@@ -66,7 +66,7 @@ namespace BlueControls.ItemCollection
         private readonly int IDCount = 0;
 
 
-        public readonly ListExt<PointDF> AllPoints;
+        public readonly ListExt<PointM> AllPoints;
         public readonly ListExt<clsPointRelation> AllRelations;
 
 
@@ -159,7 +159,7 @@ namespace BlueControls.ItemCollection
             AllRelations.ItemAdded += PointOrRelation_ItemAdded;
             AllRelations.ItemRemoved += PointOrRelation_ItemRemoved;
 
-            AllPoints = new ListExt<PointDF>();
+            AllPoints = new ListExt<PointM>();
             AllPoints.ItemAdded += PointOrRelation_ItemAdded;
             AllPoints.ItemRemoved += PointOrRelation_ItemRemoved;
 
@@ -809,16 +809,16 @@ namespace BlueControls.ItemCollection
             if (P_rLO == null)
             {
 
-                P_rLO = new PointDF(this, "Druckbereich LO", 0, 0, true);
+                P_rLO = new PointM(this, "Druckbereich LO", 0, 0, true);
                 AllPoints.AddIfNotExists(P_rLO);
 
-                P_rRO = new PointDF(this, "Druckbereich RO", 0, 0, true);
+                P_rRO = new PointM(this, "Druckbereich RO", 0, 0, true);
                 AllPoints.AddIfNotExists(P_rRO);
 
-                P_rRU = new PointDF(this, "Druckbereich RU", 0, 0, true);
+                P_rRU = new PointM(this, "Druckbereich RU", 0, 0, true);
                 AllPoints.AddIfNotExists(P_rRU);
 
-                P_rLU = new PointDF(this, "Druckbereich LU", 0, 0, true);
+                P_rLU = new PointM(this, "Druckbereich LU", 0, 0, true);
                 AllPoints.AddIfNotExists(P_rLU);
             }
 
@@ -858,10 +858,10 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public List<PointDF> ConnectsWith(PointDF Point, bool CheckX, bool IgnoreInternals)
+        public List<PointM> ConnectsWith(PointM Point, bool CheckX, bool IgnoreInternals)
         {
 
-            var Points = new List<PointDF>
+            var Points = new List<PointM>
             {
                 Point
             };
@@ -1299,7 +1299,7 @@ namespace BlueControls.ItemCollection
 
         }
 
-        public void ComputeOrders(List<PointDF> Sel_P)
+        public void ComputeOrders(List<PointM> Sel_P)
         {
             if (_OrdersValid) { return; }
 
@@ -1322,7 +1322,7 @@ namespace BlueControls.ItemCollection
             if (NotPerforming(true) > 0) { return; }
 
 
-            var Cb = new List<PointDF>();
+            var Cb = new List<PointM>();
             var DobR = new List<clsPointRelation>();
 
 
@@ -1466,7 +1466,7 @@ namespace BlueControls.ItemCollection
             InvalidateOrder();
         }
 
-        public PointDF Getbetterpoint(double X, double Y, PointDF notPoint, bool MustUsableForAutoRelation)
+        public PointM Getbetterpoint(double X, double Y, PointM notPoint, bool MustUsableForAutoRelation)
         {
 
             foreach (var thispoint in AllPoints)
@@ -1491,7 +1491,7 @@ namespace BlueControls.ItemCollection
             return null;
         }
 
-        public PointDF GetPointWithLowerIndex(PointDF NotPoint, PointDF ErsatzFür, bool MustUsableForAutoRelation)
+        public PointM GetPointWithLowerIndex(PointM NotPoint, PointM ErsatzFür, bool MustUsableForAutoRelation)
         {
             if (NotPoint != null && NotPoint.Parent == ErsatzFür.Parent) { return ErsatzFür; }
 
@@ -1518,13 +1518,13 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private void ComputePointOrder(List<PointDF> Sel_P)
+        private void ComputePointOrder(List<PointM> Sel_P)
         {
             var Modus = 0;
             var Count = 1;
 
 
-            var _Points = new List<PointDF>();
+            var _Points = new List<PointM>();
             _Points.AddRange(AllPoints);
 
 
@@ -1571,7 +1571,7 @@ namespace BlueControls.ItemCollection
 
             do
             {
-                PointDF DidPoint = null;
+                PointM DidPoint = null;
                 clsPointRelation DidRel = null;
 
 
@@ -1580,7 +1580,7 @@ namespace BlueControls.ItemCollection
                     switch (Modus)
                     {
                         case 0: // Fixpunkte hinzufgen
-                            if (Thispoint.PositionFix)
+                            if (Thispoint.Moveable)
                             {
                                 Thispoint.Order = Count;
                                 DidPoint = Thispoint;
@@ -1751,7 +1751,7 @@ namespace BlueControls.ItemCollection
             AllRelations.Sort();
         }
 
-        public int LowestOrder(ListExt<PointDF> ThisPoints)
+        public int LowestOrder(ListExt<PointM> ThisPoints)
         {
             var l = int.MaxValue;
 

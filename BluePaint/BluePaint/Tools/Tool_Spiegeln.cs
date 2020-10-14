@@ -136,7 +136,7 @@ namespace BluePaint
 
             var _Pic = OnNeedCurrentPic();
 
-            var Wink = (float)GeometryDF.Winkel(new PointDF(e.MouseDown.X, e.MouseDown.Y), new PointDF(e.Current.X, e.Current.Y));
+            var Wink = (float)GeometryDF.Winkel(new PointM(e.MouseDown.X, e.MouseDown.Y), new PointM(e.Current.X, e.Current.Y));
 
 
 

@@ -27,17 +27,13 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection
 {
-    public class SpacerPadItem : BasicPadItem
+    public class SpacerPadItem : FormPadItemRectangle
     {
 
 
         #region  Variablen-Deklarationen 
 
-        internal PointDF p_o;
-        internal PointDF p_u;
-        internal PointDF p_l;
-        internal PointDF p_r;
-        internal PointDF p_m;
+
 
 
         private readonly decimal mm125x; //Math.Round(mmToPixel(1.25D, _DPIx), 1)
@@ -63,18 +59,18 @@ namespace BlueControls.ItemCollection
             mm125x = Math.Round(modConverter.mmToPixel(1.25M, ItemCollectionPad.DPI), 1);
 
             Größe_Distanzhalter = (mm125x * 2).ToString(Constants.Format_Float10); // 19,68 = 2,5 mm
-            p_o = new PointDF(this, "O", 0, 0);
-            p_u = new PointDF(this, "U", 0, 0);
-            p_l = new PointDF(this, "L", 0, 0);
-            p_r = new PointDF(this, "R", 0, 0);
-            p_m = new PointDF(this, "M", 0, 0, false, true, true);
+            //p_O = new PointM(this, "O", 0, 0);
+            //p_U = new PointM(this, "U", 0, 0);
+            //p_L = new PointM(this, "L", 0, 0);
+            //p_R = new PointM(this, "R", 0, 0);
+            //p_M = new PointM(this, "M", 0, 0, false, true, true);
 
 
-            Points.Add(p_m);
-            Points.Add(p_o);
-            Points.Add(p_u);
-            Points.Add(p_l);
-            Points.Add(p_r);
+            //Points.Add(p_M);
+            //Points.Add(p_O);
+            //Points.Add(p_U);
+            //Points.Add(p_L);
+            //Points.Add(p_R);
 
         }
 
@@ -94,7 +90,7 @@ namespace BlueControls.ItemCollection
         public override void DesignOrStyleChanged()
         {
             // Muss angepasst werden, evtl. wegen 70% größe
-            SetCoordinates(new RectangleDF(p_m.X - 5, p_m.Y - 5, 10, 10));
+            CaluclatePointsWORelations();
         }
 
         protected override string ClassId()
@@ -105,7 +101,7 @@ namespace BlueControls.ItemCollection
         public override bool Contains(PointF value, decimal zoomfactor)
         {
             var mp = UsedArea().PointOf(enAlignment.Horizontal_Vertical_Center);
-            return GeometryDF.Länge(value.ToPointDF(), mp) < decimal.Parse(Größe_Distanzhalter) / 2;
+            return GeometryDF.Länge(value.ToPointM(), mp) < decimal.Parse(Größe_Distanzhalter) / 2;
         }
 
 
@@ -117,25 +113,25 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void Move(decimal x, decimal y)
-        {
-            p_m.SetTo(p_m.X + x, p_m.Y + y);
-            base.Move(x, y);
-        }
+        //public override void Move(decimal x, decimal y)
+        //{
+        //    p_M.SetTo(p_M.X + x, p_M.Y + y);
+        //    base.Move(x, y);
+        //}
 
 
-        public override void SetCoordinates(RectangleDF r)
-        {
-            p_m.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));
-            base.SetCoordinates(r);
-        }
+        //public override void SetCoordinates(RectangleDF r)
+        //{
+        //    p_M.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));
+        //    base.SetCoordinates(r);
+        //}
 
 
-        public override RectangleDF UsedArea()
-        {
-            var t = decimal.Parse(Größe_Distanzhalter) * Parent.SheetStyleScale;
-            return new RectangleDF(p_l.X, p_o.Y, t, t);
-        }
+        //public override RectangleDF UsedArea()
+        //{
+        //    var t = decimal.Parse(Größe_Distanzhalter) * Parent.SheetStyleScale;
+        //    return new RectangleDF(p_L.X, p_O.Y, t, t);
+        //}
 
 
 
@@ -169,23 +165,22 @@ namespace BlueControls.ItemCollection
 
         public override void CaluclatePointsWORelations()
         {
+            var p_M = new PointM((p_LO.X + p_RU.Y) / 2, (p_LO.Y + p_RU.Y) / 2);
+
+
             var t = decimal.Parse(Größe_Distanzhalter) * Parent.SheetStyleScale / 2;
-            p_o.SetTo(p_m.X, p_m.Y - t);
-            p_u.SetTo(p_m.X, p_m.Y + t);
-            p_l.SetTo(p_m.X - t, p_m.Y);
-            p_r.SetTo(p_m.X + t, p_m.Y);
+            p_O.SetTo(p_M.X, p_M.Y - t);
+            p_U.SetTo(p_M.X, p_M.Y + t);
+            p_L.SetTo(p_M.X - t, p_M.Y);
+            p_R.SetTo(p_M.X + t, p_M.Y);
 
             base.CaluclatePointsWORelations();
         }
 
 
-        protected override void GenerateInternalRelationExplicit()
-        {
-            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_m, p_u));
-            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_m, p_o));
-            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_m, p_r));
-            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_m, p_l));
-        }
+        // protected override void GenerateInternalRelationExplicit()
+        // {
+        //}
 
 
         public override List<FlexiControl> GetStyleOptions()

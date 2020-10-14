@@ -30,7 +30,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection
 {
-    public class RowFormulaPadItem : BasicPadItem
+    public class RowFormulaPadItem : FormPadItemRectangle
     {
 
 
@@ -40,15 +40,8 @@ namespace BlueControls.ItemCollection
 
         #region  Variablen-Deklarationen 
 
-        internal PointDF p_LO;
-        internal PointDF p_RO;
-        internal PointDF p_RU;
-        internal PointDF p_LU;
 
-        internal PointDF p_L;
-        internal PointDF p_R;
-        internal PointDF p_o;
-        internal PointDF p_u;
+
 
 
         private RowItem _Row;
@@ -77,25 +70,7 @@ namespace BlueControls.ItemCollection
         {
             _Row = row;
             _LayoutID = layoutID;
-            p_LO = new PointDF(this, "LO", 0, 0, false, true, true);
-            p_RO = new PointDF(this, "RO", 0, 0);
-            p_RU = new PointDF(this, "RU", 0, 0);
-            p_LU = new PointDF(this, "LU", 0, 0);
-            p_L = new PointDF(this, "L", 0, 0);
-            p_R = new PointDF(this, "R", 0, 0);
-            p_o = new PointDF(this, "O", 0, 0);
-            p_u = new PointDF(this, "U", 0, 0);
             _tmpBMP = null;
-
-            Points.Add(p_LO);
-            Points.Add(p_RU);
-            Points.Add(p_LU);
-            Points.Add(p_RO);
-
-            Points.Add(p_L);
-            Points.Add(p_R);
-            Points.Add(p_u);
-            Points.Add(p_o);
         }
 
         #endregion
@@ -172,7 +147,7 @@ namespace BlueControls.ItemCollection
             var tmp = UsedArea();
             var ne = (int)(5 / zoomfactor);
             tmp.Inflate(-ne, -ne);
-            return tmp.Contains(value.ToPointDF());
+            return tmp.Contains(value.ToPointM());
         }
 
 
@@ -283,47 +258,14 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void Move(decimal x, decimal y)
-        {
-            p_LO.SetTo(p_LO.X + x, p_LO.Y + y);
-            p_RU.SetTo(p_RU.X + x, p_RU.Y + y);
-            base.Move(x, y);
-        }
-
-        public override void SetCoordinates(RectangleDF r)
-        {
-            p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
-            p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
-            base.SetCoordinates(r);
-        }
 
 
         public override void CaluclatePointsWORelations()
         {
-            p_RO.SetTo(p_RU.X, p_LO.Y);
-            p_LU.SetTo(p_LO.X, p_RU.Y);
-
-
-            p_L.SetTo(p_LO.X, p_LO.Y + (p_LU.Y - p_LO.Y) / 2);
-            p_R.SetTo(p_RO.X, p_L.Y);
-
-            p_o.SetTo(p_LO.X + (p_RO.X - p_LO.X) / 2, p_LO.Y);
-            p_u.SetTo(p_o.X, p_LU.Y);
-
-            p_LU.X = p_LO.X;
-            p_RO.Y = p_LO.Y;
-            p_RU.X = p_RO.X;
-            p_RU.Y = p_LU.Y;
-
-
-            p_o.Y = p_LO.Y;
-            p_u.Y = p_LU.Y;
-
-            p_L.X = p_LO.X;
-            p_R.X = p_RO.X;
-
             base.CaluclatePointsWORelations();
 
+
+    
         }
 
 
@@ -333,30 +275,13 @@ namespace BlueControls.ItemCollection
             Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RU));
             Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_LU));
 
-            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_R));
-            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_L));
-            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_u));
-            Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_o));
+            //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_R));
+            //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_L));
+            //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_U));
+            //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_O));
         }
 
 
-
-        internal PointDF PointOf(enAlignment P)
-        {
-
-            switch (P)
-            {
-                case enAlignment.Bottom_Left: return p_LU;
-                case enAlignment.Bottom_Right: return p_RU;
-                case enAlignment.Top_Left: return p_LO;
-                case enAlignment.Top_Right: return p_RO;
-                case enAlignment.Bottom_HorizontalCenter: return p_u;
-                case enAlignment.Top_HorizontalCenter: return p_o;
-                case enAlignment.VerticalCenter_Left: return p_L;
-                case enAlignment.VerticalCenter_Right: return p_R;
-                default: return null;
-            }
-        }
 
         private void GeneratePic(bool SizeChangeAllowed)
         {

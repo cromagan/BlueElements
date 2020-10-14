@@ -26,7 +26,7 @@ namespace BlueControls.Controls
         #endregion
 
 
-        private readonly List<PointDF> points = new List<PointDF>();
+        private readonly List<PointM> points = new List<PointM>();
 
 
 
@@ -142,7 +142,7 @@ namespace BlueControls.Controls
             foreach (var thisO in Names)
             {
                 var s = Tags.TagGet(thisO);
-                points.Add(new PointDF(null, s));
+                points.Add(new PointM(null, s));
             }
         }
 
@@ -192,7 +192,7 @@ namespace BlueControls.Controls
             Tags.TagSet("AllPointNames", s.TrimEnd("|").ToNonCritical());
         }
 
-        public PointDF GetPoint(string name)
+        public PointM GetPoint(string name)
         {
             foreach (var thisp in points)
             {
@@ -226,7 +226,7 @@ namespace BlueControls.Controls
 
             if (p == null)
             {
-                p = new PointDF(name, x, y);
+                p = new PointM(name, x, y);
                 points.Add(p);
                 WritePointsInTags();
                 Invalidate();
@@ -355,15 +355,15 @@ namespace BlueControls.Controls
 
             if (_Helper.HasFlag(enHelpers.HorizontalLine))
             {
-                var p1 = new PointDF(0, e.Y).ZoomAndMove(eg);
-                var p2 = new PointDF(BMP.Width, e.Y).ZoomAndMove(eg);
+                var p1 = new PointM(0, e.Y).ZoomAndMove(eg);
+                var p2 = new PointM(BMP.Width, e.Y).ZoomAndMove(eg);
                 eg.G.DrawLine(Pen_RotTransp, p1, p2);
             }
 
             if (_Helper.HasFlag(enHelpers.VerticalLine))
             {
-                var p1 = new PointDF(e.X, 0).ZoomAndMove(eg);
-                var p2 = new PointDF(e.X, BMP.Height).ZoomAndMove(eg);
+                var p1 = new PointM(e.X, 0).ZoomAndMove(eg);
+                var p2 = new PointM(e.X, BMP.Height).ZoomAndMove(eg);
                 eg.G.DrawLine(Pen_RotTransp, p1, p2);
             }
 
@@ -374,8 +374,8 @@ namespace BlueControls.Controls
                 var h = BMP.Width / 2;
                 var x = Math.Abs(h - e.X);
 
-                var p1 = new PointDF(h - x, e.Y).ZoomAndMove(eg);
-                var p2 = new PointDF(h + x, e.Y).ZoomAndMove(eg);
+                var p1 = new PointM(h - x, e.Y).ZoomAndMove(eg);
+                var p2 = new PointM(h + x, e.Y).ZoomAndMove(eg);
                 eg.G.DrawLine(Pen_RotTransp, p1, p2);
 
             }
@@ -383,15 +383,15 @@ namespace BlueControls.Controls
             if (_Helper.HasFlag(enHelpers.MouseDownPoint))
             {
 
-                var m1 = new PointDF(e.X, e.Y).ZoomAndMove(eg);
+                var m1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
 
                 eg.G.DrawEllipse(Pen_RotTransp, new RectangleF(m1.X - 3, m1.Y - 3, 6, 6));
 
                 if (!MouseDownPos_1_1.IsEmpty)
                 {
 
-                    var md1 = new PointDF(MouseDownPos_1_1).ZoomAndMove(eg);
-                    var mc1 = new PointDF(e.X, e.Y).ZoomAndMove(eg);
+                    var md1 = new PointM(MouseDownPos_1_1).ZoomAndMove(eg);
+                    var mc1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
 
                     eg.G.DrawEllipse(Pen_RotTransp, new RectangleF(md1.X - 3, md1.Y - 3, 6, 6));
                     eg.G.DrawLine(Pen_RotTransp, mc1, md1);
@@ -405,8 +405,8 @@ namespace BlueControls.Controls
             {
                 if (!MouseDownPos_1_1.IsEmpty)
                 {
-                    var md1 = new PointDF(MouseDownPos_1_1).ZoomAndMove(eg);
-                    var mc1 = new PointDF(e.X, e.Y).ZoomAndMove(eg);
+                    var md1 = new PointM(MouseDownPos_1_1).ZoomAndMove(eg);
+                    var mc1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
                     var r = new RectangleF(Math.Min(md1.X, e.X), Math.Min(md1.Y, e.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
                     eg.G.FillRectangle(Brush_RotTransp, r);
                 }
@@ -503,7 +503,7 @@ namespace BlueControls.Controls
             foreach (var thisO in Names)
             {
                 var s = tags2.TagGet(thisO);
-                var ThisP = new PointDF(null, s);
+                var ThisP = new PointM(null, s);
 
                 ThisP.X *= zoomx;
                 ThisP.Y *= zoomy;

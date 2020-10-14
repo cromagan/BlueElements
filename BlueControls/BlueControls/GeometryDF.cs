@@ -32,7 +32,7 @@ namespace BlueControls
 
 
         /// Berechnet, ob sich zwei geraden IRGENDWO treffen.
-        public static PointDF LinesIntersect(PointDF Line1Start, PointDF Line1End, PointDF Line2Start, PointDF Line2End)
+        public static PointM LinesIntersect(PointM Line1Start, PointM Line1End, PointM Line2Start, PointM Line2End)
         {
 
             decimal a1, a2, b1, b2, c1, c2, denom;
@@ -54,12 +54,12 @@ namespace BlueControls
                 return null;
             }
 
-            return new PointDF((b1 * c2 - b2 * c1) / denom, (a2 * c1 - a1 * c2) / denom);
+            return new PointM((b1 * c2 - b2 * c1) / denom, (a2 * c1 - a1 * c2) / denom);
 
 
         }
 
-        public static PointDF LinesIntersect(PointDF Line1Start, PointDF Line1End, PointDF Line2Start, PointDF Line2End, bool considerEndpoints)
+        public static PointM LinesIntersect(PointM Line1Start, PointM Line1End, PointM Line2Start, PointM Line2End, bool considerEndpoints)
         {
 
             var sp = LinesIntersect(Line1Start, Line1End, Line2Start, Line2End);
@@ -94,7 +94,7 @@ namespace BlueControls
         /// <param name="P1"></param>
         /// <param name="P2"></param>
         /// <returns></returns>
-        public static decimal DistanzZuStrecke(this PointF P, PointDF P1, PointDF P2)
+        public static decimal DistanzZuStrecke(this PointF P, PointM P1, PointM P2)
         {
             return P.DistanzZuStrecke(P1.X, P1.Y, P2.X, P2.Y);
         }
@@ -103,9 +103,9 @@ namespace BlueControls
         //{
         //    return P.DistanzZuStrecke(P1.X, P1.Y, P2.X, P2.Y);
         //}
-        public static PointDF ToPointDF(this PointF P)
+        public static PointM ToPointM(this PointF P)
         {
-            return new PointDF(P.X, P.Y);
+            return new PointM(P.X, P.Y);
         }
 
 
@@ -120,21 +120,21 @@ namespace BlueControls
         /// <returns></returns>
         public static decimal DistanzZuStrecke(this PointF P, decimal X1, decimal Y1, decimal X2, decimal Y2)
         {
-            var SP = PointOnLine(new PointDF(P.X, P.Y), X1, Y1, X2, Y2);
+            var SP = PointOnLine(new PointM(P.X, P.Y), X1, Y1, X2, Y2);
 
 
-            var P1 = new PointDF(P.X, P.Y);
+            var P1 = new PointM(P.X, P.Y);
 
 
             if (Extensions.PointInRect(SP.ToPointF(), X1, Y1, X2, Y2, 5)) { return Länge(P1, SP); }
 
-            return Math.Min(Länge(new PointDF(X1, Y1), P1), Länge(new PointDF(X2, X2), P1));
+            return Math.Min(Länge(new PointM(X1, Y1), P1), Länge(new PointM(X2, X2), P1));
 
 
 
         }
 
-        public static PointDF PolarToCartesian(decimal R, double Winkel)
+        public static PointM PolarToCartesian(decimal R, double Winkel)
         {
             // http://de.wikipedia.org/wiki/Polarkoordinaten
 
@@ -143,33 +143,33 @@ namespace BlueControls
             switch (Winkel)
             {
                 case 0:
-                    return new PointDF(R, 0);
+                    return new PointM(R, 0);
                 case 90:
-                    return new PointDF(0, -R);
+                    return new PointM(0, -R);
                 case 180:
-                    return new PointDF(-R, 0);
+                    return new PointM(-R, 0);
                 case 270:
-                    return new PointDF(0, R);
+                    return new PointM(0, R);
                 default:
-                    return new PointDF((double)R * Geometry.Cosinus(Winkel), -(double)R * Geometry.Sinus(Winkel));
+                    return new PointM((double)R * Geometry.Cosinus(Winkel), -(double)R * Geometry.Sinus(Winkel));
             }
         }
 
-        public static decimal Winkel(PointDF Sp, PointDF EP)
+        public static decimal Winkel(PointM Sp, PointM EP)
         {
             return Geometry.Winkel(Sp.X, Sp.Y, EP.X, EP.Y);
         }
-        public static PointDF PointOnLine(PointDF Maus, decimal P_X, decimal P_Y, decimal Q_X, decimal Q_Y)
+        public static PointM PointOnLine(PointM Maus, decimal P_X, decimal P_Y, decimal Q_X, decimal Q_Y)
         {
             //http://de.wikipedia.org/wiki/Geradengleichung
             // < 0.000001 ist 0 gleich, weil ansonsten zu große ergebnisse rauskommen
             if (Math.Abs(P_Y - Q_Y) < 0.0000001m) // genau Waagerecht
             {
-                return new PointDF(Maus.X, P_Y);
+                return new PointM(Maus.X, P_Y);
             }
             if (Math.Abs(P_X - Q_X) < 0.0000001m) // genau Senkrecht
             {
-                return new PointDF(P_X, Maus.Y);
+                return new PointM(P_X, Maus.Y);
             }
 
             var m1 = (P_Y - Q_Y) / (P_X - Q_X);
@@ -181,13 +181,13 @@ namespace BlueControls
             var SchnittX = (T2 - T1) / (m1 - m2);
             var Schnitty = m1 * SchnittX + T1;
 
-            return new PointDF(SchnittX, Schnitty);
+            return new PointM(SchnittX, Schnitty);
         }
 
 
 
 
-        public static decimal Länge(PointDF SP, PointDF Ep)
+        public static decimal Länge(PointM SP, PointM Ep)
         {
             // Berechnet die Länge einer Strecke
 

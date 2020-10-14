@@ -46,7 +46,7 @@ namespace BlueControls.ItemCollection
 
         #region  Variablen-Deklarationen 
 
-        internal PointDF NP;
+        internal PointM NP;
         internal decimal GridShow = 10M; // in mm
                                          //   Dim _RasterSnap As Decimal = 50 ' in mm
 
@@ -72,7 +72,7 @@ namespace BlueControls.ItemCollection
 
         public GridPadItem(ItemCollectionPad parent, string internalname, PadStyles style, Point nullpunkt) : base(parent, internalname)
         {
-            NP = new PointDF(this, "Nullpunkt", 0, 0, true, false, true);
+            NP = new PointM(this, "Nullpunkt", 0, 0, enXY.XY, false, true);
             NP.SetTo(nullpunkt);
             Stil = style;
 
@@ -177,11 +177,11 @@ namespace BlueControls.ItemCollection
 
         protected override void GenerateInternalRelationExplicit() { }
 
-        public override void SetCoordinates(RectangleDF r)
-        {
-            NP.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));
-            base.SetCoordinates(r);
-        }
+        //public override void SetCoordinates(RectangleDF r)
+        //{
+        //    NP.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));
+        //    base.SetCoordinates(r);
+        //}
 
 
         public override bool ParseThis(string tag, string value)
