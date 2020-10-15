@@ -222,7 +222,7 @@ namespace BlueControls.ItemCollection
         /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
         /// </summary>
         /// <remarks></remarks>
-        public abstract RectangleDF UsedArea();
+        public abstract RectangleM UsedArea();
 
 
 
@@ -592,7 +592,7 @@ namespace BlueControls.ItemCollection
         /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.
         /// </summary>
         /// <remarks></remarks>
-        public RectangleDF ZoomToArea()
+        public RectangleM ZoomToArea()
         {
             var x = UsedArea();
 

@@ -108,11 +108,11 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override RectangleDF UsedArea()
+        public override RectangleM UsedArea()
         {
 
 
-            var r = new RectangleDF(Parent.DruckbereichRect()); // muss der gesamte druckbereich sein, ansonsten wirds ja nicht angezeigt, wenn der NP ausserhalb dem Bild ist
+            var r = new RectangleM(Parent.DruckbereichRect()); // muss der gesamte druckbereich sein, ansonsten wirds ja nicht angezeigt, wenn der NP ausserhalb dem Bild ist
             r.ExpandTo(NP);
             return r;
         }
@@ -177,7 +177,7 @@ namespace BlueControls.ItemCollection
 
         protected override void GenerateInternalRelationExplicit() { }
 
-        //public override void SetCoordinates(RectangleDF r)
+        //public override void SetCoordinates(RectangleM r)
         //{
         //    NP.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));
         //    base.SetCoordinates(r);

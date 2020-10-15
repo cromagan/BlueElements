@@ -41,12 +41,38 @@ namespace BlueControls.ItemCollection
         internal PointM p_U;
         internal PointM p_L;
         internal PointM p_R;
+        private int drehwinkel = 0;
+        private bool größe_fixiert = false;
 
+        public int Drehwinkel
+        {
+            get
+            {
+                return drehwinkel;
+            }
+            set
+            {
+                if (drehwinkel == value) { return; }
+                drehwinkel = value;
+                OnChanged();
+            }
+        }
+        public bool Größe_fixiert
+        {
+            get
+            {
+                return größe_fixiert;
+            }
+            set
+            {
+                if (größe_fixiert == value) { return; }
 
-
-
-        public int Drehwinkel { get; set; } = 0;
-        public bool Größe_fixiert { get; set; } = false;
+                größe_fixiert = value;
+                GenerateInternalRelationExplicit();
+                OnChanged();
+      
+            }
+        }
         #endregion
 
         #region  Event-Deklarationen + Delegaten 
@@ -62,10 +88,10 @@ namespace BlueControls.ItemCollection
             p_LU = new PointM(this, "LU", 0, 0);
 
 
-            p_L = new PointM(this, "L", 0, 0);
-            p_R = new PointM(this, "R", 0, 0);
-            p_O = new PointM(this, "O", 0, 0);
-            p_U = new PointM(this, "U", 0, 0);
+            p_L = new PointM(this, "L", 0, 0, enXY.X);
+            p_R = new PointM(this, "R", 0, 0, enXY.X);
+            p_O = new PointM(this, "O", 0, 0, enXY.Y);
+            p_U = new PointM(this, "U", 0, 0, enXY.Y);
 
 
 
@@ -108,20 +134,23 @@ namespace BlueControls.ItemCollection
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RO));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RU));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_LU));
-
-
-
             }
             else
             {
-                //relations.Add(new clsPointRelation(enRelationType.YPositionZueinander, p_LO, p_RU));
-
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
 
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
             }
+
+
+
+            //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_L));
+            //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_RU, p_R));
+            //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_O));
+            //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_RU, p_U));
+
         }
 
         public override List<FlexiControl> GetStyleOptions()
@@ -147,7 +176,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public void SetCoordinates(RectangleDF r)
+        public void SetCoordinates(RectangleM r)
         {
             p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
             p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
@@ -157,10 +186,10 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override RectangleDF UsedArea()
+        public override RectangleM UsedArea()
         {
-            if (p_LO == null || p_RU == null) { return new RectangleDF(); }
-            return new RectangleDF(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
+            if (p_LO == null || p_RU == null) { return new RectangleM(); }
+            return new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
         }
 
         public override void CaluclatePointsWORelations()
@@ -177,11 +206,7 @@ namespace BlueControls.ItemCollection
             p_U.SetTo(p_O.X, p_LU.Y);
 
 
-            p_O.Y = p_LO.Y;
-            p_U.Y = p_LU.Y;
 
-            p_L.X = p_LO.X;
-            p_R.X = p_RO.X;
 
 
 

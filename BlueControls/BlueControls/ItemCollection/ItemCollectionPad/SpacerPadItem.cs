@@ -120,17 +120,17 @@ namespace BlueControls.ItemCollection
         //}
 
 
-        //public override void SetCoordinates(RectangleDF r)
+        //public override void SetCoordinates(RectangleM r)
         //{
         //    p_M.SetTo(r.PointOf(enAlignment.Horizontal_Vertical_Center));
         //    base.SetCoordinates(r);
         //}
 
 
-        //public override RectangleDF UsedArea()
+        //public override RectangleM UsedArea()
         //{
         //    var t = decimal.Parse(Größe_Distanzhalter) * Parent.SheetStyleScale;
-        //    return new RectangleDF(p_L.X, p_O.Y, t, t);
+        //    return new RectangleM(p_L.X, p_O.Y, t, t);
         //}
 
 
@@ -208,7 +208,7 @@ namespace BlueControls.ItemCollection
         //{
 
         //    _Size = decimal.Parse(Tags.TagGet("Größe Distanzhalter").FromNonCritical());
-        //    SetCoordinates(new RectangleDF(p_m.X - 5, p_m.Y - 5, 10, 10));
+        //    SetCoordinates(new RectangleM(p_m.X - 5, p_m.Y - 5, 10, 10));
 
         //}
     }

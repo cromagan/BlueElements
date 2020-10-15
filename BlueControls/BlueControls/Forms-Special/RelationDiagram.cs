@@ -116,7 +116,7 @@ namespace BlueControls.Forms
             var i2 = new RowFormulaPadItem(Pad.Item, r);
             Pad.Item.Add(i2);
             //  Pad.Invalidate()
-            i2.SetCoordinates(new RectangleDF(xPos, Ypos, -1, -1));
+            i2.SetCoordinates(new RectangleM(xPos, Ypos, -1, -1));
 
             i2.InDenVordergrund();
 

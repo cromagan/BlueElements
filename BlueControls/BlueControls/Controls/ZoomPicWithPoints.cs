@@ -80,7 +80,7 @@ namespace BlueControls.Controls
 
 
 
-        protected override RectangleDF MaxBounds()
+        protected override RectangleM MaxBounds()
         {
 
             var r = base.MaxBounds();

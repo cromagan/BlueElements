@@ -220,20 +220,20 @@ namespace BlueControls
             }
         }
 
-        public int Order
-        {
-            get
-            {
-                return _order;
-            }
+        //public int Order
+        //{
+        //    get
+        //    {
+        //        return _order;
+        //    }
 
-            set
-            {
-                if (_order == value) { return; }
-                _order = value;
-                OnChanged();
-            }
-        }
+        //    set
+        //    {
+        //        if (_order == value) { return; }
+        //        _order = value;
+        //        OnChanged();
+        //    }
+        //}
 
         public bool PrimaryGridSnapPoint
         {

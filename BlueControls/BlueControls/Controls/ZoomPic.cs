@@ -55,10 +55,10 @@ namespace BlueControls.Controls
         public event EventHandler<AdditionalDrawing> DoAdditionalDrawing;
         public event EventHandler<PositionEventArgs> OverwriteMouseImageData;
 
-        protected override RectangleDF MaxBounds()
+        protected override RectangleM MaxBounds()
         {
-            if (BMP != null) { return new RectangleDF(0, 0, BMP.Width, BMP.Height); }
-            return new RectangleDF(0, 0, 0, 0);
+            if (BMP != null) { return new RectangleM(0, 0, BMP.Width, BMP.Height); }
+            return new RectangleM(0, 0, 0, 0);
         }
 
 
@@ -78,7 +78,7 @@ namespace BlueControls.Controls
             if (BMP != null)
             {
 
-                var r = new RectangleDF(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(_Zoom, _MoveX, _MoveY);
+                var r = new RectangleM(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(_Zoom, _MoveX, _MoveY);
 
 
                 if (_Zoom < 1 || AlwaysSmooth)

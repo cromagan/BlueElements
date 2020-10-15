@@ -75,7 +75,7 @@ namespace BlueControls.ItemCollection
 
 
             Bitmap = bmp;
-            SetCoordinates(new RectangleDF(0, 0, size.Width, size.Height));
+            SetCoordinates(new RectangleM(0, 0, size.Width, size.Height));
 
             Overlays = new List<QuickImage>();
             Hintergrund_weiß_füllen = true;

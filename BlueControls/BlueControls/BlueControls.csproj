@@ -500,7 +500,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RectangleDF.cs" />
+    <Compile Include="RectangleM.cs" />
     <Compile Include="Forms-Common\ScreenShot.cs">
       <SubType>Form</SubType>
     </Compile>

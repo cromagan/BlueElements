@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
@@ -49,24 +50,27 @@ namespace BlueControls.ItemCollection
         public PointM P_rRO;
 
 
-
         private bool _OrdersValid;
-
         private bool ComputeOrders_isin;
 
-        public string Caption = "";
+        public string Caption = string.Empty;
 
         public string ID = string.Empty;
 
-
-
         /// <summary>
-        /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter
+        /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter für den Dateinamen
         /// </summary>
         private readonly int IDCount = 0;
 
 
+        /// <summary>
+        /// Alle Punkte. Im Regelfall nach Wichtigkeit aufsteigend sortiert
+        /// </summary>
         public readonly ListExt<PointM> AllPoints;
+
+        /// <summary>
+        /// Alle Beziehungen. Im Regelfall nach Wichtigkeit aufsteigens sortiert
+        /// </summary>
         public readonly ListExt<clsPointRelation> AllRelations;
 
 
@@ -178,7 +182,7 @@ namespace BlueControls.ItemCollection
             do
             {
                 Count++;
-                PerformAll(1, false);
+                PerformAll();
                 if (NotPerforming(false) == 0) { break; }
                 if (Count > 20) { break; }
             } while (true);
@@ -293,7 +297,7 @@ namespace BlueControls.ItemCollection
 
             //CheckGrid();
 
-            PerformAll(0, true);
+            PerformAll();
 
             //if (needPrinterData) { RepairPrinterData(); }
         }
@@ -524,7 +528,7 @@ namespace BlueControls.ItemCollection
 
                 DesignOrStyleChanged();
 
-                PerformAll(0, true);
+                PerformAll();
                 OnDoInvalidate();
             }
         }
@@ -546,8 +550,8 @@ namespace BlueControls.ItemCollection
             if (!did) { return false; }
 
 
-            PerformAll(0, true);
-            PerformAll(1, true);
+            PerformAll();
+            PerformAll();
 
             return true;
         }
@@ -651,10 +655,6 @@ namespace BlueControls.ItemCollection
                 }
             }
 
-
-
-
-
         }
 
         public bool RemoveInvalidRelations()
@@ -740,7 +740,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public RectangleDF MaximumBounds(List<BasicPadItem> ZoomItems)
+        public RectangleM MaximumBounds(List<BasicPadItem> ZoomItems)
         {
             var x1 = decimal.MaxValue;
             var y1 = decimal.MaxValue;
@@ -770,9 +770,9 @@ namespace BlueControls.ItemCollection
             }
 
 
-            if (!Done) { return new RectangleDF(); }
+            if (!Done) { return new RectangleM(); }
 
-            return new RectangleDF(x1, y1, x2 - x1, y2 - y1);
+            return new RectangleM(x1, y1, x2 - x1, y2 - y1);
         }
 
 
@@ -809,16 +809,16 @@ namespace BlueControls.ItemCollection
             if (P_rLO == null)
             {
 
-                P_rLO = new PointM(this, "Druckbereich LO", 0, 0, true);
+                P_rLO = new PointM(this, "Druckbereich LO", 0, 0, enXY.none);
                 AllPoints.AddIfNotExists(P_rLO);
 
-                P_rRO = new PointM(this, "Druckbereich RO", 0, 0, true);
+                P_rRO = new PointM(this, "Druckbereich RO", 0, 0, enXY.none);
                 AllPoints.AddIfNotExists(P_rRO);
 
-                P_rRU = new PointM(this, "Druckbereich RU", 0, 0, true);
+                P_rRU = new PointM(this, "Druckbereich RU", 0, 0, enXY.none);
                 AllPoints.AddIfNotExists(P_rRU);
 
-                P_rLU = new PointM(this, "Druckbereich LU", 0, 0, true);
+                P_rLU = new PointM(this, "Druckbereich LU", 0, 0, enXY.none);
                 AllPoints.AddIfNotExists(P_rLU);
             }
 
@@ -858,7 +858,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public List<PointM> ConnectsWith(PointM Point, bool CheckX, bool IgnoreInternals)
+        public List<PointM> ConnectsWith(PointM Point, enXY CheckX, bool IgnoreInternals)
         {
 
             var Points = new List<PointM>
@@ -904,7 +904,7 @@ namespace BlueControls.ItemCollection
         public new string ToString()
         {
 
-            PerformAll(2, false);
+            PerformAll();
 
             var t = "{";
 
@@ -1045,18 +1045,18 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected RectangleDF MaxBounds()
+        protected RectangleM MaxBounds()
         {
             return MaxBounds(null);
         }
 
-        internal RectangleDF MaxBounds(List<BasicPadItem> ZoomItems)
+        internal RectangleM MaxBounds(List<BasicPadItem> ZoomItems)
         {
 
-            RectangleDF r;
+            RectangleM r;
             if (Count == 0)
             {
-                r = new RectangleDF(0, 0, 0, 0);
+                r = new RectangleM(0, 0, 0, 0);
             }
             else
             {
@@ -1073,7 +1073,7 @@ namespace BlueControls.ItemCollection
                 var x2 = Math.Max(r.Right, modConverter.mmToPixel((decimal)SheetSizeInMM.Width, ItemCollectionPad.DPI));
                 var y2 = Math.Max(r.Bottom, modConverter.mmToPixel((decimal)SheetSizeInMM.Height, ItemCollectionPad.DPI));
 
-                return new RectangleDF(X1, y1, x2 - X1, y2 - y1);
+                return new RectangleM(X1, y1, x2 - X1, y2 - y1);
             }
 
             return r;
@@ -1095,7 +1095,7 @@ namespace BlueControls.ItemCollection
                 }
             }
 
-            if (did) { PerformAll(1, false); }
+            if (did) { PerformAll(); }
             return did;
         }
 
@@ -1239,63 +1239,67 @@ namespace BlueControls.ItemCollection
         /// Level 2 = Leicht / Reparier nur die neuen Sachen mit schnelleren Abbruchbedingungen</param>
         /// <param name="AllowBigChanges"></param>
         /// <returns></returns>
-        public bool PerformAll(int Level, bool AllowBigChanges)
+        public void PerformAll()
         {
 
-            var L = new List<string>();
-            var Methode = 0;
+            //var L = new List<clsPointRelation>();
+            //var Methode = 0;
 
-            //InvalidateOrder();
             ComputeOrders(null);
 
-            do
+            foreach (var ThisRelation in AllRelations)
             {
-                var tmp = "";
+                ThisRelation.Perform(AllPoints);
+            }
 
-                foreach (var ThisRelation in AllRelations)
-                {
+            //do
+            //{
+            //    var tmp = "";
 
-                    if (ThisRelation.Performs(true))
-                    {
-                        ThisRelation.Computed = true;
-                    }
-                    else
-                    {
-                        ThisRelation.Computed = false;
-                        tmp = tmp + ThisRelation.Order + ";";
-                    }
+            //    foreach (var ThisRelation in AllRelations)
+            //    {
 
-                }
+            //        if (ThisRelation.Performs(true))
+            //        {
+            //            ThisRelation.Computed = true;
+            //        }
+            //        else
+            //        {
+            //            ThisRelation.Computed = false;
+            //            tmp = tmp + ThisRelation.Order + ";";
+            //        }
 
-                if (string.IsNullOrEmpty(tmp)) { return true; }
+            //    }
+
+            //    if (string.IsNullOrEmpty(tmp)) { return true; }
 
 
 
-                if (L.Contains(tmp))
-                {
-                    if (Level == 2) { return false; }
-                    if (Methode == 2) { return false; }
+            //    if (L.Contains(tmp))
+            //    {
+            //        if (Level == 2) { return false; }
+            //        if (Methode == 2) { return false; }
 
-                    Methode++;
-                    Relations_Optimize();
-                    //RecomputePointAndRelations();
-                    ComputeOrders(null);
-                    L.Clear();
-                }
-                else
-                {
-                    L.Add(tmp);
-                }
+            //        Methode++;
+            //        Relations_Optimize();
+            //        //RecomputePointAndRelations();
+            //        ComputeOrders(null);
+            //        L.Clear();
+            //    }
+            //    else
+            //    {
+            //        L.Add(tmp);
+            //    }
 
-                foreach (var ThisRelation in AllRelations)
-                {
-                    if (!ThisRelation.Computed)
-                    {
-                        ThisRelation.MakePointKonsistent(LowestOrder(ThisRelation.Points), AllowBigChanges);
-                    }
-                }
+            //    foreach (var ThisRelation in AllRelations)
+            //    {
+            //        if (!ThisRelation.Computed)
+            //        {
+            //            ThisRelation.MakePointKonsistent(LowestOrder(ThisRelation.Points), AllowBigChanges);
+            //        }
+            //    }
 
-            } while (true);
+            //} while (true);
 
         }
 
@@ -1311,10 +1315,8 @@ namespace BlueControls.ItemCollection
             RemoveInvalidRelations();
 
             ComputePointOrder(Sel_P);
-            ComputeRelationOrder();
 
             _OrdersValid = true;
-
             ComputeOrders_isin = false;
         }
         public void Relations_Optimize()
@@ -1328,8 +1330,8 @@ namespace BlueControls.ItemCollection
 
             foreach (var thisPoint in AllPoints)
             {
-                var CX = ConnectsWith(thisPoint, true, true);
-                var CY = ConnectsWith(thisPoint, false, true);
+                var CX = ConnectsWith(thisPoint, enXY.X, true);
+                var CY = ConnectsWith(thisPoint, enXY.Y, true);
 
                 // Ermitteln, die auf X und Y miteinander verbunden sind
                 Cb.Clear();
@@ -1480,7 +1482,7 @@ namespace BlueControls.ItemCollection
 
                         if (thispoint != notPoint)
                         {
-                            if (Math.Abs((double)thispoint.X - X) < 0.01 && Math.Abs((double)thispoint.Y - Y) < 0.01) { return GetPointWithLowerIndex(notPoint, thispoint, true); }
+                            if (Math.Abs((double)thispoint.X - X) < 0.01 && Math.Abs((double)thispoint.Y - Y) < 0.01) { return thispoint; }
                         }
 
                     }
@@ -1491,61 +1493,57 @@ namespace BlueControls.ItemCollection
             return null;
         }
 
-        public PointM GetPointWithLowerIndex(PointM NotPoint, PointM ErsatzFür, bool MustUsableForAutoRelation)
-        {
-            if (NotPoint != null && NotPoint.Parent == ErsatzFür.Parent) { return ErsatzFür; }
+        //public PointM GetPointWithLowerIndex(PointM NotPoint, PointM ErsatzFür, bool MustUsableForAutoRelation)
+        //{
+        //    if (NotPoint != null && NotPoint.Parent == ErsatzFür.Parent) { return ErsatzFür; }
 
-            var p = ErsatzFür;
 
-            foreach (var thispoint in AllPoints)
-            {
-                if (thispoint != null)
-                {
-                    if (!MustUsableForAutoRelation || thispoint.CanUsedForAutoRelation)
-                    {
-                        if (thispoint != NotPoint && thispoint != ErsatzFür)
-                        {
-                            if (Math.Abs(thispoint.X - ErsatzFür.X) < 0.01m && Math.Abs(thispoint.Y - ErsatzFür.Y) < 0.01m)
-                            {
-                                if (thispoint.Order < p.Order) { p = thispoint; }
-                            }
-                        }
-                    }
-                }
-            }
 
-            return p;
-        }
+        //    foreach (var thispoint in PointOrder)
+        //    {
+        //        if (thispoint != null)
+        //        {
+        //            if (!MustUsableForAutoRelation || thispoint.CanUsedForAutoRelation)
+        //            {
+        //                if (thispoint != NotPoint)
+        //                {
+        //                    if (Math.Abs(thispoint.X - ErsatzFür.X) < 0.01m && Math.Abs(thispoint.Y - ErsatzFür.Y) < 0.01m)
+        //                    {
+        //                        return thispoint; // der erste Punkt ist der niedrigste im Index - kann auch der "ErsatzFür" sein
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return ErsatzFür;
+        //}
 
 
         private void ComputePointOrder(List<PointM> Sel_P)
         {
             var Modus = 0;
-            var Count = 1;
+            var done = false;
 
-
+            #region Punkte vorbereiten
             var _Points = new List<PointM>();
             _Points.AddRange(AllPoints);
 
+            AllPoints.Clear();
+            #endregion
 
-            foreach (var Thispoint in _Points)
-            {
-                Thispoint.Order = int.MaxValue;
-            }
-
-            _Points.Sort();
+            #region Beziehungen ermitteln, wie sie was verbinden
 
             var RelationNone = new List<clsPointRelation>();
             var RelationY = new List<clsPointRelation>();
             var RelationX = new List<clsPointRelation>();
             var RelationXY = new List<clsPointRelation>();
 
-
             foreach (var thisRelation in AllRelations)
             {
-                if (thisRelation.Connects(true))
+                if (thisRelation.Connects(enXY.X))
                 {
-                    if (thisRelation.Connects(false))
+                    if (thisRelation.Connects(enXY.Y))
                     {
                         RelationXY.Add(thisRelation);
                     }
@@ -1556,10 +1554,9 @@ namespace BlueControls.ItemCollection
                 }
                 else
                 {
-                    if (thisRelation.Connects(false))
+                    if (thisRelation.Connects(enXY.Y))
                     {
                         RelationY.Add(thisRelation);
-                        //Stop
                     }
                     else
                     {
@@ -1569,51 +1566,56 @@ namespace BlueControls.ItemCollection
             }
 
 
+            AllRelations.Clear();
+            #endregion
+
             do
             {
-                PointM DidPoint = null;
-                clsPointRelation DidRel = null;
 
-
-                foreach (var Thispoint in _Points)
+                var z = 0;
+                while (z < _Points.Count)
                 {
+
+                    var Thispoint = _Points[z];
+
                     switch (Modus)
                     {
-                        case 0: // Fixpunkte hinzufgen
-                            if (Thispoint.Moveable)
-                            {
-                                Thispoint.Order = Count;
-                                DidPoint = Thispoint;
-                            }
+                        case 0: // Unbewegliche Punkte hinzufügen
+                            if (Thispoint.Moveable == enXY.none) { AllPoints.Add(Thispoint); }
                             break;
 
-                        case 1: // X und Y Fix hinzufügen
-
+                        case 1: // Verbundene Punkte, die durch verbindungen X und Y Fix sind
                             foreach (var thisRelation in RelationXY)
                             {
-                                if (thisRelation.NeedCount(Thispoint))
+                                if (thisRelation.NeedCount(Thispoint, AllPoints))
                                 {
-                                    if (thisRelation.Connects(true) && thisRelation.Connects(false))
+                                    if (thisRelation.Connects(enXY.X) && thisRelation.Connects(enXY.Y))
                                     {
-                                        Thispoint.Order = Count;
-                                        DidPoint = Thispoint;
-                                        DidRel = thisRelation;
+                                        AllPoints.Add(Thispoint);
+                                        AllRelations.Add(thisRelation);
+                                        RelationXY.Remove(thisRelation);
                                         break;
                                     }
                                 }
                             }
                             break;
 
-                        case 2: // Fixe Y-Punkte hinzufügen
+
+
+                        case 2: // Y-Unbewegliche Punkte hinzufügen
+                            if (!Thispoint.Moveable.HasFlag(enXY.Y)) { AllPoints.Add(Thispoint); }
+                            break;
+
+                        case 3: // Fixe Y-Punkte hinzufügen
                             foreach (var thisRelation in RelationY)
                             {
-                                if (thisRelation.NeedCount(Thispoint))
+                                if (thisRelation.NeedCount(Thispoint, AllPoints))
                                 {
-                                    if (thisRelation.Connects(false))
+                                    if (thisRelation.Connects(enXY.Y))
                                     {
-                                        Thispoint.Order = Count;
-                                        DidPoint = Thispoint;
-                                        DidRel = thisRelation;
+                                        AllPoints.Add(Thispoint);
+                                        AllRelations.Add(thisRelation);
+                                        RelationY.Remove(thisRelation);
                                         break;
                                     }
                                 }
@@ -1621,147 +1623,146 @@ namespace BlueControls.ItemCollection
 
                             break;
 
-                        case 3: // Fixe X-Punkte hinzufügen
+                        case 4: // X-Unbewegliche Punkte hinzufügen
+                            if (!Thispoint.Moveable.HasFlag(enXY.X)) { AllPoints.Add(Thispoint); }
+                            break;
+
+                        case 5: // Fixe X-Punkte hinzufügen
                             foreach (var thisRelation in RelationX)
                             {
-                                if (thisRelation.NeedCount(Thispoint))
+                                if (thisRelation.NeedCount(Thispoint, AllPoints))
                                 {
-                                    if (thisRelation.Connects(true))
+                                    if (thisRelation.Connects(enXY.X))
                                     {
-                                        Thispoint.Order = Count;
-                                        DidPoint = Thispoint;
-                                        DidRel = thisRelation;
+                                        AllPoints.Add(Thispoint);
+                                        AllRelations.Add(thisRelation);
+                                        RelationX.Remove(thisRelation);
                                         break;
                                     }
                                 }
                             }
                             break;
 
-                        case 4: // Punkte hinzufügen, die in einer Beziehung sind UND ein Punkt bereits einen Order hat
+                        case 6: // Punkte hinzufügen, die in einer Beziehung sind UND ein Punkt bereits einen Order hat
 
                             foreach (var thisRelation in RelationNone)
                             {
-                                if (thisRelation.NeedCount(Thispoint))
+                                if (thisRelation.NeedCount(Thispoint, AllPoints))
                                 {
-                                    Thispoint.Order = Count;
-                                    DidPoint = Thispoint;
-                                    DidRel = thisRelation;
+                                    AllPoints.Add(Thispoint);
+                                    AllRelations.Add(thisRelation);
+                                    RelationNone.Remove(thisRelation);
                                     break;
                                 }
                             }
                             break;
 
-                        case 5: // Selectierte Punkte bevorzugen
-                            if (Sel_P.Contains(Thispoint))
+                        case 7: // Selectierte Punkte bevorzugen
+                            if (Sel_P != null && Sel_P.Contains(Thispoint))
                             {
-                                Thispoint.Order = Count;
-                                DidPoint = Thispoint;
+                                AllPoints.Add(Thispoint);
                             }
 
                             break;
 
-                        case 6: // Der gute Rest
-                            Thispoint.Order = Count;
-                            DidPoint = Thispoint;
+                        case 8: // Der gute Rest
+                            AllPoints.Add(Thispoint);
                             break;
 
                         default:
-                            return;
+                            done = true;
+                            break;
                     }
 
-                    if (DidPoint != null) { break; }
-                }
-
-
-
-                if (DidPoint != null)
-                {
-                    _Points.Remove(DidPoint);
-                    Count++;
-                    if (Modus > 1) { Modus = 1; }
-                }
-                else
-                {
-                    Modus++;
-                }
-
-                if (Modus == 5)
-                {
-                    if (Sel_P == null || Sel_P.Count == 0) { Modus++; }
-                }
-
-                if (_Points.Count == 0) { return; }
-
-
-
-                if (DidRel != null && DidRel.AllPointsHaveOrder())
-                {
-                    RelationNone.Remove(DidRel);
-                    RelationY.Remove(DidRel);
-                    RelationX.Remove(DidRel);
-                    RelationXY.Remove(DidRel);
-                }
-
-
-            } while (true);
-
-        }
-        public void ComputeRelationOrder()
-        {
-            var Count = 0;
-
-            // Zurücksetzen ---- 
-            foreach (var ThisRelation in AllRelations)
-            {
-                ThisRelation.Order = -1;
-            }
-
-
-            for (var Durch = 0; Durch <= 1; Durch++)
-            {
-
-                do
-                {
-                    clsPointRelation NextRel = null;
-                    var RelPO = int.MaxValue;
-
-                    foreach (var ThisRelation in AllRelations)
+                    if (AllPoints.Contains(Thispoint))
                     {
-                        if (ThisRelation.Order < 0)
+                        Modus = 0;
+                        z = 0;
+                        _Points.Remove(Thispoint);
+                    }
+                    else
+                    {
+                        z++;
+
+                        if (z >= _Points.Count)
                         {
-                            if (Durch > 0 || ThisRelation.IsInternal())
-                            {
-                                if (LowestOrder(ThisRelation.Points) < RelPO)
-                                {
-                                    NextRel = ThisRelation;
-                                    RelPO = LowestOrder(ThisRelation.Points);
-                                }
-                            }
+                            Modus++;
                         }
                     }
 
-                    if (NextRel == null) { break; }
 
-                    Count++;
-                    NextRel.Order = Count;
-                } while (true);
+                }
 
-            }
+                if (_Points.Count == 0) { done = true; }
 
-            AllRelations.Sort();
+            } while (!done);
+
+            AllRelations.AddRange(RelationXY);
+            AllRelations.AddRange(RelationX);
+            AllRelations.AddRange(RelationY);
+            AllRelations.AddRange(RelationNone);
+
+            AllPoints.AddRange(_Points);
+
+
         }
 
-        public int LowestOrder(ListExt<PointM> ThisPoints)
-        {
-            var l = int.MaxValue;
+        //public void ComputeRelationOrder()
+        //{
+        //    var Count = 0;
 
-            foreach (var Thispouint in ThisPoints)
-            {
-                l = Math.Min(l, Thispouint.Order);
-            }
+        //    // Zurücksetzen ---- 
+        //    foreach (var ThisRelation in AllRelations)
+        //    {
+        //        ThisRelation.Order = -1;
+        //    }
 
-            return l;
-        }
+
+        //    for (var Durch = 0; Durch <= 1; Durch++)
+        //    {
+
+        //        do
+        //        {
+        //            clsPointRelation NextRel = null;
+        //            var RelPO = int.MaxValue;
+
+        //            foreach (var ThisRelation in AllRelations)
+        //            {
+        //                if (ThisRelation.Order < 0)
+        //                {
+        //                    if (Durch > 0 || ThisRelation.IsInternal())
+        //                    {
+        //                        if (LowestOrder(ThisRelation.Points) < RelPO)
+        //                        {
+        //                            NextRel = ThisRelation;
+        //                            RelPO = LowestOrder(ThisRelation.Points);
+        //                        }
+        //                    }
+        //                }
+        //            }
+
+        //            if (NextRel == null) { break; }
+
+        //            Count++;
+        //            NextRel.Order = Count;
+        //        } while (true);
+
+        //    }
+
+        //    AllRelations.Sort();
+        //}
+
+        //public int LowestOrder(ListExt<PointM> ThisPoints)
+        //{
+        //    var l = int.MaxValue;
+
+        //    foreach (var Thispouint in ThisPoints)
+        //    {
+        //        l = Math.Min(l, Thispouint.Order);
+        //    }
+
+        //    return l;
+        //}
 
         public void SaveAsBitmap(string Filename)
         {

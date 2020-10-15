@@ -134,13 +134,13 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override RectangleDF UsedArea()
+        public override RectangleM UsedArea()
         {
-            if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M) { return new RectangleDF(); }
+            if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M) { return new RectangleM(); }
 
             if (_TempPoints.Count == 0) { CalcTempPoints(); }
 
-            if (_TempPoints.Count == 0) { return new RectangleDF(); }
+            if (_TempPoints.Count == 0) { return new RectangleM(); }
             var x1 = decimal.MaxValue;
             var y1 = decimal.MaxValue;
             var x2 = decimal.MinValue;
@@ -156,7 +156,7 @@ namespace BlueControls.ItemCollection
                 y2 = Math.Max(ThisPoint.Y, y2);
             }
 
-            return new RectangleDF(x1, y1, x2 - x1, y2 - y1);
+            return new RectangleM(x1, y1, x2 - x1, y2 - y1);
 
 
             //Return New Rectangle(CInt(Math.Min(Point1.X, Point2.X)), CInt(Math.Min(Point1.Y, Point2.Y)), CInt(Math.Abs(Point2.X - Point1.X)), CInt(Math.Abs(Point2.Y - Point1.Y)))
@@ -194,7 +194,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        //public override void SetCoordinates(RectangleDF r)
+        //public override void SetCoordinates(RectangleM r)
         //{
         //    _LastRecalc = DateTime.Now.AddHours(-1);
 

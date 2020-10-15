@@ -331,9 +331,9 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override RectangleDF UsedArea()
+        public override RectangleM UsedArea()
         {
-            if (Stil == PadStyles.Undefiniert) { return new RectangleDF(0, 0, 0, 0); }
+            if (Stil == PadStyles.Undefiniert) { return new RectangleM(0, 0, 0, 0); }
             var geszoom = Parent.SheetStyleScale * Skalierung;
 
             var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
@@ -344,7 +344,7 @@ namespace BlueControls.ItemCollection
             var maxrad = (decimal)(Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height)) / 2 + 10);
 
 
-            var X = new RectangleDF(Point1, Point2);
+            var X = new RectangleM(Point1, Point2);
             X.ExpandTo(_Bezugslinie1);
             X.ExpandTo(_Bezugslinie2);
 
@@ -354,7 +354,7 @@ namespace BlueControls.ItemCollection
 
 
 
-            //return new RectangleDF(P1_x - 2, P1_y - 2, P2_x - P1_x + 4, P2_y - P1_y + 4); 
+            //return new RectangleM(P1_x - 2, P1_y - 2, P2_x - P1_x + 4, P2_y - P1_y + 4); 
 
             X.Inflate(-2, -2); // die Sicherheits koordinaten damit nicht linien abgeschnitten werden
 

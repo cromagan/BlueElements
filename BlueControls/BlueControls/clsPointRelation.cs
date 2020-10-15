@@ -29,7 +29,7 @@ using System.Drawing;
 
 namespace BlueControls
 {
-    public sealed class clsPointRelation : IComparable, ICompareKey
+    public sealed class clsPointRelation
     {
 
         private enRelationType _relationtype;
@@ -41,8 +41,8 @@ namespace BlueControls
         private string _Richtmaß;
 
 
-        internal bool Computed;
-        internal int Order;
+        //internal bool Computed;
+        //internal int Order;
 
 
         public event EventHandler Changed;
@@ -57,8 +57,8 @@ namespace BlueControls
             Points.ListOrItemChanged += Points_ListOrItemChanged;
 
             _Richtmaß = string.Empty;
-            Computed = false;
-            Order = -1;
+            //Computed = false;
+            //Order = -1;
             Parent = parent;
         }
 
@@ -165,24 +165,24 @@ namespace BlueControls
 
 
 
-        public int CompareTo(object obj)
-        {
-            if (obj is clsPointRelation PRL)
-            {
-                // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
-                return CompareKey().CompareTo(PRL.CompareKey());
-            }
-            else
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
-                return 0;
-            }
-        }
+        //public int CompareTo(object obj)
+        //{
+        //    if (obj is clsPointRelation PRL)
+        //    {
+        //        // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
+        //        return CompareKey().CompareTo(PRL.CompareKey());
+        //    }
+        //    else
+        //    {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+        //        return 0;
+        //    }
+        //}
 
-        public string CompareKey()
-        {
-            return Order.ToString(Constants.Format_Integer5) + "|" + ((int)_relationtype).ToString(Constants.Format_Integer3);
-        }
+        //public string CompareKey()
+        //{
+        //    return Order.ToString(Constants.Format_Integer5) + "|" + ((int)_relationtype).ToString(Constants.Format_Integer3);
+        //}
 
 
 
@@ -476,36 +476,59 @@ namespace BlueControls
         }
 
 
-        public bool MakePointKonsistent(int OrderNr, bool AllowBigChanges)
+        public void Perform(List<PointM> pointOrder)
         {
-
-            var OK = false;
-            foreach (var t in Points)
-            {
-                if (t.Order > OrderNr) { OK = true; }
-            }
-            if (!OK) { return false; }
-
-            var StartPx = new List<PointM>();
-            foreach (var t in Points)
-            {
-                StartPx.Add(new PointM(t));
-            }
-
+            if (Points.Count != 2) { return; }
 
             PointM Fix, Flex;
 
 
-            if (Points[1].Order > Points[0].Order)
+            var p1 = pointOrder.IndexOf(Points[0]);
+            var p2 = pointOrder.IndexOf(Points[1]);
+
+
+            if (p1 > p2)
+            {
+                Fix = Points[1];
+                Flex = Points[0];
+            }
+            else if (p1 < p2)
             {
                 Fix = Points[0];
                 Flex = Points[1];
             }
             else
             {
-                Fix = Points[1];
-                Flex = Points[0];
+                return;
             }
+
+            //var OK = false;
+            //foreach (var t in Points)
+            //{
+            //    if (t.Order > OrderNr) { OK = true; }
+            //}
+            //if (!OK) { return false; }
+
+            //var StartPx = new List<PointM>();
+            //foreach (var t in Points)
+            //{
+            //    StartPx.Add(new PointM(t));
+            //}
+
+
+            //PointM Fix, Flex;
+
+
+            //if (Points[1].Order > Points[0].Order)
+            //{
+            //    Fix = Points[0];
+            //    Flex = Points[1];
+            //}
+            //else
+            //{
+            //    Fix = Points[1];
+            //    Flex = Points[0];
+            //}
 
 
 
@@ -557,39 +580,39 @@ namespace BlueControls
             }
 
 
-            var DidSomething = false;
+            //var DidSomething = false;
 
 
-            for (var z = 0; z < Points.Count; z++)
-            {
+            //for (var z = 0; z < Points.Count; z++)
+            //{
 
-                // ACHTUNG: Position-Fix und Fixpoints sind unterschiedlich!
-                // Position-Fix: Der Punkt DARF nicht bewegt werden
-                // FixPoints: Über Beziehungen kann er eigentlich nicht bewegt werden. Aber über des kontextmenü kann es ja sein, dass die Beziehungen ungültig geworden sind.
-                if (Points[z].Moveable != enXY.none)
-                {
-                    // Erst auf Änderungen prüfen, damit ein neuer Durchgang angestoßen wird.
-                    // Und dann die Fixen dinegns zurück setzen
-                    Points[z].X = StartPx[z].X;
-                    Points[z].Y = StartPx[z].Y;
-                }
+            //    // ACHTUNG: Position-Fix und Fixpoints sind unterschiedlich!
+            //    // Position-Fix: Der Punkt DARF nicht bewegt werden
+            //    // FixPoints: Über Beziehungen kann er eigentlich nicht bewegt werden. Aber über des kontextmenü kann es ja sein, dass die Beziehungen ungültig geworden sind.
+            //    if (Points[z].Moveable != enXY.none)
+            //    {
+            //        // Erst auf Änderungen prüfen, damit ein neuer Durchgang angestoßen wird.
+            //        // Und dann die Fixen dinegns zurück setzen
+            //        Points[z].X = StartPx[z].X;
+            //        Points[z].Y = StartPx[z].Y;
+            //    }
 
-                if (!AllowBigChanges && GeometryDF.Länge(Points[z], StartPx[z]) > 100M)
-                {
-                    Points[z].X = StartPx[z].X;
-                    Points[z].Y = StartPx[z].Y;
-                }
-
-
-                if (Math.Abs(StartPx[z].X - Points[z].X) > 0.01m || Math.Abs(StartPx[z].X - Points[z].X) > 0.01m)
-                {
-                    DidSomething = true;
-                }
+            //    if (!AllowBigChanges && GeometryDF.Länge(Points[z], StartPx[z]) > 100M)
+            //    {
+            //        Points[z].X = StartPx[z].X;
+            //        Points[z].Y = StartPx[z].Y;
+            //    }
 
 
-            }
+            //    if (Math.Abs(StartPx[z].X - Points[z].X) > 0.01m || Math.Abs(StartPx[z].X - Points[z].X) > 0.01m)
+            //    {
+            //        DidSomething = true;
+            //    }
 
-            return DidSomething;
+
+            //}
+
+            //return DidSomething;
         }
 
 
@@ -682,25 +705,30 @@ namespace BlueControls
             return true;
         }
 
-        public bool AllPointsHaveOrder()
+        //public bool AllPointsHaveOrder()
+        //{
+        //    foreach (var Thispoint2 in Points)
+        //    {
+        //        if (Thispoint2.Order == int.MaxValue) { return false; }
+        //    }
+
+        //    return true;
+        //}
+
+        /// <summary>
+        /// Gibt true zurück, wenn der zu testente Punkt nicht in allreadyUsed ist, aber einer der anderen der Punkte in dieser Beziehung bereits in allreadyUsed hat
+        /// </summary>
+        /// <param name="pointToCheck"></param>
+        /// <returns></returns>
+        public bool NeedCount(PointM pointToCheck, List<PointM> allreadyUsed)
         {
+            if (!Points.Contains(pointToCheck)) { return false; }
+            if (allreadyUsed.Contains(pointToCheck)) { return false; }
+
+
             foreach (var Thispoint2 in Points)
             {
-                if (Thispoint2.Order == int.MaxValue) { return false; }
-            }
-
-            return true;
-        }
-
-        public bool NeedCount(PointM PointToCheck)
-        {
-
-            if (PointToCheck.Order < int.MaxValue) { return false; }
-            if (!Points.Contains(PointToCheck)) { return false; }
-
-            foreach (var Thispoint2 in Points)
-            {
-                if (Thispoint2.Order < int.MaxValue) { return true; }
+                if (allreadyUsed.Contains(Thispoint2)) { return true; }
             }
 
             return false;

@@ -459,7 +459,7 @@ namespace BlueControls.Forms
 
                     //Dim it As New RowFormulaPadItem(Liste(StartNr), Integer.Parse(FrmDrucken_Layout1.Text))
                     PrintPad.Item.Add(It);
-                    It.SetCoordinates(new RectangleDF(DruckB.Left + x * OneItem.Width, DruckB.Top + y * OneItem.Height, OneItem.Width, OneItem.Height));
+                    It.SetCoordinates(new RectangleM(DruckB.Left + x * OneItem.Width, DruckB.Top + y * OneItem.Height, OneItem.Width, OneItem.Height));
 
 
                     StartNr++;

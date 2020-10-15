@@ -70,30 +70,31 @@ namespace BlueControls.Controls
 
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e)
         {
-            base.OnMouseDown(e);
+     
             MousePos_1_1 = KoordinatesUnscaled(e);
             MouseDownPos_1_1 = KoordinatesUnscaled(e);
+            base.OnMouseDown(e);
         }
 
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e)
-        {
-            base.OnMouseUp(e);
+        {   
             MousePos_1_1 = KoordinatesUnscaled(e);
+            base.OnMouseUp(e);
             MouseDownPos_1_1 = Point.Empty;
         }
 
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            base.OnMouseMove(e);
             MousePos_1_1 = KoordinatesUnscaled(e);
+            base.OnMouseMove(e);
         }
 
         protected override void OnMouseLeave(System.EventArgs e)
         {
-            base.OnMouseLeave(e);
             MousePos_1_1 = Point.Empty;
+            base.OnMouseLeave(e);
         }
 
 
@@ -140,7 +141,7 @@ namespace BlueControls.Controls
 
 
 
-        public decimal ZoomFitValue(RectangleDF MaxBounds, bool sliderShowing, Size sizeOfPaintArea)
+        public decimal ZoomFitValue(RectangleM MaxBounds, bool sliderShowing, Size sizeOfPaintArea)
         {
             if (MaxBounds.Width < 0.01m || MaxBounds.Height < 0.01m) { return 1m; }
 
@@ -167,7 +168,7 @@ namespace BlueControls.Controls
         }
 
 
-        protected virtual RectangleDF MaxBounds()
+        protected virtual RectangleM MaxBounds()
         {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
             return null;
@@ -246,12 +247,12 @@ namespace BlueControls.Controls
             Invalidate();
         }
 
-        internal PointF SliderValues(RectangleDF bounds, decimal ZoomToUse, Point TopLeftPos)
+        internal PointF SliderValues(RectangleM bounds, decimal ZoomToUse, Point TopLeftPos)
         {
             return new PointF((float)(bounds.Left * ZoomToUse - TopLeftPos.X / 2m), (float)(bounds.Top * ZoomToUse - TopLeftPos.Y / 2m));
         }
 
-        private void ComputeSliders(RectangleDF maxBounds)
+        private void ComputeSliders(RectangleM maxBounds)
         {
 
 
@@ -325,7 +326,7 @@ namespace BlueControls.Controls
         /// <param name="sizeOfPaintArea"></param>
         /// <param name="ZoomToUse"></param>
         /// <returns></returns>
-        public Point CenterPos(RectangleDF MaxBounds, bool SliderShowing, Size sizeOfPaintArea, decimal ZoomToUse)
+        public Point CenterPos(RectangleM MaxBounds, bool SliderShowing, Size sizeOfPaintArea, decimal ZoomToUse)
         {
             var w = 0;
             var h = 0;
@@ -347,7 +348,7 @@ namespace BlueControls.Controls
 
 
 
-        public Rectangle AviablePaintArea()
+        public Rectangle AvailablePaintArea()
         {
 
             var wi = Size.Width;

@@ -145,7 +145,7 @@ namespace BlueControls.Forms
         {
             var b = new SpacerPadItem(Pad.Item);
             Pad.Item.Add(b);
-            b.SetCoordinates(new RectangleDF(10, 10, 20, 20));
+            b.SetCoordinates(new RectangleM(10, 10, 20, 20));
         }
 
         private void btnAddImage_Click(object sender, System.EventArgs e)
@@ -163,7 +163,7 @@ namespace BlueControls.Forms
                 Stil = PadStyles.Style_Standard
             };
             Pad.Item.Add(b);
-            b.SetCoordinates(new RectangleDF(10, 10, 200, 200));
+            b.SetCoordinates(new RectangleM(10, 10, 200, 200));
         }
 
 
@@ -273,14 +273,14 @@ namespace BlueControls.Forms
         private void btnAddUnterStufe_Click(object sender, System.EventArgs e)
         {
             var b = new ChildPadItem(Pad.Item);
-            b.SetCoordinates(new RectangleDF(100, 100, 300, 300));
+            b.SetCoordinates(new RectangleM(100, 100, 300, 300));
             Pad.Item.Add(b);
         }
 
         private void btnAddSymbol_Click(object sender, System.EventArgs e)
         {
             var b = new SymbolPadItem(Pad.Item);
-            b.SetCoordinates(new RectangleDF(100, 100, 300, 300));
+            b.SetCoordinates(new RectangleM(100, 100, 300, 300));
             Pad.Item.Add(b);
         }
 

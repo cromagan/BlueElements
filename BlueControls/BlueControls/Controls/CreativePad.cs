@@ -227,8 +227,6 @@ namespace BlueControls.Controls
             }
         }
 
-        #endregion
-
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -259,6 +257,8 @@ namespace BlueControls.Controls
         }
 
 
+        #endregion
+
 
 
 
@@ -287,9 +287,9 @@ namespace BlueControls.Controls
 
 
 
-        protected override RectangleDF MaxBounds()
+        protected override RectangleM MaxBounds()
         {
-            if (_Item == null) { return new RectangleDF(0, 0, 0, 0); }
+            if (_Item == null) { return new RectangleM(0, 0, 0, 0); }
 
             return _Item.MaxBounds(null);
         }
@@ -526,14 +526,14 @@ namespace BlueControls.Controls
                 if (Convert.ToBoolean(_AutoRelation | enAutoRelationMode.NurBeziehungenErhalten) && _NewAutoRelations.Count > 0)
                 {
                     _Item.AllRelations.AddRange(_NewAutoRelations);
-                    _Item.PerformAll(0, false);
+                    _Item.PerformAll();
                 }
 
             }
 
             _NewAutoRelations.Clear();
 
-            _Item.PerformAll(1, false);
+            _Item.PerformAll();
 
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
@@ -716,11 +716,11 @@ namespace BlueControls.Controls
 
             if (errorsBefore == 0)
             {
-                _Item.PerformAll(1, true);
+                _Item.PerformAll();
             }
             else
             {
-                _Item.PerformAll(2, false);
+                _Item.PerformAll();
                 // Sind eh schon fehler drinne, also schneller abbrechen, um nicht allzusehr verzögen
                 // und sicherheitshalber große Änderungen verbieten, um nicht noch mehr kaputt zu machen...
             }
@@ -777,8 +777,8 @@ namespace BlueControls.Controls
 
             foreach (var thispoint in Sel_P)
             {
-                Move_X.AddIfNotExists(_Item.ConnectsWith(thispoint, true, false));
-                Move_Y.AddIfNotExists(_Item.ConnectsWith(thispoint, false, false));
+                Move_X.AddIfNotExists(_Item.ConnectsWith(thispoint, enXY.X, false));
+                Move_Y.AddIfNotExists(_Item.ConnectsWith(thispoint, enXY.Y, false));
             }
 
             foreach (var thispoint in Move_X)
@@ -883,6 +883,13 @@ namespace BlueControls.Controls
             MouseDownPos_1_1 = new Point((int)(MouseDownPos_1_1.X + MoveX), (int)(MouseDownPos_1_1.Y + MoveY));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="DoX"></param>
+        /// <param name="Movep">Die zu verschiebenden (testenden) Punkte. Die Reihenfolge muss nach Wichtigkeit sortiert sein</param>
+        /// <param name="MouseMovedTo"></param>
+        /// <returns></returns>
         private decimal SnapToGrid(bool DoX, List<PointM> Movep, decimal MouseMovedTo)
         {
 
@@ -891,27 +898,28 @@ namespace BlueControls.Controls
             if (Movep == null || Movep.Count == 0) { return 0M; }
 
             PointM MasterPoint = null;
-            var LowOrderPoint = Movep[0];
+            PointM LowOrderPoint = null;
 
             foreach (var thisPoint in Movep)
             {
-                if (thisPoint == null) // Keine Lust das zu berücksichte. Muss halt stimmen!
+                if (thisPoint == null) // Keine Lust das zu berücksichten. Muss halt stimmen!
                 {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Punkt verworfen");
                 }
                 if (thisPoint.PrimaryGridSnapPoint)
                 {
-                    if (MasterPoint == null || thisPoint.Order < MasterPoint.Order) { MasterPoint = thisPoint; }
+                    if (MasterPoint == null) { MasterPoint = thisPoint; }
                 }
-
-                if (thisPoint.Order < LowOrderPoint.Order) { LowOrderPoint = thisPoint; }
-
+                else if (LowOrderPoint == null)
+                {
+                    LowOrderPoint = thisPoint;
+                }
             }
 
             if (MasterPoint == null) { MasterPoint = LowOrderPoint; }
 
             var Multi = modConverter.mmToPixel((decimal)_Gridsnap, ItemCollectionPad.DPI);
-            var Value = 0M;
+            decimal Value;
 
             if (DoX)
             {
@@ -968,7 +976,7 @@ namespace BlueControls.Controls
 
             if (PointToTest == null) { return; }
 
-            var dr = AviablePaintArea();
+            var dr = AvailablePaintArea();
 
 
             var WillMoveTo = new PointM(PointToTest.X + MouseMovedTo.X - MouseDownPos_1_1.X, PointToTest.Y + MouseMovedTo.Y - MouseDownPos_1_1.Y);
@@ -1089,7 +1097,7 @@ namespace BlueControls.Controls
 
 
 
-            _Item.PerformAll(0, false); // Da könnte sich ja alles geändert haben...
+            _Item.PerformAll(); // Da könnte sich ja alles geändert haben...
             Invalidate();
 
             return Done;

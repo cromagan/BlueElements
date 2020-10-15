@@ -24,7 +24,7 @@ using System.Drawing;
 
 namespace BlueControls
 {
-    public class RectangleDF
+    public class RectangleM
     {
 
         public decimal X;
@@ -32,16 +32,14 @@ namespace BlueControls
         public decimal Width;
         public decimal Height;
 
+        public RectangleM() : this(0M, 0M, 0M, 0M) { }
 
-        public RectangleDF()
-        {
-            X = 0M;
-            Y = 0M;
-            Width = 0M;
-            Height = 0M;
-        }
+        public RectangleM(Rectangle r) : this(r.X, r.Y, r.Width, r.Height) { }
 
-        public RectangleDF(decimal x, decimal y, decimal width, decimal height)
+        public RectangleM(PointM p1, PointM p2) : this(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y)) { }
+
+
+        public RectangleM(decimal x, decimal y, decimal width, decimal height)
         {
             X = x;
             Y = y;
@@ -49,23 +47,9 @@ namespace BlueControls
             Height = height;
         }
 
-        public RectangleDF(Rectangle r)
-        {
-            X = r.X;
-            Y = r.Y;
-            Width = r.Width;
-            Height = r.Height;
-        }
 
-        public RectangleDF(PointM p1, PointM p2)
-        {
 
-            X = Math.Min(p1.X, p2.X);
-            Y = Math.Min(p1.Y, p2.Y);
-            Width = Math.Abs(p1.X - p2.X);
-            Height = Math.Abs(p1.Y - p2.Y);
 
-        }
 
         public decimal Left
         {

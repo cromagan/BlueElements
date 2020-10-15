@@ -40,13 +40,13 @@ namespace BlueControls.EventArgs
 
         public void FillRectangle(Brush brush, Rectangle rectangle)
         {
-            var x = new RectangleDF(rectangle).ZoomAndMoveRect(Zoom, MoveX, MoveY);
+            var x = new RectangleM(rectangle).ZoomAndMoveRect(Zoom, MoveX, MoveY);
             G.FillRectangle(brush, x);
         }
 
         public void DrawImage(Bitmap BMP)
         {
-            var r = new RectangleDF(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(Zoom, MoveX, MoveY);
+            var r = new RectangleM(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(Zoom, MoveX, MoveY);
 
             G.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
 
