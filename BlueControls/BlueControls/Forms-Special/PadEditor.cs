@@ -298,5 +298,11 @@ namespace BlueControls.Forms
 
         }
 
+        private void btnPhsyik_Click(object sender, System.EventArgs e)
+        {
+            var b = new clsPhysicPadItem(Pad.Item);
+            //b.SetCoordinates(new RectangleM(100, 100, 300, 300));
+            Pad.Item.Add(b);
+        }
     }
 }

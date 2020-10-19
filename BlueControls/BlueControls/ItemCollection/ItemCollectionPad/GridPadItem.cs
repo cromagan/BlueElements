@@ -38,10 +38,6 @@ namespace BlueControls.ItemCollection
     {
 
 
-        public override void DesignOrStyleChanged()
-        {
-            // Keine Variablen zum Reseten, ein Invalidate reicht
-        }
 
 
         #region  Variablen-Deklarationen 
@@ -108,7 +104,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override RectangleM UsedArea()
+        protected override RectangleM CalculateUsedArea()
         {
 
 

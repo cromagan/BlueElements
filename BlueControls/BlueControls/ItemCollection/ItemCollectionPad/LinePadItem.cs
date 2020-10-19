@@ -32,11 +32,6 @@ namespace BlueControls.ItemCollection
     public class LinePadItem : BasicPadItem
     {
 
-        public override void DesignOrStyleChanged()
-        {
-            // Keine Variablen zum Reseten, ein Invalidate reicht
-        }
-
 
         #region  Variablen-Deklarationen 
 
@@ -134,7 +129,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override RectangleM UsedArea()
+        protected override RectangleM CalculateUsedArea()
         {
             if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M) { return new RectangleM(); }
 
@@ -165,17 +160,11 @@ namespace BlueControls.ItemCollection
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
-            if (Stil == PadStyles.Undefiniert)
-            {
-                return;
-            }
+            if (Stil == PadStyles.Undefiniert) { return; }
 
 
             CalcTempPoints();
-            if (_TempPoints.Count == 0)
-            {
-                return;
-            }
+            if (_TempPoints.Count == 0) { return; }
 
 
             for (var z = 0; z <= _TempPoints.Count - 2; z++)

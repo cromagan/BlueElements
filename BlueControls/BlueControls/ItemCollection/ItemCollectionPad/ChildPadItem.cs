@@ -96,7 +96,7 @@ namespace BlueControls.ItemCollection
             {
                 if (value == _Name) { return; }
                 _Name = value;
-                OnChanged(false);
+                OnChanged();
             }
         }
 
@@ -349,7 +349,7 @@ namespace BlueControls.ItemCollection
         private void _Pad_DoInvalidate(object sender, System.EventArgs e)
         {
             if (IsParsing) { return; }
-            OnChanged(false);
+            OnChanged();
         }
 
         public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY)
@@ -476,7 +476,7 @@ namespace BlueControls.ItemCollection
             if (PadInternal == null) { return false; }
             var b = PadInternal.Item.ParseVariable(VariableName, ValueType, Value);
 
-            if (b) { OnChanged(true); }
+            if (b) { OnChanged(); }
             return b;
 
         }
@@ -488,7 +488,7 @@ namespace BlueControls.ItemCollection
             if (PadInternal == null) { return false; }
             var b = PadInternal.Item.ParseSpecialCodes();
 
-            if (b) { OnChanged(true); }
+            if (b) { OnChanged(); }
             return b;
         }
 
@@ -506,7 +506,7 @@ namespace BlueControls.ItemCollection
         {
             if (PadInternal == null) { return false; }
             var b = PadInternal.Item.ResetVariables();
-            if (b) { OnChanged(true); }
+            if (b) { OnChanged(); }
             return b;
         }
 

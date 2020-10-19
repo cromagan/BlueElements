@@ -35,6 +35,8 @@ namespace BlueControls.ItemCollection
         private static int UniqueInternal_Count;
         public readonly ItemCollectionPad Parent = null;
 
+        public RectangleM tmpUsedArea = null;
+
 
         #region  Event-Deklarationen + Delegaten 
         public event System.EventHandler PointOrRelationsChanged;
@@ -148,7 +150,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public abstract void DesignOrStyleChanged();
+        public virtual void DesignOrStyleChanged() { }
 
         protected BasicPadItem(ItemCollectionPad parent, string internalname)
         {
@@ -205,7 +207,13 @@ namespace BlueControls.ItemCollection
         /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
         /// </summary>
         /// <remarks></remarks>
-        public abstract bool Contains(PointF value, decimal zoomfactor);
+        public virtual bool Contains(PointF value, decimal zoomfactor)
+        {
+            var tmp = UsedArea();
+            var ne = (int)(5 / zoomfactor);
+            tmp.Inflate(-ne, -ne);
+            return tmp.Contains(value.ToPointM());
+        }
 
         protected abstract void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting);
 
@@ -214,7 +222,7 @@ namespace BlueControls.ItemCollection
 
         public virtual void Move(decimal x, decimal y)
         {
-            OnChanged(true);
+            GenerateInternalRelation();
         }
 
 
@@ -222,9 +230,13 @@ namespace BlueControls.ItemCollection
         /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
         /// </summary>
         /// <remarks></remarks>
-        public abstract RectangleM UsedArea();
+        public RectangleM UsedArea()
+        {
+            if (tmpUsedArea == null) { tmpUsedArea = CalculateUsedArea(); }
+            return tmpUsedArea;
+        }
 
-
+        protected abstract RectangleM CalculateUsedArea();
 
         /// <summary>
         /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
@@ -264,7 +276,7 @@ namespace BlueControls.ItemCollection
             {
                 if (_Bei_Export_sichtbar == value) { return; }
                 _Bei_Export_sichtbar = value;
-                OnChanged(false);
+                OnChanged();
             }
         }
 
@@ -278,7 +290,7 @@ namespace BlueControls.ItemCollection
             {
                 if (_ZoomPadding == value) { return; }
                 _ZoomPadding = value;
-                OnChanged(false);
+                OnChanged();
             }
         }
 
@@ -294,7 +306,7 @@ namespace BlueControls.ItemCollection
                 if (_Style == value) { return; }
                 _Style = value;
                 DesignOrStyleChanged();
-                OnChanged(true);
+                GenerateInternalRelation();
             }
 
         }
@@ -330,8 +342,7 @@ namespace BlueControls.ItemCollection
                     {
                         if (value.Contains("Name=" + ThisPoint.Name + ","))
                         {
-                            ThisPoint.Parse(value);
-                            ThisPoint.Parent = this;
+                            ThisPoint.Parse(value, this);
                         }
                     }
                     return true;
@@ -611,12 +622,12 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public void OnChanged(bool checkLogic)
-        {
-            if (!Parent.Contains(this)) { return; } // Wir sind nich im Konstruktor, also ignorieren
-            if (checkLogic) { GenerateInternalRelation(); }
-            OnChanged();
-        }
+        //public void OnChanged(bool checkLogic)
+        //{
+        //    if (!Parent.Contains(this)) { return; } // Wir sind nich im Konstruktor, also ignorieren
+        //    if (checkLogic) { GenerateInternalRelation(); }
+        //    OnChanged();
+        //}
 
         public void GenerateInternalRelation()
         {
@@ -625,13 +636,14 @@ namespace BlueControls.ItemCollection
             GenerateInternalRelationExplicit();
             OverrideSavedRichtmaßOfAllRelations();
             OnPointOrRelationsChanged();
-            OnChanged(false); // False, sonst endlosschleife
+            OnChanged(); // False, sonst endlosschleife
         }
 
 
         public void OnChanged()
         {
             if (this is IParseable O && O.IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
+            tmpUsedArea = null;
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 

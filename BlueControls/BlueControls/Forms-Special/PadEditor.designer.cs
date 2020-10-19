@@ -62,6 +62,7 @@ namespace BlueControls.Forms
             this.sscchrifthgöße = new BlueControls.Controls.Caption();
             this.PadDesign = new BlueControls.Controls.ComboBox();
             this.ssss = new BlueControls.Controls.Caption();
+            this.btnPhsyik = new BlueControls.Controls.Button();
             this.Ribbon.SuspendLayout();
             this.tabPageStart.SuspendLayout();
             this.Area_Drucken.SuspendLayout();
@@ -129,6 +130,7 @@ namespace BlueControls.Forms
             // 
             // tabPageStart
             // 
+            this.tabPageStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabPageStart.Controls.Add(this.Area_Drucken);
             this.tabPageStart.Location = new System.Drawing.Point(4, 25);
             this.tabPageStart.Name = "tabPageStart";
@@ -138,6 +140,7 @@ namespace BlueControls.Forms
             // 
             // Area_Drucken
             // 
+            this.Area_Drucken.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.Area_Drucken.CausesValidation = false;
             this.Area_Drucken.Controls.Add(this.Vorschau);
             this.Area_Drucken.Controls.Add(this.Button_PageSetup);
@@ -147,6 +150,8 @@ namespace BlueControls.Forms
             this.Area_Drucken.Location = new System.Drawing.Point(0, 0);
             this.Area_Drucken.Name = "Area_Drucken";
             this.Area_Drucken.Size = new System.Drawing.Size(296, 81);
+            this.Area_Drucken.TabIndex = 0;
+            this.Area_Drucken.TabStop = false;
             this.Area_Drucken.Text = "Drucken";
             // 
             // Vorschau
@@ -192,6 +197,7 @@ namespace BlueControls.Forms
             // 
             // tabPageControl
             // 
+            this.tabPageControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabPageControl.Controls.Add(this.grpKomponenteHinzufügen);
             this.tabPageControl.Controls.Add(this.grpWerkzeuge);
             this.tabPageControl.Location = new System.Drawing.Point(4, 25);
@@ -202,7 +208,9 @@ namespace BlueControls.Forms
             // 
             // grpKomponenteHinzufügen
             // 
+            this.grpKomponenteHinzufügen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpKomponenteHinzufügen.CausesValidation = false;
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnPhsyik);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddSymbol);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddUnterStufe);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddText);
@@ -211,14 +219,17 @@ namespace BlueControls.Forms
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDimension);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddLine);
             this.grpKomponenteHinzufügen.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpKomponenteHinzufügen.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.grpKomponenteHinzufügen.Location = new System.Drawing.Point(240, 0);
             this.grpKomponenteHinzufügen.Name = "grpKomponenteHinzufügen";
             this.grpKomponenteHinzufügen.Size = new System.Drawing.Size(264, 81);
+            this.grpKomponenteHinzufügen.TabIndex = 0;
+            this.grpKomponenteHinzufügen.TabStop = false;
             this.grpKomponenteHinzufügen.Text = "Komponente hinzufügen";
             // 
             // btnAddSymbol
             // 
-            this.btnAddSymbol.ImageCode = "Formel|16";
+            this.btnAddSymbol.ImageCode = "Stern|16|||||137|0";
             this.btnAddSymbol.Location = new System.Drawing.Point(8, 46);
             this.btnAddSymbol.Name = "btnAddSymbol";
             this.btnAddSymbol.Size = new System.Drawing.Size(80, 22);
@@ -288,6 +299,7 @@ namespace BlueControls.Forms
             // 
             // grpWerkzeuge
             // 
+            this.grpWerkzeuge.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpWerkzeuge.CausesValidation = false;
             this.grpWerkzeuge.Controls.Add(this.btnAuswahl);
             this.grpWerkzeuge.Controls.Add(this.btnZoomFit);
@@ -297,6 +309,8 @@ namespace BlueControls.Forms
             this.grpWerkzeuge.Location = new System.Drawing.Point(0, 0);
             this.grpWerkzeuge.Name = "grpWerkzeuge";
             this.grpWerkzeuge.Size = new System.Drawing.Size(240, 81);
+            this.grpWerkzeuge.TabIndex = 1;
+            this.grpWerkzeuge.TabStop = false;
             this.grpWerkzeuge.Text = "Werkzeuge";
             // 
             // btnAuswahl
@@ -312,6 +326,7 @@ namespace BlueControls.Forms
             // 
             // Page_Settings
             // 
+            this.Page_Settings.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.Page_Settings.Controls.Add(this.Area_Assistent);
             this.Page_Settings.Controls.Add(this.Area_Design);
             this.Page_Settings.Location = new System.Drawing.Point(4, 25);
@@ -322,6 +337,7 @@ namespace BlueControls.Forms
             // 
             // Area_Assistent
             // 
+            this.Area_Assistent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.Area_Assistent.CausesValidation = false;
             this.Area_Assistent.Controls.Add(this.Bez_None);
             this.Area_Assistent.Controls.Add(this.Bez_Direkt);
@@ -335,6 +351,8 @@ namespace BlueControls.Forms
             this.Area_Assistent.Location = new System.Drawing.Point(288, 0);
             this.Area_Assistent.Name = "Area_Assistent";
             this.Area_Assistent.Size = new System.Drawing.Size(426, 81);
+            this.Area_Assistent.TabIndex = 0;
+            this.Area_Assistent.TabStop = false;
             this.Area_Assistent.Text = "Assistenten";
             // 
             // Bez_None
@@ -360,6 +378,7 @@ namespace BlueControls.Forms
             // 
             // capRasterFangen
             // 
+            this.capRasterFangen.CausesValidation = false;
             this.capRasterFangen.Location = new System.Drawing.Point(8, 46);
             this.capRasterFangen.Name = "capRasterFangen";
             this.capRasterFangen.Size = new System.Drawing.Size(56, 22);
@@ -367,6 +386,7 @@ namespace BlueControls.Forms
             // 
             // capRasterAnzeige
             // 
+            this.capRasterAnzeige.CausesValidation = false;
             this.capRasterAnzeige.Location = new System.Drawing.Point(8, 24);
             this.capRasterAnzeige.Name = "capRasterAnzeige";
             this.capRasterAnzeige.Size = new System.Drawing.Size(56, 22);
@@ -419,6 +439,7 @@ namespace BlueControls.Forms
             // 
             // Area_Design
             // 
+            this.Area_Design.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.Area_Design.CausesValidation = false;
             this.Area_Design.Controls.Add(this.ArbeitsbreichSetup);
             this.Area_Design.Controls.Add(this.SchriftGröße);
@@ -429,6 +450,8 @@ namespace BlueControls.Forms
             this.Area_Design.Location = new System.Drawing.Point(0, 0);
             this.Area_Design.Name = "Area_Design";
             this.Area_Design.Size = new System.Drawing.Size(288, 81);
+            this.Area_Design.TabIndex = 1;
+            this.Area_Design.TabStop = false;
             this.Area_Design.Text = "Design";
             // 
             // ArbeitsbreichSetup
@@ -453,6 +476,7 @@ namespace BlueControls.Forms
             // 
             // sscchrifthgöße
             // 
+            this.sscchrifthgöße.CausesValidation = false;
             this.sscchrifthgöße.Location = new System.Drawing.Point(112, 46);
             this.sscchrifthgöße.Name = "sscchrifthgöße";
             this.sscchrifthgöße.Size = new System.Drawing.Size(88, 22);
@@ -470,11 +494,22 @@ namespace BlueControls.Forms
             // 
             // ssss
             // 
+            this.ssss.CausesValidation = false;
             this.ssss.Location = new System.Drawing.Point(112, 2);
             this.ssss.Name = "ssss";
             this.ssss.Size = new System.Drawing.Size(77, 22);
             this.ssss.Text = "Design:";
             this.ssss.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+            // 
+            // btnPhsyik
+            // 
+            this.btnPhsyik.ImageCode = "Formel|16";
+            this.btnPhsyik.Location = new System.Drawing.Point(168, 24);
+            this.btnPhsyik.Name = "btnPhsyik";
+            this.btnPhsyik.Size = new System.Drawing.Size(88, 22);
+            this.btnPhsyik.TabIndex = 10;
+            this.btnPhsyik.Text = "Physik";
+            this.btnPhsyik.Click += new System.EventHandler(this.btnPhsyik_Click);
             // 
             // PadEditor
             // 
@@ -537,5 +572,6 @@ namespace BlueControls.Forms
             private TabPage Page_Settings;
         private Button btnAddUnterStufe;
         private Button btnAddSymbol;
+        private Button btnPhsyik;
     }
 	}

@@ -14,7 +14,7 @@
     <AssemblyName>BeCreative</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsFormsWithCustomSubMain</MyType>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <ApplicationIcon>
     </ApplicationIcon>
     <FileUpgradeFlags>

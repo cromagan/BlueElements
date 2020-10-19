@@ -49,7 +49,7 @@ namespace BlueControls.ItemCollection
                 _VariableText = value;
                 Text = value;
                 MakeNewETxt();
-                OnChanged(true);
+                GenerateInternalRelation();
             }
         }
 
@@ -117,7 +117,7 @@ namespace BlueControls.ItemCollection
                 if (value == _ausrichtung) { return; }
                 _ausrichtung = value;
                 MakeNewETxt();
-                OnChanged(false);
+                OnChanged();
             }
         }
 
@@ -343,7 +343,7 @@ namespace BlueControls.ItemCollection
             if (ot == Text) { return false; }
 
             MakeNewETxt();
-            OnChanged(true);
+            GenerateInternalRelation();
 
             return true;
         }
@@ -354,7 +354,7 @@ namespace BlueControls.ItemCollection
             if (_VariableText == Text) { return false; }
             Text = _VariableText;
             MakeNewETxt();
-            OnChanged(true);
+            GenerateInternalRelation();
 
             return true;
         }
@@ -367,7 +367,7 @@ namespace BlueControls.ItemCollection
 
             if (ot == Text) { return false; }
             MakeNewETxt();
-            OnChanged(true);
+            GenerateInternalRelation();
 
             return true;
         }
@@ -382,7 +382,7 @@ namespace BlueControls.ItemCollection
 
             Text = _VariableText;
             MakeNewETxt();
-            OnChanged(true);
+            GenerateInternalRelation();
             return true;
         }
 

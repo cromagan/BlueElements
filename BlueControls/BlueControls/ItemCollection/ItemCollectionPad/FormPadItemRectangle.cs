@@ -68,9 +68,7 @@ namespace BlueControls.ItemCollection
                 if (größe_fixiert == value) { return; }
 
                 größe_fixiert = value;
-                GenerateInternalRelationExplicit();
-                OnChanged();
-      
+                GenerateInternalRelation();
             }
         }
         #endregion
@@ -118,13 +116,7 @@ namespace BlueControls.ItemCollection
             base.Move(x, y);
         }
 
-        public override bool Contains(PointF value, decimal zoomfactor)
-        {
-            var tmp = UsedArea();
-            var ne = (int)(5 / zoomfactor);
-            tmp.Inflate(-ne, -ne);
-            return tmp.Contains(value.ToPointM());
-        }
+
 
 
         protected override void GenerateInternalRelationExplicit()
@@ -180,13 +172,13 @@ namespace BlueControls.ItemCollection
         {
             p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
             p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
-            OnChanged(true);
+            GenerateInternalRelation();
         }
 
 
 
 
-        public override RectangleM UsedArea()
+        protected override RectangleM CalculateUsedArea()
         {
             if (p_LO == null || p_RU == null) { return new RectangleM(); }
             return new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
@@ -222,11 +214,11 @@ namespace BlueControls.ItemCollection
             switch (tag)
             {
                 case "fixsize":
-                    Größe_fixiert = value.FromPlusMinus();
+                    größe_fixiert = value.FromPlusMinus();
                     return true;
 
                 case "rotation":
-                    Drehwinkel = int.Parse(value);
+                    drehwinkel = int.Parse(value);
                     return true;
             }
             return false;

@@ -714,16 +714,18 @@ namespace BlueControls.Controls
 
             CaluclateOtherPointsOf(Sel_P);
 
-            if (errorsBefore == 0)
-            {
-                _Item.PerformAll();
-            }
-            else
-            {
-                _Item.PerformAll();
-                // Sind eh schon fehler drinne, also schneller abbrechen, um nicht allzusehr verzögen
-                // und sicherheitshalber große Änderungen verbieten, um nicht noch mehr kaputt zu machen...
-            }
+
+            _Item.PerformAll();
+            //if (errorsBefore == 0)
+            //{
+            //    _Item.PerformAll();
+            //}
+            //else
+            //{
+            //    _Item.PerformAll();
+            //    // Sind eh schon fehler drinne, also schneller abbrechen, um nicht allzusehr verzögen
+            //    // und sicherheitshalber große Änderungen verbieten, um nicht noch mehr kaputt zu machen...
+            //}
 
             var errorsAfter = _Item.NotPerforming(false);
 
@@ -736,7 +738,34 @@ namespace BlueControls.Controls
                 CaluclateOtherPointsOf(Sel_P);
 
             }
-            else if (errorsAfter < errorsBefore)
+            else
+            {
+                var done = new List<Object>();
+
+                foreach (var thispoint in _Item.AllPoints)
+                {
+                    if (!done.Contains(thispoint.Parent))
+                    {
+                        done.Add(thispoint.Parent);
+
+                        if (thispoint.Parent is BasicPadItem bpi)
+                        {
+                            bpi.OnChanged();
+                        }
+
+                    }
+
+
+                }
+                CaluclateOtherPointsOf(Sel_P);
+
+            }
+            
+            
+            
+            
+            
+            if (errorsAfter < errorsBefore)
             {
                 ComputeMovingData(); // Evtl. greifen nun vorher invalide Beziehungen.
             }

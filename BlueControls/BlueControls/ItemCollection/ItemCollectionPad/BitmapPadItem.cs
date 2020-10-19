@@ -133,11 +133,6 @@ namespace BlueControls.ItemCollection
 
         #endregion
 
-        public override void DesignOrStyleChanged()
-        {
-            // Keine Variablen zum Reseten, ein Invalidate reicht
-        }
-
 
         protected override string ClassId()
         {
@@ -342,7 +337,7 @@ namespace BlueControls.ItemCollection
 
             Bitmap = modConverter.StringToBitmap(ot);
 
-            OnChanged(true);
+            OnChanged();
 
             return true;
         }
@@ -361,7 +356,7 @@ namespace BlueControls.ItemCollection
             {
                 Bitmap.Dispose();
                 Bitmap = null;
-                OnChanged(true);
+                OnChanged();
                 return true;
             }
 

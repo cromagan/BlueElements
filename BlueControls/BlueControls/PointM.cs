@@ -268,10 +268,17 @@ namespace BlueControls
 
         public event EventHandler Changed;
 
-        public void Parse(string ToParse)
+
+        public void Parse(string ToParse) => Parse(ToParse, null);
+
+
+        public void Parse(string ToParse, object parent)
         {
             IsParsing = true;
             Initialize();
+
+            _parent = parent;
+
             foreach (var pair in ToParse.GetAllTags())
             {
                 switch (pair.Key)
@@ -302,6 +309,10 @@ namespace BlueControls
                         }
 
                         break;
+                    case "moveable":
+                        _moveable = (enXY)int.Parse(pair.Value);
+                        return;
+
                     case "getsnapped":
                         _canUsedForAutoRelation = pair.Value.FromPlusMinus();
                         break;

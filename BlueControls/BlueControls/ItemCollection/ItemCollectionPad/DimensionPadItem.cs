@@ -58,7 +58,7 @@ namespace BlueControls.ItemCollection
             {
                 if (_text_oben == Länge_in_MM.ToString()) { value = string.Empty; }
                 _text_oben = value;
-                OnChanged(false);
+                OnChanged();
             }
         }
         public string Text_unten { get; set; } = string.Empty;
@@ -144,10 +144,6 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        public override void DesignOrStyleChanged()
-        {
-            // Keine Variablen zum Reseten, ein Invalidate reicht
-        }
 
 
         public override bool ParseThis(string tag, string value)
@@ -331,7 +327,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override RectangleM UsedArea()
+        protected override RectangleM CalculateUsedArea()
         {
             if (Stil == PadStyles.Undefiniert) { return new RectangleM(0, 0, 0, 0); }
             var geszoom = Parent.SheetStyleScale * Skalierung;

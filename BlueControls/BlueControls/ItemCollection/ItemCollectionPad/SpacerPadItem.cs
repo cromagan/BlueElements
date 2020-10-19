@@ -98,11 +98,11 @@ namespace BlueControls.ItemCollection
             return "SPACER";
         }
 
-        public override bool Contains(PointF value, decimal zoomfactor)
-        {
-            var mp = UsedArea().PointOf(enAlignment.Horizontal_Vertical_Center);
-            return GeometryDF.Länge(value.ToPointM(), mp) < decimal.Parse(Größe_Distanzhalter) / 2;
-        }
+        //public override bool Contains(PointF value, decimal zoomfactor)
+        //{
+        //    var mp = UsedArea().PointOf(enAlignment.Horizontal_Vertical_Center);
+        //    return GeometryDF.Länge(value.ToPointM(), mp) < decimal.Parse(Größe_Distanzhalter) / 2;
+        //}
 
 
 
@@ -127,7 +127,7 @@ namespace BlueControls.ItemCollection
         //}
 
 
-        //public override RectangleM UsedArea()
+        //        protected override RectangleM CalculateUsedArea()
         //{
         //    var t = decimal.Parse(Größe_Distanzhalter) * Parent.SheetStyleScale;
         //    return new RectangleM(p_L.X, p_O.Y, t, t);

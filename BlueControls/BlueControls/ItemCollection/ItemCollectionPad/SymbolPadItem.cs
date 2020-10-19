@@ -30,11 +30,6 @@ namespace BlueControls.ItemCollection
 {
     public class SymbolPadItem : FormPadItemRectangle
     {
-        public override void DesignOrStyleChanged()
-        {
-            // Keine Variablen zum Reseten, ein Invalidate reicht
-        }
-
         public SymbolPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
 
 

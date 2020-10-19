@@ -154,10 +154,7 @@ namespace BlueControls.ItemCollection
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
 
-            if (_tmpBMP == null)
-            {
-                GeneratePic(false);
-            }
+            if (_tmpBMP == null) { GeneratePic(false); }
 
 
 
@@ -177,7 +174,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override RectangleM UsedArea()
+        protected override RectangleM CalculateUsedArea()
         {
             if (p_LO == null || p_RU == null) { return new RectangleM(); }
             return new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
@@ -265,7 +262,7 @@ namespace BlueControls.ItemCollection
             base.CaluclatePointsWORelations();
 
 
-    
+
         }
 
 
@@ -289,7 +286,7 @@ namespace BlueControls.ItemCollection
             if (Row == null || string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#"))
             {
                 _tmpBMP = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
-                OnChanged(true);
+                GenerateInternalRelation();
                 return;
             }
 
@@ -329,7 +326,7 @@ namespace BlueControls.ItemCollection
 
             if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + _tmpBMP.Width, p_LO.Y + _tmpBMP.Height); }
 
-            OnChanged(true);
+            GenerateInternalRelation();
         }
 
 

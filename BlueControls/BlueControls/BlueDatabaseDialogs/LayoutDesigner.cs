@@ -147,7 +147,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             c.Item.Caption = ex;
             Pad.Grid = false;
-            Database.Layouts.Add(c.ToString());
+            Database.Layouts.Add(c.Item.ToString());
             Pad.Grid = ckbRaster.Checked;
 
             befülleLayoutDropdown();
