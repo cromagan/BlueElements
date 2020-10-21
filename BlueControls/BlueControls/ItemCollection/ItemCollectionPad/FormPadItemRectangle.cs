@@ -68,7 +68,7 @@ namespace BlueControls.ItemCollection
                 if (größe_fixiert == value) { return; }
 
                 größe_fixiert = value;
-                GenerateInternalRelation();
+                RecalculateAndOnChanged();
             }
         }
         #endregion
@@ -172,7 +172,7 @@ namespace BlueControls.ItemCollection
         {
             p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
             p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
-            GenerateInternalRelation();
+            RecalculateAndOnChanged();
         }
 
 

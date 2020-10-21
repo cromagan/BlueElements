@@ -286,7 +286,7 @@ namespace BlueControls.ItemCollection
             if (Row == null || string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#"))
             {
                 _tmpBMP = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
-                GenerateInternalRelation();
+                RecalculateAndOnChanged();
                 return;
             }
 
@@ -326,7 +326,7 @@ namespace BlueControls.ItemCollection
 
             if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + _tmpBMP.Width, p_LO.Y + _tmpBMP.Height); }
 
-            GenerateInternalRelation();
+            RecalculateAndOnChanged();
         }
 
 

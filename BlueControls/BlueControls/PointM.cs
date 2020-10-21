@@ -327,15 +327,21 @@ namespace BlueControls
             IsParsing = false;
         }
 
-        public PointF ToPointF()
-        {
-            return new PointF((float)_x, (float)_y);
-        }
+        public static explicit operator PointF(PointM p) => new PointF((float)p.X, (float)p.Y);
 
-        public Point ToPoint()
-        {
-            return new Point((int)_x, (int)_y);
-        }
+        public static explicit operator Point(PointM p) => new Point((int)p.X, (int)p.Y);
+
+
+
+        //public PointF ToPointF()
+        //{
+        //    return new PointF((float)_x, (float)_y);
+        //}
+
+        //public Point ToPoint()
+        //{
+        //    return new Point((int)_x, (int)_y);
+        //}
 
         public static PointM Empty()
         {
@@ -599,6 +605,47 @@ namespace BlueControls
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
+
+        public decimal Magnitude
+        {
+            get { return (decimal)Math.Sqrt((double)(_x * _x + _y * _y)); }
+        }
+
+        public void Normalize()
+        {
+            var magnitude = Magnitude;
+            _x = _x / magnitude;
+            _y = _y / magnitude;
+        }
+
+
+
+        public decimal DotProduct(PointM vector)
+        {
+            return this._x * vector._x + this._y * vector._y;
+        }
+
+
+        public static PointM operator +(PointM a, PointM b)
+        {
+            return new PointM(a._x + b._x, a._y + b._y);
+        }
+
+        public static PointM operator -(PointM a)
+        {
+            return new PointM(-a._x, -a._y);
+        }
+
+        public static PointM operator -(PointM a, PointM b)
+        {
+            return new PointM(a._x - b._x, a._y - b._y);
+        }
+
+
+        public static PointM operator *(PointM a, decimal b)
+        {
+            return new PointM(a._x * b, a._y * b);
+        }
 
     }
 }

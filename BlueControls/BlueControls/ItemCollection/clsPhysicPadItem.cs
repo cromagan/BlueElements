@@ -9,11 +9,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace BlueControls.ItemCollection
 {
     class clsPhysicPadItem : clsAbstractPhysicPadItem
     {
 
+
+        public readonly List<clsKraft> Kraft = new List<clsKraft>();
 
 
 

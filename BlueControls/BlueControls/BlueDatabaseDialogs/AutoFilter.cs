@@ -174,7 +174,7 @@ namespace BlueControls.BlueDatabaseDialogs
                         {
 
 
-                            if (Convert.ToBoolean(Thisfilter.FilterType & enFilterType.Istgleich))
+                            if (Thisfilter.FilterType.HasFlag(enFilterType.Istgleich))
                             {
                                 foreach (var ThisValue in Thisfilter.SearchValue)
                                 {
@@ -190,7 +190,7 @@ namespace BlueControls.BlueDatabaseDialogs
                                 }
 
                             }
-                            else if (Convert.ToBoolean(Thisfilter.FilterType & enFilterType.Instr))
+                            else if (Thisfilter.FilterType.HasFlag(enFilterType.Instr))
                             {
                                 txbEingabe.Text = Thisfilter.SearchValue[0];
 
@@ -368,7 +368,7 @@ namespace BlueControls.BlueDatabaseDialogs
                             {
                                 modAllgemein.Swap(ref Zd1, ref Zd2);
                             }
-                            CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Berechne | enFilterType.UND, "BTW(VALUE, " + Zd1.ToString().Replace(",",".") + "," + Zd2.ToString().Replace(",", ".") + ")"));
+                            CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Berechne | enFilterType.UND, "BTW(VALUE, " + Zd1.ToString().Replace(",", ".") + "," + Zd2.ToString().Replace(",", ".") + ")"));
                             return;
                         }
                     }

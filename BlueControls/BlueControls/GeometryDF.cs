@@ -125,8 +125,8 @@ namespace BlueControls
 
             var P1 = new PointM(P.X, P.Y);
 
-
-            if (Extensions.PointInRect(SP.ToPointF(), X1, Y1, X2, Y2, 5)) { return Länge(P1, SP); }
+      
+            if (Extensions.PointInRect((PointF)SP, X1, Y1, X2, Y2, 5)) { return Länge(P1, SP); }
 
             return Math.Min(Länge(new PointM(X1, Y1), P1), Länge(new PointM(X2, X2), P1));
 

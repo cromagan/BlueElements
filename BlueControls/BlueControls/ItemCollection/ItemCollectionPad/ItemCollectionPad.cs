@@ -578,7 +578,7 @@ namespace BlueControls.ItemCollection
             }
 
             base.OnItemAdded(item);
-            item.GenerateInternalRelation();
+            item.RecalculateAndOnChanged();
 
             AllPoints.AddIfNotExists(item.Points);
             AllRelations.AddIfNotExists(item.Relations); // Eigentlich überflüssig

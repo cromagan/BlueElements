@@ -290,16 +290,16 @@ namespace BlueBasics
                 case enDataFormat.Datum_und_Uhrzeit:
                     if (il == 19) { return true; }
                     if (il == 16) { return true; } // 01.01.2011 11:11
-                    return Convert.ToBoolean(il == 10);
+                    return il == 10;
 
                 case enDataFormat.Bit:
-                    return Convert.ToBoolean(il == 1);
+                    return il == 1;
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.FarbeInteger:
                 case enDataFormat.BildCode:
-                    return Convert.ToBoolean(il > 0);
+                    return il > 0;
 
 
                 case enDataFormat.LinkedCell:
@@ -307,7 +307,7 @@ namespace BlueBasics
                     return true;
 
                 case enDataFormat.Link_To_Filesystem:
-                    return Convert.ToBoolean(il < 257);
+                    return il < 257;
 
 
                 default:
@@ -378,7 +378,7 @@ namespace BlueBasics
 
 
                 case enDataFormat.Bit:
-                    return Convert.ToBoolean(TXT.Length == 1);
+                    return TXT.Length == 1;
 
                 case enDataFormat.Gleitkommazahl:
                     if (TXT == "0") { return true; }

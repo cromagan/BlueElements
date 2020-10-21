@@ -83,6 +83,7 @@ namespace BlueBasics
         }
 
 
+
         public static Rectangle ToRect(this RectangleF r)
         {
             return new Rectangle((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);

@@ -222,7 +222,7 @@ namespace BlueControls.ItemCollection
 
         public virtual void Move(decimal x, decimal y)
         {
-            GenerateInternalRelation();
+            RecalculateAndOnChanged();
         }
 
 
@@ -306,7 +306,7 @@ namespace BlueControls.ItemCollection
                 if (_Style == value) { return; }
                 _Style = value;
                 DesignOrStyleChanged();
-                GenerateInternalRelation();
+                RecalculateAndOnChanged();
             }
 
         }
@@ -629,7 +629,7 @@ namespace BlueControls.ItemCollection
         //    OnChanged();
         //}
 
-        public void GenerateInternalRelation()
+        public void RecalculateAndOnChanged()
         {
             Relations.Clear();
             CaluclatePointsWORelations();
