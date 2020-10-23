@@ -849,9 +849,9 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void OnListOrItemChanged()
+        public override void OnChanged()
         {
-            base.OnListOrItemChanged();
+            base.OnChanged();
             IsSaved = false;
             InvalidateOrder();
             OnDoInvalidate();

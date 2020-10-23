@@ -52,7 +52,7 @@ namespace BlueDatabase
             _Action = 0;
             _Text = string.Empty;
             Columns.Clear(); // = New List(Of ColumnItem)
-            Columns.ListOrItemChanged += Columns_ListOrItemChanged;
+            Columns.Changed += Columns_ListOrItemChanged;
         }
 
 

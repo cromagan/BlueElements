@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 namespace BlueBasics
 {
-    public class ListExt<T> : List<T>
+    public class ListExt<T> : List<T>, IChangedFeedback
     {
         private bool _ThrowEvents = true;
 
@@ -35,7 +35,7 @@ namespace BlueBasics
 
         public event EventHandler<ListEventArgs> ItemSeted;
         public event EventHandler<ListEventArgs> ItemInternalChanged;
-        public event EventHandler<System.EventArgs> ListOrItemChanged;
+        public event EventHandler Changed;
 
 
         public ListExt()
@@ -56,7 +56,7 @@ namespace BlueBasics
             set
             {
 
-                if (_ThrowEvents == value) { Develop.DebugPrint(enFehlerArt.Fehler, "Set ThrowEvents-Fehler! "); }
+                if (_ThrowEvents == value) { Develop.DebugPrint(enFehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
 
                 _ThrowEvents = value;
             }
@@ -141,7 +141,7 @@ namespace BlueBasics
         public new void Reverse()
         {
             base.Reverse();
-            OnListOrItemChanged();
+            OnChanged();
         }
 
         public new void Sort(int index, int count, IComparer<T> comparer) { Develop.DebugPrint_NichtImplementiert(); }
@@ -152,7 +152,7 @@ namespace BlueBasics
         public new void Sort()
         {
             base.Sort();
-            OnListOrItemChanged();
+            OnChanged();
         }
 
         public new void Sort(IComparer<T> comparer) { Develop.DebugPrint_NichtImplementiert(); }
@@ -197,7 +197,7 @@ namespace BlueBasics
 
             if (!_ThrowEvents) { return; }
             ItemAdded?.Invoke(this, new ListEventArgs(item));
-            OnListOrItemChanged();
+            OnChanged();
         }
 
         private void CItem_Changed(object sender, System.EventArgs e)
@@ -227,7 +227,7 @@ namespace BlueBasics
 
             if (!_ThrowEvents) { return; }
             ItemRemoved?.Invoke(this, System.EventArgs.Empty);
-            OnListOrItemChanged();
+            OnChanged();
         }
 
 
@@ -246,13 +246,13 @@ namespace BlueBasics
         {
             if (!_ThrowEvents) { return; }
             ItemInternalChanged?.Invoke(this, new ListEventArgs(item));
-            OnListOrItemChanged();
+            OnChanged();
         }
 
-        protected virtual void OnListOrItemChanged()
+        public virtual void OnChanged()
         {
             if (!_ThrowEvents) { return; }
-            ListOrItemChanged?.Invoke(this, System.EventArgs.Empty);
+            Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
         public void Swap(int Index1, int Index2)
@@ -263,7 +263,7 @@ namespace BlueBasics
             var tmp = base[Index1];
             base[Index1] = base[Index2];
             base[Index2] = tmp;
-            OnListOrItemChanged();
+            OnChanged();
 
         }
 

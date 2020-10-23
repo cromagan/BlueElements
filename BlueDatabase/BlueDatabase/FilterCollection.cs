@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
-using System;
 using System.Collections.Generic;
 
 namespace BlueDatabase
@@ -38,9 +37,9 @@ namespace BlueDatabase
 
         public bool IsParsing { get; private set; }
 
-        #region  Event-Deklarationen + Delegaten 
-        public event EventHandler Changed;
-        #endregion
+        //#region  Event-Deklarationen + Delegaten 
+        //public event EventHandler Changed;
+        //#endregion
 
 
         #region  Construktor + Initialize 
@@ -84,11 +83,11 @@ namespace BlueDatabase
         #endregion
 
 
-        protected override void OnListOrItemChanged()
-        {
-            base.OnListOrItemChanged();
-            OnChanged();
-        }
+        //protected override void OnChanged()
+        //{
+        //    base.OnChanged();
+        //    OnChanged();
+        //}
 
 
 
@@ -379,10 +378,10 @@ namespace BlueDatabase
         //    return _Internal.GetEnumerator();
         //}
 
-        public void OnChanged()
+        public override void OnChanged()
         {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
-            Changed?.Invoke(this, System.EventArgs.Empty);
+            base.OnChanged();
         }
 
         public void RemoveOtherAndAddIfNotExists(ColumnItem column, enFilterType filterType, string filterBy)

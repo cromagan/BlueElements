@@ -4511,7 +4511,7 @@ namespace BlueControls.Controls
         {
 
             var tmpText = CellItem.ValueReadable(column, originalText, style, compact);
-            var tmpAlign = CellItem.StandardAlignment(column);
+            var tmpAlign = CellItem.StandardAlignment(column, compact);
             QuickImage tmpImageCode;
 
 

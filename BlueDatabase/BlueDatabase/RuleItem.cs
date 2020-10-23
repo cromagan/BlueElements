@@ -46,7 +46,7 @@ namespace BlueDatabase
         private void Initialize()
         {
             if (Actions.Count > 0) { Actions.Clear(); }
-            Actions.ListOrItemChanged += Actions_ListOrItemChanged;
+            Actions.Changed += Actions_ListOrItemChanged;
         }
 
 

@@ -341,8 +341,8 @@ namespace BlueControls.BlueDatabaseDialogs
                     _TableView.CurrentArrangement.Remove(ViewItem);
                 }
 
-                if (index >= _TableView.CurrentArrangement.Count()) { index = _TableView.CurrentArrangement.Count(); }
-                _TableView.CurrentArrangement.InsertAt(index, c);
+                if (index >= _TableView.CurrentArrangement.Count) { index = _TableView.CurrentArrangement.Count; }
+                _TableView.CurrentArrangement.Insert(index, c);
                 _TableView.CursorPos_Set(c, _TableView.CursorPosRow(), true);
                 Check_OrderButtons();
             }
@@ -450,7 +450,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 // grpAktuelleSpalte.Text = "Spalte: " + column.ReadableText();
                 btnSpalteNachLinks.Enabled = Convert.ToBoolean(IndexOfViewItem > 0);
-                btnSpalteNachRechts.Enabled = Convert.ToBoolean(IndexOfViewItem >= 0) && Convert.ToBoolean(IndexOfViewItem < _TableView.CurrentArrangement.Count() - 1);
+                btnSpalteNachRechts.Enabled = Convert.ToBoolean(IndexOfViewItem >= 0) && Convert.ToBoolean(IndexOfViewItem < _TableView.CurrentArrangement.Count - 1);
 
 
 

@@ -49,7 +49,7 @@ namespace BlueControls.Controls
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Item = new ItemCollectionList();
-            Item.ListOrItemChanged += _Item_ListOrItemChanged;
+            Item.Changed += _Item_ListOrItemChanged;
             Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
             Item.ItemAdded += _Item_ItemAdded;
             Item.ItemRemoved += _Item_ItemRemoved;

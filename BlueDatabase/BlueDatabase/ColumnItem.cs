@@ -254,12 +254,12 @@ namespace BlueDatabase
             #endregion
 
 
-            DropDownItems.ListOrItemChanged += DropDownItems_ListOrItemChanged;
-            OpticalReplace.ListOrItemChanged += OpticalReplacer_ListOrItemChanged;
-            AfterEdit_AutoReplace.ListOrItemChanged += AfterEdit_AutoReplace_ListOrItemChanged;
-            Regex.ListOrItemChanged += Regex_ListOrItemChanged;
-            PermissionGroups_ChangeCell.ListOrItemChanged += PermissionGroups_ChangeCell_ListOrItemChanged;
-            Tags.ListOrItemChanged += Tags_ListOrItemChanged;
+            DropDownItems.Changed += DropDownItems_ListOrItemChanged;
+            OpticalReplace.Changed += OpticalReplacer_ListOrItemChanged;
+            AfterEdit_AutoReplace.Changed += AfterEdit_AutoReplace_ListOrItemChanged;
+            Regex.Changed += Regex_ListOrItemChanged;
+            PermissionGroups_ChangeCell.Changed += PermissionGroups_ChangeCell_ListOrItemChanged;
+            Tags.Changed += Tags_ListOrItemChanged;
 
 
 

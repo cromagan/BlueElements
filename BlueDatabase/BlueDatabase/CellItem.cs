@@ -368,7 +368,7 @@ namespace BlueDatabase
 
 
 
-        public static enAlignment StandardAlignment(ColumnItem column)
+        public static enAlignment StandardAlignment(ColumnItem column, bool compact)
         {
 
 
@@ -387,7 +387,7 @@ namespace BlueDatabase
                     return enAlignment.Top_Right;
 
                 case enDataFormat.Bit:
-                    if (column.CompactView) { return enAlignment.Top_HorizontalCenter; }
+                    if (compact) { return enAlignment.Top_HorizontalCenter; }
                     return enAlignment.Top_Left;
 
                 default:

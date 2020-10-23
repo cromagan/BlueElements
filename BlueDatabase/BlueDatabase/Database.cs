@@ -277,17 +277,17 @@ namespace BlueDatabase
 
 
 
-            ColumnArrangements.ListOrItemChanged += ColumnArrangements_ListOrItemChanged;
-            Layouts.ListOrItemChanged += Layouts_ListOrItemChanged;
+            ColumnArrangements.Changed += ColumnArrangements_ListOrItemChanged;
+            Layouts.Changed += Layouts_ListOrItemChanged;
             Layouts.ItemSeted += Layouts_ItemSeted;
 
-            Views.ListOrItemChanged += Views_ListOrItemChanged;
-            Rules.ListOrItemChanged += Rules_ListOrItemChanged;
-            PermissionGroups_NewRow.ListOrItemChanged += PermissionGroups_NewRow_ListOrItemChanged;
-            Tags.ListOrItemChanged += DatabaseTags_ListOrItemChanged;
-            Bins.ListOrItemChanged += Bins_ListOrItemChanged;
-            Export.ListOrItemChanged += Export_ListOrItemChanged;
-            DatenbankAdmin.ListOrItemChanged += DatabaseAdmin_ListOrItemChanged;
+            Views.Changed += Views_ListOrItemChanged;
+            Rules.Changed += Rules_ListOrItemChanged;
+            PermissionGroups_NewRow.Changed += PermissionGroups_NewRow_ListOrItemChanged;
+            Tags.Changed += DatabaseTags_ListOrItemChanged;
+            Bins.Changed += Bins_ListOrItemChanged;
+            Export.Changed += Export_ListOrItemChanged;
+            DatenbankAdmin.Changed += DatabaseAdmin_ListOrItemChanged;
 
 
 
@@ -768,12 +768,12 @@ namespace BlueDatabase
 
             foreach (var ThisCol in ColumnArrangements)
             {
-                ThisCol.Repair(this);
+                ThisCol.Repair();
             }
 
             foreach (var ThisCol in Views)
             {
-                ThisCol.Repair(this);
+                ThisCol.Repair();
             }
 
 
@@ -857,7 +857,7 @@ namespace BlueDatabase
 
         private void Views_ListOrItemChanged(object sender, System.EventArgs e)
         {
-            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.Views, -1, Views.ToString(true), false);
         }
 
@@ -866,8 +866,8 @@ namespace BlueDatabase
 
         private void ColumnArrangements_ListOrItemChanged(object sender, System.EventArgs e)
         {
-            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-            AddPending(enDatabaseDataType.ColumnArrangement, -1, ColumnArrangements.ToString(true), false);
+            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
+            AddPending(enDatabaseDataType.ColumnArrangement, -1, ColumnArrangements.ToString(), false);
         }
 
 
@@ -2112,9 +2112,9 @@ namespace BlueDatabase
 
 
 
-                SaveToByteList(l, enDatabaseDataType.ColumnArrangement, ColumnArrangements.ToString(true));
+                SaveToByteList(l, enDatabaseDataType.ColumnArrangement, ColumnArrangements.ToString());
 
-                SaveToByteList(l, enDatabaseDataType.Views, Views.ToString(true));
+                SaveToByteList(l, enDatabaseDataType.Views, Views.ToString());
 
                 SaveToByteList(l, enDatabaseDataType.Layouts, Layouts.JoinWithCr());
 

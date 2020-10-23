@@ -253,7 +253,7 @@ namespace BlueBasics
 
 
         /// <summary>
-        ///  Falls der Dateityp String ist, WIRD zwischen Gross und Kleinschreibung unterschieden!
+        ///  Falls der Dateityp String ist, WIRD zwischen Gross und Kleinschreibung unterschieden! Dafür kann RemoveString benutzt werden.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="L"></param>

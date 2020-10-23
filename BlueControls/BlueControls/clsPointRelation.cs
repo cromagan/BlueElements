@@ -54,7 +54,7 @@ namespace BlueControls
             _relationtype = enRelationType.None;
 
             Points.Clear();
-            Points.ListOrItemChanged += Points_ListOrItemChanged;
+            Points.Changed += Points_ListOrItemChanged;
 
             _Richtmaß = string.Empty;
             //Computed = false;

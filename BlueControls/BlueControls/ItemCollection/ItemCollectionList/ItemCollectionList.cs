@@ -275,10 +275,10 @@ namespace BlueControls.ItemCollection
             DoInvalidate?.Invoke(this, System.EventArgs.Empty);
         }
 
-        protected override void OnListOrItemChanged()
+        public override void OnChanged()
         {
             _CellposCorrect = Size.Empty;
-            base.OnListOrItemChanged();
+            base.OnChanged();
             OnDoInvalidate();
         }
 

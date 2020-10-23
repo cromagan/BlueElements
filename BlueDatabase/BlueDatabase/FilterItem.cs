@@ -58,14 +58,14 @@ namespace BlueDatabase
             Database = database;
             _FilterType = filterType;
             if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
-            SearchValue.ListOrItemChanged += SearchValue_ListOrItemChanged;
+            SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
         public FilterItem(Database database, string FilterCode)
         {
             Database = database;
             Parse(FilterCode);
-            SearchValue.ListOrItemChanged += SearchValue_ListOrItemChanged;
+            SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
         public FilterItem(ColumnItem column, enFilterType filterType, string searchValue) : this(column, filterType, new List<string>() { searchValue }, string.Empty) { }
@@ -87,7 +87,7 @@ namespace BlueDatabase
             Tag = tag;
 
             if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
-            SearchValue.ListOrItemChanged += SearchValue_ListOrItemChanged;
+            SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
         #endregion

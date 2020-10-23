@@ -198,7 +198,7 @@ namespace BlueDatabase
             Filter = new FilterCollection(Database);
             Filter.Changed += _Filter_Changed;
             _BereitsExportiert = new ListExt<string>();
-            _BereitsExportiert.ListOrItemChanged += _BereitsExportiert_ListOrItemChanged;
+            _BereitsExportiert.Changed += _BereitsExportiert_ListOrItemChanged;
 
             _LastExportTime = new DateTime(1900, 1, 1);
         }

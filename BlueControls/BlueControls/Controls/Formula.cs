@@ -966,7 +966,7 @@ namespace BlueControls.Controls
             aa.CheckBehavior = enCheckBehavior.MultiSelection;
             aa.Check(CurrView.PermissionGroups_Show, true);
 
-            if (CurrView == _Database.Views[1])
+            if (_Database.Views.Count > 1 && CurrView == _Database.Views[1])
             {
                 aa["#Everybody"].Enabled = false;
                 aa["#Everybody"].Checked = true;
