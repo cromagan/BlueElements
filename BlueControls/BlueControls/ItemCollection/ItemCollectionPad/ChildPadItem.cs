@@ -529,11 +529,9 @@ namespace BlueControls.ItemCollection
                 new FlexiControlForProperty(this, "Randfarbe")
             };
 
-            var Lage = new ItemCollectionList
-            {
-                new TextListItem("-1", "ohne"),
-                new TextListItem(((int)enAlignment.Top_Left).ToString(), "Links oben")
-            };
+            var Lage = new ItemCollectionList();
+            Lage.Add("-1", "ohne");
+            Lage.Add(((int)enAlignment.Top_Left).ToString(), "Links oben");
 
             l.Add(new FlexiControlForProperty(this, "Textlage", Lage));
 

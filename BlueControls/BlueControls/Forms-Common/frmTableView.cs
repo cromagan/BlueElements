@@ -50,12 +50,12 @@ namespace BlueControls.Forms
             Copyright.Text = "(c) 2010-" + DateTime.Now.Year + " Christian Peter";
 
             btnDrucken.Item.Clear();
-            btnDrucken.Item.Add(new TextListItem("erweitert", "Drucken bzw. Export", QuickImage.Get(enImageCode.Drucker, 28)));
+            btnDrucken.Item.Add("erweitert", "Drucken bzw. Export", QuickImage.Get(enImageCode.Drucker, 28));
             btnDrucken.Item.Add(new LineListItem());
-            btnDrucken.Item.Add(new TextListItem("csv", "CSV-Format für Excel in die Zwischenablage", QuickImage.Get(enImageCode.Excel, 28)));
-            btnDrucken.Item.Add(new TextListItem("html", "HTML-Format für Internet-Seiten", QuickImage.Get(enImageCode.Globus, 28)));
+            btnDrucken.Item.Add("csv", "CSV-Format für Excel in die Zwischenablage", QuickImage.Get(enImageCode.Excel, 28));
+            btnDrucken.Item.Add("html", "HTML-Format für Internet-Seiten", QuickImage.Get(enImageCode.Globus, 28));
             btnDrucken.Item.Add(new LineListItem());
-            btnDrucken.Item.Add(new TextListItem("editor", "Layout-Editor öffnen", QuickImage.Get(enImageCode.Layout, 28)));
+            btnDrucken.Item.Add("editor", "Layout-Editor öffnen", QuickImage.Get(enImageCode.Layout, 28));
 
 
             if (!adminTabVisible)
@@ -840,40 +840,40 @@ namespace BlueControls.Forms
             if (_Ansicht != enAnsicht.Überschriften_und_Formular)
             {
 
-                e.UserMenu.Add(new TextListItem("Sortierung", true));
+                e.UserMenu.Add("Sortierung", true);
                 e.UserMenu.Add(enContextMenuComands.SpaltenSortierungAZ, Column != null && Column.Format.CanBeChangedByRules());
                 e.UserMenu.Add(enContextMenuComands.SpaltenSortierungZA, Column != null && Column.Format.CanBeChangedByRules());
 
                 e.UserMenu.Add(new LineListItem());
 
 
-                e.UserMenu.Add(new TextListItem("Zelle", true));
-                e.UserMenu.Add(new TextListItem("ContentCopy", "Inhalt Kopieren", enImageCode.Kopieren, Column != null && Column.Format.CanBeChangedByRules()));
-                e.UserMenu.Add(new TextListItem("ContentPaste", "Inhalt Einfügen", enImageCode.Clipboard, Column != null && Column.Format.CanBeChangedByRules()));
+                e.UserMenu.Add("Zelle", true);
+                e.UserMenu.Add("ContentCopy", "Inhalt Kopieren", enImageCode.Kopieren, Column != null && Column.Format.CanBeChangedByRules());
+                e.UserMenu.Add("ContentPaste", "Inhalt Einfügen", enImageCode.Clipboard, Column != null && Column.Format.CanBeChangedByRules());
 
-                e.UserMenu.Add(new TextListItem("ContentDelete", "Inhalt löschen", enImageCode.Radiergummi, Column != null && Column.Format.CanBeChangedByRules()));
+                e.UserMenu.Add("ContentDelete", "Inhalt löschen", enImageCode.Radiergummi, Column != null && Column.Format.CanBeChangedByRules());
                 e.UserMenu.Add(enContextMenuComands.VorherigenInhaltWiederherstellen, Column != null && Column.Format.CanBeChangedByRules() && Column.ShowUndo);
 
                 e.UserMenu.Add(enContextMenuComands.SuchenUndErsetzen, Column != null && Column.Format.CanBeChangedByRules());
 
                 e.UserMenu.Add(new LineListItem());
 
-                e.UserMenu.Add(new TextListItem("Spalte", true));
+                e.UserMenu.Add("Spalte", true);
                 e.UserMenu.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten, Column != null);
 
-                e.UserMenu.Add(new TextListItem("ColumnContentDelete", "Inhalte aller angezeigten Zellen dieser Spalte löschen", enImageCode.Radiergummi, Column != null && Column.Format.CanBeChangedByRules()));
+                e.UserMenu.Add("ColumnContentDelete", "Inhalte aller angezeigten Zellen dieser Spalte löschen", enImageCode.Radiergummi, Column != null && Column.Format.CanBeChangedByRules());
 
-                e.UserMenu.Add(new TextListItem("Summe", "Summe", enImageCode.Summe, Column != null));
+                e.UserMenu.Add("Summe", "Summe", enImageCode.Summe, Column != null);
 
 
                 e.UserMenu.Add(new LineListItem());
 
             }
-            e.UserMenu.Add(new TextListItem("Zeile", true));
+            e.UserMenu.Add("Zeile", true);
             e.UserMenu.Add(enContextMenuComands.ZeileLöschen, Row != null);
 
 
-            e.UserMenu.Add(new TextListItem("Fehlersuche", "Fehler anzeigen", enImageCode.Kritisch, Row != null));
+            e.UserMenu.Add("Fehlersuche", "Fehler anzeigen", enImageCode.Kritisch, Row != null);
 
 
         }

@@ -395,13 +395,12 @@ namespace BlueControls.ItemCollection
             };
 
 
-            var Aursicht = new ItemCollectionList
-            {
-                new TextListItem(((int)enAlignment.Top_Left).ToString(), "Linksbündig ausrichten", enImageCode.Linksbündig),
-                new TextListItem(((int)enAlignment.Top_HorizontalCenter).ToString(), "Zentrieren", enImageCode.Zentrieren),
-                new TextListItem(((int)enAlignment.Top_Right).ToString(), "Rechtsbündig ausrichten", enImageCode.Rechtsbündig)
-            };
+            var Aursicht = new ItemCollectionList();
+            Aursicht.Add(((int)enAlignment.Top_Left).ToString(), "Linksbündig ausrichten", enImageCode.Linksbündig);
+            Aursicht.Add(((int)enAlignment.Top_HorizontalCenter).ToString(), "Zentrieren", enImageCode.Zentrieren);
+            Aursicht.Add(((int)enAlignment.Top_Right).ToString(), "Rechtsbündig ausrichten", enImageCode.Rechtsbündig);
             Aursicht.Sort();
+
             l.Add(new FlexiControlForProperty(this, "Ausrichtung", Aursicht));
             l.Add(new FlexiControlForProperty(this, "Skalierung"));
 

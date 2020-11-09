@@ -724,7 +724,7 @@ namespace BlueControls.Controls
             {
                 //if (FileExists(t.Internal))
                 //{
-                    e.UserMenu.Add(new TextListItem("Bild öffnen"));
+                    e.UserMenu.Add("Bild öffnen");
                 //}
             }
 
@@ -944,7 +944,7 @@ namespace BlueControls.Controls
 
             if (_tmpColumn != null && _tmpColumn.Database.IsAdministrator())
             {
-                Items.Add(new TextListItem("#ColumnEdit", "Spalte bearbeiten", QuickImage.Get(enImageCode.Spalte), _tmpColumn != null));
+                Items.Add("#ColumnEdit", "Spalte bearbeiten", QuickImage.Get(enImageCode.Spalte), _tmpColumn != null);
             }
 
 

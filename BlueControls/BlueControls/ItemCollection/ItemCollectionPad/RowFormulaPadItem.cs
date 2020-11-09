@@ -380,7 +380,7 @@ namespace BlueControls.ItemCollection
             for (var z = 0; z < Row.Database.Layouts.Count; z++)
             {
                 var p = new ItemCollectionPad(Row.Database.Layouts[z], string.Empty);
-                Layouts.Add(new TextListItem(z.ToString(), p.Caption, enImageCode.Stern));
+                Layouts.Add(z.ToString(), p.Caption, enImageCode.Stern);
             }
 
             l.Add(new FlexiControlForProperty(this, "LayoutId", Layouts));

@@ -1849,7 +1849,7 @@ namespace BlueControls.Controls
                     Cell_Edit(cellInThisDatabaseColumn, cellInThisDatabaseRow, false);
                     return;
                 }
-                t.Add(new TextListItem("#Erweitert", "Erweiterte Eingabe", QuickImage.Get(enImageCode.Stift), true, Constants.FirstSortChar + "1"));
+                t.Add("#Erweitert", "Erweiterte Eingabe", QuickImage.Get(enImageCode.Stift), true, Constants.FirstSortChar + "1");
                 t.Add(new LineListItem(Constants.FirstSortChar + "2"));
                 t.Sort();
             }
@@ -3192,7 +3192,7 @@ namespace BlueControls.Controls
                 {
                     if (_ColumnArrangementSelector != null && _Database.PermissionCheck(ThisArrangement.PermissionGroups_Show, null))
                     {
-                        _ColumnArrangementSelector.Item.Add(new TextListItem(_Database.ColumnArrangements.IndexOf(ThisArrangement).ToString(), ThisArrangement.Name));
+                        _ColumnArrangementSelector.Item.Add(_Database.ColumnArrangements.IndexOf(ThisArrangement).ToString(), ThisArrangement.Name);
                     }
                 }
             }
@@ -4314,11 +4314,11 @@ namespace BlueControls.Controls
                     LasNr = z;
                     if (isfirst)
                     {
-                        Las = new TextListItem("Cancel", "Aktueller Text - ab " + _Database.Works[z].Date + " UTC, geändert von " + _Database.Works[z].User);
+                        Las = new TextListItem("Cancel", "Aktueller Text - ab " + _Database.Works[z].Date + " UTC, geändert von " + _Database.Works[z].User, null, false, true, enDataFormat.Text, string.Empty);
                     }
                     else
                     {
-                        Las = new TextListItem(co.ToString(Constants.Format_Integer5) + _Database.Works[z].ChangedTo, "ab " + _Database.Works[z].Date + " UTC, geändert von " + _Database.Works[z].User);
+                        Las = new TextListItem(co.ToString(Constants.Format_Integer5) + _Database.Works[z].ChangedTo, "ab " + _Database.Works[z].Date + " UTC, geändert von " + _Database.Works[z].User, null, false, true, enDataFormat.Text, string.Empty);
                     }
 
                     isfirst = false;
@@ -4330,7 +4330,7 @@ namespace BlueControls.Controls
             if (Las != null)
             {
                 co++;
-                i.Add(new TextListItem(co.ToString(Constants.Format_Integer5) + _Database.Works[LasNr].PreviousValue, "vor " + _Database.Works[LasNr].Date + " UTC"));
+                i.Add(co.ToString(Constants.Format_Integer5) + _Database.Works[LasNr].PreviousValue, "vor " + _Database.Works[LasNr].Date + " UTC");
             }
 
 

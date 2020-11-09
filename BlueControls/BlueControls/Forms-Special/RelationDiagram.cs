@@ -136,10 +136,10 @@ namespace BlueControls.Forms
             if (!(e.HotItem is RowFormulaPadItem)) { return; }
 
 
-            e.UserMenu.Add(new TextListItem("Bez+", "Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", enImageCode.PlusZeichen));
-            e.UserMenu.Add(new TextListItem("Bez+Ü", "Übergeordnete Einträge hinzufügen, die mit diesem hier Beziehungen haben", enImageCode.PlusZeichen));
-            e.UserMenu.Add(new TextListItem("Bez+U", "Untergeordnete Einträge hinzufügen, die mit diesem hier Beziehungen haben", enImageCode.PlusZeichen));
-            e.UserMenu.Add(new TextListItem("Bez+G", "Gleichgestellte Einträge hinzufügen, die mit diesem hier Beziehungen haben", enImageCode.PlusZeichen));
+            e.UserMenu.Add("Bez+", "Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", enImageCode.PlusZeichen);
+            e.UserMenu.Add("Bez+Ü", "Übergeordnete Einträge hinzufügen, die mit diesem hier Beziehungen haben", enImageCode.PlusZeichen);
+            e.UserMenu.Add("Bez+U", "Untergeordnete Einträge hinzufügen, die mit diesem hier Beziehungen haben", enImageCode.PlusZeichen);
+            e.UserMenu.Add("Bez+G", "Gleichgestellte Einträge hinzufügen, die mit diesem hier Beziehungen haben", enImageCode.PlusZeichen);
             //Stop
         }
 

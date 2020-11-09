@@ -19,6 +19,7 @@
 
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -143,7 +144,7 @@ namespace BlueControls.Controls
 
             //if (!string.IsNullOrEmpty(_specialcommand))
             //{
-            //    Item.Add(new TextListItem("#SPECIAL#", _specialcommand, QuickImage.Get(ImageCode), true, "!"));
+            //    Item.Add("#SPECIAL#", _specialcommand, QuickImage.Get(ImageCode), true, "!"));
             //}
 
 
@@ -181,7 +182,7 @@ namespace BlueControls.Controls
                                 show = show + " - " + x[1];
                             }
 
-                            var it = new TextListItem(x[0], show, false, NR.ToString(Constants.Format_Integer3));
+                            var it = new TextListItem(x[0], show, null, false, true, enDataFormat.Text, NR.ToString(Constants.Format_Integer3));
 
                             var t = new List<string>();
 

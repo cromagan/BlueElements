@@ -107,6 +107,7 @@ namespace BlueDatabase
         /// <returns></returns>
         public static string DoTranslate(string txt, bool mustTranslate, params object[] args)
         {
+
             if (Translation == null) { return string.Format(txt, args); }
             if (string.IsNullOrEmpty(txt)) { return string.Empty; }
 

@@ -1735,7 +1735,7 @@ namespace BlueControls.Controls
                         if (!string.IsNullOrEmpty(bmp.Name))
                         {
                             var crc = "DB_" + bmp.Name;
-                            i.Add(new TextListItem(crc, bmp.Name, QuickImage.Get(crc, 20)));
+                            i.Add(crc, bmp.Name, QuickImage.Get(crc, 20));
                         }
                     }
 
@@ -1745,11 +1745,11 @@ namespace BlueControls.Controls
                 i.Add(new LineListItem());
             }
 
-            i.Add(new TextListItem("sphere", "Kugel", QuickImage.Get(enImageCode.Kugel, 20)));
-            i.Add(new TextListItem("Warnung", "Warnung", QuickImage.Get(enImageCode.Warnung, 20)));
-            i.Add(new TextListItem("Information", "Information", QuickImage.Get(enImageCode.Information, 20)));
-            i.Add(new TextListItem("Kritisch", "Kritisch", QuickImage.Get(enImageCode.Kritisch, 20)));
-            i.Add(new TextListItem("Frage", "Frage", QuickImage.Get(enImageCode.Frage, 20)));
+            i.Add("sphere", "Kugel", QuickImage.Get(enImageCode.Kugel, 20));
+            i.Add("Warnung", "Warnung", QuickImage.Get(enImageCode.Warnung, 20));
+            i.Add("Information", "Information", QuickImage.Get(enImageCode.Information, 20));
+            i.Add("Kritisch", "Kritisch", QuickImage.Get(enImageCode.Kritisch, 20));
+            i.Add("Frage", "Frage", QuickImage.Get(enImageCode.Frage, 20));
 
             var r = InputBoxListBoxStyle.Show("Wählen sie:", i, enAddType.None, true);
 
@@ -1788,12 +1788,12 @@ namespace BlueControls.Controls
 
             if (_SpellChecking && !Dictionary.IsWordOk(tmpWord))
             {
-                Items.Add(new TextListItem("Rechtschreibprüfung", true));
+                Items.Add("Rechtschreibprüfung", true);
 
 
                 if (Dictionary.IsSpellChecking)
                 {
-                    Items.Add(new TextListItem("Gerade ausgelastet...", "Gerade ausgelastet...", false));
+                    Items.Add("Gerade ausgelastet...", "Gerade ausgelastet...", false);
                     Items.Add(new LineListItem());
                 }
                 else
@@ -1803,7 +1803,7 @@ namespace BlueControls.Controls
                     {
                         foreach (var ThisS in sim)
                         {
-                            Items.Add(new TextListItem("#ChangeTo:" + ThisS, " - " + ThisS));
+                            Items.Add("#ChangeTo:" + ThisS, " - " + ThisS);
                         }
 
                         Items.Add(new LineListItem());
@@ -1811,14 +1811,14 @@ namespace BlueControls.Controls
 
 
 
-                    Items.Add(new TextListItem("#SpellAdd", "'" + tmpWord + "' ins Wörterbuch aufnehmen", Dictionary.IsWriteable()));
+                    Items.Add("#SpellAdd", "'" + tmpWord + "' ins Wörterbuch aufnehmen", Dictionary.IsWriteable());
                     if (tmpWord.ToLower() != tmpWord)
                     {
-                        Items.Add(new TextListItem("#SpellAddLower", "'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", Dictionary.IsWriteable()));
+                        Items.Add("#SpellAddLower", "'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", Dictionary.IsWriteable());
                     }
 
-                    Items.Add(new TextListItem("#SpellChecking", "Schnelle Rechtschreibprüfung", Dictionary.IsWriteable()));
-                    Items.Add(new TextListItem("#SpellChecking2", "Alle Wörter sind ok", Dictionary.IsWriteable()));
+                    Items.Add("#SpellChecking", "Schnelle Rechtschreibprüfung", Dictionary.IsWriteable());
+                    Items.Add("#SpellChecking2", "Alle Wörter sind ok", Dictionary.IsWriteable());
                     Items.Add(new LineListItem());
                 }
 
@@ -1835,14 +1835,14 @@ namespace BlueControls.Controls
                 if (_Format == enDataFormat.Text_mit_Formatierung)
                 {
                     Items.Add(new LineListItem());
-                    Items.Add(new TextListItem("#Sonderzeichen", "Sonderzeichen einfügen", QuickImage.Get(enImageCode.Sonne, 16), _Cursor_CharPos > -1));
+                    Items.Add("#Sonderzeichen", "Sonderzeichen einfügen", QuickImage.Get(enImageCode.Sonne, 16), _Cursor_CharPos > -1);
 
                     if (Convert.ToBoolean(_MarkEnd > -1))
                     {
                         Items.Add(new LineListItem());
-                        Items.Add(new TextListItem("#Caption", "Als Überschrift markieren", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _MarkEnd > -1));
-                        Items.Add(new TextListItem("#Bold", "Fettschrift", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1)));
-                        Items.Add(new TextListItem("#NoCaption", "Als normalen Text markieren", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1)));
+                        Items.Add("#Caption", "Als Überschrift markieren", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _MarkEnd > -1);
+                        Items.Add("#Bold", "Fettschrift", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
+                        Items.Add("#NoCaption", "Als normalen Text markieren", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
                     }
                 }
             }

@@ -949,7 +949,7 @@ namespace BlueControls.Controls
             }
             else if (SourceItem == null && TargetItem == null)
             {
-                TargetItem = new TextListItem(Internal);
+                TargetItem = new TextListItem(Internal, Internal, null, false, true, enDataFormat.Text, string.Empty);
                 Target.Item.Add(TargetItem);
             }
 
@@ -1233,11 +1233,11 @@ namespace BlueControls.Controls
                         {
                             if (ThisString.FileType() == enFileFormat.Image)
                             {
-                                Main.Item.Add(new BitmapListItem(ThisString, ThisString.FileNameWithoutSuffix(), ThisString, FileEncryptionKey));
+                                Main.Item.Add(ThisString, ThisString.FileNameWithoutSuffix(), ThisString, FileEncryptionKey);
                             }
                             else
                             {
-                                Main.Item.Add(new TextListItem(ThisString, ThisString.FileNameWithSuffix(), QuickImage.Get(ThisString.FileType(), 48)));
+                                Main.Item.Add(ThisString, ThisString.FileNameWithSuffix(), QuickImage.Get(ThisString.FileType(), 48));
                             }
                         }
                         else

@@ -93,7 +93,7 @@ namespace BlueControls.Classes_Editor
             {
                 if (thisFilter != null)
                 {
-                    lbxFilter.Item.Add(new TextListItem(thisFilter));
+                    lbxFilter.Item.Add(thisFilter);
                 }
             }
 
@@ -108,12 +108,12 @@ namespace BlueControls.Classes_Editor
 
                     if (!FileExists(t[0]))
                     {
-                        lsbExportDateien.Item.Add(new TextListItem(t1, t[0], QuickImage.Get(enImageCode.Kritisch), true, "0000"));
+                        lsbExportDateien.Item.Add(t1, t[0], QuickImage.Get(enImageCode.Kritisch), true, "0000");
                     }
                     else
                     {
                         var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutomatischLöschen).ToHTMLCode(), "");
-                        lsbExportDateien.Item.Add(new TextListItem(t1, t[0], q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit)));
+                        lsbExportDateien.Item.Add(t1, t[0], q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit));
                     }
                 }
             }
@@ -134,7 +134,7 @@ namespace BlueControls.Classes_Editor
             ExportSpaltenAnsicht.Item.Clear();
             for (var spa = 0; spa < Item.Database.ColumnArrangements.Count; spa++)
             {
-                ExportSpaltenAnsicht.Item.Add(new TextListItem(spa.ToString(), Item.Database.ColumnArrangements[spa].Name));
+                ExportSpaltenAnsicht.Item.Add(spa.ToString(), Item.Database.ColumnArrangements[spa].Name);
             }
 
             if (!string.IsNullOrEmpty(Item.Database.GlobalShowPass))
@@ -314,8 +314,7 @@ namespace BlueControls.Classes_Editor
 
         private void lbxFilter_AddClicked(object sender, System.EventArgs e)
         {
-            var NewFilterItem = new TextListItem(new FilterItem(Item.Database, string.Empty));
-            lbxFilter.Item.Add(NewFilterItem);
+            var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty));
             NewFilterItem.Checked = true;
         }
 

@@ -166,16 +166,14 @@ namespace BlueControls.Controls
 
             if (e.Control is ComboBox cbx)
             {
-                var Item2 = new ItemCollectionList
-                {
-                    new TextListItem("|~", "Keine weiteren Einträge vorhanden")
-                };
+                var Item2 = new ItemCollectionList();
+                Item2.Add("|~", "Keine weiteren Einträge vorhanden");
 
                 //var c = Filter.Column.Contents(null);
 
                 //foreach (var thiss in c)
                 //{
-                //    Item2.Add(new TextListItem("|" + thiss, thiss));
+                //    Item2.Add("|" + thiss, thiss));
                 //}
 
                 StyleComboBox(cbx, Item2, System.Windows.Forms.ComboBoxStyle.DropDown);
@@ -193,10 +191,10 @@ namespace BlueControls.Controls
                 }
                 else
                 {
-                    if (Filter != null && Filter.SearchValue != null && Filter.SearchValue.Count >0 && !string.IsNullOrEmpty(Filter.SearchValue[0]))
+                    if (Filter != null && Filter.SearchValue != null && Filter.SearchValue.Count > 0 && !string.IsNullOrEmpty(Filter.SearchValue[0]))
                     {
                         btn.ImageCode = "Trichter|16";
-                        btn.Text = "wählen (" + Filter.SearchValue.Count.ToString()  + ")";
+                        btn.Text = "wählen (" + Filter.SearchValue.Count.ToString() + ")";
                     }
                     else
                     {
@@ -240,7 +238,7 @@ namespace BlueControls.Controls
 
             if (TableView == null)
             {
-                cbx.Item.Add(new TextListItem("|~", "Anzeigefehler", enImageCode.Kreuz, false));
+                cbx.Item.Add("|~", "Anzeigefehler", enImageCode.Kreuz, false);
                 return;
             }
 
@@ -249,7 +247,7 @@ namespace BlueControls.Controls
             if (List_FilterString.Count == 0)
             {
 
-                cbx.Item.Add(new TextListItem("|~", "Keine weiteren Einträge vorhanden", enImageCode.Kreuz, false));
+                cbx.Item.Add("|~", "Keine weiteren Einträge vorhanden", enImageCode.Kreuz, false);
             }
 
             else if (List_FilterString.Count < 400)
@@ -259,7 +257,7 @@ namespace BlueControls.Controls
             }
             else
             {
-                cbx.Item.Add(new TextListItem("|~", "Zu viele Einträge", enImageCode.Kreuz, false));
+                cbx.Item.Add("|~", "Zu viele Einträge", enImageCode.Kreuz, false);
             }
 
         }
@@ -302,7 +300,7 @@ namespace BlueControls.Controls
 
 
 
-            Items.Add(new TextListItem("#ColumnEdit", "Spalte bearbeiten", QuickImage.Get(enImageCode.Spalte)));
+            Items.Add("#ColumnEdit", "Spalte bearbeiten", QuickImage.Get(enImageCode.Spalte));
 
 
             if (Parent is Filterleiste f)
@@ -310,9 +308,9 @@ namespace BlueControls.Controls
 
                 if (f.pic.Visible)
                 {
-                    Items.Add(new TextListItem("#FilterVerschieben", "Filter verschieben", QuickImage.Get(enImageCode.Trichter)));
+                    Items.Add("#FilterVerschieben", "Filter verschieben", QuickImage.Get(enImageCode.Trichter));
 
-                    Items.Add(new TextListItem("#BildPfad", "Bild-Pfad öffnen", QuickImage.Get(enImageCode.Ordner)));
+                    Items.Add("#BildPfad", "Bild-Pfad öffnen", QuickImage.Get(enImageCode.Ordner));
                 }
 
 

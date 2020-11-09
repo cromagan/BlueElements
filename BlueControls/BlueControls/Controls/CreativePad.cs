@@ -1199,30 +1199,30 @@ namespace BlueControls.Controls
 
             if (selectedHotItem != null)
             {
-                Items.Add(new TextListItem("Allgemeine Element-Aktionen", true));
-                Items.Add(new TextListItem("#Erweitert", "Objekt bearbeiten", enImageCode.Stift));
+                Items.Add("Allgemeine Element-Aktionen", true);
+                Items.Add("#Erweitert", "Objekt bearbeiten", enImageCode.Stift);
                 Items.Add(new LineListItem());
 
 
-                Items.Add(new TextListItem("#ExterneBeziehungen", "Objektübergreifende Punkt-Beziehungen aufheben", enImageCode.Kreuz));
+                Items.Add("#ExterneBeziehungen", "Objektübergreifende Punkt-Beziehungen aufheben", enImageCode.Kreuz);
                 //if (((BasicPadItem)HotItem).Bei_Export_sichtbar)
                 //{
-                //    Items.Add(new TextListItem("#PrintMeNot", "Objekt nicht drucken", QuickImage.Get("Drucker|16||1")));
+                //    Items.Add("#PrintMeNot", "Objekt nicht drucken", QuickImage.Get("Drucker|16||1")));
                 //}
                 //else
                 //{
-                //    Items.Add(new TextListItem("#PrintMe", "Objekt drucken", enImageCode.Drucker));
+                //    Items.Add("#PrintMe", "Objekt drucken", enImageCode.Drucker));
                 //}
 
 
-                Items.Add(new TextListItem("#Duplicate", "Objekt duplizieren", enImageCode.Kopieren, selectedHotItem is ICloneable));
+                Items.Add("#Duplicate", "Objekt duplizieren", enImageCode.Kopieren, selectedHotItem is ICloneable);
 
 
                 Items.Add(new LineListItem());
-                Items.Add(new TextListItem("#Vordergrund", "In den Vordergrund", enImageCode.InDenVordergrund));
-                Items.Add(new TextListItem("#Hintergrund", "In den Hintergrund", enImageCode.InDenHintergrund));
-                Items.Add(new TextListItem("#Vorne", "Eine Ebene nach vorne", enImageCode.EbeneNachVorne));
-                Items.Add(new TextListItem("#Hinten", "Eine Ebene nach hinten", enImageCode.EbeneNachHinten));
+                Items.Add("#Vordergrund", "In den Vordergrund", enImageCode.InDenVordergrund);
+                Items.Add("#Hintergrund", "In den Hintergrund", enImageCode.InDenHintergrund);
+                Items.Add("#Vorne", "Eine Ebene nach vorne", enImageCode.EbeneNachVorne);
+                Items.Add("#Hinten", "Eine Ebene nach hinten", enImageCode.EbeneNachHinten);
             }
 
 

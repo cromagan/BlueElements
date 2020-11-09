@@ -641,6 +641,7 @@ namespace BlueDatabase
                     if (FileExists(x[0]))
                     {
                         DeleteFile(x[0], false);
+                        Database.WaitUnfreezed();
                         _BereitsExportiert[n] = string.Empty;
                     }
 
@@ -649,6 +650,7 @@ namespace BlueDatabase
                 }
             }
 
+            Database.WaitUnfreezed();
             _BereitsExportiert.RemoveNullOrEmpty();
 
         }
@@ -674,6 +676,7 @@ namespace BlueDatabase
                         }
                         if (!FileExists(x[0]))
                         {
+                            Database.WaitUnfreezed();
                             _BereitsExportiert[n] = string.Empty;
                             Did = true;
                         }
@@ -733,6 +736,7 @@ namespace BlueDatabase
 
                         if (!FileExists(x[0]))
                         {
+                            Database.WaitUnfreezed();
                             _BereitsExportiert[n] = string.Empty;
                             Did = true;
                         }
@@ -743,7 +747,11 @@ namespace BlueDatabase
 
             }
 
-            if (Did) { _BereitsExportiert.RemoveNullOrEmpty(); }
+            if (Did) 
+            {
+                Database.WaitUnfreezed();
+                _BereitsExportiert.RemoveNullOrEmpty();
+            }
             return Did;
         }
 
@@ -834,7 +842,7 @@ namespace BlueDatabase
             if (!IsOk()) { return false; }
 
 
-            string SavePath = null;
+            string SavePath;
 
             if (!string.IsNullOrEmpty(_Verzeichnis))
             {
@@ -956,6 +964,7 @@ namespace BlueDatabase
                 {
                     if (!_BereitsExportiert.Contains(ThisString))
                     {
+                        Database.WaitUnfreezed();
                         _BereitsExportiert.Add(ThisString);
                         DidAndOk = true;
                     }
@@ -983,6 +992,7 @@ namespace BlueDatabase
                         if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         if (!FileExists(x[0]))
                         {
+                            Database.WaitUnfreezed();
                             _BereitsExportiert[f] = string.Empty;
                             Did = true;
                         }
@@ -991,7 +1001,11 @@ namespace BlueDatabase
             }
 
 
-            if (Did) { _BereitsExportiert.RemoveNullOrEmpty(); }
+            if (Did) 
+            {
+                Database.WaitUnfreezed();
+                _BereitsExportiert.RemoveNullOrEmpty(); 
+            }
             return Did;
         }
 

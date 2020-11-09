@@ -52,7 +52,7 @@ namespace BlueControls.Forms
             {
                 if (ThisString.FileType() == enFileFormat.Image)
                 {
-                    List.Item.Add(new BitmapListItem(ThisString, ThisString.FileNameWithoutSuffix(), ThisString, FileEncryptionKey));
+                    List.Item.Add(ThisString, ThisString.FileNameWithoutSuffix(), ThisString, FileEncryptionKey);
                 }
             }
 
@@ -85,7 +85,7 @@ namespace BlueControls.Forms
 
             if (!string.IsNullOrEmpty(textOfNewRow))
             {
-                List.Item.Add(new BitmapListItem(QuickImage.Get("Kreuz|128").BMP, textOfNewRow));
+                List.Item.Add(QuickImage.Get("Kreuz|128").BMP, textOfNewRow);
             }
 
             do

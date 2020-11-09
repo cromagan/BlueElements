@@ -155,7 +155,7 @@ namespace BlueControls.Controls
         public static BitmapListItem GenerateBitmapListItem(Bitmap B, List<string> T)
         {
             var FilenamePNG = T.TagGet("ImageFile");
-            var i = new BitmapListItem(FilenamePNG, FilenamePNG.FileNameWithoutSuffix(), FilenamePNG, string.Empty)
+            var i = new BitmapListItem(FilenamePNG, FilenamePNG.FileNameWithoutSuffix(), FilenamePNG, null, string.Empty)
             {
                 Padding = 10,
                 Tags = T,

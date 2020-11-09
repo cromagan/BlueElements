@@ -72,7 +72,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 var All = Directory.GetFiles(_Column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
                 foreach (var ThisString in All)
                 {
-                    if (ThisString.ToLower() != _Column.Database.Filename.ToLower()) { cbxLinkedDatabase.Item.Add(new TextListItem(ThisString.FileNameWithSuffix())); }
+                    if (ThisString.ToLower() != _Column.Database.Filename.ToLower()) { cbxLinkedDatabase.Item.Add(ThisString.FileNameWithSuffix()); }
                 }
             }
             cbxLinkedDatabase.Item.Sort();
@@ -80,21 +80,21 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (cbxEinheit.Item.Count < 1)
             {
-                cbxEinheit.Item.Add(new TextListItem("µm", enImageCode.Lineal));
-                cbxEinheit.Item.Add(new TextListItem("mm", enImageCode.Lineal));
-                cbxEinheit.Item.Add(new TextListItem("cm", enImageCode.Lineal));
-                cbxEinheit.Item.Add(new TextListItem("dm", enImageCode.Lineal));
-                cbxEinheit.Item.Add(new TextListItem("m", enImageCode.Lineal));
-                cbxEinheit.Item.Add(new TextListItem("km", enImageCode.Lineal));
+                cbxEinheit.Item.Add("µm", enImageCode.Lineal);
+                cbxEinheit.Item.Add("mm", enImageCode.Lineal);
+                cbxEinheit.Item.Add("cm", enImageCode.Lineal);
+                cbxEinheit.Item.Add("dm", enImageCode.Lineal);
+                cbxEinheit.Item.Add("m", enImageCode.Lineal);
+                cbxEinheit.Item.Add("km", enImageCode.Lineal);
 
-                cbxEinheit.Item.Add(new TextListItem("mm²", enImageCode.GrößeÄndern));
-                cbxEinheit.Item.Add(new TextListItem("m²", enImageCode.GrößeÄndern));
+                cbxEinheit.Item.Add("mm²", enImageCode.GrößeÄndern);
+                cbxEinheit.Item.Add("m²", enImageCode.GrößeÄndern);
 
-                cbxEinheit.Item.Add(new TextListItem("µg", enImageCode.Gewicht));
-                cbxEinheit.Item.Add(new TextListItem("mg", enImageCode.Gewicht));
-                cbxEinheit.Item.Add(new TextListItem("g", enImageCode.Gewicht));
-                cbxEinheit.Item.Add(new TextListItem("kg", enImageCode.Gewicht));
-                cbxEinheit.Item.Add(new TextListItem("t", enImageCode.Gewicht));
+                cbxEinheit.Item.Add("µg", enImageCode.Gewicht);
+                cbxEinheit.Item.Add("mg", enImageCode.Gewicht);
+                cbxEinheit.Item.Add("g", enImageCode.Gewicht);
+                cbxEinheit.Item.Add("kg", enImageCode.Gewicht);
+                cbxEinheit.Item.Add("t", enImageCode.Gewicht);
             }
 
 

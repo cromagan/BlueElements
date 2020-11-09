@@ -97,17 +97,17 @@ namespace BlueControls.Forms
 
             Pad.Item.SheetStyle = Skin.StyleDB.Row[PadDesign.Text];
 
-            SchriftGröße.Item.Add(new TextListItem("050", "50%"));
-            SchriftGröße.Item.Add(new TextListItem("060", "60%"));
-            SchriftGröße.Item.Add(new TextListItem("070", "70%"));
-            SchriftGröße.Item.Add(new TextListItem("080", "80%"));
-            SchriftGröße.Item.Add(new TextListItem("090", "90%"));
-            SchriftGröße.Item.Add(new TextListItem("100", "100%"));
-            SchriftGröße.Item.Add(new TextListItem("110", "110%"));
-            SchriftGröße.Item.Add(new TextListItem("120", "120%"));
-            SchriftGröße.Item.Add(new TextListItem("130", "130%"));
-            SchriftGröße.Item.Add(new TextListItem("140", "140%"));
-            SchriftGröße.Item.Add(new TextListItem("150", "150%"));
+            SchriftGröße.Item.Add("050", "50%");
+            SchriftGröße.Item.Add("060", "60%");
+            SchriftGröße.Item.Add("070", "70%");
+            SchriftGröße.Item.Add("080", "80%");
+            SchriftGröße.Item.Add("090", "90%");
+            SchriftGröße.Item.Add("100", "100%");
+            SchriftGröße.Item.Add("110", "110%");
+            SchriftGröße.Item.Add("120", "120%");
+            SchriftGröße.Item.Add("130", "130%");
+            SchriftGröße.Item.Add("140", "140%");
+            SchriftGröße.Item.Add("150", "150%");
 
             SchriftGröße.Item.Sort();
 

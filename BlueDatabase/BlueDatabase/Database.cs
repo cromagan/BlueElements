@@ -639,6 +639,7 @@ namespace BlueDatabase
         }
 
 
+
         internal void OnProgressbarInfo(ProgressbarEventArgs e)
         {
             ProgressbarInfo?.Invoke(this, e);
@@ -2981,6 +2982,20 @@ namespace BlueDatabase
             if (!Backup.IsBusy) { Backup.RunWorkerAsync(); }
         }
 
+        ///// <summary>
+        ///// Nach 20 Sekunden wird der trotzdem diese Routine verlassen. Freeze sollte nur en Bruchteil einer Sekunde gesetzt sein.
+        ///// </summary>
+        internal void WaitUnfreezed()
+        {
+            if (!Cell.Freezed) { return; } //99.9% der Fälle. Variable x wird gespart ;-)
+            var x = DateTime.Now;
+
+            while (Cell.Freezed)
+            {
+                Develop.DoEvents();
+                if (DateTime.Now.Subtract(x).TotalSeconds > 20) { return; }
+            }
+        }
 
     }
 }

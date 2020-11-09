@@ -56,23 +56,7 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
-
-
-        public BitmapListItem() : this(string.Empty, string.Empty, string.Empty, null, string.Empty) { }
-
-
-        public BitmapListItem(string internalname, string caption) : this(internalname, caption, string.Empty, null, string.Empty) { }
-
-
-
-        public BitmapListItem(Bitmap BMP, string caption) : this(string.Empty, caption, string.Empty, BMP, string.Empty) { }
-
-
-
-        public BitmapListItem(string internalname, Bitmap BMP) : this(internalname, string.Empty, string.Empty, BMP, string.Empty) { }
-
-
-        private BitmapListItem(string internalname, string caption, string Filename, Bitmap bmp, string EncryptionKey) : base(internalname)
+        public BitmapListItem(string internalname, string caption, string Filename, Bitmap bmp, string EncryptionKey) : base(internalname)
         {
 
             _caption = caption;
@@ -95,10 +79,6 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public BitmapListItem(string internalname, string caption, string Filename, string EncryptionKey) : this(internalname, caption, Filename, null, EncryptionKey) { }
-
-
-        public BitmapListItem(string internalname, string caption, QuickImage QI) : this(internalname, caption, string.Empty, QI.BMP, string.Empty) { }
 
 
         #endregion

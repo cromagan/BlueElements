@@ -45,86 +45,6 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-        /// <summary>
-        /// Fügt das übergebende Object den Tags hinzu.
-        /// </summary>
-        /// <param name="obj"></param>
-        public TextListItem(IReadableText obj) : this(string.Empty, obj, string.Empty)
-        {
-            Tags = obj;
-        }
-
-        /// <summary>
-        /// Fügt das übergebende Object den Tags hinzu.
-        /// </summary>
-        /// <param name="internalname"></param>
-        /// <param name="obj"></param>
-        public TextListItem(string internalname, IReadableText obj) : this(internalname, obj, string.Empty)
-        {
-            Tags = obj;
-        }
-
-        /// <summary>
-        /// Fügt das übergebende Object den Tags hinzu.
-        /// </summary>
-        /// <param name="internalname"></param>
-        /// <param name="obj"></param>
-        public TextListItem(string internalname, IReadableText obj, string userDefCompareKey) : this(internalname, obj.ReadableText(), obj.SymbolForReadableText(), true, userDefCompareKey)
-        {
-            Tags = obj;
-        }
-
-
-        public TextListItem(string internalname, string readableText, bool isCaption, string userDefCompareKey) : this(internalname, readableText, null, isCaption, true, enDataFormat.Text, userDefCompareKey) { }
-
-
-
-        public TextListItem(string internalAndReadableText, bool isCaption) : this(internalAndReadableText, internalAndReadableText, null, isCaption, true, enDataFormat.Text, string.Empty) { }
-
-
-
-
-
-        public TextListItem(string internalAndReadableText) : this(internalAndReadableText, internalAndReadableText, null, false, true, enDataFormat.Text, string.Empty) { }
-
-
-
-        public TextListItem(string internalAndReadableText, enDataFormat format) : this(internalAndReadableText, internalAndReadableText, null, false, true, format, string.Empty) { }
-
-
-        public TextListItem(string internalAndReadableText, enImageCode symbol) : this(internalAndReadableText, internalAndReadableText, symbol, false, true, enDataFormat.Text, string.Empty) { }
-
-
-
-        public TextListItem(string internalname, string readableText, bool enabled) : this(internalname, readableText, null, false, enabled, enDataFormat.Text, string.Empty) { }
-
-        public TextListItem(string internalname, string readableText, enImageCode symbol, bool enabled) : this(internalname, readableText, symbol, false, enabled, enDataFormat.Text, string.Empty) { }
-
-        public TextListItem(string internalname, string readableText, enImageCode symbol, bool enabled, string userDefCompareKey) : this(internalname, readableText, symbol, false, enabled, enDataFormat.Text, userDefCompareKey) { }
-
-        public TextListItem(string internalname, string readableText, QuickImage symbol, bool enabled) : this(internalname, readableText, symbol, false, enabled, enDataFormat.Text, string.Empty) { }
-
-        public TextListItem(string internalname, string readableText, QuickImage symbol, bool enabled, string userDefCompareKey) : this(internalname, readableText, symbol, false, enabled, enDataFormat.Text, userDefCompareKey) { }
-
-
-
-
-
-        public TextListItem(string internalname, string readableText) : this(internalname, readableText, null, false, true, enDataFormat.Text, string.Empty) { }
-
-        public TextListItem(string internalname, string readableText, enImageCode symbol) : this(internalname, readableText, symbol, false, true, enDataFormat.Text, string.Empty) { }
-
-
-        public TextListItem(string internalname, string readableText, QuickImage symbol) : this(internalname, readableText, symbol, false, true, enDataFormat.Text, string.Empty) { }
-
-
-
-
-        public TextListItem(string internalname, string readableText, enImageCode symbol, bool isCaption, bool enabled, enDataFormat format, string userDefCompareKey) : this(internalname, readableText, null, isCaption, enabled, format, userDefCompareKey)
-        {
-            _Symbol = QuickImage.Get(symbol, 16);
-            //if (_Symbol != null) { _SymbolDisabled = QuickImage.Get(_Symbol, Skin.AdditionalState(enStates.Standard_Disabled)); }
-        }
 
         public TextListItem(string internalname, string readableText, QuickImage symbol, bool isCaption, bool enabled, enDataFormat format, string userDefCompareKey) : base(internalname)
         {
@@ -135,7 +55,6 @@ namespace BlueControls.ItemCollection
             _Format = format;
             UserDefCompareKey = userDefCompareKey;
         }
-
 
 
 

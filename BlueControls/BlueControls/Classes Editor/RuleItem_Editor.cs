@@ -53,7 +53,7 @@ namespace BlueControls.Classes_Editor
             {
                 if (ThisAction != null)
                 {
-                    lstActionSelector.Item.Add(new TextListItem(ThisAction));
+                    lstActionSelector.Item.Add(ThisAction);
                 }
             }
             lstActionSelector.Item.Sort();
@@ -82,10 +82,7 @@ namespace BlueControls.Classes_Editor
             var NewAction = new RuleActionItem(Item, 0, string.Empty, null);
             Item.Actions.Add(NewAction);
 
-            var NewActionItem = new TextListItem(NewAction);
-
-            lstActionSelector.Item.Add(NewActionItem);
-
+            var NewActionItem = lstActionSelector.Item.Add(NewAction);
             NewActionItem.Checked = true;
             OnChanged(Item);
         }

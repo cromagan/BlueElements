@@ -244,8 +244,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (ThisRule != null)
                 {
-                    var obj = new TextListItem(ThisRule);
-                    lbxRuleSelector.Item.Add(obj);
+                    lbxRuleSelector.Item.Add(ThisRule);
                 }
             }
 
@@ -257,7 +256,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (ThisSet != null)
                 {
-                    lbxExportSets.Item.Add(new TextListItem(ThisSet));
+                    lbxExportSets.Item.Add(ThisSet);
                 }
             }
             lbxExportSets.Item.Sort();
@@ -297,7 +296,13 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             lstBinary.Item.Clear();
-            lstBinary.Item.AddRange(_Database.Bins);
+
+
+            foreach (var ThisBin in _Database.Bins)
+            {
+                lstBinary.Item.Add(ThisBin);
+            }
+
 
             CryptStatus();
 
@@ -325,8 +330,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void ExportSets_AddClicked(object sender, System.EventArgs e)
         {
-            var NewExportItem = new TextListItem(new ExportDefinition(_Database));
-            lbxExportSets.Item.Add(NewExportItem);
+            var NewExportItem = lbxExportSets.Item.Add(new ExportDefinition(_Database));
             NewExportItem.Checked = true;
         }
 
@@ -360,8 +364,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private void lbxRuleSelector_AddClicked(object sender, System.EventArgs e)
         {
-            var NewRuleItem = new TextListItem(new RuleItem(_Database));
-            lbxRuleSelector.Item.Add(NewRuleItem);
+            var NewRuleItem = lbxRuleSelector.Item.Add(new RuleItem(_Database));
             NewRuleItem.Checked = true;
         }
 
@@ -377,8 +380,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 case "Kopieren":
                     var ClickedRule = (RuleItem)((TextListItem)e.HotItem).Tags;
-                    var NewRuleItem = new TextListItem((RuleItem)ClickedRule.Clone());
-                    lbxRuleSelector.Item.Add(NewRuleItem);
+                    var NewRuleItem = lbxRuleSelector.Item.Add((RuleItem)ClickedRule.Clone());
                     NewRuleItem.Checked = true;
                     break;
 
@@ -562,18 +564,17 @@ namespace BlueControls.BlueDatabaseDialogs
                 return;
             }
 
-            var I = new ItemCollectionList
-            {
-                new TextListItem(((int)enDatabaseDataType.ColumnArrangement).ToString(), "Anordnungen der Spaltenansichten"),
-                new TextListItem(((int)enDatabaseDataType.Views).ToString(), "Formulare"),
-                new TextListItem(((int)enDatabaseDataType.Rules).ToString(), "Regeln"),
-                new TextListItem(((int)enDatabaseDataType.UndoInOne).ToString(), "Undo-Speicher"),
-                new TextListItem(((int)enDatabaseDataType.AutoExport).ToString(), "Auto-Export"),
-                new TextListItem(((int)enDatabaseDataType.BinaryDataInOne).ToString(), "Binäre Daten im Kopf der Datenbank"),
-                new TextListItem(((int)enDatabaseDataType.Layouts).ToString(), "Eingebettete Layouts"),
-                new TextListItem(((int)enDatabaseDataType.Tags).ToString(), "Tags des Datenbankkopfes"),
-                new TextListItem(((int)enDatabaseDataType.SortDefinition).ToString(), "Standard-Sortierung")
-            };
+            var I = new ItemCollectionList();
+            I.Add(((int)enDatabaseDataType.ColumnArrangement).ToString(), "Anordnungen der Spaltenansichten");
+            I.Add(((int)enDatabaseDataType.Views).ToString(), "Formulare");
+            I.Add(((int)enDatabaseDataType.Rules).ToString(), "Regeln");
+            I.Add(((int)enDatabaseDataType.UndoInOne).ToString(), "Undo-Speicher");
+            I.Add(((int)enDatabaseDataType.AutoExport).ToString(), "Auto-Export");
+            I.Add(((int)enDatabaseDataType.BinaryDataInOne).ToString(), "Binäre Daten im Kopf der Datenbank");
+            I.Add(((int)enDatabaseDataType.Layouts).ToString(), "Eingebettete Layouts");
+            I.Add(((int)enDatabaseDataType.Tags).ToString(), "Tags des Datenbankkopfes");
+            I.Add(((int)enDatabaseDataType.SortDefinition).ToString(), "Standard-Sortierung");
+
 
             I.Sort();
 

@@ -470,16 +470,16 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             BefE2.Item.Clear();
-            BefE2.Item.Add(new TextListItem("//AS/300/AE", "Kopf Ende, Körper beginnt", QuickImage.Get("Pfeil_Rechts|16")));
-            BefE2.Item.Add(new TextListItem("//AS/301/AE", "Körper Ende, Fuß beginnt", QuickImage.Get("Pfeil_Rechts|16")));
-            BefE2.Item.Add(new TextListItem("//XS/302", "Bereinigung Start", enImageCode.Pinsel));
-            BefE2.Item.Add(new TextListItem("/XE", "Bereinigung Ende", enImageCode.Pinsel));
+            BefE2.Item.Add("//AS/300/AE", "Kopf Ende, Körper beginnt", QuickImage.Get("Pfeil_Rechts|16"));
+            BefE2.Item.Add("//AS/301/AE", "Körper Ende, Fuß beginnt", QuickImage.Get("Pfeil_Rechts|16"));
+            BefE2.Item.Add("//XS/302", "Bereinigung Start", enImageCode.Pinsel);
+            BefE2.Item.Add("/XE", "Bereinigung Ende", enImageCode.Pinsel);
 
             if (LeerM)
             {
                 BefE2.Item.Add(new LineListItem());
-                BefE2.Item.Add(new TextListItem("//AS/003" + Nam.ToUpper() + "/310", "Wenn der Inhalt Nicht Leer ist, dann...", QuickImage.Get("Gänsefüßchen|16|12")));
-                BefE2.Item.Add(new TextListItem("/AE", "...Ende der Abfrage", QuickImage.Get("Gänsefüßchen|16|12|6")));
+                BefE2.Item.Add("//AS/003" + Nam.ToUpper() + "/310", "Wenn der Inhalt Nicht Leer ist, dann...", QuickImage.Get("Gänsefüßchen|16|12"));
+                BefE2.Item.Add("/AE", "...Ende der Abfrage", QuickImage.Get("Gänsefüßchen|16|12|6"));
             }
 
 
@@ -519,17 +519,17 @@ namespace BlueControls.BlueDatabaseDialogs
         private void BefülleRestlicheDropDowns()
         {
             Leer.Item.Clear();
-            Leer.Item.Add(new TextListItem("k. A."));
-            Leer.Item.Add(new TextListItem("-"));
+            Leer.Item.Add("k. A.");
+            Leer.Item.Add("-");
 
 
             ZeilUmbruch.Item.Clear();
-            ZeilUmbruch.Item.Add(new TextListItem(", "));
-            ZeilUmbruch.Item.Add(new TextListItem("/"));
-            ZeilUmbruch.Item.Add(new TextListItem(" ", "Leerzeichen"));
-            ZeilUmbruch.Item.Add(new TextListItem("<br>", "<br> (HTML-Format)"));
-            ZeilUmbruch.Item.Add(new TextListItem("<w:br/>", "<w:br/> (Word XML-Format)"));
-            ZeilUmbruch.Item.Add(new TextListItem("\r\n", "Zeilenumbruch (CR & LF [Carriage Return und Line Feed])"));
+            ZeilUmbruch.Item.Add(", ");
+            ZeilUmbruch.Item.Add("/");
+            ZeilUmbruch.Item.Add(" ", "Leerzeichen");
+            ZeilUmbruch.Item.Add("<br>", "<br> (HTML-Format)");
+            ZeilUmbruch.Item.Add("<w:br/>", "<w:br/> (Word XML-Format)");
+            ZeilUmbruch.Item.Add("\r\n", "Zeilenumbruch (CR & LF [Carriage Return und Line Feed])");
 
 
         }

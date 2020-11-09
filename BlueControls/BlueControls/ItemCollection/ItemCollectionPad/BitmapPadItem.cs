@@ -393,12 +393,10 @@ namespace BlueControls.ItemCollection
                 new FlexiControl()
             };
 
-            var Comms = new ItemCollectionList
-            {
-                new TextListItem(((int)enSizeModes.BildAbschneiden).ToString(), "Abschneiden", QuickImage.Get("BildmodusAbschneiden|32")),
-                new TextListItem(((int)enSizeModes.Verzerren).ToString(), "Verzerren", QuickImage.Get("BildmodusVerzerren|32")),
-                new TextListItem(((int)enSizeModes.EmptySpace).ToString(), "Einpassen", QuickImage.Get("BildmodusEinpassen|32"))
-            };
+            var Comms = new ItemCollectionList();
+            Comms.Add(((int)enSizeModes.BildAbschneiden).ToString(), "Abschneiden", QuickImage.Get("BildmodusAbschneiden|32"));
+            Comms.Add(((int)enSizeModes.Verzerren).ToString(), "Verzerren", QuickImage.Get("BildmodusVerzerren|32"));
+            Comms.Add(((int)enSizeModes.EmptySpace).ToString(), "Einpassen", QuickImage.Get("BildmodusEinpassen|32"));
 
             l.Add(new FlexiControlForProperty(this, "Bild-Modus", Comms));
 

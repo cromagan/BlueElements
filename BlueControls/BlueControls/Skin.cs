@@ -838,17 +838,17 @@ namespace BlueControls
             var Rahms = new ItemCollectionList();
             if (MitOhne)
             {
-                Rahms.Add(new TextListItem(((int)PadStyles.Undefiniert).ToString(), "Ohne Rahmen", enImageCode.Kreuz));
+                Rahms.Add(((int)PadStyles.Undefiniert).ToString(), "Ohne Rahmen", enImageCode.Kreuz);
             }
 
 
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_Standard).ToString(), "Standard", GetBlueFont(PadStyles.Style_Standard, SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GetBlueFont(PadStyles.Style_StandardFett, SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GetBlueFont(PadStyles.Style_StandardAlternativ, SheetStyle).SymbolOfLine()));
-            Rahms.Add(new TextListItem(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolOfLine()));
+            Rahms.Add(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolOfLine());
+            Rahms.Add(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolOfLine());
+            Rahms.Add(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolOfLine());
+            Rahms.Add(((int)PadStyles.Style_Standard).ToString(), "Standard", GetBlueFont(PadStyles.Style_Standard, SheetStyle).SymbolOfLine());
+            Rahms.Add(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GetBlueFont(PadStyles.Style_StandardFett, SheetStyle).SymbolOfLine());
+            Rahms.Add(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GetBlueFont(PadStyles.Style_StandardAlternativ, SheetStyle).SymbolOfLine());
+            Rahms.Add(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolOfLine());
             Rahms.Sort();
 
             return Rahms;
@@ -860,17 +860,15 @@ namespace BlueControls
         public static ItemCollectionList GetFonts(RowItem SheetStyle)
         {
 
-            var Rahms = new ItemCollectionList
-            {
-                //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
-                new TextListItem(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolForReadableText()),
-                new TextListItem(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolForReadableText()),
-                new TextListItem(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolForReadableText()),
-                new TextListItem(((int)PadStyles.Style_Standard).ToString(), "Standard", GetBlueFont(PadStyles.Style_Standard, SheetStyle).SymbolForReadableText()),
-                new TextListItem(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GetBlueFont(PadStyles.Style_StandardFett, SheetStyle).SymbolForReadableText()),
-                new TextListItem(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GetBlueFont(PadStyles.Style_StandardAlternativ, SheetStyle).SymbolForReadableText()),
-                new TextListItem(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolForReadableText())
-            };
+            var Rahms = new ItemCollectionList();
+            //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
+            Rahms.Add(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolForReadableText());
+            Rahms.Add(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolForReadableText());
+            Rahms.Add(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolForReadableText());
+            Rahms.Add(((int)PadStyles.Style_Standard).ToString(), "Standard", GetBlueFont(PadStyles.Style_Standard, SheetStyle).SymbolForReadableText());
+            Rahms.Add(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GetBlueFont(PadStyles.Style_StandardFett, SheetStyle).SymbolForReadableText());
+            Rahms.Add(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GetBlueFont(PadStyles.Style_StandardAlternativ, SheetStyle).SymbolForReadableText());
+            Rahms.Add(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolForReadableText());
             Rahms.Sort();
 
             return Rahms;

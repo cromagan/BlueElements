@@ -57,7 +57,7 @@ namespace BlueControls.Forms
                             try
                             {
                                 BlueFont.MeasureString("T", fo);
-                                FNList.Add(new TextListItem(f.Name, "", BlueFont.Get(f, 12).NameInStyle(), true));
+                                FNList.Add(f.Name, "", BlueFont.Get(f, 12).NameInStyle(), true);
                             }
                             catch (Exception)
                             {
@@ -70,25 +70,24 @@ namespace BlueControls.Forms
                 }
                 FNList.Sort();
 
-                FSList = new ItemCollectionList
-                {
-                    new TextListItem("8", enDataFormat.Gleitkommazahl),
-                    new TextListItem("9", enDataFormat.Gleitkommazahl),
-                    new TextListItem("10", enDataFormat.Gleitkommazahl),
-                    new TextListItem("11", enDataFormat.Gleitkommazahl),
-                    new TextListItem("12", enDataFormat.Gleitkommazahl),
-                    new TextListItem("14", enDataFormat.Gleitkommazahl),
-                    new TextListItem("16", enDataFormat.Gleitkommazahl),
-                    new TextListItem("18", enDataFormat.Gleitkommazahl),
-                    new TextListItem("20", enDataFormat.Gleitkommazahl),
-                    new TextListItem("22", enDataFormat.Gleitkommazahl),
-                    new TextListItem("24", enDataFormat.Gleitkommazahl),
-                    new TextListItem("26", enDataFormat.Gleitkommazahl),
-                    new TextListItem("28", enDataFormat.Gleitkommazahl),
-                    new TextListItem("36", enDataFormat.Gleitkommazahl),
-                    new TextListItem("48", enDataFormat.Gleitkommazahl),
-                    new TextListItem("72", enDataFormat.Gleitkommazahl)
-                };
+                FSList = new ItemCollectionList();
+                FSList.Add("8", enDataFormat.Gleitkommazahl);
+                FSList.Add("9", enDataFormat.Gleitkommazahl);
+                FSList.Add("10", enDataFormat.Gleitkommazahl);
+                FSList.Add("11", enDataFormat.Gleitkommazahl);
+                FSList.Add("12", enDataFormat.Gleitkommazahl);
+                FSList.Add("14", enDataFormat.Gleitkommazahl);
+                FSList.Add("16", enDataFormat.Gleitkommazahl);
+                FSList.Add("18", enDataFormat.Gleitkommazahl);
+                FSList.Add("20", enDataFormat.Gleitkommazahl);
+                FSList.Add("22", enDataFormat.Gleitkommazahl);
+                FSList.Add("24", enDataFormat.Gleitkommazahl);
+                FSList.Add("26", enDataFormat.Gleitkommazahl);
+                FSList.Add("28", enDataFormat.Gleitkommazahl);
+                FSList.Add("36", enDataFormat.Gleitkommazahl);
+                FSList.Add("48", enDataFormat.Gleitkommazahl);
+                FSList.Add("72", enDataFormat.Gleitkommazahl);
+
                 FSList.Sort();
             }
 
@@ -119,12 +118,12 @@ namespace BlueControls.Forms
                 if (value == null) { value = BlueFont.Get(Skin.DummyStandardFont); }
 
 
-                if (FName.Item[value.FontName] == null) { FName.Item.Add(new TextListItem(value.FontName, value.FontName, QuickImage.Get(enImageCode.Warnung, 20))); }
+                if (FName.Item[value.FontName] == null) { FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(enImageCode.Warnung, 20)); }
                 FName.Item.UncheckAll();
                 FName.Item[value.FontName].Checked = true;
 
 
-                if (FSize.Item[value.FontSize.ToString()] == null) { FSize.Item.Add(new TextListItem(value.FontSize.ToString())); }
+                if (FSize.Item[value.FontSize.ToString()] == null) { FSize.Item.Add(value.FontSize.ToString()); }
                 FSize.Item.UncheckAll();
                 FSize.Item[value.FontSize.ToString()].Checked = true;
                 fFett.Checked = value.Bold;
