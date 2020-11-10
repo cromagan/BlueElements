@@ -127,7 +127,6 @@ namespace BlueBasics.MultiUserFile
         public event EventHandler<LoadedEventArgs> Loaded;
         public event EventHandler<LoadingEventArgs> Loading;
         public event EventHandler SavedToDisk;
-        public event EventHandler<OldBlockFileEventArgs> OldBlockFileExists;
         public event EventHandler<MultiUserFileStopWorkingEventArgs> ConnectedControlsStopAllWorking;
         public static event EventHandler<MultiUserFileGiveBackEventArgs> MultiUserFileAdded;
 
@@ -552,16 +551,7 @@ namespace BlueBasics.MultiUserFile
                     x.Close();
                 }
                 done = true;
-                //if (FileExists(tBackup))
-                //{
-                //    System.IO.File.SetCreationTimeUtc(tBackup, DateTime.UtcNow);
-                //    done = RenameFile(tBackup, BlockDatei, false);
-                //}
-                //else
-                //{
-                //    System.IO.File.SetCreationTimeUtc(Filename, DateTime.UtcNow);
-                //    done = CopyFile(Filename, BlockDatei, false);
-                //}
+
             }
             catch (Exception ex)
             {
@@ -755,16 +745,49 @@ namespace BlueBasics.MultiUserFile
         {
 
             if (DateTime.UtcNow.Subtract(_LastMessageUTC).TotalMinutes < 1) { return; }
-
+            _LastMessageUTC = DateTime.UtcNow;
 
             var sec = AgeOfBlockDatei();
 
-            if (sec >= 0)
+
+            try
             {
-                OldBlockFileExists?.Invoke(this, new OldBlockFileEventArgs(sec));
+
+                //Nach 15 Minuten versuchen die Datei zu reparieren
+                if (sec >= 900)
+                {
+                    if (!FileExists(Filename)) { return; }
+
+                    var x = LoadFromDisk(Blockdateiname());
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Repariere MultiUserFile: " + x + " " + Filename);
+
+                    if (!CreateBlockDatei()) { return; }
+
+
+                    var AutoRepairName = TempFile(Filename.FilePath(), Filename.FileNameWithoutSuffix() + "_BeforeAutoRepair", "AUT");
+                    if (!CopyFile(Filename, AutoRepairName, false))
+                    {
+                        Develop.DebugPrint(enFehlerArt.Info, "Autoreparatur fehlgeschlagen 1: " + Filename);
+                        return;
+                    }
+                    if (!DeleteFile(Blockdateiname(), false))
+                    {
+                        Develop.DebugPrint(enFehlerArt.Info, "Autoreparatur fehlgeschlagen 2: " + Filename);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(ex);
             }
 
+
         }
+
+
+
+
+
 
         private void OnParsed()
         {
@@ -994,14 +1017,12 @@ namespace BlueBasics.MultiUserFile
         {
             if (!FileExists(Blockdateiname())) { return -1; }
 
-
-            _LastMessageUTC = DateTime.UtcNow;
             var f = new FileInfo(Blockdateiname());
 
             var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
 
 
-            return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil vonSecunden in der Zukunft erzeugt.
+            return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
         }
 
 

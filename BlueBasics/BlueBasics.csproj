@@ -88,7 +88,6 @@
     <Compile Include="Enums\enErrorReason.cs" />
     <Compile Include="EventArgs\NeedImageEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserFileGiveBackEventArgs.cs" />
-    <Compile Include="EventArgs\OldBlockFileEventArgs.cs" />
     <Compile Include="Extensions\RectangleFExtension.cs" />
     <Compile Include="HTML.cs" />
     <Compile Include="Interfaces\IReloadable.cs" />

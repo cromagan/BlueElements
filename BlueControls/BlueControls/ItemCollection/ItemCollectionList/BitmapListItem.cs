@@ -56,19 +56,30 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
-        public BitmapListItem(Bitmap bmp, string Filename, string internalname, string caption, string encryptionKey) : base(internalname)
+        public BitmapListItem(Bitmap bmp, string internalname, string caption) : base(internalname)
         {
 
             _caption = caption;
             _captiontmp.Clear();
 
-            if (bmp != null && !string.IsNullOrEmpty(Filename))
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Filename UND bmp angekommen!");
-            }
-
-
             _Bitmap = bmp;
+            //_ImageFilename = Filename;
+            //_EncryptionKey = encryptionKey;
+
+            _padding = 0;
+
+            _overlays.Clear();
+            //_overlays.ListOrItemChanged += _overlays_ListOrItemChanged;
+        }
+
+
+        public BitmapListItem(string Filename, string internalname, string caption, string encryptionKey) : base(internalname)
+        {
+
+            _caption = caption;
+            _captiontmp.Clear();
+
+            //_Bitmap = bmp;
             _ImageFilename = Filename;
             _EncryptionKey = encryptionKey;
 

@@ -146,19 +146,19 @@ namespace BlueControls.Controls
             }
         }
 
-        public static BitmapListItem GenerateBitmapListItem(string PathOfPicture)
+        public static BitmapListItem GenerateBitmapListItem(string pathOfPicture)
         {
-            var x = LoadFromDisk(PathOfPicture);
+            var x = LoadFromDisk(pathOfPicture);
             return GenerateBitmapListItem(x.Item1, x.Item2);
         }
 
-        public static BitmapListItem GenerateBitmapListItem(Bitmap B, List<string> T)
+        public static BitmapListItem GenerateBitmapListItem(Bitmap bmp, List<string> tags)
         {
-            var FilenamePNG = T.TagGet("ImageFile");
-            var i = new BitmapListItem(B, FilenamePNG, FilenamePNG, FilenamePNG.FileNameWithoutSuffix(), string.Empty)
+            var FilenamePNG = tags.TagGet("ImageFile");
+            var i = new BitmapListItem(bmp, FilenamePNG, FilenamePNG.FileNameWithoutSuffix())
             {
                 Padding = 10,
-                Tags = T,
+                Tags = tags,
             };
             return i;
         }
@@ -168,7 +168,7 @@ namespace BlueControls.Controls
         public BitmapListItem GenerateBitmapListItem()
         {
             WritePointsInTags();
-            return ZoomPicWithPoints.GenerateBitmapListItem(BMP, Tags);
+            return GenerateBitmapListItem(BMP, Tags);
         }
 
         private void WritePointsInTags()
@@ -280,13 +280,13 @@ namespace BlueControls.Controls
 
 
 
-            Bitmap B = null;
-            var T = new List<string>();
+            Bitmap bmp = null;
+            var tags = new List<string>();
 
 
             if (FileExists(PathOfPicture))
             {
-                B = (Bitmap)BitmapExt.Image_FromFile(PathOfPicture);
+                bmp = (Bitmap)BitmapExt.Image_FromFile(PathOfPicture);
             }
 
             var ftxt = FilenameTXT(PathOfPicture);
@@ -294,13 +294,13 @@ namespace BlueControls.Controls
 
             if (FileExists(ftxt))
             {
-                T = modAllgemein.LoadFromDisk(ftxt).SplitByCRToList();
+                tags = modAllgemein.LoadFromDisk(ftxt).SplitByCRToList();
             }
 
 
-            T.TagSet("ImageFile", PathOfPicture);
+            tags.TagSet("ImageFile", PathOfPicture);
 
-            return new Tuple<Bitmap, List<string>>(B, T);
+            return new Tuple<Bitmap, List<string>>(bmp, tags);
 
         }
 

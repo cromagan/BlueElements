@@ -797,7 +797,7 @@ namespace BlueControls.ItemCollection
 
         public BitmapListItem Add(Bitmap bmp, string caption)
         {
-            var i = new BitmapListItem(bmp, string.Empty, string.Empty, caption, string.Empty);
+            var i = new BitmapListItem(bmp, string.Empty, caption);
             Add(i);
             return i;
 
@@ -816,7 +816,7 @@ namespace BlueControls.ItemCollection
 
         public BitmapListItem Add(string filename, string internalname, string caption, string EncryptionKey)
         {
-            var i = new BitmapListItem(null, filename, internalname, caption, EncryptionKey);
+            var i = new BitmapListItem(filename, internalname, caption, EncryptionKey);
             Add(i);
             return i;
         }
