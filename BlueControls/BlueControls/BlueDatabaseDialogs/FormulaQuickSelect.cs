@@ -83,7 +83,7 @@ namespace BlueControls.BlueDatabaseDialogs
                                                 if (thisItem.Internal.ToLower().Contains(t))
                                                 {
 
-                                                    var ni = Auswahl.Item.Add(ThisColumn.Name.ToUpper() + "|" + thisItem.Internal, ThisColumn.ReadableText() + ": " + thisItem.Internal);
+                                                    var ni = Auswahl.Item.Add(ThisColumn.ReadableText() + ": " + thisItem.Internal, ThisColumn.Name.ToUpper() + "|" + thisItem.Internal);
                                                     ni.Checked = thisItem.Checked;
 
                                                 }

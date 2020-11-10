@@ -56,7 +56,7 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
-        public BitmapListItem(string internalname, string caption, string Filename, Bitmap bmp, string EncryptionKey) : base(internalname)
+        public BitmapListItem(Bitmap bmp, string Filename, string internalname, string caption, string encryptionKey) : base(internalname)
         {
 
             _caption = caption;
@@ -70,7 +70,7 @@ namespace BlueControls.ItemCollection
 
             _Bitmap = bmp;
             _ImageFilename = Filename;
-            _EncryptionKey = EncryptionKey;
+            _EncryptionKey = encryptionKey;
 
             _padding = 0;
 

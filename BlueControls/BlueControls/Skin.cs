@@ -838,17 +838,17 @@ namespace BlueControls
             var Rahms = new ItemCollectionList();
             if (MitOhne)
             {
-                Rahms.Add(((int)PadStyles.Undefiniert).ToString(), "Ohne Rahmen", enImageCode.Kreuz);
+                Rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), enImageCode.Kreuz);
             }
 
 
-            Rahms.Add(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolOfLine());
-            Rahms.Add(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolOfLine());
-            Rahms.Add(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolOfLine());
-            Rahms.Add(((int)PadStyles.Style_Standard).ToString(), "Standard", GetBlueFont(PadStyles.Style_Standard, SheetStyle).SymbolOfLine());
-            Rahms.Add(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GetBlueFont(PadStyles.Style_StandardFett, SheetStyle).SymbolOfLine());
-            Rahms.Add(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GetBlueFont(PadStyles.Style_StandardAlternativ, SheetStyle).SymbolOfLine());
-            Rahms.Add(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolOfLine());
+            Rahms.Add("Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolOfLine());
+            Rahms.Add("Untertitel für Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Untertitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolOfLine());
+            Rahms.Add("Überschrift für Kapitel", ((int)PadStyles.Style_Überschrift_Kapitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolOfLine());
+            Rahms.Add("Standard", ((int)PadStyles.Style_Standard).ToString(), GetBlueFont(PadStyles.Style_Standard, SheetStyle).SymbolOfLine());
+            Rahms.Add("Standard Fett", ((int)PadStyles.Style_StandardFett).ToString(), GetBlueFont(PadStyles.Style_StandardFett, SheetStyle).SymbolOfLine());
+            Rahms.Add("Standard Alternativ-Design", ((int)PadStyles.Style_StandardAlternativ).ToString(), GetBlueFont(PadStyles.Style_StandardAlternativ, SheetStyle).SymbolOfLine());
+            Rahms.Add("Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolOfLine());
             Rahms.Sort();
 
             return Rahms;
@@ -862,13 +862,13 @@ namespace BlueControls
 
             var Rahms = new ItemCollectionList();
             //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
-            Rahms.Add(((int)PadStyles.Style_Überschrift_Haupt).ToString(), "Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolForReadableText());
-            Rahms.Add(((int)PadStyles.Style_Überschrift_Untertitel).ToString(), "Untertitel für Haupt-Überschrift", GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolForReadableText());
-            Rahms.Add(((int)PadStyles.Style_Überschrift_Kapitel).ToString(), "Überschrift für Kapitel", GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolForReadableText());
-            Rahms.Add(((int)PadStyles.Style_Standard).ToString(), "Standard", GetBlueFont(PadStyles.Style_Standard, SheetStyle).SymbolForReadableText());
-            Rahms.Add(((int)PadStyles.Style_StandardFett).ToString(), "Standard Fett", GetBlueFont(PadStyles.Style_StandardFett, SheetStyle).SymbolForReadableText());
-            Rahms.Add(((int)PadStyles.Style_StandardAlternativ).ToString(), "Standard Alternativ-Design", GetBlueFont(PadStyles.Style_StandardAlternativ, SheetStyle).SymbolForReadableText());
-            Rahms.Add(((int)PadStyles.Style_KleinerZusatz).ToString(), "Kleiner Zusatz", GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolForReadableText());
+            Rahms.Add("Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolForReadableText());
+            Rahms.Add("Untertitel für Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Untertitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolForReadableText());
+            Rahms.Add("Überschrift für Kapitel", ((int)PadStyles.Style_Überschrift_Kapitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolForReadableText());
+            Rahms.Add("Standard", ((int)PadStyles.Style_Standard).ToString(), GetBlueFont(PadStyles.Style_Standard, SheetStyle).SymbolForReadableText());
+            Rahms.Add("Standard Fett", ((int)PadStyles.Style_StandardFett).ToString(), GetBlueFont(PadStyles.Style_StandardFett, SheetStyle).SymbolForReadableText());
+            Rahms.Add("Standard Alternativ-Design", ((int)PadStyles.Style_StandardAlternativ).ToString(), GetBlueFont(PadStyles.Style_StandardAlternativ, SheetStyle).SymbolForReadableText());
+            Rahms.Add("Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolForReadableText());
             Rahms.Sort();
 
             return Rahms;

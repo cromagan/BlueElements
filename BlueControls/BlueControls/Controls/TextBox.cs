@@ -1735,17 +1735,17 @@ namespace BlueControls.Controls
                         if (!string.IsNullOrEmpty(bmp.Name))
                         {
                             var crc = "DB_" + bmp.Name;
-                            i.Add(crc, bmp.Name, QuickImage.Get(crc, 20));
+                            i.Add(bmp.Name, crc, QuickImage.Get(crc, 20));
                         }
                     }
 
 
                 }
 
-                i.Add(new LineListItem());
+                i.AddSeparator();
             }
 
-            i.Add("sphere", "Kugel", QuickImage.Get(enImageCode.Kugel, 20));
+            i.Add("Kugel", "sphere", QuickImage.Get(enImageCode.Kugel, 20));
             i.Add("Warnung", "Warnung", QuickImage.Get(enImageCode.Warnung, 20));
             i.Add("Information", "Information", QuickImage.Get(enImageCode.Information, 20));
             i.Add("Kritisch", "Kritisch", QuickImage.Get(enImageCode.Kritisch, 20));
@@ -1794,7 +1794,7 @@ namespace BlueControls.Controls
                 if (Dictionary.IsSpellChecking)
                 {
                     Items.Add("Gerade ausgelastet...", "Gerade ausgelastet...", false);
-                    Items.Add(new LineListItem());
+                    Items.AddSeparator();
                 }
                 else
                 {
@@ -1803,23 +1803,23 @@ namespace BlueControls.Controls
                     {
                         foreach (var ThisS in sim)
                         {
-                            Items.Add("#ChangeTo:" + ThisS, " - " + ThisS);
+                            Items.Add(" - " + ThisS, "#ChangeTo:" + ThisS);
                         }
 
-                        Items.Add(new LineListItem());
+                        Items.AddSeparator();
                     }
 
 
 
-                    Items.Add("#SpellAdd", "'" + tmpWord + "' ins Wörterbuch aufnehmen", Dictionary.IsWriteable());
+                    Items.Add("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable());
                     if (tmpWord.ToLower() != tmpWord)
                     {
-                        Items.Add("#SpellAddLower", "'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", Dictionary.IsWriteable());
+                        Items.Add("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable());
                     }
 
-                    Items.Add("#SpellChecking", "Schnelle Rechtschreibprüfung", Dictionary.IsWriteable());
-                    Items.Add("#SpellChecking2", "Alle Wörter sind ok", Dictionary.IsWriteable());
-                    Items.Add(new LineListItem());
+                    Items.Add("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable());
+                    Items.Add("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable());
+                    Items.AddSeparator();
                 }
 
             }
@@ -1834,15 +1834,15 @@ namespace BlueControls.Controls
 
                 if (_Format == enDataFormat.Text_mit_Formatierung)
                 {
-                    Items.Add(new LineListItem());
-                    Items.Add("#Sonderzeichen", "Sonderzeichen einfügen", QuickImage.Get(enImageCode.Sonne, 16), _Cursor_CharPos > -1);
+                    Items.AddSeparator();
+                    Items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(enImageCode.Sonne, 16), _Cursor_CharPos > -1);
 
                     if (Convert.ToBoolean(_MarkEnd > -1))
                     {
-                        Items.Add(new LineListItem());
-                        Items.Add("#Caption", "Als Überschrift markieren", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _MarkEnd > -1);
-                        Items.Add("#Bold", "Fettschrift", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
-                        Items.Add("#NoCaption", "Als normalen Text markieren", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
+                        Items.AddSeparator();
+                        Items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _MarkEnd > -1);
+                        Items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
+                        Items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
                     }
                 }
             }

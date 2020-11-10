@@ -60,11 +60,11 @@ namespace BlueControls.Forms
                 var nn = ps.Width + ";" + ps.Height;
                 if (Format.Item[nn] == null)
                 {
-                    Format.Item.Add(nn, ps.PaperName, QuickImage.Get(enImageCode.Datei), true, ps.PaperName);
+                    Format.Item.Add(ps.PaperName, nn, QuickImage.Get(enImageCode.Datei), true, ps.PaperName);
                 }
             }
 
-            Format.Item.Add("neu", "Manuelle Eingabe", enImageCode.Stern, true, Constants.FirstSortChar.ToString());
+            Format.Item.Add("Manuelle Eingabe", "neu", enImageCode.Stern, true, Constants.FirstSortChar.ToString());
             Format.Item.Sort();
 
             if (NurHochformat)

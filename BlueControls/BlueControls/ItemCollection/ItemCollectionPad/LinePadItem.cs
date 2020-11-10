@@ -757,9 +757,9 @@ namespace BlueControls.ItemCollection
 
 
             var Verhalt = new ItemCollectionList();
-            Verhalt.Add(((int)enConectorStyle.Direct).ToString(), "Linie direkt zwischen zwei Punkten", QuickImage.Get(enImageCode.Linie));
-            Verhalt.Add(((int)enConectorStyle.Ausweichenx).ToString(), "Linie soll Objekten ausweichen", QuickImage.Get(enImageCode.Linie));
-            Verhalt.Add(((int)enConectorStyle.AusweichenUndGerade).ToString(), "Linie soll Objekten ausweichen und rechtwinklig sein", QuickImage.Get(enImageCode.Linie));
+            Verhalt.Add("Linie direkt zwischen zwei Punkten", ((int)enConectorStyle.Direct).ToString(), QuickImage.Get(enImageCode.Linie));
+            Verhalt.Add("Linie soll Objekten ausweichen", ((int)enConectorStyle.Ausweichenx).ToString(), QuickImage.Get(enImageCode.Linie));
+            Verhalt.Add("Linie soll Objekten ausweichen und rechtwinklig sein", ((int)enConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(enImageCode.Linie));
 
             l.Add(new FlexiControlForProperty(this, "Linien-Verhalten", Verhalt));
 

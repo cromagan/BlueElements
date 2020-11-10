@@ -31,7 +31,7 @@ namespace BlueControls.ItemCollection
         #region  Variablen-Deklarationen 
         private string _ReadableText;
         private QuickImage _Symbol;
-        private readonly enDataFormat _Format = enDataFormat.Text;
+        //private readonly enDataFormat _Format = enDataFormat.Text;
 
 
         #endregion
@@ -46,13 +46,13 @@ namespace BlueControls.ItemCollection
 
 
 
-        public TextListItem(string internalname, string readableText, QuickImage symbol, bool isCaption, bool enabled, enDataFormat format, string userDefCompareKey) : base(internalname)
+        public TextListItem(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname)
         {
             IsCaption = isCaption;
             _ReadableText = readableText;
             _Symbol = symbol;
             _Enabled = enabled;
-            _Format = format;
+            //_Format = format;
             UserDefCompareKey = userDefCompareKey;
         }
 
@@ -151,7 +151,7 @@ namespace BlueControls.ItemCollection
 
         protected override string GetCompareKey()
         {
-            return DataFormat.CompareKey(Internal, _Format);
+            return DataFormat.CompareKey(Internal, enDataFormat.Text);
         }
 
 
@@ -164,7 +164,7 @@ namespace BlueControls.ItemCollection
 
         public override BasicListItem CloneToNewCollection(ItemCollectionList newParent)
         {
-            return CloneToNewCollection(newParent, new TextListItem(Internal, _ReadableText, _Symbol, IsCaption, _Enabled, _Format, UserDefCompareKey));
+            return CloneToNewCollection(newParent, new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey));
         }
 
         public override bool FilterMatch(string FilterText)

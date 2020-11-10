@@ -142,7 +142,7 @@ namespace BlueControls.Controls
 
             if (_Bitmap != null)
             {
-                Items.Add("ExF", "Externes Fenster öffnen");
+                Items.Add("Externes Fenster öffnen", "ExF");
                 Items.Add(enContextMenuComands.Speichern);
             }
 

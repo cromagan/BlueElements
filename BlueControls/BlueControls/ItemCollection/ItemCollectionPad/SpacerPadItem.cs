@@ -189,10 +189,10 @@ namespace BlueControls.ItemCollection
 
 
             var Size = new ItemCollectionList();
-            Size.Add((mm125x * 1m).ToString(Constants.Format_Float4), "Klein (1,25 mm)", enImageCode.GrößeÄndern);
-            Size.Add((mm125x * 2m).ToString(Constants.Format_Float4), "Normal (2,5 mm)", enImageCode.GrößeÄndern);
-            Size.Add((mm125x * 4m).ToString(Constants.Format_Float4), "Groß (5,0 mm)", enImageCode.GrößeÄndern);
-            Size.Add((mm125x * 5m).ToString(Constants.Format_Float4), "Sehr groß (10,0 mm)", enImageCode.GrößeÄndern);
+            Size.Add("Klein (1,25 mm)", (mm125x * 1m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern);
+            Size.Add("Normal (2,5 mm)", (mm125x * 2m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern);
+            Size.Add("Groß (5,0 mm)", (mm125x * 4m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern);
+            Size.Add("Sehr groß (10,0 mm)", (mm125x * 5m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern);
 
 
             l.Add(new FlexiControlForProperty(this, "Größe Distanzhalter", Size));

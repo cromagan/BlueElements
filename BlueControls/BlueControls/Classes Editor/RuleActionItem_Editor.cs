@@ -50,13 +50,13 @@ namespace BlueControls.Classes_Editor
             cbxRuleAktion.Item.Clear();
 
 
-            cbxRuleAktion.Item.Add("0+", "Wenn...", false);
+            cbxRuleAktion.Item.Add("Wenn...", "0+", false);
             for (var z = 0; z <= 5000; z++)
             {
 
                 if (z == 1000)
                 {
-                    cbxRuleAktion.Item.Add("1000+", "Dann...", false);
+                    cbxRuleAktion.Item.Add("Dann...", "1000+", false);
                 }
 
 
@@ -67,7 +67,7 @@ namespace BlueControls.Classes_Editor
                     var t = string.Empty;
                     QuickImage s = null;
                     RuleActionItem.MaximalText(Item.Rule.Database, Ac, ref t, ref s);
-                    cbxRuleAktion.Item.Add(z.ToString(), t, s);
+                    cbxRuleAktion.Item.Add(t, z.ToString(), s);
                 }
             }
 

@@ -530,8 +530,8 @@ namespace BlueControls.ItemCollection
             };
 
             var Lage = new ItemCollectionList();
-            Lage.Add("-1", "ohne");
-            Lage.Add(((int)enAlignment.Top_Left).ToString(), "Links oben");
+            Lage.Add("ohne", "-1");
+            Lage.Add("Links oben", ((int)enAlignment.Top_Left).ToString());
 
             l.Add(new FlexiControlForProperty(this, "Textlage", Lage));
 

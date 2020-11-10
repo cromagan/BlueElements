@@ -470,16 +470,16 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             BefE2.Item.Clear();
-            BefE2.Item.Add("//AS/300/AE", "Kopf Ende, Körper beginnt", QuickImage.Get("Pfeil_Rechts|16"));
-            BefE2.Item.Add("//AS/301/AE", "Körper Ende, Fuß beginnt", QuickImage.Get("Pfeil_Rechts|16"));
-            BefE2.Item.Add("//XS/302", "Bereinigung Start", enImageCode.Pinsel);
-            BefE2.Item.Add("/XE", "Bereinigung Ende", enImageCode.Pinsel);
+            BefE2.Item.Add("Kopf Ende, Körper beginnt", "//AS/300/AE", QuickImage.Get("Pfeil_Rechts|16"));
+            BefE2.Item.Add("Körper Ende, Fuß beginnt", "//AS/301/AE", QuickImage.Get("Pfeil_Rechts|16"));
+            BefE2.Item.Add("Bereinigung Start", "//XS/302", enImageCode.Pinsel);
+            BefE2.Item.Add("Bereinigung Ende", "/XE", enImageCode.Pinsel);
 
             if (LeerM)
             {
-                BefE2.Item.Add(new LineListItem());
-                BefE2.Item.Add("//AS/003" + Nam.ToUpper() + "/310", "Wenn der Inhalt Nicht Leer ist, dann...", QuickImage.Get("Gänsefüßchen|16|12"));
-                BefE2.Item.Add("/AE", "...Ende der Abfrage", QuickImage.Get("Gänsefüßchen|16|12|6"));
+                BefE2.Item.AddSeparator();
+                BefE2.Item.Add("Wenn der Inhalt nicht leer ist, dann...", "//AS/003" + Nam.ToUpper() + "/310", QuickImage.Get("Gänsefüßchen|16|12"));
+                BefE2.Item.Add("...Ende der Abfrage", "/AE", QuickImage.Get("Gänsefüßchen|16|12|6"));
             }
 
 
@@ -526,10 +526,10 @@ namespace BlueControls.BlueDatabaseDialogs
             ZeilUmbruch.Item.Clear();
             ZeilUmbruch.Item.Add(", ");
             ZeilUmbruch.Item.Add("/");
-            ZeilUmbruch.Item.Add(" ", "Leerzeichen");
-            ZeilUmbruch.Item.Add("<br>", "<br> (HTML-Format)");
-            ZeilUmbruch.Item.Add("<w:br/>", "<w:br/> (Word XML-Format)");
-            ZeilUmbruch.Item.Add("\r\n", "Zeilenumbruch (CR & LF [Carriage Return und Line Feed])");
+            ZeilUmbruch.Item.Add("Leerzeichen", " ");
+            ZeilUmbruch.Item.Add("<br> (HTML-Format)", "<br>");
+            ZeilUmbruch.Item.Add("<w:br/> (Word XML-Format)", "<w:br/>");
+            ZeilUmbruch.Item.Add("Zeilenumbruch (CR & LF [Carriage Return und Line Feed])", "\r\n");
 
 
         }

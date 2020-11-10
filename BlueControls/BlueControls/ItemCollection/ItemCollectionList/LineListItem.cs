@@ -44,15 +44,10 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
-        public LineListItem(string internalname, string cUserDefCompareKey) : base(internalname)
+        public LineListItem(string internalname, string userDefCompareKey) : base(internalname)
         {
-            UserDefCompareKey = cUserDefCompareKey;
+            UserDefCompareKey = userDefCompareKey;
         }
-
-        public LineListItem(string cUserDefCompareKey) : this(string.Empty, cUserDefCompareKey) { }
-
-
-        public LineListItem() : this(string.Empty, string.Empty) { }
 
 
 

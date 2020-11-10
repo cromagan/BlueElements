@@ -1849,8 +1849,8 @@ namespace BlueControls.Controls
                     Cell_Edit(cellInThisDatabaseColumn, cellInThisDatabaseRow, false);
                     return;
                 }
-                t.Add("#Erweitert", "Erweiterte Eingabe", QuickImage.Get(enImageCode.Stift), true, Constants.FirstSortChar + "1");
-                t.Add(new LineListItem(Constants.FirstSortChar + "2"));
+                t.Add("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(enImageCode.Stift), true, Constants.FirstSortChar + "1");
+                t.AddSeparator(Constants.FirstSortChar + "2");
                 t.Sort();
             }
 
@@ -3192,7 +3192,7 @@ namespace BlueControls.Controls
                 {
                     if (_ColumnArrangementSelector != null && _Database.PermissionCheck(ThisArrangement.PermissionGroups_Show, null))
                     {
-                        _ColumnArrangementSelector.Item.Add(_Database.ColumnArrangements.IndexOf(ThisArrangement).ToString(), ThisArrangement.Name);
+                        _ColumnArrangementSelector.Item.Add(ThisArrangement.Name, _Database.ColumnArrangements.IndexOf(ThisArrangement).ToString());
                     }
                 }
             }
@@ -3440,7 +3440,7 @@ namespace BlueControls.Controls
         {
             get
             {
-                if (_Database == null || _Database.ColumnArrangements == null || _Database.ColumnArrangements.Count <= _ArrangementNr ) { return null; }
+                if (_Database == null || _Database.ColumnArrangements == null || _Database.ColumnArrangements.Count <= _ArrangementNr) { return null; }
                 return _Database.ColumnArrangements[_ArrangementNr];
             }
         }
@@ -4099,7 +4099,7 @@ namespace BlueControls.Controls
             Database?.Load_Reload();
 
 
-            if ( e == null)
+            if (e == null)
             {
                 Cancel = true;
                 return;
@@ -4314,11 +4314,11 @@ namespace BlueControls.Controls
                     LasNr = z;
                     if (isfirst)
                     {
-                        Las = new TextListItem("Cancel", "Aktueller Text - ab " + _Database.Works[z].Date + " UTC, geändert von " + _Database.Works[z].User, null, false, true, enDataFormat.Text, string.Empty);
+                        Las = new TextListItem("Aktueller Text - ab " + _Database.Works[z].Date + " UTC, geändert von " + _Database.Works[z].User, "Cancel", null, false, true, string.Empty);
                     }
                     else
                     {
-                        Las = new TextListItem(co.ToString(Constants.Format_Integer5) + _Database.Works[z].ChangedTo, "ab " + _Database.Works[z].Date + " UTC, geändert von " + _Database.Works[z].User, null, false, true, enDataFormat.Text, string.Empty);
+                        Las = new TextListItem("ab " + _Database.Works[z].Date + " UTC, geändert von " + _Database.Works[z].User, co.ToString(Constants.Format_Integer5) + _Database.Works[z].ChangedTo, null, false, true, string.Empty);
                     }
 
                     isfirst = false;
@@ -4330,7 +4330,7 @@ namespace BlueControls.Controls
             if (Las != null)
             {
                 co++;
-                i.Add(co.ToString(Constants.Format_Integer5) + _Database.Works[LasNr].PreviousValue, "vor " + _Database.Works[LasNr].Date + " UTC");
+                i.Add("vor " + _Database.Works[LasNr].Date + " UTC", co.ToString(Constants.Format_Integer5) + _Database.Works[LasNr].PreviousValue);
             }
 
 

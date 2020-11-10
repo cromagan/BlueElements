@@ -97,17 +97,17 @@ namespace BlueControls.Forms
 
             Pad.Item.SheetStyle = Skin.StyleDB.Row[PadDesign.Text];
 
-            SchriftGröße.Item.Add("050", "50%");
-            SchriftGröße.Item.Add("060", "60%");
-            SchriftGröße.Item.Add("070", "70%");
-            SchriftGröße.Item.Add("080", "80%");
-            SchriftGröße.Item.Add("090", "90%");
-            SchriftGröße.Item.Add("100", "100%");
-            SchriftGröße.Item.Add("110", "110%");
-            SchriftGröße.Item.Add("120", "120%");
-            SchriftGröße.Item.Add("130", "130%");
-            SchriftGröße.Item.Add("140", "140%");
-            SchriftGröße.Item.Add("150", "150%");
+            SchriftGröße.Item.Add("50%", "050");
+            SchriftGröße.Item.Add("60%", "060");
+            SchriftGröße.Item.Add("70%", "070");
+            SchriftGröße.Item.Add("80%", "080");
+            SchriftGröße.Item.Add("90%", "090");
+            SchriftGröße.Item.Add("100%", "100");
+            SchriftGröße.Item.Add("110%", "110");
+            SchriftGröße.Item.Add("120%", "120");
+            SchriftGröße.Item.Add("130%", "130");
+            SchriftGröße.Item.Add("140%", "140");
+            SchriftGröße.Item.Add("150%", "150");
 
             SchriftGröße.Item.Sort();
 

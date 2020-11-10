@@ -167,7 +167,7 @@ namespace BlueControls.Controls
             if (e.Control is ComboBox cbx)
             {
                 var Item2 = new ItemCollectionList();
-                Item2.Add("|~", "Keine weiteren Einträge vorhanden");
+                Item2.Add("Keine weiteren Einträge vorhanden", "|~");
 
                 //var c = Filter.Column.Contents(null);
 
@@ -238,7 +238,7 @@ namespace BlueControls.Controls
 
             if (TableView == null)
             {
-                cbx.Item.Add("|~", "Anzeigefehler", enImageCode.Kreuz, false);
+                cbx.Item.Add("Anzeigefehler", "|~", enImageCode.Kreuz, false);
                 return;
             }
 
@@ -247,7 +247,7 @@ namespace BlueControls.Controls
             if (List_FilterString.Count == 0)
             {
 
-                cbx.Item.Add("|~", "Keine weiteren Einträge vorhanden", enImageCode.Kreuz, false);
+                cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", enImageCode.Kreuz, false);
             }
 
             else if (List_FilterString.Count < 400)
@@ -257,7 +257,7 @@ namespace BlueControls.Controls
             }
             else
             {
-                cbx.Item.Add("|~", "Zu viele Einträge", enImageCode.Kreuz, false);
+                cbx.Item.Add("Zu viele Einträge", "|~", enImageCode.Kreuz, false);
             }
 
         }
@@ -300,7 +300,7 @@ namespace BlueControls.Controls
 
 
 
-            Items.Add("#ColumnEdit", "Spalte bearbeiten", QuickImage.Get(enImageCode.Spalte));
+            Items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(enImageCode.Spalte));
 
 
             if (Parent is Filterleiste f)
@@ -308,9 +308,9 @@ namespace BlueControls.Controls
 
                 if (f.pic.Visible)
                 {
-                    Items.Add("#FilterVerschieben", "Filter verschieben", QuickImage.Get(enImageCode.Trichter));
+                    Items.Add("Filter verschieben", "#FilterVerschieben", QuickImage.Get(enImageCode.Trichter));
 
-                    Items.Add("#BildPfad", "Bild-Pfad öffnen", QuickImage.Get(enImageCode.Ordner));
+                    Items.Add("Bild-Pfad öffnen", "#BildPfad", QuickImage.Get(enImageCode.Ordner));
                 }
 
 

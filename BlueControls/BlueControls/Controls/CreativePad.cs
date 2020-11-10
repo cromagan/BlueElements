@@ -1200,11 +1200,11 @@ namespace BlueControls.Controls
             if (selectedHotItem != null)
             {
                 Items.Add("Allgemeine Element-Aktionen", true);
-                Items.Add("#Erweitert", "Objekt bearbeiten", enImageCode.Stift);
-                Items.Add(new LineListItem());
+                Items.Add("Objekt bearbeiten", "#Erweitert", enImageCode.Stift);
+                Items.AddSeparator();
 
 
-                Items.Add("#ExterneBeziehungen", "Objektübergreifende Punkt-Beziehungen aufheben", enImageCode.Kreuz);
+                Items.Add("Objektübergreifende Punkt-Beziehungen aufheben", "#ExterneBeziehungen", enImageCode.Kreuz);
                 //if (((BasicPadItem)HotItem).Bei_Export_sichtbar)
                 //{
                 //    Items.Add("#PrintMeNot", "Objekt nicht drucken", QuickImage.Get("Drucker|16||1")));
@@ -1215,14 +1215,14 @@ namespace BlueControls.Controls
                 //}
 
 
-                Items.Add("#Duplicate", "Objekt duplizieren", enImageCode.Kopieren, selectedHotItem is ICloneable);
+                Items.Add("Objekt duplizieren", "#Duplicate", enImageCode.Kopieren, selectedHotItem is ICloneable);
 
 
-                Items.Add(new LineListItem());
-                Items.Add("#Vordergrund", "In den Vordergrund", enImageCode.InDenVordergrund);
-                Items.Add("#Hintergrund", "In den Hintergrund", enImageCode.InDenHintergrund);
-                Items.Add("#Vorne", "Eine Ebene nach vorne", enImageCode.EbeneNachVorne);
-                Items.Add("#Hinten", "Eine Ebene nach hinten", enImageCode.EbeneNachHinten);
+                Items.AddSeparator();
+                Items.Add("In den Vordergrund", "#Vordergrund", enImageCode.InDenVordergrund);
+                Items.Add("In den Hintergrund", "#Hintergrund", enImageCode.InDenHintergrund);
+                Items.Add("Eine Ebene nach vorne", "#Vorne", enImageCode.EbeneNachVorne);
+                Items.Add("Eine Ebene nach hinten", "#Hinten", enImageCode.EbeneNachHinten);
             }
 
 

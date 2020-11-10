@@ -116,9 +116,9 @@ namespace BlueControls.ItemCollection
             };
 
             var Comms = new ItemCollectionList();
-            Comms.Add(((int)enSymbol.Ohne).ToString(), "Ohne", QuickImage.Get("Datei|32"));
-            Comms.Add(((int)enSymbol.Pfeil).ToString(), "Pfeil", QuickImage.Get("Pfeil_Rechts|32"));
-            Comms.Add(((int)enSymbol.Bruchlinie).ToString(), "Bruchlinie");
+            Comms.Add("Ohne", ((int)enSymbol.Ohne).ToString(), QuickImage.Get("Datei|32"));
+            Comms.Add("Pfeil", ((int)enSymbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32"));
+            Comms.Add("Bruchlinie", ((int)enSymbol.Bruchlinie).ToString());
 
             l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty(this, "Symbol", Comms));

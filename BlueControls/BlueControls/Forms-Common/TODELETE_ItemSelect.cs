@@ -52,7 +52,7 @@ namespace BlueControls.Forms
             {
                 if (ThisString.FileType() == enFileFormat.Image)
                 {
-                    List.Item.Add(ThisString, ThisString.FileNameWithoutSuffix(), ThisString, FileEncryptionKey);
+                    List.Item.Add(ThisString, ThisString, ThisString.FileNameWithoutSuffix(), FileEncryptionKey);
                 }
             }
 
@@ -75,11 +75,7 @@ namespace BlueControls.Forms
 
             foreach (var ThisRow in rows)
             {
-                var x = new RowFormulaListItem(ThisRow)
-                {
-                    LayoutID = layoutID
-                };
-                List.Item.Add(x);
+                List.Item.Add(ThisRow, layoutID);
             }
 
 

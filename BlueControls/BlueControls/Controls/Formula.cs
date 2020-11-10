@@ -652,7 +652,7 @@ namespace BlueControls.Controls
                 }
                 else
                 {
-                    if (lbxColumns.Item[intName] == null) { lbxColumns.Item.Add(intName, Nam, true, (ItC + 1).ToString(Constants.Format_Integer3) + "|A"); }
+                    if (lbxColumns.Item[intName] == null) { lbxColumns.Item.Add(Nam, intName, true, (ItC + 1).ToString(Constants.Format_Integer3) + "|A"); }
                 }
             }
 
@@ -804,7 +804,7 @@ namespace BlueControls.Controls
                             {
                                 if (ViewItem.Column.UserEditDialogTypeInFormula(w))
                                 {
-                                    cbxControlType.Item.Add(z.ToString(), w.ToString());
+                                    cbxControlType.Item.Add(w.ToString(), z.ToString());
                                 }
                             }
                         }
@@ -831,12 +831,12 @@ namespace BlueControls.Controls
 
             if (cd == null)
             {
-                e.UserMenu.Add("#AddColumnToHead", "Zum Kopfbereich hinzufügen", enImageCode.Sonne);
-                e.UserMenu.Add("#AddColumnToBody", "Zum Körperbereich hinzufügen", enImageCode.Kreis, _Database.Views.Count > 1);
+                e.UserMenu.Add("Zum Kopfbereich hinzufügen", "#AddColumnToHead", enImageCode.Sonne);
+                e.UserMenu.Add("Zum Körperbereich hinzufügen", "#AddColumnToBody", enImageCode.Kreis, _Database.Views.Count > 1);
             }
             else
             {
-                e.UserMenu.Add("#RemoveColumnFromView", "Dieses Feld ausblenden", enImageCode.Kreuz, Convert.ToBoolean(cd != null));
+                e.UserMenu.Add("Dieses Feld ausblenden", "#RemoveColumnFromView", enImageCode.Kreuz, Convert.ToBoolean(cd != null));
             }
 
         }
@@ -1346,13 +1346,13 @@ namespace BlueControls.Controls
             }
 
 
-            Items.Add("#Schnelleingabe", "Allgemeine Schnelleingabe öffnen", QuickImage.Get(enImageCode.Lupe), _Database != null && ShowingRow != null);
+            Items.Add("Allgemeine Schnelleingabe öffnen", "#Schnelleingabe", QuickImage.Get(enImageCode.Lupe), _Database != null && ShowingRow != null);
 
 
             if (_Database.IsAdministrator())
             {
-                Items.Add(new LineListItem());
-                Items.Add("#Ansicht", "Formular bearbeiten", QuickImage.Get(enImageCode.Textfeld), _Database != null);
+                Items.AddSeparator();
+                Items.Add("Formular bearbeiten", "#Ansicht", QuickImage.Get(enImageCode.Textfeld), _Database != null);
 
             }
         }

@@ -29,7 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices.WindowsRuntime;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection
@@ -361,15 +360,9 @@ namespace BlueControls.ItemCollection
 
             if (data.Item4 == enOrientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, null, data); }
 
-
-
             BreakAfterItems = CalculateColumnCount(data.Item1, data.Item3, data.Item4);
 
             return ComputeAllItemPositions(new Size(1, 30), null, null, data);
-
-
-
-
         }
 
         internal Size ComputeAllItemPositions(Size ControlDrawingArea, System.Windows.Forms.Control InControl, Slider SliderY, Tuple<int, int, int, enOrientation> data)
@@ -410,8 +403,7 @@ namespace BlueControls.ItemCollection
             }
 
 
-            var colWidth = 0;
-            var colCount = 1;
+            int colWidth;
 
             switch (_Appearance)
             {
@@ -431,7 +423,7 @@ namespace BlueControls.ItemCollection
                     }
                     else
                     {
-                        colCount = Count / BreakAfterItems;
+                        var colCount = (int)(Count / BreakAfterItems);
                         var r = Count % colCount;
                         if (r != 0) { colCount++; }
 
@@ -640,14 +632,14 @@ namespace BlueControls.ItemCollection
                     //NewReplacer.Add(th.ToString() + "|" + te);
                     if (th >= ZumDropdownHinzuAb && th < ZumDropdownHinzuBis)
                     {
-                        Add(th.ToString(), te);
+                        Add(te, th.ToString());
                     }
                 }
             }
 
         }
 
-        #region  Add / AddRange / AddBasicLevel 
+        #region  Add / AddRange 
 
 
 
@@ -657,18 +649,30 @@ namespace BlueControls.ItemCollection
 
         public TextListItem Add(string internalAndReadableText)
         {
-            return Add(internalAndReadableText, internalAndReadableText, null, false, true, enDataFormat.Text, string.Empty);
+            return Add(internalAndReadableText, internalAndReadableText, null, false, true, string.Empty);
         }
 
 
         /// <summary>
         /// Fügt das übergebende Object den Tags hinzu.
         /// </summary>
-        /// <param name="obj"></param>
-        public TextListItem Add(IReadableText obj)
+        /// <param name="readableObject"></param>
+        public TextListItem Add(IReadableText readableObject)
         {
-            var i = Add(string.Empty, obj, string.Empty);
-            i.Tags = obj;
+            var i = Add(readableObject, string.Empty, string.Empty);
+            i.Tags = readableObject;
+            return i;
+        }
+
+        /// <summary>
+        /// Fügt das übergebende Object den Tags hinzu.
+        /// </summary>
+        /// <param name="readableObject"></param>
+        /// <param name="internalname"></param>
+        public TextListItem Add(IReadableText readableObject, string internalname)
+        {
+            var i = Add(readableObject, internalname, string.Empty);
+            i.Tags = readableObject;
             return i;
         }
 
@@ -676,38 +680,25 @@ namespace BlueControls.ItemCollection
         /// Fügt das übergebende Object den Tags hinzu.
         /// </summary>
         /// <param name="internalname"></param>
-        /// <param name="obj"></param>
-        public TextListItem Add(string internalname, IReadableText obj)
+        /// <param name="readableObject"></param>
+        public TextListItem Add(IReadableText readableObject, string internalname, string userDefCompareKey)
         {
-            var i = Add(internalname, obj, string.Empty);
-            i.Tags = obj;
-            return i;
-        }
-
-        /// <summary>
-        /// Fügt das übergebende Object den Tags hinzu.
-        /// </summary>
-        /// <param name="internalname"></param>
-        /// <param name="obj"></param>
-        public TextListItem Add(string internalname, IReadableText obj, string userDefCompareKey)
-        {
-            var i = Add(internalname, obj.ReadableText(), obj.SymbolForReadableText(), true, userDefCompareKey);
-            i.Tags = obj;
+            var i = Add(readableObject.ReadableText(), internalname, readableObject.SymbolForReadableText(), true, userDefCompareKey);
+            i.Tags = readableObject;
             return i;
         }
 
 
-        public TextListItem Add(string internalname, string readableText, bool isCaption, string userDefCompareKey)
-
+        public TextListItem Add(string readableText, string internalname, bool isCaption, string userDefCompareKey)
         {
-            return Add(internalname, readableText, null, isCaption, true, enDataFormat.Text, userDefCompareKey);
+            return Add(readableText, internalname, null, isCaption, true, userDefCompareKey);
         }
 
 
 
         public TextListItem Add(string internalAndReadableText, bool isCaption)
         {
-            return Add(internalAndReadableText, internalAndReadableText, null, isCaption, true, enDataFormat.Text, string.Empty);
+            return Add(internalAndReadableText, internalAndReadableText, null, isCaption, true, string.Empty);
         }
 
 
@@ -720,75 +711,75 @@ namespace BlueControls.ItemCollection
 
         public TextListItem Add(string internalAndReadableText, enDataFormat format)
         {
-            return Add(internalAndReadableText, internalAndReadableText, null, false, true, format, string.Empty);
+            return Add(internalAndReadableText, internalAndReadableText, null, false, true, DataFormat.CompareKey(internalAndReadableText,format));
         }
 
 
         public TextListItem Add(string internalAndReadableText, enImageCode symbol)
         {
-            return Add(internalAndReadableText, internalAndReadableText, symbol, false, true, enDataFormat.Text, string.Empty);
+            return Add(internalAndReadableText, internalAndReadableText, symbol, false, true, string.Empty);
         }
 
 
 
-        public TextListItem Add(string internalname, string readableText, bool enabled)
+        public TextListItem Add(string readableText, string internalname, bool enabled)
         {
-            return Add(internalname, readableText, null, false, enabled, enDataFormat.Text, string.Empty);
+            return Add(readableText, internalname, null, false, enabled, string.Empty);
         }
 
-        public TextListItem Add(string internalname, string readableText, enImageCode symbol, bool enabled)
+        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled)
         {
-            return Add(internalname, readableText, symbol, false, enabled, enDataFormat.Text, string.Empty);
+            return Add(readableText, internalname, symbol, false, enabled, string.Empty);
         }
 
-        public TextListItem Add(string internalname, string readableText, enImageCode symbol, bool enabled, string userDefCompareKey)
+        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled, string userDefCompareKey)
         {
-            return Add(internalname, readableText, symbol, false, enabled, enDataFormat.Text, userDefCompareKey);
+            return Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
         }
 
-        public TextListItem Add(string internalname, string readableText, QuickImage symbol, bool enabled)
+        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled)
         {
-            return Add(internalname, readableText, symbol, false, enabled, enDataFormat.Text, string.Empty);
+            return Add(readableText, internalname, symbol, false, enabled, string.Empty);
         }
 
-        public TextListItem Add(string internalname, string readableText, QuickImage symbol, bool enabled, string userDefCompareKey)
+        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled, string userDefCompareKey)
         {
-            return Add(internalname, readableText, symbol, false, enabled, enDataFormat.Text, userDefCompareKey);
-        }
-
-
-
-
-
-        public TextListItem Add(string internalname, string readableText)
-        {
-            return Add(internalname, readableText, null, false, true, enDataFormat.Text, string.Empty);
-
-        }
-
-        public TextListItem Add(string internalname, string readableText, enImageCode symbol)
-        {
-            return Add(internalname, readableText, symbol, false, true, enDataFormat.Text, string.Empty);
-        }
-
-
-        public TextListItem Add(string internalname, string readableText, QuickImage symbol)
-        {
-            return Add(internalname, readableText, symbol, false, true, enDataFormat.Text, string.Empty);
+            return Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
         }
 
 
 
 
-        public TextListItem Add(string internalname, string readableText, enImageCode symbol, bool isCaption, bool enabled, enDataFormat format, string userDefCompareKey)
+
+        public TextListItem Add(string readableText, string internalname)
         {
-            return Add(internalname, readableText, QuickImage.Get(symbol, 16), isCaption, enabled, format, userDefCompareKey);
+            return Add(readableText, internalname, null, false, true, string.Empty);
+
         }
 
-        public TextListItem Add(string internalname, string readableText, QuickImage symbol, bool isCaption, bool enabled, enDataFormat format, string userDefCompareKey)
+        public TextListItem Add(string readableText, string internalname, enImageCode symbol)
+        {
+            return Add(readableText, internalname, symbol, false, true, string.Empty);
+        }
+
+
+        public TextListItem Add(string readableText, string internalname, QuickImage symbol)
+        {
+            return Add(readableText, internalname, symbol, false, true, string.Empty);
+        }
+
+
+
+
+        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey)
+        {
+            return Add(readableText, internalname, QuickImage.Get(symbol, 16), isCaption, enabled, userDefCompareKey);
+        }
+
+        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey)
         {
 
-            var x = new TextListItem(internalname, readableText, symbol, isCaption, enabled, format, userDefCompareKey);
+            var x = new TextListItem(readableText, internalname, symbol, isCaption, enabled, userDefCompareKey);
             Add(x);
             return x;
         }
@@ -801,38 +792,33 @@ namespace BlueControls.ItemCollection
 
         #region  BitmapListItem
 
-        //public BitmapListItem Add()
-        //{
-        //    return Add(string.Empty, string.Empty, string.Empty, null, string.Empty);
-        //}
-
-
-        //public BitmapListItem Add(string internalname, string caption)
-        //{
-        //    return Add(internalname, caption, string.Empty, null, string.Empty);
-        //}
 
 
 
-        public BitmapListItem Add(Bitmap BMP, string caption)
+        public BitmapListItem Add(Bitmap bmp, string caption)
         {
-            return Add(string.Empty, caption, string.Empty, BMP, string.Empty);
+            var i = new BitmapListItem(bmp, string.Empty, string.Empty, caption, string.Empty);
+            Add(i);
+            return i;
+
         }
 
 
 
-        public BitmapListItem Add(string internalname, Bitmap BMP)
+        //public BitmapListItem Add(Bitmap BMP, string internalname)
+        //{
+        //    return Add(internalname, string.Empty, string.Empty, BMP, string.Empty);
+        //}
+
+
+
+
+
+        public BitmapListItem Add(string filename, string internalname, string caption, string EncryptionKey)
         {
-            return Add(internalname, string.Empty, string.Empty, BMP, string.Empty);
-        }
-
-
-
-
-
-        public BitmapListItem Add(string internalname, string caption, string Filename, string EncryptionKey)
-        {
-            return Add(internalname, caption, Filename, null, EncryptionKey);
+            var i = new BitmapListItem(null, filename, internalname, caption, EncryptionKey);
+            Add(i);
+            return i;
         }
 
 
@@ -842,26 +828,86 @@ namespace BlueControls.ItemCollection
         //}
 
 
-        private BitmapListItem Add(string internalname, string caption, string Filename, Bitmap bmp, string EncryptionKey)
+        //private BitmapListItem Add(string internalname, string caption, string Filename, Bitmap bmp, string EncryptionKey)
+        //{
+
+        //    var i = new BitmapListItem(internalname, caption, Filename, bmp, EncryptionKey);
+        //    Add(i);
+        //    return i;
+        //}
+
+
+        #endregion
+
+        #region CellLikeListItem
+
+
+        public CellLikeListItem Add(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool compact, bool enabled)
         {
 
-            var i = new BitmapListItem(internalname, caption, Filename, bmp, EncryptionKey);
+
+            var i = new CellLikeListItem(internalAndReadableText, columnStyle, style, enabled, compact);
+            Add(i);
             return i;
+
+        }
+
+        #endregion
+
+
+
+        #region LineListItem
+
+
+        public LineListItem AddSeparator(string userDefCompareKey)
+        {
+            var i = new LineListItem(string.Empty, userDefCompareKey);
+            Add(i);
+            return i;
+        }
+
+
+        public LineListItem AddSeparator()
+        {
+            return AddSeparator(string.Empty);
         }
 
 
         #endregion
 
 
-        public BasicListItem Add(clsNamedBinary ThisBin)
+        #region RowFormulaItem
+
+        public RowFormulaListItem Add(RowItem row)
         {
-            if (ThisBin.Picture != null)
+            return Add(row, string.Empty, string.Empty);
+        }
+
+        public RowFormulaListItem Add(RowItem row, string layoutID)
+        {
+            return Add(row, layoutID, string.Empty);
+        }
+
+
+        public RowFormulaListItem Add(RowItem row, string layoutID, string userDefCompareKey)
+        {
+            var i = new RowFormulaListItem(row, layoutID, userDefCompareKey);
+            Add(i);
+            return i;
+        }
+
+
+        #endregion
+
+        public BasicListItem Add(clsNamedBinary binary)
+        {
+            if (binary.Picture != null)
             {
-                return Add(ThisBin.Picture, ThisBin.Name);
+                return Add(binary.Picture, binary.Name);
             }
             else
             {
-                return Add(ThisBin.Binary, ThisBin.Name);
+                return Add(binary.Name, binary.Binary);
             }
         }
 
@@ -869,33 +915,23 @@ namespace BlueControls.ItemCollection
         {
             if (doCaptionSort)
             {
-                return Add(column.Name, column, column.Ueberschriften + Constants.SecondSortChar + column.Name);
+                return Add(column, column.Name, column.Ueberschriften + Constants.SecondSortChar + column.Name);
             }
             else
             {
-                return Add(column.Name, column, string.Empty);
+                return Add(column, column.Name, string.Empty);
             }
 
         }
 
-        public TextListItem Add(enContextMenuComands Comand, bool vEnabled = true)
+        public TextListItem Add(enContextMenuComands comand, bool enabled = true)
         {
 
-            //if (ThisBin.Picture != null)
-            //{
-            //    Add(new BitmapListItem(ThisBin.Picture, ThisBin.Name));
-            //}
-            //else
-            //{
-            //    Add(new TextListItem(ThisBin.Binary, ThisBin.Name));
-            //}
-
-            //var _Enabled = vEnabled;
-            var _Internal = Comand.ToString();
+            var _Internal = comand.ToString();
             QuickImage _Symbol = null;
             var _ReadableText = string.Empty;
 
-            switch (Comand)
+            switch (comand)
             {
                 case enContextMenuComands.Abbruch: _ReadableText = "Abbrechen"; _Symbol = QuickImage.Get("TasteESC|16"); break;
                 case enContextMenuComands.Bearbeiten: _ReadableText = "Bearbeiten"; _Symbol = QuickImage.Get(enImageCode.Stift); break;
@@ -918,15 +954,15 @@ namespace BlueControls.ItemCollection
                 case enContextMenuComands.VorherigenInhaltWiederherstellen: _ReadableText = "Vorherigen Inhalt wieder herstellen"; _Symbol = QuickImage.Get(enImageCode.Undo); break;
                 case enContextMenuComands.WeitereBefehle: _ReadableText = "Weitere Befehle"; _Symbol = QuickImage.Get(enImageCode.Hierarchie); break;
                 default:
-                    Develop.DebugPrint(Comand);
+                    Develop.DebugPrint(comand);
                     _ReadableText = _Internal;
                     _Symbol = QuickImage.Get(enImageCode.Fragezeichen);
                     break;
             }
 
-            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben:" + Comand); }
+            if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben:" + comand); }
 
-            return Add(_Internal, _ReadableText, _Symbol, vEnabled);
+            return Add(_ReadableText, _Internal, _Symbol, enabled);
 
 
         }
@@ -958,7 +994,7 @@ namespace BlueControls.ItemCollection
 
                             if (this[capt] == null)
                             {
-                                Add(new TextListItem(capt, capt, null, true, true, enDataFormat.Text, capt + Constants.FirstSortChar));
+                                Add(new TextListItem(capt, capt, null, true, true, capt + Constants.FirstSortChar));
                             }
 
 
@@ -977,7 +1013,7 @@ namespace BlueControls.ItemCollection
         {
             foreach (int z1 in Enum.GetValues(type))
             {
-                if (this[z1.ToString()] == null) { Add(z1.ToString(), Enum.GetName(type, z1).Replace("_", " ")); }
+                if (this[z1.ToString()] == null) { Add(Enum.GetName(type, z1).Replace("_", " "), z1.ToString()); }
             }
 
             Sort();
@@ -1040,7 +1076,7 @@ namespace BlueControls.ItemCollection
             {
                 if (ColumnStyle.Format == enDataFormat.Link_To_Filesystem && Value.FileType() == enFileFormat.Image)
                 {
-                    return Add(Value, Value, ColumnStyle.BestFile(Value, false), ColumnStyle.Database.FileEncryptionKey);
+                    return Add(ColumnStyle.BestFile(Value, false), Value, Value, ColumnStyle.Database.FileEncryptionKey);
                 }
                 else
                 {
@@ -1117,7 +1153,7 @@ namespace BlueControls.ItemCollection
             for (var z = 0; z < vLayoutDatabase.Layouts.Count; z++)
             {
                 var p = new ItemCollectionPad(vLayoutDatabase.Layouts[z], string.Empty);
-                Add(p.ID, p.Caption, enImageCode.Stern);
+                Add(p.Caption, p.ID, enImageCode.Stern);
             }
 
             if (!vDoDiscLayouts) { return; }
@@ -1135,7 +1171,7 @@ namespace BlueControls.ItemCollection
 
                         if (ThisFile.FilePath() == vLayoutDatabase.DefaultLayoutPath()) { ThisFile.TrimStart(vLayoutDatabase.DefaultLayoutPath()); }
 
-                        if (this[ThisFile] == null) { Add(ThisFile, ThisFile.FileNameWithSuffix(), QuickImage.Get(ThisFile.FileType(), 16)); }
+                        if (this[ThisFile] == null) { Add(ThisFile.FileNameWithSuffix(), ThisFile, QuickImage.Get(ThisFile.FileType(), 16)); }
                     }
                 }
 

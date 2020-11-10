@@ -247,7 +247,7 @@ namespace BlueControls.Forms
 
             if (!ec.Translate) { Translate = false; }
 
-            if (ThisContextMenu.Count > 0 && UserMenu.Count > 0) { ThisContextMenu.Add(new LineListItem()); }
+            if (ThisContextMenu.Count > 0 && UserMenu.Count > 0) { ThisContextMenu.AddSeparator(); }
             if (UserMenu.Count > 0) { ThisContextMenu.AddRange(UserMenu); }
 
 
@@ -261,11 +261,11 @@ namespace BlueControls.Forms
 
                 if (par != null)
                 {
-                    ThisContextMenu.Add(new LineListItem());
+                    ThisContextMenu.AddSeparator();
                     ThisContextMenu.Add(enContextMenuComands.WeitereBefehle);
                 }
 
-                ThisContextMenu.Add(new LineListItem());
+                ThisContextMenu.AddSeparator();
                 ThisContextMenu.Add(enContextMenuComands.Abbruch);
 
                 var Infos = new List<object>

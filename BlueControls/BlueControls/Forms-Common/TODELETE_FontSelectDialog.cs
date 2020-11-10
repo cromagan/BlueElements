@@ -57,7 +57,7 @@ namespace BlueControls.Forms
                             try
                             {
                                 BlueFont.MeasureString("T", fo);
-                                FNList.Add(f.Name, "", BlueFont.Get(f, 12).NameInStyle(), true);
+                                FNList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
                             }
                             catch (Exception)
                             {

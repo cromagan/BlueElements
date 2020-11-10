@@ -182,7 +182,7 @@ namespace BlueControls.Controls
                                 show = show + " - " + x[1];
                             }
 
-                            var it = new TextListItem(x[0], show, null, false, true, enDataFormat.Text, NR.ToString(Constants.Format_Integer3));
+                            var it = new TextListItem(show, x[0], null, false, true, NR.ToString(Constants.Format_Integer3));
 
                             var t = new List<string>();
 

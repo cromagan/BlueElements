@@ -50,12 +50,12 @@ namespace BlueControls.Forms
             Copyright.Text = "(c) 2010-" + DateTime.Now.Year + " Christian Peter";
 
             btnDrucken.Item.Clear();
-            btnDrucken.Item.Add("erweitert", "Drucken bzw. Export", QuickImage.Get(enImageCode.Drucker, 28));
-            btnDrucken.Item.Add(new LineListItem());
-            btnDrucken.Item.Add("csv", "CSV-Format für Excel in die Zwischenablage", QuickImage.Get(enImageCode.Excel, 28));
-            btnDrucken.Item.Add("html", "HTML-Format für Internet-Seiten", QuickImage.Get(enImageCode.Globus, 28));
-            btnDrucken.Item.Add(new LineListItem());
-            btnDrucken.Item.Add("editor", "Layout-Editor öffnen", QuickImage.Get(enImageCode.Layout, 28));
+            btnDrucken.Item.Add("Drucken bzw. Export", "erweitert", QuickImage.Get(enImageCode.Drucker, 28));
+            btnDrucken.Item.AddSeparator();
+            btnDrucken.Item.Add("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(enImageCode.Excel, 28));
+            btnDrucken.Item.Add("HTML-Format für Internet-Seiten", "html", QuickImage.Get(enImageCode.Globus, 28));
+            btnDrucken.Item.AddSeparator();
+            btnDrucken.Item.Add("Layout-Editor öffnen", "editor", QuickImage.Get(enImageCode.Layout, 28));
 
 
             if (!adminTabVisible)
@@ -844,36 +844,36 @@ namespace BlueControls.Forms
                 e.UserMenu.Add(enContextMenuComands.SpaltenSortierungAZ, Column != null && Column.Format.CanBeChangedByRules());
                 e.UserMenu.Add(enContextMenuComands.SpaltenSortierungZA, Column != null && Column.Format.CanBeChangedByRules());
 
-                e.UserMenu.Add(new LineListItem());
+                e.UserMenu.AddSeparator();
 
 
                 e.UserMenu.Add("Zelle", true);
-                e.UserMenu.Add("ContentCopy", "Inhalt Kopieren", enImageCode.Kopieren, Column != null && Column.Format.CanBeChangedByRules());
-                e.UserMenu.Add("ContentPaste", "Inhalt Einfügen", enImageCode.Clipboard, Column != null && Column.Format.CanBeChangedByRules());
+                e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", enImageCode.Kopieren, Column != null && Column.Format.CanBeChangedByRules());
+                e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", enImageCode.Clipboard, Column != null && Column.Format.CanBeChangedByRules());
 
-                e.UserMenu.Add("ContentDelete", "Inhalt löschen", enImageCode.Radiergummi, Column != null && Column.Format.CanBeChangedByRules());
+                e.UserMenu.Add("Inhalt löschen", "ContentDelete", enImageCode.Radiergummi, Column != null && Column.Format.CanBeChangedByRules());
                 e.UserMenu.Add(enContextMenuComands.VorherigenInhaltWiederherstellen, Column != null && Column.Format.CanBeChangedByRules() && Column.ShowUndo);
 
                 e.UserMenu.Add(enContextMenuComands.SuchenUndErsetzen, Column != null && Column.Format.CanBeChangedByRules());
 
-                e.UserMenu.Add(new LineListItem());
+                e.UserMenu.AddSeparator();
 
                 e.UserMenu.Add("Spalte", true);
                 e.UserMenu.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten, Column != null);
 
-                e.UserMenu.Add("ColumnContentDelete", "Inhalte aller angezeigten Zellen dieser Spalte löschen", enImageCode.Radiergummi, Column != null && Column.Format.CanBeChangedByRules());
+                e.UserMenu.Add("Inhalte aller angezeigten Zellen dieser Spalte löschen", "ColumnContentDelete", enImageCode.Radiergummi, Column != null && Column.Format.CanBeChangedByRules());
 
                 e.UserMenu.Add("Summe", "Summe", enImageCode.Summe, Column != null);
 
 
-                e.UserMenu.Add(new LineListItem());
+                e.UserMenu.AddSeparator();
 
             }
             e.UserMenu.Add("Zeile", true);
             e.UserMenu.Add(enContextMenuComands.ZeileLöschen, Row != null);
 
 
-            e.UserMenu.Add("Fehlersuche", "Fehler anzeigen", enImageCode.Kritisch, Row != null);
+            e.UserMenu.Add("Fehler anzeigen", "Fehlersuche", enImageCode.Kritisch, Row != null);
 
 
         }

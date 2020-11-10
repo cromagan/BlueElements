@@ -565,15 +565,15 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
             var I = new ItemCollectionList();
-            I.Add(((int)enDatabaseDataType.ColumnArrangement).ToString(), "Anordnungen der Spaltenansichten");
-            I.Add(((int)enDatabaseDataType.Views).ToString(), "Formulare");
-            I.Add(((int)enDatabaseDataType.Rules).ToString(), "Regeln");
-            I.Add(((int)enDatabaseDataType.UndoInOne).ToString(), "Undo-Speicher");
-            I.Add(((int)enDatabaseDataType.AutoExport).ToString(), "Auto-Export");
-            I.Add(((int)enDatabaseDataType.BinaryDataInOne).ToString(), "Binäre Daten im Kopf der Datenbank");
-            I.Add(((int)enDatabaseDataType.Layouts).ToString(), "Eingebettete Layouts");
-            I.Add(((int)enDatabaseDataType.Tags).ToString(), "Tags des Datenbankkopfes");
-            I.Add(((int)enDatabaseDataType.SortDefinition).ToString(), "Standard-Sortierung");
+            I.Add("Anordnungen der Spaltenansichten", ((int)enDatabaseDataType.ColumnArrangement).ToString());
+            I.Add("Formulare", ((int)enDatabaseDataType.Views).ToString());
+            I.Add("Regeln", ((int)enDatabaseDataType.Rules).ToString());
+            I.Add("Undo-Speicher", ((int)enDatabaseDataType.UndoInOne).ToString());
+            I.Add("Auto-Export", ((int)enDatabaseDataType.AutoExport).ToString());
+            I.Add("Binäre Daten im Kopf der Datenbank", ((int)enDatabaseDataType.BinaryDataInOne).ToString());
+            I.Add("Eingebettete Layouts", ((int)enDatabaseDataType.Layouts).ToString());
+            I.Add("Tags des Datenbankkopfes", ((int)enDatabaseDataType.Tags).ToString());
+            I.Add("Standard-Sortierung", ((int)enDatabaseDataType.SortDefinition).ToString());
 
 
             I.Sort();

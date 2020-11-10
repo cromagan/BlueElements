@@ -944,7 +944,7 @@ namespace BlueControls.Controls
 
             if (_tmpColumn != null && _tmpColumn.Database.IsAdministrator())
             {
-                Items.Add("#ColumnEdit", "Spalte bearbeiten", QuickImage.Get(enImageCode.Spalte), _tmpColumn != null);
+                Items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(enImageCode.Spalte), _tmpColumn != null);
             }
 
 
@@ -959,7 +959,7 @@ namespace BlueControls.Controls
                 {
                     if (Items.Count > 0)
                     {
-                        Items.Add(new LineListItem());
+                        Items.AddSeparator();
                     }
 
                     Items.AddRange(x);

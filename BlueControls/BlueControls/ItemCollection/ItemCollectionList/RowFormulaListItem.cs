@@ -46,12 +46,6 @@ namespace BlueControls.ItemCollection
         #region  Construktor + Initialize 
 
 
-
-        public RowFormulaListItem(RowItem row) : this(row, string.Empty, string.Empty) { }
-
-        public RowFormulaListItem(RowItem row, string userDefCompareKey) : this(row, string.Empty, userDefCompareKey) { }
-
-
         public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey) : base(string.Empty)
         {
             _Row = row;
