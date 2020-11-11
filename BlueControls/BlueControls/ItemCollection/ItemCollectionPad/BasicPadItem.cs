@@ -209,10 +209,10 @@ namespace BlueControls.ItemCollection
         /// <remarks></remarks>
         public virtual bool Contains(PointF value, decimal zoomfactor)
         {
-            var tmp = UsedArea();
-            var ne = (int)(5 / zoomfactor);
-            tmp.Inflate(-ne, -ne);
-            return tmp.Contains(value.ToPointM());
+            var tmp = (RectangleF)UsedArea(); // Umwandlung, um den Bezug zur Klasse zu zerstören
+            var ne = (int)(-5 / zoomfactor);
+            tmp.Inflate(ne,ne);
+            return tmp.Contains(value);
         }
 
         protected abstract void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting);

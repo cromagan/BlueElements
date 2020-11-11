@@ -93,42 +93,36 @@ namespace BlueControls.ItemCollection
 
 
 
-        public string Bildschirmbereich_wählen
+        public void Bildschirmbereich_wählen()
         {
-            set
+            if (Bitmap != null)
             {
-                if (Bitmap != null)
-                {
-                    if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-                }
-
-                Bitmap = ScreenShot.GrabArea(null, 2000, 2000).Pic;
+                if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
+
+            Bitmap = ScreenShot.GrabArea(null, 2000, 2000).Pic;
         }
 
-        public string Datei_laden
+        public void Datei_laden()
         {
-            set
+            if (Bitmap != null)
             {
-                if (Bitmap != null)
-                {
-                    if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-                }
-
-                var e = new System.Windows.Forms.OpenFileDialog
-                {
-                    CheckFileExists = true,
-                    Multiselect = false,
-                    Title = "Bild wählen:",
-                    Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|BMP Windows Bitmap|*.bmp"
-                };
-
-                e.ShowDialog();
-
-                if (!FileExists(e.FileName)) { return; }
-
-                Bitmap = (Bitmap)BitmapExt.Image_FromFile(e.FileName);
+                if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
+
+            var e = new System.Windows.Forms.OpenFileDialog
+            {
+                CheckFileExists = true,
+                Multiselect = false,
+                Title = "Bild wählen:",
+                Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|BMP Windows Bitmap|*.bmp"
+            };
+
+            e.ShowDialog();
+
+            if (!FileExists(e.FileName)) { return; }
+
+            Bitmap = (Bitmap)BitmapExt.Image_FromFile(e.FileName);
         }
 
         #endregion

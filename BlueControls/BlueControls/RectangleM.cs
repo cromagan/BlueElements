@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BlueControls
 {
@@ -210,5 +211,10 @@ namespace BlueControls
 
 
         }
+
+
+        public static explicit operator RectangleF(RectangleM r) => new RectangleF((float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
+
+        public static explicit operator Rectangle(RectangleM r) => new Rectangle((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
     }
 }

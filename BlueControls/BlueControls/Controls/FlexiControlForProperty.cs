@@ -22,7 +22,7 @@ namespace BlueControls.Controls
     public class FlexiControlForProperty : FlexiControl
     {
 
-
+        private MethodInfo _methInfo;
         private PropertyInfo _propInfo;
         private object _propertyObject;
         private string _propertyName;
@@ -51,7 +51,7 @@ namespace BlueControls.Controls
 
         public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount) : this(propertyObject, propertyName, rowCount, null, enImageCode.None) { }
 
-        public FlexiControlForProperty(object propertyObject, string propertyName, enImageCode image) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
+        public FlexiControlForProperty(object propertyObject, string propertyName, enImageCode image) : this(propertyObject, propertyName, 1, null, image) { }
 
         public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
 
@@ -303,7 +303,7 @@ namespace BlueControls.Controls
                 base.DisabledReason = "Kein Feld-Name angegeben.";
                 return false;
             }
-            if (_propInfo == null)
+            if (_propInfo == null && _methInfo == null)
             {
                 base.DisabledReason = "Feld existiert im zugehörigen Objekt nicht.";
                 return false;
@@ -315,7 +315,7 @@ namespace BlueControls.Controls
             }
 
 
-            if (!_propInfo.CanWrite)
+            if (_propInfo != null && !_propInfo.CanWrite)
             {
                 base.DisabledReason = "Feld ist schreibgeschützt.";
                 return false;
@@ -342,18 +342,13 @@ namespace BlueControls.Controls
 
             if (string.IsNullOrEmpty(_propertyName) || _propertyObject == null)
             {
+                _methInfo = null;
                 _propInfo = null;
                 _propertynamecpl = string.Empty;
             }
             else
             {
                 _propertynamecpl = _propertyName;
-
-                //if (_addGroupboxText && Parent is GroupBox grp)
-                //{
-                //    _propertynamecpl = _propertynamecpl + "_" + grp.Text;
-                //}
-
 
                 _propertynamecpl = _propertynamecpl.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + "-/\\ _");
                 _propertynamecpl = _propertynamecpl.Replace("-", "_");
@@ -363,6 +358,7 @@ namespace BlueControls.Controls
                 _propertynamecpl = _propertynamecpl.Replace("__", "_");
 
                 _propInfo = _propertyObject.GetType().GetProperty(_propertynamecpl);
+                _methInfo = _propertyObject.GetType().GetMethod(_propertynamecpl);
 
             }
 
@@ -384,6 +380,23 @@ namespace BlueControls.Controls
             #endregion
 
             #region Art des Steuerelements bestimmen
+
+            if (withCreate && _methInfo != null)
+            {
+
+                EditType = enEditTypeFormula.Button;
+                CaptionPosition = enÜberschriftAnordnung.ohne;
+                var s = BlueFont.MeasureStringOfCaption(_Caption.TrimEnd(":"));
+                Size = new Size((int)s.Width + 50 + 22, 30);
+                var c = (Button)CreateSubControls();
+                c.Text = _Caption.TrimEnd(":");
+
+                if (image != enImageCode.None)
+                {
+                    c.ImageCode = QuickImage.Get(image, 22).ToString();
+                }
+            }
+
 
             if (withCreate && _propInfo != null)
             {
@@ -424,15 +437,15 @@ namespace BlueControls.Controls
                                 StyleComboBox(c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
 
                             }
-                            else if (image != enImageCode.None)
-                            {
-                                EditType = enEditTypeFormula.Button;
-                                CaptionPosition = enÜberschriftAnordnung.ohne;
-                                Size = new Size((int)BlueFont.MeasureStringOfCaption(_Caption).Width + 50, 30);
-                                var c = (Button)CreateSubControls();
-                                c.ImageCode = QuickImage.Get(image).ToString();
+                            //else if (image != enImageCode.None)
+                            //{
+                            //    EditType = enEditTypeFormula.Button;
+                            //    CaptionPosition = enÜberschriftAnordnung.ohne;
+                            //    Size = new Size((int)BlueFont.MeasureStringOfCaption(_Caption).Width + 50, 30);
+                            //    var c = (Button)CreateSubControls();
+                            //    c.ImageCode = QuickImage.Get(image).ToString();
 
-                            }
+                            //}
                             else
                             {
                                 _EditType = enEditTypeFormula.Textfeld;
@@ -483,7 +496,7 @@ namespace BlueControls.Controls
             // https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
             _FehlerWennLeer = true;
 
-            if (_propInfo == null)
+            if (_propInfo == null && _methInfo == null)
             {
                 QuickInfo = string.Empty;
             }
@@ -493,7 +506,11 @@ namespace BlueControls.Controls
                 var done = false;
 
 
-                var ca = _propInfo.GetCustomAttributes();
+                IEnumerable<Attribute> ca = null;
+
+                if (_propInfo != null) { ca = _propInfo.GetCustomAttributes(); }
+                if (_methInfo != null) { ca = _methInfo.GetCustomAttributes(); }
+
                 if (ca != null)
 
                 {
@@ -618,6 +635,19 @@ namespace BlueControls.Controls
             base.OnHandleDestroyed(e);
         }
 
+
+
+        protected override void OnButtonClicked()
+        {
+
+            base.OnButtonClicked();
+
+            if (_methInfo != null)
+            {
+                _methInfo.Invoke(_propertyObject, null);
+            }
+
+        }
 
 
         protected override void Dispose(bool disposing)
