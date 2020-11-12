@@ -463,7 +463,7 @@ namespace BlueBasics.MultiUserFile
 
             //OK, nun gehts rund: Zuerst das Backup löschen
             if (FileExists(Backupdateiname())) { DeleteFile(Backupdateiname(), true); }
-
+    
             //Haupt-Datei wird zum Backup umbenannt
             RenameFile(Filename, Backupdateiname(), true);
 
@@ -534,19 +534,18 @@ namespace BlueBasics.MultiUserFile
         private bool CreateBlockDatei()
         {
 
-            //var tBackup = Backupdateiname();
-            //var BlockDatei = Blockdateiname();
+
+            var Inhalt = (UserName() + "\r\n" + DateTime.UtcNow.ToString(Constants.Format_Date5));
 
             // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
             var done = false;
             try
             {
-
-
+                var bInhalt = Inhalt.ToByte();
+                //Nicht modAllgemein, wegen den strengen Datei-Rechten 
                 using (var x = new FileStream(Blockdateiname(), FileMode.Create, FileAccess.Write, FileShare.None))
                 {
-                    var tw = (UserName() + "\r\n" + DateTime.UtcNow.ToString(Constants.Format_Date5)).ToByte();
-                    x.Write(tw, 0, tw.Length);
+                    x.Write(bInhalt, 0, bInhalt.Length);
                     x.Flush();
                     x.Close();
                 }
@@ -575,6 +574,24 @@ namespace BlueBasics.MultiUserFile
                 return false;
             }
 
+
+
+            // Kontrolle, ob kein Netzwerkkonflikt vorliegt
+            Pause(1, false);
+            try
+            {
+                var Inhalt2 = modAllgemein.LoadFromDisk(Blockdateiname());
+                if (Inhalt != Inhalt2)
+                {
+                    Develop.DebugPrint("Block-Datei Konflikt 3\r\n" + Filename + "\r\nSoll: " + Inhalt  + "\r\n\r\nIst: " + Inhalt2);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Develop.DebugPrint(enFehlerArt.Warnung, ex);
+                return false;
+            }
             return true;
 
         }
