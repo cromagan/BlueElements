@@ -842,7 +842,7 @@ namespace BlueControls.ItemCollection
         #region CellLikeListItem
 
 
-        public CellLikeListItem Add(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool compact, bool enabled)
+        public CellLikeListItem Add(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, enImageNotFound compact, bool enabled)
         {
 
 
@@ -1048,7 +1048,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public void AddRange(List<string> Values, ColumnItem ColumnStyle, enShortenStyle Style, bool compact)
+        public void AddRange(List<string> Values, ColumnItem ColumnStyle, enShortenStyle Style, enImageNotFound compact)
         {
 
             if (Values == null) { return; }
@@ -1068,7 +1068,7 @@ namespace BlueControls.ItemCollection
 
         }
 
-        public BasicListItem Add(string Value, ColumnItem ColumnStyle, enShortenStyle Style, bool compact)
+        public BasicListItem Add(string Value, ColumnItem ColumnStyle, enShortenStyle Style, enImageNotFound compact)
         {
 
 
@@ -1361,7 +1361,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem checkedItemsAtRow, enShortenStyle style, int maxItems, bool compact)
+        public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem checkedItemsAtRow, enShortenStyle style, int maxItems, enImageNotFound compact)
         {
 
             var Marked = new List<string>();

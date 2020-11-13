@@ -47,7 +47,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxEinheit = new BlueControls.Controls.ComboBox();
             this.picCaptionImage = new BlueControls.Controls.EasyPic();
             this.Caption6 = new BlueControls.Controls.Caption();
-            this.btnKompakteAnzeige = new BlueControls.Controls.Button();
             this.cbxFormat = new BlueControls.Controls.ComboBox();
             this.Caption16 = new BlueControls.Controls.Caption();
             this.H_Colorx = new BlueControls.Controls.Button();
@@ -199,7 +198,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabDesign.Controls.Add(this.cbxEinheit);
             this.tabDesign.Controls.Add(this.picCaptionImage);
             this.tabDesign.Controls.Add(this.Caption6);
-            this.tabDesign.Controls.Add(this.btnKompakteAnzeige);
             this.tabDesign.Controls.Add(this.cbxFormat);
             this.tabDesign.Controls.Add(this.Caption16);
             this.tabDesign.Controls.Add(this.H_Colorx);
@@ -375,15 +373,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption6.Size = new System.Drawing.Size(152, 24);
             this.Caption6.Text = "Spaltenbild:";
             this.Caption6.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // btnKompakteAnzeige
-            // 
-            this.btnKompakteAnzeige.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
-            this.btnKompakteAnzeige.Location = new System.Drawing.Point(8, 176);
-            this.btnKompakteAnzeige.Name = "btnKompakteAnzeige";
-            this.btnKompakteAnzeige.Size = new System.Drawing.Size(296, 16);
-            this.btnKompakteAnzeige.TabIndex = 28;
-            this.btnKompakteAnzeige.Text = "Kompakte Anzeige verwenden";
             // 
             // cbxFormat
             // 
@@ -1659,7 +1648,6 @@ namespace BlueControls.BlueDatabaseDialogs
             private TextBox txbPrefix;
             private Caption caption7;
             private Button btnStandard;
-            private Button btnKompakteAnzeige;
             private TabPage tabSpezial;
             private GroupBox grpLinkToFileSystem;
             private GroupBox grpLinkedDatabase;

@@ -504,7 +504,7 @@ namespace BlueDatabase
             c.Regex.AddRange(Source.Regex);
 
 
-            c.CompactView = Source.CompactView;
+            //c.CompactView = Source.CompactView;
             c.ShowUndo = Source.ShowUndo;
             c.ShowMultiLineInOneLine = Source.ShowMultiLineInOneLine;
 
@@ -519,7 +519,7 @@ namespace BlueDatabase
 
             c.LinkedKeyKennung = Source.LinkedKeyKennung;
             c.LinkedDatabaseFile = Source.LinkedDatabaseFile;
-            c.BildCode_ImageNotFound = Source.BildCode_ImageNotFound;
+            c.BildTextVerhalten = Source.BildTextVerhalten;
             c.BildCode_ConstantHeight = Source.BildCode_ConstantHeight;
             c.BestFile_StandardSuffix = Source.BestFile_StandardSuffix;
             c.BestFile_StandardFolder = Source.BestFile_StandardFolder;

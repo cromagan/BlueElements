@@ -431,7 +431,7 @@ namespace BlueControls.Controls
             {
                 case ComboBox comboBox:
                     var Item2 = new ItemCollectionList();
-                    ItemCollectionList.GetItemCollection(Item2, column1, null, enShortenStyle.Replaced, 10000, false);
+                    ItemCollectionList.GetItemCollection(Item2, column1, null, enShortenStyle.Replaced, 10000, enImageNotFound.Bild_Wenn_möglich_und_Text);
 
                     if (column1.TextBearbeitungErlaubt)
                     {
@@ -771,7 +771,7 @@ namespace BlueControls.Controls
                             lbx.LastFilePath = f.FileNames[z].FilePath();
 
                             modConverter.ByteToFile(neu, b);
-                            lbx.Item.Add(neu.FileNameWithSuffix(), _tmpColumn, enShortenStyle.Replaced, _tmpColumn.CompactView);
+                            lbx.Item.Add(neu.FileNameWithSuffix(), _tmpColumn, enShortenStyle.Replaced, _tmpColumn.BildTextVerhalten);
 
                             DelList.Add(f.FileNames[z]);
                         }

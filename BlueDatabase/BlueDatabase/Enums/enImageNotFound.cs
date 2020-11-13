@@ -2,15 +2,20 @@
 {
     public enum enImageNotFound
     {
-        //AlwaysText = 0,
-        No_Image = 1,
-        Show_Error_QuestionMark = 2,
-        Show_Green_Checkmark = 3,
-        Show_Yellow_Circle = 4,
-        Show_Red_Cross = 5,
-        Show_Info_Sign = 6,
-        Show_Warning_Sign = 7,
-        Show_Critical_Sign = 8
+
+        Bild_Wenn_möglich_und_Text = 100,
+        Nur_Text = 120,
+        Nur_Bild = 120,
+        Bild_oder_Text = 130,
+
+        Fehlendes_Bild_zeige_Fragezeichen = 200,
+        Fehlendes_Bild_zeige_Häkchen = 300,
+        Fehlendes_Bild_zeige_Kreis = 400,
+        Fehlendes_Bild_zeige_Kreuz = 500,
+        Fehlendes_Bild_zeige_Infozeichen = 600,
+        Fehlendes_Bild_zeige_Warnung = 700,
+        Fehlendes_Bild_zeige_Kritischzeichen = 800,
+
 
     }
 }

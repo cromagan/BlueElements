@@ -34,13 +34,13 @@ namespace BlueDatabase
 
 
         /// <summary>
-        /// Fügt Präfix und Suffix hinzu und ersteztt den Text nach dem geünschten Stil.
+        /// Fügt Präfix und Suffix hinzu und ersteztt den Text nach dem gewünschten Stil.
         /// </summary>
         /// <param name="newTXT"></param>
         /// <param name="Column"></param>
         /// <param name="Style"></param>
         /// <returns></returns>
-        public static string ColumnReplace(string newTXT, ColumnItem Column, enShortenStyle Style, bool compactView)
+        public static string ColumnReplace(string newTXT, ColumnItem Column, enShortenStyle Style, enImageNotFound compactView)
         {
             if (!compactView && !string.IsNullOrEmpty(newTXT))
             {

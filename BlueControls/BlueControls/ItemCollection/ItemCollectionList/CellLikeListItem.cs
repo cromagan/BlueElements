@@ -45,7 +45,7 @@ namespace BlueControls.ItemCollection
 
         private readonly enShortenStyle _style;
 
-        private readonly bool _compact;
+        private readonly enImageNotFound _compact;
 
         public override string QuickInfo
         {
@@ -68,7 +68,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled, bool compact) : base(internalAndReadableText)
+        public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled, enImageNotFound compact) : base(internalAndReadableText)
         {
             _StyleLikeThis = columnStyle;
             _style = style;
@@ -118,8 +118,8 @@ namespace BlueControls.ItemCollection
         protected override string GetCompareKey()
         {
             // Die hauptklasse frägt nach diesem Kompare-Key
-            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
-            return DataFormat.CompareKey(txt, _StyleLikeThis.Format) + "|" + Internal;
+        //    var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
+            return DataFormat.CompareKey(Internal, _StyleLikeThis.Format) + "|" + Internal;
         }
 
 
@@ -137,7 +137,7 @@ namespace BlueControls.ItemCollection
         public override bool FilterMatch(string FilterText)
         {
             if (base.FilterMatch(FilterText)) { return true; }
-            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, false);
+            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, enImageNotFound.Bild_Wenn_möglich_und_Text);
             return txt.ToUpper().Contains(FilterText.ToUpper());
         }
 

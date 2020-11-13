@@ -76,7 +76,7 @@ namespace BlueDatabase
         //private bool _AutofilterTextFilterErlaubt;
         //private bool _AutoFilterErweitertErlaubt;
         private bool _IgnoreAtRowFilter;
-        private bool _CompactView;
+        //private bool _CompactView;
         private bool _ShowMultiLineInOneLine;
         private bool _DropdownBearbeitungErlaubt;
         private bool _DropdownAllesAbwählenErlaubt;
@@ -233,7 +233,7 @@ namespace BlueDatabase
 
             _SpellCheckingEnabled = false;
 
-            _CompactView = true;
+            //_CompactView = true;
             _ShowUndo = true;
             _ShowMultiLineInOneLine = false;
             _EditTrotzSperreErlaubt = false;
@@ -242,7 +242,7 @@ namespace BlueDatabase
 
             _LinkedKeyKennung = string.Empty;
             _LinkedDatabaseFile = string.Empty;
-            _BildCode_ImageNotFound = enImageNotFound.Show_Error_QuestionMark;
+            _BildCode_ImageNotFound = enImageNotFound.Bild_oder_Text;
             _BildCode_ConstantHeight = 0;
             _Prefix = string.Empty;
             _BestFile_StandardSuffix = string.Empty;
@@ -727,7 +727,7 @@ namespace BlueDatabase
             }
         }
 
-        public enImageNotFound BildCode_ImageNotFound
+        public enImageNotFound BildTextVerhalten
         {
             get
             {
@@ -1155,20 +1155,20 @@ namespace BlueDatabase
         }
 
 
-        public bool CompactView
-        {
-            get
-            {
-                return _CompactView;
-            }
-            set
-            {
-                if (_CompactView == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_CompactView, this, _CompactView.ToPlusMinus(), value.ToPlusMinus(), true);
-                Invalidate_ColumAndContent();
-                OnChanged();
-            }
-        }
+        //public bool CompactView
+        //{
+        //    get
+        //    {
+        //        return _CompactView;
+        //    }
+        //    set
+        //    {
+        //        if (_CompactView == value) { return; }
+        //        Database.AddPending(enDatabaseDataType.co_CompactView, this, _CompactView.ToPlusMinus(), value.ToPlusMinus(), true);
+        //        Invalidate_ColumAndContent();
+        //        OnChanged();
+        //    }
+        //}
 
         public bool ShowUndo
         {
@@ -1597,7 +1597,13 @@ namespace BlueDatabase
                     if (Wert.FromPlusMinus()) { _FilterOptions |= enFilterOptions.ExtendedFilterEnabled; }
                     break;
                 case enDatabaseDataType.co_BeiZeilenfilterIgnorieren: _IgnoreAtRowFilter = Wert.FromPlusMinus(); break;
-                case enDatabaseDataType.co_CompactView: _CompactView = Wert.FromPlusMinus(); break;
+
+                case enDatabaseDataType.co_CompactView_alt: 
+
+                    if (Wert.FromPlusMinus()) { _BildCode_ImageNotFound = enImageNotFound.Nur_Bild; }
+                    
+                    //_CompactView = Wert.FromPlusMinus(); 
+                    break;
                 case enDatabaseDataType.co_ShowUndo: _ShowUndo = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_ShowMultiLineInOneLine: _ShowMultiLineInOneLine = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_TextBearbeitungErlaubt: _TextBearbeitungErlaubt = Wert.FromPlusMinus(); break;
@@ -1610,22 +1616,6 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_AfterEdit_DoUcase: _AfterEdit_DoUCase = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_AfterEdit_AutoCorrect: _AfterEdit_AutoCorrect = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_SaveContent: _SaveContent = Wert.FromPlusMinus(); break;
-                //case enDatabaseDataType.co_AutoFilter_Dauerfilter:
-
-                //    if (Wert == "-")
-                //    {
-                //        _AutoFilter_Dauerfilter = enDauerfilter.ohne;
-                //    }
-                //    else if (Wert == "+")
-                //    {
-                //        _AutoFilter_Dauerfilter = enDauerfilter.waagerecht_senkrecht;
-                //    }
-                //    else
-                //    {
-                //        _AutoFilter_Dauerfilter = (enDauerfilter)int.Parse(Wert);
-                //    }
-
-                //    break;
                 case enDatabaseDataType.co_AutoRemove: _AutoRemove = Wert; break;
                 case enDatabaseDataType.co_AdminInfo: _AdminInfo = Wert; break;
                 case enDatabaseDataType.co_Suffix: _Suffix = Wert; break;
@@ -1635,7 +1625,10 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_BestFile_StandardFolder: _BestFile_StandardFolder = Wert; break;
                 case enDatabaseDataType.co_BildCode_ConstantHeight: _BildCode_ConstantHeight = int.Parse(Wert); break;
                 case enDatabaseDataType.co_Prefix: _Prefix = Wert; break;
-                case enDatabaseDataType.co_BildCode_ImageNotFound: _BildCode_ImageNotFound = (enImageNotFound)int.Parse(Wert); break;
+                case enDatabaseDataType.co_BildCode_ImageNotFound:
+                    var l = int.Parse(Wert);
+                    if (l < 100) { l *= 100; } // altes Format 
+                    _BildCode_ImageNotFound = (enImageNotFound)l; break;
                 case enDatabaseDataType.co_EditTrotzSperreErlaubt: _EditTrotzSperreErlaubt = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_CellInitValue: _CellInitValue = Wert; break;
                 case enDatabaseDataType.co_KeyColumnKey: _KeyColumnKey = int.Parse(Wert); break;
@@ -1938,7 +1931,7 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_BeiZeilenfilterIgnorieren, _IgnoreAtRowFilter.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_TextBearbeitungErlaubt, _TextBearbeitungErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_SpellCheckingEnabled, _SpellCheckingEnabled.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_CompactView, _CompactView.ToPlusMinus(), Key);
+          //  Database.SaveToByteList(l, enDatabaseDataType.co_CompactView, _CompactView.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_ShowMultiLineInOneLine, _ShowMultiLineInOneLine.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_ShowUndo, _ShowUndo.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_ForeColor, _ForeColor.ToArgb().ToString(), Key);

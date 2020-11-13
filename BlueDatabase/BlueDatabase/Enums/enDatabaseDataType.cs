@@ -141,7 +141,7 @@ namespace BlueDatabase.Enums
         // co_ÜberschriftAnordnung = 149
         // co_ÜberschriftErsatz = 150
         co_Identifier = 151,
-        co_CompactView = 152,
+        co_CompactView_alt = 152,
 
         co_ShowMultiLineInOneLine = 153,
         co_EditTrotzSperreErlaubt = 154,

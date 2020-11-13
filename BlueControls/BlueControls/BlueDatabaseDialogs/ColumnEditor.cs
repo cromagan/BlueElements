@@ -185,7 +185,6 @@ namespace BlueControls.BlueDatabaseDialogs
 
             txbPrefix.Text = _Column.Prefix;
 
-            btnKompakteAnzeige.Checked = _Column.CompactView;
             btnLogUndo.Checked = _Column.ShowUndo;
             btnSpellChecking.Checked = _Column.SpellCheckingEnabled;
             btnEinzeiligDarstellen.Checked = _Column.ShowMultiLineInOneLine;
@@ -219,7 +218,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             txbBildCodeConstHeight.Text = _Column.BildCode_ConstantHeight.ToString();
-            cbxBildCodeImageNotfound.Text = ((int)_Column.BildCode_ImageNotFound).ToString();
+            cbxBildCodeImageNotfound.Text = ((int)_Column.BildTextVerhalten).ToString();
             txbBestFileStandardFolder.Text = _Column.BestFile_StandardFolder;
             txbBestFileStandardSuffix.Text = _Column.BestFile_StandardSuffix;
             cbxLinkedDatabase.Text = _Column.LinkedDatabaseFile;
@@ -400,7 +399,6 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             _Column.ShowMultiLineInOneLine = btnEinzeiligDarstellen.Checked;
-            _Column.CompactView = btnKompakteAnzeige.Checked;
             _Column.ShowUndo = btnLogUndo.Checked;
             _Column.SpellCheckingEnabled = btnSpellChecking.Checked;
 
@@ -494,7 +492,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             int.TryParse(cbxBildCodeImageNotfound.Text, out var ImNF);
-            _Column.BildCode_ImageNotFound = (enImageNotFound)ImNF;
+            _Column.BildTextVerhalten = (enImageNotFound)ImNF;
 
             _Column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
             _Column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;

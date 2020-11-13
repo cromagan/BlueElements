@@ -100,19 +100,19 @@ namespace BlueDatabase
 
             if (!column.MultiLine)
             {
-                ret.Add(ValueReadable(column, Row.CellGetString(column), Style, column.CompactView));
+                ret.Add(ValueReadable(column, Row.CellGetString(column), Style, column.BildTextVerhalten));
                 return ret;
             }
 
             var x = Row.CellGetList(column);
             foreach (var thisstring in x)
             {
-                ret.Add(ValueReadable(column, thisstring, Style, column.CompactView));
+                ret.Add(ValueReadable(column, thisstring, Style, column.BildTextVerhalten));
             }
 
             if (x.Count == 0)
             {
-                var tmp = ValueReadable(column, string.Empty, Style, column.CompactView);
+                var tmp = ValueReadable(column, string.Empty, Style, column.BildTextVerhalten);
                 if (!string.IsNullOrEmpty(tmp)) { ret.Add(tmp); }
             }
 
@@ -129,8 +129,10 @@ namespace BlueDatabase
         /// <param name="Txt"></param>
         /// <param name="Style"></param>
         /// <returns></returns>
-        public static string ValueReadable(ColumnItem column, string Txt, enShortenStyle Style, bool CompactView)
+        public static string ValueReadable(ColumnItem column, string Txt, enShortenStyle Style, enImageNotFound CompactView)
         {
+
+            CompactPossible
 
             switch (column.Format)
             {
@@ -238,8 +240,35 @@ namespace BlueDatabase
 
 
 
-        public static QuickImage StandardImage(ColumnItem column, string Txt)
+        public static QuickImage StandardImage(ColumnItem column, string originalText, string replacedText, enShortenStyle style, enImageNotFound compact)
         {
+
+
+            ddd
+                CompactPossible
+
+            //if (column.Format == enDataFormat.BildCode)
+            //{
+            //    if (style == enShortenStyle.Replaced && !compact)
+            //    {
+            //        tmpImageCode = CellItem.StandardImage(column, tmpText);
+            //    }
+            //    else
+            //    {
+            //        var tmpText2 = CellItem.ValueReadable(column, originalText, enShortenStyle.Replaced, enImageNotFound.Bild_Wenn_möglich_und_Text);
+            //        tmpImageCode = CellItem.StandardImage(column, tmpText2);
+            //    }
+            //}
+            //else
+            //{
+            //    tmpImageCode = CellItem.StandardImage(column, originalText);
+            //}
+
+
+
+
+
+
 
             switch (column.Format)
             {
@@ -249,27 +278,25 @@ namespace BlueDatabase
                     return null; // z.B. KontextMenu
 
                 case enDataFormat.Bit:
-                    if (Txt == true.ToPlusMinus())
+                    if (originalText == true.ToPlusMinus())
                     {
-                        if (column == column.Database.Column.SysCorrect) { return QuickImage.Get("Häkchen|16||||||||80"); }
-                        //if (column == column.Database.Column.SysLocked) { return QuickImage.Get(enImageCode.Schloss, 16,"00AA00",string.Empty); }
+                        if (column == column.Database.Column.SysCorrect) { return QuickImage.Get("Häkchen|16||||||||80"); }       
                         return QuickImage.Get(enImageCode.Häkchen, 16);
                     }
-                    else if (Txt == false.ToPlusMinus())
+                    else if (originalText == false.ToPlusMinus())
                     {
                         if (column == column.Database.Column.SysCorrect) { return QuickImage.Get(enImageCode.Warnung, 16); }
-                        //if (column == column.Database.Column.SysLocked) { return QuickImage.Get(enImageCode.Schlüssel, 16, "FFBB00", string.Empty); }
                         return QuickImage.Get(enImageCode.Kreuz, 16);
                     }
-                    else if (Txt == "o" || Txt == "O")
+                    else if (originalText == "o" || originalText == "O")
                     {
                         return QuickImage.Get(enImageCode.Kreis2, 16);
                     }
-                    else if (Txt == "?")
+                    else if (originalText == "?")
                     {
                         return QuickImage.Get(enImageCode.Fragezeichen, 16);
                     }
-                    else if (string.IsNullOrEmpty(Txt))
+                    else if (string.IsNullOrEmpty(originalText))
                     {
                         return null;
                     }
@@ -280,15 +307,15 @@ namespace BlueDatabase
 
                 case enDataFormat.Button:
                     if (column == null) { return null; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
-                    if (string.IsNullOrEmpty(Txt)) { return null; }
+                    if (string.IsNullOrEmpty(originalText)) { return null; }
                     return  QuickImage.Get("Stern|16");
 
 
                 case enDataFormat.BildCode:
                     if (column == null) { return null; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
-                    if (string.IsNullOrEmpty(Txt)) { return null; }
+                    if (string.IsNullOrEmpty(originalText)) { return null; }
 
-                    var code = column.Prefix + Txt + column.Suffix;
+                    var code = column.Prefix + originalText + column.Suffix;
                     if (column.BildCode_ConstantHeight > 0) { code = code + "|" + column.BildCode_ConstantHeight; }
                     var defaultImage = QuickImage.Get(code);
 
@@ -299,22 +326,22 @@ namespace BlueDatabase
                     var gr = 16;
 
                     if (column.BildCode_ConstantHeight > 0) { gr = column.BildCode_ConstantHeight; }
-                    switch (column.BildCode_ImageNotFound)
+                    switch (column.BildTextVerhalten)
                     {
-                        case enImageNotFound.Show_Error_QuestionMark:
+                        case enImageNotFound.Fehlendes_Bild_zeige_Fragezeichen:
                             return QuickImage.Get("Fragezeichen|" + gr + "|||||200|||80");
-                        case enImageNotFound.Show_Yellow_Circle:
+                        case enImageNotFound.Fehlendes_Bild_zeige_Kreis:
                             return QuickImage.Get("Kreis2|" + gr);
-                        case enImageNotFound.Show_Red_Cross:
+                        case enImageNotFound.Fehlendes_Bild_zeige_Kreuz:
                             return QuickImage.Get("Kreuz|" + gr);
-                        case enImageNotFound.Show_Green_Checkmark:
+                        case enImageNotFound.Fehlendes_Bild_zeige_Häkchen:
                             return QuickImage.Get("Häkchen|" + gr);
 
-                        case enImageNotFound.Show_Info_Sign:
+                        case enImageNotFound.Fehlendes_Bild_zeige_Infozeichen:
                             return QuickImage.Get("Information|" + gr);
-                        case enImageNotFound.Show_Warning_Sign:
+                        case enImageNotFound.Fehlendes_Bild_zeige_Warnung:
                             return QuickImage.Get("Warnung|" + gr);
-                        case enImageNotFound.Show_Critical_Sign:
+                        case enImageNotFound.Fehlendes_Bild_zeige_Kritischzeichen:
                             return QuickImage.Get("Kritisch|" + gr);
 
                         default:
@@ -326,9 +353,9 @@ namespace BlueDatabase
 
                 case enDataFormat.FarbeInteger:
 
-                    if (!string.IsNullOrEmpty(Txt) && Txt.IsFormat(enDataFormat.FarbeInteger))
+                    if (!string.IsNullOrEmpty(originalText) && originalText.IsFormat(enDataFormat.FarbeInteger))
                     {
-                        var col = Color.FromArgb(int.Parse(Txt));
+                        var col = Color.FromArgb(int.Parse(originalText));
                         return QuickImage.Get(enImageCode.Kreis, 16, "", col.ToHTMLCode());
                     }
                     return null;
@@ -342,8 +369,8 @@ namespace BlueDatabase
 
 
                 case enDataFormat.Link_To_Filesystem:
-                    if (Txt.FileType() == enFileFormat.Unknown) { return null; }
-                    return QuickImage.Get(Txt.FileType(), 48);
+                    if (originalText.FileType() == enFileFormat.Unknown) { return null; }
+                    return QuickImage.Get(originalText.FileType(), 48);
 
                 case enDataFormat.Schrift:
                     //  Develop.DebugPrint_NichtImplementiert();
@@ -368,9 +395,9 @@ namespace BlueDatabase
 
 
 
-        public static enAlignment StandardAlignment(ColumnItem column, bool compact)
+        public static enAlignment StandardAlignment(ColumnItem column, enImageNotFound compact)
         {
-
+            CompactPossible
 
             switch (column.Align)
             {
