@@ -91,7 +91,7 @@ namespace BlueDatabase
 
         private string _LinkedKeyKennung;
         private string _LinkedDatabaseFile;
-        private enImageNotFound _BildCode_ImageNotFound;
+        private enImageNotFound _BildTextVerhalten;
         private int _BildCode_ConstantHeight;
 
         private string _Prefix;
@@ -242,7 +242,7 @@ namespace BlueDatabase
 
             _LinkedKeyKennung = string.Empty;
             _LinkedDatabaseFile = string.Empty;
-            _BildCode_ImageNotFound = enImageNotFound.Bild_oder_Text;
+            _BildTextVerhalten = enImageNotFound.Nur_Text;
             _BildCode_ConstantHeight = 0;
             _Prefix = string.Empty;
             _BestFile_StandardSuffix = string.Empty;
@@ -731,12 +731,12 @@ namespace BlueDatabase
         {
             get
             {
-                return _BildCode_ImageNotFound;
+                return _BildTextVerhalten;
             }
             set
             {
-                if (_BildCode_ImageNotFound == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_BildCode_ImageNotFound, this, ((int)_BildCode_ImageNotFound).ToString(), ((int)value).ToString(), true);
+                if (_BildTextVerhalten == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_BildTextVerhalten, this, ((int)_BildTextVerhalten).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -1598,10 +1598,10 @@ namespace BlueDatabase
                     break;
                 case enDatabaseDataType.co_BeiZeilenfilterIgnorieren: _IgnoreAtRowFilter = Wert.FromPlusMinus(); break;
 
-                case enDatabaseDataType.co_CompactView_alt: 
+                case enDatabaseDataType.co_CompactView_alt:
 
-                    if (Wert.FromPlusMinus()) { _BildCode_ImageNotFound = enImageNotFound.Nur_Bild; }
-                    
+                    //if (Wert.FromPlusMinus()) { _BildTextVerhalten = enImageNotFound.Nur_Bild; }
+
                     //_CompactView = Wert.FromPlusMinus(); 
                     break;
                 case enDatabaseDataType.co_ShowUndo: _ShowUndo = Wert.FromPlusMinus(); break;
@@ -1625,10 +1625,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_BestFile_StandardFolder: _BestFile_StandardFolder = Wert; break;
                 case enDatabaseDataType.co_BildCode_ConstantHeight: _BildCode_ConstantHeight = int.Parse(Wert); break;
                 case enDatabaseDataType.co_Prefix: _Prefix = Wert; break;
-                case enDatabaseDataType.co_BildCode_ImageNotFound:
-                    var l = int.Parse(Wert);
-                    if (l < 100) { l *= 100; } // altes Format 
-                    _BildCode_ImageNotFound = (enImageNotFound)l; break;
+                case enDatabaseDataType.co_BildTextVerhalten: _BildTextVerhalten = (enImageNotFound)int.Parse(Wert); break;
                 case enDatabaseDataType.co_EditTrotzSperreErlaubt: _EditTrotzSperreErlaubt = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_CellInitValue: _CellInitValue = Wert; break;
                 case enDatabaseDataType.co_KeyColumnKey: _KeyColumnKey = int.Parse(Wert); break;
@@ -1931,7 +1928,7 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_BeiZeilenfilterIgnorieren, _IgnoreAtRowFilter.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_TextBearbeitungErlaubt, _TextBearbeitungErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_SpellCheckingEnabled, _SpellCheckingEnabled.ToPlusMinus(), Key);
-          //  Database.SaveToByteList(l, enDatabaseDataType.co_CompactView, _CompactView.ToPlusMinus(), Key);
+            //  Database.SaveToByteList(l, enDatabaseDataType.co_CompactView, _CompactView.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_ShowMultiLineInOneLine, _ShowMultiLineInOneLine.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_ShowUndo, _ShowUndo.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_ForeColor, _ForeColor.ToArgb().ToString(), Key);
@@ -1960,7 +1957,7 @@ namespace BlueDatabase
             Database.SaveToByteList(l, enDatabaseDataType.co_BestFile_StandardFolder, _BestFile_StandardFolder, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BestFile_StandardSuffix, _BestFile_StandardSuffix, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ConstantHeight, _BildCode_ConstantHeight.ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ImageNotFound, ((int)_BildCode_ImageNotFound).ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_BildTextVerhalten, ((int)_BildTextVerhalten).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Prefix, _Prefix, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_KeyColumnKey, _KeyColumnKey.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_RowKey, _LinkedCell_RowKey.ToString(), Key);
@@ -2420,7 +2417,27 @@ namespace BlueDatabase
 
 
 
+            if (_BildTextVerhalten != enImageNotFound.Nur_Text)
+            {
 
+                if (_Format == enDataFormat.Datum_und_Uhrzeit ||
+                    _Format == enDataFormat.Ganzzahl ||
+                    _Format == enDataFormat.Gleitkommazahl ||
+                    _Format == enDataFormat.Text ||
+                    _Format == enDataFormat.Text_mit_Formatierung)
+                {
+                    // Performance-Teschnische Gründe
+                    _BildTextVerhalten = enImageNotFound.Nur_Text;
+                    //return "Bei diesem Format muss das Bild/Text-Verhalten 'Nur Text' sein.";
+                }
+            }
+            else
+            {
+                if (_Format == enDataFormat.BildCode || _Format == enDataFormat.FarbeInteger)
+                {
+                    return "Bei diesem Format darf das Bild/Text-Verhalten nicht 'Nur Text' sein.";
+                }
+            }
 
 
 

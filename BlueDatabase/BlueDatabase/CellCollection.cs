@@ -892,7 +892,7 @@ namespace BlueDatabase
 
                 }
                 if (_String is null) { _String = string.Empty; }
-                if (Typ.HasFlag(enFilterType.Instr)) { _String = LanguageTool.ColumnReplace(_String, fColumn, enShortenStyle.Both, enImageNotFound.Bild_Wenn_möglich_und_Text); }
+                if (Typ.HasFlag(enFilterType.Instr)) { _String = LanguageTool.ColumnReplace(_String, fColumn, enShortenStyle.Both, enImageNotFound.Nur_Text); }
 
 
 
@@ -908,7 +908,7 @@ namespace BlueDatabase
                     TMPMultiLine = false;
                     Typ ^= enFilterType.MultiRowIgnorieren;
                 }
-                if (TMPMultiLine && !_String.Contains("\r")) { TMPMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multinline behandel werden.
+                if (TMPMultiLine && !_String.Contains("\r")) { TMPMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multiline behandel werden.
 
 
 

@@ -86,7 +86,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             if (List_FilterString.Count < 400)
             {
-                lsbFilterItems.Item.AddRange(List_FilterString, Column, enShortenStyle.Replaced, false);
+                lsbFilterItems.Item.AddRange(List_FilterString, Column, enShortenStyle.Replaced, Column.BildTextVerhalten);
                 lsbFilterItems.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
             }
             else
@@ -130,7 +130,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 }
 
 
-                var tmp = CellItem.ValueReadable(Column, string.Empty, enShortenStyle.Replaced, false);
+                var tmp = CellItem.ValueReadable(Column, string.Empty, enShortenStyle.Replaced, enImageNotFound.Nur_Text);
 
 
                 if (string.IsNullOrEmpty(tmp))

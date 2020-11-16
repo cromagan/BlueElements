@@ -1106,7 +1106,7 @@ namespace BlueControls.Controls
 
             if (Column.DropdownBearbeitungErlaubt)
             {
-                ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000, enImageNotFound.Bild_Wenn_möglich_und_Text);
+                ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000);
 
                 if (!Column.DropdownWerteAndererZellenAnzeigen)
                 {

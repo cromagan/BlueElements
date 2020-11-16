@@ -73,7 +73,7 @@ namespace BlueControls.BlueDatabaseDialogs
                                     {
                                         var dummy = new ItemCollectionList();
 
-                                        ItemCollectionList.GetItemCollection(dummy, ThisColumn, Row, enShortenStyle.Replaced, 1000, false);
+                                        ItemCollectionList.GetItemCollection(dummy, ThisColumn, Row, enShortenStyle.Replaced, 1000);
                                         if (dummy.Count > 0)
                                         {
 

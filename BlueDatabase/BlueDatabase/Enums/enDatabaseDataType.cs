@@ -163,7 +163,7 @@ namespace BlueDatabase.Enums
         co_BestFile_StandardSuffix = 168,
         co_BestFile_StandardFolder = 169,
         co_BildCode_ConstantHeight = 170,
-        co_BildCode_ImageNotFound = 171,
+        co_BildTextVerhalten = 171,
         //co_FontScale = 172,
         co_OpticalReplace = 173,
         co_Ueberschrift1 = 174,

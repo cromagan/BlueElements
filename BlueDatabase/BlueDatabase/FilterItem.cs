@@ -265,13 +265,13 @@ namespace BlueDatabase
                 case enFilterType.Istgleich_GroßKleinEgal:
                 case enFilterType.Istgleich_ODER_GroßKleinEgal:
                 case enFilterType.Istgleich_UND_GroßKleinEgal:
-                    return nam + " = " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced, enImageNotFound.Bild_Wenn_möglich_und_Text);
+                    return nam + " = " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced, enImageNotFound.Nur_Text);
 
                 case enFilterType.Ungleich_MultiRowIgnorieren:
                 case enFilterType.Ungleich_MultiRowIgnorieren_UND_GroßKleinEgal:
                 case enFilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal:
                     if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss befüllt sein"; }
-                    return nam + " <> " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced, enImageNotFound.Bild_Wenn_möglich_und_Text);
+                    return nam + " <> " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced, enImageNotFound.Nur_Text);
 
 
                 case enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren:

@@ -1361,7 +1361,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem checkedItemsAtRow, enShortenStyle style, int maxItems, enImageNotFound compact)
+        public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem checkedItemsAtRow, enShortenStyle style, int maxItems)
         {
 
             var Marked = new List<string>();
@@ -1452,7 +1452,7 @@ namespace BlueControls.ItemCollection
 
             if (maxItems > 0 && l.Count > maxItems) { return; }
 
-            e.AddRange(l, column, style, compact);
+            e.AddRange(l, column, style, column.BildTextVerhalten);
 
 
             if (checkedItemsAtRow != null)

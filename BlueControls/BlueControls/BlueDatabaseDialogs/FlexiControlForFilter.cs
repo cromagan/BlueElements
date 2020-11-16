@@ -252,7 +252,7 @@ namespace BlueControls.Controls
 
             else if (List_FilterString.Count < 400)
             {
-                cbx.Item.AddRange(List_FilterString, Filter.Column, enShortenStyle.Replaced, false);
+                cbx.Item.AddRange(List_FilterString, Filter.Column, enShortenStyle.Replaced, Filter.Column.BildTextVerhalten);
                 cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
             }
             else

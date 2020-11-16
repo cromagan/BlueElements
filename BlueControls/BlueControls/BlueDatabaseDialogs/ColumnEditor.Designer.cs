@@ -180,8 +180,10 @@ namespace BlueControls.BlueDatabaseDialogs
             // tabDesign
             // 
             this.tabDesign.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabDesign.Controls.Add(this.cbxBildCodeImageNotfound);
             this.tabDesign.Controls.Add(this.cbxAlign);
             this.tabDesign.Controls.Add(this.txbReplacer);
+            this.tabDesign.Controls.Add(this.capBildCodeImageNotfound);
             this.tabDesign.Controls.Add(this.btnStandard);
             this.tabDesign.Controls.Add(this.capAlign);
             this.tabDesign.Controls.Add(this.txbPrefix);
@@ -460,8 +462,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.grpBildCode.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpBildCode.CausesValidation = false;
-            this.grpBildCode.Controls.Add(this.cbxBildCodeImageNotfound);
-            this.grpBildCode.Controls.Add(this.capBildCodeImageNotfound);
             this.grpBildCode.Controls.Add(this.capBildCodeConstHeight);
             this.grpBildCode.Controls.Add(this.txbBildCodeConstHeight);
             this.grpBildCode.Location = new System.Drawing.Point(456, 8);
@@ -475,18 +475,18 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.cbxBildCodeImageNotfound.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxBildCodeImageNotfound.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxBildCodeImageNotfound.Location = new System.Drawing.Point(200, 40);
+            this.cbxBildCodeImageNotfound.Location = new System.Drawing.Point(144, 176);
             this.cbxBildCodeImageNotfound.Name = "cbxBildCodeImageNotfound";
-            this.cbxBildCodeImageNotfound.Size = new System.Drawing.Size(232, 24);
+            this.cbxBildCodeImageNotfound.Size = new System.Drawing.Size(368, 24);
             this.cbxBildCodeImageNotfound.TabIndex = 34;
             // 
             // capBildCodeImageNotfound
             // 
             this.capBildCodeImageNotfound.CausesValidation = false;
-            this.capBildCodeImageNotfound.Location = new System.Drawing.Point(8, 40);
+            this.capBildCodeImageNotfound.Location = new System.Drawing.Point(8, 176);
             this.capBildCodeImageNotfound.Name = "capBildCodeImageNotfound";
-            this.capBildCodeImageNotfound.Size = new System.Drawing.Size(184, 16);
-            this.capBildCodeImageNotfound.Text = "Verhalten bei Fehler-Bildern:";
+            this.capBildCodeImageNotfound.Size = new System.Drawing.Size(136, 16);
+            this.capBildCodeImageNotfound.Text = "Bild/Text-Verhalten:";
             // 
             // capBildCodeConstHeight
             // 

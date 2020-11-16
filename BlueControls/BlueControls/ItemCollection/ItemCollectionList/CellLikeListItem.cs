@@ -137,7 +137,7 @@ namespace BlueControls.ItemCollection
         public override bool FilterMatch(string FilterText)
         {
             if (base.FilterMatch(FilterText)) { return true; }
-            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, enImageNotFound.Bild_Wenn_möglich_und_Text);
+            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, _StyleLikeThis.BildTextVerhalten);
             return txt.ToUpper().Contains(FilterText.ToUpper());
         }
 

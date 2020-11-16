@@ -431,7 +431,7 @@ namespace BlueControls.Controls
             {
                 case ComboBox comboBox:
                     var Item2 = new ItemCollectionList();
-                    ItemCollectionList.GetItemCollection(Item2, column1, null, enShortenStyle.Replaced, 10000, enImageNotFound.Bild_Wenn_möglich_und_Text);
+                    ItemCollectionList.GetItemCollection(Item2, column1, null, enShortenStyle.Replaced, 10000);
 
                     if (column1.TextBearbeitungErlaubt)
                     {

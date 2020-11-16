@@ -621,10 +621,6 @@ namespace BlueControls.BlueDatabaseDialogs
             btnMultiline.Enabled = tmpFormat.MultilinePossible();
             if (!tmpFormat.MultilinePossible()) { btnMultiline.Checked = false; }
 
-            // Kompakt
-            btnKompakteAnzeige.Enabled = tmpFormat.CompactPossible();
-            if (!tmpFormat.CompactPossible()) { btnKompakteAnzeige.Checked = false; }
-
             // Rechtschreibprüfung
             btnSpellChecking.Enabled = tmpFormat.SpellCheckingPossible();
             if (!tmpFormat.SpellCheckingPossible()) { btnSpellChecking.Checked = false; }

@@ -34,45 +34,45 @@ namespace BlueDatabase
 
 
         /// <summary>
-        /// Fügt Präfix und Suffix hinzu und ersteztt den Text nach dem gewünschten Stil.
+        /// Fügt Präfix und Suffix hinzu und ersetzt den Text nach dem gewünschten Stil.
         /// </summary>
-        /// <param name="newTXT"></param>
-        /// <param name="Column"></param>
-        /// <param name="Style"></param>
+        /// <param name="txt"></param>
+        /// <param name="column"></param>
+        /// <param name="style"></param>
         /// <returns></returns>
-        public static string ColumnReplace(string newTXT, ColumnItem Column, enShortenStyle Style, enImageNotFound compactView)
+        public static string ColumnReplace(string txt, ColumnItem column, enShortenStyle style, enImageNotFound compactView)
         {
-            if (!compactView && !string.IsNullOrEmpty(newTXT))
+            if (!string.IsNullOrEmpty(txt))
             {
-                if (!string.IsNullOrEmpty(Column.Prefix)) { newTXT = DoTranslate(Column.Prefix, true) + " " + newTXT; }
-                if (!string.IsNullOrEmpty(Column.Suffix)) { newTXT = newTXT + " " + DoTranslate(Column.Suffix, true); }
+                if (!string.IsNullOrEmpty(column.Prefix)) { txt = DoTranslate(column.Prefix, true) + " " + txt; }
+                if (!string.IsNullOrEmpty(column.Suffix)) { txt = txt + " " + DoTranslate(column.Suffix, true); }
             }
 
-            if (Translation != null) { return ColumnReplaceTranslated(newTXT, Column); }
+            if (Translation != null) { return ColumnReplaceTranslated(txt, column); }
 
-            if (Style == enShortenStyle.Unreplaced || Column.OpticalReplace.Count == 0) { return newTXT; }
+            if (style == enShortenStyle.Unreplaced || column.OpticalReplace.Count == 0) { return txt; }
 
-            var OT = newTXT;
+            var OT = txt;
 
-            foreach (var ThisString in Column.OpticalReplace)
+            foreach (var ThisString in column.OpticalReplace)
             {
                 var x = ThisString.SplitBy("|");
                 if (x.Length == 2)
                 {
                     if (string.IsNullOrEmpty(x[0]))
                     {
-                        if (string.IsNullOrEmpty(newTXT)) { newTXT = x[1]; }
+                        if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
                     }
                     else
                     {
-                        newTXT = newTXT.Replace(x[0], x[1]);
+                        txt = txt.Replace(x[0], x[1]);
                     }
                 }
-                if (x.Length == 1 && !ThisString.StartsWith("|")) { newTXT = newTXT.Replace(x[0], string.Empty); }
+                if (x.Length == 1 && !ThisString.StartsWith("|")) { txt = txt.Replace(x[0], string.Empty); }
             }
 
-            if (Style == enShortenStyle.Replaced || Style == enShortenStyle.HTML || OT == newTXT) { return newTXT; }
-            return OT + " (" + newTXT + ")";
+            if (style == enShortenStyle.Replaced || style == enShortenStyle.HTML || OT == txt) { return txt; }
+            return OT + " (" + txt + ")";
         }
 
         private static string ColumnReplaceTranslated(string newTXT, ColumnItem column)

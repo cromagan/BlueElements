@@ -1786,7 +1786,7 @@ namespace BlueControls.Controls
 
             if (Box is ComboBox box)
             {
-                ItemCollectionList.GetItemCollection(box.Item, ContentHolderCellColumn, ContentHolderCellRow, enShortenStyle.Both, 1000, enImageNotFound.Bild_Wenn_möglich_und_Text);
+                ItemCollectionList.GetItemCollection(box.Item, ContentHolderCellColumn, ContentHolderCellRow, enShortenStyle.Both, 1000);
                 if (box.Item.Count == 0)
                 {
                     return Cell_Edit_TextBox(cellInThisDatabaseColumn, cellInThisDatabaseRow, ContentHolderCellColumn, ContentHolderCellRow, BTB, 0, 0);
@@ -1831,7 +1831,7 @@ namespace BlueControls.Controls
             {
                 Appearance = enBlueListBoxAppearance.DropdownSelectbox
             };
-            ItemCollectionList.GetItemCollection(t, ContentHolderCellColumn, ContentHolderCellRow, enShortenStyle.Both, 1000, enImageNotFound.Bild_Wenn_möglich_und_Text);
+            ItemCollectionList.GetItemCollection(t, ContentHolderCellColumn, ContentHolderCellRow, enShortenStyle.Both, 1000);
 
             if (t.Count == 0)
             {
@@ -4510,17 +4510,17 @@ namespace BlueControls.Controls
         private static void Draw_FormatedText(Graphics gr, ColumnItem column, string originalText, Rectangle fitInRect, bool deleteBack, BlueFont font, enShortenStyle style, enStates state, enImageNotFound compact)
         {
 
-            var tmpText = CellItem.ValueReadable(column, originalText, style, compact);
-            var tmpAlign = CellItem.StandardAlignment(column, compact);
-            var tmpImageCode = CellItem.StandardImage(column, originalText, tmpText, style, compact);
+            //var tmpText = CellItem.ValueReadable(column, originalText, style, compact);
+            //var tmpAlign = CellItem.StandardAlignment(column, compact);
+            //var tmpImageCode = CellItem.StandardImage(column, originalText, tmpText, style, compact);
+
+            var tmpData = CellItem.GetDrawingData(column, originalText, style, compact);
+            var tmpImageCode = tmpData.Item3;
+
+            if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
 
 
-            if (tmpImageCode != null)
-            {
-                tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state));
-            }
-
-            Skin.Draw_FormatedText(gr, tmpText, tmpImageCode, tmpAlign, fitInRect, null, deleteBack, font, false);
+            Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, tmpData.Item2, fitInRect, null, deleteBack, font, false);
         }
 
 
@@ -4544,10 +4544,12 @@ namespace BlueControls.Controls
 
         public static Size FormatedText_NeededSize(ColumnItem column, string originalText, BlueFont font, enShortenStyle style, int minSize, enImageNotFound compact)
         {
-            var tmpText = CellItem.ValueReadable(column, originalText, style, compact);
-            var tmpImageCode = CellItem.StandardImage(column, tmpText, originalText, style, compact);
+            //var tmpText = CellItem.ValueReadable(column, originalText, style, compact);
+            //var tmpImageCode = CellItem.StandardImage(column, tmpText, originalText, style, compact);
 
-            return Skin.FormatedText_NeededSize(tmpText, tmpImageCode, font, minSize);
+            var tmpData = CellItem.GetDrawingData(column, originalText, style, compact);
+
+            return Skin.FormatedText_NeededSize(tmpData.Item1, tmpData.Item3, font, minSize);
         }
 
         public override string QuickInfoText
