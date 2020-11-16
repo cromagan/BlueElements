@@ -57,7 +57,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption4 = new BlueControls.Controls.Caption();
             this.btnMultiline = new BlueControls.Controls.Button();
             this.grpBildCode = new BlueControls.Controls.GroupBox();
-            this.cbxBildCodeImageNotfound = new BlueControls.Controls.ComboBox();
+            this.cbxBildTextVerhalten = new BlueControls.Controls.ComboBox();
             this.capBildCodeImageNotfound = new BlueControls.Controls.Caption();
             this.capBildCodeConstHeight = new BlueControls.Controls.Caption();
             this.txbBildCodeConstHeight = new BlueControls.Controls.TextBox();
@@ -180,7 +180,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // tabDesign
             // 
             this.tabDesign.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabDesign.Controls.Add(this.cbxBildCodeImageNotfound);
+            this.tabDesign.Controls.Add(this.cbxBildTextVerhalten);
             this.tabDesign.Controls.Add(this.cbxAlign);
             this.tabDesign.Controls.Add(this.txbReplacer);
             this.tabDesign.Controls.Add(this.capBildCodeImageNotfound);
@@ -471,14 +471,14 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpBildCode.TabStop = false;
             this.grpBildCode.Text = "Fomat: BildCode";
             // 
-            // cbxBildCodeImageNotfound
+            // cbxBildTextVerhalten
             // 
-            this.cbxBildCodeImageNotfound.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxBildCodeImageNotfound.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxBildCodeImageNotfound.Location = new System.Drawing.Point(144, 176);
-            this.cbxBildCodeImageNotfound.Name = "cbxBildCodeImageNotfound";
-            this.cbxBildCodeImageNotfound.Size = new System.Drawing.Size(368, 24);
-            this.cbxBildCodeImageNotfound.TabIndex = 34;
+            this.cbxBildTextVerhalten.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxBildTextVerhalten.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxBildTextVerhalten.Location = new System.Drawing.Point(144, 176);
+            this.cbxBildTextVerhalten.Name = "cbxBildTextVerhalten";
+            this.cbxBildTextVerhalten.Size = new System.Drawing.Size(368, 24);
+            this.cbxBildTextVerhalten.TabIndex = 34;
             // 
             // capBildCodeImageNotfound
             // 
@@ -1614,7 +1614,7 @@ namespace BlueControls.BlueDatabaseDialogs
 			private TextBox tbxRunden;
 			private Caption Caption11;
 			private Button btnAutoEditAutoSort;
-            private ComboBox cbxBildCodeImageNotfound;
+            private ComboBox cbxBildTextVerhalten;
             private Caption capBildCodeImageNotfound;
             private Caption capBildCodeConstHeight;
             private TextBox txbBildCodeConstHeight;

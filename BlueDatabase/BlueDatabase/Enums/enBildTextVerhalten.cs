@@ -19,7 +19,7 @@
 
 namespace BlueDatabase.Enums
 {
-    public enum enImageNotFound
+    public enum enBildTextVerhalten
     {
         Nur_Text = 0,
         Wenn_möglich_Bild_und_immer_Text = 1,

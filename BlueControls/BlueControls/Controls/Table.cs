@@ -4507,14 +4507,14 @@ namespace BlueControls.Controls
         /// <param name="Child"></param>
         /// <param name="deleteBack"></param>
         /// <param name="font"></param>
-        private static void Draw_FormatedText(Graphics gr, ColumnItem column, string originalText, Rectangle fitInRect, bool deleteBack, BlueFont font, enShortenStyle style, enStates state, enImageNotFound compact)
+        private static void Draw_FormatedText(Graphics gr, ColumnItem column, string originalText, Rectangle fitInRect, bool deleteBack, BlueFont font, enShortenStyle style, enStates state, enBildTextVerhalten bildTextverhalten)
         {
 
             //var tmpText = CellItem.ValueReadable(column, originalText, style, compact);
             //var tmpAlign = CellItem.StandardAlignment(column, compact);
             //var tmpImageCode = CellItem.StandardImage(column, originalText, tmpText, style, compact);
 
-            var tmpData = CellItem.GetDrawingData(column, originalText, style, compact);
+            var tmpData = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
             var tmpImageCode = tmpData.Item3;
 
             if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
@@ -4528,7 +4528,7 @@ namespace BlueControls.Controls
         /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werdern.
         /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
         /// </summary>
-        public static void Draw_FormatedText(ColumnItem column, string Txt, Graphics GR, Rectangle FitInRect, bool DeleteBack, enShortenStyle Style, enDesign vDesign, enStates vState, enImageNotFound compact)
+        public static void Draw_FormatedText(ColumnItem column, string Txt, Graphics GR, Rectangle FitInRect, bool DeleteBack, enShortenStyle Style, enDesign vDesign, enStates vState, enBildTextVerhalten bildTextverhalten)
         {
             if (string.IsNullOrEmpty(Txt)) { return; }
 
@@ -4539,15 +4539,15 @@ namespace BlueControls.Controls
             BlueFont f = null;
             if (!string.IsNullOrEmpty(Txt)) { f = Skin.GetBlueFont(SkinRow); }
 
-            Draw_FormatedText(GR, column, Txt, FitInRect, DeleteBack, f, Style, vState, compact);
+            Draw_FormatedText(GR, column, Txt, FitInRect, DeleteBack, f, Style, vState, bildTextverhalten);
         }
 
-        public static Size FormatedText_NeededSize(ColumnItem column, string originalText, BlueFont font, enShortenStyle style, int minSize, enImageNotFound compact)
+        public static Size FormatedText_NeededSize(ColumnItem column, string originalText, BlueFont font, enShortenStyle style, int minSize, enBildTextVerhalten bildTextverhalten)
         {
             //var tmpText = CellItem.ValueReadable(column, originalText, style, compact);
             //var tmpImageCode = CellItem.StandardImage(column, tmpText, originalText, style, compact);
 
-            var tmpData = CellItem.GetDrawingData(column, originalText, style, compact);
+            var tmpData = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
 
             return Skin.FormatedText_NeededSize(tmpData.Item1, tmpData.Item3, font, minSize);
         }

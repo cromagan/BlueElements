@@ -91,7 +91,7 @@ namespace BlueDatabase
 
         private string _LinkedKeyKennung;
         private string _LinkedDatabaseFile;
-        private enImageNotFound _BildTextVerhalten;
+        private enBildTextVerhalten _BildTextVerhalten;
         private int _BildCode_ConstantHeight;
 
         private string _Prefix;
@@ -242,7 +242,7 @@ namespace BlueDatabase
 
             _LinkedKeyKennung = string.Empty;
             _LinkedDatabaseFile = string.Empty;
-            _BildTextVerhalten = enImageNotFound.Nur_Text;
+            _BildTextVerhalten = enBildTextVerhalten.Nur_Text;
             _BildCode_ConstantHeight = 0;
             _Prefix = string.Empty;
             _BestFile_StandardSuffix = string.Empty;
@@ -727,7 +727,7 @@ namespace BlueDatabase
             }
         }
 
-        public enImageNotFound BildTextVerhalten
+        public enBildTextVerhalten BildTextVerhalten
         {
             get
             {
@@ -1154,21 +1154,6 @@ namespace BlueDatabase
             }
         }
 
-
-        //public bool CompactView
-        //{
-        //    get
-        //    {
-        //        return _CompactView;
-        //    }
-        //    set
-        //    {
-        //        if (_CompactView == value) { return; }
-        //        Database.AddPending(enDatabaseDataType.co_CompactView, this, _CompactView.ToPlusMinus(), value.ToPlusMinus(), true);
-        //        Invalidate_ColumAndContent();
-        //        OnChanged();
-        //    }
-        //}
 
         public bool ShowUndo
         {
@@ -1599,10 +1584,6 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_BeiZeilenfilterIgnorieren: _IgnoreAtRowFilter = Wert.FromPlusMinus(); break;
 
                 case enDatabaseDataType.co_CompactView_alt:
-
-                    //if (Wert.FromPlusMinus()) { _BildTextVerhalten = enImageNotFound.Nur_Bild; }
-
-                    //_CompactView = Wert.FromPlusMinus(); 
                     break;
                 case enDatabaseDataType.co_ShowUndo: _ShowUndo = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_ShowMultiLineInOneLine: _ShowMultiLineInOneLine = Wert.FromPlusMinus(); break;
@@ -1625,7 +1606,7 @@ namespace BlueDatabase
                 case enDatabaseDataType.co_BestFile_StandardFolder: _BestFile_StandardFolder = Wert; break;
                 case enDatabaseDataType.co_BildCode_ConstantHeight: _BildCode_ConstantHeight = int.Parse(Wert); break;
                 case enDatabaseDataType.co_Prefix: _Prefix = Wert; break;
-                case enDatabaseDataType.co_BildTextVerhalten: _BildTextVerhalten = (enImageNotFound)int.Parse(Wert); break;
+                case enDatabaseDataType.co_BildTextVerhalten: _BildTextVerhalten = (enBildTextVerhalten)int.Parse(Wert); break;
                 case enDatabaseDataType.co_EditTrotzSperreErlaubt: _EditTrotzSperreErlaubt = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_CellInitValue: _CellInitValue = Wert; break;
                 case enDatabaseDataType.co_KeyColumnKey: _KeyColumnKey = int.Parse(Wert); break;
@@ -2417,7 +2398,7 @@ namespace BlueDatabase
 
 
 
-            if (_BildTextVerhalten != enImageNotFound.Nur_Text)
+            if (_BildTextVerhalten != enBildTextVerhalten.Nur_Text)
             {
 
                 if (_Format == enDataFormat.Datum_und_Uhrzeit ||
@@ -2427,7 +2408,7 @@ namespace BlueDatabase
                     _Format == enDataFormat.Text_mit_Formatierung)
                 {
                     // Performance-Teschnische Gründe
-                    _BildTextVerhalten = enImageNotFound.Nur_Text;
+                    _BildTextVerhalten = enBildTextVerhalten.Nur_Text;
                     //return "Bei diesem Format muss das Bild/Text-Verhalten 'Nur Text' sein.";
                 }
             }

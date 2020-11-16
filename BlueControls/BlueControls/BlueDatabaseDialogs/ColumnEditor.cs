@@ -62,7 +62,7 @@ namespace BlueControls.BlueDatabaseDialogs
             cbxFormat.Item.AddRange(typeof(enDataFormat));
             cbxRandLinks.Item.AddRange(typeof(enColumnLineStyle));
             cbxRandRechts.Item.AddRange(typeof(enColumnLineStyle));
-            cbxBildCodeImageNotfound.Item.AddRange(typeof(enImageNotFound));
+            cbxBildTextVerhalten.Item.AddRange(typeof(enBildTextVerhalten));
             cbxAlign.Item.AddRange(typeof(enAlignmentHorizontal));
 
 
@@ -218,7 +218,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
             txbBildCodeConstHeight.Text = _Column.BildCode_ConstantHeight.ToString();
-            cbxBildCodeImageNotfound.Text = ((int)_Column.BildTextVerhalten).ToString();
+            cbxBildTextVerhalten.Text = ((int)_Column.BildTextVerhalten).ToString();
             txbBestFileStandardFolder.Text = _Column.BestFile_StandardFolder;
             txbBestFileStandardSuffix.Text = _Column.BestFile_StandardSuffix;
             cbxLinkedDatabase.Text = _Column.LinkedDatabaseFile;
@@ -491,8 +491,8 @@ namespace BlueControls.BlueDatabaseDialogs
             _Column.BildCode_ConstantHeight = Res;
 
 
-            int.TryParse(cbxBildCodeImageNotfound.Text, out var ImNF);
-            _Column.BildTextVerhalten = (enImageNotFound)ImNF;
+            int.TryParse(cbxBildTextVerhalten.Text, out var ImNF);
+            _Column.BildTextVerhalten = (enBildTextVerhalten)ImNF;
 
             _Column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
             _Column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
@@ -631,7 +631,7 @@ namespace BlueControls.BlueDatabaseDialogs
             if (tmpFormat != enDataFormat.BildCode)
             {
                 txbBildCodeConstHeight.Text = string.Empty;
-                cbxBildCodeImageNotfound.Text = string.Empty;
+                cbxBildTextVerhalten.Text = string.Empty;
             }
 
             // Format: LinkToFileSystem

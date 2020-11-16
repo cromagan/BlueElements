@@ -45,7 +45,7 @@ namespace BlueControls.ItemCollection
 
         private readonly enShortenStyle _style;
 
-        private readonly enImageNotFound _compact;
+        private readonly enBildTextVerhalten _bildTextverhalten;
 
         public override string QuickInfo
         {
@@ -68,14 +68,14 @@ namespace BlueControls.ItemCollection
 
 
 
-        public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled, enImageNotFound compact) : base(internalAndReadableText)
+        public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled, enBildTextVerhalten bildTextverhalten) : base(internalAndReadableText)
         {
             _StyleLikeThis = columnStyle;
             _style = style;
 
             _Enabled = enabled;
 
-            _compact = compact;
+            _bildTextverhalten = bildTextverhalten;
 
 
         }
@@ -94,7 +94,7 @@ namespace BlueControls.ItemCollection
 
         public override Size SizeUntouchedForListBox()
         {
-            return Table.FormatedText_NeededSize(_StyleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16, _compact);
+            return Table.FormatedText_NeededSize(_StyleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16, _bildTextverhalten);
         }
 
 
@@ -106,7 +106,7 @@ namespace BlueControls.ItemCollection
                 Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
             }
 
-            Table.Draw_FormatedText(_StyleLikeThis, Internal, GR, PositionModified, false, _style, itemdesign, vState, _compact);
+            Table.Draw_FormatedText(_StyleLikeThis, Internal, GR, PositionModified, false, _style, itemdesign, vState, _bildTextverhalten);
 
             if (DrawBorderAndBack)
             {
@@ -131,7 +131,7 @@ namespace BlueControls.ItemCollection
 
         public override BasicListItem CloneToNewCollection(ItemCollectionList newParent)
         {
-            return CloneToNewCollection(newParent, new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _compact));
+            return CloneToNewCollection(newParent, new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _bildTextverhalten));
         }
 
         public override bool FilterMatch(string FilterText)

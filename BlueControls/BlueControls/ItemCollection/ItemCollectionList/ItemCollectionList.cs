@@ -842,11 +842,11 @@ namespace BlueControls.ItemCollection
         #region CellLikeListItem
 
 
-        public CellLikeListItem Add(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, enImageNotFound compact, bool enabled)
+        public CellLikeListItem Add(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, enBildTextVerhalten bildTextverhaltent, bool enabled)
         {
 
 
-            var i = new CellLikeListItem(internalAndReadableText, columnStyle, style, enabled, compact);
+            var i = new CellLikeListItem(internalAndReadableText, columnStyle, style, enabled, bildTextverhaltent);
             Add(i);
             return i;
 
@@ -1048,7 +1048,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public void AddRange(List<string> Values, ColumnItem ColumnStyle, enShortenStyle Style, enImageNotFound compact)
+        public void AddRange(List<string> Values, ColumnItem ColumnStyle, enShortenStyle Style, enBildTextVerhalten bildTextverhalten)
         {
 
             if (Values == null) { return; }
@@ -1063,12 +1063,12 @@ namespace BlueControls.ItemCollection
 
             foreach (var thisstring in Values)
             {
-                Add(thisstring, ColumnStyle, Style, compact); // If Item(thisstring) Is Nothing Then Add(New CellLikeItem(thisstring, ColumnStyle))
+                Add(thisstring, ColumnStyle, Style, bildTextverhalten); // If Item(thisstring) Is Nothing Then Add(New CellLikeItem(thisstring, ColumnStyle))
             }
 
         }
 
-        public BasicListItem Add(string Value, ColumnItem ColumnStyle, enShortenStyle Style, enImageNotFound compact)
+        public BasicListItem Add(string Value, ColumnItem ColumnStyle, enShortenStyle Style, enBildTextVerhalten bildTextverhalten)
         {
 
 
@@ -1080,7 +1080,7 @@ namespace BlueControls.ItemCollection
                 }
                 else
                 {
-                    var i = new CellLikeListItem(Value, ColumnStyle, Style, true, compact);
+                    var i = new CellLikeListItem(Value, ColumnStyle, Style, true, bildTextverhalten);
                     Add(i);
                     return i;
 

@@ -49,19 +49,19 @@ namespace BlueBasics
             }
         }
 
-        public static bool CompactPossible(this enDataFormat format)
-        {
-            switch (format)
-            {
-                case enDataFormat.Bit:
-                case enDataFormat.BildCode:
-                case enDataFormat.FarbeInteger:
-                case enDataFormat.Schrift:
-                    return true;
-                default:
-                    return false;
-            }
-        }
+        //public static bool CompactPossible(this enDataFormat format)
+        //{
+        //    switch (format)
+        //    {
+        //        case enDataFormat.Bit:
+        //        case enDataFormat.BildCode:
+        //        case enDataFormat.FarbeInteger:
+        //        case enDataFormat.Schrift:
+        //            return true;
+        //        default:
+        //            return false;
+        //    }
+        //}
 
 
 

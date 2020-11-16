@@ -87,7 +87,7 @@
     <Compile Include="Enums\enEditTypeTable.cs" />
     <Compile Include="Enums\enExportTyp.cs" />
     <Compile Include="Enums\enAnsicht.cs" />
-    <Compile Include="Enums\enImageNotFound.cs" />
+    <Compile Include="Enums\enBildTextVerhalten.cs" />
     <Compile Include="Enums\enNeededColumns.cs" />
     <Compile Include="Enums\enFirstRow.cs" />
     <Compile Include="Enums\enNeededText.cs" />
