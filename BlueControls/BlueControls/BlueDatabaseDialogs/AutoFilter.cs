@@ -155,6 +155,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 lsbStandardFilter.Item.Add("negativ Auswahl aktivieren", "ModusNegativ", QuickImage.Get(enImageCode.MinusZeichen, 17), !Column.MultiLine && Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "08");
                 lsbStandardFilter.Item.Add("Einzigartige Einträge", "Einzigartig", QuickImage.Get(enImageCode.Eins, 17), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "09");
                 lsbStandardFilter.Item.Add("Nicht Einzigartige Einträge", "NichtEinzigartig", QuickImage.Get("Eins|17||1"), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "10");
+                lsbStandardFilter.Item.Add("Vergleiche mit anderer Spalte", "Spaltenvergleich", QuickImage.Get(enImageCode.Spalte, 17), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && vFilter[Column.Database.Column[0]] == null , Constants.FirstSortChar + "11");
 
 
             }
@@ -452,10 +453,15 @@ namespace BlueControls.BlueDatabaseDialogs
                 case "nichteinzigartig":
                     {
                         CloseAndDispose("DoNichtEinzigartig", null);
-
-
                         break;
                     }
+                case "spaltenvergleich":
+                    {
+                        CloseAndDispose("DoSpaltenvergleich", null);
+                        break;
+                    }
+
+
                 default:
                     {
                         Develop.DebugPrint("Unbekannter Filter: " + e.Item.Internal);

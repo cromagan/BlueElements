@@ -118,16 +118,21 @@ namespace BlueControls.BlueDatabaseDialogs
             if (_TableView.Database.ReadOnly) { return; }
 
             var Vorlage = _TableView.CursorPosColumn();
+            var mitDaten = false;
 
             if (Vorlage != null && !string.IsNullOrEmpty(Vorlage.Identifier)) { Vorlage = null; }
             if (Vorlage != null)
             {
-                switch (MessageBox.Show("Spalte '" + Vorlage.ReadableText() + "' als<br>Vorlage verwenden?", enImageCode.Frage, "Ja", "Nein", "Abbrechen"))
+                switch (MessageBox.Show("Spalte '" + Vorlage.ReadableText() + "' als<br>Vorlage verwenden?", enImageCode.Frage, "Ja", "Ja, mit allen Daten", "Nein", "Abbrechen"))
                 {
                     case 0:
                         break;
 
                     case 1:
+                        mitDaten = true;
+                        break;
+
+                    case 2:
                         Vorlage = null;
                         break;
 
@@ -137,11 +142,20 @@ namespace BlueControls.BlueDatabaseDialogs
             }
 
 
-            ColumnItem newc = null;
+            ColumnItem newc;
 
             if (Vorlage != null)
             {
                 newc = _TableView.Database.Column.AddACloneFrom(Vorlage);
+
+                if (mitDaten)
+                {
+                    foreach (var thisR in _TableView.Database.Row)
+                    {
+                        thisR.CellSet(newc, thisR.CellGetString(Vorlage));
+                    }
+                }
+
 
             }
             else

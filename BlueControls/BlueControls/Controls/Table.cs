@@ -2282,6 +2282,42 @@ namespace BlueControls.Controls
                     }
                     break;
 
+
+                case "dospaltenvergleich":
+                    var ro = new List<RowItem>();
+                    ro.AddRange(SortedRows());
+
+
+                    var ic = new ItemCollectionList();
+
+                    foreach (var ThisColumnItem in e.Column.Database.Column)
+                    {
+                        if (ThisColumnItem != null && ThisColumnItem != e.Column) { ic.Add(ThisColumnItem, false); }
+
+                    }
+                    ic.Sort();
+
+                    var r = InputBoxListBoxStyle.Show("Mit welcher Spalte vergleichen?", ic, enAddType.None, true);
+                    if (r == null || r.Count == 0) { return; }
+                    //Filter.Remove(e.Column);
+
+                    var d = new List<string>();
+                    foreach (var thisR in ro)
+                    {
+                        if (thisR.CellGetString(e.Column) != thisR.CellGetString(r[0])) { d.Add(thisR.CellFirstString()); }
+                    }
+                    if (d.Count > 0)
+                    {
+                        Filter.Add(new FilterItem(e.Column.Database.Column[0], enFilterType.Istgleich_ODER_GroßKleinEgal, d));
+                        Notification.Show("Die aktuell <b>unterschiedlichen</b> Einträge wurden berechnet<br>und als <b>ODER-Filter</b> in der <b>ersten Spalte</b> gespeichert.", enImageCode.Trichter);
+                    }
+                    else
+                    {
+                        Notification.Show("Keine Filter verändert,<br>da <b>alle Einträge</b> indentisch sind.", enImageCode.Trichter);
+                    }
+
+
+                    break;
                 default:
                     Develop.DebugPrint("Unbekannter Comand:   " + e.Comand);
                     break;
