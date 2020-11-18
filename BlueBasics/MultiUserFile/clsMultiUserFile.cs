@@ -479,7 +479,6 @@ namespace BlueBasics.MultiUserFile
             {
                 // Und nun den Block entfernen
                 CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
-
                 DeleteBlockDatei(false, true);
             }
 
@@ -500,7 +499,7 @@ namespace BlueBasics.MultiUserFile
                     // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichter und ungeladen.
                     _CheckedAndReloadNeed = true;
                     _LastSaveCode = "Fehler";
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!!" + Filename);
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!! " + Filename);
                     _IsSaving = false;
                     return Feedback("Speichervorgang fehlgeschlagen.");
                 }
@@ -589,7 +588,6 @@ namespace BlueBasics.MultiUserFile
             var tmpInhalt = (UserName() + "\r\n" + DateTime.UtcNow.ToString(Constants.Format_Date5));
 
             // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
-            var done = false;
             try
             {
                 var bInhalt = tmpInhalt.ToByte();
@@ -601,7 +599,6 @@ namespace BlueBasics.MultiUserFile
                     x.Close();
                 }
                 _inhaltBlockdatei = tmpInhalt;
-                done = true;
 
             }
             catch (Exception ex)
@@ -611,12 +608,12 @@ namespace BlueBasics.MultiUserFile
             }
 
 
-            if (!done)
-            {
-                // Letztens aufgetreten, dass eine Blockdatei schon vorhanden war. Anscheinden Zeitgleiche Kopie?
-                Develop.DebugPrint(enFehlerArt.Info, "Befehl anscheinend abgebrochen:\r\n" + Filename);
-                return false;
-            }
+            //if (!done)
+            //{
+            //    // Letztens aufgetreten, dass eine Blockdatei schon vorhanden war. Anscheinden Zeitgleiche Kopie?
+            //    Develop.DebugPrint(enFehlerArt.Info, "Befehl anscheinend abgebrochen:\r\n" + Filename);
+            //    return false;
+            //}
 
 
 

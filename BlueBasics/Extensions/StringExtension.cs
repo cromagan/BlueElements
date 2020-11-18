@@ -75,7 +75,7 @@ namespace BlueBasics
 
         public static bool isPossibleLineBreak(this char value)
         {
-            const string TR = " ?!%/\\}])-.,;_°~|\r\n\t";
+            const string TR = " ?!%/\\}])-.,;_°~€|\r\n\t";
             // Kein Doppelpunkt, weil auch 3:50 Uhr möglich ist
             return TR.Contains(value.ToString());
         }

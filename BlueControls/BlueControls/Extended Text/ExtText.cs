@@ -791,7 +791,7 @@ namespace BlueControls
 
             while (cZ <= Bis && Chars[cZ].Char > 0)
             {
-                if (Chars[cZ].Char < ExtChar.ImagesStart)
+                if (Chars[cZ].Char < (int)enASCIIKey.ImageStart)
                 {
                     if (LastStufe != Chars[cZ].Stufe)
                     {
@@ -803,7 +803,7 @@ namespace BlueControls
                 }
                 else
                 {
-                    var index = Chars[cZ].Char - ExtChar.ImagesStart;
+                    var index = Chars[cZ].Char - (int)enASCIIKey.ImageStart;
                     var x = QuickImage.Get(index);
                     if (x != null) { T += "<ImageCode=" + x.Name + ">"; }
 
@@ -828,7 +828,7 @@ namespace BlueControls
                 while (cZ <= Bis && Chars[cZ].Char > 0)
                 {
 
-                    if (Chars[cZ].Char < ExtChar.ImagesStart)
+                    if (Chars[cZ].Char < (int)enASCIIKey.ImageStart)
                     {
                         T += Convert.ToChar(Chars[cZ].Char).ToString();
                     }
@@ -1074,7 +1074,7 @@ namespace BlueControls
 
                     Position++;
 
-                    Chars.Add(new ExtChar((char)(QuickImage.GetIndex(x) + ExtChar.ImagesStart), _Design, _State, PF, Stufe, enMarkState.None));
+                    Chars.Add(new ExtChar((char)(QuickImage.GetIndex(x) + (int)enASCIIKey.ImageStart), _Design, _State, PF, Stufe, enMarkState.None));
                     break;
 
                 //case "PROGRESSBAR":
@@ -1293,30 +1293,17 @@ namespace BlueControls
         private bool InsertAnything(enASCIIKey KeyAscii, string img, int Position)
         {
 
-            if (Position < 0 && !string.IsNullOrEmpty(PlainText))
-            {
-                return false;
-            }
-            // Text zwar da, aber kein Cursor angezeigt
-            if (Position < 0) // Ist echt möglich!
-            {
-                Position = 0;
-            }
+            if (Position < 0 && !string.IsNullOrEmpty(PlainText)) { return false; }            // Text zwar da, aber kein Cursor angezeigt
+            if (Position < 0) { Position = 0; }// Ist echt möglich!
 
             BlueFont tmpFont = null;
             var tmpStufe = 4;
             var tmpState = enStates.Undefiniert;
             var tmpMarkState = enMarkState.None;
 
-            if (Position > Chars.Count)
-            {
-                Position = Chars.Count;
-            }
+            if (Position > Chars.Count) { Position = Chars.Count; }
 
-            if ((int)_Design > 10000)
-            {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Art");
-            }
+            if ((int)_Design > 10000) { Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Art"); }
 
 
             if (Position < Chars.Count && Chars[Position].Char > 0)
@@ -1340,17 +1327,11 @@ namespace BlueControls
             {
                 if (KeyAscii == enASCIIKey.ENTER)
                 {
-                    if (!Multiline)
-                    {
-                        return false;
-                    }
+                    if (!Multiline) { return false; }
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(AllowedChars) && !AllowedChars.Contains(Convert.ToChar(KeyAscii).ToString()))
-                    {
-                        return false;
-                    }
+                    if (!string.IsNullOrEmpty(AllowedChars) && !AllowedChars.Contains(Convert.ToChar(KeyAscii).ToString())) { return false; }
                 }
 
                 Chars.Insert(Position, new ExtChar((char)KeyAscii, _Design, tmpState, tmpFont, tmpStufe, tmpMarkState));
@@ -1359,7 +1340,7 @@ namespace BlueControls
             else if (!string.IsNullOrEmpty(img))
             {
                 var x = QuickImage.Get(img, (int)(tmpFont.Oberlänge(1)));
-                Chars.Insert(Position, new ExtChar((char)(QuickImage.GetIndex(x) + ExtChar.ImagesStart), _Design, tmpState, tmpFont, tmpStufe, tmpMarkState));
+                Chars.Insert(Position, new ExtChar((char)(QuickImage.GetIndex(x) + (int)enASCIIKey.ImageStart), _Design, tmpState, tmpFont, tmpStufe, tmpMarkState));
             }
             else
             {

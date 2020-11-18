@@ -25,6 +25,13 @@
         StrgA = 1,
 
         Space = 32,
-        Chr255 = 255
+        //Chr255 = 255,
+
+
+        Euro = 8364,
+
+
+
+        ImageStart = 20000
     }
 }

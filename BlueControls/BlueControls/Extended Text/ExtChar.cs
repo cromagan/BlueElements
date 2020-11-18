@@ -38,7 +38,7 @@ namespace BlueControls
         private int _Stufe = 4;
 
 
-        public const int ImagesStart = 5000;
+      //  public const int ImagesStart = 5000;
         public const char Top = (char)4;
         public const char StoreX = (char)5;
 
@@ -88,8 +88,8 @@ namespace BlueControls
         {
             get
             {
-                if (!_Size.IsEmpty) { return _Size; }
 
+                if (!_Size.IsEmpty) { return _Size; }
 
                 if (Font == null)
                 {
@@ -253,7 +253,7 @@ namespace BlueControls
             var IsCap = false;
 
 
-            if (_Char < ImagesStart)
+            if (_Char < (int)enASCIIKey.ImageStart)
             {
                 GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
@@ -334,13 +334,13 @@ namespace BlueControls
 
                 if (Math.Abs(czoom - 1) < 0.001)
                 {
-                    var BNR = QuickImage.Get(_Char - ImagesStart);
+                    var BNR = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
                     if (BNR == null) { return; }
                     GR.DrawImage(BNR.BMP, (int)DrawX, (int)DrawY);
                 }
                 else
                 {
-                    var l = QuickImage.Get(_Char - ImagesStart);
+                    var l = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
 
                     if (l == null || l.Width == 0) { l = QuickImage.Get("Warnung|16"); }
 

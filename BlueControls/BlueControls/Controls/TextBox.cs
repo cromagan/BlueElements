@@ -565,7 +565,7 @@ namespace BlueControls.Controls
                     }
                 default:
                     {
-                        if (KeyAscii >= enASCIIKey.Space && KeyAscii <= enASCIIKey.Chr255) //Ascii-Codes (Außer 127 = DEL)
+                        if (KeyAscii >= enASCIIKey.Space) //Ascii-Codes (Außer 127 = DEL)
                         {
                             Char_DelBereich(-1, -1);
                             if (_eTxt.InsertChar(KeyAscii, _Cursor_CharPos))

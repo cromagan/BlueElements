@@ -286,9 +286,9 @@ namespace BlueControls
         {
 
             if (vChar >= 0 && vChar <= 31) { return new SizeF(0, _Zeilenabstand); }
-            if (vChar >= ExtChar.ImagesStart)
+            if (vChar >= (int)enASCIIKey.ImageStart)
             {
-                var BNR = QuickImage.Get(vChar - ExtChar.ImagesStart);
+                var BNR = QuickImage.Get(vChar - (int)enASCIIKey.ImageStart);
                 if (BNR == null) { return new SizeF(0, 0); }
                 return new SizeF(BNR.BMP.Width + 1, BNR.BMP.Height + 1);
             }

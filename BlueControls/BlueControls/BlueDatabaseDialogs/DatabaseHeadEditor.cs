@@ -646,6 +646,7 @@ namespace BlueControls.BlueDatabaseDialogs
                     ThisColumn.MultiLine = true;
                     ThisColumn.TextBearbeitungErlaubt = false;
                     ThisColumn.DropdownBearbeitungErlaubt = false;
+                    ThisColumn.BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
                 }
             }
 
@@ -756,7 +757,10 @@ namespace BlueControls.BlueDatabaseDialogs
                 }
 
             }
+
+ 
             tblUndo.Database = x;
+            tblUndo.Arrangement = 0;
         }
 
         private void btnSperreAufheben_Click(object sender, System.EventArgs e)

@@ -422,7 +422,7 @@ namespace BlueDatabase
             var T = string.Empty;
             if (!string.IsNullOrEmpty(_QuickInfo)) { T += _QuickInfo; }
             if (Database.IsAdministrator() && !string.IsNullOrEmpty(_AdminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + _AdminInfo; }
-
+            if (Database.IsAdministrator() && Tags.Count >0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + Tags.JoinWith("<br>"); }
 
             T = T.Trim();
             T = T.Trim("<br>");
