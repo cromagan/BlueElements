@@ -892,7 +892,7 @@ namespace BlueDatabase
 
                 }
                 if (_String is null) { _String = string.Empty; }
-                if (Typ.HasFlag(enFilterType.Instr)) { _String = LanguageTool.ColumnReplace(_String, fColumn, enShortenStyle.Both, enBildTextVerhalten.Nur_Text); }
+                if (Typ.HasFlag(enFilterType.Instr)) { _String = LanguageTool.ColumnReplace(_String, fColumn, enShortenStyle.Both); }
 
 
 

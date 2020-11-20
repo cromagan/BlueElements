@@ -712,7 +712,7 @@ namespace BlueControls.Controls
                 thispoint.SetTo(thispoint.X, thispoint.Y + Y);
             }
 
-            CaluclateOtherPointsOf(Sel_P);
+            CaluclateOtherPointsOf();
 
 
             _Item.PerformAll();
@@ -735,12 +735,12 @@ namespace BlueControls.Controls
                 {
                     thispoint?.ReStore();
                 }
-                CaluclateOtherPointsOf(Sel_P);
+                CaluclateOtherPointsOf();
 
             }
             else
             {
-                var done = new List<Object>();
+                var done = new List<object>();
 
                 foreach (var thispoint in _Item.AllPoints)
                 {
@@ -757,7 +757,7 @@ namespace BlueControls.Controls
 
 
                 }
-                CaluclateOtherPointsOf(Sel_P);
+                CaluclateOtherPointsOf();
 
             }
             
@@ -776,7 +776,11 @@ namespace BlueControls.Controls
             return Convert.ToBoolean(errorsAfter == 0);
         }
 
-        private void CaluclateOtherPointsOf(ListExt<PointM> sel_P)
+
+        /// <summary>
+        /// Repariert bei allen selektierten Punkte (Sel_P), die in einem Objekt sind, die Beziehungen
+        /// </summary>
+        private void CaluclateOtherPointsOf()
         {
             var x = new List<BasicPadItem>();
 

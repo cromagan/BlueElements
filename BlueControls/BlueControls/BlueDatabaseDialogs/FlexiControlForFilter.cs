@@ -51,13 +51,13 @@ namespace BlueControls.Controls
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
-        public FlexiControlForFilter() : this(null, null, enÜberschriftAnordnung.Links_neben_Dem_Feld, null)
+        public FlexiControlForFilter() : this(null, null, null)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
             // InitializeComponent();
         }
 
-        public FlexiControlForFilter(Table tableView, FilterItem filter, enÜberschriftAnordnung captionPosition, Filterleiste myParent)
+        public FlexiControlForFilter(Table tableView, FilterItem filter, Filterleiste myParent)
         {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();

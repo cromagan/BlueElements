@@ -40,7 +40,7 @@ namespace BlueDatabase
         /// <param name="column"></param>
         /// <param name="style"></param>
         /// <returns></returns>
-        public static string ColumnReplace(string txt, ColumnItem column, enShortenStyle style, enBildTextVerhalten bildTextverhalten)
+        public static string ColumnReplace(string txt, ColumnItem column, enShortenStyle style)
         {
             if (!string.IsNullOrEmpty(txt))
             {

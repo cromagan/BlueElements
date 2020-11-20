@@ -164,14 +164,14 @@ namespace BlueDatabase
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
                 case enDataFormat.LinkedCell:  // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
-                    txt = LanguageTool.ColumnReplace(txt, column, style, bildTextverhalten);
+                    txt = LanguageTool.ColumnReplace(txt, column, style);
                     txt = txt.Replace("\r\n", " ");
                     txt = txt.Replace("\r", " ");
                     break;
 
                 case enDataFormat.BildCode:
                 case enDataFormat.Button:
-                    txt = LanguageTool.ColumnReplace(txt, column, style, bildTextverhalten);
+                    txt = LanguageTool.ColumnReplace(txt, column, style);
                     break;
 
                 case enDataFormat.Bit:
@@ -196,7 +196,7 @@ namespace BlueDatabase
                     {
                         txt = "Unbekannt";
                     }
-                    txt = LanguageTool.ColumnReplace(txt, column, style, bildTextverhalten);
+                    txt = LanguageTool.ColumnReplace(txt, column, style);
                     break;
 
 
@@ -206,7 +206,7 @@ namespace BlueDatabase
                         var col = Color.FromArgb(int.Parse(txt));
                         txt = col.ColorName();
                     }
-                    txt = LanguageTool.ColumnReplace(txt, column, style, bildTextverhalten);
+                    txt = LanguageTool.ColumnReplace(txt, column, style);
                     break;
 
 
@@ -227,7 +227,7 @@ namespace BlueDatabase
                     var C = LinkedDatabase.Column.SearchByKey(ColKey);
                     if (C == null) { return "Columnkey nicht gefunden"; }
 
-                    txt = LanguageTool.ColumnReplace(C.ReadableText(), column, style, bildTextverhalten);
+                    txt = LanguageTool.ColumnReplace(C.ReadableText(), column, style);
                     break;
 
                 default:

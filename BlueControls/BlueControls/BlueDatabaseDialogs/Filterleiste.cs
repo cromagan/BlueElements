@@ -337,7 +337,7 @@ namespace BlueControls.BlueDatabaseDialogs
                         else
                         {
                             // Na gut, eben neuen Flex erstellen
-                            flx = new FlexiControlForFilter(_TableView, FilterItem, enÜberschriftAnordnung.Links_neben_Dem_Feld, this);
+                            flx = new FlexiControlForFilter(_TableView, FilterItem, this);
                             flx.ValueChanged += Flx_ValueChanged;
                             flx.ButtonClicked += Flx_ButtonClicked;
                             Controls.Add(flx);

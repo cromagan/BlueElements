@@ -358,14 +358,14 @@ namespace BlueControls.ItemCollection
         {
             var data = ItemData(); /// BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
 
-            if (data.Item4 == enOrientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, null, data); }
+            if (data.Item4 == enOrientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, data); }
 
             BreakAfterItems = CalculateColumnCount(data.Item1, data.Item3, data.Item4);
 
-            return ComputeAllItemPositions(new Size(1, 30), null, null, data);
+            return ComputeAllItemPositions(new Size(1, 30), null, data);
         }
 
-        internal Size ComputeAllItemPositions(Size ControlDrawingArea, System.Windows.Forms.Control InControl, Slider SliderY, Tuple<int, int, int, enOrientation> data)
+        internal Size ComputeAllItemPositions(Size ControlDrawingArea, Slider SliderY, Tuple<int, int, int, enOrientation> data)
         {
 
 
@@ -928,8 +928,8 @@ namespace BlueControls.ItemCollection
         {
 
             var _Internal = comand.ToString();
-            QuickImage _Symbol = null;
-            var _ReadableText = string.Empty;
+            QuickImage _Symbol;
+            string _ReadableText;
 
             switch (comand)
             {
