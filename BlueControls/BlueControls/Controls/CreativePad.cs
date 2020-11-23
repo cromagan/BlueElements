@@ -1045,7 +1045,7 @@ namespace BlueControls.Controls
                             }
 
 
-                            if (SnapDist < ShortestDist || SnapDist == ShortestDist && Distanz < Nearest)
+                            if (SnapDist < ShortestDist || (SnapDist == ShortestDist && Distanz < Nearest))
                             {
                                 if (!HängenZusammen(DoX, PointToTest, ThisPoint, null))
                                 {

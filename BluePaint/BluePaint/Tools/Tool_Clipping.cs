@@ -56,16 +56,9 @@ namespace BluePaint
         }
 
 
-        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic)
-        {
-            OnDoInvalidate();
-        }
+        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) => OnDoInvalidate();
 
-        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
-        {
-            OnDoInvalidate();
-
-        }
+        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) => OnDoInvalidate();
 
         public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
@@ -103,10 +96,7 @@ namespace BluePaint
         }
 
 
-        private void ValueChangedByClicking(object sender, System.EventArgs e)
-        {
-            OnDoInvalidate();
-        }
+        private void ValueChangedByClicking(object sender, System.EventArgs e) => OnDoInvalidate();
 
 
         public void DrawZusatz(AdditionalDrawing e, Bitmap OriginalPic)
@@ -200,10 +190,7 @@ namespace BluePaint
             Unten.Minimum = -_Pic.Height - 1;
         }
 
-        public override string MacroKennung()
-        {
-            return "Clipping";
-        }
+        public override string MacroKennung() => "Clipping";
 
         public override void ExcuteCommand(string command)
         {

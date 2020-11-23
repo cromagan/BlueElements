@@ -476,7 +476,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
                 if (_TableView.Filter == null || _TableView.Filter.Count == 0 || !_TableView.Filter.Contains(flx.Filter))
                 {
-                    if (ISFilter) { flx.Filter.FilterType = enFilterType.Istgleich_ODER_GroßKleinEgal; } // Filter noch nicht in der Collection, kann ganz einfach geändert werdern
+                    if (ISFilter) { flx.Filter.FilterType = enFilterType.Istgleich_ODER_GroßKleinEgal; } // Filter noch nicht in der Collection, kann ganz einfach geändert werden
                     flx.Filter.SearchValue[0] = v;
                     _TableView.Filter.Add(flx.Filter);
                     return;

@@ -48,10 +48,7 @@ namespace BluePaint
 
 
 
-        public override void ToolFirstShown()
-        {
-            OnZoomFit();
-        }
+        public override void ToolFirstShown() => OnZoomFit();
 
 
         private void optNeuerName_Click(object sender, System.EventArgs e)
@@ -164,14 +161,8 @@ namespace BluePaint
             }
         }
 
-        private void ThisTool_NeedCurrentPic(object sender, BitmapEventArgs e)
-        {
-            e.BMP = OnNeedCurrentPic();
-        }
+        private void ThisTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.BMP = OnNeedCurrentPic();
 
-        private void ThisTool_OverridePic(object sender, BitmapEventArgs e)
-        {
-            OnOverridePic(e.BMP);
-        }
+        private void ThisTool_OverridePic(object sender, BitmapEventArgs e) => OnOverridePic(e.BMP);
     }
 }

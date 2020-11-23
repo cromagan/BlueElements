@@ -82,16 +82,23 @@ namespace BlueControls.Forms
             Close();
         }
 
-        public static int Show(string TXT)
+        public static void Show(string TXT)
         {
-            return Show(TXT, enImageCode.None, true, "OK");
+            Show(TXT, enImageCode.None, true, "OK");
+        }
+
+
+        public static void Show(string TXT, enImageCode Pic, string Buttons)
+        {
+            Show(TXT, Pic, true, Buttons);
         }
 
 
         public static int Show(string TXT, enImageCode Pic, params string[] Buttons)
         {
-            return Show(TXT, Pic, true, Buttons);
+           return Show(TXT, Pic, true, Buttons);
         }
+
 
         public static int Show(string TXT, enImageCode Pic, bool Dialog, params string[] Buttons)
         {

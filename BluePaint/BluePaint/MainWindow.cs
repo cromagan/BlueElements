@@ -61,10 +61,7 @@ namespace BluePaint
         }
 
 
-        public MainWindow(string filename, bool LoadSaveEnabled) : this(LoadSaveEnabled)
-        {
-            LoadFromDisk(filename);
-        }
+        public MainWindow(string filename, bool LoadSaveEnabled) : this(LoadSaveEnabled) => LoadFromDisk(filename);
 
         private void LoadFromDisk(string filename)
         {
@@ -84,15 +81,9 @@ namespace BluePaint
 
         }
 
-        private void Screenshot_Click(object sender, System.EventArgs e)
-        {
-            SetTool(new Tool_Screenshot(), !_aufnahme);
-        }
+        private void Screenshot_Click(object sender, System.EventArgs e) => SetTool(new Tool_Screenshot(), !_aufnahme);
 
-        private void Clipping_Click(object sender, System.EventArgs e)
-        {
-            SetTool(new Tool_Clipping(_aufnahme), !_aufnahme);
-        }
+        private void Clipping_Click(object sender, System.EventArgs e) => SetTool(new Tool_Clipping(_aufnahme), !_aufnahme);
 
         /// <summary>
         /// Filename wird entfernt!
@@ -208,35 +199,20 @@ namespace BluePaint
 
         }
 
-        private void CurrentTool_NeedCurrentPic(object sender, BitmapEventArgs e)
-        {
-            e.BMP = P.BMP;
-        }
+        private void CurrentTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.BMP = P.BMP;
 
-        private void CurrentTool_DoInvalidate(object sender, System.EventArgs e)
-        {
-            P.Invalidate();
-        }
+        private void CurrentTool_DoInvalidate(object sender, System.EventArgs e) => P.Invalidate();
 
-        private void CurrentTool_ZoomFit(object sender, System.EventArgs e)
-        {
-            P.ZoomFit();
-        }
+        private void CurrentTool_ZoomFit(object sender, System.EventArgs e) => P.ZoomFit();
 
         //private void CurrentTool_PicChangedByTool(object sender, System.EventArgs e)
         //{
         //    P.Invalidate();
         //}
 
-        private void CurrentTool_HideMainWindow(object sender, System.EventArgs e)
-        {
-            this.Hide();
-        }
+        private void CurrentTool_HideMainWindow(object sender, System.EventArgs e) => this.Hide();
 
-        private void CurrentTool_ShowMainWindow(object sender, System.EventArgs e)
-        {
-            this.Show();
-        }
+        private void CurrentTool_ShowMainWindow(object sender, System.EventArgs e) => this.Show();
 
         private void CurrentTool_OverridePic(object sender, BitmapEventArgs e)
         {
@@ -278,30 +254,15 @@ namespace BluePaint
 
         }
 
-        private void Bruchlinie_Click(object sender, System.EventArgs e)
-        {
-            SetTool(new Tool_Bruchlinie(), !_aufnahme);
-        }
+        private void Bruchlinie_Click(object sender, System.EventArgs e) => SetTool(new Tool_Bruchlinie(), !_aufnahme);
 
-        private void Spiegeln_Click(object sender, System.EventArgs e)
-        {
-            SetTool(new Tool_Spiegeln(), !_aufnahme);
-        }
+        private void Spiegeln_Click(object sender, System.EventArgs e) => SetTool(new Tool_Spiegeln(), !_aufnahme);
 
-        private void Zeichnen_Click(object sender, System.EventArgs e)
-        {
-            SetTool(new Tool_Paint(), !_aufnahme);
-        }
+        private void Zeichnen_Click(object sender, System.EventArgs e) => SetTool(new Tool_Paint(), !_aufnahme);
 
-        private void Radiergummi_Click(object sender, System.EventArgs e)
-        {
-            SetTool(new Tool_Eraser(_aufnahme), !_aufnahme);
-        }
+        private void Radiergummi_Click(object sender, System.EventArgs e) => SetTool(new Tool_Eraser(_aufnahme), !_aufnahme);
 
-        private void Kontrast_Click(object sender, System.EventArgs e)
-        {
-            SetTool(new Tool_Kontrast(), !_aufnahme);
-        }
+        private void Kontrast_Click(object sender, System.EventArgs e) => SetTool(new Tool_Kontrast(), !_aufnahme);
 
         private void Rückg_Click(object sender, System.EventArgs e)
         {
@@ -337,11 +298,7 @@ namespace BluePaint
 
 
 
-        private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e)
-        {
-
-            CurrentTool?.MouseDown(e, P.BMP);
-        }
+        private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e) => CurrentTool?.MouseDown(e, P.BMP);
 
 
         private void P_ImageMouseMove(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e)
@@ -367,10 +324,7 @@ namespace BluePaint
 
         }
 
-        private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e)
-        {
-            CurrentTool?.MouseUp(e, P.BMP);
-        }
+        private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) => CurrentTool?.MouseUp(e, P.BMP);
 
 
 
@@ -383,27 +337,15 @@ namespace BluePaint
 
         }
 
-        private void OK_Click(object sender, System.EventArgs e)
-        {
-            this.Close();
-        }
+        private void OK_Click(object sender, System.EventArgs e) => this.Close();
 
 
-        private void P_MouseLeave(object sender, System.EventArgs e)
-        {
-            InfoText.Text = "";
-        }
+        private void P_MouseLeave(object sender, System.EventArgs e) => InfoText.Text = "";
 
 
-        private void Dummy_Click(object sender, System.EventArgs e)
-        {
-            SetTool(new Tool_DummyGenerator(), !_aufnahme);
-        }
+        private void Dummy_Click(object sender, System.EventArgs e) => SetTool(new Tool_DummyGenerator(), !_aufnahme);
 
-        private void btnZoomFit_Click(object sender, System.EventArgs e)
-        {
-            P.ZoomFit();
-        }
+        private void btnZoomFit_Click(object sender, System.EventArgs e) => P.ZoomFit();
 
         private void btnNeu_Click(object sender, System.EventArgs e)
         {
@@ -473,11 +415,7 @@ namespace BluePaint
             return IsSaved();
         }
 
-        private void btnSave_Click(object sender, System.EventArgs e)
-        {
-            Speichern();
-
-        }
+        private void btnSave_Click(object sender, System.EventArgs e) => Speichern();
 
         private void Speichern()
         {
@@ -523,10 +461,7 @@ namespace BluePaint
 
         }
 
-        private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            LoadFromDisk(LoadTab.FileName);
-        }
+        private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) => LoadFromDisk(LoadTab.FileName);
 
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
@@ -536,10 +471,7 @@ namespace BluePaint
             base.OnFormClosing(e);
         }
 
-        private void P_DoAdditionalDrawing(object sender, BlueControls.EventArgs.AdditionalDrawing e)
-        {
-            CurrentTool?.DoAdditionalDrawing(e, P.BMP);
-        }
+        private void P_DoAdditionalDrawing(object sender, BlueControls.EventArgs.AdditionalDrawing e) => CurrentTool?.DoAdditionalDrawing(e, P.BMP);
 
 
 
@@ -590,15 +522,9 @@ namespace BluePaint
         }
 
 
-        private void btnGrößeÄndern_Click(object sender, System.EventArgs e)
-        {
-            SetTool(new Tool_Resize(), !_aufnahme);
-        }
+        private void btnGrößeÄndern_Click(object sender, System.EventArgs e) => SetTool(new Tool_Resize(), !_aufnahme);
 
-        private void btn100_Click(object sender, System.EventArgs e)
-        {
-            P.Zoom100();
-        }
+        private void btn100_Click(object sender, System.EventArgs e) => P.Zoom100();
 
         private void btnCopy_Click(object sender, System.EventArgs e)
         {

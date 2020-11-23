@@ -614,8 +614,8 @@ namespace BlueControls
         public void Normalize()
         {
             var magnitude = Magnitude;
-            _x = _x / magnitude;
-            _y = _y / magnitude;
+            _x /= magnitude;
+            _y /= magnitude;
         }
 
 

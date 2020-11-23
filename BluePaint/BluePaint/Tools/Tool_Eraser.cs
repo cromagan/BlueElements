@@ -122,16 +122,10 @@ namespace BluePaint
             }
         }
 
-        private void DrawBox_CheckedChanged(object sender, System.EventArgs e)
-        {
-            OnDoInvalidate();
-        }
+        private void DrawBox_CheckedChanged(object sender, System.EventArgs e) => OnDoInvalidate();
 
 
-        public override string MacroKennung()
-        {
-            return "Eraser";
-        }
+        public override string MacroKennung() => "Eraser";
 
         public override void ExcuteCommand(string command)
         {

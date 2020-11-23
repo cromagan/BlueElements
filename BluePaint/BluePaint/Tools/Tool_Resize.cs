@@ -105,10 +105,7 @@ namespace BluePaint
 
 
 
-        public override string MacroKennung()
-        {
-            return "Resize";
-        }
+        public override string MacroKennung() => "Resize";
 
         public override void ExcuteCommand(string command)
         {
@@ -125,10 +122,7 @@ namespace BluePaint
             }
         }
 
-        private void flxProzent_ValueChanged(object sender, System.EventArgs e)
-        {
-            DoCapInfo();
-        }
+        private void flxProzent_ValueChanged(object sender, System.EventArgs e) => DoCapInfo();
 
         public override void PictureChangedByMainWindow()
         {
