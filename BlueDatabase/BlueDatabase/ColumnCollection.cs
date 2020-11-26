@@ -25,10 +25,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.FileOperations;
 
-namespace BlueDatabase
-{
-    public sealed class ColumnCollection : ListExt<ColumnItem>
-    {
+namespace BlueDatabase {
+    public sealed class ColumnCollection : ListExt<ColumnItem> {
 
 
 
@@ -49,15 +47,13 @@ namespace BlueDatabase
 
         #region  Construktor + Initialize 
 
-        public void Initialize()
-        {
+        public void Initialize() {
             _LastColumnKey = 0;
             Clear();
             ResetSystems();
         }
 
-        public ColumnCollection(Database cDatabase)
-        {
+        public ColumnCollection(Database cDatabase) {
             Database = cDatabase;
             Initialize();
         }
@@ -67,10 +63,8 @@ namespace BlueDatabase
 
         #region  Properties 
 
-        public new ColumnItem this[int Index]
-        {
-            get
-            {
+        public new ColumnItem this[int Index] {
+            get {
                 if (Database == null) { return null; }
 
                 if (Index < 0 || Index >= Count) { return null; }
@@ -80,50 +74,78 @@ namespace BlueDatabase
 
 
 
-        public ColumnItem SearchByKey(int key)
-        {
-            try
-            {
+        public ColumnItem SearchByKey(int key) {
+            try {
                 if (Database == null) { return null; }
                 if (key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
 
-                foreach (var ThisColumn in this)
-                {
+                foreach (var ThisColumn in this) {
                     if (ThisColumn != null && ThisColumn.Key == key) { return ThisColumn; }
                 }
 
                 return null;
             }
-            catch
-            {
+            catch {
                 return SearchByKey(key); // Sammlung wurde verändert
             }
         }
 
 
-        public ColumnItem this[string ColumnName]
-        {
-            get
-            {
-                if (Database == null) { return null; }
-                if (string.IsNullOrEmpty(ColumnName)) { return null; }// Evtl. Gelöschte Spalte in irgendeiner Order
+        public ColumnItem this[string columnName] {
+            get {
 
-                ColumnName = ColumnName.ToUpper();
+                var colum = Exists(columnName);
+                //if (Database == null) {
+                //    Develop.DebugPrint(enFehlerArt.Info, "Database ist null bei " + columnName);
+                //    return null;
+                //}
+                //if (string.IsNullOrEmpty(columnName)) {
+                //    Develop.DebugPrint(enFehlerArt.Info, "Leerer Spaltenname");
+                //    return null;
+                //}// Evtl. Gelöschte Spalte in irgendeiner Order
 
-                foreach (var ThisColumn in this)
-                {
-                    if (ThisColumn != null && ThisColumn.Name == ColumnName) { return ThisColumn; }
+                //columnName = columnName.ToUpper();
+
+                //foreach (var ThisColumn in this) {
+                //    if (ThisColumn != null && ThisColumn.Name == columnName) { return ThisColumn; }
+                //}
+                if (colum is null) {
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Spalte nicht gefunden: " + columnName + " " + Database.IsParsing().ToString());
                 }
 
-                return null;
+                return colum;
             }
         }
 
 
         #endregion
 
-        public void ResetSystems()
-        {
+
+        public ColumnItem Exists(string columnName) {
+
+            if (Database == null) {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Database ist null bei " + columnName);
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(columnName)) {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Leerer Spaltenname");
+                return null;
+            }
+
+            columnName = columnName.ToUpper();
+
+            foreach (var ThisColumn in this) {
+                if (ThisColumn != null && ThisColumn.Name == columnName) { return ThisColumn; }
+            }
+
+            return null;
+        }
+
+
+
+
+        public void ResetSystems() {
             SysLocked = null;
             SysRowCreateDate = null;
             SysRowCreator = null;
@@ -134,11 +156,9 @@ namespace BlueDatabase
         }
 
 
-        internal string Load_310(enDatabaseDataType Art, string Wert)
-        {
+        internal string Load_310(enDatabaseDataType Art, string Wert) {
 
-            switch (Art)
-            {
+            switch (Art) {
 
 
                 case enDatabaseDataType.LastColumnKey:
@@ -147,12 +167,10 @@ namespace BlueDatabase
 
                 default:
 
-                    if (Art.ToString() == ((int)Art).ToString())
-                    {
+                    if (Art.ToString() == ((int)Art).ToString()) {
                         Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + Art + "' nicht definiert.<br>Wert: " + Wert + "<br>Datei: " + Database.Filename);
                     }
-                    else
-                    {
+                    else {
                         return "Interner Fehler: Für den Datentyp  '" + Art + "'  wurde keine Laderegel definiert.";
                     }
                     break;
@@ -187,8 +205,7 @@ namespace BlueDatabase
 
 
 
-        public void Swap(ColumnItem Column1, ColumnItem Column2)
-        {
+        public void Swap(ColumnItem Column1, ColumnItem Column2) {
 
             if (Column1 == Column2 || Column1 == null || Column2 == null) { return; }
 
@@ -204,11 +221,9 @@ namespace BlueDatabase
         }
 
 
-        private void AddSystems(string Kennung)
-        {
+        private void AddSystems(string Kennung) {
 
-            foreach (var ThisColumn in this)
-            {
+            foreach (var ThisColumn in this) {
                 if (ThisColumn != null && ThisColumn.Identifier.ToUpper() == Kennung.ToUpper()) { return; }
             }
 
@@ -219,33 +234,26 @@ namespace BlueDatabase
         }
 
 
-        internal void SaveToByteList(List<byte> List)
-        {
+        internal void SaveToByteList(List<byte> List) {
 
             Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
 
 
-            for (var ColumnCount = 0; ColumnCount < Count; ColumnCount++)
-            {
-                if (this[ColumnCount] != null && !string.IsNullOrEmpty(this[ColumnCount].Name))
-                {
+            for (var ColumnCount = 0; ColumnCount < Count; ColumnCount++) {
+                if (this[ColumnCount] != null && !string.IsNullOrEmpty(this[ColumnCount].Name)) {
                     this[ColumnCount].SaveToByteList(ref List);
                 }
             }
         }
 
 
-        public void GetSystems()
-        {
+        public void GetSystems() {
 
             ResetSystems();
 
-            foreach (var ThisColumnItem in this)
-            {
-                if (ThisColumnItem != null)
-                {
-                    switch (ThisColumnItem.Identifier)
-                    {
+            foreach (var ThisColumnItem in this) {
+                if (ThisColumnItem != null) {
+                    switch (ThisColumnItem.Identifier) {
                         case "": break;
                         case "System: Locked": SysLocked = ThisColumnItem; break;
                         case "System: Creator": SysRowCreator = ThisColumnItem; break;
@@ -266,8 +274,7 @@ namespace BlueDatabase
         }
 
 
-        public void Repair()
-        {
+        public void Repair() {
 
             var w = new List<string>
             {
@@ -283,44 +290,35 @@ namespace BlueDatabase
 
             // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
             // Den Wert Am I a Key Column ermitteln
-            foreach (var ThisColumnItem in this)
-            {
+            foreach (var ThisColumnItem in this) {
 
-                if (ThisColumnItem != null)
-                {
+                if (ThisColumnItem != null) {
                     _LastColumnKey = Math.Max(_LastColumnKey, ThisColumnItem.Key);
                     ThisColumnItem.CheckIfIAmAKeyColumn();
                 }
             }
 
 
-            foreach (var thisstring in w)
-            {
+            foreach (var thisstring in w) {
                 AddSystems(thisstring);
             }
 
             GetSystems();
 
 
-            for (var s1 = 0; s1 < Count; s1++)
-            {
-                if (base[s1] != null)
-                {
+            for (var s1 = 0; s1 < Count; s1++) {
+                if (base[s1] != null) {
 
-                    for (var s2 = s1 + 1; s2 < Count; s2++)
-                    {
-                        if (base[s2] != null)
-                        {
+                    for (var s2 = s1 + 1; s2 < Count; s2++) {
+                        if (base[s2] != null) {
 
                             // Evtl. Doppelte Namen einzigartig machen
-                            if (base[s1].Name.ToUpper() == base[s2].Name.ToUpper())
-                            {
+                            if (base[s1].Name.ToUpper() == base[s2].Name.ToUpper()) {
                                 base[s2].Load(enDatabaseDataType.co_Name, base[s2].Name + "0");
                             }
 
                             // Evtl. Doppelte Identifier eleminieren
-                            if (!string.IsNullOrEmpty(base[s1].Identifier) && base[s1].Identifier.ToUpper() == base[s2].Identifier.ToUpper())
-                            {
+                            if (!string.IsNullOrEmpty(base[s1].Identifier) && base[s1].Identifier.ToUpper() == base[s2].Identifier.ToUpper()) {
                                 base[s2].Load(enDatabaseDataType.co_Identifier, string.Empty);
                             }
 
@@ -335,33 +333,27 @@ namespace BlueDatabase
 
             // Reihengolge reparieren
             var ColN = -1;
-            do
-            {
+            do {
                 ColN++;
 
                 if (ColN + 2 > Count) { break; }
 
-                if (this[ColN] == null)
-                {
+                if (this[ColN] == null) {
                     base.Swap(ColN, ColN + 1);
                     ColN = -1;
                 }
-                else if (this[ColN + 1] == null)
-                {
+                else if (this[ColN + 1] == null) {
                     // Dummy, um nachfoldgnd nicht abfragen zu müssen
 
                 }
-                else if (!string.IsNullOrEmpty(this[ColN].Identifier) && string.IsNullOrEmpty(this[ColN + 1].Identifier))
-                {
+                else if (!string.IsNullOrEmpty(this[ColN].Identifier) && string.IsNullOrEmpty(this[ColN + 1].Identifier)) {
                     base.Swap(ColN, ColN + 1);
                     ColN = -1;
 
                 }
-                else if (!string.IsNullOrEmpty(this[ColN].Identifier) && !string.IsNullOrEmpty(this[ColN + 1].Identifier))
-                {
+                else if (!string.IsNullOrEmpty(this[ColN].Identifier) && !string.IsNullOrEmpty(this[ColN + 1].Identifier)) {
 
-                    if (w.IndexOf(this[ColN].Identifier) > w.IndexOf(this[ColN + 1].Identifier))
-                    {
+                    if (w.IndexOf(this[ColN].Identifier) > w.IndexOf(this[ColN + 1].Identifier)) {
                         base.Swap(ColN, ColN + 1);
                         ColN = -1;
                     }
@@ -370,11 +362,9 @@ namespace BlueDatabase
         }
 
 
-        internal int NextColumnKey()
-        {
+        internal int NextColumnKey() {
 
-            do
-            {
+            do {
                 if (_LastColumnKey == int.MaxValue) { _LastColumnKey = 0; }
                 _LastColumnKey++;
                 if (SearchByKey(_LastColumnKey) == null) { return _LastColumnKey; }
@@ -382,22 +372,19 @@ namespace BlueDatabase
         }
 
 
-        internal static string ParsableColumnKey(ColumnItem Column)
-        {
+        internal static string ParsableColumnKey(ColumnItem Column) {
             if (Column == null) { return "ColumnKey=?"; }
             return ParsableColumnKey(Column.Key);
         }
 
 
-        internal static string ParsableColumnKey(int Key)
-        {
+        internal static string ParsableColumnKey(int Key) {
             return "ColumnKey=" + Key;
         }
 
 
 
-        public static string ChangeKeysInString(string OriginalString, int OldKey, int NewKey)
-        {
+        public static string ChangeKeysInString(string OriginalString, int OldKey, int NewKey) {
 
             var o = ParsableColumnKey(OldKey);
             if (!OriginalString.Contains(o)) { return OriginalString; }
@@ -405,8 +392,7 @@ namespace BlueDatabase
             var n = ParsableColumnKey(NewKey);
 
 
-            if (OldKey == NewKey)
-            {
+            if (OldKey == NewKey) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Schlüssel gleich:  " + OldKey);
                 return OriginalString;
             }
@@ -419,8 +405,7 @@ namespace BlueDatabase
             if (OriginalString.EndsWith(o)) { OriginalString = OriginalString.TrimEnd(o) + n; }
 
 
-            if (OriginalString.Contains(o))
-            {
+            if (OriginalString.Contains(o)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "String nicht ersetzt: " + OriginalString);
                 return OriginalString;
             }
@@ -429,8 +414,7 @@ namespace BlueDatabase
 
         }
 
-        public ColumnItem AddACloneFrom(ColumnItem Source)
-        {
+        public ColumnItem AddACloneFrom(ColumnItem Source) {
 
             var c = Add(string.Empty);
 
@@ -549,8 +533,7 @@ namespace BlueDatabase
 
         //}
 
-        public void GenerateOverView()
-        {
+        public void GenerateOverView() {
             var da = new HTML(Database.Filename.FileNameWithoutSuffix());
             da.AddCaption("Spaltenliste von: " + Database.Caption);
             da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.Filename + "</h1><br>");
@@ -571,11 +554,9 @@ namespace BlueDatabase
 
 
             var lfdn = 0;
-            foreach (var ThisColumnItem in Database.Column)
-            {
+            foreach (var ThisColumnItem in Database.Column) {
 
-                if (ThisColumnItem != null)
-                {
+                if (ThisColumnItem != null) {
                     lfdn++;
                     da.RowBeginn();
                     da.CellAdd(lfdn.ToString());
@@ -603,28 +584,25 @@ namespace BlueDatabase
 
 
 
-        public string Freename(string Wunschname)
-        {
+        public string Freename(string wunschname) {
             var nr = 0;
 
-            Wunschname = Wunschname.ReduceToChars(ColumnItem.AllowedCharsInternalName);
-            if (string.IsNullOrEmpty(Wunschname)) { Wunschname = "NewColumn"; }
+            wunschname = wunschname.ReduceToChars(ColumnItem.AllowedCharsInternalName);
+            if (string.IsNullOrEmpty(wunschname)) { wunschname = "NewColumn"; }
 
-            if (this[Wunschname] == null) { return Wunschname; }
-            string TestName = null;
+            if (Exists(wunschname) == null) { return wunschname; }
+            string TestName;
 
-            do
-            {
+            do {
                 nr++;
-                TestName = Wunschname + "_" + nr;
-            } while (this[TestName] != null);
+                TestName = wunschname + "_" + nr;
+            } while (Exists(TestName) != null);
 
             return TestName;
         }
 
         [Obsolete]
-        public new ColumnItem Add(ColumnItem column)
-        {
+        public new ColumnItem Add(ColumnItem column) {
 
             Develop.DebugPrint(enFehlerArt.Fehler, "Direkter Aufruf nicht erlaubt!");
             return null;
@@ -637,21 +615,17 @@ namespace BlueDatabase
         /// <param name="comand">AddColumn muss benutzt werden. Ein Sicherheitsfaktor, um zu zeigen, dass das AddPending bereits erledigt wurde.</param>
         /// <param name="column"></param>
         /// <returns></returns>
-        public ColumnItem Add(enDatabaseDataType comand, ColumnItem column)
-        {
+        public ColumnItem Add(enDatabaseDataType comand, ColumnItem column) {
 
-            if (comand != enDatabaseDataType.AddColumn)
-            {
+            if (comand != enDatabaseDataType.AddColumn) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!");
             }
 
-            if (column.Database != Database)
-            {
+            if (column.Database != Database) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!");
             }
 
-            if (base.Contains(column))
-            {
+            if (base.Contains(column)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Spalte bereits vorhanden!");
             }
 
@@ -668,22 +642,19 @@ namespace BlueDatabase
         /// </summary>
         /// <param name="colKey">Ein bereits bekannter einmaliger Schlüssel mit einer Wert >= 0</param>
         /// <returns></returns>
-        internal ColumnItem Add(int colKey)
-        {
+        internal ColumnItem Add(int colKey) {
             Database.AddPending(enDatabaseDataType.AddColumn, colKey, -1, "", colKey.ToString(), true);
             return SearchByKey(colKey);
         }
 
 
-        public ColumnItem Add()
-        {
+        public ColumnItem Add() {
             return Add(Database.Column.NextColumnKey());
         }
 
 
 
-        public ColumnItem Add(string internalName, string caption, enDataFormat format)
-        {
+        public ColumnItem Add(string internalName, string caption, enDataFormat format) {
             var c = Add();
             c.Name = internalName;
 
@@ -695,8 +666,7 @@ namespace BlueDatabase
 
         }
 
-        public ColumnItem Add(string internalName, string caption, string suffix, enDataFormat format)
-        {
+        public ColumnItem Add(string internalName, string caption, string suffix, enDataFormat format) {
             var c = Add();
             c.Name = internalName;
             c.Caption = caption;
@@ -705,8 +675,7 @@ namespace BlueDatabase
             return c;
         }
 
-        public ColumnItem Add(string internalName)
-        {
+        public ColumnItem Add(string internalName) {
             var c = Add();
             c.Name = internalName;
             return c;
