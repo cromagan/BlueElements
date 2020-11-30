@@ -188,7 +188,7 @@ namespace BlueDatabase.Enums
         //co_Intelligenter_Multifilter = 193,
         co_DauerFilterPos = 194,
         co_AfterEdit_AutoReplace = 195,
-        co_co_FilterOptions = 196,
+        co_FilterOptions = 196,
 
 
 

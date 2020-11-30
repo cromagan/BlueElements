@@ -296,7 +296,6 @@ namespace BlueBasics.MultiUserFile {
         /// Führt - falls nötig - einen Reload der Datei aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
         /// </summary>
         public void Load_Reload() {
-
             WaitLoaded();
 
             if (string.IsNullOrEmpty(Filename)) { return; }
@@ -327,9 +326,7 @@ namespace BlueBasics.MultiUserFile {
             _LastSaveCode = tmpLastSaveCode; // initialize setzt zurück
             _CheckedAndReloadNeed = false;
 
-
             CheckDataAfterReload();
-
 
             OnLoaded(new LoadedEventArgs(OnlyReload));
             RepairOldBlockFiles();
@@ -342,8 +339,6 @@ namespace BlueBasics.MultiUserFile {
         /// Nicht für Reperaturzwecke gedacht.
         /// </summary>
         protected abstract void CheckDataAfterReload();
-
-
 
         /// <summary>
         /// Gibt die Möglichkeit, vor einem Reload Daten in Variablen zu speichern. Diese kann nach dem Reload mit CheckDataAfterReload zu prüfen, ob alles geklappt hat.
@@ -502,8 +497,6 @@ namespace BlueBasics.MultiUserFile {
                 RepairOldBlockFiles();
                 return txt;
             }
-
-
         }
 
 
@@ -546,8 +539,6 @@ namespace BlueBasics.MultiUserFile {
 
 
         private bool CreateBlockDatei() {
-
-
             var tmpInhalt = (UserName() + "\r\n" + DateTime.UtcNow.ToString(Constants.Format_Date5) + "\r\nThread: " + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName);
 
             // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
@@ -575,25 +566,16 @@ namespace BlueBasics.MultiUserFile {
             //    return false;
             //}
 
-
-
             if (AgeOfBlockDatei() < 0) {
                 Develop.DebugPrint("Block-Datei Konflikt 1\r\n" + Filename);
                 return false;
             }
 
-
-
             // Kontrolle, ob kein Netzwerkkonflikt vorliegt
             Pause(1, false);
 
-
-
-
             return BlockDateiCheck();
-
         }
-
 
         /// <summary>
         /// EasyMode gibt immer false zurück
@@ -615,8 +597,6 @@ namespace BlueBasics.MultiUserFile {
             return false;
         }
 
-
-
         protected abstract List<byte> ToListOfByte(bool willSave);
 
 
@@ -624,10 +604,6 @@ namespace BlueBasics.MultiUserFile {
         ///  Der Richtige Ort, um das "PendingChanges" flag auf false zu setzen.
         /// </summary>
         protected abstract void DoWorkAfterSaving();
-
-
-
-
 
         protected abstract bool isSomethingDiscOperatingsBlocking();
 
@@ -647,8 +623,6 @@ namespace BlueBasics.MultiUserFile {
 
             if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
 
-
-
             if (!FileExists(fileNameToLoad)) {
 
                 if (CreateWhenNotExisting) {
@@ -666,13 +640,6 @@ namespace BlueBasics.MultiUserFile {
                 }
             }
 
-
-
-
-
-
-
-
             Filename = fileNameToLoad;
 
 
@@ -686,11 +653,7 @@ namespace BlueBasics.MultiUserFile {
                 count++;
                 if (count > 10) { Develop.DebugPrint(enFehlerArt.Fehler, "Datei nicht korrekt geladen (nicht mehr aktuell)"); }
             } while (ReloadNeeded());
-
-
         }
-
-
 
         public void SaveAsAndChangeTo(string NewFileName) {
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
@@ -718,13 +681,13 @@ namespace BlueBasics.MultiUserFile {
         private void OnLoading(LoadingEventArgs e) {
             Loading?.Invoke(this, e);
         }
+
         protected virtual void OnLoaded(LoadedEventArgs e) {
             Loaded?.Invoke(this, e);
         }
 
 
         private string GetFileInfo(bool MustDo) {
-
             try {
                 var f = new FileInfo(Filename);
                 return f.LastWriteTimeUtc.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
@@ -740,6 +703,7 @@ namespace BlueBasics.MultiUserFile {
         private void OnSavedToDisk() {
             SavedToDisk?.Invoke(this, System.EventArgs.Empty);
         }
+
         public void RepairOldBlockFiles() {
 
             if (DateTime.UtcNow.Subtract(_LastMessageUTC).TotalMinutes < 1) { return; }
@@ -773,13 +737,7 @@ namespace BlueBasics.MultiUserFile {
             catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
-
-
         }
-
-
-
-
 
 
         private void OnParsed() {
@@ -793,7 +751,7 @@ namespace BlueBasics.MultiUserFile {
         /// </summary>
         public bool Save(bool mustSave) {
 
-            if (ReadOnly) { RepairOldBlockFiles(); return false; }
+            if (ReadOnly) { return false; }
 
             if (isSomethingDiscOperatingsBlocking()) {
                 if (!mustSave) { RepairOldBlockFiles(); return false; }
@@ -899,12 +857,18 @@ namespace BlueBasics.MultiUserFile {
             if (!iAmThePureBinSaver && PureBinSaver.IsBusy) { return null; }
 
             do {
+
+                if (!iAmThePureBinSaver) {
+                    // Also, im NICHT-parallelen Prozess ist explizit der Save angestoßen worden.
+                    // Somit sollte des Prgramm auf Warteschleife sein und keine Benutzereingabe mehr kommen.
+                    // Problem: Wenn die ganze Save-Routine in einem Parallelen-Thread ist
+                    UserEditedAktionUTC = new DateTime(1900, 1, 1);
+                }
+
                 var f = ErrorReason(enErrorReason.Save);
                 if (!string.IsNullOrEmpty(f)) { return null; }
 
                 FileInfoBeforeSaving = GetFileInfo(true);
-
-
 
                 if (_zipped) {
                     var bytes = ToListOfByte(true).ToArray();
@@ -916,7 +880,6 @@ namespace BlueBasics.MultiUserFile {
                     DataUncompressed = Writer_BinaryData.ToStringConvert();
                 }
 
-
                 TMPFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + modAllgemein.UserName().ToUpper());
 
                 try {
@@ -926,9 +889,6 @@ namespace BlueBasics.MultiUserFile {
                         x.Close();
                     }
 
-
-                    //File.SetLastWriteTimeUtc(TMP, DateTime.UtcNow);
-                    //SetFileDate();
                     break;
                 }
                 catch (Exception ex) {
@@ -965,12 +925,10 @@ namespace BlueBasics.MultiUserFile {
         }
 
 
-
         private string Blockdateiname() {
             if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
             return Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
         }
-
 
         /// <summary>
         /// 
@@ -986,7 +944,6 @@ namespace BlueBasics.MultiUserFile {
 
             return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
         }
-
 
         public bool IsParsing() {
             return _isParsing;
@@ -1215,9 +1172,6 @@ namespace BlueBasics.MultiUserFile {
             }
 
         }
-
-
-
 
         public void WaitEditable() {
             while (!string.IsNullOrEmpty(ErrorReason(enErrorReason.EditAcut))) {
