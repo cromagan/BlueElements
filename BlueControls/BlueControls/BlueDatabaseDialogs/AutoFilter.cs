@@ -66,11 +66,11 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
 
-        public void GenerateAll(FilterCollection vFilter) {
+        public void GenerateAll(FilterCollection filter) {
 
             var nochOk = true;
 
-            var List_FilterString = Column.Autofilter_ItemList(vFilter);
+            var List_FilterString = Column.Autofilter_ItemList(filter);
 
 
             var F = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
@@ -112,8 +112,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
                 lsbStandardFilter.Item.Clear();
-                if (vFilter != null) {
-                    lsbStandardFilter.Item.Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), vFilter[Column] != null, Constants.FirstSortChar + "01");
+                if (filter != null) {
+                    lsbStandardFilter.Item.Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), filter[Column] != null, Constants.FirstSortChar + "01");
                 }
                 else {
                     lsbStandardFilter.Item.Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), false, Constants.FirstSortChar + "01");
@@ -144,7 +144,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 lsbStandardFilter.Item.Add("negativ Auswahl aktivieren", "ModusNegativ", QuickImage.Get(enImageCode.MinusZeichen, 17), !Column.MultiLine && Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "09");
                 lsbStandardFilter.Item.Add("Einzigartige Einträge", "Einzigartig", QuickImage.Get(enImageCode.Eins, 17), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "10");
                 lsbStandardFilter.Item.Add("Nicht Einzigartige Einträge", "NichtEinzigartig", QuickImage.Get("Eins|17||1"), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "11");
-                lsbStandardFilter.Item.Add("Vergleiche mit anderer Spalte", "Spaltenvergleich", QuickImage.Get(enImageCode.Spalte, 17), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && vFilter[Column.Database.Column[0]] == null, Constants.FirstSortChar + "12");
+                lsbStandardFilter.Item.Add("Vergleiche mit anderer Spalte", "Spaltenvergleich", QuickImage.Get(enImageCode.Spalte, 17), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && filter[Column.Database.Column[0]] == null, Constants.FirstSortChar + "12");
 
 
             }
@@ -153,9 +153,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             Height = lsbFilterItems.Bottom + Skin.PaddingSmal;
 
 
-            if (vFilter != null) {
+            if (filter != null) {
 
-                foreach (var Thisfilter in vFilter) {
+                foreach (var Thisfilter in filter) {
                     if (Thisfilter != null && Thisfilter.FilterType != enFilterType.KeinFilter) {
                         if (Thisfilter.Column == Column) {
 

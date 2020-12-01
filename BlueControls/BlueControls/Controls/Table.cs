@@ -99,6 +99,7 @@ namespace BlueControls.Controls {
         private BlueFont _NewRow_Font;
         private int Pix16 = 16;
         private int Pix18 = 18;
+        private const int _AutoFilterSize = 22;
 
         private Rectangle tmpCursorRect = Rectangle.Empty;
 
@@ -998,7 +999,7 @@ namespace BlueControls.Controls {
 
 
 
-            // Recude-Button zeichnen
+            #region Recude-Button zeichnen
             if (Column_DrawWidth(ViewItem, displayRectangleWOSlider) > 70 || ViewItem._TMP_Reduced) {
 
                 ViewItem._TMP_ReduceLocation = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 18, Down, 18, 18);
@@ -1010,53 +1011,93 @@ namespace BlueControls.Controls {
                 }
             }
 
-            // Autofilter-Button zeichnen und lfd Nummer zeichnen
-            QuickImage i = null;
-            var tstate = enStates.Undefiniert;
-            ViewItem._TMP_AutoFilterLocation = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 18, HeadSize() - 18, 18, 18);
+            #endregion
+
+            #region Filter-Knopf mit Trichter
+
+            var TrichterText = string.Empty;
+            QuickImage TrichterIcon = null;
+            var TrichterState = enStates.Undefiniert;
+            ViewItem._TMP_AutoFilterLocation = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - _AutoFilterSize, HeadSize() - _AutoFilterSize, _AutoFilterSize, _AutoFilterSize);
 
             var filtIt = Filter[ViewItem.Column];
             if (ViewItem.Column.AutoFilterSymbolPossible()) {
 
                 if (filtIt != null) {
-                    tstate = enStates.Checked;
+                    TrichterState = enStates.Checked;
+                    var anz = Autofilter_Text(ViewItem.Column);
+                    if (anz > -100) {
+                        TrichterText = (anz * -1).ToString();
+                    }
+                    else {
+                        TrichterText = "∞";
+                    }
+
                 }
-                else if (Autofilter_Sinnvoll(ViewItem)) {
-                    tstate = enStates.Standard;
+                else if (Autofilter_Sinnvoll(ViewItem.Column)) {
+                    TrichterState = enStates.Standard;
                 }
                 else {
-                    tstate = enStates.Standard_Disabled;
+                    TrichterState = enStates.Standard_Disabled;
                 }
             }
 
+            var TrichterSize = (_AutoFilterSize - 4).ToString();
+
             if (filtIt != null) {
-                i = QuickImage.Get("Trichter|14|||FF0000");
+                TrichterIcon = QuickImage.Get("Trichter|" + TrichterSize + "|||FF0000");
             }
             else if (Filter.MayHasRowFilter(ViewItem.Column)) {
-                i = QuickImage.Get("Trichter|14|||227722");
+                TrichterIcon = QuickImage.Get("Trichter|" + TrichterSize + "|||227722");
 
 
             }
             else if (ViewItem.Column.AutoFilterSymbolPossible()) {
 
-                if (Autofilter_Sinnvoll(ViewItem)) {
-                    i = QuickImage.Get("Trichter|14");
+                if (Autofilter_Sinnvoll(ViewItem.Column)) {
+                    TrichterIcon = QuickImage.Get("Trichter|" + TrichterSize);
                 }
                 else {
-                    i = QuickImage.Get("Trichter|14||128");
+                    TrichterIcon = QuickImage.Get("Trichter|" + TrichterSize + "||128");
                 }
             }
 
-            if (tstate != enStates.Undefiniert) {
-                Skin.Draw_Back(GR, enDesign.Button_AutoFilter, tstate, ViewItem._TMP_AutoFilterLocation, null, false);
-                Skin.Draw_Border(GR, enDesign.Button_AutoFilter, tstate, ViewItem._TMP_AutoFilterLocation);
+            if (TrichterState != enStates.Undefiniert) {
+                Skin.Draw_Back(GR, enDesign.Button_AutoFilter, TrichterState, ViewItem._TMP_AutoFilterLocation, null, false);
+                Skin.Draw_Border(GR, enDesign.Button_AutoFilter, TrichterState, ViewItem._TMP_AutoFilterLocation);
             }
 
-            if (i != null) {
-                GR.DrawImage(i.BMP, ViewItem._TMP_AutoFilterLocation.Left + 2, ViewItem._TMP_AutoFilterLocation.Top + 2);
+            if (TrichterIcon != null) {
+                GR.DrawImage(TrichterIcon.BMP, ViewItem._TMP_AutoFilterLocation.Left + 2, ViewItem._TMP_AutoFilterLocation.Top + 2);
             }
 
 
+            if (!string.IsNullOrEmpty(TrichterText)) {
+
+                var s = _Column_Font.MeasureString(TrichterText);
+                for (var x = -1; x < 2; x++) {
+                    for (var y = -1; y < 2; y++) {
+                        GR.DrawString(TrichterText, _Column_Font.Font(), Brushes.Red,
+                                           ViewItem._TMP_AutoFilterLocation.Left + (_AutoFilterSize - s.Width) / 2 + x,
+                                           ViewItem._TMP_AutoFilterLocation.Top + (_AutoFilterSize - s.Height) / 2 + y);
+                    }
+                }
+
+
+                GR.DrawString(TrichterText, _Column_Font.Font(), Brushes.White,
+                                    ViewItem._TMP_AutoFilterLocation.Left + (_AutoFilterSize - s.Width) / 2,
+                                    ViewItem._TMP_AutoFilterLocation.Top + (_AutoFilterSize - s.Height) / 2);
+            }
+
+            if (TrichterState == enStates.Undefiniert) {
+                ViewItem._TMP_AutoFilterLocation = new Rectangle(0, 0, 0, 0);
+            }
+
+
+
+            #endregion
+
+            #region LaufendeNummer
 
             if (_ShowNumber) {
                 for (var x = -1; x < 2; x++) {
@@ -1068,11 +1109,10 @@ namespace BlueControls.Controls {
                 GR.DrawString("#" + lfdNo.ToString(), _Column_Font.Font(), Brushes.White, (int)ViewItem.OrderTMP_Spalte_X1, ViewItem._TMP_AutoFilterLocation.Top);
             }
 
+            #endregion
 
 
-            if (tstate == enStates.Undefiniert) {
-                ViewItem._TMP_AutoFilterLocation = new Rectangle(0, 0, 0, 0);
-            }
+
 
             var tx = ViewItem.Column.Caption;
             tx = BlueDatabase.LanguageTool.DoTranslate(tx, Translate).Replace("\r", "\r\n");
@@ -1092,7 +1132,7 @@ namespace BlueControls.Controls {
 
             }
             else {
-                var pos = new Point((int)ViewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(ViewItem, displayRectangleWOSlider) - FS.Height) / 2.0), HeadSize() - 4 - 18);
+                var pos = new Point((int)ViewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(ViewItem, displayRectangleWOSlider) - FS.Height) / 2.0), HeadSize() - 4 - _AutoFilterSize);
 
                 GR.TranslateTransform(pos.X, pos.Y);
 
@@ -1108,10 +1148,10 @@ namespace BlueControls.Controls {
             var tmpSortDefinition = SortUsed();
             if (tmpSortDefinition != null && tmpSortDefinition.UsedForRowSort(ViewItem.Column)) {
                 if (tmpSortDefinition.Reverse) {
-                    GR.DrawImage(QuickImage.Get("ZA|11|5||||50").BMP, (float)(ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) / 2.0 - 6), HeadSize() - 6 - 18);
+                    GR.DrawImage(QuickImage.Get("ZA|11|5||||50").BMP, (float)(ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) / 2.0 - 6), HeadSize() - 6 - _AutoFilterSize);
                 }
                 else {
-                    GR.DrawImage(QuickImage.Get("AZ|11|5||||50").BMP, (float)(ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) / 2.0 - 6), HeadSize() - 6 - 18);
+                    GR.DrawImage(QuickImage.Get("AZ|11|5||||50").BMP, (float)(ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) / 2.0 - 6), HeadSize() - 6 - _AutoFilterSize);
                 }
             }
 
@@ -1819,7 +1859,6 @@ namespace BlueControls.Controls {
                 foreach (var ThisViewItem in CurrentArrangement) {
                     if (ThisViewItem != null) {
                         ThisViewItem.OrderTMP_Spalte_X1 = null;
-                        ThisViewItem.TMP_AutoFilterSinnvoll = null;
                     }
                 }
                 foreach (var ThisRowItem in _Database.Row) {
@@ -2204,6 +2243,23 @@ namespace BlueControls.Controls {
         private void OnCellValueChanged(CellEventArgs e) {
             CellValueChanged?.Invoke(this, e);
         }
+
+
+        private void Invalidate_Filterinfo() {
+
+            if (_Database == null) { return; }
+
+
+            foreach (var thisColumn in _Database.Column) {
+                if (thisColumn != null) {
+
+                    thisColumn.TMP_IfFilterRemoved = null;
+                    thisColumn.TMP_AutoFilterSinnvoll = null;
+                }
+            }
+
+        }
+
 
         private void Invalidate_RowSort() {
 
@@ -3179,7 +3235,7 @@ namespace BlueControls.Controls {
             }
 
             _HeadSize += 8;
-            _HeadSize += 18;
+            _HeadSize += _AutoFilterSize;
 
 
 
@@ -3274,7 +3330,7 @@ namespace BlueControls.Controls {
                 }
             }
 
-            ViewItem._TMP_DrawWidth = Math.Max((int)ViewItem._TMP_DrawWidth, 18); // Mindesten so groß wie der Autofilter;
+            ViewItem._TMP_DrawWidth = Math.Max((int)ViewItem._TMP_DrawWidth, _AutoFilterSize); // Mindestens so groß wie der Autofilter;
             ViewItem._TMP_DrawWidth = Math.Max((int)ViewItem._TMP_DrawWidth, (int)ColumnHead_Size(ViewItem.Column).Width);
 
             return (int)ViewItem._TMP_DrawWidth;
@@ -3378,21 +3434,41 @@ namespace BlueControls.Controls {
         }
 
 
-        private bool Autofilter_Sinnvoll(ColumnViewItem vcolumn) {
+        private bool Autofilter_Sinnvoll(ColumnItem column) {
 
-            if (vcolumn.TMP_AutoFilterSinnvoll != null) { return (bool)vcolumn.TMP_AutoFilterSinnvoll; }
+            if (column.TMP_AutoFilterSinnvoll != null) { return (bool)column.TMP_AutoFilterSinnvoll; }
 
             for (var rowcount = 0; rowcount <= SortedRows().Count - 2; rowcount++) {
-                if (SortedRows()[rowcount].CellGetString(vcolumn.Column) != SortedRows()[rowcount + 1].CellGetString(vcolumn.Column)) {
-                    vcolumn.TMP_AutoFilterSinnvoll = true;
+                if (SortedRows()[rowcount].CellGetString(column) != SortedRows()[rowcount + 1].CellGetString(column)) {
+                    column.TMP_AutoFilterSinnvoll = true;
                     return true;
                 }
             }
 
-            vcolumn.TMP_AutoFilterSinnvoll = false;
+            column.TMP_AutoFilterSinnvoll = false;
             return false;
         }
 
+        private int Autofilter_Text(ColumnItem column) {
+            if (column.TMP_IfFilterRemoved != null) { return (int)column.TMP_IfFilterRemoved; }
+
+
+
+            var tfilter = new FilterCollection(Database);
+
+            foreach (var ThisFilter in Filter) {
+                if (ThisFilter != null && ThisFilter.Column != column) { tfilter.Add(ThisFilter); }
+            }
+
+
+
+            var temp = Database.Row.CalculateSortedRows(tfilter, SortUsed(), _PinnedRows);
+
+
+            column.TMP_IfFilterRemoved = SortedRows().Count - temp.Count;
+            return (int)column.TMP_IfFilterRemoved;
+
+        }
 
 
 
@@ -3553,6 +3629,7 @@ namespace BlueControls.Controls {
         }
 
         private void Filter_Changed(object sender, System.EventArgs e) {
+            Invalidate_Filterinfo();
             Invalidate_RowSort();
             Invalidate();
             OnFilterChanged();

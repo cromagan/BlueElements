@@ -142,6 +142,8 @@ namespace BlueDatabase {
         public SizeF TMP_CaptionText_Size = new SizeF(-1, -1);
         internal Database _TMP_LinkedDatabase;
         public int? TMP_ColumnContentWidth = null;
+        public bool? TMP_AutoFilterSinnvoll = null;
+        public int? TMP_IfFilterRemoved = null;
 
         internal List<string> _UcaseNamesSortedByLenght = null;
 

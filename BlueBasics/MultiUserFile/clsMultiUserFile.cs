@@ -120,6 +120,8 @@ namespace BlueBasics.MultiUserFile {
         private bool _IsLoading = false;
         private bool _IsSaving = false;
 
+        private bool _DoingTempFile = false;
+
         public DateTime UserEditedAktionUTC;
 
 
@@ -856,6 +858,13 @@ namespace BlueBasics.MultiUserFile {
 
             if (!iAmThePureBinSaver && PureBinSaver.IsBusy) { return null; }
 
+            if (_DoingTempFile) {
+                if (!iAmThePureBinSaver) { Develop.DebugPrint("Ersteller schon temp File"); }
+                return null;
+            }
+
+            _DoingTempFile = true;
+
             do {
 
                 if (!iAmThePureBinSaver) {
@@ -866,7 +875,7 @@ namespace BlueBasics.MultiUserFile {
                 }
 
                 var f = ErrorReason(enErrorReason.Save);
-                if (!string.IsNullOrEmpty(f)) { return null; }
+                if (!string.IsNullOrEmpty(f)) { _DoingTempFile = false; return null; }
 
                 FileInfoBeforeSaving = GetFileInfo(true);
 
@@ -897,12 +906,14 @@ namespace BlueBasics.MultiUserFile {
                     count++;
                     if (count > 15) {
                         Develop.DebugPrint(enFehlerArt.Warnung, "Speichern der TMP-Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + ex.Message);
+                        _DoingTempFile = false;
                         return null;
                     }
                     Pause(1, true);
                 }
             } while (true);
 
+            _DoingTempFile = false;
             return new Tuple<string, string, string>(TMPFileName, FileInfoBeforeSaving, DataUncompressed);
 
         }

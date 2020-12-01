@@ -24,10 +24,8 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace BlueDatabase
-{
-    public sealed class FilterItem : IParseable, ICompareKey, IReadableText, ICanBeEmpty
-    {
+namespace BlueDatabase {
+    public sealed class FilterItem : IParseable, ICompareKey, IReadableText, ICanBeEmpty {
 
         #region  Variablen-Deklarationen 
 
@@ -53,16 +51,14 @@ namespace BlueDatabase
         #region  Construktor + Initialize 
 
         public FilterItem(Database database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string>() { searchValue }) { }
-        public FilterItem(Database database, enFilterType filterType, List<string> searchValue)
-        {
+        public FilterItem(Database database, enFilterType filterType, List<string> searchValue) {
             Database = database;
             _FilterType = filterType;
             if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
-        public FilterItem(Database database, string FilterCode)
-        {
+        public FilterItem(Database database, string FilterCode) {
             Database = database;
             Parse(FilterCode);
             SearchValue.Changed += SearchValue_ListOrItemChanged;
@@ -76,8 +72,7 @@ namespace BlueDatabase
         public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 
 
-        public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue, string tag)
-        {
+        public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue, string tag) {
 
             if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte nicht vorhanden."); }
 
@@ -90,6 +85,8 @@ namespace BlueDatabase
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
+        public FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, enFilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
+
         #endregion
 
 
@@ -97,14 +94,11 @@ namespace BlueDatabase
 
         public bool IsParsing { get; private set; }
 
-        public ColumnItem Column
-        {
-            get
-            {
+        public ColumnItem Column {
+            get {
                 return _Column;
             }
-            set
-            {
+            set {
                 _Column = value;
                 OnChanged();
             }
@@ -113,22 +107,18 @@ namespace BlueDatabase
 
         public ListExt<string> SearchValue { get; private set; } = new ListExt<string>();
 
-        public enFilterType FilterType
-        {
-            get
-            {
+        public enFilterType FilterType {
+            get {
                 return _FilterType;
             }
-            set
-            {
+            set {
                 _FilterType = value;
                 OnChanged();
             }
         }
 
 
-        public void OnChanged()
-        {
+        public void OnChanged() {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
@@ -137,8 +127,7 @@ namespace BlueDatabase
 
 
 
-        public override string ToString()
-        {
+        public override string ToString() {
 
             if (!IsOk()) { return string.Empty; }
 
@@ -148,8 +137,7 @@ namespace BlueDatabase
             if (_Column != null) { Result = Result + ", " + _Column.ParsableColumnKey(); }
 
 
-            foreach (var t in SearchValue)
-            {
+            foreach (var t in SearchValue) {
                 Result = Result + ", Value=" + t.ToNonCritical();
             }
 
@@ -159,16 +147,12 @@ namespace BlueDatabase
         }
 
 
-        public void Parse(string ToParse)
-        {
+        public void Parse(string ToParse) {
             IsParsing = true;
-            foreach (var pair in ToParse.GetAllTags())
-            {
-                switch (pair.Key)
-                {
+            foreach (var pair in ToParse.GetAllTags()) {
+                switch (pair.Key) {
                     case "identifier":
-                        if (pair.Value != "Filter")
-                        {
+                        if (pair.Value != "Filter") {
                             Develop.DebugPrint(enFehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value);
                         }
                         break;
@@ -204,13 +188,11 @@ namespace BlueDatabase
 
 
 
-        public string CompareKey()
-        {
+        public string CompareKey() {
             return ((int)_FilterType).ToString(Constants.Format_Integer10);
         }
 
-        public string ReadableText()
-        {
+        public string ReadableText() {
 
 
             if (_FilterType == enFilterType.KeinFilter) { return "Filter ohne Funktion"; }
@@ -227,10 +209,8 @@ namespace BlueDatabase
 
             if (SearchValue == null || SearchValue.Count < 1) { return "#### Filter-Fehler ####"; }
 
-            if (SearchValue.Count > 1)
-            {
-                switch (_FilterType)
-                {
+            if (SearchValue.Count > 1) {
+                switch (_FilterType) {
                     case enFilterType.Istgleich:
                     case enFilterType.IstGleich_ODER:
                     case enFilterType.Istgleich_GroﬂKleinEgal:
@@ -252,15 +232,13 @@ namespace BlueDatabase
 
 
 
-            if (_Column == Database.Column.SysCorrect && _FilterType.HasFlag(enFilterType.Istgleich))
-            {
+            if (_Column == Database.Column.SysCorrect && _FilterType.HasFlag(enFilterType.Istgleich)) {
                 if (SearchValue[0].FromPlusMinus()) { return "Fehlerfreie Zeilen"; }
                 if (!SearchValue[0].FromPlusMinus()) { return "Fehlerhafte Zeilen"; }
             }
 
 
-            switch (_FilterType)
-            {
+            switch (_FilterType) {
                 case enFilterType.Istgleich:
                 case enFilterType.Istgleich_GroﬂKleinEgal:
                 case enFilterType.Istgleich_ODER_GroﬂKleinEgal:
@@ -290,8 +268,7 @@ namespace BlueDatabase
                 case enFilterType.Berechne:
                 case (enFilterType.Berechne | enFilterType.UND):
 
-                    if (SearchValue[0].ToUpper().StartsWith("BTW(VALUE, "))
-                    {
+                    if (SearchValue[0].ToUpper().StartsWith("BTW(VALUE, ")) {
                         var l = SearchValue[0].ToUpper().TrimStart("BTW(VALUE, ");
                         l = l.TrimEnd(")");
                         l = "von " + l.Replace(",", " bis ");
@@ -308,42 +285,35 @@ namespace BlueDatabase
             }
         }
 
-        public QuickImage SymbolForReadableText()
-        {
+        public QuickImage SymbolForReadableText() {
             return null;
         }
 
-        public bool IsNullOrEmpty()
-        {
+        public bool IsNullOrEmpty() {
             if (_FilterType == enFilterType.KeinFilter) { return true; }
             return false;
         }
 
 
 
-        public object Clone()
-        {
+        public object Clone() {
             return new FilterItem(Database, ToString());
         }
 
-        public bool IsOk()
-        {
+        public bool IsOk() {
             return string.IsNullOrEmpty(ErrorReason());
         }
 
-        public string ErrorReason()
-        {
+        public string ErrorReason() {
             if (_FilterType == enFilterType.KeinFilter) { return "'Kein Filter' angegeben"; }
             return string.Empty;
         }
 
-        private void SearchValue_ListOrItemChanged(object sender, System.EventArgs e)
-        {
+        private void SearchValue_ListOrItemChanged(object sender, System.EventArgs e) {
             OnChanged();
         }
 
-        public void Changeto(enFilterType type, string searchvalue)
-        {
+        public void Changeto(enFilterType type, string searchvalue) {
             SearchValue.ThrowEvents = false;
 
             SearchValue.Clear();
