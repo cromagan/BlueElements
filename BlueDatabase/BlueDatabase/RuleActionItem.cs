@@ -363,7 +363,7 @@ namespace BlueDatabase
 
                     foreach (var t in Columns)
                     {
-                        var erg2 = Row.ReplaceVariables(_Text);
+                        var erg2 = Row.ReplaceVariables(_Text, false);
                         if (erg2 == _Text)
                         {
                             return "Der Text der Spalte '#Spalte:" + t.Name + "' konnte nicht erstellt werden.";
@@ -1285,7 +1285,7 @@ namespace BlueDatabase
 
                 case enAction.Ist:
                     if (string.IsNullOrEmpty(_Text)) { return "die Zelle in " + ColsOder + " leer ist"; }
-                    return "die gesamte Zelle in " + ColsOder + " genau der Wert '" + _Text.Replace("\r", "' oder '") + "' ist";
+                    return "die gesamte Zelle in " + ColsOder + " genau der Text '" + _Text.Replace("\r", "' oder '") + "' ist";
 
                 //case enAction.Erhält_den_Focus:
                 //    return "die Zelle in " + ColsOder + " den Focus erhält";
@@ -1299,7 +1299,7 @@ namespace BlueDatabase
 
                 case enAction.Ist_Nicht:
                     if (string.IsNullOrEmpty(_Text)) { return "die Zelle in " + ColsOder + " befüllt ist"; }
-                    return "die Zelle in " + ColsOder + " NICHT der Wert '" + _Text.Replace("\r", "' oder '") + "' ist";
+                    return "die Zelle in " + ColsOder + " NICHT der Text '" + _Text.Replace("\r", "' oder '") + "' ist";
 
                 case enAction.Enthält_ungültige_Zeichen:
                     return "die Zelle in " + ColsOder + " nicht erlaubte Zeichen enthält";
@@ -1315,7 +1315,7 @@ namespace BlueDatabase
                     return "die Zelle in  " + ColsOder + " auf eine existierenden Dateipfad verweist";
 
                 case enAction.Enthält:
-                    return "einer der Werte in der Zelle " + ColsOder + " genau der Wert '" + _Text.Replace("\r", "' oder '") + "' ist";
+                    return "einer der Werte in der Zelle " + ColsOder + " genau der Text '" + _Text.Replace("\r", "' oder '") + "' ist";
 
                 case enAction.Enthält_Zeichenkette:
                     return "die Zelle in " + ColsOder + " die Zeichenkette '" + _Text.Replace("\r", "' oder '") + "' enthält";
@@ -1334,7 +1334,7 @@ namespace BlueDatabase
                     return "markiere die Zeile als fehlerhaft, mit speziellen Fehlertext";
 
                 case enAction.Wert_Setzen:
-                    if (string.IsNullOrEmpty(_Text)) { return "lösche den Wert in der Zelle " + ColsUnd; }
+                    if (string.IsNullOrEmpty(_Text)) { return "lösche den Text in der Zelle " + ColsUnd; }
                     return "ändere den Wert in der Zelle " + ColsUnd + " in '" + _Text.Replace("\r", "'/'") + "' ab";
 
                 case enAction.Berechne:

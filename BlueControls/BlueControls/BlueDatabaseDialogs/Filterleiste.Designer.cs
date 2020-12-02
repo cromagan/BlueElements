@@ -35,6 +35,7 @@
             this.btnPinZurück = new BlueControls.Controls.Button();
             this.btnAdmin = new BlueControls.Controls.Button();
             this.pic = new System.Windows.Forms.PictureBox();
+            this.btnÄhnliche = new BlueControls.Controls.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pic)).BeginInit();
             this.SuspendLayout();
             // 
@@ -113,9 +114,22 @@
             this.pic.TabStop = false;
             this.pic.Visible = false;
             // 
+            // btnÄhnliche
+            // 
+            this.btnÄhnliche.ImageCode = "Fernglas|16|||||||||Istgleich";
+            this.btnÄhnliche.Location = new System.Drawing.Point(8, 40);
+            this.btnÄhnliche.Margin = new System.Windows.Forms.Padding(4);
+            this.btnÄhnliche.Name = "btnÄhnliche";
+            this.btnÄhnliche.Size = new System.Drawing.Size(136, 24);
+            this.btnÄhnliche.TabIndex = 18;
+            this.btnÄhnliche.Text = "ähnlich";
+            this.btnÄhnliche.Visible = false;
+            this.btnÄhnliche.Click += new System.EventHandler(this.btnÄhnliche_Click);
+            // 
             // Filterleiste
             // 
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.Controls.Add(this.btnÄhnliche);
             this.Controls.Add(this.pic);
             this.Controls.Add(this.btnAdmin);
             this.Controls.Add(this.btnPinZurück);
@@ -140,5 +154,6 @@
         private Controls.Button btnPinZurück;
         private Controls.Button btnAdmin;
         internal System.Windows.Forms.PictureBox pic;
+        private Controls.Button btnÄhnliche;
     }
 }
