@@ -150,7 +150,7 @@ namespace BlueControls.Forms
             this.TableView.CursorPosChanged += new System.EventHandler<BlueDatabase.EventArgs.CellEventArgs>(this.TableView_CursorPosChanged);
             this.TableView.ColumnArrangementChanged += new System.EventHandler(this.TableView_ColumnArrangementChanged);
             this.TableView.ViewChanged += new System.EventHandler(this.TableView_ViewChanged);
-            this.TableView.RowsSorted += new System.EventHandler(this.TableView_RowsSorted);
+            this.TableView.VisibleRowsChanged += new System.EventHandler(this.TableView_RowsSorted);
             // 
             // cbxColumnArr
             // 

@@ -1569,6 +1569,22 @@ namespace BlueDatabase {
             }
         }
 
+        public string Verwendung() {
+
+            var t = "<b><u>Verwendung von " + ReadableText() + "</b></u><br>";
+
+
+            if (!string.IsNullOrEmpty(_Identifier)) {
+                t += " - Systemspalte<br>";
+            }
+
+
+            return t + Database.Column_UsedIn(this);
+
+
+
+        }
+
         public double? Summe(FilterCollection Filter) {
             double summ = 0;
 

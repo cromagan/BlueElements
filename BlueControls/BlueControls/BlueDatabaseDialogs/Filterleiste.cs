@@ -29,6 +29,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private ColumnViewCollection _ähnliche = null;
 
+
+        private bool _AutoPin = false;
+
+        private string _LastLooked = string.Empty;
+
         #endregion
 
         #region Konstruktor
@@ -94,6 +99,19 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
 
+        [DefaultValue(false)]
+        public bool AutoPin {
+            get {
+                return _AutoPin;
+            }
+            set {
+                if (_AutoPin == value) { return; }
+                _AutoPin = value;
+            }
+        }
+
+
+
 
 
         [DefaultValue((Table)null)]
@@ -108,7 +126,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 if (_TableView != null) {
                     _TableView.DatabaseChanged -= _TableView_DatabaseChanged;
-                    _TableView.FilterChanged -= _TableView_FilterChanged;
+                    _TableView.FilterChanged -= _TableView_PinnedOrFilterChanged;
+                    _TableView.PinnedChanged -= _TableView_PinnedOrFilterChanged;
                     _TableView.EnabledChanged -= _TableView_EnabledChanged;
                     _TableView.ViewChanged -= _TableView_ViewChanged;
                     //ChangeDatabase(null);
@@ -124,7 +143,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                     _TableView.DatabaseChanged += _TableView_DatabaseChanged;
                     //_TableView.CursorPosChanged += _TableView_CursorPosChanged;
                     //_TableView.ViewChanged += _TableView_ViewChanged;
-                    _TableView.FilterChanged += _TableView_FilterChanged;
+                    _TableView.FilterChanged += _TableView_PinnedOrFilterChanged;
+                    _TableView.PinnedChanged += _TableView_PinnedOrFilterChanged;
                     _TableView.EnabledChanged += _TableView_EnabledChanged;
                     _TableView.ViewChanged += _TableView_ViewChanged;
                 }
@@ -140,20 +160,66 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _ähnliche = null;
 
+            if (_TableView != null && _TableView.Database != null && !string.IsNullOrEmpty(_ÄhnlicheAnsichtName)) {
+
+                foreach (var thisArr in _TableView.Database.ColumnArrangements) {
+                    if (thisArr.Name.ToUpper() == _ÄhnlicheAnsichtName.ToUpper()) {
+                        _ähnliche = thisArr;
+                    }
+                }
+
+            }
+            DoÄhnlich();
+        }
+
+        private void DoÄhnlich() {
+
+
             if (_TableView == null || _TableView.Database == null) { return; }
 
-            foreach (var thisArr in _TableView.Database.ColumnArrangements) {
-                if (thisArr.Name.ToUpper() == _ÄhnlicheAnsichtName.ToUpper()) {
-                    _ähnliche = thisArr;
-                }
+            var fl = new List<FilterItem>() { new FilterItem(_TableView.Database.Column[0], enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
+            var r = _TableView.Database.Row.CalculateSortedRows(fl, null, null);
+
+
+
+            if (_ähnliche != null) {
+                btnÄhnliche.Visible = true;
+                btnÄhnliche.Enabled = (r != null && r.Count == 1);
+
             }
+            else {
+                btnÄhnliche.Visible = false;
+            }
+
+
+
+
+            if (_AutoPin && r != null && r.Count == 1) {
+                if (_LastLooked != r[0].CellFirstString()) {
+
+                    var l = _TableView.SortedRows();
+
+                    if (!l.Contains(r[0])) {
+
+                        if (MessageBox.Show("Die Zeile wird durch andere Regeln ausgeblendet.<br>Soll sie zusätzlich eingeblendet werden?", enImageCode.Frage, "Ja", "Nein") == 0) {
+                            _TableView.PinAdd(r[0]);
+                        }
+                        _LastLooked = r[0].CellFirstString();
+
+                    }
+                }
+
+            }
+
         }
+
+
 
         private void _TableView_ViewChanged(object sender, System.EventArgs e) {
             FillFilters();
         }
 
-        private void _TableView_FilterChanged(object sender, System.EventArgs e) {
+        private void _TableView_PinnedOrFilterChanged(object sender, System.EventArgs e) {
             FillFilters();
         }
 
@@ -171,6 +237,10 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
             btnAdmin.Visible = _TableView != null && _TableView.Database != null && _TableView.Database.IsAdministrator();
+
+            btnPin.Enabled = !_AutoPin;
+            btnPin.Visible = !_AutoPin;
+            btnPinZurück.Enabled = !_AutoPin && _TableView != null && _TableView.Database != null && _TableView.PinnedRows != null && _TableView.PinnedRows.Count > 0;
 
             #region ZeilenFilter befüllen
             if (_TableView != null && _TableView.Database != null && _TableView.Filter.IsRowFilterActiv()) {
@@ -513,9 +583,15 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void txbZeilenFilter_TextChanged(object sender, System.EventArgs e) {
-            if (_isFilling) { return; }
 
             var NeuerT = txbZeilenFilter.Text.TrimStart();
+
+            btnTextLöschen.Enabled = !string.IsNullOrEmpty(NeuerT);
+
+
+            if (_isFilling) { return; }
+
+
 
 
             //NeuerT = NeuerT.TrimStart('+');
@@ -532,6 +608,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             Filter_ZeilenFilterSetzen();
 
+
+            DoÄhnlich();
         }
 
         private void txbZeilenFilter_Enter(object sender, System.EventArgs e) {
@@ -542,7 +620,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void Filter_ZeilenFilterSetzen() {
 
             if (_TableView == null || _TableView.Database == null) {
-                btnÄhnliche.Visible = false;
+                DoÄhnlich();
                 return;
             }
 
@@ -558,28 +636,26 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (string.IsNullOrEmpty(newF)) {
                 _TableView.Filter.Remove_RowFilter();
-                btnÄhnliche.Visible = false;
+                DoÄhnlich();
                 return;
             }
 
             _TableView.Filter.RowFilterText = newF;
 
-            if (_ähnliche != null) {
-                var fl = new List<FilterItem>() { new FilterItem(_TableView.Database.Column[0], enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
-                var r = _TableView.Database.Row.CalculateSortedRows(fl, null, null);
-                btnÄhnliche.Visible = (r != null && r.Count == 1);
-
-            }
-            else {
-                btnÄhnliche.Visible = false;
-            }
-
+            DoÄhnlich();
 
 
         }
 
         private void btnAlleFilterAus_Click(object sender, System.EventArgs e) {
-            if (_TableView.Database != null) { _TableView.Filter.Clear(); }
+            if (_TableView.Database != null) {
+                _TableView.Filter.Clear();
+
+                if (_AutoPin) { _TableView.Pin(null); }
+
+
+
+            }
         }
 
         private void btnTextLöschen_Click(object sender, System.EventArgs e) {
@@ -631,14 +707,21 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 if (thiscolumnitem.Column.AutoFilterSymbolPossible()) {
 
-                    var fi = new FilterItem(thiscolumnitem.Column, r[0]);
-                    _TableView.Filter.Add(fi);
-                }
+                    if (thiscolumnitem.Column.MultiLine) {
+                        var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
+                        var fi = new FilterItem(thiscolumnitem.Column, enFilterType.Istgleich_UND_GroßKleinEgal, l);
+                        _TableView.Filter.Add(fi);
+                    }
+                    else {
+                        var l = r[0].CellGetString(thiscolumnitem.Column);
+                        var fi = new FilterItem(thiscolumnitem.Column, enFilterType.Istgleich_UND_GroßKleinEgal, l);
+                        _TableView.Filter.Add(fi);
+                    }
 
+                }
             }
 
-
-
+            btnÄhnliche.Enabled = false;
 
         }
     }

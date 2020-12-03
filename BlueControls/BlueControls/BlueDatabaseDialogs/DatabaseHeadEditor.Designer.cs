@@ -71,6 +71,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpExport = new BlueControls.Controls.GroupBox();
             this.lbxExportSets = new BlueControls.Controls.ListBox();
             this.Tab_Regeln = new BlueControls.Controls.TabPage();
+            this.btnAutoSort = new BlueControls.Controls.Button();
             this.Tab_Rechte = new BlueControls.Controls.TabPage();
             this.grpDateiVerschluesselung = new BlueControls.Controls.GroupBox();
             this.capDateiverschluesselungInfo = new BlueControls.Controls.Caption();
@@ -126,13 +127,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.PermissionGroups_NewRow.LastFilePath = null;
             this.PermissionGroups_NewRow.Location = new System.Drawing.Point(192, 48);
             this.PermissionGroups_NewRow.Name = "PermissionGroups_NewRow";
-            this.PermissionGroups_NewRow.QuickInfo = "";
             this.PermissionGroups_NewRow.RemoveAllowed = true;
             this.PermissionGroups_NewRow.Size = new System.Drawing.Size(176, 352);
             this.PermissionGroups_NewRow.TabIndex = 4;
             // 
             // capNeueZeilenInfo
             // 
+            this.capNeueZeilenInfo.CausesValidation = false;
             this.capNeueZeilenInfo.Location = new System.Drawing.Point(192, 408);
             this.capNeueZeilenInfo.Name = "capNeueZeilenInfo";
             this.capNeueZeilenInfo.Size = new System.Drawing.Size(176, 72);
@@ -142,6 +143,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption22
             // 
+            this.Caption22.CausesValidation = false;
             this.Caption22.Location = new System.Drawing.Point(8, 24);
             this.Caption22.Name = "Caption22";
             this.Caption22.Size = new System.Drawing.Size(176, 22);
@@ -158,13 +160,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.DatenbankAdmin.LastFilePath = null;
             this.DatenbankAdmin.Location = new System.Drawing.Point(8, 46);
             this.DatenbankAdmin.Name = "DatenbankAdmin";
-            this.DatenbankAdmin.QuickInfo = "";
             this.DatenbankAdmin.RemoveAllowed = true;
             this.DatenbankAdmin.Size = new System.Drawing.Size(176, 434);
             this.DatenbankAdmin.TabIndex = 4;
             // 
             // capNeueZeilen
             // 
+            this.capNeueZeilen.CausesValidation = false;
             this.capNeueZeilen.Location = new System.Drawing.Point(192, 24);
             this.capNeueZeilen.Name = "capNeueZeilen";
             this.capNeueZeilen.Size = new System.Drawing.Size(176, 24);
@@ -186,6 +188,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capKennwort
             // 
+            this.capKennwort.CausesValidation = false;
             this.capKennwort.Location = new System.Drawing.Point(8, 24);
             this.capKennwort.Name = "capKennwort";
             this.capKennwort.Size = new System.Drawing.Size(216, 22);
@@ -208,13 +211,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxSortierSpalten.Location = new System.Drawing.Point(16, 32);
             this.lbxSortierSpalten.MoveAllowed = true;
             this.lbxSortierSpalten.Name = "lbxSortierSpalten";
-            this.lbxSortierSpalten.QuickInfo = "";
             this.lbxSortierSpalten.RemoveAllowed = true;
             this.lbxSortierSpalten.Size = new System.Drawing.Size(256, 440);
             this.lbxSortierSpalten.TabIndex = 5;
             // 
             // capSortierspalten
             // 
+            this.capSortierspalten.CausesValidation = false;
             this.capSortierspalten.Location = new System.Drawing.Point(16, 8);
             this.capSortierspalten.Name = "capSortierspalten";
             this.capSortierspalten.Size = new System.Drawing.Size(160, 24);
@@ -277,6 +280,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capCaption
             // 
+            this.capCaption.CausesValidation = false;
             this.capCaption.Location = new System.Drawing.Point(8, 8);
             this.capCaption.Name = "capCaption";
             this.capCaption.Size = new System.Drawing.Size(137, 16);
@@ -286,6 +290,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // capTags
             // 
             this.capTags.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.capTags.CausesValidation = false;
             this.capTags.Location = new System.Drawing.Point(616, 8);
             this.capTags.Name = "capTags";
             this.capTags.QuickInfo = "Tags / Eigenschaften, die von einem ";
@@ -298,6 +303,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.capInfo.CausesValidation = false;
             this.capInfo.Location = new System.Drawing.Point(8, 56);
             this.capInfo.Name = "capInfo";
             this.capInfo.Size = new System.Drawing.Size(599, 90);
@@ -324,11 +330,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxRuleSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbxRuleSelector.CheckBehavior = BlueControls.Enums.enCheckBehavior.AlwaysSingleSelection;
-            this.lbxRuleSelector.FilterAllowed = true;
             this.lbxRuleSelector.LastFilePath = null;
             this.lbxRuleSelector.Location = new System.Drawing.Point(8, 8);
+            this.lbxRuleSelector.MoveAllowed = true;
             this.lbxRuleSelector.Name = "lbxRuleSelector";
-            this.lbxRuleSelector.QuickInfo = "";
             this.lbxRuleSelector.RemoveAllowed = true;
             this.lbxRuleSelector.Size = new System.Drawing.Size(1023, 360);
             this.lbxRuleSelector.TabIndex = 1;
@@ -340,6 +345,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption14
             // 
+            this.Caption14.CausesValidation = false;
             this.Caption14.Location = new System.Drawing.Point(448, 24);
             this.Caption14.Name = "Caption14";
             this.Caption14.Size = new System.Drawing.Size(79, 18);
@@ -347,6 +353,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption13
             // 
+            this.Caption13.CausesValidation = false;
             this.Caption13.Location = new System.Drawing.Point(264, 24);
             this.Caption13.Name = "Caption13";
             this.Caption13.Size = new System.Drawing.Size(42, 18);
@@ -354,6 +361,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption11
             // 
+            this.Caption11.CausesValidation = false;
             this.Caption11.Location = new System.Drawing.Point(8, 16);
             this.Caption11.Name = "Caption11";
             this.Caption11.Size = new System.Drawing.Size(232, 16);
@@ -366,8 +374,8 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GlobalTab.Controls.Add(this.Tab_Allgemein);
-            this.GlobalTab.Controls.Add(this.Tab_Backup);
             this.GlobalTab.Controls.Add(this.Tab_Regeln);
+            this.GlobalTab.Controls.Add(this.Tab_Backup);
             this.GlobalTab.Controls.Add(this.Tab_Rechte);
             this.GlobalTab.Controls.Add(this.Tab_Binaer);
             this.GlobalTab.Controls.Add(this.Tab_Sortierung);
@@ -423,6 +431,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // capFilterImagePath
             // 
             this.capFilterImagePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.capFilterImagePath.CausesValidation = false;
             this.capFilterImagePath.Location = new System.Drawing.Point(8, 320);
             this.capFilterImagePath.Name = "capFilterImagePath";
             this.capFilterImagePath.Size = new System.Drawing.Size(152, 18);
@@ -440,6 +449,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // caption1
             // 
             this.caption1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.caption1.CausesValidation = false;
             this.caption1.Location = new System.Drawing.Point(8, 512);
             this.caption1.Name = "caption1";
             this.caption1.Size = new System.Drawing.Size(144, 18);
@@ -458,6 +468,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // capVerwaisteDaten
             // 
             this.capVerwaisteDaten.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.capVerwaisteDaten.CausesValidation = false;
             this.capVerwaisteDaten.Location = new System.Drawing.Point(8, 584);
             this.capVerwaisteDaten.Name = "capVerwaisteDaten";
             this.capVerwaisteDaten.Size = new System.Drawing.Size(120, 18);
@@ -487,6 +498,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // capJoinTyp
             // 
             this.capJoinTyp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.capJoinTyp.CausesValidation = false;
             this.capJoinTyp.Location = new System.Drawing.Point(8, 466);
             this.capJoinTyp.Name = "capJoinTyp";
             this.capJoinTyp.Size = new System.Drawing.Size(152, 18);
@@ -495,6 +507,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // capReloadVerzoegerung
             // 
             this.capReloadVerzoegerung.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.capReloadVerzoegerung.CausesValidation = false;
             this.capReloadVerzoegerung.Location = new System.Drawing.Point(8, 490);
             this.capReloadVerzoegerung.Name = "capReloadVerzoegerung";
             this.capReloadVerzoegerung.Size = new System.Drawing.Size(136, 18);
@@ -523,6 +536,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // capAnsicht
             // 
             this.capAnsicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.capAnsicht.CausesValidation = false;
             this.capAnsicht.Location = new System.Drawing.Point(8, 560);
             this.capAnsicht.Name = "capAnsicht";
             this.capAnsicht.Size = new System.Drawing.Size(120, 18);
@@ -580,7 +594,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxExportSets.LastFilePath = null;
             this.lbxExportSets.Location = new System.Drawing.Point(8, 24);
             this.lbxExportSets.Name = "lbxExportSets";
-            this.lbxExportSets.QuickInfo = "";
             this.lbxExportSets.RemoveAllowed = true;
             this.lbxExportSets.Size = new System.Drawing.Size(2046, 304);
             this.lbxExportSets.TabIndex = 0;
@@ -592,6 +605,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // Tab_Regeln
             // 
             this.Tab_Regeln.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Tab_Regeln.Controls.Add(this.btnAutoSort);
             this.Tab_Regeln.Controls.Add(this.RuleItemEditor);
             this.Tab_Regeln.Controls.Add(this.lbxRuleSelector);
             this.Tab_Regeln.Location = new System.Drawing.Point(4, 25);
@@ -600,6 +614,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Regeln.Size = new System.Drawing.Size(1039, 616);
             this.Tab_Regeln.TabIndex = 3;
             this.Tab_Regeln.Text = "Regeln";
+            // 
+            // btnAutoSort
+            // 
+            this.btnAutoSort.Location = new System.Drawing.Point(944, 8);
+            this.btnAutoSort.Name = "btnAutoSort";
+            this.btnAutoSort.Size = new System.Drawing.Size(88, 24);
+            this.btnAutoSort.TabIndex = 2;
+            this.btnAutoSort.Text = "Auto-Sort";
+            this.btnAutoSort.Click += new System.EventHandler(this.btnAutoSort_Click);
             // 
             // Tab_Rechte
             // 
@@ -629,6 +652,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capDateiverschluesselungInfo
             // 
+            this.capDateiverschluesselungInfo.CausesValidation = false;
             this.capDateiverschluesselungInfo.Location = new System.Drawing.Point(8, 24);
             this.capDateiverschluesselungInfo.Name = "capDateiverschluesselungInfo";
             this.capDateiverschluesselungInfo.Size = new System.Drawing.Size(216, 72);
@@ -665,7 +689,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lstBinary.LastFilePath = null;
             this.lstBinary.Location = new System.Drawing.Point(0, 0);
             this.lstBinary.Name = "lstBinary";
-            this.lstBinary.QuickInfo = "";
             this.lstBinary.RemoveAllowed = true;
             this.lstBinary.Size = new System.Drawing.Size(1039, 616);
             this.lstBinary.TabIndex = 0;
@@ -708,6 +731,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capUndoAnzahl
             // 
+            this.capUndoAnzahl.CausesValidation = false;
             this.capUndoAnzahl.Location = new System.Drawing.Point(0, 8);
             this.capUndoAnzahl.Name = "capUndoAnzahl";
             this.capUndoAnzahl.Size = new System.Drawing.Size(168, 40);
@@ -746,6 +770,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capExperimentellWarnung
             // 
+            this.capExperimentellWarnung.CausesValidation = false;
             this.capExperimentellWarnung.Location = new System.Drawing.Point(16, 16);
             this.capExperimentellWarnung.Name = "capExperimentellWarnung";
             this.capExperimentellWarnung.Size = new System.Drawing.Size(488, 80);
@@ -835,5 +860,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private TabControl GlobalTab;
         private TextBox txbFilterImagePath;
         private Caption capFilterImagePath;
+        private Button btnAutoSort;
     }
 }

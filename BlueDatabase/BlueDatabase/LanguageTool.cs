@@ -21,10 +21,8 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 
-namespace BlueDatabase
-{
-    public static class LanguageTool
-    {
+namespace BlueDatabase {
+    public static class LanguageTool {
 
         public static Database Translation = null;
         private static string German = string.Empty;
@@ -40,10 +38,8 @@ namespace BlueDatabase
         /// <param name="column"></param>
         /// <param name="style"></param>
         /// <returns></returns>
-        public static string ColumnReplace(string txt, ColumnItem column, enShortenStyle style)
-        {
-            if (!string.IsNullOrEmpty(txt))
-            {
+        public static string ColumnReplace(string txt, ColumnItem column, enShortenStyle style) {
+            if (!string.IsNullOrEmpty(txt)) {
                 if (!string.IsNullOrEmpty(column.Prefix)) { txt = DoTranslate(column.Prefix, true) + " " + txt; }
                 if (!string.IsNullOrEmpty(column.Suffix)) { txt = txt + " " + DoTranslate(column.Suffix, true); }
             }
@@ -54,17 +50,13 @@ namespace BlueDatabase
 
             var OT = txt;
 
-            foreach (var ThisString in column.OpticalReplace)
-            {
+            foreach (var ThisString in column.OpticalReplace) {
                 var x = ThisString.SplitBy("|");
-                if (x.Length == 2)
-                {
-                    if (string.IsNullOrEmpty(x[0]))
-                    {
+                if (x.Length == 2) {
+                    if (string.IsNullOrEmpty(x[0])) {
                         if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
                     }
-                    else
-                    {
+                    else {
                         txt = txt.Replace(x[0], x[1]);
                     }
                 }
@@ -75,10 +67,8 @@ namespace BlueDatabase
             return OT + " (" + txt + ")";
         }
 
-        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column)
-        {
-            switch (column.Format)
-            {
+        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) {
+            switch (column.Format) {
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.Datum_und_Uhrzeit:
@@ -105,43 +95,47 @@ namespace BlueDatabase
         /// <param name="txt"></param>
         /// <param name="mustTranslate">TRUE erstellt einen Eintrag in der Englisch-Datenbank, falls nicht vorhanden.</param>
         /// <returns></returns>
-        public static string DoTranslate(string txt, bool mustTranslate, params object[] args)
-        {
+        public static string DoTranslate(string txt, bool mustTranslate, params object[] args) {
 
-            if (Translation == null) { return string.Format(txt, args); }
-            if (string.IsNullOrEmpty(txt)) { return string.Empty; }
+            try {
 
-            if (German == txt) { return string.Format(English, args); }
+                if (Translation == null) { return string.Format(txt, args); }
+                if (string.IsNullOrEmpty(txt)) { return string.Empty; }
 
-            German = txt;
+                if (German == txt) { return string.Format(English, args); }
 
-            //if (txt.ContainsChars(Constants.Char_Numerals)) { English = German; return string.Format(English, args); }
-            //if (txt.ToLower().Contains("imagecode")) { English = German; return string.Format(English, args); }
+                German = txt;
 
-            var addend = string.Empty;
+                //if (txt.ContainsChars(Constants.Char_Numerals)) { English = German; return string.Format(English, args); }
+                //if (txt.ToLower().Contains("imagecode")) { English = German; return string.Format(English, args); }
 
-            if (txt.EndsWith(":"))
-            {
-                txt = txt.TrimEnd(":");
-                addend = ":";
+                var addend = string.Empty;
+
+                if (txt.EndsWith(":")) {
+                    txt = txt.TrimEnd(":");
+                    addend = ":";
+                }
+
+                txt = txt.Replace("\r\n", "\r");
+
+                var r = Translation.Row[txt];
+                if (r == null) {
+                    if (Translation.ReadOnly) { English = German; return string.Format(English, args); }
+                    if (!mustTranslate) { English = German; return string.Format(English, args); }
+                    r = Translation.Row.Add(txt);
+                }
+
+
+                var t = r.CellGetString("Translation");
+                if (string.IsNullOrEmpty(t)) { English = German; return string.Format(English, args); }
+                English = t + addend;
+
+                return string.Format(English, args);
+            }
+            catch {
+                return txt;
             }
 
-            txt = txt.Replace("\r\n", "\r");
-
-            var r = Translation.Row[txt];
-            if (r == null)
-            {
-                if (Translation.ReadOnly) { English = German; return string.Format(English, args); }
-                if (!mustTranslate) { English = German; return string.Format(English, args); }
-                r = Translation.Row.Add(txt);
-            }
-
-
-            var t = r.CellGetString("Translation");
-            if (string.IsNullOrEmpty(t)) { English = German; return string.Format(English, args); }
-            English = t + addend;
-
-            return string.Format(English, args);
         }
 
     }

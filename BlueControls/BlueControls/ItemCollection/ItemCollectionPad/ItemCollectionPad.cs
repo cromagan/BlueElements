@@ -535,7 +535,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        internal bool RenameColumn(string oldName, ColumnItem cColumnItem)
+        internal bool RenameColumn(string oldName, ColumnItem newName)
         {
             var did = false;
 
@@ -543,7 +543,7 @@ namespace BlueControls.ItemCollection
             {
                 if (thisItem is ICanHaveColumnVariables variables)
                 {
-                    if (variables.RenameColumn(oldName, cColumnItem)) { did = true; }
+                    if (variables.RenameColumn(oldName, newName)) { did = true; }
                 }
             }
 

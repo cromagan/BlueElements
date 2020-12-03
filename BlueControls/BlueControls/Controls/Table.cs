@@ -159,7 +159,9 @@ namespace BlueControls.Controls {
 
         public event EventHandler FilterChanged;
 
-        public event EventHandler RowsSorted;
+        public event EventHandler VisibleRowsChanged;
+
+        public event EventHandler PinnedChanged;
 
         public event EventHandler<FilterEventArgs> AutoFilterClicked;
 
@@ -375,12 +377,12 @@ namespace BlueControls.Controls {
             rows = rows.Distinct().ToList();
 
             if (!rows.IsDifferentTo(_PinnedRows)) { return; }
-
+            Invalidate_Filterinfo();
             _PinnedRows.Clear();
             _PinnedRows.AddRange(rows);
-
             Invalidate_RowSort();
             Invalidate();
+            OnPinnedChanged();
         }
 
         private static int GetPix(int Pix, BlueFont F, double Scale) {
@@ -1551,14 +1553,18 @@ namespace BlueControls.Controls {
 
         public void PinRemove(RowItem row) {
             _PinnedRows.Remove(row);
+            Invalidate_Filterinfo();
             Invalidate_RowSort();
             Invalidate();
+            OnPinnedChanged();
         }
 
         public void PinAdd(RowItem row) {
             _PinnedRows.Add(row);
+            Invalidate_Filterinfo();
             Invalidate_RowSort();
             Invalidate();
+            OnPinnedChanged();
         }
 
 
@@ -3381,7 +3387,7 @@ namespace BlueControls.Controls {
                 if (_SortedRows != null) { _SortedRowsBefore.AddRange(_SortedRows); }
                 EnsureVisible(_CursorPosColumn, _CursorPosRow);
                 //          CursorPos_Set(null, null, true);
-                OnRowsSorted();
+                OnVisibleRowsChanged();
             }
 
             return SortedRows(); // Rekursiver aufruf. Manchmal funktiniert OnRowsSorted nicht...
@@ -3401,8 +3407,12 @@ namespace BlueControls.Controls {
 
 
 
-        private void OnRowsSorted() {
-            RowsSorted?.Invoke(this, System.EventArgs.Empty);
+        private void OnVisibleRowsChanged() {
+            VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
+        }
+
+        private void OnPinnedChanged() {
+            PinnedChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
 

@@ -24,11 +24,9 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace BlueDatabase
-{
+namespace BlueDatabase {
 
-    public sealed class RuleItem : IParseable, IReadableText, IComparable, ICompareKey, ICloneable, ICheckable, ICanBeEmpty
-    {
+    public sealed class RuleItem : IParseable, IReadableText, IComparable, ICompareKey, ICloneable, ICheckable, ICanBeEmpty {
 
         #region  Variablen-Deklarationen 
         public readonly Database Database;
@@ -43,27 +41,23 @@ namespace BlueDatabase
         #region  Construktor + Initialize 
 
 
-        private void Initialize()
-        {
+        private void Initialize() {
             if (Actions.Count > 0) { Actions.Clear(); }
             Actions.Changed += Actions_ListOrItemChanged;
         }
 
 
-        public RuleItem(Database database, string CodeToParse)
-        {
+        public RuleItem(Database database, string CodeToParse) {
             Database = database;
             Parse(CodeToParse);
         }
 
-        public RuleItem(Database database)
-        {
+        public RuleItem(Database database) {
             Database = database;
             Initialize();
         }
 
-        public RuleItem(ColumnItem column)
-        {
+        public RuleItem(ColumnItem column) {
             Database = column.Database;
             Initialize();
         }
@@ -82,25 +76,21 @@ namespace BlueDatabase
         #endregion
 
 
-        public bool IsNullOrEmpty()
-        {
+        public bool IsNullOrEmpty() {
             if (!IsOk()) { return true; }
             return false;
         }
 
 
-        public override string ToString()
-        {
+        public override string ToString() {
 
             var Result = "";
 
             //   if (!string.IsNullOrEmpty(_SystemKey)) { Result = Result + "SK=" + _SystemKey.ToNonCritical() + ", "; }
 
 
-            foreach (var ThisAction in Actions)
-            {
-                if (ThisAction != null)
-                {
+            foreach (var ThisAction in Actions) {
+                if (ThisAction != null) {
                     Result = Result + ", Aktion=" + ThisAction;
                 }
             }
@@ -110,17 +100,14 @@ namespace BlueDatabase
         }
 
 
-        public void Parse(string ToParse)
-        {
+        public void Parse(string ToParse) {
             IsParsing = true;
             Actions.ThrowEvents = false;
 
             Initialize();
 
-            foreach (var pair in ToParse.GetAllTags())
-            {
-                switch (pair.Key)
-                {
+            foreach (var pair in ToParse.GetAllTags()) {
+                switch (pair.Key) {
                     case "sk": // TODO: alt 28.03.2019 , löschen
                                //  _SystemKey = pair.Value.FromNonCritical();
                         break;
@@ -141,8 +128,7 @@ namespace BlueDatabase
 
 
 
-        public string ErrorReason()
-        {
+        public string ErrorReason() {
             //var VorschlagsRegel = false;
 
             //   if (!string.IsNullOrEmpty(_SystemKey)) { return string.Empty; }
@@ -152,10 +138,8 @@ namespace BlueDatabase
             if (Dann == 0) { return "Es ist keine 'Dann-Aktion' vorhanden."; }
 
 
-            foreach (var ThisAction in Actions)
-            {
-                if (ThisAction != null)
-                {
+            foreach (var ThisAction in Actions) {
+                if (ThisAction != null) {
                     if (!ThisAction.IsOk()) { return "Eine Aktion ist fehlerhaft."; }
 
                     //switch (ThisAction.Action)
@@ -182,32 +166,27 @@ namespace BlueDatabase
         }
 
 
-        public bool IsOk()
-        {
+        public bool IsOk() {
             return string.IsNullOrEmpty(ErrorReason());
         }
 
-        public int AnzahlWenns()
-        {
+        public int AnzahlWenns() {
             var W = 0;
 
             if (Actions.Count == 0) { return 0; }
 
-            foreach (var ThisAction in Actions)
-            {
+            foreach (var ThisAction in Actions) {
                 if (ThisAction != null && ThisAction.IsOk() && ThisAction.IsBedingung()) { W++; }
             }
 
             return W;
         }
 
-        public int AnzahlDanns()
-        {
+        public int AnzahlDanns() {
             var W = 0;
             if (Actions.Count == 0) { return 0; }
 
-            foreach (var ThisAction in Actions)
-            {
+            foreach (var ThisAction in Actions) {
                 if (ThisAction != null && ThisAction.IsOk() && !ThisAction.IsBedingung()) { W++; }
             }
 
@@ -216,17 +195,14 @@ namespace BlueDatabase
         }
 
 
-        public QuickImage SymbolForReadableText()
-        {
+        public QuickImage SymbolForReadableText() {
 
             if (!IsOk()) { return QuickImage.Get(enImageCode.Kritisch); }
 
             if (AnzahlWenns() > 1) { return null; }
 
-            foreach (var ThisAction in Actions)
-            {
-                if (ThisAction != null)
-                {
+            foreach (var ThisAction in Actions) {
+                if (ThisAction != null) {
                     if (ThisAction.IsBedingung()) { return ThisAction.SymbolForReadableText(); }
                 }
             }
@@ -236,8 +212,7 @@ namespace BlueDatabase
         }
 
 
-        public string ReadableText()
-        {
+        public string ReadableText() {
             if (!IsOk()) { return "Fehlerhafte Regel wird ignoriert: " + ErrorReason(); }
 
 
@@ -248,22 +223,17 @@ namespace BlueDatabase
             var hasAnmerkung = string.Empty;
 
 
-            foreach (var ThisAction in Actions)
-            {
-                if (ThisAction != null)
-                {
+            foreach (var ThisAction in Actions) {
+                if (ThisAction != null) {
 
-                    if (ThisAction.Action == enAction.Anmerkung)
-                    {
+                    if (ThisAction.Action == enAction.Anmerkung) {
                         hasAnmerkung = ThisAction.ReadableText() + "  ";
 
                     }
-                    else if (ThisAction.IsBedingung())
-                    {
+                    else if (ThisAction.IsBedingung()) {
                         Txts[0].Add(ThisAction.ReadableText());
                     }
-                    else
-                    {
+                    else {
                         Txts[1].Add(ThisAction.ReadableText());
                     }
                 }
@@ -273,22 +243,18 @@ namespace BlueDatabase
             var GiveB = new string[2];
 
 
-            for (var z = 0; z <= 1; z++)
-            {
-                switch (Txts[z].Count)
-                {
+            for (var z = 0; z <= 1; z++) {
+                switch (Txts[z].Count) {
                     case 1:
                         GiveB[z] = Txts[z][0];
                         break;
                     case 0:
                         GiveB[z] = "";
                         break;
-                    default:
-                        {
+                    default: {
                             GiveB[z] = Txts[z][0];
                             var tempVar = Txts[z].Count - 2;
-                            for (var z1 = 1; z1 <= tempVar; z1++)
-                            {
+                            for (var z1 = 1; z1 <= tempVar; z1++) {
                                 GiveB[z] = GiveB[z] + ", " + Txts[z][z1];
                             }
                             GiveB[z] = GiveB[z] + " und " + Txts[z][Txts[z].Count - 1];
@@ -298,8 +264,7 @@ namespace BlueDatabase
             }
 
 
-            if (!string.IsNullOrEmpty(GiveB[0]) && !string.IsNullOrEmpty(GiveB[1]))
-            {
+            if (!string.IsNullOrEmpty(GiveB[0]) && !string.IsNullOrEmpty(GiveB[1])) {
                 return hasAnmerkung + "Wenn " + GiveB[0] + ", dann " + GiveB[1] + ".";
             }
 
@@ -307,34 +272,26 @@ namespace BlueDatabase
         }
 
 
-        public bool TrifftZu(RowItem vRow)
-        {
-            foreach (var ThisAction in Actions)
-            {
+        public bool TrifftZu(RowItem vRow) {
+            foreach (var ThisAction in Actions) {
                 if (ThisAction != null && ThisAction.IsBedingung() && !ThisAction.TrifftZu(vRow)) { return false; }
             }
             return true;
         }
 
 
-        public string Execute(RowItem vRow, bool FreezeMode)
-        {
+        public string Execute(RowItem vRow, bool FreezeMode) {
 
             var Meldung = string.Empty;
 
 
-            foreach (var ThisAction in Actions)
-            {
-                if (ThisAction != null)
-                {
-                    if (!ThisAction.IsBedingung())
-                    {
-                        if (string.IsNullOrEmpty(Meldung))
-                        {
+            foreach (var ThisAction in Actions) {
+                if (ThisAction != null) {
+                    if (!ThisAction.IsBedingung()) {
+                        if (string.IsNullOrEmpty(Meldung)) {
                             Meldung = ThisAction.Execute(vRow, FreezeMode);
                         }
-                        else
-                        {
+                        else {
                             ThisAction.Execute(vRow, FreezeMode);
                         }
                     }
@@ -350,8 +307,7 @@ namespace BlueDatabase
 
             var e = new List<string>();
 
-            foreach (var ThisAction in Actions)
-            {
+            foreach (var ThisAction in Actions) {
                 if (ThisAction != null && ThisAction.IsBedingung()) { e.Add(ThisAction.TrifftZuText(vRow)); }
             }
 
@@ -359,24 +315,19 @@ namespace BlueDatabase
 
 
             var m = "";
-            if (Meldung == "*")
-            {
+            if (Meldung == "*") {
                 if (e.Count == 0) { return " Diese Zeile wird immer als fehlerhaft markiert."; }
             }
-            else
-            {
+            else {
                 m = Meldung + "<DELETE>";
             }
 
 
-            for (var z = 0; z < e.Count; z++)
-            {
-                if (z == 0)
-                {
+            for (var z = 0; z < e.Count; z++) {
+                if (z == 0) {
                     m = m + e[z].Substring(0, 1).ToUpper() + e[z].Substring(1);
                 }
-                else
-                {
+                else {
                     m = m + "<br><b> - O D E R - </b><br>" + e[z];
                 }
             }
@@ -386,35 +337,27 @@ namespace BlueDatabase
         }
 
 
-        public int CompareTo(object obj)
-        {
-            if (obj is RuleItem RLI)
-            {
+        public int CompareTo(object obj) {
+            if (obj is RuleItem RLI) {
                 return CompareKey().CompareTo(RLI.CompareKey());
             }
-            else
-            {
+            else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
                 return 0;
             }
         }
 
 
-        public string CompareKey()
-        {
+        public string CompareKey() {
 
 
             var MaxColumnIndex = -1;
             var MaxCode = -1;
 
-            foreach (var ThisAction in Actions)
-            {
-                if (ThisAction != null)
-                {
-                    foreach (var ThisColumnItem in ThisAction.ColumnsAllUsed())
-                    {
-                        if (ThisColumnItem != null)
-                        {
+            foreach (var ThisAction in Actions) {
+                if (ThisAction != null) {
+                    foreach (var ThisColumnItem in ThisAction.ColumnsAllUsed()) {
+                        if (ThisColumnItem != null) {
                             MaxColumnIndex = Math.Max(ThisColumnItem.Index(), MaxColumnIndex);
                         }
                     }
@@ -422,8 +365,7 @@ namespace BlueDatabase
 
 
                 var Co = -1;
-                switch (ThisAction.Action)
-                {
+                switch (ThisAction.Action) {
                     case 0: Co = 1; break; // Neue Action
                     case enAction.Anmerkung: Co = 2; break;
                     //case enAction.Ist_der_Nutzer: Co = 3; break;
@@ -467,8 +409,7 @@ namespace BlueDatabase
         }
 
 
-        public void Repair()
-        {
+        public void Repair() {
 
             if (!IsOk()) { return; }
 
@@ -479,32 +420,37 @@ namespace BlueDatabase
 
 
 
-        public object Clone()
-        {
+        public object Clone() {
 
             return new RuleItem(Database, ToString());
         }
 
-        internal void RenameColumn(string oldName, ColumnItem cColumnItem)
-        {
+
+        internal bool Contains(ColumnItem newName) {
             // Wichtig, daß Rechenformeln richtiggestellt werden
-            if (Database != cColumnItem.Database) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbanken inkonsitent"); }
+            if (Database != newName.Database) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbanken inkonsitent"); }
 
 
-            foreach (var Thisaction in Actions)
-            {
-                Thisaction.RenameColumn(oldName, cColumnItem);
+            foreach (var Thisaction in Actions) {
+                if (Thisaction.Contains(newName)) { return true; }
+            }
+            return false;
+        }
+
+        internal void RenameColumn(string oldName, ColumnItem newName) {
+            // Wichtig, daß Rechenformeln richtiggestellt werden
+            if (Database != newName.Database) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbanken inkonsitent"); }
+
+
+            foreach (var Thisaction in Actions) {
+                Thisaction.RenameColumn(oldName, newName);
             }
         }
 
-        internal bool BlockEditing(ColumnItem Column, RowItem Row)
-        {
-            foreach (var ThisAction in Actions)
-            {
-                if (ThisAction != null)
-                {
-                    if (ThisAction.Action == enAction.Sperre_die_Zelle && ThisAction.Columns.Contains(Column))
-                    {
+        internal bool BlockEditing(ColumnItem Column, RowItem Row) {
+            foreach (var ThisAction in Actions) {
+                if (ThisAction != null) {
+                    if (ThisAction.Action == enAction.Sperre_die_Zelle && ThisAction.Columns.Contains(Column)) {
                         var Match = TrifftZu(Row);
                         if (Match) { return true; }
                     }
@@ -513,15 +459,12 @@ namespace BlueDatabase
             return false;
         }
 
-        internal bool WillAlwaysCellOverride(ColumnItem Column)
-        {
+        internal bool WillAlwaysCellOverride(ColumnItem Column) {
 
             if (AnzahlWenns() > 0) { return false; }
 
-            foreach (var ThisAction in Actions)
-            {
-                if (ThisAction != null)
-                {
+            foreach (var ThisAction in Actions) {
+                if (ThisAction != null) {
                     //if (ThisAction.Action != enAction.KopiereAndereSpalten)
                     //{
                     if (ThisAction.Columns.Contains(Column)) { return true; }
@@ -531,15 +474,13 @@ namespace BlueDatabase
             return false;
         }
 
-        internal void Actions_ListOrItemChanged(object sender, System.EventArgs e)
-        {
+        internal void Actions_ListOrItemChanged(object sender, System.EventArgs e) {
             OnChanged();
         }
 
 
 
-        public void OnChanged()
-        {
+        public void OnChanged() {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }

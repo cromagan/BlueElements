@@ -1260,10 +1260,58 @@ namespace BlueDatabase {
             }
         }
 
-        internal void Column_NameChanged(string OldName, ColumnItem cColumnItem) {
+
+        internal string Column_UsedIn(ColumnItem column) {
+
+            var t = string.Empty;
+            var layout = false;
+            foreach (var thisLayout in Layouts) {
+                if (thisLayout.ToUpper().Contains(column.Name.ToUpper())) { layout = true; }
+            }
+            if (layout) { t += " - Layouts (für Export)"; }
 
 
-            if (string.IsNullOrEmpty(OldName)) { return; }
+
+            if (SortDefinition.Columns.Contains(column)) { t += " - Sortierung<br>"; }
+
+            var view = false;
+            foreach (var thisView in Views) {
+                if (thisView[column] != null) { view = true; }
+            }
+            if (view) { t += " - Formular-Ansichten<br>"; }
+
+            var cola = false;
+            var first = true;
+            foreach (var thisView in ColumnArrangements) {
+                if (!first && thisView[column] != null) { cola = true; }
+                first = false;
+            }
+            if (cola) { t += " - Benutzerdefiniert Spalten-Anordnungen<br>"; }
+
+
+            if (ImportScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Import-Skript<br>"; }
+
+
+            var rul = false;
+            foreach (var ThisRule in Rules) {
+                if (ThisRule.Contains(column)) { rul = true; }
+            }
+            if (rul) { t += " - Regeln<br>"; }
+
+            var l = column.Contents(null);
+            if (l.Count > 0) {
+                t = t + " - Befüllt mit " + l.Count.ToString() + " verschiedenen Werten";
+            }
+
+            return t;
+
+        }
+
+
+        internal void Column_NameChanged(string oldName, ColumnItem newName) {
+
+
+            if (string.IsNullOrEmpty(oldName)) { return; }
 
             // Cells ----------------------------------------------
             //   Cell.ChangeCaptionName(OldName, cColumnItem.Name, cColumnItem)
@@ -1276,7 +1324,7 @@ namespace BlueDatabase {
             if (Layouts != null && Layouts.Count > 0) {
                 for (var cc = 0; cc < Layouts.Count; cc++) {
 
-                    var e = new RenameColumnInLayoutEventArgs(Layouts[cc], OldName, cColumnItem);
+                    var e = new RenameColumnInLayoutEventArgs(Layouts[cc], oldName, newName);
                     OnRenameColumnInLayout(e);
 
                     Layouts[cc] = e.LayoutCode;
@@ -1297,7 +1345,7 @@ namespace BlueDatabase {
             // Rules -----------------------------------------
             // Wichtig, dass Rechenformeln richtiggestellt werden
             foreach (var ThisRule in Rules) {
-                ThisRule?.RenameColumn(OldName, cColumnItem);
+                ThisRule?.RenameColumn(oldName, newName);
             }
 
             // ImportScript -----------------------------------------
@@ -1307,8 +1355,8 @@ namespace BlueDatabase {
             foreach (var thisstring in x) {
                 if (!string.IsNullOrEmpty(thisstring)) {
                     var x2 = thisstring.SplitBy("|");
-                    if (x2.Length > 2 && x2[1].ToUpper() == OldName.ToUpper()) {
-                        x2[1] = cColumnItem.Name.ToUpper();
+                    if (x2.Length > 2 && x2[1].ToUpper() == oldName.ToUpper()) {
+                        x2[1] = newName.Name.ToUpper();
                         xn.Add(x2.JoinWith("|"));
                     }
                     else {
@@ -1317,9 +1365,6 @@ namespace BlueDatabase {
                 }
             }
             ImportScript = xn.JoinWithCr().ToNonCritical();
-
-
-
 
         }
 

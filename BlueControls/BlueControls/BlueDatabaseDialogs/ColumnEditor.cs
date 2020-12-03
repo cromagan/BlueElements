@@ -483,7 +483,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.SaveContent = butSaveContent.Checked;
 
 
-            _Column.Database.Rules.Sort();
+            //_Column.Database.Rules.Sort();
         }
 
 
@@ -700,6 +700,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             Column_DatenAuslesen(_Table.CurrentArrangement[_Column].NextVisible(_Table.CurrentArrangement).Column);
         }
 
-
+        private void btnVerwendung_Click(object sender, System.EventArgs e) {
+            MessageBox.Show(_Column.Verwendung());
+        }
     }
 }

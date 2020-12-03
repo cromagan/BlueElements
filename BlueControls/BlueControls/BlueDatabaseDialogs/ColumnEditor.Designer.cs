@@ -29,8 +29,10 @@ namespace BlueControls.BlueDatabaseDialogs
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColumnEditor));
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabDesign = new BlueControls.Controls.TabPage();
+            this.cbxBildTextVerhalten = new BlueControls.Controls.ComboBox();
             this.cbxAlign = new BlueControls.Controls.ComboBox();
             this.txbReplacer = new BlueControls.Controls.TextBox();
+            this.capBildCodeImageNotfound = new BlueControls.Controls.Caption();
             this.btnStandard = new BlueControls.Controls.Button();
             this.capAlign = new BlueControls.Controls.Caption();
             this.txbPrefix = new BlueControls.Controls.TextBox();
@@ -57,8 +59,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption4 = new BlueControls.Controls.Caption();
             this.btnMultiline = new BlueControls.Controls.Button();
             this.grpBildCode = new BlueControls.Controls.GroupBox();
-            this.cbxBildTextVerhalten = new BlueControls.Controls.ComboBox();
-            this.capBildCodeImageNotfound = new BlueControls.Controls.Caption();
             this.capBildCodeConstHeight = new BlueControls.Controls.Caption();
             this.txbBildCodeConstHeight = new BlueControls.Controls.TextBox();
             this.tabRechte = new BlueControls.Controls.TabPage();
@@ -155,6 +155,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
+            this.btnVerwendung = new BlueControls.Controls.Button();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -216,6 +217,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabDesign.TabIndex = 0;
             this.tabDesign.Text = "Design";
             // 
+            // cbxBildTextVerhalten
+            // 
+            this.cbxBildTextVerhalten.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxBildTextVerhalten.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxBildTextVerhalten.Location = new System.Drawing.Point(144, 176);
+            this.cbxBildTextVerhalten.Name = "cbxBildTextVerhalten";
+            this.cbxBildTextVerhalten.Size = new System.Drawing.Size(368, 24);
+            this.cbxBildTextVerhalten.TabIndex = 34;
+            // 
             // cbxAlign
             // 
             this.cbxAlign.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -239,6 +249,14 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbReplacer.Size = new System.Drawing.Size(904, 221);
             this.txbReplacer.SpellChecking = true;
             this.txbReplacer.TabIndex = 35;
+            // 
+            // capBildCodeImageNotfound
+            // 
+            this.capBildCodeImageNotfound.CausesValidation = false;
+            this.capBildCodeImageNotfound.Location = new System.Drawing.Point(8, 176);
+            this.capBildCodeImageNotfound.Name = "capBildCodeImageNotfound";
+            this.capBildCodeImageNotfound.Size = new System.Drawing.Size(136, 16);
+            this.capBildCodeImageNotfound.Text = "Bild/Text-Verhalten:";
             // 
             // btnStandard
             // 
@@ -470,23 +488,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpBildCode.TabIndex = 2;
             this.grpBildCode.TabStop = false;
             this.grpBildCode.Text = "Fomat: BildCode";
-            // 
-            // cbxBildTextVerhalten
-            // 
-            this.cbxBildTextVerhalten.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxBildTextVerhalten.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxBildTextVerhalten.Location = new System.Drawing.Point(144, 176);
-            this.cbxBildTextVerhalten.Name = "cbxBildTextVerhalten";
-            this.cbxBildTextVerhalten.Size = new System.Drawing.Size(368, 24);
-            this.cbxBildTextVerhalten.TabIndex = 34;
-            // 
-            // capBildCodeImageNotfound
-            // 
-            this.capBildCodeImageNotfound.CausesValidation = false;
-            this.capBildCodeImageNotfound.Location = new System.Drawing.Point(8, 176);
-            this.capBildCodeImageNotfound.Name = "capBildCodeImageNotfound";
-            this.capBildCodeImageNotfound.Size = new System.Drawing.Size(136, 16);
-            this.capBildCodeImageNotfound.Text = "Bild/Text-Verhalten:";
             // 
             // capBildCodeConstHeight
             // 
@@ -1203,6 +1204,7 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Right)));
             this.BlueFrame1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.BlueFrame1.CausesValidation = false;
+            this.BlueFrame1.Controls.Add(this.btnVerwendung);
             this.BlueFrame1.Controls.Add(this.capInfo);
             this.BlueFrame1.Controls.Add(this.Caption3);
             this.BlueFrame1.Controls.Add(this.tbxName);
@@ -1516,6 +1518,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
             // 
+            // btnVerwendung
+            // 
+            this.btnVerwendung.Location = new System.Drawing.Point(8, 80);
+            this.btnVerwendung.Name = "btnVerwendung";
+            this.btnVerwendung.Size = new System.Drawing.Size(144, 24);
+            this.btnVerwendung.TabIndex = 3;
+            this.btnVerwendung.Text = "Verwendungs-Info";
+            this.btnVerwendung.Click += new System.EventHandler(this.btnVerwendung_Click);
+            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(926, 671);
@@ -1678,5 +1689,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Caption capAutoReplace;
         private Button chkFilterOnlyAND;
         private Button chkFilterOnlyOr;
+        private Button btnVerwendung;
     }
 	}
