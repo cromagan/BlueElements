@@ -201,7 +201,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                     if (!l.Contains(r[0])) {
 
-                        if (MessageBox.Show("Die Zeile wird durch andere Regeln ausgeblendet.<br>Soll sie zusätzlich eingeblendet werden?", enImageCode.Frage, "Ja", "Nein") == 0) {
+                        if (MessageBox.Show("Die Zeile wird durch andere Regeln <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", enImageCode.Pinnadel, "Ja", "Nein") == 0) {
                             _TableView.PinAdd(r[0]);
                         }
                         _LastLooked = r[0].CellFirstString();
@@ -238,9 +238,9 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             btnAdmin.Visible = _TableView != null && _TableView.Database != null && _TableView.Database.IsAdministrator();
 
-            btnPin.Enabled = !_AutoPin;
-            btnPin.Visible = !_AutoPin;
-            btnPinZurück.Enabled = !_AutoPin && _TableView != null && _TableView.Database != null && _TableView.PinnedRows != null && _TableView.PinnedRows.Count > 0;
+            //btnPin.Enabled = !_AutoPin;
+            //btnPin.Visible = !_AutoPin;
+            btnPinZurück.Enabled = _TableView != null && _TableView.Database != null && _TableView.PinnedRows != null && _TableView.PinnedRows.Count > 0;
 
             #region ZeilenFilter befüllen
             if (_TableView != null && _TableView.Database != null && _TableView.Filter.IsRowFilterActiv()) {
@@ -648,10 +648,12 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnAlleFilterAus_Click(object sender, System.EventArgs e) {
+            _LastLooked = string.Empty;
+
             if (_TableView.Database != null) {
                 _TableView.Filter.Clear();
 
-                if (_AutoPin) { _TableView.Pin(null); }
+                //if (_AutoPin) { _TableView.Pin(null); }
 
 
 
@@ -667,6 +669,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnPinZurück_Click(object sender, System.EventArgs e) {
+            _LastLooked = string.Empty;
             if (_TableView == null) { return; }
             _TableView.Pin(null);
         }
@@ -706,8 +709,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             foreach (var thiscolumnitem in _ähnliche) {
 
                 if (thiscolumnitem.Column.AutoFilterSymbolPossible()) {
-
-                    if (thiscolumnitem.Column.MultiLine) {
+                    if (r[0].CellIsNullOrEmpty(thiscolumnitem.Column)) {
+                        var fi = new FilterItem(thiscolumnitem.Column, enFilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
+                        _TableView.Filter.Add(fi);
+                    }
+                    else if (thiscolumnitem.Column.MultiLine) {
                         var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
                         var fi = new FilterItem(thiscolumnitem.Column, enFilterType.Istgleich_UND_GroßKleinEgal, l);
                         _TableView.Filter.Add(fi);

@@ -454,6 +454,22 @@ namespace BlueControls.Controls {
 
             var lfdno = 0;
 
+
+            if (type == enTableDrawType.PinnedRows) {
+
+
+                if (col == enTableDrawColumn.Permament) {
+                    Draw_Pinned(GR, displayRectangleWOSlider, 0, PermaX);
+                }
+
+                if (col == enTableDrawColumn.NonPermament) {
+                    Draw_Pinned(GR, displayRectangleWOSlider, PermaX, displayRectangleWOSlider.Width);
+                }
+                return;
+            }
+
+
+
             foreach (var ViewItem in CurrentArrangement) {
 
 
@@ -477,7 +493,6 @@ namespace BlueControls.Controls {
                                 case enTableDrawType.ColumnHead:
                                     Draw_Column_Head(GR, ViewItem, displayRectangleWOSlider, lfdno);
                                     break;
-
                             }
                         }
                     }
@@ -512,6 +527,10 @@ namespace BlueControls.Controls {
                 var CurrentRow = SortedRows()[Zei];
                 var y = (int)CurrentRow.TMP_Y;
                 GR.SmoothingMode = SmoothingMode.None;
+
+
+
+
 
                 //if (ViewItem.Column.ZellenZusammenfassen)
                 //{
@@ -604,14 +623,16 @@ namespace BlueControls.Controls {
 
 
                 Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.PinnedRows, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
                 Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
 
 
                 Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.PinnedRows, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
                 Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
 
-                // PinnedRowsMarkieren
-                Draw_Pinned(GR, displayRectangleWOSlider);
+                //// PinnedRowsMarkieren
+                //Draw_Pinned(GR, displayRectangleWOSlider);
 
                 // Den CursorLines zeichnen
                 Draw_Cursor(GR, displayRectangleWOSlider, true);
@@ -647,20 +668,40 @@ namespace BlueControls.Controls {
 
         }
 
-        private void Draw_Pinned(Graphics gR, Rectangle displayRectangleWOSlider) {
+        //private void Draw_Pinned(Graphics gR, Rectangle displayRectangleWOSlider) {
+
+        //    if (_PinnedRows == null || _PinnedRows.Count == 0) { return; }
+        //    var b = new SolidBrush(Color.FromArgb(50, 255, 255, 0));
+
+
+        //    foreach (var ThisRowItem in _PinnedRows) {
+        //        if (ThisRowItem.TMP_Y is int y) {
+        //            if (y > 1 && y < displayRectangleWOSlider.Height) {
+
+        //                gR.FillRectangle(b, 0, y, displayRectangleWOSlider.Width, Row_DrawHeight(ThisRowItem, DisplayRectangleWithoutSlider()));
+        //                //gR.DrawImage(QuickImage.Get("Pinnadel|16||||||||50").BMP, 1, y);
+        //            }
+        //        }
+        //    }
+
+        private void Draw_Pinned(Graphics gR, Rectangle displayRectangleWOSlider, int startx, int endx) {
 
             if (_PinnedRows == null || _PinnedRows.Count == 0) { return; }
-            var b = new SolidBrush(Color.FromArgb(50, 255, 255, 0));
+            var b = new SolidBrush(Color.FromArgb(180, 255, 255, 0));
 
 
             foreach (var ThisRowItem in _PinnedRows) {
                 if (ThisRowItem.TMP_Y is int y) {
                     if (y > 1 && y < displayRectangleWOSlider.Height) {
 
-                        gR.FillRectangle(b, 0, y, displayRectangleWOSlider.Width, Row_DrawHeight(ThisRowItem, DisplayRectangleWithoutSlider()));
+                        gR.FillRectangle(b, startx, y, endx - startx, Row_DrawHeight(ThisRowItem, DisplayRectangleWithoutSlider()));
+                        //gR.DrawImage(QuickImage.Get("Pinnadel|16||||||||50").BMP, 1, y);
                     }
                 }
             }
+
+
+
         }
 
         private void Draw_Column_Head_Captions(Graphics GR) {
@@ -903,6 +944,8 @@ namespace BlueControls.Controls {
         private void Draw_CellTransparent(Graphics GR, ColumnViewItem cellInThisDatabaseColumn, RowItem cellInThisDatabaseRow, int rowY, Rectangle displayRectangleWOSlider, BlueFont vfont) {
 
             if (cellInThisDatabaseRow == null) { return; }
+
+
 
             if (cellInThisDatabaseColumn.Column.Format == enDataFormat.LinkedCell) {
                 var LinkedData = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow, false, false, false);

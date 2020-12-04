@@ -243,6 +243,9 @@ namespace BlueDatabase {
                 case enFilterType.Istgleich_GroﬂKleinEgal:
                 case enFilterType.Istgleich_ODER_GroﬂKleinEgal:
                 case enFilterType.Istgleich_UND_GroﬂKleinEgal:
+
+                    if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
+
                     return nam + " = " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced);
 
                 case enFilterType.Ungleich_MultiRowIgnorieren:

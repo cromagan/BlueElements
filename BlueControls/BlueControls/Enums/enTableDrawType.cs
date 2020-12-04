@@ -26,7 +26,8 @@ namespace BlueControls.Enums
 
         ColumnBackBody = 0,
         Cells = 1,
-        ColumnHead = 2
+        ColumnHead = 2,
+        PinnedRows = 3
 
     }
 }
