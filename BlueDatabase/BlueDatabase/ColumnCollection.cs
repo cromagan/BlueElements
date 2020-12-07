@@ -129,7 +129,7 @@ namespace BlueDatabase {
             }
 
             if (string.IsNullOrEmpty(columnName)) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Leerer Spaltenname");
+                Develop.DebugPrint(enFehlerArt.Warnung, "Leerer Spaltenname");
                 return null;
             }
 

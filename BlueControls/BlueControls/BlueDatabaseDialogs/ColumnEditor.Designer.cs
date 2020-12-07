@@ -128,6 +128,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capBestFileStandardFolder = new BlueControls.Controls.Caption();
             this.txbBestFileStandardFolder = new BlueControls.Controls.TextBox();
             this.BlueFrame1 = new BlueControls.Controls.GroupBox();
+            this.btnVerwendung = new BlueControls.Controls.Button();
             this.capInfo = new BlueControls.Controls.Caption();
             this.Caption3 = new BlueControls.Controls.Caption();
             this.tbxName = new BlueControls.Controls.TextBox();
@@ -155,7 +156,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
-            this.btnVerwendung = new BlueControls.Controls.Button();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -1034,8 +1034,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbSortMask
             // 
-            this.txbSortMask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbSortMask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.txbSortMask.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbSortMask.Enabled = false;
             this.txbSortMask.Location = new System.Drawing.Point(512, 304);
@@ -1056,10 +1055,9 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbRegex
             // 
-            this.txbRegex.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbRegex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.txbRegex.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbRegex.Location = new System.Drawing.Point(512, 120);
+            this.txbRegex.Location = new System.Drawing.Point(512, 128);
             this.txbRegex.MultiLine = true;
             this.txbRegex.Name = "txbRegex";
             this.txbRegex.Size = new System.Drawing.Size(392, 96);
@@ -1067,6 +1065,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capSortiermaske
             // 
+            this.capSortiermaske.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.capSortiermaske.CausesValidation = false;
             this.capSortiermaske.Location = new System.Drawing.Point(512, 288);
             this.capSortiermaske.Name = "capSortiermaske";
@@ -1085,8 +1084,9 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capRegex
             // 
+            this.capRegex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.capRegex.CausesValidation = false;
-            this.capRegex.Location = new System.Drawing.Point(512, 104);
+            this.capRegex.Location = new System.Drawing.Point(512, 112);
             this.capRegex.Name = "capRegex";
             this.capRegex.Size = new System.Drawing.Size(388, 17);
             this.capRegex.Text = "Das Format muss mit dieser Regex-Maske übereinstimmen:";
@@ -1216,6 +1216,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BlueFrame1.TabIndex = 16;
             this.BlueFrame1.TabStop = false;
             this.BlueFrame1.Text = "Allgemein";
+            // 
+            // btnVerwendung
+            // 
+            this.btnVerwendung.Location = new System.Drawing.Point(8, 80);
+            this.btnVerwendung.Name = "btnVerwendung";
+            this.btnVerwendung.Size = new System.Drawing.Size(144, 24);
+            this.btnVerwendung.TabIndex = 3;
+            this.btnVerwendung.Text = "Verwendungs-Info";
+            this.btnVerwendung.Click += new System.EventHandler(this.btnVerwendung_Click);
             // 
             // capInfo
             // 
@@ -1517,15 +1526,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.butAktuellZurueck.Size = new System.Drawing.Size(72, 24);
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
-            // 
-            // btnVerwendung
-            // 
-            this.btnVerwendung.Location = new System.Drawing.Point(8, 80);
-            this.btnVerwendung.Name = "btnVerwendung";
-            this.btnVerwendung.Size = new System.Drawing.Size(144, 24);
-            this.btnVerwendung.TabIndex = 3;
-            this.btnVerwendung.Text = "Verwendungs-Info";
-            this.btnVerwendung.Click += new System.EventHandler(this.btnVerwendung_Click);
             // 
             // ColumnEditor
             // 

@@ -1813,7 +1813,22 @@ namespace BlueDatabase {
                     }
                 }
             }
-            return ret.Replace("\r", " ").Replace("\n", " ").Replace("  ", " ").TrimEnd(":");
+
+            ret = ret.Replace("\n", "\r").Replace("\r\r", "\r");
+
+            var i = ret.IndexOf("-\r");
+
+            if (i>0 && i < ret.Length -3) 
+                {
+            var tzei = ret.Substring(i + 2, 1); 
+                if (tzei.ToLower() == tzei)
+                    {
+                    ret = ret.Substring(0, i) + ret.Substring(i + 2);
+                }
+
+            }
+
+            return ret.Replace("\r", " ").Replace("  ", " ").TrimEnd(":");
         }
 
         public string CompareKey() {

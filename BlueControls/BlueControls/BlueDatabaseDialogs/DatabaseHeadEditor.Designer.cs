@@ -66,12 +66,12 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxAnsicht = new BlueControls.Controls.ComboBox();
             this.cbxJoinTyp = new BlueControls.Controls.ComboBox();
             this.capAnsicht = new BlueControls.Controls.Caption();
+            this.Tab_Regeln = new BlueControls.Controls.TabPage();
+            this.btnAutoSort = new BlueControls.Controls.Button();
             this.Tab_Backup = new BlueControls.Controls.TabPage();
             this.ExportEditor = new BlueControls.Classes_Editor.ExportDefinition_Editor();
             this.grpExport = new BlueControls.Controls.GroupBox();
             this.lbxExportSets = new BlueControls.Controls.ListBox();
-            this.Tab_Regeln = new BlueControls.Controls.TabPage();
-            this.btnAutoSort = new BlueControls.Controls.Button();
             this.Tab_Rechte = new BlueControls.Controls.TabPage();
             this.grpDateiVerschluesselung = new BlueControls.Controls.GroupBox();
             this.capDateiverschluesselungInfo = new BlueControls.Controls.Caption();
@@ -90,9 +90,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.Tab_Allgemein.SuspendLayout();
+            this.Tab_Regeln.SuspendLayout();
             this.Tab_Backup.SuspendLayout();
             this.grpExport.SuspendLayout();
-            this.Tab_Regeln.SuspendLayout();
             this.Tab_Rechte.SuspendLayout();
             this.grpDateiVerschluesselung.SuspendLayout();
             this.Tab_Binaer.SuspendLayout();
@@ -258,24 +258,23 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tbxTags
             // 
-            this.tbxTags.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.tbxTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxTags.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbxTags.Location = new System.Drawing.Point(615, 24);
+            this.tbxTags.Location = new System.Drawing.Point(568, 24);
             this.tbxTags.MultiLine = true;
             this.tbxTags.Name = "tbxTags";
-            this.tbxTags.Size = new System.Drawing.Size(416, 581);
+            this.tbxTags.Size = new System.Drawing.Size(463, 581);
             this.tbxTags.TabIndex = 26;
             this.tbxTags.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbCaption
             // 
-            this.txbCaption.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.txbCaption.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbCaption.Location = new System.Drawing.Point(8, 24);
             this.txbCaption.Name = "txbCaption";
-            this.txbCaption.Size = new System.Drawing.Size(600, 24);
+            this.txbCaption.Size = new System.Drawing.Size(552, 24);
             this.txbCaption.TabIndex = 24;
             // 
             // capCaption
@@ -289,9 +288,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capTags
             // 
-            this.capTags.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.capTags.CausesValidation = false;
-            this.capTags.Location = new System.Drawing.Point(616, 8);
+            this.capTags.Location = new System.Drawing.Point(568, 8);
             this.capTags.Name = "capTags";
             this.capTags.QuickInfo = "Tags / Eigenschaften, die von einem ";
             this.capTags.Size = new System.Drawing.Size(152, 16);
@@ -300,13 +298,12 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capInfo
             // 
-            this.capInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.capInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.capInfo.CausesValidation = false;
             this.capInfo.Location = new System.Drawing.Point(8, 56);
             this.capInfo.Name = "capInfo";
-            this.capInfo.Size = new System.Drawing.Size(599, 90);
+            this.capInfo.Size = new System.Drawing.Size(552, 90);
             this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // RuleItemEditor
@@ -420,11 +417,11 @@ namespace BlueControls.BlueDatabaseDialogs
             // txbFilterImagePath
             // 
             this.txbFilterImagePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.txbFilterImagePath.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbFilterImagePath.Location = new System.Drawing.Point(8, 336);
             this.txbFilterImagePath.Name = "txbFilterImagePath";
-            this.txbFilterImagePath.Size = new System.Drawing.Size(600, 64);
+            this.txbFilterImagePath.Size = new System.Drawing.Size(552, 64);
             this.txbFilterImagePath.TabIndex = 41;
             this.txbFilterImagePath.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -542,6 +539,28 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capAnsicht.Size = new System.Drawing.Size(120, 18);
             this.capAnsicht.Text = "Bevorzugte Ansicht:";
             // 
+            // Tab_Regeln
+            // 
+            this.Tab_Regeln.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Tab_Regeln.Controls.Add(this.btnAutoSort);
+            this.Tab_Regeln.Controls.Add(this.RuleItemEditor);
+            this.Tab_Regeln.Controls.Add(this.lbxRuleSelector);
+            this.Tab_Regeln.Location = new System.Drawing.Point(4, 25);
+            this.Tab_Regeln.Name = "Tab_Regeln";
+            this.Tab_Regeln.Padding = new System.Windows.Forms.Padding(3);
+            this.Tab_Regeln.Size = new System.Drawing.Size(1039, 616);
+            this.Tab_Regeln.TabIndex = 3;
+            this.Tab_Regeln.Text = "Regeln";
+            // 
+            // btnAutoSort
+            // 
+            this.btnAutoSort.Location = new System.Drawing.Point(944, 8);
+            this.btnAutoSort.Name = "btnAutoSort";
+            this.btnAutoSort.Size = new System.Drawing.Size(88, 24);
+            this.btnAutoSort.TabIndex = 2;
+            this.btnAutoSort.Text = "Auto-Sort";
+            this.btnAutoSort.Click += new System.EventHandler(this.btnAutoSort_Click);
+            // 
             // Tab_Backup
             // 
             this.Tab_Backup.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -601,28 +620,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxExportSets.ItemCheckedChanged += new System.EventHandler(this.lbxExportSets_ItemCheckedChanged);
             this.lbxExportSets.AddClicked += new System.EventHandler(this.ExportSets_AddClicked);
             this.lbxExportSets.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.lbxExportSets_RemoveClicked);
-            // 
-            // Tab_Regeln
-            // 
-            this.Tab_Regeln.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Regeln.Controls.Add(this.btnAutoSort);
-            this.Tab_Regeln.Controls.Add(this.RuleItemEditor);
-            this.Tab_Regeln.Controls.Add(this.lbxRuleSelector);
-            this.Tab_Regeln.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Regeln.Name = "Tab_Regeln";
-            this.Tab_Regeln.Padding = new System.Windows.Forms.Padding(3);
-            this.Tab_Regeln.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Regeln.TabIndex = 3;
-            this.Tab_Regeln.Text = "Regeln";
-            // 
-            // btnAutoSort
-            // 
-            this.btnAutoSort.Location = new System.Drawing.Point(944, 8);
-            this.btnAutoSort.Name = "btnAutoSort";
-            this.btnAutoSort.Size = new System.Drawing.Size(88, 24);
-            this.btnAutoSort.TabIndex = 2;
-            this.btnAutoSort.Text = "Auto-Sort";
-            this.btnAutoSort.Click += new System.EventHandler(this.btnAutoSort_Click);
             // 
             // Tab_Rechte
             // 
@@ -790,9 +787,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpKennwort.ResumeLayout(false);
             this.GlobalTab.ResumeLayout(false);
             this.Tab_Allgemein.ResumeLayout(false);
+            this.Tab_Regeln.ResumeLayout(false);
             this.Tab_Backup.ResumeLayout(false);
             this.grpExport.ResumeLayout(false);
-            this.Tab_Regeln.ResumeLayout(false);
             this.Tab_Rechte.ResumeLayout(false);
             this.grpDateiVerschluesselung.ResumeLayout(false);
             this.Tab_Binaer.ResumeLayout(false);

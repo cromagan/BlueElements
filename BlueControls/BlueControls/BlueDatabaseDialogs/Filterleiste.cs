@@ -370,9 +370,10 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                     #region Sichtbarkeit des Filterelemts bestimmen
 
-                    if (ViewItemOrder != null && _Filtertypes.HasFlag(enFilterTypesToShow.NachDefinierterAnsicht)) { ShowMe = true; }
-                    if (ViewItemCurrent != null && FilterItem != null && _Filtertypes.HasFlag(enFilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { ShowMe = true; }
-
+                    if (thisColumn.AutoFilterSymbolPossible()) {
+                        if (ViewItemOrder != null && _Filtertypes.HasFlag(enFilterTypesToShow.NachDefinierterAnsicht)) { ShowMe = true; }
+                        if (ViewItemCurrent != null && FilterItem != null && _Filtertypes.HasFlag(enFilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { ShowMe = true; }
+                    }
                     #endregion
 
 
