@@ -412,8 +412,7 @@ namespace BlueControls.Forms
 
             if (tmpDatabase == null)
             {
-                tmpDatabase = new Database(false);
-                tmpDatabase.Load(Datei, false);
+                tmpDatabase = new Database(Datei, false, false);
             }
 
 

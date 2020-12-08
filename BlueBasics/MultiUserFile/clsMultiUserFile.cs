@@ -610,7 +610,7 @@ namespace BlueBasics.MultiUserFile {
         protected abstract bool isSomethingDiscOperatingsBlocking();
 
 
-        public void Load(string fileNameToLoad, bool CreateWhenNotExisting) {
+        protected void Load(string fileNameToLoad, bool CreateWhenNotExisting) {
 
             if (fileNameToLoad.ToUpper() == Filename.ToUpper()) { return; }
 

@@ -195,8 +195,7 @@ namespace BlueControls.ItemCollection
                     ParseExplicit_TMPDatabase = (Database)Database.GetByFilename(value, false);
                     if (ParseExplicit_TMPDatabase == null)
                     {
-                        ParseExplicit_TMPDatabase = new Database(false);
-                        ParseExplicit_TMPDatabase.Load(value, false);
+                        ParseExplicit_TMPDatabase = new Database(value, false, false);
                     }
                     return true;
 

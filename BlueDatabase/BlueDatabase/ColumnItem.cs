@@ -1235,8 +1235,7 @@ namespace BlueDatabase {
             if (_TMP_LinkedDatabase == null) {
                 if (FileExists(el.Filenname)) {
 
-                    TMP_LinkedDatabase = new Database(el.ReadOnly); // Wichtig, NICHT _TMP_LinkedDatabase
-                    _TMP_LinkedDatabase.Load(el.Filenname, false);
+                    TMP_LinkedDatabase = new Database(el.Filenname, el.ReadOnly, false); // Wichtig, NICHT _TMP_LinkedDatabase
                 }
             }
 

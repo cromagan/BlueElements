@@ -355,8 +355,7 @@ namespace BlueControls.BlueDatabaseDialogs
             var tmp = (Database)Database.GetByFilename(Files[0], false);
             if (tmp == null)
             {
-                tmp = new Database(true);
-                tmp.Load(Files[0], false);
+                tmp = new Database(Files[0],true, false);
             }
 
             _TableView.Database = tmp;

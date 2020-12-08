@@ -63,18 +63,18 @@ namespace BlueDatabase {
         //}
 
 
-        private static Database Load(Stream Stream) {
-            if (Stream == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname nicht angegeben!"); }
+        //private static Database Load(Stream Stream) {
+        //    if (Stream == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname nicht angegeben!"); }
 
 
 
-            var db = new Database(true);
+        //    var db = new Database(true);
 
-            //TODO: In AllDatabases Aufnehmen!!!!!
+        //    //TODO: In AllDatabases Aufnehmen!!!!!
 
-            db.LoadFromStream(Stream);
-            return db;
-        }
+        //    db.LoadFromStream(Stream);
+        //    return db;
+        //}
 
         public static Database LoadResource(Assembly assembly, string Name, string BlueBasicsSubDir, bool FehlerAusgeben, bool MustBeStream) {
 
@@ -126,8 +126,7 @@ namespace BlueDatabase {
                     if (FileExists(pf)) {
                         var tmp = GetByFilename(pf, false);
                         if (tmp != null) { return (Database)tmp; }
-                        tmp = new Database(false);
-                        tmp.Load(pf, false);
+                        tmp = new Database(pf, false, false);
                         return (Database)tmp;
                     }
 
@@ -135,7 +134,7 @@ namespace BlueDatabase {
             }
 
             var d = modAllgemein.GetEmmbedResource(assembly, Name);
-            if (d != null) { return Load(d); }
+            if (d != null) { return new Database(d); }
 
             if (FehlerAusgeben) { Develop.DebugPrint(enFehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + BlueBasicsSubDir + " - " + Name); }
 
@@ -245,11 +244,16 @@ namespace BlueDatabase {
 
         #region  Construktor + Initialize 
 
-        /// <summary>
-        /// Nachher  Load benutzen.
-        /// </summary>
-        /// <param name="readOnly"></param>
-        public Database(bool readOnly) : base(readOnly, false, true) {
+        public Database(Stream Stream) : this(Stream, string.Empty, true, false) { }
+
+        public Database(bool readOnly) : this(null, string.Empty, readOnly, true) { }
+
+        public Database(string filename, bool readOnly, bool create) : this(null, filename, readOnly, create) { }
+
+
+        private Database(Stream stream, string filename, bool readOnly, bool create) : base(readOnly, false, true) {
+
+
 
             var culture = new System.Globalization.CultureInfo("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -296,6 +300,15 @@ namespace BlueDatabase {
 
 
             UserGroup = "#Administrator";
+
+            if (!string.IsNullOrEmpty(filename)) {
+                Load(filename, create);
+            }
+            else if (stream != null) {
+                LoadFromStream(stream);
+            }
+
+
 
 
         }
