@@ -201,7 +201,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                     if (!l.Contains(r[0])) {
 
-                        if (MessageBox.Show("Die Zeile wird durch andere Regeln <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", enImageCode.Pinnadel, "Ja", "Nein") == 0) {
+                        if (MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", enImageCode.Pinnadel, "Ja", "Nein") == 0) {
                             _TableView.PinAdd(r[0]);
                         }
                         _LastLooked = r[0].CellFirstString();

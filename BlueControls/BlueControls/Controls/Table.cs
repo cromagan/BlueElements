@@ -370,7 +370,7 @@ namespace BlueControls.Controls {
 
         }
 
-        internal void Pin(List<RowItem> rows) {
+        public void Pin(List<RowItem> rows) {
 
             if (rows == null) { rows = new List<RowItem>(); }
 
