@@ -327,6 +327,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxRuleSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbxRuleSelector.CheckBehavior = BlueControls.Enums.enCheckBehavior.AlwaysSingleSelection;
+            this.lbxRuleSelector.FilterAllowed = true;
             this.lbxRuleSelector.LastFilePath = null;
             this.lbxRuleSelector.Location = new System.Drawing.Point(8, 8);
             this.lbxRuleSelector.MoveAllowed = true;

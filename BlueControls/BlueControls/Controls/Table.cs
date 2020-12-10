@@ -2051,6 +2051,16 @@ namespace BlueControls.Controls {
 
             if (!columnviewitem.Column.AutoFilterSymbolPossible()) { return; }
 
+            foreach (var thisFilter in Filter) {
+                if (thisFilter != null) {
+                    if (thisFilter.Column == columnviewitem.Column && !string.IsNullOrEmpty(thisFilter.Herkunft)) {
+
+                        MessageBox.Show("Dieser Filter wurde<br>automatisch gesetzt.", enImageCode.Information, "OK");
+                        return;
+                    }
+                }
+            }
+
             Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             //OnBeforeAutoFilterShow(new ColumnEventArgs(columnviewitem.Column));
 

@@ -93,7 +93,12 @@ namespace BlueControls.Controls
             }
             else
             {
-                DisabledReason = string.Empty;
+                if (string.IsNullOrEmpty(Filter.Herkunft)) {
+                    DisabledReason = string.Empty;
+                } else
+                {
+                    DisabledReason = "Dieser Filter ist automatisch<br>gesetzt worden.";
+                }
 
                 var qi = Filter.Column.QuickInfoText(string.Empty);
 

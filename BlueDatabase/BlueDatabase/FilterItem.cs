@@ -38,7 +38,7 @@ namespace BlueDatabase {
         private ColumnItem _Column;
         private enFilterType _FilterType = enFilterType.KeinFilter;
 
-        public string Tag = string.Empty;
+        public string Herkunft = string.Empty;
 
         #endregion
 
@@ -72,14 +72,13 @@ namespace BlueDatabase {
         public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 
 
-        public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue, string tag) {
+        public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue, string herkunft) {
 
             if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte nicht vorhanden."); }
-
             Database = column.Database;
             _Column = column;
             _FilterType = filterType;
-            Tag = tag;
+            Herkunft = herkunft;
 
             if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
             SearchValue.Changed += SearchValue_ListOrItemChanged;
@@ -141,7 +140,7 @@ namespace BlueDatabase {
                 Result = Result + ", Value=" + t.ToNonCritical();
             }
 
-            if (!string.IsNullOrEmpty(Tag)) { Result = Result + ", Tag=" + Tag.ToNonCritical(); }
+            if (!string.IsNullOrEmpty(Herkunft)) { Result = Result + ", Herkunft=" + Herkunft.ToNonCritical(); }
 
             return Result + "}";
         }
@@ -168,8 +167,8 @@ namespace BlueDatabase {
                     case "value":
                         SearchValue.Add(pair.Value.FromNonCritical());
                         break;
-                    case "tag":
-                        Tag = pair.Value.FromNonCritical();
+                    case "herkunft":
+                        Herkunft = pair.Value.FromNonCritical();
                         break;
                     default:
                         Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);

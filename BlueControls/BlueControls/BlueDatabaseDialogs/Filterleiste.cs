@@ -407,7 +407,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                             Controls.Add(flx);
                         }
 
-
                         if (showPic && !FilterItem.Column.DauerFilterPos.IsEmpty) {
                             flx.Height = consthe * 2;
 
@@ -508,7 +507,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _TableView.Filter.Remove(e.Column);
 
             if (e.Comand != "Filter") { return; }
-            e.Filter.Tag = "Filterleiste";
+            //e.Filter.Herkunft = "Filterleiste";
             _TableView.Filter.Add(e.Filter);
 
         }
@@ -523,7 +522,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 var ISFilter = flx.WasThisValueClicked(); //  flx.Value.StartsWith("|");
 
-                flx.Filter.Tag = "Filterleiste";
+                //flx.Filter.Herkunft = "Filterleiste";
 
                 var v = flx.Value; //.Trim("|");
 
