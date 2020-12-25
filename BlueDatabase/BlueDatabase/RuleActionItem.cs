@@ -123,8 +123,7 @@ namespace BlueDatabase {
             if (obj is RuleActionItem RAI) {
                 // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
                 return CompareKey().CompareTo(RAI.CompareKey());
-            }
-            else {
+            } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
                 return 0;
             }
@@ -315,8 +314,7 @@ namespace BlueDatabase {
                         if (t.Format == enDataFormat.Ganzzahl) {
                             erg += 0.000000000000001; // 2,5 rundet sonst auf 2 ab...
                             Row.CellSet(t, (int)erg, FreezeMode);
-                        }
-                        else {
+                        } else {
                             Row.CellSet(t, (double)erg, FreezeMode);
                         }
                     }
@@ -325,7 +323,7 @@ namespace BlueDatabase {
                 case enAction.Substring:
 
                     foreach (var t in Columns) {
-                        var erg2 = Row.ReplaceVariables(_Text, false);
+                        var erg2 = Row.ReplaceVariables(_Text, false, false);
                         if (erg2 == _Text) {
                             return "Der Text der Spalte '#Spalte:" + t.Name + "' konnte nicht erstellt werden.";
                         }
@@ -557,16 +555,14 @@ namespace BlueDatabase {
                 case enAction.Ist:
                     if (string.IsNullOrEmpty(_Text)) {
                         return QuickImage.Get(enImageCode.Datei, 16, "00FF00", "");
-                    }
-                    else {
+                    } else {
                         return QuickImage.Get(enImageCode.Textdatei, 16, "0000FF", "");
                     }
 
                 case enAction.Ist_Nicht:
                     if (string.IsNullOrEmpty(_Text)) {
                         return QuickImage.Get("Datei|16||1|00FF00");
-                    }
-                    else {
+                    } else {
                         return QuickImage.Get("Textdatei|16||1|0000FF");
                     }
 
@@ -691,8 +687,7 @@ namespace BlueDatabase {
                 //rtext = rtext.Replace(" 2 Stu", " ?? Stu");
                 rSym = tmpa.SymbolForReadableText();
 
-            }
-            else {
+            } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Action: " + Action);
 
             }
@@ -883,8 +878,7 @@ namespace BlueDatabase {
             if ((int)Action < 1000) {
                 r = r + "<b>Bedingung:<br>Wenn </b>" + t.Trim('.') + "<b>, dann </b>...<br>";
                 r += "<i> - Bedingungen können nicht alleine stehen, sie benötigen immer eine auszuführende Aktion<br> - Bedingungen prüfen nur und ändern nichts</i><br>";
-            }
-            else {
+            } else {
                 r = r + "<b>Aktion:<br>Wenn </b>..., <b> dann </b>" + t.Trim('.') + ".<br>";
                 r += "<i> - Aktion können alleine stehen, evtl. ist dadurch eine manuelle Zellenbearbeitung nicht mehr möglich<br> - Aktionen haben immer Auswirkungen auf eine oder mehrere Zellen</i><br>";
             }
@@ -1097,8 +1091,7 @@ namespace BlueDatabase {
 
                 if (IsBedingung()) {
                     if (!t.Format.CanBeCheckedByRules()) { return "Aus der Spalte '" + t.ReadableText() + "' kann generell nicht gelesen werden"; }
-                }
-                else {
+                } else {
                     if (!t.Format.CanBeChangedByRules()) { return "Die Spalte '" + t.ReadableText() + "' kann generell nicht beschrieben werden"; }
                 }
             }
@@ -1182,8 +1175,7 @@ namespace BlueDatabase {
                 if (z == Columns.Count - 2) {
                     ColsOder = ColsOder + "'" + Columns[z].ReadableText() + "' oder ";
                     ColsUnd = ColsUnd + "'" + Columns[z].ReadableText() + "' und ";
-                }
-                else {
+                } else {
                     ColsUnd = ColsUnd + "'" + Columns[z].ReadableText() + "', ";
                     ColsOder = ColsOder + "'" + Columns[z].ReadableText() + "', ";
                 }
@@ -1310,8 +1302,7 @@ namespace BlueDatabase {
             if (string.IsNullOrEmpty(_Text)) {
                 w = new string[1]; //MUSS mindestens eines haben, daß auf Leere geprüft werden kann
                 w[0] = "";
-            }
-            else {
+            } else {
                 w = _Text.SplitByCR();
             }
 
@@ -1323,8 +1314,7 @@ namespace BlueDatabase {
                     t += TrifftZuText(vRow, t1, w);
                     if (!string.IsNullOrEmpty(t)) { break; }
                 }
-            }
-            else {
+            } else {
                 t = t + TrifftZuText(vRow, null, w) + "\r";
             }
 
@@ -1347,8 +1337,7 @@ namespace BlueDatabase {
             if (string.IsNullOrEmpty(_Text)) {
                 w = new string[1]; //MUSS mindestens eines haben, daß auf Leere geprüft werden kann
                 w[0] = string.Empty;
-            }
-            else {
+            } else {
                 w = _Text.SplitByCR();
             }
 
@@ -1357,8 +1346,7 @@ namespace BlueDatabase {
                     foreach (var t in Columns) {
                         if (TrifftZu(vRow, t, w[wtz])) { return true; }
                     }
-                }
-                else {
+                } else {
                     if (TrifftZu(vRow, null, w[wtz])) { return true; }
                 }
             }
@@ -1428,8 +1416,7 @@ namespace BlueDatabase {
                         string tmp;
                         if (!string.IsNullOrEmpty(Column.AllowedChars)) {
                             tmp = Column.AllowedChars;
-                        }
-                        else {
+                        } else {
                             tmp = Column.Format.AllowedChars();
                         }
                         if (Column.MultiLine) {

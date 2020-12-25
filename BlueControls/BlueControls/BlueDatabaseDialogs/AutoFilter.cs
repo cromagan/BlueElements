@@ -120,7 +120,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
 
 
-                var tmp = CellItem.ValueReadable(Column, string.Empty, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text);
+                var tmp = CellItem.ValueReadable(Column, string.Empty, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text, true);
 
 
                 if (string.IsNullOrEmpty(tmp)) {

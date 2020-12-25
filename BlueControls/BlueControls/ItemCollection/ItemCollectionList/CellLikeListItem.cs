@@ -24,10 +24,8 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection
-{
-    public class CellLikeListItem : BasicListItem
-    {
+namespace BlueControls.ItemCollection {
+    public class CellLikeListItem : BasicListItem {
         // Implements IReadableText
 
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
@@ -47,11 +45,9 @@ namespace BlueControls.ItemCollection
 
         private readonly enBildTextVerhalten _bildTextverhalten;
 
-        public override string QuickInfo
-        {
-            get
-            {
-                return Internal.ToHTMLText(); // unveränderter Text
+        public override string QuickInfo {
+            get {
+                return Internal.CreateHtmlCodes(true); // unveränderter Text
             }
         }
 
@@ -68,8 +64,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled, enBildTextVerhalten bildTextverhalten) : base(internalAndReadableText)
-        {
+        public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled, enBildTextVerhalten bildTextverhalten) : base(internalAndReadableText) {
             _StyleLikeThis = columnStyle;
             _style = style;
 
@@ -92,52 +87,44 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override Size SizeUntouchedForListBox()
-        {
+        public override Size SizeUntouchedForListBox() {
             return Table.FormatedText_NeededSize(_StyleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16, _bildTextverhalten);
         }
 
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate)
-        {
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
 
-            if (DrawBorderAndBack)
-            {
+            if (DrawBorderAndBack) {
                 Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
             }
 
             Table.Draw_FormatedText(_StyleLikeThis, Internal, GR, PositionModified, false, _style, itemdesign, vState, _bildTextverhalten);
 
-            if (DrawBorderAndBack)
-            {
+            if (DrawBorderAndBack) {
                 Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
             }
         }
 
 
-        protected override string GetCompareKey()
-        {
+        protected override string GetCompareKey() {
             // Die hauptklasse frägt nach diesem Kompare-Key
-        //    var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
+            //    var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
             return DataFormat.CompareKey(Internal, _StyleLikeThis.Format) + "|" + Internal;
         }
 
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth)
-        {
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
             return SizeUntouchedForListBox().Height;
         }
 
 
-        public override BasicListItem CloneToNewCollection(ItemCollectionList newParent)
-        {
+        public override BasicListItem CloneToNewCollection(ItemCollectionList newParent) {
             return CloneToNewCollection(newParent, new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _bildTextverhalten));
         }
 
-        public override bool FilterMatch(string FilterText)
-        {
+        public override bool FilterMatch(string FilterText) {
             if (base.FilterMatch(FilterText)) { return true; }
-            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, _StyleLikeThis.BildTextVerhalten);
+            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, _StyleLikeThis.BildTextVerhalten, true);
             return txt.ToUpper().Contains(FilterText.ToUpper());
         }
 

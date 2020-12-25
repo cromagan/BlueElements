@@ -75,13 +75,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.LayBearb = new BlueControls.Controls.Button();
             this.LayVZ = new BlueControls.Controls.Button();
             this.LayOpen = new BlueControls.Controls.Button();
-            this.grpDateiSystem = new BlueControls.Controls.GroupBox();
-            this.btnLastFiles = new BlueControls.Controls.LastFilesCombo();
-            this.btnNeu = new BlueControls.Controls.Button();
-            this.btnOeffnen = new BlueControls.Controls.Button();
-            this.btnSpeichern = new BlueControls.Controls.Button();
-            this.LoadTab = new System.Windows.Forms.OpenFileDialog();
-            this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.tabRightSide = new BlueControls.Controls.TabControl();
             this.tabElementEigenschaften = new BlueControls.Controls.TabPage();
             this.tabCodeGenerator = new BlueControls.Controls.TabPage();
@@ -90,6 +83,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabPageStart.SuspendLayout();
             this.Area_Drucken.SuspendLayout();
             this.Area_Design.SuspendLayout();
+            this.Area_Assistent.SuspendLayout();
             this.DatenbankVER.SuspendLayout();
             this.groupBoxX.SuspendLayout();
             this.FomAx.SuspendLayout();
@@ -98,7 +92,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Abma.SuspendLayout();
             this.ex2.SuspendLayout();
             this.BlueFrame1.SuspendLayout();
-            this.grpDateiSystem.SuspendLayout();
             this.tabRightSide.SuspendLayout();
             this.tabCodeGenerator.SuspendLayout();
             this.SuspendLayout();
@@ -107,7 +100,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.Pad.AutoRelation = ((BlueControls.Enums.enAutoRelationMode)((BlueControls.Enums.enAutoRelationMode.DirektVerbindungen | BlueControls.Enums.enAutoRelationMode.NurBeziehungenErhalten)));
             this.Pad.Size = new System.Drawing.Size(816, 502);
-            this.Pad.HotItemChanged += new System.EventHandler(this.Pad_HotItemChanged);
+            this.Pad.ClickedItemChanged += new System.EventHandler(this.Pad_ClickedItemChanged);
             // 
             // Ribbon
             // 
@@ -118,9 +111,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.tabPageStart.Controls.Add(this.BlueFrame1);
             this.tabPageStart.Controls.Add(this.DatenbankVER);
-            this.tabPageStart.Controls.Add(this.grpDateiSystem);
             this.tabPageStart.Size = new System.Drawing.Size(1332, 81);
-            this.tabPageStart.Controls.SetChildIndex(this.grpDateiSystem, 0);
             this.tabPageStart.Controls.SetChildIndex(this.Area_Drucken, 0);
             this.tabPageStart.Controls.SetChildIndex(this.DatenbankVER, 0);
             this.tabPageStart.Controls.SetChildIndex(this.BlueFrame1, 0);
@@ -129,16 +120,9 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.Area_Drucken.Location = new System.Drawing.Point(312, 0);
             // 
-            // Button_PageSetup
-            // 
-            this.Button_PageSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
-            // 
-            // ArbeitsbreichSetup
-            // 
-            this.ArbeitsbreichSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
-            // 
             // DatenbankVER
             // 
+            this.DatenbankVER.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.DatenbankVER.CausesValidation = false;
             this.DatenbankVER.Controls.Add(this.NamB);
             this.DatenbankVER.Controls.Add(this.weg);
@@ -146,9 +130,12 @@ namespace BlueControls.BlueDatabaseDialogs
             this.DatenbankVER.Controls.Add(this.Captionxx1);
             this.DatenbankVER.Controls.Add(this.Layout1);
             this.DatenbankVER.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DatenbankVER.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.DatenbankVER.Location = new System.Drawing.Point(608, 0);
             this.DatenbankVER.Name = "DatenbankVER";
             this.DatenbankVER.Size = new System.Drawing.Size(232, 81);
+            this.DatenbankVER.TabIndex = 2;
+            this.DatenbankVER.TabStop = false;
             this.DatenbankVER.Text = "Datenbank";
             // 
             // NamB
@@ -180,6 +167,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Captionxx1
             // 
+            this.Captionxx1.CausesValidation = false;
             this.Captionxx1.Location = new System.Drawing.Point(8, 2);
             this.Captionxx1.Name = "Captionxx1";
             this.Captionxx1.Size = new System.Drawing.Size(82, 22);
@@ -208,6 +196,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption4
             // 
+            this.Caption4.CausesValidation = false;
             this.Caption4.Location = new System.Drawing.Point(16, 24);
             this.Caption4.Name = "Caption4";
             this.Caption4.Size = new System.Drawing.Size(104, 24);
@@ -236,6 +225,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // groupBoxX
             // 
+            this.groupBoxX.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.groupBoxX.CausesValidation = false;
             this.groupBoxX.Controls.Add(this.Caption4);
             this.groupBoxX.Controls.Add(this.Spaltx);
@@ -247,10 +237,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.groupBoxX.Location = new System.Drawing.Point(0, 0);
             this.groupBoxX.Name = "groupBoxX";
             this.groupBoxX.Size = new System.Drawing.Size(516, 473);
+            this.groupBoxX.TabIndex = 0;
+            this.groupBoxX.TabStop = false;
             this.groupBoxX.Text = "Feld-Codes";
             // 
             // Caption11
             // 
+            this.Caption11.CausesValidation = false;
             this.Caption11.Location = new System.Drawing.Point(8, 352);
             this.Caption11.Name = "Caption11";
             this.Caption11.Size = new System.Drawing.Size(48, 18);
@@ -264,11 +257,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.FomAx.HotTrack = true;
             this.FomAx.Location = new System.Drawing.Point(8, 67);
             this.FomAx.Name = "FomAx";
+            this.FomAx.SelectedIndex = 0;
             this.FomAx.Size = new System.Drawing.Size(472, 285);
             this.FomAx.TabIndex = 111;
             // 
             // txt
             // 
+            this.txt.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.txt.Controls.Add(this.Abkürz);
             this.txt.Controls.Add(this.ÜberschriftS);
             this.txt.Controls.Add(this.Leer);
@@ -288,7 +283,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txt.Size = new System.Drawing.Size(464, 256);
             this.txt.TabIndex = 0;
             this.txt.Text = "Textfeld";
-            this.txt.UseVisualStyleBackColor = true;
             // 
             // Abkürz
             // 
@@ -378,6 +372,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ZeilCap
             // 
+            this.ZeilCap.CausesValidation = false;
             this.ZeilCap.Location = new System.Drawing.Point(4, 63);
             this.ZeilCap.Name = "ZeilCap";
             this.ZeilCap.Size = new System.Drawing.Size(172, 18);
@@ -385,6 +380,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption10
             // 
+            this.Caption10.CausesValidation = false;
             this.Caption10.Location = new System.Drawing.Point(236, 95);
             this.Caption10.Name = "Caption10";
             this.Caption10.Size = new System.Drawing.Size(76, 18);
@@ -392,6 +388,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption9
             // 
+            this.Caption9.CausesValidation = false;
             this.Caption9.Location = new System.Drawing.Point(4, 95);
             this.Caption9.Name = "Caption9";
             this.Caption9.Size = new System.Drawing.Size(68, 18);
@@ -399,6 +396,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption7
             // 
+            this.Caption7.CausesValidation = false;
             this.Caption7.Location = new System.Drawing.Point(4, 39);
             this.Caption7.Name = "Caption7";
             this.Caption7.Size = new System.Drawing.Size(134, 18);
@@ -406,6 +404,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Pic
             // 
+            this.Pic.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.Pic.Controls.Add(this.Base64);
             this.Pic.Controls.Add(this.Abma);
             this.Pic.Location = new System.Drawing.Point(4, 25);
@@ -414,7 +413,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Pic.Size = new System.Drawing.Size(464, 256);
             this.Pic.TabIndex = 1;
             this.Pic.Text = "Bild";
-            this.Pic.UseVisualStyleBackColor = true;
             // 
             // Base64
             // 
@@ -429,6 +427,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Abma
             // 
+            this.Abma.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.Abma.CausesValidation = false;
             this.Abma.Controls.Add(this.GroMi);
             this.Abma.Controls.Add(this.Caption6);
@@ -440,6 +439,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Abma.Location = new System.Drawing.Point(8, 8);
             this.Abma.Name = "Abma";
             this.Abma.Size = new System.Drawing.Size(272, 240);
+            this.Abma.TabIndex = 11;
+            this.Abma.TabStop = false;
             this.Abma.Text = "Abmaße:";
             // 
             // GroMi
@@ -458,6 +459,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption6
             // 
+            this.Caption6.CausesValidation = false;
             this.Caption6.Location = new System.Drawing.Point(8, 16);
             this.Caption6.Name = "Caption6";
             this.Caption6.Size = new System.Drawing.Size(39, 18);
@@ -465,6 +467,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Caption5
             // 
+            this.Caption5.CausesValidation = false;
             this.Caption5.Location = new System.Drawing.Point(112, 16);
             this.Caption5.Name = "Caption5";
             this.Caption5.Size = new System.Drawing.Size(34, 18);
@@ -519,6 +522,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ex2
             // 
+            this.ex2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.ex2.Controls.Add(this.BefE2);
             this.ex2.Location = new System.Drawing.Point(4, 25);
             this.ex2.Name = "ex2";
@@ -526,7 +530,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ex2.Size = new System.Drawing.Size(464, 256);
             this.ex2.TabIndex = 2;
             this.ex2.Text = "Allgemeine Steuercodes";
-            this.ex2.UseVisualStyleBackColor = true;
             // 
             // BefE2
             // 
@@ -534,21 +537,24 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BefE2.LastFilePath = null;
             this.BefE2.Location = new System.Drawing.Point(0, 16);
             this.BefE2.Name = "BefE2";
-            this.BefE2.QuickInfo = "";
             this.BefE2.Size = new System.Drawing.Size(456, 232);
             this.BefE2.TabIndex = 0;
             this.BefE2.ItemCheckedChanged += new System.EventHandler(this.BefE2_Item_CheckedChanged);
             // 
             // BlueFrame1
             // 
+            this.BlueFrame1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.BlueFrame1.CausesValidation = false;
             this.BlueFrame1.Controls.Add(this.LayBearb);
             this.BlueFrame1.Controls.Add(this.LayVZ);
             this.BlueFrame1.Controls.Add(this.LayOpen);
             this.BlueFrame1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.BlueFrame1.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.BlueFrame1.Location = new System.Drawing.Point(840, 0);
             this.BlueFrame1.Name = "BlueFrame1";
             this.BlueFrame1.Size = new System.Drawing.Size(336, 81);
+            this.BlueFrame1.TabIndex = 1;
+            this.BlueFrame1.TabStop = false;
             this.BlueFrame1.Text = "Externe Layouts aus dem Dateisytem";
             // 
             // LayBearb
@@ -582,78 +588,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.LayOpen.Text = "Layout mit Std.-Anwendung öffnen";
             this.LayOpen.Click += new System.EventHandler(this.LayOpen_Click);
             // 
-            // grpDateiSystem
-            // 
-            this.grpDateiSystem.CausesValidation = false;
-            this.grpDateiSystem.Controls.Add(this.btnLastFiles);
-            this.grpDateiSystem.Controls.Add(this.btnNeu);
-            this.grpDateiSystem.Controls.Add(this.btnOeffnen);
-            this.grpDateiSystem.Controls.Add(this.btnSpeichern);
-            this.grpDateiSystem.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpDateiSystem.Location = new System.Drawing.Point(0, 0);
-            this.grpDateiSystem.Name = "grpDateiSystem";
-            this.grpDateiSystem.Size = new System.Drawing.Size(312, 81);
-            this.grpDateiSystem.Text = "Dateisystem";
-            // 
-            // btnLastFiles
-            // 
-            this.btnLastFiles.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.btnLastFiles.DrawStyle = BlueControls.Enums.enComboboxStyle.RibbonBar;
-            this.btnLastFiles.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.btnLastFiles.Enabled = false;
-            this.btnLastFiles.ImageCode = "Ordner";
-            this.btnLastFiles.Location = new System.Drawing.Point(136, 2);
-            this.btnLastFiles.Name = "btnLastFiles";
-            this.btnLastFiles.Size = new System.Drawing.Size(104, 66);
-            this.btnLastFiles.TabIndex = 11;
-            this.btnLastFiles.Text = "zuletzt geöffnete Dateien";
-            this.btnLastFiles.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.btnLastFiles_ItemClicked);
-            // 
-            // btnNeu
-            // 
-            this.btnNeu.ImageCode = "Datei";
-            this.btnNeu.Location = new System.Drawing.Point(8, 2);
-            this.btnNeu.Name = "btnNeu";
-            this.btnNeu.Size = new System.Drawing.Size(64, 66);
-            this.btnNeu.TabIndex = 10;
-            this.btnNeu.Text = "Neu";
-            this.btnNeu.Click += new System.EventHandler(this.btnNeu_Click);
-            // 
-            // btnOeffnen
-            // 
-            this.btnOeffnen.ImageCode = "Ordner";
-            this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
-            this.btnOeffnen.Name = "btnOeffnen";
-            this.btnOeffnen.QuickInfo = "Eine Datei von ihrem<br>Computer öffnen";
-            this.btnOeffnen.Size = new System.Drawing.Size(64, 66);
-            this.btnOeffnen.TabIndex = 9;
-            this.btnOeffnen.Text = "Öffnen";
-            this.btnOeffnen.Click += new System.EventHandler(this.btnOeffnen_Click);
-            // 
-            // btnSpeichern
-            // 
-            this.btnSpeichern.ImageCode = "Diskette";
-            this.btnSpeichern.Location = new System.Drawing.Point(240, 2);
-            this.btnSpeichern.Name = "btnSpeichern";
-            this.btnSpeichern.Size = new System.Drawing.Size(64, 66);
-            this.btnSpeichern.TabIndex = 8;
-            this.btnSpeichern.Text = "Speichern";
-            this.btnSpeichern.Click += new System.EventHandler(this.btnSpeichern_Click);
-            // 
-            // LoadTab
-            // 
-            this.LoadTab.DefaultExt = "BCR";
-            this.LoadTab.Filter = "*.BCR BCR-Datei|*.BCR|*.* Alle Dateien|*";
-            this.LoadTab.Title = "Bitte Datei zum Laden wählen:";
-            this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
-            // 
-            // SaveTab
-            // 
-            this.SaveTab.DefaultExt = "BCR";
-            this.SaveTab.Filter = "*.BCR BCR-Datei|*.BCR|*.* Alle Dateien|*";
-            this.SaveTab.Title = "Bitte neuen Dateinamen der Datei wählen.";
-            this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.SaveTab_FileOk);
-            // 
             // tabRightSide
             // 
             this.tabRightSide.Controls.Add(this.tabElementEigenschaften);
@@ -662,11 +596,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabRightSide.HotTrack = true;
             this.tabRightSide.Location = new System.Drawing.Point(816, 110);
             this.tabRightSide.Name = "tabRightSide";
+            this.tabRightSide.SelectedIndex = 0;
             this.tabRightSide.Size = new System.Drawing.Size(524, 502);
             this.tabRightSide.TabIndex = 3;
             // 
             // tabElementEigenschaften
             // 
+            this.tabElementEigenschaften.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabElementEigenschaften.Location = new System.Drawing.Point(4, 25);
             this.tabElementEigenschaften.Name = "tabElementEigenschaften";
             this.tabElementEigenschaften.Size = new System.Drawing.Size(516, 473);
@@ -675,6 +611,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabCodeGenerator
             // 
+            this.tabCodeGenerator.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabCodeGenerator.Controls.Add(this.groupBoxX);
             this.tabCodeGenerator.Location = new System.Drawing.Point(4, 25);
             this.tabCodeGenerator.Name = "tabCodeGenerator";
@@ -699,6 +636,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabPageStart.ResumeLayout(false);
             this.Area_Drucken.ResumeLayout(false);
             this.Area_Design.ResumeLayout(false);
+            this.Area_Assistent.ResumeLayout(false);
             this.DatenbankVER.ResumeLayout(false);
             this.groupBoxX.ResumeLayout(false);
             this.FomAx.ResumeLayout(false);
@@ -707,7 +645,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Abma.ResumeLayout(false);
             this.ex2.ResumeLayout(false);
             this.BlueFrame1.ResumeLayout(false);
-            this.grpDateiSystem.ResumeLayout(false);
             this.tabRightSide.ResumeLayout(false);
             this.tabCodeGenerator.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -756,15 +693,8 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button LayOpen;
         private Button ÜberschriftS;
         private Button Abkürz;
-        protected internal GroupBox grpDateiSystem;
-        private LastFilesCombo btnLastFiles;
-        private Button btnNeu;
-        private Button btnOeffnen;
-        private Button btnSpeichern;
-        private System.Windows.Forms.OpenFileDialog LoadTab;
-        private System.Windows.Forms.SaveFileDialog SaveTab;
-        private AbstractTabControl tabRightSide;
         private TabPage tabElementEigenschaften;
         private TabPage tabCodeGenerator;
+        private TabControl tabRightSide;
     }
 }

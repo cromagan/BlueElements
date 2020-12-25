@@ -8,7 +8,7 @@ using BlueControls.EventArgs;
 namespace BlueControls.Forms
     {
 
-        public partial class RelationDiagram : PadEditor
+        public partial class RelationDiagram 
 		{
 			//Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
 			[DebuggerNonUserCode()]
@@ -35,63 +35,60 @@ namespace BlueControls.Forms
 			[DebuggerStepThrough()]
 			private void InitializeComponent()
 			{
-            this.Hinzu = new Button();
+            this.Hinzu = new BlueControls.Controls.Button();
             this.Ribbon.SuspendLayout();
             this.tabPageControl.SuspendLayout();
             this.tabPageStart.SuspendLayout();
             this.grpKomponenteHinzufügen.SuspendLayout();
             this.Area_Drucken.SuspendLayout();
             this.Area_Design.SuspendLayout();
+            this.Area_Assistent.SuspendLayout();
             this.SuspendLayout();
             // 
             // Pad
             // 
-            this.Pad.AutoRelation = enAutoRelationMode.DirektVerbindungen_Erhalten;
-            this.Pad.Size = new Size(1290, 528);
-            this.Pad.ContextMenuInit += new EventHandler<ContextMenuInitEventArgs>(this.Pad_ContextMenuInit);
-            this.Pad.ContextMenuItemClicked += new EventHandler<ContextMenuItemClickedEventArgs>(this.Pad_ContextMenuItemClicked);
+            this.Pad.AutoRelation = ((BlueControls.Enums.enAutoRelationMode)((BlueControls.Enums.enAutoRelationMode.DirektVerbindungen | BlueControls.Enums.enAutoRelationMode.NurBeziehungenErhalten)));
+            this.Pad.Size = new System.Drawing.Size(1290, 528);
+            this.Pad.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.Pad_ContextMenuInit);
+            this.Pad.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.Pad_ContextMenuItemClicked);
             // 
             // Ribbon
             // 
-            this.Ribbon.SelectedIndex = 1;
-            this.Ribbon.Size = new Size(1290, 110);
+            this.Ribbon.Size = new System.Drawing.Size(1290, 110);
             // 
             // tabPageControl
             // 
-            this.tabPageControl.Size = new Size(1282, 81);
+            this.tabPageControl.Size = new System.Drawing.Size(1282, 81);
             // 
-            // Area_KomponenteHinzufügen
+            // grpKomponenteHinzufügen
             // 
             this.grpKomponenteHinzufügen.Controls.Add(this.Hinzu);
-            this.grpKomponenteHinzufügen.Size = new Size(256, 81);
+            this.grpKomponenteHinzufügen.Size = new System.Drawing.Size(336, 81);
             this.grpKomponenteHinzufügen.Controls.SetChildIndex(this.Hinzu, 0);
-            // 
-            // Area_Design
-            // 
-            this.Area_Design.Location = new Point(608, 0);
-            // 
-            // Area_Assistent
-            // 
-            this.Area_Assistent.Location = new Point(896, 0);
             // 
             // Button_PageSetup
             // 
+            this.Button_PageSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
             this.Button_PageSetup.Visible = false;
+            // 
+            // ArbeitsbreichSetup
+            // 
+            this.ArbeitsbreichSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
             // 
             // Hinzu
             // 
             this.Hinzu.ImageCode = "PlusZeichen";
-            this.Hinzu.Location = new Point(176, 2);
+            this.Hinzu.Location = new System.Drawing.Point(264, 2);
             this.Hinzu.Name = "Hinzu";
-            this.Hinzu.Size = new Size(64, 66);
+            this.Hinzu.Size = new System.Drawing.Size(64, 66);
             this.Hinzu.TabIndex = 3;
             this.Hinzu.Text = "Eintrag hinzufügen";
-            this.Hinzu.Click += new EventHandler(this.Hinzu_Click);
+            this.Hinzu.Click += new System.EventHandler(this.Hinzu_Click);
             // 
             // RelationDiagram
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new Size(1290, 638);
+            this.ClientSize = new System.Drawing.Size(1290, 638);
             this.Name = "RelationDiagram";
             this.Text = "Beziehungs-Editor";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -101,6 +98,7 @@ namespace BlueControls.Forms
             this.grpKomponenteHinzufügen.ResumeLayout(false);
             this.Area_Drucken.ResumeLayout(false);
             this.Area_Design.ResumeLayout(false);
+            this.Area_Assistent.ResumeLayout(false);
             this.ResumeLayout(false);
 
 			}

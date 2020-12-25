@@ -273,9 +273,9 @@ namespace BlueBasics
                         if (!strace.GetFrame(z).GetMethod().Name.Contains("DebugPrint"))
                         {
                             if (First) { Trace.WriteLine("<font color =0000FF>"); }
-                            Trace.WriteLine("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
+                            Trace.WriteLine("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes(true) + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes(true).TrimStart("Void ") + "<br>");
 
-                            l?.Add("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
+                            l?.Add("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes(true) + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes(true).TrimStart("Void ") + "<br>");
 
                             if (First) { Trace.WriteLine("<font color =000000>"); }
                             First = false;
@@ -283,7 +283,7 @@ namespace BlueBasics
 
                     }
 
-                    Meldung = Meldung.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes();
+                    Meldung = Meldung.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes(true);
                     Trace.WriteLine("</th><th ALIGN=LEFT><font size = 3>" + Meldung + "</th>");
 
                     Trace.WriteLine("</tr>");

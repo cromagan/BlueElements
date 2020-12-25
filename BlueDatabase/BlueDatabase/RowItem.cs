@@ -38,6 +38,8 @@ namespace BlueDatabase {
         public int? TMP_Y = null;
         public int? TMP_DrawHeight = null;
 
+        private string? _tmpQuickInfo = null;
+
         #endregion
 
         public event EventHandler<RowCheckedEventArgs> RowChecked;
@@ -46,31 +48,46 @@ namespace BlueDatabase {
 
         #region  Construktor + Initialize 
 
-        private void Initialize() {
+
+
+        public RowItem(Database database, int key) {
+            Database = database;
+            Key = key;
             TMP_Chapter = string.Empty;
             TMP_Y = null;
             TMP_DrawHeight = null;
+            _tmpQuickInfo = null;
+
+
+
+            Database.Cell.CellValueChanged += Cell_CellValueChanged;
         }
 
 
-        public RowItem(Database cDatabase, int Key) {
-            Database = cDatabase;
-            this.Key = Key;
-            Initialize();
-        }
-
-
-        public RowItem(Database cDatabase) {
-            Database = cDatabase;
-            Key = Database.Row.NextRowKey();
-            Initialize();
-        }
+        public RowItem(Database database) : this(database, database.Row.NextRowKey()) { }
 
         #endregion
 
 
         #region  Properties 
         public int Key { get; }
+
+
+
+        public string QuickInfo {
+            get {
+                if (_tmpQuickInfo != null) { return _tmpQuickInfo; }
+                GenerateQuickInfo();
+                return _tmpQuickInfo;
+
+            }
+
+        }
+
+        private void GenerateQuickInfo() {
+            if (string.IsNullOrEmpty(Database.ZeilenQuickInfo)) { _tmpQuickInfo = string.Empty; return; }
+            _tmpQuickInfo = ReplaceVariables(Database.ZeilenQuickInfo, true, false);
+        }
 
         #endregion
 
@@ -302,6 +319,10 @@ namespace BlueDatabase {
             return Database.Cell.ValuesReadable(Column, this, style);
         }
 
+        private void Cell_CellValueChanged(object sender, CellEventArgs e) {
+            if (e.Row != this) { return; }
+            _tmpQuickInfo = null;
+        }
 
 
 
@@ -315,8 +336,7 @@ namespace BlueDatabase {
 
             if (Database.Cell.Freezed) {
                 DoUnfreeze = false;
-            }
-            else {
+            } else {
                 Database.Cell.Freeze();
             }
 
@@ -342,8 +362,7 @@ namespace BlueDatabase {
                                 foreach (var t in tmpColumNames) {
                                     ColumnAndErrors.Add(t + "|" + tmpMessage);
                                 }
-                            }
-                            else {
+                            } else {
                                 ColumnAndErrors.Add("|" + tmpMessage); // Sie gehören zur Nutzergruppe...
                             }
 
@@ -422,8 +441,7 @@ namespace BlueDatabase {
 
                         if (ThisColum.Format != enDataFormat.LinkedCell && x != x2) {
                             Database.Cell.Set(ThisColum, this, x2, false);
-                        }
-                        else {
+                        } else {
                             if (!ThisColum.IsFirst()) {
 
                                 Database.Cell.DoSpecialFormats(ThisColum, Key, CellGetString(ThisColum), false, true);
@@ -462,8 +480,7 @@ namespace BlueDatabase {
 
             if (cols.Count == 0) {
                 _InfoTXT += "Diese Zeile ist fehlerfrei.";
-            }
-            else {
+            } else {
                 _InfoTXT += _Info.JoinWith("<br><hr><br>");
             }
 
@@ -519,8 +536,7 @@ namespace BlueDatabase {
                     foreach (var t in Filter.SearchValue) {
                         if (!RowFilterMatch(t)) { return false; }
                     }
-                }
-                else {
+                } else {
                     if (!Database.Cell.MatchesTo(Filter.Column, this, Filter)) { return false; }
                 }
             }
@@ -633,9 +649,9 @@ namespace BlueDatabase {
         /// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; oder &Spaltenname(L,8);
         /// </summary>
         /// <param name="formel"></param>
-        /// <param name="fulltext">Bei TRUE wird der Text so zurückgegeben, wie er in der Zelle angezeigt werden würde. Zeilenumnrücke werden eleminiert!</param>
+        /// <param name="fulltext">Bei TRUE wird der Text so zurückgegeben, wie er in der Zelle angezeigt werden würde: Mit Suffix und Ersetzungen. Zeilenumbrüche werden eleminiert!</param>
         /// <returns></returns>
-        public string ReplaceVariables(string formel, bool fulltext) {
+        public string ReplaceVariables(string formel, bool fulltext, bool removeLineBreaks) {
 
             var erg = formel;
 
@@ -646,9 +662,13 @@ namespace BlueDatabase {
                 if (thisColumnItem != null) {
                     var txt = CellGetString(thisColumnItem);
 
-                    if (fulltext) { txt = CellItem.ValueReadable(thisColumnItem, txt, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text); }
+                    if (fulltext) { txt = CellItem.ValueReadable(thisColumnItem, txt, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text, removeLineBreaks); }
 
 
+                    if (removeLineBreaks && !fulltext) {
+                        txt = txt.Replace("\r\n", " ");
+                        txt = txt.Replace("\r", " ");
+                    }
 
                     erg = erg.Replace("&" + thisColumnItem.Name.ToUpper() + ";", txt, RegexOptions.IgnoreCase);
 

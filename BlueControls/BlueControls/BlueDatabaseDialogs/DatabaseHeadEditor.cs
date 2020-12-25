@@ -105,8 +105,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (tbxUndoAnzahl.Text.IsLong()) {
                 _Database.UndoCount = Math.Max(int.Parse(tbxUndoAnzahl.Text), 5);
-            }
-            else {
+            } else {
                 _Database.UndoCount = 5;
             }
 
@@ -114,20 +113,20 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (tbxReloadVerzoegerung.Text.IsLong()) {
                 _Database.ReloadDelaySecond = Math.Max(int.Parse(tbxReloadVerzoegerung.Text), 5);
-            }
-            else {
+            } else {
                 _Database.ReloadDelaySecond = 5;
             }
 
             if (txbGlobalScale.Text.IsDouble()) {
                 _Database.GlobalScale = Math.Min(double.Parse(txbGlobalScale.Text), 5);
                 _Database.GlobalScale = Math.Max(0.5, _Database.GlobalScale);
-            }
-            else {
+            } else {
                 _Database.ReloadDelaySecond = 1;
             }
 
             _Database.FilterImagePfad = txbFilterImagePath.Text;
+
+            _Database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r","<br>");
 
             if (tbxTags.Text != _Database.Tags.JoinWithCr()) {
                 _Database.Tags.Clear();
@@ -252,6 +251,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             txbGlobalScale.Text = _Database.GlobalScale.ToString();
 
             txbFilterImagePath.Text = _Database.FilterImagePfad;
+
+            txbZeilenQuickInfo.Text = _Database.ZeilenQuickInfo.Replace("<br>","\r");
 
             tbxUndoAnzahl.Text = _Database.UndoCount.ToString();
 
@@ -480,9 +481,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     FileOperations.DeleteFile(ThisFile, true);
                     modConverter.ByteToFile(ThisFile, b);
                 }
-            }
-
-            else {
+            } else {
                 NewKey = string.Empty;
                 foreach (var ThisFile in lLCase) {
                     var b = modConverter.FileToByte(ThisFile);
@@ -506,8 +505,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(_Database.FileEncryptionKey)) {
                 btnDateiSchluessel.Text = "Dateien verschlüsseln";
                 btnDateiSchluessel.QuickInfo = "Dazugehörige Dateien der Datenbank sind aktuell im Originalformat auf dem Laufwerk für jedem zugänglich.";
-            }
-            else {
+            } else {
                 btnDateiSchluessel.Text = "Dateien freigeben";
                 btnDateiSchluessel.QuickInfo = "Dazugehörige Dateien der Datenbank sind aktuell verschlüsselt.";
             }
@@ -534,8 +532,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             };
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
                 GetFromFile = openFileDialog1.FileName;
-            }
-            else {
+            } else {
                 return;
             }
 
@@ -654,8 +651,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                     if (Row != null) {
                         r.CellSet("RowFirst", Row.CellFirstString());
-                    }
-                    else if (cd[1] != "-1") {
+                    } else if (cd[1] != "-1") {
                         r.CellSet("RowFirst", "[gelöscht]");
                     }
 

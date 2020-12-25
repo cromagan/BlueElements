@@ -19,7 +19,6 @@
 
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -29,12 +28,10 @@ using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.Controls
-{
+namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ItemClicked")]
-    public sealed class LastFilesCombo : ComboBox
-    {
+    public sealed class LastFilesCombo : ComboBox {
 
         private List<string> LastD = new List<string>();
 
@@ -44,8 +41,7 @@ namespace BlueControls.Controls
         //public string _specialcommand = string.Empty;
 
         #region Constructor
-        public LastFilesCombo() : base()
-        {
+        public LastFilesCombo() : base() {
             SetLastFilesStyle();
         }
 
@@ -61,14 +57,11 @@ namespace BlueControls.Controls
         /// </summary>
         /// 
         [DefaultValue("")]
-        public string Filename
-        {
-            get
-            {
+        public string Filename {
+            get {
                 return _filename;
             }
-            set
-            {
+            set {
                 if (_filename == value) { return; }
                 _filename = value;
                 LoadFromDisk();
@@ -97,14 +90,11 @@ namespace BlueControls.Controls
 
 
         [DefaultValue(true)]
-        public bool MustExist
-        {
-            get
-            {
+        public bool MustExist {
+            get {
                 return _mustExists;
             }
-            set
-            {
+            set {
                 if (_mustExists == value) { return; }
                 _mustExists = value;
                 GenerateMenu();
@@ -113,14 +103,11 @@ namespace BlueControls.Controls
         }
 
         [DefaultValue(20)]
-        public int MaxCount
-        {
-            get
-            {
+        public int MaxCount {
+            get {
                 return _maxCount;
             }
-            set
-            {
+            set {
                 if (_maxCount == value) { return; }
                 _maxCount = value;
                 GenerateMenu();
@@ -130,8 +117,7 @@ namespace BlueControls.Controls
 
 
 
-        private void GenerateMenu()
-        {
+        private void GenerateMenu() {
 
             var NR = 0;
 
@@ -151,34 +137,26 @@ namespace BlueControls.Controls
 
             NR = -1;
 
-            for (var Z = LastD.Count - 1; Z >= 0; Z--)
-            {
+            for (var Z = LastD.Count - 1; Z >= 0; Z--) {
 
                 var x = LastD[Z].SplitBy("|");
 
 
-                if (x == null || x.GetUpperBound(0) < 0 || !string.IsNullOrEmpty(x[0]))
-                {
-                    if (!_mustExists || FileExists(x[0]))
-                    {
+                if (x == null || x.GetUpperBound(0) < 0 || !string.IsNullOrEmpty(x[0])) {
+                    if (!_mustExists || FileExists(x[0])) {
                         NR++;
 
-                        if (NR < MaxCount)
-                        {
+                        if (NR < MaxCount) {
                             Vis = true;
                             var show = (NR + 1).ToString(Constants.Format_Integer3) + ": ";
 
-                            if (_mustExists)
-                            {
+                            if (_mustExists) {
                                 show += x[0].FileNameWithSuffix();
-                            }
-                            else
-                            {
+                            } else {
                                 show += x[0];
                             }
 
-                            if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]))
-                            {
+                            if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1])) {
                                 show = show + " - " + x[1];
                             }
 
@@ -186,12 +164,9 @@ namespace BlueControls.Controls
 
                             var t = new List<string>();
 
-                            if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]))
-                            {
+                            if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1])) {
                                 t.Add(x[1]);
-                            }
-                            else
-                            {
+                            } else {
                                 t.Add(string.Empty);
                             }
                             it.Tags = t;
@@ -210,8 +185,7 @@ namespace BlueControls.Controls
         }
 
 
-        public void AddFileName(string FileName, string AdditionalText)
-        {
+        public void AddFileName(string FileName, string AdditionalText) {
 
             var s = FileName + "|" + AdditionalText;
 
@@ -220,8 +194,7 @@ namespace BlueControls.Controls
             s = s.Replace("\r", ";");
             s = s.Replace("\n", ";");
 
-            if (!_mustExists || FileExists(FileName))
-            {
+            if (!_mustExists || FileExists(FileName)) {
                 if (LastD.Count > 0) { LastD.RemoveString(FileName, false); }
                 if (LastD.Count > 0) { LastD.RemoveString(s, false); }
                 LastD.Add(s);
@@ -231,34 +204,29 @@ namespace BlueControls.Controls
         }
 
 
-        protected override void DrawControl(Graphics gr, enStates state)
-        {
+        protected override void DrawControl(Graphics gr, enStates state) {
             SetLastFilesStyle();
             base.DrawControl(gr, state);
         }
 
-        protected override void OnHandleCreated(System.EventArgs e)
-        {
+        protected override void OnHandleCreated(System.EventArgs e) {
             base.OnHandleCreated(e);
             LoadFromDisk();
             GenerateMenu();
         }
 
 
-        private string SaveFile()
-        {
+        private string SaveFile() {
             if (!string.IsNullOrEmpty(_filename)) { return _filename; }
 
             return System.Windows.Forms.Application.StartupPath + "\\" + Name + "-Files.laf";
         }
 
 
-        private void LoadFromDisk()
-        {
+        private void LoadFromDisk() {
             LastD = new List<string>();
 
-            if (FileExists(SaveFile()))
-            {
+            if (FileExists(SaveFile())) {
                 var t = modAllgemein.LoadFromDisk(SaveFile());
                 t = t.RemoveChars("\n");
                 LastD.AddRange(t.SplitByCR());
@@ -266,10 +234,8 @@ namespace BlueControls.Controls
         }
 
 
-        private void SetLastFilesStyle()
-        {
-            if (DrawStyle == enComboboxStyle.TextBox)
-            {
+        private void SetLastFilesStyle() {
+            if (DrawStyle == enComboboxStyle.TextBox) {
                 DrawStyle = enComboboxStyle.Button;
             }
             if (string.IsNullOrEmpty(ImageCode)) { ImageCode = "Ordner"; }
@@ -278,8 +244,7 @@ namespace BlueControls.Controls
 
 
 
-        protected override void OnItemClicked(BasicListItemEventArgs e)
-        {
+        protected override void OnItemClicked(BasicListItemEventArgs e) {
 
             //if (!string.IsNullOrEmpty(_specialcommand) && e.Item.Internal == "#SPECIAL#")
             //{

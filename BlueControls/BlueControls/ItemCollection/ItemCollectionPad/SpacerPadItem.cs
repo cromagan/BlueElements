@@ -25,20 +25,38 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection
-{
-    public class SpacerPadItem : FormPadItemRectangle
-    {
+namespace BlueControls.ItemCollection {
+    public class SpacerPadItem : FormPadItemRectangle {
 
 
         #region  Variablen-Deklarationen 
 
 
-
+        private decimal _Größe_Distanzhalter;
 
         private readonly decimal mm125x; //Math.Round(mmToPixel(1.25D, _DPIx), 1)
 
-        public string Größe_Distanzhalter { get; set; }
+        public decimal Größe_Distanzhalter {
+            get {
+                return _Größe_Distanzhalter;
+            }
+
+
+            set {
+
+                if (value < mm125x * 1m) { value = mm125x * 1m; }
+
+                if (value == _Größe_Distanzhalter) { return; }
+
+                _Größe_Distanzhalter = value;
+
+
+                p_RU.SetTo(p_LO.X + _Größe_Distanzhalter, p_LO.Y + _Größe_Distanzhalter);
+
+                RecalculateAndOnChanged();
+
+            }
+        }
 
         #endregion
 
@@ -54,23 +72,13 @@ namespace BlueControls.ItemCollection
         public SpacerPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
 
 
-        public SpacerPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname)
-        {
+        public SpacerPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
             mm125x = Math.Round(modConverter.mmToPixel(1.25M, ItemCollectionPad.DPI), 1);
 
-            Größe_Distanzhalter = (mm125x * 2).ToString(Constants.Format_Float10); // 19,68 = 2,5 mm
-            //p_O = new PointM(this, "O", 0, 0);
-            //p_U = new PointM(this, "U", 0, 0);
-            //p_L = new PointM(this, "L", 0, 0);
-            //p_R = new PointM(this, "R", 0, 0);
-            //p_M = new PointM(this, "M", 0, 0, false, true, true);
+            Größe_Distanzhalter = mm125x * 2; // 19,68 = 2,5 mm
 
+            Größe_fixiert = true;
 
-            //Points.Add(p_M);
-            //Points.Add(p_O);
-            //Points.Add(p_U);
-            //Points.Add(p_L);
-            //Points.Add(p_R);
 
         }
 
@@ -87,14 +95,12 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        public override void DesignOrStyleChanged()
-        {
+        public override void DesignOrStyleChanged() {
             // Muss angepasst werden, evtl. wegen 70% größe
             CaluclatePointsWORelations();
         }
 
-        protected override string ClassId()
-        {
+        protected override string ClassId() {
             return "SPACER";
         }
 
@@ -106,9 +112,9 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
-        {
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (ForPrinting) { return; }
+
             GR.DrawEllipse(CreativePad.PenGray, DCoordinates);
         }
 
@@ -135,14 +141,12 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override bool ParseThis(string tag, string value)
-        {
+        public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
 
-            switch (tag)
-            {
+            switch (tag) {
                 case "size":
-                    Größe_Distanzhalter = value.FromNonCritical();
+                    Größe_Distanzhalter = BlueBasics.modConverter.DecimalParse(value.FromNonCritical());
                     return true;
                 case "checked":
                     return true;
@@ -155,27 +159,26 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override string ToString()
-        {
+        public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-            return t + "Size=" + Größe_Distanzhalter.ToNonCritical() + "}";
+            return t + "Size=" + Größe_Distanzhalter.ToString(Constants.Format_Float10).ToNonCritical() + "}";
         }
 
 
-        public override void CaluclatePointsWORelations()
-        {
-            var p_M = new PointM((p_LO.X + p_RU.Y) / 2, (p_LO.Y + p_RU.Y) / 2);
+        //public override void CaluclatePointsWORelations()
+        //{
+        //    var p_M = new PointM((p_LO.X + p_RU.Y) / 2, (p_LO.Y + p_RU.Y) / 2);
 
 
-            var t = decimal.Parse(Größe_Distanzhalter) * Parent.SheetStyleScale / 2;
-            p_O.SetTo(p_M.X, p_M.Y - t);
-            p_U.SetTo(p_M.X, p_M.Y + t);
-            p_L.SetTo(p_M.X - t, p_M.Y);
-            p_R.SetTo(p_M.X + t, p_M.Y);
+        //    var t = decimal.Parse(Größe_Distanzhalter) * Parent.SheetStyleScale / 2;
+        //    p_O.SetTo(p_M.X, p_M.Y - t);
+        //    p_U.SetTo(p_M.X, p_M.Y + t);
+        //    p_L.SetTo(p_M.X - t, p_M.Y);
+        //    p_R.SetTo(p_M.X + t, p_M.Y);
 
-            base.CaluclatePointsWORelations();
-        }
+        //    base.CaluclatePointsWORelations();
+        //}
 
 
         // protected override void GenerateInternalRelationExplicit()
@@ -183,8 +186,7 @@ namespace BlueControls.ItemCollection
         //}
 
 
-        public override List<FlexiControl> GetStyleOptions()
-        {
+        public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>();
 
 

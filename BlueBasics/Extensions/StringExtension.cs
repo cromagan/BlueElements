@@ -417,7 +417,7 @@ namespace BlueBasics
 
 
 
-        public static string CreateHtmlCodes(this string TXT)
+        public static string CreateHtmlCodes(this string TXT, bool crlftoo)
         {
             // http://sonderzeichentabelle.de/
             // http://www.htmlhelp.com/reference/html40/entities/special.html
@@ -448,16 +448,7 @@ namespace BlueBasics
             TXT = TXT.Replace("\"", "&quot;");
 
 
-
-            //TXT = TXT.Replace("&lt;br&gt;", "<br>", False)
-            //TXT = TXT.Replace("&lt;b&gt;", "<b>", False)
-            //TXT = TXT.Replace("&lt;/b&gt;", "</b>", False)
-            //TXT = TXT.Replace("&lt;u&gt;", "<u>", False)
-            //TXT = TXT.Replace("&lt;/u&gt;", "</u>", False)
-            //TXT = TXT.Replace("&lt;i&gt;", "<i>", False)
-            //TXT = TXT.Replace("&lt;/i&gt;", "</i>", False)
-
-
+            if (!crlftoo) { return TXT; }
 
             TXT = TXT.Replace("\r\n", "<br>", RegexOptions.IgnoreCase);
             TXT = TXT.Replace("\r", "<br>", RegexOptions.IgnoreCase);
@@ -476,18 +467,18 @@ namespace BlueBasics
         }
 
 
-        public static string ToHTMLText(this string txt)
-        {
-            txt = txt.Replace("&", "&amp;");
-            txt = txt.Replace("<", "&lt;");
-            txt = txt.Replace(">", "&gt;");
-            //s
-            //txt = txt.Replace("~~&lt;", "<<>");
-            //txt = txt.Replace("~~&gt;", "<>>");
-            txt = txt.Replace("\r\n", "<br>");
-            txt = txt.Replace("\r", "<br>");
-            return txt;
-        }
+        //public static string ToHTMLText(this string txt)
+        //{
+        //    txt = txt.Replace("&", "&amp;");
+        //    txt = txt.Replace("<", "&lt;");
+        //    txt = txt.Replace(">", "&gt;");
+        //    //s
+        //    //txt = txt.Replace("~~&lt;", "<<>");
+        //    //txt = txt.Replace("~~&gt;", "<>>");
+        //    txt = txt.Replace("\r\n", "<br>");
+        //    txt = txt.Replace("\r", "<br>");
+        //    return txt;
+        //}
 
         public static string ConvertFromHtmlToRich(this string txt)
         {

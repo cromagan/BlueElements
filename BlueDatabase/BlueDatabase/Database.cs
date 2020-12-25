@@ -32,6 +32,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using static BlueBasics.FileOperations;
 
 
@@ -185,6 +186,7 @@ namespace BlueDatabase {
         private enAnsicht _Ansicht;
         private double _GlobalScale;
         private string _FilterImagePfad;
+        private string _ZeilenQuickInfo;
 
         public readonly ListExt<RuleItem> Rules = new ListExt<RuleItem>();
         public readonly ListExt<ColumnViewCollection> ColumnArrangements = new ListExt<ColumnViewCollection>();
@@ -303,8 +305,7 @@ namespace BlueDatabase {
 
             if (!string.IsNullOrEmpty(filename)) {
                 Load(filename, create);
-            }
-            else if (stream != null) {
+            } else if (stream != null) {
                 LoadFromStream(stream);
             }
 
@@ -358,6 +359,7 @@ namespace BlueDatabase {
             _GlobalScale = 1f;
             _Ansicht = enAnsicht.Unverändert;
             _FilterImagePfad = string.Empty;
+            _ZeilenQuickInfo = string.Empty;
 
             _sortDefinition = null;
 
@@ -409,6 +411,17 @@ namespace BlueDatabase {
                 if (_FilterImagePfad == value) { return; }
                 AddPending(enDatabaseDataType.FilterImagePfad, -1, -1, _FilterImagePfad, value, true);
                 Cell.InvalidateAllSizes();
+            }
+        }
+
+        [Browsable(false)]
+        public string ZeilenQuickInfo {
+            get {
+                return _ZeilenQuickInfo;
+            }
+            set {
+                if (_ZeilenQuickInfo == value) { return; }
+                AddPending(enDatabaseDataType.ZeilenQuickInfo, -1, -1, _ZeilenQuickInfo, value, true);
             }
         }
 
@@ -579,8 +592,7 @@ namespace BlueDatabase {
 
                 if (row == null) {
                     row = feh.Item3;
-                }
-                else {
+                } else {
                     if (row != feh.Item3) { return "Zeilen-Inkonsistenz festgestellt."; }
                 }
 
@@ -628,8 +640,7 @@ namespace BlueDatabase {
                 case "IMPORT1":
                     if (c.IsFirst() && row == null) {
                         row = Row.Add(txt);
-                    }
-                    else {
+                    } else {
                         if (row == null) { return Tuple.Create("Keine Zeile angegeben.", true, row); }
                         row.CellSet(c, txt);
                     }
@@ -775,8 +786,7 @@ namespace BlueDatabase {
             if (sender is RuleItem RL) {
                 if (!Rules.Contains(RL)) { return; }
                 AddPending(enDatabaseDataType.Rules, -1, Rules.ToString(true), false);
-            }
-            else {
+            } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Typ ist kein RuleItem");
             }
         }
@@ -932,8 +942,7 @@ namespace BlueDatabase {
                             // Prima, gefunden! Noch die Collections korrigieren
                             Column.Add(enDatabaseDataType.AddColumn, _Column);
                             ColumnsOld.Remove(_Column);
-                        }
-                        else {
+                        } else {
                             // Nicht gefunden, als neu machen
                             _Column = Column.Add(ColKey);
                         }
@@ -1078,8 +1087,7 @@ namespace BlueDatabase {
                     if (LoadedVersion != DatabaseVersion) {
                         Initialize();
                         LoadedVersion = content.Trim();
-                    }
-                    else {
+                    } else {
                         //Cell.RemoveOrphans();
                         Row.RemoveNullOrEmpty();
                         Cell.SetAllValuesToEmpty();
@@ -1115,6 +1123,9 @@ namespace BlueDatabase {
                     break;
                 case enDatabaseDataType.FilterImagePfad:
                     _FilterImagePfad = content;
+                    break;
+                case enDatabaseDataType.ZeilenQuickInfo:
+                    _ZeilenQuickInfo = content;
                     break;
                 case enDatabaseDataType.Ansicht:
                     _Ansicht = (enAnsicht)int.Parse(content);
@@ -1299,10 +1310,12 @@ namespace BlueDatabase {
                 if (!first && thisView[column] != null) { cola = true; }
                 first = false;
             }
-            if (cola) { t += " - Benutzerdefiniert Spalten-Anordnungen<br>"; }
+            if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
 
 
             if (ImportScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Import-Skript<br>"; }
+
+            if (ZeilenQuickInfo.ToUpper().Contains(column.Name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
 
 
             var rul = false;
@@ -1371,13 +1384,19 @@ namespace BlueDatabase {
                     if (x2.Length > 2 && x2[1].ToUpper() == oldName.ToUpper()) {
                         x2[1] = newName.Name.ToUpper();
                         xn.Add(x2.JoinWith("|"));
-                    }
-                    else {
+                    } else {
                         xn.Add(thisstring);
                     }
                 }
             }
             ImportScript = xn.JoinWithCr().ToNonCritical();
+
+
+
+            // Zeilen-Quick-Info -----------------------------------------
+            ZeilenQuickInfo = ZeilenQuickInfo.Replace("&" + oldName + ";", "&" + newName.Name + ";", RegexOptions.IgnoreCase);
+            ZeilenQuickInfo = ZeilenQuickInfo.Replace("&" + oldName + "(", "&" + newName.Name + "(", RegexOptions.IgnoreCase);
+
 
         }
 
@@ -1488,8 +1507,7 @@ namespace BlueDatabase {
                     if (ThisWork.State == enItemState.Pending) { return true; }
                 }
                 return false;
-            }
-            catch {
+            } catch {
                 return HasPendingChanges();
             }
 
@@ -1698,8 +1716,7 @@ namespace BlueDatabase {
 
                             if (LCrow != null && LCColumn != null) {
                                 da.CellAdd(LCrow.CellGetValuesReadable(LCColumn, enShortenStyle.HTML).JoinWith("<br>"), ThisColumn.BackColor);
-                            }
-                            else {
+                            } else {
                                 da.CellAdd(" ", ThisColumn.BackColor);
 
                             }
@@ -1721,8 +1738,7 @@ namespace BlueDatabase {
                         da.CellAdd("-", ThisColumn.BackColor);
 
                         //da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">-</th>");
-                    }
-                    else {
+                    } else {
                         da.CellAdd("&sum; " + s, ThisColumn.BackColor);
                         //da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">&sum; " + s + "</th>");
                     }
@@ -1758,26 +1774,23 @@ namespace BlueDatabase {
 
             if (allowed.ToUpper() == "#EVERYBODY") {
                 return true;
-            }
-            else if (allowed.ToUpper() == "#ROWCREATOR") {
+            } else if (allowed.ToUpper() == "#ROWCREATOR") {
                 if (row != null && Cell.GetString(Column.SysRowCreator, row).ToUpper() == tmpName) {
                     return true;
                 }
             }
-            //else if (allowed.ToUpper() == "#ROWCHANGER")
-            //{
-            //    if (row != null && Cell.GetString(Column.SysRowChanger, row).ToUpper() == tmpName)
-            //    {
-            //        return true;
-            //    }
-            //}
-            else if (allowed.ToUpper() == "#USER: " + tmpName) {
+              //else if (allowed.ToUpper() == "#ROWCHANGER")
+              //{
+              //    if (row != null && Cell.GetString(Column.SysRowChanger, row).ToUpper() == tmpName)
+              //    {
+              //        return true;
+              //    }
+              //}
+              else if (allowed.ToUpper() == "#USER: " + tmpName) {
                 return true;
-            }
-            else if (allowed.ToUpper() == "#USER:" + tmpName) {
+            } else if (allowed.ToUpper() == "#USER:" + tmpName) {
                 return true;
-            }
-            else if (allowed.ToUpper() == tmpGroup) {
+            } else if (allowed.ToUpper() == tmpGroup) {
                 return true;
             }
             //else if (allowed.ToUpper() == "#DATABASECREATOR")
@@ -1851,8 +1864,7 @@ namespace BlueDatabase {
             if (!DatabaseEbene) {
                 e.Add("#RowCreator");
                 //e.Add("#RowChanger");
-            }
-            else {
+            } else {
                 e.RemoveString("#RowCreator", false);
                 //e.RemoveString("#RowChanger", false);
 
@@ -1891,8 +1903,7 @@ namespace BlueDatabase {
                 // Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
                 if (string.IsNullOrEmpty(_GlobalShowPass)) {
                     SaveToByteList(l, enDatabaseDataType.CryptionState, false.ToPlusMinus());
-                }
-                else {
+                } else {
                     SaveToByteList(l, enDatabaseDataType.CryptionState, true.ToPlusMinus());
                     CryptPos = l.Count;
                     SaveToByteList(l, enDatabaseDataType.CryptionTest, "OK");
@@ -1919,6 +1930,7 @@ namespace BlueDatabase {
 
                 SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _FilterImagePfad);
 
+                SaveToByteList(l, enDatabaseDataType.ZeilenQuickInfo, _ZeilenQuickInfo);
 
                 Column.SaveToByteList(l);
                 Row.SaveToByteList(l);
@@ -1928,8 +1940,7 @@ namespace BlueDatabase {
                 if (SortDefinition == null) {
                     // Ganz neue Datenbank
                     SaveToByteList(l, enDatabaseDataType.SortDefinition, "");
-                }
-                else {
+                } else {
                     SaveToByteList(l, enDatabaseDataType.SortDefinition, _sortDefinition.ToString());
                 }
 
@@ -1953,8 +1964,7 @@ namespace BlueDatabase {
                 foreach (var thisWorkItem in Works) {
                     if (thisWorkItem.Comand != enDatabaseDataType.ce_Value_withoutSizeData) {
                         Works2.Add(thisWorkItem.ToString());
-                    }
-                    else {
+                    } else {
                         if (thisWorkItem.LogsUndo(this)) {
                             Works2.Add(thisWorkItem.ToString());
                         }
@@ -1979,8 +1989,7 @@ namespace BlueDatabase {
                 }
                 return l;
 
-            }
-            catch {
+            } catch {
                 return ToListOfByte(willSave);
             }
         }
@@ -2235,8 +2244,7 @@ namespace BlueDatabase {
 
                                 if (!string.IsNullOrEmpty(Value) && fRow != null) {
                                     ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
-                                }
-                                else {
+                                } else {
                                     ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
                                 }
 
@@ -2534,8 +2542,7 @@ namespace BlueDatabase {
                 }
 
 
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
 
@@ -2609,8 +2616,7 @@ namespace BlueDatabase {
                         if (tmp == _LastWorkItem) {
                             ok = true;
                             break;
-                        }
-                        else if (tmp.Substring(7) == _LastWorkItem.Substring(7)) {
+                        } else if (tmp.Substring(7) == _LastWorkItem.Substring(7)) {
                             ok2 = tmp;
                         }
                     }
@@ -2621,8 +2627,7 @@ namespace BlueDatabase {
                         }
                     }
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
         }

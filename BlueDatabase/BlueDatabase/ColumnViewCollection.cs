@@ -23,8 +23,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
 
-namespace BlueDatabase
-{
+namespace BlueDatabase {
     public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable //, IEnumerable
     {
         //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
@@ -40,22 +39,19 @@ namespace BlueDatabase
 
         #region  Construktor + Initialize 
 
-        private void Initialize()
-        {
+        private void Initialize() {
             _Name = string.Empty;
             PermissionGroups_Show.Clear();
             PermissionGroups_Show.Changed += _PermissionGroups_Show_ListOrItemChanged;
         }
 
-        public ColumnViewCollection(Database database, string code)
-        {
+        public ColumnViewCollection(Database database, string code) {
             Database = database;
             Parse(code);
 
         }
 
-        public ColumnViewCollection(Database database, string code, string newname)
-        {
+        public ColumnViewCollection(Database database, string code, string newname) {
             Database = database;
             Parse(code);
             _Name = newname;
@@ -67,14 +63,11 @@ namespace BlueDatabase
         #region  Properties 
         public bool IsParsing { get; private set; }
 
-        public string Name
-        {
-            get
-            {
+        public string Name {
+            get {
                 return _Name;
             }
-            set
-            {
+            set {
                 if (_Name == value) { return; }
                 _Name = value;
                 OnChanged();
@@ -85,15 +78,12 @@ namespace BlueDatabase
         public ListExt<string> PermissionGroups_Show { get; } = new ListExt<string>();
 
 
-        public ColumnViewItem this[ColumnItem vColumn]
-        {
+        public ColumnViewItem this[ColumnItem vColumn] {
 
-            get
-            {
+            get {
                 if (vColumn == null) { return null; }
 
-                foreach (var ThisViewItem in this)
-                {
+                foreach (var ThisViewItem in this) {
                     if (ThisViewItem != null && ThisViewItem.Column == vColumn) { return ThisViewItem; }
                 }
 
@@ -105,39 +95,30 @@ namespace BlueDatabase
 
 
 
-        private void _PermissionGroups_Show_ListOrItemChanged(object sender, System.EventArgs e)
-        {
+        private void _PermissionGroups_Show_ListOrItemChanged(object sender, System.EventArgs e) {
             OnChanged();
         }
-        public void Add(ColumnItem Column, bool Permanent)
-        {
-            if (Permanent)
-            {
+        public void Add(ColumnItem Column, bool Permanent) {
+            if (Permanent) {
                 Add(new ColumnViewItem(Column, enViewType.PermanentColumn));
-            }
-            else
-            {
+            } else {
                 Add(new ColumnViewItem(Column, enViewType.Column));
             }
         }
 
 
-        public void Insert(int index, ColumnItem Column)
-        {
+        public void Insert(int index, ColumnItem Column) {
             Insert(index, new ColumnViewItem(Column, enViewType.Column));
         }
 
-        public void Parse(string ToParse)
-        {
+        public void Parse(string ToParse) {
             IsParsing = true;
             ThrowEvents = false;
             PermissionGroups_Show.ThrowEvents = false;
             Initialize();
 
-            foreach (var pair in ToParse.GetAllTags())
-            {
-                switch (pair.Key)
-                {
+            foreach (var pair in ToParse.GetAllTags()) {
+                switch (pair.Key) {
                     case "name":
                         _Name = pair.Value;
                         break;
@@ -159,14 +140,11 @@ namespace BlueDatabase
             IsParsing = false;
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             var Result = "{Name=" + _Name.ToNonCritical();
 
-            foreach (var ThisViewItem in this)
-            {
-                if (ThisViewItem != null)
-                {
+            foreach (var ThisViewItem in this) {
+                if (ThisViewItem != null) {
                     Result = Result + ", Columndata=" + ThisViewItem;
                 }
             }
@@ -174,10 +152,8 @@ namespace BlueDatabase
             var tmp = PermissionGroups_Show.SortedDistinctList();
             tmp.RemoveString("#Administrator", false);
 
-            foreach (var t in tmp)
-            {
-                if (!string.IsNullOrEmpty(t))
-                {
+            foreach (var t in tmp) {
+                if (!string.IsNullOrEmpty(t)) {
                     Result = Result + ", Permissiongroup=" + t;
                 }
             }
@@ -185,21 +161,17 @@ namespace BlueDatabase
             return Result + "}";
         }
 
-        public void ShowAllColumns(Database OfDatabase)
-        {
+        public void ShowAllColumns(Database OfDatabase) {
             if (OfDatabase.IsParsing()) { return; }
 
             var OK = true;
-            for (var z = 0; z < OfDatabase.Column.Count; z++)
-            {
-                if (z >= Count)
-                {
+            for (var z = 0; z < OfDatabase.Column.Count; z++) {
+                if (z >= Count) {
                     OK = false;
                     break;
                 }
 
-                if (this[z].Column != OfDatabase.Column[z])
-                {
+                if (this[z].Column != OfDatabase.Column[z]) {
                     OK = false;
                     break;
                 }
@@ -211,10 +183,8 @@ namespace BlueDatabase
 
             Clear();
 
-            foreach (var ThisColumnItem in OfDatabase.Column)
-            {
-                if (ThisColumnItem != null)
-                {
+            foreach (var ThisColumnItem in OfDatabase.Column) {
+                if (ThisColumnItem != null) {
                     Add(new ColumnViewItem(ThisColumnItem, enViewType.Column));
                 }
             }
@@ -222,17 +192,14 @@ namespace BlueDatabase
             if (Count > 0) { this[0].ViewType = enViewType.PermanentColumn; }
         }
 
-        public ColumnItem PreviousVisible(ColumnItem OfColumn)
-        {
+        public ColumnItem PreviousVisible(ColumnItem OfColumn) {
             var ViewItemNo = Count - 1;
             var Found = false;
 
-            do
-            {
+            do {
                 if (ViewItemNo < 0) { return null; }
 
-                if (this[ViewItemNo] != null && this[ViewItemNo].Column != null)
-                {
+                if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) {
                     if (Found) { return this[ViewItemNo].Column; }
                     if (this[ViewItemNo].Column == OfColumn) { Found = true; }
                 }
@@ -241,17 +208,14 @@ namespace BlueDatabase
             } while (true);
         }
 
-        public ColumnItem NextVisible(ColumnItem OfColumn)
-        {
+        public ColumnItem NextVisible(ColumnItem OfColumn) {
             var ViewItemNo = 0;
             var Found = false;
 
-            do
-            {
+            do {
                 if (ViewItemNo >= this.Count) { return null; }
 
-                if (this[ViewItemNo] != null && this[ViewItemNo].Column != null)
-                {
+                if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) {
                     if (Found) { return this[ViewItemNo].Column; }
                     if (this[ViewItemNo].Column == OfColumn) { Found = true; }
                 }
@@ -261,12 +225,10 @@ namespace BlueDatabase
 
         }
 
-        public ColumnViewItem PreviousVisible(ColumnViewItem OfViewItem)
-        {
+        public ColumnViewItem PreviousVisible(ColumnViewItem OfViewItem) {
             var ViewItemNo = IndexOf(OfViewItem);
 
-            do
-            {
+            do {
                 ViewItemNo--;
                 if (ViewItemNo < 0) { return null; }
 
@@ -275,15 +237,13 @@ namespace BlueDatabase
             } while (true);
         }
 
-        public ColumnViewItem NextVisible(ColumnViewItem OfViewItem)
-        {
+        public ColumnViewItem NextVisible(ColumnViewItem OfViewItem) {
             var ViewItemNo = IndexOf(OfViewItem);
 
             if (ViewItemNo < 0) { return null; }
 
 
-            do
-            {
+            do {
                 ViewItemNo++;
                 if (ViewItemNo >= Count) { return null; }
 
@@ -292,8 +252,7 @@ namespace BlueDatabase
 
         }
 
-        public void Swap(ColumnViewItem View1, ColumnViewItem View2)
-        {
+        public void Swap(ColumnViewItem View1, ColumnViewItem View2) {
             // Absichtlich anderer Name, um klarzustellen, dass hier nicht der Standard-Swap angewandt wird
             if (View1 == null) { return; }
             if (View2 == null) { return; }
@@ -310,20 +269,17 @@ namespace BlueDatabase
 
         }
 
-        public List<ColumnItem> ListOfUsedColumn()
-        {
+        public List<ColumnItem> ListOfUsedColumn() {
 
             var ColList = new List<ColumnItem>();
-            foreach (var t in this)
-            {
+            foreach (var t in this) {
                 if (t != null) { ColList.Add(t.Column); }
             }
 
             return ColList;
         }
 
-        public override void OnChanged()
-        {
+        public override void OnChanged() {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
 
             base.OnChanged();
@@ -331,14 +287,10 @@ namespace BlueDatabase
         }
 
 
-        public void HideSystemColumns()
-        {
-            foreach (var ThisViewItem in this)
-            {
-                if (ThisViewItem != null)
-                {
-                    if (ThisViewItem.Column == null || !string.IsNullOrEmpty(ThisViewItem.Column.Identifier))
-                    {
+        public void HideSystemColumns() {
+            foreach (var ThisViewItem in this) {
+                if (ThisViewItem != null) {
+                    if (ThisViewItem.Column == null || !string.IsNullOrEmpty(ThisViewItem.Column.Identifier)) {
                         Remove(ThisViewItem);
                         HideSystemColumns();
                         return;
@@ -347,14 +299,10 @@ namespace BlueDatabase
             }
         }
 
-        public void Hide(string ColumnName)
-        {
-            foreach (var ThisViewItem in this)
-            {
-                if (ThisViewItem != null)
-                {
-                    if (ThisViewItem.Column == null || ThisViewItem.Column.Name.ToUpper() == ColumnName.ToUpper())
-                    {
+        public void Hide(string ColumnName) {
+            foreach (var ThisViewItem in this) {
+                if (ThisViewItem != null) {
+                    if (ThisViewItem.Column == null || ThisViewItem.Column.Name.ToUpper() == ColumnName.ToUpper()) {
                         Remove(ThisViewItem);
                         Hide(ColumnName);
                         return;
@@ -387,15 +335,12 @@ namespace BlueDatabase
         //    return _Internal.IndexOf(vColumnViewItem);
         //}
 
-        internal void Repair()
-        {
+        internal void Repair() {
 
             if (this == null || this.Count == 0) { return; }
 
-            for (var z = 0; z < Count; z++)
-            {
-                if (this[z].Column == null || !Database.Column.Contains(this[z].Column))
-                {
+            for (var z = 0; z < Count; z++) {
+                if (this[z].Column == null || !Database.Column.Contains(this[z].Column)) {
                     this[z] = null;
                 }
             }
@@ -407,8 +352,7 @@ namespace BlueDatabase
             tmp.RemoveString("#Administrator", false);
             tmp.RemoveNullOrEmpty();
 
-            if (PermissionGroups_Show.IsDifferentTo(tmp))
-            {
+            if (PermissionGroups_Show.IsDifferentTo(tmp)) {
                 PermissionGroups_Show.Clear();
                 PermissionGroups_Show.AddRange(tmp);
             }

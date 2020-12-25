@@ -53,6 +53,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption11 = new BlueControls.Controls.Caption();
             this.GlobalTab = new BlueControls.Controls.TabControl();
             this.Tab_Allgemein = new BlueControls.Controls.TabPage();
+            this.txbZeilenQuickInfo = new BlueControls.Controls.TextBox();
+            this.capZeilenQuickInfo = new BlueControls.Controls.Caption();
             this.txbFilterImagePath = new BlueControls.Controls.TextBox();
             this.capFilterImagePath = new BlueControls.Controls.Caption();
             this.txbGlobalScale = new BlueControls.Controls.TextBox();
@@ -86,6 +88,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Expermimentell = new BlueControls.Controls.TabPage();
             this.btnFremdImport = new BlueControls.Controls.Button();
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
+            this.capBinInfo = new BlueControls.Controls.Caption();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -389,6 +392,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // Tab_Allgemein
             // 
             this.Tab_Allgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Tab_Allgemein.Controls.Add(this.txbZeilenQuickInfo);
+            this.Tab_Allgemein.Controls.Add(this.capZeilenQuickInfo);
             this.Tab_Allgemein.Controls.Add(this.txbFilterImagePath);
             this.Tab_Allgemein.Controls.Add(this.capFilterImagePath);
             this.Tab_Allgemein.Controls.Add(this.txbGlobalScale);
@@ -415,12 +420,33 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.TabIndex = 1;
             this.Tab_Allgemein.Text = "Allgemein";
             // 
+            // txbZeilenQuickInfo
+            // 
+            this.txbZeilenQuickInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.txbZeilenQuickInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbZeilenQuickInfo.Location = new System.Drawing.Point(8, 176);
+            this.txbZeilenQuickInfo.MultiLine = true;
+            this.txbZeilenQuickInfo.Name = "txbZeilenQuickInfo";
+            this.txbZeilenQuickInfo.Size = new System.Drawing.Size(552, 192);
+            this.txbZeilenQuickInfo.TabIndex = 43;
+            this.txbZeilenQuickInfo.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // capZeilenQuickInfo
+            // 
+            this.capZeilenQuickInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.capZeilenQuickInfo.CausesValidation = false;
+            this.capZeilenQuickInfo.Location = new System.Drawing.Point(8, 160);
+            this.capZeilenQuickInfo.Name = "capZeilenQuickInfo";
+            this.capZeilenQuickInfo.Size = new System.Drawing.Size(152, 18);
+            this.capZeilenQuickInfo.Text = "Zeilen-Quick-Info: ";
+            // 
             // txbFilterImagePath
             // 
             this.txbFilterImagePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.txbFilterImagePath.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbFilterImagePath.Location = new System.Drawing.Point(8, 336);
+            this.txbFilterImagePath.Location = new System.Drawing.Point(8, 392);
             this.txbFilterImagePath.Name = "txbFilterImagePath";
             this.txbFilterImagePath.Size = new System.Drawing.Size(552, 64);
             this.txbFilterImagePath.TabIndex = 41;
@@ -430,7 +456,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.capFilterImagePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.capFilterImagePath.CausesValidation = false;
-            this.capFilterImagePath.Location = new System.Drawing.Point(8, 320);
+            this.capFilterImagePath.Location = new System.Drawing.Point(8, 376);
             this.capFilterImagePath.Name = "capFilterImagePath";
             this.capFilterImagePath.Size = new System.Drawing.Size(152, 18);
             this.capFilterImagePath.Text = "Filter-Bild-Datei-Pfad:";
@@ -671,6 +697,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.Tab_Binaer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.Tab_Binaer.Controls.Add(this.lstBinary);
+            this.Tab_Binaer.Controls.Add(this.capBinInfo);
             this.Tab_Binaer.Location = new System.Drawing.Point(4, 25);
             this.Tab_Binaer.Name = "Tab_Binaer";
             this.Tab_Binaer.Size = new System.Drawing.Size(1039, 616);
@@ -685,10 +712,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lstBinary.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstBinary.FilterAllowed = true;
             this.lstBinary.LastFilePath = null;
-            this.lstBinary.Location = new System.Drawing.Point(0, 0);
+            this.lstBinary.Location = new System.Drawing.Point(0, 24);
             this.lstBinary.Name = "lstBinary";
             this.lstBinary.RemoveAllowed = true;
-            this.lstBinary.Size = new System.Drawing.Size(1039, 616);
+            this.lstBinary.Size = new System.Drawing.Size(1039, 592);
             this.lstBinary.TabIndex = 0;
             this.lstBinary.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.Bilder_ContextMenuInit);
             this.lstBinary.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.Bilder_ContextMenuItemClicked);
@@ -773,6 +800,16 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capExperimentellWarnung.Name = "capExperimentellWarnung";
             this.capExperimentellWarnung.Size = new System.Drawing.Size(488, 80);
             this.capExperimentellWarnung.Text = resources.GetString("capExperimentellWarnung.Text");
+            // 
+            // capBinInfo
+            // 
+            this.capBinInfo.CausesValidation = false;
+            this.capBinInfo.Dock = System.Windows.Forms.DockStyle.Top;
+            this.capBinInfo.Location = new System.Drawing.Point(0, 0);
+            this.capBinInfo.Name = "capBinInfo";
+            this.capBinInfo.Size = new System.Drawing.Size(1039, 24);
+            this.capBinInfo.Text = "Die hier aufgeführten Binärdaten können - falls es ein Bild ist - mit DB_Dateinam" +
+    "e mit Suffix angesprochen werden.";
             // 
             // DatabaseHeadEditor
             // 
@@ -859,5 +896,8 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbFilterImagePath;
         private Caption capFilterImagePath;
         private Button btnAutoSort;
+        private TextBox txbZeilenQuickInfo;
+        private Caption capZeilenQuickInfo;
+        private Caption capBinInfo;
     }
 }

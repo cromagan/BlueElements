@@ -84,6 +84,7 @@ namespace BlueDatabase.Enums
         ImportScript = 63,
         GlobalScale = 64,
         FilterImagePfad = 65,
+        ZeilenQuickInfo = 66,
 
 
         Info_ColumDataSart = 100,

@@ -366,7 +366,7 @@ namespace BlueControls
                 case 11:
                     return string.Empty;
                 default:
-                    return Convert.ToChar(_Char).ToString().CreateHtmlCodes();
+                    return Convert.ToChar(_Char).ToString().CreateHtmlCodes(true);
             }
         }
     }

@@ -22,10 +22,8 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection
-{
-    public class TextListItem : BasicListItem
-    {
+namespace BlueControls.ItemCollection {
+    public class TextListItem : BasicListItem {
 
         #region  Variablen-Deklarationen 
         private string _ReadableText;
@@ -45,8 +43,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public TextListItem(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname)
-        {
+        public TextListItem(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname) {
             IsCaption = isCaption;
             _ReadableText = readableText;
             _Symbol = symbol;
@@ -63,22 +60,17 @@ namespace BlueControls.ItemCollection
 
         #region  Properties 
 
-        public override string QuickInfo
-        {
-            get
-            {
-                return _ReadableText.ToHTMLText();
+        public override string QuickInfo {
+            get {
+                return _ReadableText.CreateHtmlCodes(true);
             }
         }
 
-        public string Text
-        {
-            get
-            {
+        public string Text {
+            get {
                 return _ReadableText;
             }
-            set
-            {
+            set {
                 if (value == _ReadableText) { return; }
                 _ReadableText = value;
                 //OnChanged();
@@ -86,14 +78,11 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public QuickImage Symbol
-        {
-            get
-            {
+        public QuickImage Symbol {
+            get {
                 return _Symbol;
             }
-            set
-            {
+            set {
                 if (value == _Symbol) { return; }
                 _Symbol = value;
                 //OnChanged();
@@ -105,12 +94,9 @@ namespace BlueControls.ItemCollection
 
 
 
-        private enDesign tempDesign(enDesign itemdesign)
-        {
-            if (IsCaption)
-            {
-                switch (itemdesign)
-                {
+        private enDesign tempDesign(enDesign itemdesign) {
+            if (IsCaption) {
+                switch (itemdesign) {
                     case enDesign.Item_KontextMenu:
                         return enDesign.Item_KontextMenu_Caption;
                     case enDesign.Item_Listbox:
@@ -123,51 +109,43 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override Size SizeUntouchedForListBox()
-        {
+        public override Size SizeUntouchedForListBox() {
             return Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(Parent.ItemDesign), enStates.Standard), 16);
         }
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign design, enStates vState, bool DrawBorderAndBack, bool Translate)
-        {
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign design, enStates vState, bool DrawBorderAndBack, bool Translate) {
 
             var tmpd = tempDesign(design);
 
-            if (DrawBorderAndBack)
-            {
+            if (DrawBorderAndBack) {
                 Skin.Draw_Back(GR, tmpd, vState, PositionModified, null, false);
             }
 
             Skin.Draw_FormatedText(GR, _ReadableText, tmpd, vState, _Symbol, enAlignment.VerticalCenter_Left, PositionModified, null, false, Translate);
 
-            if (DrawBorderAndBack)
-            {
+            if (DrawBorderAndBack) {
                 Skin.Draw_Border(GR, tmpd, vState, PositionModified);
             }
         }
 
 
 
-        protected override string GetCompareKey()
-        {
+        protected override string GetCompareKey() {
             return DataFormat.CompareKey(Internal, enDataFormat.Text);
         }
 
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth)
-        {
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
             return SizeUntouchedForListBox().Height;
         }
 
 
 
-        public override BasicListItem CloneToNewCollection(ItemCollectionList newParent)
-        {
+        public override BasicListItem CloneToNewCollection(ItemCollectionList newParent) {
             return CloneToNewCollection(newParent, new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey));
         }
 
-        public override bool FilterMatch(string FilterText)
-        {
+        public override bool FilterMatch(string FilterText) {
             if (base.FilterMatch(FilterText)) { return true; }
             return _ReadableText.ToUpper().Contains(FilterText.ToUpper());
         }

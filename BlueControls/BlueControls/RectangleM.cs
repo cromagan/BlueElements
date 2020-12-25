@@ -22,10 +22,8 @@ using BlueBasics.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueControls
-{
-    public class RectangleM
-    {
+namespace BlueControls {
+    public class RectangleM : ICloneable {
 
         public decimal X;
         public decimal Y;
@@ -39,8 +37,7 @@ namespace BlueControls
         public RectangleM(PointM p1, PointM p2) : this(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y)) { }
 
 
-        public RectangleM(decimal x, decimal y, decimal width, decimal height)
-        {
+        public RectangleM(decimal x, decimal y, decimal width, decimal height) {
             X = x;
             Y = y;
             Width = width;
@@ -51,21 +48,17 @@ namespace BlueControls
 
 
 
-        public decimal Left
-        {
+        public decimal Left {
             get { return X; }
         }
 
-        public decimal Top
-        {
+        public decimal Top {
             get { return Y; }
         }
-        public decimal Right
-        {
+        public decimal Right {
             get { return X + Width; }
         }
-        public decimal Bottom
-        {
+        public decimal Bottom {
             get { return Y + Height; }
         }
 
@@ -74,8 +67,7 @@ namespace BlueControls
         /// </summary>
         /// <param name="XVal"></param>
         /// <param name="YVal"></param>
-        public void Inflate(int XVal, int YVal)
-        {
+        public void Inflate(int XVal, int YVal) {
             X += XVal;
             Y += YVal;
             Width -= XVal * 2;
@@ -83,10 +75,8 @@ namespace BlueControls
 
         }
 
-        public PointM PointOf(enAlignment P)
-        {
-            switch (P)
-            {
+        public PointM PointOf(enAlignment P) {
+            switch (P) {
                 case enAlignment.Bottom_Left:
                     return new PointM(Left, Bottom);
                 case enAlignment.Bottom_Right:
@@ -114,8 +104,7 @@ namespace BlueControls
 
 
 
-        public PointM NearestCornerOF(PointM P)
-        {
+        public PointM NearestCornerOF(PointM P) {
 
             var LO = PointOf(enAlignment.Top_Left);
             var rO = PointOf(enAlignment.Top_Right);
@@ -140,14 +129,12 @@ namespace BlueControls
         }
 
 
-        public bool Contains(PointM P)
-        {
+        public bool Contains(PointM P) {
             return Contains(P.X, P.Y);
         }
 
 
-        public bool Contains(decimal PX, decimal PY)
-        {
+        public bool Contains(decimal PX, decimal PY) {
             if (PX < X) { return false; }
             if (PY < Y) { return false; }
             if (PX > X + Width) { return false; }
@@ -157,9 +144,8 @@ namespace BlueControls
         }
 
 
-        public RectangleF ZoomAndMoveRect(decimal cZoom, decimal MoveX, decimal MoveY)
-        {
-            return new RectangleF((int)(X * cZoom - MoveX), (int)(Y * cZoom - MoveY), (int)(Width * cZoom), (int)(Height * cZoom));
+        public RectangleF ZoomAndMoveRect(decimal cZoom, decimal MoveX, decimal MoveY) {
+            return new RectangleF((int)(X * cZoom - MoveX + cZoom / 2), (int)(Y * cZoom - MoveY + cZoom / 2), (int)(Width * cZoom), (int)(Height * cZoom));
         }
 
         /// <summary>
@@ -167,8 +153,7 @@ namespace BlueControls
         /// </summary>
         /// <param name="P"></param>
         /// <param name="maxrad"></param>
-        public void ExpandTo(PointM middle, decimal radius)
-        {
+        public void ExpandTo(PointM middle, decimal radius) {
             ExpandTo(new PointM(middle.X, middle.Y + radius));
             ExpandTo(new PointM(middle.X, middle.Y - radius));
             ExpandTo(new PointM(middle.X + radius, middle.Y));
@@ -182,28 +167,23 @@ namespace BlueControls
         /// Erweitert das Rechteck, dass der Angegebene Punkt ebenfalls umschlossen wird.
         /// </summary>
         /// <param name="P"></param>
-        public void ExpandTo(PointM P)
-        {
-            if (P.X < X)
-            {
+        public void ExpandTo(PointM P) {
+            if (P.X < X) {
                 Width = Right - P.X;
                 X = P.X;
             }
 
-            if (P.Y < Y)
-            {
+            if (P.Y < Y) {
                 Height = Bottom - P.Y;
                 Y = P.Y;
             }
 
 
-            if (P.X > Right)
-            {
+            if (P.X > Right) {
                 Width = P.X - X;
             }
 
-            if (P.Y > Bottom)
-            {
+            if (P.Y > Bottom) {
                 Height = P.Y - Y;
             }
 
@@ -211,6 +191,9 @@ namespace BlueControls
 
         }
 
+        public object Clone() {
+            return new RectangleM(X, Y, Width, Height);
+        }
 
         public static explicit operator RectangleF(RectangleM r) => new RectangleF((float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
 

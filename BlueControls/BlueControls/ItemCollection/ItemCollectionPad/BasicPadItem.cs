@@ -26,16 +26,16 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection
-{
-    public abstract class BasicPadItem : IParseable, System.ICloneable, IChangedFeedback
-    {
+namespace BlueControls.ItemCollection {
+    public abstract class BasicPadItem : IParseable, System.ICloneable, IChangedFeedback {
 
         private static string UniqueInternal_LastTime = "InitialDummy";
         private static int UniqueInternal_Count;
         public readonly ItemCollectionPad Parent = null;
 
         public RectangleM tmpUsedArea = null;
+
+        public virtual string QuickInfo { get; set; } = string.Empty;
 
 
         #region  Event-Deklarationen + Delegaten 
@@ -45,8 +45,7 @@ namespace BlueControls.ItemCollection
 
         public string Internal { get; private set; }
 
-        public static BasicPadItem NewByParsing(ItemCollectionPad parent, string code)
-        {
+        public static BasicPadItem NewByParsing(ItemCollectionPad parent, string code) {
             BasicPadItem i = null;
             var x = code.GetAllTags();
 
@@ -54,10 +53,8 @@ namespace BlueControls.ItemCollection
             var name = string.Empty;
 
 
-            foreach (var thisIt in x)
-            {
-                switch (thisIt.Key)
-                {
+            foreach (var thisIt in x) {
+                switch (thisIt.Key) {
                     case "type":
                     case "classid":
                         ding = thisIt.Value;
@@ -69,21 +66,18 @@ namespace BlueControls.ItemCollection
             }
 
 
-            if (string.IsNullOrEmpty(ding))
-            {
+            if (string.IsNullOrEmpty(ding)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Itemtyp unbekannt: " + code);
                 return null;
             }
 
-            if (string.IsNullOrEmpty(name))
-            {
+            if (string.IsNullOrEmpty(name)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Itemname unbekannt: " + code);
                 return null;
             }
 
 
-            switch (ding.ToLower())
-            {
+            switch (ding.ToLower()) {
                 case "blueelements.clsitemtext":
                 case "blueelements.textitem":
                 case "text":
@@ -152,17 +146,13 @@ namespace BlueControls.ItemCollection
 
         public virtual void DesignOrStyleChanged() { }
 
-        protected BasicPadItem(ItemCollectionPad parent, string internalname)
-        {
+        protected BasicPadItem(ItemCollectionPad parent, string internalname) {
             Parent = parent;
 
 
-            if (string.IsNullOrEmpty(internalname))
-            {
+            if (string.IsNullOrEmpty(internalname)) {
                 Internal = UniqueInternal();
-            }
-            else
-            {
+            } else {
                 Internal = internalname;
             }
 
@@ -172,17 +162,13 @@ namespace BlueControls.ItemCollection
 
 
 
-        public static string UniqueInternal()
-        {
+        public static string UniqueInternal() {
 
             var NeueZeit = DateTime.Now + " " + DateTime.Now.Millisecond;
 
-            if (NeueZeit == UniqueInternal_LastTime)
-            {
+            if (NeueZeit == UniqueInternal_LastTime) {
                 UniqueInternal_Count++;
-            }
-            else
-            {
+            } else {
                 UniqueInternal_Count = 0;
                 UniqueInternal_LastTime = NeueZeit;
             }
@@ -207,11 +193,10 @@ namespace BlueControls.ItemCollection
         /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
         /// </summary>
         /// <remarks></remarks>
-        public virtual bool Contains(PointF value, decimal zoomfactor)
-        {
+        public virtual bool Contains(PointF value, decimal zoomfactor) {
             var tmp = (RectangleF)UsedArea(); // Umwandlung, um den Bezug zur Klasse zu zerstören
-            var ne = (int)(-5 / zoomfactor);
-            tmp.Inflate(ne,ne);
+            var ne = (float)(-5 / zoomfactor) + (float)1;
+            tmp.Inflate(ne, ne);
             return tmp.Contains(value);
         }
 
@@ -220,8 +205,7 @@ namespace BlueControls.ItemCollection
         protected abstract string ClassId();
 
 
-        public virtual void Move(decimal x, decimal y)
-        {
+        public virtual void Move(decimal x, decimal y) {
             RecalculateAndOnChanged();
         }
 
@@ -230,8 +214,7 @@ namespace BlueControls.ItemCollection
         /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
         /// </summary>
         /// <remarks></remarks>
-        public RectangleM UsedArea()
-        {
+        public RectangleM UsedArea() {
             if (tmpUsedArea == null) { tmpUsedArea = CalculateUsedArea(); }
             return tmpUsedArea;
         }
@@ -266,28 +249,22 @@ namespace BlueControls.ItemCollection
         public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
         [PropertyAttributes("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.", false)]
-        public bool Bei_Export_sichtbar
-        {
-            get
-            {
+        public bool Bei_Export_sichtbar {
+            get {
                 return _Bei_Export_sichtbar;
             }
-            set
-            {
+            set {
                 if (_Bei_Export_sichtbar == value) { return; }
                 _Bei_Export_sichtbar = value;
                 OnChanged();
             }
         }
 
-        public int ZoomPadding
-        {
-            get
-            {
+        public int ZoomPadding {
+            get {
                 return _ZoomPadding;
             }
-            set
-            {
+            set {
                 if (_ZoomPadding == value) { return; }
                 _ZoomPadding = value;
                 OnChanged();
@@ -295,14 +272,11 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public PadStyles Stil
-        {
-            get
-            {
+        public PadStyles Stil {
+            get {
                 return _Style;
             }
-            set
-            {
+            set {
                 if (_Style == value) { return; }
                 _Style = value;
                 DesignOrStyleChanged();
@@ -311,18 +285,14 @@ namespace BlueControls.ItemCollection
 
         }
 
-        public List<string> Tags
-        {
-            get
-            {
+        public List<string> Tags {
+            get {
                 return _Tags;
             }
         }
 
-        public virtual bool ParseThis(string tag, string value)
-        {
-            switch (tag.ToLower())
-            {
+        public virtual bool ParseThis(string tag, string value) {
+            switch (tag.ToLower()) {
                 case "classid":
                 case "type":
                 case "enabled":
@@ -338,10 +308,8 @@ namespace BlueControls.ItemCollection
                     return true;
 
                 case "point":
-                    foreach (var ThisPoint in Points)
-                    {
-                        if (value.Contains("Name=" + ThisPoint.Name + ","))
-                        {
+                    foreach (var ThisPoint in Points) {
+                        if (value.Contains("Name=" + ThisPoint.Name + ",")) {
                             ThisPoint.Parse(value, this);
                         }
                     }
@@ -363,14 +331,17 @@ namespace BlueControls.ItemCollection
 
 
                 case "internalname":
-                    if (value != Internal)
-                    {
+                    if (value != Internal) {
                         Develop.DebugPrint(enFehlerArt.Fehler, "Namen unterschiedlich: " + value + " / " + Internal);
                     }
                     return true;
 
                 case "zoompadding":
                     _ZoomPadding = int.Parse(value);
+                    return true;
+
+                case "quickinfo":
+                    QuickInfo = value.FromNonCritical();
                     return true;
 
                 default:
@@ -383,15 +354,12 @@ namespace BlueControls.ItemCollection
         public bool IsParsing { get; private set; }
 
 
-        public void Parse(List<KeyValuePair<string, string>> ToParse)
-        {
+        public void Parse(List<KeyValuePair<string, string>> ToParse) {
             IsParsing = true;
 
-            foreach (var pair in ToParse)
-            {
+            foreach (var pair in ToParse) {
 
-                if (!ParseThis(pair.Key, pair.Value))
-                {
+                if (!ParseThis(pair.Key, pair.Value)) {
                     Develop.DebugPrint(enFehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + ToParse);
                 }
             }
@@ -406,8 +374,7 @@ namespace BlueControls.ItemCollection
         /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
         /// </summary>
         /// <returns></returns>
-        public virtual List<FlexiControl> GetStyleOptions()
-        {
+        public virtual List<FlexiControl> GetStyleOptions() {
 
             var l = new List<FlexiControl>
             {
@@ -423,18 +390,15 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override string ToString()
-        {
+        public override string ToString() {
 
             var t = "{";
 
             t = t + "ClassID=" + ClassId() + ", ";
             t = t + "InternalName=" + Internal.ToNonCritical() + ", ";
 
-            if (_Tags.Count > 0)
-            {
-                foreach (var ThisTag in _Tags)
-                {
+            if (_Tags.Count > 0) {
+                foreach (var ThisTag in _Tags) {
                     t = t + "Tag=" + ThisTag.ToNonCritical() + ", ";
                 }
             }
@@ -443,21 +407,20 @@ namespace BlueControls.ItemCollection
             t = t + "Style=" + (int)_Style + ", ";
             t = t + "Print=" + _Bei_Export_sichtbar.ToPlusMinus() + ", ";
 
+            t = t + "QuickInfo=" + QuickInfo.ToNonCritical() + ", ";
 
-            if (_ZoomPadding != 0)
-            {
+
+            if (_ZoomPadding != 0) {
                 t = t + "ZoomPadding=" + _ZoomPadding + ", ";
             }
 
 
-            foreach (var ThisPoint in Points)
-            {
+            foreach (var ThisPoint in Points) {
                 t = t + "Point=" + ThisPoint + ", ";
             }
 
 
-            if (!string.IsNullOrEmpty(Gruppenzugehörigkeit))
-            {
+            if (!string.IsNullOrEmpty(Gruppenzugehörigkeit)) {
                 t = t + "RemoveTooGroup=" + Gruppenzugehörigkeit.ToNonCritical() + ", ";
             }
 
@@ -465,67 +428,55 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public void InDenVordergrund()
-        {
+        public void InDenVordergrund() {
             Parent?.InDenVordergrund(this);
         }
 
-        public void InDenHintergrund()
-        {
+        public void InDenHintergrund() {
             Parent?.InDenHintergrund(this);
         }
 
-        public void EineEbeneNachVorne()
-        {
+        public void EineEbeneNachVorne() {
             if (Parent == null) { return; }
 
             var i2 = Next();
-            if (i2 != null)
-            {
+            if (i2 != null) {
                 var tempVar = this;
                 Parent.Swap(tempVar, i2);
             }
         }
 
-        internal void AddStyleOption(List<FlexiControl> l)
-        {
+        internal void AddStyleOption(List<FlexiControl> l) {
             l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetFonts(Parent.SheetStyle)));
             //l.Add(new FlexiControl("Stil", ((int)Stil).ToString()));
         }
-        internal void AddLineStyleOption(List<FlexiControl> l)
-        {
+        internal void AddLineStyleOption(List<FlexiControl> l) {
             l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetRahmenArt(Parent.SheetStyle, true)));
             //l.Add(new FlexiControlForProperty("Umrandung", ((int)Stil).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, true)));
 
         }
 
 
-        public void EineEbeneNachHinten()
-        {
+        public void EineEbeneNachHinten() {
             if (Parent == null) { return; }
             var i2 = Previous();
-            if (i2 != null)
-            {
+            if (i2 != null) {
                 var tempVar = this;
                 Parent.Swap(tempVar, i2);
             }
         }
 
 
-        protected void OverrideSavedRichtmaßOfAllRelations()
-        {
-            if (Relations == null || Relations.Count == 0)
-            {
-                foreach (var ThisRelation in Relations)
-                {
+        protected void OverrideSavedRichtmaßOfAllRelations() {
+            if (Relations == null || Relations.Count == 0) {
+                foreach (var ThisRelation in Relations) {
                     ThisRelation.OverrideSavedRichtmaß(false, false);
                 }
             }
         }
 
 
-        public void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
-        {
+        public void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
 
             if (ForPrinting && !_Bei_Export_sichtbar) { return; }
@@ -540,23 +491,19 @@ namespace BlueControls.ItemCollection
             DrawExplicit(GR, DCoordinates, cZoom, MoveX, MoveY, vState, SizeOfParentControl, ForPrinting);
 
 
-            if (!_Bei_Export_sichtbar)
-            {
+            if (!_Bei_Export_sichtbar) {
 
-                if (IsInDrawingArea(DCoordinates, SizeOfParentControl))
-                {
+                if (IsInDrawingArea(DCoordinates, SizeOfParentControl)) {
                     GR.DrawImage(QuickImage.Get("Drucker|16||1").BMP, DCoordinates.X, DCoordinates.Y);
                 }
             }
         }
 
-        internal BasicPadItem Previous()
-        {
+        internal BasicPadItem Previous() {
             var ItemCount = Parent.IndexOf(this);
             if (ItemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
 
-            do
-            {
+            do {
                 ItemCount--;
                 if (ItemCount < 0) { return null; }
                 if (Parent[ItemCount] != null) { return Parent[ItemCount]; }
@@ -564,15 +511,13 @@ namespace BlueControls.ItemCollection
 
         }
 
-        internal BasicPadItem Next()
-        {
+        internal BasicPadItem Next() {
 
 
             var ItemCount = Parent.IndexOf(this);
             if (ItemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
 
-            do
-            {
+            do {
                 ItemCount++;
                 if (ItemCount >= Parent.Count) { return null; }
                 if (Parent[ItemCount] != null) { return Parent[ItemCount]; }
@@ -581,19 +526,16 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public void DrawOutline(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, Color c)
-        {
+        public void DrawOutline(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, Color c) {
             GR.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY));
         }
 
-        protected bool IsInDrawingArea(RectangleF DrawingKoordinates, Size SizeOfParentControl)
-        {
+        protected bool IsInDrawingArea(RectangleF DrawingKoordinates, Size SizeOfParentControl) {
             if (SizeOfParentControl.IsEmpty || SizeOfParentControl.Width == 0 || SizeOfParentControl.Height == 0) { return true; }
             return DrawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, SizeOfParentControl));
         }
 
-        public void Parse(string ToParse)
-        {
+        public void Parse(string ToParse) {
             Parse(ToParse.GetAllTags());
         }
 
@@ -603,8 +545,7 @@ namespace BlueControls.ItemCollection
         /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.
         /// </summary>
         /// <remarks></remarks>
-        public RectangleM ZoomToArea()
-        {
+        public RectangleM ZoomToArea() {
             var x = UsedArea();
 
             if (_ZoomPadding == 0) { return x; }
@@ -615,8 +556,7 @@ namespace BlueControls.ItemCollection
             return x;
         }
 
-        public object Clone()
-        {
+        public object Clone() {
             var t = ToString();
             return NewByParsing(Parent, t);
         }
@@ -629,46 +569,36 @@ namespace BlueControls.ItemCollection
         //    OnChanged();
         //}
 
-        public void RecalculateAndOnChanged()
-        {
+        public void RecalculateAndOnChanged() {
             Relations.Clear();
             CaluclatePointsWORelations();
             GenerateInternalRelationExplicit();
             OverrideSavedRichtmaßOfAllRelations();
             OnPointOrRelationsChanged();
-            OnChanged(); // False, sonst endlosschleife
+            OnChanged();
         }
 
 
-        public void OnChanged()
-        {
+        public void OnChanged() {
             if (this is IParseable O && O.IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             tmpUsedArea = null;
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        protected void OnPointOrRelationsChanged()
-        {
+        protected void OnPointOrRelationsChanged() {
             PointOrRelationsChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public void RelationDeleteExternal()
-        {
+        public void RelationDeleteExternal() {
 
-            foreach (var ThisRelation in Parent.AllRelations)
-            {
-                if (ThisRelation != null)
-                {
+            foreach (var ThisRelation in Parent.AllRelations) {
+                if (ThisRelation != null) {
 
-                    if (!ThisRelation.IsInternal())
-                    {
-                        foreach (var Thispoint in ThisRelation.Points)
-                        {
+                    if (!ThisRelation.IsInternal()) {
+                        foreach (var Thispoint in ThisRelation.Points) {
 
-                            if (Thispoint.Parent is BasicPadItem tItem)
-                            {
-                                if (tItem == this)
-                                {
+                            if (Thispoint.Parent is BasicPadItem tItem) {
+                                if (tItem == this) {
                                     Parent.AllRelations.Remove(ThisRelation);
                                     RelationDeleteExternal(); // 'Rekursiv
                                     return;

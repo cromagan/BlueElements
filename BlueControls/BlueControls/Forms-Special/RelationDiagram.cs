@@ -24,13 +24,12 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
+using System.Collections.Generic;
 
-namespace BlueControls.Forms
-{
-    public partial class RelationDiagram
-    {
-        private readonly Database Database;
-        private readonly ColumnItem Col;
+namespace BlueControls.Forms {
+    public partial class RelationDiagram : PadEditor {
+        private readonly Database _Database;
+        private readonly ColumnItem _column;
 
         //private bool RelationsValid;
 
@@ -38,22 +37,18 @@ namespace BlueControls.Forms
         //   Dim ItS As New Size(60, 80)
 
 
-        public RelationDiagram(Database DB)
-        {
+        public RelationDiagram(Database DB) {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            Database = DB;
+            _Database = DB;
 
-            foreach (var ThisColumnItem in Database.Column)
-            {
-                if (ThisColumnItem != null)
-                {
-                    if (ThisColumnItem.Format == enDataFormat.RelationText)
-                    {
-                        Col = ThisColumnItem;
+            foreach (var ThisColumnItem in _Database.Column) {
+                if (ThisColumnItem != null) {
+                    if (ThisColumnItem.Format == enDataFormat.RelationText) {
+                        _column = ThisColumnItem;
                         break;
                     }
                 }
@@ -61,33 +56,33 @@ namespace BlueControls.Forms
         }
 
 
-        private void Hinzu_Click(object sender, System.EventArgs e)
-        {
+        private void Hinzu_Click(object sender, System.EventArgs e) {
 
             var il = new ItemCollectionList();
-            il.AddRange(Database.Column[0].Contents(null));
+            il.AddRange(_Database.Column[0].Contents(null));
             il.Sort();
             il.CheckBehavior = enCheckBehavior.SingleSelection;
 
 
             var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, enAddType.None, true);
-            if (i == null || i.Count != 1)
-            {
+            if (i == null || i.Count != 1) {
                 return;
             }
 
 
-            AddOne(i[0], 0, 0);
+            AddOne(i[0], 0, 0, string.Empty);
+
+            if (Pad.Item.Count < 10) {
+                Pad.ZoomFit();
+            }
 
             RepairLinesAndFullProcessing();
         }
 
 
-        public RowFormulaPadItem ItemOfRow(RowItem R)
-        {
+        public RowFormulaPadItem ItemOfRow(RowItem R) {
 
-            foreach (var ThisItem in Pad.Item)
-            {
+            foreach (var ThisItem in Pad.Item) {
                 if (ThisItem != null && ThisItem is RowFormulaPadItem tempVar && tempVar.Row == R) { return tempVar; }
             }
 
@@ -95,28 +90,26 @@ namespace BlueControls.Forms
         }
 
 
-        public RowFormulaPadItem AddOne(string What, int xPos, int Ypos)
-        {
+        public RowFormulaPadItem AddOne(string What, int xPos, int Ypos, string layoutID) {
 
 
             if (string.IsNullOrEmpty(What)) { return null; }
 
             if (Pad.Item[What] != null) { return null; }
 
-            var r = Database.Row[What];
+            var r = _Database.Row[What];
 
-            if (r == null)
-            {
+            if (r == null) {
                 MessageBox.Show("<b>" + What + "</B> konnte nicht hinzugefügt werden.", enImageCode.Information, "OK");
                 return null;
             }
             if (ItemOfRow(r) != null) { return null; }
 
 
-            var i2 = new RowFormulaPadItem(Pad.Item, r);
+            var i2 = new RowFormulaPadItem(Pad.Item, r, layoutID);
             Pad.Item.Add(i2);
             //  Pad.Invalidate()
-            i2.SetCoordinates(new RectangleM(xPos, Ypos, -1, -1));
+            i2.SetCoordinates(new RectangleM(xPos, Ypos, i2.UsedArea().Width, i2.UsedArea().Height));
 
             i2.InDenVordergrund();
 
@@ -126,8 +119,7 @@ namespace BlueControls.Forms
         }
 
 
-        private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
-        {
+        private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
             if (e.HotItem == null) { return; }
 
             //Dim i As BasicItem = DirectCast(MouseOver, BasicItem)
@@ -137,15 +129,14 @@ namespace BlueControls.Forms
 
 
             e.UserMenu.Add("Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+", enImageCode.PlusZeichen);
-            e.UserMenu.Add("Übergeordnete Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+Ü", enImageCode.PlusZeichen);
-            e.UserMenu.Add("Untergeordnete Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+U", enImageCode.PlusZeichen);
-            e.UserMenu.Add("Gleichgestellte Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+G", enImageCode.PlusZeichen);
+            //e.UserMenu.Add("Übergeordnete Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+Ü", enImageCode.PlusZeichen);
+            //e.UserMenu.Add("Untergeordnete Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+U", enImageCode.PlusZeichen);
+            //e.UserMenu.Add("Gleichgestellte Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+G", enImageCode.PlusZeichen);
             //Stop
         }
 
 
-        private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
-        {
+        private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
 
             if (e.HotItem == null) { return; }
 
@@ -154,23 +145,22 @@ namespace BlueControls.Forms
             var i = (RowFormulaPadItem)e.HotItem;
 
 
-            switch (e.ClickedComand)
-            {
+            switch (e.ClickedComand) {
                 case "Bez+":
-                    BezPlus(i, -1);
+                    BezPlus(i);
                     break;
 
-                case "Bez+Ü":
-                    BezPlus(i, 1);
-                    break;
+                //case "Bez+Ü":
+                //    BezPlus(i, 1);
+                //    break;
 
-                case "Bez+U":
-                    BezPlus(i, 2);
-                    break;
+                //case "Bez+U":
+                //    BezPlus(i, 2);
+                //    break;
 
-                case "Bez+G":
-                    BezPlus(i, 0);
-                    break;
+                //case "Bez+G":
+                //    BezPlus(i, 0);
+                //    break;
 
                 default:
                     Develop.DebugPrint(e);
@@ -182,14 +172,44 @@ namespace BlueControls.Forms
         }
 
 
-        private void BezPlus(RowFormulaPadItem I, int Welche)
-        {
-            Develop.DebugPrint_NichtImplementiert();
-            //var l = Database.Cell.GetList(Col, I.Row);
-            //if (l.Count == 0)
-            //{
-            //    return;
-            //}
+        private void BezPlus(RowFormulaPadItem initialItem) {
+
+            // Den Beziehungstext holen
+            var t = initialItem.Row.CellGetString(_column).ToUpper();
+            if (string.IsNullOrEmpty(t)) { return; }
+
+
+            // Alle möglichen Namen holen
+            var Names = new List<string>();
+            Names.AddRange(_Database.Column[0].GetUcaseNamesSortedByLenght());
+
+
+            // Namen ermitteln, die relevant sind
+            var bez = new List<string>();
+            foreach (var thisN in Names) {
+                if (t.Contains(thisN)) {
+                    bez.AddIfNotExists(thisN);
+                    t.Replace(thisN, string.Empty);
+                }
+            }
+
+            if (bez.Count == 0) { return; }
+
+            // Namen in der Übersicht hinzufügen
+            var lastit = initialItem;
+            foreach (var thisn in bez) {
+
+
+                var ro = _Database.Row[thisn];
+                var it = ItemOfRow(ro);
+
+
+                if (it == null) {
+                    lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);
+                }
+            }
+
+
 
             //var Plus = 0;
 
@@ -233,9 +253,8 @@ namespace BlueControls.Forms
         }
 
 
-        private void RepairLinesAndFullProcessing()
-        {
-            Develop.DebugPrint_NichtImplementiert();
+        private void RepairLinesAndFullProcessing() {
+            //Develop.DebugPrint_NichtImplementiert();
             //if (RelationsValid)
             //{
             //    return;
@@ -286,8 +305,7 @@ namespace BlueControls.Forms
 
         }
 
-        private void AddVerbinder(RowFormulaPadItem Von, string NachRelation)
-        {
+        private void AddVerbinder(RowFormulaPadItem Von, string NachRelation) {
             Develop.DebugPrint_NichtImplementiert();
             //if (Von == null)
             //{

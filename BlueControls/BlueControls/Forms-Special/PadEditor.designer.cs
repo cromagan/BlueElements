@@ -35,8 +35,14 @@ namespace BlueControls.Forms
             this.Button_PageSetup = new BlueControls.Controls.Button();
             this.Bild = new BlueControls.Controls.Button();
             this.Drucken = new BlueControls.Controls.Button();
+            this.grpDateiSystem = new BlueControls.Controls.GroupBox();
+            this.btnLastFiles = new BlueControls.Controls.LastFilesCombo();
+            this.btnNeu = new BlueControls.Controls.Button();
+            this.btnOeffnen = new BlueControls.Controls.Button();
+            this.btnSpeichern = new BlueControls.Controls.Button();
             this.tabPageControl = new BlueControls.Controls.TabPage();
             this.grpKomponenteHinzufügen = new BlueControls.Controls.GroupBox();
+            this.btnPhsyik = new BlueControls.Controls.Button();
             this.btnAddSymbol = new BlueControls.Controls.Button();
             this.btnAddUnterStufe = new BlueControls.Controls.Button();
             this.btnAddText = new BlueControls.Controls.Button();
@@ -57,15 +63,20 @@ namespace BlueControls.Forms
             this.ckbRaster = new BlueControls.Controls.Button();
             this.Bez_All = new BlueControls.Controls.Button();
             this.Area_Design = new BlueControls.Controls.GroupBox();
+            this.btnHintergrundFarbe = new BlueControls.Controls.Button();
+            this.btnVorschauModus = new BlueControls.Controls.Button();
             this.ArbeitsbreichSetup = new BlueControls.Controls.Button();
             this.SchriftGröße = new BlueControls.Controls.ComboBox();
             this.sscchrifthgöße = new BlueControls.Controls.Caption();
             this.PadDesign = new BlueControls.Controls.ComboBox();
             this.ssss = new BlueControls.Controls.Caption();
-            this.btnPhsyik = new BlueControls.Controls.Button();
+            this.LoadTab = new System.Windows.Forms.OpenFileDialog();
+            this.SaveTab = new System.Windows.Forms.SaveFileDialog();
+            this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.Ribbon.SuspendLayout();
             this.tabPageStart.SuspendLayout();
             this.Area_Drucken.SuspendLayout();
+            this.grpDateiSystem.SuspendLayout();
             this.tabPageControl.SuspendLayout();
             this.grpKomponenteHinzufügen.SuspendLayout();
             this.grpWerkzeuge.SuspendLayout();
@@ -113,6 +124,7 @@ namespace BlueControls.Forms
             this.Pad.Name = "Pad";
             this.Pad.Size = new System.Drawing.Size(1334, 571);
             this.Pad.TabIndex = 0;
+            this.Pad.PreviewModeChanged += new System.EventHandler(this.Pad_PreviewModChanged);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon
@@ -124,7 +136,7 @@ namespace BlueControls.Forms
             this.Ribbon.HotTrack = true;
             this.Ribbon.Location = new System.Drawing.Point(0, 0);
             this.Ribbon.Name = "Ribbon";
-            this.Ribbon.SelectedIndex = 1;
+            this.Ribbon.SelectedIndex = 2;
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
             this.Ribbon.TabIndex = 2;
             // 
@@ -132,6 +144,7 @@ namespace BlueControls.Forms
             // 
             this.tabPageStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabPageStart.Controls.Add(this.Area_Drucken);
+            this.tabPageStart.Controls.Add(this.grpDateiSystem);
             this.tabPageStart.Location = new System.Drawing.Point(4, 25);
             this.tabPageStart.Name = "tabPageStart";
             this.tabPageStart.Size = new System.Drawing.Size(1326, 81);
@@ -147,7 +160,7 @@ namespace BlueControls.Forms
             this.Area_Drucken.Controls.Add(this.Bild);
             this.Area_Drucken.Controls.Add(this.Drucken);
             this.Area_Drucken.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Area_Drucken.Location = new System.Drawing.Point(0, 0);
+            this.Area_Drucken.Location = new System.Drawing.Point(312, 0);
             this.Area_Drucken.Name = "Area_Drucken";
             this.Area_Drucken.Size = new System.Drawing.Size(296, 81);
             this.Area_Drucken.TabIndex = 0;
@@ -195,6 +208,68 @@ namespace BlueControls.Forms
             this.Drucken.Text = "Drucken";
             this.Drucken.Click += new System.EventHandler(this.Drucken_Click);
             // 
+            // grpDateiSystem
+            // 
+            this.grpDateiSystem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpDateiSystem.CausesValidation = false;
+            this.grpDateiSystem.Controls.Add(this.btnLastFiles);
+            this.grpDateiSystem.Controls.Add(this.btnNeu);
+            this.grpDateiSystem.Controls.Add(this.btnOeffnen);
+            this.grpDateiSystem.Controls.Add(this.btnSpeichern);
+            this.grpDateiSystem.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpDateiSystem.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpDateiSystem.Location = new System.Drawing.Point(0, 0);
+            this.grpDateiSystem.Name = "grpDateiSystem";
+            this.grpDateiSystem.Size = new System.Drawing.Size(312, 81);
+            this.grpDateiSystem.TabIndex = 4;
+            this.grpDateiSystem.TabStop = false;
+            this.grpDateiSystem.Text = "Dateisystem";
+            // 
+            // btnLastFiles
+            // 
+            this.btnLastFiles.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.btnLastFiles.DrawStyle = BlueControls.Enums.enComboboxStyle.RibbonBar;
+            this.btnLastFiles.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.btnLastFiles.Enabled = false;
+            this.btnLastFiles.ImageCode = "Ordner";
+            this.btnLastFiles.Location = new System.Drawing.Point(136, 2);
+            this.btnLastFiles.Name = "btnLastFiles";
+            this.btnLastFiles.Size = new System.Drawing.Size(104, 66);
+            this.btnLastFiles.TabIndex = 11;
+            this.btnLastFiles.Text = "zuletzt geöffnete Dateien";
+            this.btnLastFiles.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.btnLastFiles_ItemClicked);
+            // 
+            // btnNeu
+            // 
+            this.btnNeu.ImageCode = "Datei";
+            this.btnNeu.Location = new System.Drawing.Point(8, 2);
+            this.btnNeu.Name = "btnNeu";
+            this.btnNeu.Size = new System.Drawing.Size(64, 66);
+            this.btnNeu.TabIndex = 10;
+            this.btnNeu.Text = "Neu";
+            this.btnNeu.Click += new System.EventHandler(this.btnNeu_Click);
+            // 
+            // btnOeffnen
+            // 
+            this.btnOeffnen.ImageCode = "Ordner";
+            this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
+            this.btnOeffnen.Name = "btnOeffnen";
+            this.btnOeffnen.QuickInfo = "Eine Datei von ihrem<br>Computer importieren";
+            this.btnOeffnen.Size = new System.Drawing.Size(64, 66);
+            this.btnOeffnen.TabIndex = 9;
+            this.btnOeffnen.Text = "Öffnen";
+            this.btnOeffnen.Click += new System.EventHandler(this.btnOeffnen_Click);
+            // 
+            // btnSpeichern
+            // 
+            this.btnSpeichern.ImageCode = "Diskette";
+            this.btnSpeichern.Location = new System.Drawing.Point(240, 2);
+            this.btnSpeichern.Name = "btnSpeichern";
+            this.btnSpeichern.Size = new System.Drawing.Size(64, 66);
+            this.btnSpeichern.TabIndex = 8;
+            this.btnSpeichern.Text = "Speichern";
+            this.btnSpeichern.Click += new System.EventHandler(this.btnSpeichern_Click);
+            // 
             // tabPageControl
             // 
             this.tabPageControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
@@ -226,6 +301,16 @@ namespace BlueControls.Forms
             this.grpKomponenteHinzufügen.TabIndex = 0;
             this.grpKomponenteHinzufügen.TabStop = false;
             this.grpKomponenteHinzufügen.Text = "Komponente hinzufügen";
+            // 
+            // btnPhsyik
+            // 
+            this.btnPhsyik.ImageCode = "Formel|16";
+            this.btnPhsyik.Location = new System.Drawing.Point(168, 24);
+            this.btnPhsyik.Name = "btnPhsyik";
+            this.btnPhsyik.Size = new System.Drawing.Size(88, 22);
+            this.btnPhsyik.TabIndex = 10;
+            this.btnPhsyik.Text = "Physik";
+            this.btnPhsyik.Click += new System.EventHandler(this.btnPhsyik_Click);
             // 
             // btnAddSymbol
             // 
@@ -348,7 +433,7 @@ namespace BlueControls.Forms
             this.Area_Assistent.Controls.Add(this.ckbRaster);
             this.Area_Assistent.Controls.Add(this.Bez_All);
             this.Area_Assistent.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Area_Assistent.Location = new System.Drawing.Point(288, 0);
+            this.Area_Assistent.Location = new System.Drawing.Point(464, 0);
             this.Area_Assistent.Name = "Area_Assistent";
             this.Area_Assistent.Size = new System.Drawing.Size(426, 81);
             this.Area_Assistent.TabIndex = 0;
@@ -439,20 +524,47 @@ namespace BlueControls.Forms
             // 
             // Area_Design
             // 
-            this.Area_Design.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Area_Design.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.Area_Design.CausesValidation = false;
+            this.Area_Design.Controls.Add(this.btnHintergrundFarbe);
+            this.Area_Design.Controls.Add(this.btnVorschauModus);
             this.Area_Design.Controls.Add(this.ArbeitsbreichSetup);
             this.Area_Design.Controls.Add(this.SchriftGröße);
             this.Area_Design.Controls.Add(this.sscchrifthgöße);
             this.Area_Design.Controls.Add(this.PadDesign);
             this.Area_Design.Controls.Add(this.ssss);
             this.Area_Design.Dock = System.Windows.Forms.DockStyle.Left;
+            this.Area_Design.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.Area_Design.Location = new System.Drawing.Point(0, 0);
             this.Area_Design.Name = "Area_Design";
-            this.Area_Design.Size = new System.Drawing.Size(288, 81);
+            this.Area_Design.Size = new System.Drawing.Size(464, 81);
             this.Area_Design.TabIndex = 1;
             this.Area_Design.TabStop = false;
             this.Area_Design.Text = "Design";
+            // 
+            // btnHintergrundFarbe
+            // 
+            this.btnHintergrundFarbe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnHintergrundFarbe.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_RibbonBar;
+            this.btnHintergrundFarbe.ImageCode = "Farben";
+            this.btnHintergrundFarbe.Location = new System.Drawing.Point(320, 2);
+            this.btnHintergrundFarbe.Name = "btnHintergrundFarbe";
+            this.btnHintergrundFarbe.Size = new System.Drawing.Size(80, 66);
+            this.btnHintergrundFarbe.TabIndex = 15;
+            this.btnHintergrundFarbe.Text = "Hintergrund-Farbe";
+            this.btnHintergrundFarbe.Click += new System.EventHandler(this.btnHintergrundFarbe_Click);
+            // 
+            // btnVorschauModus
+            // 
+            this.btnVorschauModus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnVorschauModus.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_RibbonBar;
+            this.btnVorschauModus.ImageCode = "Textdatei";
+            this.btnVorschauModus.Location = new System.Drawing.Point(400, 2);
+            this.btnVorschauModus.Name = "btnVorschauModus";
+            this.btnVorschauModus.Size = new System.Drawing.Size(56, 66);
+            this.btnVorschauModus.TabIndex = 14;
+            this.btnVorschauModus.Text = "Vorschau-Modus";
+            this.btnVorschauModus.CheckedChanged += new System.EventHandler(this.btnVorschauModus_CheckedChanged);
             // 
             // ArbeitsbreichSetup
             // 
@@ -466,11 +578,13 @@ namespace BlueControls.Forms
             // 
             // SchriftGröße
             // 
+            this.SchriftGröße.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.SchriftGröße.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.SchriftGröße.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.SchriftGröße.Location = new System.Drawing.Point(208, 46);
             this.SchriftGröße.Name = "SchriftGröße";
-            this.SchriftGröße.Size = new System.Drawing.Size(72, 22);
+            this.SchriftGröße.Size = new System.Drawing.Size(104, 22);
             this.SchriftGröße.TabIndex = 3;
             this.SchriftGröße.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.SchriftGröße_ItemClicked);
             // 
@@ -484,11 +598,13 @@ namespace BlueControls.Forms
             // 
             // PadDesign
             // 
+            this.PadDesign.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.PadDesign.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.PadDesign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.PadDesign.Location = new System.Drawing.Point(112, 24);
             this.PadDesign.Name = "PadDesign";
-            this.PadDesign.Size = new System.Drawing.Size(168, 22);
+            this.PadDesign.Size = new System.Drawing.Size(200, 22);
             this.PadDesign.TabIndex = 1;
             this.PadDesign.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.PadDesign_ItemClicked);
             // 
@@ -501,15 +617,19 @@ namespace BlueControls.Forms
             this.ssss.Text = "Design:";
             this.ssss.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             // 
-            // btnPhsyik
+            // LoadTab
             // 
-            this.btnPhsyik.ImageCode = "Formel|16";
-            this.btnPhsyik.Location = new System.Drawing.Point(168, 24);
-            this.btnPhsyik.Name = "btnPhsyik";
-            this.btnPhsyik.Size = new System.Drawing.Size(88, 22);
-            this.btnPhsyik.TabIndex = 10;
-            this.btnPhsyik.Text = "Physik";
-            this.btnPhsyik.Click += new System.EventHandler(this.btnPhsyik_Click);
+            this.LoadTab.DefaultExt = "BCR";
+            this.LoadTab.Filter = "*.BCR BCR-Datei|*.BCR|*.* Alle Dateien|*";
+            this.LoadTab.Title = "Bitte Datei zum Laden wählen:";
+            this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
+            // 
+            // SaveTab
+            // 
+            this.SaveTab.DefaultExt = "BCR";
+            this.SaveTab.Filter = "*.BCR BCR-Datei|*.BCR|*.* Alle Dateien|*";
+            this.SaveTab.Title = "Bitte neuen Dateinamen der Datei wählen.";
+            this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.SaveTab_FileOk);
             // 
             // PadEditor
             // 
@@ -523,6 +643,7 @@ namespace BlueControls.Forms
             this.Ribbon.ResumeLayout(false);
             this.tabPageStart.ResumeLayout(false);
             this.Area_Drucken.ResumeLayout(false);
+            this.grpDateiSystem.ResumeLayout(false);
             this.tabPageControl.ResumeLayout(false);
             this.grpKomponenteHinzufügen.ResumeLayout(false);
             this.grpWerkzeuge.ResumeLayout(false);
@@ -573,5 +694,15 @@ namespace BlueControls.Forms
         private Button btnAddUnterStufe;
         private Button btnAddSymbol;
         private Button btnPhsyik;
+        private Button btnVorschauModus;
+        private System.Windows.Forms.OpenFileDialog LoadTab;
+        private System.Windows.Forms.SaveFileDialog SaveTab;
+        protected GroupBox grpDateiSystem;
+        protected LastFilesCombo btnLastFiles;
+        protected Button btnNeu;
+        protected Button btnOeffnen;
+        protected Button btnSpeichern;
+        private Button btnHintergrundFarbe;
+        private System.Windows.Forms.ColorDialog ColorDia;
     }
 	}

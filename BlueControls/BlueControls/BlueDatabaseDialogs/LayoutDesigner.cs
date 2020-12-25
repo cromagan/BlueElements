@@ -570,71 +570,17 @@ namespace BlueControls.BlueDatabaseDialogs
                 Layout1.Item.AddLayoutsOf(Database, true, _AdditionalLayoutPath);
             }
         }
-
-        private void LoadTab_FileOk(object sender, CancelEventArgs e)
-        {
-            LoadFile(LoadTab.FileName);
-            Ribbon.SelectedIndex = 1;
-        }
-
-        private void SaveTab_FileOk(object sender, CancelEventArgs e)
-        {
-            Pad.Grid = false;
-            var t = Pad.Item.ToString();
-            Pad.Grid = ckbRaster.Checked;
-
-            modAllgemein.SaveToDisk(SaveTab.FileName, t, false);
-
-        }
-
-        private void btnOeffnen_Click(object sender, System.EventArgs e)
-        {
-            LoadTab.ShowDialog();
-        }
-
-
-        private void btnSpeichern_Click(object sender, System.EventArgs e)
-        {
-
-            SaveTab.ShowDialog();
-        }
-
-        private void btnNeu_Click(object sender, System.EventArgs e)
-        {
-            Pad.Item.Clear();
-            Pad.ZoomFit();
-            Ribbon.SelectedIndex = 1;
-        }
-
-        private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e)
-        {
-            LoadFile(e.Item.Internal);
-        }
-
-
-        private void LoadFile(string fileName)
-        {
-            Pad.Item.Clear();
-            var t = modAllgemein.LoadFromDisk(fileName);
-
-            Pad.Item = new ItemCollectionPad(t, _LoadedLayout);
-            ItemChanged();
-
-        }
-
-        private void Pad_HotItemChanged(object sender, System.EventArgs e)
-        {
+        private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
 
             tabElementEigenschaften.Controls.Clear();
-            if (Pad.HotItem == null) { return; }
+            if (Pad.LastClickedItem == null) { return; }
 
-            var Flexis = Pad.HotItem.GetStyleOptions();
+            var Flexis = Pad.LastClickedItem.GetStyleOptions();
             if (Flexis.Count == 0) { return; }
 
 
             var top = Skin.Padding;
-            foreach (var ThisFlexi in Flexis)
-            {
+            foreach (var ThisFlexi in Flexis) {
                 tabElementEigenschaften.Controls.Add(ThisFlexi);
                 ThisFlexi.DisabledReason = string.Empty;
                 ThisFlexi.Left = Skin.Padding;
