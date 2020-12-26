@@ -621,43 +621,37 @@ namespace BlueControls
             return _Richtmaß;
         }
 
-        public bool Connects(enXY toCheck)
+        public enXY Connects()
         {
             switch (_relationtype)
             {
                 case enRelationType.WaagerechtSenkrecht:
-                    if (toCheck.HasFlag(enXY.X) && _Richtmaß != "90") { return false; }
-                    if (toCheck.HasFlag(enXY.Y) && _Richtmaß != "0") { return false; }
-                    break;
+                    if (_Richtmaß != "90") { return enXY.X; }
+                    if ( _Richtmaß != "0") { return enXY.Y; }
+                    return enXY.none;
 
                 case enRelationType.PositionZueinander:
+                    return enXY.XY;
 
-                    //break; case Is = enRelationType.Mittig
-                    //    Return False
-
-                    //break; case Is = enRelationType.WinkelÜberMittelpunkt
-                    //    Return False
-
-                    break;
                 case enRelationType.YPositionZueinander:
-                    return toCheck.HasFlag(enXY.Y);
+                    return enXY.Y;
 
                 case enRelationType.Dummy:
-                    return true;
+                    return enXY.XY;
 
                 case enRelationType.None:
-                    return false;
+                    return enXY.none;
 
                 case enRelationType.AbstandZueinander:
-                    return false;
+                    return enXY.none;
 
 
                 default:
                     Develop.DebugPrint(_relationtype);
-                    return false;
+                    return enXY.none;
             }
 
-            return true;
+
         }
 
 

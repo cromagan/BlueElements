@@ -657,7 +657,7 @@ namespace BlueControls.Controls {
             CaluclateOtherPointsOf();
 
 
-            //   _Item.PerformAll();
+            _Item.PerformAll();
 
 
             var errorsAfter = _Item.NotPerforming(false);
@@ -671,7 +671,7 @@ namespace BlueControls.Controls {
             } else {
                 var done = new List<object>();
 
-                foreach (var thispoint in Sel_P) {
+                foreach (var thispoint in _Item.AllPoints) {
                     if (!done.Contains(thispoint.Parent)) {
                         done.Add(thispoint.Parent);
 
@@ -775,39 +775,39 @@ namespace BlueControls.Controls {
 
             _NewAutoRelations.Clear();
 
-            var MoveX = (decimal)(MousePos_1_1.X - MouseDownPos_1_1.X);
-            var MoveY = (decimal)(MousePos_1_1.Y - MouseDownPos_1_1.Y);
+
+            var move = new PointM((decimal)(MousePos_1_1.X - MouseDownPos_1_1.X), (decimal)(MousePos_1_1.Y - MouseDownPos_1_1.Y));
 
             var MouseMovedTo = new PointM(MousePos_1_1);
 
 
             if (Move_X.Count > 0) {
-                MoveX = SnapToGrid(true, Move_X, MoveX);
+                move.X = SnapToGrid(true, Move_X, move.X);
 
-                if (_Grid == false || Math.Abs(_Gridsnap) < 0.001 || MoveX == 0M) {
+                if (!_Grid || Math.Abs(_Gridsnap) < 0.001 || move.X == 0M) {
                     if (_AutoRelation != enAutoRelationMode.None) { SnapToPoint(enXY.X, Sel_P, MouseMovedTo, ref PMoveX, ref PSnapToX); }
-                    if (PMoveX != null) { MoveX = PSnapToX.X - PMoveX.X; }
+                    if (PMoveX != null) { move.X = PSnapToX.X - PMoveX.X; }
                 }
             } else {
-                MoveX = 0M;
+                move.X = 0M;
             }
 
             if (Move_Y.Count > 0) {
-                MoveY = SnapToGrid(false, Move_Y, MoveY);
+                move.Y = SnapToGrid(false, Move_Y, move.Y);
 
-                if (_Grid == false || Math.Abs(_Gridsnap) < 0.001 || MoveY == 0M) {
+                if (!_Grid || Math.Abs(_Gridsnap) < 0.001 || move.Y == 0M) {
                     if (_AutoRelation != enAutoRelationMode.None) { SnapToPoint(enXY.Y, Sel_P, MouseMovedTo, ref PMoveY, ref PSnapToY); }
-                    if (PMoveY != null) { MoveY = PSnapToY.Y - PMoveY.Y; }
+                    if (PMoveY != null) { move.Y = PSnapToY.Y - PMoveY.Y; }
                 }
             } else {
-                MoveY = 0M;
+                move.Y = 0M;
             }
 
-            if (MoveX == 0M && MoveY == 0M && PMoveX == null && PMoveY == null) { return; }
+            if (move.X == 0M && move.Y == 0M && PMoveX == null && PMoveY == null) { return; }
 
 
 
-            if (MoveSelectedPoints(MoveX, MoveY)) {
+            if (MoveSelectedPoints(move.X, move.Y)) {
                 // Wenn Strongmode true ist es für den Anwender unerklärlich, warum er denn nix macht,obwohl kein Fehler da ist...
                 if (_Item.NotPerforming(false) == 0) {
                     AddAllAutoRelations(PMoveX, PSnapToX, PMoveY, PSnapToY);
@@ -817,7 +817,7 @@ namespace BlueControls.Controls {
             }
 
 
-            MouseDownPos_1_1 = new Point((int)(MouseDownPos_1_1.X + MoveX), (int)(MouseDownPos_1_1.Y + MoveY));
+            MouseDownPos_1_1 = new Point((int)(MouseDownPos_1_1.X + move.X), (int)(MouseDownPos_1_1.Y + move.Y));
         }
 
         /// <summary>
@@ -866,36 +866,35 @@ namespace BlueControls.Controls {
         }
 
 
-        private void SnapToPoint(enXY DoX, List<PointM> Movep, PointM MouseMovedTo, ref PointM PMove, ref PointM PSnapTo) {
+        private void SnapToPoint(enXY toCheck, List<PointM> Movep, PointM MouseMovedTo, ref PointM PMove, ref PointM PSnapTo) {
             decimal ShortestDist = 10;
             var Nearest = decimal.MaxValue;
 
 
-            if (!Convert.ToBoolean(_AutoRelation & enAutoRelationMode.Senkrecht) && !Convert.ToBoolean(_AutoRelation & enAutoRelationMode.Waagerecht) && !Convert.ToBoolean(_AutoRelation & enAutoRelationMode.DirektVerbindungen)) {
+            if (!_AutoRelation.HasFlag( enAutoRelationMode.Senkrecht) && !_AutoRelation.HasFlag( enAutoRelationMode.Waagerecht) && !_AutoRelation.HasFlag(enAutoRelationMode.DirektVerbindungen)) {
                 return;
             }
 
-            if (!Convert.ToBoolean(_AutoRelation & enAutoRelationMode.DirektVerbindungen)) {
-                if (DoX.HasFlag(enXY.X) && !Convert.ToBoolean(_AutoRelation & enAutoRelationMode.Senkrecht)) { return; }
-                if (DoX.HasFlag(enXY.Y) && !Convert.ToBoolean(_AutoRelation & enAutoRelationMode.Waagerecht)) { return; }
-
-            } else {
-                if (!Convert.ToBoolean(_AutoRelation & enAutoRelationMode.Senkrecht) && !Convert.ToBoolean(_AutoRelation & enAutoRelationMode.Waagerecht)) {
+            if (_AutoRelation.HasFlag(enAutoRelationMode.DirektVerbindungen)) {
+                if (!_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht) && !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht)) {
                     Nearest = 2;
                 }
-            }
+            } else {
+                if (toCheck.HasFlag(enXY.X) && !_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht)) { return; }
+                if (toCheck.HasFlag(enXY.Y) && !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht)) { return; }
 
+            }
 
 
             // Berechne, welcher Punkt snappt
             foreach (var ThisPoint in Movep) {
                 var tempVar = ThisPoint;
-                SnapToPoint(DoX, ref tempVar, MouseMovedTo, ref ShortestDist, ref PMove, ref PSnapTo, ref Nearest);
+                SnapToPoint(toCheck, ref tempVar, MouseMovedTo, ref ShortestDist, ref PMove, ref PSnapTo, ref Nearest);
             }
 
         }
 
-        private void SnapToPoint(enXY DoX, ref PointM PointToTest, PointM MouseMovedTo, ref decimal ShortestDist, ref PointM PMove, ref PointM PSnapTo, ref decimal Nearest) {
+        private void SnapToPoint(enXY toCheck, ref PointM PointToTest, PointM MouseMovedTo, ref decimal ShortestDist, ref PointM PMove, ref PointM PSnapTo, ref decimal Nearest) {
 
             if (PointToTest == null) { return; }
 
@@ -913,10 +912,10 @@ namespace BlueControls.Controls {
 
                         if (Distanz < 1000 * _Zoom) {
                             decimal SnapDist = 0;
-                            if (DoX.HasFlag(enXY.X)) {
+                            if (toCheck.HasFlag(enXY.X)) {
                                 SnapDist = Math.Abs(WillMoveTo.X - ThisPoint.X) * _Zoom;
                             }
-                            if (DoX.HasFlag(enXY.Y)) {
+                            if (toCheck.HasFlag(enXY.Y)) {
                                 SnapDist = Math.Abs(WillMoveTo.Y - ThisPoint.Y) * _Zoom;
                             }
 
@@ -929,7 +928,7 @@ namespace BlueControls.Controls {
 
 
                             if (SnapDist < ShortestDist || (SnapDist == ShortestDist && Distanz < Nearest)) {
-                                if (!HängenZusammen(DoX, PointToTest, ThisPoint, null)) {
+                                if (!HängenZusammen(toCheck, PointToTest, ThisPoint, null)) {
                                     ShortestDist = SnapDist;
                                     Nearest = Distanz;
                                     PMove = PointToTest;
@@ -1146,19 +1145,19 @@ namespace BlueControls.Controls {
 
         }
 
-        private bool HängenZusammen(enXY CheckX, PointM Point1, PointM Point2, List<clsPointRelation> l) {
+        private bool HängenZusammen(enXY toCheck, PointM point1, PointM point2, List<clsPointRelation> allreadyChecked) {
 
-            if (l == null) { l = new List<clsPointRelation>(); }
+            if (allreadyChecked == null) { allreadyChecked = new List<clsPointRelation>(); }
 
             foreach (var thisRelation in _Item.AllRelations) {
-                if (thisRelation != null && !l.Contains(thisRelation) && thisRelation.Connects(CheckX)) {
+                if (thisRelation != null && !allreadyChecked.Contains(thisRelation) && thisRelation.Connects().HasFlag(toCheck)) {
 
-                    if (thisRelation.Points.Contains(Point1)) {
-                        l.Add(thisRelation);
-                        if (thisRelation.Points.Contains(Point2)) { return true; }
+                    if (thisRelation.Points.Contains(point1)) {
+                        allreadyChecked.Add(thisRelation);
+                        if (thisRelation.Points.Contains(point2)) { return true; }
                         foreach (var thispoint in thisRelation.Points) {
-                            if (thispoint != Point1) {
-                                if (HängenZusammen(CheckX, thispoint, Point2, l)) { return true; }
+                            if (thispoint != point1) {
+                                if (HängenZusammen(toCheck, thispoint, point2, allreadyChecked)) { return true; }
                             }
                         }
                     }

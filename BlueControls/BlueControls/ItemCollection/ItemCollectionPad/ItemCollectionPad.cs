@@ -789,7 +789,7 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public List<PointM> ConnectsWith(PointM Point, enXY CheckX, bool IgnoreInternals) {
+        public List<PointM> ConnectsWith(PointM Point, enXY toCheck, bool IgnoreInternals) {
 
             var Points = new List<PointM>
             {
@@ -806,7 +806,7 @@ namespace BlueControls.ItemCollection {
 
 
                 foreach (var ThisRelation in AllRelations) {
-                    if (ThisRelation != null && ThisRelation.Points.Contains(Points[Ist]) && ThisRelation.Performs(false) && ThisRelation.Connects(CheckX)) {
+                    if (ThisRelation != null && ThisRelation.Points.Contains(Points[Ist]) && ThisRelation.Performs(false) && ThisRelation.Connects().HasFlag(toCheck)) {
 
 
                         if (!IgnoreInternals || !ThisRelation.IsInternal()) {
@@ -1389,18 +1389,11 @@ namespace BlueControls.ItemCollection {
             var RelationXY = new List<clsPointRelation>();
 
             foreach (var thisRelation in AllRelations) {
-                if (thisRelation.Connects(enXY.X)) {
-                    if (thisRelation.Connects(enXY.Y)) {
-                        RelationXY.Add(thisRelation);
-                    } else {
-                        RelationX.Add(thisRelation);
-                    }
-                } else {
-                    if (thisRelation.Connects(enXY.Y)) {
-                        RelationY.Add(thisRelation);
-                    } else {
-                        RelationNone.Add(thisRelation);
-                    }
+                switch (thisRelation.Connects()) {
+                    case enXY.XY: RelationXY.Add(thisRelation); break;
+                    case enXY.X: RelationX.Add(thisRelation); break;
+                    case enXY.Y: RelationY.Add(thisRelation); break;
+                    default: RelationNone.Add(thisRelation); break;
                 }
             }
 
@@ -1423,12 +1416,11 @@ namespace BlueControls.ItemCollection {
                         case 1: // Verbundene Punkte, die durch verbindungen X und Y Fix sind
                             foreach (var thisRelation in RelationXY) {
                                 if (thisRelation.NeedCount(Thispoint, AllPoints)) {
-                                    if (thisRelation.Connects(enXY.X) && thisRelation.Connects(enXY.Y)) {
-                                        AllPoints.Add(Thispoint);
-                                        AllRelations.Add(thisRelation);
-                                        RelationXY.Remove(thisRelation);
-                                        break;
-                                    }
+                                    AllPoints.Add(Thispoint);
+                                    AllRelations.Add(thisRelation);
+                                    RelationXY.Remove(thisRelation);
+                                    break;
+
                                 }
                             }
                             break;
@@ -1442,12 +1434,10 @@ namespace BlueControls.ItemCollection {
                         case 3: // Fixe Y-Punkte hinzufügen
                             foreach (var thisRelation in RelationY) {
                                 if (thisRelation.NeedCount(Thispoint, AllPoints)) {
-                                    if (thisRelation.Connects(enXY.Y)) {
-                                        AllPoints.Add(Thispoint);
-                                        AllRelations.Add(thisRelation);
-                                        RelationY.Remove(thisRelation);
-                                        break;
-                                    }
+                                    AllPoints.Add(Thispoint);
+                                    AllRelations.Add(thisRelation);
+                                    RelationY.Remove(thisRelation);
+                                    break;
                                 }
                             }
 
@@ -1460,12 +1450,10 @@ namespace BlueControls.ItemCollection {
                         case 5: // Fixe X-Punkte hinzufügen
                             foreach (var thisRelation in RelationX) {
                                 if (thisRelation.NeedCount(Thispoint, AllPoints)) {
-                                    if (thisRelation.Connects(enXY.X)) {
-                                        AllPoints.Add(Thispoint);
-                                        AllRelations.Add(thisRelation);
-                                        RelationX.Remove(thisRelation);
-                                        break;
-                                    }
+                                    AllPoints.Add(Thispoint);
+                                    AllRelations.Add(thisRelation);
+                                    RelationX.Remove(thisRelation);
+                                    break;
                                 }
                             }
                             break;

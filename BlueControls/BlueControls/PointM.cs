@@ -455,7 +455,7 @@ namespace BlueControls {
                 if (ThisRelation != null && !Alredychecked.Contains(ThisRelation) && ThisRelation.Points.Contains(this) && ThisRelation.Performs(false)) {
                     Alredychecked.Add(ThisRelation);
 
-                    if (ThisRelation.Connects(toCheck)) {
+                    if (ThisRelation.Connects().HasFlag(toCheck)) {
                         var Move = true;
                         foreach (var thispoint in ThisRelation.Points) {
                             if (thispoint != this) { Move = thispoint.CanMove(toCheck, Rel, Alredychecked); }
