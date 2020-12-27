@@ -21,10 +21,10 @@ namespace BlueControls.Interfaces
 {
     public interface IMouseAndKeyHandle
     {
-        bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY);
-        bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY);
-        bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY);
-        bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY);
+        bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal zoom, decimal shiftX, decimal shiftY);
+        bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, decimal zoom, decimal shiftX, decimal shiftY);
+        bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, decimal zoom, decimal shiftX, decimal shiftY);
+        bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, decimal zoom, decimal shiftX, decimal shiftY);
 
         //Function BlueCreativePad_MouseWheel(sender As Object, e As System.Windows.Forms.MouseEventArgs) As Boolean
 

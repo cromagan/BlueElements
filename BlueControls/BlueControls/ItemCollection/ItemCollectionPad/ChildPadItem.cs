@@ -147,7 +147,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
             try
             {
@@ -273,7 +273,7 @@ namespace BlueControls.ItemCollection
             {
             }
 
-            base.DrawExplicit(GR, DCoordinates, cZoom, MoveX, MoveY, vState, SizeOfParentControl, ForPrinting);
+            base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
 
 
         }
@@ -352,11 +352,11 @@ namespace BlueControls.ItemCollection
             OnChanged();
         }
 
-        public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY)
+        public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY)
         {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
 
-            var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
+            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
 
 
@@ -391,11 +391,11 @@ namespace BlueControls.ItemCollection
             return true;
         }
 
-        public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY)
+        public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY)
         {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
 
-            var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
+            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
 
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
@@ -432,12 +432,12 @@ namespace BlueControls.ItemCollection
             return true;
         }
 
-        public bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY)
+        public bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY)
         {
 
             if (PadInternal.Item.Count == 0) { return false; }
 
-            var l1 = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
+            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
 
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
@@ -493,7 +493,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, decimal cZoom, decimal MoveX, decimal MoveY)
+        public bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY)
         {
             if (PadInternal.Item.Count == 0) { return false; }
             PadInternal.DoKeyUp(e, false);

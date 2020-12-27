@@ -25,28 +25,28 @@ namespace BlueControls.EventArgs
 {
     public class AdditionalDrawing : MouseEventArgs1_1DownAndCurrent
     {
-        public AdditionalDrawing(Graphics gr, decimal zoom, decimal movex, decimal movey, MouseEventArgs1_1 mouseDown, MouseEventArgs1_1 current) : base(mouseDown, current)
+        public AdditionalDrawing(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, MouseEventArgs1_1 mouseDown, MouseEventArgs1_1 current) : base(mouseDown, current)
         {
             G = gr;
             Zoom = zoom;
-            MoveX = movex;
-            MoveY = movey;
+            ShiftX = shiftX;
+            ShiftY = shiftY;
         }
 
         public Graphics G { get; }
         public decimal Zoom { get; }
-        public decimal MoveX { get; }
-        public decimal MoveY { get; }
+        public decimal ShiftX { get; }
+        public decimal ShiftY { get; }
 
         public void FillRectangle(Brush brush, Rectangle rectangle)
         {
-            var x = new RectangleM(rectangle).ZoomAndMoveRect(Zoom, MoveX, MoveY);
+            var x = new RectangleM(rectangle).ZoomAndMoveRect(Zoom, ShiftX, ShiftY);
             G.FillRectangle(brush, x);
         }
 
         public void DrawImage(Bitmap BMP)
         {
-            var r = new RectangleM(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(Zoom, MoveX, MoveY);
+            var r = new RectangleM(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(Zoom, ShiftX, ShiftY);
 
             G.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
 

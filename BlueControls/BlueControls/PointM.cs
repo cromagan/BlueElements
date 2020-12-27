@@ -363,21 +363,21 @@ namespace BlueControls {
         }
 
 
-        public bool IsOnScreen(decimal czoom, decimal MoveX, decimal MoveY, Rectangle DisplayRectangle) {
+        public bool IsOnScreen(decimal zoom, decimal shiftX, decimal shiftY, Rectangle displayRectangle) {
 
-            var tx = _x * czoom - MoveX;
-            var ty = _y * czoom - MoveY;
+            var tx = _x * zoom - shiftX;
+            var ty = _y * zoom - shiftY;
 
-            if (tx < DisplayRectangle.Left || ty < DisplayRectangle.Top) { return false; }
-            if (tx > DisplayRectangle.Right || ty > DisplayRectangle.Bottom) { return false; }
+            if (tx < displayRectangle.Left || ty < displayRectangle.Top) { return false; }
+            if (tx > displayRectangle.Right || ty > displayRectangle.Bottom) { return false; }
             return true;
 
         }
 
 
-        public void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, enDesign Type, enStates State, bool DrawName) {
-            var tx = _x * cZoom - MoveX + cZoom / 2;
-            var ty = _y * cZoom - MoveY + cZoom / 2;
+        public void Draw(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, enDesign Type, enStates State, bool DrawName) {
+            var tx = _x * cZoom - shiftX + cZoom / 2;
+            var ty = _y * cZoom - shiftY + cZoom / 2;
 
             var r = new Rectangle((int)(tx - 4), (int)(ty - 4), 9, 9);
 
@@ -405,11 +405,11 @@ namespace BlueControls {
         }
 
         public PointF ZoomAndMove(AdditionalDrawing e) {
-            return ZoomAndMove(e.Zoom, e.MoveX, e.MoveY);
+            return ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
         }
 
-        public PointF ZoomAndMove(decimal Zoom, decimal MoveX, decimal MoveY) {
-            return new PointF((float)(_x * Zoom - MoveX + Zoom / 2), (float)(_y * Zoom - MoveY + Zoom / 2));
+        public PointF ZoomAndMove(decimal zoom, decimal shiftX, decimal shiftY) {
+            return new PointF((float)(_x * zoom - shiftX + zoom / 2), (float)(_y * zoom - shiftY + zoom / 2));
         }
 
 

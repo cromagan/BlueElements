@@ -78,7 +78,7 @@ namespace BlueControls.Controls
             if (BMP != null)
             {
 
-                var r = new RectangleM(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(_Zoom, _MoveX, _MoveY);
+                var r = new RectangleM(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(_Zoom, _shiftX, _shiftY);
 
 
                 if (_Zoom < 1 || AlwaysSmooth)
@@ -109,7 +109,7 @@ namespace BlueControls.Controls
 
 
 
-            OnDoAdditionalDrawing(new AdditionalDrawing(gr, _Zoom, _MoveX, _MoveY, _MouseDown, _MouseCurrent));
+            OnDoAdditionalDrawing(new AdditionalDrawing(gr, _Zoom, _shiftX, _shiftY, _MouseDown, _MouseCurrent));
 
 
             Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, new Rectangle(1, 1, Size.Width - SliderY.Width, Size.Height - SliderX.Height));

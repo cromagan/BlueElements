@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.ItemCollection;
@@ -27,10 +26,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls
-{
-    public sealed class clsPointRelation
-    {
+namespace BlueControls {
+    public sealed class clsPointRelation {
 
         private enRelationType _relationtype;
         public readonly ListExt<PointM> Points = new ListExt<PointM>();
@@ -38,7 +35,7 @@ namespace BlueControls
         public readonly ItemCollectionPad ParentCollection;
         public readonly object Parent;
 
-        private string _Richtmaß;
+        public readonly List<decimal> _Richtmaß = new List<decimal>();
 
 
         //internal bool Computed;
@@ -47,8 +44,7 @@ namespace BlueControls
 
         public event EventHandler Changed;
 
-        public clsPointRelation(ItemCollectionPad parentCollection, object parent)
-        {
+        public clsPointRelation(ItemCollectionPad parentCollection, object parent) {
 
             ParentCollection = parentCollection;
             _relationtype = enRelationType.None;
@@ -56,15 +52,14 @@ namespace BlueControls
             Points.Clear();
             Points.Changed += Points_ListOrItemChanged;
 
-            _Richtmaß = string.Empty;
+            _Richtmaß.Clear();
             //Computed = false;
             //Order = -1;
             Parent = parent;
         }
 
 
-        public clsPointRelation(ItemCollectionPad parentCollection, object parent, enRelationType enRelationType, PointM Point1, PointM Point2) : this(parentCollection, parent)
-        {
+        public clsPointRelation(ItemCollectionPad parentCollection, object parent, enRelationType enRelationType, PointM Point1, PointM Point2) : this(parentCollection, parent) {
 
             _relationtype = enRelationType;
             Points.ThrowEvents = false;
@@ -78,56 +73,52 @@ namespace BlueControls
         }
 
 
-        public clsPointRelation(ItemCollectionPad parentCollection, object parent, string ToParse) : this(parentCollection, parent)
-        {
+        public clsPointRelation(ItemCollectionPad parentCollection, object parent, string ToParse) : this(parentCollection, parent) {
 
             Points.ThrowEvents = false;
 
-            if (ToParse.Contains("ParentType=BlueBasics.CreativePad,"))
-            {
+            if (ToParse.Contains("ParentType=BlueBasics.CreativePad,")) {
                 ToParse = ToParse.Replace("ParentType=BlueBasics.CreativePad,", "ParentType=Main,");
             }
-            if (ToParse.Contains("ParentType=BlueBasics.BlueCreativePad,"))
-            {
+            if (ToParse.Contains("ParentType=BlueBasics.BlueCreativePad,")) {
                 ToParse = ToParse.Replace("ParentType=BlueBasics.BlueCreativePad,", "ParentType=Main,");
             }
-            if (ToParse.Contains("ParentType=BlueControls.ItemCollection.ItemCollectionPad,"))
-            {
+            if (ToParse.Contains("ParentType=BlueControls.ItemCollection.ItemCollectionPad,")) {
                 ToParse = ToParse.Replace("ParentType=BlueControls.ItemCollection.ItemCollectionPad,", "ParentType=Main,");
             }
 
 
 
-            foreach (var pair in ToParse.GetAllTags())
-            {
-                switch (pair.Key)
-                {
+            foreach (var pair in ToParse.GetAllTags()) {
+                switch (pair.Key) {
                     case "type":
                         _relationtype = (enRelationType)int.Parse(pair.Value);
                         break;
+
                     case "value":
-                        _Richtmaß = pair.Value;
+                        var x = pair.Value.FromNonCritical().SplitBy(";");
+                        _Richtmaß.Clear();
+                        foreach (var thisv in x) {
+                            _Richtmaß.Add(modConverter.DecimalParse(thisv));
+                        }
                         break;
+
                     case "point":
                         var added = false;
                         var m = pair.Value.IndexOf(", X=") + 4;
-                        foreach (var ThisPoint in ParentCollection.AllPoints)
-                        {
-                            if (ThisPoint != null)
-                            {
+                        foreach (var ThisPoint in ParentCollection.AllPoints) {
+                            if (ThisPoint != null) {
 
                                 var nv = ThisPoint.ToString();
 
-                                if (!string.IsNullOrEmpty(nv) && nv.Length >= m && nv.Substring(0, m) == pair.Value.Substring(0, m))
-                                {
+                                if (!string.IsNullOrEmpty(nv) && nv.Length >= m && nv.Substring(0, m) == pair.Value.Substring(0, m)) {
                                     added = true;
                                     Points.Add(ThisPoint);
                                     break;
                                 }
                             }
                         }
-                        if (!added)
-                        {
+                        if (!added) {
                             Develop.DebugPrint(enFehlerArt.Warnung, "Punkt nicht gefunden: " + pair.Value);
                         }
 
@@ -146,15 +137,12 @@ namespace BlueControls
 
 
 
-        public enRelationType RelationType
-        {
-            get
-            {
+        public enRelationType RelationType {
+            get {
                 return _relationtype;
             }
 
-            set
-            {
+            set {
                 if (_relationtype == value) { return; }
                 _relationtype = value;
                 OnChanged();
@@ -186,15 +174,13 @@ namespace BlueControls
 
 
 
-        public override string ToString()
-        {
+        public override string ToString() {
 
             var t = "{Type=" + (int)_relationtype +
                      ", Value=" + _Richtmaß;
 
 
-            foreach (var thispoint in Points)
-            {
+            foreach (var thispoint in Points) {
                 t = t + ", Point=" + thispoint;
             }
 
@@ -202,13 +188,11 @@ namespace BlueControls
         }
 
 
-        public void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, int OrderNr)
-        {
+        public void Draw(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, int OrderNr) {
 
-            if (CreativePad.Debug_ShowRelationOrder)
-            {
-                var l1 = Points[0].ZoomAndMove(cZoom, MoveX, MoveY);
-                var l2 = Points[1].ZoomAndMove(cZoom, MoveX, MoveY);
+            if (CreativePad.Debug_ShowRelationOrder) {
+                var l1 = Points[0].ZoomAndMove(cZoom, shiftX, shiftY);
+                var l2 = Points[1].ZoomAndMove(cZoom, shiftX, shiftY);
                 GR.DrawLine(Pens.Orange, l1, l2);
                 var mm1 = new PointF((l1.X + l2.X) / 2 - 5, (l1.Y + l2.Y) / 2 - 5);
                 GR.DrawString(OrderNr.ToString(), new Font("Arial", 6), Brushes.Orange, mm1.X, mm1.Y);
@@ -222,38 +206,33 @@ namespace BlueControls
             var p = new Pen(c);
 
 
-            foreach (var thispoint in Points)
-            {
-                thispoint.Draw(GR, cZoom, MoveX, MoveY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
+            foreach (var thispoint in Points) {
+                thispoint.Draw(GR, cZoom, shiftX, shiftY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
 
 
-                if (thispoint.Parent is BasicPadItem tempVar)
-                {
-                    tempVar.Draw(GR, cZoom, MoveX, MoveY, enStates.Standard, Size.Empty, false);
-                    tempVar.DrawOutline(GR, cZoom, MoveX, MoveY, c);
+                if (thispoint.Parent is BasicPadItem tempVar) {
+                    tempVar.Draw(GR, cZoom, shiftX, shiftY, enStates.Standard, Size.Empty, false);
+                    tempVar.DrawOutline(GR, cZoom, shiftX, shiftY, c);
                 }
             }
 
 
 
-            switch (_relationtype)
-            {
-                case enRelationType.WaagerechtSenkrecht:
-                    {
-                        var P1 = Points[0].ZoomAndMove(cZoom, MoveX, MoveY);
-                        var P2 = Points[1].ZoomAndMove(cZoom, MoveX, MoveY);
+            switch (_relationtype) {
+                case enRelationType.WaagerechtSenkrecht: {
+                        var P1 = Points[0].ZoomAndMove(cZoom, shiftX, shiftY);
+                        var P2 = Points[1].ZoomAndMove(cZoom, shiftX, shiftY);
                         var pb = new PointF((P1.X + P2.X) / 2 - 5, (P1.Y + P2.Y) / 2 - 5);
                         GR.DrawLine(p, P1, P2);
 
 
-                        switch (_Richtmaß)
-                        {
-                            case "0":
-                            case "180":
+                        switch (_Richtmaß[0]) {
+                            case 0:
+                            case 180:
                                 GR.DrawImage(QuickImage.Get(enImageCode.PfeilLinksRechts, 10).BMP, pb.X + 10, pb.Y);
                                 break;
-                            case "90":
-                            case "270":
+                            case 90:
+                            case 270:
                                 GR.DrawImage(QuickImage.Get(enImageCode.PfeilObenUnten, 10).BMP, pb.X, pb.Y + 10);
                                 break;
                             default:
@@ -265,67 +244,51 @@ namespace BlueControls
                     }
                 case enRelationType.PositionZueinander:
                 case enRelationType.YPositionZueinander:
-                case enRelationType.AbstandZueinander:
-                    {
-                        var P1 = Points[0].ZoomAndMove(cZoom, MoveX, MoveY);
-                        var P2 = Points[1].ZoomAndMove(cZoom, MoveX, MoveY);
+                case enRelationType.AbstandZueinander: {
+                        var P1 = Points[0].ZoomAndMove(cZoom, shiftX, shiftY);
+                        var P2 = Points[1].ZoomAndMove(cZoom, shiftX, shiftY);
 
 
-                        double sX = 0;
-                        double sY = 0;
-                        double iX = 0;
-                        double iY = 0;
+                        decimal sX;
+                        decimal sY;
+                        decimal iX;
+                        decimal iY;
 
-                        if (_relationtype == enRelationType.PositionZueinander)
-                        {
-                            var soll = _Richtmaß.SplitBy(";");
-                            var ist = GetRichtmaß().SplitBy(";");
+                        var ist = GetRichtmaß();
 
-                            sX = float.Parse(soll[0]);
-                            sY = float.Parse(soll[1]);
-                            iX = float.Parse(ist[0]);
-                            iY = float.Parse(ist[1]);
-
-
-                        }
-                        else
-                        {
+                        if (_relationtype == enRelationType.PositionZueinander) {
+                            sX = _Richtmaß[0];
+                            sY = _Richtmaß[1];
+                            iX = ist[0];
+                            iY = ist[1];
+                        } else {
                             sX = 0;
                             iX = 0;
-                            sY = float.Parse(_Richtmaß);
-                            iY = float.Parse(GetRichtmaß());
-
-
+                            sY = _Richtmaß[0];
+                            iY = ist[0];
                         }
 
 
                         GR.DrawLine(p, P1, P2);
 
 
-                        if (sX - iX > 0)
-                        {
+                        if (sX - iX > 0) {
                             //ok
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Rechts, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Links, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
 
 
-                        }
-                        else if (sX - iX < 0)
-                        {
+                        } else if (sX - iX < 0) {
                             //ok
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Links, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Rechts, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
 
-                        }
-                        else if (sY - iY < 0)
-                        {
+                        } else if (sY - iY < 0) {
                             //ok
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Oben, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Unten, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
 
-                        }
-                        else if (sY - iY > 0)
-                        {
+                        } else if (sY - iY > 0) {
                             //ok
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Unten, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Oben, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
@@ -333,6 +296,7 @@ namespace BlueControls
 
                         break;
                     }
+
                 default:
                     Develop.DebugPrint(_relationtype);
                     break;
@@ -340,24 +304,19 @@ namespace BlueControls
         }
 
 
-        public bool Performs(bool StrongMode)
-        {
+        public bool Performs(bool StrongMode) {
 
-            var Multi = 10;
-            if (!StrongMode) { Multi = 300; }
+            var Multi = 300;
+            if (StrongMode) { Multi = 10; }
 
             if (!IsOk(false)) { return false; }
 
 
-            switch (_relationtype)
-            {
-                case enRelationType.WaagerechtSenkrecht:
-                    {
+            switch (_relationtype) {
+                case enRelationType.WaagerechtSenkrecht: {
 
                         if (Math.Abs(Points[0].X - Points[1].X) < 0.01m * Multi && Math.Abs(Points[0].Y - Points[1].Y) < 0.01m * Multi) { return true; }
-                        var RMd = decimal.Parse(_Richtmaß);
-                        var RMd2 = decimal.Parse(GetRichtmaß());
-                        var Dif = Math.Abs(RMd - RMd2);
+                        var Dif = Math.Abs(_Richtmaß[0] - GetRichtmaß()[0]);
 
                         if (Dif <= 0.01m * Multi) { return true; }
 
@@ -367,45 +326,36 @@ namespace BlueControls
                         return false;
 
                     }
-                case enRelationType.PositionZueinander:
-                    {
-                        var ist = _Richtmaß.SplitBy(";");
-                        var soll = GetRichtmaß().SplitBy(";");
-                        if (Math.Abs(decimal.Parse(ist[0]) - decimal.Parse(soll[0])) > 0.01m * Multi) { return false; }
-                        if (Math.Abs(decimal.Parse(ist[1]) - decimal.Parse(soll[1])) > 0.01m * Multi) { return false; }
+                case enRelationType.PositionZueinander: {
+                        var soll = GetRichtmaß();
+                        if (Math.Abs(soll[0] - _Richtmaß[0]) > 0.01m * Multi) { return false; }
+                        if (Math.Abs(soll[1] - _Richtmaß[1]) > 0.01m * Multi) { return false; }
                         return true;
 
 
                     }
-                default:
-                    {
-
-                        var RMd = decimal.Parse(_Richtmaß);
-                        var RMd2 = decimal.Parse(GetRichtmaß());
-
-                        return Math.Abs(RMd - RMd2) <= 0.01m * Multi;
+                default: {
+                        return Math.Abs(_Richtmaß[0] - GetRichtmaß()[0]) <= 0.01m * Multi;
 
                     }
             }
         }
 
 
-        public void OverrideSavedRichtmaß(bool Parsing, bool IsCreating)
-        {
+        public void OverrideSavedRichtmaß(bool Parsing, bool IsCreating) {
             if (!IsOk(IsCreating)) { return; }
 
-            if (!Parsing || string.IsNullOrEmpty(_Richtmaß)) { _Richtmaß = GetRichtmaß(); }
+            if (!Parsing || _Richtmaß.Count == 0) { _Richtmaß.AddRange(GetRichtmaß()); }
 
 
-            switch (_relationtype)
-            {
+            switch (_relationtype) {
                 case enRelationType.WaagerechtSenkrecht:
-                    _Richtmaß = Math.Round(decimal.Parse(_Richtmaß), 0).ToString();
+                    _Richtmaß[0] = Math.Round(_Richtmaß[0]);
 
-                    if (_Richtmaß == "180" || _Richtmaß == "360") { _Richtmaß = "0"; }
-                    if (_Richtmaß == "90" || _Richtmaß == "270") { _Richtmaß = "90"; }
+                    if (_Richtmaß[0] == 180 || _Richtmaß[0] == 360) { _Richtmaß[0] = 0; }
+                    if (_Richtmaß[0] == 90 || _Richtmaß[0] == 270) { _Richtmaß[0] = 90; }
 
-                    if (_Richtmaß != "0" && _Richtmaß != "90") { Develop.DebugPrint(enFehlerArt.Fehler, "Winkel nicht erlaubt: " + _Richtmaß); }
+                    if (_Richtmaß[0] != 0 && _Richtmaß[0] != 90) { Develop.DebugPrint(enFehlerArt.Fehler, "Winkel nicht erlaubt: " + _Richtmaß); }
 
                     break;
 
@@ -428,56 +378,55 @@ namespace BlueControls
         }
 
 
-        private string GetRichtmaß()
-        {
-            switch (_relationtype)
-            {
+        private List<decimal> GetRichtmaß() {
+            switch (_relationtype) {
                 case enRelationType.None:
                     Develop.DebugPrint(enFehlerArt.Fehler, "Der Type None ist nicht erlaubt");
-                    break;
+                    return new List<decimal>();
 
                 case enRelationType.WaagerechtSenkrecht:
-                    if (Math.Abs(Points[0].X) > 9999999 || Math.Abs(Points[0].Y) > 9999999) { return "-1"; }
+                    if (Math.Abs(Points[0].X) > 9999999 || Math.Abs(Points[0].Y) > 9999999) { return new List<decimal>() { -1 }; }
 
                     var tmp = Math.Round(Geometry.Winkel(Math.Round(Points[0].X, 2), Math.Round(Points[0].Y, 2), Math.Round(Points[1].X, 2), Math.Round(Points[1].Y, 2)), 2);
-                    switch (tmp)
-                    {
+                    switch (tmp) {
                         case 0M:
                         case 180M:
                         case 360M:
-                            return "0";
+                            return new List<decimal>() { 0 };
                         case 90M:
                         case 270M:
-                            return "90";
+                            return new List<decimal>() { 90 };
                         default:
-                            return tmp.ToString();
+                            return new List<decimal>() { tmp };
                     }
 
                 case enRelationType.PositionZueinander:
-                    return Math.Round(Points[0].X - Points[1].X, 1) + ";" + Math.Round(Points[0].Y - Points[1].Y, 1);
+
+                    return new List<decimal>() { Math.Round(Points[0].X - Points[1].X, 1), Math.Round(Points[0].Y - Points[1].Y, 1) };
+
+
 
                 case enRelationType.YPositionZueinander:
-                    return Math.Round(Points[0].Y - Points[1].Y, 1).ToString();
+                    return new List<decimal>() { Math.Round(Points[0].Y - Points[1].Y, 1) };
 
 
                 case enRelationType.Dummy:
-                    return string.Empty;
+                    return new List<decimal>();
 
                 case enRelationType.AbstandZueinander:
                     tmp = Math.Round(GeometryDF.Länge(Points[0], Points[1]), 5);
-                    return tmp.ToString();
+                    return new List<decimal>() { tmp };
 
                 default:
                     Develop.DebugPrint(_relationtype);
-                    break;
+                    return new List<decimal>();
             }
 
-            return string.Empty;
+
         }
 
 
-        public void Perform(List<PointM> pointOrder)
-        {
+        public void Perform(List<PointM> pointOrder) {
             if (Points.Count != 2) { return; }
 
             PointM Fix, Flex;
@@ -487,18 +436,13 @@ namespace BlueControls
             var p2 = pointOrder.IndexOf(Points[1]);
 
 
-            if (p1 > p2)
-            {
+            if (p1 > p2) {
                 Fix = Points[1];
                 Flex = Points[0];
-            }
-            else if (p1 < p2)
-            {
+            } else if (p1 < p2) {
                 Fix = Points[0];
                 Flex = Points[1];
-            }
-            else
-            {
+            } else {
                 return;
             }
 
@@ -532,46 +476,36 @@ namespace BlueControls
 
 
 
-            switch (_relationtype)
-            {
+            switch (_relationtype) {
                 case enRelationType.WaagerechtSenkrecht:
-                    if (_Richtmaß == "90")
-                    {
+                    if (_Richtmaß[0] == 90) {
                         Flex.SetTo(Fix.X, Flex.Y);
-                    }
-                    else
-                    {
+                    } else {
                         Flex.SetTo(Flex.X, Fix.Y);
                     }
                     break;
 
                 case enRelationType.PositionZueinander:
-                    var w = _Richtmaß.SplitBy(";");
+                    //var w = _Richtmaß.SplitBy(";");
 
-                    if (Fix == Points[1])
-                    {
-                        Flex.SetTo(Fix.X + decimal.Parse(w[0]), Fix.Y + decimal.Parse(w[1]));
-                    }
-                    else
-                    {
-                        Flex.SetTo(Fix.X - decimal.Parse(w[0]), Fix.Y - decimal.Parse(w[1]));
+                    if (Fix == Points[1]) {
+                        Flex.SetTo(Fix.X + _Richtmaß[0], Fix.Y + _Richtmaß[1]);
+                    } else {
+                        Flex.SetTo(Fix.X - _Richtmaß[0], Fix.Y - _Richtmaß[1]);
                     }
                     break;
 
                 case enRelationType.YPositionZueinander:
-                    if (Fix == Points[1])
-                    {
-                        Flex.SetTo(Flex.X, Fix.Y + decimal.Parse(_Richtmaß));
-                    }
-                    else
-                    {
-                        Flex.SetTo(Flex.X, Fix.Y - decimal.Parse(_Richtmaß));
+                    if (Fix == Points[1]) {
+                        Flex.SetTo(Flex.X, Fix.Y + _Richtmaß[0]);
+                    } else {
+                        Flex.SetTo(Flex.X, Fix.Y - _Richtmaß[0]);
                     }
                     break;
 
                 case enRelationType.AbstandZueinander:
                     var wi = GeometryDF.Winkel(Fix, Flex);
-                    Flex.SetTo(Fix, decimal.Parse(_Richtmaß), wi);
+                    Flex.SetTo(Fix, _Richtmaß[0], wi);
                     break;
 
                 default:
@@ -616,18 +550,15 @@ namespace BlueControls
         }
 
 
-        public string Richtmaß()
-        {
-            return _Richtmaß;
-        }
+        //public List<decimal> Richtmaß() {
+        //    return _Richtmaß;
+        //}
 
-        public enXY Connects()
-        {
-            switch (_relationtype)
-            {
+        public enXY Connects() {
+            switch (_relationtype) {
                 case enRelationType.WaagerechtSenkrecht:
-                    if (_Richtmaß != "90") { return enXY.X; }
-                    if ( _Richtmaß != "0") { return enXY.Y; }
+                    if (_Richtmaß[0] != 90) { return enXY.X; }
+                    if (_Richtmaß[0] != 0) { return enXY.Y; }
                     return enXY.none;
 
                 case enRelationType.PositionZueinander:
@@ -655,16 +586,14 @@ namespace BlueControls
         }
 
 
-        public bool SinngemäßIdenitisch(clsPointRelation R2)
-        {
+        public bool SinngemäßIdenitisch(clsPointRelation R2) {
             return SinngemäßIdenitisch(this, R2);
         }
 
 
 
 
-        public static bool SinngemäßIdenitisch(clsPointRelation R1, clsPointRelation R2)
-        {
+        public static bool SinngemäßIdenitisch(clsPointRelation R1, clsPointRelation R2) {
 
             if (R1 == null) { Develop.DebugPrint_Disposed(true); }
             if (R2 == null) { Develop.DebugPrint_Disposed(true); }
@@ -673,27 +602,24 @@ namespace BlueControls
             if (R1._relationtype != R2._relationtype) { return false; }
 
 
-            if (R1.Richtmaß() != R2.Richtmaß()) { return false; }
+            if (R1._Richtmaß.Count > -1 & R1._Richtmaß[0] != R2._Richtmaß[0]) { return false; }
+            if (R1._Richtmaß.Count > 0 & R1._Richtmaß[1] != R2._Richtmaß[1]) { return false; }
 
             return UsesSamePoints(R1, R2);
         }
 
-        public bool UsesSamePoints(clsPointRelation R2)
-        {
+        public bool UsesSamePoints(clsPointRelation R2) {
             return UsesSamePoints(this, R2);
         }
 
 
-        private static bool UsesSamePoints(clsPointRelation R1, clsPointRelation R2)
-        {
+        private static bool UsesSamePoints(clsPointRelation R1, clsPointRelation R2) {
 
-            foreach (var thisPoint in R1.Points)
-            {
+            foreach (var thisPoint in R1.Points) {
                 if (!R2.Points.Contains(thisPoint)) { return false; }
             }
 
-            foreach (var thisPoint in R2.Points)
-            {
+            foreach (var thisPoint in R2.Points) {
                 if (!R1.Points.Contains(thisPoint)) { return false; }
             }
             return true;
@@ -714,31 +640,26 @@ namespace BlueControls
         /// </summary>
         /// <param name="pointToCheck"></param>
         /// <returns></returns>
-        public bool NeedCount(PointM pointToCheck, List<PointM> allreadyUsed)
-        {
+        public bool NeedCount(PointM pointToCheck, List<PointM> allreadyUsed) {
             if (!Points.Contains(pointToCheck)) { return false; }
             if (allreadyUsed.Contains(pointToCheck)) { return false; }
 
 
-            foreach (var Thispoint2 in Points)
-            {
+            foreach (var Thispoint2 in Points) {
                 if (allreadyUsed.Contains(Thispoint2)) { return true; }
             }
 
             return false;
         }
 
-        public bool IsInternal()
-        {
-            for (var z = 0; z <= Points.Count - 2; z++)
-            {
+        public bool IsInternal() {
+            for (var z = 0; z <= Points.Count - 2; z++) {
                 if (Points[z].Parent != Points[z + 1].Parent) { return false; }
             }
             return true;
         }
 
-        public void OnChanged()
-        {
+        public void OnChanged() {
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
@@ -746,8 +667,7 @@ namespace BlueControls
 
 
 
-        private void Points_ListOrItemChanged(object sender, System.EventArgs e)
-        {
+        private void Points_ListOrItemChanged(object sender, System.EventArgs e) {
             OnChanged();
         }
 
@@ -756,8 +676,7 @@ namespace BlueControls
         /// Um zu prüfen, ob die Punkte zueinander stimmen, muss Performs benutzt werden.
         /// </summary>
         /// <returns></returns>
-        public bool IsOk(bool IsCreating)
-        {
+        public bool IsOk(bool IsCreating) {
             return string.IsNullOrEmpty(ErrorReason(IsCreating));
         }
 
@@ -766,8 +685,7 @@ namespace BlueControls
         /// Um zu prüfen, ob die Punkte zueinander stimmen, muss Performs benutzt werden.
         /// </summary>
         /// <returns></returns>
-        public string ErrorReason(bool IsCreating)
-        {
+        public string ErrorReason(bool IsCreating) {
 
 
             if (Points == null) { return "Keine Punkte definiert."; }
@@ -775,19 +693,16 @@ namespace BlueControls
             if (Points[0] == Points[1]) { return "Die Punkte verweisen auf sich selbst."; }
             if (_relationtype == enRelationType.None) { return "Der Type None ist nicht erlaubt"; }
 
-            if (!IsCreating)
-            {
+            if (!IsCreating) {
                 if (!ParentCollection.AllRelations.Contains(this)) { return "Beziehung nicht mehr vorhanden."; }
 
 
-                if (Parent is BasicPadItem ba)
-                {
+                if (Parent is BasicPadItem ba) {
                     if (!ParentCollection.Contains(ba)) { return "Objekt nicht mehr vorhanden"; }
                     if (!ba.Relations.Contains(this)) { return "Beziehung nicht mehr vorhanden."; }
                 }
 
-                foreach (var Thispoint in Points)
-                {
+                foreach (var Thispoint in Points) {
                     if (Thispoint == null) { return "Einer der Punkte ist null."; }
                     if (!ParentCollection.AllPoints.Contains(Thispoint)) { return "Punkt nicht mehr vorhanden."; }
                 }

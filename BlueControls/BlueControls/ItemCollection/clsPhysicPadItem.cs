@@ -10,24 +10,20 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace BlueControls.ItemCollection
-{
-    class clsPhysicPadItem : clsAbstractPhysicPadItem
-    {
+namespace BlueControls.ItemCollection {
+    class clsPhysicPadItem : clsAbstractPhysicPadItem {
 
 
         public readonly List<clsKraft> Kraft = new List<clsKraft>();
 
 
 
-        public clsPhysicPadItem(ItemCollectionPad parent) : base(parent, string.Empty)
-        {
+        public clsPhysicPadItem(ItemCollectionPad parent) : base(parent, string.Empty) {
 
         }
 
 
-        protected override string ClassId()
-        {
+        protected override string ClassId() {
             return "Physics-Object";
         }
         //public override bool Contains(PointF value, decimal zoomfactor)
@@ -46,10 +42,7 @@ namespace BlueControls.ItemCollection
         //    throw new NotImplementedException();
         //}
 
-        //protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
-        //{
-        //    throw new NotImplementedException();
-        //}
+
 
         //protected override void GenerateInternalRelationExplicit()
         //{

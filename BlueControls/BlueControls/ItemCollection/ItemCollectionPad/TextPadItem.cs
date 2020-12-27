@@ -178,7 +178,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
 
             if (Stil == PadStyles.Undefiniert) { return; }
@@ -206,7 +206,7 @@ namespace BlueControls.ItemCollection
             GR.ResetTransform();
 
 
-            base.DrawExplicit(GR, DCoordinates, cZoom, MoveX, MoveY, vState, SizeOfParentControl, ForPrinting);
+            base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
         }
 
         private string ChangeText(string tmpBody)

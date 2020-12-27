@@ -253,7 +253,7 @@ namespace BlueControls.ItemCollection
             return false;
         }
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
 
             if (Stil == PadStyles.Undefiniert) { return; }
@@ -269,16 +269,16 @@ namespace BlueControls.ItemCollection
             var PfeilG = (decimal)f.Font(geszoom).Size * 0.8m;
             var pen2 = f.Pen(cZoom);
 
-            GR.DrawLine(pen2, Point1.ZoomAndMove(cZoom, MoveX, MoveY), _Bezugslinie1.ZoomAndMove(cZoom, MoveX, MoveY)); // Bezugslinie 1
-            GR.DrawLine(pen2, Point2.ZoomAndMove(cZoom, MoveX, MoveY), _Bezugslinie2.ZoomAndMove(cZoom, MoveX, MoveY)); // Bezugslinie 2
-            GR.DrawLine(pen2, _SchnittPunkt1.ZoomAndMove(cZoom, MoveX, MoveY), _SchnittPunkt2.ZoomAndMove(cZoom, MoveX, MoveY)); // Maßhilfslinie
-            GR.DrawLine(pen2, _SchnittPunkt1.ZoomAndMove(cZoom, MoveX, MoveY), TextPointx.ZoomAndMove(cZoom, MoveX, MoveY)); // Maßhilfslinie
+            GR.DrawLine(pen2, Point1.ZoomAndMove(cZoom, shiftX, shiftY), _Bezugslinie1.ZoomAndMove(cZoom, shiftX, shiftY)); // Bezugslinie 1
+            GR.DrawLine(pen2, Point2.ZoomAndMove(cZoom, shiftX, shiftY), _Bezugslinie2.ZoomAndMove(cZoom, shiftX, shiftY)); // Bezugslinie 2
+            GR.DrawLine(pen2, _SchnittPunkt1.ZoomAndMove(cZoom, shiftX, shiftY), _SchnittPunkt2.ZoomAndMove(cZoom, shiftX, shiftY)); // Maßhilfslinie
+            GR.DrawLine(pen2, _SchnittPunkt1.ZoomAndMove(cZoom, shiftX, shiftY), TextPointx.ZoomAndMove(cZoom, shiftX, shiftY)); // Maßhilfslinie
 
 
             var sz1 = GR.MeasureString(AngezeigterText1(), f.Font(geszoom));
             var sz2 = GR.MeasureString(Text_unten, f.Font(geszoom));
-            var P1 = _SchnittPunkt1.ZoomAndMove(cZoom, MoveX, MoveY);
-            var P2 = _SchnittPunkt2.ZoomAndMove(cZoom, MoveX, MoveY);
+            var P1 = _SchnittPunkt1.ZoomAndMove(cZoom, shiftX, shiftY);
+            var P2 = _SchnittPunkt2.ZoomAndMove(cZoom, shiftX, shiftY);
 
 
 
@@ -297,7 +297,7 @@ namespace BlueControls.ItemCollection
 
 
 
-            var Mitte = TextPointx.ZoomAndMove(cZoom, MoveX, MoveY);
+            var Mitte = TextPointx.ZoomAndMove(cZoom, shiftX, shiftY);
 
 
             var TextWinkel = (float)(_Winkel % 360);

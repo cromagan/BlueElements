@@ -137,7 +137,7 @@ namespace BlueControls.ItemCollection {
 
 
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
             if (_tmpBMP == null) { GeneratePic(false); }
 
@@ -145,16 +145,20 @@ namespace BlueControls.ItemCollection {
             if (_tmpBMP != null) {
                 var scale = (float)Math.Min(DCoordinates.Width / (double)_tmpBMP.Width, DCoordinates.Height / (double)_tmpBMP.Height);
                 var r2 = new RectangleF(DCoordinates.Left, DCoordinates.Top, _tmpBMP.Width * scale, _tmpBMP.Height * scale);
-                GR.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                GR.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+
+                if (ForPrinting) {
+                    GR.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    GR.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                } else {
+                    GR.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
+                    GR.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                }
+
                 GR.DrawImage(_tmpBMP, r2, new RectangleF(0, 0, _tmpBMP.Width, _tmpBMP.Height), GraphicsUnit.Pixel);
             }
 
-            base.DrawExplicit(GR, DCoordinates, cZoom, MoveX, MoveY, vState, SizeOfParentControl, ForPrinting);
+            base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
 
-            //if (!ForPrinting) {
-            //    GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
-            //}
         }
 
 

@@ -925,7 +925,7 @@ namespace BlueControls.ItemCollection {
             return I;
         }
 
-        public bool Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, Size SizeOfParentControl, bool ForPrinting, List<BasicPadItem> VisibleItems) {
+        public bool Draw(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, Size SizeOfParentControl, bool ForPrinting, List<BasicPadItem> VisibleItems) {
 
 
             try {
@@ -937,7 +937,7 @@ namespace BlueControls.ItemCollection {
                         GR.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
 
                         if (VisibleItems == null || VisibleItems.Contains(thisItem)) {
-                            thisItem.Draw(GR, cZoom, MoveX, MoveY, 0, SizeOfParentControl, ForPrinting);
+                            thisItem.Draw(GR, cZoom, shiftX, shiftY, 0, SizeOfParentControl, ForPrinting);
                         }
                     }
                 }
@@ -1295,7 +1295,7 @@ namespace BlueControls.ItemCollection {
                                         AllRelations.Remove(r2);
                                         Relations_Optimize();
                                         return;
-                                    case enRelationType.WaagerechtSenkrecht when r2.RelationType == enRelationType.WaagerechtSenkrecht && r1.Richtmaß() != r2.Richtmaß():
+                                    case enRelationType.WaagerechtSenkrecht when r2.RelationType == enRelationType.WaagerechtSenkrecht && r1._Richtmaß[0] != r2._Richtmaß[0]:
                                         // Beziehungen mit gleichen punkten, aber spearat mit X und Y -> PositionZueinander konvertieren 
                                         r1.RelationType = enRelationType.PositionZueinander;
                                         r1.OverrideSavedRichtmaß(false, false);

@@ -244,7 +244,7 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             try {
 
                 if (!ForPrinting) {

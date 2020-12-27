@@ -150,7 +150,7 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
 
 
@@ -159,7 +159,7 @@ namespace BlueControls.ItemCollection {
 
 
             for (var z = 0; z <= _TempPoints.Count - 2; z++) {
-                GR.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(cZoom, MoveX, MoveY), _TempPoints[z + 1].ZoomAndMove(cZoom, MoveX, MoveY));
+                GR.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(cZoom, shiftX, shiftY), _TempPoints[z + 1].ZoomAndMove(cZoom, shiftX, shiftY));
             }
 
         }

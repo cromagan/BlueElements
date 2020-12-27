@@ -111,6 +111,8 @@ namespace BlueControls.Controls {
         private ItemCollectionPad _Item;
 
 
+        private DateTime lastredraw = DateTime.Now;
+
         #region  Events 
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
@@ -162,7 +164,7 @@ namespace BlueControls.Controls {
         internal Point MiddleOfVisiblesScreen() {
 
 
-            return new Point((int)((Width / 2 + _MoveX) / _Zoom), (int)((Height / 2 + _MoveY) / _Zoom));
+            return new Point((int)((Width / 2 + _shiftX) / _Zoom), (int)((Height / 2 + _shiftY) / _Zoom));
 
 
             //var x = (Width/2 / _Zoom)+ (decimal)SliderX.Value;
@@ -308,7 +310,7 @@ namespace BlueControls.Controls {
 
 
             if (_GivesMouseComandsTo != null) {
-                if (_GivesMouseComandsTo.KeyUp(this, e, _Zoom, _MoveX, _MoveY)) { return; }
+                if (_GivesMouseComandsTo.KeyUp(this, e, _Zoom, _shiftX, _shiftY)) { return; }
             }
 
 
@@ -369,7 +371,7 @@ namespace BlueControls.Controls {
             _LastQuickInfo = string.Empty;
 
             if (HotItem is IMouseAndKeyHandle ho2) {
-                if (ho2.MouseDown(this, e, _Zoom, _MoveX, _MoveY)) {
+                if (ho2.MouseDown(this, e, _Zoom, _shiftX, _shiftY)) {
                     _GivesMouseComandsTo = ho2;
                     return;
                 }
@@ -430,7 +432,7 @@ namespace BlueControls.Controls {
                     _GivesMouseComandsTo = null;
                     Invalidate();
                 } else {
-                    if (!_GivesMouseComandsTo.MouseMove(this, e, _Zoom, _MoveX, _MoveY)) {
+                    if (!_GivesMouseComandsTo.MouseMove(this, e, _Zoom, _shiftX, _shiftY)) {
                         _GivesMouseComandsTo = null;
                         Invalidate();
                     } else {
@@ -439,7 +441,7 @@ namespace BlueControls.Controls {
                 }
             } else {
                 if (HotItem is IMouseAndKeyHandle Ho2) {
-                    if (Ho2.MouseMove(this, e, _Zoom, _MoveX, _MoveY)) {
+                    if (Ho2.MouseMove(this, e, _Zoom, _shiftX, _shiftY)) {
                         _GivesMouseComandsTo = Ho2;
                         Invalidate();
                         return;
@@ -473,7 +475,7 @@ namespace BlueControls.Controls {
 
 
             if (_GivesMouseComandsTo != null) {
-                if (!_GivesMouseComandsTo.MouseUp(this, e, _Zoom, _MoveX, _MoveY)) {
+                if (!_GivesMouseComandsTo.MouseUp(this, e, _Zoom, _shiftX, _shiftY)) {
                     _GivesMouseComandsTo = null;
                 } else {
                     return;
@@ -622,9 +624,14 @@ namespace BlueControls.Controls {
 
         protected override void DrawControl(Graphics gr, enStates state) {
 
-            DrawCreativePadTo(gr, Size, state, _Zoom, _MoveX, _MoveY, null);
+            DrawCreativePadTo(gr, Size, state, _Zoom, _shiftX, _shiftY, null);
 
             Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, DisplayRectangle);
+
+            gr.DrawString(DateTime.Now.Subtract(lastredraw).TotalMilliseconds.ToString(), new Font("Arial", 10), Brushes.Red, PointF.Empty);
+
+            lastredraw = DateTime.Now;
+
         }
 
 
@@ -871,7 +878,7 @@ namespace BlueControls.Controls {
             var Nearest = decimal.MaxValue;
 
 
-            if (!_AutoRelation.HasFlag( enAutoRelationMode.Senkrecht) && !_AutoRelation.HasFlag( enAutoRelationMode.Waagerecht) && !_AutoRelation.HasFlag(enAutoRelationMode.DirektVerbindungen)) {
+            if (!_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht) && !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht) && !_AutoRelation.HasFlag(enAutoRelationMode.DirektVerbindungen)) {
                 return;
             }
 
@@ -905,7 +912,7 @@ namespace BlueControls.Controls {
 
 
             foreach (var ThisPoint in _Item.AllPoints) {
-                if (ThisPoint != null && ThisPoint.CanUsedForAutoRelation && ThisPoint.IsOnScreen(_Zoom, _MoveX, _MoveY, dr)) {
+                if (ThisPoint != null && ThisPoint.CanUsedForAutoRelation && ThisPoint.IsOnScreen(_Zoom, _shiftX, _shiftY, dr)) {
 
                     if (PointToTest.Parent == null || ThisPoint.Parent != PointToTest.Parent) {
                         var Distanz = GeometryDF.Länge(WillMoveTo, ThisPoint);
@@ -1023,7 +1030,7 @@ namespace BlueControls.Controls {
             if (e == null) { return new List<BasicPadItem>(); }
 
 
-            var P = new Point((int)((e.X + _MoveX) / _Zoom), (int)((e.Y + _MoveY) / _Zoom));
+            var P = new Point((int)((e.X + _shiftX) / _Zoom), (int)((e.Y + _shiftY) / _Zoom));
 
             var l = new List<BasicPadItem>();
 
@@ -1127,22 +1134,19 @@ namespace BlueControls.Controls {
             }
 
 
-            var r = new clsPointRelation(_Item, null, rel, Snap1, SnaP2);
+
+            // Prüfen, ob die Beziehung vielleicht schon vorhanden ist
+
+            var r = new clsPointRelation(_Item, null, rel, Snap1, SnaP2); ;
 
 
             foreach (var thisRelation in _Item.AllRelations) {
                 if (thisRelation != null) {
-                    if (thisRelation.RelationType == rel && thisRelation.Richtmaß() == r.Richtmaß()) {
-                        if (thisRelation.Points[0] == Snap1 && thisRelation.Points[1] == SnaP2) { return null; }
-                        if (thisRelation.Points[0] == SnaP2 && thisRelation.Points[1] == Snap1) { return null; }
-                    }
+                    if (thisRelation.SinngemäßIdenitisch(r)) { return null; }
                 }
             }
 
-
             return r;
-
-
         }
 
         private bool HängenZusammen(enXY toCheck, PointM point1, PointM point2, List<clsPointRelation> allreadyChecked) {

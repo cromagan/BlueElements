@@ -113,7 +113,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
         {
             if (Stil == PadStyles.Undefiniert) { return; }
 
@@ -123,7 +123,7 @@ namespace BlueControls.ItemCollection
             var p = new Pen(Color.FromArgb(30, c.R, c.G, c.B), 1);
             float ex = 0;
 
-            var po = NP.ZoomAndMove(cZoom, MoveX, MoveY);
+            var po = NP.ZoomAndMove(cZoom, shiftX, shiftY);
 
 
             var mo = (float)(modConverter.mmToPixel(GridShow, ItemCollectionPad.DPI) * cZoom);

@@ -200,7 +200,7 @@ namespace BlueControls.ItemCollection {
             return tmp.Contains(value);
         }
 
-        protected abstract void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting);
+        protected abstract void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting);
 
         protected abstract string ClassId();
 
@@ -476,19 +476,19 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public void Draw(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        public void Draw(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
 
             if (ForPrinting && !_Bei_Export_sichtbar) { return; }
 
-            var DCoordinates = UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY);
+            var DCoordinates = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
 
 
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
 
             if (!IsInDrawingArea(DCoordinates, SizeOfParentControl)) { return; }
 
-            DrawExplicit(GR, DCoordinates, cZoom, MoveX, MoveY, vState, SizeOfParentControl, ForPrinting);
+            DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
 
 
             if (!_Bei_Export_sichtbar) {
@@ -526,8 +526,8 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public void DrawOutline(Graphics GR, decimal cZoom, decimal MoveX, decimal MoveY, Color c) {
-            GR.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(cZoom, MoveX, MoveY));
+        public void DrawOutline(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, Color c) {
+            GR.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY));
         }
 
         protected bool IsInDrawingArea(RectangleF DrawingKoordinates, Size SizeOfParentControl) {

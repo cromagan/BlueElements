@@ -144,8 +144,8 @@ namespace BlueControls {
         }
 
 
-        public RectangleF ZoomAndMoveRect(decimal cZoom, decimal MoveX, decimal MoveY) {
-            return new RectangleF((int)(X * cZoom - MoveX + cZoom / 2), (int)(Y * cZoom - MoveY + cZoom / 2), (int)(Width * cZoom), (int)(Height * cZoom));
+        public RectangleF ZoomAndMoveRect(decimal cZoom, decimal shiftX, decimal shiftY) {
+            return new RectangleF((int)(X * cZoom - shiftX + cZoom / 2), (int)(Y * cZoom - shiftY + cZoom / 2), (int)(Width * cZoom), (int)(Height * cZoom));
         }
 
         /// <summary>

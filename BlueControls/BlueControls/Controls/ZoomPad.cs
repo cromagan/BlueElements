@@ -48,8 +48,8 @@ namespace BlueControls.Controls {
 
         protected bool _Fitting = true;
 
-        protected decimal _MoveX = -1;
-        protected decimal _MoveY = -1;
+        protected decimal _shiftX = -1;
+        protected decimal _shiftY = -1;
 
 
 
@@ -150,7 +150,7 @@ namespace BlueControls.Controls {
         /// <remarks>
         /// </remarks>
         protected Point KoordinatesUnscaled(System.Windows.Forms.MouseEventArgs e) {
-            return new Point((int)((e.X + _MoveX) / _Zoom), (int)((e.Y + _MoveY) / _Zoom));
+            return new Point((int)((e.X + _shiftX) / _Zoom), (int)((e.Y + _shiftY) / _Zoom));
         }
 
 
@@ -216,12 +216,12 @@ namespace BlueControls.Controls {
 
 
         private void SliderX_ValueChanged(object sender, System.EventArgs e) {
-            _MoveX = (decimal)SliderX.Value;
+            _shiftX = (decimal)SliderX.Value;
             Invalidate();
         }
 
         private void SliderY_ValueChanged(object sender, System.EventArgs e) {
-            _MoveY = (decimal)SliderY.Value;
+            _shiftY = (decimal)SliderY.Value;
             Invalidate();
         }
 

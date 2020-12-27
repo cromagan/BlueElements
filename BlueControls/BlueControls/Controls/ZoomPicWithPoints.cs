@@ -113,7 +113,7 @@ namespace BlueControls.Controls
             /// Punkte
             foreach (var ThisPoint in points)
             {
-                ThisPoint.Draw(e.G, e.Zoom, e.MoveX, e.MoveY, enDesign.Button_EckpunktSchieber, enStates.Standard, _Helper.HasFlag(enHelpers.PointNames));
+                ThisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard, _Helper.HasFlag(enHelpers.PointNames));
             }
         }
 
