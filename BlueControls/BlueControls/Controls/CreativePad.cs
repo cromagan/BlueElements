@@ -334,7 +334,7 @@ namespace BlueControls.Controls {
                 var p = KoordinatesUnscaled(e);
                 foreach (var thisPoint in _pointsSelected) {
 
-                    if (GeometryDF.Länge(thisPoint, new PointM(p)) < 5m / _Zoom) {
+                    if (thisPoint.UserSelectable &&  GeometryDF.Länge(thisPoint, new PointM(p)) < 5m / _Zoom) {
 
                         if (!thisPoint.CanMove(_Item.AllRelations)) {
                             Invalidate();
@@ -355,6 +355,7 @@ namespace BlueControls.Controls {
             if (point == null) { return; }
 
             _pointsSelected.Add(point);
+            Item.InvalidateOrder();
             ComputeMovingData();
             Invalidate();
         }
@@ -374,6 +375,7 @@ namespace BlueControls.Controls {
 
 
             _pointsSelected.AddIfNotExists(item.Points);
+            Item.InvalidateOrder();
             ComputeMovingData();
             Invalidate();
 
@@ -524,7 +526,7 @@ namespace BlueControls.Controls {
 
                     // Alle Punkte mit Order anzeigen
                     foreach (var ThisPoint in _Item.AllPoints) {
-                        ThisPoint.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
+                        ThisPoint.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, Item.AllPoints.IndexOf(ThisPoint).ToString());
                     }
                 }
 
@@ -535,9 +537,9 @@ namespace BlueControls.Controls {
 
                 foreach (var ThisPoint in _pointsSelected) {
                     if (ThisPoint.CanMove(_Item.AllRelations)) {
-                        ThisPoint.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard, false);
+                        ThisPoint.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard, string.Empty);
                     } else {
-                        ThisPoint.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
+                        ThisPoint.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, string.Empty);
                     }
                 }
 
@@ -1150,6 +1152,8 @@ namespace BlueControls.Controls {
 
 
         public void Unselect() {
+            if (_pointsSelected.Count > 0) { Item.InvalidateOrder(); }
+
             _pointsSelected.Clear();
             _pointsToMoveX.Clear();
             _pointsToMoveY.Clear();

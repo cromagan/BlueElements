@@ -64,7 +64,7 @@ namespace BlueControls.ItemCollection {
         public GridPadItem(ItemCollectionPad parent, PadStyles style, Point nullpunkt) : this(parent, string.Empty, style, nullpunkt) { }
 
         public GridPadItem(ItemCollectionPad parent, string internalname, PadStyles style, Point nullpunkt) : base(parent, internalname) {
-            NP = new PointM(this, "Nullpunkt", 0, 0, enXY.XY, false, true);
+            NP = new PointM(this, "Nullpunkt", 0, 0, true, false, true);
             NP.SetTo(nullpunkt);
             Stil = style;
 

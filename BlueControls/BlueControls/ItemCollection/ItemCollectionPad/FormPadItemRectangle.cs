@@ -61,17 +61,17 @@ namespace BlueControls.ItemCollection {
 
                 _größe_fixiert = value;
 
-                if (Größe_fixiert) {
-                    Points.AddIfNotExists(p_L);
-                    Points.AddIfNotExists(p_R);
-                    Points.AddIfNotExists(p_O);
-                    Points.AddIfNotExists(p_U);
-                } else {
-                    Points.Remove(p_L);
-                    Points.Remove(p_R);
-                    Points.Remove(p_O);
-                    Points.Remove(p_U);
-                }
+                //if (Größe_fixiert) {
+                //    Points.AddIfNotExists(p_L);
+                //    Points.AddIfNotExists(p_R);
+                //    Points.AddIfNotExists(p_O);
+                //    Points.AddIfNotExists(p_U);
+                //} else {
+                //    Points.Remove(p_L);
+                //    Points.Remove(p_R);
+                //    Points.Remove(p_O);
+                //    Points.Remove(p_U);
+                //}
 
                 RecalculateAndOnChanged();
             }
@@ -84,32 +84,30 @@ namespace BlueControls.ItemCollection {
         #region  Construktor 
 
         public FormPadItemRectangle(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
-            p_LO = new PointM(this, "LO", 0, 0, enXY.XY, true, true);
-            p_RO = new PointM(this, "RO", 0, 0);
+            p_LO = new PointM(this, "LO", 0, 0, false, true, true);
+            p_RO = new PointM(this, "RO", 0, 0, false);
             p_RU = new PointM(this, "RU", 0, 0);
             p_LU = new PointM(this, "LU", 0, 0);
 
-
-            p_L = new PointM(this, "L", 0, 0, enXY.X);
-            p_R = new PointM(this, "R", 0, 0, enXY.X);
-            p_O = new PointM(this, "O", 0, 0, enXY.Y);
-            p_U = new PointM(this, "U", 0, 0, enXY.Y);
-
-
-
-
+            p_L = new PointM(this, "L", 0, 0, false);
+            p_L.UserSelectable = false;
+            p_R = new PointM(this, "R", 0, 0, false);
+            p_R.UserSelectable = false;
+            p_O = new PointM(this, "O", 0, 0, false);
+            p_O.UserSelectable = false;
+            p_U = new PointM(this, "U", 0, 0, false);
+            p_U.UserSelectable = false;
 
             Points.Add(p_LO);
             Points.Add(p_RO);
             Points.Add(p_LU);
             Points.Add(p_RU);
+            Points.Add(p_L);
+            Points.Add(p_R);
+            Points.Add(p_U);
+            Points.Add(p_O);
 
-            if (Größe_fixiert) {
-                Points.Add(p_L);
-                Points.Add(p_R);
-                Points.Add(p_U);
-                Points.Add(p_O);
-            }
+
             Drehwinkel = 0;
         }
 

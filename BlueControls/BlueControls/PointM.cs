@@ -36,10 +36,9 @@ namespace BlueControls {
         private object _parent;
         private decimal _x;
         private decimal _y;
-        private enXY _moveable;
         private bool _canUsedForAutoRelation;
 
-        private int _order;
+        //private int _order;
 
         private bool _primaryGridSnapPoint;
 
@@ -50,7 +49,12 @@ namespace BlueControls {
         private decimal _StoreY;
 
 
-        public static Font SimpleArial = new Font("Arial", 8);
+        public static readonly Font SimpleArial = new Font("Arial", 8);
+
+        private bool _fix = false;
+
+        private bool _UserSelectable = true;
+
 
         #endregion
 
@@ -86,34 +90,35 @@ namespace BlueControls {
 
 
 
-        public PointM(object parent, string name, decimal x, decimal y, enXY moveable, bool canUsedForAutoRelation, bool primaryGridSnapPoint, string tag) {
+        public PointM(object parent, string name, decimal x, decimal y, bool fix, bool canUsedForAutoRelation, bool primaryGridSnapPoint, bool userselectable, string tag) {
             Initialize();
             _parent = parent;
             _x = x;
             _y = y;
             Name = name;
-            _moveable = moveable;
+            Fix = fix;
             _canUsedForAutoRelation = canUsedForAutoRelation;
             _primaryGridSnapPoint = primaryGridSnapPoint;
             _tag = tag;
+            _UserSelectable = userselectable;
         }
-        public PointM() : this(null, "Dummy Point ohne Angaben", 0m, 0m, enXY.XY, true, false, string.Empty) { }
-        public PointM(string name, decimal x, decimal y) : this(null, name, x, y, enXY.XY, true, false, string.Empty) { }
-        public PointM(object parent, string name, int x, int y, enXY moveable, bool canUsedForAutoRelation, bool primaryGridSnapPoint) : this(parent, name, (decimal)x, (decimal)y, moveable, canUsedForAutoRelation, primaryGridSnapPoint, string.Empty) { }
-        public PointM(object parent, string name, decimal x, decimal y) : this(parent, name, x, y, enXY.XY, true, false, string.Empty) { }
-        public PointM(PointF point) : this(null, "Dummy Point von PointF", (decimal)point.X, (decimal)point.Y, enXY.XY, true, false, string.Empty) { }
-        public PointM(int x, int y) : this(null, "Dummy Point von IntX und IntY", (decimal)x, (decimal)y, enXY.XY, true, false, string.Empty) { }
-        public PointM(double x, double y) : this(null, "Dummy Point von DoubleX und DoubleY", (decimal)x, (decimal)y, enXY.XY, true, false, string.Empty) { }
-        public PointM(decimal x, decimal y) : this(null, "Dummy Point von DecimalX und DecimalY", x, y, enXY.XY, true, false, string.Empty) { }
-        public PointM(PointM point) : this(null, "Dummy Point von PointM", point.X, point.Y, enXY.XY, true, false, string.Empty) { }
-        public PointM(object parent, string name, int x, int y, enXY moveable) : this(parent, name, (decimal)x, (decimal)y, moveable, true, false, string.Empty) { }
+        public PointM() : this(null, "Dummy Point ohne Angaben", 0m, 0m, false, true, false, true, string.Empty) { }
+        public PointM(string name, decimal x, decimal y) : this(null, name, x, y, false, true, false, true, string.Empty) { }
+        public PointM(object parent, string name, int x, int y, bool fix, bool canUsedForAutoRelation, bool primaryGridSnapPoint) : this(parent, name, (decimal)x, (decimal)y, fix, canUsedForAutoRelation, primaryGridSnapPoint, true, string.Empty) { }
+        public PointM(object parent, string name, decimal x, decimal y) : this(parent, name, x, y, false, true, false, true, string.Empty) { }
+        public PointM(PointF point) : this(null, "Dummy Point von PointF", (decimal)point.X, (decimal)point.Y, false, true, false, true, string.Empty) { }
+        public PointM(int x, int y) : this(null, "Dummy Point von IntX und IntY", (decimal)x, (decimal)y, false, true, false, true, string.Empty) { }
+        public PointM(double x, double y) : this(null, "Dummy Point von DoubleX und DoubleY", (decimal)x, (decimal)y, false, true, false, true, string.Empty) { }
+        public PointM(decimal x, decimal y) : this(null, "Dummy Point von DecimalX und DecimalY", x, y, false, true, false, true, string.Empty) { }
+        public PointM(PointM point) : this(null, "Dummy Point von PointM", point.X, point.Y, false, true, false, true, string.Empty) { }
+        public PointM(object parent, string name, int x, int y, bool fix) : this(parent, name, (decimal)x, (decimal)y, fix, true, false, true, string.Empty) { }
 
-        public PointM(object parent, string name, int x, int y, enXY moveable, bool canUsedForAutoRelation) : this(parent, name, (decimal)x, (decimal)y, moveable, canUsedForAutoRelation, false, string.Empty) { }
+        public PointM(object parent, string name, int x, int y, bool fix, bool canUsedForAutoRelation) : this(parent, name, (decimal)x, (decimal)y, fix, canUsedForAutoRelation, false, true, string.Empty) { }
 
-        public PointM(object parent, string name, decimal x, decimal y, enXY moveable, bool canUsedForAutoRelation) : this(parent, name, x, y, moveable, canUsedForAutoRelation, false, string.Empty) { }
+        public PointM(object parent, string name, decimal x, decimal y, bool fix, bool canUsedForAutoRelation) : this(parent, name, x, y, fix, canUsedForAutoRelation, false, true, string.Empty) { }
 
 
-        public PointM(object parent, PointM template) : this(parent, template.Name, template.X, template.Y, template.Moveable, template.CanUsedForAutoRelation, template.PrimaryGridSnapPoint, template.Tag) { }
+        public PointM(object parent, PointM template) : this(parent, template.Name, template.X, template.Y, template.Fix, template.CanUsedForAutoRelation, template.PrimaryGridSnapPoint, template.UserSelectable, template.Tag) { }
 
 
 
@@ -123,11 +128,10 @@ namespace BlueControls {
             _parent = null;
             _x = 0;
             _y = 0;
-            _moveable = enXY.XY;
+            Fix = false;
             _canUsedForAutoRelation = true;
             _primaryGridSnapPoint = false;
             _tag = string.Empty;
-            _order = int.MaxValue; // Muß sein, daß nicht angezeigte Punkte immer verschoben werden können und nie fix sind.
         }
 
         #endregion
@@ -175,17 +179,17 @@ namespace BlueControls {
             }
         }
 
-        public enXY Moveable {
-            get {
-                return _moveable;
-            }
+        //public enXY Moveable {
+        //    get {
+        //        return _moveable;
+        //    }
 
-            set {
-                if (_moveable == value) { return; }
-                _moveable = value;
-                OnChanged();
-            }
-        }
+        //    set {
+        //        if (_moveable == value) { return; }
+        //        _moveable = value;
+        //        OnChanged();
+        //    }
+        //}
 
         public bool CanUsedForAutoRelation {
             get {
@@ -195,6 +199,32 @@ namespace BlueControls {
             set {
                 if (_canUsedForAutoRelation == value) { return; }
                 _canUsedForAutoRelation = value;
+                OnChanged();
+            }
+        }
+
+
+        public bool Fix {
+            get {
+                return _fix;
+            }
+
+            set {
+                if (_fix == value) { return; }
+                _fix = value;
+                OnChanged();
+            }
+        }
+
+
+        public bool UserSelectable {
+            get {
+                return _UserSelectable;
+            }
+
+            set {
+                if (_UserSelectable == value) { return; }
+                _UserSelectable = value;
                 OnChanged();
             }
         }
@@ -268,16 +298,19 @@ namespace BlueControls {
                         _y = decimal.Parse(pair.Value);
                         break;
                     case "fix":
-
-                        if (pair.Value.FromPlusMinus()) {
-                            _moveable = enXY.none;
-                        } else {
-                            _moveable = enXY.XY;
-                        }
+                        Fix = pair.Value.FromPlusMinus();
+                        //if (pair.Value.FromPlusMinus()) {
+                        //    _moveable = enXY.none;
+                        //} else {
+                        //    _moveable = enXY.XY;
+                        //}
 
                         break;
                     case "moveable":
-                        _moveable = (enXY)int.Parse(pair.Value);
+                        //   _moveable = (enXY)int.Parse(pair.Value);
+
+
+                        Fix = (enXY)int.Parse(pair.Value) == enXY.none;
                         break;
 
                     case "getsnapped":
@@ -344,12 +377,11 @@ namespace BlueControls {
             if (!string.IsNullOrEmpty(_tag)) {
                 t = t + "Tag=" + _tag.ToNonCritical() + ", ";
             }
-            //if (_moveable)
-            //{
-            //    t = t + "Fix=" + _moveable + ", ";
-            //}
 
-            t = t + "Moveable=" + ((int)_moveable).ToString() + ", ";
+            t = t + "Fix=" + Fix.ToPlusMinus() + ", ";
+
+
+            //t = t + "Moveable=" + ((int)_moveable).ToString() + ", ";
 
             if (!_canUsedForAutoRelation) {
                 t = t + "GetSnapped=" + _canUsedForAutoRelation + ", ";
@@ -375,31 +407,32 @@ namespace BlueControls {
         }
 
 
-        public void Draw(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, enDesign Type, enStates State, bool DrawName) {
-            var tx = _x * cZoom - shiftX + cZoom / 2;
-            var ty = _y * cZoom - shiftY + cZoom / 2;
+        public void Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, enDesign type, enStates state, string textToDraw) {
+            var tx = _x * zoom - shiftX + zoom / 2;
+            var ty = _y * zoom - shiftY + zoom / 2;
 
             var r = new Rectangle((int)(tx - 4), (int)(ty - 4), 9, 9);
 
-            Skin.Draw_Back(GR, Type, State, r, null, false);
-            Skin.Draw_Border(GR, Type, State, r);
 
-
-            if (CreativePad.Debug_ShowPointOrder) {
-                if (_order >= 0) {
-                    GR.DrawString(_order.ToString(), SimpleArial, Brushes.Magenta, r.PointOf(enAlignment.Top_Right).X + Constants.GlobalRND.Next(-20, 10), r.PointOf(enAlignment.Top_Right).Y + Constants.GlobalRND.Next(-20, 10));
-                }
+            if (!_UserSelectable) {
+                type = enDesign.Button_EckpunktSchieber_Phantom;
+                state = enStates.Standard; 
             }
 
 
-            if (DrawName) {
+            Skin.Draw_Back(gr, type, state, r, null, false);
+            Skin.Draw_Border(gr, type, state, r);
+
+
+
+            if (!string.IsNullOrEmpty(textToDraw)) {
                 for (var x = -1; x < 2; x++) {
                     for (var y = -1; y < 2; y++) {
-                        GR.DrawString(Name, SimpleArial, Brushes.White, (float)tx + x, (float)ty + y - 16);
+                        gr.DrawString(textToDraw, SimpleArial, Brushes.White, (float)tx + x, (float)ty + y - 16);
                     }
 
                 }
-                GR.DrawString(Name, SimpleArial, Brushes.Black, (float)tx, (float)ty - 16);
+                gr.DrawString(textToDraw, SimpleArial, Brushes.Black, (float)tx, (float)ty - 16);
             }
 
         }
@@ -448,7 +481,7 @@ namespace BlueControls {
 
 
         private bool CanMove(enXY toCheck, List<clsPointRelation> Rel, List<clsPointRelation> Alredychecked) {
-            if (_moveable == enXY.none) { return false; }
+            if (Fix) { return false; }
 
 
             foreach (var ThisRelation in Rel) {
@@ -513,8 +546,8 @@ namespace BlueControls {
 
 
         internal string CompareKey() {
-            if (_x > int.MaxValue / 10.0m || _y > int.MaxValue / 10.0m || _x < int.MinValue / 10.0m || _y < int.MinValue / 10.0m) { return _order.ToString(Constants.Format_Integer10) + "|ZZZ-ZZZ"; }
-            return _order.ToString(Constants.Format_Integer10) + "|" + ((int)(_y * 10)).ToString(Constants.Format_Integer10) + "-" + ((int)(_x * 10)).ToString(Constants.Format_Integer10);
+            //if (_x > int.MaxValue / 10.0m || _y > int.MaxValue / 10.0m || _x < int.MinValue / 10.0m || _y < int.MinValue / 10.0m) { return "ZZZ-ZZZ"; }
+            return _y.ToString(Constants.Format_Float5_1) + "-" + _x.ToString(Constants.Format_Float5_1);
         }
 
 

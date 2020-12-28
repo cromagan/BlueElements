@@ -25,15 +25,13 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection
-{
-    public class DimensionPadItem : BasicPadItem
-    {
+namespace BlueControls.ItemCollection {
+    public class DimensionPadItem : BasicPadItem {
         #region  Variablen-Deklarationen 
 
-        private readonly PointM Point1 = new PointM(null, "Punkt 1", 0, 0, enXY.XY, false);
-        private readonly PointM Point2 = new PointM(null, "Punkt 2", 0, 0, enXY.XY, false);
-        private readonly PointM TextPointx = new PointM(null, "Mitte Text", 0, 0, enXY.XY, false);
+        private readonly PointM Point1 = new PointM(null, "Punkt 1", 0, 0, false, false);
+        private readonly PointM Point2 = new PointM(null, "Punkt 2", 0, 0, false, false);
+        private readonly PointM TextPointx = new PointM(null, "Mitte Text", 0, 0, false, false);
 
         private readonly PointM _SchnittPunkt1 = new PointM(null, "Schnittpunkt 1, Zeigt der Pfeil hin", 0, 0);
         private readonly PointM _SchnittPunkt2 = new PointM(null, "Schnittpunkt 2, Zeigt der Pfeil hin", 0, 0);
@@ -48,14 +46,11 @@ namespace BlueControls.ItemCollection
 
         public int Nachkommastellen { get; set; } = 1;
 
-        public string Text_oben
-        {
-            get
-            {
+        public string Text_oben {
+            get {
                 return _text_oben;
             }
-            set
-            {
+            set {
                 if (_text_oben == Länge_in_MM.ToString()) { value = string.Empty; }
                 _text_oben = value;
                 OnChanged();
@@ -92,8 +87,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public DimensionPadItem(ItemCollectionPad parent, string internalname, PointM cPoint1, PointM cPoint2, int AbstandinMM) : base(parent, internalname)
-        {
+        public DimensionPadItem(ItemCollectionPad parent, string internalname, PointM cPoint1, PointM cPoint2, int AbstandinMM) : base(parent, internalname) {
 
 
             Point1.SetTo(cPoint1.X, cPoint1.Y);
@@ -127,10 +121,7 @@ namespace BlueControls.ItemCollection
             Points.Add(Point1);
             Points.Add(Point2);
             Points.Add(TextPointx);
-
-
         }
-
 
         public DimensionPadItem(ItemCollectionPad parent, PointF cPoint1, PointF cPoint2, int AbstandInMM) : this(parent, new PointM(cPoint1), new PointM(cPoint2), AbstandInMM) { }
 
@@ -146,12 +137,10 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override bool ParseThis(string tag, string value)
-        {
+        public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
 
-            switch (tag)
-            {
+            switch (tag) {
                 case "text": // TODO: Alt 06.09.2019
                 case "text1":
                     Text_oben = value.FromNonCritical();
@@ -198,8 +187,7 @@ namespace BlueControls.ItemCollection
 
         protected override void GenerateInternalRelationExplicit() { }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
@@ -213,35 +201,29 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public string AngezeigterText1()
-        {
+        public string AngezeigterText1() {
             if (!string.IsNullOrEmpty(Text_oben)) { return Text_oben; }
             var s = Länge_in_MM.ToString(Constants.Format_Float10);
             s = s.Replace(".", ",");
 
-            if (s.Contains(","))
-            {
+            if (s.Contains(",")) {
                 s = s.TrimEnd("0");
                 s = s.TrimEnd(",");
             }
             return Präfix + s + Suffix;
         }
 
-        public decimal Länge_in_MM
-        {
-            get
-            {
+        public decimal Länge_in_MM {
+            get {
                 return Math.Round(modConverter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
             }
         }
 
-        protected override string ClassId()
-        {
+        protected override string ClassId() {
             return "DIMENSION";
         }
 
-        public override bool Contains(PointF value, decimal zoomfactor)
-        {
+        public override bool Contains(PointF value, decimal zoomfactor) {
             var ne = 5 / zoomfactor;
 
             if (value.DistanzZuStrecke(Point1, _Bezugslinie1) < ne) { return true; }
@@ -253,8 +235,7 @@ namespace BlueControls.ItemCollection
             return false;
         }
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
-        {
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
             if (Stil == PadStyles.Undefiniert) { return; }
 
@@ -284,13 +265,10 @@ namespace BlueControls.ItemCollection
 
 
 
-            if ((decimal)sz1.Width + PfeilG * 2m < Geometry.Länge(P1, P2))
-            {
+            if ((decimal)sz1.Width + PfeilG * 2m < Geometry.Länge(P1, P2)) {
                 DrawPfeil(GR, P1, Convert.ToDouble(_Winkel), f.Color_Main, PfeilG);
                 DrawPfeil(GR, P2, Convert.ToDouble(_Winkel + 180), f.Color_Main, PfeilG);
-            }
-            else
-            {
+            } else {
                 DrawPfeil(GR, P1, Convert.ToDouble(_Winkel + 180), f.Color_Main, PfeilG);
                 DrawPfeil(GR, P2, Convert.ToDouble(_Winkel), f.Color_Main, PfeilG);
             }
@@ -327,8 +305,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override RectangleM CalculateUsedArea()
-        {
+        protected override RectangleM CalculateUsedArea() {
             if (Stil == PadStyles.Undefiniert) { return new RectangleM(0, 0, 0, 0); }
             var geszoom = Parent.SheetStyleScale * Skalierung;
 
@@ -361,14 +338,12 @@ namespace BlueControls.ItemCollection
 
 
 
-        private void ComputeData()
-        {
+        private void ComputeData() {
             _Länge = GeometryDF.Länge(Point1, Point2);
             _Winkel = GeometryDF.Winkel(Point1, Point2);
         }
 
-        public override void CaluclatePointsWORelations()
-        {
+        public override void CaluclatePointsWORelations() {
             //Gegeben sind:
             // Point1, Point2 und Textpoint
 
@@ -383,8 +358,7 @@ namespace BlueControls.ItemCollection
             _SchnittPunkt2.SetTo(Point2, MaßL, _Winkel - 90);
 
 
-            if (TextPointx.DistanzZuLinie(_SchnittPunkt1, _SchnittPunkt2) > 0.5M)
-            {
+            if (TextPointx.DistanzZuLinie(_SchnittPunkt1, _SchnittPunkt2) > 0.5M) {
                 _SchnittPunkt1.SetTo(Point1, MaßL, _Winkel + 90);
                 _SchnittPunkt2.SetTo(Point2, MaßL, _Winkel + 90);
                 tmppW = 90;
@@ -398,8 +372,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override List<FlexiControl> GetStyleOptions()
-        {
+        public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>
             {
                 new FlexiControlForProperty(this, "Länge_in_MM"),
@@ -436,8 +409,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public static void DrawPfeil(Graphics GR, PointF Point, double Winkel, Color Col, decimal FontSize)
-        {
+        public static void DrawPfeil(Graphics GR, PointF Point, double Winkel, Color Col, decimal FontSize) {
             var m1 = FontSize * 1.5m;
             var Px2 = GeometryDF.PolarToCartesian(m1, Winkel + 10);
             var Px3 = GeometryDF.PolarToCartesian(m1, Winkel - 10);

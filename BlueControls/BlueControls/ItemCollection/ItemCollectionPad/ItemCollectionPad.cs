@@ -732,16 +732,16 @@ namespace BlueControls.ItemCollection {
 
             if (P_rLO == null) {
 
-                P_rLO = new PointM(this, "Druckbereich LO", 0, 0, enXY.none);
+                P_rLO = new PointM(this, "Druckbereich LO", 0, 0, true);
                 AllPoints.AddIfNotExists(P_rLO);
 
-                P_rRO = new PointM(this, "Druckbereich RO", 0, 0, enXY.none);
+                P_rRO = new PointM(this, "Druckbereich RO", 0, 0, true);
                 AllPoints.AddIfNotExists(P_rRO);
 
-                P_rRU = new PointM(this, "Druckbereich RU", 0, 0, enXY.none);
+                P_rRU = new PointM(this, "Druckbereich RU", 0, 0, true);
                 AllPoints.AddIfNotExists(P_rRU);
 
-                P_rLU = new PointM(this, "Druckbereich LU", 0, 0, enXY.none);
+                P_rLU = new PointM(this, "Druckbereich LU", 0, 0, true);
                 AllPoints.AddIfNotExists(P_rLU);
             }
 
@@ -1331,7 +1331,7 @@ namespace BlueControls.ItemCollection {
 
                     switch (Modus) {
                         case 0: // Unbewegliche Punkte hinzufügen
-                            if (Thispoint.Moveable == enXY.none) { AllPoints.Add(Thispoint); }
+                            if (Thispoint.Fix) { AllPoints.Add(Thispoint); }
                             break;
 
                         case 1: // Verbundene Punkte, die durch verbindungen X und Y Fix sind
@@ -1348,11 +1348,11 @@ namespace BlueControls.ItemCollection {
 
 
 
-                        case 2: // Y-Unbewegliche Punkte hinzufügen
-                            if (!Thispoint.Moveable.HasFlag(enXY.Y)) { AllPoints.Add(Thispoint); }
-                            break;
+                        //case 2: // Y-Unbewegliche Punkte hinzufügen
+                        //    if (!Thispoint.Moveable.HasFlag(enXY.Y)) { AllPoints.Add(Thispoint); }
+                        //    break;
 
-                        case 3: // Fixe Y-Punkte hinzufügen
+                        case 2: // Fixe Y-Punkte hinzufügen
                             foreach (var thisRelation in RelationY) {
                                 if (thisRelation.NeedCount(Thispoint, AllPoints)) {
                                     AllPoints.Add(Thispoint);
@@ -1364,11 +1364,11 @@ namespace BlueControls.ItemCollection {
 
                             break;
 
-                        case 4: // X-Unbewegliche Punkte hinzufügen
-                            if (!Thispoint.Moveable.HasFlag(enXY.X)) { AllPoints.Add(Thispoint); }
-                            break;
+                        //case 4: // X-Unbewegliche Punkte hinzufügen
+                        //    if (!Thispoint.Moveable.HasFlag(enXY.X)) { AllPoints.Add(Thispoint); }
+                        //    break;
 
-                        case 5: // Fixe X-Punkte hinzufügen
+                        case 3: // Fixe X-Punkte hinzufügen
                             foreach (var thisRelation in RelationX) {
                                 if (thisRelation.NeedCount(Thispoint, AllPoints)) {
                                     AllPoints.Add(Thispoint);
@@ -1379,7 +1379,7 @@ namespace BlueControls.ItemCollection {
                             }
                             break;
 
-                        case 6: // Punkte hinzufügen, die in einer Beziehung sind UND ein Punkt bereits einen Order hat
+                        case 4: // Punkte hinzufügen, die in einer Beziehung sind UND ein Punkt bereits einen Order hat
 
                             foreach (var thisRelation in RelationNone) {
                                 if (thisRelation.NeedCount(Thispoint, AllPoints)) {
@@ -1391,14 +1391,14 @@ namespace BlueControls.ItemCollection {
                             }
                             break;
 
-                        case 7: // Selectierte Punkte bevorzugen
+                        case 5: // Selectierte Punkte bevorzugen
                             if (Sel_P != null && Sel_P.Contains(Thispoint)) {
                                 AllPoints.Add(Thispoint);
                             }
 
                             break;
 
-                        case 8: // Der gute Rest
+                        case 6: // Der gute Rest
                             AllPoints.Add(Thispoint);
                             break;
 
@@ -1414,9 +1414,7 @@ namespace BlueControls.ItemCollection {
                     } else {
                         z++;
 
-                        if (z >= _Points.Count) {
-                            Modus++;
-                        }
+                        if (z >= _Points.Count) { Modus++; }
                     }
 
 

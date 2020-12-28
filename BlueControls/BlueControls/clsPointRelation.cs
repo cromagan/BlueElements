@@ -207,7 +207,7 @@ namespace BlueControls {
 
 
             foreach (var thispoint in Points) {
-                thispoint.Draw(GR, cZoom, shiftX, shiftY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, false);
+                thispoint.Draw(GR, cZoom, shiftX, shiftY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, string.Empty);
 
 
                 if (thispoint.Parent is BasicPadItem tempVar) {
@@ -487,8 +487,8 @@ namespace BlueControls {
         public enXY Connects() {
             switch (_relationtype) {
                 case enRelationType.WaagerechtSenkrecht:
-                    if (_Richtmaß[0] != 90) { return enXY.X; }
-                    if (_Richtmaß[0] != 0) { return enXY.Y; }
+                    if (_Richtmaß[0] == 90) { return enXY.X; } // Senkrecht, dann müssen X gleich sein
+                    if (_Richtmaß[0] == 0) { return enXY.Y; } // Waagerecht, dann müssen Y gleich sein
                     return enXY.none;
 
                 case enRelationType.PositionZueinander:
