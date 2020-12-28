@@ -86,7 +86,7 @@ namespace BlueControls {
             if (ToParse.Contains("ParentType=BlueControls.ItemCollection.ItemCollectionPad,")) {
                 ToParse = ToParse.Replace("ParentType=BlueControls.ItemCollection.ItemCollectionPad,", "ParentType=Main,");
             }
-
+            _Richtmaß.Clear();
 
 
             foreach (var pair in ToParse.GetAllTags()) {
@@ -96,11 +96,8 @@ namespace BlueControls {
                         break;
 
                     case "value":
-                        var x = pair.Value.FromNonCritical().SplitBy(";");
-                        _Richtmaß.Clear();
-                        foreach (var thisv in x) {
-                            _Richtmaß.Add(modConverter.DecimalParse(thisv));
-                        }
+                        //var x = modConverter.DecimalParse(pair.Value.FromNonCritical());
+                        //_Richtmaß.Add(x);
                         break;
 
                     case "point":
@@ -132,6 +129,12 @@ namespace BlueControls {
             Points.ThrowEvents = true;
 
             OverrideSavedRichtmaß(true, true);
+
+
+            //if (!IsOk(true)) {
+            //    _Richtmaß.Clear();
+            //    OverrideSavedRichtmaß(true, true);
+            //}
         }
 
 
@@ -176,9 +179,12 @@ namespace BlueControls {
 
         public override string ToString() {
 
-            var t = "{Type=" + (int)_relationtype +
-                     ", Value=" + _Richtmaß;
+            var t = "{Type=" + (int)_relationtype;
 
+
+            //foreach (var thisr in _Richtmaß) {
+            //    t = t + ", Value=" + thisr.ToString().ToNonCritical();
+            //}
 
             foreach (var thispoint in Points) {
                 t = t + ", Point=" + thispoint;
@@ -621,7 +627,9 @@ namespace BlueControls {
             if (Points == null) { return "Keine Punkte definiert."; }
             if (Points.Count < 2) { return "Zu wenige Punkte definiert."; }
             if (Points[0] == Points[1]) { return "Die Punkte verweisen auf sich selbst."; }
-            if (_relationtype == enRelationType.None) { return "Der Type None ist nicht erlaubt"; }
+            if (_relationtype == enRelationType.None) { return "Der Type None ist nicht erlaubt."; }
+
+            if (_relationtype == enRelationType.PositionZueinander && Points.Count < 2) { return "Zu wenige Punkte definiert."; }
 
             if (!IsCreating) {
                 if (!ParentCollection.AllRelations.Contains(this)) { return "Beziehung nicht mehr vorhanden."; }

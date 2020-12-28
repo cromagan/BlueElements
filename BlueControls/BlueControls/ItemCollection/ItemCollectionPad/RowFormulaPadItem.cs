@@ -36,7 +36,7 @@ namespace BlueControls.ItemCollection {
         #region  Variablen-Deklarationen 
         private Database ParseExplicit_TMPDatabase;
         private RowItem _Row;
-        private Bitmap _tmpBMP;
+        public Bitmap GeneratedBitmap;
         private string _LayoutID;
         private string _tmpQuickInfo;
         private string _lastQuickInfo;
@@ -121,8 +121,8 @@ namespace BlueControls.ItemCollection {
         }
 
         private void removePic() {
-            if (_tmpBMP != null) { _tmpBMP.Dispose(); }
-            _tmpBMP = null;
+            if (GeneratedBitmap != null) { GeneratedBitmap.Dispose(); }
+            GeneratedBitmap = null;
         }
 
         public override void DesignOrStyleChanged() {
@@ -139,12 +139,12 @@ namespace BlueControls.ItemCollection {
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
-            if (_tmpBMP == null) { GeneratePic(false); }
+            if (GeneratedBitmap == null) { GeneratePic(false); }
 
 
-            if (_tmpBMP != null) {
-                var scale = (float)Math.Min(DCoordinates.Width / (double)_tmpBMP.Width, DCoordinates.Height / (double)_tmpBMP.Height);
-                var r2 = new RectangleF(DCoordinates.Left, DCoordinates.Top, _tmpBMP.Width * scale, _tmpBMP.Height * scale);
+            if (GeneratedBitmap != null) {
+                var scale = (float)Math.Min(DCoordinates.Width / (double)GeneratedBitmap.Width, DCoordinates.Height / (double)GeneratedBitmap.Height);
+                var r2 = new RectangleF(DCoordinates.Left, DCoordinates.Top, GeneratedBitmap.Width * scale, GeneratedBitmap.Height * scale);
 
                 if (ForPrinting) {
                     GR.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
@@ -154,7 +154,7 @@ namespace BlueControls.ItemCollection {
                     GR.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
                 }
 
-                GR.DrawImage(_tmpBMP, r2, new RectangleF(0, 0, _tmpBMP.Width, _tmpBMP.Height), GraphicsUnit.Pixel);
+                GR.DrawImage(GeneratedBitmap, r2, new RectangleF(0, 0, GeneratedBitmap.Width, GeneratedBitmap.Height), GraphicsUnit.Pixel);
             }
 
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
@@ -252,9 +252,9 @@ namespace BlueControls.ItemCollection {
         private void GeneratePic(bool SizeChangeAllowed) {
 
             if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
-                _tmpBMP = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
+                GeneratedBitmap = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
                 RecalculateAndOnChanged();
-                if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + _tmpBMP.Width, p_LO.Y + _tmpBMP.Height); }
+                if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
                 return;
             }
 
@@ -265,18 +265,18 @@ namespace BlueControls.ItemCollection {
 
             var re = _pad.Item.MaxBounds(null);
 
-            if (_tmpBMP != null) {
-                if (_tmpBMP.Width != re.Width || _tmpBMP.Height != re.Height) {
+            if (GeneratedBitmap != null) {
+                if (GeneratedBitmap.Width != re.Width || GeneratedBitmap.Height != re.Height) {
                     removePic();
                 }
             }
 
-            if (_tmpBMP == null) { _tmpBMP = new Bitmap((int)re.Width, (int)re.Height); }
+            if (GeneratedBitmap == null) { GeneratedBitmap = new Bitmap((int)re.Width, (int)re.Height); }
 
             var mb = _pad.Item.MaxBounds(null);
 
-            var zoomv = _pad.ZoomFitValue(mb, false, _tmpBMP.Size);
-            var centerpos = _pad.CenterPos(mb, false, _tmpBMP.Size, zoomv);
+            var zoomv = _pad.ZoomFitValue(mb, false, GeneratedBitmap.Size);
+            var centerpos = _pad.CenterPos(mb, false, GeneratedBitmap.Size, zoomv);
             var slidervalues = _pad.SliderValues(mb, zoomv, centerpos);
 
             _pad.ShowInPrintMode = true;
@@ -286,10 +286,10 @@ namespace BlueControls.ItemCollection {
             if (Parent.SheetStyle != null) { _pad.Item.SheetStyle = Parent.SheetStyle; }
 
 
-            _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y, null);
+            _pad.DrawCreativePadToBitmap(GeneratedBitmap, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y, null);
 
 
-            if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + _tmpBMP.Width, p_LO.Y + _tmpBMP.Height); }
+            if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
 
             RecalculateAndOnChanged();
         }

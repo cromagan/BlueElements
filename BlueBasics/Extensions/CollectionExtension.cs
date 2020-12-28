@@ -48,7 +48,6 @@ namespace BlueBasics
             return string.Join(JoinChar, IC.ToArray()); // .TrimEnd(JoinChar);
         }
 
-
         public static void RemoveRange<t>(this ICollection<t> IC, List<t> remove)
         {
             foreach (var thisItem in remove)

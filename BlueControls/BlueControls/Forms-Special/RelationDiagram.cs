@@ -375,6 +375,112 @@ namespace BlueControls.Forms {
             //Pad.Relation_Add(enRelationType.PositionZueinander, P2, i.Point2);
         }
 
+        private void btnBilderExport_Click(object sender, System.EventArgs e) {
+
+
+            var fl = new System.Windows.Forms.FolderBrowserDialog();
+
+
+            fl.ShowDialog();
+
+
+
+            foreach (var thisR in Pad.Item) {
+
+
+                if (thisR is RowFormulaPadItem r) {
+
+
+                    var no = r.Row.CellFirstString();
+                    no = no.Replace(" ", "_");
+                    no = no.Replace(",", "_");
+                    no = no.Replace("__", "_");
+
+                    var newn = FileOperations.TempFile(fl.SelectedPath, no, "png");
+                    r.GeneratedBitmap.Save(newn, System.Drawing.Imaging.ImageFormat.Png);
+
+
+                    foreach (var thisc in r.Row.Database.Column) {
+                        if (thisc.Format == enDataFormat.Link_To_Filesystem) {
+
+                            var l = r.Row.CellGetList(thisc);
+
+                            foreach (var thiss in l) {
+
+                                var f = thisc.BestFile(thiss, false);
+
+                                if (FileOperations.FileExists(f)) {
+
+                                    var n2 = r.Row.CellFirstString() + "-" + thisc.Caption;
+                                    n2 = n2.Replace(" ", "_");
+                                    n2 = n2.Replace(",", "_");
+                                    n2 = n2.Replace("__", "_");
+                                    var newn2 = FileOperations.TempFile(fl.SelectedPath, n2, f.FileSuffix());
+                                    FileOperations.CopyFile(f, newn2, true);
+                                }
+                            }
+
+
+
+
+                        }
+                    }
+                }
+            }
+        }
+
+        private void btnTextExport_Click(object sender, System.EventArgs e) {
+
+            var fl = new System.Windows.Forms.FolderBrowserDialog();
+
+
+            fl.ShowDialog();
+
+
+            var l = new List<string>();
+
+
+            foreach (var thisR in Pad.Item) {
+
+
+                if (thisR is RowFormulaPadItem r) {
+
+                    r.Row.DoAutomatic(true, true);
+
+                    l.Add("#######################################################################");
+                    l.Add(" ");
+                    l.Add(r.Row.CellFirstString());
+                    l.Add(" ");
+
+                    var t = r.Row.CellGetList(_column);
+                    l.AddRange(t);
+                    l.Add(" ");
+                    l.Add(" ");
+                    l.Add(" ");
+                    l.Add(" ");
+                    l.Add(" ");
+
+
+                    var no = r.Row.CellFirstString();
+                    no = no.Replace(" ", "_");
+                    no = no.Replace(",", "_");
+                    no = no.Replace("__", "_");
+
+                    var newn = FileOperations.TempFile(fl.SelectedPath, no, "txt");
+                    t.Save(newn, false);
+
+
+
+                }
+            }
+
+
+            var newn2 = FileOperations.TempFile(fl.SelectedPath, "+++ALLES+++", "txt");
+
+            l.Save(newn2, true);
+
+        }
+
 
         //Private Sub Entwirren()
 
