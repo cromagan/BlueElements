@@ -64,12 +64,12 @@ namespace BlueControls.ItemCollection {
         /// <summary>
         /// Alle Punkte. Im Regelfall nach Wichtigkeit aufsteigend sortiert
         /// </summary>
-        public readonly ListExt<PointM> AllPoints;
+        public readonly ListExt<PointM> AllPoints = new ListExt<PointM>();
 
         /// <summary>
         /// Alle Beziehungen. Im Regelfall nach Wichtigkeit aufsteigens sortiert
         /// </summary>
-        public readonly ListExt<clsPointRelation> AllRelations;
+        public readonly ListExt<clsPointRelation> AllRelations = new ListExt<clsPointRelation>();
 
 
         #endregion
@@ -151,14 +151,6 @@ namespace BlueControls.ItemCollection {
             _SheetStyleScale = 1.0m;
 
             if (Skin.StyleDB != null) { _SheetStyle = Skin.StyleDB.Row.First(); }
-
-            AllRelations = new ListExt<clsPointRelation>();
-            AllRelations.ItemAdded += PointOrRelation_ItemAdded;
-            AllRelations.ItemRemoved += PointOrRelation_ItemRemoved;
-
-            AllPoints = new ListExt<PointM>();
-            AllPoints.ItemAdded += PointOrRelation_ItemAdded;
-            AllPoints.ItemRemoved += PointOrRelation_ItemRemoved;
 
         }
 
@@ -549,7 +541,7 @@ namespace BlueControls.ItemCollection {
             AllRelations.AddIfNotExists(item.Relations); // Eigentlich überflüssig
 
             IsSaved = false;
-            InvalidateOrder();
+
 
             item.Changed += Item_Changed;
             item.PointOrRelationsChanged += Item_PointOrRelationsChanged;
@@ -568,6 +560,7 @@ namespace BlueControls.ItemCollection {
 
             var ni = (BasicPadItem)sender;
 
+            InvalidateOrder();
 
             AllPoints.AddIfNotExists(ni.Points);
             AllRelations.AddIfNotExists(ni.Relations);
@@ -576,7 +569,7 @@ namespace BlueControls.ItemCollection {
             RemoveInvalidRelations();
         }
 
-        private void RemoveInvalidPoints() {
+        public void RemoveInvalidPoints() {
 
             /// Zuerst die Punkte
             foreach (var ThisPoint in AllPoints) {
@@ -586,20 +579,17 @@ namespace BlueControls.ItemCollection {
                     if (ThisPoint.Parent is BasicPadItem Pad) {
                         if (!Contains(Pad)) {
                             AllPoints.Remove(ThisPoint);
-                            InvalidateOrder();
                             RemoveInvalidPoints(); //Rekursiv
                             return;
                         }
                     } else if (ThisPoint.Parent is ItemCollectionPad ICP) {
                         if (ICP != this) {
                             AllPoints.Remove(ThisPoint);
-                            InvalidateOrder();
                             RemoveInvalidPoints(); //Rekursiv
                             return;
                         }
                     } else {
                         AllPoints.Remove(ThisPoint);
-                        InvalidateOrder();
                         RemoveInvalidPoints(); //Rekursiv
                         return;
                     }
@@ -781,10 +771,16 @@ namespace BlueControls.ItemCollection {
         }
 
 
+        protected override void OnItemRemoved() {
+            base.OnItemRemoved();
+            RemoveInvalidPoints();
+            RemoveInvalidRelations();
+            InvalidateOrder();
+        }
+
         public override void OnChanged() {
             base.OnChanged();
             IsSaved = false;
-            InvalidateOrder();
             OnDoInvalidate();
         }
 
@@ -925,7 +921,7 @@ namespace BlueControls.ItemCollection {
             return I;
         }
 
-        public bool Draw(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, Size SizeOfParentControl, bool ForPrinting, List<BasicPadItem> VisibleItems) {
+        public bool Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, Size sizeOfParentControl, bool forPrinting, List<BasicPadItem> visibleItems) {
 
 
             try {
@@ -934,10 +930,10 @@ namespace BlueControls.ItemCollection {
 
                 foreach (var thisItem in this) {
                     if (thisItem != null) {
-                        GR.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
+                        gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
 
-                        if (VisibleItems == null || VisibleItems.Contains(thisItem)) {
-                            thisItem.Draw(GR, cZoom, shiftX, shiftY, 0, SizeOfParentControl, ForPrinting);
+                        if (visibleItems == null || visibleItems.Contains(thisItem)) {
+                            thisItem.Draw(gr, zoom, shiftX, shiftY, 0, sizeOfParentControl, forPrinting);
                         }
                     }
                 }
@@ -1117,7 +1113,7 @@ namespace BlueControls.ItemCollection {
             ComputeOrders(null);
             foreach (var ThisRelation in AllRelations) {
                 ThisRelation.Perform(AllPoints);
-            } 
+            }
         }
 
 
@@ -1166,7 +1162,6 @@ namespace BlueControls.ItemCollection {
                             if (Cb.Contains(ThisRelation.Points[0]) && Cb.Contains(ThisRelation.Points[1])) {
                                 ThisRelation.RelationType = enRelationType.PositionZueinander;
                                 ThisRelation.OverrideSavedRichtmaß(false, false);
-                                InvalidateOrder();
                                 Relations_Optimize();
                                 return;
                             }
@@ -1192,14 +1187,12 @@ namespace BlueControls.ItemCollection {
 
                                         if (R1.Points[0].Parent == R2.Points[0].Parent && R1.Points[1].Parent == R2.Points[1].Parent) {
                                             AllRelations.Remove(R1);
-                                            InvalidateOrder();
                                             Relations_Optimize();
                                             return;
                                         }
 
                                         if (R1.Points[0].Parent == R2.Points[1].Parent && R1.Points[1].Parent == R2.Points[0].Parent) {
                                             AllRelations.Remove(R1);
-                                            InvalidateOrder();
                                             Relations_Optimize();
                                             return;
                                         }
@@ -1251,15 +1244,6 @@ namespace BlueControls.ItemCollection {
         public void InvalidateOrder() {
             _OrdersValid = false;
         }
-
-        private void PointOrRelation_ItemRemoved(object sender, System.EventArgs e) {
-            InvalidateOrder();
-        }
-
-        private void PointOrRelation_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            InvalidateOrder();
-        }
-
         public PointM Getbetterpoint(double X, double Y, PointM notPoint, bool MustUsableForAutoRelation) {
 
             foreach (var thispoint in AllPoints) {

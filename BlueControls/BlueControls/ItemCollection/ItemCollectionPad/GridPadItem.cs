@@ -25,16 +25,14 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Reflection;
 
-namespace BlueControls.ItemCollection
-{
+namespace BlueControls.ItemCollection {
     // LinenKollision
     //http://www.vb-fun.de/cgi-bin/loadframe.pl?ID=vb/tipps/tip0294.shtml
 
     //'Imports Microsoft.VisualBasic
 
 
-    public class GridPadItem : BasicPadItem
-    {
+    public class GridPadItem : BasicPadItem {
 
 
 
@@ -65,8 +63,7 @@ namespace BlueControls.ItemCollection
 
         public GridPadItem(ItemCollectionPad parent, PadStyles style, Point nullpunkt) : this(parent, string.Empty, style, nullpunkt) { }
 
-        public GridPadItem(ItemCollectionPad parent, string internalname, PadStyles style, Point nullpunkt) : base(parent, internalname)
-        {
+        public GridPadItem(ItemCollectionPad parent, string internalname, PadStyles style, Point nullpunkt) : base(parent, internalname) {
             NP = new PointM(this, "Nullpunkt", 0, 0, enXY.XY, false, true);
             NP.SetTo(nullpunkt);
             Stil = style;
@@ -91,30 +88,25 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        protected override string ClassId()
-        {
+        protected override string ClassId() {
             return "GRID";
         }
 
-        public override bool Contains(PointF value, decimal zoomfactor)
-        {
+        public override bool Contains(PointF value, decimal zoomfactor) {
             return false;
         }
 
 
 
-        protected override RectangleM CalculateUsedArea()
-        {
-
-
-            var r = new RectangleM(Parent.DruckbereichRect()); // muss der gesamte druckbereich sein, ansonsten wirds ja nicht angezeigt, wenn der NP ausserhalb dem Bild ist
-            r.ExpandTo(NP);
-            return r;
+        protected override RectangleM CalculateUsedArea() {
+            //var r = new RectangleM(Parent.DruckbereichRect()); // muss der gesamte druckbereich sein, ansonsten wirds ja nicht angezeigt, wenn der NP ausserhalb dem Bild ist
+            //r.ExpandTo(NP);
+            //return r;
+            return new RectangleM(NP.X - 10, NP.Y - 10, 20, 20);
         }
 
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
-        {
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
 
             var c = Skin.GetBlueFont(Stil, Parent.SheetStyle).Color_Main;
@@ -129,43 +121,36 @@ namespace BlueControls.ItemCollection
             var mo = (float)(modConverter.mmToPixel(GridShow, ItemCollectionPad.DPI) * cZoom);
 
             var count = 0;
-            do
-            {
+            do {
                 count++;
                 if (count > 20) { break; }
                 if (mo < 5) { mo *= 2; }
             } while (true);
 
-            if (mo >= 5)
-            {
-                do
-                {
+            if (mo >= 5) {
+                do {
                     GR.DrawLine(p, po.X + (int)ex, 0, po.X + (int)ex, SizeOfParentControl.Height);
                     GR.DrawLine(p, 0, po.Y + (int)ex, SizeOfParentControl.Width, po.Y + (int)ex);
 
-                    if (ex > 0)
-                    {
+                    if (ex > 0) {
                         GR.DrawLine(p, po.X - (int)ex, 0, po.X - (int)ex, SizeOfParentControl.Height);
                         GR.DrawLine(p, 0, po.Y - (int)ex, SizeOfParentControl.Width, po.Y - (int)ex);
                     }
 
                     ex += mo;
-                    if (po.X - ex < 0 && po.Y - ex < 0 && po.X + ex > SizeOfParentControl.Width && po.Y + ex > SizeOfParentControl.Height)
-                    {
+                    if (po.X - ex < 0 && po.Y - ex < 0 && po.X + ex > SizeOfParentControl.Width && po.Y + ex > SizeOfParentControl.Height) {
                         break;
                     }
                 } while (true);
             }
 
 
-            if (!ForPrinting)
-            {
+            if (!ForPrinting) {
 
                 GR.DrawImage(NPEMF, new RectangleF(po.X - 7, po.Y - 7, 15, 15));
             }
         }
-        public override void Move(decimal x, decimal y)
-        {
+        public override void Move(decimal x, decimal y) {
             NP.SetTo(NP.X + x, NP.Y + y);
             base.Move(x, y);
         }
@@ -179,12 +164,10 @@ namespace BlueControls.ItemCollection
         //}
 
 
-        public override bool ParseThis(string tag, string value)
-        {
+        public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
 
-            switch (tag)
-            {
+            switch (tag) {
                 case "grid":
                     GridShow = int.Parse(value);
                     return true;
@@ -195,8 +178,7 @@ namespace BlueControls.ItemCollection
 
         protected override void ParseFinished() { }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             return t + "Grid=" + GridShow + "}";
@@ -205,8 +187,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override List<FlexiControl> GetStyleOptions()
-        {
+        public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>();
 
             AddLineStyleOption(l);

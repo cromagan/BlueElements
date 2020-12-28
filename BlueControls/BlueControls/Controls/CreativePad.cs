@@ -50,11 +50,6 @@ namespace BlueControls.Controls {
             Item = itemCollectionPad;
 
             Unselect();
-
-
-            _pointsSelected.ItemAdded += pointsSelected_ItemAdded;
-            _pointsSelected.ItemRemoved += pointsSelected_ItemRemoved;
-
             _MouseHighlight = false;
         }
 
@@ -113,7 +108,7 @@ namespace BlueControls.Controls {
         private ItemCollectionPad _Item;
 
 
-        private DateTime lastredraw = DateTime.Now;
+        //private DateTime lastredraw = DateTime.Now;
 
         #region  Events 
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
@@ -243,18 +238,6 @@ namespace BlueControls.Controls {
 
 
         #endregion
-
-
-
-
-        private void pointsSelected_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            _Item.InvalidateOrder();
-        }
-
-        private void pointsSelected_ItemRemoved(object sender, System.EventArgs e) {
-            _Item.InvalidateOrder();
-        }
-
         private void Item_DoInvalidate(object sender, System.EventArgs e) {
             Invalidate();
         }
@@ -439,6 +422,7 @@ namespace BlueControls.Controls {
             if (MouseDownPos_1_1 != null && e.Button == System.Windows.Forms.MouseButtons.Left) {
                 _LastQuickInfo = string.Empty;
                 MoveItems();
+                Refresh(); // Ansonsten werden einige Redraws übersprungen
             }
         }
 
@@ -596,14 +580,8 @@ namespace BlueControls.Controls {
         }
 
         protected override void DrawControl(Graphics gr, enStates state) {
-
             DrawCreativePadTo(gr, Size, state, _Zoom, _shiftX, _shiftY, null);
-
             Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, DisplayRectangle);
-
-            gr.DrawString(DateTime.Now.Subtract(lastredraw).TotalMilliseconds.ToString(), new Font("Arial", 10), Brushes.Red, PointF.Empty);
-
-            lastredraw = DateTime.Now;
         }
 
         private void _Item_ItemRemoved(object sender, System.EventArgs e) {
@@ -648,15 +626,10 @@ namespace BlueControls.Controls {
                 foreach (var thispoint in _Item.AllPoints) {
                     if (!done.Contains(thispoint.Parent)) {
                         done.Add(thispoint.Parent);
-
-                        if (thispoint.Parent is BasicPadItem bpi) {
-                            bpi.OnChanged();
-                        }
-
+                        if (thispoint.Parent is BasicPadItem bpi) { bpi.OnChanged(); } // Allen Items mitteilen, dass sich was geändert hat. Zb. Ihr Zeichenbereich
                     }
-
-
                 }
+
                 SelectedItems_CaluclatePointsWORelations();
 
             }
@@ -788,8 +761,6 @@ namespace BlueControls.Controls {
                     _NewAutoRelations.Clear();
                 }
             }
-
-
             MouseDownPos_1_1 = new Point((int)(MouseDownPos_1_1.X + move.X), (int)(MouseDownPos_1_1.Y + move.Y));
         }
 

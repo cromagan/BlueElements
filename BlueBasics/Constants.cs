@@ -23,10 +23,8 @@ using System;
 // http://www.carlosag.net/tools/codetranslator/
 // http://converter.telerik.com/
 
-namespace BlueBasics
-{
-    public static class Constants
-    {
+namespace BlueBasics {
+    public static class Constants {
 
         //public const char beTab = (char)9;
 
@@ -110,5 +108,6 @@ namespace BlueBasics
         public const string Format_Float10_1 = "0000000000.#";
         public const string Format_Float10_2 = "0000000000.##";
         public const string Format_Float10_3 = "0000000000.###";
+        public const string Format_Float5_1 = "00000.0";
     }
 }

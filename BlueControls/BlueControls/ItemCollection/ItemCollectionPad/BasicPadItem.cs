@@ -476,25 +476,25 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public void Draw(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        public void Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
 
-            if (ForPrinting && !_Bei_Export_sichtbar) { return; }
+            if (forPrinting && !_Bei_Export_sichtbar) { return; }
 
-            var DCoordinates = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
+            var DCoordinates = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY);
 
 
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
 
-            if (!IsInDrawingArea(DCoordinates, SizeOfParentControl)) { return; }
+            if (!IsInDrawingArea(DCoordinates, sizeOfParentControl) && !(this is GridPadItem)) { return; }
 
-            DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
+            DrawExplicit(gr, DCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
 
 
             if (!_Bei_Export_sichtbar) {
 
-                if (IsInDrawingArea(DCoordinates, SizeOfParentControl)) {
-                    GR.DrawImage(QuickImage.Get("Drucker|16||1").BMP, DCoordinates.X, DCoordinates.Y);
+                if (IsInDrawingArea(DCoordinates, sizeOfParentControl)) {
+                    gr.DrawImage(QuickImage.Get("Drucker|16||1").BMP, DCoordinates.X, DCoordinates.Y);
                 }
             }
         }

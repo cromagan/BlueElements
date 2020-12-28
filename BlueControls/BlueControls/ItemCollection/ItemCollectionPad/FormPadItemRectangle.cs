@@ -103,11 +103,13 @@ namespace BlueControls.ItemCollection {
             Points.Add(p_RO);
             Points.Add(p_LU);
             Points.Add(p_RU);
-            Points.Add(p_L);
-            Points.Add(p_R);
-            Points.Add(p_U);
-            Points.Add(p_O);
 
+            if (Größe_fixiert) {
+                Points.Add(p_L);
+                Points.Add(p_R);
+                Points.Add(p_U);
+                Points.Add(p_O);
+            }
             Drehwinkel = 0;
         }
 

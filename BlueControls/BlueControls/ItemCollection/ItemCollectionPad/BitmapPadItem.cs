@@ -198,7 +198,14 @@ namespace BlueControls.ItemCollection
             {
                 if (Bitmap != null)
                 {
-                    GR.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    if (ForPrinting) {
+                        GR.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        GR.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    } else {
+                        GR.InterpolationMode = InterpolationMode.Low;
+                        GR.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+                    }
+
                     GR.DrawImage(Bitmap, r2, r3, GraphicsUnit.Pixel);
                 }
             }
