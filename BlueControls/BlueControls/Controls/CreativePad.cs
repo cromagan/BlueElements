@@ -49,16 +49,11 @@ namespace BlueControls.Controls {
 
             Item = itemCollectionPad;
 
+            Unselect();
 
-            _NewAutoRelations.Clear();
 
-
-            Sel_P = new ListExt<PointM>();
-            Sel_P.ItemAdded += Sel_P_ItemAdded;
-            Sel_P.ItemRemoved += Sel_P_ItemRemoved;
-
-            Move_X.Clear();
-            Move_Y.Clear();
+            _pointsSelected.ItemAdded += pointsSelected_ItemAdded;
+            _pointsSelected.ItemRemoved += pointsSelected_ItemRemoved;
 
             _MouseHighlight = false;
         }
@@ -84,18 +79,25 @@ namespace BlueControls.Controls {
         private readonly List<clsPointRelation> _NewAutoRelations = new List<clsPointRelation>();
 
 
+
+        private List<PointM> _pointsOnScreenWichAreNotSelected = null;
+
+
         /// <summary>
         /// Die Punkte, die zum Schieben markiert sind.
         /// </summary>
-        private readonly ListExt<PointM> Sel_P;
+        private readonly ListExt<PointM> _pointsSelected = new ListExt<PointM>();
         /// <summary>
         /// Diese Punkte bewegen sich in der X-Richtung mit
         /// </summary>
-        private readonly List<PointM> Move_X = new List<PointM>();
+        private readonly List<PointM> _pointsToMoveX = new List<PointM>();
         /// <summary>
         /// Diese Punkte bewegen sich in der Y-Richtung mit
         /// </summary>
-        private readonly List<PointM> Move_Y = new List<PointM>();
+        private readonly List<PointM> _pointsToMoveY = new List<PointM>();
+
+        private readonly List<BasicPadItem> _ItemsToMove = new List<BasicPadItem>();
+
 
         private string _LastQuickInfo = string.Empty;
 
@@ -162,19 +164,8 @@ namespace BlueControls.Controls {
         }
 
         internal Point MiddleOfVisiblesScreen() {
-
-
             return new Point((int)((Width / 2 + _shiftX) / _Zoom), (int)((Height / 2 + _shiftY) / _Zoom));
-
-
-            //var x = (Width/2 / _Zoom)+ (decimal)SliderX.Value;
-            //var y = (Height2 / _Zoom) + (decimal)SliderY.Value;
-
-            //return new Point((int)x, (int)y);
-
         }
-
-
 
 
         [DefaultValue(10.0)]
@@ -256,27 +247,17 @@ namespace BlueControls.Controls {
 
 
 
-        private void Sel_P_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+        private void pointsSelected_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             _Item.InvalidateOrder();
         }
 
-        private void Sel_P_ItemRemoved(object sender, System.EventArgs e) {
+        private void pointsSelected_ItemRemoved(object sender, System.EventArgs e) {
             _Item.InvalidateOrder();
         }
 
         private void Item_DoInvalidate(object sender, System.EventArgs e) {
             Invalidate();
         }
-
-
-
-
-
-
-
-
-
-
 
         protected override RectangleM MaxBounds() {
             if (_Item == null) { return new RectangleM(0, 0, 0, 0); }
@@ -321,25 +302,13 @@ namespace BlueControls.Controls {
                 case System.Windows.Forms.Keys.Delete:
                 case System.Windows.Forms.Keys.Back:
 
-                    var Del = new List<BasicPadItem>();
-                    foreach (var ThisPoint in Sel_P) {
-                        if (ThisPoint?.Parent is BasicPadItem bpi) {
-                            Del.Add(bpi);
-                        }
-
+                    var ItemsDoDelete = new List<BasicPadItem>();
+                    foreach (var ThisPoint in _pointsSelected) {
+                        if (ThisPoint?.Parent is BasicPadItem bpi) { ItemsDoDelete.Add(bpi); }
                     }
 
                     Unselect();
-
-
-                    do {
-                        if (Del.Count == 0) { break; }
-                        _Item.Remove(Del[0]);
-                        Del[0] = null;
-                        Del.RemoveAt(0);
-                    } while (true);
-
-                    ComputeMovingData();
+                    _Item.RemoveRange(ItemsDoDelete);
                     break;
 
                 case System.Windows.Forms.Keys.Up:
@@ -380,7 +349,7 @@ namespace BlueControls.Controls {
 
             if (e.Button == System.Windows.Forms.MouseButtons.Left) {
                 var p = KoordinatesUnscaled(e);
-                foreach (var thisPoint in Sel_P) {
+                foreach (var thisPoint in _pointsSelected) {
 
                     if (GeometryDF.Länge(thisPoint, new PointM(p)) < 5m / _Zoom) {
 
@@ -390,33 +359,41 @@ namespace BlueControls.Controls {
                             return;
                         }
 
-                        Unselect();
-                        Sel_P.Add(thisPoint);
-                        ComputeMovingData();
-                        Invalidate();
+                        SelectPoint(thisPoint);
                         return;
                     }
                 }
-
-
-
-
-
-                if ((ModifierKeys & System.Windows.Forms.Keys.Control) <= 0 && Sel_P.Count > 0) {
-                    Unselect();
-
-                    if (HotItem == null) { ComputeMovingData(); }
-                    Invalidate();
-
-                }
-
-                if (HotItem != null) {
-                    Sel_P.AddIfNotExists(HotItem.Points);
-                    ComputeMovingData();
-                    Invalidate();
-                }
-
+                SelectItem(HotItem, ModifierKeys.HasFlag(System.Windows.Forms.Keys.Control));
             }
+        }
+
+        public void SelectPoint(PointM point) {
+            Unselect();
+            if (point == null) { return; }
+
+            _pointsSelected.Add(point);
+            ComputeMovingData();
+            Invalidate();
+        }
+
+
+        public void SelectItem(BasicPadItem item, bool additional) {
+
+
+            if (!additional) { Unselect(); }
+
+            if (item == null) { return; }
+
+
+            foreach (var thisPoint in _pointsSelected) {
+                if (thisPoint.Parent == item) { return; }
+            }
+
+
+            _pointsSelected.AddIfNotExists(item.Points);
+            ComputeMovingData();
+            Invalidate();
+
         }
 
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => DoMouseMove(e); // Kann nicht public gemacht werden, deswegen Umleitung
@@ -459,9 +436,6 @@ namespace BlueControls.Controls {
 
             }
 
-
-
-
             if (MouseDownPos_1_1 != null && e.Button == System.Windows.Forms.MouseButtons.Left) {
                 _LastQuickInfo = string.Empty;
                 MoveItems();
@@ -485,35 +459,39 @@ namespace BlueControls.Controls {
 
 
 
-
-            if (e.Button == System.Windows.Forms.MouseButtons.Left) {
-                //   AmRasterAusrichten()
-
-                foreach (var Thispoint in Sel_P) {
-                    if (Thispoint.Parent is BasicPadItem item) {
-                        Sel_P.AddIfNotExists(item.Points);
-                        Invalidate();
-                        break;
+            switch (e.Button) {
+                case System.Windows.Forms.MouseButtons.Left:
+                    // Da ja evtl. nur ein Punkt verschoben wird, das Ursprüngliche Element wieder komplett auswählen.
+                    BasicPadItem select = null;
+                    foreach (var Thispoint in _pointsSelected) {
+                        if (Thispoint.Parent is BasicPadItem item) {
+                            select = item;
+                            break;
+                        }
                     }
-                }
 
-                if (Convert.ToBoolean(_AutoRelation | enAutoRelationMode.NurBeziehungenErhalten) && _NewAutoRelations.Count > 0) {
-                    _Item.AllRelations.AddRange(_NewAutoRelations);
-                    _Item.PerformAll();
-                }
+                    if (_AutoRelation.HasFlag(enAutoRelationMode.NurBeziehungenErhalten) && _NewAutoRelations.Count > 0) {
+                        _Item.AllRelations.AddRange(_NewAutoRelations);
+                    }
+
+                    SelectItem(select, false);
+                    break;
+
+                case System.Windows.Forms.MouseButtons.Right:
+                    FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+                    break;
+
+                default:
+
+                    break;
+
 
             }
 
-            _NewAutoRelations.Clear();
 
-            _Item.PerformAll();
 
-            if (e.Button == System.Windows.Forms.MouseButtons.Right) {
-
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
-
-            }
-            ComputeMovingData();
+            _Item.PerformAllRelations();
+            //ComputeMovingData();
             Invalidate(); // Damit auch snap-Punkte wieder gelöscht werden
         }
 
@@ -571,7 +549,7 @@ namespace BlueControls.Controls {
 
                 // Dann die selectiereren Punkte
 
-                foreach (var ThisPoint in Sel_P) {
+                foreach (var ThisPoint in _pointsSelected) {
                     if (ThisPoint.CanMove(_Item.AllRelations)) {
                         ThisPoint.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard, false);
                     } else {
@@ -610,17 +588,12 @@ namespace BlueControls.Controls {
             }
         }
 
-
-
-
         internal void DrawCreativePadToBitmap(Bitmap BMP, enStates vState, decimal zoomf, decimal X, decimal Y, List<BasicPadItem> visibleItems) {
 
             var gr = Graphics.FromImage(BMP);
             DrawCreativePadTo(gr, BMP.Size, vState, zoomf, X, Y, visibleItems);
             gr.Dispose();
         }
-
-
 
         protected override void DrawControl(Graphics gr, enStates state) {
 
@@ -631,10 +604,7 @@ namespace BlueControls.Controls {
             gr.DrawString(DateTime.Now.Subtract(lastredraw).TotalMilliseconds.ToString(), new Font("Arial", 10), Brushes.Red, PointF.Empty);
 
             lastredraw = DateTime.Now;
-
         }
-
-
 
         private void _Item_ItemRemoved(object sender, System.EventArgs e) {
             CheckHotItem(null, true);
@@ -642,9 +612,6 @@ namespace BlueControls.Controls {
             ZoomFit();
             Invalidate();
         }
-
-
-
 
         private bool MoveSelectedPoints(decimal X, decimal Y) {
             var errorsBefore = _Item.NotPerforming(false);
@@ -654,17 +621,17 @@ namespace BlueControls.Controls {
             }
 
 
-            foreach (var thispoint in Move_X) {
+            foreach (var thispoint in _pointsToMoveX) {
                 thispoint.SetTo(thispoint.X + X, thispoint.Y);
             }
-            foreach (var thispoint in Move_Y) {
+            foreach (var thispoint in _pointsToMoveY) {
                 thispoint.SetTo(thispoint.X, thispoint.Y + Y);
             }
 
-            CaluclateOtherPointsOf();
+            SelectedItems_CaluclatePointsWORelations();
 
 
-            _Item.PerformAll();
+            _Item.PerformAllRelations();
 
 
             var errorsAfter = _Item.NotPerforming(false);
@@ -673,7 +640,7 @@ namespace BlueControls.Controls {
                 foreach (var thispoint in _Item.AllPoints) {
                     thispoint?.ReStore();
                 }
-                CaluclateOtherPointsOf();
+                SelectedItems_CaluclatePointsWORelations();
 
             } else {
                 var done = new List<object>();
@@ -690,76 +657,80 @@ namespace BlueControls.Controls {
 
 
                 }
-                CaluclateOtherPointsOf();
+                SelectedItems_CaluclatePointsWORelations();
 
             }
 
-
-
-
-
-            if (errorsAfter < errorsBefore) {
-                ComputeMovingData(); // Evtl. greifen nun vorher invalide Beziehungen.
-            }
-
-
+            if (errorsAfter < errorsBefore) { ComputeMovingData(); }// Evtl. greifen nun vorher invalide Beziehungen
 
             Invalidate();
-            return Convert.ToBoolean(errorsAfter == 0);
-
+            return errorsAfter == 0;
         }
 
 
         /// <summary>
-        /// Repariert bei allen selektierten Punkte (Sel_P), die in einem Objekt sind, die Beziehungen
+        /// Repariert bei allen selektierten Items (_ItemsToMove) die anderen Punkte, die keine Bezieheung haben und nur "Lose mitgehen"
         /// </summary>
-        private void CaluclateOtherPointsOf() {
-            var x = new List<BasicPadItem>();
+        private void SelectedItems_CaluclatePointsWORelations() {
+            foreach (var thisItem in _ItemsToMove) {
+                thisItem.CaluclatePointsWORelations();
 
-
-            foreach (var thispoint in Sel_P) {
-                if (thispoint.Parent is BasicPadItem BP) {
-                    if (!x.Contains(BP)) {
-                        BP.CaluclatePointsWORelations();
-                        x.Add(BP);
-                    }
-
-                }
             }
         }
 
         private void ComputeMovingData() {
-            _Item.ComputeOrders(Sel_P);
+            _Item.ComputeOrders(_pointsSelected);
 
-            Move_X.Clear();
-            Move_Y.Clear();
+
+            _pointsToMoveX.Clear();
+            _pointsToMoveY.Clear();
             var CanMove_X = true;
             var CanMove_Y = true;
 
-            foreach (var thispoint in Sel_P) {
-                Move_X.AddIfNotExists(_Item.ConnectsWith(thispoint, enXY.X, false));
-                Move_Y.AddIfNotExists(_Item.ConnectsWith(thispoint, enXY.Y, false));
+            foreach (var thispoint in _pointsSelected) {
+                _pointsToMoveX.AddIfNotExists(_Item.ConnectsWith(thispoint, enXY.X, false));
+                _pointsToMoveY.AddIfNotExists(_Item.ConnectsWith(thispoint, enXY.Y, false));
             }
 
-            foreach (var thispoint in Move_X) {
+            foreach (var thispoint in _pointsToMoveX) {
                 if (!thispoint.CanMoveX(_Item.AllRelations)) {
+                    _pointsToMoveX.Clear();
                     CanMove_X = false;
                     break;
                 }
             }
 
             if (!CanMove_X) {
-                Move_X.Clear();
+                _pointsToMoveX.Clear();
             }
 
-            foreach (var thispoint in Move_Y) {
+            foreach (var thispoint in _pointsToMoveY) {
                 if (!thispoint.CanMoveY(_Item.AllRelations)) {
+                    _pointsToMoveY.Clear();
                     CanMove_Y = false;
                     break;
                 }
             }
             if (!CanMove_Y) {
-                Move_Y.Clear();
+                _pointsToMoveY.Clear();
+            }
+
+
+            foreach (var thispoint in _pointsToMoveX) {
+
+                if (thispoint.Parent is BasicPadItem bpi) {
+
+                    _ItemsToMove.AddIfNotExists(bpi);
+                }
+            }
+
+
+            foreach (var thispoint in _pointsToMoveY) {
+
+                if (thispoint.Parent is BasicPadItem bpi) {
+
+                    _ItemsToMove.AddIfNotExists(bpi);
+                }
             }
 
 
@@ -767,57 +738,52 @@ namespace BlueControls.Controls {
         }
 
 
-
-
-
-
-
         private void MoveItems() {
             if (MouseDownPos_1_1 == null) { return; }
 
-            PointM PMoveX = null;
-            PointM PMoveY = null;
-            PointM PSnapToX = null;
-            PointM PSnapToY = null;
+            PointM ThisPointSnapsX = null;
+            PointM ThisPointSnapsY = null;
+            PointM PointSnapedToX = null;
+            PointM PointSnapedToY = null;
 
             _NewAutoRelations.Clear();
 
 
-            var move = new PointM((decimal)(MousePos_1_1.X - MouseDownPos_1_1.X), (decimal)(MousePos_1_1.Y - MouseDownPos_1_1.Y));
+            var move = new PointM((decimal)(MousePos_1_1.X - MouseDownPos_1_1.X), MousePos_1_1.Y - MouseDownPos_1_1.Y);
 
-            var MouseMovedTo = new PointM(MousePos_1_1);
+            //var MouseMovedToCoords = new PointM(MousePos_1_1);
 
 
-            if (Move_X.Count > 0) {
-                move.X = SnapToGrid(true, Move_X, move.X);
+            if (_pointsToMoveX.Count > 0) {
+                move.X = SnapToGrid(true, _pointsToMoveX, move.X);
 
                 if (!_Grid || Math.Abs(_Gridsnap) < 0.001 || move.X == 0M) {
-                    if (_AutoRelation != enAutoRelationMode.None) { SnapToPoint(enXY.X, Sel_P, MouseMovedTo, ref PMoveX, ref PSnapToX); }
-                    if (PMoveX != null) { move.X = PSnapToX.X - PMoveX.X; }
+                    if (_AutoRelation != enAutoRelationMode.None) { SnapToPoint(enXY.X, _pointsSelected, move, ref ThisPointSnapsX, ref PointSnapedToX); }
+                    if (ThisPointSnapsX != null) { move.X = PointSnapedToX.X - ThisPointSnapsX.X; }
                 }
             } else {
                 move.X = 0M;
             }
 
-            if (Move_Y.Count > 0) {
-                move.Y = SnapToGrid(false, Move_Y, move.Y);
+            if (_pointsToMoveY.Count > 0) {
+                move.Y = SnapToGrid(false, _pointsToMoveY, move.Y);
 
                 if (!_Grid || Math.Abs(_Gridsnap) < 0.001 || move.Y == 0M) {
-                    if (_AutoRelation != enAutoRelationMode.None) { SnapToPoint(enXY.Y, Sel_P, MouseMovedTo, ref PMoveY, ref PSnapToY); }
-                    if (PMoveY != null) { move.Y = PSnapToY.Y - PMoveY.Y; }
+                    if (_AutoRelation != enAutoRelationMode.None) { SnapToPoint(enXY.Y, _pointsSelected, move, ref ThisPointSnapsY, ref PointSnapedToY); }
+                    if (ThisPointSnapsY != null) { move.Y = PointSnapedToY.Y - ThisPointSnapsY.Y; }
                 }
             } else {
                 move.Y = 0M;
             }
 
-            if (move.X == 0M && move.Y == 0M && PMoveX == null && PMoveY == null) { return; }
+            if (move.X == 0M && move.Y == 0M && ThisPointSnapsX == null && ThisPointSnapsY == null) { return; }
 
 
 
             if (MoveSelectedPoints(move.X, move.Y)) {
                 // Wenn Strongmode true ist es für den Anwender unerklärlich, warum er denn nix macht,obwohl kein Fehler da ist...
                 if (_Item.NotPerforming(false) == 0) {
-                    AddAllAutoRelations(PMoveX, PSnapToX, PMoveY, PSnapToY);
+                    AddAllAutoRelations(ThisPointSnapsX, PointSnapedToX, ThisPointSnapsY, PointSnapedToY);
                 } else {
                     _NewAutoRelations.Clear();
                 }
@@ -873,19 +839,19 @@ namespace BlueControls.Controls {
         }
 
 
-        private void SnapToPoint(enXY toCheck, List<PointM> Movep, PointM MouseMovedTo, ref PointM PMove, ref PointM PSnapTo) {
+        private void SnapToPoint(enXY toCheck, List<PointM> movedPoints, PointM move, ref PointM thisPointSnaps, ref PointM snapedToPoint) {
             decimal ShortestDist = 10;
             var Nearest = decimal.MaxValue;
 
 
-            if (!_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht) && !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht) && !_AutoRelation.HasFlag(enAutoRelationMode.DirektVerbindungen)) {
+            if (!_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht) &&
+                !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht) &&
+                !_AutoRelation.HasFlag(enAutoRelationMode.DirektVerbindungen)) {
                 return;
             }
 
             if (_AutoRelation.HasFlag(enAutoRelationMode.DirektVerbindungen)) {
-                if (!_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht) && !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht)) {
-                    Nearest = 2;
-                }
+                if (!_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht) && !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht)) { Nearest = 2; }
             } else {
                 if (toCheck.HasFlag(enXY.X) && !_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht)) { return; }
                 if (toCheck.HasFlag(enXY.Y) && !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht)) { return; }
@@ -894,66 +860,47 @@ namespace BlueControls.Controls {
 
 
             // Berechne, welcher Punkt snappt
-            foreach (var ThisPoint in Movep) {
-                var tempVar = ThisPoint;
-                SnapToPoint(toCheck, ref tempVar, MouseMovedTo, ref ShortestDist, ref PMove, ref PSnapTo, ref Nearest);
+            foreach (var thisPoint in movedPoints) {
+                SnapToPoint(toCheck, thisPoint, move, ref ShortestDist, ref thisPointSnaps, ref snapedToPoint, ref Nearest);
             }
 
         }
 
-        private void SnapToPoint(enXY toCheck, ref PointM PointToTest, PointM MouseMovedTo, ref decimal ShortestDist, ref PointM PMove, ref PointM PSnapTo, ref decimal Nearest) {
+        private void SnapToPoint(enXY toCheck, PointM pointToTest, PointM move, ref decimal shortestDist, ref PointM thisPointSnaps, ref PointM snapedToPoint, ref decimal nearest) {
 
-            if (PointToTest == null) { return; }
+            if (pointToTest == null) { return; }
 
-            var dr = AvailablePaintArea();
+            var WillMoveTo = new PointM(pointToTest.X + move.X, pointToTest.Y + move.Y);
 
+            var l = PointsOnScreenWichAreNotSelected;
 
-            var WillMoveTo = new PointM(PointToTest.X + MouseMovedTo.X - MouseDownPos_1_1.X, PointToTest.Y + MouseMovedTo.Y - MouseDownPos_1_1.Y);
-
-
-            foreach (var ThisPoint in _Item.AllPoints) {
-                if (ThisPoint != null && ThisPoint.CanUsedForAutoRelation && ThisPoint.IsOnScreen(_Zoom, _shiftX, _shiftY, dr)) {
-
-                    if (PointToTest.Parent == null || ThisPoint.Parent != PointToTest.Parent) {
-                        var Distanz = GeometryDF.Länge(WillMoveTo, ThisPoint);
-
-                        if (Distanz < 1000 * _Zoom) {
-                            decimal SnapDist = 0;
-                            if (toCheck.HasFlag(enXY.X)) {
-                                SnapDist = Math.Abs(WillMoveTo.X - ThisPoint.X) * _Zoom;
-                            }
-                            if (toCheck.HasFlag(enXY.Y)) {
-                                SnapDist = Math.Abs(WillMoveTo.Y - ThisPoint.Y) * _Zoom;
-                            }
+            foreach (var ThisPoint in l) {
+                if (ThisPoint.CanUsedForAutoRelation && ThisPoint.Parent != pointToTest.Parent) {
+                    var Distanz = GeometryDF.Länge(WillMoveTo, ThisPoint);
 
 
-                            if (!Convert.ToBoolean(_AutoRelation & enAutoRelationMode.Senkrecht) && !Convert.ToBoolean(_AutoRelation & enAutoRelationMode.Waagerecht)) {
-
-                                SnapDist = Math.Max(Math.Abs(WillMoveTo.X - ThisPoint.X), Math.Abs(WillMoveTo.Y - ThisPoint.Y)) * _Zoom;
-                                SnapDist = Math.Max(SnapDist, Distanz) * _Zoom;
-                            }
+                    decimal SnapDist = 0;
+                    if (toCheck.HasFlag(enXY.X)) { SnapDist = Math.Abs(WillMoveTo.X - ThisPoint.X) * _Zoom; }
+                    if (toCheck.HasFlag(enXY.Y)) { SnapDist = Math.Abs(WillMoveTo.Y - ThisPoint.Y) * _Zoom; }
 
 
-                            if (SnapDist < ShortestDist || (SnapDist == ShortestDist && Distanz < Nearest)) {
-                                if (!HängenZusammen(toCheck, PointToTest, ThisPoint, null)) {
-                                    ShortestDist = SnapDist;
-                                    Nearest = Distanz;
-                                    PMove = PointToTest;
-                                    PSnapTo = ThisPoint;
-                                }
-                            }
+                    if (!_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht) && !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht)) {
+                        SnapDist = Math.Max(Math.Abs(WillMoveTo.X - ThisPoint.X), Math.Abs(WillMoveTo.Y - ThisPoint.Y)) * _Zoom;
+                        SnapDist = Math.Max(SnapDist, Distanz) * _Zoom;
+                    }
+
+
+                    if (SnapDist < shortestDist || (SnapDist == shortestDist && Distanz < nearest)) {
+                        if (!HängenZusammen(toCheck, pointToTest, ThisPoint, null)) {
+                            shortestDist = SnapDist;
+                            nearest = Distanz;
+                            thisPointSnaps = pointToTest;
+                            snapedToPoint = ThisPoint;
                         }
                     }
                 }
             }
-
         }
-
-
-
-
-
-
 
 
 
@@ -1003,22 +950,12 @@ namespace BlueControls.Controls {
                         _Item.Add((BasicPadItem)((ICloneable)thisItem).Clone());
                         break;
                 }
-
-
-
             }
 
-            //if (!Done) { Done = thisItem.ContextMenuItemClicked(new ContextMenuItemClickedEventArgs(e.ClickedComand, null, e.Tags)); }
-
-
-
-
-
-            _Item.PerformAll(); // Da könnte sich ja alles geändert haben...
+            _Item.PerformAllRelations(); // Da könnte sich ja alles geändert haben...
             Invalidate();
 
             return Done;
-
         }
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
@@ -1240,29 +1177,14 @@ namespace BlueControls.Controls {
 
         }
 
-        //public void Relation_Add(enRelationType enRelationType, PointM Point1, PointM Point2)
-        //{
-        //    Item.AllRelations.Add(new clsPointRelation(enRelationType, Point1, Point2));
-        //}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         public void Unselect() {
-            Sel_P.Clear();
-            Move_X.Clear();
-            Move_Y.Clear();
+            _pointsSelected.Clear();
+            _pointsToMoveX.Clear();
+            _pointsToMoveY.Clear();
             _NewAutoRelations.Clear();
+            _ItemsToMove.Clear();
+            _pointsOnScreenWichAreNotSelected = null;
         }
 
 
@@ -1400,7 +1322,7 @@ namespace BlueControls.Controls {
         }
 
 
-        public void CheckGrid() {
+        private void CheckGrid() {
             GridPadItem Found = null;
 
             Invalidate();
@@ -1438,15 +1360,6 @@ namespace BlueControls.Controls {
 
 
 
-
-
-
-
-
-
-
-
-
         public void ShowErweitertMenü(BasicPadItem Item) {
             var l = Item.GetStyleOptions();
 
@@ -1455,27 +1368,8 @@ namespace BlueControls.Controls {
                 return;
             }
 
-
             EditBoxFlexiControl.Show(l);
-
-
-            //if (tg.Count == 0) { return; }
-
-            //var ClosMe = true;
-
-            ////Item.DoStyleCommands(this, tg, ref ClosMe);
-
-
-
-            //Item.RecomputePointAndRelationsx();
-
-
-            //if (!ClosMe) { ShowErweitertMenü(Item); }
-
-
-
         }
-
 
 
         private void DruckerDokument_BeginPrint(object sender, PrintEventArgs e) {
@@ -1504,8 +1398,24 @@ namespace BlueControls.Controls {
         }
 
 
+        protected override void ZoomOrShiftChanged() {
+            _pointsOnScreenWichAreNotSelected = null;
+            base.ZoomOrShiftChanged();
+        }
+        public List<PointM> PointsOnScreenWichAreNotSelected {
+            get {
+                if (_pointsOnScreenWichAreNotSelected != null) { return _pointsOnScreenWichAreNotSelected; }
 
+                var dr = AvailablePaintArea();
+                _pointsOnScreenWichAreNotSelected = new List<PointM>();
 
-
+                foreach (var thisPoint in _Item.AllPoints) {
+                    if (thisPoint != null && !_pointsSelected.Contains(thisPoint) && thisPoint.IsOnScreen(_Zoom, _shiftX, _shiftY, dr)) {
+                        _pointsOnScreenWichAreNotSelected.AddIfNotExists(thisPoint);
+                    }
+                }
+                return _pointsOnScreenWichAreNotSelected;
+            }
+        }
     }
 }

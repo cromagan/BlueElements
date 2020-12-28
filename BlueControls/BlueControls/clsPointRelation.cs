@@ -446,35 +446,6 @@ namespace BlueControls {
                 return;
             }
 
-            //var OK = false;
-            //foreach (var t in Points)
-            //{
-            //    if (t.Order > OrderNr) { OK = true; }
-            //}
-            //if (!OK) { return false; }
-
-            //var StartPx = new List<PointM>();
-            //foreach (var t in Points)
-            //{
-            //    StartPx.Add(new PointM(t));
-            //}
-
-
-            //PointM Fix, Flex;
-
-
-            //if (Points[1].Order > Points[0].Order)
-            //{
-            //    Fix = Points[0];
-            //    Flex = Points[1];
-            //}
-            //else
-            //{
-            //    Fix = Points[1];
-            //    Flex = Points[0];
-            //}
-
-
 
             switch (_relationtype) {
                 case enRelationType.WaagerechtSenkrecht:
@@ -486,8 +457,6 @@ namespace BlueControls {
                     break;
 
                 case enRelationType.PositionZueinander:
-                    //var w = _Richtmaß.SplitBy(";");
-
                     if (Fix == Points[1]) {
                         Flex.SetTo(Fix.X + _Richtmaß[0], Fix.Y + _Richtmaß[1]);
                     } else {
@@ -512,47 +481,8 @@ namespace BlueControls {
                     Develop.DebugPrint(_relationtype);
                     break;
             }
-
-
-            //var DidSomething = false;
-
-
-            //for (var z = 0; z < Points.Count; z++)
-            //{
-
-            //    // ACHTUNG: Position-Fix und Fixpoints sind unterschiedlich!
-            //    // Position-Fix: Der Punkt DARF nicht bewegt werden
-            //    // FixPoints: Über Beziehungen kann er eigentlich nicht bewegt werden. Aber über des kontextmenü kann es ja sein, dass die Beziehungen ungültig geworden sind.
-            //    if (Points[z].Moveable != enXY.none)
-            //    {
-            //        // Erst auf Änderungen prüfen, damit ein neuer Durchgang angestoßen wird.
-            //        // Und dann die Fixen dinegns zurück setzen
-            //        Points[z].X = StartPx[z].X;
-            //        Points[z].Y = StartPx[z].Y;
-            //    }
-
-            //    if (!AllowBigChanges && GeometryDF.Länge(Points[z], StartPx[z]) > 100M)
-            //    {
-            //        Points[z].X = StartPx[z].X;
-            //        Points[z].Y = StartPx[z].Y;
-            //    }
-
-
-            //    if (Math.Abs(StartPx[z].X - Points[z].X) > 0.01m || Math.Abs(StartPx[z].X - Points[z].X) > 0.01m)
-            //    {
-            //        DidSomething = true;
-            //    }
-
-
-            //}
-
-            //return DidSomething;
         }
 
-
-        //public List<decimal> Richtmaß() {
-        //    return _Richtmaß;
-        //}
 
         public enXY Connects() {
             switch (_relationtype) {

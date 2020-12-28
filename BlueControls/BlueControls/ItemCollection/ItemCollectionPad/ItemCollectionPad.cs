@@ -173,7 +173,7 @@ namespace BlueControls.ItemCollection {
             var Count = 0;
             do {
                 Count++;
-                PerformAll();
+                PerformAllRelations();
                 if (NotPerforming(false) == 0) { break; }
                 if (Count > 20) { break; }
             } while (true);
@@ -289,7 +289,7 @@ namespace BlueControls.ItemCollection {
 
             //CheckGrid();
 
-            PerformAll();
+            PerformAllRelations();
 
             //if (needPrinterData) { RepairPrinterData(); }
         }
@@ -499,7 +499,7 @@ namespace BlueControls.ItemCollection {
 
                 DesignOrStyleChanged();
 
-                PerformAll();
+                PerformAllRelations();
                 OnDoInvalidate();
             }
         }
@@ -518,8 +518,8 @@ namespace BlueControls.ItemCollection {
             if (!did) { return false; }
 
 
-            PerformAll();
-            PerformAll();
+            PerformAllRelations();
+            PerformAllRelations();
 
             return true;
         }
@@ -829,7 +829,7 @@ namespace BlueControls.ItemCollection {
 
         public new string ToString() {
 
-            PerformAll();
+            PerformAllRelations();
 
             var t = "{";
 
@@ -992,7 +992,7 @@ namespace BlueControls.ItemCollection {
                 }
             }
 
-            if (did) { PerformAll(); }
+            if (did) { PerformAllRelations(); }
             return did;
         }
 
@@ -1113,78 +1113,15 @@ namespace BlueControls.ItemCollection {
         //}
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ThisItemCol"></param>
-        /// <param name="Level">             Level 0 gibt es nicht;
-        /// Level 1 = Normal / Reparier nur die neuen Sachen ;
-        /// Level 2 = Leicht / Reparier nur die neuen Sachen mit schnelleren Abbruchbedingungen</param>
-        /// <param name="AllowBigChanges"></param>
-        /// <returns></returns>
-        public void PerformAll() {
-
-            //var L = new List<clsPointRelation>();
-            //var Methode = 0;
-
+        public void PerformAllRelations() {
             ComputeOrders(null);
-
             foreach (var ThisRelation in AllRelations) {
                 ThisRelation.Perform(AllPoints);
-            }
-
-            //do
-            //{
-            //    var tmp = "";
-
-            //    foreach (var ThisRelation in AllRelations)
-            //    {
-
-            //        if (ThisRelation.Performs(true))
-            //        {
-            //            ThisRelation.Computed = true;
-            //        }
-            //        else
-            //        {
-            //            ThisRelation.Computed = false;
-            //            tmp = tmp + ThisRelation.Order + ";";
-            //        }
-
-            //    }
-
-            //    if (string.IsNullOrEmpty(tmp)) { return true; }
-
-
-
-            //    if (L.Contains(tmp))
-            //    {
-            //        if (Level == 2) { return false; }
-            //        if (Methode == 2) { return false; }
-
-            //        Methode++;
-            //        Relations_Optimize();
-            //        //RecomputePointAndRelations();
-            //        ComputeOrders(null);
-            //        L.Clear();
-            //    }
-            //    else
-            //    {
-            //        L.Add(tmp);
-            //    }
-
-            //    foreach (var ThisRelation in AllRelations)
-            //    {
-            //        if (!ThisRelation.Computed)
-            //        {
-            //            ThisRelation.MakePointKonsistent(LowestOrder(ThisRelation.Points), AllowBigChanges);
-            //        }
-            //    }
-
-            //} while (true);
-
+            } 
         }
 
-        public void ComputeOrders(List<PointM> Sel_P) {
+
+        public void ComputeOrders(List<PointM> selectedPoints) {
             if (_OrdersValid) { return; }
 
             if (ComputeOrders_isin) { return; }
@@ -1194,7 +1131,7 @@ namespace BlueControls.ItemCollection {
             RemoveInvalidPoints();
             RemoveInvalidRelations();
 
-            ComputePointOrder(Sel_P);
+            ComputePointOrder(selectedPoints);
 
             _OrdersValid = true;
             ComputeOrders_isin = false;

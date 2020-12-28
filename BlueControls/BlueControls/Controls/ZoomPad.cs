@@ -108,9 +108,9 @@ namespace BlueControls.Controls {
 
             _ZoomFit = ZoomFitValue(mb, true, Size);
 
-            //if (_Fitting && !MousePressing()) { _Zoom = _ZoomFit; }
-            _Zoom = _ZoomFit; // Math.Max(_Zoom, _ZoomFit / 1.2m);
+            _Zoom = _ZoomFit; 
             ComputeSliders(mb);
+            ZoomOrShiftChanged();
             Invalidate();
         }
 
@@ -123,6 +123,7 @@ namespace BlueControls.Controls {
 
             _Zoom = 1m;
             ComputeSliders(mb);
+            ZoomOrShiftChanged();
             Invalidate();
 
         }
@@ -158,6 +159,7 @@ namespace BlueControls.Controls {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
             return null;
         }
+        protected virtual void ZoomOrShiftChanged() { }
 
 
 
@@ -173,9 +175,6 @@ namespace BlueControls.Controls {
             } else {
                 _Zoom *= (1m / 1.5m);
             }
-
-
-
 
             _Zoom = Math.Max(_ZoomFit / 1.2m, _Zoom);
             _Zoom = Math.Min(20, _Zoom);
@@ -197,6 +196,8 @@ namespace BlueControls.Controls {
             SliderX.Value = (double)(m.X * _Zoom - e.X);
             SliderY.Value = (double)(m.Y * _Zoom - e.Y);
 
+            ZoomOrShiftChanged();
+
             // Alte Berechnung für Mittig Setzen
             //SliderX.Value = (m.X * _Zoom) - (Width / 2) - SliderY.Width
             //SliderY.Value = (m.Y * _Zoom) - (Height / 2) - SliderX.Height
@@ -217,11 +218,13 @@ namespace BlueControls.Controls {
 
         private void SliderX_ValueChanged(object sender, System.EventArgs e) {
             _shiftX = (decimal)SliderX.Value;
+            ZoomOrShiftChanged();
             Invalidate();
         }
 
         private void SliderY_ValueChanged(object sender, System.EventArgs e) {
             _shiftY = (decimal)SliderY.Value;
+            ZoomOrShiftChanged();
             Invalidate();
         }
 
@@ -283,6 +286,7 @@ namespace BlueControls.Controls {
             SliderY.Minimum = 0;
             SliderY.Maximum = 0;
             SliderY.Value = 0;
+            ZoomOrShiftChanged();
 
         }
 
