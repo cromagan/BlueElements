@@ -86,6 +86,8 @@ namespace BlueControls.Forms {
 
             Pad.Item.SheetStyle = Skin.StyleDB.Row[PadDesign.Text];
 
+            SchriftGröße.Item.Add("30%", "030");
+            SchriftGröße.Item.Add("40%", "040");
             SchriftGröße.Item.Add("50%", "050");
             SchriftGröße.Item.Add("60%", "060");
             SchriftGröße.Item.Add("70%", "070");

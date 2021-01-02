@@ -96,8 +96,10 @@ namespace BlueControls {
                         break;
 
                     case "value":
-                        //var x = modConverter.DecimalParse(pair.Value.FromNonCritical());
-                        //_Richtmaß.Add(x);
+                        var x = pair.Value.SplitBy(";");
+                        foreach (var thisv in x) {
+                            _Richtmaß.Add(modConverter.DecimalParse(thisv));
+                        }
                         break;
 
                     case "point":
@@ -128,16 +130,21 @@ namespace BlueControls {
 
             Points.ThrowEvents = true;
 
-            OverrideSavedRichtmaß(true, true);
 
+            if (_Richtmaß.Count != NeededRichtmaßData()) {
+                _Richtmaß.Clear();
+                OverrideSavedRichtmaß(true, true);
+            }
+
+
+            //_Richtmaß.Clear();
+            //OverrideSavedRichtmaß(true, true);
 
             //if (!IsOk(true)) {
             //    _Richtmaß.Clear();
             //    OverrideSavedRichtmaß(true, true);
             //}
         }
-
-
 
 
         public enRelationType RelationType {
@@ -181,10 +188,10 @@ namespace BlueControls {
 
             var t = "{Type=" + (int)_relationtype;
 
-
-            //foreach (var thisr in _Richtmaß) {
-            //    t = t + ", Value=" + thisr.ToString().ToNonCritical();
-            //}
+            // Richtmaß wird mitgespeichert. Falls sich die Vorlagen ändern, besteht die Chance, dass beziehungen erhalten bleiben
+            foreach (var thisr in _Richtmaß) {
+                t = t + ", Value=" + thisr.ToString().ToNonCritical();
+            }
 
             foreach (var thispoint in Points) {
                 t = t + ", Point=" + thispoint;
@@ -607,6 +614,18 @@ namespace BlueControls {
             OnChanged();
         }
 
+
+        private int NeededRichtmaßData() {
+
+            if (_relationtype == enRelationType.None) { return 0; }
+            if (_relationtype == enRelationType.PositionZueinander) { return 2; }
+
+            return 1;
+        }
+
+
+
+
         /// <summary>
         /// Prüft, ob die Beziehung einen Fehler enthält, der ein Löschen der Beziehung erfordert.
         /// Um zu prüfen, ob die Punkte zueinander stimmen, muss Performs benutzt werden.
@@ -633,7 +652,7 @@ namespace BlueControls {
 
             if (!IsCreating) {
                 if (!ParentCollection.AllRelations.Contains(this)) { return "Beziehung nicht mehr vorhanden."; }
-
+                if (_Richtmaß.Count < NeededRichtmaßData()) { return "Richtmaß hat zu wenig Angaben."; }
 
                 if (Parent is BasicPadItem ba) {
                     if (!ParentCollection.Contains(ba)) { return "Objekt nicht mehr vorhanden"; }

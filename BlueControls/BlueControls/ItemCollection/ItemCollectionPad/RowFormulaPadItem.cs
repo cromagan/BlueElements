@@ -329,7 +329,9 @@ namespace BlueControls.ItemCollection {
         //    Return False
         //End Function
 
-        protected override void ParseFinished() { }
+        protected override void ParseFinished() {
+            GeneratePic(true);
+        }
 
         public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>

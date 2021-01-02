@@ -569,13 +569,19 @@ namespace BlueControls.ItemCollection {
         //    OnChanged();
         //}
 
+        /// <summary>
+        /// OnChanged wird nicht im Parsing gemacht
+        /// </summary>
         public void RecalculateAndOnChanged() {
             Relations.Clear();
             CaluclatePointsWORelations();
             GenerateInternalRelationExplicit();
             OverrideSavedRichtmaßOfAllRelations();
-            OnPointOrRelationsChanged();
-            OnChanged();
+
+            if (!IsParsing) {
+                OnPointOrRelationsChanged();
+                OnChanged();
+            }
         }
 
 
