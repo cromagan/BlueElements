@@ -95,22 +95,20 @@ namespace BlueDatabase {
             get {
 
                 var colum = Exists(columnName);
-                //if (Database == null) {
-                //    Develop.DebugPrint(enFehlerArt.Info, "Database ist null bei " + columnName);
-                //    return null;
-                //}
-                //if (string.IsNullOrEmpty(columnName)) {
-                //    Develop.DebugPrint(enFehlerArt.Info, "Leerer Spaltenname");
-                //    return null;
-                //}// Evtl. Gelöschte Spalte in irgendeiner Order
 
-                //columnName = columnName.ToUpper();
-
-                //foreach (var ThisColumn in this) {
-                //    if (ThisColumn != null && ThisColumn.Name == columnName) { return ThisColumn; }
-                //}
                 if (colum is null) {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Spalte nicht gefunden: " + columnName + " " + Database.IsParsing().ToString());
+
+                    var t = "Spalte nicht gefunden: " + columnName;
+
+                    try {
+                        t += "\r\nParsing: " + Database.IsParsing().ToString();
+                        t += "\r\nCount: " + Count.ToString();
+                        t += "\r\nRowCount: " + Database.Row.Count.ToString();
+                        t += "\r\nFile: " + Database.Filename;
+                    }
+                    catch { }
+
+                    Develop.DebugPrint(enFehlerArt.Warnung, t);
                 }
 
                 return colum;

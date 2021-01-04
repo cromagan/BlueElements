@@ -707,7 +707,7 @@ namespace BlueControls.ItemCollection {
 
             if (Contains(item)) { Develop.DebugPrint(enFehlerArt.Warnung, "Bereits vorhanden!"); return; }
 
-            if (this[item.Internal] != null) { Develop.DebugPrint(enFehlerArt.Warnung, "Name bereits vorhanden!"); return; }
+            if (this[item.Internal] != null) { Develop.DebugPrint(enFehlerArt.Info, "Name bereits vorhanden!"); return; }
 
 
             base.Add(item);
@@ -1248,7 +1248,7 @@ namespace BlueControls.ItemCollection {
                     break;
             }
 
-            if (column.Database.Row.Count() > 0) {
+            if (column.Database.Row.Count > 0) {
                 if (checkedItemsAtRow != null) {
                     if (!checkedItemsAtRow.CellIsNullOrEmpty(column)) {
                         if (column.MultiLine) {

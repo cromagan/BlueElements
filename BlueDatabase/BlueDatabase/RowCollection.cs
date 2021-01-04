@@ -353,8 +353,9 @@ namespace BlueDatabase {
         }
 
 
-        public int Count() {
-            return _Internal.Count;
+        public int Count {
+            get { return _Internal.Count; }
+
         }
 
         internal void RemoveNullOrEmpty() {

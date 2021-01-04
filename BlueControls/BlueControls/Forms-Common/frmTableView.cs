@@ -108,7 +108,7 @@ namespace BlueControls.Forms {
             column = TableView.Database.Column[0];
             row = null;
 
-            if (TableView.Database.Row.Count() < 1) { return; }
+            if (TableView.Database.Row.Count < 1) { return; }
 
 
             // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
@@ -328,7 +328,7 @@ namespace BlueControls.Forms {
 
         private void Check_SuchButton() {
 
-            if (_Database == null || _Database.Row.Count() < 1) {
+            if (_Database == null || _Database.Row.Count < 1) {
                 SuchB.Enabled = false;
             } else {
                 if (!string.IsNullOrEmpty(such.Text) && !string.IsNullOrEmpty(such.Text.RemoveChars(" "))) {
