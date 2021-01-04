@@ -721,7 +721,7 @@ namespace BlueBasics.MultiUserFile {
                     if (!FileExists(Filename)) { return; }
 
                     var x = LoadFromDisk(Blockdateiname());
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Repariere MultiUserFile: " + x + " " + Filename);
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Repariere MultiUserFile: " + Filename + " \r\n" + x);
 
                     if (!CreateBlockDatei()) { return; }
 
@@ -731,7 +731,7 @@ namespace BlueBasics.MultiUserFile {
                         Develop.DebugPrint(enFehlerArt.Info, "Autoreparatur fehlgeschlagen 1: " + Filename);
                         return;
                     }
-                    if (DeleteBlockDatei(true, false)) {
+                    if (!DeleteBlockDatei(true, false)) {
                         Develop.DebugPrint(enFehlerArt.Info, "Autoreparatur fehlgeschlagen 2: " + Filename);
                     }
                 }
