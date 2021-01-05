@@ -83,7 +83,7 @@ namespace BlueControls.ItemCollection {
         #endregion
         #region  Construktor 
 
-        public FormPadItemRectangle(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
+        public FormPadItemRectangle(ItemCollectionPad parent, string internalname, bool sizefix) : base(parent, internalname) {
             p_LO = new PointM(this, "LO", 0, 0, false, true, true);
             p_RO = new PointM(this, "RO", 0, 0, false);
             p_RU = new PointM(this, "RU", 0, 0);
@@ -107,6 +107,8 @@ namespace BlueControls.ItemCollection {
             Points.Add(p_U);
             Points.Add(p_O);
 
+            Größe_fixiert = sizefix;
+
 
             Drehwinkel = 0;
         }
@@ -121,7 +123,6 @@ namespace BlueControls.ItemCollection {
 
 
 
-
         protected override void GenerateInternalRelationExplicit() {
             if (Größe_fixiert) {
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RO));
@@ -133,28 +134,15 @@ namespace BlueControls.ItemCollection {
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_O));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_U));
 
-            } else {
+            }
+            else {
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
 
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
 
-
-                //// Durch Position-Zueinander kann es beim Verschieben nichtz mehr schief -gehen. Aber die BErechung erfolgt anders und setzt die Beziehungen wieder richtig
-                //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_L));
-                //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_R));
-                //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_O));
-                //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_U));
-            }
-
-
-
-            //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_L));
-            //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_RU, p_R));
-            //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_O));
-            //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_RU, p_U));
-
+             }
         }
 
         public override List<FlexiControl> GetStyleOptions() {
@@ -167,7 +155,8 @@ namespace BlueControls.ItemCollection {
             if (!Größe_fixiert && !p_LO.CanMove(Parent.AllRelations) && !p_RU.CanMove(Parent.AllRelations)) {
                 l.Add(new FlexiControl());
                 l.Add(new FlexiControl("Objekt fest definiert,<br>Größe kann nicht fixiert werden"));
-            } else {
+            }
+            else {
                 l.Add(new FlexiControlForProperty(this, "Größe_fixiert"));
             }
 
@@ -176,16 +165,17 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public void SetCoordinates(RectangleM r) {
+        public void SetCoordinates(RectangleM r, bool overrideFixedSize) {
 
-            if (_größe_fixiert) {
+            if (_größe_fixiert && !overrideFixedSize) {
                 var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
                 var ur = UsedArea();
 
                 p_LO.SetTo(vr.X - ur.Width / 2, vr.Y - ur.Height / 2);
                 p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
 
-            } else {
+            }
+            else {
 
                 p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
                 p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
@@ -211,12 +201,6 @@ namespace BlueControls.ItemCollection {
 
             p_O.SetTo(p_LO.X + (p_RO.X - p_LO.X) / 2, p_LO.Y);
             p_U.SetTo(p_O.X, p_LU.Y);
-
-
-
-
-
-
 
             base.CaluclatePointsWORelations();
         }
@@ -250,13 +234,15 @@ namespace BlueControls.ItemCollection {
                 if (!ForPrinting) {
                     if (cZoom > 1) {
                         GR.DrawRectangle(new Pen(Color.Gray, (float)cZoom), DCoordinates);
-                    } else {
+                    }
+                    else {
                         GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
                     }
 
 
                 }
-            } catch { }
+            }
+            catch { }
         }
 
 

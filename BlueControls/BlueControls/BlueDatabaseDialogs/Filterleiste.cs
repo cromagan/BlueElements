@@ -412,8 +412,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
                             if (flx.GetComboBox() is ComboBox cbx) {
-                                var data = cbx.Item.ItemData();  // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-                                var wi = Math.Min(data.Item1 + Skin.Padding + 16, 100);
+                                var (BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed) = cbx.Item.ItemData();  // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+                                var wi = Math.Min(BiggestItemX + Skin.Padding + 16, 100);
 
                                 flx.Width = wi;
                             }

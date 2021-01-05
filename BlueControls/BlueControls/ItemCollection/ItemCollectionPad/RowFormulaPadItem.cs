@@ -78,9 +78,8 @@ namespace BlueControls.ItemCollection {
 
         public RowFormulaPadItem(ItemCollectionPad parent, RowItem row, string layoutID) : this(parent, string.Empty, row, layoutID) { }
 
-        public RowFormulaPadItem(ItemCollectionPad parent, string internalname, RowItem row, string layoutID) : base(parent, internalname) {
+        public RowFormulaPadItem(ItemCollectionPad parent, string internalname, RowItem row, string layoutID) : base(parent, internalname, true) {
             Row = row;
-            Größe_fixiert = true;
 
             if (row != null && string.IsNullOrEmpty(layoutID)) {
                 var p = new ItemCollectionPad(Row.Database.Layouts[0], string.Empty);
@@ -149,7 +148,8 @@ namespace BlueControls.ItemCollection {
                 if (ForPrinting) {
                     GR.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                     GR.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
-                } else {
+                }
+                else {
                     GR.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
                     GR.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
                 }
@@ -199,7 +199,8 @@ namespace BlueControls.ItemCollection {
 
                     if (_Row == null) {
                         MessageBox.Show("<b><u>Eintrag nicht hinzugefügt</b></u><br>" + n, enImageCode.Warnung, "OK");
-                    } else {
+                    }
+                    else {
                         MessageBox.Show("<b><u>Eintrag neu gefunden:</b></u><br>" + n, enImageCode.Warnung, "OK");
                     }
 

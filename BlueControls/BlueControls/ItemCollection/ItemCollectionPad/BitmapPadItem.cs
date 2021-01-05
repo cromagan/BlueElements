@@ -70,12 +70,12 @@ namespace BlueControls.ItemCollection
 
         public BitmapPadItem(ItemCollectionPad parent, Bitmap bmp) : this(parent, string.Empty, bmp, Size.Empty) { }
 
-        public BitmapPadItem(ItemCollectionPad parent, string internalname, Bitmap bmp, Size size) : base(parent, internalname)
+        public BitmapPadItem(ItemCollectionPad parent, string internalname, Bitmap bmp, Size size) : base(parent, internalname, false)
         {
 
 
             Bitmap = bmp;
-            SetCoordinates(new RectangleM(0, 0, size.Width, size.Height));
+            SetCoordinates(new RectangleM(0, 0, size.Width, size.Height), true);
 
             Overlays = new List<QuickImage>();
             Hintergrund_weiß_füllen = true;
@@ -229,8 +229,6 @@ namespace BlueControls.ItemCollection
             }
 
 
-
-
             GR.TranslateTransform(-trp.X, -trp.Y);
             GR.ResetTransform();
             if (!ForPrinting)
@@ -275,8 +273,6 @@ namespace BlueControls.ItemCollection
             return false;
         }
 
-
-
         protected override void ParseFinished() { }
 
         public override string ToString()
@@ -305,25 +301,6 @@ namespace BlueControls.ItemCollection
 
             return t.Trim(", ") + "}";
         }
-
-
-
-
-        //public object Clone()
-        //{
-        //    ClearInternalRelations(); // Damit nix geclont wird
-        //    var i = (BitmapPadItem)MemberwiseClone();
-
-        //    i.p_LO = new PointM(i, p_LO);
-        //    i.p_LU = new PointM(i, p_LU);
-        //    i.p_RU = new PointM(i, p_RU);
-        //    i.p_RO = new PointM(i, p_RO);
-
-        //    return i;
-        //}
-
-
-
 
 
 
@@ -364,8 +341,6 @@ namespace BlueControls.ItemCollection
             return false;
         }
 
-
-
         public bool RenameColumn(string oldName, ColumnItem cColumnItem)
         {
             var ot = Platzhalter_für_Layout;
@@ -377,8 +352,6 @@ namespace BlueControls.ItemCollection
             Platzhalter_für_Layout = Platzhalter_für_Layout.Replace("//TS/302" + oldName + "/", "//TS/302" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
             return ot != Platzhalter_für_Layout;
         }
-
-
 
         public override List<FlexiControl> GetStyleOptions()
         {

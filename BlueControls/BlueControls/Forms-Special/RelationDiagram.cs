@@ -76,7 +76,7 @@ namespace BlueControls.Forms {
                 Pad.ZoomFit();
             }
 
-            RepairLinesAndFullProcessing();
+            //RepairLinesAndFullProcessing();
         }
 
 
@@ -109,7 +109,7 @@ namespace BlueControls.Forms {
             var i2 = new RowFormulaPadItem(Pad.Item, r, layoutID);
             Pad.Item.Add(i2);
             //  Pad.Invalidate()
-            i2.SetCoordinates(new RectangleM(xPos, Ypos, i2.UsedArea().Width, i2.UsedArea().Height));
+            i2.SetCoordinates(new RectangleM(xPos, Ypos, i2.UsedArea().Width, i2.UsedArea().Height), false);
 
             i2.InDenVordergrund();
 
@@ -129,10 +129,6 @@ namespace BlueControls.Forms {
 
 
             e.UserMenu.Add("Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+", enImageCode.PlusZeichen);
-            //e.UserMenu.Add("Übergeordnete Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+Ü", enImageCode.PlusZeichen);
-            //e.UserMenu.Add("Untergeordnete Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+U", enImageCode.PlusZeichen);
-            //e.UserMenu.Add("Gleichgestellte Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+G", enImageCode.PlusZeichen);
-            //Stop
         }
 
 
@@ -150,25 +146,13 @@ namespace BlueControls.Forms {
                     BezPlus(i);
                     break;
 
-                //case "Bez+Ü":
-                //    BezPlus(i, 1);
-                //    break;
-
-                //case "Bez+U":
-                //    BezPlus(i, 2);
-                //    break;
-
-                //case "Bez+G":
-                //    BezPlus(i, 0);
-                //    break;
-
                 default:
                     Develop.DebugPrint(e);
                     break;
             }
 
 
-            RepairLinesAndFullProcessing();
+            //RepairLinesAndFullProcessing();
         }
 
 
@@ -253,57 +237,57 @@ namespace BlueControls.Forms {
         }
 
 
-        private void RepairLinesAndFullProcessing() {
-            //Develop.DebugPrint_NichtImplementiert();
-            //if (RelationsValid)
-            //{
-            //    return;
-            //}
-            //RelationsValid = true;
+        //private void RepairLinesAndFullProcessing() {
+        //    //Develop.DebugPrint_NichtImplementiert();
+        //    //if (RelationsValid)
+        //    //{
+        //    //    return;
+        //    //}
+        //    //RelationsValid = true;
 
 
-            //var z = 0;
+        //    //var z = 0;
 
-            //do
-            //{
-            //    if (z >= Pad.Item.Count) { break; }
-            //    if (Pad.Item[z] is LinePadItem)
-            //    {
-            //        Pad.Item.RemoveAt(z);
-            //    }
-            //    else
-            //    {
-            //        z++;
-            //    }
-            //} while (true);
-
-
-            //var it = new List<BasicItem>();
-            //it.AddRange(Pad.Item);
-
-            //if (it == null || it.Count < 2) { return; }
-
-            //foreach (BasicPadItem ThisItem in it)
-            //{
-            //    if (ThisItem != null && ThisItem is RowFormulaPadItem tempVar)
-            //    {
-            //        var l = Database.Cell.GetList(Col, tempVar.Row);
-            //        if (l.Count > 0)
-            //        {
-            //            foreach (var thisR in l)
-            //            {
-            //                if (thisR.Contains("{ID=Relation") || !thisR.StartsWith("{"))
-            //                {
-            //                    AddVerbinder(tempVar, new clsRelation(Col, tempVar.Row, thisR));
-            //                }
-            //            }
-
-            //        }
-            //    }
-            //}
+        //    //do
+        //    //{
+        //    //    if (z >= Pad.Item.Count) { break; }
+        //    //    if (Pad.Item[z] is LinePadItem)
+        //    //    {
+        //    //        Pad.Item.RemoveAt(z);
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        z++;
+        //    //    }
+        //    //} while (true);
 
 
-        }
+        //    //var it = new List<BasicItem>();
+        //    //it.AddRange(Pad.Item);
+
+        //    //if (it == null || it.Count < 2) { return; }
+
+        //    //foreach (BasicPadItem ThisItem in it)
+        //    //{
+        //    //    if (ThisItem != null && ThisItem is RowFormulaPadItem tempVar)
+        //    //    {
+        //    //        var l = Database.Cell.GetList(Col, tempVar.Row);
+        //    //        if (l.Count > 0)
+        //    //        {
+        //    //            foreach (var thisR in l)
+        //    //            {
+        //    //                if (thisR.Contains("{ID=Relation") || !thisR.StartsWith("{"))
+        //    //                {
+        //    //                    AddVerbinder(tempVar, new clsRelation(Col, tempVar.Row, thisR));
+        //    //                }
+        //    //            }
+
+        //    //        }
+        //    //    }
+        //    //}
+
+
+        //}
 
         private void AddVerbinder(RowFormulaPadItem Von, string NachRelation) {
             Develop.DebugPrint_NichtImplementiert();

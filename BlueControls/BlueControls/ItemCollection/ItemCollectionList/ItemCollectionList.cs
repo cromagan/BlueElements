@@ -218,7 +218,8 @@ namespace BlueControls.ItemCollection {
 
             if (_CheckBehavior == enCheckBehavior.NoSelection) {
                 value = false;
-            } else if (CheckVariable && value == false && _CheckBehavior == enCheckBehavior.AlwaysSingleSelection) {
+            }
+            else if (CheckVariable && value == false && _CheckBehavior == enCheckBehavior.AlwaysSingleSelection) {
                 if (Checked().Count == 1) { value = true; }
             }
 
@@ -277,7 +278,7 @@ namespace BlueControls.ItemCollection {
         ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
         /// </summary>
         /// <returns></returns>
-        internal Tuple<int, int, int, enOrientation> ItemData() // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+        internal (int BiggestItemX, int BiggestItemY, int HeightAdded, enOrientation SenkrechtAllowed) ItemData() // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
         {
             var w = 16;
             var h = 0;
@@ -296,7 +297,8 @@ namespace BlueControls.ItemCollection {
 
                     if (sameh < 0) {
                         sameh = ThisItem.SizeUntouchedForListBox().Height;
-                    } else {
+                    }
+                    else {
                         if (sameh != ThisItem.SizeUntouchedForListBox().Height) { or = enOrientation.Waagerecht; }
                         sameh = ThisItem.SizeUntouchedForListBox().Height;
                     }
@@ -308,27 +310,27 @@ namespace BlueControls.ItemCollection {
             }
 
 
-            return new Tuple<int, int, int, enOrientation>(w, h, hall, or);
+            return (w, h, hall, or);
         }
 
 
 
 
         public Size CalculateColumnAndSize() {
-            var data = ItemData(); /// BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+            var (BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed) = ItemData();
 
-            if (data.Item4 == enOrientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, data); }
+            if (SenkrechtAllowed == enOrientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, BiggestItemX, HeightAdded, SenkrechtAllowed); }
 
-            BreakAfterItems = CalculateColumnCount(data.Item1, data.Item3, data.Item4);
+            BreakAfterItems = CalculateColumnCount(BiggestItemX, HeightAdded, SenkrechtAllowed);
 
-            return ComputeAllItemPositions(new Size(1, 30), null, data);
+            return ComputeAllItemPositions(new Size(1, 30), null, BiggestItemX, HeightAdded, SenkrechtAllowed);
         }
 
-        internal Size ComputeAllItemPositions(Size ControlDrawingArea, Slider SliderY, Tuple<int, int, int, enOrientation> data) {
+        internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider sliderY, int biggestItemX, int heightAdded, enOrientation senkrechtAllowed) {
 
 
-            if (Math.Abs(LastCheckedMaxSize.Width - ControlDrawingArea.Width) > 0.1 || Math.Abs(LastCheckedMaxSize.Height - ControlDrawingArea.Height) > 0.1) {
-                LastCheckedMaxSize = ControlDrawingArea;
+            if (Math.Abs(LastCheckedMaxSize.Width - controlDrawingArea.Width) > 0.1 || Math.Abs(LastCheckedMaxSize.Height - controlDrawingArea.Height) > 0.1) {
+                LastCheckedMaxSize = controlDrawingArea;
                 _CellposCorrect = Size.Empty;
             }
             if (!_CellposCorrect.IsEmpty) { return _CellposCorrect; }
@@ -341,23 +343,14 @@ namespace BlueControls.ItemCollection {
 
             if (_ItemDesign == enDesign.Undefiniert) { GetDesigns(); }
 
-            // var data = ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-
-            if (data == null) { data = ItemData(); }
-
-
-            var ori = data.Item4;
-
-            if (BreakAfterItems < 1) { ori = enOrientation.Waagerecht; }
-
+            if (BreakAfterItems < 1) { senkrechtAllowed = enOrientation.Waagerecht; }
 
             var SliderWidth = 0;
-            if (SliderY != null) {
-                if (BreakAfterItems < 1 && data.Item3 > ControlDrawingArea.Height) {
-                    SliderWidth = SliderY.Width;
+            if (sliderY != null) {
+                if (BreakAfterItems < 1 && heightAdded > controlDrawingArea.Height) {
+                    SliderWidth = sliderY.Width;
                 }
             }
-
 
             int colWidth;
 
@@ -373,16 +366,18 @@ namespace BlueControls.ItemCollection {
                 default:
                     // u.a. Autofilter
                     if (BreakAfterItems < 1) {
-                        colWidth = ControlDrawingArea.Width - SliderWidth;
-                    } else {
+                        colWidth = controlDrawingArea.Width - SliderWidth;
+                    }
+                    else {
                         var colCount = (int)(Count / BreakAfterItems);
                         var r = Count % colCount;
                         if (r != 0) { colCount++; }
 
-                        if (ControlDrawingArea.Width < 5) {
-                            colWidth = data.Item1;
-                        } else {
-                            colWidth = (ControlDrawingArea.Width - SliderWidth) / colCount;
+                        if (controlDrawingArea.Width < 5) {
+                            colWidth = biggestItemX;
+                        }
+                        else {
+                            colWidth = (controlDrawingArea.Width - SliderWidth) / colCount;
                         }
 
 
@@ -410,28 +405,32 @@ namespace BlueControls.ItemCollection {
                     itenc++;
 
 
-                    if (ori == enOrientation.Waagerecht) {
-                        if (ThisItem.IsCaption) { wi = ControlDrawingArea.Width - SliderWidth; }
+                    if (senkrechtAllowed == enOrientation.Waagerecht) {
+                        if (ThisItem.IsCaption) { wi = controlDrawingArea.Width - SliderWidth; }
                         he = ThisItem.HeightForListBox(_Appearance, wi);
-                    } else {
+                    }
+                    else {
                         he = ThisItem.HeightForListBox(_Appearance, wi);
                     }
 
 
                     if (previtem != null) {
-                        if (ori == enOrientation.Waagerecht) {
-                            if (previtem.Pos.Right + colWidth > ControlDrawingArea.Width || ThisItem.IsCaption) {
+                        if (senkrechtAllowed == enOrientation.Waagerecht) {
+                            if (previtem.Pos.Right + colWidth > controlDrawingArea.Width || ThisItem.IsCaption) {
                                 cx = 0;
                                 cy = previtem.Pos.Bottom;
-                            } else {
+                            }
+                            else {
                                 cx = previtem.Pos.Right;
                                 cy = previtem.Pos.Top;
                             }
-                        } else {
+                        }
+                        else {
                             if (itenc % BreakAfterItems == 0) {
                                 cx = previtem.Pos.Right;
                                 cy = 0;
-                            } else {
+                            }
+                            else {
                                 cx = previtem.Pos.Left;
                                 cy = previtem.Pos.Bottom;
                             }
@@ -448,40 +447,39 @@ namespace BlueControls.ItemCollection {
             }
 
 
-            if (SliderY != null) {
+            if (sliderY != null) {
 
                 var SetTo0 = false;
 
                 if (SliderWidth > 0) {
-                    if (Maxy - ControlDrawingArea.Height <= 0) {
-                        SliderY.Enabled = false;
+                    if (Maxy - controlDrawingArea.Height <= 0) {
+                        sliderY.Enabled = false;
                         SetTo0 = true;
-                    } else {
-                        SliderY.Enabled = true;
-                        SliderY.Minimum = 0;
-                        SliderY.SmallChange = 16;
-                        SliderY.LargeChange = ControlDrawingArea.Height;
-                        SliderY.Maximum = Maxy - ControlDrawingArea.Height;
+                    }
+                    else {
+                        sliderY.Enabled = true;
+                        sliderY.Minimum = 0;
+                        sliderY.SmallChange = 16;
+                        sliderY.LargeChange = controlDrawingArea.Height;
+                        sliderY.Maximum = Maxy - controlDrawingArea.Height;
 
                         SetTo0 = false;
                     }
 
-                    SliderY.Height = ControlDrawingArea.Height;
-                    SliderY.Visible = true;
-                } else {
+                    sliderY.Height = controlDrawingArea.Height;
+                    sliderY.Visible = true;
+                }
+                else {
                     SetTo0 = true;
-                    SliderY.Visible = false;
+                    sliderY.Visible = false;
                 }
 
                 if (SetTo0) {
-                    SliderY.Minimum = 0;
-                    SliderY.Maximum = 0;
-                    SliderY.Value = 0;
+                    sliderY.Minimum = 0;
+                    sliderY.Maximum = 0;
+                    sliderY.Value = 0;
                 }
-
-
             }
-
 
             _CellposCorrect = new Size(MaxX, Maxy);
             return _CellposCorrect;
@@ -498,10 +496,6 @@ namespace BlueControls.ItemCollection {
 
             var dithemh = AllItemsHeight / Count;
 
-
-            //    Size f;
-            //    var WouldBeGood = -1;
-            //    var TestSP = 0;
             for (var TestSP = 10; TestSP >= 1; TestSP--) {
 
                 var colc = Count / TestSP;
@@ -523,10 +517,7 @@ namespace BlueControls.ItemCollection {
                 if (ok) {
                     return colc;
                 }
-
-
             }
-
             return -1;
         }
 
@@ -554,11 +545,9 @@ namespace BlueControls.ItemCollection {
                     }
                 }
             }
-
         }
 
         #region  Add / AddRange 
-
 
 
         #region TextListItem
@@ -615,21 +604,13 @@ namespace BlueControls.ItemCollection {
 
 
 
-
-
-
-
-
-
         public TextListItem Add(string internalAndReadableText, enDataFormat format) {
             return Add(internalAndReadableText, internalAndReadableText, null, false, true, DataFormat.CompareKey(internalAndReadableText, format));
         }
 
-
         public TextListItem Add(string internalAndReadableText, enImageCode symbol) {
             return Add(internalAndReadableText, internalAndReadableText, symbol, false, true, string.Empty);
         }
-
 
 
         public TextListItem Add(string readableText, string internalname, bool enabled) {
@@ -653,9 +634,6 @@ namespace BlueControls.ItemCollection {
         }
 
 
-
-
-
         public TextListItem Add(string readableText, string internalname) {
             return Add(readableText, internalname, null, false, true, string.Empty);
 
@@ -671,8 +649,6 @@ namespace BlueControls.ItemCollection {
         }
 
 
-
-
         public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey) {
             return Add(readableText, internalname, QuickImage.Get(symbol, 16), isCaption, enabled, userDefCompareKey);
         }
@@ -685,14 +661,10 @@ namespace BlueControls.ItemCollection {
         }
 
 
-
-
         #endregion
 
 
         #region  BitmapListItem
-
-
 
 
         public BitmapListItem Add(Bitmap bmp, string caption) {
@@ -707,20 +679,10 @@ namespace BlueControls.ItemCollection {
 
             if (Contains(item)) { Develop.DebugPrint(enFehlerArt.Warnung, "Bereits vorhanden!"); return; }
 
-            if (this[item.Internal] != null) { Develop.DebugPrint(enFehlerArt.Info, "Name bereits vorhanden!"); return; }
-
+            if (this[item.Internal] != null) { Develop.DebugPrint(enFehlerArt.Info, "Name bereits vorhanden: " + item.Internal); return; }
 
             base.Add(item);
         }
-
-
-
-        //public BitmapListItem Add(Bitmap BMP, string internalname)
-        //{
-        //    return Add(internalname, string.Empty, string.Empty, BMP, string.Empty);
-        //}
-
-
 
 
 
@@ -730,20 +692,6 @@ namespace BlueControls.ItemCollection {
             return i;
         }
 
-
-        //public BitmapListItem Add(string internalname, string caption, QuickImage QI)
-        //{
-        //    return Add(internalname, caption, string.Empty, QI.BMP, string.Empty);
-        //}
-
-
-        //private BitmapListItem Add(string internalname, string caption, string Filename, Bitmap bmp, string EncryptionKey)
-        //{
-
-        //    var i = new BitmapListItem(internalname, caption, Filename, bmp, EncryptionKey);
-        //    Add(i);
-        //    return i;
-        //}
 
 
         #endregion
@@ -805,7 +753,8 @@ namespace BlueControls.ItemCollection {
         public BasicListItem Add(clsNamedBinary binary) {
             if (binary.Picture != null) {
                 return Add(binary.Picture, binary.Name);
-            } else {
+            }
+            else {
                 return Add(binary.Name, binary.Binary);
             }
         }
@@ -813,7 +762,8 @@ namespace BlueControls.ItemCollection {
         public TextListItem Add(ColumnItem column, bool doCaptionSort) {
             if (doCaptionSort) {
                 return Add(column, column.Name, column.Ueberschriften + Constants.SecondSortChar + column.Name);
-            } else {
+            }
+            else {
                 return Add(column, column.Name, string.Empty);
             }
 
@@ -863,7 +813,6 @@ namespace BlueControls.ItemCollection {
 
 
 
-
         public void AddRange(ColumnCollection Columns, bool OnlyExportableTextformatForLayout, bool NoCritical, bool DoCaptionSort) {
 
             foreach (var ThisColumnItem in Columns) {
@@ -883,18 +832,11 @@ namespace BlueControls.ItemCollection {
                             if (this[capt] == null) {
                                 Add(new TextListItem(capt, capt, null, true, true, capt + Constants.FirstSortChar));
                             }
-
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
 
         public void AddRange(Type type) {
             foreach (int z1 in Enum.GetValues(type)) {
@@ -902,7 +844,6 @@ namespace BlueControls.ItemCollection {
             }
 
             Sort();
-
         }
 
         public void AddRange(string[] Values) {
@@ -911,11 +852,7 @@ namespace BlueControls.ItemCollection {
             foreach (var thisstring in Values) {
                 if (this[thisstring] == null) { Add(thisstring); }
             }
-
         }
-
-
-
 
         public void AddRange(ListExt<string> Values) {
 
@@ -924,10 +861,7 @@ namespace BlueControls.ItemCollection {
             foreach (var thisstring in Values) {
                 if (this[thisstring] == null) { Add(thisstring, thisstring); }
             }
-
-
         }
-
 
         public void AddRange(List<string> Values, ColumnItem ColumnStyle, enShortenStyle Style, enBildTextVerhalten bildTextverhalten) {
 
@@ -952,7 +886,8 @@ namespace BlueControls.ItemCollection {
             if (this[Value] == null) {
                 if (ColumnStyle.Format == enDataFormat.Link_To_Filesystem && Value.FileType() == enFileFormat.Image) {
                     return Add(ColumnStyle.BestFile(Value, false), Value, Value, ColumnStyle.Database.FileEncryptionKey);
-                } else {
+                }
+                else {
                     var i = new CellLikeListItem(Value, ColumnStyle, Style, true, bildTextverhalten);
                     Add(i);
                     return i;
@@ -990,30 +925,6 @@ namespace BlueControls.ItemCollection {
 
         }
 
-
-
-        //public void AddRange(List<BasicListItem> Vars)
-        //{
-        //    if (Vars == null) { return; }
-
-        //    foreach (var thisItem in Vars)
-        //    {
-        //        if (IndexOf(thisItem) < 0)
-        //        {
-        //            switch (thisItem)
-        //            {
-        //                case TextListItem TI: Add(TI); break;
-        //                case BitmapListItem BI: Add(BI); break;
-        //                case LineListItem LI: Add(LI); break;
-        //                // case ObjectListItem OI: Add(OI); break;
-        //                case CellLikeListItem CI: Add(CI); break;
-        //                default:
-        //                    Develop.DebugPrint_NichtImplementiert();
-        //                    break;
-        //            }
-        //        }
-        //    }
-        //}
 
         public void AddLayoutsOf(Database vLayoutDatabase, bool vDoDiscLayouts, string vAdditionalLayoutPath) {
 
@@ -1069,8 +980,6 @@ namespace BlueControls.ItemCollection {
 
 
 
-
-
         #region  Standard-Such-Properties 
 
 
@@ -1081,7 +990,6 @@ namespace BlueControls.ItemCollection {
                     if (ThisItem != null && ThisItem.Contains(X, Y)) { return ThisItem; }
                 }
 
-
                 return null;
             }
         }
@@ -1090,20 +998,15 @@ namespace BlueControls.ItemCollection {
         #endregion
 
 
-
-
         public void Remove(string Internal) {
             Remove(this[Internal]);
         }
-
-
 
         public void RemoveRange(List<string> Internal) {
             foreach (var item in Internal) {
                 Remove(item);
             }
         }
-
 
 
         public BasicListItem this[string Internal] {
@@ -1145,14 +1048,16 @@ namespace BlueControls.ItemCollection {
                                 if (ThisItem.Checked) {
                                     if (!Done) {
                                         Done = true;
-                                    } else {
+                                    }
+                                    else {
                                         if (ThisItem.Checked) {
                                             ThisItem.Checked = false;
                                             SomethingDonex = true;
                                         }
                                     }
                                 }
-                            } else {
+                            }
+                            else {
                                 Done = true;
                                 if (ThisItem != ThisMustBeChecked && ThisItem.Checked) {
                                     SomethingDonex = true;
@@ -1193,8 +1098,6 @@ namespace BlueControls.ItemCollection {
         }
 
 
-
-
         public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem checkedItemsAtRow, enShortenStyle style, int maxItems) {
 
             var Marked = new List<string>();
@@ -1213,7 +1116,8 @@ namespace BlueControls.ItemCollection {
                         new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc))
                     };
                     l.AddRange(column.Contents(F));
-                } else {
+                }
+                else {
                     l.AddRange(column.Contents(null));
                 }
             }
@@ -1253,7 +1157,8 @@ namespace BlueControls.ItemCollection {
                     if (!checkedItemsAtRow.CellIsNullOrEmpty(column)) {
                         if (column.MultiLine) {
                             Marked = checkedItemsAtRow.CellGetList(column);
-                        } else {
+                        }
+                        else {
                             Marked.Add(checkedItemsAtRow.CellGetString(column));
                         }
                     }

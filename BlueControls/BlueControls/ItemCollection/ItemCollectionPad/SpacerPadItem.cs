@@ -72,7 +72,7 @@ namespace BlueControls.ItemCollection {
         public SpacerPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
 
 
-        public SpacerPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
+        public SpacerPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname, true) {
             mm125x = Math.Round(modConverter.mmToPixel(1.25M, ItemCollectionPad.DPI), 1);
 
             Größe_Distanzhalter = mm125x * 2; // 19,68 = 2,5 mm
@@ -81,9 +81,6 @@ namespace BlueControls.ItemCollection {
 
 
         }
-
-
-
 
 
         #endregion

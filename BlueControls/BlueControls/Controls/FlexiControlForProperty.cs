@@ -349,12 +349,10 @@ namespace BlueControls.Controls {
                                 list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
                                 var s = BlueFont.MeasureStringOfCaption(_Caption);
 
-                                var data = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-                                //var Wi = data.Item1;
-                                //var He = data.Item2;
+                                var (BiggestItemX, BiggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
 
-                                var x = Math.Max((int)(data.Item1 + 20 + s.Width), 200);
-                                var y = Math.Max(data.Item2 + Skin.PaddingSmal * 2, 24);
+                                var x = Math.Max((int)(BiggestItemX + 20 + s.Width), 200);
+                                var y = Math.Max(BiggestItemY + Skin.PaddingSmal * 2, 24);
                                 Size = new Size(x, y);
                                 var c = (ComboBox)CreateSubControls();
                                 StyleComboBox(c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);

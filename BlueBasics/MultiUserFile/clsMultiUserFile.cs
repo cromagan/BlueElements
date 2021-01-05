@@ -184,8 +184,11 @@ namespace BlueBasics.MultiUserFile {
         private void PureBinSaver_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             if (e.UserState == null) { return; }
 
-            var Data = (Tuple<string, string, string>)e.UserState;
 
+
+            var Data = (ValueTuple<string, string, string>)e.UserState;
+
+            //          var Data = (Tuple<string, string, string>)e.UserState;
             SaveRoutine(true, Data.Item1, Data.Item2, Data.Item3);
         }
 
@@ -212,7 +215,7 @@ namespace BlueBasics.MultiUserFile {
 
 
 
-        private Tuple<List<byte>, string> LoadBytesFromDisk(bool OnlyReload) {
+        private (List<byte> data, string fileinfo) LoadBytesFromDisk(bool OnlyReload) {
             byte[] _tmp = null;
             var tmpLastSaveCode2 = string.Empty;
 
@@ -220,7 +223,7 @@ namespace BlueBasics.MultiUserFile {
             do {
                 try {
 
-                    if (OnlyReload && !ReloadNeeded()) { return null; } // PRoblem hat sich aufgelöst
+                    if (OnlyReload && !ReloadNeeded()) { return (null, string.Empty); } // PRoblem hat sich aufgelöst
 
                     var f = ErrorReason(enErrorReason.Load);
 
@@ -242,7 +245,7 @@ namespace BlueBasics.MultiUserFile {
                     // Home Office kann lange blokieren....
                     if (DateTime.UtcNow.Subtract(StartTime).TotalSeconds > 300) {
                         Develop.DebugPrint(enFehlerArt.Fehler, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
-                        return null;
+                        return (null, string.Empty);
                     }
                 }
             } while (true);
@@ -257,7 +260,7 @@ namespace BlueBasics.MultiUserFile {
                 _BLoaded.AddRange(_tmp);
             }
 
-            return new Tuple<List<byte>, string>(_BLoaded, tmpLastSaveCode2);
+            return (_BLoaded, tmpLastSaveCode2);
         }
 
 
@@ -316,11 +319,10 @@ namespace BlueBasics.MultiUserFile {
 
             if (OnlyReload && ReadOnly && ec.TryCancel) { _IsLoading = false; return; }
 
-            var Data = LoadBytesFromDisk(OnlyReload);
-            if (Data == null) { _IsLoading = false; return; }
+            var (_BLoaded, tmpLastSaveCode) = LoadBytesFromDisk(OnlyReload);
+            if (_BLoaded == null) { _IsLoading = false; return; }
 
-            var tmpLastSaveCode = Data.Item2;
-            var _BLoaded = Data.Item1;
+
             _dataOnDisk = _BLoaded.ToStringConvert();
 
             PrepeareDataForCheckingBeforeLoad();
@@ -391,20 +393,21 @@ namespace BlueBasics.MultiUserFile {
         /// <summary>
         /// Entfernt im Regelfall die Temporäre Datei
         /// </summary>
-        /// <param name="FromParallelProzess"></param>
-        /// <param name="SavedFileName"></param>
-        /// <param name="StateOfOriginalFile"></param>
-        /// <param name="SavedData"></param>
+        /// <param name="fromParallelProzess"></param>
+        /// <param name="tmpFileName"></param>
+        /// <param name="fileInfoBeforeSaving"></param>
+        /// <param name="savedDataUncompressed"></param>
         /// <returns></returns>
-        private string SaveRoutine(bool FromParallelProzess, string savedFileName, string StateOfOriginalFile, string SavedData) {
+        private string SaveRoutine(bool fromParallelProzess, string tmpFileName, string fileInfoBeforeSaving, string savedDataUncompressed) {
+
 
             if (ReadOnly) { return Feedback("Datei ist Readonly"); }
 
-            if (savedFileName == null || string.IsNullOrEmpty(savedFileName) ||
-                StateOfOriginalFile == null || string.IsNullOrEmpty(StateOfOriginalFile) ||
-                SavedData == null || string.IsNullOrEmpty(SavedData)) { return Feedback("Keine Daten angekommen."); }
+            if (tmpFileName == null || string.IsNullOrEmpty(tmpFileName) ||
+                fileInfoBeforeSaving == null || string.IsNullOrEmpty(fileInfoBeforeSaving) ||
+                savedDataUncompressed == null || string.IsNullOrEmpty(savedDataUncompressed)) { return Feedback("Keine Daten angekommen."); }
 
-            if (!FromParallelProzess && PureBinSaver.IsBusy) { return Feedback("Anderer interner binärer Speichervorgang noch nicht abgeschlossen."); }
+            if (!fromParallelProzess && PureBinSaver.IsBusy) { return Feedback("Anderer interner binärer Speichervorgang noch nicht abgeschlossen."); }
 
             var f = ErrorReason(enErrorReason.Save);
             if (!string.IsNullOrEmpty(f)) { return Feedback("Fehler: " + f); }
@@ -426,14 +429,14 @@ namespace BlueBasics.MultiUserFile {
 
                 // Blockdatei da, wir sind save. Andere Computer lassen die Datei ab jetzt in Ruhe!
 
-                if (GetFileInfo(true) != StateOfOriginalFile) {
+                if (GetFileInfo(true) != fileInfoBeforeSaving) {
                     DeleteBlockDatei(false, true);
                     _IsSaving = false;
                     return Feedback("Datei wurde inzwischen verändert.");
                 }
 
 
-                if (SavedData != ToString()) {
+                if (savedDataUncompressed != ToString()) {
                     DeleteBlockDatei(false, true);
                     _IsSaving = false;
                     return Feedback("Daten wurden inzwischen verändert.");
@@ -447,10 +450,10 @@ namespace BlueBasics.MultiUserFile {
             RenameFile(Filename, Backupdateiname(), true);
 
             // --- TmpFile wird zum Haupt ---
-            RenameFile(savedFileName, Filename, true);
+            RenameFile(tmpFileName, Filename, true);
 
             // ---- Steuerelemente Sagen, was gespeichert wurde
-            _dataOnDisk = SavedData;
+            _dataOnDisk = savedDataUncompressed;
 
             if (!EasyMode) {
                 // Und nun den Block entfernen
@@ -467,8 +470,8 @@ namespace BlueBasics.MultiUserFile {
 
             if (!EasyMode) {
                 // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
-                var Data = LoadBytesFromDisk(false);
-                if (SavedData != Data.Item1.ToArray().ToStringConvert()) {
+                var (data, fileinfo) = LoadBytesFromDisk(false);
+                if (savedDataUncompressed != data.ToArray().ToStringConvert()) {
                     // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichter und ungeladen.
                     _CheckedAndReloadNeed = true;
                     _LastSaveCode = "Fehler";
@@ -478,7 +481,7 @@ namespace BlueBasics.MultiUserFile {
                 }
                 else {
                     _CheckedAndReloadNeed = false;
-                    _LastSaveCode = Data.Item2;
+                    _LastSaveCode = fileinfo;
                 }
             }
             else {
@@ -494,7 +497,7 @@ namespace BlueBasics.MultiUserFile {
 
 
             string Feedback(string txt) {
-                DeleteFile(savedFileName, false);
+                DeleteFile(tmpFileName, false);
                 Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br>Grund:<br>" + txt);
                 RepairOldBlockFiles();
                 return txt;
@@ -776,8 +779,8 @@ namespace BlueBasics.MultiUserFile {
             while (HasPendingChanges()) {
 
                 Load_Reload();
-                var Data = WriteTempFileToDisk(false); // Dateiname, Stand der Originaldatei, was gespeichert wurde
-                var f = SaveRoutine(false, Data?.Item1, Data?.Item2, Data?.Item3);
+                var (TMPFileName, FileInfoBeforeSaving, DataUncompressed) = WriteTempFileToDisk(false); // Dateiname, Stand der Originaldatei, was gespeichert wurde
+                var f = SaveRoutine(false, TMPFileName, FileInfoBeforeSaving, DataUncompressed);
 
                 if (!string.IsNullOrEmpty(f)) {
                     if (DateTime.UtcNow.Subtract(D).TotalSeconds > 40) {
@@ -845,22 +848,23 @@ namespace BlueBasics.MultiUserFile {
         /// 
         /// </summary>
         /// <returns>Dateiname, Stand der Originaldatei, was gespeichert wurde</returns>
-        private Tuple<string, string, string> WriteTempFileToDisk(bool iAmThePureBinSaver) {
+        private (string TMPFileName, string FileInfoBeforeSaving, string DataUncompressed) WriteTempFileToDisk(bool iAmThePureBinSaver) {
 
             string FileInfoBeforeSaving;
             string TMPFileName;
             string DataUncompressed;
+
 
             byte[] Writer_BinaryData;
 
             var count = 0;
 
 
-            if (!iAmThePureBinSaver && PureBinSaver.IsBusy) { return null; }
+            if (!iAmThePureBinSaver && PureBinSaver.IsBusy) { return (string.Empty, string.Empty, string.Empty); }
 
             if (_DoingTempFile) {
                 if (!iAmThePureBinSaver) { Develop.DebugPrint("Ersteller schon temp File"); }
-                return null;
+                return (string.Empty, string.Empty, string.Empty);
             }
 
             _DoingTempFile = true;
@@ -875,7 +879,7 @@ namespace BlueBasics.MultiUserFile {
                 }
 
                 var f = ErrorReason(enErrorReason.Save);
-                if (!string.IsNullOrEmpty(f)) { _DoingTempFile = false; return null; }
+                if (!string.IsNullOrEmpty(f)) { _DoingTempFile = false; return (string.Empty, string.Empty, string.Empty); }
 
                 FileInfoBeforeSaving = GetFileInfo(true);
 
@@ -907,14 +911,14 @@ namespace BlueBasics.MultiUserFile {
                     if (count > 15) {
                         Develop.DebugPrint(enFehlerArt.Warnung, "Speichern der TMP-Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + ex.Message);
                         _DoingTempFile = false;
-                        return null;
+                        return (string.Empty, string.Empty, string.Empty);
                     }
                     Pause(1, true);
                 }
             } while (true);
 
             _DoingTempFile = false;
-            return new Tuple<string, string, string>(TMPFileName, FileInfoBeforeSaving, DataUncompressed);
+            return (TMPFileName, FileInfoBeforeSaving, DataUncompressed);
 
         }
 

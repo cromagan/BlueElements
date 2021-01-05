@@ -210,7 +210,8 @@ namespace BlueControls.Controls {
             if (_MoveAllowed && _FilterAllowed) {
                 FilterCap.Left = Down.Right;
 
-            } else {
+            }
+            else {
                 FilterCap.Left = 0;
             }
 
@@ -220,7 +221,8 @@ namespace BlueControls.Controls {
             if (_RemoveAllowed) {
                 if (nr.Count == 0) {
                     Minus.Enabled = false;
-                } else {
+                }
+                else {
                     Minus.Enabled = true;
                 }
             }
@@ -230,7 +232,8 @@ namespace BlueControls.Controls {
                 if (nr.Count != 1) {
                     Up.Enabled = false;
                     Down.Enabled = false;
-                } else {
+                }
+                else {
                     Up.Enabled = Item[0] != nr[0];
                     Down.Enabled = Item[Item.Count - 1] != nr[0];
                 }
@@ -363,7 +366,9 @@ namespace BlueControls.Controls {
 
             if (ButtonsVisible()) { PaintModYx = Plus.Height; }
 
-            Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - PaintModYx), SliderY, null);
+            var (BiggestItemX, _, HeightAdded, SenkrechtAllowed) = Item.ItemData();
+
+            Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - PaintModYx), SliderY, BiggestItemX, HeightAdded, SenkrechtAllowed);
 
 
             if (SliderY.Visible) { PaintModXx = SliderY.Width; }
@@ -453,9 +458,11 @@ namespace BlueControls.Controls {
 
                 if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
                     return string.Empty;
-                } else if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
+                }
+                else if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
                     return t1 + "<br><hr><br>" + t2;
-                } else {
+                }
+                else {
                     return t1 + t2; // Eins davon ist leer
                 }
 

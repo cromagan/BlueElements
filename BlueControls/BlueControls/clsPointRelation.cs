@@ -274,7 +274,8 @@ namespace BlueControls {
                             sY = _Richtmaß[1];
                             iX = ist[0];
                             iY = ist[1];
-                        } else {
+                        }
+                        else {
                             sX = 0;
                             iX = 0;
                             sY = _Richtmaß[0];
@@ -291,17 +292,20 @@ namespace BlueControls {
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Links, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
 
 
-                        } else if (sX - iX < 0) {
+                        }
+                        else if (sX - iX < 0) {
                             //ok
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Links, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Rechts, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
 
-                        } else if (sY - iY < 0) {
+                        }
+                        else if (sY - iY < 0) {
                             //ok
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Oben, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Unten, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
 
-                        } else if (sY - iY > 0) {
+                        }
+                        else if (sY - iY > 0) {
                             //ok
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Unten, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
                             GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Oben, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
@@ -368,7 +372,7 @@ namespace BlueControls {
                     if (_Richtmaß[0] == 180 || _Richtmaß[0] == 360) { _Richtmaß[0] = 0; }
                     if (_Richtmaß[0] == 90 || _Richtmaß[0] == 270) { _Richtmaß[0] = 90; }
 
-                    if (_Richtmaß[0] != 0 && _Richtmaß[0] != 90) { Develop.DebugPrint(enFehlerArt.Fehler, "Winkel nicht erlaubt: " + _Richtmaß); }
+                    if (_Richtmaß[0] != 0 && _Richtmaß[0] != 90) { Develop.DebugPrint(enFehlerArt.Fehler, "Winkel nicht erlaubt: " + _Richtmaß[0]); }
 
                     break;
 
@@ -452,10 +456,12 @@ namespace BlueControls {
             if (p1 > p2) {
                 Fix = Points[1];
                 Flex = Points[0];
-            } else if (p1 < p2) {
+            }
+            else if (p1 < p2) {
                 Fix = Points[0];
                 Flex = Points[1];
-            } else {
+            }
+            else {
                 return;
             }
 
@@ -464,7 +470,8 @@ namespace BlueControls {
                 case enRelationType.WaagerechtSenkrecht:
                     if (_Richtmaß[0] == 90) {
                         Flex.SetTo(Fix.X, Flex.Y);
-                    } else {
+                    }
+                    else {
                         Flex.SetTo(Flex.X, Fix.Y);
                     }
                     break;
@@ -472,7 +479,8 @@ namespace BlueControls {
                 case enRelationType.PositionZueinander:
                     if (Fix == Points[1]) {
                         Flex.SetTo(Fix.X + _Richtmaß[0], Fix.Y + _Richtmaß[1]);
-                    } else {
+                    }
+                    else {
                         Flex.SetTo(Fix.X - _Richtmaß[0], Fix.Y - _Richtmaß[1]);
                     }
                     break;
@@ -480,7 +488,8 @@ namespace BlueControls {
                 case enRelationType.YPositionZueinander:
                     if (Fix == Points[1]) {
                         Flex.SetTo(Flex.X, Fix.Y + _Richtmaß[0]);
-                    } else {
+                    }
+                    else {
                         Flex.SetTo(Flex.X, Fix.Y - _Richtmaß[0]);
                     }
                     break;
