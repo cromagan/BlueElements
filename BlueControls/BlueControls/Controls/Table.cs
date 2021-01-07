@@ -3804,6 +3804,10 @@ namespace BlueControls.Controls {
 
         public void OpenSearchAndReplace() {
 
+            if (!Database.IsAdministrator()) { return; }
+            if (Database.ReadOnly) { return; }
+
+
             if (_searchAndReplace == null || _searchAndReplace.IsDisposed || !_searchAndReplace.Visible) {
                 _searchAndReplace = new SearchAndReplace(this);
                 _searchAndReplace.Show();

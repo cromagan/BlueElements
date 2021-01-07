@@ -808,6 +808,9 @@ namespace BlueControls {
                 case "&Eacute;":
                     Chars.Add(new ExtChar('É', _Design, _State, f, Stufe, MarkState));
                     break;
+                case "&euro;":
+                    Chars.Add(new ExtChar('€', _Design, _State, f, Stufe, MarkState));
+                    break;
                 default:
                     Develop.DebugPrint(enFehlerArt.Info, "Unbekannter Code: " + xHTMLTextx.Substring(xStartPosx, Endpos - xStartPosx + 1));
                     Chars.Add(new ExtChar('&', _Design, _State, f, Stufe, MarkState));

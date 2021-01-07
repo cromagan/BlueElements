@@ -1281,6 +1281,7 @@ namespace BlueDatabase {
 
             if (ZeilenQuickInfo.ToUpper().Contains(column.Name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
 
+            if (Tags.JoinWithCr().ToUpper().Contains(column.Name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
 
             var rul = false;
             foreach (var ThisRule in Rules) {
