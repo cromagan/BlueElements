@@ -164,16 +164,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         public static void OpenColumnEditor(ColumnItem column, Table tableview) {
 
-            using (var w = new ColumnEditor(column, tableview)) {
-                w.ShowDialog();
-                column.Invalidate_ColumAndContent();
-            }
+            using var w = new ColumnEditor(column, tableview);
+            w.ShowDialog();
+            column.Invalidate_ColumAndContent();
 
         }
-
-
-
-
 
         private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) {
             _TableView.Database.Column.GenerateOverView();
@@ -211,10 +206,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             DB.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
 
-            //        DB.Load_Reload(); Auf keinen Fall, die Routine wird evtl. in der Laderoutine aufgerufen. z.B. bei Fehlerhaften Regeln
-            using (var w = new DatabaseHeadEditor(DB)) {
-                w.ShowDialog();
-            }
+            if (!DB.IsLoading) { DB.Load_Reload(); } // Die Routine wird evtl. in der Laderoutine aufgerufen. z.B. bei Fehlerhaften Regeln
+            using var w = new DatabaseHeadEditor(DB);
+            w.ShowDialog();
             // DB.OnLoaded(new LoadedEventArgs(true));
         }
 
@@ -222,9 +216,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
             OpenLayoutEditor(_TableView.Database, string.Empty, string.Empty);
-
-
-
         }
 
         public static void OpenLayoutEditor(Database DB, string AdditionalLayoutPath, string LayoutToOpen) {
@@ -265,7 +256,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             var L = new ItemCollectionList();
 
-
             foreach (var ThisExport in _TableView.Database.Export) {
                 if (ThisExport.Typ == enExportTyp.DatenbankOriginalFormat) {
                     foreach (var ThisString in ThisExport._BereitsExportiert) {
@@ -288,7 +278,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
 
             }
-
 
 
             if (L.Count == 0) {
@@ -347,4 +336,3 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
     }
 }
-

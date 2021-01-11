@@ -23,7 +23,6 @@ using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
@@ -60,7 +59,8 @@ namespace BlueControls.Forms {
                 MainRibbon.Controls.Remove(tabExtras);
                 grpAllgemein.Visible = false;
                 grpBearbeitung.Visible = false;
-            } else {
+            }
+            else {
                 tabAdmin.Table = TableView;
 
             }
@@ -139,7 +139,8 @@ namespace BlueControls.Forms {
 
             if (e.Column == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Row == null) {
                 Formula.ShowingRowKey = -1;
-            } else {
+            }
+            else {
                 Formula.ShowingRowKey = e.Row.Key;
             }
 
@@ -247,10 +248,12 @@ namespace BlueControls.Forms {
 
             if (GefRow == null) {
                 MessageBox.Show("Kein Eintrag gefunden!", enImageCode.Information, "OK");
-            } else {
+            }
+            else {
                 if (GefRow == Formula.ShowingRow) {
                     MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!", enImageCode.Information, "OK");
-                } else {
+                }
+                else {
                     TableView.CursorPos_Set(_Database.Column[0], GefRow, true);
                 }
             }
@@ -318,7 +321,8 @@ namespace BlueControls.Forms {
                 SuchEintragNoSave(enDirection.Unten, out var column, out var row);
                 TableView.CursorPos_Set(column, row, false);
                 TableView.Database.Row.Remove(tmpr);
-            } else {
+            }
+            else {
                 Formula.ShowingRowKey = -1;
                 TableView.Database.Row.Remove(TableView.Filter);
             }
@@ -330,10 +334,12 @@ namespace BlueControls.Forms {
 
             if (_Database == null || _Database.Row.Count < 1) {
                 SuchB.Enabled = false;
-            } else {
+            }
+            else {
                 if (!string.IsNullOrEmpty(such.Text) && !string.IsNullOrEmpty(such.Text.RemoveChars(" "))) {
                     SuchB.Enabled = true;
-                } else {
+                }
+                else {
                     SuchB.Enabled = false;
                 }
 
@@ -382,7 +388,8 @@ namespace BlueControls.Forms {
 
             if (_Database == null) {
                 SetDatabasetoNothing();
-            } else {
+            }
+            else {
 
                 if (_Database.Ansicht != enAnsicht.Unverändert) {
                     _Ansicht = _Database.Ansicht;
@@ -483,7 +490,8 @@ namespace BlueControls.Forms {
 
                     if (Formula.ShowingRow != null) {
                         Ara.Add(Formula.ShowingRow);
-                    } else {
+                    }
+                    else {
                         Ara = TableView.SortedRows(); //Database.Column().Liste_SingleRow(0, enListenOptionen.MitFilter_Sortiert_Unique)
                     }
 
@@ -604,7 +612,8 @@ namespace BlueControls.Forms {
                     }
                     if (TableView.CursorPosRow() != null) { Formula.ShowingRowKey = TableView.CursorPosRow().Key; }
                 }
-            } else {
+            }
+            else {
                 Formula.ShowingRowKey = -1;
             }
         }
@@ -659,7 +668,8 @@ namespace BlueControls.Forms {
 
             if (_Database != null) {
                 Text = _Database.Filename.FileNameWithSuffix() + " - Be Creative! V" + _Version;
-            } else {
+            }
+            else {
                 Text = "[Neue Datenbank] - Be Creative! V" + _Version;
             }
         }
@@ -843,7 +853,8 @@ namespace BlueControls.Forms {
                     var summe = Column.Summe(TableView.Filter);
                     if (!summe.HasValue) {
                         MessageBox.Show("Die Summe konnte nicht berechnet werden.", enImageCode.Summe, "OK");
-                    } else {
+                    }
+                    else {
                         MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, enImageCode.Summe, "OK");
                     }
                     break;
@@ -875,7 +886,8 @@ namespace BlueControls.Forms {
         private void TableView_RowsSorted(object sender, System.EventArgs e) {
             if (TableView.Database.Column[0] != null) {
                 Zei.Text = "<ImageCode=Information|16>Zeilen: " + TableView.SortedRows().Count + " St.";
-            } else {
+            }
+            else {
                 Zei.Text = "-";
             }
 

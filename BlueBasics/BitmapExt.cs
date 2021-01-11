@@ -79,7 +79,8 @@ namespace BlueBasics {
                 }
 
                 bmp.Dispose(); // Sichherheithalber, da es ja nun ein neues Bild ist.
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 Develop.DebugPrint(ex);
                 Width = -1;
                 Height = -1;
@@ -122,7 +123,8 @@ namespace BlueBasics {
                 fs.Close();
                 fs.Dispose();
                 return IM;
-            } catch (Exception) {
+            }
+            catch (Exception) {
                 return null;
             }
 
@@ -192,23 +194,28 @@ namespace BlueBasics {
                     if (bmp.Width > 20000 && nw < 4000) {
                         var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 4.0), (int)(bmp.Height / 4.0), null, IntPtr.Zero);
                         GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    } else if (bmp.Width > 15000 && nw < 4000) {
+                    }
+                    else if (bmp.Width > 15000 && nw < 4000) {
                         var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
                         GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    } else if (bmp.Width > 10000 && nw < 2500) {
+                    }
+                    else if (bmp.Width > 10000 && nw < 2500) {
                         var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
                         GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    } else if (bmp.Width > 8000 && nw < 2000) {
+                    }
+                    else if (bmp.Width > 8000 && nw < 2000) {
                         var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 2.5), (int)(bmp.Height / 2.5), null, IntPtr.Zero);
                         GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    } else {
+                    }
+                    else {
                         GR.DrawImage(bmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                     }
 
                 }
                 return ImageResize;
 
-            } catch {
+            }
+            catch {
                 if (!collectGarbage) { modAllgemein.CollectGarbage(); }
                 if (sizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern) {
                     return (Bitmap)bmp.GetThumbnailImage(nw, nh, null, IntPtr.Zero);
@@ -290,31 +297,34 @@ namespace BlueBasics {
 
                 EmptyBitmap(width, height);
 
-                using (var GR = Graphics.FromImage(Bitmap)) {
-                    GR.InterpolationMode = interpolationMode;
-                    GR.PixelOffsetMode = PixelOffsetMode.Half;
+                using var GR = Graphics.FromImage(Bitmap);
+                GR.InterpolationMode = interpolationMode;
+                GR.PixelOffsetMode = PixelOffsetMode.Half;
 
 
-                    // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
-                    if (Width > 20000 && nw < 4000) {
-                        var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 4.0), (int)(oldBMP.Height / 4.0), null, IntPtr.Zero);
-                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    } else if (oldBMP.Width > 15000 && nw < 4000) {
-                        var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 3.0), (int)(oldBMP.Height / 3.0), null, IntPtr.Zero);
-                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    } else if (oldBMP.Width > 10000 && nw < 2500) {
-                        var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 3.0), (int)(oldBMP.Height / 3.0), null, IntPtr.Zero);
-                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    } else if (oldBMP.Width > 8000 && nw < 2000) {
-                        var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 2.5), (int)(oldBMP.Height / 2.5), null, IntPtr.Zero);
-                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    } else {
-                        GR.DrawImage(oldBMP, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    }
-
+                // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
+                if (Width > 20000 && nw < 4000) {
+                    var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 4.0), (int)(oldBMP.Height / 4.0), null, IntPtr.Zero);
+                    GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                }
+                else if (oldBMP.Width > 15000 && nw < 4000) {
+                    var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 3.0), (int)(oldBMP.Height / 3.0), null, IntPtr.Zero);
+                    GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                }
+                else if (oldBMP.Width > 10000 && nw < 2500) {
+                    var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 3.0), (int)(oldBMP.Height / 3.0), null, IntPtr.Zero);
+                    GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                }
+                else if (oldBMP.Width > 8000 && nw < 2000) {
+                    var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 2.5), (int)(oldBMP.Height / 2.5), null, IntPtr.Zero);
+                    GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                }
+                else {
+                    GR.DrawImage(oldBMP, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                 }
 
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 Develop.DebugPrint(ex);
 
                 //if (!collectGarbage) { modAllgemein.CollectGarbage(); }

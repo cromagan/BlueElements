@@ -28,8 +28,6 @@ namespace BlueDatabase {
     {
         //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
 
-
-
         #region  Variablen-Deklarationen 
 
         public readonly Database Database;
@@ -101,7 +99,8 @@ namespace BlueDatabase {
         public void Add(ColumnItem Column, bool Permanent) {
             if (Permanent) {
                 Add(new ColumnViewItem(Column, enViewType.PermanentColumn));
-            } else {
+            }
+            else {
                 Add(new ColumnViewItem(Column, enViewType.Column));
             }
         }
@@ -162,7 +161,7 @@ namespace BlueDatabase {
         }
 
         public void ShowAllColumns(Database OfDatabase) {
-            if (OfDatabase.IsParsing()) { return; }
+            if (OfDatabase.IsParsing) { return; }
 
             var OK = true;
             for (var z = 0; z < OfDatabase.Column.Count; z++) {
@@ -311,29 +310,6 @@ namespace BlueDatabase {
             }
         }
 
-        //public IEnumerator<ColumnViewItem> GetEnumerator()
-        //{
-        //    return _Internal.GetEnumerator();
-        //}
-
-        //IEnumerator IEnumerable.GetEnumerator()
-        //{
-        //    return IEnumerable_GetEnumerator();
-        //}
-        //private IEnumerator IEnumerable_GetEnumerator()
-        //{
-        //    return _Internal.GetEnumerator();
-        //}
-        //public int Count()
-        //{
-        //    return _Internal.Count;
-        //}
-
-
-        //public int IndexOf(ColumnViewItem vColumnViewItem)
-        //{
-        //    return _Internal.IndexOf(vColumnViewItem);
-        //}
 
         internal void Repair() {
 
@@ -345,7 +321,6 @@ namespace BlueDatabase {
                 }
             }
 
-
             this.RemoveNull();
 
             var tmp = PermissionGroups_Show.SortedDistinctList();
@@ -356,10 +331,6 @@ namespace BlueDatabase {
                 PermissionGroups_Show.Clear();
                 PermissionGroups_Show.AddRange(tmp);
             }
-
-
         }
-
-
     }
 }

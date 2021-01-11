@@ -238,9 +238,6 @@ namespace BlueDatabase {
         public event EventHandler<PasswordEventArgs> NeedPassword;
         public event EventHandler<RenameColumnInLayoutEventArgs> RenameColumnInLayout;
         public event EventHandler<GenerateLayoutInternalEventargs> GenerateLayoutInternal;
-
-
-
         #endregion
 
 
@@ -658,7 +655,7 @@ namespace BlueDatabase {
         }
 
         private void Column_ItemRemoved(object sender, System.EventArgs e) {
-            if (IsParsing()) { Develop.DebugPrint(enFehlerArt.Warnung, "Parsing Falsch!"); }
+            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Parsing Falsch!"); }
             CheckViewsAndArrangements();
         }
 
@@ -673,7 +670,7 @@ namespace BlueDatabase {
         }
 
         private void Row_RowAdded(object sender, RowEventArgs e) {
-            if (!IsParsing()) {
+            if (!IsParsing) {
                 AddPending(enDatabaseDataType.dummyComand_AddRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
             }
         }
@@ -718,39 +715,39 @@ namespace BlueDatabase {
         }
 
         private void DatabaseTags_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.Tags, -1, Tags.JoinWithCr(), false);
         }
 
         private void DatabaseAdmin_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.DatenbankAdmin, -1, DatenbankAdmin.JoinWithCr(), false);
         }
 
         private void PermissionGroups_NewRow_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.PermissionGroups_NewRow, -1, PermissionGroups_NewRow.JoinWithCr(), false);
         }
 
         private void Layouts_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.Layouts, -1, Layouts.JoinWithCr(), false);
         }
 
         private void Bins_ListOrItemChanged(object sender, System.EventArgs e) {
 
-            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.BinaryDataInOne, -1, Bins.ToString(true), false);
         }
 
         private void Export_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.AutoExport, -1, Export.ToString(true), false);
         }
 
         private void Rules_ListOrItemChanged(object sender, System.EventArgs e) {
 
-            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
 
             if (sender == Rules) {
                 AddPending(enDatabaseDataType.Rules, -1, Rules.ToString(true), false);
@@ -767,12 +764,12 @@ namespace BlueDatabase {
         }
 
         private void Views_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
+            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.Views, -1, Views.ToString(true), false);
         }
 
         private void ColumnArrangements_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing()) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
+            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.ColumnArrangement, -1, ColumnArrangements.ToString(), false);
         }
 
@@ -840,13 +837,9 @@ namespace BlueDatabase {
 
 
         protected override void ParseExternal(List<byte> B) {
-
             if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren"); }
 
-
             Column.ThrowEvents = false;
-
-
 
             enDatabaseDataType Art = 0;
             var Pointer = 0;
@@ -2095,7 +2088,7 @@ namespace BlueDatabase {
                 ParseThis(Comand, ChangedTo, Column.SearchByKey(ColumnKey), Row.SearchByKey(RowKey), -1, -1);
             }
 
-            if (IsParsing()) { return; }
+            if (IsParsing) { return; }
             if (ReadOnly) {
                 if (!string.IsNullOrEmpty(Filename)) {
                     Develop.DebugPrint(enFehlerArt.Warnung, "Datei ist Readonly, " + Comand + ", " + Filename);
@@ -2118,7 +2111,7 @@ namespace BlueDatabase {
 
 
         private void ExecutePending() {
-            if (!IsParsing()) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur während des Parsens möglich"); }
+            if (!IsParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur während des Parsens möglich"); }
             if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren!"); }
             if (!HasPendingChanges()) { return; }
 
@@ -2166,7 +2159,6 @@ namespace BlueDatabase {
                     }
                 }
             }
-
 
             // Und nun alles ausführen!
             foreach (var ThisPending in Works) {
@@ -2329,12 +2321,8 @@ namespace BlueDatabase {
             }
         }
 
-
-
-
         private void InvalidateExports(string LayoutID) {
             if (ReadOnly) { return; }
-
 
             var Done = false;
 
@@ -2374,7 +2362,6 @@ namespace BlueDatabase {
                         if (ThisExport != null) { tmp = ThisExport.DeleteOutdatedBackUps(Backup); }
                         if (tmp) { ReportAChange = true; }
                         if (Backup.CancellationPending) { break; }
-
                     }
 
                 }
@@ -2384,24 +2371,17 @@ namespace BlueDatabase {
                         if (ThisExport != null) { tmp = ThisExport.DoBackUp(Backup); }
                         if (tmp) { ReportAChange = true; }
                     }
-
                 }
-
 
             }
             catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
 
-
             if (ReportAChange) {
                 Backup.ReportProgress(100, "AddPending");
             }
         }
-
-
-
-
 
         private void Backup_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             switch ((string)e.UserState) {
@@ -2443,7 +2423,6 @@ namespace BlueDatabase {
                 WVorher = Works.ToString();
             }
         }
-
 
         protected override void CheckDataAfterReload() {
 

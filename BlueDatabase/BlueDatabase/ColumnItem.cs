@@ -1869,7 +1869,7 @@ namespace BlueDatabase {
                     if (EditType_To_Check == enEditTypeFormula.None) { return true; }
                     //if (EditType_To_Check != enEditTypeFormula.Textfeld &&
                     //    EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
-                    if (Database.IsParsing()) { return true; }
+                    if (Database.IsParsing) { return true; }
 
                     if (LinkedDatabase() == null) { return false; }
                     if (_LinkedCell_ColumnKey < 0) { return false; }
@@ -1938,9 +1938,6 @@ namespace BlueDatabase {
             }
 
         }
-
-
-
 
         public int Index() {
             return Database.Column.IndexOf(this);
@@ -2191,9 +2188,6 @@ namespace BlueDatabase {
 
             }
 
-
-
-
             if (_Format != enDataFormat.LinkedCell) {
                 if (_LinkedCell_RowKey > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
                 if (_LinkedCell_ColumnKey > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
@@ -2208,9 +2202,6 @@ namespace BlueDatabase {
         public bool IsOk() {
             return string.IsNullOrEmpty(ErrorReason());
         }
-
-
-
 
         private void Tags_ListOrItemChanged(object sender, System.EventArgs e) {
             Database.AddPending(enDatabaseDataType.co_Tags, Key, Tags.JoinWithCr(), false);
@@ -2289,16 +2280,10 @@ namespace BlueDatabase {
                         } else {
                             if (l[z].ToLower() == rep[0].ToLower()) { l[z] = r; }
                         }
-
-
                     }
-
                 }
-
                 Value = l.JoinWithCr();
             }
-
-
 
             if (_AfterEdit_AutoCorrect) { Value = KleineFehlerCorrect(Value); }
 
@@ -2313,15 +2298,12 @@ namespace BlueDatabase {
                 Value = l.JoinWithCr();
             }
 
-
             return Value;
         }
 
 
         private string KleineFehlerCorrect(string TXT) {
             if (string.IsNullOrEmpty(TXT)) { return string.Empty; }
-
-
 
             const char h4 = (char)1004; // H4 = Normaler Text, nach links rutschen
             const char h3 = (char)1003; // überschrift
@@ -2492,7 +2474,6 @@ namespace BlueDatabase {
             if (!mustBeFree) {
                 return (directory.TrimEnd("\\") + "\\" + cleanfilename + "." + suffix.ToLower()).TrimEnd(".");
             }
-
 
             var nr = -1;
 
@@ -2670,7 +2651,6 @@ namespace BlueDatabase {
                 DropDownItems.Clear();
                 DropDownItems.AddRange(NewAuswahl);
             }
-
 
         }
     }

@@ -854,9 +854,8 @@ namespace BlueControls.Controls {
             var nt = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text));
 
 
-            using (var x = new Import(_Database, nt)) {
-                x.ShowDialog();
-            }
+            using var x = new Import(_Database, nt);
+            x.ShowDialog();
 
 
         }
@@ -1251,7 +1250,7 @@ namespace BlueControls.Controls {
             ServiceStarted = true;
 
 
-            Database.MultiUserFileAdded += Database_DatabaseAdded;
+            Database.MultiUserFileCreated += Database_DatabaseAdded;
 
         }
 
@@ -1884,7 +1883,7 @@ namespace BlueControls.Controls {
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
 
-            if (Database.IsParsing()) { return false; }
+            if (Database.IsParsing) { return false; }
 
             try {
 
@@ -3818,7 +3817,7 @@ namespace BlueControls.Controls {
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
 
-            if (_Database.IsParsing()) {
+            if (_Database.IsParsing) {
                 Cancel = true;
                 return;
             }

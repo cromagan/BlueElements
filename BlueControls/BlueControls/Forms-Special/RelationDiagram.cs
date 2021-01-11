@@ -289,75 +289,75 @@ namespace BlueControls.Forms {
 
         //}
 
-        private void AddVerbinder(RowFormulaPadItem Von, string NachRelation) {
-            Develop.DebugPrint_NichtImplementiert();
-            //if (Von == null)
-            //{
-            //    return;
-            //}
+        //private void AddVerbinder(RowFormulaPadItem Von, string NachRelation) {
+        //    Develop.DebugPrint_NichtImplementiert();
+        //    //if (Von == null)
+        //    //{
+        //    //    return;
+        //    //}
 
 
-            //var NachR = Database.Row[NachRelation.Sec];
-            //if (NachR == null) { return; }
-            //var nach = ItemOfRow(NachR);
-            //if (nach == null) { return; }
+        //    //var NachR = Database.Row[NachRelation.Sec];
+        //    //if (NachR == null) { return; }
+        //    //var nach = ItemOfRow(NachR);
+        //    //if (nach == null) { return; }
 
-            //if (Von == nach) { return; }
+        //    //if (Von == nach) { return; }
 
-            //var id = NachRelation.ID();
+        //    //var id = NachRelation.ID();
 
-            //foreach (var ThisItem in Pad.Item)
-            //{
-            //    if (ThisItem is LinePadItem)
-            //    {
-            //        if (ThisItem.Internal == id) { return; }
-            //    }
-            //}
-
-
-            //PointM P1 = null;
-            //PointM P2 = null;
+        //    //foreach (var ThisItem in Pad.Item)
+        //    //{
+        //    //    if (ThisItem is LinePadItem)
+        //    //    {
+        //    //        if (ThisItem.Internal == id) { return; }
+        //    //    }
+        //    //}
 
 
-            //switch (NachRelation.Status)
-            //{
-
-            //    case clsRelation.enRelationStatus.Uber:
-            //        P1 = Von.PointOf(enAlignment.Top_HorizontalCenter);
-            //        P2 = nach.PointOf(enAlignment.Bottom_HorizontalCenter);
+        //    //PointM P1 = null;
+        //    //PointM P2 = null;
 
 
-            //        break;
-            //    case clsRelation.enRelationStatus.Unter:
-            //        P1 = nach.PointOf(enAlignment.Top_HorizontalCenter);
-            //        P2 = Von.PointOf(enAlignment.Bottom_HorizontalCenter);
+        //    //switch (NachRelation.Status)
+        //    //{
 
-            //        break;
-            //    case clsRelation.enRelationStatus.Identisch:
-            //    case clsRelation.enRelationStatus.Gleich:
-            //    case clsRelation.enRelationStatus.OhneText:
-            //        P1 = nach.PointOf(enAlignment.VerticalCenter_Left);
-            //        P2 = Von.PointOf(enAlignment.VerticalCenter_Right);
-
-            //        break;
-            //    default:
-            //        P1 = nach.PointOf(enAlignment.VerticalCenter_Left);
-            //        P2 = Von.PointOf(enAlignment.VerticalCenter_Right);
-
-            //        break;
-            //}
-
-            //var i = new LinePadItem(id, PadStyles.Style_Standard, enConectorStyle.Ausweichenx, P1, P2);
+        //    //    case clsRelation.enRelationStatus.Uber:
+        //    //        P1 = Von.PointOf(enAlignment.Top_HorizontalCenter);
+        //    //        P2 = nach.PointOf(enAlignment.Bottom_HorizontalCenter);
 
 
-            //Pad.Item.Add(i);
+        //    //        break;
+        //    //    case clsRelation.enRelationStatus.Unter:
+        //    //        P1 = nach.PointOf(enAlignment.Top_HorizontalCenter);
+        //    //        P2 = Von.PointOf(enAlignment.Bottom_HorizontalCenter);
 
-            //i.InDenHintergrund();
+        //    //        break;
+        //    //    case clsRelation.enRelationStatus.Identisch:
+        //    //    case clsRelation.enRelationStatus.Gleich:
+        //    //    case clsRelation.enRelationStatus.OhneText:
+        //    //        P1 = nach.PointOf(enAlignment.VerticalCenter_Left);
+        //    //        P2 = Von.PointOf(enAlignment.VerticalCenter_Right);
+
+        //    //        break;
+        //    //    default:
+        //    //        P1 = nach.PointOf(enAlignment.VerticalCenter_Left);
+        //    //        P2 = Von.PointOf(enAlignment.VerticalCenter_Right);
+
+        //    //        break;
+        //    //}
+
+        //    //var i = new LinePadItem(id, PadStyles.Style_Standard, enConectorStyle.Ausweichenx, P1, P2);
 
 
-            //Pad.Relation_Add(enRelationType.PositionZueinander, P1, i.Point1);
-            //Pad.Relation_Add(enRelationType.PositionZueinander, P2, i.Point2);
-        }
+        //    //Pad.Item.Add(i);
+
+        //    //i.InDenHintergrund();
+
+
+        //    //Pad.Relation_Add(enRelationType.PositionZueinander, P1, i.Point1);
+        //    //Pad.Relation_Add(enRelationType.PositionZueinander, P2, i.Point2);
+        //}
 
         private void btnBilderExport_Click(object sender, System.EventArgs e) {
 

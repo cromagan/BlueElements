@@ -101,7 +101,9 @@ namespace BlueDatabase {
                     var t = "Spalte nicht gefunden: " + columnName;
 
                     try {
-                        t += "\r\nParsing: " + Database.IsParsing().ToString();
+                        t += "\r\nParsing: " + Database.IsParsing.ToString();
+                        t += "\r\nLoading: " + Database.IsLoading.ToString();
+                        t += "\r\nSaving: " + Database.IsSaving.ToString();
                         t += "\r\nCount: " + Count.ToString();
                         t += "\r\nRowCount: " + Database.Row.Count.ToString();
                         t += "\r\nFile: " + Database.Filename;
@@ -141,8 +143,6 @@ namespace BlueDatabase {
         }
 
 
-
-
         public void ResetSystems() {
             SysLocked = null;
             SysRowCreateDate = null;
@@ -153,12 +153,9 @@ namespace BlueDatabase {
             SysChapter = null;
         }
 
-
         internal string Load_310(enDatabaseDataType Art, string Wert) {
 
             switch (Art) {
-
-
                 case enDatabaseDataType.LastColumnKey:
                     _LastColumnKey = int.Parse(Wert);
                     break;
@@ -178,29 +175,19 @@ namespace BlueDatabase {
         }
 
 
-
         public ColumnItem SysChapter { get; private set; }
-
 
         public ColumnItem SysCorrect { get; private set; }
 
-
         public ColumnItem SysLocked { get; private set; }
 
-
-
         public ColumnItem SysRowChangeDate { get; private set; }
-
-
 
         public ColumnItem SysRowChanger { get; private set; }
 
         public ColumnItem SysRowCreateDate { get; private set; }
 
-
         public ColumnItem SysRowCreator { get; private set; }
-
-
 
 
         public void Swap(ColumnItem Column1, ColumnItem Column2) {
@@ -264,13 +251,9 @@ namespace BlueDatabase {
                             Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Kennung: " + ThisColumnItem.Identifier);
                             break;
                     }
-
-
                 }
             }
-
         }
-
 
         public void Repair() {
 
@@ -379,7 +362,6 @@ namespace BlueDatabase {
         internal static string ParsableColumnKey(int Key) {
             return "ColumnKey=" + Key;
         }
-
 
 
         public static string ChangeKeysInString(string OriginalString, int OldKey, int NewKey) {
@@ -576,12 +558,6 @@ namespace BlueDatabase {
             da.Save(TempFile("", "Spaltenliste.html"), true);
         }
 
-
-
-
-
-
-
         public string Freename(string wunschname) {
             var nr = 0;
 
@@ -606,7 +582,6 @@ namespace BlueDatabase {
             return null;
         }
 
-
         /// <summary>
         /// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
         /// </summary>
@@ -626,11 +601,7 @@ namespace BlueDatabase {
             if (base.Contains(column)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Spalte bereits vorhanden!");
             }
-
-
-
             base.Add(column);
-
             return column;
         }
 
@@ -645,12 +616,9 @@ namespace BlueDatabase {
             return SearchByKey(colKey);
         }
 
-
         public ColumnItem Add() {
             return Add(Database.Column.NextColumnKey());
         }
-
-
 
         public ColumnItem Add(string internalName, string caption, enDataFormat format) {
             var c = Add();
@@ -660,8 +628,6 @@ namespace BlueDatabase {
             c.Format = format;
 
             return c;
-
-
         }
 
         public ColumnItem Add(string internalName, string caption, string suffix, enDataFormat format) {
@@ -678,6 +644,5 @@ namespace BlueDatabase {
             c.Name = internalName;
             return c;
         }
-
     }
 }

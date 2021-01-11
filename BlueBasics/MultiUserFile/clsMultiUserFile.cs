@@ -115,10 +115,10 @@ namespace BlueBasics.MultiUserFile {
 
         protected int _ReloadDelaySecond = 10;
 
-        private bool _isParsing;
+        public bool IsParsing { get; private set; } = false;
 
-        private bool _IsLoading = false;
-        private bool _IsSaving = false;
+        public bool IsLoading { get; private set; } = false;
+        public bool IsSaving { get; private set; } = false;
 
         private bool _DoingTempFile = false;
 
@@ -140,7 +140,7 @@ namespace BlueBasics.MultiUserFile {
         public event EventHandler<LoadingEventArgs> Loading;
         public event EventHandler SavedToDisk;
         public event EventHandler<MultiUserFileStopWorkingEventArgs> ConnectedControlsStopAllWorking;
-        public static event EventHandler<MultiUserFileGiveBackEventArgs> MultiUserFileAdded;
+        public static event EventHandler<MultiUserFileGiveBackEventArgs> MultiUserFileCreated;
 
         /// <summary>
         /// Wird ausgegeben, sobald isParsed false ist, noch vor den automatischen Reperaturen.
@@ -158,7 +158,7 @@ namespace BlueBasics.MultiUserFile {
 
 
             AllFiles.Add(this);
-            OnMultiUserFileAdded(this);
+            OnMultiUserFileCreated(this);
 
             PureBinSaver = new System.ComponentModel.BackgroundWorker {
                 WorkerReportsProgress = true
@@ -269,9 +269,9 @@ namespace BlueBasics.MultiUserFile {
             var x = DateTime.Now;
 
 
-            while (_IsLoading) {
+            while (IsLoading) {
                 Develop.DoEvents();
-                if (DateTime.Now.Subtract(x).TotalMinutes > 2) {
+                if (DateTime.Now.Subtract(x).TotalMinutes > 1) {
                     Develop.DebugPrint(enFehlerArt.Fehler, "WaitLoaded hängt");
                     return;
                 }
@@ -305,22 +305,22 @@ namespace BlueBasics.MultiUserFile {
 
             if (string.IsNullOrEmpty(Filename)) { return; }
 
-            _IsLoading = true;
+            IsLoading = true;
 
             //Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
-            if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded()) { _IsLoading = false; return; }
+            if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded()) { IsLoading = false; return; }
 
             var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
 
-            if (OnlyReload && !ReloadNeeded()) { _IsLoading = false; return; } // Wird in der Schleife auch geprüft
+            if (OnlyReload && !ReloadNeeded()) { IsLoading = false; return; } // Wird in der Schleife auch geprüft
 
             var ec = new LoadingEventArgs(OnlyReload);
             OnLoading(ec);
 
-            if (OnlyReload && ReadOnly && ec.TryCancel) { _IsLoading = false; return; }
+            if (OnlyReload && ReadOnly && ec.TryCancel) { IsLoading = false; return; }
 
             var (_BLoaded, tmpLastSaveCode) = LoadBytesFromDisk(OnlyReload);
-            if (_BLoaded == null) { _IsLoading = false; return; }
+            if (_BLoaded == null) { IsLoading = false; return; }
 
 
             _dataOnDisk = _BLoaded.ToStringConvert();
@@ -335,7 +335,7 @@ namespace BlueBasics.MultiUserFile {
             OnLoaded(new LoadedEventArgs(OnlyReload));
             RepairOldBlockFiles();
 
-            _IsLoading = false;
+            IsLoading = false;
         }
 
         /// <summary>
@@ -372,12 +372,12 @@ namespace BlueBasics.MultiUserFile {
 
 
         internal void ParseInternal(List<byte> bLoaded) {
-            if (_isParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Doppelter Parse!"); }
+            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Doppelter Parse!"); }
 
-            _isParsing = true;
+            IsParsing = true;
             ParseExternal(bLoaded);
 
-            _isParsing = false;
+            IsParsing = false;
 
             //Repair NACH ExecutePendung, vielleicht ist es schon repariert
             //Repair NACH _isParsing, da es auch abgespeichert werden soll
@@ -415,14 +415,14 @@ namespace BlueBasics.MultiUserFile {
             if (string.IsNullOrEmpty(Filename)) { return Feedback("Kein Dateiname angegeben"); }
 
 
-            if (_IsSaving) { return Feedback("Speichervorgang von verschiedenen Routinen aufgerufen."); }
+            if (IsSaving) { return Feedback("Speichervorgang von verschiedenen Routinen aufgerufen."); }
 
-            _IsSaving = true;
+            IsSaving = true;
 
             if (!EasyMode) {
                 var erfolg = CreateBlockDatei();
                 if (!erfolg) {
-                    _IsSaving = false;
+                    IsSaving = false;
                     return Feedback("Blockdatei konnte nicht erzeugt werden.");
                 }
 
@@ -431,14 +431,14 @@ namespace BlueBasics.MultiUserFile {
 
                 if (GetFileInfo(true) != fileInfoBeforeSaving) {
                     DeleteBlockDatei(false, true);
-                    _IsSaving = false;
+                    IsSaving = false;
                     return Feedback("Datei wurde inzwischen verändert.");
                 }
 
 
                 if (savedDataUncompressed != ToString()) {
                     DeleteBlockDatei(false, true);
-                    _IsSaving = false;
+                    IsSaving = false;
                     return Feedback("Daten wurden inzwischen verändert.");
                 }
             }
@@ -476,7 +476,7 @@ namespace BlueBasics.MultiUserFile {
                     _CheckedAndReloadNeed = true;
                     _LastSaveCode = "Fehler";
                     Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!! " + Filename);
-                    _IsSaving = false;
+                    IsSaving = false;
                     return Feedback("Speichervorgang fehlgeschlagen.");
                 }
                 else {
@@ -492,7 +492,7 @@ namespace BlueBasics.MultiUserFile {
             DoWorkAfterSaving();
 
             OnSavedToDisk();
-            _IsSaving = false;
+            IsSaving = false;
             return string.Empty;
 
 
@@ -592,7 +592,7 @@ namespace BlueBasics.MultiUserFile {
 
             if (_CheckedAndReloadNeed) { return true; }
 
-            if (_IsSaving || _IsLoading) { return false; }
+            if (IsSaving || IsLoading) { return false; }
 
             if (GetFileInfo(false) != _LastSaveCode) {
                 _CheckedAndReloadNeed = true;
@@ -802,45 +802,36 @@ namespace BlueBasics.MultiUserFile {
 
 
         private byte[] UnzipIt(byte[] data) {
-            using (var originalFileStream = new MemoryStream(data)) {
+            using var originalFileStream = new MemoryStream(data);
+            using var zipArchive = new ZipArchive(originalFileStream);
+            var entry = zipArchive.GetEntry("Main.bin");
 
-                using (var zipArchive = new ZipArchive(originalFileStream)) {
-
-                    var entry = zipArchive.GetEntry("Main.bin");
-
-                    using (var stream = entry.Open()) {
-                        using (var ms = new MemoryStream()) {
-                            stream.CopyTo(ms);
-                            return ms.ToArray();
-                        }
-                    }
-                }
-            }
+            using var stream = entry.Open();
+            using var ms = new MemoryStream();
+            stream.CopyTo(ms);
+            return ms.ToArray();
         }
 
 
         private byte[] ZipIt(byte[] data) {
             // https://stackoverflow.com/questions/17217077/create-zip-file-from-byte
 
-            using (var compressedFileStream = new MemoryStream()) {
-                //Create an archive and store the stream in memory.
-                using (var zipArchive = new ZipArchive(compressedFileStream, ZipArchiveMode.Create, false)) {
+            using var compressedFileStream = new MemoryStream();
+            //Create an archive and store the stream in memory.
+            using (var zipArchive = new ZipArchive(compressedFileStream, ZipArchiveMode.Create, false)) {
 
-                    //Create a zip entry for each attachment
-                    var zipEntry = zipArchive.CreateEntry("Main.bin");
+                //Create a zip entry for each attachment
+                var zipEntry = zipArchive.CreateEntry("Main.bin");
 
-                    //Get the stream of the attachment
-                    using (var originalFileStream = new MemoryStream(data)) {
-                        using (var zipEntryStream = zipEntry.Open()) {
-                            //Copy the attachment stream to the zip entry stream
-                            originalFileStream.CopyTo(zipEntryStream);
-                        }
-                    }
+                //Get the stream of the attachment
+                using var originalFileStream = new MemoryStream(data);
+                using var zipEntryStream = zipEntry.Open();
+                //Copy the attachment stream to the zip entry stream
+                originalFileStream.CopyTo(zipEntryStream);
 
-                }
-
-                return compressedFileStream.ToArray();
             }
+
+            return compressedFileStream.ToArray();
         }
 
 
@@ -896,11 +887,10 @@ namespace BlueBasics.MultiUserFile {
                 TMPFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + modAllgemein.UserName().ToUpper());
 
                 try {
-                    using (var x = new FileStream(TMPFileName, FileMode.Create, FileAccess.Write, FileShare.None)) {
-                        x.Write(Writer_BinaryData, 0, Writer_BinaryData.Length);
-                        x.Flush();
-                        x.Close();
-                    }
+                    using var x = new FileStream(TMPFileName, FileMode.Create, FileAccess.Write, FileShare.None);
+                    x.Write(Writer_BinaryData, 0, Writer_BinaryData.Length);
+                    x.Flush();
+                    x.Close();
 
                     break;
                 }
@@ -960,9 +950,6 @@ namespace BlueBasics.MultiUserFile {
             return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
         }
 
-        public bool IsParsing() {
-            return _isParsing;
-        }
 
         public void OnConnectedControlsStopAllWorking(MultiUserFileStopWorkingEventArgs e) {
             if (e.AllreadyStopped.Contains(Filename.ToLower())) { return; }
@@ -982,7 +969,7 @@ namespace BlueBasics.MultiUserFile {
 
             var x = DateTime.Now;
 
-            while (_isParsing) {
+            while (IsParsing) {
                 Develop.DoEvents();
                 if (DateTime.Now.Subtract(x).TotalSeconds > 60) { return; }
             }
@@ -995,8 +982,8 @@ namespace BlueBasics.MultiUserFile {
 
             if (EasyMode && ReadOnly) { return; }
 
-            if (_IsLoading) { return; }
-            if (PureBinSaver.IsBusy || _IsSaving) { return; }
+            if (IsLoading) { return; }
+            if (PureBinSaver.IsBusy || IsSaving) { return; }
             if (string.IsNullOrEmpty(Filename)) { return; }
 
 
@@ -1088,7 +1075,7 @@ namespace BlueBasics.MultiUserFile {
 
                 if (PureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
                 if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
-                if (_isParsing) { return "Es werden aktuell Daten geparsed."; }
+                if (IsParsing) { return "Es werden aktuell Daten geparsed."; }
 
                 var sec = -1d;
                 if (!EasyMode) { sec = AgeOfBlockDatei(); }
@@ -1123,7 +1110,7 @@ namespace BlueBasics.MultiUserFile {
             if (mode.HasFlag(enErrorReason.EditAcut) || mode.HasFlag(enErrorReason.EditGeneral)) {
                 // Wird gespeichert, werden am Ende Penings zu Undos. Diese werden evtl nicht mitgespeichert.
                 if (PureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
-                if (_IsLoading) { return "Aktuell werden Daten geladen."; }
+                if (IsLoading) { return "Aktuell werden Daten geladen."; }
             }
 
             //----------EditGeneral------------------------------------------------------------------------------------------
@@ -1136,7 +1123,7 @@ namespace BlueBasics.MultiUserFile {
             //---------- Save ------------------------------------------------------------------------------------------
 
             if (mode.HasFlag(enErrorReason.Save)) {
-                if (_IsLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
+                if (IsLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
 
                 if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 6) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
 
@@ -1243,11 +1230,11 @@ namespace BlueBasics.MultiUserFile {
         }
 
 
-        protected static void OnMultiUserFileAdded(clsMultiUserFile file) {
+        protected static void OnMultiUserFileCreated(clsMultiUserFile file) {
             var e = new MultiUserFileGiveBackEventArgs {
                 File = file
             };
-            MultiUserFileAdded?.Invoke(null, e);
+            MultiUserFileCreated?.Invoke(null, e);
         }
 
 
