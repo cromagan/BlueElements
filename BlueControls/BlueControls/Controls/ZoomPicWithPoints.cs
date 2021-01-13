@@ -102,7 +102,8 @@ namespace BlueControls.Controls {
             foreach (var ThisPoint in points) {
                 if (_Helper.HasFlag(enHelpers.PointNames)) {
                     ThisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard, ThisPoint.Name);
-                } else {
+                }
+                else {
                     ThisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard, string.Empty);
                 }
 
@@ -140,7 +141,7 @@ namespace BlueControls.Controls {
             var FilenamePNG = tags.TagGet("ImageFile");
             var i = new BitmapListItem(bmp, FilenamePNG, FilenamePNG.FileNameWithoutSuffix()) {
                 Padding = 10,
-                Tags = tags,
+                Tag = tags,
             };
             return i;
         }

@@ -26,13 +26,10 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 
-namespace BlueControls.Classes_Editor
-{
-    internal sealed partial class RuleActionItem_Editor
-    {
+namespace BlueControls.Classes_Editor {
+    internal sealed partial class RuleActionItem_Editor {
 
-        public RuleActionItem_Editor() : base()
-        {
+        public RuleActionItem_Editor() : base() {
             InitializeComponent();
         }
 
@@ -42,8 +39,7 @@ namespace BlueControls.Classes_Editor
 
 
 
-        protected override void PrepaireFormula()
-        {
+        protected override void PrepaireFormula() {
 
 
 
@@ -51,19 +47,16 @@ namespace BlueControls.Classes_Editor
 
 
             cbxRuleAktion.Item.Add("Wenn...", "0+", false);
-            for (var z = 0; z <= 5000; z++)
-            {
+            for (var z = 0; z <= 5000; z++) {
 
-                if (z == 1000)
-                {
+                if (z == 1000) {
                     cbxRuleAktion.Item.Add("Dann...", "1000+", false);
                 }
 
 
                 var Ac = (enAction)z;
 
-                if (Ac.ToString() != z.ToString())
-                {
+                if (Ac.ToString() != z.ToString()) {
                     var t = string.Empty;
                     QuickImage s = null;
                     RuleActionItem.MaximalText(Item.Rule.Database, Ac, ref t, ref s);
@@ -77,18 +70,15 @@ namespace BlueControls.Classes_Editor
             lstRuleAktionColumns.Item.Sort();
         }
 
-        private void Enable_Action_Controls(bool CanDeleteAllData)
-        {
+        private void Enable_Action_Controls(bool CanDeleteAllData) {
 
 
-            if (Item != null)
-            {
+            if (Item != null) {
 
                 btnHelp.Enabled = true;
                 cbxRuleAktion.Enabled = true;
 
-                switch (RuleActionItem.NeededColumns(cbxRuleAktion.Text))
-                {
+                switch (RuleActionItem.NeededColumns(cbxRuleAktion.Text)) {
                     case enNeededColumns.None:
                         lstRuleAktionColumns.Enabled = false;
                         break;
@@ -104,8 +94,7 @@ namespace BlueControls.Classes_Editor
 
 
 
-                switch (RuleActionItem.NeededText(cbxRuleAktion.Text))
-                {
+                switch (RuleActionItem.NeededText(cbxRuleAktion.Text)) {
                     case enNeededText.None:
                         txbRuleActionText.Enabled = false;
                         break;
@@ -121,8 +110,7 @@ namespace BlueControls.Classes_Editor
                 }
 
             }
-            else
-            {
+            else {
 
                 btnHelp.Enabled = false;
                 cbxRuleAktion.Enabled = false;
@@ -131,39 +119,29 @@ namespace BlueControls.Classes_Editor
 
             }
 
-            if (!cbxRuleAktion.Enabled)
-            {
-                if (CanDeleteAllData)
-                {
+            if (!cbxRuleAktion.Enabled) {
+                if (CanDeleteAllData) {
                     cbxRuleAktion.Text = string.Empty;
                 }
             }
 
-            if (!txbRuleActionText.Enabled)
-            {
-                if (CanDeleteAllData)
-                {
+            if (!txbRuleActionText.Enabled) {
+                if (CanDeleteAllData) {
                     txbRuleActionText.Text = string.Empty;
                 }
-                else
-                {
-                    if (!string.IsNullOrEmpty(txbRuleActionText.Text))
-                    {
+                else {
+                    if (!string.IsNullOrEmpty(txbRuleActionText.Text)) {
                         txbRuleActionText.Enabled = true;
                     }
                 }
             }
 
-            if (!lstRuleAktionColumns.Enabled)
-            {
-                if (CanDeleteAllData)
-                {
+            if (!lstRuleAktionColumns.Enabled) {
+                if (CanDeleteAllData) {
                     lstRuleAktionColumns.Item.UncheckAll();
                 }
-                else
-                {
-                    if (lstRuleAktionColumns.Item.Checked().Count > 0)
-                    {
+                else {
+                    if (lstRuleAktionColumns.Item.Checked().Count > 0) {
                         lstRuleAktionColumns.Enabled = true;
                     }
                 }
@@ -174,8 +152,7 @@ namespace BlueControls.Classes_Editor
 
         }
 
-        private void WriteBack()
-        {
+        private void WriteBack() {
 
             if (IsFilling) { return; }
 
@@ -184,9 +161,8 @@ namespace BlueControls.Classes_Editor
             var l = lstRuleAktionColumns.Item.Checked();
             Item.Columns.Clear(); // = New List(Of ColumnItem)
 
-            foreach (var t1 in l)
-            {
-                Item.Columns.Add((ColumnItem)((TextListItem)t1).Tags);
+            foreach (var t1 in l) {
+                Item.Columns.Add((ColumnItem)((TextListItem)t1).Tag);
             }
 
             Item.Text = txbRuleActionText.Text;
@@ -197,30 +173,25 @@ namespace BlueControls.Classes_Editor
             OnChanged(Item);
         }
 
-        private void lstRuleAktionColumns_ItemClicked(object sender, BasicListItemEventArgs e)
-        {
+        private void lstRuleAktionColumns_ItemClicked(object sender, BasicListItemEventArgs e) {
             WriteBack();
         }
 
-        private void cbxRuleAktion_ItemClicked(object sender, BasicListItemEventArgs e)
-        {
+        private void cbxRuleAktion_ItemClicked(object sender, BasicListItemEventArgs e) {
             WriteBack();
         }
 
-        protected override void EnabledAndFillFormula()
-        {
+        protected override void EnabledAndFillFormula() {
             Enabled = true;
 
             cbxRuleAktion.Text = ((int)Item.Action).ToString();
 
-            if (cbxRuleAktion.Text == "0")
-            {
+            if (cbxRuleAktion.Text == "0") {
                 cbxRuleAktion.Text = "0+";
             }
 
             lstRuleAktionColumns.Item.UncheckAll();
-            foreach (var t in Item.Columns)
-            {
+            foreach (var t in Item.Columns) {
                 if (t != null && lstRuleAktionColumns.Item[t.Name] != null) { lstRuleAktionColumns.Item[t.Name].Checked = true; }
             }
             txbRuleActionText.Text = Item.Text;
@@ -230,13 +201,11 @@ namespace BlueControls.Classes_Editor
             Enable_Action_Controls(false);
         }
 
-        private void cbxRuleAktion_TextChanged(object sender, System.EventArgs e)
-        {
+        private void cbxRuleAktion_TextChanged(object sender, System.EventArgs e) {
             WriteBack();
         }
 
-        private void btnHelp_Click(object sender, System.EventArgs e)
-        {
+        private void btnHelp_Click(object sender, System.EventArgs e) {
             if (string.IsNullOrEmpty(cbxRuleAktion.Text)) { return; }
 
             var x = (enAction)int.Parse(cbxRuleAktion.Text);
@@ -247,13 +216,11 @@ namespace BlueControls.Classes_Editor
         }
 
 
-        private void txbRuleActionText_TextChanged(object sender, System.EventArgs e)
-        {
+        private void txbRuleActionText_TextChanged(object sender, System.EventArgs e) {
             WriteBack();
         }
 
-        protected override void DisableAndClearFormula()
-        {
+        protected override void DisableAndClearFormula() {
             Enabled = false;
             Enable_Action_Controls(true);
         }

@@ -21,25 +21,20 @@ using BlueBasics.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 
-namespace BlueControls.Classes_Editor
-{
-    internal sealed partial class RuleItem_Editor
-    {
+namespace BlueControls.Classes_Editor {
+    internal sealed partial class RuleItem_Editor {
 
-        public RuleItem_Editor()
-        {
+        public RuleItem_Editor() {
             InitializeComponent();
         }
 
-        protected override void PrepaireFormula()
-        {
+        protected override void PrepaireFormula() {
 
         }
 
 
 
-        protected override void EnabledAndFillFormula()
-        {
+        protected override void EnabledAndFillFormula() {
 
 
             lstActionSelector.Enabled = true;
@@ -49,31 +44,25 @@ namespace BlueControls.Classes_Editor
             lstActionSelector.Item.Clear();
 
 
-            foreach (var ThisAction in Item.Actions)
-            {
-                if (ThisAction != null)
-                {
+            foreach (var ThisAction in Item.Actions) {
+                if (ThisAction != null) {
                     lstActionSelector.Item.Add(ThisAction);
                 }
             }
             lstActionSelector.Item.Sort();
 
-            if (lstActionSelector.Item.Count > 1)
-            {
+            if (lstActionSelector.Item.Count > 1) {
                 lstActionSelector.Item[0].Checked = true;
             }
-            else
-            {
+            else {
                 RuleActionEditor.Item = null;
             }
         }
 
 
 
-        private void ActionSelector_AddClicked(object sender, System.EventArgs e)
-        {
-            if (Item == null)
-            {
+        private void ActionSelector_AddClicked(object sender, System.EventArgs e) {
+            if (Item == null) {
                 Forms.Notification.Show("Bitte vorher eine Regel auswählen.");
                 return;
             }
@@ -87,30 +76,24 @@ namespace BlueControls.Classes_Editor
             OnChanged(Item);
         }
 
-        private void lstActionSelector_ItemCheckedChanged(object sender, System.EventArgs e)
-        {
-            if (lstActionSelector.Item.Checked().Count != 1)
-            {
+        private void lstActionSelector_ItemCheckedChanged(object sender, System.EventArgs e) {
+            if (lstActionSelector.Item.Checked().Count != 1) {
                 RuleActionEditor.Item = null;
                 return;
             }
 
-            var SelectedAction = (RuleActionItem)((TextListItem)lstActionSelector.Item.Checked()[0]).Tags;
+            var SelectedAction = (RuleActionItem)((TextListItem)lstActionSelector.Item.Checked()[0]).Tag;
             RuleActionEditor.Item = SelectedAction;
         }
 
-        private void RuleActionEditor_Changed(object sender, System.EventArgs e)
-        {
+        private void RuleActionEditor_Changed(object sender, System.EventArgs e) {
 
             if (IsFilling) { return; }
 
 
-            foreach (var thisitem in lstActionSelector.Item)
-            {
-                if (thisitem is TextListItem tli)
-                {
-                    if (tli.Tags == RuleActionEditor.Item)
-                    {
+            foreach (var thisitem in lstActionSelector.Item) {
+                if (thisitem is TextListItem tli) {
+                    if (tli.Tag == RuleActionEditor.Item) {
                         tli.Text = RuleActionEditor.Item.ReadableText();
                         tli.Symbol = RuleActionEditor.Item.SymbolForReadableText();
                     }
@@ -122,17 +105,15 @@ namespace BlueControls.Classes_Editor
         }
 
 
-        private void lstActionSelector_ItemRemoving(object sender, ListEventArgs e)
-        {
+        private void lstActionSelector_ItemRemoving(object sender, ListEventArgs e) {
             if (Item == null) { return; }
-            Item.Actions.Remove((RuleActionItem)((TextListItem)e.Item).Tags);
+            Item.Actions.Remove((RuleActionItem)((TextListItem)e.Item).Tag);
             OnChanged(Item);
         }
 
 
 
-        protected override void DisableAndClearFormula()
-        {
+        protected override void DisableAndClearFormula() {
             lstActionSelector.Enabled = true;
             RuleActionEditor.Enabled = false;
 

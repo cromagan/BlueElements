@@ -55,7 +55,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         public ListExt<RuleItem> GetRulesFromList() {
             var NewRules = new ListExt<RuleItem>();
             foreach (var ThisItem in lbxRuleSelector.Item) {
-                var Rule = (RuleItem)((TextListItem)ThisItem).Tags;
+                var Rule = (RuleItem)((TextListItem)ThisItem).Tag;
                 NewRules.Add((RuleItem)Rule.Clone());
             }
             return NewRules;
@@ -105,7 +105,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (tbxUndoAnzahl.Text.IsLong()) {
                 _Database.UndoCount = Math.Max(int.Parse(tbxUndoAnzahl.Text), 5);
-            } else {
+            }
+            else {
                 _Database.UndoCount = 5;
             }
 
@@ -113,20 +114,22 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (tbxReloadVerzoegerung.Text.IsLong()) {
                 _Database.ReloadDelaySecond = Math.Max(int.Parse(tbxReloadVerzoegerung.Text), 5);
-            } else {
+            }
+            else {
                 _Database.ReloadDelaySecond = 5;
             }
 
             if (txbGlobalScale.Text.IsDouble()) {
                 _Database.GlobalScale = Math.Min(double.Parse(txbGlobalScale.Text), 5);
                 _Database.GlobalScale = Math.Max(0.5, _Database.GlobalScale);
-            } else {
+            }
+            else {
                 _Database.ReloadDelaySecond = 1;
             }
 
             _Database.FilterImagePfad = txbFilterImagePath.Text;
 
-            _Database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r","<br>");
+            _Database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
 
             if (tbxTags.Text != _Database.Tags.JoinWithCr()) {
                 _Database.Tags.Clear();
@@ -173,7 +176,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Export ------------
             var NewExports = new List<ExportDefinition>();
             foreach (var ThisItem in lbxExportSets.Item) {
-                NewExports.Add((ExportDefinition)((TextListItem)ThisItem).Tags);
+                NewExports.Add((ExportDefinition)((TextListItem)ThisItem).Tag);
             }
 
             if (NewExports.IsDifferentTo(_Database.Export)) {
@@ -252,7 +255,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             txbFilterImagePath.Text = _Database.FilterImagePfad;
 
-            txbZeilenQuickInfo.Text = _Database.ZeilenQuickInfo.Replace("<br>","\r");
+            txbZeilenQuickInfo.Text = _Database.ZeilenQuickInfo.Replace("<br>", "\r");
 
             tbxUndoAnzahl.Text = _Database.UndoCount.ToString();
 
@@ -325,7 +328,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 ExportEditor.Item = null;
                 return;
             }
-            var SelectedExport = (ExportDefinition)((TextListItem)lbxExportSets.Item.Checked()[0]).Tags;
+            var SelectedExport = (ExportDefinition)((TextListItem)lbxExportSets.Item.Checked()[0]).Tag;
 
             ExportEditor.Item = SelectedExport;
         }
@@ -354,7 +357,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void lbxRuleSelector_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             switch (e.ClickedComand) {
                 case "Kopieren":
-                    var ClickedRule = ((RuleItem)((TextListItem)e.HotItem).Tags).ToString();
+                    var ClickedRule = ((RuleItem)((TextListItem)e.HotItem).Tag).ToString();
 
                     System.Windows.Forms.Clipboard.SetDataObject("##RULE##" + ClickedRule, true);
                     Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, ClickedRule), enImageCode.Kopieren);
@@ -394,7 +397,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void lbxRuleSelector_ItemCheckedChanged(object sender, System.EventArgs e) {
             if (lbxRuleSelector.Item.Checked().Count != 1) { return; }
-            var SelectedRule = (RuleItem)((TextListItem)lbxRuleSelector.Item.Checked()[0]).Tags;
+            var SelectedRule = (RuleItem)((TextListItem)lbxRuleSelector.Item.Checked()[0]).Tag;
             RuleItemEditor.Item = SelectedRule;
         }
 
@@ -423,7 +426,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void lbxExportSets_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
             foreach (var thisitem in e.Items) {
                 if (thisitem is BasicListItem ThisItemBasic) {
-                    var tempVar = (ExportDefinition)((TextListItem)ThisItemBasic).Tags;
+                    var tempVar = (ExportDefinition)((TextListItem)ThisItemBasic).Tag;
                     tempVar.DeleteAllBackups();
                 }
             }
@@ -481,7 +484,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                     FileOperations.DeleteFile(ThisFile, true);
                     modConverter.ByteToFile(ThisFile, b);
                 }
-            } else {
+            }
+            else {
                 NewKey = string.Empty;
                 foreach (var ThisFile in lLCase) {
                     var b = modConverter.FileToByte(ThisFile);
@@ -505,7 +509,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(_Database.FileEncryptionKey)) {
                 btnDateiSchluessel.Text = "Dateien verschlüsseln";
                 btnDateiSchluessel.QuickInfo = "Dazugehörige Dateien der Datenbank sind aktuell im Originalformat auf dem Laufwerk für jedem zugänglich.";
-            } else {
+            }
+            else {
                 btnDateiSchluessel.Text = "Dateien freigeben";
                 btnDateiSchluessel.QuickInfo = "Dazugehörige Dateien der Datenbank sind aktuell verschlüsselt.";
             }
@@ -532,7 +537,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             };
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
                 GetFromFile = openFileDialog1.FileName;
-            } else {
+            }
+            else {
                 return;
             }
 
@@ -651,7 +657,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                     if (Row != null) {
                         r.CellSet("RowFirst", Row.CellFirstString());
-                    } else if (cd[1] != "-1") {
+                    }
+                    else if (cd[1] != "-1") {
                         r.CellSet("RowFirst", "[gelöscht]");
                     }
 
@@ -730,7 +737,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
         private void lbxRuleSelector_ItemRemoving(object sender, ListEventArgs e) {
-            if (RuleItemEditor.Item == ((TextListItem)e.Item).Tags) {
+            if (RuleItemEditor.Item == ((TextListItem)e.Item).Tag) {
                 RuleItemEditor.Item = null;
             }
         }
@@ -738,7 +745,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void RuleItemEditor_Changed(object sender, System.EventArgs e) {
             foreach (var thisitem in lbxRuleSelector.Item) {
                 if (thisitem is TextListItem tli) {
-                    if (tli.Tags == RuleItemEditor.Item) {
+                    if (tli.Tag == RuleItemEditor.Item) {
                         tli.Text = RuleItemEditor.Item.ReadableText();
                         tli.Symbol = RuleItemEditor.Item.SymbolForReadableText();
                     }
@@ -749,7 +756,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void ExportEditor_Changed(object sender, System.EventArgs e) {
             foreach (var thisitem in lbxExportSets.Item) {
                 if (thisitem is TextListItem tli) {
-                    if (tli.Tags == ExportEditor.Item) {
+                    if (tli.Tag == ExportEditor.Item) {
                         tli.Text = ExportEditor.Item.ReadableText();
                         tli.Symbol = ExportEditor.Item.SymbolForReadableText();
                     }

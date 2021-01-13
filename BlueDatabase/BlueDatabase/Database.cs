@@ -143,6 +143,22 @@ namespace BlueDatabase {
             return null;
         }
 
+        internal void DevelopWarnung(string t) {
+
+            try {
+                t += "\r\nParsing: " + IsParsing.ToString();
+                t += "\r\nLoading: " + IsLoading.ToString();
+                t += "\r\nSaving: " + IsSaving.ToString();
+                t += "\r\nColumn-Count: " + Column.Count.ToString();
+                t += "\r\nRow-Count: " + Row.Count.ToString();
+                t += "\r\nFile: " + Filename;
+            }
+            catch { }
+
+            Develop.DebugPrint(enFehlerArt.Warnung, t);
+
+        }
+
 
 
 

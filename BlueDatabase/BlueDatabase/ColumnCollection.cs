@@ -63,12 +63,15 @@ namespace BlueDatabase {
 
         #region  Properties 
 
-        public new ColumnItem this[int Index] {
+        public new ColumnItem this[int index] {
             get {
                 if (Database == null) { return null; }
 
-                if (Index < 0 || Index >= Count) { return null; }
-                return base[Index];
+                if (index < 0 || index >= Count) {
+                    Database.DevelopWarnung("Spalten-Index nicht gefunden: " + index.ToString());
+                    return null;
+                }
+                return base[index];
             }
         }
 
@@ -83,6 +86,10 @@ namespace BlueDatabase {
                     if (ThisColumn != null && ThisColumn.Key == key) { return ThisColumn; }
                 }
 
+                // Beim Parsen werden die Spalten ja erstellt
+                if (!Database.IsParsing) { Database.DevelopWarnung("Spalten-Key nicht gefunden: " + key.ToString()); }
+
+
                 return null;
             }
             catch {
@@ -91,28 +98,13 @@ namespace BlueDatabase {
         }
 
 
+
+
+
         public ColumnItem this[string columnName] {
             get {
-
                 var colum = Exists(columnName);
-
-                if (colum is null) {
-
-                    var t = "Spalte nicht gefunden: " + columnName;
-
-                    try {
-                        t += "\r\nParsing: " + Database.IsParsing.ToString();
-                        t += "\r\nLoading: " + Database.IsLoading.ToString();
-                        t += "\r\nSaving: " + Database.IsSaving.ToString();
-                        t += "\r\nCount: " + Count.ToString();
-                        t += "\r\nRowCount: " + Database.Row.Count.ToString();
-                        t += "\r\nFile: " + Database.Filename;
-                    }
-                    catch { }
-
-                    Develop.DebugPrint(enFehlerArt.Warnung, t);
-                }
-
+                if (colum is null) { Database.DevelopWarnung("Spalte nicht gefunden: " + columnName); }
                 return colum;
             }
         }

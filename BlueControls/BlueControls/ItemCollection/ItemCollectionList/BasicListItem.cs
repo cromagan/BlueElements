@@ -24,10 +24,8 @@ using BlueControls.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection
-{
-    public abstract class BasicListItem : ICompareKey, IComparable
-    {
+namespace BlueControls.ItemCollection {
+    public abstract class BasicListItem : ICompareKey, IComparable {
         public abstract Size SizeUntouchedForListBox();
 
         public ItemCollectionList Parent { get; private set; }
@@ -45,7 +43,7 @@ namespace BlueControls.ItemCollection
         /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
         /// </summary>
         /// <remarks></remarks>
-        public object Tags;
+        public object Tag;
 
 
         /// <summary>
@@ -66,16 +64,13 @@ namespace BlueControls.ItemCollection
         protected bool _Enabled = true;
 
 
-        protected BasicListItem(string internalname)
-        {
+        protected BasicListItem(string internalname) {
 
 
-            if (string.IsNullOrEmpty(internalname))
-            {
+            if (string.IsNullOrEmpty(internalname)) {
                 Internal = BasicPadItem.UniqueInternal(); // Wiederverwenden ;-)
             }
-            else
-            {
+            else {
                 Internal = internalname;
             }
 
@@ -87,15 +82,13 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public virtual bool IsClickable()
-        {
+        public virtual bool IsClickable() {
             return !IsCaption;
         }
 
 
 
-        public bool Contains(int x, int y)
-        {
+        public bool Contains(int x, int y) {
             return Pos.Contains(x, y);
         }
 
@@ -103,21 +96,17 @@ namespace BlueControls.ItemCollection
 
 
 
-        public void SetCoordinates(Rectangle r)
-        {
+        public void SetCoordinates(Rectangle r) {
             Pos = r;
             Parent?.OnDoInvalidate();
         }
 
 
-        public bool Enabled
-        {
-            get
-            {
+        public bool Enabled {
+            get {
                 return _Enabled;
             }
-            set
-            {
+            set {
                 if (_Enabled == value) { return; }
 
                 _Enabled = value;
@@ -126,11 +115,9 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public string CompareKey()
-        {
+        public string CompareKey() {
 
-            if (!string.IsNullOrEmpty(_UserDefCompareKey))
-            {
+            if (!string.IsNullOrEmpty(_UserDefCompareKey)) {
                 if (Convert.ToChar(_UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + _UserDefCompareKey); }
                 return _UserDefCompareKey + Constants.FirstSortChar + Parent.IndexOf(this).ToString(Constants.Format_Integer6);
             }
@@ -139,14 +126,11 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public string UserDefCompareKey
-        {
-            get
-            {
+        public string UserDefCompareKey {
+            get {
                 return _UserDefCompareKey;
             }
-            set
-            {
+            set {
                 if (value == _UserDefCompareKey) { return; }
                 _UserDefCompareKey = value;
 
@@ -155,14 +139,11 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public bool Checked
-        {
-            get
-            {
+        public bool Checked {
+            get {
                 return _Checked;
             }
-            set
-            {
+            set {
                 if (Parent == null) { Develop.DebugPrint(enFehlerArt.Warnung, "Parent == null!"); }
 
                 Parent?.SetNewCheckState(this, value, ref _Checked);
@@ -172,8 +153,7 @@ namespace BlueControls.ItemCollection
 
         public abstract string QuickInfo { get; }
 
-        public void Draw(Graphics GR, int xModifier, int YModifier, enDesign controldesign, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, string FilterText, bool Translate)
-        {
+        public void Draw(Graphics GR, int xModifier, int YModifier, enDesign controldesign, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, string FilterText, bool Translate) {
 
 
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
@@ -188,10 +168,8 @@ namespace BlueControls.ItemCollection
             DrawExplicit(GR, PositionModified, itemdesign, vState, DrawBorderAndBack, Translate);
 
 
-            if (DrawBorderAndBack)
-            {
-                if (!string.IsNullOrEmpty(FilterText) && !FilterMatch(FilterText))
-                {
+            if (DrawBorderAndBack) {
+                if (!string.IsNullOrEmpty(FilterText) && !FilterMatch(FilterText)) {
                     var c1 = Skin.Color_Back(controldesign, enStates.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
                     c1 = c1.SetAlpha(160);
                     GR.FillRectangle(new SolidBrush(c1), PositionModified);
@@ -200,35 +178,28 @@ namespace BlueControls.ItemCollection
 
         }
 
-        public int CompareTo(object obj)
-        {
-            if (obj is BasicListItem tobj)
-            {
+        public int CompareTo(object obj) {
+            if (obj is BasicListItem tobj) {
                 // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
                 return CompareKey().CompareTo(tobj.CompareKey());
             }
-            else
-            {
+            else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
                 return 0;
             }
         }
 
-        public virtual BasicListItem CloneToNewCollection(ItemCollectionList newParent)
-        {
+        public virtual BasicListItem CloneToNewCollection(ItemCollectionList newParent) {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
             return null;
         }
 
-        internal void SetParent(ItemCollectionList list)
-        {
+        internal void SetParent(ItemCollectionList list) {
             Parent = list;
         }
 
-        public BasicListItem CloneToNewCollection(ItemCollectionList newParent, BasicListItem newItem)
-        {
-            if (newItem.Internal != Internal)
-            {
+        public BasicListItem CloneToNewCollection(ItemCollectionList newParent, BasicListItem newItem) {
+            if (newItem.Internal != Internal) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Clone fehlgeschlagen, Internal unterschiedlich");
             }
 
@@ -236,14 +207,13 @@ namespace BlueControls.ItemCollection
 
             newItem.Checked = Checked; // Parent muss gesetz sein!
             newItem.Enabled = Enabled;
-            newItem.Tags = Tags;
+            newItem.Tag = Tag;
             newItem.UserDefCompareKey = UserDefCompareKey;
 
             return newItem;
         }
 
-        public virtual bool FilterMatch(string FilterText)
-        {
+        public virtual bool FilterMatch(string FilterText) {
             if (Internal.ToUpper().Contains(FilterText.ToUpper())) { return true; }
             return false;
         }

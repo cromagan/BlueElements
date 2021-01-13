@@ -565,7 +565,7 @@ namespace BlueControls.ItemCollection {
         /// <param name="readableObject"></param>
         public TextListItem Add(IReadableText readableObject) {
             var i = Add(readableObject, string.Empty, string.Empty);
-            i.Tags = readableObject;
+            i.Tag = readableObject;
             return i;
         }
 
@@ -576,7 +576,7 @@ namespace BlueControls.ItemCollection {
         /// <param name="internalname"></param>
         public TextListItem Add(IReadableText readableObject, string internalname) {
             var i = Add(readableObject, internalname, string.Empty);
-            i.Tags = readableObject;
+            i.Tag = readableObject;
             return i;
         }
 
@@ -587,7 +587,7 @@ namespace BlueControls.ItemCollection {
         /// <param name="readableObject"></param>
         public TextListItem Add(IReadableText readableObject, string internalname, string userDefCompareKey) {
             var i = Add(readableObject.ReadableText(), internalname, readableObject.SymbolForReadableText(), true, userDefCompareKey);
-            i.Tags = readableObject;
+            i.Tag = readableObject;
             return i;
         }
 
@@ -679,7 +679,7 @@ namespace BlueControls.ItemCollection {
 
             if (Contains(item)) { Develop.DebugPrint(enFehlerArt.Warnung, "Bereits vorhanden!"); return; }
 
-            if (this[item.Internal] != null) { Develop.DebugPrint(enFehlerArt.Info, "Name bereits vorhanden: " + item.Internal); return; }
+            if (this[item.Internal] != null) { Develop.DebugPrint(enFehlerArt.Warnung, "Name bereits vorhanden: " + item.Internal); return; }
 
             base.Add(item);
         }

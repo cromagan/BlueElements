@@ -119,30 +119,19 @@ namespace BlueControls.Controls {
 
         private void GenerateMenu() {
 
-            var NR = 0;
-
-
+            var NR = -1;
             var Vis = false;
-
 
             Item.Clear();
 
-
-            //if (!string.IsNullOrEmpty(_specialcommand))
-            //{
-            //    Item.Add("#SPECIAL#", _specialcommand, QuickImage.Get(ImageCode), true, "!"));
-            //}
-
-
-
-            NR = -1;
 
             for (var Z = LastD.Count - 1; Z >= 0; Z--) {
 
                 var x = LastD[Z].SplitBy("|");
 
 
-                if (x == null || x.GetUpperBound(0) < 0 || !string.IsNullOrEmpty(x[0])) {
+                if (x != null && x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[0]) && Item[x[0]] is null) {
+
                     if (!_mustExists || FileExists(x[0])) {
                         NR++;
 
@@ -152,7 +141,8 @@ namespace BlueControls.Controls {
 
                             if (_mustExists) {
                                 show += x[0].FileNameWithSuffix();
-                            } else {
+                            }
+                            else {
                                 show += x[0];
                             }
 
@@ -166,15 +156,14 @@ namespace BlueControls.Controls {
 
                             if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1])) {
                                 t.Add(x[1]);
-                            } else {
+                            }
+                            else {
                                 t.Add(string.Empty);
                             }
-                            it.Tags = t;
+                            it.Tag = t;
 
                             Item.Add(it);
                         }
-
-
                     }
                 }
             }
@@ -254,7 +243,7 @@ namespace BlueControls.Controls {
 
             base.OnItemClicked(e);
 
-            var t = (List<string>)e.Item.Tags;
+            var t = (List<string>)e.Item.Tag;
 
             AddFileName(e.Item.Internal, t[0]);
         }
