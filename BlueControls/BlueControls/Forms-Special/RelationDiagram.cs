@@ -26,8 +26,10 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
 
-namespace BlueControls.Forms {
-    public partial class RelationDiagram : PadEditor {
+namespace BlueControls.Forms
+{
+    public partial class RelationDiagram : PadEditor
+    {
         private readonly Database _Database;
         private readonly ColumnItem _column;
 
@@ -37,7 +39,8 @@ namespace BlueControls.Forms {
         //   Dim ItS As New Size(60, 80)
 
 
-        public RelationDiagram(Database DB) {
+        public RelationDiagram(Database DB)
+        {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -45,9 +48,12 @@ namespace BlueControls.Forms {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _Database = DB;
 
-            foreach (var ThisColumnItem in _Database.Column) {
-                if (ThisColumnItem != null) {
-                    if (ThisColumnItem.Format == enDataFormat.RelationText) {
+            foreach (var ThisColumnItem in _Database.Column)
+            {
+                if (ThisColumnItem != null)
+                {
+                    if (ThisColumnItem.Format == enDataFormat.RelationText)
+                    {
                         _column = ThisColumnItem;
                         break;
                     }
@@ -56,7 +62,8 @@ namespace BlueControls.Forms {
         }
 
 
-        private void Hinzu_Click(object sender, System.EventArgs e) {
+        private void Hinzu_Click(object sender, System.EventArgs e)
+        {
 
             var il = new ItemCollectionList();
             il.AddRange(_Database.Column[0].Contents(null));
@@ -65,14 +72,16 @@ namespace BlueControls.Forms {
 
 
             var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, enAddType.None, true);
-            if (i == null || i.Count != 1) {
+            if (i == null || i.Count != 1)
+            {
                 return;
             }
 
 
             AddOne(i[0], 0, 0, string.Empty);
 
-            if (Pad.Item.Count < 10) {
+            if (Pad.Item.Count < 10)
+            {
                 Pad.ZoomFit();
             }
 
@@ -80,9 +89,11 @@ namespace BlueControls.Forms {
         }
 
 
-        public RowFormulaPadItem ItemOfRow(RowItem R) {
+        public RowFormulaPadItem ItemOfRow(RowItem R)
+        {
 
-            foreach (var ThisItem in Pad.Item) {
+            foreach (var ThisItem in Pad.Item)
+            {
                 if (ThisItem != null && ThisItem is RowFormulaPadItem tempVar && tempVar.Row == R) { return tempVar; }
             }
 
@@ -90,7 +101,8 @@ namespace BlueControls.Forms {
         }
 
 
-        public RowFormulaPadItem AddOne(string What, int xPos, int Ypos, string layoutID) {
+        public RowFormulaPadItem AddOne(string What, int xPos, int Ypos, string layoutID)
+        {
 
 
             if (string.IsNullOrEmpty(What)) { return null; }
@@ -99,14 +111,15 @@ namespace BlueControls.Forms {
 
             var r = _Database.Row[What];
 
-            if (r == null) {
+            if (r == null)
+            {
                 MessageBox.Show("<b>" + What + "</B> konnte nicht hinzugefügt werden.", enImageCode.Information, "OK");
                 return null;
             }
             if (ItemOfRow(r) != null) { return null; }
 
 
-            var i2 = new RowFormulaPadItem(Pad.Item, r, layoutID);
+            var i2 = new RowFormulaPadItem(Pad.Item, _Database, r.Key, layoutID);
             Pad.Item.Add(i2);
             //  Pad.Invalidate()
             i2.SetCoordinates(new RectangleM(xPos, Ypos, i2.UsedArea().Width, i2.UsedArea().Height), false);
@@ -119,7 +132,8 @@ namespace BlueControls.Forms {
         }
 
 
-        private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+        private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
+        {
             if (e.HotItem == null) { return; }
 
             //Dim i As BasicItem = DirectCast(MouseOver, BasicItem)
@@ -132,7 +146,8 @@ namespace BlueControls.Forms {
         }
 
 
-        private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+        private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
+        {
 
             if (e.HotItem == null) { return; }
 
@@ -141,7 +156,8 @@ namespace BlueControls.Forms {
             var i = (RowFormulaPadItem)e.HotItem;
 
 
-            switch (e.ClickedComand) {
+            switch (e.ClickedComand)
+            {
                 case "Bez+":
                     BezPlus(i);
                     break;
@@ -156,7 +172,8 @@ namespace BlueControls.Forms {
         }
 
 
-        private void BezPlus(RowFormulaPadItem initialItem) {
+        private void BezPlus(RowFormulaPadItem initialItem)
+        {
 
             // Den Beziehungstext holen
             var t = initialItem.Row.CellGetString(_column).ToUpper();
@@ -170,8 +187,10 @@ namespace BlueControls.Forms {
 
             // Namen ermitteln, die relevant sind
             var bez = new List<string>();
-            foreach (var thisN in Names) {
-                if (t.Contains(thisN)) {
+            foreach (var thisN in Names)
+            {
+                if (t.Contains(thisN))
+                {
                     bez.AddIfNotExists(thisN);
                     t.Replace(thisN, string.Empty);
                 }
@@ -181,14 +200,16 @@ namespace BlueControls.Forms {
 
             // Namen in der Übersicht hinzufügen
             var lastit = initialItem;
-            foreach (var thisn in bez) {
+            foreach (var thisn in bez)
+            {
 
 
                 var ro = _Database.Row[thisn];
                 var it = ItemOfRow(ro);
 
 
-                if (it == null) {
+                if (it == null)
+                {
                     lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);
                 }
             }
@@ -359,7 +380,8 @@ namespace BlueControls.Forms {
         //    //Pad.Relation_Add(enRelationType.PositionZueinander, P2, i.Point2);
         //}
 
-        private void btnBilderExport_Click(object sender, System.EventArgs e) {
+        private void btnBilderExport_Click(object sender, System.EventArgs e)
+        {
 
 
             var fl = new System.Windows.Forms.FolderBrowserDialog();
@@ -369,10 +391,12 @@ namespace BlueControls.Forms {
 
 
 
-            foreach (var thisR in Pad.Item) {
+            foreach (var thisR in Pad.Item)
+            {
 
 
-                if (thisR is RowFormulaPadItem r) {
+                if (thisR is RowFormulaPadItem r)
+                {
 
 
                     var no = r.Row.CellFirstString();
@@ -384,16 +408,20 @@ namespace BlueControls.Forms {
                     r.GeneratedBitmap.Save(newn, System.Drawing.Imaging.ImageFormat.Png);
 
 
-                    foreach (var thisc in r.Row.Database.Column) {
-                        if (thisc.Format == enDataFormat.Link_To_Filesystem) {
+                    foreach (var thisc in r.Row.Database.Column)
+                    {
+                        if (thisc.Format == enDataFormat.Link_To_Filesystem)
+                        {
 
                             var l = r.Row.CellGetList(thisc);
 
-                            foreach (var thiss in l) {
+                            foreach (var thiss in l)
+                            {
 
                                 var f = thisc.BestFile(thiss, false);
 
-                                if (FileOperations.FileExists(f)) {
+                                if (FileOperations.FileExists(f))
+                                {
 
                                     var n2 = r.Row.CellFirstString() + "-" + thisc.Caption;
                                     n2 = n2.Replace(" ", "_");
@@ -413,7 +441,8 @@ namespace BlueControls.Forms {
             }
         }
 
-        private void btnTextExport_Click(object sender, System.EventArgs e) {
+        private void btnTextExport_Click(object sender, System.EventArgs e)
+        {
 
             var fl = new System.Windows.Forms.FolderBrowserDialog();
 
@@ -424,10 +453,12 @@ namespace BlueControls.Forms {
             var l = new List<string>();
 
 
-            foreach (var thisR in Pad.Item) {
+            foreach (var thisR in Pad.Item)
+            {
 
 
-                if (thisR is RowFormulaPadItem r) {
+                if (thisR is RowFormulaPadItem r)
+                {
 
                     r.Row.DoAutomatic(true, true);
 

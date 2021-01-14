@@ -132,13 +132,13 @@ namespace BlueControls.ItemCollection {
 
         private void GeneratePic() {
 
-            if (Row == null || string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
+            if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
                 _tmpBMP = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
                 return;
             }
 
 
-            var _pad = new CreativePad(new ItemCollectionPad(_LayoutID, _Row));
+            var _pad = new CreativePad(new ItemCollectionPad(_LayoutID, Row.Database, Row.Key));
 
             var mb = _pad.Item.MaxBounds(null);
 

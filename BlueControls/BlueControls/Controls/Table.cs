@@ -1285,7 +1285,7 @@ namespace BlueControls.Controls {
             if (e.Handled) { return; }
             e.Handled = true;
 
-            var Pad = new ItemCollectionPad(e.LayoutID, e.Row);
+            var Pad = new ItemCollectionPad(e.LayoutID, e.Row.Database, e.Row.Key);
             Pad.SaveAsBitmap(e.Filename);
         }
 
