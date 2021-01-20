@@ -86,8 +86,8 @@ namespace BlueDatabase {
                     if (ThisColumn != null && ThisColumn.Key == key) { return ThisColumn; }
                 }
 
-                // Beim Parsen werden die Spalten ja erstellt
-                if (!Database.IsParsing) { Database.DevelopWarnung("Spalten-Key nicht gefunden: " + key.ToString()); }
+                //// Beim Parsen und erstellen werden die Spalten ja erstellt
+                //if (!Database.IsParsing) { Database.DevelopWarnung("Spalten-Key nicht gefunden: " + key.ToString()); }
 
 
                 return null;
