@@ -24,11 +24,9 @@ using System.IO;
 using System.Security.Cryptography;
 using static BlueBasics.modAllgemein;
 
-namespace BlueBasics
-{
+namespace BlueBasics {
 
-    public static class FileOperations
-    {
+    public static class FileOperations {
         private static DateTime CanWrite_LastCheck = DateTime.Now.Subtract(new TimeSpan(10, 10, 10));
         private static bool CanWrite_LastResult;
         private static string CanWrite_LastFile = string.Empty;
@@ -39,16 +37,13 @@ namespace BlueBasics
         private static bool LastErg = false;
 
 
-        private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure)
-        {
+        private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure) {
             var tries = 0;
             var startTime = DateTime.Now;
 
-            while (!processMethod(file1, file2))
-            {
+            while (!processMethod(file1, file2)) {
                 tries++;
-                if (tries > 5)
-                {
+                if (tries > 5) {
                     if (!toBeSure) { return false; }
                     if (DateTime.Now.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(enFehlerArt.Fehler, "Befehl konnte nicht ausgeführt werden, " + file1 + " " + file2); }
                 }
@@ -58,17 +53,14 @@ namespace BlueBasics
         }
 
 
-        private static bool TryDeleteDir(string Pfad, string WillBeIgnored)
-        {
+        private static bool TryDeleteDir(string Pfad, string WillBeIgnored) {
             Pfad = Pfad.CheckPath();
             if (!PathExists(Pfad)) { return true; }
 
-            try
-            {
+            try {
                 Directory.Delete(Pfad, true);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
             }
 
@@ -80,10 +72,8 @@ namespace BlueBasics
         /// 
         /// </summary>
         /// <returns>True, wenn mindestens eine Datei gelöscht wurde.</returns>
-        public static bool DeleteFile(List<string> filelist)
-        {
-            for (var Z = 0; Z < filelist.Count; Z++)
-            {
+        public static bool DeleteFile(List<string> filelist) {
+            for (var Z = 0; Z < filelist.Count; Z++) {
                 if (!FileExists(filelist[Z])) { filelist[Z] = string.Empty; }
             }
 
@@ -92,8 +82,7 @@ namespace BlueBasics
             if (filelist.Count == 0) { return false; }
 
             var del = false;
-            foreach (var ThisFile in filelist)
-            {
+            foreach (var ThisFile in filelist) {
                 if (DeleteFile(ThisFile, false)) { del = true; }
             }
 
@@ -101,46 +90,37 @@ namespace BlueBasics
         }
 
 
-        public static bool DeleteFile(string file, bool toBeSure)
-        {
+        public static bool DeleteFile(string file, bool toBeSure) {
             if (!FileExists(file)) { return true; }
             return ProcessFile(TryDeleteFile, file, file, toBeSure);
         }
-        public static bool RenameFile(string oldName, string newName, bool toBeSure)
-        {
+        public static bool RenameFile(string oldName, string newName, bool toBeSure) {
             return ProcessFile(TryRenameFile, oldName, newName, toBeSure);
         }
-        public static bool CopyFile(string source, string target, bool toBeSure)
-        {
+        public static bool CopyFile(string source, string target, bool toBeSure) {
             return ProcessFile(TryCopyFile, source, target, toBeSure);
         }
 
-        public static bool DeleteDir(string directory, bool toBeSure)
-        {
+        public static bool DeleteDir(string directory, bool toBeSure) {
             return ProcessFile(TryDeleteDir, directory, directory, toBeSure);
         }
 
 
 
-        private static bool TryDeleteFile(string ThisFile, string WillbeIgnored)
-        {
+        private static bool TryDeleteFile(string ThisFile, string WillbeIgnored) {
             // Komisch, manche Dateien können zwar gelöscht werden, die Attribute aber nicht geändert (Berechtigungen?)
-            try
-            {
+            try {
                 File.SetAttributes(ThisFile, FileAttributes.Normal);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
             }
 
-            try
-            {
+            try {
                 CanWrite(ThisFile, 0.5);
                 File.Delete(ThisFile);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
@@ -150,19 +130,16 @@ namespace BlueBasics
 
 
 
-        private static bool TryRenameFile(string oldName, string newName)
-        {
+        private static bool TryRenameFile(string oldName, string newName) {
             if (oldName == newName) { return true; }
             if (!FileExists(oldName)) { return false; }
             if (FileExists(newName)) { return false; }
 
 
-            try
-            {
+            try {
                 File.Move(oldName, newName);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
@@ -170,18 +147,15 @@ namespace BlueBasics
             return true; // FileExists(newName) && !FileExists(oldName);
         }
 
-        private static bool TryCopyFile(string source, string target)
-        {
+        private static bool TryCopyFile(string source, string target) {
             if (source == target) { return true; }
             if (!FileExists(source)) { return false; }
             if (FileExists(target)) { return false; }
 
-            try
-            {
+            try {
                 File.Copy(source, target);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
@@ -190,8 +164,7 @@ namespace BlueBasics
         }
 
 
-        public static bool FileExists(string file)
-        {
+        public static bool FileExists(string file) {
             if (file == null) { return false; }
             if (string.IsNullOrEmpty(file)) { return false; }
             if (file.ContainsChars(Constants.Char_PfadSonderZeichen)) { return false; }
@@ -233,8 +206,7 @@ namespace BlueBasics
         //}
 
 
-        public static bool CanWriteInDirectory(string DirectoryPath)
-        {
+        public static bool CanWriteInDirectory(string DirectoryPath) {
 
 
 
@@ -247,60 +219,49 @@ namespace BlueBasics
             LastErg = false;
 
 
-            try
-            {
-                using (var fs = File.Create(Path.Combine(DirectoryPath, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose))
-                { }
+            try {
+                using (var fs = File.Create(Path.Combine(DirectoryPath, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
                 LastErg = true;
                 return true;
             }
-            catch
-            {
+            catch {
                 return false;
             }
         }
 
 
-        public static bool CanWrite(string Datei, double TryItForSeconds)
-        {
+        public static bool CanWrite(string Datei, double TryItForSeconds) {
             if (!CanWriteInDirectory(Datei.FilePath())) { return false; }
             var s = DateTime.Now;
-            do
-            {
+            do {
                 if (CanWrite(Datei)) { return true; }
                 if (DateTime.Now.Subtract(s).TotalSeconds > TryItForSeconds) { return false; }
             } while (true);
         }
 
 
-        private static bool CanWrite(string sFile)
-        {
+        private static bool CanWrite(string sFile) {
             //Private lassen, das andere CanWrite greift auf diese zu.
             //Aber das andere prüft zusätzlich die Schreibrechte im Verzeichnis
             //http://www.vbarchiv.net/tipps/tipp_1281.html
 
             if (CanWrite_LastResult) { CanWrite_LastFile = string.Empty; }
             if (DateTime.Now.Subtract(CanWrite_LastCheck).TotalSeconds > 10) { CanWrite_LastFile = string.Empty; }
-            if (CanWrite_LastFile != sFile.ToUpper())
-            {
+            if (CanWrite_LastFile != sFile.ToUpper()) {
 
                 var StartTime = DateTime.Now;
 
-                if (FileExists(sFile))
-                {
-                    try
-                    {
+                if (FileExists(sFile)) {
+                    try {
                         // Versuch, Datei EXKLUSIV zu öffnen
-                        using (var obFi = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        {
+                        using (var obFi = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                             obFi.Close();
                         }
 
                         CanWrite_LastResult = Convert.ToBoolean(DateTime.Now.Subtract(StartTime).TotalSeconds < 1);
 
                     }
-                    catch
-                    {
+                    catch {
                         // Bei Fehler ist die Datei in Benutzung
                         CanWrite_LastResult = false;
                     }
@@ -314,22 +275,19 @@ namespace BlueBasics
             return CanWrite_LastResult;
         }
 
-        public static bool PathExists(string Pfad)
-        {
+        public static bool PathExists(string Pfad) {
             if (Pfad.Length < 3) { return false; }
             return Directory.Exists(Pfad.CheckPath());
         }
 
 
-        public static string TempFile(string NewPath, string Filename)
-        {
+        public static string TempFile(string NewPath, string Filename) {
             var dn = Filename.FileNameWithoutSuffix();
             var ds = Filename.FileSuffix();
             return TempFile(NewPath, dn, ds);
         }
 
-        public static string TempFile(string FullName)
-        {
+        public static string TempFile(string FullName) {
             var dp = FullName.FilePath();
             var dn = FullName.FileNameWithoutSuffix();
             var ds = FullName.FileSuffix();
@@ -337,13 +295,11 @@ namespace BlueBasics
         }
 
 
-        public static string TempFile()
-        {
+        public static string TempFile() {
             return TempFile("", "", "");
         }
 
-        public static string TempFile(string Pfad, string Wunschname, string Suffix)
-        {
+        public static string TempFile(string Pfad, string Wunschname, string Suffix) {
             if (string.IsNullOrEmpty(Pfad)) { Pfad = Path.GetTempPath(); }
             if (string.IsNullOrEmpty(Suffix)) { Suffix = "tmp"; }
             if (string.IsNullOrEmpty(Wunschname)) { Wunschname = UserName() + DateTime.Now.ToString(Constants.Format_Date6); }
@@ -357,15 +313,12 @@ namespace BlueBasics
 
             string filename;
 
-            do
-            {
+            do {
                 z++;
-                if (z > 0)
-                {
+                if (z > 0) {
                     filename = Pfad + Wunschname + "_" + z.ToString(Constants.Format_Integer5) + "." + Suffix;
                 }
-                else
-                {
+                else {
                     filename = Pfad + Wunschname + "." + Suffix;
                 }
             } while (FileExists(filename));
@@ -374,19 +327,14 @@ namespace BlueBasics
         }
 
 
-        public static string CalculateMD5(string filename)
-        {
+        public static string CalculateMD5(string filename) {
 
             if (!FileExists(filename)) { return string.Empty; }
 
-            using (var md5 = MD5.Create())
-            {
-                using (var stream = File.OpenRead(filename))
-                {
-                    var hash = md5.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                }
-            }
+            using var md5 = MD5.Create();
+            using var stream = File.OpenRead(filename);
+            var hash = md5.ComputeHash(stream);
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
 
     }

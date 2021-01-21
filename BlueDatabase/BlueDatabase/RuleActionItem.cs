@@ -27,7 +27,7 @@ using System.Text.RegularExpressions;
 using static BlueBasics.FileOperations;
 
 namespace BlueDatabase {
-    public sealed class RuleActionItem : IParseable, IReadableText, IComparable, ICompareKey, ICloneable, ICheckable, ICanBeEmpty {
+    public sealed class RuleActionItem : IParseable, IReadableTextWithChanging, IComparable, ICompareKey, ICloneable, ICheckable, ICanBeEmpty {
         #region  Variablen-Deklarationen 
 
         public readonly RuleItem Rule;

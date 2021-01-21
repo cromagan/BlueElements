@@ -35,7 +35,7 @@ using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 
 namespace BlueDatabase {
-    public sealed class ColumnItem : IReadableText, IParseable, ICompareKey, ICheckable {
+    public sealed class ColumnItem : IReadableTextWithChanging, IParseable, ICompareKey, ICheckable {
         #region  Variablen-Deklarationen 
 
         public readonly Database Database;

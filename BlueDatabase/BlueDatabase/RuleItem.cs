@@ -26,7 +26,7 @@ using System.Collections.Generic;
 
 namespace BlueDatabase {
 
-    public sealed class RuleItem : IParseable, IReadableText, IComparable, ICompareKey, ICloneable, ICheckable, ICanBeEmpty {
+    public sealed class RuleItem : IParseable, IReadableTextWithChanging, IComparable, ICompareKey, ICloneable, ICheckable, ICanBeEmpty {
 
         #region  Variablen-Deklarationen 
         public readonly Database Database;

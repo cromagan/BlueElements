@@ -19,10 +19,8 @@
 
 namespace BlueBasics.Interfaces
 {
-    public interface IReadableText
+    public interface IReadableTextWithChanging : IReadableText, IChangedFeedback
     {
-        string ReadableText();
-        QuickImage SymbolForReadableText();
 
 
 

@@ -36,7 +36,7 @@ namespace BlueDatabase
     //Der Export wird nur Intern verwaltet und gibt keine Ereignisse aus.
     //Wenn mal ein LAyout geändert wird, sind es gleich 100 und mehr AddPenduings mit imensen Daten.
 
-    public class ExportDefinition : IParseable, IReadableText, ICompareKey, ICheckable
+    public class ExportDefinition : IParseable, IReadableTextWithChanging, ICompareKey, ICheckable
     {
 
 

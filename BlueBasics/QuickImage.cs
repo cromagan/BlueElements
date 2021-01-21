@@ -29,7 +29,7 @@ using static BlueBasics.modConverter;
 
 namespace BlueBasics
 {
-    public sealed class QuickImage : IParseable, IReadableText, ICompareKey
+    public sealed class QuickImage : IParseable, IReadableTextWithChanging, ICompareKey
     {
         private static string _SearchedCode = "";
         private static int _FoundInde = -1;
@@ -568,12 +568,10 @@ namespace BlueBasics
             {
                 _IsError = true;
                 _Bitmap = new BitmapExt(16, 16);
-                using (var GR = Graphics.FromImage(_Bitmap.Bitmap))
-                {
-                    GR.Clear(Color.Black);
-                    GR.DrawLine(new Pen(Color.Red, 3), 0, 0, _Bitmap.Width - 1, _Bitmap.Height - 1);
-                    GR.DrawLine(new Pen(Color.Red, 3), _Bitmap.Width - 1, 0, 0, _Bitmap.Height - 1);
-                }
+                using var GR = Graphics.FromImage(_Bitmap.Bitmap);
+                GR.Clear(Color.Black);
+                GR.DrawLine(new Pen(Color.Red, 3), 0, 0, _Bitmap.Width - 1, _Bitmap.Height - 1);
+                GR.DrawLine(new Pen(Color.Red, 3), _Bitmap.Width - 1, 0, 0, _Bitmap.Height - 1);
                 return;
             }
 

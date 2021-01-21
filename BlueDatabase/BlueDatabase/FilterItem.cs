@@ -25,7 +25,7 @@ using System;
 using System.Collections.Generic;
 
 namespace BlueDatabase {
-    public sealed class FilterItem : IParseable, ICompareKey, IReadableText, ICanBeEmpty {
+    public sealed class FilterItem : IParseable, ICompareKey, IReadableTextWithChanging, ICanBeEmpty {
 
         #region  Variablen-Deklarationen 
 
