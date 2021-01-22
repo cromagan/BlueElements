@@ -210,12 +210,13 @@ namespace BlueBasics.MultiUserFile {
         }
 
         public void SetReadOnly() {
+            Develop.DebugPrint(enFehlerArt.Info, "ReadOnly gesetzt<br>" + Filename);
             ReadOnly = true;
         }
 
         public void RemoveFilename() {
             Filename = string.Empty;
-            ReadOnly = true;
+            SetReadOnly();
         }
 
 
@@ -628,7 +629,7 @@ namespace BlueBasics.MultiUserFile {
             fileNameToLoad = modConverter.SerialNr2Path(fileNameToLoad);
 
 
-            if (!CanWriteInDirectory(fileNameToLoad.FilePath())) { ReadOnly = true; }
+            if (!CreateWhenNotExisting && !CanWriteInDirectory(fileNameToLoad.FilePath())) { SetReadOnly(); }
 
 
             if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
@@ -637,7 +638,7 @@ namespace BlueBasics.MultiUserFile {
 
                 if (CreateWhenNotExisting) {
                     if (ReadOnly) {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Readonly kann keine Datei erzeugen");
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Readonly kann keine Datei erzeugen<br>" + fileNameToLoad);
                         return;
                     }
                     SaveAsAndChangeTo(fileNameToLoad);
@@ -645,7 +646,7 @@ namespace BlueBasics.MultiUserFile {
                 else {
 
                     Develop.DebugPrint(enFehlerArt.Warnung, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
-                    ReadOnly = true;
+                    SetReadOnly();
                     return;
                 }
             }

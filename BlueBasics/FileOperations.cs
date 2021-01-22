@@ -27,14 +27,15 @@ using static BlueBasics.modAllgemein;
 namespace BlueBasics {
 
     public static class FileOperations {
-        private static DateTime CanWrite_LastCheck = DateTime.Now.Subtract(new TimeSpan(10, 10, 10));
-        private static bool CanWrite_LastResult;
-        private static string CanWrite_LastFile = string.Empty;
+
 
         private delegate bool DoThis(string file1, string file2);
 
-        private static string LastCheck = string.Empty;
-        private static bool LastErg = false;
+        //private static string LastCheck = string.Empty;
+        //private static bool LastErg = false;
+
+        private static List<string> WriteAccess = new List<string>();
+        private static List<string> NoWriteAccess = new List<string>();
 
 
         private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure) {
@@ -206,73 +207,87 @@ namespace BlueBasics {
         //}
 
 
-        public static bool CanWriteInDirectory(string DirectoryPath) {
+        public static bool CanWriteInDirectory(string directory) {
 
 
 
-            if (string.IsNullOrEmpty(DirectoryPath)) { return false; }
+            if (string.IsNullOrEmpty(directory)) { return false; }
+            var DirUpper = directory.ToUpper();
+
+            if (WriteAccess.Contains(DirUpper)) { return true; }
+            if (NoWriteAccess.Contains(DirUpper)) { return false; }
 
 
-            if (LastCheck == DirectoryPath.ToUpper()) { return LastErg; }
-
-            LastCheck = DirectoryPath.ToUpper();
-            LastErg = false;
 
 
             try {
-                using (var fs = File.Create(Path.Combine(DirectoryPath, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
-                LastErg = true;
+                using (var fs = File.Create(Path.Combine(directory, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
+                WriteAccess.AddIfNotExists(DirUpper); // Multitasking
                 return true;
             }
             catch {
+                NoWriteAccess.AddIfNotExists(DirUpper); // Multitasking
                 return false;
             }
+
+          
         }
 
 
-        public static bool CanWrite(string Datei, double TryItForSeconds) {
-            if (!CanWriteInDirectory(Datei.FilePath())) { return false; }
+        private static DateTime _canWrite_LastCheck = DateTime.Now.Subtract(new TimeSpan(10, 10, 10));
+        private static bool _canWrite_LastResult;
+        private static string _canWrite_LastFile = string.Empty;
+        public static int _canWrite_tryintervall = 10;
+        public static bool CanWrite(string filename, double tryItForSeconds) {
+            if (!CanWriteInDirectory(filename.FilePath())) { return false; }
+
             var s = DateTime.Now;
             do {
-                if (CanWrite(Datei)) { return true; }
-                if (DateTime.Now.Subtract(s).TotalSeconds > TryItForSeconds) { return false; }
+                if (CanWrite(filename)) { return true; }
+                if (tryItForSeconds < _canWrite_tryintervall) { return false; }
+
+                if (DateTime.Now.Subtract(s).TotalSeconds > tryItForSeconds) { return false; }
             } while (true);
         }
 
 
-        private static bool CanWrite(string sFile) {
+        private static bool CanWrite(string file) {
             //Private lassen, das andere CanWrite greift auf diese zu.
             //Aber das andere prüft zusätzlich die Schreibrechte im Verzeichnis
             //http://www.vbarchiv.net/tipps/tipp_1281.html
 
-            if (CanWrite_LastResult) { CanWrite_LastFile = string.Empty; }
-            if (DateTime.Now.Subtract(CanWrite_LastCheck).TotalSeconds > 10) { CanWrite_LastFile = string.Empty; }
-            if (CanWrite_LastFile != sFile.ToUpper()) {
+            if (_canWrite_LastResult) { _canWrite_LastFile = string.Empty; }
+            if (DateTime.Now.Subtract(_canWrite_LastCheck).TotalSeconds > _canWrite_tryintervall) { _canWrite_LastFile = string.Empty; }
+
+
+
+
+            if (_canWrite_LastFile != file.ToUpper()) {
 
                 var StartTime = DateTime.Now;
 
-                if (FileExists(sFile)) {
+                if (FileExists(file)) {
                     try {
                         // Versuch, Datei EXKLUSIV zu öffnen
-                        using (var obFi = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                        using (var obFi = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                             obFi.Close();
                         }
 
-                        CanWrite_LastResult = Convert.ToBoolean(DateTime.Now.Subtract(StartTime).TotalSeconds < 1);
+                        _canWrite_LastResult = Convert.ToBoolean(DateTime.Now.Subtract(StartTime).TotalSeconds < 1);
 
                     }
                     catch {
                         // Bei Fehler ist die Datei in Benutzung
-                        CanWrite_LastResult = false;
+                        _canWrite_LastResult = false;
                     }
                 }
 
-                CanWrite_LastCheck = DateTime.Now;
+                _canWrite_LastCheck = DateTime.Now;
             }
 
-            CanWrite_LastFile = sFile.ToUpper();
+            _canWrite_LastFile = file.ToUpper();
 
-            return CanWrite_LastResult;
+            return _canWrite_LastResult;
         }
 
         public static bool PathExists(string Pfad) {
