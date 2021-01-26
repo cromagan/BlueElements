@@ -136,7 +136,26 @@ namespace BlueBasics.MultiUserFile {
         private DateTime _EditNormalyNextCheckUTC = DateTime.UtcNow.AddSeconds(-30);
         private string _EditNormalyError = string.Empty;
 
+
+        private int _BlockReload = 0;
+
         #endregion
+
+
+
+        public void BlockReload() {
+
+
+            // Im Parse-Befehel werdendie neuen Spalten erstellt
+            //while (IsLoading && !IsParsing) { Develop.DoEvents(); }
+            _BlockReload++;
+
+        }
+
+        public void UnblockReload() {
+            _BlockReload--;
+        }
+
 
 
         #region  Event-Deklarationen 
@@ -222,10 +241,10 @@ namespace BlueBasics.MultiUserFile {
 
 
         private (List<byte> data, string fileinfo) LoadBytesFromDisk(bool OnlyReload) {
-            byte[] _tmp = null;
             var tmpLastSaveCode2 = string.Empty;
 
             var StartTime = DateTime.UtcNow;
+            byte[] _tmp;
             do {
                 try {
 
@@ -987,6 +1006,8 @@ namespace BlueBasics.MultiUserFile {
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
             if (EasyMode && ReadOnly) { return; }
+
+            if (_BlockReload > 0) { return; }
 
             if (IsLoading) { return; }
             if (PureBinSaver.IsBusy || IsSaving) { return; }

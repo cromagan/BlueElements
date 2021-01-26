@@ -42,7 +42,7 @@ namespace BlueControls.Forms
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-            InitWindow(false, "", -1, "");
+            InitWindow(false, "", -1);
         }
 
 
@@ -55,7 +55,7 @@ namespace BlueControls.Forms
             _FileList = FileList;
             LoadPic(0);
 
-            InitWindow(MitScreenResize, WindowCaption, -1, "");
+            InitWindow(MitScreenResize, WindowCaption, -1);
 
 
             ZoomIn.Checked = true;
@@ -71,7 +71,7 @@ namespace BlueControls.Forms
             _FileList = new List<string>();
 
 
-            InitWindow(false, "", -1, "");
+            InitWindow(false, "", -1);
 
             Pad.BMP = BMP;
 
@@ -91,7 +91,7 @@ namespace BlueControls.Forms
             _FileList = FileList;
             LoadPic(0);
 
-            InitWindow(MitScreenResize, WindowCaption, OpenOnScreen, "");
+            InitWindow(MitScreenResize, WindowCaption, OpenOnScreen);
 
             grpSeiten.Visible = FileList != null && FileList.Count > 1;
 
@@ -173,16 +173,15 @@ namespace BlueControls.Forms
         }
 
 
-        private void InitWindow(bool FitWindowToBest, string WindowCaption, int OpenOnScreen, string DesignName)
-        {
+        private void InitWindow(bool fitWindowToBest, string windowCaption, int openOnScreen) {
             //    Me.ShowInTaskbar = False
 
             if (_FileList == null || _FileList.Count < 2) { grpSeiten.Enabled = false; }
 
 
-            if (FitWindowToBest)
+            if (fitWindowToBest)
             {
-                if (System.Windows.Forms.Screen.AllScreens.Length == 1 || OpenOnScreen < 0)
+                if (System.Windows.Forms.Screen.AllScreens.Length == 1 || openOnScreen < 0)
                 {
                     var OpScNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
 
@@ -194,17 +193,17 @@ namespace BlueControls.Forms
                 }
                 else
                 {
-                    Width = System.Windows.Forms.Screen.AllScreens[OpenOnScreen].WorkingArea.Width;
-                    Height = System.Windows.Forms.Screen.AllScreens[OpenOnScreen].WorkingArea.Height;
-                    Left = System.Windows.Forms.Screen.AllScreens[OpenOnScreen].WorkingArea.Left;
-                    Top = System.Windows.Forms.Screen.AllScreens[OpenOnScreen].WorkingArea.Top;
+                    Width = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Width;
+                    Height = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Height;
+                    Left = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Left;
+                    Top = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Top;
                 }
             }
 
 
-            if (!string.IsNullOrEmpty(WindowCaption))
+            if (!string.IsNullOrEmpty(windowCaption))
             {
-                Text = WindowCaption;
+                Text = windowCaption;
             }
 
 

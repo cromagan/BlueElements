@@ -1150,7 +1150,7 @@ namespace BlueDatabase {
 
         private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
 
-
+            Database.BlockReload();
 
             if (_Format != enDataFormat.Columns_für_LinkedCellDropdown) {
                 var os = e.KeyOld.ToString();
@@ -1172,6 +1172,8 @@ namespace BlueDatabase {
                     }
                 }
             }
+
+            Database.UnblockReload();
         }
 
         private void _TMP_LinkedDatabase_RowKeyChanged(object sender, KeyChangedEventArgs e) {

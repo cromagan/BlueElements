@@ -66,12 +66,16 @@ namespace BlueDatabase {
         public new ColumnItem this[int index] {
             get {
                 if (Database == null) { return null; }
+                Database.BlockReload();
 
                 if (index < 0 || index >= Count) {
                     Database.DevelopWarnung("Spalten-Index nicht gefunden: " + index.ToString());
+                    Database.UnblockReload();
                     return null;
                 }
-                return base[index];
+                var x = base[index];
+                Database.UnblockReload();
+                return x;
             }
         }
 
@@ -81,18 +85,23 @@ namespace BlueDatabase {
             try {
                 if (Database == null) { return null; }
                 if (key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
+                Database.BlockReload();
 
                 foreach (var ThisColumn in this) {
-                    if (ThisColumn != null && ThisColumn.Key == key) { return ThisColumn; }
+                    if (ThisColumn != null && ThisColumn.Key == key) {
+                        Database.UnblockReload();
+                        return ThisColumn;
+                    }
                 }
 
                 //// Beim Parsen und erstellen werden die Spalten ja erstellt
                 //if (!Database.IsParsing) { Database.DevelopWarnung("Spalten-Key nicht gefunden: " + key.ToString()); }
-
+                Database.UnblockReload();
 
                 return null;
             }
             catch {
+                Database.UnblockReload();
                 return SearchByKey(key); // Sammlung wurde verändert
             }
         }
@@ -103,8 +112,13 @@ namespace BlueDatabase {
 
         public ColumnItem this[string columnName] {
             get {
+
+                Database.BlockReload();
+
                 var colum = Exists(columnName);
                 if (colum is null) { Database.DevelopWarnung("Spalte nicht gefunden: " + columnName); }
+
+                Database.UnblockReload();
                 return colum;
             }
         }
