@@ -41,7 +41,7 @@ namespace BlueControls.Controls
 {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ImageChanged")]
-    public sealed partial class EasyPic : IContextMenu, IBackgroundNone
+    public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundNone
     {
 
         #region Constructor

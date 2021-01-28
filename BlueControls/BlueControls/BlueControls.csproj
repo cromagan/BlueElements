@@ -111,6 +111,12 @@
     </Compile>
     <Compile Include="BlueFont.cs" />
     <Compile Include="clsSerializeableMultiUserFile.cs" />
+    <Compile Include="Controls\EasyPicMulti.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\EasyPicMulti.Designer.cs">
+      <DependentUpon>EasyPicMulti.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TabControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -590,6 +596,9 @@
     <EmbeddedResource Include="Classes Editor\RuleItem_Editor.resx">
       <DependentUpon>RuleItem_Editor.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\EasyPicMulti.resx">
+      <DependentUpon>EasyPicMulti.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ComboBox.resx">
       <DependentUpon>ComboBox.cs</DependentUpon>

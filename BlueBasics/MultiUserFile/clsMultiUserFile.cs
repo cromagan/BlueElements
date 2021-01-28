@@ -123,6 +123,12 @@ namespace BlueBasics.MultiUserFile {
         public bool IsParsing { get; private set; } = false;
 
         public bool IsLoading { get; private set; } = false;
+
+        private int _loadingThreadId = -1;
+
+
+
+
         public bool IsSaving { get; private set; } = false;
 
         private bool _DoingTempFile = false;
@@ -145,9 +151,9 @@ namespace BlueBasics.MultiUserFile {
 
         public void BlockReload() {
 
-
-            // Im Parse-Befehel werdendie neuen Spalten erstellt
-            //while (IsLoading && !IsParsing) { Develop.DoEvents(); }
+            WaitLoaded();
+            //// Im Parse-Befehel werdendie neuen Spalten erstellt
+            //while (IsLoading ) { Develop.DoEvents(); }
             _BlockReload++;
 
         }
@@ -291,6 +297,11 @@ namespace BlueBasics.MultiUserFile {
 
 
         private void WaitLoaded() {
+
+
+
+            if( _loadingThreadId == Thread.CurrentThread.ManagedThreadId) { return; }
+
             var x = DateTime.Now;
 
 
@@ -331,6 +342,7 @@ namespace BlueBasics.MultiUserFile {
             if (string.IsNullOrEmpty(Filename)) { return; }
 
             IsLoading = true;
+            _loadingThreadId = Thread.CurrentThread.ManagedThreadId;
 
             //Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
             if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded()) { IsLoading = false; return; }

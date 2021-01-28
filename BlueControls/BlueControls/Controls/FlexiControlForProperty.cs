@@ -164,23 +164,32 @@ namespace BlueControls.Controls {
             var x = _propInfo.GetValue(_propertyObject, null);
             if (x is null) {
                 Value = string.Empty;
-            } else if (x is string s) {
+            }
+            else if (x is string s) {
                 Value = s;
-            } else if (x is List<string> ls) {
+            }
+            else if (x is List<string> ls) {
                 Value = ls.JoinWithCr();
-            } else if (x is bool bo) {
+            }
+            else if (x is bool bo) {
                 Value = bo.ToPlusMinus();
-            } else if (x is int iv) {
+            }
+            else if (x is int iv) {
                 Value = iv.ToString();
-            } else if (x is Enum) {
+            }
+            else if (x is Enum) {
                 Value = ((int)x).ToString();
-            } else if (x is decimal dc) {
+            }
+            else if (x is decimal dc) {
                 Value = dc.ToString(Constants.Format_Float2);
-            } else if (x is double db) {
+            }
+            else if (x is double db) {
                 Value = db.ToString(Constants.Format_Float2);
-            } else if (x is Color co) {
+            }
+            else if (x is Color co) {
                 Value = co.ToHTMLCode();
-            } else {
+            }
+            else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
             }
 
@@ -201,31 +210,40 @@ namespace BlueControls.Controls {
             if (x is null) {
                 OldVal = string.Empty;
                 toSet = Value; // Wissen wir leider nicht, welcher Typ....
-            } else if (x is string s) {
+            }
+            else if (x is string s) {
                 OldVal = s;
                 toSet = Value;
-            } else if (x is List<string> ls) {
+            }
+            else if (x is List<string> ls) {
                 OldVal = ls.JoinWithCr();
                 toSet = Value.SplitByCRToList();
-            } else if (x is bool bo) {
+            }
+            else if (x is bool bo) {
                 OldVal = bo.ToPlusMinus();
                 toSet = Value.FromPlusMinus();
-            } else if (x is Color co) {
+            }
+            else if (x is Color co) {
                 OldVal = co.ToHTMLCode();
                 toSet = Value.FromHTMLCode();
-            } else if (x is int iv) {
+            }
+            else if (x is int iv) {
                 OldVal = iv.ToString();
                 toSet = IntParse(Value);
-            } else if (x is Enum) {
+            }
+            else if (x is Enum) {
                 OldVal = ((int)x).ToString();
                 toSet = IntParse(Value);
-            } else if (x is decimal dc) {
+            }
+            else if (x is decimal dc) {
                 OldVal = dc.ToString(Constants.Format_Float2);
                 toSet = DecimalParse(Value);
-            } else if (x is double db) {
+            }
+            else if (x is double db) {
                 OldVal = db.ToString(Constants.Format_Float2);
                 toSet = DoubleParse(Value);
-            } else {
+            }
+            else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
             }
 
@@ -236,6 +254,13 @@ namespace BlueControls.Controls {
         }
 
         internal bool CheckEnabledState() {
+
+            if (Develop.IsDevelopment() || DesignMode) {
+                base.DisabledReason = string.Empty;
+                return true;
+            }
+
+
             if (_propertyObject == null) {
                 base.DisabledReason = "Kein zugehöriges Objekt definiert.";
                 return false;
@@ -280,7 +305,8 @@ namespace BlueControls.Controls {
                 _methInfo = null;
                 _propInfo = null;
                 _propertynamecpl = string.Empty;
-            } else {
+            }
+            else {
                 _propertynamecpl = _propertyName;
 
                 _propertynamecpl = _propertynamecpl.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + "-/\\ _");
@@ -303,7 +329,8 @@ namespace BlueControls.Controls {
                 var x = _propertyName.SplitBy("__");
                 Caption = x[0].Replace("_", " ") + ":";
                 FileEncryptionKey = string.Empty;
-            } else {
+            }
+            else {
                 Caption = "[unbekannt]";
             }
             #endregion
@@ -378,7 +405,8 @@ namespace BlueControls.Controls {
                                     Size = new Size(200, 16 + 24 * TextLines);
                                     _MultiLine = true;
                                     tmpName = "system.string";
-                                } else {
+                                }
+                                else {
                                     _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
                                     Size = new Size(200, 24);
                                     _MultiLine = false;
@@ -410,11 +438,15 @@ namespace BlueControls.Controls {
 
             #region QuickInfo setzen
             // https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
+
+            // [PropertyAttributes("", false)] setzen
+
             _FehlerWennLeer = true;
 
             if (_propInfo == null && _methInfo == null) {
                 QuickInfo = string.Empty;
-            } else {
+            }
+            else {
 
                 var done = false;
 
@@ -432,7 +464,8 @@ namespace BlueControls.Controls {
                             QuickInfo = pa.Description;
                             _FehlerWennLeer = pa.FehlerWennLeer;
                             done = true;
-                        } else if (thisas is DescriptionAttribute da) {
+                        }
+                        else if (thisas is DescriptionAttribute da) {
                             QuickInfo = da.Description;
                             done = true;
                         }

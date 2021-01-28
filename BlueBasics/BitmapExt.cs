@@ -50,6 +50,12 @@ namespace BlueBasics {
 
         public BitmapExt(string filename) : this((Bitmap)Image_FromFile(filename)) { }
 
+
+        public BitmapExt(string filename, bool setDummyPicIfFails) {
+            FromFile(filename, setDummyPicIfFails);
+        }
+
+
         public BitmapExt(int width, int height) => EmptyBitmap(width, height);
 
         public BitmapExt(Icon icon) : this(icon.ToBitmap()) { }
@@ -59,12 +65,20 @@ namespace BlueBasics {
         /// </summary>
         /// <param name="bmp"></param>
         public BitmapExt(Bitmap bmp) {
+            SetBitmap(bmp);
+        }
+
+        /// <summary>
+        /// Achtung, das eingehende Bild wird zerstört!
+        /// </summary>
+        /// <param name="bmp"></param>
+        private void SetBitmap(Bitmap bmp) {
+
             if (bmp == null) {
                 Width = -1;
                 Height = -1;
                 return;
             }
-
 
             try {
 
@@ -105,20 +119,29 @@ namespace BlueBasics {
         }
 
 
+        public void FromFile(string dateiName, bool setDummyPicIfFails) {
+            var x = (Bitmap)Image_FromFile(dateiName);
 
+            if (x == null && setDummyPicIfFails) {
+                x = QuickImage.Get(enImageCode.Warnung).BMP;
+            }
+            SetBitmap(x);
+
+
+        }
 
         /// <summary>
         /// Diese Routine ist genau so schnell wie Image.fromFile, setzt aber KEINEN Datei-Lock.
         /// </summary>
-        /// <param name="DateiName"></param>
+        /// <param name="dateiName"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static Image Image_FromFile(string DateiName) {
-            if (string.IsNullOrEmpty(DateiName)) { return null; }
-            if (!FileExists(DateiName)) { return null; }
+        public static Image Image_FromFile(string dateiName) {
+            if (string.IsNullOrEmpty(dateiName)) { return null; }
+            if (!FileExists(dateiName)) { return null; }
 
             try {
-                var fs = new FileStream(DateiName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var fs = new FileStream(dateiName, FileMode.Open, FileAccess.Read, FileShare.Read);
                 var IM = Image.FromStream(fs);
                 fs.Close();
                 fs.Dispose();
@@ -344,13 +367,11 @@ namespace BlueBasics {
             Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
         }
 
-        public void MakeTransparent(Color color) {
-            Bitmap.MakeTransparent(color);
-        }
+        public void MakeTransparent(Color color) => Bitmap.MakeTransparent(color);
 
-        public void Save(string name, ImageFormat imageFormat) {
-            Bitmap.Save(name, imageFormat);
-        }
+
+        public void Save(string name, ImageFormat imageFormat) => Bitmap.Save(name, imageFormat);
+
 
 
 

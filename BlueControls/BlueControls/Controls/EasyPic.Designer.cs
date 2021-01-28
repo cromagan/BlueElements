@@ -7,7 +7,7 @@ using BlueControls.Enums;
 
 namespace BlueControls.Controls
 {
-    public partial class EasyPic : GenericControl
+    public partial class EasyPic 
     {
         //Inherits Windows.Forms.UserControl
         //UserControl überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
