@@ -271,8 +271,10 @@ namespace BluePaint
             btnRückgänig.Enabled = false;
             _isSaved = false;
 
+            Bitmap _bmp = null;
+            BlueBasics.modAllgemein.Swap(ref _bmp, ref _PicUndo);
 
-            BlueBasics.modAllgemein.Swap(ref P.BMP, ref _PicUndo);
+            P.BMP = _bmp;
 
 
             if (P.BMP.Width != _PicUndo.Width || P.BMP.Height != _PicUndo.Height)

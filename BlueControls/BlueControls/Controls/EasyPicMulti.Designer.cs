@@ -26,9 +26,10 @@ namespace BlueControls.Controls {
         /// </summary>
         private void InitializeComponent() {
             this.pnlControls = new BlueControls.Controls.GroupBox();
+            this.btnSchnittView = new BlueControls.Controls.Button();
             this.btnRight = new BlueControls.Controls.Button();
             this.btnLeft = new BlueControls.Controls.Button();
-            this.btnSchnittView = new BlueControls.Controls.Button();
+            this.zoompic = new BlueControls.Controls.ZoomPic();
             this.pnlControls.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -41,9 +42,18 @@ namespace BlueControls.Controls {
             this.pnlControls.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlControls.Location = new System.Drawing.Point(0, 0);
             this.pnlControls.Name = "pnlControls";
-            this.pnlControls.Size = new System.Drawing.Size(150, 32);
+            this.pnlControls.Size = new System.Drawing.Size(0, 32);
             this.pnlControls.TabIndex = 2;
             this.pnlControls.TabStop = false;
+            // 
+            // btnSchnittView
+            // 
+            this.btnSchnittView.ImageCode = "Brille|32";
+            this.btnSchnittView.Location = new System.Drawing.Point(77, 3);
+            this.btnSchnittView.Name = "btnSchnittView";
+            this.btnSchnittView.Size = new System.Drawing.Size(40, 26);
+            this.btnSchnittView.TabIndex = 12;
+            this.btnSchnittView.Click += new System.EventHandler(this.btnSchnittView_Click);
             // 
             // btnRight
             // 
@@ -63,19 +73,19 @@ namespace BlueControls.Controls {
             this.btnLeft.TabIndex = 2;
             this.btnLeft.Click += new System.EventHandler(this.btnLeft_Click);
             // 
-            // btnSchnittView
+            // zoompic
             // 
-            this.btnSchnittView.ImageCode = "Brille|32";
-            this.btnSchnittView.Location = new System.Drawing.Point(77, 3);
-            this.btnSchnittView.Name = "btnSchnittView";
-            this.btnSchnittView.Size = new System.Drawing.Size(40, 26);
-            this.btnSchnittView.TabIndex = 12;
-            this.btnSchnittView.Click += new System.EventHandler(this.btnSchnittView_Click);
+            this.zoompic.AlwaysSmooth = false;
+            this.zoompic.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.zoompic.Location = new System.Drawing.Point(0, 32);
+            this.zoompic.Name = "zoompic";
+            this.zoompic.Size = new System.Drawing.Size(0, 0);
+            this.zoompic.TabIndex = 3;
             // 
             // EasyPicMulti
             // 
+            this.Controls.Add(this.zoompic);
             this.Controls.Add(this.pnlControls);
-            this.Name = "EasyPicMulti";
             this.pnlControls.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -88,5 +98,6 @@ namespace BlueControls.Controls {
         private Button btnRight;
         private Button btnLeft;
         private Button btnSchnittView;
+        private ZoomPic zoompic;
     }
 }

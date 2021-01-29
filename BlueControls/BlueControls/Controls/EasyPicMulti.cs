@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using BlueControls.Forms;
 
 namespace BlueControls.Controls {
-    public partial class EasyPicMulti : GenericControl, IBackgroundNone //  System.Windows.Forms.UserControl //
+    public partial class EasyPicMulti :  GenericControl, IBackgroundNone // System.Windows.Forms.UserControl //
         {
 
 
@@ -24,8 +24,10 @@ namespace BlueControls.Controls {
                 pic.Clear();
                 files = value;
                 _nr = 0;
+                if (files == null) { files = new List<string>(); }
+
                 while (pic.Count < files.Count) { pic.Add(null); }
-                Invalidate();
+                SetPic();
             }
         }
 
@@ -46,7 +48,7 @@ namespace BlueControls.Controls {
             _nr++;
 
             if (_nr > pic.Count - 1) { _nr = pic.Count - 1; }
-            Invalidate();
+            SetPic();
 
 
         }
@@ -55,7 +57,7 @@ namespace BlueControls.Controls {
             _nr--;
 
             if (_nr < 0) { _nr = 0; }
-            Invalidate();
+            SetPic();
 
         }
 
@@ -65,14 +67,8 @@ namespace BlueControls.Controls {
         }
 
 
-
-        protected override void DrawControl(Graphics GR, enStates vState) {
-            if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
-            if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }
-
-
-            Skin.Draw_Back(GR, enDesign.EasyPic, vState, DisplayRectangle, this, true);
-
+        private void SetPic()
+            {
             Bitmap _Bitmap = null;
 
 
@@ -91,23 +87,44 @@ namespace BlueControls.Controls {
 
             }
 
-
-            if (_Bitmap != null) {
-                GR.DrawImageInRectAspectRatio(_Bitmap, 1, pnlControls.Height, Width - 2, Height - 2 - pnlControls.Height);
-
-            }
-
-            Skin.Draw_Border(GR, enDesign.EasyPic, vState, DisplayRectangle);
+            zoompic.BMP = _Bitmap;
 
         }
 
 
+        protected override void DrawControl(Graphics GR, enStates vState) {
+            if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
+            if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }
+
+
+            Skin.Draw_Back(GR, enDesign.EasyPic, vState, DisplayRectangle, this, true);
+
+            //Bitmap _Bitmap = null;
 
 
 
 
 
+            //if (pic.Count > 0) {
+
+            //    if (pic[_nr] == null) {
+
+            //        pic[_nr] = new BitmapExt(files[_nr], true);
+            //    }
+
+            //    _Bitmap = pic[_nr].Bitmap;
 
 
+            //}
+
+
+            //if (_Bitmap != null) {
+            //    GR.DrawImageInRectAspectRatio(_Bitmap, 1, pnlControls.Height, Width - 2, Height - 2 - pnlControls.Height);
+
+            //}
+
+            Skin.Draw_Border(GR, enDesign.EasyPic, vState, DisplayRectangle);
+
+        }
     }
 }

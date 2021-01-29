@@ -151,7 +151,7 @@ namespace BlueBasics.MultiUserFile {
 
         public void BlockReload() {
 
-            WaitLoaded();
+            WaitLoaded(false);
             //// Im Parse-Befehel werdendie neuen Spalten erstellt
             //while (IsLoading ) { Develop.DoEvents(); }
             _BlockReload++;
@@ -296,17 +296,19 @@ namespace BlueBasics.MultiUserFile {
 
 
 
-        private void WaitLoaded() {
-
-
-
-            if( _loadingThreadId == Thread.CurrentThread.ManagedThreadId) { return; }
+        private void WaitLoaded(bool hardmode) {
+            if (_loadingThreadId == Thread.CurrentThread.ManagedThreadId) { return; }
 
             var x = DateTime.Now;
 
-
             while (IsLoading) {
                 Develop.DoEvents();
+
+                if (!hardmode && DateTime.Now.Subtract(x).TotalSeconds > 15) {
+                    Develop.DebugPrint(enFehlerArt.Warnung, "WaitLoaded hängt");
+                    return;
+                }
+
                 if (DateTime.Now.Subtract(x).TotalMinutes > 1) {
                     Develop.DebugPrint(enFehlerArt.Fehler, "WaitLoaded hängt");
                     return;
@@ -337,7 +339,7 @@ namespace BlueBasics.MultiUserFile {
         /// Führt - falls nötig - einen Reload der Datei aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
         /// </summary>
         public void Load_Reload() {
-            WaitLoaded();
+            WaitLoaded(true);
 
             if (string.IsNullOrEmpty(Filename)) { return; }
 
