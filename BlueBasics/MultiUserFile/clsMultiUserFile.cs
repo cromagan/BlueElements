@@ -125,6 +125,7 @@ namespace BlueBasics.MultiUserFile {
         public bool IsLoading { get; private set; } = false;
 
         private int _loadingThreadId = -1;
+        private string _loadingInfo = string.Empty;
 
 
 
@@ -148,18 +149,24 @@ namespace BlueBasics.MultiUserFile {
         #endregion
 
 
-
         public void BlockReload() {
 
             WaitLoaded(false);
-            //// Im Parse-Befehel werdendie neuen Spalten erstellt
-            //while (IsLoading ) { Develop.DoEvents(); }
+            //var strace = new System.Diagnostics.StackTrace(true);
+            //Prot.Add(DateTime.Now.ToString(Constants.Format_Date) + " " + _BlockReload.ToString() + " #B " + Thread.CurrentThread.ManagedThreadId + " " + strace.GetFrame(1).GetMethod().ReflectedType.FullName + "/" + strace.GetFrame(1).GetMethod().ToString());
             _BlockReload++;
 
         }
 
         public void UnblockReload() {
             _BlockReload--;
+
+            //if (_BlockReload == 0) { Prot.Clear(); return; }
+
+            if (_BlockReload < 0) {
+                Develop.DebugPrint(enFehlerArt.Warnung, "Ungleichgewicht!");
+                _BlockReload = 0;
+            }
         }
 
 
@@ -304,13 +311,12 @@ namespace BlueBasics.MultiUserFile {
             while (IsLoading) {
                 Develop.DoEvents();
 
-                if (!hardmode && DateTime.Now.Subtract(x).TotalSeconds > 15) {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "WaitLoaded hängt");
+                if (!hardmode && !IsParsing) {
                     return;
                 }
 
                 if (DateTime.Now.Subtract(x).TotalMinutes > 1) {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "WaitLoaded hängt");
+                    Develop.DebugPrint(enFehlerArt.Fehler, "WaitLoaded hängt: " + Filename);
                     return;
                 }
 
@@ -345,6 +351,10 @@ namespace BlueBasics.MultiUserFile {
 
             IsLoading = true;
             _loadingThreadId = Thread.CurrentThread.ManagedThreadId;
+
+
+            var strace = new System.Diagnostics.StackTrace(true);
+            _loadingInfo = DateTime.Now.ToString(Constants.Format_Date) + " " + _BlockReload.ToString() + " #U " + Thread.CurrentThread.ManagedThreadId + " " + strace.GetFrame(1).GetMethod().ReflectedType.FullName + "/" + strace.GetFrame(1).GetMethod().ToString();
 
             //Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
             if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded()) { IsLoading = false; return; }

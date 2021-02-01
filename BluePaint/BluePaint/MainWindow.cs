@@ -271,7 +271,7 @@ namespace BluePaint
             btnRückgänig.Enabled = false;
             _isSaved = false;
 
-            Bitmap _bmp = null;
+            var _bmp = P.BMP;
             BlueBasics.modAllgemein.Swap(ref _bmp, ref _PicUndo);
 
             P.BMP = _bmp;

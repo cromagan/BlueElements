@@ -160,7 +160,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Database.VerwaisteDaten = (enVerwaisteDaten)int.Parse(cbxVerwaisteDaten.Text);
             _Database.Ansicht = (enAnsicht)int.Parse(cbxAnsicht.Text);
 
-            _Database.SortDefinition = new RowSortDefinition(_Database, lbxSortierSpalten.Item.ToListOfString().ToArray(), btnSortRichtung.Checked);
+            _Database.SortDefinition = new RowSortDefinition(_Database, lbxSortierSpalten.Item.ToListOfString(), btnSortRichtung.Checked);
 
             // Regeln --------------
             RepairNewRules(NewRules);

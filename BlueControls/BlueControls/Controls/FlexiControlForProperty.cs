@@ -255,7 +255,7 @@ namespace BlueControls.Controls {
 
         internal bool CheckEnabledState() {
 
-            if (Develop.IsDevelopment() || DesignMode) {
+            if (DesignMode) {
                 base.DisabledReason = string.Empty;
                 return true;
             }

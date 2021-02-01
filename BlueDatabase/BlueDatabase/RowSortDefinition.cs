@@ -23,11 +23,9 @@ using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 
-namespace BlueDatabase
-{
+namespace BlueDatabase {
 
-    public sealed class RowSortDefinition : IParseable
-    {
+    public sealed class RowSortDefinition : IParseable {
         #region  Variablen-Deklarationen 
 
         public Database Database;
@@ -43,33 +41,29 @@ namespace BlueDatabase
 
         #region  Construktor + Initialize 
 
-        private void Initialize()
-        {
+        private void Initialize() {
             Reverse = false;
             _Columns.Clear();
         }
 
-        public RowSortDefinition(Database cDatabase, string Code)
-        {
-            Database = cDatabase;
-            Parse(Code);
+        public RowSortDefinition(Database database, string code) {
+            Database = database;
+            Parse(code);
         }
 
-        public RowSortDefinition(Database cDatabase, string ColumnName, bool Reverse)
-        {
-            Database = cDatabase;
+        public RowSortDefinition(Database database, string columnName, bool reverse) {
+            Database = database;
             Initialize();
 
-            this.Reverse = Reverse;
-            SetColumn(new[] { ColumnName });
+            Reverse = reverse;
+            SetColumn(new List<string>() { columnName });
         }
 
-        public RowSortDefinition(Database cDatabase, string[] ColumnNames, bool Reverse)
-        {
+        public RowSortDefinition(Database database, List<string> columnNames, bool reverse) {
             Initialize();
-            Database = cDatabase;
-            this.Reverse = Reverse;
-            SetColumn(ColumnNames);
+            Database = database;
+            Reverse = reverse;
+            SetColumn(columnNames);
         }
 
         #endregion
@@ -80,10 +74,8 @@ namespace BlueDatabase
 
         public bool Reverse { get; private set; }
 
-        public List<ColumnItem> Columns
-        {
-            get
-            {
+        public List<ColumnItem> Columns {
+            get {
                 return _Columns;
             }
         }
@@ -93,26 +85,20 @@ namespace BlueDatabase
 
 
 
-        public override string ToString()
-        {
+        public override string ToString() {
 
             var Result = "{";
 
-            if (Reverse)
-            {
+            if (Reverse) {
                 Result += "Direction=Z-A";
             }
-            else
-            {
+            else {
                 Result += "Direction=A-Z";
             }
 
-            if (_Columns != null)
-            {
-                foreach (var ThisColumn in _Columns)
-                {
-                    if (ThisColumn != null)
-                    {
+            if (_Columns != null) {
+                foreach (var ThisColumn in _Columns) {
+                    if (ThisColumn != null) {
                         Result = Result + ", " + ThisColumn.ParsableColumnKey();
                     }
                 }
@@ -122,14 +108,11 @@ namespace BlueDatabase
         }
 
 
-        public void Parse(string ToParse)
-        {
+        public void Parse(string ToParse) {
             IsParsing = true;
             Initialize();
-            foreach (var pair in ToParse.GetAllTags())
-            {
-                switch (pair.Key)
-                {
+            foreach (var pair in ToParse.GetAllTags()) {
+                switch (pair.Key) {
                     case "identifier":
                         if (pair.Value != "SortDefinition") { Develop.DebugPrint(enFehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value); }
                         break;
@@ -156,32 +139,26 @@ namespace BlueDatabase
         }
 
 
-        private void SetColumn(string[] name)
-        {
+        private void SetColumn(List<string> names) {
             _Columns.Clear();
-            for (var z = 0; z <= name.GetUpperBound(0); z++)
-            {
-                if (Database.Column[name[z]] != null)
-                {
-                    _Columns.Add(Database.Column[name[z]]);
-                }
+            for (var z = 0; z < names.Count; z++) {
+                var c = Database.Column.Exists(names[z]);
+
+                if (c != null) { _Columns.Add(c); }
             }
         }
 
-        public bool UsedForRowSort(ColumnItem vcolumn)
-        {
+        public bool UsedForRowSort(ColumnItem vcolumn) {
 
             if (_Columns.Count == 0) { return false; }
 
-            foreach (var ThisColumn in _Columns)
-            {
+            foreach (var ThisColumn in _Columns) {
                 if (ThisColumn == vcolumn) { return true; }
             }
             return false;
         }
 
-        public void OnChanged()
-        {
+        public void OnChanged() {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }

@@ -161,6 +161,7 @@ namespace BlueControls.Controls {
         [DefaultValue(true)]
         public new bool Enabled {
             get {
+                if (DesignMode) { return false; }
                 return string.IsNullOrEmpty(_disabledReason);
             }
             // set
