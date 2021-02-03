@@ -40,7 +40,7 @@ namespace BlueControls.Controls
             //
             this.But1.ButtonStyle = enButtonStyle.SliderButton;
             this.But1.Checked = false;
-            this.But1.ImageCode = "Pfeil_Oben_Scrollbar|8";
+            this.But1.ImageCode = "Pfeil_Oben_Scrollbar|8|||||0";
             this.But1.ImageCode_Checked = "";
             this.But1.Location = new Point(56, 48);
             this.But1.Name = "But1";
@@ -53,7 +53,7 @@ namespace BlueControls.Controls
             //
             this.But2.ButtonStyle = enButtonStyle.SliderButton;
             this.But2.Checked = false;
-            this.But2.ImageCode = "Pfeil_Unten_Scrollbar|8";
+            this.But2.ImageCode = "Pfeil_Unten_Scrollbar|8|||||0";
             this.But2.ImageCode_Checked = "";
             this.But2.Location = new Point(24, 24);
             this.But2.Name = "But2";

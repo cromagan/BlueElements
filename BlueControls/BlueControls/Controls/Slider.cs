@@ -307,9 +307,9 @@ namespace BlueControls.Controls
                 _BackStyle = enDesign.Slider_Hintergrund_Waagerecht;
                 _SliderStyle = enDesign.Button_Slider_Waagerecht;
                 But1.SetBounds(0, 0, _ButtonSize, Height);
-                But1.ImageCode = "Pfeil_Links_Scrollbar|8";
+                But1.ImageCode = "Pfeil_Links_Scrollbar|8|||||0";
                 But2.SetBounds(Width - _ButtonSize, 0, _ButtonSize, Height);
-                But2.ImageCode = "Pfeil_Rechts_Scrollbar|8";
+                But2.ImageCode = "Pfeil_Rechts_Scrollbar|8|||||0";
 
                 _ClickArea = new Rectangle(DisplayRectangle.Left + But1.Width, DisplayRectangle.Top, DisplayRectangle.Width - But1.Width - But2.Width, DisplayRectangle.Height);
 
@@ -318,9 +318,9 @@ namespace BlueControls.Controls
             {
                 _BackStyle = enDesign.Slider_Hintergrund_Senkrecht;
                 _SliderStyle = enDesign.Button_Slider_Senkrecht;
-                But1.ImageCode = "Pfeil_Oben_Scrollbar|8";
+                But1.ImageCode = "Pfeil_Oben_Scrollbar|8|||||0";
                 But1.SetBounds(0, 0, Width, _ButtonSize);
-                But2.ImageCode = "Pfeil_Unten_Scrollbar|8";
+                But2.ImageCode = "Pfeil_Unten_Scrollbar|8|||||0";
                 But2.SetBounds(0, Height - _ButtonSize, Width, _ButtonSize);
 
                 _ClickArea = new Rectangle(DisplayRectangle.Top, DisplayRectangle.Top + But1.Height, DisplayRectangle.Width, DisplayRectangle.Height - But1.Height - But2.Height);

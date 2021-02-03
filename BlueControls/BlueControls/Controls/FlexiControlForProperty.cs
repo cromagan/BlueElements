@@ -26,6 +26,7 @@ namespace BlueControls.Controls {
         private string _propertyName;
         private string _propertynamecpl;
         private bool _FehlerWennLeer = true;
+        private bool _alwaysDiabled = false;
         private readonly bool _FehlerFormatCheck = true;
         private bool _enabled = true;
 
@@ -280,6 +281,11 @@ namespace BlueControls.Controls {
 
 
             if (_propInfo != null && !_propInfo.CanWrite) {
+                base.DisabledReason = "Feld kann generell nicht beschrieben werdern.";
+                return false;
+            }
+
+            if (_alwaysDiabled) {
                 base.DisabledReason = "Feld ist schreibgeschützt.";
                 return false;
             }
@@ -442,6 +448,7 @@ namespace BlueControls.Controls {
             // [PropertyAttributes("", false)] setzen
 
             _FehlerWennLeer = true;
+            _alwaysDiabled = false;
 
             if (_propInfo == null && _methInfo == null) {
                 QuickInfo = string.Empty;
@@ -463,6 +470,7 @@ namespace BlueControls.Controls {
                         if (thisas is PropertyAttributes pa) {
                             QuickInfo = pa.Description;
                             _FehlerWennLeer = pa.FehlerWennLeer;
+                            _alwaysDiabled = !pa.BenutzerEditierbar;
                             done = true;
                         }
                         else if (thisas is DescriptionAttribute da) {

@@ -46,7 +46,7 @@ namespace BlueControls.Controls
             // 
             this.btnDropDown.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
                                               | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDropDown.ImageCode = "Pfeil_Unten_Scrollbar";
+            this.btnDropDown.ImageCode = "Pfeil_Unten_Scrollbar|8|||||0";
             this.btnDropDown.Location = new Point(476, 0);
             this.btnDropDown.Name = "btnDropDown";
             this.btnDropDown.Size = new Size(24, 150);

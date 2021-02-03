@@ -245,10 +245,10 @@ namespace BlueControls.ItemCollection {
         /// <summary>
         /// Wird ein Element gelöscht, das diese Feld befüllt hat, werden automatisch alle andern Elemente mit der selben Gruppe gelöscht.
         /// </summary>
-        [PropertyAttributes("Alle Elemente, die der selben Gruppe angehören, werden beim Löschen eines Elements ebenfalls gelöscht.", false)]
+        [PropertyAttributes("Alle Elemente, die der selben Gruppe angehören, werden beim Löschen eines Elements ebenfalls gelöscht.", true, false)]
         public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
-        [PropertyAttributes("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.", false)]
+        [PropertyAttributes("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.", true, false)]
         public bool Bei_Export_sichtbar {
             get {
                 return _Bei_Export_sichtbar;

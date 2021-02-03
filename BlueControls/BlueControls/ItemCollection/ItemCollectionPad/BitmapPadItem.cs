@@ -47,7 +47,7 @@ namespace BlueControls.ItemCollection
         public List<QuickImage> Overlays;
         public enSizeModes Bild_Modus { get; set; }
 
-        [PropertyAttributes("Hier kann ein Platzhalter, der mit dem Code-Generator erzeugt wurde, eingefügt werden.", false)]
+        [PropertyAttributes("Hier kann ein Platzhalter, der mit dem Code-Generator erzeugt wurde, eingefügt werden.", true, false)]
         public string Platzhalter_für_Layout { get; set; }
         #endregion
 

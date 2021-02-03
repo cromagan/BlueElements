@@ -1776,7 +1776,7 @@ namespace BlueDatabase {
                 return QuickImage.Get(enImageCode.Textfeld);
             }
 
-            return QuickImage.Get("Pfeil_Unten_Scrollbar|14");
+            return QuickImage.Get("Pfeil_Unten_Scrollbar|14|||||0");
 
         }
 

@@ -35,6 +35,8 @@ namespace BlueDatabase {
 
         public readonly Database Database;
         public string TMP_Chapter;
+        public bool TMP_Expanded;
+        public Rectangle? TMP_CaptionPos;
         public int? TMP_Y = null;
         public int? TMP_DrawHeight = null;
 
@@ -48,21 +50,18 @@ namespace BlueDatabase {
 
         #region  Construktor + Initialize 
 
-
-
         public RowItem(Database database, int key) {
             Database = database;
             Key = key;
             TMP_Chapter = string.Empty;
             TMP_Y = null;
             TMP_DrawHeight = null;
+            TMP_Expanded = true;
+            TMP_CaptionPos = null;
             _tmpQuickInfo = null;
-
-
 
             Database.Cell.CellValueChanged += Cell_CellValueChanged;
         }
-
 
         public RowItem(Database database) : this(database, database.Row.NextRowKey()) { }
 
@@ -71,8 +70,6 @@ namespace BlueDatabase {
 
         #region  Properties 
         public int Key { get; }
-
-
 
         public string QuickInfo {
             get {
@@ -90,8 +87,6 @@ namespace BlueDatabase {
         }
 
         #endregion
-
-
 
         #region Cell Get / Set
 
@@ -149,7 +144,6 @@ namespace BlueDatabase {
         public double CellGetDouble(ColumnItem column) {
             return Database.Cell.GetDouble(column, this);
         }
-
 
         public void CellSet(string columnName, double value) {
             Database.Cell.Set(Database.Column[columnName], this, value, false);
@@ -336,7 +330,8 @@ namespace BlueDatabase {
 
             if (Database.Cell.Freezed) {
                 DoUnfreeze = false;
-            } else {
+            }
+            else {
                 Database.Cell.Freeze();
             }
 
@@ -362,7 +357,8 @@ namespace BlueDatabase {
                                 foreach (var t in tmpColumNames) {
                                     ColumnAndErrors.Add(t + "|" + tmpMessage);
                                 }
-                            } else {
+                            }
+                            else {
                                 ColumnAndErrors.Add("|" + tmpMessage); // Sie gehören zur Nutzergruppe...
                             }
 
@@ -441,7 +437,8 @@ namespace BlueDatabase {
 
                         if (ThisColum.Format != enDataFormat.LinkedCell && x != x2) {
                             Database.Cell.Set(ThisColum, this, x2, false);
-                        } else {
+                        }
+                        else {
                             if (!ThisColum.IsFirst()) {
 
                                 Database.Cell.DoSpecialFormats(ThisColum, Key, CellGetString(ThisColum), false, true);
@@ -480,7 +477,8 @@ namespace BlueDatabase {
 
             if (cols.Count == 0) {
                 _InfoTXT += "Diese Zeile ist fehlerfrei.";
-            } else {
+            }
+            else {
                 _InfoTXT += _Info.JoinWith("<br><hr><br>");
             }
 
@@ -536,7 +534,8 @@ namespace BlueDatabase {
                     foreach (var t in Filter.SearchValue) {
                         if (!RowFilterMatch(t)) { return false; }
                     }
-                } else {
+                }
+                else {
                     if (!Database.Cell.MatchesTo(Filter.Column, this, Filter)) { return false; }
                 }
             }
@@ -719,5 +718,18 @@ namespace BlueDatabase {
             return r.ToString();
         }
 
+        public string CaptionReadable() {
+
+
+            var c= CellGetString(Database.Column.SysChapter);
+
+            if (string.IsNullOrEmpty(c)) {
+                return  "- ohne " + Database.Column.SysChapter.Caption + " -";
+            }
+            else {
+                return  c.Replace("\r", ", ");
+            }
+
+        }
     }
 }

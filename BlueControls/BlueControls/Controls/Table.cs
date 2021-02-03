@@ -92,6 +92,9 @@ namespace BlueControls.Controls {
         private readonly List<RowItem> _SortedRowsBefore = new List<RowItem>(); // Die Sortierung der Zeile
         private readonly List<RowItem> _PinnedRows = new List<RowItem>();
 
+        private readonly List<string> _collapsed = new List<string>();
+
+
         private readonly object Lock_UserAction = new object();
         private BlueFont _Column_Font;
         private BlueFont _Chapter_Font;
@@ -193,6 +196,7 @@ namespace BlueControls.Controls {
 
                 CloseAllComponents();
 
+                _collapsed.Clear();
                 _PinnedRows.Clear();
                 _MouseOverColumn = null;
                 _MouseOverRow = null;
@@ -531,53 +535,37 @@ namespace BlueControls.Controls {
 
 
 
+                if (CurrentRow.TMP_Expanded) {
 
-                //if (ViewItem.Column.ZellenZusammenfassen)
-                //{
-                //    var ToDraw = Database.Cell.GetStringBehindLinkedValue(ViewItem.Column, CurrentRow);
-
-                //    if (Drawn != ToDraw)
-                //    {
-
-                //        if (y - 2 < HeadSize() && Zei < (SortedRows().Count - 1))
-                //        {
-                //            if (Database.Cell.GetStringBehindLinkedValue(ViewItem.Column, SortedRows()[Zei + 1]) == ToDraw)
-                //            {
-                //                y = HeadSize();
-                //            }
-                //        }
-
-                //        // Zeilenlinie Zeichnen
-                //        GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 1, y);
-                //        // Zelleninhalt Zeichnen
-                //        Draw_CellTransparent(GR, ViewItem, CurrentRow, y, displayRectangleWOSlider, _Cell_Font);
-                //        Drawn = ToDraw;
-                //    }
-                //}
-                //else
-                //{
-                // Zeilenlinie Zeichnen
-                GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 1, y);
-                // Zelleninhalt Zeichnen
-                Draw_CellTransparent(GR, ViewItem, CurrentRow, y, displayRectangleWOSlider, _Cell_Font);
-                //}
-
+                    GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, y, (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 1, y);
+                    // Zelleninhalt Zeichnen
+                    Draw_CellTransparent(GR, ViewItem, CurrentRow, y, displayRectangleWOSlider, _Cell_Font);
+                }
 
                 if (lfdno == 1) {
-                    // Überschrift zeichnen
+                    // Überschrift in der ersten Spalte zeichnen
+                    CurrentRow.TMP_CaptionPos = null;
                     if (!string.IsNullOrEmpty(CurrentRow.TMP_Chapter)) {
                         var si = GR.MeasureString(CurrentRow.TMP_Chapter, _Chapter_Font.Font());
                         GR.FillRectangle(new SolidBrush(Skin.Color_Back(enDesign.Table_And_Pad, enStates.Standard).SetAlpha(50)), 1, (int)CurrentRow.TMP_Y - RowCaptionSizeY, displayRectangleWOSlider.Width - 2, RowCaptionSizeY);
+                        RowItem r2 = null;
 
-                        GR.FillRectangle(new SolidBrush(Skin.Color_Back(enDesign.Table_And_Pad, enStates.Standard).SetAlpha(200)), 1, (int)CurrentRow.TMP_Y - RowCaptionFontY, si.Width, si.Height);
-                        GR.DrawString(CurrentRow.TMP_Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, (int)CurrentRow.TMP_Y - RowCaptionFontY);
+                        CurrentRow.TMP_CaptionPos = new Rectangle(1, (int)CurrentRow.TMP_Y - RowCaptionFontY, (int)si.Width + 28, (int)si.Height);
+
+                        if (CurrentRow.TMP_Expanded) {
+                            Button.DrawButton(this, GR, ref r2, enDesign.Button_CheckBox, enStates.Checked, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, (Rectangle)CurrentRow.TMP_CaptionPos, false);
+                            GR.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|14|||FF0000||200|200").BMP, 5, (int)CurrentRow.TMP_Y - RowCaptionFontY + 6);
+                        }
+                        else {
+                            Button.DrawButton(this, GR, ref r2, enDesign.Button_CheckBox, enStates.Standard, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, (Rectangle)CurrentRow.TMP_CaptionPos, false);
+                            GR.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|14|||||0").BMP, 5, (int)CurrentRow.TMP_Y - RowCaptionFontY + 6);
+                        }
+
+                        GR.DrawString(CurrentRow.TMP_Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 23, (int)CurrentRow.TMP_Y - RowCaptionFontY);
                         GR.DrawLine(Skin.Pen_LinieDick, 0, (int)CurrentRow.TMP_Y, displayRectangleWOSlider.Width, (int)CurrentRow.TMP_Y);
-
                     }
                 }
             }
-
-
         }
 
         private void SliderSchalten(Rectangle DisplayR, int MaxX, int MaxY) {
@@ -906,6 +894,24 @@ namespace BlueControls.Controls {
             }
 
 
+        }
+
+        public void CollapesAll() {
+            _collapsed.Clear();
+
+            if (Database != null) {
+                foreach (var thisr in Database.Row) {
+                    _collapsed.AddIfNotExists(thisr.CaptionReadable());
+                }
+            }
+
+            Invalidate_RowSort();
+            Invalidate();
+        }
+        public void ExpandAll() {
+            _collapsed.Clear();
+            Invalidate_RowSort();
+            Invalidate();
         }
 
         private void Draw_CellAsButton(Graphics gR, ColumnViewItem cellInThisDatabaseColumn, RowItem cellInThisDatabaseRow, int rowY, int drawRowHeight, int drawColumnWidth) {
@@ -1363,11 +1369,29 @@ namespace BlueControls.Controls {
                 CellOnCoordinate(e.X, e.Y, out _MouseOverColumn, out _MouseOverRow);
 
                 // Die beiden Befehle nur in Mouse Down!
-                // Wenn der Cursor bei Click/Up/Down geeändert wird, wird ein ereignis ausgelöst.
+                // Wenn der Cursor bei Click/Up/Down geändert wird, wird ein Ereignis ausgelöst.
                 // Das könnte auch sehr Zeitintensiv sein. Dann kann die Maus inzwischen wo ander sein.
                 // Somit würde das Ereignis doppelt und dreifach ausgelöste werden können.
                 // Beipiel: MouseDown-> Bildchen im Pad erzeugen, dauert.... Maus Bewegt sich
-                //          MouseUp  -> Curswor wird umgesetzt, Ereginis CursorChanged wieder ausgelöst, noch ein Bildchen
+                //          MouseUp  -> Cursor wird umgesetzt, Ereginis CursorChanged wieder ausgelöst, noch ein Bildchen
+
+
+                if (_MouseOverRow == null) {
+                    var rc = RowCaptionOnCoordinate(e.X, e.Y);
+
+                    if (!string.IsNullOrEmpty(rc)) {
+                        if (_collapsed.Contains(rc)) {
+                            _collapsed.Remove(rc);
+                        }
+                        else {
+                            _collapsed.Add(rc);
+                        }
+                        Invalidate_RowSort();
+                        Invalidate();
+                    }
+
+                }
+
                 EnsureVisible(_MouseOverColumn, _MouseOverRow);
                 CursorPos_Set(_MouseOverColumn, _MouseOverRow, false);
                 ISIN_MouseDown = false;
@@ -1887,14 +1911,6 @@ namespace BlueControls.Controls {
 
             try {
 
-                var MaxX = 0;
-                var MaxY = 0;
-                var LastCap = "";
-
-                var DisplayR = DisplayRectangleWithoutSlider();
-
-
-                if (UserEdit_NewRowAllowed()) { MaxY += Pix18; }
 
 
                 // Kommt vor, dass spontan doch geparsed wird...
@@ -1917,7 +1933,8 @@ namespace BlueControls.Controls {
                 _MouseOverText = string.Empty;
 
                 var wdh = true;
-
+                var MaxX = 0;
+                var DisplayR = DisplayRectangleWithoutSlider();
                 // Spalten berechnen
                 foreach (var ThisViewItem in CurrentArrangement) {
                     if (ThisViewItem?.Column != null) {
@@ -1941,45 +1958,40 @@ namespace BlueControls.Controls {
                 }
 
 
-
+                var MaxY = 0;
+                if (UserEdit_NewRowAllowed()) { MaxY += Pix18; }
+                var expanded = true;
+                var LastCap = string.Empty;
 
                 foreach (var ThisRow in SortedRows()) {
                     ThisRow.TMP_Y = (int)(MaxY - SliderY.Value + HeadSize());
 
-                    if (ThisRow.CellGetString(_Database.Column.SysChapter) != LastCap) {
+                    var tmpCap = ThisRow.CellGetString(Database.Column.SysChapter);
+
+                    if (tmpCap != LastCap) {
                         ThisRow.TMP_Y += RowCaptionSizeY;
+                        LastCap = tmpCap;
+                        ThisRow.TMP_Chapter = ThisRow.CaptionReadable();
+                        expanded = !_collapsed.Contains(ThisRow.TMP_Chapter);
                         MaxY += RowCaptionSizeY;
-                        LastCap = ThisRow.CellGetString(_Database.Column.SysChapter);
-
-
-                        if (string.IsNullOrEmpty(LastCap)) {
-                            ThisRow.TMP_Chapter = "- ohne " + _Database.Column.SysChapter.Caption + " -";
-                        }
-                        else {
-                            ThisRow.TMP_Chapter = LastCap.Replace("\r", ", ");
-                        }
 
                     }
                     else {
-                        ThisRow.TMP_Chapter = "";
+                        ThisRow.TMP_Chapter = string.Empty;
                     }
 
-                    MaxY += Row_DrawHeight(ThisRow, DisplayR);
+                    ThisRow.TMP_Expanded = expanded;
+                    if (expanded) { MaxY += Row_DrawHeight(ThisRow, DisplayR); }
                 }
 
                 // Slider berechnen ---------------------------------------------------------------
                 SliderSchalten(DisplayR, MaxX, MaxY);
-
-
             }
             catch (Exception ex) {
                 Develop.DebugPrint(ex);
                 return false;
             }
-
             return true;
-
-
         }
 
         internal bool PermanentPossible(ColumnViewItem ThisViewItem) {
@@ -1993,8 +2005,6 @@ namespace BlueControls.Controls {
 
             if (prev == null) { return true; }
             return Convert.ToBoolean(prev.ViewType == enViewType.PermanentColumn);
-
-
         }
 
         internal bool NonPermanentPossible(ColumnViewItem ThisViewItem) {
@@ -2008,18 +2018,7 @@ namespace BlueControls.Controls {
 
             if (NX == null) { return true; }
             return Convert.ToBoolean(NX.ViewType != enViewType.PermanentColumn);
-
-
         }
-
-
-
-
-
-
-
-
-
 
         protected override bool IsInputKey(System.Windows.Forms.Keys keyData) {
             // Ganz wichtig diese Routine!
@@ -2032,11 +2031,8 @@ namespace BlueControls.Controls {
                 case System.Windows.Forms.Keys.Right:
                     return true;
             }
-
             return false;
-
         }
-
 
         #region  AutoFilter 
 
@@ -2072,7 +2068,6 @@ namespace BlueControls.Controls {
             Develop.Debugprint_BackgroundThread();
         }
 
-
         private void AutoFilter_Close() {
             if (_AutoFilter != null) {
                 _AutoFilter.FilterComand -= AutoFilter_FilterComand;
@@ -2081,12 +2076,6 @@ namespace BlueControls.Controls {
                 _AutoFilter = null;
             }
         }
-
-
-
-
-
-
 
         private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
             switch (e.Comand.ToLower()) {
@@ -2195,21 +2184,12 @@ namespace BlueControls.Controls {
 
                     }
 
-
-
-
-
-
-
                 default:
                     Develop.DebugPrint("Unbekannter Comand:   " + e.Comand);
                     break;
             }
 
-
             OnAutoFilterClicked(new FilterEventArgs(e.Filter));
-
-
         }
 
         private void OnAutoFilterClicked(FilterEventArgs e) {
@@ -2227,13 +2207,9 @@ namespace BlueControls.Controls {
         //    BeforeAutoFilterShow?.Invoke(this, e);
         //}
 
-
-
         #endregion
 
         #region  ContextMenu 
-
-
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             return false;
@@ -2243,7 +2219,6 @@ namespace BlueControls.Controls {
             ContextMenuItemClicked?.Invoke(this, e);
         }
         #endregion
-
 
 
         #region  Ereignisse der Slider 
@@ -2271,13 +2246,7 @@ namespace BlueControls.Controls {
 
         #region  Ereignisse der Datenbank 
 
-
-
-
-
-
         private void _Database_CellValueChanged(object sender, CellEventArgs e) {
-
 
             if (AreRowsSorted()) {
                 if (Filter[e.Column] != null || SortUsed() == null || SortUsed().UsedForRowSort(e.Column) || Filter.MayHasRowFilter(e.Column)) {
@@ -2290,10 +2259,7 @@ namespace BlueControls.Controls {
 
             Invalidate();
 
-
             OnCellValueChanged(e);
-
-
         }
 
         private void OnCellValueChanged(CellEventArgs e) {
@@ -2316,7 +2282,6 @@ namespace BlueControls.Controls {
 
         }
 
-
         private void Invalidate_RowSort() {
 
             if (_Database == null) { return; }
@@ -2325,22 +2290,15 @@ namespace BlueControls.Controls {
                 _SortedRows = null;
                 // InvalidatexXXXXXXX() <- Tödlich, der InvalidatexXXXXXX  muss von wo anders ausgelöst werden!
             }
-
         }
 
         public bool AreRowsSorted() {
-
             return _SortedRows != null;
         }
-
 
         private void _Database_StopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) {
             CloseAllComponents();
         }
-
-
-
-
 
 
         private void _Database_DatabaseLoaded(object sender, LoadedEventArgs e) {
@@ -2349,8 +2307,6 @@ namespace BlueControls.Controls {
             // Deswegen prüfen, ob wirklich alles geleöscht werden muss, oder weiter behalten werden kann.
 
             // Auf Nothing  muss auch geprüft werden, da bei einem Dispose oder beim Beenden sich die Datenbank auch änsdert....
-
-
 
             Invalidate_HeadSize();
 
@@ -2363,8 +2319,6 @@ namespace BlueControls.Controls {
                 Filter.Changed -= Filter_Changed;
                 Filter = null;
             }
-
-
 
             if (_Database != null) {
 
@@ -2397,8 +2351,6 @@ namespace BlueControls.Controls {
                     _ArrangementNr = 1;
                 }
 
-
-
             }
             else {
                 _MouseOverColumn = null;
@@ -2407,7 +2359,6 @@ namespace BlueControls.Controls {
                 _CursorPosRow = null;
                 _ArrangementNr = 1;
             }
-
 
             _sortDefinitionTemporary = null;
 
@@ -2443,7 +2394,6 @@ namespace BlueControls.Controls {
             AutoFilter_Close();
             Forms.QuickInfo.Close();
 
-
         }
         #endregion
 
@@ -2465,12 +2415,9 @@ namespace BlueControls.Controls {
                 }
                 SliderY.DoMouseWheel(e);
 
-
                 ISIN_MouseWheel = false;
             }
-
         }
-
 
         protected override void OnClick(System.EventArgs e) {
             base.OnClick(e);
@@ -2483,7 +2430,6 @@ namespace BlueControls.Controls {
 
                 Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
                 CellOnCoordinate(MousePos().X, MousePos().Y, out _MouseOverColumn, out _MouseOverRow);
-
 
                 ISIN_Click = false;
             }
@@ -2535,8 +2481,6 @@ namespace BlueControls.Controls {
                             else {
                                 NotEditableInfo(l2);
                             }
-
-
                         }
                         break;
 
@@ -2652,15 +2596,10 @@ namespace BlueControls.Controls {
                             }
                         }
                         break;
-
                 }
-
                 ISIN_KeyDown = false;
             }
-
-
         }
-
 
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseMove(e);
@@ -2724,24 +2663,11 @@ namespace BlueControls.Controls {
                     _MouseOverText = _MouseOverText.Trim("<br>");
                     _MouseOverText = _MouseOverText.Trim();
 
-                    //if (string.IsNullOrEmpty(T))
-                    //{
-                    //    Forms.QuickInfo.Close();
-                    //}
-                    //else
-                    //{
-                    //    Forms.QuickInfo.Show(T);
-                    //}
-
-
-
                 }
 
                 ISIN_MouseMove = false;
             }
-
         }
-
 
         private Rectangle DisplayRectangleWithoutSlider() {
 
@@ -2753,7 +2679,6 @@ namespace BlueControls.Controls {
             return new Rectangle(DisplayRectangle.Left, DisplayRectangle.Left, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height);
             // Return ExpandRectangle(DisplayRectangle, 0, 0, -SliderY.Width, 0)
         }
-
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
@@ -2775,21 +2700,14 @@ namespace BlueControls.Controls {
 
                 CellOnCoordinate(e.X, e.Y, out _MouseOverColumn, out _MouseOverRow);
 
-
-
                 if (_CursorPosColumn != _MouseOverColumn || _CursorPosRow != _MouseOverRow) { Forms.QuickInfo.Close(); }
-
-
 
                 // TXTBox_Close() NICHT! Weil sonst nach dem öffnen sofort wieder gschlossen wird
                 // AutoFilter_Close() NICHT! Weil sonst nach dem öffnen sofort wieder geschlossen wird
-                //ContextMenu_Close();
                 FloatingInputBoxListBoxStyle.Close(this, enDesign.Form_KontextMenu);
 
                 //EnsureVisible(_MouseOver) <-Nur MouseDown, siehe Da
                 //CursorPos_Set(_MouseOver) <-Nur MouseDown, siehe Da
-
-
 
                 ColumnViewItem ViewItem = null;
 
@@ -2817,8 +2735,6 @@ namespace BlueControls.Controls {
                             OnButtonCellClicked(new CellEventArgs(_MouseOverColumn, _MouseOverRow));
                             Invalidate();
                         }
-
-
                     }
                 }
 
@@ -2835,7 +2751,7 @@ namespace BlueControls.Controls {
         }
 
         protected override void OnDoubleClick(System.EventArgs e) {
-            //    base.OnDoubleClick(e); Wird komplett selsbt gehandledt und das neue Ereigniss ausgelöst
+            //    base.OnDoubleClick(e); Wird komplett selsbt gehandlet und das neue Ereigniss ausgelöst
 
 
             if (_Database == null) { return; }
@@ -2851,28 +2767,20 @@ namespace BlueControls.Controls {
 
                 if (Mouse_IsInHead()) {
                     Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
-
                     DoubleClick?.Invoke(this, ea);
-                    ISIN_DoubleClick = false;
-                    return;
                 }
+                else {
 
-                var col = _MouseOverColumn;
-                var row = _MouseOverRow;
+                    if (_MouseOverRow == null && MousePos().Y > HeadSize() + Pix18) {
+                        Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                        DoubleClick?.Invoke(this, ea);
+                    }
+                    else {
 
-                CellOnCoordinate(MousePos().X, MousePos().Y, out _MouseOverColumn, out _MouseOverRow);
-
-
-
-                if (col != _MouseOverColumn || row != _MouseOverRow) // Da hat das eventx z.B. die Zeile gelöscht
-                {
-                    ISIN_DoubleClick = false;
-                    return;
+                        DoubleClick?.Invoke(this, ea);
+                        if (ea.StartEdit) { Cell_Edit(_MouseOverColumn, _MouseOverRow, true); }
+                    }
                 }
-
-                DoubleClick?.Invoke(this, ea);
-
-                if (ea.StartEdit) { Cell_Edit(_MouseOverColumn, _MouseOverRow, true); }
 
                 ISIN_DoubleClick = false;
             }
@@ -2914,12 +2822,7 @@ namespace BlueControls.Controls {
             CloseAllComponents();
         }
 
-
         #endregion
-
-
-
-
         public void CursorPos_Set(ColumnItem column, RowItem row, bool ensureVisible) {
 
             if (column != null) { column = Database.Column.SearchByKey(column.Key); }
@@ -2978,8 +2881,6 @@ namespace BlueControls.Controls {
             }
         }
 
-
-
         protected override void OnResize(System.EventArgs e) {
             base.OnResize(e);
 
@@ -3035,9 +2936,6 @@ namespace BlueControls.Controls {
             }
         }
 
-
-
-
         #region  Store and Restore View 
         public string ViewToString() {
 
@@ -3060,6 +2958,11 @@ namespace BlueControls.Controls {
                 }
             }
 
+            if (_collapsed != null && _collapsed.Count > 0) {
+                foreach (var thiss in _collapsed) {
+                    x = x + ", Collapsed=" + thiss.ToNonCritical();
+                }
+            }
 
             foreach (var thiscol in CurrentArrangement) {
                 if (thiscol._TMP_Reduced) { x = x + ", Reduced=" + thiscol.Column.Key.ToString(); }
@@ -3079,6 +2982,9 @@ namespace BlueControls.Controls {
         public void ParseView(string ToParse) {
 
             if (string.IsNullOrEmpty(ToParse)) { return; }
+
+            _PinnedRows.Clear();
+            _collapsed.Clear();
 
             foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
@@ -3113,6 +3019,10 @@ namespace BlueControls.Controls {
                         _PinnedRows.Add(_Database.Row.SearchByKey(int.Parse(pair.Value)));
                         break;
 
+                    case "collapsed":
+                        _collapsed.Add(pair.Value.FromNonCritical());
+                        break;
+
                     case "reduced":
                         var c = _Database.Column.SearchByKey(int.Parse(pair.Value));
                         var cv = CurrentArrangement[c];
@@ -3126,16 +3036,12 @@ namespace BlueControls.Controls {
             }
 
             Filter.OnChanged();
-
             Invalidate_RowSort(); // beim Parsen wirft der Filter kein Event ab
-
         }
 
 
         private void _Database_StoreView(object sender, System.EventArgs e) {
-
             //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
-
             _StoredView = ViewToString();
 
         }
@@ -3151,8 +3057,6 @@ namespace BlueControls.Controls {
             if (string.IsNullOrEmpty(_StoredView)) { return; }
             _StoredView = ColumnCollection.ChangeKeysInString(_StoredView, e.KeyOld, e.KeyNew);
         }
-
-
 
         #endregion
 
@@ -3244,11 +3148,11 @@ namespace BlueControls.Controls {
 
 
         private void CellOnCoordinate(int Xpos, int Ypos, out ColumnItem Column, out RowItem Row) {
-            Column = OnCoordinateColumn(Xpos);
-            Row = OnCoordinateRow(Ypos);
+            Column = ColumnOnCoordinate(Xpos);
+            Row = RowOnCoordinate(Ypos);
         }
 
-        private ColumnItem OnCoordinateColumn(int Xpos) {
+        private ColumnItem ColumnOnCoordinate(int Xpos) {
             if (_Database == null || _Database.ColumnArrangements.Count - 1 < _ArrangementNr) { return null; }
 
             foreach (var ThisViewItem in CurrentArrangement) {
@@ -3258,13 +3162,43 @@ namespace BlueControls.Controls {
                         return ThisViewItem.Column;
                     }
                 }
+            }
 
+            return null;
+        }
+
+        private RowItem RowOnCoordinate(int YPos) {
+            if (_Database == null || YPos <= HeadSize()) { return null; }
+            var s = SortedRows();
+
+            foreach (var ThisRowItem in s) {
+                if (ThisRowItem != null) {
+                    if (YPos >= ThisRowItem.TMP_Y &&
+                        YPos <= ThisRowItem.TMP_Y + Row_DrawHeight(ThisRowItem, DisplayRectangleWithoutSlider())
+                        && ThisRowItem.TMP_Expanded) {
+                        return ThisRowItem;
+                    }
+                }
             }
 
             return null;
         }
 
 
+        private string RowCaptionOnCoordinate(int XPos, int YPos) {
+            try {
+                var s = SortedRows();
+                foreach (var thisRow in s) {
+
+                    if (thisRow.TMP_CaptionPos is Rectangle r) {
+                        if (r.Contains(XPos, YPos)) { return thisRow.TMP_Chapter; }
+                    }
+
+                }
+            }
+            catch { }
+            return string.Empty;
+        }
 
         private int HeadSize() {
             if (_HeadSize != null) { return (int)_HeadSize; }
@@ -3292,14 +3226,8 @@ namespace BlueControls.Controls {
             _HeadSize += 8;
             _HeadSize += _AutoFilterSize;
 
-
-
-
             return (int)_HeadSize;
         }
-
-
-
 
         private bool IsOnScreen(ColumnViewItem ViewItem, Rectangle displayRectangleWOSlider) {
             if (ViewItem == null) { return false; }
@@ -3354,8 +3282,6 @@ namespace BlueControls.Controls {
         }
 
 
-
-
         private int Column_DrawWidth(ColumnViewItem ViewItem, Rectangle displayRectangleWOSlider) {
             // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
@@ -3407,8 +3333,6 @@ namespace BlueControls.Controls {
         }
 
 
-
-
         private RowSortDefinition SortUsed() {
             if (_sortDefinitionTemporary?.Columns != null) { return _sortDefinitionTemporary; }
             if (_Database.SortDefinition?.Columns != null) { return _Database.SortDefinition; }
@@ -3420,7 +3344,6 @@ namespace BlueControls.Controls {
                 return _PinnedRows;
             }
         }
-
 
         public List<RowItem> SortedRows() {
             if (AreRowsSorted()) { return _SortedRows; }
@@ -3450,10 +3373,6 @@ namespace BlueControls.Controls {
             ButtonCellClicked?.Invoke(this, e);
         }
 
-
-
-
-
         private void OnVisibleRowsChanged() {
             VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
         }
@@ -3475,8 +3394,6 @@ namespace BlueControls.Controls {
             ColumnArrangementChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
-
-
         public RowItem View_RowFirst() {
             if (_Database == null) { return null; }
 
@@ -3489,7 +3406,6 @@ namespace BlueControls.Controls {
             if (SortedRows().Count == 0) { return null; }
             return SortedRows()[SortedRows().Count - 1];
         }
-
 
         private bool Autofilter_Sinnvoll(ColumnItem column) {
 
@@ -3526,24 +3442,6 @@ namespace BlueControls.Controls {
             return (int)column.TMP_IfFilterRemoved;
 
         }
-
-
-
-        private RowItem OnCoordinateRow(int YPos) {
-            if (_Database == null || YPos <= HeadSize()) { return null; }
-
-
-            foreach (var ThisRowItem in _Database.Row) {
-                if (ThisRowItem != null) {
-                    if (YPos >= ThisRowItem.TMP_Y && YPos <= ThisRowItem.TMP_Y + Row_DrawHeight(ThisRowItem, DisplayRectangleWithoutSlider())) {
-                        return ThisRowItem;
-                    }
-                }
-            }
-
-            return null;
-        }
-
 
 
         private void Invalidate_AllDraw(bool AllOrder) {
@@ -3629,8 +3527,6 @@ namespace BlueControls.Controls {
 
         }
 
-
-
         /// <summary>
         /// Berechnet die Zelle, ausgehend von einer Zellenposition. Dabei wird die Columns und Zeilensortierung berücksichtigt.
         /// Gibt des keine Nachbarszelle, wird die Eingangszelle zurückgegeben.
@@ -3649,8 +3545,6 @@ namespace BlueControls.Controls {
                     return;
                 }
             }
-
-
 
             if (NewColumn != null) {
                 if (Convert.ToBoolean(Direction & enDirection.Links)) {
@@ -3677,8 +3571,6 @@ namespace BlueControls.Controls {
 
             }
         }
-
-
 
         private void _Database_SortParameterChanged(object sender, System.EventArgs e) {
             Invalidate_RowSort();
@@ -3713,9 +3605,6 @@ namespace BlueControls.Controls {
             if (ViewItem._TMP_ReduceLocation.Width == 0) { return false; }
             return ViewItem._TMP_ReduceLocation.Contains(e.X, e.Y);
         }
-
-
-
 
         private SizeF ColumnCaptionText_Size(ColumnItem Column) {
 
@@ -3775,10 +3664,6 @@ namespace BlueControls.Controls {
             }
 
         }
-
-
-
-
 
         private void _Database_SavedToDisk(object sender, System.EventArgs e) {
             Invalidate();
@@ -3843,13 +3728,6 @@ namespace BlueControls.Controls {
                 Tags.TagSet("RowKey", _MouseOverRow.Key.ToString());
             }
 
-
-
-
-            //OnContextMenuInit(new ContextMenuInitEventArgs(, UserMenu));
-
-
-
         }
 
 
@@ -3888,10 +3766,6 @@ namespace BlueControls.Controls {
             // QickInfo beisst sich mit den letzten Änderungen Quickinfo
             //DialogBoxes.QuickInfo.Show("<IMAGECODE=Stift|16||1> " + Reason);
         }
-
-
-
-
 
         public static Size Cell_ContentSize(Table table, ColumnItem Column, RowItem Row, BlueFont CellFont, int Pix16) {
 
@@ -3988,8 +3862,6 @@ namespace BlueControls.Controls {
             row.DoAutomatic(true, true, 5);
         }
 
-
-
         public static ItemCollectionList UndoItems(Database database, string cellkey) {
             var i = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu) {
                 CheckBehavior = enCheckBehavior.AlwaysSingleSelection
@@ -4053,11 +3925,7 @@ namespace BlueControls.Controls {
             catch {
                 if (Meldung) { Notification.Show(LanguageTool.DoTranslate("Unerwarteter Fehler beim Kopieren."), enImageCode.Warnung); }
             }
-
-
-
         }
-
 
         public static void SearchNextText(string searchTXT, Table TableView, ColumnItem column, RowItem row, out ColumnItem foundColumn, out RowItem foundRow, bool VereinfachteSuche) {
             searchTXT = searchTXT.Trim();
@@ -4083,8 +3951,6 @@ namespace BlueControls.Controls {
             }
 
 
-
-
             do {
 
                 if (TableView.Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) {
@@ -4093,7 +3959,6 @@ namespace BlueControls.Controls {
                 else {
                     column = ca.NextVisible(column);
                 }
-
 
 
                 if (column == null) {
@@ -4108,10 +3973,7 @@ namespace BlueControls.Controls {
                     rowsChecked++;
                     row = TableView.View_NextRow(row);
                     if (row == null) { row = TableView.View_RowFirst(); }
-
                 }
-
-
 
                 var ContentHolderCellColumn = column;
                 var ContenHolderCellRow = row;
@@ -4127,15 +3989,12 @@ namespace BlueControls.Controls {
                     _Ist1 = ContenHolderCellRow.CellGetString(ContentHolderCellColumn);
                 }
 
-
-
                 if (ContentHolderCellColumn.Format == enDataFormat.Text_mit_Formatierung) {
                     var l = new ExtText(enDesign.TextBox, enStates.Standard) {
                         HtmlText = _Ist1
                     };
                     _Ist1 = l.PlainText;
                 }
-
 
                 // Allgemeine Prüfung
                 if (!string.IsNullOrEmpty(_Ist1) && _Ist1.ToLower().Contains(searchTXT.ToLower())) {
@@ -4165,11 +4024,6 @@ namespace BlueControls.Controls {
             } while (true);
         }
 
-
-
-
-
-
         /// <summary>
         /// Der Status des Bildes wird geändert, Texte werden gekürzt
         /// </summary>
@@ -4190,7 +4044,6 @@ namespace BlueControls.Controls {
             var tmpImageCode = tmpData.Item3;
 
             if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
-
 
             Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, tmpData.Item2, fitInRect, null, deleteBack, font, false);
         }
@@ -4242,8 +4095,5 @@ namespace BlueControls.Controls {
 
             }
         }
-
-
-
     }
 }

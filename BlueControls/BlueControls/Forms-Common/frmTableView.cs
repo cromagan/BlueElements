@@ -1006,6 +1006,12 @@ namespace BlueControls.Forms {
             return TableView.SortedRows();
         }
 
+        private void btnAlleErweitern_Click(object sender, System.EventArgs e) {
+            TableView.ExpandAll();
+        }
 
+        private void btnAlleSchlieﬂen_Click(object sender, System.EventArgs e) {
+            TableView.CollapesAll();
+        }
     }
 }

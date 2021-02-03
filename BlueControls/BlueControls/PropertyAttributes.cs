@@ -25,13 +25,17 @@ namespace BlueControls
     [AttributeUsage(AttributeTargets.All)]
     public class PropertyAttributes : DescriptionAttribute
     {
-        public PropertyAttributes(string description, bool fehlerWennLeer)
+        public PropertyAttributes(string description, bool benutzerEditierbar, bool fehlerWennLeer)
         {
             Description = description;
             FehlerWennLeer = fehlerWennLeer;
+            BenutzerEditierbar = benutzerEditierbar;
         }
 
         public override string Description { get; }
         public bool FehlerWennLeer { get; }
+
+
+        public bool BenutzerEditierbar { get; }
     }
 }

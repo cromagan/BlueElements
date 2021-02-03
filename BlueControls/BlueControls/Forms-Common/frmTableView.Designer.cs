@@ -86,6 +86,8 @@ namespace BlueControls.Forms
             this.Ansicht1 = new BlueControls.Controls.Button();
             this.Ansicht0 = new BlueControls.Controls.Button();
             this.grpBearbeitung = new BlueControls.Controls.GroupBox();
+            this.btnAlleSchließen = new BlueControls.Controls.Button();
+            this.btnAlleErweitern = new BlueControls.Controls.Button();
             this.Datenüberprüfung = new BlueControls.Controls.Button();
             this.AngezeigteZeilenLöschen = new BlueControls.Controls.Button();
             this.SuchenUndErsetzen = new BlueControls.Controls.Button();
@@ -164,6 +166,7 @@ namespace BlueControls.Forms
             // 
             // Zei
             // 
+            this.Zei.CausesValidation = false;
             this.Zei.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.Zei.Location = new System.Drawing.Point(0, 714);
             this.Zei.Name = "Zei";
@@ -180,7 +183,7 @@ namespace BlueControls.Forms
             this.MainRibbon.HotTrack = true;
             this.MainRibbon.Location = new System.Drawing.Point(0, 0);
             this.MainRibbon.Name = "MainRibbon";
-            this.MainRibbon.SelectedIndex = 0;
+            this.MainRibbon.SelectedIndex = 1;
             this.MainRibbon.Size = new System.Drawing.Size(1212, 110);
             this.MainRibbon.TabIndex = 92;
             // 
@@ -212,6 +215,7 @@ namespace BlueControls.Forms
             // 
             // Copyright
             // 
+            this.Copyright.CausesValidation = false;
             this.Copyright.Location = new System.Drawing.Point(96, 2);
             this.Copyright.Name = "Copyright";
             this.Copyright.Size = new System.Drawing.Size(176, 22);
@@ -340,7 +344,7 @@ namespace BlueControls.Forms
             // 
             // grpAnsicht
             // 
-            this.grpAnsicht.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpAnsicht.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAnsicht.CausesValidation = false;
             this.grpAnsicht.Controls.Add(this.cbxColumnArr);
             this.grpAnsicht.Controls.Add(this.SpaltAnsichtCap);
@@ -349,7 +353,8 @@ namespace BlueControls.Forms
             this.grpAnsicht.Controls.Add(this.Ansicht1);
             this.grpAnsicht.Controls.Add(this.Ansicht0);
             this.grpAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAnsicht.Location = new System.Drawing.Point(696, 0);
+            this.grpAnsicht.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpAnsicht.Location = new System.Drawing.Point(808, 0);
             this.grpAnsicht.Name = "grpAnsicht";
             this.grpAnsicht.Size = new System.Drawing.Size(464, 81);
             this.grpAnsicht.TabIndex = 0;
@@ -358,6 +363,7 @@ namespace BlueControls.Forms
             // 
             // SpaltAnsichtCap
             // 
+            this.SpaltAnsichtCap.CausesValidation = false;
             this.SpaltAnsichtCap.Location = new System.Drawing.Point(8, 46);
             this.SpaltAnsichtCap.Name = "SpaltAnsichtCap";
             this.SpaltAnsichtCap.Size = new System.Drawing.Size(98, 22);
@@ -406,18 +412,45 @@ namespace BlueControls.Forms
             // 
             // grpBearbeitung
             // 
-            this.grpBearbeitung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpBearbeitung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpBearbeitung.CausesValidation = false;
+            this.grpBearbeitung.Controls.Add(this.btnAlleSchließen);
+            this.grpBearbeitung.Controls.Add(this.btnAlleErweitern);
             this.grpBearbeitung.Controls.Add(this.Datenüberprüfung);
             this.grpBearbeitung.Controls.Add(this.AngezeigteZeilenLöschen);
             this.grpBearbeitung.Controls.Add(this.SuchenUndErsetzen);
             this.grpBearbeitung.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpBearbeitung.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.grpBearbeitung.Location = new System.Drawing.Point(448, 0);
             this.grpBearbeitung.Name = "grpBearbeitung";
-            this.grpBearbeitung.Size = new System.Drawing.Size(248, 81);
+            this.grpBearbeitung.Size = new System.Drawing.Size(360, 81);
             this.grpBearbeitung.TabIndex = 1;
             this.grpBearbeitung.TabStop = false;
             this.grpBearbeitung.Text = "Bearbeitung";
+            // 
+            // btnAlleSchließen
+            // 
+            this.btnAlleSchließen.Enabled = false;
+            this.btnAlleSchließen.ImageCode = "Pfeil_Oben_Scrollbar|14|||||0";
+            this.btnAlleSchließen.Location = new System.Drawing.Point(248, 24);
+            this.btnAlleSchließen.Name = "btnAlleSchließen";
+            this.btnAlleSchließen.QuickInfo = "Neuen Eintrag ergänzen";
+            this.btnAlleSchließen.Size = new System.Drawing.Size(104, 22);
+            this.btnAlleSchließen.TabIndex = 14;
+            this.btnAlleSchließen.Text = "alle schließen";
+            this.btnAlleSchließen.Click += new System.EventHandler(this.btnAlleSchließen_Click);
+            // 
+            // btnAlleErweitern
+            // 
+            this.btnAlleErweitern.Enabled = false;
+            this.btnAlleErweitern.ImageCode = "Pfeil_Unten_Scrollbar|14|||ff0000||200|200";
+            this.btnAlleErweitern.Location = new System.Drawing.Point(248, 2);
+            this.btnAlleErweitern.Name = "btnAlleErweitern";
+            this.btnAlleErweitern.QuickInfo = "Neuen Eintrag ergänzen";
+            this.btnAlleErweitern.Size = new System.Drawing.Size(104, 22);
+            this.btnAlleErweitern.TabIndex = 13;
+            this.btnAlleErweitern.Text = "alle erweitern";
+            this.btnAlleErweitern.Click += new System.EventHandler(this.btnAlleErweitern_Click);
             // 
             // Datenüberprüfung
             // 
@@ -453,13 +486,14 @@ namespace BlueControls.Forms
             // 
             // grpFormularSteuerung
             // 
-            this.grpFormularSteuerung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpFormularSteuerung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpFormularSteuerung.CausesValidation = false;
             this.grpFormularSteuerung.Controls.Add(this.SuchB);
             this.grpFormularSteuerung.Controls.Add(this.such);
             this.grpFormularSteuerung.Controls.Add(this.Vorwärts);
             this.grpFormularSteuerung.Controls.Add(this.zurück);
             this.grpFormularSteuerung.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpFormularSteuerung.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.grpFormularSteuerung.Location = new System.Drawing.Point(208, 0);
             this.grpFormularSteuerung.Name = "grpFormularSteuerung";
             this.grpFormularSteuerung.Size = new System.Drawing.Size(240, 81);
@@ -515,12 +549,13 @@ namespace BlueControls.Forms
             // 
             // grpAllgemein
             // 
-            this.grpAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAllgemein.CausesValidation = false;
             this.grpAllgemein.Controls.Add(this.btnNeu);
             this.grpAllgemein.Controls.Add(this.btnDrucken);
             this.grpAllgemein.Controls.Add(this.btnLoeschen);
             this.grpAllgemein.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAllgemein.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.grpAllgemein.Location = new System.Drawing.Point(0, 0);
             this.grpAllgemein.Name = "grpAllgemein";
             this.grpAllgemein.Size = new System.Drawing.Size(208, 81);
@@ -617,9 +652,9 @@ namespace BlueControls.Forms
             // 
             // Filter
             // 
+            this.Filter.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.Filter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.Filter.Dock = System.Windows.Forms.DockStyle.Top;
-            this.Filter.Filtertypes = ((BlueControls.Enums.enFilterTypesToShow)((BlueControls.Enums.enFilterTypesToShow.NachDefinierterAnsicht | BlueControls.Enums.enFilterTypesToShow.AktuelleAnsicht_AktiveFilter)));
             this.Filter.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.Nothing;
             this.Filter.Location = new System.Drawing.Point(0, 110);
             this.Filter.Name = "Filter";
@@ -702,6 +737,8 @@ namespace BlueControls.Forms
         private RibbonBar MainRibbon;
         private tabAdministration tabAdmin;
         private Filterleiste Filter;
+        protected Button btnAlleSchließen;
+        protected Button btnAlleErweitern;
     }
 
 }
