@@ -93,6 +93,7 @@ namespace BlueBasics.MultiUserFile {
 
         private readonly System.ComponentModel.BackgroundWorker PureBinSaver;
         private readonly Timer Checker;
+        private FileSystemWatcher Watcher;
 
 
         private string _inhaltBlockdatei = string.Empty;
@@ -205,8 +206,8 @@ namespace BlueBasics.MultiUserFile {
 
             Checker = new Timer(Checker_Tick);
 
-
             Filename = string.Empty;// KEIN Filename. Ansonsten wird davon ausgegnagen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
+            DoWatcher();
             _CheckedAndReloadNeed = true;
             _LastSaveCode = string.Empty;
             _dataOnDisk = string.Empty;
@@ -248,11 +249,18 @@ namespace BlueBasics.MultiUserFile {
 
         public void RemoveFilename() {
             Filename = string.Empty;
+            DoWatcher();
             SetReadOnly();
         }
 
 
-
+        /// <summary>
+        /// Diese Routine lädt die Datei von der Festplatte. Zur Not wartet sie bis zu 5 Minuten.
+        /// Hier wird auch nochmal geprüft, ob ein Laden überhaupt möglich ist.
+        /// Es kann auch NULL zurück gegeben werden, wenn es ein Reload ist und die Daten inzwischen aktuell sind.
+        /// </summary>
+        /// <param name="OnlyReload"></param>
+        /// <returns></returns>
         private (List<byte> data, string fileinfo) LoadBytesFromDisk(bool OnlyReload) {
             var tmpLastSaveCode2 = string.Empty;
 
@@ -261,7 +269,7 @@ namespace BlueBasics.MultiUserFile {
             do {
                 try {
 
-                    if (OnlyReload && !ReloadNeeded()) { return (null, string.Empty); } // PRoblem hat sich aufgelöst
+                    if (OnlyReload && !ReloadNeeded) { return (null, string.Empty); } // Problem hat sich aufgelöst
 
                     var f = ErrorReason(enErrorReason.Load);
 
@@ -302,7 +310,11 @@ namespace BlueBasics.MultiUserFile {
         }
 
 
-
+        /// <summary>
+        /// Wartet bis der Reload abgeschlossen ist.
+        /// Ist de LoadThread der aktuelle Thread, wir nicht gewartet!
+        /// </summary>
+        /// <param name="hardmode"></param>
         private void WaitLoaded(bool hardmode) {
             if (_loadingThreadId == Thread.CurrentThread.ManagedThreadId) { return; }
 
@@ -342,7 +354,9 @@ namespace BlueBasics.MultiUserFile {
         //}
 
         /// <summary>
-        /// Führt - falls nötig - einen Reload der Datei aus. Der Prozess wartet solange, bis der Reload erfolgreich war.
+        /// Führt - falls nötig - einen Reload der Datei aus. 
+        /// Der Prozess wartet solange, bis der Reload erfolgreich war.
+        /// Ein bereits eventuell bestehender Ladevorgang wird abgewartet.
         /// </summary>
         public void Load_Reload() {
             WaitLoaded(true);
@@ -357,11 +371,11 @@ namespace BlueBasics.MultiUserFile {
             _loadingInfo = DateTime.Now.ToString(Constants.Format_Date) + " " + _BlockReload.ToString() + " #U " + Thread.CurrentThread.ManagedThreadId + " " + strace.GetFrame(1).GetMethod().ReflectedType.FullName + "/" + strace.GetFrame(1).GetMethod().ToString();
 
             //Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
-            if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded()) { IsLoading = false; return; }
+            if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded) { IsLoading = false; return; }
 
             var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
 
-            if (OnlyReload && !ReloadNeeded()) { IsLoading = false; return; } // Wird in der Schleife auch geprüft
+            if (OnlyReload && !ReloadNeeded) { IsLoading = false; return; } // Wird in der Schleife auch geprüft
 
             var ec = new LoadingEventArgs(OnlyReload);
             OnLoading(ec);
@@ -635,20 +649,20 @@ namespace BlueBasics.MultiUserFile {
         /// EasyMode gibt immer false zurück
         /// </summary>
         /// <returns></returns>
-        public bool ReloadNeeded() {
-            if (EasyMode) { return false; }
-            if (string.IsNullOrEmpty(Filename)) { return false; }
+        public bool ReloadNeeded {
+            get {
+                if (EasyMode) { return false; }
+                if (string.IsNullOrEmpty(Filename)) { return false; }
 
-            if (_CheckedAndReloadNeed) { return true; }
+                if (_CheckedAndReloadNeed) { return true; }
 
-            if (IsSaving || IsLoading) { return false; }
+                if (GetFileInfo(false) != _LastSaveCode) {
+                    _CheckedAndReloadNeed = true;
+                    return true;
+                }
 
-            if (GetFileInfo(false) != _LastSaveCode) {
-                _CheckedAndReloadNeed = true;
-                return true;
+                return false;
             }
-
-            return false;
         }
 
         protected abstract List<byte> ToListOfByte(bool willSave);
@@ -695,18 +709,73 @@ namespace BlueBasics.MultiUserFile {
             }
 
             Filename = fileNameToLoad;
+            DoWatcher();
 
 
             // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
+            Load_Reload();
+            //var count = 0;
+            //do {
 
-            var count = 0;
-            do {
+            //    if (count > 0) { Pause(1, false); }
 
-                if (count > 0) { Pause(1, false); }
-                Load_Reload();
-                count++;
-                if (count > 10) { Develop.DebugPrint(enFehlerArt.Fehler, "Datei nicht korrekt geladen (nicht mehr aktuell)"); }
-            } while (ReloadNeeded());
+            //    count++;
+            //    if (count > 10) { Develop.DebugPrint(enFehlerArt.Fehler, "Datei nicht korrekt geladen (nicht mehr aktuell)"); }
+            //} while (ReloadNeeded());
+        }
+
+        private void DoWatcher() {
+
+
+
+            if (Watcher != null) {
+                Watcher.EnableRaisingEvents = false;
+                Watcher.Changed -= Watcher_Changed;
+                Watcher.Created -= Watcher_Created;
+                Watcher.Deleted -= Watcher_Deleted;
+                Watcher.Renamed -= Watcher_Renamed;
+                Watcher.Error -= Watcher_Error;
+                Watcher.Dispose();
+                Watcher = null;
+            }
+
+
+
+            if (!string.IsNullOrEmpty(Filename)) {
+
+                Watcher = new FileSystemWatcher(Filename.FilePath());
+                Watcher.Changed += Watcher_Changed;
+                Watcher.Created += Watcher_Created;
+                Watcher.Deleted += Watcher_Deleted;
+                Watcher.Renamed += Watcher_Renamed;
+                Watcher.Error += Watcher_Error;
+                Watcher.EnableRaisingEvents = true;
+            }
+
+        }
+
+        private void Watcher_Error(object sender, ErrorEventArgs e) {
+            Develop.DebugPrint(enFehlerArt.Warnung, e.ToString());
+        }
+        private void Watcher_Renamed(object sender, RenamedEventArgs e) {
+            if (e.FullPath.ToUpper() != Filename.ToUpper()) { return; }
+            _CheckedAndReloadNeed = true;
+        }
+        private void Watcher_Deleted(object sender, FileSystemEventArgs e) {
+            if (e.FullPath.ToUpper() != Filename.ToUpper()) { return; }
+
+            _CheckedAndReloadNeed = true;
+        }
+        private void Watcher_Created(object sender, FileSystemEventArgs e) {
+            if (e.FullPath.ToUpper() != Filename.ToUpper()) { return; }
+
+            _CheckedAndReloadNeed = true;
+        }
+        private void Watcher_Changed(object sender, FileSystemEventArgs e) {
+
+            if (e.FullPath.ToUpper() != Filename.ToUpper()) { return; }
+            _CheckedAndReloadNeed = true;
+
         }
 
         public void SaveAsAndChangeTo(string NewFileName) {
@@ -717,6 +786,7 @@ namespace BlueBasics.MultiUserFile {
             Save(true); // Original-Datei speichern, die ist ja dann weg.
 
             Filename = NewFileName;
+            DoWatcher();
             var l = ToListOfByte(true);
 
             using (var x = new FileStream(NewFileName, FileMode.Create, FileAccess.Write, FileShare.None)) {
@@ -964,7 +1034,6 @@ namespace BlueBasics.MultiUserFile {
         public abstract bool HasPendingChanges();
 
         public void UnlockHard() {
-            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             try {
                 Load_Reload();
                 if (AgeOfBlockDatei() >= 0) { DeleteBlockDatei(true, true); }
@@ -1039,7 +1108,7 @@ namespace BlueBasics.MultiUserFile {
 
 
             // Ausstehende Arbeiten ermittelen
-            var _MustReload = ReloadNeeded();
+            var _MustReload = ReloadNeeded;
             var _MustSave = !ReadOnly && HasPendingChanges();
             var _MustBackup = !ReadOnly && IsThereBackgroundWorkToDo(_MustSave);
 
@@ -1078,7 +1147,6 @@ namespace BlueBasics.MultiUserFile {
             if (_MustReload && _MustSave) {
                 var f = ErrorReason(enErrorReason.Load);
                 if (!string.IsNullOrEmpty(f)) { return; }
-
                 // Checker_Tick_count nicht auf 0 setzen, dass der Saver noch stimmt.
                 Load_Reload();
                 return;
@@ -1122,6 +1190,8 @@ namespace BlueBasics.MultiUserFile {
             if (mode == enErrorReason.Load) {
                 if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
 
+                if (_BlockReload > 0) { return "Laden aktuell blockiert."; }
+
                 if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 6) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen 
 
                 if (PureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
@@ -1164,10 +1234,10 @@ namespace BlueBasics.MultiUserFile {
                 if (IsLoading) { return "Aktuell werden Daten geladen."; }
             }
 
-            //----------EditGeneral------------------------------------------------------------------------------------------
-            if (mode.HasFlag(enErrorReason.EditGeneral)) {
+            //----------EditGeneral, Save------------------------------------------------------------------------------------------
+            if (mode.HasFlag(enErrorReason.EditGeneral) || mode.HasFlag(enErrorReason.Save)) {
                 if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
-                if (ReloadNeeded()) { return "Die Datei muss neu eingelesen werden."; }
+                if (ReloadNeeded) { return "Die Datei muss neu eingelesen werden."; }
             }
 
 

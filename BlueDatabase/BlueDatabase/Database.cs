@@ -1462,10 +1462,11 @@ namespace BlueDatabase {
 
 
         public override string ErrorReason(enErrorReason mode) {
-            if (mode == enErrorReason.OnlyRead) { return string.Empty; }
-            if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."; }
             var f = base.ErrorReason(mode);
             if (!string.IsNullOrEmpty(f)) { return f; }
+
+            if (mode == enErrorReason.OnlyRead) { return string.Empty; }
+            if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."; }
 
             if (mode.HasFlag(enErrorReason.Save) || mode.HasFlag(enErrorReason.Load) || mode.HasFlag(enErrorReason.EditGeneral)) {
                 if (Cell.Freezed) { return "Datenbank gerade eingefroren."; }

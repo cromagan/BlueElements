@@ -135,7 +135,7 @@ namespace BlueDatabase {
             }
 
             if (string.IsNullOrEmpty(columnName)) {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Leerer Spaltenname");
+   //             Develop.DebugPrint(enFehlerArt.Warnung, "Leerer Spaltenname"); Neue Spalten haben noch keinen Namen
                 return null;
             }
 

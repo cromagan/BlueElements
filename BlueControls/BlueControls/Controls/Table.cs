@@ -642,7 +642,7 @@ namespace BlueControls.Controls {
                 Skin.Draw_Border(GR, enDesign.Table_And_Pad, State, displayRectangleWOSlider);
 
 
-                if (Database.ReloadNeeded()) { GR.DrawImage(QuickImage.Get(enImageCode.Uhr, 16).BMP, 8, 8); }
+                if (Database.ReloadNeeded) { GR.DrawImage(QuickImage.Get(enImageCode.Uhr, 16).BMP, 8, 8); }
                 if (Database.HasPendingChanges()) { GR.DrawImage(QuickImage.Get(enImageCode.Stift, 16).BMP, 16, 8); }
                 if (Database.ReadOnly) { GR.DrawImage(QuickImage.Get(enImageCode.Schloss, 32).BMP, 16, 8); }
 
@@ -3702,7 +3702,7 @@ namespace BlueControls.Controls {
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
 
-            if (_Database.IsParsing) {
+            if (_Database.IsParsing || _Database.IsLoading) {
                 Cancel = true;
                 return;
             }
