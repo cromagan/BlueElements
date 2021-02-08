@@ -494,7 +494,8 @@ namespace BlueDatabase {
 
                 if (value == null) {
                     _CaptionBitmap = null;
-                } else {
+                }
+                else {
                     _CaptionBitmap = (Bitmap)value.Clone();
                 }
 
@@ -1149,7 +1150,6 @@ namespace BlueDatabase {
         }
 
         private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
-
             Database.BlockReload();
 
             if (_Format != enDataFormat.Columns_für_LinkedCellDropdown) {
@@ -1173,7 +1173,6 @@ namespace BlueDatabase {
                 }
             }
 
-            Database.UnblockReload();
         }
 
         private void _TMP_LinkedDatabase_RowKeyChanged(object sender, KeyChangedEventArgs e) {
@@ -1217,7 +1216,8 @@ namespace BlueDatabase {
             if (FileExists(_LinkedDatabaseFile)) {
                 el = new DatabaseSettingsEventHandler(this, _LinkedDatabaseFile, Database.ReadOnly);
 
-            } else {
+            }
+            else {
                 el = new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly);
 
             }
@@ -1262,7 +1262,8 @@ namespace BlueDatabase {
                     if (ThisRowItem.MatchesTo(Filter)) {
                         if (_MultiLine) {
                             list.AddRange(ThisRowItem.CellGetList(this));
-                        } else {
+                        }
+                        else {
                             if (ThisRowItem.CellGetString(this).Length > 0) {
                                 list.Add(ThisRowItem.CellGetString(this));
                             }
@@ -1407,7 +1408,8 @@ namespace BlueDatabase {
                 default:
                     if (Art.ToString() == ((int)Art).ToString()) {
                         Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + Art + "' nicht definiert.<br>Wert: " + Wert + "<br>Datei: " + Database.Filename);
-                    } else {
+                    }
+                    else {
                         return "Interner Fehler: Für den Datentyp  '" + Art + "'  wurde keine Laderegel definiert.";
                     }
 
@@ -1831,7 +1833,8 @@ namespace BlueDatabase {
 
             if (string.IsNullOrEmpty(_Caption)) {
                 tmp = _Name + Constants.FirstSortChar + _Name;
-            } else {
+            }
+            else {
                 tmp = _Caption + Constants.FirstSortChar + _Name;
             }
 
@@ -1901,7 +1904,8 @@ namespace BlueDatabase {
                     if (_MultiLine) {
                         //if (EditType_To_Check == enEditType.Listbox) { return true; }
                         if (EditType_To_Check == enEditTypeFormula.Gallery) { return true; }
-                    } else {
+                    }
+                    else {
                         if (EditType_To_Check == enEditTypeFormula.EasyPic) { return true; }
                     }
                     return false;
@@ -2024,7 +2028,8 @@ namespace BlueDatabase {
                         var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
                         if (c == null) { return "Die verknüpfte Spalte existiert nicht."; }
                         if (c.MultiLine != _MultiLine) { return "Multiline stimmt nicht mit der Ziel-Spalte Multiline überein"; }
-                    } else {
+                    }
+                    else {
                         if (!_MultiLine) { return "Dieses Format muss mehrzeilig sein, da es von der Ziel-Spalte gesteuert wird."; }
                     }
 
@@ -2062,7 +2067,8 @@ namespace BlueDatabase {
             if (_MultiLine) {
                 if (!_Format.MultilinePossible()) { return "Format unterstützt keine mehrzeiligen Texte."; }
                 if (_AfterEdit_Runden != -1) { return "Runden nur bei einzeiligen Texten möglich"; }
-            } else {
+            }
+            else {
                 if (_ShowMultiLineInOneLine) { return "Wenn mehrzeilige Texte einzeilig dargestellt werden sollen, muss mehrzeilig angewählt sein."; }
                 if (_AfterEdit_QuickSortRemoveDouble) { return "Sortierung kann nur bei mehrzeiligen Feldern erfolgen."; }
             }
@@ -2080,7 +2086,8 @@ namespace BlueDatabase {
             if (_TextBearbeitungErlaubt) {
                 if (TMP_EditDialog == enEditTypeTable.Dropdown_Single) { return "Format unterstützt nur Dropdown-Menü."; }
                 if (TMP_EditDialog == enEditTypeTable.None) { return "Format unterstützt keine Standard-Bearbeitung."; }
-            } else {
+            }
+            else {
                 if (_VorschlagsColumn > -1) { return "'Vorschlags-Text-Spalte' nur bei Texteingabe möglich."; }
                 if (!string.IsNullOrEmpty(_AllowedChars)) { return "'Erlaubte Zeichen' nur bei Texteingabe nötig."; }
             }
@@ -2111,7 +2118,8 @@ namespace BlueDatabase {
                     if (!_DropdownWerteAndererZellenAnzeigen && DropDownItems.Count == 0) { return "Keine Dropdown-Items vorhanden bzw. Alles hinzufügen nicht angewählt."; }
                 }
 
-            } else {
+            }
+            else {
 
                 if (_DropdownWerteAndererZellenAnzeigen) { return "Dropdownmenu nicht ausgewählt, 'alles hinzufügen' prüfen."; }
                 if (_DropdownAllesAbwählenErlaubt) { return "Dropdownmenu nicht ausgewählt, 'alles abwählen' prüfen."; }
@@ -2137,7 +2145,8 @@ namespace BlueDatabase {
                     _BildTextVerhalten = enBildTextVerhalten.Nur_Text;
                     //return "Bei diesem Format muss das Bild/Text-Verhalten 'Nur Text' sein.";
                 }
-            } else {
+            }
+            else {
                 if (_Format == enDataFormat.BildCode || _Format == enDataFormat.FarbeInteger) {
                     return "Bei diesem Format darf das Bild/Text-Verhalten nicht 'Nur Text' sein.";
                 }
@@ -2275,11 +2284,13 @@ namespace BlueDatabase {
 
                         if (op == "casesensitive") {
                             if (l[z] == rep[0]) { l[z] = r; }
-                        } else if (op == "instr") {
+                        }
+                        else if (op == "instr") {
                             l[z] = l[z].Replace(rep[0], r, RegexOptions.IgnoreCase);
 
                             //if (l[z].ToLower() == rep[0].ToLower()) { l[z] = r; }
-                        } else {
+                        }
+                        else {
                             if (l[z].ToLower() == rep[0].ToLower()) { l[z] = r; }
                         }
                     }
@@ -2459,7 +2470,8 @@ namespace BlueDatabase {
             var cleanfilename = filename;
             if (string.IsNullOrEmpty(suffix)) {
                 suffix = _BestFile_StandardSuffix;
-            } else {
+            }
+            else {
                 cleanfilename = filename.FileNameWithoutSuffix();
             }
 
@@ -2597,14 +2609,16 @@ namespace BlueDatabase {
                 List<string> TMP = null;
                 if (MultiLine) {
                     TMP = ThisRow.CellGetList(this);
-                } else {
+                }
+                else {
                     TMP = new List<string> { ThisRow.CellGetString(this) };
                 }
 
                 foreach (var ThisString in TMP) {
                     if (Einzigartig.Contains(ThisString)) {
                         NichtEinzigartig.AddIfNotExists(ThisString);
-                    } else {
+                    }
+                    else {
                         Einzigartig.AddIfNotExists(ThisString);
                     }
                 }

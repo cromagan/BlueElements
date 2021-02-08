@@ -70,12 +70,9 @@ namespace BlueDatabase {
 
                 if (index < 0 || index >= Count) {
                     Database.DevelopWarnung("Spalten-Index nicht gefunden: " + index.ToString());
-                    Database.UnblockReload();
                     return null;
                 }
-                var x = base[index];
-                Database.UnblockReload();
-                return x;
+                return base[index];
             }
         }
 
@@ -89,19 +86,16 @@ namespace BlueDatabase {
 
                 foreach (var ThisColumn in this) {
                     if (ThisColumn != null && ThisColumn.Key == key) {
-                        Database.UnblockReload();
                         return ThisColumn;
                     }
                 }
 
                 //// Beim Parsen und erstellen werden die Spalten ja erstellt
                 //if (!Database.IsParsing) { Database.DevelopWarnung("Spalten-Key nicht gefunden: " + key.ToString()); }
-                Database.UnblockReload();
 
                 return null;
             }
             catch {
-                Database.UnblockReload();
                 return SearchByKey(key); // Sammlung wurde verändert
             }
         }
@@ -117,8 +111,6 @@ namespace BlueDatabase {
 
                 var colum = Exists(columnName);
                 if (colum is null) { Database.DevelopWarnung("Spalte nicht gefunden: " + columnName); }
-
-                Database.UnblockReload();
                 return colum;
             }
         }
@@ -135,7 +127,7 @@ namespace BlueDatabase {
             }
 
             if (string.IsNullOrEmpty(columnName)) {
-   //             Develop.DebugPrint(enFehlerArt.Warnung, "Leerer Spaltenname"); Neue Spalten haben noch keinen Namen
+                //             Develop.DebugPrint(enFehlerArt.Warnung, "Leerer Spaltenname"); Neue Spalten haben noch keinen Namen
                 return null;
             }
 

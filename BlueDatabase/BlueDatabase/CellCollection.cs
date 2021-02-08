@@ -252,13 +252,11 @@ namespace BlueDatabase {
                 column.Database.BlockReload();
                 if (string.IsNullOrEmpty(fehler)) {
                     column.Database.Cell.SetValueBehindLinkedValue(column, row, CellCollection.KeyOfCell(targetColumn.Key, targetRow.Key), FreezeMode);
-                    column.Database.UnblockReload();
                     return (targetColumn, targetRow);
 
                 }
                 else {
                     column.Database.Cell.SetValueBehindLinkedValue(column, row, string.Empty, FreezeMode);
-                    column.Database.UnblockReload();
                     return (null, null);
                 }
             }
@@ -632,7 +630,6 @@ namespace BlueDatabase {
         }
 
         internal void SetValueBehindLinkedValue(ColumnItem Column, RowItem Row, string Value, bool FreezeMode) {
-
             Database.BlockReload();
 
             if (Column == null || Database.Column.SearchByKey(Column.Key) == null) {
@@ -651,10 +648,7 @@ namespace BlueDatabase {
 
             if (_cells.ContainsKey(CellKey)) { OldValue = _cells[CellKey].Value; }
 
-            if (Value == OldValue) {
-                Database.UnblockReload();
-                return;
-            }
+            if (Value == OldValue) { return; }
 
 
             Database.WaitEditable();
@@ -675,7 +669,6 @@ namespace BlueDatabase {
             Column.Invalidate_TmpColumnContentWidth();
 
             OnCellValueChanged(new CellEventArgs(Column, Row));
-            Database.UnblockReload();
         }
 
 
@@ -1085,11 +1078,9 @@ namespace BlueDatabase {
             if (column.Format == enDataFormat.LinkedCell) {
                 var (lcolumn, lrow) = LinkedCellData(column, row, freezeMode, true, true);
                 lrow?.CellSet(lcolumn, value, false);
-                Database.UnblockReload();
                 return;
             }
             SetValueBehindLinkedValue(column, row, value, freezeMode);
-            Database.UnblockReload(); 
         }
         #endregion
 

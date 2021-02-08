@@ -145,7 +145,7 @@ namespace BlueBasics.MultiUserFile {
         private string _EditNormalyError = string.Empty;
 
 
-        private int _BlockReload = 0;
+        private DateTime _BlockReload = new DateTime(1900, 1, 1);
 
         #endregion
 
@@ -153,24 +153,8 @@ namespace BlueBasics.MultiUserFile {
         public void BlockReload() {
 
             WaitLoaded(false);
-            //var strace = new System.Diagnostics.StackTrace(true);
-            //Prot.Add(DateTime.Now.ToString(Constants.Format_Date) + " " + _BlockReload.ToString() + " #B " + Thread.CurrentThread.ManagedThreadId + " " + strace.GetFrame(1).GetMethod().ReflectedType.FullName + "/" + strace.GetFrame(1).GetMethod().ToString());
-            _BlockReload++;
-
+            _BlockReload = DateTime.UtcNow;
         }
-
-        public void UnblockReload() {
-            _BlockReload--;
-
-            //if (_BlockReload == 0) { Prot.Clear(); return; }
-
-            if (_BlockReload < 0) {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Ungleichgewicht!");
-                _BlockReload = 0;
-            }
-        }
-
-
 
         #region  Event-Deklarationen 
 
@@ -1100,7 +1084,7 @@ namespace BlueBasics.MultiUserFile {
 
             if (EasyMode && ReadOnly) { return; }
 
-            if (_BlockReload > 0) { return; }
+            if (DateTime.UtcNow.Subtract(_BlockReload).TotalSeconds < 5) { return; }
 
             if (IsLoading) { return; }
             if (PureBinSaver.IsBusy || IsSaving) { return; }
@@ -1190,7 +1174,7 @@ namespace BlueBasics.MultiUserFile {
             if (mode == enErrorReason.Load) {
                 if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
 
-                if (_BlockReload > 0) { return "Laden aktuell blockiert."; }
+                if (DateTime.UtcNow.Subtract(_BlockReload).TotalSeconds < 5) { return "Laden aktuell blockiert."; }
 
                 if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 6) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen 
 

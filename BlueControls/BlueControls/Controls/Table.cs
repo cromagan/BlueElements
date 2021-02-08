@@ -1472,7 +1472,7 @@ namespace BlueControls.Controls {
             RowItem ContentHolderCellRow;
 
 
-            if (Database.ReloadNeeded()) { Database.Load_Reload(); }
+            if (Database.ReloadNeeded) { Database.Load_Reload(); }
 
 
             var f = Database.ErrorReason(enErrorReason.EditGeneral);
