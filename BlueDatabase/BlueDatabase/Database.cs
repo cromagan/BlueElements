@@ -168,19 +168,10 @@ namespace BlueDatabase {
         #region  Variablen-Deklarationen 
 
         //private IContainer components;
-        private BackgroundWorker Backup;
-
 
         public readonly ColumnCollection Column;
         public readonly CellCollection Cell;
         public readonly RowCollection Row;
-
-
-
-
-
-
-
         public ListExt<WorkItem> Works;
 
         private readonly List<string> FilesAfterLoadingLCase;
@@ -188,8 +179,6 @@ namespace BlueDatabase {
         private string _Creator;
         private string _CreateDate;
         private int _UndoCount;
-
-
 
         private string _GlobalShowPass;
         private string _FileEncryptionKey;
@@ -231,14 +220,9 @@ namespace BlueDatabase {
         /// Variable nur temporär für den BinReloader, um mögliche Datenverluste zu entdecken.
         /// </summary>
         private string _LastWorkItem = string.Empty;
-
-
-
         private string WVorher = string.Empty;
 
-
         #endregion
-
 
         #region  Event-Deklarationen 
         public event EventHandler SortParameterChanged;
@@ -274,8 +258,6 @@ namespace BlueDatabase {
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-            InitializeComponent();
-
             Cell = new CellCollection(this);
             Column = new ColumnCollection(this);
             Row = new RowCollection(this);
@@ -283,9 +265,6 @@ namespace BlueDatabase {
             Works = new ListExt<WorkItem>();
 
             FilesAfterLoadingLCase = new List<string>();
-
-
-
 
             ColumnArrangements.Changed += ColumnArrangements_ListOrItemChanged;
             Layouts.Changed += Layouts_ListOrItemChanged;
@@ -322,10 +301,6 @@ namespace BlueDatabase {
             else if (stream != null) {
                 LoadFromStream(stream);
             }
-
-
-
-
         }
 
         private void Initialize() {
@@ -376,17 +351,11 @@ namespace BlueDatabase {
             _ZeilenQuickInfo = string.Empty;
 
             _sortDefinition = null;
-
-
-
         }
-
 
         #endregion
 
         #region  Properties 
-
-
 
         [Browsable(false)]
         public string Caption {
@@ -412,9 +381,6 @@ namespace BlueDatabase {
                 Cell.InvalidateAllSizes();
             }
         }
-
-
-
 
         [Browsable(false)]
         public string FilterImagePfad {
@@ -679,10 +645,6 @@ namespace BlueDatabase {
             var Key = ((ColumnItem)e.Item).Key;
             AddPending(enDatabaseDataType.dummyComand_RemoveColumn, Key, -1, string.Empty, Key.ToString(), false);
 
-        }
-
-        public void AbortBackup() {
-            if (Backup.IsBusy && !Backup.CancellationPending) { Backup.CancelAsync(); }
         }
 
         private void Row_RowAdded(object sender, RowEventArgs e) {
@@ -2045,21 +2007,6 @@ namespace BlueDatabase {
             return Filename.FilePath() + "Layouts\\";
         }
 
-        private void InitializeComponent() {
-            Backup = new System.ComponentModel.BackgroundWorker {
-
-                // 
-                // Backup
-                // 
-                WorkerReportsProgress = true,
-                WorkerSupportsCancellation = true
-            };
-            Backup.DoWork += new System.ComponentModel.DoWorkEventHandler(Backup_DoWork);
-            Backup.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(Backup_ProgressChanged);
-
-
-        }
-
         /// <summary>
         /// Fügt Comandos manuell hinzu. Vorsicht: Kann Datenbank beschädigen
         /// </summary>
@@ -2198,7 +2145,7 @@ namespace BlueDatabase {
                 if (ThisPendingItem.RowKey > -1) {
                     _Row = Row.SearchByKey(ThisPendingItem.RowKey);
                     if (_Row == null) {
-                        if (ThisPendingItem.Comand != enDatabaseDataType.dummyComand_AddRow) {
+                        if (ThisPendingItem.Comand != enDatabaseDataType.dummyComand_AddRow && ThisPendingItem.User != UserName) {
                             Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + Filename + "<br>" + ThisPendingItem.ToString());
                             return;
                         }
@@ -2210,7 +2157,7 @@ namespace BlueDatabase {
                 if (ThisPendingItem.ColKey > -1) {
                     _Col = Column.SearchByKey(ThisPendingItem.ColKey);
                     if (_Col == null) {
-                        if (ThisPendingItem.Comand != enDatabaseDataType.AddColumn) {
+                        if (ThisPendingItem.Comand != enDatabaseDataType.AddColumn && ThisPendingItem.User != UserName) {
                             Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + Filename + "<br>" + ThisPendingItem.ToString());
                             return;
                         }
@@ -2348,7 +2295,7 @@ namespace BlueDatabase {
                     if (ThisExport.Typ == enExportTyp.EinzelnMitFormular) {
                         if (ThisExport.ExportFormularID == LayoutID) {
                             Done = true;
-                            ThisExport.LastExportTime = new DateTime(1900, 1, 1);
+                            ThisExport.LastExportTimeUTC = new DateTime(1900, 1, 1);
                         }
                     }
                 }
@@ -2360,32 +2307,33 @@ namespace BlueDatabase {
         }
 
 
-        private void Backup_DoWork(object sender, DoWorkEventArgs e) {
-            //if (!IsSaveAble(false)) { return; }
+        protected override void DoBackGroundWork(BackgroundWorker listenToMyCancel) {
             if (ReadOnly) { return; }
 
-            var ec = new CancelEventArgs(false);
-            OnExporting(ec);
-            if (ec.Cancel) { return; }
+            if (!HasPendingChanges()) {
 
+                var ec = new CancelEventArgs(false);
+                OnExporting(ec);
+                if (ec.Cancel) { return; }
+            }
             var ReportAChange = false;
             var tmp = false;
 
             try {
 
-                if (!Backup.CancellationPending) {
+                if (!listenToMyCancel.CancellationPending) {
 
                     foreach (var ThisExport in Export) {
-                        if (ThisExport != null) { tmp = ThisExport.DeleteOutdatedBackUps(Backup); }
+                        if (ThisExport != null) { tmp = ThisExport.DeleteOutdatedBackUps(listenToMyCancel); }
                         if (tmp) { ReportAChange = true; }
-                        if (Backup.CancellationPending) { break; }
+                        if (listenToMyCancel.CancellationPending) { break; }
                     }
 
                 }
 
-                if (!Backup.CancellationPending) {
+                if (!listenToMyCancel.CancellationPending) {
                     foreach (var ThisExport in Export) {
-                        if (ThisExport != null) { tmp = ThisExport.DoBackUp(Backup); }
+                        if (ThisExport != null) { tmp = ThisExport.DoBackUp(listenToMyCancel); }
                         if (tmp) { ReportAChange = true; }
                     }
                 }
@@ -2396,21 +2344,22 @@ namespace BlueDatabase {
             }
 
             if (ReportAChange) {
-                Backup.ReportProgress(100, "AddPending");
+                AddPending(enDatabaseDataType.AutoExport, -1, Export.ToString(true), false);
             }
         }
 
-        private void Backup_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            switch ((string)e.UserState) {
-                case "AddPending":
-                    AddPending(enDatabaseDataType.AutoExport, -1, Export.ToString(true), false);
-                    break;
 
-                default:
-                    Develop.DebugPrint("Unbekannter Befehl:" + (string)e.UserState);
-                    break;
+        protected override void BackgroundWorkerMessage(ProgressChangedEventArgs e) {
+            //switch ((string)e.UserState) {
+            //    case "AddPending":
+            //        AddPending(enDatabaseDataType.AutoExport, -1, Export.ToString(true), false);
+            //        break;
 
-            }
+            //    default:
+            //        Develop.DebugPrint("Unbekannter Befehl:" + (string)e.UserState);
+            //        break;
+
+            //}
         }
 
         public bool AllRulesOK() {
@@ -2498,30 +2447,26 @@ namespace BlueDatabase {
             return false;
         }
 
-        protected override bool IsThereBackgroundWorkToDo(bool mustSave) {
-            if (mustSave) { return true; }
+        protected override bool IsThereBackgroundWorkToDo() {
+            if (HasPendingChanges()) { return true; }
+
+            var ec = new CancelEventArgs(false);
+            OnExporting(ec);
+            if (ec.Cancel) { return false; }
+
+
 
             foreach (var ThisExport in Export) {
                 if (ThisExport != null) {
                     if (ThisExport.Typ == enExportTyp.EinzelnMitFormular) { return true; }
-                    if (ThisExport.LastExportTime.Subtract(DateTime.Now).TotalDays > 10) { return true; }
+                    if (DateTime.UtcNow.Subtract(ThisExport.LastExportTimeUTC).TotalDays > ThisExport.Intervall) { return true; }
                 }
             }
 
             return false;
         }
 
-        protected override void CancelBackGroundWorker() {
-            if (Backup.IsBusy && !Backup.CancellationPending) { Backup.CancelAsync(); }
-        }
 
-        protected override bool IsBackgroundWorkerBusy() {
-            return Backup.IsBusy;
-        }
-
-        protected override void StartBackgroundWorker() {
-            if (!Backup.IsBusy) { Backup.RunWorkerAsync(); }
-        }
 
         ///// <summary>
         ///// Nach 20 Sekunden wird der trotzdem diese Routine verlassen. Freeze sollte nur en Bruchteil einer Sekunde gesetzt sein.
@@ -2535,6 +2480,7 @@ namespace BlueDatabase {
                 if (DateTime.Now.Subtract(x).TotalSeconds > 20) { return; }
             }
         }
+
 
     }
 }

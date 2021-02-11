@@ -4,6 +4,7 @@ using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
@@ -135,19 +136,8 @@ namespace BlueControls {
 
         }
 
-        protected override void StartBackgroundWorker() {
 
-        }
-
-        protected override bool IsBackgroundWorkerBusy() {
-            return false;
-        }
-
-        protected override void CancelBackGroundWorker() {
-
-        }
-
-        protected override bool IsThereBackgroundWorkToDo(bool mustSave) {
+        protected override bool IsThereBackgroundWorkToDo() {
             return false;
         }
 
@@ -179,5 +169,9 @@ namespace BlueControls {
         private void OnMultipleUserDetected() {
             MultipleUserDetected?.Invoke(this, System.EventArgs.Empty);
         }
+
+        protected override void DoBackGroundWork(BackgroundWorker listenToMyCancel) { }
+
+        protected override void BackgroundWorkerMessage(ProgressChangedEventArgs e) { }
     }
 }

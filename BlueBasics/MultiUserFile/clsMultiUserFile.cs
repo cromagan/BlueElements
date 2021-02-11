@@ -89,8 +89,7 @@ namespace BlueBasics.MultiUserFile {
 
         #region Variablen und Properties
 
-
-
+        private readonly System.ComponentModel.BackgroundWorker Backup;
         private readonly System.ComponentModel.BackgroundWorker PureBinSaver;
         private readonly Timer Checker;
         private FileSystemWatcher Watcher;
@@ -133,6 +132,13 @@ namespace BlueBasics.MultiUserFile {
 
         public bool IsSaving { get; private set; } = false;
 
+
+        /// <summary>
+        /// Ab aktuell die "Save" Routine vom Code aufgerufen wird, und diese auf einen erfolgreichen Speichervorgang abwartet
+        /// </summary>
+        public bool IsInSaveingLoop { get; private set; } = false;
+
+
         private bool _DoingTempFile = false;
 
         public DateTime UserEditedAktionUTC;
@@ -153,6 +159,8 @@ namespace BlueBasics.MultiUserFile {
         public void BlockReload() {
 
             WaitLoaded(false);
+            if (IsInSaveingLoop) { return; } //Ausnahme, bearbeitung sollte eh blockiert sein...
+            if (IsSaving) { return; }
             _BlockReload = DateTime.UtcNow;
         }
 
@@ -185,8 +193,19 @@ namespace BlueBasics.MultiUserFile {
             PureBinSaver = new System.ComponentModel.BackgroundWorker {
                 WorkerReportsProgress = true
             };
-            PureBinSaver.DoWork += new System.ComponentModel.DoWorkEventHandler(PureBinSaver_DoWork);
-            PureBinSaver.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(PureBinSaver_ProgressChanged);
+            PureBinSaver.DoWork += PureBinSaver_DoWork;
+            PureBinSaver.ProgressChanged += PureBinSaver_ProgressChanged;
+
+
+
+            Backup = new System.ComponentModel.BackgroundWorker {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true,
+            };
+            Backup.DoWork += Backup_DoWork;
+            Backup.ProgressChanged += Backup_ProgressChanged;
+
+
 
             Checker = new Timer(Checker_Tick);
 
@@ -205,8 +224,6 @@ namespace BlueBasics.MultiUserFile {
 
         private void PureBinSaver_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             if (e.UserState == null) { return; }
-
-
 
             var Data = (ValueTuple<string, string, string>)e.UserState;
 
@@ -455,6 +472,9 @@ namespace BlueBasics.MultiUserFile {
                 savedDataUncompressed == null || string.IsNullOrEmpty(savedDataUncompressed)) { return Feedback("Keine Daten angekommen."); }
 
             if (!fromParallelProzess && PureBinSaver.IsBusy) { return Feedback("Anderer interner binärer Speichervorgang noch nicht abgeschlossen."); }
+
+            if (fromParallelProzess && IsInSaveingLoop) { return Feedback("Anderer manuell ausgelöster binärer Speichervorgang noch nicht abgeschlossen."); }
+
 
             var f = ErrorReason(enErrorReason.Save);
             if (!string.IsNullOrEmpty(f)) { return Feedback("Fehler: " + f); }
@@ -861,6 +881,8 @@ namespace BlueBasics.MultiUserFile {
 
             if (ReadOnly) { return false; }
 
+            if (IsInSaveingLoop) { return false; }
+
             if (isSomethingDiscOperatingsBlocking()) {
                 if (!mustSave) { RepairOldBlockFiles(); return false; }
                 Develop.DebugPrint(enFehlerArt.Warnung, "Release unmöglich, Dateistatus geblockt");
@@ -880,6 +902,8 @@ namespace BlueBasics.MultiUserFile {
             if (!mustSave && AgeOfBlockDatei() >= 0) { RepairOldBlockFiles(); return false; }
 
             while (HasPendingChanges()) {
+                IsInSaveingLoop = true;
+                CancelBackGroundWorker();
 
                 Load_Reload();
                 var (TMPFileName, FileInfoBeforeSaving, DataUncompressed) = WriteTempFileToDisk(false); // Dateiname, Stand der Originaldatei, was gespeichert wurde
@@ -890,16 +914,19 @@ namespace BlueBasics.MultiUserFile {
                         // Da liegt ein größerer Fehler vor...
                         if (mustSave) { Develop.DebugPrint(enFehlerArt.Warnung, "Datei nicht gespeichert: " + Filename + " " + f); }
                         RepairOldBlockFiles();
+                        IsInSaveingLoop = false;
                         return false;
                     }
 
                     if (!mustSave && DateTime.UtcNow.Subtract(D).TotalSeconds > 5 && AgeOfBlockDatei() < 0) {
                         Develop.DebugPrint(enFehlerArt.Info, "Optionales Speichern nach 5 Sekunden abgebrochen bei " + Filename + " " + f);
+                        IsInSaveingLoop = false;
                         return false;
                     }
                 }
 
             }
+            IsInSaveingLoop = false;
             return true;
         }
 
@@ -1092,9 +1119,10 @@ namespace BlueBasics.MultiUserFile {
 
 
             // Ausstehende Arbeiten ermittelen
+            var _editable = string.IsNullOrEmpty(ErrorReason(enErrorReason.EditNormaly));
             var _MustReload = ReloadNeeded;
-            var _MustSave = !ReadOnly && HasPendingChanges();
-            var _MustBackup = !ReadOnly && IsThereBackgroundWorkToDo(_MustSave);
+            var _MustSave = _editable && HasPendingChanges();
+            var _MustBackup = _editable && IsThereBackgroundWorkToDo();
 
 
             Checker_Tick_count++;
@@ -1118,7 +1146,7 @@ namespace BlueBasics.MultiUserFile {
             if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < Count_UserWork) { return; } // Benutzer arbeiten lassen
             if (Checker_Tick_count > Count_Save && _MustSave) { CancelBackGroundWorker(); }
             if (Checker_Tick_count > _ReloadDelaySecond && _MustReload) { CancelBackGroundWorker(); }
-            if (IsBackgroundWorkerBusy()) { return; }
+            if (Backup.IsBusy) { return; }
 
 
 
@@ -1160,10 +1188,27 @@ namespace BlueBasics.MultiUserFile {
 
         }
 
-        protected abstract void StartBackgroundWorker();
-        protected abstract bool IsBackgroundWorkerBusy();
-        protected abstract void CancelBackGroundWorker();
-        protected abstract bool IsThereBackgroundWorkToDo(bool mustSave);
+        public void CancelBackGroundWorker() {
+            if (Backup.IsBusy && !Backup.CancellationPending) { Backup.CancelAsync(); }
+        }
+
+
+        private void StartBackgroundWorker() {
+            if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.EditNormaly))) { return; }
+            if (!Backup.IsBusy) { Backup.RunWorkerAsync(); }
+        }
+
+        private void Backup_ProgressChanged(object sender, ProgressChangedEventArgs e) {
+            BackgroundWorkerMessage(e);
+        }
+
+        private void Backup_DoWork(object sender, DoWorkEventArgs e) {
+            DoBackGroundWork((BackgroundWorker)sender);
+        }
+
+        protected abstract void DoBackGroundWork(BackgroundWorker listenToMyCancel);
+        protected abstract void BackgroundWorkerMessage(ProgressChangedEventArgs e);
+        protected abstract bool IsThereBackgroundWorkToDo();
 
 
 
@@ -1174,12 +1219,13 @@ namespace BlueBasics.MultiUserFile {
             if (mode == enErrorReason.Load) {
                 if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
 
-                if (DateTime.UtcNow.Subtract(_BlockReload).TotalSeconds < 5) { return "Laden aktuell blockiert."; }
+                var x = DateTime.UtcNow.Subtract(_BlockReload).TotalSeconds;
+                if (x < 5) { return "Laden noch " + (5 - x).ToString() + " Sekunden blockiert."; }
 
                 if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 6) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen 
 
                 if (PureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
-                if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
+                if (Backup.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
                 if (IsParsing) { return "Es werden aktuell Daten geparsed."; }
 
                 var sec = -1d;
@@ -1215,12 +1261,13 @@ namespace BlueBasics.MultiUserFile {
             if (mode.HasFlag(enErrorReason.EditAcut) || mode.HasFlag(enErrorReason.EditGeneral)) {
                 // Wird gespeichert, werden am Ende Penings zu Undos. Diese werden evtl nicht mitgespeichert.
                 if (PureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
+                if (IsInSaveingLoop) { return "Aktuell werden Daten gespeichert."; }
                 if (IsLoading) { return "Aktuell werden Daten geladen."; }
             }
 
             //----------EditGeneral, Save------------------------------------------------------------------------------------------
             if (mode.HasFlag(enErrorReason.EditGeneral) || mode.HasFlag(enErrorReason.Save)) {
-                if (IsBackgroundWorkerBusy()) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
+                if (Backup.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
                 if (ReloadNeeded) { return "Die Datei muss neu eingelesen werden."; }
             }
 

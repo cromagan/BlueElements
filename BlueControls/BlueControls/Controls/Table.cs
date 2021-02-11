@@ -2464,6 +2464,29 @@ namespace BlueControls.Controls {
                 Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
                 switch (e.KeyCode) {
+                    case System.Windows.Forms.Keys.Oemcomma: // normales ,
+                        if (e.Modifiers == System.Windows.Forms.Keys.Control) {
+
+
+                            var lp = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow, enErrorReason.EditGeneral);
+                            Neighbour(_CursorPosColumn, _CursorPosRow, enDirection.Oben, out var _newCol, out var _newRow);
+
+                            if (_newRow== _CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
+
+
+
+                            if (string.IsNullOrEmpty(lp) && _newRow != null) {
+                                UserEdited(this,_newRow.CellGetString(_CursorPosColumn), _CursorPosColumn, _CursorPosRow, true);
+                            }
+                            else {
+                                NotEditableInfo(lp);
+                            }
+
+
+                        }
+
+                            break;
+
                     case System.Windows.Forms.Keys.X:
                         if (e.Modifiers == System.Windows.Forms.Keys.Control) {
                             CopyToClipboard(_CursorPosColumn, _CursorPosRow, true);

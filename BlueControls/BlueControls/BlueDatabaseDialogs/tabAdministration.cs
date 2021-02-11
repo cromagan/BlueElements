@@ -221,7 +221,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         public static void OpenLayoutEditor(Database DB, string AdditionalLayoutPath, string LayoutToOpen) {
             if (!string.IsNullOrEmpty(DB.ErrorReason(enErrorReason.EditNormaly))) { return; }
 
-            DB.AbortBackup();
+            DB.CancelBackGroundWorker();
 
             var w = new LayoutDesigner(DB, AdditionalLayoutPath);
             if (!string.IsNullOrEmpty(LayoutToOpen)) { w.LoadLayout(LayoutToOpen); }
