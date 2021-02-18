@@ -93,8 +93,6 @@
     <Compile Include="HTML.cs" />
     <Compile Include="Interfaces\IReadableText.cs" />
     <Compile Include="Interfaces\IVersionable.cs" />
-    <Compile Include="Interfaces\IReloadable.cs" />
-    <Compile Include="Interfaces\ILastSavedBy.cs" />
     <Compile Include="MultiUserFile\clsMultiUserFile.cs" />
     <Compile Include="Enums\enAlignmentHorizontal.cs" />
     <Compile Include="Enums\enSW.cs" />

@@ -124,30 +124,30 @@ namespace BlueControls.Controls {
 
                 FillPropertyNow();
 
-                if (_propertyObject is IReloadable LS) {
-                    LS.LoadedFromDisk -= OnLoadedFromDisk;
-                }
+                //if (_propertyObject is IReloadable LS) {
+                //    LS.LoadedFromDisk -= OnLoadedFromDisk;
+                //}
 
                 _propertyObject = value;
                 UpdateControlData(false, 1, null, enImageCode.None);
                 CheckEnabledState();
 
 
-                if (_propertyObject is IReloadable LSn) {
-                    LSn.LoadedFromDisk += OnLoadedFromDisk;
-                }
+                //if (_propertyObject is IReloadable LSn) {
+                //    LSn.LoadedFromDisk += OnLoadedFromDisk;
+                //}
 
             }
         }
 
-        private void OnLoadedFromDisk(object sender, System.EventArgs e) {
-            FillPropertyNow();
-            _propertyObject = null;  //Das Objekt ist tot und irgendwo im Nirvana verschwunden
-            UpdateControlData(false, 1, null, enImageCode.None);
-            CheckEnabledState();
+        //private void OnLoadedFromDisk(object sender, System.EventArgs e) {
+        //    FillPropertyNow();
+        //    _propertyObject = null;  //Das Objekt ist tot und irgendwo im Nirvana verschwunden
+        //    UpdateControlData(false, 1, null, enImageCode.None);
+        //    CheckEnabledState();
 
-            LoadedFromDisk?.Invoke(this, System.EventArgs.Empty);
-        }
+        //    LoadedFromDisk?.Invoke(this, System.EventArgs.Empty);
+        //}
 
 
 
@@ -585,7 +585,7 @@ namespace BlueControls.Controls {
 
         protected override void Dispose(bool disposing) {
             _IdleTimer.Tick -= Checker_Tick;
-            if (_propertyObject is IReloadable LS) { LS.LoadedFromDisk -= OnLoadedFromDisk; }
+            //if (_propertyObject is IReloadable LS) { LS.LoadedFromDisk -= OnLoadedFromDisk; }
 
             base.Dispose(disposing);
         }

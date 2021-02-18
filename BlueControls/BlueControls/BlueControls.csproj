@@ -110,7 +110,6 @@
       <DependentUpon>Filterleiste.cs</DependentUpon>
     </Compile>
     <Compile Include="BlueFont.cs" />
-    <Compile Include="clsSerializeableMultiUserFile.cs" />
     <Compile Include="Controls\EasyPicMulti.cs">
       <SubType>Component</SubType>
     </Compile>
