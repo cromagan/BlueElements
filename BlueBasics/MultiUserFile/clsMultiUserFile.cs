@@ -109,9 +109,7 @@ namespace BlueBasics.MultiUserFile {
 
         public bool ReadOnly { get; private set; }
 
-        public bool EasyMode { get; private set; }
-
-        /// <summary>
+          /// <summary>
         /// Load oder SaveAsAndChangeTo benutzen
         /// </summary>
         public string Filename { get; private set; }
@@ -182,7 +180,7 @@ namespace BlueBasics.MultiUserFile {
 
 
 
-        protected clsMultiUserFile(bool readOnly, bool easyMode, bool zipped) {
+        protected clsMultiUserFile(bool readOnly, bool zipped) {
 
             _zipped = zipped;
 
@@ -215,7 +213,6 @@ namespace BlueBasics.MultiUserFile {
             _LastSaveCode = string.Empty;
             _dataOnDisk = string.Empty;
             ReadOnly = readOnly;
-            EasyMode = easyMode;
             AutoDeleteBAK = false;
             UserEditedAktionUTC = new DateTime(1900, 1, 1);
 
@@ -260,9 +257,9 @@ namespace BlueBasics.MultiUserFile {
         /// Hier wird auch nochmal geprüft, ob ein Laden überhaupt möglich ist.
         /// Es kann auch NULL zurück gegeben werden, wenn es ein Reload ist und die Daten inzwischen aktuell sind.
         /// </summary>
-        /// <param name="OnlyReload"></param>
+        /// <param name="onlyReload"></param>
         /// <returns></returns>
-        private (List<byte> data, string fileinfo) LoadBytesFromDisk(bool OnlyReload) {
+        private (List<byte> data, string fileinfo) LoadBytesFromDisk(bool onlyReload, enErrorReason checkmode) {
             var tmpLastSaveCode2 = string.Empty;
 
             var StartTime = DateTime.UtcNow;
@@ -270,9 +267,9 @@ namespace BlueBasics.MultiUserFile {
             do {
                 try {
 
-                    if (OnlyReload && !ReloadNeeded) { return (null, string.Empty); } // Problem hat sich aufgelöst
+                    if (onlyReload && !ReloadNeeded) { return (null, string.Empty); } // Problem hat sich aufgelöst
 
-                    var f = ErrorReason(enErrorReason.Load);
+                    var f = ErrorReason(checkmode);
 
                     if (string.IsNullOrEmpty(f)) {
                         var tmpLastSaveCode1 = GetFileInfo(true);
@@ -383,7 +380,7 @@ namespace BlueBasics.MultiUserFile {
 
             if (OnlyReload && ReadOnly && ec.TryCancel) { IsLoading = false; return; }
 
-            var (_BLoaded, tmpLastSaveCode) = LoadBytesFromDisk(OnlyReload);
+            var (_BLoaded, tmpLastSaveCode) = LoadBytesFromDisk(OnlyReload, enErrorReason.Load);
             if (_BLoaded == null) { IsLoading = false; return; }
 
 
@@ -486,29 +483,29 @@ namespace BlueBasics.MultiUserFile {
 
             IsSaving = true;
 
-            if (!EasyMode) {
-                var erfolg = CreateBlockDatei();
-                if (!erfolg) {
-                    IsSaving = false;
-                    return Feedback("Blockdatei konnte nicht erzeugt werden.");
-                }
 
-
-                // Blockdatei da, wir sind save. Andere Computer lassen die Datei ab jetzt in Ruhe!
-
-                if (GetFileInfo(true) != fileInfoBeforeSaving) {
-                    DeleteBlockDatei(false, true);
-                    IsSaving = false;
-                    return Feedback("Datei wurde inzwischen verändert.");
-                }
-
-
-                if (savedDataUncompressed != ToString()) {
-                    DeleteBlockDatei(false, true);
-                    IsSaving = false;
-                    return Feedback("Daten wurden inzwischen verändert.");
-                }
+            var erfolg = CreateBlockDatei();
+            if (!erfolg) {
+                IsSaving = false;
+                return Feedback("Blockdatei konnte nicht erzeugt werden.");
             }
+
+
+            // Blockdatei da, wir sind save. Andere Computer lassen die Datei ab jetzt in Ruhe!
+
+            if (GetFileInfo(true) != fileInfoBeforeSaving) {
+                DeleteBlockDatei(false, true);
+                IsSaving = false;
+                return Feedback("Datei wurde inzwischen verändert.");
+            }
+
+
+            if (savedDataUncompressed != ToString()) {
+                DeleteBlockDatei(false, true);
+                IsSaving = false;
+                return Feedback("Daten wurden inzwischen verändert.");
+            }
+
 
             //OK, nun gehts rund: Zuerst das Backup löschen
             if (FileExists(Backupdateiname())) { DeleteFile(Backupdateiname(), true); }
@@ -522,11 +519,11 @@ namespace BlueBasics.MultiUserFile {
             // ---- Steuerelemente Sagen, was gespeichert wurde
             _dataOnDisk = savedDataUncompressed;
 
-            if (!EasyMode) {
-                // Und nun den Block entfernen
-                CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
-                DeleteBlockDatei(false, true);
-            }
+
+            // Und nun den Block entfernen
+            CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
+            DeleteBlockDatei(false, true);
+
 
 
             // Evtl. das BAK löschen
@@ -535,26 +532,22 @@ namespace BlueBasics.MultiUserFile {
             }
 
 
-            if (!EasyMode) {
-                // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
-                var (data, fileinfo) = LoadBytesFromDisk(false);
-                if (savedDataUncompressed != data.ToArray().ToStringConvert()) {
-                    // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichter und ungeladen.
-                    _CheckedAndReloadNeed = true;
-                    _LastSaveCode = "Fehler";
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!! " + Filename);
-                    IsSaving = false;
-                    return Feedback("Speichervorgang fehlgeschlagen.");
-                }
-                else {
-                    _CheckedAndReloadNeed = false;
-                    _LastSaveCode = fileinfo;
-                }
+
+            // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
+            var (data, fileinfo) = LoadBytesFromDisk(false, enErrorReason.LoadForCheckingOnly);
+            if (savedDataUncompressed != data.ToArray().ToStringConvert()) {
+                // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichter und ungeladen.
+                _CheckedAndReloadNeed = true;
+                _LastSaveCode = "Fehler";
+                Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!! " + Filename);
+                IsSaving = false;
+                return Feedback("Speichervorgang fehlgeschlagen.");
             }
             else {
                 _CheckedAndReloadNeed = false;
-                _LastSaveCode = GetFileInfo(true);
+                _LastSaveCode = fileinfo;
             }
+
 
             DoWorkAfterSaving();
 
@@ -649,13 +642,8 @@ namespace BlueBasics.MultiUserFile {
             return BlockDateiCheck();
         }
 
-        /// <summary>
-        /// EasyMode gibt immer false zurück
-        /// </summary>
-        /// <returns></returns>
         public bool ReloadNeeded {
             get {
-                if (EasyMode) { return false; }
                 if (string.IsNullOrEmpty(Filename)) { return false; }
 
                 if (_CheckedAndReloadNeed) { return true; }
@@ -1107,9 +1095,6 @@ namespace BlueBasics.MultiUserFile {
         private int Checker_Tick_count = -5;
 
         private void Checker_Tick(object state) {
-            //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
-
-            if (EasyMode && ReadOnly) { return; }
 
             if (DateTime.UtcNow.Subtract(_BlockReload).TotalSeconds < 5) { return; }
 
@@ -1216,9 +1201,15 @@ namespace BlueBasics.MultiUserFile {
             if (mode == enErrorReason.OnlyRead) { return string.Empty; }
 
             //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
-            if (mode == enErrorReason.Load) {
-                if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
 
+            if (mode == enErrorReason.Load || mode == enErrorReason.LoadForCheckingOnly) {
+                if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
+                var sec = AgeOfBlockDatei();
+                if (sec >= 0 && sec < 10) { return "Ein anderer Computer speichert gerade Daten ab."; }
+            }
+
+
+            if (mode == enErrorReason.Load) {
                 var x = DateTime.UtcNow.Subtract(_BlockReload).TotalSeconds;
                 if (x < 5) { return "Laden noch " + (5 - x).ToString() + " Sekunden blockiert."; }
 
@@ -1228,9 +1219,6 @@ namespace BlueBasics.MultiUserFile {
                 if (Backup.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
                 if (IsParsing) { return "Es werden aktuell Daten geparsed."; }
 
-                var sec = -1d;
-                if (!EasyMode) { sec = AgeOfBlockDatei(); }
-                if (sec >= 0 && sec < 10) { return "Ein anderer Computer speichert gerade Daten ab."; }
                 if (isSomethingDiscOperatingsBlocking()) { return "Reload unmöglich, vererbte Klasse gab Fehler zurück"; }
                 return string.Empty;
             }

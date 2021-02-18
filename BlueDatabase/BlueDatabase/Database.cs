@@ -250,7 +250,7 @@ namespace BlueDatabase {
         public Database(string filename, bool readOnly, bool create) : this(null, filename, readOnly, create) { }
 
 
-        private Database(Stream stream, string filename, bool readOnly, bool create) : base(readOnly, false, true) {
+        private Database(Stream stream, string filename, bool readOnly, bool create) : base(readOnly, true) {
 
 
 

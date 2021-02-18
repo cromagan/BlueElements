@@ -26,7 +26,7 @@ namespace BlueControls {
         public event EventHandler MultipleUserDetected;
 
 
-        public clsSerializeableMultiUserFile(string fileName, bool createWhenNotExisting, bool readOnly, bool easymode) : base(readOnly, easymode, false) {
+        public clsSerializeableMultiUserFile(string fileName, bool createWhenNotExisting, bool readOnly) : base(readOnly, false) {
             obj = (T)Activator.CreateInstance(typeof(T));
             Load(fileName, createWhenNotExisting);
         }

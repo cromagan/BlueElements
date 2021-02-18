@@ -26,7 +26,6 @@ namespace BlueBasics.Enums
         /// </summary>
         OnlyRead = 1,
 
-
         ///// <summary>
         ///// Ob das Feld im allgemeinen bearbeitet werden kann, wenn keine Prozesse dazwischenpfuschen
         ///// </summary>
@@ -45,7 +44,15 @@ namespace BlueBasics.Enums
 
         Save = 16,
 
-        Load = 32
+        /// <summary>
+        ///  Wenn die Daten von der Festplatte geladen und auch weiterverarbeitet werdern sollen
+        /// </summary>
+        Load = 32,
+
+        /// <summary>
+        /// Wenn die Daten von der Festplatte geladen - aber wieder verworfen werdern. Nur für Kontrollzwecke benutzen!
+        /// </summary>
+        LoadForCheckingOnly = 64
 
 
     }
