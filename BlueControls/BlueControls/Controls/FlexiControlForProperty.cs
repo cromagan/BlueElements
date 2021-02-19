@@ -3,6 +3,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.ItemCollection;
+using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
@@ -31,10 +32,10 @@ namespace BlueControls.Controls {
         private bool _enabled = true;
 
 
-        /// <summary>
-        /// Die Hauptklasse wird zwar beibehalten, aber Unterklassen müssen evtl. neu definiert werden.
-        /// </summary>
-        public event System.EventHandler LoadedFromDisk;
+        ///// <summary>
+        ///// Die Hauptklasse wird zwar beibehalten, aber Unterklassen müssen evtl. neu definiert werden.
+        ///// </summary>
+        //public event System.EventHandler LoadedFromDisk;
 
         #region Constructor
 
@@ -466,20 +467,10 @@ namespace BlueControls.Controls {
                 if (ca != null) {
 
                     foreach (var thisas in ca) {
-
-                        if (thisas is PropertyAttributes pa) {
-                            QuickInfo = pa.Description;
-                            _FehlerWennLeer = pa.FehlerWennLeer;
-                            _alwaysDiabled = !pa.BenutzerEditierbar;
-                            done = true;
-                        }
-                        else if (thisas is DescriptionAttribute da) {
+                        if (thisas is DescriptionAttribute da) {
                             QuickInfo = da.Description;
                             done = true;
                         }
-
-
-
                     }
                 }
 
@@ -501,24 +492,18 @@ namespace BlueControls.Controls {
             if (_in == null || _in.IsDisposed) { return; }
 
             foreach (var thisc in _in.Controls) {
-
-                //if (thisc is GroupBox gr)
-                //{
-                //    if (rekursiv) { SetAllFlexControls(gr, _to, rekursiv); }
-                //}
-                //if (thisc is TabControl tb)
-                //{
-                //    if (rekursiv) { SetAllFlexControls(tb, _to, rekursiv); }
-                //}
-                //if (thisc is TabPage tabp)
-                //{
-                //    if (rekursiv) { SetAllFlexControls(tabp, _to, rekursiv); }
-                //}
                 if (thisc is FlexiControlForProperty flx) {
                     flx.PropertyObject = _to;
                 }
-            }
 
+                if (thisc is FlexiControlForCell flxc && _to is DataHolder dh) {
+
+                    dh.Column(flxc.ColumnName, "Incorrecte Zuordnung: " + flxc.ColumnName); 
+
+                    flxc.Database = dh.InternalDatabase;
+                    flxc.RowKey = dh.Row().Key;
+                }
+            }
         }
 
 

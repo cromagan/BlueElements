@@ -64,6 +64,7 @@ namespace BlueControls.Controls {
         private int _ColKey = -1;
         private int _RowKey = -1;
         private Database _Database = null;
+        private string _ColumnName = string.Empty;
 
 
         private ColumnItem _tmpColumn = null;
@@ -71,6 +72,25 @@ namespace BlueControls.Controls {
 
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+
+        [Description("Dieses Feld kann für den Forms-Editor verwendet werden. Falls ein Key und ein Name befüllt sind, ist der Name führend.")]
+        [DefaultValue("")]
+        public string ColumnName {
+            get { return _ColumnName; }
+            set {
+                if (_ColumnName == value) { return; }
+
+                _ColumnName = value;
+                GetTmpVariables();
+                UpdateColumnData();
+                SetValueFromCell();
+            }
+        }
+
+
+
+
+
 
         public int RowKey {
             get {
@@ -87,10 +107,12 @@ namespace BlueControls.Controls {
             }
         }
 
+
+        [Description("Falls ein Key und ein Name befüllt sind, ist der Name führend.")]
         public int ColumnKey {
-            get {
-                return _ColKey;
-            }
+            //get {
+            //    return _ColKey;
+            //}
             set {
                 if (value == _ColKey) { return; }
                 FillCellNow();
@@ -167,9 +189,15 @@ namespace BlueControls.Controls {
         private void GetTmpVariables() {
 
             if (_Database != null) {
-                _tmpColumn = _Database.Column.SearchByKey(_ColKey);
+                if (!string.IsNullOrEmpty(_ColumnName)) {
+                    _tmpColumn = _Database.Column[DataHolder.ColumnName(_ColumnName)];
+                }
+                else {
+                    _tmpColumn = _Database.Column.SearchByKey(_ColKey);
+                }
                 _tmpRow = _Database.Row.SearchByKey(_RowKey);
-            } else {
+            }
+            else {
                 _tmpColumn = null;
                 _tmpRow = null;
             }
@@ -180,11 +208,21 @@ namespace BlueControls.Controls {
 
         private void UpdateColumnData() {
             if (_tmpColumn == null) {
-                Caption = string.Empty;
-                EditType = enEditTypeFormula.None;
-                QuickInfo = string.Empty;
-                FileEncryptionKey = string.Empty;
-            } else {
+
+                if (!string.IsNullOrEmpty(_ColumnName)) {
+                    Caption = _ColumnName + ":";
+                    //EditType = enEditTypeFormula.None;
+                    //QuickInfo = string.Empty;
+                    //FileEncryptionKey = string.Empty;
+                }
+                else {
+                    Caption = string.Empty;
+                    EditType = enEditTypeFormula.None;
+                    QuickInfo = string.Empty;
+                    FileEncryptionKey = string.Empty;
+                }
+            }
+            else {
                 Caption = _tmpColumn.ReadableText() + ":";
                 EditType = _tmpColumn.EditType;
                 QuickInfo = _tmpColumn.QuickInfoText(string.Empty);
@@ -243,7 +281,8 @@ namespace BlueControls.Controls {
                         var tmpF = _tmpColumn.BestFile(file, false);
                         if (FileExists(tmpF)) {
                             tmp2.Add(tmpF);
-                        } else {
+                        }
+                        else {
                             tmp2.Add(file);
                         }
                     }
@@ -304,7 +343,7 @@ namespace BlueControls.Controls {
             if (_tmpColumn == null || _tmpRow == null) { return; }
 
             var OldVal = _tmpRow.CellGetString(_tmpColumn);
-            var NewValue = string.Empty;
+            string NewValue;
 
             switch (_tmpColumn.Format) {
                 case enDataFormat.Link_To_Filesystem:
@@ -320,12 +359,9 @@ namespace BlueControls.Controls {
                 default:
                     NewValue = Value;
                     break;
-
-
             }
 
             if (OldVal == NewValue) { return; }
-
 
             _tmpRow.Database.WaitEditable();
 
@@ -337,7 +373,6 @@ namespace BlueControls.Controls {
         private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) {
             e.File = _Database;
         }
-
 
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
             base.OnControlAdded(e);
@@ -380,7 +415,8 @@ namespace BlueControls.Controls {
 
                     if (column1.TextBearbeitungErlaubt) {
                         StyleComboBox(comboBox, Item2, System.Windows.Forms.ComboBoxStyle.DropDown);
-                    } else {
+                    }
+                    else {
                         StyleComboBox(comboBox, Item2, System.Windows.Forms.ComboBoxStyle.DropDownList);
                     }
 
@@ -522,7 +558,8 @@ namespace BlueControls.Controls {
 
                             if (fil2.FilePath().ToUpper() != Control.SorceName.FilePath().ToUpper()) {
                                 Control.Bitmap.Save(fil2, ImageFormat.Png);
-                            } else {
+                            }
+                            else {
                                 fil2 = Control.SorceName;
                             }
                             Control.ChangeSource(fil2, enSorceType.LoadedFromDisk, false);
@@ -737,7 +774,8 @@ namespace BlueControls.Controls {
 
                             if (ThisWord == myname) {
                                 Marker.ReportProgress(0, new List<object> { TXB, "Mark1", fo, fo + ThisWord.Length - 1 });
-                            } else {
+                            }
+                            else {
                                 Marker.ReportProgress(0, new List<object> { TXB, "Mark2", fo, fo + ThisWord.Length - 1 });
                             }
                             cap = fo + ThisWord.Length;
@@ -746,7 +784,8 @@ namespace BlueControls.Controls {
                     }
 
 
-                } catch {
+                }
+                catch {
                     Ok = false;
                 }
 
@@ -856,7 +895,7 @@ namespace BlueControls.Controls {
 
             switch (e.ClickedComand.ToLower()) {
                 case "spalteneigenschaftenbearbeiten":
-                        tabAdministration.OpenColumnEditor(_tmpColumn, null);
+                    tabAdministration.OpenColumnEditor(_tmpColumn, null);
                     return true;
 
                 case "vorherigeninhaltwiederherstellen":

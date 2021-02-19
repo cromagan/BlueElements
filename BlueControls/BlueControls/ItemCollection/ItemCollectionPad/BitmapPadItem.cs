@@ -27,6 +27,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -47,7 +48,7 @@ namespace BlueControls.ItemCollection
         public List<QuickImage> Overlays;
         public enSizeModes Bild_Modus { get; set; }
 
-        [PropertyAttributes("Hier kann ein Platzhalter, der mit dem Code-Generator erzeugt wurde, eingefügt werden.", true, false)]
+        [Description("Hier kann ein Platzhalter, der mit dem Code-Generator erzeugt wurde, eingefügt werden.")]
         public string Platzhalter_für_Layout { get; set; }
         #endregion
 

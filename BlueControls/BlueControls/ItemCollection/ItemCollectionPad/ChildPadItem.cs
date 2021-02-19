@@ -26,6 +26,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
@@ -66,7 +67,7 @@ namespace BlueControls.ItemCollection {
         public enAlignment Textlage { get; set; } = (enAlignment)(-1);
         public Color Randfarbe { get; set; } = Color.Transparent;
 
-        [PropertyAttributes("Soll eine Umrandung einer anderen Ansicht hier angezeigt werden,<br>muss dessen Name hier eingegeben werden.", true, false)]
+        [Description("Soll eine Umrandung einer anderen Ansicht hier angezeigt werden,<br>muss dessen Name hier eingegeben werden.")]
         public List<string> Eingebettete_Ansichten { get; set; } = new List<string>();
 
 
@@ -78,7 +79,7 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        [PropertyAttributes("Name und gleichzeitig eventuelle Beschriftung dieser Ansicht.", true,  false)]
+        [Description("Name und gleichzeitig eventuelle Beschriftung dieser Ansicht.")]
         public string Name {
             get {
                 return _Name;

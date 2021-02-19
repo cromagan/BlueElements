@@ -24,6 +24,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
@@ -245,10 +246,10 @@ namespace BlueControls.ItemCollection {
         /// <summary>
         /// Wird ein Element gelöscht, das diese Feld befüllt hat, werden automatisch alle andern Elemente mit der selben Gruppe gelöscht.
         /// </summary>
-        [PropertyAttributes("Alle Elemente, die der selben Gruppe angehören, werden beim Löschen eines Elements ebenfalls gelöscht.", true, false)]
+        [Description("Alle Elemente, die der selben Gruppe angehören, werden beim Löschen eines Elements ebenfalls gelöscht.")]
         public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
-        [PropertyAttributes("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.", true, false)]
+        [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
         public bool Bei_Export_sichtbar {
             get {
                 return _Bei_Export_sichtbar;

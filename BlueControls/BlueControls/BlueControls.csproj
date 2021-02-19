@@ -261,7 +261,6 @@
     <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\clsKraft.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\strPolygonCollisionResult.cs" />
-    <Compile Include="PropertyAttributes.cs" />
     <Compile Include="Controls\RibbonBar.cs">
       <SubType>Component</SubType>
     </Compile>

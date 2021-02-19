@@ -27,6 +27,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Text.RegularExpressions;
 
@@ -34,7 +35,7 @@ namespace BlueControls.ItemCollection {
     public class TextPadItem : FormPadItemRectangle, ICanHaveColumnVariables {
         #region  Variablen-Deklarationen 
 
-        [PropertyAttributes("Text der angezeigt werden soll.<br>Kann Variablen aus dem Code-Generator enthalten.", true, true)]
+        [Description("Text der angezeigt werden soll.<br>Kann Variablen aus dem Code-Generator enthalten.")]
         public string Interner_Text {
             get {
                 return _VariableText;
