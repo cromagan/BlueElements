@@ -20,6 +20,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -39,10 +40,23 @@ namespace BlueDatabase {
         public abstract string MyDefaultFileName();
         public abstract string MyDefaultSubTyp();
 
+        public abstract bool UseExtraFile();
 
-        //public DataHolder() {
-        //    Develop.DebugPrint_NichtImplementiert();
+        //private List<(ColumnItem, ListExt<object>)> syncs = new List<(ColumnItem, ListExt<object>)>();
+
+
+
+        //public void Sync<t>(string columnname, ListExt<object> data) {
+        //    var c = Column(columnname, string.Empty);
+
+        //    syncs.Add((c, data));
+
+        //    data.Changed += Data_Changed;
+
         //}
+
+
+
 
 
         /// <summary>
@@ -51,6 +65,11 @@ namespace BlueDatabase {
         /// <param name="parent"></param>
         /// <param name="id"></param>
         public DataHolder(DataHolder parent, string id) {
+
+            if (UseExtraFile()) {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Routine!");
+            }
+
             InternalDatabase = parent.InternalDatabase;
             Typ = parent.Row().CellFirstString() + "/" + MyDefaultSubTyp();
             ID = id;
@@ -61,6 +80,10 @@ namespace BlueDatabase {
         /// </summary>
         /// <param name="id"></param>
         public DataHolder(string id) {
+
+            if (!UseExtraFile()) {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Routine!");
+            }
 
             ID = id;
             Typ = "MAIN";
@@ -73,29 +96,53 @@ namespace BlueDatabase {
 
             if (InternalDatabase == null) {
                 InternalDatabase = new Database(filename, false, true);
-                InternalDatabase.Column.Add("ID", "ID", enDataFormat.Text);
-                InternalDatabase.RepairAfterParse();
-                InternalDatabase.UndoCount = 10;
-                InternalDatabase.Column.SysCorrect.SaveContent = false;
-                InternalDatabase.Column.SysLocked.SaveContent = false;
-                InternalDatabase.Column.SysRowChangeDate.SaveContent = false;
-                InternalDatabase.Column.SysRowCreateDate.SaveContent = false;
-                InternalDatabase.Column.SysRowCreator.SaveContent = false;
-                InternalDatabase.Column.SysCorrect.ShowUndo = false;
-                InternalDatabase.Column.SysLocked.ShowUndo = false;
-                InternalDatabase.Column.SysRowChangeDate.ShowUndo = false;
-                InternalDatabase.Column.SysRowCreateDate.ShowUndo = false;
-                InternalDatabase.Column.SysRowCreator.ShowUndo = false;
+
+                if (InternalDatabase.Column.Exists("ID")== null) {
+
+
+                    InternalDatabase.Column.Add("ID", "ID", enDataFormat.Text);
+                    InternalDatabase.RepairAfterParse();
+                    InternalDatabase.UndoCount = 10;
+                    InternalDatabase.Column.SysCorrect.SaveContent = false;
+                    InternalDatabase.Column.SysLocked.SaveContent = false;
+                    InternalDatabase.Column.SysRowChangeDate.SaveContent = false;
+                    InternalDatabase.Column.SysRowCreateDate.SaveContent = false;
+                    InternalDatabase.Column.SysRowCreator.SaveContent = false;
+                    InternalDatabase.Column.SysCorrect.ShowUndo = false;
+                    InternalDatabase.Column.SysLocked.ShowUndo = false;
+                    InternalDatabase.Column.SysRowChangeDate.ShowUndo = false;
+                    InternalDatabase.Column.SysRowCreateDate.ShowUndo = false;
+                    InternalDatabase.Column.SysRowCreator.ShowUndo = false;
+
+                    InternalDatabase.ColumnArrangements[1].ShowAllColumns(InternalDatabase);
+                    InternalDatabase.ColumnArrangements[1].HideSystemColumns();
+                    //InternalDatabase.ColumnArrangements[1].Remove(t.ColumnArrangements[1][t.Column["dummy"]]);
+                    //InternalDatabase.ColumnArrangements[1].Remove(t.ColumnArrangements[1][t.Column["GebindeMatNr"]]);
+                    //InternalDatabase.ColumnArrangements[1].Remove(t.ColumnArrangements[1][t.Column["BehaelterMatNr"]]);
+
+                    //t.ZeilenQuickInfo = "<b><u>Gebinde &Nummer; in Beleg &Beleg;</b></u><br>" +
+                    //                    "<b>Nummer: </b> &GebindeMatNr; <br> " +
+                    //                    "<b>Art: </b> &Art; &Formation; (&Laenge; x &Breite; mm) H= &Hoehe; mm<br><br>" +
+                    //                    "<b><u>Zugehöriger Behälter:</b></u><br>" +
+                    //                    "<b>Nummer: </b> &BehaelterMatNr; <br> " +
+                    //                    "<b>Volumen: </b> &Volumen;";
+
+                    InternalDatabase.SortDefinition = new RowSortDefinition(InternalDatabase, new List<string>() { "ID" }, false);
+
+                }
+
             }
 
-
+            InternalDatabase.AutoDeleteBAK = true;
         }
+
 
         public static string ColumnName(string originalName) {
 
-            originalName = originalName.ToUpper().StarkeVereinfachung(" _\\*/");
+            originalName = originalName.ToUpper().StarkeVereinfachung(" -_\\*/");
 
             originalName = originalName.Replace(" ", "_");
+            originalName = originalName.Replace("-", "_");
             originalName = originalName.Replace("\\", "_");
             originalName = originalName.Replace("/", "_");
             originalName = originalName.Replace("__", "_");
@@ -119,6 +166,8 @@ namespace BlueDatabase {
                 c.Caption = dataName;
                 c.Format = enDataFormat.Text;
                 c.MultiLine = true;
+                c.TextBearbeitungErlaubt = true;
+                c.PermissionGroups_ChangeCell.Add("#Everybody");
                 c.Ueberschrift1 = Typ;
 
                 c.Quickinfo = message;
@@ -126,6 +175,10 @@ namespace BlueDatabase {
                     c.Caption = "!!!" + c.Caption;
                     Develop.DebugPrint(enFehlerArt.Warnung, "Erzeugungsfehler: " + message);
                 }
+
+                InternalDatabase.ColumnArrangements[1].ShowAllColumns(InternalDatabase);
+                InternalDatabase.ColumnArrangements[1].HideSystemColumns();
+
 
             }
 
@@ -164,73 +217,127 @@ namespace BlueDatabase {
         }
 
 
-        public void SetSynchronizedFiles<t>(string dataName, List<string> value, List<t> synchronData) where t : DataHolder {
-            Row().CellSet(Column(dataName, string.Empty), value);
+        //public void SetSynchronizedFiles<t>(string dataName, List<string> value, List<t> synchronData) where t : DataHolder {
+        //    Row().CellSet(Column(dataName, string.Empty), value);
 
-            var oldl = new List<t>();
-            oldl.AddRange(synchronData);
-            synchronData.Clear();
+        //    var oldl = new List<t>();
+        //    oldl.AddRange(synchronData);
+        //    synchronData.Clear();
 
-            foreach (var thisID in value) {
-                var v = oldl.GetByID(thisID);
+        //    foreach (var thisID in value) {
+        //        var v = oldl.GetByID(thisID);
 
-                if (v == null) {
-                    //var obj = new object[2];
-                    //obj[0] = filename + thisc + ".mdd";
-                    //obj[1] = dataName + "-Data";
+        //        if (v == null) {
+        //            //var obj = new object[2];
+        //            //obj[0] = filename + thisc + ".mdd";
+        //            //obj[1] = dataName + "-Data";
 
-                    // (string filename, string id) {
-                    v = (t)System.Activator.CreateInstance(typeof(t), thisID);
+        //            // (string filename, string id) {
+        //            v = (t)System.Activator.CreateInstance(typeof(t), thisID);
+        //        }
+        //        synchronData.Add(v);
+
+        //    }
+        //}
+
+
+
+
+        public void Register<t>(out ListExt<t> data, bool separateFiles) where t : DataHolder {
+
+            data = new ListExt<t>();
+
+            var name = data.GetType().ToString();
+
+            var IDS = GetList(name);
+
+            foreach (var thisID in IDS) {
+                if (!separateFiles) {
+
+                    var v = (t)System.Activator.CreateInstance(typeof(t), this, thisID.ToUpper());
+                    data.Add(v);
                 }
-                synchronData.Add(v);
+                else {
+                    var v = (t)System.Activator.CreateInstance(typeof(t), thisID.ToUpper());
+                    data.Add(v);
+                }
 
             }
+
+            data.Changed += Data_Changed;
+
         }
 
-        /// <summary>
-        /// Setz die Synchronen Daten in dieser Datei mit ab
-        /// </summary>
-        /// <typeparam name="t"></typeparam>
-        /// <param name="dataName"></param>
-        /// <param name="value"></param>
-        /// <param name="synchronData"></param>
-        public void SetSynchronized<t>(string dataName, List<string> value, List<t> synchronData) where t : DataHolder {
+        private void Data_Changed(object sender, System.EventArgs e) {
 
-            var oldSync = new List<t>();
-            oldSync.AddRange(synchronData);
+            var IDS = new List<string>();
+            if (sender is IEnumerable enumerable) {
 
-            #region Alte Werte aus der Datenbank löschen
-            var oldval = GetList(dataName);
-            oldval.RemoveRange(value);
-
-            foreach (var toremove in oldval) {
-                var rem = oldSync.GetByID(toremove);
-                var r = rem.Row(); //ja, ein bisschen blöd, evtl. wir die Zeile ersr hiermit erzeugt
-                InternalDatabase.Row.Remove(r);
-            }
-
-            #endregion
-
-            Row().CellSet(Column(dataName, string.Empty), value);
-
-            #region die Daten Synchron halten
-            synchronData.Clear();
-
-            foreach (var thisID in value) {
-                var v = oldSync.GetByID(thisID);
-
-                if (v == null) {
-                    //var obj = new object[2];
-                    //obj[0] = this;
-                    //obj[1] = dataName + "-Data";
-                    //obj[2] = thisc.ToUpper();
-
-                    v = (t)System.Activator.CreateInstance(typeof(t), this, thisID.ToUpper()); ;
+                foreach (var thisd in enumerable) {
+                    if (thisd is DataHolder dh) {
+                        IDS.Add(dh.ID);
+                    }
                 }
-                synchronData.Add(v);
             }
-            #endregion
+            else {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Typ");
+            }
+
+            var name = sender.GetType().ToString();
+            Set(name, IDS);
         }
+
+
+
+
+
+
+
+
+        ///// <summary>
+        ///// Setz die Synchronen Daten in dieser Datei mit ab
+        ///// </summary>
+        ///// <typeparam name="t"></typeparam>
+        ///// <param name="dataName"></param>
+        ///// <param name="value"></param>
+        ///// <param name="synchronData"></param>
+        //public void SetSynchronized<t>(string dataName, List<string> value, List<t> synchronData) where t : DataHolder {
+
+        //    var oldSync = new List<t>();
+        //    oldSync.AddRange(synchronData);
+
+        //    #region Alte Werte aus der Datenbank löschen
+        //    var oldval = GetList(dataName);
+        //    oldval.RemoveRange(value);
+
+        //    foreach (var toremove in oldval) {
+        //        var rem = oldSync.GetByID(toremove);
+        //        var r = rem.Row(); //ja, ein bisschen blöd, evtl. wir die Zeile ersr hiermit erzeugt
+        //        InternalDatabase.Row.Remove(r);
+        //    }
+
+        //    #endregion
+
+        //    Row().CellSet(Column(dataName, string.Empty), value);
+
+        //    #region die Daten Synchron halten
+        //    synchronData.Clear();
+
+        //    foreach (var thisID in value) {
+        //        var v = oldSync.GetByID(thisID);
+
+        //        if (v == null) {
+        //            //var obj = new object[2];
+        //            //obj[0] = this;
+        //            //obj[1] = dataName + "-Data";
+        //            //obj[2] = thisc.ToUpper();
+
+        //            v = (t)System.Activator.CreateInstance(typeof(t), this, thisID.ToUpper()); ;
+        //        }
+        //        synchronData.Add(v);
+        //    }
+        //    #endregion
+        //}
 
 
 

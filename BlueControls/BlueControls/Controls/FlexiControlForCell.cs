@@ -209,24 +209,30 @@ namespace BlueControls.Controls {
         private void UpdateColumnData() {
             if (_tmpColumn == null) {
 
-                if (!string.IsNullOrEmpty(_ColumnName)) {
-                    Caption = _ColumnName + ":";
-                    //EditType = enEditTypeFormula.None;
-                    //QuickInfo = string.Empty;
-                    //FileEncryptionKey = string.Empty;
-                }
-                else {
+                if (string.IsNullOrEmpty(_ColumnName)) {
                     Caption = string.Empty;
                     EditType = enEditTypeFormula.None;
                     QuickInfo = string.Empty;
                     FileEncryptionKey = string.Empty;
                 }
+                else {
+                    Caption = _ColumnName + ":";
+                }
             }
             else {
+
                 Caption = _tmpColumn.ReadableText() + ":";
-                EditType = _tmpColumn.EditType;
-                QuickInfo = _tmpColumn.QuickInfoText(string.Empty);
                 FileEncryptionKey = _Database.FileEncryptionKey;
+
+                if (string.IsNullOrEmpty(_ColumnName)) {
+                    EditType = _tmpColumn.EditType;
+                    QuickInfo = _tmpColumn.QuickInfoText(string.Empty);
+                }
+                else {
+                    _tmpColumn.EditType= EditType;
+                    _tmpColumn.Quickinfo = QuickInfo;
+                }
+
             }
         }
 

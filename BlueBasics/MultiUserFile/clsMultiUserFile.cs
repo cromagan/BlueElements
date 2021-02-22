@@ -48,6 +48,13 @@ namespace BlueBasics.MultiUserFile {
             if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
 
 
+            //Parallel.ForEach(AllFiles, thisFile => {
+            //        thisFile?.Save(mustSave);
+            //});
+
+
+
+
             var x = AllFiles.Count;
 
             foreach (var thisFile in AllFiles) {
@@ -747,7 +754,9 @@ namespace BlueBasics.MultiUserFile {
         }
 
         private void Watcher_Error(object sender, ErrorEventArgs e) {
-            Develop.DebugPrint(enFehlerArt.Warnung, e.ToString());
+            //Develop.DebugPrint(enFehlerArt.Warnung, e.ToString());
+            // Im Verzeichnis wurden zu viele Änderungen gleichzeitig vorgenommen...
+            _CheckedAndReloadNeed = true;
         }
         private void Watcher_Renamed(object sender, RenamedEventArgs e) {
             if (e.FullPath.ToUpper() != Filename.ToUpper()) { return; }

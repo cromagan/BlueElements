@@ -159,6 +159,9 @@ namespace BlueControls.Controls {
         /// DisabledReason befüllen, um das Steuerelement zu disablen
         /// </summary>
         [DefaultValue(true)]
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new bool Enabled {
             get {
                 if (DesignMode) { return false; }
