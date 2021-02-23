@@ -402,7 +402,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                         else {
                             // Na gut, eben neuen Flex erstellen
                             flx = new FlexiControlForFilter(_TableView, FilterItem, this);
-                            flx.ValueChanged += Flx_ValueChanged;
+                            flx.TextChanged += Flx_ValueChanged;
                             flx.ButtonClicked += Flx_ButtonClicked;
                             Controls.Add(flx);
                         }
@@ -464,7 +464,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             #region  Unnötige Flexis löschen
 
             foreach (var thisFlexi in flexsToDelete) {
-                thisFlexi.ValueChanged -= Flx_ValueChanged;
+                thisFlexi.TextChanged -= Flx_ValueChanged;
                 thisFlexi.ButtonClicked -= Flx_ButtonClicked;
                 thisFlexi.Visible = false;
                 //thisFlexi.thisFilter = null;

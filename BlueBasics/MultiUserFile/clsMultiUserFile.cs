@@ -25,6 +25,7 @@ using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Threading;
+using System.Threading.Tasks;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modAllgemein;
 
@@ -48,24 +49,24 @@ namespace BlueBasics.MultiUserFile {
             if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
 
 
-            //Parallel.ForEach(AllFiles, thisFile => {
-            //        thisFile?.Save(mustSave);
-            //});
-
-
-
-
-            var x = AllFiles.Count;
-
-            foreach (var thisFile in AllFiles) {
+            Parallel.ForEach(AllFiles, thisFile => {
                 thisFile?.Save(mustSave);
+            });
 
-                if (x != AllFiles.Count) {
-                    // Die Auflistung wurde verändert! Selten, aber kann passieren!
-                    SaveAll(mustSave);
-                    return;
-                }
-            }
+
+
+
+            //var x = AllFiles.Count;
+
+            //foreach (var thisFile in AllFiles) {
+            //    thisFile?.Save(mustSave);
+
+            //    if (x != AllFiles.Count) {
+            //        // Die Auflistung wurde verändert! Selten, aber kann passieren!
+            //        SaveAll(mustSave);
+            //        return;
+            //    }
+            //}
         }
 
 
@@ -130,7 +131,7 @@ namespace BlueBasics.MultiUserFile {
         public bool IsLoading { get; private set; } = false;
 
         private int _loadingThreadId = -1;
-        private string _loadingInfo = string.Empty;
+        //private string _loadingInfo = string.Empty;
 
 
 
@@ -372,8 +373,8 @@ namespace BlueBasics.MultiUserFile {
             _loadingThreadId = Thread.CurrentThread.ManagedThreadId;
 
 
-            var strace = new System.Diagnostics.StackTrace(true);
-            _loadingInfo = DateTime.Now.ToString(Constants.Format_Date) + " " + _BlockReload.ToString() + " #U " + Thread.CurrentThread.ManagedThreadId + " " + strace.GetFrame(1).GetMethod().ReflectedType.FullName + "/" + strace.GetFrame(1).GetMethod().ToString();
+            //var strace = new System.Diagnostics.StackTrace(true);
+            //_loadingInfo = DateTime.Now.ToString(Constants.Format_Date) + " " + _BlockReload.ToString() + " #U " + Thread.CurrentThread.ManagedThreadId + " " + strace.GetFrame(1).GetMethod().ReflectedType.FullName + "/" + strace.GetFrame(1).GetMethod().ToString();
 
             //Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
             if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded) { IsLoading = false; return; }
@@ -844,7 +845,7 @@ namespace BlueBasics.MultiUserFile {
                     if (!FileExists(Filename)) { return; }
 
                     var x = LoadFromDisk(Blockdateiname());
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Repariere MultiUserFile: " + Filename + " \r\n" + x);
+                    Develop.DebugPrint(enFehlerArt.Info, "Repariere MultiUserFile: " + Filename + " \r\n" + x);
 
                     if (!CreateBlockDatei()) { return; }
 

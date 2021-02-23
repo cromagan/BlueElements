@@ -498,7 +498,7 @@ namespace BlueControls.Controls {
 
                 if (thisc is FlexiControlForCell flxc && _to is DataHolder dh) {
 
-                    dh.Column(flxc.ColumnName, "Incorrecte Zuordnung: " + flxc.ColumnName); 
+                    dh.Column(flxc.ColumnName, "Inkorrecte Zuordnung: " + flxc.ColumnName);
 
                     flxc.Database = dh.InternalDatabase;
                     flxc.RowKey = dh.Row().Key;

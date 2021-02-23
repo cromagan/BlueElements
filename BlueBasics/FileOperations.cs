@@ -111,7 +111,11 @@ namespace BlueBasics {
         private static bool TryDeleteFile(string ThisFile, string WillbeIgnored) {
             // Komisch, manche Dateien können zwar gelöscht werden, die Attribute aber nicht geändert (Berechtigungen?)
             try {
-                File.SetAttributes(ThisFile, FileAttributes.Normal);
+
+                if (File.GetAttributes(ThisFile).HasFlag(FileAttributes.ReadOnly)) {
+                    File.SetAttributes(ThisFile, FileAttributes.Normal);
+                }
+
             }
             catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Info, ex);

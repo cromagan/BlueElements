@@ -163,6 +163,8 @@ namespace BlueControls.Controls {
 
                 }
 
+                SetValueFromCell();
+
                 CheckEnabledState();
             }
         }

@@ -293,6 +293,18 @@ namespace BlueControls.Controls {
 
 
         private void DoDraw(Graphics gr) {
+
+
+            if (IsDisposed) {
+                gr.Clear(Color.Red);
+                return;
+            }
+
+            if (BeginnEditCounter >0) {
+                gr.Clear(Color.Green);
+                return;
+            }
+
             if (Develop.Exited || IsDisposed || !Visible || BeginnEditCounter > 0) { return; }
 
             lock (this) {

@@ -223,9 +223,12 @@ namespace BlueControls.Controls {
             }
         }
 
+        [Obsolete]
+        public new string Text { get; set; }
 
 
         [DefaultValue("")]
+        d
         public string Value {
             get {
                 if (_Value == null) { return string.Empty; }
@@ -772,12 +775,6 @@ namespace BlueControls.Controls {
 
 
         #region  ComboBox 
-
-
-        //private void ComboBoxItemClicked(object sender, BasicListItemEventArgs e)
-        //{
-        //    Value = e.Item.Internal;
-        //}
 
 
         /// <summary>

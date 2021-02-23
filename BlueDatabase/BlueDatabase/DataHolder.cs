@@ -56,7 +56,24 @@ namespace BlueDatabase {
         //}
 
 
+        public void SetData(string feldname, bool editable, string quickinfo) {
+            var c = Column(feldname, string.Empty);
 
+            //c.Caption = dataName;
+            //c.Format = enDataFormat.Text;
+            //c.MultiLine = true;
+            c.TextBearbeitungErlaubt = editable;
+            if (editable) {
+                c.PermissionGroups_ChangeCell.AddIfNotExists("#Everybody");
+            }
+            else {
+                c.PermissionGroups_ChangeCell.Remove("#Everybody");
+            }
+            c.Quickinfo = quickinfo;
+
+
+
+        }
 
 
         /// <summary>
@@ -97,12 +114,12 @@ namespace BlueDatabase {
             if (InternalDatabase == null) {
                 InternalDatabase = new Database(filename, false, true);
 
-                if (InternalDatabase.Column.Exists("ID")== null) {
+                if (InternalDatabase.Column.Exists("ID") == null) {
 
 
                     InternalDatabase.Column.Add("ID", "ID", enDataFormat.Text);
                     InternalDatabase.RepairAfterParse();
-                    InternalDatabase.UndoCount = 10;
+                    InternalDatabase.UndoCount = 50;
                     InternalDatabase.Column.SysCorrect.SaveContent = false;
                     InternalDatabase.Column.SysLocked.SaveContent = false;
                     InternalDatabase.Column.SysRowChangeDate.SaveContent = false;
@@ -133,16 +150,22 @@ namespace BlueDatabase {
 
             }
 
+            InternalDatabase.ReloadDelaySecond = 240;
             InternalDatabase.AutoDeleteBAK = true;
         }
 
+        public void Save(bool mustsave) {
+            InternalDatabase.Save(mustsave);
+        }
 
         public static string ColumnName(string originalName) {
 
-            originalName = originalName.ToUpper().StarkeVereinfachung(" -_\\*/");
+            originalName = originalName.ToUpper().StarkeVereinfachung(" -_\\*/()");
 
             originalName = originalName.Replace(" ", "_");
             originalName = originalName.Replace("-", "_");
+            originalName = originalName.Replace("(", "_");
+            originalName = originalName.Replace(")", "_");
             originalName = originalName.Replace("\\", "_");
             originalName = originalName.Replace("/", "_");
             originalName = originalName.Replace("__", "_");
@@ -170,9 +193,10 @@ namespace BlueDatabase {
                 c.PermissionGroups_ChangeCell.Add("#Everybody");
                 c.Ueberschrift1 = Typ;
 
-                c.Quickinfo = message;
+
                 if (!string.IsNullOrEmpty(message)) {
                     c.Caption = "!!!" + c.Caption;
+                    c.Quickinfo = message;
                     Develop.DebugPrint(enFehlerArt.Warnung, "Erzeugungsfehler: " + message);
                 }
 
