@@ -141,8 +141,8 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public override BasicListItem CloneToNewCollection(ItemCollectionList newParent) {
-            return CloneToNewCollection(newParent, new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey));
+        public override void CloneToNewCollection(ItemCollectionList newParent) {
+            CloneToNewCollection(newParent, new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey));
         }
 
         public override bool FilterMatch(string FilterText) {

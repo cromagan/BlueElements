@@ -82,7 +82,7 @@ namespace BlueControls.Controls {
                 EditType = enEditTypeFormula.None;
                 QuickInfo = string.Empty;
                 FileEncryptionKey = string.Empty;
-                Value = string.Empty;
+                ValueSet(string.Empty,true,false);
             } else {
                 if (string.IsNullOrEmpty(Filter.Herkunft)) {
                     DisabledReason = string.Empty;
@@ -117,7 +117,7 @@ namespace BlueControls.Controls {
                         ShowDelFilterButton = false;
                         Caption = Filter.Column.ReadableText() + ":";
                         EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
-                        Value = Filter.SearchValue[0];
+                        ValueSet(Filter.SearchValue[0], true, false);
                     }
 
 

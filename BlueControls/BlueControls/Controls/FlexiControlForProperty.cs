@@ -1,6 +1,5 @@
 ﻿using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.ItemCollection;
 using BlueDatabase;
@@ -157,7 +156,7 @@ namespace BlueControls.Controls {
 
 
             if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead) {
-                Value = string.Empty;
+                ValueSet(string.Empty, true, false);
                 InfoText = string.Empty;
                 return;
             }
@@ -165,31 +164,31 @@ namespace BlueControls.Controls {
 
             var x = _propInfo.GetValue(_propertyObject, null);
             if (x is null) {
-                Value = string.Empty;
+                ValueSet(string.Empty, true, false);
             }
             else if (x is string s) {
-                Value = s;
+                ValueSet(s, true, false);
             }
             else if (x is List<string> ls) {
-                Value = ls.JoinWithCr();
+                ValueSet(ls.JoinWithCr(), true, false);
             }
             else if (x is bool bo) {
-                Value = bo.ToPlusMinus();
+                ValueSet(bo.ToPlusMinus(), true, false);
             }
             else if (x is int iv) {
-                Value = iv.ToString();
+                ValueSet(iv.ToString(), true, false); 
             }
             else if (x is Enum) {
-                Value = ((int)x).ToString();
+                ValueSet(((int)x).ToString(), true, false);
             }
             else if (x is decimal dc) {
-                Value = dc.ToString(Constants.Format_Float2);
+                ValueSet(dc.ToString(Constants.Format_Float2), true, false);
             }
             else if (x is double db) {
-                Value = db.ToString(Constants.Format_Float2);
+                ValueSet(db.ToString(Constants.Format_Float2), true, false);
             }
             else if (x is Color co) {
-                Value = co.ToHTMLCode();
+                ValueSet(co.ToHTMLCode(), true, false);
             }
             else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");

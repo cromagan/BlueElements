@@ -197,6 +197,15 @@ namespace BlueControls.Controls {
         protected virtual void OnQuickInfoChanged() {
             // Dummy, dass die angeleeiteten Controls reagieren können.
         }
+
+
+        public virtual string QuickInfoText {
+            get {
+                return _QuickInfo;
+            }
+        }
+
+
         #endregion
 
         #region ISupportsEdit
@@ -206,11 +215,6 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int BeginnEditCounter { get; set; } = 0;
-        public virtual string QuickInfoText {
-            get {
-                return _QuickInfo;
-            }
-        }
 
         public new void SuspendLayout() {
             BeginnEdit();
@@ -300,8 +304,8 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            if (BeginnEditCounter >0) {
-                gr.Clear(Color.Green);
+            if (BeginnEditCounter > 0) {
+                gr.Clear(Color.LightGray);
                 return;
             }
 

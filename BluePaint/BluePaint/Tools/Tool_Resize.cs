@@ -39,6 +39,8 @@ namespace BluePaint
             InitializeComponent();
             capInfo.Text = "Bitte Skalierung in Prozent eingeben";
 
+            flxProzent.ValueSet("100", true, false);
+
 
         }
 
@@ -113,7 +115,7 @@ namespace BluePaint
 
             if (c[0] == "ResizeProzent")
             {
-                flxProzent.Value = c[1];
+                flxProzent.ValueSet(c[1], true,true);
                 btnDoResize_Click(null, null);
             }
             else

@@ -34,6 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Threading.Tasks;
 
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
@@ -159,6 +160,13 @@ namespace BlueControls.Controls {
                 _ShowingRowKey = value;
                 _tmpShowingRow = _Database?.Row.SearchByKey(_ShowingRowKey);
 
+
+                //Parallel.ForEach(_Control, thisFlex => {
+                //    if (thisFlex != null && !thisFlex.IsDisposed) {
+                //        thisFlex.RowKey = _ShowingRowKey;
+                //        thisFlex.CheckEnabledState();
+                //    }
+                //});
                 foreach (var thisFlex in _Control) {
                     if (thisFlex != null && !thisFlex.IsDisposed) {
                         thisFlex.RowKey = _ShowingRowKey;
@@ -167,9 +175,7 @@ namespace BlueControls.Controls {
                 }
 
                 OnShowingRowChanged(new RowEventArgs(ShowingRow));
-
                 ShowingRow?.DoAutomatic(false, false);
-
                 EndEdit();
             }
         }

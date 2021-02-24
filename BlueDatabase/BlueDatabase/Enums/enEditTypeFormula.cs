@@ -24,7 +24,7 @@ namespace BlueDatabase.Enums
         None = -1,
         Textfeld = 0,
         Textfeld_mit_Auswahlknopf = 1,
-        Listbox_6_Zeilen = 2,
+        Listbox = 2,
         EasyPic = 3,
         Ja_Nein_Knopf = 4,
         Farb_Auswahl_Dialog = 5,
@@ -67,8 +67,10 @@ namespace BlueDatabase.Enums
 
         ////ListBoxForRelation = 24,
 
-        Listbox_3_Zeilen = 25,
-        Listbox_1_Zeile = 26,
+        //Listbox_3_Zeilen = 25,
+        //Listbox_1_Zeile = 26,
+
+        SwapListBox = 27,
 
 
         Line = 1000,

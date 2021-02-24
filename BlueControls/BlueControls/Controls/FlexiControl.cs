@@ -22,16 +22,14 @@ using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
-using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls {
@@ -52,7 +50,6 @@ namespace BlueControls.Controls {
         protected string _Caption;
 
         private int _ControlX = -1;
-        private Color _Color = Color.Transparent;
         private Caption _CaptionObject;
         private Caption _InfoCaption;
         private string _InfoText = string.Empty;
@@ -77,7 +74,7 @@ namespace BlueControls.Controls {
         protected DateTime? _LastTextChange;
 
 
-        public event EventHandler RemovingAll;
+        //public event EventHandler RemovingAll;
 
         public event EventHandler NeedRefresh;
         public event EventHandler ButtonClicked;
@@ -141,19 +138,19 @@ namespace BlueControls.Controls {
         }
 
 
-        [DefaultValue(typeof(Color), "Transparent")]
-        public Color Color {
-            get {
-                return _Color;
-            }
-            set {
+        //[DefaultValue(typeof(Color), "Transparent")]
+        //public Color Color {
+        //    get {
+        //        return _Color;
+        //    }
+        //    set {
 
-                if (_Color == value) { return; }
+        //        if (_Color == value) { return; }
 
-                _Color = value;
-                Invalidate();
-            }
-        }
+        //        _Color = value;
+        //        Invalidate();
+        //    }
+        //}
 
         /// <summary>
         /// DisabledReason befüllen, um das Steuerelement zu disablen
@@ -211,7 +208,8 @@ namespace BlueControls.Controls {
                 foreach (System.Windows.Forms.Control ThisControl in Controls) {
                     if (ThisControl != _InfoCaption) {
                         ThisControl.Enabled = Enabled;
-                    } else {
+                    }
+                    else {
                         ThisControl.Enabled = true;
                     }
                 }
@@ -224,27 +222,25 @@ namespace BlueControls.Controls {
         }
 
         [Obsolete]
+        [DefaultValue("")]
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new string Text { get; set; }
 
 
         [DefaultValue("")]
-        d
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Value {
             get {
                 if (_Value == null) { return string.Empty; }
                 return _Value;
             }
-            set {
-                if (value == null) { value = string.Empty; }
-                if (_Value == null && string.IsNullOrEmpty(value)) { return; }
-                if (_Value == value) { return; }
-                _LastTextChange = DateTime.UtcNow;
-                _Value = value;
-                UpdateValueToControl();
 
-                if (InvokeRequired || !Focused || _InstantChangedEvent) { CheckIfChanged(); }
-                //OnValueChanged();
-            }
+
+
         }
 
 
@@ -408,37 +404,37 @@ namespace BlueControls.Controls {
 
 
 
-            if (_Color.A != 0) {
-                if (state.HasFlag(enStates.Standard_Disabled)) {
-                    var br = (byte)(_Color.GetBrightness() * 254);
-                    var lgb = new LinearGradientBrush(ClientRectangle, Color.FromArgb(br, br, br), Color.Transparent, LinearGradientMode.Horizontal);
-                    gr.FillRectangle(lgb, ClientRectangle);
-                } else {
-                    var lgb = new LinearGradientBrush(ClientRectangle, _Color, Color.Transparent, LinearGradientMode.Horizontal);
-                    gr.FillRectangle(lgb, ClientRectangle);
-                }
-            }
+            //if (_Color.A != 0) {
+            //    if (state.HasFlag(enStates.Standard_Disabled)) {
+            //        var br = (byte)(_Color.GetBrightness() * 254);
+            //        var lgb = new LinearGradientBrush(ClientRectangle, Color.FromArgb(br, br, br), Color.Transparent, LinearGradientMode.Horizontal);
+            //        gr.FillRectangle(lgb, ClientRectangle);
+            //    } else {
+            //        var lgb = new LinearGradientBrush(ClientRectangle, _Color, Color.Transparent, LinearGradientMode.Horizontal);
+            //        gr.FillRectangle(lgb, ClientRectangle);
+            //    }
+            //}
 
             if (!_allinitialized) { CreateSubControls(); }
 
 
-            if (_EditType == enEditTypeFormula.Listbox_6_Zeilen || _EditType == enEditTypeFormula.Listbox_1_Zeile || _EditType == enEditTypeFormula.Listbox_3_Zeilen) {
-                ListBoxen(out var Main, out var Suggest);
+            //if (_EditType == enEditTypeFormula.Listbox || _EditType == enEditTypeFormula.Listbox_1_Zeile || _EditType == enEditTypeFormula.Listbox_3_Zeilen) {
+            //    ListBoxen(out var Main, out var Suggest);
 
-                if (Suggest != null) {
-                    var tmpstate = state;
-                    if (tmpstate != enStates.Checked_Disabled) { tmpstate = enStates.Standard; }
+            //    if (Suggest != null) {
+            //        var tmpstate = state;
+            //        if (tmpstate != enStates.Checked_Disabled) { tmpstate = enStates.Standard; }
 
-                    var R = new Rectangle {
-                        X = Main.Left - 1,
-                        Y = Main.Top - 1,
-                        Width = Main.Width + 2,
-                        Height = Height - Main.Top - 1
-                    };
+            //        var R = new Rectangle {
+            //            X = Main.Left - 1,
+            //            Y = Main.Top - 1,
+            //            Width = Main.Width + 2,
+            //            Height = Height - Main.Top - 1
+            //        };
 
-                    Skin.Draw_Border(gr, enDesign.ListBox, tmpstate, R);
-                }
-            }
+            //        Skin.Draw_Border(gr, enDesign.ListBox, tmpstate, R);
+            //    }
+            //}
 
 
 
@@ -446,10 +442,12 @@ namespace BlueControls.Controls {
 
             if (!string.IsNullOrEmpty(_disabledReason)) {
                 DoInfoTextCaption(_disabledReason);
-            } else {
+            }
+            else {
                 if (state.HasFlag(enStates.Standard_Disabled)) {
                     DoInfoTextCaption("Übergeordnetes Steuerlement ist deaktiviert.");
-                } else {
+                }
+                else {
                     DoInfoTextCaption(string.Empty);
                 }
             }
@@ -481,7 +479,11 @@ namespace BlueControls.Controls {
                         break;
 
                     case ListBox ListBox:
-                        if (ListBox.Name == "Main") { UpdateValueTo_ListBox(); }
+                        UpdateValueTo_ListBox(ListBox.Item);
+                        break;
+
+                    case SwapListBox SwapListBox:
+                        UpdateValueTo_ListBox(SwapListBox.Item);
                         break;
 
                     case Button Button:
@@ -537,8 +539,15 @@ namespace BlueControls.Controls {
                     // Einzig und alleine eigene Datenbank kann den dazugehörigen Wert generieren.
                     break;
 
+
+                case SwapListBox SwapListBox:
+                    //ListBox.ItemClicked += ListBox_ItemClicked;
+                    SwapListBox.ItemAdded += ListBox_ItemAdded;
+                    SwapListBox.ItemRemoved += ListBox_ItemRemoved;
+                    break;
+
                 case ListBox ListBox:
-                    ListBox.ItemClicked += ListBox_ItemClicked;
+                    //ListBox.ItemClicked += ListBox_ItemClicked;
                     ListBox.ItemAdded += ListBox_ItemAdded;
                     ListBox.ItemRemoved += ListBox_ItemRemoved;
                     break;
@@ -597,9 +606,16 @@ namespace BlueControls.Controls {
                     break;
 
                 case ListBox ListBox:
-                    ListBox.ItemClicked -= ListBox_ItemClicked;
+                    //ListBox.ItemClicked -= ListBox_ItemClicked;
                     ListBox.ItemAdded -= ListBox_ItemAdded;
                     ListBox.ItemRemoved -= ListBox_ItemRemoved;
+                    break;
+
+
+                case SwapListBox SwapListBox:
+                    //ListBox.ItemClicked -= ListBox_ItemClicked;
+                    SwapListBox.ItemAdded -= ListBox_ItemAdded;
+                    SwapListBox.ItemRemoved -= ListBox_ItemRemoved;
                     break;
 
                 case Button Button:
@@ -641,28 +657,41 @@ namespace BlueControls.Controls {
         protected virtual void RemoveAll() {
 
 
-            if (Controls.Count > 0) { OnRemovingAll(); }
+            //if (Controls.Count > 0) { OnRemovingAll(); }
 
-            while (Controls.Count > 0) {
-                Controls[0].Visible = false;
-                Controls[0].Dispose(); // Dispose entfernt da Control aus der Collection
-                                       // Controls.Remove(Controls[0]);
+
+
+            var l = new List<Control>();
+
+
+            for (var z = 0; z < Controls.Count; z++) { l.Add(Controls[z]); }
+
+
+
+            foreach (var thisc in l) {
+                thisc.Visible = false;
+
+                if (thisc != _CaptionObject && thisc != _InfoCaption) {
+                    thisc.Dispose(); // Dispose entfernt da Control aus der Collection // Controls.Remove(Controls[0]);
+                }
             }
 
-            //foreach (System.Windows.Forms.Control ThisControl in Controls)
-            //{
-            //    //Control.Parent.Controls.Remove(Control);
-            //    //  OnControlRemoved(new ControlEventArgs(Control));
 
+            //while (Controls.Count > 0) {
+            //    Controls[0].Visible = false;
+            //    Controls[0].Dispose(); // Dispose entfernt da Control aus der Collection
+            //                           // Controls.Remove(Controls[0]);
             //}
-            Controls.Clear();
+
+
+            //Controls.Clear();
             _allinitialized = false;
-            Invalidate();
+            //Invalidate();
         }
 
-        protected virtual void OnRemovingAll() {
-            RemovingAll?.Invoke(this, System.EventArgs.Empty);
-        }
+        //protected virtual void OnRemovingAll() {
+        //    RemovingAll?.Invoke(this, System.EventArgs.Empty);
+        //}
 
         protected virtual void OnNeedRefresh() {
             NeedRefresh?.Invoke(this, System.EventArgs.Empty);
@@ -675,11 +704,13 @@ namespace BlueControls.Controls {
         private void Control_Create_Caption() {
             if (_CaptionPosition == enÜberschriftAnordnung.ohne) { return; }
 
-            _CaptionObject = new Caption {
-                Enabled = Enabled
-            };
 
-            Controls.Add(_CaptionObject);
+            if (_CaptionObject == null) {
+                _CaptionObject = new Caption();
+                Controls.Add(_CaptionObject);
+            }
+
+            _CaptionObject.Enabled = Enabled;
 
             _CaptionObject.TextAnzeigeVerhalten = enSteuerelementVerhalten.Text_Abschneiden; // nicht enSteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
             _CaptionObject.Text = _Caption;
@@ -691,15 +722,11 @@ namespace BlueControls.Controls {
             _CaptionObject.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
 
             if (_CaptionPosition == enÜberschriftAnordnung.Ohne_mit_Abstand) {
-
                 _CaptionObject.Visible = false;
-            } else {
+            }
+            else {
                 _CaptionObject.Visible = true;
             }
-
-
-
-
 
             _CaptionObject.BringToFront();
 
@@ -726,7 +753,6 @@ namespace BlueControls.Controls {
 
 
         #endregion
-
 
         #region  Line 
         /// <summary>
@@ -773,7 +799,6 @@ namespace BlueControls.Controls {
 
         #endregion
 
-
         #region  ComboBox 
 
 
@@ -810,168 +835,71 @@ namespace BlueControls.Controls {
 
         private void ValueChanged_ComboBox(object sender, System.EventArgs e) {
             if (_IsFilling) { return; }
-            Value = ((ComboBox)sender).Text;
-
-            if (((ComboBox)sender).DropDownStyle == ComboBoxStyle.DropDownList) {
-                CheckIfChanged();
-            }
+            ValueSet(((ComboBox)sender).Text, false, ((ComboBox)sender).DropDownStyle == ComboBoxStyle.DropDownList);
         }
 
 
         #endregion
 
+        #region SwapListBox
 
-        #region  ListBox 
-        private void ListBox_ItemClicked(object sender, BasicListItemEventArgs e) {
+        // Nimmt Teilweise die Routinen der Listbox her
 
-            ListBoxen(out var Main, out var Suggest);
-
-            if (Suggest == null) { return; } // Wenn keine Vorschlagbox vorhanden ist, dann müssen die Items zum entfernen angewählt werden
-
-            e.Item.Checked = false; // von einer Box zur anderen darf keine Markierung erhalten bleiben
-
-            if (sender == Main) {
-                MoveItemBetweenList(Main, Suggest, e.Item.Internal);
-            } else {
-                MoveItemBetweenList(Suggest, Main, e.Item.Internal);
-            }
-
-        }
-
-
-        protected void MoveItemBetweenList(ListBox Source, ListBox Target, string Internal) {
-            var SourceItem = Source.Item[Internal];
-            var TargetItem = Target.Item[Internal];
-
-            if (SourceItem != null && TargetItem == null) {
-
-                SourceItem.CloneToNewCollection(Target.Item);
-                //TargetItem = (BasicListItem)SourceItem.Clone();
-                //Target.Item.Add(TargetItem);
-            } else if (SourceItem == null && TargetItem == null) {
-                TargetItem = new TextListItem(Internal, Internal, null, false, true, string.Empty);
-                Target.Item.Add(TargetItem);
-            }
-
-            //var SourceItem = Source.Item[Internal];
-            //var TargetItem = Target.Item[Internal];
-
-            //if (SourceItem == null && TargetItem == null)
-            //{
-            //    TargetItem = new TextListItem(Internal);
-            //    Target.Item.Add(TargetItem);
-            //}
-
-
-
-            Target.Item.Sort();
-
-            if (SourceItem != null) { Source.Item.Remove(SourceItem); }
-        }
-
-
-        private void ListBox_ItemRemoved(object sender, System.EventArgs e) {
-            if (_IsFilling) { return; }
-            ListBoxen(out var Main, out var Suggest);
-            if (sender == Suggest) { return; }
-            Value = Main.Item.ToListOfString().JoinWithCr();
-            CheckIfChanged();
-        }
-
-        private void ListBox_ItemAdded(object sender, ListEventArgs e) {
-
-            ListBoxen(out var Main, out var Suggest);
-            if (sender == Suggest) {
-
-                if (Main.Item.Contains((BasicListItem)e.Item)) { return; } // Es soll gerade aus dem Main entfernt werden, also Wirklich im Suggest lassen
-                if (Suggest.Item.Contains((BasicListItem)e.Item)) { return; } // Es soll gerade aus dem Main entfernt werden, also Wirklich im Suggest lassen
-
-                ListBox_ItemClicked(Suggest, new BasicListItemEventArgs((BasicListItem)e.Item)); // Gleich nach oben schieben
-                return;
-            }
-            if (_IsFilling) { return; }
-
-            Value = Main.Item.ToListOfString().JoinWithCr();
-            CheckIfChanged();
-        }
-
-
-
-        protected void ListBoxen(out ListBox Main, out ListBox Suggest) {
-
-            Main = null;
-            Suggest = null;
-
-            foreach (System.Windows.Forms.Control Control in Controls) {
-
-                if (Control is ListBox LB) {
-                    switch (LB.Name) {
-                        case "Main":
-                            Main = LB;
-                            break;
-                        case "Suggest":
-                            Suggest = LB;
-                            break;
-                    }
-                }
-            }
-
-
-
-
-        }
-
-
-
-
-        /// <summary>
-        /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
-        /// </summary>
-        /// <param name="MainBox"></param>
-        /// <param name="List"></param>
-        /// <returns></returns>
-        private ListBox Control_Create_SuggestListBox(ListBox MainBox, ItemCollectionList List) {
-            var Control = new ListBox {
-                Enabled = Enabled
+        private SwapListBox Control_Create_SwapListBox() {
+            var Control = new SwapListBox {
+                Enabled = Enabled,
             };
-            Control.Item.Clear();
-            Control.Item.AddRange(List);
-            Control.Item.CheckBehavior = enCheckBehavior.NoSelection;
 
-            Control.Name = "Suggest";
-
-            Control.AddAllowed = enAddType.None;
-            Control.MoveAllowed = false;
-            Control.FilterAllowed = true;
-            Control.RemoveAllowed = false;
-            Control.Appearance = enBlueListBoxAppearance.Listbox;
-
-            Control.Item.Sort();
-
+            StyleSwapListBox(Control, null);
+            UpdateValueToControl();
             StandardBehandlung(Control);
-
-            Control.Top = MainBox.Bottom;
-            Control.Height = Height - Control.Top - 1;
-
-
-            Control.Height -= 2;
-            Control.Left = 2;
-            Control.Width -= 4;
-
-            Control.BringToFront();
-
-
 
             return Control;
         }
 
+        protected void StyleSwapListBox(SwapListBox Control, ColumnItem Column) {
+            Control.Enabled = Enabled;
+
+            Control.Item.Clear();
+            Control.Item.CheckBehavior = enCheckBehavior.NoSelection;
+
+            if (Column == null) { return; }
+
+            var Item = new ItemCollectionList();
+
+            ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000);
+
+            Control.SuggestionsAdd(Item);
+
+
+            Control.AddAllowed = enAddType.UserDef;
+
+
+
+        }
+
+        #endregion
+
+        #region  ListBox 
+
+
+
+        private void ListBox_ItemRemoved(object sender, System.EventArgs e) {
+            if (_IsFilling) { return; }
+            ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, false);
+        }
+
+        private void ListBox_ItemAdded(object sender, ListEventArgs e) {
+            if (_IsFilling) { return; }
+            ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, false);
+        }
+
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
-        private ListBox Control_Create_MainListBox() {
+        private ListBox Control_Create_ListBox() {
             var Control = new ListBox {
                 Enabled = Enabled,
-                Name = "Main"
             };
 
             StyleListBox(Control, null);
@@ -1011,102 +939,32 @@ namespace BlueControls.Controls {
             }
 
 
-            var FullSize = Item.Count == 0;
             Control.AddAllowed = enAddType.UserDef;
-
-            if (FullSize) {
-                Control.RemoveAllowed = true;
-            } else {
-
-                Control.RemoveAllowed = false;
-            }
-
-
             Control.FilterAllowed = false;
             Control.MoveAllowed = false;
-
-
-            var Zeil = 1;
 
             switch (_EditType) {
                 case enEditTypeFormula.Gallery:
                     Control.Appearance = enBlueListBoxAppearance.Gallery;
+                    Control.RemoveAllowed = true;
                     break;
 
-                case enEditTypeFormula.Listbox_1_Zeile:
-                    Zeil = 1;
+
+                case enEditTypeFormula.Listbox:
+                    Control.RemoveAllowed = true;
+
                     Control.Appearance = enBlueListBoxAppearance.Listbox;
                     break;
-
-                case enEditTypeFormula.Listbox_3_Zeilen:
-                    Zeil = 3;
-                    Control.Appearance = enBlueListBoxAppearance.Listbox;
-                    break;
-
-                case enEditTypeFormula.Listbox_6_Zeilen:
-                    Zeil = 6;
-                    Control.Appearance = enBlueListBoxAppearance.Listbox;
-                    break;
-            }
-
-
-            Control.Left = 2;
-            Control.Width -= 4;
-
-            if (!FullSize) {
-                Control.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-                Control.Height = 16 * Zeil + 24;
 
             }
 
-            if (Item.Count > 0) { Control_Create_SuggestListBox(Control, Item); }
         }
 
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_ListBox() {
-            //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
-            // Das muss OnChanged von FlexiControlForCell übernehmen.
-
-            ListBoxen(out var Main, out var Suggest);
-
-            var _Soll = _Value.SplitByCRToList();
-            var _Ist = Main.Item.ToListOfString();
-            var _zuviel = _Ist.Except(_Soll).ToList();
-            var _zuwenig = _Soll.Except(_Ist).ToList();
-
-            if (Suggest != null) {
-
-                // Zu viele im Main zu den Suggests schieben
-                foreach (var ThisString in _zuviel) {
-                    MoveItemBetweenList(Main, Suggest, ThisString);
-                }
-
-                // Evtl. Suggests in die Mainlist verschieben.
-                foreach (var ThisString in _zuwenig) {
-                    MoveItemBetweenList(Suggest, Main, ThisString);
-                }
-            } else {
-
-                // Zu viele im Mains aus der Liste löschen
-                foreach (var ThisString in _zuviel) {
-                    if (!_Soll.Contains(ThisString)) { Main.Item.Remove(ThisString); }
-                }
-
-                // und die Mains auffüllen
-                foreach (var ThisString in _zuwenig) {
-                    if (FileOperations.FileExists(ThisString)) {
-                        if (ThisString.FileType() == enFileFormat.Image) {
-                            Main.Item.Add(ThisString, ThisString, ThisString.FileNameWithoutSuffix(), FileEncryptionKey);
-                        } else {
-                            Main.Item.Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(ThisString.FileType(), 48));
-                        }
-                    } else {
-                        Main.Item.Add(ThisString);
-                    }
-                }
-            }
+        private void UpdateValueTo_ListBox(ItemCollectionList Main) {
+            Main.SetValuesTo(_Value.SplitByCRToList(), FileEncryptionKey);
         }
 
         #endregion
@@ -1117,7 +975,7 @@ namespace BlueControls.Controls {
 
         private void ComandButton_Click(object sender, System.EventArgs e) {
             if (_EditType != enEditTypeFormula.Button) { return; }
-            Value = "+"; // Geklickt, wurde hiermit vermerkt
+            _Value = "+"; // Geklickt, wurde hiermit vermerkt
             CheckIfChanged();
             OnButtonClicked();
         }
@@ -1125,8 +983,8 @@ namespace BlueControls.Controls {
         private void ColorButton_Click(object sender, System.EventArgs e) {
 
             Develop.DebugPrint_NichtImplementiert(); // TODO: Erstellen!
-            //if (_EditType != enEditTypeFormula.Button) { return; }
-            //CheckIfChanged("+");
+                                                     //if (_EditType != enEditTypeFormula.Button) { return; }
+                                                     //CheckIfChanged("+");
 
             //OnButtonClicked();
 
@@ -1137,7 +995,7 @@ namespace BlueControls.Controls {
         }
 
         private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) {
-            Value = ((Button)sender).Checked.ToPlusMinus();
+            _Value = ((Button)sender).Checked.ToPlusMinus();
             CheckIfChanged();
         }
 
@@ -1214,7 +1072,8 @@ namespace BlueControls.Controls {
                 case enEditTypeFormula.Farb_Auswahl_Dialog:
                     if (string.IsNullOrEmpty(_Value)) {
                         Control.ImageCode = "Fragezeichen|24";
-                    } else {
+                    }
+                    else {
                         Control.ImageCode = "Kreis|24|||" + Color.FromArgb(int.Parse(_Value)).ToHTMLCode();
                     }
                     break;
@@ -1255,7 +1114,8 @@ namespace BlueControls.Controls {
 
             if (_MultiLine || Height > 20) {
                 Control.Verhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            } else {
+            }
+            else {
                 Control.Verhalten = enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             }
 
@@ -1275,7 +1135,7 @@ namespace BlueControls.Controls {
 
         private void ValueChanged_TextBox(object sender, System.EventArgs e) {
             //if (_IsCreating || _IsFilling) { return; }
-            Value = ((TextBox)sender).Text;
+            _Value = ((TextBox)sender).Text;
         }
 
 
@@ -1369,13 +1229,16 @@ namespace BlueControls.Controls {
             if (string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText)) {
                 txt = string.Empty;
                 symbol = string.Empty;
-            } else if (!string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText)) {
+            }
+            else if (!string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText)) {
                 symbol = "  <ImageCode=Schloss|10|||||150||20>";
                 txt = disabledReason;
-            } else if (string.IsNullOrEmpty(disabledReason) && !string.IsNullOrEmpty(_InfoText)) {
+            }
+            else if (string.IsNullOrEmpty(disabledReason) && !string.IsNullOrEmpty(_InfoText)) {
                 symbol = "<ImageCode=Warnung|16>";
                 txt = _InfoText;
-            } else {
+            }
+            else {
                 symbol = "<ImageCode=Information|16>";
                 txt = "<b>Der Wert kann nicht bearbeitet werden:</b><br>" + disabledReason + "<br><br><b>Enthält aber einen Fehler:</b><br>" + _InfoText;
             }
@@ -1406,7 +1269,8 @@ namespace BlueControls.Controls {
                 //_InfoCaption.Dispose();
                 //_InfoCaption = null;
                 _InfoCaption.Visible = false;
-            } else {
+            }
+            else {
                 _InfoCaption = new Caption {
                     Name = "Info",
                     QuickInfo = txt,
@@ -1480,10 +1344,10 @@ namespace BlueControls.Controls {
                     break;
 
                 case enEditTypeFormula.Gallery:
-                case enEditTypeFormula.Listbox_1_Zeile:
-                case enEditTypeFormula.Listbox_3_Zeilen:
-                case enEditTypeFormula.Listbox_6_Zeilen:
-                    c = Control_Create_MainListBox();
+                //case enEditTypeFormula.Listbox_1_Zeile:
+                //case enEditTypeFormula.Listbox_3_Zeilen:
+                case enEditTypeFormula.Listbox:
+                    c = Control_Create_ListBox();
                     break;
 
                 case enEditTypeFormula.Textfeld_mit_Auswahlknopf:
@@ -1508,6 +1372,10 @@ namespace BlueControls.Controls {
 
                 case enEditTypeFormula.Button:
                     c = Control_Create_ButtonComand();
+                    break;
+
+                case enEditTypeFormula.SwapListBox:
+                    c = Control_Create_SwapListBox();
                     break;
 
                 default:
@@ -1540,6 +1408,26 @@ namespace BlueControls.Controls {
         }
 
 
+        public void ValueSet(string newvalue, bool updateControls, bool alwaysValueChanged) {
+            if (newvalue == null) { newvalue = string.Empty; }
+            if (_Value == null && string.IsNullOrEmpty(newvalue)) { return; }
+            if (_Value == newvalue) { return; }
+            _LastTextChange = DateTime.UtcNow;
+            _Value = newvalue;
+
+            if (updateControls) {
+                UpdateValueToControl();
+                //return; // kein CheckedIfChanged. Der Wert kommt ja von der Zelle / Property / etc. und ist somit gesetzt und wir nicht geändert
+
+            }
+            if (alwaysValueChanged || InvokeRequired || !Focused || _InstantChangedEvent) { CheckIfChanged(); }
+        }
+
+
+
+
+
+
         private void UpdateControls() {
 
 
@@ -1549,7 +1437,8 @@ namespace BlueControls.Controls {
                 if (Control != _InfoCaption) {
                     if (Control is GenericControl QI) { QI.QuickInfo = QuickInfo; }
                     Control.Enabled = Enabled;
-                } else {
+                }
+                else {
                     Control.Enabled = true;
                 }
 
@@ -1570,6 +1459,11 @@ namespace BlueControls.Controls {
                         break;
 
                     case ListBox _:
+                        //if (ListBox.Name == "Main") { UpdateValueTo_ListBox(); }
+                        break;
+
+
+                    case SwapListBox _:
                         //if (ListBox.Name == "Main") { UpdateValueTo_ListBox(); }
                         break;
 

@@ -118,8 +118,8 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public override BasicListItem CloneToNewCollection(ItemCollectionList newParent) {
-            return CloneToNewCollection(newParent, new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _bildTextverhalten));
+        public override void CloneToNewCollection(ItemCollectionList newParent) {
+            CloneToNewCollection(newParent, new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _bildTextverhalten));
         }
 
         public override bool FilterMatch(string FilterText) {

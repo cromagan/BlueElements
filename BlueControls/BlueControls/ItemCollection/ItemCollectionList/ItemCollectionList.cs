@@ -30,6 +30,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using static BlueBasics.FileOperations;
+using static BlueBasics.Extensions;
+using System.Linq;
 
 namespace BlueControls.ItemCollection {
     public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
@@ -677,7 +679,7 @@ namespace BlueControls.ItemCollection {
 
         public new void Add(BasicListItem item) {
 
-            if (Contains(item)) { Develop.DebugPrint(enFehlerArt.Warnung, "Bereits vorhanden!"); return; }
+            if (Contains(item)) { Develop.DebugPrint(enFehlerArt.Fehler, "Bereits vorhanden!"); return; }
 
             if (this[item.Internal] != null) { Develop.DebugPrint(enFehlerArt.Warnung, "Name bereits vorhanden: " + item.Internal); return; }
 
@@ -834,6 +836,35 @@ namespace BlueControls.ItemCollection {
                             }
                         }
                     }
+                }
+            }
+        }
+
+        internal void SetValuesTo(List<string> values, string fileEncryptionKey) {
+
+    
+            var _Ist = this.ToListOfString();
+            var _zuviel = _Ist.Except(values).ToList();
+            var _zuwenig = values.Except(_Ist).ToList();
+
+
+            // Zu viele im Mains aus der Liste löschen
+            foreach (var ThisString in _zuviel) {
+                if (!values.Contains(ThisString)) { Remove(ThisString); }
+            }
+
+            // und die Mains auffüllen
+            foreach (var ThisString in _zuwenig) {
+                if (FileOperations.FileExists(ThisString)) {
+                    if (ThisString.FileType() == enFileFormat.Image) {
+                        Add(ThisString, ThisString, ThisString.FileNameWithoutSuffix(), fileEncryptionKey);
+                    }
+                    else {
+                        Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(ThisString.FileType(), 48));
+                    }
+                }
+                else {
+                    Add(ThisString);
                 }
             }
         }

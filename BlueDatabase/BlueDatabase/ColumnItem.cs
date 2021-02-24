@@ -1861,9 +1861,9 @@ namespace BlueDatabase {
                     if (_TextBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind, um die Anzeieg zu gewährleisten.
                     if (_MultiLine && EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return false; }
                     if (_DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
-                    if (_DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Listbox_1_Zeile) { return true; }
-                    if (_MultiLine && _DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Listbox_3_Zeilen) { return true; }
-                    if (_MultiLine && _DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Listbox_6_Zeilen) { return true; }
+                    if (_DropdownBearbeitungErlaubt && _DropdownWerteAndererZellenAnzeigen && EditType_To_Check == enEditTypeFormula.SwapListBox) { return true; }
+                    //if (_MultiLine && _DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Listbox_3_Zeilen) { return true; }
+                    if (_MultiLine && _DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Listbox) { return true; }
 
                     if (EditType_To_Check == enEditTypeFormula.nur_als_Text_anzeigen) { return true; }
 

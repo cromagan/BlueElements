@@ -60,7 +60,6 @@ namespace BluePaint
             this.flxProzent.Size = new System.Drawing.Size(168, 32);
             this.flxProzent.Suffix = "%";
             this.flxProzent.TabIndex = 10;
-            this.flxProzent.Value = "100";
             this.flxProzent.ValueChanged += new System.EventHandler(this.flxProzent_ValueChanged);
             // 
             // capInfo

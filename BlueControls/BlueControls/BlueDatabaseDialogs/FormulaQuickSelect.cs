@@ -60,7 +60,7 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (ThisColumn != null)
                 {
-                    if (ThisColumn.EditType == enEditTypeFormula.Listbox_1_Zeile || ThisColumn.EditType == enEditTypeFormula.Listbox_3_Zeilen || ThisColumn.EditType == enEditTypeFormula.Listbox_6_Zeilen || ThisColumn.EditType == enEditTypeFormula.Textfeld_mit_Auswahlknopf)
+                    if (ThisColumn.EditType == enEditTypeFormula.SwapListBox || ThisColumn.EditType == enEditTypeFormula.Listbox || ThisColumn.EditType == enEditTypeFormula.Textfeld_mit_Auswahlknopf)
                     {
                         if (ThisColumn.DropdownBearbeitungErlaubt)
                         {

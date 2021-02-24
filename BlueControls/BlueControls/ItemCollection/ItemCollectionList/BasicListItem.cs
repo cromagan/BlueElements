@@ -189,16 +189,16 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public virtual BasicListItem CloneToNewCollection(ItemCollectionList newParent) {
+        public virtual void CloneToNewCollection(ItemCollectionList newParent) {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-            return null;
+            //return null;
         }
 
         internal void SetParent(ItemCollectionList list) {
             Parent = list;
         }
 
-        public BasicListItem CloneToNewCollection(ItemCollectionList newParent, BasicListItem newItem) {
+        public void CloneToNewCollection(ItemCollectionList newParent, BasicListItem newItem) {
             if (newItem.Internal != Internal) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Clone fehlgeschlagen, Internal unterschiedlich");
             }
@@ -210,7 +210,7 @@ namespace BlueControls.ItemCollection {
             newItem.Tag = Tag;
             newItem.UserDefCompareKey = UserDefCompareKey;
 
-            return newItem;
+            //return newItem;
         }
 
         public virtual bool FilterMatch(string FilterText) {

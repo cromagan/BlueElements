@@ -231,7 +231,7 @@ namespace BlueControls.Controls {
                     QuickInfo = _tmpColumn.QuickInfoText(string.Empty);
                 }
                 else {
-                    _tmpColumn.EditType= EditType;
+                    _tmpColumn.EditType = EditType;
                     _tmpColumn.Quickinfo = QuickInfo;
                 }
 
@@ -274,7 +274,7 @@ namespace BlueControls.Controls {
 
 
             if (_tmpColumn == null || _tmpRow == null) {
-                Value = string.Empty;
+                ValueSet(string.Empty, true, false);
                 InfoText = string.Empty;
                 return;
             }
@@ -295,7 +295,7 @@ namespace BlueControls.Controls {
                         }
                     }
 
-                    Value = tmp2.JoinWithCr();
+                    ValueSet(tmp2.JoinWithCr(), true, false);
 
                     if (Value.ToUpper() != tmp2.JoinWithCr().ToUpper()) {
                         Develop.DebugPrint(enFehlerArt.Warnung, "Werte ungleich: " + Value + " - " + tmp2.JoinWithCr());
@@ -303,14 +303,9 @@ namespace BlueControls.Controls {
                     break;
 
                 default:
-                    Value = _tmpRow.CellGetString(_tmpColumn);
+                    ValueSet(_tmpRow.CellGetString(_tmpColumn), true, false);
                     break;
-
-
             }
-
-
-
         }
 
         private void Database_ConnectedControlsStopAllWorking(object sender, System.EventArgs e) {
@@ -445,15 +440,18 @@ namespace BlueControls.Controls {
                     break;
 
                 case ListBox listBox:
-                    if (listBox.Name == "Main") {
-                        StyleListBox(listBox, column1);
-                        listBox.ContextMenuInit += ListBox_ContextMenuInit;
-                        listBox.ContextMenuItemClicked += ListBox_ContextMenuItemClicked;
-                    }
+                    StyleListBox(listBox, column1);
+                    listBox.ContextMenuInit += ListBox_ContextMenuInit;
+                    listBox.ContextMenuItemClicked += ListBox_ContextMenuItemClicked;
                     listBox.AddClicked += ListBox_AddClicked;
-                    //listBox.NeedRow += ListBox_NeedRow;
                     break;
 
+                case SwapListBox swapListBox:
+                    StyleSwapListBox(swapListBox, column1);
+                    swapListBox.ContextMenuInit += ListBox_ContextMenuInit;
+                    swapListBox.ContextMenuItemClicked += ListBox_ContextMenuItemClicked;
+                    swapListBox.AddClicked += ListBox_AddClicked;
+                    break;
 
                 case Button _:
                     break;
@@ -502,13 +500,18 @@ namespace BlueControls.Controls {
                     break;
 
                 case ListBox listBox:
-                    if (listBox.Name == "Main") {
-                        listBox.ContextMenuInit -= ListBox_ContextMenuInit;
-                        listBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
-                    }
+                    listBox.ContextMenuInit -= ListBox_ContextMenuInit;
+                    listBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
                     listBox.AddClicked -= ListBox_AddClicked;
-                    //listBox.NeedRow -= ListBox_NeedRow;
                     break;
+
+
+                case SwapListBox swaplistBox:
+                    swaplistBox.ContextMenuInit -= ListBox_ContextMenuInit;
+                    swaplistBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
+                    swaplistBox.AddClicked -= ListBox_AddClicked;
+                    break;
+
 
                 case Caption _:
                     break;
@@ -533,30 +536,29 @@ namespace BlueControls.Controls {
 
             foreach (System.Windows.Forms.Control ThisControl in Controls) {
 
-                if (ThisControl is EasyPic Control) {
+                if (ThisControl is EasyPic ep) {
                     if (_tmpColumn == null && _tmpRow == null) { Develop.DebugPrint_NichtImplementiert(); }
                     if (_tmpColumn.Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
 
 
 
-                    switch (Control.SorceType) {
+                    switch (ep.SorceType) {
                         case enSorceType.ScreenShot:
                             var fil = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
-                            Control.Bitmap.Save(fil, ImageFormat.Png);
-                            Control.ChangeSource(fil, enSorceType.LoadedFromDisk, false);
-                            Value = fil;   // Ruft rekursiv DoEasyPicValueChanged und springt zu LoadedFromDisk
+                            ep.Bitmap.Save(fil, ImageFormat.Png);
+                            ep.ChangeSource(fil, enSorceType.LoadedFromDisk, false);
+
+                            ValueSet(fil, false, true);
                             return;
 
                         case enSorceType.Nichts:
-                            Value = string.Empty;   // TODO: SetValue(FromCell) benutzen
-                            FillCellNow();
+                            ValueSet(string.Empty, false, true);
                             return;
 
                         case enSorceType.LoadedFromDisk:
-                            if (Control.SorceName != _tmpColumn.SimplyFile(Control.SorceName)) {
+                            if (ep.SorceName != _tmpColumn.SimplyFile(ep.SorceName)) {
                                 // DEr name kann nur vereifacht werden, wenn es bereits im richtigen Verzeichniss ist. Name wird vereinfacht (ungleich) - bereits im richtigen verzeichniss!
-                                Value = Control.SorceName;
-                                FillCellNow();
+                                ValueSet(ep.SorceName, false, true);
                                 return;
                             }
 
@@ -564,18 +566,18 @@ namespace BlueControls.Controls {
 
                             var fil2 = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
 
-                            if (fil2.FilePath().ToUpper() != Control.SorceName.FilePath().ToUpper()) {
-                                Control.Bitmap.Save(fil2, ImageFormat.Png);
+                            if (fil2.FilePath().ToUpper() != ep.SorceName.FilePath().ToUpper()) {
+                                ep.Bitmap.Save(fil2, ImageFormat.Png);
                             }
                             else {
-                                fil2 = Control.SorceName;
+                                fil2 = ep.SorceName;
                             }
-                            Control.ChangeSource(fil2, enSorceType.LoadedFromDisk, false);
-                            Value = fil2;    // Ruft rekursiv DoEasyPicValueChanged und springt zu LoadedFromDisk
+                            ep.ChangeSource(fil2, enSorceType.LoadedFromDisk, false);
+                            ValueSet(fil2, false, true);
                             return;
 
                         case enSorceType.EntryWithoutPic:
-                            Value = Control.SorceName;   // TODO: SetValue(FromCell) benutzen
+                            ValueSet(ep.SorceName, false, true);
                             // Entweder ein Dummy eintrag (Bildzeichen-Liste, wo Haupt das Bild sein sollte, aber eben nur bei den 3 Seitensichten eines da ist
                             // Oder datenbank wird von einem andern PC aus gestartet
                             return;
@@ -595,7 +597,7 @@ namespace BlueControls.Controls {
         private void GotFocus_ComboBox(object sender, System.EventArgs e) {
             if (_tmpColumn == null || _tmpRow == null) { return; }
             if (!string.IsNullOrEmpty(((ComboBox)sender).Text)) { return; }
-            Value = CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow);   // TODO: SetValue(FromCell) benutzen
+            ValueSet(CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow), true, true);
         }
 
 
@@ -603,9 +605,7 @@ namespace BlueControls.Controls {
         private void GotFocus_TextBox(object sender, System.EventArgs e) {
             if (_tmpColumn == null || _tmpRow == null) { return; }
             if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
-
-
-            Value = CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow);   // TODO: SetValue(FromCell) benutzen
+            ValueSet(CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow), true, true);
         }
 
 
@@ -854,9 +854,10 @@ namespace BlueControls.Controls {
         }
 
 
-        protected override void OnRemovingAll() {
+        protected override void RemoveAll() {
             FillCellNow();
-            base.OnRemovingAll();
+            base.RemoveAll();
+            //base.OnRemovingAll();
         }
 
         public void GetContextMenuItems(MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
