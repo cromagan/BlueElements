@@ -273,7 +273,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override Size SizeUntouchedForListBox()
+        protected override Size ComputeSizeUntouchedForListBox()
         {
             return new Size(300, 300);
         }

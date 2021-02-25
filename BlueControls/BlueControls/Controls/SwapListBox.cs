@@ -31,24 +31,14 @@ namespace BlueControls.Controls {
         public event EventHandler ItemRemoved;
 
 
-        public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
-        public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
         public event EventHandler AddClicked;
 
 
 
 
-        public new bool Enabled {
-            get {
 
-                return base.Enabled;
-            }
-            set {
-                base.Enabled = value;
-                Main.Enabled = value;
-                Suggest.Enabled = value;
-            }
-        }
+
+
 
         public enAddType AddAllowed { 
             get => Main.AddAllowed; 
@@ -131,6 +121,12 @@ namespace BlueControls.Controls {
         //private void Main_ContextMenuInit(object sender, EventArgs.ContextMenuInitEventArgs e) {
         //    OnContextMenuInit(e);
         //}
+
+        protected override void OnEnabledChanged(System.EventArgs e) {
+            base.OnEnabledChanged(e);
+            Main.Enabled = Enabled;
+            Suggest.Enabled = Enabled;
+        }
 
         private void Main_AddClicked(object sender, System.EventArgs e) {
             OnAddClicked();

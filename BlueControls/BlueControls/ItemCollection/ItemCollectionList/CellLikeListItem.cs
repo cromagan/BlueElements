@@ -87,7 +87,7 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public override Size SizeUntouchedForListBox() {
+        protected override Size ComputeSizeUntouchedForListBox() {
             return Table.FormatedText_NeededSize(_StyleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16, _bildTextverhalten);
         }
 

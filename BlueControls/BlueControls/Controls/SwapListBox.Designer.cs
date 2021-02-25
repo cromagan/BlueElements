@@ -61,8 +61,8 @@
             this.Main.Size = new System.Drawing.Size(345, 115);
             this.Main.TabIndex = 0;
             this.Main.ItemAdded += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.Main_ItemAdded);
+            this.Main.ItemRemoving += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.Main_ItemRemoving);
             this.Main.ItemRemoved += new System.EventHandler(this.Main_ItemRemoved);
-            this.Main.ItemRemoving += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs > (this.Main_ItemRemoving);
             this.Main.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Main_ItemClicked);
             this.Main.AddClicked += new System.EventHandler(this.Main_AddClicked);
             // 
@@ -71,6 +71,7 @@
             this.Suggest.AddAllowed = BlueControls.Enums.enAddType.None;
             this.Suggest.CheckBehavior = BlueControls.Enums.enCheckBehavior.NoSelection;
             this.Suggest.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Suggest.FilterAllowed = true;
             this.Suggest.LastFilePath = null;
             this.Suggest.Location = new System.Drawing.Point(0, 0);
             this.Suggest.Name = "Suggest";
@@ -81,7 +82,6 @@
             // SwapListBox
             // 
             this.Controls.Add(this.splitContainer1);
-            this.Name = "SwapListBox";
             this.Size = new System.Drawing.Size(345, 371);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);

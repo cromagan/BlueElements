@@ -542,8 +542,8 @@ namespace BlueControls.Controls {
 
                 case SwapListBox SwapListBox:
                     //ListBox.ItemClicked += ListBox_ItemClicked;
-                    SwapListBox.ItemAdded += ListBox_ItemAdded;
-                    SwapListBox.ItemRemoved += ListBox_ItemRemoved;
+                    SwapListBox.ItemAdded += SwapListBox_ItemAdded;
+                    SwapListBox.ItemRemoved += SwapListBox_ItemRemoved;
                     break;
 
                 case ListBox ListBox:
@@ -614,8 +614,8 @@ namespace BlueControls.Controls {
 
                 case SwapListBox SwapListBox:
                     //ListBox.ItemClicked -= ListBox_ItemClicked;
-                    SwapListBox.ItemAdded -= ListBox_ItemAdded;
-                    SwapListBox.ItemRemoved -= ListBox_ItemRemoved;
+                    SwapListBox.ItemAdded -= SwapListBox_ItemAdded;
+                    SwapListBox.ItemRemoved -= SwapListBox_ItemRemoved;
                     break;
 
                 case Button Button:
@@ -878,6 +878,19 @@ namespace BlueControls.Controls {
 
         }
 
+
+
+        private void SwapListBox_ItemRemoved(object sender, System.EventArgs e) {
+            if (_IsFilling) { return; }
+            ValueSet(((SwapListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
+        }
+
+        private void SwapListBox_ItemAdded(object sender, ListEventArgs e) {
+            if (_IsFilling) { return; }
+            ValueSet(((SwapListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
+        }
+
+
         #endregion
 
         #region  ListBox 
@@ -886,12 +899,12 @@ namespace BlueControls.Controls {
 
         private void ListBox_ItemRemoved(object sender, System.EventArgs e) {
             if (_IsFilling) { return; }
-            ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, false);
+            ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
 
         private void ListBox_ItemAdded(object sender, ListEventArgs e) {
             if (_IsFilling) { return; }
-            ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, false);
+            ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
 
         /// <summary>
@@ -975,8 +988,7 @@ namespace BlueControls.Controls {
 
         private void ComandButton_Click(object sender, System.EventArgs e) {
             if (_EditType != enEditTypeFormula.Button) { return; }
-            _Value = "+"; // Geklickt, wurde hiermit vermerkt
-            CheckIfChanged();
+            ValueSet(true.ToPlusMinus(), false, true); // Geklickt, wurde hiermit vermerkt
             OnButtonClicked();
         }
 
@@ -995,8 +1007,7 @@ namespace BlueControls.Controls {
         }
 
         private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) {
-            _Value = ((Button)sender).Checked.ToPlusMinus();
-            CheckIfChanged();
+            ValueSet(((Button)sender).Checked.ToPlusMinus(), false, true);
         }
 
         /// <summary>
@@ -1134,8 +1145,8 @@ namespace BlueControls.Controls {
 
 
         private void ValueChanged_TextBox(object sender, System.EventArgs e) {
-            //if (_IsCreating || _IsFilling) { return; }
-            _Value = ((TextBox)sender).Text;
+            if (_IsFilling) { return; }
+            ValueSet(((TextBox)sender).Text, false, false);
         }
 
 
@@ -1407,7 +1418,12 @@ namespace BlueControls.Controls {
             UpdateControls();
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="newvalue"></param>
+        /// <param name="updateControls"></param>
+        /// <param name="alwaysValueChanged">Steuerelemente, wie Button, Checkboxen, DropDownListen müssen hier TRUE setzen. Auch Texte, die in einem Stück gesetzt werden.</param>
         public void ValueSet(string newvalue, bool updateControls, bool alwaysValueChanged) {
             if (newvalue == null) { newvalue = string.Empty; }
             if (_Value == null && string.IsNullOrEmpty(newvalue)) { return; }

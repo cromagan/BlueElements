@@ -69,8 +69,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public override Size SizeUntouchedForListBox()
-        {
+        protected override Size ComputeSizeUntouchedForListBox() {
             if (Pos.X == 0 && Pos.X == 0 && Pos.Width == 0 && Pos.Height == 0)
             {
 

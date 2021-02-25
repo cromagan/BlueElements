@@ -49,24 +49,24 @@ namespace BlueBasics.MultiUserFile {
             if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
 
 
-            Parallel.ForEach(AllFiles, thisFile => {
-                thisFile?.Save(mustSave);
-            });
-
-
-
-
-            //var x = AllFiles.Count;
-
-            //foreach (var thisFile in AllFiles) {
+            //Parallel.ForEach(AllFiles, thisFile => {
             //    thisFile?.Save(mustSave);
+            //});
 
-            //    if (x != AllFiles.Count) {
-            //        // Die Auflistung wurde verändert! Selten, aber kann passieren!
-            //        SaveAll(mustSave);
-            //        return;
-            //    }
-            //}
+
+
+
+            var x = AllFiles.Count;
+
+            foreach (var thisFile in AllFiles) {
+                thisFile?.Save(mustSave);
+
+                if (x != AllFiles.Count) {
+                    // Die Auflistung wurde verändert! Selten, aber kann passieren!
+                    SaveAll(mustSave);
+                    return;
+                }
+            }
         }
 
 

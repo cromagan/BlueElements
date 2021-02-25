@@ -82,11 +82,13 @@ namespace BlueControls.Controls {
                 EditType = enEditTypeFormula.None;
                 QuickInfo = string.Empty;
                 FileEncryptionKey = string.Empty;
-                ValueSet(string.Empty,true,false);
-            } else {
+                ValueSet(string.Empty, true, true);
+            }
+            else {
                 if (string.IsNullOrEmpty(Filter.Herkunft)) {
                     DisabledReason = string.Empty;
-                } else {
+                }
+                else {
                     DisabledReason = "Dieser Filter ist automatisch<br>gesetzt worden.";
                 }
 
@@ -94,7 +96,8 @@ namespace BlueControls.Controls {
 
                 if (string.IsNullOrEmpty(qi)) {
                     QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText();
-                } else {
+                }
+                else {
                     QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText() + "<br><br><b>Info:</b><br>" + qi;
                 }
 
@@ -102,7 +105,8 @@ namespace BlueControls.Controls {
 
                 if (!Filter.Column.AutoFilterSymbolPossible()) {
                     EditType = enEditTypeFormula.None;
-                } else {
+                }
+                else {
 
                     var ShowDelFilterButton = true;
 
@@ -110,14 +114,15 @@ namespace BlueControls.Controls {
 
                         if (myParent == null || myParent.Orientation == enOrientation.Waagerecht || Filter.Column.DauerFilterPos.IsEmpty) {
                             CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-                        } else {
+                        }
+                        else {
                             CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
 
                         }
                         ShowDelFilterButton = false;
                         Caption = Filter.Column.ReadableText() + ":";
                         EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
-                        ValueSet(Filter.SearchValue[0], true, false);
+                        ValueSet(Filter.SearchValue[0], true, true);
                     }
 
 
@@ -167,11 +172,13 @@ namespace BlueControls.Controls {
                 if (CaptionPosition == enÜberschriftAnordnung.ohne) {
                     btn.ImageCode = "Trichter|16||1";
                     btn.Text = Filter.ReadableText();
-                } else {
+                }
+                else {
                     if (Filter != null && Filter.SearchValue != null && Filter.SearchValue.Count > 0 && !string.IsNullOrEmpty(Filter.SearchValue[0])) {
                         btn.ImageCode = "Trichter|16";
                         btn.Text = "wählen (" + Filter.SearchValue.Count.ToString() + ")";
-                    } else {
+                    }
+                    else {
                         btn.ImageCode = "Trichter|16";
                         btn.Text = "wählen";
                     }
@@ -215,10 +222,12 @@ namespace BlueControls.Controls {
             if (List_FilterString.Count == 0) {
 
                 cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", enImageCode.Kreuz, false);
-            } else if (List_FilterString.Count < 400) {
+            }
+            else if (List_FilterString.Count < 400) {
                 cbx.Item.AddRange(List_FilterString, Filter.Column, enShortenStyle.Replaced, Filter.Column.BildTextVerhalten);
                 cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
-            } else {
+            }
+            else {
                 cbx.Item.Add("Zu viele Einträge", "|~", enImageCode.Kreuz, false);
             }
 

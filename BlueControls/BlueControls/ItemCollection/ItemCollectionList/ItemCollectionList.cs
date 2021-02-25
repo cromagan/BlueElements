@@ -289,6 +289,10 @@ namespace BlueControls.ItemCollection {
             var sameh = -1;
             var or = enOrientation.Senkrecht;
 
+            PreComputeSize();
+
+
+
             foreach (var ThisItem in this) {
                 if (ThisItem != null) {
                     var s = ThisItem.SizeUntouchedForListBox();
@@ -315,8 +319,12 @@ namespace BlueControls.ItemCollection {
             return (w, h, hall, or);
         }
 
+        private void PreComputeSize() {
+            System.Threading.Tasks.Parallel.ForEach(this, ThisItem => {
 
-
+                ThisItem.SizeUntouchedForListBox();
+            });
+        }
 
         public Size CalculateColumnAndSize() {
             var (BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed) = ItemData();
@@ -331,6 +339,7 @@ namespace BlueControls.ItemCollection {
         internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider sliderY, int biggestItemX, int heightAdded, enOrientation senkrechtAllowed) {
 
 
+
             if (Math.Abs(LastCheckedMaxSize.Width - controlDrawingArea.Width) > 0.1 || Math.Abs(LastCheckedMaxSize.Height - controlDrawingArea.Height) > 0.1) {
                 LastCheckedMaxSize = controlDrawingArea;
                 _CellposCorrect = Size.Empty;
@@ -341,6 +350,8 @@ namespace BlueControls.ItemCollection {
                 return Size.Empty;
             }
 
+
+            PreComputeSize();
 
 
             if (_ItemDesign == enDesign.Undefiniert) { GetDesigns(); }
@@ -393,6 +404,11 @@ namespace BlueControls.ItemCollection {
             var Maxy = int.MinValue;
 
             var itenc = -1;
+
+
+
+
+
 
 
             BasicListItem previtem = null;
@@ -842,7 +858,7 @@ namespace BlueControls.ItemCollection {
 
         internal void SetValuesTo(List<string> values, string fileEncryptionKey) {
 
-    
+
             var _Ist = this.ToListOfString();
             var _zuviel = _Ist.Except(values).ToList();
             var _zuwenig = values.Except(_Ist).ToList();
@@ -1042,12 +1058,20 @@ namespace BlueControls.ItemCollection {
 
         public BasicListItem this[string Internal] {
             get {
-                if (string.IsNullOrEmpty(Internal)) { return null; }
 
-                foreach (var ThisItem in this) {
-                    if (ThisItem != null && Internal.ToUpper() == ThisItem.Internal.ToUpper()) { return ThisItem; }
+                try {
+
+                    if (string.IsNullOrEmpty(Internal)) { return null; }
+
+                    foreach (var ThisItem in this) {
+                        if (ThisItem != null && Internal.ToUpper() == ThisItem.Internal.ToUpper()) { return ThisItem; }
+                    }
+                    return null;
                 }
-                return null;
+                catch {
+                    return this[Internal];
+                }
+
             }
         }
 

@@ -274,7 +274,7 @@ namespace BlueControls.Controls {
 
 
             if (_tmpColumn == null || _tmpRow == null) {
-                ValueSet(string.Empty, true, false);
+                ValueSet(string.Empty, true, true);
                 InfoText = string.Empty;
                 return;
             }
@@ -295,7 +295,7 @@ namespace BlueControls.Controls {
                         }
                     }
 
-                    ValueSet(tmp2.JoinWithCr(), true, false);
+                    ValueSet(tmp2.JoinWithCr(), true, true);
 
                     if (Value.ToUpper() != tmp2.JoinWithCr().ToUpper()) {
                         Develop.DebugPrint(enFehlerArt.Warnung, "Werte ungleich: " + Value + " - " + tmp2.JoinWithCr());
@@ -303,7 +303,7 @@ namespace BlueControls.Controls {
                     break;
 
                 default:
-                    ValueSet(_tmpRow.CellGetString(_tmpColumn), true, false);
+                    ValueSet(_tmpRow.CellGetString(_tmpColumn), true, true);
                     break;
             }
         }
@@ -448,8 +448,8 @@ namespace BlueControls.Controls {
 
                 case SwapListBox swapListBox:
                     StyleSwapListBox(swapListBox, column1);
-                    swapListBox.ContextMenuInit += ListBox_ContextMenuInit;
-                    swapListBox.ContextMenuItemClicked += ListBox_ContextMenuItemClicked;
+                    //swapListBox.ContextMenuInit += ListBox_ContextMenuInit;
+                    //swapListBox.ContextMenuItemClicked += ListBox_ContextMenuItemClicked;
                     swapListBox.AddClicked += ListBox_AddClicked;
                     break;
 
@@ -507,8 +507,8 @@ namespace BlueControls.Controls {
 
 
                 case SwapListBox swaplistBox:
-                    swaplistBox.ContextMenuInit -= ListBox_ContextMenuInit;
-                    swaplistBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
+                    //swaplistBox.ContextMenuInit -= ListBox_ContextMenuInit;
+                    //swaplistBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
                     swaplistBox.AddClicked -= ListBox_AddClicked;
                     break;
 

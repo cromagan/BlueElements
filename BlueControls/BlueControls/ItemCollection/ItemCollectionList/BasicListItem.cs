@@ -26,7 +26,17 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection {
     public abstract class BasicListItem : ICompareKey, IComparable {
-        public abstract Size SizeUntouchedForListBox();
+
+        public Size SizeUntouchedForListBox() {
+            if (_SizeUntouchedForListBox.IsEmpty) {
+                _SizeUntouchedForListBox = ComputeSizeUntouchedForListBox();
+            }
+
+            return _SizeUntouchedForListBox;
+        }
+
+        protected abstract Size ComputeSizeUntouchedForListBox();
+
 
         public ItemCollectionList Parent { get; private set; }
         public string Internal { get; set; }
@@ -44,6 +54,8 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         /// <remarks></remarks>
         public object Tag;
+
+        private Size _SizeUntouchedForListBox = Size.Empty;
 
 
         /// <summary>

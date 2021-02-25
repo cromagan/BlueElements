@@ -27,12 +27,11 @@ using System.Drawing.Drawing2D;
 using System.Reflection;
 using static BlueBasics.modConverter;
 
-namespace BlueBasics
-{
-    public sealed class QuickImage : IParseable, IReadableTextWithChanging, ICompareKey
-    {
+namespace BlueBasics {
+    public sealed class QuickImage : IParseable, IReadableTextWithChanging, ICompareKey {
         private static string _SearchedCode = "";
         private static int _FoundInde = -1;
+        private static object _locker = new object();
 
         #region  Variablen-Deklarationen 
 
@@ -78,13 +77,11 @@ namespace BlueBasics
 
 
 
-        public QuickImage(string ImageCode)
-        {
+        public QuickImage(string ImageCode) {
             Parse(ImageCode);
         }
 
-        private void Initialize()
-        {
+        private void Initialize() {
             _name = string.Empty;
             _effekt = enImageCodeEffect.Ohne;
             _width = -1;
@@ -103,29 +100,23 @@ namespace BlueBasics
 
         #region  Properties 
 
-        public Bitmap BMP
-        {
-            get
-            {
+        public Bitmap BMP {
+            get {
                 if (_Bitmap == null) { Generate(); }
                 return _Bitmap.Bitmap;
             }
         }
 
-        public BitmapExt BMPExt
-        {
-            get
-            {
+        public BitmapExt BMPExt {
+            get {
                 if (_Bitmap == null) { Generate(); }
                 return _Bitmap;
             }
         }
 
 
-        public bool IsError
-        {
-            get
-            {
+        public bool IsError {
+            get {
                 if (_Bitmap == null) { Generate(); }
                 return _IsError;
             }
@@ -133,155 +124,122 @@ namespace BlueBasics
 
         public bool IsParsing { get; private set; }
 
-        public string Name
-        {
-            get
-            {
+        public string Name {
+            get {
                 return _name;
             }
 
-            set
-            {
+            set {
                 _name = value;
                 OnChanged();
             }
         }
 
-        public enImageCodeEffect Effekt
-        {
-            get
-            {
+        public enImageCodeEffect Effekt {
+            get {
                 return _effekt;
             }
 
-            set
-            {
+            set {
                 _effekt = value;
                 OnChanged();
             }
         }
 
-        public int Width
-        {
-            get
-            {
+        public int Width {
+            get {
                 return _width;
             }
 
-            set
-            {
+            set {
                 _width = value;
                 OnChanged();
             }
         }
 
-        public int Height
-        {
-            get
-            {
+        public int Height {
+            get {
                 return _height;
             }
 
-            set
-            {
+            set {
                 _height = value;
                 OnChanged();
             }
         }
 
-        public string Färbung
-        {
-            get
-            {
+        public string Färbung {
+            get {
                 return _färbung;
             }
 
-            set
-            {
+            set {
                 _färbung = value;
                 OnChanged();
             }
         }
 
-        public string ChangeGreenTo
-        {
-            get
-            {
+        public string ChangeGreenTo {
+            get {
                 return _changeGreenTo;
             }
 
-            set
-            {
+            set {
                 _changeGreenTo = value;
                 OnChanged();
             }
         }
 
-        public int Helligkeit
-        {
-            get
-            {
+        public int Helligkeit {
+            get {
                 return _helligkeit;
             }
 
-            set
-            {
+            set {
                 _helligkeit = value;
                 OnChanged();
             }
         }
 
-        public int Sättigung
-        {
-            get
-            {
+        public int Sättigung {
+            get {
                 return _sättigung;
             }
 
-            set
-            {
+            set {
                 _sättigung = value;
                 OnChanged();
             }
         }
 
-        public int Transparenz
-        {
-            get
-            {
+        public int Transparenz {
+            get {
                 return _transparenz;
             }
 
-            set
-            {
+            set {
                 _transparenz = value;
                 OnChanged();
             }
         }
 
-        public string Zweitsymbol
-        {
-            get
-            {
+        public string Zweitsymbol {
+            get {
                 return _Zweitsymbol;
             }
 
-            set
-            {
+            set {
                 _Zweitsymbol = value;
                 OnChanged();
             }
         }
 
-        public int DrehWinkel
-        {
-            get
-            {
+        public int DrehWinkel {
+            get {
                 return _drehWinkel;
             }
 
-            set
-            {
+            set {
                 _drehWinkel = value;
                 OnChanged();
             }
@@ -293,60 +251,57 @@ namespace BlueBasics
 
         #region  Shares 
 
-        private static readonly List<QuickImage> PC = new List<QuickImage>();
+        private static readonly List<QuickImage> _pics = new List<QuickImage>();
 
 
 
 
-        public static QuickImage Get(Bitmap Image)
-        {
+        public static QuickImage Get(Bitmap Image) {
             if (Image == null) { return null; }
 
-            foreach (var ThisQuickImage in PC)
-            {
-                if (ThisQuickImage != null) { return ThisQuickImage; }
-            }
 
+            lock (_locker) {
+                foreach (var ThisQuickImage in _pics) {
+                    if (ThisQuickImage != null) { return ThisQuickImage; }
+                }
+            }
             return null;
         }
 
 
-        public static QuickImage Get(QuickImage ImageCode, enImageCodeEffect AdditionalState)
-        {
+        public static QuickImage Get(QuickImage ImageCode, enImageCodeEffect AdditionalState) {
             if (AdditionalState == enImageCodeEffect.Ohne) { return ImageCode; }
             return Get(GenerateCode(ImageCode.Name, ImageCode.Width, ImageCode.Height, ImageCode.Effekt | AdditionalState, ImageCode.Färbung, ImageCode.ChangeGreenTo, ImageCode.Sättigung, ImageCode.Helligkeit, ImageCode.DrehWinkel, ImageCode.Transparenz, ImageCode.Zweitsymbol));
         }
 
-        public static QuickImage Get(string ImageCode)
-        {
+        public static QuickImage Get(string ImageCode) {
             if (string.IsNullOrEmpty(ImageCode)) { return null; }
 
             var z = GetIndex(ImageCode);
-            if (z >= 0) { return PC[z]; }
+            if (z >= 0) { return _pics[z]; }
 
 
 
             var l = new QuickImage(ImageCode);
-            if (l.ToString() != ImageCode)
-            {
+            if (l.ToString() != ImageCode) {
                 Develop.DebugPrint("Fehlerhafter Imagecode: " + ImageCode + " -> " + l);
                 z = GetIndex(l.ToString());
-                if (z >= 0) { return PC[z]; }
+                if (z >= 0) { return _pics[z]; }
             }
 
 
-            PC.Add(l);
+            lock (_locker) {
+                _pics.Add(l);
+            }
 
             return l;
         }
 
-        public static QuickImage Get(string Image, int SquareWidth)
-        {
+        public static QuickImage Get(string Image, int SquareWidth) {
             if (string.IsNullOrEmpty(Image)) { return null; }
 
 
-            if (Image.Contains("|"))
-            {
+            if (Image.Contains("|")) {
                 var w = (Image + "||||||").Split('|');
                 w[1] = SquareWidth.ToString();
                 w[2] = string.Empty;
@@ -359,35 +314,31 @@ namespace BlueBasics
 
 
 
-        public static QuickImage Get(enImageCode Image)
-        {
+        public static QuickImage Get(enImageCode Image) {
             return Get(Image, 16);
         }
 
-        public static QuickImage Get(enImageCode Image, int SquareWidth)
-        {
+        public static QuickImage Get(enImageCode Image, int SquareWidth) {
             if (Image == enImageCode.None) { return null; }
             return Get(GenerateCode(Enum.GetName(Image.GetType(), Image), SquareWidth, 0, enImageCodeEffect.Ohne, "", "", 100, 100, 0, 0, string.Empty));
         }
 
-        public static QuickImage Get(enImageCode Image, int SquareWidth, string Färbung, string ChangeGreenTo)
-        {
+        public static QuickImage Get(enImageCode Image, int SquareWidth, string Färbung, string ChangeGreenTo) {
             if (Image == enImageCode.None) { return null; }
             return Get(GenerateCode(Enum.GetName(Image.GetType(), Image), SquareWidth, 0, enImageCodeEffect.Ohne, Färbung, ChangeGreenTo, 100, 100, 0, 0, string.Empty));
         }
 
-        public static QuickImage Get(int Index)
-        {
-            if (Index >= 0 && Index < PC.Count) { return PC[Index]; }
+        public static QuickImage Get(int Index) {
+            lock (_locker) {
+                if (Index >= 0 && Index < _pics.Count) { return _pics[Index]; }
+            }
             return null;
         }
 
 
-        public static enImageCode FileTypeImage(enFileFormat File)
-        {
+        public static enImageCode FileTypeImage(enFileFormat File) {
 
-            switch (File)
-            {
+            switch (File) {
                 case enFileFormat.WordKind:
                     return enImageCode.Word;
                 case enFileFormat.ExcelKind:
@@ -432,39 +383,39 @@ namespace BlueBasics
             }
         }
 
-        public static QuickImage Get(enFileFormat File, int Size)
-        {
+        public static QuickImage Get(enFileFormat File, int Size) {
             return Get(FileTypeImage(File), Size);
         }
 
 
-        public static int GetIndex(QuickImage Img)
-        {
-            return PC.IndexOf(Img);
-        }
-
-
-        public static int GetIndex(string Code)
-        {
-            if (string.IsNullOrEmpty(Code)) { return -1; }
-
-            if (_SearchedCode == Code) { return _FoundInde; }
-
-            for (var z = 0; z < PC.Count; z++)
-            {
-                if (Code == PC[z].ToString())
-                {
-                    _SearchedCode = Code;
-                    _FoundInde = z;
-                    return z;
-                }
-
+        public static int GetIndex(QuickImage Img) {
+            lock (_locker) {
+                return _pics.IndexOf(Img);
             }
-            return -1;
         }
 
-        public static string GenerateCode(string Name, int Width, int Height, enImageCodeEffect Effekt, string Färbung, string ChangeGreenTo, int Sättigung, int Helligkeit, int Drehwinkel, int Transparenz, string Zweitsymbol)
-        {
+
+        public static int GetIndex(string Code) {
+
+            lock (_locker) {
+
+                if (string.IsNullOrEmpty(Code)) { return -1; }
+
+                if (_SearchedCode == Code) { return _FoundInde; }
+
+                for (var z = 0; z < _pics.Count; z++) {
+                    if (Code == _pics[z].ToString()) {
+                        _SearchedCode = Code;
+                        _FoundInde = z;
+                        return z;
+                    }
+
+                }
+                return -1;
+            }
+        }
+
+        public static string GenerateCode(string Name, int Width, int Height, enImageCodeEffect Effekt, string Färbung, string ChangeGreenTo, int Sättigung, int Helligkeit, int Drehwinkel, int Transparenz, string Zweitsymbol) {
 
             var C = Name + "|";
             if (Width > 0) { C += Width; }
@@ -490,23 +441,23 @@ namespace BlueBasics
         }
 
 
-        public static void Add(string Name, BitmapExt BMP)
-        {
+        public static void Add(string Name, BitmapExt BMP) {
 
             if (string.IsNullOrEmpty(Name)) { return; }
             if (BMP == null) { return; }
 
+            lock (_locker) {
 
-            var z = GetIndex(Name);
-            if (z < 0)
-            {
-                var l = new QuickImage(Name);
-                PC.Add(l);
-                z = GetIndex(Name);
+                var z = GetIndex(Name);
+                if (z < 0) {
+                    var l = new QuickImage(Name);
+                    _pics.Add(l);
+                    z = GetIndex(Name);
+                }
+
+
+                _pics[z]._Bitmap = BMP;
             }
-
-
-            PC[z]._Bitmap = BMP;
         }
 
 
@@ -514,11 +465,9 @@ namespace BlueBasics
 
 
 
-        public override string ToString()
-        {
+        public override string ToString() {
 
-            if (string.IsNullOrEmpty(TMPCode))
-            {
+            if (string.IsNullOrEmpty(TMPCode)) {
                 TMPCode = GenerateCode(_name, _width, _height, _effekt, _färbung, _changeGreenTo, _sättigung, _helligkeit, _drehWinkel, _transparenz, _Zweitsymbol);
             }
 
@@ -526,33 +475,31 @@ namespace BlueBasics
         }
 
 
-        public BitmapExt GetBitmap(string TMPName)
-        {
+        public BitmapExt GetBitmap(string TMPName) {
             var vbmp = modAllgemein.GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), TMPName + ".png");
             if (vbmp != null) { return vbmp; }
 
-            var i = GetIndex(TMPName);
-            if (i >= 0 && PC[i] != this) { return PC[i].BMPExt; }
+            lock (_locker) {
 
+                var i = GetIndex(TMPName);
+                if (i >= 0 && _pics[i] != this) { return _pics[i].BMPExt; }
+            }
 
             var e = new NeedImageEventArgs(TMPName);
-
             OnNeedImage(e);
-
             if (e.BMP != null) { return e.BMP; }
 
-
-            // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen
-            var i2 = GetIndex(TMPName);
-            if (i2 >= 0 && PC[i2] != this) { return PC[i2].BMPExt; }
-
+            lock (_locker) {
+                // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen
+                var i2 = GetIndex(TMPName);
+                if (i2 >= 0 && _pics[i2] != this) { return _pics[i2].BMPExt; }
+            }
 
             return null;
         }
 
 
-        private void Generate()
-        {
+        private void Generate() {
 
             var bmpOri = GetBitmap(_name);
             BitmapExt bmpTMP = null;
@@ -564,8 +511,7 @@ namespace BlueBasics
 
 
             // Fehlerhaftes Bild
-            if (bmpOri == null)
-            {
+            if (bmpOri == null) {
                 _IsError = true;
                 _Bitmap = new BitmapExt(16, 16);
                 using var GR = Graphics.FromImage(_Bitmap.Bitmap);
@@ -578,16 +524,12 @@ namespace BlueBasics
 
 
             // Bild ohne besonderen Effekte, schnell abhandeln
-            if (bmpOri != null && _effekt == enImageCodeEffect.Ohne && string.IsNullOrEmpty(_changeGreenTo) && string.IsNullOrEmpty(_färbung) && _sättigung == 100 && _helligkeit == 100 && _transparenz == 100 && string.IsNullOrEmpty(_Zweitsymbol))
-            {
-                if (_width > 0)
-                {
-                    if (_height > 0)
-                    {
+            if (bmpOri != null && _effekt == enImageCodeEffect.Ohne && string.IsNullOrEmpty(_changeGreenTo) && string.IsNullOrEmpty(_färbung) && _sättigung == 100 && _helligkeit == 100 && _transparenz == 100 && string.IsNullOrEmpty(_Zweitsymbol)) {
+                if (_width > 0) {
+                    if (_height > 0) {
                         bmpOri.Resize(_width, _height, enSizeModes.EmptySpace, InterpolationMode.High, false);
                     }
-                    else
-                    {
+                    else {
                         bmpOri.Resize(_width, _width, enSizeModes.EmptySpace, InterpolationMode.High, false);
                     }
                 }
@@ -603,12 +545,10 @@ namespace BlueBasics
 
 
             // Bild Modifizieren ---------------------------------
-            if (bmpOri != null)
-            {
+            if (bmpOri != null) {
 
                 bmpTMP = new BitmapExt(bmpOri.Width, bmpOri.Height);
-                if (_effekt.HasFlag(enImageCodeEffect.Durchgestrichen))
-                {
+                if (_effekt.HasFlag(enImageCodeEffect.Durchgestrichen)) {
                     var tmpEx = _effekt ^ enImageCodeEffect.Durchgestrichen;
                     var n = "Kreuz|" + bmpOri.Width + "|";
                     if (bmpOri.Width != bmpOri.Height) { n += bmpOri.Height; }
@@ -617,38 +557,31 @@ namespace BlueBasics
                     bmpKreuz = Get(n.Trim("|")).BMP;
                 }
 
-                if (!string.IsNullOrEmpty(_Zweitsymbol))
-                {
+                if (!string.IsNullOrEmpty(_Zweitsymbol)) {
                     var x = bmpOri.Width / 2;
                     bmpSecond = Get(_Zweitsymbol + "|" + x).BMP;
                 }
 
-               for (var X = 0; X < bmpOri.Width; X++)
-                {
+                for (var X = 0; X < bmpOri.Width; X++) {
 
-                    for (var Y = 0; Y < bmpOri.Height; Y++)
-                    {
+                    for (var Y = 0; Y < bmpOri.Height; Y++) {
                         var c = bmpOri.GetPixel(X, Y);
 
-                        if (bmpSecond != null && X > bmpOri.Width - bmpSecond.Width && Y > bmpOri.Height - bmpSecond.Height)
-                        {
+                        if (bmpSecond != null && X > bmpOri.Width - bmpSecond.Width && Y > bmpOri.Height - bmpSecond.Height) {
                             var c2 = bmpSecond.GetPixel(X - (bmpOri.Width - bmpSecond.Width), Y - (bmpOri.Height - bmpSecond.Height));
                             if (!c2.IsMagentaOrTransparent()) { c = c2; }
                         }
 
 
-                        if (c.IsMagentaOrTransparent())
-                        {
+                        if (c.IsMagentaOrTransparent()) {
                             c = Color.FromArgb(0, 0, 0, 0);
                         }
-                        else
-                        {
+                        else {
                             if (colgreen != null && c.ToArgb() == -16711936) { c = (Color)colgreen; }
                             if (colfärb != null) { c = Extensions.FromHSB(((Color)colfärb).GetHue(), ((Color)colfärb).GetSaturation(), c.GetBrightness(), c.A); }
                             if (_sättigung != 100 || _helligkeit != 100) { c = Extensions.FromHSB(c.GetHue(), c.GetSaturation() * _sättigung / 100, c.GetBrightness() * _helligkeit / 100, c.A); }
 
-                            if (_effekt.HasFlag(enImageCodeEffect.WindowsXPDisabled))
-                            {
+                            if (_effekt.HasFlag(enImageCodeEffect.WindowsXPDisabled)) {
                                 var w = (int)(c.GetBrightness() * 100);
                                 w = (int)(w / 2.8);
                                 c = Extensions.FromHSB(0, 0, (float)(w / 100.0 + 0.5), c.A);
@@ -658,39 +591,31 @@ namespace BlueBasics
                         }
 
 
-                        if (_effekt.HasFlag(enImageCodeEffect.Durchgestrichen))
-                        {
-                            if (c.IsMagentaOrTransparent())
-                            {
+                        if (_effekt.HasFlag(enImageCodeEffect.Durchgestrichen)) {
+                            if (c.IsMagentaOrTransparent()) {
                                 c = bmpKreuz.GetPixel(X, Y);
                             }
-                            else
-                            {
+                            else {
                                 if (bmpKreuz.GetPixel(X, Y).A > 0) { c = Extensions.MixColor(bmpKreuz.GetPixel(X, Y), c, 0.5); }
                             }
                         }
 
-                        if (!c.IsMagentaOrTransparent())
-                        {
+                        if (!c.IsMagentaOrTransparent()) {
                             if (_transparenz > 0 && _transparenz < 100) { c = Color.FromArgb((int)(c.A * (100 - _transparenz) / 100.0), c.R, c.G, c.B); }
                         }
 
-                        if (_effekt.HasFlag(enImageCodeEffect.WindowsMEDisabled))
-                        {
+                        if (_effekt.HasFlag(enImageCodeEffect.WindowsMEDisabled)) {
                             var c1 = Color.FromArgb(0, 0, 0, 0);
-                            if (!c.IsMagentaOrTransparent())
-                            {
+                            if (!c.IsMagentaOrTransparent()) {
                                 var RandPixel = false;
                                 if (X > 0 && bmpOri.GetPixel(X - 1, Y).IsMagentaOrTransparent()) { RandPixel = true; }
                                 if (Y > 0 && bmpOri.GetPixel(X, Y - 1).IsMagentaOrTransparent()) { RandPixel = true; }
                                 if (X < bmpOri.Width - 1 && bmpOri.GetPixel(X + 1, Y).IsMagentaOrTransparent()) { RandPixel = true; }
                                 if (Y < bmpOri.Height - 1 && bmpOri.GetPixel(X, Y + 1).IsMagentaOrTransparent()) { RandPixel = true; }
 
-                                if (c.B < 128 || RandPixel)
-                                {
+                                if (c.B < 128 || RandPixel) {
                                     c1 = SystemColors.ControlDark;
-                                    if (X < bmpOri.Width - 1 && Y < bmpOri.Height - 1)
-                                    {
+                                    if (X < bmpOri.Width - 1 && Y < bmpOri.Height - 1) {
                                         if (bmpOri.GetPixel(X + 1, Y + 1).IsMagentaOrTransparent()) { c1 = SystemColors.ControlLightLight; }
                                     }
                                 }
@@ -704,20 +629,16 @@ namespace BlueBasics
 
             }
 
-            if (_width > 0)
-            {
-                if (_height > 0)
-                {
+            if (_width > 0) {
+                if (_height > 0) {
                     bmpTMP.Resize(_width, _height, enSizeModes.EmptySpace, InterpolationMode.High, false);
                 }
-                else
-                {
+                else {
                     bmpTMP.Resize(_width, _width, enSizeModes.EmptySpace, InterpolationMode.High, false);
                 }
                 _Bitmap = bmpTMP;
             }
-            else
-            {
+            else {
                 _Bitmap = bmpTMP;
             }
         }
@@ -725,8 +646,7 @@ namespace BlueBasics
 
 
 
-        public void Parse(string ToParse)
-        {
+        public void Parse(string ToParse) {
             IsParsing = true;
 
             Initialize();
@@ -736,26 +656,21 @@ namespace BlueBasics
 
 
 
-            if (string.IsNullOrEmpty(w[1]))
-            {
+            if (string.IsNullOrEmpty(w[1])) {
                 _width = -1;
             }
-            else
-            {
+            else {
                 _width = IntParse(w[1]);
             }
 
-            if (string.IsNullOrEmpty(w[2]))
-            {
+            if (string.IsNullOrEmpty(w[2])) {
                 _height = -1;
             }
-            else
-            {
+            else {
                 _height = IntParse(w[2]);
             }
 
-            if (!string.IsNullOrEmpty(w[3]))
-            {
+            if (!string.IsNullOrEmpty(w[3])) {
                 _effekt = (enImageCodeEffect)IntParse(w[3]);
             }
 
@@ -764,53 +679,42 @@ namespace BlueBasics
             _changeGreenTo = w[5];
 
 
-            if (string.IsNullOrEmpty(w[6]))
-            {
+            if (string.IsNullOrEmpty(w[6])) {
                 _helligkeit = 100;
             }
-            else
-            {
+            else {
                 _helligkeit = int.Parse(w[6]);
             }
 
-            if (string.IsNullOrEmpty(w[7]))
-            {
+            if (string.IsNullOrEmpty(w[7])) {
                 _sättigung = 100;
             }
-            else
-            {
+            else {
                 _sättigung = int.Parse(w[7]);
             }
 
-            if (string.IsNullOrEmpty(w[8]))
-            {
+            if (string.IsNullOrEmpty(w[8])) {
                 _drehWinkel = 0;
             }
-            else
-            {
+            else {
                 _drehWinkel = int.Parse(w[8]);
             }
 
-            if (string.IsNullOrEmpty(w[9]))
-            {
+            if (string.IsNullOrEmpty(w[9])) {
                 _transparenz = 0;
             }
-            else
-            {
+            else {
                 _transparenz = int.Parse(w[9]);
             }
 
-            if (string.IsNullOrEmpty(w[10]))
-            {
+            if (string.IsNullOrEmpty(w[10])) {
                 _Zweitsymbol = string.Empty;
             }
-            else
-            {
+            else {
                 _Zweitsymbol = w[10];
             }
 
-            if (_width > 0 && _height < 0)
-            {
+            if (_width > 0 && _height < 0) {
                 _height = _width;
             }
             IsParsing = false;
@@ -818,29 +722,24 @@ namespace BlueBasics
 
 
 
-        public QuickImage SymbolForReadableText()
-        {
+        public QuickImage SymbolForReadableText() {
             return this;
         }
 
-        public string ReadableText()
-        {
+        public string ReadableText() {
             return string.Empty;
         }
 
-        public string CompareKey()
-        {
+        public string CompareKey() {
             return ToString();
         }
 
-        public void OnChanged()
-        {
+        public void OnChanged() {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public void OnNeedImage(NeedImageEventArgs e)
-        {
+        public void OnNeedImage(NeedImageEventArgs e) {
             NeedImage?.Invoke(this, e);
         }
 

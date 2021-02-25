@@ -391,7 +391,10 @@ namespace BlueControls.Controls {
 
             _MouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
 
-            foreach (var ThisItem in Item) {
+            var _locker = new object();
+
+
+            System.Threading.Tasks.Parallel.ForEach(Item, ThisItem => {
 
                 if (ThisItem.Pos.IntersectsWith(VisArea)) {
                     var vStateItem = vStateBox;
@@ -399,10 +402,14 @@ namespace BlueControls.Controls {
                     if (!ThisItem.Enabled) { vStateItem = enStates.Standard_Disabled; }
                     if (ThisItem.Checked) { vStateItem |= enStates.Checked; }
 
-                    ThisItem.Draw(gr, 0, (int)SliderY.Value, Item.ControlDesign, Item.ItemDesign, vStateItem, true, FilterTxt.Text, false); // Items müssen beim Erstellen ersetzt werden!!!!
+                    lock (_locker)
+                    {
+                        ThisItem.Draw(gr, 0, (int)SliderY.Value, Item.ControlDesign, Item.ItemDesign, vStateItem, true, FilterTxt.Text, false); // Items müssen beim Erstellen ersetzt werden!!!!
+                    }
                 }
+            });
 
-            }
+
 
             if (BorderCoords.Height > 0) {
                 // Kann sein, wenn PaintModY größer als die Höhe ist
