@@ -149,7 +149,7 @@ namespace BlueDatabase {
                 }
 
             }
-
+            InternalDatabase.Caption = id;
             InternalDatabase.ReloadDelaySecond = 240;
             InternalDatabase.AutoDeleteBAK = true;
         }

@@ -74,6 +74,9 @@ namespace BlueBasics {
 
 
         public new void Remove(T item) {
+
+            if (!Contains(item)) { return; }
+
             OnItemRemoving(item);
             base.Remove(item);
             OnItemRemoved();
@@ -84,10 +87,10 @@ namespace BlueBasics {
 
             if (collection is null) { return; }
 
-            base.AddRange(collection);
+            //base.AddRange(collection);
 
             foreach (var item in collection) {
-                OnItemAdded(item);
+                Add(item);
             }
 
         }

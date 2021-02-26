@@ -232,7 +232,7 @@ namespace BlueControls.Controls {
                 }
                 else {
                     _tmpColumn.EditType = EditType;
-                    _tmpColumn.Quickinfo = QuickInfo;
+                    //_tmpColumn.Quickinfo = QuickInfo;
                 }
 
             }

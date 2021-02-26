@@ -330,7 +330,10 @@ namespace BlueControls.Controls {
                         if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
                         var TMPGR = Graphics.FromImage(_BitmapOfControl);
                         DrawControl(TMPGR, IsStatus());
-                        gr.DrawImage(_BitmapOfControl, 0, 0);
+
+                        if (_BitmapOfControl != null) {
+                            gr.DrawImage(_BitmapOfControl, 0, 0);
+                        }
                         TMPGR.Dispose();
                     }
                     else {

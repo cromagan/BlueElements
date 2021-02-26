@@ -35,7 +35,7 @@ using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 
 namespace BlueDatabase {
-    public sealed class ColumnItem : IReadableTextWithChanging, IParseable, ICompareKey, ICheckable {
+    public sealed class ColumnItem : IReadableTextWithChanging, ICompareKey, ICheckable {
         #region  Variablen-Deklarationen 
 
         public readonly Database Database;
@@ -1117,12 +1117,12 @@ namespace BlueDatabase {
             }
         }
 
-        public bool IsParsing {
-            get {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Kann nur über die Datenbank geparsed werden.");
-                return false;
-            }
-        }
+        //public bool IsParsing {
+        //    get {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Kann nur über die Datenbank geparsed werden.");
+        //        return false;
+        //    }
+        //}
 
 
 
@@ -2584,9 +2584,9 @@ namespace BlueDatabase {
 
         }
 
-        public void Parse(string ToParse) {
-            Develop.DebugPrint(enFehlerArt.Fehler, "Kann nur über die Datenbank geparsed werden.");
-        }
+        //public void Parse(string ToParse) {
+        //    Develop.DebugPrint(enFehlerArt.Fehler, "Kann nur über die Datenbank geparsed werden.");
+        //}
 
         //public object Clone()
         //{
