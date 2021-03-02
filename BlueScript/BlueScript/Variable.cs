@@ -30,12 +30,22 @@ using Skript.Enums;
 namespace BlueScript {
     public class Variable {
 
-        public string Name { get; set; }
+
+        public Variable(string name) {
+
+            if (!IsValidName(name)) {
+                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Ungültiger Variablenname: " + name);
+            }
+            Name = name.ToLower();
+        }
+
+
+        public string Name { get; private set; }
         public string ValueString { get; set; }
 
         public enVariableDataType Type { get; set; }
 
-        protected static bool IsValidName(string v) {
+        public static bool IsValidName(string v) {
 
             v = v.ToLower();
 
@@ -65,6 +75,16 @@ namespace BlueScript {
             }
 
             return null;
+        }
+
+        public static List<string> AllNames(this List<Variable> vars) {
+
+            var l = new List<string>();
+            foreach (var thisvar in vars) {
+                l.Add(thisvar.Name);
+            }
+
+            return l;
         }
 
     }

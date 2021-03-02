@@ -29,42 +29,65 @@ namespace BlueScript {
     class Method_var : Method {
 
 
-        public Method_var() : base() { }
+        public Method_var(Script parent) : base(parent) { }
 
 
         //public Method_var(Script parent, string toParse) : base(parent, toParse) { }
 
 
-        public override string Command { get => "var"; }
+        public override List<string> Command { get => new List<string>() { "var" }; }
         public override List<string> StartSequence { get => new List<string>() { " " }; }
         public override List<string> EndSequence { get => new List<string>() { ";" }; }
-
-        //public override string Parse(string txt) {
-
-
-        //    return string.Empty;
-        //}
+        public override List<string> AllowedIn { get => null; }
+        public override bool GetCodeBlockAfter { get => false; }
+        public override bool ReturnsVoid { get => true; }
 
 
 
-        internal override (string error, int pos) DoIt(string betweentext, List<Variable> variablen) {
 
-            if (string.IsNullOrEmpty(betweentext)) { return ("Kein Text angekommen.", 0); }
+        internal override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen, Method parent) {
 
-            var bs = betweentext.SplitBy("=");
+            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            if (bs.GetUpperBound(0) !=1) { return ("Fehler mit = - Zeichen", 0); }
-             
+            var bs = infos.AttributText.SplitBy("=");
+
+            if (bs.GetUpperBound(0) != 1) { return new strDoItFeedback("Fehler mit = - Zeichen"); }
+
             bs[0] = DeKlammere(bs[0]);
 
-            if (!Variable.IsValidName(bs[0])) {  return (bs[0] + "ist kein gültiger Variablen-Name", 0); }
+            if (!Variable.IsValidName(bs[0])) { return new strDoItFeedback(bs[0] + "ist kein gültiger Variablen-Name"); }
 
 
             var v = variablen.Get(bs[0]);
 
-            if (v!= null) { return (bs[0] + " ist bereits vorhanden.", 0); }
+            if (v != null) { return new strDoItFeedback("Variable " + bs[0] + " ist bereits vorhanden."); }
 
-            ss
+            variablen.Add(new Variable(bs[0]));
+
+
+            var r = new Method_BerechneVariable(Parent);
+
+            var f = r.CanDo(infos.AttributText + ";", 0, this);
+
+
+            if (!string.IsNullOrEmpty(f.ErrorMessage)) {
+
+                return new strDoItFeedback("Befehl nicht erkannt");
+            }
+
+            if (infos.AttributText.Length != f.ContinueOrErrorPosition -1) {
+                return new strDoItFeedback("Falsch gesetztes Semikolon") ;
+            }
+
+
+            var f2 = r.DoIt(f, variablen, this);
+
+            if (!string.IsNullOrEmpty(f2.ErrorMessage)) {
+                return new strDoItFeedback("Berechung fehlerhaft: " + f2.ErrorMessage);
+            }
+
+            return new strDoItFeedback();
+
         }
     }
 }

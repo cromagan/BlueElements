@@ -332,12 +332,12 @@ namespace BlueDatabase {
                     return string.Empty;
 
                 case enAction.Skript:
-                    var sc = new BlueScript.Script {
-                        ScriptText = _Text
-                    };
+                    //var sc = new BlueScript.Script {
+                    //    ScriptText = _Text
+                    //};
                     // sc.Execute();
 
-
+                    Develop.DebugPrint_NichtImplementiert();
                     return string.Empty;
 
 

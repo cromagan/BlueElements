@@ -24,159 +24,181 @@ using System.Text;
 using System.Threading.Tasks;
 using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
+using BlueBasics;
 
 namespace BlueScript {
-    public abstract class Method : Variable {
+    public abstract class Method {
 
 
         public readonly Script Parent;
 
-        public Method() { } // Dummy für Ermittlung des richtigen Codes
+        //public Method() { } // Dummy für Ermittlung des richtigen Codes
 
-        //public Method(Script parent, string toParse) {
-        //    Parent = parent;
-        //    Parse(toParse);
-        //}
-
-
-        public abstract string Command { get; }
-        public abstract List<string> StartSequence { get; }
-        public abstract List<string> EndSequence { get; }
-
-
-        public (int continuepos, string error, bool abbruch, string betweentext) CanDo(string scriptText, int pos) {
-
-            var maxl = scriptText.Length;
-
-            foreach (var thisseq in StartSequence) {
-                var s = (Command + thisseq).ToLower();
-                var l = s.Length;
-
-                if (pos + l < maxl) {
-
-
-                    if (scriptText.Substring(pos, l).ToLower() == s) {
-
-                        (var endpos, var textBetween, var error) = GetEnd(scriptText, pos + l);
-                        if (!string.IsNullOrEmpty(error)) {
-                            return (endpos, "Fehler bei " + Command + ": " + error, true, string.Empty);
-                        }
-
-
-
-
-                        return (endpos, string.Empty, false, textBetween);
-                    }
-                }
-
-            }
-
-            return (pos, "Kann nicht geparst werden", false, string.Empty);
+        public Method(Script parent) {
+            Parent = parent;
         }
 
 
-        (int enspos, string textBetween, string error) GetEnd(string scriptText, int startpos) {
+        public abstract bool ReturnsVoid { get; }
 
-            var klammern = 0;
-            var Gans = false;
-            var GeschwKlammern = false;
-            var EckigeKlammern = 0;
+        public abstract List<string> Command { get; }
+        public abstract List<string> StartSequence { get; }
+        public abstract List<string> EndSequence { get; }
+        public abstract List<string> AllowedIn { get; }
+        public abstract bool GetCodeBlockAfter { get; }
 
-            var pos = startpos - 1; // Letztes Zeichen noch berücksichtigen, könnte ja Klammer auf oder zu sein
+        internal abstract strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen, Method parent);
+
+
+        public strCanDoFeedback CanDo(string scriptText, int pos, Method parent) {
 
             var maxl = scriptText.Length;
 
-            do {
 
-                if (pos > maxl) { return (pos, string.Empty, "Lesen über Textende"); }
+            foreach (var thiscomand in Command) {
 
-                #region Klammer und " erledigen
-                switch (scriptText.Substring(pos)) {
+                foreach (var thisseq in StartSequence) {
+                    var comandtext = thiscomand + thisseq;
+                    var l = comandtext.Length;
 
-                    // Gänsefüsschen, immer erlaubt
-                    case "\"":
-                        Gans = !Gans;
-                        break;
-
-                    // Ekige klammern könne in { oder ( vorkommen, immer erlaubt
-                    case "[":
-                        if (!Gans) {
-                            EckigeKlammern++;
-                        }
-                        break;
-
-                    case "]":
-                        if (!Gans) {
-                            if (EckigeKlammern <= 0) { return (pos, string.Empty, "] nicht gültig"); }
-                            EckigeKlammern--;
-                        }
-                        break;
+                    if (pos + l < maxl) {
 
 
-                    // Runde klammern können in { vorkommen
-                    case "(":
-                        if (!Gans) {
-                            if (EckigeKlammern > 0) { return (pos, string.Empty, "( nicht gültig"); }
-                            klammern++;
-                        }
+                        if (scriptText.Substring(pos, l).ToLower() == comandtext.ToLower()) {
 
-                        break;
-
-                    case ")":
-                        if (!Gans) {
-                            if (EckigeKlammern > 0) { return (pos, string.Empty, ") nicht gültig"); }
-                            if (klammern <= 0) { return (pos, string.Empty, ") nicht gültig"); }
-                            klammern--;
-                        }
-                        break;
-
-
-                    // Gescheifte klammern müssen immer sauber auf und zu gemacht werdrn!
-                    case "{":
-                        if (!Gans) {
-                            if (klammern > 0) { return (pos, string.Empty, "{ nicht gültig"); }
-                            if (EckigeKlammern > 0) { return (pos, string.Empty, "{ nicht gültig"); }
-                            if (GeschwKlammern) { return (pos, string.Empty, "{ nicht gültig"); }
-                            GeschwKlammern = true;
-                        }
-                        break;
-
-                    case "}":
-                        if (!Gans) {
-                            if (klammern > 0) { return (pos, string.Empty, "} nicht gültig"); }
-                            if (EckigeKlammern > 0) { return (pos, string.Empty, "} nicht gültig"); }
-                            if (!GeschwKlammern) { return (pos, string.Empty, "} nicht gültig"); }
-                            GeschwKlammern = false;
-                        }
-                        break;
-                }
-                #endregion
-
-
-
-                if (klammern == 0 && !Gans && !GeschwKlammern && EckigeKlammern == 0) {
-
-                    foreach (var thisEnd in EndSequence) {
-
-
-                        if (pos + thisEnd.Length <= maxl) {
-
-                            if (scriptText.Substring(pos, thisEnd.Length).ToLower() == thisEnd.ToLower()) {
-
-                                var txtBTW = DeKlammere(scriptText.Substring(startpos, pos - startpos));
-                                return (pos + thisEnd.Length, txtBTW, string.Empty);
+                            var f = GetEnd(scriptText, pos + l);
+                            if (!string.IsNullOrEmpty(f.ErrorMessage)) {
+                                return new strCanDoFeedback(f.ContinuePosition, "Fehler bei " + Command + ": " + f.ErrorMessage, true);
                             }
 
-                        }
 
+
+
+                            return new strCanDoFeedback(f.ContinuePosition, comandtext, f.AttributeText, string.Empty);
+                        }
                     }
 
-
-
                 }
+            }
 
-                pos++;
-            } while (true);
+            return new strCanDoFeedback(pos, "Kann nicht geparst werden", false);
+        }
+
+
+        strGetEndFeedback GetEnd(string scriptText, int startpos) {
+
+            var (pos, witch) = Script.NextText(scriptText, startpos, EndSequence);
+
+
+            if (pos< startpos) {
+                return new strGetEndFeedback("Keinen Endpunkt gefunden.");
+            }
+
+            var txtBTW = DeKlammere(scriptText.Substring(startpos, pos - startpos));
+            return new strGetEndFeedback(pos + witch.Length, txtBTW);
+
+
+
+            //var klammern = 0;
+            //var Gans = false;
+            //var GeschwKlammern = false;
+            //var EckigeKlammern = 0;
+
+            //var pos = startpos - 1; // Letztes Zeichen noch berücksichtigen, könnte ja Klammer auf oder zu sein
+
+            //var maxl = scriptText.Length;
+
+            //do {
+
+            //    if (pos > maxl) { return new strGetEndFeedback("Lesen über Textende"); }
+
+            //    #region Klammer und " erledigen
+            //    switch (scriptText.Substring(pos)) {
+
+            //        // Gänsefüsschen, immer erlaubt
+            //        case "\"":
+            //            Gans = !Gans;
+            //            break;
+
+            //        // Ekige klammern könne in { oder ( vorkommen, immer erlaubt
+            //        case "[":
+            //            if (!Gans) {
+            //                EckigeKlammern++;
+            //            }
+            //            break;
+
+            //        case "]":
+            //            if (!Gans) {
+            //                if (EckigeKlammern <= 0) { return new strGetEndFeedback("] nicht gültig"); }
+            //                EckigeKlammern--;
+            //            }
+            //            break;
+
+
+            //        // Runde klammern können in { vorkommen
+            //        case "(":
+            //            if (!Gans) {
+            //                if (EckigeKlammern > 0) { return new strGetEndFeedback("( nicht gültig"); }
+            //                klammern++;
+            //            }
+
+            //            break;
+
+            //        case ")":
+            //            if (!Gans) {
+            //                if (EckigeKlammern > 0) { return new strGetEndFeedback(") nicht gültig"); }
+            //                if (klammern <= 0) { return new strGetEndFeedback(") nicht gültig"); }
+            //                klammern--;
+            //            }
+            //            break;
+
+
+            //        // Gescheifte klammern müssen immer sauber auf und zu gemacht werdrn!
+            //        case "{":
+            //            if (!Gans) {
+            //                if (klammern > 0) { return new strGetEndFeedback("{ nicht gültig"); }
+            //                if (EckigeKlammern > 0) { return new strGetEndFeedback("{ nicht gültig"); }
+            //                if (GeschwKlammern) { return new strGetEndFeedback("{ nicht gültig"); }
+            //                GeschwKlammern = true;
+            //            }
+            //            break;
+
+            //        case "}":
+            //            if (!Gans) {
+            //                if (klammern > 0) { return new strGetEndFeedback("} nicht gültig"); }
+            //                if (EckigeKlammern > 0) { return new strGetEndFeedback("} nicht gültig"); }
+            //                if (!GeschwKlammern) { return new strGetEndFeedback("} nicht gültig"); }
+            //                GeschwKlammern = false;
+            //            }
+            //            break;
+            //    }
+            //    #endregion
+
+
+
+            //    if (klammern == 0 && !Gans && !GeschwKlammern && EckigeKlammern == 0) {
+
+            //        foreach (var thisEnd in EndSequence) {
+
+
+            //            if (pos + thisEnd.Length <= maxl) {
+
+            //                if (scriptText.Substring(pos, thisEnd.Length).ToLower() == thisEnd.ToLower()) {
+
+            //                    var txtBTW = DeKlammere(scriptText.Substring(startpos, pos - startpos));
+            //                    return new strGetEndFeedback(pos + thisEnd.Length, txtBTW);
+            //                }
+
+            //            }
+
+            //        }
+
+
+
+            //    }
+
+            //    pos++;
+            //} while (true);
 
 
         }
@@ -184,7 +206,7 @@ namespace BlueScript {
 
         public string DeKlammere(string txtBTW) {
 
-            var otxt = txtBTW;
+            string otxt;
 
             do {
                 otxt = txtBTW;
@@ -206,7 +228,48 @@ namespace BlueScript {
         }
 
 
-        internal abstract (string error, int pos) DoIt(string betweentext, List<Variable> variablen);
+
+        public strGetEndFeedback ReplaceVariable(string txt, List<Variable> vars) {
+            var t = "¶";
+            if (txt.Contains(t)) {
+                return new strGetEndFeedback("Unerlaubtes Zeichen");
+            }
+
+            txt = txt.Replace(" ", t + " " + t);
+            txt = txt.Replace("\t", t + "\t" + t);
+            txt = txt.Replace("\r", t + "\r" + t);
+            txt = txt.Replace("\n", t + "\n" + t);
+            txt = txt.Replace("+", t + "+" + t);
+            txt = txt.Replace("-", t + "-" + t);
+            txt = txt.Replace("*", t + "*" + t);
+            txt = txt.Replace("/", t + "/" + t);
+            txt = txt.Replace("(", t + "(" + t);
+            txt = txt.Replace(")", t + ")" + t);
+            txt = txt.Replace("|", t + "|" + t);
+            txt = txt.Replace("&", t + "&" + t);
+            txt = txt.Replace("=", t + "=" + t);
+            txt = txt.Replace("!", t + "!" + t);
+            txt = txt.Replace("<", t + "<" + t);
+            txt = txt.Replace(">", t + ">" + t);
+            txt = txt.Replace("\"", t + "\"" + t);
+            txt = txt.Replace(",", t + "," + t);
+
+            foreach (var thisV in vars) {
+                if (thisV.Type == Skript.Enums.enVariableDataType.NotDefinedYet) {
+                    if (txt.ToLower().Contains(t + thisV.Name.ToLower() + t)) {
+                        return new strGetEndFeedback("Variable " + thisV + " ist keinem Typ zugeordnet");
+                    }
+                }
+
+                txt = txt.Replace(t + thisV.Name + t, t + thisV.ValueString + t);
+            }
+
+            txt = txt.Replace(t, string.Empty);
+            return new strGetEndFeedback(0, txt);
+
+        }
+
+
     }
 
 

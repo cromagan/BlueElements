@@ -31,7 +31,7 @@ namespace BlueScript {
 
         string _ScriptText = string.Empty;
 
-        public IEnumerable<Method> Comands;
+        public static IEnumerable<Method> Comands;
 
         public readonly List<Variable> Variablen;
 
@@ -50,7 +50,7 @@ namespace BlueScript {
         public Script(List<Variable> variablen) {
 
 
-            Comands = GetEnumerableOfType<Method>();
+            Comands = GetEnumerableOfType<Method>(this);
 
             Variablen = variablen;
         }
@@ -70,30 +70,19 @@ namespace BlueScript {
 
 
 
-        public (string error, int pos) Parse() {
+        public strParseFeedback Parse() {
 
-            var pos = -1;
+            var pos = 0;
 
 
             do {
-                pos++;
+                if (pos > _ScriptText.Length) { return new strParseFeedback(); }
 
 
-                foreach (var thisC in Comands) {
+                var f = ComandOnPosition(_ScriptText, pos, Variablen, false);
 
-                    (var continuepos, var error, var abbruch, var betweentext) = thisC.CanDo(_ScriptText, pos);
-
-                    if (abbruch) { return (error, continuepos); }
-
-                    if (string.IsNullOrEmpty(error)) {
-                        (var error2, var pos2) = thisC.DoIt(betweentext, Variablen);
-
-                        if (!string.IsNullOrEmpty(error2)) { return (error2, pos + pos2); }
-
-                    }
-
-
-                }
+                if (!string.IsNullOrEmpty(f.ErrorMessage)) { return new strParseFeedback(pos, f.ErrorMessage); }
+                pos = f.Position;
 
 
 
@@ -105,6 +94,143 @@ namespace BlueScript {
 
 
         }
+
+
+        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, List<Variable> Variablen, bool mustHaveFeedback) {
+            foreach (var thisC in Comands) {
+
+                if (!mustHaveFeedback || !thisC.ReturnsVoid) {
+
+                    var f = thisC.CanDo(txt, pos, null);
+
+                    if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
+
+                    if (string.IsNullOrEmpty(f.ErrorMessage)) {
+                        var fn = thisC.DoIt(f, Variablen, null);
+                        return new strDoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
+                    }
+                }
+            }
+            return new strDoItWithEndedPosFeedback("Kann nicht geparsed werden.");
+        }
+
+
+        public static (int pos, string witch) NextText(string scriptText, int startpos, List<string> searchfor) {
+
+            var klammern = 0;
+            var Gans = false;
+            var GeschwKlammern = false;
+            var EckigeKlammern = 0;
+
+            var pos = startpos - 1; // Letztes Zeichen noch berücksichtigen, könnte ja Klammer auf oder zu sein
+
+            var maxl = scriptText.Length;
+
+            do {
+
+                if (pos > maxl) { return (-1, string.Empty); ; }
+
+                #region Klammer und " erledigen
+                switch (scriptText.Substring(pos)) {
+
+                    // Gänsefüsschen, immer erlaubt
+                    case "\"":
+                        Gans = !Gans;
+                        break;
+
+                    // Ekige klammern könne in { oder ( vorkommen, immer erlaubt
+                    case "[":
+                        if (!Gans) {
+                            EckigeKlammern++;
+                        }
+                        break;
+
+                    case "]":
+                        if (!Gans) {
+                            if (EckigeKlammern <= 0) { return (-1, string.Empty); }
+                            EckigeKlammern--;
+                        }
+                        break;
+
+
+                    // Runde klammern können in { vorkommen
+                    case "(":
+                        if (!Gans) {
+                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            klammern++;
+                        }
+
+                        break;
+
+                    case ")":
+                        if (!Gans) {
+                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            if (klammern <= 0) { return (-1, string.Empty); }
+                            klammern--;
+                        }
+                        break;
+
+
+                    // Gescheifte klammern müssen immer sauber auf und zu gemacht werdrn!
+                    case "{":
+                        if (!Gans) {
+                            if (klammern > 0) { return (-1, string.Empty); }
+                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            if (GeschwKlammern) { return (-1, string.Empty); }
+                            GeschwKlammern = true;
+                        }
+                        break;
+
+                    case "}":
+                        if (!Gans) {
+                            if (klammern > 0) { return (-1, string.Empty); }
+                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            if (!GeschwKlammern) { return (-1, string.Empty); }
+                            GeschwKlammern = false;
+                        }
+                        break;
+                }
+                #endregion
+
+
+
+                if (klammern == 0 && !Gans && !GeschwKlammern && EckigeKlammern == 0) {
+
+                    foreach (var thisEnd in searchfor) {
+
+
+                        if (pos + thisEnd.Length <= maxl) {
+
+                            if (scriptText.Substring(pos, thisEnd.Length).ToLower() == thisEnd.ToLower()) {
+
+                                return (pos, thisEnd);
+                            }
+
+                        }
+
+                    }
+
+
+
+                }
+
+                pos++;
+            } while (true);
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     }

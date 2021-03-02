@@ -21,10 +21,10 @@ namespace Skript.Enums {
 
     public enum enVariableDataType {
 
+        NotDefinedYet =0,
         Bool = 1,
-        Int = 2,
-        Float = 3,
-        String = 4,
+        Number = 2,
+        String = 3,
         Date = 5,
         List = 6
 
