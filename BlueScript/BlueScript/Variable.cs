@@ -40,6 +40,26 @@ namespace BlueScript {
         }
 
 
+        public string ValueForReplace {
+            get {
+
+                switch (Type) {
+
+                    case enVariableDataType.String:
+                        return "\"" + ValueString + "\"";
+
+                    case enVariableDataType.Number:
+                        return ValueString;
+
+                    default:
+                        Develop.DebugPrint_NichtImplementiert();
+                        return ValueString;
+
+                }
+            }
+        }
+
+
         public string Name { get; private set; }
         public string ValueString { get; set; }
 
@@ -54,6 +74,8 @@ namespace BlueScript {
 
 
             if (v != vo) { return false; }
+
+            if (string.IsNullOrEmpty(v)) { return false; }
 
             return true;
 

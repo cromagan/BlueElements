@@ -10,6 +10,11 @@ public struct strDoItFeedback {
         Value = string.Empty;
     }
 
+    public strDoItFeedback(string value, string errormessage) {
+        ErrorMessage = errormessage;
+        Value = value;
+    }
+
     public string Value;
     public string ErrorMessage;
 

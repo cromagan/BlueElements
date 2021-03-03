@@ -39,12 +39,13 @@ namespace BlueScript {
         }
 
 
-        public abstract bool ReturnsVoid { get; }
+        //public abstract bool ReturnsVoid { get; }
 
-        public abstract List<string> Command { get; }
-        public abstract List<string> StartSequence { get; }
-        public abstract List<string> EndSequence { get; }
-        public abstract List<string> AllowedIn { get; }
+        public abstract string ID { get; }
+        public abstract List<string> Comand { get; }
+        public abstract string StartSequence { get; }
+        public abstract string EndSequence { get; }
+        public abstract List<string> AllowedInIDs { get; }
         public abstract bool GetCodeBlockAfter { get; }
 
         internal abstract strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen, Method parent);
@@ -54,47 +55,47 @@ namespace BlueScript {
 
             var maxl = scriptText.Length;
 
-
-            foreach (var thiscomand in Command) {
-
-                foreach (var thisseq in StartSequence) {
-                    var comandtext = thiscomand + thisseq;
-                    var l = comandtext.Length;
-
-                    if (pos + l < maxl) {
-
-
-                        if (scriptText.Substring(pos, l).ToLower() == comandtext.ToLower()) {
-
-                            var f = GetEnd(scriptText, pos + l);
-                            if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                                return new strCanDoFeedback(f.ContinuePosition, "Fehler bei " + Command + ": " + f.ErrorMessage, true);
-                            }
-
-
-
-
-                            return new strCanDoFeedback(f.ContinuePosition, comandtext, f.AttributeText, string.Empty);
-                        }
-                    }
-
+            if (parent != null) {
+                var al = AllowedInIDs;
+                if (al != null && !al.Contains(parent.ID)) {
+                    return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
                 }
+            }
+
+            foreach (var thiscomand in Comand) {
+                var comandtext = thiscomand + StartSequence;
+                var l = comandtext.Length;
+
+                if (pos + l < maxl) {
+
+
+                    if (scriptText.Substring(pos, l).ToLower() == comandtext.ToLower()) {
+
+                        var f = GetEnd(scriptText, pos + thiscomand.Length, StartSequence.Length);
+                        if (!string.IsNullOrEmpty(f.ErrorMessage)) {
+                            return new strCanDoFeedback(f.ContinuePosition, "Fehler bei " + Comand + ": " + f.ErrorMessage, true);
+                        }
+                        return new strCanDoFeedback(f.ContinuePosition, comandtext, f.AttributeText, string.Empty);
+                    }
+                }
+
+
             }
 
             return new strCanDoFeedback(pos, "Kann nicht geparst werden", false);
         }
 
 
-        strGetEndFeedback GetEnd(string scriptText, int startpos) {
+        strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
 
-            var (pos, witch) = Script.NextText(scriptText, startpos, EndSequence);
+            var (pos, witch) = Script.NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false, false);
 
 
-            if (pos< startpos) {
+            if (pos < startpos) {
                 return new strGetEndFeedback("Keinen Endpunkt gefunden.");
             }
 
-            var txtBTW = DeKlammere(scriptText.Substring(startpos, pos - startpos));
+            var txtBTW = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
             return new strGetEndFeedback(pos + witch.Length, txtBTW);
 
 
@@ -204,68 +205,196 @@ namespace BlueScript {
         }
 
 
-        public string DeKlammere(string txtBTW) {
+        //public string DeKlammere(string txtBTW) {
 
-            string otxt;
+        //    string otxt;
+
+        //    do {
+        //        otxt = txtBTW;
+        //        txtBTW = txtBTW.Trim(" ");
+        //        if (otxt.StartsWith("(") && otxt.EndsWith(")")) {
+        //            BlueBasics.Develop.DebugPrint_NichtImplementiert();
+        //        }
+        //        if (otxt.StartsWith("{") && otxt.EndsWith("}")) {
+        //            BlueBasics.Develop.DebugPrint_NichtImplementiert();
+        //        }
+        //        if (otxt.StartsWith("[") && otxt.EndsWith("]")) {
+        //            BlueBasics.Develop.DebugPrint_NichtImplementiert();
+        //        }
+
+
+        //    } while (otxt != txtBTW);
+
+        //    return txtBTW;
+        //}
+
+        public strGetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, List<Variable> variablen, Method parent) {
+            var c = new List<string>();
+            foreach (var thisc in comands) {
+
+                if (thisc.AllowedInIDs == null || thisc.AllowedInIDs.Contains(parent.ID)) {
+
+                    foreach (var thiscs in thisc.Comand) {
+                        c.Add(thiscs + thisc.StartSequence);
+                    }
+                }
+            }
+
+
+            var posc = 0;
 
             do {
-                otxt = txtBTW;
-                txtBTW = txtBTW.Trim(" ");
-                if (otxt.StartsWith("(") && otxt.EndsWith(")")) {
-                    BlueBasics.Develop.DebugPrint_NichtImplementiert();
+
+                var (pos, witch) = Script.NextText(txt, posc, c, true, false, true);
+
+                if (pos < 0) { return new strGetEndFeedback(0, txt); }
+
+                var f = Script.ComandOnPosition(txt, pos, variablen, parent);
+
+                if (!string.IsNullOrEmpty(f.ErrorMessage)) {
+                    return new strGetEndFeedback(f.ErrorMessage);
                 }
-                if (otxt.StartsWith("{") && otxt.EndsWith("}")) {
-                    BlueBasics.Develop.DebugPrint_NichtImplementiert();
-                }
-                if (otxt.StartsWith("[") && otxt.EndsWith("]")) {
-                    BlueBasics.Develop.DebugPrint_NichtImplementiert();
+
+                txt = txt.Substring(0, pos) + f.Value + txt.Substring(f.Position);
+                posc = pos;
+
+
+            } while (true);
+
+
+
+            //var pos = -1;
+
+            //do {
+            //    Alle Routinen ohne Void übergeben und ausführen und ersetzen
+            //    if (Script.ComandOnPosition(txt,))
+            //        Develop.DebugPrint_NichtImplementiert();
+
+            //}
+
+
+
+        }
+
+        public strGetEndFeedback ReplaceVariable(string txt, List<Variable> vars) {
+
+
+            var posc = 0;
+
+
+            var v = vars.AllNames();
+
+
+
+            do {
+
+                var (pos, witch) = Script.NextText(txt, posc, v, true, true, true);
+
+                if (pos < 0) { return new strGetEndFeedback(0, txt); }
+
+                var thisV = vars.Get(witch);
+                if (thisV == null) { return new strGetEndFeedback("Variablen-Fehler " + witch); }
+
+                if (thisV.Type == Skript.Enums.enVariableDataType.NotDefinedYet) {
+                    return new strGetEndFeedback("Variable " + witch + " ist keinem Typ zugeordnet");
                 }
 
 
-            } while (otxt != txtBTW);
+                txt = txt.Substring(0, pos) + thisV.ValueForReplace + txt.Substring(pos + witch.Length);
+                posc = pos;
 
-            return txtBTW;
+            } while (true);
+
+
+
+
+
+
+
+
+
+            //var t = "¶";
+            //if (txt.Contains(t)) {
+            //    return new strGetEndFeedback("Unerlaubtes Zeichen");
+            //}
+
+            //txt = txt.Replace(" ", t + " " + t);
+            //txt = txt.Replace("\t", t + "\t" + t);
+            //txt = txt.Replace("\r", t + "\r" + t);
+            //txt = txt.Replace("\n", t + "\n" + t);
+            //txt = txt.Replace("+", t + "+" + t);
+            //txt = txt.Replace("-", t + "-" + t);
+            //txt = txt.Replace("*", t + "*" + t);
+            //txt = txt.Replace("/", t + "/" + t);
+            //txt = txt.Replace("(", t + "(" + t);
+            //txt = txt.Replace(")", t + ")" + t);
+            //txt = txt.Replace("|", t + "|" + t);
+            //txt = txt.Replace("&", t + "&" + t);
+            //txt = txt.Replace("=", t + "=" + t);
+            //txt = txt.Replace("!", t + "!" + t);
+            //txt = txt.Replace("<", t + "<" + t);
+            //txt = txt.Replace(">", t + ">" + t);
+            //txt = txt.Replace("\"", t + "\"" + t);
+            //txt = txt.Replace(",", t + "," + t);
+
+            //foreach (var thisV in vars) {
+            //    if (thisV.Type == Skript.Enums.enVariableDataType.NotDefinedYet) {
+            //        if (txt.ToLower().Contains(t + thisV.Name.ToLower() + t)) {
+            //            return new strGetEndFeedback("Variable " + thisV + " ist keinem Typ zugeordnet");
+            //        }
+            //    }
+
+            //    txt = txt.Replace(t + thisV.Name + t, t + thisV.ValueString + t);
+            //}
+
+            //txt = txt.Replace(t, string.Empty);
+            //return new strGetEndFeedback(0, txt);
+
         }
 
 
+        public List<string> SplitAttribute(string attributtext, List<Variable> variablen, Method parent) {
 
-        public strGetEndFeedback ReplaceVariable(string txt, List<Variable> vars) {
-            var t = "¶";
-            if (txt.Contains(t)) {
-                return new strGetEndFeedback("Unerlaubtes Zeichen");
+            var t = ReplaceVariable(attributtext, variablen);
+            if (!string.IsNullOrEmpty(t.ErrorMessage)) {
+                return null; // new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
             }
 
-            txt = txt.Replace(" ", t + " " + t);
-            txt = txt.Replace("\t", t + "\t" + t);
-            txt = txt.Replace("\r", t + "\r" + t);
-            txt = txt.Replace("\n", t + "\n" + t);
-            txt = txt.Replace("+", t + "+" + t);
-            txt = txt.Replace("-", t + "-" + t);
-            txt = txt.Replace("*", t + "*" + t);
-            txt = txt.Replace("/", t + "/" + t);
-            txt = txt.Replace("(", t + "(" + t);
-            txt = txt.Replace(")", t + ")" + t);
-            txt = txt.Replace("|", t + "|" + t);
-            txt = txt.Replace("&", t + "&" + t);
-            txt = txt.Replace("=", t + "=" + t);
-            txt = txt.Replace("!", t + "!" + t);
-            txt = txt.Replace("<", t + "<" + t);
-            txt = txt.Replace(">", t + ">" + t);
-            txt = txt.Replace("\"", t + "\"" + t);
-            txt = txt.Replace(",", t + "," + t);
+            var t2 = ReplaceComands(t.AttributeText, Script.Comands, variablen, parent);
 
-            foreach (var thisV in vars) {
-                if (thisV.Type == Skript.Enums.enVariableDataType.NotDefinedYet) {
-                    if (txt.ToLower().Contains(t + thisV.Name.ToLower() + t)) {
-                        return new strGetEndFeedback("Variable " + thisV + " ist keinem Typ zugeordnet");
-                    }
+            if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
+                return null; // new  strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
+            }
+
+            var x = new List<string>();
+            var pos = -1;
+            var start = 0;
+            var gänsef = false;
+            var nt = t2.AttributeText;
+            do {
+                pos++;
+
+                if (pos >= nt.Length) {
+                    if (gänsef) { return null; }
+                    x.Add(nt.Substring(start, pos - start));
+                    return x;
                 }
 
-                txt = txt.Replace(t + thisV.Name + t, t + thisV.ValueString + t);
-            }
+                var c = nt.Substring(pos, 1);
 
-            txt = txt.Replace(t, string.Empty);
-            return new strGetEndFeedback(0, txt);
+                if (c == "\"") { gänsef = !gänsef; }
+
+                if (!gänsef && c == ",") {
+                    x.Add(nt.Substring(start, pos - start));
+                    start = pos + 1;
+                }
+
+
+
+            } while (true);
+
+
+
 
         }
 

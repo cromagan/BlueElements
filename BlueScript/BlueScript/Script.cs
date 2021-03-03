@@ -29,6 +29,8 @@ namespace BlueScript {
     public class Script {
 
 
+        public string Error { get; private set; }
+
         string _ScriptText = string.Empty;
 
         public static IEnumerable<Method> Comands;
@@ -69,69 +71,121 @@ namespace BlueScript {
 
 
 
+        private string ReduceText(string txt) {
 
-        public strParseFeedback Parse() {
+
+            var s = new System.Text.StringBuilder();
+
+            var gänsef = false;
+            var comment = false;
+
+
+            for (var pos = 0; pos < txt.Length; pos++) {
+
+                var c = txt.Substring(pos, 1);
+                var addt = true;
+
+                switch (c) {
+                    case "\"":
+                        if (!comment) { gänsef = !gänsef; }
+                        break;
+
+                    case "/":
+                        if (!gänsef) {
+                            if (pos < txt.Length - 1 && txt.Substring(pos, 2) == "//") { comment = true; }
+                        }
+                        break;
+
+                    case "\r":
+                        if (!gänsef) {
+                            comment = false;
+                            addt = false;
+                        }
+                        break;
+
+                    case " ":
+                    case "\n":
+                    case "\t":
+                        if (!gänsef) { addt = false; }
+                        break;
+                }
+
+                if (!comment && addt) {
+                    s.Append(c);
+                }
+
+            }
+
+            return s.ToString();
+        }
+
+
+        public bool Parse() {
 
             var pos = 0;
 
+            Error = string.Empty;
+            var tmptxt = ReduceText(_ScriptText);
+
 
             do {
-                if (pos > _ScriptText.Length) { return new strParseFeedback(); }
+                if (pos >= tmptxt.Length) { return true; }
 
 
-                var f = ComandOnPosition(_ScriptText, pos, Variablen, false);
+                var f = ComandOnPosition(tmptxt, pos, Variablen, null);
 
-                if (!string.IsNullOrEmpty(f.ErrorMessage)) { return new strParseFeedback(pos, f.ErrorMessage); }
+                if (!string.IsNullOrEmpty(f.ErrorMessage)) {
+                    Error = f.ErrorMessage;
+                    return false;
+                }
                 pos = f.Position;
-
-
 
 
             } while (true);
 
-
-
-
-
         }
 
 
-        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, List<Variable> Variablen, bool mustHaveFeedback) {
+        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, List<Variable> Variablen, Method parent) {
             foreach (var thisC in Comands) {
 
-                if (!mustHaveFeedback || !thisC.ReturnsVoid) {
+                //if (!mustHaveFeedback || !thisC.ReturnsVoid) {
 
-                    var f = thisC.CanDo(txt, pos, null);
+                var f = thisC.CanDo(txt, pos, parent);
 
-                    if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
+                if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
 
-                    if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                        var fn = thisC.DoIt(f, Variablen, null);
-                        return new strDoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
-                    }
+                if (string.IsNullOrEmpty(f.ErrorMessage)) {
+                    var fn = thisC.DoIt(f, Variablen, null);
+                    return new strDoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
                 }
+                //}
             }
             return new strDoItWithEndedPosFeedback("Kann nicht geparsed werden.");
         }
 
 
-        public static (int pos, string witch) NextText(string scriptText, int startpos, List<string> searchfor) {
+        public static (int pos, string witch) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter, bool ignoreKlammern) {
 
             var klammern = 0;
             var Gans = false;
             var GeschwKlammern = false;
             var EckigeKlammern = 0;
 
-            var pos = startpos - 1; // Letztes Zeichen noch berücksichtigen, könnte ja Klammer auf oder zu sein
+            var pos = startpos;
 
-            var maxl = scriptText.Length;
+            var maxl = txt.Length;
+
+
+            const string TR = ".,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t";
+
 
             do {
 
-                if (pos > maxl) { return (-1, string.Empty); ; }
+                if (pos >= maxl) { return (-1, string.Empty); ; }
 
                 #region Klammer und " erledigen
-                switch (scriptText.Substring(pos)) {
+                switch (txt.Substring(pos, 1)) {
 
                     // Gänsefüsschen, immer erlaubt
                     case "\"":
@@ -155,7 +209,7 @@ namespace BlueScript {
 
                     // Runde klammern können in { vorkommen
                     case "(":
-                        if (!Gans) {
+                        if (!Gans && !ignoreKlammern) {
                             if (EckigeKlammern > 0) { return (-1, string.Empty); }
                             klammern++;
                         }
@@ -163,7 +217,7 @@ namespace BlueScript {
                         break;
 
                     case ")":
-                        if (!Gans) {
+                        if (!Gans && !ignoreKlammern) {
                             if (EckigeKlammern > 0) { return (-1, string.Empty); }
                             if (klammern <= 0) { return (-1, string.Empty); }
                             klammern--;
@@ -196,22 +250,20 @@ namespace BlueScript {
 
                 if (klammern == 0 && !Gans && !GeschwKlammern && EckigeKlammern == 0) {
 
-                    foreach (var thisEnd in searchfor) {
 
+                    if (!checkforSeparatorbefore || pos == 0 || TR.Contains(txt.Substring(pos - 1, 1))) {
 
-                        if (pos + thisEnd.Length <= maxl) {
+                        foreach (var thisEnd in searchfor) {
+                            if (pos + thisEnd.Length <= maxl) {
 
-                            if (scriptText.Substring(pos, thisEnd.Length).ToLower() == thisEnd.ToLower()) {
-
-                                return (pos, thisEnd);
+                                if (txt.Substring(pos, thisEnd.Length).ToLower() == thisEnd.ToLower()) {
+                                    if (!checkforSeparatorafter || pos + thisEnd.Length >= maxl || TR.Contains(txt.Substring(pos + thisEnd.Length, 1))) {
+                                        return (pos, thisEnd);
+                                    }
+                                }
                             }
-
                         }
-
                     }
-
-
-
                 }
 
                 pos++;

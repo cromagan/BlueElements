@@ -35,14 +35,14 @@ namespace BlueScript {
 
 
         //public Method_var(Script parent, string toParse) : base(parent, toParse) { }
+        public override string ID { get => "var_caluclate"; }
 
-
-        public override List<string> Command { get => Parent.Variablen.AllNames(); }
-        public override List<string> StartSequence { get => new List<string>() { " = ", "=", " =", "= " }; }
-        public override List<string> EndSequence { get => new List<string>() { ";" }; }
-        public override List<string> AllowedIn { get => null; }
+        public override List<string> Comand { get => Parent.Variablen.AllNames(); }
+        public override string StartSequence { get => "="; }
+        public override string EndSequence { get => ";"; }
+        public override List<string> AllowedInIDs { get => null; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override bool ReturnsVoid { get => true; }
+        //public override bool ReturnsVoid { get => true; }
 
 
 
@@ -55,26 +55,33 @@ namespace BlueScript {
                 return new strDoItFeedback("Variable " + variableName + " nicht gefunden");
             }
 
+            //var nt = infos.AttributText.Trim("=");
+            var bs = SplitAttribute(infos.AttributText, variablen, this);
 
-            var t = ReplaceVariable(infos.AttributText, variablen);
+            if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler"); }
 
-            if (!string.IsNullOrEmpty(t.ErrorMessage)) {
-                return new strDoItFeedback("Berechnungsfehler: " + t.ErrorMessage);
+
+            if (bs[0].StartsWith("\"")) {
+
+                if (variable.Type != enVariableDataType.NotDefinedYet && variable.Type != enVariableDataType.String) {
+                    return new strDoItFeedback("Variable ist kein String");
+                }
+                variable.ValueString = bs[0].Replace("\"+\"", string.Empty).Trim("\"");
+                variable.Type = enVariableDataType.String;
+                return new strDoItFeedback();
             }
 
 
 
 
-            var pos = -1;
+            var erg = modErgebnis.Ergebnis(bs[0]);
+            if (erg == null) { return new strDoItFeedback("Berechnungsfehler der Formel"); }
 
-            //do {
-                // Alle Routinen ohne Void übergeben und ausführen und ersetzen
-                //if (Script.ComandOnPosition(txt,))
-                Develop.DebugPrint_NichtImplementiert();
-
-            //}
-
-
+            if (variable.Type != enVariableDataType.NotDefinedYet && variable.Type != enVariableDataType.Number) {
+                return new strDoItFeedback("Variable ist keine Zahl");
+            }
+            variable.ValueString = ((double)erg).ToString();
+            variable.Type = enVariableDataType.Number;
 
             //var mustType = enVariableDataType.NotDefinedYet;
 

@@ -16,11 +16,11 @@ public struct strGetEndFeedback {
         AttributeText = attributetext;
     }
 
-    public strGetEndFeedback(string errormessage, int continuePosition, string attributetext) {
-        ContinuePosition = continuePosition;
-        ErrorMessage = errormessage;
-        AttributeText = attributetext;
-    }
+    //public strGetEndFeedback(string errormessage, int continuePosition, string attributetext) {
+    //    ContinuePosition = continuePosition;
+    //    ErrorMessage = errormessage;
+    //    AttributeText = attributetext;
+    //}
 
     public int ContinuePosition;
     public string ErrorMessage;

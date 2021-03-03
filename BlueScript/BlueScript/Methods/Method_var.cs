@@ -34,13 +34,13 @@ namespace BlueScript {
 
         //public Method_var(Script parent, string toParse) : base(parent, toParse) { }
 
-
-        public override List<string> Command { get => new List<string>() { "var" }; }
-        public override List<string> StartSequence { get => new List<string>() { " " }; }
-        public override List<string> EndSequence { get => new List<string>() { ";" }; }
-        public override List<string> AllowedIn { get => null; }
+        public override string ID { get => "var"; }
+        public override List<string> Comand { get => new List<string>() { "var" }; }
+        public override string StartSequence { get => ""; }
+        public override string EndSequence { get => ";"; }
+        public override List<string> AllowedInIDs { get => null; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override bool ReturnsVoid { get => true; }
+        //public override bool ReturnsVoid { get => true; }
 
 
 
@@ -53,7 +53,6 @@ namespace BlueScript {
 
             if (bs.GetUpperBound(0) != 1) { return new strDoItFeedback("Fehler mit = - Zeichen"); }
 
-            bs[0] = DeKlammere(bs[0]);
 
             if (!Variable.IsValidName(bs[0])) { return new strDoItFeedback(bs[0] + "ist kein gültiger Variablen-Name"); }
 
@@ -75,8 +74,8 @@ namespace BlueScript {
                 return new strDoItFeedback("Befehl nicht erkannt");
             }
 
-            if (infos.AttributText.Length != f.ContinueOrErrorPosition -1) {
-                return new strDoItFeedback("Falsch gesetztes Semikolon") ;
+            if (infos.AttributText.Length != f.ContinueOrErrorPosition - 1) {
+                return new strDoItFeedback("Falsch gesetztes Semikolon");
             }
 
 
