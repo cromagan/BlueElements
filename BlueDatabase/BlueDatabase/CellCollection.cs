@@ -1009,12 +1009,12 @@ namespace BlueDatabase {
             }
 
 
-            foreach (var ThisRule in Column.Database.Rules) {
-                if (ThisRule != null) {
-                    if (ThisRule.WillAlwaysCellOverride(Column)) { return LanguageTool.DoTranslate("Diese Zelle wird von automatischen Regeln befüllt."); }
-                    if (ThisRule.BlockEditing(Column, Row)) { return LanguageTool.DoTranslate("Eine Regel sperrt diese Zelle."); }
-                }
-            }
+            //foreach (var ThisRule in Column.Database.Rules) {
+            //    if (ThisRule != null) {
+            //        if (ThisRule.WillAlwaysCellOverride(Column)) { return LanguageTool.DoTranslate("Diese Zelle wird von automatischen Regeln befüllt."); }
+            //        if (ThisRule.BlockEditing(Column, Row)) { return LanguageTool.DoTranslate("Eine Regel sperrt diese Zelle."); }
+            //    }
+            //}
 
             if (!Column.Database.PermissionCheck(Column.PermissionGroups_ChangeCell, Row)) { return LanguageTool.DoTranslate("Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern."); }
             return string.Empty;

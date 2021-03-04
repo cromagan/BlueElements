@@ -59,7 +59,7 @@ namespace BlueDatabase.Enums
         ColumnArrangement = 32,
         Views = 33,
         LastRowKey = 34,
-        Rules = 35,
+        Rules_ALT = 35,
         //    VorgängerDateien_ALT = 37
         DatenbankAdmin = 38,
         // DatenbankUser = 39
@@ -85,6 +85,7 @@ namespace BlueDatabase.Enums
         GlobalScale = 64,
         FilterImagePfad = 65,
         ZeilenQuickInfo = 66,
+        RulesScript = 67,
 
 
         Info_ColumDataSart = 100,

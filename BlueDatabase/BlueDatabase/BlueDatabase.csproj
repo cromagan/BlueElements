@@ -90,9 +90,7 @@
     <Compile Include="Enums\enExportTyp.cs" />
     <Compile Include="Enums\enAnsicht.cs" />
     <Compile Include="Enums\enBildTextVerhalten.cs" />
-    <Compile Include="Enums\enNeededColumns.cs" />
     <Compile Include="Enums\enFirstRow.cs" />
-    <Compile Include="Enums\enNeededText.cs" />
     <Compile Include="Enums\enRoutinen.cs" />
     <Compile Include="Enums\enDatabaseDataType.cs" />
     <Compile Include="Enums\enViewType.cs" />

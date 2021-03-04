@@ -26,7 +26,7 @@ using System.Collections.Generic;
 
 namespace BlueDatabase {
 
-    public sealed class RuleItem : IParseable, IReadableTextWithChanging, IComparable, ICompareKey, ICloneable, ICheckable, ICanBeEmpty {
+    public sealed class RuleItem_Old : IParseable, IReadableTextWithChanging, ICompareKey {
 
         #region  Variablen-Deklarationen 
         public readonly Database Database;
@@ -47,17 +47,17 @@ namespace BlueDatabase {
         }
 
 
-        public RuleItem(Database database, string CodeToParse) {
+        public RuleItem_Old(Database database, string CodeToParse) {
             Database = database;
             Parse(CodeToParse);
         }
 
-        public RuleItem(Database database) {
+        public RuleItem_Old(Database database) {
             Database = database;
             Initialize();
         }
 
-        public RuleItem(ColumnItem column) {
+        public RuleItem_Old(ColumnItem column) {
             Database = column.Database;
             Initialize();
         }
@@ -76,10 +76,10 @@ namespace BlueDatabase {
         #endregion
 
 
-        public bool IsNullOrEmpty() {
-            if (!IsOk()) { return true; }
-            return false;
-        }
+        //public bool IsNullOrEmpty() {
+        //    if (!IsOk()) { return true; }
+        //    return false;
+        //}
 
 
         public override string ToString() {
@@ -128,47 +128,47 @@ namespace BlueDatabase {
 
 
 
-        public string ErrorReason() {
-            //var VorschlagsRegel = false;
+        //public string ErrorReason() {
+        //    //var VorschlagsRegel = false;
 
-            //   if (!string.IsNullOrEmpty(_SystemKey)) { return string.Empty; }
+        //    //   if (!string.IsNullOrEmpty(_SystemKey)) { return string.Empty; }
 
-            var Dann = AnzahlDanns();
+        //    var Dann = AnzahlDanns();
 
-            if (Dann == 0) { return "Es ist keine 'Dann-Aktion' vorhanden."; }
-
-
-            foreach (var ThisAction in Actions) {
-                if (ThisAction != null) {
-                    if (!ThisAction.IsOk()) { return "Eine Aktion ist fehlerhaft."; }
-
-                    //switch (ThisAction.Action)
-                    //{
-
-                    //    case enAction.Erh‰lt_den_Focus:
-                    //        VorschlagsRegel = true;
-                    //        break;
-                    //}
-                }
-            }
-
-            //if (VorschlagsRegel)
-            //{
-            //    if (Dann != 1) { return "Eine Regel f¸r eine neue Zeile oder einen Vorschlag benˆtigt genau eine 'Dann-Aktion'."; }
-
-            //    foreach (var ThisAction in Actions)
-            //    {
-            //        if (ThisAction != null && !ThisAction.IsBedingung() && ThisAction.Action != enAction.Mache_einen_Vorschlag) { return "Nur 'Mache einen Vorschlag' bei neuen Focus-Aktionen mˆglich."; }
-            //    }
-            //}
-
-            return string.Empty;
-        }
+        //    if (Dann == 0) { return "Es ist keine 'Dann-Aktion' vorhanden."; }
 
 
-        public bool IsOk() {
-            return string.IsNullOrEmpty(ErrorReason());
-        }
+        //    foreach (var ThisAction in Actions) {
+        //        if (ThisAction != null) {
+        //            //if (!ThisAction.IsOk()) { return "Eine Aktion ist fehlerhaft."; }
+
+        //            //switch (ThisAction.Action)
+        //            //{
+
+        //            //    case enAction.Erh‰lt_den_Focus:
+        //            //        VorschlagsRegel = true;
+        //            //        break;
+        //            //}
+        //        }
+        //    }
+
+        //    //if (VorschlagsRegel)
+        //    //{
+        //    //    if (Dann != 1) { return "Eine Regel f¸r eine neue Zeile oder einen Vorschlag benˆtigt genau eine 'Dann-Aktion'."; }
+
+        //    //    foreach (var ThisAction in Actions)
+        //    //    {
+        //    //        if (ThisAction != null && !ThisAction.IsBedingung() && ThisAction.Action != enAction.Mache_einen_Vorschlag) { return "Nur 'Mache einen Vorschlag' bei neuen Focus-Aktionen mˆglich."; }
+        //    //    }
+        //    //}
+
+        //    return string.Empty;
+        //}
+
+
+        //public bool IsOk() {
+        //    return string.IsNullOrEmpty(ErrorReason());
+        //}
 
         public int AnzahlWenns() {
             var W = 0;
@@ -176,7 +176,7 @@ namespace BlueDatabase {
             if (Actions.Count == 0) { return 0; }
 
             foreach (var ThisAction in Actions) {
-                if (ThisAction != null && ThisAction.IsOk() && ThisAction.IsBedingung()) { W++; }
+                if (ThisAction != null  && ThisAction.IsBedingung()) { W++; }
             }
 
             return W;
@@ -187,7 +187,7 @@ namespace BlueDatabase {
             if (Actions.Count == 0) { return 0; }
 
             foreach (var ThisAction in Actions) {
-                if (ThisAction != null && ThisAction.IsOk() && !ThisAction.IsBedingung()) { W++; }
+                if (ThisAction != null  && !ThisAction.IsBedingung()) { W++; }
             }
 
 
@@ -197,7 +197,7 @@ namespace BlueDatabase {
 
         public QuickImage SymbolForReadableText() {
 
-            if (!IsOk()) { return QuickImage.Get(enImageCode.Kritisch); }
+            //if (!IsOk()) { return QuickImage.Get(enImageCode.Kritisch); }
 
             if (AnzahlWenns() > 1) { return null; }
 
@@ -213,7 +213,7 @@ namespace BlueDatabase {
 
 
         public string ReadableText() {
-            if (!IsOk()) { return "Fehlerhafte Regel wird ignoriert: " + ErrorReason(); }
+           // if (!IsOk()) { return "Fehlerhafte Regel wird ignoriert: " + ErrorReason(); }
 
 
             var Txts = new List<string>[2];
@@ -280,72 +280,72 @@ namespace BlueDatabase {
         }
 
 
-        public string Execute(RowItem vRow, bool FreezeMode) {
+        //public string Execute() {
 
-            var Meldung = string.Empty;
-
-
-            foreach (var ThisAction in Actions) {
-                if (ThisAction != null) {
-                    if (!ThisAction.IsBedingung()) {
-                        if (string.IsNullOrEmpty(Meldung)) {
-                            Meldung = ThisAction.Execute(vRow, FreezeMode);
-                        }
-                        else {
-                            ThisAction.Execute(vRow, FreezeMode);
-                        }
-                    }
-                }
-            }
-
-            if (string.IsNullOrEmpty(Meldung)) { return string.Empty; }
-            //if (FeedbackMode == enControlAccesMode.NoFeedBack)
-            //{
-            //    return "Dummy-Fehler mit Dummy Spalte '#Spalte:" + Database.Column[0].Name + "'";
-            //}
+        //    var Meldung = string.Empty;
 
 
-            var e = new List<string>();
+        //    //foreach (var ThisAction in Actions) {
+        //    //    if (ThisAction != null) {
+        //    //        if (!ThisAction.IsBedingung()) {
+        //    //            if (string.IsNullOrEmpty(Meldung)) {
+        //    //                Meldung = ThisAction.Execute(vRow, FreezeMode);
+        //    //            }
+        //    //            else {
+        //    //                ThisAction.Execute(vRow, FreezeMode);
+        //    //            }
+        //    //        }
+        //    //    }
+        //    //}
 
-            foreach (var ThisAction in Actions) {
-                if (ThisAction != null && ThisAction.IsBedingung()) { e.Add(ThisAction.TrifftZuText(vRow)); }
-            }
-
-            e = e.SortedDistinctList();
-
-
-            var m = "";
-            if (Meldung == "*") {
-                if (e.Count == 0) { return " Diese Zeile wird immer als fehlerhaft markiert."; }
-            }
-            else {
-                m = Meldung + "<DELETE>";
-            }
-
-
-            for (var z = 0; z < e.Count; z++) {
-                if (z == 0) {
-                    m = m + e[z].Substring(0, 1).ToUpper() + e[z].Substring(1);
-                }
-                else {
-                    m = m + "<br><b> - O D E R - </b><br>" + e[z];
-                }
-            }
+        //    //if (string.IsNullOrEmpty(Meldung)) { return string.Empty; }
+        //    ////if (FeedbackMode == enControlAccesMode.NoFeedBack)
+        //    ////{
+        //    ////    return "Dummy-Fehler mit Dummy Spalte '#Spalte:" + Database.Column[0].Name + "'";
+        //    ////}
 
 
-            return m + ".";
-        }
+        //    var e = new List<string>();
+
+        //    foreach (var ThisAction in Actions) {
+        //        if (ThisAction != null && ThisAction.IsBedingung()) { e.Add(ThisAction.TrifftZuText(vRow)); }
+        //    }
+
+        //    e = e.SortedDistinctList();
 
 
-        public int CompareTo(object obj) {
-            if (obj is RuleItem RLI) {
-                return CompareKey().CompareTo(RLI.CompareKey());
-            }
-            else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
-                return 0;
-            }
-        }
+        //    var m = "";
+        //    if (Meldung == "*") {
+        //        if (e.Count == 0) { return " Diese Zeile wird immer als fehlerhaft markiert."; }
+        //    }
+        //    else {
+        //        m = Meldung + "<DELETE>";
+        //    }
+
+
+        //    for (var z = 0; z < e.Count; z++) {
+        //        if (z == 0) {
+        //            m = m + e[z].Substring(0, 1).ToUpper() + e[z].Substring(1);
+        //        }
+        //        else {
+        //            m = m + "<br><b> - O D E R - </b><br>" + e[z];
+        //        }
+        //    }
+
+
+        //    return m + ".";
+        //}
+
+
+        //public int CompareTo(object obj) {
+        //    if (obj is RuleItem RLI) {
+        //        return CompareKey().CompareTo(RLI.CompareKey());
+        //    }
+        //    else {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+        //        return 0;
+        //    }
+        //}
 
 
         public string CompareKey() {
@@ -409,55 +409,55 @@ namespace BlueDatabase {
         }
 
 
-        public void Repair() {
+        //public void Repair() {
 
-            if (!IsOk()) { return; }
+        //    if (!IsOk()) { return; }
 
-            Actions.RemoveNullOrEmpty();
-            Actions.Sort();
+        //    Actions.RemoveNullOrEmpty();
+        //    Actions.Sort();
 
-        }
-
-
-
-        public object Clone() {
-
-            return new RuleItem(Database, ToString());
-        }
+        //}
 
 
-        internal bool Contains(ColumnItem newName) {
-            // Wichtig, daﬂ Rechenformeln richtiggestellt werden
-            if (Database != newName.Database) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbanken inkonsitent"); }
+
+        //public object Clone() {
+
+        //    return new RuleItem(Database, ToString());
+        //}
 
 
-            foreach (var Thisaction in Actions) {
-                if (Thisaction.Contains(newName)) { return true; }
-            }
-            return false;
-        }
-
-        internal void RenameColumn(string oldName, ColumnItem newName) {
-            // Wichtig, daﬂ Rechenformeln richtiggestellt werden
-            if (Database != newName.Database) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbanken inkonsitent"); }
+        //internal bool Contains(ColumnItem newName) {
+        //    // Wichtig, daﬂ Rechenformeln richtiggestellt werden
+        //    if (Database != newName.Database) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbanken inkonsitent"); }
 
 
-            foreach (var Thisaction in Actions) {
-                Thisaction.RenameColumn(oldName, newName);
-            }
-        }
+        //    foreach (var Thisaction in Actions) {
+        //        if (Thisaction.Contains(newName)) { return true; }
+        //    }
+        //    return false;
+        //}
 
-        internal bool BlockEditing(ColumnItem Column, RowItem Row) {
-            foreach (var ThisAction in Actions) {
-                if (ThisAction != null) {
-                    if (ThisAction.Action == enAction.Sperre_die_Zelle && ThisAction.Columns.Contains(Column)) {
-                        var Match = TrifftZu(Row);
-                        if (Match) { return true; }
-                    }
-                }
-            }
-            return false;
-        }
+        //internal void RenameColumn(string oldName, ColumnItem newName) {
+        //    // Wichtig, daﬂ Rechenformeln richtiggestellt werden
+        //    if (Database != newName.Database) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbanken inkonsitent"); }
+
+
+        //    foreach (var Thisaction in Actions) {
+        //        Thisaction.RenameColumn(oldName, newName);
+        //    }
+        //}
+
+        //internal bool BlockEditing(ColumnItem Column, RowItem Row) {
+        //    foreach (var ThisAction in Actions) {
+        //        if (ThisAction != null) {
+        //            if (ThisAction.Action == enAction.Sperre_die_Zelle && ThisAction.Columns.Contains(Column)) {
+        //                var Match = TrifftZu(Row);
+        //                if (Match) { return true; }
+        //            }
+        //        }
+        //    }
+        //    return false;
+        //}
 
         internal bool WillAlwaysCellOverride(ColumnItem Column) {
 
@@ -485,5 +485,35 @@ namespace BlueDatabase {
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
+        internal string ToScript() {
+
+            var txt = "\r\n\r\n// --------------------------------------------------------\r\n";
+                txt += "// " + ReadableText();
+            txt += "// --------------------------------------------------------\r\b";
+
+
+            var a = string.Empty;
+            var e = string.Empty;
+
+            foreach(var thisAktion in Actions) {
+
+                var (anfang, ende) = thisAktion.ToScript();
+
+                a += anfang + "\r\n";
+
+                if (!string.IsNullOrEmpty(e)) {
+                    e = ende + "\r\n" + e;
+                }
+
+
+            }
+
+
+
+
+            return txt + a + e;
+
+
+        }
     }
 }

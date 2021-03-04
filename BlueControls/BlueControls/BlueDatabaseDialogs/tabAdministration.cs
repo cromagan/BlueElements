@@ -92,10 +92,10 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (_database != null && !_database.ReadOnly) {
                 if (_database.IsAdministrator()) {
-                    while (!_database.AllRulesOK()) {
-                        MessageBox.Show("Bitte reparieren sie<br>die fehlerhaften Regeln.", enImageCode.Information, "OK");
-                        OpenDatabaseHeadEditor(_database);
-                    }
+                    //while (!_database.AllRulesOK()) {
+                    //    MessageBox.Show("Bitte reparieren sie<br>die fehlerhaften Regeln.", enImageCode.Information, "OK");
+                    //    OpenDatabaseHeadEditor(_database);
+                    //}
 
 
                     foreach (var ThisColumnItem in _database.Column) {

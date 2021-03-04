@@ -52,29 +52,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-        public ListExt<RuleItem> GetRulesFromList() {
-            var NewRules = new ListExt<RuleItem>();
-            foreach (var ThisItem in lbxRuleSelector.Item) {
-                var Rule = (RuleItem)((TextListItem)ThisItem).Tag;
-                NewRules.Add((RuleItem)Rule.Clone());
-            }
-            return NewRules;
-        }
-
-        public void AddRulesToList(ListExt<RuleItem> thisRules) {
-
-
-            lbxRuleSelector.Item.Clear();
-
-            foreach (var ThisRule in thisRules) {
-                if (ThisRule != null) {
-                    lbxRuleSelector.Item.Add(ThisRule);
-                }
-            }
-        }
-
-
-
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             base.OnFormClosing(e);
 
@@ -85,17 +62,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             frmHeadEditor_FormClosing_isin = true;
 
 
-
-            // Rules, die 1.
-            var NewRules = GetRulesFromList();
-
-            if (!Database.AllRulesOK(NewRules)) {
-                if (MessageBox.Show("Es sind <b>fehlerhafte Regeln</b> vorhanden, diese werden <b>gelöscht</b>.<br><br>Wollen sie fortfahren?", enImageCode.Warnung, "Ja", "Nein") != 0) {
-                    e.Cancel = true;
-                    frmHeadEditor_FormClosing_isin = false;
-                    return;
-                }
-            }
 
 
             _Database.GlobalShowPass = txbKennwort.Text;
@@ -162,15 +128,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _Database.SortDefinition = new RowSortDefinition(_Database, lbxSortierSpalten.Item.ToListOfString(), btnSortRichtung.Checked);
 
-            // Regeln --------------
-            RepairNewRules(NewRules);
-
-            if (NewRules.IsDifferentTo(_Database.Rules)) {
-                _Database.Rules.Clear();
-                _Database.Rules.AddRange(NewRules);
-                RepairNewRules(_Database.Rules); // sollte umsonst sein
-            }
-
 
 
             // Export ------------
@@ -231,9 +188,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             tbxTags.Text = _Database.Tags.JoinWithCr();
 
 
-
-            // Rules ----------------------------------------
-            AddRulesToList(_Database.Rules);
 
 
 
@@ -335,89 +289,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
 
-
-
-        #endregion
-
-
-        #region  Regeln 
-
-
-        private void lbxRuleSelector_AddClicked(object sender, System.EventArgs e) {
-            var NewRuleItem = lbxRuleSelector.Item.Add(new RuleItem(_Database));
-            NewRuleItem.Checked = true;
-        }
-
-        private void lbxRuleSelector_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-            if (e.HotItem == null) { return; }
-            e.UserMenu.Add(enContextMenuComands.Kopieren);
-            e.UserMenu.Add(enContextMenuComands.Einfügen);
-        }
-
-        private void lbxRuleSelector_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-            switch (e.ClickedComand) {
-                case "Kopieren":
-                    var ClickedRule = ((RuleItem)((TextListItem)e.HotItem).Tag).ToString();
-
-                    System.Windows.Forms.Clipboard.SetDataObject("##RULE##" + ClickedRule, true);
-                    Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, ClickedRule), enImageCode.Kopieren);
-
-                    //var NewRuleItem = lbxRuleSelector.Item.Add((RuleItem)ClickedRule.Clone());
-                    //NewRuleItem.Checked = true;
-                    break;
-
-                case "Einfügen":
-
-
-                    if (!System.Windows.Forms.Clipboard.ContainsText()) {
-                        Notification.Show("Abbruch,<br>keine Regel im Zwischenspeicher!", enImageCode.Information);
-                        return;
-                    }
-
-                    var nt = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text));
-
-
-                    if (!nt.StartsWith("##RULE##")) {
-                        Notification.Show("Abbruch,<br>keine Regel im Zwischenspeicher!", enImageCode.Information);
-                        return;
-                    }
-
-                    var NewRuleItem = lbxRuleSelector.Item.Add(new RuleItem(_Database, nt.Substring(8)));
-
-                    if (NewRuleItem != null) { NewRuleItem.Checked = true; }
-
-                    break;
-
-                default:
-                    Develop.DebugPrint(e);
-                    break;
-            }
-        }
-
-
-        private void lbxRuleSelector_ItemCheckedChanged(object sender, System.EventArgs e) {
-            if (lbxRuleSelector.Item.Checked().Count != 1) { return; }
-            var SelectedRule = (RuleItem)((TextListItem)lbxRuleSelector.Item.Checked()[0]).Tag;
-            RuleItemEditor.Item = SelectedRule;
-        }
-
-
-
-        private void RepairNewRules(ListExt<RuleItem> Rules) {
-            //Rules.Sort();
-            foreach (var thisRule in Rules) {
-                if (thisRule != null) {
-                    if (!thisRule.IsOk() || thisRule.IsNullOrEmpty()) {
-                        Rules.Remove(thisRule);
-                        RepairNewRules(Rules);
-                        return;
-                    }
-                    thisRule.Repair();
-                }
-            }
-
-            //Rules.Sort();
-        }
 
 
         #endregion
@@ -545,7 +416,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var I = new ItemCollectionList();
             I.Add("Anordnungen der Spaltenansichten", ((int)enDatabaseDataType.ColumnArrangement).ToString());
             I.Add("Formulare", ((int)enDatabaseDataType.Views).ToString());
-            I.Add("Regeln", ((int)enDatabaseDataType.Rules).ToString());
+            I.Add("Regeln", ((int)enDatabaseDataType.Rules_ALT).ToString());
             I.Add("Undo-Speicher", ((int)enDatabaseDataType.UndoInOne).ToString());
             I.Add("Auto-Export", ((int)enDatabaseDataType.AutoExport).ToString());
             I.Add("Binäre Daten im Kopf der Datenbank", ((int)enDatabaseDataType.BinaryDataInOne).ToString());
@@ -693,7 +564,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                             Symb = enImageCode.PlusZeichen;
                             break;
 
-                        case enDatabaseDataType.Rules:
+                        case enDatabaseDataType.Rules_ALT:
                             aenderung = "Regeln verändert";
                             Symb = enImageCode.Formel;
                             alt = "";
@@ -736,22 +607,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
 
-        private void lbxRuleSelector_ItemRemoving(object sender, ListEventArgs e) {
-            if (RuleItemEditor.Item == ((TextListItem)e.Item).Tag) {
-                RuleItemEditor.Item = null;
-            }
-        }
 
-        private void RuleItemEditor_Changed(object sender, System.EventArgs e) {
-            foreach (var thisitem in lbxRuleSelector.Item) {
-                if (thisitem is TextListItem tli) {
-                    if (tli.Tag == RuleItemEditor.Item) {
-                        tli.Text = RuleItemEditor.Item.ReadableText();
-                        tli.Symbol = RuleItemEditor.Item.SymbolForReadableText();
-                    }
-                }
-            }
-        }
 
         private void ExportEditor_Changed(object sender, System.EventArgs e) {
             foreach (var thisitem in lbxExportSets.Item) {
@@ -764,17 +620,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private void btnAutoSort_Click(object sender, System.EventArgs e) {
 
-            RuleItemEditor.Item = null;
-
-            var tmpR = GetRulesFromList();
-
-            lbxRuleSelector.Item.Clear();
-            tmpR.Sort();
-            AddRulesToList(tmpR);
-
-
-        }
     }
 }

@@ -1210,6 +1210,8 @@ namespace BlueBasics.MultiUserFile {
         public virtual string ErrorReason(enErrorReason mode) {
             if (mode == enErrorReason.OnlyRead) { return string.Empty; }
 
+            if (mode == enErrorReason.Save) { return "Speichern temporär deaktiviert!"; }
+
             //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
 
             if (mode == enErrorReason.Load || mode == enErrorReason.LoadForCheckingOnly) {

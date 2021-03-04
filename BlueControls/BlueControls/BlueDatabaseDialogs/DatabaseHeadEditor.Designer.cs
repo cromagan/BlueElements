@@ -46,8 +46,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capCaption = new BlueControls.Controls.Caption();
             this.capTags = new BlueControls.Controls.Caption();
             this.capInfo = new BlueControls.Controls.Caption();
-            this.RuleItemEditor = new BlueControls.Classes_Editor.RuleItem_Editor();
-            this.lbxRuleSelector = new BlueControls.Controls.ListBox();
             this.Caption14 = new BlueControls.Controls.Caption();
             this.Caption13 = new BlueControls.Controls.Caption();
             this.Caption11 = new BlueControls.Controls.Caption();
@@ -69,7 +67,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxJoinTyp = new BlueControls.Controls.ComboBox();
             this.capAnsicht = new BlueControls.Controls.Caption();
             this.Tab_Regeln = new BlueControls.Controls.TabPage();
-            this.btnAutoSort = new BlueControls.Controls.Button();
             this.Tab_Backup = new BlueControls.Controls.TabPage();
             this.ExportEditor = new BlueControls.Classes_Editor.ExportDefinition_Editor();
             this.grpExport = new BlueControls.Controls.GroupBox();
@@ -309,41 +306,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capInfo.Size = new System.Drawing.Size(552, 90);
             this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // RuleItemEditor
-            // 
-            this.RuleItemEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.RuleItemEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.RuleItemEditor.CausesValidation = false;
-            this.RuleItemEditor.Location = new System.Drawing.Point(8, 384);
-            this.RuleItemEditor.Name = "RuleItemEditor";
-            this.RuleItemEditor.Size = new System.Drawing.Size(1023, 221);
-            this.RuleItemEditor.TabIndex = 0;
-            this.RuleItemEditor.TabStop = false;
-            this.RuleItemEditor.Text = "Regel-Editor";
-            this.RuleItemEditor.Changed += new System.EventHandler(this.RuleItemEditor_Changed);
-            // 
-            // lbxRuleSelector
-            // 
-            this.lbxRuleSelector.AddAllowed = BlueControls.Enums.enAddType.UserDef;
-            this.lbxRuleSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbxRuleSelector.CheckBehavior = BlueControls.Enums.enCheckBehavior.AlwaysSingleSelection;
-            this.lbxRuleSelector.FilterAllowed = true;
-            this.lbxRuleSelector.LastFilePath = null;
-            this.lbxRuleSelector.Location = new System.Drawing.Point(8, 8);
-            this.lbxRuleSelector.MoveAllowed = true;
-            this.lbxRuleSelector.Name = "lbxRuleSelector";
-            this.lbxRuleSelector.RemoveAllowed = true;
-            this.lbxRuleSelector.Size = new System.Drawing.Size(1023, 360);
-            this.lbxRuleSelector.TabIndex = 1;
-            this.lbxRuleSelector.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.lbxRuleSelector_ContextMenuInit);
-            this.lbxRuleSelector.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.lbxRuleSelector_ContextMenuItemClicked);
-            this.lbxRuleSelector.ItemCheckedChanged += new System.EventHandler(this.lbxRuleSelector_ItemCheckedChanged);
-            this.lbxRuleSelector.ItemRemoving += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.lbxRuleSelector_ItemRemoving);
-            this.lbxRuleSelector.AddClicked += new System.EventHandler(this.lbxRuleSelector_AddClicked);
-            // 
             // Caption14
             // 
             this.Caption14.CausesValidation = false;
@@ -569,24 +531,12 @@ namespace BlueControls.BlueDatabaseDialogs
             // Tab_Regeln
             // 
             this.Tab_Regeln.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Regeln.Controls.Add(this.btnAutoSort);
-            this.Tab_Regeln.Controls.Add(this.RuleItemEditor);
-            this.Tab_Regeln.Controls.Add(this.lbxRuleSelector);
             this.Tab_Regeln.Location = new System.Drawing.Point(4, 25);
             this.Tab_Regeln.Name = "Tab_Regeln";
             this.Tab_Regeln.Padding = new System.Windows.Forms.Padding(3);
             this.Tab_Regeln.Size = new System.Drawing.Size(1039, 616);
             this.Tab_Regeln.TabIndex = 3;
             this.Tab_Regeln.Text = "Regeln";
-            // 
-            // btnAutoSort
-            // 
-            this.btnAutoSort.Location = new System.Drawing.Point(944, 8);
-            this.btnAutoSort.Name = "btnAutoSort";
-            this.btnAutoSort.Size = new System.Drawing.Size(88, 24);
-            this.btnAutoSort.TabIndex = 2;
-            this.btnAutoSort.Text = "Auto-Sort";
-            this.btnAutoSort.Click += new System.EventHandler(this.btnAutoSort_Click);
             // 
             // Tab_Backup
             // 
@@ -850,7 +800,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox tbxTags;
         private ListBox lbxSortierSpalten;
         private Button btnSperreAufheben;
-        private ListBox lbxRuleSelector;
         private Caption Caption11;
         private Caption Caption14;
         private Caption Caption13;
@@ -864,7 +813,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private ComboBox cbxAnsicht;
         private Caption capAnsicht;
         private GroupBox grpKennwort;
-        private RuleItem_Editor RuleItemEditor;
         private GroupBox grpBenutzergruppen;
         private TabPage Tab_Undo;
         private TabPage Tab_Binaer;
@@ -895,7 +843,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private TabControl GlobalTab;
         private TextBox txbFilterImagePath;
         private Caption capFilterImagePath;
-        private Button btnAutoSort;
         private TextBox txbZeilenQuickInfo;
         private Caption capZeilenQuickInfo;
         private Caption capBinInfo;

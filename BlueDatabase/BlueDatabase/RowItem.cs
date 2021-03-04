@@ -338,34 +338,36 @@ namespace BlueDatabase {
             // Dann die Aktionen ausführen und fall es einen Fehler gibt, die Spalten ermitteln
             var ColumnAndErrors = new List<string>();
 
-            foreach (var ThisRule in Database.Rules) {
-                if (ThisRule != null) {
-                    if (ThisRule.TrifftZu(this)) {
-                        var tmpMessage = ThisRule.Execute(this, true);
+            Develop.DebugPrint_NichtImplementiert();
 
-                        if (!string.IsNullOrEmpty(tmpMessage)) {
-                            var tmpColumNames = tmpMessage.ReduceToMulti("'#Spalte:*'");
-                            if (tmpMessage.Contains("<DELETE>")) { tmpMessage = tmpMessage.Substring(0, tmpMessage.IndexOf("<DELETE>")); }
+            //foreach (var ThisRule in Database.Rules) {
+            //    if (ThisRule != null) {
+            //        if (ThisRule.TrifftZu(this)) {
+            //            var tmpMessage = ThisRule.Execute(this, true);
 
-                            foreach (var t in tmpColumNames) {
-                                var Column = Database.Column[t];
-                                if (Column != null) { tmpMessage = tmpMessage.Replace("#Spalte:" + Column.Name, Column.ReadableText(), RegexOptions.IgnoreCase); }
-                            }
+            //            if (!string.IsNullOrEmpty(tmpMessage)) {
+            //                var tmpColumNames = tmpMessage.ReduceToMulti("'#Spalte:*'");
+            //                if (tmpMessage.Contains("<DELETE>")) { tmpMessage = tmpMessage.Substring(0, tmpMessage.IndexOf("<DELETE>")); }
+
+            //                foreach (var t in tmpColumNames) {
+            //                    var Column = Database.Column[t];
+            //                    if (Column != null) { tmpMessage = tmpMessage.Replace("#Spalte:" + Column.Name, Column.ReadableText(), RegexOptions.IgnoreCase); }
+            //                }
 
 
-                            if (tmpColumNames.Count > 0) {
-                                foreach (var t in tmpColumNames) {
-                                    ColumnAndErrors.Add(t + "|" + tmpMessage);
-                                }
-                            }
-                            else {
-                                ColumnAndErrors.Add("|" + tmpMessage); // Sie gehören zur Nutzergruppe...
-                            }
+            //                if (tmpColumNames.Count > 0) {
+            //                    foreach (var t in tmpColumNames) {
+            //                        ColumnAndErrors.Add(t + "|" + tmpMessage);
+            //                    }
+            //                }
+            //                else {
+            //                    ColumnAndErrors.Add("|" + tmpMessage); // Sie gehören zur Nutzergruppe...
+            //                }
 
-                        }
-                    }
-                }
-            }
+            //            }
+            //        }
+            //    }
+            //}
 
             // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
             var e = new DoRowAutomaticEventArgs(this);

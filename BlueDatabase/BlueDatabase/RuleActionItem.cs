@@ -27,10 +27,10 @@ using System.Text.RegularExpressions;
 using static BlueBasics.FileOperations;
 
 namespace BlueDatabase {
-    public sealed class RuleActionItem : IParseable, IReadableTextWithChanging, IComparable, ICompareKey, ICloneable, ICheckable, ICanBeEmpty {
+    public sealed class RuleActionItem : IParseable, IReadableTextWithChanging, IComparable, ICompareKey, ICloneable {
         #region  Variablen-Deklarationen 
 
-        public readonly RuleItem Rule;
+        public readonly RuleItem_Old Rule;
         private enAction _Action;
         private string _Text;
 
@@ -53,7 +53,7 @@ namespace BlueDatabase {
         }
 
 
-        public RuleActionItem(RuleItem RL, enAction Action, string Text, ColumnItem Column) {
+        public RuleActionItem(RuleItem_Old RL, enAction Action, string Text, ColumnItem Column) {
             Rule = RL;
             Initialize();
             _Action = Action;
@@ -61,7 +61,7 @@ namespace BlueDatabase {
             if (Column != null) { Columns.Add(Column); }
         }
 
-        public RuleActionItem(RuleItem RL, string Code) {
+        public RuleActionItem(RuleItem_Old RL, string Code) {
             Rule = RL;
             Parse(Code);
         }
@@ -106,10 +106,10 @@ namespace BlueDatabase {
         #endregion
 
 
-        public bool IsNullOrEmpty() {
-            if (!IsOk()) { return true; }
-            return false;
-        }
+        //public bool IsNullOrEmpty() {
+        //    if (!IsOk()) { return true; }
+        //    return false;
+        //}
 
 
 
@@ -513,19 +513,52 @@ namespace BlueDatabase {
             }
         }
 
-        internal void RenameColumn(string oldName, ColumnItem newName) {
-            if (!Text.ToUpper().Contains(oldName.ToUpper())) { return; }
-            _Text = _Text.Replace("&" + oldName + ";", "&" + newName.Name + ";", RegexOptions.IgnoreCase);
-            _Text = _Text.Replace("&" + oldName + "(", "&" + newName.Name + "(", RegexOptions.IgnoreCase);
-            OnChanged();
-        }
+        internal (string anfang, string ende) ToScript() {
+
+            switch (_Action) {
+
+                case enAction.Ist:
+
+                    var txt = Text.SplitByCRToList();
+
+                    if (txt is null || txt.Count==0) {
+                        return ("if (IsNullOrEmpty(" + Columns[0].Name + ")) {", "}");
+                    }
+
+                    if (txt.Count >1) {
+                        var tmpn = "tmpList_" + Columns[0].Name;
+                        var tmpt = "var " + tmpn + " = {\"" + txt.JoinWith("\", \"");
+                        tmpt = tmpt.Trim(", \"") + "\"}";
+                        return (tmpt + "\r\nif (Contains(" + tmpt + ", " + Columns[0].Name +") {", "}");
+                    }
 
 
-        internal bool Contains(ColumnItem column) {
-            if (Text.ToUpper().Contains("&" + column.Name.ToUpper() + ";")) { return true; }
-            if (Text.ToUpper().Contains("&" + column.Name.ToUpper() + "(")) { return true; }
-            return Columns.Contains(column);
+
+                    if  (Columns[0].Format.IsZahl()) {
+                        return ("if (" + Columns[0].Name + " == " + Text + ") {", "}");
+                    }
+
+
+                    return ("if (" + Columns[0].Name + " == \"" + Text + "\") {", "}" );
+
+
+                case enAction.Setze_Fehlerhaft:
+                    return ("SetError(\"" +  Text.Replace("\r\n","") +  "\",  Spalten_Zum_Markieren); // TODO: Spalten und Text korrigieren", "");
+
+
+                 
+
+                default:
+                    Develop.DebugPrint_NichtImplementiert();
+                    break;
+
+
+            }
+
+            return (string.Empty, string.Empty);
+
         }
+
 
 
 
@@ -548,7 +581,7 @@ namespace BlueDatabase {
 
 
         public QuickImage SymbolForReadableText() {
-            if (!IsOk()) { return QuickImage.Get(enImageCode.Kritisch); }
+            //if (!IsOk()) { return QuickImage.Get(enImageCode.Kritisch); }
 
 
             switch (_Action) {
@@ -625,541 +658,541 @@ namespace BlueDatabase {
         }
 
 
-        public static void MaximalText(Database IrgendeineDatebank, enAction Action, ref string rtext, ref QuickImage rSym) {
-            var tmpa = new RuleActionItem(null, Action, string.Empty, null); // HIER NOTHING! WEil sonst eine Änderun ausgelöst wird, wo keine ist
+        //public static void MaximalText(Database IrgendeineDatebank, enAction Action, ref string rtext, ref QuickImage rSym) {
+        //    var tmpa = new RuleActionItem(null, Action, string.Empty, null); // HIER NOTHING! WEil sonst eine Änderun ausgelöst wird, wo keine ist
 
-            tmpa.Columns.Clear(); // = New List(Of ColumnItem)
-            tmpa._Text = "TEXT";
+        //    tmpa.Columns.Clear(); // = New List(Of ColumnItem)
+        //    tmpa._Text = "TEXT";
 
 
-            if (!tmpa.IsOk()) {
-                tmpa._Text = "TEXT";
-                tmpa.Columns.Clear(); // = New List(Of ColumnItem)
-                tmpa.Columns.Add(IrgendeineDatebank.Column[0]);
-            }
+        //    if (!tmpa.IsOk()) {
+        //        tmpa._Text = "TEXT";
+        //        tmpa.Columns.Clear(); // = New List(Of ColumnItem)
+        //        tmpa.Columns.Add(IrgendeineDatebank.Column[0]);
+        //    }
 
-            if (!tmpa.IsOk()) {
-                tmpa._Text = "TEXT\rTEXT2"; // Für Analyse
-            }
+        //    if (!tmpa.IsOk()) {
+        //        tmpa._Text = "TEXT\rTEXT2"; // Für Analyse
+        //    }
 
 
-            if (!tmpa.IsOk()) {
-                tmpa._Text = "TEXT\rTEXT2\rTEXT3"; // Einheit, Spalte, Einheitenspalte
-            }
+        //    if (!tmpa.IsOk()) {
+        //        tmpa._Text = "TEXT\rTEXT2\rTEXT3"; // Einheit, Spalte, Einheitenspalte
+        //    }
 
-            if (!tmpa.IsOk()) {
-                tmpa._Text = "";
-            }
+        //    if (!tmpa.IsOk()) {
+        //        tmpa._Text = "";
+        //    }
 
-            if (!tmpa.IsOk()) {
-                tmpa._Text = "";
-                tmpa.Columns.Clear();
-            }
+        //    if (!tmpa.IsOk()) {
+        //        tmpa._Text = "";
+        //        tmpa.Columns.Clear();
+        //    }
 
 
-            if (!tmpa.IsOk()) {
-                tmpa._Text = "2";
-                tmpa.Columns.Clear();
-                tmpa.Columns.Add(IrgendeineDatebank.Column[0]);
-            }
-
-            if (!tmpa.IsOk()) {
-                tmpa._Text = "";
-                tmpa.Columns.Clear();
-                tmpa.Columns.Add(IrgendeineDatebank.Column[0]);
-                tmpa.Columns.Add(IrgendeineDatebank.Column[1]);
-            }
-
-
-
-            if (!tmpa.IsOk()) {
-                tmpa._Text = "2";
-                tmpa.Columns.Clear();
-            }
-
-
-            if (tmpa.IsOk()) {
-                rtext = "..." + tmpa.ReadableText();
-
-                rtext = rtext.Replace("'" + IrgendeineDatebank.Column[0].ReadableText() + "'", "'SPALTE'");
-                rtext = rtext.Replace("'" + IrgendeineDatebank.Column[1].ReadableText() + "'", "'SPALTE'");
-                //rtext = rtext.Replace(" 2 Kom", " ?? Kom");
-                //rtext = rtext.Replace(" 2 Stu", " ?? Stu");
-                rSym = tmpa.SymbolForReadableText();
-
-            } else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Action: " + Action);
-
-            }
-
-
-        }
-
-
-
-        public static enNeededColumns NeededColumns(string Action) {
-
-            if (string.IsNullOrEmpty(Action)) { return enNeededColumns.None; }
-            if (!Action.IsLong()) { return enNeededColumns.None; }
-
-            var x = (enAction)int.Parse(Action);
-            if (x.ToString() == ((int)x).ToString()) { return enNeededColumns.None; }
-
-            return NeededColumns(x);
-        }
-
-        public static enNeededText NeededText(string Action) {
-            if (string.IsNullOrEmpty(Action)) { return enNeededText.None; }
-            if (!Action.IsLong()) { return enNeededText.None; }
-
-            var x = (enAction)int.Parse(Action);
-            if (x.ToString() == ((int)x).ToString()) {
-                return enNeededText.None;
-            }
-
-            return NeededText(x);
-        }
-
-        public static enNeededColumns NeededColumns(enAction Action) {
-
-
-            switch (Action) {
-                case enAction.Ist:
-                    return enNeededColumns.OneOrMore;
-                //case enAction.Erhält_den_Focus:
-                //    return enNeededColumns.OnlyOne;
-                //case enAction.Mache_einen_Vorschlag:
-                //    return enNeededColumns.OneOrMore;
-                case enAction.Ist_Nicht:
-                    return enNeededColumns.OneOrMore;
-                case enAction.Enthält_ungültige_Zeichen:
-                    return enNeededColumns.OneOrMore;
-                case enAction.Formatfehler_des_Zelleninhaltes:
-                    return enNeededColumns.OneOrMore;
-                //    Case Is = enAction.Zeile_wird_initialisiertx : Return enNeededColumns.None
-                case enAction.Auf_eine_existierende_Datei_verweist:
-                    return enNeededColumns.OnlyOne;
-                case enAction.Auf_einen_existierenden_Pfad_verweist:
-                    return enNeededColumns.OnlyOne;
-                case enAction.Enthält:
-                    return enNeededColumns.OneOrMore;
-                case enAction.Enthält_Zeichenkette:
-                    return enNeededColumns.OneOrMore;
-                case enAction.Enthält_NICHT_Zeichenkette:
-                    return enNeededColumns.OnlyOne;
-                case enAction.Setze_Fehlerhaft:
-                    return enNeededColumns.None;
-                case enAction.Wert_Setzen:
-                    return enNeededColumns.OneOrMore;
-                case enAction.Sperre_die_Zelle:
-                    return enNeededColumns.OneOrMore;
-                case enAction.Berechne:
-                    return enNeededColumns.OnlyOne;
-                case enAction.Substring:
-                    return enNeededColumns.OnlyOne;
-                case enAction.Wert_Dazu:
-                    return enNeededColumns.OneOrMore;
-                case enAction.Wert_Weg:
-                    return enNeededColumns.OneOrMore;
-                case enAction.Anmerkung:
-                    return enNeededColumns.DoesNotMatter;
-                //case enAction.Ist_der_Nutzer:
-                //    return enNeededColumns.None;
-                case enAction.Berechnung_ist_True:
-                    return enNeededColumns.None;
-                case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
-                    return enNeededColumns.OneOrMore;
-                //case enAction.Ist_Jünger_Als:
-                //    return enNeededColumns.None;
-                //case enAction.SortiereIntelligent:
-                //    return enNeededColumns.MoreThanOne;
-                //case enAction.KopiereAndereSpalten:
-                //    return enNeededColumns.TwoColumns;
-                case enAction.Skript:
-                    return enNeededColumns.None;
-
-
-                default:
-                    Develop.DebugPrint(Action);
-
-                    break;
-            }
-
-            return enNeededColumns.None;
-        }
-
-        public static enNeededText NeededText(enAction Action) {
-
-
-            switch (Action) {
-                case enAction.Ist:
-                    return enNeededText.DoesNotMatter;
-                //case enAction.Erhält_den_Focus:
-                //    return enNeededText.None;
-                //case enAction.Mache_einen_Vorschlag:
-                //    return enNeededText.None;
-                case enAction.Ist_Nicht:
-                    return enNeededText.MaxOneLine;
-                case enAction.Enthält_ungültige_Zeichen:
-                    return enNeededText.None;
-                case enAction.Formatfehler_des_Zelleninhaltes:
-                    return enNeededText.None;
-                case enAction.Auf_eine_existierende_Datei_verweist:
-                    return enNeededText.None;
-                case enAction.Auf_einen_existierenden_Pfad_verweist:
-                    return enNeededText.None;
-                case enAction.Enthält:
-                    return enNeededText.OneOrMore;
-                case enAction.Enthält_Zeichenkette:
-                    return enNeededText.OneOrMore;
-                case enAction.Enthält_NICHT_Zeichenkette:
-                    return enNeededText.OneOrMore;
-                case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
-                    return enNeededText.None;
-                case enAction.Setze_Fehlerhaft:
-                    return enNeededText.DoesNotMatter;
-                case enAction.Wert_Setzen:
-                    return enNeededText.DoesNotMatter;
-                case enAction.Sperre_die_Zelle:
-                    return enNeededText.None;
-                case enAction.Berechnung_ist_True:
-                    return enNeededText.Rechenformel1;
-                case enAction.Berechne:
-                    return enNeededText.Rechenformel1;
-                case enAction.Substring:
-                    return enNeededText.Rechenformel2;
-                case enAction.Wert_Dazu:
-                    return enNeededText.OneOrMore;
-                case enAction.Wert_Weg:
-                    return enNeededText.OneOrMore;
-                //case enAction.Ist_der_Nutzer:
-                //    return enNeededText.OneOrMore;
-                case enAction.Anmerkung:
-                    return enNeededText.DoesNotMatter;
-
-                case enAction.Skript:
-                    return enNeededText.DoesNotMatter;
-                //case enAction.Ist_Jünger_Als:
-                //    return enNeededText.OneIntegerValue;
-                //case enAction.SortiereIntelligent:
-                //    return enNeededText.None;
-                //case enAction.KopiereAndereSpalten:
-                //    return enNeededText.None;
-
-
-
-                default:
-                    Develop.DebugPrint(Action);
-
-                    break;
-            }
-
-            return enNeededText.None;
-        }
-
-
-        public static string HelpTextinHTML(Database IrgedeineDatenbank, enAction Action) {
-
-
-            //Dim x As enAction = CType(CInt(Rule_Aktion.Text), enAction)
-            //If x.ToString = Microsoft.VisualBasic.Val(x).ToString Then Exit Sub
-
-
-            var t = string.Empty;
-            QuickImage s = null;
-            MaximalText(IrgedeineDatenbank, Action, ref t, ref s);
-
-            t = t.Trim('.');
-            t = t.Trim(' ');
-
-            var r = "<b><u>Information</b></u><br><br>";
-
-
-            if ((int)Action < 1000) {
-                r = r + "<b>Bedingung:<br>Wenn </b>" + t.Trim('.') + "<b>, dann </b>...<br>";
-                r += "<i> - Bedingungen können nicht alleine stehen, sie benötigen immer eine auszuführende Aktion<br> - Bedingungen prüfen nur und ändern nichts</i><br>";
-            } else {
-                r = r + "<b>Aktion:<br>Wenn </b>..., <b> dann </b>" + t.Trim('.') + ".<br>";
-                r += "<i> - Aktion können alleine stehen, evtl. ist dadurch eine manuelle Zellenbearbeitung nicht mehr möglich<br> - Aktionen haben immer Auswirkungen auf eine oder mehrere Zellen</i><br>";
-            }
-
-            r += "<br><br><b>Beschreibung:</b><br>";
-
-
-            var MehrereTexteReichtEiner = false;
-            var EineSpalteWahrUmWahrzusein = false;
-
-            var MehrTexteAllegeamacht = false;
-            var MehrSpaltenAllegeamacht = false;
-
-
-            switch (Action) {
-                case enAction.Anmerkung:
-                    r += "Anmerkung ist ohne Funktion und nur für Notizen gedacht.";
-                    break;
-
-                case enAction.Ist:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so <b>in der Zelle</b> steht.<br>" +
-                            "Wird hier kein Text eingegeben, ist <i>WAHR</i>, wenn die Zelle komplett leer ist.";
-                    EineSpalteWahrUmWahrzusein = true;
-                    break;
-
-                case enAction.Ist_Nicht:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text vom Zelleninhalt abweicht.<br>" +
-                            "Wird hier kein Text eingegeben, ist <i>WAHR</i>, wenn die Zelle befüllt ist.";
-                    EineSpalteWahrUmWahrzusein = true;
-                    break;
-
-                case enAction.Enthält:
-                    r += "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so <b>in einer Zeile der Zelle</b> steht.";
-                    MehrereTexteReichtEiner = true;
-                    EineSpalteWahrUmWahrzusein = true;
-                    break;
-
-                case enAction.Enthält_Zeichenkette:
-                    r += "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so <b>irgendwo in der Zelle</b> steht.<br>Gross/Kleinschreibung wird ignoriert.";
-                    EineSpalteWahrUmWahrzusein = true;
-                    break;
-
-                case enAction.Enthält_NICHT_Zeichenkette:
-                    r += "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so  <b>nicht in der Zelle</b> steht.<br>Gross/Kleinschreibung wird ignoriert.";
-                    MehrereTexteReichtEiner = true;
-                    break;
-
-
-                case enAction.Formatfehler_des_Zelleninhaltes:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der <b>Inhalt der Zelle</b> nicht mit dem geforderten<br>" +
-                            "Format der jeweiligen Spalte übereinstimmt.";
-                    EineSpalteWahrUmWahrzusein = true;
-                    break;
-
-                case enAction.Enthält_ungültige_Zeichen:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn <b>im Inhalt der Zelle</b> mindestens ein Zeichen enthalten ist,<br>" +
-                            "die laut Definiton der jeweiligen Spalte nicht erlaubt ist.";
-                    EineSpalteWahrUmWahrzusein = true;
-                    break;
-
-                case enAction.Setze_Fehlerhaft:
-                    r = r + "Zeilen sind standardmässig fehlerfrei. Durch diese Aktion wird die Zeile als fehlerhaft markiert.<br>" +
-                            "Wird ein Text angegeben, wird dieser als Fehlermeldung zurückgegen.<br>" +
-                            "Wird kein Text angegeben, wird ein Standard-Fehler-Text angezeigt.";
-                    break;
-
-                case enAction.Auf_eine_existierende_Datei_verweist:
-                    r += "Diese Bedingung ist <i>WAHR</i>, wenn der <b>Inhalt der Zelle</b> auf eine existierende Datei im Windows-Dateisystem verweist.";
-                    break;
-
-                case enAction.Auf_einen_existierenden_Pfad_verweist:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der <b>Inhalt der Zelle</b> auf einen existierenden Dateipfad im Windows-Dateisystem verweist.<br>" +
-                            "Dateinamen oder Dateinamen mit Dateipfaden sind nicht <i>WAHR</i>.";
-                    break;
-
-                //case enAction.Erhält_den_Focus:
-                //    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn das Bearbeitungsfeld in der Formularansicht den Fokus erhält.<br>" +
-                //            "Nur in Kombination mit <b>Vorschlag machen</b> erlaubt.";
-                //    break;
-
-                case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
-                    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn am Ende des <b>Inhalts der Zelle</b> Leerzeichen oder Zeilenumbruchcodes sind. <br>" +
-                            "Damit können unötige Zeichen abgefagen werden.";
-                    EineSpalteWahrUmWahrzusein = true;
-                    break;
-
-                //case enAction.Ist_der_Nutzer:
-                //    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der Benutzer zu einer Benutzergruppe gehört, die im Text definiert ist.<br>" +
-                //            "Hier trifft die Benutzergruppe #Administrator nicht automatisch und muss separat angegeben werden.<br>" +
-                //            "Einzelne Nutzer können direkt mit #USER:Max Mustermann angesprochen werden.";
-                //    MehrereTexteReichtEiner = true;
-                //    break;
-
-
-                //case enAction.Ist_Jünger_Als:
-                //    r = r + "Diese Bedingung ist <i>WAHR</i>, das Erstelldatum der Zeile jünger ist, als die im Textfeld angegebene Stunden-Zahl.";
-                //    break;
-
-
-                case enAction.Wert_Dazu:
-                    r += "Diese Aktion fügt neue Werte hinzu, ohne die alten zu löschen. Anschließende wird sortiert und eventuell doppelt Werte entfernt.";
-                    MehrTexteAllegeamacht = true;
-                    MehrSpaltenAllegeamacht = true;
-                    break;
-
-                case enAction.Wert_Weg:
-                    r += "Diese Aktion entfernt die hier angegeben Werte hinzu, ohne die alten zu löschen. Anschließende wird sortiert und eventuell doppelte Werte entfernt.";
-                    MehrTexteAllegeamacht = true;
-                    MehrSpaltenAllegeamacht = true;
-                    break;
-
-                case enAction.Wert_Setzen:
-                    r += "Diese Aktion überschreibt den Text in der Zelle mit dem hier angegeben Text.";
-                    MehrSpaltenAllegeamacht = true;
-                    break;
-
-                //case enAction.Mache_einen_Vorschlag:
-                //    r = r + "Diese Aktion benötigt die vorherige Bedingung <b>erhält den Focus</b>.<br>" +
-                //            "Die hier angegebenen Spalten werden verglichen, ob diese bereits in einer Zeile der Datenbank vorkommen.<br>" +
-                //            "Falls ja, wird der Wert, der in dieser Zeile enthalten ist, in das Feld im Formular geschrieben.";
-                //    break;
-
-                case enAction.Berechne:
-                    r = r + "Diese Aktion berechnet einen Wert. Dazu muss hier im Textfeld eine Formel eingegeben werden.<br>" +
-                            "Inhalte anderer Spalten der gleichen Zeile können ebenfalls angesprochen werden.<br>" +
-                            "Dazu wird der interne Spaltenname als Variable benutzt. <i><u>Beispiel:</u> &amp;SPALTENNAME;</i><br>" +
-                            "Unterstützt werden Operatoren (< > =), Funktionen (Int, IFF, Min, Max), Klammern, Addition, Subtraktion, Muliplikation und Divison.<br>" +
-                            "Kann die Formel nicht berechnet werden, wird die Zeile als fehlerhaft markiert.<br>" +
-                            "<i><u>Beispiel:</u> ( &amp;Spalte1; + 10,5 )  / ( &amp;Spalte2; - &amp;Spalte3; ) * &amp;Spalte4;</i>";
-                    break;
-
-                case enAction.Berechnung_ist_True:
-                    r = r + "Diese Bedingung berechent das Ergebnis. Wenn am Ende der Wert -1 (=True) steht, trifft die Bedingung zu.<br>" +
-                            "Inhalte anderer Spalten der gleichen Zeile können ebenfalls angesprochen werden.<br>" +
-                            "Dazu wird der interne Spaltenname als Variable benutzt. <i><u>Beispiel:</u> &amp;SPALTENNAME;</i><br>" +
-                            "Unterstützt werden Operatoren (< > =), Funktionen (Int, IFF, Min, Max), Klammern, Addition, Subtraktion, Muliplikation und Divison.<br>" +
-                            "Kann die Formel nicht berechnet werden, wird die Zeile als fehlerhaft markiert.<br>" +
-                            "<i><u>Beispiel:</u> ( &amp;Spalte1; + 10,5 )  / ( &amp;Spalte2; - &amp;Spalte3; ) * &amp;Spalte4;</i>";
-                    break;
-
-                case enAction.Substring:
-                    //r = r + "Diese Aktion setzt einen Text mit Inhalten aus anderen Zellen zusammen.<br>" +
-                    //        "Dazu wird der interne Spaltenname als Variable benutzt. <i><u>Beispiel:</u> &amp;SPALTENNAME;</i><br>" +
-                    //        "Zusätzlich können auch nur Teilbereiche benutzt werden <i><u>Beispiel:</u> &amp;SPALTENNAME(L,1);</i><br>" +
-                    //        "Es sind die Buchstaben L für links, M für Mitte und R für rechts möglich:<br>" +
-                    //        "&amp;SPALTENNAME(L,3) = Die ersten 3 Zeichen<br>" +
-                    //        "&amp;SPALTENNAME(R,3) = Die letzten 5 Zeichen<br>" +
-                    //        "&amp;SPALTENNAME(M,3,5) = Ab dem dritten Zeichen 5 Zeichen<br>" +
-                    //        "Diese Berechnung erzeugt keine Fehler.";
-                    r = r + "Diese Aktion setzt einen Text mit Inhalten aus anderen Zellen zusammen.<br>" +
-                            "Dazu wird der interne Spaltenname als Variable benutzt. <i><u>Beispiel:</u> &amp;SPALTENNAME;</i><br>" +
-                            "Zusätzlich können auch nur Teilbereiche benutzt werden <i><u>Beispiel:</u> &amp;SPALTENNAME(L,1);</i><br>" +
-                            "&amp;SPALTENNAME(L,3) = Die ersten 3 Zeichen<br>" +
-                            "Diese Berechnung erzeugt keine Fehler.";
-                    break;
-
-                case enAction.Sperre_die_Zelle:
-                    r += "Diese Aktion sperrt die <b>manuelle</b> Bearbeitung für dieser Zelle.";
-                    MehrSpaltenAllegeamacht = true;
-                    break;
-
-                case enAction.Skript:
-                    r += " ";
-                    //MehrSpaltenAllegeamacht = true;
-                    break;
-
-                //case enAction.SortiereIntelligent:
-                //    r = r + "Diese Aktion sortiert die Einträge der gewwählten Spalten automatisch in die richtigen Spalten ein.";
-                //    break;
-
-
-                //case enAction.KopiereAndereSpalten:
-                //    r = r + "Diese Aktion benötigt eine Spalte vom Typ 'Relation' und eine normale Spalte. Alle mittels 'Relations' miteinander verknüpften Zeilen, erhalten den gleichen Wert der zweiten Spalte.";
-                //    break;
-
-
-
-
-                default:
-                    Develop.DebugPrint(Action);
-
-                    break;
-            }
-
-            if (MehrereTexteReichtEiner) {
-                r += "<br>Werden hier mehrere Textzeilen eingegeben, wird jede Textzeile für sich geprüft. Um <i>WAHR</i> zu sein, reicht es, wenn <b>eine</b> Textzeile zutrifft.";
-            }
-
-            if (EineSpalteWahrUmWahrzusein) {
-                r += "<br>Werden hier mehrere Spalten ausgewählt, reicht es wenn <b>eine</b> der Spalten <i>WAHR</i> zurückgibt, um <i>WAHR</i> zu sein.";
-            }
-
-            if (MehrTexteAllegeamacht) {
-                r += "<br>Werden hier mehrere Textzeilen eingegeben, wird jede Textzeile für sich abgearbeitet.";
-            }
-
-            if (MehrSpaltenAllegeamacht) {
-                r += "<br>Werden hier mehrere Spalten ausgewählt, werden alle abgearbeitet.";
-            }
-
-            return r;
-        }
-
-
-        public string ErrorReason() {
-            if (_Action == enAction.Sperre_die_Zelle) { return string.Empty; }
-
-            foreach (var t in Columns) {
-                if (t == null) { return " Veraltete Spalten sind angewählt"; }
-
-                if (IsBedingung()) {
-                    if (!t.Format.CanBeCheckedByRules()) { return "Aus der Spalte '" + t.ReadableText() + "' kann generell nicht gelesen werden"; }
-                } else {
-                    if (!t.Format.CanBeChangedByRules()) { return "Die Spalte '" + t.ReadableText() + "' kann generell nicht beschrieben werden"; }
-                }
-            }
-
-            if (_Action == 0) { return "Keine Aktion gewählt"; }
-
-            switch (NeededColumns(_Action)) {
-                case enNeededColumns.DoesNotMatter:
-                    break;
-                case enNeededColumns.None:
-                    if (Columns.Count > 0) { return "Es darf keine Spalte angewählt werden"; }
-                    break;
-                case enNeededColumns.MoreThanOne:
-                    if (Columns.Count < 2) { return "Es müssen mindestens zwei Spalten angewählt werden"; }
-                    break;
-                case enNeededColumns.OneOrMore:
-                    if (Columns.Count == 0) { return "Es muss mindestens eine Spalte angewählt werden"; }
-                    break;
-                case enNeededColumns.OnlyOne:
-                    if (Columns.Count != 1) { return "Es muss genau eine Spalte angewählt werden"; }
-                    break;
-                case enNeededColumns.TwoColumns:
-                    if (Columns.Count != 2) { return "Es müssen genau zwei Spalten angewählt werden"; }
-                    break;
-                default:
-                    Develop.DebugPrint(NeededColumns(_Action));
-                    break;
-            }
-
-
-            switch (NeededText(_Action)) {
-                case enNeededText.DoesNotMatter:
-                    break;
-                case enNeededText.None:
-                    if (!string.IsNullOrEmpty(_Text)) { return "Es darf kein Text eingegeben werden"; }
-                    break;
-
-                case enNeededText.MaxOneLine:
-                    if (_Text.Contains("\r")) { return "Der Text darf maximal eine Zeile haben"; }
-                    break;
-
-                case enNeededText.OneOrMore:
-                    if (string.IsNullOrEmpty(_Text)) { return "Es muss ein Text eingegeben werden"; }
-                    break;
-
-                case enNeededText.Rechenformel1:
-                    if (string.IsNullOrEmpty(_Text)) { return "Es muss eine Rechenformel im Textfeld eingegeben werden"; }
-                    break;
-
-
-                case enNeededText.Rechenformel2:
-                    if (string.IsNullOrEmpty(_Text)) { return "Es muss ein Text-Baukasten im Textfeld eingegeben werden"; }
-                    break;
-
-                case enNeededText.OneIntegerValue:
-                    if (string.IsNullOrEmpty(_Text)) { return "Es muss eine Zahl eingegeben werden"; }
-                    if (!_Text.IsFormat(enDataFormat.Ganzzahl)) { return "Es muss eine Zahl eingegeben werden"; }
-                    break;
-
-                default: {
-                        Develop.DebugPrint(NeededText(_Action));
-                        break;
-                    }
-            }
-
-
-            return string.Empty;
-        }
+        //    if (!tmpa.IsOk()) {
+        //        tmpa._Text = "2";
+        //        tmpa.Columns.Clear();
+        //        tmpa.Columns.Add(IrgendeineDatebank.Column[0]);
+        //    }
+
+        //    if (!tmpa.IsOk()) {
+        //        tmpa._Text = "";
+        //        tmpa.Columns.Clear();
+        //        tmpa.Columns.Add(IrgendeineDatebank.Column[0]);
+        //        tmpa.Columns.Add(IrgendeineDatebank.Column[1]);
+        //    }
+
+
+
+        //    if (!tmpa.IsOk()) {
+        //        tmpa._Text = "2";
+        //        tmpa.Columns.Clear();
+        //    }
+
+
+        //    if (tmpa.IsOk()) {
+        //        rtext = "..." + tmpa.ReadableText();
+
+        //        rtext = rtext.Replace("'" + IrgendeineDatebank.Column[0].ReadableText() + "'", "'SPALTE'");
+        //        rtext = rtext.Replace("'" + IrgendeineDatebank.Column[1].ReadableText() + "'", "'SPALTE'");
+        //        //rtext = rtext.Replace(" 2 Kom", " ?? Kom");
+        //        //rtext = rtext.Replace(" 2 Stu", " ?? Stu");
+        //        rSym = tmpa.SymbolForReadableText();
+
+        //    } else {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Action: " + Action);
+
+        //    }
+
+
+        //}
+
+
+
+        //public static enNeededColumns NeededColumns(string Action) {
+
+        //    if (string.IsNullOrEmpty(Action)) { return enNeededColumns.None; }
+        //    if (!Action.IsLong()) { return enNeededColumns.None; }
+
+        //    var x = (enAction)int.Parse(Action);
+        //    if (x.ToString() == ((int)x).ToString()) { return enNeededColumns.None; }
+
+        //    return NeededColumns(x);
+        //}
+
+        //public static enNeededText NeededText(string Action) {
+        //    if (string.IsNullOrEmpty(Action)) { return enNeededText.None; }
+        //    if (!Action.IsLong()) { return enNeededText.None; }
+
+        //    var x = (enAction)int.Parse(Action);
+        //    if (x.ToString() == ((int)x).ToString()) {
+        //        return enNeededText.None;
+        //    }
+
+        //    return NeededText(x);
+        //}
+
+        //public static enNeededColumns NeededColumns(enAction Action) {
+
+
+        //    switch (Action) {
+        //        case enAction.Ist:
+        //            return enNeededColumns.OneOrMore;
+        //        //case enAction.Erhält_den_Focus:
+        //        //    return enNeededColumns.OnlyOne;
+        //        //case enAction.Mache_einen_Vorschlag:
+        //        //    return enNeededColumns.OneOrMore;
+        //        case enAction.Ist_Nicht:
+        //            return enNeededColumns.OneOrMore;
+        //        case enAction.Enthält_ungültige_Zeichen:
+        //            return enNeededColumns.OneOrMore;
+        //        case enAction.Formatfehler_des_Zelleninhaltes:
+        //            return enNeededColumns.OneOrMore;
+        //        //    Case Is = enAction.Zeile_wird_initialisiertx : Return enNeededColumns.None
+        //        case enAction.Auf_eine_existierende_Datei_verweist:
+        //            return enNeededColumns.OnlyOne;
+        //        case enAction.Auf_einen_existierenden_Pfad_verweist:
+        //            return enNeededColumns.OnlyOne;
+        //        case enAction.Enthält:
+        //            return enNeededColumns.OneOrMore;
+        //        case enAction.Enthält_Zeichenkette:
+        //            return enNeededColumns.OneOrMore;
+        //        case enAction.Enthält_NICHT_Zeichenkette:
+        //            return enNeededColumns.OnlyOne;
+        //        case enAction.Setze_Fehlerhaft:
+        //            return enNeededColumns.None;
+        //        case enAction.Wert_Setzen:
+        //            return enNeededColumns.OneOrMore;
+        //        case enAction.Sperre_die_Zelle:
+        //            return enNeededColumns.OneOrMore;
+        //        case enAction.Berechne:
+        //            return enNeededColumns.OnlyOne;
+        //        case enAction.Substring:
+        //            return enNeededColumns.OnlyOne;
+        //        case enAction.Wert_Dazu:
+        //            return enNeededColumns.OneOrMore;
+        //        case enAction.Wert_Weg:
+        //            return enNeededColumns.OneOrMore;
+        //        case enAction.Anmerkung:
+        //            return enNeededColumns.DoesNotMatter;
+        //        //case enAction.Ist_der_Nutzer:
+        //        //    return enNeededColumns.None;
+        //        case enAction.Berechnung_ist_True:
+        //            return enNeededColumns.None;
+        //        case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
+        //            return enNeededColumns.OneOrMore;
+        //        //case enAction.Ist_Jünger_Als:
+        //        //    return enNeededColumns.None;
+        //        //case enAction.SortiereIntelligent:
+        //        //    return enNeededColumns.MoreThanOne;
+        //        //case enAction.KopiereAndereSpalten:
+        //        //    return enNeededColumns.TwoColumns;
+        //        case enAction.Skript:
+        //            return enNeededColumns.None;
+
+
+        //        default:
+        //            Develop.DebugPrint(Action);
+
+        //            break;
+        //    }
+
+        //    return enNeededColumns.None;
+        //}
+
+        //public static enNeededText NeededText(enAction Action) {
+
+
+        //    switch (Action) {
+        //        case enAction.Ist:
+        //            return enNeededText.DoesNotMatter;
+        //        //case enAction.Erhält_den_Focus:
+        //        //    return enNeededText.None;
+        //        //case enAction.Mache_einen_Vorschlag:
+        //        //    return enNeededText.None;
+        //        case enAction.Ist_Nicht:
+        //            return enNeededText.MaxOneLine;
+        //        case enAction.Enthält_ungültige_Zeichen:
+        //            return enNeededText.None;
+        //        case enAction.Formatfehler_des_Zelleninhaltes:
+        //            return enNeededText.None;
+        //        case enAction.Auf_eine_existierende_Datei_verweist:
+        //            return enNeededText.None;
+        //        case enAction.Auf_einen_existierenden_Pfad_verweist:
+        //            return enNeededText.None;
+        //        case enAction.Enthält:
+        //            return enNeededText.OneOrMore;
+        //        case enAction.Enthält_Zeichenkette:
+        //            return enNeededText.OneOrMore;
+        //        case enAction.Enthält_NICHT_Zeichenkette:
+        //            return enNeededText.OneOrMore;
+        //        case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
+        //            return enNeededText.None;
+        //        case enAction.Setze_Fehlerhaft:
+        //            return enNeededText.DoesNotMatter;
+        //        case enAction.Wert_Setzen:
+        //            return enNeededText.DoesNotMatter;
+        //        case enAction.Sperre_die_Zelle:
+        //            return enNeededText.None;
+        //        case enAction.Berechnung_ist_True:
+        //            return enNeededText.Rechenformel1;
+        //        case enAction.Berechne:
+        //            return enNeededText.Rechenformel1;
+        //        case enAction.Substring:
+        //            return enNeededText.Rechenformel2;
+        //        case enAction.Wert_Dazu:
+        //            return enNeededText.OneOrMore;
+        //        case enAction.Wert_Weg:
+        //            return enNeededText.OneOrMore;
+        //        //case enAction.Ist_der_Nutzer:
+        //        //    return enNeededText.OneOrMore;
+        //        case enAction.Anmerkung:
+        //            return enNeededText.DoesNotMatter;
+
+        //        case enAction.Skript:
+        //            return enNeededText.DoesNotMatter;
+        //        //case enAction.Ist_Jünger_Als:
+        //        //    return enNeededText.OneIntegerValue;
+        //        //case enAction.SortiereIntelligent:
+        //        //    return enNeededText.None;
+        //        //case enAction.KopiereAndereSpalten:
+        //        //    return enNeededText.None;
+
+
+
+        //        default:
+        //            Develop.DebugPrint(Action);
+
+        //            break;
+        //    }
+
+        //    return enNeededText.None;
+        //}
+
+
+        //public static string HelpTextinHTML(Database IrgedeineDatenbank, enAction Action) {
+
+
+        //    //Dim x As enAction = CType(CInt(Rule_Aktion.Text), enAction)
+        //    //If x.ToString = Microsoft.VisualBasic.Val(x).ToString Then Exit Sub
+
+
+        //    var t = string.Empty;
+        //    QuickImage s = null;
+        //    MaximalText(IrgedeineDatenbank, Action, ref t, ref s);
+
+        //    t = t.Trim('.');
+        //    t = t.Trim(' ');
+
+        //    var r = "<b><u>Information</b></u><br><br>";
+
+
+        //    if ((int)Action < 1000) {
+        //        r = r + "<b>Bedingung:<br>Wenn </b>" + t.Trim('.') + "<b>, dann </b>...<br>";
+        //        r += "<i> - Bedingungen können nicht alleine stehen, sie benötigen immer eine auszuführende Aktion<br> - Bedingungen prüfen nur und ändern nichts</i><br>";
+        //    } else {
+        //        r = r + "<b>Aktion:<br>Wenn </b>..., <b> dann </b>" + t.Trim('.') + ".<br>";
+        //        r += "<i> - Aktion können alleine stehen, evtl. ist dadurch eine manuelle Zellenbearbeitung nicht mehr möglich<br> - Aktionen haben immer Auswirkungen auf eine oder mehrere Zellen</i><br>";
+        //    }
+
+        //    r += "<br><br><b>Beschreibung:</b><br>";
+
+
+        //    var MehrereTexteReichtEiner = false;
+        //    var EineSpalteWahrUmWahrzusein = false;
+
+        //    var MehrTexteAllegeamacht = false;
+        //    var MehrSpaltenAllegeamacht = false;
+
+
+        //    switch (Action) {
+        //        case enAction.Anmerkung:
+        //            r += "Anmerkung ist ohne Funktion und nur für Notizen gedacht.";
+        //            break;
+
+        //        case enAction.Ist:
+        //            r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so <b>in der Zelle</b> steht.<br>" +
+        //                    "Wird hier kein Text eingegeben, ist <i>WAHR</i>, wenn die Zelle komplett leer ist.";
+        //            EineSpalteWahrUmWahrzusein = true;
+        //            break;
+
+        //        case enAction.Ist_Nicht:
+        //            r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text vom Zelleninhalt abweicht.<br>" +
+        //                    "Wird hier kein Text eingegeben, ist <i>WAHR</i>, wenn die Zelle befüllt ist.";
+        //            EineSpalteWahrUmWahrzusein = true;
+        //            break;
+
+        //        case enAction.Enthält:
+        //            r += "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so <b>in einer Zeile der Zelle</b> steht.";
+        //            MehrereTexteReichtEiner = true;
+        //            EineSpalteWahrUmWahrzusein = true;
+        //            break;
+
+        //        case enAction.Enthält_Zeichenkette:
+        //            r += "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so <b>irgendwo in der Zelle</b> steht.<br>Gross/Kleinschreibung wird ignoriert.";
+        //            EineSpalteWahrUmWahrzusein = true;
+        //            break;
+
+        //        case enAction.Enthält_NICHT_Zeichenkette:
+        //            r += "Diese Bedingung ist <i>WAHR</i>, wenn der hier angegebene Text exakt so  <b>nicht in der Zelle</b> steht.<br>Gross/Kleinschreibung wird ignoriert.";
+        //            MehrereTexteReichtEiner = true;
+        //            break;
+
+
+        //        case enAction.Formatfehler_des_Zelleninhaltes:
+        //            r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der <b>Inhalt der Zelle</b> nicht mit dem geforderten<br>" +
+        //                    "Format der jeweiligen Spalte übereinstimmt.";
+        //            EineSpalteWahrUmWahrzusein = true;
+        //            break;
+
+        //        case enAction.Enthält_ungültige_Zeichen:
+        //            r = r + "Diese Bedingung ist <i>WAHR</i>, wenn <b>im Inhalt der Zelle</b> mindestens ein Zeichen enthalten ist,<br>" +
+        //                    "die laut Definiton der jeweiligen Spalte nicht erlaubt ist.";
+        //            EineSpalteWahrUmWahrzusein = true;
+        //            break;
+
+        //        case enAction.Setze_Fehlerhaft:
+        //            r = r + "Zeilen sind standardmässig fehlerfrei. Durch diese Aktion wird die Zeile als fehlerhaft markiert.<br>" +
+        //                    "Wird ein Text angegeben, wird dieser als Fehlermeldung zurückgegen.<br>" +
+        //                    "Wird kein Text angegeben, wird ein Standard-Fehler-Text angezeigt.";
+        //            break;
+
+        //        case enAction.Auf_eine_existierende_Datei_verweist:
+        //            r += "Diese Bedingung ist <i>WAHR</i>, wenn der <b>Inhalt der Zelle</b> auf eine existierende Datei im Windows-Dateisystem verweist.";
+        //            break;
+
+        //        case enAction.Auf_einen_existierenden_Pfad_verweist:
+        //            r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der <b>Inhalt der Zelle</b> auf einen existierenden Dateipfad im Windows-Dateisystem verweist.<br>" +
+        //                    "Dateinamen oder Dateinamen mit Dateipfaden sind nicht <i>WAHR</i>.";
+        //            break;
+
+        //        //case enAction.Erhält_den_Focus:
+        //        //    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn das Bearbeitungsfeld in der Formularansicht den Fokus erhält.<br>" +
+        //        //            "Nur in Kombination mit <b>Vorschlag machen</b> erlaubt.";
+        //        //    break;
+
+        //        case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
+        //            r = r + "Diese Bedingung ist <i>WAHR</i>, wenn am Ende des <b>Inhalts der Zelle</b> Leerzeichen oder Zeilenumbruchcodes sind. <br>" +
+        //                    "Damit können unötige Zeichen abgefagen werden.";
+        //            EineSpalteWahrUmWahrzusein = true;
+        //            break;
+
+        //        //case enAction.Ist_der_Nutzer:
+        //        //    r = r + "Diese Bedingung ist <i>WAHR</i>, wenn der Benutzer zu einer Benutzergruppe gehört, die im Text definiert ist.<br>" +
+        //        //            "Hier trifft die Benutzergruppe #Administrator nicht automatisch und muss separat angegeben werden.<br>" +
+        //        //            "Einzelne Nutzer können direkt mit #USER:Max Mustermann angesprochen werden.";
+        //        //    MehrereTexteReichtEiner = true;
+        //        //    break;
+
+
+        //        //case enAction.Ist_Jünger_Als:
+        //        //    r = r + "Diese Bedingung ist <i>WAHR</i>, das Erstelldatum der Zeile jünger ist, als die im Textfeld angegebene Stunden-Zahl.";
+        //        //    break;
+
+
+        //        case enAction.Wert_Dazu:
+        //            r += "Diese Aktion fügt neue Werte hinzu, ohne die alten zu löschen. Anschließende wird sortiert und eventuell doppelt Werte entfernt.";
+        //            MehrTexteAllegeamacht = true;
+        //            MehrSpaltenAllegeamacht = true;
+        //            break;
+
+        //        case enAction.Wert_Weg:
+        //            r += "Diese Aktion entfernt die hier angegeben Werte hinzu, ohne die alten zu löschen. Anschließende wird sortiert und eventuell doppelte Werte entfernt.";
+        //            MehrTexteAllegeamacht = true;
+        //            MehrSpaltenAllegeamacht = true;
+        //            break;
+
+        //        case enAction.Wert_Setzen:
+        //            r += "Diese Aktion überschreibt den Text in der Zelle mit dem hier angegeben Text.";
+        //            MehrSpaltenAllegeamacht = true;
+        //            break;
+
+        //        //case enAction.Mache_einen_Vorschlag:
+        //        //    r = r + "Diese Aktion benötigt die vorherige Bedingung <b>erhält den Focus</b>.<br>" +
+        //        //            "Die hier angegebenen Spalten werden verglichen, ob diese bereits in einer Zeile der Datenbank vorkommen.<br>" +
+        //        //            "Falls ja, wird der Wert, der in dieser Zeile enthalten ist, in das Feld im Formular geschrieben.";
+        //        //    break;
+
+        //        case enAction.Berechne:
+        //            r = r + "Diese Aktion berechnet einen Wert. Dazu muss hier im Textfeld eine Formel eingegeben werden.<br>" +
+        //                    "Inhalte anderer Spalten der gleichen Zeile können ebenfalls angesprochen werden.<br>" +
+        //                    "Dazu wird der interne Spaltenname als Variable benutzt. <i><u>Beispiel:</u> &amp;SPALTENNAME;</i><br>" +
+        //                    "Unterstützt werden Operatoren (< > =), Funktionen (Int, IFF, Min, Max), Klammern, Addition, Subtraktion, Muliplikation und Divison.<br>" +
+        //                    "Kann die Formel nicht berechnet werden, wird die Zeile als fehlerhaft markiert.<br>" +
+        //                    "<i><u>Beispiel:</u> ( &amp;Spalte1; + 10,5 )  / ( &amp;Spalte2; - &amp;Spalte3; ) * &amp;Spalte4;</i>";
+        //            break;
+
+        //        case enAction.Berechnung_ist_True:
+        //            r = r + "Diese Bedingung berechent das Ergebnis. Wenn am Ende der Wert -1 (=True) steht, trifft die Bedingung zu.<br>" +
+        //                    "Inhalte anderer Spalten der gleichen Zeile können ebenfalls angesprochen werden.<br>" +
+        //                    "Dazu wird der interne Spaltenname als Variable benutzt. <i><u>Beispiel:</u> &amp;SPALTENNAME;</i><br>" +
+        //                    "Unterstützt werden Operatoren (< > =), Funktionen (Int, IFF, Min, Max), Klammern, Addition, Subtraktion, Muliplikation und Divison.<br>" +
+        //                    "Kann die Formel nicht berechnet werden, wird die Zeile als fehlerhaft markiert.<br>" +
+        //                    "<i><u>Beispiel:</u> ( &amp;Spalte1; + 10,5 )  / ( &amp;Spalte2; - &amp;Spalte3; ) * &amp;Spalte4;</i>";
+        //            break;
+
+        //        case enAction.Substring:
+        //            //r = r + "Diese Aktion setzt einen Text mit Inhalten aus anderen Zellen zusammen.<br>" +
+        //            //        "Dazu wird der interne Spaltenname als Variable benutzt. <i><u>Beispiel:</u> &amp;SPALTENNAME;</i><br>" +
+        //            //        "Zusätzlich können auch nur Teilbereiche benutzt werden <i><u>Beispiel:</u> &amp;SPALTENNAME(L,1);</i><br>" +
+        //            //        "Es sind die Buchstaben L für links, M für Mitte und R für rechts möglich:<br>" +
+        //            //        "&amp;SPALTENNAME(L,3) = Die ersten 3 Zeichen<br>" +
+        //            //        "&amp;SPALTENNAME(R,3) = Die letzten 5 Zeichen<br>" +
+        //            //        "&amp;SPALTENNAME(M,3,5) = Ab dem dritten Zeichen 5 Zeichen<br>" +
+        //            //        "Diese Berechnung erzeugt keine Fehler.";
+        //            r = r + "Diese Aktion setzt einen Text mit Inhalten aus anderen Zellen zusammen.<br>" +
+        //                    "Dazu wird der interne Spaltenname als Variable benutzt. <i><u>Beispiel:</u> &amp;SPALTENNAME;</i><br>" +
+        //                    "Zusätzlich können auch nur Teilbereiche benutzt werden <i><u>Beispiel:</u> &amp;SPALTENNAME(L,1);</i><br>" +
+        //                    "&amp;SPALTENNAME(L,3) = Die ersten 3 Zeichen<br>" +
+        //                    "Diese Berechnung erzeugt keine Fehler.";
+        //            break;
+
+        //        case enAction.Sperre_die_Zelle:
+        //            r += "Diese Aktion sperrt die <b>manuelle</b> Bearbeitung für dieser Zelle.";
+        //            MehrSpaltenAllegeamacht = true;
+        //            break;
+
+        //        case enAction.Skript:
+        //            r += " ";
+        //            //MehrSpaltenAllegeamacht = true;
+        //            break;
+
+        //        //case enAction.SortiereIntelligent:
+        //        //    r = r + "Diese Aktion sortiert die Einträge der gewwählten Spalten automatisch in die richtigen Spalten ein.";
+        //        //    break;
+
+
+        //        //case enAction.KopiereAndereSpalten:
+        //        //    r = r + "Diese Aktion benötigt eine Spalte vom Typ 'Relation' und eine normale Spalte. Alle mittels 'Relations' miteinander verknüpften Zeilen, erhalten den gleichen Wert der zweiten Spalte.";
+        //        //    break;
+
+
+
+
+        //        default:
+        //            Develop.DebugPrint(Action);
+
+        //            break;
+        //    }
+
+        //    if (MehrereTexteReichtEiner) {
+        //        r += "<br>Werden hier mehrere Textzeilen eingegeben, wird jede Textzeile für sich geprüft. Um <i>WAHR</i> zu sein, reicht es, wenn <b>eine</b> Textzeile zutrifft.";
+        //    }
+
+        //    if (EineSpalteWahrUmWahrzusein) {
+        //        r += "<br>Werden hier mehrere Spalten ausgewählt, reicht es wenn <b>eine</b> der Spalten <i>WAHR</i> zurückgibt, um <i>WAHR</i> zu sein.";
+        //    }
+
+        //    if (MehrTexteAllegeamacht) {
+        //        r += "<br>Werden hier mehrere Textzeilen eingegeben, wird jede Textzeile für sich abgearbeitet.";
+        //    }
+
+        //    if (MehrSpaltenAllegeamacht) {
+        //        r += "<br>Werden hier mehrere Spalten ausgewählt, werden alle abgearbeitet.";
+        //    }
+
+        //    return r;
+        //}
+
+
+        //public string ErrorReason() {
+        //    if (_Action == enAction.Sperre_die_Zelle) { return string.Empty; }
+
+        //    foreach (var t in Columns) {
+        //        if (t == null) { return " Veraltete Spalten sind angewählt"; }
+
+        //        if (IsBedingung()) {
+        //            if (!t.Format.CanBeCheckedByRules()) { return "Aus der Spalte '" + t.ReadableText() + "' kann generell nicht gelesen werden"; }
+        //        } else {
+        //            if (!t.Format.CanBeChangedByRules()) { return "Die Spalte '" + t.ReadableText() + "' kann generell nicht beschrieben werden"; }
+        //        }
+        //    }
+
+        //    if (_Action == 0) { return "Keine Aktion gewählt"; }
+
+        //    switch (NeededColumns(_Action)) {
+        //        case enNeededColumns.DoesNotMatter:
+        //            break;
+        //        case enNeededColumns.None:
+        //            if (Columns.Count > 0) { return "Es darf keine Spalte angewählt werden"; }
+        //            break;
+        //        case enNeededColumns.MoreThanOne:
+        //            if (Columns.Count < 2) { return "Es müssen mindestens zwei Spalten angewählt werden"; }
+        //            break;
+        //        case enNeededColumns.OneOrMore:
+        //            if (Columns.Count == 0) { return "Es muss mindestens eine Spalte angewählt werden"; }
+        //            break;
+        //        case enNeededColumns.OnlyOne:
+        //            if (Columns.Count != 1) { return "Es muss genau eine Spalte angewählt werden"; }
+        //            break;
+        //        case enNeededColumns.TwoColumns:
+        //            if (Columns.Count != 2) { return "Es müssen genau zwei Spalten angewählt werden"; }
+        //            break;
+        //        default:
+        //            Develop.DebugPrint(NeededColumns(_Action));
+        //            break;
+        //    }
+
+
+        //    switch (NeededText(_Action)) {
+        //        case enNeededText.DoesNotMatter:
+        //            break;
+        //        case enNeededText.None:
+        //            if (!string.IsNullOrEmpty(_Text)) { return "Es darf kein Text eingegeben werden"; }
+        //            break;
+
+        //        case enNeededText.MaxOneLine:
+        //            if (_Text.Contains("\r")) { return "Der Text darf maximal eine Zeile haben"; }
+        //            break;
+
+        //        case enNeededText.OneOrMore:
+        //            if (string.IsNullOrEmpty(_Text)) { return "Es muss ein Text eingegeben werden"; }
+        //            break;
+
+        //        case enNeededText.Rechenformel1:
+        //            if (string.IsNullOrEmpty(_Text)) { return "Es muss eine Rechenformel im Textfeld eingegeben werden"; }
+        //            break;
+
+
+        //        case enNeededText.Rechenformel2:
+        //            if (string.IsNullOrEmpty(_Text)) { return "Es muss ein Text-Baukasten im Textfeld eingegeben werden"; }
+        //            break;
+
+        //        case enNeededText.OneIntegerValue:
+        //            if (string.IsNullOrEmpty(_Text)) { return "Es muss eine Zahl eingegeben werden"; }
+        //            if (!_Text.IsFormat(enDataFormat.Ganzzahl)) { return "Es muss eine Zahl eingegeben werden"; }
+        //            break;
+
+        //        default: {
+        //                Develop.DebugPrint(NeededText(_Action));
+        //                break;
+        //            }
+        //    }
+
+
+        //    return string.Empty;
+        //}
 
 
         public string ReadableText() {
@@ -1167,8 +1200,8 @@ namespace BlueDatabase {
             var ColsOder = "";
             var ColsUnd = "";
 
-            var dd = ErrorReason();
-            if (!string.IsNullOrEmpty(dd)) { return "Aktion fehlerhaft: " + dd; }
+            //var dd = ErrorReason();
+            //if (!string.IsNullOrEmpty(dd)) { return "Aktion fehlerhaft: " + dd; }
 
 
             for (var z = 0; z < Columns.Count; z++) {
@@ -1623,8 +1656,8 @@ namespace BlueDatabase {
 
 
 
-        public bool IsOk() {
-            return string.IsNullOrEmpty(ErrorReason());
-        }
+        //public bool IsOk() {
+        //    return string.IsNullOrEmpty(ErrorReason());
+        //}
     }
 }

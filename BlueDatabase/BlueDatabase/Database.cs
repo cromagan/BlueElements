@@ -42,7 +42,7 @@ namespace BlueDatabase {
     public sealed class Database : BlueBasics.MultiUserFile.clsMultiUserFile {
         #region  Shareds 
 
-        public static readonly string DatabaseVersion = "3.40";
+        public static readonly string DatabaseVersion = "3.50";
 
 
 
@@ -188,12 +188,13 @@ namespace BlueDatabase {
         private enJoinTyp _JoinTyp;
         private enVerwaisteDaten _VerwaisteDaten;
         private string _ImportScript;
+        private string _RulesScript;
         private enAnsicht _Ansicht;
         private double _GlobalScale;
         private string _FilterImagePfad;
         private string _ZeilenQuickInfo;
 
-        public readonly ListExt<RuleItem> Rules = new ListExt<RuleItem>();
+
         public readonly ListExt<ColumnViewCollection> ColumnArrangements = new ListExt<ColumnViewCollection>();
         public readonly ListExt<ColumnViewCollection> Views = new ListExt<ColumnViewCollection>();
         public readonly ListExt<string> Tags = new ListExt<string>();
@@ -271,7 +272,6 @@ namespace BlueDatabase {
             Layouts.ItemSeted += Layouts_ItemSeted;
 
             Views.Changed += Views_ListOrItemChanged;
-            Rules.Changed += Rules_ListOrItemChanged;
             PermissionGroups_NewRow.Changed += PermissionGroups_NewRow_ListOrItemChanged;
             Tags.Changed += DatabaseTags_ListOrItemChanged;
             Bins.Changed += Bins_ListOrItemChanged;
@@ -318,7 +318,6 @@ namespace BlueDatabase {
             Layouts.Clear();
             Views.Clear();
 
-            Rules.Clear();
 
             PermissionGroups_NewRow.Clear();
             Tags.Clear();
@@ -344,6 +343,7 @@ namespace BlueDatabase {
             _VerwaisteDaten = enVerwaisteDaten.Ignorieren;
             LoadedVersion = DatabaseVersion;
             _ImportScript = string.Empty;
+            _RulesScript = string.Empty;
 
             _GlobalScale = 1f;
             _Ansicht = enAnsicht.Unverändert;
@@ -520,6 +520,16 @@ namespace BlueDatabase {
             set {
                 if (_ImportScript == value) { return; }
                 AddPending(enDatabaseDataType.ImportScript, -1, -1, _ImportScript, value, true);
+            }
+        }
+
+        public string RulesScript {
+            get {
+                return _RulesScript;
+            }
+            set {
+                if (_RulesScript == value) { return; }
+                AddPending(enDatabaseDataType.RulesScript, -1, -1, _RulesScript, value, true);
             }
         }
 
@@ -723,23 +733,23 @@ namespace BlueDatabase {
             AddPending(enDatabaseDataType.AutoExport, -1, Export.ToString(true), false);
         }
 
-        private void Rules_ListOrItemChanged(object sender, System.EventArgs e) {
+        //private void Rules_ListOrItemChanged(object sender, System.EventArgs e) {
 
-            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+        //    if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
 
-            if (sender == Rules) {
-                AddPending(enDatabaseDataType.Rules, -1, Rules.ToString(true), false);
-                return;
-            }
+        //    if (sender == Rules) {
+        //        AddPending(enDatabaseDataType.Rules, -1, Rules.ToString(true), false);
+        //        return;
+        //    }
 
-            if (sender is RuleItem RL) {
-                if (!Rules.Contains(RL)) { return; }
-                AddPending(enDatabaseDataType.Rules, -1, Rules.ToString(true), false);
-            }
-            else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Typ ist kein RuleItem");
-            }
-        }
+        //    if (sender is RuleItem RL) {
+        //        if (!Rules.Contains(RL)) { return; }
+        //        AddPending(enDatabaseDataType.Rules, -1, Rules.ToString(true), false);
+        //    }
+        //    else {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Typ ist kein RuleItem");
+        //    }
+        //}
 
         private void Views_ListOrItemChanged(object sender, System.EventArgs e) {
             if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
@@ -1086,12 +1096,13 @@ namespace BlueDatabase {
                     }
                     break;
 
-                case enDatabaseDataType.Rules:
-                    Rules.Clear();
+                case enDatabaseDataType.Rules_ALT:
+                    var Rules = new List<RuleItem_Old>();
                     var RU = content.SplitByCR();
                     for (var z = 0; z <= RU.GetUpperBound(0); z++) {
-                        Rules.Add(new RuleItem(this, RU[z]));
+                        Rules.Add(new RuleItem_Old(this, RU[z]));
                     }
+                    _RulesScript = GenerateScriptFromRules(Rules);
                     break;
 
                 case enDatabaseDataType.ColumnArrangement:
@@ -1142,6 +1153,10 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.ImportScript:
                     _ImportScript = content;
+                    break;
+
+                case enDatabaseDataType.RulesScript:
+                    _RulesScript = content;
                     break;
 
                 case enDatabaseDataType.FileEncryptionKey:
@@ -1207,6 +1222,23 @@ namespace BlueDatabase {
             return "";
         }
 
+        private string GenerateScriptFromRules(List<RuleItem_Old> rules) {
+            if (rules is null || rules.Count ==0) { return string.Empty; }
+
+
+            var txt = "// Automatische Umwandlung des Alten Regel-Systems\r\n// in die neue Skript-Sprache.\r\n";
+            txt += "// - Zur Bearbeitung wird NOTEPAD++ empfohlen.\r\n";
+            txt += "// - Zur Verschönerung der Optik wird https://codebeautify.org/javaviewer empfohlen.\r\n\r\n\r\n";
+
+            foreach ( var thisRegel in rules) {
+                txt = txt + thisRegel.ToScript();
+            }
+
+
+            return txt;
+
+
+        }
 
         public void LoadPicsIntoImageChache() {
             foreach (var bmp in Bins) {
@@ -1250,15 +1282,17 @@ namespace BlueDatabase {
 
             if (ImportScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Import-Skript<br>"; }
 
+            if (RulesScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Regeln-Skript<br>"; }
+
             if (ZeilenQuickInfo.ToUpper().Contains(column.Name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
 
             if (Tags.JoinWithCr().ToUpper().Contains(column.Name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
 
-            var rul = false;
-            foreach (var ThisRule in Rules) {
-                if (ThisRule.Contains(column)) { rul = true; }
-            }
-            if (rul) { t += " - Regeln<br>"; }
+            //var rul = false;
+            //foreach (var ThisRule in Rules) {
+            //    if (ThisRule.Contains(column)) { rul = true; }
+            //}
+            //if (rul) { t += " - Regeln<br>"; }
 
             var l = column.Contents(null);
             if (l.Count > 0) {
@@ -1304,11 +1338,6 @@ namespace BlueDatabase {
             // Nicht nötig, da die Spalten als Verweiß gespeichert sind
 
 
-            // Rules -----------------------------------------
-            // Wichtig, dass Rechenformeln richtiggestellt werden
-            foreach (var ThisRule in Rules) {
-                ThisRule?.RenameColumn(oldName, newName);
-            }
 
             // ImportScript -----------------------------------------
             var x = ImportScript.FromNonCritical().SplitByCRToList();
@@ -1847,6 +1876,7 @@ namespace BlueDatabase {
                 SaveToByteList(l, enDatabaseDataType.Ansicht, ((int)_Ansicht).ToString());
                 SaveToByteList(l, enDatabaseDataType.ReloadDelaySecond, _ReloadDelaySecond.ToString());
                 SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
+                SaveToByteList(l, enDatabaseDataType.RulesScript, _RulesScript);
 
                 SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
 
@@ -1868,7 +1898,7 @@ namespace BlueDatabase {
                 }
 
 
-                SaveToByteList(l, enDatabaseDataType.Rules, Rules.ToString(true));
+                //SaveToByteList(l, enDatabaseDataType.Rules_ALT, Rules.ToString(true));
 
 
 
@@ -2362,16 +2392,16 @@ namespace BlueDatabase {
             //}
         }
 
-        public bool AllRulesOK() {
-            return AllRulesOK(Rules);
-        }
+        //public bool AllRulesOK() {
+        //    return AllRulesOK(Rules);
+        //}
 
-        public static bool AllRulesOK(ListExt<RuleItem> RulesToCheck) {
-            foreach (var thisRule in RulesToCheck) {
-                if (thisRule != null && !thisRule.IsOk()) { return false; }
-            }
-            return true;
-        }
+        //public static bool AllRulesOK(ListExt<RuleItem> RulesToCheck) {
+        //    foreach (var thisRule in RulesToCheck) {
+        //        if (thisRule != null && !thisRule.IsOk()) { return false; }
+        //    }
+        //    return true;
+        //}
 
         protected override void PrepeareDataForCheckingBeforeLoad() {
             // Letztes WorkItem speichern, als Kontrolle

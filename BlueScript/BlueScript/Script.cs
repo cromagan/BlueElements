@@ -28,7 +28,12 @@ using System.Reflection;
 namespace BlueScript {
     public class Script {
 
-
+        /*
+        IsNullOrEmpty(Var);
+        Contains(List, Value);
+        SetError(Text, Spalte1, Spalte2, ...);
+         * 
+         */
         public string Error { get; private set; }
 
         string _ScriptText = string.Empty;

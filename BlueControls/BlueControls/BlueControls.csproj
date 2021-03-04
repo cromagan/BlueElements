@@ -298,18 +298,6 @@
     <Compile Include="Classes Editor\FilterItem_Editor.Designer.cs">
       <DependentUpon>FilterItem_Editor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes Editor\RuleActionItem_Editor.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes Editor\RuleActionItem_Editor.Designer.cs">
-      <DependentUpon>RuleActionItem_Editor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Classes Editor\RuleItem_Editor.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes Editor\RuleItem_Editor.Designer.cs">
-      <DependentUpon>RuleItem_Editor.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms-Common\FileDialogs.cs" />
     <Compile Include="Enums\enBlueTableAppearance.cs" />
     <Compile Include="Enums\enButtonStyle.cs" />
@@ -591,14 +579,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Classes Editor\FilterItem_Editor.resx">
       <DependentUpon>FilterItem_Editor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Classes Editor\RuleActionItem_Editor.resx">
-      <DependentUpon>RuleActionItem_Editor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Classes Editor\RuleItem_Editor.resx">
-      <DependentUpon>RuleItem_Editor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\EasyPicMulti.resx">
