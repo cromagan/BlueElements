@@ -41,28 +41,41 @@ namespace BlueScript {
 
         //public abstract bool ReturnsVoid { get; }
 
-        public abstract string ID { get; }
+        //public abstract string ID { get; }
         public abstract List<string> Comand { get; }
         public abstract string StartSequence { get; }
         public abstract string EndSequence { get; }
-        public abstract List<string> AllowedInIDs { get; }
+        //public abstract List<string> AllowedInIDs { get; }
         public abstract bool GetCodeBlockAfter { get; }
+        public abstract string Returns { get; }
 
-        internal abstract strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen, Method parent);
+        internal abstract strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen);
 
 
-        public strCanDoFeedback CanDo(string scriptText, int pos, Method parent) {
+        public strCanDoFeedback CanDo(string scriptText, int pos, string expectedvariablefeedback) {
+
+
+            if (string.IsNullOrEmpty(expectedvariablefeedback) != string.IsNullOrEmpty(Returns)) {
+                return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
+            }
+
+            if (expectedvariablefeedback != "var" && Returns !="var" && expectedvariablefeedback != Returns) {
+                return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
+            }
+
 
             var maxl = scriptText.Length;
 
-            if (parent != null) {
-                var al = AllowedInIDs;
-                if (al != null && !al.Contains(parent.ID)) {
-                    return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
-                }
-            }
+            //if (parent != null) {
+            //    var al = AllowedInIDs;
+            //    if (al != null && !al.Contains(parent.ID)) {
+            //        return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
+            //    }
+            //}
 
             foreach (var thiscomand in Comand) {
+
+
                 var comandtext = thiscomand + StartSequence;
                 var l = comandtext.Length;
 
@@ -75,11 +88,30 @@ namespace BlueScript {
                         if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                             return new strCanDoFeedback(f.ContinuePosition, "Fehler bei " + Comand + ": " + f.ErrorMessage, true);
                         }
-                        return new strCanDoFeedback(f.ContinuePosition, comandtext, f.AttributeText, string.Empty);
+
+                        var cont = f.ContinuePosition;
+                        var codebltxt = string.Empty;
+
+                        if (GetCodeBlockAfter) {
+                            if (f.ContinuePosition >= maxl ||  scriptText.Substring(f.ContinuePosition,1) !="{") {
+                                return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + Comand, true);
+                            }
+
+                            var (posek, witch) = Script.NextText(scriptText, f.ContinuePosition, new List<string>() { "}" }, false, false, false);
+                            if (posek < f.ContinuePosition) {
+                                return new strCanDoFeedback(f.ContinuePosition, "Kein Codeblock Ende bei " + Comand, true);
+                            }
+
+                            codebltxt = scriptText.Substring(f.ContinuePosition + 1, posek - f.ContinuePosition - 1);
+                            if (string.IsNullOrEmpty(codebltxt)) {
+                                return new strCanDoFeedback(f.ContinuePosition, "Leerer Codeblock bei " + Comand, true);
+                            }
+                            cont = posek + 1;
+                        }
+
+                        return new strCanDoFeedback(cont, comandtext, f.AttributeText, codebltxt);
                     }
                 }
-
-
             }
 
             return new strCanDoFeedback(pos, "Kann nicht geparst werden", false);
@@ -228,12 +260,11 @@ namespace BlueScript {
         //    return txtBTW;
         //}
 
-        public strGetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, List<Variable> variablen, Method parent) {
+        public strGetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, List<Variable> variablen) {
             var c = new List<string>();
             foreach (var thisc in comands) {
 
-                if (thisc.AllowedInIDs == null || thisc.AllowedInIDs.Contains(parent.ID)) {
-
+                if (!string.IsNullOrEmpty(thisc.Returns)) {
                     foreach (var thiscs in thisc.Comand) {
                         c.Add(thiscs + thisc.StartSequence);
                     }
@@ -249,7 +280,7 @@ namespace BlueScript {
 
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
-                var f = Script.ComandOnPosition(txt, pos, variablen, parent);
+                var f = Script.ComandOnPosition(txt, pos, variablen, "var");
 
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                     return new strGetEndFeedback(f.ErrorMessage);
@@ -353,14 +384,14 @@ namespace BlueScript {
         }
 
 
-        public List<string> SplitAttribute(string attributtext, List<Variable> variablen, Method parent) {
+        public List<string> SplitAttribute(string attributtext, List<Variable> variablen) {
 
             var t = ReplaceVariable(attributtext, variablen);
             if (!string.IsNullOrEmpty(t.ErrorMessage)) {
                 return null; // new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
             }
 
-            var t2 = ReplaceComands(t.AttributeText, Script.Comands, variablen, parent);
+            var t2 = ReplaceComands(t.AttributeText, Script.Comands, variablen);
 
             if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
                 return null; // new  strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);

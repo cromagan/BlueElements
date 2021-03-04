@@ -71,7 +71,7 @@ namespace BlueScript {
 
 
 
-        private string ReduceText(string txt) {
+        private static string ReduceText(string txt) {
 
 
             var s = new System.Text.StringBuilder();
@@ -120,48 +120,50 @@ namespace BlueScript {
         }
 
 
-        public bool Parse() {
-
+        public static string Parse(string scriptText, List<Variable> variablen) {
             var pos = 0;
 
-            Error = string.Empty;
-            var tmptxt = ReduceText(_ScriptText);
+
+            var tmptxt = ReduceText(scriptText);
 
 
             do {
-                if (pos >= tmptxt.Length) { return true; }
+                if (pos >= tmptxt.Length) { return string.Empty; }
 
 
-                var f = ComandOnPosition(tmptxt, pos, Variablen, null);
+                var f = ComandOnPosition(tmptxt, pos, variablen, string.Empty);
 
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                    Error = f.ErrorMessage;
-                    return false;
+                    return f.ErrorMessage;
                 }
                 pos = f.Position;
 
 
             } while (true);
+        }
 
+        public bool Parse() {
+            Error = Parse(_ScriptText, Variablen);
+            return !string.IsNullOrEmpty(Error);
         }
 
 
-        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, List<Variable> Variablen, Method parent) {
+        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, List<Variable> Variablen, string expectedvariablefeedback) {
             foreach (var thisC in Comands) {
 
                 //if (!mustHaveFeedback || !thisC.ReturnsVoid) {
 
-                var f = thisC.CanDo(txt, pos, parent);
+                var f = thisC.CanDo(txt, pos, expectedvariablefeedback);
 
                 if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
 
                 if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                    var fn = thisC.DoIt(f, Variablen, null);
+                    var fn = thisC.DoIt(f, Variablen);
                     return new strDoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
                 }
                 //}
             }
-            return new strDoItWithEndedPosFeedback("Kann nicht geparsed werden.");
+            return new strDoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos));
         }
 
 

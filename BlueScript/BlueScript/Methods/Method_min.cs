@@ -31,21 +31,20 @@ namespace BlueScript {
     class Method_min : Method {
 
         public Method_min(Script parent) : base(parent) { }
-        public override string ID { get => "min"; }
         public override List<string> Comand { get => new List<string>() { "min" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
-        public override List<string> AllowedInIDs { get => new List<string>() { "var_caluclate", "max" }; }
         public override bool GetCodeBlockAfter { get => false; }
+        public override string Returns { get => "numeral"; }
 
 
-        internal override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen, Method parent) {
+        internal override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            var bs = SplitAttribute(infos.AttributText, variablen, this);
+            var bs = SplitAttribute(infos.AttributText, variablen);
 
-            if (bs == null || bs.Count < 2) { return new strDoItFeedback("Attributfehler"); }
+            if (bs == null || bs.Count < 2) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
 
             var val = double.MinValue;
 

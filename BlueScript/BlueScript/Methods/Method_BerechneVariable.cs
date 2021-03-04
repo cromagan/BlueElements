@@ -35,19 +35,20 @@ namespace BlueScript {
 
 
         //public Method_var(Script parent, string toParse) : base(parent, toParse) { }
-        public override string ID { get => "var_caluclate"; }
+        //public override string ID { get => "var_caluclate"; }
 
         public override List<string> Comand { get => Parent.Variablen.AllNames(); }
         public override string StartSequence { get => "="; }
         public override string EndSequence { get => ";"; }
-        public override List<string> AllowedInIDs { get => null; }
+        //public override List<string> AllowedInIDs { get => null; }
         public override bool GetCodeBlockAfter { get => false; }
-        //public override bool ReturnsVoid { get => true; }
+        public override string Returns { get => string.Empty; }
 
 
 
 
-        internal override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen, Method parent) {
+
+        internal override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
 
             var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.Char_az + "_" + Constants.Char_Numerals);
             var variable = variablen.Get(variableName);
@@ -56,9 +57,9 @@ namespace BlueScript {
             }
 
             //var nt = infos.AttributText.Trim("=");
-            var bs = SplitAttribute(infos.AttributText, variablen, this);
+            var bs = SplitAttribute(infos.AttributText, variablen);
 
-            if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler"); }
+            if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
 
 
             if (bs[0].StartsWith("\"")) {
@@ -75,7 +76,7 @@ namespace BlueScript {
 
 
             var erg = modErgebnis.Ergebnis(bs[0]);
-            if (erg == null) { return new strDoItFeedback("Berechnungsfehler der Formel"); }
+            if (erg == null) { return new strDoItFeedback("Berechnungsfehler der Formel: " + infos.AttributText + " => " + bs[0]); }
 
             if (variable.Type != enVariableDataType.NotDefinedYet && variable.Type != enVariableDataType.Number) {
                 return new strDoItFeedback("Variable ist keine Zahl");

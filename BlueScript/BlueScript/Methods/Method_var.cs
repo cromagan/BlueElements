@@ -32,20 +32,17 @@ namespace BlueScript {
         public Method_var(Script parent) : base(parent) { }
 
 
-        //public Method_var(Script parent, string toParse) : base(parent, toParse) { }
 
-        public override string ID { get => "var"; }
         public override List<string> Comand { get => new List<string>() { "var" }; }
         public override string StartSequence { get => ""; }
         public override string EndSequence { get => ";"; }
-        public override List<string> AllowedInIDs { get => null; }
         public override bool GetCodeBlockAfter { get => false; }
-        //public override bool ReturnsVoid { get => true; }
+        public override string Returns { get => string.Empty; }
 
 
 
 
-        internal override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen, Method parent) {
+        internal override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
@@ -66,12 +63,12 @@ namespace BlueScript {
 
             var r = new Method_BerechneVariable(Parent);
 
-            var f = r.CanDo(infos.AttributText + ";", 0, this);
+            var f = r.CanDo(infos.AttributText + ";", 0, string.Empty);
 
 
             if (!string.IsNullOrEmpty(f.ErrorMessage)) {
 
-                return new strDoItFeedback("Befehl nicht erkannt");
+                return new strDoItFeedback("Befehl nicht erkannt, " + f.ErrorMessage + ": " + infos.AttributText);
             }
 
             if (infos.AttributText.Length != f.ContinueOrErrorPosition - 1) {
@@ -79,7 +76,7 @@ namespace BlueScript {
             }
 
 
-            var f2 = r.DoIt(f, variablen, this);
+            var f2 = r.DoIt(f, variablen);
 
             if (!string.IsNullOrEmpty(f2.ErrorMessage)) {
                 return new strDoItFeedback("Berechung fehlerhaft: " + f2.ErrorMessage);

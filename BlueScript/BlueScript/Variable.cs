@@ -31,6 +31,33 @@ namespace BlueScript {
     public class Variable {
 
 
+        public override string ToString() {
+
+
+            switch (Type) {
+
+                case enVariableDataType.String:
+                    return Name + ": {string} " + ValueString;
+
+                case enVariableDataType.Number:
+                    return Name + ": {numeral} " + ValueString;
+
+                case enVariableDataType.Date:
+                    return Name + ": {date} " + ValueString;
+
+                case enVariableDataType.Bool:
+                    return Name + ": {bool} " + ValueString;
+
+                case enVariableDataType.List:
+                    return Name + ": {list} " + ValueString;
+
+                default:
+                    return Name + ": {unknown} " + ValueString;
+
+            }
+
+        }
+
         public Variable(string name) {
 
             if (!IsValidName(name)) {
