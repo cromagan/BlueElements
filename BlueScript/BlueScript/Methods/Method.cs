@@ -59,7 +59,7 @@ namespace BlueScript {
                 return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
 
-            if (expectedvariablefeedback != "var" && Returns !="var" && expectedvariablefeedback != Returns) {
+            if (expectedvariablefeedback != "var" && Returns != "var" && expectedvariablefeedback != Returns) {
                 return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
 
@@ -86,25 +86,25 @@ namespace BlueScript {
 
                         var f = GetEnd(scriptText, pos + thiscomand.Length, StartSequence.Length);
                         if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                            return new strCanDoFeedback(f.ContinuePosition, "Fehler bei " + Comand + ": " + f.ErrorMessage, true);
+                            return new strCanDoFeedback(f.ContinuePosition, "Fehler bei " + comandtext + ": " + f.ErrorMessage, true);
                         }
 
                         var cont = f.ContinuePosition;
                         var codebltxt = string.Empty;
 
                         if (GetCodeBlockAfter) {
-                            if (f.ContinuePosition >= maxl ||  scriptText.Substring(f.ContinuePosition,1) !="{") {
-                                return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + Comand, true);
+                            if (f.ContinuePosition >= maxl || scriptText.Substring(f.ContinuePosition, 1) != "{") {
+                                return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true);
                             }
 
                             var (posek, witch) = Script.NextText(scriptText, f.ContinuePosition, new List<string>() { "}" }, false, false, false);
                             if (posek < f.ContinuePosition) {
-                                return new strCanDoFeedback(f.ContinuePosition, "Kein Codeblock Ende bei " + Comand, true);
+                                return new strCanDoFeedback(f.ContinuePosition, "Kein Codeblock Ende bei " + comandtext, true);
                             }
 
                             codebltxt = scriptText.Substring(f.ContinuePosition + 1, posek - f.ContinuePosition - 1);
                             if (string.IsNullOrEmpty(codebltxt)) {
-                                return new strCanDoFeedback(f.ContinuePosition, "Leerer Codeblock bei " + Comand, true);
+                                return new strCanDoFeedback(f.ContinuePosition, "Leerer Codeblock bei " + comandtext, true);
                             }
                             cont = posek + 1;
                         }
@@ -276,7 +276,7 @@ namespace BlueScript {
 
             do {
 
-                var (pos, witch) = Script.NextText(txt, posc, c, true, false, true);
+                var (pos, witch) = Script.NextText(txt, posc, c, true, false, false);
 
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
@@ -312,14 +312,11 @@ namespace BlueScript {
 
             var posc = 0;
 
-
             var v = vars.AllNames();
-
-
 
             do {
 
-                var (pos, witch) = Script.NextText(txt, posc, v, true, true, true);
+                var (pos, witch) = Script.NextText(txt, posc, v, true, true, false);
 
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
@@ -384,48 +381,78 @@ namespace BlueScript {
         }
 
 
-        public List<string> SplitAttribute(string attributtext, List<Variable> variablen) {
+        public List<string> SplitAttribute(string attributtext, List<Variable> variablen, bool let0asitis) {
 
-            var t = ReplaceVariable(attributtext, variablen);
-            if (!string.IsNullOrEmpty(t.ErrorMessage)) {
-                return null; // new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
-            }
+            var attributes = new List<string>();
 
-            var t2 = ReplaceComands(t.AttributeText, Script.Comands, variablen);
-
-            if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
-                return null; // new  strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
-            }
-
-            var x = new List<string>();
-            var pos = -1;
-            var start = 0;
-            var gänsef = false;
-            var nt = t2.AttributeText;
+            #region Liste der Attribute splitten
+            var posc = 0;
+            var v = new List<string>() { "," };
             do {
-                pos++;
-
-                if (pos >= nt.Length) {
-                    if (gänsef) { return null; }
-                    x.Add(nt.Substring(start, pos - start));
-                    return x;
+                var (pos, witch) = Script.NextText(attributtext, posc, v, false, false, false);
+                if (pos < 0) {
+                    attributes.Add(attributtext.Substring(posc));
+                    break;
                 }
 
-                var c = nt.Substring(pos, 1);
 
-                if (c == "\"") { gänsef = !gänsef; }
-
-                if (!gänsef && c == ",") {
-                    x.Add(nt.Substring(start, pos - start));
-                    start = pos + 1;
-                }
-
+                attributes.Add(attributtext.Substring(posc, pos - posc));
+                posc = pos+1;
 
 
             } while (true);
+            //var pos = -1;
+            //var start = 0;
+            //var gänsef = false;
+            //var kl = 0;
+            //do {
+            //    pos++;
 
+            //    if (pos >= attributtext.Length) {
+            //        if (gänsef) { return null; }
+            //        if (kl > 0) { return null; }
+            //        attributes.Add(attributtext.Substring(start, pos - start));
+            //        break;
+            //    }
 
+            //    switch (attributtext.Substring(pos, 1)) {
+            //        case "\"": gänsef = !gänsef; break;
+            //        case "(": kl++; break;
+            //        case ")":
+            //            if (kl < 0) { return null; }
+            //            kl--;
+            //            break;
+            //        case ",":
+            //            if (!gänsef && kl == 0) {
+            //                attributes.Add(attributtext.Substring(start, pos - start));
+            //                start = pos + 1;
+            //            }
+            //            break;
+            //    }
+            //} while (true);
 
+            #endregion
+
+            for (var n = 0; n < attributes.Count; n++) {
+
+                if (!let0asitis || n > 0) {
+
+                    var t = ReplaceVariable(attributes[n], variablen);
+                    if (!string.IsNullOrEmpty(t.ErrorMessage)) {
+                        return null; // new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
+                    }
+
+                    var t2 = ReplaceComands(t.AttributeText, Script.Comands, variablen);
+                    if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
+                        return null; // new  strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
+                    }
+
+                    attributes[n] = t2.AttributeText;
+                }
+
+            }
+
+            return attributes;
 
         }
 

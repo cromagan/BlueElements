@@ -28,33 +28,43 @@ using BlueBasics;
 using static BlueBasics.modConverter;
 
 namespace BlueScript {
-    class Method_min : Method {
+    class Method_IsNullOrEmpty : Method {
 
-        public Method_min(Script parent) : base(parent) { }
-        public override List<string> Comand { get => new List<string>() { "min" }; }
+
+        public Method_IsNullOrEmpty(Script parent) : base(parent) { }
+
+
+        //public Method_var(Script parent, string toParse) : base(parent, toParse) { }
+
+        public override List<string> Comand { get => new List<string>() { "isnullorempty" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => "numeral"; }
+        public override string Returns { get => "bool"; }
+
+
 
 
         internal override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            var bs = SplitAttribute(infos.AttributText, variablen, false);
+            var bs = SplitAttribute(infos.AttributText, variablen, true);
 
-            if (bs == null || bs.Count < 2) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
 
-            var val = double.MaxValue;
 
-            foreach (var thisval in bs) {
-                if (!thisval.IsNumeral()) { return new strDoItFeedback(thisval + " ist keine Zahl."); }
-                val = Math.Min(DoubleParse(thisval), val);
-
+            var variable = variablen.Get(bs[0]);
+            if (variable == null) {
+                return new strDoItFeedback("Variable " + bs[0] + " nicht gefunden");
             }
 
-            return new strDoItFeedback(val.ToString(), string.Empty);
+            if (string.IsNullOrEmpty(variable.ValueString)) {
+                return new strDoItFeedback("true", string.Empty);
+            }
+
+            return new strDoItFeedback("false", string.Empty);
+
         }
     }
 }

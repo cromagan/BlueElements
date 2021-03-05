@@ -30,11 +30,18 @@ namespace BlueScript {
 
         /*
         IsNullOrEmpty(Var);
-        Contains(List, Value);
         SetError(Text, Spalte1, Spalte2, ...);
+        var list = {"1","2",...}
+        Contains(Var, value1, value2, value3); -- Für Listen und Strings
+        Exception(message);
+        Add(List, value1, value2, value3);
+        Remove(List, value1, value2, value3);
+        Exception(message);
+        EndsWith(var, value1, value2, value3);
          * 
          */
         public string Error { get; private set; }
+        public string ErrorCode { get; private set; }
 
         string _ScriptText = string.Empty;
 
@@ -125,21 +132,29 @@ namespace BlueScript {
         }
 
 
-        public static string Parse(string scriptText, List<Variable> variablen) {
+        public static (string, string) Parse(string scriptText, List<Variable> variablen, bool reduce) {
             var pos = 0;
 
 
-            var tmptxt = ReduceText(scriptText);
+            string tmptxt;
+
+            if (reduce) {
+                tmptxt = ReduceText(scriptText);
+            }
+            else {
+                tmptxt = scriptText;
+
+            }
 
 
             do {
-                if (pos >= tmptxt.Length) { return string.Empty; }
+                if (pos >= tmptxt.Length) { return (string.Empty, string.Empty); }
 
 
                 var f = ComandOnPosition(tmptxt, pos, variablen, string.Empty);
 
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                    return f.ErrorMessage;
+                    return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(15, tmptxt.Length - pos)));
                 }
                 pos = f.Position;
 
@@ -148,7 +163,7 @@ namespace BlueScript {
         }
 
         public bool Parse() {
-            Error = Parse(_ScriptText, Variablen);
+            (Error, ErrorCode) = Parse(_ScriptText, Variablen, true);
             return !string.IsNullOrEmpty(Error);
         }
 
@@ -176,7 +191,7 @@ namespace BlueScript {
 
             var klammern = 0;
             var Gans = false;
-            var GeschwKlammern = false;
+            var GeschwKlammern = 0;
             var EckigeKlammern = 0;
 
             var pos = startpos;
@@ -208,7 +223,7 @@ namespace BlueScript {
 
                     case "]":
                         if (!Gans) {
-                            if (EckigeKlammern <= 0) { return (-1, string.Empty); }
+                            if (EckigeKlammern <1) { return (-1, string.Empty); }
                             EckigeKlammern--;
                         }
                         break;
@@ -226,7 +241,7 @@ namespace BlueScript {
                     case ")":
                         if (!Gans && !ignoreKlammern) {
                             if (EckigeKlammern > 0) { return (-1, string.Empty); }
-                            if (klammern <= 0) { return (-1, string.Empty); }
+                            if (klammern <1) { return (-1, string.Empty); }
                             klammern--;
                         }
                         break;
@@ -237,8 +252,8 @@ namespace BlueScript {
                         if (!Gans) {
                             if (klammern > 0) { return (-1, string.Empty); }
                             if (EckigeKlammern > 0) { return (-1, string.Empty); }
-                            if (GeschwKlammern) { return (-1, string.Empty); }
-                            GeschwKlammern = true;
+                            //if (GeschwKlammern) { return (-1, string.Empty); }
+                            GeschwKlammern++;
                         }
                         break;
 
@@ -246,8 +261,8 @@ namespace BlueScript {
                         if (!Gans) {
                             if (klammern > 0) { return (-1, string.Empty); }
                             if (EckigeKlammern > 0) { return (-1, string.Empty); }
-                            if (!GeschwKlammern) { return (-1, string.Empty); }
-                            GeschwKlammern = false;
+                            if (GeschwKlammern<1) { return (-1, string.Empty); }
+                            GeschwKlammern--;
                         }
                         break;
                 }
@@ -255,7 +270,7 @@ namespace BlueScript {
 
 
 
-                if (klammern == 0 && !Gans && !GeschwKlammern && EckigeKlammern == 0) {
+                if (klammern == 0 && !Gans && GeschwKlammern==0 && EckigeKlammern == 0) {
 
 
                     if (!checkforSeparatorbefore || pos == 0 || TR.Contains(txt.Substring(pos - 1, 1))) {

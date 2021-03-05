@@ -22,6 +22,8 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using BlueScript;
+using Skript.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -324,7 +326,7 @@ namespace BlueDatabase {
         /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
         /// </summary>
         /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
-        private List<string> DoRules() {
+        private BlueScript.Script DoRules(bool onlyTest) {
 
             var DoUnfreeze = true;
 
@@ -335,75 +337,135 @@ namespace BlueDatabase {
                 Database.Cell.Freeze();
             }
 
-            // Dann die Aktionen ausführen und fall es einen Fehler gibt, die Spalten ermitteln
-            var ColumnAndErrors = new List<string>();
+            //// Dann die Aktionen ausführen und fall es einen Fehler gibt, die Spalten ermitteln
+            //var ColumnAndErrors = new List<string>();
 
-            Develop.DebugPrint_NichtImplementiert();
+            #region Variablen für Skript erstellen
+            var vars = new List<Variable>();
 
-            //foreach (var ThisRule in Database.Rules) {
-            //    if (ThisRule != null) {
-            //        if (ThisRule.TrifftZu(this)) {
-            //            var tmpMessage = ThisRule.Execute(this, true);
+            foreach(var thisCol in Database.Column) {
 
-            //            if (!string.IsNullOrEmpty(tmpMessage)) {
-            //                var tmpColumNames = tmpMessage.ReduceToMulti("'#Spalte:*'");
-            //                if (tmpMessage.Contains("<DELETE>")) { tmpMessage = tmpMessage.Substring(0, tmpMessage.IndexOf("<DELETE>")); }
-
-            //                foreach (var t in tmpColumNames) {
-            //                    var Column = Database.Column[t];
-            //                    if (Column != null) { tmpMessage = tmpMessage.Replace("#Spalte:" + Column.Name, Column.ReadableText(), RegexOptions.IgnoreCase); }
-            //                }
-
-
-            //                if (tmpColumNames.Count > 0) {
-            //                    foreach (var t in tmpColumNames) {
-            //                        ColumnAndErrors.Add(t + "|" + tmpMessage);
-            //                    }
-            //                }
-            //                else {
-            //                    ColumnAndErrors.Add("|" + tmpMessage); // Sie gehören zur Nutzergruppe...
-            //                }
-
-            //            }
-            //        }
-            //    }
-            //}
-
-            // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
-            var e = new DoRowAutomaticEventArgs(this);
-            OnDoSpecialRules(e);
+                switch (thisCol.Format) {
+                    case enDataFormat.Bit:
+                        if (CellGetString(thisCol) == "+") {
+                            vars.Add(new Variable(thisCol.Name, "true", enVariableDataType.Bool));
+                        }
+                        else {
+                            vars.Add(new Variable(thisCol.Name, "false", enVariableDataType.Bool));
+                        }
+                        break;
 
 
-            if (!string.IsNullOrEmpty(e.Feedback) && e.FeedbackColumn == null) { e.FeedbackColumn = Database.Column[0]; }
+                    case enDataFormat.Ganzzahl:
+                    case enDataFormat.Gleitkommazahl:
+                        vars.Add(new Variable(thisCol.Name, CellGetString(thisCol), enVariableDataType.Number));
+                        break;
+                    case enDataFormat.Text:
+                    case enDataFormat.BildCode:
+                    case enDataFormat.Datum_und_Uhrzeit:
+                    case enDataFormat.FarbeInteger:
+                    case enDataFormat.RelationText:
+                    case enDataFormat.Schrift:
+                    case enDataFormat.Text_mit_Formatierung:
+                    case enDataFormat.Link_To_Filesystem:
+                    case enDataFormat.LinkedCell:
+                    case enDataFormat.Columns_für_LinkedCellDropdown:
+                    case enDataFormat.Values_für_LinkedCellDropdown:
+                        if(thisCol.MultiLine) {
+                            vars.Add(new Variable(thisCol.Name, CellGetString(thisCol), enVariableDataType.List));
+                        } else {
+                            vars.Add(new Variable(thisCol.Name, CellGetString(thisCol), enVariableDataType.String));
+                        }
+                        break;
 
-            if (e.FeedbackColumn != null) {
-                if (string.IsNullOrEmpty(e.Feedback)) { e.Feedback = "Allgemeiner Fehler in '" + e.FeedbackColumn.ReadableText() + "'."; }
-                ColumnAndErrors.Add(e.FeedbackColumn.Name + "|" + e.Feedback);
+                }
+
+            }
+            #endregion
+
+            var script = new BlueScript.Script(vars);
+            script.ScriptText = Database.RulesScript;
+
+            script.Parse();
+
+            if (!onlyTest) {
+
+
+
+                Develop.DebugPrint_NichtImplementiert();
+
+                //foreach (var ThisRule in Database.Rules) {
+                //    if (ThisRule != null) {
+                //        if (ThisRule.TrifftZu(this)) {
+                //            var tmpMessage = ThisRule.Execute(this, true);
+
+                //            if (!string.IsNullOrEmpty(tmpMessage)) {
+                //                var tmpColumNames = tmpMessage.ReduceToMulti("'#Spalte:*'");
+                //                if (tmpMessage.Contains("<DELETE>")) { tmpMessage = tmpMessage.Substring(0, tmpMessage.IndexOf("<DELETE>")); }
+
+                //                foreach (var t in tmpColumNames) {
+                //                    var Column = Database.Column[t];
+                //                    if (Column != null) { tmpMessage = tmpMessage.Replace("#Spalte:" + Column.Name, Column.ReadableText(), RegexOptions.IgnoreCase); }
+                //                }
+
+
+                //                if (tmpColumNames.Count > 0) {
+                //                    foreach (var t in tmpColumNames) {
+                //                        ColumnAndErrors.Add(t + "|" + tmpMessage);
+                //                    }
+                //                }
+                //                else {
+                //                    ColumnAndErrors.Add("|" + tmpMessage); // Sie gehören zur Nutzergruppe...
+                //                }
+
+                //            }
+                //        }
+                //    }
+                //}
+
+                //// Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
+                //var e = new DoRowAutomaticEventArgs(this);
+                //OnDoSpecialRules(e);
+
+
+                //if (!string.IsNullOrEmpty(e.Feedback) && e.FeedbackColumn == null) { e.FeedbackColumn = Database.Column[0]; }
+
+                //if (e.FeedbackColumn != null) {
+                //    if (string.IsNullOrEmpty(e.Feedback)) { e.Feedback = "Allgemeiner Fehler in '" + e.FeedbackColumn.ReadableText() + "'."; }
+                //    ColumnAndErrors.Add(e.FeedbackColumn.Name + "|" + e.Feedback);
+                //}
+
             }
 
             if (DoUnfreeze) { Database.Cell.UnFreeze(); }
+            return script;
 
-            return ColumnAndErrors.SortedDistinctList();
+            //return ColumnAndErrors.SortedDistinctList();
+        }
+
+        public (bool, string, BlueScript.Script) DoAutomatic(bool OnlyTest) {
+            return DoAutomatic(false, false, true);
         }
 
 
-        /// <summary>
-        /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
-        /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
-        /// </summary>
-        /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
-        /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
-        /// <param name="tryforsceonds"></param>
-        /// <returns></returns>
-        public Tuple<bool, string> DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds) {
 
-            if (Database.ReadOnly) { return new Tuple<bool, string>(false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"); }
+            /// <summary>
+            /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
+            /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
+            /// </summary>
+            /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
+            /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
+            /// <param name="tryforsceonds"></param>
+            /// <returns></returns>
+            public (bool, string, BlueScript.Script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds) {
+
+            if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
 
             var t = DateTime.Now;
             do {
-                var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck);
-                if (erg.Item1) { return erg; }
+                var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, false);
+                if (erg.ok) { return erg; }
 
                 if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
             } while (true);
@@ -415,19 +477,21 @@ namespace BlueDatabase {
         /// </summary>
         /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
         /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
-        public Tuple<bool, string> DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck) {
+        public (bool ok, string error, BlueScript.Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, bool onlyTest) {
 
-            if (Database.ReadOnly) { return new Tuple<bool, string>(false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"); }
+            if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
             var feh = Database.ErrorReason(enErrorReason.EditAcut);
 
             if (!string.IsNullOrEmpty(feh)) {
                 //Develop.DebugPrint(enFehlerArt.Warnung, "Automatik nicht möglich: " + feh);
-                return new Tuple<bool, string>(false, feh);
+                return (false, feh, null);
             }
 
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
-            var cols = DoRules();
+            var cols = DoRules(onlyTest);
+
+            if (onlyTest) { return (true, string.Empty, cols); }
 
             // Dann die Abschließenden Korrekturen vornehmen
             foreach (var ThisColum in Database.Column) {
@@ -458,35 +522,36 @@ namespace BlueDatabase {
                 }
             }
 
-            TMP_Y = null;
-            TMP_DrawHeight = null;
+            Develop.DebugPrint_NichtImplementiert(); return (true, string.Empty, cols);
+            //TMP_Y = null;
+            //TMP_DrawHeight = null;
 
 
-            if (Database.Column.SysCorrect.SaveContent) {
-                if (IsNullOrEmpty(Database.Column.SysCorrect) || Convert.ToBoolean(cols.Count == 0) != CellGetBoolean(Database.Column.SysCorrect)) { CellSet(Database.Column.SysCorrect, Convert.ToBoolean(cols.Count == 0)); }
-            }
-            OnRowChecked(new RowCheckedEventArgs(this, cols));
+            //if (Database.Column.SysCorrect.SaveContent) {
+            //    if (IsNullOrEmpty(Database.Column.SysCorrect) || Convert.ToBoolean(cols.Count == 0) != CellGetBoolean(Database.Column.SysCorrect)) { CellSet(Database.Column.SysCorrect, Convert.ToBoolean(cols.Count == 0)); }
+            //}
+            //OnRowChecked(new RowCheckedEventArgs(this, cols));
 
 
-            var _Info = new List<string>();
+            //var _Info = new List<string>();
 
-            foreach (var ThisString in cols) {
-                var X = ThisString.SplitBy("|");
-                _Info.AddIfNotExists(X[1]);
-            }
+            //foreach (var ThisString in cols) {
+            //    var X = ThisString.SplitBy("|");
+            //    _Info.AddIfNotExists(X[1]);
+            //}
 
-            var _InfoTXT = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
+            //var _InfoTXT = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
 
-            if (cols.Count == 0) {
-                _InfoTXT += "Diese Zeile ist fehlerfrei.";
-            }
-            else {
-                _InfoTXT += _Info.JoinWith("<br><hr><br>");
-            }
+            //if (cols.Count == 0) {
+            //    _InfoTXT += "Diese Zeile ist fehlerfrei.";
+            //}
+            //else {
+            //    _InfoTXT += _Info.JoinWith("<br><hr><br>");
+            //}
 
-            //MessageBox.Show(_InfoTXT, enImageCode.Information, "OK");
+            ////MessageBox.Show(_InfoTXT, enImageCode.Information, "OK");
 
-            return new Tuple<bool, string>(true, _InfoTXT); ;
+            //return (true, _InfoTXT); ;
 
         }
 

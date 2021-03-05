@@ -1226,7 +1226,7 @@ namespace BlueDatabase {
             if (rules is null || rules.Count ==0) { return string.Empty; }
 
 
-            var txt = "// Automatische Umwandlung des Alten Regel-Systems\r\n// in die neue Skript-Sprache.\r\n";
+            var txt = "// Automatische Umwandlung des alten Regel-Systems in die neue Skript-Sprache.\r\n";
             txt += "// - Zur Bearbeitung wird NOTEPAD++ empfohlen.\r\n";
             txt += "// - Zur Verschönerung der Optik wird https://codebeautify.org/javaviewer empfohlen.\r\n\r\n\r\n";
 

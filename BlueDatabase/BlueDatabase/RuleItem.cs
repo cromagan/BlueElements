@@ -487,9 +487,12 @@ namespace BlueDatabase {
 
         internal string ToScript() {
 
+
+            var c = new List<ColumnItem>();
+
             var txt = "\r\n\r\n// --------------------------------------------------------\r\n";
                 txt += "// " + ReadableText();
-            txt += "// --------------------------------------------------------\r\b";
+            txt += "\r\n// --------------------------------------------------------\r\n";
 
 
             var a = string.Empty;
@@ -497,11 +500,11 @@ namespace BlueDatabase {
 
             foreach(var thisAktion in Actions) {
 
-                var (anfang, ende) = thisAktion.ToScript();
+                var (anfang, ende) = thisAktion.ToScript(c);
 
                 a += anfang + "\r\n";
 
-                if (!string.IsNullOrEmpty(e)) {
+                if (!string.IsNullOrEmpty(ende)) {
                     e = ende + "\r\n" + e;
                 }
 
@@ -511,7 +514,7 @@ namespace BlueDatabase {
 
 
 
-            return txt + a + e;
+            return txt + a + e.TrimStart("\r\n");
 
 
         }

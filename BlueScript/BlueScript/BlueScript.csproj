@@ -48,6 +48,8 @@
     <Compile Include="Enums\enVariableType.cs" />
     <Compile Include="Methods\Method_BerechneVariable.cs" />
     <Compile Include="Methods\Method_if.cs" />
+    <Compile Include="Methods\Method_Contains.cs" />
+    <Compile Include="Methods\Method_IsNullOrEmpty.cs" />
     <Compile Include="Methods\Method_max.cs" />
     <Compile Include="Methods\Method_min.cs" />
     <Compile Include="Script.cs" />

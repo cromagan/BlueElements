@@ -266,7 +266,7 @@ namespace BlueDatabase {
             while (x.Count > 0) {
 
                 Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - x.Count(), all, false, false));
-                if (x[0].DoAutomatic(true, fullCheck).Item1) {
+                if (x[0].DoAutomatic(true, fullCheck, false).ok) {
                     x.RemoveAt(0);
                 }
 

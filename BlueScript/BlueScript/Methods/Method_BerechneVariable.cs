@@ -56,8 +56,9 @@ namespace BlueScript {
                 return new strDoItFeedback("Variable " + variableName + " nicht gefunden");
             }
 
-            //var nt = infos.AttributText.Trim("=");
-            var bs = SplitAttribute(infos.AttributText, variablen);
+
+
+            var bs = SplitAttribute(infos.AttributText, variablen, false);
 
             if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
 
@@ -72,7 +73,13 @@ namespace BlueScript {
                 return new strDoItFeedback();
             }
 
-
+            if (bs[0].Contains("|") || bs[0].Contains("&") || bs[0].Contains("!") || bs[0].ToLower().Contains("true") || bs[0].ToLower().Contains("false")) {
+                var b = Method_if.GetBool(bs[0]);
+                if (b == null) { return new strDoItFeedback("Berechnungsfehler der Formel: " + infos.AttributText + " => " + bs[0]); }
+                variable.ValueString = ((string)b).ToString();
+                variable.Type = enVariableDataType.Bool;
+                return new strDoItFeedback();
+            }
 
 
             var erg = modErgebnis.Ergebnis(bs[0]);

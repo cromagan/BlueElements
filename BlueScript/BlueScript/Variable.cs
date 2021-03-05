@@ -37,22 +37,22 @@ namespace BlueScript {
             switch (Type) {
 
                 case enVariableDataType.String:
-                    return Name + ": {string} " + ValueString;
+                    return "{str} " + Name + " = " + ValueForReplace;
 
                 case enVariableDataType.Number:
-                    return Name + ": {numeral} " + ValueString;
+                    return "{num} " + Name + " = " + ValueForReplace;
 
                 case enVariableDataType.Date:
-                    return Name + ": {date} " + ValueString;
+                    return "{dat} " + Name + " = " + ValueForReplace;
 
                 case enVariableDataType.Bool:
-                    return Name + ": {bool} " + ValueString;
+                    return "{bol} " + Name + " = " + ValueForReplace;
 
                 case enVariableDataType.List:
-                    return Name + ": {list} " + ValueString;
+                    return "{lst} " + Name + " = " + ValueForReplace;
 
                 default:
-                    return Name + ": {unknown} " + ValueString;
+                    return "{ukn} " + Name + " = " + ValueString;
 
             }
 
@@ -67,6 +67,17 @@ namespace BlueScript {
         }
 
 
+        public Variable(string name, string value, enVariableDataType type) {
+
+            if (!IsValidName(name)) {
+                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Ungültiger Variablenname: " + name);
+            }
+            Name = name.ToLower();
+            ValueString = value;
+            Type = type;
+        }
+
+
         public string ValueForReplace {
             get {
 
@@ -77,6 +88,11 @@ namespace BlueScript {
 
                     case enVariableDataType.Number:
                         return ValueString;
+                    case enVariableDataType.Bool:
+                        return ValueString;
+
+                    case enVariableDataType.List:
+                        return "{\"" + ValueString.SplitByCRToList().JoinWith("\", \"").TrimEnd(", \"") + "\"}";
 
                     default:
                         Develop.DebugPrint_NichtImplementiert();

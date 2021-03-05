@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -102,6 +101,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _Database.Tags.AddRange(tbxTags.Text.SplitByCR());
             }
 
+            _Database.RulesScript = txtSkript.Text;
 
             var l = lstBinary.Item.GetNamedBinaries();
             if (l.IsDifferentTo(_Database.Bins)) {
@@ -171,7 +171,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             txbKennwort.Text = _Database.GlobalShowPass;
 
-
+            txtSkript.Text = _Database.RulesScript;
 
             lbxSortierSpalten.Item.Clear();
             if (_Database.SortDefinition != null) {
@@ -620,6 +620,39 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
+        private void btnTest_Click(object sender, System.EventArgs e) {
+            txbSkriptInfo.Text = string.Empty;
+            txbVariablen.Text = string.Empty;
 
+            if (_Database.Row.Count == 0) {
+                MessageBox.Show("Zum Test wird zumindest eine Zeile benötigt.", enImageCode.Information, "OK");
+                return;
+            }
+
+            var r = _Database.Row.First();
+
+            (var ok, var message, var s) = r.DoAutomatic(true);
+
+            var t = string.Empty;
+
+            foreach( var thisv in s.Variablen) {
+                t = t + thisv.ToString() + "\r\n";
+            }
+            txbVariablen.Text = t;
+
+
+            if (!string.IsNullOrEmpty(message)) {
+                txbSkriptInfo.Text = message;
+                return;
+            }
+
+            txbSkriptInfo.Text = s.Error + "\r\n" + s.ErrorCode;
+
+
+        }
+
+        private void tabCSckript_SelectedIndexChanged(object sender, System.EventArgs e) {
+
+        }
     }
 }

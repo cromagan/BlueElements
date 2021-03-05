@@ -460,7 +460,7 @@ namespace BlueControls.Forms
                 if (thisR is RowFormulaPadItem r)
                 {
 
-                    r.Row.DoAutomatic(true, true);
+                    r.Row.DoAutomatic(true, true, false);
 
                     l.Add("#######################################################################");
                     l.Add(" ");

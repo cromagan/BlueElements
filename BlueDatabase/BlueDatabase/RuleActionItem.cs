@@ -123,7 +123,8 @@ namespace BlueDatabase {
             if (obj is RuleActionItem RAI) {
                 // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
                 return CompareKey().CompareTo(RAI.CompareKey());
-            } else {
+            }
+            else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
                 return 0;
             }
@@ -314,7 +315,8 @@ namespace BlueDatabase {
                         if (t.Format == enDataFormat.Ganzzahl) {
                             erg += 0.000000000000001; // 2,5 rundet sonst auf 2 ab...
                             Row.CellSet(t, (int)erg, FreezeMode);
-                        } else {
+                        }
+                        else {
                             Row.CellSet(t, (double)erg, FreezeMode);
                         }
                     }
@@ -513,49 +515,177 @@ namespace BlueDatabase {
             }
         }
 
-        internal (string anfang, string ende) ToScript() {
+        internal (string anfang, string ende) ToScript(List<ColumnItem> c) {
+
+            var txtList = Text.SplitByCRToList();
+            var txtJoinedKomma = "\"" + txtList.JoinWith("\", \"").Trim(", \"") + "\"";
+            var txtListString = "{\"" + txtJoinedKomma + "}";
+            var txtJoined = txtList.JoinWith(";").Trim(";");
+
+
+            var ct = "Exception(\"Nicht oder unvollständig konvertiert!\");\r\n// Benutzte Spalten:";
+
+            foreach (var thisc in Columns) {
+                ct = ct + " " + thisc.Name;
+                c.Add(thisc);
+            }
+            ct = ct + "\r\n// Original-Text: " + txtJoined + "\r\n";
+
+
+            var cnl = string.Empty;
+
+            foreach (var thisc in c) {
+                cnl = cnl + thisc.Name + ", ";
+            }
+            cnl = cnl.Trim(", ");
+
 
             switch (_Action) {
-
                 case enAction.Ist:
 
-                    var txt = Text.SplitByCRToList();
-
-                    if (txt is null || txt.Count==0) {
+                    if (txtList is null || txtList.Count == 0) {
                         return ("if (IsNullOrEmpty(" + Columns[0].Name + ")) {", "}");
                     }
 
-                    if (txt.Count >1) {
-                        var tmpn = "tmpList_" + Columns[0].Name;
-                        var tmpt = "var " + tmpn + " = {\"" + txt.JoinWith("\", \"");
-                        tmpt = tmpt.Trim(", \"") + "\"}";
-                        return (tmpt + "\r\nif (Contains(" + tmpt + ", " + Columns[0].Name +") {", "}");
+                    if (txtList.Count > 1) {
+                        //var tmpn = "tmpList_" + Columns[0].Name;
+                        //var tmpt = "var " + tmpn + " = " + txtListString + ";";
+                        return ("if (Contains(" + Columns[0].Name + ", " + txtJoinedKomma + ") { ", "} ");
                     }
 
 
 
-                    if  (Columns[0].Format.IsZahl()) {
+                    if (Columns[0].Format.IsZahl()) {
                         return ("if (" + Columns[0].Name + " == " + Text + ") {", "}");
                     }
 
+                    if (Columns[0].Format == enDataFormat.Bit) {
 
-                    return ("if (" + Columns[0].Name + " == \"" + Text + "\") {", "}" );
+                        if (Text == "+") {
+                            return ("if (" + Columns[0].Name + ") {", "}");
+                        }
+                        if (Text == "-") {
+                            return ("if (!" + Columns[0].Name + ") {", "}");
+                        }
+
+                        return (ct, "");
+                    }
+
+
+                    return ("if (" + Columns[0].Name + " == \"" + Text + "\") {", "}");
 
 
                 case enAction.Setze_Fehlerhaft:
-                    return ("SetError(\"" +  Text.Replace("\r\n","") +  "\",  Spalten_Zum_Markieren); // TODO: Spalten und Text korrigieren", "");
+
+                    if (string.IsNullOrEmpty(Text)) {
+                        return ("SetError(\"Allgemeiner Fehler.\",  " + cnl + "); // TODO: Text korrigieren", "");
+                    }
+
+                    return ("SetError(\"" + Text.Replace("\r\n", "") + "\",  " + cnl + ");", "");
+
+                case enAction.Ist_Nicht:
+                    if (txtList is null || txtList.Count == 0) {
+                        return ("if (!IsNullOrEmpty(" + Columns[0].Name + ")) {", "}");
+                    }
+
+                    if (txtList is null || txtList.Count == 1) {
+                        return ("if (" + Columns[0].Name + " != \"" + txtList[0] + "\") {", "}");
+                    }
+
+                    return (ct, "");
 
 
-                 
+                case enAction.Wert_Setzen:
+                    if (Columns.Count == 0) { return (ct, ""); }
+                    var bigt = string.Empty;
+
+
+
+                    foreach (var thisc in Columns) {
+                        var thist = string.Empty;
+
+                        if (thisc.Format.IsZahl() || thisc.Format == enDataFormat.FarbeInteger) {
+                            thist = thisc.Name + " = " + txtJoined + ";";
+                        }
+
+                        if (thisc.MultiLine) {
+                            thist = thisc.Name + " = " + txtList + ";";
+                        }
+
+
+                        if (thisc.Format == enDataFormat.Text || thisc.Format == enDataFormat.LinkedCell || thisc.Format == enDataFormat.BildCode || thisc.Format == enDataFormat.Datum_und_Uhrzeit) {
+                            thist = thisc.Name + " = " + txtJoined + ";";
+                        }
+
+                        if (thisc.Format == enDataFormat.Bit) {
+                            if (Text == "+") { thist = thisc.Name + " = true;"; }
+                            if (Text == "-") { thist = thisc.Name + " = false;"; }
+
+                        }
+                        if (!string.IsNullOrEmpty(thist)) {
+                            bigt = bigt + thist + "\r\n";
+                        }
+                        else {
+                            bigt = bigt + ct;
+                        }
+
+                    }
+
+                    return (bigt, "");
+
+                case enAction.Substring:
+                case enAction.Berechne:
+                    if (Columns.Count != 1) { return (ct, ""); }
+                    return (ct + Columns[0].Name + " = " + txtJoined.Replace("&", " + ").Replace(";", "") + ";", "");
+
+
+                case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
+                    return ("if (EndsWith(" + Columns[0].Name + ", \" \", \"\\r\", \"\\n\", \"\\t\")) {", "}");
+
+                case enAction.Enthält:
+                case enAction.Enthält_Zeichenkette:
+                    var s = "if (";
+                    foreach (var thisc in Columns) {
+                        s = s + "Contains(" + Columns[0].Name + ", " + txtJoinedKomma + ") ||";
+                    }
+                    s = s.TrimEnd(" ||") + ") {";
+                    return (s, "}");
+
+                case enAction.Enthält_NICHT_Zeichenkette:
+                    var s2 = "if (";
+                    foreach (var thisc in Columns) {
+                        s2 = s2 + "!Contains(" + Columns[0].Name + ", " + txtJoinedKomma + ") &&";
+                    }
+                    s2 = s2.TrimEnd(" &&") + ") {";
+                    return (s2, "}");
+
+
+                case enAction.Wert_Dazu:
+                    if (Columns.Count != 1) { return (ct, ""); }
+                    return ("Add(" + Columns[0].Name + ", " + txtJoinedKomma + ");", "");
+
+                case enAction.Wert_Weg:
+                    if (Columns.Count != 1) { return (ct, ""); }
+                    return ("Remove(" + Columns[0].Name + ", " + txtJoinedKomma + ");", "");
+
+
+                case enAction.Anmerkung:
+                    return ("// #### " + txtJoined + " ####", "");
+
+                case enAction.Formatfehler_des_Zelleninhaltes:
+                case enAction.Enthält_ungültige_Zeichen:
+                case enAction.Berechnung_ist_True:
+                    return (ct + "if (false) { // Deaktiverter Inhalt", "}");
+
+                case enAction.Sperre_die_Zelle:
+                    return (ct, "");
 
                 default:
-                    Develop.DebugPrint_NichtImplementiert();
-                    break;
+                    return (ct, "");
 
 
             }
 
-            return (string.Empty, string.Empty);
 
         }
 
@@ -588,14 +718,16 @@ namespace BlueDatabase {
                 case enAction.Ist:
                     if (string.IsNullOrEmpty(_Text)) {
                         return QuickImage.Get(enImageCode.Datei, 16, "00FF00", "");
-                    } else {
+                    }
+                    else {
                         return QuickImage.Get(enImageCode.Textdatei, 16, "0000FF", "");
                     }
 
                 case enAction.Ist_Nicht:
                     if (string.IsNullOrEmpty(_Text)) {
                         return QuickImage.Get("Datei|16||1|00FF00");
-                    } else {
+                    }
+                    else {
                         return QuickImage.Get("Textdatei|16||1|0000FF");
                     }
 
@@ -1208,7 +1340,8 @@ namespace BlueDatabase {
                 if (z == Columns.Count - 2) {
                     ColsOder = ColsOder + "'" + Columns[z].ReadableText() + "' oder ";
                     ColsUnd = ColsUnd + "'" + Columns[z].ReadableText() + "' und ";
-                } else {
+                }
+                else {
                     ColsUnd = ColsUnd + "'" + Columns[z].ReadableText() + "', ";
                     ColsOder = ColsOder + "'" + Columns[z].ReadableText() + "', ";
                 }
@@ -1335,7 +1468,8 @@ namespace BlueDatabase {
             if (string.IsNullOrEmpty(_Text)) {
                 w = new string[1]; //MUSS mindestens eines haben, daß auf Leere geprüft werden kann
                 w[0] = "";
-            } else {
+            }
+            else {
                 w = _Text.SplitByCR();
             }
 
@@ -1347,7 +1481,8 @@ namespace BlueDatabase {
                     t += TrifftZuText(vRow, t1, w);
                     if (!string.IsNullOrEmpty(t)) { break; }
                 }
-            } else {
+            }
+            else {
                 t = t + TrifftZuText(vRow, null, w) + "\r";
             }
 
@@ -1370,7 +1505,8 @@ namespace BlueDatabase {
             if (string.IsNullOrEmpty(_Text)) {
                 w = new string[1]; //MUSS mindestens eines haben, daß auf Leere geprüft werden kann
                 w[0] = string.Empty;
-            } else {
+            }
+            else {
                 w = _Text.SplitByCR();
             }
 
@@ -1379,7 +1515,8 @@ namespace BlueDatabase {
                     foreach (var t in Columns) {
                         if (TrifftZu(vRow, t, w[wtz])) { return true; }
                     }
-                } else {
+                }
+                else {
                     if (TrifftZu(vRow, null, w[wtz])) { return true; }
                 }
             }
@@ -1449,7 +1586,8 @@ namespace BlueDatabase {
                         string tmp;
                         if (!string.IsNullOrEmpty(Column.AllowedChars)) {
                             tmp = Column.AllowedChars;
-                        } else {
+                        }
+                        else {
                             tmp = Column.Format.AllowedChars();
                         }
                         if (Column.MultiLine) {

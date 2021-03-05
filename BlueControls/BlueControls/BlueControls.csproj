@@ -758,6 +758,10 @@
       <Project>{ce8be078-ddae-47f5-aaa9-685564b898c9}</Project>
       <Name>BlueDatabase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\BlueScript\BlueScript\BlueScript.csproj">
+      <Project>{3ACC6EE6-B919-4952-8502-F62BAEEEFC60}</Project>
+      <Name>BlueScript</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms-Common\Notification.resx">

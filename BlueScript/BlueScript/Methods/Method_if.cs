@@ -51,7 +51,7 @@ namespace BlueScript {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            var bs = SplitAttribute(infos.AttributText, variablen);
+            var bs = SplitAttribute(infos.AttributText, variablen, false);
 
             if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
 
@@ -61,8 +61,8 @@ namespace BlueScript {
 
 
             if (x == "true") {
-                var err = Script.Parse(infos.CodeBlockAfterText, variablen);
-                if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback("Fehler im If-Codeblock"); }
+                var (err, ermess2) = Script.Parse(infos.CodeBlockAfterText, variablen, false);
+                if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback("Fehler im If-Codeblock: " + ermess2); }
             }
 
             return new strDoItFeedback(string.Empty, string.Empty);
@@ -70,7 +70,7 @@ namespace BlueScript {
 
 
 
-        public string? GetBool(string txt) {
+        public static string? GetBool(string txt) {
 
             switch (txt.ToLower()) {
                 case "true": return "true";
@@ -98,7 +98,7 @@ namespace BlueScript {
                 var tmp = GetBool(txt.Substring(posa + 1, pose - posa - 1));
                 if (tmp == null) { return null; }
 
-                return GetBool(txt.Substring(0, posa) + (string)tmp + txt.Substring(pose+1));
+                return GetBool(txt.Substring(0, posa) + (string)tmp + txt.Substring(pose + 1));
 
             }
 
@@ -126,6 +126,9 @@ namespace BlueScript {
             ntxt = GetBoolTMP(txt, ">");
             if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
 
+            ntxt = GetBoolTMP(txt, "!");
+            if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
+
             ntxt = GetBoolTMP(txt, "||");
             if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
 
@@ -139,10 +142,13 @@ namespace BlueScript {
 
 
 
-        string GetBoolTMP(string txt, string check) {
+        static string GetBoolTMP(string txt, string check) {
             var i = txt.IndexOf(check);
 
-            if (i < 1) { return string.Empty; } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
+
+            if (i < 0) { return string.Empty; } 
+
+            if (i < 1 && check != "!") { return string.Empty; } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
 
             if (i >= txt.Length - 1) { return string.Empty; } // siehe oben
 
@@ -166,7 +172,7 @@ namespace BlueScript {
             var s2 = txt.Substring(i + check.Length, ende - check.Length - i);
 
 
-            if (string.IsNullOrEmpty(s1)) { return string.Empty; }
+            if (string.IsNullOrEmpty(s1) && check != "!") { return string.Empty; }
             if (string.IsNullOrEmpty(s2)) { return string.Empty; }
 
             var replacer = string.Empty;
@@ -229,9 +235,9 @@ namespace BlueScript {
                     break;
 
                 case "||":
-                    if (s1=="true" || s1 =="false") {
+                    if (s1 == "true" || s1 == "false") {
                         if (s2 == "true" || s2 == "false") {
-                            replacer = (string) GetBool(s1 + check + s2);
+                            replacer = (string)GetBool(s1 + check + s2);
                         }
                     }
                     break;
@@ -244,6 +250,14 @@ namespace BlueScript {
                     }
                     break;
 
+                case "!":
+                    // S1 dürfte eigentlich nie was sein: !False||!false
+                    // entwederist es ganz am anfang, oder direkt nach einem Trenneichen
+                    if (string.IsNullOrEmpty(s1)) {
+                        if (s2 == "true") { replacer = "false"; }
+                        if (s2 == "false") { replacer = "true"; }
+                    }
+                    break;
 
                 default:
                     Develop.DebugPrint_NichtImplementiert();
