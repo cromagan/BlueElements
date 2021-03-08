@@ -28,18 +28,18 @@ using BlueBasics;
 using static BlueBasics.modConverter;
 
 namespace BlueScript {
-    class Method_IsNullOrEmpty : Method {
+    class Method_Sort : Method {
 
 
-        public Method_IsNullOrEmpty(Script parent) : base(parent) { }
+        public Method_Sort(Script parent) : base(parent) { }
 
+        public override string Syntax { get => "Sort(ListVariable, EliminateDupes);"; }
 
-        public override string Syntax { get => "isNullOrEmpty(Variable)"; }
-        public override List<string> Comand { get => new List<string>() { "isnullorempty" }; }
+        public override List<string> Comand { get => new List<string>() { "sort" }; }
         public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
+        public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => "bool"; }
+        public override string Returns { get => string.Empty; }
 
 
 
@@ -50,19 +50,46 @@ namespace BlueScript {
 
             var bs = SplitAttribute(infos.AttributText, variablen, 1);
 
-            if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            if (bs == null || bs.Count != 2) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
 
+
+        
+            if (bs[1].ToLower() != "false" && bs[1].ToLower() != "true") { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            var removedouble = bs[1].ToLower() == "true";
 
             var variable = variablen.Get(bs[0]);
             if (variable == null) {
                 return new strDoItFeedback("Variable " + bs[0] + " nicht gefunden");
             }
 
-            if (string.IsNullOrEmpty(variable.ValueString)) {
-                return new strDoItFeedback("true", string.Empty);
+            if (variable.Type == Skript.Enums.enVariableDataType.List) {
+
+                var x = variable.ValueString.SplitByCRToList();
+
+
+                if (removedouble) {
+                    x = x.SortedDistinctList();
+                }
+                else {
+                    x.Sort();
+                }
+
+
+                variable.ValueString = x.JoinWithCr();
+                return new strDoItFeedback();
+
             }
 
-            return new strDoItFeedback("false", string.Empty);
+
+
+            return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText);
+
+
+            //if (string.IsNullOrEmpty(variable.ValueString)) {
+            //    return new strDoItFeedback("true", string.Empty);
+            //}
+
+            //return new strDoItFeedback("false", string.Empty);
 
         }
     }

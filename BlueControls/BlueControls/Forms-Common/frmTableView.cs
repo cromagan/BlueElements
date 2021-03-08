@@ -817,7 +817,7 @@ namespace BlueControls.Forms {
                     break;
 
                 case "Fehlersuche":
-                    MessageBox.Show(Row.DoAutomatic(true, true, 10).Item2);
+                    MessageBox.Show(Row.DoAutomatic(true, true, 10).error);
                     break;
 
                 case "ZeileLöschen":

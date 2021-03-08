@@ -30,6 +30,8 @@ using static BlueBasics.modConverter;
 namespace BlueScript {
     class Method_min : Method {
 
+        public override string Syntax { get => "Min(Value1, Value2, ...)"; }
+
         public Method_min(Script parent) : base(parent) { }
         public override List<string> Comand { get => new List<string>() { "min" }; }
         public override string StartSequence { get => "("; }
@@ -38,11 +40,11 @@ namespace BlueScript {
         public override string Returns { get => "numeral"; }
 
 
-        internal override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            var bs = SplitAttribute(infos.AttributText, variablen, false);
+            var bs = SplitAttribute(infos.AttributText, variablen, 0);
 
             if (bs == null || bs.Count < 2) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
 

@@ -28,42 +28,34 @@ using BlueBasics;
 using static BlueBasics.modConverter;
 
 namespace BlueScript {
-    class Method_IsNullOrEmpty : Method {
+    class Method_Exception : Method {
 
 
-        public Method_IsNullOrEmpty(Script parent) : base(parent) { }
+        public Method_Exception(Script parent) : base(parent) { }
 
+        public override string Syntax { get => "Exception(\"Unbehandelter Programmcode!\");"; }
 
-        public override string Syntax { get => "isNullOrEmpty(Variable)"; }
-        public override List<string> Comand { get => new List<string>() { "isnullorempty" }; }
+        public override List<string> Comand { get => new List<string>() { "Exception" }; }
         public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
+        public override string EndSequence { get => ");"; }
+        //public override List<string> AllowedInIDs { get => null; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => "bool"; }
+        public override string Returns { get => string.Empty; }
 
 
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
 
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
+            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 
-            var bs = SplitAttribute(infos.AttributText, variablen, 1);
+            var bs = SplitAttribute(infos.AttributText, variablen, 0);
 
-            if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            if (bs == null || bs.Count != 1) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 
 
-            var variable = variablen.Get(bs[0]);
-            if (variable == null) {
-                return new strDoItFeedback("Variable " + bs[0] + " nicht gefunden");
-            }
 
-            if (string.IsNullOrEmpty(variable.ValueString)) {
-                return new strDoItFeedback("true", string.Empty);
-            }
-
-            return new strDoItFeedback("false", string.Empty);
-
+            return new strDoItFeedback(string.Empty, bs[0]);
         }
     }
 }

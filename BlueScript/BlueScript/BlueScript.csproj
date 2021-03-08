@@ -46,7 +46,13 @@
   <ItemGroup>
     <Compile Include="Methods\Method.cs" />
     <Compile Include="Enums\enVariableType.cs" />
+    <Compile Include="Methods\Method_EndsWith.cs" />
+    <Compile Include="Methods\Method_Exception.cs" />
+    <Compile Include="Methods\Method_IsNumeral.cs" />
+    <Compile Include="Methods\Method_Sort.cs" />
+    <Compile Include="Methods\Method_Remove.cs" />
     <Compile Include="Methods\Method_BerechneVariable.cs" />
+    <Compile Include="Methods\Method_Add.cs" />
     <Compile Include="Methods\Method_if.cs" />
     <Compile Include="Methods\Method_Contains.cs" />
     <Compile Include="Methods\Method_IsNullOrEmpty.cs" />

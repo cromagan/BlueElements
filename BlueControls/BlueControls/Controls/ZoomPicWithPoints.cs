@@ -256,7 +256,7 @@ namespace BlueControls.Controls {
 
 
             if (FileExists(ftxt)) {
-                tags = modAllgemein.LoadFromDisk(ftxt).SplitByCRToList();
+                tags = FileOperations.LoadFromDisk(ftxt).SplitByCRToList();
             }
 
 

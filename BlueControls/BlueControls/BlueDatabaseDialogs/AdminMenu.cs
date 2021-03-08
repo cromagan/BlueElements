@@ -404,7 +404,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
             var P = _TableView.Database.Filename.FilePath();
 
-            if (PathExists(P)) { modAllgemein.ExecuteFile(P); }
+            if (PathExists(P)) { ExecuteFile(P); }
 
         }
 

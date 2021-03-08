@@ -26,6 +26,7 @@ namespace BlueControls.BlueDatabaseDialogs
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DatabaseHeadEditor));
             this.grpBenutzergruppen = new BlueControls.Controls.GroupBox();
             this.PermissionGroups_NewRow = new BlueControls.Controls.ListBox();
@@ -69,12 +70,11 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Regeln = new BlueControls.Controls.TabPage();
             this.tabCSckript = new BlueControls.Controls.TabControl();
             this.tabScriptAnzeige = new BlueControls.Controls.TabPage();
+            this.btnExtern = new BlueControls.Controls.Button();
             this.txtSkript = new BlueControls.Controls.TextBox();
             this.tabVariablen = new BlueControls.Controls.TabPage();
             this.txbVariablen = new BlueControls.Controls.TextBox();
             this.tabBefehle = new BlueControls.Controls.TabPage();
-            this.capTXT = new BlueControls.Controls.Caption();
-            this.lsbComands = new BlueControls.Controls.ListBox();
             this.grpTextAllgemein = new BlueControls.Controls.GroupBox();
             this.txbSkriptInfo = new BlueControls.Controls.TextBox();
             this.btnTest = new BlueControls.Controls.Button();
@@ -97,6 +97,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Expermimentell = new BlueControls.Controls.TabPage();
             this.btnFremdImport = new BlueControls.Controls.Button();
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
+            this.ExternTimer = new System.Windows.Forms.Timer(this.components);
+            this.txbComms = new BlueControls.Controls.TextBox();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -563,22 +565,32 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabCSckript.Controls.Add(this.tabBefehle);
             this.tabCSckript.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabCSckript.HotTrack = true;
-            this.tabCSckript.Location = new System.Drawing.Point(3, 64);
+            this.tabCSckript.Location = new System.Drawing.Point(3, 80);
             this.tabCSckript.Name = "tabCSckript";
             this.tabCSckript.SelectedIndex = 0;
-            this.tabCSckript.Size = new System.Drawing.Size(1033, 549);
+            this.tabCSckript.Size = new System.Drawing.Size(1033, 533);
             this.tabCSckript.TabIndex = 0;
             this.tabCSckript.SelectedIndexChanged += new System.EventHandler(this.tabCSckript_SelectedIndexChanged);
             // 
             // tabScriptAnzeige
             // 
             this.tabScriptAnzeige.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabScriptAnzeige.Controls.Add(this.btnExtern);
             this.tabScriptAnzeige.Controls.Add(this.txtSkript);
             this.tabScriptAnzeige.Location = new System.Drawing.Point(4, 25);
             this.tabScriptAnzeige.Name = "tabScriptAnzeige";
-            this.tabScriptAnzeige.Size = new System.Drawing.Size(1025, 520);
+            this.tabScriptAnzeige.Size = new System.Drawing.Size(1025, 504);
             this.tabScriptAnzeige.TabIndex = 0;
             this.tabScriptAnzeige.Text = "Skript-Text";
+            // 
+            // btnExtern
+            // 
+            this.btnExtern.Location = new System.Drawing.Point(888, 0);
+            this.btnExtern.Name = "btnExtern";
+            this.btnExtern.Size = new System.Drawing.Size(112, 40);
+            this.btnExtern.TabIndex = 1;
+            this.btnExtern.Text = "Extern öffnen";
+            this.btnExtern.Click += new System.EventHandler(this.btnExtern_Click);
             // 
             // txtSkript
             // 
@@ -587,7 +599,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txtSkript.Location = new System.Drawing.Point(0, 0);
             this.txtSkript.MultiLine = true;
             this.txtSkript.Name = "txtSkript";
-            this.txtSkript.Size = new System.Drawing.Size(1025, 520);
+            this.txtSkript.Size = new System.Drawing.Size(1025, 504);
             this.txtSkript.TabIndex = 0;
             // 
             // tabVariablen
@@ -596,7 +608,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabVariablen.Controls.Add(this.txbVariablen);
             this.tabVariablen.Location = new System.Drawing.Point(4, 25);
             this.tabVariablen.Name = "tabVariablen";
-            this.tabVariablen.Size = new System.Drawing.Size(1025, 520);
+            this.tabVariablen.Size = new System.Drawing.Size(1025, 504);
             this.tabVariablen.TabIndex = 1;
             this.tabVariablen.Text = "Variablen";
             // 
@@ -606,39 +618,19 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txbVariablen.Location = new System.Drawing.Point(0, 0);
             this.txbVariablen.Name = "txbVariablen";
-            this.txbVariablen.Size = new System.Drawing.Size(1025, 520);
+            this.txbVariablen.Size = new System.Drawing.Size(1025, 504);
             this.txbVariablen.TabIndex = 0;
             this.txbVariablen.Text = "Skript \"testen\", um diese anzuzeigen.";
             // 
             // tabBefehle
             // 
             this.tabBefehle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabBefehle.Controls.Add(this.capTXT);
-            this.tabBefehle.Controls.Add(this.lsbComands);
+            this.tabBefehle.Controls.Add(this.txbComms);
             this.tabBefehle.Location = new System.Drawing.Point(4, 25);
             this.tabBefehle.Name = "tabBefehle";
-            this.tabBefehle.Size = new System.Drawing.Size(1025, 520);
+            this.tabBefehle.Size = new System.Drawing.Size(1025, 504);
             this.tabBefehle.TabIndex = 2;
             this.tabBefehle.Text = "Befehle";
-            // 
-            // capTXT
-            // 
-            this.capTXT.CausesValidation = false;
-            this.capTXT.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.capTXT.Location = new System.Drawing.Point(232, 0);
-            this.capTXT.Name = "capTXT";
-            this.capTXT.Size = new System.Drawing.Size(793, 520);
-            this.capTXT.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // lsbComands
-            // 
-            this.lsbComands.AddAllowed = BlueControls.Enums.enAddType.None;
-            this.lsbComands.Dock = System.Windows.Forms.DockStyle.Left;
-            this.lsbComands.LastFilePath = null;
-            this.lsbComands.Location = new System.Drawing.Point(0, 0);
-            this.lsbComands.Name = "lsbComands";
-            this.lsbComands.Size = new System.Drawing.Size(232, 520);
-            this.lsbComands.TabIndex = 0;
             // 
             // grpTextAllgemein
             // 
@@ -648,7 +640,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpTextAllgemein.Dock = System.Windows.Forms.DockStyle.Top;
             this.grpTextAllgemein.Location = new System.Drawing.Point(3, 3);
             this.grpTextAllgemein.Name = "grpTextAllgemein";
-            this.grpTextAllgemein.Size = new System.Drawing.Size(1033, 61);
+            this.grpTextAllgemein.Size = new System.Drawing.Size(1033, 77);
             this.grpTextAllgemein.TabIndex = 1;
             this.grpTextAllgemein.TabStop = false;
             this.grpTextAllgemein.Text = "Allgemein";
@@ -658,7 +650,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbSkriptInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbSkriptInfo.Location = new System.Drawing.Point(160, 16);
             this.txbSkriptInfo.Name = "txbSkriptInfo";
-            this.txbSkriptInfo.Size = new System.Drawing.Size(864, 32);
+            this.txbSkriptInfo.Size = new System.Drawing.Size(864, 56);
             this.txbSkriptInfo.TabIndex = 1;
             this.txbSkriptInfo.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -894,6 +886,21 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capExperimentellWarnung.Size = new System.Drawing.Size(488, 80);
             this.capExperimentellWarnung.Text = resources.GetString("capExperimentellWarnung.Text");
             // 
+            // ExternTimer
+            // 
+            this.ExternTimer.Interval = 1000;
+            this.ExternTimer.Tick += new System.EventHandler(this.ExternTimer_Tick);
+            // 
+            // txbComms
+            // 
+            this.txbComms.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbComms.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txbComms.Location = new System.Drawing.Point(0, 0);
+            this.txbComms.Name = "txbComms";
+            this.txbComms.Size = new System.Drawing.Size(1025, 504);
+            this.txbComms.TabIndex = 2;
+            this.txbComms.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1050, 677);
@@ -990,10 +997,12 @@ namespace BlueControls.BlueDatabaseDialogs
         private TabPage tabVariablen;
         private TextBox txbVariablen;
         private TabPage tabBefehle;
-        private Caption capTXT;
-        private ListBox lsbComands;
         private GroupBox grpTextAllgemein;
         private TextBox txbSkriptInfo;
         private Button btnTest;
+        private Button btnExtern;
+        private System.Windows.Forms.Timer ExternTimer;
+        private System.ComponentModel.IContainer components;
+        private TextBox txbComms;
     }
 }

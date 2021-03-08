@@ -68,6 +68,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalScriptComands\Method_Lookup.cs" />
+    <Compile Include="AdditionalScriptComands\Method_SetError.cs" />
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />
     <Compile Include="ColumnCollection.cs" />

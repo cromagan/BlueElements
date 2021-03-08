@@ -34,9 +34,8 @@ namespace BlueScript {
         public Method_if(Script parent) : base(parent) { }
 
 
-        //public Method_var(Script parent, string toParse) : base(parent, toParse) { }
+        public override string Syntax { get => "if (true) { Code zum ausführen }"; }
 
-        //public override string ID { get => "if"; }
         public override List<string> Comand { get => new List<string>() { "if" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
@@ -47,11 +46,11 @@ namespace BlueScript {
 
 
 
-        internal override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            var bs = SplitAttribute(infos.AttributText, variablen, false);
+            var bs = SplitAttribute(infos.AttributText, variablen, 0);
 
             if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
 
@@ -89,7 +88,7 @@ namespace BlueScript {
 
 
 
-            var posa = txt.IndexOf("(");
+            var (posa, witcha) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false, false);
             if (posa > -1) {
                 var (pose, witche) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false, false);
 
@@ -143,10 +142,10 @@ namespace BlueScript {
 
 
         static string GetBoolTMP(string txt, string check) {
-            var i = txt.IndexOf(check);
+            var (i, _) = Script.NextText(txt, 0, new List<string>() { check }, false, false, false);
 
 
-            if (i < 0) { return string.Empty; } 
+            if (i < 0) { return string.Empty; }
 
             if (i < 1 && check != "!") { return string.Empty; } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
 
@@ -156,15 +155,21 @@ namespace BlueScript {
             var ende = i + check.Length;
             var trenn = "(!|&<>=)";
 
+            var gans = false;
+
             do {
                 if (start < 0) { break; }
-                if (trenn.Contains(txt.Substring(start, 1))) { break; }
+                var ze = txt.Substring(start, 1);
+                if (!gans && trenn.Contains(ze)) { break; }
+                if (ze == "\"") { gans = !gans; }
                 start--;
             } while (true);
 
             do {
                 if (ende >= txt.Length) { break; }
-                if (trenn.Contains(txt.Substring(ende, 1))) { break; }
+                var ze = txt.Substring(ende, 1);
+                if (!gans && trenn.Contains(ze)) { break; }
+                if (ze == "\"") { gans = !gans; }
                 ende++;
             } while (true);
 

@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
@@ -322,7 +323,7 @@ namespace BlueControls.Controls {
 
                 case "#bildpfad":
                     var p = (string)((Filterleiste)Parent).pic.Tag;
-                    modAllgemein.ExecuteFile(p.FilePath());
+                    ExecuteFile(p.FilePath());
                     MessageBox.Show("Aktuelle Datei:<br>" + p);
                     return true;
 

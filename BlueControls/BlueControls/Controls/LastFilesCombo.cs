@@ -216,7 +216,7 @@ namespace BlueControls.Controls {
             LastD = new List<string>();
 
             if (FileExists(SaveFile())) {
-                var t = modAllgemein.LoadFromDisk(SaveFile());
+                var t = FileOperations.LoadFromDisk(SaveFile());
                 t = t.RemoveChars("\n");
                 LastD.AddRange(t.SplitByCR());
             }

@@ -20,8 +20,10 @@
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 using static BlueBasics.modAllgemein;
 
 namespace BlueBasics {
@@ -355,6 +357,119 @@ namespace BlueBasics {
             var hash = md5.ComputeHash(stream);
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
+
+
+
+        public static bool ExecuteFile(string FileName, string Arguments = null, bool WaitForExit = false, bool LogException = true) {
+            try {
+                if (string.IsNullOrEmpty(FileName) && string.IsNullOrEmpty(Arguments)) { return false; }
+
+                Process Processx = null;
+
+                if (Arguments == null) {
+                    Processx = Process.Start(FileName);
+                }
+                else {
+                    Processx = Process.Start(FileName, Arguments);
+                }
+
+                if (WaitForExit) {
+                    if (Processx == null) { return true; }// Windows 8, DANKE!
+
+                    Processx.WaitForExit();
+                    Processx.Dispose();
+                }
+            }
+            catch (Exception ex) {
+                if (LogException) { Develop.DebugPrint("ExecuteFile konnte nicht ausgeführt werden:<br>" + ex.Message + "<br>Datei: " + FileName); }
+                return false;
+            }
+
+
+            return true;
+        }
+
+
+
+
+        public static string ChecksumFileName(string name) {
+
+            name = name.Replace("\\", "}");
+            name = name.Replace("/", "}");
+            name = name.Replace(":", "}");
+            name = name.Replace("?", "}");
+
+            name = name.Replace("\r", "");
+
+            if (name.Length < 100) { return name; }
+
+            var nn = "";
+
+            for (var z = 0; z <= name.Length - 21; z++) {
+                nn += name.Substring(z, 1);
+            }
+            nn += name.Substring(name.Length - 20);
+
+
+            return nn;
+        }
+
+
+        public static void SaveToDisk(string DateiName, string Text2Save, bool ExecuteAfter) {
+
+            try {
+                switch (DateiName.FileType()) {
+                    case enFileFormat.HTML:
+                    case enFileFormat.XMLFile:
+                        File.WriteAllText(DateiName, Text2Save, Encoding.UTF8);
+                        break;
+
+                    case enFileFormat.ProgrammingCode:
+                        File.WriteAllText(DateiName, Text2Save, Encoding.Unicode);
+                        break;
+
+                    default:
+                        File.WriteAllText(DateiName, Text2Save, Encoding.Default);
+                        break;
+                }
+
+                if (ExecuteAfter) { ExecuteFile(DateiName); }
+            }
+            catch (Exception ex) {
+                Develop.DebugPrint(ex);
+            }
+
+
+
+        }
+
+        public static string LoadFromDisk(string DateiName) {
+
+
+            switch (DateiName.FileSuffix()) {
+                case "XML":
+                    return File.ReadAllText(DateiName, Encoding.UTF8);
+                default:
+                    return File.ReadAllText(DateiName, Encoding.Default);
+            }
+
+
+        }
+
+        public static string GetFileInfo(string filename, bool mustDo) {
+            try {
+                var f = new FileInfo(filename);
+                return f.LastWriteTimeUtc.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
+            }
+            catch {
+                if (!mustDo) { return string.Empty; }
+                Develop.CheckStackForOverflow();
+                Pause(0.5, false);
+                return GetFileInfo(filename, mustDo);
+            }
+        }
+
+
 
     }
 }

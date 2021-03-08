@@ -394,7 +394,7 @@ namespace BlueControls.Controls
 
                     _Bitmap.Save(NDT, ImageFormat.Png);
 
-                    modAllgemein.ExecuteFile(NDT);
+                    ExecuteFile(NDT);
                     return true;
 
             }

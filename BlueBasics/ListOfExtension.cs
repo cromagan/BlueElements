@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using static BlueBasics.modConverter;
+using static BlueBasics.FileOperations;
 
 namespace BlueBasics
 {
@@ -231,7 +232,7 @@ namespace BlueBasics
 
         public static void Load(this List<string> L, string Filename)
         {
-            var t = modAllgemein.LoadFromDisk(Filename);
+            var t = LoadFromDisk(Filename);
 
             L.Clear();
             L.AddRange(t.SplitByCR());
@@ -248,7 +249,7 @@ namespace BlueBasics
                 System.IO.Directory.CreateDirectory(DateiName.FilePath());
             }
 
-            modAllgemein.SaveToDisk(DateiName, t, ExecuteAfter);
+            SaveToDisk(DateiName, t, ExecuteAfter);
         }
 
 

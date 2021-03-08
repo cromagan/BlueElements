@@ -550,7 +550,7 @@ namespace BlueDatabase {
                     if (txtList.Count > 1) {
                         //var tmpn = "tmpList_" + Columns[0].Name;
                         //var tmpt = "var " + tmpn + " = " + txtListString + ";";
-                        return ("if (Contains(" + Columns[0].Name + ", " + txtJoinedKomma + ") { ", "} ");
+                        return ("if (Contains(" + Columns[0].Name + ", false, " + txtJoinedKomma + ") { ", "} ");
                     }
 
 
@@ -614,7 +614,7 @@ namespace BlueDatabase {
 
 
                         if (thisc.Format == enDataFormat.Text || thisc.Format == enDataFormat.LinkedCell || thisc.Format == enDataFormat.BildCode || thisc.Format == enDataFormat.Datum_und_Uhrzeit) {
-                            thist = thisc.Name + " = " + txtJoined + ";";
+                            thist = thisc.Name + " = \"" + txtJoined + "\";";
                         }
 
                         if (thisc.Format == enDataFormat.Bit) {
@@ -640,13 +640,13 @@ namespace BlueDatabase {
 
 
                 case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
-                    return ("if (EndsWith(" + Columns[0].Name + ", \" \", \"\\r\", \"\\n\", \"\\t\")) {", "}");
+                    return ("if (EndsWith(" + Columns[0].Name + ", false, \" \", \"\\r\", \"\\n\", \"\\t\")) {", "}");
 
                 case enAction.Enthält:
                 case enAction.Enthält_Zeichenkette:
                     var s = "if (";
                     foreach (var thisc in Columns) {
-                        s = s + "Contains(" + Columns[0].Name + ", " + txtJoinedKomma + ") ||";
+                        s = s + "Contains(" + Columns[0].Name + ", false, " + txtJoinedKomma + ") ||";
                     }
                     s = s.TrimEnd(" ||") + ") {";
                     return (s, "}");
@@ -654,7 +654,7 @@ namespace BlueDatabase {
                 case enAction.Enthält_NICHT_Zeichenkette:
                     var s2 = "if (";
                     foreach (var thisc in Columns) {
-                        s2 = s2 + "!Contains(" + Columns[0].Name + ", " + txtJoinedKomma + ") &&";
+                        s2 = s2 + "!Contains(" + Columns[0].Name + ", false, " + txtJoinedKomma + ") &&";
                     }
                     s2 = s2.TrimEnd(" &&") + ") {";
                     return (s2, "}");
@@ -666,7 +666,7 @@ namespace BlueDatabase {
 
                 case enAction.Wert_Weg:
                     if (Columns.Count != 1) { return (ct, ""); }
-                    return ("Remove(" + Columns[0].Name + ", " + txtJoinedKomma + ");", "");
+                    return ("Remove(" + Columns[0].Name + ", false,  " + txtJoinedKomma + ");", "");
 
 
                 case enAction.Anmerkung:
@@ -675,7 +675,7 @@ namespace BlueDatabase {
                 case enAction.Formatfehler_des_Zelleninhaltes:
                 case enAction.Enthält_ungültige_Zeichen:
                 case enAction.Berechnung_ist_True:
-                    return (ct + "if (false) { // Deaktiverter Inhalt", "}");
+                    return (ct + "if (false) { // Deaktivierter Inhalt", "}");
 
                 case enAction.Sperre_die_Zelle:
                     return (ct, "");

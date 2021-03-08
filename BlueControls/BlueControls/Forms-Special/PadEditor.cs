@@ -24,6 +24,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using System.Drawing;
+using static BlueBasics.FileOperations;
 
 
 
@@ -285,7 +286,7 @@ namespace BlueControls.Forms {
             var t = Pad.Item.ToString();
             Pad.Grid = ckbRaster.Checked;
 
-            modAllgemein.SaveToDisk(SaveTab.FileName, t, false);
+            SaveToDisk(SaveTab.FileName, t, false);
 
 
             btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
@@ -312,7 +313,7 @@ namespace BlueControls.Forms {
 
         private void LoadFile(string fileName) {
             Pad.Item.Clear();
-            var t = modAllgemein.LoadFromDisk(fileName);
+            var t = LoadFromDisk(fileName);
 
             Pad.Item = new ItemCollectionPad(t, fileName);
             ItemChanged();

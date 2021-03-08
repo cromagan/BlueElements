@@ -199,7 +199,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (fileOrLayoutID.FileSuffix().ToUpper() == "BCR") {
                     Pad.Enabled = true;
                     _LoadedLayout = fileOrLayoutID;
-                    var l = modAllgemein.LoadFromDisk(fileOrLayoutID);
+                    var l = LoadFromDisk(fileOrLayoutID);
                     Pad.Item = new ItemCollectionPad(l, string.Empty);
                     ItemChanged();
 
@@ -251,7 +251,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 Database.Layouts[ind] = newl;
             }
             else if (_LoadedLayout.FileSuffix().ToUpper() == "BCR") {
-                modAllgemein.SaveToDisk(_LoadedLayout, newl, false);
+                SaveToDisk(_LoadedLayout, newl, false);
             }
 
 
@@ -485,18 +485,18 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void LayBearb_Click(object sender, System.EventArgs e) {
-            modAllgemein.ExecuteFile("notepad.exe", Layout1.Text, false);
+            ExecuteFile("notepad.exe", Layout1.Text, false);
         }
 
         private void LayOpen_Click(object sender, System.EventArgs e) {
-            modAllgemein.ExecuteFile(Layout1.Text, null, false);
+            ExecuteFile(Layout1.Text, null, false);
         }
 
         private void LayVZ_Click(object sender, System.EventArgs e) {
 
             if (string.IsNullOrEmpty(_AdditionalLayoutPath) && Database != null) { _AdditionalLayoutPath = Database.Filename.FilePath() + "Layouts\\"; }
 
-            modAllgemein.ExecuteFile(_AdditionalLayoutPath);
+            ExecuteFile(_AdditionalLayoutPath);
         }
 
         private void befülleLayoutDropdown() {

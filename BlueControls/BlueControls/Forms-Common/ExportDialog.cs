@@ -269,7 +269,7 @@ namespace BlueControls.Forms
 
         private void Button1_Click(object sender, System.EventArgs e)
         {
-            modAllgemein.ExecuteFile(ZielPfad);
+            ExecuteFile(ZielPfad);
         }
 
         private void WeiterEinträge_Click(object sender, System.EventArgs e)
@@ -361,7 +361,7 @@ namespace BlueControls.Forms
 
         private void Exported_ItemClicked(object sender, BasicListItemEventArgs e)
         {
-            modAllgemein.ExecuteFile(e.Item.Internal);
+            ExecuteFile(e.Item.Internal);
         }
 
         private void FrmDrucken_Drucken_Click(object sender, System.EventArgs e)

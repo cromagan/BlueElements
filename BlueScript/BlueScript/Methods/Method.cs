@@ -39,17 +39,15 @@ namespace BlueScript {
         }
 
 
-        //public abstract bool ReturnsVoid { get; }
 
-        //public abstract string ID { get; }
+        public abstract string Syntax { get; }
         public abstract List<string> Comand { get; }
         public abstract string StartSequence { get; }
         public abstract string EndSequence { get; }
-        //public abstract List<string> AllowedInIDs { get; }
         public abstract bool GetCodeBlockAfter { get; }
         public abstract string Returns { get; }
 
-        internal abstract strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen);
+        public abstract strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen);
 
 
         public strCanDoFeedback CanDo(string scriptText, int pos, string expectedvariablefeedback) {
@@ -381,7 +379,7 @@ namespace BlueScript {
         }
 
 
-        public List<string> SplitAttribute(string attributtext, List<Variable> variablen, bool let0asitis) {
+        public List<string> SplitAttribute(string attributtext, List<Variable> variablen, int modifiyab) {
 
             var attributes = new List<string>();
 
@@ -435,7 +433,7 @@ namespace BlueScript {
 
             for (var n = 0; n < attributes.Count; n++) {
 
-                if (!let0asitis || n > 0) {
+                if (n >= modifiyab) {
 
                     var t = ReplaceVariable(attributes[n], variablen);
                     if (!string.IsNullOrEmpty(t.ErrorMessage)) {

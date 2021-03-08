@@ -34,13 +34,11 @@ namespace BlueScript {
         public Method_BerechneVariable(Script parent) : base(parent) { }
 
 
-        //public Method_var(Script parent, string toParse) : base(parent, toParse) { }
-        //public override string ID { get => "var_caluclate"; }
+        public override string Syntax { get => "VariablenName = Berechung;"; }
 
         public override List<string> Comand { get => Parent.Variablen.AllNames(); }
         public override string StartSequence { get => "="; }
         public override string EndSequence { get => ";"; }
-        //public override List<string> AllowedInIDs { get => null; }
         public override bool GetCodeBlockAfter { get => false; }
         public override string Returns { get => string.Empty; }
 
@@ -48,7 +46,7 @@ namespace BlueScript {
 
 
 
-        internal override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
 
             var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.Char_az + "_" + Constants.Char_Numerals);
             var variable = variablen.Get(variableName);
@@ -58,7 +56,7 @@ namespace BlueScript {
 
 
 
-            var bs = SplitAttribute(infos.AttributText, variablen, false);
+            var bs = SplitAttribute(infos.AttributText, variablen, 0);
 
             if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
 

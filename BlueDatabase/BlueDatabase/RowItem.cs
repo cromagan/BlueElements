@@ -322,6 +322,92 @@ namespace BlueDatabase {
 
 
 
+        private void VariableToCell(ColumnItem thisCol, List<Variable> vars) {
+
+            var s = vars.Get(thisCol.Name);
+
+            if (s == null) { return; }
+
+            if (thisCol.MultiLine) {
+                CellSet(thisCol, s.ValueString, true);
+                return;
+            }
+
+
+            switch (thisCol.Format) {
+                case enDataFormat.Bit:
+                    if (s.ValueString.ToLower() == "true") {
+                        CellSet(thisCol, true, true);
+                    }
+                    else {
+                        CellSet(thisCol, false, false);
+                    }
+                    return;
+
+                case enDataFormat.Ganzzahl:
+                case enDataFormat.Gleitkommazahl:
+                    CellSet(thisCol, s.SystemVariable, true);
+                    return;
+
+                case enDataFormat.Text:
+                case enDataFormat.BildCode:
+                case enDataFormat.Datum_und_Uhrzeit:
+                case enDataFormat.FarbeInteger:
+                case enDataFormat.RelationText:
+                case enDataFormat.Schrift:
+                case enDataFormat.Text_mit_Formatierung:
+                case enDataFormat.Link_To_Filesystem:
+                case enDataFormat.LinkedCell:
+                case enDataFormat.Columns_für_LinkedCellDropdown:
+                case enDataFormat.Values_für_LinkedCellDropdown:
+                    CellSet(thisCol, s.SystemVariable, true);
+                    return;
+
+            }
+        }
+
+
+        public static Variable CellToVariable(ColumnItem thisCol, RowItem r) {
+
+
+            if (thisCol.MultiLine) {
+                return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.List);
+            }
+
+
+            switch (thisCol.Format) {
+                case enDataFormat.Bit:
+                    if (r.CellGetString(thisCol) == "+") {
+                        return new Variable(thisCol.Name, "true", enVariableDataType.Bool);
+                    }
+                    else {
+                        return new Variable(thisCol.Name, "false", enVariableDataType.Bool);
+                    }
+
+                case enDataFormat.Ganzzahl:
+                case enDataFormat.Gleitkommazahl:
+                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.Number);
+
+                case enDataFormat.Text:
+                case enDataFormat.BildCode:
+                case enDataFormat.Datum_und_Uhrzeit:
+                case enDataFormat.FarbeInteger:
+                case enDataFormat.RelationText:
+                case enDataFormat.Schrift:
+                case enDataFormat.Text_mit_Formatierung:
+                case enDataFormat.Link_To_Filesystem:
+                case enDataFormat.LinkedCell:
+                case enDataFormat.Columns_für_LinkedCellDropdown:
+                case enDataFormat.Values_für_LinkedCellDropdown:
+                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.String);
+
+            }
+            return null;
+
+        }
+
+
+
         /// <summary>
         /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
         /// </summary>
@@ -343,44 +429,14 @@ namespace BlueDatabase {
             #region Variablen für Skript erstellen
             var vars = new List<Variable>();
 
-            foreach(var thisCol in Database.Column) {
-
-                switch (thisCol.Format) {
-                    case enDataFormat.Bit:
-                        if (CellGetString(thisCol) == "+") {
-                            vars.Add(new Variable(thisCol.Name, "true", enVariableDataType.Bool));
-                        }
-                        else {
-                            vars.Add(new Variable(thisCol.Name, "false", enVariableDataType.Bool));
-                        }
-                        break;
-
-
-                    case enDataFormat.Ganzzahl:
-                    case enDataFormat.Gleitkommazahl:
-                        vars.Add(new Variable(thisCol.Name, CellGetString(thisCol), enVariableDataType.Number));
-                        break;
-                    case enDataFormat.Text:
-                    case enDataFormat.BildCode:
-                    case enDataFormat.Datum_und_Uhrzeit:
-                    case enDataFormat.FarbeInteger:
-                    case enDataFormat.RelationText:
-                    case enDataFormat.Schrift:
-                    case enDataFormat.Text_mit_Formatierung:
-                    case enDataFormat.Link_To_Filesystem:
-                    case enDataFormat.LinkedCell:
-                    case enDataFormat.Columns_für_LinkedCellDropdown:
-                    case enDataFormat.Values_für_LinkedCellDropdown:
-                        if(thisCol.MultiLine) {
-                            vars.Add(new Variable(thisCol.Name, CellGetString(thisCol), enVariableDataType.List));
-                        } else {
-                            vars.Add(new Variable(thisCol.Name, CellGetString(thisCol), enVariableDataType.String));
-                        }
-                        break;
-
-                }
-
+            foreach (var thisCol in Database.Column) {
+                var v = CellToVariable(thisCol, this);
+                if (v != null) { vars.Add(v); }
             }
+
+
+            vars.Add(new Variable("Filename", Database.Filename, enVariableDataType.String, true, false));
+
             #endregion
 
             var script = new BlueScript.Script(vars);
@@ -390,6 +446,14 @@ namespace BlueDatabase {
 
             if (!onlyTest) {
 
+                if (!string.IsNullOrEmpty(script.Error)) {
+                    if (DoUnfreeze) { Database.Cell.UnFreeze(); }
+                    return script;
+                }
+
+                foreach (var thisCol in Database.Column) {
+                    VariableToCell(thisCol, vars);
+                }
 
 
                 Develop.DebugPrint_NichtImplementiert();
@@ -423,9 +487,9 @@ namespace BlueDatabase {
                 //    }
                 //}
 
-                //// Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
-                //var e = new DoRowAutomaticEventArgs(this);
-                //OnDoSpecialRules(e);
+                // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
+                var e = new DoRowAutomaticEventArgs(this);
+                OnDoSpecialRules(e);
 
 
                 //if (!string.IsNullOrEmpty(e.Feedback) && e.FeedbackColumn == null) { e.FeedbackColumn = Database.Column[0]; }
@@ -443,21 +507,22 @@ namespace BlueDatabase {
             //return ColumnAndErrors.SortedDistinctList();
         }
 
-        public (bool, string, BlueScript.Script) DoAutomatic(bool OnlyTest) {
-            return DoAutomatic(false, false, true);
+
+        public (bool didSuccesfullyCheck, string error, BlueScript.Script script) DoAutomatic(bool onlyTest) {
+            return DoAutomatic(false, false, onlyTest);
         }
 
 
 
-            /// <summary>
-            /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
-            /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
-            /// </summary>
-            /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
-            /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
-            /// <param name="tryforsceonds"></param>
-            /// <returns></returns>
-            public (bool, string, BlueScript.Script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds) {
+        /// <summary>
+        /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
+        /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
+        /// </summary>
+        /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
+        /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
+        /// <param name="tryforsceonds"></param>
+        /// <returns></returns>
+        public (bool didSuccesfullyCheck, string error, BlueScript.Script script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds) {
 
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
@@ -465,7 +530,7 @@ namespace BlueDatabase {
             var t = DateTime.Now;
             do {
                 var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, false);
-                if (erg.ok) { return erg; }
+                if (erg.didSuccesfullyCheck) { return erg; }
 
                 if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
             } while (true);
@@ -477,21 +542,22 @@ namespace BlueDatabase {
         /// </summary>
         /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
         /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
-        public (bool ok, string error, BlueScript.Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, bool onlyTest) {
+        public (bool didSuccesfullyCheck, string error, BlueScript.Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, bool onlyTest) {
 
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
             var feh = Database.ErrorReason(enErrorReason.EditAcut);
 
-            if (!string.IsNullOrEmpty(feh)) {
-                //Develop.DebugPrint(enFehlerArt.Warnung, "Automatik nicht möglich: " + feh);
-                return (false, feh, null);
-            }
+            if (!string.IsNullOrEmpty(feh)) { return (false, feh, null); }
 
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
-            var cols = DoRules(onlyTest);
+            var script = DoRules(onlyTest);
 
-            if (onlyTest) { return (true, string.Empty, cols); }
+            if (onlyTest) { return (true, string.Empty, script); }
+
+            /// didSuccesfullyCheck geht von Dateisystemfehlern aus
+            if (!string.IsNullOrEmpty(script.Error)) { return (true, "Das Skript ist fehlerhaft: \r\n" + script.Error + "\r\n" + script.ErrorCode, script); }
+
 
             // Dann die Abschließenden Korrekturen vornehmen
             foreach (var ThisColum in Database.Column) {
@@ -522,36 +588,33 @@ namespace BlueDatabase {
                 }
             }
 
-            Develop.DebugPrint_NichtImplementiert(); return (true, string.Empty, cols);
-            //TMP_Y = null;
-            //TMP_DrawHeight = null;
 
-
-            //if (Database.Column.SysCorrect.SaveContent) {
-            //    if (IsNullOrEmpty(Database.Column.SysCorrect) || Convert.ToBoolean(cols.Count == 0) != CellGetBoolean(Database.Column.SysCorrect)) { CellSet(Database.Column.SysCorrect, Convert.ToBoolean(cols.Count == 0)); }
-            //}
-            //OnRowChecked(new RowCheckedEventArgs(this, cols));
-
-
+            var cols = new List<string>();
             //var _Info = new List<string>();
+            var _InfoTXT = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
+            foreach (var thisc in Database.Column) {
 
-            //foreach (var ThisString in cols) {
-            //    var X = ThisString.SplitBy("|");
-            //    _Info.AddIfNotExists(X[1]);
-            //}
+                var n = thisc.Name + "_error";
 
-            //var _InfoTXT = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
+                var va = script.Variablen.GetSystem(n);
+                if (n != null) {
+                    cols.Add(thisc.Name + "|" + va.ValueString);
+                    _InfoTXT = _InfoTXT + "<b>" + thisc.ReadableText() + ":<b> " + va.ValueString + "<br><hr><br>";
+                }
+            }
 
-            //if (cols.Count == 0) {
-            //    _InfoTXT += "Diese Zeile ist fehlerfrei.";
-            //}
-            //else {
-            //    _InfoTXT += _Info.JoinWith("<br><hr><br>");
-            //}
+            if (cols.Count == 0) {
+                _InfoTXT += "Diese Zeile ist fehlerfrei.";
+            }
 
-            ////MessageBox.Show(_InfoTXT, enImageCode.Information, "OK");
 
-            //return (true, _InfoTXT); ;
+            if (Database.Column.SysCorrect.SaveContent) {
+                if (IsNullOrEmpty(Database.Column.SysCorrect) || (cols.Count == 0) != CellGetBoolean(Database.Column.SysCorrect)) { CellSet(Database.Column.SysCorrect, cols.Count == 0); }
+            }
+            OnRowChecked(new RowCheckedEventArgs(this, cols));
+
+
+            return (true, _InfoTXT, script); ;
 
         }
 
@@ -788,13 +851,13 @@ namespace BlueDatabase {
         public string CaptionReadable() {
 
 
-            var c= CellGetString(Database.Column.SysChapter);
+            var c = CellGetString(Database.Column.SysChapter);
 
             if (string.IsNullOrEmpty(c)) {
-                return  "- ohne " + Database.Column.SysChapter.Caption + " -";
+                return "- ohne " + Database.Column.SysChapter.Caption + " -";
             }
             else {
-                return  c.Replace("\r", ", ");
+                return c.Replace("\r", ", ");
             }
 
         }

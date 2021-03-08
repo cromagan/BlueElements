@@ -66,6 +66,27 @@ namespace BlueScript {
             Name = name.ToLower();
         }
 
+        public Variable(string name, string value, enVariableDataType type, bool ronly, bool system) {
+
+            if (!IsValidName(name)) {
+                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Ungültiger Variablenname: " + name);
+            }
+
+            if (system) {
+                Name = "*" + name.ToLower();
+            }
+            else {
+
+                Name = name.ToLower();
+            }
+
+
+            ValueString = value;
+            Type = type;
+            Readonly = ronly;
+            SystemVariable = system;
+        }
+
 
         public Variable(string name, string value, enVariableDataType type) {
 
@@ -103,8 +124,18 @@ namespace BlueScript {
         }
 
 
-        public string Name { get; private set; }
-        public string ValueString { get; set; }
+        public bool SystemVariable { get; set; }
+        public bool Readonly { get; set; }
+        public string Name { get; set; }
+
+        private string _ValueString = string.Empty;
+        public string ValueString {
+            get { return _ValueString; }
+            set {
+                if (Readonly) { return; }
+                _ValueString = value;
+            }
+        }
 
         public enVariableDataType Type { get; set; }
 
@@ -133,7 +164,20 @@ namespace BlueScript {
         public static Variable Get(this List<Variable> vars, string name) {
 
             foreach (var thisv in vars) {
-                if (thisv.Name.ToUpper() == name.ToUpper()) {
+                if (!thisv.SystemVariable && thisv.Name.ToUpper() == name.ToUpper()) {
+                    return thisv;
+                }
+
+            }
+
+            return null;
+        }
+
+
+        public static Variable GetSystem(this List<Variable> vars, string name) {
+
+            foreach (var thisv in vars) {
+                if (thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper()) {
                     return thisv;
                 }
 

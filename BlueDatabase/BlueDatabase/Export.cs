@@ -679,12 +679,12 @@ namespace BlueDatabase {
             {
                 Row
             };
-            InternalCreateLayout(TMPList, modAllgemein.LoadFromDisk(LoadFile), SaveFile, false);
+            InternalCreateLayout(TMPList, LoadFromDisk(LoadFile), SaveFile, false);
         }
 
         public static void CreateLayout(List<RowItem> Rows, string LoadFile, string SaveFile) {
             if (!FileExists(LoadFile)) { return; }
-            InternalCreateLayout(Rows, modAllgemein.LoadFromDisk(LoadFile), SaveFile, false);
+            InternalCreateLayout(Rows, LoadFromDisk(LoadFile), SaveFile, false);
         }
 
 
@@ -732,7 +732,7 @@ namespace BlueDatabase {
             tmpSave += Foot;
             if (!string.IsNullOrEmpty(SaveFile)) // Dateien ohne SUfiix-Angabe könenn nicht gespeichert werden
             {
-                modAllgemein.SaveToDisk(SaveFile, tmpSave, false);
+                SaveToDisk(SaveFile, tmpSave, false);
             }
 
             return tmpSave;

@@ -28,43 +28,57 @@ using System.Reflection;
 namespace BlueScript {
     public class Script {
 
-        /*
-        IsNullOrEmpty(Var);
-        SetError(Text, Spalte1, Spalte2, ...);
-        var list = {"1","2",...}
-        Contains(Var, value1, value2, value3); -- Für Listen und Strings
-        Exception(message);
-        Add(List, value1, value2, value3);
-        Remove(List, value1, value2, value3);
-        Exception(message);
-        EndsWith(var, value1, value2, value3);
-         * 
-         */
-        public string Error { get; private set; }
-        public string ErrorCode { get; private set; }
+        private string _error;
+        private string _errorCode;
+
+        public string Error {
+            get => _error;
+            private set { _error = value.Replace("{", "").Replace("}", ""); }
+        }
+        public string ErrorCode {
+            get => _errorCode;
+            private set { _errorCode = value.Replace("{", "").Replace("}", ""); }
+        }
 
         string _ScriptText = string.Empty;
 
-        public static IEnumerable<Method> Comands;
+        public static IEnumerable<Method> Comands = null;
 
         public readonly List<Variable> Variablen;
 
         public static IEnumerable<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
             var objects = new List<T>();
-            foreach (var type in
-                Assembly.GetAssembly(typeof(T)).GetTypes()
-                .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
+
+            var types =
+            from a in AppDomain.CurrentDomain.GetAssemblies()
+            from t in a.GetTypes()
+            select t;
+
+            foreach (var type in types.Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
                 objects.Add((T)Activator.CreateInstance(type, constructorArgs));
+
             }
-            //objects.Sort();
+
+
+            //foreach( var thisa in  AppDomain.CurrentDomain.GetAssemblies())
+            //       {
+
+
+            //   foreach (var type in
+            //       Assembly.GetAssembly(typeof(T)).GetTypes()
+            //       .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
+            //       objects.Add((T)Activator.CreateInstance(type, constructorArgs));
+            //   }
+            //   //objects.Sort();
             return objects;
         }
 
 
         public Script(List<Variable> variablen) {
 
-
-            Comands = GetEnumerableOfType<Method>(this);
+            if (Comands == null) {
+                Comands = GetEnumerableOfType<Method>(this);
+            }
 
             Variablen = variablen;
         }
@@ -154,7 +168,7 @@ namespace BlueScript {
                 var f = ComandOnPosition(tmptxt, pos, variablen, string.Empty);
 
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                    return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(15, tmptxt.Length - pos)));
+                    return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(30, tmptxt.Length - pos)));
                 }
                 pos = f.Position;
 
@@ -223,7 +237,7 @@ namespace BlueScript {
 
                     case "]":
                         if (!Gans) {
-                            if (EckigeKlammern <1) { return (-1, string.Empty); }
+                            if (EckigeKlammern < 1) { return (-1, string.Empty); }
                             EckigeKlammern--;
                         }
                         break;
@@ -241,7 +255,7 @@ namespace BlueScript {
                     case ")":
                         if (!Gans && !ignoreKlammern) {
                             if (EckigeKlammern > 0) { return (-1, string.Empty); }
-                            if (klammern <1) { return (-1, string.Empty); }
+                            if (klammern < 1) { return (-1, string.Empty); }
                             klammern--;
                         }
                         break;
@@ -261,7 +275,7 @@ namespace BlueScript {
                         if (!Gans) {
                             if (klammern > 0) { return (-1, string.Empty); }
                             if (EckigeKlammern > 0) { return (-1, string.Empty); }
-                            if (GeschwKlammern<1) { return (-1, string.Empty); }
+                            if (GeschwKlammern < 1) { return (-1, string.Empty); }
                             GeschwKlammern--;
                         }
                         break;
@@ -270,7 +284,7 @@ namespace BlueScript {
 
 
 
-                if (klammern == 0 && !Gans && GeschwKlammern==0 && EckigeKlammern == 0) {
+                if (klammern == 0 && !Gans && GeschwKlammern == 0 && EckigeKlammern == 0) {
 
 
                     if (!checkforSeparatorbefore || pos == 0 || TR.Contains(txt.Substring(pos - 1, 1))) {

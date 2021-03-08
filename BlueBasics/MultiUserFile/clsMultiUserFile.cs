@@ -280,9 +280,9 @@ namespace BlueBasics.MultiUserFile {
                     var f = ErrorReason(checkmode);
 
                     if (string.IsNullOrEmpty(f)) {
-                        var tmpLastSaveCode1 = GetFileInfo(true);
+                        var tmpLastSaveCode1 = GetFileInfo(Filename, true);
                         _tmp = File.ReadAllBytes(Filename);
-                        tmpLastSaveCode2 = GetFileInfo(true);
+                        tmpLastSaveCode2 = GetFileInfo(Filename, true);
 
                         if (tmpLastSaveCode1 == tmpLastSaveCode2) { break; }
 
@@ -501,7 +501,7 @@ namespace BlueBasics.MultiUserFile {
 
             // Blockdatei da, wir sind save. Andere Computer lassen die Datei ab jetzt in Ruhe!
 
-            if (GetFileInfo(true) != fileInfoBeforeSaving) {
+            if (GetFileInfo(Filename, true) != fileInfoBeforeSaving) {
                 DeleteBlockDatei(false, true);
                 IsSaving = false;
                 return Feedback("Datei wurde inzwischen verändert.");
@@ -581,7 +581,7 @@ namespace BlueBasics.MultiUserFile {
             }
 
             try {
-                var Inhalt2 = modAllgemein.LoadFromDisk(Blockdateiname());
+                var Inhalt2 = LoadFromDisk(Blockdateiname());
                 if (_inhaltBlockdatei != Inhalt2) {
                     Develop.DebugPrint("Block-Datei Konflikt 3\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei + "\r\n\r\nIst: " + Inhalt2);
                     return false;
@@ -656,7 +656,7 @@ namespace BlueBasics.MultiUserFile {
 
                 if (_CheckedAndReloadNeed) { return true; }
 
-                if (GetFileInfo(false) != _LastSaveCode) {
+                if (GetFileInfo(Filename, false) != _LastSaveCode) {
                     _CheckedAndReloadNeed = true;
                     return true;
                 }
@@ -800,7 +800,7 @@ namespace BlueBasics.MultiUserFile {
             _dataOnDisk = l.ToStringConvert();
 
 
-            _LastSaveCode = GetFileInfo(true);
+            _LastSaveCode = GetFileInfo(Filename, true);
             _CheckedAndReloadNeed = false;
         }
 
@@ -813,18 +813,7 @@ namespace BlueBasics.MultiUserFile {
         }
 
 
-        private string GetFileInfo(bool MustDo) {
-            try {
-                var f = new FileInfo(Filename);
-                return f.LastWriteTimeUtc.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
-            }
-            catch {
-                if (!MustDo) { return string.Empty; }
-                Develop.CheckStackForOverflow();
-                Pause(0.5, false);
-                return GetFileInfo(MustDo);
-            }
-        }
+
 
         private void OnSavedToDisk() {
             SavedToDisk?.Invoke(this, System.EventArgs.Empty);
@@ -1000,7 +989,7 @@ namespace BlueBasics.MultiUserFile {
                 var f = ErrorReason(enErrorReason.Save);
                 if (!string.IsNullOrEmpty(f)) { _DoingTempFile = false; return (string.Empty, string.Empty, string.Empty); }
 
-                FileInfoBeforeSaving = GetFileInfo(true);
+                FileInfoBeforeSaving = GetFileInfo(Filename, true);
 
                 if (_zipped) {
                     var bytes = ToListOfByte(true).ToArray();

@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -36,6 +37,10 @@ namespace BlueControls.BlueDatabaseDialogs {
     internal sealed partial class DatabaseHeadEditor {
         private readonly Database _Database;
 
+
+
+        private string _ExternCode = string.Empty;
+        private string _FileState = string.Empty;
 
 
         private bool frmHeadEditor_FormClosing_isin;
@@ -60,7 +65,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (frmHeadEditor_FormClosing_isin) { return; }
             frmHeadEditor_FormClosing_isin = true;
 
-
+            if (ExternTimer.Enabled) {
+                ExternTimer.Enabled = false;
+                ExternTimer_Tick(null, System.EventArgs.Empty);
+            }
 
 
             _Database.GlobalShowPass = txbKennwort.Text;
@@ -630,28 +638,113 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
             var r = _Database.Row.First();
+            _Database.RulesScript = txtSkript.Text;
 
             (var ok, var message, var s) = r.DoAutomatic(true);
 
             var t = string.Empty;
 
-            foreach( var thisv in s.Variablen) {
+            foreach (var thisv in s.Variablen) {
                 t = t + thisv.ToString() + "\r\n";
             }
             txbVariablen.Text = t;
 
 
+            var co = string.Empty;
+
+            foreach (var thisc in BlueScript.Script.Comands) {
+                co = co + thisc.Syntax + "\r\n";
+                co = co + "    Rückgabetyp: " + thisc.Returns + "\r\n\r\n";
+            }
+            txbComms.Text = co;
+
+
             if (!string.IsNullOrEmpty(message)) {
-                txbSkriptInfo.Text = message;
+                txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] " + message;
                 return;
             }
 
-            txbSkriptInfo.Text = s.Error + "\r\n" + s.ErrorCode;
+
+            if (string.IsNullOrEmpty(s.Error)) {
+
+                txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.";
+
+            }
+            else {
+                txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] " + s.Error + "\r\n >>> " + s.ErrorCode;
+            }
+
+ 
 
 
         }
 
         private void tabCSckript_SelectedIndexChanged(object sender, System.EventArgs e) {
+
+        }
+
+        private void btnExtern_Click(object sender, System.EventArgs e) {
+            txtSkript.Enabled = false;
+
+
+            var txtplus = FileExists(@"C:\Program Files (x86)\Notepad++\notepad++.exe");
+
+
+
+
+            if (string.IsNullOrEmpty(_ExternCode)) {
+                if (txtplus) {
+                    _ExternCode = TempFile(string.Empty, string.Empty, "cs");
+                }
+                else {
+                    _ExternCode = TempFile(string.Empty, string.Empty, "txt");
+                }
+
+            }
+            else {
+                ExternTimer_Tick(null, System.EventArgs.Empty);
+            }
+
+
+            SaveToDisk(_ExternCode, txtSkript.Text, false);
+
+            _FileState = GetFileInfo(_ExternCode, true);
+
+            if (txtplus) {
+                ExecuteFile(@"C:\Program Files (x86)\Notepad++\notepad++.exe", _ExternCode, false, true);
+            }
+            else {
+                ExecuteFile(_ExternCode, string.Empty, false, true);
+            }
+
+
+
+            ExternTimer.Enabled = true;
+
+
+        }
+
+        private void ExternTimer_Tick(object sender, System.EventArgs e) {
+            ExternTimer.Enabled = false;
+
+            if (!FileExists(_ExternCode)) {
+
+                txtSkript.Enabled = true;
+                return;
+            }
+
+
+            var nfilestate = GetFileInfo(_ExternCode, true);
+
+            if (_FileState == nfilestate) { ExternTimer.Enabled = true; return; }
+
+            _FileState = nfilestate;
+
+            txtSkript.Text = LoadFromDisk(_ExternCode);
+
+
+            ExternTimer.Enabled = true;
+
 
         }
     }

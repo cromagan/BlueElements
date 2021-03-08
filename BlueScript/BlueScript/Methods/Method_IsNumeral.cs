@@ -25,17 +25,20 @@ using System.Threading.Tasks;
 using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
 using BlueBasics;
+using static BlueBasics.Extensions;
+using BlueBasics;
 using static BlueBasics.modConverter;
 
+
 namespace BlueScript {
-    class Method_IsNullOrEmpty : Method {
+    class Method_IsNumeral : Method {
 
 
-        public Method_IsNullOrEmpty(Script parent) : base(parent) { }
+        public Method_IsNumeral(Script parent) : base(parent) { }
 
 
-        public override string Syntax { get => "isNullOrEmpty(Variable)"; }
-        public override List<string> Comand { get => new List<string>() { "isnullorempty" }; }
+        public override string Syntax { get => "isNumeral(Value)"; }
+        public override List<string> Comand { get => new List<string>() { "isnumeral" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
@@ -48,17 +51,14 @@ namespace BlueScript {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            var bs = SplitAttribute(infos.AttributText, variablen, 1);
+            var bs = SplitAttribute(infos.AttributText, variablen, 0);
 
             if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
 
 
-            var variable = variablen.Get(bs[0]);
-            if (variable == null) {
-                return new strDoItFeedback("Variable " + bs[0] + " nicht gefunden");
-            }
+            bs[0]  = bs[0].Trim("\"");
 
-            if (string.IsNullOrEmpty(variable.ValueString)) {
+           if (bs[0].IsNumeral()) {
                 return new strDoItFeedback("true", string.Empty);
             }
 

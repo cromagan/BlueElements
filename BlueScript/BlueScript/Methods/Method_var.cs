@@ -31,6 +31,7 @@ namespace BlueScript {
 
         public Method_var(Script parent) : base(parent) { }
 
+        public override string Syntax { get => "var VariablenName = Wert;"; }
 
 
         public override List<string> Comand { get => new List<string>() { "var" }; }
@@ -42,7 +43,7 @@ namespace BlueScript {
 
 
 
-        internal override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 

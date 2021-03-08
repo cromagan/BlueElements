@@ -28,15 +28,16 @@ using BlueBasics;
 using static BlueBasics.modConverter;
 
 namespace BlueScript {
-    class Method_Contains : Method {
+    class Method_EndsWith : Method {
 
 
-        public Method_Contains(Script parent) : base(parent) { }
+        public Method_EndsWith(Script parent) : base(parent) { }
 
 
-        public override string Syntax { get => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...);"; }
+        public override string Syntax { get => "EndsWith(StringVariable, CaseSensitive, Value1, Value2, ...);"; }
 
-        public override List<string> Comand { get => new List<string>() { "contains" }; }
+
+        public override List<string> Comand { get => new List<string>() { "endswith" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
@@ -62,19 +63,19 @@ namespace BlueScript {
                 return new strDoItFeedback("Variable " + bs[0] + " nicht gefunden");
             }
 
-            if (variable.Type == Skript.Enums.enVariableDataType.List) {
+            //if (variable.Type == Skript.Enums.enVariableDataType.List) {
 
-                var x = variable.ValueString.SplitByCRToList();
+            //    var x = variable.ValueString.SplitByCRToList();
 
-                for (var z = 2; z < bs.Count; z++) {
+            //    for (var z = 2; z < bs.Count; z++) {
 
-                    if (x.Contains(bs[z].Trim("\""), css)) {
-                        return new strDoItFeedback("true", string.Empty);
-                    }
-                }
+            //        if (x.Contains(bs[z].Trim("\""), css)) {
+            //            return new strDoItFeedback("true", string.Empty);
+            //        }
+            //    }
 
-                return new strDoItFeedback("false", string.Empty);
-            }
+            //    return new strDoItFeedback("false", string.Empty);
+            //}
 
 
 
@@ -87,12 +88,12 @@ namespace BlueScript {
                 for (var z = 2; z < bs.Count; z++) {
 
                     if (css) {
-                        if (x.Contains(bs[z])) {
+                        if (x.EndsWith(bs[z])) {
                             return new strDoItFeedback("true", string.Empty);
                         }
                     }
                     else {
-                        if (x.ToLower().Contains(bs[z].ToLower())) {
+                        if (x.ToLower().EndsWith(bs[z].ToLower())) {
                             return new strDoItFeedback("true", string.Empty);
                         }
                     }
@@ -104,7 +105,7 @@ namespace BlueScript {
             }
 
 
-            return new strDoItFeedback("Variablentyp unterstützt den Befehl Contains nicht: " + infos.AttributText );
+            return new strDoItFeedback("EndsWith unterstütz den Datentyp nicht: " + infos.AttributText);
 
 
             //if (string.IsNullOrEmpty(variable.ValueString)) {

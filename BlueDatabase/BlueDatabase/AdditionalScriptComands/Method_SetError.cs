@@ -28,41 +28,61 @@ using BlueBasics;
 using static BlueBasics.modConverter;
 
 namespace BlueScript {
-    class Method_max : Method {
+    public class Method_SetError : BlueScript.Method {
 
 
-        public Method_max(Script parent) : base(parent) { }
+        public Method_SetError(Script parent) : base(parent) { }
+
+        public override string Syntax { get => "SetError(Nachricht, Column1, Colum2, ...);"; }
 
 
-        public override string Syntax { get => "Max(Value1, Value2, ...)"; }
-
-
-        public override List<string> Comand { get => new List<string>() { "max" }; }
+        public override List<string> Comand { get => new List<string>() { "seterror" }; }
         public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
+        public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => "numeral"; }
-
-
-
+        public override string Returns { get => string.Empty; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            var bs = SplitAttribute(infos.AttributText, variablen, 0);
+            var bs = SplitAttribute(infos.AttributText, variablen, 9999);
 
             if (bs == null || bs.Count < 2) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
 
-            var val = double.MinValue;
 
-            foreach (var thisval in bs) {
-                if (!thisval.IsNumeral()) { return new strDoItFeedback(thisval + " ist keine Zahl."); }
-                val = Math.Max(DoubleParse(thisval), val);
+            for (var z = 1; z < bs.Count; z++) {
+
+                var v = variablen.Get(bs[z]);
+                if (v == null) { return new strDoItFeedback("Spalte nicht gefunden: " + bs[z]); }
+
+          
+                var n = bs[z].ToLower() + "_error";
+
+                var ve = variablen.GetSystem(n);
+
+
+                //foreach (var thisv in variablen) {
+                //    if (thisv.Name == n) {
+                //        ve = thisv; break;
+                //    }
+                //}
+
+
+                if (ve == null) {
+                    ve = new Variable(n, string.Empty, Skript.Enums.enVariableDataType.List, false, true);
+                    variablen.Add(ve);
+                }
+
+                var l = ve.ValueString.SplitByCRToList();
+                l.AddIfNotExists(bs[0].Trim("\""));
+                ve.ValueString = l.JoinWithCr();
 
             }
 
-            return new strDoItFeedback(val.ToString(), string.Empty);
+
+
+            return new strDoItFeedback();
         }
     }
 }
