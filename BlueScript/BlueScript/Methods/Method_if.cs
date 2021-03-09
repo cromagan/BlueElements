@@ -46,22 +46,26 @@ namespace BlueScript {
 
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            var bs = SplitAttribute(infos.AttributText, variablen, 0);
+            var bs = SplitAttribute(infos.AttributText, s, 0);
 
-            if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            if (bs == null || bs.Count != 1) { return new strDoItFeedback("'If' erwartet genau ein Attribut: " + infos.AttributText); }
 
 
             var x = GetBool(bs[0]);
-            if (x == null) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            if (x == null) { return new strDoItFeedback("'If' konnte nicht berechnet werden: " + infos.AttributText); }
 
 
             if (x == "true") {
-                var (err, ermess2) = Script.Parse(infos.CodeBlockAfterText, variablen, false);
-                if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback("Fehler im If-Codeblock: " + ermess2); }
+                var (err, ermess2) = Script.Parse(infos.CodeBlockAfterText, false, s);
+                if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
+            }
+            else {
+                s.Line += infos.LineBreakInCodeBlock;
+
             }
 
             return new strDoItFeedback(string.Empty, string.Empty);

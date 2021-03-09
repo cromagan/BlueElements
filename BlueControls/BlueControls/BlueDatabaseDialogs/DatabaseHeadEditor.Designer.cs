@@ -75,6 +75,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabVariablen = new BlueControls.Controls.TabPage();
             this.txbVariablen = new BlueControls.Controls.TextBox();
             this.tabBefehle = new BlueControls.Controls.TabPage();
+            this.txbComms = new BlueControls.Controls.TextBox();
             this.grpTextAllgemein = new BlueControls.Controls.GroupBox();
             this.txbSkriptInfo = new BlueControls.Controls.TextBox();
             this.btnTest = new BlueControls.Controls.Button();
@@ -98,7 +99,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnFremdImport = new BlueControls.Controls.Button();
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
             this.ExternTimer = new System.Windows.Forms.Timer(this.components);
-            this.txbComms = new BlueControls.Controls.TextBox();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -632,6 +632,16 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabBefehle.TabIndex = 2;
             this.tabBefehle.Text = "Befehle";
             // 
+            // txbComms
+            // 
+            this.txbComms.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbComms.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txbComms.Location = new System.Drawing.Point(0, 0);
+            this.txbComms.Name = "txbComms";
+            this.txbComms.Size = new System.Drawing.Size(1025, 504);
+            this.txbComms.TabIndex = 2;
+            this.txbComms.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
             // grpTextAllgemein
             // 
             this.grpTextAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -890,16 +900,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.ExternTimer.Interval = 1000;
             this.ExternTimer.Tick += new System.EventHandler(this.ExternTimer_Tick);
-            // 
-            // txbComms
-            // 
-            this.txbComms.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbComms.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txbComms.Location = new System.Drawing.Point(0, 0);
-            this.txbComms.Name = "txbComms";
-            this.txbComms.Size = new System.Drawing.Size(1025, 504);
-            this.txbComms.TabIndex = 2;
-            this.txbComms.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // DatabaseHeadEditor
             // 

@@ -17,15 +17,9 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static BlueBasics.modAllgemein;
-using static BlueBasics.Extensions;
 using BlueBasics;
-using static BlueBasics.modConverter;
+using System.Collections.Generic;
+using static BlueBasics.Extensions;
 
 namespace BlueScript {
     public class Method_SetError : BlueScript.Method {
@@ -42,24 +36,24 @@ namespace BlueScript {
         public override bool GetCodeBlockAfter { get => false; }
         public override string Returns { get => string.Empty; }
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            var bs = SplitAttribute(infos.AttributText, variablen, 9999);
+            var bs = SplitAttribute(infos.AttributText, s, 9999);
 
-            if (bs == null || bs.Count < 2) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            if (bs == null || bs.Count < 2) { return new strDoItFeedback("'SetError' erwartet mindestens zwei Attribute: " + infos.AttributText); }
 
 
             for (var z = 1; z < bs.Count; z++) {
 
-                var v = variablen.Get(bs[z]);
+                var v = s.Variablen.Get(bs[z]);
                 if (v == null) { return new strDoItFeedback("Spalte nicht gefunden: " + bs[z]); }
 
           
                 var n = bs[z].ToLower() + "_error";
 
-                var ve = variablen.GetSystem(n);
+                var ve = s.Variablen.GetSystem(n);
 
 
                 //foreach (var thisv in variablen) {
@@ -71,7 +65,7 @@ namespace BlueScript {
 
                 if (ve == null) {
                     ve = new Variable(n, string.Empty, Skript.Enums.enVariableDataType.List, false, true);
-                    variablen.Add(ve);
+                    s.Variablen.Add(ve);
                 }
 
                 var l = ve.ValueString.SplitByCRToList();

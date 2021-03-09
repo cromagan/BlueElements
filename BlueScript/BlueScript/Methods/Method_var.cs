@@ -43,7 +43,7 @@ namespace BlueScript {
 
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
@@ -55,11 +55,11 @@ namespace BlueScript {
             if (!Variable.IsValidName(bs[0])) { return new strDoItFeedback(bs[0] + "ist kein gültiger Variablen-Name"); }
 
 
-            var v = variablen.Get(bs[0]);
+            var v = s.Variablen.Get(bs[0]);
 
             if (v != null) { return new strDoItFeedback("Variable " + bs[0] + " ist bereits vorhanden."); }
 
-            variablen.Add(new Variable(bs[0]));
+            s.Variablen.Add(new Variable(bs[0]));
 
 
             var r = new Method_BerechneVariable(Parent);
@@ -77,7 +77,7 @@ namespace BlueScript {
             }
 
 
-            var f2 = r.DoIt(f, variablen);
+            var f2 = r.DoIt(f, s);
 
             if (!string.IsNullOrEmpty(f2.ErrorMessage)) {
                 return new strDoItFeedback("Berechung fehlerhaft: " + f2.ErrorMessage);

@@ -424,7 +424,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var I = new ItemCollectionList();
             I.Add("Anordnungen der Spaltenansichten", ((int)enDatabaseDataType.ColumnArrangement).ToString());
             I.Add("Formulare", ((int)enDatabaseDataType.Views).ToString());
-            I.Add("Regeln", ((int)enDatabaseDataType.Rules_ALT).ToString());
+            //I.Add("Regeln", ((int)enDatabaseDataType.Rules_ALT).ToString());
             I.Add("Undo-Speicher", ((int)enDatabaseDataType.UndoInOne).ToString());
             I.Add("Auto-Export", ((int)enDatabaseDataType.AutoExport).ToString());
             I.Add("Binäre Daten im Kopf der Datenbank", ((int)enDatabaseDataType.BinaryDataInOne).ToString());
@@ -572,6 +572,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                             Symb = enImageCode.PlusZeichen;
                             break;
 
+                        case enDatabaseDataType.RulesScript:
                         case enDatabaseDataType.Rules_ALT:
                             aenderung = "Regeln verändert";
                             Symb = enImageCode.Formel;
@@ -671,7 +672,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             }
             else {
-                txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] " + s.Error + "\r\n >>> " + s.ErrorCode;
+                txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode;
             }
 
  

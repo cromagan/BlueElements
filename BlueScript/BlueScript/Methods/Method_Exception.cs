@@ -45,11 +45,11 @@ namespace BlueScript {
 
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 
-            var bs = SplitAttribute(infos.AttributText, variablen, 0);
+            var bs = SplitAttribute(infos.AttributText, s, 0);
 
             if (bs == null || bs.Count != 1) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 

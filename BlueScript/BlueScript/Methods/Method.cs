@@ -47,7 +47,7 @@ namespace BlueScript {
         public abstract bool GetCodeBlockAfter { get; }
         public abstract string Returns { get; }
 
-        public abstract strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen);
+        public abstract strDoItFeedback DoIt(strCanDoFeedback infos, Script s);
 
 
         public strCanDoFeedback CanDo(string scriptText, int pos, string expectedvariablefeedback) {
@@ -258,7 +258,7 @@ namespace BlueScript {
         //    return txtBTW;
         //}
 
-        public strGetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, List<Variable> variablen) {
+        public strGetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, Script s) {
             var c = new List<string>();
             foreach (var thisc in comands) {
 
@@ -278,7 +278,7 @@ namespace BlueScript {
 
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
-                var f = Script.ComandOnPosition(txt, pos, variablen, "var");
+                var f = Script.ComandOnPosition(txt, pos, s, "var");
 
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                     return new strGetEndFeedback(f.ErrorMessage);
@@ -379,7 +379,7 @@ namespace BlueScript {
         }
 
 
-        public List<string> SplitAttribute(string attributtext, List<Variable> variablen, int modifiyab) {
+        public List<string> SplitAttribute(string attributtext, Script s, int modifiyab) {
 
             var attributes = new List<string>();
 
@@ -435,12 +435,12 @@ namespace BlueScript {
 
                 if (n >= modifiyab) {
 
-                    var t = ReplaceVariable(attributes[n], variablen);
+                    var t = ReplaceVariable(attributes[n], s.Variablen);
                     if (!string.IsNullOrEmpty(t.ErrorMessage)) {
                         return null; // new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
                     }
 
-                    var t2 = ReplaceComands(t.AttributeText, Script.Comands, variablen);
+                    var t2 = ReplaceComands(t.AttributeText, Script.Comands, s);
                     if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
                         return null; // new  strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
                     }

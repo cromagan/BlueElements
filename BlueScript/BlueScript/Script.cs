@@ -31,6 +31,9 @@ namespace BlueScript {
         private string _error;
         private string _errorCode;
 
+
+        public int Line { get; internal set; }
+
         public string Error {
             get => _error;
             private set { _error = value.Replace("{", "").Replace("}", ""); }
@@ -123,10 +126,11 @@ namespace BlueScript {
                         break;
 
                     case "\r":
-                        if (!gänsef) {
-                            comment = false;
-                            addt = false;
-                        }
+                        if (gänsef) { s.Append("\";Exception(\"Fehler mit Anführungsstrichen\");"); }
+                        s.Append("¶");
+                        comment = false;
+                        addt = false;
+
                         break;
 
                     case " ":
@@ -146,7 +150,7 @@ namespace BlueScript {
         }
 
 
-        public static (string, string) Parse(string scriptText, List<Variable> variablen, bool reduce) {
+        public static (string, string) Parse(string scriptText, bool reduce, Script s) {
             var pos = 0;
 
 
@@ -154,6 +158,7 @@ namespace BlueScript {
 
             if (reduce) {
                 tmptxt = ReduceText(scriptText);
+                s.Line = 1;
             }
             else {
                 tmptxt = scriptText;
@@ -165,24 +170,31 @@ namespace BlueScript {
                 if (pos >= tmptxt.Length) { return (string.Empty, string.Empty); }
 
 
-                var f = ComandOnPosition(tmptxt, pos, variablen, string.Empty);
-
-                if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                    return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(30, tmptxt.Length - pos)));
+                if (tmptxt.Substring(pos, 1) == "¶") {
+                    s.Line++;
+                    pos++;
                 }
-                pos = f.Position;
+
+                else {
+                    var f = ComandOnPosition(tmptxt, pos, s, string.Empty);
+
+                    if (!string.IsNullOrEmpty(f.ErrorMessage)) {
+                        return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(30, tmptxt.Length - pos)));
+                    }
+                    pos = f.Position;
+                }
 
 
             } while (true);
         }
 
         public bool Parse() {
-            (Error, ErrorCode) = Parse(_ScriptText, Variablen, true);
+            (Error, ErrorCode) = Parse(_ScriptText, true, this);
             return !string.IsNullOrEmpty(Error);
         }
 
 
-        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, List<Variable> Variablen, string expectedvariablefeedback) {
+        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, string expectedvariablefeedback) {
             foreach (var thisC in Comands) {
 
                 //if (!mustHaveFeedback || !thisC.ReturnsVoid) {
@@ -192,7 +204,7 @@ namespace BlueScript {
                 if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
 
                 if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                    var fn = thisC.DoIt(f, Variablen);
+                    var fn = thisC.DoIt(f, s);
                     return new strDoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
                 }
                 //}
@@ -213,7 +225,7 @@ namespace BlueScript {
             var maxl = txt.Length;
 
 
-            const string TR = ".,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t";
+            const string TR = "&.,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t";
 
 
             do {

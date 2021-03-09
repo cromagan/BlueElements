@@ -43,18 +43,18 @@ namespace BlueScript {
         public override bool GetCodeBlockAfter { get => false; }
         public override string Returns { get => string.Empty; }
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, List<Variable> variablen) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            var bs = SplitAttribute(infos.AttributText, variablen, 0);
+            var bs = SplitAttribute(infos.AttributText, s, 0);
 
-            if (bs == null || bs.Count < 3) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            if (bs == null || bs.Count < 3) { return new strDoItFeedback("'Lookup' erwartet mindestens drei Attribute: " + infos.AttributText); }
 
 
 
-            var f = variablen.GetSystem("filename");
-            if (f == null) { return new strDoItFeedback("Variable Filename nicht gefunden."); }
+            var f = s.Variablen.GetSystem("filename");
+            if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
 
 
 

@@ -34,25 +34,29 @@ namespace BlueScript {
         public override string ToString() {
 
 
+            var zusatz = string.Empty;
+            if (Readonly) { zusatz = " [Read Only] "; }
+
+
             switch (Type) {
 
                 case enVariableDataType.String:
-                    return "{str} " + Name + " = " + ValueForReplace;
+                    return "{str} " + zusatz + Name + " = " + ValueForReplace;
 
                 case enVariableDataType.Number:
-                    return "{num} " + Name + " = " + ValueForReplace;
+                    return "{num} " + zusatz + Name + " = " + ValueForReplace;
 
                 case enVariableDataType.Date:
-                    return "{dat} " + Name + " = " + ValueForReplace;
+                    return "{dat} " + zusatz + Name + " = " + ValueForReplace;
 
                 case enVariableDataType.Bool:
-                    return "{bol} " + Name + " = " + ValueForReplace;
+                    return "{bol} " + zusatz + Name + " = " + ValueForReplace;
 
                 case enVariableDataType.List:
-                    return "{lst} " + Name + " = " + ValueForReplace;
+                    return "{lst} " + zusatz + Name + " = " + ValueForReplace;
 
                 default:
-                    return "{ukn} " + Name + " = " + ValueString;
+                    return "{ukn} " + zusatz + Name + " = " + ValueString;
 
             }
 

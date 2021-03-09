@@ -272,12 +272,12 @@ namespace BlueDatabase {
         }
 
 
-        public bool TrifftZu(RowItem vRow) {
-            foreach (var ThisAction in Actions) {
-                if (ThisAction != null && ThisAction.IsBedingung() && !ThisAction.TrifftZu(vRow)) { return false; }
-            }
-            return true;
-        }
+        //public bool TrifftZu(RowItem vRow) {
+        //    foreach (var ThisAction in Actions) {
+        //        if (ThisAction != null && ThisAction.IsBedingung() && !ThisAction.TrifftZu(vRow)) { return false; }
+        //    }
+        //    return true;
+        //}
 
 
         //public string Execute() {

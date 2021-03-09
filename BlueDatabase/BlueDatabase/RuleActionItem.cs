@@ -255,265 +255,265 @@ namespace BlueDatabase {
 
 
 
-        public string Execute(RowItem Row, bool FreezeMode) {
-            if (IsBedingung()) { return string.Empty; }
+        //public string Execute(RowItem Row, bool FreezeMode) {
+        //    if (IsBedingung()) { return string.Empty; }
 
-            _Text = _Text.Replace("\r\n", "\r");
+        //    _Text = _Text.Replace("\r\n", "\r");
 
-            switch (_Action) {
-                case enAction.Setze_Fehlerhaft:
-                    if (string.IsNullOrEmpty(_Text)) { return "*"; }
-                    return _Text;
+        //    switch (_Action) {
+        //        case enAction.Setze_Fehlerhaft:
+        //            if (string.IsNullOrEmpty(_Text)) { return "*"; }
+        //            return _Text;
 
-                case enAction.Wert_Setzen:
-                    foreach (var t in Columns) {
-                        Row.CellSet(t, _Text, FreezeMode);
-                    }
-                    return string.Empty;
-
-
-                case enAction.Wert_Dazu:
-
-                    foreach (var t in Columns) {
-                        var w = Row.CellGetList(t);
-                        w.AddRange(_Text.Split(new[] { "\r" }, StringSplitOptions.RemoveEmptyEntries));
-                        Row.CellSet(t, w.SortedDistinctList(), FreezeMode);
-                    }
-                    return string.Empty;
-
-                case enAction.Wert_Weg:
-                    foreach (var t in Columns) {
-                        var w = Row.CellGetList(t);
-                        w.RemoveString(_Text.Split(new[] { "\r" }, StringSplitOptions.RemoveEmptyEntries), false);
-                        Row.CellSet(t, w.SortedDistinctList(), FreezeMode);
-                    }
-                    return string.Empty;
-
-                //case enAction.Mache_einen_Vorschlag:
-                //    if (ColumnFocus == null) { return string.Empty; }
-                //    var x = new FilterCollection(Columns[0].Database);
-                //    foreach (var t in Columns)
-                //    {
-                //        x.Add(new FilterItem(t, enFilterType.Istgleich_GroßKleinEgal | enFilterType.MultiRowIgnorieren, Row.CellGetString(t)));
-                //    }
-
-                //    x.Add(new FilterItem(ColumnFocus, enFilterType.Ungleich_MultiRowIgnorieren, ""));
-                //    x.Add(new FilterItem(ColumnFocus.Database.Column.SysCorrect, enFilterType.Istgleich, true.ToPlusMinus()));
-
-                //    var r = ColumnFocus.Database.Row[x];
-                //    if (r == null) { return string.Empty; }
-                //    return ColumnFocus.Database.Cell.GetString(ColumnFocus, r);
+        //        case enAction.Wert_Setzen:
+        //            foreach (var t in Columns) {
+        //                Row.CellSet(t, _Text, FreezeMode);
+        //            }
+        //            return string.Empty;
 
 
-                case enAction.Berechne:
-                    foreach (var t in Columns) {
-                        var erg = MatheErgebnis(_Text, Row);
-                        if (erg == null) {
-                            return "Die Rechenformel der Spalte '#Spalte:" + t.Name + "' konnte nicht berechnet werden.";
-                        }
+        //        case enAction.Wert_Dazu:
 
-                        if (t.Format == enDataFormat.Ganzzahl) {
-                            erg += 0.000000000000001; // 2,5 rundet sonst auf 2 ab...
-                            Row.CellSet(t, (int)erg, FreezeMode);
-                        }
-                        else {
-                            Row.CellSet(t, (double)erg, FreezeMode);
-                        }
-                    }
-                    return string.Empty;
+        //            foreach (var t in Columns) {
+        //                var w = Row.CellGetList(t);
+        //                w.AddRange(_Text.Split(new[] { "\r" }, StringSplitOptions.RemoveEmptyEntries));
+        //                Row.CellSet(t, w.SortedDistinctList(), FreezeMode);
+        //            }
+        //            return string.Empty;
 
-                case enAction.Substring:
+        //        case enAction.Wert_Weg:
+        //            foreach (var t in Columns) {
+        //                var w = Row.CellGetList(t);
+        //                w.RemoveString(_Text.Split(new[] { "\r" }, StringSplitOptions.RemoveEmptyEntries), false);
+        //                Row.CellSet(t, w.SortedDistinctList(), FreezeMode);
+        //            }
+        //            return string.Empty;
 
-                    foreach (var t in Columns) {
-                        var erg2 = Row.ReplaceVariables(_Text, false, false);
-                        if (erg2 == _Text) {
-                            return "Der Text der Spalte '#Spalte:" + t.Name + "' konnte nicht erstellt werden.";
-                        }
-                        Row.CellSet(t, erg2, FreezeMode);
-                    }
-                    return string.Empty;
+        //        //case enAction.Mache_einen_Vorschlag:
+        //        //    if (ColumnFocus == null) { return string.Empty; }
+        //        //    var x = new FilterCollection(Columns[0].Database);
+        //        //    foreach (var t in Columns)
+        //        //    {
+        //        //        x.Add(new FilterItem(t, enFilterType.Istgleich_GroßKleinEgal | enFilterType.MultiRowIgnorieren, Row.CellGetString(t)));
+        //        //    }
 
-                case enAction.Skript:
-                    //var sc = new BlueScript.Script {
-                    //    ScriptText = _Text
-                    //};
-                    // sc.Execute();
+        //        //    x.Add(new FilterItem(ColumnFocus, enFilterType.Ungleich_MultiRowIgnorieren, ""));
+        //        //    x.Add(new FilterItem(ColumnFocus.Database.Column.SysCorrect, enFilterType.Istgleich, true.ToPlusMinus()));
 
-                    Develop.DebugPrint_NichtImplementiert();
-                    return string.Empty;
+        //        //    var r = ColumnFocus.Database.Row[x];
+        //        //    if (r == null) { return string.Empty; }
+        //        //    return ColumnFocus.Database.Cell.GetString(ColumnFocus, r);
 
 
-                case enAction.Sperre_die_Zelle:
-                    return string.Empty;
+        //        case enAction.Berechne:
+        //            foreach (var t in Columns) {
+        //                var erg = MatheErgebnis(_Text, Row);
+        //                if (erg == null) {
+        //                    return "Die Rechenformel der Spalte '#Spalte:" + t.Name + "' konnte nicht berechnet werden.";
+        //                }
 
-                case enAction.Anmerkung:
-                    return string.Empty;
+        //                if (t.Format == enDataFormat.Ganzzahl) {
+        //                    erg += 0.000000000000001; // 2,5 rundet sonst auf 2 ab...
+        //                    Row.CellSet(t, (int)erg, FreezeMode);
+        //                }
+        //                else {
+        //                    Row.CellSet(t, (double)erg, FreezeMode);
+        //                }
+        //            }
+        //            return string.Empty;
 
-                //case enAction.KopiereAndereSpalten:
-                //    if (ColumnFocus != null) { return string.Empty; }
-                //    ColumnItem Link;
-                //    ColumnItem Other;
+        //        case enAction.Substring:
 
-                //    if (Columns[0].Format == enDataFormat.RelationText || Columns[0].Format == enDataFormat.KeyForSame)
-                //    {
-                //        Link = Columns[0];
-                //        Other = Columns[1];
-                //    }
-                //    else
-                //    {
-                //        if (Columns[1].Format != enDataFormat.RelationText && Columns[1].Format != enDataFormat.KeyForSame) { return "Verknüpfung fehlgeschlagen, keine der Spalten ist ein 'Beziehungsformat/Schlüsselformat'"; }
-                //        Link = Columns[1];
-                //        Other = Columns[0];
-                //    }
+        //            foreach (var t in Columns) {
+        //                var erg2 = Row.ReplaceVariables(_Text, false, false);
+        //                if (erg2 == _Text) {
+        //                    return "Der Text der Spalte '#Spalte:" + t.Name + "' konnte nicht erstellt werden.";
+        //                }
+        //                Row.CellSet(t, erg2, FreezeMode);
+        //            }
+        //            return string.Empty;
 
-                //    List<RowItem> LinkRows = null;
-                //    if (Link.Format == enDataFormat.RelationText)
-                //    {
-                //        LinkRows = CellCollection.ConnectedRowsOfRelations(Row.CellGetString(Link), Row);
-                //    }
-                //    else
-                //    {
-                //        LinkRows = RowCollection.MatchesTo(new FilterItem(Link, enFilterType.Istgleich_GroßKleinEgal, Row.CellGetString(Link)));
-                //    }
+        //        case enAction.Skript:
+        //            //var sc = new BlueScript.Script {
+        //            //    ScriptText = _Text
+        //            //};
+        //            // sc.Execute();
 
-                //    var V = Row.CellGetString(Other);
-                //    foreach (var Thisrow in LinkRows)
-                //    {
-                //        if (Thisrow.CellGetString(Other) != V)
-                //        {
-                //            Thisrow.CellSet(Other, V, FreezeMode);
-                //            Thisrow.DoAutomatic(false, false, FreezeMode);
-                //        }
-
-                //    }
-                //    return string.Empty;
-
-                //case enAction.LinkedCell:
-                //    if (ColumnFocus != null) { return string.Empty; }
+        //            Develop.DebugPrint_NichtImplementiert();
+        //            return string.Empty;
 
 
-                //    foreach (var t in Columns)
-                //    {
-                //        Database LinkedDB = null;
-                //        if (t != null) { LinkedDB = t.LinkedDatabase(); }
-                //        if (LinkedDB == null) { return "Verlinkte Datenbank der Spalte '#Spalte:" + t.Name + "' nicht gefunden."; }
+        //        case enAction.Sperre_die_Zelle:
+        //            return string.Empty;
 
-                //        var o = (_Text + "\r+").SplitByCR();
-                //        if (o.Length < 5) { return "Definitionsfehler in der Spalte '#Spalte:" + t.Name + "' der 'Verlinkten-Zell-Zuweisung'"; }
+        //        case enAction.Anmerkung:
+        //            return string.Empty;
 
-                //        if (!int.TryParse(o[0], out var RowKey)) { return "Spalte mit Zeilenschlüssel in der Spalte '#Spalte:" + t.Name + "' nicht definiert"; }
-                //        var rowC = t.Database.Column.SearchByKey(RowKey);
-                //        if (rowC == null) { return "Die Spalte für den Zeilenschlüssel in der Spalte '#Spalte:" + t.Name + "' existiert nicht"; }
+        //        //case enAction.KopiereAndereSpalten:
+        //        //    if (ColumnFocus != null) { return string.Empty; }
+        //        //    ColumnItem Link;
+        //        //    ColumnItem Other;
 
-                //        ColumnItem tarC = null;
+        //        //    if (Columns[0].Format == enDataFormat.RelationText || Columns[0].Format == enDataFormat.KeyForSame)
+        //        //    {
+        //        //        Link = Columns[0];
+        //        //        Other = Columns[1];
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        if (Columns[1].Format != enDataFormat.RelationText && Columns[1].Format != enDataFormat.KeyForSame) { return "Verknüpfung fehlgeschlagen, keine der Spalten ist ein 'Beziehungsformat/Schlüsselformat'"; }
+        //        //        Link = Columns[1];
+        //        //        Other = Columns[0];
+        //        //    }
 
-                //        if (int.TryParse(o[1], out var ColumnKey))
-                //        {
-                //            var c = t.Database.Column.SearchByKey(ColumnKey);
-                //            if (c == null) { return "Die Spalte für den Spaltenschlüssel in der Spalte '#Spalte:" + t.Name + "' existiert nicht"; }
-                //            if (!int.TryParse(Row.CellGetString(c), out var colKey)) { return "Der Text Spalte in 'ColumnKeyInColumn'  in der Spalte '#Spalte:" + t.Name + "'  ist fehlerhaft"; }
-                //            tarC = LinkedDB.Column.SearchByKey(colKey);
+        //        //    List<RowItem> LinkRows = null;
+        //        //    if (Link.Format == enDataFormat.RelationText)
+        //        //    {
+        //        //        LinkRows = CellCollection.ConnectedRowsOfRelations(Row.CellGetString(Link), Row);
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        LinkRows = RowCollection.MatchesTo(new FilterItem(Link, enFilterType.Istgleich_GroßKleinEgal, Row.CellGetString(Link)));
+        //        //    }
 
-                //            if (!string.IsNullOrEmpty(o[3]))
-                //            {
-                //                tarC = LinkedDB.Column[o[3] + tarC.Name];
-                //            }
+        //        //    var V = Row.CellGetString(Other);
+        //        //    foreach (var Thisrow in LinkRows)
+        //        //    {
+        //        //        if (Thisrow.CellGetString(Other) != V)
+        //        //        {
+        //        //            Thisrow.CellSet(Other, V, FreezeMode);
+        //        //            Thisrow.DoAutomatic(false, false, FreezeMode);
+        //        //        }
 
-                //        }
-                //        else if (int.TryParse(o[2], out var TargetColumnKey))
-                //        {
-                //            tarC = LinkedDB.Column.SearchByKey(TargetColumnKey);
-                //        }
-                //        else
-                //        {
-                //            return "Spalte mit Spaltenschlüssel/Zielspalte in der Spalte '#Spalte:" + t.Name + "' nicht definiert";
-                //        }
+        //        //    }
+        //        //    return string.Empty;
 
-                //        if (Row.CellIsNullOrEmpty(rowC))
-                //        {
-                //            return "Kein Schlüssel angegeben."; // RowAdded Ereigniss löst ein DoRules aus. Und da ist noch kein Wert gesetzt.
-                //        }
-                //        var tarR = LinkedDB.Row[Row.CellGetString(rowC)];
-
-                //        if (tarC != null && tarR == null && o[4] == ((int)enFehlendesZiel.ZeileAnlegen).ToString())
-                //        {
-                //            tarR = LinkedDB.Row.Add(Row.CellGetString(rowC));
-                //        }
-
-
-                //        if (tarC != null && tarR != null)
-                //        {
-                //            Row.Database.Cell.SetValueBehindLinkedValue(t, Row, CellCollection.KeyOfCell(tarC, tarR), FreezeMode);
-                //        }
-                //        else
-                //        {
-                //            Row.Database.Cell.SetValueBehindLinkedValue(t, Row, string.Empty, FreezeMode);
-
-                //            if (o[4] == ((int)enFehlendesZiel.Ignorieren).ToString()) { return string.Empty; }
-
-                //            return "Zelle in Zieldatenbank in Spalte '#Spalte:" + t.Name + "' nicht vorhanden";
-                //        }
-                //    }
-                //    return string.Empty;
+        //        //case enAction.LinkedCell:
+        //        //    if (ColumnFocus != null) { return string.Empty; }
 
 
-                //  case enAction.SortiereIntelligent:
-                //if (ColumnFocus != null) { return string.Empty; }
+        //        //    foreach (var t in Columns)
+        //        //    {
+        //        //        Database LinkedDB = null;
+        //        //        if (t != null) { LinkedDB = t.LinkedDatabase(); }
+        //        //        if (LinkedDB == null) { return "Verlinkte Datenbank der Spalte '#Spalte:" + t.Name + "' nicht gefunden."; }
 
-                //var ALL = new List<string>();
-                //var Calc = new List<List<string>>();
+        //        //        var o = (_Text + "\r+").SplitByCR();
+        //        //        if (o.Length < 5) { return "Definitionsfehler in der Spalte '#Spalte:" + t.Name + "' der 'Verlinkten-Zell-Zuweisung'"; }
+
+        //        //        if (!int.TryParse(o[0], out var RowKey)) { return "Spalte mit Zeilenschlüssel in der Spalte '#Spalte:" + t.Name + "' nicht definiert"; }
+        //        //        var rowC = t.Database.Column.SearchByKey(RowKey);
+        //        //        if (rowC == null) { return "Die Spalte für den Zeilenschlüssel in der Spalte '#Spalte:" + t.Name + "' existiert nicht"; }
+
+        //        //        ColumnItem tarC = null;
+
+        //        //        if (int.TryParse(o[1], out var ColumnKey))
+        //        //        {
+        //        //            var c = t.Database.Column.SearchByKey(ColumnKey);
+        //        //            if (c == null) { return "Die Spalte für den Spaltenschlüssel in der Spalte '#Spalte:" + t.Name + "' existiert nicht"; }
+        //        //            if (!int.TryParse(Row.CellGetString(c), out var colKey)) { return "Der Text Spalte in 'ColumnKeyInColumn'  in der Spalte '#Spalte:" + t.Name + "'  ist fehlerhaft"; }
+        //        //            tarC = LinkedDB.Column.SearchByKey(colKey);
+
+        //        //            if (!string.IsNullOrEmpty(o[3]))
+        //        //            {
+        //        //                tarC = LinkedDB.Column[o[3] + tarC.Name];
+        //        //            }
+
+        //        //        }
+        //        //        else if (int.TryParse(o[2], out var TargetColumnKey))
+        //        //        {
+        //        //            tarC = LinkedDB.Column.SearchByKey(TargetColumnKey);
+        //        //        }
+        //        //        else
+        //        //        {
+        //        //            return "Spalte mit Spaltenschlüssel/Zielspalte in der Spalte '#Spalte:" + t.Name + "' nicht definiert";
+        //        //        }
+
+        //        //        if (Row.CellIsNullOrEmpty(rowC))
+        //        //        {
+        //        //            return "Kein Schlüssel angegeben."; // RowAdded Ereigniss löst ein DoRules aus. Und da ist noch kein Wert gesetzt.
+        //        //        }
+        //        //        var tarR = LinkedDB.Row[Row.CellGetString(rowC)];
+
+        //        //        if (tarC != null && tarR == null && o[4] == ((int)enFehlendesZiel.ZeileAnlegen).ToString())
+        //        //        {
+        //        //            tarR = LinkedDB.Row.Add(Row.CellGetString(rowC));
+        //        //        }
 
 
-                //foreach (var t in Columns)
-                //{
-                //    ALL.AddRange(Row.CellGetList(t));
-                //    Row.CellSet(t, string.Empty,FreezeMode);
-                //    var AllValsOfCol = t.Contents(null, false);
-                //    AllValsOfCol.QuickSort();
-                //    Calc.Add(AllValsOfCol);
-                //}
-                //ALL.QuickSortAndRemoveDouble();
+        //        //        if (tarC != null && tarR != null)
+        //        //        {
+        //        //            Row.Database.Cell.SetValueBehindLinkedValue(t, Row, CellCollection.KeyOfCell(tarC, tarR), FreezeMode);
+        //        //        }
+        //        //        else
+        //        //        {
+        //        //            Row.Database.Cell.SetValueBehindLinkedValue(t, Row, string.Empty, FreezeMode);
 
-                //if (ALL.Count == 0) { return string.Empty; }
+        //        //            if (o[4] == ((int)enFehlendesZiel.Ignorieren).ToString()) { return string.Empty; }
 
-
-                //foreach (var ThisString in ALL)
-                //{
-                //    var Max = -1;
-                //    ColumnItem Col = null;
-                //    for (var zx = 0 ; zx < Columns.Count ; zx++)
-                //    {
-                //        var Curr = 0;
-                //        foreach (var ThisSerach in Calc[zx])
-                //        {
-                //            if (ThisSerach.ToLower() == ThisString.ToLower()) { Curr++; }
-                //        }
-                //        if (Curr > Max)
-                //        {
-                //            Max = Curr;
-                //            Col = Columns[zx];
-                //        }
-                //    }
+        //        //            return "Zelle in Zieldatenbank in Spalte '#Spalte:" + t.Name + "' nicht vorhanden";
+        //        //        }
+        //        //    }
+        //        //    return string.Empty;
 
 
+        //        //  case enAction.SortiereIntelligent:
+        //        //if (ColumnFocus != null) { return string.Empty; }
 
-                //    var L = Row.CellGetList(Col);
-                //    L.Add(ThisString);
-                //    Row.CellSet(Col, L);
-                //}
+        //        //var ALL = new List<string>();
+        //        //var Calc = new List<List<string>>();
+
+
+        //        //foreach (var t in Columns)
+        //        //{
+        //        //    ALL.AddRange(Row.CellGetList(t));
+        //        //    Row.CellSet(t, string.Empty,FreezeMode);
+        //        //    var AllValsOfCol = t.Contents(null, false);
+        //        //    AllValsOfCol.QuickSort();
+        //        //    Calc.Add(AllValsOfCol);
+        //        //}
+        //        //ALL.QuickSortAndRemoveDouble();
+
+        //        //if (ALL.Count == 0) { return string.Empty; }
+
+
+        //        //foreach (var ThisString in ALL)
+        //        //{
+        //        //    var Max = -1;
+        //        //    ColumnItem Col = null;
+        //        //    for (var zx = 0 ; zx < Columns.Count ; zx++)
+        //        //    {
+        //        //        var Curr = 0;
+        //        //        foreach (var ThisSerach in Calc[zx])
+        //        //        {
+        //        //            if (ThisSerach.ToLower() == ThisString.ToLower()) { Curr++; }
+        //        //        }
+        //        //        if (Curr > Max)
+        //        //        {
+        //        //            Max = Curr;
+        //        //            Col = Columns[zx];
+        //        //        }
+        //        //    }
 
 
 
+        //        //    var L = Row.CellGetList(Col);
+        //        //    L.Add(ThisString);
+        //        //    Row.CellSet(Col, L);
+        //        //}
 
-                //return string.Empty;
-                //   return "'Sortiere Intelligent' nicht fertig Programmiert";
 
 
-                default:
-                    Develop.DebugPrint(_Action);
-                    return string.Empty;
-            }
-        }
+
+        //        //return string.Empty;
+        //        //   return "'Sortiere Intelligent' nicht fertig Programmiert";
+
+
+        //        default:
+        //            Develop.DebugPrint(_Action);
+        //            return string.Empty;
+        //    }
+        //}
 
         internal (string anfang, string ende) ToScript(List<ColumnItem> c) {
 
@@ -581,7 +581,7 @@ namespace BlueDatabase {
                         return ("SetError(\"Allgemeiner Fehler.\",  " + cnl + "); // TODO: Text korrigieren", "");
                     }
 
-                    return ("SetError(\"" + Text.Replace("\r\n", "") + "\",  " + cnl + ");", "");
+                    return ("SetError(\"" + Text.Replace("\r\n", "").Replace("\r", "")  + "\",  " + cnl + ");", "");
 
                 case enAction.Ist_Nicht:
                     if (txtList is null || txtList.Count == 0) {
@@ -693,19 +693,19 @@ namespace BlueDatabase {
 
 
 
-        private static double? MatheErgebnis(string Formel, RowItem Row) {
+        //private static double? MatheErgebnis(string Formel, RowItem Row) {
 
-            // Formel Vorbereiten ----------------
-            Formel = Formel.ToUpper();
-            Formel = Formel.RemoveChars(" \r\n");
+        //    // Formel Vorbereiten ----------------
+        //    Formel = Formel.ToUpper();
+        //    Formel = Formel.RemoveChars(" \r\n");
 
-            Formel = Row.ReplaceVariablesForMath(Formel);
+        //    Formel = Row.ReplaceVariablesForMath(Formel);
 
-            Formel = Formel.ToUpper();
-            Formel = Formel.RemoveChars(" \r\n");
+        //    Formel = Formel.ToUpper();
+        //    Formel = Formel.RemoveChars(" \r\n");
 
-            return modErgebnis.Ergebnis(Formel);
-        }
+        //    return modErgebnis.Ergebnis(Formel);
+        //}
 
 
 
@@ -1462,231 +1462,231 @@ namespace BlueDatabase {
             return string.Empty;
         }
 
-        public string TrifftZuText(RowItem vRow) {
+        //public string TrifftZuText(RowItem vRow) {
 
-            string[] w;
-            if (string.IsNullOrEmpty(_Text)) {
-                w = new string[1]; //MUSS mindestens eines haben, daß auf Leere geprüft werden kann
-                w[0] = "";
-            }
-            else {
-                w = _Text.SplitByCR();
-            }
-
-
-            var t = "";
-
-            if (Columns.Count > 0) {
-                foreach (var t1 in Columns) {
-                    t += TrifftZuText(vRow, t1, w);
-                    if (!string.IsNullOrEmpty(t)) { break; }
-                }
-            }
-            else {
-                t = t + TrifftZuText(vRow, null, w) + "\r";
-            }
-
-            do {
-                if (!t.Contains("\r\r")) { break; }
-                t = t.Replace("\r\r", "\r");
-            } while (true);
+        //    string[] w;
+        //    if (string.IsNullOrEmpty(_Text)) {
+        //        w = new string[1]; //MUSS mindestens eines haben, daß auf Leere geprüft werden kann
+        //        w[0] = "";
+        //    }
+        //    else {
+        //        w = _Text.SplitByCR();
+        //    }
 
 
-            t = t.TrimCr();
-            t = t.Replace("\r", " und ");
-            return t;
-        }
+        //    var t = "";
 
-        public bool TrifftZu(RowItem vRow) {
-            if (!IsBedingung()) { return true; }
+        //    if (Columns.Count > 0) {
+        //        foreach (var t1 in Columns) {
+        //            t += TrifftZuText(vRow, t1, w);
+        //            if (!string.IsNullOrEmpty(t)) { break; }
+        //        }
+        //    }
+        //    else {
+        //        t = t + TrifftZuText(vRow, null, w) + "\r";
+        //    }
 
-
-            string[] w;
-            if (string.IsNullOrEmpty(_Text)) {
-                w = new string[1]; //MUSS mindestens eines haben, daß auf Leere geprüft werden kann
-                w[0] = string.Empty;
-            }
-            else {
-                w = _Text.SplitByCR();
-            }
-
-            for (var wtz = 0; wtz <= w.GetUpperBound(0); wtz++) {
-                if (Columns.Count > 0) {
-                    foreach (var t in Columns) {
-                        if (TrifftZu(vRow, t, w[wtz])) { return true; }
-                    }
-                }
-                else {
-                    if (TrifftZu(vRow, null, w[wtz])) { return true; }
-                }
-            }
-
-            return false;
-        }
-
-        private bool TrifftZu(RowItem Row, ColumnItem Column, string OneValue) {
-
-            switch (_Action) {
-                case enAction.Anmerkung:
-                    break;
-
-                case enAction.Ist:
-                    if (Column == null) { return false; }
-                    return OneValue.ToUpper() == Column.Database.Cell.GetString(Column, Row).ToUpper();
-
-                case enAction.Ist_Nicht:
-                    if (Column == null) { return false; }
-                    return OneValue.ToUpper() != Column.Database.Cell.GetString(Column, Row).ToUpper();
-
-                case enAction.Enthält:
-                    if (Column == null) { return false; }
-                    return Column.Database.Cell.GetList(Column, Row).Contains(OneValue, false);
-
-                case enAction.Enthält_Zeichenkette:
-                    if (Column == null) { return false; }
-                    return Column.Database.Cell.GetString(Column, Row).ToUpper().Contains(OneValue.ToUpper());
-
-                case enAction.Enthält_NICHT_Zeichenkette:
-                    if (Column == null) { return false; }
-                    return !Column.Database.Cell.GetString(Column, Row).ToUpper().Contains(OneValue.ToUpper());
-
-                case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
-                    if (Column == null) { return false; }
-                    var TMP = Column.Database.Cell.GetString(Column, Row);
+        //    do {
+        //        if (!t.Contains("\r\r")) { break; }
+        //        t = t.Replace("\r\r", "\r");
+        //    } while (true);
 
 
-                    if (!string.IsNullOrEmpty(TMP)) {
-                        switch (TMP.Substring(TMP.Length - 1, 1)) {
-                            case " ":
-                                return true;
-                            case "\r":
-                                return true;
-                            case "\n":
-                                return true;
-                        }
-                    }
+        //    t = t.TrimCr();
+        //    t = t.Replace("\r", " und ");
+        //    return t;
+        //}
+
+        //public bool TrifftZu(RowItem vRow) {
+        //    if (!IsBedingung()) { return true; }
 
 
-                    if (TMP.Contains(" \r")) { return true; }
-                    if (TMP.Contains(" \n")) { return true; }
+        //    string[] w;
+        //    if (string.IsNullOrEmpty(_Text)) {
+        //        w = new string[1]; //MUSS mindestens eines haben, daß auf Leere geprüft werden kann
+        //        w[0] = string.Empty;
+        //    }
+        //    else {
+        //        w = _Text.SplitByCR();
+        //    }
 
-                    break;
+        //    for (var wtz = 0; wtz <= w.GetUpperBound(0); wtz++) {
+        //        if (Columns.Count > 0) {
+        //            foreach (var t in Columns) {
+        //                if (TrifftZu(vRow, t, w[wtz])) { return true; }
+        //            }
+        //        }
+        //        else {
+        //            if (TrifftZu(vRow, null, w[wtz])) { return true; }
+        //        }
+        //    }
 
+        //    return false;
+        //}
 
-                //case enAction.Ist_Jünger_Als:
-                //    return DateTime.Now.Subtract(Row.CellGetDateTime(Row.Database.Column.SysRowCreateDate())).TotalHours < int.Parse(OneValue);
+        //private bool TrifftZu(RowItem Row, ColumnItem Column, string OneValue) {
 
+        //    switch (_Action) {
+        //        case enAction.Anmerkung:
+        //            break;
 
+        //        case enAction.Ist:
+        //            if (Column == null) { return false; }
+        //            return OneValue.ToUpper() == Column.Database.Cell.GetString(Column, Row).ToUpper();
 
+        //        case enAction.Ist_Nicht:
+        //            if (Column == null) { return false; }
+        //            return OneValue.ToUpper() != Column.Database.Cell.GetString(Column, Row).ToUpper();
 
-                case enAction.Enthält_ungültige_Zeichen:
-                    if (Column == null) { return false; }
+        //        case enAction.Enthält:
+        //            if (Column == null) { return false; }
+        //            return Column.Database.Cell.GetList(Column, Row).Contains(OneValue, false);
 
-                    if (!Row.CellIsNullOrEmpty(Column)) {
-                        string tmp;
-                        if (!string.IsNullOrEmpty(Column.AllowedChars)) {
-                            tmp = Column.AllowedChars;
-                        }
-                        else {
-                            tmp = Column.Format.AllowedChars();
-                        }
-                        if (Column.MultiLine) {
-                            tmp += "\r";
-                        }
-                        return !Column.Database.Cell.GetString(Column, Row).ContainsOnlyChars(tmp);
-                    }
-                    break;
+        //        case enAction.Enthält_Zeichenkette:
+        //            if (Column == null) { return false; }
+        //            return Column.Database.Cell.GetString(Column, Row).ToUpper().Contains(OneValue.ToUpper());
 
-                case enAction.Formatfehler_des_Zelleninhaltes:
-                    if (Column == null) { return false; }
-                    if (!Row.CellIsNullOrEmpty(Column)) {
-                        if (!Column.Database.Cell.GetString(Column, Row).IsFormat(Column.Format, true)) { return true; }
-                    }
-                    break;
+        //        case enAction.Enthält_NICHT_Zeichenkette:
+        //            if (Column == null) { return false; }
+        //            return !Column.Database.Cell.GetString(Column, Row).ToUpper().Contains(OneValue.ToUpper());
 
-                case enAction.Auf_eine_existierende_Datei_verweist:
-                    if (Column == null) { return false; }
-                    return FileExists(Column.Database.Cell.GetString(Column, Row));
-
-
-                case enAction.Auf_einen_existierenden_Pfad_verweist:
-                    if (Column == null) { return false; }
-                    return PathExists(Column.Database.Cell.GetString(Column, Row));
-
-                //case enAction.Ist_der_Nutzer:
-                //    return Row.Database.PermissionCheckWithoutAdmin(OneValue, Row);
-
-                //case enAction.Erhält_den_Focus:
-                //    return Convert.ToBoolean(ColumnFocus == Column);
-
-                case enAction.Berechnung_ist_True:
-                    return Convert.ToBoolean(MatheErgebnis(_Text, Row) == -1);
+        //        case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
+        //            if (Column == null) { return false; }
+        //            var TMP = Column.Database.Cell.GetString(Column, Row);
 
 
-                default:
-                    Develop.DebugPrint(_Action);
-                    break;
-            }
-
-            return false;
-        }
-
-        private string TrifftZuText(RowItem Row, ColumnItem Column, string[] AllValue) {
-
-            // Es werden nur Bedingungen abgefragt, weil es nur Sinn macht, einen Fehlertext generieren zu lassen.
-
-            for (var z = 0; z <= AllValue.GetUpperBound(0); z++) {
-                if (TrifftZu(Row, Column, AllValue[z])) {
-
-                    switch (_Action) {
-                        case enAction.Enthält:
-                            var ex = Column.Database.Cell.GetList(Column, Row);
-                            if (ex.Contains(AllValue[z], false)) { return "'" + AllValue[z] + "' in '#Spalte:" + Column.Name + "' ist nicht erlaubt"; }
-                            break;
-
-                        case enAction.Ist:
-                            if (AllValue.GetUpperBound(0) == 0 && string.IsNullOrEmpty(AllValue[0])) { return "'#Spalte:" + Column.Name + "' muss befüllt werden"; }
-                            return "der Wert in '#Spalte:" + Column.Name + "' ist ungültig";
-
-                        case enAction.Ist_Nicht:
-                            if (AllValue.GetUpperBound(z) == 0 && string.IsNullOrEmpty(AllValue[0])) { return "'#Spalte:" + Column.Name + "' muss leer sein"; }
-                            return "der Wert in '#Spalte:" + Column.Name + "' ist ungültig";
-
-                        case enAction.Berechnung_ist_True:
-                            return "eine Berechnung trifft zu";
-
-                        case enAction.Formatfehler_des_Zelleninhaltes:
-                            return "der Wert in '#Spalte:" + Column.Name + "' entspricht nicht dem erwarteten Format";
-
-                        case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
-                            return "am Ende einer Zeile der Spalte '#Spalte:" + Column.Name + "' sind unsichtbare Zeichen";
+        //            if (!string.IsNullOrEmpty(TMP)) {
+        //                switch (TMP.Substring(TMP.Length - 1, 1)) {
+        //                    case " ":
+        //                        return true;
+        //                    case "\r":
+        //                        return true;
+        //                    case "\n":
+        //                        return true;
+        //                }
+        //            }
 
 
-                        case enAction.Enthält_ungültige_Zeichen:
-                            return "der Wert in '#Spalte:" + Column.Name + "' enthält nicht erlaubte Zeichen";
+        //            if (TMP.Contains(" \r")) { return true; }
+        //            if (TMP.Contains(" \n")) { return true; }
 
-                        case enAction.Enthält_Zeichenkette:
-                            return "der Wert in '#Spalte:" + Column.Name + "' enthält eine unerlaubte Zeichenkette";
+        //            break;
 
-                        case enAction.Enthält_NICHT_Zeichenkette:
-                            return "beim Wert in '#Spalte:" + Column.Name + "' fehlt eine Zeichenkette";
 
-                            //case enAction.Ist_der_Nutzer:
-                            //    return "sie gehören zu einer bestimmten Benutzergruppe";
+        //        //case enAction.Ist_Jünger_Als:
+        //        //    return DateTime.Now.Subtract(Row.CellGetDateTime(Row.Database.Column.SysRowCreateDate())).TotalHours < int.Parse(OneValue);
 
-                            //case enAction.Ist_Jünger_Als:
-                            //    return "die Zeile ist zu jung";
 
-                    }
-                    Develop.DebugPrint(_Action);
-                    return "Fehler in der Spalte '#Spalte:" + Column.Name + "'";
 
-                }
 
-            }
+        //        case enAction.Enthält_ungültige_Zeichen:
+        //            if (Column == null) { return false; }
 
-            return string.Empty;
-        }
+        //            if (!Row.CellIsNullOrEmpty(Column)) {
+        //                string tmp;
+        //                if (!string.IsNullOrEmpty(Column.AllowedChars)) {
+        //                    tmp = Column.AllowedChars;
+        //                }
+        //                else {
+        //                    tmp = Column.Format.AllowedChars();
+        //                }
+        //                if (Column.MultiLine) {
+        //                    tmp += "\r";
+        //                }
+        //                return !Column.Database.Cell.GetString(Column, Row).ContainsOnlyChars(tmp);
+        //            }
+        //            break;
+
+        //        case enAction.Formatfehler_des_Zelleninhaltes:
+        //            if (Column == null) { return false; }
+        //            if (!Row.CellIsNullOrEmpty(Column)) {
+        //                if (!Column.Database.Cell.GetString(Column, Row).IsFormat(Column.Format, true)) { return true; }
+        //            }
+        //            break;
+
+        //        case enAction.Auf_eine_existierende_Datei_verweist:
+        //            if (Column == null) { return false; }
+        //            return FileExists(Column.Database.Cell.GetString(Column, Row));
+
+
+        //        case enAction.Auf_einen_existierenden_Pfad_verweist:
+        //            if (Column == null) { return false; }
+        //            return PathExists(Column.Database.Cell.GetString(Column, Row));
+
+        //        //case enAction.Ist_der_Nutzer:
+        //        //    return Row.Database.PermissionCheckWithoutAdmin(OneValue, Row);
+
+        //        //case enAction.Erhält_den_Focus:
+        //        //    return Convert.ToBoolean(ColumnFocus == Column);
+
+        //        case enAction.Berechnung_ist_True:
+        //            return Convert.ToBoolean(MatheErgebnis(_Text, Row) == -1);
+
+
+        //        default:
+        //            Develop.DebugPrint(_Action);
+        //            break;
+        //    }
+
+        //    return false;
+        //}
+
+        //private string TrifftZuText(RowItem Row, ColumnItem Column, string[] AllValue) {
+
+        //    // Es werden nur Bedingungen abgefragt, weil es nur Sinn macht, einen Fehlertext generieren zu lassen.
+
+        //    for (var z = 0; z <= AllValue.GetUpperBound(0); z++) {
+        //        if (TrifftZu(Row, Column, AllValue[z])) {
+
+        //            switch (_Action) {
+        //                case enAction.Enthält:
+        //                    var ex = Column.Database.Cell.GetList(Column, Row);
+        //                    if (ex.Contains(AllValue[z], false)) { return "'" + AllValue[z] + "' in '#Spalte:" + Column.Name + "' ist nicht erlaubt"; }
+        //                    break;
+
+        //                case enAction.Ist:
+        //                    if (AllValue.GetUpperBound(0) == 0 && string.IsNullOrEmpty(AllValue[0])) { return "'#Spalte:" + Column.Name + "' muss befüllt werden"; }
+        //                    return "der Wert in '#Spalte:" + Column.Name + "' ist ungültig";
+
+        //                case enAction.Ist_Nicht:
+        //                    if (AllValue.GetUpperBound(z) == 0 && string.IsNullOrEmpty(AllValue[0])) { return "'#Spalte:" + Column.Name + "' muss leer sein"; }
+        //                    return "der Wert in '#Spalte:" + Column.Name + "' ist ungültig";
+
+        //                case enAction.Berechnung_ist_True:
+        //                    return "eine Berechnung trifft zu";
+
+        //                case enAction.Formatfehler_des_Zelleninhaltes:
+        //                    return "der Wert in '#Spalte:" + Column.Name + "' entspricht nicht dem erwarteten Format";
+
+        //                case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
+        //                    return "am Ende einer Zeile der Spalte '#Spalte:" + Column.Name + "' sind unsichtbare Zeichen";
+
+
+        //                case enAction.Enthält_ungültige_Zeichen:
+        //                    return "der Wert in '#Spalte:" + Column.Name + "' enthält nicht erlaubte Zeichen";
+
+        //                case enAction.Enthält_Zeichenkette:
+        //                    return "der Wert in '#Spalte:" + Column.Name + "' enthält eine unerlaubte Zeichenkette";
+
+        //                case enAction.Enthält_NICHT_Zeichenkette:
+        //                    return "beim Wert in '#Spalte:" + Column.Name + "' fehlt eine Zeichenkette";
+
+        //                    //case enAction.Ist_der_Nutzer:
+        //                    //    return "sie gehören zu einer bestimmten Benutzergruppe";
+
+        //                    //case enAction.Ist_Jünger_Als:
+        //                    //    return "die Zeile ist zu jung";
+
+        //            }
+        //            Develop.DebugPrint(_Action);
+        //            return "Fehler in der Spalte '#Spalte:" + Column.Name + "'";
+
+        //        }
+
+        //    }
+
+        //    return string.Empty;
+        //}
 
         public bool IsBedingung() {
             return (int)_Action > 1 && (int)_Action < 1000;

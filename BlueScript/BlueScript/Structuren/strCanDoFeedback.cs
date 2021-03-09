@@ -1,5 +1,7 @@
 ﻿
 
+using System.Linq;
+
 public struct strCanDoFeedback {
 
     public strCanDoFeedback(int errorposition, string errormessage, bool mustabort) {
@@ -9,6 +11,7 @@ public struct strCanDoFeedback {
         ComandText = string.Empty;
         AttributText = string.Empty;
         CodeBlockAfterText = string.Empty;
+        LineBreakInCodeBlock = 0;
     }
 
 
@@ -20,6 +23,7 @@ public struct strCanDoFeedback {
         ComandText = comandText;
         AttributText = attributtext;
         CodeBlockAfterText = codeblockaftertext;
+        LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶'); ;
     }
 
     /// <summary>
@@ -43,5 +47,6 @@ public struct strCanDoFeedback {
     /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
     /// </summary>
     public string CodeBlockAfterText;
+    public int LineBreakInCodeBlock;
 
 }

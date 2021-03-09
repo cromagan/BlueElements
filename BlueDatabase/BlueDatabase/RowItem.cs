@@ -327,6 +327,8 @@ namespace BlueDatabase {
             var s = vars.Get(thisCol.Name);
 
             if (s == null) { return; }
+            if (s.Readonly) { return; }
+
 
             if (thisCol.MultiLine) {
                 CellSet(thisCol, s.ValueString, true);
@@ -340,13 +342,13 @@ namespace BlueDatabase {
                         CellSet(thisCol, true, true);
                     }
                     else {
-                        CellSet(thisCol, false, false);
+                        CellSet(thisCol, false, true);
                     }
                     return;
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
-                    CellSet(thisCol, s.SystemVariable, true);
+                    CellSet(thisCol, s.ValueString, true);
                     return;
 
                 case enDataFormat.Text:
@@ -360,7 +362,7 @@ namespace BlueDatabase {
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                    CellSet(thisCol, s.SystemVariable, true);
+                    CellSet(thisCol, s.ValueString, true);
                     return;
 
             }
@@ -369,40 +371,40 @@ namespace BlueDatabase {
 
         public static Variable CellToVariable(ColumnItem thisCol, RowItem r) {
 
+            if (!thisCol.Format.CanBeCheckedByRules()) { return null; }
+
+            var ro = !thisCol.Format.CanBeChangedByRules();
+
+            if (thisCol == thisCol.Database.Column.SysCorrect) { ro = true; }
+            if (thisCol == thisCol.Database.Column[0]) { ro = true; }
+            if (thisCol == thisCol.Database.Column.SysRowChanger) { ro = true; }
+            if (thisCol == thisCol.Database.Column.SysRowChangeDate) { ro = true; }
+
+
 
             if (thisCol.MultiLine) {
-                return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.List);
+                return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.List, ro, false);
             }
 
 
             switch (thisCol.Format) {
                 case enDataFormat.Bit:
                     if (r.CellGetString(thisCol) == "+") {
-                        return new Variable(thisCol.Name, "true", enVariableDataType.Bool);
+                        return new Variable(thisCol.Name, "true", enVariableDataType.Bool, ro, false);
                     }
                     else {
-                        return new Variable(thisCol.Name, "false", enVariableDataType.Bool);
+                        return new Variable(thisCol.Name, "false", enVariableDataType.Bool, ro, false);
                     }
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
-                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.Number);
+                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.Number, ro, false);
 
-                case enDataFormat.Text:
-                case enDataFormat.BildCode:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.FarbeInteger:
-                case enDataFormat.RelationText:
-                case enDataFormat.Schrift:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.LinkedCell:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.String);
+                default:
+                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.String, ro, false);
 
             }
-            return null;
+
 
         }
 
@@ -435,7 +437,7 @@ namespace BlueDatabase {
             }
 
 
-            vars.Add(new Variable("Filename", Database.Filename, enVariableDataType.String, true, false));
+            vars.Add(new Variable("Filename", Database.Filename, enVariableDataType.String, true, true));
 
             #endregion
 
@@ -456,7 +458,7 @@ namespace BlueDatabase {
                 }
 
 
-                Develop.DebugPrint_NichtImplementiert();
+                //Develop.DebugPrint_NichtImplementiert();
 
                 //foreach (var ThisRule in Database.Rules) {
                 //    if (ThisRule != null) {
@@ -556,7 +558,7 @@ namespace BlueDatabase {
             if (onlyTest) { return (true, string.Empty, script); }
 
             /// didSuccesfullyCheck geht von Dateisystemfehlern aus
-            if (!string.IsNullOrEmpty(script.Error)) { return (true, "Das Skript ist fehlerhaft: \r\n" + script.Error + "\r\n" + script.ErrorCode, script); }
+            if (!string.IsNullOrEmpty(script.Error)) { return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line.ToString() + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script); }
 
 
             // Dann die Abschließenden Korrekturen vornehmen
@@ -597,9 +599,9 @@ namespace BlueDatabase {
                 var n = thisc.Name + "_error";
 
                 var va = script.Variablen.GetSystem(n);
-                if (n != null) {
+                if (va != null) {
                     cols.Add(thisc.Name + "|" + va.ValueString);
-                    _InfoTXT = _InfoTXT + "<b>" + thisc.ReadableText() + ":<b> " + va.ValueString + "<br><hr><br>";
+                    _InfoTXT = _InfoTXT + "<b>" + thisc.ReadableText() + ":</b> " + va.ValueString + "<br><hr><br>";
                 }
             }
 
@@ -754,25 +756,25 @@ namespace BlueDatabase {
         }
 
 
-        /// <summary>
-        /// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; Leere ZEllen werden mit 0 ersetzt.
-        /// </summary>
-        /// <param name="formel"></param>
-        /// <returns></returns>
-        public string ReplaceVariablesForMath(string formel) {
+        ///// <summary>
+        ///// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; Leere ZEllen werden mit 0 ersetzt.
+        ///// </summary>
+        ///// <param name="formel"></param>
+        ///// <returns></returns>
+        //public string ReplaceVariablesForMath(string formel) {
 
-            // Variablen ersetzen
-            foreach (var thisColumnItem in Database.Column) {
-                if (thisColumnItem != null) {
-                    var w = "0";
-                    if (!CellIsNullOrEmpty(thisColumnItem)) { w = CellGetString(thisColumnItem); }
-                    formel = formel.Replace("&" + thisColumnItem.Name.ToUpper() + ";", w);
-                }
+        //    // Variablen ersetzen
+        //    foreach (var thisColumnItem in Database.Column) {
+        //        if (thisColumnItem != null) {
+        //            var w = "0";
+        //            if (!CellIsNullOrEmpty(thisColumnItem)) { w = CellGetString(thisColumnItem); }
+        //            formel = formel.Replace("&" + thisColumnItem.Name.ToUpper() + ";", w);
+        //        }
 
-            }
+        //    }
 
-            return formel;
-        }
+        //    return formel;
+        //}
 
         /// <summary>
         /// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; oder &Spaltenname(L,8);
