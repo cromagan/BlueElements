@@ -79,9 +79,10 @@ namespace BlueScript {
 
         public Script(List<Variable> variablen) {
 
-            if (Comands == null) {
+            // Jedes mal, wegen der Skriptübergabe (mit Variablen);
+            //if (Comands == null) {
                 Comands = GetEnumerableOfType<Method>(this);
-            }
+            //}
 
             Variablen = variablen;
         }
@@ -213,7 +214,7 @@ namespace BlueScript {
         }
 
 
-        public static (int pos, string witch) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter, bool ignoreKlammern) {
+        public static (int pos, string witch) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter) {
 
             var klammern = 0;
             var Gans = false;
@@ -257,7 +258,7 @@ namespace BlueScript {
 
                     // Runde klammern können in { vorkommen
                     case "(":
-                        if (!Gans && !ignoreKlammern) {
+                        if (!Gans) {
                             if (EckigeKlammern > 0) { return (-1, string.Empty); }
                             klammern++;
                         }
@@ -265,7 +266,7 @@ namespace BlueScript {
                         break;
 
                     case ")":
-                        if (!Gans && !ignoreKlammern) {
+                        if (!Gans) {
                             if (EckigeKlammern > 0) { return (-1, string.Empty); }
                             if (klammern < 1) { return (-1, string.Empty); }
                             klammern--;

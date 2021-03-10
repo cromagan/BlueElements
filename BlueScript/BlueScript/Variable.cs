@@ -17,15 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static BlueBasics.modAllgemein;
-using static BlueBasics.Extensions;
 using BlueBasics;
 using Skript.Enums;
+using System.Collections.Generic;
+using static BlueBasics.Extensions;
+using static BlueBasics.modConverter;
 
 namespace BlueScript {
     public class Variable {
@@ -55,6 +51,9 @@ namespace BlueScript {
                 case enVariableDataType.List:
                     return "{lst} " + zusatz + Name + " = " + ValueForReplace;
 
+                case enVariableDataType.Error:
+                    return "{err} " + zusatz + Name + " = " + ValueString;
+
                 default:
                     return "{ukn} " + zusatz + Name + " = " + ValueString;
 
@@ -69,6 +68,76 @@ namespace BlueScript {
             }
             Name = name.ToLower();
         }
+
+
+        public strDoItFeedback CaluclateByAttribute(string attributesText) {
+
+            var bl = new List<string>() { "true", "false" , "||", "&&", "==","!=", "<", ">", ">=", "<="};
+
+        var (pos, witch) = Script.NextText(attributesText, 0, bl, false, false);
+
+            if (pos >= 0) {
+                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Bool) {
+                    return new strDoItFeedback("Variable ist kein Boolean");
+                }
+                var b = Method_if.GetBool(attributesText);
+                if (b == null) { return new strDoItFeedback("Berechnungsfehler der Formel: " + attributesText); }
+                ValueString = (string)b;
+                Type = enVariableDataType.Bool;
+                return new strDoItFeedback();
+            }
+
+            if (attributesText.StartsWith("\"")) {
+
+                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.String) {
+                    return new strDoItFeedback("Variable ist kein String");
+                }
+                ValueString = attributesText.Replace("\"+\"", string.Empty).Trim("\"");
+                Type = enVariableDataType.String;
+                return new strDoItFeedback();
+            }
+
+
+
+
+            if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Number) {
+                return new strDoItFeedback("Variable ist keine Zahl");
+            }
+
+            var erg = modErgebnis.Ergebnis(attributesText);
+            if (erg == null) { return new strDoItFeedback("Berechnungsfehler der Formel: " + attributesText); }
+
+
+            ValueString = ((double)erg).ToString();
+            Type = enVariableDataType.Number;
+            return new strDoItFeedback();
+
+        }
+
+
+        public Variable(string name, string attributesText) {
+
+            if (!IsValidName(name)) {
+                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Ungültiger Variablenname: " + name);
+            }
+            Name = name.ToLower();
+
+            var x = CaluclateByAttribute(attributesText);
+
+
+            if (!string.IsNullOrEmpty(x.ErrorMessage)) {
+                Type = enVariableDataType.Error;
+                ValueString = string.Empty;
+                Readonly = true;
+            }
+            else {
+                Readonly = true;
+            }
+        }
+
+
+
+
 
         public Variable(string name, string value, enVariableDataType type, bool ronly, bool system) {
 
@@ -141,7 +210,29 @@ namespace BlueScript {
             }
         }
 
+        public List<string> ValueListString {
+            get { return _ValueString.SplitByCRToList(); }
+            set {
+                if (Readonly) { return; }
+                _ValueString = value.JoinWithCr();
+            }
+        }
+
+
         public enVariableDataType Type { get; set; }
+        public bool ValueBool {
+            get {
+                return _ValueString == "true";
+            }
+        }
+
+        public double ValueDouble {
+            get {
+                return DoubleParse(_ValueString);
+            }
+        }
+
+
 
         public static bool IsValidName(string v) {
 

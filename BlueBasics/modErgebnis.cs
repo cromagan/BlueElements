@@ -30,26 +30,24 @@ namespace BlueBasics
             Formel = Formel.ToUpper();
             Formel = Formel.Replace(" ", "");
             if (string.IsNullOrEmpty(Formel)) { return null; }
-            Formel = Formel.Replace("INT(", "XNT(0,");
-            Formel = Formel.Replace("RND()", "XND(0,1)");
+            //Formel = Formel.Replace("INT(", "XNT(0,");
+            //Formel = Formel.Replace("RND()", "XND(0,1)");
             return ErgebnisCore(Formel);
         }
 
 
 
+
+
         private static double? ErgebnisCore(string Formel)
         {
-            var TMP = 0;
+            //var TMP = 0;
 
+
+            Formel = Formel.DeKlammere();
             //Das alles kann nur möglich sein, WENN eine Klammer vorhanden ist
             if (Formel.Contains("("))
             {
-                if (Formel.StartsWith("(") && Formel.IndexOf(")") == Formel.Length - 1)
-                {
-                    return ErgebnisCore(Formel.Substring(1, Formel.Length - 2)); // Unnötige Klammern entfernen und noch Ne Runde!!!!
-                }
-
-
                 // --------------------------------------------------------------------------------------------------------------------------------
                 // --- Eine Klammer auflösen, im Formelstring ersetzen und         mittels Rekursivität die nun einfachere Formel berechnen.
                 // --------------------------------------------------------------------------------------------------------------------------------
@@ -60,88 +58,88 @@ namespace BlueBasics
 
                 double? Replacer = 0;
 
-                if (a > 2 && Formel.IndexOf(",", a) > a && Formel.IndexOf(",", a) < e)
-                {
+                //if (a > 2 && Formel.IndexOf(",", a) > a && Formel.IndexOf(",", a) < e)
+                //{
 
-                    // --------------------------------------------------------------------------------------------------------------------------------
-                    // --- Ok, Funktion kommt, erkannt an den beinhaltenden Kommas.
-                    // --- Es ist die Letzte Klammer, deswegen KANN in der Funktion keine mehr sein.
-                    // --- Und die Kommas stellen den Seperator dar.
-                    // --------------------------------------------------------------------------------------------------------------------------------
-                    var Att = Formel.Substring(a + 1, e - a - 1).SplitBy(",");
-                    var Att2 = new double?[Att.Length];
+                //    // --------------------------------------------------------------------------------------------------------------------------------
+                //    // --- Ok, Funktion kommt, erkannt an den beinhaltenden Kommas.
+                //    // --- Es ist die Letzte Klammer, deswegen KANN in der Funktion keine mehr sein.
+                //    // --- Und die Kommas stellen den Seperator dar.
+                //    // --------------------------------------------------------------------------------------------------------------------------------
+                //    var Att = Formel.Substring(a + 1, e - a - 1).SplitBy(",");
+                //    var Att2 = new double?[Att.Length];
 
-                    for (TMP = 0; TMP < Att.Length; TMP++)
-                    {
-                        var qq = ErgebnisCore(Att[TMP]);
-                        if (qq == null) { return null; }
-                        Att2[TMP] = qq;
-                    }
+                //    for (TMP = 0; TMP < Att.Length; TMP++)
+                //    {
+                //        var qq = ErgebnisCore(Att[TMP]);
+                //        if (qq == null) { return null; }
+                //        Att2[TMP] = qq;
+                //    }
 
-                    Replacer = Att2[0];
+                //    Replacer = Att2[0];
 
-                    switch (Formel.Substring(a - 3, 4))
-                    {
-                        case "MIN(":
-                            for (TMP = 1; TMP < Att2.Length; TMP++)
-                            {
-                                if (Att2[TMP] < Replacer) { Replacer = Att2[TMP]; }
-                            }
+                //    switch (Formel.Substring(a - 3, 4))
+                //    {
+                //        case "MIN(":
+                //            for (TMP = 1; TMP < Att2.Length; TMP++)
+                //            {
+                //                if (Att2[TMP] < Replacer) { Replacer = Att2[TMP]; }
+                //            }
 
-                            break;
-                        case "MAX(":
-                            for (TMP = 1; TMP < Att2.Length; TMP++)
-                            {
-                                if (Att2[TMP] > Replacer) { Replacer = Att2[TMP]; }
-                            }
+                //            break;
+                //        case "MAX(":
+                //            for (TMP = 1; TMP < Att2.Length; TMP++)
+                //            {
+                //                if (Att2[TMP] > Replacer) { Replacer = Att2[TMP]; }
+                //            }
 
-                            break;
-                        case "XNT(":
-                            if (Att2.Length != 2) { return null; }
-                            Replacer = Math.Floor((double)Att2[1]);
+                //            break;
+                //        case "XNT(":
+                //            if (Att2.Length != 2) { return null; }
+                //            Replacer = Math.Floor((double)Att2[1]);
 
-                            break;
-                        case "BTW(": // Between. Format: BTW(IsValue, MinValue, MaxValue)
-                            if (Att2.Length != 3) { return null; }
-                            if (Att2[0] >= Att2[1] && Att2[0] <= Att2[2])
-                            {
-                                Replacer = -1;
-                            }
-                            else
-                            {
-                                Replacer = 0;
-                            }
+                //            break;
+                //        case "BTW(": // Between. Format: BTW(IsValue, MinValue, MaxValue)
+                //            if (Att2.Length != 3) { return null; }
+                //            if (Att2[0] >= Att2[1] && Att2[0] <= Att2[2])
+                //            {
+                //                Replacer = -1;
+                //            }
+                //            else
+                //            {
+                //                Replacer = 0;
+                //            }
 
-                            break;
-                        case "IFF(":
-                            if (Att2.Length != 3) { return null; }
+                //            break;
+                //        case "IFF(":
+                //            if (Att2.Length != 3) { return null; }
 
-                            if (Att2[0] == -1)
-                            {
-                                Replacer = Att2[1];
-                            }
-                            else
-                            {
-                                Replacer = Att2[2];
-                            }
+                //            if (Att2[0] == -1)
+                //            {
+                //                Replacer = Att2[1];
+                //            }
+                //            else
+                //            {
+                //                Replacer = Att2[2];
+                //            }
 
-                            break;
+                //            break;
 
-                        case "XND(":
-                            if (Att2.Length != 2) { return null; }
-                            Replacer = Constants.GlobalRND.NextDouble();
-                            break;
+                //        case "XND(":
+                //            if (Att2.Length != 2) { return null; }
+                //            Replacer = Constants.GlobalRND.NextDouble();
+                //            break;
 
-                        default:
-                            return null;
-                    }
+                //        default:
+                //            return null;
+                //    }
 
-                    a -= 3;
-                }
-                else // Es ist KEINE Funktion, also den Inhalt der Klammer normal berechnen
-                {
+                //    a -= 3;
+                //}
+                //else // Es ist KEINE Funktion, also den Inhalt der Klammer normal berechnen
+                //{
                     Replacer = ErgebnisCore(Formel.Substring(a + 1, e - a - 1));
-                }
+                //}
 
                 if (Replacer == null) { return null; }
 
@@ -154,8 +152,8 @@ namespace BlueBasics
             // --- Prüfen, ob überhaupt eine Berechnung nötig ist. Z.B. wenn unnötige Klammern aufgelöst wurden. ------------------------------
             // --------------------------------------------------------------------------------------------------------------------------------
             if (Formel.Replace(".", ",").IsNumeral()) { return double.Parse(Formel.Replace(".", ",")); }
-            TMP = Math.Max(Math.Max(-1, Formel.LastIndexOf("=")), Math.Max(Formel.LastIndexOf("<"), Formel.LastIndexOf(">")));
-            if (TMP < 0) { TMP = Math.Max(Formel.LastIndexOf("+"), LastMinusIndex(Formel)); }
+            //TMP = Math.Max(Math.Max(-1, Formel.LastIndexOf("=")), Math.Max(Formel.LastIndexOf("<"), Formel.LastIndexOf(">")));
+            var TMP = Math.Max(Formel.LastIndexOf("+"), LastMinusIndex(Formel)); 
             if (TMP < 0) { TMP = Math.Max(Formel.LastIndexOf("/"), Formel.LastIndexOf("*")); }
             if (TMP < 1) { return null; }
 
@@ -165,15 +163,15 @@ namespace BlueBasics
             // --------------------------------------------------------------------------------------------------------------------------------
             var Seperator = Formel.Substring(TMP, 1);
 
-            if (Seperator == "<" || Seperator == ">" || Seperator == "=")
-            {
-                if (TMP < 1 || TMP > Formel.Length - 2) { return null; }
+            //if (Seperator == "<" || Seperator == ">" || Seperator == "=")
+            //{
+            //    if (TMP < 1 || TMP > Formel.Length - 2) { return null; }
 
-                var sep2 = Formel.Substring(TMP - 1, 1);
-                if (sep2 == "<" || sep2 == ">" || sep2 == "=") { TMP--; }
-                sep2 = Formel.Substring(TMP + 1, 1);
-                if (sep2 == "<" || sep2 == ">" || sep2 == "=") { Seperator = Formel.Substring(TMP, 2); }
-            }
+            //    var sep2 = Formel.Substring(TMP - 1, 1);
+            //    if (sep2 == "<" || sep2 == ">" || sep2 == "=") { TMP--; }
+            //    sep2 = Formel.Substring(TMP + 1, 1);
+            //    if (sep2 == "<" || sep2 == ">" || sep2 == "=") { Seperator = Formel.Substring(TMP, 2); }
+            //}
 
             var w1 = ErgebnisCore(Formel.Substring(0, TMP));
             if (w1 == null) { return null; }
@@ -197,27 +195,27 @@ namespace BlueBasics
                     return w1 - w2;
                 case "+":
                     return w1 + w2;
-                case ">":
-                    if (w1 > w2) { return -1; }
-                    return 0;
-                case ">=":
-                case "=>":
-                    if (w1 >= w2) { return -1; }
-                    return 0;
-                case "<":
-                    if (w1 < w2) { return -1; }
-                    return 0;
-                case "<=":
-                case "=<":
-                    if (w1 <= w2) { return -1; }
-                    return 0;
-                case "=":
-                    if (w1 == w2) { return -1; }
-                    return 0;
-                case "<>":
-                case "><":
-                    if (w1 != w2) { return -1; }
-                    return 0;
+                //case ">":
+                //    if (w1 > w2) { return -1; }
+                //    return 0;
+                //case ">=":
+                //case "=>":
+                //    if (w1 >= w2) { return -1; }
+                //    return 0;
+                //case "<":
+                //    if (w1 < w2) { return -1; }
+                //    return 0;
+                //case "<=":
+                //case "=<":
+                //    if (w1 <= w2) { return -1; }
+                //    return 0;
+                //case "=":
+                //    if (w1 == w2) { return -1; }
+                //    return 0;
+                //case "<>":
+                //case "><":
+                //    if (w1 != w2) { return -1; }
+                //    return 0;
             }
 
             return null;

@@ -29,6 +29,29 @@ namespace BlueBasics
     public static partial class Extensions
     {
 
+        /// <summary>
+        /// Entfernt ( und ), { und } und " "
+        /// </summary>
+        /// <param name="Formel"></param>
+        /// <returns></returns>
+        public static string DeKlammere(this string Formel) {
+            if (Formel.StartsWith("(") && Formel.IndexOf(")") == Formel.Length - 1) {
+                return Formel.Substring(1, Formel.Length - 2); // Unnötige Klammern entfernen und noch Ne Runde!!!!
+            }
+
+            if (Formel.StartsWith("{") && Formel.IndexOf("}") == Formel.Length - 1) {
+                return Formel.Substring(1, Formel.Length - 2); // Unnötige Klammern entfernen und noch Ne Runde!!!!
+            }
+
+            //if (Formel.StartsWith("\"") && Formel.IndexOf("\"",1) == Formel.Length - 1) {
+            //    return Formel.Substring(1, Formel.Length - 2); // Unnötige Klammern entfernen und noch Ne Runde!!!!
+            //}
+
+
+            return Formel;
+
+
+        }
         public static bool FromPlusMinus(this string Value)
         {
 

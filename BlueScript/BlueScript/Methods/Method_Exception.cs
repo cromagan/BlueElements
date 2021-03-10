@@ -49,13 +49,13 @@ namespace BlueScript {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 
-            var bs = SplitAttribute(infos.AttributText, s, 0);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, 0);
 
-            if (bs == null || bs.Count != 1) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
+            if (attvar == null || attvar.Count != 1) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 
+            if (attvar[0].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
 
-
-            return new strDoItFeedback(string.Empty, bs[0]);
+            return new strDoItFeedback(string.Empty, attvar[0].ValueString);
         }
     }
 }

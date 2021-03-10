@@ -95,7 +95,7 @@ namespace BlueScript {
                                 return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true);
                             }
 
-                            var (posek, witch) = Script.NextText(scriptText, f.ContinuePosition, new List<string>() { "}" }, false, false, false);
+                            var (posek, witch) = Script.NextText(scriptText, f.ContinuePosition, new List<string>() { "}" }, false, false);
                             if (posek < f.ContinuePosition) {
                                 return new strCanDoFeedback(f.ContinuePosition, "Kein Codeblock Ende bei " + comandtext, true);
                             }
@@ -118,7 +118,7 @@ namespace BlueScript {
 
         strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
 
-            var (pos, witch) = Script.NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false, false);
+            var (pos, witch) = Script.NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
 
 
             if (pos < startpos) {
@@ -274,7 +274,7 @@ namespace BlueScript {
 
             do {
 
-                var (pos, witch) = Script.NextText(txt, posc, c, true, false, false);
+                var (pos, witch) = Script.NextText(txt, posc, c, true, false);
 
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
@@ -314,7 +314,7 @@ namespace BlueScript {
 
             do {
 
-                var (pos, witch) = Script.NextText(txt, posc, v, true, true, false);
+                var (pos, witch) = Script.NextText(txt, posc, v, true, true);
 
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
@@ -378,8 +378,8 @@ namespace BlueScript {
 
         }
 
-
-        public List<string> SplitAttribute(string attributtext, Script s, int modifiyab) {
+        public List<string> SplitAttributeToString(string attributtext) {
+            if (string.IsNullOrEmpty(attributtext)) { return null; }
 
             var attributes = new List<string>();
 
@@ -387,70 +387,62 @@ namespace BlueScript {
             var posc = 0;
             var v = new List<string>() { "," };
             do {
-                var (pos, witch) = Script.NextText(attributtext, posc, v, false, false, false);
+                var (pos, witch) = Script.NextText(attributtext, posc, v, false, false);
                 if (pos < 0) {
-                    attributes.Add(attributtext.Substring(posc));
+                    attributes.Add((attributtext.Substring(posc)).DeKlammere());
                     break;
                 }
 
-
-                attributes.Add(attributtext.Substring(posc, pos - posc));
-                posc = pos+1;
-
+                attributes.Add((attributtext.Substring(posc, pos - posc)).DeKlammere());
+                posc = pos + 1;
 
             } while (true);
-            //var pos = -1;
-            //var start = 0;
-            //var gänsef = false;
-            //var kl = 0;
-            //do {
-            //    pos++;
-
-            //    if (pos >= attributtext.Length) {
-            //        if (gänsef) { return null; }
-            //        if (kl > 0) { return null; }
-            //        attributes.Add(attributtext.Substring(start, pos - start));
-            //        break;
-            //    }
-
-            //    switch (attributtext.Substring(pos, 1)) {
-            //        case "\"": gänsef = !gänsef; break;
-            //        case "(": kl++; break;
-            //        case ")":
-            //            if (kl < 0) { return null; }
-            //            kl--;
-            //            break;
-            //        case ",":
-            //            if (!gänsef && kl == 0) {
-            //                attributes.Add(attributtext.Substring(start, pos - start));
-            //                start = pos + 1;
-            //            }
-            //            break;
-            //    }
-            //} while (true);
 
             #endregion
 
-            for (var n = 0; n < attributes.Count; n++) {
+            return attributes;
+        }
 
-                if (n >= modifiyab) {
 
-                    var t = ReplaceVariable(attributes[n], s.Variablen);
-                    if (!string.IsNullOrEmpty(t.ErrorMessage)) {
-                        return null; // new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
-                    }
+        public List<Variable> SplitAttributeToVars(string attributtext, Script s, int modifiyab) {
+            var attributes = SplitAttributeToString(attributtext);
+            if (attributes == null || attributes.Count == 0) { return null; }
 
-                    var t2 = ReplaceComands(t.AttributeText, Script.Comands, s);
-                    if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
-                        return null; // new  strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
-                    }
+            #region Variablen und Routinen ersetzen
+            for (var n = modifiyab; n < attributes.Count; n++) {
 
-                    attributes[n] = t2.AttributeText;
+                var t = ReplaceVariable(attributes[n], s.Variablen);
+                if (!string.IsNullOrEmpty(t.ErrorMessage)) {
+                    return null; // new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
                 }
 
+                var t2 = ReplaceComands(t.AttributeText, Script.Comands, s);
+                if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
+                    return null; // new  strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
+                }
+
+                attributes[n] = t2.AttributeText;
+
+            }
+            #endregion
+
+            #region Liste der Variablen erstellen
+            var vars = new List<Variable>();
+
+            for (var n = 0; n < attributes.Count; n++) {
+                if (n < modifiyab) {
+                    vars.Add(s.Variablen.Get(attributes[n]));
+                }
+                else {
+
+                    vars.Add(new Variable("dummy", attributes[n]));
+                }
             }
 
-            return attributes;
+
+            #endregion
+
+            return vars;
 
         }
 

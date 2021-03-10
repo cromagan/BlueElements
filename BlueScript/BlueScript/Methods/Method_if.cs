@@ -48,26 +48,19 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
+            var attvar = SplitAttributeToVars(infos.AttributText, s, 0);
+            if (attvar == null || attvar.Count != 1) { return strDoItFeedback.AttributFehler(); }
 
-            var bs = SplitAttribute(infos.AttributText, s, 0);
-
-            if (bs == null || bs.Count != 1) { return new strDoItFeedback("'If' erwartet genau ein Attribut: " + infos.AttributText); }
-
-
-            var x = GetBool(bs[0]);
-            if (x == null) { return new strDoItFeedback("'If' konnte nicht berechnet werden: " + infos.AttributText); }
+            if (attvar[0].Type != Skript.Enums.enVariableDataType.Bool) { return strDoItFeedback.FalscherDatentyp(); }
 
 
-            if (x == "true") {
+            if (attvar[0].ValueBool) {
                 var (err, ermess2) = Script.Parse(infos.CodeBlockAfterText, false, s);
                 if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
             }
             else {
                 s.Line += infos.LineBreakInCodeBlock;
-
             }
-
             return new strDoItFeedback(string.Empty, string.Empty);
         }
 
@@ -92,9 +85,9 @@ namespace BlueScript {
 
 
 
-            var (posa, witcha) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false, false);
+            var (posa, witcha) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
             if (posa > -1) {
-                var (pose, witche) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false, false);
+                var (pose, witche) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
 
                 if (pose < posa) { return null; }
 
@@ -146,7 +139,7 @@ namespace BlueScript {
 
 
         static string GetBoolTMP(string txt, string check) {
-            var (i, _) = Script.NextText(txt, 0, new List<string>() { check }, false, false, false);
+            var (i, _) = Script.NextText(txt, 0, new List<string>() { check }, false, false);
 
 
             if (i < 0) { return string.Empty; }

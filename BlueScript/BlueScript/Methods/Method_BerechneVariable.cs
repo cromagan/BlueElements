@@ -54,57 +54,14 @@ namespace BlueScript {
                 return new strDoItFeedback("Variable " + variableName + " nicht gefunden");
             }
 
+            var attvar = SplitAttributeToVars(infos.AttributText, s, 0);
 
+            if (attvar == null || attvar.Count != 1) { return strDoItFeedback.AttributFehler(); }
 
-            var bs = SplitAttribute(infos.AttributText, s, 0);
+            if (variable.Type != enVariableDataType.NotDefinedYet && attvar[0].Type != variable.Type) { return strDoItFeedback.FalscherDatentyp(); }
 
-            if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
-
-
-            if (bs[0].StartsWith("\"")) {
-
-                if (variable.Type != enVariableDataType.NotDefinedYet && variable.Type != enVariableDataType.String) {
-                    return new strDoItFeedback("Variable ist kein String");
-                }
-                variable.ValueString = bs[0].Replace("\"+\"", string.Empty).Trim("\"");
-                variable.Type = enVariableDataType.String;
-                return new strDoItFeedback();
-            }
-
-            if (bs[0].Contains("|") || bs[0].Contains("&") || bs[0].Contains("!") || bs[0].ToLower().Contains("true") || bs[0].ToLower().Contains("false")) {
-                var b = Method_if.GetBool(bs[0]);
-                if (b == null) { return new strDoItFeedback("Berechnungsfehler der Formel: " + infos.AttributText + " => " + bs[0]); }
-                variable.ValueString = ((string)b).ToString();
-                variable.Type = enVariableDataType.Bool;
-                return new strDoItFeedback();
-            }
-
-
-            var erg = modErgebnis.Ergebnis(bs[0]);
-            if (erg == null) { return new strDoItFeedback("Berechnungsfehler der Formel: " + infos.AttributText + " => " + bs[0]); }
-
-            if (variable.Type != enVariableDataType.NotDefinedYet && variable.Type != enVariableDataType.Number) {
-                return new strDoItFeedback("Variable ist keine Zahl");
-            }
-            variable.ValueString = ((double)erg).ToString();
-            variable.Type = enVariableDataType.Number;
-
-            //var mustType = enVariableDataType.NotDefinedYet;
-
-
-            //if (txt.Contains("<") || txt.Contains(">") || txt.Contains("=") || txt.Contains("|") || txt.Contains("&") || txt.Contains("!")) {
-            //    if (mustType != enVariableDataType.Bool && mustType != enVariableDataType.NotDefinedYet) { return new strDoItFeedback("Unverträglicher Datentyp"); }
-            //    mustType = enVariableDataType.Bool;
-            //}
-
-            //if (txt.Contains("<") || txt.Contains(">") || txt.Contains("=") || txt.Contains("|") || txt.Contains("&")) {
-            //    if (mustType != enVariableDataType.Bool && mustType != enVariableDataType.NotDefinedYet) { return new strDoItFeedback("Unverträglicher Datentyp"); }
-            //    mustType = enVariableDataType.Bool;
-            //}
-
-
-
-            //f
+            variable.ValueString = attvar[0].ValueString;
+            variable.Type = attvar[0].Type;
 
             return new strDoItFeedback();
         }

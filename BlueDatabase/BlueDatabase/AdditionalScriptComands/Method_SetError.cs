@@ -38,29 +38,22 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
+            var attvar = SplitAttributeToVars(infos.AttributText, s, 9999);
 
-            var bs = SplitAttribute(infos.AttributText, s, 9999);
+            if (attvar == null || attvar.Count < 2) { return strDoItFeedback.AttributFehler(); }
 
-            if (bs == null || bs.Count < 2) { return new strDoItFeedback("'SetError' erwartet mindestens zwei Attribute: " + infos.AttributText); }
+            var attvartext = SplitAttributeToString(infos.AttributText);
+            attvartext[0] = attvartext[0].Trim("\"");
 
+            if (string.IsNullOrEmpty(attvartext[0])) { return strDoItFeedback.FalscherDatentyp(); }
 
-            for (var z = 1; z < bs.Count; z++) {
+            for (var z = 1; z < attvar.Count; z++) {
 
-                var v = s.Variablen.Get(bs[z]);
-                if (v == null) { return new strDoItFeedback("Spalte nicht gefunden: " + bs[z]); }
+                if (attvar[z] == null) { return new strDoItFeedback("Spalte nicht gefunden"); }
 
-          
-                var n = bs[z].ToLower() + "_error";
+                var n = attvar[z].Name.ToLower() + "_error";
 
                 var ve = s.Variablen.GetSystem(n);
-
-
-                //foreach (var thisv in variablen) {
-                //    if (thisv.Name == n) {
-                //        ve = thisv; break;
-                //    }
-                //}
 
 
                 if (ve == null) {
@@ -68,9 +61,9 @@ namespace BlueScript {
                     s.Variablen.Add(ve);
                 }
 
-                var l = ve.ValueString.SplitByCRToList();
-                l.AddIfNotExists(bs[0].Trim("\""));
-                ve.ValueString = l.JoinWithCr();
+                var l = ve.ValueListString;
+                l.AddIfNotExists(attvartext[0]);
+                ve.ValueListString = l;
 
             }
 

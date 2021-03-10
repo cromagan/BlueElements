@@ -48,59 +48,41 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            var bs = SplitAttribute(infos.AttributText, s, 1);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, 1);
+            if (attvar == null || attvar.Count < 3) { return strDoItFeedback.AttributFehler(); }
 
-            if (bs == null || bs.Count < 3) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            if (attvar[0] == null) { return strDoItFeedback.VariableNichtGefunden(); }
 
-
-            if (bs[1].ToLower() != "false" && bs[1].ToLower() != "true") { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
-            var css = bs[1].ToLower() == "true";
-
-            var variable = s.Variablen.Get(bs[0]);
-            if (variable == null) {
-                return new strDoItFeedback("Variable " + bs[0] + " nicht gefunden");
-            }
-
-            //if (variable.Type == Skript.Enums.enVariableDataType.List) {
-
-            //    var x = variable.ValueString.SplitByCRToList();
-
-            //    for (var z = 2; z < bs.Count; z++) {
-
-            //        if (x.Contains(bs[z].Trim("\""), css)) {
-            //            return new strDoItFeedback("true", string.Empty);
-            //        }
-            //    }
-
-            //    return new strDoItFeedback("false", string.Empty);
-            //}
+            if (attvar[1].Type != Skript.Enums.enVariableDataType.Bool) { return strDoItFeedback.FalscherDatentyp(); }
 
 
 
 
 
-            if (variable.Type == Skript.Enums.enVariableDataType.String) {
 
-                var x = variable.ValueString;
 
-                for (var z = 2; z < bs.Count; z++) {
+            if (attvar[0].Type == Skript.Enums.enVariableDataType.String) {
 
-                    if (css) {
-                        if (x.EndsWith(bs[z])) {
-                            return new strDoItFeedback("true", string.Empty);
+           
+
+                for (var z = 2; z < attvar.Count; z++) {
+                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
+
+                    if (attvar[1].ValueBool) {
+                        if (attvar[0].ValueString.EndsWith(attvar[z].ValueString)) {
+                            return strDoItFeedback.Wahr();
                         }
                     }
                     else {
-                        if (x.ToLower().EndsWith(bs[z].ToLower())) {
-                            return new strDoItFeedback("true", string.Empty);
+                        if (attvar[0].ValueString.ToLower().EndsWith(attvar[z].ValueString.ToLower())) {
+                            return strDoItFeedback.Wahr();
                         }
                     }
 
 
                 }
-                return new strDoItFeedback("false", string.Empty);
+                return strDoItFeedback.Falsch();
 
             }
 
@@ -109,10 +91,10 @@ namespace BlueScript {
 
 
             //if (string.IsNullOrEmpty(variable.ValueString)) {
-            //    return new strDoItFeedback("true", string.Empty);
+            //    return strDoItFeedback.Wahr();
             //}
 
-            //return new strDoItFeedback("false", string.Empty);
+            //return strDoItFeedback.Falsch();
 
         }
     }

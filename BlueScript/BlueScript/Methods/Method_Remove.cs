@@ -46,45 +46,27 @@ namespace BlueScript {
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, 1);
+            if (attvar == null || attvar.Count < 3) { return strDoItFeedback.AttributFehler(); }
 
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
+            if (attvar[0] == null) { return strDoItFeedback.VariableNichtGefunden(); }
 
-            var bs = SplitAttribute(infos.AttributText, s, 1);
+            if (attvar[1].Type != Skript.Enums.enVariableDataType.Bool ) { return strDoItFeedback.FalscherDatentyp(); }
 
-            if (bs == null || bs.Count < 3) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
 
+                var x = attvar[0].ValueString.SplitByCRToList();
 
-        
-            if (bs[1].ToLower() != "false" && bs[1].ToLower() != "true") { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
-            var css = bs[1].ToLower() == "true";
-
-            var variable = s.Variablen.Get(bs[0]);
-            if (variable == null) {
-                return new strDoItFeedback("Variable " + bs[0] + " nicht gefunden");
-            }
-
-            if (variable.Type == Skript.Enums.enVariableDataType.List) {
-
-                var x = variable.ValueString.SplitByCRToList();
-
-                for (var z = 2; z < bs.Count; z++) {
-                    x.RemoveString(bs[z].Trim("\""), css);
+                for (var z = 2; z < attvar.Count; z++) {
+                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
+                    x.RemoveString(attvar[z].ValueString, attvar[1].ValueBool);
                 }
-                variable.ValueString = x.JoinWithCr();
-                return new strDoItFeedback();
 
+                attvar[0].ValueString = x.JoinWithCr();
+                return new strDoItFeedback();
             }
 
-
-
-            return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText);
-
-
-            //if (string.IsNullOrEmpty(variable.ValueString)) {
-            //    return new strDoItFeedback("true", string.Empty);
-            //}
-
-            //return new strDoItFeedback("false", string.Empty);
+            return strDoItFeedback.FalscherDatentyp();
 
         }
     }

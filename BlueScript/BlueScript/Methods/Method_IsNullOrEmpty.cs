@@ -45,25 +45,15 @@ namespace BlueScript {
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, 1);
+            if (attvar == null || attvar.Count != 1) { return strDoItFeedback.AttributFehler(); }
 
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
+            if (attvar[0] == null) { return strDoItFeedback.VariableNichtGefunden(); }
 
-            var bs = SplitAttribute(infos.AttributText, s, 1);
-
-            if (bs == null || bs.Count != 1) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
-
-
-            var variable = s.Variablen.Get(bs[0]);
-            if (variable == null) {
-                return new strDoItFeedback("Variable " + bs[0] + " nicht gefunden");
+            if (string.IsNullOrEmpty(attvar[0].ValueString)) {
+                return strDoItFeedback.Wahr();
             }
-
-            if (string.IsNullOrEmpty(variable.ValueString)) {
-                return new strDoItFeedback("true", string.Empty);
-            }
-
-            return new strDoItFeedback("false", string.Empty);
-
+            return strDoItFeedback.Falsch();
         }
     }
 }

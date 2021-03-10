@@ -41,19 +41,14 @@ namespace BlueScript {
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
-
-            var bs = SplitAttribute(infos.AttributText, s, 0);
-
-            if (bs == null || bs.Count < 2) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            var attvar = SplitAttributeToVars(infos.AttributText, s, 0);
+            if (attvar == null || attvar.Count < 2) { return strDoItFeedback.AttributFehler(); }
 
             var val = double.MaxValue;
 
-            foreach (var thisval in bs) {
-                if (!thisval.IsNumeral()) { return new strDoItFeedback(thisval + " ist keine Zahl."); }
-                val = Math.Min(DoubleParse(thisval), val);
-
+            foreach (var thisval in attvar) {
+                if (thisval.Type != Skript.Enums.enVariableDataType.Number) { return strDoItFeedback.FalscherDatentyp(); }
+                val = Math.Min(thisval.ValueDouble, val);
             }
 
             return new strDoItFeedback(val.ToString(), string.Empty);

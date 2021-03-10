@@ -47,72 +47,51 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            var bs = SplitAttribute(infos.AttributText, s, 1);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, 1);
+            if (attvar == null || attvar.Count < 3) { return strDoItFeedback.AttributFehler(); }
 
-            if (bs == null || bs.Count < 3) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            if (attvar[0] == null) { return strDoItFeedback.VariableNichtGefunden(); }
+            if (attvar[1].Type != Skript.Enums.enVariableDataType.Bool) { return strDoItFeedback.AttributFehler(); }
 
 
-            if (bs[1].ToLower() != "false" && bs[1].ToLower() != "true") { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
-            var css = bs[1].ToLower() == "true";
 
-            var variable = s.Variablen.Get(bs[0]);
-            if (variable == null) {
-                return new strDoItFeedback("Variable " + bs[0] + " nicht gefunden");
-            }
 
-            if (variable.Type == Skript.Enums.enVariableDataType.List) {
+            if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
+                var x = attvar[0].ValueListString;
 
-                var x = variable.ValueString.SplitByCRToList();
+                for (var z = 2; z < attvar.Count; z++) {
+                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.AttributFehler(); }
 
-                for (var z = 2; z < bs.Count; z++) {
-
-                    if (x.Contains(bs[z].Trim("\""), css)) {
-                        return new strDoItFeedback("true", string.Empty);
+                    if (x.Contains(attvar[z].ValueString, attvar[1].ValueBool)) {
+                        return strDoItFeedback.Wahr();
                     }
                 }
-
-                return new strDoItFeedback("false", string.Empty);
+                return strDoItFeedback.Falsch();
             }
 
+            if (attvar[0].Type == Skript.Enums.enVariableDataType.String) {
 
 
+                for (var z = 2; z < attvar.Count; z++) {
+                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
 
 
-            if (variable.Type == Skript.Enums.enVariableDataType.String) {
-
-                var x = variable.ValueString;
-
-                for (var z = 2; z < bs.Count; z++) {
-
-                    if (css) {
-                        if (x.Contains(bs[z])) {
-                            return new strDoItFeedback("true", string.Empty);
+                    if (attvar[1].ValueBool) {
+                        if (attvar[0].ValueString.Contains(attvar[z].ValueString)) {
+                            return strDoItFeedback.Wahr();
                         }
                     }
                     else {
-                        if (x.ToLower().Contains(bs[z].ToLower())) {
-                            return new strDoItFeedback("true", string.Empty);
+                        if (attvar[0].ValueString.ToLower().Contains(attvar[z].ValueString.ToLower())) {
+                            return strDoItFeedback.Wahr();
                         }
                     }
-
-
                 }
-                return new strDoItFeedback("false", string.Empty);
-
+                return strDoItFeedback.Falsch();
             }
 
-
-            return new strDoItFeedback("Variablentyp unterstützt den Befehl Contains nicht: " + infos.AttributText );
-
-
-            //if (string.IsNullOrEmpty(variable.ValueString)) {
-            //    return new strDoItFeedback("true", string.Empty);
-            //}
-
-            //return new strDoItFeedback("false", string.Empty);
-
+            return strDoItFeedback.FalscherDatentyp();
         }
     }
 }

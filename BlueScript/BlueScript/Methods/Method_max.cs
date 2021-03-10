@@ -19,13 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static BlueBasics.modAllgemein;
-using static BlueBasics.Extensions;
-using BlueBasics;
-using static BlueBasics.modConverter;
 
 namespace BlueScript {
     class Method_max : Method {
@@ -33,9 +26,7 @@ namespace BlueScript {
 
         public Method_max(Script parent) : base(parent) { }
 
-
         public override string Syntax { get => "Max(Value1, Value2, ...)"; }
-
 
         public override List<string> Comand { get => new List<string>() { "max" }; }
         public override string StartSequence { get => "("; }
@@ -47,19 +38,14 @@ namespace BlueScript {
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
-
-            var bs = SplitAttribute(infos.AttributText, s, 0);
-
-            if (bs == null || bs.Count < 2) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+            var attvar = SplitAttributeToVars(infos.AttributText, s, 0);
+            if (attvar == null || attvar.Count <2) { return strDoItFeedback.AttributFehler(); }
 
             var val = double.MinValue;
 
-            foreach (var thisval in bs) {
-                if (!thisval.IsNumeral()) { return new strDoItFeedback(thisval + " ist keine Zahl."); }
-                val = Math.Max(DoubleParse(thisval), val);
-
+            foreach (var thisval in attvar) {
+                if (thisval.Type != Skript.Enums.enVariableDataType.Number ) { return strDoItFeedback.FalscherDatentyp(); }
+                val = Math.Max(thisval.ValueDouble, val);
             }
 
             return new strDoItFeedback(val.ToString(), string.Empty);

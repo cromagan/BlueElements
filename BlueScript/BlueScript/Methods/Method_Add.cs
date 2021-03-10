@@ -44,44 +44,25 @@ namespace BlueScript {
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, 1);
+            if (attvar == null || attvar.Count < 2) { return strDoItFeedback.AttributFehler(); }
 
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
+            if (attvar[0] == null) { return strDoItFeedback.VariableNichtGefunden(); }
 
-            var bs = SplitAttribute(infos.AttributText, s, 1);
+            if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
 
-            if (bs == null || bs.Count < 2) { return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText); }
+                var x = attvar[0].ValueString.SplitByCRToList();
 
-
-            var variable = s.Variablen.Get(bs[0]);
-            if (variable == null) {
-                return new strDoItFeedback("Variable " + bs[0] + " nicht gefunden");
-            }
-
-            if (variable.Type == Skript.Enums.enVariableDataType.List) {
-
-                var x = variable.ValueString.SplitByCRToList();
-
-                for (var z = 1; z < bs.Count; z++) {
-                    x.Add(bs[z].Trim("\""));
-
-
+                for (var z = 1; z < attvar.Count; z++) {
+                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
+                    x.Add(attvar[z].ValueString);
                 }
-                variable.ValueString = x.JoinWithCr();
-                return new strDoItFeedback();
 
+                attvar[0].ValueString = x.JoinWithCr();
+                return new strDoItFeedback();
             }
 
-
-
-            return new strDoItFeedback("Attributfehler bei " + infos.ComandText + ": " + infos.AttributText);
-
-
-            //if (string.IsNullOrEmpty(variable.ValueString)) {
-            //    return new strDoItFeedback("true", string.Empty);
-            //}
-
-            //return new strDoItFeedback("false", string.Empty);
-
+            return strDoItFeedback.FalscherDatentyp();
         }
     }
 }

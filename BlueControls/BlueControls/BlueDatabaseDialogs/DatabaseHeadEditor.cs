@@ -675,7 +675,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode;
             }
 
- 
+
 
 
         }
@@ -728,23 +728,31 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void ExternTimer_Tick(object sender, System.EventArgs e) {
             ExternTimer.Enabled = false;
 
-            if (!FileExists(_ExternCode)) {
+            try {
+                if (!FileExists(_ExternCode)) {
 
-                txtSkript.Enabled = true;
-                return;
+                    txtSkript.Enabled = true;
+                    return;
+                }
+
+
+                var nfilestate = GetFileInfo(_ExternCode, true);
+
+                if (_FileState == nfilestate) { ExternTimer.Enabled = true; return; }
+
+                _FileState = nfilestate;
+
+                txtSkript.Text = LoadFromDisk(_ExternCode);
+
+
+                ExternTimer.Enabled = true;
+
+            }
+            catch {
+                _FileState = "Fehler";
+                ExternTimer.Enabled = true;
             }
 
-
-            var nfilestate = GetFileInfo(_ExternCode, true);
-
-            if (_FileState == nfilestate) { ExternTimer.Enabled = true; return; }
-
-            _FileState = nfilestate;
-
-            txtSkript.Text = LoadFromDisk(_ExternCode);
-
-
-            ExternTimer.Enabled = true;
 
 
         }

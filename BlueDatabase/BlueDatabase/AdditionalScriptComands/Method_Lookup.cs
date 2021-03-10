@@ -44,21 +44,21 @@ namespace BlueScript {
         public override string Returns { get => string.Empty; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, 0);
 
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
-
-            var bs = SplitAttribute(infos.AttributText, s, 0);
-
-            if (bs == null || bs.Count < 3) { return new strDoItFeedback("'Lookup' erwartet mindestens drei Attribute: " + infos.AttributText); }
-
+            if (attvar == null || attvar.Count < 3) { return strDoItFeedback.AttributFehler(); }
 
 
             var f = s.Variablen.GetSystem("filename");
             if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
 
 
+            foreach ( var thisv in attvar) {
+                if (thisv.Type  != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
+            }
 
-            var newf = f.ValueString.FilePath() + bs[0] + ".mdb";
+
+            var newf = f.ValueString.FilePath() + attvar[0].ValueString + ".mdb";
 
             var db2 = BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(newf, true);
             BlueDatabase.Database db;
@@ -71,28 +71,25 @@ namespace BlueScript {
                 db = (BlueDatabase.Database)db2;
             }
 
-            var c = db.Column.Exists(bs[2]);
+            var c = db.Column.Exists(attvar[2].ValueString);
 
-            if (c == null) {  return new strDoItFeedback("Spalte nicht gefunden: " + bs[2]); } 
+            if (c == null) {  return new strDoItFeedback("Spalte nicht gefunden: " + attvar[2].ValueString); } 
 
-            var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], BlueDatabase.Enums.enFilterType.Istgleich_GroßKleinEgal, bs[1].Trim("\"")));
+            var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], BlueDatabase.Enums.enFilterType.Istgleich_GroßKleinEgal, attvar[1].ValueString));
 
             if (r == null || r.Count == 0) {
-                if (bs.Count > 3) { return new strDoItFeedback(bs[3], string.Empty); }
+                if (attvar.Count > 3) { return new strDoItFeedback(attvar[3].ValueString, string.Empty); }
                 return new strDoItFeedback(string.Empty, string.Empty);
             }
 
             if (r.Count > 1) {
-                if (bs.Count > 4) { return new strDoItFeedback(bs[4], string.Empty); }
+                if (attvar.Count > 4) { return new strDoItFeedback(attvar[4].ValueString, string.Empty); }
                 return new strDoItFeedback(string.Empty, string.Empty);
             }
 
 
             var v = RowItem.CellToVariable(c, r[0]);
-
-            if (v==null) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + bs[2]); }
-
-
+            if (v==null) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar[2].ValueString); }
 
             return new strDoItFeedback(v.ValueForReplace, string.Empty); 
         }
