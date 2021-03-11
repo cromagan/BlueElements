@@ -177,88 +177,99 @@ namespace BlueScript {
             if (string.IsNullOrEmpty(s1) && check != "!") { return string.Empty; }
             if (string.IsNullOrEmpty(s2)) { return string.Empty; }
 
+
+            Variable v1 = null;
+            if (check != "!") { v1 = new Variable("dummy", s1); }
+            var v2 = new Variable("dummy", s2);
+
+
+            // V2 braucht nicht gepürft werden, muss ja eh der gleiche TYpe wie V1 sein
+            if (v1 != null) {
+                if (v1.Type != v2.Type) { return string.Empty; }
+
+                if (v1.Type != Skript.Enums.enVariableDataType.Bool &&
+                    v1.Type != Skript.Enums.enVariableDataType.Number &&
+                    v1.Type != Skript.Enums.enVariableDataType.String) { return string.Empty; }
+            }
+            else {
+                if (v2.Type != Skript.Enums.enVariableDataType.Bool) { return string.Empty; }
+            }
+
+
             var replacer = string.Empty;
 
             switch (check) {
                 case "==":
                     replacer = "false";
-                    if (s1 == s2) { replacer = "true"; }
+                    if (v1.ValueString == v2.ValueString) { replacer = "true"; }
 
-                    if (s1.IsNumeral()) {
-                        if (s2.IsNumeral()) {
-                            if (FloatParse(s1) == FloatParse(s2)) { replacer = "true"; }
-                        }
-                        else {
-                            replacer = string.Empty;
-                        }
-                    }
+                    //if (s1.IsNumeral()) {
+                    //    if (s2.IsNumeral()) {
+                    //        if (FloatParse(s1) == FloatParse(s2)) { replacer = "true"; }
+                    //    }
+                    //    else {
+                    //        replacer = string.Empty;
+                    //    }
+                    //}
                     break;
 
                 case "!=":
                     replacer = "false";
-                    if (s1 != s2) { replacer = "true"; }
+                    if (v1.ValueString != v2.ValueString) { replacer = "true"; }
 
-                    if (s1.IsNumeral()) {
-                        if (s2.IsNumeral()) {
-                            if (FloatParse(s1) != FloatParse(s2)) { replacer = "true"; }
-                        }
-                        else {
-                            replacer = string.Empty;
-                        }
-                    }
+                    //if (s1.IsNumeral()) {
+                    //    if (s2.IsNumeral()) {
+                    //        if (FloatParse(s1) != FloatParse(s2)) { replacer = "true"; }
+                    //    }
+                    //    else {
+                    //        replacer = string.Empty;
+                    //    }
+                    //}
                     break;
 
                 case ">=":
-                    if (s1.IsNumeral() && s2.IsNumeral()) {
-                        replacer = "false";
-                        if (FloatParse(s1) >= FloatParse(s2)) { replacer = "true"; }
-                    }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Number) { return string.Empty; }
+                    replacer = "false";
+                    if (v1.ValueDouble >= v2.ValueDouble) { replacer = "true"; }
                     break;
 
                 case "<=":
-                    if (s1.IsNumeral() && s2.IsNumeral()) {
-                        replacer = "false";
-                        if (FloatParse(s1) <= FloatParse(s2)) { replacer = "true"; }
-                    }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Number) { return string.Empty; }
+                    replacer = "false";
+                    if (v1.ValueDouble <= v2.ValueDouble) { replacer = "true"; }
                     break;
 
                 case "<":
-                    if (s1.IsNumeral() && s2.IsNumeral()) {
-                        replacer = "false";
-                        if (FloatParse(s1) < FloatParse(s2)) { replacer = "true"; }
-                    }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Number) { return string.Empty; }
+                    replacer = "false";
+                    if (v1.ValueDouble < v2.ValueDouble) { replacer = "true"; }
                     break;
 
                 case ">":
-                    if (s1.IsNumeral() && s2.IsNumeral()) {
-                        replacer = "false";
-                        if (FloatParse(s1) > FloatParse(s2)) { replacer = "true"; }
-                    }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Number) { return string.Empty; }
+                    replacer = "false";
+                    if (v1.ValueDouble > v2.ValueDouble) { replacer = "true"; }
                     break;
 
                 case "||":
-                    if (s1 == "true" || s1 == "false") {
-                        if (s2 == "true" || s2 == "false") {
-                            replacer = (string)GetBool(s1 + check + s2);
-                        }
-                    }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Bool) { return string.Empty; }
+                    replacer = "false";
+                    if (v1.ValueBool || v2.ValueBool) { replacer = "true"; }
                     break;
 
                 case "&&":
-                    if (s1 == "true" || s1 == "false") {
-                        if (s2 == "true" || s2 == "false") {
-                            replacer = (string)GetBool(s1 + check + s2);
-                        }
-                    }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Bool) { return string.Empty; }
+                    replacer = "false";
+                    if (v1.ValueBool && v2.ValueBool) { replacer = "true"; }
                     break;
 
                 case "!":
                     // S1 dürfte eigentlich nie was sein: !False||!false
                     // entwederist es ganz am anfang, oder direkt nach einem Trenneichen
-                    if (string.IsNullOrEmpty(s1)) {
-                        if (s2 == "true") { replacer = "false"; }
-                        if (s2 == "false") { replacer = "true"; }
-                    }
+                    if (v2.Type != Skript.Enums.enVariableDataType.Bool) { return string.Empty; }
+                    replacer = "false";
+                    if (!v2.ValueBool) { replacer = "true"; }
+
                     break;
 
                 default:

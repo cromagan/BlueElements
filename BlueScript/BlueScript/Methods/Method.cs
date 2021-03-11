@@ -409,7 +409,12 @@ namespace BlueScript {
             if (attributes == null || attributes.Count == 0) { return null; }
 
             #region Variablen und Routinen ersetzen
+      
             for (var n = modifiyab; n < attributes.Count; n++) {
+
+                var lb = attributes[n].Count(c => c == '¶');
+
+                attributes[n] = attributes[n].RemoveChars("¶");
 
                 var t = ReplaceVariable(attributes[n], s.Variablen);
                 if (!string.IsNullOrEmpty(t.ErrorMessage)) {
@@ -422,6 +427,7 @@ namespace BlueScript {
                 }
 
                 attributes[n] = t2.AttributeText;
+                s.Line += lb;
 
             }
             #endregion

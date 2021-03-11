@@ -23,7 +23,7 @@ public struct strCanDoFeedback {
         ComandText = comandText;
         AttributText = attributtext;
         CodeBlockAfterText = codeblockaftertext;
-        LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶'); ;
+        LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶'); 
     }
 
     /// <summary>
