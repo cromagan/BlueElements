@@ -1157,7 +1157,7 @@ namespace BlueDatabase {
                 var ns = e.KeyNew.ToString();
                 foreach (var ThisRow in Database.Row) {
                     if (Database.Cell.GetStringBehindLinkedValue(this, ThisRow) == os) {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, ns, false);
+                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, ns);
                     }
                 }
             }
@@ -1168,7 +1168,7 @@ namespace BlueDatabase {
                 foreach (var ThisRow in Database.Row) {
                     var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
                     if (val.StartsWith(os)) {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns), false);
+                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
                     }
                 }
             }
@@ -1182,7 +1182,7 @@ namespace BlueDatabase {
                 foreach (var ThisRow in Database.Row) {
                     var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
                     if (val.EndsWith(os)) {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns), false);
+                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
                     }
                 }
             }

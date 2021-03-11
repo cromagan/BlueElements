@@ -26,32 +26,29 @@ using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
 using BlueBasics;
 using static BlueBasics.modConverter;
+using Skript.Enums;
 
 namespace BlueScript {
     class Method_Remove : Method {
 
-
-        public Method_Remove(Script parent) : base(parent) { }
-
         public override string Syntax { get => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);"; }
 
-
-        public override List<string> Comand { get => new List<string>() { "remove" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "remove" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => string.Empty; }
+        public override enVariableDataType Returns { get => enVariableDataType.Null; }
+
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableList, enVariableDataType.String,  enVariableDataType.String }; }
+        public override bool EndlessArgs { get => true; }
 
 
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, 1);
-            if (attvar == null || attvar.Count < 3) { return strDoItFeedback.AttributFehler(); }
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            if (attvar[0] == null) { return strDoItFeedback.VariableNichtGefunden(); }
-
-            if (attvar[1].Type != Skript.Enums.enVariableDataType.Bool ) { return strDoItFeedback.FalscherDatentyp(); }
 
             if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
 

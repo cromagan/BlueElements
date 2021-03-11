@@ -22,8 +22,6 @@ namespace BlueDatabase.Enums
     internal enum enItemState
     {
         Pending = 2,
-        Undo = 3,
-        FreezedPending = 4,
-        FreezedDiscard = 5
+        Undo = 3
     }
 }

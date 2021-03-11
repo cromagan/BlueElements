@@ -27,36 +27,37 @@ using static BlueBasics.Extensions;
 using BlueBasics;
 using static BlueBasics.modConverter;
 using BlueDatabase;
+using Skript.Enums;
 
 namespace BlueScript {
     public class Method_Lookup : BlueScript.Method {
 
 
-        public Method_Lookup(Script parent) : base(parent) { }
+        //public Method_Lookup(Script parent) : base(parent) { }
 
         public override string Syntax { get => "Lookup(Database, KeyValue, Column, NothingFoundMessage, FoundToMuchMessage);"; }
 
 
-        public override List<string> Comand { get => new List<string>() { "lookup" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "lookup" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => string.Empty; }
+        public override enVariableDataType Returns { get => enVariableDataType.List; }
+
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String }; }
+        public override bool EndlessArgs { get => false; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, 0);
-
-            if (attvar == null || attvar.Count < 3) { return strDoItFeedback.AttributFehler(); }
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
             var f = s.Variablen.GetSystem("filename");
             if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
 
-
             foreach ( var thisv in attvar) {
                 if (thisv.Type  != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
             }
-
 
             var newf = f.ValueString.FilePath() + attvar[0].ValueString + ".mdb";
 

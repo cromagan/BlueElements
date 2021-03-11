@@ -72,10 +72,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabScriptAnzeige = new BlueControls.Controls.TabPage();
             this.btnExtern = new BlueControls.Controls.Button();
             this.txtSkript = new BlueControls.Controls.TextBox();
-            this.tabVariablen = new BlueControls.Controls.TabPage();
-            this.txbVariablen = new BlueControls.Controls.TextBox();
             this.tabBefehle = new BlueControls.Controls.TabPage();
             this.txbComms = new BlueControls.Controls.TextBox();
+            this.tabVariablen = new BlueControls.Controls.TabPage();
+            this.txbVariablen = new BlueControls.Controls.TextBox();
             this.grpTextAllgemein = new BlueControls.Controls.GroupBox();
             this.txbSkriptInfo = new BlueControls.Controls.TextBox();
             this.btnTest = new BlueControls.Controls.Button();
@@ -106,8 +106,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Regeln.SuspendLayout();
             this.tabCSckript.SuspendLayout();
             this.tabScriptAnzeige.SuspendLayout();
-            this.tabVariablen.SuspendLayout();
             this.tabBefehle.SuspendLayout();
+            this.tabVariablen.SuspendLayout();
             this.grpTextAllgemein.SuspendLayout();
             this.Tab_Backup.SuspendLayout();
             this.grpExport.SuspendLayout();
@@ -561,8 +561,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // tabCSckript
             // 
             this.tabCSckript.Controls.Add(this.tabScriptAnzeige);
-            this.tabCSckript.Controls.Add(this.tabVariablen);
             this.tabCSckript.Controls.Add(this.tabBefehle);
+            this.tabCSckript.Controls.Add(this.tabVariablen);
             this.tabCSckript.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabCSckript.HotTrack = true;
             this.tabCSckript.Location = new System.Drawing.Point(3, 80);
@@ -602,26 +602,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txtSkript.Size = new System.Drawing.Size(1025, 504);
             this.txtSkript.TabIndex = 0;
             // 
-            // tabVariablen
-            // 
-            this.tabVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabVariablen.Controls.Add(this.txbVariablen);
-            this.tabVariablen.Location = new System.Drawing.Point(4, 25);
-            this.tabVariablen.Name = "tabVariablen";
-            this.tabVariablen.Size = new System.Drawing.Size(1025, 504);
-            this.tabVariablen.TabIndex = 1;
-            this.tabVariablen.Text = "Variablen";
-            // 
-            // txbVariablen
-            // 
-            this.txbVariablen.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txbVariablen.Location = new System.Drawing.Point(0, 0);
-            this.txbVariablen.Name = "txbVariablen";
-            this.txbVariablen.Size = new System.Drawing.Size(1025, 504);
-            this.txbVariablen.TabIndex = 0;
-            this.txbVariablen.Text = "Skript \"testen\", um diese anzuzeigen.";
-            // 
             // tabBefehle
             // 
             this.tabBefehle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -641,6 +621,26 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbComms.Size = new System.Drawing.Size(1025, 504);
             this.txbComms.TabIndex = 2;
             this.txbComms.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // tabVariablen
+            // 
+            this.tabVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabVariablen.Controls.Add(this.txbVariablen);
+            this.tabVariablen.Location = new System.Drawing.Point(4, 25);
+            this.tabVariablen.Name = "tabVariablen";
+            this.tabVariablen.Size = new System.Drawing.Size(1025, 504);
+            this.tabVariablen.TabIndex = 1;
+            this.tabVariablen.Text = "Variablen";
+            // 
+            // txbVariablen
+            // 
+            this.txbVariablen.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txbVariablen.Location = new System.Drawing.Point(0, 0);
+            this.txbVariablen.Name = "txbVariablen";
+            this.txbVariablen.Size = new System.Drawing.Size(1025, 504);
+            this.txbVariablen.TabIndex = 0;
+            this.txbVariablen.Text = "Skript \"testen\", um diese anzuzeigen.";
             // 
             // grpTextAllgemein
             // 
@@ -918,8 +918,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Regeln.ResumeLayout(false);
             this.tabCSckript.ResumeLayout(false);
             this.tabScriptAnzeige.ResumeLayout(false);
-            this.tabVariablen.ResumeLayout(false);
             this.tabBefehle.ResumeLayout(false);
+            this.tabVariablen.ResumeLayout(false);
             this.grpTextAllgemein.ResumeLayout(false);
             this.Tab_Backup.ResumeLayout(false);
             this.grpExport.ResumeLayout(false);

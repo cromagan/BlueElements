@@ -26,46 +26,34 @@ using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
 using BlueBasics;
 using static BlueBasics.modConverter;
+using Skript.Enums;
 
 namespace BlueScript {
     class Method_EndsWith : Method {
 
 
-        public Method_EndsWith(Script parent) : base(parent) { }
+        //public Method_EndsWith(Script parent) : base(parent) { }
 
 
-        public override string Syntax { get => "EndsWith(StringVariable, CaseSensitive, Value1, Value2, ...);"; }
+        public override string Syntax { get => "EndsWith(StringVariable, CaseSensitive, Value1, Value2, ...)"; }
 
 
-        public override List<string> Comand { get => new List<string>() { "endswith" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "endswith" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => "bool"; }
+        public override enVariableDataType Returns { get => enVariableDataType.Bool; }
 
-
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableString, enVariableDataType.Bool, enVariableDataType.String }; }
+        public override bool EndlessArgs { get => true; }
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-
-
-            var attvar = SplitAttributeToVars(infos.AttributText, s, 1);
-            if (attvar == null || attvar.Count < 3) { return strDoItFeedback.AttributFehler(); }
-
-            if (attvar[0] == null) { return strDoItFeedback.VariableNichtGefunden(); }
-
-            if (attvar[1].Type != Skript.Enums.enVariableDataType.Bool) { return strDoItFeedback.FalscherDatentyp(); }
-
-
-
-
-
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
             if (attvar[0].Type == Skript.Enums.enVariableDataType.String) {
-
-           
-
                 for (var z = 2; z < attvar.Count; z++) {
                     if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
 
@@ -88,14 +76,6 @@ namespace BlueScript {
 
 
             return new strDoItFeedback("EndsWith unterstütz den Datentyp nicht: " + infos.AttributText);
-
-
-            //if (string.IsNullOrEmpty(variable.ValueString)) {
-            //    return strDoItFeedback.Wahr();
-            //}
-
-            //return strDoItFeedback.Falsch();
-
         }
     }
 }

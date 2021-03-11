@@ -79,10 +79,10 @@ namespace BlueScript {
 
         public Script(List<Variable> variablen) {
 
-            // Jedes mal, wegen der Skriptübergabe (mit Variablen);
-            //if (Comands == null) {
-                Comands = GetEnumerableOfType<Method>(this);
-            //}
+
+            if (Comands == null) {
+                Comands = GetEnumerableOfType<Method>();
+            }
 
             Variablen = variablen;
         }
@@ -177,7 +177,7 @@ namespace BlueScript {
                 }
 
                 else {
-                    var f = ComandOnPosition(tmptxt, pos, s, string.Empty);
+                    var f = ComandOnPosition(tmptxt, pos, s, false);
 
                     if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                         return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(30, tmptxt.Length - pos)));
@@ -195,12 +195,12 @@ namespace BlueScript {
         }
 
 
-        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, string expectedvariablefeedback) {
+        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
             foreach (var thisC in Comands) {
 
                 //if (!mustHaveFeedback || !thisC.ReturnsVoid) {
 
-                var f = thisC.CanDo(txt, pos, expectedvariablefeedback);
+                var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
 
                 if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
 

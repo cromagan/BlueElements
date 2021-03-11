@@ -26,33 +26,33 @@ using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
 using BlueBasics;
 using static BlueBasics.modConverter;
+using Skript.Enums;
 
 namespace BlueScript {
     class Method_if : Method {
 
 
-        public Method_if(Script parent) : base(parent) { }
+        //public Method_if(Script parent) : base(parent) { }
 
 
         public override string Syntax { get => "if (true) { Code zum ausführen }"; }
 
-        public override List<string> Comand { get => new List<string>() { "if" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "if" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         //public override List<string> AllowedInIDs { get => null; }
         public override bool GetCodeBlockAfter { get => true; }
-        public override string Returns { get => string.Empty; }
+        public override enVariableDataType Returns { get => enVariableDataType.Null; }
+
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() {  enVariableDataType.Bool }; }
+        public override bool EndlessArgs { get => false; }
 
 
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-
-            var attvar = SplitAttributeToVars(infos.AttributText, s, 0);
-            if (attvar == null || attvar.Count != 1) { return strDoItFeedback.AttributFehler(); }
-
-            if (attvar[0].Type != Skript.Enums.enVariableDataType.Bool) { return strDoItFeedback.FalscherDatentyp(); }
-
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             if (attvar[0].ValueBool) {
                 var (err, ermess2) = Script.Parse(infos.CodeBlockAfterText, false, s);

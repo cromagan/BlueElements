@@ -24,23 +24,25 @@ using System.Text;
 using System.Threading.Tasks;
 using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
+using Skript.Enums;
 
 namespace BlueScript {
     class Method_var : Method {
 
 
-        public Method_var(Script parent) : base(parent) { }
+        //public Method_var(Script parent) : base(parent) { }
 
         public override string Syntax { get => "var VariablenName = Wert;"; }
 
 
-        public override List<string> Comand { get => new List<string>() { "var" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "var" }; }
         public override string StartSequence { get => ""; }
         public override string EndSequence { get => ";"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => string.Empty; }
+        public override enVariableDataType Returns { get => enVariableDataType.Null; }
 
-
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.BoolNumString }; }
+        public override bool EndlessArgs { get => false; }
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
@@ -62,9 +64,9 @@ namespace BlueScript {
             s.Variablen.Add(new Variable(bs[0]));
 
 
-            var r = new Method_BerechneVariable(Parent);
+            var r = new Method_BerechneVariable();
 
-            var f = r.CanDo(infos.AttributText + ";", 0, string.Empty);
+            var f = r.CanDo(infos.AttributText + ";", 0, false, s);
 
 
             if (!string.IsNullOrEmpty(f.ErrorMessage)) {

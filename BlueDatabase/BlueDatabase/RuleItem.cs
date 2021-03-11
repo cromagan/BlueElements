@@ -289,10 +289,10 @@ namespace BlueDatabase {
         //    //    if (ThisAction != null) {
         //    //        if (!ThisAction.IsBedingung()) {
         //    //            if (string.IsNullOrEmpty(Meldung)) {
-        //    //                Meldung = ThisAction.Execute(vRow, FreezeMode);
+        //    //                Meldung = ThisAction.Execute(vRow);
         //    //            }
         //    //            else {
-        //    //                ThisAction.Execute(vRow, FreezeMode);
+        //    //                ThisAction.Execute(vRow);
         //    //            }
         //    //        }
         //    //    }

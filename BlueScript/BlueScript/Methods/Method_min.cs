@@ -26,28 +26,33 @@ using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
 using BlueBasics;
 using static BlueBasics.modConverter;
+using Skript.Enums;
 
 namespace BlueScript {
     class Method_min : Method {
 
         public override string Syntax { get => "Min(Value1, Value2, ...)"; }
 
-        public Method_min(Script parent) : base(parent) { }
-        public override List<string> Comand { get => new List<string>() { "min" }; }
+        //public Method_min(Script parent) : base(parent) { }
+        public override List<string> Comand(Script s) { return new List<string>() { "min" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => "numeral"; }
+        public override enVariableDataType Returns { get => enVariableDataType.Number; }
+
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number }; }
+        public override bool EndlessArgs { get => true; }
+
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, 0);
-            if (attvar == null || attvar.Count < 2) { return strDoItFeedback.AttributFehler(); }
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+
 
             var val = double.MaxValue;
 
             foreach (var thisval in attvar) {
-                if (thisval.Type != Skript.Enums.enVariableDataType.Number) { return strDoItFeedback.FalscherDatentyp(); }
                 val = Math.Min(thisval.ValueDouble, val);
             }
 

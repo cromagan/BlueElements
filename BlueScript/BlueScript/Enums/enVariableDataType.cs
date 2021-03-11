@@ -20,14 +20,31 @@
 namespace Skript.Enums {
 
     public enum enVariableDataType {
-        Error = -1,
-        NotDefinedYet =0,
+
+        NotDefinedYet = 0,
         Bool = 1,
         Number = 2,
-        String = 3,
-        Date = 5,
-        List = 6
+        String = 4,
+        Date = 8,
+        List = 16,
 
+        BoolNumString = Bool | Number | String,
+
+        Variable = 1024,
+
+        Error = 2048,
+        Null = 4096,
+
+
+        //VariableBool = 128,
+        //VariableNum = 256,
+        //VariableString = 512,
+        VariableList = Variable | List,
+        VariableString = Variable | String,
+
+        VariableListOrString = Variable | String | List,
+        VariableListOrStringNumBool = Variable | String | List | Number | Bool,
+        VariableStringNum = Variable | String | List | Number
     }
 
 }

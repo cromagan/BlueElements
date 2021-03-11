@@ -825,7 +825,6 @@ namespace BlueDatabase {
 
 
         protected override void ParseExternal(List<byte> B) {
-            if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren"); }
 
             Column.ThrowEvents = false;
 
@@ -854,7 +853,6 @@ namespace BlueDatabase {
             var OldPendings = new List<WorkItem>();
             foreach (var ThisWork in Works) {
                 if (ThisWork.State == enItemState.Pending) { OldPendings.Add(ThisWork); }
-                if (ThisWork.State == enItemState.FreezedPending) { Develop.DebugPrint(enFehlerArt.Fehler, "FreezedPending vorhanden"); }
             }
 
             Works.Clear();
@@ -1459,9 +1457,6 @@ namespace BlueDatabase {
             if (mode == enErrorReason.OnlyRead) { return string.Empty; }
             if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."; }
 
-            if (mode.HasFlag(enErrorReason.Save) || mode.HasFlag(enErrorReason.Load) || mode.HasFlag(enErrorReason.EditGeneral)) {
-                if (Cell.Freezed) { return "Datenbank gerade eingefroren."; }
-            }
             return string.Empty;
         }
 
@@ -1677,7 +1672,7 @@ namespace BlueDatabase {
                             var LCColumn = ThisColumn;
                             var LCrow = ThisRow;
                             if (ThisColumn.Format == enDataFormat.LinkedCell) {
-                                (LCColumn, LCrow) = CellCollection.LinkedCellData(ThisColumn, ThisRow, false, false, false);
+                                (LCColumn, LCrow) = CellCollection.LinkedCellData(ThisColumn, ThisRow, false, false);
                             }
 
                             if (LCrow != null && LCColumn != null) {
@@ -2046,37 +2041,14 @@ namespace BlueDatabase {
 
 
         internal void AddPending(enDatabaseDataType Comand, ColumnItem column, string PreviousValue, string ChangedTo, bool ExecuteNow) {
-            AddPending(Comand, column.Key, -1, PreviousValue, ChangedTo, ExecuteNow, false);
+            AddPending(Comand, column.Key, -1, PreviousValue, ChangedTo, ExecuteNow);
         }
 
         internal void AddPending(enDatabaseDataType Comand, int ColumnKey, string ListExt, bool ExecuteNow) {
-            AddPending(Comand, ColumnKey, -1, "", ListExt, ExecuteNow, false);
+            AddPending(Comand, ColumnKey, -1, "", ListExt, ExecuteNow);
         }
 
         internal void AddPending(enDatabaseDataType Comand, int ColumnKey, int RowKey, string PreviousValue, string ChangedTo, bool ExecuteNow) {
-            AddPending(Comand, ColumnKey, RowKey, PreviousValue, ChangedTo, ExecuteNow, false);
-        }
-
-        internal void AddPending(enDatabaseDataType Comand, int ColumnKey, int RowKey, string PreviousValue, string ChangedTo, bool ExecuteNow, bool FreezedMode) {
-
-            if (Cell.Freezed != FreezedMode) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "FreezeMode-Inkonsitent: " + Comand);
-                return;
-            }
-
-
-            if (Cell.Freezed) {
-                if (Comand != enDatabaseDataType.ce_Value_withoutSizeData) {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "FreezeCommand = " + Comand.ToString());
-                    return;
-                }
-                if (!ExecuteNow) {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Nicht ExecuteNow, FreezeCommand = " + Comand.ToString());
-                    return;
-                }
-                Cell.AddFreeze(ColumnKey, RowKey, PreviousValue);
-            }
-
 
             if (ExecuteNow) {
                 ParseThis(Comand, ChangedTo, Column.SearchByKey(ColumnKey), Row.SearchByKey(RowKey), -1, -1);
@@ -2098,7 +2070,7 @@ namespace BlueDatabase {
             if (RowKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
             if (ColumnKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
 
-            Works.Add(new WorkItem(Comand, ColumnKey, RowKey, PreviousValue, ChangedTo, UserName, FreezedMode));
+            Works.Add(new WorkItem(Comand, ColumnKey, RowKey, PreviousValue, ChangedTo, UserName));
 
 
         }
@@ -2106,7 +2078,6 @@ namespace BlueDatabase {
 
         private void ExecutePending() {
             if (!IsParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur während des Parsens möglich"); }
-            if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren!"); }
             if (!HasPendingChanges()) { return; }
 
 
@@ -2167,7 +2138,6 @@ namespace BlueDatabase {
         }
 
         private void ExecutePending(WorkItem ThisPendingItem) {
-            if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren!"); }
             if (ThisPendingItem.State == enItemState.Pending) {
 
 
@@ -2214,7 +2184,6 @@ namespace BlueDatabase {
 
 
         private void ChangeRowKeyInPending(int OldKey, int NewKey) {
-            if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren!"); }
 
             foreach (var ThisPending in Works) {
 
@@ -2260,7 +2229,6 @@ namespace BlueDatabase {
 
 
         private void ChangeColumnKeyInPending(int OldKey, int NewKey) {
-            if (Cell.Freezed) { Develop.DebugPrint(enFehlerArt.Fehler, "Datenbank eingefroren!"); }
 
             foreach (var ThisPending in Works) {
                 if (ThisPending.State == enItemState.Pending) {
@@ -2470,10 +2438,6 @@ namespace BlueDatabase {
         }
 
         protected override bool isSomethingDiscOperatingsBlocking() {
-            if (Cell.Freezed) {
-                //          Develop.DebugPrint(enFehlerArt.Warnung, "Reload unmöglich, Datenbankstatus eingefroren");
-                return true;
-            }
             return false;
         }
 
@@ -2495,22 +2459,6 @@ namespace BlueDatabase {
 
             return false;
         }
-
-
-
-        ///// <summary>
-        ///// Nach 20 Sekunden wird der trotzdem diese Routine verlassen. Freeze sollte nur en Bruchteil einer Sekunde gesetzt sein.
-        ///// </summary>
-        internal void WaitUnfreezed() {
-            if (!Cell.Freezed) { return; } //99.9% der Fälle. Variable x wird gespart ;-)
-            var x = DateTime.Now;
-
-            while (Cell.Freezed) {
-                Develop.DoEvents();
-                if (DateTime.Now.Subtract(x).TotalSeconds > 20) { return; }
-            }
-        }
-
 
     }
 }

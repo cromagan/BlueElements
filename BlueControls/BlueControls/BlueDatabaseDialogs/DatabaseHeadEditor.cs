@@ -655,7 +655,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             foreach (var thisc in BlueScript.Script.Comands) {
                 co = co + thisc.Syntax + "\r\n";
-                co = co + "    Rückgabetyp: " + thisc.Returns + "\r\n\r\n";
+                co = co + "    Rückgabetyp: " + thisc.Returns.ToString() + "\r\n\r\n";
             }
             txbComms.Text = co;
 

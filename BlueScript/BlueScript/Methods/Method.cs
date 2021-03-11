@@ -25,39 +25,34 @@ using System.Threading.Tasks;
 using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
 using BlueBasics;
+using Skript.Enums;
 
 namespace BlueScript {
     public abstract class Method {
 
-
-        public readonly Script Parent;
-
-        //public Method() { } // Dummy für Ermittlung des richtigen Codes
-
-        public Method(Script parent) {
-            Parent = parent;
-        }
-
+        public abstract List<string> Comand(Script s);
 
 
         public abstract string Syntax { get; }
-        public abstract List<string> Comand { get; }
         public abstract string StartSequence { get; }
         public abstract string EndSequence { get; }
         public abstract bool GetCodeBlockAfter { get; }
-        public abstract string Returns { get; }
+        public abstract enVariableDataType Returns { get; }
+
+        public abstract List<enVariableDataType> Args { get; }
+        public abstract bool EndlessArgs { get; }
 
         public abstract strDoItFeedback DoIt(strCanDoFeedback infos, Script s);
 
 
-        public strCanDoFeedback CanDo(string scriptText, int pos, string expectedvariablefeedback) {
+        public strCanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s) {
 
 
-            if (string.IsNullOrEmpty(expectedvariablefeedback) != string.IsNullOrEmpty(Returns)) {
+            if (!expectedvariablefeedback && Returns  != enVariableDataType.Null) {
                 return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
 
-            if (expectedvariablefeedback != "var" && Returns != "var" && expectedvariablefeedback != Returns) {
+            if (expectedvariablefeedback  && Returns == enVariableDataType.Null) {
                 return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
 
@@ -71,7 +66,7 @@ namespace BlueScript {
             //    }
             //}
 
-            foreach (var thiscomand in Comand) {
+            foreach (var thiscomand in Comand(s)) {
 
 
                 var comandtext = thiscomand + StartSequence;
@@ -262,8 +257,8 @@ namespace BlueScript {
             var c = new List<string>();
             foreach (var thisc in comands) {
 
-                if (!string.IsNullOrEmpty(thisc.Returns)) {
-                    foreach (var thiscs in thisc.Comand) {
+                if (thisc.Returns != enVariableDataType.Null ) {
+                    foreach (var thiscs in thisc.Comand(s)) {
                         c.Add(thiscs + thisc.StartSequence);
                     }
                 }
@@ -278,7 +273,7 @@ namespace BlueScript {
 
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
-                var f = Script.ComandOnPosition(txt, pos, s, "var");
+                var f = Script.ComandOnPosition(txt, pos, s, true);
 
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                     return new strGetEndFeedback(f.ErrorMessage);
@@ -404,49 +399,78 @@ namespace BlueScript {
         }
 
 
-        public List<Variable> SplitAttributeToVars(string attributtext, Script s, int modifiyab) {
+        public List<Variable> SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool endlessargs) {
             var attributes = SplitAttributeToString(attributtext);
             if (attributes == null || attributes.Count == 0) { return null; }
 
-            #region Variablen und Routinen ersetzen
-      
-            for (var n = modifiyab; n < attributes.Count; n++) {
+            if (attributes.Count < types.Count) { return null; }
+            if (!EndlessArgs && attributes.Count > types.Count) { return null; }
+
+
+            //  Variablen und Routinen ersetzen
+            var vars = new List<Variable>();
+
+
+            for (var n = 0; n < attributes.Count; n++) {
 
                 var lb = attributes[n].Count(c => c == '¶');
 
                 attributes[n] = attributes[n].RemoveChars("¶");
 
-                var t = ReplaceVariable(attributes[n], s.Variablen);
-                if (!string.IsNullOrEmpty(t.ErrorMessage)) {
-                    return null; // new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
+                enVariableDataType thistype;
+                if (n < types.Count) {
+                    thistype = types[n];
+                }
+                else {
+                    thistype = types[types.Count - 1];
                 }
 
-                var t2 = ReplaceComands(t.AttributeText, Script.Comands, s);
-                if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
-                    return null; // new  strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
-                }
+                Variable v= null;
 
-                attributes[n] = t2.AttributeText;
-                s.Line += lb;
 
-            }
-            #endregion
-
-            #region Liste der Variablen erstellen
-            var vars = new List<Variable>();
-
-            for (var n = 0; n < attributes.Count; n++) {
-                if (n < modifiyab) {
-                    vars.Add(s.Variablen.Get(attributes[n]));
+                if (thistype.HasFlag(enVariableDataType.Variable)) {
+                    v = s.Variablen.Get(attributes[n]);
                 }
                 else {
 
-                    vars.Add(new Variable("dummy", attributes[n]));
+
+                    var t = ReplaceVariable(attributes[n], s.Variablen);
+                    if (!string.IsNullOrEmpty(t.ErrorMessage)) {
+                        return null; // new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
+                    }
+
+                    var t2 = ReplaceComands(t.AttributeText, Script.Comands, s);
+                    if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
+                        return null; // new  strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
+                    }
+
+                   v = new Variable("dummy", t2.AttributeText);
+
                 }
+
+                if (v== null) { return null; }
+
+                if (!thistype.HasFlag(v.Type)) { return null; }
+                vars.Add(v);
+                s.Line += lb;
+
             }
 
 
-            #endregion
+            //#region Liste der Variablen erstellen
+
+            //for (var n = 0; n < attributes.Count; n++) {
+            //    if (n < modifiyab) {
+            //        vars.Add(s.Variablen.Get(attributes[n]));
+            //    }
+            //    else {
+
+
+            //    }
+            //}
+
+
+            //#endregion
 
             return vars;
 

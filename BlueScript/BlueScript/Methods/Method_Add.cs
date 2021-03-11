@@ -26,28 +26,26 @@ using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
 using BlueBasics;
 using static BlueBasics.modConverter;
+using Skript.Enums;
 
 namespace BlueScript {
     class Method_Add : Method {
 
 
-        public Method_Add(Script parent) : base(parent) { }
-
         public override string Syntax { get => "Add(List-Variable, Value1, Value2, ...)"; }
-        public override List<string> Comand { get => new List<string>() { "add" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "add" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => string.Empty; }
-
-
-
+        public override enVariableDataType Returns { get => enVariableDataType.Null; }
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableList, enVariableDataType.String }; }
+        public override bool EndlessArgs { get => true; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, 1);
-            if (attvar == null || attvar.Count < 2) { return strDoItFeedback.AttributFehler(); }
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            if (attvar[0] == null) { return strDoItFeedback.VariableNichtGefunden(); }
+
 
             if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
 

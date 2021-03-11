@@ -18,6 +18,7 @@
 #endregion
 
 using BlueBasics;
+using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
@@ -25,36 +26,27 @@ namespace BlueScript {
     public class Method_SetError : BlueScript.Method {
 
 
-        public Method_SetError(Script parent) : base(parent) { }
+        //public Method_SetError(Script parent) : base(parent) { }
 
         public override string Syntax { get => "SetError(Nachricht, Column1, Colum2, ...);"; }
 
 
-        public override List<string> Comand { get => new List<string>() { "seterror" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "seterror" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => string.Empty; }
+        public override enVariableDataType Returns { get => enVariableDataType.Null; }
+
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.VariableListOrStringNumBool }; }
+        public override bool EndlessArgs { get => true; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-
-            var attvar = SplitAttributeToVars(infos.AttributText, s, 9999);
-
-            if (attvar == null || attvar.Count < 2) { return strDoItFeedback.AttributFehler(); }
-
-            var attvartext = SplitAttributeToString(infos.AttributText);
-            attvartext[0] = attvartext[0].Trim("\"");
-
-            if (string.IsNullOrEmpty(attvartext[0])) { return strDoItFeedback.FalscherDatentyp(); }
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             for (var z = 1; z < attvar.Count; z++) {
-
-                if (attvar[z] == null) { return new strDoItFeedback("Spalte nicht gefunden"); }
-
                 var n = attvar[z].Name.ToLower() + "_error";
-
                 var ve = s.Variablen.GetSystem(n);
-
 
                 if (ve == null) {
                     ve = new Variable(n, string.Empty, Skript.Enums.enVariableDataType.List, false, true);
@@ -62,7 +54,7 @@ namespace BlueScript {
                 }
 
                 var l = ve.ValueListString;
-                l.AddIfNotExists(attvartext[0]);
+                l.AddIfNotExists(attvar[0].ValueString);
                 ve.ValueListString = l;
 
             }

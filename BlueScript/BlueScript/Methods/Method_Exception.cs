@@ -26,21 +26,22 @@ using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
 using BlueBasics;
 using static BlueBasics.modConverter;
+using Skript.Enums;
 
 namespace BlueScript {
     class Method_Exception : Method {
 
-
-        public Method_Exception(Script parent) : base(parent) { }
-
         public override string Syntax { get => "Exception(\"Unbehandelter Programmcode!\");"; }
 
-        public override List<string> Comand { get => new List<string>() { "Exception" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "Exception" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         //public override List<string> AllowedInIDs { get => null; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => string.Empty; }
+        public override enVariableDataType Returns { get => enVariableDataType.Null; }
+
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String }; }
+        public override bool EndlessArgs { get => false; }
 
 
 
@@ -49,11 +50,9 @@ namespace BlueScript {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 
-            var attvar = SplitAttributeToVars(infos.AttributText, s, 0);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
             if (attvar == null || attvar.Count != 1) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
-
-            if (attvar[0].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
 
             return new strDoItFeedback(string.Empty, attvar[0].ValueString);
         }

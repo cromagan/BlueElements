@@ -953,7 +953,7 @@ namespace BlueControls.Controls {
 
 
             if (cellInThisDatabaseColumn.Column.Format == enDataFormat.LinkedCell) {
-                var (lcolumn, lrow) = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow, false, false, false);
+                var (lcolumn, lrow) = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow, false, false);
                 if (lcolumn != null && lrow != null) {
                     Draw_CellTransparentDirect(GR, cellInThisDatabaseColumn, cellInThisDatabaseRow, rowY, lcolumn, lrow, displayRectangleWOSlider, vfont);
                 }
@@ -1493,7 +1493,7 @@ namespace BlueControls.Controls {
             }
 
             if (cellInThisDatabaseColumn.Format == enDataFormat.LinkedCell) {
-                (ContentHolderCellColumn, ContentHolderCellRow) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow, false, true, true);
+                (ContentHolderCellColumn, ContentHolderCellRow) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow, true, true);
                 if (ContentHolderCellColumn == null) {
                     NotEditableInfo("In verknüpfter Datenbank nicht vorhanden");
                     return;
@@ -1788,7 +1788,7 @@ namespace BlueControls.Controls {
 
 
             if (column.Format == enDataFormat.LinkedCell) {
-                var (lcolumn, lrow) = CellCollection.LinkedCellData(column, row, false, true, false);
+                var (lcolumn, lrow) = CellCollection.LinkedCellData(column, row, true, false);
                 if (lcolumn == null || lrow == null) {
                     table.NotEditableInfo("Zelle in verlinkter Datenbank nicht vorhanden.");
                     return;
@@ -2659,7 +2659,7 @@ namespace BlueControls.Controls {
 
                                     case enDataFormat.LinkedCell:
                                     case enDataFormat.Values_für_LinkedCellDropdown:
-                                        var (lcolumn, lrow) = CellCollection.LinkedCellData(_MouseOverColumn, _MouseOverRow, false, false, false);
+                                        var (lcolumn, lrow) = CellCollection.LinkedCellData(_MouseOverColumn, _MouseOverRow, false, false);
                                         if (lcolumn != null) { _MouseOverText = lcolumn.QuickInfoText(_MouseOverColumn.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
                                         break;
 
@@ -3793,7 +3793,7 @@ namespace BlueControls.Controls {
         public static Size Cell_ContentSize(Table table, ColumnItem Column, RowItem Row, BlueFont CellFont, int Pix16) {
 
             if (Column.Format == enDataFormat.LinkedCell) {
-                var (lcolumn, lrow) = CellCollection.LinkedCellData(Column, Row, false, false, false);
+                var (lcolumn, lrow) = CellCollection.LinkedCellData(Column, Row, false, false);
                 if (lcolumn != null && lrow != null) { return Cell_ContentSize(table, lcolumn, lrow, CellFont, Pix16); }
                 return new Size(Pix16, Pix16);
             }
@@ -3856,7 +3856,7 @@ namespace BlueControls.Controls {
             if (row == null) { return; }
 
             if (column.Format == enDataFormat.LinkedCell) {
-                var (lcolumn, lrow) = CellCollection.LinkedCellData(column, row, false, true, false);
+                var (lcolumn, lrow) = CellCollection.LinkedCellData(column, row, true, false);
                 if (lcolumn != null && lrow != null) { DoUndo(lcolumn, lrow); }
                 return;
             }
@@ -3878,7 +3878,7 @@ namespace BlueControls.Controls {
 
             if (v[0] == "Cancel") { return; } // =Aktueller Eintrag angeklickt
 
-            row.CellSet(column, v[0].Substring(5), false);
+            row.CellSet(column, v[0].Substring(5));
 
 
             //Database.Cell.Set(column, row, v[0].Substring(5), false);
@@ -4002,7 +4002,7 @@ namespace BlueControls.Controls {
                 var ContenHolderCellRow = row;
 
                 if (column.Format == enDataFormat.LinkedCell) {
-                    (ContentHolderCellColumn, ContenHolderCellRow) = CellCollection.LinkedCellData(column, row, false, false, false);
+                    (ContentHolderCellColumn, ContenHolderCellRow) = CellCollection.LinkedCellData(column, row, false, false);
                 }
 
 

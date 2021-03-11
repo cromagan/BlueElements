@@ -101,16 +101,11 @@ namespace BlueDatabase {
         }
 
         public void CellSet(string columnName, bool value) {
-            Database.Cell.Set(Database.Column[columnName], this, value, false);
+            Database.Cell.Set(Database.Column[columnName], this, value);
         }
-        public void CellSet(string columnName, bool value, bool freezeMode) {
-            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
-        }
+
         public void CellSet(ColumnItem column, bool value) {
-            Database.Cell.Set(column, this, value, false);
-        }
-        public void CellSet(ColumnItem column, bool value, bool freezeMode) {
-            Database.Cell.Set(column, this, value, freezeMode);
+            Database.Cell.Set(column, this, value);
         }
         #endregion
 
@@ -126,16 +121,11 @@ namespace BlueDatabase {
         }
 
         public void CellSet(string columnName, string value) {
-            Database.Cell.Set(Database.Column[columnName], this, value, false);
+            Database.Cell.Set(Database.Column[columnName], this, value);
         }
-        public void CellSet(string columnName, string value, bool freezeMode) {
-            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
-        }
+
         public void CellSet(ColumnItem column, string value) {
-            Database.Cell.Set(column, this, value, false);
-        }
-        public void CellSet(ColumnItem column, string value, bool freezeMode) {
-            Database.Cell.Set(column, this, value, freezeMode);
+            Database.Cell.Set(column, this, value);
         }
         #endregion
 
@@ -148,16 +138,11 @@ namespace BlueDatabase {
         }
 
         public void CellSet(string columnName, double value) {
-            Database.Cell.Set(Database.Column[columnName], this, value, false);
+            Database.Cell.Set(Database.Column[columnName], this, value);
         }
-        public void CellSet(string columnName, double value, bool freezeMode) {
-            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
-        }
+
         public void CellSet(ColumnItem column, double value) {
-            Database.Cell.Set(column, this, value, false);
-        }
-        public void CellSet(ColumnItem column, double value, bool freezeMode) {
-            Database.Cell.Set(column, this, value, freezeMode);
+            Database.Cell.Set(column, this, value);
         }
         #endregion
 
@@ -169,18 +154,11 @@ namespace BlueDatabase {
             return Database.Cell.GetDecimal(column, this);
         }
 
-
         public void CellSet(string columnName, decimal value) {
-            Database.Cell.Set(Database.Column[columnName], this, value, false);
-        }
-        public void CellSet(string columnName, decimal value, bool freezeMode) {
-            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
+            Database.Cell.Set(Database.Column[columnName], this, value);
         }
         public void CellSet(ColumnItem column, decimal value) {
-            Database.Cell.Set(column, this, value, false);
-        }
-        public void CellSet(ColumnItem column, decimal value, bool freezeMode) {
-            Database.Cell.Set(column, this, value, freezeMode);
+            Database.Cell.Set(column, this, value);
         }
         #endregion
 
@@ -193,16 +171,11 @@ namespace BlueDatabase {
         }
 
         public void CellSet(string columnName, int value) {
-            Database.Cell.Set(Database.Column[columnName], this, value, false);
+            Database.Cell.Set(Database.Column[columnName], this, value);
         }
-        public void CellSet(string columnName, int value, bool freezeMode) {
-            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
-        }
+
         public void CellSet(ColumnItem column, int value) {
-            Database.Cell.Set(column, this, value, false);
-        }
-        public void CellSet(ColumnItem column, int value, bool freezeMode) {
-            Database.Cell.Set(column, this, value, freezeMode);
+            Database.Cell.Set(column, this, value);
         }
         #endregion
 
@@ -214,18 +187,12 @@ namespace BlueDatabase {
             return Database.Cell.GetPoint(column, this);
         }
 
-
         public void CellSet(string columnName, Point value) {
-            Database.Cell.Set(Database.Column[columnName], this, value, false);
+            Database.Cell.Set(Database.Column[columnName], this, value);
         }
-        public void CellSet(string columnName, Point value, bool freezeMode) {
-            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
-        }
+
         public void CellSet(ColumnItem column, Point value) {
-            Database.Cell.Set(column, this, value, false);
-        }
-        public void CellSet(ColumnItem column, Point value, bool freezeMode) {
-            Database.Cell.Set(column, this, value, freezeMode);
+            Database.Cell.Set(column, this, value);
         }
         #endregion
 
@@ -238,16 +205,11 @@ namespace BlueDatabase {
         }
 
         public void CellSet(string columnName, List<string> value) {
-            Database.Cell.Set(Database.Column[columnName], this, value, false);
+            Database.Cell.Set(Database.Column[columnName], this, value);
         }
-        public void CellSet(string columnName, List<string> value, bool freezeMode) {
-            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
-        }
+
         public void CellSet(ColumnItem column, List<string> value) {
-            Database.Cell.Set(column, this, value, false);
-        }
-        public void CellSet(ColumnItem column, List<string> value, bool freezeMode) {
-            Database.Cell.Set(column, this, value, freezeMode);
+            Database.Cell.Set(column, this, value);
         }
         #endregion
 
@@ -259,18 +221,12 @@ namespace BlueDatabase {
             return Database.Cell.GetDateTime(column, this);
         }
 
-
         public void CellSet(string columnName, DateTime value) {
-            Database.Cell.Set(Database.Column[columnName], this, value, false);
+            Database.Cell.Set(Database.Column[columnName], this, value);
         }
-        public void CellSet(string columnName, DateTime value, bool freezeMode) {
-            Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
-        }
+
         public void CellSet(ColumnItem column, DateTime value) {
-            Database.Cell.Set(column, this, value, false);
-        }
-        public void CellSet(ColumnItem column, DateTime value, bool freezeMode) {
-            Database.Cell.Set(column, this, value, freezeMode);
+            Database.Cell.Set(column, this, value);
         }
         #endregion
 
@@ -286,17 +242,17 @@ namespace BlueDatabase {
         //{
         //    Database.Cell.Set(Database.Column[columnName], this, value, false);
         //}
-        //public void CellSet(string columnName, Color value, bool freezeMode)
+        //public void CellSet(string columnName, Color value)
         //{
-        //    Database.Cell.Set(Database.Column[columnName], this, value, freezeMode);
+        //    Database.Cell.Set(Database.Column[columnName], this, value);
         //}
         //public void CellSet(ColumnItem column, Color value)
         //{
         //    Database.Cell.Set(column, this, value, false);
         //}
-        //public void CellSet(ColumnItem column, Color value, bool freezeMode)
+        //public void CellSet(ColumnItem column, Color value)
         //{
-        //    Database.Cell.Set(column, this, value, freezeMode);
+        //    Database.Cell.Set(column, this, value);
         //}
 
 
@@ -331,7 +287,7 @@ namespace BlueDatabase {
 
 
             if (thisCol.MultiLine) {
-                CellSet(thisCol, s.ValueString, true);
+                CellSet(thisCol, s.ValueString);
                 return;
             }
 
@@ -339,16 +295,16 @@ namespace BlueDatabase {
             switch (thisCol.Format) {
                 case enDataFormat.Bit:
                     if (s.ValueString.ToLower() == "true") {
-                        CellSet(thisCol, true, true);
+                        CellSet(thisCol, true);
                     }
                     else {
-                        CellSet(thisCol, false, true);
+                        CellSet(thisCol, false);
                     }
                     return;
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
-                    CellSet(thisCol, s.ValueString, true);
+                    CellSet(thisCol, s.ValueString);
                     return;
 
                 case enDataFormat.Text:
@@ -362,7 +318,7 @@ namespace BlueDatabase {
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                    CellSet(thisCol, s.ValueString, true);
+                    CellSet(thisCol, s.ValueString);
                     return;
 
             }
@@ -416,14 +372,6 @@ namespace BlueDatabase {
         /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
         private BlueScript.Script DoRules(bool onlyTest) {
 
-            var DoUnfreeze = true;
-
-            if (Database.Cell.Freezed) {
-                DoUnfreeze = false;
-            }
-            else {
-                Database.Cell.Freeze();
-            }
 
             //// Dann die Aktionen ausführen und fall es einen Fehler gibt, die Spalten ermitteln
             //var ColumnAndErrors = new List<string>();
@@ -449,7 +397,6 @@ namespace BlueDatabase {
             if (!onlyTest) {
 
                 if (!string.IsNullOrEmpty(script.Error)) {
-                    if (DoUnfreeze) { Database.Cell.UnFreeze(); }
                     return script;
                 }
 
@@ -503,7 +450,6 @@ namespace BlueDatabase {
 
             }
 
-            if (DoUnfreeze) { Database.Cell.UnFreeze(); }
             return script;
 
             //return ColumnAndErrors.SortedDistinctList();
@@ -570,12 +516,12 @@ namespace BlueDatabase {
                         var x2 = ThisColum.AutoCorrect(x);
 
                         if (ThisColum.Format != enDataFormat.LinkedCell && x != x2) {
-                            Database.Cell.Set(ThisColum, this, x2, false);
+                            Database.Cell.Set(ThisColum, this, x2);
                         }
                         else {
                             if (!ThisColum.IsFirst()) {
 
-                                Database.Cell.DoSpecialFormats(ThisColum, Key, CellGetString(ThisColum), false, true);
+                                Database.Cell.DoSpecialFormats(ThisColum, Key, CellGetString(ThisColum), false);
                             }
                         }
                         CellCollection.Invalidate_CellContentSize(ThisColum, this);

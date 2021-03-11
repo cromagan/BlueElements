@@ -31,16 +31,14 @@ namespace BlueScript {
     class Method_BerechneVariable : Method {
 
 
-        public Method_BerechneVariable(Script parent) : base(parent) { }
-
-
         public override string Syntax { get => "VariablenName = Berechung;"; }
-
-        public override List<string> Comand { get => Parent.Variablen.AllNames(); }
+        public override List<string> Comand(Script s) { return s.Variablen.AllNames(); }
         public override string StartSequence { get => "="; }
         public override string EndSequence { get => ";"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => string.Empty; }
+        public override enVariableDataType Returns { get => enVariableDataType.Null; }
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.BoolNumString }; }
+        public override bool EndlessArgs { get => false; }
 
 
 
@@ -54,7 +52,7 @@ namespace BlueScript {
                 return new strDoItFeedback("Variable " + variableName + " nicht gefunden");
             }
 
-            var attvar = SplitAttributeToVars(infos.AttributText, s, 0);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
             if (attvar == null || attvar.Count != 1) { return strDoItFeedback.AttributFehler(); }
 

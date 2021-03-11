@@ -19,32 +19,32 @@
 
 using System;
 using System.Collections.Generic;
+using Skript.Enums;
 
 namespace BlueScript {
     class Method_max : Method {
 
-
-        public Method_max(Script parent) : base(parent) { }
-
         public override string Syntax { get => "Max(Value1, Value2, ...)"; }
 
-        public override List<string> Comand { get => new List<string>() { "max" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "max" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => "numeral"; }
+        public override enVariableDataType Returns { get => enVariableDataType.Number; }
 
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number }; }
+        public override bool EndlessArgs { get => true; }
 
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, 0);
-            if (attvar == null || attvar.Count <2) { return strDoItFeedback.AttributFehler(); }
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+
 
             var val = double.MinValue;
 
             foreach (var thisval in attvar) {
-                if (thisval.Type != Skript.Enums.enVariableDataType.Number ) { return strDoItFeedback.FalscherDatentyp(); }
                 val = Math.Max(thisval.ValueDouble, val);
             }
 

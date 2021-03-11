@@ -49,6 +49,7 @@
     <Compile Include="Methods\Method_EndsWith.cs" />
     <Compile Include="Methods\Method_Exception.cs" />
     <Compile Include="Methods\Method_IsNumeral.cs" />
+    <Compile Include="Methods\Method_round.cs" />
     <Compile Include="Methods\Method_Sort.cs" />
     <Compile Include="Methods\Method_Remove.cs" />
     <Compile Include="Methods\Method_BerechneVariable.cs" />

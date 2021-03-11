@@ -26,33 +26,32 @@ using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
 using BlueBasics;
 using static BlueBasics.modConverter;
+using Skript.Enums;
 
 namespace BlueScript {
     class Method_Sort : Method {
 
 
-        public Method_Sort(Script parent) : base(parent) { }
+        //public Method_Sort(Script parent) : base(parent) { }
 
         public override string Syntax { get => "Sort(ListVariable, EliminateDupes);"; }
 
-        public override List<string> Comand { get => new List<string>() { "sort" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "sort" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override string Returns { get => string.Empty; }
+        public override enVariableDataType Returns { get => enVariableDataType.Null; }
 
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableList, enVariableDataType.Bool }; }
+        public override bool EndlessArgs { get => false; }
 
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, 1);
-            if (attvar == null || attvar.Count != 2) { return strDoItFeedback.AttributFehler(); }
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            if (attvar[0] == null) { return strDoItFeedback.VariableNichtGefunden(); }
-            if (attvar[0].Type != Skript.Enums.enVariableDataType.List) { return strDoItFeedback.FalscherDatentyp(); }
-            if (attvar[1].Type != Skript.Enums.enVariableDataType.Bool) { return strDoItFeedback.FalscherDatentyp(); }
-
-            var x = attvar[0].ValueListString;
+             var x = attvar[0].ValueListString;
 
             if (attvar[1].ValueBool) {
                 x = x.SortedDistinctList();
