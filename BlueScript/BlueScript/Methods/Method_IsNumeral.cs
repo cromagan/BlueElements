@@ -35,6 +35,8 @@ namespace BlueScript {
     class Method_IsNumeral : Method {
 
 
+        public override string Description { get => "Püft, ob der Inhalt der Variable eine gültige Zahl ist. "; }
+
         public override string Syntax { get => "isNumeral(Value)"; }
         public override List<string> Comand(Script s) { return new List<string>() { "isnumeral" }; }
         public override string StartSequence { get => "("; }
@@ -42,7 +44,7 @@ namespace BlueScript {
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Bool; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableStringNum }; }
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.NumString }; }
         public override bool EndlessArgs { get => false; }
 
 

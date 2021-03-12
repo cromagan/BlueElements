@@ -36,6 +36,8 @@ namespace BlueScript {
 
         public override string Syntax { get => "Sort(ListVariable, EliminateDupes);"; }
 
+        public override string Description { get => "Sortiert die Liste und falls der zweite Wert TRUE ist, entfernt Doubletten."; }
+
         public override List<string> Comand(Script s) { return new List<string>() { "sort" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }

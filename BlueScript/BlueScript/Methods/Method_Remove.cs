@@ -33,6 +33,8 @@ namespace BlueScript {
 
         public override string Syntax { get => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);"; }
 
+        public override string Description { get => "Entfernt aus der Liste die angegebenen Werte."; }
+
         public override List<string> Comand(Script s) { return new List<string>() { "remove" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }

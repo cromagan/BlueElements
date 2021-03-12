@@ -35,8 +35,9 @@ namespace BlueScript {
         //public Method_EndsWith(Script parent) : base(parent) { }
 
 
-        public override string Syntax { get => "EndsWith(StringVariable, CaseSensitive, Value1, Value2, ...)"; }
+        public override string Syntax { get => "EndsWith(String, CaseSensitive, Value1, Value2, ...)"; }
 
+        public override string Description { get => "Prüft, ob der String mit einem der angegeben Strings endet."; }
 
         public override List<string> Comand(Script s) { return new List<string>() { "endswith" }; }
         public override string StartSequence { get => "("; }
@@ -44,7 +45,7 @@ namespace BlueScript {
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Bool; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableString, enVariableDataType.Bool, enVariableDataType.String }; }
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.Bool, enVariableDataType.String }; }
         public override bool EndlessArgs { get => true; }
 
 

@@ -19,23 +19,32 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static BlueBasics.modAllgemein;
+using static BlueBasics.Extensions;
+using BlueBasics;
+using static BlueBasics.modConverter;
 using Skript.Enums;
 
+
 namespace BlueScript {
-    class Method_round : Method {
+    class Method_Number : Method {
 
-        public override string Syntax { get => "Round(Value, Nachkommastellen)"; }
+        public override string Syntax { get => "Number(string, number)"; }
 
-        public override string Description { get => "Rundet den Zahlenwert mathematisch korrekt."; }
+        public override string Description { get => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird der nachfolgende Zahlenwert zurückgegeben."; }
 
-        public override List<string> Comand(Script s) { return new List<string>() { "round" }; }
+        //public Method_min(Script parent) : base(parent) { }
+        public override List<string> Comand(Script s) { return new List<string>() { "number" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Number; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number, enVariableDataType.Integer }; }
-        public override bool EndlessArgs { get => false; }
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.Number }; }
+        public override bool EndlessArgs { get => true; }
 
 
 
@@ -43,14 +52,12 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            var n = (int)attvar[1].ValueDouble;
 
-            if (n < 0) { n = 0; }
-            if (n > 10) { n = 10; }
+            if (attvar[0].ValueString.IsNumeral()) {
+                return new strDoItFeedback(attvar[0].ValueString, string.Empty);
+            }
 
-            var val = Math.Round(attvar[0].ValueDouble, n);
-
-            return new strDoItFeedback(val.ToString(), string.Empty);
+            return new strDoItFeedback(attvar[1].ValueString, string.Empty);
         }
     }
 }

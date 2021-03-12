@@ -33,6 +33,9 @@ namespace BlueScript {
 
 
         public override string Syntax { get => "Add(List-Variable, Value1, Value2, ...)"; }
+
+
+        public override string Description { get => "Fügt einer Liste einen oder mehrere Werte hinzu."; }
         public override List<string> Comand(Script s) { return new List<string>() { "add" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }

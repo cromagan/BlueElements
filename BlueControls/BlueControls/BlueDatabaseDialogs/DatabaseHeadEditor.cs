@@ -654,8 +654,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             var co = string.Empty;
 
             foreach (var thisc in BlueScript.Script.Comands) {
+
+                co = co + "#################################################################" + "\r\n";
                 co = co + thisc.Syntax + "\r\n";
-                co = co + "    Rückgabetyp: " + thisc.Returns.ToString() + "\r\n\r\n";
+                co = co + "  - Rückgabetyp: " + thisc.Returns.ToString() + "\r\n";
+                for (var z = 0; z < thisc.Args.Count(); z++) {
+                    co = co + "  - Argument " +  (z+1).ToString() +": " + thisc.Args[z].ToString();
+                    if (z == thisc.Args.Count()-1 && thisc.EndlessArgs) {
+                        co = co + " -> Dieses Argument kann beliebig oft wiederholt werden";
+                    }
+                    co = co + "\r\n";
+                }
+                co = co + thisc.Description +  "\r\n";
             }
             txbComms.Text = co;
 

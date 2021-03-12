@@ -22,19 +22,19 @@ using System.Collections.Generic;
 using Skript.Enums;
 
 namespace BlueScript {
-    class Method_round : Method {
+    class Method_Substring : Method {
 
-        public override string Syntax { get => "Round(Value, Nachkommastellen)"; }
+        public override string Syntax { get => "Subsrting(String, Start, Anzahl)"; }
 
-        public override string Description { get => "Rundet den Zahlenwert mathematisch korrekt."; }
+        public override string Description { get => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück."; }
 
-        public override List<string> Comand(Script s) { return new List<string>() { "round" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "substring" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Number; }
+        public override enVariableDataType Returns { get => enVariableDataType.String; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number, enVariableDataType.Integer }; }
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.Integer, enVariableDataType.Integer }; }
         public override bool EndlessArgs { get => false; }
 
 
@@ -43,14 +43,21 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            var n = (int)attvar[1].ValueDouble;
+            var st = attvar[1].ValueInt;
+            var en = attvar[2].ValueInt;
 
-            if (n < 0) { n = 0; }
-            if (n > 10) { n = 10; }
+            if (st < 0) {
+                en += st;
+                st = 0;
+            }
 
-            var val = Math.Round(attvar[0].ValueDouble, n);
 
-            return new strDoItFeedback(val.ToString(), string.Empty);
+            if (st+en > attvar[0].ValueString.Length) {
+                en = attvar[0].ValueString.Length - st;
+            }
+
+
+            return new strDoItFeedback("\"" + attvar[0].ValueString.Substring(st,en) +"\"", string.Empty);
         }
     }
 }

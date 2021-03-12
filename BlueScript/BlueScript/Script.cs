@@ -222,16 +222,14 @@ namespace BlueScript {
             var EckigeKlammern = 0;
 
             var pos = startpos;
-
             var maxl = txt.Length;
-
-
             const string TR = "&.,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t";
 
 
             do {
-
                 if (pos >= maxl) { return (-1, string.Empty); ; }
+
+
 
                 #region Klammer und " erledigen
                 switch (txt.Substring(pos, 1)) {
@@ -260,6 +258,10 @@ namespace BlueScript {
                     case "(":
                         if (!Gans) {
                             if (EckigeKlammern > 0) { return (-1, string.Empty); }
+
+                            if (klammern == 0 && GeschwKlammern == 0 && searchfor.Contains("(")) {
+                                return (pos, "(");
+                            }
                             klammern++;
                         }
 
@@ -295,13 +297,9 @@ namespace BlueScript {
                 }
                 #endregion
 
-
-
+                #region Den Text suchen
                 if (klammern == 0 && !Gans && GeschwKlammern == 0 && EckigeKlammern == 0) {
-
-
                     if (!checkforSeparatorbefore || pos == 0 || TR.Contains(txt.Substring(pos - 1, 1))) {
-
                         foreach (var thisEnd in searchfor) {
                             if (pos + thisEnd.Length <= maxl) {
 
@@ -314,6 +312,8 @@ namespace BlueScript {
                         }
                     }
                 }
+                #endregion
+
 
                 pos++;
             } while (true);

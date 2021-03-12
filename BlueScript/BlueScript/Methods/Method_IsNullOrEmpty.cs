@@ -34,6 +34,7 @@ namespace BlueScript {
 
         //public Method_IsNullOrEmpty(Script parent) : base(parent) { }
 
+        public override string Description { get => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat."; }
 
         public override string Syntax { get => "isNullOrEmpty(Variable)"; }
         public override List<string> Comand(Script s) { return new List<string>() { "isnullorempty" }; }
@@ -50,11 +51,17 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+            if (attvar == null) { return strDoItFeedback.Wahr(); }
 
             if (string.IsNullOrEmpty(attvar[0].ValueString)) {
                 return strDoItFeedback.Wahr();
             }
+
+
+            if (attvar[0].Type == enVariableDataType.Null || attvar[0].Type == enVariableDataType.Error || attvar[0].Type == enVariableDataType.NotDefinedYet) {
+                return strDoItFeedback.Wahr();
+            }
+
             return strDoItFeedback.Falsch();
         }
     }

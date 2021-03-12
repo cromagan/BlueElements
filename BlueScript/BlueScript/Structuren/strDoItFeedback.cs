@@ -31,6 +31,10 @@ public struct strDoItFeedback {
         return new strDoItFeedback("Variable nicht gefunden.");
     }
 
+    public static strDoItFeedback Klammerfehler() {
+        return new strDoItFeedback("Fehler bei der Klammersetzung.");
+    }
+
 
     public static strDoItFeedback Wahr() {
         return new strDoItFeedback("true", string.Empty);

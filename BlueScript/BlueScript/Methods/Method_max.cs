@@ -25,7 +25,7 @@ namespace BlueScript {
     class Method_max : Method {
 
         public override string Syntax { get => "Max(Value1, Value2, ...)"; }
-
+        public override string Description { get => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück."; }
         public override List<string> Comand(Script s) { return new List<string>() { "max" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }

@@ -28,6 +28,13 @@ namespace Skript.Enums {
         Date = 8,
         List = 16,
 
+        /// <summary>
+        /// Nur für Attribute
+        /// </summary>
+        Integer = 256,
+
+        NumString = Number | String,
+
         BoolNumString = Bool | Number | String,
 
         Variable = 1024,

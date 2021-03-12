@@ -20,13 +20,10 @@
 
 using System;
 
-namespace BlueBasics
-{
-    public static class modErgebnis
-    {
+namespace BlueBasics {
+    public static class modErgebnis {
 
-        public static double? Ergebnis(string Formel)
-        {
+        public static double? Ergebnis(string Formel) {
             Formel = Formel.ToUpper();
             Formel = Formel.Replace(" ", "");
             if (string.IsNullOrEmpty(Formel)) { return null; }
@@ -39,15 +36,13 @@ namespace BlueBasics
 
 
 
-        private static double? ErgebnisCore(string Formel)
-        {
+        private static double? ErgebnisCore(string Formel) {
             //var TMP = 0;
 
 
-            Formel = Formel.DeKlammere();
+            Formel = Formel.DeKlammere(true, false, false);
             //Das alles kann nur möglich sein, WENN eine Klammer vorhanden ist
-            if (Formel.Contains("("))
-            {
+            if (Formel.Contains("(")) {
                 // --------------------------------------------------------------------------------------------------------------------------------
                 // --- Eine Klammer auflösen, im Formelstring ersetzen und         mittels Rekursivität die nun einfachere Formel berechnen.
                 // --------------------------------------------------------------------------------------------------------------------------------
@@ -138,7 +133,7 @@ namespace BlueBasics
                 //}
                 //else // Es ist KEINE Funktion, also den Inhalt der Klammer normal berechnen
                 //{
-                    Replacer = ErgebnisCore(Formel.Substring(a + 1, e - a - 1));
+                Replacer = ErgebnisCore(Formel.Substring(a + 1, e - a - 1));
                 //}
 
                 if (Replacer == null) { return null; }
@@ -153,7 +148,7 @@ namespace BlueBasics
             // --------------------------------------------------------------------------------------------------------------------------------
             if (Formel.Replace(".", ",").IsNumeral()) { return double.Parse(Formel.Replace(".", ",")); }
             //TMP = Math.Max(Math.Max(-1, Formel.LastIndexOf("=")), Math.Max(Formel.LastIndexOf("<"), Formel.LastIndexOf(">")));
-            var TMP = Math.Max(Formel.LastIndexOf("+"), LastMinusIndex(Formel)); 
+            var TMP = Math.Max(Formel.LastIndexOf("+"), LastMinusIndex(Formel));
             if (TMP < 0) { TMP = Math.Max(Formel.LastIndexOf("/"), Formel.LastIndexOf("*")); }
             if (TMP < 1) { return null; }
 
@@ -184,8 +179,7 @@ namespace BlueBasics
 
 
 
-            switch (Seperator)
-            {
+            switch (Seperator) {
                 case "/":
                     if (w2 == 0) { return null; }
                     return w1 / w2;
@@ -195,42 +189,40 @@ namespace BlueBasics
                     return w1 - w2;
                 case "+":
                     return w1 + w2;
-                //case ">":
-                //    if (w1 > w2) { return -1; }
-                //    return 0;
-                //case ">=":
-                //case "=>":
-                //    if (w1 >= w2) { return -1; }
-                //    return 0;
-                //case "<":
-                //    if (w1 < w2) { return -1; }
-                //    return 0;
-                //case "<=":
-                //case "=<":
-                //    if (w1 <= w2) { return -1; }
-                //    return 0;
-                //case "=":
-                //    if (w1 == w2) { return -1; }
-                //    return 0;
-                //case "<>":
-                //case "><":
-                //    if (w1 != w2) { return -1; }
-                //    return 0;
+                    //case ">":
+                    //    if (w1 > w2) { return -1; }
+                    //    return 0;
+                    //case ">=":
+                    //case "=>":
+                    //    if (w1 >= w2) { return -1; }
+                    //    return 0;
+                    //case "<":
+                    //    if (w1 < w2) { return -1; }
+                    //    return 0;
+                    //case "<=":
+                    //case "=<":
+                    //    if (w1 <= w2) { return -1; }
+                    //    return 0;
+                    //case "=":
+                    //    if (w1 == w2) { return -1; }
+                    //    return 0;
+                    //case "<>":
+                    //case "><":
+                    //    if (w1 != w2) { return -1; }
+                    //    return 0;
             }
 
             return null;
         }
 
 
-        public static int LastMinusIndex(string Formel)
-        {
+        public static int LastMinusIndex(string Formel) {
             if (Formel.Contains("-") == false) { return -1; }
 
             var LastMin = 1;
             var OkMin = -1;
 
-            while (true)
-            {
+            while (true) {
                 LastMin = Formel.IndexOf("-", LastMin);
                 if (LastMin < 1) { break; }
 

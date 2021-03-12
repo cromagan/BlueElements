@@ -22,18 +22,14 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using static BlueBasics.modConverter;
 
-namespace BlueBasics
-{
-    public static class DataFormat
-    {
+namespace BlueBasics {
+    public static class DataFormat {
 
 
 
 
-        public static bool MultilinePossible(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool MultilinePossible(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
@@ -68,10 +64,8 @@ namespace BlueBasics
 
 
 
-        public static bool SaveSizeData(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool SaveSizeData(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Bit:
                 case enDataFormat.Ganzzahl:
@@ -90,10 +84,8 @@ namespace BlueBasics
         }
 
 
-        public static bool SpellCheckingPossible(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool SpellCheckingPossible(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.RelationText:
@@ -104,10 +96,8 @@ namespace BlueBasics
 
 
 
-        public static bool TextboxEditPossible(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool TextboxEditPossible(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
@@ -133,11 +123,9 @@ namespace BlueBasics
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool IsFormat(this string Txt, enDataFormat Format, bool MultiLine)
-        {
+        public static bool IsFormat(this string Txt, enDataFormat Format, bool MultiLine) {
 
-            if (MultiLine)
-            {
+            if (MultiLine) {
                 var ex = Txt.SplitByCR();
                 return ex.All(ThisString => string.IsNullOrEmpty(ThisString) || ThisString.IsFormat(Format));
             }
@@ -152,8 +140,7 @@ namespace BlueBasics
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool IsFormat(this string Txt, enDataFormat Format)
-        {
+        public static bool IsFormat(this string Txt, enDataFormat Format) {
             if (!Text_LängeCheck(Txt, Format)) { return false; }
             if (!Text_SchabloneCheck(Txt, Format)) { return false; }
             if (!Txt.ContainsOnlyChars(AllowedChars(Format))) { return false; }
@@ -163,11 +150,9 @@ namespace BlueBasics
 
 
 
-        public static string AllowedChars(this enDataFormat format)
-        {
+        public static string AllowedChars(this enDataFormat format) {
 
-            switch (format)
-            {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.BildCode:
@@ -208,10 +193,8 @@ namespace BlueBasics
 
 
 
-        public static bool ExportableForLayout(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool ExportableForLayout(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Bit:
                 case enDataFormat.Ganzzahl:
@@ -233,10 +216,8 @@ namespace BlueBasics
 
 
 
-        public static int Text_MaximaleLänge(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static int Text_MaximaleLänge(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Gleitkommazahl:
@@ -270,16 +251,14 @@ namespace BlueBasics
 
         }
 
-        public static bool Text_LängeCheck(string TXT, enDataFormat format)
-        {
+        public static bool Text_LängeCheck(string TXT, enDataFormat format) {
             var ml = Text_MaximaleLänge(format);
             var il = 0;
             if (TXT != null) { il = TXT.Length; }
 
             if (ml > -1 && il > ml) { return false; }
 
-            switch (format)
-            {
+            switch (format) {
 
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
@@ -321,11 +300,9 @@ namespace BlueBasics
 
 
 
-        public static bool Text_ValueCheck(string TXT, enDataFormat Format)
-        {
+        public static bool Text_ValueCheck(string TXT, enDataFormat Format) {
 
-            switch (Format)
-            {
+            switch (Format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.BildCode:
@@ -341,9 +318,11 @@ namespace BlueBasics
                     return DateTimeTryParse(TXT, out _);
 
                 case enDataFormat.Gleitkommazahl:
+                    return float.TryParse(TXT, out _);
+
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.FarbeInteger:
-                    return true; // Macht Alls der Text_SchabloneCheck
+                    return long.TryParse(TXT, out _);
 
                 case enDataFormat.LinkedCell:
                     Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
@@ -363,11 +342,9 @@ namespace BlueBasics
         /// <param name="Format"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool Text_SchabloneCheck(string TXT, enDataFormat Format)
-        {
+        public static bool Text_SchabloneCheck(string TXT, enDataFormat Format) {
 
-            switch (Format)
-            {
+            switch (Format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.BildCode:
@@ -423,23 +400,19 @@ namespace BlueBasics
 
 
 
-        public static string CompareKey(string IsValue, enDataFormat Format)
-        {
+        public static string CompareKey(string IsValue, enDataFormat Format) {
             var CompareKey_S_OK = Constants.SecondSortChar + "X";
             var CompareKey_S_NOK = Constants.SecondSortChar + "A";
 
 
-            switch (Format)
-            {
+            switch (Format) {
                 case enDataFormat.Ganzzahl:
                     if (string.IsNullOrEmpty(IsValue)) { return CompareKey_S_NOK + "0000000000"; }
 
-                    if (int.TryParse(IsValue, out var w))
-                    {
+                    if (int.TryParse(IsValue, out var w)) {
                         return CompareKey_S_OK + w.ToString(Constants.Format_Integer10);
                     }
-                    else
-                    {
+                    else {
                         return CompareKey_S_NOK + IsValue;
                     }
 
@@ -491,8 +464,7 @@ namespace BlueBasics
                 case enDataFormat.Gleitkommazahl:
                     if (string.IsNullOrEmpty(IsValue)) { return "0000000000,000"; }
 
-                    if (double.TryParse(IsValue, out var dw))
-                    {
+                    if (double.TryParse(IsValue, out var dw)) {
                         var t = dw.ToString(Constants.Format_Float10_3);
                         if (!t.Contains(",")) { t += ",000"; };
                         while (t.Length < 14) { t += "0"; }
@@ -500,20 +472,17 @@ namespace BlueBasics
                         return CompareKey_S_OK + t;
 
                     }
-                    else
-                    {
+                    else {
                         return CompareKey_S_NOK + IsValue;
                     }
 
 
                 case enDataFormat.Datum_und_Uhrzeit:
 
-                    if (DateTimeTryParse(IsValue, out var d))
-                    {
+                    if (DateTimeTryParse(IsValue, out var d)) {
                         return CompareKey_S_OK + d.ToString("u");
                     }
-                    else
-                    {
+                    else {
                         return CompareKey_S_NOK + IsValue;
                     }
 
@@ -536,10 +505,8 @@ namespace BlueBasics
 
 
 
-        public static bool Autofilter_möglich(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool Autofilter_möglich(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Bit:
                 case enDataFormat.Ganzzahl:
@@ -563,10 +530,8 @@ namespace BlueBasics
 
 
 
-        public static bool NeedUTF8(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool NeedUTF8(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.RelationText:
                 case enDataFormat.Text_mit_Formatierung:
@@ -579,10 +544,8 @@ namespace BlueBasics
 
 
 
-        public static bool NeedTargetDatabase(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool NeedTargetDatabase(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
@@ -592,10 +555,8 @@ namespace BlueBasics
             }
         }
 
-        public static bool IsZahl(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool IsZahl(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
                     return true;
@@ -605,10 +566,8 @@ namespace BlueBasics
         }
 
 
-        public static bool DropdownItemsOfOtherCellsAllowed(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool DropdownItemsOfOtherCellsAllowed(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
@@ -625,10 +584,8 @@ namespace BlueBasics
             }
         }
 
-        public static bool NeedLinkedKeyKennung(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool NeedLinkedKeyKennung(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     return true;
                 default:
@@ -638,10 +595,8 @@ namespace BlueBasics
 
 
 
-        public static bool DropdownUnselectAllAllowed(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool DropdownUnselectAllAllowed(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
@@ -660,10 +615,8 @@ namespace BlueBasics
         }
 
 
-        public static bool DropdownItemsAllowed(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool DropdownItemsAllowed(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Bit:
                 case enDataFormat.Ganzzahl:
@@ -682,10 +635,8 @@ namespace BlueBasics
         }
 
 
-        public static bool CanBeChangedByRules(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool CanBeChangedByRules(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Bit:
                 case enDataFormat.Ganzzahl:
@@ -704,10 +655,8 @@ namespace BlueBasics
         }
 
 
-        public static bool CanBeCheckedByRules(this enDataFormat format)
-        {
-            switch (format)
-            {
+        public static bool CanBeCheckedByRules(this enDataFormat format) {
+            switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Bit:
                 case enDataFormat.Ganzzahl:

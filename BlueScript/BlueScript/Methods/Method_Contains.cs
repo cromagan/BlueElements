@@ -37,6 +37,8 @@ namespace BlueScript {
 
         public override string Syntax { get => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)"; }
 
+        public override string Description { get => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt."; }
+
         public override List<string> Comand(Script s) { return new List<string>() { "contains" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }

@@ -37,6 +37,8 @@ namespace BlueScript {
 
         public override string Syntax { get => "if (true) { Code zum ausführen }"; }
 
+        public override string Description { get => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt."; }
+
         public override List<string> Comand(Script s) { return new List<string>() { "if" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
@@ -67,6 +69,7 @@ namespace BlueScript {
 
 
         public static string? GetBool(string txt) {
+            txt = txt.DeKlammere(true, false, false);
 
             switch (txt.ToLower()) {
                 case "true": return "true";
@@ -84,10 +87,10 @@ namespace BlueScript {
             }
 
 
-
-            var (posa, witcha) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
+            #region Klammern zuerst berechnen
+            var (posa, _) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
             if (posa > -1) {
-                var (pose, witche) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
+                var (pose, _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
 
                 if (pose < posa) { return null; }
 
@@ -97,6 +100,7 @@ namespace BlueScript {
                 return GetBool(txt.Substring(0, posa) + (string)tmp + txt.Substring(pose + 1));
 
             }
+            #endregion
 
 
 
@@ -179,8 +183,8 @@ namespace BlueScript {
 
 
             Variable v1 = null;
-            if (check != "!") { v1 = new Variable("dummy", s1); }
-            var v2 = new Variable("dummy", s2);
+            if (check != "!") { v1 = new Variable("dummy", s1, null); }
+            var v2 = new Variable("dummy", s2, null);
 
 
             // V2 braucht nicht gepürft werden, muss ja eh der gleiche TYpe wie V1 sein

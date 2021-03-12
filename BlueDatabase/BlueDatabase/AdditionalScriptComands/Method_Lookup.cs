@@ -37,7 +37,7 @@ namespace BlueScript {
 
         public override string Syntax { get => "Lookup(Database, KeyValue, Column, NothingFoundMessage, FoundToMuchMessage);"; }
 
-
+        public override string Description { get => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundMessage zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchMessage zurückgegeben."; }
         public override List<string> Comand(Script s) { return new List<string>() { "lookup" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }

@@ -1063,7 +1063,7 @@ namespace BlueDatabase {
 
 
             if (column.Format == enDataFormat.LinkedCell) {
-                var (lcolumn, lrow) = LinkedCellData(column, row, true, true);
+                var (lcolumn, lrow) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
                 lrow?.CellSet(lcolumn, value);
                 return;
             }
@@ -1126,7 +1126,7 @@ namespace BlueDatabase {
         }
 
         public void Set(ColumnItem column, RowItem row, List<string> value) {
-            Set(column, row, value);
+            Set(column, row, value.JoinWithCr());
         }
 
         #endregion

@@ -33,6 +33,8 @@ namespace BlueScript {
 
         public override string Syntax { get => "Min(Value1, Value2, ...)"; }
 
+        public override string Description { get => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück."; }
+
         //public Method_min(Script parent) : base(parent) { }
         public override List<string> Comand(Script s) { return new List<string>() { "min" }; }
         public override string StartSequence { get => "("; }

@@ -32,6 +32,9 @@ namespace BlueScript {
 
 
         public override string Syntax { get => "VariablenName = Berechung;"; }
+
+
+        public override string Description { get => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen."; }
         public override List<string> Comand(Script s) { return s.Variablen.AllNames(); }
         public override string StartSequence { get => "="; }
         public override string EndSequence { get => ";"; }

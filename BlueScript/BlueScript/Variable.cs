@@ -70,72 +70,108 @@ namespace BlueScript {
         }
 
 
-        public strDoItFeedback CaluclateByAttribute(string attributesText) {
+        public static strDoItFeedback AttributeAuflösen(string txt, Script s) {
 
-            var bl = new List<string>() { "true", "false" , "||", "&&", "==","!=", "<", ">", ">=", "<="};
 
-        var (pos, witch) = Script.NextText(attributesText, 0, bl, false, false);
+            txt = txt.DeKlammere(true, true, false);
 
-            if (pos >= 0) {
-                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Bool) {
-                    return new strDoItFeedback("Variable ist kein Boolean");
+            if (s != null) {
+                #region Variablen ersetzen
+                var t = Method.ReplaceVariable(txt, s.Variablen);
+                if (!string.IsNullOrEmpty(t.ErrorMessage)) {
+                    return new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
                 }
-                var b = Method_if.GetBool(attributesText);
-                if (b == null) { return new strDoItFeedback("Berechnungsfehler der Formel: " + attributesText); }
-                ValueString = (string)b;
-                Type = enVariableDataType.Bool;
-                return new strDoItFeedback();
-            }
+                #endregion
 
-            if (attributesText.StartsWith("\"")) {
-
-                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.String) {
-                    return new strDoItFeedback("Variable ist kein String");
+                #region Routinen ersetzen, vor den Klammern, das ansonsten Min(x,y,z) falsch anschlägt
+                var t2 = Method.ReplaceComands(t.AttributeText, Script.Comands, s);
+                if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
+                    return new strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
                 }
-                ValueString = attributesText.Replace("\"+\"", string.Empty).Trim("\"");
-                Type = enVariableDataType.String;
-                return new strDoItFeedback();
+                #endregion
+
+                txt = t2.AttributeText;
             }
 
 
+            #region Klammern am ende berechnen, das ansonsten Min(x,y,z) falsch anschlägt
+            var (posa, _) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
+            if (posa > -1) {
+                var (pose, _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
 
+                if (pose < posa) { return strDoItFeedback.Klammerfehler(); }
 
-            if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Number) {
-                return new strDoItFeedback("Variable ist keine Zahl");
+                var tmp = AttributeAuflösen(txt.Substring(posa + 1, pose - posa - 1), s);
+                if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return tmp; }
+
+                return AttributeAuflösen(txt.Substring(0, posa) + tmp.Value + txt.Substring(pose + 1), s);
+
             }
+            #endregion
 
-            var erg = modErgebnis.Ergebnis(attributesText);
-            if (erg == null) { return new strDoItFeedback("Berechnungsfehler der Formel: " + attributesText); }
-
-
-            ValueString = ((double)erg).ToString();
-            Type = enVariableDataType.Number;
-            return new strDoItFeedback();
+            return new strDoItFeedback(txt, string.Empty);
 
         }
 
 
-        public Variable(string name, string attributesText) {
+        public Variable(string name, string attributesText, Script s) {
 
             if (!IsValidName(name)) {
                 Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Ungültiger Variablenname: " + name);
             }
             Name = name.ToLower();
 
-            var x = CaluclateByAttribute(attributesText);
+            var txt = AttributeAuflösen(attributesText, s);
 
 
-            if (!string.IsNullOrEmpty(x.ErrorMessage)) {
-                Type = enVariableDataType.Error;
-                ValueString = string.Empty;
-                Readonly = true;
+            if (!string.IsNullOrEmpty(txt.ErrorMessage)) { SetError(); return; }
+
+
+
+            var bl = new List<string>() { "true", "false", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
+
+            var (pos, witch) = Script.NextText(txt.Value, 0, bl, false, false);
+
+            if (pos >= 0) {
+                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Bool) { SetError(); return; }//return new strDoItFeedback("Variable ist kein Boolean");
+                var b = Method_if.GetBool(txt.Value);
+                if (b == null) { SetError(); return; }//return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); 
+                ValueString = (string)b;
+                Type = enVariableDataType.Bool;
+                return;
             }
-            else {
-                Readonly = true;
+
+            if (txt.Value.StartsWith("\"")) {
+
+                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.String) {
+                    SetError(); return;
+                    //return new strDoItFeedback("Variable ist kein String");
+                }
+                ValueString = txt.Value.Replace("\"+\"", string.Empty).Trim("\"");
+                Type = enVariableDataType.String;
+                return;// new strDoItFeedback();
             }
+
+
+
+
+            if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Number) { SetError(); return; } //return new strDoItFeedback("Variable ist keine Zahl");
+
+            var erg = modErgebnis.Ergebnis(txt.Value);
+            if (erg == null) { SetError(); return; }//return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); 
+
+
+            ValueString = ((double)erg).ToString();
+            Type = enVariableDataType.Number;
+            Readonly = true;
         }
 
-
+        private void SetError() {
+            Readonly = false;
+            Type = enVariableDataType.Error;
+            ValueString = string.Empty;
+            Readonly = true;
+        }
 
 
 
@@ -229,6 +265,12 @@ namespace BlueScript {
         public double ValueDouble {
             get {
                 return DoubleParse(_ValueString);
+            }
+        }
+
+        public int ValueInt {
+            get {
+                return IntParse(_ValueString);
             }
         }
 

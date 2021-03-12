@@ -556,7 +556,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Regeln.Padding = new System.Windows.Forms.Padding(3);
             this.Tab_Regeln.Size = new System.Drawing.Size(1039, 616);
             this.Tab_Regeln.TabIndex = 3;
-            this.Tab_Regeln.Text = "Regeln";
+            this.Tab_Regeln.Text = "Skript";
             // 
             // tabCSckript
             // 

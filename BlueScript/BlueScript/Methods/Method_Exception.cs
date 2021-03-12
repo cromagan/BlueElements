@@ -33,6 +33,7 @@ namespace BlueScript {
 
         public override string Syntax { get => "Exception(\"Unbehandelter Programmcode!\");"; }
 
+        public override string Description { get => "Unterbricht das Skript mit einer Fehlermeldung."; }
         public override List<string> Comand(Script s) { return new List<string>() { "Exception" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }

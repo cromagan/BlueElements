@@ -30,7 +30,7 @@ namespace BlueScript {
 
         public override string Syntax { get => "SetError(Nachricht, Column1, Colum2, ...);"; }
 
-
+        public override string Description { get => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden."; }
         public override List<string> Comand(Script s) { return new List<string>() { "seterror" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }

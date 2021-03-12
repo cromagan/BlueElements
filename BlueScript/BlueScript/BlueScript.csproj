@@ -48,17 +48,24 @@
     <Compile Include="Enums\enVariableType.cs" />
     <Compile Include="Methods\Method_EndsWith.cs" />
     <Compile Include="Methods\Method_Exception.cs" />
+    <Compile Include="Methods\Method_Exists.cs" />
     <Compile Include="Methods\Method_IsNumeral.cs" />
-    <Compile Include="Methods\Method_round.cs" />
+    <Compile Include="Methods\Method_Join.cs" />
+    <Compile Include="Methods\Method_Int.cs" />
+    <Compile Include="Methods\Method_Substring.cs" />
+    <Compile Include="Methods\Method_Split.cs" />
+    <Compile Include="Methods\Method_String.cs" />
+    <Compile Include="Methods\Method_Number.cs" />
+    <Compile Include="Methods\Method_Round.cs" />
     <Compile Include="Methods\Method_Sort.cs" />
     <Compile Include="Methods\Method_Remove.cs" />
     <Compile Include="Methods\Method_BerechneVariable.cs" />
     <Compile Include="Methods\Method_Add.cs" />
-    <Compile Include="Methods\Method_if.cs" />
+    <Compile Include="Methods\Method_If.cs" />
     <Compile Include="Methods\Method_Contains.cs" />
     <Compile Include="Methods\Method_IsNullOrEmpty.cs" />
-    <Compile Include="Methods\Method_max.cs" />
-    <Compile Include="Methods\Method_min.cs" />
+    <Compile Include="Methods\Method_Max.cs" />
+    <Compile Include="Methods\Method_Min.cs" />
     <Compile Include="Script.cs" />
     <Compile Include="Enums\enVariableDataType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,7 +74,7 @@
     <Compile Include="Structuren\strDoItFeedback.cs" />
     <Compile Include="Structuren\strCanDoFeedback.cs" />
     <Compile Include="Variable.cs" />
-    <Compile Include="Methods\Method_var.cs" />
+    <Compile Include="Methods\Method_Var.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj">
