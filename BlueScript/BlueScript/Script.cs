@@ -31,6 +31,8 @@ namespace BlueScript {
         private string _error;
         private string _errorCode;
 
+        public bool Break = false;
+
 
         public int Line { get; internal set; }
 
@@ -153,6 +155,7 @@ namespace BlueScript {
 
         public static (string, string) Parse(string scriptText, bool reduce, Script s) {
             var pos = 0;
+            s.Break = false;
 
 
             string tmptxt;
@@ -168,7 +171,8 @@ namespace BlueScript {
 
 
             do {
-                if (pos >= tmptxt.Length) { return (string.Empty, string.Empty); }
+                if (pos >= tmptxt.Length || s.Break) { return (string.Empty, string.Empty); }
+                
 
 
                 if (tmptxt.Substring(pos, 1) == "¶") {

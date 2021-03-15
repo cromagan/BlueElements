@@ -44,6 +44,8 @@ namespace BlueDatabase {
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler<RowCheckedEventArgs> RowChecked;
 
+
+        public event EventHandler<BeginnRowAutomaticEventArgs> BeginnRowAutomatic;
         public event EventHandler<DoRowAutomaticEventArgs> DoSpecialRules;
 
         public event EventHandler<RowEventArgs> RowRemoving;
@@ -219,6 +221,10 @@ namespace BlueDatabase {
         }
 
 
+        private void OnBeginnRowAutomatic(object sender, BeginnRowAutomaticEventArgs e) {
+            BeginnRowAutomatic?.Invoke(this, e);
+        }
+
         private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) {
             DoSpecialRules?.Invoke(this, e);
         }
@@ -255,10 +261,15 @@ namespace BlueDatabase {
         public void DoAutomatic(FilterCollection filter, bool fullCheck, List<RowItem> pinned) {
             if (Database.ReadOnly) { return; }
 
-            var x = CalculateSortedRows(filter, null, pinned);
+            DoAutomatic(CalculateSortedRows(filter, null, pinned), fullCheck);
 
 
-            if (x.Count() == 0) { return; }
+        }
+
+        public void DoAutomatic(List<RowItem>x, bool fullCheck) {
+            if (Database.ReadOnly) { return; }
+
+            if (x == null || x.Count() == 0) { return; }
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", 0, x.Count(), true, false));
 
             var all = x.Count;
@@ -272,15 +283,9 @@ namespace BlueDatabase {
 
             }
 
-            //foreach (var ThisRowItem in x)
-            //{
-            //    c++;
-            //    Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", c, x.Count(), false, false));
-            //    ThisRowItem.DoAutomatic(true, fullCheck);
-            //}
-
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", x.Count(), x.Count(), false, true));
         }
+
 
 
 
@@ -365,12 +370,14 @@ namespace BlueDatabase {
         internal void OnRowAdded(RowEventArgs e) {
             e.Row.RowChecked += OnRowChecked;
             e.Row.DoSpecialRules += OnDoSpecialRules;
+            e.Row.BeginnRowAutomatic += OnBeginnRowAutomatic;
             RowAdded?.Invoke(this, e);
         }
 
         internal void OnRowRemoving(RowEventArgs e) {
             e.Row.RowChecked -= OnRowChecked;
             e.Row.DoSpecialRules -= OnDoSpecialRules;
+            e.Row.BeginnRowAutomatic -= OnBeginnRowAutomatic;
             RowRemoving?.Invoke(this, e);
         }
 

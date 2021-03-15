@@ -30,19 +30,19 @@ using Skript.Enums;
 
 
 namespace BlueScript {
-    class Method_String : Method {
+    class Method_ChangeType : Method {
 
-        public override string Syntax { get => "String(numeral)"; }
+        public override string Syntax { get => "ChangeType(Variable, num / str / lst / dat / bol)"; }
 
-        public override string Description { get => "Wandelt die Zahl in einen Text um."; }
+        public override string Description { get => "Ändert den Variabelntyp einfach um. Ohne jegliche Prüfung. Alle Variablen werden Intern als Text gespeichert, weshalb diese Änderung möglich ist. Evtl. entstehen dadurch Variablen, die an sich kaputt sind, aber nicht als solches markiert sind."; }
 
-        public override List<string> Comand(Script s) { return new List<string>() { "string" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "changetype" }; }
         public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
+        public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.String; }
+        public override enVariableDataType Returns { get => enVariableDataType.Null; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number}; }
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableNumStrListDateBool, enVariableDataType.String }; }
         public override bool EndlessArgs { get => false; }
 
 
@@ -50,8 +50,20 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            attvar[0].Type = enVariableDataType.String;
-            return new strDoItFeedback(attvar[0].ValueForReplace, string.Empty);
+
+            switch (attvar[1].ValueString.ToLower()) {
+
+                case "num": attvar[0].Type = enVariableDataType.Number; break;
+                case "str": attvar[0].Type = enVariableDataType.String; break;
+                case "lst": attvar[0].Type = enVariableDataType.List; break;
+                case "dat": attvar[0].Type = enVariableDataType.Date; break;
+                case "bol": attvar[0].Type = enVariableDataType.Bool; break;
+                default:
+                    return strDoItFeedback.AttributFehler();
+           }
+
+
+            return new strDoItFeedback();
         }
     }
 }

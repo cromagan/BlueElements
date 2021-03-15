@@ -48,7 +48,7 @@ namespace BlueDatabase {
 
         public event EventHandler<RowCheckedEventArgs> RowChecked;
         public event EventHandler<DoRowAutomaticEventArgs> DoSpecialRules;
-
+        public event EventHandler<BeginnRowAutomaticEventArgs> BeginnRowAutomatic;
 
         #region  Construktor + Initialize 
 
@@ -372,18 +372,37 @@ namespace BlueDatabase {
         /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
         private BlueScript.Script DoRules(bool onlyTest) {
 
-
-            //// Dann die Aktionen ausführen und fall es einen Fehler gibt, die Spalten ermitteln
-            //var ColumnAndErrors = new List<string>();
-
-            #region Variablen für Skript erstellen
             var vars = new List<Variable>();
 
+            var x = new BeginnRowAutomaticEventArgs(this, vars);
+
+            OnBeginnRowAutomatic(x);
+
+            #region Variablen für Skript erstellen
             foreach (var thisCol in Database.Column) {
                 var v = CellToVariable(thisCol, this);
                 if (v != null) { vars.Add(v); }
             }
 
+
+            vars.Add(new Variable("User",modAllgemein.UserName(), enVariableDataType.String, true, false));
+
+            vars.Add(new Variable("Usergroup", Database.UserGroup, enVariableDataType.String, true, false));
+
+            if (Database.IsAdministrator()) {
+                vars.Add(new Variable("Administrator","TRUE", enVariableDataType.Bool, true, false));
+            }
+            else {
+                vars.Add(new Variable("Administrator", "FALSE", enVariableDataType.Bool, true, false));
+            }
+
+
+            if (Database.ReadOnly) {
+                vars.Add(new Variable("ReadOnly", "TRUE", enVariableDataType.Bool, true, false));
+            }
+            else {
+                vars.Add(new Variable("ReadOnly", "FALSE", enVariableDataType.Bool, true, false));
+            }
 
             vars.Add(new Variable("Filename", Database.Filename, enVariableDataType.String, true, true));
 
@@ -489,7 +508,7 @@ namespace BlueDatabase {
         /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
         /// </summary>
         /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
-        /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
+        /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgeführt</param>
         public (bool didSuccesfullyCheck, string error, BlueScript.Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, bool onlyTest) {
 
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
@@ -700,7 +719,9 @@ namespace BlueDatabase {
         internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) {
             DoSpecialRules?.Invoke(this, e);
         }
-
+        internal void OnBeginnRowAutomatic(BeginnRowAutomaticEventArgs e) {
+            BeginnRowAutomatic?.Invoke(this, e);
+        }
 
         ///// <summary>
         ///// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; Leere ZEllen werden mit 0 ersetzt.

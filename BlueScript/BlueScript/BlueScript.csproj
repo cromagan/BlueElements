@@ -46,12 +46,14 @@
   <ItemGroup>
     <Compile Include="Methods\Method.cs" />
     <Compile Include="Enums\enVariableType.cs" />
+    <Compile Include="Methods\Method_isType.cs" />
     <Compile Include="Methods\Method_EndsWith.cs" />
     <Compile Include="Methods\Method_Exception.cs" />
     <Compile Include="Methods\Method_Exists.cs" />
     <Compile Include="Methods\Method_IsNumeral.cs" />
     <Compile Include="Methods\Method_Join.cs" />
     <Compile Include="Methods\Method_Int.cs" />
+    <Compile Include="Methods\Method_ChangeType.cs" />
     <Compile Include="Methods\Method_Substring.cs" />
     <Compile Include="Methods\Method_Split.cs" />
     <Compile Include="Methods\Method_String.cs" />
@@ -66,6 +68,7 @@
     <Compile Include="Methods\Method_IsNullOrEmpty.cs" />
     <Compile Include="Methods\Method_Max.cs" />
     <Compile Include="Methods\Method_Min.cs" />
+    <Compile Include="Methods\Method_Break.cs" />
     <Compile Include="Script.cs" />
     <Compile Include="Enums\enVariableDataType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

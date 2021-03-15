@@ -37,6 +37,7 @@ namespace Skript.Enums {
 
         BoolNumString = Bool | Number | String,
 
+
         Variable = 1024,
 
         Error = 2048,
@@ -51,7 +52,9 @@ namespace Skript.Enums {
 
         VariableListOrString = Variable | String | List,
         VariableListOrStringNumBool = Variable | String | List | Number | Bool,
-        VariableStringNum = Variable | String | List | Number
+        VariableStringNum = Variable | String | List | Number,
+        VariableNumStrListDateBool = Variable | String | List | Number | Bool | Date,
+        VariableAny = Variable | String | List | Number | Bool | Date | Error | NotDefinedYet
     }
 
 }

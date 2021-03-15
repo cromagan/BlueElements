@@ -309,7 +309,76 @@ namespace BlueScript {
 
             return null;
         }
+        public static double TagGetDouble(this List<Variable> vars, string name) {
+            name = name.Replace("/", "_");
+            var v = vars.Get(name);
+            if (name == null) { return 0f; }
 
+            return v.ValueDouble;
+        }
+
+        public static int TagGetInt(this List<Variable> vars, string name) {
+            name = name.Replace("/", "_");
+            var v = vars.Get(name);
+            if (name == null) { return 0; }
+
+            return v.ValueInt;
+        }
+
+        public static decimal TagGetDecimal(this List<Variable> vars, string name) {
+            name = name.Replace("/", "_");
+            var v = vars.Get(name);
+            if (name == null) { return 0m; }
+
+            return (decimal)v.ValueDouble;
+        }
+
+        public static string TagGet(this List<Variable> vars, string name) {
+            name = name.Replace("/", "_");
+            var v = vars.Get(name);
+            if (name == null) { return string.Empty; }
+
+            return v.ValueString;
+        }
+
+        public static void TagSet(this List<Variable> vars, string name, string value) {
+
+            name = name.Replace("/", "_");
+
+            var v = vars.Get(name);
+            if (v == null) {
+                v = new Variable(name);
+            }
+
+            v.Type = enVariableDataType.String;
+            v.ValueString = value;
+
+            
+        }
+
+
+        public static void TagSet(this List<Variable> vars, string name, bool value) {
+
+            name = name.Replace("/", "_");
+
+            var v = vars.Get(name);
+            if (name == null) {
+                v = new Variable(name);
+            }
+
+            v.Type = enVariableDataType.Bool;
+
+            if (value) {
+                v.ValueString = "TRUE";
+            }
+            else {
+                v.ValueString = "FALSE";
+            }
+
+   
+
+
+        }
 
         public static Variable GetSystem(this List<Variable> vars, string name) {
 
