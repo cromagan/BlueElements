@@ -34,7 +34,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Threading.Tasks;
 
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
@@ -175,7 +174,7 @@ namespace BlueControls.Controls {
                 }
 
                 OnShowingRowChanged(new RowEventArgs(ShowingRow));
-                ShowingRow?.DoAutomatic(false, false, false);
+                ShowingRow?.DoAutomatic(false, false, false, "to be sure");
                 EndEdit();
             }
         }

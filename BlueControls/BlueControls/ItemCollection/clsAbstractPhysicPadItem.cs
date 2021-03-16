@@ -1,13 +1,7 @@
-﻿using BlueBasics;
-using BlueControls;
-using BlueControls.Enums;
-using BlueControls.ItemCollection;
+﻿using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueControls.ItemCollection {
     public abstract class clsAbstractPhysicPadItem : BasicPadItem {

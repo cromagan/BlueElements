@@ -21,13 +21,11 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection;
 using System;
 using System.Drawing;
 using System.Drawing.Printing;
 
-namespace BlueControls.Forms
-{
+namespace BlueControls.Forms {
     public partial class PageSetupDialog
     {
         private bool Doing;

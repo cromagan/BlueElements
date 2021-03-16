@@ -48,7 +48,6 @@ namespace BlueDatabase {
 
         public event EventHandler<RowCheckedEventArgs> RowChecked;
         public event EventHandler<DoRowAutomaticEventArgs> DoSpecialRules;
-        public event EventHandler<BeginnRowAutomaticEventArgs> BeginnRowAutomatic;
 
         #region  Construktor + Initialize 
 
@@ -339,25 +338,25 @@ namespace BlueDatabase {
 
 
             if (thisCol.MultiLine) {
-                return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.List, ro, false);
+                return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.List, ro, false, thisCol.ReadableText());
             }
 
 
             switch (thisCol.Format) {
                 case enDataFormat.Bit:
                     if (r.CellGetString(thisCol) == "+") {
-                        return new Variable(thisCol.Name, "true", enVariableDataType.Bool, ro, false);
+                        return new Variable(thisCol.Name, "true", enVariableDataType.Bool, ro, false, thisCol.ReadableText());
                     }
                     else {
-                        return new Variable(thisCol.Name, "false", enVariableDataType.Bool, ro, false);
+                        return new Variable(thisCol.Name, "false", enVariableDataType.Bool, ro, false, thisCol.ReadableText());
                     }
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
-                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.Number, ro, false);
+                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.Number, ro, false, thisCol.ReadableText());
 
                 default:
-                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.String, ro, false);
+                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.String, ro, false, thisCol.ReadableText());
 
             }
 
@@ -370,13 +369,16 @@ namespace BlueDatabase {
         /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
         /// </summary>
         /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
-        private BlueScript.Script DoRules(bool onlyTest) {
+        private BlueScript.Script DoRules(bool onlyTest, string startRoutine) {
 
             var vars = new List<Variable>();
 
-            var x = new BeginnRowAutomaticEventArgs(this, vars);
+            //var x = new BeginnRowAutomaticEventArgs(this, vars);
 
-            OnBeginnRowAutomatic(x);
+            //OnBeginnRowAutomatic(x);
+            vars.Add(new Variable("Startroutine", startRoutine, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden. Mögliche Werte: new row, value changed, script testing, manual check, to be sure"));
+
+
 
             #region Variablen für Skript erstellen
             foreach (var thisCol in Database.Column) {
@@ -385,26 +387,31 @@ namespace BlueDatabase {
             }
 
 
-            vars.Add(new Variable("User",modAllgemein.UserName(), enVariableDataType.String, true, false));
+            vars.Add(new Variable("User", modAllgemein.UserName(), enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
 
-            vars.Add(new Variable("Usergroup", Database.UserGroup, enVariableDataType.String, true, false));
+
+            vars.Add(new Variable("Usergroup", Database.UserGroup, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+
+
+
 
             if (Database.IsAdministrator()) {
-                vars.Add(new Variable("Administrator","TRUE", enVariableDataType.Bool, true, false));
+                vars.Add(new Variable("Administrator", "TRUE", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden. Diese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             }
             else {
-                vars.Add(new Variable("Administrator", "FALSE", enVariableDataType.Bool, true, false));
+                vars.Add(new Variable("Administrator", "FALSE", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden. Diese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             }
 
 
-            if (Database.ReadOnly) {
-                vars.Add(new Variable("ReadOnly", "TRUE", enVariableDataType.Bool, true, false));
-            }
-            else {
-                vars.Add(new Variable("ReadOnly", "FALSE", enVariableDataType.Bool, true, false));
-            }
 
-            vars.Add(new Variable("Filename", Database.Filename, enVariableDataType.String, true, true));
+            //if (Database.ReadOnly) {
+            //    vars.Add(new Variable("ReadOnly", "TRUE", enVariableDataType.Bool, true, false, "Gibt an, ob die Datenbank schreibgeschützt));
+            //}
+            //else {
+            //    vars.Add(new Variable("ReadOnly", "FALSE", enVariableDataType.Bool, true, false));
+            //}
+
+            vars.Add(new Variable("Filename", Database.Filename, enVariableDataType.String, true, true, string.Empty));
 
             #endregion
 
@@ -475,8 +482,8 @@ namespace BlueDatabase {
         }
 
 
-        public (bool didSuccesfullyCheck, string error, BlueScript.Script script) DoAutomatic(bool onlyTest) {
-            return DoAutomatic(false, false, onlyTest);
+        public (bool didSuccesfullyCheck, string error, BlueScript.Script script) DoAutomatic(bool onlyTest, string startroutine) {
+            return DoAutomatic(false, false, onlyTest, startroutine);
         }
 
 
@@ -489,14 +496,14 @@ namespace BlueDatabase {
         /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
         /// <param name="tryforsceonds"></param>
         /// <returns></returns>
-        public (bool didSuccesfullyCheck, string error, BlueScript.Script script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds) {
+        public (bool didSuccesfullyCheck, string error, BlueScript.Script script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string startroutine) {
 
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
 
             var t = DateTime.Now;
             do {
-                var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, false);
+                var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, false, startroutine);
                 if (erg.didSuccesfullyCheck) { return erg; }
 
                 if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
@@ -509,7 +516,7 @@ namespace BlueDatabase {
         /// </summary>
         /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
         /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgeführt</param>
-        public (bool didSuccesfullyCheck, string error, BlueScript.Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, bool onlyTest) {
+        public (bool didSuccesfullyCheck, string error, BlueScript.Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, bool onlyTest, string startroutine) {
 
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
@@ -518,7 +525,7 @@ namespace BlueDatabase {
             if (!string.IsNullOrEmpty(feh)) { return (false, feh, null); }
 
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
-            var script = DoRules(onlyTest);
+            var script = DoRules(onlyTest, startroutine);
 
             if (onlyTest) { return (true, string.Empty, script); }
 
@@ -718,9 +725,6 @@ namespace BlueDatabase {
 
         internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) {
             DoSpecialRules?.Invoke(this, e);
-        }
-        internal void OnBeginnRowAutomatic(BeginnRowAutomaticEventArgs e) {
-            BeginnRowAutomatic?.Invoke(this, e);
         }
 
         ///// <summary>

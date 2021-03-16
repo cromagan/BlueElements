@@ -32,7 +32,6 @@ using System.ComponentModel;
 using System.IO;
 using static BlueBasics.Develop;
 using static BlueBasics.FileOperations;
-using static BlueBasics.modAllgemein;
 
 namespace BlueControls.Forms {
     public partial class frmTableView {
@@ -817,7 +816,7 @@ namespace BlueControls.Forms {
                     break;
 
                 case "Fehlersuche":
-                    MessageBox.Show(Row.DoAutomatic(true, true, 10).error);
+                    MessageBox.Show(Row.DoAutomatic(true, true, 10, "manual check").error);
                     break;
 
                 case "ZeileLöschen":
@@ -938,7 +937,7 @@ namespace BlueControls.Forms {
 
 
         private void Datenüberprüfung_Click(object sender, System.EventArgs e) {
-            TableView.Database.Row.DoAutomatic(TableView.Filter, true, TableView.PinnedRows);
+            TableView.Database.Row.DoAutomatic(TableView.Filter, true, TableView.PinnedRows, "manual check");
         }
 
 

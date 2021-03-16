@@ -17,14 +17,13 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
 using System.Collections.Generic;
 using Skript.Enums;
 
 namespace BlueScript {
     class Method_Substring : Method {
 
-        public override string Syntax { get => "Subsrting(String, Start, Anzahl)"; }
+        public override string Syntax { get => "Substring(String, Start, Anzahl)"; }
 
         public override string Description { get => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück."; }
 

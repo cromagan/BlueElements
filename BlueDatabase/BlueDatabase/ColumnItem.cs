@@ -1197,7 +1197,7 @@ namespace BlueDatabase {
                     CellCollection.Invalidate_CellContentSize(this, ThisRow);
                     Invalidate_TmpColumnContentWidth();
                     Database.Cell.OnCellValueChanged(new CellEventArgs(this, ThisRow));
-                    ThisRow.DoAutomatic(true, false, 5);
+                    ThisRow.DoAutomatic(true, false, 5, "value changed");
                 }
             }
         }

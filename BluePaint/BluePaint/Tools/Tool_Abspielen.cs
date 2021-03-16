@@ -18,16 +18,13 @@
 #endregion
 
 using BluePaint.EventArgs;
-using BlueControls;
 using System.Drawing;
 using BlueControls.Forms;
 using BlueBasics;
 using static BlueBasics.FileOperations;
-using System;
 using System.Collections.Generic;
 
-namespace BluePaint
-{
+namespace BluePaint {
     public partial class Tool_Abspielen : GenericTool   // BlueControls.Forms.Form// 
     {
 

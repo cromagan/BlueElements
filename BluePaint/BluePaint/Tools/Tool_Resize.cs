@@ -17,20 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Drawing;
 using BlueBasics;
-using static BlueBasics.modAllgemein;
 using static BlueBasics.Extensions;
-using static BlueBasics.Develop;
-using BluePaint.EventArgs;
 using BlueBasics.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Controls;
-using BlueControls.Forms;
 
-namespace BluePaint
-{
+namespace BluePaint {
 
     public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
     {

@@ -17,15 +17,10 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using BluePaint;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BluePaint
-{
+namespace BluePaint {
     static class Program
     {
         /// <summary>

@@ -20,12 +20,9 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Forms;
-using BluePaint.EventArgs;
-using System;
 using System.Drawing;
 
-namespace BluePaint
-{
+namespace BluePaint {
     public partial class Tool_DummyGenerator
     {
 

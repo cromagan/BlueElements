@@ -17,12 +17,9 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using BluePaint.EventArgs;
 using BlueControls;
-using System.Drawing;
 
-namespace BluePaint
-{
+namespace BluePaint {
     public partial class Tool_Screenshot
     {
 

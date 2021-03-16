@@ -1849,7 +1849,7 @@ namespace BlueControls.Controls {
 
                 if (table.Database == column.Database) { table.CursorPos_Set(column, row, false); }
 
-                row.DoAutomatic(true, false, 5);
+                row.DoAutomatic(true, false, 5, "value changed");
 
                 // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
                 // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
@@ -3882,7 +3882,7 @@ namespace BlueControls.Controls {
 
 
             //Database.Cell.Set(column, row, v[0].Substring(5), false);
-            row.DoAutomatic(true, true, 5);
+            row.DoAutomatic(true, true, 5, "value changed");
         }
 
         public static ItemCollectionList UndoItems(Database database, string cellkey) {

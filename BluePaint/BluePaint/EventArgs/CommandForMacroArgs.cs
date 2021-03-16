@@ -16,12 +16,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-using BlueBasics.Enums;
-using BlueControls.Enums;
-using System.Drawing;
 
-namespace BluePaint.EventArgs
-{
+namespace BluePaint.EventArgs {
     public class CommandForMacroArgs : System.EventArgs
     {
 

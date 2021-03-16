@@ -19,13 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static BlueBasics.modAllgemein;
-using static BlueBasics.Extensions;
-using BlueBasics;
-using static BlueBasics.modConverter;
 using Skript.Enums;
 
 namespace BlueScript {

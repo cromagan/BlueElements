@@ -323,7 +323,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnDatenüberprüfung_Click(object sender, System.EventArgs e) {
             if (_TableView.Database == null || !_TableView.Database.IsAdministrator()) { return; }
-            _TableView.Database.Row.DoAutomatic(_TableView.Filter, true, _TableView.PinnedRows);
+            _TableView.Database.Row.DoAutomatic(_TableView.Filter, true, _TableView.PinnedRows, "manual check");
         }
 
         private void btnZeileLöschen_Click(object sender, System.EventArgs e) {

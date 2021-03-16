@@ -17,15 +17,12 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
 using System.Drawing;
 using BlueBasics;
-using BlueControls.Controls;
 using BlueControls.EventArgs;
 using static BlueBasics.Extensions;
 
-namespace BluePaint
-{
+namespace BluePaint {
     public partial class Tool_Eraser : GenericTool
     {
         public Tool_Eraser(bool Aufnahme) : base()

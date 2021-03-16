@@ -161,7 +161,7 @@ namespace BlueScript {
             if (erg == null) { SetError(); return; }//return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); 
 
 
-            ValueString = ((double)erg).ToString();
+            ValueDouble = (double)erg;
             Type = enVariableDataType.Number;
             Readonly = true;
         }
@@ -175,7 +175,7 @@ namespace BlueScript {
 
 
 
-        public Variable(string name, string value, enVariableDataType type, bool ronly, bool system) {
+        public Variable(string name, string value, enVariableDataType type, bool ronly, bool system, string coment) {
 
             if (!IsValidName(name)) {
                 Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Ungültiger Variablenname: " + name);
@@ -194,6 +194,7 @@ namespace BlueScript {
             Type = type;
             Readonly = ronly;
             SystemVariable = system;
+            Coment = coment;
         }
 
 
@@ -236,6 +237,7 @@ namespace BlueScript {
         public bool SystemVariable { get; set; }
         public bool Readonly { get; set; }
         public string Name { get; set; }
+        public string Coment { get; set; }
 
         private string _ValueString = string.Empty;
         public string ValueString {
@@ -265,6 +267,10 @@ namespace BlueScript {
         public double ValueDouble {
             get {
                 return DoubleParse(_ValueString);
+            }
+            set {
+                if (Readonly) { return; }
+                _ValueString = value.ToString();
             }
         }
 
@@ -298,72 +304,142 @@ namespace BlueScript {
     public static class VariableExtensions {
 
 
-        public static Variable Get(this List<Variable> vars, string name) {
 
+        public static Variable Get(this List<Variable> vars, string name) {
             foreach (var thisv in vars) {
                 if (!thisv.SystemVariable && thisv.Name.ToUpper() == name.ToUpper()) {
                     return thisv;
                 }
-
             }
-
             return null;
         }
-        public static double TagGetDouble(this List<Variable> vars, string name) {
-            name = name.Replace("/", "_");
-            var v = vars.Get(name);
-            if (name == null) { return 0f; }
 
+
+        /// <summary>
+        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten eine leere Liste
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        public static List<string> GetList(this List<Variable> vars, string name) {
+            var v = vars.Get(name);
+            if (v == null) { return new List<string>(); }
+            return v.ValueListString;
+        }
+
+        /// <summary>
+        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten 0
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        public static double GetDouble(this List<Variable> vars, string name) {
+            var v = vars.Get(name);
+            if (v == null) { return 0f; }
             return v.ValueDouble;
         }
 
-        public static int TagGetInt(this List<Variable> vars, string name) {
-            name = name.Replace("/", "_");
+        /// <summary>
+        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten 0
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        public static int GetInt(this List<Variable> vars, string name) {
             var v = vars.Get(name);
-            if (name == null) { return 0; }
-
+            if (v == null) { return 0; }
             return v.ValueInt;
         }
 
-        public static decimal TagGetDecimal(this List<Variable> vars, string name) {
-            name = name.Replace("/", "_");
-            var v = vars.Get(name);
-            if (name == null) { return 0m; }
 
+        /// <summary>
+        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten 0
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        public static decimal GetDecimal(this List<Variable> vars, string name) {
+            var v = vars.Get(name);
+            if (v == null) { return 0m; }
             return (decimal)v.ValueDouble;
         }
 
-        public static string TagGet(this List<Variable> vars, string name) {
-            name = name.Replace("/", "_");
+        /// <summary>
+        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string GetString(this List<Variable> vars, string name) {
             var v = vars.Get(name);
-            if (name == null) { return string.Empty; }
-
+            if (v == null) { return string.Empty; }
             return v.ValueString;
         }
 
-        public static void TagSet(this List<Variable> vars, string name, string value) {
 
-            name = name.Replace("/", "_");
-
+        /// <summary>
+        /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public static void Set(this List<Variable> vars, string name, string value) {
             var v = vars.Get(name);
             if (v == null) {
                 v = new Variable(name);
+                vars.Add(v);
             }
 
             v.Type = enVariableDataType.String;
             v.ValueString = value;
+            v.Readonly = true;
+        }
 
-            
+        /// <summary>
+        /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public static void Set(this List<Variable> vars, string name, double value) {
+            var v = vars.Get(name);
+            if (v == null) {
+                v = new Variable(name);
+                vars.Add(v);
+            }
+
+            v.Type = enVariableDataType.Number;
+            v.ValueDouble = value;
+            v.Readonly = true;
         }
 
 
-        public static void TagSet(this List<Variable> vars, string name, bool value) {
-
-            name = name.Replace("/", "_");
-
+        /// <summary>
+        /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public static void Set(this List<Variable> vars, string name, List<string> value) {
             var v = vars.Get(name);
-            if (name == null) {
+            if (v == null) {
                 v = new Variable(name);
+                vars.Add(v);
+            }
+
+            v.Type = enVariableDataType.VariableList;
+            v.ValueListString = value;
+            v.Readonly = true;
+        }
+
+
+        /// <summary>
+        /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public static void Set(this List<Variable> vars, string name, bool value) {
+            var v = vars.Get(name);
+            if (v == null) {
+                v = new Variable(name);
+                vars.Add(v);
             }
 
             v.Type = enVariableDataType.Bool;
@@ -374,10 +450,7 @@ namespace BlueScript {
             else {
                 v.ValueString = "FALSE";
             }
-
-   
-
-
+            v.Readonly = true;
         }
 
         public static Variable GetSystem(this List<Variable> vars, string name) {
@@ -388,7 +461,6 @@ namespace BlueScript {
                 }
 
             }
-
             return null;
         }
 
@@ -401,10 +473,7 @@ namespace BlueScript {
 
             return l;
         }
-
     }
-
-
 }
 
 

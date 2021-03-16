@@ -17,15 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static BlueBasics.modAllgemein;
-using static BlueBasics.Extensions;
-using BlueBasics;
-using static BlueBasics.modConverter;
 using Skript.Enums;
 
 namespace BlueScript {
@@ -43,7 +35,7 @@ namespace BlueScript {
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Bool; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Variable }; }
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableAny }; }
         public override bool EndlessArgs { get => false; }
 
 

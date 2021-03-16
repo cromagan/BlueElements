@@ -45,7 +45,6 @@ namespace BlueDatabase {
         public event EventHandler<RowCheckedEventArgs> RowChecked;
 
 
-        public event EventHandler<BeginnRowAutomaticEventArgs> BeginnRowAutomatic;
         public event EventHandler<DoRowAutomaticEventArgs> DoSpecialRules;
 
         public event EventHandler<RowEventArgs> RowRemoving;
@@ -220,11 +219,6 @@ namespace BlueDatabase {
             RowChecked?.Invoke(this, e);
         }
 
-
-        private void OnBeginnRowAutomatic(object sender, BeginnRowAutomaticEventArgs e) {
-            BeginnRowAutomatic?.Invoke(this, e);
-        }
-
         private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) {
             DoSpecialRules?.Invoke(this, e);
         }
@@ -251,22 +245,22 @@ namespace BlueDatabase {
                 if (ThisColum != null && !string.IsNullOrEmpty(ThisColum.CellInitValue)) { Row.CellSet(ThisColum, ThisColum.CellInitValue); }
             }
 
-            Row.DoAutomatic(false, false, 1);
+            Row.DoAutomatic(false, false, 1, "new row");
 
 
             return Row;
         }
 
 
-        public void DoAutomatic(FilterCollection filter, bool fullCheck, List<RowItem> pinned) {
+        public void DoAutomatic(FilterCollection filter, bool fullCheck, List<RowItem> pinned, string startroutine) {
             if (Database.ReadOnly) { return; }
 
-            DoAutomatic(CalculateSortedRows(filter, null, pinned), fullCheck);
+            DoAutomatic(CalculateSortedRows(filter, null, pinned), fullCheck, startroutine);
 
 
         }
 
-        public void DoAutomatic(List<RowItem>x, bool fullCheck) {
+        public void DoAutomatic(List<RowItem> x, bool fullCheck, string startroutine) {
             if (Database.ReadOnly) { return; }
 
             if (x == null || x.Count() == 0) { return; }
@@ -277,7 +271,7 @@ namespace BlueDatabase {
             while (x.Count > 0) {
 
                 Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - x.Count(), all, false, false));
-                if (x[0].DoAutomatic(true, fullCheck, false).didSuccesfullyCheck) {
+                if (x[0].DoAutomatic(true, fullCheck, false, startroutine).didSuccesfullyCheck) {
                     x.RemoveAt(0);
                 }
 
@@ -370,14 +364,12 @@ namespace BlueDatabase {
         internal void OnRowAdded(RowEventArgs e) {
             e.Row.RowChecked += OnRowChecked;
             e.Row.DoSpecialRules += OnDoSpecialRules;
-            e.Row.BeginnRowAutomatic += OnBeginnRowAutomatic;
             RowAdded?.Invoke(this, e);
         }
 
         internal void OnRowRemoving(RowEventArgs e) {
             e.Row.RowChecked -= OnRowChecked;
             e.Row.DoSpecialRules -= OnDoSpecialRules;
-            e.Row.BeginnRowAutomatic -= OnBeginnRowAutomatic;
             RowRemoving?.Invoke(this, e);
         }
 

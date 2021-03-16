@@ -17,18 +17,14 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using BluePaint.EventArgs;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using static BlueBasics.modAllgemein;
-using static BlueBasics.Extensions;
 using BlueControls.EventArgs;
 using BlueControls;
-using BlueBasics;
 using System;
 
-namespace BluePaint
-{
+namespace BluePaint {
     public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserControl // 
     {
 

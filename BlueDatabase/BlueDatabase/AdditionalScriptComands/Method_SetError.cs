@@ -20,7 +20,6 @@
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
-using static BlueBasics.Extensions;
 
 namespace BlueScript {
     public class Method_SetError : BlueScript.Method {
@@ -49,7 +48,7 @@ namespace BlueScript {
                 var ve = s.Variablen.GetSystem(n);
 
                 if (ve == null) {
-                    ve = new Variable(n, string.Empty, Skript.Enums.enVariableDataType.List, false, true);
+                    ve = new Variable(n, string.Empty, Skript.Enums.enVariableDataType.List, false, true, string.Empty);
                     s.Variablen.Add(ve);
                 }
 

@@ -369,7 +369,7 @@ namespace BlueControls.Controls {
             _tmpRow.Database.WaitEditable();
 
             _tmpRow.CellSet(_tmpColumn, NewValue);
-            if (OldVal != _tmpRow.CellGetString(_tmpColumn)) { _tmpRow.DoAutomatic(false, false, 1); }
+            if (OldVal != _tmpRow.CellGetString(_tmpColumn)) { _tmpRow.DoAutomatic(false, false, 1, "value changed"); }
         }
 
 

@@ -638,15 +638,36 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-            var r = _Database.Row.First();
+            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
+                txbTestZeile.Text = _Database.Row.First().CellFirstString();
+            }
+
+
+            var r = _Database.Row[txbTestZeile.Text];
+
+            if (r == null) {
+                MessageBox.Show("Zeile nicht gefunden.", enImageCode.Information, "OK");
+                return;
+            }
+
+
             _Database.RulesScript = txtSkript.Text;
 
-            (var ok, var message, var s) = r.DoAutomatic(true);
+            (var ok, var message, var s) = r.DoAutomatic(true, "script testing");
 
             var t = string.Empty;
 
             foreach (var thisv in s.Variablen) {
+
+                t = t + "#### " + thisv.Name.ToUpper() + " ####\r\n";
+
+
                 t = t + thisv.ToString() + "\r\n";
+
+                if (!string.IsNullOrEmpty(thisv.Coment)) {
+                    t = t + " - " + thisv.Coment + "\r\n";
+                }
+                t = t + "\r\n";
             }
             txbVariablen.Text = t;
 
@@ -659,13 +680,13 @@ namespace BlueControls.BlueDatabaseDialogs {
                 co = co + thisc.Syntax + "\r\n";
                 co = co + "  - Rückgabetyp: " + thisc.Returns.ToString() + "\r\n";
                 for (var z = 0; z < thisc.Args.Count(); z++) {
-                    co = co + "  - Argument " +  (z+1).ToString() +": " + thisc.Args[z].ToString();
-                    if (z == thisc.Args.Count()-1 && thisc.EndlessArgs) {
+                    co = co + "  - Argument " + (z + 1).ToString() + ": " + thisc.Args[z].ToString();
+                    if (z == thisc.Args.Count() - 1 && thisc.EndlessArgs) {
                         co = co + " -> Dieses Argument kann beliebig oft wiederholt werden";
                     }
                     co = co + "\r\n";
                 }
-                co = co + thisc.Description +  "\r\n";
+                co = co + thisc.Description + "\r\n";
             }
             txbComms.Text = co;
 
