@@ -17,13 +17,13 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
-using static BlueBasics.Extensions;
 using BlueBasics;
 using Skript.Enums;
+using System.Collections.Generic;
+using static BlueBasics.Extensions;
 
 namespace BlueScript {
-    class Method_Add : Method {
+    internal class Method_Add : Method {
 
 
         public override string Syntax { get => "Add(List-Variable, Value1, Value2, ...)"; }

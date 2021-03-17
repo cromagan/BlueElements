@@ -32,15 +32,14 @@ public struct strCanDoFeedback {
     }
 
 
-    public strCanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext)
-        {
+    public strCanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext) {
         ContinueOrErrorPosition = continuePosition;
         ErrorMessage = string.Empty;
         MustAbort = false;
         ComandText = comandText;
         AttributText = attributtext;
         CodeBlockAfterText = codeblockaftertext;
-        LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶'); 
+        LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶');
     }
 
     /// <summary>

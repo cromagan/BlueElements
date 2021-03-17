@@ -244,6 +244,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             GenerateUndoTabelle();
 
+            GenerateVariableTable();
 
             lstBinary.Item.Clear();
 
@@ -472,11 +473,44 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             IgnoreAll = true;
             Close();
-
-
         }
 
+        private void GenerateVariableTable() {
 
+            var x = new Database(true);
+            x.Column.Add("Name", "Name", enDataFormat.Text);
+            x.Column.Add("Typ", "Typ", enDataFormat.Text);
+            x.Column.Add("RO", "Schreibgeschützt", enDataFormat.Bit);
+            x.Column.Add("System", "Systemspalte", enDataFormat.Bit);
+            x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
+            x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
+
+            foreach (var ThisColumn in x.Column) {
+                if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
+                    ThisColumn.MultiLine = true;
+                    ThisColumn.TextBearbeitungErlaubt = false;
+                    ThisColumn.DropdownBearbeitungErlaubt = false;
+                    ThisColumn.BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
+                }
+            }
+
+            x.RepairAfterParse();
+
+            x.ColumnArrangements[1].ShowAllColumns(x);
+            x.ColumnArrangements[1].HideSystemColumns();
+
+
+            x.SortDefinition = new RowSortDefinition(x, "Name", true);
+
+
+
+
+
+
+            tableVariablen.Database = x;
+            tableVariablen.Arrangement = 1;
+            filterVariablen.Table = tableVariablen;
+        }
         private void GenerateUndoTabelle() {
 
             var x = new Database(true);
@@ -631,7 +665,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnTest_Click(object sender, System.EventArgs e) {
             txbSkriptInfo.Text = string.Empty;
-            txbVariablen.Text = string.Empty;
+
+            tableVariablen.Database.Row.Clear();
 
             if (_Database.Row.Count == 0) {
                 MessageBox.Show("Zum Test wird zumindest eine Zeile benötigt.", enImageCode.Information, "OK");
@@ -655,22 +690,18 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             (var ok, var message, var s) = r.DoAutomatic(true, "script testing");
 
-            var t = string.Empty;
+            //var t = string.Empty;
 
             foreach (var thisv in s.Variablen) {
 
-                t = t + "#### " + thisv.Name.ToUpper() + " ####\r\n";
-
-
-                t = t + thisv.ToString() + "\r\n";
-
-                if (!string.IsNullOrEmpty(thisv.Coment)) {
-                    t = t + " - " + thisv.Coment + "\r\n";
-                }
-                t = t + "\r\n";
+                var ro = tableVariablen.Database.Row.Add(thisv.Name);
+                ro.CellSet("typ", thisv.Type.ToString());
+                ro.CellSet("RO", thisv.Readonly);
+                ro.CellSet("System", thisv.SystemVariable);
+                ro.CellSet("Inhalt", thisv.ValueString);
+                ro.CellSet("Kommentar", thisv.Coment);
+  
             }
-            txbVariablen.Text = t;
-
 
             var co = string.Empty;
 

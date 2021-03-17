@@ -17,26 +17,21 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
 using Skript.Enums;
+using System.Collections.Generic;
 
 namespace BlueScript {
-    class Method_Substring : Method {
+    internal class Method_Substring : Method {
 
         public override string Syntax { get => "Substring(String, Start, Anzahl)"; }
-
         public override string Description { get => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück."; }
-
         public override List<string> Comand(Script s) { return new List<string>() { "substring" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.String; }
-
         public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.Integer, enVariableDataType.Integer }; }
         public override bool EndlessArgs { get => false; }
-
-
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -51,12 +46,10 @@ namespace BlueScript {
             }
 
 
-            if (st+en > attvar[0].ValueString.Length) {
+            if (st + en > attvar[0].ValueString.Length) {
                 en = attvar[0].ValueString.Length - st;
             }
-
-
-            return new strDoItFeedback("\"" + attvar[0].ValueString.Substring(st,en) +"\"", string.Empty);
+            return new strDoItFeedback("\"" + attvar[0].ValueString.Substring(st, en) + "\"", string.Empty);
         }
     }
 }

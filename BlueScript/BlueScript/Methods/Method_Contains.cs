@@ -17,14 +17,14 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
+using Skript.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.Extensions;
-using BlueBasics;
-using Skript.Enums;
 
 namespace BlueScript {
-    class Method_Contains : Method {
+    internal class Method_Contains : Method {
 
 
         //public Method_Contains(Script parent) : base(parent) { }
@@ -46,7 +46,7 @@ namespace BlueScript {
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s,  Args, EndlessArgs);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 

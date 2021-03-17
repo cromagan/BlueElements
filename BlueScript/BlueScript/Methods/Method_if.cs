@@ -17,33 +17,23 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
-using static BlueBasics.Extensions;
 using BlueBasics;
 using Skript.Enums;
+using System.Collections.Generic;
+using static BlueBasics.Extensions;
 
 namespace BlueScript {
-    class Method_if : Method {
-
-
-        //public Method_if(Script parent) : base(parent) { }
-
+    internal class Method_if : Method {
 
         public override string Syntax { get => "if (true) { Code zum ausführen }"; }
-
         public override string Description { get => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt."; }
-
         public override List<string> Comand(Script s) { return new List<string>() { "if" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
-        //public override List<string> AllowedInIDs { get => null; }
         public override bool GetCodeBlockAfter { get => true; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
-
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() {  enVariableDataType.Bool }; }
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Bool }; }
         public override bool EndlessArgs { get => false; }
-
-
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
@@ -91,7 +81,7 @@ namespace BlueScript {
                 var tmp = GetBool(txt.Substring(posa + 1, pose - posa - 1));
                 if (tmp == null) { return null; }
 
-                return GetBool(txt.Substring(0, posa) + (string)tmp + txt.Substring(pose + 1));
+                return GetBool(txt.Substring(0, posa) + tmp + txt.Substring(pose + 1));
 
             }
             #endregion
@@ -133,10 +123,7 @@ namespace BlueScript {
 
         }
 
-
-
-
-        static string GetBoolTMP(string txt, string check) {
+        private static string GetBoolTMP(string txt, string check) {
             var (i, _) = Script.NextText(txt, 0, new List<string>() { check }, false, false);
 
 

@@ -17,15 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
 using Skript.Enums;
+using System.Collections.Generic;
 
 namespace BlueScript {
-    class Method_EndsWith : Method {
-
-
-        //public Method_EndsWith(Script parent) : base(parent) { }
-
+    internal class Method_EndsWith : Method {
 
         public override string Syntax { get => "EndsWith(String, CaseSensitive, Value1, Value2, ...)"; }
 

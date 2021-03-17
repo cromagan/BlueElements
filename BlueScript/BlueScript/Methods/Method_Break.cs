@@ -17,11 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
 using Skript.Enums;
+using System.Collections.Generic;
 
 namespace BlueScript {
-    class Method_Break : Method {
+    internal class Method_Break : Method {
 
 
         //public Method_var(Script parent) : base(parent) { }
@@ -35,7 +35,7 @@ namespace BlueScript {
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() {}; }
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { }; }
         public override bool EndlessArgs { get => false; }
 
 

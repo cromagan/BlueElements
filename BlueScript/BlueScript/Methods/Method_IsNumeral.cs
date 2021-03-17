@@ -17,36 +17,30 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
-using static BlueBasics.Extensions;
 using BlueBasics;
 using Skript.Enums;
+using System.Collections.Generic;
+using static BlueBasics.Extensions;
 
 
 namespace BlueScript {
-    class Method_IsNumeral : Method {
-
+    internal class Method_IsNumeral : Method {
 
         public override string Description { get => "Püft, ob der Inhalt der Variable eine gültige Zahl ist. "; }
-
         public override string Syntax { get => "isNumeral(Value)"; }
         public override List<string> Comand(Script s) { return new List<string>() { "isnumeral" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Bool; }
-
         public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.NumString }; }
         public override bool EndlessArgs { get => false; }
 
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs); 
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (attvar == null) { return strDoItFeedback.Falsch(); }
 
-
             if (attvar[0].Type == Skript.Enums.enVariableDataType.Number) { return strDoItFeedback.Wahr(); }
-
 
             if (attvar[0].Type == Skript.Enums.enVariableDataType.String) {
 
@@ -54,9 +48,7 @@ namespace BlueScript {
                     return strDoItFeedback.Wahr();
                 }
             }
-
             return strDoItFeedback.Falsch();
-
         }
     }
 }

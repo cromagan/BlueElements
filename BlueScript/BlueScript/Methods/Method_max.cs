@@ -17,12 +17,12 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using Skript.Enums;
 using System;
 using System.Collections.Generic;
-using Skript.Enums;
 
 namespace BlueScript {
-    class Method_max : Method {
+    internal class Method_max : Method {
 
         public override string Syntax { get => "Max(Value1, Value2, ...)"; }
         public override string Description { get => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück."; }
@@ -31,16 +31,12 @@ namespace BlueScript {
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Number; }
-
         public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number }; }
         public override bool EndlessArgs { get => true; }
-
-
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
-
 
             var val = double.MinValue;
 

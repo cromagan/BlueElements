@@ -17,11 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
 using Skript.Enums;
+using System.Collections.Generic;
 
 namespace BlueScript {
-    class Method_Int : Method {
+    internal class Method_Int : Method {
 
         public override string Syntax { get => "Int(Value)"; }
         public override string Description { get => "Schneidet Nachkommastellen ab."; }
@@ -30,9 +30,8 @@ namespace BlueScript {
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Number; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number}; }
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number }; }
         public override bool EndlessArgs { get => false; }
-
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {

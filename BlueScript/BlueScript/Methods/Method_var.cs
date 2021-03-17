@@ -17,28 +17,22 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
-using Skript.Enums;
 
 namespace BlueScript {
-    class Method_var : Method {
-
-
-        //public Method_var(Script parent) : base(parent) { }
+    internal class Method_var : Method {
 
         public override string Syntax { get => "var VariablenName = Wert;"; }
-
         public override string Description { get => "Erstellt eine neue Variable, der Typ wird automtisch bestimmt."; }
         public override List<string> Comand(Script s) { return new List<string>() { "var" }; }
         public override string StartSequence { get => ""; }
         public override string EndSequence { get => ";"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
-
         public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.BoolNumString }; }
         public override bool EndlessArgs { get => false; }
-
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
@@ -48,9 +42,7 @@ namespace BlueScript {
 
             if (bs.GetUpperBound(0) != 1) { return new strDoItFeedback("Fehler mit = - Zeichen"); }
 
-
             if (!Variable.IsValidName(bs[0])) { return new strDoItFeedback(bs[0] + "ist kein gültiger Variablen-Name"); }
-
 
             var v = s.Variablen.Get(bs[0]);
 
@@ -60,9 +52,7 @@ namespace BlueScript {
 
 
             var r = new Method_BerechneVariable();
-
             var f = r.CanDo(infos.AttributText + ";", 0, false, s);
-
 
             if (!string.IsNullOrEmpty(f.ErrorMessage)) {
 
@@ -81,7 +71,6 @@ namespace BlueScript {
             }
 
             return new strDoItFeedback();
-
         }
     }
 }

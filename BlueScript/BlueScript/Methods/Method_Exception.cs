@@ -17,25 +17,21 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
 using Skript.Enums;
+using System.Collections.Generic;
 
 namespace BlueScript {
-    class Method_Exception : Method {
+    internal class Method_Exception : Method {
 
         public override string Syntax { get => "Exception(\"Unbehandelter Programmcode!\");"; }
-
         public override string Description { get => "Unterbricht das Skript mit einer Fehlermeldung."; }
         public override List<string> Comand(Script s) { return new List<string>() { "Exception" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
-        //public override List<string> AllowedInIDs { get => null; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
-
         public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String }; }
         public override bool EndlessArgs { get => false; }
-
 
 
 

@@ -17,13 +17,13 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
-using static BlueBasics.Extensions;
 using BlueBasics;
 using Skript.Enums;
+using System.Collections.Generic;
+using static BlueBasics.Extensions;
 
 namespace BlueScript {
-    class Method_BerechneVariable : Method {
+    internal class Method_BerechneVariable : Method {
 
 
         public override string Syntax { get => "VariablenName = Berechung;"; }

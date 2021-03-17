@@ -17,35 +17,29 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
 using Skript.Enums;
-
+using System.Collections.Generic;
 
 namespace BlueScript {
-    class Method_isType : Method {
+    internal class Method_isType : Method {
 
         public override string Syntax { get => "isType(Variable, num / str / lst / dat / bol / err / ukn)"; }
-
         public override string Description { get => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführ!"; }
-
         public override List<string> Comand(Script s) { return new List<string>() { "istype" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
-
         public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableAny, enVariableDataType.String }; }
         public override bool EndlessArgs { get => false; }
-
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
- 
+
             switch (attvar[1].ValueString.ToLower()) {
 
                 case "num":
-                    if( attvar[0].Type == enVariableDataType.Number) { return strDoItFeedback.Wahr(); }
+                    if (attvar[0].Type == enVariableDataType.Number) { return strDoItFeedback.Wahr(); }
                     return strDoItFeedback.Falsch();
                 case "str":
                     if (attvar[0].Type == enVariableDataType.String) { return strDoItFeedback.Wahr(); }
@@ -67,10 +61,7 @@ namespace BlueScript {
                     return strDoItFeedback.Falsch();
                 default:
                     return strDoItFeedback.AttributFehler();
-           }
-
-
-
+            }
         }
     }
 }

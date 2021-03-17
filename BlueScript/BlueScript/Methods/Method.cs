@@ -17,11 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
+using Skript.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.Extensions;
-using BlueBasics;
-using Skript.Enums;
 
 namespace BlueScript {
     public abstract class Method {
@@ -113,8 +113,7 @@ namespace BlueScript {
             return new strCanDoFeedback(pos, "Kann nicht geparst werden", false);
         }
 
-
-        strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
+        private strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
 
             var (pos, witch) = Script.NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
 

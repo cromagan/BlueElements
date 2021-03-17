@@ -396,10 +396,10 @@ namespace BlueDatabase {
 
 
             if (Database.IsAdministrator()) {
-                vars.Add(new Variable("Administrator", "TRUE", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden. Diese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
+                vars.Add(new Variable("Administrator", "true", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             }
             else {
-                vars.Add(new Variable("Administrator", "FALSE", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden. Diese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
+                vars.Add(new Variable("Administrator", "false", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             }
 
 

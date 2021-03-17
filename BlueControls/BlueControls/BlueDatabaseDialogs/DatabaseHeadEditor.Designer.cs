@@ -75,7 +75,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabBefehle = new BlueControls.Controls.TabPage();
             this.txbComms = new BlueControls.Controls.TextBox();
             this.tabVariablen = new BlueControls.Controls.TabPage();
-            this.txbVariablen = new BlueControls.Controls.TextBox();
+            this.tableVariablen = new BlueControls.Controls.Table();
+            this.filterVariablen = new BlueControls.BlueDatabaseDialogs.Filterleiste();
             this.grpTextAllgemein = new BlueControls.Controls.GroupBox();
             this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.capTestZeile = new BlueControls.Controls.Caption();
@@ -569,7 +570,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabCSckript.HotTrack = true;
             this.tabCSckript.Location = new System.Drawing.Point(3, 104);
             this.tabCSckript.Name = "tabCSckript";
-            this.tabCSckript.SelectedIndex = 0;
+            this.tabCSckript.SelectedIndex = 2;
             this.tabCSckript.Size = new System.Drawing.Size(1033, 509);
             this.tabCSckript.TabIndex = 0;
             this.tabCSckript.SelectedIndexChanged += new System.EventHandler(this.tabCSckript_SelectedIndexChanged);
@@ -627,22 +628,33 @@ namespace BlueControls.BlueDatabaseDialogs
             // tabVariablen
             // 
             this.tabVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabVariablen.Controls.Add(this.txbVariablen);
+            this.tabVariablen.Controls.Add(this.tableVariablen);
+            this.tabVariablen.Controls.Add(this.filterVariablen);
             this.tabVariablen.Location = new System.Drawing.Point(4, 25);
             this.tabVariablen.Name = "tabVariablen";
             this.tabVariablen.Size = new System.Drawing.Size(1025, 480);
             this.tabVariablen.TabIndex = 1;
             this.tabVariablen.Text = "Variablen";
             // 
-            // txbVariablen
+            // tableVariablen
             // 
-            this.txbVariablen.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txbVariablen.Location = new System.Drawing.Point(0, 0);
-            this.txbVariablen.Name = "txbVariablen";
-            this.txbVariablen.Size = new System.Drawing.Size(1025, 480);
-            this.txbVariablen.TabIndex = 0;
-            this.txbVariablen.Text = "Skript \"testen\", um diese anzuzeigen.";
+            this.tableVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableVariablen.Location = new System.Drawing.Point(0, 40);
+            this.tableVariablen.Name = "tableVariablen";
+            this.tableVariablen.Size = new System.Drawing.Size(1025, 440);
+            this.tableVariablen.TabIndex = 2;
+            this.tableVariablen.Text = "tabVariablen";
+            // 
+            // filterVariablen
+            // 
+            this.filterVariablen.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.filterVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.filterVariablen.Dock = System.Windows.Forms.DockStyle.Top;
+            this.filterVariablen.Location = new System.Drawing.Point(0, 0);
+            this.filterVariablen.Name = "filterVariablen";
+            this.filterVariablen.Size = new System.Drawing.Size(1025, 40);
+            this.filterVariablen.TabIndex = 1;
+            this.filterVariablen.TabStop = false;
             // 
             // grpTextAllgemein
             // 
@@ -677,6 +689,9 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbSkriptInfo
             // 
+            this.txbSkriptInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txbSkriptInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbSkriptInfo.Location = new System.Drawing.Point(160, 16);
             this.txbSkriptInfo.Name = "txbSkriptInfo";
@@ -1015,7 +1030,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private TabPage tabScriptAnzeige;
         private TextBox txtSkript;
         private TabPage tabVariablen;
-        private TextBox txbVariablen;
         private TabPage tabBefehle;
         private GroupBox grpTextAllgemein;
         private TextBox txbSkriptInfo;
@@ -1026,5 +1040,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbComms;
         private TextBox txbTestZeile;
         private Caption capTestZeile;
+        private Table tableVariablen;
+        private Filterleiste filterVariablen;
     }
 }

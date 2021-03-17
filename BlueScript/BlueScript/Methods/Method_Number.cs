@@ -17,35 +17,29 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
-using static BlueBasics.Extensions;
 using BlueBasics;
 using Skript.Enums;
+using System.Collections.Generic;
+using static BlueBasics.Extensions;
 
 
 namespace BlueScript {
-    class Method_Number : Method {
+    internal class Method_Number : Method {
 
         public override string Syntax { get => "Number(string, number)"; }
 
         public override string Description { get => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird der nachfolgende Zahlenwert zurückgegeben."; }
-
-        //public Method_min(Script parent) : base(parent) { }
         public override List<string> Comand(Script s) { return new List<string>() { "number" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Number; }
-
         public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.Number }; }
         public override bool EndlessArgs { get => true; }
-
-
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
-
 
             if (attvar[0].ValueString.IsNumeral()) {
                 return new strDoItFeedback(attvar[0].ValueString, string.Empty);

@@ -122,8 +122,6 @@ namespace BlueDatabase {
 
 
         public void Remove(int Key) {
-            if (Database.ReadOnly) { return; }
-
             var e = SearchByKey(Key);
             if (e == null) { return; }
 
@@ -137,11 +135,9 @@ namespace BlueDatabase {
             OnRowRemoved();
         }
 
-
         public bool Clear() {
             return Remove(new FilterCollection(Database));
         }
-
 
         public bool Remove(FilterItem Filter) {
             var NF = new FilterCollection(Database)

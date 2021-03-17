@@ -17,12 +17,12 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
 using Skript.Enums;
+using System.Collections.Generic;
 
 
 namespace BlueScript {
-    class Method_ChangeType : Method {
+    internal class Method_ChangeType : Method {
 
         public override string Syntax { get => "ChangeType(Variable, num / str / lst / dat / bol)"; }
 
@@ -52,7 +52,7 @@ namespace BlueScript {
                 case "bol": attvar[0].Type = enVariableDataType.Bool; break;
                 default:
                     return strDoItFeedback.AttributFehler();
-           }
+            }
 
 
             return new strDoItFeedback();

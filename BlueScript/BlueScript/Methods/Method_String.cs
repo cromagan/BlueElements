@@ -17,24 +17,21 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
 using Skript.Enums;
+using System.Collections.Generic;
 
 
 namespace BlueScript {
-    class Method_String : Method {
+    internal class Method_String : Method {
 
         public override string Syntax { get => "String(numeral)"; }
-
         public override string Description { get => "Wandelt die Zahl in einen Text um."; }
-
         public override List<string> Comand(Script s) { return new List<string>() { "string" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.String; }
-
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number}; }
+        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number }; }
         public override bool EndlessArgs { get => false; }
 
 

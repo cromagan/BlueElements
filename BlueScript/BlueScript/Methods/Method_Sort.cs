@@ -17,13 +17,13 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Collections.Generic;
-using static BlueBasics.Extensions;
 using BlueBasics;
 using Skript.Enums;
+using System.Collections.Generic;
+using static BlueBasics.Extensions;
 
 namespace BlueScript {
-    class Method_Sort : Method {
+    internal class Method_Sort : Method {
 
 
         //public Method_Sort(Script parent) : base(parent) { }
@@ -47,7 +47,7 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-             var x = attvar[0].ValueListString;
+            var x = attvar[0].ValueListString;
 
             if (attvar[1].ValueBool) {
                 x = x.SortedDistinctList();

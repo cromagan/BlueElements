@@ -18,11 +18,10 @@
 #endregion
 
 
+using BlueBasics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-
 
 namespace BlueScript {
     public class Script {
@@ -44,7 +43,7 @@ namespace BlueScript {
             private set { _errorCode = value.Replace("{", "").Replace("}", ""); }
         }
 
-        string _ScriptText = string.Empty;
+        private string _ScriptText = string.Empty;
 
         public static IEnumerable<Method> Comands = null;
 
@@ -53,10 +52,23 @@ namespace BlueScript {
         public static IEnumerable<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
             var objects = new List<T>();
 
-            var types =
-            from a in AppDomain.CurrentDomain.GetAssemblies()
-            from t in a.GetTypes()
-            select t;
+            IEnumerable<Type> types = null;
+            try {
+                types =
+                   from a in AppDomain.CurrentDomain.GetAssemblies()
+                   from t in a.GetTypes()
+                   select t;
+            }
+            catch (Exception ex) {
+                Develop.DebugPrint(ex);
+                if (ex is System.Reflection.ReflectionTypeLoadException typeLoadException) {
+                    Develop.DebugPrint(typeLoadException.LoaderExceptions.ToString());
+                    //var loaderExceptions = typeLoadException.LoaderExceptions;
+                }
+
+                return objects;
+            }
+
 
             foreach (var type in types.Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
                 objects.Add((T)Activator.CreateInstance(type, constructorArgs));
@@ -171,7 +183,7 @@ namespace BlueScript {
 
             do {
                 if (pos >= tmptxt.Length || s.Break) { return (string.Empty, string.Empty); }
-                
+
 
 
                 if (tmptxt.Substring(pos, 1) == "¶") {
