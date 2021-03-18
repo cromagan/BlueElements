@@ -700,7 +700,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 ro.CellSet("System", thisv.SystemVariable);
                 ro.CellSet("Inhalt", thisv.ValueString);
                 ro.CellSet("Kommentar", thisv.Coment);
-  
+
             }
 
             var co = string.Empty;
@@ -750,17 +750,25 @@ namespace BlueControls.BlueDatabaseDialogs {
             txtSkript.Enabled = false;
 
 
-            var txtplus = FileExists(@"C:\Program Files (x86)\Notepad++\notepad++.exe");
+            var f = string.Empty;
+            var l = new List<string>() { @"C:\Program Files (x86)\Notepad++\notepad++.exe",
+                                         @"C:\Program Files\Notepad++\notepad++.exe" };
 
 
+            foreach (var thisf in l) {
+                if (FileExists(thisf)) {
+                    f = thisf;
+                    break;
+                }
+            }
 
 
             if (string.IsNullOrEmpty(_ExternCode)) {
-                if (txtplus) {
-                    _ExternCode = TempFile(string.Empty, string.Empty, "cs");
+                if (string.IsNullOrEmpty(f)) {
+                    _ExternCode = TempFile(string.Empty, string.Empty, "txt");
                 }
                 else {
-                    _ExternCode = TempFile(string.Empty, string.Empty, "txt");
+                    _ExternCode = TempFile(string.Empty, string.Empty, "cs");
                 }
 
             }
@@ -773,11 +781,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _FileState = GetFileInfo(_ExternCode, true);
 
-            if (txtplus) {
-                ExecuteFile(@"C:\Program Files (x86)\Notepad++\notepad++.exe", _ExternCode, false, true);
+            if (string.IsNullOrEmpty(f)) {
+                ExecuteFile(_ExternCode, string.Empty, false, true);
             }
             else {
-                ExecuteFile(_ExternCode, string.Empty, false, true);
+                ExecuteFile(f, _ExternCode, false, true);
             }
 
 

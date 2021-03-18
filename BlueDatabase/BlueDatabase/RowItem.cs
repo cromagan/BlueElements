@@ -376,7 +376,7 @@ namespace BlueDatabase {
             //var x = new BeginnRowAutomaticEventArgs(this, vars);
 
             //OnBeginnRowAutomatic(x);
-            vars.Add(new Variable("Startroutine", startRoutine, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden. Mögliche Werte: new row, value changed, script testing, manual check, to be sure"));
+            vars.Add(new Variable("Startroutine", startRoutine, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte: new row, value changed, script testing, manual check, to be sure"));
 
 
 

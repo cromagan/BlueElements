@@ -21,13 +21,13 @@ using Skript.Enums;
 using System.Collections.Generic;
 
 namespace BlueScript {
-    internal class Method_EndsWith : Method {
+    internal class Method_StartsWith : Method {
 
-        public override string Syntax { get => "EndsWith(String, CaseSensitive, Value1, Value2, ...)"; }
+        public override string Syntax { get => "StartsWith(String, CaseSensitive, Value1, Value2, ...)"; }
 
-        public override string Description { get => "Prüft, ob der String mit einem der angegeben Strings endet."; }
+        public override string Description { get => "Prüft, ob der String mit einem der angegeben Strings startet."; }
 
-        public override List<string> Comand(Script s) { return new List<string>() { "endswith" }; }
+        public override List<string> Comand(Script s) { return new List<string>() { "startswith" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
@@ -43,12 +43,12 @@ namespace BlueScript {
 
             for (var z = 2; z < attvar.Count; z++) {
                 if (attvar[1].ValueBool) {
-                    if (attvar[0].ValueString.EndsWith(attvar[z].ValueString)) {
+                    if (attvar[0].ValueString.StartsWith(attvar[z].ValueString)) {
                         return strDoItFeedback.Wahr();
                     }
                 }
                 else {
-                    if (attvar[0].ValueString.ToLower().EndsWith(attvar[z].ValueString.ToLower())) {
+                    if (attvar[0].ValueString.ToLower().StartsWith(attvar[z].ValueString.ToLower())) {
                         return strDoItFeedback.Wahr();
                     }
                 }

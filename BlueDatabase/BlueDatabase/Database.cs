@@ -45,38 +45,6 @@ namespace BlueDatabase {
         public static readonly string DatabaseVersion = "3.50";
 
 
-
-
-
-
-        //public static List<Database> GetByCaption(string Caption)
-        //{
-        //    var l = new List<Database>();
-        //    foreach (var ThisDatabase in AllFiles)
-        //    {
-        //        if (ThisDatabase is Database DB)
-        //        {
-        //            if (DB.Caption.ToUpper() == Caption.ToUpper()) { l.Add(DB); }
-        //        }
-        //    }
-
-        //    return l;
-        //}
-
-
-        //private static Database Load(Stream Stream) {
-        //    if (Stream == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname nicht angegeben!"); }
-
-
-
-        //    var db = new Database(true);
-
-        //    //TODO: In AllDatabases Aufnehmen!!!!!
-
-        //    db.LoadFromStream(Stream);
-        //    return db;
-        //}
-
         public static Database LoadResource(Assembly assembly, string Name, string BlueBasicsSubDir, bool FehlerAusgeben, bool MustBeStream) {
 
             if (Develop.IsHostRunning() && !MustBeStream) {
@@ -143,24 +111,6 @@ namespace BlueDatabase {
             return null;
         }
 
-        internal void DevelopWarnung(string t) {
-
-            try {
-                t += "\r\nParsing: " + IsParsing.ToString();
-                t += "\r\nLoading: " + IsLoading.ToString();
-                t += "\r\nSaving: " + IsSaving.ToString();
-                t += "\r\nColumn-Count: " + Column.Count.ToString();
-                t += "\r\nRow-Count: " + Row.Count.ToString();
-                t += "\r\nFile: " + Filename;
-            }
-            catch { }
-
-            Develop.DebugPrint(enFehlerArt.Warnung, t);
-
-        }
-
-
-
 
         #endregion
 
@@ -173,6 +123,8 @@ namespace BlueDatabase {
         public readonly CellCollection Cell;
         public readonly RowCollection Row;
         public ListExt<WorkItem> Works;
+
+        private long _startTick = DateTime.UtcNow.Ticks;
 
         private readonly List<string> FilesAfterLoadingLCase;
 
@@ -547,6 +499,23 @@ namespace BlueDatabase {
 
         #endregion
 
+
+
+        internal void DevelopWarnung(string t) {
+
+            try {
+                t += "\r\nParsing: " + IsParsing.ToString();
+                t += "\r\nLoading: " + IsLoading.ToString();
+                t += "\r\nSaving: " + IsSaving.ToString();
+                t += "\r\nColumn-Count: " + Column.Count.ToString();
+                t += "\r\nRow-Count: " + Row.Count.ToString();
+                t += "\r\nFile: " + Filename;
+            }
+            catch { }
+
+            Develop.DebugPrint(enFehlerArt.Warnung, t);
+
+        }
 
         public int LayoutIDToIndex(string exportFormularID) {
 
@@ -2447,6 +2416,11 @@ namespace BlueDatabase {
             var ec = new CancelEventArgs(false);
             OnExporting(ec);
             if (ec.Cancel) { return false; }
+
+
+            var nowsek = (DateTime.UtcNow.Ticks - _startTick)/10000000;
+
+            if (nowsek % 60 !=0) { return false; } // Lasten startabhängig verteilen. Bei Pending changes ist es eh immer true;
 
 
 

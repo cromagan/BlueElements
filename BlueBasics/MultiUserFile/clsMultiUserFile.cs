@@ -96,7 +96,7 @@ namespace BlueBasics.MultiUserFile {
 
         #region Variablen und Properties
 
-        private readonly System.ComponentModel.BackgroundWorker Backup;
+        private readonly System.ComponentModel.BackgroundWorker BackgroundWorker;
         private readonly System.ComponentModel.BackgroundWorker PureBinSaver;
         private readonly Timer Checker;
         private FileSystemWatcher Watcher;
@@ -203,12 +203,12 @@ namespace BlueBasics.MultiUserFile {
 
 
 
-            Backup = new System.ComponentModel.BackgroundWorker {
+            BackgroundWorker = new System.ComponentModel.BackgroundWorker {
                 WorkerReportsProgress = true,
                 WorkerSupportsCancellation = true,
             };
-            Backup.DoWork += Backup_DoWork;
-            Backup.ProgressChanged += Backup_ProgressChanged;
+            BackgroundWorker.DoWork += BackgroundWorker_DoWork;
+            BackgroundWorker.ProgressChanged += Backup_ProgressChanged;
 
 
 
@@ -1100,6 +1100,8 @@ namespace BlueBasics.MultiUserFile {
             if (PureBinSaver.IsBusy || IsSaving) { return; }
             if (string.IsNullOrEmpty(Filename)) { return; }
 
+            Checker_Tick_count++;
+            if (Checker_Tick_count < 0) { return; }
 
             // Ausstehende Arbeiten ermittelen
             var _editable = string.IsNullOrEmpty(ErrorReason(enErrorReason.EditNormaly));
@@ -1108,9 +1110,6 @@ namespace BlueBasics.MultiUserFile {
             var _MustBackup = _editable && IsThereBackgroundWorkToDo();
 
 
-            Checker_Tick_count++;
-
-            if (Checker_Tick_count < 0) { return; }
 
             if (!_MustReload && !_MustSave && !_MustBackup) {
                 RepairOldBlockFiles();
@@ -1129,7 +1128,7 @@ namespace BlueBasics.MultiUserFile {
             if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < Count_UserWork) { return; } // Benutzer arbeiten lassen
             if (Checker_Tick_count > Count_Save && _MustSave) { CancelBackGroundWorker(); }
             if (Checker_Tick_count > _ReloadDelaySecond && _MustReload) { CancelBackGroundWorker(); }
-            if (Backup.IsBusy) { return; }
+            if (BackgroundWorker.IsBusy) { return; }
 
 
 
@@ -1172,20 +1171,20 @@ namespace BlueBasics.MultiUserFile {
         }
 
         public void CancelBackGroundWorker() {
-            if (Backup.IsBusy && !Backup.CancellationPending) { Backup.CancelAsync(); }
+            if (BackgroundWorker.IsBusy && !BackgroundWorker.CancellationPending) { BackgroundWorker.CancelAsync(); }
         }
 
 
         private void StartBackgroundWorker() {
             if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.EditNormaly))) { return; }
-            if (!Backup.IsBusy) { Backup.RunWorkerAsync(); }
+            if (!BackgroundWorker.IsBusy) { BackgroundWorker.RunWorkerAsync(); }
         }
 
         private void Backup_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             BackgroundWorkerMessage(e);
         }
 
-        private void Backup_DoWork(object sender, DoWorkEventArgs e) {
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             DoBackGroundWork((BackgroundWorker)sender);
         }
 
@@ -1214,7 +1213,7 @@ namespace BlueBasics.MultiUserFile {
                 if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 6) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen 
 
                 if (PureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
-                if (Backup.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
+                if (BackgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
                 if (IsParsing) { return "Es werden aktuell Daten geparsed."; }
 
                 if (isSomethingDiscOperatingsBlocking()) { return "Reload unmöglich, vererbte Klasse gab Fehler zurück"; }
@@ -1253,7 +1252,7 @@ namespace BlueBasics.MultiUserFile {
 
             //----------EditGeneral, Save------------------------------------------------------------------------------------------
             if (mode.HasFlag(enErrorReason.EditGeneral) || mode.HasFlag(enErrorReason.Save)) {
-                if (Backup.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
+                if (BackgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
                 if (ReloadNeeded) { return "Die Datei muss neu eingelesen werden."; }
             }
 

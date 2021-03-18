@@ -78,6 +78,8 @@ namespace BlueControls.Controls {
         private ColumnItem _MouseOverColumn;
         private RowItem _MouseOverRow;
 
+        private RowItem _Unterschiede;
+
         private string _MouseOverText;
         private AutoFilter _AutoFilter;
         private SearchAndReplace _searchAndReplace;
@@ -202,6 +204,7 @@ namespace BlueControls.Controls {
                 _MouseOverRow = null;
                 _CursorPosColumn = null;
                 _CursorPosRow = null;
+                _Unterschiede = null;
                 _MouseOverText = string.Empty;
 
                 if (_Database != null) {
@@ -285,6 +288,27 @@ namespace BlueControls.Controls {
 
             }
         }
+
+
+
+
+        //  <Obsolete("Database darf nicht im Designer gesetzt werden.", True)>
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public RowItem Unterschiede {
+            get {
+                return _Unterschiede;
+            }
+            set {
+                //if (_Unterschiede != null && value != null && _sortDefinitionTemporary.ToString() == value.ToString()) { return; }
+                if (_Unterschiede == value) { return; }
+                _Unterschiede = value;
+                Invalidate();
+
+            }
+        }
+
 
 
         [DefaultValue(1.0f)]
@@ -522,10 +546,6 @@ namespace BlueControls.Controls {
                 Skin.Draw_FormatedText(GR, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, Pix16), enAlignment.Left, new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)ViewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font, Translate);
             }
 
-
-            //var Drawn = string.Empty;
-
-
             // Zeilen Zeichnen (Alle Zellen)
             for (var Zei = FirstVisibleRow; Zei <= LastVisibleRow; Zei++) {
                 var CurrentRow = SortedRows()[Zei];
@@ -533,6 +553,7 @@ namespace BlueControls.Controls {
                 GR.SmoothingMode = SmoothingMode.None;
 
 
+           
 
 
                 if (CurrentRow.TMP_Expanded) {
@@ -541,6 +562,18 @@ namespace BlueControls.Controls {
                     // Zelleninhalt Zeichnen
                     Draw_CellTransparent(GR, ViewItem, CurrentRow, y, displayRectangleWOSlider, _Cell_Font);
                 }
+
+                if (_Unterschiede != null && _Unterschiede != CurrentRow) {
+
+                    if (CurrentRow.CellGetString(ViewItem.Column) != _Unterschiede.CellGetString(ViewItem.Column)) {
+                        var tmpr = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 +1, y+1, Column_DrawWidth(ViewItem, displayRectangleWOSlider)-2, Row_DrawHeight(CurrentRow, displayRectangleWOSlider) - 2);
+                        GR.DrawRectangle(new Pen(Color.Red, 1), tmpr);
+                    }
+
+                }
+
+
+
 
                 if (lfdno == 1) {
                     // Überschrift in der ersten Spalte zeichnen
@@ -2471,12 +2504,12 @@ namespace BlueControls.Controls {
                             var lp = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow, enErrorReason.EditGeneral);
                             Neighbour(_CursorPosColumn, _CursorPosRow, enDirection.Oben, out var _newCol, out var _newRow);
 
-                            if (_newRow== _CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
+                            if (_newRow == _CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
 
 
 
                             if (string.IsNullOrEmpty(lp) && _newRow != null) {
-                                UserEdited(this,_newRow.CellGetString(_CursorPosColumn), _CursorPosColumn, _CursorPosRow, true);
+                                UserEdited(this, _newRow.CellGetString(_CursorPosColumn), _CursorPosColumn, _CursorPosRow, true);
                             }
                             else {
                                 NotEditableInfo(lp);
@@ -2485,7 +2518,7 @@ namespace BlueControls.Controls {
 
                         }
 
-                            break;
+                        break;
 
                     case System.Windows.Forms.Keys.X:
                         if (e.Modifiers == System.Windows.Forms.Keys.Control) {

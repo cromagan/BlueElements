@@ -570,7 +570,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabCSckript.HotTrack = true;
             this.tabCSckript.Location = new System.Drawing.Point(3, 104);
             this.tabCSckript.Name = "tabCSckript";
-            this.tabCSckript.SelectedIndex = 2;
+            this.tabCSckript.SelectedIndex = 0;
             this.tabCSckript.Size = new System.Drawing.Size(1033, 509);
             this.tabCSckript.TabIndex = 0;
             this.tabCSckript.SelectedIndexChanged += new System.EventHandler(this.tabCSckript_SelectedIndexChanged);
