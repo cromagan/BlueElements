@@ -42,7 +42,7 @@
     <Compile Include="Methods\Method.cs" />
     <Compile Include="Enums\enVariableType.cs" />
     <Compile Include="Methods\Method_StartsWith.cs" />
-    <Compile Include="Methods\Method_isType.cs" />
+    <Compile Include="Methods\Method_IsType.cs" />
     <Compile Include="Methods\Method_EndsWith.cs" />
     <Compile Include="Methods\Method_Exception.cs" />
     <Compile Include="Methods\Method_Exists.cs" />

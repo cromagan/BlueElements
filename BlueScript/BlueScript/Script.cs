@@ -45,49 +45,127 @@ namespace BlueScript {
 
         private string _ScriptText = string.Empty;
 
-        public static IEnumerable<Method> Comands = null;
+        public static List<Method> Comands = null;
 
         public readonly List<Variable> Variablen;
 
-        public static IEnumerable<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
-            var objects = new List<T>();
 
-            IEnumerable<Type> types = null;
-            try {
-                types =
-                   from a in AppDomain.CurrentDomain.GetAssemblies()
-                   from t in a.GetTypes()
-                   select t;
-            }
-            catch (Exception ex) {
-                Develop.DebugPrint(ex);
-                if (ex is System.Reflection.ReflectionTypeLoadException typeLoadException) {
-                    Develop.DebugPrint(typeLoadException.LoaderExceptions.ToString());
-                    //var loaderExceptions = typeLoadException.LoaderExceptions;
+
+
+
+        public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
+
+            var l = new List<T>();
+
+            foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
+
+
+                try {
+                    foreach (var thist in thisas.GetTypes()) {
+                        if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T))) {
+                            l.Add((T)Activator.CreateInstance(thist, constructorArgs));
+                        }
+                    }
+                }
+                catch (Exception ex) {
+                    Develop.DebugPrint(ex);
                 }
 
-                return objects;
-            }
-
-
-            foreach (var type in types.Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
-                objects.Add((T)Activator.CreateInstance(type, constructorArgs));
 
             }
+            return l;
 
 
-            //foreach( var thisa in  AppDomain.CurrentDomain.GetAssemblies())
-            //       {
 
 
-            //   foreach (var type in
-            //       Assembly.GetAssembly(typeof(T)).GetTypes()
-            //       .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
-            //       objects.Add((T)Activator.CreateInstance(type, constructorArgs));
-            //   }
-            //   //objects.Sort();
-            return objects;
+
+
+            //    var objects = new List<T>();
+
+            //    IEnumerable<Type> types = null;
+            //    try {
+            //        types =
+            //           from a in AppDomain.CurrentDomain.GetAssemblies()
+            //           from t in a.GetTypes()
+            //           select t;
+            //    }
+            //    catch (Exception ex) {
+            //        Develop.DebugPrint(ex);
+            //        if (ex is System.Reflection.ReflectionTypeLoadException typeLoadException) {
+            //            Develop.DebugPrint(typeLoadException.LoaderExceptions.ToString());
+            //            //var loaderExceptions = typeLoadException.LoaderExceptions;
+            //        }
+
+            //        return objects;
+            //    }
+
+
+            //    foreach (var type in types.Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
+            //        objects.Add((T)Activator.CreateInstance(type, constructorArgs));
+
+            //    }
+
+
+            //    //foreach( var thisa in  AppDomain.CurrentDomain.GetAssemblies())
+            //    //       {
+
+
+            //    //   foreach (var type in
+            //    //       Assembly.GetAssembly(typeof(T)).GetTypes()
+            //    //       .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
+            //    //       objects.Add((T)Activator.CreateInstance(type, constructorArgs));
+            //    //   }
+            //    //   //objects.Sort();
+            //    return objects;
         }
+
+
+
+
+
+
+
+
+
+        //public static IEnumerable<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
+        //    var objects = new List<T>();
+
+        //    IEnumerable<Type> types = null;
+        //    try {
+        //        types =
+        //           from a in AppDomain.CurrentDomain.GetAssemblies()
+        //           from t in a.GetTypes()
+        //           select t;
+        //    }
+        //    catch (Exception ex) {
+        //        Develop.DebugPrint(ex);
+        //        if (ex is System.Reflection.ReflectionTypeLoadException typeLoadException) {
+        //            Develop.DebugPrint(typeLoadException.LoaderExceptions.ToString());
+        //            //var loaderExceptions = typeLoadException.LoaderExceptions;
+        //        }
+
+        //        return objects;
+        //    }
+
+
+        //    foreach (var type in types.Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
+        //        objects.Add((T)Activator.CreateInstance(type, constructorArgs));
+
+        //    }
+
+
+        //    //foreach( var thisa in  AppDomain.CurrentDomain.GetAssemblies())
+        //    //       {
+
+
+        //    //   foreach (var type in
+        //    //       Assembly.GetAssembly(typeof(T)).GetTypes()
+        //    //       .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
+        //    //       objects.Add((T)Activator.CreateInstance(type, constructorArgs));
+        //    //   }
+        //    //   //objects.Sort();
+        //    return objects;
+        //}
 
 
         public Script(List<Variable> variablen) {
@@ -336,18 +414,33 @@ namespace BlueScript {
 
         }
 
+        //public static void AddScriptComands() {
 
+        //    Comands.Add(new Method_Add());
+        //    Comands.Add(new Method_BerechneVariable());
+        //    Comands.Add(new Method_Break());
+        //    Comands.Add(new Method_ChangeType());
+        //    Comands.Add(new Method_Contains());
+        //    Comands.Add(new Method_EndsWith());
+        //    Comands.Add(new Method_Exception());
+        //    Comands.Add(new Method_Exists());
+        //    Comands.Add(new Method_if());
+        //    Comands.Add(new Method_Int());
+        //    Comands.Add(new Method_IsNullOrEmpty());
+        //    Comands.Add(new Method_IsType());
+        //    Comands.Add(new Method_Join());
+        //    Comands.Add(new Method_Max());
+        //    Comands.Add(new Method_Min());
+        //    Comands.Add(new Method_Number());
+        //    Comands.Add(new Method_Remove());
+        //    Comands.Add(new Method_Round());
+        //    Comands.Add(new Method_Sort());
+        //    Comands.Add(new Method_Split());
+        //    Comands.Add(new Method_StartsWith());
+        //    Comands.Add(new Method_String());
+        //       Comands.Add(new Method_Substring());
+        //    Comands.Add(new Method_Var());
 
-
-
-
-
-
-
-
-
-
-
-
+        //}
     }
 }

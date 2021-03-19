@@ -401,7 +401,7 @@ namespace BlueScript {
         }
 
 
-        public List<Variable> SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool endlessargs) {
+        public List<Variable> SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types) {
             var attributes = SplitAttributeToString(attributtext);
             if (attributes == null || attributes.Count == 0) { return null; }
 

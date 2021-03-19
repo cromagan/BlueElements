@@ -4040,12 +4040,14 @@ namespace BlueControls.Controls {
 
 
                 var _Ist1 = string.Empty;
+                var _Ist2 = string.Empty;
 
                 if (ContenHolderCellRow != null && ContentHolderCellColumn != null) {
                     _Ist1 = ContenHolderCellRow.CellGetString(ContentHolderCellColumn);
+                    _Ist2 = CellItem.ValuesReadable(ContentHolderCellColumn, ContenHolderCellRow, enShortenStyle.Both).JoinWithCr();
                 }
 
-                if (ContentHolderCellColumn.Format == enDataFormat.Text_mit_Formatierung) {
+                if (ContentHolderCellColumn != null && ContentHolderCellColumn.Format == enDataFormat.Text_mit_Formatierung) {
                     var l = new ExtText(enDesign.TextBox, enStates.Standard) {
                         HtmlText = _Ist1
                     };
@@ -4060,7 +4062,6 @@ namespace BlueControls.Controls {
                 }
 
                 // Prüfung mit und ohne Ersetzungen / Prefix / Suffix
-                var _Ist2 = CellItem.ValuesReadable(ContentHolderCellColumn, ContenHolderCellRow, enShortenStyle.Both).JoinWithCr();
                 if (!string.IsNullOrEmpty(_Ist2) && _Ist2.ToLower().Contains(searchTXT.ToLower())) {
                     foundColumn = column;
                     foundRow = row;

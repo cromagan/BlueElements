@@ -21,7 +21,7 @@ using Skript.Enums;
 using System.Collections.Generic;
 
 namespace BlueScript {
-    internal class Method_isType : Method {
+    internal class Method_IsType : Method {
 
         public override string Syntax { get => "isType(Variable, num / str / lst / dat / bol / err / ukn)"; }
         public override string Description { get => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführ!"; }
@@ -33,7 +33,7 @@ namespace BlueScript {
         public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableAny, enVariableDataType.String }; }
         public override bool EndlessArgs { get => false; }
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             switch (attvar[1].ValueString.ToLower()) {

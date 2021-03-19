@@ -415,6 +415,13 @@ namespace BlueDatabase {
 
             #endregion
 
+
+            //if (BlueScript.Script.Comands == null) { }
+            //BlueScript.Script.AddScriptComands();
+            //Database.AddScriptComands();
+            //]
+
+
             var script = new BlueScript.Script(vars);
             script.ScriptText = Database.RulesScript;
 

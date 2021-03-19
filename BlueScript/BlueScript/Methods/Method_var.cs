@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
 namespace BlueScript {
-    internal class Method_var : Method {
+    internal class Method_Var : Method {
 
         public override string Syntax { get => "var VariablenName = Wert;"; }
         public override string Description { get => "Erstellt eine neue Variable, der Typ wird automtisch bestimmt."; }

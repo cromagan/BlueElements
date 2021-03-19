@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 
 namespace BlueScript {
-    internal class Method_round : Method {
+    internal class Method_Round : Method {
 
         public override string Syntax { get => "Round(Value, Nachkommastellen)"; }
         public override string Description { get => "Rundet den Zahlenwert mathematisch korrekt."; }
@@ -36,7 +36,7 @@ namespace BlueScript {
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             var n = (int)attvar[1].ValueDouble;

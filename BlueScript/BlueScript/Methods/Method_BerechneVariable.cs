@@ -50,7 +50,7 @@ namespace BlueScript {
                 return new strDoItFeedback("Variable " + variableName + " nicht gefunden");
             }
 
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
 
             if (attvar == null || attvar.Count != 1) { return strDoItFeedback.AttributFehler(); }
 
