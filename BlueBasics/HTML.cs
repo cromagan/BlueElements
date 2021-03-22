@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueBasics
-{
-    public class HTML
-    {
+namespace BlueBasics {
+    public class HTML {
 
 
         private List<string> Code { get; set; }
@@ -13,8 +11,7 @@ namespace BlueBasics
         // https://www.w3schools.com/html/html_tables.asp
 
 
-        public HTML(string Title)
-        {
+        public HTML(string Title) {
             Code = new List<string>
             {
                 "<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"",
@@ -57,8 +54,7 @@ namespace BlueBasics
         }
 
 
-        public void AddFoot()
-        {
+        public void AddFoot() {
 
             Code.Add("  </body>");
             Code.Add("</html>");
@@ -66,35 +62,29 @@ namespace BlueBasics
 
 
 
-        public void AddCaption(string _Caption)
-        {
+        public void AddCaption(string _Caption) {
             AddCaption(_Caption, 1);
         }
 
-        public void Add(string what)
-        {
+        public void Add(string what) {
             Code.Add(what);
         }
 
 
-        public void RowBeginn()
-        {
+        public void RowBeginn() {
             Code.Add("      <tr>");
         }
 
-        public void RowEnd()
-        {
+        public void RowEnd() {
             Code.Add("      </tr>");
         }
 
-        public void Save(string filename, bool executeafter)
-        {
+        public void Save(string filename, bool executeafter) {
             Code.Save(filename, executeafter);
         }
 
 
-        public void TableBeginn()
-        {
+        public void TableBeginn() {
 
             //da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
 
@@ -109,26 +99,21 @@ namespace BlueBasics
             //Code.Add("      </tr>");
         }
 
-        public void TableEnd()
-        {
+        public void TableEnd() {
             Code.Add("    </table>");
         }
 
-        public void CellAdd(string content)
-        {
+        public void CellAdd(string content) {
             Code.Add("              <th>" + content + "</th>");
         }
 
-        public void CellAdd(string content, Color c)
-        {
+        public void CellAdd(string content, Color c) {
             Code.Add("        <th  bgcolor=\"#" + c.ToHTMLCode() + "\">" + content + "</th>");
         }
 
-        public void AddCaption(string _caption, int size)
-        {
+        public void AddCaption(string _caption, int size) {
 
-            switch (size)
-            {
+            switch (size) {
                 case 1:
                     Code.Add("  <h1>" + _caption + "</h1><br>");
                     break;
@@ -147,12 +132,10 @@ namespace BlueBasics
 
         }
 
-        public void ListAdd(List<string> items)
-        {
+        public void ListAdd(List<string> items) {
             Code.Add("<ul>");
 
-            foreach (var thisitem in items)
-            {
+            foreach (string thisitem in items) {
                 Code.Add("  <li>" + thisitem + "</li>");
 
             }

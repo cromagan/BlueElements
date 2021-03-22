@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueBasics.Interfaces
-{
-    public interface IReadableText
-    {
+namespace BlueBasics.Interfaces {
+    public interface IReadableText {
         string ReadableText();
         QuickImage SymbolForReadableText();
 

@@ -39,16 +39,16 @@ namespace BlueScript {
         public override bool EndlessArgs { get => true; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
 
             if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
 
-                var x = attvar[0].ValueString.SplitByCRToList();
+                List<string> x = attvar[0].ValueString.SplitByCRToList();
 
-                for (var z = 1; z < attvar.Count; z++) {
+                for (int z = 1; z < attvar.Count; z++) {
                     if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
                     x.Add(attvar[z].ValueString);
                 }

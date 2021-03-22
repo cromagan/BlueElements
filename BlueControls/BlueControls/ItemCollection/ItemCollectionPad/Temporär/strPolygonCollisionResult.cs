@@ -1,8 +1,7 @@
 ﻿using BlueControls;
 using BlueControls.ItemCollection;
 
-public struct strPolygonCollisionResult
-{
+public struct strPolygonCollisionResult {
     /// <summary>
     /// Are the polygons going to intersect forward in time?
     /// </summary>
@@ -16,7 +15,7 @@ public struct strPolygonCollisionResult
     /// <summary>
     /// The translation to apply to polygon A to push the polygons appart. 
     /// </summary>
-    public PointM MinimumTranslationVector; 
+    public PointM MinimumTranslationVector;
 
     public clsAbstractPhysicPadItem CheckedObjectA;
     public clsAbstractPhysicPadItem CheckedObjectB;

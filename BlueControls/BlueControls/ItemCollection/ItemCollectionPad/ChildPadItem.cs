@@ -137,10 +137,10 @@ namespace BlueControls.ItemCollection {
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             try {
 
-                var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+                PointF trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
                 GR.TranslateTransform(trp.X, trp.Y);
                 GR.RotateTransform(-Drehwinkel);
-                var font = new Font("Arial", (float)(30 * cZoom));
+                Font font = new Font("Arial", (float)(30 * cZoom));
 
 
                 if (PadInternal != null) {
@@ -164,10 +164,10 @@ namespace BlueControls.ItemCollection {
                         _tmpBMP = new Bitmap((int)Math.Abs(DCoordinates.Width), (int)Math.Abs(DCoordinates.Height));
                     }
 
-                    var mb = PadInternal.Item.MaxBounds(ZoomItems);
-                    var zoomv = PadInternal.ZoomFitValue(mb, false, _tmpBMP.Size);
-                    var centerpos = PadInternal.CenterPos(mb, false, _tmpBMP.Size, zoomv);
-                    var slidervalues = PadInternal.SliderValues(mb, zoomv, centerpos);
+                    RectangleM mb = PadInternal.Item.MaxBounds(ZoomItems);
+                    decimal zoomv = PadInternal.ZoomFitValue(mb, false, _tmpBMP.Size);
+                    Point centerpos = PadInternal.CenterPos(mb, false, _tmpBMP.Size, zoomv);
+                    PointF slidervalues = PadInternal.SliderValues(mb, zoomv, centerpos);
 
                     PadInternal.ShowInPrintMode = ForPrinting;
                     if (ForPrinting) { PadInternal.Unselect(); }
@@ -178,9 +178,9 @@ namespace BlueControls.ItemCollection {
 
                     if (_tmpBMP != null) {
 
-                        foreach (var thisA in Eingebettete_Ansichten) {
+                        foreach (string thisA in Eingebettete_Ansichten) {
                             ChildPadItem Pad = null;
-                            foreach (var It in Parent) {
+                            foreach (BasicPadItem It in Parent) {
                                 if (It is ChildPadItem CP) {
                                     if (CP.Name.ToUpper() == thisA.ToUpper()) {
                                         Pad = CP;
@@ -192,20 +192,20 @@ namespace BlueControls.ItemCollection {
 
                             if (Pad != null) {
 
-                                var mb2 = Pad.PadInternal.Item.MaxBounds(Pad.ZoomItems);
+                                RectangleM mb2 = Pad.PadInternal.Item.MaxBounds(Pad.ZoomItems);
                                 mb2.Inflate(-1, -1);
-                                var tmpG = Graphics.FromImage(_tmpBMP);
-                                var p = new Pen(Pad.Randfarbe, (float)(8.7m * cZoom));
-                                var p2 = new Pen(Color.White, (float)(8.7m * cZoom) + 2f);
+                                Graphics tmpG = Graphics.FromImage(_tmpBMP);
+                                Pen p = new Pen(Pad.Randfarbe, (float)(8.7m * cZoom));
+                                Pen p2 = new Pen(Color.White, (float)(8.7m * cZoom) + 2f);
                                 p.DashPattern = new float[] { 5, 1, 1, 1 };
-                                var DC2 = mb2.ZoomAndMoveRect(zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y);
+                                RectangleF DC2 = mb2.ZoomAndMoveRect(zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y);
                                 tmpG.DrawRectangle(p2, DC2);
                                 tmpG.DrawRectangle(p, DC2);
 
 
 
                                 if (Pad.Textlage != (enAlignment)(-1)) {
-                                    var s = tmpG.MeasureString(Pad.Name, font);
+                                    SizeF s = tmpG.MeasureString(Pad.Name, font);
 
                                     tmpG.FillRectangle(Brushes.White, new RectangleF((float)DC2.Left, (float)(DC2.Top - s.Height - 9f * (float)cZoom), s.Width, s.Height));
                                     tmpG.DrawString(Pad.Name, font, new SolidBrush(Pad.Randfarbe), (float)DC2.Left, (float)(DC2.Top - s.Height - 9f * (float)cZoom));
@@ -229,18 +229,17 @@ namespace BlueControls.ItemCollection {
 
 
                 if (Textlage != (enAlignment)(-1)) {
-                    var p = new Pen(Randfarbe, (float)(8.7m * cZoom)) {
+                    Pen p = new Pen(Randfarbe, (float)(8.7m * cZoom)) {
                         DashPattern = new float[] { 10, 2, 1, 2 }
                     };
                     GR.DrawRectangle(p, DCoordinates);
 
-                    var s = GR.MeasureString(Name, font);
+                    SizeF s = GR.MeasureString(Name, font);
                     GR.DrawString(Name, font, new SolidBrush(Randfarbe), (float)DCoordinates.Left, (float)(DCoordinates.Top - s.Height - 9f * (float)cZoom));
                 }
 
 
-            }
-            catch {
+            } catch {
             }
 
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
@@ -285,7 +284,7 @@ namespace BlueControls.ItemCollection {
         protected override void ParseFinished() { }
 
         public override string ToString() {
-            var t = base.ToString();
+            string t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
 
@@ -320,18 +319,18 @@ namespace BlueControls.ItemCollection {
         public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY) {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
 
-            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
-            var l2 = PadInternal.Item.MaxBounds(ZoomItems);
+            RectangleF l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
+            RectangleM l2 = PadInternal.Item.MaxBounds(ZoomItems);
 
 
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
 
-            var tZo = Math.Min((decimal)l1.Width / l2.Width, (decimal)l1.Height / l2.Height);
+            decimal tZo = Math.Min((decimal)l1.Width / l2.Width, (decimal)l1.Height / l2.Height);
             PadInternal.SetZoom(1);
 
             // Coordinaten auf Maßstab 1/1 scalieren
-            var x = (e.X - (decimal)l1.X) / tZo;
-            var y = (e.Y - (decimal)l1.Y) / tZo;
+            decimal x = (e.X - (decimal)l1.X) / tZo;
+            decimal y = (e.Y - (decimal)l1.Y) / tZo;
 
             // Nullpunkt verschiebung laut Maxbounds
             x += l2.X;
@@ -347,7 +346,7 @@ namespace BlueControls.ItemCollection {
             y = Math.Max(y, int.MinValue / 2.0m);
 
 
-            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
+            System.Windows.Forms.MouseEventArgs e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
 
 
             PadInternal.DoMouseDown(e2);
@@ -358,8 +357,8 @@ namespace BlueControls.ItemCollection {
         public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY) {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
 
-            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
-            var l2 = PadInternal.Item.MaxBounds(ZoomItems);
+            RectangleF l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
+            RectangleM l2 = PadInternal.Item.MaxBounds(ZoomItems);
 
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
 
@@ -370,8 +369,8 @@ namespace BlueControls.ItemCollection {
             PadInternal.SetZoom(1);
 
             // Coordinaten auf Maßstab 1/1 scalieren
-            var x = (e.X - (decimal)l1.X) / tZo;
-            var y = (e.Y - (decimal)l1.Y) / tZo;
+            decimal x = (e.X - (decimal)l1.X) / tZo;
+            decimal y = (e.Y - (decimal)l1.Y) / tZo;
 
             // Nullpunkt verschiebung laut Maxbounds
             x += l2.X;
@@ -387,7 +386,7 @@ namespace BlueControls.ItemCollection {
             y = Math.Max(y, int.MinValue / 2.0m);
 
 
-            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
+            System.Windows.Forms.MouseEventArgs e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
 
 
             PadInternal.DoMouseMove(e2);
@@ -399,17 +398,17 @@ namespace BlueControls.ItemCollection {
 
             if (PadInternal.Item.Count == 0) { return false; }
 
-            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
-            var l2 = PadInternal.Item.MaxBounds(ZoomItems);
+            RectangleF l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
+            RectangleM l2 = PadInternal.Item.MaxBounds(ZoomItems);
 
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
 
-            var tZo = Math.Min((decimal)l1.Width / l2.Width, (decimal)l1.Height / l2.Height);
+            decimal tZo = Math.Min((decimal)l1.Width / l2.Width, (decimal)l1.Height / l2.Height);
             PadInternal.SetZoom(1);
 
             // Coordinaten auf Maßstab 1/1 scalieren
-            var x = (e.X - (decimal)l1.X) / tZo;
-            var y = (e.Y - (decimal)l1.Y) / tZo;
+            decimal x = (e.X - (decimal)l1.X) / tZo;
+            decimal y = (e.Y - (decimal)l1.Y) / tZo;
 
             // Nullpunkt verschiebung laut Maxbounds
             x += l2.X;
@@ -425,7 +424,7 @@ namespace BlueControls.ItemCollection {
             y = Math.Max(y, int.MinValue / 2.0m);
 
 
-            var e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
+            System.Windows.Forms.MouseEventArgs e2 = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
 
 
             PadInternal.DoMouseUp(e2);
@@ -435,7 +434,7 @@ namespace BlueControls.ItemCollection {
 
         public bool ReplaceVariable(string VariableName, enValueType ValueType, string Value) {
             if (PadInternal == null) { return false; }
-            var b = PadInternal.Item.ParseVariable(VariableName, ValueType, Value);
+            bool b = PadInternal.Item.ParseVariable(VariableName, ValueType, Value);
 
             if (b) { OnChanged(); }
             return b;
@@ -446,7 +445,7 @@ namespace BlueControls.ItemCollection {
 
         public bool DoSpecialCodes() {
             if (PadInternal == null) { return false; }
-            var b = PadInternal.Item.ParseSpecialCodes();
+            bool b = PadInternal.Item.ParseSpecialCodes();
 
             if (b) { OnChanged(); }
             return b;
@@ -463,7 +462,7 @@ namespace BlueControls.ItemCollection {
 
         public bool ResetVariables() {
             if (PadInternal == null) { return false; }
-            var b = PadInternal.Item.ResetVariables();
+            bool b = PadInternal.Item.ResetVariables();
             if (b) { OnChanged(); }
             return b;
         }
@@ -478,16 +477,18 @@ namespace BlueControls.ItemCollection {
 
 
         public override List<FlexiControl> GetStyleOptions() {
-            var l = new List<FlexiControl>
+            List<FlexiControl> l = new List<FlexiControl>
             {
                 new FlexiControlForProperty(this, "Name"),
 
                 new FlexiControlForProperty(this, "Randfarbe")
             };
 
-            var Lage = new ItemCollectionList();
-            Lage.Add("ohne", "-1");
-            Lage.Add("Links oben", ((int)enAlignment.Top_Left).ToString());
+            ItemCollectionList Lage = new ItemCollectionList
+            {
+                { "ohne", "-1" },
+                { "Links oben", ((int)enAlignment.Top_Left).ToString() }
+            };
 
             l.Add(new FlexiControlForProperty(this, "Textlage", Lage));
 

@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueDatabase.Enums
-{
-    internal enum enItemState
-    {
+namespace BlueDatabase.Enums {
+    internal enum enItemState {
         Pending = 2,
         Undo = 3
     }

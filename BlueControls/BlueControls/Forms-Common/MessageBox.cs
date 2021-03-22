@@ -20,10 +20,8 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 
-namespace BlueControls.Forms
-{
-    public partial class MessageBox : Forms.Form
-    {
+namespace BlueControls.Forms {
+    public partial class MessageBox : Forms.Form {
         private Button Pressed = null;
 
         //private MessageBox()
@@ -36,19 +34,15 @@ namespace BlueControls.Forms
         //    }
         //}
 
-        private MessageBox(string TXT, enImageCode Pic, params string[] Buttons) : base(Enums.enDesign.Form_MsgBox)
-        {
+        private MessageBox(string TXT, enImageCode Pic, params string[] Buttons) : base(Enums.enDesign.Form_MsgBox) {
             InitializeComponent();
 
 
             Text = Develop.AppName();
 
-            if (Pic != enImageCode.None)
-            {
+            if (Pic != enImageCode.None) {
                 capText.Text = "<ImageCode=" + QuickImage.Get(Pic, 32) + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(TXT, false);
-            }
-            else
-            {
+            } else {
                 capText.Text = BlueDatabase.LanguageTool.DoTranslate(TXT, false);
             }
 
@@ -57,64 +51,52 @@ namespace BlueControls.Forms
 
             if (Buttons.Length == 0) { Buttons = new[] { "OK" }; }
 
-            var B = Generate_Buttons(Buttons);
+            System.Collections.Generic.List<Button> B = Generate_Buttons(Buttons);
 
-            foreach (var ThisButton in B)
-            {
+            foreach (Button ThisButton in B) {
                 ThisButton.Click += ThisButton_Click;
 
-                if (ThisButton.Left < BorderWidth)
-                {
+                if (ThisButton.Left < BorderWidth) {
                     Width = (Width - ThisButton.Left) + BorderWidth;
                 }
             }
             Pressed = null;
 
-            if (Owner == null)
-            {
+            if (Owner == null) {
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             }
         }
 
-        private void ThisButton_Click(object sender, System.EventArgs e)
-        {
+        private void ThisButton_Click(object sender, System.EventArgs e) {
             Pressed = (Button)sender;
             Close();
         }
 
-        public static void Show(string TXT)
-        {
+        public static void Show(string TXT) {
             Show(TXT, enImageCode.None, true, "OK");
         }
 
 
-        public static void Show(string TXT, enImageCode Pic, string Buttons)
-        {
+        public static void Show(string TXT, enImageCode Pic, string Buttons) {
             Show(TXT, Pic, true, Buttons);
         }
 
 
-        public static int Show(string TXT, enImageCode Pic, params string[] Buttons)
-        {
-           return Show(TXT, Pic, true, Buttons);
+        public static int Show(string TXT, enImageCode Pic, params string[] Buttons) {
+            return Show(TXT, Pic, true, Buttons);
         }
 
 
-        public static int Show(string TXT, enImageCode Pic, bool Dialog, params string[] Buttons)
-        {
+        public static int Show(string TXT, enImageCode Pic, bool Dialog, params string[] Buttons) {
 
-            var MB = new MessageBox(TXT, Pic, Buttons);
+            MessageBox MB = new MessageBox(TXT, Pic, Buttons);
 
-            if (Dialog)
-            {
+            if (Dialog) {
                 MB.ShowDialog();
-            }
-            else
-            {
+            } else {
                 MB.Show();
 
-                while (MB.Pressed == null)
-                {
+                while (MB.Pressed == null) {
                     modAllgemein.Pause(0.1, true);
                 }
 

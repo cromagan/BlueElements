@@ -25,10 +25,8 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using static BlueBasics.FileOperations;
 
-namespace BlueBasics
-{
-    public sealed class clsNamedBinary : ICanBeEmpty, IParseable
-    {
+namespace BlueBasics {
+    public sealed class clsNamedBinary : ICanBeEmpty, IParseable {
         #region  Variablen-Deklarationen 
 
         private string _binary;
@@ -43,33 +41,28 @@ namespace BlueBasics
 
         #region  Construktor + Initialize 
 
-        public clsNamedBinary(string CodeToParse)
-        {
+        public clsNamedBinary(string CodeToParse) {
             Parse(CodeToParse);
         }
 
-        public clsNamedBinary(string vName, Bitmap BMP)
-        {
+        public clsNamedBinary(string vName, Bitmap BMP) {
             Initialize();
             _name = vName;
             _picture = BMP;
         }
 
-        public clsNamedBinary()
-        {
+        public clsNamedBinary() {
             Initialize();
         }
 
 
-        public clsNamedBinary(string vName, string Bins)
-        {
+        public clsNamedBinary(string vName, string Bins) {
             Initialize();
             _name = vName;
             _binary = Bins;
         }
 
-        public void Initialize()
-        {
+        public void Initialize() {
             _name = string.Empty;
             _binary = string.Empty;
             _picture = null;
@@ -80,45 +73,36 @@ namespace BlueBasics
         #region  Properties 
         public bool IsParsing { get; private set; }
 
-        public string Binary
-        {
-            get
-            {
+        public string Binary {
+            get {
                 return _binary;
             }
 
-            set
-            {
+            set {
                 if (_binary == value) { return; }
                 _binary = value;
                 OnChanged();
             }
         }
 
-        public Bitmap Picture
-        {
-            get
-            {
+        public Bitmap Picture {
+            get {
                 return _picture;
             }
 
-            set
-            {
+            set {
                 if (_picture == value) { return; }
                 _picture = value;
                 OnChanged();
             }
         }
 
-        public string Name
-        {
-            get
-            {
+        public string Name {
+            get {
                 return _name;
             }
 
-            set
-            {
+            set {
                 if (_name == value) { return; }
                 _name = value;
                 OnChanged();
@@ -127,10 +111,8 @@ namespace BlueBasics
         #endregion
 
 
-        public void LoadFromFile(string FileName)
-        {
-            if (!FileExists(FileName))
-            {
+        public void LoadFromFile(string FileName) {
+            if (!FileExists(FileName)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Datei Existiert nicht");
                 return;
             }
@@ -138,39 +120,31 @@ namespace BlueBasics
             _binary = string.Empty;
             _picture = null;
 
-            if (FileName.FileType() == enFileFormat.Image)
-            {
+            if (FileName.FileType() == enFileFormat.Image) {
                 _picture = (Bitmap)BitmapExt.Image_FromFile(FileName);
-            }
-            else
-            {
+            } else {
                 _binary = modConverter.FileToString(FileName);
             }
 
             _name = FileName.FileNameWithSuffix();
         }
 
-        public bool IsNullOrEmpty()
-        {
+        public bool IsNullOrEmpty() {
             if (_picture == null && string.IsNullOrEmpty(_binary)) { return true; }
             return false;
         }
 
-        public void Parse(string ToParse)
-        {
+        public void Parse(string ToParse) {
             IsParsing = true;
             Initialize();
 
-            if (string.IsNullOrEmpty(ToParse) || ToParse.Length < 10)
-            {
+            if (string.IsNullOrEmpty(ToParse) || ToParse.Length < 10) {
                 IsParsing = false;
                 return;
             }
 
-            foreach (var pair in ToParse.GetAllTags())
-            {
-                switch (pair.Key)
-                {
+            foreach (System.Collections.Generic.KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
+                switch (pair.Key) {
                     case "name":
                         _name = pair.Value.FromNonCritical();
                         break;
@@ -188,25 +162,21 @@ namespace BlueBasics
             IsParsing = false;
         }
 
-        public override string ToString()
-        {
-            var t = "{Name=" + _name.ToNonCritical() + ", ";
+        public override string ToString() {
+            string t = "{Name=" + _name.ToNonCritical() + ", ";
 
-            if (_picture != null)
-            {
+            if (_picture != null) {
                 t = t + "PNG=" + modConverter.BitmapToString(_picture, ImageFormat.Png).ToNonCritical() + ", ";
             }
 
-            if (!string.IsNullOrEmpty(_binary))
-            {
+            if (!string.IsNullOrEmpty(_binary)) {
                 t = t + "BIN=" + _binary.ToNonCritical() + ", ";
             }
 
             return t.TrimEnd(", ") + "}";
         }
 
-        public void OnChanged()
-        {
+        public void OnChanged() {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }

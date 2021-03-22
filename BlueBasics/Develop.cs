@@ -112,7 +112,7 @@ namespace BlueBasics {
 
         public static string AppName() {
             try {
-                var ex_a = Assembly.GetEntryAssembly();
+                Assembly ex_a = Assembly.GetEntryAssembly();
                 return ex_a.GetName().Name;
             } catch {
                 return "Programm von Christian Peter";
@@ -181,7 +181,7 @@ namespace BlueBasics {
 
                     if (DateTime.Now.Subtract(_LastDebugTime).TotalSeconds > 5) { _LastDebugMessage = string.Empty; }
 
-                    var net = Art + (";" + Meldung);
+                    string net = Art + (";" + Meldung);
                     if (net == _LastDebugMessage) {
                         _IsTraceLogging = false;
                         return;
@@ -189,10 +189,10 @@ namespace BlueBasics {
 
                     _LastDebugMessage = net;
                     _LastDebugTime = DateTime.Now;
-                    var First = true;
-                    var tmp = _CurrentTraceLogFile;
-                    var strace = new StackTrace(true);
-                    var Nr = 100;
+                    bool First = true;
+                    string tmp = _CurrentTraceLogFile;
+                    StackTrace strace = new StackTrace(true);
+                    int Nr = 100;
                     List<string> l = null;
                     Trace.WriteLine("<tr>");
 
@@ -236,7 +236,7 @@ namespace BlueBasics {
 
                     Trace.WriteLine("<br>" + DateTime.Now.ToString(Constants.Format_Date) + "<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
                     Trace.WriteLine("<th ALIGN=LEFT>");
-                    for (var z = 0; z <= Math.Min(Nr + 2, strace.FrameCount - 2); z++) {
+                    for (int z = 0; z <= Math.Min(Nr + 2, strace.FrameCount - 2); z++) {
                         if (!strace.GetFrame(z).GetMethod().Name.Contains("DebugPrint")) {
                             if (First) { Trace.WriteLine("<font color =0000FF>"); }
                             Trace.WriteLine("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes(true) + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes(true).TrimStart("Void ") + "<br>");
@@ -255,7 +255,7 @@ namespace BlueBasics {
                     Trace.WriteLine("</tr>");
                     if (Art == enFehlerArt.Fehler) {
                         TraceLogging_End();
-                        var endl = new List<string>();
+                        List<string> endl = new List<string>();
                         HTML_AddHead(endl, "Beenden...");
                         endl.Add("<center>");
                         endl.Add("<font size = 10>");
@@ -320,7 +320,7 @@ namespace BlueBasics {
         }
 
         public static void CheckStackForOverflow() {
-            var stackTrace = new StackTrace();
+            StackTrace stackTrace = new StackTrace();
             if (stackTrace.GetFrames().GetUpperBound(0) > 300) {
                 DebugPrint(enFehlerArt.Fehler, "Stack-Overflow abgefangen!");
             }
@@ -331,7 +331,7 @@ namespace BlueBasics {
             if (ServiceStarted) { return; }
 
             ServiceStarted = true;
-            var ci = new CultureInfo("de-DE");
+            CultureInfo ci = new CultureInfo("de-DE");
             ci.NumberFormat.CurrencyGroupSeparator = string.Empty;
             ci.NumberFormat.NumberGroupSeparator = string.Empty;
             ci.NumberFormat.PercentGroupSeparator = string.Empty;
@@ -341,7 +341,7 @@ namespace BlueBasics {
             CultureInfo.DefaultThreadCurrentUICulture = ci;
             TraceLogging_Start(TempFile("", AppName() + "-Trace.html"));
 
-            var Check = new System.Windows.Forms.Timer();
+            System.Windows.Forms.Timer Check = new System.Windows.Forms.Timer();
             Check.Tick += CloseAfter12Hours;
             Check.Interval = 60000;
             Check.Enabled = true;
@@ -364,7 +364,7 @@ namespace BlueBasics {
         public static void StopUhr(string txt) {
 
             if (!string.IsNullOrEmpty(txt)) {
-                var x = DateTime.Now.Subtract(_StopUhr);
+                TimeSpan x = DateTime.Now.Subtract(_StopUhr);
                 Console.WriteLine("### STOPUHR ### " + x.TotalMilliseconds.ToString(Constants.Format_Float5_1) + " ms ----> " + txt);
             }
             _StopUhr = DateTime.Now;

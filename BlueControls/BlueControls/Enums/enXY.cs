@@ -1,7 +1,5 @@
-﻿namespace BlueControls.Enums
-{
-    public enum enXY
-    {
+﻿namespace BlueControls.Enums {
+    public enum enXY {
 
 
         none = 0,

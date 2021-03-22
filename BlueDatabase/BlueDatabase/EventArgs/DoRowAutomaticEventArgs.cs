@@ -18,13 +18,10 @@
 #endregion
 
 
-namespace BlueDatabase.EventArgs
-{
-    public class DoRowAutomaticEventArgs : RowEventArgs
-    {
+namespace BlueDatabase.EventArgs {
+    public class DoRowAutomaticEventArgs : RowEventArgs {
 
-        public DoRowAutomaticEventArgs(RowItem Row) : base(Row)
-        {
+        public DoRowAutomaticEventArgs(RowItem Row) : base(Row) {
         }
 
         public string Feedback { get; set; }

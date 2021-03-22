@@ -84,7 +84,7 @@ namespace BlueControls.Classes_Editor {
 
             lbxFilter.Item.Clear();
 
-            foreach (var thisFilter in Item.Filter) {
+            foreach (FilterItem thisFilter in Item.Filter) {
                 if (thisFilter != null) {
                     lbxFilter.Item.Add(thisFilter);
                 }
@@ -93,15 +93,14 @@ namespace BlueControls.Classes_Editor {
 
             lsbExportDateien.Item.Clear();
 
-            foreach (var t1 in Item.BereitsExportiert) {
+            foreach (string t1 in Item.BereitsExportiert) {
                 if (!string.IsNullOrEmpty(t1)) {
-                    var t = t1.Split('|');
+                    string[] t = t1.Split('|');
 
                     if (!FileExists(t[0])) {
                         lsbExportDateien.Item.Add(t[0], t1, QuickImage.Get(enImageCode.Kritisch), true, "0000");
-                    }
-                    else {
-                        var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutomatischLöschen).ToHTMLCode(), "");
+                    } else {
+                        QuickImage q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutomatischLöschen).ToHTMLCode(), "");
                         lsbExportDateien.Item.Add(t[0], t1, q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit));
                     }
                 }
@@ -120,7 +119,7 @@ namespace BlueControls.Classes_Editor {
 
 
             ExportSpaltenAnsicht.Item.Clear();
-            for (var spa = 0; spa < Item.Database.ColumnArrangements.Count; spa++) {
+            for (int spa = 0; spa < Item.Database.ColumnArrangements.Count; spa++) {
                 ExportSpaltenAnsicht.Item.Add(Item.Database.ColumnArrangements[spa].Name, spa.ToString());
             }
 
@@ -128,8 +127,7 @@ namespace BlueControls.Classes_Editor {
                 ExportCSVFormat.Enabled = false;
                 ExportHTMLFormat.Enabled = false;
                 ExportalsBild.Enabled = false;
-            }
-            else {
+            } else {
                 ExportCSVFormat.Enabled = true;
                 ExportHTMLFormat.Enabled = true;
                 ExportalsBild.Enabled = true;
@@ -147,15 +145,14 @@ namespace BlueControls.Classes_Editor {
         }
 
         private void ExportDateien_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
-            foreach (var thisItem in e.Items) {
+            foreach (BasicListItem thisItem in e.Items) {
 
                 if (thisItem is BasicListItem ThisItemBasic) {
                     string fil = null;
                     if (ThisItemBasic.Internal.Contains("|")) {
-                        var f = ThisItemBasic.Internal.SplitBy("|");
+                        string[] f = ThisItemBasic.Internal.SplitBy("|");
                         fil = f[0];
-                    }
-                    else {
+                    } else {
                         fil = ThisItemBasic.Internal;
 
                     }
@@ -183,16 +180,14 @@ namespace BlueControls.Classes_Editor {
                 ExportAutomatischLöschen.Enabled = true;
                 lbxFilter.Enabled = false;
 
-            }
-            else if (ExportCSVFormat.Checked || ExportHTMLFormat.Checked) {
+            } else if (ExportCSVFormat.Checked || ExportHTMLFormat.Checked) {
                 ExportIntervall.Enabled = true;
                 ExportSpaltenAnsicht.Enabled = true;
                 cbxExportFormularID.Enabled = false;
                 ExportAutomatischLöschen.Enabled = true;
                 lbxFilter.Enabled = true;
 
-            }
-            else if (ExportalsBild.Checked) {
+            } else if (ExportalsBild.Checked) {
                 ExportIntervall.Enabled = false;
                 ExportSpaltenAnsicht.Enabled = false;
                 cbxExportFormularID.Enabled = true;
@@ -278,7 +273,7 @@ namespace BlueControls.Classes_Editor {
         #region  Filter 
 
         private void lbxFilter_AddClicked(object sender, System.EventArgs e) {
-            var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty));
+            TextListItem NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty));
             NewFilterItem.Checked = true;
         }
 
@@ -311,7 +306,7 @@ namespace BlueControls.Classes_Editor {
             if (IsFilling) { return; }
 
 
-            foreach (var thisitem in lbxFilter.Item) {
+            foreach (BasicListItem thisitem in lbxFilter.Item) {
                 if (thisitem is TextListItem tli) {
                     if (tli.Tag == filterItemEditor.Item) {
                         tli.Text = filterItemEditor.Item.ReadableText();

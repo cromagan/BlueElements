@@ -46,14 +46,14 @@ namespace BlueScript {
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
             if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
-                var x = attvar[0].ValueListString;
+                List<string> x = attvar[0].ValueListString;
 
-                for (var z = 2; z < attvar.Count; z++) {
+                for (int z = 2; z < attvar.Count; z++) {
                     if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.AttributFehler(); }
 
                     if (x.Contains(attvar[z].ValueString, attvar[1].ValueBool)) {
@@ -66,7 +66,7 @@ namespace BlueScript {
             if (attvar[0].Type == Skript.Enums.enVariableDataType.String) {
 
 
-                for (var z = 2; z < attvar.Count; z++) {
+                for (int z = 2; z < attvar.Count; z++) {
                     if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
 
 
@@ -74,8 +74,7 @@ namespace BlueScript {
                         if (attvar[0].ValueString.Contains(attvar[z].ValueString)) {
                             return strDoItFeedback.Wahr();
                         }
-                    }
-                    else {
+                    } else {
                         if (attvar[0].ValueString.ToLower().Contains(attvar[z].ValueString.ToLower())) {
                             return strDoItFeedback.Wahr();
                         }

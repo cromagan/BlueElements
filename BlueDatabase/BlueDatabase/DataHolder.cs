@@ -57,7 +57,7 @@ namespace BlueDatabase {
 
 
         public void SetData(string feldname, bool editable, string quickinfo) {
-            var c = Column(feldname, string.Empty);
+            ColumnItem c = Column(feldname, string.Empty);
 
             //c.Caption = dataName;
             //c.Format = enDataFormat.Text;
@@ -65,8 +65,7 @@ namespace BlueDatabase {
             c.TextBearbeitungErlaubt = editable;
             if (editable) {
                 c.PermissionGroups_ChangeCell.AddIfNotExists("#Everybody");
-            }
-            else {
+            } else {
                 c.PermissionGroups_ChangeCell.Remove("#Everybody");
             }
             c.Quickinfo = quickinfo;
@@ -105,7 +104,7 @@ namespace BlueDatabase {
             ID = id;
             Typ = "MAIN";
 
-            var filename = MyDefaultFileName();
+            string filename = MyDefaultFileName();
             InternalDatabase = (Database)Database.GetByFilename(filename, false);
 
             Parent = null;
@@ -179,11 +178,11 @@ namespace BlueDatabase {
 
         public ColumnItem Column(string dataName, string message) {
 
-            var nd = ColumnName(dataName);
+            string nd = ColumnName(dataName);
 
 
 
-            var c = InternalDatabase.Column.Exists(nd);
+            ColumnItem c = InternalDatabase.Column.Exists(nd);
             if (c == null) {
                 c = InternalDatabase.Column.Add(nd);
                 c.Caption = dataName;
@@ -210,9 +209,9 @@ namespace BlueDatabase {
         }
 
         public RowItem Row() {
-            var rn = Typ + "/" + ID;
+            string rn = Typ + "/" + ID;
 
-            var r = InternalDatabase.Row[rn];
+            RowItem r = InternalDatabase.Row[rn];
 
             if (r == null) {
                 r = InternalDatabase.Row.Add(rn);
@@ -271,18 +270,17 @@ namespace BlueDatabase {
 
             data = new ListExt<t>();
 
-            var name = data.GetType().ToString();
+            string name = data.GetType().ToString();
 
-            var IDS = GetList(name);
+            List<string> IDS = GetList(name);
 
-            foreach (var thisID in IDS) {
+            foreach (string thisID in IDS) {
                 if (!separateFiles) {
 
-                    var v = (t)System.Activator.CreateInstance(typeof(t), this, thisID.ToUpper());
+                    t v = (t)System.Activator.CreateInstance(typeof(t), this, thisID.ToUpper());
                     data.Add(v);
-                }
-                else {
-                    var v = (t)System.Activator.CreateInstance(typeof(t), thisID.ToUpper());
+                } else {
+                    t v = (t)System.Activator.CreateInstance(typeof(t), thisID.ToUpper());
                     data.Add(v);
                 }
 
@@ -294,20 +292,19 @@ namespace BlueDatabase {
 
         private void Data_Changed(object sender, System.EventArgs e) {
 
-            var IDS = new List<string>();
+            List<string> IDS = new List<string>();
             if (sender is IEnumerable enumerable) {
 
-                foreach (var thisd in enumerable) {
+                foreach (object thisd in enumerable) {
                     if (thisd is DataHolder dh) {
                         IDS.Add(dh.ID);
                     }
                 }
-            }
-            else {
+            } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Typ");
             }
 
-            var name = sender.GetType().ToString();
+            string name = sender.GetType().ToString();
             Set(name, IDS);
         }
 
@@ -424,7 +421,7 @@ namespace BlueDatabase {
 
     public static class DataHolderExtensions {
         public static t GetByID<t>(this List<t> items, string id) where t : DataHolder {
-            foreach (var thisit in items) {
+            foreach (t thisit in items) {
                 if (thisit.ID.ToUpper() == id.ToUpper()) { return thisit; }
             }
             return null;

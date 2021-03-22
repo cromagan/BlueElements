@@ -39,17 +39,27 @@ namespace BlueScript {
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
             switch (attvar[1].ValueString.ToLower()) {
 
-                case "num": attvar[0].Type = enVariableDataType.Number; break;
-                case "str": attvar[0].Type = enVariableDataType.String; break;
-                case "lst": attvar[0].Type = enVariableDataType.List; break;
-                case "dat": attvar[0].Type = enVariableDataType.Date; break;
-                case "bol": attvar[0].Type = enVariableDataType.Bool; break;
+                case "num":
+                    attvar[0].Type = enVariableDataType.Number;
+                    break;
+                case "str":
+                    attvar[0].Type = enVariableDataType.String;
+                    break;
+                case "lst":
+                    attvar[0].Type = enVariableDataType.List;
+                    break;
+                case "dat":
+                    attvar[0].Type = enVariableDataType.Date;
+                    break;
+                case "bol":
+                    attvar[0].Type = enVariableDataType.Bool;
+                    break;
                 default:
                     return strDoItFeedback.AttributFehler();
             }

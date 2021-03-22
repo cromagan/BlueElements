@@ -279,7 +279,7 @@ namespace BlueDatabase {
 
         private void VariableToCell(ColumnItem thisCol, List<Variable> vars) {
 
-            var s = vars.Get(thisCol.Name);
+            Variable s = vars.Get(thisCol.Name);
 
             if (s == null) { return; }
             if (s.Readonly) { return; }
@@ -295,8 +295,7 @@ namespace BlueDatabase {
                 case enDataFormat.Bit:
                     if (s.ValueString.ToLower() == "true") {
                         CellSet(thisCol, true);
-                    }
-                    else {
+                    } else {
                         CellSet(thisCol, false);
                     }
                     return;
@@ -328,7 +327,7 @@ namespace BlueDatabase {
 
             if (!thisCol.Format.CanBeCheckedByRules()) { return null; }
 
-            var ro = !thisCol.Format.CanBeChangedByRules();
+            bool ro = !thisCol.Format.CanBeChangedByRules();
 
             if (thisCol == thisCol.Database.Column.SysCorrect) { ro = true; }
             if (thisCol == thisCol.Database.Column[0]) { ro = true; }
@@ -346,8 +345,7 @@ namespace BlueDatabase {
                 case enDataFormat.Bit:
                     if (r.CellGetString(thisCol) == "+") {
                         return new Variable(thisCol.Name, "true", enVariableDataType.Bool, ro, false, thisCol.ReadableText());
-                    }
-                    else {
+                    } else {
                         return new Variable(thisCol.Name, "false", enVariableDataType.Bool, ro, false, thisCol.ReadableText());
                     }
 
@@ -371,18 +369,20 @@ namespace BlueDatabase {
         /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
         private BlueScript.Script DoRules(bool onlyTest, string startRoutine) {
 
-            var vars = new List<Variable>();
+            List<Variable> vars = new List<Variable>
+            {
 
-            //var x = new BeginnRowAutomaticEventArgs(this, vars);
+                //var x = new BeginnRowAutomaticEventArgs(this, vars);
 
-            //OnBeginnRowAutomatic(x);
-            vars.Add(new Variable("Startroutine", startRoutine, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte: new row, value changed, script testing, manual check, to be sure"));
+                //OnBeginnRowAutomatic(x);
+                new Variable("Startroutine", startRoutine, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte: new row, value changed, script testing, manual check, to be sure")
+            };
 
 
 
             #region Variablen für Skript erstellen
-            foreach (var thisCol in Database.Column) {
-                var v = CellToVariable(thisCol, this);
+            foreach (ColumnItem thisCol in Database.Column) {
+                Variable v = CellToVariable(thisCol, this);
                 if (v != null) { vars.Add(v); }
             }
 
@@ -397,18 +397,17 @@ namespace BlueDatabase {
 
             if (Database.IsAdministrator()) {
                 vars.Add(new Variable("Administrator", "true", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-            }
-            else {
+            } else {
                 vars.Add(new Variable("Administrator", "false", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             }
 
 
 
             //if (Database.ReadOnly) {
-            //    vars.Add(new Variable("ReadOnly", "TRUE", enVariableDataType.Bool, true, false, "Gibt an, ob die Datenbank schreibgeschützt));
+            //    vars.Add(new Variable("ReadOnly", "true", enVariableDataType.Bool, true, false, "Gibt an, ob die Datenbank schreibgeschützt));
             //}
             //else {
-            //    vars.Add(new Variable("ReadOnly", "FALSE", enVariableDataType.Bool, true, false));
+            //    vars.Add(new Variable("ReadOnly", "false", enVariableDataType.Bool, true, false));
             //}
 
             vars.Add(new Variable("Filename", Database.Filename, enVariableDataType.String, true, true, string.Empty));
@@ -422,8 +421,9 @@ namespace BlueDatabase {
             //]
 
 
-            var script = new BlueScript.Script(vars);
-            script.ScriptText = Database.RulesScript;
+            Script script = new BlueScript.Script(vars) {
+                ScriptText = Database.RulesScript
+            };
 
             script.Parse();
 
@@ -433,7 +433,7 @@ namespace BlueDatabase {
                     return script;
                 }
 
-                foreach (var thisCol in Database.Column) {
+                foreach (ColumnItem thisCol in Database.Column) {
                     VariableToCell(thisCol, vars);
                 }
 
@@ -470,7 +470,7 @@ namespace BlueDatabase {
                 //}
 
                 // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
-                var e = new DoRowAutomaticEventArgs(this);
+                DoRowAutomaticEventArgs e = new DoRowAutomaticEventArgs(this);
                 OnDoSpecialRules(e);
 
 
@@ -508,9 +508,9 @@ namespace BlueDatabase {
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
 
-            var t = DateTime.Now;
+            DateTime t = DateTime.Now;
             do {
-                var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, false, startroutine);
+                (bool didSuccesfullyCheck, string error, Script skript) erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, false, startroutine);
                 if (erg.didSuccesfullyCheck) { return erg; }
 
                 if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
@@ -527,12 +527,12 @@ namespace BlueDatabase {
 
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
-            var feh = Database.ErrorReason(enErrorReason.EditAcut);
+            string feh = Database.ErrorReason(enErrorReason.EditAcut);
 
             if (!string.IsNullOrEmpty(feh)) { return (false, feh, null); }
 
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
-            var script = DoRules(onlyTest, startroutine);
+            Script script = DoRules(onlyTest, startroutine);
 
             if (onlyTest) { return (true, string.Empty, script); }
 
@@ -541,17 +541,16 @@ namespace BlueDatabase {
 
 
             // Dann die Abschließenden Korrekturen vornehmen
-            foreach (var ThisColum in Database.Column) {
+            foreach (ColumnItem ThisColum in Database.Column) {
                 if (ThisColum != null) {
 
                     if (fullCheck) {
-                        var x = CellGetString(ThisColum);
-                        var x2 = ThisColum.AutoCorrect(x);
+                        string x = CellGetString(ThisColum);
+                        string x2 = ThisColum.AutoCorrect(x);
 
                         if (ThisColum.Format != enDataFormat.LinkedCell && x != x2) {
                             Database.Cell.Set(ThisColum, this, x2);
-                        }
-                        else {
+                        } else {
                             if (!ThisColum.IsFirst()) {
 
                                 Database.Cell.DoSpecialFormats(ThisColum, Key, CellGetString(ThisColum), false);
@@ -570,14 +569,14 @@ namespace BlueDatabase {
             }
 
 
-            var cols = new List<string>();
+            List<string> cols = new List<string>();
             //var _Info = new List<string>();
-            var _InfoTXT = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
-            foreach (var thisc in Database.Column) {
+            string _InfoTXT = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
+            foreach (ColumnItem thisc in Database.Column) {
 
-                var n = thisc.Name + "_error";
+                string n = thisc.Name + "_error";
 
-                var va = script.Variablen.GetSystem(n);
+                Variable va = script.Variablen.GetSystem(n);
                 if (va != null) {
                     cols.Add(thisc.Name + "|" + va.ValueString);
                     _InfoTXT = _InfoTXT + "<b>" + thisc.ReadableText() + ":</b> " + va.ValueString + "<br><hr><br>";
@@ -595,7 +594,8 @@ namespace BlueDatabase {
             OnRowChecked(new RowCheckedEventArgs(this, cols));
 
 
-            return (true, _InfoTXT, script); ;
+            return (true, _InfoTXT, script);
+            ;
 
         }
 
@@ -642,11 +642,10 @@ namespace BlueDatabase {
                     if (Filter.FilterType != enFilterType.Instr_GroßKleinEgal && Filter.FilterType != enFilterType.Instr_UND_GroßKleinEgal) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit Instr möglich!"); }
                     if (Filter.SearchValue.Count < 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit mindestens einem Wert möglich"); }
 
-                    foreach (var t in Filter.SearchValue) {
+                    foreach (string t in Filter.SearchValue) {
                         if (!RowFilterMatch(t)) { return false; }
                     }
-                }
-                else {
+                } else {
                     if (!Database.Cell.MatchesTo(Filter.Column, this, Filter)) { return false; }
                 }
             }
@@ -659,7 +658,7 @@ namespace BlueDatabase {
 
             if (filter == null || filter.Count == 0) { return true; }
 
-            foreach (var ThisFilter in filter) {
+            foreach (FilterItem ThisFilter in filter) {
                 if (!MatchesTo(ThisFilter)) { return false; }
             }
 
@@ -676,10 +675,10 @@ namespace BlueDatabase {
 
             searchText = searchText.ToUpper();
 
-            foreach (var ThisColumnItem in Database.Column) {
+            foreach (ColumnItem ThisColumnItem in Database.Column) {
                 {
                     if (!ThisColumnItem.IgnoreAtRowFilter) {
-                        var _String = CellGetString(ThisColumnItem);
+                        string _String = CellGetString(ThisColumnItem);
                         _String = LanguageTool.ColumnReplace(_String, ThisColumnItem, enShortenStyle.Both);
                         if (!string.IsNullOrEmpty(_String) && _String.ToUpper().Contains(searchText)) { return true; }
                     }
@@ -692,7 +691,7 @@ namespace BlueDatabase {
 
         public bool IsNullOrEmpty() {
 
-            foreach (var ThisColumnItem in Database.Column) {
+            foreach (ColumnItem ThisColumnItem in Database.Column) {
                 if (ThisColumnItem != null) {
                     if (!CellIsNullOrEmpty(ThisColumnItem)) { return false; }
                 }
@@ -762,14 +761,14 @@ namespace BlueDatabase {
         /// <returns></returns>
         public string ReplaceVariables(string formel, bool fulltext, bool removeLineBreaks) {
 
-            var erg = formel;
+            string erg = formel;
 
             // Variablen ersetzen
-            foreach (var thisColumnItem in Database.Column) {
+            foreach (ColumnItem thisColumnItem in Database.Column) {
                 if (!erg.Contains("&")) { return erg; }
 
                 if (thisColumnItem != null) {
-                    var txt = CellGetString(thisColumnItem);
+                    string txt = CellGetString(thisColumnItem);
 
                     if (fulltext) { txt = CellItem.ValueReadable(thisColumnItem, txt, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text, removeLineBreaks); }
 
@@ -783,19 +782,19 @@ namespace BlueDatabase {
 
 
                     while (erg.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + "(")) {
-                        var x = erg.ToUpper().IndexOf("&" + thisColumnItem.Name.ToUpper() + "(");
+                        int x = erg.ToUpper().IndexOf("&" + thisColumnItem.Name.ToUpper() + "(");
 
-                        var x2 = erg.IndexOf(")", x);
+                        int x2 = erg.IndexOf(")", x);
                         if (x2 < x) { return erg; }
 
-                        var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
+                        string ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
                         ww = ww.Replace(" ", string.Empty).ToUpper();
-                        var vals = ww.SplitBy(",");
+                        string[] vals = ww.SplitBy(",");
                         if (vals.Length != 2) { return formel; }
                         if (vals[0] != "L") { return formel; }
-                        if (!int.TryParse(vals[1], out var Stellen)) { return formel; }
+                        if (!int.TryParse(vals[1], out int Stellen)) { return formel; }
 
-                        var newW = txt.Substring(0, Math.Min(Stellen, txt.Length));
+                        string newW = txt.Substring(0, Math.Min(Stellen, txt.Length));
                         erg = erg.Replace(erg.Substring(x, x2 - x + 1), newW);
                     }
                 }
@@ -814,10 +813,10 @@ namespace BlueDatabase {
         /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
         /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
         public string CompareKey(List<ColumnItem> columns) {
-            var r = new StringBuilder();
+            StringBuilder r = new StringBuilder();
 
             if (columns != null) {
-                foreach (var t in columns) {
+                foreach (ColumnItem t in columns) {
                     if (t != null) {
                         r.Append(Database.Cell.CompareKey(t, this) + Constants.FirstSortChar);
                     }
@@ -831,12 +830,11 @@ namespace BlueDatabase {
         public string CaptionReadable() {
 
 
-            var c = CellGetString(Database.Column.SysChapter);
+            string c = CellGetString(Database.Column.SysChapter);
 
             if (string.IsNullOrEmpty(c)) {
                 return "- ohne " + Database.Column.SysChapter.Caption + " -";
-            }
-            else {
+            } else {
                 return c.Replace("\r", ", ");
             }
 

@@ -234,7 +234,7 @@ namespace BlueDatabase {
 
 
         public override string ToString() {
-            var Result = "{Type=" + (int)(_ViewType);
+            string Result = "{Type=" + (int)(_ViewType);
             if (Column != null) { Result = Result + ", " + Column.ParsableColumnKey(); }
             if (_Spalte_X1 > 0) { Result = Result + ", X=" + _Spalte_X1; }
             if (_Spalte_Width > 1) { Result = Result + ", Width=" + _Spalte_Width; }
@@ -247,7 +247,7 @@ namespace BlueDatabase {
         public void Parse(string ToParse) {
             IsParsing = true;
             Initialize();
-            foreach (var pair in ToParse.GetAllTags()) {
+            foreach (System.Collections.Generic.KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "column":
                     case "columnname":// Columname wichtg, wegen CopyLayout

@@ -106,18 +106,18 @@ namespace BlueControls {
 
         public PointM NearestCornerOF(PointM P) {
 
-            var LO = PointOf(enAlignment.Top_Left);
-            var rO = PointOf(enAlignment.Top_Right);
-            var ru = PointOf(enAlignment.Bottom_Right);
-            var lu = PointOf(enAlignment.Bottom_Left);
+            PointM LO = PointOf(enAlignment.Top_Left);
+            PointM rO = PointOf(enAlignment.Top_Right);
+            PointM ru = PointOf(enAlignment.Bottom_Right);
+            PointM lu = PointOf(enAlignment.Bottom_Left);
 
 
-            var llo = GeometryDF.Länge(P, LO);
-            var lro = GeometryDF.Länge(P, rO);
-            var llu = GeometryDF.Länge(P, lu);
-            var lru = GeometryDF.Länge(P, ru);
+            decimal llo = GeometryDF.Länge(P, LO);
+            decimal lro = GeometryDF.Länge(P, rO);
+            decimal llu = GeometryDF.Länge(P, lu);
+            decimal lru = GeometryDF.Länge(P, ru);
 
-            var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
+            decimal Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
 
             if (Erg == llo) { return LO; }
             if (Erg == lro) { return rO; }

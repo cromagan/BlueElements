@@ -23,30 +23,25 @@ using BlueControls.Enums;
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
-namespace BlueControls.Forms
-{
-    public partial class InputBoxListBoxStyle : Forms.DialogWithOkAndCancel
-    {
+namespace BlueControls.Forms {
+    public partial class InputBoxListBoxStyle : Forms.DialogWithOkAndCancel {
         private List<string> GiveBack = null;
 
         #region Konstruktor
 
 
-        private InputBoxListBoxStyle() : base()
-        {
+        private InputBoxListBoxStyle() : base() {
             InitializeComponent();
         }
 
-        private InputBoxListBoxStyle(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl) : this()
-        {
-            if (ItemsOriginal.Appearance != enBlueListBoxAppearance.Listbox)
-            {
+        private InputBoxListBoxStyle(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl) : this() {
+            if (ItemsOriginal.Appearance != enBlueListBoxAppearance.Listbox) {
                 Develop.DebugPrint("Design nicht Listbox");
             }
 
 
 
-            var itemsClone = (ItemCollectionList)ItemsOriginal.Clone();
+            ItemCollectionList itemsClone = (ItemCollectionList)ItemsOriginal.Clone();
             txbText.Item.CheckBehavior = itemsClone.CheckBehavior;
             txbText.Item.AddRange(itemsClone);
 
@@ -63,23 +58,20 @@ namespace BlueControls.Forms
 
         #endregion
 
-        public static string Show(string TXT, List<string> Items)
-        {
+        public static string Show(string TXT, List<string> Items) {
 
-            if (Items == null || Items.Count == 0)
-            {
+            if (Items == null || Items.Count == 0) {
                 return InputBox.Show(TXT, "", enDataFormat.Text);
             }
 
 
-            var x = new ItemCollectionList(enBlueListBoxAppearance.Listbox)
-            {
+            ItemCollectionList x = new ItemCollectionList(enBlueListBoxAppearance.Listbox) {
                 CheckBehavior = enCheckBehavior.AlwaysSingleSelection
             };
             x.AddRange(Items);
             x.Sort();
 
-            var erg = Show(TXT, x, enAddType.None, true);
+            List<string> erg = Show(TXT, x, enAddType.None, true);
 
 
             if (erg is null || erg.Count != 1) { return string.Empty; }
@@ -87,9 +79,8 @@ namespace BlueControls.Forms
         }
 
 
-        public static List<string> Show(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl)
-        {
-            var MB = new InputBoxListBoxStyle(TXT, ItemsOriginal, AddNewAllowed, CancelErl);
+        public static List<string> Show(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl) {
+            InputBoxListBoxStyle MB = new InputBoxListBoxStyle(TXT, ItemsOriginal, AddNewAllowed, CancelErl);
             MB.ShowDialog();
 
             return MB.GiveBack;
@@ -99,19 +90,14 @@ namespace BlueControls.Forms
 
 
 
-        private void InputBox_Shown(object sender, System.EventArgs e)
-        {
+        private void InputBox_Shown(object sender, System.EventArgs e) {
             txbText.Focus();
         }
 
-        protected override void SetValue(bool canceled)
-        {
-            if (canceled)
-            {
+        protected override void SetValue(bool canceled) {
+            if (canceled) {
                 GiveBack = null;
-            }
-            else
-            {
+            } else {
                 GiveBack = txbText.Item.Checked().ToListOfString();
             }
         }

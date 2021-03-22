@@ -26,10 +26,10 @@ namespace BlueScript {
 
         //public Method_var(Script parent) : base(parent) { }
 
-        public override string Syntax { get => "Break;"; }
+        public override string Syntax { get => "End;"; }
 
-        public override string Description { get => "Bricht das Skript ohne Fehler ab."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "break" }; }
+        public override string Description { get => "Beendet das Skript ohne Fehler."; }
+        public override List<string> Comand(Script s) { return new List<string>() { "end" }; }
         public override string StartSequence { get => ""; }
         public override string EndSequence { get => ";"; }
         public override bool GetCodeBlockAfter { get => false; }
@@ -41,7 +41,7 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
-            s.Break = true;
+            s.EndSkript = true;
             return new strDoItFeedback();
 
         }

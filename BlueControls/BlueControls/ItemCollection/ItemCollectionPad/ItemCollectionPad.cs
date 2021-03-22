@@ -31,10 +31,8 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.ItemCollection
-{
-    public class ItemCollectionPad : ListExt<BasicPadItem>
-    {
+namespace BlueControls.ItemCollection {
+    public class ItemCollectionPad : ListExt<BasicPadItem> {
         #region  Variablen-Deklarationen 
 
         public static readonly int DPI = 300;
@@ -85,12 +83,10 @@ namespace BlueControls.ItemCollection
 
         public Color BackColor { get; set; } = Color.White;
 
-        public RowItem SheetStyle
-        {
+        public RowItem SheetStyle {
             get { return _SheetStyle; }
 
-            set
-            {
+            set {
                 if (_SheetStyle == value) { return; }
 
                 //        if (!_isParsing && value == SheetStyle) { return; }
@@ -111,28 +107,22 @@ namespace BlueControls.ItemCollection
 
 
 
-        public SizeF SheetSizeInMM
-        {
-            get
-            {
+        public SizeF SheetSizeInMM {
+            get {
                 return _SheetSizeInMM;
             }
-            set
-            {
+            set {
                 if (value == _SheetSizeInMM) { return; }
                 _SheetSizeInMM = new SizeF(value.Width, value.Height);
                 GenPoints();
             }
         }
 
-        public System.Windows.Forms.Padding RandinMM
-        {
-            get
-            {
+        public System.Windows.Forms.Padding RandinMM {
+            get {
                 return _RandinMM;
             }
-            set
-            {
+            set {
                 _RandinMM = new System.Windows.Forms.Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
                 GenPoints();
             }
@@ -142,8 +132,7 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
-        public ItemCollectionPad() : base()
-        {
+        public ItemCollectionPad() : base() {
 
             if (Skin.StyleDB == null) { Skin.InitStyles(); }
 
@@ -166,8 +155,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public ItemCollectionPad(string layoutID, Database database, int rowkey) : this(database.Layouts[database.LayoutIDToIndex(layoutID)], string.Empty)
-        {
+        public ItemCollectionPad(string layoutID, Database database, int rowkey) : this(database.Layouts[database.LayoutIDToIndex(layoutID)], string.Empty) {
 
 
             // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
@@ -176,9 +164,8 @@ namespace BlueControls.ItemCollection
 
 
 
-            var Count = 0;
-            do
-            {
+            int Count = 0;
+            do {
                 Count++;
                 PerformAllRelations();
                 if (NotPerforming(false) == 0) { break; }
@@ -196,8 +183,7 @@ namespace BlueControls.ItemCollection
         /// <param name="value"></param>
         /// <param name="needPrinterData"></param>
         /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
-        public ItemCollectionPad(string ToParse, string useThisID) : this()
-        {
+        public ItemCollectionPad(string ToParse, string useThisID) : this() {
 
             if (string.IsNullOrEmpty(ToParse) || ToParse.Length < 3) { return; }
             if (ToParse.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
@@ -205,11 +191,9 @@ namespace BlueControls.ItemCollection
 
             ID = useThisID;
 
-            foreach (var pair in ToParse.GetAllTags())
-            {
+            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
 
-                switch (pair.Key.ToLower())
-                {
+                switch (pair.Key.ToLower()) {
                     case "sheetsize":
                         _SheetSizeInMM = Extensions.SizeFParse(pair.Value);
                         GenPoints();
@@ -269,8 +253,7 @@ namespace BlueControls.ItemCollection
                         break;
 
                     case "dpi":
-                        if (int.Parse(pair.Value) != DPI)
-                        {
+                        if (int.Parse(pair.Value) != DPI) {
                             Develop.DebugPrint("DPI Unterschied: " + DPI + " <> " + pair.Value);
                         }
 
@@ -305,13 +288,10 @@ namespace BlueControls.ItemCollection
             //if (needPrinterData) { RepairPrinterData(); }
         }
 
-        private void ParseItems(string ToParse)
-        {
-            foreach (var pair in ToParse.GetAllTags())
-            {
+        private void ParseItems(string ToParse) {
+            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
 
-                switch (pair.Key.ToLower())
-                {
+                switch (pair.Key.ToLower()) {
                     //case "sheetsize":
                     //    _SheetSizeInMM = Extensions.SizeFParse(pair.Value);
                     //    GenPoints();
@@ -366,8 +346,7 @@ namespace BlueControls.ItemCollection
                         break;
 
                     case "dpi": // TODO: LÖschen 26.02.2020
-                        if (int.Parse(pair.Value) != DPI)
-                        {
+                        if (int.Parse(pair.Value) != DPI) {
                             Develop.DebugPrint("DPI Unterschied: " + DPI + " <> " + pair.Value);
                         }
 
@@ -404,11 +383,10 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        internal void InDenVordergrund(BasicPadItem ThisItem)
-        {
+        internal void InDenVordergrund(BasicPadItem ThisItem) {
             if (IndexOf(ThisItem) == Count - 1) { return; }
 
-            var g1 = ThisItem.Gruppenzugehörigkeit;
+            string g1 = ThisItem.Gruppenzugehörigkeit;
             ThisItem.Gruppenzugehörigkeit = string.Empty;
 
             Remove(ThisItem);
@@ -418,11 +396,10 @@ namespace BlueControls.ItemCollection
             OnDoInvalidate();
         }
 
-        internal void InDenHintergrund(BasicPadItem ThisItem)
-        {
+        internal void InDenHintergrund(BasicPadItem ThisItem) {
             if (IndexOf(ThisItem) == 0) { return; }
 
-            var g1 = ThisItem.Gruppenzugehörigkeit;
+            string g1 = ThisItem.Gruppenzugehörigkeit;
             ThisItem.Gruppenzugehörigkeit = string.Empty;
 
             Remove(ThisItem);
@@ -442,12 +419,11 @@ namespace BlueControls.ItemCollection
         //}
 
 
-        public void Swap(BasicPadItem Nr1, BasicPadItem Nr2)
-        {
-            var g1 = Nr1.Gruppenzugehörigkeit;
+        public void Swap(BasicPadItem Nr1, BasicPadItem Nr2) {
+            string g1 = Nr1.Gruppenzugehörigkeit;
             Nr1.Gruppenzugehörigkeit = string.Empty;
 
-            var g2 = Nr2.Gruppenzugehörigkeit;
+            string g2 = Nr2.Gruppenzugehörigkeit;
             Nr2.Gruppenzugehörigkeit = string.Empty;
 
             Swap(IndexOf(Nr1), IndexOf(Nr2));
@@ -460,21 +436,15 @@ namespace BlueControls.ItemCollection
 
         #region  Standard-Such-Properties 
 
-        public BasicPadItem this[string Internal]
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(Internal))
-                {
+        public BasicPadItem this[string Internal] {
+            get {
+                if (string.IsNullOrEmpty(Internal)) {
                     return null;
                 }
 
-                foreach (var ThisItem in this)
-                {
-                    if (ThisItem != null)
-                    {
-                        if (Internal.ToUpper() == ThisItem.Internal.ToUpper())
-                        {
+                foreach (BasicPadItem ThisItem in this) {
+                    if (ThisItem != null) {
+                        if (Internal.ToUpper() == ThisItem.Internal.ToUpper()) {
                             return ThisItem;
                         }
                     }
@@ -484,21 +454,16 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public List<BasicPadItem> this[int x, int Y]
-        {
+        public List<BasicPadItem> this[int x, int Y] {
             get { return this[new Point(x, Y)]; }
         }
 
-        public List<BasicPadItem> this[Point p]
-        {
-            get
-            {
-                var l = new List<BasicPadItem>();
+        public List<BasicPadItem> this[Point p] {
+            get {
+                List<BasicPadItem> l = new List<BasicPadItem>();
 
-                foreach (var ThisItem in this)
-                {
-                    if (ThisItem != null && ThisItem.Contains(p, 1))
-                    {
+                foreach (BasicPadItem ThisItem in this) {
+                    if (ThisItem != null && ThisItem.Contains(p, 1)) {
                         l.Add(ThisItem);
                     }
                 }
@@ -511,14 +476,11 @@ namespace BlueControls.ItemCollection
         #region  Properties 
 
         [DefaultValue(1.0)]
-        public decimal SheetStyleScale
-        {
-            get
-            {
+        public decimal SheetStyleScale {
+            get {
                 return _SheetStyleScale;
             }
-            set
-            {
+            set {
 
                 if (value < 0.1m) { value = 0.1m; }
 
@@ -538,14 +500,11 @@ namespace BlueControls.ItemCollection
 
 
 
-        internal bool RenameColumn(string oldName, ColumnItem newName)
-        {
-            var did = false;
+        internal bool RenameColumn(string oldName, ColumnItem newName) {
+            bool did = false;
 
-            foreach (var thisItem in this)
-            {
-                if (thisItem is ICanHaveColumnVariables variables)
-                {
+            foreach (BasicPadItem thisItem in this) {
+                if (thisItem is ICanHaveColumnVariables variables) {
                     if (variables.RenameColumn(oldName, newName)) { did = true; }
                 }
             }
@@ -565,18 +524,15 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        public void OnDoInvalidate()
-        {
+        public void OnDoInvalidate() {
             DoInvalidate?.Invoke(this, System.EventArgs.Empty);
         }
 
 
 
 
-        protected override void OnItemAdded(BasicPadItem item)
-        {
-            if (string.IsNullOrEmpty(item.Internal))
-            {
+        protected override void OnItemAdded(BasicPadItem item) {
+            if (string.IsNullOrEmpty(item.Internal)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
             }
 
@@ -594,8 +550,7 @@ namespace BlueControls.ItemCollection
 
             //RecomputePointAndRelations();
 
-            if (item.Parent != this)
-            {
+            if (item.Parent != this) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Parent ungleich!");
 
             }
@@ -603,10 +558,9 @@ namespace BlueControls.ItemCollection
 
         }
 
-        private void Item_PointOrRelationsChanged(object sender, System.EventArgs e)
-        {
+        private void Item_PointOrRelationsChanged(object sender, System.EventArgs e) {
 
-            var ni = (BasicPadItem)sender;
+            BasicPadItem ni = (BasicPadItem)sender;
 
             InvalidateOrder();
 
@@ -617,36 +571,26 @@ namespace BlueControls.ItemCollection
             RemoveInvalidRelations();
         }
 
-        public void RemoveInvalidPoints()
-        {
+        public void RemoveInvalidPoints() {
 
             /// Zuerst die Punkte
-            foreach (var ThisPoint in AllPoints)
-            {
+            foreach (PointM ThisPoint in AllPoints) {
 
-                if (ThisPoint != null)
-                {
+                if (ThisPoint != null) {
 
-                    if (ThisPoint.Parent is BasicPadItem Pad)
-                    {
-                        if (!Contains(Pad))
-                        {
+                    if (ThisPoint.Parent is BasicPadItem Pad) {
+                        if (!Contains(Pad)) {
                             AllPoints.Remove(ThisPoint);
                             RemoveInvalidPoints(); //Rekursiv
                             return;
                         }
-                    }
-                    else if (ThisPoint.Parent is ItemCollectionPad ICP)
-                    {
-                        if (ICP != this)
-                        {
+                    } else if (ThisPoint.Parent is ItemCollectionPad ICP) {
+                        if (ICP != this) {
                             AllPoints.Remove(ThisPoint);
                             RemoveInvalidPoints(); //Rekursiv
                             return;
                         }
-                    }
-                    else
-                    {
+                    } else {
                         AllPoints.Remove(ThisPoint);
                         RemoveInvalidPoints(); //Rekursiv
                         return;
@@ -658,19 +602,16 @@ namespace BlueControls.ItemCollection
 
         }
 
-        public bool RemoveInvalidRelations()
-        {
-            var z = -1;
-            var SomethingChanged = false;
+        public bool RemoveInvalidRelations() {
+            int z = -1;
+            bool SomethingChanged = false;
 
 
-            do
-            {
+            do {
                 z++;
                 if (z > AllRelations.Count - 1) { break; }
 
-                if (!AllRelations[z].IsOk(false))
-                {
+                if (!AllRelations[z].IsOk(false)) {
                     AllRelations.Remove(AllRelations[z]);
                     z = -1;
                     SomethingChanged = true;
@@ -685,13 +626,11 @@ namespace BlueControls.ItemCollection
         /// </summary>
         /// <param name="Strongmode"></param>
         /// <returns></returns>
-        public int NotPerforming(bool Strongmode)
-        {
+        public int NotPerforming(bool Strongmode) {
 
-            var f = 0;
+            int f = 0;
 
-            foreach (var ThisRelation in AllRelations)
-            {
+            foreach (clsPointRelation ThisRelation in AllRelations) {
                 if (!ThisRelation.Performs(Strongmode)) { f++; }
             }
 
@@ -699,30 +638,25 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private void Item_Changed(object sender, System.EventArgs e)
-        {
+        private void Item_Changed(object sender, System.EventArgs e) {
             IsSaved = false;
             OnDoInvalidate();
 
         }
 
-        public void DesignOrStyleChanged()
-        {
-            foreach (var thisItem in this)
-            {
+        public void DesignOrStyleChanged() {
+            foreach (BasicPadItem thisItem in this) {
                 thisItem?.DesignOrStyleChanged();
             }
             OnDoInvalidate();
         }
 
 
-        public void Remove(string internalname)
-        {
+        public void Remove(string internalname) {
             Remove(this[internalname]);
         }
 
-        public new void Remove(BasicPadItem item)
-        {
+        public new void Remove(BasicPadItem item) {
             if (item == null || !Contains(item)) { return; }
 
             base.Remove(item);
@@ -730,10 +664,8 @@ namespace BlueControls.ItemCollection
             if (string.IsNullOrEmpty(item.Gruppenzugehörigkeit)) { return; }
 
 
-            foreach (var ThisToo in this)
-            {
-                if (item.Gruppenzugehörigkeit.ToLower() == ThisToo.Gruppenzugehörigkeit?.ToLower())
-                {
+            foreach (BasicPadItem ThisToo in this) {
+                if (item.Gruppenzugehörigkeit.ToLower() == ThisToo.Gruppenzugehörigkeit?.ToLower()) {
                     Remove(ThisToo);
                     return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
                 }
@@ -741,24 +673,20 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public RectangleM MaximumBounds(List<BasicPadItem> ZoomItems)
-        {
-            var x1 = decimal.MaxValue;
-            var y1 = decimal.MaxValue;
-            var x2 = decimal.MinValue;
-            var y2 = decimal.MinValue;
+        public RectangleM MaximumBounds(List<BasicPadItem> ZoomItems) {
+            decimal x1 = decimal.MaxValue;
+            decimal y1 = decimal.MaxValue;
+            decimal x2 = decimal.MinValue;
+            decimal y2 = decimal.MinValue;
 
-            var Done = false;
+            bool Done = false;
 
 
-            foreach (var ThisItem in this)
-            {
-                if (ThisItem != null)
-                {
-                    if (ZoomItems == null || ZoomItems.Contains(ThisItem))
-                    {
+            foreach (BasicPadItem ThisItem in this) {
+                if (ThisItem != null) {
+                    if (ZoomItems == null || ZoomItems.Contains(ThisItem)) {
 
-                        var UA = ThisItem.ZoomToArea();
+                        RectangleM UA = ThisItem.ZoomToArea();
 
                         x1 = Math.Min(x1, UA.Left);
                         y1 = Math.Min(y1, UA.Top);
@@ -779,13 +707,10 @@ namespace BlueControls.ItemCollection
 
 
 
-        private void GenPoints()
-        {
+        private void GenPoints() {
 
-            if (Math.Abs(_SheetSizeInMM.Width) < 0.001 || Math.Abs(_SheetSizeInMM.Height) < 0.001)
-            {
-                if (P_rLO != null)
-                {
+            if (Math.Abs(_SheetSizeInMM.Width) < 0.001 || Math.Abs(_SheetSizeInMM.Height) < 0.001) {
+                if (P_rLO != null) {
                     P_rLO.Parent = null;
                     AllPoints.Remove(P_rLO);
                     P_rLO = null;
@@ -807,8 +732,7 @@ namespace BlueControls.ItemCollection
             }
 
 
-            if (P_rLO == null)
-            {
+            if (P_rLO == null) {
 
                 P_rLO = new PointM(this, "Druckbereich LO", 0, 0, true);
                 AllPoints.AddIfNotExists(P_rLO);
@@ -823,12 +747,12 @@ namespace BlueControls.ItemCollection
                 AllPoints.AddIfNotExists(P_rLU);
             }
 
-            var SSW = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI), 1);
-            var SSH = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Height, DPI), 1);
-            var rr = Math.Round(modConverter.mmToPixel(_RandinMM.Right, DPI), 1);
-            var rl = Math.Round(modConverter.mmToPixel(_RandinMM.Left, DPI), 1);
-            var ro = Math.Round(modConverter.mmToPixel(_RandinMM.Top, DPI), 1);
-            var ru = Math.Round(modConverter.mmToPixel(_RandinMM.Bottom, DPI), 1);
+            decimal SSW = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI), 1);
+            decimal SSH = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Height, DPI), 1);
+            decimal rr = Math.Round(modConverter.mmToPixel(_RandinMM.Right, DPI), 1);
+            decimal rl = Math.Round(modConverter.mmToPixel(_RandinMM.Left, DPI), 1);
+            decimal ro = Math.Round(modConverter.mmToPixel(_RandinMM.Top, DPI), 1);
+            decimal ru = Math.Round(modConverter.mmToPixel(_RandinMM.Bottom, DPI), 1);
 
             P_rLO.SetTo(rl, ro);
             P_rRO.SetTo(SSW - rr, ro);
@@ -838,8 +762,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void OnItemRemoving(BasicPadItem item)
-        {
+        protected override void OnItemRemoving(BasicPadItem item) {
             item.Changed -= Item_Changed;
             item.PointOrRelationsChanged -= Item_PointOrRelationsChanged;
 
@@ -850,48 +773,41 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void OnItemRemoved()
-        {
+        protected override void OnItemRemoved() {
             base.OnItemRemoved();
             RemoveInvalidPoints();
             RemoveInvalidRelations();
             InvalidateOrder();
         }
 
-        public override void OnChanged()
-        {
+        public override void OnChanged() {
             base.OnChanged();
             IsSaved = false;
             OnDoInvalidate();
         }
 
 
-        public List<PointM> ConnectsWith(PointM Point, enXY toCheck, bool IgnoreInternals)
-        {
+        public List<PointM> ConnectsWith(PointM Point, enXY toCheck, bool IgnoreInternals) {
 
-            var Points = new List<PointM>
+            List<PointM> Points = new List<PointM>
             {
                 Point
             };
 
-            var Ist = -1;
+            int Ist = -1;
 
             // Nur, wenn eine Beziehung gut ist, kann man mit sicherheit sagen, daß das zusammenhängt. Deswegen auch ein Performs test
 
-            do
-            {
+            do {
                 Ist++;
                 if (Ist >= Points.Count) { break; }
 
 
-                foreach (var ThisRelation in AllRelations)
-                {
-                    if (ThisRelation != null && ThisRelation.Points.Contains(Points[Ist]) && ThisRelation.Performs(false) && ThisRelation.Connects().HasFlag(toCheck))
-                    {
+                foreach (clsPointRelation ThisRelation in AllRelations) {
+                    if (ThisRelation != null && ThisRelation.Points.Contains(Points[Ist]) && ThisRelation.Performs(false) && ThisRelation.Connects().HasFlag(toCheck)) {
 
 
-                        if (!IgnoreInternals || !ThisRelation.IsInternal())
-                        {
+                        if (!IgnoreInternals || !ThisRelation.IsInternal()) {
                             Points.AddIfNotExists(ThisRelation.Points);
                         }
                     }
@@ -909,12 +825,11 @@ namespace BlueControls.ItemCollection
 
 
 
-        public new string ToString()
-        {
+        public new string ToString() {
 
             PerformAllRelations();
 
-            var t = "{";
+            string t = "{";
 
 
             if (!string.IsNullOrEmpty(ID)) { t = t + "ID=" + ID.ToNonCritical() + ", "; }
@@ -930,8 +845,7 @@ namespace BlueControls.ItemCollection
 
             if (Math.Abs(SheetStyleScale - 1) > 0.001m) { t = t + "FontScale=" + SheetStyleScale + ", "; }
 
-            if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0)
-            {
+            if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
                 t = t + "SheetSize=" + SheetSizeInMM + ", ";
                 t = t + "PrintArea=" + RandinMM + ", ";
             }
@@ -941,10 +855,8 @@ namespace BlueControls.ItemCollection
             t += "Items={";
 
 
-            foreach (var Thisitem in this)
-            {
-                if (Thisitem != null)
-                {
+            foreach (BasicPadItem Thisitem in this) {
+                if (Thisitem != null) {
                     t = t + "Item=" + Thisitem.ToString() + ", ";
                 }
             }
@@ -962,12 +874,9 @@ namespace BlueControls.ItemCollection
 
             //Dim One As Boolean
 
-            foreach (var ThisRelation in AllRelations)
-            {
-                if (ThisRelation != null)
-                {
-                    if (!ThisRelation.IsInternal() && ThisRelation.IsOk(false))
-                    {
+            foreach (clsPointRelation ThisRelation in AllRelations) {
+                if (ThisRelation != null) {
+                    if (!ThisRelation.IsInternal() && ThisRelation.IsOk(false)) {
                         t = t + "Relation=" + ThisRelation + ", ";
                     }
                 }
@@ -980,44 +889,33 @@ namespace BlueControls.ItemCollection
 
 
 
-        public Bitmap ToBitmap(decimal Scale)
-        {
-            var r = MaxBounds(null);
+        public Bitmap ToBitmap(decimal Scale) {
+            RectangleM r = MaxBounds(null);
             if (r.Width == 0) { return null; }
 
             modAllgemein.CollectGarbage();
 
-            do
-            {
-                if ((int)(r.Width * Scale) > 15000)
-                {
+            do {
+                if ((int)(r.Width * Scale) > 15000) {
                     Scale *= 0.8m;
-                }
-                else if ((int)(r.Height * Scale) > 15000)
-                {
+                } else if ((int)(r.Height * Scale) > 15000) {
                     Scale *= 0.8m;
-                }
-                else if ((int)(r.Height * Scale) * (int)(r.Height * Scale) > 90000000)
-                {
+                } else if ((int)(r.Height * Scale) * (int)(r.Height * Scale) > 90000000) {
                     Scale *= 0.8m;
-                }
-                else
-                {
+                } else {
                     break;
                 }
             } while (true);
 
 
 
-            var I = new Bitmap((int)(r.Width * Scale), (int)(r.Height * Scale));
+            Bitmap I = new Bitmap((int)(r.Width * Scale), (int)(r.Height * Scale));
 
 
-            using (var gr = Graphics.FromImage(I))
-            {
+            using (Graphics gr = Graphics.FromImage(I)) {
                 gr.Clear(Color.White);
 
-                if (!Draw(gr, Scale, r.Left * Scale, r.Top * Scale, Size.Empty, true, null))
-                {
+                if (!Draw(gr, Scale, r.Left * Scale, r.Top * Scale, Size.Empty, true, null)) {
                     return ToBitmap(Scale);
                 }
 
@@ -1025,31 +923,24 @@ namespace BlueControls.ItemCollection
             return I;
         }
 
-        public bool Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, Size sizeOfParentControl, bool forPrinting, List<BasicPadItem> visibleItems)
-        {
+        public bool Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, Size sizeOfParentControl, bool forPrinting, List<BasicPadItem> visibleItems) {
 
 
-            try
-            {
+            try {
                 if (SheetStyle == null || SheetStyleScale < 0.1m) { return true; }
 
 
-                foreach (var thisItem in this)
-                {
-                    if (thisItem != null)
-                    {
+                foreach (BasicPadItem thisItem in this) {
+                    if (thisItem != null) {
                         gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
 
-                        if (visibleItems == null || visibleItems.Contains(thisItem))
-                        {
+                        if (visibleItems == null || visibleItems.Contains(thisItem)) {
                             thisItem.Draw(gr, zoom, shiftX, shiftY, 0, sizeOfParentControl, forPrinting);
                         }
                     }
                 }
                 return true;
-            }
-            catch
-            {
+            } catch {
                 modAllgemein.CollectGarbage();
                 return false;
             }
@@ -1058,33 +949,27 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected RectangleM MaxBounds()
-        {
+        protected RectangleM MaxBounds() {
             return MaxBounds(null);
         }
 
-        internal RectangleM MaxBounds(List<BasicPadItem> ZoomItems)
-        {
+        internal RectangleM MaxBounds(List<BasicPadItem> ZoomItems) {
 
             RectangleM r;
-            if (Count == 0)
-            {
+            if (Count == 0) {
                 r = new RectangleM(0, 0, 0, 0);
-            }
-            else
-            {
+            } else {
                 r = MaximumBounds(ZoomItems);
             }
 
-            if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0)
-            {
+            if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
 
-                var X1 = Math.Min(r.Left, 0);
-                var y1 = Math.Min(r.Top, 0);
+                decimal X1 = Math.Min(r.Left, 0);
+                decimal y1 = Math.Min(r.Top, 0);
 
 
-                var x2 = Math.Max(r.Right, modConverter.mmToPixel((decimal)SheetSizeInMM.Width, ItemCollectionPad.DPI));
-                var y2 = Math.Max(r.Bottom, modConverter.mmToPixel((decimal)SheetSizeInMM.Height, ItemCollectionPad.DPI));
+                decimal x2 = Math.Max(r.Right, modConverter.mmToPixel((decimal)SheetSizeInMM.Width, ItemCollectionPad.DPI));
+                decimal y2 = Math.Max(r.Bottom, modConverter.mmToPixel((decimal)SheetSizeInMM.Height, ItemCollectionPad.DPI));
 
                 return new RectangleM(X1, y1, x2 - X1, y2 - y1);
             }
@@ -1095,15 +980,12 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public bool ParseVariable(string VariableName, enValueType ValueType, string Value)
-        {
+        public bool ParseVariable(string VariableName, enValueType ValueType, string Value) {
 
-            var did = false;
+            bool did = false;
 
-            foreach (var thisItem in this)
-            {
-                if (thisItem is ICanHaveColumnVariables variables)
-                {
+            foreach (BasicPadItem thisItem in this) {
+                if (thisItem is ICanHaveColumnVariables variables) {
                     if (variables.ReplaceVariable(VariableName, ValueType, Value)) { did = true; }
                 }
             }
@@ -1112,17 +994,13 @@ namespace BlueControls.ItemCollection
             return did;
         }
 
-        public void ParseVariableAndSpecialCodes(RowItem row)
-        {
+        public void ParseVariableAndSpecialCodes(RowItem row) {
 
 
-            if (row != null)
-            {
+            if (row != null) {
 
-                foreach (var thiscolumnitem in row.Database.Column)
-                {
-                    if (thiscolumnitem != null)
-                    {
+                foreach (ColumnItem thiscolumnitem in row.Database.Column) {
+                    if (thiscolumnitem != null) {
                         ParseVariable(thiscolumnitem.Name, thiscolumnitem, row);
                     }
                 }
@@ -1130,12 +1008,10 @@ namespace BlueControls.ItemCollection
             ParseSpecialCodes();
         }
 
-        private void ParseVariable(string VariableName, ColumnItem Column, RowItem Row)
-        {
+        private void ParseVariable(string VariableName, ColumnItem Column, RowItem Row) {
 
 
-            switch (Column.Format)
-            {
+            switch (Column.Format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Gleitkommazahl:
@@ -1148,19 +1024,14 @@ namespace BlueControls.ItemCollection
 
                 case enDataFormat.Link_To_Filesystem:
 
-                    if (!Column.MultiLine)
-                    {
-                        var f = Column.BestFile(Row.CellGetString(Column), false);
+                    if (!Column.MultiLine) {
+                        string f = Column.BestFile(Row.CellGetString(Column), false);
 
-                        if (FileExists(f))
-                        {
-                            if (Column.MultiLine)
-                            {
+                        if (FileExists(f)) {
+                            if (Column.MultiLine) {
                                 ParseVariable(VariableName, enValueType.Text, f);
-                            }
-                            else
-                            {
-                                var x = modConverter.FileToString(f);
+                            } else {
+                                string x = modConverter.FileToString(f);
                                 ParseVariable(VariableName, enValueType.BinaryImage, x);
                             }
                         }
@@ -1182,14 +1053,11 @@ namespace BlueControls.ItemCollection
 
 
 
-        public bool ParseSpecialCodes()
-        {
-            var did = false;
+        public bool ParseSpecialCodes() {
+            bool did = false;
 
-            foreach (var thisItem in this)
-            {
-                if (thisItem is ICanHaveColumnVariables variables)
-                {
+            foreach (BasicPadItem thisItem in this) {
+                if (thisItem is ICanHaveColumnVariables variables) {
                     if (variables.DoSpecialCodes()) { did = true; }
                 }
             }
@@ -1199,14 +1067,11 @@ namespace BlueControls.ItemCollection
             return did;
         }
 
-        public bool ResetVariables()
-        {
-            var did = false;
+        public bool ResetVariables() {
+            bool did = false;
 
-            foreach (var thisItem in this)
-            {
-                if (thisItem is ICanHaveColumnVariables variables)
-                {
+            foreach (BasicPadItem thisItem in this) {
+                if (thisItem is ICanHaveColumnVariables variables) {
                     if (variables.ResetVariables()) { did = true; }
                 }
             }
@@ -1220,8 +1085,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        internal Rectangle DruckbereichRect()
-        {
+        internal Rectangle DruckbereichRect() {
             if (P_rLO == null) { return new Rectangle(0, 0, 0, 0); }
             return new Rectangle((int)P_rLO.X, (int)P_rLO.Y, (int)(P_rRU.X - P_rLO.X), (int)(P_rRU.Y - P_rLO.Y));
         }
@@ -1250,18 +1114,15 @@ namespace BlueControls.ItemCollection
         //}
 
 
-        public void PerformAllRelations()
-        {
+        public void PerformAllRelations() {
             ComputeOrders(null);
-            foreach (var ThisRelation in AllRelations)
-            {
+            foreach (clsPointRelation ThisRelation in AllRelations) {
                 ThisRelation.Perform(AllPoints);
             }
         }
 
 
-        public void ComputeOrders(List<PointM> selectedPoints)
-        {
+        public void ComputeOrders(List<PointM> selectedPoints) {
             if (_OrdersValid) { return; }
 
             if (ComputeOrders_isin) { return; }
@@ -1276,41 +1137,34 @@ namespace BlueControls.ItemCollection
             _OrdersValid = true;
             ComputeOrders_isin = false;
         }
-        public void Relations_Optimize()
-        {
+        public void Relations_Optimize() {
             if (NotPerforming(true) > 0) { return; }
 
 
-            var Cb = new List<PointM>();
-            var DobR = new List<clsPointRelation>();
+            List<PointM> Cb = new List<PointM>();
+            List<clsPointRelation> DobR = new List<clsPointRelation>();
 
 
-            foreach (var thisPoint in AllPoints)
-            {
-                var CX = ConnectsWith(thisPoint, enXY.X, true);
-                var CY = ConnectsWith(thisPoint, enXY.Y, true);
+            foreach (PointM thisPoint in AllPoints) {
+                List<PointM> CX = ConnectsWith(thisPoint, enXY.X, true);
+                List<PointM> CY = ConnectsWith(thisPoint, enXY.Y, true);
 
                 // Ermitteln, die auf X und Y miteinander verbunden sind
                 Cb.Clear();
-                foreach (var thisPoint2 in CX)
-                {
+                foreach (PointM thisPoint2 in CX) {
                     if (CY.Contains(thisPoint2)) { Cb.Add(thisPoint2); }
                 }
 
 
-                if (Cb.Count > 1)
-                {
+                if (Cb.Count > 1) {
 
                     DobR.Clear();
-                    foreach (var ThisRelation in AllRelations)
-                    {
+                    foreach (clsPointRelation ThisRelation in AllRelations) {
 
 
                         // Wenn Punkte nicht direct verbunden sind, aber trotzdem Fix zueinander, die Beziehung optimieren
-                        if (ThisRelation.RelationType == enRelationType.WaagerechtSenkrecht && !ThisRelation.IsInternal())
-                        {
-                            if (Cb.Contains(ThisRelation.Points[0]) && Cb.Contains(ThisRelation.Points[1]))
-                            {
+                        if (ThisRelation.RelationType == enRelationType.WaagerechtSenkrecht && !ThisRelation.IsInternal()) {
+                            if (Cb.Contains(ThisRelation.Points[0]) && Cb.Contains(ThisRelation.Points[1])) {
                                 ThisRelation.RelationType = enRelationType.PositionZueinander;
                                 ThisRelation.OverrideSavedRichtmaß(false, false);
                                 Relations_Optimize();
@@ -1320,8 +1174,7 @@ namespace BlueControls.ItemCollection
 
 
                         // Für nachher, die doppelten fixen Beziehungen merken
-                        if (ThisRelation.RelationType == enRelationType.PositionZueinander)
-                        {
+                        if (ThisRelation.RelationType == enRelationType.PositionZueinander) {
                             if (Cb.Contains(ThisRelation.Points[0]) && Cb.Contains(ThisRelation.Points[1])) { DobR.Add(ThisRelation); }
                         }
 
@@ -1330,27 +1183,20 @@ namespace BlueControls.ItemCollection
 
 
                     // Und nun beziehungen löschen, die auf gleiche Objecte zugreifen
-                    if (DobR.Count > 1)
-                    {
-                        foreach (var R1 in DobR)
-                        {
+                    if (DobR.Count > 1) {
+                        foreach (clsPointRelation R1 in DobR) {
                             // Mindestens eine muss external sein!!!
-                            if (!R1.IsInternal())
-                            {
-                                foreach (var R2 in DobR)
-                                {
-                                    if (!R1.SinngemäßIdenitisch(R2))
-                                    {
+                            if (!R1.IsInternal()) {
+                                foreach (clsPointRelation R2 in DobR) {
+                                    if (!R1.SinngemäßIdenitisch(R2)) {
 
-                                        if (R1.Points[0].Parent == R2.Points[0].Parent && R1.Points[1].Parent == R2.Points[1].Parent)
-                                        {
+                                        if (R1.Points[0].Parent == R2.Points[0].Parent && R1.Points[1].Parent == R2.Points[1].Parent) {
                                             AllRelations.Remove(R1);
                                             Relations_Optimize();
                                             return;
                                         }
 
-                                        if (R1.Points[0].Parent == R2.Points[1].Parent && R1.Points[1].Parent == R2.Points[0].Parent)
-                                        {
+                                        if (R1.Points[0].Parent == R2.Points[1].Parent && R1.Points[1].Parent == R2.Points[0].Parent) {
                                             AllRelations.Remove(R1);
                                             Relations_Optimize();
                                             return;
@@ -1366,26 +1212,19 @@ namespace BlueControls.ItemCollection
 
 
             // und nun direct nach doppelten suchen
-            foreach (var r1 in AllRelations)
-            {
-                if (!r1.IsInternal())
-                {
-                    foreach (var r2 in AllRelations)
-                    {
-                        if (!r1.SinngemäßIdenitisch(r2) && !r2.IsInternal())
-                        {
-                            if (r1.SinngemäßIdenitisch(r2))
-                            {
+            foreach (clsPointRelation r1 in AllRelations) {
+                if (!r1.IsInternal()) {
+                    foreach (clsPointRelation r2 in AllRelations) {
+                        if (!r1.SinngemäßIdenitisch(r2) && !r2.IsInternal()) {
+                            if (r1.SinngemäßIdenitisch(r2)) {
                                 AllRelations.Remove(r2);
                                 Relations_Optimize();
                                 return;
 
                             }
 
-                            if (r1.UsesSamePoints(r2))
-                            {
-                                switch (r1.RelationType)
-                                {
+                            if (r1.UsesSamePoints(r2)) {
+                                switch (r1.RelationType) {
                                     case enRelationType.PositionZueinander:
                                         // Beziehungen mit gleichen punkten, aber einer mächtigen PositionZueinander -> andere löschen
                                         AllRelations.Remove(r2);
@@ -1407,24 +1246,18 @@ namespace BlueControls.ItemCollection
 
         }
 
-        public void InvalidateOrder()
-        {
+        public void InvalidateOrder() {
             _OrdersValid = false;
         }
-        public PointM Getbetterpoint(double X, double Y, PointM notPoint, bool MustUsableForAutoRelation)
-        {
+        public PointM Getbetterpoint(double X, double Y, PointM notPoint, bool MustUsableForAutoRelation) {
 
-            foreach (var thispoint in AllPoints)
-            {
+            foreach (PointM thispoint in AllPoints) {
 
-                if (thispoint != null)
-                {
+                if (thispoint != null) {
 
-                    if (!MustUsableForAutoRelation || thispoint.CanUsedForAutoRelation)
-                    {
+                    if (!MustUsableForAutoRelation || thispoint.CanUsedForAutoRelation) {
 
-                        if (thispoint != notPoint)
-                        {
+                        if (thispoint != notPoint) {
                             if (Math.Abs((double)thispoint.X - X) < 0.01 && Math.Abs((double)thispoint.Y - Y) < 0.01) { return thispoint; }
                         }
 
@@ -1463,13 +1296,12 @@ namespace BlueControls.ItemCollection
         //}
 
 
-        private void ComputePointOrder(List<PointM> Sel_P)
-        {
-            var Modus = 0;
-            var done = false;
+        private void ComputePointOrder(List<PointM> Sel_P) {
+            int Modus = 0;
+            bool done = false;
 
             #region Punkte vorbereiten
-            var _Points = new List<PointM>();
+            List<PointM> _Points = new List<PointM>();
             _Points.AddRange(AllPoints);
 
             AllPoints.Clear();
@@ -1477,19 +1309,25 @@ namespace BlueControls.ItemCollection
 
             #region Beziehungen ermitteln, wie sie was verbinden
 
-            var RelationNone = new List<clsPointRelation>();
-            var RelationY = new List<clsPointRelation>();
-            var RelationX = new List<clsPointRelation>();
-            var RelationXY = new List<clsPointRelation>();
+            List<clsPointRelation> RelationNone = new List<clsPointRelation>();
+            List<clsPointRelation> RelationY = new List<clsPointRelation>();
+            List<clsPointRelation> RelationX = new List<clsPointRelation>();
+            List<clsPointRelation> RelationXY = new List<clsPointRelation>();
 
-            foreach (var thisRelation in AllRelations)
-            {
-                switch (thisRelation.Connects())
-                {
-                    case enXY.XY: RelationXY.Add(thisRelation); break;
-                    case enXY.X: RelationX.Add(thisRelation); break;
-                    case enXY.Y: RelationY.Add(thisRelation); break;
-                    default: RelationNone.Add(thisRelation); break;
+            foreach (clsPointRelation thisRelation in AllRelations) {
+                switch (thisRelation.Connects()) {
+                    case enXY.XY:
+                        RelationXY.Add(thisRelation);
+                        break;
+                    case enXY.X:
+                        RelationX.Add(thisRelation);
+                        break;
+                    case enXY.Y:
+                        RelationY.Add(thisRelation);
+                        break;
+                    default:
+                        RelationNone.Add(thisRelation);
+                        break;
                 }
             }
 
@@ -1497,26 +1335,21 @@ namespace BlueControls.ItemCollection
             AllRelations.Clear();
             #endregion
 
-            do
-            {
+            do {
 
-                var z = 0;
-                while (z < _Points.Count)
-                {
+                int z = 0;
+                while (z < _Points.Count) {
 
-                    var Thispoint = _Points[z];
+                    PointM Thispoint = _Points[z];
 
-                    switch (Modus)
-                    {
+                    switch (Modus) {
                         case 0: // Unbewegliche Punkte hinzufügen
                             if (Thispoint.Fix) { AllPoints.Add(Thispoint); }
                             break;
 
                         case 1: // Verbundene Punkte, die durch verbindungen X und Y Fix sind
-                            foreach (var thisRelation in RelationXY)
-                            {
-                                if (thisRelation.NeedCount(Thispoint, AllPoints))
-                                {
+                            foreach (clsPointRelation thisRelation in RelationXY) {
+                                if (thisRelation.NeedCount(Thispoint, AllPoints)) {
                                     AllPoints.Add(Thispoint);
                                     AllRelations.Add(thisRelation);
                                     RelationXY.Remove(thisRelation);
@@ -1533,10 +1366,8 @@ namespace BlueControls.ItemCollection
                         //    break;
 
                         case 2: // Fixe Y-Punkte hinzufügen
-                            foreach (var thisRelation in RelationY)
-                            {
-                                if (thisRelation.NeedCount(Thispoint, AllPoints))
-                                {
+                            foreach (clsPointRelation thisRelation in RelationY) {
+                                if (thisRelation.NeedCount(Thispoint, AllPoints)) {
                                     AllPoints.Add(Thispoint);
                                     AllRelations.Add(thisRelation);
                                     RelationY.Remove(thisRelation);
@@ -1551,10 +1382,8 @@ namespace BlueControls.ItemCollection
                         //    break;
 
                         case 3: // Fixe X-Punkte hinzufügen
-                            foreach (var thisRelation in RelationX)
-                            {
-                                if (thisRelation.NeedCount(Thispoint, AllPoints))
-                                {
+                            foreach (clsPointRelation thisRelation in RelationX) {
+                                if (thisRelation.NeedCount(Thispoint, AllPoints)) {
                                     AllPoints.Add(Thispoint);
                                     AllRelations.Add(thisRelation);
                                     RelationX.Remove(thisRelation);
@@ -1565,10 +1394,8 @@ namespace BlueControls.ItemCollection
 
                         case 4: // Punkte hinzufügen, die in einer Beziehung sind UND ein Punkt bereits einen Order hat
 
-                            foreach (var thisRelation in RelationNone)
-                            {
-                                if (thisRelation.NeedCount(Thispoint, AllPoints))
-                                {
+                            foreach (clsPointRelation thisRelation in RelationNone) {
+                                if (thisRelation.NeedCount(Thispoint, AllPoints)) {
                                     AllPoints.Add(Thispoint);
                                     AllRelations.Add(thisRelation);
                                     RelationNone.Remove(thisRelation);
@@ -1578,8 +1405,7 @@ namespace BlueControls.ItemCollection
                             break;
 
                         case 5: // Selectierte Punkte bevorzugen
-                            if (Sel_P != null && Sel_P.Contains(Thispoint))
-                            {
+                            if (Sel_P != null && Sel_P.Contains(Thispoint)) {
                                 AllPoints.Add(Thispoint);
                             }
 
@@ -1594,14 +1420,11 @@ namespace BlueControls.ItemCollection
                             break;
                     }
 
-                    if (AllPoints.Contains(Thispoint))
-                    {
+                    if (AllPoints.Contains(Thispoint)) {
                         Modus = 0;
                         z = 0;
                         _Points.Remove(Thispoint);
-                    }
-                    else
-                    {
+                    } else {
                         z++;
 
                         if (z >= _Points.Count) { Modus++; }
@@ -1681,16 +1504,14 @@ namespace BlueControls.ItemCollection
         //    return l;
         //}
 
-        public void SaveAsBitmap(string Filename)
-        {
+        public void SaveAsBitmap(string Filename) {
 
-            var i = ToBitmap(1);
+            Bitmap i = ToBitmap(1);
 
             if (i == null) { return; }
 
 
-            switch (Filename.FileSuffix().ToUpper())
-            {
+            switch (Filename.FileSuffix().ToUpper()) {
 
                 case "JPG":
                 case "JPEG":

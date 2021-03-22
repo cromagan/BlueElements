@@ -1,20 +1,17 @@
-﻿using System;
-using System.Drawing;
-using BlueControls.Interfaces;
-using BlueBasics;
+﻿using BlueBasics;
 using BlueControls.Enums;
-using System.Collections.Generic;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueControls.Controls {
-    public partial class EasyPicMulti :  GenericControl, IBackgroundNone // System.Windows.Forms.UserControl //
-        {
-
-
-        int _nr = 0;
-
-        readonly List<BlueBasics.BitmapExt> pic = new List<BlueBasics.BitmapExt>();
-        List<string> files = new List<string>();
+    public partial class EasyPicMulti : GenericControl, IBackgroundNone // System.Windows.Forms.UserControl //
+    {
+        private int _nr = 0;
+        private readonly List<BlueBasics.BitmapExt> pic = new List<BlueBasics.BitmapExt>();
+        private List<string> files = new List<string>();
 
         public List<string> Files {
             get => files;
@@ -62,13 +59,12 @@ namespace BlueControls.Controls {
         }
 
         private void btnSchnittView_Click(object sender, System.EventArgs e) {
-            var x = new PictureView(Files, false, string.Empty);
+            PictureView x = new PictureView(Files, false, string.Empty);
             x.Show();
         }
 
 
-        private void SetPic()
-            {
+        private void SetPic() {
             Bitmap _Bitmap = null;
 
 

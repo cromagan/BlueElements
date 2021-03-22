@@ -88,7 +88,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         public static void CheckDatabase(object sender, LoadedEventArgs e) {
 
-            var _database = (Database)sender;
+            Database _database = (Database)sender;
 
             if (_database != null && !_database.ReadOnly) {
                 if (_database.IsAdministrator()) {
@@ -98,7 +98,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     //}
 
 
-                    foreach (var ThisColumnItem in _database.Column) {
+                    foreach (ColumnItem ThisColumnItem in _database.Column) {
                         while (!ThisColumnItem.IsOk()) {
                             MessageBox.Show("Die folgende Spalte enthält einen Fehler:<br>" + ThisColumnItem.ErrorReason() + "<br><br>Bitte reparieren.", enImageCode.Information, "OK");
                             OpenColumnEditor(ThisColumnItem, null);
@@ -127,14 +127,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
             ColumnItem column2 = null;
-            var PosError = false;
+            bool PosError = false;
 
 
             switch (column.Format) {
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
-                    var Txt = Row.CellGetString(column);
-                    if (int.TryParse(Txt, out var ColKey)) {
+                    string Txt = Row.CellGetString(column);
+                    if (int.TryParse(Txt, out int ColKey)) {
                         column2 = column.LinkedDatabase().Column.SearchByKey(ColKey);
                     }
                     break;
@@ -151,8 +151,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (column2 != null) {
                 if (MessageBox.Show("Welche Spalte bearbeiten?", enImageCode.Frage, "Spalte in dieser Datenbank", "Verlinkte Spalte") == 1) { column = column2; }
-            }
-            else {
+            } else {
                 if (PosError) {
                     Notification.Show("Keine aktive Verlinkung.<br>Spalte in dieser Datenbank wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Datenbank vorhanden?", enImageCode.Information);
                 }
@@ -164,7 +163,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         public static void OpenColumnEditor(ColumnItem column, Table tableview) {
 
-            using var w = new ColumnEditor(column, tableview);
+            using ColumnEditor w = new ColumnEditor(column, tableview);
             w.ShowDialog();
             column.Invalidate_ColumAndContent();
 
@@ -180,8 +179,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-            var enTabAllgemein = true;
-            var enTabellenAnsicht = true;
+            bool enTabAllgemein = true;
+            bool enTabellenAnsicht = true;
 
             if (_TableView?.Database == null || !_TableView.Database.IsAdministrator()) {
                 Enabled = false;
@@ -207,7 +206,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
             if (!DB.IsLoading) { DB.Load_Reload(); } // Die Routine wird evtl. in der Laderoutine aufgerufen. z.B. bei Fehlerhaften Regeln
-            using var w = new DatabaseHeadEditor(DB);
+            using DatabaseHeadEditor w = new DatabaseHeadEditor(DB);
             w.ShowDialog();
             // DB.OnLoaded(new LoadedEventArgs(true));
         }
@@ -223,7 +222,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             DB.CancelBackGroundWorker();
 
-            var w = new LayoutDesigner(DB, AdditionalLayoutPath);
+            LayoutDesigner w = new LayoutDesigner(DB, AdditionalLayoutPath);
             if (!string.IsNullOrEmpty(LayoutToOpen)) { w.LoadLayout(LayoutToOpen); }
             w.ShowDialog();
         }
@@ -249,19 +248,19 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-            var _merker = _TableView.Database;
+            Database _merker = _TableView.Database;
 
-            var Zusatz = new List<string>();
+            List<string> Zusatz = new List<string>();
 
 
-            var L = new ItemCollectionList();
+            ItemCollectionList L = new ItemCollectionList();
 
-            foreach (var ThisExport in _TableView.Database.Export) {
+            foreach (ExportDefinition ThisExport in _TableView.Database.Export) {
                 if (ThisExport.Typ == enExportTyp.DatenbankOriginalFormat) {
-                    foreach (var ThisString in ThisExport._BereitsExportiert) {
-                        var t = ThisString.SplitBy("|");
+                    foreach (string ThisString in ThisExport._BereitsExportiert) {
+                        string[] t = ThisString.SplitBy("|");
                         if (FileExists(t[0])) {
-                            var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutomatischLöschen).ToHTMLCode(), "");
+                            QuickImage q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutomatischLöschen).ToHTMLCode(), "");
                             L.Add(t[1], t[0], q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit));
                         }
                     }
@@ -271,7 +270,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
 
-            foreach (var ThisString in Zusatz) {
+            foreach (string ThisString in Zusatz) {
 
                 if (L[ThisString] == null) {
                     L.Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(enImageCode.Warnung), true, DataFormat.CompareKey(new FileInfo(ThisString).CreationTime.ToString(), enDataFormat.Datum_und_Uhrzeit));
@@ -288,13 +287,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             L.Sort();
 
-            var Files = InputBoxListBoxStyle.Show("Stand wählen:", L, enAddType.None, true);
+            List<string> Files = InputBoxListBoxStyle.Show("Stand wählen:", L, enAddType.None, true);
             if (Files == null || Files.Count != 1) {
                 btnVorherigeVersion.Enabled = true;
                 return;
             }
 
-            var tmp = (Database)Database.GetByFilename(Files[0], false);
+            Database tmp = (Database)Database.GetByFilename(Files[0], false);
             if (tmp == null) {
                 tmp = new Database(Files[0], true, false);
             }
@@ -307,14 +306,14 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnScripting_Click(object sender, System.EventArgs e) {
-            var o = new Skript(_TableView);
+            Skript o = new Skript(_TableView);
             o.Show();
         }
 
         private void btnAdminMenu_Click(object sender, System.EventArgs e) {
             if (_TableView == null) { return; }
 
-            var adm = new AdminMenu(_TableView);
+            AdminMenu adm = new AdminMenu(_TableView);
 
             adm.Show();
             adm.BringToFront();
@@ -329,7 +328,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnZeileLöschen_Click(object sender, System.EventArgs e) {
             if (!_TableView.Database.IsAdministrator()) { return; }
 
-            var m = MessageBox.Show("Angezeigte Zeilen löschen?", enImageCode.Warnung, "Ja", "Nein");
+            int m = MessageBox.Show("Angezeigte Zeilen löschen?", enImageCode.Warnung, "Ja", "Nein");
             if (m != 0) { return; }
 
             _TableView.Database.Row.Remove(_TableView.Filter);

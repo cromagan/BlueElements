@@ -21,14 +21,11 @@
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
-namespace BlueControls.EventArgs
-{
-    public class ContextMenuInitEventArgs : System.EventArgs
-    {
+namespace BlueControls.EventArgs {
+    public class ContextMenuInitEventArgs : System.EventArgs {
 
 
-        public ContextMenuInitEventArgs(object hotItem, List<string> tags, ItemCollectionList userMenu)
-        {
+        public ContextMenuInitEventArgs(object hotItem, List<string> tags, ItemCollectionList userMenu) {
             UserMenu = userMenu;
             HotItem = hotItem;
             Tags = tags;

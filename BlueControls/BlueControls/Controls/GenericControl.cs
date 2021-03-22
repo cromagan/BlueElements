@@ -161,8 +161,7 @@ namespace BlueControls.Controls {
                 //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
                 if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
                 base.WndProc(ref m);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
         }
@@ -238,7 +237,7 @@ namespace BlueControls.Controls {
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }
 
-            foreach (var ThisControl in Controls) {
+            foreach (object ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
             }
 
@@ -252,7 +251,7 @@ namespace BlueControls.Controls {
 
             if (BeginnEditCounter == 0) { Invalidate(); }
 
-            foreach (var ThisControl in Controls) {
+            foreach (object ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
             }
         }
@@ -316,8 +315,7 @@ namespace BlueControls.Controls {
                 if (Skin.SkinDB == null) {
                     if (DesignMode) {
                         Skin.LoadSkin();
-                    }
-                    else {
+                    } else {
                         return;
                     }
                 }
@@ -328,20 +326,18 @@ namespace BlueControls.Controls {
                 try {
                     if (_UseBackBitmap) {
                         if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
-                        var TMPGR = Graphics.FromImage(_BitmapOfControl);
+                        Graphics TMPGR = Graphics.FromImage(_BitmapOfControl);
                         DrawControl(TMPGR, IsStatus());
 
                         if (_BitmapOfControl != null) {
                             gr.DrawImage(_BitmapOfControl, 0, 0);
                         }
                         TMPGR.Dispose();
-                    }
-                    else {
+                    } else {
                         DrawControl(gr, IsStatus());
                     }
 
-                }
-                catch {
+                } catch {
                     return;
                 }
 
@@ -350,7 +346,7 @@ namespace BlueControls.Controls {
 
                 // UmRandung für DesignMode ------------
                 if (DesignMode) {
-                    using var P = new Pen(Color.FromArgb(128, 255, 0, 0));
+                    using Pen P = new Pen(Color.FromArgb(128, 255, 0, 0));
                     gr.DrawRectangle(P, 0, 0, Width - 1, Height - 1);
                 }
 
@@ -386,14 +382,13 @@ namespace BlueControls.Controls {
         private enStates IsStatus() {
             if (!Enabled) { return enStates.Standard_Disabled; }
 
-            var S = enStates.Standard;
+            enStates S = enStates.Standard;
             if (_MouseHighlight && ContainsMouse()) { S |= enStates.Standard_MouseOver; }
 
             if (_MousePressing) {
                 if (_MouseHighlight) { S |= enStates.Standard_MousePressed; }
                 if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus) { S |= enStates.Standard_HasFocus; }
-            }
-            else {
+            } else {
                 if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus && Focused) { S |= enStates.Standard_HasFocus; }
             }
 
@@ -408,8 +403,7 @@ namespace BlueControls.Controls {
 
             if (!GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
                 Parent.SelectNextControl(this, true, true, true, true);
-            }
-            else {
+            } else {
                 tmpSkinRow = null;
                 base.OnGotFocus(e);
                 Invalidate();
@@ -488,12 +482,10 @@ namespace BlueControls.Controls {
         public void DoQuickInfo() {
             if (string.IsNullOrEmpty(_QuickInfo) && string.IsNullOrEmpty(QuickInfoText)) {
                 Forms.QuickInfo.Close();
-            }
-            else {
+            } else {
                 if (ContainsMouse()) {
                     Forms.QuickInfo.Show(QuickInfoText);
-                }
-                else {
+                } else {
                     Forms.QuickInfo.Close();
                 }
             }
@@ -594,14 +586,14 @@ namespace BlueControls.Controls {
                 case null:
                     return enPartentType.Nothing;
                 case GroupBox _: {
-                        if (control.Parent is TabPage TP) {
+                    if (control.Parent is TabPage TP) {
 
-                            if (TP.Parent == null) { return enPartentType.Unbekannt; }
+                        if (TP.Parent == null) { return enPartentType.Unbekannt; }
 
-                            if (TP.Parent is RibbonBar) { return enPartentType.RibbonGroupBox; }
-                        }
-                        return enPartentType.GroupBox;
+                        if (TP.Parent is RibbonBar) { return enPartentType.RibbonGroupBox; }
                     }
+                    return enPartentType.GroupBox;
+                }
                 case LastFilesCombo _:
                     return enPartentType.LastFilesCombo;
                 //Is = "BlueBasics.ComboBox"

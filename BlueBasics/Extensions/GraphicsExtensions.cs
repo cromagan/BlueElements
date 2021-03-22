@@ -21,36 +21,30 @@ using System;
 using System.Drawing;
 
 
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
-        public static void DrawImageInRectAspectRatio(this Graphics GR, Bitmap bmp, int x, int y, int width, int height)
-        {
-            var Sc = Math.Min((float)width / bmp.Width, (float)height / bmp.Height);
-            var dw = (int)(bmp.Width * Sc);
-            var dh = (int)(bmp.Height * Sc);
+namespace BlueBasics {
+    public static partial class Extensions {
+        public static void DrawImageInRectAspectRatio(this Graphics GR, Bitmap bmp, int x, int y, int width, int height) {
+            float Sc = Math.Min((float)width / bmp.Width, (float)height / bmp.Height);
+            int dw = (int)(bmp.Width * Sc);
+            int dh = (int)(bmp.Height * Sc);
             GR.DrawImage(bmp, x + (width - dw) / 2, y + (height - dh) / 2, dw, dh);
         }
 
-        public static void DrawImageInRectAspectRatio(this Graphics GR, Bitmap bmp, Rectangle R)
-        {
+        public static void DrawImageInRectAspectRatio(this Graphics GR, Bitmap bmp, Rectangle R) {
             DrawImageInRectAspectRatio(GR, bmp, R.Left, R.Top, R.Width, R.Height);
         }
 
 
-        public static void DrawRectangle(this Graphics GR, Pen pen, RectangleF R)
-        {
+        public static void DrawRectangle(this Graphics GR, Pen pen, RectangleF R) {
             GR.DrawRectangle(pen, R.X, R.Y, R.Width, R.Height);
         }
 
 
 
-        public static void DrawRad(this Graphics GR, Pen pen, PointF middle, PointF startP, float Wink)
-        {
+        public static void DrawRad(this Graphics GR, Pen pen, PointF middle, PointF startP, float Wink) {
 
-            var radius = (float)Math.Abs(Geometry.Länge(middle, startP));
-            var startw = (float)Geometry.Winkel(middle, startP);
+            float radius = (float)Math.Abs(Geometry.Länge(middle, startP));
+            float startw = (float)Geometry.Winkel(middle, startP);
 
 
             GR.DrawArc(pen, middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -Wink);

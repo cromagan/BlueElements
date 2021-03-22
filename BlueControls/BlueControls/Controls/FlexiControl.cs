@@ -115,7 +115,7 @@ namespace BlueControls.Controls {
             ValueId = string.Empty;
 
 
-            var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+            SizeF s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
 
             Size = new Size((int)(s.Width + 2), (int)(s.Height + 2));
 
@@ -208,8 +208,7 @@ namespace BlueControls.Controls {
                 foreach (System.Windows.Forms.Control ThisControl in Controls) {
                     if (ThisControl != _InfoCaption) {
                         ThisControl.Enabled = Enabled;
-                    }
-                    else {
+                    } else {
                         ThisControl.Enabled = true;
                     }
                 }
@@ -442,12 +441,10 @@ namespace BlueControls.Controls {
 
             if (!string.IsNullOrEmpty(_disabledReason)) {
                 DoInfoTextCaption(_disabledReason);
-            }
-            else {
+            } else {
                 if (state.HasFlag(enStates.Standard_Disabled)) {
                     DoInfoTextCaption("Übergeordnetes Steuerlement ist deaktiviert.");
-                }
-                else {
+                } else {
                     DoInfoTextCaption(string.Empty);
                 }
             }
@@ -661,14 +658,14 @@ namespace BlueControls.Controls {
 
 
 
-            var l = new List<Control>();
+            List<Control> l = new List<Control>();
 
 
-            for (var z = 0; z < Controls.Count; z++) { l.Add(Controls[z]); }
+            for (int z = 0; z < Controls.Count; z++) { l.Add(Controls[z]); }
 
 
 
-            foreach (var thisc in l) {
+            foreach (Control thisc in l) {
                 thisc.Visible = false;
 
                 if (thisc != _CaptionObject && thisc != _InfoCaption) {
@@ -723,8 +720,7 @@ namespace BlueControls.Controls {
 
             if (_CaptionPosition == enÜberschriftAnordnung.Ohne_mit_Abstand) {
                 _CaptionObject.Visible = false;
-            }
-            else {
+            } else {
                 _CaptionObject.Visible = true;
             }
 
@@ -759,7 +755,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
         private Line Control_Create_Line() {
-            var Control = new Line {
+            Line Control = new Line {
                 Enabled = Enabled,
                 Orientation = enOrientation.Waagerecht
             };
@@ -779,7 +775,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
         private EasyPic Control_Create_EasyPic() {
-            var Control = new EasyPic {
+            EasyPic Control = new EasyPic {
                 Enabled = Enabled
             };
 
@@ -806,7 +802,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private ComboBox Control_Create_ComboBox() {
-            var Control = new ComboBox();
+            ComboBox Control = new ComboBox();
 
             StyleComboBox(Control, null, System.Windows.Forms.ComboBoxStyle.DropDownList);
 
@@ -846,7 +842,7 @@ namespace BlueControls.Controls {
         // Nimmt Teilweise die Routinen der Listbox her
 
         private SwapListBox Control_Create_SwapListBox() {
-            var Control = new SwapListBox {
+            SwapListBox Control = new SwapListBox {
                 Enabled = Enabled,
             };
 
@@ -865,7 +861,7 @@ namespace BlueControls.Controls {
 
             if (Column == null) { return; }
 
-            var Item = new ItemCollectionList();
+            ItemCollectionList Item = new ItemCollectionList();
 
             ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000);
 
@@ -911,7 +907,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private ListBox Control_Create_ListBox() {
-            var Control = new ListBox {
+            ListBox Control = new ListBox {
                 Enabled = Enabled,
             };
 
@@ -931,7 +927,7 @@ namespace BlueControls.Controls {
 
             if (Column == null) { return; }
 
-            var Item = new ItemCollectionList();
+            ItemCollectionList Item = new ItemCollectionList();
 
             if (Column.DropdownBearbeitungErlaubt) {
                 ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000);
@@ -940,7 +936,7 @@ namespace BlueControls.Controls {
                     bool again;
                     do {
                         again = false;
-                        foreach (var ThisItem in Item) {
+                        foreach (BasicListItem ThisItem in Item) {
                             if (!Column.DropDownItems.Contains(ThisItem.Internal)) {
                                 again = true;
                                 Item.Remove(ThisItem);
@@ -1014,7 +1010,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private Button Control_Create_ButtonComand() {
-            var Control = new Button {
+            Button Control = new Button {
                 Enabled = Enabled,
                 Name = "ComandButton",
                 Checked = false,
@@ -1032,7 +1028,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private Button Control_Create_ButtonColor() {
-            var Control = new Button {
+            Button Control = new Button {
                 Enabled = Enabled,
                 Name = "ColorButton",
                 Checked = false,
@@ -1051,7 +1047,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
         private Button Control_Create_ButtonYesNo() {
-            var Control = new Button {
+            Button Control = new Button {
                 Enabled = Enabled,
                 Name = "YesNoButton",
                 ButtonStyle = enButtonStyle.Yes_or_No,
@@ -1083,8 +1079,7 @@ namespace BlueControls.Controls {
                 case enEditTypeFormula.Farb_Auswahl_Dialog:
                     if (string.IsNullOrEmpty(_Value)) {
                         Control.ImageCode = "Fragezeichen|24";
-                    }
-                    else {
+                    } else {
                         Control.ImageCode = "Kreis|24|||" + Color.FromArgb(int.Parse(_Value)).ToHTMLCode();
                     }
                     break;
@@ -1105,7 +1100,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private TextBox Control_Create_TextBox() {
-            var Control = new TextBox();
+            TextBox Control = new TextBox();
             StyleTextBox(Control, string.Empty, false);
             UpdateValueToControl();
             StandardBehandlung(Control);
@@ -1125,8 +1120,7 @@ namespace BlueControls.Controls {
 
             if (_MultiLine || Height > 20) {
                 Control.Verhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            }
-            else {
+            } else {
                 Control.Verhalten = enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             }
 
@@ -1235,21 +1229,18 @@ namespace BlueControls.Controls {
 
 
         private void DoInfoTextCaption(string disabledReason) {
-            var txt = string.Empty;
-            var symbol = string.Empty;
+            string txt = string.Empty;
+            string symbol = string.Empty;
             if (string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText)) {
                 txt = string.Empty;
                 symbol = string.Empty;
-            }
-            else if (!string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText)) {
+            } else if (!string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText)) {
                 symbol = "  <ImageCode=Schloss|10|||||150||20>";
                 txt = disabledReason;
-            }
-            else if (string.IsNullOrEmpty(disabledReason) && !string.IsNullOrEmpty(_InfoText)) {
+            } else if (string.IsNullOrEmpty(disabledReason) && !string.IsNullOrEmpty(_InfoText)) {
                 symbol = "<ImageCode=Warnung|16>";
                 txt = _InfoText;
-            }
-            else {
+            } else {
                 symbol = "<ImageCode=Information|16>";
                 txt = "<b>Der Wert kann nicht bearbeitet werden:</b><br>" + disabledReason + "<br><br><b>Enthält aber einen Fehler:</b><br>" + _InfoText;
             }
@@ -1280,8 +1271,7 @@ namespace BlueControls.Controls {
                 //_InfoCaption.Dispose();
                 //_InfoCaption = null;
                 _InfoCaption.Visible = false;
-            }
-            else {
+            } else {
                 _InfoCaption = new Caption {
                     Name = "Info",
                     QuickInfo = txt,
@@ -1305,7 +1295,7 @@ namespace BlueControls.Controls {
 
         private void _InfoCaption_Click(object sender, System.EventArgs e) {
 
-            foreach (var thisc in Controls) {
+            foreach (object thisc in Controls) {
                 if (thisc is ComboBox cbx) {
                     cbx.Focus();
                     cbx.ShowMenu(null, null);
@@ -1405,7 +1395,7 @@ namespace BlueControls.Controls {
             if (DateTime.UtcNow.Subtract((DateTime)_LastTextChange).TotalSeconds < 20) { return; }
 
 
-            this.Focus(); // weitere Tastatureingabn verhindern. Z.B: wenn was mariert wird und dann entfernen gedrück wird. Wenn die Box neu sortiert wird, ist dsa ergebnis nicht schön
+            Focus(); // weitere Tastatureingabn verhindern. Z.B: wenn was mariert wird und dann entfernen gedrück wird. Wenn die Box neu sortiert wird, ist dsa ergebnis nicht schön
 
 
 
@@ -1453,8 +1443,7 @@ namespace BlueControls.Controls {
                 if (Control != _InfoCaption) {
                     if (Control is GenericControl QI) { QI.QuickInfo = QuickInfo; }
                     Control.Enabled = Enabled;
-                }
-                else {
+                } else {
                     Control.Enabled = true;
                 }
 

@@ -109,18 +109,18 @@ namespace BlueControls.ItemCollection {
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
 
-            var c = Skin.GetBlueFont(Stil, Parent.SheetStyle).Color_Main;
+            Color c = Skin.GetBlueFont(Stil, Parent.SheetStyle).Color_Main;
 
 
-            var p = new Pen(Color.FromArgb(30, c.R, c.G, c.B), 1);
+            Pen p = new Pen(Color.FromArgb(30, c.R, c.G, c.B), 1);
             float ex = 0;
 
-            var po = NP.ZoomAndMove(cZoom, shiftX, shiftY);
+            PointF po = NP.ZoomAndMove(cZoom, shiftX, shiftY);
 
 
-            var mo = (float)(modConverter.mmToPixel(GridShow, ItemCollectionPad.DPI) * cZoom);
+            float mo = (float)(modConverter.mmToPixel(GridShow, ItemCollectionPad.DPI) * cZoom);
 
-            var count = 0;
+            int count = 0;
             do {
                 count++;
                 if (count > 20) { break; }
@@ -179,7 +179,7 @@ namespace BlueControls.ItemCollection {
         protected override void ParseFinished() { }
 
         public override string ToString() {
-            var t = base.ToString();
+            string t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             return t + "Grid=" + GridShow + "}";
         }
@@ -188,7 +188,7 @@ namespace BlueControls.ItemCollection {
 
 
         public override List<FlexiControl> GetStyleOptions() {
-            var l = new List<FlexiControl>();
+            List<FlexiControl> l = new List<FlexiControl>();
 
             AddLineStyleOption(l);
 

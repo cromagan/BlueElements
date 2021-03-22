@@ -21,37 +21,30 @@ using BlueBasics.Enums;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
+namespace BlueBasics {
+    public static partial class Extensions {
 
 
 
-        public static bool Contains(this ICollection<string> IC, string SearchKeyword, bool CaseSensitive)
-        {
+        public static bool Contains(this ICollection<string> IC, string SearchKeyword, bool CaseSensitive) {
             if (CaseSensitive) { Develop.DebugPrint(enFehlerArt.Fehler, "CaseSensitive = True"); }
 
             return IC.Any(Item => Item.ToUpper() == SearchKeyword.ToUpper());
         }
 
-        public static string JoinWithCr(this ICollection<string> IC)
-        {
+        public static string JoinWithCr(this ICollection<string> IC) {
             if (IC == null || IC.Count == 0) { return string.Empty; }
 
             return IC.JoinWith("\r");
         }
 
 
-        public static string JoinWith(this ICollection<string> IC, string JoinChar)
-        {
+        public static string JoinWith(this ICollection<string> IC, string JoinChar) {
             return string.Join(JoinChar, IC.ToArray()); // .TrimEnd(JoinChar);
         }
 
-        public static void RemoveRange<t>(this ICollection<t> IC, List<t> remove)
-        {
-            foreach (var thisItem in remove)
-            {
+        public static void RemoveRange<t>(this ICollection<t> IC, List<t> remove) {
+            foreach (t thisItem in remove) {
                 IC.Remove(thisItem);
             }
 

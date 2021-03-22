@@ -19,12 +19,10 @@
 
 using System;
 
-namespace BlueBasics
-{
+namespace BlueBasics {
 
 
-    public struct strProcess
-    {
+    public struct strProcess {
         public IntPtr MainWindowHandle;
         public int prid;
         public string MainWindowTitle;

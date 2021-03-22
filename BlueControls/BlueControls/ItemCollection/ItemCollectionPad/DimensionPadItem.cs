@@ -95,7 +95,7 @@ namespace BlueControls.ItemCollection {
 
             ComputeData();
 
-            var a = GeometryDF.PolarToCartesian(modConverter.mmToPixel(AbstandinMM, ItemCollectionPad.DPI), Convert.ToDouble(_Winkel - 90));
+            PointM a = GeometryDF.PolarToCartesian(modConverter.mmToPixel(AbstandinMM, ItemCollectionPad.DPI), Convert.ToDouble(_Winkel - 90));
 
             TextPointx.SetTo(Point1, _Länge / 2, _Winkel);
             TextPointx.X += a.X;
@@ -188,7 +188,7 @@ namespace BlueControls.ItemCollection {
         protected override void GenerateInternalRelationExplicit() { }
 
         public override string ToString() {
-            var t = base.ToString();
+            string t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
             return t +
@@ -203,7 +203,7 @@ namespace BlueControls.ItemCollection {
 
         public string AngezeigterText1() {
             if (!string.IsNullOrEmpty(Text_oben)) { return Text_oben; }
-            var s = Länge_in_MM.ToString(Constants.Format_Float10);
+            string s = Länge_in_MM.ToString(Constants.Format_Float10);
             s = s.Replace(".", ",");
 
             if (s.Contains(",")) {
@@ -224,7 +224,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public override bool Contains(PointF value, decimal zoomfactor) {
-            var ne = 5 / zoomfactor;
+            decimal ne = 5 / zoomfactor;
 
             if (value.DistanzZuStrecke(Point1, _Bezugslinie1) < ne) { return true; }
             if (value.DistanzZuStrecke(Point2, _Bezugslinie2) < ne) { return true; }
@@ -242,13 +242,13 @@ namespace BlueControls.ItemCollection {
 
 
 
-            var geszoom = Parent.SheetStyleScale * Skalierung * cZoom;
+            decimal geszoom = Parent.SheetStyleScale * Skalierung * cZoom;
 
 
-            var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
+            BlueFont f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
 
-            var PfeilG = (decimal)f.Font(geszoom).Size * 0.8m;
-            var pen2 = f.Pen(cZoom);
+            decimal PfeilG = (decimal)f.Font(geszoom).Size * 0.8m;
+            Pen pen2 = f.Pen(cZoom);
 
             GR.DrawLine(pen2, Point1.ZoomAndMove(cZoom, shiftX, shiftY), _Bezugslinie1.ZoomAndMove(cZoom, shiftX, shiftY)); // Bezugslinie 1
             GR.DrawLine(pen2, Point2.ZoomAndMove(cZoom, shiftX, shiftY), _Bezugslinie2.ZoomAndMove(cZoom, shiftX, shiftY)); // Bezugslinie 2
@@ -256,10 +256,10 @@ namespace BlueControls.ItemCollection {
             GR.DrawLine(pen2, _SchnittPunkt1.ZoomAndMove(cZoom, shiftX, shiftY), TextPointx.ZoomAndMove(cZoom, shiftX, shiftY)); // Maßhilfslinie
 
 
-            var sz1 = GR.MeasureString(AngezeigterText1(), f.Font(geszoom));
-            var sz2 = GR.MeasureString(Text_unten, f.Font(geszoom));
-            var P1 = _SchnittPunkt1.ZoomAndMove(cZoom, shiftX, shiftY);
-            var P2 = _SchnittPunkt2.ZoomAndMove(cZoom, shiftX, shiftY);
+            SizeF sz1 = GR.MeasureString(AngezeigterText1(), f.Font(geszoom));
+            SizeF sz2 = GR.MeasureString(Text_unten, f.Font(geszoom));
+            PointF P1 = _SchnittPunkt1.ZoomAndMove(cZoom, shiftX, shiftY);
+            PointF P2 = _SchnittPunkt2.ZoomAndMove(cZoom, shiftX, shiftY);
 
 
 
@@ -275,10 +275,10 @@ namespace BlueControls.ItemCollection {
 
 
 
-            var Mitte = TextPointx.ZoomAndMove(cZoom, shiftX, shiftY);
+            PointF Mitte = TextPointx.ZoomAndMove(cZoom, shiftX, shiftY);
 
 
-            var TextWinkel = (float)(_Winkel % 360);
+            float TextWinkel = (float)(_Winkel % 360);
 
             if (TextWinkel > 90 && TextWinkel <= 270) { TextWinkel = (float)(_Winkel - 180); }
 
@@ -286,15 +286,15 @@ namespace BlueControls.ItemCollection {
             if (geszoom < 0.15m) { return; } // Schrift zu klein, würde abstürzen
 
 
-            var Mitte1 = new PointM(Mitte, (decimal)(sz1.Height / 2.1), (decimal)(TextWinkel + 90));
-            var x = GR.Save();
+            PointM Mitte1 = new PointM(Mitte, (decimal)(sz1.Height / 2.1), (decimal)(TextWinkel + 90));
+            System.Drawing.Drawing2D.GraphicsState x = GR.Save();
             GR.TranslateTransform((float)Mitte1.X, (float)Mitte1.Y);
             GR.RotateTransform(-TextWinkel);
             GR.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz1.Width * 0.9 / 2), (int)(-sz1.Height * 0.8 / 2), (int)(sz1.Width * 0.9), (int)(sz1.Height * 0.8)));
             GR.DrawString(AngezeigterText1(), f.Font(geszoom), f.Brush_Color_Main, new PointF((float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0)));
             GR.Restore(x);
 
-            var Mitte2 = new PointM(Mitte, (decimal)(sz2.Height / 2.1), (decimal)(TextWinkel - 90));
+            PointM Mitte2 = new PointM(Mitte, (decimal)(sz2.Height / 2.1), (decimal)(TextWinkel - 90));
             x = GR.Save();
             GR.TranslateTransform((float)Mitte2.X, (float)Mitte2.Y);
             GR.RotateTransform(-TextWinkel);
@@ -307,17 +307,17 @@ namespace BlueControls.ItemCollection {
 
         protected override RectangleM CalculateUsedArea() {
             if (Stil == PadStyles.Undefiniert) { return new RectangleM(0, 0, 0, 0); }
-            var geszoom = Parent.SheetStyleScale * Skalierung;
+            decimal geszoom = Parent.SheetStyleScale * Skalierung;
 
-            var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
+            BlueFont f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
 
-            var sz1 = BlueFont.MeasureString(AngezeigterText1(), f.Font(geszoom));
-            var sz2 = BlueFont.MeasureString(Text_unten, f.Font(geszoom));
+            SizeF sz1 = BlueFont.MeasureString(AngezeigterText1(), f.Font(geszoom));
+            SizeF sz2 = BlueFont.MeasureString(Text_unten, f.Font(geszoom));
 
-            var maxrad = (decimal)(Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height)) / 2 + 10);
+            decimal maxrad = (decimal)(Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height)) / 2 + 10);
 
 
-            var X = new RectangleM(Point1, Point2);
+            RectangleM X = new RectangleM(Point1, Point2);
             X.ExpandTo(_Bezugslinie1);
             X.ExpandTo(_Bezugslinie2);
 
@@ -347,9 +347,9 @@ namespace BlueControls.ItemCollection {
             //Gegeben sind:
             // Point1, Point2 und Textpoint
 
-            var MaßL = 0M;
-            var tmppW = -90;
-            var MHLAb = modConverter.mmToPixel(1.5M * Skalierung / 3.07m, ItemCollectionPad.DPI); // Den Abstand der Maßhilsfline, in echten MM
+            decimal MaßL = 0M;
+            int tmppW = -90;
+            decimal MHLAb = modConverter.mmToPixel(1.5M * Skalierung / 3.07m, ItemCollectionPad.DPI); // Den Abstand der Maßhilsfline, in echten MM
             ComputeData();
 
             MaßL = TextPointx.DistanzZuLinie(Point1, Point2);
@@ -373,7 +373,7 @@ namespace BlueControls.ItemCollection {
 
 
         public override List<FlexiControl> GetStyleOptions() {
-            var l = new List<FlexiControl>
+            List<FlexiControl> l = new List<FlexiControl>
             {
                 new FlexiControlForProperty(this, "Länge_in_MM"),
 
@@ -410,11 +410,11 @@ namespace BlueControls.ItemCollection {
 
 
         public static void DrawPfeil(Graphics GR, PointF Point, double Winkel, Color Col, decimal FontSize) {
-            var m1 = FontSize * 1.5m;
-            var Px2 = GeometryDF.PolarToCartesian(m1, Winkel + 10);
-            var Px3 = GeometryDF.PolarToCartesian(m1, Winkel - 10);
+            decimal m1 = FontSize * 1.5m;
+            PointM Px2 = GeometryDF.PolarToCartesian(m1, Winkel + 10);
+            PointM Px3 = GeometryDF.PolarToCartesian(m1, Winkel - 10);
 
-            var pa = modAllgemein.Poly_Triangle(Point, new PointF(Point.X + (float)Px2.X, Point.Y + (float)Px2.Y), new PointF(Point.X + (float)Px3.X, Point.Y + (float)Px3.Y));
+            System.Drawing.Drawing2D.GraphicsPath pa = modAllgemein.Poly_Triangle(Point, new PointF(Point.X + (float)Px2.X, Point.Y + (float)Px2.Y), new PointF(Point.X + (float)Px3.X, Point.Y + (float)Px3.Y));
             GR.FillPath(new SolidBrush(Col), pa);
 
         }

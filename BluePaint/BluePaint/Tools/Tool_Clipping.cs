@@ -17,48 +17,47 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
-using System.Drawing;
 using BlueBasics;
-using static BlueBasics.modAllgemein;
-using static BlueBasics.Develop;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
+using System;
+using System.Drawing;
+using static BlueBasics.Develop;
+using static BlueBasics.modAllgemein;
 
 namespace BluePaint {
 
-    public partial class Tool_Clipping
-    {
-        public Tool_Clipping(bool aufnahme) : base()
-        {
+    public partial class Tool_Clipping {
+        public Tool_Clipping(bool aufnahme) : base() {
             InitializeComponent();
 
-            if (aufnahme)
-            {
+            if (aufnahme) {
                 CheckMinMax();
                 AutoZ_Click(null, null);
                 ZuschnittOK_Click(null, null);
-                this.Enabled = false;
+                Enabled = false;
                 MessageBox.Show("Automatisch zugeschnitten.");
                 OnCommandForMacro("AutoZuschnitt");
             }
 
         }
 
-        public override void ToolFirstShown()
-        {
+        public override void ToolFirstShown() {
             CheckMinMax();
             AutoZ_Click(null, null);
         }
 
 
-        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) => OnDoInvalidate();
+        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) {
+            OnDoInvalidate();
+        }
 
-        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) => OnDoInvalidate();
+        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+            OnDoInvalidate();
+        }
 
-        public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
-        {
+        public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
             if (OriginalPic == null) { return; }
 
             Links.Value = Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX) + 1;
@@ -69,11 +68,10 @@ namespace BluePaint {
             ValueChangedByClicking(this, System.EventArgs.Empty);
 
         }
-        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
-        {
+        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
             if (OriginalPic == null) { return; }
 
-            var Pen_Blau = new Pen(Color.FromArgb(150, 0, 0, 255));
+            Pen Pen_Blau = new Pen(Color.FromArgb(150, 0, 0, 255));
 
 
             DrawZusatz(e, OriginalPic);
@@ -84,8 +82,7 @@ namespace BluePaint {
             e.DrawLine(Pen_Blau, e.Current.TrimmedX, -1, e.Current.TrimmedX, OriginalPic.Height);
             e.DrawLine(Pen_Blau, -1, e.Current.TrimmedY, OriginalPic.Width, e.Current.TrimmedY);
 
-            if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null)
-            {
+            if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
                 e.DrawLine(Pen_Blau, e.MouseDown.X, -1, e.MouseDown.X, OriginalPic.Height);
                 e.DrawLine(Pen_Blau, -1, e.MouseDown.Y, OriginalPic.Width, e.MouseDown.Y);
             }
@@ -93,29 +90,25 @@ namespace BluePaint {
         }
 
 
-        private void ValueChangedByClicking(object sender, System.EventArgs e) => OnDoInvalidate();
+        private void ValueChangedByClicking(object sender, System.EventArgs e) {
+            OnDoInvalidate();
+        }
+
+        public void DrawZusatz(AdditionalDrawing e, Bitmap OriginalPic) {
+            SolidBrush Brush_Blau = new SolidBrush(Color.FromArgb(120, 0, 0, 255));
 
 
-        public void DrawZusatz(AdditionalDrawing e, Bitmap OriginalPic)
-        {
-            var Brush_Blau = new SolidBrush(Color.FromArgb(120, 0, 0, 255));
-
-
-            if (Links.Value != 0)
-            {
+            if (Links.Value != 0) {
                 e.FillRectangle(Brush_Blau, new Rectangle(0, 0, Convert.ToInt32(Links.Value), OriginalPic.Height));
             }
-            if (Recht.Value != 0)
-            {
+            if (Recht.Value != 0) {
                 e.FillRectangle(Brush_Blau, new Rectangle(OriginalPic.Width + Convert.ToInt32(Recht.Value), 0, (int)-Recht.Value, OriginalPic.Height));
             }
 
-            if (Oben.Value != 0)
-            {
+            if (Oben.Value != 0) {
                 e.FillRectangle(Brush_Blau, new Rectangle(0, 0, OriginalPic.Width, Convert.ToInt32(Oben.Value)));
             }
-            if (Unten.Value != 0)
-            {
+            if (Unten.Value != 0) {
                 e.FillRectangle(Brush_Blau, new Rectangle(0, OriginalPic.Height + Convert.ToInt32(Unten.Value), OriginalPic.Width, (int)-Unten.Value));
             }
 
@@ -123,11 +116,10 @@ namespace BluePaint {
         }
 
 
-        private void ZuschnittOK_Click(object sender, System.EventArgs e)
-        {
-            var _Pic = OnNeedCurrentPic();
+        private void ZuschnittOK_Click(object sender, System.EventArgs e) {
+            Bitmap _Pic = OnNeedCurrentPic();
 
-            var _BMP2 = _Pic.Crop((int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
+            Bitmap _BMP2 = _Pic.Crop((int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
 
 
             OnOverridePic(_BMP2);
@@ -143,13 +135,12 @@ namespace BluePaint {
             OnZoomFit();
         }
 
-        private void AutoZ_Click(object sender, System.EventArgs e)
-        {
+        private void AutoZ_Click(object sender, System.EventArgs e) {
 
-            var _Pic = base.OnNeedCurrentPic();
+            Bitmap _Pic = base.OnNeedCurrentPic();
             OnZoomFit();
 
-            var pa = _Pic.GetAutoValuesForCrop(0.9);
+            System.Windows.Forms.Padding pa = _Pic.GetAutoValuesForCrop(0.9);
 
             Links.Value = pa.Left;
             Recht.Value = pa.Right;
@@ -160,11 +151,9 @@ namespace BluePaint {
 
         }
 
-        public void Set(int Left, int Top, int Right, int Bottom)
-        {
+        public void Set(int Left, int Top, int Right, int Bottom) {
 
-            if (Left < 0 || Top < 0 || Right > 0 || Bottom > 0)
-            {
+            if (Left < 0 || Top < 0 || Right > 0 || Bottom > 0) {
                 DebugPrint(enFehlerArt.Warnung, "Fehler in den Angaben");
             }
             CheckMinMax();
@@ -176,9 +165,8 @@ namespace BluePaint {
             Unten.Value = Bottom;
         }
 
-        public void CheckMinMax()
-        {
-            var _Pic = OnNeedCurrentPic();
+        public void CheckMinMax() {
+            Bitmap _Pic = OnNeedCurrentPic();
 
             if (_Pic == null) { return; }
             Links.Maximum = _Pic.Width - 1;
@@ -187,20 +175,18 @@ namespace BluePaint {
             Unten.Minimum = -_Pic.Height - 1;
         }
 
-        public override string MacroKennung() => "Clipping";
+        public override string MacroKennung() {
+            return "Clipping";
+        }
 
-        public override void ExcuteCommand(string command)
-        {
-            var c = command.SplitBy(";");
+        public override void ExcuteCommand(string command) {
+            string[] c = command.SplitBy(";");
 
-            if (c[0] == "AutoZuschnitt")
-            {
+            if (c[0] == "AutoZuschnitt") {
                 CheckMinMax();
                 AutoZ_Click(null, null);
                 ZuschnittOK_Click(null, null);
-            }
-            else
-            {
+            } else {
                 Develop.DebugPrint_NichtImplementiert();
             }
         }

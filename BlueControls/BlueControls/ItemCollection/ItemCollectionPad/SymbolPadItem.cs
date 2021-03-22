@@ -54,7 +54,7 @@ namespace BlueControls.ItemCollection {
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
-            var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            PointF trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
 
             GR.TranslateTransform(trp.X, trp.Y);
             GR.RotateTransform(-Drehwinkel);
@@ -63,7 +63,7 @@ namespace BlueControls.ItemCollection {
             GraphicsPath p = null;
 
 
-            var d2 = DCoordinates;
+            RectangleF d2 = DCoordinates;
             d2.X = -DCoordinates.Width / 2;
             d2.X = -DCoordinates.Width / 2;
             d2.Y = -DCoordinates.Height / 2;
@@ -102,15 +102,17 @@ namespace BlueControls.ItemCollection {
 
 
         public override List<FlexiControl> GetStyleOptions() {
-            var l = new List<FlexiControl>
+            List<FlexiControl> l = new List<FlexiControl>
             {
                 new FlexiControl()
             };
 
-            var Comms = new ItemCollectionList();
-            Comms.Add("Ohne", ((int)enSymbol.Ohne).ToString(), QuickImage.Get("Datei|32"));
-            Comms.Add("Pfeil", ((int)enSymbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32"));
-            Comms.Add("Bruchlinie", ((int)enSymbol.Bruchlinie).ToString());
+            ItemCollectionList Comms = new ItemCollectionList
+            {
+                { "Ohne", ((int)enSymbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
+                { "Pfeil", ((int)enSymbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
+                { "Bruchlinie", ((int)enSymbol.Bruchlinie).ToString() }
+            };
 
             l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty(this, "Symbol", Comms));
@@ -142,7 +144,7 @@ namespace BlueControls.ItemCollection {
 
 
         public override string ToString() {
-            var t = base.ToString();
+            string t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             t = t + "Symbol=" + (int)Symbol + ", ";
             t = t + "Backcolor=" + Randfarbe.ToHTMLCode() + ", ";

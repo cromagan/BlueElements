@@ -92,23 +92,23 @@ namespace BlueControls.Controls {
 
 
         public void ZoomIn(System.Windows.Forms.MouseEventArgs e) {
-            var x = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, e.X, e.Y, 1);
+            MouseEventArgs x = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, e.X, e.Y, 1);
             OnMouseWheel(x);
         }
 
         public void ZoomOut(System.Windows.Forms.MouseEventArgs e) {
-            var x = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, e.X, e.Y, -1);
+            MouseEventArgs x = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, e.X, e.Y, -1);
             OnMouseWheel(x);
         }
 
         public void ZoomFit() {
             _Fitting = true;
 
-            var mb = MaxBounds();
+            RectangleM mb = MaxBounds();
 
             _ZoomFit = ZoomFitValue(mb, true, Size);
 
-            _Zoom = _ZoomFit; 
+            _Zoom = _ZoomFit;
             ComputeSliders(mb);
             ZoomOrShiftChanged();
             Invalidate();
@@ -117,7 +117,7 @@ namespace BlueControls.Controls {
         public void Zoom100() {
             _Fitting = true;
 
-            var mb = MaxBounds();
+            RectangleM mb = MaxBounds();
 
             _ZoomFit = ZoomFitValue(mb, true, Size);
 
@@ -168,7 +168,7 @@ namespace BlueControls.Controls {
 
             _Fitting = false;
 
-            var m = KoordinatesUnscaled(e);
+            Point m = KoordinatesUnscaled(e);
 
             if (e.Delta > 0) {
                 _Zoom *= 1.5m;
@@ -179,7 +179,7 @@ namespace BlueControls.Controls {
             _Zoom = Math.Max(_ZoomFit / 1.2m, _Zoom);
             _Zoom = Math.Min(20, _Zoom);
 
-            var mb = MaxBounds();
+            RectangleM mb = MaxBounds();
 
             ComputeSliders(mb);
 
@@ -237,8 +237,8 @@ namespace BlueControls.Controls {
 
             if (maxBounds == null || maxBounds.Width == 0) { return; }
 
-            var p = CenterPos(maxBounds, true, Size, _Zoom);
-            var sliderv = SliderValues(maxBounds, _Zoom, p);
+            Point p = CenterPos(maxBounds, true, Size, _Zoom);
+            PointF sliderv = SliderValues(maxBounds, _Zoom, p);
 
 
 
@@ -298,8 +298,8 @@ namespace BlueControls.Controls {
         /// <param name="ZoomToUse"></param>
         /// <returns></returns>
         public Point CenterPos(RectangleM MaxBounds, bool SliderShowing, Size sizeOfPaintArea, decimal ZoomToUse) {
-            var w = 0;
-            var h = 0;
+            int w = 0;
+            int h = 0;
 
 
             if (SliderShowing) {
@@ -317,10 +317,10 @@ namespace BlueControls.Controls {
 
         public Rectangle AvailablePaintArea() {
 
-            var wi = Size.Width;
+            int wi = Size.Width;
             if (SliderY.Visible) { wi -= SliderY.Width; }
 
-            var he = Size.Width;
+            int he = Size.Width;
             if (SliderX.Visible) { he -= SliderX.Height; }
 
             return new Rectangle(0, 0, wi, he);

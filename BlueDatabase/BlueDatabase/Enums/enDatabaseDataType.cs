@@ -16,10 +16,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-namespace BlueDatabase.Enums
-{
-    public enum enDatabaseDataType : byte
-    {
+namespace BlueDatabase.Enums {
+    public enum enDatabaseDataType : byte {
         // Fehler = 0
 
         Version = 1,

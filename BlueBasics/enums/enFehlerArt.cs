@@ -16,11 +16,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-namespace BlueBasics.Enums
-{
+namespace BlueBasics.Enums {
 
-    public enum enFehlerArt
-    {
+    public enum enFehlerArt {
         Info = 1,
         Warnung = 2,
         Fehler = 3,

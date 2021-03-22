@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueBasics.Enums
-{
-    public enum enImageCode
-    {
+namespace BlueBasics.Enums {
+    public enum enImageCode {
         None,
         Abspielen,
         Anwendung,

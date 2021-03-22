@@ -23,52 +23,45 @@ using BlueControls.Forms;
 using System.Drawing;
 
 namespace BluePaint {
-    public partial class Tool_DummyGenerator
-    {
+    public partial class Tool_DummyGenerator {
 
-        public Tool_DummyGenerator() : base()
-        {
+        public Tool_DummyGenerator() : base() {
             InitializeComponent();
         }
-        private void Erstellen_Click(object sender, System.EventArgs e)
-        {
+        private void Erstellen_Click(object sender, System.EventArgs e) {
             CreateDummy();
             OnZoomFit();
         }
 
-        private void CreateDummy()
-        {
-            var W = modErgebnis.Ergebnis(X.Text);
-            var H = modErgebnis.Ergebnis(Y.Text);
+        private void CreateDummy() {
+            double? W = modErgebnis.Ergebnis(X.Text);
+            double? H = modErgebnis.Ergebnis(Y.Text);
 
-            if (W == null || (int)W < 2)
-            {
+            if (W == null || (int)W < 2) {
                 Notification.Show("Bitte Breite eingeben.", enImageCode.Information);
                 return;
             }
 
 
-            if (H == null || (int)H < 2)
-            {
+            if (H == null || (int)H < 2) {
                 Notification.Show("Bitte Höhe eingeben.", enImageCode.Information);
                 return;
             }
 
-     
-            var newPic = new Bitmap((int)W, (int)H);
+
+            Bitmap newPic = new Bitmap((int)W, (int)H);
 
 
-            var gr = Graphics.FromImage(newPic);
+            Graphics gr = Graphics.FromImage(newPic);
 
             gr.Clear(Color.White);
             gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, newPic.Width - 2, newPic.Height - 2);
 
-            if (!string.IsNullOrEmpty(TXT.Text))
-            {
+            if (!string.IsNullOrEmpty(TXT.Text)) {
 
-                var f = new Font("Arial", 50, FontStyle.Bold);
+                Font f = new Font("Arial", 50, FontStyle.Bold);
 
-                var fs = gr.MeasureString(TXT.Text, f);
+                SizeF fs = gr.MeasureString(TXT.Text, f);
 
                 gr.TranslateTransform((float)(newPic.Width / 2.0), (float)(newPic.Height / 2.0));
 

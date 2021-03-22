@@ -22,30 +22,24 @@ using BlueBasics.Interfaces;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
+namespace BlueBasics {
+    public static partial class Extensions {
 
-        public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<int, T> L) where T : ICanBeEmpty
-        {
+        public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<int, T> L) where T : ICanBeEmpty {
 
             if (L == null || L.Count == 0) { return false; }
 
-            var remo = new List<int>();
+            List<int> remo = new List<int>();
 
-            foreach (var pair in L)
-            {
+            foreach (KeyValuePair<int, T> pair in L) {
                 if (pair.Value == null || pair.Value.IsNullOrEmpty()) { remo.Add(pair.Key); }
             }
 
             if (remo.Count == 0) { return false; }
-            var dummy = default(T);
+            T dummy = default(T);
 
-            foreach (var ThisInteger in remo)
-            {
-                if (!L.TryRemove(ThisInteger, out dummy))
-                {
+            foreach (int ThisInteger in remo) {
+                if (!L.TryRemove(ThisInteger, out dummy)) {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Remove failed: " + ThisInteger);
                 }
             }

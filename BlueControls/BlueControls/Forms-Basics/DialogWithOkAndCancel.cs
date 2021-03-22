@@ -4,29 +4,24 @@ using BlueControls.Enums;
 using System;
 using static BlueBasics.Develop;
 
-namespace BlueControls.Forms
-{
-    public partial class DialogWithOkAndCancel : BlueControls.Forms.Form
-    {
+namespace BlueControls.Forms {
+    public partial class DialogWithOkAndCancel : BlueControls.Forms.Form {
 
 
 
 
         #region Konstruktor
-        public DialogWithOkAndCancel() : this(Enums.enDesign.Form_MsgBox)
-        {
+        public DialogWithOkAndCancel() : this(Enums.enDesign.Form_MsgBox) {
 
         }
 
 
-        public DialogWithOkAndCancel(enDesign design) : base(design)
-        {
+        public DialogWithOkAndCancel(enDesign design) : base(design) {
             InitializeComponent();
             SetTopLevel(true);
 
 
-            if (Owner == null)
-            {
+            if (Owner == null) {
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             }
 
@@ -34,8 +29,7 @@ namespace BlueControls.Forms
 
         #endregion
 
-        public void Setup(int MinWidth, int BottomOfLowestControl, bool CancelPossible, bool Sizeable)
-        {
+        public void Setup(int MinWidth, int BottomOfLowestControl, bool CancelPossible, bool Sizeable) {
 
             Text = Develop.AppName();
 
@@ -44,13 +38,10 @@ namespace BlueControls.Forms
 
             Size = new System.Drawing.Size(MinWidth, BottomOfLowestControl + butOK.Height + BorderHeight + Skin.Padding);
 
-            if (CancelPossible)
-            {
+            if (CancelPossible) {
                 butAbbrechen.Left = MinWidth - Skin.Padding - butAbbrechen.Width - BorderWidth;
                 butOK.Left = butAbbrechen.Left - Skin.Padding - butOK.Width;
-            }
-            else
-            {
+            } else {
                 butAbbrechen.Visible = false;
                 butAbbrechen.Enabled = false;
 
@@ -62,21 +53,18 @@ namespace BlueControls.Forms
 
             butOK.Top = BottomOfLowestControl;
             butAbbrechen.Top = BottomOfLowestControl;
-            if (Sizeable)
-            {
+            if (Sizeable) {
                 FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             }
 
 
         }
 
-        public void Setup(string TXT, GenericControl CenterControl, int MinWidth, bool CancelPossible, bool Sizeable)
-        {
-            var wi = Skin.Padding * 2;
-            var he = Skin.Padding * 2;
+        public void Setup(string TXT, GenericControl CenterControl, int MinWidth, bool CancelPossible, bool Sizeable) {
+            int wi = Skin.Padding * 2;
+            int he = Skin.Padding * 2;
 
-            if (!string.IsNullOrEmpty(TXT))
-            {
+            if (!string.IsNullOrEmpty(TXT)) {
                 capText.Visible = true;
                 capText.Translate = false;
                 capText.Text = TXT;
@@ -86,8 +74,7 @@ namespace BlueControls.Forms
             }
 
 
-            if (CenterControl != null)
-            {
+            if (CenterControl != null) {
                 CenterControl.Top = he;
                 he = he + CenterControl.Height + Skin.Padding;
             }
@@ -98,8 +85,7 @@ namespace BlueControls.Forms
 
             Setup(wi, he, CancelPossible, Sizeable);
 
-            if (CenterControl != null)
-            {
+            if (CenterControl != null) {
                 CenterControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             }
 
@@ -109,40 +95,32 @@ namespace BlueControls.Forms
         /// <summary>
         /// Diese Routine wird aufgerufen, nachdem OK oder Cancel gedrückt wurde.
         /// </summary>
-        protected virtual void SetValue(bool canceled)
-        {
+        protected virtual void SetValue(bool canceled) {
             DebugPrint_RoutineMussUeberschriebenWerden();
         }
 
-        protected void Ok()
-        {
+        protected void Ok() {
             SetValue(false);
             Close();
         }
 
-        protected void Cancel()
-        {
+        protected void Cancel() {
             SetValue(true);
             Close();
         }
 
-        private void butAbbrechen_Click(object sender, System.EventArgs e)
-        {
+        private void butAbbrechen_Click(object sender, System.EventArgs e) {
             Cancel();
         }
-        protected bool OK_Enabled
-        {
-            get
-            {
+        protected bool OK_Enabled {
+            get {
                 return butOK.Enabled;
             }
-            set
-            {
+            set {
                 butOK.Enabled = value;
             }
         }
-        private void butOK_Click(object sender, System.EventArgs e)
-        {
+        private void butOK_Click(object sender, System.EventArgs e) {
             Ok();
         }
     }

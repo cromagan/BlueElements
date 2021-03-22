@@ -44,15 +44,14 @@ namespace BlueScript {
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            var x = attvar[0].ValueListString;
+            List<string> x = attvar[0].ValueListString;
 
             if (attvar[1].ValueBool) {
                 x = x.SortedDistinctList();
-            }
-            else {
+            } else {
                 x.Sort();
             }
 

@@ -36,13 +36,13 @@ namespace BlueBasics {
         //private static string LastCheck = string.Empty;
         //private static bool LastErg = false;
 
-        private static List<string> WriteAccess = new List<string>();
-        private static List<string> NoWriteAccess = new List<string>();
+        private static readonly List<string> WriteAccess = new List<string>();
+        private static readonly List<string> NoWriteAccess = new List<string>();
 
 
         private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure) {
-            var tries = 0;
-            var startTime = DateTime.Now;
+            int tries = 0;
+            DateTime startTime = DateTime.Now;
 
             while (!processMethod(file1, file2)) {
                 tries++;
@@ -62,8 +62,7 @@ namespace BlueBasics {
 
             try {
                 Directory.Delete(Pfad, true);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
             }
 
@@ -76,7 +75,7 @@ namespace BlueBasics {
         /// </summary>
         /// <returns>True, wenn mindestens eine Datei gelöscht wurde.</returns>
         public static bool DeleteFile(List<string> filelist) {
-            for (var Z = 0; Z < filelist.Count; Z++) {
+            for (int Z = 0; Z < filelist.Count; Z++) {
                 if (!FileExists(filelist[Z])) { filelist[Z] = string.Empty; }
             }
 
@@ -84,8 +83,8 @@ namespace BlueBasics {
 
             if (filelist.Count == 0) { return false; }
 
-            var del = false;
-            foreach (var ThisFile in filelist) {
+            bool del = false;
+            foreach (string ThisFile in filelist) {
                 if (DeleteFile(ThisFile, false)) { del = true; }
             }
 
@@ -118,16 +117,14 @@ namespace BlueBasics {
                     File.SetAttributes(ThisFile, FileAttributes.Normal);
                 }
 
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
             }
 
             try {
                 CanWrite(ThisFile, 0.5);
                 File.Delete(ThisFile);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
@@ -145,8 +142,7 @@ namespace BlueBasics {
 
             try {
                 File.Move(oldName, newName);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
@@ -161,8 +157,7 @@ namespace BlueBasics {
 
             try {
                 File.Copy(source, target);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
@@ -218,7 +213,7 @@ namespace BlueBasics {
 
 
             if (string.IsNullOrEmpty(directory)) { return false; }
-            var DirUpper = directory.ToUpper();
+            string DirUpper = directory.ToUpper();
 
             if (WriteAccess.Contains(DirUpper)) { return true; }
             if (NoWriteAccess.Contains(DirUpper)) { return false; }
@@ -227,16 +222,15 @@ namespace BlueBasics {
 
 
             try {
-                using (var fs = File.Create(Path.Combine(directory, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
+                using (FileStream fs = File.Create(Path.Combine(directory, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
                 WriteAccess.AddIfNotExists(DirUpper); // Multitasking
                 return true;
-            }
-            catch {
+            } catch {
                 NoWriteAccess.AddIfNotExists(DirUpper); // Multitasking
                 return false;
             }
 
-          
+
         }
 
 
@@ -247,7 +241,7 @@ namespace BlueBasics {
         public static bool CanWrite(string filename, double tryItForSeconds) {
             if (!CanWriteInDirectory(filename.FilePath())) { return false; }
 
-            var s = DateTime.Now;
+            DateTime s = DateTime.Now;
             do {
                 if (CanWrite(filename)) { return true; }
                 if (tryItForSeconds < _canWrite_tryintervall) { return false; }
@@ -270,19 +264,18 @@ namespace BlueBasics {
 
             if (_canWrite_LastFile != file.ToUpper()) {
 
-                var StartTime = DateTime.Now;
+                DateTime StartTime = DateTime.Now;
 
                 if (FileExists(file)) {
                     try {
                         // Versuch, Datei EXKLUSIV zu öffnen
-                        using (var obFi = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                        using (FileStream obFi = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                             obFi.Close();
                         }
 
                         _canWrite_LastResult = Convert.ToBoolean(DateTime.Now.Subtract(StartTime).TotalSeconds < 1);
 
-                    }
-                    catch {
+                    } catch {
                         // Bei Fehler ist die Datei in Benutzung
                         _canWrite_LastResult = false;
                     }
@@ -303,15 +296,15 @@ namespace BlueBasics {
 
 
         public static string TempFile(string NewPath, string Filename) {
-            var dn = Filename.FileNameWithoutSuffix();
-            var ds = Filename.FileSuffix();
+            string dn = Filename.FileNameWithoutSuffix();
+            string ds = Filename.FileSuffix();
             return TempFile(NewPath, dn, ds);
         }
 
         public static string TempFile(string FullName) {
-            var dp = FullName.FilePath();
-            var dn = FullName.FileNameWithoutSuffix();
-            var ds = FullName.FileSuffix();
+            string dp = FullName.FilePath();
+            string dn = FullName.FileNameWithoutSuffix();
+            string ds = FullName.FileSuffix();
             return TempFile(dp, dn, ds);
         }
 
@@ -325,7 +318,7 @@ namespace BlueBasics {
             if (string.IsNullOrEmpty(Suffix)) { Suffix = "tmp"; }
             if (string.IsNullOrEmpty(Wunschname)) { Wunschname = UserName() + DateTime.Now.ToString(Constants.Format_Date6); }
 
-            var z = -1;
+            int z = -1;
             Pfad = Pfad.TrimEnd("\\") + "\\";
 
             if (!PathExists(Pfad)) { Directory.CreateDirectory(Pfad); }
@@ -338,8 +331,7 @@ namespace BlueBasics {
                 z++;
                 if (z > 0) {
                     filename = Pfad + Wunschname + "_" + z.ToString(Constants.Format_Integer5) + "." + Suffix;
-                }
-                else {
+                } else {
                     filename = Pfad + Wunschname + "." + Suffix;
                 }
             } while (FileExists(filename));
@@ -352,9 +344,9 @@ namespace BlueBasics {
 
             if (!FileExists(filename)) { return string.Empty; }
 
-            using var md5 = MD5.Create();
-            using var stream = File.OpenRead(filename);
-            var hash = md5.ComputeHash(stream);
+            using MD5 md5 = MD5.Create();
+            using FileStream stream = File.OpenRead(filename);
+            byte[] hash = md5.ComputeHash(stream);
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
 
@@ -368,8 +360,7 @@ namespace BlueBasics {
 
                 if (Arguments == null) {
                     Processx = Process.Start(FileName);
-                }
-                else {
+                } else {
                     Processx = Process.Start(FileName, Arguments);
                 }
 
@@ -379,8 +370,7 @@ namespace BlueBasics {
                     Processx.WaitForExit();
                     Processx.Dispose();
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 if (LogException) { Develop.DebugPrint("ExecuteFile konnte nicht ausgeführt werden:<br>" + ex.Message + "<br>Datei: " + FileName); }
                 return false;
             }
@@ -403,9 +393,9 @@ namespace BlueBasics {
 
             if (name.Length < 100) { return name; }
 
-            var nn = "";
+            string nn = "";
 
-            for (var z = 0; z <= name.Length - 21; z++) {
+            for (int z = 0; z <= name.Length - 21; z++) {
                 nn += name.Substring(z, 1);
             }
             nn += name.Substring(name.Length - 20);
@@ -434,8 +424,7 @@ namespace BlueBasics {
                 }
 
                 if (ExecuteAfter) { ExecuteFile(DateiName); }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
 
@@ -458,10 +447,9 @@ namespace BlueBasics {
 
         public static string GetFileInfo(string filename, bool mustDo) {
             try {
-                var f = new FileInfo(filename);
+                FileInfo f = new FileInfo(filename);
                 return f.LastWriteTimeUtc.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
-            }
-            catch {
+            } catch {
                 if (!mustDo) { return string.Empty; }
                 Develop.CheckStackForOverflow();
                 Pause(0.5, false);

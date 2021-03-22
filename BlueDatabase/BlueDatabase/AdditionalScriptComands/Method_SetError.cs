@@ -40,19 +40,19 @@ namespace BlueScript {
         public override bool EndlessArgs { get => true; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            for (var z = 1; z < attvar.Count; z++) {
-                var n = attvar[z].Name.ToLower() + "_error";
-                var ve = s.Variablen.GetSystem(n);
+            for (int z = 1; z < attvar.Count; z++) {
+                string n = attvar[z].Name.ToLower() + "_error";
+                Variable ve = s.Variablen.GetSystem(n);
 
                 if (ve == null) {
                     ve = new Variable(n, string.Empty, Skript.Enums.enVariableDataType.List, false, true, string.Empty);
                     s.Variablen.Add(ve);
                 }
 
-                var l = ve.ValueListString;
+                List<string> l = ve.ValueListString;
                 l.AddIfNotExists(attvar[0].ValueString);
                 ve.ValueListString = l;
 

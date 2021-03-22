@@ -37,14 +37,13 @@ namespace BlueScript {
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             if (attvar[0].ValueBool) {
-                var (err, ermess2) = Script.Parse(infos.CodeBlockAfterText, false, s);
+                (string err, string ermess2) = Script.Parse(infos.CodeBlockAfterText, false, s);
                 if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
-            }
-            else {
+            } else {
                 s.Line += infos.LineBreakInCodeBlock;
             }
             return new strDoItFeedback(string.Empty, string.Empty);
@@ -56,29 +55,41 @@ namespace BlueScript {
             txt = txt.DeKlammere(true, false, false);
 
             switch (txt.ToLower()) {
-                case "true": return "true";
-                case "false": return "false";
-                case "true&&true": return "true";
-                case "true&&false": return "false";
-                case "false&&true": return "false";
-                case "false&&false": return "false";
-                case "true||true": return "true";
-                case "true||false": return "true";
-                case "false||true": return "true";
-                case "false||false": return "false";
-                case "!true": return "false";
-                case "!false": return "true";
+                case "true":
+                    return "true";
+                case "false":
+                    return "false";
+                case "true&&true":
+                    return "true";
+                case "true&&false":
+                    return "false";
+                case "false&&true":
+                    return "false";
+                case "false&&false":
+                    return "false";
+                case "true||true":
+                    return "true";
+                case "true||false":
+                    return "true";
+                case "false||true":
+                    return "true";
+                case "false||false":
+                    return "false";
+                case "!true":
+                    return "false";
+                case "!false":
+                    return "true";
             }
 
 
             #region Klammern zuerst berechnen
-            var (posa, _) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
+            (int posa, string _) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
             if (posa > -1) {
-                var (pose, _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
+                (int pose, string _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
 
                 if (pose < posa) { return null; }
 
-                var tmp = GetBool(txt.Substring(posa + 1, pose - posa - 1));
+                string tmp = GetBool(txt.Substring(posa + 1, pose - posa - 1));
                 if (tmp == null) { return null; }
 
                 return GetBool(txt.Substring(0, posa) + tmp + txt.Substring(pose + 1));
@@ -124,7 +135,7 @@ namespace BlueScript {
         }
 
         private static string GetBoolTMP(string txt, string check) {
-            var (i, _) = Script.NextText(txt, 0, new List<string>() { check }, false, false);
+            (int i, string _) = Script.NextText(txt, 0, new List<string>() { check }, false, false);
 
 
             if (i < 0) { return string.Empty; }
@@ -133,15 +144,15 @@ namespace BlueScript {
 
             if (i >= txt.Length - 1) { return string.Empty; } // siehe oben
 
-            var start = i - 1;
-            var ende = i + check.Length;
-            var trenn = "(!|&<>=)";
+            int start = i - 1;
+            int ende = i + check.Length;
+            string trenn = "(!|&<>=)";
 
-            var gans = false;
+            bool gans = false;
 
             do {
                 if (start < 0) { break; }
-                var ze = txt.Substring(start, 1);
+                string ze = txt.Substring(start, 1);
                 if (!gans && trenn.Contains(ze)) { break; }
                 if (ze == "\"") { gans = !gans; }
                 start--;
@@ -149,14 +160,14 @@ namespace BlueScript {
 
             do {
                 if (ende >= txt.Length) { break; }
-                var ze = txt.Substring(ende, 1);
+                string ze = txt.Substring(ende, 1);
                 if (!gans && trenn.Contains(ze)) { break; }
                 if (ze == "\"") { gans = !gans; }
                 ende++;
             } while (true);
 
-            var s1 = txt.Substring(start + 1, i - start - 1);
-            var s2 = txt.Substring(i + check.Length, ende - check.Length - i);
+            string s1 = txt.Substring(start + 1, i - start - 1);
+            string s2 = txt.Substring(i + check.Length, ende - check.Length - i);
 
 
             if (string.IsNullOrEmpty(s1) && check != "!") { return string.Empty; }
@@ -165,7 +176,7 @@ namespace BlueScript {
 
             Variable v1 = null;
             if (check != "!") { v1 = new Variable("dummy", s1, null); }
-            var v2 = new Variable("dummy", s2, null);
+            Variable v2 = new Variable("dummy", s2, null);
 
 
             // V2 braucht nicht gepürft werden, muss ja eh der gleiche TYpe wie V1 sein
@@ -175,13 +186,12 @@ namespace BlueScript {
                 if (v1.Type != Skript.Enums.enVariableDataType.Bool &&
                     v1.Type != Skript.Enums.enVariableDataType.Number &&
                     v1.Type != Skript.Enums.enVariableDataType.String) { return string.Empty; }
-            }
-            else {
+            } else {
                 if (v2.Type != Skript.Enums.enVariableDataType.Bool) { return string.Empty; }
             }
 
 
-            var replacer = string.Empty;
+            string replacer = string.Empty;
 
             switch (check) {
                 case "==":

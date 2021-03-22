@@ -18,14 +18,11 @@
 #endregion
 using BlueControls.Enums;
 
-namespace BlueControls.Controls
-{
-    public class RibbonBar : AbstractTabControl
-    {
+namespace BlueControls.Controls {
+    public class RibbonBar : AbstractTabControl {
 
 
-        public RibbonBar() : base() 
-        {
+        public RibbonBar() : base() {
             Height = 110;
             SendToBack();
             Dock = System.Windows.Forms.DockStyle.Top;

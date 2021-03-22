@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueBasics.Interfaces
-{
-    public interface ICompareKey
-    {
+namespace BlueBasics.Interfaces {
+    public interface ICompareKey {
         string CompareKey();
     }
 }

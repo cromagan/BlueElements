@@ -26,10 +26,8 @@ using BlueDatabase;
 using BlueDatabase.EventArgs;
 using System;
 
-namespace BlueControls.BlueDatabaseDialogs
-{
-    public partial class Skript : Forms.Form
-    {
+namespace BlueControls.BlueDatabaseDialogs {
+    public partial class Skript : Forms.Form {
 
         private readonly Table _BlueTable;
         private Database _Database;
@@ -37,8 +35,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         private readonly string _DidImport = string.Empty;
 
-        public Skript(Table table)
-        {
+        public Skript(Table table) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
@@ -53,32 +50,25 @@ namespace BlueControls.BlueDatabaseDialogs
             CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
         }
 
-        private void WriteBack()
-        {
-            if (_Database != null)
-            {
+        private void WriteBack() {
+            if (_Database != null) {
                 _Database.ImportScript = txbImportSkript.Text.ToNonCritical();
             }
 
         }
 
-        private void FillNow()
-        {
-            if (_Database == null)
-            {
+        private void FillNow() {
+            if (_Database == null) {
                 txbImportSkript.Text = string.Empty;
                 txbImportSkript.Enabled = false;
-            }
-            else
-            {
+            } else {
                 txbImportSkript.Enabled = _Database.IsAdministrator();
                 txbImportSkript.Text = _Database.ImportScript.FromNonCritical();
 
                 chkFehlgeschlageneSpalten.Visible = _Database.IsAdministrator();
                 chkFehlgeschlageneSpalten.Enabled = _Database.IsAdministrator();
 
-                if (!_Database.IsAdministrator())
-                {
+                if (!_Database.IsAdministrator()) {
                     chkFehlgeschlageneSpalten.Checked = false;
                 }
             }
@@ -87,26 +77,21 @@ namespace BlueControls.BlueDatabaseDialogs
 
         }
 
-        private void _BlueTable_DatabaseChanged(object sender, System.EventArgs e)
-        {
+        private void _BlueTable_DatabaseChanged(object sender, System.EventArgs e) {
             Database = _BlueTable.Database;
         }
 
-        public Database Database
-        {
-            get
-            {
+        public Database Database {
+            get {
                 return _Database;
             }
-            set
-            {
+            set {
 
                 if (_Database == value) { return; }
 
                 WriteBack();
 
-                if (_Database != null)
-                {
+                if (_Database != null) {
 
                     _Database.Loaded -= _DatabaseLoaded;
                     _Database.Save(false); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
@@ -115,8 +100,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 _Database = value;
                 FillNow();
 
-                if (_Database != null)
-                {
+                if (_Database != null) {
                     _Database.Loaded += _DatabaseLoaded;
                 }
 
@@ -124,24 +108,17 @@ namespace BlueControls.BlueDatabaseDialogs
         }
 
 
-        private void CursorPosChanged(object sender, CellEventArgs e)
-        {
-            var ok = true;
-            if (e.Row == null)
-            {
+        private void CursorPosChanged(object sender, CellEventArgs e) {
+            bool ok = true;
+            if (e.Row == null) {
                 optVorhandenZeile.Text = "Aktuell angewählte Zeile überschreiben";
                 ok = false;
-            }
-            else
-            {
+            } else {
                 optVorhandenZeile.Text = "Aktuell angewählte Zeile  <b>(" + e.Row.CellFirstString() + ")</b> überschreiben";
 
-                if (!Database.IsAdministrator())
-                {
-                    foreach (var ThisColumn in Database.Column)
-                    {
-                        if (ThisColumn != Database.Column.SysRowChangeDate && ThisColumn != Database.Column.SysRowChanger)
-                        {
+                if (!Database.IsAdministrator()) {
+                    foreach (ColumnItem ThisColumn in Database.Column) {
+                        if (ThisColumn != Database.Column.SysRowChangeDate && ThisColumn != Database.Column.SysRowChanger) {
                             if (!CellCollection.UserEditPossible(ThisColumn, e.Row, enErrorReason.EditGeneral)) { ok = false; }
                         }
                     }
@@ -156,20 +133,16 @@ namespace BlueControls.BlueDatabaseDialogs
 
             optVorhandenZeile.Enabled = ok;
 
-            if (!ok)
-            {
+            if (!ok) {
                 optVorhandenZeile.Checked = false;
                 _row = null;
-            }
-            else
-            {
+            } else {
                 _row = e.Row;
             }
         }
 
 
-        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
-        {
+        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             Database = null;
             _BlueTable.CursorPosChanged -= CursorPosChanged;
             _BlueTable.DatabaseChanged -= _BlueTable_DatabaseChanged;
@@ -180,54 +153,46 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
 
-        private void _DatabaseLoaded(object sender, LoadedEventArgs e)
-        {
+        private void _DatabaseLoaded(object sender, LoadedEventArgs e) {
             FillNow();
         }
 
-        private void btnClipboard_Click(object sender, System.EventArgs e)
-        {
+        private void btnClipboard_Click(object sender, System.EventArgs e) {
 
             WriteBack();
 
-            if (Database == null)
-            {
+            if (Database == null) {
                 MessageBox.Show("Keine Datenbank angewählt, abbruch.", enImageCode.Information, "OK");
                 return;
             }
 
 
-            if (!opbNeueZeile.Checked && !optVorhandenZeile.Checked)
-            {
+            if (!opbNeueZeile.Checked && !optVorhandenZeile.Checked) {
                 MessageBox.Show("Vorher anwählen, ob eine neue Zeile gewünscht ist, abbruch.", enImageCode.Information, "OK");
                 return;
             }
 
-            if (opbNeueZeile.Checked && optVorhandenZeile.Checked)
-            {
+            if (opbNeueZeile.Checked && optVorhandenZeile.Checked) {
                 MessageBox.Show("Zu viele Zeilen-Optionen, abbruch.", enImageCode.Information, "OK");
                 Develop.DebugPrint(enFehlerArt.Warnung, "Eigentlich nicht möglich");
                 return;
             }
 
-            if (!System.Windows.Forms.Clipboard.ContainsText())
-            {
+            if (!System.Windows.Forms.Clipboard.ContainsText()) {
                 MessageBox.Show("Kein Text im Zwischenspeicher, abbruch.", enImageCode.Information, "OK");
                 return;
             }
 
 
-            var nt = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text));
+            string nt = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text));
 
 
-            if (string.IsNullOrEmpty(nt))
-            {
+            if (string.IsNullOrEmpty(nt)) {
                 MessageBox.Show("Nur leerer Text im Zwischenspeicher, abbruch.", enImageCode.Information, "OK");
                 return;
             }
 
-            if (optVorhandenZeile.Checked && _row == null)
-            {
+            if (optVorhandenZeile.Checked && _row == null) {
                 MessageBox.Show("Keine Zeile angewählt, abbruch.", enImageCode.Information, "OK");
                 return;
             }
@@ -235,10 +200,9 @@ namespace BlueControls.BlueDatabaseDialogs
 
 
 
-            var _newdid = nt + "\r" + _DidImport;
+            string _newdid = nt + "\r" + _DidImport;
 
-            if (_newdid == _DidImport && opbNeueZeile.Checked)
-            {
+            if (_newdid == _DidImport && opbNeueZeile.Checked) {
                 if (MessageBox.Show("Es wurde bereits eine neue Zeile mit diesen Werten angelegt.\r<b>Noch eine anlegen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
 
@@ -248,23 +212,17 @@ namespace BlueControls.BlueDatabaseDialogs
             string feh;
 
 
-            if (opbNeueZeile.Checked)
-            {
+            if (opbNeueZeile.Checked) {
                 feh = Database.DoImportScript(nt, null, chkFehlgeschlageneSpalten.Checked);
-            }
-            else
-            {
+            } else {
                 feh = Database.DoImportScript(nt, _row, chkFehlgeschlageneSpalten.Checked);
             }
 
 
-            if (!string.IsNullOrEmpty(feh))
-            {
+            if (!string.IsNullOrEmpty(feh)) {
                 MessageBox.Show("Fehler während es Imports:<br>" + feh, enImageCode.Warnung, "OK");
                 return;
-            }
-            else
-            {
+            } else {
                 MessageBox.Show("Erfolgreich!", enImageCode.Smiley, "OK");
                 return;
             }

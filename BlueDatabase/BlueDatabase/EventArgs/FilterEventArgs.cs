@@ -18,13 +18,10 @@
 #endregion
 
 
-namespace BlueDatabase.EventArgs
-{
-    public class FilterEventArgs : System.EventArgs
-    {
+namespace BlueDatabase.EventArgs {
+    public class FilterEventArgs : System.EventArgs {
 
-        public FilterEventArgs(FilterItem Filter)
-        {
+        public FilterEventArgs(FilterItem Filter) {
             this.Filter = Filter;
         }
         public FilterItem Filter { get; set; }

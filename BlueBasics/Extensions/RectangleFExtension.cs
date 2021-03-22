@@ -21,17 +21,13 @@ using BlueBasics.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
+namespace BlueBasics {
+    public static partial class Extensions {
 
-        public static PointF PointOf(this RectangleF r, enAlignment P)
-        {
+        public static PointF PointOf(this RectangleF r, enAlignment P) {
 
 
-            switch (P)
-            {
+            switch (P) {
                 case enAlignment.Bottom_Left:
                     return new PointF(r.Left, r.Bottom);
                 case enAlignment.Bottom_Right:
@@ -58,21 +54,20 @@ namespace BlueBasics
         }
 
 
-        public static PointF NearestCornerOF(this RectangleF r, Point P)
-        {
+        public static PointF NearestCornerOF(this RectangleF r, Point P) {
 
-            var LO = r.PointOf(enAlignment.Top_Left);
-            var rO = r.PointOf(enAlignment.Top_Right);
-            var ru = r.PointOf(enAlignment.Bottom_Right);
-            var lu = r.PointOf(enAlignment.Bottom_Left);
+            PointF LO = r.PointOf(enAlignment.Top_Left);
+            PointF rO = r.PointOf(enAlignment.Top_Right);
+            PointF ru = r.PointOf(enAlignment.Bottom_Right);
+            PointF lu = r.PointOf(enAlignment.Bottom_Left);
 
 
-            var llo = Geometry.Länge(P, LO);
-            var lro = Geometry.Länge(P, rO);
-            var llu = Geometry.Länge(P, lu);
-            var lru = Geometry.Länge(P, ru);
+            decimal llo = Geometry.Länge(P, LO);
+            decimal lro = Geometry.Länge(P, rO);
+            decimal llu = Geometry.Länge(P, lu);
+            decimal lru = Geometry.Länge(P, ru);
 
-            var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
+            decimal Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
 
             if (Erg == llo) { return LO; }
             if (Erg == lro) { return rO; }
@@ -84,8 +79,7 @@ namespace BlueBasics
 
 
 
-        public static Rectangle ToRect(this RectangleF r)
-        {
+        public static Rectangle ToRect(this RectangleF r) {
             return new Rectangle((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
         }
 

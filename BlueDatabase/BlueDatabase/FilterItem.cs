@@ -131,12 +131,12 @@ namespace BlueDatabase {
             if (!IsOk()) { return string.Empty; }
 
 
-            var Result = "{Type=" + (int)_FilterType;
+            string Result = "{Type=" + (int)_FilterType;
 
             if (_Column != null) { Result = Result + ", " + _Column.ParsableColumnKey(); }
 
 
-            foreach (var t in SearchValue) {
+            foreach (string t in SearchValue) {
                 Result = Result + ", Value=" + t.ToNonCritical();
             }
 
@@ -148,7 +148,7 @@ namespace BlueDatabase {
 
         public void Parse(string ToParse) {
             IsParsing = true;
-            foreach (var pair in ToParse.GetAllTags()) {
+            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "identifier":
                         if (pair.Value != "Filter") {
@@ -204,7 +204,7 @@ namespace BlueDatabase {
 
 
 
-            var nam = _Column.ReadableText();
+            string nam = _Column.ReadableText();
 
             if (SearchValue == null || SearchValue.Count < 1) { return "#### Filter-Fehler ####"; }
 
@@ -271,7 +271,7 @@ namespace BlueDatabase {
                 case (enFilterType.Berechne | enFilterType.UND):
 
                     if (SearchValue[0].ToUpper().StartsWith("BTW(VALUE, ")) {
-                        var l = SearchValue[0].ToUpper().TrimStart("BTW(VALUE, ");
+                        string l = SearchValue[0].ToUpper().TrimStart("BTW(VALUE, ");
                         l = l.TrimEnd(")");
                         l = "von " + l.Replace(",", " bis ");
 

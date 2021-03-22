@@ -157,7 +157,7 @@ namespace BlueControls.ItemCollection {
 
 
         public override string ToString() {
-            var t = base.ToString();
+            string t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             return t + "Size=" + Größe_Distanzhalter.ToString(Constants.Format_Float10).ToNonCritical() + "}";
         }
@@ -184,14 +184,16 @@ namespace BlueControls.ItemCollection {
 
 
         public override List<FlexiControl> GetStyleOptions() {
-            var l = new List<FlexiControl>();
+            List<FlexiControl> l = new List<FlexiControl>();
 
 
-            var Size = new ItemCollectionList();
-            Size.Add("Klein (1,25 mm)", (mm125x * 1m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern);
-            Size.Add("Normal (2,5 mm)", (mm125x * 2m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern);
-            Size.Add("Groß (5,0 mm)", (mm125x * 4m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern);
-            Size.Add("Sehr groß (10,0 mm)", (mm125x * 5m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern);
+            ItemCollectionList Size = new ItemCollectionList
+            {
+                { "Klein (1,25 mm)", (mm125x * 1m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern },
+                { "Normal (2,5 mm)", (mm125x * 2m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern },
+                { "Groß (5,0 mm)", (mm125x * 4m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern },
+                { "Sehr groß (10,0 mm)", (mm125x * 5m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern }
+            };
 
 
             l.Add(new FlexiControlForProperty(this, "Größe Distanzhalter", Size));

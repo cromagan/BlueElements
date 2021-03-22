@@ -71,16 +71,16 @@ namespace BlueBasics {
             if (Image1 == null || Image2 == null) { return false; }
 
 
-            var Koord1 = new Rectangle(Pos1, Image1.Size);
-            var Koord2 = new Rectangle(Pos2, Image2.Size);
+            Rectangle Koord1 = new Rectangle(Pos1, Image1.Size);
+            Rectangle Koord2 = new Rectangle(Pos2, Image2.Size);
 
             if (!Koord1.IntersectsWith(Koord2)) { return false; }
 
-            var Schnitt = new Rectangle(Koord1.Location, Koord1.Size);
+            Rectangle Schnitt = new Rectangle(Koord1.Location, Koord1.Size);
             Schnitt.Intersect(Koord2);
 
-            for (var x = Schnitt.Left; x < Schnitt.Right; x += Accuracy) {
-                for (var y = Schnitt.Top; y < Schnitt.Bottom; y += Accuracy) {
+            for (int x = Schnitt.Left; x < Schnitt.Right; x += Accuracy) {
+                for (int y = Schnitt.Top; y < Schnitt.Bottom; y += Accuracy) {
                     if (!Image1.GetPixel(x - Koord1.X, y - Koord1.Y).IsNearWhite(0.9) && !Image2.GetPixel(x - Koord2.X, y - Koord2.Y).IsNearWhite(0.9)) {
                         return true;
                     }
@@ -96,44 +96,42 @@ namespace BlueBasics {
         public static List<Bitmap> SplitTiff(string fileName, int MaxSize) {
 
             // Open a Stream and decode a TIFF image
-            var imageStreamSource = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var l = new List<Bitmap>();
-            var frames = 1;
+            FileStream imageStreamSource = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            List<Bitmap> l = new List<Bitmap>();
+            int frames = 1;
 
             try {
 
-                var decoder = new TiffBitmapDecoder(imageStreamSource, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
+                TiffBitmapDecoder decoder = new TiffBitmapDecoder(imageStreamSource, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
                 frames = decoder.Frames.Count;
 
-                foreach (var frame in decoder.Frames) {
+                foreach (BitmapFrame frame in decoder.Frames) {
                     l.Add(GetBitmap(frame, MaxSize));
                 }
 
-            }
-            catch {
+            } catch {
 
 
                 try {
                     l.Clear();
                     CollectGarbage();
 
-                    var x = (Bitmap)BitmapExt.Image_FromFile(fileName);
+                    Bitmap x = (Bitmap)BitmapExt.Image_FromFile(fileName);
                     l.Add(BitmapExt.Resize(x, MaxSize, MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
 
 
                     if (frames > 1) {
-                        var x2 = new Bitmap(200, 200);
-                        var gr = Graphics.FromImage(x2);
+                        Bitmap x2 = new Bitmap(200, 200);
+                        Graphics gr = Graphics.FromImage(x2);
                         gr.Clear(Color.White);
                         gr.DrawString("Weitere Blätter vorhanden!", new Font("Arial", 9), Brushes.Red, new Point(0, 0));
                         l.Add(x2);
                     }
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     l.Clear();
                     CollectGarbage();
-                    var x2 = new Bitmap(200, 200);
-                    var gr = Graphics.FromImage(x2);
+                    Bitmap x2 = new Bitmap(200, 200);
+                    Graphics gr = Graphics.FromImage(x2);
                     gr.Clear(Color.White);
                     gr.DrawString("Vorschaubild fehlgeschlagen!", new Font("Arial", 9), Brushes.Red, new Point(0, 0));
                     l.Add(x2);
@@ -166,7 +164,7 @@ namespace BlueBasics {
             Pause(0.1, true);
 
             Bitmap bitmap;
-            using (var outStream = new MemoryStream()) {
+            using (MemoryStream outStream = new MemoryStream()) {
                 BitmapEncoder enc = new BmpBitmapEncoder();
                 enc.Frames.Add(BitmapFrame.Create(bitmapsource));
                 enc.Save(outStream);
@@ -188,28 +186,27 @@ namespace BlueBasics {
             const int w1 = 200; // Größe des Rechteckes
             const int w5 = 10; // Pixel zum vergrößerm
 
-            var x = 0;
+            int x = 0;
 
             if (!SwapX) {
                 x = 150 - (int)(w1 / 2.0);
                 if (Point.X < Screenshot.Width / 2.0) { x = Screenshot.Width - 150 - (int)(w1 / 2.0); }
-            }
-            else {
+            } else {
                 x = Screenshot.Width - 150 - (int)(w1 / 2.0);
                 if (Point.X < Screenshot.Width / 2.0) { x = 150 - (int)(w1 / 2.0); }
             }
 
 
-            var y = 150 - (int)(w1 / 2.0);
+            int y = 150 - (int)(w1 / 2.0);
             if (Point.Y < Screenshot.Height / 2.0) { y = Screenshot.Height - 150 - (int)(w1 / 2.0); }
 
-            var r = new Rectangle(x, y, w1, w1);
+            Rectangle r = new Rectangle(x, y, w1, w1);
 
 
-            for (var z = 5; z >= 0; z--) {
+            for (int z = 5; z >= 0; z--) {
                 r.Inflate(1, 1);
                 // r.Expand(0, 0, 1, 1)
-                var w = Convert.ToByte(255 / (double)10 * z);
+                byte w = Convert.ToByte(255 / (double)10 * z);
                 GR.DrawRectangle(new Pen(Color.FromArgb(w, 0, 0, 0)), r);
             }
 
@@ -220,7 +217,7 @@ namespace BlueBasics {
             GR.DrawImage(Screenshot, r, new Rectangle(Point.X - w5, Point.Y - w5, w5 * 2 + 1, w5 * 2 + 1), GraphicsUnit.Pixel);
             GR.DrawRectangle(Pens.Black, r);
 
-            var Mitte = r.PointOf(enAlignment.Horizontal_Vertical_Center);
+            Point Mitte = r.PointOf(enAlignment.Horizontal_Vertical_Center);
 
             GR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X, Mitte.Y - 7, Mitte.X, Mitte.Y + 6);
             GR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X - 7, Mitte.Y, Mitte.X + 6, Mitte.Y);
@@ -235,13 +232,13 @@ namespace BlueBasics {
 
         public static Rectangle RectangleOfAllScreens() {
 
-            var x1 = int.MaxValue;
-            var y1 = int.MaxValue;
-            var x2 = int.MinValue;
-            var y2 = int.MinValue;
+            int x1 = int.MaxValue;
+            int y1 = int.MaxValue;
+            int x2 = int.MinValue;
+            int y2 = int.MinValue;
 
 
-            for (var zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++) {
+            for (int zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++) {
                 x1 = Math.Min(x1, System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Left);
                 y1 = Math.Min(y1, System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Top);
 
@@ -250,8 +247,8 @@ namespace BlueBasics {
             }
 
 
-            var GP = new Point(x1, y1);
-            var sz = new Size(-x1 + x2, -y1 + y2);
+            Point GP = new Point(x1, y1);
+            Size sz = new Size(-x1 + x2, -y1 + y2);
 
             return new Rectangle(GP, sz);
         }
@@ -263,7 +260,7 @@ namespace BlueBasics {
 
         public static GraphicsPath Poly_Triangle(PointF P1, PointF P2, PointF P3) {
 
-            var P = new GraphicsPath();
+            GraphicsPath P = new GraphicsPath();
 
             P.AddLine(P1, P2);
             P.AddLine(P2, P3);
@@ -285,7 +282,7 @@ namespace BlueBasics {
             if (width < 1 || height < 1) { return null; }
 
 
-            var tempPoly_RoundRec = new GraphicsPath();
+            GraphicsPath tempPoly_RoundRec = new GraphicsPath();
             if (radius > height / 2.0 + 2) { radius = (int)(height / 2.0) + 2; }
             if (radius > width / 2.0 + 2) { radius = (int)(width / 2.0) + 2; }
 
@@ -310,9 +307,7 @@ namespace BlueBasics {
             return tempPoly_RoundRec;
 
 
-            void AddRad90(int MxX, int MxY, int Radius, int GradStart) {
-                tempPoly_RoundRec.AddArc(MxX, MxY, Radius, Radius, GradStart, 90);
-            }
+            void AddRad90(int MxX, int MxY, int Radius, int GradStart) => tempPoly_RoundRec.AddArc(MxX, MxY, Radius, Radius, GradStart, 90);
 
         }
 
@@ -333,12 +328,12 @@ namespace BlueBasics {
             p.AddLine(p.GetLastPoint(), rect.PointOf(enAlignment.Bottom_Left));
 
 
-            var versX = rect.Width / 6;
-            var versY = -rect.Height / 10;
+            int versX = rect.Width / 6;
+            int versY = -rect.Height / 10;
 
-            var pu = p.GetLastPoint();
+            PointF pu = p.GetLastPoint();
 
-            for (var z = 0; z < 10; z++) {
+            for (int z = 0; z < 10; z++) {
                 pu.Y += versY;
                 pu.X += versX;
                 versX *= -1;
@@ -354,7 +349,7 @@ namespace BlueBasics {
 
 
         public static GraphicsPath Poly_Arrow(Rectangle rect) {
-            var p = new GraphicsPath();
+            GraphicsPath p = new GraphicsPath();
 
 
 
@@ -363,8 +358,8 @@ namespace BlueBasics {
             ///         |/
             ///        
 
-            var plusOben = new PointF((float)(rect.Left + rect.Width * 0.5), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y - rect.Height * 0.18));
-            var plusUnten = new PointF((float)(rect.Left + rect.Width * 0.5), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y + rect.Height * 0.18));
+            PointF plusOben = new PointF((float)(rect.Left + rect.Width * 0.5), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y - rect.Height * 0.18));
+            PointF plusUnten = new PointF((float)(rect.Left + rect.Width * 0.5), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y + rect.Height * 0.18));
 
             p.AddLine(rect.PointOf(enAlignment.VerticalCenter_Right), new PointF(plusUnten.X, rect.Bottom));
             p.AddLine(p.GetLastPoint(), plusUnten);
@@ -387,8 +382,8 @@ namespace BlueBasics {
 
         public static void AddRad(this GraphicsPath GP, PointF middle, PointF startP, float Wink) {
 
-            var radius = (float)Math.Abs(Geometry.Länge(middle, startP));
-            var startw = (float)Geometry.Winkel(middle, startP);
+            float radius = (float)Math.Abs(Geometry.Länge(middle, startP));
+            float startw = (float)Geometry.Winkel(middle, startP);
 
 
             GP.AddArc(middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -Wink);
@@ -406,7 +401,7 @@ namespace BlueBasics {
 
 
         public static void Swap<T>(ref T W1, ref T W2) {
-            var W3 = W1;
+            T W3 = W1;
             W1 = W2;
             W2 = W3;
         }
@@ -423,15 +418,15 @@ namespace BlueBasics {
 
         public static string Nummer(this string Nr, int Stellen) {
 
-            var M = "";
+            string M = "";
             if (Nr[0] == '-') {
                 M = "-";
                 Nr = Nr.Remove(0, 1);
             }
 
-            var x = new StringBuilder();
+            StringBuilder x = new StringBuilder();
 
-            for (var z = 1; z <= Stellen - Nr.Length; z++) {
+            for (int z = 1; z <= Stellen - Nr.Length; z++) {
                 x.Append("0");
             }
 
@@ -509,7 +504,7 @@ namespace BlueBasics {
             }
 
             TimeSpan AkTimer;
-            var FirstTimer = DateTime.Now;
+            DateTime FirstTimer = DateTime.Now;
 
             do {
                 Develop.DoEvents();
@@ -565,7 +560,7 @@ namespace BlueBasics {
         public static string Download(string Url) {
             //  My.Computer.Network.DownloadFile("http://.png", "C:\TMP\a.png")
 
-            using var wc = new WebClient();
+            using WebClient wc = new WebClient();
             wc.Encoding = Encoding.UTF8;
             return wc.DownloadString(Url);
         }
@@ -573,16 +568,15 @@ namespace BlueBasics {
         public static bool CreateInternetLink(string SaveTo, string linkUrl) {
 
 
-            var Title = "unbekannt";
+            string Title = "unbekannt";
 
             //string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
             try {
-                var x = new WebClient();
-                var source = x.DownloadString(linkUrl);
+                WebClient x = new WebClient();
+                string source = x.DownloadString(linkUrl);
                 Title = Regex.Match(source, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
                 Title = Title.RemoveChars(Constants.Char_DateiSonderZeichen);
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 //Title = "unbekannt";
                 //DebugPrint(enFehlerArt.Warnung, ex);
                 //return false;
@@ -590,7 +584,7 @@ namespace BlueBasics {
 
             Title = Title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + "!.,()+-_ " + Constants.Char_Numerals);
 
-            using (var writer = new StreamWriter(TempFile(SaveTo.TrimEnd("\\") + "\\" + Title + ".url"))) {
+            using (StreamWriter writer = new StreamWriter(TempFile(SaveTo.TrimEnd("\\") + "\\" + Title + ".url"))) {
                 writer.WriteLine("[InternetShortcut]");
                 writer.WriteLine("URL=" + linkUrl);
                 writer.Flush();
@@ -600,7 +594,7 @@ namespace BlueBasics {
         }
 
         public static string GetUrlFileDestination(string Filename) {
-            var D = LoadFromDisk(Filename).SplitByCRToList();
+            List<string> D = LoadFromDisk(Filename).SplitByCRToList();
             return D.TagGet("URL");
         }
 
@@ -608,18 +602,17 @@ namespace BlueBasics {
             try {
                 //string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
-                using (var writer = new StreamWriter(TempFile(SaveTo + linkName + ".url"))) {
-                    var app = Assembly.GetExecutingAssembly().Location;
+                using (StreamWriter writer = new StreamWriter(TempFile(SaveTo + linkName + ".url"))) {
+                    string app = Assembly.GetExecutingAssembly().Location;
                     writer.WriteLine("[InternetShortcut]");
                     writer.WriteLine("URL=file:///" + app);
                     writer.WriteLine("IconIndex=0");
-                    var icon = app.Replace('\\', '/');
+                    string icon = app.Replace('\\', '/');
                     writer.WriteLine("IconFile=" + icon);
                     writer.Flush();
                 }
                 return true;
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Warnung, ex);
                 return false;
             }
@@ -630,11 +623,11 @@ namespace BlueBasics {
             WebResponse response = null;
             Stream remoteStream = null;
             StreamReader readStream = null;
-            var request = WebRequest.Create(Url);
+            WebRequest request = WebRequest.Create(Url);
             response = request.GetResponse();
             remoteStream = response.GetResponseStream();
             readStream = new StreamReader(remoteStream);
-            var img = Image.FromStream(remoteStream);
+            Image img = Image.FromStream(remoteStream);
             response.Close();
             remoteStream.Close();
             readStream.Close();
@@ -644,22 +637,19 @@ namespace BlueBasics {
 
 
         public static void launchBrowser(string url) {
-            var browserName = "iexplore.exe";
-            var adds = string.Empty;
-            using (var userChoiceKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice")) {
-                var progIdValue = userChoiceKey?.GetValue("Progid");
+            string browserName = "iexplore.exe";
+            string adds = string.Empty;
+            using (RegistryKey userChoiceKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice")) {
+                object progIdValue = userChoiceKey?.GetValue("Progid");
                 if (progIdValue != null) {
                     if (progIdValue.ToString().ToLower().Contains("chrome")) {
                         browserName = "chrome.exe";
-                    }
-                    else if (progIdValue.ToString().ToLower().Contains("firefox")) {
+                    } else if (progIdValue.ToString().ToLower().Contains("firefox")) {
                         browserName = "firefox.exe";
                         //adds = "-private-window -url";
-                    }
-                    else if (progIdValue.ToString().ToLower().Contains("safari")) {
+                    } else if (progIdValue.ToString().ToLower().Contains("safari")) {
                         browserName = "safari.exe";
-                    }
-                    else if (progIdValue.ToString().ToLower().Contains("opera")) {
+                    } else if (progIdValue.ToString().ToLower().Contains("opera")) {
                         browserName = "opera.exe";
                     }
                 }
@@ -671,7 +661,7 @@ namespace BlueBasics {
 
         public static int PointOnScreenNr(Point CP) {
 
-            for (var zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++) {
+            for (int zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++) {
                 if (CP.X >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Left && CP.Y >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Top && CP.X < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Right && CP.Y < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Bottom) {
                     return zSC;
                 }
@@ -719,7 +709,7 @@ namespace BlueBasics {
             if (Name.Contains("|")) { return null; }
             if (Name.Contains("[")) { return null; }
 
-            using var d = GetEmmbedResource(assembly, Name);
+            using Stream d = GetEmmbedResource(assembly, Name);
             if (d == null) { return null; }
 
             switch (Name.FileType()) {
@@ -737,31 +727,30 @@ namespace BlueBasics {
 
 
         public static int LevenshteinDistance(string txt1, string txt2) {
-            var l1 = txt1.Length;
-            var l2 = txt2.Length;
-            var d = new int[l1 + 2, l2 + 2];
+            int l1 = txt1.Length;
+            int l2 = txt2.Length;
+            int[,] d = new int[l1 + 2, l2 + 2];
 
             if (l1 == 0) { return l2; }
             if (l2 == 0) { return l1; }
 
 
 
-            for (var i = 0; i <= l1; i++) {
+            for (int i = 0; i <= l1; i++) {
                 d[i, 0] = i;
             }
 
-            for (var j = 0; j <= l2; j++) {
+            for (int j = 0; j <= l2; j++) {
                 d[0, j] = j;
             }
 
-            for (var i = 1; i <= l1; i++) {
-                for (var j = 1; j <= l2; j++) {
+            for (int i = 1; i <= l1; i++) {
+                for (int j = 1; j <= l2; j++) {
 
-                    var cost = 0;
+                    int cost = 0;
                     if (txt2[j - 1].ToString()[0] == txt1[i - 1]) {
                         cost = 0;
-                    }
-                    else {
+                    } else {
                         cost = 1;
                     }
 
@@ -776,9 +765,9 @@ namespace BlueBasics {
 
 
         public static void IntensifyBitmap(ref Bitmap BMP) {
-            for (var X = 0; X < BMP.Width; X++) {
-                for (var Y = 0; Y < BMP.Height; Y++) {
-                    var c = BMP.GetPixel(X, Y);
+            for (int X = 0; X < BMP.Width; X++) {
+                for (int Y = 0; Y < BMP.Height; Y++) {
+                    Color c = BMP.GetPixel(X, Y);
                     if (c.A > 0.5 && BMP.GetPixel(X, Y).GetBrightness() < 0.9) { BMP.SetPixel(X, Y, Color.Black); }
                 }
             }
@@ -802,7 +791,7 @@ namespace BlueBasics {
 
             if (x > 20) { return 1; }
 
-            var et = (float)Math.Pow(Math.E, x);
+            float et = (float)Math.Pow(Math.E, x);
             return et / (1 + et) * 2 - 1;
         }
 
@@ -811,8 +800,8 @@ namespace BlueBasics {
             if (string.IsNullOrEmpty(Pass)) { return b; }
             if (End <= Start) { return b; }
 
-            for (var z = Start; z <= End; z++) {
-                var TMP = b[z] + Pass[z % Pass.Length] * Direction;
+            for (int z = Start; z <= End; z++) {
+                int TMP = b[z] + Pass[z % Pass.Length] * Direction;
                 if (TMP < 0) { TMP += 256; }
                 if (TMP > 255) { TMP -= 256; }
                 b[z] = (byte)TMP;
@@ -830,8 +819,8 @@ namespace BlueBasics {
             if (string.IsNullOrEmpty(Pass)) { return b; }
             if (End <= Start) { return b; }
 
-            for (var z = Start; z <= End; z++) {
-                var TMP = b[z] + Pass[z % Pass.Length] * Direction;
+            for (int z = Start; z <= End; z++) {
+                int TMP = b[z] + Pass[z % Pass.Length] * Direction;
                 if (TMP < 0) { TMP += 256; }
                 if (TMP > 255) { TMP -= 256; }
                 b[z] = (byte)TMP;

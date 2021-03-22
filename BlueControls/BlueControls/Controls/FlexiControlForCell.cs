@@ -193,13 +193,11 @@ namespace BlueControls.Controls {
             if (_Database != null) {
                 if (!string.IsNullOrEmpty(_ColumnName)) {
                     _tmpColumn = _Database.Column[DataHolder.ColumnName(_ColumnName)];
-                }
-                else {
+                } else {
                     _tmpColumn = _Database.Column.SearchByKey(_ColKey);
                 }
                 _tmpRow = _Database.Row.SearchByKey(_RowKey);
-            }
-            else {
+            } else {
                 _tmpColumn = null;
                 _tmpRow = null;
             }
@@ -216,12 +214,10 @@ namespace BlueControls.Controls {
                     EditType = enEditTypeFormula.None;
                     QuickInfo = string.Empty;
                     FileEncryptionKey = string.Empty;
-                }
-                else {
+                } else {
                     Caption = _ColumnName + ":";
                 }
-            }
-            else {
+            } else {
 
                 Caption = _tmpColumn.ReadableText() + ":";
                 FileEncryptionKey = _Database.FileEncryptionKey;
@@ -229,8 +225,7 @@ namespace BlueControls.Controls {
                 if (string.IsNullOrEmpty(_ColumnName)) {
                     EditType = _tmpColumn.EditType;
                     QuickInfo = _tmpColumn.QuickInfoText(string.Empty);
-                }
-                else {
+                } else {
                     _tmpColumn.EditType = EditType;
                     //_tmpColumn.Quickinfo = QuickInfo;
                 }
@@ -241,11 +236,11 @@ namespace BlueControls.Controls {
         private void Database_RowChecked(object sender, RowCheckedEventArgs e) {
             if (e.Row != _tmpRow) { return; }
 
-            var NewT = string.Empty;
+            string NewT = string.Empty;
 
-            foreach (var ThisString in e.ColumnsWithErrors) {
+            foreach (string ThisString in e.ColumnsWithErrors) {
 
-                var X = ThisString.SplitBy("|");
+                string[] X = ThisString.SplitBy("|");
                 if (_tmpColumn != null && X[0].ToUpper() == _tmpColumn.Name.ToUpper()) {
                     if (!string.IsNullOrEmpty(InfoText)) { InfoText += "<br><hr><br>"; }
                     NewT += X[1];
@@ -283,14 +278,13 @@ namespace BlueControls.Controls {
 
             switch (_tmpColumn.Format) {
                 case enDataFormat.Link_To_Filesystem:
-                    var tmp = _tmpRow.CellGetList(_tmpColumn);
-                    var tmp2 = new List<string>();
-                    foreach (var file in tmp) {
-                        var tmpF = _tmpColumn.BestFile(file, false);
+                    List<string> tmp = _tmpRow.CellGetList(_tmpColumn);
+                    List<string> tmp2 = new List<string>();
+                    foreach (string file in tmp) {
+                        string tmpF = _tmpColumn.BestFile(file, false);
                         if (FileExists(tmpF)) {
                             tmp2.Add(tmpF);
-                        }
-                        else {
+                        } else {
                             tmp2.Add(file);
                         }
                     }
@@ -345,15 +339,15 @@ namespace BlueControls.Controls {
 
             if (_tmpColumn == null || _tmpRow == null) { return; }
 
-            var OldVal = _tmpRow.CellGetString(_tmpColumn);
+            string OldVal = _tmpRow.CellGetString(_tmpColumn);
             string NewValue;
 
             switch (_tmpColumn.Format) {
                 case enDataFormat.Link_To_Filesystem:
-                    var tmp = Value.SplitByCRToList();
-                    var tmp2 = new List<string>();
+                    List<string> tmp = Value.SplitByCRToList();
+                    List<string> tmp2 = new List<string>();
 
-                    foreach (var file in tmp) {
+                    foreach (string file in tmp) {
                         tmp2.Add(_tmpColumn.SimplyFile(file));
                     }
                     NewValue = tmp2.JoinWithCr();
@@ -383,7 +377,7 @@ namespace BlueControls.Controls {
             if (e.Control is Caption) { return; } // z.B. Info Caption
 
 
-            var column1 = _tmpColumn;
+            ColumnItem column1 = _tmpColumn;
 
             if (column1 == null) {
                 //            Develop.DebugPrint("Column nicht gefunden"); 
@@ -413,13 +407,12 @@ namespace BlueControls.Controls {
 
             switch (e.Control) {
                 case ComboBox comboBox:
-                    var Item2 = new ItemCollectionList();
+                    ItemCollectionList Item2 = new ItemCollectionList();
                     ItemCollectionList.GetItemCollection(Item2, column1, null, enShortenStyle.Replaced, 10000);
 
                     if (column1.TextBearbeitungErlaubt) {
                         StyleComboBox(comboBox, Item2, System.Windows.Forms.ComboBoxStyle.DropDown);
-                    }
-                    else {
+                    } else {
                         StyleComboBox(comboBox, Item2, System.Windows.Forms.ComboBoxStyle.DropDownList);
                     }
 
@@ -544,7 +537,7 @@ namespace BlueControls.Controls {
 
                     switch (ep.SorceType) {
                         case enSorceType.ScreenShot:
-                            var fil = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
+                            string fil = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
                             ep.Bitmap.Save(fil, ImageFormat.Png);
                             ep.ChangeSource(fil, enSorceType.LoadedFromDisk, false);
 
@@ -564,12 +557,11 @@ namespace BlueControls.Controls {
 
 
 
-                            var fil2 = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
+                            string fil2 = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
 
                             if (fil2.FilePath().ToUpper() != ep.SorceName.FilePath().ToUpper()) {
                                 ep.Bitmap.Save(fil2, ImageFormat.Png);
-                            }
-                            else {
+                            } else {
                                 fil2 = ep.SorceName;
                             }
                             ep.ChangeSource(fil2, enSorceType.LoadedFromDisk, false);
@@ -623,9 +615,9 @@ namespace BlueControls.Controls {
                 case "dateiöffnen":
                     if (e.HotItem is TextListItem t) {
                         if (FileExists(t.Internal)) {
-                            var b = modConverter.FileToByte(t.Internal);
+                            byte[] b = modConverter.FileToByte(t.Internal);
                             b = modAllgemein.SimpleCrypt(b, FileEncryptionKey, -1);
-                            var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
+                            string tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
                             modConverter.ByteToFile(tmp, b);
                             ExecuteFile(tmp, null, true, false);
                             MessageBox.Show("Warte...");
@@ -637,7 +629,7 @@ namespace BlueControls.Controls {
                 case "bild öffnen":
                     if (e.HotItem is BitmapListItem bi) {
                         if (bi.ImageLoaded()) {
-                            var x = new BlueControls.Forms.PictureView(bi.Bitmap);
+                            Forms.PictureView x = new BlueControls.Forms.PictureView(bi.Bitmap);
                             x.Show();
 
                             //var b = modConverter.FileToByte(t.Internal);
@@ -675,9 +667,9 @@ namespace BlueControls.Controls {
 
         private void ListBox_AddClicked(object sender, System.EventArgs e) {
 
-            var Dia = ColumnItem.UserEditDialogTypeInTable(_tmpColumn, false);
+            enEditTypeTable Dia = ColumnItem.UserEditDialogTypeInTable(_tmpColumn, false);
 
-            var lbx = (ListBox)sender;
+            ListBox lbx = (ListBox)sender;
 
             switch (Dia) {
                 case enEditTypeTable.None:
@@ -686,8 +678,8 @@ namespace BlueControls.Controls {
                 case enEditTypeTable.FileHandling_InDateiSystem:
                     // korrektheit der Zelle bereits geprüft
                     if (_tmpColumn != null && string.IsNullOrEmpty(lbx.LastFilePath)) { lbx.LastFilePath = _Database.Filename.FilePath(); }
-                    var DelList = new List<string>();
-                    using (var f = new System.Windows.Forms.OpenFileDialog()) {
+                    List<string> DelList = new List<string>();
+                    using (OpenFileDialog f = new System.Windows.Forms.OpenFileDialog()) {
                         f.CheckFileExists = true;
                         f.CheckPathExists = true;
                         f.Multiselect = true;
@@ -698,12 +690,12 @@ namespace BlueControls.Controls {
                         if (f.FileNames == null || f.FileNames.Length == 0) { return; }
 
 
-                        for (var z = 0; z <= f.FileNames.GetUpperBound(0); z++) {
-                            var b = modConverter.FileToByte(f.FileNames[z]);
+                        for (int z = 0; z <= f.FileNames.GetUpperBound(0); z++) {
+                            byte[] b = modConverter.FileToByte(f.FileNames[z]);
 
                             if (!string.IsNullOrEmpty(_Database.FileEncryptionKey)) { b = modAllgemein.SimpleCrypt(b, _Database.FileEncryptionKey, 1); }
 
-                            var neu = f.FileNames[z].FileNameWithSuffix();
+                            string neu = f.FileNames[z].FileNameWithSuffix();
                             neu = _tmpColumn.BestFile(neu.FileNameWithSuffix(), true);
                             lbx.LastFilePath = f.FileNames[z].FilePath();
 
@@ -739,7 +731,7 @@ namespace BlueControls.Controls {
         private void Marker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e) {
             TextBox TXB = null;
 
-            foreach (var Control in Controls) {
+            foreach (object Control in Controls) {
                 if (Control is TextBox t) { TXB = t; }
             }
 
@@ -751,12 +743,12 @@ namespace BlueControls.Controls {
             if (_tmpRow == null) { return; }
 
             if (Marker.CancellationPending) { return; }
-            var Names = new List<string>();
+            List<string> Names = new List<string>();
             Names.AddRange(_Database.Column[0].GetUcaseNamesSortedByLenght());
             if (Marker.CancellationPending) { return; }
-            var myname = _tmpRow.CellFirstString().ToUpper();
+            string myname = _tmpRow.CellFirstString().ToUpper();
 
-            var InitT = TXB.Text;
+            string InitT = TXB.Text;
 
             bool Ok;
             do {
@@ -771,19 +763,18 @@ namespace BlueControls.Controls {
                 if (Marker.CancellationPending || InitT != TXB.Text) { return; }
 
                 try {
-                    foreach (var ThisWord in Names) {
-                        var cap = 0;
+                    foreach (string ThisWord in Names) {
+                        int cap = 0;
                         do {
                             Develop.DoEvents();
                             if (Marker.CancellationPending || InitT != TXB.Text) { return; }
-                            var fo = InitT.IndexOfWord(ThisWord, cap, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                            int fo = InitT.IndexOfWord(ThisWord, cap, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
                             if (fo < 0) { break; }
 
                             if (ThisWord == myname) {
                                 Marker.ReportProgress(0, new List<object> { TXB, "Mark1", fo, fo + ThisWord.Length - 1 });
-                            }
-                            else {
+                            } else {
                                 Marker.ReportProgress(0, new List<object> { TXB, "Mark2", fo, fo + ThisWord.Length - 1 });
                             }
                             cap = fo + ThisWord.Length;
@@ -792,8 +783,7 @@ namespace BlueControls.Controls {
                     }
 
 
-                }
-                catch {
+                } catch {
                     Ok = false;
                 }
 
@@ -806,8 +796,8 @@ namespace BlueControls.Controls {
             //Ja, Multithreading ist kompliziert...
             if (Marker.CancellationPending) { return; }
 
-            var x = (List<object>)e.UserState;
-            var TXB = (TextBox)x[0];
+            List<object> x = (List<object>)e.UserState;
+            TextBox TXB = (TextBox)x[0];
 
             switch ((string)x[1]) {
                 case "Unmark1":
@@ -877,9 +867,9 @@ namespace BlueControls.Controls {
 
             if (Parent is Formula f) {
 
-                var x = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+                ItemCollectionList x = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
 
-                f.GetContextMenuItems(null, x, out var _, Tags, ref Cancel, ref Translate);
+                f.GetContextMenuItems(null, x, out object _, Tags, ref Cancel, ref Translate);
 
                 if (x.Count > 0) {
                     if (Items.Count > 0) {

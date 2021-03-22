@@ -22,14 +22,11 @@ using BlueBasics.Interfaces;
 using System;
 using System.ComponentModel;
 
-namespace BlueControls.Classes_Editor
-{
+namespace BlueControls.Classes_Editor {
     [DefaultEvent("Changed")]
-    internal partial class AbstractClassEditor<T> : BlueControls.Controls.GroupBox where T : IParseable
-    {
+    internal partial class AbstractClassEditor<T> : BlueControls.Controls.GroupBox where T : IParseable {
 
-        public AbstractClassEditor() : base()
-        {
+        public AbstractClassEditor() : base() {
             InitializeComponent();
         }
 
@@ -46,31 +43,24 @@ namespace BlueControls.Classes_Editor
         /// </summary>
         /// <returns></returns>
         [DefaultValue(null)]
-        internal T Item
-        {
-            get
-            {
+        internal T Item {
+            get {
 
                 return _Item;
             }
-            set
-            {
+            set {
                 _Item = value;
 
-                if (_Item != null)
-                {
+                if (_Item != null) {
                     _LastState = _Item.ToString();
-                    if (!Inited)
-                    {
+                    if (!Inited) {
                         Inited = true;
                         PrepaireFormula();
                     }
                     IsFilling = true;
                     EnabledAndFillFormula();
                     IsFilling = false;
-                }
-                else
-                {
+                } else {
                     _LastState = string.Empty;
                     IsFilling = true;
                     DisableAndClearFormula();
@@ -88,16 +78,14 @@ namespace BlueControls.Classes_Editor
         /// Sperrt die komplette Bearbeitung des Formulars und löscht alle Einträge.
         /// Typischerweiße, wenn das zu bearbeitende Objekt 'null' ist oder beim erstmaligen Initialiseren des Steuerelementes.
         /// </summary>
-        protected virtual void DisableAndClearFormula()
-        {
+        protected virtual void DisableAndClearFormula() {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
         }
 
         /// <summary>
         /// Erlaubt die Bearbeitung des Objektes und füllt den aktuellen Zustand in das Formular.
         /// </summary>
-        protected virtual void EnabledAndFillFormula()
-        {
+        protected virtual void EnabledAndFillFormula() {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
         }
 
@@ -105,17 +93,15 @@ namespace BlueControls.Classes_Editor
         /// Bereitet das Formular vor. Z.B. werden in den Auswahldialog-Boxen die voreingestellten Werte hineingeschrieben.
         /// Diese Routine wird aufgerufen, wenn das Item zum ersten Mal empfangen wurde.
         /// </summary>
-        protected virtual void PrepaireFormula()
-        {
+        protected virtual void PrepaireFormula() {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
         }
 
 
-        protected void OnChanged(T Obj)
-        {
+        protected void OnChanged(T Obj) {
             if (IsFilling) { return; }
 
-            var newstatse = Obj.ToString();
+            string newstatse = Obj.ToString();
 
             if (newstatse == _LastState) { return; }
 
@@ -125,8 +111,7 @@ namespace BlueControls.Classes_Editor
         }
 
 
-        protected override void OnVisibleChanged(System.EventArgs e)
-        {
+        protected override void OnVisibleChanged(System.EventArgs e) {
             base.OnVisibleChanged(e);
 
             // Damit das Formular nach der Anzeige erstmal deaktiviert ist.
@@ -136,8 +121,7 @@ namespace BlueControls.Classes_Editor
             _VisibleChanged_Done = true;
 
 
-            if (_Item == null)
-            {
+            if (_Item == null) {
                 IsFilling = true;
                 DisableAndClearFormula();
                 IsFilling = false;

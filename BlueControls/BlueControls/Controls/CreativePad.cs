@@ -200,7 +200,7 @@ namespace BlueControls.Controls {
                 _AutoRelation = value;
 
                 if (_Item != null) {
-                    foreach (var thisItem in _Item) {
+                    foreach (BasicPadItem thisItem in _Item) {
                         if (thisItem is ChildPadItem cpi) {
                             if (cpi.PadInternal != null) {
                                 cpi.PadInternal.AutoRelation = value;
@@ -278,15 +278,15 @@ namespace BlueControls.Controls {
             }
 
 
-            var Multi = modConverter.mmToPixel((decimal)_Gridsnap, ItemCollectionPad.DPI);
+            decimal Multi = modConverter.mmToPixel((decimal)_Gridsnap, ItemCollectionPad.DPI);
 
 
             switch (e.KeyCode) {
                 case System.Windows.Forms.Keys.Delete:
                 case System.Windows.Forms.Keys.Back:
 
-                    var ItemsDoDelete = new List<BasicPadItem>();
-                    foreach (var ThisPoint in _pointsSelected) {
+                    List<BasicPadItem> ItemsDoDelete = new List<BasicPadItem>();
+                    foreach (PointM ThisPoint in _pointsSelected) {
                         if (ThisPoint?.Parent is BasicPadItem bpi) { ItemsDoDelete.Add(bpi); }
                     }
 
@@ -331,10 +331,10 @@ namespace BlueControls.Controls {
 
 
             if (e.Button == System.Windows.Forms.MouseButtons.Left) {
-                var p = KoordinatesUnscaled(e);
-                foreach (var thisPoint in _pointsSelected) {
+                Point p = KoordinatesUnscaled(e);
+                foreach (PointM thisPoint in _pointsSelected) {
 
-                    if (thisPoint.UserSelectable &&  GeometryDF.Länge(thisPoint, new PointM(p)) < 5m / _Zoom) {
+                    if (thisPoint.UserSelectable && GeometryDF.Länge(thisPoint, new PointM(p)) < 5m / _Zoom) {
 
                         if (!thisPoint.CanMove(_Item.AllRelations)) {
                             Invalidate();
@@ -369,7 +369,7 @@ namespace BlueControls.Controls {
             if (item == null) { return; }
 
 
-            foreach (var thisPoint in _pointsSelected) {
+            foreach (PointM thisPoint in _pointsSelected) {
                 if (thisPoint.Parent == item) { return; }
             }
 
@@ -449,7 +449,7 @@ namespace BlueControls.Controls {
                 case System.Windows.Forms.MouseButtons.Left:
                     // Da ja evtl. nur ein Punkt verschoben wird, das Ursprüngliche Element wieder komplett auswählen.
                     BasicPadItem select = null;
-                    foreach (var Thispoint in _pointsSelected) {
+                    foreach (PointM Thispoint in _pointsSelected) {
                         if (Thispoint.Parent is BasicPadItem item) {
                             select = item;
                             break;
@@ -488,20 +488,20 @@ namespace BlueControls.Controls {
 
                 if (_Item.SheetSizeInMM.Width > 0 && _Item.SheetSizeInMM.Height > 0) {
                     Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
-                    var SSW = Math.Round(modConverter.mmToPixel((decimal)_Item.SheetSizeInMM.Width, ItemCollectionPad.DPI), 1);
-                    var SSH = Math.Round(modConverter.mmToPixel((decimal)_Item.SheetSizeInMM.Height, ItemCollectionPad.DPI), 1);
-                    var LO = new PointM(0m, 0m).ZoomAndMove(zoom, X, Y);
-                    var RU = new PointM(SSW, SSH).ZoomAndMove(zoom, X, Y);
+                    decimal SSW = Math.Round(modConverter.mmToPixel((decimal)_Item.SheetSizeInMM.Width, ItemCollectionPad.DPI), 1);
+                    decimal SSH = Math.Round(modConverter.mmToPixel((decimal)_Item.SheetSizeInMM.Height, ItemCollectionPad.DPI), 1);
+                    PointF LO = new PointM(0m, 0m).ZoomAndMove(zoom, X, Y);
+                    PointF RU = new PointM(SSW, SSH).ZoomAndMove(zoom, X, Y);
 
-                    var R = new Rectangle((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
+                    Rectangle R = new Rectangle((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
                     gr.FillRectangle(Brushes.White, R);
                     gr.FillRectangle(new SolidBrush(Item.BackColor), R);
                     gr.DrawRectangle(PenGray, R);
 
                     if (!_ShowInPrintMode) {
-                        var rLO = new PointM(_Item.P_rLO.X, _Item.P_rLO.Y).ZoomAndMove(zoom, X, Y);
-                        var rRU = new PointM(_Item.P_rRU.X, _Item.P_rRU.Y).ZoomAndMove(zoom, X, Y);
-                        var Rr = new Rectangle((int)rLO.X, (int)rLO.Y, (int)(rRU.X - rLO.X), (int)(rRU.Y - rLO.Y));
+                        PointF rLO = new PointM(_Item.P_rLO.X, _Item.P_rLO.Y).ZoomAndMove(zoom, X, Y);
+                        PointF rRU = new PointM(_Item.P_rRU.X, _Item.P_rRU.Y).ZoomAndMove(zoom, X, Y);
+                        Rectangle Rr = new Rectangle((int)rLO.X, (int)rLO.Y, (int)(rRU.X - rLO.X), (int)(rRU.Y - rLO.Y));
                         gr.DrawRectangle(PenGray, Rr);
                     }
 
@@ -517,7 +517,7 @@ namespace BlueControls.Controls {
 
 
                 // Erst Beziehungen, weil die die Grauen Punkte zeichnet
-                foreach (var ThisRelation in _Item.AllRelations) {
+                foreach (clsPointRelation ThisRelation in _Item.AllRelations) {
                     ThisRelation.Draw(gr, zoom, X, Y, _Item.AllRelations.IndexOf(ThisRelation));
                 }
 
@@ -525,7 +525,7 @@ namespace BlueControls.Controls {
                 if (Debug_ShowPointOrder) {
 
                     // Alle Punkte mit Order anzeigen
-                    foreach (var ThisPoint in _Item.AllPoints) {
+                    foreach (PointM ThisPoint in _Item.AllPoints) {
                         ThisPoint.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, Item.AllPoints.IndexOf(ThisPoint).ToString());
                     }
                 }
@@ -535,7 +535,7 @@ namespace BlueControls.Controls {
 
                 // Dann die selectiereren Punkte
 
-                foreach (var ThisPoint in _pointsSelected) {
+                foreach (PointM ThisPoint in _pointsSelected) {
                     if (ThisPoint.CanMove(_Item.AllRelations)) {
                         ThisPoint.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard, string.Empty);
                     } else {
@@ -544,11 +544,11 @@ namespace BlueControls.Controls {
                 }
 
 
-                foreach (var ThisRelation in _NewAutoRelations) {
+                foreach (clsPointRelation ThisRelation in _NewAutoRelations) {
 
 
-                    var P1 = ThisRelation.Points[0].ZoomAndMove(zoom, X, Y);
-                    var P2 = ThisRelation.Points[1].ZoomAndMove(zoom, X, Y);
+                    PointF P1 = ThisRelation.Points[0].ZoomAndMove(zoom, X, Y);
+                    PointF P2 = ThisRelation.Points[1].ZoomAndMove(zoom, X, Y);
 
                     if (ThisRelation.RelationType == enRelationType.WaagerechtSenkrecht) {
                         gr.DrawEllipse(new Pen(Color.Green, 3), P1.X - 4, P1.Y - 3, 7, 7);
@@ -563,7 +563,7 @@ namespace BlueControls.Controls {
 
 
                 if (_GivesMouseComandsTo is BasicPadItem PA) {
-                    var DCoordinates = PA.UsedArea().ZoomAndMoveRect(zoom, X, Y);
+                    RectangleF DCoordinates = PA.UsedArea().ZoomAndMoveRect(zoom, X, Y);
 
                     gr.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
                 }
@@ -576,7 +576,7 @@ namespace BlueControls.Controls {
 
         internal void DrawCreativePadToBitmap(Bitmap BMP, enStates vState, decimal zoomf, decimal X, decimal Y, List<BasicPadItem> visibleItems) {
 
-            var gr = Graphics.FromImage(BMP);
+            Graphics gr = Graphics.FromImage(BMP);
             DrawCreativePadTo(gr, BMP.Size, vState, zoomf, X, Y, visibleItems);
             gr.Dispose();
         }
@@ -594,17 +594,17 @@ namespace BlueControls.Controls {
         }
 
         private bool MoveSelectedPoints(decimal X, decimal Y) {
-            var errorsBefore = _Item.NotPerforming(false);
+            int errorsBefore = _Item.NotPerforming(false);
 
-            foreach (var thispoint in _Item.AllPoints) {
+            foreach (PointM thispoint in _Item.AllPoints) {
                 thispoint?.Store();
             }
 
 
-            foreach (var thispoint in _pointsToMoveX) {
+            foreach (PointM thispoint in _pointsToMoveX) {
                 thispoint.SetTo(thispoint.X + X, thispoint.Y);
             }
-            foreach (var thispoint in _pointsToMoveY) {
+            foreach (PointM thispoint in _pointsToMoveY) {
                 thispoint.SetTo(thispoint.X, thispoint.Y + Y);
             }
 
@@ -614,18 +614,18 @@ namespace BlueControls.Controls {
             _Item.PerformAllRelations();
 
 
-            var errorsAfter = _Item.NotPerforming(false);
+            int errorsAfter = _Item.NotPerforming(false);
 
             if (errorsAfter > errorsBefore) {
-                foreach (var thispoint in _Item.AllPoints) {
+                foreach (PointM thispoint in _Item.AllPoints) {
                     thispoint?.ReStore();
                 }
                 SelectedItems_CaluclatePointsWORelations();
 
             } else {
-                var done = new List<object>();
+                List<object> done = new List<object>();
 
-                foreach (var thispoint in _Item.AllPoints) {
+                foreach (PointM thispoint in _Item.AllPoints) {
                     if (!done.Contains(thispoint.Parent)) {
                         done.Add(thispoint.Parent);
                         if (thispoint.Parent is BasicPadItem bpi) { bpi.OnChanged(); } // Allen Items mitteilen, dass sich was geändert hat. Zb. Ihr Zeichenbereich
@@ -647,7 +647,7 @@ namespace BlueControls.Controls {
         /// Repariert bei allen selektierten Items (_ItemsToMove) die anderen Punkte, die keine Bezieheung haben und nur "Lose mitgehen"
         /// </summary>
         private void SelectedItems_CaluclatePointsWORelations() {
-            foreach (var thisItem in _ItemsToMove) {
+            foreach (BasicPadItem thisItem in _ItemsToMove) {
                 thisItem.CaluclatePointsWORelations();
 
             }
@@ -659,15 +659,15 @@ namespace BlueControls.Controls {
 
             _pointsToMoveX.Clear();
             _pointsToMoveY.Clear();
-            var CanMove_X = true;
-            var CanMove_Y = true;
+            bool CanMove_X = true;
+            bool CanMove_Y = true;
 
-            foreach (var thispoint in _pointsSelected) {
+            foreach (PointM thispoint in _pointsSelected) {
                 _pointsToMoveX.AddIfNotExists(_Item.ConnectsWith(thispoint, enXY.X, false));
                 _pointsToMoveY.AddIfNotExists(_Item.ConnectsWith(thispoint, enXY.Y, false));
             }
 
-            foreach (var thispoint in _pointsToMoveX) {
+            foreach (PointM thispoint in _pointsToMoveX) {
                 if (!thispoint.CanMoveX(_Item.AllRelations)) {
                     _pointsToMoveX.Clear();
                     CanMove_X = false;
@@ -679,7 +679,7 @@ namespace BlueControls.Controls {
                 _pointsToMoveX.Clear();
             }
 
-            foreach (var thispoint in _pointsToMoveY) {
+            foreach (PointM thispoint in _pointsToMoveY) {
                 if (!thispoint.CanMoveY(_Item.AllRelations)) {
                     _pointsToMoveY.Clear();
                     CanMove_Y = false;
@@ -691,7 +691,7 @@ namespace BlueControls.Controls {
             }
 
 
-            foreach (var thispoint in _pointsToMoveX) {
+            foreach (PointM thispoint in _pointsToMoveX) {
 
                 if (thispoint.Parent is BasicPadItem bpi) {
 
@@ -700,7 +700,7 @@ namespace BlueControls.Controls {
             }
 
 
-            foreach (var thispoint in _pointsToMoveY) {
+            foreach (PointM thispoint in _pointsToMoveY) {
 
                 if (thispoint.Parent is BasicPadItem bpi) {
 
@@ -724,7 +724,7 @@ namespace BlueControls.Controls {
             _NewAutoRelations.Clear();
 
 
-            var move = new PointM((decimal)(MousePos_1_1.X - MouseDownPos_1_1.X), MousePos_1_1.Y - MouseDownPos_1_1.Y);
+            PointM move = new PointM((decimal)(MousePos_1_1.X - MouseDownPos_1_1.X), MousePos_1_1.Y - MouseDownPos_1_1.Y);
 
             //var MouseMovedToCoords = new PointM(MousePos_1_1);
 
@@ -782,7 +782,7 @@ namespace BlueControls.Controls {
             PointM MasterPoint = null;
             PointM LowOrderPoint = null;
 
-            foreach (var thisPoint in Movep) {
+            foreach (PointM thisPoint in Movep) {
                 if (thisPoint == null) // Keine Lust das zu berücksichten. Muss halt stimmen!
                 {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Punkt verworfen");
@@ -796,7 +796,7 @@ namespace BlueControls.Controls {
 
             if (MasterPoint == null) { MasterPoint = LowOrderPoint; }
 
-            var Multi = modConverter.mmToPixel((decimal)_Gridsnap, ItemCollectionPad.DPI);
+            decimal Multi = modConverter.mmToPixel((decimal)_Gridsnap, ItemCollectionPad.DPI);
             decimal Value;
 
             if (DoX) {
@@ -814,7 +814,7 @@ namespace BlueControls.Controls {
 
         private void SnapToPoint(enXY toCheck, List<PointM> movedPoints, PointM move, ref PointM thisPointSnaps, ref PointM snapedToPoint) {
             decimal ShortestDist = 10;
-            var Nearest = decimal.MaxValue;
+            decimal Nearest = decimal.MaxValue;
 
 
             if (!_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht) &&
@@ -833,7 +833,7 @@ namespace BlueControls.Controls {
 
 
             // Berechne, welcher Punkt snappt
-            foreach (var thisPoint in movedPoints) {
+            foreach (PointM thisPoint in movedPoints) {
                 SnapToPoint(toCheck, thisPoint, move, ref ShortestDist, ref thisPointSnaps, ref snapedToPoint, ref Nearest);
             }
 
@@ -843,13 +843,13 @@ namespace BlueControls.Controls {
 
             if (pointToTest == null) { return; }
 
-            var WillMoveTo = new PointM(pointToTest.X + move.X, pointToTest.Y + move.Y);
+            PointM WillMoveTo = new PointM(pointToTest.X + move.X, pointToTest.Y + move.Y);
 
-            var l = PointsOnScreenWichAreNotSelected;
+            List<PointM> l = PointsOnScreenWichAreNotSelected;
 
-            foreach (var ThisPoint in l) {
+            foreach (PointM ThisPoint in l) {
                 if (ThisPoint.CanUsedForAutoRelation && ThisPoint.Parent != pointToTest.Parent) {
-                    var Distanz = GeometryDF.Länge(WillMoveTo, ThisPoint);
+                    decimal Distanz = GeometryDF.Länge(WillMoveTo, ThisPoint);
 
 
                     decimal SnapDist = 0;
@@ -884,7 +884,7 @@ namespace BlueControls.Controls {
 
             if (e.HotItem is BasicPadItem item) { thisItem = item; }
 
-            var Done = false;
+            bool Done = false;
 
             if (thisItem != null) {
                 switch (e.ClickedComand.ToLower()) {
@@ -940,11 +940,11 @@ namespace BlueControls.Controls {
             if (e == null) { return new List<BasicPadItem>(); }
 
 
-            var P = new Point((int)((e.X + _shiftX) / _Zoom), (int)((e.Y + _shiftY) / _Zoom));
+            Point P = new Point((int)((e.X + _shiftX) / _Zoom), (int)((e.Y + _shiftY) / _Zoom));
 
-            var l = new List<BasicPadItem>();
+            List<BasicPadItem> l = new List<BasicPadItem>();
 
-            foreach (var ThisItem in _Item) {
+            foreach (BasicPadItem ThisItem in _Item) {
                 if (ThisItem != null && ThisItem.Contains(P, _Zoom)) {
                     l.Add(ThisItem);
                 }
@@ -954,18 +954,18 @@ namespace BlueControls.Controls {
 
 
         private void CheckHotItem(System.Windows.Forms.MouseEventArgs e, bool doLastClicked) {
-            var OldClicked = LastClickedItem;
+            BasicPadItem OldClicked = LastClickedItem;
 
-            var l = HotItems(e);
+            List<BasicPadItem> l = HotItems(e);
 
-            var Mina = long.MaxValue;
+            long Mina = long.MaxValue;
 
             HotItem = null;
 
             if (e != null) {
 
-                foreach (var ThisItem in l) {
-                    var a = (long)Math.Abs(ThisItem.UsedArea().Width) * (long)Math.Abs(ThisItem.UsedArea().Height);
+                foreach (BasicPadItem ThisItem in l) {
+                    long a = (long)Math.Abs(ThisItem.UsedArea().Width) * (long)Math.Abs(ThisItem.UsedArea().Height);
                     if (a <= Mina) {
                         // Gleich deswegen, dass neuere, IDENTISCHE Items dass oberste gewählt wird.
                         Mina = a;
@@ -1018,7 +1018,7 @@ namespace BlueControls.Controls {
             }
 
 
-            foreach (var Thispoint in _Item.AllPoints) {
+            foreach (PointM Thispoint in _Item.AllPoints) {
                 Thispoint?.Store();
             }
 
@@ -1047,10 +1047,11 @@ namespace BlueControls.Controls {
 
             // Prüfen, ob die Beziehung vielleicht schon vorhanden ist
 
-            var r = new clsPointRelation(_Item, null, rel, Snap1, SnaP2); ;
+            clsPointRelation r = new clsPointRelation(_Item, null, rel, Snap1, SnaP2);
+            ;
 
 
-            foreach (var thisRelation in _Item.AllRelations) {
+            foreach (clsPointRelation thisRelation in _Item.AllRelations) {
                 if (thisRelation != null) {
                     if (thisRelation.SinngemäßIdenitisch(r)) { return null; }
                 }
@@ -1063,13 +1064,13 @@ namespace BlueControls.Controls {
 
             if (allreadyChecked == null) { allreadyChecked = new List<clsPointRelation>(); }
 
-            foreach (var thisRelation in _Item.AllRelations) {
+            foreach (clsPointRelation thisRelation in _Item.AllRelations) {
                 if (thisRelation != null && !allreadyChecked.Contains(thisRelation) && thisRelation.Connects().HasFlag(toCheck)) {
 
                     if (thisRelation.Points.Contains(point1)) {
                         allreadyChecked.Add(thisRelation);
                         if (thisRelation.Points.Contains(point2)) { return true; }
-                        foreach (var thispoint in thisRelation.Points) {
+                        foreach (PointM thispoint in thisRelation.Points) {
                             if (thispoint != point1) {
                                 if (HängenZusammen(toCheck, thispoint, point2, allreadyChecked)) { return true; }
                             }
@@ -1187,7 +1188,7 @@ namespace BlueControls.Controls {
             OnPrintPage(e);
 
 
-            var i = _Item.ToBitmap(3);
+            Bitmap i = _Item.ToBitmap(3);
             if (i == null) { return; }
             e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
         }
@@ -1200,7 +1201,7 @@ namespace BlueControls.Controls {
 
             RepairPrinterData();
 
-            var x = new BlueControls.Forms.PageSetupDialog(DruckerDokument, false);
+            PageSetupDialog x = new BlueControls.Forms.PageSetupDialog(DruckerDokument, false);
             x.ShowDialog();
             x.Dispose();
 
@@ -1225,7 +1226,7 @@ namespace BlueControls.Controls {
 
         public void ShowWorkingAreaSetup() {
 
-            var OriD = new PrintDocument();
+            PrintDocument OriD = new PrintDocument();
 
 
             OriD.DefaultPageSettings.Landscape = false;
@@ -1238,7 +1239,7 @@ namespace BlueControls.Controls {
 
 
 
-            using (var x = new BlueControls.Forms.PageSetupDialog(OriD, true)) {
+            using (PageSetupDialog x = new BlueControls.Forms.PageSetupDialog(OriD, true)) {
                 x.ShowDialog();
                 if (x.Canceled()) { return; }
             }
@@ -1259,7 +1260,7 @@ namespace BlueControls.Controls {
 
             DruckerDokument.DocumentName = _Item.Caption;
 
-            var done = false;
+            bool done = false;
             foreach (PaperSize ps in DruckerDokument.PrinterSettings.PaperSizes) {
                 if (ps.Width == (int)(_Item.SheetSizeInMM.Width / 25.4 * 100) && ps.Height == (int)(_Item.SheetSizeInMM.Height / 25.4 * 100)) {
                     done = true;
@@ -1302,7 +1303,7 @@ namespace BlueControls.Controls {
 
             Invalidate();
 
-            foreach (var ThisItem in _Item) {
+            foreach (BasicPadItem ThisItem in _Item) {
                 if (ThisItem is GridPadItem gpi) {
                     Found = gpi;
                     break;
@@ -1336,7 +1337,7 @@ namespace BlueControls.Controls {
 
 
         public void ShowErweitertMenü(BasicPadItem Item) {
-            var l = Item.GetStyleOptions();
+            List<FlexiControl> l = Item.GetStyleOptions();
 
             if (l.Count == 0) {
                 MessageBox.Show("Objekt hat keine<br>Bearbeitungsmöglichkeiten.", enImageCode.Information);
@@ -1381,10 +1382,10 @@ namespace BlueControls.Controls {
             get {
                 if (_pointsOnScreenWichAreNotSelected != null) { return _pointsOnScreenWichAreNotSelected; }
 
-                var dr = AvailablePaintArea();
+                Rectangle dr = AvailablePaintArea();
                 _pointsOnScreenWichAreNotSelected = new List<PointM>();
 
-                foreach (var thisPoint in _Item.AllPoints) {
+                foreach (PointM thisPoint in _Item.AllPoints) {
                     if (thisPoint != null && !_pointsSelected.Contains(thisPoint) && thisPoint.IsOnScreen(_Zoom, _shiftX, _shiftY, dr)) {
                         _pointsOnScreenWichAreNotSelected.AddIfNotExists(thisPoint);
                     }

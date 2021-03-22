@@ -19,22 +19,17 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
-        public static string ToStringConvert(this byte[] b)
-        {
+namespace BlueBasics {
+    public static partial class Extensions {
+        public static string ToStringConvert(this byte[] b) {
             return Encoding.Default.GetString(b);
         }
 
-        public static string ToStringConvertUTF8(this List<byte> b)
-        {
+        public static string ToStringConvertUTF8(this List<byte> b) {
             return Encoding.UTF8.GetString(b.ToArray());
         }
 
-        public static string ToStringConvert(this List<byte> b)
-        {
+        public static string ToStringConvert(this List<byte> b) {
             return Encoding.Default.GetString(b.ToArray());
         }
 

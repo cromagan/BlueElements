@@ -84,21 +84,18 @@ namespace BlueControls.Controls {
                 QuickInfo = string.Empty;
                 FileEncryptionKey = string.Empty;
                 ValueSet(string.Empty, true, true);
-            }
-            else {
+            } else {
                 if (string.IsNullOrEmpty(Filter.Herkunft)) {
                     DisabledReason = string.Empty;
-                }
-                else {
+                } else {
                     DisabledReason = "Dieser Filter ist automatisch<br>gesetzt worden.";
                 }
 
-                var qi = Filter.Column.QuickInfoText(string.Empty);
+                string qi = Filter.Column.QuickInfoText(string.Empty);
 
                 if (string.IsNullOrEmpty(qi)) {
                     QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText();
-                }
-                else {
+                } else {
                     QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText() + "<br><br><b>Info:</b><br>" + qi;
                 }
 
@@ -106,17 +103,15 @@ namespace BlueControls.Controls {
 
                 if (!Filter.Column.AutoFilterSymbolPossible()) {
                     EditType = enEditTypeFormula.None;
-                }
-                else {
+                } else {
 
-                    var ShowDelFilterButton = true;
+                    bool ShowDelFilterButton = true;
 
                     if (Filter.FilterType == enFilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1) {
 
                         if (myParent == null || myParent.Orientation == enOrientation.Waagerecht || Filter.Column.DauerFilterPos.IsEmpty) {
                             CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-                        }
-                        else {
+                        } else {
                             CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
 
                         }
@@ -153,8 +148,10 @@ namespace BlueControls.Controls {
             e.Control.MouseUp += Control_MouseUp;
 
             if (e.Control is ComboBox cbx) {
-                var Item2 = new ItemCollectionList();
-                Item2.Add("Keine weiteren Einträge vorhanden", "|~");
+                ItemCollectionList Item2 = new ItemCollectionList
+                {
+                    { "Keine weiteren Einträge vorhanden", "|~" }
+                };
 
                 //var c = Filter.Column.Contents(null);
 
@@ -173,13 +170,11 @@ namespace BlueControls.Controls {
                 if (CaptionPosition == enÜberschriftAnordnung.ohne) {
                     btn.ImageCode = "Trichter|16||1";
                     btn.Text = Filter.ReadableText();
-                }
-                else {
+                } else {
                     if (Filter != null && Filter.SearchValue != null && Filter.SearchValue.Count > 0 && !string.IsNullOrEmpty(Filter.SearchValue[0])) {
                         btn.ImageCode = "Trichter|16";
                         btn.Text = "wählen (" + Filter.SearchValue.Count.ToString() + ")";
-                    }
-                    else {
+                    } else {
                         btn.ImageCode = "Trichter|16";
                         btn.Text = "wählen";
                     }
@@ -207,7 +202,7 @@ namespace BlueControls.Controls {
         }
 
         private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
-            var cbx = (ComboBox)sender;
+            ComboBox cbx = (ComboBox)sender;
 
             cbx.Item.Clear();
             cbx.Item.CheckBehavior = enCheckBehavior.MultiSelection;
@@ -218,17 +213,15 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            var List_FilterString = Filter.Column.Autofilter_ItemList(TableView.Filter);
+            List<string> List_FilterString = Filter.Column.Autofilter_ItemList(TableView.Filter);
 
             if (List_FilterString.Count == 0) {
 
                 cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", enImageCode.Kreuz, false);
-            }
-            else if (List_FilterString.Count < 400) {
+            } else if (List_FilterString.Count < 400) {
                 cbx.Item.AddRange(List_FilterString, Filter.Column, enShortenStyle.Replaced, Filter.Column.BildTextVerhalten);
                 cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
-            }
-            else {
+            } else {
                 cbx.Item.Add("Zu viele Einträge", "|~", enImageCode.Kreuz, false);
             }
 
@@ -236,7 +229,7 @@ namespace BlueControls.Controls {
 
         internal ComboBox GetComboBox() {
 
-            foreach (var thisc in Controls) {
+            foreach (object thisc in Controls) {
                 if (thisc is ComboBox cbx) {
 
                     return cbx;
@@ -247,7 +240,7 @@ namespace BlueControls.Controls {
         }
 
         internal bool WasThisValueClicked() {
-            var cb = GetComboBox();
+            ComboBox cb = GetComboBox();
             if (cb == null) { return false; }
             return cb.WasThisValueClicked();
         }
@@ -299,19 +292,19 @@ namespace BlueControls.Controls {
 
                 case "#filterverschieben":
                     if (e.HotItem is ColumnItem col2) {
-                        var pc = (Filterleiste)Parent; // Parent geht verlren, wenn der Filter selbst disposed und neu erzeugt wird
+                        Filterleiste pc = (Filterleiste)Parent; // Parent geht verlren, wenn der Filter selbst disposed und neu erzeugt wird
 
                         while (true) {
 
-                            var nx = InputBox.Show("X, von 0 bis 10000", col2.DauerFilterPos.X.ToString(), enDataFormat.Ganzzahl);
+                            string nx = InputBox.Show("X, von 0 bis 10000", col2.DauerFilterPos.X.ToString(), enDataFormat.Ganzzahl);
                             if (string.IsNullOrEmpty(nx)) { return true; }
-                            var nxi = modConverter.IntParse(nx);
+                            int nxi = modConverter.IntParse(nx);
                             nxi = Math.Max(nxi, 0);
                             nxi = Math.Min(nxi, 10000);
 
-                            var ny = InputBox.Show("Y, von 0 bis 10000", col2.DauerFilterPos.Y.ToString(), enDataFormat.Ganzzahl);
+                            string ny = InputBox.Show("Y, von 0 bis 10000", col2.DauerFilterPos.Y.ToString(), enDataFormat.Ganzzahl);
                             if (string.IsNullOrEmpty(ny)) { return true; }
-                            var nyi = modConverter.IntParse(ny);
+                            int nyi = modConverter.IntParse(ny);
                             nyi = Math.Max(nyi, 0);
                             nyi = Math.Min(nyi, 10000);
 
@@ -322,7 +315,7 @@ namespace BlueControls.Controls {
                     return true;
 
                 case "#bildpfad":
-                    var p = (string)((Filterleiste)Parent).pic.Tag;
+                    string p = (string)((Filterleiste)Parent).pic.Tag;
                     ExecuteFile(p.FilePath());
                     MessageBox.Show("Aktuelle Datei:<br>" + p);
                     return true;

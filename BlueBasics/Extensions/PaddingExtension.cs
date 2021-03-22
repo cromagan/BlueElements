@@ -17,21 +17,17 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
+namespace BlueBasics {
+    public static partial class Extensions {
 
-        public static System.Windows.Forms.Padding PaddingParse(string Code)
-        {
+        public static System.Windows.Forms.Padding PaddingParse(string Code) {
 
 
             Code = Code.RemoveChars("{}LeftTopRightBm= ");
 
-            var w = Code.Split(',');
+            string[] w = Code.Split(',');
 
-            var P = new System.Windows.Forms.Padding
-            {
+            System.Windows.Forms.Padding P = new System.Windows.Forms.Padding {
                 Left = int.Parse(w[0]),
                 Top = int.Parse(w[1]),
                 Right = int.Parse(w[2]),

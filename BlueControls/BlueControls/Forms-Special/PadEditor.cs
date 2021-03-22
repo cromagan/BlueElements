@@ -53,15 +53,14 @@ namespace BlueControls.Forms {
 
             if (FitWindowToBest) {
                 if (System.Windows.Forms.Screen.AllScreens.Length == 1 || OpenOnScreen < 0) {
-                    var OpScNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
+                    int OpScNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
 
                     Width = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width / 1.5);
                     Height = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height / 1.5);
                     Left = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Left + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width - Width) / 2.0);
                     Top = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Top + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height - Height) / 2.0);
 
-                }
-                else {
+                } else {
                     Width = System.Windows.Forms.Screen.AllScreens[OpenOnScreen].WorkingArea.Width;
                     Height = System.Windows.Forms.Screen.AllScreens[OpenOnScreen].WorkingArea.Height;
                     Left = System.Windows.Forms.Screen.AllScreens[OpenOnScreen].WorkingArea.Left;
@@ -82,8 +81,7 @@ namespace BlueControls.Forms {
 
             if (string.IsNullOrEmpty(DesignName)) {
                 PadDesign.Text = PadDesign.Item[0].Internal;
-            }
-            else {
+            } else {
                 PadDesign.Text = DesignName;
             }
 
@@ -129,28 +127,28 @@ namespace BlueControls.Forms {
 
         private void btnAddLine_Click(object sender, System.EventArgs e) {
 
-            var P = Pad.MiddleOfVisiblesScreen();
-            var w = (int)(300 / Pad.ZoomCurrent());
+            Point P = Pad.MiddleOfVisiblesScreen();
+            int w = (int)(300 / Pad.ZoomCurrent());
 
 
-            var b = new LinePadItem(Pad.Item, PadStyles.Style_Standard, new Point(P.X - w, P.Y), new Point(P.X + w, P.Y));
+            LinePadItem b = new LinePadItem(Pad.Item, PadStyles.Style_Standard, new Point(P.X - w, P.Y), new Point(P.X + w, P.Y));
             Pad.Item.Add(b);
         }
 
         private void btnAddDistance_Click(object sender, System.EventArgs e) {
-            var b = new SpacerPadItem(Pad.Item);
+            SpacerPadItem b = new SpacerPadItem(Pad.Item);
             Pad.Item.Add(b);
             b.SetCoordinates(new RectangleM(10, 10, 20, 20), false);
         }
 
         private void btnAddImage_Click(object sender, System.EventArgs e) {
-            var b = new BitmapPadItem(Pad.Item, QuickImage.Get(enImageCode.Fragezeichen).BMP, new Size(1000, 1000));
+            BitmapPadItem b = new BitmapPadItem(Pad.Item, QuickImage.Get(enImageCode.Fragezeichen).BMP, new Size(1000, 1000));
             Pad.Item.Add(b);
         }
 
 
         private void AddText_Click(object sender, System.EventArgs e) {
-            var b = new TextPadItem(Pad.Item) {
+            TextPadItem b = new TextPadItem(Pad.Item) {
                 Interner_Text = string.Empty,
                 Stil = PadStyles.Style_Standard
             };
@@ -160,7 +158,7 @@ namespace BlueControls.Forms {
 
 
         private void btnAddDimension_Click(object sender, System.EventArgs e) {
-            var b = new DimensionPadItem(Pad.Item, new PointF(300, 300), new PointF(400, 300), 30);
+            DimensionPadItem b = new DimensionPadItem(Pad.Item, new PointF(300, 300), new PointF(400, 300), 30);
             Pad.Item.Add(b);
         }
 
@@ -214,11 +212,9 @@ namespace BlueControls.Forms {
         private void CheckBezMode() {
             if (Bez_None.Checked) {
                 Pad.AutoRelation = enAutoRelationMode.None;
-            }
-            else if (Bez_Direkt.Checked) {
+            } else if (Bez_Direkt.Checked) {
                 Pad.AutoRelation = enAutoRelationMode.DirektVerbindungen_Erhalten;
-            }
-            else if (Bez_All.Checked) {
+            } else if (Bez_All.Checked) {
                 Pad.AutoRelation = enAutoRelationMode.Alle_Erhalten;
 
             }
@@ -239,13 +235,13 @@ namespace BlueControls.Forms {
         }
 
         private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
-            var b = new ChildPadItem(Pad.Item);
+            ChildPadItem b = new ChildPadItem(Pad.Item);
             b.SetCoordinates(new RectangleM(100, 100, 300, 300), true);
             Pad.Item.Add(b);
         }
 
         private void btnAddSymbol_Click(object sender, System.EventArgs e) {
-            var b = new SymbolPadItem(Pad.Item);
+            SymbolPadItem b = new SymbolPadItem(Pad.Item);
             b.SetCoordinates(new RectangleM(100, 100, 300, 300), true);
             Pad.Item.Add(b);
         }
@@ -261,7 +257,7 @@ namespace BlueControls.Forms {
         }
 
         private void btnPhsyik_Click(object sender, System.EventArgs e) {
-            var b = new clsPhysicPadItem(Pad.Item);
+            clsPhysicPadItem b = new clsPhysicPadItem(Pad.Item);
             //b.SetCoordinates(new RectangleM(100, 100, 300, 300));
             Pad.Item.Add(b);
         }
@@ -283,7 +279,7 @@ namespace BlueControls.Forms {
 
         private void SaveTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
             Pad.Grid = false;
-            var t = Pad.Item.ToString();
+            string t = Pad.Item.ToString();
             Pad.Grid = ckbRaster.Checked;
 
             SaveToDisk(SaveTab.FileName, t, false);
@@ -313,7 +309,7 @@ namespace BlueControls.Forms {
 
         private void LoadFile(string fileName) {
             Pad.Item.Clear();
-            var t = LoadFromDisk(fileName);
+            string t = LoadFromDisk(fileName);
 
             Pad.Item = new ItemCollectionPad(t, fileName);
             ItemChanged();

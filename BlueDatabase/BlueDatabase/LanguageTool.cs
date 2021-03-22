@@ -48,15 +48,14 @@ namespace BlueDatabase {
 
             if (style == enShortenStyle.Unreplaced || column.OpticalReplace.Count == 0) { return txt; }
 
-            var OT = txt;
+            string OT = txt;
 
-            foreach (var ThisString in column.OpticalReplace) {
-                var x = ThisString.SplitBy("|");
+            foreach (string ThisString in column.OpticalReplace) {
+                string[] x = ThisString.SplitBy("|");
                 if (x.Length == 2) {
                     if (string.IsNullOrEmpty(x[0])) {
                         if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
-                    }
-                    else {
+                    } else {
                         txt = txt.Replace(x[0], x[1]);
                     }
                 }
@@ -109,7 +108,7 @@ namespace BlueDatabase {
                 //if (txt.ContainsChars(Constants.Char_Numerals)) { English = German; return string.Format(English, args); }
                 //if (txt.ToLower().Contains("imagecode")) { English = German; return string.Format(English, args); }
 
-                var addend = string.Empty;
+                string addend = string.Empty;
 
                 if (txt.EndsWith(":")) {
                     txt = txt.TrimEnd(":");
@@ -118,7 +117,7 @@ namespace BlueDatabase {
 
                 txt = txt.Replace("\r\n", "\r");
 
-                var r = Translation.Row[txt];
+                RowItem r = Translation.Row[txt];
                 if (r == null) {
                     if (Translation.ReadOnly) { English = German; return string.Format(English, args); }
                     if (!mustTranslate) { English = German; return string.Format(English, args); }
@@ -126,13 +125,12 @@ namespace BlueDatabase {
                 }
 
 
-                var t = r.CellGetString("Translation");
+                string t = r.CellGetString("Translation");
                 if (string.IsNullOrEmpty(t)) { English = German; return string.Format(English, args); }
                 English = t + addend;
 
                 return string.Format(English, args);
-            }
-            catch {
+            } catch {
                 return txt;
             }
 

@@ -1,7 +1,5 @@
-﻿namespace BlueDatabase.Enums
-{
-    public enum enAnsicht
-    {
+﻿namespace BlueDatabase.Enums {
+    public enum enAnsicht {
         Unverändert = -1,
         Nur_Tabelle = 0,
         Überschriften_und_Formular = 1,

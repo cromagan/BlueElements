@@ -37,7 +37,7 @@ namespace BlueBasics {
         private static string SerialNr2Path_LastErgebnis = "";
 
         public static string ByteToBin8(byte B) {
-            var x = Convert.ToString(B, 2);
+            string x = Convert.ToString(B, 2);
             do {
                 if (x.Length == 8) { return x; }
                 x = "0" + x;
@@ -57,8 +57,8 @@ namespace BlueBasics {
                 return null;
             }
 
-            var b = TXT.ToByte();
-            var BMP = ByteToBitmap(b);
+            byte[] b = TXT.ToByte();
+            Bitmap BMP = ByteToBitmap(b);
             return BMP;
         }
 
@@ -81,7 +81,7 @@ namespace BlueBasics {
 
 
             string base64 = null;
-            var memory = new MemoryStream();
+            MemoryStream memory = new MemoryStream();
             BMP.Save(memory, BFormat);
             base64 = Convert.ToBase64String(memory.ToArray());
             memory.Close();
@@ -91,14 +91,13 @@ namespace BlueBasics {
         public static Bitmap Base64ToBitmap(string base64) {
             try {
 
-                using (var memory = new MemoryStream(Convert.FromBase64String(base64))) {
-                    var oBitmap = new Bitmap(memory);
+                using (MemoryStream memory = new MemoryStream(Convert.FromBase64String(base64))) {
+                    Bitmap oBitmap = new Bitmap(memory);
                     memory.Close();
                     return oBitmap;
                 }
 
-            }
-            catch {
+            } catch {
                 return null;
             }
         }
@@ -107,10 +106,10 @@ namespace BlueBasics {
         public static byte[] FileToByte(string Dateiname) {
 
             byte[] b = null;
-            var obFi = new FileStream(Dateiname, FileMode.Open, FileAccess.Read);
+            FileStream obFi = new FileStream(Dateiname, FileMode.Open, FileAccess.Read);
 
 
-            var r = new BinaryReader(obFi);
+            BinaryReader r = new BinaryReader(obFi);
             b = r.ReadBytes((int)new FileInfo(Dateiname).Length);
 
             r.Close();
@@ -133,7 +132,7 @@ namespace BlueBasics {
 
 
             //   Stop
-            var l = File.Create(Dateiname);
+            FileStream l = File.Create(Dateiname);
             l.Write(b, 0, b.Length);
             l.Flush();
             l.Close();
@@ -157,7 +156,7 @@ namespace BlueBasics {
 
             if (BMP.PixelFormat != PixelFormat.Format32bppPArgb) { BMP = Bitmap_ChangePixelFormat(BMP); }
 
-            var MemSt = new MemoryStream();
+            MemoryStream MemSt = new MemoryStream();
             BMP.Save(MemSt, Format);
             return MemSt.ToArray();
         }
@@ -174,10 +173,9 @@ namespace BlueBasics {
             if (value.GetUpperBound(0) == 0) { return null; }
 
             try {
-                var fs = new MemoryStream(value, 0, value.Length, false);
+                MemoryStream fs = new MemoryStream(value, 0, value.Length, false);
                 return (Bitmap)Image.FromStream(fs);
-            }
-            catch {
+            } catch {
                 Develop.DebugPrint("Fehler bei der Umwandlung!");
                 return null;
             }
@@ -192,10 +190,9 @@ namespace BlueBasics {
 
         public static string FileToString(string Dateiname) {
             try {
-                var b = FileToByte(Dateiname);
+                byte[] b = FileToByte(Dateiname);
                 return b.ToStringConvert();
-            }
-            catch {
+            } catch {
                 return string.Empty;
             }
         }
@@ -225,13 +222,13 @@ namespace BlueBasics {
 
         private static string GetDriveSerialNumber(string drive) {
 
-            var driveSerial = string.Empty;
-            var driveFixed = Path.GetPathRoot(drive);
+            string driveSerial = string.Empty;
+            string driveFixed = Path.GetPathRoot(drive);
             driveFixed = driveFixed.Replace("\\", "");
 
-            using (var querySearch = new ManagementObjectSearcher("SELECT VolumeSerialNumber FROM Win32_LogicalDisk Where Name = '" + driveFixed + "'")) {
+            using (ManagementObjectSearcher querySearch = new ManagementObjectSearcher("SELECT VolumeSerialNumber FROM Win32_LogicalDisk Where Name = '" + driveFixed + "'")) {
 
-                using (var queryCollection = querySearch.Get()) {
+                using (ManagementObjectCollection queryCollection = querySearch.Get()) {
 
                     foreach (ManagementObject moItem in queryCollection) {
                         driveSerial = Convert.ToString(moItem["VolumeSerialNumber"]);
@@ -249,8 +246,8 @@ namespace BlueBasics {
         }
 
         public static string SerialNr2Path(string Pfad) {
-            var MustSearch = true;
-            var z = 0;
+            bool MustSearch = true;
+            int z = 0;
 
 
             if (Pfad.Length > 2 && Pfad.Substring(1, 2) == ":\\") { MustSearch = false; }
@@ -267,7 +264,7 @@ namespace BlueBasics {
                 MustSearch = false;
             }
 
-            var xq = 0; //= Pfad.IndexOf(":\")
+            int xq = 0; //= Pfad.IndexOf(":\")
             do {
                 xq = (Pfad + "\\").IndexOf("..\\");
                 if (xq < 0) { break; }
@@ -287,7 +284,7 @@ namespace BlueBasics {
 
             SerialNr2Path_LastSearch = Pfad.Substring(0, xq);
 
-            var odrive = DriveInfo.GetDrives();
+            DriveInfo[] odrive = DriveInfo.GetDrives();
 
 
             for (z = 0; z <= odrive.GetUpperBound(0); z++) {
@@ -315,7 +312,7 @@ namespace BlueBasics {
         /// <returns></returns>
         public static int IntParse(string s) {
             if (string.IsNullOrEmpty(s)) { return 0; }
-            if (int.TryParse(s, out var result)) { return result; }
+            if (int.TryParse(s, out int result)) { return result; }
             Develop.DebugPrint(enFehlerArt.Warnung, "Int kann nicht geparsed werden: " + s);
             return 0;
         }
@@ -329,7 +326,7 @@ namespace BlueBasics {
         /// <returns></returns>
         public static long LongParse(string s) {
             if (string.IsNullOrEmpty(s)) { return 0; }
-            if (long.TryParse(s, out var result)) { return result; }
+            if (long.TryParse(s, out long result)) { return result; }
             Develop.DebugPrint(enFehlerArt.Warnung, "Long kann nicht geparsed werden: " + s);
             return 0;
         }
@@ -341,7 +338,7 @@ namespace BlueBasics {
         /// <returns></returns>
         public static decimal DecimalParse(string s) {
             if (string.IsNullOrEmpty(s)) { return 0; }
-            if (decimal.TryParse(s, out var result)) { return result; }
+            if (decimal.TryParse(s, out decimal result)) { return result; }
             //Develop.DebugPrint(enFehlerArt.Warnung, "Decimal kann nicht geparsed werden: " + s);
             return 0;
         }
@@ -354,10 +351,10 @@ namespace BlueBasics {
         /// <returns></returns>
         public static double DoubleParse(string s) {
             if (string.IsNullOrEmpty(s)) { return 0; }
-            if (double.TryParse(s, out var result)) { return result; }
+            if (double.TryParse(s, out double result)) { return result; }
 
-            if (double.TryParse(s.Replace(",", "."), out var result2)) { return result2; }
-            if (double.TryParse(s.Replace(".", ","), out var result3)) { return result3; }
+            if (double.TryParse(s.Replace(",", "."), out double result2)) { return result2; }
+            if (double.TryParse(s.Replace(".", ","), out double result3)) { return result3; }
 
             Develop.DebugPrint(enFehlerArt.Warnung, "Double kann nicht geparsed werden: " + s);
             return 0;
@@ -371,10 +368,10 @@ namespace BlueBasics {
         /// <returns></returns>
         public static float FloatParse(string s) {
             if (string.IsNullOrEmpty(s)) { return 0; }
-            if (float.TryParse(s, out var result)) { return result; }
+            if (float.TryParse(s, out float result)) { return result; }
 
-            if (float.TryParse(s.Replace(",", "."), out var result2)) { return result2; }
-            if (float.TryParse(s.Replace(".", ","), out var result3)) { return result3; }
+            if (float.TryParse(s.Replace(",", "."), out float result2)) { return result2; }
+            if (float.TryParse(s.Replace(".", ","), out float result3)) { return result3; }
 
             Develop.DebugPrint(enFehlerArt.Warnung, "float kann nicht geparsed werden: " + s);
             return 0;
@@ -389,7 +386,7 @@ namespace BlueBasics {
         /// <param name="s"></param>
         /// <returns></returns>
         public static DateTime DateTimeParse(string s) {
-            if (DateTimeTryParse(s, out var result)) { return result; }
+            if (DateTimeTryParse(s, out DateTime result)) { return result; }
             Develop.DebugPrint(enFehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
             return DateTime.Now;
         }

@@ -49,7 +49,7 @@ namespace BlueDatabase {
 
             if (Develop.IsHostRunning() && !MustBeStream) {
 
-                var x = -1;
+                int x = -1;
                 string pf;
 
                 do {
@@ -93,7 +93,7 @@ namespace BlueDatabase {
                     }
 
                     if (FileExists(pf)) {
-                        var tmp = GetByFilename(pf, false);
+                        BlueBasics.MultiUserFile.clsMultiUserFile tmp = GetByFilename(pf, false);
                         if (tmp != null) { return (Database)tmp; }
                         tmp = new Database(pf, false, false);
                         return (Database)tmp;
@@ -102,7 +102,7 @@ namespace BlueDatabase {
                 } while (pf != string.Empty);
             }
 
-            var d = modAllgemein.GetEmmbedResource(assembly, Name);
+            Stream d = modAllgemein.GetEmmbedResource(assembly, Name);
             if (d != null) { return new Database(d); }
 
             if (FehlerAusgeben) { Develop.DebugPrint(enFehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + BlueBasicsSubDir + " - " + Name); }
@@ -124,7 +124,7 @@ namespace BlueDatabase {
         public readonly RowCollection Row;
         public ListExt<WorkItem> Works;
 
-        private long _startTick = DateTime.UtcNow.Ticks;
+        private readonly long _startTick = DateTime.UtcNow.Ticks;
 
         private readonly List<string> FilesAfterLoadingLCase;
 
@@ -207,7 +207,7 @@ namespace BlueDatabase {
 
 
 
-            var culture = new System.Globalization.CultureInfo("de-DE");
+            CultureInfo culture = new System.Globalization.CultureInfo("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
@@ -249,8 +249,7 @@ namespace BlueDatabase {
 
             if (!string.IsNullOrEmpty(filename)) {
                 Load(filename, create);
-            }
-            else if (stream != null) {
+            } else if (stream != null) {
                 LoadFromStream(stream);
             }
         }
@@ -375,8 +374,8 @@ namespace BlueDatabase {
                 return _sortDefinition;
             }
             set {
-                var Alt = string.Empty;
-                var Neu = string.Empty;
+                string Alt = string.Empty;
+                string Neu = string.Empty;
 
                 if (_sortDefinition != null) { Alt = _sortDefinition.ToString(); }
                 if (value != null) { Neu = value.ToString(); }
@@ -510,8 +509,7 @@ namespace BlueDatabase {
                 t += "\r\nColumn-Count: " + Column.Count.ToString();
                 t += "\r\nRow-Count: " + Row.Count.ToString();
                 t += "\r\nFile: " + Filename;
-            }
-            catch { }
+            } catch { }
 
             Develop.DebugPrint(enFehlerArt.Warnung, t);
 
@@ -519,7 +517,7 @@ namespace BlueDatabase {
 
         public int LayoutIDToIndex(string exportFormularID) {
 
-            for (var z = 0; z < Layouts.Count; z++) {
+            for (int z = 0; z < Layouts.Count; z++) {
                 if (Layouts[z].Contains("ID=" + exportFormularID + ",")) { return z; }
             }
 
@@ -531,7 +529,7 @@ namespace BlueDatabase {
             if (string.IsNullOrEmpty(TextToImport)) { return "Kein Text zum Importieren angegeben."; }
 
 
-            var cmds = _ImportScript.FromNonCritical().SplitByCRToList();
+            List<string> cmds = _ImportScript.FromNonCritical().SplitByCRToList();
 
             //if (row == null)
             //{
@@ -544,15 +542,14 @@ namespace BlueDatabase {
 
 
 
-            foreach (var thiscmd in cmds) {
-                var (fehlertext, bigfailure, importrow) = DoImportScript(TextToImport, thiscmd.Replace(";cr;", "\r").Replace(";tab;", "\t").SplitBy("|"), row);
+            foreach (string thiscmd in cmds) {
+                (string fehlertext, bool bigfailure, RowItem importrow) = DoImportScript(TextToImport, thiscmd.Replace(";cr;", "\r").Replace(";tab;", "\t").SplitBy("|"), row);
 
                 if (importrow == null) { return "Es konnte keine neue Zeile erzeugt werden."; }
 
                 if (row == null) {
                     row = importrow;
-                }
-                else {
+                } else {
                     if (row != importrow) { return "Zeilen-Inkonsistenz festgestellt."; }
                 }
 
@@ -577,26 +574,25 @@ namespace BlueDatabase {
             if (cmd == null) { return ("Kein Befehl übergeben", true, row); }
             if (cmd.GetUpperBound(0) != 3) { return ("Format muss 4 | haben.", true, row); }
 
-            var c = Column[cmd[1]];
+            ColumnItem c = Column[cmd[1]];
             if (c == null) { return ("Spalte nicht in der Datenbank gefunden.", true, row); }
 
             if (string.IsNullOrEmpty(cmd[2])) { return ("Suchtext 'vorher' ist nicht angegeben", true, row); }
             if (string.IsNullOrEmpty(cmd[3])) { return ("Suchtext 'nachher' ist nicht angegeben", true, row); }
 
-            var vh = textToImport.IndexOf(cmd[2]);
+            int vh = textToImport.IndexOf(cmd[2]);
             if (vh < 0) { return ("Suchtext 'vorher' im Text nicht vorhanden.", false, row); }
 
-            var nh = textToImport.IndexOf(cmd[3], vh + cmd[2].Length);
+            int nh = textToImport.IndexOf(cmd[3], vh + cmd[2].Length);
             if (nh < 0) { return ("Suchtext 'nachher' im Text nicht vorhanden.", false, row); }
 
-            var txt = textToImport.Substring(vh + cmd[2].Length, nh - vh - cmd[2].Length);
+            string txt = textToImport.Substring(vh + cmd[2].Length, nh - vh - cmd[2].Length);
 
             switch (cmd[0].ToUpper()) {
                 case "IMPORT1":
                     if (c.IsFirst() && row == null) {
                         row = Row.Add(txt);
-                    }
-                    else {
+                    } else {
                         if (row == null) { return ("Keine Zeile angegeben.", true, row); }
                         row.CellSet(c, txt);
                     }
@@ -604,7 +600,7 @@ namespace BlueDatabase {
 
                 case "IMPORT2":
                     if (row == null) { return ("Keine Zeile angegeben.", true, row); }
-                    var l = row.CellGetList(c);
+                    List<string> l = row.CellGetList(c);
                     l.Add(txt);
                     row.CellSet(c, l);
                     return (string.Empty, false, row);
@@ -621,7 +617,7 @@ namespace BlueDatabase {
         }
 
         private void Column_ItemRemoving(object sender, ListEventArgs e) {
-            var Key = ((ColumnItem)e.Item).Key;
+            int Key = ((ColumnItem)e.Item).Key;
             AddPending(enDatabaseDataType.dummyComand_RemoveColumn, Key, -1, string.Empty, Key.ToString(), false);
 
         }
@@ -638,11 +634,11 @@ namespace BlueDatabase {
 
         private void Layouts_ItemSeted(object sender, ListEventArgs e) {
             if (e != null) {
-                var x = (string)e.Item;
+                string x = (string)e.Item;
                 if (!x.StartsWith("{ID=#")) { Develop.DebugPrint("ID nicht gefunden: " + x); }
-                var ko = x.IndexOf(", ");
+                int ko = x.IndexOf(", ");
 
-                var id = x.Substring(4, ko - 4);
+                string id = x.Substring(4, ko - 4);
 
                 InvalidateExports(id);
             }
@@ -650,11 +646,11 @@ namespace BlueDatabase {
 
         private void CheckViewsAndArrangements() {
 
-            foreach (var ThisCol in ColumnArrangements) {
+            foreach (ColumnViewCollection ThisCol in ColumnArrangements) {
                 ThisCol.Repair();
             }
 
-            foreach (var ThisCol in Views) {
+            foreach (ColumnViewCollection ThisCol in Views) {
                 ThisCol.Repair();
             }
 
@@ -664,7 +660,7 @@ namespace BlueDatabase {
                 if (Views.Count > 1 && !Views[1].PermissionGroups_Show.Contains("#Everybody")) { Views[1].PermissionGroups_Show.Add("#Everybody"); }
             }
 
-            for (var z = 0; z < Layouts.Count; z++) {
+            for (int z = 0; z < Layouts.Count; z++) {
                 if (!Layouts[z].StartsWith("{ID=#")) {
                     Layouts[z] = "{ID=#Converted" + z.ToString() + ", " + Layouts[z].Substring(1);
                 }
@@ -736,59 +732,59 @@ namespace BlueDatabase {
 
             switch ((enRoutinen)_BLoaded[Pointer]) {
                 case enRoutinen.CellFormat_OLD: {
-                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                        Les = NummerCode3(_BLoaded, Pointer + 2);
-                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                    Les = NummerCode3(_BLoaded, Pointer + 2);
+                    ColNR = NummerCode3(_BLoaded, Pointer + 5);
+                    RowNR = NummerCode3(_BLoaded, Pointer + 8);
 
-                        //  Wert = String.
-                        var b = new byte[Les];
-                        _BLoaded.CopyTo(Pointer + 11, b, 0, Les);
-                        Wert = Encoding.Default.GetString(b);
+                    //  Wert = String.
+                    byte[] b = new byte[Les];
+                    _BLoaded.CopyTo(Pointer + 11, b, 0, Les);
+                    Wert = Encoding.Default.GetString(b);
 
-                        //     Wert = System.Text.Encoding.Default.GetString(BLoaded, Pointer + 11, Les)
-                        X = NummerCode2(_BLoaded, Pointer + 11 + Les);
-                        Y = NummerCode2(_BLoaded, Pointer + 11 + Les + 2);
-                        Pointer += 11 + Les + 4;
+                    //     Wert = System.Text.Encoding.Default.GetString(BLoaded, Pointer + 11, Les)
+                    X = NummerCode2(_BLoaded, Pointer + 11 + Les);
+                    Y = NummerCode2(_BLoaded, Pointer + 11 + Les + 2);
+                    Pointer += 11 + Les + 4;
 
 
-                        break;
-                    }
+                    break;
+                }
                 case enRoutinen.DatenAllgemein: {
-                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                        Les = NummerCode3(_BLoaded, Pointer + 2);
-                        ColNR = -1;
-                        RowNR = -1;
-                        var b = new byte[Les];
-                        _BLoaded.CopyTo(Pointer + 5, b, 0, Les);
-                        Wert = Encoding.Default.GetString(b);
+                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                    Les = NummerCode3(_BLoaded, Pointer + 2);
+                    ColNR = -1;
+                    RowNR = -1;
+                    byte[] b = new byte[Les];
+                    _BLoaded.CopyTo(Pointer + 5, b, 0, Les);
+                    Wert = Encoding.Default.GetString(b);
 
 
-                        //   Wert = System.Text.Encoding.Default.GetString(BLoaded, Pointer + 5, Les)
-                        X = 0;
-                        Y = 0;
-                        Pointer += 5 + Les;
+                    //   Wert = System.Text.Encoding.Default.GetString(BLoaded, Pointer + 5, Les)
+                    X = 0;
+                    Y = 0;
+                    Pointer += 5 + Les;
 
-                        break;
-                    }
+                    break;
+                }
                 case enRoutinen.Column: {
-                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                        Les = NummerCode3(_BLoaded, Pointer + 2);
-                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
-                        var b = new byte[Les];
-                        _BLoaded.CopyTo(Pointer + 11, b, 0, Les);
-                        Wert = Encoding.Default.GetString(b);
+                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                    Les = NummerCode3(_BLoaded, Pointer + 2);
+                    ColNR = NummerCode3(_BLoaded, Pointer + 5);
+                    RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                    byte[] b = new byte[Les];
+                    _BLoaded.CopyTo(Pointer + 11, b, 0, Les);
+                    Wert = Encoding.Default.GetString(b);
 
-                        X = 0;
-                        Y = 0;
-                        Pointer += 11 + Les;
-                        break;
-                    }
+                    X = 0;
+                    Y = 0;
+                    Pointer += 11 + Les;
+                    break;
+                }
                 default: {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Laderoutine nicht definiert: " + _BLoaded[Pointer]);
-                        break;
-                    }
+                    Develop.DebugPrint(enFehlerArt.Fehler, "Laderoutine nicht definiert: " + _BLoaded[Pointer]);
+                    break;
+                }
             }
         }
 
@@ -798,29 +794,29 @@ namespace BlueDatabase {
             Column.ThrowEvents = false;
 
             enDatabaseDataType Art = 0;
-            var Pointer = 0;
+            int Pointer = 0;
 
-            var Inhalt = "";
+            string Inhalt = "";
             ColumnItem _Column = null;
 
 
             RowItem _Row = null;
 
-            var X = 0;
-            var Y = 0;
+            int X = 0;
+            int Y = 0;
 
 
-            var ColKey = 0;
-            var RowKey = 0;
+            int ColKey = 0;
+            int RowKey = 0;
 
 
-            var ColumnsOld = new List<ColumnItem>();
+            List<ColumnItem> ColumnsOld = new List<ColumnItem>();
             ColumnsOld.AddRange(Column);
             Column.Clear();
 
 
-            var OldPendings = new List<WorkItem>();
-            foreach (var ThisWork in Works) {
+            List<WorkItem> OldPendings = new List<WorkItem>();
+            foreach (WorkItem ThisWork in Works) {
                 if (ThisWork.State == enItemState.Pending) { OldPendings.Add(ThisWork); }
             }
 
@@ -844,7 +840,7 @@ namespace BlueDatabase {
 
                     if (_Column == null) {
                         // Column noch nicht gefunden. Schauen, ob sie vor dem Reload vorhanden war und gg. hinzufügen
-                        foreach (var ThisColumn in ColumnsOld) {
+                        foreach (ColumnItem ThisColumn in ColumnsOld) {
                             if (ThisColumn != null && ThisColumn.Key == ColKey) {
                                 _Column = ThisColumn;
                             }
@@ -854,8 +850,7 @@ namespace BlueDatabase {
                             // Prima, gefunden! Noch die Collections korrigieren
                             Column.Add(enDatabaseDataType.AddColumn, _Column);
                             ColumnsOld.Remove(_Column);
-                        }
-                        else {
+                        } else {
                             // Nicht gefunden, als neu machen
                             _Column = Column.Add(ColKey);
                         }
@@ -865,7 +860,7 @@ namespace BlueDatabase {
 
                 if (Art == enDatabaseDataType.CryptionState) {
                     if (Inhalt.FromPlusMinus()) {
-                        var e = new PasswordEventArgs();
+                        PasswordEventArgs e = new PasswordEventArgs();
                         OnNeedPassword(e);
 
                         B = modAllgemein.SimpleCrypt(B, e.Password, -1, Pointer, B.Count - 1);
@@ -880,7 +875,7 @@ namespace BlueDatabase {
                 }
 
 
-                var _Fehler = ParseThis(Art, Inhalt, _Column, _Row, X, Y);
+                string _Fehler = ParseThis(Art, Inhalt, _Column, _Row, X, Y);
 
                 if (Art == enDatabaseDataType.EOF) { break; }
 
@@ -930,7 +925,7 @@ namespace BlueDatabase {
             Row.Repair();
 
             //Defekte Ansichten reparieren - Teil 1
-            for (var z = 0; z <= 1; z++) {
+            for (int z = 0; z <= 1; z++) {
                 if (ColumnArrangements.Count < z + 1) {
                     ColumnArrangements.Add(new ColumnViewCollection(this, ""));
                 }
@@ -998,8 +993,7 @@ namespace BlueDatabase {
                     if (LoadedVersion != DatabaseVersion) {
                         Initialize();
                         LoadedVersion = content.Trim();
-                    }
-                    else {
+                    } else {
                         //Cell.RemoveOrphans();
                         Row.RemoveNullOrEmpty();
                         Cell.SetAllValuesToEmpty();
@@ -1047,8 +1041,8 @@ namespace BlueDatabase {
                     break;
                 case enDatabaseDataType.BinaryDataInOne:
                     Bins.Clear();
-                    var l = new List<string>(content.SplitByCR());
-                    foreach (var t in l) {
+                    List<string> l = new List<string>(content.SplitByCR());
+                    foreach (string t in l) {
                         Bins.Add(new clsNamedBinary(t));
                     }
                     break;
@@ -1057,16 +1051,16 @@ namespace BlueDatabase {
                     break;
                 case enDatabaseDataType.AutoExport:
                     Export.Clear();
-                    var AE = new List<string>(content.SplitByCR());
-                    foreach (var t in AE) {
+                    List<string> AE = new List<string>(content.SplitByCR());
+                    foreach (string t in AE) {
                         Export.Add(new ExportDefinition(this, t));
                     }
                     break;
 
                 case enDatabaseDataType.Rules_ALT:
-                    var Rules = new List<RuleItem_Old>();
-                    var RU = content.SplitByCR();
-                    for (var z = 0; z <= RU.GetUpperBound(0); z++) {
+                    List<RuleItem_Old> Rules = new List<RuleItem_Old>();
+                    string[] RU = content.SplitByCR();
+                    for (int z = 0; z <= RU.GetUpperBound(0); z++) {
                         Rules.Add(new RuleItem_Old(this, RU[z]));
                     }
                     _RulesScript = GenerateScriptFromRules(Rules);
@@ -1074,16 +1068,16 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.ColumnArrangement:
                     ColumnArrangements.Clear();
-                    var CA = new List<string>(content.SplitByCR());
-                    foreach (var t in CA) {
+                    List<string> CA = new List<string>(content.SplitByCR());
+                    foreach (string t in CA) {
                         ColumnArrangements.Add(new ColumnViewCollection(this, t));
                     }
                     break;
 
                 case enDatabaseDataType.Views:
                     Views.Clear();
-                    var VI = new List<string>(content.SplitByCR());
-                    foreach (var t in VI) {
+                    List<string> VI = new List<string>(content.SplitByCR());
+                    foreach (string t in VI) {
                         Views.Add(new ColumnViewCollection(this, t));
                     }
                     break;
@@ -1145,9 +1139,9 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.UndoInOne:
                     Works.Clear();
-                    var UIO = content.SplitByCR();
-                    for (var z = 0; z <= UIO.GetUpperBound(0); z++) {
-                        var tmpWork = new WorkItem(UIO[z]) {
+                    string[] UIO = content.SplitByCR();
+                    for (int z = 0; z <= UIO.GetUpperBound(0); z++) {
+                        WorkItem tmpWork = new WorkItem(UIO[z]) {
                             State = enItemState.Undo // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Deswegen die alten "Pendings" zu Undos ändern.
                         };
                         Works.Add(tmpWork);
@@ -1156,22 +1150,22 @@ namespace BlueDatabase {
 
 
                 case enDatabaseDataType.dummyComand_AddRow:
-                    var addRowKey = int.Parse(content);
+                    int addRowKey = int.Parse(content);
                     if (Row.SearchByKey(addRowKey) == null) { Row.Add(new RowItem(this, addRowKey)); }
                     break;
 
                 case enDatabaseDataType.AddColumn:
-                    var addColumnKey = int.Parse(content);
+                    int addColumnKey = int.Parse(content);
                     if (Column.SearchByKey(addColumnKey) == null) { Column.Add(enDatabaseDataType.AddColumn, new ColumnItem(this, addColumnKey)); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveRow:
-                    var removeRowKey = int.Parse(content);
+                    int removeRowKey = int.Parse(content);
                     if (Row.SearchByKey(removeRowKey) is RowItem) { Row.Remove(removeRowKey); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveColumn:
-                    var removeColumnKey = int.Parse(content);
+                    int removeColumnKey = int.Parse(content);
                     if (Column.SearchByKey(removeColumnKey) is ColumnItem col) { Column.Remove(col); }
                     break;
 
@@ -1190,14 +1184,14 @@ namespace BlueDatabase {
         }
 
         private string GenerateScriptFromRules(List<RuleItem_Old> rules) {
-            if (rules is null || rules.Count ==0) { return string.Empty; }
+            if (rules is null || rules.Count == 0) { return string.Empty; }
 
 
-            var txt = "// Automatische Umwandlung des alten Regel-Systems in die neue Skript-Sprache.\r\n";
+            string txt = "// Automatische Umwandlung des alten Regel-Systems in die neue Skript-Sprache.\r\n";
             txt += "// - Zur Bearbeitung wird NOTEPAD++ empfohlen.\r\n";
             txt += "// - Zur Verschönerung der Optik wird https://codebeautify.org/javaviewer empfohlen.\r\n\r\n\r\n";
 
-            foreach ( var thisRegel in rules) {
+            foreach (RuleItem_Old thisRegel in rules) {
                 txt = txt + thisRegel.ToScript();
             }
 
@@ -1208,7 +1202,7 @@ namespace BlueDatabase {
         }
 
         public void LoadPicsIntoImageChache() {
-            foreach (var bmp in Bins) {
+            foreach (clsNamedBinary bmp in Bins) {
                 if (bmp.Picture != null) {
                     if (!string.IsNullOrEmpty(bmp.Name)) {
                         QuickImage.Add("DB_" + bmp.Name, new BitmapExt((Bitmap)bmp.Picture.Clone()));
@@ -1221,9 +1215,9 @@ namespace BlueDatabase {
 
         internal string Column_UsedIn(ColumnItem column) {
 
-            var t = string.Empty;
-            var layout = false;
-            foreach (var thisLayout in Layouts) {
+            string t = string.Empty;
+            bool layout = false;
+            foreach (string thisLayout in Layouts) {
                 if (thisLayout.ToUpper().Contains(column.Name.ToUpper())) { layout = true; }
             }
             if (layout) { t += " - Layouts (für Export)"; }
@@ -1232,15 +1226,15 @@ namespace BlueDatabase {
 
             if (SortDefinition.Columns.Contains(column)) { t += " - Sortierung<br>"; }
 
-            var view = false;
-            foreach (var thisView in Views) {
+            bool view = false;
+            foreach (ColumnViewCollection thisView in Views) {
                 if (thisView[column] != null) { view = true; }
             }
             if (view) { t += " - Formular-Ansichten<br>"; }
 
-            var cola = false;
-            var first = true;
-            foreach (var thisView in ColumnArrangements) {
+            bool cola = false;
+            bool first = true;
+            foreach (ColumnViewCollection thisView in ColumnArrangements) {
                 if (!first && thisView[column] != null) { cola = true; }
                 first = false;
             }
@@ -1261,7 +1255,7 @@ namespace BlueDatabase {
             //}
             //if (rul) { t += " - Regeln<br>"; }
 
-            var l = column.Contents(null);
+            List<string> l = column.Contents(null);
             if (l.Count > 0) {
                 t = t + " - Befüllt mit " + l.Count.ToString() + " verschiedenen Werten";
             }
@@ -1285,9 +1279,9 @@ namespace BlueDatabase {
 
             // Layouts -----------------------------------------
             if (Layouts != null && Layouts.Count > 0) {
-                for (var cc = 0; cc < Layouts.Count; cc++) {
+                for (int cc = 0; cc < Layouts.Count; cc++) {
 
-                    var e = new RenameColumnInLayoutEventArgs(Layouts[cc], oldName, newName);
+                    RenameColumnInLayoutEventArgs e = new RenameColumnInLayoutEventArgs(Layouts[cc], oldName, newName);
                     OnRenameColumnInLayout(e);
 
                     Layouts[cc] = e.LayoutCode;
@@ -1307,17 +1301,16 @@ namespace BlueDatabase {
 
 
             // ImportScript -----------------------------------------
-            var x = ImportScript.FromNonCritical().SplitByCRToList();
-            var xn = new List<string>();
+            List<string> x = ImportScript.FromNonCritical().SplitByCRToList();
+            List<string> xn = new List<string>();
 
-            foreach (var thisstring in x) {
+            foreach (string thisstring in x) {
                 if (!string.IsNullOrEmpty(thisstring)) {
-                    var x2 = thisstring.SplitBy("|");
+                    string[] x2 = thisstring.SplitBy("|");
                     if (x2.Length > 2 && x2[1].ToUpper() == oldName.ToUpper()) {
                         x2[1] = newName.Name.ToUpper();
                         xn.Add(x2.JoinWith("|"));
-                    }
-                    else {
+                    } else {
                         xn.Add(thisstring);
                     }
                 }
@@ -1348,13 +1341,13 @@ namespace BlueDatabase {
 
             if (string.IsNullOrEmpty(vCell.Value.Value)) { return; }
 
-            Cell.DataOfCellKey(vCell.Key, out var tColumn, out var tRow);
+            Cell.DataOfCellKey(vCell.Key, out ColumnItem tColumn, out RowItem tRow);
 
 
             if (!tColumn.SaveContent) { return; }
 
-            var s = vCell.Value.Value;
-            var tx = enDatabaseDataType.ce_Value_withSizeData;
+            string s = vCell.Value.Value;
+            enDatabaseDataType tx = enDatabaseDataType.ce_Value_withSizeData;
 
             if (tColumn.Format.NeedUTF8()) {
                 s = modConverter.StringtoUTF8(s);
@@ -1367,7 +1360,7 @@ namespace BlueDatabase {
             SaveToByteList(List, tColumn.Key, 3);
             SaveToByteList(List, tRow.Key, 3);
             List.AddRange(s.ToByte());
-            var ContentSize = Cell.ContentSizeToSave(vCell, tColumn);
+            Size ContentSize = Cell.ContentSizeToSave(vCell, tColumn);
             SaveToByteList(List, ContentSize.Width, 2);
             SaveToByteList(List, ContentSize.Height, 2);
 
@@ -1420,7 +1413,7 @@ namespace BlueDatabase {
 
 
         public override string ErrorReason(enErrorReason mode) {
-            var f = base.ErrorReason(mode);
+            string f = base.ErrorReason(mode);
             if (!string.IsNullOrEmpty(f)) { return f; }
 
             if (mode == enErrorReason.OnlyRead) { return string.Empty; }
@@ -1434,12 +1427,11 @@ namespace BlueDatabase {
             try {
                 if (ReadOnly) { return false; }
 
-                foreach (var ThisWork in Works) {
+                foreach (WorkItem ThisWork in Works) {
                     if (ThisWork.State == enItemState.Pending) { return true; }
                 }
                 return false;
-            }
-            catch {
+            } catch {
                 return HasPendingChanges();
             }
 
@@ -1474,7 +1466,7 @@ namespace BlueDatabase {
         public string Export_CSV(enFirstRow firstRow, List<ColumnItem> columnList, List<RowItem> sortedRows) {
             if (columnList == null) {
                 columnList = new List<ColumnItem>();
-                foreach (var ThisColumnItem in Column) {
+                foreach (ColumnItem ThisColumnItem in Column) {
                     if (ThisColumnItem != null) {
                         columnList.Add(ThisColumnItem);
                     }
@@ -1483,14 +1475,14 @@ namespace BlueDatabase {
 
             if (sortedRows == null) {
                 sortedRows = new List<RowItem>();
-                foreach (var ThisRowItem in Row) {
+                foreach (RowItem ThisRowItem in Row) {
                     if (ThisRowItem != null) {
                         sortedRows.Add(ThisRowItem);
                     }
                 }
             }
 
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
 
 
             switch (firstRow) {
@@ -1498,9 +1490,9 @@ namespace BlueDatabase {
 
                     break;
                 case enFirstRow.ColumnCaption:
-                    for (var ColNr = 0; ColNr < columnList.Count; ColNr++) {
+                    for (int ColNr = 0; ColNr < columnList.Count; ColNr++) {
                         if (columnList[ColNr] != null) {
-                            var tmp = columnList[ColNr].ReadableText();
+                            string tmp = columnList[ColNr].ReadableText();
                             tmp = tmp.Replace(";", "|");
                             tmp = tmp.Replace(" |", "|");
                             tmp = tmp.Replace("| ", "|");
@@ -1513,7 +1505,7 @@ namespace BlueDatabase {
 
                     break;
                 case enFirstRow.ColumnInternalName:
-                    for (var ColNr = 0; ColNr < columnList.Count; ColNr++) {
+                    for (int ColNr = 0; ColNr < columnList.Count; ColNr++) {
                         if (columnList[ColNr] != null) {
                             sb.Append(columnList[ColNr].Name);
                             if (ColNr < columnList.Count - 1) { sb.Append(";"); }
@@ -1531,11 +1523,11 @@ namespace BlueDatabase {
 
 
 
-            foreach (var ThisRow in sortedRows) {
+            foreach (RowItem ThisRow in sortedRows) {
                 if (ThisRow != null) {
-                    for (var ColNr = 0; ColNr < columnList.Count; ColNr++) {
+                    for (int ColNr = 0; ColNr < columnList.Count; ColNr++) {
                         if (columnList[ColNr] != null) {
-                            var tmp = Cell.GetString(columnList[ColNr], ThisRow);
+                            string tmp = Cell.GetString(columnList[ColNr], ThisRow);
                             tmp = tmp.Replace("\r\n", "|");
                             tmp = tmp.Replace("\r", "|");
                             tmp = tmp.Replace("\n", "|");
@@ -1595,7 +1587,7 @@ namespace BlueDatabase {
         public void Export_HTML(string filename, List<ColumnItem> columnList, List<RowItem> sortedRows, bool execute) {
             if (columnList == null || columnList.Count == 0) {
                 columnList = new List<ColumnItem>();
-                foreach (var ThisColumnItem in Column) {
+                foreach (ColumnItem ThisColumnItem in Column) {
                     if (ThisColumnItem != null) {
                         columnList.Add(ThisColumnItem);
                     }
@@ -1604,7 +1596,7 @@ namespace BlueDatabase {
 
             if (sortedRows == null) {
                 sortedRows = new List<RowItem>();
-                foreach (var ThisRowItem in Row) {
+                foreach (RowItem ThisRowItem in Row) {
                     if (ThisRowItem != null) {
                         sortedRows.Add(ThisRowItem);
                     }
@@ -1616,14 +1608,14 @@ namespace BlueDatabase {
             }
 
 
-            var da = new HTML(Filename.FileNameWithoutSuffix());
+            HTML da = new HTML(Filename.FileNameWithoutSuffix());
             da.AddCaption(_Caption);
 
             da.TableBeginn();
             da.RowBeginn();
 
 
-            foreach (var ThisColumn in columnList) {
+            foreach (ColumnItem ThisColumn in columnList) {
                 if (ThisColumn != null) {
                     da.CellAdd(ThisColumn.ReadableText().Replace(";", "<br>"), ThisColumn.BackColor);
                     //da.Add("        <th bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\"><b>" + ThisColumn.ReadableText().Replace(";", "<br>") + "</b></th>");
@@ -1632,22 +1624,21 @@ namespace BlueDatabase {
             da.RowEnd();
 
 
-            foreach (var ThisRow in sortedRows) {
+            foreach (RowItem ThisRow in sortedRows) {
                 if (ThisRow != null) {
                     da.RowBeginn();
-                    foreach (var ThisColumn in columnList) {
+                    foreach (ColumnItem ThisColumn in columnList) {
                         if (ThisColumn != null) {
 
-                            var LCColumn = ThisColumn;
-                            var LCrow = ThisRow;
+                            ColumnItem LCColumn = ThisColumn;
+                            RowItem LCrow = ThisRow;
                             if (ThisColumn.Format == enDataFormat.LinkedCell) {
                                 (LCColumn, LCrow) = CellCollection.LinkedCellData(ThisColumn, ThisRow, false, false);
                             }
 
                             if (LCrow != null && LCColumn != null) {
                                 da.CellAdd(LCrow.CellGetValuesReadable(LCColumn, enShortenStyle.HTML).JoinWith("<br>"), ThisColumn.BackColor);
-                            }
-                            else {
+                            } else {
                                 da.CellAdd(" ", ThisColumn.BackColor);
                             }
                         }
@@ -1659,15 +1650,14 @@ namespace BlueDatabase {
 
             // Summe----
             da.RowBeginn();
-            foreach (var ThisColumn in columnList) {
+            foreach (ColumnItem ThisColumn in columnList) {
                 if (ThisColumn != null) {
-                    var s = ThisColumn.Summe(sortedRows);
+                    double? s = ThisColumn.Summe(sortedRows);
                     if (s == null) {
                         da.CellAdd("-", ThisColumn.BackColor);
 
                         //da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">-</th>");
-                    }
-                    else {
+                    } else {
                         da.CellAdd("&sum; " + s, ThisColumn.BackColor);
                         //da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">&sum; " + s + "</th>");
                     }
@@ -1697,32 +1687,29 @@ namespace BlueDatabase {
         private bool PermissionCheckWithoutAdmin(string allowed, RowItem row) {
 
 
-            var tmpName = UserName.ToUpper();
-            var tmpGroup = UserGroup.ToUpper();
+            string tmpName = UserName.ToUpper();
+            string tmpGroup = UserGroup.ToUpper();
 
 
             if (allowed.ToUpper() == "#EVERYBODY") {
                 return true;
-            }
-            else if (allowed.ToUpper() == "#ROWCREATOR") {
+            } else if (allowed.ToUpper() == "#ROWCREATOR") {
                 if (row != null && Cell.GetString(Column.SysRowCreator, row).ToUpper() == tmpName) {
                     return true;
                 }
             }
-            //else if (allowed.ToUpper() == "#ROWCHANGER")
-            //{
-            //    if (row != null && Cell.GetString(Column.SysRowChanger, row).ToUpper() == tmpName)
-            //    {
-            //        return true;
-            //    }
-            //}
-            else if (allowed.ToUpper() == "#USER: " + tmpName) {
+              //else if (allowed.ToUpper() == "#ROWCHANGER")
+              //{
+              //    if (row != null && Cell.GetString(Column.SysRowChanger, row).ToUpper() == tmpName)
+              //    {
+              //        return true;
+              //    }
+              //}
+              else if (allowed.ToUpper() == "#USER: " + tmpName) {
                 return true;
-            }
-            else if (allowed.ToUpper() == "#USER:" + tmpName) {
+            } else if (allowed.ToUpper() == "#USER:" + tmpName) {
                 return true;
-            }
-            else if (allowed.ToUpper() == tmpGroup) {
+            } else if (allowed.ToUpper() == tmpGroup) {
                 return true;
             }
             //else if (allowed.ToUpper() == "#DATABASECREATOR")
@@ -1741,11 +1728,10 @@ namespace BlueDatabase {
                 if (IsAdministrator()) { return true; }
                 if (allowed == null || allowed.Count == 0) { return false; }
 
-                foreach (var ThisString in allowed) {
+                foreach (string ThisString in allowed) {
                     if (PermissionCheckWithoutAdmin(ThisString, row)) { return true; }
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Warnung, ex);
             }
 
@@ -1753,9 +1739,9 @@ namespace BlueDatabase {
         }
 
         public List<string> Permission_AllUsed(bool DatabaseEbene) {
-            var e = new List<string>();
+            List<string> e = new List<string>();
 
-            foreach (var ThisColumnItem in Column) {
+            foreach (ColumnItem ThisColumnItem in Column) {
                 if (ThisColumnItem != null) {
                     e.AddRange(ThisColumnItem.PermissionGroups_ChangeCell);
                 }
@@ -1764,11 +1750,11 @@ namespace BlueDatabase {
             e.AddRange(PermissionGroups_NewRow);
             e.AddRange(DatenbankAdmin);
 
-            foreach (var ThisArrangement in ColumnArrangements) {
+            foreach (ColumnViewCollection ThisArrangement in ColumnArrangements) {
                 e.AddRange(ThisArrangement.PermissionGroups_Show);
             }
 
-            foreach (var ThisArrangement in Views) {
+            foreach (ColumnViewCollection ThisArrangement in Views) {
                 e.AddRange(ThisArrangement.PermissionGroups_Show);
             }
 
@@ -1781,8 +1767,7 @@ namespace BlueDatabase {
             if (!DatabaseEbene) {
                 e.Add("#RowCreator");
                 //e.Add("#RowChanger");
-            }
-            else {
+            } else {
                 e.RemoveString("#RowCreator", false);
                 //e.RemoveString("#RowChanger", false);
 
@@ -1806,8 +1791,8 @@ namespace BlueDatabase {
         protected override List<byte> ToListOfByte(bool willSave) {
 
             try {
-                var CryptPos = -1;
-                var l = new List<byte>();
+                int CryptPos = -1;
+                List<byte> l = new List<byte>();
 
                 // Wichtig, Reihenfolge und Länge NIE verändern!
                 SaveToByteList(l, enDatabaseDataType.Formatkennung, "BlueDatabase");
@@ -1817,8 +1802,7 @@ namespace BlueDatabase {
                 // Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
                 if (string.IsNullOrEmpty(_GlobalShowPass)) {
                     SaveToByteList(l, enDatabaseDataType.CryptionState, false.ToPlusMinus());
-                }
-                else {
+                } else {
                     SaveToByteList(l, enDatabaseDataType.CryptionState, true.ToPlusMinus());
                     CryptPos = l.Count;
                     SaveToByteList(l, enDatabaseDataType.CryptionTest, "OK");
@@ -1856,8 +1840,7 @@ namespace BlueDatabase {
                 if (SortDefinition == null) {
                     // Ganz neue Datenbank
                     SaveToByteList(l, enDatabaseDataType.SortDefinition, "");
-                }
-                else {
+                } else {
                     SaveToByteList(l, enDatabaseDataType.SortDefinition, _sortDefinition.ToString());
                 }
 
@@ -1877,12 +1860,11 @@ namespace BlueDatabase {
                 // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
                 // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
                 // Status des Work-Items ist egal, da es beim LADEN automatisch auf 'Undo' gesetzt wird.
-                var Works2 = new List<string>();
-                foreach (var thisWorkItem in Works) {
+                List<string> Works2 = new List<string>();
+                foreach (WorkItem thisWorkItem in Works) {
                     if (thisWorkItem.Comand != enDatabaseDataType.ce_Value_withoutSizeData) {
                         Works2.Add(thisWorkItem.ToString());
-                    }
-                    else {
+                    } else {
                         if (thisWorkItem.LogsUndo(this)) {
                             Works2.Add(thisWorkItem.ToString());
                         }
@@ -1907,8 +1889,7 @@ namespace BlueDatabase {
                 }
                 return l;
 
-            }
-            catch {
+            } catch {
                 return ToListOfByte(willSave);
             }
         }
@@ -1939,15 +1920,15 @@ namespace BlueDatabase {
 
 
         public List<string> AllConnectedFilesLCase() {
-            var Column_All = new List<string>();
+            List<string> Column_All = new List<string>();
 
-            foreach (var ThisColumnItem in Column) {
+            foreach (ColumnItem ThisColumnItem in Column) {
                 if (ThisColumnItem != null) {
 
                     if (ThisColumnItem.Format == enDataFormat.Link_To_Filesystem) {
-                        var tmp = ThisColumnItem.Contents(null);
+                        List<string> tmp = ThisColumnItem.Contents(null);
 
-                        foreach (var thisTmp in tmp) {
+                        foreach (string thisTmp in tmp) {
                             Column_All.AddIfNotExists(ThisColumnItem.BestFile(thisTmp, false).ToLower());
                         }
                     }
@@ -1970,11 +1951,11 @@ namespace BlueDatabase {
             if (Works == null || Works.Count == 0) { return string.Empty; }
 
 
-            var CellKey = CellCollection.KeyOfCell(column, row);
+            string CellKey = CellCollection.KeyOfCell(column, row);
 
-            var t = "";
+            string t = "";
 
-            for (var z = Works.Count - 1; z >= 0; z--) {
+            for (int z = Works.Count - 1; z >= 0; z--) {
                 if (Works[z].CellKey == CellKey) {
 
                     if (Works[z].HistorischRelevant) {
@@ -2051,8 +2032,8 @@ namespace BlueDatabase {
 
 
             // Erst die Neuen Zeilen / Spalten alle neutralisieren
-            var dummy = -1000;
-            foreach (var ThisPending in Works) {
+            int dummy = -1000;
+            foreach (WorkItem ThisPending in Works) {
 
                 if (ThisPending.State == enItemState.Pending) {
                     if (ThisPending.Comand == enDatabaseDataType.dummyComand_AddRow) {
@@ -2067,23 +2048,22 @@ namespace BlueDatabase {
             }
 
             // Dann den neuen Zeilen / Spalten Tatsächlich eine neue ID zuweisen
-            foreach (var ThisPending in Works) {
+            foreach (WorkItem ThisPending in Works) {
 
                 if (ThisPending.State == enItemState.Pending) {
                     switch (ThisPending.Comand) {
                         case enDatabaseDataType.dummyComand_AddRow when _JoinTyp == enJoinTyp.Intelligent_zusammenfassen: {
-                                var Value = SearchKeyValueInPendingsOf(ThisPending.RowKey);
-                                var fRow = Row[Value];
+                            string Value = SearchKeyValueInPendingsOf(ThisPending.RowKey);
+                            RowItem fRow = Row[Value];
 
-                                if (!string.IsNullOrEmpty(Value) && fRow != null) {
-                                    ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
-                                }
-                                else {
-                                    ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
-                                }
-
-                                break;
+                            if (!string.IsNullOrEmpty(Value) && fRow != null) {
+                                ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
+                            } else {
+                                ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
                             }
+
+                            break;
+                        }
                         case enDatabaseDataType.dummyComand_AddRow:
                             ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
                             break;
@@ -2095,7 +2075,7 @@ namespace BlueDatabase {
             }
 
             // Und nun alles ausführen!
-            foreach (var ThisPending in Works) {
+            foreach (WorkItem ThisPending in Works) {
                 if (ThisPending.State == enItemState.Pending) {
 
                     if (ThisPending.Comand == enDatabaseDataType.co_Name) {
@@ -2138,8 +2118,8 @@ namespace BlueDatabase {
 
 
         private string SearchKeyValueInPendingsOf(int RowKey) {
-            var F = string.Empty;
-            foreach (var ThisPending in Works) {
+            string F = string.Empty;
+            foreach (WorkItem ThisPending in Works) {
 
                 if (ThisPending.State == enItemState.Pending) {
                     if (ThisPending.RowKey == RowKey && ThisPending.Comand == enDatabaseDataType.ce_Value_withoutSizeData && ThisPending.ColKey == Column[0].Key) {
@@ -2154,7 +2134,7 @@ namespace BlueDatabase {
 
         private void ChangeRowKeyInPending(int OldKey, int NewKey) {
 
-            foreach (var ThisPending in Works) {
+            foreach (WorkItem ThisPending in Works) {
 
                 if (ThisPending.State == enItemState.Pending) {
 
@@ -2199,7 +2179,7 @@ namespace BlueDatabase {
 
         private void ChangeColumnKeyInPending(int OldKey, int NewKey) {
 
-            foreach (var ThisPending in Works) {
+            foreach (WorkItem ThisPending in Works) {
                 if (ThisPending.State == enItemState.Pending) {
 
                     if (ThisPending.ColKey == OldKey) {
@@ -2247,7 +2227,7 @@ namespace BlueDatabase {
 
         internal void ChangeWorkItems(enItemState OldState, enItemState NewState) {
 
-            foreach (var ThisWork in Works) {
+            foreach (WorkItem ThisWork in Works) {
                 if (ThisWork.State == OldState) { ThisWork.State = NewState; }
             }
         }
@@ -2255,9 +2235,9 @@ namespace BlueDatabase {
         private void InvalidateExports(string LayoutID) {
             if (ReadOnly) { return; }
 
-            var Done = false;
+            bool Done = false;
 
-            foreach (var ThisExport in Export) {
+            foreach (ExportDefinition ThisExport in Export) {
                 if (ThisExport != null) {
                     if (ThisExport.Typ == enExportTyp.EinzelnMitFormular) {
                         if (ThisExport.ExportFormularID == LayoutID) {
@@ -2279,18 +2259,18 @@ namespace BlueDatabase {
 
             if (!HasPendingChanges()) {
 
-                var ec = new CancelEventArgs(false);
+                CancelEventArgs ec = new CancelEventArgs(false);
                 OnExporting(ec);
                 if (ec.Cancel) { return; }
             }
-            var ReportAChange = false;
-            var tmp = false;
+            bool ReportAChange = false;
+            bool tmp = false;
 
             try {
 
                 if (!listenToMyCancel.CancellationPending) {
 
-                    foreach (var ThisExport in Export) {
+                    foreach (ExportDefinition ThisExport in Export) {
                         if (ThisExport != null) { tmp = ThisExport.DeleteOutdatedBackUps(listenToMyCancel); }
                         if (tmp) { ReportAChange = true; }
                         if (listenToMyCancel.CancellationPending) { break; }
@@ -2299,14 +2279,13 @@ namespace BlueDatabase {
                 }
 
                 if (!listenToMyCancel.CancellationPending) {
-                    foreach (var ThisExport in Export) {
+                    foreach (ExportDefinition ThisExport in Export) {
                         if (ThisExport != null) { tmp = ThisExport.DoBackUp(listenToMyCancel); }
                         if (tmp) { ReportAChange = true; }
                     }
                 }
 
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
 
@@ -2345,11 +2324,11 @@ namespace BlueDatabase {
             WVorher = string.Empty;
             _LastWorkItem = string.Empty;
             if (Works != null && Works.Count > 0) {
-                var c = 0;
+                int c = 0;
                 do {
                     c++;
                     if (c > 20 || Works.Count - c < 20) { break; }
-                    var wn = Works.Count - c;
+                    int wn = Works.Count - c;
                     if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { _LastWorkItem = Works[wn].ToString(); }
 
                 } while (string.IsNullOrEmpty(_LastWorkItem));
@@ -2363,15 +2342,14 @@ namespace BlueDatabase {
 
                 // Leztes WorkItem suchen. Auch Ohne LogUndo MUSS es vorhanden sein.
                 if (!string.IsNullOrEmpty(_LastWorkItem)) {
-                    var ok = false;
-                    var ok2 = string.Empty;
-                    foreach (var ThisWorkItem in Works) {
-                        var tmp = ThisWorkItem.ToString();
+                    bool ok = false;
+                    string ok2 = string.Empty;
+                    foreach (WorkItem ThisWorkItem in Works) {
+                        string tmp = ThisWorkItem.ToString();
                         if (tmp == _LastWorkItem) {
                             ok = true;
                             break;
-                        }
-                        else if (tmp.Substring(7) == _LastWorkItem.Substring(7)) {
+                        } else if (tmp.Substring(7) == _LastWorkItem.Substring(7)) {
                             ok2 = tmp;
                         }
                     }
@@ -2382,8 +2360,7 @@ namespace BlueDatabase {
                         }
                     }
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
         }
@@ -2392,9 +2369,9 @@ namespace BlueDatabase {
 
             ChangeWorkItems(enItemState.Pending, enItemState.Undo);
 
-            var FilesNewLCase = AllConnectedFilesLCase();
+            List<string> FilesNewLCase = AllConnectedFilesLCase();
 
-            var Writer_FilesToDeleteLCase = new List<string>();
+            List<string> Writer_FilesToDeleteLCase = new List<string>();
 
             if (_VerwaisteDaten == enVerwaisteDaten.Löschen) {
                 Writer_FilesToDeleteLCase = FilesAfterLoadingLCase.Except(FilesNewLCase).ToList();
@@ -2413,18 +2390,18 @@ namespace BlueDatabase {
         protected override bool IsThereBackgroundWorkToDo() {
             if (HasPendingChanges()) { return true; }
 
-            var ec = new CancelEventArgs(false);
+            CancelEventArgs ec = new CancelEventArgs(false);
             OnExporting(ec);
             if (ec.Cancel) { return false; }
 
 
-            var nowsek = (DateTime.UtcNow.Ticks - _startTick)/10000000;
+            long nowsek = (DateTime.UtcNow.Ticks - _startTick) / 10000000;
 
-            if (nowsek % 60 !=0) { return false; } // Lasten startabhängig verteilen. Bei Pending changes ist es eh immer true;
+            if (nowsek % 60 != 0) { return false; } // Lasten startabhängig verteilen. Bei Pending changes ist es eh immer true;
 
 
 
-            foreach (var ThisExport in Export) {
+            foreach (ExportDefinition ThisExport in Export) {
                 if (ThisExport != null) {
                     if (ThisExport.Typ == enExportTyp.EinzelnMitFormular) { return true; }
                     if (DateTime.UtcNow.Subtract(ThisExport.LastExportTimeUTC).TotalDays > ThisExport.Intervall) { return true; }

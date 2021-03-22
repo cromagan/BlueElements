@@ -1,7 +1,5 @@
-﻿namespace BlueControls.Enums
-{
-    public enum enHintergrundArt
-    {
+﻿namespace BlueControls.Enums {
+    public enum enHintergrundArt {
         Unbekannt = -1,
         Ohne = 0,
 

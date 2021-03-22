@@ -19,11 +19,9 @@
 
 using System;
 
-namespace BlueBasics.Enums
-{
+namespace BlueBasics.Enums {
     [Flags]
-    public enum enImageCodeEffect
-    {
+    public enum enImageCodeEffect {
         Undefiniert = -1,
 
         Ohne = 0,

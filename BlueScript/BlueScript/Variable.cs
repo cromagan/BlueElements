@@ -30,7 +30,7 @@ namespace BlueScript {
         public override string ToString() {
 
 
-            var zusatz = string.Empty;
+            string zusatz = string.Empty;
             if (Readonly) { zusatz = " [Read Only] "; }
 
 
@@ -77,14 +77,14 @@ namespace BlueScript {
 
             if (s != null) {
                 #region Variablen ersetzen
-                var t = Method.ReplaceVariable(txt, s.Variablen);
+                strGetEndFeedback t = Method.ReplaceVariable(txt, s.Variablen);
                 if (!string.IsNullOrEmpty(t.ErrorMessage)) {
                     return new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
                 }
                 #endregion
 
                 #region Routinen ersetzen, vor den Klammern, das ansonsten Min(x,y,z) falsch anschlägt
-                var t2 = Method.ReplaceComands(t.AttributeText, Script.Comands, s);
+                strGetEndFeedback t2 = Method.ReplaceComands(t.AttributeText, Script.Comands, s);
                 if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
                     return new strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
                 }
@@ -95,13 +95,13 @@ namespace BlueScript {
 
 
             #region Klammern am ende berechnen, das ansonsten Min(x,y,z) falsch anschlägt
-            var (posa, _) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
+            (int posa, string _) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
             if (posa > -1) {
-                var (pose, _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
+                (int pose, string _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
 
                 if (pose < posa) { return strDoItFeedback.Klammerfehler(); }
 
-                var tmp = AttributeAuflösen(txt.Substring(posa + 1, pose - posa - 1), s);
+                strDoItFeedback tmp = AttributeAuflösen(txt.Substring(posa + 1, pose - posa - 1), s);
                 if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return tmp; }
 
                 return AttributeAuflösen(txt.Substring(0, posa) + tmp.Value + txt.Substring(pose + 1), s);
@@ -121,22 +121,22 @@ namespace BlueScript {
             }
             Name = name.ToLower();
 
-            var txt = AttributeAuflösen(attributesText, s);
+            strDoItFeedback txt = AttributeAuflösen(attributesText, s);
 
 
             if (!string.IsNullOrEmpty(txt.ErrorMessage)) { SetError(); return; }
 
 
 
-            var bl = new List<string>() { "true", "false", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
+            List<string> bl = new List<string>() { "true", "false", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
 
-            var (pos, witch) = Script.NextText(txt.Value, 0, bl, false, false);
+            (int pos, string witch) = Script.NextText(txt.Value, 0, bl, false, false);
 
             if (pos >= 0) {
                 if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Bool) { SetError(); return; }//return new strDoItFeedback("Variable ist kein Boolean");
-                var b = Method_if.GetBool(txt.Value);
+                string b = Method_if.GetBool(txt.Value);
                 if (b == null) { SetError(); return; }//return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); 
-                ValueString = (string)b;
+                ValueString = b;
                 Type = enVariableDataType.Bool;
                 return;
             }
@@ -144,10 +144,11 @@ namespace BlueScript {
             if (txt.Value.StartsWith("\"")) {
 
                 if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.String) {
-                    SetError(); return;
+                    SetError();
+                    return;
                     //return new strDoItFeedback("Variable ist kein String");
                 }
-                ValueString = txt.Value.Replace("\"+\"", string.Empty).Trim("\"");
+                ValueString = txt.Value.Trim("\"").Replace("\"+\"", string.Empty); // Erst trimmen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
                 Type = enVariableDataType.String;
                 return;// new strDoItFeedback();
             }
@@ -157,7 +158,7 @@ namespace BlueScript {
 
             if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Number) { SetError(); return; } //return new strDoItFeedback("Variable ist keine Zahl");
 
-            var erg = modErgebnis.Ergebnis(txt.Value);
+            double? erg = modErgebnis.Ergebnis(txt.Value);
             if (erg == null) { SetError(); return; }//return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); 
 
 
@@ -183,8 +184,7 @@ namespace BlueScript {
 
             if (system) {
                 Name = "*" + name.ToLower();
-            }
-            else {
+            } else {
 
                 Name = name.ToLower();
             }
@@ -286,7 +286,7 @@ namespace BlueScript {
 
             v = v.ToLower();
 
-            var vo = v;
+            string vo = v;
             v = v.ReduceToChars(Constants.Char_az + "_" + Constants.Char_Numerals);
 
 
@@ -306,7 +306,7 @@ namespace BlueScript {
 
 
         public static Variable Get(this List<Variable> vars, string name) {
-            foreach (var thisv in vars) {
+            foreach (Variable thisv in vars) {
                 if (!thisv.SystemVariable && thisv.Name.ToUpper() == name.ToUpper()) {
                     return thisv;
                 }
@@ -321,7 +321,7 @@ namespace BlueScript {
         /// <param name="vars"></param>
         /// <param name="name"></param>
         public static List<string> GetList(this List<Variable> vars, string name) {
-            var v = vars.Get(name);
+            Variable v = vars.Get(name);
             if (v == null) { return new List<string>(); }
             return v.ValueListString;
         }
@@ -332,7 +332,7 @@ namespace BlueScript {
         /// <param name="vars"></param>
         /// <param name="name"></param>
         public static double GetDouble(this List<Variable> vars, string name) {
-            var v = vars.Get(name);
+            Variable v = vars.Get(name);
             if (v == null) { return 0f; }
             return v.ValueDouble;
         }
@@ -343,7 +343,7 @@ namespace BlueScript {
         /// <param name="vars"></param>
         /// <param name="name"></param>
         public static int GetInt(this List<Variable> vars, string name) {
-            var v = vars.Get(name);
+            Variable v = vars.Get(name);
             if (v == null) { return 0; }
             return v.ValueInt;
         }
@@ -355,7 +355,7 @@ namespace BlueScript {
         /// <param name="vars"></param>
         /// <param name="name"></param>
         public static decimal GetDecimal(this List<Variable> vars, string name) {
-            var v = vars.Get(name);
+            Variable v = vars.Get(name);
             if (v == null) { return 0m; }
             return (decimal)v.ValueDouble;
         }
@@ -367,7 +367,7 @@ namespace BlueScript {
         /// <param name="name"></param>
         /// <returns></returns>
         public static string GetString(this List<Variable> vars, string name) {
-            var v = vars.Get(name);
+            Variable v = vars.Get(name);
             if (v == null) { return string.Empty; }
             return v.ValueString;
         }
@@ -380,7 +380,7 @@ namespace BlueScript {
         /// <param name="name"></param>
         /// <param name="value"></param>
         public static void Set(this List<Variable> vars, string name, string value) {
-            var v = vars.Get(name);
+            Variable v = vars.Get(name);
             if (v == null) {
                 v = new Variable(name);
                 vars.Add(v);
@@ -398,7 +398,7 @@ namespace BlueScript {
         /// <param name="name"></param>
         /// <param name="value"></param>
         public static void Set(this List<Variable> vars, string name, double value) {
-            var v = vars.Get(name);
+            Variable v = vars.Get(name);
             if (v == null) {
                 v = new Variable(name);
                 vars.Add(v);
@@ -417,13 +417,13 @@ namespace BlueScript {
         /// <param name="name"></param>
         /// <param name="value"></param>
         public static void Set(this List<Variable> vars, string name, List<string> value) {
-            var v = vars.Get(name);
+            Variable v = vars.Get(name);
             if (v == null) {
                 v = new Variable(name);
                 vars.Add(v);
             }
 
-            v.Type = enVariableDataType.VariableList;
+            v.Type = enVariableDataType.List;
             v.ValueListString = value;
             v.Readonly = true;
         }
@@ -436,7 +436,7 @@ namespace BlueScript {
         /// <param name="name"></param>
         /// <param name="value"></param>
         public static void Set(this List<Variable> vars, string name, bool value) {
-            var v = vars.Get(name);
+            Variable v = vars.Get(name);
             if (v == null) {
                 v = new Variable(name);
                 vars.Add(v);
@@ -445,17 +445,16 @@ namespace BlueScript {
             v.Type = enVariableDataType.Bool;
 
             if (value) {
-                v.ValueString = "TRUE";
-            }
-            else {
-                v.ValueString = "FALSE";
+                v.ValueString = "true";
+            } else {
+                v.ValueString = "false";
             }
             v.Readonly = true;
         }
 
         public static Variable GetSystem(this List<Variable> vars, string name) {
 
-            foreach (var thisv in vars) {
+            foreach (Variable thisv in vars) {
                 if (thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper()) {
                     return thisv;
                 }
@@ -466,8 +465,8 @@ namespace BlueScript {
 
         public static List<string> AllNames(this List<Variable> vars) {
 
-            var l = new List<string>();
-            foreach (var thisvar in vars) {
+            List<string> l = new List<string>();
+            foreach (Variable thisvar in vars) {
                 l.Add(thisvar.Name);
             }
 

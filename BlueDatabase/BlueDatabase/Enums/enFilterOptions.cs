@@ -1,10 +1,8 @@
 ﻿using System;
 
-namespace BlueDatabase.Enums
-{
+namespace BlueDatabase.Enums {
     [Flags]
-    public enum enFilterOptions
-    {
+    public enum enFilterOptions {
 
         None = 0,
         Enabled = 1,

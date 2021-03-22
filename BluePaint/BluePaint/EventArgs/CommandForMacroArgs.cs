@@ -18,12 +18,10 @@
 #endregion
 
 namespace BluePaint.EventArgs {
-    public class CommandForMacroArgs : System.EventArgs
-    {
+    public class CommandForMacroArgs : System.EventArgs {
 
 
-        public CommandForMacroArgs(string Command)
-        {
+        public CommandForMacroArgs(string Command) {
             this.Command = Command;
         }
 

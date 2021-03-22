@@ -17,11 +17,9 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueControls.Interfaces
-{
+namespace BlueControls.Interfaces {
 
-    public interface ISupportsBeginnEdit
-    {
+    public interface ISupportsBeginnEdit {
         void BeginnEdit();
 
         void BeginnEdit(int count);

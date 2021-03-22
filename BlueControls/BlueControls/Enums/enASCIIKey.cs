@@ -1,7 +1,5 @@
-﻿namespace BlueControls.Enums
-{
-    public enum enASCIIKey
-    {
+﻿namespace BlueControls.Enums {
+    public enum enASCIIKey {
         Undefined = -1,
 
         LineFeed = 10,

@@ -73,8 +73,8 @@ namespace BlueControls.Controls {
 
         protected override RectangleM MaxBounds() {
 
-            var r = base.MaxBounds();
-            foreach (var thisP in points) {
+            RectangleM r = base.MaxBounds();
+            foreach (PointM thisP in points) {
                 r.X = Math.Min(r.X, thisP.X);
                 r.Y = Math.Min(r.Y, thisP.Y);
                 r.Width = Math.Max(r.Width, thisP.X - r.X);
@@ -99,11 +99,10 @@ namespace BlueControls.Controls {
 
 
             /// Punkte
-            foreach (var ThisPoint in points) {
+            foreach (PointM ThisPoint in points) {
                 if (_Helper.HasFlag(enHelpers.PointNames)) {
                     ThisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard, ThisPoint.Name);
-                }
-                else {
+                } else {
                     ThisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard, string.Empty);
                 }
 
@@ -112,7 +111,7 @@ namespace BlueControls.Controls {
 
 
         public void LoadData(string PathOfPicture) {
-            var x = LoadFromDisk(PathOfPicture);
+            Tuple<Bitmap, List<string>> x = LoadFromDisk(PathOfPicture);
 
             BMP = x.Item1;
             Tags = x.Item2;
@@ -122,24 +121,24 @@ namespace BlueControls.Controls {
         }
 
         private void GeneratePointsFromTags() {
-            var Names = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
+            string[] Names = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
 
             points.Clear();
 
-            foreach (var thisO in Names) {
-                var s = Tags.TagGet(thisO);
+            foreach (string thisO in Names) {
+                string s = Tags.TagGet(thisO);
                 points.Add(new PointM(null, s));
             }
         }
 
         public static BitmapListItem GenerateBitmapListItem(string pathOfPicture) {
-            var x = LoadFromDisk(pathOfPicture);
+            Tuple<Bitmap, List<string>> x = LoadFromDisk(pathOfPicture);
             return GenerateBitmapListItem(x.Item1, x.Item2);
         }
 
         public static BitmapListItem GenerateBitmapListItem(Bitmap bmp, List<string> tags) {
-            var FilenamePNG = tags.TagGet("ImageFile");
-            var i = new BitmapListItem(bmp, FilenamePNG, FilenamePNG.FileNameWithoutSuffix()) {
+            string FilenamePNG = tags.TagGet("ImageFile");
+            BitmapListItem i = new BitmapListItem(bmp, FilenamePNG, FilenamePNG.FileNameWithoutSuffix()) {
                 Padding = 10,
                 Tag = tags,
             };
@@ -152,15 +151,15 @@ namespace BlueControls.Controls {
         }
 
         private void WritePointsInTags() {
-            var Old = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
+            string[] Old = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
 
-            foreach (var thisO in Old) {
+            foreach (string thisO in Old) {
                 Tags.TagSet(thisO, string.Empty);
             }
 
-            var s = string.Empty;
+            string s = string.Empty;
 
-            foreach (var ThisP in points) {
+            foreach (PointM ThisP in points) {
                 s = s + ThisP.Name + "|";
                 Tags.TagSet(ThisP.Name, ThisP.ToString());
             }
@@ -169,7 +168,7 @@ namespace BlueControls.Controls {
         }
 
         public PointM GetPoint(string name) {
-            foreach (var thisp in points) {
+            foreach (PointM thisp in points) {
                 if (thisp != null && thisp.Name.ToUpper() == name.ToUpper()) { return thisp; }
             }
             return null;
@@ -192,7 +191,7 @@ namespace BlueControls.Controls {
 
         public void PointSet(string name, decimal x, decimal y) {
 
-            var p = GetPoint(name);
+            PointM p = GetPoint(name);
 
             if (p == null) {
                 p = new PointM(name, x, y);
@@ -245,14 +244,14 @@ namespace BlueControls.Controls {
 
 
             Bitmap bmp = null;
-            var tags = new List<string>();
+            List<string> tags = new List<string>();
 
 
             if (FileExists(PathOfPicture)) {
                 bmp = (Bitmap)BitmapExt.Image_FromFile(PathOfPicture);
             }
 
-            var ftxt = FilenameTXT(PathOfPicture);
+            string ftxt = FilenameTXT(PathOfPicture);
 
 
             if (FileExists(ftxt)) {
@@ -271,7 +270,7 @@ namespace BlueControls.Controls {
             if (BMP == null) { return; }
 
 
-            var e = new PositionEventArgs(MousePos_1_1.X, MousePos_1_1.Y);
+            PositionEventArgs e = new PositionEventArgs(MousePos_1_1.X, MousePos_1_1.Y);
             OnOverwriteMouseImageData(e);
 
 
@@ -291,18 +290,18 @@ namespace BlueControls.Controls {
             //TMPGR.Clear(Color.Transparent);
 
             // Mittellinie
-            var PicturePos = base.MaxBounds();
+            RectangleM PicturePos = base.MaxBounds();
 
             if (_MittelLinie.HasFlag(enOrientation.Waagerecht)) {
-                var p1 = PicturePos.PointOf(enAlignment.VerticalCenter_Left).ZoomAndMove(eg);
-                var p2 = PicturePos.PointOf(enAlignment.VerticalCenter_Right).ZoomAndMove(eg);
+                PointF p1 = PicturePos.PointOf(enAlignment.VerticalCenter_Left).ZoomAndMove(eg);
+                PointF p2 = PicturePos.PointOf(enAlignment.VerticalCenter_Right).ZoomAndMove(eg);
                 eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
                 eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
             }
 
             if (_MittelLinie.HasFlag(enOrientation.Senkrecht)) {
-                var p1 = PicturePos.PointOf(enAlignment.Top_HorizontalCenter).ZoomAndMove(eg);
-                var p2 = PicturePos.PointOf(enAlignment.Bottom_HorizontalCenter).ZoomAndMove(eg);
+                PointF p1 = PicturePos.PointOf(enAlignment.Top_HorizontalCenter).ZoomAndMove(eg);
+                PointF p2 = PicturePos.PointOf(enAlignment.Bottom_HorizontalCenter).ZoomAndMove(eg);
                 eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
                 eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
             }
@@ -312,39 +311,39 @@ namespace BlueControls.Controls {
 
 
             if (_Helper.HasFlag(enHelpers.HorizontalLine)) {
-                var p1 = new PointM(0, e.Y).ZoomAndMove(eg);
-                var p2 = new PointM(BMP.Width, e.Y).ZoomAndMove(eg);
+                PointF p1 = new PointM(0, e.Y).ZoomAndMove(eg);
+                PointF p2 = new PointM(BMP.Width, e.Y).ZoomAndMove(eg);
                 eg.G.DrawLine(Pen_RotTransp, p1, p2);
             }
 
             if (_Helper.HasFlag(enHelpers.VerticalLine)) {
-                var p1 = new PointM(e.X, 0).ZoomAndMove(eg);
-                var p2 = new PointM(e.X, BMP.Height).ZoomAndMove(eg);
+                PointF p1 = new PointM(e.X, 0).ZoomAndMove(eg);
+                PointF p2 = new PointM(e.X, BMP.Height).ZoomAndMove(eg);
                 eg.G.DrawLine(Pen_RotTransp, p1, p2);
             }
 
 
 
             if (_Helper.HasFlag(enHelpers.SymetricalHorizontal)) {
-                var h = BMP.Width / 2;
-                var x = Math.Abs(h - e.X);
+                int h = BMP.Width / 2;
+                int x = Math.Abs(h - e.X);
 
-                var p1 = new PointM(h - x, e.Y).ZoomAndMove(eg);
-                var p2 = new PointM(h + x, e.Y).ZoomAndMove(eg);
+                PointF p1 = new PointM(h - x, e.Y).ZoomAndMove(eg);
+                PointF p2 = new PointM(h + x, e.Y).ZoomAndMove(eg);
                 eg.G.DrawLine(Pen_RotTransp, p1, p2);
 
             }
 
             if (_Helper.HasFlag(enHelpers.MouseDownPoint)) {
 
-                var m1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
+                PointF m1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
 
                 eg.G.DrawEllipse(Pen_RotTransp, new RectangleF(m1.X - 3, m1.Y - 3, 6, 6));
 
                 if (!MouseDownPos_1_1.IsEmpty) {
 
-                    var md1 = new PointM(MouseDownPos_1_1).ZoomAndMove(eg);
-                    var mc1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
+                    PointF md1 = new PointM(MouseDownPos_1_1).ZoomAndMove(eg);
+                    PointF mc1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
 
                     eg.G.DrawEllipse(Pen_RotTransp, new RectangleF(md1.X - 3, md1.Y - 3, 6, 6));
                     eg.G.DrawLine(Pen_RotTransp, mc1, md1);
@@ -356,9 +355,9 @@ namespace BlueControls.Controls {
 
             if (_Helper.HasFlag(enHelpers.FilledRectancle)) {
                 if (!MouseDownPos_1_1.IsEmpty) {
-                    var md1 = new PointM(MouseDownPos_1_1).ZoomAndMove(eg);
-                    var mc1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
-                    var r = new RectangleF(Math.Min(md1.X, e.X), Math.Min(md1.Y, e.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
+                    PointF md1 = new PointM(MouseDownPos_1_1).ZoomAndMove(eg);
+                    PointF mc1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
+                    RectangleF r = new RectangleF(Math.Min(md1.X, e.X), Math.Min(md1.Y, e.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
                     eg.G.FillRectangle(Brush_RotTransp, r);
                 }
             }
@@ -367,7 +366,7 @@ namespace BlueControls.Controls {
         }
 
         public void PointRemove(string name) {
-            var p = GetPoint(name);
+            PointM p = GetPoint(name);
             if (p == null) { return; }
             points.Remove(p);
             WritePointsInTags();
@@ -408,10 +407,10 @@ namespace BlueControls.Controls {
 
         public void SaveData() {
             WritePointsInTags();
-            var Path = Tags.TagGet("ImageFile");
+            string Path = Tags.TagGet("ImageFile");
 
 
-            var pathtxt = FilenameTXT(Path);
+            string pathtxt = FilenameTXT(Path);
 
 
             if (BMP != null) {
@@ -429,22 +428,22 @@ namespace BlueControls.Controls {
 
         public static Tuple<Bitmap, List<string>> ResizeData(Bitmap pic, List<string> tags, int width, int height) {
 
-            var zoomx = (decimal)width / pic.Width;
-            var zoomy = (decimal)height / pic.Height;
+            decimal zoomx = (decimal)width / pic.Width;
+            decimal zoomy = (decimal)height / pic.Height;
 
 
-            var pic2 = BitmapExt.Resize(pic, width, height, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
+            Bitmap pic2 = BitmapExt.Resize(pic, width, height, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
 
-            var tags2 = new List<string>(tags);
-
-
-            var Names = tags2.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
+            List<string> tags2 = new List<string>(tags);
 
 
+            string[] Names = tags2.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
 
-            foreach (var thisO in Names) {
-                var s = tags2.TagGet(thisO);
-                var ThisP = new PointM(null, s);
+
+
+            foreach (string thisO in Names) {
+                string s = tags2.TagGet(thisO);
+                PointM ThisP = new PointM(null, s);
 
                 ThisP.X *= zoomx;
                 ThisP.Y *= zoomy;

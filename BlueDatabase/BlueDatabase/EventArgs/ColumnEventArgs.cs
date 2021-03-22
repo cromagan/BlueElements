@@ -18,13 +18,10 @@
 #endregion
 
 
-namespace BlueDatabase.EventArgs
-{
-    public class ColumnEventArgs : System.EventArgs
-    {
+namespace BlueDatabase.EventArgs {
+    public class ColumnEventArgs : System.EventArgs {
 
-        public ColumnEventArgs(ColumnItem column)
-        {
+        public ColumnEventArgs(ColumnItem column) {
             Column = column;
         }
 

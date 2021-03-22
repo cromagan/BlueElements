@@ -59,7 +59,7 @@ namespace BlueBasics {
         public new void Clear() {
             if (Count == 0) { return; }
 
-            foreach (var item in this) {
+            foreach (T item in this) {
                 OnItemRemoving(item);
             }
             base.Clear();
@@ -89,7 +89,7 @@ namespace BlueBasics {
 
             //base.AddRange(collection);
 
-            foreach (var item in collection) {
+            foreach (T item in collection) {
                 Add(item);
             }
 
@@ -98,7 +98,7 @@ namespace BlueBasics {
 
         public void RemoveRange(IEnumerable<T> collection) {
 
-            foreach (var item in collection) {
+            foreach (T item in collection) {
                 Remove(item);
             }
         }
@@ -154,8 +154,7 @@ namespace BlueBasics {
                     OnItemRemoving(base[index]);
                     base[index] = value;
                     OnItemRemoved();
-                }
-                else {
+                } else {
                     base[index] = value;
                 }
 
@@ -230,7 +229,7 @@ namespace BlueBasics {
 
             // Der Swap geht so, und nicht anders! Es müssen die Items im Original-Array geswapt werden!
             // Wichtig auch der Zugriff auf die base (nicht auf this). Dadurch werden keine Add/Remove Event ausgelöst.
-            var tmp = base[Index1];
+            T tmp = base[Index1];
             base[Index1] = base[Index2];
             base[Index2] = tmp;
             OnChanged();
@@ -242,7 +241,7 @@ namespace BlueBasics {
 
             try {
                 if (typeof(IParseable).IsAssignableFrom(typeof(T))) {
-                    var a = new System.Text.StringBuilder();
+                    System.Text.StringBuilder a = new System.Text.StringBuilder();
 
                     foreach (IParseable thisP in this) {
                         if (thisP != null) {
@@ -255,8 +254,7 @@ namespace BlueBasics {
                 }
 
                 return base.ToString();
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Develop.DebugPrint(ex);
                 return ToString();
             }

@@ -92,7 +92,7 @@ namespace BlueDatabase {
                     return null;
                 }
 
-                var d = new FilterCollection(filter[0].Database);
+                FilterCollection d = new FilterCollection(filter[0].Database);
                 d.AddRange(filter);
                 return this[d];
             }
@@ -122,11 +122,11 @@ namespace BlueDatabase {
 
 
         public void Remove(int Key) {
-            var e = SearchByKey(Key);
+            RowItem e = SearchByKey(Key);
             if (e == null) { return; }
 
             OnRowRemoving(new RowEventArgs(e));
-            foreach (var ThisColumnItem in Database.Column) {
+            foreach (ColumnItem ThisColumnItem in Database.Column) {
                 if (ThisColumnItem != null) {
                     Database.Cell.Delete(ThisColumnItem, Key);
                 }
@@ -140,7 +140,7 @@ namespace BlueDatabase {
         }
 
         public bool Remove(FilterItem Filter) {
-            var NF = new FilterCollection(Database)
+            FilterCollection NF = new FilterCollection(Database)
             {
                 Filter
             };
@@ -149,7 +149,7 @@ namespace BlueDatabase {
 
         public bool Remove(FilterCollection Filter) {
 
-            var x = (from thisrowitem in _Internal.Values where thisrowitem != null && thisrowitem.MatchesTo(Filter) select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
+            List<long> x = (from thisrowitem in _Internal.Values where thisrowitem != null && thisrowitem.MatchesTo(Filter) select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
             //var x = new List<long>();
             //foreach (var thisrowitem in _Internal.Values)
             //{
@@ -191,8 +191,7 @@ namespace BlueDatabase {
 
                     if (Art.ToString() == ((int)Art).ToString()) {
                         Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + Art + "' nicht definiert.<br>Wert: " + Wert + "<br>Datei: " + Database.Filename);
-                    }
-                    else {
+                    } else {
                         return "Interner Fehler: Für den Datentyp  '" + Art + "'  wurde keine Laderegel definiert.";
                     }
 
@@ -226,7 +225,7 @@ namespace BlueDatabase {
             }
 
 
-            var Row = new RowItem(Database);
+            RowItem Row = new RowItem(Database);
 
             Add(Row);
 
@@ -237,7 +236,7 @@ namespace BlueDatabase {
             Database.Cell.SystemSet(Database.Column.SysRowCreateDate, Row, DateTime.Now.ToString(Constants.Format_Date5));
 
             // Dann die Inital-Werte reinschreiben
-            foreach (var ThisColum in Database.Column) {
+            foreach (ColumnItem ThisColum in Database.Column) {
                 if (ThisColum != null && !string.IsNullOrEmpty(ThisColum.CellInitValue)) { Row.CellSet(ThisColum, ThisColum.CellInitValue); }
             }
 
@@ -262,7 +261,7 @@ namespace BlueDatabase {
             if (x == null || x.Count() == 0) { return; }
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", 0, x.Count(), true, false));
 
-            var all = x.Count;
+            int all = x.Count;
 
             while (x.Count > 0) {
 
@@ -295,7 +294,7 @@ namespace BlueDatabase {
 
         internal void Repair() {
 
-            foreach (var ThisRowItem in _Internal.Values) {
+            foreach (RowItem ThisRowItem in _Internal.Values) {
                 if (ThisRowItem != null) {
                     //ThisRowItem.Repair();
                     _LastRowKey = Math.Max(_LastRowKey, ThisRowItem.Key); // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
@@ -316,8 +315,7 @@ namespace BlueDatabase {
                 if (Key < 0) { return null; }
                 if (!_Internal.ContainsKey(Key)) { return null; }
                 return _Internal[Key];
-            }
-            catch {
+            } catch {
                 // Develop.DebugPrint(ex);
                 return SearchByKey(Key);
             }
@@ -375,7 +373,7 @@ namespace BlueDatabase {
 
         public bool RemoveOlderThan(float InHours) {
 
-            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
+            List<long> x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
 
             //foreach (var thisrowitem in _Internal.Values)
             //{
@@ -402,18 +400,17 @@ namespace BlueDatabase {
 
 
         public List<RowItem> CalculateSortedRows(List<FilterItem> Filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) {
-            var TMP = new List<string>();
-            var _tmpSortedRows = new List<RowItem>();
+            List<string> TMP = new List<string>();
+            List<RowItem> _tmpSortedRows = new List<RowItem>();
 
             if (pinnedRows == null) { pinnedRows = new List<RowItem>(); }
 
-            foreach (var ThisRowItem in Database.Row) {
+            foreach (RowItem ThisRowItem in Database.Row) {
                 if (ThisRowItem != null) {
                     if (ThisRowItem.MatchesTo(Filter) && !pinnedRows.Contains(ThisRowItem)) {
                         if (rowSortDefinition == null) {
                             TMP.Add(ThisRowItem.CompareKey(null));
-                        }
-                        else {
+                        } else {
                             TMP.Add(ThisRowItem.CompareKey(rowSortDefinition.Columns));
                         }
                     }
@@ -424,17 +421,16 @@ namespace BlueDatabase {
             TMP.Sort();
 
 
-            var cc = 0;
+            int cc = 0;
             if (rowSortDefinition == null || !rowSortDefinition.Reverse) {
-                foreach (var t in TMP) {
+                foreach (string t in TMP) {
                     if (!string.IsNullOrEmpty(t)) {
                         cc = t.IndexOf(Constants.SecondSortChar + "<key>");
                         _tmpSortedRows.Add(Database.Row.SearchByKey(int.Parse(t.Substring(cc + 6))));
                     }
                 }
-            }
-            else {
-                for (var z = TMP.Count - 1; z > -1; z--) {
+            } else {
+                for (int z = TMP.Count - 1; z > -1; z--) {
                     if (!string.IsNullOrEmpty(TMP[z])) {
                         cc = TMP[z].IndexOf(Constants.SecondSortChar + "<key>");
                         _tmpSortedRows.Add(Database.Row.SearchByKey(int.Parse(TMP[z].Substring(cc + 6))));
@@ -443,9 +439,9 @@ namespace BlueDatabase {
 
             }
 
-            var newPinned = new List<RowItem>();
+            List<RowItem> newPinned = new List<RowItem>();
 
-            foreach (var thisPinned in pinnedRows) {
+            foreach (RowItem thisPinned in pinnedRows) {
                 if (Database.Row.Contains(thisPinned)) {
                     newPinned.Add(thisPinned);
                 }
@@ -458,8 +454,8 @@ namespace BlueDatabase {
 
         internal static List<RowItem> MatchesTo(FilterItem FilterItem) {
 
-            var l = new List<RowItem>();
-            foreach (var ThisRow in FilterItem.Database.Row) {
+            List<RowItem> l = new List<RowItem>();
+            foreach (RowItem ThisRow in FilterItem.Database.Row) {
                 if (ThisRow.MatchesTo(FilterItem)) {
                     l.Add(ThisRow);
                 }

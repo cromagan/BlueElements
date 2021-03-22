@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueControls.Interfaces
-{
-    public interface ILastSavedBy
-    {
+namespace BlueControls.Interfaces {
+    public interface ILastSavedBy {
         string LastSavedBy { get; set; }
     }
 }

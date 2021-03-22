@@ -21,12 +21,9 @@
 using System;
 using System.Drawing;
 
-namespace BlueControls.EventArgs
-{
-    public class AdditionalDrawing : MouseEventArgs1_1DownAndCurrent
-    {
-        public AdditionalDrawing(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, MouseEventArgs1_1 mouseDown, MouseEventArgs1_1 current) : base(mouseDown, current)
-        {
+namespace BlueControls.EventArgs {
+    public class AdditionalDrawing : MouseEventArgs1_1DownAndCurrent {
+        public AdditionalDrawing(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, MouseEventArgs1_1 mouseDown, MouseEventArgs1_1 current) : base(mouseDown, current) {
             G = gr;
             Zoom = zoom;
             ShiftX = shiftX;
@@ -38,15 +35,13 @@ namespace BlueControls.EventArgs
         public decimal ShiftX { get; }
         public decimal ShiftY { get; }
 
-        public void FillRectangle(Brush brush, Rectangle rectangle)
-        {
-            var x = new RectangleM(rectangle).ZoomAndMoveRect(Zoom, ShiftX, ShiftY);
+        public void FillRectangle(Brush brush, Rectangle rectangle) {
+            RectangleF x = new RectangleM(rectangle).ZoomAndMoveRect(Zoom, ShiftX, ShiftY);
             G.FillRectangle(brush, x);
         }
 
-        public void DrawImage(Bitmap BMP)
-        {
-            var r = new RectangleM(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(Zoom, ShiftX, ShiftY);
+        public void DrawImage(Bitmap BMP) {
+            RectangleF r = new RectangleM(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(Zoom, ShiftX, ShiftY);
 
             G.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
 
@@ -59,15 +54,12 @@ namespace BlueControls.EventArgs
         }
 
 
-        public void FillCircle(Color C, int X, int Y, int R)
-        {
-            var B = new SolidBrush(C);
-            for (var adx = -R; adx <= R; adx++)
-            {
-                for (var ady = -R; ady <= R; ady++)
-                {
+        public void FillCircle(Color C, int X, int Y, int R) {
+            SolidBrush B = new SolidBrush(C);
+            for (int adx = -R; adx <= R; adx++) {
+                for (int ady = -R; ady <= R; ady++) {
 
-                    var d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady)) - 0.5;
+                    double d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady)) - 0.5;
 
                     if (d <= R) { FillRectangle(B, new Rectangle(X + adx, Y + ady, 1, 1)); }
 
@@ -75,10 +67,9 @@ namespace BlueControls.EventArgs
             }
         }
 
-        public void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
-        {
-            var p1 = new PointM(x1, y1).ZoomAndMove(this);
-            var p2 = new PointM(x2, y2).ZoomAndMove(this);
+        public void DrawLine(Pen pen, int x1, int y1, int x2, int y2) {
+            PointF p1 = new PointM(x1, y1).ZoomAndMove(this);
+            PointF p2 = new PointM(x2, y2).ZoomAndMove(this);
             G.DrawLine(pen, p1, p2);
         }
     }

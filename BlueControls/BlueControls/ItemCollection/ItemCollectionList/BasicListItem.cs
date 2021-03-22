@@ -81,8 +81,7 @@ namespace BlueControls.ItemCollection {
 
             if (string.IsNullOrEmpty(internalname)) {
                 Internal = BasicPadItem.UniqueInternal(); // Wiederverwenden ;-)
-            }
-            else {
+            } else {
                 Internal = internalname;
             }
 
@@ -172,7 +171,7 @@ namespace BlueControls.ItemCollection {
             if (itemdesign == enDesign.Undefiniert) { return; }
 
 
-            var PositionModified = new Rectangle(Pos.X - xModifier, Pos.Y - YModifier, Pos.Width, Pos.Height);
+            Rectangle PositionModified = new Rectangle(Pos.X - xModifier, Pos.Y - YModifier, Pos.Width, Pos.Height);
 
 
 
@@ -182,7 +181,7 @@ namespace BlueControls.ItemCollection {
 
             if (DrawBorderAndBack) {
                 if (!string.IsNullOrEmpty(FilterText) && !FilterMatch(FilterText)) {
-                    var c1 = Skin.Color_Back(controldesign, enStates.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
+                    Color c1 = Skin.Color_Back(controldesign, enStates.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
                     c1 = c1.SetAlpha(160);
                     GR.FillRectangle(new SolidBrush(c1), PositionModified);
                 }
@@ -194,8 +193,7 @@ namespace BlueControls.ItemCollection {
             if (obj is BasicListItem tobj) {
                 // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
                 return CompareKey().CompareTo(tobj.CompareKey());
-            }
-            else {
+            } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
                 return 0;
             }

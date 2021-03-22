@@ -21,13 +21,10 @@
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
-namespace BlueControls.EventArgs
-{
-    public class ListOfBasicListItemEventArgs : System.EventArgs
-    {
+namespace BlueControls.EventArgs {
+    public class ListOfBasicListItemEventArgs : System.EventArgs {
 
-        public ListOfBasicListItemEventArgs(List<BasicListItem> items)
-        {
+        public ListOfBasicListItemEventArgs(List<BasicListItem> items) {
             Items = items;
         }
 

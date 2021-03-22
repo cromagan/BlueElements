@@ -6,29 +6,24 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Drawing;
 
-namespace BlueControls.Classes_Editor
-{
+namespace BlueControls.Classes_Editor {
     internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem> //System.Windows.Forms.UserControl // :
     {
-        public FilterItem_Editor() : base()
-        {
+        public FilterItem_Editor() : base() {
             InitializeComponent();
         }
 
         private AutoFilter autofilter;
 
 
-        protected override void PrepaireFormula()
-        {
+        protected override void PrepaireFormula() {
             Col.Item.AddRange(Item.Database.Column, false, false, true);
         }
 
-        protected override void EnabledAndFillFormula()
-        {
+        protected override void EnabledAndFillFormula() {
             Enabled = true;
 
-            if (Item?.Column == null)
-            {
+            if (Item?.Column == null) {
                 Col.Text = string.Empty;
                 return;
             }
@@ -37,8 +32,7 @@ namespace BlueControls.Classes_Editor
 
         }
 
-        protected override void DisableAndClearFormula()
-        {
+        protected override void DisableAndClearFormula() {
             Enabled = false;
             Col.Text = string.Empty;
         }
@@ -48,20 +42,19 @@ namespace BlueControls.Classes_Editor
 
 
 
-        private void FiltWahl_Click(object sender, System.EventArgs e)
-        {
+        private void FiltWahl_Click(object sender, System.EventArgs e) {
 
-            var c = Item.Database.Column[Col.Text];
+            ColumnItem c = Item.Database.Column[Col.Text];
 
 
             if (c == null || !c.AutoFilterSymbolPossible()) { return; }
 
-            var tmpfc = new FilterCollection(Item.Database);
+            FilterCollection tmpfc = new FilterCollection(Item.Database);
             if (Item.FilterType != enFilterType.KeinFilter) { tmpfc.Add(Item); }
 
             autofilter = new AutoFilter(c, tmpfc);
 
-            var p = FiltWahl.PointToScreen(Point.Empty);
+            Point p = FiltWahl.PointToScreen(Point.Empty);
 
             autofilter.Position_LocateToPosition(new Point(p.X, p.Y + FiltWahl.Height));
 
@@ -74,12 +67,10 @@ namespace BlueControls.Classes_Editor
         }
 
 
-        private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e)
-        {
+        private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
             if (IsFilling) { return; }
 
-            if (e.Comand != "Filter")
-            {
+            if (e.Comand != "Filter") {
                 Notification.Show("Diese Funktion wird nicht unterstützt,<br>abbruch.");
                 return;
             }
@@ -92,19 +83,15 @@ namespace BlueControls.Classes_Editor
             OnChanged(Item);
         }
 
-        private void Col_TextChanged(object sender, System.EventArgs e)
-        {
+        private void Col_TextChanged(object sender, System.EventArgs e) {
             if (IsFilling) { return; }
 
-            var c = Item.Database.Column[Col.Text];
+            ColumnItem c = Item.Database.Column[Col.Text];
 
 
-            if (c == null || c.AutoFilterSymbolPossible())
-            {
+            if (c == null || c.AutoFilterSymbolPossible()) {
                 FiltWahl.Enabled = true;
-            }
-            else
-            {
+            } else {
                 FiltWahl.Enabled = true;
             }
 

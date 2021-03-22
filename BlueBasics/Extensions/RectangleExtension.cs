@@ -21,17 +21,13 @@ using BlueBasics.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
+namespace BlueBasics {
+    public static partial class Extensions {
 
-        public static Point PointOf(this Rectangle r, enAlignment P)
-        {
+        public static Point PointOf(this Rectangle r, enAlignment P) {
 
 
-            switch (P)
-            {
+            switch (P) {
                 case enAlignment.Bottom_Left:
                     return new Point(r.Left, r.Bottom);
                 case enAlignment.Bottom_Right:
@@ -58,21 +54,20 @@ namespace BlueBasics
         }
 
 
-        public static Point NearestCornerOF(this Rectangle r, Point P)
-        {
+        public static Point NearestCornerOF(this Rectangle r, Point P) {
 
-            var LO = r.PointOf(enAlignment.Top_Left);
-            var rO = r.PointOf(enAlignment.Top_Right);
-            var ru = r.PointOf(enAlignment.Bottom_Right);
-            var lu = r.PointOf(enAlignment.Bottom_Left);
+            Point LO = r.PointOf(enAlignment.Top_Left);
+            Point rO = r.PointOf(enAlignment.Top_Right);
+            Point ru = r.PointOf(enAlignment.Bottom_Right);
+            Point lu = r.PointOf(enAlignment.Bottom_Left);
 
 
-            var llo = Geometry.Länge(P, LO);
-            var lro = Geometry.Länge(P, rO);
-            var llu = Geometry.Länge(P, lu);
-            var lru = Geometry.Länge(P, ru);
+            decimal llo = Geometry.Länge(P, LO);
+            decimal lro = Geometry.Länge(P, rO);
+            decimal llu = Geometry.Länge(P, lu);
+            decimal lru = Geometry.Länge(P, ru);
 
-            var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
+            decimal Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
 
             if (Erg == llo) { return LO; }
             if (Erg == lro) { return rO; }

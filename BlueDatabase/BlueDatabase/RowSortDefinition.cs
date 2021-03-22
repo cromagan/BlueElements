@@ -87,17 +87,16 @@ namespace BlueDatabase {
 
         public override string ToString() {
 
-            var Result = "{";
+            string Result = "{";
 
             if (Reverse) {
                 Result += "Direction=Z-A";
-            }
-            else {
+            } else {
                 Result += "Direction=A-Z";
             }
 
             if (_Columns != null) {
-                foreach (var ThisColumn in _Columns) {
+                foreach (ColumnItem ThisColumn in _Columns) {
                     if (ThisColumn != null) {
                         Result = Result + ", " + ThisColumn.ParsableColumnKey();
                     }
@@ -111,7 +110,7 @@ namespace BlueDatabase {
         public void Parse(string ToParse) {
             IsParsing = true;
             Initialize();
-            foreach (var pair in ToParse.GetAllTags()) {
+            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "identifier":
                         if (pair.Value != "SortDefinition") { Develop.DebugPrint(enFehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value); }
@@ -141,8 +140,8 @@ namespace BlueDatabase {
 
         private void SetColumn(List<string> names) {
             _Columns.Clear();
-            for (var z = 0; z < names.Count; z++) {
-                var c = Database.Column.Exists(names[z]);
+            for (int z = 0; z < names.Count; z++) {
+                ColumnItem c = Database.Column.Exists(names[z]);
 
                 if (c != null) { _Columns.Add(c); }
             }
@@ -152,7 +151,7 @@ namespace BlueDatabase {
 
             if (_Columns.Count == 0) { return false; }
 
-            foreach (var ThisColumn in _Columns) {
+            foreach (ColumnItem ThisColumn in _Columns) {
                 if (ThisColumn == vcolumn) { return true; }
             }
             return false;

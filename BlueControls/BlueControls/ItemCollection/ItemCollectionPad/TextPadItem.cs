@@ -148,7 +148,7 @@ namespace BlueControls.ItemCollection {
 
 
         public override string ToString() {
-            var t = base.ToString();
+            string t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             if (!string.IsNullOrEmpty(Text)) { t = t + "ReadableText=" + Text.ToNonCritical() + ", "; }
             if (Format != enDataFormat.Text) { t = t + "Format=" + (int)Format + ", "; }
@@ -170,7 +170,7 @@ namespace BlueControls.ItemCollection {
 
 
 
-            var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            PointF trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
             GR.TranslateTransform(trp.X, trp.Y);
             GR.RotateTransform(-Drehwinkel);
 
@@ -195,27 +195,27 @@ namespace BlueControls.ItemCollection {
         private string ChangeText(string tmpBody) {
 
 
-            var nt = tmpBody;
+            string nt = tmpBody;
 
 
             do {
-                var stx = nt.ToUpper().IndexOf("//TS/");
+                int stx = nt.ToUpper().IndexOf("//TS/");
                 if (stx < 0) { break; }
-                var enx = nt.ToUpper().IndexOf("/E", stx + 4);
+                int enx = nt.ToUpper().IndexOf("/E", stx + 4);
                 if (enx < 0) { break; }
-                var t1 = nt.Substring(stx, enx - stx + 2);
+                string t1 = nt.Substring(stx, enx - stx + 2);
 
                 if (string.IsNullOrEmpty(t1)) { break; }
                 if (!t1.Contains("//TS/000")) { break; }
 
-                var l = t1.SplitBy("/");
+                string[] l = t1.SplitBy("/");
                 if (l.Length < 3) { break; }
 
-                var Nam = "";
-                var Vor = "";
-                var Nach = "";
+                string Nam = "";
+                string Vor = "";
+                string Nach = "";
 
-                for (var tec = 0; tec <= l.GetUpperBound(0); tec++) {
+                for (int tec = 0; tec <= l.GetUpperBound(0); tec++) {
 
                     if (l[tec].Length > 3) {
                         switch (l[tec].Substring(0, 3)) {
@@ -235,7 +235,7 @@ namespace BlueControls.ItemCollection {
                 }
 
 
-                var t2 = "<MarkState=2>" + Vor + Nam + Nach + "<MarkState=0>";
+                string t2 = "<MarkState=2>" + Vor + Nam + Nach + "<MarkState=0>";
 
                 nt = nt.Replace(t1, t2);
 
@@ -260,16 +260,14 @@ namespace BlueControls.ItemCollection {
 
                 if (Parent == null) {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Parent is Nothing, wurde das Objekt zu einer Collection hinzugefügt?");
-                }
-                else {
+                } else {
                     etxt = new ExtText(Stil, Parent.SheetStyle);
                 }
 
 
                 if (!string.IsNullOrEmpty(Text)) {
                     etxt.HtmlText = ChangeText(Text);
-                }
-                else {
+                } else {
                     etxt.HtmlText = "{Text}";
                 }
 
@@ -290,8 +288,7 @@ namespace BlueControls.ItemCollection {
 
             if (etxt == null || etxt.Height() < 8) {
                 p_RU.Y = Math.Max(p_LO.Y + 8 * Skalierung * Parent.SheetStyleScale, p_LO.Y + 10);
-            }
-            else {
+            } else {
                 p_RU.Y = Math.Max(p_LO.Y + etxt.Height() * Skalierung * Parent.SheetStyleScale, p_LO.Y + 10);
             }
 
@@ -304,7 +301,7 @@ namespace BlueControls.ItemCollection {
 
         public bool ReplaceVariable(string VariableName, enValueType ValueType, string Value) {
 
-            var ot = Text;
+            string ot = Text;
             Text = Export.ParseVariable(Text, VariableName, Value, ValueType, enValueType.Text);
 
             if (ot == Text) { return false; }
@@ -327,7 +324,7 @@ namespace BlueControls.ItemCollection {
 
 
         public bool DoSpecialCodes() {
-            var ot = Text;
+            string ot = Text;
             Text = Export.DoLayoutCode("XS", Text, null, "XE", false);
 
             if (ot == Text) { return false; }
@@ -338,7 +335,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public bool RenameColumn(string oldName, ColumnItem cColumnItem) {
-            var ot = _VariableText;
+            string ot = _VariableText;
             _VariableText = _VariableText.Replace("//TS/000" + oldName + "/", "//TS/000" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
             _VariableText = _VariableText.Replace("//TS/001" + oldName + "/", "//TS/001" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
 
@@ -352,16 +349,18 @@ namespace BlueControls.ItemCollection {
 
 
         public override List<FlexiControl> GetStyleOptions() {
-            var l = new List<FlexiControl>
+            List<FlexiControl> l = new List<FlexiControl>
             {
                 new FlexiControlForProperty(this, "Interner-Text", 5)
             };
 
 
-            var Aursicht = new ItemCollectionList();
-            Aursicht.Add("Linksbündig ausrichten", ((int)enAlignment.Top_Left).ToString(), enImageCode.Linksbündig);
-            Aursicht.Add("Zentrieren", ((int)enAlignment.Top_HorizontalCenter).ToString(), enImageCode.Zentrieren);
-            Aursicht.Add("Rechtsbündig ausrichten", ((int)enAlignment.Top_Right).ToString(), enImageCode.Rechtsbündig);
+            ItemCollectionList Aursicht = new ItemCollectionList
+            {
+                { "Linksbündig ausrichten", ((int)enAlignment.Top_Left).ToString(), enImageCode.Linksbündig },
+                { "Zentrieren", ((int)enAlignment.Top_HorizontalCenter).ToString(), enImageCode.Zentrieren },
+                { "Rechtsbündig ausrichten", ((int)enAlignment.Top_Right).ToString(), enImageCode.Rechtsbündig }
+            };
             Aursicht.Sort();
 
             l.Add(new FlexiControlForProperty(this, "Ausrichtung", Aursicht));

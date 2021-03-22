@@ -33,7 +33,7 @@ namespace BlueScript {
         public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableAny, enVariableDataType.String }; }
         public override bool EndlessArgs { get => false; }
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             switch (attvar[1].ValueString.ToLower()) {

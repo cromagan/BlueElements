@@ -106,7 +106,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public override bool Contains(PointF value, decimal zoomfactor) {
-            var ne = 5 / zoomfactor;
+            decimal ne = 5 / zoomfactor;
 
             if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M) { return false; }
 
@@ -115,7 +115,7 @@ namespace BlueControls.ItemCollection {
 
             if (_TempPoints.Count == 0) { return false; }
 
-            for (var z = 0; z <= _TempPoints.Count - 2; z++) {
+            for (int z = 0; z <= _TempPoints.Count - 2; z++) {
                 if (value.DistanzZuStrecke(_TempPoints[z], _TempPoints[z + 1]) < ne) { return true; }
             }
 
@@ -129,13 +129,13 @@ namespace BlueControls.ItemCollection {
             if (_TempPoints.Count == 0) { CalcTempPoints(); }
 
             if (_TempPoints.Count == 0) { return new RectangleM(); }
-            var x1 = decimal.MaxValue;
-            var y1 = decimal.MaxValue;
-            var x2 = decimal.MinValue;
-            var y2 = decimal.MinValue;
+            decimal x1 = decimal.MaxValue;
+            decimal y1 = decimal.MaxValue;
+            decimal x2 = decimal.MinValue;
+            decimal y2 = decimal.MinValue;
 
 
-            foreach (var ThisPoint in _TempPoints) {
+            foreach (PointM ThisPoint in _TempPoints) {
                 x1 = Math.Min(ThisPoint.X, x1);
                 y1 = Math.Min(ThisPoint.Y, y1);
 
@@ -158,7 +158,7 @@ namespace BlueControls.ItemCollection {
             if (_TempPoints.Count == 0) { return; }
 
 
-            for (var z = 0; z <= _TempPoints.Count - 2; z++) {
+            for (int z = 0; z <= _TempPoints.Count - 2; z++) {
                 GR.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(cZoom, shiftX, shiftY), _TempPoints[z + 1].ZoomAndMove(cZoom, shiftX, shiftY));
             }
 
@@ -199,7 +199,7 @@ namespace BlueControls.ItemCollection {
         protected override void ParseFinished() { }
 
         public override string ToString() {
-            var t = base.ToString();
+            string t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
             if (Linien_Verhalten != enConectorStyle.Direct) { t = t + "Connection=" + (int)Linien_Verhalten + ", "; }
@@ -209,7 +209,7 @@ namespace BlueControls.ItemCollection {
         protected override void GenerateInternalRelationExplicit() { }
 
         private void CalcTempPoints() {
-            var NewCode = Point1 + Point2.ToString();
+            string NewCode = Point1 + Point2.ToString();
 
             if (CalcTempPoints_Code != NewCode) {
                 CalcTempPoints_Code = NewCode;
@@ -241,16 +241,16 @@ namespace BlueControls.ItemCollection {
 
             if (Linien_Verhalten == enConectorStyle.Direct) { return; }
 
-            var count = 0;
+            int count = 0;
 
             do {
                 count++;
-                var again = false;
+                bool again = false;
                 if (_TempPoints.Count > 100) {
                     break;
                 }
 
-                for (var z = 0; z < _TempPoints.Count; z++) {
+                for (int z = 0; z < _TempPoints.Count; z++) {
                     if (LöscheVerdeckte(z)) {
                         again = true;
                         break;
@@ -284,13 +284,13 @@ namespace BlueControls.ItemCollection {
 
         private bool IsVerdeckt(decimal X, decimal Y) {
 
-            foreach (var ThisBasicItem in Parent) {
+            foreach (BasicPadItem ThisBasicItem in Parent) {
                 if (ThisBasicItem != null) {
 
 
                     if (!(ThisBasicItem is LinePadItem)) {
 
-                        var a = (RectangleM)ThisBasicItem.UsedArea().Clone();
+                        RectangleM a = (RectangleM)ThisBasicItem.UsedArea().Clone();
 
                         if (a.Width > 0 && a.Height > 0) {
                             a.Inflate(2, 2);
@@ -306,10 +306,10 @@ namespace BlueControls.ItemCollection {
 
         private bool SchneidetWas(decimal X1, decimal Y1, decimal X2, decimal Y2) {
 
-            var p1 = new PointM(X1, Y1);
-            var p2 = new PointM(X2, Y2);
+            PointM p1 = new PointM(X1, Y1);
+            PointM p2 = new PointM(X2, Y2);
 
-            foreach (var ThisItemBasic in Parent) {
+            foreach (BasicPadItem ThisItemBasic in Parent) {
                 if (SchneidetDas(ThisItemBasic, p1, p2)) { return true; }
             }
 
@@ -325,15 +325,15 @@ namespace BlueControls.ItemCollection {
 
             if (!(ThisBasicItem is LinePadItem)) {
 
-                var a = (RectangleM)ThisBasicItem.UsedArea().Clone();
+                RectangleM a = (RectangleM)ThisBasicItem.UsedArea().Clone();
 
                 if (a.Width > 0 && a.Height > 0) {
                     a.Inflate(2, 2);
 
-                    var lo = a.PointOf(enAlignment.Top_Left);
-                    var ro = a.PointOf(enAlignment.Top_Right);
-                    var lu = a.PointOf(enAlignment.Bottom_Left);
-                    var ru = a.PointOf(enAlignment.Bottom_Right);
+                    PointM lo = a.PointOf(enAlignment.Top_Left);
+                    PointM ro = a.PointOf(enAlignment.Top_Right);
+                    PointM lu = a.PointOf(enAlignment.Bottom_Left);
+                    PointM ru = a.PointOf(enAlignment.Bottom_Right);
                     if (GeometryDF.LinesIntersect(P1, P2, lo, ro, true) != null || GeometryDF.LinesIntersect(P1, P2, lu, ru, true) != null || GeometryDF.LinesIntersect(P1, P2, lo, lu, true) != null || GeometryDF.LinesIntersect(P1, P2, ro, ru, true) != null) {
                         return true;
                     }
@@ -411,25 +411,25 @@ namespace BlueControls.ItemCollection {
             if (P1 >= _TempPoints.Count - 1) { return false; }
             //   If _TempPoints.Count > 4 Then Return False
 
-            foreach (var ThisItemBasic in Parent) {
+            foreach (BasicPadItem ThisItemBasic in Parent) {
                 if (ThisItemBasic != null) {
                     //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
 
                     if (!(ThisItemBasic is LinePadItem)) {
 
-                        var a = (RectangleM)ThisItemBasic.UsedArea().Clone(); // Umwandeln, um den Bezu zu brechen
+                        RectangleM a = (RectangleM)ThisItemBasic.UsedArea().Clone(); // Umwandeln, um den Bezu zu brechen
 
                         if (a.Width > 0 && a.Height > 0) {
                             a.Inflate(2, 2);
 
-                            var lo = a.PointOf(enAlignment.Top_Left);
-                            var ro = a.PointOf(enAlignment.Top_Right);
-                            var lu = a.PointOf(enAlignment.Bottom_Left);
-                            var ru = a.PointOf(enAlignment.Bottom_Right);
-                            var tOben = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, ro, true);
-                            var tUnten = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lu, ru, true);
-                            var tLinks = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, lu, true);
-                            var trechts = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], ro, ru, true);
+                            PointM lo = a.PointOf(enAlignment.Top_Left);
+                            PointM ro = a.PointOf(enAlignment.Top_Right);
+                            PointM lu = a.PointOf(enAlignment.Bottom_Left);
+                            PointM ru = a.PointOf(enAlignment.Bottom_Right);
+                            PointM tOben = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, ro, true);
+                            PointM tUnten = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lu, ru, true);
+                            PointM tLinks = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, lu, true);
+                            PointM trechts = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], ro, ru, true);
 
 
                             //    If DirectCast(Object2, RowFormulaItem).Row.CellFirst().String.Contains("Lilo") AndAlso DirectCast(Object1, RowFormulaItem).Row.CellFirst().String.Contains("Karl") Then Stop
@@ -441,10 +441,10 @@ namespace BlueControls.ItemCollection {
                                 ro = a.PointOf(enAlignment.Top_Right);
                                 lu = a.PointOf(enAlignment.Bottom_Left);
                                 ru = a.PointOf(enAlignment.Bottom_Right);
-                                var Oben = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, ro, true);
-                                var Unten = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lu, ru, true);
-                                var Links = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, lu, true);
-                                var rechts = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], ro, ru, true);
+                                PointM Oben = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, ro, true);
+                                PointM Unten = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lu, ru, true);
+                                PointM Links = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, lu, true);
+                                PointM rechts = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], ro, ru, true);
 
 
                                 if (Oben == null && tOben != null) {
@@ -654,14 +654,16 @@ namespace BlueControls.ItemCollection {
         }
 
         public override List<FlexiControl> GetStyleOptions() {
-            var l = new List<FlexiControl>();
+            List<FlexiControl> l = new List<FlexiControl>();
 
 
 
-            var Verhalt = new ItemCollectionList();
-            Verhalt.Add("Linie direkt zwischen zwei Punkten", ((int)enConectorStyle.Direct).ToString(), QuickImage.Get(enImageCode.Linie));
-            Verhalt.Add("Linie soll Objekten ausweichen", ((int)enConectorStyle.Ausweichenx).ToString(), QuickImage.Get(enImageCode.Linie));
-            Verhalt.Add("Linie soll Objekten ausweichen und rechtwinklig sein", ((int)enConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(enImageCode.Linie));
+            ItemCollectionList Verhalt = new ItemCollectionList
+            {
+                { "Linie direkt zwischen zwei Punkten", ((int)enConectorStyle.Direct).ToString(), QuickImage.Get(enImageCode.Linie) },
+                { "Linie soll Objekten ausweichen", ((int)enConectorStyle.Ausweichenx).ToString(), QuickImage.Get(enImageCode.Linie) },
+                { "Linie soll Objekten ausweichen und rechtwinklig sein", ((int)enConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(enImageCode.Linie) }
+            };
 
             l.Add(new FlexiControlForProperty(this, "Linien-Verhalten", Verhalt));
 

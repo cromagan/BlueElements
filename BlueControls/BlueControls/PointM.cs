@@ -74,7 +74,7 @@ namespace BlueControls {
             Initialize();
             _parent = parent;
             Name = name;
-            var tempVar = GeometryDF.PolarToCartesian(laenge, Convert.ToDouble(alpha));
+            PointM tempVar = GeometryDF.PolarToCartesian(laenge, Convert.ToDouble(alpha));
             _x = startX + tempVar.X;
             _y = startY + tempVar.Y;
         }
@@ -104,16 +104,16 @@ namespace BlueControls {
         }
         public PointM() : this(null, "Dummy Point ohne Angaben", 0m, 0m, false, true, false, true, string.Empty) { }
         public PointM(string name, decimal x, decimal y) : this(null, name, x, y, false, true, false, true, string.Empty) { }
-        public PointM(object parent, string name, int x, int y, bool fix, bool canUsedForAutoRelation, bool primaryGridSnapPoint) : this(parent, name, (decimal)x, (decimal)y, fix, canUsedForAutoRelation, primaryGridSnapPoint, true, string.Empty) { }
+        public PointM(object parent, string name, int x, int y, bool fix, bool canUsedForAutoRelation, bool primaryGridSnapPoint) : this(parent, name, x, y, fix, canUsedForAutoRelation, primaryGridSnapPoint, true, string.Empty) { }
         public PointM(object parent, string name, decimal x, decimal y) : this(parent, name, x, y, false, true, false, true, string.Empty) { }
         public PointM(PointF point) : this(null, "Dummy Point von PointF", (decimal)point.X, (decimal)point.Y, false, true, false, true, string.Empty) { }
-        public PointM(int x, int y) : this(null, "Dummy Point von IntX und IntY", (decimal)x, (decimal)y, false, true, false, true, string.Empty) { }
+        public PointM(int x, int y) : this(null, "Dummy Point von IntX und IntY", x, y, false, true, false, true, string.Empty) { }
         public PointM(double x, double y) : this(null, "Dummy Point von DoubleX und DoubleY", (decimal)x, (decimal)y, false, true, false, true, string.Empty) { }
         public PointM(decimal x, decimal y) : this(null, "Dummy Point von DecimalX und DecimalY", x, y, false, true, false, true, string.Empty) { }
         public PointM(PointM point) : this(null, "Dummy Point von PointM", point.X, point.Y, false, true, false, true, string.Empty) { }
-        public PointM(object parent, string name, int x, int y, bool fix) : this(parent, name, (decimal)x, (decimal)y, fix, true, false, true, string.Empty) { }
+        public PointM(object parent, string name, int x, int y, bool fix) : this(parent, name, x, y, fix, true, false, true, string.Empty) { }
 
-        public PointM(object parent, string name, int x, int y, bool fix, bool canUsedForAutoRelation) : this(parent, name, (decimal)x, (decimal)y, fix, canUsedForAutoRelation, false, true, string.Empty) { }
+        public PointM(object parent, string name, int x, int y, bool fix, bool canUsedForAutoRelation) : this(parent, name, x, y, fix, canUsedForAutoRelation, false, true, string.Empty) { }
 
         public PointM(object parent, string name, decimal x, decimal y, bool fix, bool canUsedForAutoRelation) : this(parent, name, x, y, fix, canUsedForAutoRelation, false, true, string.Empty) { }
 
@@ -281,7 +281,7 @@ namespace BlueControls {
 
             _parent = parent;
 
-            foreach (var pair in ToParse.GetAllTags()) {
+            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "parentname":
                         break;
@@ -350,7 +350,7 @@ namespace BlueControls {
 
 
         public override string ToString() {
-            var t = "{";
+            string t = "{";
 
 
             if (_parent != null) {
@@ -397,8 +397,8 @@ namespace BlueControls {
 
         public bool IsOnScreen(decimal zoom, decimal shiftX, decimal shiftY, Rectangle displayRectangle) {
 
-            var tx = _x * zoom - shiftX;
-            var ty = _y * zoom - shiftY;
+            decimal tx = _x * zoom - shiftX;
+            decimal ty = _y * zoom - shiftY;
 
             if (tx < displayRectangle.Left || ty < displayRectangle.Top) { return false; }
             if (tx > displayRectangle.Right || ty > displayRectangle.Bottom) { return false; }
@@ -408,15 +408,15 @@ namespace BlueControls {
 
 
         public void Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, enDesign type, enStates state, string textToDraw) {
-            var tx = _x * zoom - shiftX + zoom / 2;
-            var ty = _y * zoom - shiftY + zoom / 2;
+            decimal tx = _x * zoom - shiftX + zoom / 2;
+            decimal ty = _y * zoom - shiftY + zoom / 2;
 
-            var r = new Rectangle((int)(tx - 4), (int)(ty - 4), 9, 9);
+            Rectangle r = new Rectangle((int)(tx - 4), (int)(ty - 4), 9, 9);
 
 
             if (!_UserSelectable) {
                 type = enDesign.Button_EckpunktSchieber_Phantom;
-                state = enStates.Standard; 
+                state = enStates.Standard;
             }
 
 
@@ -426,8 +426,8 @@ namespace BlueControls {
 
 
             if (!string.IsNullOrEmpty(textToDraw)) {
-                for (var x = -1; x < 2; x++) {
-                    for (var y = -1; y < 2; y++) {
+                for (int x = -1; x < 2; x++) {
+                    for (int y = -1; y < 2; y++) {
                         gr.DrawString(textToDraw, SimpleArial, Brushes.White, (float)tx + x, (float)ty + y - 16);
                     }
 
@@ -457,7 +457,7 @@ namespace BlueControls {
         }
 
         public void SetTo(PointM StartPoint, decimal Länge, decimal Alpha) {
-            var tempVar = GeometryDF.PolarToCartesian(Länge, Convert.ToDouble(Alpha));
+            PointM tempVar = GeometryDF.PolarToCartesian(Länge, Convert.ToDouble(Alpha));
             _x = StartPoint.X + tempVar.X;
             _y = StartPoint.Y + tempVar.Y;
         }
@@ -484,13 +484,13 @@ namespace BlueControls {
             if (Fix) { return false; }
 
 
-            foreach (var ThisRelation in Rel) {
+            foreach (clsPointRelation ThisRelation in Rel) {
                 if (ThisRelation != null && !Alredychecked.Contains(ThisRelation) && ThisRelation.Points.Contains(this) && ThisRelation.Performs(false)) {
                     Alredychecked.Add(ThisRelation);
 
                     if (ThisRelation.Connects().HasFlag(toCheck)) {
-                        var Move = true;
-                        foreach (var thispoint in ThisRelation.Points) {
+                        bool Move = true;
+                        foreach (PointM thispoint in ThisRelation.Points) {
                             if (thispoint != this) { Move = thispoint.CanMove(toCheck, Rel, Alredychecked); }
                             if (!Move) { return false; }
                         }
@@ -503,13 +503,13 @@ namespace BlueControls {
         }
 
         public bool CanMoveX(List<clsPointRelation> Rel) {
-            var Alredychecked = new List<clsPointRelation>();
+            List<clsPointRelation> Alredychecked = new List<clsPointRelation>();
 
             return CanMove(enXY.X, Rel, Alredychecked);
         }
 
         public bool CanMoveY(List<clsPointRelation> Rel) {
-            var Alredychecked = new List<clsPointRelation>();
+            List<clsPointRelation> Alredychecked = new List<clsPointRelation>();
 
             return CanMove(enXY.Y, Rel, Alredychecked);
         }
@@ -556,7 +556,7 @@ namespace BlueControls {
         }
 
         public decimal DistanzZuLinie(decimal X1, decimal Y1, decimal X2, decimal Y2) {
-            var pal = GeometryDF.PointOnLine(this, X1, Y1, X2, Y2);
+            PointM pal = GeometryDF.PointOnLine(this, X1, Y1, X2, Y2);
             return GeometryDF.Länge(this, pal);
         }
 
@@ -571,7 +571,7 @@ namespace BlueControls {
         }
 
         public void Normalize() {
-            var magnitude = Magnitude;
+            decimal magnitude = Magnitude;
             _x /= magnitude;
             _y /= magnitude;
         }
@@ -579,7 +579,7 @@ namespace BlueControls {
 
 
         public decimal DotProduct(PointM vector) {
-            return this._x * vector._x + this._y * vector._y;
+            return _x * vector._x + _y * vector._y;
         }
 
 

@@ -63,8 +63,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             cbxLinkedDatabase.Item.Clear();
             if (!string.IsNullOrEmpty(_Column.Database.Filename)) {
-                var All = Directory.GetFiles(_Column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
-                foreach (var ThisString in All) {
+                string[] All = Directory.GetFiles(_Column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
+                foreach (string ThisString in All) {
                     if (ThisString.ToLower() != _Column.Database.Filename.ToLower()) { cbxLinkedDatabase.Item.Add(ThisString.FileNameWithSuffix()); }
                 }
             }
@@ -99,8 +99,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (_Table != null && _Table.CurrentArrangement != null) {
                 butAktuellZurueck.Enabled = _Table.CurrentArrangement[_Column]?.PreviewsVisible(_Table.CurrentArrangement) != null;
                 butAktuellVor.Enabled = _Table.CurrentArrangement[_Column]?.NextVisible(_Table.CurrentArrangement) != null;
-            }
-            else {
+            } else {
                 butAktuellVor.Enabled = false;
                 butAktuellZurueck.Enabled = false;
 
@@ -113,8 +112,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(_Column.Identifier)) {
                 btnStandard.Enabled = false;
                 capInfo.Text = "<Imagecode=" + _Column.SymbolForReadableText() + "> Normale Spalte (Key: " + _Column.Key + ")";
-            }
-            else {
+            } else {
                 btnStandard.Enabled = true;
                 capInfo.Text = "<Imagecode=" + _Column.SymbolForReadableText() + "> " + _Column.Identifier + " (Key: " + _Column.Key + ")";
             }
@@ -152,8 +150,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnAutoEditAutoSort.Checked = _Column.AfterEdit_QuickSortRemoveDouble;
             if (_Column.AfterEdit_Runden > -1 && _Column.AfterEdit_Runden < 7) {
                 tbxRunden.Text = _Column.AfterEdit_Runden.ToString();
-            }
-            else {
+            } else {
                 tbxRunden.Text = string.Empty;
             }
             btnAutoEditToUpper.Checked = _Column.AfterEdit_DoUCase;
@@ -230,7 +227,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Einige Dropdown-Menüs sind abhängig von der LinkedDatabase und werden in dessen TextChanged-Event befüllt
             // siehe Ende dieser Routine
 
-            foreach (var ThisColumn in _Column.Database.Column) {
+            foreach (ColumnItem ThisColumn in _Column.Database.Column) {
                 if ((ThisColumn.Format == enDataFormat.RelationText || !ThisColumn.MultiLine) && ThisColumn.Format.CanBeCheckedByRules()) { cbxSchlüsselspalte.Item.Add(ThisColumn, false); }
                 if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
                     cbxDropDownKey.Item.Add(ThisColumn, false);
@@ -257,13 +254,11 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void SetKeyTo(Database database, ComboBox combobox, int columnKey) {
             if (database is null || columnKey < 0) {
                 combobox.Text = "#Ohne";
-            }
-            else {
-                var c = database.Column.SearchByKey(columnKey);
+            } else {
+                ColumnItem c = database.Column.SearchByKey(columnKey);
                 if (c != null) {
                     combobox.Text = c.Name;
-                }
-                else {
+                } else {
                     combobox.Text = "#Ohne";
                 }
             }
@@ -273,12 +268,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (database == null) { return -1; }
 
-            var c = database.Column.Exists(columnName);
+            ColumnItem c = database.Column.Exists(columnName);
 
             if (c is null) {
                 return -1;
-            }
-            else {
+            } else {
                 return c.Key;
             }
 
@@ -286,7 +280,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
         private bool AllOk() {
-            var Feh = "";
+            string Feh = "";
 
             // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
             if (string.IsNullOrEmpty(Feh)) {
@@ -295,7 +289,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
             if (string.IsNullOrEmpty(Feh)) {
-                foreach (var ThisColumn in _Column.Database.Column) {
+                foreach (ColumnItem ThisColumn in _Column.Database.Column) {
                     if (ThisColumn != _Column && ThisColumn != null) {
                         if (tbxName.Text.ToUpper() == ThisColumn.Name.ToUpper()) { Feh = "Spalten-Name bereits vorhanden."; }
                     }
@@ -349,12 +343,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.AfterEdit_QuickSortRemoveDouble = btnAutoEditAutoSort.Checked;
 
             if (tbxRunden.Text.IsLong()) {
-                var zahl = int.Parse(tbxRunden.Text);
+                int zahl = int.Parse(tbxRunden.Text);
                 if (zahl > -1 && zahl < 7) {
                     _Column.AfterEdit_Runden = zahl;
                 }
-            }
-            else {
+            } else {
                 _Column.AfterEdit_Runden = -1;
             }
             _Column.AfterEdit_DoUCase = btnAutoEditToUpper.Checked;
@@ -367,7 +360,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.SpellCheckingEnabled = btnSpellChecking.Checked;
 
 
-            var tmpf = enFilterOptions.None;
+            enFilterOptions tmpf = enFilterOptions.None;
             if (AutoFilterMöglich.Checked) { tmpf |= enFilterOptions.Enabled; }
             if (AutoFilterTXT.Checked) { tmpf |= enFilterOptions.TextFilterEnabled; }
             if (AutoFilterErw.Checked) { tmpf |= enFilterOptions.ExtendedFilterEnabled; }
@@ -388,20 +381,20 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
 
-            var NewDD = tbxAuswaehlbareWerte.Text.SplitByCRToList().SortedDistinctList();
+            System.Collections.Generic.List<string> NewDD = tbxAuswaehlbareWerte.Text.SplitByCRToList().SortedDistinctList();
             if (NewDD.IsDifferentTo(_Column.DropDownItems)) {
                 _Column.DropDownItems.Clear();
                 _Column.DropDownItems.AddRange(NewDD);
             }
 
 
-            var NewRep = txbReplacer.Text.SplitByCRToList();
+            System.Collections.Generic.List<string> NewRep = txbReplacer.Text.SplitByCRToList();
             if (NewRep.IsDifferentTo(_Column.OpticalReplace)) {
                 _Column.OpticalReplace.Clear();
                 _Column.OpticalReplace.AddRange(NewRep);
             }
 
-            var NewRep2 = txbAutoReplace.Text.SplitByCRToList();
+            System.Collections.Generic.List<string> NewRep2 = txbAutoReplace.Text.SplitByCRToList();
             if (NewRep2.IsDifferentTo(_Column.AfterEdit_AutoReplace)) {
                 _Column.AfterEdit_AutoReplace.Clear();
                 _Column.AfterEdit_AutoReplace.AddRange(NewRep2);
@@ -418,14 +411,14 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _Column.DauerFilterPos = PointParse(txbDauerFilterPos.Text);
 
-            var NewTags = tbxTags.Text.SplitByCRToList();
+            System.Collections.Generic.List<string> NewTags = tbxTags.Text.SplitByCRToList();
             if (NewTags.IsDifferentTo(_Column.Tags)) {
                 _Column.Tags.Clear();
                 _Column.Tags.AddRange(NewTags);
             }
 
 
-            var NewRegex = txbRegex.Text.SplitByCRToList();
+            System.Collections.Generic.List<string> NewRegex = txbRegex.Text.SplitByCRToList();
             if (NewRegex.IsDifferentTo(_Column.Regex)) {
                 _Column.Regex.Clear();
                 _Column.Regex.AddRange(NewRegex);
@@ -445,11 +438,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
 
-            int.TryParse(txbBildCodeConstHeight.Text, out var Res);
+            int.TryParse(txbBildCodeConstHeight.Text, out int Res);
             _Column.BildCode_ConstantHeight = Res;
 
 
-            int.TryParse(cbxBildTextVerhalten.Text, out var ImNF);
+            int.TryParse(cbxBildTextVerhalten.Text, out int ImNF);
             _Column.BildTextVerhalten = (enBildTextVerhalten)ImNF;
 
             _Column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
@@ -466,8 +459,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (btnTargetColumn.Checked) {
                 _Column.LinkedCell_ColumnKey = ColumKeyFrom(_Column.LinkedDatabase(), cbxTargetColumn.Text); // LINKED DATABASE
                 _Column.LinkedCell_ColumnValueFoundIn = -1;
-            }
-            else {
+            } else {
                 _Column.LinkedCell_ColumnKey = -1;
                 _Column.LinkedCell_ColumnValueFoundIn = ColumKeyFrom(_Column.Database, cbxColumnKeyInColumn.Text);
 
@@ -560,7 +552,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
         private void ButtonCheck() {
-            var tmpFormat = (enDataFormat)int.Parse(cbxFormat.Text);
+            enDataFormat tmpFormat = (enDataFormat)int.Parse(cbxFormat.Text);
 
 
 
@@ -623,7 +615,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
             if (_Column.LinkedDatabase() != null) {
-                foreach (var ThisColumn in _Column.Database.Column) {
+                foreach (ColumnItem ThisColumn in _Column.Database.Column) {
                     if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
                         cbxRowKeyInColumn.Item.Add(ThisColumn, false);
                     }
@@ -636,7 +628,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
 
 
-                foreach (var ThisLinkedColumn in _Column.LinkedDatabase().Column) {
+                foreach (ColumnItem ThisLinkedColumn in _Column.LinkedDatabase().Column) {
                     if (!ThisLinkedColumn.IsFirst() && ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) {
                         cbxTargetColumn.Item.Add(ThisLinkedColumn, false);
                     }

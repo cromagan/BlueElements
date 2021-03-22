@@ -148,7 +148,7 @@ namespace BlueDatabase {
 
         public void Parse(string ToParse) {
             IsParsing = true;
-            foreach (var pair in ToParse.GetAllTags()) {
+            foreach (System.Collections.Generic.KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "st":
                         _state = (enItemState)int.Parse(pair.Value);
@@ -171,12 +171,12 @@ namespace BlueDatabase {
                         break;
 
                     case "cell":
-                        var _CellKey = pair.Value.TrimStart("{ColumnKey=");
+                        string _CellKey = pair.Value.TrimStart("{ColumnKey=");
                         if (_CellKey == "{Disposed}") { _CellKey = "-1|-1"; }
                         _CellKey = _CellKey.Replace(", RowKey=", "|");
                         _CellKey = _CellKey.TrimEnd("}");
 
-                        var x = _CellKey.SplitBy("|");
+                        string[] x = _CellKey.SplitBy("|");
 
                         if (x.GetUpperBound(0) == 1) {
                             int.TryParse(x[0], out _colKey);
@@ -186,7 +186,7 @@ namespace BlueDatabase {
 
                     case "cellkey":
                         _CellKey = pair.Value;
-                        var x2 = _CellKey.SplitBy("|");
+                        string[] x2 = _CellKey.SplitBy("|");
 
                         int.TryParse(x2[0], out _colKey);
                         int.TryParse(x2[1], out _rowKey);
@@ -242,8 +242,8 @@ namespace BlueDatabase {
         public string UndoTextTableMouseOver() {
 
 
-            var a = "'" + PreviousValue + "'";
-            var n = "'" + ChangedTo + "'";
+            string a = "'" + PreviousValue + "'";
+            string n = "'" + ChangedTo + "'";
 
             if (a == "''") { a = "<IMAGECODE=Stern|16>"; }
             if (n == "''") { n = "<IMAGECODE=Papierkorb|16>"; }

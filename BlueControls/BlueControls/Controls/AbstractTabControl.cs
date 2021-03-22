@@ -155,10 +155,10 @@ namespace BlueControls.Controls {
 
             try {
                 if (m.Msg == (int)enWndProc.WM_REFLECT + (int)enWndProc.WM_NOTIFY) {
-                    var hdr = (NMHDR)Marshal.PtrToStructure(m.LParam, typeof(NMHDR));
+                    NMHDR hdr = (NMHDR)Marshal.PtrToStructure(m.LParam, typeof(NMHDR));
                     if (hdr.code == TCN_SELCHANGING) {
                         if (_HotTab != null) {
-                            var e = new TabControlEventArgs(_HotTab, Controls.IndexOf(_HotTab));
+                            TabControlEventArgs e = new TabControlEventArgs(_HotTab, Controls.IndexOf(_HotTab));
                             OnSelectedIndexChanging(e);
 
                             if (e.Cancel || _HotTab.Enabled == false) {
@@ -172,9 +172,7 @@ namespace BlueControls.Controls {
                 if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
 
                 base.WndProc(ref m);
-            }
-
-            catch {
+            } catch {
 
             }
 
@@ -236,14 +234,14 @@ namespace BlueControls.Controls {
             if (TabPages.Contains(tp1) == false || TabPages.Contains(tp2) == false) {
                 throw new ArgumentException("TabPages must be in the TabCotrols TabPageCollection.");
             }
-            var Index1 = TabPages.IndexOf(tp1);
-            var Index2 = TabPages.IndexOf(tp2);
+            int Index1 = TabPages.IndexOf(tp1);
+            int Index2 = TabPages.IndexOf(tp2);
             TabPages[Index1] = tp2;
             TabPages[Index2] = tp1;
         }
 
         private System.Windows.Forms.TabPage TestTab(Point pt) {
-            for (var index = 0; index < TabCount; index++) {
+            for (int index = 0; index < TabCount; index++) {
                 if (GetTabRect(index).Contains(pt.X, pt.Y)) {
                     return TabPages[index];
                 }
@@ -273,8 +271,7 @@ namespace BlueControls.Controls {
 
             if (this is RibbonBar) {
                 Skin.Draw_Back(e.Graphics, enDesign.RibbonBar_Back, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
-            }
-            else {
+            } else {
                 Skin.Draw_Back(e.Graphics, enDesign.TabStrip_Back, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
             }
 
@@ -287,12 +284,12 @@ namespace BlueControls.Controls {
 
 
 
-            for (var id = 0; id < TabCount; id++) {
+            for (int id = 0; id < TabCount; id++) {
                 if (id != SelectedIndex) { DrawTabHead(e.Graphics, id); }
             }
 
 
-            for (var id = 0; id < TabCount; id++) {
+            for (int id = 0; id < TabCount; id++) {
                 if (id == SelectedIndex) {
                     DrawTabBody(e.Graphics, id);
                     DrawTabHead(e.Graphics, id);
@@ -306,7 +303,7 @@ namespace BlueControls.Controls {
         private void DrawTabHead(Graphics graphics, int id) {
 
             try {
-                var tmpState = enStates.Standard;
+                enStates tmpState = enStates.Standard;
                 if (!TabPages[id].Enabled) { tmpState = enStates.Standard_Disabled; }
 
 
@@ -318,7 +315,7 @@ namespace BlueControls.Controls {
 
 
 
-                var r = GetTabRect(id);
+                Rectangle r = GetTabRect(id);
 
                 r.Y -= 2;
                 r.X++;
@@ -327,15 +324,13 @@ namespace BlueControls.Controls {
                     Skin.Draw_Back(graphics, enDesign.RibbonBar_Head, tmpState, r, this, true);
                     Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.RibbonBar_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
                     Skin.Draw_Border(graphics, enDesign.RibbonBar_Head, tmpState, r);
-                }
-                else {
+                } else {
                     Skin.Draw_Back(graphics, enDesign.TabStrip_Head, tmpState, r, this, true);
                     Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.TabStrip_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
                     Skin.Draw_Border(graphics, enDesign.TabStrip_Head, tmpState, r);
                 }
 
-            }
-            catch {
+            } catch {
 
             }
 
@@ -343,19 +338,18 @@ namespace BlueControls.Controls {
         }
 
         private void DrawTabBody(Graphics graphics, int id) {
-            var w = enStates.Standard;
+            enStates w = enStates.Standard;
             if (!TabPages[id].Enabled) { w = enStates.Standard_Disabled; }
 
-            var tabRect = GetTabRect(id);
-            var r = new Rectangle(0, tabRect.Bottom, Width, Height - tabRect.Bottom);
+            Rectangle tabRect = GetTabRect(id);
+            Rectangle r = new Rectangle(0, tabRect.Bottom, Width, Height - tabRect.Bottom);
 
             if (r.Width < 2 || r.Height < 2) { return; }
 
             if (this is RibbonBar) {
                 Skin.Draw_Back(graphics, enDesign.RibbonBar_Body, w, r, this, true);
                 Skin.Draw_Border(graphics, enDesign.RibbonBar_Body, w, r);
-            }
-            else {
+            } else {
                 Skin.Draw_Back(graphics, enDesign.TabStrip_Body, w, r, this, true);
                 Skin.Draw_Border(graphics, enDesign.TabStrip_Body, w, r);
             }
@@ -390,8 +384,7 @@ namespace BlueControls.Controls {
                 if (_HotTab != null) {
                     Tags.TagSet("Page", TabPages.IndexOf(_HotTab).ToString());
                 }
-            }
-            else {
+            } else {
                 HotItem = null;
             }
 
@@ -435,7 +428,7 @@ namespace BlueControls.Controls {
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }
 
-            foreach (var ThisControl in Controls) {
+            foreach (object ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
             }
 
@@ -449,7 +442,7 @@ namespace BlueControls.Controls {
 
             if (BeginnEditCounter == 0) { Invalidate(); }
 
-            foreach (var ThisControl in Controls) {
+            foreach (object ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
             }
         }

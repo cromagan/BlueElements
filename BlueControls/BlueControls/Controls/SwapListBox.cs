@@ -39,8 +39,8 @@ namespace BlueControls.Controls {
 
 
 
-        public enAddType AddAllowed { 
-            get => Main.AddAllowed; 
+        public enAddType AddAllowed {
+            get => Main.AddAllowed;
             set => Main.AddAllowed = value;
         }
 
@@ -86,13 +86,12 @@ namespace BlueControls.Controls {
 
 
         protected void MoveItemBetweenList(ListBox Source, ListBox Target, string Internal, bool doRemove) {
-            var SourceItem = Source.Item[Internal];
-            var TargetItem = Target.Item[Internal];
+            BasicListItem SourceItem = Source.Item[Internal];
+            BasicListItem TargetItem = Target.Item[Internal];
 
             if (SourceItem != null && TargetItem == null) {
                 SourceItem.CloneToNewCollection(Target.Item);
-            }
-            else if (SourceItem == null && TargetItem == null) {
+            } else if (SourceItem == null && TargetItem == null) {
                 TargetItem = new TextListItem(Internal, Internal, null, false, true, string.Empty);
                 Target.Item.Add(TargetItem);
             }
@@ -138,10 +137,10 @@ namespace BlueControls.Controls {
 
         internal void SuggestionsAdd(ItemCollectionList item) {
 
-            foreach(var thisi in item) {
+            foreach (BasicListItem thisi in item) {
 
 
-                if ( Main.Item[thisi.Internal] == null && Suggest.Item[thisi.Internal] == null) {
+                if (Main.Item[thisi.Internal] == null && Suggest.Item[thisi.Internal] == null) {
                     thisi.Checked = false;
                     thisi.CloneToNewCollection(Suggest.Item);
 

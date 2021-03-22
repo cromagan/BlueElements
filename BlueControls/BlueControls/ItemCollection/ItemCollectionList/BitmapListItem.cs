@@ -25,10 +25,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.ItemCollection
-{
-    public class BitmapListItem : BasicListItem
-    {
+namespace BlueControls.ItemCollection {
+    public class BitmapListItem : BasicListItem {
         #region  Variablen-Deklarationen 
 
 
@@ -56,8 +54,7 @@ namespace BlueControls.ItemCollection
 
         #region  Construktor + Initialize 
 
-        public BitmapListItem(Bitmap bmp, string internalname, string caption) : base(internalname)
-        {
+        public BitmapListItem(Bitmap bmp, string internalname, string caption) : base(internalname) {
 
             _caption = caption;
             _captiontmp.Clear();
@@ -73,8 +70,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public BitmapListItem(string Filename, string internalname, string caption, string encryptionKey) : base(internalname)
-        {
+        public BitmapListItem(string Filename, string internalname, string caption, string encryptionKey) : base(internalname) {
 
             _caption = caption;
             _captiontmp.Clear();
@@ -98,30 +94,24 @@ namespace BlueControls.ItemCollection
         #region  Properties 
 
 
-        public Bitmap Bitmap
-        {
-            get
-            {
+        public Bitmap Bitmap {
+            get {
                 GetImage();
                 return _Bitmap;
             }
-            set
-            {
+            set {
                 _ImageFilename = string.Empty;
                 _Bitmap = value;
                 //OnChanged();
             }
         }
 
-        public string Caption
-        {
-            get
-            {
+        public string Caption {
+            get {
                 return _caption;
             }
 
-            set
-            {
+            set {
                 if (_caption == value) { return; }
                 _caption = value;
                 _captiontmp.Clear();
@@ -129,14 +119,11 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public int CaptionLines
-        {
-            get
-            {
+        public int CaptionLines {
+            get {
                 return _captionlines;
             }
-            set
-            {
+            set {
                 if (value < 1) { value = 1; }
 
                 if (_captionlines == value) { return; }
@@ -146,34 +133,27 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public int Padding
-        {
-            get
-            {
+        public int Padding {
+            get {
                 return _padding;
             }
 
-            set
-            {
+            set {
                 if (_padding == value) { return; }
                 _padding = value;
                 //OnChanged();
             }
         }
 
-        public List<QuickImage> Overlays
-        {
-            get
-            {
+        public List<QuickImage> Overlays {
+            get {
                 return _overlays;
             }
 
         }
 
-        public override string QuickInfo
-        {
-            get
-            {
+        public override string QuickInfo {
+            get {
                 return string.Empty;
             }
         }
@@ -184,17 +164,15 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate)
-        {
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
 
-            if (DrawBorderAndBack)
-            {
+            if (DrawBorderAndBack) {
                 Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
             }
-            var DCoordinates = PositionModified;
+            Rectangle DCoordinates = PositionModified;
             DCoordinates.Inflate(-_padding, -_padding);
-            var ScaledImagePosition = new RectangleF();
-            var AreaOfWholeImage = new RectangleF();
+            RectangleF ScaledImagePosition = new RectangleF();
+            RectangleF AreaOfWholeImage = new RectangleF();
 
             GetImage();
 
@@ -204,10 +182,9 @@ namespace BlueControls.ItemCollection
 
 
 
-            if (_Bitmap != null)
-            {
+            if (_Bitmap != null) {
                 AreaOfWholeImage = new RectangleF(0, 0, _Bitmap.Width, _Bitmap.Height);
-                var scale = (float)Math.Min((DCoordinates.Width - _padding * 2) / (double)_Bitmap.Width,
+                float scale = (float)Math.Min((DCoordinates.Width - _padding * 2) / (double)_Bitmap.Width,
                                               (DCoordinates.Height - _padding * 2 - _captionlines * ConstMY) / (double)_Bitmap.Height);
 
                 ScaledImagePosition = new RectangleF((DCoordinates.Width - _Bitmap.Width * scale) / 2 + DCoordinates.Left,
@@ -217,7 +194,7 @@ namespace BlueControls.ItemCollection
             }
 
 
-            var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            Point trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
 
             ScaledImagePosition = new RectangleF(ScaledImagePosition.Left - trp.X, ScaledImagePosition.Top - trp.Y, ScaledImagePosition.Width, ScaledImagePosition.Height);
 
@@ -225,25 +202,22 @@ namespace BlueControls.ItemCollection
             GR.TranslateTransform(trp.X, trp.Y);
             if (_Bitmap != null) { GR.DrawImage(_Bitmap, ScaledImagePosition, AreaOfWholeImage, GraphicsUnit.Pixel); }
 
-            foreach (var thisQI in Overlays)
-            {
+            foreach (QuickImage thisQI in Overlays) {
                 GR.DrawImage(thisQI.BMP, ScaledImagePosition.Left + 8, ScaledImagePosition.Top + 8);
             }
 
-            if (!string.IsNullOrEmpty(_caption))
-            {
+            if (!string.IsNullOrEmpty(_caption)) {
 
 
-                var c = _captiontmp.Count;
+                int c = _captiontmp.Count;
 
-                var Ausgl = (c - _captionlines) * ConstMY / 2;
+                int Ausgl = (c - _captionlines) * ConstMY / 2;
 
 
-                foreach (var ThisCap in _captiontmp)
-                {
+                foreach (string ThisCap in _captiontmp) {
                     c--;
-                    var s = Skin.FormatedText_NeededSize(ThisCap, null, Skin.GetBlueFont(enDesign.Item_Listbox, vState), 16);
-                    var r = new Rectangle((int)(DCoordinates.Left + (DCoordinates.Width - s.Width) / 2.0), DCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
+                    Size s = Skin.FormatedText_NeededSize(ThisCap, null, Skin.GetBlueFont(enDesign.Item_Listbox, vState), 16);
+                    Rectangle r = new Rectangle((int)(DCoordinates.Left + (DCoordinates.Width - s.Width) / 2.0), DCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
 
                     r.X -= trp.X;
                     r.Y -= trp.Y;
@@ -264,8 +238,7 @@ namespace BlueControls.ItemCollection
             GR.ResetTransform();
 
 
-            if (DrawBorderAndBack)
-            {
+            if (DrawBorderAndBack) {
                 Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
             }
 
@@ -273,50 +246,38 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override Size ComputeSizeUntouchedForListBox()
-        {
+        protected override Size ComputeSizeUntouchedForListBox() {
             return new Size(300, 300);
         }
 
-        private void GetImage()
-        {
+        private void GetImage() {
             if (string.IsNullOrEmpty(_ImageFilename)) { return; }
             if (_Bitmap != null) { return; }
 
-            try
-            {
+            try {
 
-                if (FileExists(_ImageFilename))
-                {
-                    if (!string.IsNullOrEmpty(_EncryptionKey))
-                    {
-                        var b = modConverter.FileToByte(_ImageFilename);
+                if (FileExists(_ImageFilename)) {
+                    if (!string.IsNullOrEmpty(_EncryptionKey)) {
+                        byte[] b = modConverter.FileToByte(_ImageFilename);
                         b = modAllgemein.SimpleCrypt(b, _EncryptionKey, -1);
                         _Bitmap = modConverter.ByteToBitmap(b);
-                    }
-                    else
-                    {
+                    } else {
                         _Bitmap = (Bitmap)BitmapExt.Image_FromFile(_ImageFilename);
                     }
 
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
         }
 
 
-        public bool ImageLoaded()
-        {
+        public bool ImageLoaded() {
             return _Bitmap != null;
         }
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth)
-        {
-            switch (style)
-            {
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
+            switch (style) {
                 case enBlueListBoxAppearance.FileSystem:
                     return (110 + _captionlines * ConstMY);
                 default:
@@ -326,13 +287,11 @@ namespace BlueControls.ItemCollection
 
 
 
-        protected override string GetCompareKey()
-        {
+        protected override string GetCompareKey() {
             return Internal;
         }
 
-        public override bool FilterMatch(string FilterText)
-        {
+        public override bool FilterMatch(string FilterText) {
             if (base.FilterMatch(FilterText)) { return true; }
             if (Caption.ToUpper().Contains(FilterText.ToUpper())) { return true; }
             if (_ImageFilename.ToUpper().Contains(FilterText.ToUpper())) { return true; }

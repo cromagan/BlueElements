@@ -89,14 +89,18 @@ namespace BlueControls.ItemCollection {
             p_RU = new PointM(this, "RU", 0, 0);
             p_LU = new PointM(this, "LU", 0, 0);
 
-            p_L = new PointM(this, "L", 0, 0, false);
-            p_L.UserSelectable = false;
-            p_R = new PointM(this, "R", 0, 0, false);
-            p_R.UserSelectable = false;
-            p_O = new PointM(this, "O", 0, 0, false);
-            p_O.UserSelectable = false;
-            p_U = new PointM(this, "U", 0, 0, false);
-            p_U.UserSelectable = false;
+            p_L = new PointM(this, "L", 0, 0, false) {
+                UserSelectable = false
+            };
+            p_R = new PointM(this, "R", 0, 0, false) {
+                UserSelectable = false
+            };
+            p_O = new PointM(this, "O", 0, 0, false) {
+                UserSelectable = false
+            };
+            p_U = new PointM(this, "U", 0, 0, false) {
+                UserSelectable = false
+            };
 
             Points.Add(p_LO);
             Points.Add(p_RO);
@@ -134,19 +138,18 @@ namespace BlueControls.ItemCollection {
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_O));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_U));
 
-            }
-            else {
+            } else {
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
 
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
                 Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
 
-             }
+            }
         }
 
         public override List<FlexiControl> GetStyleOptions() {
-            var l = new List<FlexiControl>
+            List<FlexiControl> l = new List<FlexiControl>
             {
                 new FlexiControl(),
                 new FlexiControlForProperty(this, "Drehwinkel")
@@ -155,8 +158,7 @@ namespace BlueControls.ItemCollection {
             if (!Größe_fixiert && !p_LO.CanMove(Parent.AllRelations) && !p_RU.CanMove(Parent.AllRelations)) {
                 l.Add(new FlexiControl());
                 l.Add(new FlexiControl("Objekt fest definiert,<br>Größe kann nicht fixiert werden"));
-            }
-            else {
+            } else {
                 l.Add(new FlexiControlForProperty(this, "Größe_fixiert"));
             }
 
@@ -168,14 +170,13 @@ namespace BlueControls.ItemCollection {
         public void SetCoordinates(RectangleM r, bool overrideFixedSize) {
 
             if (_größe_fixiert && !overrideFixedSize) {
-                var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
-                var ur = UsedArea();
+                PointM vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
+                RectangleM ur = UsedArea();
 
                 p_LO.SetTo(vr.X - ur.Width / 2, vr.Y - ur.Height / 2);
                 p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
 
-            }
-            else {
+            } else {
 
                 p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
                 p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
@@ -221,7 +222,7 @@ namespace BlueControls.ItemCollection {
             return false;
         }
         public override string ToString() {
-            var t = base.ToString();
+            string t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             if (Drehwinkel != 0) { t = t + "Rotation=" + Drehwinkel + ", "; }
             t = t + "Fixsize=" + Größe_fixiert.ToPlusMinus() + ", ";
@@ -234,15 +235,13 @@ namespace BlueControls.ItemCollection {
                 if (!ForPrinting) {
                     if (cZoom > 1) {
                         GR.DrawRectangle(new Pen(Color.Gray, (float)cZoom), DCoordinates);
-                    }
-                    else {
+                    } else {
                         GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
                     }
 
 
                 }
-            }
-            catch { }
+            } catch { }
         }
 
 

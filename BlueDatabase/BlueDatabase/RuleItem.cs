@@ -84,12 +84,12 @@ namespace BlueDatabase {
 
         public override string ToString() {
 
-            var Result = "";
+            string Result = "";
 
             //   if (!string.IsNullOrEmpty(_SystemKey)) { Result = Result + "SK=" + _SystemKey.ToNonCritical() + ", "; }
 
 
-            foreach (var ThisAction in Actions) {
+            foreach (RuleActionItem ThisAction in Actions) {
                 if (ThisAction != null) {
                     Result = Result + ", Aktion=" + ThisAction;
                 }
@@ -106,7 +106,7 @@ namespace BlueDatabase {
 
             Initialize();
 
-            foreach (var pair in ToParse.GetAllTags()) {
+            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "sk": // TODO: alt 28.03.2019 , löschen
                                //  _SystemKey = pair.Value.FromNonCritical();
@@ -171,23 +171,23 @@ namespace BlueDatabase {
         //}
 
         public int AnzahlWenns() {
-            var W = 0;
+            int W = 0;
 
             if (Actions.Count == 0) { return 0; }
 
-            foreach (var ThisAction in Actions) {
-                if (ThisAction != null  && ThisAction.IsBedingung()) { W++; }
+            foreach (RuleActionItem ThisAction in Actions) {
+                if (ThisAction != null && ThisAction.IsBedingung()) { W++; }
             }
 
             return W;
         }
 
         public int AnzahlDanns() {
-            var W = 0;
+            int W = 0;
             if (Actions.Count == 0) { return 0; }
 
-            foreach (var ThisAction in Actions) {
-                if (ThisAction != null  && !ThisAction.IsBedingung()) { W++; }
+            foreach (RuleActionItem ThisAction in Actions) {
+                if (ThisAction != null && !ThisAction.IsBedingung()) { W++; }
             }
 
 
@@ -201,7 +201,7 @@ namespace BlueDatabase {
 
             if (AnzahlWenns() > 1) { return null; }
 
-            foreach (var ThisAction in Actions) {
+            foreach (RuleActionItem ThisAction in Actions) {
                 if (ThisAction != null) {
                     if (ThisAction.IsBedingung()) { return ThisAction.SymbolForReadableText(); }
                 }
@@ -213,37 +213,35 @@ namespace BlueDatabase {
 
 
         public string ReadableText() {
-           // if (!IsOk()) { return "Fehlerhafte Regel wird ignoriert: " + ErrorReason(); }
+            // if (!IsOk()) { return "Fehlerhafte Regel wird ignoriert: " + ErrorReason(); }
 
 
-            var Txts = new List<string>[2];
+            List<string>[] Txts = new List<string>[2];
             Txts[0] = new List<string>();
             Txts[1] = new List<string>();
 
-            var hasAnmerkung = string.Empty;
+            string hasAnmerkung = string.Empty;
 
 
-            foreach (var ThisAction in Actions) {
+            foreach (RuleActionItem ThisAction in Actions) {
                 if (ThisAction != null) {
 
                     if (ThisAction.Action == enAction.Anmerkung) {
                         hasAnmerkung = ThisAction.ReadableText() + "  ";
 
-                    }
-                    else if (ThisAction.IsBedingung()) {
+                    } else if (ThisAction.IsBedingung()) {
                         Txts[0].Add(ThisAction.ReadableText());
-                    }
-                    else {
+                    } else {
                         Txts[1].Add(ThisAction.ReadableText());
                     }
                 }
             }
 
 
-            var GiveB = new string[2];
+            string[] GiveB = new string[2];
 
 
-            for (var z = 0; z <= 1; z++) {
+            for (int z = 0; z <= 1; z++) {
                 switch (Txts[z].Count) {
                     case 1:
                         GiveB[z] = Txts[z][0];
@@ -252,14 +250,14 @@ namespace BlueDatabase {
                         GiveB[z] = "";
                         break;
                     default: {
-                            GiveB[z] = Txts[z][0];
-                            var tempVar = Txts[z].Count - 2;
-                            for (var z1 = 1; z1 <= tempVar; z1++) {
-                                GiveB[z] = GiveB[z] + ", " + Txts[z][z1];
-                            }
-                            GiveB[z] = GiveB[z] + " und " + Txts[z][Txts[z].Count - 1];
-                            break;
+                        GiveB[z] = Txts[z][0];
+                        int tempVar = Txts[z].Count - 2;
+                        for (int z1 = 1; z1 <= tempVar; z1++) {
+                            GiveB[z] = GiveB[z] + ", " + Txts[z][z1];
                         }
+                        GiveB[z] = GiveB[z] + " und " + Txts[z][Txts[z].Count - 1];
+                        break;
+                    }
                 }
             }
 
@@ -351,12 +349,12 @@ namespace BlueDatabase {
         public string CompareKey() {
 
 
-            var MaxColumnIndex = -1;
-            var MaxCode = -1;
+            int MaxColumnIndex = -1;
+            int MaxCode = -1;
 
-            foreach (var ThisAction in Actions) {
+            foreach (RuleActionItem ThisAction in Actions) {
                 if (ThisAction != null) {
-                    foreach (var ThisColumnItem in ThisAction.ColumnsAllUsed()) {
+                    foreach (ColumnItem ThisColumnItem in ThisAction.ColumnsAllUsed()) {
                         if (ThisColumnItem != null) {
                             MaxColumnIndex = Math.Max(ThisColumnItem.Index(), MaxColumnIndex);
                         }
@@ -364,33 +362,73 @@ namespace BlueDatabase {
                 }
 
 
-                var Co = -1;
+                int Co = -1;
                 switch (ThisAction.Action) {
-                    case 0: Co = 1; break; // Neue Action
-                    case enAction.Anmerkung: Co = 2; break;
+                    case 0:
+                        Co = 1;
+                        break; // Neue Action
+                    case enAction.Anmerkung:
+                        Co = 2;
+                        break;
                     //case enAction.Ist_der_Nutzer: Co = 3; break;
-                    case enAction.Setze_Fehlerhaft: Co = 4; break;
-                    case enAction.Sperre_die_Zelle: Co = 5; break;
-                    case enAction.Wert_Setzen: Co = 10; break;
-                    case enAction.Wert_Dazu: Co = 20; break;
-                    case enAction.Wert_Weg: Co = 30; break;
+                    case enAction.Setze_Fehlerhaft:
+                        Co = 4;
+                        break;
+                    case enAction.Sperre_die_Zelle:
+                        Co = 5;
+                        break;
+                    case enAction.Wert_Setzen:
+                        Co = 10;
+                        break;
+                    case enAction.Wert_Dazu:
+                        Co = 20;
+                        break;
+                    case enAction.Wert_Weg:
+                        Co = 30;
+                        break;
 
 
-                    case enAction.Berechne: Co = 37; break;
+                    case enAction.Berechne:
+                        Co = 37;
+                        break;
 
 
-                    case enAction.Ist: Co = 100; break;
-                    case enAction.Ist_Nicht: Co = 101; break;
-                    case enAction.Enthält: Co = 102; break;
-                    case enAction.Enthält_Zeichenkette: Co = 103; break;
-                    case enAction.Enthält_NICHT_Zeichenkette: Co = 104; break;
-                    case enAction.Formatfehler_des_Zelleninhaltes: Co = 105; break;
-                    case enAction.Enthält_ungültige_Zeichen: Co = 106; break;
-                    case enAction.Unsichtbare_Zeichen_am_Ende_Enthält: Co = 107; break;
-                    case enAction.Auf_eine_existierende_Datei_verweist: Co = 108; break;
-                    case enAction.Auf_einen_existierenden_Pfad_verweist: Co = 109; break;
-                    case enAction.Berechnung_ist_True: Co = 110; break;
-                    case enAction.Substring: Co = 115; break;
+                    case enAction.Ist:
+                        Co = 100;
+                        break;
+                    case enAction.Ist_Nicht:
+                        Co = 101;
+                        break;
+                    case enAction.Enthält:
+                        Co = 102;
+                        break;
+                    case enAction.Enthält_Zeichenkette:
+                        Co = 103;
+                        break;
+                    case enAction.Enthält_NICHT_Zeichenkette:
+                        Co = 104;
+                        break;
+                    case enAction.Formatfehler_des_Zelleninhaltes:
+                        Co = 105;
+                        break;
+                    case enAction.Enthält_ungültige_Zeichen:
+                        Co = 106;
+                        break;
+                    case enAction.Unsichtbare_Zeichen_am_Ende_Enthält:
+                        Co = 107;
+                        break;
+                    case enAction.Auf_eine_existierende_Datei_verweist:
+                        Co = 108;
+                        break;
+                    case enAction.Auf_einen_existierenden_Pfad_verweist:
+                        Co = 109;
+                        break;
+                    case enAction.Berechnung_ist_True:
+                        Co = 110;
+                        break;
+                    case enAction.Substring:
+                        Co = 115;
+                        break;
 
                     default:
                         Co = 0;
@@ -463,7 +501,7 @@ namespace BlueDatabase {
 
             if (AnzahlWenns() > 0) { return false; }
 
-            foreach (var ThisAction in Actions) {
+            foreach (RuleActionItem ThisAction in Actions) {
                 if (ThisAction != null) {
                     //if (ThisAction.Action != enAction.KopiereAndereSpalten)
                     //{
@@ -488,19 +526,19 @@ namespace BlueDatabase {
         internal string ToScript() {
 
 
-            var c = new List<ColumnItem>();
+            List<ColumnItem> c = new List<ColumnItem>();
 
-            var txt = "\r\n\r\n// --------------------------------------------------------\r\n";
-                txt += "// " + ReadableText();
+            string txt = "\r\n\r\n// --------------------------------------------------------\r\n";
+            txt += "// " + ReadableText();
             txt += "\r\n// --------------------------------------------------------\r\n";
 
 
-            var a = string.Empty;
-            var e = string.Empty;
+            string a = string.Empty;
+            string e = string.Empty;
 
-            foreach(var thisAktion in Actions) {
+            foreach (RuleActionItem thisAktion in Actions) {
 
-                var (anfang, ende) = thisAktion.ToScript(c);
+                (string anfang, string ende) = thisAktion.ToScript(c);
 
                 a += anfang + "\r\n";
 

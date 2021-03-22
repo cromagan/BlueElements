@@ -21,15 +21,13 @@ using System;
 using System.Globalization;
 
 namespace BluePaint {
-    static class Program
-    {
+    internal static class Program {
         /// <summary>
         /// Der Haupteinstiegspunkt für die Anwendung.
         /// </summary>
         [STAThread]
-        static void Main()
-        {
-            var culture = new System.Globalization.CultureInfo("de-DE");
+        private static void Main() {
+            CultureInfo culture = new System.Globalization.CultureInfo("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
             System.Windows.Forms.Application.EnableVisualStyles();

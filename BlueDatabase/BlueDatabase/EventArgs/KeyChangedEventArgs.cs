@@ -19,14 +19,11 @@
 
 
 
-namespace BlueDatabase.EventArgs
-{
-    public class KeyChangedEventArgs : System.EventArgs
-    {
+namespace BlueDatabase.EventArgs {
+    public class KeyChangedEventArgs : System.EventArgs {
 
 
-        public KeyChangedEventArgs(int KeyOld, int KeyNew)
-        {
+        public KeyChangedEventArgs(int KeyOld, int KeyNew) {
             this.KeyOld = KeyOld;
             this.KeyNew = KeyNew;
         }

@@ -64,7 +64,7 @@
     <Compile Include="Methods\Method_IsNullOrEmpty.cs" />
     <Compile Include="Methods\Method_Max.cs" />
     <Compile Include="Methods\Method_Min.cs" />
-    <Compile Include="Methods\Method_Break.cs" />
+    <Compile Include="Methods\Method_End.cs" />
     <Compile Include="Script.cs" />
     <Compile Include="Enums\enVariableDataType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

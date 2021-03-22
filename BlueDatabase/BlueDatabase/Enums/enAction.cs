@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueDatabase.Enums
-{
-    public enum enAction
-    {
+namespace BlueDatabase.Enums {
+    public enum enAction {
 
         Anmerkung = 1,
 

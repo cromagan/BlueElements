@@ -81,7 +81,7 @@ namespace BlueDatabase {
             get {
                 if (vColumn == null) { return null; }
 
-                foreach (var ThisViewItem in this) {
+                foreach (ColumnViewItem ThisViewItem in this) {
                     if (ThisViewItem != null && ThisViewItem.Column == vColumn) { return ThisViewItem; }
                 }
 
@@ -99,8 +99,7 @@ namespace BlueDatabase {
         public void Add(ColumnItem Column, bool Permanent) {
             if (Permanent) {
                 Add(new ColumnViewItem(Column, enViewType.PermanentColumn));
-            }
-            else {
+            } else {
                 Add(new ColumnViewItem(Column, enViewType.Column));
             }
         }
@@ -116,7 +115,7 @@ namespace BlueDatabase {
             PermissionGroups_Show.ThrowEvents = false;
             Initialize();
 
-            foreach (var pair in ToParse.GetAllTags()) {
+            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "name":
                         _Name = pair.Value;
@@ -140,18 +139,18 @@ namespace BlueDatabase {
         }
 
         public override string ToString() {
-            var Result = "{Name=" + _Name.ToNonCritical();
+            string Result = "{Name=" + _Name.ToNonCritical();
 
-            foreach (var ThisViewItem in this) {
+            foreach (ColumnViewItem ThisViewItem in this) {
                 if (ThisViewItem != null) {
                     Result = Result + ", Columndata=" + ThisViewItem;
                 }
             }
 
-            var tmp = PermissionGroups_Show.SortedDistinctList();
+            List<string> tmp = PermissionGroups_Show.SortedDistinctList();
             tmp.RemoveString("#Administrator", false);
 
-            foreach (var t in tmp) {
+            foreach (string t in tmp) {
                 if (!string.IsNullOrEmpty(t)) {
                     Result = Result + ", Permissiongroup=" + t;
                 }
@@ -163,8 +162,8 @@ namespace BlueDatabase {
         public void ShowAllColumns(Database OfDatabase) {
             if (OfDatabase.IsParsing) { return; }
 
-            var OK = true;
-            for (var z = 0; z < OfDatabase.Column.Count; z++) {
+            bool OK = true;
+            for (int z = 0; z < OfDatabase.Column.Count; z++) {
                 if (z >= Count) {
                     OK = false;
                     break;
@@ -182,7 +181,7 @@ namespace BlueDatabase {
 
             Clear();
 
-            foreach (var ThisColumnItem in OfDatabase.Column) {
+            foreach (ColumnItem ThisColumnItem in OfDatabase.Column) {
                 if (ThisColumnItem != null) {
                     Add(new ColumnViewItem(ThisColumnItem, enViewType.Column));
                 }
@@ -192,8 +191,8 @@ namespace BlueDatabase {
         }
 
         public ColumnItem PreviousVisible(ColumnItem OfColumn) {
-            var ViewItemNo = Count - 1;
-            var Found = false;
+            int ViewItemNo = Count - 1;
+            bool Found = false;
 
             do {
                 if (ViewItemNo < 0) { return null; }
@@ -208,11 +207,11 @@ namespace BlueDatabase {
         }
 
         public ColumnItem NextVisible(ColumnItem OfColumn) {
-            var ViewItemNo = 0;
-            var Found = false;
+            int ViewItemNo = 0;
+            bool Found = false;
 
             do {
-                if (ViewItemNo >= this.Count) { return null; }
+                if (ViewItemNo >= Count) { return null; }
 
                 if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) {
                     if (Found) { return this[ViewItemNo].Column; }
@@ -225,7 +224,7 @@ namespace BlueDatabase {
         }
 
         public ColumnViewItem PreviousVisible(ColumnViewItem OfViewItem) {
-            var ViewItemNo = IndexOf(OfViewItem);
+            int ViewItemNo = IndexOf(OfViewItem);
 
             do {
                 ViewItemNo--;
@@ -237,7 +236,7 @@ namespace BlueDatabase {
         }
 
         public ColumnViewItem NextVisible(ColumnViewItem OfViewItem) {
-            var ViewItemNo = IndexOf(OfViewItem);
+            int ViewItemNo = IndexOf(OfViewItem);
 
             if (ViewItemNo < 0) { return null; }
 
@@ -257,8 +256,8 @@ namespace BlueDatabase {
             if (View2 == null) { return; }
             if (View1 == View2) { return; }
 
-            var Col1 = IndexOf(View1);
-            var Col2 = IndexOf(View2);
+            int Col1 = IndexOf(View1);
+            int Col2 = IndexOf(View2);
             if (Col1 < 0 || Col2 < 0) { return; }
 
 
@@ -270,8 +269,8 @@ namespace BlueDatabase {
 
         public List<ColumnItem> ListOfUsedColumn() {
 
-            var ColList = new List<ColumnItem>();
-            foreach (var t in this) {
+            List<ColumnItem> ColList = new List<ColumnItem>();
+            foreach (ColumnViewItem t in this) {
                 if (t != null) { ColList.Add(t.Column); }
             }
 
@@ -287,7 +286,7 @@ namespace BlueDatabase {
 
 
         public void HideSystemColumns() {
-            foreach (var ThisViewItem in this) {
+            foreach (ColumnViewItem ThisViewItem in this) {
                 if (ThisViewItem != null) {
                     if (ThisViewItem.Column == null || !string.IsNullOrEmpty(ThisViewItem.Column.Identifier)) {
                         Remove(ThisViewItem);
@@ -299,7 +298,7 @@ namespace BlueDatabase {
         }
 
         public void Hide(string ColumnName) {
-            foreach (var ThisViewItem in this) {
+            foreach (ColumnViewItem ThisViewItem in this) {
                 if (ThisViewItem != null) {
                     if (ThisViewItem.Column == null || ThisViewItem.Column.Name.ToUpper() == ColumnName.ToUpper()) {
                         Remove(ThisViewItem);
@@ -313,9 +312,9 @@ namespace BlueDatabase {
 
         internal void Repair() {
 
-            if (this == null || this.Count == 0) { return; }
+            if (this == null || Count == 0) { return; }
 
-            for (var z = 0; z < Count; z++) {
+            for (int z = 0; z < Count; z++) {
                 if (this[z].Column == null || !Database.Column.Contains(this[z].Column)) {
                     this[z] = null;
                 }
@@ -323,7 +322,7 @@ namespace BlueDatabase {
 
             this.RemoveNull();
 
-            var tmp = PermissionGroups_Show.SortedDistinctList();
+            List<string> tmp = PermissionGroups_Show.SortedDistinctList();
             tmp.RemoveString("#Administrator", false);
             tmp.RemoveNullOrEmpty();
 

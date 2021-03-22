@@ -21,7 +21,6 @@
 using BlueBasics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BlueScript {
     public class Script {
@@ -29,7 +28,7 @@ namespace BlueScript {
         private string _error;
         private string _errorCode;
 
-        public bool Break = false;
+        public bool EndSkript = false;
 
 
         public int Line { get; internal set; }
@@ -55,19 +54,18 @@ namespace BlueScript {
 
         public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
 
-            var l = new List<T>();
+            List<T> l = new List<T>();
 
-            foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
+            foreach (System.Reflection.Assembly thisas in AppDomain.CurrentDomain.GetAssemblies()) {
 
 
                 try {
-                    foreach (var thist in thisas.GetTypes()) {
+                    foreach (Type thist in thisas.GetTypes()) {
                         if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T))) {
                             l.Add((T)Activator.CreateInstance(thist, constructorArgs));
                         }
                     }
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     Develop.DebugPrint(ex);
                 }
 
@@ -195,16 +193,16 @@ namespace BlueScript {
         private static string ReduceText(string txt) {
 
 
-            var s = new System.Text.StringBuilder();
+            System.Text.StringBuilder s = new System.Text.StringBuilder();
 
-            var gänsef = false;
-            var comment = false;
+            bool gänsef = false;
+            bool comment = false;
 
 
-            for (var pos = 0; pos < txt.Length; pos++) {
+            for (int pos = 0; pos < txt.Length; pos++) {
 
-                var c = txt.Substring(pos, 1);
-                var addt = true;
+                string c = txt.Substring(pos, 1);
+                bool addt = true;
 
                 switch (c) {
                     case "\"":
@@ -243,8 +241,8 @@ namespace BlueScript {
 
 
         public static (string, string) Parse(string scriptText, bool reduce, Script s) {
-            var pos = 0;
-            s.Break = false;
+            int pos = 0;
+            s.EndSkript = false;
 
 
             string tmptxt;
@@ -252,25 +250,22 @@ namespace BlueScript {
             if (reduce) {
                 tmptxt = ReduceText(scriptText);
                 s.Line = 1;
-            }
-            else {
+            } else {
                 tmptxt = scriptText;
 
             }
 
 
             do {
-                if (pos >= tmptxt.Length || s.Break) { return (string.Empty, string.Empty); }
+                if (pos >= tmptxt.Length || s.EndSkript) { return (string.Empty, string.Empty); }
 
 
 
                 if (tmptxt.Substring(pos, 1) == "¶") {
                     s.Line++;
                     pos++;
-                }
-
-                else {
-                    var f = ComandOnPosition(tmptxt, pos, s, false);
+                } else {
+                    strDoItWithEndedPosFeedback f = ComandOnPosition(tmptxt, pos, s, false);
 
                     if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                         return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(30, tmptxt.Length - pos)));
@@ -289,16 +284,16 @@ namespace BlueScript {
 
 
         public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
-            foreach (var thisC in Comands) {
+            foreach (Method thisC in Comands) {
 
                 //if (!mustHaveFeedback || !thisC.ReturnsVoid) {
 
-                var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
+                strCanDoFeedback f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
 
                 if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
 
                 if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                    var fn = thisC.DoIt(f, s);
+                    strDoItFeedback fn = thisC.DoIt(f, s);
                     return new strDoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
                 }
                 //}
@@ -309,13 +304,13 @@ namespace BlueScript {
 
         public static (int pos, string witch) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter) {
 
-            var klammern = 0;
-            var Gans = false;
-            var GeschwKlammern = 0;
-            var EckigeKlammern = 0;
+            int klammern = 0;
+            bool Gans = false;
+            int GeschwKlammern = 0;
+            int EckigeKlammern = 0;
 
-            var pos = startpos;
-            var maxl = txt.Length;
+            int pos = startpos;
+            int maxl = txt.Length;
             const string TR = "&.,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t";
 
 
@@ -393,7 +388,7 @@ namespace BlueScript {
                 #region Den Text suchen
                 if (klammern == 0 && !Gans && GeschwKlammern == 0 && EckigeKlammern == 0) {
                     if (!checkforSeparatorbefore || pos == 0 || TR.Contains(txt.Substring(pos - 1, 1))) {
-                        foreach (var thisEnd in searchfor) {
+                        foreach (string thisEnd in searchfor) {
                             if (pos + thisEnd.Length <= maxl) {
 
                                 if (txt.Substring(pos, thisEnd.Length).ToLower() == thisEnd.ToLower()) {

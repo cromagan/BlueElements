@@ -21,10 +21,8 @@ using BlueBasics;
 using System;
 using System.Drawing;
 
-namespace BlueControls.Forms
-{
-    public partial class QuickInfo : FloatingForm
-    {
+namespace BlueControls.Forms {
+    public partial class QuickInfo : FloatingForm {
 
 
         public static string _shownTXT = string.Empty;
@@ -35,21 +33,19 @@ namespace BlueControls.Forms
 
         private int Counter = 0;
 
-        private QuickInfo() : base(Enums.enDesign.Form_QuickInfo)
-        {
+        private QuickInfo() : base(Enums.enDesign.Form_QuickInfo) {
             InitializeComponent();
         }
 
-        private QuickInfo(string Text) : this()
-        {
+        private QuickInfo(string Text) : this() {
             //InitializeComponent();
 
 
             capTXT.Text = Text;
 
 
-            var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-            var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+            int He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+            int Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
 
 
             Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
@@ -61,8 +57,7 @@ namespace BlueControls.Forms
         }
 
 
-        public static void Show(string Text)
-        {
+        public static void Show(string Text) {
 
             if (Text == _shownTXT) { return; }
             Close(false);
@@ -79,40 +74,30 @@ namespace BlueControls.Forms
         }
 
 
-        public static new void Close()
-        {
+        public static new void Close() {
             Close(false);
         }
 
 
-        private static void Close(bool AutoClose)
-        {
+        private static void Close(bool AutoClose) {
 
-            if (AutoClose)
-            {
+            if (AutoClose) {
                 _AutoClosedTXT = _shownTXT;
-            }
-            else
-            {
+            } else {
                 _shownTXT = string.Empty;
                 _AutoClosedTXT = string.Empty;
             }
 
 
 
-            foreach (var ThisForm in AllBoxes)
-            {
-                if (!ThisForm.IsDisposed && ThisForm is QuickInfo QI)
-                {
-                    try
-                    {
+            foreach (FloatingForm ThisForm in AllBoxes) {
+                if (!ThisForm.IsDisposed && ThisForm is QuickInfo QI) {
+                    try {
                         QI.timQI.Enabled = false;
                         ThisForm.Close();
                         Close(AutoClose);
                         return;
-                    }
-                    catch (Exception ex)
-                    {
+                    } catch (Exception ex) {
                         Develop.DebugPrint(ex);
                     }
                 }
@@ -121,12 +106,10 @@ namespace BlueControls.Forms
 
 
 
-        private void timQI_Tick(object sender, System.EventArgs e)
-        {
+        private void timQI_Tick(object sender, System.EventArgs e) {
             Position_LocateToMouse();
 
-            if (!_Shown)
-            {
+            if (!_Shown) {
                 _Shown = true;
                 Show();
                 timQI.Interval = 15;
@@ -135,8 +118,7 @@ namespace BlueControls.Forms
 
             Counter++;
 
-            if (Counter * timQI.Interval > 10000)
-            {
+            if (Counter * timQI.Interval > 10000) {
                 timQI.Enabled = false;
                 Close(true);
             }

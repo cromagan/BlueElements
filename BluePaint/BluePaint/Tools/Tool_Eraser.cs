@@ -17,47 +17,40 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System.Drawing;
 using BlueBasics;
 using BlueControls.EventArgs;
+using System.Drawing;
 using static BlueBasics.Extensions;
 
 namespace BluePaint {
-    public partial class Tool_Eraser : GenericTool
-    {
-        public Tool_Eraser(bool Aufnahme) : base()
-        {
+    public partial class Tool_Eraser : GenericTool {
+        public Tool_Eraser(bool Aufnahme) : base() {
             InitializeComponent();
 
 
             DrawBox.Enabled = !Aufnahme;
             Razi.Enabled = !Aufnahme;
 
-            if (Aufnahme)
-            {
+            if (Aufnahme) {
                 Eleminate.Checked = true;
             }
 
         }
 
 
-        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
-        {
-            if (Razi.Checked)
-            {
+        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
+            if (Razi.Checked) {
                 e.FillCircle(ColorRedTransp, e.Current.TrimmedX, e.Current.TrimmedY, 3);
             }
 
 
-            if (DrawBox.Checked && e.Current != null)
-            {
-                var _Pic = OnNeedCurrentPic();
+            if (DrawBox.Checked && e.Current != null) {
+                Bitmap _Pic = OnNeedCurrentPic();
 
                 e.DrawLine(Pen_RedTransp, -1, e.Current.TrimmedY, _Pic.Width, e.Current.TrimmedY);
                 e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, _Pic.Height);
 
-                if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null)
-                {
+                if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
                     e.DrawLine(Pen_RedTransp, -1, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
                     e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, -1, e.MouseDown.TrimmedX, _Pic.Height);
                     e.FillRectangle(Brush_RedTransp, e.TrimmedRectangle());
@@ -65,40 +58,33 @@ namespace BluePaint {
             }
         }
 
-        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic)
-        {
+        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) {
             OnForceUndoSaving();
             MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
 
-        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
-        {
-            if (e.Current.Button == System.Windows.Forms.MouseButtons.Left)
-            {
+        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+            if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
 
-                if (Razi.Checked)
-                {
-                    var _Pic = OnNeedCurrentPic();
+                if (Razi.Checked) {
+                    Bitmap _Pic = OnNeedCurrentPic();
                     _Pic.FillCircle(Color.White, e.Current.TrimmedX, e.Current.TrimmedY, 3);
                 }
             }
             OnDoInvalidate();
         }
 
-        public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
-        {
+        public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
 
             if (Razi.Checked) { return; }
 
-            var _Pic = OnNeedCurrentPic();
+            Bitmap _Pic = OnNeedCurrentPic();
 
 
-            if (Eleminate.Checked)
-            {
+            if (Eleminate.Checked) {
 
-                if (e.Current.IsInPic)
-                {
-                    var cc = _Pic.GetPixel(e.Current.X, e.Current.Y);
+                if (e.Current.IsInPic) {
+                    Color cc = _Pic.GetPixel(e.Current.X, e.Current.Y);
 
                     if (cc.ToArgb() == 0) { return; }
 
@@ -111,31 +97,29 @@ namespace BluePaint {
             }
 
 
-            if (DrawBox.Checked)
-            {
-                var g = Graphics.FromImage(_Pic);
+            if (DrawBox.Checked) {
+                Graphics g = Graphics.FromImage(_Pic);
                 g.FillRectangle(Brushes.White, e.TrimmedRectangle());
                 OnDoInvalidate();
             }
         }
 
-        private void DrawBox_CheckedChanged(object sender, System.EventArgs e) => OnDoInvalidate();
+        private void DrawBox_CheckedChanged(object sender, System.EventArgs e) {
+            OnDoInvalidate();
+        }
 
+        public override string MacroKennung() {
+            return "Eraser";
+        }
 
-        public override string MacroKennung() => "Eraser";
+        public override void ExcuteCommand(string command) {
+            string[] c = command.SplitBy(";");
 
-        public override void ExcuteCommand(string command)
-        {
-            var c = command.SplitBy(";");
-
-            if (c[0] == "Replace")
-            {
-                var OriginalPic = OnNeedCurrentPic();
-                var cc = Color.FromArgb(int.Parse(c[1]));
+            if (c[0] == "Replace") {
+                Bitmap OriginalPic = OnNeedCurrentPic();
+                Color cc = Color.FromArgb(int.Parse(c[1]));
                 OnOverridePic(OriginalPic.ReplaceColor(cc, Color.Transparent));
-            }
-            else
-            {
+            } else {
                 Develop.DebugPrint_NichtImplementiert();
             }
         }

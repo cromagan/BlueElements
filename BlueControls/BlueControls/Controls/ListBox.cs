@@ -196,7 +196,7 @@ namespace BlueControls.Controls {
             if (!Visible) { return; }
             if (Parent == null) { return; }
 
-            var nr = Item.Checked();
+            List<BasicListItem> nr = Item.Checked();
 
 
             Down.Visible = _MoveAllowed;
@@ -210,8 +210,7 @@ namespace BlueControls.Controls {
             if (_MoveAllowed && _FilterAllowed) {
                 FilterCap.Left = Down.Right;
 
-            }
-            else {
+            } else {
                 FilterCap.Left = 0;
             }
 
@@ -221,8 +220,7 @@ namespace BlueControls.Controls {
             if (_RemoveAllowed) {
                 if (nr.Count == 0) {
                     Minus.Enabled = false;
-                }
-                else {
+                } else {
                     Minus.Enabled = true;
                 }
             }
@@ -232,8 +230,7 @@ namespace BlueControls.Controls {
                 if (nr.Count != 1) {
                     Up.Enabled = false;
                     Down.Enabled = false;
-                }
-                else {
+                } else {
                     Up.Enabled = Item[0] != nr[0];
                     Down.Enabled = Item[Item.Count - 1] != nr[0];
                 }
@@ -285,7 +282,7 @@ namespace BlueControls.Controls {
             base.OnMouseUp(e);
             if (!Enabled) { return; }
 
-            var ND = MouseOverNode(e.X, e.Y);
+            BasicListItem ND = MouseOverNode(e.X, e.Y);
 
             if (ND != null && !ND.Enabled) { return; }
 
@@ -323,7 +320,7 @@ namespace BlueControls.Controls {
         protected override void OnDoubleClick(System.EventArgs e) {
             if (!Enabled) { return; }
 
-            var ND = MouseOverNode(MousePos().X, MousePos().Y);
+            BasicListItem ND = MouseOverNode(MousePos().X, MousePos().Y);
 
             if (ND == null) { return; }
 
@@ -347,12 +344,12 @@ namespace BlueControls.Controls {
 
         protected override void DrawControl(Graphics gr, enStates state) {
             if (Item != null) { Item.Appearance = _Appearance; }
-            var tmp = enDesign.ListBox;
+            enDesign tmp = enDesign.ListBox;
             if (_Appearance != enBlueListBoxAppearance.Gallery && _Appearance != enBlueListBoxAppearance.FileSystem) { tmp = (enDesign)_Appearance; }
 
-            var PaintModXx = 0;
-            var PaintModYx = 0;
-            var vStateBox = state;
+            int PaintModXx = 0;
+            int PaintModYx = 0;
+            enStates vStateBox = state;
 
             if (Convert.ToBoolean(vStateBox & enStates.Standard_MouseOver)) { vStateBox ^= enStates.Standard_MouseOver; }
             if (Convert.ToBoolean(vStateBox & enStates.Standard_MousePressed)) { vStateBox ^= enStates.Standard_MousePressed; }
@@ -366,15 +363,15 @@ namespace BlueControls.Controls {
 
             if (ButtonsVisible()) { PaintModYx = Plus.Height; }
 
-            var (BiggestItemX, _, HeightAdded, SenkrechtAllowed) = Item.ItemData();
+            (int BiggestItemX, int _, int HeightAdded, enOrientation SenkrechtAllowed) = Item.ItemData();
 
             Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - PaintModYx), SliderY, BiggestItemX, HeightAdded, SenkrechtAllowed);
 
 
             if (SliderY.Visible) { PaintModXx = SliderY.Width; }
 
-            var BorderCoords = new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width - PaintModXx, DisplayRectangle.Height - PaintModYx);
-            var VisArea = new Rectangle(BorderCoords.X, (int)(BorderCoords.Y + SliderY.Value), BorderCoords.Width, BorderCoords.Height);
+            Rectangle BorderCoords = new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width - PaintModXx, DisplayRectangle.Height - PaintModYx);
+            Rectangle VisArea = new Rectangle(BorderCoords.X, (int)(BorderCoords.Y + SliderY.Value), BorderCoords.Width, BorderCoords.Height);
 
 
             if (BorderCoords.Height > 0) {
@@ -391,19 +388,18 @@ namespace BlueControls.Controls {
 
             _MouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
 
-            var _locker = new object();
+            object _locker = new object();
 
 
             System.Threading.Tasks.Parallel.ForEach(Item, ThisItem => {
 
                 if (ThisItem.Pos.IntersectsWith(VisArea)) {
-                    var vStateItem = vStateBox;
+                    enStates vStateItem = vStateBox;
                     if (_MouseOverItem == ThisItem && Enabled) { vStateItem |= enStates.Standard_MouseOver; }
                     if (!ThisItem.Enabled) { vStateItem = enStates.Standard_Disabled; }
                     if (ThisItem.Checked) { vStateItem |= enStates.Checked; }
 
-                    lock (_locker)
-                    {
+                    lock (_locker) {
                         ThisItem.Draw(gr, 0, (int)SliderY.Value, Item.ControlDesign, Item.ItemDesign, vStateItem, true, FilterTxt.Text, false); // Items müssen beim Erstellen ersetzt werden!!!!
                     }
                 }
@@ -435,7 +431,7 @@ namespace BlueControls.Controls {
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseMove(e);
 
-            var ND = MouseOverNode(MousePos().X, MousePos().Y);
+            BasicListItem ND = MouseOverNode(MousePos().X, MousePos().Y);
 
 
             if (ND != _MouseOverItem) {
@@ -457,19 +453,17 @@ namespace BlueControls.Controls {
 
         public override string QuickInfoText {
             get {
-                var t1 = base.QuickInfoText;
-                var t2 = string.Empty;
+                string t1 = base.QuickInfoText;
+                string t2 = string.Empty;
 
                 if (_MouseOverItem != null) { t2 = _MouseOverItem.QuickInfo; }
 
 
                 if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
                     return string.Empty;
-                }
-                else if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
+                } else if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
                     return t1 + "<br><hr><br>" + t2;
-                }
-                else {
+                } else {
                     return t1 + t2; // Eins davon ist leer
                 }
 
@@ -501,7 +495,7 @@ namespace BlueControls.Controls {
         private void Up_Click(object sender, System.EventArgs e) {
             BasicListItem LN = null;
 
-            foreach (var thisItem in Item) {
+            foreach (BasicListItem thisItem in Item) {
                 if (thisItem != null) {
 
                     if (thisItem.Checked) {
@@ -521,9 +515,9 @@ namespace BlueControls.Controls {
 
         private void Down_Click(object sender, System.EventArgs e) {
 
-            var LN = -1;
+            int LN = -1;
 
-            for (var z = Item.Count - 1; z >= 0; z--) {
+            for (int z = Item.Count - 1; z >= 0; z--) {
                 if (Item[z] != null) {
 
                     if (Item[z].Checked) {
@@ -545,7 +539,7 @@ namespace BlueControls.Controls {
 
             OnRemoveClicked(new ListOfBasicListItemEventArgs(Item.Checked()));
 
-            foreach (var ThisItem in Item.Checked()) {
+            foreach (BasicListItem ThisItem in Item.Checked()) {
                 Item.Remove(ThisItem);
             }
 
@@ -559,7 +553,7 @@ namespace BlueControls.Controls {
 
         public BasicListItem Add_FromFileSystem() {
 
-            using (var f = new System.Windows.Forms.OpenFileDialog()) {
+            using (System.Windows.Forms.OpenFileDialog f = new System.Windows.Forms.OpenFileDialog()) {
                 f.CheckFileExists = true;
                 f.CheckPathExists = true;
                 f.Multiselect = false;
@@ -569,7 +563,7 @@ namespace BlueControls.Controls {
 
                 if (f.FileNames == null || f.FileNames.Length != 1) { return null; }
 
-                var x = new clsNamedBinary();
+                clsNamedBinary x = new clsNamedBinary();
                 x.LoadFromFile(f.FileNames[0]);
                 Item.Add(x);
             }
@@ -585,7 +579,7 @@ namespace BlueControls.Controls {
             }
             Suggestions.CheckBehavior = enCheckBehavior.SingleSelection;
 
-            var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, enAddType.None, true);
+            List<string> rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, enAddType.None, true);
             if (rück == null || rück.Count == 0) { return null; }
             return Add_Text(rück[0]);
         }
@@ -593,19 +587,19 @@ namespace BlueControls.Controls {
         public TextListItem Add_Text(string Val) {
             if (string.IsNullOrEmpty(Val)) { return null; }
 
-            foreach (var thisItem in Item) {
+            foreach (BasicListItem thisItem in Item) {
                 if (thisItem != null && thisItem.Internal.ToUpper() == Val.ToUpper()) { return null; }
             }
 
 
-            var i = Item.Add(Val, Val);
+            TextListItem i = Item.Add(Val, Val);
             i.Checked = true;
 
             return i;
         }
 
         public TextListItem Add_Text() {
-            var Val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
+            string Val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
             return Add_Text(Val);
         }
 

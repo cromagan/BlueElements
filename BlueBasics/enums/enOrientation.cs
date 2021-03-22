@@ -19,11 +19,9 @@
 
 using System;
 
-namespace BlueBasics.Enums
-{
+namespace BlueBasics.Enums {
     [Flags]
-    public enum enOrientation
-    {
+    public enum enOrientation {
         Ohne = 0,
         Waagerecht = 1,
         Senkrecht = 2

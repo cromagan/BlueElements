@@ -18,11 +18,9 @@
 #endregion
 
 
-namespace BlueControls.Enums
-{
+namespace BlueControls.Enums {
 
-    public enum enPartentType
-    {
+    public enum enPartentType {
         Unbekannt = -1,
 
         Nothing = 1,

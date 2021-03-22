@@ -21,11 +21,10 @@ using BlueControls.Controls;
 using BluePaint.EventArgs;
 using System.Drawing;
 
-namespace BluePaint
-{
+namespace BluePaint {
 
 
-    public abstract partial  class GenericTool : GroupBox // System.Windows.Forms.UserControl //
+    public abstract partial class GenericTool : GroupBox // System.Windows.Forms.UserControl //
     {
 
         protected static Color ColorRedTransp = Color.FromArgb(50, 255, 0, 0);
@@ -33,7 +32,9 @@ namespace BluePaint
         protected static Pen Pen_RedTransp = new Pen(ColorRedTransp);
         protected static Pen Pen_LightWhite = new Pen(Color.FromArgb(150, 255, 255, 255), 3);
 
-        public GenericTool() : base() => InitializeComponent();
+        public GenericTool() : base() {
+            InitializeComponent();
+        }
 
         public event System.EventHandler DoInvalidate;
         public event System.EventHandler ZoomFit;
@@ -52,17 +53,17 @@ namespace BluePaint
         /// 
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual new void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) { }
+        public new virtual void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) { }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual new void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
+        public new virtual void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual new void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
+        public new virtual void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
 
         /// <summary>
         /// 
@@ -75,32 +76,37 @@ namespace BluePaint
         /// Wenn keine BEnutzung möglich ist, wird string.empty zurückgegebenm
         /// </summary>
         /// <returns></returns>
-        public virtual string MacroKennung() => string.Empty;
+        public virtual string MacroKennung() {
+            return string.Empty;
+        }
 
         /// <summary>
         /// Z.B: bei Undo
         /// </summary>
         /// <returns></returns>
-        public virtual void PictureChangedByMainWindow()
-        {
+        public virtual void PictureChangedByMainWindow() {
 
         }
 
 
-        protected virtual void OnHideMainWindow() => HideMainWindow?.Invoke(this, System.EventArgs.Empty);
+        protected virtual void OnHideMainWindow() {
+            HideMainWindow?.Invoke(this, System.EventArgs.Empty);
+        }
 
+        protected virtual void OnZoomFit() {
+            ZoomFit?.Invoke(this, System.EventArgs.Empty);
+        }
 
-        protected virtual void OnZoomFit() => ZoomFit?.Invoke(this, System.EventArgs.Empty);
+        protected virtual void OnShowMainWindow() {
+            ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
+        }
 
+        public virtual void ExcuteCommand(string command) {
+            BlueBasics.Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+        }
 
-        protected virtual void OnShowMainWindow() => ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
-
-        public virtual void ExcuteCommand(string command) => BlueBasics.Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-
-
-        protected virtual Bitmap OnNeedCurrentPic()
-        {
-            var e = new BitmapEventArgs(null);
+        protected virtual Bitmap OnNeedCurrentPic() {
+            BitmapEventArgs e = new BitmapEventArgs(null);
             NeedCurrentPic?.Invoke(this, e);
             return e.BMP;
         }
@@ -110,20 +116,21 @@ namespace BluePaint
         /// Wird benutzt, wenn ein neues Bild erstellt wurde und dieses in den Speicher soll.
         /// </summary>
         /// <param name="BMP"></param>
-        protected virtual void OnOverridePic(Bitmap BMP) => OverridePic?.Invoke(this, new BitmapEventArgs(BMP));
+        protected virtual void OnOverridePic(Bitmap BMP) {
+            OverridePic?.Invoke(this, new BitmapEventArgs(BMP));
+        }
 
-        protected virtual void OnForceUndoSaving() => ForceUndoSaving?.Invoke(this, System.EventArgs.Empty);
+        protected virtual void OnForceUndoSaving() {
+            ForceUndoSaving?.Invoke(this, System.EventArgs.Empty);
+        }
 
-        protected virtual void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
+        protected virtual void OnDoInvalidate() {
+            DoInvalidate?.Invoke(this, System.EventArgs.Empty);
+        }
 
-
-
-        protected virtual void OnCommandForMacro(string command) => CommandForMacro?.Invoke(this, new CommandForMacroArgs(command));
-
-
-
-
-
+        protected virtual void OnCommandForMacro(string command) {
+            CommandForMacro?.Invoke(this, new CommandForMacroArgs(command));
+        }
     }
 
 }

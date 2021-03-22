@@ -1,10 +1,8 @@
 ﻿using System;
 
-namespace BlueControls.Enums
-{
+namespace BlueControls.Enums {
     [Flags]
-    public enum enAutoRelationMode
-    {
+    public enum enAutoRelationMode {
         None = 0,
         DirektVerbindungen = 1,
         Waagerecht = 2,

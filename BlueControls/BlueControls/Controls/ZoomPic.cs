@@ -50,7 +50,7 @@ namespace BlueControls.Controls {
 
                 _bmp = value;
                 ZoomFit();
-              //  Invalidate();
+                //  Invalidate();
 
 
             }
@@ -83,20 +83,19 @@ namespace BlueControls.Controls {
 
             //var TMPGR = Graphics.FromImage(_BitmapOfControl);
 
-            var lgb = new LinearGradientBrush(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
+            LinearGradientBrush lgb = new LinearGradientBrush(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
 
             gr.FillRectangle(lgb, ClientRectangle);
 
             if (_bmp != null) {
 
-                var r = new RectangleM(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(_Zoom, _shiftX, _shiftY);
+                RectangleF r = new RectangleM(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(_Zoom, _shiftX, _shiftY);
 
 
                 if (_Zoom < 1 || AlwaysSmooth) {
                     gr.SmoothingMode = SmoothingMode.AntiAlias;
                     gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                }
-                else {
+                } else {
                     gr.SmoothingMode = SmoothingMode.HighSpeed;
                     gr.InterpolationMode = InterpolationMode.NearestNeighbor;
                 }
@@ -141,10 +140,10 @@ namespace BlueControls.Controls {
 
         private MouseEventArgs1_1 GenerateNewMouseEventArgs(MouseEventArgs e) {
 
-            var en = new PositionEventArgs(MousePos_1_1.X, MousePos_1_1.Y);
+            PositionEventArgs en = new PositionEventArgs(MousePos_1_1.X, MousePos_1_1.Y);
             OnOverwriteMouseImageData(en);
 
-            var p = PointInsidePic(en.X, en.Y);
+            Point p = PointInsidePic(en.X, en.Y);
             return new MouseEventArgs1_1(e.Button, e.Clicks, en.X, en.Y, e.Delta, p.X, p.Y, IsInBitmap(en.X, en.Y));
 
         }

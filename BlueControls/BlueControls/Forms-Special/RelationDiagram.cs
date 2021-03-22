@@ -26,10 +26,8 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
 
-namespace BlueControls.Forms
-{
-    public partial class RelationDiagram : PadEditor
-    {
+namespace BlueControls.Forms {
+    public partial class RelationDiagram : PadEditor {
         private readonly Database _Database;
         private readonly ColumnItem _column;
 
@@ -39,8 +37,7 @@ namespace BlueControls.Forms
         //   Dim ItS As New Size(60, 80)
 
 
-        public RelationDiagram(Database DB)
-        {
+        public RelationDiagram(Database DB) {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -48,12 +45,9 @@ namespace BlueControls.Forms
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _Database = DB;
 
-            foreach (var ThisColumnItem in _Database.Column)
-            {
-                if (ThisColumnItem != null)
-                {
-                    if (ThisColumnItem.Format == enDataFormat.RelationText)
-                    {
+            foreach (ColumnItem ThisColumnItem in _Database.Column) {
+                if (ThisColumnItem != null) {
+                    if (ThisColumnItem.Format == enDataFormat.RelationText) {
                         _column = ThisColumnItem;
                         break;
                     }
@@ -62,26 +56,23 @@ namespace BlueControls.Forms
         }
 
 
-        private void Hinzu_Click(object sender, System.EventArgs e)
-        {
+        private void Hinzu_Click(object sender, System.EventArgs e) {
 
-            var il = new ItemCollectionList();
+            ItemCollectionList il = new ItemCollectionList();
             il.AddRange(_Database.Column[0].Contents(null));
             il.Sort();
             il.CheckBehavior = enCheckBehavior.SingleSelection;
 
 
-            var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, enAddType.None, true);
-            if (i == null || i.Count != 1)
-            {
+            List<string> i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, enAddType.None, true);
+            if (i == null || i.Count != 1) {
                 return;
             }
 
 
             AddOne(i[0], 0, 0, string.Empty);
 
-            if (Pad.Item.Count < 10)
-            {
+            if (Pad.Item.Count < 10) {
                 Pad.ZoomFit();
             }
 
@@ -89,11 +80,9 @@ namespace BlueControls.Forms
         }
 
 
-        public RowFormulaPadItem ItemOfRow(RowItem R)
-        {
+        public RowFormulaPadItem ItemOfRow(RowItem R) {
 
-            foreach (var ThisItem in Pad.Item)
-            {
+            foreach (BasicPadItem ThisItem in Pad.Item) {
                 if (ThisItem != null && ThisItem is RowFormulaPadItem tempVar && tempVar.Row == R) { return tempVar; }
             }
 
@@ -101,25 +90,23 @@ namespace BlueControls.Forms
         }
 
 
-        public RowFormulaPadItem AddOne(string What, int xPos, int Ypos, string layoutID)
-        {
+        public RowFormulaPadItem AddOne(string What, int xPos, int Ypos, string layoutID) {
 
 
             if (string.IsNullOrEmpty(What)) { return null; }
 
             if (Pad.Item[What] != null) { return null; }
 
-            var r = _Database.Row[What];
+            RowItem r = _Database.Row[What];
 
-            if (r == null)
-            {
+            if (r == null) {
                 MessageBox.Show("<b>" + What + "</B> konnte nicht hinzugefügt werden.", enImageCode.Information, "OK");
                 return null;
             }
             if (ItemOfRow(r) != null) { return null; }
 
 
-            var i2 = new RowFormulaPadItem(Pad.Item, _Database, r.Key, layoutID);
+            RowFormulaPadItem i2 = new RowFormulaPadItem(Pad.Item, _Database, r.Key, layoutID);
             Pad.Item.Add(i2);
             //  Pad.Invalidate()
             i2.SetCoordinates(new RectangleM(xPos, Ypos, i2.UsedArea().Width, i2.UsedArea().Height), false);
@@ -132,8 +119,7 @@ namespace BlueControls.Forms
         }
 
 
-        private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e)
-        {
+        private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
             if (e.HotItem == null) { return; }
 
             //Dim i As BasicItem = DirectCast(MouseOver, BasicItem)
@@ -146,18 +132,16 @@ namespace BlueControls.Forms
         }
 
 
-        private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
-        {
+        private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
 
             if (e.HotItem == null) { return; }
 
             if (!(e.HotItem is RowFormulaPadItem)) { return; }
 
-            var i = (RowFormulaPadItem)e.HotItem;
+            RowFormulaPadItem i = (RowFormulaPadItem)e.HotItem;
 
 
-            switch (e.ClickedComand)
-            {
+            switch (e.ClickedComand) {
                 case "Bez+":
                     BezPlus(i);
                     break;
@@ -172,25 +156,22 @@ namespace BlueControls.Forms
         }
 
 
-        private void BezPlus(RowFormulaPadItem initialItem)
-        {
+        private void BezPlus(RowFormulaPadItem initialItem) {
 
             // Den Beziehungstext holen
-            var t = initialItem.Row.CellGetString(_column).ToUpper();
+            string t = initialItem.Row.CellGetString(_column).ToUpper();
             if (string.IsNullOrEmpty(t)) { return; }
 
 
             // Alle möglichen Namen holen
-            var Names = new List<string>();
+            List<string> Names = new List<string>();
             Names.AddRange(_Database.Column[0].GetUcaseNamesSortedByLenght());
 
 
             // Namen ermitteln, die relevant sind
-            var bez = new List<string>();
-            foreach (var thisN in Names)
-            {
-                if (t.Contains(thisN))
-                {
+            List<string> bez = new List<string>();
+            foreach (string thisN in Names) {
+                if (t.Contains(thisN)) {
                     bez.AddIfNotExists(thisN);
                     t.Replace(thisN, string.Empty);
                 }
@@ -199,17 +180,15 @@ namespace BlueControls.Forms
             if (bez.Count == 0) { return; }
 
             // Namen in der Übersicht hinzufügen
-            var lastit = initialItem;
-            foreach (var thisn in bez)
-            {
+            RowFormulaPadItem lastit = initialItem;
+            foreach (string thisn in bez) {
 
 
-                var ro = _Database.Row[thisn];
-                var it = ItemOfRow(ro);
+                RowItem ro = _Database.Row[thisn];
+                RowFormulaPadItem it = ItemOfRow(ro);
 
 
-                if (it == null)
-                {
+                if (it == null) {
                     lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);
                 }
             }
@@ -380,54 +359,47 @@ namespace BlueControls.Forms
         //    //Pad.Relation_Add(enRelationType.PositionZueinander, P2, i.Point2);
         //}
 
-        private void btnBilderExport_Click(object sender, System.EventArgs e)
-        {
+        private void btnBilderExport_Click(object sender, System.EventArgs e) {
 
 
-            var fl = new System.Windows.Forms.FolderBrowserDialog();
+            System.Windows.Forms.FolderBrowserDialog fl = new System.Windows.Forms.FolderBrowserDialog();
 
 
             fl.ShowDialog();
 
 
 
-            foreach (var thisR in Pad.Item)
-            {
+            foreach (BasicPadItem thisR in Pad.Item) {
 
 
-                if (thisR is RowFormulaPadItem r)
-                {
+                if (thisR is RowFormulaPadItem r) {
 
 
-                    var no = r.Row.CellFirstString();
+                    string no = r.Row.CellFirstString();
                     no = no.Replace(" ", "_");
                     no = no.Replace(",", "_");
                     no = no.Replace("__", "_");
 
-                    var newn = FileOperations.TempFile(fl.SelectedPath, no, "png");
+                    string newn = FileOperations.TempFile(fl.SelectedPath, no, "png");
                     r.GeneratedBitmap.Save(newn, System.Drawing.Imaging.ImageFormat.Png);
 
 
-                    foreach (var thisc in r.Row.Database.Column)
-                    {
-                        if (thisc.Format == enDataFormat.Link_To_Filesystem)
-                        {
+                    foreach (ColumnItem thisc in r.Row.Database.Column) {
+                        if (thisc.Format == enDataFormat.Link_To_Filesystem) {
 
-                            var l = r.Row.CellGetList(thisc);
+                            List<string> l = r.Row.CellGetList(thisc);
 
-                            foreach (var thiss in l)
-                            {
+                            foreach (string thiss in l) {
 
-                                var f = thisc.BestFile(thiss, false);
+                                string f = thisc.BestFile(thiss, false);
 
-                                if (FileOperations.FileExists(f))
-                                {
+                                if (FileOperations.FileExists(f)) {
 
-                                    var n2 = r.Row.CellFirstString() + "-" + thisc.Caption;
+                                    string n2 = r.Row.CellFirstString() + "-" + thisc.Caption;
                                     n2 = n2.Replace(" ", "_");
                                     n2 = n2.Replace(",", "_");
                                     n2 = n2.Replace("__", "_");
-                                    var newn2 = FileOperations.TempFile(fl.SelectedPath, n2, f.FileSuffix());
+                                    string newn2 = FileOperations.TempFile(fl.SelectedPath, n2, f.FileSuffix());
                                     FileOperations.CopyFile(f, newn2, true);
                                 }
                             }
@@ -441,24 +413,21 @@ namespace BlueControls.Forms
             }
         }
 
-        private void btnTextExport_Click(object sender, System.EventArgs e)
-        {
+        private void btnTextExport_Click(object sender, System.EventArgs e) {
 
-            var fl = new System.Windows.Forms.FolderBrowserDialog();
+            System.Windows.Forms.FolderBrowserDialog fl = new System.Windows.Forms.FolderBrowserDialog();
 
 
             fl.ShowDialog();
 
 
-            var l = new List<string>();
+            List<string> l = new List<string>();
 
 
-            foreach (var thisR in Pad.Item)
-            {
+            foreach (BasicPadItem thisR in Pad.Item) {
 
 
-                if (thisR is RowFormulaPadItem r)
-                {
+                if (thisR is RowFormulaPadItem r) {
 
                     r.Row.DoAutomatic(true, true, false, "to be sure");
 
@@ -467,7 +436,7 @@ namespace BlueControls.Forms
                     l.Add(r.Row.CellFirstString());
                     l.Add(" ");
 
-                    var t = r.Row.CellGetList(_column);
+                    List<string> t = r.Row.CellGetList(_column);
                     l.AddRange(t);
                     l.Add(" ");
                     l.Add(" ");
@@ -476,12 +445,12 @@ namespace BlueControls.Forms
                     l.Add(" ");
 
 
-                    var no = r.Row.CellFirstString();
+                    string no = r.Row.CellFirstString();
                     no = no.Replace(" ", "_");
                     no = no.Replace(",", "_");
                     no = no.Replace("__", "_");
 
-                    var newn = FileOperations.TempFile(fl.SelectedPath, no, "txt");
+                    string newn = FileOperations.TempFile(fl.SelectedPath, no, "txt");
                     t.Save(newn, false);
 
 
@@ -490,7 +459,7 @@ namespace BlueControls.Forms
             }
 
 
-            var newn2 = FileOperations.TempFile(fl.SelectedPath, "+++ALLES+++", "txt");
+            string newn2 = FileOperations.TempFile(fl.SelectedPath, "+++ALLES+++", "txt");
 
             l.Save(newn2, true);
 

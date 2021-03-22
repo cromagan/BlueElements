@@ -78,8 +78,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (tbxUndoAnzahl.Text.IsLong()) {
                 _Database.UndoCount = Math.Max(int.Parse(tbxUndoAnzahl.Text), 5);
-            }
-            else {
+            } else {
                 _Database.UndoCount = 5;
             }
 
@@ -87,16 +86,14 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (tbxReloadVerzoegerung.Text.IsLong()) {
                 _Database.ReloadDelaySecond = Math.Max(int.Parse(tbxReloadVerzoegerung.Text), 5);
-            }
-            else {
+            } else {
                 _Database.ReloadDelaySecond = 5;
             }
 
             if (txbGlobalScale.Text.IsDouble()) {
                 _Database.GlobalScale = Math.Min(double.Parse(txbGlobalScale.Text), 5);
                 _Database.GlobalScale = Math.Max(0.5, _Database.GlobalScale);
-            }
-            else {
+            } else {
                 _Database.ReloadDelaySecond = 1;
             }
 
@@ -111,7 +108,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _Database.RulesScript = txtSkript.Text;
 
-            var l = lstBinary.Item.GetNamedBinaries();
+            ListExt<clsNamedBinary> l = lstBinary.Item.GetNamedBinaries();
             if (l.IsDifferentTo(_Database.Bins)) {
                 _Database.Bins.Clear();
                 _Database.Bins.AddRange(l);
@@ -139,8 +136,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
             // Export ------------
-            var NewExports = new List<ExportDefinition>();
-            foreach (var ThisItem in lbxExportSets.Item) {
+            List<ExportDefinition> NewExports = new List<ExportDefinition>();
+            foreach (BasicListItem ThisItem in lbxExportSets.Item) {
                 NewExports.Add((ExportDefinition)((TextListItem)ThisItem).Tag);
             }
 
@@ -186,7 +183,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 btnSortRichtung.Checked = _Database.SortDefinition.Reverse;
 
                 if (_Database.SortDefinition.Columns != null) {
-                    foreach (var ThisColumn in _Database.SortDefinition.Columns) {
+                    foreach (ColumnItem ThisColumn in _Database.SortDefinition.Columns) {
                         if (ThisColumn != null) { lbxSortierSpalten.Item.Add(ThisColumn, false); }
                     }
                 }
@@ -202,7 +199,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Exports ----------------
             lbxExportSets.Item.Clear();
 
-            foreach (var ThisSet in _Database.Export) {
+            foreach (ExportDefinition ThisSet in _Database.Export) {
                 if (ThisSet != null) {
                     lbxExportSets.Item.Add(ThisSet);
                 }
@@ -249,7 +246,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             lstBinary.Item.Clear();
 
 
-            foreach (var ThisBin in _Database.Bins) {
+            foreach (clsNamedBinary ThisBin in _Database.Bins) {
                 lstBinary.Item.Add(ThisBin);
             }
 
@@ -266,7 +263,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
         private void GenerateInfoText() {
-            var t = "<b>Datei:</b><tab>" + _Database.Filename + "<br>";
+            string t = "<b>Datei:</b><tab>" + _Database.Filename + "<br>";
             t = t + "<b>Zeilen:</b><tab>" + (_Database.Row.Count() - 1);
             capInfo.Text = t.TrimEnd("<br>");
         }
@@ -277,7 +274,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         #region  Export 
 
         private void ExportSets_AddClicked(object sender, System.EventArgs e) {
-            var NewExportItem = lbxExportSets.Item.Add(new ExportDefinition(_Database));
+            TextListItem NewExportItem = lbxExportSets.Item.Add(new ExportDefinition(_Database));
             NewExportItem.Checked = true;
         }
 
@@ -291,7 +288,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 ExportEditor.Item = null;
                 return;
             }
-            var SelectedExport = (ExportDefinition)((TextListItem)lbxExportSets.Item.Checked()[0]).Tag;
+            ExportDefinition SelectedExport = (ExportDefinition)((TextListItem)lbxExportSets.Item.Checked()[0]).Tag;
 
             ExportEditor.Item = SelectedExport;
         }
@@ -304,9 +301,9 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
         private void lbxExportSets_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
-            foreach (var thisitem in e.Items) {
+            foreach (BasicListItem thisitem in e.Items) {
                 if (thisitem is BasicListItem ThisItemBasic) {
-                    var tempVar = (ExportDefinition)((TextListItem)ThisItemBasic).Tag;
+                    ExportDefinition tempVar = (ExportDefinition)((TextListItem)ThisItemBasic).Tag;
                     tempVar.DeleteAllBackups();
                 }
             }
@@ -327,12 +324,12 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (!(e.HotItem is BitmapListItem)) { return; }
 
-            var l = (BitmapListItem)e.HotItem;
+            BitmapListItem l = (BitmapListItem)e.HotItem;
 
 
             switch (e.ClickedComand) {
                 case "Umbenennen":
-                    var n = InputBox.Show("<b><u>Bild umbenennen:</u></b><br><br>Achtung! Dadruch können Bezüge<br> in Texten und Spalten verlorengehen!", l.Caption, enDataFormat.Text);
+                    string n = InputBox.Show("<b><u>Bild umbenennen:</u></b><br><br>Achtung! Dadruch können Bezüge<br> in Texten und Spalten verlorengehen!", l.Caption, enDataFormat.Text);
                     if (!string.IsNullOrEmpty(n)) { l.Caption = n; }
                     break;
 
@@ -351,24 +348,23 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnDateiSchluessel.Enabled = false;
             btnDateiSchluessel.Text = "Dateien in Arbeit";
 
-            var lLCase = _Database.AllConnectedFilesLCase();
+            List<string> lLCase = _Database.AllConnectedFilesLCase();
 
 
             string NewKey;
 
             if (string.IsNullOrEmpty(_Database.FileEncryptionKey)) {
                 NewKey = new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyz äöü#_-<>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 10).Select(s => s[Constants.GlobalRND.Next(s.Length)]).ToArray());
-                foreach (var ThisFile in lLCase) {
-                    var b = modConverter.FileToByte(ThisFile);
+                foreach (string ThisFile in lLCase) {
+                    byte[] b = modConverter.FileToByte(ThisFile);
                     b = modAllgemein.SimpleCrypt(b, NewKey, 1);
                     FileOperations.DeleteFile(ThisFile, true);
                     modConverter.ByteToFile(ThisFile, b);
                 }
-            }
-            else {
+            } else {
                 NewKey = string.Empty;
-                foreach (var ThisFile in lLCase) {
-                    var b = modConverter.FileToByte(ThisFile);
+                foreach (string ThisFile in lLCase) {
+                    byte[] b = modConverter.FileToByte(ThisFile);
                     b = modAllgemein.SimpleCrypt(b, _Database.FileEncryptionKey, -1);
                     FileOperations.DeleteFile(ThisFile, true);
                     modConverter.ByteToFile(ThisFile, b);
@@ -389,8 +385,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(_Database.FileEncryptionKey)) {
                 btnDateiSchluessel.Text = "Dateien verschlüsseln";
                 btnDateiSchluessel.QuickInfo = "Dazugehörige Dateien der Datenbank sind aktuell im Originalformat auf dem Laufwerk für jedem zugänglich.";
-            }
-            else {
+            } else {
                 btnDateiSchluessel.Text = "Dateien freigeben";
                 btnDateiSchluessel.QuickInfo = "Dazugehörige Dateien der Datenbank sind aktuell verschlüsselt.";
             }
@@ -401,7 +396,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnFremdImport_Click(object sender, System.EventArgs e) {
             if (_Database.ReadOnly) { return; }
 
-            var en = new System.Windows.Forms.FormClosingEventArgs(System.Windows.Forms.CloseReason.None, false);
+            System.Windows.Forms.FormClosingEventArgs en = new System.Windows.Forms.FormClosingEventArgs(System.Windows.Forms.CloseReason.None, false);
 
             OnFormClosing(en);
             if (en.Cancel) { return; }
@@ -411,52 +406,53 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
             string GetFromFile;
-            var openFileDialog1 = new System.Windows.Forms.OpenFileDialog {
+            System.Windows.Forms.OpenFileDialog openFileDialog1 = new System.Windows.Forms.OpenFileDialog {
                 CheckFileExists = true,
                 Filter = "Datenbanken|*.mdb"
             };
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
                 GetFromFile = openFileDialog1.FileName;
-            }
-            else {
+            } else {
                 return;
             }
 
-            var I = new ItemCollectionList();
-            I.Add("Anordnungen der Spaltenansichten", ((int)enDatabaseDataType.ColumnArrangement).ToString());
-            I.Add("Formulare", ((int)enDatabaseDataType.Views).ToString());
-            //I.Add("Regeln", ((int)enDatabaseDataType.Rules_ALT).ToString());
-            I.Add("Undo-Speicher", ((int)enDatabaseDataType.UndoInOne).ToString());
-            I.Add("Auto-Export", ((int)enDatabaseDataType.AutoExport).ToString());
-            I.Add("Binäre Daten im Kopf der Datenbank", ((int)enDatabaseDataType.BinaryDataInOne).ToString());
-            I.Add("Eingebettete Layouts", ((int)enDatabaseDataType.Layouts).ToString());
-            I.Add("Tags des Datenbankkopfes", ((int)enDatabaseDataType.Tags).ToString());
-            I.Add("Standard-Sortierung", ((int)enDatabaseDataType.SortDefinition).ToString());
+            ItemCollectionList I = new ItemCollectionList
+            {
+                { "Anordnungen der Spaltenansichten", ((int)enDatabaseDataType.ColumnArrangement).ToString() },
+                { "Formulare", ((int)enDatabaseDataType.Views).ToString() },
+                //I.Add("Regeln", ((int)enDatabaseDataType.Rules_ALT).ToString());
+                { "Undo-Speicher", ((int)enDatabaseDataType.UndoInOne).ToString() },
+                { "Auto-Export", ((int)enDatabaseDataType.AutoExport).ToString() },
+                { "Binäre Daten im Kopf der Datenbank", ((int)enDatabaseDataType.BinaryDataInOne).ToString() },
+                { "Eingebettete Layouts", ((int)enDatabaseDataType.Layouts).ToString() },
+                { "Tags des Datenbankkopfes", ((int)enDatabaseDataType.Tags).ToString() },
+                { "Standard-Sortierung", ((int)enDatabaseDataType.SortDefinition).ToString() }
+            };
 
 
             I.Sort();
 
-            var What = InputBoxComboStyle.Show("Welchen Code:", I, false);
+            string What = InputBoxComboStyle.Show("Welchen Code:", I, false);
 
             if (string.IsNullOrEmpty(What)) { return; }
 
 
-            var _tmp = File.ReadAllBytes(GetFromFile);
+            byte[] _tmp = File.ReadAllBytes(GetFromFile);
 
-            var B = new List<byte>();
+            List<byte> B = new List<byte>();
             B.AddRange(_tmp);
 
 
 
             enDatabaseDataType Art = 0;
-            var Pointer = 0;
-            var ColKey = 0;
-            var RowKey = 0;
-            var X = 0;
-            var Y = 0;
-            var Inhalt = "";
+            int Pointer = 0;
+            int ColKey = 0;
+            int RowKey = 0;
+            int X = 0;
+            int Y = 0;
+            string Inhalt = "";
 
-            var Such = (enDatabaseDataType)int.Parse(What);
+            enDatabaseDataType Such = (enDatabaseDataType)int.Parse(What);
 
             do {
                 if (Pointer >= B.Count) { break; }
@@ -477,7 +473,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void GenerateVariableTable() {
 
-            var x = new Database(true);
+            Database x = new Database(true);
             x.Column.Add("Name", "Name", enDataFormat.Text);
             x.Column.Add("Typ", "Typ", enDataFormat.Text);
             x.Column.Add("RO", "Schreibgeschützt", enDataFormat.Bit);
@@ -485,7 +481,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
             x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
 
-            foreach (var ThisColumn in x.Column) {
+            foreach (ColumnItem ThisColumn in x.Column) {
                 if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
                     ThisColumn.MultiLine = true;
                     ThisColumn.TextBearbeitungErlaubt = false;
@@ -513,7 +509,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
         private void GenerateUndoTabelle() {
 
-            var x = new Database(true);
+            Database x = new Database(true);
             x.Column.Add("Index", "Index", enDataFormat.Ganzzahl);
             x.Column.Add("ColumnKey", "Spalten-<br>Schlüssel", enDataFormat.Ganzzahl);
             x.Column.Add("ColumnName", "Spalten-<br>Name", enDataFormat.Text);
@@ -527,7 +523,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             x.Column.Add("WertAlt", "Wert alt", enDataFormat.Text);
             x.Column.Add("WertNeu", "Wert neu", enDataFormat.Text);
 
-            foreach (var ThisColumn in x.Column) {
+            foreach (ColumnItem ThisColumn in x.Column) {
                 if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
                     ThisColumn.MultiLine = true;
                     ThisColumn.TextBearbeitungErlaubt = false;
@@ -545,17 +541,17 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
 
-            for (var n = 0; n < _Database.Works.Count; n++) {
+            for (int n = 0; n < _Database.Works.Count; n++) {
 
 
                 if (_Database.Works[n].HistorischRelevant) {
 
-                    var cd = _Database.Works[n].CellKey.SplitBy("|");
+                    string[] cd = _Database.Works[n].CellKey.SplitBy("|");
 
 
-                    _Database.Cell.DataOfCellKey(_Database.Works[n].CellKey, out var Col, out var Row);
+                    _Database.Cell.DataOfCellKey(_Database.Works[n].CellKey, out ColumnItem Col, out RowItem Row);
 
-                    var r = x.Row.Add(n.ToString());
+                    RowItem r = x.Row.Add(n.ToString());
 
                     r.CellSet("ColumnKey", cd[0]);
                     r.CellSet("RowKey", cd[1]);
@@ -570,8 +566,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                     if (Row != null) {
                         r.CellSet("RowFirst", Row.CellFirstString());
-                    }
-                    else if (cd[1] != "-1") {
+                    } else if (cd[1] != "-1") {
                         r.CellSet("RowFirst", "[gelöscht]");
                     }
 
@@ -582,10 +577,10 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
 
-                    var Symb = enImageCode.Fragezeichen;
-                    var alt = _Database.Works[n].PreviousValue;
-                    var neu = _Database.Works[n].ChangedTo;
-                    var aenderung = _Database.Works[n].Comand.ToString();
+                    enImageCode Symb = enImageCode.Fragezeichen;
+                    string alt = _Database.Works[n].PreviousValue;
+                    string neu = _Database.Works[n].ChangedTo;
+                    string aenderung = _Database.Works[n].Comand.ToString();
 
                     switch (_Database.Works[n].Comand) {
                         case enDatabaseDataType.ce_UTF8Value_withoutSizeData:
@@ -653,7 +648,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
         private void ExportEditor_Changed(object sender, System.EventArgs e) {
-            foreach (var thisitem in lbxExportSets.Item) {
+            foreach (BasicListItem thisitem in lbxExportSets.Item) {
                 if (thisitem is TextListItem tli) {
                     if (tli.Tag == ExportEditor.Item) {
                         tli.Text = ExportEditor.Item.ReadableText();
@@ -678,7 +673,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
 
-            var r = _Database.Row[txbTestZeile.Text];
+            RowItem r = _Database.Row[txbTestZeile.Text];
 
             if (r == null) {
                 MessageBox.Show("Zeile nicht gefunden.", enImageCode.Information, "OK");
@@ -688,13 +683,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _Database.RulesScript = txtSkript.Text;
 
-            (var ok, var message, var s) = r.DoAutomatic(true, "script testing");
+            (bool ok, string message, BlueScript.Script s) = r.DoAutomatic(true, "script testing");
 
             //var t = string.Empty;
 
-            foreach (var thisv in s.Variablen) {
+            foreach (BlueScript.Variable thisv in s.Variablen) {
 
-                var ro = tableVariablen.Database.Row.Add(thisv.Name);
+                RowItem ro = tableVariablen.Database.Row.Add(thisv.Name);
                 ro.CellSet("typ", thisv.Type.ToString());
                 ro.CellSet("RO", thisv.Readonly);
                 ro.CellSet("System", thisv.SystemVariable);
@@ -703,14 +698,14 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             }
 
-            var co = string.Empty;
+            string co = string.Empty;
 
-            foreach (var thisc in BlueScript.Script.Comands) {
+            foreach (BlueScript.Method thisc in BlueScript.Script.Comands) {
 
                 co = co + "#################################################################" + "\r\n";
                 co = co + thisc.Syntax + "\r\n";
                 co = co + "  - Rückgabetyp: " + thisc.Returns.ToString() + "\r\n";
-                for (var z = 0; z < thisc.Args.Count(); z++) {
+                for (int z = 0; z < thisc.Args.Count(); z++) {
                     co = co + "  - Argument " + (z + 1).ToString() + ": " + thisc.Args[z].ToString();
                     if (z == thisc.Args.Count() - 1 && thisc.EndlessArgs) {
                         co = co + " -> Dieses Argument kann beliebig oft wiederholt werden";
@@ -732,8 +727,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.";
 
-            }
-            else {
+            } else {
                 txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode;
             }
 
@@ -750,12 +744,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             txtSkript.Enabled = false;
 
 
-            var f = string.Empty;
-            var l = new List<string>() { @"C:\Program Files (x86)\Notepad++\notepad++.exe",
+            string f = string.Empty;
+            List<string> l = new List<string>() { @"C:\Program Files (x86)\Notepad++\notepad++.exe",
                                          @"C:\Program Files\Notepad++\notepad++.exe" };
 
 
-            foreach (var thisf in l) {
+            foreach (string thisf in l) {
                 if (FileExists(thisf)) {
                     f = thisf;
                     break;
@@ -766,13 +760,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(_ExternCode)) {
                 if (string.IsNullOrEmpty(f)) {
                     _ExternCode = TempFile(string.Empty, string.Empty, "txt");
-                }
-                else {
+                } else {
                     _ExternCode = TempFile(string.Empty, string.Empty, "cs");
                 }
 
-            }
-            else {
+            } else {
                 ExternTimer_Tick(null, System.EventArgs.Empty);
             }
 
@@ -783,8 +775,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (string.IsNullOrEmpty(f)) {
                 ExecuteFile(_ExternCode, string.Empty, false, true);
-            }
-            else {
+            } else {
                 ExecuteFile(f, _ExternCode, false, true);
             }
 
@@ -806,7 +797,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
 
 
-                var nfilestate = GetFileInfo(_ExternCode, true);
+                string nfilestate = GetFileInfo(_ExternCode, true);
 
                 if (_FileState == nfilestate) { ExternTimer.Enabled = true; return; }
 
@@ -817,8 +808,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 ExternTimer.Enabled = true;
 
-            }
-            catch {
+            } catch {
                 _FileState = "Fehler";
                 ExternTimer.Enabled = true;
             }

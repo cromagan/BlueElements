@@ -89,26 +89,26 @@ namespace BlueControls {
             _Richtmaß.Clear();
 
 
-            foreach (var pair in ToParse.GetAllTags()) {
+            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "type":
                         _relationtype = (enRelationType)int.Parse(pair.Value);
                         break;
 
                     case "value":
-                        var x = pair.Value.SplitBy(";");
-                        foreach (var thisv in x) {
+                        string[] x = pair.Value.SplitBy(";");
+                        foreach (string thisv in x) {
                             _Richtmaß.Add(modConverter.DecimalParse(thisv));
                         }
                         break;
 
                     case "point":
-                        var added = false;
-                        var m = pair.Value.IndexOf(", X=") + 4;
-                        foreach (var ThisPoint in ParentCollection.AllPoints) {
+                        bool added = false;
+                        int m = pair.Value.IndexOf(", X=") + 4;
+                        foreach (PointM ThisPoint in ParentCollection.AllPoints) {
                             if (ThisPoint != null) {
 
-                                var nv = ThisPoint.ToString();
+                                string nv = ThisPoint.ToString();
 
                                 if (!string.IsNullOrEmpty(nv) && nv.Length >= m && nv.Substring(0, m) == pair.Value.Substring(0, m)) {
                                     added = true;
@@ -186,14 +186,14 @@ namespace BlueControls {
 
         public override string ToString() {
 
-            var t = "{Type=" + (int)_relationtype;
+            string t = "{Type=" + (int)_relationtype;
 
             // Richtmaß wird mitgespeichert. Falls sich die Vorlagen ändern, besteht die Chance, dass beziehungen erhalten bleiben
-            foreach (var thisr in _Richtmaß) {
+            foreach (decimal thisr in _Richtmaß) {
                 t = t + ", Value=" + thisr.ToString().ToNonCritical();
             }
 
-            foreach (var thispoint in Points) {
+            foreach (PointM thispoint in Points) {
                 t = t + ", Point=" + thispoint;
             }
 
@@ -204,10 +204,10 @@ namespace BlueControls {
         public void Draw(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, int OrderNr) {
 
             if (CreativePad.Debug_ShowRelationOrder) {
-                var l1 = Points[0].ZoomAndMove(cZoom, shiftX, shiftY);
-                var l2 = Points[1].ZoomAndMove(cZoom, shiftX, shiftY);
+                PointF l1 = Points[0].ZoomAndMove(cZoom, shiftX, shiftY);
+                PointF l2 = Points[1].ZoomAndMove(cZoom, shiftX, shiftY);
                 GR.DrawLine(Pens.Orange, l1, l2);
-                var mm1 = new PointF((l1.X + l2.X) / 2 - 5, (l1.Y + l2.Y) / 2 - 5);
+                PointF mm1 = new PointF((l1.X + l2.X) / 2 - 5, (l1.Y + l2.Y) / 2 - 5);
                 GR.DrawString(OrderNr.ToString(), new Font("Arial", 6), Brushes.Orange, mm1.X, mm1.Y);
             }
 
@@ -215,11 +215,11 @@ namespace BlueControls {
             if (Performs(true)) { return; }
 
 
-            var c = Color.FromArgb(50, 255, 0, 0);
-            var p = new Pen(c);
+            Color c = Color.FromArgb(50, 255, 0, 0);
+            Pen p = new Pen(c);
 
 
-            foreach (var thispoint in Points) {
+            foreach (PointM thispoint in Points) {
                 thispoint.Draw(GR, cZoom, shiftX, shiftY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, string.Empty);
 
 
@@ -233,86 +233,82 @@ namespace BlueControls {
 
             switch (_relationtype) {
                 case enRelationType.WaagerechtSenkrecht: {
-                        var P1 = Points[0].ZoomAndMove(cZoom, shiftX, shiftY);
-                        var P2 = Points[1].ZoomAndMove(cZoom, shiftX, shiftY);
-                        var pb = new PointF((P1.X + P2.X) / 2 - 5, (P1.Y + P2.Y) / 2 - 5);
-                        GR.DrawLine(p, P1, P2);
+                    PointF P1 = Points[0].ZoomAndMove(cZoom, shiftX, shiftY);
+                    PointF P2 = Points[1].ZoomAndMove(cZoom, shiftX, shiftY);
+                    PointF pb = new PointF((P1.X + P2.X) / 2 - 5, (P1.Y + P2.Y) / 2 - 5);
+                    GR.DrawLine(p, P1, P2);
 
 
-                        switch (_Richtmaß[0]) {
-                            case 0:
-                            case 180:
-                                GR.DrawImage(QuickImage.Get(enImageCode.PfeilLinksRechts, 10).BMP, pb.X + 10, pb.Y);
-                                break;
-                            case 90:
-                            case 270:
-                                GR.DrawImage(QuickImage.Get(enImageCode.PfeilObenUnten, 10).BMP, pb.X, pb.Y + 10);
-                                break;
-                            default:
-                                Develop.DebugPrint("Winkel unbekannt: " + _Richtmaß);
-                                break;
-                        }
-
-                        break;
+                    switch (_Richtmaß[0]) {
+                        case 0:
+                        case 180:
+                            GR.DrawImage(QuickImage.Get(enImageCode.PfeilLinksRechts, 10).BMP, pb.X + 10, pb.Y);
+                            break;
+                        case 90:
+                        case 270:
+                            GR.DrawImage(QuickImage.Get(enImageCode.PfeilObenUnten, 10).BMP, pb.X, pb.Y + 10);
+                            break;
+                        default:
+                            Develop.DebugPrint("Winkel unbekannt: " + _Richtmaß);
+                            break;
                     }
+
+                    break;
+                }
                 case enRelationType.PositionZueinander:
                 case enRelationType.YPositionZueinander:
                 case enRelationType.AbstandZueinander: {
-                        var P1 = Points[0].ZoomAndMove(cZoom, shiftX, shiftY);
-                        var P2 = Points[1].ZoomAndMove(cZoom, shiftX, shiftY);
+                    PointF P1 = Points[0].ZoomAndMove(cZoom, shiftX, shiftY);
+                    PointF P2 = Points[1].ZoomAndMove(cZoom, shiftX, shiftY);
 
 
-                        decimal sX;
-                        decimal sY;
-                        decimal iX;
-                        decimal iY;
+                    decimal sX;
+                    decimal sY;
+                    decimal iX;
+                    decimal iY;
 
-                        var ist = GetRichtmaß();
+                    List<decimal> ist = GetRichtmaß();
 
-                        if (_relationtype == enRelationType.PositionZueinander) {
-                            sX = _Richtmaß[0];
-                            sY = _Richtmaß[1];
-                            iX = ist[0];
-                            iY = ist[1];
-                        }
-                        else {
-                            sX = 0;
-                            iX = 0;
-                            sY = _Richtmaß[0];
-                            iY = ist[0];
-                        }
-
-
-                        GR.DrawLine(p, P1, P2);
-
-
-                        if (sX - iX > 0) {
-                            //ok
-                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Rechts, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
-                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Links, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
-
-
-                        }
-                        else if (sX - iX < 0) {
-                            //ok
-                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Links, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
-                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Rechts, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
-
-                        }
-                        else if (sY - iY < 0) {
-                            //ok
-                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Oben, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
-                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Unten, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
-
-                        }
-                        else if (sY - iY > 0) {
-                            //ok
-                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Unten, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
-                            GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Oben, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
-                        }
-
-                        break;
+                    if (_relationtype == enRelationType.PositionZueinander) {
+                        sX = _Richtmaß[0];
+                        sY = _Richtmaß[1];
+                        iX = ist[0];
+                        iY = ist[1];
+                    } else {
+                        sX = 0;
+                        iX = 0;
+                        sY = _Richtmaß[0];
+                        iY = ist[0];
                     }
+
+
+                    GR.DrawLine(p, P1, P2);
+
+
+                    if (sX - iX > 0) {
+                        //ok
+                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Rechts, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
+                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Links, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
+
+
+                    } else if (sX - iX < 0) {
+                        //ok
+                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Links, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
+                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Rechts, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
+
+                    } else if (sY - iY < 0) {
+                        //ok
+                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Oben, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
+                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Unten, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
+
+                    } else if (sY - iY > 0) {
+                        //ok
+                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Unten, 16, "FFaaaa", "").BMP, P1.X - 8, P1.Y - 8);
+                        GR.DrawImage(QuickImage.Get(enImageCode.Pfeil_Oben, 16, "FFaaaa", "").BMP, P2.X - 8, P2.Y - 8);
+                    }
+
+                    break;
+                }
 
                 default:
                     Develop.DebugPrint(_relationtype);
@@ -323,7 +319,7 @@ namespace BlueControls {
 
         public bool Performs(bool StrongMode) {
 
-            var Multi = 300;
+            int Multi = 300;
             if (StrongMode) { Multi = 10; }
 
             if (!IsOk(false)) { return false; }
@@ -332,29 +328,29 @@ namespace BlueControls {
             switch (_relationtype) {
                 case enRelationType.WaagerechtSenkrecht: {
 
-                        if (Math.Abs(Points[0].X - Points[1].X) < 0.01m * Multi && Math.Abs(Points[0].Y - Points[1].Y) < 0.01m * Multi) { return true; }
-                        var Dif = Math.Abs(_Richtmaß[0] - GetRichtmaß()[0]);
+                    if (Math.Abs(Points[0].X - Points[1].X) < 0.01m * Multi && Math.Abs(Points[0].Y - Points[1].Y) < 0.01m * Multi) { return true; }
+                    decimal Dif = Math.Abs(_Richtmaß[0] - GetRichtmaß()[0]);
 
-                        if (Dif <= 0.01m * Multi) { return true; }
+                    if (Dif <= 0.01m * Multi) { return true; }
 
-                        if (Dif > 175M && Dif < 185M) { Dif -= 180M; }
-                        if (Math.Abs(Dif) <= 0.01m * Multi) { return true; }
+                    if (Dif > 175M && Dif < 185M) { Dif -= 180M; }
+                    if (Math.Abs(Dif) <= 0.01m * Multi) { return true; }
 
-                        return false;
+                    return false;
 
-                    }
+                }
                 case enRelationType.PositionZueinander: {
-                        var soll = GetRichtmaß();
-                        if (Math.Abs(soll[0] - _Richtmaß[0]) > 0.01m * Multi) { return false; }
-                        if (Math.Abs(soll[1] - _Richtmaß[1]) > 0.01m * Multi) { return false; }
-                        return true;
+                    List<decimal> soll = GetRichtmaß();
+                    if (Math.Abs(soll[0] - _Richtmaß[0]) > 0.01m * Multi) { return false; }
+                    if (Math.Abs(soll[1] - _Richtmaß[1]) > 0.01m * Multi) { return false; }
+                    return true;
 
 
-                    }
+                }
                 default: {
-                        return Math.Abs(_Richtmaß[0] - GetRichtmaß()[0]) <= 0.01m * Multi;
+                    return Math.Abs(_Richtmaß[0] - GetRichtmaß()[0]) <= 0.01m * Multi;
 
-                    }
+                }
             }
         }
 
@@ -404,7 +400,7 @@ namespace BlueControls {
                 case enRelationType.WaagerechtSenkrecht:
                     if (Math.Abs(Points[0].X) > 9999999 || Math.Abs(Points[0].Y) > 9999999) { return new List<decimal>() { -1 }; }
 
-                    var tmp = Math.Round(Geometry.Winkel(Math.Round(Points[0].X, 2), Math.Round(Points[0].Y, 2), Math.Round(Points[1].X, 2), Math.Round(Points[1].Y, 2)), 2);
+                    decimal tmp = Math.Round(Geometry.Winkel(Math.Round(Points[0].X, 2), Math.Round(Points[0].Y, 2), Math.Round(Points[1].X, 2), Math.Round(Points[1].Y, 2)), 2);
                     switch (tmp) {
                         case 0M:
                         case 180M:
@@ -449,19 +445,17 @@ namespace BlueControls {
             PointM Fix, Flex;
 
 
-            var p1 = pointOrder.IndexOf(Points[0]);
-            var p2 = pointOrder.IndexOf(Points[1]);
+            int p1 = pointOrder.IndexOf(Points[0]);
+            int p2 = pointOrder.IndexOf(Points[1]);
 
 
             if (p1 > p2) {
                 Fix = Points[1];
                 Flex = Points[0];
-            }
-            else if (p1 < p2) {
+            } else if (p1 < p2) {
                 Fix = Points[0];
                 Flex = Points[1];
-            }
-            else {
+            } else {
                 return;
             }
 
@@ -470,8 +464,7 @@ namespace BlueControls {
                 case enRelationType.WaagerechtSenkrecht:
                     if (_Richtmaß[0] == 90) {
                         Flex.SetTo(Fix.X, Flex.Y);
-                    }
-                    else {
+                    } else {
                         Flex.SetTo(Flex.X, Fix.Y);
                     }
                     break;
@@ -479,8 +472,7 @@ namespace BlueControls {
                 case enRelationType.PositionZueinander:
                     if (Fix == Points[1]) {
                         Flex.SetTo(Fix.X + _Richtmaß[0], Fix.Y + _Richtmaß[1]);
-                    }
-                    else {
+                    } else {
                         Flex.SetTo(Fix.X - _Richtmaß[0], Fix.Y - _Richtmaß[1]);
                     }
                     break;
@@ -488,14 +480,13 @@ namespace BlueControls {
                 case enRelationType.YPositionZueinander:
                     if (Fix == Points[1]) {
                         Flex.SetTo(Flex.X, Fix.Y + _Richtmaß[0]);
-                    }
-                    else {
+                    } else {
                         Flex.SetTo(Flex.X, Fix.Y - _Richtmaß[0]);
                     }
                     break;
 
                 case enRelationType.AbstandZueinander:
-                    var wi = GeometryDF.Winkel(Fix, Flex);
+                    decimal wi = GeometryDF.Winkel(Fix, Flex);
                     Flex.SetTo(Fix, _Richtmaß[0], wi);
                     break;
 
@@ -567,11 +558,11 @@ namespace BlueControls {
 
         private static bool UsesSamePoints(clsPointRelation R1, clsPointRelation R2) {
 
-            foreach (var thisPoint in R1.Points) {
+            foreach (PointM thisPoint in R1.Points) {
                 if (!R2.Points.Contains(thisPoint)) { return false; }
             }
 
-            foreach (var thisPoint in R2.Points) {
+            foreach (PointM thisPoint in R2.Points) {
                 if (!R1.Points.Contains(thisPoint)) { return false; }
             }
             return true;
@@ -597,7 +588,7 @@ namespace BlueControls {
             if (allreadyUsed.Contains(pointToCheck)) { return false; }
 
 
-            foreach (var Thispoint2 in Points) {
+            foreach (PointM Thispoint2 in Points) {
                 if (allreadyUsed.Contains(Thispoint2)) { return true; }
             }
 
@@ -605,7 +596,7 @@ namespace BlueControls {
         }
 
         public bool IsInternal() {
-            for (var z = 0; z <= Points.Count - 2; z++) {
+            for (int z = 0; z <= Points.Count - 2; z++) {
                 if (Points[z].Parent != Points[z + 1].Parent) { return false; }
             }
             return true;
@@ -668,7 +659,7 @@ namespace BlueControls {
                     if (!ba.Relations.Contains(this)) { return "Beziehung nicht mehr vorhanden."; }
                 }
 
-                foreach (var Thispoint in Points) {
+                foreach (PointM Thispoint in Points) {
                     if (Thispoint == null) { return "Einer der Punkte ist null."; }
                     if (!ParentCollection.AllPoints.Contains(Thispoint)) { return "Punkt nicht mehr vorhanden."; }
                 }

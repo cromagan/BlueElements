@@ -162,35 +162,26 @@ namespace BlueControls.Controls {
             }
 
 
-            var x = _propInfo.GetValue(_propertyObject, null);
+            object x = _propInfo.GetValue(_propertyObject, null);
             if (x is null) {
                 ValueSet(string.Empty, true, false);
-            }
-            else if (x is string s) {
+            } else if (x is string s) {
                 ValueSet(s, true, false);
-            }
-            else if (x is List<string> ls) {
+            } else if (x is List<string> ls) {
                 ValueSet(ls.JoinWithCr(), true, false);
-            }
-            else if (x is bool bo) {
+            } else if (x is bool bo) {
                 ValueSet(bo.ToPlusMinus(), true, false);
-            }
-            else if (x is int iv) {
-                ValueSet(iv.ToString(), true, false); 
-            }
-            else if (x is Enum) {
+            } else if (x is int iv) {
+                ValueSet(iv.ToString(), true, false);
+            } else if (x is Enum) {
                 ValueSet(((int)x).ToString(), true, false);
-            }
-            else if (x is decimal dc) {
+            } else if (x is decimal dc) {
                 ValueSet(dc.ToString(Constants.Format_Float2), true, false);
-            }
-            else if (x is double db) {
+            } else if (x is double db) {
                 ValueSet(db.ToString(Constants.Format_Float2), true, false);
-            }
-            else if (x is Color co) {
+            } else if (x is Color co) {
                 ValueSet(co.ToHTMLCode(), true, false);
-            }
-            else {
+            } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
             }
 
@@ -205,46 +196,37 @@ namespace BlueControls.Controls {
             if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead) { return; }
 
 
-            var OldVal = string.Empty;
-            var x = _propInfo.GetValue(_propertyObject, null);
+            string OldVal = string.Empty;
+            object x = _propInfo.GetValue(_propertyObject, null);
             object toSet = null;
             if (x is null) {
                 OldVal = string.Empty;
                 toSet = Value; // Wissen wir leider nicht, welcher Typ....
-            }
-            else if (x is string s) {
+            } else if (x is string s) {
                 OldVal = s;
                 toSet = Value;
-            }
-            else if (x is List<string> ls) {
+            } else if (x is List<string> ls) {
                 OldVal = ls.JoinWithCr();
                 toSet = Value.SplitByCRToList();
-            }
-            else if (x is bool bo) {
+            } else if (x is bool bo) {
                 OldVal = bo.ToPlusMinus();
                 toSet = Value.FromPlusMinus();
-            }
-            else if (x is Color co) {
+            } else if (x is Color co) {
                 OldVal = co.ToHTMLCode();
                 toSet = Value.FromHTMLCode();
-            }
-            else if (x is int iv) {
+            } else if (x is int iv) {
                 OldVal = iv.ToString();
                 toSet = IntParse(Value);
-            }
-            else if (x is Enum) {
+            } else if (x is Enum) {
                 OldVal = ((int)x).ToString();
                 toSet = IntParse(Value);
-            }
-            else if (x is decimal dc) {
+            } else if (x is decimal dc) {
                 OldVal = dc.ToString(Constants.Format_Float2);
                 toSet = DecimalParse(Value);
-            }
-            else if (x is double db) {
+            } else if (x is double db) {
                 OldVal = db.ToString(Constants.Format_Float2);
                 toSet = DoubleParse(Value);
-            }
-            else {
+            } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
             }
 
@@ -311,8 +293,7 @@ namespace BlueControls.Controls {
                 _methInfo = null;
                 _propInfo = null;
                 _propertynamecpl = string.Empty;
-            }
-            else {
+            } else {
                 _propertynamecpl = _propertyName;
 
                 _propertynamecpl = _propertynamecpl.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + "-/\\ _");
@@ -332,11 +313,10 @@ namespace BlueControls.Controls {
             #region Caption setzen
             if (!string.IsNullOrEmpty(_propertyName)) {
 
-                var x = _propertyName.SplitBy("__");
+                string[] x = _propertyName.SplitBy("__");
                 Caption = x[0].Replace("_", " ") + ":";
                 FileEncryptionKey = string.Empty;
-            }
-            else {
+            } else {
                 Caption = "[unbekannt]";
             }
             #endregion
@@ -347,9 +327,9 @@ namespace BlueControls.Controls {
 
                 EditType = enEditTypeFormula.Button;
                 CaptionPosition = enÜberschriftAnordnung.ohne;
-                var s = BlueFont.MeasureStringOfCaption(_Caption.TrimEnd(":"));
+                SizeF s = BlueFont.MeasureStringOfCaption(_Caption.TrimEnd(":"));
                 Size = new Size((int)s.Width + 50 + 22, 30);
-                var c = (Button)CreateSubControls();
+                Button c = (Button)CreateSubControls();
                 c.Text = _Caption.TrimEnd(":");
 
                 if (image != enImageCode.None) {
@@ -368,70 +348,79 @@ namespace BlueControls.Controls {
 
 
                     case "system.boolean": {
-                            EditType = enEditTypeFormula.Ja_Nein_Knopf;
-                            var s = BlueFont.MeasureStringOfCaption(_Caption);
-                            Size = new Size((int)s.Width + 30, 22);
-                            break;
-                        }
+                        EditType = enEditTypeFormula.Ja_Nein_Knopf;
+                        SizeF s = BlueFont.MeasureStringOfCaption(_Caption);
+                        Size = new Size((int)s.Width + 30, 22);
+                        break;
+                    }
 
                     default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
                         {
 
-                            if (list != null) {
-                                EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
-                                list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
-                                var s = BlueFont.MeasureStringOfCaption(_Caption);
+                        if (list != null) {
+                            EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
+                            list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
+                            SizeF s = BlueFont.MeasureStringOfCaption(_Caption);
 
-                                var (BiggestItemX, BiggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+                            (int BiggestItemX, int BiggestItemY, int _, enOrientation _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
 
-                                var x = Math.Max((int)(BiggestItemX + 20 + s.Width), 200);
-                                var y = Math.Max(BiggestItemY + Skin.PaddingSmal * 2, 24);
-                                Size = new Size(x, y);
-                                var c = (ComboBox)CreateSubControls();
-                                StyleComboBox(c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
+                            int x = Math.Max((int)(BiggestItemX + 20 + s.Width), 200);
+                            int y = Math.Max(BiggestItemY + Skin.PaddingSmal * 2, 24);
+                            Size = new Size(x, y);
+                            ComboBox c = (ComboBox)CreateSubControls();
+                            StyleComboBox(c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
 
-                            }
-                            //else if (image != enImageCode.None)
-                            //{
-                            //    EditType = enEditTypeFormula.Button;
-                            //    CaptionPosition = enÜberschriftAnordnung.ohne;
-                            //    Size = new Size((int)BlueFont.MeasureStringOfCaption(_Caption).Width + 50, 30);
-                            //    var c = (Button)CreateSubControls();
-                            //    c.ImageCode = QuickImage.Get(image).ToString();
-
-                            //}
-                            else {
-                                _EditType = enEditTypeFormula.Textfeld;
-
-                                var tmpName = _propInfo.PropertyType.FullName.ToLower();
-
-
-                                if (TextLines >= 2) {
-                                    _CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
-                                    Size = new Size(200, 16 + 24 * TextLines);
-                                    _MultiLine = true;
-                                    tmpName = "system.string";
-                                }
-                                else {
-                                    _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-                                    Size = new Size(200, 24);
-                                    _MultiLine = false;
-                                }
-
-
-                                switch (tmpName) {
-                                    case "system.string": Format = enDataFormat.Text; break;
-                                    case "system.int32": Format = enDataFormat.Ganzzahl; break;
-                                    case "system.decimal": Format = enDataFormat.Gleitkommazahl; break;
-                                    case "system.drawing.color": Format = enDataFormat.Text; break; // HTML-Farbcode noch nicht programmiert
-                                    default: Format = enDataFormat.Text; break;
-                                }
-
-                                var c = CreateSubControls();
-                                StyleTextBox((TextBox)c, string.Empty, false);
-                            }
-                            break;
                         }
+                        //else if (image != enImageCode.None)
+                        //{
+                        //    EditType = enEditTypeFormula.Button;
+                        //    CaptionPosition = enÜberschriftAnordnung.ohne;
+                        //    Size = new Size((int)BlueFont.MeasureStringOfCaption(_Caption).Width + 50, 30);
+                        //    var c = (Button)CreateSubControls();
+                        //    c.ImageCode = QuickImage.Get(image).ToString();
+
+                        //}
+                        else {
+                            _EditType = enEditTypeFormula.Textfeld;
+
+                            string tmpName = _propInfo.PropertyType.FullName.ToLower();
+
+
+                            if (TextLines >= 2) {
+                                _CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
+                                Size = new Size(200, 16 + 24 * TextLines);
+                                _MultiLine = true;
+                                tmpName = "system.string";
+                            } else {
+                                _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+                                Size = new Size(200, 24);
+                                _MultiLine = false;
+                            }
+
+
+                            switch (tmpName) {
+                                case "system.string":
+                                    Format = enDataFormat.Text;
+                                    break;
+                                case "system.int32":
+                                    Format = enDataFormat.Ganzzahl;
+                                    break;
+                                case "system.decimal":
+                                    Format = enDataFormat.Gleitkommazahl;
+                                    break;
+                                case "system.drawing.color":
+                                    Format = enDataFormat.Text;
+                                    break; // HTML-Farbcode noch nicht programmiert
+                                default:
+                                    Format = enDataFormat.Text;
+                                    break;
+                            }
+
+                            GenericControl c = CreateSubControls();
+                            StyleTextBox((TextBox)c, string.Empty, false);
+                        }
+                        break;
+                    }
 
                 }
             }
@@ -452,10 +441,9 @@ namespace BlueControls.Controls {
 
             if (_propInfo == null && _methInfo == null) {
                 QuickInfo = string.Empty;
-            }
-            else {
+            } else {
 
-                var done = false;
+                bool done = false;
 
 
                 IEnumerable<Attribute> ca = null;
@@ -465,7 +453,7 @@ namespace BlueControls.Controls {
 
                 if (ca != null) {
 
-                    foreach (var thisas in ca) {
+                    foreach (Attribute thisas in ca) {
                         if (thisas is DescriptionAttribute da) {
                             QuickInfo = da.Description;
                             done = true;
@@ -490,7 +478,7 @@ namespace BlueControls.Controls {
 
             if (_in == null || _in.IsDisposed) { return; }
 
-            foreach (var thisc in _in.Controls) {
+            foreach (object thisc in _in.Controls) {
                 if (thisc is FlexiControlForProperty flx) {
                     flx.PropertyObject = _to;
                 }
@@ -543,7 +531,7 @@ namespace BlueControls.Controls {
             if (!_allinitialized) { return null; }
 
 
-            foreach (var thiscon in Controls) {
+            foreach (object thiscon in Controls) {
                 if (thiscon is ComboBox cbx) { return cbx; }
             }
             return null;

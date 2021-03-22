@@ -24,17 +24,14 @@ using BlueControls.Interfaces;
 using System.ComponentModel;
 using System.Drawing;
 
-namespace BlueControls.Controls
-{
+namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
-    public class Line : GenericControl, IBackgroundNone
-    {
+    public class Line : GenericControl, IBackgroundNone {
 
 
         #region Constructor
-        public Line() : base(false, false)
-        {
+        public Line() : base(false, false) {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             //  InitializeComponent()
@@ -52,16 +49,12 @@ namespace BlueControls.Controls
 
 
         [DefaultValue(enOrientation.Waagerecht)]
-        public enOrientation Orientation
-        {
-            get
-            {
+        public enOrientation Orientation {
+            get {
                 return _Orientation;
             }
-            set
-            {
-                if (value == _Orientation)
-                {
+            set {
+                if (value == _Orientation) {
                     return;
                 }
                 _Orientation = value;
@@ -72,43 +65,33 @@ namespace BlueControls.Controls
         }
 
         [DefaultValue(0)]
-        public new int TabIndex
-        {
-            get
-            {
+        public new int TabIndex {
+            get {
                 return 0;
             }
 
-            set
-            {
+            set {
                 base.TabIndex = 0;
             }
         }
 
         [DefaultValue(false)]
-        public new bool TabStop
-        {
-            get
-            {
+        public new bool TabStop {
+            get {
                 return false;
             }
-            set
-            {
+            set {
                 base.TabStop = false;
             }
         }
 
 
 
-        public void CheckSize()
-        {
-            if (_Orientation == enOrientation.Waagerecht)
-            {
+        public void CheckSize() {
+            if (_Orientation == enOrientation.Waagerecht) {
                 if (Width < 10) { Width = 10; }
                 Height = 2;
-            }
-            else
-            {
+            } else {
                 Width = 2;
                 if (Height < 10) { Height = 10; }
             }
@@ -117,19 +100,15 @@ namespace BlueControls.Controls
         }
 
 
-        protected override void DrawControl(Graphics gr, enStates state)
-        {
+        protected override void DrawControl(Graphics gr, enStates state) {
             CheckSize();
-            var DP = new Pen(SystemColors.ControlDark);
-            var LP = new Pen(SystemColors.ControlLight);
+            Pen DP = new Pen(SystemColors.ControlDark);
+            Pen LP = new Pen(SystemColors.ControlLight);
 
-            if (_Orientation == enOrientation.Waagerecht)
-            {
+            if (_Orientation == enOrientation.Waagerecht) {
                 gr.DrawLine(DP, 0, 0, Width - 1, 0);
                 gr.DrawLine(LP, 1, 1, Width, 1);
-            }
-            else
-            {
+            } else {
                 gr.DrawLine(DP, 0, 0, 0, Height - 1);
                 gr.DrawLine(LP, 1, 1, 1, Height);
             }

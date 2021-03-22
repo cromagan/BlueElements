@@ -84,7 +84,7 @@ namespace BlueDatabase {
                 if (key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
                 Database.BlockReload();
 
-                foreach (var ThisColumn in this) {
+                foreach (ColumnItem ThisColumn in this) {
                     if (ThisColumn != null && ThisColumn.Key == key) {
                         return ThisColumn;
                     }
@@ -94,8 +94,7 @@ namespace BlueDatabase {
                 //if (!Database.IsParsing) { Database.DevelopWarnung("Spalten-Key nicht gefunden: " + key.ToString()); }
 
                 return null;
-            }
-            catch {
+            } catch {
                 return SearchByKey(key); // Sammlung wurde verändert
             }
         }
@@ -109,7 +108,7 @@ namespace BlueDatabase {
 
                 Database.BlockReload();
 
-                var colum = Exists(columnName);
+                ColumnItem colum = Exists(columnName);
                 if (colum is null) { Database.DevelopWarnung("Spalte nicht gefunden: " + columnName); }
                 return colum;
             }
@@ -133,7 +132,7 @@ namespace BlueDatabase {
 
             columnName = columnName.ToUpper();
 
-            foreach (var ThisColumn in this) {
+            foreach (ColumnItem ThisColumn in this) {
                 if (ThisColumn != null && ThisColumn.Name == columnName) { return ThisColumn; }
             }
 
@@ -162,8 +161,7 @@ namespace BlueDatabase {
 
                     if (Art.ToString() == ((int)Art).ToString()) {
                         Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + Art + "' nicht definiert.<br>Wert: " + Wert + "<br>Datei: " + Database.Filename);
-                    }
-                    else {
+                    } else {
                         return "Interner Fehler: Für den Datentyp  '" + Art + "'  wurde keine Laderegel definiert.";
                     }
                     break;
@@ -192,8 +190,8 @@ namespace BlueDatabase {
 
             if (Column1 == Column2 || Column1 == null || Column2 == null) { return; }
 
-            var nr1 = IndexOf(Column1);
-            var nr2 = IndexOf(Column2);
+            int nr1 = IndexOf(Column1);
+            int nr2 = IndexOf(Column2);
 
             base.Swap(nr1, nr2);
 
@@ -206,11 +204,11 @@ namespace BlueDatabase {
 
         private void AddSystems(string Kennung) {
 
-            foreach (var ThisColumn in this) {
+            foreach (ColumnItem ThisColumn in this) {
                 if (ThisColumn != null && ThisColumn.Identifier.ToUpper() == Kennung.ToUpper()) { return; }
             }
 
-            var c = Database.Column.Add();
+            ColumnItem c = Database.Column.Add();
             c.Load(enDatabaseDataType.co_Identifier, Kennung);
             c.StandardWerteNachKennung(true);
 
@@ -222,7 +220,7 @@ namespace BlueDatabase {
             Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
 
 
-            for (var ColumnCount = 0; ColumnCount < Count; ColumnCount++) {
+            for (int ColumnCount = 0; ColumnCount < Count; ColumnCount++) {
                 if (this[ColumnCount] != null && !string.IsNullOrEmpty(this[ColumnCount].Name)) {
                     this[ColumnCount].SaveToByteList(ref List);
                 }
@@ -234,17 +232,32 @@ namespace BlueDatabase {
 
             ResetSystems();
 
-            foreach (var ThisColumnItem in this) {
+            foreach (ColumnItem ThisColumnItem in this) {
                 if (ThisColumnItem != null) {
                     switch (ThisColumnItem.Identifier) {
-                        case "": break;
-                        case "System: Locked": SysLocked = ThisColumnItem; break;
-                        case "System: Creator": SysRowCreator = ThisColumnItem; break;
-                        case "System: Changer": SysRowChanger = ThisColumnItem; break;
-                        case "System: Date Created": SysRowCreateDate = ThisColumnItem; break;
-                        case "System: Correct": SysCorrect = ThisColumnItem; break;
-                        case "System: Date Changed": SysRowChangeDate = ThisColumnItem; break;
-                        case "System: Chapter": SysChapter = ThisColumnItem; break;
+                        case "":
+                            break;
+                        case "System: Locked":
+                            SysLocked = ThisColumnItem;
+                            break;
+                        case "System: Creator":
+                            SysRowCreator = ThisColumnItem;
+                            break;
+                        case "System: Changer":
+                            SysRowChanger = ThisColumnItem;
+                            break;
+                        case "System: Date Created":
+                            SysRowCreateDate = ThisColumnItem;
+                            break;
+                        case "System: Correct":
+                            SysCorrect = ThisColumnItem;
+                            break;
+                        case "System: Date Changed":
+                            SysRowChangeDate = ThisColumnItem;
+                            break;
+                        case "System: Chapter":
+                            SysChapter = ThisColumnItem;
+                            break;
                         default:
                             Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Kennung: " + ThisColumnItem.Identifier);
                             break;
@@ -255,7 +268,7 @@ namespace BlueDatabase {
 
         public void Repair() {
 
-            var w = new List<string>
+            List<string> w = new List<string>
             {
                 "System: Chapter",
                 "System: Date Changed",
@@ -269,7 +282,7 @@ namespace BlueDatabase {
 
             // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
             // Den Wert Am I a Key Column ermitteln
-            foreach (var ThisColumnItem in this) {
+            foreach (ColumnItem ThisColumnItem in this) {
 
                 if (ThisColumnItem != null) {
                     _LastColumnKey = Math.Max(_LastColumnKey, ThisColumnItem.Key);
@@ -278,17 +291,17 @@ namespace BlueDatabase {
             }
 
 
-            foreach (var thisstring in w) {
+            foreach (string thisstring in w) {
                 AddSystems(thisstring);
             }
 
             GetSystems();
 
 
-            for (var s1 = 0; s1 < Count; s1++) {
+            for (int s1 = 0; s1 < Count; s1++) {
                 if (base[s1] != null) {
 
-                    for (var s2 = s1 + 1; s2 < Count; s2++) {
+                    for (int s2 = s1 + 1; s2 < Count; s2++) {
                         if (base[s2] != null) {
 
                             // Evtl. Doppelte Namen einzigartig machen
@@ -311,7 +324,7 @@ namespace BlueDatabase {
 
 
             // Reihengolge reparieren
-            var ColN = -1;
+            int ColN = -1;
             do {
                 ColN++;
 
@@ -320,17 +333,14 @@ namespace BlueDatabase {
                 if (this[ColN] == null) {
                     base.Swap(ColN, ColN + 1);
                     ColN = -1;
-                }
-                else if (this[ColN + 1] == null) {
+                } else if (this[ColN + 1] == null) {
                     // Dummy, um nachfoldgnd nicht abfragen zu müssen
 
-                }
-                else if (!string.IsNullOrEmpty(this[ColN].Identifier) && string.IsNullOrEmpty(this[ColN + 1].Identifier)) {
+                } else if (!string.IsNullOrEmpty(this[ColN].Identifier) && string.IsNullOrEmpty(this[ColN + 1].Identifier)) {
                     base.Swap(ColN, ColN + 1);
                     ColN = -1;
 
-                }
-                else if (!string.IsNullOrEmpty(this[ColN].Identifier) && !string.IsNullOrEmpty(this[ColN + 1].Identifier)) {
+                } else if (!string.IsNullOrEmpty(this[ColN].Identifier) && !string.IsNullOrEmpty(this[ColN + 1].Identifier)) {
 
                     if (w.IndexOf(this[ColN].Identifier) > w.IndexOf(this[ColN + 1].Identifier)) {
                         base.Swap(ColN, ColN + 1);
@@ -364,10 +374,10 @@ namespace BlueDatabase {
 
         public static string ChangeKeysInString(string OriginalString, int OldKey, int NewKey) {
 
-            var o = ParsableColumnKey(OldKey);
+            string o = ParsableColumnKey(OldKey);
             if (!OriginalString.Contains(o)) { return OriginalString; }
 
-            var n = ParsableColumnKey(NewKey);
+            string n = ParsableColumnKey(NewKey);
 
 
             if (OldKey == NewKey) {
@@ -394,7 +404,7 @@ namespace BlueDatabase {
 
         public ColumnItem AddACloneFrom(ColumnItem Source) {
 
-            var c = Add(string.Empty);
+            ColumnItem c = Add(string.Empty);
 
             c.Caption = Source.Caption;
             c.CaptionBitmap = Source.CaptionBitmap;
@@ -512,7 +522,7 @@ namespace BlueDatabase {
         //}
 
         public void GenerateOverView() {
-            var da = new HTML(Database.Filename.FileNameWithoutSuffix());
+            HTML da = new HTML(Database.Filename.FileNameWithoutSuffix());
             da.AddCaption("Spaltenliste von: " + Database.Caption);
             da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.Filename + "</h1><br>");
 
@@ -531,8 +541,8 @@ namespace BlueDatabase {
             da.RowEnd();
 
 
-            var lfdn = 0;
-            foreach (var ThisColumnItem in Database.Column) {
+            int lfdn = 0;
+            foreach (ColumnItem ThisColumnItem in Database.Column) {
 
                 if (ThisColumnItem != null) {
                     lfdn++;
@@ -557,7 +567,7 @@ namespace BlueDatabase {
         }
 
         public string Freename(string wunschname) {
-            var nr = 0;
+            int nr = 0;
 
             wunschname = wunschname.ReduceToChars(ColumnItem.AllowedCharsInternalName);
             if (string.IsNullOrEmpty(wunschname)) { wunschname = "NewColumn"; }
@@ -619,7 +629,7 @@ namespace BlueDatabase {
         }
 
         public ColumnItem Add(string internalName, string caption, enDataFormat format) {
-            var c = Add();
+            ColumnItem c = Add();
             c.Name = internalName;
 
             c.Caption = caption;
@@ -629,7 +639,7 @@ namespace BlueDatabase {
         }
 
         public ColumnItem Add(string internalName, string caption, string suffix, enDataFormat format) {
-            var c = Add();
+            ColumnItem c = Add();
             c.Name = internalName;
             c.Caption = caption;
             c.Format = format;
@@ -638,7 +648,7 @@ namespace BlueDatabase {
         }
 
         public ColumnItem Add(string internalName) {
-            var c = Add();
+            ColumnItem c = Add();
             c.Name = internalName;
             return c;
         }

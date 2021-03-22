@@ -19,10 +19,8 @@
 
 using System;
 
-namespace BlueBasics.Interfaces
-{
-    public interface IChangedFeedback
-    {
+namespace BlueBasics.Interfaces {
+    public interface IChangedFeedback {
 
         /// <summary>
         /// Wird ausgelöst, wenn sich ein Objekt verändert.

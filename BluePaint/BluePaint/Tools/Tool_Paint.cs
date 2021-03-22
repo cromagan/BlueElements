@@ -21,40 +21,31 @@ using BlueBasics;
 using BlueControls.EventArgs;
 using System.Drawing;
 
-namespace BluePaint
-{
-    public partial class Tool_Paint
-    {
+namespace BluePaint {
+    public partial class Tool_Paint {
 
-        public Tool_Paint() : base()
-        {
+        public Tool_Paint() : base() {
             InitializeComponent();
         }
 
 
-        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic)
-        {
+        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) {
             OnForceUndoSaving();
             MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
 
-        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
-        {
-            if (e.Current.Button == System.Windows.Forms.MouseButtons.Left)
-            {
-                var _Pic = OnNeedCurrentPic();
+        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+            if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
+                Bitmap _Pic = OnNeedCurrentPic();
                 _Pic.FillCircle(Color.Black, e.Current.TrimmedX, e.Current.TrimmedY, 2);
                 OnDoInvalidate();
-            }
-            else
-            {
+            } else {
                 OnDoInvalidate();
             }
         }
 
-        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
-        {
-            var c = Color.FromArgb(50, 255, 0, 0);
+        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
+            Color c = Color.FromArgb(50, 255, 0, 0);
             e.FillCircle(c, e.Current.TrimmedX, e.Current.TrimmedY, 2);
         }
 

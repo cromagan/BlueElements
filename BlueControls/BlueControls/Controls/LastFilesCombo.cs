@@ -119,15 +119,15 @@ namespace BlueControls.Controls {
 
         private void GenerateMenu() {
 
-            var NR = -1;
-            var Vis = false;
+            int NR = -1;
+            bool Vis = false;
 
             Item.Clear();
 
 
-            for (var Z = LastD.Count - 1; Z >= 0; Z--) {
+            for (int Z = LastD.Count - 1; Z >= 0; Z--) {
 
-                var x = LastD[Z].SplitBy("|");
+                string[] x = LastD[Z].SplitBy("|");
 
 
                 if (x != null && x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && Item[x[0]] is null) {
@@ -137,12 +137,11 @@ namespace BlueControls.Controls {
 
                         if (NR < MaxCount) {
                             Vis = true;
-                            var show = (NR + 1).ToString(Constants.Format_Integer3) + ": ";
+                            string show = (NR + 1).ToString(Constants.Format_Integer3) + ": ";
 
                             if (_mustExists) {
                                 show += x[0].FileNameWithSuffix();
-                            }
-                            else {
+                            } else {
                                 show += x[0];
                             }
 
@@ -150,14 +149,13 @@ namespace BlueControls.Controls {
                                 show = show + " - " + x[1];
                             }
 
-                            var it = new TextListItem(show, x[0], null, false, true, NR.ToString(Constants.Format_Integer3));
+                            TextListItem it = new TextListItem(show, x[0], null, false, true, NR.ToString(Constants.Format_Integer3));
 
-                            var t = new List<string>();
+                            List<string> t = new List<string>();
 
                             if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1])) {
                                 t.Add(x[1]);
-                            }
-                            else {
+                            } else {
                                 t.Add(string.Empty);
                             }
                             it.Tag = t;
@@ -176,7 +174,7 @@ namespace BlueControls.Controls {
 
         public void AddFileName(string FileName, string AdditionalText) {
 
-            var s = FileName + "|" + AdditionalText;
+            string s = FileName + "|" + AdditionalText;
 
 
             s = s.Replace("\r\n", ";");
@@ -216,7 +214,7 @@ namespace BlueControls.Controls {
             LastD = new List<string>();
 
             if (FileExists(SaveFile())) {
-                var t = FileOperations.LoadFromDisk(SaveFile());
+                string t = FileOperations.LoadFromDisk(SaveFile());
                 t = t.RemoveChars("\n");
                 LastD.AddRange(t.SplitByCR());
             }
@@ -243,7 +241,7 @@ namespace BlueControls.Controls {
 
             base.OnItemClicked(e);
 
-            var t = (List<string>)e.Item.Tag;
+            List<string> t = (List<string>)e.Item.Tag;
 
             AddFileName(e.Item.Internal, t[0]);
         }

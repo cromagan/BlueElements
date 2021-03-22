@@ -18,15 +18,14 @@
 #endregion
 
 using BlueBasics;
-using static BlueBasics.Extensions;
 using BlueBasics.Enums;
+using static BlueBasics.Extensions;
 
 namespace BluePaint {
 
     public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
     {
-        public Tool_Resize() : base()
-        {
+        public Tool_Resize() : base() {
             InitializeComponent();
             capInfo.Text = "Bitte Skalierung in Prozent eingeben";
 
@@ -35,12 +34,10 @@ namespace BluePaint {
 
         }
 
-        private void DoCapInfo()
-        {
-            var p = OnNeedCurrentPic();
+        private void DoCapInfo() {
+            System.Drawing.Bitmap p = OnNeedCurrentPic();
 
-            if (p == null)
-            {
+            if (p == null) {
                 capInfo.Text = "Kein Bild gewählt.";
                 return;
             }
@@ -48,19 +45,17 @@ namespace BluePaint {
 
 
 
-            if (!double.TryParse(flxProzent.Value, out var pr))
-            {
+            if (!double.TryParse(flxProzent.Value, out double pr)) {
                 capInfo.Text = "Keine Prozentzahl angegeben.";
                 return;
             }
 
             pr /= 100;
 
-            var wi = (int)(p.Width * pr);
-            var he = (int)(p.Height * pr);
+            int wi = (int)(p.Width * pr);
+            int he = (int)(p.Height * pr);
 
-            if (pr == 1 || pr < 0.01 || pr > 1000 || wi < 1 || he < 1)
-            {
+            if (pr == 1 || pr < 0.01 || pr > 1000 || wi < 1 || he < 1) {
                 capInfo.Text = "Bitte gültigen Wert angeben.";
                 return;
             }
@@ -73,19 +68,18 @@ namespace BluePaint {
 
         }
 
-        private void btnDoResize_Click(object sender, System.EventArgs e)
-        {
-            var p = OnNeedCurrentPic();
+        private void btnDoResize_Click(object sender, System.EventArgs e) {
+            System.Drawing.Bitmap p = OnNeedCurrentPic();
             if (p == null) { return; }
-            if (!double.TryParse(flxProzent.Value, out var pr)) { return; }
+            if (!double.TryParse(flxProzent.Value, out double pr)) { return; }
             pr /= 100;
 
-            var wi = (int)(p.Width * pr);
-            var he = (int)(p.Height * pr);
+            int wi = (int)(p.Width * pr);
+            int he = (int)(p.Height * pr);
 
             if (pr == 1 || pr < 0.01 || pr > 1000 || wi < 1 || he < 1) { return; }
 
-            var _BMP2 = BitmapExt.Resize(p, wi, he, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
+            System.Drawing.Bitmap _BMP2 = BitmapExt.Resize(p, wi, he, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
 
             OnOverridePic(_BMP2);
 
@@ -98,27 +92,26 @@ namespace BluePaint {
 
 
 
-        public override string MacroKennung() => "Resize";
+        public override string MacroKennung() {
+            return "Resize";
+        }
 
-        public override void ExcuteCommand(string command)
-        {
-            var c = command.SplitBy(";");
+        public override void ExcuteCommand(string command) {
+            string[] c = command.SplitBy(";");
 
-            if (c[0] == "ResizeProzent")
-            {
-                flxProzent.ValueSet(c[1], true,true);
+            if (c[0] == "ResizeProzent") {
+                flxProzent.ValueSet(c[1], true, true);
                 btnDoResize_Click(null, null);
-            }
-            else
-            {
+            } else {
                 Develop.DebugPrint_NichtImplementiert();
             }
         }
 
-        private void flxProzent_ValueChanged(object sender, System.EventArgs e) => DoCapInfo();
+        private void flxProzent_ValueChanged(object sender, System.EventArgs e) {
+            DoCapInfo();
+        }
 
-        public override void PictureChangedByMainWindow()
-        {
+        public override void PictureChangedByMainWindow() {
             base.PictureChangedByMainWindow();
             DoCapInfo();
         }

@@ -65,8 +65,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (Layout1.Item.Count > 0) {
                 Layout1.Enabled = true;
-            }
-            else {
+            } else {
                 Layout1.Enabled = false;
                 Layout1.Text = string.Empty;
                 _LoadedLayout = string.Empty;
@@ -77,8 +76,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (Database.Layouts.Count == 0) {
                     _LoadedLayout = string.Empty;
                 }
-            }
-            else {
+            } else {
                 Hinzu.Enabled = true;
                 _LoadedLayout = string.Empty;
             }
@@ -92,8 +90,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 Abma.Enabled = true;
                 Base64.Enabled = true;
                 Area_Drucken.Enabled = false;
-            }
-            else {
+            } else {
                 LayBearb.Enabled = false;
                 LayOpen.Enabled = false;
                 Abma.Enabled = false;
@@ -109,8 +106,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 weg.Enabled = true;
                 NamB.Enabled = true;
                 Area_Drucken.Enabled = true;
-            }
-            else {
+            } else {
                 Area_Drucken.Enabled = false;
                 tabPageControl.Enabled = false;
 
@@ -125,9 +121,9 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void Hinzu_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
 
-            var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text);
+            string ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
-            var c = new CreativePad();
+            CreativePad c = new CreativePad();
 
             c.Item.Caption = ex;
             Pad.Grid = false;
@@ -154,7 +150,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (MessageBox.Show("Layout <b>'" + Pad.Item.Caption + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
 
             Pad.Item.Clear();
-            var ind = Database.LayoutIDToIndex(_LoadedLayout);
+            int ind = Database.LayoutIDToIndex(_LoadedLayout);
 
             Database.Layouts.RemoveAt(ind);
             _LoadedLayout = string.Empty;
@@ -172,7 +168,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             SaveCurrentLayout();
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
 
-            var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, enDataFormat.Text);
+            string ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, enDataFormat.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
             Pad.Item.Caption = ex;
 
@@ -199,27 +195,25 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (fileOrLayoutID.FileSuffix().ToUpper() == "BCR") {
                     Pad.Enabled = true;
                     _LoadedLayout = fileOrLayoutID;
-                    var l = LoadFromDisk(fileOrLayoutID);
+                    string l = LoadFromDisk(fileOrLayoutID);
                     Pad.Item = new ItemCollectionPad(l, string.Empty);
                     ItemChanged();
 
-                }
-                else {
+                } else {
                     _LoadedLayout = string.Empty;
                     Pad.Item.Clear();
                     Pad.Item.SheetSizeInMM = SizeF.Empty;
-                    var x = new TextPadItem(Pad.Item, "x", "Nicht editierbares Layout aus dem Dateisystem");
+                    TextPadItem x = new TextPadItem(Pad.Item, "x", "Nicht editierbares Layout aus dem Dateisystem");
                     Pad.Item.Add(x);
                     x.Stil = Enums.PadStyles.Style_Überschrift_Haupt;
                     x.SetCoordinates(new RectangleM(0, 0, 1000, 400), true);
                     ItemChanged();
                     Pad.Enabled = false;
                 }
-            }
-            else {
+            } else {
                 Pad.Enabled = true;
                 _LoadedLayout = fileOrLayoutID;
-                var ind = Database.LayoutIDToIndex(_LoadedLayout);
+                int ind = Database.LayoutIDToIndex(_LoadedLayout);
                 Pad.Item = new ItemCollectionPad(Database.Layouts[ind], string.Empty);
                 ItemChanged();
             }
@@ -242,15 +236,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
 
             Pad.Grid = false;
-            var newl = Pad.Item.ToString();
+            string newl = Pad.Item.ToString();
             Pad.Grid = ckbRaster.Checked;
 
             if (_LoadedLayout.StartsWith("#")) {
-                var ind = Database.LayoutIDToIndex(_LoadedLayout);
+                int ind = Database.LayoutIDToIndex(_LoadedLayout);
                 if (Database.Layouts[ind] == newl) { return; }
                 Database.Layouts[ind] = newl;
-            }
-            else if (_LoadedLayout.FileSuffix().ToUpper() == "BCR") {
+            } else if (_LoadedLayout.FileSuffix().ToUpper() == "BCR") {
                 SaveToDisk(_LoadedLayout, newl, false);
             }
 
@@ -273,7 +266,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             ColumnItem c = null;
             if (Database != null) { c = Database.Column[Spaltx.Text]; }
-            var i = Spaltx.Item[Spaltx.Text];
+            BasicListItem i = Spaltx.Item[Spaltx.Text];
 
 
             if (i == null) { return; }
@@ -282,8 +275,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (c != null) {
                 Nam = c.Name;
-            }
-            else {
+            } else {
                 Nam = i.Internal;
             }
 
@@ -308,8 +300,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 T += "/E";
                 Code.Text = T;
 
-            }
-            else if (!string.IsNullOrEmpty(Nam) && Pic.Enabled && FomAx.SelectedIndex == 1) {
+            } else if (!string.IsNullOrEmpty(Nam) && Pic.Enabled && FomAx.SelectedIndex == 1) {
                 if (Abma.Enabled) {
                     T = "//TS/001" + Nam;
                     if (int.Parse(Wi.Text) > 5) { T = T + "/200" + int.Parse(Wi.Text); }
@@ -318,8 +309,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     if (ExactMi.Checked) { T += "/211"; }
                     if (GroMi.Checked) { T += "/212"; }
                     if (Base64.Checked) { T += "/220"; }
-                }
-                else {
+                } else {
                     T = "//TS/000" + Nam;
                 }
 
@@ -327,11 +317,9 @@ namespace BlueControls.BlueDatabaseDialogs {
                 T += "/E";
                 Code.Text = T;
 
-            }
-            else if (FomAx.SelectedIndex == 2) {
+            } else if (FomAx.SelectedIndex == 2) {
                 if (BefE2.Item.Checked().Count == 1) { Code.Text = BefE2.Item.Checked()[0].Internal; }
-            }
-            else {
+            } else {
                 Code.Text = "";
             }
         }
@@ -344,13 +332,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             ColumnItem c = null;
             if (Database != null) { c = Database.Column[Spaltx.Text]; }
-            var i = Spaltx.Item[Spaltx.Text];
+            BasicListItem i = Spaltx.Item[Spaltx.Text];
 
-            var TextB = false;
-            var PicB = false;
-            var MultiL = false;
-            var LeerM = false;
-            var Nam = "UNBEKANNT";
+            bool TextB = false;
+            bool PicB = false;
+            bool MultiL = false;
+            bool LeerM = false;
+            string Nam = "UNBEKANNT";
 
             if (c != null) {
                 Nam = c.Name;
@@ -361,8 +349,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (TextB) {
                     MultiL = c.MultiLine;
                     LeerM = true;
-                }
-                else {
+                } else {
                     if (c.Format == enDataFormat.Link_To_Filesystem) {
                         if (c.MultiLine == false) { PicB = true; }
                     }
@@ -370,8 +357,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
 
-            }
-            else {
+            } else {
                 switch (i) {
                     case TextListItem _:
                         Nam = i.Internal;
@@ -394,13 +380,11 @@ namespace BlueControls.BlueDatabaseDialogs {
                 txt.Enabled = true;
                 if (FomAx.SelectedIndex == 1) { FomAx.SelectedIndex = 0; }
                 Pic.Enabled = false;
-            }
-            else if (PicB) {
+            } else if (PicB) {
                 Pic.Enabled = true;
                 if (FomAx.SelectedIndex == 0) { FomAx.SelectedIndex = 1; }
                 txt.Enabled = false;
-            }
-            else {
+            } else {
                 FomAx.SelectedIndex = 2;
                 Pic.Enabled = false;
                 txt.Enabled = false;
@@ -409,8 +393,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (MultiL) {
                 ZeilUmbruch.Enabled = true;
                 ZeilCap.Enabled = true;
-            }
-            else {
+            } else {
                 ZeilUmbruch.Enabled = false;
                 ZeilUmbruch.Text = "";
                 ZeilCap.Enabled = false;
@@ -452,8 +435,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (Spaltx.Item.Count > 0) {
                 Spaltx.Enabled = true;
                 Spaltx.Text = Spaltx.Item[0].Internal;
-            }
-            else {
+            } else {
                 Spaltx.Enabled = false;
             }
         }
@@ -510,12 +492,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             tabElementEigenschaften.Controls.Clear();
             if (Pad.LastClickedItem == null) { return; }
 
-            var Flexis = Pad.LastClickedItem.GetStyleOptions();
+            System.Collections.Generic.List<FlexiControl> Flexis = Pad.LastClickedItem.GetStyleOptions();
             if (Flexis.Count == 0) { return; }
 
 
-            var top = Skin.Padding;
-            foreach (var ThisFlexi in Flexis) {
+            int top = Skin.Padding;
+            foreach (FlexiControl ThisFlexi in Flexis) {
                 tabElementEigenschaften.Controls.Add(ThisFlexi);
                 ThisFlexi.DisabledReason = string.Empty;
                 ThisFlexi.Left = Skin.Padding;

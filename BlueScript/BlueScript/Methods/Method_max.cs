@@ -35,12 +35,12 @@ namespace BlueScript {
         public override bool EndlessArgs { get => true; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            var val = double.MinValue;
+            double val = double.MinValue;
 
-            foreach (var thisval in attvar) {
+            foreach (Variable thisval in attvar) {
                 val = Math.Max(thisval.ValueDouble, val);
             }
 
