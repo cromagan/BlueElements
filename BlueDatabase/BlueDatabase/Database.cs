@@ -1364,10 +1364,11 @@ namespace BlueDatabase {
 
 
         internal void SaveToByteList(List<byte> List, enDatabaseDataType DatabaseDataType, string Content) {
+            var b = Content.ToByteUTF8();
             List.Add((byte)enRoutinen.DatenAllgemeinUTF8);
             List.Add((byte)DatabaseDataType);
-            SaveToByteList(List, Content.Length, 3);
-            List.AddRange(Content.ToByteUTF8());
+            SaveToByteList(List, b.Length, 3);
+            List.AddRange(b);
         }
 
         internal void SaveToByteList(List<byte> List, KeyValuePair<string, CellItem> vCell) {
@@ -1379,20 +1380,15 @@ namespace BlueDatabase {
 
             if (!tColumn.SaveContent) { return; }
 
-            var s = vCell.Value.Value;
+            var b = vCell.Value.Value.ToByteUTF8();
             var tx = enDatabaseDataType.ce_Value_withSizeData;
-
-            //if (tColumn.Format.NeedUTF8()) {
-            //    s = modConverter.StringtoUTF8(s);
-            //    tx = enDatabaseDataType.ce_UTF8Value_withSizeData;
-            //}
 
             List.Add((byte)enRoutinen.CellFormatUTF8);
             List.Add((byte)tx);
-            SaveToByteList(List, s.Length, 3);
+            SaveToByteList(List, b.Length, 3);
             SaveToByteList(List, tColumn.Key, 3);
             SaveToByteList(List, tRow.Key, 3);
-            List.AddRange(s.ToByteUTF8());
+            List.AddRange(b);
             var ContentSize = Cell.ContentSizeToSave(vCell, tColumn);
             SaveToByteList(List, ContentSize.Width, 2);
             SaveToByteList(List, ContentSize.Height, 2);
@@ -1401,12 +1397,13 @@ namespace BlueDatabase {
 
 
         internal void SaveToByteList(List<byte> List, enDatabaseDataType DatabaseDataType, string Content, int TargetColumNr) {
+            var b = Content.ToByteUTF8();
             List.Add((byte)enRoutinen.ColumnUTF8);
             List.Add((byte)DatabaseDataType);
-            SaveToByteList(List, Content.Length, 3);
+            SaveToByteList(List, b.Length, 3);
             SaveToByteList(List, TargetColumNr, 3);
             SaveToByteList(List, 0, 3); //Zeile-Unötig
-            List.AddRange(Content.ToByteUTF8());
+            List.AddRange(b);
         }
 
         private static int NummerCode3(byte[] b, int pointer) {
@@ -1821,7 +1818,7 @@ namespace BlueDatabase {
             return Convert.ToBoolean(UserGroup.ToUpper() == "#ADMINISTRATOR");
         }
 
-        protected override byte[] ToListOfByte(bool willSave) {
+        protected override byte[] ToListOfByte() {
 
             try {
                 var CryptPos = -1;
@@ -1923,7 +1920,7 @@ namespace BlueDatabase {
                 return l.ToArray();
 
             } catch {
-                return ToListOfByte(willSave);
+                return ToListOfByte();
             }
         }
 

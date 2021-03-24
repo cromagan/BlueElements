@@ -27,10 +27,6 @@
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Design" />
-    <Reference Include="System.Windows" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="BlueDatabaseDialogs\FlexiControlForFilter.cs">
       <SubType>Component</SubType>
     </Compile>

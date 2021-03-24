@@ -475,8 +475,8 @@ namespace BlueBasics.MultiUserFile {
             if (ReadOnly) { return Feedback("Datei ist Readonly"); }
 
             if (!ReadOnly) { return Feedback("Datei ist Readonly"); }
-
-            if (tmpFileName == null || string.IsNullOrEmpty(tmpFileName) ||
+     
+                if (tmpFileName == null || string.IsNullOrEmpty(tmpFileName) ||
                 fileInfoBeforeSaving == null || string.IsNullOrEmpty(fileInfoBeforeSaving) ||
                 savedDataUncompressed == null || savedDataUncompressed.Length == 0) { return Feedback("Keine Daten angekommen."); }
 
@@ -513,7 +513,7 @@ namespace BlueBasics.MultiUserFile {
             }
 
 
-            if (!savedDataUncompressed.SequenceEqual(ToListOfByte(false))) {
+            if (!savedDataUncompressed.SequenceEqual(ToListOfByte())) {
                 DeleteBlockDatei(false, true);
                 IsSaving = false;
                 return Feedback("Daten wurden inzwischen verändert.");
@@ -667,7 +667,7 @@ namespace BlueBasics.MultiUserFile {
             }
         }
 
-        protected abstract byte[] ToListOfByte(bool willSave);
+        protected abstract byte[] ToListOfByte();
 
 
         /// <summary>
@@ -790,7 +790,7 @@ namespace BlueBasics.MultiUserFile {
 
             Filename = NewFileName;
             DoWatcher();
-            var l = ToListOfByte(true);
+            var l = ToListOfByte();
 
             using (var x = new FileStream(NewFileName, FileMode.Create, FileAccess.Write, FileShare.None)) {
                 x.Write(l.ToArray(), 0, l.ToArray().Length);
@@ -992,7 +992,7 @@ namespace BlueBasics.MultiUserFile {
 
                 FileInfoBeforeSaving = GetFileInfo(Filename, true);
 
-                DataUncompressed = ToListOfByte(true);
+                DataUncompressed = ToListOfByte();
                 if (_zipped) {
                     Writer_BinaryData = ZipIt(DataUncompressed);
                 } else {
