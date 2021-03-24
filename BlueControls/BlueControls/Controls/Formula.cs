@@ -165,7 +165,7 @@ namespace BlueControls.Controls {
                 //        thisFlex.CheckEnabledState();
                 //    }
                 //});
-                foreach (FlexiControlForCell thisFlex in _Control) {
+                foreach (var thisFlex in _Control) {
                     if (thisFlex != null && !thisFlex.IsDisposed) {
                         thisFlex.RowKey = _ShowingRowKey;
                         thisFlex.CheckEnabledState();
@@ -254,27 +254,27 @@ namespace BlueControls.Controls {
 
 
             string[] p = null;
-            int nr = int.MaxValue;
-            int ColNr = int.MaxValue;
+            var nr = int.MaxValue;
+            var ColNr = int.MaxValue;
 
 
 
-            for (int cc = 0; cc < e.ColumnsWithErrors.Count; cc++) {
+            for (var cc = 0; cc < e.ColumnsWithErrors.Count; cc++) {
                 p = e.ColumnsWithErrors[cc].Split('|');
 
 
 
-                foreach (ColumnItem ThisColumnItem in e.Row.Database.Column) {
+                foreach (var ThisColumnItem in e.Row.Database.Column) {
                     if (ThisColumnItem != null) {
 
 
                         if (p[0].ToUpper() == ThisColumnItem.Name.ToUpper()) {
 
                             //Bitte jeden Fehler anzeigen..... Es verursacht mehr Rätsel, wenn die Zeile einfach Fehlerhaft ist und überhaut kein Hinweis kommt
-                            ColumnViewItem CD = SearchViewItem(ThisColumnItem);
-                            ColumnViewCollection View = SearchColumnView(ThisColumnItem);
+                            var CD = SearchViewItem(ThisColumnItem);
+                            var View = SearchColumnView(ThisColumnItem);
 
-                            int tmp = 0;
+                            var tmp = 0;
                             if (CD == null) {
                                 tmp = ThisColumnItem.Index() + 200000;
                             } else if (View == CurrentView()) {
@@ -306,9 +306,9 @@ namespace BlueControls.Controls {
         /// <param name="ViewCollection"></param>
         /// <returns></returns>
         private int View_AnzahlSpalten(ColumnViewCollection ViewCollection) {
-            int MaxS = 0;
+            var MaxS = 0;
 
-            foreach (ColumnViewItem ThisViewItem in ViewCollection) {
+            foreach (var ThisViewItem in ViewCollection) {
                 if (ThisViewItem != null) {
                     MaxS = Math.Max(MaxS, ThisViewItem.Spalte_X1 + ThisViewItem.Width - 1); // Spalte_X2
                 }
@@ -318,21 +318,21 @@ namespace BlueControls.Controls {
         }
 
         private void Control_RepairSize_All() {
-            int Count = -1;
+            var Count = -1;
             BeginnEdit();
 
-            foreach (ColumnViewCollection ThisView in _Database.Views) {
+            foreach (var ThisView in _Database.Views) {
                 Count++;
 
-                int View_Spalten = View_AnzahlSpalten(ThisView);
-                int[] _BelegterBereichTop = new int[View_Spalten + 1];
+                var View_Spalten = View_AnzahlSpalten(ThisView);
+                var _BelegterBereichTop = new int[View_Spalten + 1];
 
-                int ViewN = _Database.Views.IndexOf(ThisView);
+                var ViewN = _Database.Views.IndexOf(ThisView);
 
 
-                int WidthInPixelOfParent = 0;
-                int HeightOfParent = 0;
-                int MoveIn = 0;
+                var WidthInPixelOfParent = 0;
+                var HeightOfParent = 0;
+                var MoveIn = 0;
                 if (ViewN == 0) {
                     WidthInPixelOfParent = Width - 4;
                     HeightOfParent = Height;
@@ -344,20 +344,20 @@ namespace BlueControls.Controls {
                     MoveIn = Skin.PaddingSmal * 2;
                 }
 
-                int WidthInPixelOfColumn = (WidthInPixelOfParent - View_Spalten * Skin.PaddingSmal) / (View_Spalten + 1);
+                var WidthInPixelOfColumn = (WidthInPixelOfParent - View_Spalten * Skin.PaddingSmal) / (View_Spalten + 1);
 
 
-                foreach (ColumnViewItem ThisViewItem in ThisView) {
+                foreach (var ThisViewItem in ThisView) {
 
                     if (ThisViewItem?.Column != null) {
 
-                        Rectangle ObjPX = new Rectangle {
+                        var ObjPX = new Rectangle {
                             Width = ThisViewItem.Width * WidthInPixelOfColumn + (ThisViewItem.Width - 1) * Skin.PaddingSmal,
                             X = ThisViewItem.Spalte_X1 * WidthInPixelOfColumn + ThisViewItem.Spalte_X1 * Skin.PaddingSmal + MoveIn,
 
                             Y = MoveIn
                         }; // Die Koordinaten in Pixel des Steuerelements
-                        for (int z = ThisViewItem.Spalte_X1; z < ThisViewItem.Spalte_X1 + ThisViewItem.Width; z++) // Spalte_X2
+                        for (var z = ThisViewItem.Spalte_X1; z < ThisViewItem.Spalte_X1 + ThisViewItem.Width; z++) // Spalte_X2
                         {
                             ObjPX.Y = Math.Max(_BelegterBereichTop[z], ObjPX.Y);
                         }
@@ -380,7 +380,7 @@ namespace BlueControls.Controls {
                         }
 
 
-                        for (int z = ThisViewItem.Spalte_X1; z < ThisViewItem.Spalte_X1 + ThisViewItem.Width; z++) // Spalte_X2
+                        for (var z = ThisViewItem.Spalte_X1; z < ThisViewItem.Spalte_X1 + ThisViewItem.Width; z++) // Spalte_X2
                         {
                             _BelegterBereichTop[z] = Math.Max(_BelegterBereichTop[z], ObjPX.Bottom);
                         }
@@ -410,7 +410,7 @@ namespace BlueControls.Controls {
             if (cd?.Column == null) { return; }
 
             Develop.Debugprint_BackgroundThread();
-            FlexiControlForCell btb = new FlexiControlForCell(cd.Column.Database, cd.Column.Key, cd.ÜberschriftAnordnung) {
+            var btb = new FlexiControlForCell(cd.Column.Database, cd.Column.Key, cd.ÜberschriftAnordnung) {
                 TabIndex = TabIndex + 10000,
                 Tag = cd
             };
@@ -426,14 +426,14 @@ namespace BlueControls.Controls {
         }
 
         private void SetButtonsToPosition(int TopPos) {
-            int SPH = 1;
-            int SPF = 1;
-            int WidthOfParent = Width - 4;
+            var SPH = 1;
+            var SPF = 1;
+            var WidthOfParent = Width - 4;
             if (Editor.Visible) {
                 WidthOfParent = Width - Editor.Width - 8;
             }
 
-            foreach (ColumnViewCollection ThisView in _Database.Views) {
+            foreach (var ThisView in _Database.Views) {
                 if (_Database.Views.IndexOf(ThisView) == 0) {
                     SPH = Math.Max(SPH, View_AnzahlSpalten(ThisView));
                 } else {
@@ -447,7 +447,7 @@ namespace BlueControls.Controls {
             if (SPF >= SPH || SPF == 0) {
                 Tabs.Width = WidthOfParent;
             } else {
-                int WidthOfColum = (WidthOfParent - SPH * Skin.PaddingSmal) / (SPH + 1);
+                var WidthOfColum = (WidthOfParent - SPH * Skin.PaddingSmal) / (SPH + 1);
                 Tabs.Width = WidthOfColum * (SPF + 1) + SPF * Skin.PaddingSmal;
             }
 
@@ -456,18 +456,18 @@ namespace BlueControls.Controls {
 
 
         private void Control_Create_All() {
-            int Count = -1;
+            var Count = -1;
 
             BeginnEdit();
 
             _Control = new List<FlexiControlForCell>();
 
-            foreach (ColumnViewCollection ThisView in _Database.Views) {
+            foreach (var ThisView in _Database.Views) {
                 if (ThisView != null) {
-                    int Index = _Database.Views.IndexOf(ThisView);
+                    var Index = _Database.Views.IndexOf(ThisView);
                     Count++;
 
-                    foreach (ColumnViewItem ThisViewItem in ThisView) {
+                    foreach (var ThisViewItem in ThisView) {
                         if (ThisViewItem?.Column != null) {
                             if (Index == 0) {
                                 Control_Create(ThisViewItem, this);
@@ -486,7 +486,7 @@ namespace BlueControls.Controls {
             Develop.DebugPrint_Disposed(IsDisposed);
 
             BeginnEdit();
-            foreach (FlexiControlForCell ThisControl in _Control) {
+            foreach (var ThisControl in _Control) {
                 if (ThisControl != null && !ThisControl.IsDisposed) { ThisControl.CheckEnabledState(); }
             }
             EndEdit();
@@ -537,7 +537,7 @@ namespace BlueControls.Controls {
         }
 
         private void ColumnsEinfärben() {
-            int ItC = 0;
+            var ItC = 0;
 
 
             for (ItC = -1; ItC <= Tabs.TabCount + 100; ItC++) {
@@ -563,7 +563,7 @@ namespace BlueControls.Controls {
                     }
                 }
 
-                string intName = "@Ansicht" + ItC.ToString();
+                var intName = "@Ansicht" + ItC.ToString();
 
                 if (string.IsNullOrEmpty(Nam)) {
                     if (lbxColumns.Item[intName] != null) { lbxColumns.Item.Remove(intName); }
@@ -586,15 +586,15 @@ namespace BlueControls.Controls {
                 if (lbxColumns.Item[ItC] != null) {
 
                     if (lbxColumns.Item[ItC].IsClickable()) {
-                        TextListItem ThisItem = (TextListItem)lbxColumns.Item[ItC];
-                        ColumnItem co = (ColumnItem)ThisItem.Tag; //  _Database.Column[ThisItem.Internal];
+                        var ThisItem = (TextListItem)lbxColumns.Item[ItC];
+                        var co = (ColumnItem)ThisItem.Tag; //  _Database.Column[ThisItem.Internal];
 
                         if (co == null) {
                             lbxColumns.Item.Remove(ThisItem);
                         } else {
 
-                            ColumnViewCollection cv = SearchColumnView(co);
-                            int Sort = 0;
+                            var cv = SearchColumnView(co);
+                            var Sort = 0;
                             if (cv == null) {
                                 Sort = 0;
                             } else {
@@ -621,12 +621,12 @@ namespace BlueControls.Controls {
 
             BeginnEdit();
 
-            foreach (ColumnViewCollection ThisView in _Database.Views) {
+            foreach (var ThisView in _Database.Views) {
 
 
                 if (ThisView != null && ThisView != _Database.Views[0]) {
                     TabGeneratorCount++;
-                    TabPage tempPage = new TabPage {
+                    var tempPage = new TabPage {
                         Text = "Seite #" + TabGeneratorCount
                     };
 
@@ -691,8 +691,8 @@ namespace BlueControls.Controls {
 
                     if (Blinki) {
                         cbxControlType.Item.Clear();
-                        for (int z = 0; z <= 999; z++) {
-                            enEditTypeFormula w = (enEditTypeFormula)z;
+                        for (var z = 0; z <= 999; z++) {
+                            var w = (enEditTypeFormula)z;
                             if (w.ToString() != z.ToString()) {
                                 if (ViewItem.Column.UserEditDialogTypeInFormula(w)) {
                                     cbxControlType.Item.Add(w.ToString(), z.ToString());
@@ -710,12 +710,12 @@ namespace BlueControls.Controls {
         }
 
         private void lbxColumns_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-            BasicListItem item = (BasicListItem)e.HotItem;
+            var item = (BasicListItem)e.HotItem;
             if (item == null) { return; }
 
             item.Checked = true;
 
-            ColumnViewItem cd = SearchViewItem(_Database.Column[item.Internal]);
+            var cd = SearchViewItem(_Database.Column[item.Internal]);
 
             if (cd == null) {
                 e.UserMenu.Add("Zum Kopfbereich hinzufügen", "#AddColumnToHead", enImageCode.Sonne);
@@ -730,11 +730,11 @@ namespace BlueControls.Controls {
         private void lbxColumns_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             //if (_Database.Views.Count == 0) { _Database.Views.Add(new ColumnViewCollection(_Database, "")); }
 
-            ColumnItem Column = _Database.Column[((BasicListItem)e.HotItem).Internal];
+            var Column = _Database.Column[((BasicListItem)e.HotItem).Internal];
             _ = SearchColumnView(Column);
-            ColumnViewItem ViewItem = SearchViewItem(Column);
+            var ViewItem = SearchViewItem(Column);
 
-            ColumnViewCollection CurrView = CurrentView();
+            var CurrView = CurrentView();
 
 
             switch (e.ClickedComand) {
@@ -778,7 +778,7 @@ namespace BlueControls.Controls {
 
 
         private void RedoView() {
-            int i = Tabs.SelectedIndex;
+            var i = Tabs.SelectedIndex;
 
 
             BeginnEdit();
@@ -798,7 +798,7 @@ namespace BlueControls.Controls {
 
 
         private void Arrangement_Swap(int Ri) {
-            int vn = _Database.Views.IndexOf(CurrentView());
+            var vn = _Database.Views.IndexOf(CurrentView());
 
             if (vn < 1) { return; }
             if (vn >= _Database.Views.Count) { return; }
@@ -808,8 +808,8 @@ namespace BlueControls.Controls {
             if (vn >= _Database.Views.Count - 1 && Ri > 0) { return; }
 
 
-            ColumnViewCollection tmpx1 = _Database.Views[vn];
-            ColumnViewCollection tmpx2 = _Database.Views[vn + Ri];
+            var tmpx1 = _Database.Views[vn];
+            var tmpx2 = _Database.Views[vn + Ri];
 
             // Binding List Changes müsste reagieren
             _Database.Views[vn] = tmpx2;
@@ -822,9 +822,9 @@ namespace BlueControls.Controls {
 
 
         private void Rename_Click(object sender, System.EventArgs e) {
-            ColumnViewCollection CurrView = CurrentView();
+            var CurrView = CurrentView();
             if (CurrView == null || CurrView == _Database.Views[0]) { return; }
-            string n = InputBox.Show("Umbenennen:", CurrView.Name, enDataFormat.Text);
+            var n = InputBox.Show("Umbenennen:", CurrView.Name, enDataFormat.Text);
             if (!string.IsNullOrEmpty(n)) { CurrView.Name = n; }
 
 
@@ -833,10 +833,10 @@ namespace BlueControls.Controls {
 
         }
         private void Rechte_Click(object sender, System.EventArgs e) {
-            ColumnViewCollection CurrView = CurrentView();
+            var CurrView = CurrentView();
 
 
-            ItemCollectionList aa = new ItemCollectionList();
+            var aa = new ItemCollectionList();
             aa.AddRange(_Database.Permission_AllUsed(true));
             aa.CheckBehavior = enCheckBehavior.MultiSelection;
             aa.Check(CurrView.PermissionGroups_Show, true);
@@ -847,7 +847,7 @@ namespace BlueControls.Controls {
             }
             aa.Sort();
 
-            List<string> b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
+            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
             if (b == null) { return; }
 
 
@@ -860,10 +860,10 @@ namespace BlueControls.Controls {
 
 
         private void OrderDelete_Click(object sender, System.EventArgs e) {
-            ColumnViewCollection CurrView = CurrentView();
+            var CurrView = CurrentView();
 
             if (CurrView == null) { return; }
-            int i = _Database.Views.IndexOf(CurrView);
+            var i = _Database.Views.IndexOf(CurrView);
             if (i < 1) { return; } // 0 darf auch nicht gelöscht werden
             if (MessageBox.Show("Ansicht <b>'" + CurrView.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             _Database.Views.RemoveAt(i);
@@ -878,7 +878,7 @@ namespace BlueControls.Controls {
 
         private void OrderAdd_Click(object sender, System.EventArgs e) {
 
-            string ex = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enDataFormat.Text);
+            var ex = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enDataFormat.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
 
             _Database.Views.Add(new ColumnViewCollection(_Database, "", ex));
@@ -889,9 +889,9 @@ namespace BlueControls.Controls {
 
         private void cbxCaptionPosition_ItemClicked(object sender, BasicListItemEventArgs e) {
 
-            ColumnItem Column = _Database.Column[EditorSelectedColumn()];
+            var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
-            ColumnViewItem ViewItem = SearchViewItem(Column);
+            var ViewItem = SearchViewItem(Column);
 
 
             if (ViewItem != null) { ViewItem.ÜberschriftAnordnung = (enÜberschriftAnordnung)int.Parse(cbxCaptionPosition.Text); }
@@ -902,9 +902,9 @@ namespace BlueControls.Controls {
         }
 
         private void cbxControlType_ItemClicked(object sender, BasicListItemEventArgs e) {
-            ColumnItem Column = _Database.Column[EditorSelectedColumn()];
+            var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
-            ColumnViewItem ViewItem = SearchViewItem(Column);
+            var ViewItem = SearchViewItem(Column);
 
             if (ViewItem != null) { ViewItem.Column.EditType = (enEditTypeFormula)int.Parse(cbxControlType.Text); }
 
@@ -914,9 +914,9 @@ namespace BlueControls.Controls {
 
 
         private void SLinks_Click(object sender, System.EventArgs e) {
-            ColumnItem Column = _Database.Column[EditorSelectedColumn()];
+            var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
-            ColumnViewItem ViewItem = SearchViewItem(Column);
+            var ViewItem = SearchViewItem(Column);
 
             ViewItem?.KoordÄndern(-1, 0, 0);
 
@@ -925,9 +925,9 @@ namespace BlueControls.Controls {
         }
 
         private void SRechts_Click(object sender, System.EventArgs e) {
-            ColumnItem Column = _Database.Column[EditorSelectedColumn()];
+            var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
-            ColumnViewItem ViewItem = SearchViewItem(Column);
+            var ViewItem = SearchViewItem(Column);
 
             ViewItem?.KoordÄndern(1, 0, 0);
 
@@ -936,9 +936,9 @@ namespace BlueControls.Controls {
         }
 
         private void SOben_Click(object sender, System.EventArgs e) {
-            ColumnItem Column = _Database.Column[EditorSelectedColumn()];
-            ColumnViewCollection View = SearchColumnView(Column);
-            ColumnViewItem ViewItem = SearchViewItem(Column);
+            var Column = _Database.Column[EditorSelectedColumn()];
+            var View = SearchColumnView(Column);
+            var ViewItem = SearchViewItem(Column);
 
 
             if (ViewItem != null) { View.Swap(ViewItem, ViewItem.PreviewsVisible(View)); }
@@ -948,9 +948,9 @@ namespace BlueControls.Controls {
         }
 
         private void SUnten_Click(object sender, System.EventArgs e) {
-            ColumnItem Column = _Database.Column[EditorSelectedColumn()];
-            ColumnViewCollection View = SearchColumnView(Column);
-            ColumnViewItem ViewItem = SearchViewItem(Column);
+            var Column = _Database.Column[EditorSelectedColumn()];
+            var View = SearchColumnView(Column);
+            var ViewItem = SearchViewItem(Column);
 
             if (ViewItem != null) { View.Swap(ViewItem, ViewItem.NextVisible(View)); }
 
@@ -961,9 +961,9 @@ namespace BlueControls.Controls {
         }
 
         private void EOben_Click(object sender, System.EventArgs e) {
-            ColumnItem Column = _Database.Column[EditorSelectedColumn()];
+            var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
-            ColumnViewItem ViewItem = SearchViewItem(Column);
+            var ViewItem = SearchViewItem(Column);
 
             ViewItem?.KoordÄndern(0, 0, -1);
 
@@ -976,9 +976,9 @@ namespace BlueControls.Controls {
 
         private void EUnten_Click(object sender, System.EventArgs e) {
 
-            ColumnItem Column = _Database.Column[EditorSelectedColumn()];
+            var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
-            ColumnViewItem ViewItem = SearchViewItem(Column);
+            var ViewItem = SearchViewItem(Column);
 
             ViewItem?.KoordÄndern(0, 0, 1);
 
@@ -991,9 +991,9 @@ namespace BlueControls.Controls {
         }
 
         private void ELinks_Click(object sender, System.EventArgs e) {
-            ColumnItem Column = _Database.Column[EditorSelectedColumn()];
+            var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
-            ColumnViewItem ViewItem = SearchViewItem(Column);
+            var ViewItem = SearchViewItem(Column);
 
             ViewItem?.KoordÄndern(0, -1, 0);
 
@@ -1006,9 +1006,9 @@ namespace BlueControls.Controls {
         }
 
         private void ERechts_Click(object sender, System.EventArgs e) {
-            ColumnItem Column = _Database.Column[EditorSelectedColumn()];
+            var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
-            ColumnViewItem ViewItem = SearchViewItem(Column);
+            var ViewItem = SearchViewItem(Column);
 
             ViewItem?.KoordÄndern(0, 1, 0);
 
@@ -1033,7 +1033,7 @@ namespace BlueControls.Controls {
             }
 
 
-            bool R = false;
+            var R = false;
             BeginnEdit();
 
             do {
@@ -1087,7 +1087,7 @@ namespace BlueControls.Controls {
                     break;
 
                 default:
-                    FlexiControlForCell tempVar = (FlexiControlForCell)vObject;
+                    var tempVar = (FlexiControlForCell)vObject;
                     tempVar.NeedRefresh -= Btb_IAmInvalid;
                     break;
             }
@@ -1114,7 +1114,7 @@ namespace BlueControls.Controls {
 
         private void _Database_ColumnContentChanged(object sender, ListEventArgs e) {
             if (IsDisposed) { return; }
-            int r = _ShowingRowKey;
+            var r = _ShowingRowKey;
             ShowingRowKey = -1;
 
             View_Init();
@@ -1130,7 +1130,7 @@ namespace BlueControls.Controls {
         }
 
         private ColumnViewItem SearchViewItem(ColumnItem Column) {
-            ColumnViewCollection ThisView = SearchColumnView(Column);
+            var ThisView = SearchColumnView(Column);
             return ThisView?[Column];
         }
 
@@ -1139,11 +1139,11 @@ namespace BlueControls.Controls {
 
             if (Column == null) { return null; }
 
-            foreach (ColumnViewCollection ThisView in Column.Database.Views) {
+            foreach (var ThisView in Column.Database.Views) {
 
                 if (ThisView != null) {
 
-                    foreach (ColumnViewItem thisViewItem in ThisView) {
+                    foreach (var thisViewItem in ThisView) {
                         if (thisViewItem?.Column != null) {
                             if (thisViewItem.Column == Column) { return ThisView; }
                         }
@@ -1164,7 +1164,7 @@ namespace BlueControls.Controls {
         //}
 
         private FlexiControlForCell ControlOf(ColumnViewItem ThisViewItem) {
-            foreach (FlexiControlForCell ThisControl in _Control) {
+            foreach (var ThisControl in _Control) {
                 if (ThisControl != null && !ThisControl.IsDisposed && ThisControl.Tag == ThisViewItem) { return ThisControl; }
             }
 
@@ -1199,7 +1199,7 @@ namespace BlueControls.Controls {
 
                 case "#schnelleingabe":
                     if (ShowingRow == null) { return true; }
-                    FormulaQuickSelect sh = new FormulaQuickSelect(ShowingRow);
+                    var sh = new FormulaQuickSelect(ShowingRow);
                     sh.ShowDialog();
                     return true;
 

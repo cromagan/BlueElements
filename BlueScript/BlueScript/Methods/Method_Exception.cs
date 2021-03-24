@@ -25,12 +25,12 @@ namespace BlueScript {
 
         public override string Syntax { get => "Exception(\"Unbehandelter Programmcode!\");"; }
         public override string Description { get => "Unterbricht das Skript mit einer Fehlermeldung."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "Exception" }; }
+        public override List<string> Comand(Script s) { return new() { "Exception" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.String }; }
         public override bool EndlessArgs { get => false; }
 
 
@@ -39,7 +39,7 @@ namespace BlueScript {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
 
             if (attvar == null || attvar.Count != 1) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 

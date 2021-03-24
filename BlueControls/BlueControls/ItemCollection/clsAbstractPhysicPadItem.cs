@@ -8,7 +8,7 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public readonly List<PointM> Edges = new List<PointM>();
+        public readonly List<PointM> Edges = new();
 
         protected clsAbstractPhysicPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
             Points.Add(new PointM(5, 0));
@@ -19,13 +19,13 @@ namespace BlueControls.ItemCollection {
         }
 
         protected override RectangleM CalculateUsedArea() {
-            decimal minx = decimal.MaxValue;
-            decimal miny = decimal.MaxValue;
-            decimal maxx = decimal.MinValue;
-            decimal maxy = decimal.MinValue;
+            var minx = decimal.MaxValue;
+            var miny = decimal.MaxValue;
+            var maxx = decimal.MinValue;
+            var maxy = decimal.MinValue;
 
 
-            foreach (PointM thisP in Points) {
+            foreach (var thisP in Points) {
                 minx = Math.Min(minx, thisP.X);
                 maxx = Math.Max(maxx, thisP.X);
                 miny = Math.Min(miny, thisP.Y);
@@ -45,9 +45,9 @@ namespace BlueControls.ItemCollection {
 
             if (Points.Count < 1) { return; }
 
-            PointM lastP = Points[Points.Count - 1];
+            var lastP = Points[Points.Count - 1];
 
-            foreach (PointM thisP in Points) {
+            foreach (var thisP in Points) {
                 GR.DrawLine(Pens.Black, lastP.ZoomAndMove(cZoom, shiftX, shiftY), thisP.ZoomAndMove(cZoom, shiftX, shiftY));
                 lastP = thisP;
             }
@@ -64,7 +64,7 @@ namespace BlueControls.ItemCollection {
         public void BuildEdges() {
 
             Edges.Clear();
-            for (int i = 0; i < Points.Count; i++) {
+            for (var i = 0; i < Points.Count; i++) {
                 if (i + 1 >= Points.Count) {
                     Edges.Add(Points[0] - Points[i]);
                 } else {
@@ -77,7 +77,7 @@ namespace BlueControls.ItemCollection {
             get {
                 decimal totalX = 0;
                 decimal totalY = 0;
-                for (int i = 0; i < Points.Count; i++) {
+                for (var i = 0; i < Points.Count; i++) {
                     totalX += Points[i].X;
                     totalY += Points[i].Y;
                 }
@@ -91,7 +91,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public override void Move(decimal x, decimal y) {
-            for (int i = 0; i < Points.Count; i++) {
+            for (var i = 0; i < Points.Count; i++) {
                 Points[i].X += x;
                 Points[i].Y += y;
             }
@@ -109,12 +109,12 @@ namespace BlueControls.ItemCollection {
         // Return the union of the two polygons.
         public List<PointF> FindPolygonUnion(List<PointF>[] polygons) {
             // Find the lower-leftmost point in either polygon.
-            int cur_pgon = 0;
-            int cur_index = 0;
-            PointF cur_point = polygons[cur_pgon][cur_index];
-            for (int pgon = 0; pgon < 2; pgon++) {
-                for (int index = 0; index < polygons[pgon].Count; index++) {
-                    PointF test_point = polygons[pgon][index];
+            var cur_pgon = 0;
+            var cur_index = 0;
+            var cur_point = polygons[cur_pgon][cur_index];
+            for (var pgon = 0; pgon < 2; pgon++) {
+                for (var index = 0; index < polygons[pgon].Count; index++) {
+                    var test_point = polygons[pgon][index];
                     if ((test_point.X < cur_point.X) ||
                         ((test_point.X == cur_point.X) &&
                          (test_point.Y > cur_point.Y))) {
@@ -126,10 +126,10 @@ namespace BlueControls.ItemCollection {
             }
 
             // Create the result polygon.
-            List<PointF> union = new List<PointF>();
+            var union = new List<PointF>();
 
             // Start here.
-            PointF start_point = cur_point;
+            var start_point = cur_point;
             union.Add(start_point);
 
             // Start traversing the polygons.
@@ -137,8 +137,8 @@ namespace BlueControls.ItemCollection {
             for (; ; )
             {
                 // Find the next point.
-                int next_index = (cur_index + 1) % polygons[cur_pgon].Count;
-                PointF next_point = polygons[cur_pgon][next_index];
+                var next_index = (cur_index + 1) % polygons[cur_pgon].Count;
+                var next_point = polygons[cur_pgon][next_index];
 
                 // Each time through the loop:
                 //      cur_pgon is the index of the polygon we're following
@@ -148,24 +148,24 @@ namespace BlueControls.ItemCollection {
 
                 // See if this segment intersects
                 // any of the other polygon's segments.
-                int other_pgon = (cur_pgon + 1) % 2;
+                var other_pgon = (cur_pgon + 1) % 2;
 
                 // Keep track of the closest intersection.
-                PointF best_intersection = new PointF(0, 0);
-                int best_index1 = -1;
-                float best_t = 2f;
+                var best_intersection = new PointF(0, 0);
+                var best_index1 = -1;
+                var best_t = 2f;
 
-                for (int index1 = 0; index1 < polygons[other_pgon].Count; index1++) {
+                for (var index1 = 0; index1 < polygons[other_pgon].Count; index1++) {
                     // Get the index of the next point in the polygon.
-                    int index2 = (index1 + 1) % polygons[other_pgon].Count;
+                    var index2 = (index1 + 1) % polygons[other_pgon].Count;
 
                     // See if the segment between points index1
                     // and index2 intersect the current segment.
-                    PointF point1 = polygons[other_pgon][index1];
-                    PointF point2 = polygons[other_pgon][index2];
+                    var point1 = polygons[other_pgon][index1];
+                    var point2 = polygons[other_pgon][index2];
                     FindIntersection(cur_point, next_point, point1, point2,
-                        out bool lines_intersect, out bool segments_intersect,
-                        out PointF intersection, out PointF close_p1, out PointF close_p2, out float t1, out float t2);
+                        out var lines_intersect, out var segments_intersect,
+                        out var intersection, out var close_p1, out var close_p2, out var t1, out var t2);
 
                     if ((segments_intersect) && // The segments intersect
                         (t1 > 0.001) &&         // Not at the previous intersection
@@ -215,13 +215,13 @@ namespace BlueControls.ItemCollection {
             out PointF intersection, out PointF close_p1, out PointF close_p2,
             out float t1, out float t2) {
             // Get the segments' parameters.
-            float dx12 = p2.X - p1.X;
-            float dy12 = p2.Y - p1.Y;
-            float dx34 = p4.X - p3.X;
-            float dy34 = p4.Y - p3.Y;
+            var dx12 = p2.X - p1.X;
+            var dy12 = p2.Y - p1.Y;
+            var dx34 = p4.X - p3.X;
+            var dy34 = p4.Y - p3.Y;
 
             // Solve for t1 and t2
-            float denominator = (dy12 * dx34 - dx12 * dy34);
+            var denominator = (dy12 * dx34 - dx12 * dy34);
             t1 = ((p1.X - p3.X) * dy34 + (p3.Y - p1.Y) * dx34) / denominator;
             if (float.IsInfinity(t1)) {
                 // The lines are parallel (or close enough to it).
@@ -266,14 +266,14 @@ namespace BlueControls.ItemCollection {
 
         private float SignedPolygonArea(List<PointF> points) {
             // Add the first point to the end.
-            int num_points = points.Count;
-            PointF[] pts = new PointF[num_points + 1];
+            var num_points = points.Count;
+            var pts = new PointF[num_points + 1];
             points.CopyTo(pts, 0);
             pts[num_points] = points[0];
 
             // Get the areas.
             float area = 0;
-            for (int i = 0; i < num_points; i++) {
+            for (var i = 0; i < num_points; i++) {
                 area +=
                     (pts[i + 1].X - pts[i].X) *
                     (pts[i + 1].Y + pts[i].Y) / 2;
@@ -299,21 +299,21 @@ namespace BlueControls.ItemCollection {
 
         // Check if polygon A is going to collide with polygon B for the given velocity
         public static strPolygonCollisionResult PolygonCollision(clsAbstractPhysicPadItem polygonA, clsAbstractPhysicPadItem polygonB, PointM velocity) {
-            strPolygonCollisionResult result = new strPolygonCollisionResult {
+            var result = new strPolygonCollisionResult {
                 CheckedObjectA = polygonA,
                 CheckedObjectB = polygonB,
                 Intersect = true,
                 WillIntersect = true
             };
 
-            int edgeCountA = polygonA.Edges.Count;
-            int edgeCountB = polygonB.Edges.Count;
-            decimal minIntervalDistance = decimal.MaxValue;
-            PointM translationAxis = new PointM(0, 0);
+            var edgeCountA = polygonA.Edges.Count;
+            var edgeCountB = polygonB.Edges.Count;
+            var minIntervalDistance = decimal.MaxValue;
+            var translationAxis = new PointM(0, 0);
             PointM edge;
 
             // Loop through all the edges of both polygons
-            for (int edgeIndex = 0; edgeIndex < edgeCountA + edgeCountB; edgeIndex++) {
+            for (var edgeIndex = 0; edgeIndex < edgeCountA + edgeCountB; edgeIndex++) {
                 if (edgeIndex < edgeCountA) {
                     edge = polygonA.Edges[edgeIndex];
                 } else {
@@ -323,14 +323,14 @@ namespace BlueControls.ItemCollection {
                 // ===== 1. Find if the polygons are currently intersecting =====
 
                 // Find the axis perpendicular to the current edge
-                PointM axis = new PointM(-edge.Y, edge.X);
+                var axis = new PointM(-edge.Y, edge.X);
                 axis.Normalize();
 
                 // Find the projection of the polygon on the current axis
-                decimal minA = 0m;
-                decimal minB = 0m;
-                decimal maxA = 0m;
-                decimal maxB = 0m;
+                var minA = 0m;
+                var minB = 0m;
+                var maxA = 0m;
+                var maxB = 0m;
                 ProjectPolygon(axis, polygonA, ref minA, ref maxA);
                 ProjectPolygon(axis, polygonB, ref minB, ref maxB);
 
@@ -342,7 +342,7 @@ namespace BlueControls.ItemCollection {
                 // ===== 2. Now find if the polygons *will* intersect =====
 
                 // Project the velocity on the current axis
-                decimal velocityProjection = axis.DotProduct(velocity);
+                var velocityProjection = axis.DotProduct(velocity);
 
                 // Get the projection of polygon A during the movement
                 if (velocityProjection < 0) {
@@ -352,7 +352,7 @@ namespace BlueControls.ItemCollection {
                 }
 
                 // Do the same test as above for the new projection
-                decimal intervalDistance = IntervalDistance(minA, maxA, minB, maxB);
+                var intervalDistance = IntervalDistance(minA, maxA, minB, maxB);
                 if (intervalDistance > 0) { result.WillIntersect = false; }
 
                 // If the polygons are not intersecting and won't intersect, exit the loop
@@ -366,7 +366,7 @@ namespace BlueControls.ItemCollection {
                     minIntervalDistance = intervalDistance;
                     translationAxis = axis;
 
-                    PointM d = polygonA.Center - polygonB.Center;
+                    var d = polygonA.Center - polygonB.Center;
                     if (d.DotProduct(translationAxis) < 0) {
                         translationAxis = -translationAxis;
                     }
@@ -419,10 +419,10 @@ namespace BlueControls.ItemCollection {
         // Calculate the projection of a polygon on an axis and returns it as a [min, max] interval
         public static void ProjectPolygon(PointM axis, clsAbstractPhysicPadItem polygon, ref decimal min, ref decimal max) {
             // To project a point on an axis use the dot product
-            decimal d = axis.DotProduct(polygon.Points[0]);
+            var d = axis.DotProduct(polygon.Points[0]);
             min = d;
             max = d;
-            for (int i = 0; i < polygon.Points.Count; i++) {
+            for (var i = 0; i < polygon.Points.Count; i++) {
                 d = polygon.Points[i].DotProduct(axis);
                 if (d < min) {
                     min = d;
@@ -443,8 +443,8 @@ namespace BlueControls.ItemCollection {
         // Find the polygon's centroid.
         public PointM FindCentroid() {
             // Add the first point at the end of the array.
-            int num_points = Points.Count - 1;
-            PointM[] pts = new PointM[num_points + 1];
+            var num_points = Points.Count - 1;
+            var pts = new PointM[num_points + 1];
             Points.CopyTo(pts, 0);
             pts[num_points] = Points[0];
 
@@ -452,7 +452,7 @@ namespace BlueControls.ItemCollection {
             decimal X = 0;
             decimal Y = 0;
             decimal second_factor;
-            for (int i = 0; i < num_points; i++) {
+            for (var i = 0; i < num_points; i++) {
                 second_factor =
                     pts[i].X * pts[i + 1].Y -
                     pts[i + 1].X * pts[i].Y;
@@ -461,7 +461,7 @@ namespace BlueControls.ItemCollection {
             }
 
             // Divide by 6 times the polygon's area.
-            decimal polygon_area = PolygonArea();
+            var polygon_area = PolygonArea();
             X /= (6 * polygon_area);
             Y /= (6 * polygon_area);
 
@@ -485,14 +485,14 @@ namespace BlueControls.ItemCollection {
         // oriented clockwise.
         private decimal SignedPolygonArea() {
             // Add the first point to the end.
-            int num_points = Points.Count - 1;
-            PointM[] pts = new PointM[num_points + 1];
+            var num_points = Points.Count - 1;
+            var pts = new PointM[num_points + 1];
             Points.CopyTo(pts, 0);
             pts[num_points] = Points[0];
 
             // Get the areas.
             decimal area = 0;
-            for (int i = 0; i < num_points; i++) {
+            for (var i = 0; i < num_points; i++) {
                 area += (pts[i + 1].X - pts[i].X) * (pts[i + 1].Y + pts[i].Y) / 2;
             }
 
@@ -519,11 +519,11 @@ namespace BlueControls.ItemCollection {
         public bool PointInPolygon(decimal X, decimal Y) {
             // Get the angle between the point and the
             // first and last vertices.
-            int max_point = Points.Count - 2;
-            double total_angle = GetAngle(Points[max_point].X, Points[max_point].Y, X, Y, Points[0].X, Points[0].Y);
+            var max_point = Points.Count - 2;
+            var total_angle = GetAngle(Points[max_point].X, Points[max_point].Y, X, Y, Points[0].X, Points[0].Y);
             // Add the angles from the point
             // to each other pair of vertices.
-            for (int i = 0; i < max_point; i++) {
+            for (var i = 0; i < max_point; i++) {
                 total_angle += GetAngle(
                     Points[i].X, Points[i].Y,
                     X, Y,
@@ -544,10 +544,10 @@ namespace BlueControls.ItemCollection {
         // expect because Y coordinates increase downward.
         public static double GetAngle(decimal Ax, decimal Ay, decimal Bx, decimal By, decimal Cx, decimal Cy) {
             // Get the dot product.
-            decimal dot_product = DotProduct(Ax, Ay, Bx, By, Cx, Cy);
+            var dot_product = DotProduct(Ax, Ay, Bx, By, Cx, Cy);
 
             // Get the cross product.
-            decimal cross_product = CrossProductLength(Ax, Ay, Bx, By, Cx, Cy);
+            var cross_product = CrossProductLength(Ax, Ay, Bx, By, Cx, Cy);
 
             // Calculate the angle.
             return Math.Atan2((double)cross_product, (double)dot_product);
@@ -558,10 +558,10 @@ namespace BlueControls.ItemCollection {
         // Note that AB · BC = |AB| * |BC| * Cos(theta).
         private static decimal DotProduct(decimal Ax, decimal Ay, decimal Bx, decimal By, decimal Cx, decimal Cy) {
             // Get the vectors' coordinates.
-            decimal BAx = Ax - Bx;
-            decimal BAy = Ay - By;
-            decimal BCx = Cx - Bx;
-            decimal BCy = Cy - By;
+            var BAx = Ax - Bx;
+            var BAy = Ay - By;
+            var BCx = Cx - Bx;
+            var BCy = Cy - By;
 
             // Calculate the dot product.
             return (BAx * BCx + BAy * BCy);
@@ -581,15 +581,15 @@ namespace BlueControls.ItemCollection {
             // are all positive or negative (depending on the
             // order in which we visit them) so the polygon
             // is convex.
-            bool got_negative = false;
-            bool got_positive = false;
-            int num_points = Points.Count - 1;
+            var got_negative = false;
+            var got_positive = false;
+            var num_points = Points.Count - 1;
             int B, C;
-            for (int A = 0; A < num_points; A++) {
+            for (var A = 0; A < num_points; A++) {
                 B = (A + 1) % num_points;
                 C = (B + 1) % num_points;
 
-                decimal cross_product =
+                var cross_product =
                     CrossProductLength(
                         Points[A].X, Points[A].Y,
                         Points[B].X, Points[B].Y,
@@ -618,10 +618,10 @@ namespace BlueControls.ItemCollection {
         // gives the vector's length and direction.
         public static decimal CrossProductLength(decimal Ax, decimal Ay, decimal Bx, decimal By, decimal Cx, decimal Cy) {
             // Get the vectors' coordinates.
-            decimal BAx = Ax - Bx;
-            decimal BAy = Ay - By;
-            decimal BCx = Cx - Bx;
-            decimal BCy = Cy - By;
+            var BAx = Ax - Bx;
+            var BAy = Ay - By;
+            var BCx = Cx - Bx;
+            var BCy = Cy - By;
 
             // Calculate the Z coordinate of the cross product.
             return (BAx * BCy - BAy * BCx);

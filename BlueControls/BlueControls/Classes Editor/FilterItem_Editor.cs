@@ -44,17 +44,17 @@ namespace BlueControls.Classes_Editor {
 
         private void FiltWahl_Click(object sender, System.EventArgs e) {
 
-            ColumnItem c = Item.Database.Column[Col.Text];
+            var c = Item.Database.Column[Col.Text];
 
 
             if (c == null || !c.AutoFilterSymbolPossible()) { return; }
 
-            FilterCollection tmpfc = new FilterCollection(Item.Database);
+            var tmpfc = new FilterCollection(Item.Database);
             if (Item.FilterType != enFilterType.KeinFilter) { tmpfc.Add(Item); }
 
             autofilter = new AutoFilter(c, tmpfc);
 
-            Point p = FiltWahl.PointToScreen(Point.Empty);
+            var p = FiltWahl.PointToScreen(Point.Empty);
 
             autofilter.Position_LocateToPosition(new Point(p.X, p.Y + FiltWahl.Height));
 
@@ -86,7 +86,7 @@ namespace BlueControls.Classes_Editor {
         private void Col_TextChanged(object sender, System.EventArgs e) {
             if (IsFilling) { return; }
 
-            ColumnItem c = Item.Database.Column[Col.Text];
+            var c = Item.Database.Column[Col.Text];
 
 
             if (c == null || c.AutoFilterSymbolPossible()) {

@@ -105,8 +105,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (_TableView.Database.ReadOnly) { return; }
 
-            ColumnItem Vorlage = _TableView.CursorPosColumn();
-            bool mitDaten = false;
+            var Vorlage = _TableView.CursorPosColumn();
+            var mitDaten = false;
 
             if (Vorlage != null && !string.IsNullOrEmpty(Vorlage.Identifier)) { Vorlage = null; }
             if (Vorlage != null) {
@@ -134,7 +134,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 newc = _TableView.Database.Column.AddACloneFrom(Vorlage);
 
                 if (mitDaten) {
-                    foreach (RowItem thisR in _TableView.Database.Row) {
+                    foreach (var thisR in _TableView.Database.Row) {
                         thisR.CellSet(newc, thisR.CellGetString(Vorlage));
                     }
                 }
@@ -145,7 +145,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
 
-            using (ColumnEditor w = new ColumnEditor(newc, _TableView)) {
+            using (var w = new ColumnEditor(newc, _TableView)) {
                 w.ShowDialog();
                 newc.Invalidate_ColumAndContent();
             }
@@ -162,7 +162,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void OrderAdd_Click(object sender, System.EventArgs e) {
             string newname = null;
 
-            bool MitVorlage = false;
+            var MitVorlage = false;
 
             if (_TableView.Arrangement > 0 && _TableView.CurrentArrangement != null) {
                 MitVorlage = Convert.ToBoolean(Forms.MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
@@ -192,7 +192,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
-            string n = InputBox.Show("Umbenennen:", _TableView.CurrentArrangement.Name, enDataFormat.Text);
+            var n = InputBox.Show("Umbenennen:", _TableView.CurrentArrangement.Name, enDataFormat.Text);
             if (!string.IsNullOrEmpty(n)) { _TableView.CurrentArrangement.Name = n; }
         }
 
@@ -203,9 +203,9 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
-            ItemCollectionList ic = new ItemCollectionList();
+            var ic = new ItemCollectionList();
 
-            foreach (ColumnItem ThisColumnItem in _TableView.Database.Column) {
+            foreach (var ThisColumnItem in _TableView.Database.Column) {
                 if (ThisColumnItem != null && _TableView.CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem, false); }
 
             }
@@ -218,7 +218,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             ic.Sort();
 
-            System.Collections.Generic.List<string> r = InputBoxListBoxStyle.Show("Wählen sie:", ic, enAddType.None, true);
+            var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, enAddType.None, true);
             if (r == null || r.Count == 0) { return; }
             _TableView.CurrentArrangement.Add(_TableView.Database.Column[r[0]], false);
 
@@ -235,14 +235,14 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
-            ItemCollectionList aa = new ItemCollectionList();
+            var aa = new ItemCollectionList();
             aa.AddRange(_TableView.Database.Permission_AllUsed(true));
             aa.Sort();
             aa.CheckBehavior = enCheckBehavior.MultiSelection;
             aa.Check(_TableView.CurrentArrangement.PermissionGroups_Show, true);
 
 
-            System.Collections.Generic.List<string> b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
+            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
             if (b == null) { return; }
 
             _TableView.CurrentArrangement.PermissionGroups_Show.Clear();
@@ -290,18 +290,18 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (_TableView.Arrangement < 0) { return; }
 
-            ColumnItem c = _TableView.CursorPosColumn();
+            var c = _TableView.CursorPosColumn();
 
             if (c == null) { return; }
 
 
-            string p = InputBox.Show("<b>" + _TableView.CursorPosColumn().ReadableText() + "</b><br>Auf welche Position verschieben?<br>Info: Nummerierung beginnt mit 1", "", enDataFormat.Ganzzahl);
+            var p = InputBox.Show("<b>" + _TableView.CursorPosColumn().ReadableText() + "</b><br>Auf welche Position verschieben?<br>Info: Nummerierung beginnt mit 1", "", enDataFormat.Ganzzahl);
 
 
-            if (int.TryParse(p, out int index)) {
+            if (int.TryParse(p, out var index)) {
                 if (index < 1) { return; }
                 index--;
-                ColumnViewItem ViewItem = _TableView.CurrentArrangement[c];
+                var ViewItem = _TableView.CurrentArrangement[c];
 
                 if (ViewItem != null) {
                     _TableView.CurrentArrangement.Remove(ViewItem);
@@ -346,7 +346,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnDatenbankPfad_Click(object sender, System.EventArgs e) {
 
-            string P = _TableView.Database.Filename.FilePath();
+            var P = _TableView.Database.Filename.FilePath();
 
             if (PathExists(P)) { ExecuteFile(P); }
 
@@ -358,9 +358,9 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-            bool enAnsichtsVerwaltung = true;
-            bool enAktuelleAnsicht = true;
-            bool enAktuelleSpalte = true;
+            var enAnsichtsVerwaltung = true;
+            var enAktuelleAnsicht = true;
+            var enAktuelleSpalte = true;
 
             if (_TableView?.Database == null || !_TableView.Database.IsAdministrator()) {
                 Enabled = false;
@@ -375,15 +375,15 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
             ColumnViewItem ViewItem = null;
-            ColumnItem column = _TableView.CursorPosColumn();
+            var column = _TableView.CursorPosColumn();
 
             if (column != null) { ViewItem = _TableView.CurrentArrangement[column]; }
-            int IndexOfViewItem = -1;
+            var IndexOfViewItem = -1;
             if (_TableView.Arrangement <= _TableView.Database.ColumnArrangements.Count) { IndexOfViewItem = _TableView.CurrentArrangement.IndexOf(ViewItem); }
 
 
-            bool enLayoutEditable = Convert.ToBoolean(_TableView.Arrangement > 0); // Hauptansicht (0) kann nicht bearbeitet werden
-            bool enLayoutDeletable = Convert.ToBoolean(_TableView.Arrangement > 1); // Hauptansicht (0) und Allgemeine Ansicht (1) können nicht gelöscht werden
+            var enLayoutEditable = Convert.ToBoolean(_TableView.Arrangement > 0); // Hauptansicht (0) kann nicht bearbeitet werden
+            var enLayoutDeletable = Convert.ToBoolean(_TableView.Arrangement > 1); // Hauptansicht (0) und Allgemeine Ansicht (1) können nicht gelöscht werden
 
             btnAktuelleAnsichtLoeschen.Enabled = enLayoutDeletable;
 

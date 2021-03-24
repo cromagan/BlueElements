@@ -63,8 +63,8 @@ namespace BlueBasics {
         public static decimal Länge(PointF SP, PointF Ep) {
             // Berechnet die Länge einer Strecke
 
-            decimal L1 = (decimal)(SP.X - Ep.X);
-            decimal L2 = (decimal)(SP.Y - Ep.Y);
+            var L1 = (decimal)(SP.X - Ep.X);
+            var L2 = (decimal)(SP.Y - Ep.Y);
 
             // ^2 ist langsamer, laut Project Analyzer
             return (decimal)Math.Sqrt(Convert.ToDouble(L1 * L1 + L2 * L2));
@@ -81,8 +81,8 @@ namespace BlueBasics {
 
             // http://de.wikipedia.org/wiki/Polarkoordinaten
 
-            decimal XA = X2 - X1;
-            decimal YA = Y2 - Y1;
+            var XA = X2 - X1;
+            var YA = Y2 - Y1;
 
 
 

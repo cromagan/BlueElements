@@ -39,7 +39,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             OriTXT = TXT.Replace("\r\n", "\r").Trim("\r");
 
-            List<string> Ein = new List<string>();
+            var Ein = new List<string>();
 
             Ein.AddRange(OriTXT.SplitByCR());
             Eintr.Text = Ein.Count + " zum Importieren bereit.";
@@ -51,7 +51,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void Fertig_Click(object sender, System.EventArgs e) {
 
-            string TR = string.Empty;
+            var TR = string.Empty;
 
             if (TabStopp.Checked) {
                 TR = "\t";
@@ -86,12 +86,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Vorbereitung des Textes -----------------------------
             TXT = TXT.Replace("\r\n", "\r").Trim("\r");
 
-            string[] ein = TXT.SplitByCR();
-            List<string[]> Zeil = new List<string[]>();
-            int neuZ = 0;
+            var ein = TXT.SplitByCR();
+            var Zeil = new List<string[]>();
+            var neuZ = 0;
 
 
-            for (int z = 0; z <= ein.GetUpperBound(0); z++) {
+            for (var z = 0; z <= ein.GetUpperBound(0); z++) {
                 if (EliminateMultipleSplitter) {
                     ein[z] = ein[z].Replace(ColumnSplitChar + ColumnSplitChar, ColumnSplitChar);
                 }
@@ -110,9 +110,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
 
-            List<ColumnItem> columns = new List<ColumnItem>();
+            var columns = new List<ColumnItem>();
             RowItem row = null;
-            int StartZ = 0;
+            var StartZ = 0;
 
             // -------------------------------------
             // --- Spalten-Reihenfolge ermitteln ---
@@ -121,14 +121,14 @@ namespace BlueControls.BlueDatabaseDialogs {
                 StartZ = 1;
 
 
-                for (int SpaltNo = 0; SpaltNo < Zeil[0].GetUpperBound(0) + 1; SpaltNo++) {
+                for (var SpaltNo = 0; SpaltNo < Zeil[0].GetUpperBound(0) + 1; SpaltNo++) {
                     if (string.IsNullOrEmpty(Zeil[0][SpaltNo])) {
                         if (!SilentMode) { MessageBox.Show("Abbruch,<br>leerer Spaltenname.", enImageCode.Information, "Ok"); }
                         return;
                     }
 
                     Zeil[0][SpaltNo] = Zeil[0][SpaltNo].Replace(" ", "_");
-                    ColumnItem Col = _Database.Column[Zeil[0][SpaltNo]];
+                    var Col = _Database.Column[Zeil[0][SpaltNo]];
                     if (Col == null) {
                         Col = _Database.Column.Add(Zeil[0][SpaltNo]);
                         Col.Caption = Zeil[0][SpaltNo];
@@ -138,12 +138,12 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 }
             } else {
-                foreach (ColumnItem thisColumn in _Database.Column) {
+                foreach (var thisColumn in _Database.Column) {
                     if (thisColumn != null && string.IsNullOrEmpty(thisColumn.Identifier)) { columns.Add(thisColumn); }
                 }
 
                 while (columns.Count < Zeil[0].GetUpperBound(0) + 1) {
-                    ColumnItem newc = _Database.Column.Add(string.Empty);
+                    var newc = _Database.Column.Add(string.Empty);
                     newc.Caption = newc.Name;
                     newc.Format = enDataFormat.Text;
                     newc.MultiLine = true;
@@ -162,13 +162,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (!SilentMode) { P = Progressbar.Show("Importiere...", Zeil.Count - 1); }
 
-            for (int ZeilNo = StartZ; ZeilNo < Zeil.Count; ZeilNo++) {
+            for (var ZeilNo = StartZ; ZeilNo < Zeil.Count; ZeilNo++) {
                 P?.Update(ZeilNo);
 
 
-                int tempVar2 = Math.Min(Zeil[ZeilNo].GetUpperBound(0) + 1, columns.Count);
+                var tempVar2 = Math.Min(Zeil[ZeilNo].GetUpperBound(0) + 1, columns.Count);
                 row = null;
-                for (int SpaltNo = 0; SpaltNo < tempVar2; SpaltNo++) {
+                for (var SpaltNo = 0; SpaltNo < tempVar2; SpaltNo++) {
 
                     if (SpaltNo == 0) {
                         row = null;

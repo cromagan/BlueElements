@@ -26,16 +26,16 @@ namespace BlueScript {
 
         public override string Syntax { get => "Split(String, Trennzeichen)"; }
         public override string Description { get => "Wandelt einen Text in eine Liste um. Es Trennt den Text dabei mitteles dem angegebenen Trennzeichen"; }
-        public override List<string> Comand(Script s) { return new List<string>() { "split" }; }
+        public override List<string> Comand(Script s) { return new() { "split" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.List; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.String }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.String, enVariableDataType.String }; }
         public override bool EndlessArgs { get => false; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             attvar[0].Readonly = false;

@@ -36,7 +36,7 @@ namespace BlueDatabase {
         #region  Variablen-Deklarationen 
 
         private readonly Database Database;
-        private readonly Dictionary<string, CellItem> _cells = new Dictionary<string, CellItem>();
+        private readonly Dictionary<string, CellItem> _cells = new();
 
         #endregion
 
@@ -70,7 +70,7 @@ namespace BlueDatabase {
 
 
         public void Delete(ColumnItem Column, int RowKey) {
-            string CellKey = KeyOfCell(Column.Key, RowKey);
+            var CellKey = KeyOfCell(Column.Key, RowKey);
             if (!_cells.ContainsKey(CellKey)) { return; }
 
             //           var Inhalt = _cells[CellKey].Value;
@@ -83,10 +83,10 @@ namespace BlueDatabase {
             if (_Row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Row konnte nicht generiert werden."); }
             if (_Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Column konnte nicht generiert werden."); }
 
-            string CellKey = KeyOfCell(_Column, _Row);
+            var CellKey = KeyOfCell(_Column, _Row);
 
             if (_cells.ContainsKey(CellKey)) {
-                CellItem c = _cells[CellKey];
+                var c = _cells[CellKey];
                 c.Value = Value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
 
                 if (Width > 0) {
@@ -119,7 +119,7 @@ namespace BlueDatabase {
                 return;
             }
 
-            string[] cd = CellKey.SplitBy("|");
+            var cd = CellKey.SplitBy("|");
             if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher CellKey übergeben: " + CellKey); }
 
             Column = Database.Column.SearchByKey(int.Parse(cd[0]));
@@ -134,13 +134,13 @@ namespace BlueDatabase {
             if (Row == null) { return true; }
 
             if (Column.Format == enDataFormat.LinkedCell) {
-                (ColumnItem lcolumn, RowItem lrow) = LinkedCellData(Column, Row, false, false);
+                (var lcolumn, var lrow) = LinkedCellData(Column, Row, false, false);
                 if (lcolumn != null && lrow != null) { return lrow.CellIsNullOrEmpty(lcolumn); }
                 return true;
             }
 
 
-            string CellKey = KeyOfCell(Column.Key, Row.Key);
+            var CellKey = KeyOfCell(Column.Key, Row.Key);
 
             if (!_cells.ContainsKey(CellKey)) { return true; }
             return string.IsNullOrEmpty(_cells[CellKey].Value);
@@ -155,7 +155,7 @@ namespace BlueDatabase {
             if (column == null || row == null) { return (null, null); }
             if (column.Format != enDataFormat.LinkedCell) { return (null, null); }
 
-            Database LinkedDatabase = column.LinkedDatabase();
+            var LinkedDatabase = column.LinkedDatabase();
 
             if (LinkedDatabase == null) { return (null, null); }
 
@@ -165,16 +165,16 @@ namespace BlueDatabase {
             }
 
 
-            string Key = column.Database.Cell.GetStringBehindLinkedValue(column, row);
+            var Key = column.Database.Cell.GetStringBehindLinkedValue(column, row);
 
             if (string.IsNullOrEmpty(Key)) { return (null, null); }
 
-            string[] V = Key.SplitBy("|");
+            var V = Key.SplitBy("|");
 
             if (V.Length != 2) { return RepairLinkedCellValue(LinkedDatabase, column, row, AddRowIfNotExists); }
 
-            ColumnItem LinkedColumn = LinkedDatabase.Column.SearchByKey(int.Parse(V[0]));
-            RowItem LinkedRow = LinkedDatabase.Row.SearchByKey(int.Parse(V[1]));
+            var LinkedColumn = LinkedDatabase.Column.SearchByKey(int.Parse(V[0]));
+            var LinkedRow = LinkedDatabase.Row.SearchByKey(int.Parse(V[1]));
 
             if (KeyOfCell(LinkedColumn, LinkedRow) == Key) { return (LinkedColumn, LinkedRow); }
 
@@ -198,16 +198,16 @@ namespace BlueDatabase {
                 targetColumn = LinkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKey);
             } else {
                 // Spalte aus einer Spalte lesen
-                ColumnItem LinkedCell_ColumnValueFoundInColumn = column.Database.Column.SearchByKey(column.LinkedCell_ColumnValueFoundIn);
+                var LinkedCell_ColumnValueFoundInColumn = column.Database.Column.SearchByKey(column.LinkedCell_ColumnValueFoundIn);
                 if (LinkedCell_ColumnValueFoundInColumn == null) { return Ergebnis("Die Spalte, aus der der Spaltenschlüssel kommen soll, existiert nicht."); }
 
-                if (!int.TryParse(row.CellGetString(LinkedCell_ColumnValueFoundInColumn), out int colKey)) { return Ergebnis("Der Text Spalte der Spalte, aus der der Spaltenschlüssel kommen soll, ist fehlerhaft."); }
+                if (!int.TryParse(row.CellGetString(LinkedCell_ColumnValueFoundInColumn), out var colKey)) { return Ergebnis("Der Text Spalte der Spalte, aus der der Spaltenschlüssel kommen soll, ist fehlerhaft."); }
 
                 if (string.IsNullOrEmpty(column.LinkedCell_ColumnValueAdd)) {   // Ohne Vorsatz
                     targetColumn = LinkedDatabase.Column.SearchByKey(colKey);
                 } else {
                     // Mit Vorsatz
-                    ColumnItem tarCx = LinkedDatabase.Column.SearchByKey(colKey);
+                    var tarCx = LinkedDatabase.Column.SearchByKey(colKey);
                     if (tarCx == null) { return Ergebnis("Die Spalte, aus der der Spaltenschlüssel (mit anschließenden Zusatz) kommen soll, existiert nicht."); }
                     targetColumn = LinkedDatabase.Column[column.LinkedCell_ColumnValueAdd + tarCx.Name];
 
@@ -224,7 +224,7 @@ namespace BlueDatabase {
             ///
             /// Zeilenschlüssel lesen
             ///   
-            ColumnItem LinkedCell_RowColumn = column.Database.Column.SearchByKey(column.LinkedCell_RowKey);
+            var LinkedCell_RowColumn = column.Database.Column.SearchByKey(column.LinkedCell_RowKey);
             if (LinkedCell_RowColumn == null) { return Ergebnis("Die Spalte, aus der der Zeilenschlüssel kommen soll, existiert nicht."); }
 
             if (row.CellIsNullOrEmpty(LinkedCell_RowColumn)) { return Ergebnis("Kein Zeilenschlüssel angegeben."); }
@@ -263,18 +263,18 @@ namespace BlueDatabase {
 
         internal bool RemoveOrphans() {
             try {
-                List<string> RemoveKeys = new List<string>();
+                var RemoveKeys = new List<string>();
 
-                foreach (KeyValuePair<string, CellItem> pair in _cells) {
+                foreach (var pair in _cells) {
                     if (!string.IsNullOrEmpty(pair.Value.Value)) {
-                        DataOfCellKey(pair.Key, out ColumnItem Column, out RowItem Row);
+                        DataOfCellKey(pair.Key, out var Column, out var Row);
                         if (Column == null || Row == null) { RemoveKeys.Add(pair.Key); }
                     }
                 }
 
                 if (RemoveKeys.Count == 0) { return false; }
 
-                foreach (string ThisKey in RemoveKeys) {
+                foreach (var ThisKey in RemoveKeys) {
                     _cells.Remove(ThisKey);
                 }
                 return true;
@@ -296,7 +296,7 @@ namespace BlueDatabase {
         public void DoSpecialFormats(ColumnItem Column, int RowKey, string PreviewsValue, bool DoAlways) {
             if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
 
-            string CurrentValue = GetString(Column, Database.Row.SearchByKey(RowKey));
+            var CurrentValue = GetString(Column, Database.Row.SearchByKey(RowKey));
 
 
             if (!DoAlways && CurrentValue == PreviewsValue) { return; }
@@ -322,7 +322,7 @@ namespace BlueDatabase {
 
 
             if (Column.IsFirst()) {
-                foreach (ColumnItem ThisColumnItem in Database.Column) {
+                foreach (var ThisColumnItem in Database.Column) {
                     if (ThisColumnItem != null) {
                         switch (ThisColumnItem.Format) {
                             //case enDataFormat.Relation:
@@ -351,11 +351,11 @@ namespace BlueDatabase {
         /// <param name="column"></param>
         /// <param name="rowKey"></param>
         private void ChangeValueOfKey(string currentvalue, ColumnItem column, int rowKey) {
-            ColumnItem keyc = Database.Column.SearchByKey(column.KeyColumnKey); // Schlüsselspalte für diese Spalte bestimmen
+            var keyc = Database.Column.SearchByKey(column.KeyColumnKey); // Schlüsselspalte für diese Spalte bestimmen
             if (keyc is null) { return; }
 
             List<RowItem> Rows;
-            RowItem ownRow = Database.Row.SearchByKey(rowKey);
+            var ownRow = Database.Row.SearchByKey(rowKey);
             if (keyc.Format == enDataFormat.RelationText) {
                 Rows = CellCollection.ConnectedRowsOfRelations(ownRow.CellGetString(keyc), ownRow);
             } else {
@@ -365,7 +365,7 @@ namespace BlueDatabase {
             if (Rows.Count < 1) { return; }
 
 
-            foreach (RowItem thisRow in Rows) {
+            foreach (var thisRow in Rows) {
                 thisRow.CellSet(column, currentvalue);
             }
 
@@ -382,10 +382,10 @@ namespace BlueDatabase {
         private void SetSameValueOfKey(ColumnItem column, int rowKey, string currentvalue) {
 
             List<RowItem> Rows = null;
-            RowItem ownRow = Database.Row.SearchByKey(rowKey);
+            var ownRow = Database.Row.SearchByKey(rowKey);
 
 
-            foreach (ColumnItem ThisColumn in Database.Column) {
+            foreach (var ThisColumn in Database.Column) {
 
                 if (ThisColumn.LinkedCell_RowKey == column.Key || ThisColumn.LinkedCell_ColumnValueFoundIn == column.Key) {
                     LinkedCellData(ThisColumn, ownRow, true, false); // Repariert auch Zellbezüge
@@ -423,7 +423,7 @@ namespace BlueDatabase {
         /// <param name="Row"></param>
         /// <param name="PreviewsValue"></param>
         private void RepairRelationText(ColumnItem Column, RowItem Row, string PreviewsValue) {
-            string CurrentString = GetString(Column, Row);
+            var CurrentString = GetString(Column, Row);
             CurrentString = ChangeTextToRowId(CurrentString, string.Empty, string.Empty, -1);
             CurrentString = ChangeTextFromRowId(CurrentString);
 
@@ -434,18 +434,18 @@ namespace BlueDatabase {
             }
 
 
-            List<string> OldBZ = new List<string>(PreviewsValue.SplitByCR()).SortedDistinctList();
-            List<string> NewBZ = new List<string>(CurrentString.SplitByCR()).SortedDistinctList();
+            var OldBZ = new List<string>(PreviewsValue.SplitByCR()).SortedDistinctList();
+            var NewBZ = new List<string>(CurrentString.SplitByCR()).SortedDistinctList();
 
             // Zuerst Beziehungen LÖSCHEN
-            foreach (string t in OldBZ) {
+            foreach (var t in OldBZ) {
                 if (!NewBZ.Contains(t)) {
 
-                    List<RowItem> X = ConnectedRowsOfRelations(t, Row);
-                    foreach (RowItem ThisRow in X) {
+                    var X = ConnectedRowsOfRelations(t, Row);
+                    foreach (var ThisRow in X) {
 
                         if (ThisRow != null && ThisRow != Row) {
-                            List<string> ex = ThisRow.CellGetList(Column);
+                            var ex = ThisRow.CellGetList(Column);
 
                             if (X.Contains(Row)) {
                                 ex.Remove(t);
@@ -467,12 +467,12 @@ namespace BlueDatabase {
             //// Dann die neuen Erstellen
 
 
-            foreach (string t in NewBZ) {
+            foreach (var t in NewBZ) {
                 if (!OldBZ.Contains(t)) {
-                    List<RowItem> X = ConnectedRowsOfRelations(t, Row);
-                    foreach (RowItem ThisRow in X) {
+                    var X = ConnectedRowsOfRelations(t, Row);
+                    foreach (var ThisRow in X) {
                         if (ThisRow != Row) {
-                            List<string> ex = ThisRow.CellGetList(Column);
+                            var ex = ThisRow.CellGetList(Column);
                             if (X.Contains(Row)) {
                                 ex.Add(t);
                             } else {
@@ -487,14 +487,14 @@ namespace BlueDatabase {
 
 
         private string ChangeTextToRowId(string CompleteRelationText, string OldValue, string NewValue, int KeyOfCHangedRow) {
-            List<string> Names = Database.Column[0].GetUcaseNamesSortedByLenght();
-            bool DidOld = false;
-            bool DidNew = false;
+            var Names = Database.Column[0].GetUcaseNamesSortedByLenght();
+            var DidOld = false;
+            var DidNew = false;
 
 
 
 
-            for (int Z = Names.Count - 1; Z > -1; Z--) {
+            for (var Z = Names.Count - 1; Z > -1; Z--) {
 
 
 
@@ -540,7 +540,7 @@ namespace BlueDatabase {
         private string ChangeTextFromRowId(string CompleteRelationText) {
 
 
-            foreach (RowItem RowItem in Database.Row) {
+            foreach (var RowItem in Database.Row) {
                 if (RowItem != null) {
                     CompleteRelationText = CompleteRelationText.Replace("/@X" + RowItem.Key.ToString() + "X@/", RowItem.CellFirstString());
                 }
@@ -550,16 +550,16 @@ namespace BlueDatabase {
 
 
         internal static List<RowItem> ConnectedRowsOfRelations(string CompleteRelationText, RowItem Row) {
-            List<RowItem> AllRows = new List<RowItem>();
-            List<string> Names = Row.Database.Column[0].GetUcaseNamesSortedByLenght();
+            var AllRows = new List<RowItem>();
+            var Names = Row.Database.Column[0].GetUcaseNamesSortedByLenght();
 
-            string[] RelationTextLine = CompleteRelationText.ToUpper().SplitByCR();
+            var RelationTextLine = CompleteRelationText.ToUpper().SplitByCR();
 
-            foreach (string thisTextLine in RelationTextLine) {
-                string tmp = thisTextLine;
-                List<RowItem> R = new List<RowItem>();
+            foreach (var thisTextLine in RelationTextLine) {
+                var tmp = thisTextLine;
+                var R = new List<RowItem>();
 
-                for (int Z = Names.Count - 1; Z > -1; Z--) {
+                for (var Z = Names.Count - 1; Z > -1; Z--) {
                     if (tmp.IndexOfWord(Names[Z], 0, RegexOptions.IgnoreCase) > -1) {
                         R.Add(Row.Database.Row[Names[Z]]);
                         tmp = tmp.Replace(Names[Z], string.Empty);
@@ -580,15 +580,15 @@ namespace BlueDatabase {
             if (string.IsNullOrEmpty(NewValue)) { return; }
 
 
-            foreach (RowItem ThisRowItem in Database.Row) {
+            foreach (var ThisRowItem in Database.Row) {
                 if (ThisRowItem != null) {
                     if (!ThisRowItem.CellIsNullOrEmpty(ColumnToRepair)) {
-                        string t = ThisRowItem.CellGetString(ColumnToRepair);
+                        var t = ThisRowItem.CellGetString(ColumnToRepair);
 
                         if (!string.IsNullOrEmpty(OldValue) && t.ToUpper().Contains(OldValue.ToUpper())) {
                             t = ChangeTextToRowId(t, OldValue, NewValue, RowKey);
                             t = ChangeTextFromRowId(t);
-                            List<string> t2 = t.SplitByCRToList().SortedDistinctList();
+                            var t2 = t.SplitByCRToList().SortedDistinctList();
                             ThisRowItem.CellSet(ColumnToRepair, t2);
                         }
 
@@ -603,7 +603,7 @@ namespace BlueDatabase {
 
         internal void InvalidateAllSizes() {
 
-            foreach (ColumnItem ThisColumn in Database.Column) {
+            foreach (var ThisColumn in Database.Column) {
                 ThisColumn.Invalidate_ColumAndContent();
             }
 
@@ -623,8 +623,8 @@ namespace BlueDatabase {
 
             Value = Column.AutoCorrect(Value);
 
-            string CellKey = KeyOfCell(Column.Key, Row.Key);
-            string OldValue = string.Empty;
+            var CellKey = KeyOfCell(Column.Key, Row.Key);
+            var OldValue = string.Empty;
 
             if (_cells.ContainsKey(CellKey)) { OldValue = _cells[CellKey].Value; }
 
@@ -656,7 +656,7 @@ namespace BlueDatabase {
             if (column == null || row == null) { return string.Empty; }
 
             if (column.Format == enDataFormat.LinkedCell) {
-                (ColumnItem lcolumn, RowItem lrow) = LinkedCellData(column, row, true, true);
+                (var lcolumn, var lrow) = LinkedCellData(column, row, true, true);
                 return AutomaticInitalValue(lcolumn, lrow);
             }
 
@@ -664,16 +664,16 @@ namespace BlueDatabase {
             if (column.VorschlagsColumn < 0) { return string.Empty; }
 
 
-            ColumnItem cc = column.Database.Column.SearchByKey(column.VorschlagsColumn);
+            var cc = column.Database.Column.SearchByKey(column.VorschlagsColumn);
             if (cc == null) { return string.Empty; }
 
-            FilterCollection F = new FilterCollection(column.Database)
+            var F = new FilterCollection(column.Database)
             {
                 new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, row.CellGetString(cc)),
                 new FilterItem(column, enFilterType.Ungleich_MultiRowIgnorieren, string.Empty)
             };
 
-            List<RowItem> rows = column.Database.Row.CalculateSortedRows(F, null, null);
+            var rows = column.Database.Row.CalculateSortedRows(F, null, null);
             rows.Remove(row);
             if (rows.Count == 0) { return string.Empty; }
             return rows[0].CellGetString(column);
@@ -681,7 +681,7 @@ namespace BlueDatabase {
 
 
         internal static void Invalidate_CellContentSize(ColumnItem Column, RowItem Row) {
-            string CellKey = KeyOfCell(Column, Row);
+            var CellKey = KeyOfCell(Column, Row);
 
             if (Column.Database.Cell._cells.ContainsKey(CellKey)) {
                 Column.Database.Cell._cells[CellKey].InvalidateSize();
@@ -697,8 +697,8 @@ namespace BlueDatabase {
 
             if (!Column.SaveContent) { return; }
 
-            string CellKey = KeyOfCell(Column, Row);
-            string _String = string.Empty;
+            var CellKey = KeyOfCell(Column, Row);
+            var _String = string.Empty;
 
             if (_cells.ContainsKey(CellKey)) {
                 _String = _cells[CellKey].Value;
@@ -729,14 +729,14 @@ namespace BlueDatabase {
 
             try {
 
-                enFilterType Typ = filter.FilterType;
+                var Typ = filter.FilterType;
 
 
                 // Oder-Flag ermitteln --------------------------------------------
-                bool Oder = Typ.HasFlag(enFilterType.ODER);
+                var Oder = Typ.HasFlag(enFilterType.ODER);
                 if (Oder) { Typ ^= enFilterType.ODER; }
                 // Und-Flag Ermitteln --------------------------------------------
-                bool Und = Typ.HasFlag(enFilterType.UND);
+                var Und = Typ.HasFlag(enFilterType.UND);
                 if (Und) { Typ ^= enFilterType.UND; }
 
                 if (filter.SearchValue.Count < 2) {
@@ -748,17 +748,17 @@ namespace BlueDatabase {
 
 
                 // Tatsächlichen String ermitteln --------------------------------------------
-                string _String = string.Empty;
-                ColumnItem fColumn = column;
+                var _String = string.Empty;
+                var fColumn = column;
                 if (column.Format == enDataFormat.LinkedCell) {
-                    (ColumnItem column, RowItem row) LinkedData = LinkedCellData(column, row, false, false);
+                    var LinkedData = LinkedCellData(column, row, false, false);
                     if (LinkedData.column != null && LinkedData.row != null) {
                         _String = LinkedData.row.CellGetString(LinkedData.column);
                         fColumn = LinkedData.column;
                     }
 
                 } else {
-                    string CellKey = KeyOfCell(column, row);
+                    var CellKey = KeyOfCell(column, row);
                     if (_cells.ContainsKey(CellKey)) {
                         _String = _cells[CellKey].Value;
                     } else {
@@ -774,7 +774,7 @@ namespace BlueDatabase {
 
 
                 // Multiline-Typ ermitteln  --------------------------------------------
-                bool TMPMultiLine = false;
+                var TMPMultiLine = false;
                 if (column != null) { TMPMultiLine = column.MultiLine; }
 
 
@@ -803,8 +803,8 @@ namespace BlueDatabase {
 
 
                 if (!TMPMultiLine) {
-                    bool BedingungErfüllt = false;
-                    for (int FiltNachNr = 0; FiltNachNr < filter.SearchValue.Count; FiltNachNr++) {
+                    var BedingungErfüllt = false;
+                    for (var FiltNachNr = 0; FiltNachNr < filter.SearchValue.Count; FiltNachNr++) {
                         BedingungErfüllt = CompareValues(_String, filter.SearchValue[FiltNachNr], Typ);
                         if (Oder && BedingungErfüllt) { return true; }
                         if (Und && BedingungErfüllt == false) { return false; } // Bei diesem UND hier müssen allezutreffen, deshalb kann getrost bei einem False dieses zurückgegeben werden.
@@ -813,7 +813,7 @@ namespace BlueDatabase {
                     return BedingungErfüllt;
                 }
 
-                List<string> VorhandenWerte = new List<string>(_String.SplitByCR());
+                var VorhandenWerte = new List<string>(_String.SplitByCR());
                 if (VorhandenWerte.Count == 0) // Um den Filter, der nach 'Leere' Sucht, zu befriediegen
                 {
                     VorhandenWerte.Add("");
@@ -825,9 +825,9 @@ namespace BlueDatabase {
                 // bevor sie bei einem UND ein False zurückgibt
 
 
-                for (int FiltNachNr = 0; FiltNachNr < filter.SearchValue.Count; FiltNachNr++) {
-                    bool BedingungErfüllt = false;
-                    foreach (string t in VorhandenWerte) {
+                for (var FiltNachNr = 0; FiltNachNr < filter.SearchValue.Count; FiltNachNr++) {
+                    var BedingungErfüllt = false;
+                    foreach (var t in VorhandenWerte) {
                         BedingungErfüllt = CompareValues(t, filter.SearchValue[FiltNachNr], Typ);
                         if (Oder && BedingungErfüllt) { return true; }// Irgendein vorhandener Value trifft zu!!! Super!!!
                         if (Und && BedingungErfüllt) { break; }// Irgend ein vorhandener Value trifft zu, restliche Prüfung uninteresant
@@ -874,7 +874,7 @@ namespace BlueDatabase {
                 case enFilterType.Berechne:
                     if (string.IsNullOrEmpty(IstValue)) { return false; }
                     if (!FilterValue.ToUpper().Contains("VALUE")) { return false; }
-                    double? d = modErgebnis.Ergebnis(FilterValue.Replace("VALUE", IstValue.Replace(",", "."), RegexOptions.IgnoreCase));
+                    var d = modErgebnis.Ergebnis(FilterValue.Replace("VALUE", IstValue.Replace(",", "."), RegexOptions.IgnoreCase));
                     if (d == null) { return false; }
                     return Convert.ToBoolean(d == -1);
 
@@ -895,7 +895,7 @@ namespace BlueDatabase {
 
         public string GetStringBehindLinkedValue(ColumnItem Column, RowItem Row) {
             if (Column == null || Row == null) { return string.Empty; }
-            string CellKey = KeyOfCell(Column, Row);
+            var CellKey = KeyOfCell(Column, Row);
             if (!_cells.ContainsKey(CellKey)) { return string.Empty; }
             return _cells[CellKey].Value;
         }
@@ -946,15 +946,15 @@ namespace BlueDatabase {
 
             if (Column == null) { return LanguageTool.DoTranslate("Es ist keine Spalte ausgewählt."); }
 
-            string tmpf = Column.Database.ErrorReason(mode);
+            var tmpf = Column.Database.ErrorReason(mode);
             if (!string.IsNullOrEmpty(tmpf)) { return LanguageTool.DoTranslate(tmpf); }
 
             if (!Column.SaveContent) { return LanguageTool.DoTranslate("Der Spalteninhalt wird nicht gespeichert."); }
 
             if (Column.Format == enDataFormat.LinkedCell) {
-                (ColumnItem lcolumn, RowItem lrow) = LinkedCellData(Column, Row, true, false);
+                (var lcolumn, var lrow) = LinkedCellData(Column, Row, true, false);
                 if (lcolumn != null && lrow != null) {
-                    string tmp = ErrorReason(lcolumn, lrow, mode);
+                    var tmp = ErrorReason(lcolumn, lrow, mode);
                     if (!string.IsNullOrEmpty(tmp)) { return LanguageTool.DoTranslate("Die verlinkte Zelle kann nicht bearbeitet werden: ") + tmp; }
                     return string.Empty;
                 }
@@ -1013,16 +1013,16 @@ namespace BlueDatabase {
                 if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!<br>" + Database.Filename); }
 
                 if (column.Format == enDataFormat.LinkedCell) {
-                    (ColumnItem lcolumn, RowItem lrow) = LinkedCellData(column, row, false, false);
+                    (var lcolumn, var lrow) = LinkedCellData(column, row, false, false);
                     if (lcolumn != null && lrow != null) { return lrow.CellGetString(lcolumn); }
                     return string.Empty;
                 }
 
-                string CellKey = KeyOfCell(column, row);
+                var CellKey = KeyOfCell(column, row);
 
                 if (!_cells.ContainsKey(CellKey)) { return string.Empty; }
 
-                string s = _cells[CellKey].Value;
+                var s = _cells[CellKey].Value;
 
                 if (s != null) { return s; }
                 return string.Empty;
@@ -1045,7 +1045,7 @@ namespace BlueDatabase {
 
 
             if (column.Format == enDataFormat.LinkedCell) {
-                (ColumnItem lcolumn, RowItem lrow) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
+                (var lcolumn, var lrow) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
                 lrow?.CellSet(lcolumn, value);
                 return;
             }
@@ -1078,9 +1078,9 @@ namespace BlueDatabase {
         }
         public DateTime GetDateTime(ColumnItem column, RowItem row) // Main Method
         {
-            string _String = GetString(column, row);
+            var _String = GetString(column, row);
             if (string.IsNullOrEmpty(_String)) { return default; }
-            if (DateTimeTryParse(_String, out DateTime d)) { return d; }
+            if (DateTimeTryParse(_String, out var d)) { return d; }
             return default;
         }
 
@@ -1119,7 +1119,7 @@ namespace BlueDatabase {
         }
         public Point GetPoint(ColumnItem column, RowItem row) // Main Method
         {
-            string _String = GetString(column, row);
+            var _String = GetString(column, row);
             if (string.IsNullOrEmpty(_String)) { return Point.Empty; }
             return Extensions.PointParse(_String);
         }
@@ -1142,7 +1142,7 @@ namespace BlueDatabase {
         }
         public int GetInteger(ColumnItem column, RowItem row) // Main Method
         {
-            string x = GetString(column, row);
+            var x = GetString(column, row);
             if (string.IsNullOrEmpty(x)) { return 0; }
             return int.Parse(x);
         }
@@ -1163,7 +1163,7 @@ namespace BlueDatabase {
         }
         public double GetDouble(ColumnItem column, RowItem row) // Main Method
         {
-            string x = GetString(column, row);
+            var x = GetString(column, row);
             if (string.IsNullOrEmpty(x)) { return 0; }
             return double.Parse(x);
         }
@@ -1184,7 +1184,7 @@ namespace BlueDatabase {
         }
         public decimal GetDecimal(ColumnItem column, RowItem row) // Main Method
         {
-            string x = GetString(column, row);
+            var x = GetString(column, row);
             if (string.IsNullOrEmpty(x)) { return 0; }
             return decimal.Parse(x);
         }
@@ -1237,7 +1237,7 @@ namespace BlueDatabase {
         /// <param name="row"></param>
         /// <returns></returns>
         public string BestFile(string columnName, RowItem row) {
-            ColumnItem column = Database.Column[columnName];
+            var column = Database.Column[columnName];
             return column.BestFile(GetString(column, row), false);
         }
 
@@ -1253,7 +1253,7 @@ namespace BlueDatabase {
         }
 
         public int GetColorBGR(ColumnItem Column, RowItem Row) {
-            Color c = GetColor(Column, Row);
+            var c = GetColor(Column, Row);
             int colorBlue = c.B;
             int colorGreen = c.G;
             int colorRed = c.R;
@@ -1270,7 +1270,7 @@ namespace BlueDatabase {
 
 
         public bool IsNullOrEmpty(string CellKey) {
-            DataOfCellKey(CellKey, out ColumnItem Column, out RowItem Row);
+            DataOfCellKey(CellKey, out var Column, out var Row);
             return IsNullOrEmpty(Column, Row);
 
         }
@@ -1295,7 +1295,7 @@ namespace BlueDatabase {
 
             RemoveOrphans();
 
-            foreach (KeyValuePair<string, CellItem> ThisString in _cells) {
+            foreach (var ThisString in _cells) {
                 Database.SaveToByteList(l, ThisString);
             }
         }
@@ -1311,7 +1311,7 @@ namespace BlueDatabase {
         }
 
         public Size GetSizeOfCellContent(ColumnItem Column, RowItem Row) {
-            string CellKey = KeyOfCell(Column, Row);
+            var CellKey = KeyOfCell(Column, Row);
             if (_cells.ContainsKey(CellKey)) {
                 return Column.Database.Cell._cells[CellKey].Size;
             }
@@ -1325,7 +1325,7 @@ namespace BlueDatabase {
         /// <param name="Row"></param>
         /// <param name="ContentSize">Wird im Scale der Datenbank gespeichert, da es ja Benutzerübergreifend ist</param>
         public void SetSizeOfCellContent(ColumnItem Column, RowItem Row, Size ContentSize) {
-            string CellKey = KeyOfCell(Column, Row);
+            var CellKey = KeyOfCell(Column, Row);
             if (!_cells.ContainsKey(CellKey)) { return; }
 
             _cells[CellKey].Size = ContentSize;

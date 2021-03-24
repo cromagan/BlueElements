@@ -34,8 +34,8 @@ namespace BluePaint {
         }
 
         private void CreateDummy() {
-            double? W = modErgebnis.Ergebnis(X.Text);
-            double? H = modErgebnis.Ergebnis(Y.Text);
+            var W = modErgebnis.Ergebnis(X.Text);
+            var H = modErgebnis.Ergebnis(Y.Text);
 
             if (W == null || (int)W < 2) {
                 Notification.Show("Bitte Breite eingeben.", enImageCode.Information);
@@ -49,19 +49,19 @@ namespace BluePaint {
             }
 
 
-            Bitmap newPic = new Bitmap((int)W, (int)H);
+            var newPic = new Bitmap((int)W, (int)H);
 
 
-            Graphics gr = Graphics.FromImage(newPic);
+            var gr = Graphics.FromImage(newPic);
 
             gr.Clear(Color.White);
             gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, newPic.Width - 2, newPic.Height - 2);
 
             if (!string.IsNullOrEmpty(TXT.Text)) {
 
-                Font f = new Font("Arial", 50, FontStyle.Bold);
+                var f = new Font("Arial", 50, FontStyle.Bold);
 
-                SizeF fs = gr.MeasureString(TXT.Text, f);
+                var fs = gr.MeasureString(TXT.Text, f);
 
                 gr.TranslateTransform((float)(newPic.Width / 2.0), (float)(newPic.Height / 2.0));
 

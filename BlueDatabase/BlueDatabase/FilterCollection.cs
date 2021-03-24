@@ -61,7 +61,7 @@ namespace BlueDatabase {
 
         public FilterItem this[ColumnItem column] {
             get {
-                foreach (FilterItem ThisFilterItem in this) {
+                foreach (var ThisFilterItem in this) {
                     if (ThisFilterItem != null && ThisFilterItem.FilterType != enFilterType.KeinFilter) {
                         if (ThisFilterItem.Column == column) { return ThisFilterItem; }
                     }
@@ -89,9 +89,9 @@ namespace BlueDatabase {
 
         public void Remove(ColumnItem column) {
 
-            List<FilterItem> toDel = new List<FilterItem>();
+            var toDel = new List<FilterItem>();
 
-            foreach (FilterItem thisFilter in this) {
+            foreach (var thisFilter in this) {
                 if (thisFilter.Column == column) { toDel.Add(thisFilter); }
 
             }
@@ -102,7 +102,7 @@ namespace BlueDatabase {
 
         public void Remove(string columnName) {
 
-            ColumnItem tmp = Database.Column[columnName];
+            var tmp = Database.Column[columnName];
             if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
 
             Remove(tmp);
@@ -266,14 +266,14 @@ namespace BlueDatabase {
 
             get {
 
-                FilterItem f = this[null];
+                var f = this[null];
                 if (f != null) { return f.SearchValue[0]; }
 
                 return string.Empty;
             }
             set {
 
-                FilterItem f = this[null];
+                var f = this[null];
 
                 if (f != null) {
                     if (f.SearchValue[0].ToLower() == value.ToLower()) { return; }
@@ -281,7 +281,7 @@ namespace BlueDatabase {
                     //OnChanged();
                     return;
                 }
-                FilterItem fi = new FilterItem(Database, enFilterType.Instr_UND_GroﬂKleinEgal, value);
+                var fi = new FilterItem(Database, enFilterType.Instr_UND_GroﬂKleinEgal, value);
                 //{
                 //    Tag = "RowFilter"
                 //};
@@ -311,7 +311,7 @@ namespace BlueDatabase {
             ThrowEvents = false;
             // Initialize();
 
-            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
+            foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "filter":
                         AddIfNotExists(new FilterItem(Database, pair.Value));
@@ -328,9 +328,9 @@ namespace BlueDatabase {
         }
 
         public override string ToString() {
-            string w = "{";
+            var w = "{";
 
-            foreach (FilterItem ThisFilterItem in this) {
+            foreach (var ThisFilterItem in this) {
                 if (ThisFilterItem != null) {
                     w = w + "Filter=" + ThisFilterItem + ", ";
                 }
@@ -361,7 +361,7 @@ namespace BlueDatabase {
 
         public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, string filterBy, string herkunft) {
 
-            ColumnItem column = Database.Column[columName];
+            var column = Database.Column[columName];
             if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
 
 
@@ -381,7 +381,7 @@ namespace BlueDatabase {
         }
 
         public bool Exists(FilterItem filterItem) {
-            foreach (FilterItem thisFilter in this) {
+            foreach (var thisFilter in this) {
                 if (thisFilter.FilterType == filterItem.FilterType) {
                     if (thisFilter.Column == filterItem.Column) {
 
@@ -402,7 +402,7 @@ namespace BlueDatabase {
 
         public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, List<string> filterBy, string herkunft) {
 
-            ColumnItem tmp = Database.Column[columName];
+            var tmp = Database.Column[columName];
             if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
 
             RemoveOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy, herkunft));

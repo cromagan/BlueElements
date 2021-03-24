@@ -48,10 +48,10 @@ namespace BlueDatabase {
 
             if (style == enShortenStyle.Unreplaced || column.OpticalReplace.Count == 0) { return txt; }
 
-            string OT = txt;
+            var OT = txt;
 
-            foreach (string ThisString in column.OpticalReplace) {
-                string[] x = ThisString.SplitBy("|");
+            foreach (var ThisString in column.OpticalReplace) {
+                var x = ThisString.SplitBy("|");
                 if (x.Length == 2) {
                     if (string.IsNullOrEmpty(x[0])) {
                         if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
@@ -108,7 +108,7 @@ namespace BlueDatabase {
                 //if (txt.ContainsChars(Constants.Char_Numerals)) { English = German; return string.Format(English, args); }
                 //if (txt.ToLower().Contains("imagecode")) { English = German; return string.Format(English, args); }
 
-                string addend = string.Empty;
+                var addend = string.Empty;
 
                 if (txt.EndsWith(":")) {
                     txt = txt.TrimEnd(":");
@@ -117,7 +117,7 @@ namespace BlueDatabase {
 
                 txt = txt.Replace("\r\n", "\r");
 
-                RowItem r = Translation.Row[txt];
+                var r = Translation.Row[txt];
                 if (r == null) {
                     if (Translation.ReadOnly) { English = German; return string.Format(English, args); }
                     if (!mustTranslate) { English = German; return string.Format(English, args); }
@@ -125,7 +125,7 @@ namespace BlueDatabase {
                 }
 
 
-                string t = r.CellGetString("Translation");
+                var t = r.CellGetString("Translation");
                 if (string.IsNullOrEmpty(t)) { English = German; return string.Format(English, args); }
                 English = t + addend;
 

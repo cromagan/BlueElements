@@ -27,24 +27,24 @@ namespace BlueScript {
 
         public override string Syntax { get => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);"; }
         public override string Description { get => "Entfernt aus der Liste die angegebenen Werte."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "remove" }; }
+        public override List<string> Comand(Script s) { return new() { "remove" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableList, enVariableDataType.String, enVariableDataType.String }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableList, enVariableDataType.String, enVariableDataType.String }; }
         public override bool EndlessArgs { get => true; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
             if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
 
-                List<string> x = attvar[0].ValueString.SplitByCRToList();
+                var x = attvar[0].ValueString.SplitByCRToList();
 
-                for (int z = 2; z < attvar.Count; z++) {
+                for (var z = 2; z < attvar.Count; z++) {
                     if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
                     x.RemoveString(attvar[z].ValueString, attvar[1].ValueBool);
                 }

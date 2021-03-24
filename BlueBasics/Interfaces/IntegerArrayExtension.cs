@@ -23,9 +23,9 @@ namespace BlueBasics.Interfaces {
 
         public static string[] ToStringArray(this int[] Ar) {
 
-            string[] sar = new string[Ar.GetUpperBound(0) + 1];
+            var sar = new string[Ar.GetUpperBound(0) + 1];
 
-            for (int z = 0; z <= Ar.GetUpperBound(0); z++) {
+            for (var z = 0; z <= Ar.GetUpperBound(0); z++) {
                 sar[z] = Ar[z].ToString().Trim();
             }
 

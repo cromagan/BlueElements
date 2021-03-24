@@ -28,9 +28,9 @@ namespace BluePaint {
     {
 
         protected static Color ColorRedTransp = Color.FromArgb(50, 255, 0, 0);
-        protected static SolidBrush Brush_RedTransp = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
-        protected static Pen Pen_RedTransp = new Pen(ColorRedTransp);
-        protected static Pen Pen_LightWhite = new Pen(Color.FromArgb(150, 255, 255, 255), 3);
+        protected static SolidBrush Brush_RedTransp = new(Color.FromArgb(128, 255, 0, 0));
+        protected static Pen Pen_RedTransp = new(ColorRedTransp);
+        protected static Pen Pen_LightWhite = new(Color.FromArgb(150, 255, 255, 255), 3);
 
         public GenericTool() : base() {
             InitializeComponent();
@@ -106,7 +106,7 @@ namespace BluePaint {
         }
 
         protected virtual Bitmap OnNeedCurrentPic() {
-            BitmapEventArgs e = new BitmapEventArgs(null);
+            var e = new BitmapEventArgs(null);
             NeedCurrentPic?.Invoke(this, e);
             return e.BMP;
         }

@@ -63,8 +63,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             cbxLinkedDatabase.Item.Clear();
             if (!string.IsNullOrEmpty(_Column.Database.Filename)) {
-                string[] All = Directory.GetFiles(_Column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
-                foreach (string ThisString in All) {
+                var All = Directory.GetFiles(_Column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
+                foreach (var ThisString in All) {
                     if (ThisString.ToLower() != _Column.Database.Filename.ToLower()) { cbxLinkedDatabase.Item.Add(ThisString.FileNameWithSuffix()); }
                 }
             }
@@ -227,7 +227,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Einige Dropdown-Menüs sind abhängig von der LinkedDatabase und werden in dessen TextChanged-Event befüllt
             // siehe Ende dieser Routine
 
-            foreach (ColumnItem ThisColumn in _Column.Database.Column) {
+            foreach (var ThisColumn in _Column.Database.Column) {
                 if ((ThisColumn.Format == enDataFormat.RelationText || !ThisColumn.MultiLine) && ThisColumn.Format.CanBeCheckedByRules()) { cbxSchlüsselspalte.Item.Add(ThisColumn, false); }
                 if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
                     cbxDropDownKey.Item.Add(ThisColumn, false);
@@ -255,7 +255,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (database is null || columnKey < 0) {
                 combobox.Text = "#Ohne";
             } else {
-                ColumnItem c = database.Column.SearchByKey(columnKey);
+                var c = database.Column.SearchByKey(columnKey);
                 if (c != null) {
                     combobox.Text = c.Name;
                 } else {
@@ -268,7 +268,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (database == null) { return -1; }
 
-            ColumnItem c = database.Column.Exists(columnName);
+            var c = database.Column.Exists(columnName);
 
             if (c is null) {
                 return -1;
@@ -280,7 +280,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
         private bool AllOk() {
-            string Feh = "";
+            var Feh = "";
 
             // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
             if (string.IsNullOrEmpty(Feh)) {
@@ -289,7 +289,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
             if (string.IsNullOrEmpty(Feh)) {
-                foreach (ColumnItem ThisColumn in _Column.Database.Column) {
+                foreach (var ThisColumn in _Column.Database.Column) {
                     if (ThisColumn != _Column && ThisColumn != null) {
                         if (tbxName.Text.ToUpper() == ThisColumn.Name.ToUpper()) { Feh = "Spalten-Name bereits vorhanden."; }
                     }
@@ -343,7 +343,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.AfterEdit_QuickSortRemoveDouble = btnAutoEditAutoSort.Checked;
 
             if (tbxRunden.Text.IsLong()) {
-                int zahl = int.Parse(tbxRunden.Text);
+                var zahl = int.Parse(tbxRunden.Text);
                 if (zahl > -1 && zahl < 7) {
                     _Column.AfterEdit_Runden = zahl;
                 }
@@ -360,7 +360,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.SpellCheckingEnabled = btnSpellChecking.Checked;
 
 
-            enFilterOptions tmpf = enFilterOptions.None;
+            var tmpf = enFilterOptions.None;
             if (AutoFilterMöglich.Checked) { tmpf |= enFilterOptions.Enabled; }
             if (AutoFilterTXT.Checked) { tmpf |= enFilterOptions.TextFilterEnabled; }
             if (AutoFilterErw.Checked) { tmpf |= enFilterOptions.ExtendedFilterEnabled; }
@@ -381,20 +381,20 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
 
-            System.Collections.Generic.List<string> NewDD = tbxAuswaehlbareWerte.Text.SplitByCRToList().SortedDistinctList();
+            var NewDD = tbxAuswaehlbareWerte.Text.SplitByCRToList().SortedDistinctList();
             if (NewDD.IsDifferentTo(_Column.DropDownItems)) {
                 _Column.DropDownItems.Clear();
                 _Column.DropDownItems.AddRange(NewDD);
             }
 
 
-            System.Collections.Generic.List<string> NewRep = txbReplacer.Text.SplitByCRToList();
+            var NewRep = txbReplacer.Text.SplitByCRToList();
             if (NewRep.IsDifferentTo(_Column.OpticalReplace)) {
                 _Column.OpticalReplace.Clear();
                 _Column.OpticalReplace.AddRange(NewRep);
             }
 
-            System.Collections.Generic.List<string> NewRep2 = txbAutoReplace.Text.SplitByCRToList();
+            var NewRep2 = txbAutoReplace.Text.SplitByCRToList();
             if (NewRep2.IsDifferentTo(_Column.AfterEdit_AutoReplace)) {
                 _Column.AfterEdit_AutoReplace.Clear();
                 _Column.AfterEdit_AutoReplace.AddRange(NewRep2);
@@ -411,14 +411,14 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _Column.DauerFilterPos = PointParse(txbDauerFilterPos.Text);
 
-            System.Collections.Generic.List<string> NewTags = tbxTags.Text.SplitByCRToList();
+            var NewTags = tbxTags.Text.SplitByCRToList();
             if (NewTags.IsDifferentTo(_Column.Tags)) {
                 _Column.Tags.Clear();
                 _Column.Tags.AddRange(NewTags);
             }
 
 
-            System.Collections.Generic.List<string> NewRegex = txbRegex.Text.SplitByCRToList();
+            var NewRegex = txbRegex.Text.SplitByCRToList();
             if (NewRegex.IsDifferentTo(_Column.Regex)) {
                 _Column.Regex.Clear();
                 _Column.Regex.AddRange(NewRegex);
@@ -438,11 +438,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
 
-            int.TryParse(txbBildCodeConstHeight.Text, out int Res);
+            int.TryParse(txbBildCodeConstHeight.Text, out var Res);
             _Column.BildCode_ConstantHeight = Res;
 
 
-            int.TryParse(cbxBildTextVerhalten.Text, out int ImNF);
+            int.TryParse(cbxBildTextVerhalten.Text, out var ImNF);
             _Column.BildTextVerhalten = (enBildTextVerhalten)ImNF;
 
             _Column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
@@ -552,7 +552,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
         private void ButtonCheck() {
-            enDataFormat tmpFormat = (enDataFormat)int.Parse(cbxFormat.Text);
+            var tmpFormat = (enDataFormat)int.Parse(cbxFormat.Text);
 
 
 
@@ -615,7 +615,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
             if (_Column.LinkedDatabase() != null) {
-                foreach (ColumnItem ThisColumn in _Column.Database.Column) {
+                foreach (var ThisColumn in _Column.Database.Column) {
                     if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
                         cbxRowKeyInColumn.Item.Add(ThisColumn, false);
                     }
@@ -628,7 +628,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
 
 
-                foreach (ColumnItem ThisLinkedColumn in _Column.LinkedDatabase().Column) {
+                foreach (var ThisLinkedColumn in _Column.LinkedDatabase().Column) {
                     if (!ThisLinkedColumn.IsFirst() && ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) {
                         cbxTargetColumn.Item.Add(ThisLinkedColumn, false);
                     }

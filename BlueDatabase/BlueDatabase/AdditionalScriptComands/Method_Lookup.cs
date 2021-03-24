@@ -32,30 +32,30 @@ namespace BlueScript {
         public override string Syntax { get => "Lookup(Database, KeyValue, Column, NothingFoundMessage, FoundToMuchMessage);"; }
 
         public override string Description { get => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundMessage zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchMessage zurückgegeben."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "lookup" }; }
+        public override List<string> Comand(Script s) { return new() { "lookup" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.List; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String }; }
         public override bool EndlessArgs { get => false; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
-            Variable f = s.Variablen.GetSystem("filename");
+            var f = s.Variablen.GetSystem("filename");
             if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
 
-            foreach (Variable thisv in attvar) {
+            foreach (var thisv in attvar) {
                 if (thisv.Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
             }
 
-            string newf = f.ValueString.FilePath() + attvar[0].ValueString + ".mdb";
+            var newf = f.ValueString.FilePath() + attvar[0].ValueString + ".mdb";
 
-            BlueBasics.MultiUserFile.clsMultiUserFile db2 = BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(newf, true);
+            var db2 = BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(newf, true);
             BlueDatabase.Database db;
 
             if (db2 == null) {
@@ -65,11 +65,11 @@ namespace BlueScript {
                 db = (BlueDatabase.Database)db2;
             }
 
-            ColumnItem c = db.Column.Exists(attvar[2].ValueString);
+            var c = db.Column.Exists(attvar[2].ValueString);
 
             if (c == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar[2].ValueString); }
 
-            List<RowItem> r = RowCollection.MatchesTo(new FilterItem(db.Column[0], BlueDatabase.Enums.enFilterType.Istgleich_GroßKleinEgal, attvar[1].ValueString));
+            var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], BlueDatabase.Enums.enFilterType.Istgleich_GroßKleinEgal, attvar[1].ValueString));
 
             if (r == null || r.Count == 0) {
                 if (attvar.Count > 3) { return new strDoItFeedback(attvar[3].ValueString, string.Empty); }
@@ -82,7 +82,7 @@ namespace BlueScript {
             }
 
 
-            Variable v = RowItem.CellToVariable(c, r[0]);
+            var v = RowItem.CellToVariable(c, r[0]);
             if (v == null) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar[2].ValueString); }
 
             return new strDoItFeedback(v.ValueForReplace, string.Empty);

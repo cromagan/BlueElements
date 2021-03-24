@@ -86,8 +86,8 @@ namespace BlueControls.Controls {
 
 
         protected void MoveItemBetweenList(ListBox Source, ListBox Target, string Internal, bool doRemove) {
-            BasicListItem SourceItem = Source.Item[Internal];
-            BasicListItem TargetItem = Target.Item[Internal];
+            var SourceItem = Source.Item[Internal];
+            var TargetItem = Target.Item[Internal];
 
             if (SourceItem != null && TargetItem == null) {
                 SourceItem.CloneToNewCollection(Target.Item);
@@ -137,7 +137,7 @@ namespace BlueControls.Controls {
 
         internal void SuggestionsAdd(ItemCollectionList item) {
 
-            foreach (BasicListItem thisi in item) {
+            foreach (var thisi in item) {
 
 
                 if (Main.Item[thisi.Internal] == null && Suggest.Item[thisi.Internal] == null) {

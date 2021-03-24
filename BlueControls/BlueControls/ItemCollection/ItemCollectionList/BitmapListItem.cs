@@ -32,9 +32,9 @@ namespace BlueControls.ItemCollection {
 
         private Bitmap _Bitmap;
         private string _caption;
-        private List<string> _captiontmp = new List<string>();
+        private List<string> _captiontmp = new();
         private int _padding;
-        private readonly ListExt<QuickImage> _overlays = new ListExt<QuickImage>();
+        private readonly ListExt<QuickImage> _overlays = new();
 
         private string _ImageFilename;
 
@@ -169,10 +169,10 @@ namespace BlueControls.ItemCollection {
             if (DrawBorderAndBack) {
                 Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
             }
-            Rectangle DCoordinates = PositionModified;
+            var DCoordinates = PositionModified;
             DCoordinates.Inflate(-_padding, -_padding);
-            RectangleF ScaledImagePosition = new RectangleF();
-            RectangleF AreaOfWholeImage = new RectangleF();
+            var ScaledImagePosition = new RectangleF();
+            var AreaOfWholeImage = new RectangleF();
 
             GetImage();
 
@@ -184,7 +184,7 @@ namespace BlueControls.ItemCollection {
 
             if (_Bitmap != null) {
                 AreaOfWholeImage = new RectangleF(0, 0, _Bitmap.Width, _Bitmap.Height);
-                float scale = (float)Math.Min((DCoordinates.Width - _padding * 2) / (double)_Bitmap.Width,
+                var scale = (float)Math.Min((DCoordinates.Width - _padding * 2) / (double)_Bitmap.Width,
                                               (DCoordinates.Height - _padding * 2 - _captionlines * ConstMY) / (double)_Bitmap.Height);
 
                 ScaledImagePosition = new RectangleF((DCoordinates.Width - _Bitmap.Width * scale) / 2 + DCoordinates.Left,
@@ -194,7 +194,7 @@ namespace BlueControls.ItemCollection {
             }
 
 
-            Point trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
 
             ScaledImagePosition = new RectangleF(ScaledImagePosition.Left - trp.X, ScaledImagePosition.Top - trp.Y, ScaledImagePosition.Width, ScaledImagePosition.Height);
 
@@ -202,22 +202,22 @@ namespace BlueControls.ItemCollection {
             GR.TranslateTransform(trp.X, trp.Y);
             if (_Bitmap != null) { GR.DrawImage(_Bitmap, ScaledImagePosition, AreaOfWholeImage, GraphicsUnit.Pixel); }
 
-            foreach (QuickImage thisQI in Overlays) {
+            foreach (var thisQI in Overlays) {
                 GR.DrawImage(thisQI.BMP, ScaledImagePosition.Left + 8, ScaledImagePosition.Top + 8);
             }
 
             if (!string.IsNullOrEmpty(_caption)) {
 
 
-                int c = _captiontmp.Count;
+                var c = _captiontmp.Count;
 
-                int Ausgl = (c - _captionlines) * ConstMY / 2;
+                var Ausgl = (c - _captionlines) * ConstMY / 2;
 
 
-                foreach (string ThisCap in _captiontmp) {
+                foreach (var ThisCap in _captiontmp) {
                     c--;
-                    Size s = Skin.FormatedText_NeededSize(ThisCap, null, Skin.GetBlueFont(enDesign.Item_Listbox, vState), 16);
-                    Rectangle r = new Rectangle((int)(DCoordinates.Left + (DCoordinates.Width - s.Width) / 2.0), DCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
+                    var s = Skin.FormatedText_NeededSize(ThisCap, null, Skin.GetBlueFont(enDesign.Item_Listbox, vState), 16);
+                    var r = new Rectangle((int)(DCoordinates.Left + (DCoordinates.Width - s.Width) / 2.0), DCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
 
                     r.X -= trp.X;
                     r.Y -= trp.Y;
@@ -258,7 +258,7 @@ namespace BlueControls.ItemCollection {
 
                 if (FileExists(_ImageFilename)) {
                     if (!string.IsNullOrEmpty(_EncryptionKey)) {
-                        byte[] b = modConverter.FileToByte(_ImageFilename);
+                        var b = modConverter.FileToByte(_ImageFilename);
                         b = modAllgemein.SimpleCrypt(b, _EncryptionKey, -1);
                         _Bitmap = modConverter.ByteToBitmap(b);
                     } else {

@@ -29,13 +29,13 @@ namespace BlueScript {
         public override string Syntax { get => "End;"; }
 
         public override string Description { get => "Beendet das Skript ohne Fehler."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "end" }; }
+        public override List<string> Comand(Script s) { return new() { "end" }; }
         public override string StartSequence { get => ""; }
         public override string EndSequence { get => ";"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { }; }
+        public override List<enVariableDataType> Args { get => new() { }; }
         public override bool EndlessArgs { get => false; }
 
 

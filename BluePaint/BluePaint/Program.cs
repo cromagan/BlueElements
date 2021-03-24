@@ -27,7 +27,7 @@ namespace BluePaint {
         /// </summary>
         [STAThread]
         private static void Main() {
-            CultureInfo culture = new System.Globalization.CultureInfo("de-DE");
+            var culture = new System.Globalization.CultureInfo("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
             System.Windows.Forms.Application.EnableVisualStyles();

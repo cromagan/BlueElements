@@ -115,8 +115,8 @@ namespace BlueControls.ItemCollection {
 
 
             if (_tmpBMP != null) {
-                float scale = (float)Math.Min(PositionModified.Width / (double)_tmpBMP.Width, PositionModified.Height / (double)_tmpBMP.Height);
-                RectangleF r2 = new RectangleF((PositionModified.Width - _tmpBMP.Width * scale) / 2 + PositionModified.Left, (PositionModified.Height - _tmpBMP.Height * scale) / 2 + PositionModified.Top, _tmpBMP.Width * scale, _tmpBMP.Height * scale);
+                var scale = (float)Math.Min(PositionModified.Width / (double)_tmpBMP.Width, PositionModified.Height / (double)_tmpBMP.Height);
+                var r2 = new RectangleF((PositionModified.Width - _tmpBMP.Width * scale) / 2 + PositionModified.Left, (PositionModified.Height - _tmpBMP.Height * scale) / 2 + PositionModified.Top, _tmpBMP.Width * scale, _tmpBMP.Height * scale);
 
                 GR.DrawImage(_tmpBMP, r2, new RectangleF(0, 0, _tmpBMP.Width, _tmpBMP.Height), GraphicsUnit.Pixel);
             }
@@ -138,9 +138,9 @@ namespace BlueControls.ItemCollection {
             }
 
 
-            CreativePad _pad = new CreativePad(new ItemCollectionPad(_LayoutID, Row.Database, Row.Key));
+            var _pad = new CreativePad(new ItemCollectionPad(_LayoutID, Row.Database, Row.Key));
 
-            RectangleM mb = _pad.Item.MaxBounds(null);
+            var mb = _pad.Item.MaxBounds(null);
 
             if (_tmpBMP != null) {
                 if (_tmpBMP.Width != mb.Width || _tmpBMP.Height != mb.Height) {
@@ -152,9 +152,9 @@ namespace BlueControls.ItemCollection {
             if (_tmpBMP == null) { _tmpBMP = new Bitmap((int)mb.Width, (int)mb.Height); }
 
 
-            decimal zoomv = _pad.ZoomFitValue(mb, false, _tmpBMP.Size);
-            Point centerpos = _pad.CenterPos(mb, false, _tmpBMP.Size, zoomv);
-            PointF slidervalues = _pad.SliderValues(mb, zoomv, centerpos);
+            var zoomv = _pad.ZoomFitValue(mb, false, _tmpBMP.Size);
+            var centerpos = _pad.CenterPos(mb, false, _tmpBMP.Size, zoomv);
+            var slidervalues = _pad.SliderValues(mb, zoomv, centerpos);
 
             _pad.ShowInPrintMode = true;
             _pad.Unselect();

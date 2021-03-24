@@ -157,7 +157,7 @@ namespace BlueControls.ItemCollection {
 
 
         public override string ToString() {
-            string t = base.ToString();
+            var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             return t + "Size=" + Größe_Distanzhalter.ToString(Constants.Format_Float10).ToNonCritical() + "}";
         }
@@ -184,10 +184,10 @@ namespace BlueControls.ItemCollection {
 
 
         public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new List<FlexiControl>();
+            var l = new List<FlexiControl>();
 
 
-            ItemCollectionList Size = new ItemCollectionList
+            var Size = new ItemCollectionList
             {
                 { "Klein (1,25 mm)", (mm125x * 1m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern },
                 { "Normal (2,5 mm)", (mm125x * 2m).ToString(Constants.Format_Float4), enImageCode.GrößeÄndern },

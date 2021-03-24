@@ -36,13 +36,13 @@ namespace BlueBasics {
         //private static string LastCheck = string.Empty;
         //private static bool LastErg = false;
 
-        private static readonly List<string> WriteAccess = new List<string>();
-        private static readonly List<string> NoWriteAccess = new List<string>();
+        private static readonly List<string> WriteAccess = new();
+        private static readonly List<string> NoWriteAccess = new();
 
 
         private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure) {
-            int tries = 0;
-            DateTime startTime = DateTime.Now;
+            var tries = 0;
+            var startTime = DateTime.Now;
 
             while (!processMethod(file1, file2)) {
                 tries++;
@@ -75,7 +75,7 @@ namespace BlueBasics {
         /// </summary>
         /// <returns>True, wenn mindestens eine Datei gelöscht wurde.</returns>
         public static bool DeleteFile(List<string> filelist) {
-            for (int Z = 0; Z < filelist.Count; Z++) {
+            for (var Z = 0; Z < filelist.Count; Z++) {
                 if (!FileExists(filelist[Z])) { filelist[Z] = string.Empty; }
             }
 
@@ -83,8 +83,8 @@ namespace BlueBasics {
 
             if (filelist.Count == 0) { return false; }
 
-            bool del = false;
-            foreach (string ThisFile in filelist) {
+            var del = false;
+            foreach (var ThisFile in filelist) {
                 if (DeleteFile(ThisFile, false)) { del = true; }
             }
 
@@ -213,7 +213,7 @@ namespace BlueBasics {
 
 
             if (string.IsNullOrEmpty(directory)) { return false; }
-            string DirUpper = directory.ToUpper();
+            var DirUpper = directory.ToUpper();
 
             if (WriteAccess.Contains(DirUpper)) { return true; }
             if (NoWriteAccess.Contains(DirUpper)) { return false; }
@@ -222,7 +222,7 @@ namespace BlueBasics {
 
 
             try {
-                using (FileStream fs = File.Create(Path.Combine(directory, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
+                using (var fs = File.Create(Path.Combine(directory, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
                 WriteAccess.AddIfNotExists(DirUpper); // Multitasking
                 return true;
             } catch {
@@ -241,7 +241,7 @@ namespace BlueBasics {
         public static bool CanWrite(string filename, double tryItForSeconds) {
             if (!CanWriteInDirectory(filename.FilePath())) { return false; }
 
-            DateTime s = DateTime.Now;
+            var s = DateTime.Now;
             do {
                 if (CanWrite(filename)) { return true; }
                 if (tryItForSeconds < _canWrite_tryintervall) { return false; }
@@ -264,12 +264,12 @@ namespace BlueBasics {
 
             if (_canWrite_LastFile != file.ToUpper()) {
 
-                DateTime StartTime = DateTime.Now;
+                var StartTime = DateTime.Now;
 
                 if (FileExists(file)) {
                     try {
                         // Versuch, Datei EXKLUSIV zu öffnen
-                        using (FileStream obFi = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                        using (var obFi = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                             obFi.Close();
                         }
 
@@ -296,15 +296,15 @@ namespace BlueBasics {
 
 
         public static string TempFile(string NewPath, string Filename) {
-            string dn = Filename.FileNameWithoutSuffix();
-            string ds = Filename.FileSuffix();
+            var dn = Filename.FileNameWithoutSuffix();
+            var ds = Filename.FileSuffix();
             return TempFile(NewPath, dn, ds);
         }
 
         public static string TempFile(string FullName) {
-            string dp = FullName.FilePath();
-            string dn = FullName.FileNameWithoutSuffix();
-            string ds = FullName.FileSuffix();
+            var dp = FullName.FilePath();
+            var dn = FullName.FileNameWithoutSuffix();
+            var ds = FullName.FileSuffix();
             return TempFile(dp, dn, ds);
         }
 
@@ -318,7 +318,7 @@ namespace BlueBasics {
             if (string.IsNullOrEmpty(Suffix)) { Suffix = "tmp"; }
             if (string.IsNullOrEmpty(Wunschname)) { Wunschname = UserName() + DateTime.Now.ToString(Constants.Format_Date6); }
 
-            int z = -1;
+            var z = -1;
             Pfad = Pfad.TrimEnd("\\") + "\\";
 
             if (!PathExists(Pfad)) { Directory.CreateDirectory(Pfad); }
@@ -344,9 +344,9 @@ namespace BlueBasics {
 
             if (!FileExists(filename)) { return string.Empty; }
 
-            using MD5 md5 = MD5.Create();
-            using FileStream stream = File.OpenRead(filename);
-            byte[] hash = md5.ComputeHash(stream);
+            using var md5 = MD5.Create();
+            using var stream = File.OpenRead(filename);
+            var hash = md5.ComputeHash(stream);
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
 
@@ -393,9 +393,9 @@ namespace BlueBasics {
 
             if (name.Length < 100) { return name; }
 
-            string nn = "";
+            var nn = "";
 
-            for (int z = 0; z <= name.Length - 21; z++) {
+            for (var z = 0; z <= name.Length - 21; z++) {
                 nn += name.Substring(z, 1);
             }
             nn += name.Substring(name.Length - 20);
@@ -403,26 +403,26 @@ namespace BlueBasics {
 
             return nn;
         }
+     
 
-
-        public static void SaveToDisk(string DateiName, string Text2Save, bool ExecuteAfter) {
+        public static void SaveToDisk(string DateiName, string Text2Save, bool ExecuteAfter, System.Text.Encoding code) {
 
             try {
-                switch (DateiName.FileType()) {
-                    case enFileFormat.HTML:
-                    case enFileFormat.XMLFile:
-                        File.WriteAllText(DateiName, Text2Save, Encoding.UTF8);
-                        break;
+                //switch (DateiName.FileType()) {
+                //    case enFileFormat.HTML:
+                //    case enFileFormat.XMLFile:
+                //        File.WriteAllText(DateiName, Text2Save, Encoding.UTF8);
+                //        break;
 
-                    case enFileFormat.ProgrammingCode:
-                        File.WriteAllText(DateiName, Text2Save, Encoding.Unicode);
-                        break;
+                //    case enFileFormat.ProgrammingCode:
+                //        File.WriteAllText(DateiName, Text2Save, Encoding.Unicode);
+                //        break;
 
-                    default:
-                        File.WriteAllText(DateiName, Text2Save, Encoding.Default);
-                        break;
-                }
-
+                //    default:
+                //        File.WriteAllText(DateiName, Text2Save, Encoding.Defxault);
+                //        break;
+                //}
+                File.WriteAllText(DateiName, Text2Save, code);
                 if (ExecuteAfter) { ExecuteFile(DateiName); }
             } catch (Exception ex) {
                 Develop.DebugPrint(ex);
@@ -432,22 +432,32 @@ namespace BlueBasics {
 
         }
 
-        public static string LoadFromDisk(string DateiName) {
+        //public static string LoadFromDisk(string DateiName) {
 
 
-            switch (DateiName.FileSuffix()) {
-                case "XML":
+        //    switch (DateiName.FileSuffix()) {
+        //        case "XML":
+        //            return File.ReadAllText(DateiName, Encoding.UTF8);
+        //        default:
+        //            return File.ReadAllText(DateiName, Encoding.Defxault);
+        //    }
+
+
+        //}
+
+
+        public static string LoadFromDiskUTF8(string DateiName) {
                     return File.ReadAllText(DateiName, Encoding.UTF8);
-                default:
-                    return File.ReadAllText(DateiName, Encoding.Default);
-            }
-
-
         }
+
+        public static string LoadFromDiskLatin(string DateiName) {
+            return File.ReadAllText(DateiName, Encoding.Latin1);
+        }
+
 
         public static string GetFileInfo(string filename, bool mustDo) {
             try {
-                FileInfo f = new FileInfo(filename);
+                var f = new FileInfo(filename);
                 return f.LastWriteTimeUtc.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
             } catch {
                 if (!mustDo) { return string.Empty; }

@@ -32,9 +32,9 @@ namespace BlueBasics {
 
             if (R.Width < 2 || R.Height < 2) { return null; }
 
-            Bitmap ClipedArea = new Bitmap(R.Width, R.Height);
+            var ClipedArea = new Bitmap(R.Width, R.Height);
 
-            using (Graphics GR = Graphics.FromImage(ClipedArea)) {
+            using (var GR = Graphics.FromImage(ClipedArea)) {
                 GR.Clear(Color.Black);
                 GR.DrawImage(SourceBitmap, 0, 0, R, GraphicsUnit.Pixel);
             }
@@ -45,9 +45,9 @@ namespace BlueBasics {
         }
 
         public static void AllePixelZuSchwarz(this Bitmap _Pic, double nearWhiteSchwelle) {
-            for (int x = 0; x < _Pic.Width; x++) {
-                for (int y = 0; y < _Pic.Height; y++) {
-                    Color ca = _Pic.GetPixel(x, y);
+            for (var x = 0; x < _Pic.Width; x++) {
+                for (var y = 0; y < _Pic.Height; y++) {
+                    var ca = _Pic.GetPixel(x, y);
                     if (!ca.IsNearWhite(nearWhiteSchwelle)) {
                         _Pic.SetPixel(x, y, Color.FromArgb(ca.A, 0, 0, 0));
                     }
@@ -56,9 +56,9 @@ namespace BlueBasics {
         }
 
         public static void AllePixelZuWeiß(this Bitmap _Pic, double nearBlackSchwelle) {
-            for (int x = 0; x < _Pic.Width; x++) {
-                for (int y = 0; y < _Pic.Height; y++) {
-                    Color ca = _Pic.GetPixel(x, y);
+            for (var x = 0; x < _Pic.Width; x++) {
+                for (var y = 0; y < _Pic.Height; y++) {
+                    var ca = _Pic.GetPixel(x, y);
                     if (!ca.IsNearBlack(nearBlackSchwelle)) {
                         _Pic.SetPixel(x, y, Color.FromArgb(ca.A, 255, 255, 255));
                     }
@@ -73,24 +73,24 @@ namespace BlueBasics {
             if (pic == null) { return; }
 
 
-            for (int x = 0; x < pic.Width - 1; x++) {
-                for (int y = 0; y < pic.Height - 1; y++) {
+            for (var x = 0; x < pic.Width - 1; x++) {
+                for (var y = 0; y < pic.Height - 1; y++) {
                     if (!IsWhite(x, y)) {
-                        for (int wi = staerke; wi > 0; wi--) {
+                        for (var wi = staerke; wi > 0; wi--) {
 
-                            int ma1 = (int)Math.Floor((float)wi / 2);
-                            int ma2 = wi - ma1;
+                            var ma1 = (int)Math.Floor((float)wi / 2);
+                            var ma2 = wi - ma1;
 
                             // X                        
                             if (IsWhite(x - ma1 - 1, y) && IsWhite(x + ma2 + 1, y)) {
-                                bool allblack = true;
+                                var allblack = true;
 
-                                for (int ch = -ma1; ch <= ma2; ch++) {
+                                for (var ch = -ma1; ch <= ma2; ch++) {
                                     if (IsWhite(x + ch, y)) { allblack = false; break; }
                                 }
 
                                 if (allblack) {
-                                    for (int ch = -ma1; ch <= ma2; ch++) {
+                                    for (var ch = -ma1; ch <= ma2; ch++) {
                                         if (ch != 0) { pic.SetPixel(x + ch, y, Color.White); }
                                     }
                                 }
@@ -98,14 +98,14 @@ namespace BlueBasics {
 
                             // Y                        
                             if (IsWhite(x, y - ma1 - 1) && IsWhite(x, y + ma2 + 1)) {
-                                bool allblack = true;
+                                var allblack = true;
 
-                                for (int ch = -ma1; ch <= ma2; ch++) {
+                                for (var ch = -ma1; ch <= ma2; ch++) {
                                     if (IsWhite(x, y + ch)) { allblack = false; break; }
                                 }
 
                                 if (allblack) {
-                                    for (int ch = -ma1; ch <= ma2; ch++) {
+                                    for (var ch = -ma1; ch <= ma2; ch++) {
                                         if (ch != 0) { pic.SetPixel(x, y + ch, Color.White); }
                                     }
                                 }
@@ -130,8 +130,8 @@ namespace BlueBasics {
         public static Bitmap Image_Clone(this Bitmap SourceBMP) {
             if (SourceBMP == null) { return null; }
 
-            Bitmap bmp = new Bitmap(SourceBMP.Width, SourceBMP.Height, PixelFormat.Format32bppArgb);
-            using (Graphics g = Graphics.FromImage(bmp)) {
+            var bmp = new Bitmap(SourceBMP.Width, SourceBMP.Height, PixelFormat.Format32bppArgb);
+            using (var g = Graphics.FromImage(bmp)) {
                 g.DrawImage(SourceBMP, 0, 0, SourceBMP.Width, SourceBMP.Height); // Unerklärlich, orgiImage.Width, orgiImage.Height muss stehen bleiben!
             }
             return bmp;
@@ -139,13 +139,13 @@ namespace BlueBasics {
 
         public static Bitmap Invert(this Bitmap source) {
             //create a blank bitmap the same size as original
-            Bitmap newBitmap = new Bitmap(source.Width, source.Height);
+            var newBitmap = new Bitmap(source.Width, source.Height);
 
             //get a graphics object from the new image
-            Graphics g = Graphics.FromImage(newBitmap);
+            var g = Graphics.FromImage(newBitmap);
 
             // create the negative color matrix
-            ColorMatrix colorMatrix = new ColorMatrix(new[]
+            var colorMatrix = new ColorMatrix(new[]
             {
                 new float[] {-1, 0, 0, 0, 0},
                 new float[] {0, -1, 0, 0, 0},
@@ -155,7 +155,7 @@ namespace BlueBasics {
             });
 
             // create some image attributes
-            ImageAttributes attributes = new ImageAttributes();
+            var attributes = new ImageAttributes();
 
             attributes.SetColorMatrix(colorMatrix);
 
@@ -188,11 +188,11 @@ namespace BlueBasics {
 
             modAllgemein.CollectGarbage();
 
-            int w = Math.Max(_Pic.Width - Left + Right, 1);
-            int h = Math.Max(_Pic.Height - Top + Bottom, 1);
+            var w = Math.Max(_Pic.Width - Left + Right, 1);
+            var h = Math.Max(_Pic.Height - Top + Bottom, 1);
 
-            Bitmap _BMP2 = new Bitmap(w, h);
-            using (Graphics GR = Graphics.FromImage(_BMP2)) {
+            var _BMP2 = new Bitmap(w, h);
+            using (var GR = Graphics.FromImage(_BMP2)) {
                 GR.DrawImage(_Pic, -Left, -Top, _Pic.Width, _Pic.Height); // Width und Height MUSS angegeben werden. Manche Bilder (Falsches Format?) schlagen fehl, wenn es fehlt.
             }
 
@@ -204,17 +204,17 @@ namespace BlueBasics {
 
 
         public static Bitmap AutoCrop(this Bitmap _Pic, double MinBrightness) {
-            System.Windows.Forms.Padding pa = _Pic.GetAutoValuesForCrop(MinBrightness);
+            var pa = _Pic.GetAutoValuesForCrop(MinBrightness);
             return Crop(_Pic, pa.Left, pa.Right, pa.Top, pa.Bottom);
         }
 
         public static System.Windows.Forms.Padding GetAutoValuesForCrop(this Bitmap _Pic, double MinBrightness) {
-            System.Windows.Forms.Padding pa = new System.Windows.Forms.Padding(0, 0, 0, 0);
+            var pa = new System.Windows.Forms.Padding(0, 0, 0, 0);
             if (_Pic == null) { return pa; }
 
-            int x = 0;
-            int Y = 0;
-            bool ExitNow = false;
+            var x = 0;
+            var Y = 0;
+            var ExitNow = false;
 
             do {
                 for (Y = 0; Y < _Pic.Height; Y++) {
@@ -290,7 +290,7 @@ namespace BlueBasics {
         public static Bitmap AdjustGamma(this Bitmap image, float gamma) {
             //http://csharphelper.com/blog/2016/12/provide-gamma-correction-for-an-image-in-c/
             // Set the ImageAttributes object's gamma value.
-            ImageAttributes attributes = new ImageAttributes();
+            var attributes = new ImageAttributes();
             attributes.SetGamma(Math.Max(gamma, 0.001f));
 
             // Draw the image onto the new bitmap
@@ -301,12 +301,12 @@ namespace BlueBasics {
         new Point(image.Width, 0),
         new Point(0, image.Height),
     };
-            Rectangle rect =
+            var rect =
                 new Rectangle(0, 0, image.Width, image.Height);
 
             // Make the result bitmap.
-            Bitmap bm = new Bitmap(image.Width, image.Height);
-            using (Graphics gr = Graphics.FromImage(bm)) {
+            var bm = new Bitmap(image.Width, image.Height);
+            using (var gr = Graphics.FromImage(bm)) {
                 gr.DrawImage(image, points, rect,
                     GraphicsUnit.Pixel, attributes);
             }
@@ -319,8 +319,8 @@ namespace BlueBasics {
         public static Bitmap AdjustBrightness(this Bitmap image, float brightness) {
             // http://csharphelper.com/blog/2014/10/use-an-imageattributes-object-to-adjust-an-images-brightness-in-c/
             // Make the ColorMatrix.
-            float b = Math.Max(brightness, 0.001f);
-            ColorMatrix cm = new ColorMatrix(new float[][]
+            var b = Math.Max(brightness, 0.001f);
+            var cm = new ColorMatrix(new float[][]
                 {
             new float[] {b, 0, 0, 0, 0},
             new float[] {0, b, 0, 0, 0},
@@ -328,7 +328,7 @@ namespace BlueBasics {
             new float[] {0, 0, 0, 1, 0},
             new float[] {0, 0, 0, 0, 1},
                 });
-            ImageAttributes attributes = new ImageAttributes();
+            var attributes = new ImageAttributes();
             attributes.SetColorMatrix(cm);
 
             // Draw the image onto the new bitmap while applying
@@ -339,11 +339,11 @@ namespace BlueBasics {
         new Point(image.Width, 0),
         new Point(0, image.Height),
     };
-            Rectangle rect = new Rectangle(0, 0, image.Width, image.Height);
+            var rect = new Rectangle(0, 0, image.Width, image.Height);
 
             // Make the result bitmap.
-            Bitmap bm = new Bitmap(image.Width, image.Height);
-            using (Graphics gr = Graphics.FromImage(bm)) {
+            var bm = new Bitmap(image.Width, image.Height);
+            using (var gr = Graphics.FromImage(bm)) {
                 gr.DrawImage(image, points, rect,
                     GraphicsUnit.Pixel, attributes);
             }
@@ -355,34 +355,34 @@ namespace BlueBasics {
         public static Bitmap AdjustContrast(this Bitmap Image, float Value) {
             Value = (100.0f + Value) / 100.0f;
             Value *= Value;
-            Bitmap NewBitmap = Image_Clone(Image);
-            BitmapData data = NewBitmap.LockBits(new Rectangle(0, 0, NewBitmap.Width, NewBitmap.Height), ImageLockMode.ReadWrite, NewBitmap.PixelFormat);
-            int Height = NewBitmap.Height;
-            int Width = NewBitmap.Width;
+            var NewBitmap = Image_Clone(Image);
+            var data = NewBitmap.LockBits(new Rectangle(0, 0, NewBitmap.Width, NewBitmap.Height), ImageLockMode.ReadWrite, NewBitmap.PixelFormat);
+            var Height = NewBitmap.Height;
+            var Width = NewBitmap.Width;
 
             unsafe {
-                for (int y = 0; y < Height; ++y) {
-                    byte* row = (byte*)data.Scan0 + (y * data.Stride);
-                    int columnOffset = 0;
-                    for (int x = 0; x < Width; ++x) {
-                        byte B = row[columnOffset];
-                        byte G = row[columnOffset + 1];
-                        byte R = row[columnOffset + 2];
+                for (var y = 0; y < Height; ++y) {
+                    var row = (byte*)data.Scan0 + (y * data.Stride);
+                    var columnOffset = 0;
+                    for (var x = 0; x < Width; ++x) {
+                        var B = row[columnOffset];
+                        var G = row[columnOffset + 1];
+                        var R = row[columnOffset + 2];
 
-                        float Red = R / 255.0f;
-                        float Green = G / 255.0f;
-                        float Blue = B / 255.0f;
+                        var Red = R / 255.0f;
+                        var Green = G / 255.0f;
+                        var Blue = B / 255.0f;
                         Red = (((Red - 0.5f) * Value) + 0.5f) * 255.0f;
                         Green = (((Green - 0.5f) * Value) + 0.5f) * 255.0f;
                         Blue = (((Blue - 0.5f) * Value) + 0.5f) * 255.0f;
 
-                        int iR = (int)Red;
+                        var iR = (int)Red;
                         iR = iR > 255 ? 255 : iR;
                         iR = iR < 0 ? 0 : iR;
-                        int iG = (int)Green;
+                        var iG = (int)Green;
                         iG = iG > 255 ? 255 : iG;
                         iG = iG < 0 ? 0 : iG;
-                        int iB = (int)Blue;
+                        var iB = (int)Blue;
                         iB = iB > 255 ? 255 : iB;
                         iB = iB < 0 ? 0 : iB;
 
@@ -404,7 +404,7 @@ namespace BlueBasics {
             // https://stackoverflow.com/questions/17208254/how-to-change-pixel-color-of-an-image-in-c-net
             const int pixelSize = 4; // 32 bits per pixel
 
-            Bitmap target = new Bitmap(source.Width, source.Height, PixelFormat.Format32bppArgb);
+            var target = new Bitmap(source.Width, source.Height, PixelFormat.Format32bppArgb);
             BitmapData sourceData = null, targetData = null;
 
             try {
@@ -412,15 +412,15 @@ namespace BlueBasics {
 
                 targetData = target.LockBits(new Rectangle(0, 0, target.Width, target.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
-                for (int y = 0; y < source.Height; ++y) {
-                    byte* sourceRow = (byte*)sourceData.Scan0 + (y * sourceData.Stride);
-                    byte* targetRow = (byte*)targetData.Scan0 + (y * targetData.Stride);
+                for (var y = 0; y < source.Height; ++y) {
+                    var sourceRow = (byte*)sourceData.Scan0 + (y * sourceData.Stride);
+                    var targetRow = (byte*)targetData.Scan0 + (y * targetData.Stride);
 
-                    for (int x = 0; x < source.Width; ++x) {
-                        byte b = sourceRow[x * pixelSize + 0];
-                        byte g = sourceRow[x * pixelSize + 1];
-                        byte r = sourceRow[x * pixelSize + 2];
-                        byte a = sourceRow[x * pixelSize + 3];
+                    for (var x = 0; x < source.Width; ++x) {
+                        var b = sourceRow[x * pixelSize + 0];
+                        var g = sourceRow[x * pixelSize + 1];
+                        var r = sourceRow[x * pixelSize + 2];
+                        var a = sourceRow[x * pixelSize + 3];
 
                         if (toReplace.R == r && toReplace.G == g && toReplace.B == b && toReplace.A == a) {
                             r = replacement.R;
@@ -445,10 +445,10 @@ namespace BlueBasics {
 
 
         public static Bitmap Grayscale(this Bitmap original) {
-            Bitmap newBitmap = new Bitmap(original.Width, original.Height);
-            Graphics g = Graphics.FromImage(newBitmap);
+            var newBitmap = new Bitmap(original.Width, original.Height);
+            var g = Graphics.FromImage(newBitmap);
 
-            ColorMatrix colorMatrix = new ColorMatrix(
+            var colorMatrix = new ColorMatrix(
                new[]
                {
                    new[] {.3f, .3f, .3f, 0, 0},
@@ -458,7 +458,7 @@ namespace BlueBasics {
                    new float[] {0, 0, 0, 0, 1}
                });
 
-            ImageAttributes attributes = new ImageAttributes();
+            var attributes = new ImageAttributes();
             attributes.SetColorMatrix(colorMatrix);
 
             g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height), 0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
@@ -487,10 +487,10 @@ namespace BlueBasics {
             if (Gamma == 0) { Gamma = Convert.ToSingle(Gamma + 1.0E-45); }
 
             // Zur korrekten Darstellung:
-            float Diff = Brightness / 2 - Contrast / 2;
+            var Diff = Brightness / 2 - Contrast / 2;
 
             // ColorMatrix erstellen
-            ColorMatrix Matrix = new ColorMatrix(new[]
+            var Matrix = new ColorMatrix(new[]
             {
                 new[] {1 + Contrast, 0, 0, 0, 0},
                 new[] {0, 1 + Contrast, 0, 0, 0},
@@ -501,10 +501,10 @@ namespace BlueBasics {
 
 
             // Neue Bitmap erstellen
-            Bitmap NewBmp = new Bitmap(InBitmap.Width, InBitmap.Height, PixelFormat.Format24bppRgb);
+            var NewBmp = new Bitmap(InBitmap.Width, InBitmap.Height, PixelFormat.Format24bppRgb);
 
             // ImageAttribute-Objekt erstellen
-            using (ImageAttributes ImageAttr = new ImageAttributes()) {
+            using (var ImageAttr = new ImageAttributes()) {
 
                 // ColorMatrix für das ImageAttribute-Objekt setzen
                 ImageAttr.SetColorMatrix(Matrix);
@@ -513,7 +513,7 @@ namespace BlueBasics {
                 ImageAttr.SetGamma(Gamma);
 
                 // Graphics-Objekt von NewBmp erstellen
-                using (Graphics NewBmpGra = Graphics.FromImage(NewBmp)) {
+                using (var NewBmpGra = Graphics.FromImage(NewBmp)) {
 
                     // InBitmap in das Graphics-Objekt zeichnen
                     NewBmpGra.DrawImage(InBitmap, new Rectangle(0, 0, InBitmap.Width, InBitmap.Height), 0, 0, InBitmap.Width, InBitmap.Height, GraphicsUnit.Pixel, ImageAttr);
@@ -529,13 +529,13 @@ namespace BlueBasics {
 
         public static void FillCircle(this Bitmap BMP, Color C, int X, int Y, int R) {
 
-            for (int adx = -R; adx <= R; adx++) {
-                for (int ady = -R; ady <= R; ady++) {
+            for (var adx = -R; adx <= R; adx++) {
+                for (var ady = -R; ady <= R; ady++) {
 
-                    double d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady)) - 0.5;
+                    var d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady)) - 0.5;
 
-                    int px = X + adx;
-                    int py = Y + ady;
+                    var px = X + adx;
+                    var py = Y + ady;
                     if (px >= 0 && py >= 0 && px < BMP.Width && py < BMP.Height) {
                         if (d <= R) { BMP.SetPixel(px, py, C); }
                     }
@@ -641,17 +641,17 @@ namespace BlueBasics {
 
 
         public static Bitmap MedianFilter(this Bitmap sourceBitmap, int matrixSize) {
-            BitmapData sourceData =
+            var sourceData =
                        sourceBitmap.LockBits(new Rectangle(0, 0,
                        sourceBitmap.Width, sourceBitmap.Height),
                        ImageLockMode.ReadOnly,
                        PixelFormat.Format32bppArgb);
 
 
-            byte[] pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
+            var pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
 
 
-            byte[] resultBuffer = new byte[sourceData.Stride * sourceData.Height];
+            var resultBuffer = new byte[sourceData.Stride * sourceData.Height];
 
 
             Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
@@ -660,27 +660,27 @@ namespace BlueBasics {
             sourceBitmap.UnlockBits(sourceData);
 
 
-            int filterOffset = (matrixSize - 1) / 2;
-            int calcOffset = 0;
+            var filterOffset = (matrixSize - 1) / 2;
+            var calcOffset = 0;
 
 
-            int byteOffset = 0;
+            var byteOffset = 0;
 
 
-            List<int> neighbourPixels = new List<int>();
+            var neighbourPixels = new List<int>();
             byte[] middlePixel;
 
 
-            for (int offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++) {
-                for (int offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++) {
+            for (var offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++) {
+                for (var offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++) {
                     byteOffset = offsetY * sourceData.Stride + offsetX * 4;
 
 
                     neighbourPixels.Clear();
 
 
-                    for (int filterY = -filterOffset; filterY <= filterOffset; filterY++) {
-                        for (int filterX = -filterOffset; filterX <= filterOffset; filterX++) {
+                    for (var filterY = -filterOffset; filterY <= filterOffset; filterY++) {
+                        for (var filterX = -filterOffset; filterX <= filterOffset; filterX++) {
 
 
                             calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
@@ -703,10 +703,10 @@ namespace BlueBasics {
             }
 
 
-            Bitmap resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
+            var resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
 
 
-            BitmapData resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            var resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
 
             Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
@@ -721,35 +721,35 @@ namespace BlueBasics {
 
 
         private static Bitmap ConvolutionFilter(this Bitmap sourceBitmap, double[,] filterMatrix, double factor = 1, int bias = 0) {
-            BitmapData sourceData = sourceBitmap.LockBits(new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            var sourceData = sourceBitmap.LockBits(new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
 
-            byte[] pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
-            byte[] resultBuffer = new byte[sourceData.Stride * sourceData.Height];
+            var pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
+            var resultBuffer = new byte[sourceData.Stride * sourceData.Height];
 
 
             Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
             sourceBitmap.UnlockBits(sourceData);
 
 
-            double blue = 0.0;
-            double green = 0.0;
-            double red = 0.0;
+            var blue = 0.0;
+            var green = 0.0;
+            var red = 0.0;
 
 
-            int filterWidth = filterMatrix.GetLength(1);
+            var filterWidth = filterMatrix.GetLength(1);
             //var filterHeight = filterMatrix.GetLength(0);
 
 
-            int filterOffset = (filterWidth - 1) / 2;
-            int calcOffset = 0;
+            var filterOffset = (filterWidth - 1) / 2;
+            var calcOffset = 0;
 
 
-            int byteOffset = 0;
+            var byteOffset = 0;
 
 
-            for (int offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++) {
-                for (int offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++) {
+            for (var offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++) {
+                for (var offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++) {
                     blue = 0;
                     green = 0;
                     red = 0;
@@ -758,8 +758,8 @@ namespace BlueBasics {
                     byteOffset = offsetY * sourceData.Stride + offsetX * 4;
 
 
-                    for (int filterY = -filterOffset; filterY <= filterOffset; filterY++) {
-                        for (int filterX = -filterOffset; filterX <= filterOffset; filterX++) {
+                    for (var filterY = -filterOffset; filterY <= filterOffset; filterY++) {
+                        for (var filterX = -filterOffset; filterX <= filterOffset; filterX++) {
 
 
                             calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
@@ -797,10 +797,10 @@ namespace BlueBasics {
             }
 
 
-            Bitmap resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
+            var resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
 
 
-            BitmapData resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            var resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
 
             Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);

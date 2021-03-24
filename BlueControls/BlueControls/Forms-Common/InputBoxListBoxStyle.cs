@@ -41,7 +41,7 @@ namespace BlueControls.Forms {
 
 
 
-            ItemCollectionList itemsClone = (ItemCollectionList)ItemsOriginal.Clone();
+            var itemsClone = (ItemCollectionList)ItemsOriginal.Clone();
             txbText.Item.CheckBehavior = itemsClone.CheckBehavior;
             txbText.Item.AddRange(itemsClone);
 
@@ -65,13 +65,13 @@ namespace BlueControls.Forms {
             }
 
 
-            ItemCollectionList x = new ItemCollectionList(enBlueListBoxAppearance.Listbox) {
+            var x = new ItemCollectionList(enBlueListBoxAppearance.Listbox) {
                 CheckBehavior = enCheckBehavior.AlwaysSingleSelection
             };
             x.AddRange(Items);
             x.Sort();
 
-            List<string> erg = Show(TXT, x, enAddType.None, true);
+            var erg = Show(TXT, x, enAddType.None, true);
 
 
             if (erg is null || erg.Count != 1) { return string.Empty; }
@@ -80,7 +80,7 @@ namespace BlueControls.Forms {
 
 
         public static List<string> Show(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl) {
-            InputBoxListBoxStyle MB = new InputBoxListBoxStyle(TXT, ItemsOriginal, AddNewAllowed, CancelErl);
+            var MB = new InputBoxListBoxStyle(TXT, ItemsOriginal, AddNewAllowed, CancelErl);
             MB.ShowDialog();
 
             return MB.GiveBack;

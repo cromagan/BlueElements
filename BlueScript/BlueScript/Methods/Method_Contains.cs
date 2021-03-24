@@ -34,26 +34,26 @@ namespace BlueScript {
 
         public override string Description { get => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt."; }
 
-        public override List<string> Comand(Script s) { return new List<string>() { "contains" }; }
+        public override List<string> Comand(Script s) { return new() { "contains" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Bool; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableListOrString, enVariableDataType.Bool, enVariableDataType.String }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableListOrString, enVariableDataType.Bool, enVariableDataType.String }; }
         public override bool EndlessArgs { get => true; }
 
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
             if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
-                List<string> x = attvar[0].ValueListString;
+                var x = attvar[0].ValueListString;
 
-                for (int z = 2; z < attvar.Count; z++) {
+                for (var z = 2; z < attvar.Count; z++) {
                     if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.AttributFehler(); }
 
                     if (x.Contains(attvar[z].ValueString, attvar[1].ValueBool)) {
@@ -66,7 +66,7 @@ namespace BlueScript {
             if (attvar[0].Type == Skript.Enums.enVariableDataType.String) {
 
 
-                for (int z = 2; z < attvar.Count; z++) {
+                for (var z = 2; z < attvar.Count; z++) {
                     if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
 
 

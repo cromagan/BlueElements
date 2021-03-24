@@ -36,7 +36,7 @@ namespace BluePaint {
 
         public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
-                Bitmap _Pic = OnNeedCurrentPic();
+                var _Pic = OnNeedCurrentPic();
                 _Pic.FillCircle(Color.Black, e.Current.TrimmedX, e.Current.TrimmedY, 2);
                 OnDoInvalidate();
             } else {
@@ -45,7 +45,7 @@ namespace BluePaint {
         }
 
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
-            Color c = Color.FromArgb(50, 255, 0, 0);
+            var c = Color.FromArgb(50, 255, 0, 0);
             e.FillCircle(c, e.Current.TrimmedX, e.Current.TrimmedY, 2);
         }
 

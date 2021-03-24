@@ -26,7 +26,7 @@ namespace BlueControls.Forms {
 
         private int eProgressbar_LastCurrent = int.MaxValue;
 
-        private readonly Dictionary<int, DateTime> eProgressbar_TimeDic = new Dictionary<int, DateTime>();
+        private readonly Dictionary<int, DateTime> eProgressbar_TimeDic = new();
         private int eProgressbar_LastCalulatedSeconds = int.MinValue;
         private DateTime eProgressbar_LastTimeUpdate = DateTime.Now;
 
@@ -40,14 +40,14 @@ namespace BlueControls.Forms {
         private Progressbar(string Text) : this() {
             // InitializeComponent();
             capTXT.Text = Text;
-            int He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-            int Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+            var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+            var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
             Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
         }
 
 
         public static Progressbar Show(string Text) {
-            Progressbar P = new Progressbar(Text) {
+            var P = new Progressbar(Text) {
                 _baseText = Text
             };
             P.Show();
@@ -55,7 +55,7 @@ namespace BlueControls.Forms {
         }
 
         public static Progressbar Show(string Text, int Count) {
-            Progressbar P = new Progressbar(Text) {
+            var P = new Progressbar(Text) {
                 _baseText = Text,
                 _count = Count
             };
@@ -67,7 +67,7 @@ namespace BlueControls.Forms {
 
         private string CalculateText(string BaseText, int Current, int Count) {
 
-            int tmpCalculatedSeconds = 0;
+            var tmpCalculatedSeconds = 0;
 
             if (Current < eProgressbar_LastCurrent) {
                 eProgressbar_TimeDic.Clear();
@@ -75,7 +75,7 @@ namespace BlueControls.Forms {
                 eProgressbar_LastCalulatedSeconds = int.MinValue;
             }
 
-            double PR = Current / (double)Count;
+            var PR = Current / (double)Count;
             if (PR > 1) { PR = 1; }
             if (PR < 0) { PR = 0; }
 
@@ -84,8 +84,8 @@ namespace BlueControls.Forms {
 
             if (Current > 0) {
                 if (eProgressbar_TimeDic.ContainsKey(Math.Max(0, Current - 100))) {
-                    DateTime d = eProgressbar_TimeDic[Math.Max(0, Current - 100)];
-                    double ts = DateTime.Now.Subtract(d).TotalSeconds;
+                    var d = eProgressbar_TimeDic[Math.Max(0, Current - 100)];
+                    var ts = DateTime.Now.Subtract(d).TotalSeconds;
                     tmpCalculatedSeconds = (int)(ts / Math.Min(Current, 100) * (Count - Current));
                 } else {
                     tmpCalculatedSeconds = int.MinValue;
@@ -115,7 +115,7 @@ namespace BlueControls.Forms {
                 }
             }
 
-            int PRT = (int)(PR * 100);
+            var PRT = (int)(PR * 100);
             if (PRT > 100) { PRT = 100; }
             if (PRT < 0) { PRT = 0; }
 
@@ -153,8 +153,8 @@ namespace BlueControls.Forms {
         private void UpdateInternal(string Text) {
             if (Text != capTXT.Text) {
                 capTXT.Text = Text;
-                int Wi = Math.Max(Size.Width, capTXT.Width + Skin.Padding * 2);
-                int He = Math.Max(Size.Height, capTXT.Height + Skin.Padding * 2);
+                var Wi = Math.Max(Size.Width, capTXT.Width + Skin.Padding * 2);
+                var He = Math.Max(Size.Height, capTXT.Height + Skin.Padding * 2);
 
                 Size = new Size(Wi, He);
                 Refresh();

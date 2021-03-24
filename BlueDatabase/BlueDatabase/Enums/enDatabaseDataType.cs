@@ -16,6 +16,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
+using System;
+
 namespace BlueDatabase.Enums {
     public enum enDatabaseDataType : byte {
         // Fehler = 0
@@ -149,6 +151,7 @@ namespace BlueDatabase.Enums {
         co_SpellCheckingEnabled = 156,
         //co_TagsInternal_ALT = 157, // TODO: Entfernen
         //    co_QuickInfoImage = 158
+        [Obsolete]
         co_CaptionBitmap = 159,
         co_Suffix = 160,
 
@@ -190,11 +193,16 @@ namespace BlueDatabase.Enums {
         co_AfterEdit_AutoReplace = 195,
         co_FilterOptions = 196,
 
+        co_CaptionBitmapUTF8 = 197,
+
 
 
         ce_Value_withoutSizeData = 200,
         ce_Value_withSizeData = 201,
+
+        [Obsolete]
         ce_UTF8Value_withoutSizeData = 202,
+        [Obsolete]
         ce_UTF8Value_withSizeData = 203,
         //Dummy_ce_ValueWithoutSizeUncrypted = 204,
 

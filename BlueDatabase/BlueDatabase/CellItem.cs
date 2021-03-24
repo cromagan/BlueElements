@@ -88,20 +88,20 @@ namespace BlueDatabase {
                 Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell sollte hier nicht ankommen.");
             }
 
-            List<string> ret = new List<string>();
+            var ret = new List<string>();
 
             if (!column.MultiLine) {
                 ret.Add(ValueReadable(column, Row.CellGetString(column), Style, column.BildTextVerhalten, true));
                 return ret;
             }
 
-            List<string> x = Row.CellGetList(column);
-            foreach (string thisstring in x) {
+            var x = Row.CellGetList(column);
+            foreach (var thisstring in x) {
                 ret.Add(ValueReadable(column, thisstring, Style, column.BildTextVerhalten, true));
             }
 
             if (x.Count == 0) {
-                string tmp = ValueReadable(column, string.Empty, Style, column.BildTextVerhalten, true);
+                var tmp = ValueReadable(column, string.Empty, Style, column.BildTextVerhalten, true);
                 if (!string.IsNullOrEmpty(tmp)) { ret.Add(tmp); }
             }
 
@@ -112,9 +112,9 @@ namespace BlueDatabase {
 
 
         public static Tuple<string, enAlignment, QuickImage> GetDrawingData(ColumnItem column, string originalText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
-            string tmpText = CellItem.ValueReadable(column, originalText, style, bildTextverhalten, true);
-            enAlignment tmpAlign = CellItem.StandardAlignment(column, bildTextverhalten);
-            QuickImage tmpImageCode = CellItem.StandardImage(column, originalText, tmpText, style, bildTextverhalten);
+            var tmpText = CellItem.ValueReadable(column, originalText, style, bildTextverhalten, true);
+            var tmpAlign = CellItem.StandardAlignment(column, bildTextverhalten);
+            var tmpImageCode = CellItem.StandardImage(column, originalText, tmpText, style, bildTextverhalten);
 
             if (bildTextverhalten == enBildTextVerhalten.Bild_oder_Text) {
                 if (tmpImageCode != null) { tmpText = string.Empty; }
@@ -183,7 +183,7 @@ namespace BlueDatabase {
 
                 case enDataFormat.FarbeInteger:
                     if (!string.IsNullOrEmpty(txt) && txt.IsFormat(enDataFormat.FarbeInteger)) {
-                        Color col = Color.FromArgb(int.Parse(txt));
+                        var col = Color.FromArgb(int.Parse(txt));
                         txt = col.ColorName();
                     }
                     txt = LanguageTool.ColumnReplace(txt, column, style);
@@ -201,10 +201,10 @@ namespace BlueDatabase {
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     // Hier kommt die Spalten-ID  an
                     if (string.IsNullOrEmpty(txt)) { return string.Empty; }
-                    if (!int.TryParse(txt, out int ColKey)) { return "Columkey kann nicht geparsed werden"; }
-                    Database LinkedDatabase = column.LinkedDatabase();
+                    if (!int.TryParse(txt, out var ColKey)) { return "Columkey kann nicht geparsed werden"; }
+                    var LinkedDatabase = column.LinkedDatabase();
                     if (LinkedDatabase == null) { return "Datenbankverknüpfung fehlt"; }
-                    ColumnItem C = LinkedDatabase.Column.SearchByKey(ColKey);
+                    var C = LinkedDatabase.Column.SearchByKey(ColKey);
                     if (C == null) { return "Columnkey nicht gefunden"; }
 
                     txt = LanguageTool.ColumnReplace(C.ReadableText(), column, style);
@@ -303,17 +303,17 @@ namespace BlueDatabase {
 
                     //var code = column.Prefix + originalText + column.Suffix;
                     if (column.BildCode_ConstantHeight > 0) { replacedText = replacedText + "|" + column.BildCode_ConstantHeight; }
-                    QuickImage defaultImage = QuickImage.Get(replacedText);
+                    var defaultImage = QuickImage.Get(replacedText);
 
                     if (defaultImage != null && !defaultImage.IsError) { return defaultImage; }
-                    int gr = 16;
+                    var gr = 16;
                     if (column.BildCode_ConstantHeight > 0) { gr = column.BildCode_ConstantHeight; }
                     return StandardErrorImage(gr, bildTextverhalten);
 
                 case enDataFormat.FarbeInteger:
 
                     if (!string.IsNullOrEmpty(replacedText) && replacedText.IsFormat(enDataFormat.FarbeInteger)) {
-                        Color col = Color.FromArgb(int.Parse(replacedText));
+                        var col = Color.FromArgb(int.Parse(replacedText));
                         return QuickImage.Get(enImageCode.Kreis, 16, "", col.ToHTMLCode());
                     }
                     return null;

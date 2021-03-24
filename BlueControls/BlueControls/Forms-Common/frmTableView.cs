@@ -90,13 +90,13 @@ namespace BlueControls.Forms {
 
         private void zurück_Click(object sender, System.EventArgs e) {
             Formula.HideViewEditor();
-            SuchEintragNoSave(enDirection.Oben, out ColumnItem column, out RowItem row);
+            SuchEintragNoSave(enDirection.Oben, out var column, out var row);
             TableView.CursorPos_Set(column, row, false);
         }
 
         private void vor_Click(object sender, System.EventArgs e) {
             Formula.HideViewEditor();
-            SuchEintragNoSave(enDirection.Unten, out ColumnItem column, out RowItem row);
+            SuchEintragNoSave(enDirection.Unten, out var column, out var row);
             TableView.CursorPos_Set(column, row, false);
         }
 
@@ -165,14 +165,14 @@ namespace BlueControls.Forms {
 
         private void SuchB_Click(object sender, System.EventArgs e) {
             Formula.HideViewEditor();
-            string SuchtT = such.Text.Trim();
+            var SuchtT = such.Text.Trim();
 
             if (string.IsNullOrEmpty(SuchtT)) {
                 MessageBox.Show("Bitte Text zum Suchen eingeben.", enImageCode.Information, "OK");
                 return;
             }
 
-            Table.SearchNextText(SuchtT, TableView, null, Formula.ShowingRow, out _, out RowItem GefRow, true);
+            Table.SearchNextText(SuchtT, TableView, null, Formula.ShowingRow, out _, out var GefRow, true);
 
 
             //var CheckRow = BlueFormulax.ShowingRow;
@@ -273,13 +273,13 @@ namespace BlueControls.Forms {
         }
 
         private string NameRepair(string IstName, RowItem vRow) {
-            string NewName = IstName;
-            int IstZ = 0;
+            var NewName = IstName;
+            var IstZ = 0;
 
             do {
-                bool Changed = false;
+                var Changed = false;
 
-                foreach (RowItem ThisRow in _Database.Row) {
+                foreach (var ThisRow in _Database.Row) {
                     if (ThisRow != null && ThisRow != vRow) {
                         if (ThisRow.CellFirstString().ToUpper() == NewName.ToUpper()) {
                             IstZ++;
@@ -308,12 +308,12 @@ namespace BlueControls.Forms {
                 }
 
 
-                RowItem tmpr = Formula.ShowingRow;
+                var tmpr = Formula.ShowingRow;
                 if (MessageBox.Show("Soll der Eintrag<br><b>" + tmpr.CellFirstString() + "</b><br>wirklich <b>gelöscht</b> werden?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
 
 
 
-                SuchEintragNoSave(enDirection.Unten, out ColumnItem column, out RowItem row);
+                SuchEintragNoSave(enDirection.Unten, out var column, out var row);
                 TableView.CursorPos_Set(column, row, false);
                 TableView.Database.Row.Remove(tmpr);
             } else {
@@ -353,7 +353,7 @@ namespace BlueControls.Forms {
             LoadTab.FileName = Datei;
 
 
-            Database tmpDatabase = (Database)Database.GetByFilename(Datei, false);
+            var tmpDatabase = (Database)Database.GetByFilename(Datei, false);
 
             if (tmpDatabase == null) {
                 tmpDatabase = new Database(Datei, false, false);
@@ -476,7 +476,7 @@ namespace BlueControls.Forms {
 
                     TableView.Visible = false;
 
-                    List<RowItem> Ara = new List<RowItem>();
+                    var Ara = new List<RowItem>();
 
 
                     if (Formula.ShowingRow != null) {
@@ -486,7 +486,7 @@ namespace BlueControls.Forms {
                     }
 
 
-                    using (ExportDialog l = new ExportDialog(_Database, Ara, true)) {
+                    using (var l = new ExportDialog(_Database, Ara, true)) {
                         l.ShowDialog();
                     }
 
@@ -615,7 +615,7 @@ namespace BlueControls.Forms {
 
         private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
 
-            Button bu = (Button)sender;
+            var bu = (Button)sender;
 
             switch (bu.Name) {
                 case "btnSaveAs":
@@ -664,7 +664,7 @@ namespace BlueControls.Forms {
 
 
         private void CheckButtons() {
-            bool DatenbankDa = Convert.ToBoolean(_Database != null);
+            var DatenbankDa = Convert.ToBoolean(_Database != null);
 
 
             btnNeuDB.Enabled = true;
@@ -686,7 +686,7 @@ namespace BlueControls.Forms {
 
             BeziehungsEditor.Enabled = false;
             if (DatenbankDa) {
-                foreach (ColumnItem ThisColumnItem in _Database.Column) {
+                foreach (var ThisColumnItem in _Database.Column) {
                     if (ThisColumnItem != null) {
 
                         if (ThisColumnItem.Format == enDataFormat.RelationText) {
@@ -738,9 +738,9 @@ namespace BlueControls.Forms {
 
 
         private void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e) {
-            string CellKey = e.Tags.TagGet("Cellkey");
+            var CellKey = e.Tags.TagGet("Cellkey");
             if (string.IsNullOrEmpty(CellKey)) { return; }
-            TableView.Database.Cell.DataOfCellKey(CellKey, out ColumnItem Column, out RowItem Row);
+            TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
 
             if (_Ansicht != enAnsicht.Überschriften_und_Formular) {
 
@@ -786,12 +786,12 @@ namespace BlueControls.Forms {
         public void TableView_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
 
 
-            Table bt = (Table)sender;
+            var bt = (Table)sender;
 
-            string CellKey = e.Tags.TagGet("CellKey");
+            var CellKey = e.Tags.TagGet("CellKey");
 
             if (string.IsNullOrEmpty(CellKey)) { return; }
-            TableView.Database.Cell.DataOfCellKey(CellKey, out ColumnItem Column, out RowItem Row);
+            TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
 
 
             switch (e.ClickedComand) {
@@ -838,7 +838,7 @@ namespace BlueControls.Forms {
                     break;
 
                 case "Summe":
-                    double? summe = Column.Summe(TableView.Filter);
+                    var summe = Column.Summe(TableView.Filter);
                     if (!summe.HasValue) {
                         MessageBox.Show("Die Summe konnte nicht berechnet werden.", enImageCode.Summe, "OK");
                     } else {
@@ -909,7 +909,7 @@ namespace BlueControls.Forms {
 
             Hide();
 
-            RelationDiagram r = new RelationDiagram(_Database);
+            var r = new RelationDiagram(_Database);
 
             r.ShowDialog();
 
@@ -956,7 +956,7 @@ namespace BlueControls.Forms {
         private void AllgemeinerEditor_Click(object sender, System.EventArgs e) {
             Hide();
 
-            PadEditor r = new PadEditor {
+            var r = new PadEditor {
                 WindowState = System.Windows.Forms.FormWindowState.Maximized
             };
             r.ShowDialog();

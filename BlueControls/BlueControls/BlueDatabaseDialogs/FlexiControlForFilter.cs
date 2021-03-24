@@ -91,7 +91,7 @@ namespace BlueControls.Controls {
                     DisabledReason = "Dieser Filter ist automatisch<br>gesetzt worden.";
                 }
 
-                string qi = Filter.Column.QuickInfoText(string.Empty);
+                var qi = Filter.Column.QuickInfoText(string.Empty);
 
                 if (string.IsNullOrEmpty(qi)) {
                     QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText();
@@ -105,7 +105,7 @@ namespace BlueControls.Controls {
                     EditType = enEditTypeFormula.None;
                 } else {
 
-                    bool ShowDelFilterButton = true;
+                    var ShowDelFilterButton = true;
 
                     if (Filter.FilterType == enFilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1) {
 
@@ -148,7 +148,7 @@ namespace BlueControls.Controls {
             e.Control.MouseUp += Control_MouseUp;
 
             if (e.Control is ComboBox cbx) {
-                ItemCollectionList Item2 = new ItemCollectionList
+                var Item2 = new ItemCollectionList
                 {
                     { "Keine weiteren Einträge vorhanden", "|~" }
                 };
@@ -202,7 +202,7 @@ namespace BlueControls.Controls {
         }
 
         private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
-            ComboBox cbx = (ComboBox)sender;
+            var cbx = (ComboBox)sender;
 
             cbx.Item.Clear();
             cbx.Item.CheckBehavior = enCheckBehavior.MultiSelection;
@@ -213,7 +213,7 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            List<string> List_FilterString = Filter.Column.Autofilter_ItemList(TableView.Filter);
+            var List_FilterString = Filter.Column.Autofilter_ItemList(TableView.Filter);
 
             if (List_FilterString.Count == 0) {
 
@@ -229,7 +229,7 @@ namespace BlueControls.Controls {
 
         internal ComboBox GetComboBox() {
 
-            foreach (object thisc in Controls) {
+            foreach (var thisc in Controls) {
                 if (thisc is ComboBox cbx) {
 
                     return cbx;
@@ -240,7 +240,7 @@ namespace BlueControls.Controls {
         }
 
         internal bool WasThisValueClicked() {
-            ComboBox cb = GetComboBox();
+            var cb = GetComboBox();
             if (cb == null) { return false; }
             return cb.WasThisValueClicked();
         }
@@ -292,19 +292,19 @@ namespace BlueControls.Controls {
 
                 case "#filterverschieben":
                     if (e.HotItem is ColumnItem col2) {
-                        Filterleiste pc = (Filterleiste)Parent; // Parent geht verlren, wenn der Filter selbst disposed und neu erzeugt wird
+                        var pc = (Filterleiste)Parent; // Parent geht verlren, wenn der Filter selbst disposed und neu erzeugt wird
 
                         while (true) {
 
-                            string nx = InputBox.Show("X, von 0 bis 10000", col2.DauerFilterPos.X.ToString(), enDataFormat.Ganzzahl);
+                            var nx = InputBox.Show("X, von 0 bis 10000", col2.DauerFilterPos.X.ToString(), enDataFormat.Ganzzahl);
                             if (string.IsNullOrEmpty(nx)) { return true; }
-                            int nxi = modConverter.IntParse(nx);
+                            var nxi = modConverter.IntParse(nx);
                             nxi = Math.Max(nxi, 0);
                             nxi = Math.Min(nxi, 10000);
 
-                            string ny = InputBox.Show("Y, von 0 bis 10000", col2.DauerFilterPos.Y.ToString(), enDataFormat.Ganzzahl);
+                            var ny = InputBox.Show("Y, von 0 bis 10000", col2.DauerFilterPos.Y.ToString(), enDataFormat.Ganzzahl);
                             if (string.IsNullOrEmpty(ny)) { return true; }
-                            int nyi = modConverter.IntParse(ny);
+                            var nyi = modConverter.IntParse(ny);
                             nyi = Math.Max(nyi, 0);
                             nyi = Math.Min(nyi, 10000);
 
@@ -315,7 +315,7 @@ namespace BlueControls.Controls {
                     return true;
 
                 case "#bildpfad":
-                    string p = (string)((Filterleiste)Parent).pic.Tag;
+                    var p = (string)((Filterleiste)Parent).pic.Tag;
                     ExecuteFile(p.FilePath());
                     MessageBox.Show("Aktuelle Datei:<br>" + p);
                     return true;

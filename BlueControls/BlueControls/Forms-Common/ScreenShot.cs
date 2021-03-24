@@ -57,7 +57,7 @@ namespace BlueControls {
         private string DrawText = "";
         private int DrawSize = 20;
 
-        private List<strScreenData> AllS = new List<strScreenData>();
+        private List<strScreenData> AllS = new();
 
         [AccessedThroughProperty(nameof(Hook))]
         private SystemInputHook _Hook;
@@ -102,11 +102,11 @@ namespace BlueControls {
 
 
 
-                    Rectangle r = modAllgemein.RectangleOfAllScreens();
+                    var r = modAllgemein.RectangleOfAllScreens();
 
-                    Bitmap b = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
+                    var b = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
 
-                    using (Graphics GR = Graphics.FromImage(b)) {
+                    using (var GR = Graphics.FromImage(b)) {
                         GR.CopyFromScreen(r.X, r.Y, 0, 0, b.Size);
                     }
 
@@ -149,7 +149,7 @@ namespace BlueControls {
         public static strScreenData GrabArea(System.Windows.Forms.Form frm, int MaxW, int MaxH) {
 
 
-            using (ScreenShot x = new ScreenShot()) {
+            using (var x = new ScreenShot()) {
                 x.DrawText = "Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.";
 
 
@@ -159,8 +159,8 @@ namespace BlueControls {
         }
 
         public static Bitmap GrabContinuus() {
-            ScreenShot x = new ScreenShot();
-            Bitmap im = x.GrabContinuusIntern();
+            var x = new ScreenShot();
+            var im = x.GrabContinuusIntern();
 
 
             x.Dispose();
@@ -208,7 +208,7 @@ namespace BlueControls {
                     if (HookStartPoint.ToString() != HookEndPoint.ToString()) {
                         Rahm.Visible = false;
 
-                        strScreenData l = new strScreenData {
+                        var l = new strScreenData {
                             Pic = GrabArea(AllS[0].GrabedArea()),
                             HookP1 = HookStartPoint,
                             HookP2 = HookEndPoint
@@ -238,17 +238,17 @@ namespace BlueControls {
             Rahm.Dispose();
 
 
-            int MinX = 0;
-            int MinY = 0;
+            var MinX = 0;
+            var MinY = 0;
 
-            int maxx = AllS[0].GrabedArea().Width;
-            int maxy = AllS[0].GrabedArea().Height;
+            var maxx = AllS[0].GrabedArea().Width;
+            var maxy = AllS[0].GrabedArea().Height;
 
-            int VersX = 0;
-            int VersY = 0;
+            var VersX = 0;
+            var VersY = 0;
 
 
-            for (int z = 1; z < AllS.Count; z++) {
+            for (var z = 1; z < AllS.Count; z++) {
 
                 VersX = VersX + AllS[z].HookP1.X - AllS[z].HookP2.X;
                 VersY = VersY + AllS[z].HookP1.Y - AllS[z].HookP2.Y;
@@ -264,8 +264,8 @@ namespace BlueControls {
             modAllgemein.CollectGarbage();
 
 
-            Bitmap bmp = new Bitmap(maxx - MinX, maxy - MinY, PixelFormat.Format32bppPArgb);
-            Graphics gr = Graphics.FromImage(bmp);
+            var bmp = new Bitmap(maxx - MinX, maxy - MinY, PixelFormat.Format32bppPArgb);
+            var gr = Graphics.FromImage(bmp);
             gr.Clear(Color.White);
 
 
@@ -273,7 +273,7 @@ namespace BlueControls {
             VersX = MinX * -1;
             VersY = MinY * -1;
 
-            for (int z = 0; z < AllS.Count; z++) {
+            for (var z = 0; z < AllS.Count; z++) {
 
                 VersX = VersX + AllS[z].HookP1.X - AllS[z].HookP2.X;
                 VersY = VersY + AllS[z].HookP1.Y - AllS[z].HookP2.Y;
@@ -309,7 +309,7 @@ namespace BlueControls {
                 PrepareForm();
 
 
-                Rectangle r = modAllgemein.RectangleOfAllScreens();
+                var r = modAllgemein.RectangleOfAllScreens();
 
                 Left = r.Left;
                 Top = r.Top;
@@ -374,13 +374,13 @@ namespace BlueControls {
 
             FeedBack.Point2 = new Point(e.X, e.Y);
 
-            Rectangle r = FeedBack.GrabedArea();
+            var r = FeedBack.GrabedArea();
 
             if (r.Width < 2 || r.Height < 2) { return; }
 
             ClipedArea = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
 
-            using (Graphics GR = Graphics.FromImage(ClipedArea)) {
+            using (var GR = Graphics.FromImage(ClipedArea)) {
                 GR.Clear(Color.Black);
                 GR.DrawImage(ScreenShotBMP, 0, 0, r, GraphicsUnit.Pixel);
             }
@@ -403,7 +403,7 @@ namespace BlueControls {
                 return;
             }
 
-            Rectangle r = modAllgemein.RectangleOfAllScreens();
+            var r = modAllgemein.RectangleOfAllScreens();
 
             Left = r.Left;
             Top = r.Top;
@@ -412,7 +412,7 @@ namespace BlueControls {
 
 
 
-            using (Graphics GR = Graphics.FromImage(BackgroundImage)) {
+            using (var GR = Graphics.FromImage(BackgroundImage)) {
                 GR.Clear(Color.Black);
                 GR.DrawImage(ScreenShotBMP, 0, 0);
 
@@ -457,10 +457,10 @@ namespace BlueControls {
 
             Brush bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
             Brush bf = new SolidBrush(Color.FromArgb(255, 255, 0, 0));
-            Font fn = new Font("Arial", DrawSize, FontStyle.Bold);
-            SizeF f = GR.MeasureString(DrawText, fn);
+            var fn = new Font("Arial", DrawSize, FontStyle.Bold);
+            var f = GR.MeasureString(DrawText, fn);
 
-            int yPos = 0;
+            var yPos = 0;
 
             if (e == null) {
                 yPos = 0;
@@ -491,7 +491,7 @@ namespace BlueControls {
 
             BackgroundImage = new Bitmap(ScreenShotBMP.Width, ScreenShotBMP.Height, PixelFormat.Format32bppPArgb);
 
-            using (Graphics GR = Graphics.FromImage(BackgroundImage)) {
+            using (var GR = Graphics.FromImage(BackgroundImage)) {
                 GR.DrawImage(ScreenShotBMP, 0, 0);
             }
 

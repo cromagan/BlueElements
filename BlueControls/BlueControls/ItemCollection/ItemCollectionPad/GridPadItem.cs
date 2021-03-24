@@ -46,7 +46,7 @@ namespace BlueControls.ItemCollection {
 
         //Dim _Design As enDesign
 
-        private readonly Metafile NPEMF = new Metafile(modAllgemein.GetEmmbedResource(Assembly.GetExecutingAssembly(), "Nullpunkt.emf"));
+        private readonly Metafile NPEMF = new(modAllgemein.GetEmmbedResource(Assembly.GetExecutingAssembly(), "Nullpunkt.emf"));
 
         #endregion
 
@@ -109,18 +109,18 @@ namespace BlueControls.ItemCollection {
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
 
-            Color c = Skin.GetBlueFont(Stil, Parent.SheetStyle).Color_Main;
+            var c = Skin.GetBlueFont(Stil, Parent.SheetStyle).Color_Main;
 
 
-            Pen p = new Pen(Color.FromArgb(30, c.R, c.G, c.B), 1);
+            var p = new Pen(Color.FromArgb(30, c.R, c.G, c.B), 1);
             float ex = 0;
 
-            PointF po = NP.ZoomAndMove(cZoom, shiftX, shiftY);
+            var po = NP.ZoomAndMove(cZoom, shiftX, shiftY);
 
 
-            float mo = (float)(modConverter.mmToPixel(GridShow, ItemCollectionPad.DPI) * cZoom);
+            var mo = (float)(modConverter.mmToPixel(GridShow, ItemCollectionPad.DPI) * cZoom);
 
-            int count = 0;
+            var count = 0;
             do {
                 count++;
                 if (count > 20) { break; }
@@ -179,7 +179,7 @@ namespace BlueControls.ItemCollection {
         protected override void ParseFinished() { }
 
         public override string ToString() {
-            string t = base.ToString();
+            var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             return t + "Grid=" + GridShow + "}";
         }
@@ -188,7 +188,7 @@ namespace BlueControls.ItemCollection {
 
 
         public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new List<FlexiControl>();
+            var l = new List<FlexiControl>();
 
             AddLineStyleOption(l);
 

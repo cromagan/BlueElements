@@ -60,9 +60,9 @@ namespace BlueControls.Forms {
         /// <param name="Meldungen"></param>
         /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
         public static bool DeleteFile(List<string> Filelist, bool Meldungen) {
-            int ButtonNumber = 0;
+            var ButtonNumber = 0;
 
-            for (int Z = 0; Z < Filelist.Count; Z++) {
+            for (var Z = 0; Z < Filelist.Count; Z++) {
                 if (!FileExists(Filelist[Z])) { Filelist[Z] = ""; }
             }
 
@@ -93,7 +93,7 @@ namespace BlueControls.Forms {
         /// <param name="Meldungen"></param>
         /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
         public static bool DeleteFile(string File, bool Rückfrage) {
-            List<string> f = new List<string>
+            var f = new List<string>
             {
                 File
             };

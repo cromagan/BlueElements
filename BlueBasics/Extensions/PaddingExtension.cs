@@ -25,9 +25,9 @@ namespace BlueBasics {
 
             Code = Code.RemoveChars("{}LeftTopRightBm= ");
 
-            string[] w = Code.Split(',');
+            var w = Code.Split(',');
 
-            System.Windows.Forms.Padding P = new System.Windows.Forms.Padding {
+            var P = new System.Windows.Forms.Padding {
                 Left = int.Parse(w[0]),
                 Top = int.Parse(w[1]),
                 Right = int.Parse(w[2]),

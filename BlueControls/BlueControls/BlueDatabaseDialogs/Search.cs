@@ -72,19 +72,19 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-            string searchT = SuchText();
+            var searchT = SuchText();
             if (string.IsNullOrEmpty(searchT)) { return; }
 
-            ColumnItem found = _col;
-            ColumnViewCollection ca = _BlueTable?.CurrentArrangement;
+            var found = _col;
+            var ca = _BlueTable?.CurrentArrangement;
             if (found == null) { found = _BlueTable.Database.Column.SysLocked; }
-            ColumnItem columnStarted = _col;
+            var columnStarted = _col;
 
             do {
                 found = ca.NextVisible(found);
                 if (found == null) { found = ca[0].Column; }
 
-                string _Ist1 = found.ReadableText().ToLower();
+                var _Ist1 = found.ReadableText().ToLower();
 
                 if (!string.IsNullOrEmpty(_Ist1)) {
 
@@ -92,8 +92,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                     if (_Ist1.Contains(searchT.ToLower())) { break; }
 
                     if (btnAehnliches.Checked) {
-                        string _Ist3 = _Ist1.StarkeVereinfachung(" ,");
-                        string _searchTXT3 = searchT.StarkeVereinfachung(" ,");
+                        var _Ist3 = _Ist1.StarkeVereinfachung(" ,");
+                        var _searchTXT3 = searchT.StarkeVereinfachung(" ,");
                         if (!string.IsNullOrEmpty(_Ist3) && _Ist3.ToLower().Contains(_searchTXT3.ToLower())) {
                             break;
                         }
@@ -119,7 +119,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private string SuchText() {
-            string SuchtT = txbSuchText.Text.Trim();
+            var SuchtT = txbSuchText.Text.Trim();
 
             if (string.IsNullOrEmpty(SuchtT)) {
                 MessageBox.Show("Bitte Text zum Suchen eingeben.", enImageCode.Information, "OK");
@@ -131,12 +131,12 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
         private void btnSuchInCell_Click(object sender, System.EventArgs e) {
 
-            string SuchtT = SuchText();
+            var SuchtT = SuchText();
 
             if (string.IsNullOrEmpty(SuchtT)) { return; }
 
 
-            Table.SearchNextText(SuchtT, _BlueTable, _col, _row, out ColumnItem found, out RowItem GefRow, btnAehnliches.Checked);
+            Table.SearchNextText(SuchtT, _BlueTable, _col, _row, out var found, out var GefRow, btnAehnliches.Checked);
 
 
             if (found == null) {

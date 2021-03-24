@@ -340,7 +340,7 @@ namespace BlueControls.Controls {
 
             MarkClear();
 
-            Rectangle ri = _eTxt.CursorPixelPosx(_Cursor_CharPos);
+            var ri = _eTxt.CursorPixelPosx(_Cursor_CharPos);
 
             if (_Cursor_CharPos < 0) { _Cursor_CharPos = 0; }
 
@@ -474,8 +474,8 @@ namespace BlueControls.Controls {
 
             if (!MultiLine) { nt = nt.RemoveChars("\r"); }
 
-            foreach (char t in nt) {
-                enASCIIKey a = (enASCIIKey)t;
+            foreach (var t in nt) {
+                var a = (enASCIIKey)t;
                 if (_eTxt.InsertChar(a, _Cursor_CharPos)) {
                     _Cursor_CharPos++;
                 }
@@ -490,14 +490,14 @@ namespace BlueControls.Controls {
 
             Selection_Repair(true);
 
-            string tt = _eTxt.ConvertCharToPlainText(_MarkStart, _MarkEnd - 1);
+            var tt = _eTxt.ConvertCharToPlainText(_MarkStart, _MarkEnd - 1);
             if (string.IsNullOrEmpty(tt)) { return; }
 
 
             tt = tt.Replace("\n", string.Empty);
             tt = tt.Replace("\r", "\r\n");
 
-            System.Windows.Forms.DataObject datobj = new System.Windows.Forms.DataObject();
+            var datobj = new System.Windows.Forms.DataObject();
             datobj.SetData(System.Windows.Forms.DataFormats.Text, tt);
             System.Windows.Clipboard.SetDataObject(datobj);
         }
@@ -564,7 +564,7 @@ namespace BlueControls.Controls {
 
                 if (position + word.Length < _eTxt.Chars.Count && !_eTxt.Chars[position + word.Length].isWordSeperator()) { return false; }
 
-                string tt = _eTxt.ConvertCharToPlainText(position, position + word.Length - 1);
+                var tt = _eTxt.ConvertCharToPlainText(position, position + word.Length - 1);
 
                 return word.ToUpper() == tt.ToUpper();
 
@@ -758,7 +758,7 @@ namespace BlueControls.Controls {
 
             if (_eTxt == null) {
 
-                enStates state = enStates.Standard;
+                var state = enStates.Standard;
                 if (!Enabled) { state = enStates.Standard_Disabled; }
 
                 _eTxt = new ExtText(GetDesign(), state);
@@ -868,22 +868,22 @@ namespace BlueControls.Controls {
             if (_MarkStart < 0 || _MarkEnd < 0) { return; }
 
             Selection_Repair(false);
-            int MaS = Math.Min(_MarkStart, _MarkEnd);
-            int MaE = Math.Max(_MarkStart, _MarkEnd);
+            var MaS = Math.Min(_MarkStart, _MarkEnd);
+            var MaE = Math.Max(_MarkStart, _MarkEnd);
 
 
             if (MaS == MaE) { return; }
 
             _eTxt.Check(MaS, MaE - 1, true);
 
-            int TmpcharS = MaS;
+            var TmpcharS = MaS;
 
-            for (int cc = MaS; cc <= MaE; cc++) {
+            for (var cc = MaS; cc <= MaE; cc++) {
 
                 if (cc == MaE || _eTxt.Chars[cc].Pos.X < _eTxt.Chars[TmpcharS].Pos.X || Math.Abs(_eTxt.Chars[cc].Pos.Y - _eTxt.Chars[TmpcharS].Pos.Y) > 0.001) //Jetzt ist der Zeitpunkt zum Zeichen/start setzen
                 {
 
-                    Rectangle r = new Rectangle((int)(_eTxt.Chars[TmpcharS].Pos.X + _eTxt.DrawingPos.X), (int)(_eTxt.Chars[TmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y), (int)(_eTxt.Chars[cc - 1].Pos.X + _eTxt.Chars[cc - 1].Size.Width - _eTxt.Chars[TmpcharS].Pos.X), (int)(_eTxt.Chars[cc - 1].Pos.Y + _eTxt.Chars[cc - 1].Size.Height - _eTxt.Chars[TmpcharS].Pos.Y));
+                    var r = new Rectangle((int)(_eTxt.Chars[TmpcharS].Pos.X + _eTxt.DrawingPos.X), (int)(_eTxt.Chars[TmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y), (int)(_eTxt.Chars[cc - 1].Pos.X + _eTxt.Chars[cc - 1].Size.Width - _eTxt.Chars[TmpcharS].Pos.X), (int)(_eTxt.Chars[cc - 1].Pos.Y + _eTxt.Chars[cc - 1].Size.Height - _eTxt.Chars[TmpcharS].Pos.Y));
 
                     if (r.Width < 2) { r = new Rectangle(r.Left, r.Top, 2, r.Height); }
 
@@ -946,8 +946,8 @@ namespace BlueControls.Controls {
 
 
 
-            bool sliderVisible = false;
-            int effectWidth = Width;
+            var sliderVisible = false;
+            var effectWidth = Width;
             if (_Multiline) {
                 sliderVisible = _eTxt.Height() > (Height - 16);
             } else {
@@ -964,7 +964,7 @@ namespace BlueControls.Controls {
                     break;
 
                 case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
-                    int hp = HotPosition();
+                    var hp = HotPosition();
                     _eTxt.TextDimensions = Size.Empty;
                     _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
 
@@ -979,7 +979,7 @@ namespace BlueControls.Controls {
                             _eTxt.DrawingPos.X = Skin.PaddingSmal;
                         }
                     } else {
-                        Rectangle r = _eTxt.CursorPixelPosx(hp);
+                        var r = _eTxt.CursorPixelPosx(hp);
 
                         if (r.X > Width - Skin.PaddingSmal * 4 - _eTxt.DrawingPos.X) {
                             _eTxt.DrawingPos.X = Width - Skin.PaddingSmal * 4 - r.X + 1;
@@ -1052,7 +1052,7 @@ namespace BlueControls.Controls {
 
 
             if (!string.IsNullOrEmpty(_Suffix)) {
-                Rectangle r = new Rectangle(_eTxt.Width() + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
+                var r = new Rectangle(_eTxt.Width() + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
 
                 if (_eTxt.Chars.Count > 0) {
                     r.X += 2;
@@ -1076,7 +1076,7 @@ namespace BlueControls.Controls {
             if (!_Cursor_Visible) { return; }
             if (_Cursor_CharPos < 0) { return; }
 
-            Rectangle r = _eTxt.CursorPixelPosx(_Cursor_CharPos);
+            var r = _eTxt.CursorPixelPosx(_Cursor_CharPos);
 
             GR.DrawLine(new Pen(Color.Black), r.Left + _eTxt.DrawingPos.X, r.Top + _eTxt.DrawingPos.Y, r.Left + _eTxt.DrawingPos.X, r.Bottom + _eTxt.DrawingPos.Y);
         }
@@ -1127,7 +1127,7 @@ namespace BlueControls.Controls {
             PixX = Math.Min(PixX, _eTxt.DrawingPos.X + _eTxt.Width());
             PixY = Math.Min(PixY, _eTxt.DrawingPos.Y + _eTxt.Height());
 
-            int c = _eTxt.Char_Search(PixX, PixY);
+            var c = _eTxt.Char_Search(PixX, PixY);
             if (c < 0) { c = 0; }
 
             if (c < _eTxt.Chars.Count && PixX > _eTxt.DrawingPos.X + _eTxt.Chars[c].Pos.X + _eTxt.Chars[c].Size.Width / 2.0) { return c + 1; }
@@ -1213,8 +1213,8 @@ namespace BlueControls.Controls {
                 if (_eTxt == null) { return; }
 
 
-                int Pos = 0;
-                int woEnd = -1;
+                var Pos = 0;
+                var woEnd = -1;
 
                 bool Ok;
                 do {
@@ -1231,11 +1231,11 @@ namespace BlueControls.Controls {
                             if (_eTxt == null) { return; }// Das TExtfeld ist spontan geschlossen worden.
                             if (Pos >= _eTxt.Chars.Count) { break; }
 
-                            int woStart = _eTxt.WordStart(Pos);
+                            var woStart = _eTxt.WordStart(Pos);
 
                             if (woStart > -1) {
                                 woEnd = _eTxt.WordEnd(Pos);
-                                string wort = _eTxt.Word(Pos);
+                                var wort = _eTxt.Word(Pos);
 
                                 if (!Dictionary.IsWordOk(wort)) {
                                     if (SpellChecker.CancellationPending) { return; }
@@ -1269,7 +1269,7 @@ namespace BlueControls.Controls {
             //Ja, Multithreading ist kompliziert...
             if (SpellChecker.CancellationPending) { return; }
 
-            string[] x = Convert.ToString(e.UserState).SplitBy(";");
+            var x = Convert.ToString(e.UserState).SplitBy(";");
 
             switch (x[0]) {
                 case "Unmark":
@@ -1315,7 +1315,7 @@ namespace BlueControls.Controls {
 
             Focus();
 
-            string NewWord = "";
+            var NewWord = "";
 
 
             _MarkStart = int.Parse(e.Tags.TagGet("MarkStart"));
@@ -1323,7 +1323,7 @@ namespace BlueControls.Controls {
             _Cursor_CharPos = int.Parse(e.Tags.TagGet("Cursorpos"));
 
 
-            string tmp = e.ClickedComand;
+            var tmp = e.ClickedComand;
 
             if (e.ClickedComand.StartsWith("#ChangeTo:")) {
                 NewWord = e.ClickedComand.Substring(10);
@@ -1401,8 +1401,8 @@ namespace BlueControls.Controls {
                     return true;
 
                 case "#ChangeTo":
-                    int ws = _eTxt.WordStart(_Cursor_CharPos);
-                    int we = _eTxt.WordEnd(_Cursor_CharPos);
+                    var ws = _eTxt.WordStart(_Cursor_CharPos);
+                    var we = _eTxt.WordEnd(_Cursor_CharPos);
 
                     Char_DelBereich(ws, we);
                     _Cursor_CharPos = ws;
@@ -1426,21 +1426,21 @@ namespace BlueControls.Controls {
 
         private void AddSpecialChar() {
 
-            int x = _Cursor_CharPos;
+            var x = _Cursor_CharPos;
 
-            MultiUserFileGiveBackEventArgs e = new MultiUserFileGiveBackEventArgs();
+            var e = new MultiUserFileGiveBackEventArgs();
             OnNeedDatabaseOfAdditinalSpecialChars(e);
 
 
-            ItemCollectionList i = new ItemCollectionList(enBlueListBoxAppearance.Listbox);
+            var i = new ItemCollectionList(enBlueListBoxAppearance.Listbox);
 
 
             if (e.File is Database DB && DB.Bins.Count > 0) {
-                foreach (clsNamedBinary bmp in DB.Bins) {
+                foreach (var bmp in DB.Bins) {
 
                     if (bmp.Picture != null) {
                         if (!string.IsNullOrEmpty(bmp.Name)) {
-                            string crc = "DB_" + bmp.Name;
+                            var crc = "DB_" + bmp.Name;
                             i.Add(bmp.Name, crc, QuickImage.Get(crc, 20));
                         }
                     }
@@ -1457,7 +1457,7 @@ namespace BlueControls.Controls {
             i.Add("Kritisch", "Kritisch", QuickImage.Get(enImageCode.Kritisch, 20));
             i.Add("Frage", "Frage", QuickImage.Get(enImageCode.Frage, 20));
 
-            List<string> r = InputBoxListBoxStyle.Show("Wählen sie:", i, enAddType.None, true);
+            var r = InputBoxListBoxStyle.Show("Wählen sie:", i, enAddType.None, true);
 
             _Cursor_CharPos = x;
 
@@ -1480,13 +1480,13 @@ namespace BlueControls.Controls {
             HotItem = null;
 
             Tags.TagSet("CursorPosBeforeClick", _Cursor_CharPos.ToString());
-            int tmp = Cursor_PosAt(e.X, e.Y);
+            var tmp = Cursor_PosAt(e.X, e.Y);
             Tags.TagSet("Char", tmp.ToString());
             Tags.TagSet("MarkStart", _MarkStart.ToString());
             Tags.TagSet("MarkEnd", _MarkEnd.ToString());
             Tags.TagSet("Cursorpos", _Cursor_CharPos.ToString());
 
-            string tmpWord = _eTxt.Word(tmp);
+            var tmpWord = _eTxt.Word(tmp);
             Tags.TagSet("Word", tmpWord);
 
 
@@ -1498,9 +1498,9 @@ namespace BlueControls.Controls {
                     Items.Add("Gerade ausgelastet...", "Gerade ausgelastet...", false);
                     Items.AddSeparator();
                 } else {
-                    List<string> sim = Dictionary.SimilarTo(tmpWord);
+                    var sim = Dictionary.SimilarTo(tmpWord);
                     if (sim != null) {
-                        foreach (string ThisS in sim) {
+                        foreach (var ThisS in sim) {
                             Items.Add(" - " + ThisS, "#ChangeTo:" + ThisS);
                         }
 

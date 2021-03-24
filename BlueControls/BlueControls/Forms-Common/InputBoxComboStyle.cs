@@ -36,7 +36,7 @@ namespace BlueControls.Forms {
         private InputBoxComboStyle(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt) : this() {
             cbxText.Text = VorschlagsText;
 
-            ItemCollectionList SuggestClone = (ItemCollectionList)SuggestOriginal.Clone();
+            var SuggestClone = (ItemCollectionList)SuggestOriginal.Clone();
 
             cbxText.Item.CheckBehavior = SuggestClone.CheckBehavior;
             cbxText.Item.AddRange(SuggestClone);
@@ -71,14 +71,14 @@ namespace BlueControls.Forms {
         private static string Show(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt) {
 
 
-            InputBoxComboStyle MB = new InputBoxComboStyle(TXT, VorschlagsText, SuggestOriginal, TexteingabeErlaubt);
+            var MB = new InputBoxComboStyle(TXT, VorschlagsText, SuggestOriginal, TexteingabeErlaubt);
             MB.ShowDialog();
 
             return MB.GiveBack;
         }
 
         public static string Show(string TXT, List<string> Suggest, bool TexteingabeErlaubt) {
-            ItemCollectionList cSuggest = new ItemCollectionList();
+            var cSuggest = new ItemCollectionList();
             cSuggest.AddRange(Suggest);
             cSuggest.Sort();
             return Show(TXT, string.Empty, cSuggest, TexteingabeErlaubt);

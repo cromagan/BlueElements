@@ -186,14 +186,14 @@ namespace BlueControls.Controls {
 
             btnDropDown.Enabled = Item.Count > 0;
 
-            enDesign vType = enDesign.ComboBox_Textbox;
+            var vType = enDesign.ComboBox_Textbox;
             if (ParentType() == enPartentType.RibbonGroupBox || ParentType() == enPartentType.RibbonPage) {
                 vType = enDesign.Ribbon_ComboBox_Textbox;
             }
 
 
 
-            BasicListItem i = Item[Text];
+            var i = Item[Text];
             if (i == null) {
                 base.DrawControl(gr, state);
                 DoReturn();
@@ -226,8 +226,8 @@ namespace BlueControls.Controls {
 
             if (!FloatingInputBoxListBoxStyle.IsShowing(this)) {
                 // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
-                Rectangle r = i.Pos;
-                int ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox().Height) / 2.0);
+                var r = i.Pos;
+                var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox().Height) / 2.0);
                 i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox().Height));
                 i.Draw(gr, 0, 0, enDesign.ComboBox_Textbox, enDesign.ComboBox_Textbox, state, false, string.Empty, Translate);
                 i.SetCoordinates(r);
@@ -292,7 +292,7 @@ namespace BlueControls.Controls {
 
             if (_DrawStyle != enComboboxStyle.RibbonBar && Item[Text] != null) { Item[Text].Checked = true; }
 
-            FloatingInputBoxListBoxStyle DropDownMenu = FloatingInputBoxListBoxStyle.Show(Item, X, Y, Width, null, this, Translate);
+            var DropDownMenu = FloatingInputBoxListBoxStyle.Show(Item, X, Y, Width, null, this, Translate);
             DropDownMenu.Cancel += DropDownMenu_Cancel;
             DropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
 
@@ -407,7 +407,7 @@ namespace BlueControls.Controls {
         }
 
         public void SetTextIfItemExists(string text) {
-            foreach (BasicListItem thisItem in Item) {
+            foreach (var thisItem in Item) {
                 if (thisItem.Internal == text) {
                     Text = text;
                     return;

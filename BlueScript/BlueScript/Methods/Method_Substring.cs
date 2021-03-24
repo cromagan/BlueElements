@@ -25,20 +25,20 @@ namespace BlueScript {
 
         public override string Syntax { get => "Substring(String, Start, Anzahl)"; }
         public override string Description { get => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "substring" }; }
+        public override List<string> Comand(Script s) { return new() { "substring" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.String; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.Integer, enVariableDataType.Integer }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.String, enVariableDataType.Integer, enVariableDataType.Integer }; }
         public override bool EndlessArgs { get => false; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            int st = attvar[1].ValueInt;
-            int en = attvar[2].ValueInt;
+            var st = attvar[1].ValueInt;
+            var en = attvar[2].ValueInt;
 
             if (st < 0) {
                 en += st;

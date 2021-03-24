@@ -29,7 +29,7 @@ using System.Threading;
 
 namespace BlueControls {
     internal static class Dictionary {
-        internal static object Lock_SpellChecking = new object();
+        internal static object Lock_SpellChecking = new();
 
 
         private static Database _DictWords;
@@ -90,14 +90,14 @@ namespace BlueControls {
         public static List<string> SimilarTo(string Word) {
             if (IsWordOk(Word)) { return null; }
 
-            List<string> l = new List<string>();
+            var l = new List<string>();
 
 
-            foreach (RowItem ThisRowItem in _DictWords.Row) {
+            foreach (var ThisRowItem in _DictWords.Row) {
 
                 if (ThisRowItem != null) {
-                    string w = ThisRowItem.CellFirstString();
-                    int di = modAllgemein.LevenshteinDistance(Word.ToLower(), w.ToLower());
+                    var w = ThisRowItem.CellFirstString();
+                    var di = modAllgemein.LevenshteinDistance(Word.ToLower(), w.ToLower());
 
                     if (di < Word.Length / 2.0 || di < w.Length / 2.0) {
                         l.Add(di.ToString(Constants.Format_Integer5) + w);
@@ -109,9 +109,9 @@ namespace BlueControls {
             if (l.Count == 0) { return null; }
 
             l.Sort();
-            List<string> L2 = new List<string>();
+            var L2 = new List<string>();
 
-            foreach (string Thisstring in l) {
+            foreach (var Thisstring in l) {
                 L2.Add(Thisstring.Substring(5));
 
                 if (L2.Count == 10) { return L2; }
@@ -124,7 +124,7 @@ namespace BlueControls {
 
         public static void SpellCheckingAll(ExtText _ETXT, bool AllOK) {
 
-            bool Can = Monitor.TryEnter(Lock_SpellChecking);
+            var Can = Monitor.TryEnter(Lock_SpellChecking);
             if (Can) { Monitor.Exit(Lock_SpellChecking); }
 
 
@@ -137,8 +137,8 @@ namespace BlueControls {
             lock (Lock_SpellChecking) {
 
 
-                int Pos = 0;
-                int woEnd = -1;
+                var Pos = 0;
+                var woEnd = -1;
 
 
                 IsSpellChecking = true;
@@ -149,16 +149,16 @@ namespace BlueControls {
 
                     if (Pos >= _ETXT.Chars.Count) { break; }
 
-                    int woStart = _ETXT.WordStart(Pos);
+                    var woStart = _ETXT.WordStart(Pos);
 
                     if (woStart > -1) {
                         woEnd = _ETXT.WordEnd(Pos);
-                        string wort = _ETXT.Word(Pos);
+                        var wort = _ETXT.Word(Pos);
 
                         if (!IsWordOk(wort)) {
 
 
-                            int butt = 0;
+                            var butt = 0;
 
                             if (wort.ToLower() != wort) {
                                 butt = MessageBox.Show("<b>" + wort + "</b>", enImageCode.Stift, "'" + wort + "' aufnehmen", "'" + wort.ToLower() + "' aufnehmen", "Ignorieren", "Beenden");

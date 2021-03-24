@@ -27,21 +27,21 @@ namespace BlueScript {
 
         public override string Syntax { get => "if (true) { Code zum ausführen }"; }
         public override string Description { get => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "if" }; }
+        public override List<string> Comand(Script s) { return new() { "if" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => true; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Bool }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.Bool }; }
         public override bool EndlessArgs { get => false; }
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             if (attvar[0].ValueBool) {
-                (string err, string ermess2) = Script.Parse(infos.CodeBlockAfterText, false, s);
+                (var err, var ermess2) = Script.Parse(infos.CodeBlockAfterText, false, s);
                 if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
             } else {
                 s.Line += infos.LineBreakInCodeBlock;
@@ -83,13 +83,13 @@ namespace BlueScript {
 
 
             #region Klammern zuerst berechnen
-            (int posa, string _) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
+            (var posa, var _) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
             if (posa > -1) {
-                (int pose, string _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
+                (var pose, var _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
 
                 if (pose < posa) { return null; }
 
-                string tmp = GetBool(txt.Substring(posa + 1, pose - posa - 1));
+                var tmp = GetBool(txt.Substring(posa + 1, pose - posa - 1));
                 if (tmp == null) { return null; }
 
                 return GetBool(txt.Substring(0, posa) + tmp + txt.Substring(pose + 1));
@@ -135,7 +135,7 @@ namespace BlueScript {
         }
 
         private static string GetBoolTMP(string txt, string check) {
-            (int i, string _) = Script.NextText(txt, 0, new List<string>() { check }, false, false);
+            (var i, var _) = Script.NextText(txt, 0, new List<string>() { check }, false, false);
 
 
             if (i < 0) { return string.Empty; }
@@ -144,15 +144,15 @@ namespace BlueScript {
 
             if (i >= txt.Length - 1) { return string.Empty; } // siehe oben
 
-            int start = i - 1;
-            int ende = i + check.Length;
-            string trenn = "(!|&<>=)";
+            var start = i - 1;
+            var ende = i + check.Length;
+            var trenn = "(!|&<>=)";
 
-            bool gans = false;
+            var gans = false;
 
             do {
                 if (start < 0) { break; }
-                string ze = txt.Substring(start, 1);
+                var ze = txt.Substring(start, 1);
                 if (!gans && trenn.Contains(ze)) { break; }
                 if (ze == "\"") { gans = !gans; }
                 start--;
@@ -160,14 +160,14 @@ namespace BlueScript {
 
             do {
                 if (ende >= txt.Length) { break; }
-                string ze = txt.Substring(ende, 1);
+                var ze = txt.Substring(ende, 1);
                 if (!gans && trenn.Contains(ze)) { break; }
                 if (ze == "\"") { gans = !gans; }
                 ende++;
             } while (true);
 
-            string s1 = txt.Substring(start + 1, i - start - 1);
-            string s2 = txt.Substring(i + check.Length, ende - check.Length - i);
+            var s1 = txt.Substring(start + 1, i - start - 1);
+            var s2 = txt.Substring(i + check.Length, ende - check.Length - i);
 
 
             if (string.IsNullOrEmpty(s1) && check != "!") { return string.Empty; }
@@ -176,7 +176,7 @@ namespace BlueScript {
 
             Variable v1 = null;
             if (check != "!") { v1 = new Variable("dummy", s1, null); }
-            Variable v2 = new Variable("dummy", s2, null);
+            var v2 = new Variable("dummy", s2, null);
 
 
             // V2 braucht nicht gepürft werden, muss ja eh der gleiche TYpe wie V1 sein
@@ -191,7 +191,7 @@ namespace BlueScript {
             }
 
 
-            string replacer = string.Empty;
+            var replacer = string.Empty;
 
             switch (check) {
                 case "==":

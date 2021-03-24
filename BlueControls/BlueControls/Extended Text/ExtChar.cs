@@ -209,22 +209,22 @@ namespace BlueControls {
 
             if (_Char < 20) { return; }
 
-            float DrawX = Pos.X * czoom + PosModificator.X;
-            float DrawY = Pos.Y * czoom + PosModificator.Y;
+            var DrawX = Pos.X * czoom + PosModificator.X;
+            var DrawY = Pos.Y * czoom + PosModificator.Y;
 
             Font f = null;
 
             if (Font != null) { f = Font.FontWithoutLines(czoom); }
             if (Font == null) { return; }
 
-            bool IsCap = false;
+            var IsCap = false;
 
 
             if (_Char < (int)enASCIIKey.ImageStart) {
                 GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
 
-                char c = _Char;
+                var c = _Char;
                 if (Font.Kapitälchen && c != char.ToUpper(c)) {
                     IsCap = true;
                     f = Font.FontWithoutLinesForCapitals(czoom);
@@ -245,8 +245,8 @@ namespace BlueControls {
 
                 try {
                     if (Font.Outline) {
-                        for (int PX = -1; PX <= 1; PX++) {
-                            for (int PY = -1; PY <= 1; PY++) {
+                        for (var PX = -1; PX <= 1; PX++) {
+                            for (var PY = -1; PY <= 1; PY++) {
                                 GR.DrawString(c.ToString(), f, Font.Brush_Color_Outline, DrawX + PX, DrawY + PY, StringFormat.GenericTypographic);
                             }
                         }
@@ -283,11 +283,11 @@ namespace BlueControls {
                 // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
 
                 if (Math.Abs(czoom - 1) < 0.001) {
-                    QuickImage BNR = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
+                    var BNR = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
                     if (BNR == null) { return; }
                     GR.DrawImage(BNR.BMP, (int)DrawX, (int)DrawY);
                 } else {
-                    QuickImage l = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
+                    var l = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
 
                     if (l == null || l.Width == 0) { l = QuickImage.Get("Warnung|16"); }
 

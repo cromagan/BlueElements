@@ -98,8 +98,8 @@ namespace BluePaint {
         private bool AreSame(object a, object b) {
 
             if (a == null || b == null) { return false; }
-            Type t = a.GetType();
-            Type u = b.GetType();
+            var t = a.GetType();
+            var u = b.GetType();
 
             if (t.IsAssignableFrom(u) || u.IsAssignableFrom(t)) {
                 // x.IsAssignableFrom(y) returns true if:
@@ -274,7 +274,7 @@ namespace BluePaint {
             btnRückgänig.Enabled = false;
             _isSaved = false;
 
-            Bitmap _bmp = P.BMP;
+            var _bmp = P.BMP;
             BlueBasics.modAllgemein.Swap(ref _bmp, ref _PicUndo);
 
             P.BMP = _bmp;
@@ -309,7 +309,7 @@ namespace BluePaint {
 
 
             if (e.Current.IsInPic) {
-                Color c = P.BMP.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
+                var c = P.BMP.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
 
                 InfoText.Text = "X: " + e.Current.TrimmedX +
                                "<br>Y: " + e.Current.TrimmedY +

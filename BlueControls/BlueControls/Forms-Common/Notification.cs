@@ -45,8 +45,8 @@ namespace BlueControls.Forms {
             capTXT.Text = Text;
 
 
-            int He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-            int Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+            var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+            var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
 
 
             Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
@@ -63,7 +63,7 @@ namespace BlueControls.Forms {
         public static void Show(string Text) {
             CloseAll();
             if (string.IsNullOrEmpty(Text)) { return; }
-            Notification x = new Notification(Text);
+            var x = new Notification(Text);
             x.Show();
         }
 
@@ -82,7 +82,7 @@ namespace BlueControls.Forms {
 
         public static void CloseAll() {
 
-            foreach (FloatingForm ThisForm in AllBoxes) {
+            foreach (var ThisForm in AllBoxes) {
                 if (!ThisForm.IsDisposed && ThisForm is Notification) {
                     try {
                         ThisForm.Close();
@@ -99,7 +99,7 @@ namespace BlueControls.Forms {
         public new void Close() {
 
 
-            foreach (FloatingForm ThisForm in AllBoxes) {
+            foreach (var ThisForm in AllBoxes) {
                 if (!ThisForm.IsDisposed && ThisForm is Notification) {
                     try {
                         base.Close();
@@ -114,7 +114,7 @@ namespace BlueControls.Forms {
 
 
         private void timNote_Tick(object sender, System.EventArgs e) {
-            double MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
+            var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
             _Timer_Tick_count++;
 
             if (Tag is System.Windows.Forms.Control tempVar) {

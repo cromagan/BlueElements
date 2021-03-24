@@ -17,7 +17,7 @@ namespace BlueControls.Forms {
         #endregion
 
         public static void Show(string TXT, RowItem row, bool IsDialog) {
-            EditBoxRow MB = new EditBoxRow(TXT, row);
+            var MB = new EditBoxRow(TXT, row);
 
             if (IsDialog) {
                 MB.ShowDialog();

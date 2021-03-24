@@ -236,11 +236,11 @@ namespace BlueControls.Controls {
         private void Database_RowChecked(object sender, RowCheckedEventArgs e) {
             if (e.Row != _tmpRow) { return; }
 
-            string NewT = string.Empty;
+            var NewT = string.Empty;
 
-            foreach (string ThisString in e.ColumnsWithErrors) {
+            foreach (var ThisString in e.ColumnsWithErrors) {
 
-                string[] X = ThisString.SplitBy("|");
+                var X = ThisString.SplitBy("|");
                 if (_tmpColumn != null && X[0].ToUpper() == _tmpColumn.Name.ToUpper()) {
                     if (!string.IsNullOrEmpty(InfoText)) { InfoText += "<br><hr><br>"; }
                     NewT += X[1];
@@ -278,10 +278,10 @@ namespace BlueControls.Controls {
 
             switch (_tmpColumn.Format) {
                 case enDataFormat.Link_To_Filesystem:
-                    List<string> tmp = _tmpRow.CellGetList(_tmpColumn);
-                    List<string> tmp2 = new List<string>();
-                    foreach (string file in tmp) {
-                        string tmpF = _tmpColumn.BestFile(file, false);
+                    var tmp = _tmpRow.CellGetList(_tmpColumn);
+                    var tmp2 = new List<string>();
+                    foreach (var file in tmp) {
+                        var tmpF = _tmpColumn.BestFile(file, false);
                         if (FileExists(tmpF)) {
                             tmp2.Add(tmpF);
                         } else {
@@ -339,15 +339,15 @@ namespace BlueControls.Controls {
 
             if (_tmpColumn == null || _tmpRow == null) { return; }
 
-            string OldVal = _tmpRow.CellGetString(_tmpColumn);
+            var OldVal = _tmpRow.CellGetString(_tmpColumn);
             string NewValue;
 
             switch (_tmpColumn.Format) {
                 case enDataFormat.Link_To_Filesystem:
-                    List<string> tmp = Value.SplitByCRToList();
-                    List<string> tmp2 = new List<string>();
+                    var tmp = Value.SplitByCRToList();
+                    var tmp2 = new List<string>();
 
-                    foreach (string file in tmp) {
+                    foreach (var file in tmp) {
                         tmp2.Add(_tmpColumn.SimplyFile(file));
                     }
                     NewValue = tmp2.JoinWithCr();
@@ -377,7 +377,7 @@ namespace BlueControls.Controls {
             if (e.Control is Caption) { return; } // z.B. Info Caption
 
 
-            ColumnItem column1 = _tmpColumn;
+            var column1 = _tmpColumn;
 
             if (column1 == null) {
                 //            Develop.DebugPrint("Column nicht gefunden"); 
@@ -407,7 +407,7 @@ namespace BlueControls.Controls {
 
             switch (e.Control) {
                 case ComboBox comboBox:
-                    ItemCollectionList Item2 = new ItemCollectionList();
+                    var Item2 = new ItemCollectionList();
                     ItemCollectionList.GetItemCollection(Item2, column1, null, enShortenStyle.Replaced, 10000);
 
                     if (column1.TextBearbeitungErlaubt) {
@@ -537,7 +537,7 @@ namespace BlueControls.Controls {
 
                     switch (ep.SorceType) {
                         case enSorceType.ScreenShot:
-                            string fil = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
+                            var fil = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
                             ep.Bitmap.Save(fil, ImageFormat.Png);
                             ep.ChangeSource(fil, enSorceType.LoadedFromDisk, false);
 
@@ -557,7 +557,7 @@ namespace BlueControls.Controls {
 
 
 
-                            string fil2 = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
+                            var fil2 = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
 
                             if (fil2.FilePath().ToUpper() != ep.SorceName.FilePath().ToUpper()) {
                                 ep.Bitmap.Save(fil2, ImageFormat.Png);
@@ -615,9 +615,9 @@ namespace BlueControls.Controls {
                 case "dateiöffnen":
                     if (e.HotItem is TextListItem t) {
                         if (FileExists(t.Internal)) {
-                            byte[] b = modConverter.FileToByte(t.Internal);
+                            var b = modConverter.FileToByte(t.Internal);
                             b = modAllgemein.SimpleCrypt(b, FileEncryptionKey, -1);
-                            string tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
+                            var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
                             modConverter.ByteToFile(tmp, b);
                             ExecuteFile(tmp, null, true, false);
                             MessageBox.Show("Warte...");
@@ -629,7 +629,7 @@ namespace BlueControls.Controls {
                 case "bild öffnen":
                     if (e.HotItem is BitmapListItem bi) {
                         if (bi.ImageLoaded()) {
-                            Forms.PictureView x = new BlueControls.Forms.PictureView(bi.Bitmap);
+                            var x = new BlueControls.Forms.PictureView(bi.Bitmap);
                             x.Show();
 
                             //var b = modConverter.FileToByte(t.Internal);
@@ -667,9 +667,9 @@ namespace BlueControls.Controls {
 
         private void ListBox_AddClicked(object sender, System.EventArgs e) {
 
-            enEditTypeTable Dia = ColumnItem.UserEditDialogTypeInTable(_tmpColumn, false);
+            var Dia = ColumnItem.UserEditDialogTypeInTable(_tmpColumn, false);
 
-            ListBox lbx = (ListBox)sender;
+            var lbx = (ListBox)sender;
 
             switch (Dia) {
                 case enEditTypeTable.None:
@@ -678,8 +678,8 @@ namespace BlueControls.Controls {
                 case enEditTypeTable.FileHandling_InDateiSystem:
                     // korrektheit der Zelle bereits geprüft
                     if (_tmpColumn != null && string.IsNullOrEmpty(lbx.LastFilePath)) { lbx.LastFilePath = _Database.Filename.FilePath(); }
-                    List<string> DelList = new List<string>();
-                    using (OpenFileDialog f = new System.Windows.Forms.OpenFileDialog()) {
+                    var DelList = new List<string>();
+                    using (var f = new System.Windows.Forms.OpenFileDialog()) {
                         f.CheckFileExists = true;
                         f.CheckPathExists = true;
                         f.Multiselect = true;
@@ -690,12 +690,12 @@ namespace BlueControls.Controls {
                         if (f.FileNames == null || f.FileNames.Length == 0) { return; }
 
 
-                        for (int z = 0; z <= f.FileNames.GetUpperBound(0); z++) {
-                            byte[] b = modConverter.FileToByte(f.FileNames[z]);
+                        for (var z = 0; z <= f.FileNames.GetUpperBound(0); z++) {
+                            var b = modConverter.FileToByte(f.FileNames[z]);
 
                             if (!string.IsNullOrEmpty(_Database.FileEncryptionKey)) { b = modAllgemein.SimpleCrypt(b, _Database.FileEncryptionKey, 1); }
 
-                            string neu = f.FileNames[z].FileNameWithSuffix();
+                            var neu = f.FileNames[z].FileNameWithSuffix();
                             neu = _tmpColumn.BestFile(neu.FileNameWithSuffix(), true);
                             lbx.LastFilePath = f.FileNames[z].FilePath();
 
@@ -731,7 +731,7 @@ namespace BlueControls.Controls {
         private void Marker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e) {
             TextBox TXB = null;
 
-            foreach (object Control in Controls) {
+            foreach (var Control in Controls) {
                 if (Control is TextBox t) { TXB = t; }
             }
 
@@ -743,12 +743,12 @@ namespace BlueControls.Controls {
             if (_tmpRow == null) { return; }
 
             if (Marker.CancellationPending) { return; }
-            List<string> Names = new List<string>();
+            var Names = new List<string>();
             Names.AddRange(_Database.Column[0].GetUcaseNamesSortedByLenght());
             if (Marker.CancellationPending) { return; }
-            string myname = _tmpRow.CellFirstString().ToUpper();
+            var myname = _tmpRow.CellFirstString().ToUpper();
 
-            string InitT = TXB.Text;
+            var InitT = TXB.Text;
 
             bool Ok;
             do {
@@ -763,12 +763,12 @@ namespace BlueControls.Controls {
                 if (Marker.CancellationPending || InitT != TXB.Text) { return; }
 
                 try {
-                    foreach (string ThisWord in Names) {
-                        int cap = 0;
+                    foreach (var ThisWord in Names) {
+                        var cap = 0;
                         do {
                             Develop.DoEvents();
                             if (Marker.CancellationPending || InitT != TXB.Text) { return; }
-                            int fo = InitT.IndexOfWord(ThisWord, cap, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                            var fo = InitT.IndexOfWord(ThisWord, cap, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
                             if (fo < 0) { break; }
 
@@ -796,8 +796,8 @@ namespace BlueControls.Controls {
             //Ja, Multithreading ist kompliziert...
             if (Marker.CancellationPending) { return; }
 
-            List<object> x = (List<object>)e.UserState;
-            TextBox TXB = (TextBox)x[0];
+            var x = (List<object>)e.UserState;
+            var TXB = (TextBox)x[0];
 
             switch ((string)x[1]) {
                 case "Unmark1":
@@ -867,9 +867,9 @@ namespace BlueControls.Controls {
 
             if (Parent is Formula f) {
 
-                ItemCollectionList x = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+                var x = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
 
-                f.GetContextMenuItems(null, x, out object _, Tags, ref Cancel, ref Translate);
+                f.GetContextMenuItems(null, x, out var _, Tags, ref Cancel, ref Translate);
 
                 if (x.Count > 0) {
                     if (Items.Count > 0) {

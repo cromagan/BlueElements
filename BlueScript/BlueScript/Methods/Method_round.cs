@@ -26,25 +26,25 @@ namespace BlueScript {
 
         public override string Syntax { get => "Round(Value, Nachkommastellen)"; }
         public override string Description { get => "Rundet den Zahlenwert mathematisch korrekt."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "round" }; }
+        public override List<string> Comand(Script s) { return new() { "round" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Number; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number, enVariableDataType.Integer }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.Number, enVariableDataType.Integer }; }
         public override bool EndlessArgs { get => false; }
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            int n = (int)attvar[1].ValueDouble;
+            var n = (int)attvar[1].ValueDouble;
 
             if (n < 0) { n = 0; }
             if (n > 10) { n = 10; }
 
-            double val = Math.Round(attvar[0].ValueDouble, n);
+            var val = Math.Round(attvar[0].ValueDouble, n);
 
             return new strDoItFeedback(val.ToString(), string.Empty);
         }

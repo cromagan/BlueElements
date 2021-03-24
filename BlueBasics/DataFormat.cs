@@ -127,7 +127,7 @@ namespace BlueBasics {
         public static bool IsFormat(this string Txt, enDataFormat Format, bool MultiLine) {
 
             if (MultiLine) {
-                string[] ex = Txt.SplitByCR();
+                var ex = Txt.SplitByCR();
                 return ex.All(ThisString => string.IsNullOrEmpty(ThisString) || ThisString.IsFormat(Format));
             }
 
@@ -253,8 +253,8 @@ namespace BlueBasics {
         }
 
         public static bool Text_LängeCheck(string TXT, enDataFormat format) {
-            int ml = Text_MaximaleLänge(format);
-            int il = 0;
+            var ml = Text_MaximaleLänge(format);
+            var il = 0;
             if (TXT != null) { il = TXT.Length; }
 
             if (ml > -1 && il > ml) { return false; }
@@ -402,15 +402,15 @@ namespace BlueBasics {
 
 
         public static string CompareKey(string IsValue, enDataFormat Format) {
-            string CompareKey_S_OK = Constants.SecondSortChar + "X";
-            string CompareKey_S_NOK = Constants.SecondSortChar + "A";
+            var CompareKey_S_OK = Constants.SecondSortChar + "X";
+            var CompareKey_S_NOK = Constants.SecondSortChar + "A";
 
 
             switch (Format) {
                 case enDataFormat.Ganzzahl:
                     if (string.IsNullOrEmpty(IsValue)) { return CompareKey_S_NOK + "0000000000"; }
 
-                    if (int.TryParse(IsValue, out int w)) {
+                    if (int.TryParse(IsValue, out var w)) {
                         return CompareKey_S_OK + w.ToString(Constants.Format_Integer10);
                     } else {
                         return CompareKey_S_NOK + IsValue;
@@ -464,8 +464,8 @@ namespace BlueBasics {
                 case enDataFormat.Gleitkommazahl:
                     if (string.IsNullOrEmpty(IsValue)) { return "0000000000,000"; }
 
-                    if (double.TryParse(IsValue, out double dw)) {
-                        string t = dw.ToString(Constants.Format_Float10_3);
+                    if (double.TryParse(IsValue, out var dw)) {
+                        var t = dw.ToString(Constants.Format_Float10_3);
                         if (!t.Contains(",")) { t += ",000"; };
                         while (t.Length < 14) { t += "0"; }
 
@@ -478,7 +478,7 @@ namespace BlueBasics {
 
                 case enDataFormat.Datum_und_Uhrzeit:
 
-                    if (DateTimeTryParse(IsValue, out System.DateTime d)) {
+                    if (DateTimeTryParse(IsValue, out var d)) {
                         return CompareKey_S_OK + d.ToString("u");
                     } else {
                         return CompareKey_S_NOK + IsValue;
@@ -528,16 +528,16 @@ namespace BlueBasics {
 
 
 
-        public static bool NeedUTF8(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.RelationText:
-                case enDataFormat.Text_mit_Formatierung:
-                    return true;
-                default:
-                    return false;
-            }
-        }
+        //public static bool NeedUTF8(this enDataFormat format) {
+        //    switch (format) {
+        //        case enDataFormat.Text:
+        //        case enDataFormat.RelationText:
+        //        case enDataFormat.Text_mit_Formatierung:
+        //            return true;
+        //        default:
+        //            return false;
+        //    }
+        //}
 
 
 

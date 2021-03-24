@@ -473,12 +473,12 @@ namespace BlueControls.Designer_Support {
 
             const enImageCode tempVar = (enImageCode)9999;
             for (enImageCode z = 0; z <= tempVar; z++) {
-                string w = Enum.GetName(z.GetType(), z);
+                var w = Enum.GetName(z.GetType(), z);
                 if (!string.IsNullOrEmpty(w)) { LB.Items.Add(w); }
             }
 
 
-            QuickImage l = new QuickImage(C);
+            var l = new QuickImage(C);
 
 
             PicName.Text = l.Name;
@@ -521,7 +521,7 @@ namespace BlueControls.Designer_Support {
         }
 
         public string ICode() {
-            enImageCodeEffect e = (enImageCodeEffect)(((chkbGrauStufen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Graustufen) | ((chkbDurchgestrichen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Durchgestrichen) | ((chkbMEDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsMEDisabled) | ((chkbXPDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsXPDisabled));
+            var e = (enImageCodeEffect)(((chkbGrauStufen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Graustufen) | ((chkbDurchgestrichen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Durchgestrichen) | ((chkbMEDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsMEDisabled) | ((chkbXPDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsXPDisabled));
             return QuickImage.GenerateCode(PicName.Text, int.Parse(GrX.Text), int.Parse(GrY.Text), e, Färb.Text, grün.Text, SAT.Value, Hell.Value, 0, Transp.Value, txbZweitsymbol.Text);
         }
 

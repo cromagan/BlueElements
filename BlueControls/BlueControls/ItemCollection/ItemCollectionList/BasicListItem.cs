@@ -171,7 +171,7 @@ namespace BlueControls.ItemCollection {
             if (itemdesign == enDesign.Undefiniert) { return; }
 
 
-            Rectangle PositionModified = new Rectangle(Pos.X - xModifier, Pos.Y - YModifier, Pos.Width, Pos.Height);
+            var PositionModified = new Rectangle(Pos.X - xModifier, Pos.Y - YModifier, Pos.Width, Pos.Height);
 
 
 
@@ -181,7 +181,7 @@ namespace BlueControls.ItemCollection {
 
             if (DrawBorderAndBack) {
                 if (!string.IsNullOrEmpty(FilterText) && !FilterMatch(FilterText)) {
-                    Color c1 = Skin.Color_Back(controldesign, enStates.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
+                    var c1 = Skin.Color_Back(controldesign, enStates.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
                     c1 = c1.SetAlpha(160);
                     GR.FillRectangle(new SolidBrush(c1), PositionModified);
                 }

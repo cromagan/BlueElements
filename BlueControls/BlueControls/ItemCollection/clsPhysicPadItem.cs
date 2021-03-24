@@ -5,7 +5,7 @@ namespace BlueControls.ItemCollection {
     internal class clsPhysicPadItem : clsAbstractPhysicPadItem {
 
 
-        public readonly List<clsKraft> Kraft = new List<clsKraft>();
+        public readonly List<clsKraft> Kraft = new();
 
 
 

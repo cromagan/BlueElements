@@ -46,8 +46,8 @@ namespace BlueBasics {
                 // --------------------------------------------------------------------------------------------------------------------------------
                 // --- Eine Klammer auflösen, im Formelstring ersetzen und         mittels Rekursivität die nun einfachere Formel berechnen.
                 // --------------------------------------------------------------------------------------------------------------------------------
-                int a = Formel.LastIndexOf("(");
-                int e = Formel.IndexOf(")", a);
+                var a = Formel.LastIndexOf("(");
+                var e = Formel.IndexOf(")", a);
 
                 if (a >= e) { return null; }
 
@@ -148,7 +148,7 @@ namespace BlueBasics {
             // --------------------------------------------------------------------------------------------------------------------------------
             if (Formel.Replace(".", ",").IsNumeral()) { return double.Parse(Formel.Replace(".", ",")); }
             //TMP = Math.Max(Math.Max(-1, Formel.LastIndexOf("=")), Math.Max(Formel.LastIndexOf("<"), Formel.LastIndexOf(">")));
-            int TMP = Math.Max(Formel.LastIndexOf("+"), LastMinusIndex(Formel));
+            var TMP = Math.Max(Formel.LastIndexOf("+"), LastMinusIndex(Formel));
             if (TMP < 0) { TMP = Math.Max(Formel.LastIndexOf("/"), Formel.LastIndexOf("*")); }
             if (TMP < 1) { return null; }
 
@@ -156,7 +156,7 @@ namespace BlueBasics {
             // --------------------------------------------------------------------------------------------------------------------------------
             // --- Berechnung nötig, String Splitten berechnen und das Ergebnis zurückgeben
             // --------------------------------------------------------------------------------------------------------------------------------
-            string Seperator = Formel.Substring(TMP, 1);
+            var Seperator = Formel.Substring(TMP, 1);
 
             //if (Seperator == "<" || Seperator == ">" || Seperator == "=")
             //{
@@ -168,11 +168,11 @@ namespace BlueBasics {
             //    if (sep2 == "<" || sep2 == ">" || sep2 == "=") { Seperator = Formel.Substring(TMP, 2); }
             //}
 
-            double? w1 = ErgebnisCore(Formel.Substring(0, TMP));
+            var w1 = ErgebnisCore(Formel.Substring(0, TMP));
             if (w1 == null) { return null; }
 
 
-            double? w2 = ErgebnisCore(Formel.Substring(TMP + Seperator.Length));
+            var w2 = ErgebnisCore(Formel.Substring(TMP + Seperator.Length));
             if (w2 == null) { return null; }
 
 
@@ -219,14 +219,14 @@ namespace BlueBasics {
         public static int LastMinusIndex(string Formel) {
             if (Formel.Contains("-") == false) { return -1; }
 
-            int LastMin = 1;
-            int OkMin = -1;
+            var LastMin = 1;
+            var OkMin = -1;
 
             while (true) {
                 LastMin = Formel.IndexOf("-", LastMin);
                 if (LastMin < 1) { break; }
 
-                string VorZ = Formel.Substring(LastMin - 1, 1);
+                var VorZ = Formel.Substring(LastMin - 1, 1);
                 if (VorZ.IsNumeral()) { OkMin = LastMin; }
                 LastMin++;
             }

@@ -49,7 +49,7 @@ namespace BlueControls {
         private decimal _StoreY;
 
 
-        public static readonly Font SimpleArial = new Font("Arial", 8);
+        public static readonly Font SimpleArial = new("Arial", 8);
 
         private bool _fix = false;
 
@@ -74,7 +74,7 @@ namespace BlueControls {
             Initialize();
             _parent = parent;
             Name = name;
-            PointM tempVar = GeometryDF.PolarToCartesian(laenge, Convert.ToDouble(alpha));
+            var tempVar = GeometryDF.PolarToCartesian(laenge, Convert.ToDouble(alpha));
             _x = startX + tempVar.X;
             _y = startY + tempVar.Y;
         }
@@ -281,7 +281,7 @@ namespace BlueControls {
 
             _parent = parent;
 
-            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
+            foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "parentname":
                         break;
@@ -327,9 +327,9 @@ namespace BlueControls {
             IsParsing = false;
         }
 
-        public static explicit operator PointF(PointM p) => new PointF((float)p.X, (float)p.Y);
+        public static explicit operator PointF(PointM p) => new((float)p.X, (float)p.Y);
 
-        public static explicit operator Point(PointM p) => new Point((int)p.X, (int)p.Y);
+        public static explicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
 
 
 
@@ -350,7 +350,7 @@ namespace BlueControls {
 
 
         public override string ToString() {
-            string t = "{";
+            var t = "{";
 
 
             if (_parent != null) {
@@ -397,8 +397,8 @@ namespace BlueControls {
 
         public bool IsOnScreen(decimal zoom, decimal shiftX, decimal shiftY, Rectangle displayRectangle) {
 
-            decimal tx = _x * zoom - shiftX;
-            decimal ty = _y * zoom - shiftY;
+            var tx = _x * zoom - shiftX;
+            var ty = _y * zoom - shiftY;
 
             if (tx < displayRectangle.Left || ty < displayRectangle.Top) { return false; }
             if (tx > displayRectangle.Right || ty > displayRectangle.Bottom) { return false; }
@@ -408,10 +408,10 @@ namespace BlueControls {
 
 
         public void Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, enDesign type, enStates state, string textToDraw) {
-            decimal tx = _x * zoom - shiftX + zoom / 2;
-            decimal ty = _y * zoom - shiftY + zoom / 2;
+            var tx = _x * zoom - shiftX + zoom / 2;
+            var ty = _y * zoom - shiftY + zoom / 2;
 
-            Rectangle r = new Rectangle((int)(tx - 4), (int)(ty - 4), 9, 9);
+            var r = new Rectangle((int)(tx - 4), (int)(ty - 4), 9, 9);
 
 
             if (!_UserSelectable) {
@@ -426,8 +426,8 @@ namespace BlueControls {
 
 
             if (!string.IsNullOrEmpty(textToDraw)) {
-                for (int x = -1; x < 2; x++) {
-                    for (int y = -1; y < 2; y++) {
+                for (var x = -1; x < 2; x++) {
+                    for (var y = -1; y < 2; y++) {
                         gr.DrawString(textToDraw, SimpleArial, Brushes.White, (float)tx + x, (float)ty + y - 16);
                     }
 
@@ -457,7 +457,7 @@ namespace BlueControls {
         }
 
         public void SetTo(PointM StartPoint, decimal Länge, decimal Alpha) {
-            PointM tempVar = GeometryDF.PolarToCartesian(Länge, Convert.ToDouble(Alpha));
+            var tempVar = GeometryDF.PolarToCartesian(Länge, Convert.ToDouble(Alpha));
             _x = StartPoint.X + tempVar.X;
             _y = StartPoint.Y + tempVar.Y;
         }
@@ -484,13 +484,13 @@ namespace BlueControls {
             if (Fix) { return false; }
 
 
-            foreach (clsPointRelation ThisRelation in Rel) {
+            foreach (var ThisRelation in Rel) {
                 if (ThisRelation != null && !Alredychecked.Contains(ThisRelation) && ThisRelation.Points.Contains(this) && ThisRelation.Performs(false)) {
                     Alredychecked.Add(ThisRelation);
 
                     if (ThisRelation.Connects().HasFlag(toCheck)) {
-                        bool Move = true;
-                        foreach (PointM thispoint in ThisRelation.Points) {
+                        var Move = true;
+                        foreach (var thispoint in ThisRelation.Points) {
                             if (thispoint != this) { Move = thispoint.CanMove(toCheck, Rel, Alredychecked); }
                             if (!Move) { return false; }
                         }
@@ -503,13 +503,13 @@ namespace BlueControls {
         }
 
         public bool CanMoveX(List<clsPointRelation> Rel) {
-            List<clsPointRelation> Alredychecked = new List<clsPointRelation>();
+            var Alredychecked = new List<clsPointRelation>();
 
             return CanMove(enXY.X, Rel, Alredychecked);
         }
 
         public bool CanMoveY(List<clsPointRelation> Rel) {
-            List<clsPointRelation> Alredychecked = new List<clsPointRelation>();
+            var Alredychecked = new List<clsPointRelation>();
 
             return CanMove(enXY.Y, Rel, Alredychecked);
         }
@@ -556,7 +556,7 @@ namespace BlueControls {
         }
 
         public decimal DistanzZuLinie(decimal X1, decimal Y1, decimal X2, decimal Y2) {
-            PointM pal = GeometryDF.PointOnLine(this, X1, Y1, X2, Y2);
+            var pal = GeometryDF.PointOnLine(this, X1, Y1, X2, Y2);
             return GeometryDF.Länge(this, pal);
         }
 
@@ -571,7 +571,7 @@ namespace BlueControls {
         }
 
         public void Normalize() {
-            decimal magnitude = Magnitude;
+            var magnitude = Magnitude;
             _x /= magnitude;
             _y /= magnitude;
         }

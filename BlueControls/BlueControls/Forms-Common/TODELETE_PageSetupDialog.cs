@@ -52,7 +52,7 @@ namespace BlueControls.Forms {
             Format.Item.Clear();
 
             foreach (PaperSize ps in _PrintDocument1.PrinterSettings.PaperSizes) {
-                string nn = ps.Width + ";" + ps.Height;
+                var nn = ps.Width + ";" + ps.Height;
                 if (Format.Item[nn] == null) {
                     Format.Item.Add(ps.PaperName, nn, QuickImage.Get(enImageCode.Datei), true, ps.PaperName);
                 }
@@ -144,7 +144,7 @@ namespace BlueControls.Forms {
 
 
             if (Format.Text.Contains(";")) {
-                string[] l = Format.Text.SplitBy(";");
+                var l = Format.Text.SplitBy(";");
                 FillHöheBreite(int.Parse(l[0]), int.Parse(l[1]));
             } else {
                 Format.Text = "neu";
@@ -198,8 +198,8 @@ namespace BlueControls.Forms {
 
 
         private void FillHöheBreite(double B, double h) {
-            string nn1 = B + ";" + h;
-            string nn2 = h + ";" + B;
+            var nn1 = B + ";" + h;
+            var nn2 = h + ";" + B;
 
             if (Format.Item[nn1] != null) {
                 Format.Text = nn1;
@@ -286,7 +286,7 @@ namespace BlueControls.Forms {
 
         private void DrawSampleAndCheckButton() {
 
-            bool makeP = true;
+            var makeP = true;
 
 
             if (!Breite.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
@@ -313,18 +313,18 @@ namespace BlueControls.Forms {
                 Ok.Enabled = true;
 
 
-                double Z = Math.Min(Sample.Width / br, Sample.Height / ho);
+                var Z = Math.Min(Sample.Width / br, Sample.Height / ho);
 
 
-                float l = (float)(float.Parse(Links.Text) * Z);
-                float o = (float)(float.Parse(Oben.Text) * Z);
-                float r = (float)(float.Parse(Rechts.Text) * Z);
-                float u = (float)(float.Parse(Unten.Text) * Z);
+                var l = (float)(float.Parse(Links.Text) * Z);
+                var o = (float)(float.Parse(Oben.Text) * Z);
+                var r = (float)(float.Parse(Rechts.Text) * Z);
+                var u = (float)(float.Parse(Unten.Text) * Z);
 
 
-                Bitmap i = new Bitmap((int)(br * Z - 1), (int)(ho * Z - 1));
+                var i = new Bitmap((int)(br * Z - 1), (int)(ho * Z - 1));
 
-                Graphics gr = Graphics.FromImage(i);
+                var gr = Graphics.FromImage(i);
 
                 gr.Clear(Color.White);
                 gr.DrawRectangle(Pens.Black, 0, 0, i.Width - 1, i.Height - 1);

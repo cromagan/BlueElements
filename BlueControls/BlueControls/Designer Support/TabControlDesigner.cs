@@ -11,7 +11,7 @@ namespace BlueControls.Designer_Support {
     internal sealed class TabControlDesigner : ParentControlDesigner {
         #region  Private Instance Variables 
 
-        private readonly DesignerVerbCollection m_verbs = new DesignerVerbCollection();
+        private readonly DesignerVerbCollection m_verbs = new();
         private IDesignerHost m_DesignerHost;
         private ISelectionService m_SelectionService;
 
@@ -19,9 +19,9 @@ namespace BlueControls.Designer_Support {
 
         public TabControlDesigner() {
 
-            DesignerVerb verb1 = new DesignerVerb("Add Tab", OnAddPage);
-            DesignerVerb verb2 = new DesignerVerb("Insert Tab", OnInsertPage);
-            DesignerVerb verb3 = new DesignerVerb("Remove Tab", OnRemovePage);
+            var verb1 = new DesignerVerb("Add Tab", OnAddPage);
+            var verb2 = new DesignerVerb("Insert Tab", OnInsertPage);
+            var verb3 = new DesignerVerb("Remove Tab", OnRemovePage);
             m_verbs.AddRange(new[] { verb1, verb2, verb3 });
         }
 
@@ -30,7 +30,7 @@ namespace BlueControls.Designer_Support {
         public override DesignerVerbCollection Verbs {
             get {
                 if (m_verbs.Count == 3) {
-                    AbstractTabControl MyControl = (AbstractTabControl)Control;
+                    var MyControl = (AbstractTabControl)Control;
                     if (MyControl.TabCount > 0) {
                         m_verbs[1].Enabled = true;
                         m_verbs[2].Enabled = true;
@@ -65,12 +65,12 @@ namespace BlueControls.Designer_Support {
 
         public void OnAddPage(object sender, System.EventArgs e) {
 
-            AbstractTabControl ParentControl = (AbstractTabControl)Control;
-            System.Windows.Forms.Control.ControlCollection oldTabs = ParentControl.Controls;
+            var ParentControl = (AbstractTabControl)Control;
+            var oldTabs = ParentControl.Controls;
 
             RaiseComponentChanging(TypeDescriptor.GetProperties(ParentControl)["TabPages"]);
 
-            TabPage P = (TabPage)DesignerHost.CreateComponent(typeof(TabPage));
+            var P = (TabPage)DesignerHost.CreateComponent(typeof(TabPage));
             P.Text = P.Name;
             ParentControl.TabPages.Add(P);
 
@@ -87,25 +87,25 @@ namespace BlueControls.Designer_Support {
 
         public void OnInsertPage(object sender, System.EventArgs e) {
 
-            AbstractTabControl ParentControl = (AbstractTabControl)Control;
-            System.Windows.Forms.Control.ControlCollection oldTabs = ParentControl.Controls;
-            int Index = ParentControl.SelectedIndex;
+            var ParentControl = (AbstractTabControl)Control;
+            var oldTabs = ParentControl.Controls;
+            var Index = ParentControl.SelectedIndex;
 
             RaiseComponentChanging(TypeDescriptor.GetProperties(ParentControl)["TabPages"]);
 
-            TabPage P = (TabPage)DesignerHost.CreateComponent(typeof(TabPage));
+            var P = (TabPage)DesignerHost.CreateComponent(typeof(TabPage));
             P.Text = P.Name;
 
-            System.Windows.Forms.TabPage[] tpc = new System.Windows.Forms.TabPage[ParentControl.TabCount + 1];
+            var tpc = new System.Windows.Forms.TabPage[ParentControl.TabCount + 1];
             //Starting at our Insert Position, store and remove all the tabpages.
-            for (int i = Index; i < ParentControl.TabCount; i++) {
+            for (var i = Index; i < ParentControl.TabCount; i++) {
                 tpc[i] = ParentControl.TabPages[Index];
                 ParentControl.TabPages.Remove(ParentControl.TabPages[Index]);
             }
             //add the tabpage to be inserted.
             ParentControl.TabPages.Add(P);
             //then re-add the original tabpages.
-            for (int i = Index; i < tpc.GetUpperBound(0); i++) {
+            for (var i = Index; i < tpc.GetUpperBound(0); i++) {
                 ParentControl.TabPages.Add(tpc[i]);
             }
 
@@ -117,8 +117,8 @@ namespace BlueControls.Designer_Support {
 
         public void OnRemovePage(object sender, System.EventArgs e) {
 
-            AbstractTabControl ParentControl = (AbstractTabControl)Control;
-            System.Windows.Forms.Control.ControlCollection oldTabs = ParentControl.Controls;
+            var ParentControl = (AbstractTabControl)Control;
+            var oldTabs = ParentControl.Controls;
 
             if (ParentControl.SelectedIndex < 0) { return; }
 
@@ -135,7 +135,7 @@ namespace BlueControls.Designer_Support {
 
         private void SetVerbs() {
 
-            AbstractTabControl ParentControl = (AbstractTabControl)Control;
+            var ParentControl = (AbstractTabControl)Control;
 
             switch (ParentControl.TabPages.Count) {
                 case 0:
@@ -181,16 +181,16 @@ namespace BlueControls.Designer_Support {
         protected override bool GetHitTest(Point point) {
 
             if ((System.Windows.Forms.Control)SelectionService.PrimarySelection == Control) {
-                TCHITTESTINFO hti = new TCHITTESTINFO {
+                var hti = new TCHITTESTINFO {
                     pt = Control.PointToClient(point)
                 };
 
-                System.Windows.Forms.Message m = new System.Windows.Forms.Message {
+                var m = new System.Windows.Forms.Message {
                     HWnd = Control.Handle,
                     Msg = TCM_HITTEST
                 };
 
-                IntPtr lparam = Marshal.AllocHGlobal(Marshal.SizeOf(hti));
+                var lparam = Marshal.AllocHGlobal(Marshal.SizeOf(hti));
                 Marshal.StructureToPtr(hti, lparam, false);
                 m.LParam = lparam;
 

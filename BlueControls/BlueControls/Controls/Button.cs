@@ -270,7 +270,7 @@ namespace BlueControls.Controls {
             if (string.IsNullOrEmpty(Name)) { return; }
 
 
-            foreach (object CLT in Parent.Controls) {
+            foreach (var CLT in Parent.Controls) {
                 if (CLT is Button tempVar) {
                     if (tempVar.ButtonStyle == _ButtonStyle && tempVar != this && tempVar.Checked) { tempVar.Checked = false; }
 
@@ -281,7 +281,7 @@ namespace BlueControls.Controls {
         }
         private void _ClickFirerer_Tick(object sender, System.EventArgs e) {
 
-            bool ok = _ButtonStyle == enButtonStyle.SliderButton;
+            var ok = _ButtonStyle == enButtonStyle.SliderButton;
             if (!MousePressing()) { ok = false; }
             if (!ContainsMouse()) { ok = false; }
 
@@ -364,8 +364,8 @@ namespace BlueControls.Controls {
 
 
 
-                double Zoom = Math.Min((con.Width - 6) / (double)p.BMP.Width, 28 / (double)p.BMP.Height);
-                QuickImage p2 = QuickImage.Get(QuickImage.GenerateCode(p.Name, (int)(p.BMP.Width * Zoom), (int)(p.BMP.Height * Zoom), p.Effekt, p.Färbung, p.ChangeGreenTo, p.Sättigung, p.Helligkeit, p.DrehWinkel, p.Transparenz, p.Zweitsymbol));
+                var Zoom = Math.Min((con.Width - 6) / (double)p.BMP.Width, 28 / (double)p.BMP.Height);
+                var p2 = QuickImage.Get(QuickImage.GenerateCode(p.Name, (int)(p.BMP.Width * Zoom), (int)(p.BMP.Height * Zoom), p.Effekt, p.Färbung, p.ChangeGreenTo, p.Sättigung, p.Helligkeit, p.DrehWinkel, p.Transparenz, p.Zweitsymbol));
                 Skin.Draw_FormatedText(GR, "", p2, _SkinRow, vStatex, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, con.Width, 44), con, false, Translate);
 
                 if (etxt == null) { etxt = new ExtText(vButtonTypex, vStatex, _SkinRow); }
@@ -383,7 +383,7 @@ namespace BlueControls.Controls {
             } else {
 
 
-                string tt = "<ImageCode=" + Skin.PicCode(_SkinRow) + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(vtext, Translate); //Skin.ZusatzTextAdder(vText, vButtonType, vState)
+                var tt = "<ImageCode=" + Skin.PicCode(_SkinRow) + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(vtext, Translate); //Skin.ZusatzTextAdder(vText, vButtonType, vState)
 
                 if (etxt == null) { etxt = new ExtText(vButtonTypex, vStatex, _SkinRow); }
                 etxt.State = vStatex;
@@ -432,10 +432,10 @@ namespace BlueControls.Controls {
         protected override void DrawControl(Graphics gr, enStates state) {
 
             try {
-                bool PicHeight44 = false;
-                enPartentType Par = ParentType();
-                bool DesignToolbar = false;
-                bool DesignText = false;
+                var PicHeight44 = false;
+                var Par = ParentType();
+                var DesignToolbar = false;
+                var DesignText = false;
 
                 if (_ButtonStyle != enButtonStyle.Button && _ButtonStyle != enButtonStyle.Button_RibbonBar && _ButtonStyle != enButtonStyle.SliderButton) {
                     if (_Checked || MousePressing()) { state |= enStates.Checked; }
@@ -542,7 +542,7 @@ namespace BlueControls.Controls {
         }
 
         internal static Size StandardSize(string text, QuickImage image) {
-            Size s = Skin.FormatedText_NeededSize(text, image, Skin.GetBlueFont(enDesign.Button_CheckBox, enStates.Standard), 16);
+            var s = Skin.FormatedText_NeededSize(text, image, Skin.GetBlueFont(enDesign.Button_CheckBox, enStates.Standard), 16);
 
             s.Width += 10;
             s.Height += 4;

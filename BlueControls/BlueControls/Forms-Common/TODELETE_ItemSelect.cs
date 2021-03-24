@@ -43,7 +43,7 @@ namespace BlueControls.Forms {
 
             //    Dim l As List(Of String) = DataSystem.GetFiles()
 
-            foreach (string ThisString in Files) {
+            foreach (var ThisString in Files) {
                 if (ThisString.FileType() == enFileFormat.Image) {
                     List.Item.Add(ThisString, ThisString, ThisString.FileNameWithoutSuffix(), FileEncryptionKey);
                 }
@@ -64,7 +64,7 @@ namespace BlueControls.Forms {
 
             List.Item.Clear();
 
-            foreach (RowItem ThisRow in rows) {
+            foreach (var ThisRow in rows) {
                 List.Item.Add(ThisRow, layoutID);
             }
 

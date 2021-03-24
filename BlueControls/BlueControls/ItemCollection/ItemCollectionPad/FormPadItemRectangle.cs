@@ -149,7 +149,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new List<FlexiControl>
+            var l = new List<FlexiControl>
             {
                 new FlexiControl(),
                 new FlexiControlForProperty(this, "Drehwinkel")
@@ -170,8 +170,8 @@ namespace BlueControls.ItemCollection {
         public void SetCoordinates(RectangleM r, bool overrideFixedSize) {
 
             if (_größe_fixiert && !overrideFixedSize) {
-                PointM vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
-                RectangleM ur = UsedArea();
+                var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
+                var ur = UsedArea();
 
                 p_LO.SetTo(vr.X - ur.Width / 2, vr.Y - ur.Height / 2);
                 p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
@@ -222,7 +222,7 @@ namespace BlueControls.ItemCollection {
             return false;
         }
         public override string ToString() {
-            string t = base.ToString();
+            var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             if (Drehwinkel != 0) { t = t + "Rotation=" + Drehwinkel + ", "; }
             t = t + "Fixsize=" + Größe_fixiert.ToPlusMinus() + ", ";

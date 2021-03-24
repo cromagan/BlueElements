@@ -102,8 +102,8 @@ namespace BlueControls.Controls {
 
         protected override void DrawControl(Graphics gr, enStates state) {
             CheckSize();
-            Pen DP = new Pen(SystemColors.ControlDark);
-            Pen LP = new Pen(SystemColors.ControlLight);
+            var DP = new Pen(SystemColors.ControlDark);
+            var LP = new Pen(SystemColors.ControlLight);
 
             if (_Orientation == enOrientation.Waagerecht) {
                 gr.DrawLine(DP, 0, 0, Width - 1, 0);

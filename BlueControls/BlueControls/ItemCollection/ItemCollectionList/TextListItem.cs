@@ -115,7 +115,7 @@ namespace BlueControls.ItemCollection {
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign design, enStates vState, bool DrawBorderAndBack, bool Translate) {
 
-            enDesign tmpd = tempDesign(design);
+            var tmpd = tempDesign(design);
 
             if (DrawBorderAndBack) {
                 Skin.Draw_Back(GR, tmpd, vState, PositionModified, null, false);

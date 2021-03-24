@@ -25,17 +25,17 @@ namespace BlueScript {
 
         public override string Description { get => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat."; }
         public override string Syntax { get => "isNullOrEmpty(Variable)"; }
-        public override List<string> Comand(Script s) { return new List<string>() { "isnullorempty" }; }
+        public override List<string> Comand(Script s) { return new() { "isnullorempty" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Bool; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableListOrStringNumBool }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableListOrStringNumBool }; }
         public override bool EndlessArgs { get => false; }
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.Wahr(); }
 
             if (string.IsNullOrEmpty(attvar[0].ValueString)) {

@@ -45,31 +45,31 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             Auswahl.Item.Clear();
 
-            string t = Such.Text;
+            var t = Such.Text;
 
             if (string.IsNullOrEmpty(t)) { return; }
 
             t = t.ToLower();
 
 
-            foreach (ColumnItem ThisColumn in Row.Database.Column) {
+            foreach (var ThisColumn in Row.Database.Column) {
                 if (ThisColumn != null) {
                     if (ThisColumn.EditType == enEditTypeFormula.SwapListBox || ThisColumn.EditType == enEditTypeFormula.Listbox || ThisColumn.EditType == enEditTypeFormula.Textfeld_mit_Auswahlknopf) {
                         if (ThisColumn.DropdownBearbeitungErlaubt) {
                             if (CellCollection.UserEditPossible(ThisColumn, Row, BlueBasics.Enums.enErrorReason.OnlyRead)) {
-                                ColumnViewCollection ThisView = Formula.SearchColumnView(ThisColumn);
+                                var ThisView = Formula.SearchColumnView(ThisColumn);
                                 if (ThisView != null) {
                                     if (Row.Database.PermissionCheck(ThisView.PermissionGroups_Show, null)) {
-                                        ItemCollectionList dummy = new ItemCollectionList();
+                                        var dummy = new ItemCollectionList();
 
                                         ItemCollectionList.GetItemCollection(dummy, ThisColumn, Row, enShortenStyle.Replaced, 1000);
                                         if (dummy.Count > 0) {
 
-                                            foreach (BasicListItem thisItem in dummy) {
+                                            foreach (var thisItem in dummy) {
 
                                                 if (thisItem.Internal.ToLower().Contains(t)) {
 
-                                                    TextListItem ni = Auswahl.Item.Add(ThisColumn.ReadableText() + ": " + thisItem.Internal, ThisColumn.Name.ToUpper() + "|" + thisItem.Internal);
+                                                    var ni = Auswahl.Item.Add(ThisColumn.ReadableText() + ": " + thisItem.Internal, ThisColumn.Name.ToUpper() + "|" + thisItem.Internal);
                                                     ni.Checked = thisItem.Checked;
 
                                                 }
@@ -114,12 +114,12 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e) {
 
-            string[] x = e.Item.Internal.SplitBy("|");
+            var x = e.Item.Internal.SplitBy("|");
 
 
             if (Row.Database.Column[x[0]].MultiLine) {
 
-                System.Collections.Generic.List<string> val = Row.CellGetList(Row.Database.Column[x[0]]);
+                var val = Row.CellGetList(Row.Database.Column[x[0]]);
                 if (e.Item.Checked) {
                     val.AddIfNotExists(x[1]);
                 } else {

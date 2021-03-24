@@ -50,7 +50,7 @@ namespace BlueControls.ItemCollection {
         public override string QuickInfo {
             get {
 
-                RowItem r = Row;
+                var r = Row;
                 if (r == null) { return string.Empty; }
 
                 if (_lastQuickInfo == r.QuickInfo) { return _tmpQuickInfo; }
@@ -86,7 +86,7 @@ namespace BlueControls.ItemCollection {
             _RowKey = rowkey;
 
             if (_Database != null && string.IsNullOrEmpty(layoutID)) {
-                ItemCollectionPad p = new ItemCollectionPad(_Database.Layouts[0], string.Empty);
+                var p = new ItemCollectionPad(_Database.Layouts[0], string.Empty);
                 layoutID = p.ID;
             }
 
@@ -147,8 +147,8 @@ namespace BlueControls.ItemCollection {
 
 
             if (GeneratedBitmap != null) {
-                float scale = (float)Math.Min(DCoordinates.Width / (double)GeneratedBitmap.Width, DCoordinates.Height / (double)GeneratedBitmap.Height);
-                RectangleF r2 = new RectangleF(DCoordinates.Left, DCoordinates.Top, GeneratedBitmap.Width * scale, GeneratedBitmap.Height * scale);
+                var scale = (float)Math.Min(DCoordinates.Width / (double)GeneratedBitmap.Width, DCoordinates.Height / (double)GeneratedBitmap.Height);
+                var r2 = new RectangleF(DCoordinates.Left, DCoordinates.Top, GeneratedBitmap.Width * scale, GeneratedBitmap.Height * scale);
 
                 if (ForPrinting) {
                     GR.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
@@ -190,7 +190,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "firstvalue":
-                    string n = value.FromNonCritical();
+                    var n = value.FromNonCritical();
 
                     if (Row != null) {
                         if (Row.CellFirstString().ToUpper() != n.ToUpper()) {
@@ -199,7 +199,7 @@ namespace BlueControls.ItemCollection {
                         return true; // Alles beim Alten
                     }
 
-                    RowItem Rowtmp = _Database.Row[n];
+                    var Rowtmp = _Database.Row[n];
 
                     if (Rowtmp == null) {
                         MessageBox.Show("<b><u>Eintrag nicht hinzugefügt</b></u><br>" + n, enImageCode.Warnung, "OK");
@@ -216,7 +216,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public override string ToString() {
-            string t = base.ToString();
+            var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
             t = t + "LayoutID=" + _LayoutID.ToNonCritical() + ", ";
@@ -262,11 +262,11 @@ namespace BlueControls.ItemCollection {
             }
 
 
-            CreativePad _pad = new CreativePad(new ItemCollectionPad(_LayoutID, _Database, _RowKey));
+            var _pad = new CreativePad(new ItemCollectionPad(_LayoutID, _Database, _RowKey));
 
 
 
-            RectangleM re = _pad.Item.MaxBounds(null);
+            var re = _pad.Item.MaxBounds(null);
 
 
             if (GeneratedBitmap != null) {
@@ -277,11 +277,11 @@ namespace BlueControls.ItemCollection {
 
             if (GeneratedBitmap == null) { GeneratedBitmap = new Bitmap((int)re.Width, (int)re.Height); }
 
-            RectangleM mb = _pad.Item.MaxBounds(null);
+            var mb = _pad.Item.MaxBounds(null);
 
-            decimal zoomv = _pad.ZoomFitValue(mb, false, GeneratedBitmap.Size);
-            Point centerpos = _pad.CenterPos(mb, false, GeneratedBitmap.Size, zoomv);
-            PointF slidervalues = _pad.SliderValues(mb, zoomv, centerpos);
+            var zoomv = _pad.ZoomFitValue(mb, false, GeneratedBitmap.Size);
+            var centerpos = _pad.CenterPos(mb, false, GeneratedBitmap.Size, zoomv);
+            var slidervalues = _pad.SliderValues(mb, zoomv, centerpos);
 
             _pad.ShowInPrintMode = true;
             _pad.Unselect();
@@ -338,7 +338,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new List<FlexiControl>
+            var l = new List<FlexiControl>
             {
                 new FlexiControlForProperty(this, "Datensatz bearbeiten", enImageCode.Stift),
 
@@ -346,9 +346,9 @@ namespace BlueControls.ItemCollection {
             };
 
 
-            ItemCollectionList Layouts = new ItemCollectionList();
-            foreach (string thisLayouts in Row.Database.Layouts) {
-                ItemCollectionPad p = new ItemCollectionPad(thisLayouts, string.Empty);
+            var Layouts = new ItemCollectionList();
+            foreach (var thisLayouts in Row.Database.Layouts) {
+                var p = new ItemCollectionPad(thisLayouts, string.Empty);
                 Layouts.Add(p.Caption, p.ID, enImageCode.Stern);
             }
 

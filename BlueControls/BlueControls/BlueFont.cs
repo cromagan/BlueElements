@@ -43,7 +43,7 @@ namespace BlueControls {
         private SizeF[] _CharSize;
 
 
-        private static readonly List<BlueFont> _FontsAll = new List<BlueFont>();
+        private static readonly List<BlueFont> _FontsAll = new();
 
 
         private int _Zeilenabstand = -1;
@@ -98,7 +98,7 @@ namespace BlueControls {
             _CharSize = new SizeF[0];
 
             _CharSize = new SizeF[256];
-            for (int z = 0; z <= _CharSize.GetUpperBound(0); z++) {
+            for (var z = 0; z <= _CharSize.GetUpperBound(0); z++) {
                 _CharSize[z] = new SizeF(-1, -1);
             }
         }
@@ -120,7 +120,7 @@ namespace BlueControls {
 
             if (Math.Abs(Zoom - 1) < 0.001m && SizeOK(_Font.Size)) { return _Font; }
 
-            float GR = _FontOL.Size * (float)Zoom / Skin.Scale;
+            var GR = _FontOL.Size * (float)Zoom / Skin.Scale;
 
 
             if (SizeOK(GR)) {
@@ -139,7 +139,7 @@ namespace BlueControls {
 
             if (Math.Abs(Zoom - 1) < 0.001 && SizeOK(_FontOL.Size)) { return _FontOL; }
 
-            float GR = _FontOL.Size * Zoom / Skin.Scale;
+            var GR = _FontOL.Size * Zoom / Skin.Scale;
 
 
             if (SizeOK(GR)) {
@@ -262,7 +262,7 @@ namespace BlueControls {
 
             if (vChar >= 0 && vChar <= 31) { return new SizeF(0, _Zeilenabstand); }
             if (vChar >= (int)enASCIIKey.ImageStart) {
-                QuickImage BNR = QuickImage.Get(vChar - (int)enASCIIKey.ImageStart);
+                var BNR = QuickImage.Get(vChar - (int)enASCIIKey.ImageStart);
                 if (BNR == null) { return new SizeF(0, 0); }
                 return new SizeF(BNR.BMP.Width + 1, BNR.BMP.Height + 1);
             }
@@ -295,11 +295,11 @@ namespace BlueControls {
             IsParsing = true;
             Initialize();
 
-            FontStyle ftst = FontStyle.Regular;
-            FontStyle ftst2 = FontStyle.Regular;
+            var ftst = FontStyle.Regular;
+            var ftst2 = FontStyle.Regular;
 
 
-            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
+            foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "name":
                     case "fontname":
@@ -370,25 +370,25 @@ namespace BlueControls {
             _FontOL = new Font(FontName, FontSize / Skin.Scale, ftst2);
 
             // Die Oberlänge immer berechnen, Symbole benötigen die exacte höhe
-            float Multi = 50 / _FontOL.Size; // Zu große Schriften verursachen bei manchen Fonts Fehler!!!
+            var Multi = 50 / _FontOL.Size; // Zu große Schriften verursachen bei manchen Fonts Fehler!!!
 
-            Font tmpfont = new Font(_FontOL.Name, _FontOL.Size * Multi / Skin.Scale, _FontOL.Style);
-            SizeF f = BlueFont.MeasureString("Z", tmpfont);
-            Bitmap bmp = new Bitmap((int)(f.Width + 1), (int)(f.Height + 1));
-            Graphics gr = Graphics.FromImage(bmp);
+            var tmpfont = new Font(_FontOL.Name, _FontOL.Size * Multi / Skin.Scale, _FontOL.Style);
+            var f = BlueFont.MeasureString("Z", tmpfont);
+            var bmp = new Bitmap((int)(f.Width + 1), (int)(f.Height + 1));
+            var gr = Graphics.FromImage(bmp);
 
-            for (int du = 0; du <= 1; du++) {
+            for (var du = 0; du <= 1; du++) {
                 gr.Clear(Color.White);
                 if (du == 1) {
                     tmpfont = new Font(_FontOL.Name, _FontOL.Size * Multi * 0.8F / Skin.Scale, _FontOL.Style);
                 }
                 gr.DrawString("Z", tmpfont, Brushes.Black, 0, 0);
 
-                int miny = (int)(f.Height / 2.0);
+                var miny = (int)(f.Height / 2.0);
 
                 //var tempVar = (int)(f.Width - 1);
-                for (int x = 1; x <= (f.Width - 1); x++) {
-                    for (int y = (int)(f.Height - 1); y >= miny; y--) {
+                for (var x = 1; x <= (f.Width - 1); x++) {
+                    for (var y = (int)(f.Height - 1); y >= miny; y--) {
                         if (y > miny && bmp.GetPixel(x, y).R == 0) { miny = y; }
 
                     }
@@ -428,7 +428,7 @@ namespace BlueControls {
 
         private Pen GeneratePen(float cZoom) {
 
-            float linDi = _Zeilenabstand / 10 * cZoom;
+            var linDi = _Zeilenabstand / 10 * cZoom;
 
             if (Bold) { linDi *= 1.5F; }
 
@@ -442,7 +442,7 @@ namespace BlueControls {
 
 
         private static string ToString(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, string Color_Main, string Color_Outline, bool vKapitälchen, bool vonlyuppe, bool vonlylower) {
-            string c = "{Name=" + FontName + ", Size=" + FontSize.ToString().ToNonCritical();
+            var c = "{Name=" + FontName + ", Size=" + FontSize.ToString().ToNonCritical();
             if (Bold) { c += ", Bold=True"; }
             if (Italic) { c += ", Italic=True"; }
             if (Underline) { c += ", Underline=True"; }
@@ -479,11 +479,11 @@ namespace BlueControls {
             if (!Code.Contains("{")) { Code = "{Name=Arial, Size=10, Color=ff0000}"; }
 
 
-            foreach (BlueFont Thisfont in _FontsAll) {
+            foreach (var Thisfont in _FontsAll) {
                 if (Thisfont.ToString().ToUpper() == Code.ToUpper()) { return Thisfont; }
             }
 
-            BlueFont f = new BlueFont(Code);
+            var f = new BlueFont(Code);
             _FontsAll.Add(f);
 
             if (f._Code.ToUpper() != Code.ToUpper()) {
@@ -496,7 +496,7 @@ namespace BlueControls {
 
 
         public string ReadableText() {
-            string t = FontName + ", " + FontSize + " pt, ";
+            var t = FontName + ", " + FontSize + " pt, ";
 
 
             if (Bold) { t += "B"; }
@@ -513,11 +513,11 @@ namespace BlueControls {
 
         private BitmapExt Symbol(string Text, bool Transparent) {
 
-            SizeF s = BlueFont.MeasureString(Text, Font());
-            BitmapExt bmp = new BitmapExt((int)(s.Width + 1), (int)(s.Height + 1));
+            var s = BlueFont.MeasureString(Text, Font());
+            var bmp = new BitmapExt((int)(s.Width + 1), (int)(s.Height + 1));
 
 
-            using (Graphics gr = Graphics.FromImage(bmp.Bitmap)) {
+            using (var gr = Graphics.FromImage(bmp.Bitmap)) {
                 if (Transparent) {
                     gr.Clear(Color.FromArgb(180, 180, 180));
                 } else if (Color_Main.GetBrightness() > 0.9F) {
@@ -583,9 +583,9 @@ namespace BlueControls {
         public QuickImage SymbolOfLine() {
             if (SymbolOfLine_sym != null) { return SymbolOfLine_sym; }
 
-            BitmapExt bmp = new BitmapExt(32, 12);
+            var bmp = new BitmapExt(32, 12);
 
-            using (Graphics gr = Graphics.FromImage(bmp.Bitmap)) {
+            using (var gr = Graphics.FromImage(bmp.Bitmap)) {
 
                 if (Color_Main.GetBrightness() > 0.9F) {
                     gr.Clear(Color.FromArgb(200, 200, 200));
@@ -616,7 +616,7 @@ namespace BlueControls {
         }
 
         public static SizeF MeasureString(string s, Font f) {
-            using Graphics g = Graphics.FromHwnd(IntPtr.Zero);
+            using var g = Graphics.FromHwnd(IntPtr.Zero);
             return g.MeasureString(s, f);
         }
 

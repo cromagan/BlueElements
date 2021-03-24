@@ -7,7 +7,10 @@ namespace BlueDatabase.Enums {
     public enum enRoutinen : byte {
         Column = 0,
         DatenAllgemein = 1,
-        CellFormat_OLD = 2
+        CellFormat = 2,
+        DatenAllgemeinUTF8 = 3,
+        CellFormatUTF8 = 4,
+        ColumnUTF8 =5
     }
 
 }

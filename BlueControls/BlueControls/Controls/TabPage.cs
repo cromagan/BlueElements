@@ -255,7 +255,7 @@ namespace BlueControls.Controls {
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }
 
-            foreach (object ThisControl in Controls) {
+            foreach (var ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
             }
 
@@ -269,7 +269,7 @@ namespace BlueControls.Controls {
 
             if (BeginnEditCounter == 0) { Invalidate(); }
 
-            foreach (object ThisControl in Controls) {
+            foreach (var ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
             }
         }

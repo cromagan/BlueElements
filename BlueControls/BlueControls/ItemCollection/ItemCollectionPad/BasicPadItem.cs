@@ -48,13 +48,13 @@ namespace BlueControls.ItemCollection {
 
         public static BasicPadItem NewByParsing(ItemCollectionPad parent, string code) {
             BasicPadItem i = null;
-            List<KeyValuePair<string, string>> x = code.GetAllTags();
+            var x = code.GetAllTags();
 
-            string ding = string.Empty;
-            string name = string.Empty;
+            var ding = string.Empty;
+            var name = string.Empty;
 
 
-            foreach (KeyValuePair<string, string> thisIt in x) {
+            foreach (var thisIt in x) {
                 switch (thisIt.Key) {
                     case "type":
                     case "classid":
@@ -165,7 +165,7 @@ namespace BlueControls.ItemCollection {
 
         public static string UniqueInternal() {
 
-            string NeueZeit = DateTime.Now + " " + DateTime.Now.Millisecond;
+            var NeueZeit = DateTime.Now + " " + DateTime.Now.Millisecond;
 
             if (NeueZeit == UniqueInternal_LastTime) {
                 UniqueInternal_Count++;
@@ -195,8 +195,8 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         /// <remarks></remarks>
         public virtual bool Contains(PointF value, decimal zoomfactor) {
-            RectangleF tmp = (RectangleF)UsedArea(); // Umwandlung, um den Bezug zur Klasse zu zerstören
-            float ne = (float)(-5 / zoomfactor) + 1;
+            var tmp = (RectangleF)UsedArea(); // Umwandlung, um den Bezug zur Klasse zu zerstören
+            var ne = (float)(-5 / zoomfactor) + 1;
             tmp.Inflate(ne, ne);
             return tmp.Contains(value);
         }
@@ -226,7 +226,7 @@ namespace BlueControls.ItemCollection {
         /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
         /// </summary>
         /// <remarks></remarks>
-        private readonly List<string> _Tags = new List<string>();
+        private readonly List<string> _Tags = new();
 
         /// <summary>
         /// Soll es gedruckt werden?
@@ -236,8 +236,8 @@ namespace BlueControls.ItemCollection {
 
         protected int _ZoomPadding = 0;
 
-        public readonly List<clsPointRelation> Relations = new List<clsPointRelation>();
-        public readonly List<PointM> Points = new List<PointM>();
+        public readonly List<clsPointRelation> Relations = new();
+        public readonly List<PointM> Points = new();
 
         private PadStyles _Style = PadStyles.Undefiniert;
 
@@ -309,7 +309,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "point":
-                    foreach (PointM ThisPoint in Points) {
+                    foreach (var ThisPoint in Points) {
                         if (value.Contains("Name=" + ThisPoint.Name + ",")) {
                             ThisPoint.Parse(value, this);
                         }
@@ -358,7 +358,7 @@ namespace BlueControls.ItemCollection {
         public void Parse(List<KeyValuePair<string, string>> ToParse) {
             IsParsing = true;
 
-            foreach (KeyValuePair<string, string> pair in ToParse) {
+            foreach (var pair in ToParse) {
 
                 if (!ParseThis(pair.Key, pair.Value)) {
                     Develop.DebugPrint(enFehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + ToParse);
@@ -377,7 +377,7 @@ namespace BlueControls.ItemCollection {
         /// <returns></returns>
         public virtual List<FlexiControl> GetStyleOptions() {
 
-            List<FlexiControl> l = new List<FlexiControl>
+            var l = new List<FlexiControl>
             {
                 new FlexiControlForProperty(this, "Gruppenzugehörigkeit"),
                 new FlexiControlForProperty(this, "Bei_Export_sichtbar")
@@ -393,13 +393,13 @@ namespace BlueControls.ItemCollection {
 
         public override string ToString() {
 
-            string t = "{";
+            var t = "{";
 
             t = t + "ClassID=" + ClassId() + ", ";
             t = t + "InternalName=" + Internal.ToNonCritical() + ", ";
 
             if (_Tags.Count > 0) {
-                foreach (string ThisTag in _Tags) {
+                foreach (var ThisTag in _Tags) {
                     t = t + "Tag=" + ThisTag.ToNonCritical() + ", ";
                 }
             }
@@ -416,7 +416,7 @@ namespace BlueControls.ItemCollection {
             }
 
 
-            foreach (PointM ThisPoint in Points) {
+            foreach (var ThisPoint in Points) {
                 t = t + "Point=" + ThisPoint + ", ";
             }
 
@@ -440,9 +440,9 @@ namespace BlueControls.ItemCollection {
         public void EineEbeneNachVorne() {
             if (Parent == null) { return; }
 
-            BasicPadItem i2 = Next();
+            var i2 = Next();
             if (i2 != null) {
-                BasicPadItem tempVar = this;
+                var tempVar = this;
                 Parent.Swap(tempVar, i2);
             }
         }
@@ -460,9 +460,9 @@ namespace BlueControls.ItemCollection {
 
         public void EineEbeneNachHinten() {
             if (Parent == null) { return; }
-            BasicPadItem i2 = Previous();
+            var i2 = Previous();
             if (i2 != null) {
-                BasicPadItem tempVar = this;
+                var tempVar = this;
                 Parent.Swap(tempVar, i2);
             }
         }
@@ -470,7 +470,7 @@ namespace BlueControls.ItemCollection {
 
         protected void OverrideSavedRichtmaßOfAllRelations() {
             if (Relations == null || Relations.Count == 0) {
-                foreach (clsPointRelation ThisRelation in Relations) {
+                foreach (var ThisRelation in Relations) {
                     ThisRelation.OverrideSavedRichtmaß(false, false);
                 }
             }
@@ -482,7 +482,7 @@ namespace BlueControls.ItemCollection {
 
             if (forPrinting && !_Bei_Export_sichtbar) { return; }
 
-            RectangleF DCoordinates = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY);
+            var DCoordinates = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY);
 
 
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
@@ -501,7 +501,7 @@ namespace BlueControls.ItemCollection {
         }
 
         internal BasicPadItem Previous() {
-            int ItemCount = Parent.IndexOf(this);
+            var ItemCount = Parent.IndexOf(this);
             if (ItemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
 
             do {
@@ -515,7 +515,7 @@ namespace BlueControls.ItemCollection {
         internal BasicPadItem Next() {
 
 
-            int ItemCount = Parent.IndexOf(this);
+            var ItemCount = Parent.IndexOf(this);
             if (ItemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
 
             do {
@@ -547,7 +547,7 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         /// <remarks></remarks>
         public RectangleM ZoomToArea() {
-            RectangleM x = UsedArea();
+            var x = UsedArea();
 
             if (_ZoomPadding == 0) { return x; }
 
@@ -558,7 +558,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public object Clone() {
-            string t = ToString();
+            var t = ToString();
             return NewByParsing(Parent, t);
         }
 
@@ -598,11 +598,11 @@ namespace BlueControls.ItemCollection {
 
         public void RelationDeleteExternal() {
 
-            foreach (clsPointRelation ThisRelation in Parent.AllRelations) {
+            foreach (var ThisRelation in Parent.AllRelations) {
                 if (ThisRelation != null) {
 
                     if (!ThisRelation.IsInternal()) {
-                        foreach (PointM Thispoint in ThisRelation.Points) {
+                        foreach (var Thispoint in ThisRelation.Points) {
 
                             if (Thispoint.Parent is BasicPadItem tItem) {
                                 if (tItem == this) {

@@ -1,25 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{E7E05BAC-07CB-478D-861A-DB24A27BBF75}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BlueBasics</RootNamespace>
-    <AssemblyName>BlueBasics</AssemblyName>
-    <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <StartupObject>
     </StartupObject>
-    <OldToolsVersion>3.5</OldToolsVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -35,151 +22,44 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>
     </DocumentationFile>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <Prefer32Bit>false</Prefer32Bit>
-    <CodeAnalysisRuleSet>BlueBasics.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
-    <Optimize>true</Optimize>
     <OutputPath>Bin\</OutputPath>
     <DocumentationFile>
     </DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisRuleSet>BlueBasics.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <Optimize>false</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="BitmapExt.cs" />
-    <Compile Include="clsImageMatrix.cs" />
-    <Compile Include="Enums\enBlurType.cs" />
-    <Compile Include="Enums\enErrorReason.cs" />
-    <Compile Include="EventArgs\NeedImageEventArgs.cs" />
-    <Compile Include="EventArgs\MultiUserFileGiveBackEventArgs.cs" />
-    <Compile Include="Extensions\RectangleFExtension.cs" />
-    <Compile Include="HTML.cs" />
-    <Compile Include="Interfaces\IReadableText.cs" />
-    <Compile Include="Interfaces\IVersionable.cs" />
-    <Compile Include="MultiUserFile\clsMultiUserFile.cs" />
-    <Compile Include="Enums\enAlignmentHorizontal.cs" />
-    <Compile Include="Enums\enSW.cs" />
-    <Compile Include="Enums\enDataFormat.cs" />
-    <Compile Include="Enums\enFehlerArt.cs" />
-    <Compile Include="EventArgs\MultiUserFileStopWorkingEventArgs.cs" />
-    <Compile Include="EventArgs\LoadedEventArgs.cs" />
-    <Compile Include="EventArgs\LoadingEventArgs.cs" />
-    <Compile Include="Extensions\GraphicsExtensions.cs" />
-    <Compile Include="ListExt.cs" />
-    <Compile Include="strProcess.cs" />
-    <Compile Include="Enums\enMouseEvent.cs" />
-    <Compile Include="QuickImage.cs" />
-    <Compile Include="EventArgs\ListEventArgs.cs" />
-    <Compile Include="Extensions\BitmapExtensions.cs" />
-    <Compile Include="Extensions\ByteArrayExtension.cs" />
-    <Compile Include="Extensions\ConcurrentDictionaryExtension.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="Develop.cs" />
-    <Compile Include="clsNamedBinary.cs" />
-    <Compile Include="Enums\enAlignment.cs" />
-    <Compile Include="Enums\enDirection.cs" />
-    <Compile Include="Enums\enFileFormat.cs" />
-    <Compile Include="Enums\enImageCode.cs" />
-    <Compile Include="Enums\enImageCodeEffect.cs" />
-    <Compile Include="Enums\enOrientation.cs" />
-    <Compile Include="Enums\enTaste.cs" />
-    <Compile Include="FileOperations.cs" />
-    <Compile Include="Interfaces\IChangedFeedback.cs" />
-    <Compile Include="Interfaces\ICheckable.cs" />
-    <Compile Include="Extensions\CollectionExtension.cs" />
-    <Compile Include="Interfaces\ICompareKey.cs" />
-    <Compile Include="Interfaces\IntegerArrayExtension.cs" />
-    <Compile Include="Interfaces\IParseable.cs" />
-    <Compile Include="Interfaces\IReadableTextWithChanging.cs" />
-    <Compile Include="ListOfExtension.cs" />
-    <Compile Include="Geometry.cs" />
-    <Compile Include="Extensions\PaddingExtension.cs" />
-    <Compile Include="Extensions\PointExtension.cs" />
-    <Compile Include="Extensions\PointFExtension.cs" />
-    <Compile Include="Extensions\RectangleExtension.cs" />
-    <Compile Include="Extensions\SizeFExtension.cs" />
-    <Compile Include="Extensions\SortierExtensions.cs" />
-    <Compile Include="Extensions\StringExtension.cs" />
-    <Compile Include="modErgebnis.cs" />
-    <Compile Include="Extensions\BooleanExtensions.cs" />
-    <Compile Include="Interfaces\ICanBeEmpty.cs" />
-    <Compile Include="modAllgemein.cs" />
-    <Compile Include="modFernsteuerung.cs" />
-    <Compile Include="Enums\enSizeModes.cs" />
-    <Compile Include="Extensions\ColorExtension.cs" />
-    <Compile Include="modConverter.cs" />
-    <Compile Include="modTastaturSimulation.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Application.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Application.myapp</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="MultiUserFile\clsMultiUserFile.resx">
-      <DependentUpon>clsMultiUserFile.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="BlueBasics.ruleset" />
-    <None Include="Properties\Application.myapp">
+    <None Update="Properties\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Properties\Settings.settings">
+    <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
@@ -188,15 +68,11 @@
     <Service Include="{94E38DFF-614B-4CBD-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataFormat.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Import Include="System" />
     <Import Include="System.Collections.Generic" />
     <Import Include="System.Diagnostics" />
     <Import Include="System.Drawing" />
     <Import Include="System.IO" />
-    <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -214,17 +90,6 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Design" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Beziehungen\Doppelkreis.png" />
@@ -405,12 +270,17 @@
   <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Zahnrad.png" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.2.217201">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

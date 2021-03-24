@@ -237,7 +237,7 @@ namespace BlueControls.Controls {
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }
 
-            foreach (object ThisControl in Controls) {
+            foreach (var ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
             }
 
@@ -251,7 +251,7 @@ namespace BlueControls.Controls {
 
             if (BeginnEditCounter == 0) { Invalidate(); }
 
-            foreach (object ThisControl in Controls) {
+            foreach (var ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
             }
         }
@@ -326,7 +326,7 @@ namespace BlueControls.Controls {
                 try {
                     if (_UseBackBitmap) {
                         if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
-                        Graphics TMPGR = Graphics.FromImage(_BitmapOfControl);
+                        var TMPGR = Graphics.FromImage(_BitmapOfControl);
                         DrawControl(TMPGR, IsStatus());
 
                         if (_BitmapOfControl != null) {
@@ -346,7 +346,7 @@ namespace BlueControls.Controls {
 
                 // UmRandung für DesignMode ------------
                 if (DesignMode) {
-                    using Pen P = new Pen(Color.FromArgb(128, 255, 0, 0));
+                    using var P = new Pen(Color.FromArgb(128, 255, 0, 0));
                     gr.DrawRectangle(P, 0, 0, Width - 1, Height - 1);
                 }
 
@@ -382,7 +382,7 @@ namespace BlueControls.Controls {
         private enStates IsStatus() {
             if (!Enabled) { return enStates.Standard_Disabled; }
 
-            enStates S = enStates.Standard;
+            var S = enStates.Standard;
             if (_MouseHighlight && ContainsMouse()) { S |= enStates.Standard_MouseOver; }
 
             if (_MousePressing) {

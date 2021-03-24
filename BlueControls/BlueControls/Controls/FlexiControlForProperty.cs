@@ -162,7 +162,7 @@ namespace BlueControls.Controls {
             }
 
 
-            object x = _propInfo.GetValue(_propertyObject, null);
+            var x = _propInfo.GetValue(_propertyObject, null);
             if (x is null) {
                 ValueSet(string.Empty, true, false);
             } else if (x is string s) {
@@ -196,8 +196,8 @@ namespace BlueControls.Controls {
             if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead) { return; }
 
 
-            string OldVal = string.Empty;
-            object x = _propInfo.GetValue(_propertyObject, null);
+            var OldVal = string.Empty;
+            var x = _propInfo.GetValue(_propertyObject, null);
             object toSet = null;
             if (x is null) {
                 OldVal = string.Empty;
@@ -313,7 +313,7 @@ namespace BlueControls.Controls {
             #region Caption setzen
             if (!string.IsNullOrEmpty(_propertyName)) {
 
-                string[] x = _propertyName.SplitBy("__");
+                var x = _propertyName.SplitBy("__");
                 Caption = x[0].Replace("_", " ") + ":";
                 FileEncryptionKey = string.Empty;
             } else {
@@ -327,9 +327,9 @@ namespace BlueControls.Controls {
 
                 EditType = enEditTypeFormula.Button;
                 CaptionPosition = enÜberschriftAnordnung.ohne;
-                SizeF s = BlueFont.MeasureStringOfCaption(_Caption.TrimEnd(":"));
+                var s = BlueFont.MeasureStringOfCaption(_Caption.TrimEnd(":"));
                 Size = new Size((int)s.Width + 50 + 22, 30);
-                Button c = (Button)CreateSubControls();
+                var c = (Button)CreateSubControls();
                 c.Text = _Caption.TrimEnd(":");
 
                 if (image != enImageCode.None) {
@@ -349,7 +349,7 @@ namespace BlueControls.Controls {
 
                     case "system.boolean": {
                         EditType = enEditTypeFormula.Ja_Nein_Knopf;
-                        SizeF s = BlueFont.MeasureStringOfCaption(_Caption);
+                        var s = BlueFont.MeasureStringOfCaption(_Caption);
                         Size = new Size((int)s.Width + 30, 22);
                         break;
                     }
@@ -360,14 +360,14 @@ namespace BlueControls.Controls {
                         if (list != null) {
                             EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
                             list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
-                            SizeF s = BlueFont.MeasureStringOfCaption(_Caption);
+                            var s = BlueFont.MeasureStringOfCaption(_Caption);
 
-                            (int BiggestItemX, int BiggestItemY, int _, enOrientation _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+                            (var BiggestItemX, var BiggestItemY, var _, var _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
 
-                            int x = Math.Max((int)(BiggestItemX + 20 + s.Width), 200);
-                            int y = Math.Max(BiggestItemY + Skin.PaddingSmal * 2, 24);
+                            var x = Math.Max((int)(BiggestItemX + 20 + s.Width), 200);
+                            var y = Math.Max(BiggestItemY + Skin.PaddingSmal * 2, 24);
                             Size = new Size(x, y);
-                            ComboBox c = (ComboBox)CreateSubControls();
+                            var c = (ComboBox)CreateSubControls();
                             StyleComboBox(c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
 
                         }
@@ -383,7 +383,7 @@ namespace BlueControls.Controls {
                         else {
                             _EditType = enEditTypeFormula.Textfeld;
 
-                            string tmpName = _propInfo.PropertyType.FullName.ToLower();
+                            var tmpName = _propInfo.PropertyType.FullName.ToLower();
 
 
                             if (TextLines >= 2) {
@@ -416,7 +416,7 @@ namespace BlueControls.Controls {
                                     break;
                             }
 
-                            GenericControl c = CreateSubControls();
+                            var c = CreateSubControls();
                             StyleTextBox((TextBox)c, string.Empty, false);
                         }
                         break;
@@ -443,7 +443,7 @@ namespace BlueControls.Controls {
                 QuickInfo = string.Empty;
             } else {
 
-                bool done = false;
+                var done = false;
 
 
                 IEnumerable<Attribute> ca = null;
@@ -453,7 +453,7 @@ namespace BlueControls.Controls {
 
                 if (ca != null) {
 
-                    foreach (Attribute thisas in ca) {
+                    foreach (var thisas in ca) {
                         if (thisas is DescriptionAttribute da) {
                             QuickInfo = da.Description;
                             done = true;
@@ -478,7 +478,7 @@ namespace BlueControls.Controls {
 
             if (_in == null || _in.IsDisposed) { return; }
 
-            foreach (object thisc in _in.Controls) {
+            foreach (var thisc in _in.Controls) {
                 if (thisc is FlexiControlForProperty flx) {
                     flx.PropertyObject = _to;
                 }
@@ -531,7 +531,7 @@ namespace BlueControls.Controls {
             if (!_allinitialized) { return null; }
 
 
-            foreach (object thiscon in Controls) {
+            foreach (var thiscon in Controls) {
                 if (thiscon is ComboBox cbx) { return cbx; }
             }
             return null;

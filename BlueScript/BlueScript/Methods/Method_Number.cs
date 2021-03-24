@@ -29,16 +29,16 @@ namespace BlueScript {
         public override string Syntax { get => "Number(string, number)"; }
 
         public override string Description { get => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird der nachfolgende Zahlenwert zurückgegeben."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "number" }; }
+        public override List<string> Comand(Script s) { return new() { "number" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Number; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.Number }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.String, enVariableDataType.Number }; }
         public override bool EndlessArgs { get => true; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             if (attvar[0].ValueString.IsNumeral()) {

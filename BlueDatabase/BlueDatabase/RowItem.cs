@@ -279,7 +279,7 @@ namespace BlueDatabase {
 
         private void VariableToCell(ColumnItem thisCol, List<Variable> vars) {
 
-            Variable s = vars.Get(thisCol.Name);
+            var s = vars.Get(thisCol.Name);
 
             if (s == null) { return; }
             if (s.Readonly) { return; }
@@ -327,7 +327,7 @@ namespace BlueDatabase {
 
             if (!thisCol.Format.CanBeCheckedByRules()) { return null; }
 
-            bool ro = !thisCol.Format.CanBeChangedByRules();
+            var ro = !thisCol.Format.CanBeChangedByRules();
 
             if (thisCol == thisCol.Database.Column.SysCorrect) { ro = true; }
             if (thisCol == thisCol.Database.Column[0]) { ro = true; }
@@ -369,7 +369,7 @@ namespace BlueDatabase {
         /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
         private BlueScript.Script DoRules(bool onlyTest, string startRoutine) {
 
-            List<Variable> vars = new List<Variable>
+            var vars = new List<Variable>
             {
 
                 //var x = new BeginnRowAutomaticEventArgs(this, vars);
@@ -381,8 +381,8 @@ namespace BlueDatabase {
 
 
             #region Variablen für Skript erstellen
-            foreach (ColumnItem thisCol in Database.Column) {
-                Variable v = CellToVariable(thisCol, this);
+            foreach (var thisCol in Database.Column) {
+                var v = CellToVariable(thisCol, this);
                 if (v != null) { vars.Add(v); }
             }
 
@@ -421,7 +421,7 @@ namespace BlueDatabase {
             //]
 
 
-            Script script = new BlueScript.Script(vars) {
+            var script = new BlueScript.Script(vars) {
                 ScriptText = Database.RulesScript
             };
 
@@ -433,7 +433,7 @@ namespace BlueDatabase {
                     return script;
                 }
 
-                foreach (ColumnItem thisCol in Database.Column) {
+                foreach (var thisCol in Database.Column) {
                     VariableToCell(thisCol, vars);
                 }
 
@@ -470,7 +470,7 @@ namespace BlueDatabase {
                 //}
 
                 // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
-                DoRowAutomaticEventArgs e = new DoRowAutomaticEventArgs(this);
+                var e = new DoRowAutomaticEventArgs(this);
                 OnDoSpecialRules(e);
 
 
@@ -508,9 +508,9 @@ namespace BlueDatabase {
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
 
-            DateTime t = DateTime.Now;
+            var t = DateTime.Now;
             do {
-                (bool didSuccesfullyCheck, string error, Script skript) erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, false, startroutine);
+                var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, false, startroutine);
                 if (erg.didSuccesfullyCheck) { return erg; }
 
                 if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
@@ -527,12 +527,12 @@ namespace BlueDatabase {
 
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
-            string feh = Database.ErrorReason(enErrorReason.EditAcut);
+            var feh = Database.ErrorReason(enErrorReason.EditAcut);
 
             if (!string.IsNullOrEmpty(feh)) { return (false, feh, null); }
 
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
-            Script script = DoRules(onlyTest, startroutine);
+            var script = DoRules(onlyTest, startroutine);
 
             if (onlyTest) { return (true, string.Empty, script); }
 
@@ -541,12 +541,12 @@ namespace BlueDatabase {
 
 
             // Dann die Abschließenden Korrekturen vornehmen
-            foreach (ColumnItem ThisColum in Database.Column) {
+            foreach (var ThisColum in Database.Column) {
                 if (ThisColum != null) {
 
                     if (fullCheck) {
-                        string x = CellGetString(ThisColum);
-                        string x2 = ThisColum.AutoCorrect(x);
+                        var x = CellGetString(ThisColum);
+                        var x2 = ThisColum.AutoCorrect(x);
 
                         if (ThisColum.Format != enDataFormat.LinkedCell && x != x2) {
                             Database.Cell.Set(ThisColum, this, x2);
@@ -569,14 +569,14 @@ namespace BlueDatabase {
             }
 
 
-            List<string> cols = new List<string>();
+            var cols = new List<string>();
             //var _Info = new List<string>();
-            string _InfoTXT = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
-            foreach (ColumnItem thisc in Database.Column) {
+            var _InfoTXT = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
+            foreach (var thisc in Database.Column) {
 
-                string n = thisc.Name + "_error";
+                var n = thisc.Name + "_error";
 
-                Variable va = script.Variablen.GetSystem(n);
+                var va = script.Variablen.GetSystem(n);
                 if (va != null) {
                     cols.Add(thisc.Name + "|" + va.ValueString);
                     _InfoTXT = _InfoTXT + "<b>" + thisc.ReadableText() + ":</b> " + va.ValueString + "<br><hr><br>";
@@ -589,7 +589,7 @@ namespace BlueDatabase {
 
 
             if (Database.Column.SysCorrect.SaveContent) {
-                if (IsNullOrEmpty(Database.Column.SysCorrect) || (cols.Count == 0) != CellGetBoolean(Database.Column.SysCorrect)) { CellSet(Database.Column.SysCorrect, cols.Count == 0); }
+                if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) { CellSet(Database.Column.SysCorrect, cols.Count == 0); }
             }
             OnRowChecked(new RowCheckedEventArgs(this, cols));
 
@@ -642,7 +642,7 @@ namespace BlueDatabase {
                     if (Filter.FilterType != enFilterType.Instr_GroßKleinEgal && Filter.FilterType != enFilterType.Instr_UND_GroßKleinEgal) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit Instr möglich!"); }
                     if (Filter.SearchValue.Count < 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit mindestens einem Wert möglich"); }
 
-                    foreach (string t in Filter.SearchValue) {
+                    foreach (var t in Filter.SearchValue) {
                         if (!RowFilterMatch(t)) { return false; }
                     }
                 } else {
@@ -658,7 +658,7 @@ namespace BlueDatabase {
 
             if (filter == null || filter.Count == 0) { return true; }
 
-            foreach (FilterItem ThisFilter in filter) {
+            foreach (var ThisFilter in filter) {
                 if (!MatchesTo(ThisFilter)) { return false; }
             }
 
@@ -675,10 +675,10 @@ namespace BlueDatabase {
 
             searchText = searchText.ToUpper();
 
-            foreach (ColumnItem ThisColumnItem in Database.Column) {
+            foreach (var ThisColumnItem in Database.Column) {
                 {
                     if (!ThisColumnItem.IgnoreAtRowFilter) {
-                        string _String = CellGetString(ThisColumnItem);
+                        var _String = CellGetString(ThisColumnItem);
                         _String = LanguageTool.ColumnReplace(_String, ThisColumnItem, enShortenStyle.Both);
                         if (!string.IsNullOrEmpty(_String) && _String.ToUpper().Contains(searchText)) { return true; }
                     }
@@ -691,7 +691,7 @@ namespace BlueDatabase {
 
         public bool IsNullOrEmpty() {
 
-            foreach (ColumnItem ThisColumnItem in Database.Column) {
+            foreach (var ThisColumnItem in Database.Column) {
                 if (ThisColumnItem != null) {
                     if (!CellIsNullOrEmpty(ThisColumnItem)) { return false; }
                 }
@@ -761,14 +761,14 @@ namespace BlueDatabase {
         /// <returns></returns>
         public string ReplaceVariables(string formel, bool fulltext, bool removeLineBreaks) {
 
-            string erg = formel;
+            var erg = formel;
 
             // Variablen ersetzen
-            foreach (ColumnItem thisColumnItem in Database.Column) {
+            foreach (var thisColumnItem in Database.Column) {
                 if (!erg.Contains("&")) { return erg; }
 
                 if (thisColumnItem != null) {
-                    string txt = CellGetString(thisColumnItem);
+                    var txt = CellGetString(thisColumnItem);
 
                     if (fulltext) { txt = CellItem.ValueReadable(thisColumnItem, txt, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text, removeLineBreaks); }
 
@@ -782,19 +782,19 @@ namespace BlueDatabase {
 
 
                     while (erg.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + "(")) {
-                        int x = erg.ToUpper().IndexOf("&" + thisColumnItem.Name.ToUpper() + "(");
+                        var x = erg.ToUpper().IndexOf("&" + thisColumnItem.Name.ToUpper() + "(");
 
-                        int x2 = erg.IndexOf(")", x);
+                        var x2 = erg.IndexOf(")", x);
                         if (x2 < x) { return erg; }
 
-                        string ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
+                        var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
                         ww = ww.Replace(" ", string.Empty).ToUpper();
-                        string[] vals = ww.SplitBy(",");
+                        var vals = ww.SplitBy(",");
                         if (vals.Length != 2) { return formel; }
                         if (vals[0] != "L") { return formel; }
-                        if (!int.TryParse(vals[1], out int Stellen)) { return formel; }
+                        if (!int.TryParse(vals[1], out var Stellen)) { return formel; }
 
-                        string newW = txt.Substring(0, Math.Min(Stellen, txt.Length));
+                        var newW = txt.Substring(0, Math.Min(Stellen, txt.Length));
                         erg = erg.Replace(erg.Substring(x, x2 - x + 1), newW);
                     }
                 }
@@ -813,10 +813,10 @@ namespace BlueDatabase {
         /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
         /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
         public string CompareKey(List<ColumnItem> columns) {
-            StringBuilder r = new StringBuilder();
+            var r = new StringBuilder();
 
             if (columns != null) {
-                foreach (ColumnItem t in columns) {
+                foreach (var t in columns) {
                     if (t != null) {
                         r.Append(Database.Cell.CompareKey(t, this) + Constants.FirstSortChar);
                     }
@@ -830,7 +830,7 @@ namespace BlueDatabase {
         public string CaptionReadable() {
 
 
-            string c = CellGetString(Database.Column.SysChapter);
+            var c = CellGetString(Database.Column.SysChapter);
 
             if (string.IsNullOrEmpty(c)) {
                 return "- ohne " + Database.Column.SysChapter.Caption + " -";

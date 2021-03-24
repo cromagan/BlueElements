@@ -28,18 +28,18 @@ namespace BlueScript {
 
         public override string Description { get => "Ändert den Variabelntyp einfach um. Ohne jegliche Prüfung. Alle Variablen werden Intern als Text gespeichert, weshalb diese Änderung möglich ist. Evtl. entstehen dadurch Variablen, die an sich kaputt sind, aber nicht als solches markiert sind."; }
 
-        public override List<string> Comand(Script s) { return new List<string>() { "changetype" }; }
+        public override List<string> Comand(Script s) { return new() { "changetype" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableNumStrListDateBool, enVariableDataType.String }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableNumStrListDateBool, enVariableDataType.String }; }
         public override bool EndlessArgs { get => false; }
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 

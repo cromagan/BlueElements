@@ -1,0 +1,57 @@
+2021-03-24 12:26:30.800 +01:00 [INF] MSBuild registered from C:\Program Files\dotnet\sdk\5.0.201\
+2021-03-24 12:26:30.843 +01:00 [INF] Registered 1 extensions:
+	Default extension
+2021-03-24 12:26:35.456 +01:00 [INF] Initializing upgrade step Select an entrypoint
+2021-03-24 12:26:35.475 +01:00 [INF] Applying upgrade step Select an entrypoint
+2021-03-24 12:26:55.295 +01:00 [INF] Upgrade step Select an entrypoint applied successfully
+2021-03-24 12:27:00.495 +01:00 [INF] Initializing upgrade step Select project to upgrade
+2021-03-24 12:27:02.946 +01:00 [INF] Applying upgrade step Select project to upgrade
+2021-03-24 12:27:04.755 +01:00 [INF] Upgrade step Select project to upgrade applied successfully
+2021-03-24 12:27:06.583 +01:00 [INF] Initializing upgrade step Back up project
+2021-03-24 12:27:08.425 +01:00 [INF] Applying upgrade step Back up project
+2021-03-24 12:27:11.019 +01:00 [INF] Backing up C:\01_Data\Visual Studio GIT\BlueElements\BeCreative\BeCreative to C:\01_Data\Visual Studio GIT\BlueElements\BeCreative\BeCreative.backup
+2021-03-24 12:27:12.267 +01:00 [INF] Project backed up to C:\01_Data\Visual Studio GIT\BlueElements\BeCreative\BeCreative.backup
+2021-03-24 12:27:12.269 +01:00 [INF] Upgrade step Back up project applied successfully
+2021-03-24 12:27:14.880 +01:00 [INF] Initializing upgrade step Convert project file to SDK style
+2021-03-24 12:27:16.831 +01:00 [INF] Applying upgrade step Convert project file to SDK style
+2021-03-24 12:27:16.840 +01:00 [INF] Converting project file format with try-convert
+2021-03-24 12:27:20.112 +01:00 [INF] [try-convert] Conversion complete!
+2021-03-24 12:27:21.622 +01:00 [INF] Project file converted successfully! The project may require additional changes to build successfully against the new .NET target.
+2021-03-24 12:27:25.392 +01:00 [INF] Upgrade step Convert project file to SDK style applied successfully
+2021-03-24 12:27:25.476 +01:00 [INF] Initializing upgrade step Update TFM
+2021-03-24 12:27:27.055 +01:00 [INF] Applying upgrade step Update TFM
+2021-03-24 12:27:32.789 +01:00 [INF] Upgrade step Update TFM applied successfully
+2021-03-24 12:27:34.645 +01:00 [INF] Initializing upgrade step Update NuGet packages
+2021-03-24 12:27:39.259 +01:00 [FTL] Invalid project: C:\01_Data\Visual Studio GIT\BlueElements\BeCreative\BeCreative\BeCreative.csproj
+2021-03-24 12:27:43.955 +01:00 [INF] Applying upgrade step Update NuGet packages
+2021-03-24 12:27:49.276 +01:00 [FTL] Invalid project: C:\01_Data\Visual Studio GIT\BlueElements\BeCreative\BeCreative\BeCreative.csproj
+2021-03-24 12:27:49.279 +01:00 [WRN] Upgrade step Update NuGet packages failed: "Failed": Invalid project: C:\01_Data\Visual Studio GIT\BlueElements\BeCreative\BeCreative\BeCreative.csproj
+2021-03-24 12:28:19.293 +01:00 [INF] Applying upgrade step Update NuGet packages
+2021-03-24 12:28:24.629 +01:00 [FTL] Invalid project: C:\01_Data\Visual Studio GIT\BlueElements\BeCreative\BeCreative\BeCreative.csproj
+2021-03-24 12:28:24.631 +01:00 [WRN] Upgrade step Update NuGet packages failed: "Failed": Invalid project: C:\01_Data\Visual Studio GIT\BlueElements\BeCreative\BeCreative\BeCreative.csproj
+2021-03-24 12:28:30.292 +01:00 [INF] Applying upgrade step Update NuGet packages
+2021-03-24 12:28:35.491 +01:00 [FTL] Invalid project: C:\01_Data\Visual Studio GIT\BlueElements\BeCreative\BeCreative\BeCreative.csproj
+2021-03-24 12:28:35.493 +01:00 [WRN] Upgrade step Update NuGet packages failed: "Failed": Invalid project: C:\01_Data\Visual Studio GIT\BlueElements\BeCreative\BeCreative\BeCreative.csproj
+2021-03-24 12:28:39.632 +01:00 [INF] Skipping upgrade step Update NuGet packages
+2021-03-24 12:28:39.636 +01:00 [INF] Upgrade step Update NuGet packages skipped
+2021-03-24 12:28:42.839 +01:00 [INF] Initializing upgrade step Add template files
+2021-03-24 12:28:42.859 +01:00 [INF] 0 expected template items needed
+2021-03-24 12:28:42.864 +01:00 [INF] Initializing upgrade step Upgrade app config files
+2021-03-24 12:28:42.877 +01:00 [INF] Found 0 app settings for upgrade: 
+2021-03-24 12:28:42.886 +01:00 [INF] system.diagnostics is not supported in .NET 5. See https://github.com/dotnet/runtime/issues/23937 for details. For now, it will be disabled.
+2021-03-24 12:28:42.894 +01:00 [INF] 0 web page namespace imports need upgraded: 
+2021-03-24 12:28:48.798 +01:00 [INF] Applying upgrade step Disable unsupported configuration sections
+2021-03-24 12:28:48.805 +01:00 [INF] system.diagnostics is not supported in .NET 5. See https://github.com/dotnet/runtime/issues/23937 for details. For now, it will be disabled.
+2021-03-24 12:28:48.814 +01:00 [INF] Configuration file C:\01_Data\Visual Studio GIT\BlueElements\BeCreative\BeCreative\app.config has been updated
+2021-03-24 12:28:48.831 +01:00 [INF] Upgrade step Disable unsupported configuration sections applied successfully
+2021-03-24 12:28:48.836 +01:00 [INF] Applying upgrade step Upgrade app config files
+2021-03-24 12:28:48.840 +01:00 [INF] Upgrade step Upgrade app config files applied successfully
+2021-03-24 12:29:02.199 +01:00 [INF] Initializing upgrade step Update C# source
+2021-03-24 12:29:10.220 +01:00 [INF] Initializing upgrade step Move to next project
+2021-03-24 12:29:15.512 +01:00 [INF] Applying upgrade step Move to next project
+2021-03-24 12:29:15.516 +01:00 [INF] Upgrade step Move to next project applied successfully
+2021-03-24 12:29:17.221 +01:00 [INF] Initializing upgrade step Finalize Solution
+2021-03-24 12:29:21.929 +01:00 [INF] Applying upgrade step Finalize Solution
+2021-03-24 12:29:21.933 +01:00 [INF] Upgrade step Finalize Solution applied successfully
+2021-03-24 12:29:25.380 +01:00 [INF] Upgrade has completed. Please review any changes.
+2021-03-24 12:29:25.384 +01:00 [INF] Saving upgrade progress file at C:\01_Data\Visual Studio GIT\BlueElements\BeCreative\.upgrade-assistant

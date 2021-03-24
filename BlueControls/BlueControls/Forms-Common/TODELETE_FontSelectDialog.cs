@@ -42,10 +42,10 @@ namespace BlueControls.Forms {
 
             if (FNList == null) {
                 FNList = new ItemCollectionList();
-                foreach (FontFamily f in FontFamily.Families) {
+                foreach (var f in FontFamily.Families) {
                     if (!string.IsNullOrEmpty(f.Name)) {
                         if (f.IsStyleAvailable(FontStyle.Regular)) {
-                            Font fo = new Font(f.Name, 100);
+                            var fo = new Font(f.Name, 100);
 
                             try {
                                 BlueFont.MeasureString("T", fo);

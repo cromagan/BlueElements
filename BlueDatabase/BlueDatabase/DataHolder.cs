@@ -57,7 +57,7 @@ namespace BlueDatabase {
 
 
         public void SetData(string feldname, bool editable, string quickinfo) {
-            ColumnItem c = Column(feldname, string.Empty);
+            var c = Column(feldname, string.Empty);
 
             //c.Caption = dataName;
             //c.Format = enDataFormat.Text;
@@ -104,7 +104,7 @@ namespace BlueDatabase {
             ID = id;
             Typ = "MAIN";
 
-            string filename = MyDefaultFileName();
+            var filename = MyDefaultFileName();
             InternalDatabase = (Database)Database.GetByFilename(filename, false);
 
             Parent = null;
@@ -178,11 +178,11 @@ namespace BlueDatabase {
 
         public ColumnItem Column(string dataName, string message) {
 
-            string nd = ColumnName(dataName);
+            var nd = ColumnName(dataName);
 
 
 
-            ColumnItem c = InternalDatabase.Column.Exists(nd);
+            var c = InternalDatabase.Column.Exists(nd);
             if (c == null) {
                 c = InternalDatabase.Column.Add(nd);
                 c.Caption = dataName;
@@ -209,9 +209,9 @@ namespace BlueDatabase {
         }
 
         public RowItem Row() {
-            string rn = Typ + "/" + ID;
+            var rn = Typ + "/" + ID;
 
-            RowItem r = InternalDatabase.Row[rn];
+            var r = InternalDatabase.Row[rn];
 
             if (r == null) {
                 r = InternalDatabase.Row.Add(rn);
@@ -270,17 +270,17 @@ namespace BlueDatabase {
 
             data = new ListExt<t>();
 
-            string name = data.GetType().ToString();
+            var name = data.GetType().ToString();
 
-            List<string> IDS = GetList(name);
+            var IDS = GetList(name);
 
-            foreach (string thisID in IDS) {
+            foreach (var thisID in IDS) {
                 if (!separateFiles) {
 
-                    t v = (t)System.Activator.CreateInstance(typeof(t), this, thisID.ToUpper());
+                    var v = (t)System.Activator.CreateInstance(typeof(t), this, thisID.ToUpper());
                     data.Add(v);
                 } else {
-                    t v = (t)System.Activator.CreateInstance(typeof(t), thisID.ToUpper());
+                    var v = (t)System.Activator.CreateInstance(typeof(t), thisID.ToUpper());
                     data.Add(v);
                 }
 
@@ -292,10 +292,10 @@ namespace BlueDatabase {
 
         private void Data_Changed(object sender, System.EventArgs e) {
 
-            List<string> IDS = new List<string>();
+            var IDS = new List<string>();
             if (sender is IEnumerable enumerable) {
 
-                foreach (object thisd in enumerable) {
+                foreach (var thisd in enumerable) {
                     if (thisd is DataHolder dh) {
                         IDS.Add(dh.ID);
                     }
@@ -304,7 +304,7 @@ namespace BlueDatabase {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Typ");
             }
 
-            string name = sender.GetType().ToString();
+            var name = sender.GetType().ToString();
             Set(name, IDS);
         }
 
@@ -421,7 +421,7 @@ namespace BlueDatabase {
 
     public static class DataHolderExtensions {
         public static t GetByID<t>(this List<t> items, string id) where t : DataHolder {
-            foreach (t thisit in items) {
+            foreach (var thisit in items) {
                 if (thisit.ID.ToUpper() == id.ToUpper()) { return thisit; }
             }
             return null;

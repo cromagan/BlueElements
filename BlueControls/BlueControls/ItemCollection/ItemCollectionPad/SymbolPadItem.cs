@@ -54,7 +54,7 @@ namespace BlueControls.ItemCollection {
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
-            PointF trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
 
             GR.TranslateTransform(trp.X, trp.Y);
             GR.RotateTransform(-Drehwinkel);
@@ -63,7 +63,7 @@ namespace BlueControls.ItemCollection {
             GraphicsPath p = null;
 
 
-            RectangleF d2 = DCoordinates;
+            var d2 = DCoordinates;
             d2.X = -DCoordinates.Width / 2;
             d2.X = -DCoordinates.Width / 2;
             d2.Y = -DCoordinates.Height / 2;
@@ -102,12 +102,12 @@ namespace BlueControls.ItemCollection {
 
 
         public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new List<FlexiControl>
+            var l = new List<FlexiControl>
             {
                 new FlexiControl()
             };
 
-            ItemCollectionList Comms = new ItemCollectionList
+            var Comms = new ItemCollectionList
             {
                 { "Ohne", ((int)enSymbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
                 { "Pfeil", ((int)enSymbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
@@ -144,7 +144,7 @@ namespace BlueControls.ItemCollection {
 
 
         public override string ToString() {
-            string t = base.ToString();
+            var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             t = t + "Symbol=" + (int)Symbol + ", ";
             t = t + "Backcolor=" + Randfarbe.ToHTMLCode() + ", ";

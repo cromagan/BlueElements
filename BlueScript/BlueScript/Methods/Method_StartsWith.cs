@@ -27,21 +27,21 @@ namespace BlueScript {
 
         public override string Description { get => "Prüft, ob der String mit einem der angegeben Strings startet."; }
 
-        public override List<string> Comand(Script s) { return new List<string>() { "startswith" }; }
+        public override List<string> Comand(Script s) { return new() { "startswith" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Bool; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.Bool, enVariableDataType.String }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.String, enVariableDataType.Bool, enVariableDataType.String }; }
         public override bool EndlessArgs { get => true; }
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            for (int z = 2; z < attvar.Count; z++) {
+            for (var z = 2; z < attvar.Count; z++) {
                 if (attvar[1].ValueBool) {
                     if (attvar[0].ValueString.StartsWith(attvar[z].ValueString)) {
                         return strDoItFeedback.Wahr();

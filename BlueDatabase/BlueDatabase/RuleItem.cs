@@ -84,12 +84,12 @@ namespace BlueDatabase {
 
         public override string ToString() {
 
-            string Result = "";
+            var Result = "";
 
             //   if (!string.IsNullOrEmpty(_SystemKey)) { Result = Result + "SK=" + _SystemKey.ToNonCritical() + ", "; }
 
 
-            foreach (RuleActionItem ThisAction in Actions) {
+            foreach (var ThisAction in Actions) {
                 if (ThisAction != null) {
                     Result = Result + ", Aktion=" + ThisAction;
                 }
@@ -106,7 +106,7 @@ namespace BlueDatabase {
 
             Initialize();
 
-            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
+            foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "sk": // TODO: alt 28.03.2019 , löschen
                                //  _SystemKey = pair.Value.FromNonCritical();
@@ -171,11 +171,11 @@ namespace BlueDatabase {
         //}
 
         public int AnzahlWenns() {
-            int W = 0;
+            var W = 0;
 
             if (Actions.Count == 0) { return 0; }
 
-            foreach (RuleActionItem ThisAction in Actions) {
+            foreach (var ThisAction in Actions) {
                 if (ThisAction != null && ThisAction.IsBedingung()) { W++; }
             }
 
@@ -183,10 +183,10 @@ namespace BlueDatabase {
         }
 
         public int AnzahlDanns() {
-            int W = 0;
+            var W = 0;
             if (Actions.Count == 0) { return 0; }
 
-            foreach (RuleActionItem ThisAction in Actions) {
+            foreach (var ThisAction in Actions) {
                 if (ThisAction != null && !ThisAction.IsBedingung()) { W++; }
             }
 
@@ -201,7 +201,7 @@ namespace BlueDatabase {
 
             if (AnzahlWenns() > 1) { return null; }
 
-            foreach (RuleActionItem ThisAction in Actions) {
+            foreach (var ThisAction in Actions) {
                 if (ThisAction != null) {
                     if (ThisAction.IsBedingung()) { return ThisAction.SymbolForReadableText(); }
                 }
@@ -216,14 +216,14 @@ namespace BlueDatabase {
             // if (!IsOk()) { return "Fehlerhafte Regel wird ignoriert: " + ErrorReason(); }
 
 
-            List<string>[] Txts = new List<string>[2];
+            var Txts = new List<string>[2];
             Txts[0] = new List<string>();
             Txts[1] = new List<string>();
 
-            string hasAnmerkung = string.Empty;
+            var hasAnmerkung = string.Empty;
 
 
-            foreach (RuleActionItem ThisAction in Actions) {
+            foreach (var ThisAction in Actions) {
                 if (ThisAction != null) {
 
                     if (ThisAction.Action == enAction.Anmerkung) {
@@ -238,10 +238,10 @@ namespace BlueDatabase {
             }
 
 
-            string[] GiveB = new string[2];
+            var GiveB = new string[2];
 
 
-            for (int z = 0; z <= 1; z++) {
+            for (var z = 0; z <= 1; z++) {
                 switch (Txts[z].Count) {
                     case 1:
                         GiveB[z] = Txts[z][0];
@@ -251,8 +251,8 @@ namespace BlueDatabase {
                         break;
                     default: {
                         GiveB[z] = Txts[z][0];
-                        int tempVar = Txts[z].Count - 2;
-                        for (int z1 = 1; z1 <= tempVar; z1++) {
+                        var tempVar = Txts[z].Count - 2;
+                        for (var z1 = 1; z1 <= tempVar; z1++) {
                             GiveB[z] = GiveB[z] + ", " + Txts[z][z1];
                         }
                         GiveB[z] = GiveB[z] + " und " + Txts[z][Txts[z].Count - 1];
@@ -349,12 +349,12 @@ namespace BlueDatabase {
         public string CompareKey() {
 
 
-            int MaxColumnIndex = -1;
-            int MaxCode = -1;
+            var MaxColumnIndex = -1;
+            var MaxCode = -1;
 
-            foreach (RuleActionItem ThisAction in Actions) {
+            foreach (var ThisAction in Actions) {
                 if (ThisAction != null) {
-                    foreach (ColumnItem ThisColumnItem in ThisAction.ColumnsAllUsed()) {
+                    foreach (var ThisColumnItem in ThisAction.ColumnsAllUsed()) {
                         if (ThisColumnItem != null) {
                             MaxColumnIndex = Math.Max(ThisColumnItem.Index(), MaxColumnIndex);
                         }
@@ -362,7 +362,7 @@ namespace BlueDatabase {
                 }
 
 
-                int Co = -1;
+                var Co = -1;
                 switch (ThisAction.Action) {
                     case 0:
                         Co = 1;
@@ -501,7 +501,7 @@ namespace BlueDatabase {
 
             if (AnzahlWenns() > 0) { return false; }
 
-            foreach (RuleActionItem ThisAction in Actions) {
+            foreach (var ThisAction in Actions) {
                 if (ThisAction != null) {
                     //if (ThisAction.Action != enAction.KopiereAndereSpalten)
                     //{
@@ -526,19 +526,19 @@ namespace BlueDatabase {
         internal string ToScript() {
 
 
-            List<ColumnItem> c = new List<ColumnItem>();
+            var c = new List<ColumnItem>();
 
-            string txt = "\r\n\r\n// --------------------------------------------------------\r\n";
+            var txt = "\r\n\r\n// --------------------------------------------------------\r\n";
             txt += "// " + ReadableText();
             txt += "\r\n// --------------------------------------------------------\r\n";
 
 
-            string a = string.Empty;
-            string e = string.Empty;
+            var a = string.Empty;
+            var e = string.Empty;
 
-            foreach (RuleActionItem thisAktion in Actions) {
+            foreach (var thisAktion in Actions) {
 
-                (string anfang, string ende) = thisAktion.ToScript(c);
+                (var anfang, var ende) = thisAktion.ToScript(c);
 
                 a += anfang + "\r\n";
 

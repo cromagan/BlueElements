@@ -10,8 +10,8 @@ namespace BlueControls.Controls {
     public partial class EasyPicMulti : GenericControl, IBackgroundNone // System.Windows.Forms.UserControl //
     {
         private int _nr = 0;
-        private readonly List<BlueBasics.BitmapExt> pic = new List<BlueBasics.BitmapExt>();
-        private List<string> files = new List<string>();
+        private readonly List<BlueBasics.BitmapExt> pic = new();
+        private List<string> files = new();
 
         public List<string> Files {
             get => files;
@@ -59,7 +59,7 @@ namespace BlueControls.Controls {
         }
 
         private void btnSchnittView_Click(object sender, System.EventArgs e) {
-            PictureView x = new PictureView(Files, false, string.Empty);
+            var x = new PictureView(Files, false, string.Empty);
             x.Show();
         }
 

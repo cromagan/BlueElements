@@ -29,16 +29,16 @@ namespace BlueBasics {
 
             if (L == null || L.Count == 0) { return false; }
 
-            List<int> remo = new List<int>();
+            var remo = new List<int>();
 
-            foreach (KeyValuePair<int, T> pair in L) {
+            foreach (var pair in L) {
                 if (pair.Value == null || pair.Value.IsNullOrEmpty()) { remo.Add(pair.Key); }
             }
 
             if (remo.Count == 0) { return false; }
-            T dummy = default(T);
+            var dummy = default(T);
 
-            foreach (int ThisInteger in remo) {
+            foreach (var ThisInteger in remo) {
                 if (!L.TryRemove(ThisInteger, out dummy)) {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Remove failed: " + ThisInteger);
                 }

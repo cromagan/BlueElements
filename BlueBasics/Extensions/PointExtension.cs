@@ -26,7 +26,7 @@ namespace BlueBasics {
 
             Code = Code.RemoveChars("{}XYxy= ");
 
-            Point P = new Point();
+            var P = new Point();
 
 
             if (string.IsNullOrEmpty(Code)) {
@@ -36,7 +36,7 @@ namespace BlueBasics {
             }
 
 
-            string[] w = Code.Split(',');
+            var w = Code.Split(',');
 
             P.X = int.Parse(w[0]);
             P.Y = int.Parse(w[1]);

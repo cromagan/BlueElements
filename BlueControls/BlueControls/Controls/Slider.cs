@@ -46,8 +46,8 @@ namespace BlueControls.Controls {
         #region  Variablen 
 
         private double? LastFiredValue;
-        private readonly object Lock_UserAction = new object();
-        private readonly object Lock_RaiseEvent = new object();
+        private readonly object Lock_UserAction = new();
+        private readonly object Lock_RaiseEvent = new();
 
         private enOrientation _Orientation = enOrientation.Waagerecht;
         private double _Minimum;
@@ -296,8 +296,8 @@ namespace BlueControls.Controls {
 
 
         private double CheckMinMax(double ValueToCheck) {
-            double _Min = Math.Min(_Minimum, _Maximum);
-            double _Max = Math.Max(_Minimum, _Maximum);
+            var _Min = Math.Min(_Minimum, _Maximum);
+            var _Max = Math.Max(_Minimum, _Maximum);
 
             if (ValueToCheck < _Min) { return _Min; }
             if (ValueToCheck > _Max) { return _Max; }
@@ -346,12 +346,12 @@ namespace BlueControls.Controls {
         }
 
         protected override void DrawControl(Graphics gr, enStates state) {
-            enStates vState_Back = state;
-            enStates vState_Slider = state;
+            var vState_Back = state;
+            var vState_Slider = state;
 
             _ClickAreaContainsMouse = _ClickArea.Contains(MousePos().X, MousePos().Y);
 
-            double Proz = (_Value - Minimum) / (Maximum - Minimum);
+            var Proz = (_Value - Minimum) / (Maximum - Minimum);
 
             if (Maximum - Minimum > 0) {
 
@@ -434,8 +434,8 @@ namespace BlueControls.Controls {
 
         private void CheckButtonEnabledState() {
 
-            bool ol1 = But1.Enabled;
-            bool ol2 = But1.Enabled;
+            var ol1 = But1.Enabled;
+            var ol2 = But1.Enabled;
 
             if (!Enabled) {
                 But1.Enabled = false;

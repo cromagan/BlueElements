@@ -45,7 +45,7 @@ namespace BluePaint {
 
 
             if (DrawBox.Checked && e.Current != null) {
-                Bitmap _Pic = OnNeedCurrentPic();
+                var _Pic = OnNeedCurrentPic();
 
                 e.DrawLine(Pen_RedTransp, -1, e.Current.TrimmedY, _Pic.Width, e.Current.TrimmedY);
                 e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, _Pic.Height);
@@ -67,7 +67,7 @@ namespace BluePaint {
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
 
                 if (Razi.Checked) {
-                    Bitmap _Pic = OnNeedCurrentPic();
+                    var _Pic = OnNeedCurrentPic();
                     _Pic.FillCircle(Color.White, e.Current.TrimmedX, e.Current.TrimmedY, 3);
                 }
             }
@@ -78,13 +78,13 @@ namespace BluePaint {
 
             if (Razi.Checked) { return; }
 
-            Bitmap _Pic = OnNeedCurrentPic();
+            var _Pic = OnNeedCurrentPic();
 
 
             if (Eleminate.Checked) {
 
                 if (e.Current.IsInPic) {
-                    Color cc = _Pic.GetPixel(e.Current.X, e.Current.Y);
+                    var cc = _Pic.GetPixel(e.Current.X, e.Current.Y);
 
                     if (cc.ToArgb() == 0) { return; }
 
@@ -98,7 +98,7 @@ namespace BluePaint {
 
 
             if (DrawBox.Checked) {
-                Graphics g = Graphics.FromImage(_Pic);
+                var g = Graphics.FromImage(_Pic);
                 g.FillRectangle(Brushes.White, e.TrimmedRectangle());
                 OnDoInvalidate();
             }
@@ -113,11 +113,11 @@ namespace BluePaint {
         }
 
         public override void ExcuteCommand(string command) {
-            string[] c = command.SplitBy(";");
+            var c = command.SplitBy(";");
 
             if (c[0] == "Replace") {
-                Bitmap OriginalPic = OnNeedCurrentPic();
-                Color cc = Color.FromArgb(int.Parse(c[1]));
+                var OriginalPic = OnNeedCurrentPic();
+                var cc = Color.FromArgb(int.Parse(c[1]));
                 OnOverridePic(OriginalPic.ReplaceColor(cc, Color.Transparent));
             } else {
                 Develop.DebugPrint_NichtImplementiert();

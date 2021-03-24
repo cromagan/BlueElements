@@ -37,7 +37,7 @@ namespace BluePaint {
 
             BlueBasics.modAllgemein.Pause(1, true);
 
-            System.Drawing.Bitmap _Pic = ScreenShot.GrabArea(null, 0, 0).Pic;
+            var _Pic = ScreenShot.GrabArea(null, 0, 0).Pic;
 
             if (_Pic != null) { OnOverridePic(_Pic); }
             OnShowMainWindow();

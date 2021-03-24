@@ -8,7 +8,7 @@ using System.Drawing;
 namespace BlueControls.Forms {
     public partial class FloatingForm : Form {
 
-        internal static List<FloatingForm> AllBoxes = new List<FloatingForm>();
+        internal static List<FloatingForm> AllBoxes = new();
 
         private readonly System.Windows.Forms.Control _ConnectedControl = null;
 
@@ -74,7 +74,7 @@ namespace BlueControls.Forms {
 
         protected override System.Windows.Forms.CreateParams CreateParams {
             get {
-                System.Windows.Forms.CreateParams oParam = base.CreateParams;
+                var oParam = base.CreateParams;
 
 
                 oParam.ExStyle |= (int)enExStyle.EX_NOACTIVATE | (int)enExStyle.EX_TOOLWINDOW | (int)enExStyle.EX_TOPMOST;
@@ -93,18 +93,18 @@ namespace BlueControls.Forms {
 
 
         public void Position_CenterScreen(System.Drawing.Point BestPosition) {
-            int ScreenNr = modAllgemein.PointOnScreenNr(BestPosition);
+            var ScreenNr = modAllgemein.PointOnScreenNr(BestPosition);
             CheckMaxSize(ScreenNr);
 
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            double Xpos = System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Left + (System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Width - Width) / 2.0;
-            double Ypos = System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Top + (System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Height - Height) / 2.0;
+            var Xpos = System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Left + (System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Width - Width) / 2.0;
+            var Ypos = System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Top + (System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Height - Height) / 2.0;
             Position_SetWindowIntoScreen(ScreenNr, (int)Xpos, (int)Ypos);
         }
 
 
         public void Position_LocateToPosition(System.Drawing.Point BestPosition) {
-            int ScreenNr = modAllgemein.PointOnScreenNr(BestPosition);
+            var ScreenNr = modAllgemein.PointOnScreenNr(BestPosition);
 
             CheckMaxSize(ScreenNr);
             Position_SetWindowIntoScreen(ScreenNr, BestPosition.X, BestPosition.Y);
@@ -113,11 +113,11 @@ namespace BlueControls.Forms {
 
         public void Position_LocateToMouse() {
 
-            int ScreenNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
+            var ScreenNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
 
             CheckMaxSize(ScreenNr);
-            int Ypos = System.Windows.Forms.Cursor.Position.Y + 15;
-            int Xpos = System.Windows.Forms.Cursor.Position.X + 15;
+            var Ypos = System.Windows.Forms.Cursor.Position.Y + 15;
+            var Xpos = System.Windows.Forms.Cursor.Position.X + 15;
 
 
             if (Xpos + Width > System.Windows.Forms.Screen.AllScreens[ScreenNr].Bounds.Right) {
@@ -168,7 +168,7 @@ namespace BlueControls.Forms {
 
         internal static void Close(object ConnectedControl, enDesign Design) {
 
-            foreach (FloatingForm ThisForm in AllBoxes) {
+            foreach (var ThisForm in AllBoxes) {
                 if (!ThisForm.IsDisposed) {
 
                     if (ConnectedControl == null || ConnectedControl == ThisForm._ConnectedControl) {
@@ -198,7 +198,7 @@ namespace BlueControls.Forms {
         }
 
         internal static bool IsShowing(object ConnectedControl) {
-            foreach (FloatingForm ThisForm in AllBoxes) {
+            foreach (var ThisForm in AllBoxes) {
                 if (!ThisForm.IsDisposed && ConnectedControl == ThisForm._ConnectedControl) { return true; }
             }
             return false;
@@ -215,7 +215,7 @@ namespace BlueControls.Forms {
                 BackgroundImage = new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
             }
 
-            Graphics TMPGR = Graphics.FromImage(BackgroundImage);
+            var TMPGR = Graphics.FromImage(BackgroundImage);
 
             Skin.Draw_Back(TMPGR, Design, enStates.Standard, DisplayRectangle, null, false);
             Skin.Draw_Border(TMPGR, Design, enStates.Standard, DisplayRectangle);

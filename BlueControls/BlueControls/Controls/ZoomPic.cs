@@ -83,13 +83,13 @@ namespace BlueControls.Controls {
 
             //var TMPGR = Graphics.FromImage(_BitmapOfControl);
 
-            LinearGradientBrush lgb = new LinearGradientBrush(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
+            var lgb = new LinearGradientBrush(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
 
             gr.FillRectangle(lgb, ClientRectangle);
 
             if (_bmp != null) {
 
-                RectangleF r = new RectangleM(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(_Zoom, _shiftX, _shiftY);
+                var r = new RectangleM(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(_Zoom, _shiftX, _shiftY);
 
 
                 if (_Zoom < 1 || AlwaysSmooth) {
@@ -140,10 +140,10 @@ namespace BlueControls.Controls {
 
         private MouseEventArgs1_1 GenerateNewMouseEventArgs(MouseEventArgs e) {
 
-            PositionEventArgs en = new PositionEventArgs(MousePos_1_1.X, MousePos_1_1.Y);
+            var en = new PositionEventArgs(MousePos_1_1.X, MousePos_1_1.Y);
             OnOverwriteMouseImageData(en);
 
-            Point p = PointInsidePic(en.X, en.Y);
+            var p = PointInsidePic(en.X, en.Y);
             return new MouseEventArgs1_1(e.Button, e.Clicks, en.X, en.Y, e.Delta, p.X, p.Y, IsInBitmap(en.X, en.Y));
 
         }
@@ -172,11 +172,11 @@ namespace BlueControls.Controls {
             return true;
         }
 
-        private bool IsInBitmap() {
-            if (_bmp == null) { return false; }
-            if (MousePos_1_1 == null) { return false; }
-            return IsInBitmap(MousePos_1_1.X, MousePos_1_1.Y);
-        }
+        //private bool IsInBitmap() {
+        //    if (_bmp == null) { return false; }
+        //    if (MousePos_1_1 == null) { return false; }
+        //    return IsInBitmap(MousePos_1_1.X, MousePos_1_1.Y);
+        //}
 
         /// <summary>
         /// Zuerst ImageMouseUp, dann MouseUp

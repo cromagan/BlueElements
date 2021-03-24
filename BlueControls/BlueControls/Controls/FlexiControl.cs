@@ -115,7 +115,7 @@ namespace BlueControls.Controls {
             ValueId = string.Empty;
 
 
-            SizeF s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+            var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
 
             Size = new Size((int)(s.Width + 2), (int)(s.Height + 2));
 
@@ -658,14 +658,14 @@ namespace BlueControls.Controls {
 
 
 
-            List<Control> l = new List<Control>();
+            var l = new List<Control>();
 
 
-            for (int z = 0; z < Controls.Count; z++) { l.Add(Controls[z]); }
+            for (var z = 0; z < Controls.Count; z++) { l.Add(Controls[z]); }
 
 
 
-            foreach (Control thisc in l) {
+            foreach (var thisc in l) {
                 thisc.Visible = false;
 
                 if (thisc != _CaptionObject && thisc != _InfoCaption) {
@@ -755,7 +755,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
         private Line Control_Create_Line() {
-            Line Control = new Line {
+            var Control = new Line {
                 Enabled = Enabled,
                 Orientation = enOrientation.Waagerecht
             };
@@ -775,7 +775,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
         private EasyPic Control_Create_EasyPic() {
-            EasyPic Control = new EasyPic {
+            var Control = new EasyPic {
                 Enabled = Enabled
             };
 
@@ -802,7 +802,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private ComboBox Control_Create_ComboBox() {
-            ComboBox Control = new ComboBox();
+            var Control = new ComboBox();
 
             StyleComboBox(Control, null, System.Windows.Forms.ComboBoxStyle.DropDownList);
 
@@ -842,7 +842,7 @@ namespace BlueControls.Controls {
         // Nimmt Teilweise die Routinen der Listbox her
 
         private SwapListBox Control_Create_SwapListBox() {
-            SwapListBox Control = new SwapListBox {
+            var Control = new SwapListBox {
                 Enabled = Enabled,
             };
 
@@ -861,7 +861,7 @@ namespace BlueControls.Controls {
 
             if (Column == null) { return; }
 
-            ItemCollectionList Item = new ItemCollectionList();
+            var Item = new ItemCollectionList();
 
             ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000);
 
@@ -907,7 +907,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private ListBox Control_Create_ListBox() {
-            ListBox Control = new ListBox {
+            var Control = new ListBox {
                 Enabled = Enabled,
             };
 
@@ -927,7 +927,7 @@ namespace BlueControls.Controls {
 
             if (Column == null) { return; }
 
-            ItemCollectionList Item = new ItemCollectionList();
+            var Item = new ItemCollectionList();
 
             if (Column.DropdownBearbeitungErlaubt) {
                 ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000);
@@ -936,7 +936,7 @@ namespace BlueControls.Controls {
                     bool again;
                     do {
                         again = false;
-                        foreach (BasicListItem ThisItem in Item) {
+                        foreach (var ThisItem in Item) {
                             if (!Column.DropDownItems.Contains(ThisItem.Internal)) {
                                 again = true;
                                 Item.Remove(ThisItem);
@@ -1010,7 +1010,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private Button Control_Create_ButtonComand() {
-            Button Control = new Button {
+            var Control = new Button {
                 Enabled = Enabled,
                 Name = "ComandButton",
                 Checked = false,
@@ -1028,7 +1028,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private Button Control_Create_ButtonColor() {
-            Button Control = new Button {
+            var Control = new Button {
                 Enabled = Enabled,
                 Name = "ColorButton",
                 Checked = false,
@@ -1047,7 +1047,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
         private Button Control_Create_ButtonYesNo() {
-            Button Control = new Button {
+            var Control = new Button {
                 Enabled = Enabled,
                 Name = "YesNoButton",
                 ButtonStyle = enButtonStyle.Yes_or_No,
@@ -1100,7 +1100,7 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private TextBox Control_Create_TextBox() {
-            TextBox Control = new TextBox();
+            var Control = new TextBox();
             StyleTextBox(Control, string.Empty, false);
             UpdateValueToControl();
             StandardBehandlung(Control);
@@ -1229,8 +1229,8 @@ namespace BlueControls.Controls {
 
 
         private void DoInfoTextCaption(string disabledReason) {
-            string txt = string.Empty;
-            string symbol = string.Empty;
+            var txt = string.Empty;
+            var symbol = string.Empty;
             if (string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText)) {
                 txt = string.Empty;
                 symbol = string.Empty;
@@ -1295,7 +1295,7 @@ namespace BlueControls.Controls {
 
         private void _InfoCaption_Click(object sender, System.EventArgs e) {
 
-            foreach (object thisc in Controls) {
+            foreach (var thisc in Controls) {
                 if (thisc is ComboBox cbx) {
                     cbx.Focus();
                     cbx.ShowMenu(null, null);

@@ -64,25 +64,25 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (IsWorking) { return; }
 
-            string SuchText = Alt.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
-            string ErsetzText = Neu.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
+            var SuchText = Alt.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
+            var ErsetzText = Neu.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
 
             _BlueTable.Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
 
-            List<ColumnItem> sp = new List<ColumnItem>();
-            List<RowItem> ro = new List<RowItem>();
+            var sp = new List<ColumnItem>();
+            var ro = new List<RowItem>();
 
             if (NurinAktuellerSpalte.Checked) {
                 sp.Add(_BlueTable.CursorPosColumn());
             } else {
-                foreach (ColumnItem ThisColumn in _BlueTable.Database.Column) {
+                foreach (var ThisColumn in _BlueTable.Database.Column) {
                     if (ThisColumn != null && ThisColumn.Format.CanBeChangedByRules()) { sp.Add(ThisColumn); }
                 }
             }
 
 
-            foreach (RowItem ThisRow in _BlueTable.Database.Row) {
+            foreach (var ThisRow in _BlueTable.Database.Row) {
                 if (ThisRow != null) {
                     if (!AktuelleFilterung.Checked || ThisRow.MatchesTo(_BlueTable.Filter)) {
                         if (!AbgeschlosseZellen.Checked || !ThisRow.CellGetBoolean(_BlueTable.Database.Column.SysLocked)) { ro.Add(ThisRow); }
@@ -91,23 +91,23 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
 
-            int count = 0;
-            string GeändeterText = "";
+            var count = 0;
+            var GeändeterText = "";
 
-            int co = 0;
+            var co = 0;
 
-            Progressbar P = Progressbar.Show("Ersetze...", ro.Count);
+            var P = Progressbar.Show("Ersetze...", ro.Count);
 
-            foreach (RowItem ThisRow in ro) {
-                bool RowChanged = false;
+            foreach (var ThisRow in ro) {
+                var RowChanged = false;
                 co++;
                 P.Update(co);
 
 
-                foreach (ColumnItem Thiscolumn in sp) {
+                foreach (var Thiscolumn in sp) {
 
-                    bool trifft = false;
-                    string OriginalText = ThisRow.CellGetString(Thiscolumn);
+                    var trifft = false;
+                    var OriginalText = ThisRow.CellGetString(Thiscolumn);
 
                     if (SucheNach.Checked) {
                         trifft = OriginalText.Contains(SuchText);
@@ -126,7 +126,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                         } else if (ErsetzeKomplett.Checked) {
                             GeändeterText = ErsetzText;
                         } else if (FügeHinzu.Checked) {
-                            List<string> tmp = new List<string>(OriginalText.SplitByCR())
+                            var tmp = new List<string>(OriginalText.SplitByCR())
                             {
                                 ErsetzText
                             };
@@ -167,7 +167,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
         private void Checkbuttons() {
-            bool CanDo = true;
+            var CanDo = true;
             if (_BlueTable == null) { return; }
 
 

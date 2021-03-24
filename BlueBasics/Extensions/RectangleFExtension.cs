@@ -56,18 +56,18 @@ namespace BlueBasics {
 
         public static PointF NearestCornerOF(this RectangleF r, Point P) {
 
-            PointF LO = r.PointOf(enAlignment.Top_Left);
-            PointF rO = r.PointOf(enAlignment.Top_Right);
-            PointF ru = r.PointOf(enAlignment.Bottom_Right);
-            PointF lu = r.PointOf(enAlignment.Bottom_Left);
+            var LO = r.PointOf(enAlignment.Top_Left);
+            var rO = r.PointOf(enAlignment.Top_Right);
+            var ru = r.PointOf(enAlignment.Bottom_Right);
+            var lu = r.PointOf(enAlignment.Bottom_Left);
 
 
-            decimal llo = Geometry.Länge(P, LO);
-            decimal lro = Geometry.Länge(P, rO);
-            decimal llu = Geometry.Länge(P, lu);
-            decimal lru = Geometry.Länge(P, ru);
+            var llo = Geometry.Länge(P, LO);
+            var lro = Geometry.Länge(P, rO);
+            var llu = Geometry.Länge(P, lu);
+            var lru = Geometry.Länge(P, ru);
 
-            decimal Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
+            var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
 
             if (Erg == llo) { return LO; }
             if (Erg == lro) { return rO; }

@@ -26,17 +26,17 @@ namespace BlueScript {
 
         public override string Syntax { get => "String(numeral)"; }
         public override string Description { get => "Wandelt die Zahl in einen Text um."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "string" }; }
+        public override List<string> Comand(Script s) { return new() { "string" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.String; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.Number }; }
         public override bool EndlessArgs { get => false; }
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             attvar[0].Type = enVariableDataType.String;

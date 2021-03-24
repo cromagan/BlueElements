@@ -148,7 +148,7 @@ namespace BlueControls.Controls {
         }
 
         private void SetStandardValues() {
-            enPartentType l = GenericControl.Typ(Parent);
+            var l = GenericControl.Typ(Parent);
 
             if (_GroupBoxStyle == enGroupBoxStyle.RibbonBar) { l = enPartentType.RibbonPage; }
 
@@ -177,11 +177,11 @@ namespace BlueControls.Controls {
         protected override void OnPaint(PaintEventArgs e) {
             //      base.OnPaint(e);
 
-            enStates state = enStates.Standard;
+            var state = enStates.Standard;
 
             if (!GenericControl.AllEnabled(Parent)) { state = enStates.Standard_Disabled; }
 
-            Rectangle r = new Rectangle(0, 0, Width, Height);
+            var r = new Rectangle(0, 0, Width, Height);
 
             e.Graphics.Clear(BackColor);
 
@@ -190,7 +190,7 @@ namespace BlueControls.Controls {
                     Skin.Draw_Border(e.Graphics, enDesign.RibbonBar_Frame, state, r);
 
                     if (!string.IsNullOrEmpty(Text)) {
-                        Rectangle bottomTXT = new Rectangle(0, 0, Width, Height + 2);
+                        var bottomTXT = new Rectangle(0, 0, Width, Height + 2);
                         Skin.Draw_FormatedText(e.Graphics, Text, enDesign.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, bottomTXT, this, false, true);
                     }
 
@@ -200,7 +200,7 @@ namespace BlueControls.Controls {
                     if (Height > 33) {
                         Skin.Draw_Border(e.Graphics, enDesign.Frame, state, r);
                         if (!string.IsNullOrEmpty(Text)) {
-                            Rectangle topTXT = new Rectangle(Skin.Padding, 0, Width, Height);
+                            var topTXT = new Rectangle(Skin.Padding, 0, Width, Height);
                             Skin.Draw_FormatedText(e.Graphics, Text, enDesign.Frame, state, null, enAlignment.Top_Left, topTXT, this, true, true);
                         }
                     }

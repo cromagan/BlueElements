@@ -109,7 +109,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
         private void CursorPosChanged(object sender, CellEventArgs e) {
-            bool ok = true;
+            var ok = true;
             if (e.Row == null) {
                 optVorhandenZeile.Text = "Aktuell angewählte Zeile überschreiben";
                 ok = false;
@@ -117,7 +117,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 optVorhandenZeile.Text = "Aktuell angewählte Zeile  <b>(" + e.Row.CellFirstString() + ")</b> überschreiben";
 
                 if (!Database.IsAdministrator()) {
-                    foreach (ColumnItem ThisColumn in Database.Column) {
+                    foreach (var ThisColumn in Database.Column) {
                         if (ThisColumn != Database.Column.SysRowChangeDate && ThisColumn != Database.Column.SysRowChanger) {
                             if (!CellCollection.UserEditPossible(ThisColumn, e.Row, enErrorReason.EditGeneral)) { ok = false; }
                         }
@@ -184,7 +184,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
 
-            string nt = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text));
+            var nt = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text));
 
 
             if (string.IsNullOrEmpty(nt)) {
@@ -200,7 +200,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
 
-            string _newdid = nt + "\r" + _DidImport;
+            var _newdid = nt + "\r" + _DidImport;
 
             if (_newdid == _DidImport && opbNeueZeile.Checked) {
                 if (MessageBox.Show("Es wurde bereits eine neue Zeile mit diesen Werten angelegt.\r<b>Noch eine anlegen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }

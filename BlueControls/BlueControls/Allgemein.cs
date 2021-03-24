@@ -31,24 +31,24 @@ namespace BlueControls {
     public static class Allgemein {
 
         public static IContextMenu ParentControlWithCommands(this object o) {
-            IContextMenu par = o.ParentControl<IContextMenu>();
+            var par = o.ParentControl<IContextMenu>();
 
             if (par == null) { return null; }
 
 
-            ItemCollectionList ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
-            ItemCollectionList UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
-            List<string> tags = new List<string>();
-            bool Cancel = false;
-            bool Translate = true;
+            var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+            var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
+            var tags = new List<string>();
+            var Cancel = false;
+            var Translate = true;
 
-            par.GetContextMenuItems(null, ThisContextMenu, out object HotItem, tags, ref Cancel, ref Translate);
+            par.GetContextMenuItems(null, ThisContextMenu, out var HotItem, tags, ref Cancel, ref Translate);
 
             if (Cancel) { return null; }
 
 
 
-            ContextMenuInitEventArgs ec = new ContextMenuInitEventArgs(HotItem, tags, UserMenu);
+            var ec = new ContextMenuInitEventArgs(HotItem, tags, UserMenu);
             par.OnContextMenuInit(ec);
             if (ec.Cancel) { return null; }
 
@@ -83,23 +83,23 @@ namespace BlueControls {
         }
         public static List<string> SplitByWidth(this string Text, float MaxWidth, int MaxLines, enDesign design, enStates state) {
 
-            List<string> _broken = new List<string>();
+            var _broken = new List<string>();
 
-            int pos = 0;
-            int FoundCut = 0;
-            string Rest = Text;
+            var pos = 0;
+            var FoundCut = 0;
+            var Rest = Text;
 
             if (MaxLines < 1) { MaxLines = 100; }
 
-            BlueFont F = Skin.GetBlueFont(design, state);
+            var F = Skin.GetBlueFont(design, state);
 
 
 
 
             do {
                 pos++;
-                string ToTEst = Rest.Substring(0, pos);
-                System.Drawing.SizeF s = BlueFont.MeasureString(ToTEst, F.Font());
+                var ToTEst = Rest.Substring(0, pos);
+                var s = BlueFont.MeasureString(ToTEst, F.Font());
 
 
                 if (pos < Rest.Length && Convert.ToChar(Rest.Substring(pos, 1)).isPossibleLineBreak()) { FoundCut = pos; }
@@ -157,12 +157,12 @@ namespace BlueControls {
 
         public static string TrimByWidth(this string TXT, float MaxWidth, BlueFont F) {
             if (F == null) { return TXT; }
-            System.Drawing.SizeF tSize = BlueFont.MeasureString(TXT, F.Font());
+            var tSize = BlueFont.MeasureString(TXT, F.Font());
 
             if (tSize.Width - 1 > MaxWidth && TXT.Length > 1) {
-                int Min = 0;
-                int Max = TXT.Length;
-                int Middle = 0;
+                var Min = 0;
+                var Max = TXT.Length;
+                var Middle = 0;
 
                 do {
                     Middle = (int)(Min + (Max - Min) / 2.0);
@@ -189,10 +189,10 @@ namespace BlueControls {
         }
 
         public static List<string> ToListOfString(this List<BasicListItem> Items) {
-            List<string> w = new List<string>();
+            var w = new List<string>();
             if (Items == null) { return w; }
 
-            foreach (BasicListItem ThisItem in Items) {
+            foreach (var ThisItem in Items) {
                 if (ThisItem != null) {
                     if (!string.IsNullOrEmpty(ThisItem.Internal)) {
                         w.Add(ThisItem.Internal);

@@ -213,17 +213,17 @@ namespace BlueControls {
 
         public static void Draw_Back(Graphics GR, RowItem cRow, Rectangle r, System.Windows.Forms.Control cControl, bool NeedTransparenz) {
             try {
-                bool Need = true;
-                int X1 = 0;
-                int Y1 = 0;
-                int X2 = 0;
-                int Y2 = 0;
-                enHintergrundArt HA = enHintergrundArt.Ohne;
+                var Need = true;
+                var X1 = 0;
+                var Y1 = 0;
+                var X2 = 0;
+                var Y2 = 0;
+                var HA = enHintergrundArt.Ohne;
 
                 if (!NeedTransparenz || cControl == null) { Need = false; }
 
 
-                enKontur Kon = (enKontur)Value(cRow, col_Kontur, -1);
+                var Kon = (enKontur)Value(cRow, col_Kontur, -1);
                 if (Kon == enKontur.Unbekannt) { Kon = enKontur.Rechteck; }
 
                 if (Kon != enKontur.Ohne) {
@@ -265,15 +265,15 @@ namespace BlueControls {
 
                     case enHintergrundArt.Solide:
                         PathX = Kontur(Kon, r);
-                        SolidBrush BrushX = new SolidBrush(Color.FromArgb(Value(cRow, col_Color_Back_1, 0)));
+                        var BrushX = new SolidBrush(Color.FromArgb(Value(cRow, col_Color_Back_1, 0)));
                         GR.FillPath(BrushX, PathX);
                         break;
 
                     case enHintergrundArt.Verlauf_Vertical_2:
                         PathX = Kontur(Kon, r);
-                        Color c1 = Color.FromArgb(Value(cRow, col_Color_Back_1, 0));
-                        Color c2 = Color.FromArgb(Value(cRow, col_Color_Back_2, 0));
-                        LinearGradientBrush lgb = new LinearGradientBrush(r, c1, c2, LinearGradientMode.Vertical);
+                        var c1 = Color.FromArgb(Value(cRow, col_Color_Back_1, 0));
+                        var c2 = Color.FromArgb(Value(cRow, col_Color_Back_2, 0));
+                        var lgb = new LinearGradientBrush(r, c1, c2, LinearGradientMode.Vertical);
                         GR.FillPath(lgb, PathX);
                         break;
 
@@ -291,12 +291,12 @@ namespace BlueControls {
 
                     case enHintergrundArt.Verlauf_Diagonal_3:
                         PathX = Kontur(Kon, r);
-                        Color cx1 = Color.FromArgb(Value(cRow, col_Color_Back_1, 0));
-                        Color cx2 = Color.FromArgb(Value(cRow, col_Color_Back_2, 0));
-                        Color cx3 = Color.FromArgb(Value(cRow, col_Color_Back_3, 0));
-                        float PR = Value(cRow, col_Verlauf_Mitte, 0.7f);
-                        LinearGradientBrush lgb2 = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Bottom), cx1, cx3);
-                        ColorBlend cb = new ColorBlend {
+                        var cx1 = Color.FromArgb(Value(cRow, col_Color_Back_1, 0));
+                        var cx2 = Color.FromArgb(Value(cRow, col_Color_Back_2, 0));
+                        var cx3 = Color.FromArgb(Value(cRow, col_Color_Back_3, 0));
+                        var PR = Value(cRow, col_Verlauf_Mitte, 0.7f);
+                        var lgb2 = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Bottom), cx1, cx3);
+                        var cb = new ColorBlend {
                             Colors = new[] { cx1, cx2, cx3 },
                             Positions = new[] { 0.0F, PR, 1.0F }
                         };
@@ -398,17 +398,17 @@ namespace BlueControls {
 
         private static void Draw_Back_Verlauf_Vertical_Glanzpunkt(Graphics GR, RowItem Row, Rectangle r) {
 
-            ColorBlend cb = new ColorBlend();
+            var cb = new ColorBlend();
 
-            Color c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
-            Color c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
-            float PR = Value(Row, col_Verlauf_Mitte, 0.05f);
+            var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
+            var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
+            var PR = Value(Row, col_Verlauf_Mitte, 0.05f);
 
 
             if (PR < 0.06F) { PR = 0.06F; }
             if (PR > 0.94F) { PR = 0.94F; }
 
-            LinearGradientBrush lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c1);
+            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c1);
 
 
             cb.Colors = new[] { c1, c2, c1, c1, c1.Darken(0.3), c1 };
@@ -425,24 +425,24 @@ namespace BlueControls {
         }
 
         private static void Draw_Back_Verlauf_Horizontal_2(Graphics GR, RowItem Row, Rectangle r) {
-            Color c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
-            Color c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
-            LinearGradientBrush lgb = new LinearGradientBrush(r, c1, c2, LinearGradientMode.Horizontal);
+            var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
+            var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
+            var lgb = new LinearGradientBrush(r, c1, c2, LinearGradientMode.Horizontal);
             GR.FillRectangle(lgb, r);
 
         }
 
         private static void Draw_Back_Verlauf_Horizontal_3(Graphics GR, RowItem Row, Rectangle r) {
 
-            ColorBlend cb = new ColorBlend();
+            var cb = new ColorBlend();
 
-            Color c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
-            Color c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
-            Color c3 = Color.FromArgb(Value(Row, col_Color_Back_3, 0));
-            float PR = Value(Row, col_Verlauf_Mitte, 0.5f);
+            var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
+            var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
+            var c3 = Color.FromArgb(Value(Row, col_Color_Back_3, 0));
+            var PR = Value(Row, col_Verlauf_Mitte, 0.5f);
 
 
-            LinearGradientBrush lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Top), c1, c3);
+            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Top), c1, c3);
 
             cb.Colors = new[] { c1, c2, c3 };
             cb.Positions = new[] { 0.0F, PR, 1.0F };
@@ -455,21 +455,21 @@ namespace BlueControls {
         }
 
         private static void Draw_Back_Glossy(Graphics GR, RowItem Row, Rectangle r) {
-            Color col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
+            var col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
 
 
-            ColorBlend cb = new ColorBlend();
+            var cb = new ColorBlend();
 
-            Color c1 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.Black, 1), 0.4);
-            Color c2 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.FromArgb(64, 64, 64), 1), 0.2);
-            Color c3 = Extensions.SoftLightMix(col1, Color.FromArgb(128, 128, 128), 1);
-            Color c4 = Extensions.SoftLightMix(col1, Color.FromArgb(192, 192, 192), 1);
-            Color c5 = Extensions.OverlayMix(Extensions.SoftLightMix(col1, Color.White, 1), Color.White, 0.75);
+            var c1 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.Black, 1), 0.4);
+            var c2 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.FromArgb(64, 64, 64), 1), 0.2);
+            var c3 = Extensions.SoftLightMix(col1, Color.FromArgb(128, 128, 128), 1);
+            var c4 = Extensions.SoftLightMix(col1, Color.FromArgb(192, 192, 192), 1);
+            var c5 = Extensions.OverlayMix(Extensions.SoftLightMix(col1, Color.White, 1), Color.White, 0.75);
 
 
             cb.Colors = new[] { c1, c2, c3, c4, c5 };
             cb.Positions = new[] { 0.0F, 0.25F, 0.5F, 0.75F, 1 };
-            LinearGradientBrush lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5) {
+            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5) {
                 InterpolationColors = cb
             };
             Draw_Back_Glossy_TMP(lgb, r, GR, 20);
@@ -489,21 +489,21 @@ namespace BlueControls {
 
         private static void Draw_Back_GlossyPressed(Graphics GR, RowItem Row, Rectangle r) {
 
-            Color col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
+            var col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
 
 
-            ColorBlend cb = new ColorBlend();
+            var cb = new ColorBlend();
 
-            Color c5 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.Black, 1), 0.4);
-            Color c4 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.FromArgb(64, 64, 64), 1), 0.2);
-            Color c3 = Extensions.SoftLightMix(col1, Color.FromArgb(128, 128, 128), 1);
-            Color c2 = Extensions.SoftLightMix(col1, Color.FromArgb(192, 192, 192), 1);
-            Color c1 = Extensions.OverlayMix(Extensions.SoftLightMix(col1, Color.White, 1), Color.White, 0.75);
+            var c5 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.Black, 1), 0.4);
+            var c4 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.FromArgb(64, 64, 64), 1), 0.2);
+            var c3 = Extensions.SoftLightMix(col1, Color.FromArgb(128, 128, 128), 1);
+            var c2 = Extensions.SoftLightMix(col1, Color.FromArgb(192, 192, 192), 1);
+            var c1 = Extensions.OverlayMix(Extensions.SoftLightMix(col1, Color.White, 1), Color.White, 0.75);
 
 
             cb.Colors = new[] { c1, c2, c3, c4, c5 };
             cb.Positions = new[] { 0.0F, 0.25F, 0.5F, 0.75F, 1 };
-            LinearGradientBrush lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5) {
+            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5) {
                 InterpolationColors = cb
             };
             Draw_Back_Glossy_TMP(lgb, r, GR, 20);
@@ -524,8 +524,8 @@ namespace BlueControls {
 
         private static void Draw_Back_Glossy_TMP(Brush b, Rectangle rect, Graphics GR, int RMinus) {
 
-            int r = Math.Min(RMinus, Math.Min(rect.Width, rect.Height) - 1);
-            int r2 = (int)Math.Truncate(r / 2.0);
+            var r = Math.Min(RMinus, Math.Min(rect.Width, rect.Height) - 1);
+            var r2 = (int)Math.Truncate(r / 2.0);
             r = r2 * 2;
 
             GR.FillEllipse(b, new Rectangle(rect.Left, rect.Top - 1, r, r));
@@ -597,10 +597,10 @@ namespace BlueControls {
 
             if (Row == null) { return; }
 
-            enKontur Kon = (enKontur)Value(Row, col_Kontur, -1);
+            var Kon = (enKontur)Value(Row, col_Kontur, -1);
             if (Kon == enKontur.Ohne) { return; }
 
-            enRahmenArt Rahm = (enRahmenArt)Value(Row, col_Border_Style, -1);
+            var Rahm = (enRahmenArt)Value(Row, col_Border_Style, -1);
             if (Rahm == enRahmenArt.Ohne) { return; }
 
 
@@ -714,14 +714,14 @@ namespace BlueControls {
         private static void Draw_Border_DuoColor(Graphics GR, RowItem Row, Rectangle r, bool NurOben) {
 
 
-            Color c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
-            Color c2 = Color.FromArgb(Value(Row, col_Color_Border_3, 0));
+            var c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
+            var c2 = Color.FromArgb(Value(Row, col_Color_Border_3, 0));
 
-            LinearGradientBrush lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Height), c1, c2) {
+            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Height), c1, c2) {
                 GammaCorrection = true
             };
 
-            SmoothingMode x = GR.SmoothingMode;
+            var x = GR.SmoothingMode;
 
             GR.SmoothingMode = SmoothingMode.Default; //Returns the smoothing mode to default for a crisp structure
             GR.FillRectangle(lgb, r.Left, r.Top, r.Width + 1, 2); // Oben
@@ -785,7 +785,7 @@ namespace BlueControls {
 
         public static ItemCollectionList GetRahmenArt(RowItem SheetStyle, bool MitOhne) {
 
-            ItemCollectionList Rahms = new ItemCollectionList();
+            var Rahms = new ItemCollectionList();
             if (MitOhne) {
                 Rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), enImageCode.Kreuz);
             }
@@ -808,7 +808,7 @@ namespace BlueControls {
 
         public static ItemCollectionList GetFonts(RowItem SheetStyle) {
 
-            ItemCollectionList Rahms = new ItemCollectionList
+            var Rahms = new ItemCollectionList
             {
                 //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
                 { "Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolForReadableText() },
@@ -844,8 +844,8 @@ namespace BlueControls {
 
             //  GR.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit
 
-            SizeF pSize = SizeF.Empty;
-            SizeF tSize = SizeF.Empty;
+            var pSize = SizeF.Empty;
+            var tSize = SizeF.Empty;
 
             float XP = 0;
             float YP1 = 0;
@@ -895,8 +895,8 @@ namespace BlueControls {
 
 
         public static Size FormatedText_NeededSize(string tmpText, QuickImage tmpImageCode, BlueFont F, int MinSize) {
-            SizeF pSize = SizeF.Empty;
-            SizeF tSize = SizeF.Empty;
+            var pSize = SizeF.Empty;
+            var tSize = SizeF.Empty;
 
             if (F == null) { return new Size(3, 3); }
 
@@ -1032,7 +1032,7 @@ namespace BlueControls {
         }
 
         public static BlueFont GetBlueFont(Database StyleDB, ColumnItem Column, RowItem Row) {
-            string _String = StyleDB.Cell.GetString(Column, Row);
+            var _String = StyleDB.Cell.GetString(Column, Row);
             if (string.IsNullOrEmpty(_String)) {
                 Develop.DebugPrint("Schrift nicht definiert: " + StyleDB.Filename + " - " + Column.Name + " - " + Row.CellFirstString());
                 return null;
@@ -1054,13 +1054,13 @@ namespace BlueControls {
 
         private static void Draw_Back_Verlauf_Vertical_3(Graphics GR, RowItem Row, Rectangle r) {
 
-            ColorBlend cb = new ColorBlend();
+            var cb = new ColorBlend();
 
-            Color c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
-            Color c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
-            Color c3 = Color.FromArgb(Value(Row, col_Color_Back_3, 0));
-            float PR = Value(Row, col_Verlauf_Mitte, 0.5f);
-            LinearGradientBrush lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c3);
+            var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
+            var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
+            var c3 = Color.FromArgb(Value(Row, col_Color_Back_3, 0));
+            var PR = Value(Row, col_Verlauf_Mitte, 0.5f);
+            var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c3);
 
             cb.Colors = new[] { c1, c2, c3 };
             cb.Positions = new[] { 0.0F, PR, 1.0F };

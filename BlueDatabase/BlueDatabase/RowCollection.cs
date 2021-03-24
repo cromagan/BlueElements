@@ -32,7 +32,7 @@ namespace BlueDatabase {
     public sealed class RowCollection : IEnumerable<RowItem> {
         #region  Variablen-Deklarationen 
 
-        private readonly ConcurrentDictionary<int, RowItem> _Internal = new ConcurrentDictionary<int, RowItem>();
+        private readonly ConcurrentDictionary<int, RowItem> _Internal = new();
 
         public readonly Database Database;
 
@@ -92,7 +92,7 @@ namespace BlueDatabase {
                     return null;
                 }
 
-                FilterCollection d = new FilterCollection(filter[0].Database);
+                var d = new FilterCollection(filter[0].Database);
                 d.AddRange(filter);
                 return this[d];
             }
@@ -122,11 +122,11 @@ namespace BlueDatabase {
 
 
         public void Remove(int Key) {
-            RowItem e = SearchByKey(Key);
+            var e = SearchByKey(Key);
             if (e == null) { return; }
 
             OnRowRemoving(new RowEventArgs(e));
-            foreach (ColumnItem ThisColumnItem in Database.Column) {
+            foreach (var ThisColumnItem in Database.Column) {
                 if (ThisColumnItem != null) {
                     Database.Cell.Delete(ThisColumnItem, Key);
                 }
@@ -140,7 +140,7 @@ namespace BlueDatabase {
         }
 
         public bool Remove(FilterItem Filter) {
-            FilterCollection NF = new FilterCollection(Database)
+            var NF = new FilterCollection(Database)
             {
                 Filter
             };
@@ -149,7 +149,7 @@ namespace BlueDatabase {
 
         public bool Remove(FilterCollection Filter) {
 
-            List<long> x = (from thisrowitem in _Internal.Values where thisrowitem != null && thisrowitem.MatchesTo(Filter) select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
+            var x = (from thisrowitem in _Internal.Values where thisrowitem != null && thisrowitem.MatchesTo(Filter) select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
             //var x = new List<long>();
             //foreach (var thisrowitem in _Internal.Values)
             //{
@@ -225,7 +225,7 @@ namespace BlueDatabase {
             }
 
 
-            RowItem Row = new RowItem(Database);
+            var Row = new RowItem(Database);
 
             Add(Row);
 
@@ -236,7 +236,7 @@ namespace BlueDatabase {
             Database.Cell.SystemSet(Database.Column.SysRowCreateDate, Row, DateTime.Now.ToString(Constants.Format_Date5));
 
             // Dann die Inital-Werte reinschreiben
-            foreach (ColumnItem ThisColum in Database.Column) {
+            foreach (var ThisColum in Database.Column) {
                 if (ThisColum != null && !string.IsNullOrEmpty(ThisColum.CellInitValue)) { Row.CellSet(ThisColum, ThisColum.CellInitValue); }
             }
 
@@ -261,7 +261,7 @@ namespace BlueDatabase {
             if (x == null || x.Count() == 0) { return; }
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", 0, x.Count(), true, false));
 
-            int all = x.Count;
+            var all = x.Count;
 
             while (x.Count > 0) {
 
@@ -294,7 +294,7 @@ namespace BlueDatabase {
 
         internal void Repair() {
 
-            foreach (RowItem ThisRowItem in _Internal.Values) {
+            foreach (var ThisRowItem in _Internal.Values) {
                 if (ThisRowItem != null) {
                     //ThisRowItem.Repair();
                     _LastRowKey = Math.Max(_LastRowKey, ThisRowItem.Key); // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
@@ -373,7 +373,7 @@ namespace BlueDatabase {
 
         public bool RemoveOlderThan(float InHours) {
 
-            List<long> x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
+            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
 
             //foreach (var thisrowitem in _Internal.Values)
             //{
@@ -400,12 +400,12 @@ namespace BlueDatabase {
 
 
         public List<RowItem> CalculateSortedRows(List<FilterItem> Filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) {
-            List<string> TMP = new List<string>();
-            List<RowItem> _tmpSortedRows = new List<RowItem>();
+            var TMP = new List<string>();
+            var _tmpSortedRows = new List<RowItem>();
 
             if (pinnedRows == null) { pinnedRows = new List<RowItem>(); }
 
-            foreach (RowItem ThisRowItem in Database.Row) {
+            foreach (var ThisRowItem in Database.Row) {
                 if (ThisRowItem != null) {
                     if (ThisRowItem.MatchesTo(Filter) && !pinnedRows.Contains(ThisRowItem)) {
                         if (rowSortDefinition == null) {
@@ -421,16 +421,16 @@ namespace BlueDatabase {
             TMP.Sort();
 
 
-            int cc = 0;
+            var cc = 0;
             if (rowSortDefinition == null || !rowSortDefinition.Reverse) {
-                foreach (string t in TMP) {
+                foreach (var t in TMP) {
                     if (!string.IsNullOrEmpty(t)) {
                         cc = t.IndexOf(Constants.SecondSortChar + "<key>");
                         _tmpSortedRows.Add(Database.Row.SearchByKey(int.Parse(t.Substring(cc + 6))));
                     }
                 }
             } else {
-                for (int z = TMP.Count - 1; z > -1; z--) {
+                for (var z = TMP.Count - 1; z > -1; z--) {
                     if (!string.IsNullOrEmpty(TMP[z])) {
                         cc = TMP[z].IndexOf(Constants.SecondSortChar + "<key>");
                         _tmpSortedRows.Add(Database.Row.SearchByKey(int.Parse(TMP[z].Substring(cc + 6))));
@@ -439,9 +439,9 @@ namespace BlueDatabase {
 
             }
 
-            List<RowItem> newPinned = new List<RowItem>();
+            var newPinned = new List<RowItem>();
 
-            foreach (RowItem thisPinned in pinnedRows) {
+            foreach (var thisPinned in pinnedRows) {
                 if (Database.Row.Contains(thisPinned)) {
                     newPinned.Add(thisPinned);
                 }
@@ -454,8 +454,8 @@ namespace BlueDatabase {
 
         internal static List<RowItem> MatchesTo(FilterItem FilterItem) {
 
-            List<RowItem> l = new List<RowItem>();
-            foreach (RowItem ThisRow in FilterItem.Database.Row) {
+            var l = new List<RowItem>();
+            foreach (var ThisRow in FilterItem.Database.Row) {
                 if (ThisRow.MatchesTo(FilterItem)) {
                     l.Add(ThisRow);
                 }

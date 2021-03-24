@@ -80,7 +80,7 @@ namespace BluePaint {
 
             }
 
-            string p = txbQuelle.Text;
+            var p = txbQuelle.Text;
 
             if (optZielordner.Checked) {
 
@@ -93,27 +93,27 @@ namespace BluePaint {
 
 
 
-            string[] f = System.IO.Directory.GetFiles(txbQuelle.Text, "*.PNG", System.IO.SearchOption.TopDirectoryOnly);
+            var f = System.IO.Directory.GetFiles(txbQuelle.Text, "*.PNG", System.IO.SearchOption.TopDirectoryOnly);
             if (f == null || f.GetUpperBound(0) < 0) {
                 MessageBox.Show("Keine Dateien im Quellverzeichniss gefunden.");
                 return;
             }
 
 
-            foreach (string thisf in f) {
+            foreach (var thisf in f) {
                 OnOverridePic((Bitmap)BitmapExt.Image_FromFile(thisf));
                 OnZoomFit();
                 Develop.DoEvents();
 
-                foreach (string thisS in _macro) {
+                foreach (var thisS in _macro) {
                     DoMakro(thisS);
                     OnZoomFit();
                     Develop.DoEvents();
                 }
 
 
-                string newf = TempFile(p, thisf.FileNameWithoutSuffix(), "PNG");
-                Bitmap B = OnNeedCurrentPic();
+                var newf = TempFile(p, thisf.FileNameWithoutSuffix(), "PNG");
+                var B = OnNeedCurrentPic();
 
                 B.Save(newf, System.Drawing.Imaging.ImageFormat.Png);
                 B = null;
@@ -126,9 +126,9 @@ namespace BluePaint {
         private void DoMakro(string thisS) {
 
 
-            string[] t = thisS.SplitBy(";");
+            var t = thisS.SplitBy(";");
 
-            foreach (GenericTool ThisTool in _merker) {
+            foreach (var ThisTool in _merker) {
 
                 if (ThisTool.MacroKennung() == t[0].FromNonCritical()) {
                     ThisTool.OverridePic += ThisTool_OverridePic;

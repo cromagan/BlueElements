@@ -88,8 +88,8 @@ namespace BlueBasics {
         /// <returns></returns>
         /// <remarks></remarks> 
         public static string WinTitle(IntPtr handle) {
-            int l = GetWindowTextLength(handle) + 1;
-            string buffer = "".PadRight(l);
+            var l = GetWindowTextLength(handle) + 1;
+            var buffer = "".PadRight(l);
             l = GetWindowText(handle, buffer, l);
 
             return buffer.Substring(0, buffer.Length);
@@ -102,8 +102,8 @@ namespace BlueBasics {
         /// <returns></returns>
         /// <remarks></remarks>
         public static string WinClass(IntPtr handle) {
-            string buffer = "".PadRight(250); //= Space(250)
-            int l = GetClassName(handle, buffer, 250);
+            var buffer = "".PadRight(250); //= Space(250)
+            var l = GetClassName(handle, buffer, 250);
 
             //   If String.IsNullOrEmpty(buffer) Then Return String.Empty
 
@@ -118,8 +118,8 @@ namespace BlueBasics {
         /// <returns></returns>
         /// <remarks></remarks>
         public static string WinExeName(IntPtr handle) {
-            int l = 0;
-            string buffer = "".PadRight(250);
+            var l = 0;
+            var buffer = "".PadRight(250);
             l = GetWindowModuleFileName(handle, buffer, 250);
 
             if (l > 0) {
@@ -147,8 +147,8 @@ namespace BlueBasics {
             //End If
 
 
-            int prid = 0;
-            IntPtr hParent = IntPtr.Zero;
+            var prid = 0;
+            var hParent = IntPtr.Zero;
             //  Dim PridA As Integer
 
             prid = 0;
@@ -170,14 +170,14 @@ namespace BlueBasics {
         /// <returns></returns>
         /// <remarks></remarks>
         public static List<strProcess> exProzesse() {
-            List<strProcess> wDescr = new List<strProcess>();
-            IntPtr hh = GetTopWindow((IntPtr)0);
+            var wDescr = new List<strProcess>();
+            var hh = GetTopWindow((IntPtr)0);
 
 
             do {
                 hh = GetWindow(hh, 2);
                 if (hh.ToInt32() != 0) {
-                    strProcess l = new strProcess {
+                    var l = new strProcess {
                         MainWindowHandle = hh
                     };
                     GetWindowInfo(ref l);
@@ -192,8 +192,8 @@ namespace BlueBasics {
 
         public static IntPtr GetAncestor(IntPtr hWnd) {
 
-            IntPtr hParent = IntPtr.Zero;
-            IntPtr hw = hWnd;
+            var hParent = IntPtr.Zero;
+            var hw = hWnd;
             do {
                 hParent = GetParent(hw);
                 if (hParent.ToInt32() != 0) { hw = hParent; }
@@ -205,7 +205,7 @@ namespace BlueBasics {
 
 
         public static void FensterPosSetzen(IntPtr Handle, int Left, int Top) {
-            Rectangle r = new Rectangle();
+            var r = new Rectangle();
             GetWindowRect(Handle, ref r);
 
             if (r.Width == 0) { return; }

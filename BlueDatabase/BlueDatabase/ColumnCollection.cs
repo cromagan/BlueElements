@@ -84,7 +84,7 @@ namespace BlueDatabase {
                 if (key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
                 Database.BlockReload();
 
-                foreach (ColumnItem ThisColumn in this) {
+                foreach (var ThisColumn in this) {
                     if (ThisColumn != null && ThisColumn.Key == key) {
                         return ThisColumn;
                     }
@@ -108,7 +108,7 @@ namespace BlueDatabase {
 
                 Database.BlockReload();
 
-                ColumnItem colum = Exists(columnName);
+                var colum = Exists(columnName);
                 if (colum is null) { Database.DevelopWarnung("Spalte nicht gefunden: " + columnName); }
                 return colum;
             }
@@ -132,7 +132,7 @@ namespace BlueDatabase {
 
             columnName = columnName.ToUpper();
 
-            foreach (ColumnItem ThisColumn in this) {
+            foreach (var ThisColumn in this) {
                 if (ThisColumn != null && ThisColumn.Name == columnName) { return ThisColumn; }
             }
 
@@ -190,8 +190,8 @@ namespace BlueDatabase {
 
             if (Column1 == Column2 || Column1 == null || Column2 == null) { return; }
 
-            int nr1 = IndexOf(Column1);
-            int nr2 = IndexOf(Column2);
+            var nr1 = IndexOf(Column1);
+            var nr2 = IndexOf(Column2);
 
             base.Swap(nr1, nr2);
 
@@ -204,11 +204,11 @@ namespace BlueDatabase {
 
         private void AddSystems(string Kennung) {
 
-            foreach (ColumnItem ThisColumn in this) {
+            foreach (var ThisColumn in this) {
                 if (ThisColumn != null && ThisColumn.Identifier.ToUpper() == Kennung.ToUpper()) { return; }
             }
 
-            ColumnItem c = Database.Column.Add();
+            var c = Database.Column.Add();
             c.Load(enDatabaseDataType.co_Identifier, Kennung);
             c.StandardWerteNachKennung(true);
 
@@ -220,7 +220,7 @@ namespace BlueDatabase {
             Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
 
 
-            for (int ColumnCount = 0; ColumnCount < Count; ColumnCount++) {
+            for (var ColumnCount = 0; ColumnCount < Count; ColumnCount++) {
                 if (this[ColumnCount] != null && !string.IsNullOrEmpty(this[ColumnCount].Name)) {
                     this[ColumnCount].SaveToByteList(ref List);
                 }
@@ -232,7 +232,7 @@ namespace BlueDatabase {
 
             ResetSystems();
 
-            foreach (ColumnItem ThisColumnItem in this) {
+            foreach (var ThisColumnItem in this) {
                 if (ThisColumnItem != null) {
                     switch (ThisColumnItem.Identifier) {
                         case "":
@@ -268,7 +268,7 @@ namespace BlueDatabase {
 
         public void Repair() {
 
-            List<string> w = new List<string>
+            var w = new List<string>
             {
                 "System: Chapter",
                 "System: Date Changed",
@@ -282,7 +282,7 @@ namespace BlueDatabase {
 
             // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
             // Den Wert Am I a Key Column ermitteln
-            foreach (ColumnItem ThisColumnItem in this) {
+            foreach (var ThisColumnItem in this) {
 
                 if (ThisColumnItem != null) {
                     _LastColumnKey = Math.Max(_LastColumnKey, ThisColumnItem.Key);
@@ -291,17 +291,17 @@ namespace BlueDatabase {
             }
 
 
-            foreach (string thisstring in w) {
+            foreach (var thisstring in w) {
                 AddSystems(thisstring);
             }
 
             GetSystems();
 
 
-            for (int s1 = 0; s1 < Count; s1++) {
+            for (var s1 = 0; s1 < Count; s1++) {
                 if (base[s1] != null) {
 
-                    for (int s2 = s1 + 1; s2 < Count; s2++) {
+                    for (var s2 = s1 + 1; s2 < Count; s2++) {
                         if (base[s2] != null) {
 
                             // Evtl. Doppelte Namen einzigartig machen
@@ -324,7 +324,7 @@ namespace BlueDatabase {
 
 
             // Reihengolge reparieren
-            int ColN = -1;
+            var ColN = -1;
             do {
                 ColN++;
 
@@ -374,10 +374,10 @@ namespace BlueDatabase {
 
         public static string ChangeKeysInString(string OriginalString, int OldKey, int NewKey) {
 
-            string o = ParsableColumnKey(OldKey);
+            var o = ParsableColumnKey(OldKey);
             if (!OriginalString.Contains(o)) { return OriginalString; }
 
-            string n = ParsableColumnKey(NewKey);
+            var n = ParsableColumnKey(NewKey);
 
 
             if (OldKey == NewKey) {
@@ -404,7 +404,7 @@ namespace BlueDatabase {
 
         public ColumnItem AddACloneFrom(ColumnItem Source) {
 
-            ColumnItem c = Add(string.Empty);
+            var c = Add(string.Empty);
 
             c.Caption = Source.Caption;
             c.CaptionBitmap = Source.CaptionBitmap;
@@ -522,7 +522,7 @@ namespace BlueDatabase {
         //}
 
         public void GenerateOverView() {
-            HTML da = new HTML(Database.Filename.FileNameWithoutSuffix());
+            var da = new HTML(Database.Filename.FileNameWithoutSuffix());
             da.AddCaption("Spaltenliste von: " + Database.Caption);
             da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.Filename + "</h1><br>");
 
@@ -541,8 +541,8 @@ namespace BlueDatabase {
             da.RowEnd();
 
 
-            int lfdn = 0;
-            foreach (ColumnItem ThisColumnItem in Database.Column) {
+            var lfdn = 0;
+            foreach (var ThisColumnItem in Database.Column) {
 
                 if (ThisColumnItem != null) {
                     lfdn++;
@@ -567,7 +567,7 @@ namespace BlueDatabase {
         }
 
         public string Freename(string wunschname) {
-            int nr = 0;
+            var nr = 0;
 
             wunschname = wunschname.ReduceToChars(ColumnItem.AllowedCharsInternalName);
             if (string.IsNullOrEmpty(wunschname)) { wunschname = "NewColumn"; }
@@ -629,7 +629,7 @@ namespace BlueDatabase {
         }
 
         public ColumnItem Add(string internalName, string caption, enDataFormat format) {
-            ColumnItem c = Add();
+            var c = Add();
             c.Name = internalName;
 
             c.Caption = caption;
@@ -639,7 +639,7 @@ namespace BlueDatabase {
         }
 
         public ColumnItem Add(string internalName, string caption, string suffix, enDataFormat format) {
-            ColumnItem c = Add();
+            var c = Add();
             c.Name = internalName;
             c.Caption = caption;
             c.Format = format;
@@ -648,7 +648,7 @@ namespace BlueDatabase {
         }
 
         public ColumnItem Add(string internalName) {
-            ColumnItem c = Add();
+            var c = Add();
             c.Name = internalName;
             return c;
         }

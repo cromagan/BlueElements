@@ -32,22 +32,22 @@ namespace BlueScript {
 
         public override string Description { get => "Sortiert die Liste und falls der zweite Wert TRUE ist, entfernt Doubletten."; }
 
-        public override List<string> Comand(Script s) { return new List<string>() { "sort" }; }
+        public override List<string> Comand(Script s) { return new() { "sort" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableList, enVariableDataType.Bool }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableList, enVariableDataType.Bool }; }
         public override bool EndlessArgs { get => false; }
 
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            List<string> x = attvar[0].ValueListString;
+            var x = attvar[0].ValueListString;
 
             if (attvar[1].ValueBool) {
                 x = x.SortedDistinctList();

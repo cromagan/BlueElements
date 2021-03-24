@@ -21,16 +21,28 @@ using System.Text;
 
 namespace BlueBasics {
     public static partial class Extensions {
-        public static string ToStringConvert(this byte[] b) {
-            return Encoding.Default.GetString(b);
+
+        //static Encoding enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
+
+
+        public static string ToStringWIN1252(this byte[] b) {
+
+            // https://stackoverflow.com/questions/37870084/net-core-doesnt-know-about-windows-1252-how-to-fix
+
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            var enc1252 = Encoding.GetEncoding(1252);
+
+            return enc1252.GetString(b);
         }
 
-        public static string ToStringConvertUTF8(this List<byte> b) {
+
+        public static string ToStringUTF8(this byte[] b) {
+            return Encoding.UTF8.GetString(b);
+        }
+
+
+        public static string ToStringUTF8(this List<byte> b) {
             return Encoding.UTF8.GetString(b.ToArray());
-        }
-
-        public static string ToStringConvert(this List<byte> b) {
-            return Encoding.Default.GetString(b.ToArray());
         }
 
     }

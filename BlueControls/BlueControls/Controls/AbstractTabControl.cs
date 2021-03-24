@@ -155,10 +155,10 @@ namespace BlueControls.Controls {
 
             try {
                 if (m.Msg == (int)enWndProc.WM_REFLECT + (int)enWndProc.WM_NOTIFY) {
-                    NMHDR hdr = (NMHDR)Marshal.PtrToStructure(m.LParam, typeof(NMHDR));
+                    var hdr = (NMHDR)Marshal.PtrToStructure(m.LParam, typeof(NMHDR));
                     if (hdr.code == TCN_SELCHANGING) {
                         if (_HotTab != null) {
-                            TabControlEventArgs e = new TabControlEventArgs(_HotTab, Controls.IndexOf(_HotTab));
+                            var e = new TabControlEventArgs(_HotTab, Controls.IndexOf(_HotTab));
                             OnSelectedIndexChanging(e);
 
                             if (e.Cancel || _HotTab.Enabled == false) {
@@ -234,14 +234,14 @@ namespace BlueControls.Controls {
             if (TabPages.Contains(tp1) == false || TabPages.Contains(tp2) == false) {
                 throw new ArgumentException("TabPages must be in the TabCotrols TabPageCollection.");
             }
-            int Index1 = TabPages.IndexOf(tp1);
-            int Index2 = TabPages.IndexOf(tp2);
+            var Index1 = TabPages.IndexOf(tp1);
+            var Index2 = TabPages.IndexOf(tp2);
             TabPages[Index1] = tp2;
             TabPages[Index2] = tp1;
         }
 
         private System.Windows.Forms.TabPage TestTab(Point pt) {
-            for (int index = 0; index < TabCount; index++) {
+            for (var index = 0; index < TabCount; index++) {
                 if (GetTabRect(index).Contains(pt.X, pt.Y)) {
                     return TabPages[index];
                 }
@@ -284,12 +284,12 @@ namespace BlueControls.Controls {
 
 
 
-            for (int id = 0; id < TabCount; id++) {
+            for (var id = 0; id < TabCount; id++) {
                 if (id != SelectedIndex) { DrawTabHead(e.Graphics, id); }
             }
 
 
-            for (int id = 0; id < TabCount; id++) {
+            for (var id = 0; id < TabCount; id++) {
                 if (id == SelectedIndex) {
                     DrawTabBody(e.Graphics, id);
                     DrawTabHead(e.Graphics, id);
@@ -303,7 +303,7 @@ namespace BlueControls.Controls {
         private void DrawTabHead(Graphics graphics, int id) {
 
             try {
-                enStates tmpState = enStates.Standard;
+                var tmpState = enStates.Standard;
                 if (!TabPages[id].Enabled) { tmpState = enStates.Standard_Disabled; }
 
 
@@ -315,7 +315,7 @@ namespace BlueControls.Controls {
 
 
 
-                Rectangle r = GetTabRect(id);
+                var r = GetTabRect(id);
 
                 r.Y -= 2;
                 r.X++;
@@ -338,11 +338,11 @@ namespace BlueControls.Controls {
         }
 
         private void DrawTabBody(Graphics graphics, int id) {
-            enStates w = enStates.Standard;
+            var w = enStates.Standard;
             if (!TabPages[id].Enabled) { w = enStates.Standard_Disabled; }
 
-            Rectangle tabRect = GetTabRect(id);
-            Rectangle r = new Rectangle(0, tabRect.Bottom, Width, Height - tabRect.Bottom);
+            var tabRect = GetTabRect(id);
+            var r = new Rectangle(0, tabRect.Bottom, Width, Height - tabRect.Bottom);
 
             if (r.Width < 2 || r.Height < 2) { return; }
 
@@ -428,7 +428,7 @@ namespace BlueControls.Controls {
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }
 
-            foreach (object ThisControl in Controls) {
+            foreach (var ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
             }
 
@@ -442,7 +442,7 @@ namespace BlueControls.Controls {
 
             if (BeginnEditCounter == 0) { Invalidate(); }
 
-            foreach (object ThisControl in Controls) {
+            foreach (var ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
             }
         }

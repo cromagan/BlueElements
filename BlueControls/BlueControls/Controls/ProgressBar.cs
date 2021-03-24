@@ -64,7 +64,7 @@ namespace BlueControls.Controls {
             Skin.Draw_Back(gr, enDesign.Progressbar, state, DisplayRectangle, this, true);
 
             if (wProzent > 0) {
-                Rectangle r = new Rectangle(DisplayRectangle.X, DisplayRectangle.Y, (int)(Math.Truncate(DisplayRectangle.Width * wProzent / 100.0)), DisplayRectangle.Height);
+                var r = new Rectangle(DisplayRectangle.X, DisplayRectangle.Y, (int)(Math.Truncate(DisplayRectangle.Width * wProzent / 100.0)), DisplayRectangle.Height);
                 //r = New Rectangle(DisplayRectangle)
                 //r.Width = CInt(r.Width * wProzent / 100)
 

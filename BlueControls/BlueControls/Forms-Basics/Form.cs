@@ -160,7 +160,7 @@ namespace BlueControls.Forms {
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }
 
-            foreach (object ThisControl in Controls) {
+            foreach (var ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
             }
 
@@ -174,7 +174,7 @@ namespace BlueControls.Forms {
 
             if (BeginnEditCounter == 0) { Invalidate(); }
 
-            foreach (object ThisControl in Controls) {
+            foreach (var ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
             }
         }
@@ -246,20 +246,20 @@ namespace BlueControls.Forms {
 
 
         public List<Button> Generate_Buttons(string[] Names) {
-            int MyX = Width - Skin.Padding - BorderWidth;
-            ExtText erT = new ExtText(enDesign.Button, enStates.Standard);
-            List<Button> Buts = new List<Button>();
+            var MyX = Width - Skin.Padding - BorderWidth;
+            var erT = new ExtText(enDesign.Button, enStates.Standard);
+            var Buts = new List<Button>();
 
-            for (int Z = Names.GetUpperBound(0); Z > -1; Z--) {
+            for (var Z = Names.GetUpperBound(0); Z > -1; Z--) {
                 if (!string.IsNullOrEmpty(Names[Z])) {
 
                     erT.TextDimensions = Size.Empty;
                     erT.PlainText = Names[Z];
-                    Button B = new Button {
+                    var B = new Button {
                         Name = Z.ToString(),
                         Text = Names[Z]
                     };
-                    int W = 2;
+                    var W = 2;
 
                     switch (B.Text.ToLower()) {
                         case "ja":
@@ -320,7 +320,7 @@ namespace BlueControls.Forms {
 
         protected override System.Windows.Forms.CreateParams CreateParams {
             get {
-                System.Windows.Forms.CreateParams oParam = base.CreateParams;
+                var oParam = base.CreateParams;
                 if (!CloseButtonEnabled) {
                     oParam.ClassStyle |= (int)enCS.NOCLOSE;
                 }

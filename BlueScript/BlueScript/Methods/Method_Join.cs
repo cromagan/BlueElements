@@ -26,15 +26,15 @@ namespace BlueScript {
 
         public override string Syntax { get => "Join(VariableListe, Verbindungszeichen)"; }
         public override string Description { get => "Wandelt eine Liste in einen Text um. Es verbindet den Text dabei mitteles dem angegebenen Verbindungszeichen"; }
-        public override List<string> Comand(Script s) { return new List<string>() { "join" }; }
+        public override List<string> Comand(Script s) { return new() { "join" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.String; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.VariableList, enVariableDataType.String }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableList, enVariableDataType.String }; }
         public override bool EndlessArgs { get => false; }
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
             return new strDoItFeedback("\"" + attvar[0].ValueString.Replace("\r", attvar[1].ValueString) + "\"", string.Empty);
         }

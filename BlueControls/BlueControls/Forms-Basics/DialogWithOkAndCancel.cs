@@ -61,8 +61,8 @@ namespace BlueControls.Forms {
         }
 
         public void Setup(string TXT, GenericControl CenterControl, int MinWidth, bool CancelPossible, bool Sizeable) {
-            int wi = Skin.Padding * 2;
-            int he = Skin.Padding * 2;
+            var wi = Skin.Padding * 2;
+            var he = Skin.Padding * 2;
 
             if (!string.IsNullOrEmpty(TXT)) {
                 capText.Visible = true;

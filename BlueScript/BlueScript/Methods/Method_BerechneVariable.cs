@@ -35,7 +35,7 @@ namespace BlueScript {
         public override string EndSequence { get => ";"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.BoolNumString }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.BoolNumString }; }
         public override bool EndlessArgs { get => false; }
 
 
@@ -44,13 +44,13 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
-            string variableName = infos.ComandText.ToLower().ReduceToChars(Constants.Char_az + "_" + Constants.Char_Numerals);
-            Variable variable = s.Variablen.Get(variableName);
+            var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.Char_az + "_" + Constants.Char_Numerals);
+            var variable = s.Variablen.Get(variableName);
             if (variable == null) {
                 return new strDoItFeedback("Variable " + variableName + " nicht gefunden");
             }
 
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
 
             if (attvar == null || attvar.Count != 1) { return strDoItFeedback.AttributFehler(); }
 

@@ -30,29 +30,29 @@ namespace BlueScript {
         public override string Syntax { get => "SetError(Nachricht, Column1, Colum2, ...);"; }
 
         public override string Description { get => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "seterror" }; }
+        public override List<string> Comand(Script s) { return new() { "seterror" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ");"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
 
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.String, enVariableDataType.VariableListOrStringNumBool }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.String, enVariableDataType.VariableListOrStringNumBool }; }
         public override bool EndlessArgs { get => true; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            for (int z = 1; z < attvar.Count; z++) {
-                string n = attvar[z].Name.ToLower() + "_error";
-                Variable ve = s.Variablen.GetSystem(n);
+            for (var z = 1; z < attvar.Count; z++) {
+                var n = attvar[z].Name.ToLower() + "_error";
+                var ve = s.Variablen.GetSystem(n);
 
                 if (ve == null) {
                     ve = new Variable(n, string.Empty, Skript.Enums.enVariableDataType.List, false, true, string.Empty);
                     s.Variablen.Add(ve);
                 }
 
-                List<string> l = ve.ValueListString;
+                var l = ve.ValueListString;
                 l.AddIfNotExists(attvar[0].ValueString);
                 ve.ValueListString = l;
 

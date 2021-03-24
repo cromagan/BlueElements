@@ -51,9 +51,9 @@ namespace BlueControls.Forms {
 
             if (Buttons.Length == 0) { Buttons = new[] { "OK" }; }
 
-            System.Collections.Generic.List<Button> B = Generate_Buttons(Buttons);
+            var B = Generate_Buttons(Buttons);
 
-            foreach (Button ThisButton in B) {
+            foreach (var ThisButton in B) {
                 ThisButton.Click += ThisButton_Click;
 
                 if (ThisButton.Left < BorderWidth) {
@@ -89,7 +89,7 @@ namespace BlueControls.Forms {
 
         public static int Show(string TXT, enImageCode Pic, bool Dialog, params string[] Buttons) {
 
-            MessageBox MB = new MessageBox(TXT, Pic, Buttons);
+            var MB = new MessageBox(TXT, Pic, Buttons);
 
             if (Dialog) {
                 MB.ShowDialog();

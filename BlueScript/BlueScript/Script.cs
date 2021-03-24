@@ -54,13 +54,13 @@ namespace BlueScript {
 
         public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
 
-            List<T> l = new List<T>();
+            var l = new List<T>();
 
-            foreach (System.Reflection.Assembly thisas in AppDomain.CurrentDomain.GetAssemblies()) {
+            foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
 
 
                 try {
-                    foreach (Type thist in thisas.GetTypes()) {
+                    foreach (var thist in thisas.GetTypes()) {
                         if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T))) {
                             l.Add((T)Activator.CreateInstance(thist, constructorArgs));
                         }
@@ -193,16 +193,16 @@ namespace BlueScript {
         private static string ReduceText(string txt) {
 
 
-            System.Text.StringBuilder s = new System.Text.StringBuilder();
+            var s = new System.Text.StringBuilder();
 
-            bool gänsef = false;
-            bool comment = false;
+            var gänsef = false;
+            var comment = false;
 
 
-            for (int pos = 0; pos < txt.Length; pos++) {
+            for (var pos = 0; pos < txt.Length; pos++) {
 
-                string c = txt.Substring(pos, 1);
-                bool addt = true;
+                var c = txt.Substring(pos, 1);
+                var addt = true;
 
                 switch (c) {
                     case "\"":
@@ -241,7 +241,7 @@ namespace BlueScript {
 
 
         public static (string, string) Parse(string scriptText, bool reduce, Script s) {
-            int pos = 0;
+            var pos = 0;
             s.EndSkript = false;
 
 
@@ -265,7 +265,7 @@ namespace BlueScript {
                     s.Line++;
                     pos++;
                 } else {
-                    strDoItWithEndedPosFeedback f = ComandOnPosition(tmptxt, pos, s, false);
+                    var f = ComandOnPosition(tmptxt, pos, s, false);
 
                     if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                         return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(30, tmptxt.Length - pos)));
@@ -284,16 +284,16 @@ namespace BlueScript {
 
 
         public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
-            foreach (Method thisC in Comands) {
+            foreach (var thisC in Comands) {
 
                 //if (!mustHaveFeedback || !thisC.ReturnsVoid) {
 
-                strCanDoFeedback f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
+                var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
 
                 if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
 
                 if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                    strDoItFeedback fn = thisC.DoIt(f, s);
+                    var fn = thisC.DoIt(f, s);
                     return new strDoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
                 }
                 //}
@@ -304,13 +304,13 @@ namespace BlueScript {
 
         public static (int pos, string witch) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter) {
 
-            int klammern = 0;
-            bool Gans = false;
-            int GeschwKlammern = 0;
-            int EckigeKlammern = 0;
+            var klammern = 0;
+            var Gans = false;
+            var GeschwKlammern = 0;
+            var EckigeKlammern = 0;
 
-            int pos = startpos;
-            int maxl = txt.Length;
+            var pos = startpos;
+            var maxl = txt.Length;
             const string TR = "&.,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t";
 
 
@@ -388,7 +388,7 @@ namespace BlueScript {
                 #region Den Text suchen
                 if (klammern == 0 && !Gans && GeschwKlammern == 0 && EckigeKlammern == 0) {
                     if (!checkforSeparatorbefore || pos == 0 || TR.Contains(txt.Substring(pos - 1, 1))) {
-                        foreach (string thisEnd in searchfor) {
+                        foreach (var thisEnd in searchfor) {
                             if (pos + thisEnd.Length <= maxl) {
 
                                 if (txt.Substring(pos, thisEnd.Length).ToLower() == thisEnd.ToLower()) {

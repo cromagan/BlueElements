@@ -53,7 +53,7 @@ namespace BlueControls.Forms {
 
             if (FitWindowToBest) {
                 if (System.Windows.Forms.Screen.AllScreens.Length == 1 || OpenOnScreen < 0) {
-                    int OpScNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
+                    var OpScNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
 
                     Width = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width / 1.5);
                     Height = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height / 1.5);
@@ -127,28 +127,28 @@ namespace BlueControls.Forms {
 
         private void btnAddLine_Click(object sender, System.EventArgs e) {
 
-            Point P = Pad.MiddleOfVisiblesScreen();
-            int w = (int)(300 / Pad.ZoomCurrent());
+            var P = Pad.MiddleOfVisiblesScreen();
+            var w = (int)(300 / Pad.ZoomCurrent());
 
 
-            LinePadItem b = new LinePadItem(Pad.Item, PadStyles.Style_Standard, new Point(P.X - w, P.Y), new Point(P.X + w, P.Y));
+            var b = new LinePadItem(Pad.Item, PadStyles.Style_Standard, new Point(P.X - w, P.Y), new Point(P.X + w, P.Y));
             Pad.Item.Add(b);
         }
 
         private void btnAddDistance_Click(object sender, System.EventArgs e) {
-            SpacerPadItem b = new SpacerPadItem(Pad.Item);
+            var b = new SpacerPadItem(Pad.Item);
             Pad.Item.Add(b);
             b.SetCoordinates(new RectangleM(10, 10, 20, 20), false);
         }
 
         private void btnAddImage_Click(object sender, System.EventArgs e) {
-            BitmapPadItem b = new BitmapPadItem(Pad.Item, QuickImage.Get(enImageCode.Fragezeichen).BMP, new Size(1000, 1000));
+            var b = new BitmapPadItem(Pad.Item, QuickImage.Get(enImageCode.Fragezeichen).BMP, new Size(1000, 1000));
             Pad.Item.Add(b);
         }
 
 
         private void AddText_Click(object sender, System.EventArgs e) {
-            TextPadItem b = new TextPadItem(Pad.Item) {
+            var b = new TextPadItem(Pad.Item) {
                 Interner_Text = string.Empty,
                 Stil = PadStyles.Style_Standard
             };
@@ -158,7 +158,7 @@ namespace BlueControls.Forms {
 
 
         private void btnAddDimension_Click(object sender, System.EventArgs e) {
-            DimensionPadItem b = new DimensionPadItem(Pad.Item, new PointF(300, 300), new PointF(400, 300), 30);
+            var b = new DimensionPadItem(Pad.Item, new PointF(300, 300), new PointF(400, 300), 30);
             Pad.Item.Add(b);
         }
 
@@ -235,13 +235,13 @@ namespace BlueControls.Forms {
         }
 
         private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
-            ChildPadItem b = new ChildPadItem(Pad.Item);
+            var b = new ChildPadItem(Pad.Item);
             b.SetCoordinates(new RectangleM(100, 100, 300, 300), true);
             Pad.Item.Add(b);
         }
 
         private void btnAddSymbol_Click(object sender, System.EventArgs e) {
-            SymbolPadItem b = new SymbolPadItem(Pad.Item);
+            var b = new SymbolPadItem(Pad.Item);
             b.SetCoordinates(new RectangleM(100, 100, 300, 300), true);
             Pad.Item.Add(b);
         }
@@ -257,7 +257,7 @@ namespace BlueControls.Forms {
         }
 
         private void btnPhsyik_Click(object sender, System.EventArgs e) {
-            clsPhysicPadItem b = new clsPhysicPadItem(Pad.Item);
+            var b = new clsPhysicPadItem(Pad.Item);
             //b.SetCoordinates(new RectangleM(100, 100, 300, 300));
             Pad.Item.Add(b);
         }
@@ -279,10 +279,10 @@ namespace BlueControls.Forms {
 
         private void SaveTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
             Pad.Grid = false;
-            string t = Pad.Item.ToString();
+            var t = Pad.Item.ToString();
             Pad.Grid = ckbRaster.Checked;
 
-            SaveToDisk(SaveTab.FileName, t, false);
+            SaveToDisk(SaveTab.FileName, t, false, System.Text.Encoding.Latin1);
 
 
             btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
@@ -309,7 +309,7 @@ namespace BlueControls.Forms {
 
         private void LoadFile(string fileName) {
             Pad.Item.Clear();
-            string t = LoadFromDisk(fileName);
+            var t = LoadFromDiskLatin(fileName);
 
             Pad.Item = new ItemCollectionPad(t, fileName);
             ItemChanged();

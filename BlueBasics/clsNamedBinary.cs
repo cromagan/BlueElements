@@ -143,13 +143,16 @@ namespace BlueBasics {
                 return;
             }
 
-            foreach (System.Collections.Generic.KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
+            foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "name":
                         _name = pair.Value.FromNonCritical();
                         break;
                     case "png":
-                        _picture = modConverter.StringToBitmap(pair.Value.FromNonCritical());
+                        _picture = modConverter.StringWIN1525ToBitmap(pair.Value.FromNonCritical());
+                        break;
+                    case "pngutf8":
+                        _picture = modConverter.StringUTF8ToBitmap(pair.Value.FromNonCritical());
                         break;
                     case "bin":
                         _binary = pair.Value.FromNonCritical();
@@ -163,10 +166,10 @@ namespace BlueBasics {
         }
 
         public override string ToString() {
-            string t = "{Name=" + _name.ToNonCritical() + ", ";
+            var t = "{Name=" + _name.ToNonCritical() + ", ";
 
             if (_picture != null) {
-                t = t + "PNG=" + modConverter.BitmapToString(_picture, ImageFormat.Png).ToNonCritical() + ", ";
+                t = t + "PNGUTF8=" + modConverter.BitmapToStringUTF8(_picture, ImageFormat.Png).ToNonCritical() + ", ";
             }
 
             if (!string.IsNullOrEmpty(_binary)) {

@@ -131,11 +131,11 @@ namespace BlueDatabase {
 
 
         public string CompareKey() {
-            int MaxColumnIndex = -1;
-            int Co = -1;
+            var MaxColumnIndex = -1;
+            var Co = -1;
 
 
-            foreach (ColumnItem ThisColumnItem in ColumnsAllUsed()) {
+            foreach (var ThisColumnItem in ColumnsAllUsed()) {
                 if (ThisColumnItem != null) {
                     MaxColumnIndex = Math.Max(ThisColumnItem.Index(), MaxColumnIndex);
                 }
@@ -238,9 +238,9 @@ namespace BlueDatabase {
 
         public override string ToString() {
 
-            string Result = "{Action=" + (int)_Action;
+            var Result = "{Action=" + (int)_Action;
 
-            foreach (ColumnItem t in Columns) {
+            foreach (var t in Columns) {
                 if (t != null) {
                     Result = Result + ", " + t.ParsableColumnKey();
                 }
@@ -258,7 +258,7 @@ namespace BlueDatabase {
             IsParsing = true;
             Columns.ThrowEvents = false;
             Initialize();
-            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
+            foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "identifier": //TODO: Identifier entferneen, altlast. 06.09.2019
                         if (pair.Value != "Action") { Develop.DebugPrint(enFehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value); }
@@ -293,24 +293,24 @@ namespace BlueDatabase {
 
         internal (string anfang, string ende) ToScript(List<ColumnItem> c) {
 
-            List<string> txtList = Text.SplitByCRToList();
-            string txtJoinedKomma = "\"" + txtList.JoinWith("\", \"").Trim(", \"") + "\"";
+            var txtList = Text.SplitByCRToList();
+            var txtJoinedKomma = "\"" + txtList.JoinWith("\", \"").Trim(", \"") + "\"";
             //var txtListString = "{\"" + txtJoinedKomma + "}";
-            string txtJoined = txtList.JoinWith(";").Trim(";");
+            var txtJoined = txtList.JoinWith(";").Trim(";");
 
 
-            string ct = "Exception(\"Nicht oder unvollständig konvertiert!\");\r\n// Benutzte Spalten:";
+            var ct = "Exception(\"Nicht oder unvollständig konvertiert!\");\r\n// Benutzte Spalten:";
 
-            foreach (ColumnItem thisc in Columns) {
+            foreach (var thisc in Columns) {
                 ct = ct + " " + thisc.Name;
                 c.Add(thisc);
             }
             ct = ct + "\r\n// Original-Text: " + txtJoined + "\r\n";
 
 
-            string cnl = string.Empty;
+            var cnl = string.Empty;
 
-            foreach (ColumnItem thisc in c) {
+            foreach (var thisc in c) {
                 cnl = cnl + thisc.Name + ", ";
             }
             cnl = cnl.Trim(", ");
@@ -373,12 +373,12 @@ namespace BlueDatabase {
 
                 case enAction.Wert_Setzen:
                     if (Columns.Count == 0) { return (ct, ""); }
-                    string bigt = string.Empty;
+                    var bigt = string.Empty;
 
 
 
-                    foreach (ColumnItem thisc in Columns) {
-                        string thist = string.Empty;
+                    foreach (var thisc in Columns) {
+                        var thist = string.Empty;
 
                         if (thisc.Format.IsZahl() || thisc.Format == enDataFormat.FarbeInteger) {
                             thist = thisc.Name + " = " + txtJoined + ";";
@@ -419,16 +419,16 @@ namespace BlueDatabase {
 
                 case enAction.Enthält:
                 case enAction.Enthält_Zeichenkette:
-                    string s = "if (";
-                    foreach (ColumnItem thisc in Columns) {
+                    var s = "if (";
+                    foreach (var thisc in Columns) {
                         s = s + "Contains(" + Columns[0].Name + ", false, " + txtJoinedKomma + ") ||";
                     }
                     s = s.TrimEnd(" ||") + ") {";
                     return (s, "}");
 
                 case enAction.Enthält_NICHT_Zeichenkette:
-                    string s2 = "if (";
-                    foreach (ColumnItem thisc in Columns) {
+                    var s2 = "if (";
+                    foreach (var thisc in Columns) {
                         s2 = s2 + "!Contains(" + Columns[0].Name + ", false, " + txtJoinedKomma + ") &&";
                     }
                     s2 = s2.TrimEnd(" &&") + ") {";
@@ -1102,14 +1102,14 @@ namespace BlueDatabase {
 
         public string ReadableText() {
 
-            string ColsOder = "";
-            string ColsUnd = "";
+            var ColsOder = "";
+            var ColsUnd = "";
 
             //var dd = ErrorReason();
             //if (!string.IsNullOrEmpty(dd)) { return "Aktion fehlerhaft: " + dd; }
 
 
-            for (int z = 0; z < Columns.Count; z++) {
+            for (var z = 0; z < Columns.Count; z++) {
                 if (z == Columns.Count - 2) {
                     ColsOder = ColsOder + "'" + Columns[z].ReadableText() + "' oder ";
                     ColsUnd = ColsUnd + "'" + Columns[z].ReadableText() + "' und ";
@@ -1470,7 +1470,7 @@ namespace BlueDatabase {
         }
 
         internal List<ColumnItem> ColumnsAllUsed() {
-            List<ColumnItem> l = new List<ColumnItem>();
+            var l = new List<ColumnItem>();
 
 
             if (_Action == 0) { return l; }
@@ -1506,7 +1506,7 @@ namespace BlueDatabase {
                 case enAction.Berechne:
                 case enAction.Berechnung_ist_True:
                     if (!string.IsNullOrEmpty(_Text)) {
-                        foreach (ColumnItem thisColumnItem in Rule.Database.Column) {
+                        foreach (var thisColumnItem in Rule.Database.Column) {
                             if (thisColumnItem != null) {
                                 if (_Text.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + ";")) {
                                     l.Add(thisColumnItem);
@@ -1519,7 +1519,7 @@ namespace BlueDatabase {
 
                 case enAction.Substring:
                     if (!string.IsNullOrEmpty(_Text) && Columns.Count > 0) {
-                        foreach (ColumnItem thisColumnItem in Rule.Database.Column) {
+                        foreach (var thisColumnItem in Rule.Database.Column) {
                             if (thisColumnItem != null) {
                                 if (_Text.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + ";")) { l.Add(thisColumnItem); }
                                 if (_Text.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + "(")) { l.Add(thisColumnItem); }

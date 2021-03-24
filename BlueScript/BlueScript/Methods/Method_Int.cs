@@ -25,17 +25,17 @@ namespace BlueScript {
 
         public override string Syntax { get => "Int(Value)"; }
         public override string Description { get => "Schneidet Nachkommastellen ab."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "int" }; }
+        public override List<string> Comand(Script s) { return new() { "int" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Number; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.Number }; }
         public override bool EndlessArgs { get => false; }
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
             return new strDoItFeedback(attvar[0].ValueInt.ToString(), string.Empty);
         }

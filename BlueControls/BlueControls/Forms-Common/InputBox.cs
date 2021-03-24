@@ -34,7 +34,7 @@ namespace BlueControls.Forms {
         }
 
         public static string Show(string TXT, string VorschlagsText, enDataFormat Textformat, bool BigMultiLineBox) {
-            InputBox MB = new InputBox(TXT, VorschlagsText, Textformat, BigMultiLineBox);
+            var MB = new InputBox(TXT, VorschlagsText, Textformat, BigMultiLineBox);
             MB.ShowDialog();
 
             return MB.GiveBack;

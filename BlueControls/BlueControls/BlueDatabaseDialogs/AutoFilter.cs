@@ -68,12 +68,12 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         public void GenerateAll(FilterCollection filter) {
 
-            bool nochOk = true;
+            var nochOk = true;
 
-            List<string> List_FilterString = Column.Autofilter_ItemList(filter);
+            var List_FilterString = Column.Autofilter_ItemList(filter);
 
 
-            BlueFont F = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
+            var F = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
 
             Width = Math.Max(txbEingabe.Width + Skin.Padding * 2, Table.tmpColumnContentWidth(null, Column, F, 16));
 
@@ -89,7 +89,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
 
-            System.Drawing.Size PrefSize = lsbFilterItems.Item.CalculateColumnAndSize();
+            var PrefSize = lsbFilterItems.Item.CalculateColumnAndSize();
             lsbFilterItems.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Top;
             lsbFilterItems.Width = Math.Min(Table.tmpColumnContentWidth(null, Column, F, 16), Width - Skin.PaddingSmal * 2);
 
@@ -118,7 +118,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
 
 
-                string tmp = CellItem.ValueReadable(Column, string.Empty, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text, true);
+                var tmp = CellItem.ValueReadable(Column, string.Empty, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text, true);
 
 
                 if (string.IsNullOrEmpty(tmp)) {
@@ -152,13 +152,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (filter != null) {
 
-                foreach (FilterItem Thisfilter in filter) {
+                foreach (var Thisfilter in filter) {
                     if (Thisfilter != null && Thisfilter.FilterType != enFilterType.KeinFilter) {
                         if (Thisfilter.Column == Column) {
 
 
                             if (Thisfilter.FilterType.HasFlag(enFilterType.Istgleich)) {
-                                foreach (string ThisValue in Thisfilter.SearchValue) {
+                                foreach (var ThisValue in Thisfilter.SearchValue) {
                                     if (lsbFilterItems.Item[ThisValue] != null) {
                                         lsbFilterItems.Item[ThisValue].Checked = true;
                                     } else if (string.IsNullOrEmpty(ThisValue)) {
@@ -239,13 +239,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (MultiAuswahlUND || MultiAuswahlODER) { return; }
 
-            bool DoJoker = true;
+            var DoJoker = true;
 
             if (string.IsNullOrEmpty(Column.AutoFilterJoker)) { DoJoker = false; }
             if (NegativAuswahl) { DoJoker = false; }
 
 
-            List<string> l = new List<string>
+            var l = new List<string>
                 {
                     e.Item.Internal
                 };
@@ -308,17 +308,17 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (Column.Format.IsZahl()) {
                 if (txbEingabe.Text.Contains("-")) {
-                    string tmp = txbEingabe.Text.Replace(" ", "");
-                    int l = modErgebnis.LastMinusIndex(tmp);
+                    var tmp = txbEingabe.Text.Replace(" ", "");
+                    var l = modErgebnis.LastMinusIndex(tmp);
                     if (l > 0 && l < tmp.Length - 1) {
 
-                        string Z1 = tmp.Substring(0, l);
-                        string Z2 = tmp.Substring(l + 1);
+                        var Z1 = tmp.Substring(0, l);
+                        var Z2 = tmp.Substring(l + 1);
 
                         if (Z1.IsDouble() && Z2.IsDouble()) {
 
-                            double Zd1 = double.Parse(Z1);
-                            double Zd2 = double.Parse(Z2);
+                            var Zd1 = double.Parse(Z1);
+                            var Zd2 = double.Parse(Z2);
                             if (Zd2 < Zd1) {
                                 modAllgemein.Swap(ref Zd1, ref Zd2);
                             }
@@ -405,7 +405,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void ChangeToMultiOder() {
-            BlueFont F = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
+            var F = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
             MultiAuswahlODER = true;
             capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>ODER-Filterung:</u></b><fontsize=" + F.FontSize.ToString() + "><br><br>Wählen sie Einträge, von denen <b>einer</b> zutreffen muss:");
 
@@ -431,7 +431,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void ChangeToMultiUnd() {
             MultiAuswahlUND = true;
 
-            BlueFont F = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
+            var F = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
 
             capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>UND-Filterung:</u></b><fontsize=" + F.FontSize.ToString() + "><br><br>Wählen sie welche Einträge <b>alle</b> zutreffen müssen:");
             ChangeDesign();
@@ -442,7 +442,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void butFertig_Click(object sender, System.EventArgs e) {
 
 
-            List<string> _SearchValue = lsbFilterItems.Item.Checked().ToListOfString();
+            var _SearchValue = lsbFilterItems.Item.Checked().ToListOfString();
 
             if (_SearchValue.Count == 0) {
                 CloseAndDispose("FilterDelete", null);

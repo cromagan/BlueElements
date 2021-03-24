@@ -39,10 +39,10 @@ namespace BlueDatabase {
 
 
         public static List<string> SaveAsBitmap(List<RowItem> Row, string LayoutID, string Path) {
-            List<string> l = new List<string>();
+            var l = new List<string>();
 
-            foreach (RowItem ThisRow in Row) {
-                string FN = TempFile(Path, ThisRow.CellFirstString(), "PNG");
+            foreach (var ThisRow in Row) {
+                var FN = TempFile(Path, ThisRow.CellFirstString(), "PNG");
                 ThisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(ThisRow, LayoutID, FN));
                 l.Add(FN);
             }
@@ -65,7 +65,7 @@ namespace BlueDatabase {
 
         public static string ParseVariable(string Text, string VariableName, string Valuex, enValueType IsValueType, enValueType AcceptdValueType) {
 
-            int x = 0;
+            var x = 0;
 
             if (string.IsNullOrEmpty(Text)) { return Text; }
             if (string.IsNullOrEmpty(VariableName)) { return Text; }
@@ -74,7 +74,7 @@ namespace BlueDatabase {
 
 
             do {
-                int TMP = Text.ToUpper().IndexOf("//TS/000" + VariableName.ToUpper() + "/", x);
+                var TMP = Text.ToUpper().IndexOf("//TS/000" + VariableName.ToUpper() + "/", x);
 
                 if (TMP < 0) { return Text; }
 
@@ -87,20 +87,20 @@ namespace BlueDatabase {
 
                 x = TMP;
 
-                int e = Text.ToUpper().IndexOf("/E", x + 1);
+                var e = Text.ToUpper().IndexOf("/E", x + 1);
 
                 if (e < 0) { return Text; }
 
-                string TX = Valuex;
+                var TX = Valuex;
 
-                string Ges = Text.Substring(x, e - x + 2);
-                string ToParse = Text.Substring(x + 8 + VariableName.Length, e - x - 8 - VariableName.Length) + "/END";
+                var Ges = Text.Substring(x, e - x + 2);
+                var ToParse = Text.Substring(x + 8 + VariableName.Length, e - x - 8 - VariableName.Length) + "/END";
 
                 ToParse = ToParse.Trim('/');
 
-                string[] c = ToParse.Split('/');
-                int z = -1;
-                bool Ended = false;
+                var c = ToParse.Split('/');
+                var z = -1;
+                var Ended = false;
                 do {
                     z++;
                     if (z > c.GetUpperBound(0) || c[z].Length < 3) {
@@ -112,8 +112,8 @@ namespace BlueDatabase {
                     c[z] = c[z].FromNonCritical().FromNonCritical().GenerateSlash();
 
 
-                    int tempVar2 = 0;
-                    int tempVar3 = 0;
+                    var tempVar2 = 0;
+                    var tempVar3 = 0;
                     Bitmap tempVar4 = null;
                     string tempVar5 = null;
                     DoSingleCode(c[z], ref TX, null, ref Col, ref tempVar2, ref tempVar3, ref tempVar4, ref tempVar5, Ges, ref Ended);
@@ -236,16 +236,16 @@ namespace BlueDatabase {
                     break;
 
                 case "103": // Vortext
-                    string[] ts = tx.SplitByCR();
-                    for (int tz = 0; tz <= ts.GetUpperBound(0); tz++) {
+                    var ts = tx.SplitByCR();
+                    for (var tz = 0; tz <= ts.GetUpperBound(0); tz++) {
                         ts[tz] = CodeNr.Substring(3) + ts[tz];
                     }
                     tx = string.Join("\r", ts);
                     break;
 
                 case "104": // Nachtext
-                    string[] ts2 = tx.SplitByCR();
-                    for (int tz = 0; tz <= ts2.GetUpperBound(0); tz++) {
+                    var ts2 = tx.SplitByCR();
+                    for (var tz = 0; tz <= ts2.GetUpperBound(0); tz++) {
                         ts2[tz] = ts2[tz] + CodeNr.Substring(3);
                     }
                     tx = string.Join("\r", ts2);
@@ -339,15 +339,15 @@ namespace BlueDatabase {
                         Ended = true;
                         return;
                     }
-                    int x = Code.IndexOf("/310");
+                    var x = Code.IndexOf("/310");
                     tx = Code.Substring(x + 4, Code.Length - x - 8);
                     Ended = true;
                     return;
 
                 case "107":
 
-                    string[] ts3 = tx.SplitByCR();
-                    for (int tz = 0; tz <= ts3.GetUpperBound(0); tz++) {
+                    var ts3 = tx.SplitByCR();
+                    for (var tz = 0; tz <= ts3.GetUpperBound(0); tz++) {
                         ts3[tz] = CellItem.ValueReadable(column, ts3[tz], enShortenStyle.HTML, enBildTextVerhalten.Nur_Text, true);
                     }
                     tx = string.Join("\r", ts3);
@@ -412,7 +412,7 @@ namespace BlueDatabase {
                         tx = tx.Replace("zwei TL", "2 TL", RegexOptions.IgnoreCase);
 
 
-                        for (int t = 0; t <= A.GetUpperBound(0); t++) {
+                        for (var t = 0; t <= A.GetUpperBound(0); t++) {
                             tx = tx.Replace("gerieben" + A[t], "ger.");
                             //tx = tx.Replace("groß" + A[t], "gr.");
                             //tx = tx.Replace("klein" + A[t], "kl.");
@@ -489,16 +489,16 @@ namespace BlueDatabase {
             EndCode = EndCode.ToUpper();
 
             do {
-                int stx = tmpBody.ToUpper().IndexOf("//" + Welcher.ToUpper() + "/");
+                var stx = tmpBody.ToUpper().IndexOf("//" + Welcher.ToUpper() + "/");
                 if (stx < 0) {
                     return tmpBody;
                 }
-                int enx = tmpBody.ToUpper().IndexOf("/" + EndCode.ToUpper(), stx + 4);
+                var enx = tmpBody.ToUpper().IndexOf("/" + EndCode.ToUpper(), stx + 4);
                 if (enx < 0) {
                     return tmpBody;
                 }
-                string T1 = tmpBody.Substring(stx, enx - stx + 1 + EndCode.Length);
-                string T2 = GenerateLayoutString(T1, vRow, Welcher);
+                var T1 = tmpBody.Substring(stx, enx - stx + 1 + EndCode.Length);
+                var T2 = GenerateLayoutString(T1, vRow, Welcher);
 
 
                 T2 = T2.FromNonCritical(); // Sicherhethalber, daß der Text auf jeden Fall lesbar ist
@@ -524,19 +524,19 @@ namespace BlueDatabase {
         private static string GenerateLayoutString(string Code, RowItem vRow, string Art) {
 
             Bitmap I = null;
-            int Wi = 8;
-            int He = 8;
+            var Wi = 8;
+            var He = 8;
 
 
             Code = Code.TrimStart("//" + Art + "/");
             Code = Code.TrimEnd("XE");
             Code = Code.TrimEnd("AE");
             Code = Code.TrimEnd('E') + "END";
-            string[] c = Code.Split('/');
-            int z = -1;
-            string Tx = "";
-            string BT = "";
-            bool Ended = false;
+            var c = Code.Split('/');
+            var z = -1;
+            var Tx = "";
+            var BT = "";
+            var Ended = false;
 
 
 
@@ -568,7 +568,7 @@ namespace BlueDatabase {
 
         public static List<string> SaveAs(RowItem Row, string Layout, string DestinationFile) {
 
-            List<RowItem> l = new List<RowItem>
+            var l = new List<RowItem>
             {
                 Row
             };
@@ -607,7 +607,7 @@ namespace BlueDatabase {
 
             string sav = null;
 
-            List<string> l = new List<string>();
+            var l = new List<string>();
 
             if (Liste == null) { return l; }
 
@@ -621,7 +621,7 @@ namespace BlueDatabase {
                 CreateLayout(Liste, Lad, sav);
                 l.Add(sav);
             } else {
-                foreach (RowItem ThisRow in Liste) {
+                foreach (var ThisRow in Liste) {
                     if (!string.IsNullOrEmpty(OptionalFileName)) {
                         sav = TempFile(OptionalFileName.FilePath(), OptionalFileName.FileNameWithoutSuffix(), Lad.FileSuffix());
                     } else {
@@ -664,7 +664,7 @@ namespace BlueDatabase {
             }
 
 
-            List<RowItem> TMPList = new List<RowItem>
+            var TMPList = new List<RowItem>
             {
                 Row
             };
@@ -675,16 +675,16 @@ namespace BlueDatabase {
         public static void CreateLayout(RowItem Row, string LoadFile, string SaveFile) {
             if (!FileExists(LoadFile)) { return; }
 
-            List<RowItem> TMPList = new List<RowItem>
+            var TMPList = new List<RowItem>
             {
                 Row
             };
-            InternalCreateLayout(TMPList, LoadFromDisk(LoadFile), SaveFile, false);
+            InternalCreateLayout(TMPList, LoadFromDiskLatin(LoadFile), SaveFile, false);
         }
 
         public static void CreateLayout(List<RowItem> Rows, string LoadFile, string SaveFile) {
             if (!FileExists(LoadFile)) { return; }
-            InternalCreateLayout(Rows, LoadFromDisk(LoadFile), SaveFile, false);
+            InternalCreateLayout(Rows, LoadFromDiskLatin(LoadFile), SaveFile, false);
         }
 
 
@@ -692,11 +692,11 @@ namespace BlueDatabase {
 
 
             string tmpSave = null;
-            string Head = "";
-            string Body = FileLoaded;
-            string Foot = "";
-            int stx = FileLoaded.ToUpper().IndexOf("//AS/300/AE");
-            int enx = FileLoaded.ToUpper().IndexOf("//AS/301/AE");
+            var Head = "";
+            var Body = FileLoaded;
+            var Foot = "";
+            var stx = FileLoaded.ToUpper().IndexOf("//AS/300/AE");
+            var enx = FileLoaded.ToUpper().IndexOf("//AS/301/AE");
 
             if (stx > -1 && enx > stx) {
                 Head = FileLoaded.Substring(0, stx);
@@ -709,10 +709,10 @@ namespace BlueDatabase {
             if (Rows != null) {
 
 
-                foreach (RowItem ThisRow in Rows) // As Integer = 0 To Rows.GetUpperBound(0)
+                foreach (var ThisRow in Rows) // As Integer = 0 To Rows.GetUpperBound(0)
                 {
                     if (ThisRow != null) {
-                        string tmpBody = Body;
+                        var tmpBody = Body;
                         tmpBody = DoLayoutCode("AS", tmpBody, ThisRow, "AE", ToNonCriticalText); // Anfangsbedingungen
                         tmpBody = DoLayoutCode("TS", tmpBody, ThisRow, "E", ToNonCriticalText); // Textbedingungen (Endcode NUR e, weil Pics sonst den zweiten Buchstaben IMMER löschen!
                         tmpBody = DoLayoutCode("XS", tmpBody, ThisRow, "XE", ToNonCriticalText); // Endbedingungen
@@ -732,7 +732,7 @@ namespace BlueDatabase {
             tmpSave += Foot;
             if (!string.IsNullOrEmpty(SaveFile)) // Dateien ohne SUfiix-Angabe könenn nicht gespeichert werden
             {
-                SaveToDisk(SaveFile, tmpSave, false);
+                SaveToDisk(SaveFile, tmpSave, false, System.Text.Encoding.Latin1);
             }
 
             return tmpSave;

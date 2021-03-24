@@ -15,10 +15,10 @@ namespace BlueControls.Forms {
 
         private EditBoxFlexiControl(List<FlexiControl> Flexis) : this() {
 
-            int top = Skin.Padding;
-            int we = 300 + Skin.Padding * 4;
+            var top = Skin.Padding;
+            var we = 300 + Skin.Padding * 4;
 
-            foreach (FlexiControl ThisFlexi in Flexis) {
+            foreach (var ThisFlexi in Flexis) {
                 Controls.Add(ThisFlexi);
                 ThisFlexi.DisabledReason = string.Empty;
                 ThisFlexi.Left = Skin.Padding;
@@ -32,7 +32,7 @@ namespace BlueControls.Forms {
 
             we = Math.Min(we, 1500);
 
-            foreach (FlexiControl ThisFlexi in Flexis) {
+            foreach (var ThisFlexi in Flexis) {
                 ThisFlexi.Width = Width - Skin.Padding * 4;
             }
 
@@ -45,7 +45,7 @@ namespace BlueControls.Forms {
 
 
         public static List<string> Show(List<FlexiControl> Flexis) {
-            EditBoxFlexiControl MB = new EditBoxFlexiControl(Flexis);
+            var MB = new EditBoxFlexiControl(Flexis);
             MB.ShowDialog();
             return MB.GiveBack;
         }
@@ -58,7 +58,7 @@ namespace BlueControls.Forms {
             GiveBack = new List<string>();
 
             if (!canceled) {
-                foreach (object thisObj in Controls) {
+                foreach (var thisObj in Controls) {
 
                     if (thisObj is FlexiControl ThisFlexi) {
 

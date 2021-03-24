@@ -148,7 +148,7 @@ namespace BlueControls.ItemCollection {
 
 
         public override string ToString() {
-            string t = base.ToString();
+            var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             if (!string.IsNullOrEmpty(Text)) { t = t + "ReadableText=" + Text.ToNonCritical() + ", "; }
             if (Format != enDataFormat.Text) { t = t + "Format=" + (int)Format + ", "; }
@@ -170,7 +170,7 @@ namespace BlueControls.ItemCollection {
 
 
 
-            PointF trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
             GR.TranslateTransform(trp.X, trp.Y);
             GR.RotateTransform(-Drehwinkel);
 
@@ -195,27 +195,27 @@ namespace BlueControls.ItemCollection {
         private string ChangeText(string tmpBody) {
 
 
-            string nt = tmpBody;
+            var nt = tmpBody;
 
 
             do {
-                int stx = nt.ToUpper().IndexOf("//TS/");
+                var stx = nt.ToUpper().IndexOf("//TS/");
                 if (stx < 0) { break; }
-                int enx = nt.ToUpper().IndexOf("/E", stx + 4);
+                var enx = nt.ToUpper().IndexOf("/E", stx + 4);
                 if (enx < 0) { break; }
-                string t1 = nt.Substring(stx, enx - stx + 2);
+                var t1 = nt.Substring(stx, enx - stx + 2);
 
                 if (string.IsNullOrEmpty(t1)) { break; }
                 if (!t1.Contains("//TS/000")) { break; }
 
-                string[] l = t1.SplitBy("/");
+                var l = t1.SplitBy("/");
                 if (l.Length < 3) { break; }
 
-                string Nam = "";
-                string Vor = "";
-                string Nach = "";
+                var Nam = "";
+                var Vor = "";
+                var Nach = "";
 
-                for (int tec = 0; tec <= l.GetUpperBound(0); tec++) {
+                for (var tec = 0; tec <= l.GetUpperBound(0); tec++) {
 
                     if (l[tec].Length > 3) {
                         switch (l[tec].Substring(0, 3)) {
@@ -235,7 +235,7 @@ namespace BlueControls.ItemCollection {
                 }
 
 
-                string t2 = "<MarkState=2>" + Vor + Nam + Nach + "<MarkState=0>";
+                var t2 = "<MarkState=2>" + Vor + Nam + Nach + "<MarkState=0>";
 
                 nt = nt.Replace(t1, t2);
 
@@ -301,7 +301,7 @@ namespace BlueControls.ItemCollection {
 
         public bool ReplaceVariable(string VariableName, enValueType ValueType, string Value) {
 
-            string ot = Text;
+            var ot = Text;
             Text = Export.ParseVariable(Text, VariableName, Value, ValueType, enValueType.Text);
 
             if (ot == Text) { return false; }
@@ -324,7 +324,7 @@ namespace BlueControls.ItemCollection {
 
 
         public bool DoSpecialCodes() {
-            string ot = Text;
+            var ot = Text;
             Text = Export.DoLayoutCode("XS", Text, null, "XE", false);
 
             if (ot == Text) { return false; }
@@ -335,7 +335,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public bool RenameColumn(string oldName, ColumnItem cColumnItem) {
-            string ot = _VariableText;
+            var ot = _VariableText;
             _VariableText = _VariableText.Replace("//TS/000" + oldName + "/", "//TS/000" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
             _VariableText = _VariableText.Replace("//TS/001" + oldName + "/", "//TS/001" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
 
@@ -349,13 +349,13 @@ namespace BlueControls.ItemCollection {
 
 
         public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new List<FlexiControl>
+            var l = new List<FlexiControl>
             {
                 new FlexiControlForProperty(this, "Interner-Text", 5)
             };
 
 
-            ItemCollectionList Aursicht = new ItemCollectionList
+            var Aursicht = new ItemCollectionList
             {
                 { "Linksbündig ausrichten", ((int)enAlignment.Top_Left).ToString(), enImageCode.Linksbündig },
                 { "Zentrieren", ((int)enAlignment.Top_HorizontalCenter).ToString(), enImageCode.Zentrieren },

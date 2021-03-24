@@ -135,7 +135,7 @@ namespace BlueControls {
 
 
         public void DoMouse() {
-            System.Windows.Forms.MouseButtons B = System.Windows.Forms.MouseButtons.None;
+            var B = System.Windows.Forms.MouseButtons.None;
 
             if (GetAsyncKeyState(System.Windows.Forms.Keys.LButton) != 0) {
                 B |= System.Windows.Forms.MouseButtons.Left;
@@ -145,8 +145,8 @@ namespace BlueControls {
             }
 
 
-            System.Windows.Forms.MouseEventArgs mev = new System.Windows.Forms.MouseEventArgs(B, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
-            System.Windows.Forms.MouseEventArgs mevold = new System.Windows.Forms.MouseEventArgs(Mouse_LastButton, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
+            var mev = new System.Windows.Forms.MouseEventArgs(B, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
+            var mevold = new System.Windows.Forms.MouseEventArgs(Mouse_LastButton, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
 
 
             if (Mouse_LastX != mev.X || Mouse_LastY != mev.Y) {
@@ -187,7 +187,7 @@ namespace BlueControls {
         public void DoKeyboard() {
 
 
-            System.Windows.Forms.Keys k = System.Windows.Forms.Keys.None;
+            var k = System.Windows.Forms.Keys.None;
 
 
             if (GetAsyncKeyState(System.Windows.Forms.Keys.D1) != 0) {
@@ -377,8 +377,8 @@ namespace BlueControls {
             }
 
 
-            System.Windows.Forms.KeyEventArgs kev = new System.Windows.Forms.KeyEventArgs(k);
-            System.Windows.Forms.KeyEventArgs kevold = new System.Windows.Forms.KeyEventArgs(Key_LastKey);
+            var kev = new System.Windows.Forms.KeyEventArgs(k);
+            var kevold = new System.Windows.Forms.KeyEventArgs(Key_LastKey);
 
             if (Key_IsPressing) {
                 if (k == System.Windows.Forms.Keys.None) {

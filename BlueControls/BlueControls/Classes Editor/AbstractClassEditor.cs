@@ -101,7 +101,7 @@ namespace BlueControls.Classes_Editor {
         protected void OnChanged(T Obj) {
             if (IsFilling) { return; }
 
-            string newstatse = Obj.ToString();
+            var newstatse = Obj.ToString();
 
             if (newstatse == _LastState) { return; }
 

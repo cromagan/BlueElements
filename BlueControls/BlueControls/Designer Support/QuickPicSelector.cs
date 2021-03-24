@@ -26,7 +26,7 @@ using System.Windows.Forms.Design;
 namespace BlueControls.Designer_Support {
     public sealed class QuickPicSelector : UITypeEditor {
         private IWindowsFormsEditorService edSvc;
-        private readonly frmQuickPic fqp = new frmQuickPic();
+        private readonly frmQuickPic fqp = new();
         private string C;
 
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value) {

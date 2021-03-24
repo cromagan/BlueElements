@@ -25,7 +25,7 @@ namespace BlueControls {
 
             Control = null;
 
-            int Radius = 10;
+            var Radius = 10;
 
             Width = Radius * 2;
             Height = Radius * 2;
@@ -55,7 +55,7 @@ namespace BlueControls {
             Width = Control.Width;
             Height = Control.Height;
 
-            Point p = Control.PointToScreen(Point.Empty);
+            var p = Control.PointToScreen(Point.Empty);
 
             Left = p.X;
             Top = p.Y;
@@ -86,7 +86,7 @@ namespace BlueControls {
 
 
         public void Paint_Radius() {
-            Graphics g = CreateGraphics();
+            var g = CreateGraphics();
             g.Clear(Color.Magenta);
             g.DrawEllipse(new Pen(Color.Black, 3), 1, 1, Width - 3, Height - 3);
             g.DrawEllipse(Pens.Red, 1, 1, Width - 3, Height - 3);
@@ -97,7 +97,7 @@ namespace BlueControls {
         private void Paint_RoterRahmenUmControlUndBlinken() {
             SetControl();
 
-            Graphics g = CreateGraphics();
+            var g = CreateGraphics();
 
             g.Clear(Color.Magenta);
 
@@ -131,7 +131,7 @@ namespace BlueControls {
 
         protected override System.Windows.Forms.CreateParams CreateParams {
             get {
-                System.Windows.Forms.CreateParams oParam = base.CreateParams;
+                var oParam = base.CreateParams;
                 oParam.ExStyle |= (int)enExStyle.EX_NOACTIVATE | (int)enExStyle.EX_TOOLWINDOW | (int)enExStyle.EX_TOPMOST;
                 oParam.Parent = IntPtr.Zero;
                 return oParam;

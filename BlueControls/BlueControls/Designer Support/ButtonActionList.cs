@@ -52,7 +52,7 @@ namespace BlueControls.Designer_Support {
 
 
         public override DesignerActionItemCollection GetSortedActionItems() {
-            DesignerActionItemCollection items = new DesignerActionItemCollection
+            var items = new DesignerActionItemCollection
             {
                 new DesignerActionHeaderItem("Allgemein"),
 

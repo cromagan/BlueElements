@@ -329,7 +329,7 @@ namespace BlueControls.Controls {
         public Size TextRequiredSize() {
             if (QuickModePossible()) {
                 if (_design == enDesign.Undefiniert) { GetDesign(); }
-                SizeF s = BlueFont.MeasureString(_Text, Skin.GetBlueFont(_design, enStates.Standard).Font());
+                var s = BlueFont.MeasureString(_Text, Skin.GetBlueFont(_design, enStates.Standard).Font());
                 return new Size((int)(s.Width + 1), (int)(s.Height + 1));
             }
 

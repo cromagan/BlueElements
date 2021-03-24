@@ -59,7 +59,7 @@ namespace BlueBasics {
         public new void Clear() {
             if (Count == 0) { return; }
 
-            foreach (T item in this) {
+            foreach (var item in this) {
                 OnItemRemoving(item);
             }
             base.Clear();
@@ -89,7 +89,7 @@ namespace BlueBasics {
 
             //base.AddRange(collection);
 
-            foreach (T item in collection) {
+            foreach (var item in collection) {
                 Add(item);
             }
 
@@ -98,7 +98,7 @@ namespace BlueBasics {
 
         public void RemoveRange(IEnumerable<T> collection) {
 
-            foreach (T item in collection) {
+            foreach (var item in collection) {
                 Remove(item);
             }
         }
@@ -229,7 +229,7 @@ namespace BlueBasics {
 
             // Der Swap geht so, und nicht anders! Es müssen die Items im Original-Array geswapt werden!
             // Wichtig auch der Zugriff auf die base (nicht auf this). Dadurch werden keine Add/Remove Event ausgelöst.
-            T tmp = base[Index1];
+            var tmp = base[Index1];
             base[Index1] = base[Index2];
             base[Index2] = tmp;
             OnChanged();
@@ -241,7 +241,7 @@ namespace BlueBasics {
 
             try {
                 if (typeof(IParseable).IsAssignableFrom(typeof(T))) {
-                    System.Text.StringBuilder a = new System.Text.StringBuilder();
+                    var a = new System.Text.StringBuilder();
 
                     foreach (IParseable thisP in this) {
                         if (thisP != null) {

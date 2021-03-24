@@ -103,7 +103,7 @@ namespace BlueControls.Forms {
 
 
         private void EinWahl_Click(object sender, System.EventArgs e) {
-            using (frmTableView fr = new frmTableView(Database)) {
+            using (var fr = new frmTableView(Database)) {
                 Liste = fr.GetFilteredItems();
             }
 
@@ -170,7 +170,7 @@ namespace BlueControls.Forms {
             WeiterEinträge.Enabled = Convert.ToBoolean(Liste.Count > 0);
 
 
-            bool MultiMöglich = true;
+            var MultiMöglich = true;
             //  Dim EinzelMöglich As Boolean = True
 
 
@@ -219,7 +219,7 @@ namespace BlueControls.Forms {
 
             Enabled = false;
 
-            string n = FrmDrucken_Layout1.Text;
+            var n = FrmDrucken_Layout1.Text;
 
             FrmDrucken_Layout1.Text = string.Empty;
             tabAdministration.OpenLayoutEditor(Database, _AdditionalLayoutPath, n);
@@ -334,7 +334,7 @@ namespace BlueControls.Forms {
 
         private void PrintPad_PrintPage(object sender, PrintPageEventArgs e) {
 
-            int l = ItemNrForPrint;
+            var l = ItemNrForPrint;
 
             ItemNrForPrint = GeneratePrintPad(ItemNrForPrint);
 
@@ -355,24 +355,24 @@ namespace BlueControls.Forms {
             PrintPad.Item.Clear();
             modAllgemein.CollectGarbage();
 
-            CreativePad tmp = new CreativePad(new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[0].Database, Liste[0].Key));
+            var tmp = new CreativePad(new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[0].Database, Liste[0].Key));
 
-            RectangleM OneItem = tmp.Item.MaxBounds(null);
+            var OneItem = tmp.Item.MaxBounds(null);
 
             PrintPad.Item.SheetStyle = tmp.Item.SheetStyle;
             PrintPad.Item.SheetStyleScale = tmp.Item.SheetStyleScale;
 
             tmp.Dispose();
 
-            System.Drawing.Rectangle DruckB = PrintPad.Item.DruckbereichRect();
+            var DruckB = PrintPad.Item.DruckbereichRect();
 
-            int tempVar = Math.Max(1, (int)Math.Floor(DruckB.Width / (double)OneItem.Width + 0.01));
-            for (int x = 0; x < tempVar; x++) {
-                int tempVar2 = Math.Max(1, (int)Math.Floor(DruckB.Height / (double)OneItem.Height + 0.01));
-                for (int y = 0; y < tempVar2; y++) {
+            var tempVar = Math.Max(1, (int)Math.Floor(DruckB.Width / (double)OneItem.Width + 0.01));
+            for (var x = 0; x < tempVar; x++) {
+                var tempVar2 = Math.Max(1, (int)Math.Floor(DruckB.Height / (double)OneItem.Height + 0.01));
+                for (var y = 0; y < tempVar2; y++) {
 
 
-                    ChildPadItem It = new ChildPadItem(PrintPad.Item) {
+                    var It = new ChildPadItem(PrintPad.Item) {
                         PadInternal = new CreativePad(new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[StartNr].Database, Liste[StartNr].Key))
                     };
 

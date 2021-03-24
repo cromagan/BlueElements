@@ -35,19 +35,19 @@ namespace BluePaint {
             if (OriginalPic == null) { return; }
 
             if (sldKontrast.Value != 0) {
-                Bitmap _PicPreview = OriginalPic.AdjustContrast((float)sldKontrast.Value);
+                var _PicPreview = OriginalPic.AdjustContrast((float)sldKontrast.Value);
                 e.DrawImage(_PicPreview);
                 return;
             }
 
             if (sldGamma.Value != 1) {
-                Bitmap _PicPreview = OriginalPic.AdjustGamma((float)sldGamma.Value);
+                var _PicPreview = OriginalPic.AdjustGamma((float)sldGamma.Value);
                 e.DrawImage(_PicPreview);
                 return;
             }
 
             if (sldHelligkeit.Value != 1) {
-                Bitmap _PicPreview = OriginalPic.AdjustBrightness((float)sldHelligkeit.Value);
+                var _PicPreview = OriginalPic.AdjustBrightness((float)sldHelligkeit.Value);
                 e.DrawImage(_PicPreview);
                 return;
             }
@@ -56,7 +56,7 @@ namespace BluePaint {
 
 
         private void btnKontrastErhoehen_Click(object sender, System.EventArgs e) {
-            Bitmap _Pic = OnNeedCurrentPic();
+            var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnOverridePic(_Pic.AdjustContrast((float)sldKontrast.Value));
             OnCommandForMacro("Kontrast;" + (float)sldKontrast.Value);
@@ -67,7 +67,7 @@ namespace BluePaint {
         }
 
         private void btnGraustufen_Click(object sender, System.EventArgs e) {
-            Bitmap _Pic = OnNeedCurrentPic();
+            var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
 
             OnOverridePic(_Pic.Grayscale());
@@ -79,7 +79,7 @@ namespace BluePaint {
         }
 
         private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e) {
-            Bitmap _Pic = OnNeedCurrentPic();
+            var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnForceUndoSaving();
 
@@ -95,12 +95,12 @@ namespace BluePaint {
         }
 
         private void btnPixelHinzu_Click(object sender, System.EventArgs e) {
-            Bitmap _Pic = OnNeedCurrentPic();
+            var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnForceUndoSaving();
 
-            for (int x = 0; x < _Pic.Width - 1; x++) {
-                for (int y = 0; y < _Pic.Height - 1; y++) {
+            for (var x = 0; x < _Pic.Width - 1; x++) {
+                for (var y = 0; y < _Pic.Height - 1; y++) {
                     if (!_Pic.GetPixel(x + 1, y + 1).IsNearWhite(0.9)) { _Pic.SetPixel(x, y, Color.Black); }
                     if (!_Pic.GetPixel(x + 1, y).IsNearWhite(0.9)) { _Pic.SetPixel(x, y, Color.Black); }
                     if (!_Pic.GetPixel(x, y + 1).IsNearWhite(0.9)) { _Pic.SetPixel(x, y, Color.Black); }
@@ -116,7 +116,7 @@ namespace BluePaint {
         }
 
         private void btnAusdünnen_Click(object sender, System.EventArgs e) {
-            Bitmap _Pic = OnNeedCurrentPic();
+            var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnForceUndoSaving();
 
@@ -137,7 +137,7 @@ namespace BluePaint {
 
 
         private void btnHelligkeit_Click(object sender, System.EventArgs e) {
-            Bitmap _Pic = OnNeedCurrentPic();
+            var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnOverridePic(_Pic.AdjustBrightness((float)sldHelligkeit.Value));
             OnCommandForMacro("Helligkeit;" + (float)sldHelligkeit.Value);
@@ -147,7 +147,7 @@ namespace BluePaint {
         }
 
         private void btnGamma_Click(object sender, System.EventArgs e) {
-            Bitmap _Pic = OnNeedCurrentPic();
+            var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnOverridePic(_Pic.AdjustGamma((float)sldGamma.Value));
 
@@ -193,7 +193,7 @@ namespace BluePaint {
         }
 
         public override void ExcuteCommand(string command) {
-            string[] c = command.SplitBy(";");
+            var c = command.SplitBy(";");
 
             switch (c[0]) {
                 case "Kontrast":

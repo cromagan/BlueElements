@@ -1,769 +1,145 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6A9CFA8B-DDF5-4FA2-A110-C87A0CE34347}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BlueControls</RootNamespace>
-    <AssemblyName>BlueControls</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\..\BlueBasics\BlueBasics.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>..\..\BlueBasics\BlueBasics.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Design" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Allgemein.cs" />
-    <Compile Include="BlueDatabaseDialogs\AdminMenu.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\AdminMenu.designer.cs">
-      <DependentUpon>AdminMenu.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\FlexiControlForFilter.cs">
+    <Compile Update="BlueDatabaseDialogs\FlexiControlForFilter.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\FlexiControlForFilter.Designer.cs">
-      <DependentUpon>FlexiControlForFilter.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\Filter.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\Filter.designer.cs">
-      <DependentUpon>Filter.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\Search.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\Search.designer.cs">
-      <DependentUpon>Search.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\Skript.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\Skript.Designer.cs">
-      <DependentUpon>Skript.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\Filterleiste.cs">
+    <Compile Update="BlueDatabaseDialogs\Filterleiste.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\Filterleiste.Designer.cs">
-      <DependentUpon>Filterleiste.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueFont.cs" />
-    <Compile Include="Controls\EasyPicMulti.cs">
+    <Compile Update="Controls\EasyPicMulti.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\EasyPicMulti.Designer.cs">
-      <DependentUpon>EasyPicMulti.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\TabControl.cs">
+    <Compile Update="Controls\TabControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\SwapListBox.cs">
+    <Compile Update="Controls\SwapListBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\SwapListBox.Designer.cs">
-      <DependentUpon>SwapListBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\ZoomPic.cs">
+    <Compile Update="Controls\ZoomPic.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ZoomPic.Designer.cs">
-      <DependentUpon>ZoomPic.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\ZoomPicWithPoints.cs">
+    <Compile Update="Controls\ZoomPicWithPoints.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ZoomPicWithPoints.Designer.cs">
-      <DependentUpon>ZoomPicWithPoints.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Enums\enXY.cs" />
-    <Compile Include="Enums\enFilterTypesToShow.cs" />
-    <Compile Include="Enums\enGroupBoxStyle.cs" />
-    <Compile Include="Enums\enPartentType.cs" />
-    <Compile Include="Enums\enHelpers.cs" />
-    <Compile Include="Enums\enSymbol.cs" />
-    <Compile Include="Enums\enMovePoints.cs" />
-    <Compile Include="Enums\enTableDrawColumn.cs" />
-    <Compile Include="Enums\enTableDrawType.cs" />
-    <Compile Include="Enums\enSorceType.cs" />
-    <Compile Include="Enums\enConectorStyle.cs" />
-    <Compile Include="Enums\enASCIIKey.cs" />
-    <Compile Include="Enums\enComboboxStyle.cs" />
-    <Compile Include="Enums\enBlueListBoxAppearance.cs" />
-    <Compile Include="Enums\enAutoRelationMode.cs" />
-    <Compile Include="Enums\enAddType.cs" />
-    <Compile Include="Enums\enContextMenuComands.cs" />
-    <Compile Include="Enums\enCS.cs" />
-    <Compile Include="Enums\enExStyle.cs" />
-    <Compile Include="Enums\enKontur.cs" />
-    <Compile Include="Enums\enMarkState.cs" />
-    <Compile Include="Enums\enRahmenArt.cs" />
-    <Compile Include="Enums\enRelationType.cs" />
-    <Compile Include="Enums\enDesign.cs" />
-    <Compile Include="Enums\enStates.cs" />
-    <Compile Include="Enums\enWndProc.cs" />
-    <Compile Include="Enums\PadStyles.cs" />
-    <Compile Include="Enums\TabControlHitTest.cs" />
-    <Compile Include="EventArgs\AdditionalDrawing.cs" />
-    <Compile Include="EventArgs\MouseEventArgs1_1DownAndCurrent.cs" />
-    <Compile Include="EventArgs\PositionEventArgs.cs" />
-    <Compile Include="EventArgs\MouseEventArgs1_1.cs" />
-    <Compile Include="Controls\FlexiControlForProperty.cs">
+    <Compile Update="Controls\FlexiControlForProperty.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Forms-Basics\DialogWithOkAndCancel.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Basics\DialogWithOkAndCancel.Designer.cs">
-      <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\EditBoxFlexiControls.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\EditBoxFlexiControls.Designer.cs">
-      <DependentUpon>EditBoxFlexiControls.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\EditBoxRow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\EditBoxRow.Designer.cs">
-      <DependentUpon>EditBoxRow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\frmTableView.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\frmTableView.Designer.cs">
-      <DependentUpon>frmTableView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\InputBoxListBoxStyle.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\InputBoxListBoxStyle.Designer.cs">
-      <DependentUpon>InputBoxListBoxStyle.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\InputBoxComboStyle.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\InputBoxComboStyle.Designer.cs">
-      <DependentUpon>InputBoxComboStyle.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\InputBox.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\InputBox.Designer.cs">
-      <DependentUpon>InputBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\MessageBox.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\MessageBox.Designer.cs">
-      <DependentUpon>MessageBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\Progressbar.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\Progressbar.Designer.cs">
-      <DependentUpon>Progressbar.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\QuickInfo.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\QuickInfo.Designer.cs">
-      <DependentUpon>QuickInfo.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\FloatingInputBoxListBoxStyle.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\FloatingInputBoxListBoxStyle.Designer.cs">
-      <DependentUpon>FloatingInputBoxListBoxStyle.cs</DependentUpon>
-    </Compile>
-    <Compile Include="EventArgs\ContextMenuItemClickedEventArgs.cs" />
-    <Compile Include="Forms-Basics\FloatingForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Basics\FloatingForm.Designer.cs">
-      <DependentUpon>FloatingForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Special\PictureView.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Special\PictureView.designer.cs">
-      <DependentUpon>PictureView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Interfaces\IUseMyBackColor.cs" />
-    <Compile Include="Interfaces\ISupportsBeginnEdit.cs" />
-    <Compile Include="Forms-Common\Notification.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\Notification.Designer.cs">
-      <DependentUpon>Notification.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Interfaces\ILastSavedBy.cs" />
-    <Compile Include="ItemCollection\clsPhysicPadItem.cs" />
-    <Compile Include="ItemCollection\clsAbstractPhysicPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FormPadItemRectangle.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\Temporär\clsKraft.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\Temporär\strPolygonCollisionResult.cs" />
-    <Compile Include="Controls\RibbonBar.cs">
+    <Compile Update="Controls\RibbonBar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="SystemInputHook.cs" />
-    <Compile Include="Controls\Button.cs">
+    <Compile Update="Controls\Button.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Caption.cs">
+    <Compile Update="Controls\Caption.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Caption.Designer.cs">
-      <DependentUpon>Caption.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Classes Editor\AbstractClassEditor.cs">
+    <Compile Update="Classes Editor\AbstractClassEditor.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes Editor\AbstractClassEditor.Designer.cs">
-      <DependentUpon>AbstractClassEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Classes Editor\ExportDefinition_Editor.cs">
+    <Compile Update="Classes Editor\ExportDefinition_Editor.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes Editor\ExportDefinition_Editor.Designer.cs">
-      <DependentUpon>ExportDefinition_Editor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Classes Editor\FilterItem_Editor.cs">
+    <Compile Update="Classes Editor\FilterItem_Editor.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes Editor\FilterItem_Editor.Designer.cs">
-      <DependentUpon>FilterItem_Editor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\FileDialogs.cs" />
-    <Compile Include="Enums\enBlueTableAppearance.cs" />
-    <Compile Include="Enums\enButtonStyle.cs" />
-    <Compile Include="Enums\enCheckBehavior.cs" />
-    <Compile Include="Enums\enHintergrundArt.cs" />
-    <Compile Include="Enums\enSteuerelementVerhalten.cs" />
-    <Compile Include="Extended Text\ExtChar.cs" />
-    <Compile Include="Extended Text\ExtText.cs" />
-    <Compile Include="clsPointRelation.cs" />
-    <Compile Include="Skin.cs" />
-    <Compile Include="Controls\ComboBox.cs">
+    <Compile Update="Controls\ComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ComboBox.Designer.cs">
-      <DependentUpon>ComboBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\CreativePad.cs">
+    <Compile Update="Controls\CreativePad.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\CreativePad.Designer.cs">
-      <DependentUpon>CreativePad.cs</DependentUpon>
-    </Compile>
-    <Compile Include="EventArgs\TabControlEventArgs.cs" />
-    <Compile Include="Classes Editor\TabPageCollectionEditor.cs" />
-    <Compile Include="Designer Support\BasicDesigner.cs" />
-    <Compile Include="Designer Support\ButtonActionList.cs" />
-    <Compile Include="Designer Support\ButtonDesigner.cs" />
-    <Compile Include="Designer Support\frmQuickPic.cs">
+    <Compile Update="Designer Support\frmQuickPic.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Designer Support\QuickPicSelector.cs" />
-    <Compile Include="Designer Support\TabControlDesigner.cs" />
-    <Compile Include="BlueDatabaseDialogs\AutoFilter.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\AutoFilter.Designer.cs">
-      <DependentUpon>AutoFilter.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\ColumnEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\ColumnEditor.Designer.cs">
-      <DependentUpon>ColumnEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\DatabaseHeadEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\DatabaseHeadEditor.Designer.cs">
-      <DependentUpon>DatabaseHeadEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\FormulaQuickSelect.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\FormulaQuickSelect.Designer.cs">
-      <DependentUpon>FormulaQuickSelect.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\Import.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\Import.designer.cs">
-      <DependentUpon>Import.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\LayoutDesigner.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\LayoutDesigner.Designer.cs">
-      <DependentUpon>LayoutDesigner.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\SearchAndReplace.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\SearchAndReplace.designer.cs">
-      <DependentUpon>SearchAndReplace.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\tabAdministration.cs">
+    <Compile Update="BlueDatabaseDialogs\tabAdministration.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\tabAdministration.Designer.cs">
-      <DependentUpon>tabAdministration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dictionary.cs" />
-    <Compile Include="Controls\EasyPic.cs">
+    <Compile Update="Controls\EasyPic.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\EasyPic.Designer.cs">
-      <DependentUpon>EasyPic.cs</DependentUpon>
-    </Compile>
-    <Compile Include="EventArgs\BasicListItemEventArgs.cs" />
-    <Compile Include="EventArgs\ContextMenuInitEventArgs.cs" />
-    <Compile Include="EventArgs\FilterComandEventArgs.cs" />
-    <Compile Include="EventArgs\ListOfBasicListItemEventArgs.cs" />
-    <Compile Include="Controls\FlexiControl.cs">
+    <Compile Update="Controls\FlexiControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FlexiControl.Designer.cs">
-      <DependentUpon>FlexiControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\FlexiControlForCell.cs">
+    <Compile Update="Controls\FlexiControlForCell.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FlexiControlForCell.Designer.cs">
-      <DependentUpon>FlexiControlForCell.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\ExportDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\ExportDialog.Designer.cs">
-      <DependentUpon>ExportDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\TODELETE_FontSelectDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\TODELETE_FontSelectDialog.Designer.cs">
-      <DependentUpon>TODELETE_FontSelectDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Basics\Form.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Basics\Form.Designer.cs">
-      <DependentUpon>Form.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\TODELETE_ItemSelect.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\TODELETE_ItemSelect.Designer.cs">
-      <DependentUpon>TODELETE_ItemSelect.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Common\TODELETE_PageSetupDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\TODELETE_PageSetupDialog.Designer.cs">
-      <DependentUpon>TODELETE_PageSetupDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Special\PadEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Special\PadEditor.designer.cs">
-      <DependentUpon>PadEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms-Special\RelationDiagram.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Special\RelationDiagram.Designer.cs">
-      <DependentUpon>RelationDiagram.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Formula.cs">
+    <Compile Update="Controls\Formula.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Formula.Designer.cs">
-      <DependentUpon>Formula.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\GenericControl.cs">
+    <Compile Update="Controls\GenericControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\GroupBox.cs">
+    <Compile Update="Controls\GroupBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\GroupBox.Designer.cs">
-      <DependentUpon>GroupBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Interfaces\IBackgroundNone.cs" />
-    <Compile Include="Interfaces\ICanHaveColumnVariables.cs" />
-    <Compile Include="Interfaces\IContextMenu.cs" />
-    <Compile Include="Interfaces\IMouseAndKeyHandle.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\BasicListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\BitmapListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\CellLikeListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\ItemCollectionList.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\LineListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\RowFormulaListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\TextListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\BasicPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\BitmapPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\ChildPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\DimensionPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\GridPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\ItemCollectionPad.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\LinePadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\RowFormulaPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\SpacerPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\TextPadItem.cs" />
-    <Compile Include="Controls\LastFilesCombo.cs">
+    <Compile Update="Controls\LastFilesCombo.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Line.cs">
+    <Compile Update="Controls\Line.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ListBox.cs">
+    <Compile Update="Controls\ListBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ListBox.Designer.cs">
-      <DependentUpon>ListBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GeometryDF.cs" />
-    <Compile Include="Forms-Common\Overlay.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\Overlay.Designer.cs">
-      <DependentUpon>Overlay.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PointM.cs" />
-    <Compile Include="Controls\ProgressBar.cs">
+    <Compile Update="Controls\ProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RectangleM.cs" />
-    <Compile Include="Forms-Common\ScreenShot.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\ScreenShot.designer.cs">
-      <DependentUpon>ScreenShot.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Slider.cs">
+    <Compile Update="Controls\Slider.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Slider.Designer.cs">
-      <DependentUpon>Slider.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\AbstractTabControl.cs">
+    <Compile Update="Controls\AbstractTabControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Table.cs">
+    <Compile Update="Controls\Table.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Table.Designer.cs">
-      <DependentUpon>Table.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\TabPage.cs">
+    <Compile Update="Controls\TabPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\TextBox.cs">
+    <Compile Update="Controls\TextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\TextBox.Designer.cs">
-      <DependentUpon>TextBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="strScreenData.cs" />
-    <Compile Include="Controls\ZoomPad.cs">
+    <Compile Update="Controls\ZoomPad.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\ZoomPad.Designer.cs">
-      <DependentUpon>ZoomPad.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="BlueDatabaseDialogs\AdminMenu.resx">
-      <DependentUpon>AdminMenu.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\FlexiControlForFilter.resx">
-      <DependentUpon>FlexiControlForFilter.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\Filter.resx">
-      <DependentUpon>Filter.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\Search.resx">
-      <DependentUpon>Search.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\Skript.resx">
-      <DependentUpon>Skript.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\Filterleiste.resx">
-      <DependentUpon>Filterleiste.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Caption.resx">
-      <DependentUpon>Caption.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Classes Editor\AbstractClassEditor.resx">
-      <DependentUpon>AbstractClassEditor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Classes Editor\ExportDefinition_Editor.resx">
-      <DependentUpon>ExportDefinition_Editor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Classes Editor\FilterItem_Editor.resx">
-      <DependentUpon>FilterItem_Editor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\EasyPicMulti.resx">
-      <DependentUpon>EasyPicMulti.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\ComboBox.resx">
-      <DependentUpon>ComboBox.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\CreativePad.resx">
-      <DependentUpon>CreativePad.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\AutoFilter.resx">
-      <DependentUpon>AutoFilter.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\ColumnEditor.resx">
-      <DependentUpon>ColumnEditor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\DatabaseHeadEditor.resx">
-      <DependentUpon>DatabaseHeadEditor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\FormulaQuickSelect.resx">
-      <DependentUpon>FormulaQuickSelect.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\Import.resx">
-      <DependentUpon>Import.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\LayoutDesigner.resx">
-      <DependentUpon>LayoutDesigner.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\SearchAndReplace.resx">
-      <DependentUpon>SearchAndReplace.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\tabAdministration.resx">
-      <DependentUpon>tabAdministration.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\EasyPic.resx">
-      <DependentUpon>EasyPic.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\FlexiControl.resx">
-      <DependentUpon>FlexiControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\FlexiControlForCell.resx">
-      <DependentUpon>FlexiControlForCell.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\SwapListBox.resx">
-      <DependentUpon>SwapListBox.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Designer Support\frmQuickPic.resx">
-      <DependentUpon>frmQuickPic.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Basics\DialogWithOkAndCancel.resx">
-      <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\EditBoxFlexiControls.resx">
-      <DependentUpon>EditBoxFlexiControls.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\EditBoxRow.resx">
-      <DependentUpon>EditBoxRow.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\frmTableView.resx">
-      <DependentUpon>frmTableView.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\InputBoxListBoxStyle.resx">
-      <DependentUpon>InputBoxListBoxStyle.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\InputBoxComboStyle.resx">
-      <DependentUpon>InputBoxComboStyle.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\Progressbar.resx">
-      <DependentUpon>Progressbar.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\InputBox.resx">
-      <DependentUpon>InputBox.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\MessageBox.resx">
-      <DependentUpon>MessageBox.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\QuickInfo.resx">
-      <DependentUpon>QuickInfo.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\FloatingInputBoxListBoxStyle.resx">
-      <DependentUpon>FloatingInputBoxListBoxStyle.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\ExportDialog.resx">
-      <DependentUpon>ExportDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Basics\FloatingForm.resx">
-      <DependentUpon>FloatingForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\TODELETE_FontSelectDialog.resx">
-      <DependentUpon>TODELETE_FontSelectDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Basics\Form.resx">
-      <DependentUpon>Form.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\TODELETE_ItemSelect.resx">
-      <DependentUpon>TODELETE_ItemSelect.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\TODELETE_PageSetupDialog.resx">
-      <DependentUpon>TODELETE_PageSetupDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Special\PadEditor.resx">
-      <DependentUpon>PadEditor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Special\PictureView.resx">
-      <DependentUpon>PictureView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Special\RelationDiagram.resx">
-      <DependentUpon>RelationDiagram.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Formula.resx">
-      <DependentUpon>Formula.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\ListBox.resx">
-      <DependentUpon>ListBox.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\ScreenShot.resx">
-      <DependentUpon>ScreenShot.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Slider.resx">
-      <DependentUpon>Slider.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Table.resx">
-      <DependentUpon>Table.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\TextBox.resx">
-      <DependentUpon>TextBox.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\ZoomPad.resx">
-      <DependentUpon>ZoomPad.cs</DependentUpon>
-    </EmbeddedResource>
+    <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj" />
+    <ProjectReference Include="..\..\BlueDatabase\BlueDatabase\BlueDatabase.csproj" />
+    <ProjectReference Include="..\..\BlueScript\BlueScript\BlueScript.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj">
-      <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
-      <Name>BlueBasics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\BlueDatabase\BlueDatabase\BlueDatabase.csproj">
-      <Project>{ce8be078-ddae-47f5-aaa9-685564b898c9}</Project>
-      <Name>BlueDatabase</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\BlueScript\BlueScript\BlueScript.csproj">
-      <Project>{3ACC6EE6-B919-4952-8502-F62BAEEEFC60}</Project>
-      <Name>BlueScript</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Forms-Common\Notification.resx">
-      <DependentUpon>Notification.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Ressourcen\Dictionary\Deutsch.MDB" />
   </ItemGroup>
   <ItemGroup>
@@ -775,5 +151,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Metafile\Nullpunkt.emf" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.2.217201">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

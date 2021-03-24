@@ -27,22 +27,22 @@ namespace BlueScript {
         public override string Syntax { get => "Min(Value1, Value2, ...)"; }
         public override string Description { get => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück."; }
 
-        public override List<string> Comand(Script s) { return new List<string>() { "min" }; }
+        public override List<string> Comand(Script s) { return new() { "min" }; }
         public override string StartSequence { get => "("; }
         public override string EndSequence { get => ")"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Number; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.Number }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.Number }; }
         public override bool EndlessArgs { get => true; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            List<Variable> attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
-            double val = double.MaxValue;
+            var val = double.MaxValue;
 
-            foreach (Variable thisval in attvar) {
+            foreach (var thisval in attvar) {
                 val = Math.Min(thisval.ValueDouble, val);
             }
 

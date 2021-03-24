@@ -121,9 +121,9 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void Hinzu_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
 
-            string ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text);
+            var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
-            CreativePad c = new CreativePad();
+            var c = new CreativePad();
 
             c.Item.Caption = ex;
             Pad.Grid = false;
@@ -150,7 +150,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (MessageBox.Show("Layout <b>'" + Pad.Item.Caption + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
 
             Pad.Item.Clear();
-            int ind = Database.LayoutIDToIndex(_LoadedLayout);
+            var ind = Database.LayoutIDToIndex(_LoadedLayout);
 
             Database.Layouts.RemoveAt(ind);
             _LoadedLayout = string.Empty;
@@ -168,7 +168,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             SaveCurrentLayout();
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
 
-            string ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, enDataFormat.Text);
+            var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, enDataFormat.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
             Pad.Item.Caption = ex;
 
@@ -195,7 +195,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (fileOrLayoutID.FileSuffix().ToUpper() == "BCR") {
                     Pad.Enabled = true;
                     _LoadedLayout = fileOrLayoutID;
-                    string l = LoadFromDisk(fileOrLayoutID);
+                    var l = LoadFromDiskLatin(fileOrLayoutID);
                     Pad.Item = new ItemCollectionPad(l, string.Empty);
                     ItemChanged();
 
@@ -203,7 +203,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     _LoadedLayout = string.Empty;
                     Pad.Item.Clear();
                     Pad.Item.SheetSizeInMM = SizeF.Empty;
-                    TextPadItem x = new TextPadItem(Pad.Item, "x", "Nicht editierbares Layout aus dem Dateisystem");
+                    var x = new TextPadItem(Pad.Item, "x", "Nicht editierbares Layout aus dem Dateisystem");
                     Pad.Item.Add(x);
                     x.Stil = Enums.PadStyles.Style_Überschrift_Haupt;
                     x.SetCoordinates(new RectangleM(0, 0, 1000, 400), true);
@@ -213,7 +213,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             } else {
                 Pad.Enabled = true;
                 _LoadedLayout = fileOrLayoutID;
-                int ind = Database.LayoutIDToIndex(_LoadedLayout);
+                var ind = Database.LayoutIDToIndex(_LoadedLayout);
                 Pad.Item = new ItemCollectionPad(Database.Layouts[ind], string.Empty);
                 ItemChanged();
             }
@@ -236,15 +236,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
 
             Pad.Grid = false;
-            string newl = Pad.Item.ToString();
+            var newl = Pad.Item.ToString();
             Pad.Grid = ckbRaster.Checked;
 
             if (_LoadedLayout.StartsWith("#")) {
-                int ind = Database.LayoutIDToIndex(_LoadedLayout);
+                var ind = Database.LayoutIDToIndex(_LoadedLayout);
                 if (Database.Layouts[ind] == newl) { return; }
                 Database.Layouts[ind] = newl;
             } else if (_LoadedLayout.FileSuffix().ToUpper() == "BCR") {
-                SaveToDisk(_LoadedLayout, newl, false);
+                SaveToDisk(_LoadedLayout, newl, false, System.Text.Encoding.UTF8);
             }
 
 
@@ -266,7 +266,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             ColumnItem c = null;
             if (Database != null) { c = Database.Column[Spaltx.Text]; }
-            BasicListItem i = Spaltx.Item[Spaltx.Text];
+            var i = Spaltx.Item[Spaltx.Text];
 
 
             if (i == null) { return; }
@@ -332,13 +332,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             ColumnItem c = null;
             if (Database != null) { c = Database.Column[Spaltx.Text]; }
-            BasicListItem i = Spaltx.Item[Spaltx.Text];
+            var i = Spaltx.Item[Spaltx.Text];
 
-            bool TextB = false;
-            bool PicB = false;
-            bool MultiL = false;
-            bool LeerM = false;
-            string Nam = "UNBEKANNT";
+            var TextB = false;
+            var PicB = false;
+            var MultiL = false;
+            var LeerM = false;
+            var Nam = "UNBEKANNT";
 
             if (c != null) {
                 Nam = c.Name;
@@ -492,12 +492,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             tabElementEigenschaften.Controls.Clear();
             if (Pad.LastClickedItem == null) { return; }
 
-            System.Collections.Generic.List<FlexiControl> Flexis = Pad.LastClickedItem.GetStyleOptions();
+            var Flexis = Pad.LastClickedItem.GetStyleOptions();
             if (Flexis.Count == 0) { return; }
 
 
-            int top = Skin.Padding;
-            foreach (FlexiControl ThisFlexi in Flexis) {
+            var top = Skin.Padding;
+            foreach (var ThisFlexi in Flexis) {
                 tabElementEigenschaften.Controls.Add(ThisFlexi);
                 ThisFlexi.DisabledReason = string.Empty;
                 ThisFlexi.Left = Skin.Padding;

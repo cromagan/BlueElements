@@ -88,7 +88,7 @@ namespace BlueBasics {
                 BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
                 Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
 
-                using (Graphics gr = Graphics.FromImage(Bitmap)) {
+                using (var gr = Graphics.FromImage(Bitmap)) {
                     gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
                 }
 
@@ -119,7 +119,7 @@ namespace BlueBasics {
 
 
         public void FromFile(string dateiName, bool setDummyPicIfFails) {
-            Bitmap x = (Bitmap)Image_FromFile(dateiName);
+            var x = (Bitmap)Image_FromFile(dateiName);
 
             if (x == null && setDummyPicIfFails) {
                 x = QuickImage.Get(enImageCode.Warnung).BMP;
@@ -140,8 +140,8 @@ namespace BlueBasics {
             if (!FileExists(dateiName)) { return null; }
 
             try {
-                FileStream fs = new FileStream(dateiName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                Image IM = Image.FromStream(fs);
+                var fs = new FileStream(dateiName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var IM = Image.FromStream(fs);
                 fs.Close();
                 fs.Dispose();
                 return IM;
@@ -162,7 +162,7 @@ namespace BlueBasics {
             if (width < 1) { width = 1; }
             if (height < 1) { height = 1; }
 
-            double Scale = Math.Min(width / (double)bmp.Width, height / (double)bmp.Height);
+            var Scale = Math.Min(width / (double)bmp.Width, height / (double)bmp.Height);
 
             switch (sizeMode) {
                 case enSizeModes.EmptySpace:
@@ -193,8 +193,8 @@ namespace BlueBasics {
                     return null;
             }
 
-            int nw = (int)(bmp.Width * Scale);
-            int nh = (int)(bmp.Height * Scale);
+            var nw = (int)(bmp.Width * Scale);
+            var nh = (int)(bmp.Height * Scale);
 
             if (sizeMode == enSizeModes.Verzerren) {
                 nw = width;
@@ -205,24 +205,24 @@ namespace BlueBasics {
 
             try {
 
-                Bitmap ImageResize = new Bitmap(width, height); // Kein Format32bppPArgb --> Fehler
-                using (Graphics GR = Graphics.FromImage(ImageResize)) {
+                var ImageResize = new Bitmap(width, height); // Kein Format32bppPArgb --> Fehler
+                using (var GR = Graphics.FromImage(ImageResize)) {
                     GR.InterpolationMode = interpolationMode;
                     GR.PixelOffsetMode = PixelOffsetMode.Half;
 
 
                     // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
                     if (bmp.Width > 20000 && nw < 4000) {
-                        Bitmap tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 4.0), (int)(bmp.Height / 4.0), null, IntPtr.Zero);
+                        var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 4.0), (int)(bmp.Height / 4.0), null, IntPtr.Zero);
                         GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                     } else if (bmp.Width > 15000 && nw < 4000) {
-                        Bitmap tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
+                        var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
                         GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                     } else if (bmp.Width > 10000 && nw < 2500) {
-                        Bitmap tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
+                        var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
                         GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                     } else if (bmp.Width > 8000 && nw < 2000) {
-                        Bitmap tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 2.5), (int)(bmp.Height / 2.5), null, IntPtr.Zero);
+                        var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 2.5), (int)(bmp.Height / 2.5), null, IntPtr.Zero);
                         GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                     } else {
                         GR.DrawImage(bmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
@@ -243,10 +243,10 @@ namespace BlueBasics {
 
         public BitmapExt Crop(Rectangle re) {
 
-            BitmapExt newBMP = new BitmapExt(re.Width, re.Height);
+            var newBMP = new BitmapExt(re.Width, re.Height);
 
 
-            using (Graphics GR = Graphics.FromImage(newBMP.Bitmap)) {
+            using (var GR = Graphics.FromImage(newBMP.Bitmap)) {
                 GR.Clear(Color.Transparent);
                 GR.PixelOffsetMode = PixelOffsetMode.Half;
                 GR.DrawImage(Bitmap, new Rectangle(0, 0, re.Width, re.Height), re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel);
@@ -266,7 +266,7 @@ namespace BlueBasics {
             if (width < 1) { width = 1; }
             if (height < 1) { height = 1; }
 
-            double Scale = Math.Min(width / (double)Width, height / (double)Height);
+            var Scale = Math.Min(width / (double)Width, height / (double)Height);
 
             switch (sizeMode) {
                 case enSizeModes.EmptySpace:
@@ -297,8 +297,8 @@ namespace BlueBasics {
                     return;
             }
 
-            int nw = (int)(Width * Scale);
-            int nh = (int)(Height * Scale);
+            var nw = (int)(Width * Scale);
+            var nh = (int)(Height * Scale);
 
             if (sizeMode == enSizeModes.Verzerren) {
                 nw = width;
@@ -309,27 +309,27 @@ namespace BlueBasics {
 
 
             try {
-                Bitmap oldBMP = Bitmap;
+                var oldBMP = Bitmap;
 
                 EmptyBitmap(width, height);
 
-                using Graphics GR = Graphics.FromImage(Bitmap);
+                using var GR = Graphics.FromImage(Bitmap);
                 GR.InterpolationMode = interpolationMode;
                 GR.PixelOffsetMode = PixelOffsetMode.Half;
 
 
                 // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
                 if (Width > 20000 && nw < 4000) {
-                    Bitmap tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 4.0), (int)(oldBMP.Height / 4.0), null, IntPtr.Zero);
+                    var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 4.0), (int)(oldBMP.Height / 4.0), null, IntPtr.Zero);
                     GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                 } else if (oldBMP.Width > 15000 && nw < 4000) {
-                    Bitmap tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 3.0), (int)(oldBMP.Height / 3.0), null, IntPtr.Zero);
+                    var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 3.0), (int)(oldBMP.Height / 3.0), null, IntPtr.Zero);
                     GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                 } else if (oldBMP.Width > 10000 && nw < 2500) {
-                    Bitmap tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 3.0), (int)(oldBMP.Height / 3.0), null, IntPtr.Zero);
+                    var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 3.0), (int)(oldBMP.Height / 3.0), null, IntPtr.Zero);
                     GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                 } else if (oldBMP.Width > 8000 && nw < 2000) {
-                    Bitmap tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 2.5), (int)(oldBMP.Height / 2.5), null, IntPtr.Zero);
+                    var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 2.5), (int)(oldBMP.Height / 2.5), null, IntPtr.Zero);
                     GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                 } else {
                     GR.DrawImage(oldBMP, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);

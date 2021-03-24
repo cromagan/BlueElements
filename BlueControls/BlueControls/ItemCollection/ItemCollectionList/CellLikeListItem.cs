@@ -124,7 +124,7 @@ namespace BlueControls.ItemCollection {
 
         public override bool FilterMatch(string FilterText) {
             if (base.FilterMatch(FilterText)) { return true; }
-            string txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, _StyleLikeThis.BildTextVerhalten, true);
+            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, _StyleLikeThis.BildTextVerhalten, true);
             return txt.ToUpper().Contains(FilterText.ToUpper());
         }
 

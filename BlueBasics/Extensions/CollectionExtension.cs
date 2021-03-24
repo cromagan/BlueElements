@@ -44,7 +44,7 @@ namespace BlueBasics {
         }
 
         public static void RemoveRange<t>(this ICollection<t> IC, List<t> remove) {
-            foreach (t thisItem in remove) {
+            foreach (var thisItem in remove) {
                 IC.Remove(thisItem);
             }
 

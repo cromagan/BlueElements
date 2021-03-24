@@ -1,0 +1,8 @@
+2021-03-24 12:30:14.905 +01:00 [INF] MSBuild registered from C:\Program Files\dotnet\sdk\5.0.201\
+2021-03-24 12:30:14.947 +01:00 [INF] Registered 1 extensions:
+	Default extension
+2021-03-24 12:30:18.750 +01:00 [INF] Initializing upgrade step Select an entrypoint
+2021-03-24 12:30:21.419 +01:00 [INF] Applying upgrade step Select an entrypoint
+2021-03-24 12:30:52.446 +01:00 [INF] Upgrade step Select an entrypoint applied successfully
+2021-03-24 12:30:57.657 +01:00 [INF] Initializing upgrade step Finalize Solution
+2021-03-24 12:31:07.736 +01:00 [INF] Saving upgrade progress file at C:\01_Data\Visual Studio GIT\BlueElements\SkinDesigner_VB\.upgrade-assistant

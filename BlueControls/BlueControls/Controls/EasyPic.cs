@@ -210,9 +210,9 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            Bitmap ix = (Bitmap)BitmapExt.Image_FromFile(Filename);
+            var ix = (Bitmap)BitmapExt.Image_FromFile(Filename);
 
-            Bitmap i = ix.Image_Clone();
+            var i = ix.Image_Clone();
 
             if (_MaxSize > 0) {
                 _Bitmap = BitmapExt.Resize(i, _MaxSize, _MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
@@ -283,7 +283,7 @@ namespace BlueControls.Controls {
         protected override void OnMouseEnter(System.EventArgs e) {
             base.OnMouseEnter(e);
 
-            MultiUserFileGiveBackEventArgs ed = new MultiUserFileGiveBackEventArgs {
+            var ed = new MultiUserFileGiveBackEventArgs {
                 File = null
             };
             OnConnectedDatabase(ed);
@@ -330,12 +330,12 @@ namespace BlueControls.Controls {
 
             switch (e.ClickedComand) {
                 case "ExF":
-                    PictureView epv = new PictureView(_Bitmap);
+                    var epv = new PictureView(_Bitmap);
                     epv.Show();
                     return true;
 
                 case "Speichern":
-                    System.Windows.Forms.FolderBrowserDialog SavOrt = new System.Windows.Forms.FolderBrowserDialog();
+                    var SavOrt = new System.Windows.Forms.FolderBrowserDialog();
                     SavOrt.ShowDialog();
 
                     if (!PathExists(SavOrt.SelectedPath)) {
@@ -343,7 +343,7 @@ namespace BlueControls.Controls {
                         return true;
                     }
 
-                    string NDT = TempFile(SavOrt.SelectedPath + "\\Bild.png");
+                    var NDT = TempFile(SavOrt.SelectedPath + "\\Bild.png");
 
                     _Bitmap.Save(NDT, ImageFormat.Png);
 
@@ -416,7 +416,7 @@ namespace BlueControls.Controls {
 
         private void AusDatenbank_Click(object sender, System.EventArgs e) {
 
-            MultiUserFileGiveBackEventArgs ed = new MultiUserFileGiveBackEventArgs {
+            var ed = new MultiUserFileGiveBackEventArgs {
                 File = null
             };
             OnConnectedDatabase(ed);
@@ -428,10 +428,10 @@ namespace BlueControls.Controls {
 
                 string n;
 
-                List<string> lLCase = DB.AllConnectedFilesLCase();
+                var lLCase = DB.AllConnectedFilesLCase();
 
 
-                using (ItemSelect x = new ItemSelect()) {
+                using (var x = new ItemSelect()) {
                     n = x.SelectOne_OfDataSystem(lLCase, DB.FileEncryptionKey);
                 }
 

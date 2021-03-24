@@ -190,7 +190,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public void Check(string[] vItems, bool Checked) {
-            for (int z = 0; z <= vItems.GetUpperBound(0); z++) {
+            for (var z = 0; z <= vItems.GetUpperBound(0); z++) {
                 if (this[vItems[z]] != null) {
                     this[vItems[z]].Checked = Checked;
                 }
@@ -198,7 +198,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public void UncheckAll() {
-            foreach (BasicListItem ThisItem in this) {
+            foreach (var ThisItem in this) {
                 if (ThisItem != null) {
                     ThisItem.Checked = false;
                 }
@@ -206,7 +206,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public void CheckAll() {
-            foreach (BasicListItem ThisItem in this) {
+            foreach (var ThisItem in this) {
                 if (ThisItem != null) {
                     ThisItem.Checked = true;
                 }
@@ -266,9 +266,9 @@ namespace BlueControls.ItemCollection {
         }
 
         public List<BasicListItem> Checked() {
-            List<BasicListItem> p = new List<BasicListItem>();
+            var p = new List<BasicListItem>();
 
-            foreach (BasicListItem ThisItem in this) {
+            foreach (var ThisItem in this) {
                 if (ThisItem != null && ThisItem.Checked) { p.Add(ThisItem); }
             }
 
@@ -281,20 +281,20 @@ namespace BlueControls.ItemCollection {
         /// <returns></returns>
         internal (int BiggestItemX, int BiggestItemY, int HeightAdded, enOrientation SenkrechtAllowed) ItemData() // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
         {
-            int w = 16;
-            int h = 0;
-            int hall = 0;
+            var w = 16;
+            var h = 0;
+            var hall = 0;
 
-            int sameh = -1;
-            enOrientation or = enOrientation.Senkrecht;
+            var sameh = -1;
+            var or = enOrientation.Senkrecht;
 
             PreComputeSize();
 
 
 
-            foreach (BasicListItem ThisItem in this) {
+            foreach (var ThisItem in this) {
                 if (ThisItem != null) {
-                    Size s = ThisItem.SizeUntouchedForListBox();
+                    var s = ThisItem.SizeUntouchedForListBox();
 
                     w = Math.Max(w, s.Width);
                     h = Math.Max(h, s.Height);
@@ -325,7 +325,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public Size CalculateColumnAndSize() {
-            (int BiggestItemX, int BiggestItemY, int HeightAdded, enOrientation SenkrechtAllowed) = ItemData();
+            (var BiggestItemX, var BiggestItemY, var HeightAdded, var SenkrechtAllowed) = ItemData();
 
             if (SenkrechtAllowed == enOrientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, BiggestItemX, HeightAdded, SenkrechtAllowed); }
 
@@ -356,7 +356,7 @@ namespace BlueControls.ItemCollection {
 
             if (BreakAfterItems < 1) { senkrechtAllowed = enOrientation.Waagerecht; }
 
-            int SliderWidth = 0;
+            var SliderWidth = 0;
             if (sliderY != null) {
                 if (BreakAfterItems < 1 && heightAdded > controlDrawingArea.Height) {
                     SliderWidth = sliderY.Width;
@@ -379,8 +379,8 @@ namespace BlueControls.ItemCollection {
                     if (BreakAfterItems < 1) {
                         colWidth = controlDrawingArea.Width - SliderWidth;
                     } else {
-                        int colCount = Count / BreakAfterItems;
-                        int r = Count % colCount;
+                        var colCount = Count / BreakAfterItems;
+                        var r = Count % colCount;
                         if (r != 0) { colCount++; }
 
                         if (controlDrawingArea.Width < 5) {
@@ -396,10 +396,10 @@ namespace BlueControls.ItemCollection {
 
 
 
-            int MaxX = int.MinValue;
-            int Maxy = int.MinValue;
+            var MaxX = int.MinValue;
+            var Maxy = int.MinValue;
 
-            int itenc = -1;
+            var itenc = -1;
 
 
 
@@ -408,14 +408,14 @@ namespace BlueControls.ItemCollection {
 
 
             BasicListItem previtem = null;
-            foreach (BasicListItem ThisItem in this) {
+            foreach (var ThisItem in this) {
                 // PaintmodX kann immer abgezogen werden, da es eh nur bei einspaltigen Listboxen verändert wird!
                 if (ThisItem != null) {
-                    int cx = 0;
-                    int cy = 0;
+                    var cx = 0;
+                    var cy = 0;
 
-                    int wi = colWidth;
-                    int he = 0;
+                    var wi = colWidth;
+                    var he = 0;
                     itenc++;
 
 
@@ -459,7 +459,7 @@ namespace BlueControls.ItemCollection {
 
             if (sliderY != null) {
 
-                bool SetTo0 = false;
+                var SetTo0 = false;
 
                 if (SliderWidth > 0) {
                     if (Maxy - controlDrawingArea.Height <= 0) {
@@ -502,14 +502,14 @@ namespace BlueControls.ItemCollection {
             if (Count < 12) { return -1; }  // <10 ergibt dividieb by zere, weil es da 0 einträge währen bei 10 Spalten
 
 
-            int dithemh = AllItemsHeight / Count;
+            var dithemh = AllItemsHeight / Count;
 
-            for (int TestSP = 10; TestSP >= 1; TestSP--) {
+            for (var TestSP = 10; TestSP >= 1; TestSP--) {
 
-                int colc = Count / TestSP;
-                int rest = Count % colc;
+                var colc = Count / TestSP;
+                var rest = Count % colc;
 
-                bool ok = true;
+                var ok = true;
 
                 if (rest > 0 && rest < colc / 2) { ok = false; }
 
@@ -537,14 +537,14 @@ namespace BlueControls.ItemCollection {
         /// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
         public void GetValuesFromEnum(System.Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis) {
 
-            Array items = System.Enum.GetValues(t);
+            var items = System.Enum.GetValues(t);
 
             Clear();
 
-            foreach (object thisItem in items) {
+            foreach (var thisItem in items) {
 
-                string te = System.Enum.GetName(t, thisItem);
-                int th = (int)thisItem;
+                var te = System.Enum.GetName(t, thisItem);
+                var th = (int)thisItem;
 
                 if (!string.IsNullOrEmpty(te)) {
                     //NewReplacer.Add(th.ToString() + "|" + te);
@@ -572,7 +572,7 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         /// <param name="readableObject"></param>
         public TextListItem Add(IReadableText readableObject) {
-            TextListItem i = Add(readableObject, string.Empty, string.Empty);
+            var i = Add(readableObject, string.Empty, string.Empty);
             i.Tag = readableObject;
             return i;
         }
@@ -583,7 +583,7 @@ namespace BlueControls.ItemCollection {
         /// <param name="readableObject"></param>
         /// <param name="internalname"></param>
         public TextListItem Add(IReadableText readableObject, string internalname) {
-            TextListItem i = Add(readableObject, internalname, string.Empty);
+            var i = Add(readableObject, internalname, string.Empty);
             i.Tag = readableObject;
             return i;
         }
@@ -594,7 +594,7 @@ namespace BlueControls.ItemCollection {
         /// <param name="internalname"></param>
         /// <param name="readableObject"></param>
         public TextListItem Add(IReadableText readableObject, string internalname, string userDefCompareKey) {
-            TextListItem i = Add(readableObject.ReadableText(), internalname, readableObject.SymbolForReadableText(), true, userDefCompareKey);
+            var i = Add(readableObject.ReadableText(), internalname, readableObject.SymbolForReadableText(), true, userDefCompareKey);
             i.Tag = readableObject;
             return i;
         }
@@ -663,7 +663,7 @@ namespace BlueControls.ItemCollection {
 
         public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) {
 
-            TextListItem x = new TextListItem(readableText, internalname, symbol, isCaption, enabled, userDefCompareKey);
+            var x = new TextListItem(readableText, internalname, symbol, isCaption, enabled, userDefCompareKey);
             Add(x);
             return x;
         }
@@ -676,7 +676,7 @@ namespace BlueControls.ItemCollection {
 
 
         public BitmapListItem Add(Bitmap bmp, string caption) {
-            BitmapListItem i = new BitmapListItem(bmp, string.Empty, caption);
+            var i = new BitmapListItem(bmp, string.Empty, caption);
             Add(i);
             return i;
 
@@ -695,7 +695,7 @@ namespace BlueControls.ItemCollection {
 
 
         public BitmapListItem Add(string filename, string internalname, string caption, string EncryptionKey) {
-            BitmapListItem i = new BitmapListItem(filename, internalname, caption, EncryptionKey);
+            var i = new BitmapListItem(filename, internalname, caption, EncryptionKey);
             Add(i);
             return i;
         }
@@ -710,7 +710,7 @@ namespace BlueControls.ItemCollection {
         public CellLikeListItem Add(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, enBildTextVerhalten bildTextverhaltent, bool enabled) {
 
 
-            CellLikeListItem i = new CellLikeListItem(internalAndReadableText, columnStyle, style, enabled, bildTextverhaltent);
+            var i = new CellLikeListItem(internalAndReadableText, columnStyle, style, enabled, bildTextverhaltent);
             Add(i);
             return i;
 
@@ -724,7 +724,7 @@ namespace BlueControls.ItemCollection {
 
 
         public LineListItem AddSeparator(string userDefCompareKey) {
-            LineListItem i = new LineListItem(string.Empty, userDefCompareKey);
+            var i = new LineListItem(string.Empty, userDefCompareKey);
             Add(i);
             return i;
         }
@@ -750,7 +750,7 @@ namespace BlueControls.ItemCollection {
 
 
         public RowFormulaListItem Add(RowItem row, string layoutID, string userDefCompareKey) {
-            RowFormulaListItem i = new RowFormulaListItem(row, layoutID, userDefCompareKey);
+            var i = new RowFormulaListItem(row, layoutID, userDefCompareKey);
             Add(i);
             return i;
         }
@@ -777,7 +777,7 @@ namespace BlueControls.ItemCollection {
 
         public TextListItem Add(enContextMenuComands comand, bool enabled = true) {
 
-            string _Internal = comand.ToString();
+            var _Internal = comand.ToString();
             QuickImage _Symbol;
             string _ReadableText;
 
@@ -881,9 +881,9 @@ namespace BlueControls.ItemCollection {
 
         public void AddRange(ColumnCollection Columns, bool OnlyExportableTextformatForLayout, bool NoCritical, bool DoCaptionSort) {
 
-            foreach (ColumnItem ThisColumnItem in Columns) {
+            foreach (var ThisColumnItem in Columns) {
                 if (ThisColumnItem != null) {
-                    bool addx = true;
+                    var addx = true;
                     if (addx && OnlyExportableTextformatForLayout && !ThisColumnItem.ExportableTextformatForLayout()) { addx = false; }
                     if (addx && NoCritical && !ThisColumnItem.Format.CanBeCheckedByRules()) { addx = false; }
                     if (addx && this[ThisColumnItem.Name] != null) { addx = false; }
@@ -892,7 +892,7 @@ namespace BlueControls.ItemCollection {
                         Add(ThisColumnItem, DoCaptionSort);
 
                         if (DoCaptionSort) {
-                            string capt = ThisColumnItem.Ueberschriften;
+                            var capt = ThisColumnItem.Ueberschriften;
 
 
                             if (this[capt] == null) {
@@ -907,18 +907,18 @@ namespace BlueControls.ItemCollection {
         internal void SetValuesTo(List<string> values, string fileEncryptionKey) {
 
 
-            List<string> _Ist = this.ToListOfString();
-            List<string> _zuviel = _Ist.Except(values).ToList();
-            List<string> _zuwenig = values.Except(_Ist).ToList();
+            var _Ist = this.ToListOfString();
+            var _zuviel = _Ist.Except(values).ToList();
+            var _zuwenig = values.Except(_Ist).ToList();
 
 
             // Zu viele im Mains aus der Liste löschen
-            foreach (string ThisString in _zuviel) {
+            foreach (var ThisString in _zuviel) {
                 if (!values.Contains(ThisString)) { Remove(ThisString); }
             }
 
             // und die Mains auffüllen
-            foreach (string ThisString in _zuwenig) {
+            foreach (var ThisString in _zuwenig) {
                 if (FileOperations.FileExists(ThisString)) {
                     if (ThisString.FileType() == enFileFormat.Image) {
                         Add(ThisString, ThisString, ThisString.FileNameWithoutSuffix(), fileEncryptionKey);
@@ -942,7 +942,7 @@ namespace BlueControls.ItemCollection {
         public void AddRange(string[] Values) {
             if (Values == null) { return; }
 
-            foreach (string thisstring in Values) {
+            foreach (var thisstring in Values) {
                 if (this[thisstring] == null) { Add(thisstring); }
             }
         }
@@ -951,7 +951,7 @@ namespace BlueControls.ItemCollection {
 
             if (Values == null) { return; }
 
-            foreach (string thisstring in Values) {
+            foreach (var thisstring in Values) {
                 if (this[thisstring] == null) { Add(thisstring, thisstring); }
             }
         }
@@ -967,7 +967,7 @@ namespace BlueControls.ItemCollection {
             }
 
 
-            foreach (string thisstring in Values) {
+            foreach (var thisstring in Values) {
                 Add(thisstring, ColumnStyle, Style, bildTextverhalten); // If Item(thisstring) Is Nothing Then Add(New CellLikeItem(thisstring, ColumnStyle))
             }
 
@@ -980,7 +980,7 @@ namespace BlueControls.ItemCollection {
                 if (ColumnStyle.Format == enDataFormat.Link_To_Filesystem && Value.FileType() == enFileFormat.Image) {
                     return Add(ColumnStyle.BestFile(Value, false), Value, Value, ColumnStyle.Database.FileEncryptionKey);
                 } else {
-                    CellLikeListItem i = new CellLikeListItem(Value, ColumnStyle, Style, true, bildTextverhalten);
+                    var i = new CellLikeListItem(Value, ColumnStyle, Style, true, bildTextverhalten);
                     Add(i);
                     return i;
 
@@ -1000,7 +1000,7 @@ namespace BlueControls.ItemCollection {
 
             if (list == null) { return; }
 
-            foreach (clsNamedBinary ThisBin in list) {
+            foreach (var ThisBin in list) {
                 Add(ThisBin);
             }
         }
@@ -1009,7 +1009,7 @@ namespace BlueControls.ItemCollection {
         public void AddRange(List<string> list) {
             if (list == null) { return; }
 
-            foreach (string thisstring in list) {
+            foreach (var thisstring in list) {
                 if (!string.IsNullOrEmpty(thisstring)) {
                     if (this[thisstring] == null) { Add(thisstring, thisstring); }
                 }
@@ -1020,19 +1020,19 @@ namespace BlueControls.ItemCollection {
 
         public void AddLayoutsOf(Database vLayoutDatabase, bool vDoDiscLayouts, string vAdditionalLayoutPath) {
 
-            for (int z = 0; z < vLayoutDatabase.Layouts.Count; z++) {
-                ItemCollectionPad p = new ItemCollectionPad(vLayoutDatabase.Layouts[z], string.Empty);
+            for (var z = 0; z < vLayoutDatabase.Layouts.Count; z++) {
+                var p = new ItemCollectionPad(vLayoutDatabase.Layouts[z], string.Empty);
                 Add(p.Caption, p.ID, enImageCode.Stern);
             }
 
             if (!vDoDiscLayouts) { return; }
 
-            int du = 0;
+            var du = 0;
 
             do {
                 if (PathExists(vAdditionalLayoutPath)) {
-                    string[] e = Directory.GetFiles(vAdditionalLayoutPath);
-                    foreach (string ThisFile in e) {
+                    var e = Directory.GetFiles(vAdditionalLayoutPath);
+                    foreach (var ThisFile in e) {
 
 
                         if (ThisFile.FilePath() == vLayoutDatabase.DefaultLayoutPath()) { ThisFile.TrimStart(vLayoutDatabase.DefaultLayoutPath()); }
@@ -1056,8 +1056,8 @@ namespace BlueControls.ItemCollection {
 
 
         public ListExt<clsNamedBinary> GetNamedBinaries() {
-            ListExt<clsNamedBinary> l = new ListExt<clsNamedBinary>();
-            foreach (BasicListItem thisItem in this) {
+            var l = new ListExt<clsNamedBinary>();
+            foreach (var thisItem in this) {
                 switch (thisItem) {
                     case BitmapListItem BI:
                         l.Add(new clsNamedBinary(BI.Caption, BI.Bitmap));
@@ -1078,7 +1078,7 @@ namespace BlueControls.ItemCollection {
         public BasicListItem this[int X, int Y] {
             get {
 
-                foreach (BasicListItem ThisItem in this) {
+                foreach (var ThisItem in this) {
                     if (ThisItem != null && ThisItem.Contains(X, Y)) { return ThisItem; }
                 }
 
@@ -1095,7 +1095,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public void RemoveRange(List<string> Internal) {
-            foreach (string item in Internal) {
+            foreach (var item in Internal) {
                 Remove(item);
             }
         }
@@ -1108,7 +1108,7 @@ namespace BlueControls.ItemCollection {
 
                     if (string.IsNullOrEmpty(Internal)) { return null; }
 
-                    foreach (BasicListItem ThisItem in this) {
+                    foreach (var ThisItem in this) {
                         if (ThisItem != null && Internal.ToUpper() == ThisItem.Internal.ToUpper()) { return ThisItem; }
                     }
                     return null;
@@ -1123,9 +1123,9 @@ namespace BlueControls.ItemCollection {
         private void ValidateCheckStates(BasicListItem ThisMustBeChecked) {
 
             _Validating = true;
-            bool SomethingDonex = false;
+            var SomethingDonex = false;
 
-            bool Done = false;
+            var Done = false;
             BasicListItem F = null;
 
             switch (_CheckBehavior) {
@@ -1138,7 +1138,7 @@ namespace BlueControls.ItemCollection {
 
                 case enCheckBehavior.SingleSelection:
                 case enCheckBehavior.AlwaysSingleSelection:
-                    foreach (BasicListItem ThisItem in this) {
+                    foreach (var ThisItem in this) {
                         if (ThisItem != null) {
 
                             if (ThisMustBeChecked == null) {
@@ -1183,12 +1183,12 @@ namespace BlueControls.ItemCollection {
 
         public object Clone() {
 
-            ItemCollectionList x = new ItemCollectionList(_Appearance) {
+            var x = new ItemCollectionList(_Appearance) {
                 CheckBehavior = _CheckBehavior
             };
 
 
-            foreach (BasicListItem ThisItem in this) {
+            foreach (var ThisItem in this) {
                 ThisItem.CloneToNewCollection(x);
             }
             return x;
@@ -1197,8 +1197,8 @@ namespace BlueControls.ItemCollection {
 
         public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem checkedItemsAtRow, enShortenStyle style, int maxItems) {
 
-            List<string> Marked = new List<string>();
-            List<string> l = new List<string>();
+            var Marked = new List<string>();
+            var l = new List<string>();
 
             e.Clear();
 
@@ -1207,8 +1207,8 @@ namespace BlueControls.ItemCollection {
             l.AddRange(column.DropDownItems);
             if (column.DropdownWerteAndererZellenAnzeigen) {
                 if (column.DropdownKey >= 0 && checkedItemsAtRow != null) {
-                    ColumnItem cc = column.Database.Column.SearchByKey(column.DropdownKey);
-                    FilterCollection F = new FilterCollection(column.Database)
+                    var cc = column.Database.Column.SearchByKey(column.DropdownKey);
+                    var F = new FilterCollection(column.Database)
                     {
                         new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc))
                     };
@@ -1226,9 +1226,9 @@ namespace BlueControls.ItemCollection {
                     break;
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
-                    Database DB = column.LinkedDatabase();
+                    var DB = column.LinkedDatabase();
                     if (DB != null && !string.IsNullOrEmpty(column.LinkedKeyKennung)) {
-                        foreach (ColumnItem ThisColumn in DB.Column) {
+                        foreach (var ThisColumn in DB.Column) {
                             if (ThisColumn.Name.ToLower().StartsWith(column.LinkedKeyKennung.ToLower())) {
                                 l.Add(ThisColumn.Key.ToString());
                             }
@@ -1240,7 +1240,7 @@ namespace BlueControls.ItemCollection {
                     break;
 
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                    Database DB2 = column.LinkedDatabase();
+                    var DB2 = column.LinkedDatabase();
                     l.AddRange(DB2.Column[0].Contents(null));
                     if (l.Count == 0) {
                         Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", enImageCode.Information);
@@ -1273,7 +1273,7 @@ namespace BlueControls.ItemCollection {
 
 
             if (checkedItemsAtRow != null) {
-                foreach (string t in Marked) {
+                foreach (var t in Marked) {
                     if (e[t] is BasicListItem bli) { bli.Checked = true; }
                 }
             }

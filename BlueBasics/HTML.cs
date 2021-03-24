@@ -80,7 +80,7 @@ namespace BlueBasics {
         }
 
         public void Save(string filename, bool executeafter) {
-            Code.Save(filename, executeafter);
+            Code.Save(filename, executeafter, System.Text.Encoding.UTF8);
         }
 
 
@@ -135,7 +135,7 @@ namespace BlueBasics {
         public void ListAdd(List<string> items) {
             Code.Add("<ul>");
 
-            foreach (string thisitem in items) {
+            foreach (var thisitem in items) {
                 Code.Add("  <li>" + thisitem + "</li>");
 
             }

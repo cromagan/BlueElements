@@ -71,7 +71,7 @@ namespace BluePaint {
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
             if (OriginalPic == null) { return; }
 
-            Pen Pen_Blau = new Pen(Color.FromArgb(150, 0, 0, 255));
+            var Pen_Blau = new Pen(Color.FromArgb(150, 0, 0, 255));
 
 
             DrawZusatz(e, OriginalPic);
@@ -95,7 +95,7 @@ namespace BluePaint {
         }
 
         public void DrawZusatz(AdditionalDrawing e, Bitmap OriginalPic) {
-            SolidBrush Brush_Blau = new SolidBrush(Color.FromArgb(120, 0, 0, 255));
+            var Brush_Blau = new SolidBrush(Color.FromArgb(120, 0, 0, 255));
 
 
             if (Links.Value != 0) {
@@ -117,9 +117,9 @@ namespace BluePaint {
 
 
         private void ZuschnittOK_Click(object sender, System.EventArgs e) {
-            Bitmap _Pic = OnNeedCurrentPic();
+            var _Pic = OnNeedCurrentPic();
 
-            Bitmap _BMP2 = _Pic.Crop((int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
+            var _BMP2 = _Pic.Crop((int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
 
 
             OnOverridePic(_BMP2);
@@ -137,10 +137,10 @@ namespace BluePaint {
 
         private void AutoZ_Click(object sender, System.EventArgs e) {
 
-            Bitmap _Pic = base.OnNeedCurrentPic();
+            var _Pic = base.OnNeedCurrentPic();
             OnZoomFit();
 
-            System.Windows.Forms.Padding pa = _Pic.GetAutoValuesForCrop(0.9);
+            var pa = _Pic.GetAutoValuesForCrop(0.9);
 
             Links.Value = pa.Left;
             Recht.Value = pa.Right;
@@ -166,7 +166,7 @@ namespace BluePaint {
         }
 
         public void CheckMinMax() {
-            Bitmap _Pic = OnNeedCurrentPic();
+            var _Pic = OnNeedCurrentPic();
 
             if (_Pic == null) { return; }
             Links.Maximum = _Pic.Width - 1;
@@ -180,7 +180,7 @@ namespace BluePaint {
         }
 
         public override void ExcuteCommand(string command) {
-            string[] c = command.SplitBy(";");
+            var c = command.SplitBy(";");
 
             if (c[0] == "AutoZuschnitt") {
                 CheckMinMax();

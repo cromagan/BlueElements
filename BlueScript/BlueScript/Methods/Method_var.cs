@@ -26,33 +26,33 @@ namespace BlueScript {
 
         public override string Syntax { get => "var VariablenName = Wert;"; }
         public override string Description { get => "Erstellt eine neue Variable, der Typ wird automtisch bestimmt."; }
-        public override List<string> Comand(Script s) { return new List<string>() { "var" }; }
+        public override List<string> Comand(Script s) { return new() { "var" }; }
         public override string StartSequence { get => ""; }
         public override string EndSequence { get => ";"; }
         public override bool GetCodeBlockAfter { get => false; }
         public override enVariableDataType Returns { get => enVariableDataType.Null; }
-        public override List<enVariableDataType> Args { get => new List<enVariableDataType>() { enVariableDataType.BoolNumString }; }
+        public override List<enVariableDataType> Args { get => new() { enVariableDataType.BoolNumString }; }
         public override bool EndlessArgs { get => false; }
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            string[] bs = infos.AttributText.SplitBy("=");
+            var bs = infos.AttributText.SplitBy("=");
 
             if (bs.GetUpperBound(0) != 1) { return new strDoItFeedback("Fehler mit = - Zeichen"); }
 
             if (!Variable.IsValidName(bs[0])) { return new strDoItFeedback(bs[0] + "ist kein gültiger Variablen-Name"); }
 
-            Variable v = s.Variablen.Get(bs[0]);
+            var v = s.Variablen.Get(bs[0]);
 
             if (v != null) { return new strDoItFeedback("Variable " + bs[0] + " ist bereits vorhanden."); }
 
             s.Variablen.Add(new Variable(bs[0]));
 
 
-            Method_BerechneVariable r = new Method_BerechneVariable();
-            strCanDoFeedback f = r.CanDo(infos.AttributText + ";", 0, false, s);
+            var r = new Method_BerechneVariable();
+            var f = r.CanDo(infos.AttributText + ";", 0, false, s);
 
             if (!string.IsNullOrEmpty(f.ErrorMessage)) {
 
@@ -64,7 +64,7 @@ namespace BlueScript {
             }
 
 
-            strDoItFeedback f2 = r.DoIt(f, s);
+            var f2 = r.DoIt(f, s);
 
             if (!string.IsNullOrEmpty(f2.ErrorMessage)) {
                 return new strDoItFeedback("Berechung fehlerhaft: " + f2.ErrorMessage);

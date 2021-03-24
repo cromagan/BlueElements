@@ -64,12 +64,12 @@ namespace BlueControls.ItemCollection {
         /// <summary>
         /// Alle Punkte. Im Regelfall nach Wichtigkeit aufsteigend sortiert
         /// </summary>
-        public readonly ListExt<PointM> AllPoints = new ListExt<PointM>();
+        public readonly ListExt<PointM> AllPoints = new();
 
         /// <summary>
         /// Alle Beziehungen. Im Regelfall nach Wichtigkeit aufsteigens sortiert
         /// </summary>
-        public readonly ListExt<clsPointRelation> AllRelations = new ListExt<clsPointRelation>();
+        public readonly ListExt<clsPointRelation> AllRelations = new();
 
 
         #endregion
@@ -164,7 +164,7 @@ namespace BlueControls.ItemCollection {
 
 
 
-            int Count = 0;
+            var Count = 0;
             do {
                 Count++;
                 PerformAllRelations();
@@ -191,7 +191,7 @@ namespace BlueControls.ItemCollection {
 
             ID = useThisID;
 
-            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
+            foreach (var pair in ToParse.GetAllTags()) {
 
                 switch (pair.Key.ToLower()) {
                     case "sheetsize":
@@ -289,7 +289,7 @@ namespace BlueControls.ItemCollection {
         }
 
         private void ParseItems(string ToParse) {
-            foreach (KeyValuePair<string, string> pair in ToParse.GetAllTags()) {
+            foreach (var pair in ToParse.GetAllTags()) {
 
                 switch (pair.Key.ToLower()) {
                     //case "sheetsize":
@@ -386,7 +386,7 @@ namespace BlueControls.ItemCollection {
         internal void InDenVordergrund(BasicPadItem ThisItem) {
             if (IndexOf(ThisItem) == Count - 1) { return; }
 
-            string g1 = ThisItem.Gruppenzugehörigkeit;
+            var g1 = ThisItem.Gruppenzugehörigkeit;
             ThisItem.Gruppenzugehörigkeit = string.Empty;
 
             Remove(ThisItem);
@@ -399,7 +399,7 @@ namespace BlueControls.ItemCollection {
         internal void InDenHintergrund(BasicPadItem ThisItem) {
             if (IndexOf(ThisItem) == 0) { return; }
 
-            string g1 = ThisItem.Gruppenzugehörigkeit;
+            var g1 = ThisItem.Gruppenzugehörigkeit;
             ThisItem.Gruppenzugehörigkeit = string.Empty;
 
             Remove(ThisItem);
@@ -420,10 +420,10 @@ namespace BlueControls.ItemCollection {
 
 
         public void Swap(BasicPadItem Nr1, BasicPadItem Nr2) {
-            string g1 = Nr1.Gruppenzugehörigkeit;
+            var g1 = Nr1.Gruppenzugehörigkeit;
             Nr1.Gruppenzugehörigkeit = string.Empty;
 
-            string g2 = Nr2.Gruppenzugehörigkeit;
+            var g2 = Nr2.Gruppenzugehörigkeit;
             Nr2.Gruppenzugehörigkeit = string.Empty;
 
             Swap(IndexOf(Nr1), IndexOf(Nr2));
@@ -442,7 +442,7 @@ namespace BlueControls.ItemCollection {
                     return null;
                 }
 
-                foreach (BasicPadItem ThisItem in this) {
+                foreach (var ThisItem in this) {
                     if (ThisItem != null) {
                         if (Internal.ToUpper() == ThisItem.Internal.ToUpper()) {
                             return ThisItem;
@@ -460,9 +460,9 @@ namespace BlueControls.ItemCollection {
 
         public List<BasicPadItem> this[Point p] {
             get {
-                List<BasicPadItem> l = new List<BasicPadItem>();
+                var l = new List<BasicPadItem>();
 
-                foreach (BasicPadItem ThisItem in this) {
+                foreach (var ThisItem in this) {
                     if (ThisItem != null && ThisItem.Contains(p, 1)) {
                         l.Add(ThisItem);
                     }
@@ -501,9 +501,9 @@ namespace BlueControls.ItemCollection {
 
 
         internal bool RenameColumn(string oldName, ColumnItem newName) {
-            bool did = false;
+            var did = false;
 
-            foreach (BasicPadItem thisItem in this) {
+            foreach (var thisItem in this) {
                 if (thisItem is ICanHaveColumnVariables variables) {
                     if (variables.RenameColumn(oldName, newName)) { did = true; }
                 }
@@ -560,7 +560,7 @@ namespace BlueControls.ItemCollection {
 
         private void Item_PointOrRelationsChanged(object sender, System.EventArgs e) {
 
-            BasicPadItem ni = (BasicPadItem)sender;
+            var ni = (BasicPadItem)sender;
 
             InvalidateOrder();
 
@@ -574,7 +574,7 @@ namespace BlueControls.ItemCollection {
         public void RemoveInvalidPoints() {
 
             /// Zuerst die Punkte
-            foreach (PointM ThisPoint in AllPoints) {
+            foreach (var ThisPoint in AllPoints) {
 
                 if (ThisPoint != null) {
 
@@ -603,8 +603,8 @@ namespace BlueControls.ItemCollection {
         }
 
         public bool RemoveInvalidRelations() {
-            int z = -1;
-            bool SomethingChanged = false;
+            var z = -1;
+            var SomethingChanged = false;
 
 
             do {
@@ -628,9 +628,9 @@ namespace BlueControls.ItemCollection {
         /// <returns></returns>
         public int NotPerforming(bool Strongmode) {
 
-            int f = 0;
+            var f = 0;
 
-            foreach (clsPointRelation ThisRelation in AllRelations) {
+            foreach (var ThisRelation in AllRelations) {
                 if (!ThisRelation.Performs(Strongmode)) { f++; }
             }
 
@@ -645,7 +645,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public void DesignOrStyleChanged() {
-            foreach (BasicPadItem thisItem in this) {
+            foreach (var thisItem in this) {
                 thisItem?.DesignOrStyleChanged();
             }
             OnDoInvalidate();
@@ -664,7 +664,7 @@ namespace BlueControls.ItemCollection {
             if (string.IsNullOrEmpty(item.Gruppenzugehörigkeit)) { return; }
 
 
-            foreach (BasicPadItem ThisToo in this) {
+            foreach (var ThisToo in this) {
                 if (item.Gruppenzugehörigkeit.ToLower() == ThisToo.Gruppenzugehörigkeit?.ToLower()) {
                     Remove(ThisToo);
                     return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
@@ -674,19 +674,19 @@ namespace BlueControls.ItemCollection {
 
 
         public RectangleM MaximumBounds(List<BasicPadItem> ZoomItems) {
-            decimal x1 = decimal.MaxValue;
-            decimal y1 = decimal.MaxValue;
-            decimal x2 = decimal.MinValue;
-            decimal y2 = decimal.MinValue;
+            var x1 = decimal.MaxValue;
+            var y1 = decimal.MaxValue;
+            var x2 = decimal.MinValue;
+            var y2 = decimal.MinValue;
 
-            bool Done = false;
+            var Done = false;
 
 
-            foreach (BasicPadItem ThisItem in this) {
+            foreach (var ThisItem in this) {
                 if (ThisItem != null) {
                     if (ZoomItems == null || ZoomItems.Contains(ThisItem)) {
 
-                        RectangleM UA = ThisItem.ZoomToArea();
+                        var UA = ThisItem.ZoomToArea();
 
                         x1 = Math.Min(x1, UA.Left);
                         y1 = Math.Min(y1, UA.Top);
@@ -747,12 +747,12 @@ namespace BlueControls.ItemCollection {
                 AllPoints.AddIfNotExists(P_rLU);
             }
 
-            decimal SSW = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI), 1);
-            decimal SSH = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Height, DPI), 1);
-            decimal rr = Math.Round(modConverter.mmToPixel(_RandinMM.Right, DPI), 1);
-            decimal rl = Math.Round(modConverter.mmToPixel(_RandinMM.Left, DPI), 1);
-            decimal ro = Math.Round(modConverter.mmToPixel(_RandinMM.Top, DPI), 1);
-            decimal ru = Math.Round(modConverter.mmToPixel(_RandinMM.Bottom, DPI), 1);
+            var SSW = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI), 1);
+            var SSH = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Height, DPI), 1);
+            var rr = Math.Round(modConverter.mmToPixel(_RandinMM.Right, DPI), 1);
+            var rl = Math.Round(modConverter.mmToPixel(_RandinMM.Left, DPI), 1);
+            var ro = Math.Round(modConverter.mmToPixel(_RandinMM.Top, DPI), 1);
+            var ru = Math.Round(modConverter.mmToPixel(_RandinMM.Bottom, DPI), 1);
 
             P_rLO.SetTo(rl, ro);
             P_rRO.SetTo(SSW - rr, ro);
@@ -789,12 +789,12 @@ namespace BlueControls.ItemCollection {
 
         public List<PointM> ConnectsWith(PointM Point, enXY toCheck, bool IgnoreInternals) {
 
-            List<PointM> Points = new List<PointM>
+            var Points = new List<PointM>
             {
                 Point
             };
 
-            int Ist = -1;
+            var Ist = -1;
 
             // Nur, wenn eine Beziehung gut ist, kann man mit sicherheit sagen, daß das zusammenhängt. Deswegen auch ein Performs test
 
@@ -803,7 +803,7 @@ namespace BlueControls.ItemCollection {
                 if (Ist >= Points.Count) { break; }
 
 
-                foreach (clsPointRelation ThisRelation in AllRelations) {
+                foreach (var ThisRelation in AllRelations) {
                     if (ThisRelation != null && ThisRelation.Points.Contains(Points[Ist]) && ThisRelation.Performs(false) && ThisRelation.Connects().HasFlag(toCheck)) {
 
 
@@ -829,7 +829,7 @@ namespace BlueControls.ItemCollection {
 
             PerformAllRelations();
 
-            string t = "{";
+            var t = "{";
 
 
             if (!string.IsNullOrEmpty(ID)) { t = t + "ID=" + ID.ToNonCritical() + ", "; }
@@ -855,7 +855,7 @@ namespace BlueControls.ItemCollection {
             t += "Items={";
 
 
-            foreach (BasicPadItem Thisitem in this) {
+            foreach (var Thisitem in this) {
                 if (Thisitem != null) {
                     t = t + "Item=" + Thisitem.ToString() + ", ";
                 }
@@ -874,7 +874,7 @@ namespace BlueControls.ItemCollection {
 
             //Dim One As Boolean
 
-            foreach (clsPointRelation ThisRelation in AllRelations) {
+            foreach (var ThisRelation in AllRelations) {
                 if (ThisRelation != null) {
                     if (!ThisRelation.IsInternal() && ThisRelation.IsOk(false)) {
                         t = t + "Relation=" + ThisRelation + ", ";
@@ -890,7 +890,7 @@ namespace BlueControls.ItemCollection {
 
 
         public Bitmap ToBitmap(decimal Scale) {
-            RectangleM r = MaxBounds(null);
+            var r = MaxBounds(null);
             if (r.Width == 0) { return null; }
 
             modAllgemein.CollectGarbage();
@@ -909,10 +909,10 @@ namespace BlueControls.ItemCollection {
 
 
 
-            Bitmap I = new Bitmap((int)(r.Width * Scale), (int)(r.Height * Scale));
+            var I = new Bitmap((int)(r.Width * Scale), (int)(r.Height * Scale));
 
 
-            using (Graphics gr = Graphics.FromImage(I)) {
+            using (var gr = Graphics.FromImage(I)) {
                 gr.Clear(Color.White);
 
                 if (!Draw(gr, Scale, r.Left * Scale, r.Top * Scale, Size.Empty, true, null)) {
@@ -930,7 +930,7 @@ namespace BlueControls.ItemCollection {
                 if (SheetStyle == null || SheetStyleScale < 0.1m) { return true; }
 
 
-                foreach (BasicPadItem thisItem in this) {
+                foreach (var thisItem in this) {
                     if (thisItem != null) {
                         gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
 
@@ -964,12 +964,12 @@ namespace BlueControls.ItemCollection {
 
             if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
 
-                decimal X1 = Math.Min(r.Left, 0);
-                decimal y1 = Math.Min(r.Top, 0);
+                var X1 = Math.Min(r.Left, 0);
+                var y1 = Math.Min(r.Top, 0);
 
 
-                decimal x2 = Math.Max(r.Right, modConverter.mmToPixel((decimal)SheetSizeInMM.Width, ItemCollectionPad.DPI));
-                decimal y2 = Math.Max(r.Bottom, modConverter.mmToPixel((decimal)SheetSizeInMM.Height, ItemCollectionPad.DPI));
+                var x2 = Math.Max(r.Right, modConverter.mmToPixel((decimal)SheetSizeInMM.Width, ItemCollectionPad.DPI));
+                var y2 = Math.Max(r.Bottom, modConverter.mmToPixel((decimal)SheetSizeInMM.Height, ItemCollectionPad.DPI));
 
                 return new RectangleM(X1, y1, x2 - X1, y2 - y1);
             }
@@ -982,9 +982,9 @@ namespace BlueControls.ItemCollection {
 
         public bool ParseVariable(string VariableName, enValueType ValueType, string Value) {
 
-            bool did = false;
+            var did = false;
 
-            foreach (BasicPadItem thisItem in this) {
+            foreach (var thisItem in this) {
                 if (thisItem is ICanHaveColumnVariables variables) {
                     if (variables.ReplaceVariable(VariableName, ValueType, Value)) { did = true; }
                 }
@@ -999,7 +999,7 @@ namespace BlueControls.ItemCollection {
 
             if (row != null) {
 
-                foreach (ColumnItem thiscolumnitem in row.Database.Column) {
+                foreach (var thiscolumnitem in row.Database.Column) {
                     if (thiscolumnitem != null) {
                         ParseVariable(thiscolumnitem.Name, thiscolumnitem, row);
                     }
@@ -1025,13 +1025,13 @@ namespace BlueControls.ItemCollection {
                 case enDataFormat.Link_To_Filesystem:
 
                     if (!Column.MultiLine) {
-                        string f = Column.BestFile(Row.CellGetString(Column), false);
+                        var f = Column.BestFile(Row.CellGetString(Column), false);
 
                         if (FileExists(f)) {
                             if (Column.MultiLine) {
                                 ParseVariable(VariableName, enValueType.Text, f);
                             } else {
-                                string x = modConverter.FileToString(f);
+                                var x = modConverter.FileToString(f);
                                 ParseVariable(VariableName, enValueType.BinaryImage, x);
                             }
                         }
@@ -1054,9 +1054,9 @@ namespace BlueControls.ItemCollection {
 
 
         public bool ParseSpecialCodes() {
-            bool did = false;
+            var did = false;
 
-            foreach (BasicPadItem thisItem in this) {
+            foreach (var thisItem in this) {
                 if (thisItem is ICanHaveColumnVariables variables) {
                     if (variables.DoSpecialCodes()) { did = true; }
                 }
@@ -1068,9 +1068,9 @@ namespace BlueControls.ItemCollection {
         }
 
         public bool ResetVariables() {
-            bool did = false;
+            var did = false;
 
-            foreach (BasicPadItem thisItem in this) {
+            foreach (var thisItem in this) {
                 if (thisItem is ICanHaveColumnVariables variables) {
                     if (variables.ResetVariables()) { did = true; }
                 }
@@ -1116,7 +1116,7 @@ namespace BlueControls.ItemCollection {
 
         public void PerformAllRelations() {
             ComputeOrders(null);
-            foreach (clsPointRelation ThisRelation in AllRelations) {
+            foreach (var ThisRelation in AllRelations) {
                 ThisRelation.Perform(AllPoints);
             }
         }
@@ -1141,17 +1141,17 @@ namespace BlueControls.ItemCollection {
             if (NotPerforming(true) > 0) { return; }
 
 
-            List<PointM> Cb = new List<PointM>();
-            List<clsPointRelation> DobR = new List<clsPointRelation>();
+            var Cb = new List<PointM>();
+            var DobR = new List<clsPointRelation>();
 
 
-            foreach (PointM thisPoint in AllPoints) {
-                List<PointM> CX = ConnectsWith(thisPoint, enXY.X, true);
-                List<PointM> CY = ConnectsWith(thisPoint, enXY.Y, true);
+            foreach (var thisPoint in AllPoints) {
+                var CX = ConnectsWith(thisPoint, enXY.X, true);
+                var CY = ConnectsWith(thisPoint, enXY.Y, true);
 
                 // Ermitteln, die auf X und Y miteinander verbunden sind
                 Cb.Clear();
-                foreach (PointM thisPoint2 in CX) {
+                foreach (var thisPoint2 in CX) {
                     if (CY.Contains(thisPoint2)) { Cb.Add(thisPoint2); }
                 }
 
@@ -1159,7 +1159,7 @@ namespace BlueControls.ItemCollection {
                 if (Cb.Count > 1) {
 
                     DobR.Clear();
-                    foreach (clsPointRelation ThisRelation in AllRelations) {
+                    foreach (var ThisRelation in AllRelations) {
 
 
                         // Wenn Punkte nicht direct verbunden sind, aber trotzdem Fix zueinander, die Beziehung optimieren
@@ -1184,10 +1184,10 @@ namespace BlueControls.ItemCollection {
 
                     // Und nun beziehungen löschen, die auf gleiche Objecte zugreifen
                     if (DobR.Count > 1) {
-                        foreach (clsPointRelation R1 in DobR) {
+                        foreach (var R1 in DobR) {
                             // Mindestens eine muss external sein!!!
                             if (!R1.IsInternal()) {
-                                foreach (clsPointRelation R2 in DobR) {
+                                foreach (var R2 in DobR) {
                                     if (!R1.SinngemäßIdenitisch(R2)) {
 
                                         if (R1.Points[0].Parent == R2.Points[0].Parent && R1.Points[1].Parent == R2.Points[1].Parent) {
@@ -1212,9 +1212,9 @@ namespace BlueControls.ItemCollection {
 
 
             // und nun direct nach doppelten suchen
-            foreach (clsPointRelation r1 in AllRelations) {
+            foreach (var r1 in AllRelations) {
                 if (!r1.IsInternal()) {
-                    foreach (clsPointRelation r2 in AllRelations) {
+                    foreach (var r2 in AllRelations) {
                         if (!r1.SinngemäßIdenitisch(r2) && !r2.IsInternal()) {
                             if (r1.SinngemäßIdenitisch(r2)) {
                                 AllRelations.Remove(r2);
@@ -1251,7 +1251,7 @@ namespace BlueControls.ItemCollection {
         }
         public PointM Getbetterpoint(double X, double Y, PointM notPoint, bool MustUsableForAutoRelation) {
 
-            foreach (PointM thispoint in AllPoints) {
+            foreach (var thispoint in AllPoints) {
 
                 if (thispoint != null) {
 
@@ -1297,11 +1297,11 @@ namespace BlueControls.ItemCollection {
 
 
         private void ComputePointOrder(List<PointM> Sel_P) {
-            int Modus = 0;
-            bool done = false;
+            var Modus = 0;
+            var done = false;
 
             #region Punkte vorbereiten
-            List<PointM> _Points = new List<PointM>();
+            var _Points = new List<PointM>();
             _Points.AddRange(AllPoints);
 
             AllPoints.Clear();
@@ -1309,12 +1309,12 @@ namespace BlueControls.ItemCollection {
 
             #region Beziehungen ermitteln, wie sie was verbinden
 
-            List<clsPointRelation> RelationNone = new List<clsPointRelation>();
-            List<clsPointRelation> RelationY = new List<clsPointRelation>();
-            List<clsPointRelation> RelationX = new List<clsPointRelation>();
-            List<clsPointRelation> RelationXY = new List<clsPointRelation>();
+            var RelationNone = new List<clsPointRelation>();
+            var RelationY = new List<clsPointRelation>();
+            var RelationX = new List<clsPointRelation>();
+            var RelationXY = new List<clsPointRelation>();
 
-            foreach (clsPointRelation thisRelation in AllRelations) {
+            foreach (var thisRelation in AllRelations) {
                 switch (thisRelation.Connects()) {
                     case enXY.XY:
                         RelationXY.Add(thisRelation);
@@ -1337,10 +1337,10 @@ namespace BlueControls.ItemCollection {
 
             do {
 
-                int z = 0;
+                var z = 0;
                 while (z < _Points.Count) {
 
-                    PointM Thispoint = _Points[z];
+                    var Thispoint = _Points[z];
 
                     switch (Modus) {
                         case 0: // Unbewegliche Punkte hinzufügen
@@ -1348,7 +1348,7 @@ namespace BlueControls.ItemCollection {
                             break;
 
                         case 1: // Verbundene Punkte, die durch verbindungen X und Y Fix sind
-                            foreach (clsPointRelation thisRelation in RelationXY) {
+                            foreach (var thisRelation in RelationXY) {
                                 if (thisRelation.NeedCount(Thispoint, AllPoints)) {
                                     AllPoints.Add(Thispoint);
                                     AllRelations.Add(thisRelation);
@@ -1366,7 +1366,7 @@ namespace BlueControls.ItemCollection {
                         //    break;
 
                         case 2: // Fixe Y-Punkte hinzufügen
-                            foreach (clsPointRelation thisRelation in RelationY) {
+                            foreach (var thisRelation in RelationY) {
                                 if (thisRelation.NeedCount(Thispoint, AllPoints)) {
                                     AllPoints.Add(Thispoint);
                                     AllRelations.Add(thisRelation);
@@ -1382,7 +1382,7 @@ namespace BlueControls.ItemCollection {
                         //    break;
 
                         case 3: // Fixe X-Punkte hinzufügen
-                            foreach (clsPointRelation thisRelation in RelationX) {
+                            foreach (var thisRelation in RelationX) {
                                 if (thisRelation.NeedCount(Thispoint, AllPoints)) {
                                     AllPoints.Add(Thispoint);
                                     AllRelations.Add(thisRelation);
@@ -1394,7 +1394,7 @@ namespace BlueControls.ItemCollection {
 
                         case 4: // Punkte hinzufügen, die in einer Beziehung sind UND ein Punkt bereits einen Order hat
 
-                            foreach (clsPointRelation thisRelation in RelationNone) {
+                            foreach (var thisRelation in RelationNone) {
                                 if (thisRelation.NeedCount(Thispoint, AllPoints)) {
                                     AllPoints.Add(Thispoint);
                                     AllRelations.Add(thisRelation);
@@ -1506,7 +1506,7 @@ namespace BlueControls.ItemCollection {
 
         public void SaveAsBitmap(string Filename) {
 
-            Bitmap i = ToBitmap(1);
+            var i = ToBitmap(1);
 
             if (i == null) { return; }
 
