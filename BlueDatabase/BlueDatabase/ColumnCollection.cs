@@ -407,7 +407,7 @@ namespace BlueDatabase {
             var c = Add(string.Empty);
 
             c.Caption = Source.Caption;
-            c.CaptionBitmap = Source.CaptionBitmap;
+            //c.CaptionBitmap = Source.CaptionBitmap;
 
             c.Format = Source.Format;
             c.LineLeft = Source.LineLeft;

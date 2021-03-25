@@ -44,7 +44,7 @@ namespace BlueDatabase {
         private string _Name;
         private bool _MultiLine;
         private string _Caption;
-        private Bitmap _CaptionBitmap;
+        //private Bitmap _CaptionBitmap;
         private string _QuickInfo;
         //private string _Intelligenter_Multifilter;
         private Point _DauerFilterPos;
@@ -174,7 +174,7 @@ namespace BlueDatabase {
 
             _Name = Database.Column.Freename(string.Empty);
             _Caption = string.Empty;
-            _CaptionBitmap = null;
+            //_CaptionBitmap = null;
 
             _Format = enDataFormat.Bit;
             _LineLeft = enColumnLineStyle.Dünn;
@@ -483,25 +483,25 @@ namespace BlueDatabase {
 
 
 
-        public Bitmap CaptionBitmap {
-            get {
-                return _CaptionBitmap;
-            }
-            set {
-                if (modConverter.BitmapToStringUTF8(_CaptionBitmap, ImageFormat.Png) == modConverter.BitmapToStringUTF8(value, ImageFormat.Png)) { return; }
-                Database.AddPending(enDatabaseDataType.co_CaptionBitmapUTF8, this, modConverter.BitmapToStringUTF8(_CaptionBitmap, ImageFormat.Png), modConverter.BitmapToStringUTF8(value, ImageFormat.Png), false);
+        //public Bitmap CaptionBitmap {
+        //    get {
+        //        return _CaptionBitmap;
+        //    }
+        //    set {
+        //        if (modConverter.BitmapToStringUnicode(_CaptionBitmap, ImageFormat.Png) == modConverter.BitmapToStringUnicode(value, ImageFormat.Png)) { return; }
+        //        Database.AddPending(enDatabaseDataType.co_CaptionBitmapUTF8, this, modConverter.BitmapToStringUnicode(_CaptionBitmap, ImageFormat.Png), modConverter.BitmapToStringUnicode(value, ImageFormat.Png), false);
 
 
-                if (value == null) {
-                    _CaptionBitmap = null;
-                } else {
-                    _CaptionBitmap = (Bitmap)value.Clone();
-                }
+        //        if (value == null) {
+        //            _CaptionBitmap = null;
+        //        } else {
+        //            _CaptionBitmap = (Bitmap)value.Clone();
+        //        }
 
-                Invalidate_TmpVariables();
-                OnChanged();
-            }
-        }
+        //        Invalidate_TmpVariables();
+        //        OnChanged();
+        //    }
+        //}
 
 
         public string AdminInfo {
@@ -1360,10 +1360,7 @@ namespace BlueDatabase {
                     _Ueberschrift3 = Wert;
                     break;
                 case enDatabaseDataType.co_CaptionBitmap:
-                    _CaptionBitmap = modConverter.StringWIN1525ToBitmap(Wert);
-                    break;
-                case enDatabaseDataType.co_CaptionBitmapUTF8:
-                    _CaptionBitmap = modConverter.StringUTF8ToBitmap(Wert);
+                    //_CaptionBitmap = modConverter.StringWIN1525ToBitmap(Wert);
                     break;
                 case enDatabaseDataType.co_Identifier:
                     _Identifier = Wert;
@@ -1548,7 +1545,7 @@ namespace BlueDatabase {
                 LineLeft = enColumnLineStyle.Dünn;
                 LineRight = enColumnLineStyle.Ohne;
                 ForeColor = Color.FromArgb(0, 0, 0);
-                CaptionBitmap = null;
+                //CaptionBitmap = null;
             }
 
             switch (_Identifier) {
@@ -1812,7 +1809,7 @@ namespace BlueDatabase {
             Database.SaveToByteList(l, enDatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, _DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_QuickInfo, _QuickInfo, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AdminInfo, _AdminInfo, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_CaptionBitmapUTF8, modConverter.BitmapToStringUTF8(_CaptionBitmap, ImageFormat.Png), Key);
+            //Database.SaveToByteList(l, enDatabaseDataType.co_CaptionBitmapUTF8, modConverter.BitmapToStringUnicode(_CaptionBitmap, ImageFormat.Png), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AllowedChars, _AllowedChars, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_PermissionGroups_ChangeCell, PermissionGroups_ChangeCell.JoinWithCr(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_EditType, ((int)_EditType).ToString(), Key);

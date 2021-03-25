@@ -299,10 +299,10 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public bool ReplaceVariable(string VariableName, enValueType ValueType, string Value) {
+        public bool ReplaceVariable(string VariableName, object Value) {
 
             var ot = Text;
-            Text = Export.ParseVariable(Text, VariableName, Value, ValueType, enValueType.Text);
+            Text = Export.ParseVariable(Text, VariableName, Value);
 
             if (ot == Text) { return false; }
 

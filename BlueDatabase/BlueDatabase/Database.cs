@@ -157,7 +157,7 @@ namespace BlueDatabase {
         /// </summary>
         public readonly ListExt<ExportDefinition> Export = new();
 
-        public readonly ListExt<clsNamedBinary> Bins = new();
+        //public readonly ListExt<clsNamedBinary> Bins = new();
         public readonly ListExt<string> DatenbankAdmin = new();
         public readonly ListExt<string> PermissionGroups_NewRow = new();
         public readonly ListExt<string> Layouts = new(); // Print Views werden nicht immer benötigt. Deswegen werden sie als String gespeichert. Der Richtige Typ wäre CreativePad
@@ -226,7 +226,7 @@ namespace BlueDatabase {
             Views.Changed += Views_ListOrItemChanged;
             PermissionGroups_NewRow.Changed += PermissionGroups_NewRow_ListOrItemChanged;
             Tags.Changed += DatabaseTags_ListOrItemChanged;
-            Bins.Changed += Bins_ListOrItemChanged;
+            //Bins.Changed += Bins_ListOrItemChanged;
             Export.Changed += Export_ListOrItemChanged;
             DatenbankAdmin.Changed += DatabaseAdmin_ListOrItemChanged;
 
@@ -274,7 +274,7 @@ namespace BlueDatabase {
             Tags.Clear();
             Export.Clear();
 
-            Bins.Clear();
+            //Bins.Clear();
 
             DatenbankAdmin.Clear();
 
@@ -687,11 +687,11 @@ namespace BlueDatabase {
             AddPending(enDatabaseDataType.Layouts, -1, Layouts.JoinWithCr(), false);
         }
 
-        private void Bins_ListOrItemChanged(object sender, System.EventArgs e) {
+        //private void Bins_ListOrItemChanged(object sender, System.EventArgs e) {
 
-            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-            AddPending(enDatabaseDataType.BinaryDataInOne, -1, Bins.ToString(true), false);
-        }
+        //    if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+        //    AddPending(enDatabaseDataType.BinaryDataInOne, -1, Bins.ToString(true), false);
+        //}
 
         private void Export_ListOrItemChanged(object sender, System.EventArgs e) {
             if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
@@ -927,7 +927,7 @@ namespace BlueDatabase {
 
 
 
-            LoadPicsIntoImageChache();
+            //LoadPicsIntoImageChache();
 
             FilesAfterLoadingLCase.Clear();
             FilesAfterLoadingLCase.AddRange(AllConnectedFilesLCase());
@@ -1069,11 +1069,11 @@ namespace BlueDatabase {
                     Tags.SplitByCR(content);
                     break;
                 case enDatabaseDataType.BinaryDataInOne:
-                    Bins.Clear();
-                    var l = new List<string>(content.SplitByCR());
-                    foreach (var t in l) {
-                        Bins.Add(new clsNamedBinary(t));
-                    }
+                    //Bins.Clear();
+                    //var l = new List<string>(content.SplitByCR());
+                    //foreach (var t in l) {
+                    //    Bins.Add(new clsNamedBinary(t));
+                    //}
                     break;
                 case enDatabaseDataType.Layouts:
                     Layouts.SplitByCR_QuickSortAndRemoveDouble(content);
@@ -1234,16 +1234,16 @@ namespace BlueDatabase {
 
         }
 
-        public void LoadPicsIntoImageChache() {
-            foreach (var bmp in Bins) {
-                if (bmp.Picture != null) {
-                    if (!string.IsNullOrEmpty(bmp.Name)) {
-                        QuickImage.Add("DB_" + bmp.Name, new BitmapExt((Bitmap)bmp.Picture.Clone()));
-                    }
-                }
+        //public void LoadPicsIntoImageChache() {
+        //    foreach (var bmp in Bins) {
+        //        if (bmp.Picture != null) {
+        //            if (!string.IsNullOrEmpty(bmp.Name)) {
+        //                QuickImage.Add("DB_" + bmp.Name, new BitmapExt((Bitmap)bmp.Picture.Clone()));
+        //            }
+        //        }
 
-            }
-        }
+        //    }
+        //}
 
 
         internal string Column_UsedIn(ColumnItem column) {
@@ -1364,7 +1364,7 @@ namespace BlueDatabase {
 
 
         internal void SaveToByteList(List<byte> List, enDatabaseDataType DatabaseDataType, string Content) {
-            var b = Content.ToByteUTF8();
+            var b = Content.UTF8_ToByte();
             List.Add((byte)enRoutinen.DatenAllgemeinUTF8);
             List.Add((byte)DatabaseDataType);
             SaveToByteList(List, b.Length, 3);
@@ -1380,7 +1380,7 @@ namespace BlueDatabase {
 
             if (!tColumn.SaveContent) { return; }
 
-            var b = vCell.Value.Value.ToByteUTF8();
+            var b = vCell.Value.Value.UTF8_ToByte();
             var tx = enDatabaseDataType.ce_Value_withSizeData;
 
             List.Add((byte)enRoutinen.CellFormatUTF8);
@@ -1397,7 +1397,7 @@ namespace BlueDatabase {
 
 
         internal void SaveToByteList(List<byte> List, enDatabaseDataType DatabaseDataType, string Content, int TargetColumNr) {
-            var b = Content.ToByteUTF8();
+            var b = Content.UTF8_ToByte();
             List.Add((byte)enRoutinen.ColumnUTF8);
             List.Add((byte)DatabaseDataType);
             SaveToByteList(List, b.Length, 3);
@@ -1856,7 +1856,7 @@ namespace BlueDatabase {
                 SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
                 SaveToByteList(l, enDatabaseDataType.RulesScript, _RulesScript);
 
-                SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
+                //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
 
                 SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _FilterImagePfad);
 

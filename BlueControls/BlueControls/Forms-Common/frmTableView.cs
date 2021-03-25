@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using static BlueBasics.Develop;
 using static BlueBasics.FileOperations;
 
@@ -40,6 +41,25 @@ namespace BlueControls.Forms {
 
         public frmTableView(Database database, bool loadTabVisible, bool adminTabVisible) {
             InitializeComponent();
+
+
+            //var bmp = new System.Drawing.Bitmap(111,112);
+            //var gr = System.Drawing.Graphics.FromImage(bmp);
+            //gr.Clear(System.Drawing.Color.Gray);
+            //gr.Dispose();
+
+
+            //var stUTF8 = BlueBasics.modConverter.BitmapToStringUnicode(bmp, System.Drawing.Imaging.ImageFormat.Png);
+
+
+            //var b = stUTF8.UTF8_ToByte();
+            //var newstUTF8 = b.ToStringUTF8();
+
+            //var tmpb = newstUTF8.UTF8_ToByte();
+            //var eq = b.SequenceEqual(tmpb);
+
+            //var newbmp = BlueBasics.modConverter.StringUnicodeToBitmap(newstUTF8);
+
 
 
             Copyright.Text = "(c) 2010-" + DateTime.Now.Year + " Christian Peter";

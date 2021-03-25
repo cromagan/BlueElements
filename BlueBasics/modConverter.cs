@@ -62,12 +62,12 @@ namespace BlueBasics {
         }
 
 
-        public static Bitmap StringUTF8ToBitmap(string TXT) {
-            if (string.IsNullOrEmpty(TXT)) {
+        public static Bitmap StringUnicodeToBitmap(string unicodeTXT) {
+            if (string.IsNullOrEmpty(unicodeTXT)) {
                 return null;
             }
 
-            var b = TXT.ToByteUTF8();
+            var b = unicodeTXT.Unicode_ToByte();
             var BMP = ByteToBitmap(b);
             return BMP;
         }
@@ -171,14 +171,14 @@ namespace BlueBasics {
         }
 
 
-        public static string BitmapToStringUTF8(Bitmap BMP, ImageFormat Format) {
+        public static string BitmapToStringUnicode(Bitmap BMP, ImageFormat Format) {
             if (BMP == null) { return string.Empty; }
-            return new string(Encoding.UTF8.GetChars(BitmapToByte(BMP, Format)));
+            return new string(Encoding.Unicode.GetChars(BitmapToByte(BMP, Format)));
         }
 
 
         public static Bitmap ByteToBitmap(byte[] value) {
-            if (value.GetUpperBound(0) == 0) { return null; }
+            if (value == null || value.GetUpperBound(0) == 0) { return null; }
 
             try {
                 using var ms = new MemoryStream(value);
@@ -197,14 +197,14 @@ namespace BlueBasics {
 
 
 
-        public static string FileToString(string Dateiname) {
-            try {
-                var b = FileToByte(Dateiname);
-                return b.ToStringWIN1252();
-            } catch {
-                return string.Empty;
-            }
-        }
+        //public static string FileToString(string Dateiname) {
+        //    try {
+        //        var b = FileToByte(Dateiname);
+        //        return b.ToStringWIN1252();
+        //    } catch {
+        //        return string.Empty;
+        //    }
+        //}
 
 
         public static void CartesianToPolar(PointF ko, ref double r, ref double Win) {

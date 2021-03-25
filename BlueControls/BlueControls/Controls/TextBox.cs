@@ -1435,21 +1435,21 @@ namespace BlueControls.Controls {
             var i = new ItemCollectionList(enBlueListBoxAppearance.Listbox);
 
 
-            if (e.File is Database DB && DB.Bins.Count > 0) {
-                foreach (var bmp in DB.Bins) {
+            //if (e.File is Database DB && DB.Bins.Count > 0) {
+            //    foreach (var bmp in DB.Bins) {
 
-                    if (bmp.Picture != null) {
-                        if (!string.IsNullOrEmpty(bmp.Name)) {
-                            var crc = "DB_" + bmp.Name;
-                            i.Add(bmp.Name, crc, QuickImage.Get(crc, 20));
-                        }
-                    }
+            //        if (bmp.Picture != null) {
+            //            if (!string.IsNullOrEmpty(bmp.Name)) {
+            //                var crc = "DB_" + bmp.Name;
+            //                i.Add(bmp.Name, crc, QuickImage.Get(crc, 20));
+            //            }
+            //        }
 
 
-                }
+            //    }
 
-                i.AddSeparator();
-            }
+            //    i.AddSeparator();
+            //}
 
             i.Add("Kugel", "sphere", QuickImage.Get(enImageCode.Kugel, 20));
             i.Add("Warnung", "Warnung", QuickImage.Get(enImageCode.Warnung, 20));

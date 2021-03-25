@@ -242,7 +242,6 @@ namespace BlueControls.Controls {
             }
             if (IsDisposed) { return; }
             _Inited = false;
-            _Database?.LoadPicsIntoImageChache();
             ShowingRowKey = _savedRowKey;
         }
 

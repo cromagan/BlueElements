@@ -563,9 +563,17 @@ namespace BlueControls.Controls {
 
                 if (f.FileNames == null || f.FileNames.Length != 1) { return null; }
 
-                var x = new clsNamedBinary();
-                x.LoadFromFile(f.FileNames[0]);
-                Item.Add(x);
+                //var x = new clsNamedBinary();
+                //x.LoadFromFile(f.FileNames[0]);
+                //Item.Add(x);
+                var Picture = BitmapExt.Image_FromFile(f.FileNames[0]);
+
+                if (Picture != null) {
+                    return Item.Add((Bitmap)Picture, f.FileNames[0]);
+                } else {
+                    return Item.Add(modConverter.FileToByte(f.FileNames[0]), f.FileNames[0]);
+                }
+
             }
 
             return null;

@@ -88,8 +88,13 @@ namespace BlueBasics {
             return new string(charArray);
         }
 
-        public static byte[] ToByteUTF8(this string TXT) {
+        public static byte[] UTF8_ToByte(this string TXT) {
             return Encoding.UTF8.GetBytes(TXT);
+        }
+
+
+        public static byte[] Unicode_ToByte(this string TXT) {
+            return Encoding.Unicode.GetBytes(TXT);
         }
 
 

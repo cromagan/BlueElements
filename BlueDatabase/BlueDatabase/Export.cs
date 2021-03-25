@@ -63,38 +63,31 @@ namespace BlueDatabase {
 
 
 
-        public static string ParseVariable(string Text, string VariableName, string Valuex, enValueType IsValueType, enValueType AcceptdValueType) {
+        public static string ParseVariable(string txt, string variablename, object value) {
 
             var x = 0;
 
-            if (string.IsNullOrEmpty(Text)) { return Text; }
-            if (string.IsNullOrEmpty(VariableName)) { return Text; }
-            if (Text.Length < VariableName.Length + 4) { return Text; }
+            if (string.IsNullOrEmpty(txt)) { return txt; }
+            if (string.IsNullOrEmpty(variablename)) { return txt; }
+            if (txt.Length < variablename.Length + 4) { return txt; }
             ColumnItem Col = null;
 
 
             do {
-                var TMP = Text.ToUpper().IndexOf("//TS/000" + VariableName.ToUpper() + "/", x);
+                var TMP = txt.ToUpper().IndexOf("//TS/000" + variablename.ToUpper() + "/", x);
 
-                if (TMP < 0) { return Text; }
-
-
-                if (AcceptdValueType != IsValueType) {
-                    Develop.DebugPrint("Inkompatible Typen");
-                    return Text;
-                }
-
+                if (TMP < 0) { return txt; }
 
                 x = TMP;
 
-                var e = Text.ToUpper().IndexOf("/E", x + 1);
+                var e = txt.ToUpper().IndexOf("/E", x + 1);
 
-                if (e < 0) { return Text; }
+                if (e < 0) { return txt; }
 
-                var TX = Valuex;
+                var TX = value;
 
-                var Ges = Text.Substring(x, e - x + 2);
-                var ToParse = Text.Substring(x + 8 + VariableName.Length, e - x - 8 - VariableName.Length) + "/END";
+                var Ges = txt.Substring(x, e - x + 2);
+                var ToParse = txt.Substring(x + 8 + variablename.Length, e - x - 8 - variablename.Length) + "/END";
 
                 ToParse = ToParse.Trim('/');
 
@@ -114,15 +107,15 @@ namespace BlueDatabase {
 
                     var tempVar2 = 0;
                     var tempVar3 = 0;
-                    Bitmap tempVar4 = null;
                     string tempVar5 = null;
-                    DoSingleCode(c[z], ref TX, null, ref Col, ref tempVar2, ref tempVar3, ref tempVar4, ref tempVar5, Ges, ref Ended);
+                    DoSingleCode(c[z], ref TX, null, ref Col, ref tempVar2, ref tempVar3, ref tempVar5, Ges, ref Ended);
 
 
                 } while (!Ended);
 
-
-                Text = Text.Replace(Ges, TX);
+                if (TX is string ttt) {
+                    txt = txt.Replace(Ges, ttt);
+                }
                 x = 0;
 
 
@@ -133,7 +126,20 @@ namespace BlueDatabase {
 
 
 
-        private static void DoSingleCode(string CodeNr, ref string tx, RowItem row, ref ColumnItem column, ref int Wi, ref int He, ref Bitmap I, ref string BT, string Code, ref bool Ended) {
+        private static void DoSingleCode(string CodeNr, ref object value, RowItem row, ref ColumnItem column, ref int Wi, ref int He, ref string BT, string Code, ref bool Ended) {
+            var TXT = string.Empty;
+            var TextReturn = false;
+            Bitmap BMP = null;
+
+            if (value is string s) {
+                TXT = s;
+                TextReturn = true;
+            }
+
+            if (value is Bitmap s2) {
+                BMP = s2;
+                TextReturn = false;
+            }
 
             switch (CodeNr.Substring(0, 3)) {
                 case "000":// Spaltenname für Textersetzung
@@ -143,125 +149,99 @@ namespace BlueDatabase {
                         if (row != null) {
                             column = row.Database.Column[CodeNr.Substring(3)];
                             if (column == null || !column.ExportableTextformatForLayout()) {
-                                tx = "/FehlerTS/" + Code;
+                                TXT = "/FehlerTS/" + Code;
                                 Ended = true;
-                                return;
+                                break;
+                            } else {
+                                TXT = row.CellGetString(column);
                             }
-
-                            tx = row.CellGetString(column);
                         }
 
-                        if (!string.IsNullOrEmpty(tx)) {
-                            tx = tx.Trim();
-                            tx = tx.Replace("\r\n", "\r");
-                            tx = tx.TrimCr();
-
-
-                            //if (fo == enDataFormat.Relation)
-                            //{
-
-                            //    var tmp = tx.SplitByCR();
-                            //    for (var rz = 0 ; rz <= tmp.GetUpperBound(0) ; rz++)
-                            //    {
-                            //        tmp[rz] = new clsRelation(Col, vRow, tmp[rz]).ReadableText();
-                            //    }
-                            //    tx = string.Join("\r", tmp);
-                            //}
+                        if (!string.IsNullOrEmpty(TXT)) {
+                            TXT = TXT.Trim();
+                            TXT = TXT.Replace("\r\n", "\r");
+                            TXT = TXT.TrimCr();
                         }
                     }
-
                     break;
 
                 case "001": // Spaltenname für Bild
-
+                    TextReturn = false;
 
                     if (row != null) {
                         column = row.Database.Column[CodeNr.Substring(3)];
                         if (column == null) {
-                            tx = "/FehlerTS/" + Code;
+                            value = "/FehlerTS/" + Code;
                             Ended = true;
-                            return;
-                        }
-                        tx = row.CellGetString(column);
-                        switch (column.Format) {
-                            //case enDataFormat.Binärdaten_Bild:
-                            //    I = row.CellGetBitmap(column);
-                            //    //break; case Is = enDataFormat.Link_To_BlueDataSystem
-                            //    //    I = Nothing
-                            //    //    vRow.Database.DataSystem.File_Load(tx, I)
-
-                            //    break;
-                            case enDataFormat.Link_To_Filesystem:
-                                I = (Bitmap)BitmapExt.Image_FromFile(column.BestFile(row.CellGetString(column), false));
-
-
-                                break;
+                            break;
+                        } else {
+                            TXT = row.CellGetString(column);
+                            switch (column.Format) {
+                                case enDataFormat.Link_To_Filesystem:
+                                    BMP = (Bitmap)BitmapExt.Image_FromFile(column.BestFile(row.CellGetString(column), false));
+                                    break;
+                            }
                         }
                     }
-
-                    if (I == null) { I = QuickImage.Get(enImageCode.Warnung, 32).BMP; }
-
+                    if (BMP == null) { BMP = QuickImage.Get(enImageCode.Warnung, 32).BMP; }
                     break;
 
                 case "003": // Spaltenname für Bedingugnen
                     if (row != null) {
                         column = row.Database.Column[CodeNr.Substring(3)];
                         if (column == null || !column.ExportableTextformatForLayout()) {
-                            tx = "/FehlerTS/" + Code;
+                            TXT = "/FehlerTS/" + Code;
                             Ended = true;
-                            return;
+                            break;
                         }
                         BT = row.CellGetString(column);
                     }
-
                     break;
 
                 case "100": // Wenn leer, Nix
-                    if (string.IsNullOrEmpty(tx)) {
-                        tx = string.Empty;
+                    if (string.IsNullOrEmpty(TXT)) {
+                        TXT = string.Empty;
                         Ended = true;
                     }
-
-
                     break;
 
                 case "101": // Ersetze Leere Zelle mit
-                    if (string.IsNullOrEmpty(tx)) {
-                        tx = CodeNr.Substring(3);
+                    if (string.IsNullOrEmpty(TXT)) {
+                        TXT = CodeNr.Substring(3);
                     }
                     break;
 
                 case "102": // Ersetze Zeilenumbrüche mit
-                    tx = tx.Replace("\r", CodeNr.Substring(3));
+                    TXT = TXT.Replace("\r", CodeNr.Substring(3));
                     break;
 
                 case "103": // Vortext
-                    var ts = tx.SplitByCR();
+                    var ts = TXT.SplitByCR();
                     for (var tz = 0; tz <= ts.GetUpperBound(0); tz++) {
                         ts[tz] = CodeNr.Substring(3) + ts[tz];
                     }
-                    tx = string.Join("\r", ts);
+                    TXT = string.Join("\r", ts);
                     break;
 
                 case "104": // Nachtext
-                    var ts2 = tx.SplitByCR();
+                    var ts2 = TXT.SplitByCR();
                     for (var tz = 0; tz <= ts2.GetUpperBound(0); tz++) {
                         ts2[tz] = ts2[tz] + CodeNr.Substring(3);
                     }
-                    tx = string.Join("\r", ts2);
+                    TXT = string.Join("\r", ts2);
                     break;
 
                 case "105":
-                    if (!string.IsNullOrEmpty(tx)) {
-                        tx = tx.Replace("<H3>", CodeNr.Substring(3) + "<H3>");
-                        tx = tx.Replace("<H2>", CodeNr.Substring(3) + "<H2>");
-                        tx = tx.Replace("<H1>", CodeNr.Substring(3) + "<H1>");
+                    if (!string.IsNullOrEmpty(TXT)) {
+                        TXT = TXT.Replace("<H3>", CodeNr.Substring(3) + "<H3>");
+                        TXT = TXT.Replace("<H2>", CodeNr.Substring(3) + "<H2>");
+                        TXT = TXT.Replace("<H1>", CodeNr.Substring(3) + "<H1>");
                     }
                     break;
 
                 case "106":
-                    if (!string.IsNullOrEmpty(tx)) {
-                        tx = tx.Replace("<H4>", "<H4>" + CodeNr.Substring(3));
+                    if (!string.IsNullOrEmpty(TXT)) {
+                        TXT = TXT.Replace("<H4>", "<H4>" + CodeNr.Substring(3));
                         //Tx = Tx.Replace("<H2>", "<H2>" & cczz.Substring(3))
                         //Tx = Tx.Replace("<H1>", "<H1>" & cczz.Substring(3))
                     }
@@ -270,9 +250,9 @@ namespace BlueDatabase {
 
                 case "108": // & -Zeichen -> "&amp
 
-                    if (!string.IsNullOrEmpty(tx)) {
+                    if (!string.IsNullOrEmpty(TXT)) {
 
-                        tx = tx.CreateHtmlCodes(false);
+                        TXT = TXT.CreateHtmlCodes(false);
 
                         //tx = tx.Replace("&", "&amp;");
                         //tx = tx.Replace("<", "&lt;");
@@ -281,168 +261,159 @@ namespace BlueDatabase {
                     break;
 
                 case "109": // & -Zeichen -> "&amp
-
-                    if (!string.IsNullOrEmpty(tx)) {
-                        tx = tx.Replace("<H2>", "<H1>");
-                        tx = tx.Replace("<H3>", "<H2>");
+                    if (!string.IsNullOrEmpty(TXT)) {
+                        TXT = TXT.Replace("<H2>", "<H1>");
+                        TXT = TXT.Replace("<H3>", "<H2>");
                     }
-
                     break;
 
                 case "200": // Bildbreite
-
                     Wi = int.Parse(CodeNr.Substring(3));
-
-
-
                     break;
+
                 case "201": // Bildhöhe
-
                     He = int.Parse(CodeNr.Substring(3));
-
-
                     break;
+
                 case "210": // Maximale Größe
+                    TextReturn = false;
                     Wi = Math.Max(4, Wi);
                     He = Math.Max(4, He);
-                    I = BitmapExt.Resize(I, Wi, He, enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern, InterpolationMode.HighQualityBicubic, true);
-
+                    BMP = BitmapExt.Resize(BMP, Wi, He, enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern, InterpolationMode.HighQualityBicubic, true);
                     break;
 
                 case "211": // Exacte Größe, Weißer Rand
+                    TextReturn = false;
                     Wi = Math.Max(4, Wi);
                     He = Math.Max(4, He);
-                    I = BitmapExt.Resize(I, Wi, He, enSizeModes.EmptySpace, InterpolationMode.HighQualityBicubic, true);
+                    BMP = BitmapExt.Resize(BMP, Wi, He, enSizeModes.EmptySpace, InterpolationMode.HighQualityBicubic, true);
                     break;
 
                 case "212":// Exacte Größe, Auffüllen
+                    TextReturn = false;
                     Wi = Math.Max(4, Wi);
                     He = Math.Max(4, He);
-                    I = BitmapExt.Resize(I, Wi, He, enSizeModes.BildAbschneiden, InterpolationMode.HighQualityBicubic, true);
-
+                    BMP = BitmapExt.Resize(BMP, Wi, He, enSizeModes.BildAbschneiden, InterpolationMode.HighQualityBicubic, true);
                     break;
 
                 case "220":
-                    tx = modConverter.BitmapToBase64(I, ImageFormat.Jpeg);
+                    TXT = modConverter.BitmapToBase64(BMP, ImageFormat.Jpeg);
+                    TextReturn = true;
                     break;
 
                 case "302": // Bereinigung
-
-                    tx = CleanUpLayout(Code.Substring(3, Code.Length - 7));
+                    TXT = CleanUpLayout(Code.Substring(3, Code.Length - 7));
                     Ended = true;
-                    return;
+                    break;
 
                 case "310": // Wenn nichtleer, dann!
 
                     if (string.IsNullOrEmpty(BT)) {
-                        tx = string.Empty;
+                        TXT = string.Empty;
                         Ended = true;
-                        return;
+                        break;
                     }
                     var x = Code.IndexOf("/310");
-                    tx = Code.Substring(x + 4, Code.Length - x - 8);
+                    TXT = Code.Substring(x + 4, Code.Length - x - 8);
                     Ended = true;
-                    return;
+                    break;
 
                 case "107":
-
-                    var ts3 = tx.SplitByCR();
+                    var ts3 = TXT.SplitByCR();
                     for (var tz = 0; tz <= ts3.GetUpperBound(0); tz++) {
                         ts3[tz] = CellItem.ValueReadable(column, ts3[tz], enShortenStyle.HTML, enBildTextVerhalten.Nur_Text, true);
                     }
-                    tx = string.Join("\r", ts3);
+                    TXT = string.Join("\r", ts3);
                     break;
 
                 case "110":
-
                     string[] A = { "es", "er", "em", "en", "e", "" };
-
-                    if (!string.IsNullOrEmpty(tx)) {
-
-                        tx = tx.HTMLSpecialToNormalChar();
-
-                        tx = tx.Replace("Sekunden", "Sek.");
-                        tx = tx.Replace("Sekunde", "Sek.");
-                        tx = tx.Replace("Minuten", "Min.");
-                        tx = tx.Replace("Minute", "Min.");
-                        tx = tx.Replace("Stunden", "Std.");
-                        tx = tx.Replace("Stunde", "Std.");
-                        tx = tx.Replace(" und ", " & ");
-                        tx = tx.Replace(" oder ", " o. ");
-                        tx = tx.Replace("Zum Beispiel", "Z. B.");
-                        tx = tx.Replace("zum Beispiel", "z. B.");
-                        tx = tx.Replace("Keine Angaben", "K. A.");
-                        tx = tx.Replace("keine Angaben", "k. A.");
-                        tx = tx.Replace("Keine Angabe", "K. A.");
-                        tx = tx.Replace("keine Angabe", "k. A.");
+                    if (!string.IsNullOrEmpty(TXT)) {
+                        TXT = TXT.HTMLSpecialToNormalChar();
+                        TXT = TXT.Replace("Sekunden", "Sek.");
+                        TXT = TXT.Replace("Sekunde", "Sek.");
+                        TXT = TXT.Replace("Minuten", "Min.");
+                        TXT = TXT.Replace("Minute", "Min.");
+                        TXT = TXT.Replace("Stunden", "Std.");
+                        TXT = TXT.Replace("Stunde", "Std.");
+                        TXT = TXT.Replace(" und ", " & ");
+                        TXT = TXT.Replace(" oder ", " o. ");
+                        TXT = TXT.Replace("Zum Beispiel", "Z. B.");
+                        TXT = TXT.Replace("zum Beispiel", "z. B.");
+                        TXT = TXT.Replace("Keine Angaben", "K. A.");
+                        TXT = TXT.Replace("keine Angaben", "k. A.");
+                        TXT = TXT.Replace("Keine Angabe", "K. A.");
+                        TXT = TXT.Replace("keine Angabe", "k. A.");
                         //Tx = Tx.Replace("Etwa ", "Ca. ") ' und mit etwas Glück = und mit ca. Glück :-(((
                         //Tx = Tx.Replace("etwa ", "ca. ")
-                        tx = tx.Replace("Circa", "Ca.");
-                        tx = tx.Replace("circa", "ca.");
-                        tx = tx.Replace("Stücke", "St.");
-                        tx = tx.Replace("Stück", "St.");
-                        tx = tx.Replace("St.n", "Stücken");
-                        tx = tx.Replace("St.chen", "Stückchen");
-                        tx = tx.Replace("Kilogramm", "kg");
+                        TXT = TXT.Replace("Circa", "Ca.");
+                        TXT = TXT.Replace("circa", "ca.");
+                        TXT = TXT.Replace("Stücke", "St.");
+                        TXT = TXT.Replace("Stück", "St.");
+                        TXT = TXT.Replace("St.n", "Stücken");
+                        TXT = TXT.Replace("St.chen", "Stückchen");
+                        TXT = TXT.Replace("Kilogramm", "kg");
                         //  tx = tx.Replace(" Kilo", " kg")
-                        tx = tx.Replace("Gramm", "g");
-                        tx = tx.Replace("Päckchen", "P.");
-                        tx = tx.Replace("Packung", "P.");
-                        tx = tx.Replace("Esslöffel", "EL");
-                        tx = tx.Replace("Eßlöffel", "EL");
-                        tx = tx.Replace("Teelöffel", "TL");
-                        tx = tx.Replace("Messerspitze", "Msp.");
-                        tx = tx.Replace("Portionen", "Port.");
-                        tx = tx.Replace("Portion", "Port.");
-                        tx = tx.Replace("ein halbes ", "1/2 ", RegexOptions.IgnoreCase);
-                        tx = tx.Replace("eine halbe ", "1/2 ", RegexOptions.IgnoreCase);
-                        tx = tx.Replace("ein halber ", "1/2 ", RegexOptions.IgnoreCase);
-                        tx = tx.Replace("ein drittel ", "1/3 ", RegexOptions.IgnoreCase);
-                        tx = tx.Replace("zwei drittel ", "2/3 ", RegexOptions.IgnoreCase);
-                        tx = tx.Replace("eine drittel ", "1/3 ", RegexOptions.IgnoreCase);
-                        tx = tx.Replace("ein achtel ", "1/8 ", RegexOptions.IgnoreCase);
-                        tx = tx.Replace("eine achtel ", "1/8 ", RegexOptions.IgnoreCase);
-                        tx = tx.Replace("Stufe ", "St. ");
-                        tx = tx.Replace("Liter", "l ", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("Gramm", "g");
+                        TXT = TXT.Replace("Päckchen", "P.");
+                        TXT = TXT.Replace("Packung", "P.");
+                        TXT = TXT.Replace("Esslöffel", "EL");
+                        TXT = TXT.Replace("Eßlöffel", "EL");
+                        TXT = TXT.Replace("Teelöffel", "TL");
+                        TXT = TXT.Replace("Messerspitze", "Msp.");
+                        TXT = TXT.Replace("Portionen", "Port.");
+                        TXT = TXT.Replace("Portion", "Port.");
+                        TXT = TXT.Replace("ein halbes ", "1/2 ", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("eine halbe ", "1/2 ", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("ein halber ", "1/2 ", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("ein drittel ", "1/3 ", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("zwei drittel ", "2/3 ", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("eine drittel ", "1/3 ", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("ein achtel ", "1/8 ", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("eine achtel ", "1/8 ", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("Stufe ", "St. ");
+                        TXT = TXT.Replace("Liter", "l ", RegexOptions.IgnoreCase);
 
-                        tx = tx.Replace("ein EL", "1 EL", RegexOptions.IgnoreCase);
-                        tx = tx.Replace("ein TL", "1 TL", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("ein EL", "1 EL", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("ein TL", "1 TL", RegexOptions.IgnoreCase);
 
-                        tx = tx.Replace("zwei EL", "2 EL", RegexOptions.IgnoreCase);
-                        tx = tx.Replace("zwei TL", "2 TL", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("zwei EL", "2 EL", RegexOptions.IgnoreCase);
+                        TXT = TXT.Replace("zwei TL", "2 TL", RegexOptions.IgnoreCase);
 
 
                         for (var t = 0; t <= A.GetUpperBound(0); t++) {
-                            tx = tx.Replace("gerieben" + A[t], "ger.");
+                            TXT = TXT.Replace("gerieben" + A[t], "ger.");
                             //tx = tx.Replace("groß" + A[t], "gr.");
                             //tx = tx.Replace("klein" + A[t], "kl.");
-                            tx = tx.Replace("gekocht" + A[t], "gek.");
-                            tx = tx.Replace("tiefgekühlt" + A[t], "TK");
+                            TXT = TXT.Replace("gekocht" + A[t], "gek.");
+                            TXT = TXT.Replace("tiefgekühlt" + A[t], "TK");
                         }
 
-                        tx = tx.Replace("Tiefkühl", "TK-");
-
-                        tx = tx.CreateHtmlCodes(true);
-
+                        TXT = TXT.Replace("Tiefkühl", "TK-");
+                        TXT = TXT.CreateHtmlCodes(true);
                     }
-
-
-
                     break;
-                case "END":
 
-                    //  If SternDone AndAlso Not String.IsNullOrEmpty(Tx) Then Tx = Tx.Replace(cw2, "")
-                    //Return tx
+                case "END":
                     Ended = true;
-                    return;
+                    break;
 
 
                 default:
-
-                    tx = "/Fehler/ " + Code;
+                    value = "/Fehler/ " + Code;
                     Ended = true;
-                    return;
+                    break;
             }
+
+
+            if (TextReturn) {
+                value = TXT;
+            } else {
+                value = BMP;
+            }
+
+
+
         }
 
 
@@ -523,7 +494,7 @@ namespace BlueDatabase {
 
         private static string GenerateLayoutString(string Code, RowItem vRow, string Art) {
 
-            Bitmap I = null;
+
             var Wi = 8;
             var He = 8;
 
@@ -534,7 +505,7 @@ namespace BlueDatabase {
             Code = Code.TrimEnd('E') + "END";
             var c = Code.Split('/');
             var z = -1;
-            var Tx = "";
+            object Tx = string.Empty;
             var BT = "";
             var Ended = false;
 
@@ -549,9 +520,15 @@ namespace BlueDatabase {
 
                 c[z] = c[z].FromNonCritical().FromNonCritical().GenerateSlash();
 
-                DoSingleCode(c[z], ref Tx, vRow, ref Col, ref Wi, ref He, ref I, ref BT, Code, ref Ended);
+                DoSingleCode(c[z], ref Tx, vRow, ref Col, ref Wi, ref He, ref BT, Code, ref Ended);
 
-                if (Ended) { return Tx; }
+                if (Ended) {
+
+                    if (Tx is string txt) {
+                        return txt;
+                    }
+                    return "/FehlerTS/";
+                }
 
 
             } while (true);

@@ -275,15 +275,15 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public bool ReplaceVariable(string VariableName, enValueType ValueType, string Value) {
+        public bool ReplaceVariable(string VariableName, object Value) {
 
             if (string.IsNullOrEmpty(Platzhalter_für_Layout)) { return false; }
 
-            var ot = Export.ParseVariable(Platzhalter_für_Layout, VariableName, Value, ValueType, enValueType.BinaryImage);
+            var ot = Export.ParseVariable(Platzhalter_für_Layout, VariableName, Value);
 
             if (ot == Platzhalter_für_Layout) { return false; }
 
-            Bitmap = modConverter.StringUTF8ToBitmap(ot);
+            Bitmap = modConverter.StringUnicodeToBitmap(ot);
 
             OnChanged();
 

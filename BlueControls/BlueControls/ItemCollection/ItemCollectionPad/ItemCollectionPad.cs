@@ -980,13 +980,13 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public bool ParseVariable(string VariableName, enValueType ValueType, string Value) {
+        public bool ParseVariable(string VariableName, object Value) {
 
             var did = false;
 
             foreach (var thisItem in this) {
                 if (thisItem is ICanHaveColumnVariables variables) {
-                    if (variables.ReplaceVariable(VariableName, ValueType, Value)) { did = true; }
+                    if (variables.ReplaceVariable(VariableName, Value)) { did = true; }
                 }
             }
 
@@ -1019,7 +1019,7 @@ namespace BlueControls.ItemCollection {
                 case enDataFormat.Bit:
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.RelationText:
-                    ParseVariable(VariableName, enValueType.Text, Row.CellGetString(Column));
+                    ParseVariable(VariableName, Row.CellGetString(Column));
                     break;
 
                 case enDataFormat.Link_To_Filesystem:
@@ -1029,10 +1029,10 @@ namespace BlueControls.ItemCollection {
 
                         if (FileExists(f)) {
                             if (Column.MultiLine) {
-                                ParseVariable(VariableName, enValueType.Text, f);
+                                ParseVariable(VariableName, f);
                             } else {
-                                var x = modConverter.FileToString(f);
-                                ParseVariable(VariableName, enValueType.BinaryImage, x);
+                                var x = (Bitmap)BitmapExt.Image_FromFile(f);
+                                ParseVariable(VariableName, x);
                             }
                         }
                     }

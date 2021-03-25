@@ -196,9 +196,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxEinheit.Text = _Column.Suffix;
 
 
-            picCaptionImage.SetBitmap(_Column.CaptionBitmap);
-
-
 
             txbBildCodeConstHeight.Text = _Column.BildCode_ConstantHeight.ToString();
             cbxBildTextVerhalten.Text = ((int)_Column.BildTextVerhalten).ToString();
@@ -434,7 +431,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _Column.AllowedChars = tbxAllowedChars.Text;
 
-            _Column.CaptionBitmap = picCaptionImage.Bitmap;
 
 
 

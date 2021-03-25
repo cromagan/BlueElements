@@ -47,7 +47,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnEinzeiligDarstellen = new BlueControls.Controls.Button();
             this.capEinheit = new BlueControls.Controls.Caption();
             this.cbxEinheit = new BlueControls.Controls.ComboBox();
-            this.picCaptionImage = new BlueControls.Controls.EasyPic();
             this.Caption6 = new BlueControls.Controls.Caption();
             this.cbxFormat = new BlueControls.Controls.ComboBox();
             this.Caption16 = new BlueControls.Controls.Caption();
@@ -199,7 +198,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabDesign.Controls.Add(this.btnEinzeiligDarstellen);
             this.tabDesign.Controls.Add(this.capEinheit);
             this.tabDesign.Controls.Add(this.cbxEinheit);
-            this.tabDesign.Controls.Add(this.picCaptionImage);
             this.tabDesign.Controls.Add(this.Caption6);
             this.tabDesign.Controls.Add(this.cbxFormat);
             this.tabDesign.Controls.Add(this.Caption16);
@@ -374,16 +372,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxEinheit.Name = "cbxEinheit";
             this.cbxEinheit.Size = new System.Drawing.Size(168, 24);
             this.cbxEinheit.TabIndex = 31;
-            // 
-            // picCaptionImage
-            // 
-            this.picCaptionImage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.picCaptionImage.CausesValidation = false;
-            this.picCaptionImage.Location = new System.Drawing.Point(528, 96);
-            this.picCaptionImage.MaxSize = 300;
-            this.picCaptionImage.Name = "picCaptionImage";
-            this.picCaptionImage.Size = new System.Drawing.Size(384, 160);
             // 
             // Caption6
             // 
@@ -1612,7 +1600,6 @@ namespace BlueControls.BlueDatabaseDialogs
 			private Button btnIgnoreLock;
 			private Button btnLogUndo;
 			private Button btnSpellChecking;
-			private EasyPic picCaptionImage;
 			private Caption Caption6;
 			private Caption capEinheit;
 			private ComboBox cbxEinheit;

@@ -474,8 +474,7 @@ namespace BlueBasics.MultiUserFile {
 
             if (ReadOnly) { return Feedback("Datei ist Readonly"); }
 
-            if (!ReadOnly) { return Feedback("Datei ist Readonly"); }
-     
+    
                 if (tmpFileName == null || string.IsNullOrEmpty(tmpFileName) ||
                 fileInfoBeforeSaving == null || string.IsNullOrEmpty(fileInfoBeforeSaving) ||
                 savedDataUncompressed == null || savedDataUncompressed.Length == 0) { return Feedback("Keine Daten angekommen."); }
@@ -619,7 +618,7 @@ namespace BlueBasics.MultiUserFile {
 
             // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
             try {
-                var bInhalt = tmpInhalt.ToByteUTF8();
+                var bInhalt = tmpInhalt.UTF8_ToByte();
                 //Nicht modAllgemein, wegen den strengen Datei-Rechten 
                 using (var x = new FileStream(Blockdateiname(), FileMode.Create, FileAccess.Write, FileShare.None)) {
                     x.Write(bInhalt, 0, bInhalt.Length);

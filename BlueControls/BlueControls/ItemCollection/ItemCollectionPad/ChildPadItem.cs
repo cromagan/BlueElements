@@ -432,9 +432,9 @@ namespace BlueControls.ItemCollection {
             return true;
         }
 
-        public bool ReplaceVariable(string VariableName, enValueType ValueType, string Value) {
+        public bool ReplaceVariable(string VariableName, object Value) {
             if (PadInternal == null) { return false; }
-            var b = PadInternal.Item.ParseVariable(VariableName, ValueType, Value);
+            var b = PadInternal.Item.ParseVariable(VariableName, Value);
 
             if (b) { OnChanged(); }
             return b;

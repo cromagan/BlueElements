@@ -78,6 +78,7 @@ namespace BlueDatabase.Enums {
         //BinaryCount = 57,
         ReloadDelaySecond = 58,
         LastColumnKey = 59,
+        [Obsolete]
         BinaryDataInOne = 60,
         JoinTyp = 61,
         VerwaisteDaten = 62,
@@ -193,7 +194,6 @@ namespace BlueDatabase.Enums {
         co_AfterEdit_AutoReplace = 195,
         co_FilterOptions = 196,
 
-        co_CaptionBitmapUTF8 = 197,
 
 
 

@@ -90,8 +90,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpDateiVerschluesselung = new BlueControls.Controls.GroupBox();
             this.capDateiverschluesselungInfo = new BlueControls.Controls.Caption();
             this.btnDateiSchluessel = new BlueControls.Controls.Button();
-            this.Tab_Binaer = new BlueControls.Controls.TabPage();
-            this.lstBinary = new BlueControls.Controls.ListBox();
             this.capBinInfo = new BlueControls.Controls.Caption();
             this.Tab_Sortierung = new BlueControls.Controls.TabPage();
             this.Tab_Undo = new BlueControls.Controls.TabPage();
@@ -116,7 +114,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpExport.SuspendLayout();
             this.Tab_Rechte.SuspendLayout();
             this.grpDateiVerschluesselung.SuspendLayout();
-            this.Tab_Binaer.SuspendLayout();
             this.Tab_Sortierung.SuspendLayout();
             this.Tab_Undo.SuspendLayout();
             this.Tab_Expermimentell.SuspendLayout();
@@ -361,7 +358,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.Controls.Add(this.Tab_Regeln);
             this.GlobalTab.Controls.Add(this.Tab_Backup);
             this.GlobalTab.Controls.Add(this.Tab_Rechte);
-            this.GlobalTab.Controls.Add(this.Tab_Binaer);
             this.GlobalTab.Controls.Add(this.Tab_Sortierung);
             this.GlobalTab.Controls.Add(this.Tab_Undo);
             this.GlobalTab.Controls.Add(this.Tab_Expermimentell);
@@ -813,33 +809,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnDateiSchluessel.Text = "Dateien ";
             this.btnDateiSchluessel.Click += new System.EventHandler(this.DateienSchlüssel_Click);
             // 
-            // Tab_Binaer
-            // 
-            this.Tab_Binaer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Binaer.Controls.Add(this.lstBinary);
-            this.Tab_Binaer.Controls.Add(this.capBinInfo);
-            this.Tab_Binaer.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Binaer.Name = "Tab_Binaer";
-            this.Tab_Binaer.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Binaer.TabIndex = 7;
-            this.Tab_Binaer.Text = "Zusätzliche Binärdaten";
-            // 
-            // lstBinary
-            // 
-            this.lstBinary.AddAllowed = BlueControls.Enums.enAddType.BinarysFromFileSystem;
-            this.lstBinary.Appearance = BlueControls.Enums.enBlueListBoxAppearance.Gallery;
-            this.lstBinary.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
-            this.lstBinary.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstBinary.FilterAllowed = true;
-            this.lstBinary.LastFilePath = null;
-            this.lstBinary.Location = new System.Drawing.Point(0, 24);
-            this.lstBinary.Name = "lstBinary";
-            this.lstBinary.RemoveAllowed = true;
-            this.lstBinary.Size = new System.Drawing.Size(1039, 592);
-            this.lstBinary.TabIndex = 0;
-            this.lstBinary.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.Bilder_ContextMenuInit);
-            this.lstBinary.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.Bilder_ContextMenuItemClicked);
-            // 
             // capBinInfo
             // 
             this.capBinInfo.CausesValidation = false;
@@ -960,7 +929,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpExport.ResumeLayout(false);
             this.Tab_Rechte.ResumeLayout(false);
             this.grpDateiVerschluesselung.ResumeLayout(false);
-            this.Tab_Binaer.ResumeLayout(false);
             this.Tab_Sortierung.ResumeLayout(false);
             this.Tab_Undo.ResumeLayout(false);
             this.Tab_Expermimentell.ResumeLayout(false);
@@ -995,8 +963,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private GroupBox grpKennwort;
         private GroupBox grpBenutzergruppen;
         private TabPage Tab_Undo;
-        private TabPage Tab_Binaer;
-        private ListBox lstBinary;
         private ListBox lbxExportSets;
         private Caption capKennwort;
         private TextBox tbxReloadVerzoegerung;

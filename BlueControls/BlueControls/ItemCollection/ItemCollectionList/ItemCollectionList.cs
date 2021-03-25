@@ -673,6 +673,15 @@ namespace BlueControls.ItemCollection {
 
 
         #region  BitmapListItem
+        public DataListItem Add(byte[] b, string caption) {
+            var i = new DataListItem(b, string.Empty, caption);
+            Add(i);
+            return i;
+
+        }
+        #endregion
+
+        #region  BitmapListItem
 
 
         public BitmapListItem Add(Bitmap bmp, string caption) {
@@ -758,13 +767,13 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        public BasicListItem Add(clsNamedBinary binary) {
-            if (binary.Picture != null) {
-                return Add(binary.Picture, binary.Name);
-            } else {
-                return Add(binary.Name, binary.Binary);
-            }
-        }
+        //public BasicListItem Add(clsNamedBinary binary) {
+        //    if (binary.Picture != null) {
+        //        return Add(binary.Picture, binary.Name);
+        //    } else {
+        //        return Add(binary.Name, binary.Binary);
+        //    }
+        //}
 
         public TextListItem Add(ColumnItem column, bool doCaptionSort) {
             if (doCaptionSort) {
@@ -991,19 +1000,19 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        /// <summary>
-        /// Kann mit GetNamedBinaries zurückgeholt werden
-        /// </summary>
-        /// <param name="list"></param>
-        public void AddRange(ListExt<clsNamedBinary> list) {
+        ///// <summary>
+        ///// Kann mit GetNamedBinaries zurückgeholt werden
+        ///// </summary>
+        ///// <param name="list"></param>
+        //public void AddRange(ListExt<clsNamedBinary> list) {
 
 
-            if (list == null) { return; }
+        //    if (list == null) { return; }
 
-            foreach (var ThisBin in list) {
-                Add(ThisBin);
-            }
-        }
+        //    foreach (var ThisBin in list) {
+        //        Add(ThisBin);
+        //    }
+        //}
 
 
         public void AddRange(List<string> list) {
@@ -1055,20 +1064,20 @@ namespace BlueControls.ItemCollection {
         #endregion
 
 
-        public ListExt<clsNamedBinary> GetNamedBinaries() {
-            var l = new ListExt<clsNamedBinary>();
-            foreach (var thisItem in this) {
-                switch (thisItem) {
-                    case BitmapListItem BI:
-                        l.Add(new clsNamedBinary(BI.Caption, BI.Bitmap));
-                        break;
-                    case TextListItem TI:
-                        l.Add(new clsNamedBinary(TI.Text, TI.Internal));
-                        break;
-                }
-            }
-            return l;
-        }
+        //public ListExt<clsNamedBinary> GetNamedBinaries() {
+        //    var l = new ListExt<clsNamedBinary>();
+        //    foreach (var thisItem in this) {
+        //        switch (thisItem) {
+        //            case BitmapListItem BI:
+        //                l.Add(new clsNamedBinary(BI.Caption, BI.Bitmap));
+        //                break;
+        //            case TextListItem TI:
+        //                l.Add(new clsNamedBinary(TI.Text, TI.Internal));
+        //                break;
+        //        }
+        //    }
+        //    return l;
+        //}
 
 
 

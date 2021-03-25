@@ -1183,11 +1183,11 @@ namespace BlueControls.Controls {
             tx = BlueDatabase.LanguageTool.DoTranslate(tx, Translate).Replace("\r", "\r\n");
             var FS = GR.MeasureString(tx, _Column_Font.Font());
 
+            Bitmap CaptionBitmap = null; // TODO: Caption Bitmap neu hinzufügen
 
-
-            if (ViewItem.Column.CaptionBitmap != null && ViewItem.Column.CaptionBitmap.Width > 10) {
+            if (CaptionBitmap != null && CaptionBitmap.Width > 10) {
                 var pos = new Point((int)ViewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(ViewItem, displayRectangleWOSlider) - FS.Width) / 2.0), 3 + Down);
-                GR.DrawImageInRectAspectRatio(ViewItem.Column.CaptionBitmap, (int)ViewItem.OrderTMP_Spalte_X1 + 2, (int)(pos.Y + FS.Height), Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 4, HeadSize() - (int)(pos.Y + FS.Height) - 6 - 18);
+                GR.DrawImageInRectAspectRatio(CaptionBitmap, (int)ViewItem.OrderTMP_Spalte_X1 + 2, (int)(pos.Y + FS.Height), Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 4, HeadSize() - (int)(pos.Y + FS.Height) - 6 - 18);
 
                 // Dann der Text
                 GR.TranslateTransform(pos.X, pos.Y);
@@ -3738,7 +3738,9 @@ namespace BlueControls.Controls {
             float wi;
             float he;
 
-            if (column.CaptionBitmap != null && column.CaptionBitmap.Width > 10) {
+            Bitmap CaptionBitmap = null; // TODO: Caption Bitmap neu erstellen
+
+            if (CaptionBitmap != null && CaptionBitmap.Width > 10) {
                 wi = Math.Max(50, ColumnCaptionText_Size(column).Width + 4);
                 he = 50 + ColumnCaptionText_Size(column).Height + 3;
             } else {

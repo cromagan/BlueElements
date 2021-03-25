@@ -108,11 +108,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _Database.RulesScript = txtSkript.Text;
 
-            var l = lstBinary.Item.GetNamedBinaries();
-            if (l.IsDifferentTo(_Database.Bins)) {
-                _Database.Bins.Clear();
-                _Database.Bins.AddRange(l);
-            }
 
 
             if (DatenbankAdmin.Item.ToListOfString().IsDifferentTo(_Database.DatenbankAdmin)) {
@@ -242,13 +237,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             GenerateUndoTabelle();
 
             GenerateVariableTable();
-
-            lstBinary.Item.Clear();
-
-
-            foreach (var ThisBin in _Database.Bins) {
-                lstBinary.Item.Add(ThisBin);
-            }
 
 
             CryptStatus();
