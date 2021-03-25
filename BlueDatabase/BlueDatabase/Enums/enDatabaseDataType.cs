@@ -87,6 +87,7 @@ namespace BlueDatabase.Enums {
         FilterImagePfad = 65,
         ZeilenQuickInfo = 66,
         RulesScript = 67,
+        AdditionaFilesPfad = 68,
 
 
         Info_ColumDataSart = 100,

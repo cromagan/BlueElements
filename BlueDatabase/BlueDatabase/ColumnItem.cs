@@ -1212,8 +1212,7 @@ namespace BlueDatabase {
             if (_TMP_LinkedDatabase != null) { return _TMP_LinkedDatabase; }
             if (string.IsNullOrEmpty(_LinkedDatabaseFile)) { return null; }
 
-            DatabaseSettingsEventHandler el = null;
-
+            DatabaseSettingsEventHandler el;
 
             if (FileExists(_LinkedDatabaseFile)) {
                 el = new DatabaseSettingsEventHandler(this, _LinkedDatabaseFile, Database.ReadOnly);
@@ -1228,10 +1227,7 @@ namespace BlueDatabase {
                 Database.OnLoadingLinkedDatabase(el);
             }
 
-
-
             TMP_LinkedDatabase = (Database)clsMultiUserFile.GetByFilename(el.Filenname, true); // Event wird ausgelöst, Multitasking pfuscht rein, nochmal prüfen!!!!
-
 
             if (_TMP_LinkedDatabase == null) {
                 if (FileExists(el.Filenname)) {
@@ -1251,9 +1247,6 @@ namespace BlueDatabase {
         internal string ParsableColumnKey() {
             return ColumnCollection.ParsableColumnKey(this);
         }
-
-
-
 
         public List<string> Contents(FilterCollection Filter) {
             var list = new List<string>();

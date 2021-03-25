@@ -711,7 +711,11 @@ namespace BlueBasics {
 
 
 
-
+        /// <summary>
+        /// Standard Pfad-Korrekturen. z.B. Doppelte Slashes, Backslashes. Gibt den Pfad mit abschließenden \ zurück.
+        /// </summary>
+        /// <param name="Pfad"></param>
+        /// <returns></returns>
         public static string CheckPath(this string Pfad) {
             if (string.IsNullOrEmpty(Pfad)) { return string.Empty; }  // Kann vorkommen, wenn ein Benutzer einen Pfad per Hand eingeben darf
 
@@ -729,6 +733,11 @@ namespace BlueBasics {
 
 
 
+        /// <summary>
+        /// Gibt den Dateipad eines Dateistrings zurück, mit abschließenden \.
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <returns></returns>
         public static string FilePath(this string Name) {
 
             if (string.IsNullOrEmpty(Name)) { return string.Empty; }

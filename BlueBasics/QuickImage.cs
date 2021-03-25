@@ -487,7 +487,6 @@ namespace BlueBasics {
 
             var e = new NeedImageEventArgs(TMPName);
             OnNeedImage(e);
-            if (e.BMP != null) { return e.BMP; }
 
             lock (_locker) {
                 // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen

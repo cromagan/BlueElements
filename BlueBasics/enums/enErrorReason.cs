@@ -17,7 +17,10 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using System;
+
 namespace BlueBasics.Enums {
+    [Flags]
     public enum enErrorReason {
         /// <summary>
         /// Ob der Wert gelesen werden kann. Ein Speichern/Bearbeiten ist nicht geplant.

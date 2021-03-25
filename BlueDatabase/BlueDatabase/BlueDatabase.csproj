@@ -36,6 +36,9 @@
     <Compile Remove="EventArgs\OpenEditorEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Database.cs~RF2e18ae9.TMP" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.2.217201">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

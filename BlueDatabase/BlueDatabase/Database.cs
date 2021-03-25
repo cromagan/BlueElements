@@ -114,7 +114,6 @@ namespace BlueDatabase {
 
         #endregion
 
-
         #region  Variablen-Deklarationen 
 
         //private IContainer components;
@@ -144,6 +143,7 @@ namespace BlueDatabase {
         private enAnsicht _Ansicht;
         private double _GlobalScale;
         private string _FilterImagePfad;
+        private string _AdditionaFilesPfad;
         private string _ZeilenQuickInfo;
 
 
@@ -192,7 +192,6 @@ namespace BlueDatabase {
         public event EventHandler<RenameColumnInLayoutEventArgs> RenameColumnInLayout;
         public event EventHandler<GenerateLayoutInternalEventargs> GenerateLayoutInternal;
         #endregion
-
 
         #region  Construktor + Initialize 
 
@@ -252,6 +251,9 @@ namespace BlueDatabase {
             } else if (stream != null) {
                 LoadFromStream(stream);
             }
+
+
+            QuickImage.NeedImage += QuickImage_NeedImage;
         }
 
         private void Initialize() {
@@ -299,6 +301,7 @@ namespace BlueDatabase {
             _GlobalScale = 1f;
             _Ansicht = enAnsicht.Unverändert;
             _FilterImagePfad = string.Empty;
+            _AdditionaFilesPfad = "AdditionalFiles";
             _ZeilenQuickInfo = string.Empty;
 
             _sortDefinition = null;
@@ -333,7 +336,10 @@ namespace BlueDatabase {
             }
         }
 
+
+
         [Browsable(false)]
+        [Description("Ein Bild, da in der senkrechte Filterleiste angezeigt werden kann.")]
         public string FilterImagePfad {
             get {
                 return _FilterImagePfad;
@@ -344,6 +350,51 @@ namespace BlueDatabase {
                 Cell.InvalidateAllSizes();
             }
         }
+
+
+        private string _AdditionaFilesPfadtmp = string.Empty;
+        public string AdditionaFilesPfadWhole() {
+
+            if (_AdditionaFilesPfadtmp == "@") { return string.Empty; }
+            if (!string.IsNullOrEmpty(_AdditionaFilesPfadtmp)) { return _AdditionaFilesPfadtmp; }
+
+            var t = _AdditionaFilesPfad.CheckPath();
+            if (PathExists(t)) {
+                _AdditionaFilesPfadtmp = t;
+                return t;
+            }
+
+
+            t = (Filename.FilePath() + _AdditionaFilesPfad.Trim("\\") + "\\").CheckPath();
+
+            if (PathExists(t)) {
+                _AdditionaFilesPfadtmp = t;
+                return t;
+            }
+
+
+            _AdditionaFilesPfadtmp = "@";
+            return string.Empty;
+
+
+        }
+
+
+        [Browsable(false)]
+        [Description("Ein Bild, da in der senkrechte Filterleiste angezeigt werden kann.")]
+        public string AdditionaFilesPfad {
+            get {
+                return _AdditionaFilesPfad;
+            }
+            set {
+                if (_AdditionaFilesPfad == value) { return; }
+                _AdditionaFilesPfadtmp = string.Empty;
+                AddPending(enDatabaseDataType.AdditionaFilesPfad, -1, -1, _AdditionaFilesPfad, value, true);
+                Cell.InvalidateAllSizes();
+            }
+        }
+
+
 
         [Browsable(false)]
         public string ZeilenQuickInfo {
@@ -497,7 +548,6 @@ namespace BlueDatabase {
 
 
         #endregion
-
 
 
         internal void DevelopWarnung(string t) {
@@ -732,88 +782,88 @@ namespace BlueDatabase {
 
             switch ((enRoutinen)_BLoaded[Pointer]) {
                 case enRoutinen.CellFormat: {
-                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                    Les = NummerCode3(_BLoaded, Pointer + 2);
-                    ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                    RowNR = NummerCode3(_BLoaded, Pointer + 8);
-                    var b = new byte[Les];
-                    Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
-                    Wert = b.ToStringWIN1252();
-                    X = NummerCode2(_BLoaded, Pointer + 11 + Les);
-                    Y = NummerCode2(_BLoaded, Pointer + 11 + Les + 2);
-                    Pointer += 11 + Les + 4;
-                    break;
-                }
+                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                        Les = NummerCode3(_BLoaded, Pointer + 2);
+                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
+                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
+                        Wert = b.ToStringWIN1252();
+                        X = NummerCode2(_BLoaded, Pointer + 11 + Les);
+                        Y = NummerCode2(_BLoaded, Pointer + 11 + Les + 2);
+                        Pointer += 11 + Les + 4;
+                        break;
+                    }
                 case enRoutinen.CellFormatUTF8: {
-                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                    Les = NummerCode3(_BLoaded, Pointer + 2);
-                    ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                    RowNR = NummerCode3(_BLoaded, Pointer + 8);
-                    var b = new byte[Les];
-                    Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
-                    Wert = b.ToStringUTF8();
-                    X = NummerCode2(_BLoaded, Pointer + 11 + Les);
-                    Y = NummerCode2(_BLoaded, Pointer + 11 + Les + 2);
-                    Pointer += 11 + Les + 4;
-                    break;
-                }
+                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                        Les = NummerCode3(_BLoaded, Pointer + 2);
+                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
+                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
+                        Wert = b.ToStringUTF8();
+                        X = NummerCode2(_BLoaded, Pointer + 11 + Les);
+                        Y = NummerCode2(_BLoaded, Pointer + 11 + Les + 2);
+                        Pointer += 11 + Les + 4;
+                        break;
+                    }
                 case enRoutinen.DatenAllgemein: {
-                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                    Les = NummerCode3(_BLoaded, Pointer + 2);
-                    ColNR = -1;
-                    RowNR = -1;
-                    var b = new byte[Les];
-                    Buffer.BlockCopy(_BLoaded, Pointer + 5, b, 0, Les);
-                    Wert = b.ToStringWIN1252();
-                    X = 0;
-                    Y = 0;
-                    Pointer += 5 + Les;
-                    break;
-                }
+                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                        Les = NummerCode3(_BLoaded, Pointer + 2);
+                        ColNR = -1;
+                        RowNR = -1;
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, Pointer + 5, b, 0, Les);
+                        Wert = b.ToStringWIN1252();
+                        X = 0;
+                        Y = 0;
+                        Pointer += 5 + Les;
+                        break;
+                    }
                 case enRoutinen.DatenAllgemeinUTF8: {
-                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                    Les = NummerCode3(_BLoaded, Pointer + 2);
-                    ColNR = -1;
-                    RowNR = -1;
-                    var b = new byte[Les];
-                    Buffer.BlockCopy(_BLoaded, Pointer + 5, b, 0, Les);
-                    Wert = b.ToStringUTF8();
-                    X = 0;
-                    Y = 0;
-                    Pointer += 5 + Les;
-                    break;
-                }
+                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                        Les = NummerCode3(_BLoaded, Pointer + 2);
+                        ColNR = -1;
+                        RowNR = -1;
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, Pointer + 5, b, 0, Les);
+                        Wert = b.ToStringUTF8();
+                        X = 0;
+                        Y = 0;
+                        Pointer += 5 + Les;
+                        break;
+                    }
 
                 case enRoutinen.Column: {
-                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                    Les = NummerCode3(_BLoaded, Pointer + 2);
-                    ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                    RowNR = NummerCode3(_BLoaded, Pointer + 8);
-                    var b = new byte[Les];
-                    Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
-                    Wert = b.ToStringWIN1252();
-                    X = 0;
-                    Y = 0;
-                    Pointer += 11 + Les;
-                    break;
-                }
+                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                        Les = NummerCode3(_BLoaded, Pointer + 2);
+                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
+                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
+                        Wert = b.ToStringWIN1252();
+                        X = 0;
+                        Y = 0;
+                        Pointer += 11 + Les;
+                        break;
+                    }
                 case enRoutinen.ColumnUTF8: {
-                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                    Les = NummerCode3(_BLoaded, Pointer + 2);
-                    ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                    RowNR = NummerCode3(_BLoaded, Pointer + 8);
-                    var b = new byte[Les];
-                    Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
-                    Wert = b.ToStringUTF8();
-                    X = 0;
-                    Y = 0;
-                    Pointer += 11 + Les;
-                    break;
-                }
+                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                        Les = NummerCode3(_BLoaded, Pointer + 2);
+                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
+                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
+                        Wert = b.ToStringUTF8();
+                        X = 0;
+                        Y = 0;
+                        Pointer += 11 + Les;
+                        break;
+                    }
                 default: {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Laderoutine nicht definiert: " + _BLoaded[Pointer]);
-                    break;
-                }
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Laderoutine nicht definiert: " + _BLoaded[Pointer]);
+                        break;
+                    }
             }
         }
 
@@ -965,7 +1015,7 @@ namespace BlueDatabase {
                     switch (z) {
                         case 0:
                             ColumnArrangements[z].Name = "Alle Spalten";
-                            if (ColumnArrangements[z].Count() < 1) { ColumnArrangements[z].ShowAllColumns(this); }
+                            if (ColumnArrangements[z].Count < 1) { ColumnArrangements[z].ShowAllColumns(this); }
                             break;
                         case 1:
                             ColumnArrangements[z].Name = "Standard";
@@ -1059,6 +1109,9 @@ namespace BlueDatabase {
                 case enDatabaseDataType.FilterImagePfad:
                     _FilterImagePfad = content;
                     break;
+                case enDatabaseDataType.AdditionaFilesPfad:
+                    _AdditionaFilesPfad = content;
+                    break;
                 case enDatabaseDataType.ZeilenQuickInfo:
                     _ZeilenQuickInfo = content;
                     break;
@@ -1071,10 +1124,13 @@ namespace BlueDatabase {
                 case enDatabaseDataType.BinaryDataInOne:
                     //Bins.Clear();
                     //var l = new List<string>(content.SplitByCR());
-                    //foreach (var t in l) {
-                    //    Bins.Add(new clsNamedBinary(t));
-                    //}
+                    //foreach (var t in l)
+                    //{
+                    //  var nb = new clsNamedBinary(t);
+
+                    //    nb._picture.Save(@"D:\01_Data\" + nb.Name + ".png", System.Drawing.Imaging.ImageFormat.Png);
                     break;
+
                 case enDatabaseDataType.Layouts:
                     Layouts.SplitByCR_QuickSortAndRemoveDouble(content);
                     break;
@@ -1216,6 +1272,7 @@ namespace BlueDatabase {
             return "";
         }
 
+        [Obsolete]
         private string GenerateScriptFromRules(List<RuleItem_Old> rules) {
             if (rules is null || rules.Count == 0) { return string.Empty; }
 
@@ -1538,7 +1595,7 @@ namespace BlueDatabase {
                     for (var ColNr = 0; ColNr < columnList.Count; ColNr++) {
                         if (columnList[ColNr] != null) {
                             sb.Append(columnList[ColNr].Name);
-                            if (ColNr < columnList.Count - 1) { sb.Append(";"); }
+                            if (ColNr < columnList.Count - 1) { sb.Append(';'); }
                         }
                     }
                     sb.Append("\r\n");
@@ -1564,7 +1621,7 @@ namespace BlueDatabase {
                             tmp = tmp.Replace(";", "<sk>");
 
                             sb.Append(tmp);
-                            if (ColNr < columnList.Count - 1) { sb.Append(";"); }
+                            if (ColNr < columnList.Count - 1) { sb.Append(';'); }
                         }
                     }
                     sb.Append("\r\n");
@@ -1859,6 +1916,7 @@ namespace BlueDatabase {
                 //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
 
                 SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _FilterImagePfad);
+                SaveToByteList(l, enDatabaseDataType.AdditionaFilesPfad, _AdditionaFilesPfad);
 
                 SaveToByteList(l, enDatabaseDataType.ZeilenQuickInfo, _ZeilenQuickInfo);
 
@@ -2083,17 +2141,17 @@ namespace BlueDatabase {
                 if (ThisPending.State == enItemState.Pending) {
                     switch (ThisPending.Comand) {
                         case enDatabaseDataType.dummyComand_AddRow when _JoinTyp == enJoinTyp.Intelligent_zusammenfassen: {
-                            var Value = SearchKeyValueInPendingsOf(ThisPending.RowKey);
-                            var fRow = Row[Value];
+                                var Value = SearchKeyValueInPendingsOf(ThisPending.RowKey);
+                                var fRow = Row[Value];
 
-                            if (!string.IsNullOrEmpty(Value) && fRow != null) {
-                                ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
-                            } else {
-                                ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
+                                if (!string.IsNullOrEmpty(Value) && fRow != null) {
+                                    ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
+                                } else {
+                                    ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
+                                }
+
+                                break;
                             }
-
-                            break;
-                        }
                         case enDatabaseDataType.dummyComand_AddRow:
                             ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
                             break;
@@ -2441,5 +2499,160 @@ namespace BlueDatabase {
             return false;
         }
 
+        private void QuickImage_NeedImage(object sender, NeedImageEventArgs e) {
+            if (e.Done) { return; }
+
+            if (string.IsNullOrWhiteSpace(AdditionaFilesPfadWhole())) { return; }
+
+            if (FileExists(AdditionaFilesPfadWhole() + e.Name + ".png")) {
+                e.Done = true;
+                QuickImage.Add(e.Name, new BitmapExt(AdditionaFilesPfadWhole() + e.Name + ".png"));
+            }
+        }
+
     }
 }
+
+
+
+
+//using BlueBasics.Enums;
+//using BlueBasics.Interfaces;
+//using System;
+//using System.Drawing;
+//using System.Drawing.Imaging;
+//using static BlueBasics.FileOperations;
+
+//namespace BlueBasics
+//{
+//    public sealed class clsNamedBinary 
+//    {
+//        #region  Variablen-Deklarationen 
+
+//        private string _binary;
+//        public Bitmap _picture;
+//        private string _name;
+
+//        #endregion
+
+
+//        #region  Construktor + Initialize 
+
+//        public clsNamedBinary(string CodeToParse)
+//        {
+//            Parse(CodeToParse);
+//        }
+
+
+
+//        public clsNamedBinary()
+//        {
+//            Initialize();
+//        }
+
+
+
+
+//        public void Initialize()
+//        {
+//            _name = string.Empty;
+//            _binary = string.Empty;
+//            _picture = null;
+//        }
+
+//        #endregion
+
+//        #region  Properties 
+//        public bool IsParsing { get; private set; }
+
+//        public string Binary
+//        {
+//            get
+//            {
+//                return _binary;
+//            }
+
+//            set
+//            {
+//                if (_binary == value) { return; }
+//                _binary = value;
+
+//            }
+//        }
+
+//        public Bitmap Picture
+//        {
+//            get
+//            {
+//                return _picture;
+//            }
+
+//            set
+//            {
+//                if (_picture == value) { return; }
+//                _picture = value;
+
+//            }
+//        }
+
+//        public string Name
+//        {
+//            get
+//            {
+//                return _name;
+//            }
+
+//            set
+//            {
+//                if (_name == value) { return; }
+//                _name = value;
+
+//            }
+//        }
+//        #endregion
+
+
+
+//        public bool IsNullOrEmpty()
+//        {
+//            if (_picture == null && string.IsNullOrEmpty(_binary)) { return true; }
+//            return false;
+//        }
+
+//        public void Parse(string ToParse)
+//        {
+//            IsParsing = true;
+//            Initialize();
+
+//            if (string.IsNullOrEmpty(ToParse) || ToParse.Length < 10)
+//            {
+//                IsParsing = false;
+//                return;
+//            }
+
+//            foreach (var pair in ToParse.GetAllTags())
+//            {
+//                switch (pair.Key)
+//                {
+//                    case "name":
+//                        _name = pair.Value.FromNonCritical();
+//                        break;
+//                    case "png":
+//                        _picture = modConverter.StringWIN1525ToBitmap(pair.Value.FromNonCritical());
+//                        break;
+//                    case "bin":
+//                        _binary = pair.Value.FromNonCritical();
+//                        break;
+//                    default:
+//                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+//                        break;
+//                }
+//            }
+//            IsParsing = false;
+//        }
+
+
+
+
+//    }
+//}

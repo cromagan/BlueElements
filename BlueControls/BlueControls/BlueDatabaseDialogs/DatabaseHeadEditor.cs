@@ -99,6 +99,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _Database.FilterImagePfad = txbFilterImagePath.Text;
 
+            _Database.AdditionaFilesPfad = txbAdditionalFiles.Text;
+
             _Database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
 
             if (tbxTags.Text != _Database.Tags.JoinWithCr()) {
@@ -208,6 +210,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             txbGlobalScale.Text = _Database.GlobalScale.ToString();
 
             txbFilterImagePath.Text = _Database.FilterImagePfad;
+
+            txbAdditionalFiles.Text = _Database.AdditionaFilesPfad;
 
             txbZeilenQuickInfo.Text = _Database.ZeilenQuickInfo.Replace("<br>", "\r");
 
@@ -796,9 +800,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _FileState = "Fehler";
                 ExternTimer.Enabled = true;
             }
-
-
-
         }
     }
 }
