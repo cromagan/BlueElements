@@ -1,8 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <TargetFramework>net5.0-windows</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F357F648-987A-4442-93A9-BFC421561DD2}</ProjectGuid>
     <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BluePaint</RootNamespace>
+    <AssemblyName>BluePaint</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -18,69 +29,195 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <StartupObject>BluePaint.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>..\..\BlueBasics\BlueBasics.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Update="Properties\Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EventArgs\CommandForMacroArgs.cs" />
+    <Compile Include="EventArgs\BitmapEventArgs.cs" />
+    <Compile Include="MainWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainWindow.designer.cs">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\GenericTool.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\GenericTool.Designer.cs">
+      <DependentUpon>GenericTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Tool_Bruchlinie.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_Bruchlinie.designer.cs">
+      <DependentUpon>Tool_Bruchlinie.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Tool_Resize.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_Resize.designer.cs">
+      <DependentUpon>Tool_Resize.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Tool_Clipping.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_Clipping.designer.cs">
+      <DependentUpon>Tool_Clipping.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Tool_DummyGenerator.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_DummyGenerator.designer.cs">
+      <DependentUpon>Tool_DummyGenerator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Tool_Eraser.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_Eraser.designer.cs">
+      <DependentUpon>Tool_Eraser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Tool_Kontrast.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_Kontrast.designer.cs">
+      <DependentUpon>Tool_Kontrast.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Tool_Paint.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_Paint.designer.cs">
+      <DependentUpon>Tool_Paint.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Tool_Abspielen.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_Abspielen.designer.cs">
+      <DependentUpon>Tool_Abspielen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Tool_Screenshot.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_Screenshot.designer.cs">
+      <DependentUpon>Tool_Screenshot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Tool_Spiegeln.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tools\Tool_Spiegeln.designer.cs">
+      <DependentUpon>Tool_Spiegeln.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="MainWindow.resx">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="Tools\GenericTool.resx">
+      <DependentUpon>GenericTool.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_Bruchlinie.resx">
+      <DependentUpon>Tool_Bruchlinie.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_Resize.resx">
+      <DependentUpon>Tool_Resize.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_Clipping.resx">
+      <DependentUpon>Tool_Clipping.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_DummyGenerator.resx">
+      <DependentUpon>Tool_DummyGenerator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_Eraser.resx">
+      <DependentUpon>Tool_Eraser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_Kontrast.resx">
+      <DependentUpon>Tool_Kontrast.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_Paint.resx">
+      <DependentUpon>Tool_Paint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_Abspielen.resx">
+      <DependentUpon>Tool_Abspielen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_Screenshot.resx">
+      <DependentUpon>Tool_Screenshot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Tool_Spiegeln.resx">
+      <DependentUpon>Tool_Spiegeln.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Update="Tools\GenericTool.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Tools\Tool_Bruchlinie.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Tools\Tool_Resize.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Tools\Tool_Clipping.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Tools\Tool_DummyGenerator.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Tools\Tool_Eraser.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Tools\Tool_Kontrast.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Tools\Tool_Paint.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Tools\Tool_Abspielen.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Tools\Tool_Screenshot.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Tools\Tool_Spiegeln.cs">
-      <SubType>Component</SubType>
-    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.1">
@@ -95,20 +232,26 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj" />
-    <ProjectReference Include="..\..\BlueControls\BlueControls\BlueControls.csproj" />
-    <ProjectReference Include="..\..\BlueDatabase\BlueDatabase\BlueDatabase.csproj" />
+    <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj">
+      <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
+      <Name>BlueBasics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BlueControls\BlueControls\BlueControls.csproj">
+      <Project>{6a9cfa8b-ddf5-4fa2-a110-c87a0ce34347}</Project>
+      <Name>BlueControls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BlueDatabase\BlueDatabase\BlueDatabase.csproj">
+      <Project>{ce8be078-ddae-47f5-aaa9-685564b898c9}</Project>
+      <Name>BlueDatabase</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="encog-dotnet-core" Version="3.4.0" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.2.217201">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>

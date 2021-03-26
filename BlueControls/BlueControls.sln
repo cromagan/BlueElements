@@ -1,11 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueControls", "BlueControls\BlueControls.csproj", "{6A9CFA8B-DDF5-4FA2-A110-C87A0CE34347}"
 	ProjectSection(ProjectDependencies) = postProject
-		{FC28245C-8F58-412D-85CE-8F5327618FA8} = {FC28245C-8F58-412D-85CE-8F5327618FA8}
 		{CE8BE078-DDAE-47F5-AAA9-685564B898C9} = {CE8BE078-DDAE-47F5-AAA9-685564B898C9}
 		{E7E05BAC-07CB-478D-861A-DB24A27BBF75} = {E7E05BAC-07CB-478D-861A-DB24A27BBF75}
 	EndProjectSection
@@ -16,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueDatabase", "..\BlueData
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBasics", "..\BlueBasics\BlueBasics.csproj", "{E7E05BAC-07CB-478D-861A-DB24A27BBF75}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBrain", "..\BlueBrain\BlueBrain\BlueBrain.csproj", "{FC28245C-8F58-412D-85CE-8F5327618FA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,18 +62,6 @@ Global
 		{E7E05BAC-07CB-478D-861A-DB24A27BBF75}.Release|x64.Build.0 = Release|Any CPU
 		{E7E05BAC-07CB-478D-861A-DB24A27BBF75}.Release|x86.ActiveCfg = Release|x86
 		{E7E05BAC-07CB-478D-861A-DB24A27BBF75}.Release|x86.Build.0 = Release|x86
-		{FC28245C-8F58-412D-85CE-8F5327618FA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FC28245C-8F58-412D-85CE-8F5327618FA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FC28245C-8F58-412D-85CE-8F5327618FA8}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{FC28245C-8F58-412D-85CE-8F5327618FA8}.Debug|x64.Build.0 = Debug|Any CPU
-		{FC28245C-8F58-412D-85CE-8F5327618FA8}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{FC28245C-8F58-412D-85CE-8F5327618FA8}.Debug|x86.Build.0 = Debug|Any CPU
-		{FC28245C-8F58-412D-85CE-8F5327618FA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FC28245C-8F58-412D-85CE-8F5327618FA8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FC28245C-8F58-412D-85CE-8F5327618FA8}.Release|x64.ActiveCfg = Release|Any CPU
-		{FC28245C-8F58-412D-85CE-8F5327618FA8}.Release|x64.Build.0 = Release|Any CPU
-		{FC28245C-8F58-412D-85CE-8F5327618FA8}.Release|x86.ActiveCfg = Release|Any CPU
-		{FC28245C-8F58-412D-85CE-8F5327618FA8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
