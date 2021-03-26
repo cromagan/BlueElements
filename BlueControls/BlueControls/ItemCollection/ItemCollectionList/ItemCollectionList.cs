@@ -56,9 +56,7 @@ namespace BlueControls.ItemCollection {
         #region  Properties 
 
         public enCheckBehavior CheckBehavior {
-            get {
-                return _CheckBehavior;
-            }
+            get => _CheckBehavior;
             set {
 
                 if (value == _CheckBehavior) { return; }
@@ -96,9 +94,7 @@ namespace BlueControls.ItemCollection {
         public int BreakAfterItems { get; private set; }
 
         public enBlueListBoxAppearance Appearance {
-            get {
-                return _Appearance;
-            }
+            get => _Appearance;
             set {
                 if (value == _Appearance && _ItemDesign != enDesign.Undefiniert) { return; }
                 _Appearance = value;

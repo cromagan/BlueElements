@@ -89,7 +89,7 @@ namespace BlueControls.Controls {
         /// Der Getter/Setter des UserControls. Dabei werden Sonderzeichen in _ umgewandelt. Punkte gelöscht. Zwei __ werden zu einem geändert, und die Anzegige nach den beiden _ wird optisch abgeschnitten.
         /// </summary>
         public string PropertyName {
-            get { return _propertyName; }
+            get => _propertyName;
             set {
                 if (_propertyName == value) { return; }
 
@@ -104,9 +104,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(true)]
         public new bool Enabled {
-            get {
-                return _enabled;
-            }
+            get => _enabled;
             set {
                 if (_enabled == value) { return; }
                 _enabled = value;
@@ -118,7 +116,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(null)]
         public object PropertyObject {
-            get { return _propertyObject; }
+            get => _propertyObject;
             set {
                 if (_propertyObject == value) { return; }
 

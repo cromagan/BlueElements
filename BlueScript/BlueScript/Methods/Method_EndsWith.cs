@@ -23,18 +23,18 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_EndsWith : Method {
 
-        public override string Syntax { get => "EndsWith(String, CaseSensitive, Value1, Value2, ...)"; }
+        public override string Syntax => "EndsWith(String, CaseSensitive, Value1, Value2, ...)";
 
-        public override string Description { get => "Prüft, ob der String mit einem der angegeben Strings endet."; }
+        public override string Description => "Prüft, ob der String mit einem der angegeben Strings endet.";
 
         public override List<string> Comand(Script s) { return new() { "endswith" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Bool; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ")";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Bool;
 
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.String, enVariableDataType.Bool, enVariableDataType.String }; }
-        public override bool EndlessArgs { get => true; }
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Bool, enVariableDataType.String };
+        public override bool EndlessArgs => true;
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {

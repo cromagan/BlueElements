@@ -24,7 +24,6 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -37,9 +36,7 @@ namespace BlueControls.ItemCollection {
 
         [Description("Text der angezeigt werden soll.<br>Kann Variablen aus dem Code-Generator enthalten.")]
         public string Interner_Text {
-            get {
-                return _VariableText;
-            }
+            get => _VariableText;
             set {
                 if (value == _VariableText) { return; }
                 _VariableText = value;
@@ -101,9 +98,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public enAlignment Ausrichtung {
-            get {
-                return _ausrichtung;
-            }
+            get => _ausrichtung;
             set {
                 if (value == _ausrichtung) { return; }
                 _ausrichtung = value;

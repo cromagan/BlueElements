@@ -35,9 +35,7 @@ namespace BlueControls.Controls {
         #endregion
         [DefaultValue(100)]
         public int Prozent {
-            get {
-                return wProzent;
-            }
+            get => wProzent;
             set {
                 if (value < 0) {
                     value = 0;

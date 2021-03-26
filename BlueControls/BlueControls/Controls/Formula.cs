@@ -85,9 +85,7 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Database Database {
-            get {
-                return _Database;
-            }
+            get => _Database;
             set {
                 if (_Database == value) { return; }
                 BeginnEdit();

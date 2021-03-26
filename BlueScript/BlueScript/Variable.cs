@@ -241,7 +241,7 @@ namespace BlueScript {
 
         private string _ValueString = string.Empty;
         public string ValueString {
-            get { return _ValueString; }
+            get => _ValueString;
             set {
                 if (Readonly) { return; }
                 _ValueString = value;
@@ -249,7 +249,7 @@ namespace BlueScript {
         }
 
         public List<string> ValueListString {
-            get { return _ValueString.SplitByCRToList(); }
+            get => _ValueString.SplitByCRToList();
             set {
                 if (Readonly) { return; }
                 _ValueString = value.JoinWithCr();
@@ -258,27 +258,17 @@ namespace BlueScript {
 
 
         public enVariableDataType Type { get; set; }
-        public bool ValueBool {
-            get {
-                return _ValueString == "true";
-            }
-        }
+        public bool ValueBool => _ValueString == "true";
 
         public double ValueDouble {
-            get {
-                return DoubleParse(_ValueString);
-            }
+            get => DoubleParse(_ValueString);
             set {
                 if (Readonly) { return; }
                 _ValueString = value.ToString();
             }
         }
 
-        public int ValueInt {
-            get {
-                return IntParse(_ValueString);
-            }
-        }
+        public int ValueInt => IntParse(_ValueString);
 
 
 

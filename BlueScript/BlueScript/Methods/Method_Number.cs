@@ -26,16 +26,16 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
     internal class Method_Number : Method {
 
-        public override string Syntax { get => "Number(string, number)"; }
+        public override string Syntax => "Number(string, number)";
 
-        public override string Description { get => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird der nachfolgende Zahlenwert zurückgegeben."; }
+        public override string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird der nachfolgende Zahlenwert zurückgegeben.";
         public override List<string> Comand(Script s) { return new() { "number" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Number; }
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.String, enVariableDataType.Number }; }
-        public override bool EndlessArgs { get => true; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ")";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Number;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Number };
+        public override bool EndlessArgs => true;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);

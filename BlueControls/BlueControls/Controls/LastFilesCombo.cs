@@ -58,9 +58,7 @@ namespace BlueControls.Controls {
         /// 
         [DefaultValue("")]
         public string Filename {
-            get {
-                return _filename;
-            }
+            get => _filename;
             set {
                 if (_filename == value) { return; }
                 _filename = value;
@@ -91,9 +89,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(true)]
         public bool MustExist {
-            get {
-                return _mustExists;
-            }
+            get => _mustExists;
             set {
                 if (_mustExists == value) { return; }
                 _mustExists = value;
@@ -104,9 +100,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(20)]
         public int MaxCount {
-            get {
-                return _maxCount;
-            }
+            get => _maxCount;
             set {
                 if (_maxCount == value) { return; }
                 _maxCount = value;

@@ -62,9 +62,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public string LayoutID {
-            get {
-                return _LayoutID;
-            }
+            get => _LayoutID;
             set {
 
                 if (value == _LayoutID) { return; }
@@ -82,9 +80,7 @@ namespace BlueControls.ItemCollection {
 
 
         public RowItem Row {
-            get {
-                return _Row;
-            }
+            get => _Row;
             set {
 
                 if (_Row == value) { return; }

@@ -85,7 +85,9 @@ namespace BlueDatabase {
 
 
 
-        public static string DoTranslate(string txt) => DoTranslate(txt, true, EmptyArgs);
+        public static string DoTranslate(string txt) {
+            return DoTranslate(txt, true, EmptyArgs);
+        }
 
 
         /// <summary>

@@ -112,20 +112,12 @@ namespace BlueControls.Controls {
 
         }
 
-        protected override bool ScaleChildren {
-            get {
-                return false; //MyBase.ScaleChildren
-            }
-        }
+        protected override bool ScaleChildren => false; //MyBase.ScaleChildren
 
         [DefaultValue(false)]
         public override bool AutoSize {
-            get {
-                return false; //MyBase.AutoSize
-            }
-            set {
-                base.AutoSize = false;
-            }
+            get => false; //MyBase.AutoSize
+            set => base.AutoSize = false;
         }
 
         protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
@@ -138,11 +130,7 @@ namespace BlueControls.Controls {
         #region  Properties 
 
         [Editor(typeof(TabPageCollectionEditor), typeof(UITypeEditor))]
-        public new TabPageCollection TabPages {
-            get {
-                return base.TabPages;
-            }
-        }
+        public new TabPageCollection TabPages => base.TabPages;
 
 
 

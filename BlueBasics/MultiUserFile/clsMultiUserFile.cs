@@ -113,7 +113,7 @@ namespace BlueBasics.MultiUserFile {
 
         private string _LastSaveCode;
 
-        protected Byte[] _dataOnDisk;
+        protected byte[] _dataOnDisk;
 
         public bool ReadOnly { get; private set; }
 
@@ -432,7 +432,7 @@ namespace BlueBasics.MultiUserFile {
             if (_BLoaded.Length > 4 && BitConverter.ToInt32(_BLoaded, 0) == 67324752) {
                 // Gezipte Daten-Kennung gefunden
                 _BLoaded = UnzipIt(_BLoaded);
-            } 
+            }
 
             ParseInternal(_BLoaded);
 
@@ -474,10 +474,10 @@ namespace BlueBasics.MultiUserFile {
 
             if (ReadOnly) { return Feedback("Datei ist Readonly"); }
 
-    
-                if (tmpFileName == null || string.IsNullOrEmpty(tmpFileName) ||
-                fileInfoBeforeSaving == null || string.IsNullOrEmpty(fileInfoBeforeSaving) ||
-                savedDataUncompressed == null || savedDataUncompressed.Length == 0) { return Feedback("Keine Daten angekommen."); }
+
+            if (tmpFileName == null || string.IsNullOrEmpty(tmpFileName) ||
+            fileInfoBeforeSaving == null || string.IsNullOrEmpty(fileInfoBeforeSaving) ||
+            savedDataUncompressed == null || savedDataUncompressed.Length == 0) { return Feedback("Keine Daten angekommen."); }
 
             if (!fromParallelProzess && PureBinSaver.IsBusy) { return Feedback("Anderer interner binärer Speichervorgang noch nicht abgeschlossen."); }
 
@@ -925,7 +925,7 @@ namespace BlueBasics.MultiUserFile {
             using var stream = entry.Open();
             using var ms = new MemoryStream();
             stream.CopyTo(ms);
-            
+
             return ms.ToArray();
         }
 
@@ -1221,7 +1221,7 @@ namespace BlueBasics.MultiUserFile {
             //  Generelle Prüfung, die eigentlich immer benötigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell ändern
             //  und eine Prüfung, die nicht auf die Sekunde genau wichtig ist.
             if (ReadOnly) { return "Die Datei wurde schreibgeschützt geöffnet."; }
-
+            if (!ReadOnly) { return "Die Datei wurde schreibgeschützt geöffnet."; }
             if (CheckForLastError(ref _EditNormalyNextCheckUTC, ref _EditNormalyError)) { return _EditNormalyError; }
 
 

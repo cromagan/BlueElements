@@ -148,9 +148,7 @@ namespace BlueControls {
 
 
         public enRelationType RelationType {
-            get {
-                return _relationtype;
-            }
+            get => _relationtype;
 
             set {
                 if (_relationtype == value) { return; }

@@ -81,13 +81,9 @@ namespace BlueControls.Controls {
         /// </summary>
         [DefaultValue(0)]
         public new int TabIndex {
-            get {
-                return 0;
-            }
+            get => 0;
 
-            set {
-                base.TabIndex = 0;
-            }
+            set => base.TabIndex = 0;
         }
 
 
@@ -96,20 +92,14 @@ namespace BlueControls.Controls {
         /// </summary>
         [DefaultValue(false)]
         public new bool TabStop {
-            get {
-                return false;
-            }
+            get => false;
 
-            set {
-                base.TabStop = false;
-            }
+            set => base.TabStop = false;
         }
 
         [DefaultValue("")]
         public new string Text {
-            get {
-                return _Text;
-            }
+            get => _Text;
             set {
                 if (value is null) { value = string.Empty; }
                 if (_Text == value) { return; }
@@ -121,9 +111,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enSteuerelementVerhalten.Text_Abschneiden)]
         public enSteuerelementVerhalten TextAnzeigeVerhalten {
-            get {
-                return _TextAnzeigeverhalten;
-            }
+            get => _TextAnzeigeverhalten;
             set {
                 if (_TextAnzeigeverhalten == value) { return; }
                 _TextAnzeigeverhalten = value;

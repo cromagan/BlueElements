@@ -71,11 +71,7 @@ namespace BlueControls {
         internal BlueFont Font { get; private set; } = null;
 
 
-        public int Char {
-            get {
-                return _Char;
-            }
-        }
+        public int Char => _Char;
 
 
 
@@ -117,9 +113,7 @@ namespace BlueControls {
         }
 
         public enDesign Design {
-            get {
-                return _Design;
-            }
+            get => _Design;
             set {
                 if (value == _Design) { return; }
                 ChangeState(value, _State, _Stufe);
@@ -128,9 +122,7 @@ namespace BlueControls {
 
 
         public enStates State {
-            get {
-                return _State;
-            }
+            get => _State;
             set {
                 if (value == _State) { return; }
                 ChangeState(_Design, value, _Stufe);
@@ -141,9 +133,7 @@ namespace BlueControls {
         public enMarkState Marking { get; set; }
 
         public int Stufe {
-            get {
-                return _Stufe;
-            }
+            get => _Stufe;
             set {
                 if (_Stufe == value) { return; }
                 ChangeState(_Design, _State, value);

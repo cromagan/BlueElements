@@ -25,15 +25,15 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
     internal class Method_Remove : Method {
 
-        public override string Syntax { get => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);"; }
-        public override string Description { get => "Entfernt aus der Liste die angegebenen Werte."; }
+        public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";
+        public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
         public override List<string> Comand(Script s) { return new() { "remove" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ");"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Null; }
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableList, enVariableDataType.String, enVariableDataType.String }; }
-        public override bool EndlessArgs { get => true; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ");";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableList, enVariableDataType.String, enVariableDataType.String };
+        public override bool EndlessArgs => true;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);

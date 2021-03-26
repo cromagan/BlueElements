@@ -58,9 +58,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enGroupBoxStyle.Normal)]
         public enGroupBoxStyle GroupBoxStyle {
-            get {
-                return _GroupBoxStyle;
-            }
+            get => _GroupBoxStyle;
             set {
                 if (_GroupBoxStyle == value) { return; }
                 _GroupBoxStyle = value;

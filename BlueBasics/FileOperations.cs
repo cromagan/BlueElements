@@ -403,7 +403,7 @@ namespace BlueBasics {
 
             return nn;
         }
-     
+
 
         public static void SaveToDisk(string DateiName, string Text2Save, bool ExecuteAfter, System.Text.Encoding code) {
 
@@ -447,7 +447,7 @@ namespace BlueBasics {
 
 
         public static string LoadFromDiskUTF8(string DateiName) {
-                    return File.ReadAllText(DateiName, Encoding.UTF8);
+            return File.ReadAllText(DateiName, Encoding.UTF8);
         }
 
         public static string LoadFromDiskLatin(string DateiName) {

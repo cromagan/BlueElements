@@ -61,12 +61,8 @@ namespace BlueControls.Forms {
         /// CreateParams gesteuert. Wenn TopMost true wäre, würde das Form den Focus bekommen.
         /// </summary>
         public new bool TopMost {
-            get {
-                return false;
-            }
-            set {
-                base.TopMost = false;
-            }
+            get => false;
+            set => base.TopMost = false;
         }
 
 

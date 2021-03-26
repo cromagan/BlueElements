@@ -142,9 +142,7 @@ namespace BlueControls {
         public string Name { get; private set; }
 
         public object Parent {
-            get {
-                return _parent;
-            }
+            get => _parent;
 
 
             set {
@@ -156,9 +154,7 @@ namespace BlueControls {
         }
 
         public decimal X {
-            get {
-                return _x;
-            }
+            get => _x;
 
             set {
                 if (_x == value) { return; }
@@ -168,9 +164,7 @@ namespace BlueControls {
         }
 
         public decimal Y {
-            get {
-                return _y;
-            }
+            get => _y;
 
             set {
                 if (_y == value) { return; }
@@ -192,9 +186,7 @@ namespace BlueControls {
         //}
 
         public bool CanUsedForAutoRelation {
-            get {
-                return _canUsedForAutoRelation;
-            }
+            get => _canUsedForAutoRelation;
 
             set {
                 if (_canUsedForAutoRelation == value) { return; }
@@ -205,9 +197,7 @@ namespace BlueControls {
 
 
         public bool Fix {
-            get {
-                return _fix;
-            }
+            get => _fix;
 
             set {
                 if (_fix == value) { return; }
@@ -218,9 +208,7 @@ namespace BlueControls {
 
 
         public bool UserSelectable {
-            get {
-                return _UserSelectable;
-            }
+            get => _UserSelectable;
 
             set {
                 if (_UserSelectable == value) { return; }
@@ -245,9 +233,7 @@ namespace BlueControls {
         //}
 
         public bool PrimaryGridSnapPoint {
-            get {
-                return _primaryGridSnapPoint;
-            }
+            get => _primaryGridSnapPoint;
 
             set {
                 if (_primaryGridSnapPoint == value) { return; }
@@ -257,9 +243,7 @@ namespace BlueControls {
         }
 
         public string Tag {
-            get {
-                return _tag;
-            }
+            get => _tag;
 
             set {
                 if (_tag == value) { return; }
@@ -272,8 +256,9 @@ namespace BlueControls {
         public event EventHandler Changed;
 
 
-        public void Parse(string ToParse) => Parse(ToParse, null);
-
+        public void Parse(string ToParse) {
+            Parse(ToParse, null);
+        }
 
         public void Parse(string ToParse, object parent) {
             IsParsing = true;
@@ -327,9 +312,13 @@ namespace BlueControls {
             IsParsing = false;
         }
 
-        public static explicit operator PointF(PointM p) => new((float)p.X, (float)p.Y);
+        public static explicit operator PointF(PointM p) {
+            return new((float)p.X, (float)p.Y);
+        }
 
-        public static explicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
+        public static explicit operator Point(PointM p) {
+            return new((int)p.X, (int)p.Y);
+        }
 
 
 
@@ -566,9 +555,7 @@ namespace BlueControls {
         }
 
 
-        public decimal Magnitude {
-            get { return (decimal)Math.Sqrt((double)(_x * _x + _y * _y)); }
-        }
+        public decimal Magnitude => (decimal)Math.Sqrt((double)(_x * _x + _y * _y));
 
         public void Normalize() {
             var magnitude = Magnitude;

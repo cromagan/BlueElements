@@ -94,9 +94,7 @@ namespace BlueDatabase {
         public bool IsParsing { get; private set; }
 
         public ColumnItem Column {
-            get {
-                return _Column;
-            }
+            get => _Column;
             set {
                 _Column = value;
                 OnChanged();
@@ -107,9 +105,7 @@ namespace BlueDatabase {
         public ListExt<string> SearchValue { get; private set; } = new ListExt<string>();
 
         public enFilterType FilterType {
-            get {
-                return _FilterType;
-            }
+            get => _FilterType;
             set {
                 _FilterType = value;
                 OnChanged();

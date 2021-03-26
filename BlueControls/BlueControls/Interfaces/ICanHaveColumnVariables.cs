@@ -18,7 +18,6 @@
 #endregion
 
 using BlueDatabase;
-using BlueDatabase.Enums;
 
 namespace BlueControls.Interfaces {
     public interface ICanHaveColumnVariables {

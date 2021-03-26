@@ -275,7 +275,7 @@ namespace BlueBasics {
                         }
 
                         HTML_AddFoot(endl);
-                        endl.Save(TempFile("", "Endmeldung", "html"), true,  System.Text.Encoding.UTF8);
+                        endl.Save(TempFile("", "Endmeldung", "html"), true, System.Text.Encoding.UTF8);
                         AbortExe();
                         return;
                     }

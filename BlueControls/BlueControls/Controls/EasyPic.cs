@@ -87,9 +87,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue((Bitmap)null)]
         public Bitmap Bitmap {
-            get {
-                return _Bitmap;
-            }
+            get => _Bitmap;
             private set {
                 if (_Bitmap == null && value == null) { return; }
                 _Bitmap = value;
@@ -100,22 +98,14 @@ namespace BlueControls.Controls {
 
         [DefaultValue(0)]
         public new int TabIndex {
-            get {
-                return 0;
-            }
+            get => 0;
 
-            set {
-                base.TabIndex = 0;
-            }
+            set => base.TabIndex = 0;
         }
         [DefaultValue(false)]
         public new bool TabStop {
-            get {
-                return false;
-            }
-            set {
-                base.TabStop = false;
-            }
+            get => false;
+            set => base.TabStop = false;
         }
 
 

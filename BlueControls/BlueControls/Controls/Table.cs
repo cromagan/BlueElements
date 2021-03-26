@@ -188,9 +188,7 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Database Database {
-            get {
-                return _Database;
-            }
+            get => _Database;
             set {
                 if (_Database == value) { return; }
 
@@ -276,9 +274,7 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public RowSortDefinition SortDefinitionTemporary {
-            get {
-                return _sortDefinitionTemporary;
-            }
+            get => _sortDefinitionTemporary;
             set {
                 if (_sortDefinitionTemporary != null && value != null && _sortDefinitionTemporary.ToString() == value.ToString()) { return; }
                 if (_sortDefinitionTemporary == value) { return; }
@@ -297,9 +293,7 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public RowItem Unterschiede {
-            get {
-                return _Unterschiede;
-            }
+            get => _Unterschiede;
             set {
                 //if (_Unterschiede != null && value != null && _sortDefinitionTemporary.ToString() == value.ToString()) { return; }
                 if (_Unterschiede == value) { return; }
@@ -323,9 +317,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(false)]
         public bool ShowNumber {
-            get {
-                return _ShowNumber;
-            }
+            get => _ShowNumber;
             set {
 
                 if (value == _ShowNumber) { return; }
@@ -338,9 +330,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enBlueTableAppearance.Standard)]
         public enBlueTableAppearance Design {
-            get {
-                return _Design;
-            }
+            get => _Design;
             set {
                 SliderY.Visible = true;
                 SliderX.Visible = Convert.ToBoolean(value == enBlueTableAppearance.Standard);
@@ -3128,9 +3118,7 @@ namespace BlueControls.Controls {
         [DefaultValue(1)]
         [Description("Welche Spaltenanordnung angezeigt werden soll")]
         public int Arrangement {
-            get {
-                return _ArrangementNr;
-            }
+            get => _ArrangementNr;
             set {
                 if (value != _ArrangementNr) {
                     _ArrangementNr = value;
@@ -3339,11 +3327,7 @@ namespace BlueControls.Controls {
             return null;
         }
 
-        public List<RowItem> PinnedRows {
-            get {
-                return _PinnedRows;
-            }
-        }
+        public List<RowItem> PinnedRows => _PinnedRows;
 
         public List<RowItem> SortedRows() {
             if (AreRowsSorted()) { return _SortedRows; }

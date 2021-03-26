@@ -24,15 +24,15 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_Round : Method {
 
-        public override string Syntax { get => "Round(Value, Nachkommastellen)"; }
-        public override string Description { get => "Rundet den Zahlenwert mathematisch korrekt."; }
+        public override string Syntax => "Round(Value, Nachkommastellen)";
+        public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
         public override List<string> Comand(Script s) { return new() { "round" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Number; }
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.Number, enVariableDataType.Integer }; }
-        public override bool EndlessArgs { get => false; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ")";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Number;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Number, enVariableDataType.Integer };
+        public override bool EndlessArgs => false;
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {

@@ -126,9 +126,7 @@ namespace BlueDatabase {
         public bool IsParsing { get; private set; }
 
         public enViewType ViewType {
-            get {
-                return _ViewType;
-            }
+            get => _ViewType;
             set {
                 if (value == _ViewType) { return; }
                 _ViewType = value;
@@ -137,9 +135,7 @@ namespace BlueDatabase {
         }
 
         public enÜberschriftAnordnung ÜberschriftAnordnung {
-            get {
-                return _ÜberschriftAnordnung;
-            }
+            get => _ÜberschriftAnordnung;
             set {
                 if (value == _ÜberschriftAnordnung) { return; }
                 _ÜberschriftAnordnung = value;
@@ -152,9 +148,7 @@ namespace BlueDatabase {
         /// Nur wichtig für Formular
         /// </summary>
         public int Spalte_X1 {
-            get {
-                return _Spalte_X1;
-            }
+            get => _Spalte_X1;
             set {
                 if (value == _Spalte_X1) { return; }
                 _Spalte_X1 = value;
@@ -166,9 +160,7 @@ namespace BlueDatabase {
         /// Nur wichtig für Formular
         /// </summary>
         public int Width {
-            get {
-                return _Spalte_Width;
-            }
+            get => _Spalte_Width;
             set {
                 if (value == _Spalte_Width) { return; }
                 _Spalte_Width = value;
@@ -177,9 +169,7 @@ namespace BlueDatabase {
         }
 
         public int Height {
-            get {
-                return _Spalte_Height;
-            }
+            get => _Spalte_Height;
             set {
                 if (value == _Spalte_Height) { return; }
                 _Spalte_Height = value;

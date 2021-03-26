@@ -133,20 +133,12 @@ namespace BlueControls.Controls {
             base.ScaleControl(factor, specified);
         }
 
-        protected override bool ScaleChildren {
-            get {
-                return false; //MyBase.ScaleChildren
-            }
-        }
+        protected override bool ScaleChildren => false; //MyBase.ScaleChildren
 
         [DefaultValue(false)]
         public override bool AutoSize {
-            get {
-                return false; //MyBase.AutoSize
-            }
-            set {
-                base.AutoSize = false;
-            }
+            get => false; //MyBase.AutoSize
+            set => base.AutoSize = false;
         }
 
 
@@ -181,9 +173,7 @@ namespace BlueControls.Controls {
         [DefaultValue("")]
         [Description("QuickInfo des Steuerelementes - im extTXT-Format")]
         public string QuickInfo {
-            get {
-                return _QuickInfo;
-            }
+            get => _QuickInfo;
             set {
                 if (_QuickInfo != value) {
                     Forms.QuickInfo.Close();
@@ -198,11 +188,7 @@ namespace BlueControls.Controls {
         }
 
 
-        public virtual string QuickInfoText {
-            get {
-                return _QuickInfo;
-            }
-        }
+        public virtual string QuickInfoText => _QuickInfo;
 
 
         #endregion

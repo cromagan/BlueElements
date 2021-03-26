@@ -23,15 +23,15 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_IsNullOrEmpty : Method {
 
-        public override string Description { get => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat."; }
-        public override string Syntax { get => "isNullOrEmpty(Variable)"; }
+        public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
+        public override string Syntax => "isNullOrEmpty(Variable)";
         public override List<string> Comand(Script s) { return new() { "isnullorempty" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Bool; }
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableListOrStringNumBool }; }
-        public override bool EndlessArgs { get => false; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ")";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Bool;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableListOrStringNumBool };
+        public override bool EndlessArgs => false;
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {

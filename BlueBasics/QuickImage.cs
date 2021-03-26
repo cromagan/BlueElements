@@ -125,9 +125,7 @@ namespace BlueBasics {
         public bool IsParsing { get; private set; }
 
         public string Name {
-            get {
-                return _name;
-            }
+            get => _name;
 
             set {
                 _name = value;
@@ -136,9 +134,7 @@ namespace BlueBasics {
         }
 
         public enImageCodeEffect Effekt {
-            get {
-                return _effekt;
-            }
+            get => _effekt;
 
             set {
                 _effekt = value;
@@ -147,9 +143,7 @@ namespace BlueBasics {
         }
 
         public int Width {
-            get {
-                return _width;
-            }
+            get => _width;
 
             set {
                 _width = value;
@@ -158,9 +152,7 @@ namespace BlueBasics {
         }
 
         public int Height {
-            get {
-                return _height;
-            }
+            get => _height;
 
             set {
                 _height = value;
@@ -169,9 +161,7 @@ namespace BlueBasics {
         }
 
         public string Färbung {
-            get {
-                return _färbung;
-            }
+            get => _färbung;
 
             set {
                 _färbung = value;
@@ -180,9 +170,7 @@ namespace BlueBasics {
         }
 
         public string ChangeGreenTo {
-            get {
-                return _changeGreenTo;
-            }
+            get => _changeGreenTo;
 
             set {
                 _changeGreenTo = value;
@@ -191,9 +179,7 @@ namespace BlueBasics {
         }
 
         public int Helligkeit {
-            get {
-                return _helligkeit;
-            }
+            get => _helligkeit;
 
             set {
                 _helligkeit = value;
@@ -202,9 +188,7 @@ namespace BlueBasics {
         }
 
         public int Sättigung {
-            get {
-                return _sättigung;
-            }
+            get => _sättigung;
 
             set {
                 _sättigung = value;
@@ -213,9 +197,7 @@ namespace BlueBasics {
         }
 
         public int Transparenz {
-            get {
-                return _transparenz;
-            }
+            get => _transparenz;
 
             set {
                 _transparenz = value;
@@ -224,9 +206,7 @@ namespace BlueBasics {
         }
 
         public string Zweitsymbol {
-            get {
-                return _Zweitsymbol;
-            }
+            get => _Zweitsymbol;
 
             set {
                 _Zweitsymbol = value;
@@ -235,9 +215,7 @@ namespace BlueBasics {
         }
 
         public int DrehWinkel {
-            get {
-                return _drehWinkel;
-            }
+            get => _drehWinkel;
 
             set {
                 _drehWinkel = value;

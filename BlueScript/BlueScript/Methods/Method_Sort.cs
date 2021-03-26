@@ -28,18 +28,18 @@ namespace BlueScript {
 
         //public Method_Sort(Script parent) : base(parent) { }
 
-        public override string Syntax { get => "Sort(ListVariable, EliminateDupes);"; }
+        public override string Syntax => "Sort(ListVariable, EliminateDupes);";
 
-        public override string Description { get => "Sortiert die Liste und falls der zweite Wert TRUE ist, entfernt Doubletten."; }
+        public override string Description => "Sortiert die Liste und falls der zweite Wert TRUE ist, entfernt Doubletten.";
 
         public override List<string> Comand(Script s) { return new() { "sort" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ");"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Null; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ");";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Null;
 
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableList, enVariableDataType.Bool }; }
-        public override bool EndlessArgs { get => false; }
+        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableList, enVariableDataType.Bool };
+        public override bool EndlessArgs => false;
 
 
 

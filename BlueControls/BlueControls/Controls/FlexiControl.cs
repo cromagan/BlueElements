@@ -129,7 +129,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(false)]
         public bool ShowInfoWhenDisabled {
-            get { return _ShowInfoWhenDisabled; }
+            get => _ShowInfoWhenDisabled;
             set {
                 if (_ShowInfoWhenDisabled == value) { return; }
                 _ShowInfoWhenDisabled = value;
@@ -248,9 +248,7 @@ namespace BlueControls.Controls {
         /// </summary>
         [DefaultValue("")]
         public string Suffix {
-            get {
-                return _Suffix;
-            }
+            get => _Suffix;
             set {
 
                 if (_Suffix == value) { return; }
@@ -264,9 +262,7 @@ namespace BlueControls.Controls {
         /// </summary>
         [DefaultValue(false)]
         public bool MultiLine {
-            get {
-                return _MultiLine;
-            }
+            get => _MultiLine;
             set {
 
                 if (_MultiLine == value) { return; }
@@ -282,9 +278,7 @@ namespace BlueControls.Controls {
         /// </summary>
         [DefaultValue(false)]
         public bool InstantChangedEvent {
-            get {
-                return _InstantChangedEvent;
-            }
+            get => _InstantChangedEvent;
             set {
 
                 if (_InstantChangedEvent == value) { return; }
@@ -302,9 +296,7 @@ namespace BlueControls.Controls {
         /// </summary>
         [DefaultValue(enDataFormat.Text)]
         public enDataFormat Format {
-            get {
-                return _Format;
-            }
+            get => _Format;
             set {
                 if (_Format == value) { return; }
                 _Format = value;
@@ -314,9 +306,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enEditTypeFormula.None)]
         public enEditTypeFormula EditType {
-            get {
-                return _EditType;
-            }
+            get => _EditType;
             set {
                 if (_EditType == value) { return; }
                 RemoveAll(); // Controls and Events entfernen!
@@ -331,9 +321,7 @@ namespace BlueControls.Controls {
         /// </summary>
         [DefaultValue(-1)]
         public int ControlX {
-            get {
-                return _ControlX;
-            }
+            get => _ControlX;
             set {
                 if (_ControlX == value) { return; }
                 RemoveAll(); // Controls and Events entfernen!
@@ -344,9 +332,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue("")]
         public string InfoText {
-            get {
-                return _InfoText;
-            }
+            get => _InfoText;
             set {
                 if (_InfoText == value) { return; }
                 _InfoText = value;
@@ -357,9 +343,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enÜberschriftAnordnung.ohne)]
         public enÜberschriftAnordnung CaptionPosition {
-            get {
-                return _CaptionPosition;
-            }
+            get => _CaptionPosition;
             set {
                 if (_CaptionPosition == value) { return; }
                 RemoveAll(); // Controls and Events entfernen!
@@ -369,9 +353,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue("")]
         public string Caption {
-            get {
-                return _Caption;
-            }
+            get => _Caption;
             set {
                 if (_Caption == value) { return; }
                 RemoveAll(); // Controls and Events entfernen!

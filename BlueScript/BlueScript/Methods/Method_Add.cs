@@ -26,17 +26,17 @@ namespace BlueScript {
     internal class Method_Add : Method {
 
 
-        public override string Syntax { get => "Add(List-Variable, Value1, Value2, ...)"; }
+        public override string Syntax => "Add(List-Variable, Value1, Value2, ...)";
 
 
-        public override string Description { get => "Fügt einer Liste einen oder mehrere Werte hinzu."; }
+        public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";
         public override List<string> Comand(Script s) { return new() { "add" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ");"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Null; }
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableList, enVariableDataType.String }; }
-        public override bool EndlessArgs { get => true; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ");";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableList, enVariableDataType.String };
+        public override bool EndlessArgs => true;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);

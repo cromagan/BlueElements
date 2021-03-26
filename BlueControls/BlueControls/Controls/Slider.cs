@@ -76,33 +76,23 @@ namespace BlueControls.Controls {
 
         [DefaultValue(0)]
         public new int TabIndex {
-            get {
-                return 0;
-            }
+            get => 0;
 
-            set {
-                base.TabIndex = 0;
-            }
+            set => base.TabIndex = 0;
         }
 
         [DefaultValue(false)]
         public new bool TabStop {
-            get {
-                return false;
-            }
+            get => false;
 
-            set {
-                base.TabStop = false;
-            }
+            set => base.TabStop = false;
         }
 
 
 
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {
-            get {
-                return _Orientation;
-            }
+            get => _Orientation;
             set {
                 if (value == _Orientation) { return; }
                 _Orientation = value;
@@ -113,9 +103,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(0D)]
         public double Minimum {
-            get {
-                return Math.Min(_Minimum, _Maximum);
-            }
+            get => Math.Min(_Minimum, _Maximum);
             set {
                 if (_Minimum == value) { return; }
                 _Minimum = value;
@@ -127,9 +115,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(100.0D)]
         public double Maximum {
-            get {
-                return Math.Max(_Minimum, _Maximum);
-            }
+            get => Math.Max(_Minimum, _Maximum);
             set {
                 if (_Maximum == value) { return; }
                 _Maximum = value;
@@ -151,9 +137,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(0D)]
         public double Value {
-            get {
-                return _Value;
-            }
+            get => _Value;
             set {
                 value = CheckMinMax(value);
 

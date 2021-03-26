@@ -56,7 +56,9 @@ namespace BlueBasics {
         }
 
 
-        public BitmapExt(int width, int height) => EmptyBitmap(width, height);
+        public BitmapExt(int width, int height) {
+            EmptyBitmap(width, height);
+        }
 
         public BitmapExt(Icon icon) : this(icon.ToBitmap()) { }
 
@@ -355,14 +357,12 @@ namespace BlueBasics {
             Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
         }
 
-        public void MakeTransparent(Color color) => Bitmap.MakeTransparent(color);
+        public void MakeTransparent(Color color) {
+            Bitmap.MakeTransparent(color);
+        }
 
-
-        public void Save(string name, ImageFormat imageFormat) => Bitmap.Save(name, imageFormat);
-
-
-
-
-
+        public void Save(string name, ImageFormat imageFormat) {
+            Bitmap.Save(name, imageFormat);
+        }
     }
 }

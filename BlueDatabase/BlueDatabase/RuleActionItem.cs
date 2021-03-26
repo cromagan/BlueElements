@@ -76,9 +76,7 @@ namespace BlueDatabase {
         public bool IsParsing { get; private set; }
 
         public enAction Action {
-            get {
-                return _Action;
-            }
+            get => _Action;
             set {
                 if (_Action == value) { return; }
                 _Action = value;
@@ -88,9 +86,7 @@ namespace BlueDatabase {
 
 
         public string Text {
-            get {
-                return _Text;
-            }
+            get => _Text;
             set {
                 if (_Text == value) { return; }
                 _Text = value;

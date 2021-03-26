@@ -30,18 +30,18 @@ namespace BlueScript {
         //public Method_Contains(Script parent) : base(parent) { }
 
 
-        public override string Syntax { get => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)"; }
+        public override string Syntax => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)";
 
-        public override string Description { get => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt."; }
+        public override string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
 
         public override List<string> Comand(Script s) { return new() { "contains" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Bool; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ")";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Bool;
 
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableListOrString, enVariableDataType.Bool, enVariableDataType.String }; }
-        public override bool EndlessArgs { get => true; }
+        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableListOrString, enVariableDataType.Bool, enVariableDataType.String };
+        public override bool EndlessArgs => true;
 
 
 

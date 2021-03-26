@@ -114,9 +114,7 @@ namespace BlueControls.ItemCollection {
 
 
         public bool Enabled {
-            get {
-                return _Enabled;
-            }
+            get => _Enabled;
             set {
                 if (_Enabled == value) { return; }
 
@@ -138,9 +136,7 @@ namespace BlueControls.ItemCollection {
 
 
         public string UserDefCompareKey {
-            get {
-                return _UserDefCompareKey;
-            }
+            get => _UserDefCompareKey;
             set {
                 if (value == _UserDefCompareKey) { return; }
                 _UserDefCompareKey = value;
@@ -151,9 +147,7 @@ namespace BlueControls.ItemCollection {
 
 
         public bool Checked {
-            get {
-                return _Checked;
-            }
+            get => _Checked;
             set {
                 if (Parent == null) { Develop.DebugPrint(enFehlerArt.Warnung, "Parent == null!"); }
 

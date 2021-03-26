@@ -48,19 +48,11 @@ namespace BlueControls {
 
 
 
-        public decimal Left {
-            get { return X; }
-        }
+        public decimal Left => X;
 
-        public decimal Top {
-            get { return Y; }
-        }
-        public decimal Right {
-            get { return X + Width; }
-        }
-        public decimal Bottom {
-            get { return Y + Height; }
-        }
+        public decimal Top => Y;
+        public decimal Right => X + Width;
+        public decimal Bottom => Y + Height;
 
         /// <summary>
         /// Positive Werte verkleinern das Rechteck, negative vergrößern es.
@@ -195,8 +187,12 @@ namespace BlueControls {
             return new RectangleM(X, Y, Width, Height);
         }
 
-        public static explicit operator RectangleF(RectangleM r) => new((float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
+        public static explicit operator RectangleF(RectangleM r) {
+            return new((float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
+        }
 
-        public static explicit operator Rectangle(RectangleM r) => new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
+        public static explicit operator Rectangle(RectangleM r) {
+            return new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
+        }
     }
 }

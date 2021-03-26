@@ -74,11 +74,7 @@ namespace BlueDatabase {
 
         public bool Reverse { get; private set; }
 
-        public List<ColumnItem> Columns {
-            get {
-                return _Columns;
-            }
-        }
+        public List<ColumnItem> Columns => _Columns;
 
         #endregion
 

@@ -35,11 +35,11 @@ namespace BlueScript {
 
         public string Error {
             get => _error;
-            private set { _error = value.Replace("{", "").Replace("}", ""); }
+            private set => _error = value.Replace("{", "").Replace("}", "");
         }
         public string ErrorCode {
             get => _errorCode;
-            private set { _errorCode = value.Replace("{", "").Replace("}", ""); }
+            private set => _errorCode = value.Replace("{", "").Replace("}", "");
         }
 
         private string _ScriptText = string.Empty;
@@ -177,9 +177,7 @@ namespace BlueScript {
         }
 
         public string ScriptText {
-            get {
-                return _ScriptText;
-            }
+            get => _ScriptText;
             set {
 
                 if (_ScriptText == value) { return; }

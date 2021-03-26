@@ -41,7 +41,7 @@ namespace BlueControls.Controls {
 
 
         public Bitmap BMP {
-            get { return _bmp; }
+            get => _bmp;
 
 
             set {

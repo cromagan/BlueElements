@@ -62,9 +62,7 @@ namespace BlueDatabase {
         public bool IsParsing { get; private set; }
 
         public string Verzeichnis {
-            get {
-                return _Verzeichnis;
-            }
+            get => _Verzeichnis;
             set {
                 if (_Verzeichnis == value) { return; }
                 _Verzeichnis = value;
@@ -75,9 +73,7 @@ namespace BlueDatabase {
 
 
         public enExportTyp Typ {
-            get {
-                return _Typ;
-            }
+            get => _Typ;
             set {
                 if (_Typ == value) { return; }
                 _Typ = value;
@@ -87,9 +83,7 @@ namespace BlueDatabase {
 
 
         public float Intervall {
-            get {
-                return _Intervall;
-            }
+            get => _Intervall;
             set {
                 if (_Intervall == value) { return; }
                 _Intervall = value;
@@ -99,9 +93,7 @@ namespace BlueDatabase {
 
 
         public float AutomatischLöschen {
-            get {
-                return _AutomatischLöschen;
-            }
+            get => _AutomatischLöschen;
             set {
                 if (_AutomatischLöschen == value) { return; }
                 _AutomatischLöschen = value;
@@ -112,9 +104,7 @@ namespace BlueDatabase {
 
 
         public string ExportFormularID {
-            get {
-                return _ExportFormularID;
-            }
+            get => _ExportFormularID;
             set {
                 if (_ExportFormularID == value) { return; }
                 _ExportFormularID = value;
@@ -123,9 +113,7 @@ namespace BlueDatabase {
         }
 
         public int ExportSpaltenAnsicht {
-            get {
-                return _ExportSpaltenAnsicht;
-            }
+            get => _ExportSpaltenAnsicht;
             set {
                 if (_ExportSpaltenAnsicht == value) { return; }
                 _ExportSpaltenAnsicht = value;
@@ -136,20 +124,13 @@ namespace BlueDatabase {
         public FilterCollection Filter { get; private set; }
 
 
-        public List<string> BereitsExportiert {
-            get {
-                return _BereitsExportiert;
-            }
-
-        }
+        public List<string> BereitsExportiert => _BereitsExportiert;
 
 
 
 
         public DateTime LastExportTimeUTC {
-            get {
-                return _LastExportTimeUTC;
-            }
+            get => _LastExportTimeUTC;
             set {
                 if (_LastExportTimeUTC == value) { return; }
 

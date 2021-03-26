@@ -98,12 +98,8 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enCheckBehavior.SingleSelection)]
         public enCheckBehavior CheckBehavior {
-            get {
-                return Item.CheckBehavior;
-            }
-            set {
-                Item.CheckBehavior = value;
-            }
+            get => Item.CheckBehavior;
+            set => Item.CheckBehavior = value;
         }
 
         public string LastFilePath { get; set; }
@@ -120,9 +116,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enBlueListBoxAppearance.Listbox)]
         public enBlueListBoxAppearance Appearance {
-            get {
-                return _Appearance;
-            }
+            get => _Appearance;
             set {
                 if (_Appearance == value) { return; }
                 _Appearance = value;
@@ -133,9 +127,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(false)]
         public bool RemoveAllowed {
-            get {
-                return _RemoveAllowed;
-            }
+            get => _RemoveAllowed;
             set {
                 if (_RemoveAllowed == value) { return; }
                 _RemoveAllowed = value;
@@ -145,9 +137,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(true)]
         public enAddType AddAllowed {
-            get {
-                return _AddAlloweds;
-            }
+            get => _AddAlloweds;
             set {
                 if (_AddAlloweds == value) { return; }
                 _AddAlloweds = value;
@@ -157,9 +147,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(false)]
         public bool MoveAllowed {
-            get {
-                return _MoveAllowed;
-            }
+            get => _MoveAllowed;
             set {
                 if (_MoveAllowed == value) { return; }
                 _MoveAllowed = value;
@@ -171,7 +159,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(false)]
         public bool FilterAllowed {
-            get { return _FilterAllowed; }
+            get => _FilterAllowed;
             set {
                 //  if (_MoveAllowed) { value = false; }
                 if (_FilterAllowed == value) { return; }

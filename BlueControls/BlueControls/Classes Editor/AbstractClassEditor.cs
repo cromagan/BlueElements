@@ -44,10 +44,7 @@ namespace BlueControls.Classes_Editor {
         /// <returns></returns>
         [DefaultValue(null)]
         internal T Item {
-            get {
-
-                return _Item;
-            }
+            get => _Item;
             set {
                 _Item = value;
 

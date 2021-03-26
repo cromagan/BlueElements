@@ -24,18 +24,18 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_ChangeType : Method {
 
-        public override string Syntax { get => "ChangeType(Variable, num / str / lst / dat / bol)"; }
+        public override string Syntax => "ChangeType(Variable, num / str / lst / dat / bol)";
 
-        public override string Description { get => "Ändert den Variabelntyp einfach um. Ohne jegliche Prüfung. Alle Variablen werden Intern als Text gespeichert, weshalb diese Änderung möglich ist. Evtl. entstehen dadurch Variablen, die an sich kaputt sind, aber nicht als solches markiert sind."; }
+        public override string Description => "Ändert den Variabelntyp einfach um. Ohne jegliche Prüfung. Alle Variablen werden Intern als Text gespeichert, weshalb diese Änderung möglich ist. Evtl. entstehen dadurch Variablen, die an sich kaputt sind, aber nicht als solches markiert sind.";
 
         public override List<string> Comand(Script s) { return new() { "changetype" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ");"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Null; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ");";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Null;
 
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableNumStrListDateBool, enVariableDataType.String }; }
-        public override bool EndlessArgs { get => false; }
+        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableNumStrListDateBool, enVariableDataType.String };
+        public override bool EndlessArgs => false;
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {

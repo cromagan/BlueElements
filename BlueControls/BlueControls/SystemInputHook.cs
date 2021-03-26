@@ -33,9 +33,7 @@ namespace BlueControls {
         private System.Windows.Forms.Timer _Tim;
         private System.Windows.Forms.Timer Tim {
             [DebuggerNonUserCode]
-            get {
-                return _Tim;
-            }
+            get => _Tim;
             [MethodImpl(MethodImplOptions.Synchronized)]
             [DebuggerNonUserCode]
             set {

@@ -43,9 +43,7 @@ namespace BlueControls.ItemCollection {
         private bool _größe_fixiert = false;
 
         public int Drehwinkel {
-            get {
-                return _drehwinkel;
-            }
+            get => _drehwinkel;
             set {
                 if (_drehwinkel == value) { return; }
                 _drehwinkel = value;
@@ -53,9 +51,7 @@ namespace BlueControls.ItemCollection {
             }
         }
         public bool Größe_fixiert {
-            get {
-                return _größe_fixiert;
-            }
+            get => _größe_fixiert;
             set {
                 if (_größe_fixiert == value) { return; }
 

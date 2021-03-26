@@ -63,9 +63,7 @@ namespace BlueControls {
         private SystemInputHook _Hook;
         private SystemInputHook Hook {
             [DebuggerNonUserCode]
-            get {
-                return _Hook;
-            }
+            get => _Hook;
             [MethodImpl(MethodImplOptions.Synchronized), DebuggerNonUserCode]
             set {
                 if (_Hook != null) {

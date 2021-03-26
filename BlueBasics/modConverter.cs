@@ -74,7 +74,7 @@ namespace BlueBasics {
 
 
         //public static string UTF8toString(string S) {
-           
+
         //}
 
         //public static string StringtoUTF8(string S) {

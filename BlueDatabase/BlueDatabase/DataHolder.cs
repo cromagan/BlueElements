@@ -403,14 +403,14 @@ namespace BlueDatabase {
 
         public string Erstelldatum {
             get => InternalDatabase.CreateDate;
-            set { InternalDatabase.CreateDate = value; }
+            set => InternalDatabase.CreateDate = value;
         }
 
 
 
         public string Ersteller {
             get => InternalDatabase.Creator;
-            set { InternalDatabase.Creator = value; }
+            set => InternalDatabase.Creator = value;
         }
 
 

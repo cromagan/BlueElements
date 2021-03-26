@@ -62,9 +62,7 @@ namespace BlueDatabase {
         public bool IsParsing { get; private set; }
 
         public string Name {
-            get {
-                return _Name;
-            }
+            get => _Name;
             set {
                 if (_Name == value) { return; }
                 _Name = value;

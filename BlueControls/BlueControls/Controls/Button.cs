@@ -80,9 +80,7 @@ namespace BlueControls.Controls {
         [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
         [DefaultValue("")]
         public string ImageCode {
-            get {
-                return _ImageCode;
-            }
+            get => _ImageCode;
             set {
                 if (_ImageCode == value) { return; }
                 _ImageCode = value;
@@ -95,9 +93,7 @@ namespace BlueControls.Controls {
         [DefaultValue("")]
         [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
         public string ImageCode_Checked {
-            get {
-                return _ImageCode_Checked;
-            }
+            get => _ImageCode_Checked;
             set {
                 if (_ImageCode_Checked == value) { return; }
                 _ImageCode_Checked = value;
@@ -108,9 +104,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue("")]
         public new string Text {
-            get {
-                return _Text;
-            }
+            get => _Text;
 
             set {
                 if (_Text == value) { return; }
@@ -121,9 +115,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enButtonStyle.Button)]
         public enButtonStyle ButtonStyle {
-            get {
-                return _ButtonStyle;
-            }
+            get => _ButtonStyle;
             set {
                 if (_ButtonStyle == value) { return; }
                 _ButtonStyle = value;

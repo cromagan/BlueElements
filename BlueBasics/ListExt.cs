@@ -44,9 +44,7 @@ namespace BlueBasics {
 
 
         public bool ThrowEvents {
-            get {
-                return _ThrowEvents;
-            }
+            get => _ThrowEvents;
             set {
 
                 if (_ThrowEvents == value) { Develop.DebugPrint(enFehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }

@@ -60,16 +60,10 @@ namespace BlueControls.ItemCollection {
 
         #region  Properties 
 
-        public override string QuickInfo {
-            get {
-                return _ReadableText.CreateHtmlCodes(true);
-            }
-        }
+        public override string QuickInfo => _ReadableText.CreateHtmlCodes(true);
 
         public string Text {
-            get {
-                return _ReadableText;
-            }
+            get => _ReadableText;
             set {
                 if (value == _ReadableText) { return; }
                 _ReadableText = value;
@@ -79,9 +73,7 @@ namespace BlueControls.ItemCollection {
 
 
         public QuickImage Symbol {
-            get {
-                return _Symbol;
-            }
+            get => _Symbol;
             set {
                 if (value == _Symbol) { return; }
                 _Symbol = value;

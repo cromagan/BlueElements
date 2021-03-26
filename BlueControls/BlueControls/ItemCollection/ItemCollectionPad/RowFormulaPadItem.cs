@@ -99,9 +99,7 @@ namespace BlueControls.ItemCollection {
 
         // Namen so lassen, wegen Kontextmenu
         public string Layout_ID {
-            get {
-                return _LayoutID;
-            }
+            get => _LayoutID;
             set {
                 if (value == _LayoutID) { return; }
                 Größe_fixiert = true;

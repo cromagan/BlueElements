@@ -76,7 +76,7 @@ namespace BlueControls.Controls {
         [Description("Dieses Feld kann für den Forms-Editor verwendet werden. Falls ein Key und ein Name befüllt sind, ist der Name führend.")]
         [DefaultValue("")]
         public string ColumnName {
-            get { return _ColumnName; }
+            get => _ColumnName;
             set {
                 if (_ColumnName == value) { return; }
 
@@ -93,9 +93,7 @@ namespace BlueControls.Controls {
 
 
         public int RowKey {
-            get {
-                return _RowKey;
-            }
+            get => _RowKey;
             set {
                 if (value == _RowKey) { return; }
                 FillCellNow();
@@ -126,9 +124,7 @@ namespace BlueControls.Controls {
         }
 
         public Database Database {
-            get {
-                return _Database;
-            }
+            get => _Database;
             set {
                 if (value == _Database) { return; }
 

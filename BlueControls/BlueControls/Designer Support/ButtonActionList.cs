@@ -21,24 +21,16 @@ namespace BlueControls.Designer_Support {
 
 
         public bool Checked {
-            get {
-                return ReverenceControl.Checked;
-            }
-            set {
-                SetControlProperty("Checked", value);
-            }
+            get => ReverenceControl.Checked;
+            set => SetControlProperty("Checked", value);
         }
 
 
 
 
         public enButtonStyle ButtonStyle {
-            get {
-                return ReverenceControl.ButtonStyle;
-            }
-            set {
-                SetControlProperty("ButtonStyle", value);
-            }
+            get => ReverenceControl.ButtonStyle;
+            set => SetControlProperty("ButtonStyle", value);
         }
 
 

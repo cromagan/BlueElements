@@ -18,7 +18,7 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ItemCollectionList Item { get => Main.Item; }
+        public ItemCollectionList Item => Main.Item;
 
 
         public event EventHandler<ListEventArgs> ItemAdded;

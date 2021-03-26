@@ -82,9 +82,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         public Database Database {
-            get {
-                return _Database;
-            }
+            get => _Database;
             set {
 
                 if (_Database == value) { return; }

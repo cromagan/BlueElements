@@ -24,15 +24,15 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_Join : Method {
 
-        public override string Syntax { get => "Join(VariableListe, Verbindungszeichen)"; }
-        public override string Description { get => "Wandelt eine Liste in einen Text um. Es verbindet den Text dabei mitteles dem angegebenen Verbindungszeichen"; }
+        public override string Syntax => "Join(VariableListe, Verbindungszeichen)";
+        public override string Description => "Wandelt eine Liste in einen Text um. Es verbindet den Text dabei mitteles dem angegebenen Verbindungszeichen";
         public override List<string> Comand(Script s) { return new() { "join" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.String; }
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.VariableList, enVariableDataType.String }; }
-        public override bool EndlessArgs { get => false; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ")";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.String;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableList, enVariableDataType.String };
+        public override bool EndlessArgs => false;
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }

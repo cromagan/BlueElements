@@ -26,17 +26,17 @@ namespace BlueScript {
     internal class Method_BerechneVariable : Method {
 
 
-        public override string Syntax { get => "VariablenName = Berechung;"; }
+        public override string Syntax => "VariablenName = Berechung;";
 
 
-        public override string Description { get => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen."; }
+        public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
         public override List<string> Comand(Script s) { return s.Variablen.AllNames(); }
-        public override string StartSequence { get => "="; }
-        public override string EndSequence { get => ";"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Null; }
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.BoolNumString }; }
-        public override bool EndlessArgs { get => false; }
+        public override string StartSequence => "=";
+        public override string EndSequence => ";";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.BoolNumString };
+        public override bool EndlessArgs => false;
 
 
 

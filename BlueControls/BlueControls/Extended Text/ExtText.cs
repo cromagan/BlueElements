@@ -140,9 +140,7 @@ namespace BlueControls {
         public List<ExtChar> Chars { get; private set; }
 
         public double Zeilenabstand {
-            get {
-                return _Zeilenabstand;
-            }
+            get => _Zeilenabstand;
             set {
                 if (value == _Zeilenabstand) { return; }
                 _Zeilenabstand = value;
@@ -154,9 +152,7 @@ namespace BlueControls {
         /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll. Auch das Alingement richtet sich nach diesen Größen.
         /// </summary>
         public Size TextDimensions {
-            get {
-                return _TextDimensions;
-            }
+            get => _TextDimensions;
             set {
 
                 if (_TextDimensions.Width == value.Width && _TextDimensions.Height == value.Height) { return; }
@@ -200,9 +196,7 @@ namespace BlueControls {
 
 
         public enDesign Design {
-            get {
-                return _Design;
-            }
+            get => _Design;
             set {
                 if (value == _Design) { return; }
                 _Design = value;
@@ -213,9 +207,7 @@ namespace BlueControls {
         }
 
         public enStates State {
-            get {
-                return _State;
-            }
+            get => _State;
             set {
                 if (value == _State) { return; }
                 _State = value;

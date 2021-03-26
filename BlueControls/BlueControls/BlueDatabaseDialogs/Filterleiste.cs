@@ -48,9 +48,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {
-            get {
-                return _orientation;
-            }
+            get => _orientation;
             set {
                 if (_orientation == value) { return; }
                 _orientation = value;
@@ -59,9 +57,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         [DefaultValue(enFilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
         public enFilterTypesToShow Filtertypes {
-            get {
-                return _Filtertypes;
-            }
+            get => _Filtertypes;
             set {
                 if (_Filtertypes == value) { return; }
                 _Filtertypes = value;
@@ -74,9 +70,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         /// </summary>
         [DefaultValue("")]
         public string AnsichtName {
-            get {
-                return _AnsichtName;
-            }
+            get => _AnsichtName;
             set {
                 if (_AnsichtName == value) { return; }
                 _AnsichtName = value;
@@ -88,9 +82,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         /// </summary>
         [DefaultValue("")]
         public string ÄhnlicheAnsichtName {
-            get {
-                return _ÄhnlicheAnsichtName;
-            }
+            get => _ÄhnlicheAnsichtName;
             set {
                 if (_ÄhnlicheAnsichtName == value) { return; }
                 _ÄhnlicheAnsichtName = value;
@@ -101,9 +93,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         [DefaultValue(false)]
         public bool AutoPin {
-            get {
-                return _AutoPin;
-            }
+            get => _AutoPin;
             set {
                 if (_AutoPin == value) { return; }
                 _AutoPin = value;
@@ -117,9 +107,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         [DefaultValue((Table)null)]
         public Table Table {
 
-            get {
-                return _TableView;
-            }
+            get => _TableView;
             set {
 
                 if (_TableView == value) { return; }

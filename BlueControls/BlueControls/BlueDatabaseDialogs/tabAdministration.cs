@@ -51,9 +51,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         [DefaultValue((Table)null)]
         public Table Table {
 
-            get {
-                return _TableView;
-            }
+            get => _TableView;
             set {
 
                 if (_TableView == value) { return; }

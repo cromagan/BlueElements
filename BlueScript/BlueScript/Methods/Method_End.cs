@@ -26,17 +26,17 @@ namespace BlueScript {
 
         //public Method_var(Script parent) : base(parent) { }
 
-        public override string Syntax { get => "End;"; }
+        public override string Syntax => "End;";
 
-        public override string Description { get => "Beendet das Skript ohne Fehler."; }
+        public override string Description => "Beendet das Skript ohne Fehler.";
         public override List<string> Comand(Script s) { return new() { "end" }; }
-        public override string StartSequence { get => ""; }
-        public override string EndSequence { get => ";"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Null; }
+        public override string StartSequence => "";
+        public override string EndSequence => ";";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Null;
 
-        public override List<enVariableDataType> Args { get => new() { }; }
-        public override bool EndlessArgs { get => false; }
+        public override List<enVariableDataType> Args => new() { };
+        public override bool EndlessArgs => false;
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {

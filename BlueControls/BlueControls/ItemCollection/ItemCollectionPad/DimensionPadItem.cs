@@ -47,9 +47,7 @@ namespace BlueControls.ItemCollection {
         public int Nachkommastellen { get; set; } = 1;
 
         public string Text_oben {
-            get {
-                return _text_oben;
-            }
+            get => _text_oben;
             set {
                 if (_text_oben == Länge_in_MM.ToString()) { value = string.Empty; }
                 _text_oben = value;
@@ -213,11 +211,7 @@ namespace BlueControls.ItemCollection {
             return Präfix + s + Suffix;
         }
 
-        public decimal Länge_in_MM {
-            get {
-                return Math.Round(modConverter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
-            }
-        }
+        public decimal Länge_in_MM => Math.Round(modConverter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
 
         protected override string ClassId() {
             return "DIMENSION";

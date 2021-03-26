@@ -43,9 +43,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue((enOrientation)(-1))]
         public enOrientation Mittellinie {
-            get {
-                return _MittelLinie;
-            }
+            get => _MittelLinie;
             set {
 
 
@@ -59,9 +57,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enHelpers.Ohne)]
         public enHelpers Helper {
-            get {
-                return _Helper;
-            }
+            get => _Helper;
             set {
                 if (_Helper == value) { return; }
                 _Helper = value;

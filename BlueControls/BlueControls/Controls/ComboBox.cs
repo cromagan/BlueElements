@@ -80,9 +80,7 @@ namespace BlueControls.Controls {
         [Category("Darstellung")]
         [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
         public string ImageCode {
-            get {
-                return _ImageCode;
-            }
+            get => _ImageCode;
             set {
                 if (_ImageCode != value) {
                     _ImageCode = value;
@@ -99,9 +97,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(System.Windows.Forms.ComboBoxStyle.DropDown)]
         public System.Windows.Forms.ComboBoxStyle DropDownStyle {
-            get {
-                return _DropDownStyle;
-            }
+            get => _DropDownStyle;
 
             set {
                 if (value != _DropDownStyle) {
@@ -114,9 +110,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enComboboxStyle.TextBox)]
         public enComboboxStyle DrawStyle {
-            get {
-                return _DrawStyle;
-            }
+            get => _DrawStyle;
             set {
                 if (_DrawStyle != value) {
                     _DrawStyle = value;

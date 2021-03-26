@@ -28,8 +28,6 @@ using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
@@ -296,9 +294,7 @@ namespace BlueDatabase {
 
 
         public string Caption {
-            get {
-                return _Caption;
-            }
+            get => _Caption;
             set {
                 value = value.Replace("<br>", "\r", RegexOptions.IgnoreCase);
                 if (_Caption == value) { return; }
@@ -311,9 +307,7 @@ namespace BlueDatabase {
 
 
         public string AutoFilterJoker {
-            get {
-                return _AutoFilterJoker;
-            }
+            get => _AutoFilterJoker;
             set {
                 if (_AutoFilterJoker == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_AutoFilterJoker, this, _AutoFilterJoker, value, true);
@@ -323,9 +317,7 @@ namespace BlueDatabase {
 
 
         public string Name {
-            get {
-                return _Name.ToUpper();
-            }
+            get => _Name.ToUpper();
             set {
                 value = value.ToUpper();
                 if (value == _Name.ToUpper()) { return; }
@@ -344,9 +336,7 @@ namespace BlueDatabase {
         }
 
         public string Identifier {
-            get {
-                return _Identifier;
-            }
+            get => _Identifier;
             set {
                 if (_Identifier == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_Identifier, this, _Identifier, value, true);
@@ -355,9 +345,7 @@ namespace BlueDatabase {
         }
 
         public enEditTypeFormula EditType {
-            get {
-                return _EditType;
-            }
+            get => _EditType;
             set {
                 if (_EditType == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_EditType, this, ((int)_EditType).ToString(), ((int)value).ToString(), true);
@@ -366,9 +354,7 @@ namespace BlueDatabase {
         }
 
         public bool MultiLine {
-            get {
-                return _MultiLine;
-            }
+            get => _MultiLine;
             set {
                 if (!_Format.MultilinePossible()) { value = false; }
 
@@ -415,9 +401,7 @@ namespace BlueDatabase {
         }
 
         public string Quickinfo {
-            get {
-                return _QuickInfo;
-            }
+            get => _QuickInfo;
             set {
                 if (_QuickInfo == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_QuickInfo, this, _QuickInfo, value, true);
@@ -438,9 +422,7 @@ namespace BlueDatabase {
         //    }
         //}
         public Point DauerFilterPos {
-            get {
-                return _DauerFilterPos;
-            }
+            get => _DauerFilterPos;
             set {
                 if (_DauerFilterPos.ToString() == value.ToString()) { return; }
                 Database.AddPending(enDatabaseDataType.co_DauerFilterPos, this, _DauerFilterPos.ToString(), value.ToString(), true);
@@ -448,9 +430,7 @@ namespace BlueDatabase {
             }
         }
         public string Ueberschrift1 {
-            get {
-                return _Ueberschrift1;
-            }
+            get => _Ueberschrift1;
             set {
                 if (_Ueberschrift1 == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_Ueberschrift1, this, _Ueberschrift1, value, true);
@@ -460,9 +440,7 @@ namespace BlueDatabase {
 
 
         public string Ueberschrift2 {
-            get {
-                return _Ueberschrift2;
-            }
+            get => _Ueberschrift2;
             set {
                 if (_Ueberschrift2 == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_Ueberschrift2, this, _Ueberschrift2, value, true);
@@ -471,9 +449,7 @@ namespace BlueDatabase {
         }
 
         public string Ueberschrift3 {
-            get {
-                return _Ueberschrift3;
-            }
+            get => _Ueberschrift3;
             set {
                 if (_Ueberschrift3 == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_Ueberschrift3, this, _Ueberschrift3, value, true);
@@ -505,9 +481,7 @@ namespace BlueDatabase {
 
 
         public string AdminInfo {
-            get {
-                return _AdminInfo;
-            }
+            get => _AdminInfo;
             set {
                 if (_AdminInfo == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_AdminInfo, this, _AdminInfo, value, true);
@@ -541,9 +515,7 @@ namespace BlueDatabase {
         /// Was in Textfeldern oder Datenbankzeilen für ein Suffix angezeigt werden soll. Beispiel: mm
         /// </summary>
         public string Suffix {
-            get {
-                return _Suffix;
-            }
+            get => _Suffix;
             set {
                 if (_Suffix == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_Suffix, this, _Suffix, value, true);
@@ -555,9 +527,7 @@ namespace BlueDatabase {
 
 
         public string Prefix {
-            get {
-                return _Prefix;
-            }
+            get => _Prefix;
             set {
                 if (_Prefix == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_Prefix, this, _Prefix, value, true);
@@ -569,9 +539,7 @@ namespace BlueDatabase {
 
 
         public string LinkedDatabaseFile {
-            get {
-                return _LinkedDatabaseFile;
-            }
+            get => _LinkedDatabaseFile;
             set {
                 if (_LinkedDatabaseFile == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkedDatabase, this, _LinkedDatabaseFile, value, true);
@@ -582,9 +550,7 @@ namespace BlueDatabase {
 
 
         public string LinkedKeyKennung {
-            get {
-                return _LinkedKeyKennung;
-            }
+            get => _LinkedKeyKennung;
             set {
                 if (_LinkedKeyKennung == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkKeyKennung, this, _LinkedKeyKennung, value, true);
@@ -593,9 +559,7 @@ namespace BlueDatabase {
         }
 
         public string BestFile_StandardSuffix {
-            get {
-                return _BestFile_StandardSuffix;
-            }
+            get => _BestFile_StandardSuffix;
             set {
                 if (_BestFile_StandardSuffix == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_BestFile_StandardSuffix, this, _BestFile_StandardSuffix, value, true);
@@ -604,9 +568,7 @@ namespace BlueDatabase {
         }
 
         public string BestFile_StandardFolder {
-            get {
-                return _BestFile_StandardFolder;
-            }
+            get => _BestFile_StandardFolder;
             set {
                 if (_BestFile_StandardFolder == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_BestFile_StandardFolder, this, _BestFile_StandardFolder, value, true);
@@ -615,9 +577,7 @@ namespace BlueDatabase {
         }
 
         public int BildCode_ConstantHeight {
-            get {
-                return _BildCode_ConstantHeight;
-            }
+            get => _BildCode_ConstantHeight;
             set {
                 if (_BildCode_ConstantHeight == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_BildCode_ConstantHeight, this, _BildCode_ConstantHeight.ToString(), value.ToString(), true);
@@ -656,9 +616,7 @@ namespace BlueDatabase {
         }
 
         public enBildTextVerhalten BildTextVerhalten {
-            get {
-                return _BildTextVerhalten;
-            }
+            get => _BildTextVerhalten;
             set {
                 if (_BildTextVerhalten == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_BildTextVerhalten, this, ((int)_BildTextVerhalten).ToString(), ((int)value).ToString(), true);
@@ -669,9 +627,7 @@ namespace BlueDatabase {
 
 
         public enAlignmentHorizontal Align {
-            get {
-                return _Align;
-            }
+            get => _Align;
             set {
                 if (_Align == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_Align, this, ((int)_Align).ToString(), ((int)value).ToString(), true);
@@ -680,9 +636,7 @@ namespace BlueDatabase {
         }
 
         public enFilterOptions FilterOptions {
-            get {
-                return _FilterOptions;
-            }
+            get => _FilterOptions;
             set {
                 if (_FilterOptions == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_FilterOptions, this, ((int)_FilterOptions).ToString(), ((int)value).ToString(), true);
@@ -751,9 +705,7 @@ namespace BlueDatabase {
         }
 
         public bool TextBearbeitungErlaubt {
-            get {
-                return _TextBearbeitungErlaubt;
-            }
+            get => _TextBearbeitungErlaubt;
             set {
                 if (_TextBearbeitungErlaubt == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_TextBearbeitungErlaubt, this, _TextBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -762,9 +714,7 @@ namespace BlueDatabase {
         }
 
         public bool SpellCheckingEnabled {
-            get {
-                return _SpellCheckingEnabled;
-            }
+            get => _SpellCheckingEnabled;
             set {
                 if (_SpellCheckingEnabled == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_SpellCheckingEnabled, this, _SpellCheckingEnabled.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -774,9 +724,7 @@ namespace BlueDatabase {
 
 
         public bool DropdownBearbeitungErlaubt {
-            get {
-                return _DropdownBearbeitungErlaubt;
-            }
+            get => _DropdownBearbeitungErlaubt;
             set {
                 if (_DropdownBearbeitungErlaubt == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_DropdownBearbeitungErlaubt, this, _DropdownBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -785,9 +733,7 @@ namespace BlueDatabase {
         }
 
         public bool DropdownAllesAbwählenErlaubt {
-            get {
-                return _DropdownAllesAbwählenErlaubt;
-            }
+            get => _DropdownAllesAbwählenErlaubt;
             set {
                 if (_DropdownAllesAbwählenErlaubt == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_DropdownAllesAbwählenErlaubt, this, _DropdownAllesAbwählenErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -796,9 +742,7 @@ namespace BlueDatabase {
         }
 
         public bool DropdownWerteAndererZellenAnzeigen {
-            get {
-                return _DropdownWerteAndererZellenAnzeigen;
-            }
+            get => _DropdownWerteAndererZellenAnzeigen;
             set {
                 if (_DropdownWerteAndererZellenAnzeigen == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, this, _DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -819,9 +763,7 @@ namespace BlueDatabase {
         }
 
         public bool AfterEdit_DoUCase {
-            get {
-                return _AfterEdit_DoUCase;
-            }
+            get => _AfterEdit_DoUCase;
             set {
                 if (_AfterEdit_DoUCase == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_AfterEdit_DoUcase, this, _AfterEdit_DoUCase.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -831,9 +773,7 @@ namespace BlueDatabase {
 
 
         public bool AfterEdit_AutoCorrect {
-            get {
-                return _AfterEdit_AutoCorrect;
-            }
+            get => _AfterEdit_AutoCorrect;
             set {
                 if (_AfterEdit_AutoCorrect == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_AfterEdit_AutoCorrect, this, _AfterEdit_AutoCorrect.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -842,9 +782,7 @@ namespace BlueDatabase {
         }
 
         public string CellInitValue {
-            get {
-                return _CellInitValue;
-            }
+            get => _CellInitValue;
             set {
                 if (_CellInitValue == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_CellInitValue, this, _CellInitValue, value, true);
@@ -854,9 +792,7 @@ namespace BlueDatabase {
 
 
         public string SortMask {
-            get {
-                return _SortMask;
-            }
+            get => _SortMask;
             set {
                 if (_SortMask == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_SortMask, this, _SortMask, value, true);
@@ -865,9 +801,7 @@ namespace BlueDatabase {
         }
 
         public string AutoRemove {
-            get {
-                return _AutoRemove;
-            }
+            get => _AutoRemove;
             set {
                 if (_AutoRemove == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_AutoRemove, this, _AutoRemove, value, true);
@@ -876,9 +810,7 @@ namespace BlueDatabase {
         }
 
         public bool SaveContent {
-            get {
-                return _SaveContent;
-            }
+            get => _SaveContent;
             set {
                 if (_SaveContent == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_SaveContent, this, _SaveContent.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -903,9 +835,7 @@ namespace BlueDatabase {
 
 
         public int DropdownKey {
-            get {
-                return _DropDownKey;
-            }
+            get => _DropDownKey;
             set {
                 if (_DropDownKey == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_DropDownKey, this, _DropDownKey.ToString(), value.ToString(), true);
@@ -914,9 +844,7 @@ namespace BlueDatabase {
         }
 
         public int VorschlagsColumn {
-            get {
-                return _VorschlagsColumn;
-            }
+            get => _VorschlagsColumn;
             set {
                 if (_VorschlagsColumn == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_VorschlagColumn, this, _VorschlagsColumn.ToString(), value.ToString(), true);
@@ -926,9 +854,7 @@ namespace BlueDatabase {
 
 
         public int LinkedCell_RowKey {
-            get {
-                return _LinkedCell_RowKey;
-            }
+            get => _LinkedCell_RowKey;
             set {
                 if (_LinkedCell_RowKey == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_RowKey, this, _LinkedCell_RowKey.ToString(), value.ToString(), true);
@@ -939,9 +865,7 @@ namespace BlueDatabase {
 
 
         public int LinkedCell_ColumnKey {
-            get {
-                return _LinkedCell_ColumnKey;
-            }
+            get => _LinkedCell_ColumnKey;
             set {
                 if (_LinkedCell_ColumnKey == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnKey, this, _LinkedCell_ColumnKey.ToString(), value.ToString(), true);
@@ -951,9 +875,7 @@ namespace BlueDatabase {
         }
 
         public int LinkedCell_ColumnValueFoundIn {
-            get {
-                return _LinkedCell_ColumnValueFoundIn;
-            }
+            get => _LinkedCell_ColumnValueFoundIn;
             set {
                 if (_LinkedCell_ColumnValueFoundIn == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, this, _LinkedCell_ColumnValueFoundIn.ToString(), value.ToString(), true);
@@ -963,9 +885,7 @@ namespace BlueDatabase {
         }
 
         public string LinkedCell_ColumnValueAdd {
-            get {
-                return _LinkedCell_ColumnValueAdd;
-            }
+            get => _LinkedCell_ColumnValueAdd;
             set {
                 if (_LinkedCell_ColumnValueAdd == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnValueAdd, this, _LinkedCell_ColumnValueAdd, value, true);
@@ -980,9 +900,7 @@ namespace BlueDatabase {
         /// Hält Werte, dieser Spalte gleich, bezugnehmend der KeyColumn(key)
         /// </summary>
         public int KeyColumnKey {
-            get {
-                return _KeyColumnKey;
-            }
+            get => _KeyColumnKey;
             set {
                 if (_KeyColumnKey == value) { return; }
 
@@ -1000,9 +918,7 @@ namespace BlueDatabase {
 
 
         public int AfterEdit_Runden {
-            get {
-                return _AfterEdit_Runden;
-            }
+            get => _AfterEdit_Runden;
             set {
                 if (_AfterEdit_Runden == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_AfterEdit_Runden, this, _AfterEdit_Runden.ToString(), value.ToString(), true);
@@ -1012,9 +928,7 @@ namespace BlueDatabase {
 
 
         public bool ShowUndo {
-            get {
-                return _ShowUndo;
-            }
+            get => _ShowUndo;
             set {
                 if (_ShowUndo == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_ShowUndo, this, _ShowUndo.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -1038,9 +952,7 @@ namespace BlueDatabase {
 
 
         public string AllowedChars {
-            get {
-                return _AllowedChars;
-            }
+            get => _AllowedChars;
             set {
                 if (_AllowedChars == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_AllowedChars, this, _AllowedChars, value, true);
@@ -1050,9 +962,7 @@ namespace BlueDatabase {
 
 
         public enDataFormat Format {
-            get {
-                return _Format;
-            }
+            get => _Format;
             set {
                 if (_Format == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_Format, this, ((int)_Format).ToString(), ((int)value).ToString(), true);
@@ -1062,9 +972,7 @@ namespace BlueDatabase {
         }
 
         public Color ForeColor {
-            get {
-                return _ForeColor;
-            }
+            get => _ForeColor;
             set {
                 if (_ForeColor.ToArgb() == value.ToArgb()) { return; }
                 Database.AddPending(enDatabaseDataType.co_ForeColor, this, _ForeColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
@@ -1074,9 +982,7 @@ namespace BlueDatabase {
 
 
         public Color BackColor {
-            get {
-                return _BackColor;
-            }
+            get => _BackColor;
             set {
                 if (_BackColor.ToArgb() == value.ToArgb()) { return; }
                 Database.AddPending(enDatabaseDataType.co_BackColor, this, _BackColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
@@ -1086,9 +992,7 @@ namespace BlueDatabase {
 
 
         public bool EditTrotzSperreErlaubt {
-            get {
-                return _EditTrotzSperreErlaubt;
-            }
+            get => _EditTrotzSperreErlaubt;
             set {
                 if (_EditTrotzSperreErlaubt == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_EditTrotzSperreErlaubt, this, _EditTrotzSperreErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -1098,9 +1002,7 @@ namespace BlueDatabase {
 
 
         public enColumnLineStyle LineLeft {
-            get {
-                return _LineLeft;
-            }
+            get => _LineLeft;
             set {
                 if (_LineLeft == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LineLeft, this, ((int)_LineLeft).ToString(), ((int)value).ToString(), true);
@@ -1109,9 +1011,7 @@ namespace BlueDatabase {
         }
 
         public enColumnLineStyle LineRight {
-            get {
-                return _LineRight;
-            }
+            get => _LineRight;
             set {
                 if (_LineRight == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_LinieRight, this, ((int)_LineRight).ToString(), ((int)value).ToString(), true);

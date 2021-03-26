@@ -25,15 +25,15 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
     internal class Method_if : Method {
 
-        public override string Syntax { get => "if (true) { Code zum ausführen }"; }
-        public override string Description { get => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt."; }
+        public override string Syntax => "if (true) { Code zum ausführen }";
+        public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt.";
         public override List<string> Comand(Script s) { return new() { "if" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
-        public override bool GetCodeBlockAfter { get => true; }
-        public override enVariableDataType Returns { get => enVariableDataType.Null; }
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.Bool }; }
-        public override bool EndlessArgs { get => false; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ")";
+        public override bool GetCodeBlockAfter => true;
+        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Bool };
+        public override bool EndlessArgs => false;
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {

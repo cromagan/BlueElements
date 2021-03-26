@@ -37,9 +37,7 @@ namespace BlueControls.ItemCollection {
         private readonly decimal mm125x; //Math.Round(mmToPixel(1.25D, _DPIx), 1)
 
         public decimal Größe_Distanzhalter {
-            get {
-                return _Größe_Distanzhalter;
-            }
+            get => _Größe_Distanzhalter;
 
 
             set {

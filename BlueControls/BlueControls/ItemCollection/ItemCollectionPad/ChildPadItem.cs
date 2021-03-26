@@ -23,7 +23,6 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -44,9 +43,7 @@ namespace BlueControls.ItemCollection {
 
         private CreativePad _PadInternal;
         public CreativePad PadInternal {
-            get {
-                return _PadInternal;
-            }
+            get => _PadInternal;
             set {
                 if (_PadInternal != null) {
                     _PadInternal.Item.DoInvalidate -= _Pad_DoInvalidate;
@@ -81,9 +78,7 @@ namespace BlueControls.ItemCollection {
 
         [Description("Name und gleichzeitig eventuelle Beschriftung dieser Ansicht.")]
         public string Name {
-            get {
-                return _Name;
-            }
+            get => _Name;
             set {
                 if (value == _Name) { return; }
                 _Name = value;

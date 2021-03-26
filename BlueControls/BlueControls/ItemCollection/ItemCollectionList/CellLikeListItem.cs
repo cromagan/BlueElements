@@ -45,11 +45,7 @@ namespace BlueControls.ItemCollection {
 
         private readonly enBildTextVerhalten _bildTextverhalten;
 
-        public override string QuickInfo {
-            get {
-                return Internal.CreateHtmlCodes(true); // unveränderter Text
-            }
-        }
+        public override string QuickInfo => Internal.CreateHtmlCodes(true); // unveränderter Text
 
         #endregion
 

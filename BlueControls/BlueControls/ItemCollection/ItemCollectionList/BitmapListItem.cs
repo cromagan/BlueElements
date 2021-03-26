@@ -107,9 +107,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public string Caption {
-            get {
-                return _caption;
-            }
+            get => _caption;
 
             set {
                 if (_caption == value) { return; }
@@ -120,9 +118,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public int CaptionLines {
-            get {
-                return _captionlines;
-            }
+            get => _captionlines;
             set {
                 if (value < 1) { value = 1; }
 
@@ -134,9 +130,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public int Padding {
-            get {
-                return _padding;
-            }
+            get => _padding;
 
             set {
                 if (_padding == value) { return; }
@@ -145,18 +139,9 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public List<QuickImage> Overlays {
-            get {
-                return _overlays;
-            }
+        public List<QuickImage> Overlays => _overlays;
 
-        }
-
-        public override string QuickInfo {
-            get {
-                return string.Empty;
-            }
-        }
+        public override string QuickInfo => string.Empty;
 
 
         #endregion

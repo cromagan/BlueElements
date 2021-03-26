@@ -251,9 +251,7 @@ namespace BlueControls.ItemCollection {
 
         [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
         public bool Bei_Export_sichtbar {
-            get {
-                return _Bei_Export_sichtbar;
-            }
+            get => _Bei_Export_sichtbar;
             set {
                 if (_Bei_Export_sichtbar == value) { return; }
                 _Bei_Export_sichtbar = value;
@@ -262,9 +260,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public int ZoomPadding {
-            get {
-                return _ZoomPadding;
-            }
+            get => _ZoomPadding;
             set {
                 if (_ZoomPadding == value) { return; }
                 _ZoomPadding = value;
@@ -274,9 +270,7 @@ namespace BlueControls.ItemCollection {
 
 
         public PadStyles Stil {
-            get {
-                return _Style;
-            }
+            get => _Style;
             set {
                 if (_Style == value) { return; }
                 _Style = value;
@@ -286,11 +280,7 @@ namespace BlueControls.ItemCollection {
 
         }
 
-        public List<string> Tags {
-            get {
-                return _Tags;
-            }
-        }
+        public List<string> Tags => _Tags;
 
         public virtual bool ParseThis(string tag, string value) {
             switch (tag.ToLower()) {

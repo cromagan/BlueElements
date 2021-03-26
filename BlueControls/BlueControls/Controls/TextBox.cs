@@ -26,7 +26,6 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
-using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -83,9 +82,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(false)]
         public bool SpellChecking {
-            get {
-                return _SpellChecking;
-            }
+            get => _SpellChecking;
             set {
                 if (_SpellChecking == value) { return; }
 
@@ -98,9 +95,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enSteuerelementVerhalten.Scrollen_ohne_Textumbruch)]
         public enSteuerelementVerhalten Verhalten {
-            get {
-                return _Verhalten;
-            }
+            get => _Verhalten;
             set {
                 if (_Verhalten == value) { return; }
                 _Verhalten = value;
@@ -117,9 +112,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue("")]
         public string AllowedChars {
-            get {
-                return _AllowedChars;
-            }
+            get => _AllowedChars;
             set {
                 if (value == _AllowedChars) { return; }
                 _AllowedChars = value;
@@ -130,9 +123,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue("")]
         public string Suffix {
-            get {
-                return _Suffix;
-            }
+            get => _Suffix;
             set {
                 if (value == _Suffix) { return; }
                 _Suffix = value;
@@ -142,9 +133,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enDataFormat.Text)]
         public enDataFormat Format {
-            get {
-                return _Format;
-            }
+            get => _Format;
             set {
                 if (_Format == value) { return; }
                 _Format = value;
@@ -198,9 +187,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(false)]
         public bool MultiLine {
-            get {
-                return _Multiline;
-            }
+            get => _Multiline;
             set {
                 if (value == _Multiline) { return; }
 
@@ -1432,30 +1419,31 @@ namespace BlueControls.Controls {
             OnNeedDatabaseOfAdditinalSpecialChars(e);
 
 
-            var i = new ItemCollectionList(enBlueListBoxAppearance.Listbox);
+            var i = new ItemCollectionList(enBlueListBoxAppearance.Listbox) {
 
 
-            //if (e.File is Database DB && DB.Bins.Count > 0) {
-            //    foreach (var bmp in DB.Bins) {
+                //if (e.File is Database DB && DB.Bins.Count > 0) {
+                //    foreach (var bmp in DB.Bins) {
 
-            //        if (bmp.Picture != null) {
-            //            if (!string.IsNullOrEmpty(bmp.Name)) {
-            //                var crc = "DB_" + bmp.Name;
-            //                i.Add(bmp.Name, crc, QuickImage.Get(crc, 20));
-            //            }
-            //        }
+                //        if (bmp.Picture != null) {
+                //            if (!string.IsNullOrEmpty(bmp.Name)) {
+                //                var crc = "DB_" + bmp.Name;
+                //                i.Add(bmp.Name, crc, QuickImage.Get(crc, 20));
+                //            }
+                //        }
 
 
-            //    }
+                //    }
 
-            //    i.AddSeparator();
-            //}
+                //    i.AddSeparator();
+                //}
 
-            i.Add("Kugel", "sphere", QuickImage.Get(enImageCode.Kugel, 20));
-            i.Add("Warnung", "Warnung", QuickImage.Get(enImageCode.Warnung, 20));
-            i.Add("Information", "Information", QuickImage.Get(enImageCode.Information, 20));
-            i.Add("Kritisch", "Kritisch", QuickImage.Get(enImageCode.Kritisch, 20));
-            i.Add("Frage", "Frage", QuickImage.Get(enImageCode.Frage, 20));
+                { "Kugel", "sphere", QuickImage.Get(enImageCode.Kugel, 20) },
+                { "Warnung", "Warnung", QuickImage.Get(enImageCode.Warnung, 20) },
+                { "Information", "Information", QuickImage.Get(enImageCode.Information, 20) },
+                { "Kritisch", "Kritisch", QuickImage.Get(enImageCode.Kritisch, 20) },
+                { "Frage", "Frage", QuickImage.Get(enImageCode.Frage, 20) }
+            };
 
             var r = InputBoxListBoxStyle.Show("Wählen sie:", i, enAddType.None, true);
 

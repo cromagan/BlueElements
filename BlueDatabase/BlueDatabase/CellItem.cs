@@ -56,9 +56,7 @@ namespace BlueDatabase {
         //public byte Symbol { get; set; }
 
         public string Value {
-            get {
-                return _value;
-            }
+            get => _value;
             set {
                 if (_value == value) { return; }
 

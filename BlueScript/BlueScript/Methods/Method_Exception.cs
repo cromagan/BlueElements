@@ -23,15 +23,15 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_Exception : Method {
 
-        public override string Syntax { get => "Exception(\"Unbehandelter Programmcode!\");"; }
-        public override string Description { get => "Unterbricht das Skript mit einer Fehlermeldung."; }
+        public override string Syntax => "Exception(\"Unbehandelter Programmcode!\");";
+        public override string Description => "Unterbricht das Skript mit einer Fehlermeldung.";
         public override List<string> Comand(Script s) { return new() { "Exception" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ");"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Null; }
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.String }; }
-        public override bool EndlessArgs { get => false; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ");";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String };
+        public override bool EndlessArgs => false;
 
 
 

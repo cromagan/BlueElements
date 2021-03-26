@@ -50,9 +50,7 @@ namespace BlueDatabase {
         public bool IsParsing { get; private set; }
 
         internal enItemState State {
-            get {
-                return _state;
-            }
+            get => _state;
 
             set {
                 if (value == _state) { return; }
@@ -61,20 +59,12 @@ namespace BlueDatabase {
             }
         }
 
-        public string CellKey {
-            get {
-                return CellCollection.KeyOfCell(ColKey, RowKey);
-            }
-
-
-        }
+        public string CellKey => CellCollection.KeyOfCell(ColKey, RowKey);
 
         public enDatabaseDataType Comand { get; private set; }
 
         public int ColKey {
-            get {
-                return _colKey;
-            }
+            get => _colKey;
 
             set {
                 if (value == _colKey) { return; }
@@ -85,9 +75,7 @@ namespace BlueDatabase {
         }
 
         public int RowKey {
-            get {
-                return _rowKey;
-            }
+            get => _rowKey;
 
             set {
                 if (value == _rowKey) { return; }
@@ -104,9 +92,7 @@ namespace BlueDatabase {
         public string PreviousValue { get; private set; }
 
         public string ChangedTo {
-            get {
-                return _changedTo;
-            }
+            get => _changedTo;
 
             set {
                 if (value == _changedTo) { return; }

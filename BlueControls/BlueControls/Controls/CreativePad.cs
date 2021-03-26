@@ -128,9 +128,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(false)]
         public bool ShowInPrintMode {
-            get {
-                return _ShowInPrintMode;
-            }
+            get => _ShowInPrintMode;
             set {
 
                 if (_ShowInPrintMode == value) { return; }
@@ -147,9 +145,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(false)]
         public bool Grid {
-            get {
-                return _Grid;
-            }
+            get => _Grid;
             set {
 
                 if (_Grid == value) { return; }
@@ -165,9 +161,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(10.0)]
         public float GridShow {
-            get {
-                return _GridShow;
-            }
+            get => _GridShow;
             set {
 
                 if (_GridShow == value) { return; }
@@ -179,9 +173,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(10.0)]
         public float GridSnap {
-            get {
-                return _Gridsnap;
-            }
+            get => _Gridsnap;
             set {
 
                 if (_Gridsnap == value) { return; }
@@ -193,9 +185,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enAutoRelationMode.Alle_Erhalten)]
         public enAutoRelationMode AutoRelation {
-            get {
-                return _AutoRelation;
-            }
+            get => _AutoRelation;
             set {
                 _AutoRelation = value;
 
@@ -264,7 +254,10 @@ namespace BlueControls.Controls {
 
         }
 
-        protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => DoKeyUp(e, true); // Kann nicht public gemacht werden, deswegen Umleitung
+        protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) {
+            DoKeyUp(e, true); // Kann nicht public gemacht werden, deswegen Umleitung
+        }
+
         public void DoKeyUp(System.Windows.Forms.KeyEventArgs e, bool hasbase) {
 
             // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
@@ -312,7 +305,10 @@ namespace BlueControls.Controls {
             }
         }
 
-        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) => DoMouseDown(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+            DoMouseDown(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        }
+
         internal void DoMouseDown(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseDown(e);
 
@@ -381,7 +377,10 @@ namespace BlueControls.Controls {
 
         }
 
-        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => DoMouseMove(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+            DoMouseMove(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        }
+
         internal void DoMouseMove(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseMove(e);
 
@@ -429,7 +428,10 @@ namespace BlueControls.Controls {
         }
 
 
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => DoMouseUp(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+            DoMouseUp(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        }
+
         internal void DoMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
 
@@ -1367,10 +1369,7 @@ namespace BlueControls.Controls {
             EndPrint?.Invoke(this, e);
         }
 
-        public override string QuickInfoText {
-            get { return _LastQuickInfo; }
-
-        }
+        public override string QuickInfoText => _LastQuickInfo;
 
 
         protected override void ZoomOrShiftChanged() {

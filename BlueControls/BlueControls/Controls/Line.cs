@@ -50,9 +50,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {
-            get {
-                return _Orientation;
-            }
+            get => _Orientation;
             set {
                 if (value == _Orientation) {
                     return;
@@ -66,23 +64,15 @@ namespace BlueControls.Controls {
 
         [DefaultValue(0)]
         public new int TabIndex {
-            get {
-                return 0;
-            }
+            get => 0;
 
-            set {
-                base.TabIndex = 0;
-            }
+            set => base.TabIndex = 0;
         }
 
         [DefaultValue(false)]
         public new bool TabStop {
-            get {
-                return false;
-            }
-            set {
-                base.TabStop = false;
-            }
+            get => false;
+            set => base.TabStop = false;
         }
 
 

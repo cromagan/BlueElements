@@ -27,17 +27,17 @@ namespace BlueScript {
 
         //public Method_SetError(Script parent) : base(parent) { }
 
-        public override string Syntax { get => "SetError(Nachricht, Column1, Colum2, ...);"; }
+        public override string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
 
-        public override string Description { get => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden."; }
+        public override string Description => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden.";
         public override List<string> Comand(Script s) { return new() { "seterror" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ");"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Null; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ");";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Null;
 
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.String, enVariableDataType.VariableListOrStringNumBool }; }
-        public override bool EndlessArgs { get => true; }
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.VariableListOrStringNumBool };
+        public override bool EndlessArgs => true;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);

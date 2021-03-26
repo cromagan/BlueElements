@@ -23,15 +23,15 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_Substring : Method {
 
-        public override string Syntax { get => "Substring(String, Start, Anzahl)"; }
-        public override string Description { get => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück."; }
+        public override string Syntax => "Substring(String, Start, Anzahl)";
+        public override string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
         public override List<string> Comand(Script s) { return new() { "substring" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.String; }
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.String, enVariableDataType.Integer, enVariableDataType.Integer }; }
-        public override bool EndlessArgs { get => false; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ")";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.String;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Integer, enVariableDataType.Integer };
+        public override bool EndlessArgs => false;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);

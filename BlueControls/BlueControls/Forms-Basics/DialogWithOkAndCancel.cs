@@ -113,12 +113,8 @@ namespace BlueControls.Forms {
             Cancel();
         }
         protected bool OK_Enabled {
-            get {
-                return butOK.Enabled;
-            }
-            set {
-                butOK.Enabled = value;
-            }
+            get => butOK.Enabled;
+            set => butOK.Enabled = value;
         }
         private void butOK_Click(object sender, System.EventArgs e) {
             Ok();

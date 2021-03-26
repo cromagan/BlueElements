@@ -23,7 +23,6 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -84,7 +83,7 @@ namespace BlueControls.ItemCollection {
         public Color BackColor { get; set; } = Color.White;
 
         public RowItem SheetStyle {
-            get { return _SheetStyle; }
+            get => _SheetStyle;
 
             set {
                 if (_SheetStyle == value) { return; }
@@ -108,9 +107,7 @@ namespace BlueControls.ItemCollection {
 
 
         public SizeF SheetSizeInMM {
-            get {
-                return _SheetSizeInMM;
-            }
+            get => _SheetSizeInMM;
             set {
                 if (value == _SheetSizeInMM) { return; }
                 _SheetSizeInMM = new SizeF(value.Width, value.Height);
@@ -119,9 +116,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public System.Windows.Forms.Padding RandinMM {
-            get {
-                return _RandinMM;
-            }
+            get => _RandinMM;
             set {
                 _RandinMM = new System.Windows.Forms.Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
                 GenPoints();
@@ -454,9 +449,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public List<BasicPadItem> this[int x, int Y] {
-            get { return this[new Point(x, Y)]; }
-        }
+        public List<BasicPadItem> this[int x, int Y] => this[new Point(x, Y)];
 
         public List<BasicPadItem> this[Point p] {
             get {
@@ -477,9 +470,7 @@ namespace BlueControls.ItemCollection {
 
         [DefaultValue(1.0)]
         public decimal SheetStyleScale {
-            get {
-                return _SheetStyleScale;
-            }
+            get => _SheetStyleScale;
             set {
 
                 if (value < 0.1m) { value = 0.1m; }

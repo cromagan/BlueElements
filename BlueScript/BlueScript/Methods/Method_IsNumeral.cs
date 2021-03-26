@@ -26,15 +26,15 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
     internal class Method_IsNumeral : Method {
 
-        public override string Description { get => "Püft, ob der Inhalt der Variable eine gültige Zahl ist. "; }
-        public override string Syntax { get => "isNumeral(Value)"; }
+        public override string Description => "Püft, ob der Inhalt der Variable eine gültige Zahl ist. ";
+        public override string Syntax => "isNumeral(Value)";
         public override List<string> Comand(Script s) { return new() { "isnumeral" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Bool; }
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.NumString }; }
-        public override bool EndlessArgs { get => false; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ")";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Bool;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.NumString };
+        public override bool EndlessArgs => false;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);

@@ -24,15 +24,15 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_Max : Method {
 
-        public override string Syntax { get => "Max(Value1, Value2, ...)"; }
-        public override string Description { get => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück."; }
+        public override string Syntax => "Max(Value1, Value2, ...)";
+        public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.";
         public override List<string> Comand(Script s) { return new() { "max" }; }
-        public override string StartSequence { get => "("; }
-        public override string EndSequence { get => ")"; }
-        public override bool GetCodeBlockAfter { get => false; }
-        public override enVariableDataType Returns { get => enVariableDataType.Number; }
-        public override List<enVariableDataType> Args { get => new() { enVariableDataType.Number }; }
-        public override bool EndlessArgs { get => true; }
+        public override string StartSequence => "(";
+        public override string EndSequence => ")";
+        public override bool GetCodeBlockAfter => false;
+        public override enVariableDataType Returns => enVariableDataType.Number;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Number };
+        public override bool EndlessArgs => true;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
