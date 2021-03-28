@@ -204,8 +204,8 @@ namespace BlueBasics {
         }
 
 
-        public static void LoadLatin(this List<string> L, string Filename) {
-            var t = LoadFromDiskLatin(Filename);
+        public static void LoadWIN1252(this List<string> L, string Filename) {
+            var t = LoadFromDiskWIN1252(Filename);
 
             L.Clear();
             L.AddRange(t.SplitByCR());

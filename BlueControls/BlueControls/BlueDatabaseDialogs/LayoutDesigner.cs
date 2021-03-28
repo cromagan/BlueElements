@@ -195,7 +195,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (fileOrLayoutID.FileSuffix().ToUpper() == "BCR") {
                     Pad.Enabled = true;
                     _LoadedLayout = fileOrLayoutID;
-                    var l = LoadFromDiskLatin(fileOrLayoutID);
+                    var l = LoadFromDiskWIN1252(fileOrLayoutID);
                     Pad.Item = new ItemCollectionPad(l, string.Empty);
                     ItemChanged();
 

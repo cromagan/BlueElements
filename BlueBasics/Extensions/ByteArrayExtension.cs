@@ -29,10 +29,10 @@ namespace BlueBasics {
 
             // https://stackoverflow.com/questions/37870084/net-core-doesnt-know-about-windows-1252-how-to-fix
 
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            var enc1252 = Encoding.GetEncoding(1252);
+            //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            //var enc1252 = Encoding.GetEncoding(1252);
 
-            return enc1252.GetString(b);
+            return Encoding.GetEncoding(1252).GetString(b);
         }
 
 

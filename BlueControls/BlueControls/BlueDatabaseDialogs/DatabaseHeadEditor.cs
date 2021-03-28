@@ -757,7 +757,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
 
-            SaveToDisk(_ExternCode, txtSkript.Text, false, System.Text.Encoding.Latin1);
+            SaveToDisk(_ExternCode, txtSkript.Text, false, System.Text.Encoding.GetEncoding(1525));
 
             _FileState = GetFileInfo(_ExternCode, true);
 
@@ -791,7 +791,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 _FileState = nfilestate;
 
-                txtSkript.Text = LoadFromDiskLatin(_ExternCode);
+                txtSkript.Text = LoadFromDiskWIN1252(_ExternCode);
 
 
                 ExternTimer.Enabled = true;

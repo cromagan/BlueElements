@@ -99,8 +99,8 @@ namespace BlueBasics {
 
 
         public static byte[] ToByteWIN1252(this string TXT) {
-            var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
-            return enc1252.GetBytes(TXT);
+            //var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
+            return Encoding.GetEncoding(1252).GetBytes(TXT);
         }
         //public static List<byte> ToByteList(this string TXT) {
         //    var x = new List<byte>();

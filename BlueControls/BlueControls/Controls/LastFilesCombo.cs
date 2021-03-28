@@ -179,7 +179,7 @@ namespace BlueControls.Controls {
                 if (LastD.Count > 0) { LastD.RemoveString(FileName, false); }
                 if (LastD.Count > 0) { LastD.RemoveString(s, false); }
                 LastD.Add(s);
-                LastD.Save(SaveFile(), false, System.Text.Encoding.Latin1);
+                LastD.Save(SaveFile(), false, System.Text.Encoding.GetEncoding(1525));
             }
             GenerateMenu();
         }
@@ -208,7 +208,7 @@ namespace BlueControls.Controls {
             LastD = new List<string>();
 
             if (FileExists(SaveFile())) {
-                var t = FileOperations.LoadFromDiskLatin(SaveFile());
+                var t = FileOperations.LoadFromDiskWIN1252(SaveFile());
                 t = t.RemoveChars("\n");
                 LastD.AddRange(t.SplitByCR());
             }

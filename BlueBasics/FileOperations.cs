@@ -450,8 +450,8 @@ namespace BlueBasics {
             return File.ReadAllText(DateiName, Encoding.UTF8);
         }
 
-        public static string LoadFromDiskLatin(string DateiName) {
-            return File.ReadAllText(DateiName, Encoding.Latin1);
+        public static string LoadFromDiskWIN1252(string DateiName) {
+            return File.ReadAllText(DateiName, Encoding.GetEncoding(1252));
         }
 
 

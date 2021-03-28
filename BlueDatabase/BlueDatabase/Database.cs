@@ -1179,7 +1179,7 @@ namespace BlueDatabase {
                 case enDatabaseDataType.ce_UTF8Value_withSizeData:
                 case enDatabaseDataType.ce_Value_withoutSizeData:
                     if (Art == enDatabaseDataType.ce_UTF8Value_withSizeData) {
-                        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                        //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                         var enc1252 = Encoding.GetEncoding(1252);
                         content = Encoding.UTF8.GetString(enc1252.GetBytes(content));
                     }

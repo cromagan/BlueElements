@@ -451,7 +451,7 @@ namespace BlueControls.Forms {
                     no = no.Replace("__", "_");
 
                     var newn = FileOperations.TempFile(fl.SelectedPath, no, "txt");
-                    t.Save(newn, false, System.Text.Encoding.Latin1);
+                    t.Save(newn, false, System.Text.Encoding.GetEncoding(1525));
 
 
 
@@ -461,7 +461,7 @@ namespace BlueControls.Forms {
 
             var newn2 = FileOperations.TempFile(fl.SelectedPath, "+++ALLES+++", "txt");
 
-            l.Save(newn2, true, System.Text.Encoding.Latin1);
+            l.Save(newn2, true, System.Text.Encoding.GetEncoding(1525));
 
         }
 

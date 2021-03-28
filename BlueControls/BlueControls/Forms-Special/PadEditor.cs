@@ -282,7 +282,7 @@ namespace BlueControls.Forms {
             var t = Pad.Item.ToString();
             Pad.Grid = ckbRaster.Checked;
 
-            SaveToDisk(SaveTab.FileName, t, false, System.Text.Encoding.Latin1);
+            SaveToDisk(SaveTab.FileName, t, false, System.Text.Encoding.GetEncoding(1525));
 
 
             btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
@@ -309,7 +309,7 @@ namespace BlueControls.Forms {
 
         private void LoadFile(string fileName) {
             Pad.Item.Clear();
-            var t = LoadFromDiskLatin(fileName);
+            var t = LoadFromDiskWIN1252(fileName);
 
             Pad.Item = new ItemCollectionPad(t, fileName);
             ItemChanged();
