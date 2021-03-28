@@ -1,33 +1,34 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2020 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
 #endregion
 
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueBasics {
-    public static partial class Extensions {
-
-        public static Point PointOf(this Rectangle r, enAlignment P) {
-
-
-            switch (P) {
+namespace BlueBasics
+{
+    public static partial class Extensions
+    {
+        public static Point PointOf(this Rectangle r, enAlignment P)
+        {
+            switch (P)
+            {
                 case enAlignment.Bottom_Left:
                     return new Point(r.Left, r.Bottom);
                 case enAlignment.Bottom_Right:
@@ -49,18 +50,15 @@ namespace BlueBasics {
                 default:
                     Develop.DebugPrint(P);
                     return Point.Empty;
-
             }
         }
 
-
-        public static Point NearestCornerOF(this Rectangle r, Point P) {
-
+        public static Point NearestCornerOF(this Rectangle r, Point P)
+        {
             var LO = r.PointOf(enAlignment.Top_Left);
             var rO = r.PointOf(enAlignment.Top_Right);
             var ru = r.PointOf(enAlignment.Bottom_Right);
             var lu = r.PointOf(enAlignment.Bottom_Left);
-
 
             var llo = Geometry.Länge(P, LO);
             var lro = Geometry.Länge(P, rO);
@@ -74,7 +72,6 @@ namespace BlueBasics {
             if (Erg == llu) { return lu; }
             if (Erg == lru) { return ru; }
             return Point.Empty;
-
         }
     }
 }

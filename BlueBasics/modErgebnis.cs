@@ -1,48 +1,46 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2020 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
 #endregion
-
 
 using System;
 
-namespace BlueBasics {
-    public static class modErgebnis {
-
-        public static double? Ergebnis(string Formel) {
+namespace BlueBasics
+{
+    public static class modErgebnis
+    {
+        public static double? Ergebnis(string Formel)
+        {
             Formel = Formel.ToUpper();
-            Formel = Formel.Replace(" ", "");
+            Formel = Formel.Replace(" ", string.Empty);
             if (string.IsNullOrEmpty(Formel)) { return null; }
             //Formel = Formel.Replace("INT(", "XNT(0,");
             //Formel = Formel.Replace("RND()", "XND(0,1)");
             return ErgebnisCore(Formel);
         }
 
-
-
-
-
-        private static double? ErgebnisCore(string Formel) {
+        private static double? ErgebnisCore(string Formel)
+        {
             //var TMP = 0;
-
 
             Formel = Formel.DeKlammere(true, false, false);
             //Das alles kann nur möglich sein, WENN eine Klammer vorhanden ist
-            if (Formel.Contains("(")) {
+            if (Formel.Contains("("))
+            {
                 // --------------------------------------------------------------------------------------------------------------------------------
                 // --- Eine Klammer auflösen, im Formelstring ersetzen und         mittels Rekursivität die nun einfachere Formel berechnen.
                 // --------------------------------------------------------------------------------------------------------------------------------
@@ -138,7 +136,6 @@ namespace BlueBasics {
 
                 if (Replacer == null) { return null; }
 
-
                 Formel = Formel.Replace(Formel.Substring(a, e - a + 1), ((double)Replacer).ToString("F99").TrimEnd('0').TrimEnd(',').Replace(",", "."));
                 return ErgebnisCore(Formel);
             } // Ende Klammer Vorhanden-----------------------------------------------------------
@@ -151,7 +148,6 @@ namespace BlueBasics {
             var TMP = Math.Max(Formel.LastIndexOf("+"), LastMinusIndex(Formel));
             if (TMP < 0) { TMP = Math.Max(Formel.LastIndexOf("/"), Formel.LastIndexOf("*")); }
             if (TMP < 1) { return null; }
-
 
             // --------------------------------------------------------------------------------------------------------------------------------
             // --- Berechnung nötig, String Splitten berechnen und das Ergebnis zurückgeben
@@ -171,15 +167,11 @@ namespace BlueBasics {
             var w1 = ErgebnisCore(Formel.Substring(0, TMP));
             if (w1 == null) { return null; }
 
-
             var w2 = ErgebnisCore(Formel.Substring(TMP + Seperator.Length));
             if (w2 == null) { return null; }
 
-
-
-
-
-            switch (Seperator) {
+            switch (Seperator)
+            {
                 case "/":
                     if (w2 == 0) { return null; }
                     return w1 / w2;
@@ -215,14 +207,15 @@ namespace BlueBasics {
             return null;
         }
 
-
-        public static int LastMinusIndex(string Formel) {
-            if (Formel.Contains("-") == false) { return -1; }
+        public static int LastMinusIndex(string Formel)
+        {
+            if (!Formel.Contains("-")) { return -1; }
 
             var LastMin = 1;
             var OkMin = -1;
 
-            while (true) {
+            while (true)
+            {
                 LastMin = Formel.IndexOf("-", LastMin);
                 if (LastMin < 1) { break; }
 
@@ -230,11 +223,8 @@ namespace BlueBasics {
                 if (VorZ.IsNumeral()) { OkMin = LastMin; }
                 LastMin++;
             }
+
             return OkMin;
         }
-
-
-
     }
-
 }

@@ -1,22 +1,21 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2020 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
 #endregion
-
 
 using BlueBasics.Enums;
 using Microsoft.Win32;
@@ -37,18 +36,17 @@ using System.Threading;
 using System.Windows.Media.Imaging;
 using static BlueBasics.FileOperations;
 
-namespace BlueBasics {
-    public static class modAllgemein {
-
-
-
+namespace BlueBasics
+{
+    public static class modAllgemein
+    {
         //private static readonly object Pause_Sleeper = new object();
-        private static string _GotUserName = "";
+        private static string _GotUserName = string.Empty;
 
         [DllImport("user32", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern short GetAsyncKeyState(int vKey);
 
-        #region  Grafics/BMP - Bearbeitung 
+        #region  Grafics/BMP - Bearbeitung
         // BMP_Clear
         // BMP_Generate3DBorder
         // GR_DrawSpecialFilledRect
@@ -65,11 +63,9 @@ namespace BlueBasics {
         /// <param name="Pos2">Linke obere Eckte des 2. Bildes</param>
         /// <param name="Accuracy">Genauigkeit der Prüfung. Bei 1 wird jeder Pixel geprüft. Bei z.B. 3 wird nur jeder dritte Pixel geprüft.</param>
         /// <returns></returns>
-
-        public static bool IntersectsWith(Bitmap Image1, Point Pos1, Bitmap Image2, Point Pos2, int Accuracy) {
-
+        public static bool IntersectsWith(Bitmap Image1, Point Pos1, Bitmap Image2, Point Pos2, int Accuracy)
+        {
             if (Image1 == null || Image2 == null) { return false; }
-
 
             var Koord1 = new Rectangle(Pos1, Image1.Size);
             var Koord2 = new Rectangle(Pos2, Image2.Size);
@@ -79,55 +75,58 @@ namespace BlueBasics {
             var Schnitt = new Rectangle(Koord1.Location, Koord1.Size);
             Schnitt.Intersect(Koord2);
 
-            for (var x = Schnitt.Left; x < Schnitt.Right; x += Accuracy) {
-                for (var y = Schnitt.Top; y < Schnitt.Bottom; y += Accuracy) {
-                    if (!Image1.GetPixel(x - Koord1.X, y - Koord1.Y).IsNearWhite(0.9) && !Image2.GetPixel(x - Koord2.X, y - Koord2.Y).IsNearWhite(0.9)) {
+            for (var x = Schnitt.Left; x < Schnitt.Right; x += Accuracy)
+            {
+                for (var y = Schnitt.Top; y < Schnitt.Bottom; y += Accuracy)
+                {
+                    if (!Image1.GetPixel(x - Koord1.X, y - Koord1.Y).IsNearWhite(0.9) && !Image2.GetPixel(x - Koord2.X, y - Koord2.Y).IsNearWhite(0.9))
+                    {
                         return true;
                     }
                 }
             }
-            return false;
 
+            return false;
         }
 
-
-
-
-        public static List<Bitmap> SplitTiff(string fileName, int MaxSize) {
-
+        public static List<Bitmap> SplitTiff(string fileName, int MaxSize)
+        {
             // Open a Stream and decode a TIFF image
             var imageStreamSource = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
             var l = new List<Bitmap>();
             var frames = 1;
 
-            try {
-
+            try
+            {
                 var decoder = new TiffBitmapDecoder(imageStreamSource, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
                 frames = decoder.Frames.Count;
 
-                foreach (var frame in decoder.Frames) {
+                foreach (var frame in decoder.Frames)
+                {
                     l.Add(GetBitmap(frame, MaxSize));
                 }
-
-            } catch {
-
-
-                try {
+            }
+            catch
+            {
+                try
+                {
                     l.Clear();
                     CollectGarbage();
 
                     var x = (Bitmap)BitmapExt.Image_FromFile(fileName);
                     l.Add(BitmapExt.Resize(x, MaxSize, MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
 
-
-                    if (frames > 1) {
+                    if (frames > 1)
+                    {
                         var x2 = new Bitmap(200, 200);
                         var gr = Graphics.FromImage(x2);
                         gr.Clear(Color.White);
                         gr.DrawString("Weitere Blätter vorhanden!", new Font("Arial", 9), Brushes.Red, new Point(0, 0));
                         l.Add(x2);
                     }
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     l.Clear();
                     CollectGarbage();
                     var x2 = new Bitmap(200, 200);
@@ -136,10 +135,8 @@ namespace BlueBasics {
                     gr.DrawString("Vorschaubild fehlgeschlagen!", new Font("Arial", 9), Brushes.Red, new Point(0, 0));
                     l.Add(x2);
 
-
                     Develop.DebugPrint(ex);
                 }
-
             }
 
             imageStreamSource.Close();
@@ -147,8 +144,6 @@ namespace BlueBasics {
 
             return l;
         }
-
-
 
         //public static Bitmap GetBitmap(BitmapSource source)
         //{
@@ -159,51 +154,53 @@ namespace BlueBasics {
         //    return bmp;
         //}
 
-        public static Bitmap GetBitmap(BitmapSource bitmapsource, int MaxSize) {
+        public static Bitmap GetBitmap(BitmapSource bitmapsource, int MaxSize)
+        {
             CollectGarbage();
             Pause(0.1, true);
 
             Bitmap bitmap;
-            using (var outStream = new MemoryStream()) {
+            using (var outStream = new MemoryStream())
+            {
                 BitmapEncoder enc = new BmpBitmapEncoder();
                 enc.Frames.Add(BitmapFrame.Create(bitmapsource));
                 enc.Save(outStream);
                 bitmap = new Bitmap(outStream);
             }
 
-            if (MaxSize > 0) {
+            if (MaxSize > 0)
+            {
                 bitmap = BitmapExt.Resize(bitmap, MaxSize, MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
             }
 
             return bitmap;
         }
 
-
-
-
-
-        public static void Magnify(Bitmap Screenshot, Point Point, Graphics GR, bool SwapX) {
+        public static void Magnify(Bitmap Screenshot, Point Point, Graphics GR, bool SwapX)
+        {
             const int w1 = 200; // Größe des Rechteckes
             const int w5 = 10; // Pixel zum vergrößerm
 
             var x = 0;
 
-            if (!SwapX) {
+            if (!SwapX)
+            {
                 x = 150 - (int)(w1 / 2.0);
                 if (Point.X < Screenshot.Width / 2.0) { x = Screenshot.Width - 150 - (int)(w1 / 2.0); }
-            } else {
+            }
+            else
+            {
                 x = Screenshot.Width - 150 - (int)(w1 / 2.0);
                 if (Point.X < Screenshot.Width / 2.0) { x = 150 - (int)(w1 / 2.0); }
             }
-
 
             var y = 150 - (int)(w1 / 2.0);
             if (Point.Y < Screenshot.Height / 2.0) { y = Screenshot.Height - 150 - (int)(w1 / 2.0); }
 
             var r = new Rectangle(x, y, w1, w1);
 
-
-            for (var z = 5; z >= 0; z--) {
+            for (var z = 5; z >= 0; z--)
+            {
                 r.Inflate(1, 1);
                 // r.Expand(0, 0, 1, 1)
                 var w = Convert.ToByte(255 / (double)10 * z);
@@ -222,7 +219,6 @@ namespace BlueBasics {
             GR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X, Mitte.Y - 7, Mitte.X, Mitte.Y + 6);
             GR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X - 7, Mitte.Y, Mitte.X + 6, Mitte.Y);
 
-
             GR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), Mitte.X, r.Top, Mitte.X, r.Bottom);
             GR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), r.Left, Mitte.Y, r.Right, Mitte.Y);
 
@@ -230,22 +226,21 @@ namespace BlueBasics {
             GR.DrawLine(Pens.Red, Mitte.X - 6, Mitte.Y, Mitte.X + 5, Mitte.Y);
         }
 
-        public static Rectangle RectangleOfAllScreens() {
-
+        public static Rectangle RectangleOfAllScreens()
+        {
             var x1 = int.MaxValue;
             var y1 = int.MaxValue;
             var x2 = int.MinValue;
             var y2 = int.MinValue;
 
-
-            for (var zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++) {
+            for (var zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++)
+            {
                 x1 = Math.Min(x1, System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Left);
                 y1 = Math.Min(y1, System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Top);
 
                 x2 = Math.Max(x2, System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Right);
                 y2 = Math.Max(y2, System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Bottom);
             }
-
 
             var GP = new Point(x1, y1);
             var sz = new Size(-x1 + x2, -y1 + y2);
@@ -255,32 +250,28 @@ namespace BlueBasics {
 
         #endregion
 
-        #region  Polygone 
+        #region  Polygone
 
-
-        public static GraphicsPath Poly_Triangle(PointF P1, PointF P2, PointF P3) {
-
+        public static GraphicsPath Poly_Triangle(PointF P1, PointF P2, PointF P3)
+        {
             var P = new GraphicsPath();
 
             P.AddLine(P1, P2);
             P.AddLine(P2, P3);
 
-
             P.CloseFigure();
-
 
             return P;
         }
 
-        public static GraphicsPath Poly_RoundRec(Rectangle rect, int radius) {
+        public static GraphicsPath Poly_RoundRec(Rectangle rect, int radius)
+        {
             return Poly_RoundRec(rect.X, rect.Y, rect.Width, rect.Height, radius);
         }
 
-
-        public static GraphicsPath Poly_RoundRec(int x, int y, int width, int height, int radius) {
-
+        public static GraphicsPath Poly_RoundRec(int x, int y, int width, int height, int radius)
+        {
             if (width < 1 || height < 1) { return null; }
-
 
             var tempPoly_RoundRec = new GraphicsPath();
             if (radius > height / 2.0 + 2) { radius = (int)(height / 2.0) + 2; }
@@ -306,13 +297,11 @@ namespace BlueBasics {
 
             return tempPoly_RoundRec;
 
-
             void AddRad90(int MxX, int MxY, int Radius, int GradStart) => tempPoly_RoundRec.AddArc(MxX, MxY, Radius, Radius, GradStart, 90);
-
         }
 
-
-        public static GraphicsPath Poly_Rechteck(Rectangle rect) {
+        public static GraphicsPath Poly_Rechteck(Rectangle rect)
+        {
             GraphicsPath tempPoly_Rechteck = null;
             tempPoly_Rechteck = new GraphicsPath();
             tempPoly_Rechteck.AddRectangle(rect);
@@ -320,20 +309,21 @@ namespace BlueBasics {
             return tempPoly_Rechteck;
         }
 
-        public static GraphicsPath Poly_Bruchlinie(Rectangle rect) {
+        public static GraphicsPath Poly_Bruchlinie(Rectangle rect)
+        {
             GraphicsPath p = null;
             p = new GraphicsPath();
             p.AddLine(rect.PointOf(enAlignment.Top_Left), rect.PointOf(enAlignment.Top_Right));
             p.AddLine(p.GetLastPoint(), rect.PointOf(enAlignment.Bottom_Right));
             p.AddLine(p.GetLastPoint(), rect.PointOf(enAlignment.Bottom_Left));
 
-
             var versX = rect.Width / 6;
             var versY = -rect.Height / 10;
 
             var pu = p.GetLastPoint();
 
-            for (var z = 0; z < 10; z++) {
+            for (var z = 0; z < 10; z++)
+            {
                 pu.Y += versY;
                 pu.X += versX;
                 versX *= -1;
@@ -343,21 +333,16 @@ namespace BlueBasics {
 
             p.CloseFigure();
             return p;
-
         }
 
-
-
-        public static GraphicsPath Poly_Arrow(Rectangle rect) {
+        public static GraphicsPath Poly_Arrow(Rectangle rect)
+        {
             var p = new GraphicsPath();
-
-
 
             /// --------+  >
             ///         | /
             ///         |/
-            ///        
-
+            ///
             var plusOben = new PointF((float)(rect.Left + rect.Width * 0.5), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y - rect.Height * 0.18));
             var plusUnten = new PointF((float)(rect.Left + rect.Width * 0.5), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y + rect.Height * 0.18));
 
@@ -368,65 +353,44 @@ namespace BlueBasics {
             p.AddLine(p.GetLastPoint(), plusOben);
             p.AddLine(p.GetLastPoint(), new PointF(plusOben.X, rect.Top));
 
-
             p.CloseFigure();
             return p;
-
-
-
-
         }
 
-
-
-
-        public static void AddRad(this GraphicsPath GP, PointF middle, PointF startP, float Wink) {
-
+        public static void AddRad(this GraphicsPath GP, PointF middle, PointF startP, float Wink)
+        {
             var radius = (float)Math.Abs(Geometry.Länge(middle, startP));
             var startw = (float)Geometry.Winkel(middle, startP);
 
-
             GP.AddArc(middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -Wink);
-
-
-
         }
-
-
 
         #endregion
 
+        #region  Variablen und String
 
-        #region  Variablen und String 
-
-
-        public static void Swap<T>(ref T W1, ref T W2) {
+        public static void Swap<T>(ref T W1, ref T W2)
+        {
             var W3 = W1;
             W1 = W2;
             W2 = W3;
         }
 
+        #region  Nummer
 
-
-
-        #region  Nummer 
-
-
-
-
-
-
-        public static string Nummer(this string Nr, int Stellen) {
-
-            var M = "";
-            if (Nr[0] == '-') {
+        public static string Nummer(this string Nr, int Stellen)
+        {
+            var M = string.Empty;
+            if (Nr[0] == '-')
+            {
                 M = "-";
                 Nr = Nr.Remove(0, 1);
             }
 
             var x = new StringBuilder();
 
-            for (var z = 1; z <= Stellen - Nr.Length; z++) {
+            for (var z = 1; z <= Stellen - Nr.Length; z++)
+            {
                 x.Append("0");
             }
 
@@ -461,7 +425,6 @@ namespace BlueBasics {
         //        T[1] = T[1].TrimEnd('0');
         //    }
 
-
         //    do
         //    {
         //        if (T[1].Length < NachKomma)
@@ -483,22 +446,18 @@ namespace BlueBasics {
 
         //}
 
-
+        #endregion
 
         #endregion
 
+        #region  Datum und Zeit
 
-        #endregion
-
-        #region  Datum und Zeit 
-
-
-        public static void Pause(double sekunden, bool doEvents) {
-
+        public static void Pause(double sekunden, bool doEvents)
+        {
             if (sekunden <= 0) { return; }
 
-
-            if (!doEvents) {
+            if (!doEvents)
+            {
                 Thread.Sleep((int)(sekunden * 1000));
                 return;
             }
@@ -506,58 +465,57 @@ namespace BlueBasics {
             TimeSpan AkTimer;
             var FirstTimer = DateTime.Now;
 
-            do {
+            do
+            {
                 Develop.DoEvents();
                 AkTimer = DateTime.Now.Subtract(FirstTimer);
             } while (!(AkTimer.TotalSeconds >= sekunden));
         }
 
-
         #endregion
 
-        public static void CollectGarbage() {
+        public static void CollectGarbage()
+        {
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
             GC.WaitForPendingFinalizers();
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
             GC.WaitForFullGCComplete();
-
         }
 
-        public static string UserName() {
+        public static string UserName()
+        {
             if (!string.IsNullOrEmpty(_GotUserName)) { return _GotUserName; }
             _GotUserName = WindowsIdentity.GetCurrent().Name;
             if (_GotUserName.Contains("\\")) { _GotUserName = _GotUserName.FileNameWithSuffix(); }
             return _GotUserName;
         }
 
-
-
-
-
-        public static string LastMouseButton() {
+        public static string LastMouseButton()
+        {
             const int VK_LBUTTON = 0x1;
             const int VK_RBUTTON = 0x2;
             const int VK_MBUTTON = 0x4;
 
-            if (Convert.ToBoolean(GetAsyncKeyState(VK_LBUTTON))) {
+            if (Convert.ToBoolean(GetAsyncKeyState(VK_LBUTTON)))
+            {
                 return "Links";
             }
 
-            if (Convert.ToBoolean(GetAsyncKeyState(VK_RBUTTON))) {
+            if (Convert.ToBoolean(GetAsyncKeyState(VK_RBUTTON)))
+            {
                 return "Rechts";
             }
 
-            if (Convert.ToBoolean(GetAsyncKeyState(VK_MBUTTON))) {
+            if (Convert.ToBoolean(GetAsyncKeyState(VK_MBUTTON)))
+            {
                 return "Mitte";
             }
 
             return string.Empty;
         }
 
-
-
-
-        public static string Download(string Url) {
+        public static string Download(string Url)
+        {
             //  My.Computer.Network.DownloadFile("http://.png", "C:\TMP\a.png")
 
             using var wc = new WebClient();
@@ -565,18 +523,20 @@ namespace BlueBasics {
             return wc.DownloadString(Url);
         }
 
-        public static bool CreateInternetLink(string SaveTo, string linkUrl) {
-
-
+        public static bool CreateInternetLink(string SaveTo, string linkUrl)
+        {
             var Title = "unbekannt";
 
             //string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            try {
+            try
+            {
                 var x = new WebClient();
                 var source = x.DownloadString(linkUrl);
                 Title = Regex.Match(source, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
                 Title = Title.RemoveChars(Constants.Char_DateiSonderZeichen);
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 //Title = "unbekannt";
                 //DebugPrint(enFehlerArt.Warnung, ex);
                 //return false;
@@ -584,25 +544,30 @@ namespace BlueBasics {
 
             Title = Title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + "!.,()+-_ " + Constants.Char_Numerals);
 
-            using (var writer = new StreamWriter(TempFile(SaveTo.TrimEnd("\\") + "\\" + Title + ".url"))) {
+            using (var writer = new StreamWriter(TempFile(SaveTo.TrimEnd("\\") + "\\" + Title + ".url")))
+            {
                 writer.WriteLine("[InternetShortcut]");
                 writer.WriteLine("URL=" + linkUrl);
                 writer.Flush();
             }
-            return true;
 
+            return true;
         }
 
-        public static string GetUrlFileDestination(string Filename) {
+        public static string GetUrlFileDestination(string Filename)
+        {
             var D = LoadFromDiskUTF8(Filename).SplitByCRToList();
             return D.TagGet("URL");
         }
 
-        public static bool CreateShortCut(string SaveTo, string linkName) {
-            try {
+        public static bool CreateShortCut(string SaveTo, string linkName)
+        {
+            try
+            {
                 //string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
-                using (var writer = new StreamWriter(TempFile(SaveTo + linkName + ".url"))) {
+                using (var writer = new StreamWriter(TempFile(SaveTo + linkName + ".url")))
+                {
                     var app = Assembly.GetExecutingAssembly().Location;
                     writer.WriteLine("[InternetShortcut]");
                     writer.WriteLine("URL=file:///" + app);
@@ -611,15 +576,18 @@ namespace BlueBasics {
                     writer.WriteLine("IconFile=" + icon);
                     writer.Flush();
                 }
+
                 return true;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Develop.DebugPrint(enFehlerArt.Warnung, ex);
                 return false;
             }
         }
 
-        public static Image DownloadImage(string Url) {
-
+        public static Image DownloadImage(string Url)
+        {
             WebResponse response = null;
             Stream remoteStream = null;
             StreamReader readStream = null;
@@ -635,41 +603,52 @@ namespace BlueBasics {
             return img;
         }
 
-
-        public static void launchBrowser(string url) {
+        public static void launchBrowser(string url)
+        {
             var browserName = "iexplore.exe";
             var adds = string.Empty;
-            using (var userChoiceKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice")) {
+            using (var userChoiceKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice"))
+            {
                 var progIdValue = userChoiceKey?.GetValue("Progid");
-                if (progIdValue != null) {
-                    if (progIdValue.ToString().ToLower().Contains("chrome")) {
+                if (progIdValue != null)
+                {
+                    if (progIdValue.ToString().ToLower().Contains("chrome"))
+                    {
                         browserName = "chrome.exe";
-                    } else if (progIdValue.ToString().ToLower().Contains("firefox")) {
+                    }
+                    else if (progIdValue.ToString().ToLower().Contains("firefox"))
+                    {
                         browserName = "firefox.exe";
                         //adds = "-private-window -url";
-                    } else if (progIdValue.ToString().ToLower().Contains("safari")) {
+                    }
+                    else if (progIdValue.ToString().ToLower().Contains("safari"))
+                    {
                         browserName = "safari.exe";
-                    } else if (progIdValue.ToString().ToLower().Contains("opera")) {
+                    }
+                    else if (progIdValue.ToString().ToLower().Contains("opera"))
+                    {
                         browserName = "opera.exe";
                     }
                 }
             }
+
             //browserName = "edge.exe";
 
             Process.Start(new ProcessStartInfo(browserName, adds + " " + url));
         }
 
-        public static int PointOnScreenNr(Point CP) {
-
-            for (var zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++) {
-                if (CP.X >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Left && CP.Y >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Top && CP.X < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Right && CP.Y < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Bottom) {
+        public static int PointOnScreenNr(Point CP)
+        {
+            for (var zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++)
+            {
+                if (CP.X >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Left && CP.Y >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Top && CP.X < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Right && CP.Y < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Bottom)
+                {
                     return zSC;
                 }
             }
 
             return 0;
         }
-
 
         //public static string ChecksumFileName(string name)
         //{
@@ -691,28 +670,24 @@ namespace BlueBasics {
         //    }
         //    nn = nn + name.Substring(name.Length - 20);
 
-
         //    return nn;
         //}
 
-
-
-
-
-
-        public static Stream GetEmmbedResource(Assembly assembly, string Name) {
+        public static Stream GetEmmbedResource(Assembly assembly, string Name)
+        {
             return (from ThisString in assembly.GetManifestResourceNames() where ThisString.EndsWith("." + Name) select assembly.GetManifestResourceStream(ThisString)).FirstOrDefault();
         }
 
-        public static BitmapExt GetEmmbedBitmap(Assembly assembly, string Name) {
-
+        public static BitmapExt GetEmmbedBitmap(Assembly assembly, string Name)
+        {
             if (Name.Contains("|")) { return null; }
             if (Name.Contains("[")) { return null; }
 
             using var d = GetEmmbedResource(assembly, Name);
             if (d == null) { return null; }
 
-            switch (Name.FileType()) {
+            switch (Name.FileType())
+            {
                 case enFileFormat.Image:
                     return new BitmapExt(new Bitmap(d));
 
@@ -725,8 +700,8 @@ namespace BlueBasics {
             }
         }
 
-
-        public static int LevenshteinDistance(string txt1, string txt2) {
+        public static int LevenshteinDistance(string txt1, string txt2)
+        {
             var l1 = txt1.Length;
             var l2 = txt2.Length;
             var d = new int[l1 + 2, l2 + 2];
@@ -734,23 +709,27 @@ namespace BlueBasics {
             if (l1 == 0) { return l2; }
             if (l2 == 0) { return l1; }
 
-
-
-            for (var i = 0; i <= l1; i++) {
+            for (var i = 0; i <= l1; i++)
+            {
                 d[i, 0] = i;
             }
 
-            for (var j = 0; j <= l2; j++) {
+            for (var j = 0; j <= l2; j++)
+            {
                 d[0, j] = j;
             }
 
-            for (var i = 1; i <= l1; i++) {
-                for (var j = 1; j <= l2; j++) {
-
+            for (var i = 1; i <= l1; i++)
+            {
+                for (var j = 1; j <= l2; j++)
+                {
                     var cost = 0;
-                    if (txt2[j - 1].ToString()[0] == txt1[i - 1]) {
+                    if (txt2[j - 1].ToString()[0] == txt1[i - 1])
+                    {
                         cost = 0;
-                    } else {
+                    }
+                    else
+                    {
                         cost = 1;
                     }
 
@@ -761,12 +740,12 @@ namespace BlueBasics {
             return d[l1, l2];
         }
 
-
-
-
-        public static void IntensifyBitmap(ref Bitmap BMP) {
-            for (var X = 0; X < BMP.Width; X++) {
-                for (var Y = 0; Y < BMP.Height; Y++) {
+        public static void IntensifyBitmap(ref Bitmap BMP)
+        {
+            for (var X = 0; X < BMP.Width; X++)
+            {
+                for (var Y = 0; Y < BMP.Height; Y++)
+                {
                     var c = BMP.GetPixel(X, Y);
                     if (c.A > 0.5 && BMP.GetPixel(X, Y).GetBrightness() < 0.9) { BMP.SetPixel(X, Y, Color.Black); }
                 }
@@ -778,7 +757,8 @@ namespace BlueBasics {
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static double Sigmoid(double x) {
+        public static double Sigmoid(double x)
+        {
             return 1 / (1 + Math.Exp(-x));
         }
 
@@ -787,51 +767,54 @@ namespace BlueBasics {
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static float TangensHyperbolicus(double x) {
-
+        public static float TangensHyperbolicus(double x)
+        {
             if (x > 20) { return 1; }
 
             var et = (float)Math.Pow(Math.E, x);
             return et / (1 + et) * 2 - 1;
         }
 
-
-        public static byte[] SimpleCrypt(byte[] b, string Pass, int Direction, int Start, int End) {
+        public static byte[] SimpleCrypt(byte[] b, string Pass, int Direction, int Start, int End)
+        {
             if (string.IsNullOrEmpty(Pass)) { return b; }
             if (End <= Start) { return b; }
 
-            for (var z = Start; z <= End; z++) {
+            for (var z = Start; z <= End; z++)
+            {
                 var TMP = b[z] + Pass[z % Pass.Length] * Direction;
                 if (TMP < 0) { TMP += 256; }
                 if (TMP > 255) { TMP -= 256; }
                 b[z] = (byte)TMP;
             }
+
             return b;
         }
 
-
-        public static byte[] SimpleCrypt(byte[] b, string Pass, int Direction) {
+        public static byte[] SimpleCrypt(byte[] b, string Pass, int Direction)
+        {
             return SimpleCrypt(b, Pass, Direction, 0, b.GetUpperBound(0));
         }
 
-
-        public static List<byte> SimpleCrypt(List<byte> b, string Pass, int Direction, int Start, int End) {
+        public static List<byte> SimpleCrypt(List<byte> b, string Pass, int Direction, int Start, int End)
+        {
             if (string.IsNullOrEmpty(Pass)) { return b; }
             if (End <= Start) { return b; }
 
-            for (var z = Start; z <= End; z++) {
+            for (var z = Start; z <= End; z++)
+            {
                 var TMP = b[z] + Pass[z % Pass.Length] * Direction;
                 if (TMP < 0) { TMP += 256; }
                 if (TMP > 255) { TMP -= 256; }
                 b[z] = (byte)TMP;
             }
+
             return b;
         }
 
-
-        public static List<byte> SimpleCrypt(List<byte> b, string Pass, int Direction) {
+        public static List<byte> SimpleCrypt(List<byte> b, string Pass, int Direction)
+        {
             return SimpleCrypt(b, Pass, Direction, 0, b.Count - 1);
         }
-
     }
 }

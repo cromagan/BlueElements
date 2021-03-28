@@ -1,20 +1,20 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2020 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
 #endregion
 
 using BlueBasics.Enums;
@@ -26,11 +26,10 @@ using System.Security.Cryptography;
 using System.Text;
 using static BlueBasics.modAllgemein;
 
-namespace BlueBasics {
-
-    public static class FileOperations {
-
-
+namespace BlueBasics
+{
+    public static class FileOperations
+    {
         private delegate bool DoThis(string file1, string file2);
 
         //private static string LastCheck = string.Empty;
@@ -39,14 +38,16 @@ namespace BlueBasics {
         private static readonly List<string> WriteAccess = new();
         private static readonly List<string> NoWriteAccess = new();
 
-
-        private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure) {
+        private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure)
+        {
             var tries = 0;
             var startTime = DateTime.Now;
 
-            while (!processMethod(file1, file2)) {
+            while (!processMethod(file1, file2))
+            {
                 tries++;
-                if (tries > 5) {
+                if (tries > 5)
+                {
                     if (!toBeSure) { return false; }
                     if (DateTime.Now.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(enFehlerArt.Fehler, "Befehl konnte nicht ausgeführt werden, " + file1 + " " + file2); }
                 }
@@ -55,27 +56,31 @@ namespace BlueBasics {
             return true;
         }
 
-
-        private static bool TryDeleteDir(string Pfad, string WillBeIgnored) {
+        private static bool TryDeleteDir(string Pfad, string WillBeIgnored)
+        {
             Pfad = Pfad.CheckPath();
             if (!PathExists(Pfad)) { return true; }
 
-            try {
+            try
+            {
                 Directory.Delete(Pfad, true);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
             }
 
             return !PathExists(Pfad);
         }
 
-
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns>True, wenn mindestens eine Datei gelöscht wurde.</returns>
-        public static bool DeleteFile(List<string> filelist) {
-            for (var Z = 0; Z < filelist.Count; Z++) {
+        public static bool DeleteFile(List<string> filelist)
+        {
+            for (var Z = 0; Z < filelist.Count; Z++)
+            {
                 if (!FileExists(filelist[Z])) { filelist[Z] = string.Empty; }
             }
 
@@ -84,47 +89,57 @@ namespace BlueBasics {
             if (filelist.Count == 0) { return false; }
 
             var del = false;
-            foreach (var ThisFile in filelist) {
+            foreach (var ThisFile in filelist)
+            {
                 if (DeleteFile(ThisFile, false)) { del = true; }
             }
 
             return del;
         }
 
-
-        public static bool DeleteFile(string file, bool toBeSure) {
+        public static bool DeleteFile(string file, bool toBeSure)
+        {
             if (!FileExists(file)) { return true; }
             return ProcessFile(TryDeleteFile, file, file, toBeSure);
         }
-        public static bool RenameFile(string oldName, string newName, bool toBeSure) {
+
+        public static bool RenameFile(string oldName, string newName, bool toBeSure)
+        {
             return ProcessFile(TryRenameFile, oldName, newName, toBeSure);
         }
-        public static bool CopyFile(string source, string target, bool toBeSure) {
+
+        public static bool CopyFile(string source, string target, bool toBeSure)
+        {
             return ProcessFile(TryCopyFile, source, target, toBeSure);
         }
 
-        public static bool DeleteDir(string directory, bool toBeSure) {
+        public static bool DeleteDir(string directory, bool toBeSure)
+        {
             return ProcessFile(TryDeleteDir, directory, directory, toBeSure);
         }
 
-
-
-        private static bool TryDeleteFile(string ThisFile, string WillbeIgnored) {
+        private static bool TryDeleteFile(string ThisFile, string WillbeIgnored)
+        {
             // Komisch, manche Dateien können zwar gelöscht werden, die Attribute aber nicht geändert (Berechtigungen?)
-            try {
-
-                if (File.GetAttributes(ThisFile).HasFlag(FileAttributes.ReadOnly)) {
+            try
+            {
+                if (File.GetAttributes(ThisFile).HasFlag(FileAttributes.ReadOnly))
+                {
                     File.SetAttributes(ThisFile, FileAttributes.Normal);
                 }
-
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
             }
 
-            try {
+            try
+            {
                 CanWrite(ThisFile, 0.5);
                 File.Delete(ThisFile);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
@@ -132,17 +147,18 @@ namespace BlueBasics {
             return !FileExists(ThisFile);
         }
 
-
-
-        private static bool TryRenameFile(string oldName, string newName) {
+        private static bool TryRenameFile(string oldName, string newName)
+        {
             if (oldName == newName) { return true; }
             if (!FileExists(oldName)) { return false; }
             if (FileExists(newName)) { return false; }
 
-
-            try {
+            try
+            {
                 File.Move(oldName, newName);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
@@ -150,14 +166,18 @@ namespace BlueBasics {
             return true; // FileExists(newName) && !FileExists(oldName);
         }
 
-        private static bool TryCopyFile(string source, string target) {
+        private static bool TryCopyFile(string source, string target)
+        {
             if (source == target) { return true; }
             if (!FileExists(source)) { return false; }
             if (FileExists(target)) { return false; }
 
-            try {
+            try
+            {
                 File.Copy(source, target);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
@@ -165,8 +185,8 @@ namespace BlueBasics {
             return true; // FileExists(target);
         }
 
-
-        public static bool FileExists(string file) {
+        public static bool FileExists(string file)
+        {
             if (file == null) { return false; }
             if (string.IsNullOrEmpty(file)) { return false; }
             if (file.ContainsChars(Constants.Char_PfadSonderZeichen)) { return false; }
@@ -207,51 +227,47 @@ namespace BlueBasics {
         //    return Allow && !Deny;
         //}
 
-
-        public static bool CanWriteInDirectory(string directory) {
-
-
-
+        public static bool CanWriteInDirectory(string directory)
+        {
             if (string.IsNullOrEmpty(directory)) { return false; }
             var DirUpper = directory.ToUpper();
 
             if (WriteAccess.Contains(DirUpper)) { return true; }
             if (NoWriteAccess.Contains(DirUpper)) { return false; }
 
-
-
-
-            try {
+            try
+            {
                 using (var fs = File.Create(Path.Combine(directory, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
                 WriteAccess.AddIfNotExists(DirUpper); // Multitasking
                 return true;
-            } catch {
+            }
+            catch
+            {
                 NoWriteAccess.AddIfNotExists(DirUpper); // Multitasking
                 return false;
             }
-
-
         }
-
 
         private static DateTime _canWrite_LastCheck = DateTime.Now.Subtract(new TimeSpan(10, 10, 10));
         private static bool _canWrite_LastResult;
         private static string _canWrite_LastFile = string.Empty;
         public static int _canWrite_tryintervall = 10;
-        public static bool CanWrite(string filename, double tryItForSeconds) {
+        public static bool CanWrite(string filename, double tryItForSeconds)
+        {
             if (!CanWriteInDirectory(filename.FilePath())) { return false; }
 
             var s = DateTime.Now;
-            do {
+            while (true)
+            {
                 if (CanWrite(filename)) { return true; }
                 if (tryItForSeconds < _canWrite_tryintervall) { return false; }
 
                 if (DateTime.Now.Subtract(s).TotalSeconds > tryItForSeconds) { return false; }
-            } while (true);
+            }
         }
 
-
-        private static bool CanWrite(string file) {
+        private static bool CanWrite(string file)
+        {
             //Private lassen, das andere CanWrite greift auf diese zu.
             //Aber das andere prüft zusätzlich die Schreibrechte im Verzeichnis
             //http://www.vbarchiv.net/tipps/tipp_1281.html
@@ -259,23 +275,24 @@ namespace BlueBasics {
             if (_canWrite_LastResult) { _canWrite_LastFile = string.Empty; }
             if (DateTime.Now.Subtract(_canWrite_LastCheck).TotalSeconds > _canWrite_tryintervall) { _canWrite_LastFile = string.Empty; }
 
-
-
-
-            if (_canWrite_LastFile != file.ToUpper()) {
-
+            if (_canWrite_LastFile != file.ToUpper())
+            {
                 var StartTime = DateTime.Now;
 
-                if (FileExists(file)) {
-                    try {
+                if (FileExists(file))
+                {
+                    try
+                    {
                         // Versuch, Datei EXKLUSIV zu öffnen
-                        using (var obFi = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                        using (var obFi = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        {
                             obFi.Close();
                         }
 
                         _canWrite_LastResult = Convert.ToBoolean(DateTime.Now.Subtract(StartTime).TotalSeconds < 1);
-
-                    } catch {
+                    }
+                    catch
+                    {
                         // Bei Fehler ist die Datei in Benutzung
                         _canWrite_LastResult = false;
                     }
@@ -289,31 +306,34 @@ namespace BlueBasics {
             return _canWrite_LastResult;
         }
 
-        public static bool PathExists(string Pfad) {
+        public static bool PathExists(string Pfad)
+        {
             if (Pfad.Length < 3) { return false; }
             return Directory.Exists(Pfad.CheckPath());
         }
 
-
-        public static string TempFile(string NewPath, string Filename) {
+        public static string TempFile(string NewPath, string Filename)
+        {
             var dn = Filename.FileNameWithoutSuffix();
             var ds = Filename.FileSuffix();
             return TempFile(NewPath, dn, ds);
         }
 
-        public static string TempFile(string FullName) {
+        public static string TempFile(string FullName)
+        {
             var dp = FullName.FilePath();
             var dn = FullName.FileNameWithoutSuffix();
             var ds = FullName.FileSuffix();
             return TempFile(dp, dn, ds);
         }
 
-
-        public static string TempFile() {
-            return TempFile("", "", "");
+        public static string TempFile()
+        {
+            return TempFile(string.Empty, string.Empty, string.Empty);
         }
 
-        public static string TempFile(string Pfad, string Wunschname, string Suffix) {
+        public static string TempFile(string Pfad, string Wunschname, string Suffix)
+        {
             if (string.IsNullOrEmpty(Pfad)) { Pfad = Path.GetTempPath(); }
             if (string.IsNullOrEmpty(Suffix)) { Suffix = "tmp"; }
             if (string.IsNullOrEmpty(Wunschname)) { Wunschname = UserName() + DateTime.Now.ToString(Constants.Format_Date6); }
@@ -327,11 +347,15 @@ namespace BlueBasics {
 
             string filename;
 
-            do {
+            do
+            {
                 z++;
-                if (z > 0) {
+                if (z > 0)
+                {
                     filename = Pfad + Wunschname + "_" + z.ToString(Constants.Format_Integer5) + "." + Suffix;
-                } else {
+                }
+                else
+                {
                     filename = Pfad + Wunschname + "." + Suffix;
                 }
             } while (FileExists(filename));
@@ -339,75 +363,77 @@ namespace BlueBasics {
             return filename;
         }
 
-
-        public static string CalculateMD5(string filename) {
-
+        public static string CalculateMD5(string filename)
+        {
             if (!FileExists(filename)) { return string.Empty; }
 
             using var md5 = MD5.Create();
             using var stream = File.OpenRead(filename);
             var hash = md5.ComputeHash(stream);
-            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+            return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
         }
 
-
-
-        public static bool ExecuteFile(string FileName, string Arguments = null, bool WaitForExit = false, bool LogException = true) {
-            try {
+        public static bool ExecuteFile(string FileName, string Arguments = null, bool WaitForExit = false, bool LogException = true)
+        {
+            try
+            {
                 if (string.IsNullOrEmpty(FileName) && string.IsNullOrEmpty(Arguments)) { return false; }
 
                 Process Processx = null;
 
-                if (Arguments == null) {
+                if (Arguments == null)
+                {
                     Processx = Process.Start(FileName);
-                } else {
+                }
+                else
+                {
                     Processx = Process.Start(FileName, Arguments);
                 }
 
-                if (WaitForExit) {
+                if (WaitForExit)
+                {
                     if (Processx == null) { return true; }// Windows 8, DANKE!
 
                     Processx.WaitForExit();
                     Processx.Dispose();
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 if (LogException) { Develop.DebugPrint("ExecuteFile konnte nicht ausgeführt werden:<br>" + ex.Message + "<br>Datei: " + FileName); }
                 return false;
             }
 
-
             return true;
         }
 
-
-
-
-        public static string ChecksumFileName(string name) {
-
+        public static string ChecksumFileName(string name)
+        {
             name = name.Replace("\\", "}");
             name = name.Replace("/", "}");
             name = name.Replace(":", "}");
             name = name.Replace("?", "}");
 
-            name = name.Replace("\r", "");
+            name = name.Replace("\r", string.Empty);
 
             if (name.Length < 100) { return name; }
 
-            var nn = "";
+            var nn = string.Empty;
 
-            for (var z = 0; z <= name.Length - 21; z++) {
+            for (var z = 0; z <= name.Length - 21; z++)
+            {
                 nn += name.Substring(z, 1);
             }
-            nn += name.Substring(name.Length - 20);
 
+            nn += name.Substring(name.Length - 20);
 
             return nn;
         }
 
-
-        public static void SaveToDisk(string DateiName, string Text2Save, bool ExecuteAfter, System.Text.Encoding code) {
-
-            try {
+        public static void SaveToDisk(string DateiName, string Text2Save, bool ExecuteAfter, System.Text.Encoding code)
+        {
+            try
+            {
                 //switch (DateiName.FileType()) {
                 //    case enFileFormat.HTML:
                 //    case enFileFormat.XMLFile:
@@ -424,16 +450,14 @@ namespace BlueBasics {
                 //}
                 File.WriteAllText(DateiName, Text2Save, code);
                 if (ExecuteAfter) { ExecuteFile(DateiName); }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Develop.DebugPrint(ex);
             }
-
-
-
         }
 
         //public static string LoadFromDisk(string DateiName) {
-
 
         //    switch (DateiName.FileSuffix()) {
         //        case "XML":
@@ -442,32 +466,32 @@ namespace BlueBasics {
         //            return File.ReadAllText(DateiName, Encoding.Defxault);
         //    }
 
-
         //}
 
-
-        public static string LoadFromDiskUTF8(string DateiName) {
+        public static string LoadFromDiskUTF8(string DateiName)
+        {
             return File.ReadAllText(DateiName, Encoding.UTF8);
         }
 
-        public static string LoadFromDiskWIN1252(string DateiName) {
+        public static string LoadFromDiskWIN1252(string DateiName)
+        {
             return File.ReadAllText(DateiName, Encoding.GetEncoding(1252));
         }
 
-
-        public static string GetFileInfo(string filename, bool mustDo) {
-            try {
+        public static string GetFileInfo(string filename, bool mustDo)
+        {
+            try
+            {
                 var f = new FileInfo(filename);
                 return f.LastWriteTimeUtc.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
-            } catch {
+            }
+            catch
+            {
                 if (!mustDo) { return string.Empty; }
                 Develop.CheckStackForOverflow();
                 Pause(0.5, false);
                 return GetFileInfo(filename, mustDo);
             }
         }
-
-
-
     }
 }
